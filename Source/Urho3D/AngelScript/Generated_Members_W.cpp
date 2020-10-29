@@ -15,25 +15,6 @@ namespace Urho3D
 void FakeAddRef(void* ptr);
 void FakeReleaseRef(void* ptr);
 
-// WindowModeParams::~WindowModeParams() | Implicitly-declared 
-static void WindowModeParams_Destructor(WindowModeParams* ptr)
-{
-    ptr->~WindowModeParams();
-}
-
-// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void WorkQueue_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(WorkQueue* ptr, CScriptArray* exceptions, bool onlyUserData)
-{
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
-}
-
-// explicit WorkQueue::WorkQueue(Context* context) | File: ../Core/WorkQueue.h
-static WorkQueue* WorkQueue_WorkQueue_Context()
-{
-    return new WorkQueue(GetScriptContext());
-}
-
 // const Vector<SharedPtr<UIElement>>& UIElement::GetChildren() const | File: ../UI/UIElement.h
 static CScriptArray* Window_GetChildren_void(Window* ptr)
 {
@@ -75,158 +56,27 @@ static Window* Window_Window_Context()
     return new Window(GetScriptContext());
 }
 
+// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+static void WorkQueue_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(WorkQueue* ptr, CScriptArray* exceptions, bool onlyUserData)
+{
+    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+}
+
+// explicit WorkQueue::WorkQueue(Context* context) | File: ../Core/WorkQueue.h
+static WorkQueue* WorkQueue_WorkQueue_Context()
+{
+    return new WorkQueue(GetScriptContext());
+}
+
+// WindowModeParams::~WindowModeParams() | Implicitly-declared 
+static void WindowModeParams_Destructor(WindowModeParams* ptr)
+{
+    ptr->~WindowModeParams();
+}
+
 void ASRegisterGenerated_Members_W(asIScriptEngine* engine)
 {
-    // int WindowModeParams::height_ | File: ../Graphics/Graphics.h
-    engine->RegisterObjectProperty("WindowModeParams", "int height", offsetof(WindowModeParams, height_));
-    // ScreenModeParams WindowModeParams::screenParams_ | File: ../Graphics/Graphics.h
-    engine->RegisterObjectProperty("WindowModeParams", "ScreenModeParams screenParams", offsetof(WindowModeParams, screenParams_));
-    // int WindowModeParams::width_ | File: ../Graphics/Graphics.h
-    engine->RegisterObjectProperty("WindowModeParams", "int width", offsetof(WindowModeParams, width_));
-    // WindowModeParams::~WindowModeParams() | Implicitly-declared
-    engine->RegisterObjectBehaviour("WindowModeParams", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(WindowModeParams_Destructor), asCALL_CDECL_OBJFIRST);
-    // WindowModeParams& WindowModeParams::operator=(const WindowModeParams&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<WindowModeParams>(engine, "WindowModeParams");
-#ifdef REGISTER_MANUAL_PART_WindowModeParams
-    REGISTER_MANUAL_PART_WindowModeParams(WindowModeParams, "WindowModeParams")
-#endif
-
-    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("WorkQueue", asBEHAVE_ADDREF, "void f()", asMETHODPR(WorkQueue, AddRef, (), void), asCALL_THISCALL);
-    // void WorkQueue::AddWorkItem(const SharedPtr<WorkItem>& item) | File: ../Core/WorkQueue.h
-    // Error: type "const SharedPtr<WorkItem>&" can not automatically bind
-    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
-    // Not registered because template
-    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
-    // Not registered because template
-    // void WorkQueue::Complete(unsigned priority) | File: ../Core/WorkQueue.h
-    engine->RegisterObjectMethod("WorkQueue", "void Complete(uint)", asMETHODPR(WorkQueue, Complete, (unsigned), void), asCALL_THISCALL);
-    // void WorkQueue::CreateThreads(unsigned numThreads) | File: ../Core/WorkQueue.h
-    engine->RegisterObjectMethod("WorkQueue", "void CreateThreads(uint)", asMETHODPR(WorkQueue, CreateThreads, (unsigned), void), asCALL_THISCALL);
-    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("WorkQueue", "bool GetBlockEvents() const", asMETHODPR(WorkQueue, GetBlockEvents, () const, bool), asCALL_THISCALL);
-    // const String& Object::GetCategory() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("WorkQueue", "const String& GetCategory() const", asMETHODPR(WorkQueue, GetCategory, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("WorkQueue", "const String& get_category() const", asMETHODPR(WorkQueue, GetCategory, () const, const String&), asCALL_THISCALL);
-    // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
-    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("WorkQueue", "VariantMap& GetEventDataMap() const", asMETHODPR(WorkQueue, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
-    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // Object* Object::GetEventSender() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("WorkQueue", "Object@+ GetEventSender() const", asMETHODPR(WorkQueue, GetEventSender, () const, Object*), asCALL_THISCALL);
-    // SharedPtr<WorkItem> WorkQueue::GetFreeItem() | File: ../Core/WorkQueue.h
-    // TODO
-    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("WorkQueue", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(WorkQueue, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("WorkQueue", "const Variant& get_globalVar(StringHash) const", asMETHODPR(WorkQueue, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("WorkQueue", "const VariantMap& GetGlobalVars() const", asMETHODPR(WorkQueue, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("WorkQueue", "const VariantMap& get_globalVars() const", asMETHODPR(WorkQueue, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    // int WorkQueue::GetNonThreadedWorkMs() const | File: ../Core/WorkQueue.h
-    engine->RegisterObjectMethod("WorkQueue", "int GetNonThreadedWorkMs() const", asMETHODPR(WorkQueue, GetNonThreadedWorkMs, () const, int), asCALL_THISCALL);
-    // unsigned WorkQueue::GetNumThreads() const | File: ../Core/WorkQueue.h
-    engine->RegisterObjectMethod("WorkQueue", "uint GetNumThreads() const", asMETHODPR(WorkQueue, GetNumThreads, () const, unsigned), asCALL_THISCALL);
-    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("WorkQueue", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(WorkQueue, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
-    // Not registered because template
-    // int WorkQueue::GetTolerance() const | File: ../Core/WorkQueue.h
-    engine->RegisterObjectMethod("WorkQueue", "int GetTolerance() const", asMETHODPR(WorkQueue, GetTolerance, () const, int), asCALL_THISCALL);
-    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("WorkQueue", "StringHash GetType() const", asMETHODPR(WorkQueue, GetType, () const, StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod("WorkQueue", "StringHash get_type() const", asMETHODPR(WorkQueue, GetType, () const, StringHash), asCALL_THISCALL);
-    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("WorkQueue", "const String& GetTypeName() const", asMETHODPR(WorkQueue, GetTypeName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("WorkQueue", "const String& get_typeName() const", asMETHODPR(WorkQueue, GetTypeName, () const, const String&), asCALL_THISCALL);
-    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("WorkQueue", "bool HasEventHandlers() const", asMETHODPR(WorkQueue, HasEventHandlers, () const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("WorkQueue", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(WorkQueue, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("WorkQueue", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(WorkQueue, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
-    // bool WorkQueue::IsCompleted(unsigned priority) const | File: ../Core/WorkQueue.h
-    engine->RegisterObjectMethod("WorkQueue", "bool IsCompleted(uint) const", asMETHODPR(WorkQueue, IsCompleted, (unsigned) const, bool), asCALL_THISCALL);
-    // bool WorkQueue::IsCompleting() const | File: ../Core/WorkQueue.h
-    engine->RegisterObjectMethod("WorkQueue", "bool IsCompleting() const", asMETHODPR(WorkQueue, IsCompleting, () const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("WorkQueue", "bool IsInstanceOf(StringHash) const", asMETHODPR(WorkQueue, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
-    // Not registered because template
-    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("WorkQueue", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(WorkQueue, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
-    // void WorkQueue::Pause() | File: ../Core/WorkQueue.h
-    engine->RegisterObjectMethod("WorkQueue", "void Pause()", asMETHODPR(WorkQueue, Pause, (), void), asCALL_THISCALL);
-    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
-    // Error: type "RefCount*" can not automatically bind
-    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("WorkQueue", "int Refs() const", asMETHODPR(WorkQueue, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("WorkQueue", "int get_refs() const", asMETHODPR(WorkQueue, Refs, () const, int), asCALL_THISCALL);
-    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("WorkQueue", asBEHAVE_RELEASE, "void f()", asMETHODPR(WorkQueue, ReleaseRef, (), void), asCALL_THISCALL);
-    // bool WorkQueue::RemoveWorkItem(SharedPtr<WorkItem> item) | File: ../Core/WorkQueue.h
-    // Error: type "SharedPtr<WorkItem>" can not automatically bind
-    // unsigned WorkQueue::RemoveWorkItems(const Vector<SharedPtr<WorkItem>>& items) | File: ../Core/WorkQueue.h
-    // TODO
-    // void WorkQueue::Resume() | File: ../Core/WorkQueue.h
-    engine->RegisterObjectMethod("WorkQueue", "void Resume()", asMETHODPR(WorkQueue, Resume, (), void), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("WorkQueue", "void SendEvent(StringHash)", asMETHODPR(WorkQueue, SendEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("WorkQueue", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(WorkQueue, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
-    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
-    // Not registered because template
-    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("WorkQueue", "void SetBlockEvents(bool)", asMETHODPR(WorkQueue, SetBlockEvents, (bool), void), asCALL_THISCALL);
-    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("WorkQueue", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(WorkQueue, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("WorkQueue", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(WorkQueue, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    // void WorkQueue::SetNonThreadedWorkMs(int ms) | File: ../Core/WorkQueue.h
-    engine->RegisterObjectMethod("WorkQueue", "void SetNonThreadedWorkMs(int)", asMETHODPR(WorkQueue, SetNonThreadedWorkMs, (int), void), asCALL_THISCALL);
-    // void WorkQueue::SetTolerance(int tolerance) | File: ../Core/WorkQueue.h
-    engine->RegisterObjectMethod("WorkQueue", "void SetTolerance(int)", asMETHODPR(WorkQueue, SetTolerance, (int), void), asCALL_THISCALL);
-    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
-    engine->RegisterObjectMethod("WorkQueue", "void UnsubscribeFromAllEvents()", asMETHODPR(WorkQueue, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("WorkQueue", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(WorkQueue_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
-    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("WorkQueue", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(WorkQueue, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("WorkQueue", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(WorkQueue, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("WorkQueue", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(WorkQueue, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
-    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("WorkQueue", "int WeakRefs() const", asMETHODPR(WorkQueue, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("WorkQueue", "int get_weakRefs() const", asMETHODPR(WorkQueue, WeakRefs, () const, int), asCALL_THISCALL);
-    // explicit WorkQueue::WorkQueue(Context* context) | File: ../Core/WorkQueue.h
-    engine->RegisterObjectBehaviour("WorkQueue", asBEHAVE_FACTORY, "WorkQueue@+ f()", asFUNCTION(WorkQueue_WorkQueue_Context), asCALL_CDECL);
-#ifdef REGISTER_MANUAL_PART_Object
-    REGISTER_MANUAL_PART_Object(WorkQueue, "WorkQueue")
-#endif
-#ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(WorkQueue, "WorkQueue")
-#endif
-#ifdef REGISTER_MANUAL_PART_WorkQueue
-    REGISTER_MANUAL_PART_WorkQueue(WorkQueue, "WorkQueue")
-#endif
-    RegisterSubclass<Object, WorkQueue>(engine, "Object", "WorkQueue");
-    RegisterSubclass<RefCounted, WorkQueue>(engine, "RefCounted", "WorkQueue");
-
     // void UIElement::AddChild(UIElement* element) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("Window", "void AddChild(UIElement@+)", asMETHODPR(Window, AddChild, (UIElement*), void), asCALL_THISCALL);
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
@@ -1122,6 +972,156 @@ void ASRegisterGenerated_Members_W(asIScriptEngine* engine)
     RegisterSubclass<Serializable, Window>(engine, "Serializable", "Window");
     RegisterSubclass<Object, Window>(engine, "Object", "Window");
     RegisterSubclass<RefCounted, Window>(engine, "RefCounted", "Window");
+
+    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("WorkQueue", asBEHAVE_ADDREF, "void f()", asMETHODPR(WorkQueue, AddRef, (), void), asCALL_THISCALL);
+    // void WorkQueue::AddWorkItem(const SharedPtr<WorkItem>& item) | File: ../Core/WorkQueue.h
+    // Error: type "const SharedPtr<WorkItem>&" can not automatically bind
+    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
+    // Not registered because template
+    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
+    // Not registered because template
+    // void WorkQueue::Complete(unsigned priority) | File: ../Core/WorkQueue.h
+    engine->RegisterObjectMethod("WorkQueue", "void Complete(uint)", asMETHODPR(WorkQueue, Complete, (unsigned), void), asCALL_THISCALL);
+    // void WorkQueue::CreateThreads(unsigned numThreads) | File: ../Core/WorkQueue.h
+    engine->RegisterObjectMethod("WorkQueue", "void CreateThreads(uint)", asMETHODPR(WorkQueue, CreateThreads, (unsigned), void), asCALL_THISCALL);
+    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("WorkQueue", "bool GetBlockEvents() const", asMETHODPR(WorkQueue, GetBlockEvents, () const, bool), asCALL_THISCALL);
+    // const String& Object::GetCategory() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("WorkQueue", "const String& GetCategory() const", asMETHODPR(WorkQueue, GetCategory, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("WorkQueue", "const String& get_category() const", asMETHODPR(WorkQueue, GetCategory, () const, const String&), asCALL_THISCALL);
+    // Context* Object::GetContext() const | File: ../Core/Object.h
+    // Error: type "Context*" can not be returned
+    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("WorkQueue", "VariantMap& GetEventDataMap() const", asMETHODPR(WorkQueue, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
+    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // Object* Object::GetEventSender() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("WorkQueue", "Object@+ GetEventSender() const", asMETHODPR(WorkQueue, GetEventSender, () const, Object*), asCALL_THISCALL);
+    // SharedPtr<WorkItem> WorkQueue::GetFreeItem() | File: ../Core/WorkQueue.h
+    // TODO
+    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("WorkQueue", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(WorkQueue, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("WorkQueue", "const Variant& get_globalVar(StringHash) const", asMETHODPR(WorkQueue, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("WorkQueue", "const VariantMap& GetGlobalVars() const", asMETHODPR(WorkQueue, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("WorkQueue", "const VariantMap& get_globalVars() const", asMETHODPR(WorkQueue, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    // int WorkQueue::GetNonThreadedWorkMs() const | File: ../Core/WorkQueue.h
+    engine->RegisterObjectMethod("WorkQueue", "int GetNonThreadedWorkMs() const", asMETHODPR(WorkQueue, GetNonThreadedWorkMs, () const, int), asCALL_THISCALL);
+    // unsigned WorkQueue::GetNumThreads() const | File: ../Core/WorkQueue.h
+    engine->RegisterObjectMethod("WorkQueue", "uint GetNumThreads() const", asMETHODPR(WorkQueue, GetNumThreads, () const, unsigned), asCALL_THISCALL);
+    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("WorkQueue", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(WorkQueue, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
+    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // Not registered because template
+    // int WorkQueue::GetTolerance() const | File: ../Core/WorkQueue.h
+    engine->RegisterObjectMethod("WorkQueue", "int GetTolerance() const", asMETHODPR(WorkQueue, GetTolerance, () const, int), asCALL_THISCALL);
+    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("WorkQueue", "StringHash GetType() const", asMETHODPR(WorkQueue, GetType, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("WorkQueue", "StringHash get_type() const", asMETHODPR(WorkQueue, GetType, () const, StringHash), asCALL_THISCALL);
+    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("WorkQueue", "const String& GetTypeName() const", asMETHODPR(WorkQueue, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("WorkQueue", "const String& get_typeName() const", asMETHODPR(WorkQueue, GetTypeName, () const, const String&), asCALL_THISCALL);
+    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("WorkQueue", "bool HasEventHandlers() const", asMETHODPR(WorkQueue, HasEventHandlers, () const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("WorkQueue", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(WorkQueue, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("WorkQueue", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(WorkQueue, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
+    // bool WorkQueue::IsCompleted(unsigned priority) const | File: ../Core/WorkQueue.h
+    engine->RegisterObjectMethod("WorkQueue", "bool IsCompleted(uint) const", asMETHODPR(WorkQueue, IsCompleted, (unsigned) const, bool), asCALL_THISCALL);
+    // bool WorkQueue::IsCompleting() const | File: ../Core/WorkQueue.h
+    engine->RegisterObjectMethod("WorkQueue", "bool IsCompleting() const", asMETHODPR(WorkQueue, IsCompleting, () const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("WorkQueue", "bool IsInstanceOf(StringHash) const", asMETHODPR(WorkQueue, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
+    // Not registered because template
+    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("WorkQueue", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(WorkQueue, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
+    // void WorkQueue::Pause() | File: ../Core/WorkQueue.h
+    engine->RegisterObjectMethod("WorkQueue", "void Pause()", asMETHODPR(WorkQueue, Pause, (), void), asCALL_THISCALL);
+    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
+    // Error: type "RefCount*" can not automatically bind
+    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("WorkQueue", "int Refs() const", asMETHODPR(WorkQueue, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("WorkQueue", "int get_refs() const", asMETHODPR(WorkQueue, Refs, () const, int), asCALL_THISCALL);
+    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("WorkQueue", asBEHAVE_RELEASE, "void f()", asMETHODPR(WorkQueue, ReleaseRef, (), void), asCALL_THISCALL);
+    // bool WorkQueue::RemoveWorkItem(SharedPtr<WorkItem> item) | File: ../Core/WorkQueue.h
+    // Error: type "SharedPtr<WorkItem>" can not automatically bind
+    // unsigned WorkQueue::RemoveWorkItems(const Vector<SharedPtr<WorkItem>>& items) | File: ../Core/WorkQueue.h
+    // TODO
+    // void WorkQueue::Resume() | File: ../Core/WorkQueue.h
+    engine->RegisterObjectMethod("WorkQueue", "void Resume()", asMETHODPR(WorkQueue, Resume, (), void), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("WorkQueue", "void SendEvent(StringHash)", asMETHODPR(WorkQueue, SendEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("WorkQueue", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(WorkQueue, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
+    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
+    // Not registered because template
+    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("WorkQueue", "void SetBlockEvents(bool)", asMETHODPR(WorkQueue, SetBlockEvents, (bool), void), asCALL_THISCALL);
+    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("WorkQueue", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(WorkQueue, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("WorkQueue", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(WorkQueue, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    // void WorkQueue::SetNonThreadedWorkMs(int ms) | File: ../Core/WorkQueue.h
+    engine->RegisterObjectMethod("WorkQueue", "void SetNonThreadedWorkMs(int)", asMETHODPR(WorkQueue, SetNonThreadedWorkMs, (int), void), asCALL_THISCALL);
+    // void WorkQueue::SetTolerance(int tolerance) | File: ../Core/WorkQueue.h
+    engine->RegisterObjectMethod("WorkQueue", "void SetTolerance(int)", asMETHODPR(WorkQueue, SetTolerance, (int), void), asCALL_THISCALL);
+    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
+    engine->RegisterObjectMethod("WorkQueue", "void UnsubscribeFromAllEvents()", asMETHODPR(WorkQueue, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("WorkQueue", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(WorkQueue_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
+    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("WorkQueue", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(WorkQueue, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("WorkQueue", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(WorkQueue, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("WorkQueue", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(WorkQueue, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
+    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("WorkQueue", "int WeakRefs() const", asMETHODPR(WorkQueue, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("WorkQueue", "int get_weakRefs() const", asMETHODPR(WorkQueue, WeakRefs, () const, int), asCALL_THISCALL);
+    // explicit WorkQueue::WorkQueue(Context* context) | File: ../Core/WorkQueue.h
+    engine->RegisterObjectBehaviour("WorkQueue", asBEHAVE_FACTORY, "WorkQueue@+ f()", asFUNCTION(WorkQueue_WorkQueue_Context), asCALL_CDECL);
+#ifdef REGISTER_MANUAL_PART_Object
+    REGISTER_MANUAL_PART_Object(WorkQueue, "WorkQueue")
+#endif
+#ifdef REGISTER_MANUAL_PART_RefCounted
+    REGISTER_MANUAL_PART_RefCounted(WorkQueue, "WorkQueue")
+#endif
+#ifdef REGISTER_MANUAL_PART_WorkQueue
+    REGISTER_MANUAL_PART_WorkQueue(WorkQueue, "WorkQueue")
+#endif
+    RegisterSubclass<Object, WorkQueue>(engine, "Object", "WorkQueue");
+    RegisterSubclass<RefCounted, WorkQueue>(engine, "RefCounted", "WorkQueue");
+
+    // int WindowModeParams::height_ | File: ../Graphics/Graphics.h
+    engine->RegisterObjectProperty("WindowModeParams", "int height", offsetof(WindowModeParams, height_));
+    // ScreenModeParams WindowModeParams::screenParams_ | File: ../Graphics/Graphics.h
+    engine->RegisterObjectProperty("WindowModeParams", "ScreenModeParams screenParams", offsetof(WindowModeParams, screenParams_));
+    // int WindowModeParams::width_ | File: ../Graphics/Graphics.h
+    engine->RegisterObjectProperty("WindowModeParams", "int width", offsetof(WindowModeParams, width_));
+    // WindowModeParams::~WindowModeParams() | Implicitly-declared
+    engine->RegisterObjectBehaviour("WindowModeParams", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(WindowModeParams_Destructor), asCALL_CDECL_OBJFIRST);
+    // WindowModeParams& WindowModeParams::operator=(const WindowModeParams&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<WindowModeParams>(engine, "WindowModeParams");
+#ifdef REGISTER_MANUAL_PART_WindowModeParams
+    REGISTER_MANUAL_PART_WindowModeParams(WindowModeParams, "WindowModeParams")
+#endif
 
 }
 

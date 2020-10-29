@@ -43,130 +43,6 @@ namespace Urho3D
 void FakeAddRef(void* ptr);
 void FakeReleaseRef(void* ptr);
 
-// StaticModelGeometryData::~StaticModelGeometryData() | Implicitly-declared 
-static void StaticModelGeometryData_Destructor(StaticModelGeometryData* ptr)
-{
-    ptr->~StaticModelGeometryData();
-}
-
-#ifdef URHO3D_URHO2D
-// explicit SpriteSheet2D::SpriteSheet2D(Context* context) | File: ../Urho2D/SpriteSheet2D.h
-static SpriteSheet2D* SpriteSheet2D_SpriteSheet2D_Context()
-{
-    return new SpriteSheet2D(GetScriptContext());
-}
-#endif
-
-#ifdef URHO3D_URHO2D
-// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void SpriteSheet2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(SpriteSheet2D* ptr, CScriptArray* exceptions, bool onlyUserData)
-{
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
-}
-#endif
-
-#ifdef URHO3D_URHO2D
-// const PODVector<Light*>& Drawable::GetLights() const | File: ../Graphics/Drawable.h
-static CScriptArray* StaticSprite2D_GetLights_void(StaticSprite2D* ptr)
-{
-    const PODVector<Light*>& result = ptr->GetLights();
-    return VectorToHandleArray(result, "Array<Light@>");
-}
-#endif
-
-#ifdef URHO3D_URHO2D
-// const PODVector<Light*>& Drawable::GetVertexLights() const | File: ../Graphics/Drawable.h
-static CScriptArray* StaticSprite2D_GetVertexLights_void(StaticSprite2D* ptr)
-{
-    const PODVector<Light*>& result = ptr->GetVertexLights();
-    return VectorToHandleArray(result, "Array<Light@>");
-}
-#endif
-
-#ifdef URHO3D_URHO2D
-// explicit StaticSprite2D::StaticSprite2D(Context* context) | File: ../Urho2D/StaticSprite2D.h
-static StaticSprite2D* StaticSprite2D_StaticSprite2D_Context()
-{
-    return new StaticSprite2D(GetScriptContext());
-}
-#endif
-
-#ifdef URHO3D_URHO2D
-// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void StaticSprite2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(StaticSprite2D* ptr, CScriptArray* exceptions, bool onlyUserData)
-{
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
-}
-#endif
-
-// StringHash::StringHash(const StringHash& rhs) noexcept=default | File: ../Math/StringHash.h
-static void StringHash_StringHash_StringHash(StringHash* ptr, const StringHash &rhs)
-{
-    new(ptr) StringHash(rhs);
-}
-
-// explicit StringHash::StringHash(unsigned value) noexcept | File: ../Math/StringHash.h
-static void StringHash_StringHash_unsigned(StringHash* ptr, unsigned value)
-{
-    new(ptr) StringHash(value);
-}
-
-// StringHash::StringHash(const String& str) noexcept | File: ../Math/StringHash.h
-static void StringHash_StringHash_String(StringHash* ptr, const String &str)
-{
-    new(ptr) StringHash(str);
-}
-
-// bool StringHash::operator<(const StringHash& rhs) const | File: ../Math/StringHash.h
-// bool StringHash::operator>(const StringHash& rhs) const | File: ../Math/StringHash.h
-static int StringHash_Comparison(const StringHash& lhs, const StringHash& rhs)
-{
-    if (lhs < rhs)
-        return -1;
-
-    if (lhs > rhs)
-        return 1;
-
-    return 0;
-}
-
-#ifdef URHO3D_URHO2D
-// const PODVector<Light*>& Drawable::GetLights() const | File: ../Graphics/Drawable.h
-static CScriptArray* StretchableSprite2D_GetLights_void(StretchableSprite2D* ptr)
-{
-    const PODVector<Light*>& result = ptr->GetLights();
-    return VectorToHandleArray(result, "Array<Light@>");
-}
-#endif
-
-#ifdef URHO3D_URHO2D
-// const PODVector<Light*>& Drawable::GetVertexLights() const | File: ../Graphics/Drawable.h
-static CScriptArray* StretchableSprite2D_GetVertexLights_void(StretchableSprite2D* ptr)
-{
-    const PODVector<Light*>& result = ptr->GetVertexLights();
-    return VectorToHandleArray(result, "Array<Light@>");
-}
-#endif
-
-#ifdef URHO3D_URHO2D
-// explicit StretchableSprite2D::StretchableSprite2D(Context* context) | File: ../Urho2D/StretchableSprite2D.h
-static StretchableSprite2D* StretchableSprite2D_StretchableSprite2D_Context()
-{
-    return new StretchableSprite2D(GetScriptContext());
-}
-#endif
-
-#ifdef URHO3D_URHO2D
-// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void StretchableSprite2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(StretchableSprite2D* ptr, CScriptArray* exceptions, bool onlyUserData)
-{
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
-}
-#endif
-
 // SharedPtr<SoundStream> Sound::GetDecoderStream() const | File: ../Audio/Sound.h
 static SoundStream* Sound_GetDecoderStream_void(Sound* ptr)
 {
@@ -328,6 +204,40 @@ static void Sprite_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Sprit
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
 }
 
+#ifdef URHO3D_URHO2D
+// explicit Sprite2D::Sprite2D(Context* context) | File: ../Urho2D/Sprite2D.h
+static Sprite2D* Sprite2D_Sprite2D_Context()
+{
+    return new Sprite2D(GetScriptContext());
+}
+#endif
+
+#ifdef URHO3D_URHO2D
+// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+static void Sprite2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Sprite2D* ptr, CScriptArray* exceptions, bool onlyUserData)
+{
+    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+}
+#endif
+
+#ifdef URHO3D_URHO2D
+// explicit SpriteSheet2D::SpriteSheet2D(Context* context) | File: ../Urho2D/SpriteSheet2D.h
+static SpriteSheet2D* SpriteSheet2D_SpriteSheet2D_Context()
+{
+    return new SpriteSheet2D(GetScriptContext());
+}
+#endif
+
+#ifdef URHO3D_URHO2D
+// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+static void SpriteSheet2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(SpriteSheet2D* ptr, CScriptArray* exceptions, bool onlyUserData)
+{
+    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+}
+#endif
+
 // const PODVector<Light*>& Drawable::GetLights() const | File: ../Graphics/Drawable.h
 static CScriptArray* StaticModel_GetLights_void(StaticModel* ptr)
 {
@@ -355,23 +265,6 @@ static void StaticModel_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
 }
 
-#ifdef URHO3D_URHO2D
-// explicit Sprite2D::Sprite2D(Context* context) | File: ../Urho2D/Sprite2D.h
-static Sprite2D* Sprite2D_Sprite2D_Context()
-{
-    return new Sprite2D(GetScriptContext());
-}
-#endif
-
-#ifdef URHO3D_URHO2D
-// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Sprite2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Sprite2D* ptr, CScriptArray* exceptions, bool onlyUserData)
-{
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
-}
-#endif
-
 // const PODVector<Light*>& Drawable::GetLights() const | File: ../Graphics/Drawable.h
 static CScriptArray* StaticModelGroup_GetLights_void(StaticModelGroup* ptr)
 {
@@ -398,6 +291,76 @@ static void StaticModelGroup_UnsubscribeFromAllEventsExcept_PODVectorStringHash_
     PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
 }
+
+#ifdef URHO3D_URHO2D
+// const PODVector<Light*>& Drawable::GetLights() const | File: ../Graphics/Drawable.h
+static CScriptArray* StaticSprite2D_GetLights_void(StaticSprite2D* ptr)
+{
+    const PODVector<Light*>& result = ptr->GetLights();
+    return VectorToHandleArray(result, "Array<Light@>");
+}
+#endif
+
+#ifdef URHO3D_URHO2D
+// const PODVector<Light*>& Drawable::GetVertexLights() const | File: ../Graphics/Drawable.h
+static CScriptArray* StaticSprite2D_GetVertexLights_void(StaticSprite2D* ptr)
+{
+    const PODVector<Light*>& result = ptr->GetVertexLights();
+    return VectorToHandleArray(result, "Array<Light@>");
+}
+#endif
+
+#ifdef URHO3D_URHO2D
+// explicit StaticSprite2D::StaticSprite2D(Context* context) | File: ../Urho2D/StaticSprite2D.h
+static StaticSprite2D* StaticSprite2D_StaticSprite2D_Context()
+{
+    return new StaticSprite2D(GetScriptContext());
+}
+#endif
+
+#ifdef URHO3D_URHO2D
+// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+static void StaticSprite2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(StaticSprite2D* ptr, CScriptArray* exceptions, bool onlyUserData)
+{
+    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+}
+#endif
+
+#ifdef URHO3D_URHO2D
+// const PODVector<Light*>& Drawable::GetLights() const | File: ../Graphics/Drawable.h
+static CScriptArray* StretchableSprite2D_GetLights_void(StretchableSprite2D* ptr)
+{
+    const PODVector<Light*>& result = ptr->GetLights();
+    return VectorToHandleArray(result, "Array<Light@>");
+}
+#endif
+
+#ifdef URHO3D_URHO2D
+// const PODVector<Light*>& Drawable::GetVertexLights() const | File: ../Graphics/Drawable.h
+static CScriptArray* StretchableSprite2D_GetVertexLights_void(StretchableSprite2D* ptr)
+{
+    const PODVector<Light*>& result = ptr->GetVertexLights();
+    return VectorToHandleArray(result, "Array<Light@>");
+}
+#endif
+
+#ifdef URHO3D_URHO2D
+// explicit StretchableSprite2D::StretchableSprite2D(Context* context) | File: ../Urho2D/StretchableSprite2D.h
+static StretchableSprite2D* StretchableSprite2D_StretchableSprite2D_Context()
+{
+    return new StretchableSprite2D(GetScriptContext());
+}
+#endif
+
+#ifdef URHO3D_URHO2D
+// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+static void StretchableSprite2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(StretchableSprite2D* ptr, CScriptArray* exceptions, bool onlyUserData)
+{
+    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+}
+#endif
 
 // void String::Join(const Vector<String>& subStrings, const String& glue) | File: ../Container/Str.h
 static void String_Join_VectorString_String(String* ptr, CScriptArray* subStrings, const String& glue)
@@ -504,6 +467,37 @@ static int String_Comparison(const String& lhs, const String& rhs)
     return 0;
 }
 
+// StringHash::StringHash(const StringHash& rhs) noexcept=default | File: ../Math/StringHash.h
+static void StringHash_StringHash_StringHash(StringHash* ptr, const StringHash &rhs)
+{
+    new(ptr) StringHash(rhs);
+}
+
+// explicit StringHash::StringHash(unsigned value) noexcept | File: ../Math/StringHash.h
+static void StringHash_StringHash_unsigned(StringHash* ptr, unsigned value)
+{
+    new(ptr) StringHash(value);
+}
+
+// StringHash::StringHash(const String& str) noexcept | File: ../Math/StringHash.h
+static void StringHash_StringHash_String(StringHash* ptr, const String &str)
+{
+    new(ptr) StringHash(str);
+}
+
+// bool StringHash::operator<(const StringHash& rhs) const | File: ../Math/StringHash.h
+// bool StringHash::operator>(const StringHash& rhs) const | File: ../Math/StringHash.h
+static int StringHash_Comparison(const StringHash& lhs, const StringHash& rhs)
+{
+    if (lhs < rhs)
+        return -1;
+
+    if (lhs > rhs)
+        return 1;
+
+    return 0;
+}
+
 // StringHashRegister::StringHashRegister(bool threadSafe) | File: ../Core/StringHashRegister.h
 static void StringHashRegister_StringHashRegister_bool(StringHashRegister* ptr, bool threadSafe)
 {
@@ -536,6 +530,12 @@ static void SourceBatch2D_Destructor(SourceBatch2D* ptr)
 }
 #endif
 
+// StaticModelGeometryData::~StaticModelGeometryData() | Implicitly-declared 
+static void StaticModelGeometryData_Destructor(StaticModelGeometryData* ptr)
+{
+    ptr->~StaticModelGeometryData();
+}
+
 // StoredLogMessage::StoredLogMessage(const String& message, int level, bool error) | File: ../IO/Log.h
 static void StoredLogMessage_StoredLogMessage_String_int_bool(StoredLogMessage* ptr, const String &message, int level, bool error)
 {
@@ -550,1312 +550,6 @@ static void StoredLogMessage_Destructor(StoredLogMessage* ptr)
 
 void ASRegisterGenerated_Members_Sn_Sz(asIScriptEngine* engine)
 {
-    // Vector3 StaticModelGeometryData::center_ | File: ../Graphics/StaticModel.h
-    engine->RegisterObjectProperty("StaticModelGeometryData", "Vector3 center", offsetof(StaticModelGeometryData, center_));
-    // unsigned StaticModelGeometryData::lodLevel_ | File: ../Graphics/StaticModel.h
-    engine->RegisterObjectProperty("StaticModelGeometryData", "uint lodLevel", offsetof(StaticModelGeometryData, lodLevel_));
-    // StaticModelGeometryData::~StaticModelGeometryData() | Implicitly-declared
-    engine->RegisterObjectBehaviour("StaticModelGeometryData", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(StaticModelGeometryData_Destructor), asCALL_CDECL_OBJFIRST);
-    // StaticModelGeometryData& StaticModelGeometryData::operator=(const StaticModelGeometryData&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<StaticModelGeometryData>(engine, "StaticModelGeometryData");
-#ifdef REGISTER_MANUAL_PART_StaticModelGeometryData
-    REGISTER_MANUAL_PART_StaticModelGeometryData(StaticModelGeometryData, "StaticModelGeometryData")
-#endif
-
-#ifdef URHO3D_URHO2D
-    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("SpriteSheet2D", asBEHAVE_ADDREF, "void f()", asMETHODPR(SpriteSheet2D, AddRef, (), void), asCALL_THISCALL);
-    // bool SpriteSheet2D::BeginLoad(Deserializer& source) override | File: ../Urho2D/SpriteSheet2D.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "bool BeginLoad(Deserializer&)", asMETHODPR(SpriteSheet2D, BeginLoad, (Deserializer&), bool), asCALL_THISCALL);
-    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
-    // Not registered because template
-    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
-    // Not registered because template
-    // void SpriteSheet2D::DefineSprite(const String& name, const IntRect& rectangle, const Vector2& hotSpot=Vector2(0.5f, 0.5f), const IntVector2& offset=IntVector2::ZERO) | File: ../Urho2D/SpriteSheet2D.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "void DefineSprite(const String&in, const IntRect&in, const Vector2&in = Vector2(0.5f, 0.5f), const IntVector2&in = IntVector2::ZERO)", asMETHODPR(SpriteSheet2D, DefineSprite, (const String&, const IntRect&, const Vector2&, const IntVector2&), void), asCALL_THISCALL);
-    // bool SpriteSheet2D::EndLoad() override | File: ../Urho2D/SpriteSheet2D.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "bool EndLoad()", asMETHODPR(SpriteSheet2D, EndLoad, (), bool), asCALL_THISCALL);
-    // AsyncLoadState Resource::GetAsyncLoadState() const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "AsyncLoadState GetAsyncLoadState() const", asMETHODPR(SpriteSheet2D, GetAsyncLoadState, () const, AsyncLoadState), asCALL_THISCALL);
-    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "bool GetBlockEvents() const", asMETHODPR(SpriteSheet2D, GetBlockEvents, () const, bool), asCALL_THISCALL);
-    // const String& Object::GetCategory() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "const String& GetCategory() const", asMETHODPR(SpriteSheet2D, GetCategory, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("SpriteSheet2D", "const String& get_category() const", asMETHODPR(SpriteSheet2D, GetCategory, () const, const String&), asCALL_THISCALL);
-    // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
-    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "VariantMap& GetEventDataMap() const", asMETHODPR(SpriteSheet2D, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
-    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // Object* Object::GetEventSender() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "Object@+ GetEventSender() const", asMETHODPR(SpriteSheet2D, GetEventSender, () const, Object*), asCALL_THISCALL);
-    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(SpriteSheet2D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("SpriteSheet2D", "const Variant& get_globalVar(StringHash) const", asMETHODPR(SpriteSheet2D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "const VariantMap& GetGlobalVars() const", asMETHODPR(SpriteSheet2D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("SpriteSheet2D", "const VariantMap& get_globalVars() const", asMETHODPR(SpriteSheet2D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    // unsigned Resource::GetMemoryUse() const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "uint GetMemoryUse() const", asMETHODPR(SpriteSheet2D, GetMemoryUse, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("SpriteSheet2D", "uint get_memoryUse() const", asMETHODPR(SpriteSheet2D, GetMemoryUse, () const, unsigned), asCALL_THISCALL);
-    // const String& Resource::GetName() const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "const String& GetName() const", asMETHODPR(SpriteSheet2D, GetName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("SpriteSheet2D", "const String& get_name() const", asMETHODPR(SpriteSheet2D, GetName, () const, const String&), asCALL_THISCALL);
-    // StringHash Resource::GetNameHash() const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "StringHash GetNameHash() const", asMETHODPR(SpriteSheet2D, GetNameHash, () const, StringHash), asCALL_THISCALL);
-    // Sprite2D* SpriteSheet2D::GetSprite(const String& name) const | File: ../Urho2D/SpriteSheet2D.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "Sprite2D@+ GetSprite(const String&in) const", asMETHODPR(SpriteSheet2D, GetSprite, (const String&) const, Sprite2D*), asCALL_THISCALL);
-    // const HashMap<String, SharedPtr<Sprite2D>>& SpriteSheet2D::GetSpriteMapping() const | File: ../Urho2D/SpriteSheet2D.h
-    // Error: type "const HashMap<String, SharedPtr<Sprite2D>>&" can not automatically bind
-    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(SpriteSheet2D, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
-    // Not registered because template
-    // Texture2D* SpriteSheet2D::GetTexture() const | File: ../Urho2D/SpriteSheet2D.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "Texture2D@+ GetTexture() const", asMETHODPR(SpriteSheet2D, GetTexture, () const, Texture2D*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("SpriteSheet2D", "Texture2D@+ get_texture() const", asMETHODPR(SpriteSheet2D, GetTexture, () const, Texture2D*), asCALL_THISCALL);
-    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "StringHash GetType() const", asMETHODPR(SpriteSheet2D, GetType, () const, StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod("SpriteSheet2D", "StringHash get_type() const", asMETHODPR(SpriteSheet2D, GetType, () const, StringHash), asCALL_THISCALL);
-    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "const String& GetTypeName() const", asMETHODPR(SpriteSheet2D, GetTypeName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("SpriteSheet2D", "const String& get_typeName() const", asMETHODPR(SpriteSheet2D, GetTypeName, () const, const String&), asCALL_THISCALL);
-    // unsigned Resource::GetUseTimer() | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "uint GetUseTimer()", asMETHODPR(SpriteSheet2D, GetUseTimer, (), unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("SpriteSheet2D", "uint get_useTimer()", asMETHODPR(SpriteSheet2D, GetUseTimer, (), unsigned), asCALL_THISCALL);
-    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "bool HasEventHandlers() const", asMETHODPR(SpriteSheet2D, HasEventHandlers, () const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(SpriteSheet2D, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(SpriteSheet2D, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "bool IsInstanceOf(StringHash) const", asMETHODPR(SpriteSheet2D, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
-    // Not registered because template
-    // bool Resource::Load(Deserializer& source) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "bool Load(Deserializer&)", asMETHODPR(SpriteSheet2D, Load, (Deserializer&), bool), asCALL_THISCALL);
-    // bool Resource::LoadFile(const String& fileName) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "bool LoadFile(const String&in)", asMETHODPR(SpriteSheet2D, LoadFile, (const String&), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("SpriteSheet2D", "bool Load(const String&in)", asMETHODPR(SpriteSheet2D, LoadFile, (const String&), bool), asCALL_THISCALL);
-    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(SpriteSheet2D, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
-    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
-    // Error: type "RefCount*" can not automatically bind
-    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "int Refs() const", asMETHODPR(SpriteSheet2D, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("SpriteSheet2D", "int get_refs() const", asMETHODPR(SpriteSheet2D, Refs, () const, int), asCALL_THISCALL);
-    // static void SpriteSheet2D::RegisterObject(Context* context) | File: ../Urho2D/SpriteSheet2D.h
-    // Context can be used as firs parameter of constructors only
-    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("SpriteSheet2D", asBEHAVE_RELEASE, "void f()", asMETHODPR(SpriteSheet2D, ReleaseRef, (), void), asCALL_THISCALL);
-    // void Resource::ResetUseTimer() | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "void ResetUseTimer()", asMETHODPR(SpriteSheet2D, ResetUseTimer, (), void), asCALL_THISCALL);
-    // virtual bool Resource::Save(Serializer& dest) const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "bool Save(Serializer&) const", asMETHODPR(SpriteSheet2D, Save, (Serializer&) const, bool), asCALL_THISCALL);
-    // virtual bool Resource::SaveFile(const String& fileName) const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "bool SaveFile(const String&in) const", asMETHODPR(SpriteSheet2D, SaveFile, (const String&) const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("SpriteSheet2D", "bool Save(const String&in) const", asMETHODPR(SpriteSheet2D, SaveFile, (const String&) const, bool), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "void SendEvent(StringHash)", asMETHODPR(SpriteSheet2D, SendEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(SpriteSheet2D, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
-    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
-    // Not registered because template
-    // void Resource::SetAsyncLoadState(AsyncLoadState newState) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "void SetAsyncLoadState(AsyncLoadState)", asMETHODPR(SpriteSheet2D, SetAsyncLoadState, (AsyncLoadState), void), asCALL_THISCALL);
-    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "void SetBlockEvents(bool)", asMETHODPR(SpriteSheet2D, SetBlockEvents, (bool), void), asCALL_THISCALL);
-    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(SpriteSheet2D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("SpriteSheet2D", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(SpriteSheet2D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    // void Resource::SetMemoryUse(unsigned size) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "void SetMemoryUse(uint)", asMETHODPR(SpriteSheet2D, SetMemoryUse, (unsigned), void), asCALL_THISCALL);
-    // void Resource::SetName(const String& name) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "void SetName(const String&in)", asMETHODPR(SpriteSheet2D, SetName, (const String&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("SpriteSheet2D", "void set_name(const String&in)", asMETHODPR(SpriteSheet2D, SetName, (const String&), void), asCALL_THISCALL);
-    // void SpriteSheet2D::SetTexture(Texture2D* texture) | File: ../Urho2D/SpriteSheet2D.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "void SetTexture(Texture2D@+)", asMETHODPR(SpriteSheet2D, SetTexture, (Texture2D*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("SpriteSheet2D", "void set_texture(Texture2D@+)", asMETHODPR(SpriteSheet2D, SetTexture, (Texture2D*), void), asCALL_THISCALL);
-    // explicit SpriteSheet2D::SpriteSheet2D(Context* context) | File: ../Urho2D/SpriteSheet2D.h
-    engine->RegisterObjectBehaviour("SpriteSheet2D", asBEHAVE_FACTORY, "SpriteSheet2D@+ f()", asFUNCTION(SpriteSheet2D_SpriteSheet2D_Context), asCALL_CDECL);
-    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "void UnsubscribeFromAllEvents()", asMETHODPR(SpriteSheet2D, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(SpriteSheet2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
-    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(SpriteSheet2D, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(SpriteSheet2D, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(SpriteSheet2D, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
-    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("SpriteSheet2D", "int WeakRefs() const", asMETHODPR(SpriteSheet2D, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("SpriteSheet2D", "int get_weakRefs() const", asMETHODPR(SpriteSheet2D, WeakRefs, () const, int), asCALL_THISCALL);
-#ifdef REGISTER_MANUAL_PART_Resource
-    REGISTER_MANUAL_PART_Resource(SpriteSheet2D, "SpriteSheet2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Object
-    REGISTER_MANUAL_PART_Object(SpriteSheet2D, "SpriteSheet2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(SpriteSheet2D, "SpriteSheet2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_SpriteSheet2D
-    REGISTER_MANUAL_PART_SpriteSheet2D(SpriteSheet2D, "SpriteSheet2D")
-#endif
-    RegisterSubclass<Resource, SpriteSheet2D>(engine, "Resource", "SpriteSheet2D");
-    RegisterSubclass<Object, SpriteSheet2D>(engine, "Object", "SpriteSheet2D");
-    RegisterSubclass<RefCounted, SpriteSheet2D>(engine, "RefCounted", "SpriteSheet2D");
-#endif
-
-#ifdef URHO3D_URHO2D
-    // void Drawable::AddLight(Light* light) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void AddLight(Light@+)", asMETHODPR(StaticSprite2D, AddLight, (Light*), void), asCALL_THISCALL);
-    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("StaticSprite2D", asBEHAVE_ADDREF, "void f()", asMETHODPR(StaticSprite2D, AddRef, (), void), asCALL_THISCALL);
-    // void Component::AddReplicationState(ComponentReplicationState* state) | File: ../Scene/Component.h
-    // Error: type "ComponentReplicationState*" can not automatically bind
-    // void Drawable::AddVertexLight(Light* light) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void AddVertexLight(Light@+)", asMETHODPR(StaticSprite2D, AddVertexLight, (Light*), void), asCALL_THISCALL);
-    // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void AllocateNetworkState()", asMETHODPR(StaticSprite2D, AllocateNetworkState, (), void), asCALL_THISCALL);
-    // virtual void Serializable::ApplyAttributes() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void ApplyAttributes()", asMETHODPR(StaticSprite2D, ApplyAttributes, (), void), asCALL_THISCALL);
-    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
-    // Not registered because template
-    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
-    // Not registered because template
-    // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void CleanupConnection(Connection@+)", asMETHODPR(StaticSprite2D, CleanupConnection, (Connection*), void), asCALL_THISCALL);
-    // void Drawable::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(StaticSprite2D, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
-    // virtual bool Drawable::DrawOcclusion(OcclusionBuffer* buffer) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "bool DrawOcclusion(OcclusionBuffer@+)", asMETHODPR(StaticSprite2D, DrawOcclusion, (OcclusionBuffer*), bool), asCALL_THISCALL);
-    // float StaticSprite2D::GetAlpha() const | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StaticSprite2D", "float GetAlpha() const", asMETHODPR(StaticSprite2D, GetAlpha, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "float get_alpha() const", asMETHODPR(StaticSprite2D, GetAlpha, () const, float), asCALL_THISCALL);
-    // bool Animatable::GetAnimationEnabled() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "bool GetAnimationEnabled() const", asMETHODPR(StaticSprite2D, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "bool get_animationEnabled() const", asMETHODPR(StaticSprite2D, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
-    // Variant Serializable::GetAttribute(unsigned index) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "Variant GetAttribute(uint) const", asMETHODPR(StaticSprite2D, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "Variant get_attributes(uint) const", asMETHODPR(StaticSprite2D, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
-    // Variant Serializable::GetAttribute(const String& name) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "Variant GetAttribute(const String&in) const", asMETHODPR(StaticSprite2D, GetAttribute, (const String&) const, Variant), asCALL_THISCALL);
-    // ValueAnimation* Animatable::GetAttributeAnimation(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "ValueAnimation@+ GetAttributeAnimation(const String&in) const", asMETHODPR(StaticSprite2D, GetAttributeAnimation, (const String&) const, ValueAnimation*), asCALL_THISCALL);
-    // float Animatable::GetAttributeAnimationSpeed(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "float GetAttributeAnimationSpeed(const String&in) const", asMETHODPR(StaticSprite2D, GetAttributeAnimationSpeed, (const String&) const, float), asCALL_THISCALL);
-    // float Animatable::GetAttributeAnimationTime(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "float GetAttributeAnimationTime(const String&in) const", asMETHODPR(StaticSprite2D, GetAttributeAnimationTime, (const String&) const, float), asCALL_THISCALL);
-    // WrapMode Animatable::GetAttributeAnimationWrapMode(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "WrapMode GetAttributeAnimationWrapMode(const String&in) const", asMETHODPR(StaticSprite2D, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), asCALL_THISCALL);
-    // Variant Serializable::GetAttributeDefault(unsigned index) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "Variant GetAttributeDefault(uint) const", asMETHODPR(StaticSprite2D, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "Variant get_attributeDefaults(uint) const", asMETHODPR(StaticSprite2D, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
-    // Variant Serializable::GetAttributeDefault(const String& name) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "Variant GetAttributeDefault(const String&in) const", asMETHODPR(StaticSprite2D, GetAttributeDefault, (const String&) const, Variant), asCALL_THISCALL);
-    // virtual const Vector<AttributeInfo>* Serializable::GetAttributes() const | File: ../Scene/Serializable.h
-    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
-    // const Vector<SourceBatch>& Drawable::GetBatches() const | File: ../Graphics/Drawable.h
-    // Error: type "const Vector<SourceBatch>&" can not automatically bind
-    // BlendMode StaticSprite2D::GetBlendMode() const | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StaticSprite2D", "BlendMode GetBlendMode() const", asMETHODPR(StaticSprite2D, GetBlendMode, () const, BlendMode), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "BlendMode get_blendMode() const", asMETHODPR(StaticSprite2D, GetBlendMode, () const, BlendMode), asCALL_THISCALL);
-    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StaticSprite2D", "bool GetBlockEvents() const", asMETHODPR(StaticSprite2D, GetBlockEvents, () const, bool), asCALL_THISCALL);
-    // const BoundingBox& Drawable::GetBoundingBox() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "const BoundingBox& GetBoundingBox() const", asMETHODPR(StaticSprite2D, GetBoundingBox, () const, const BoundingBox&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "const BoundingBox& get_boundingBox() const", asMETHODPR(StaticSprite2D, GetBoundingBox, () const, const BoundingBox&), asCALL_THISCALL);
-    // bool Drawable::GetCastShadows() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "bool GetCastShadows() const", asMETHODPR(StaticSprite2D, GetCastShadows, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "bool get_castShadows() const", asMETHODPR(StaticSprite2D, GetCastShadows, () const, bool), asCALL_THISCALL);
-    // const String& Object::GetCategory() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StaticSprite2D", "const String& GetCategory() const", asMETHODPR(StaticSprite2D, GetCategory, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "const String& get_category() const", asMETHODPR(StaticSprite2D, GetCategory, () const, const String&), asCALL_THISCALL);
-    // const Color& StaticSprite2D::GetColor() const | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StaticSprite2D", "const Color& GetColor() const", asMETHODPR(StaticSprite2D, GetColor, () const, const Color&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "const Color& get_color() const", asMETHODPR(StaticSprite2D, GetColor, () const, const Color&), asCALL_THISCALL);
-    // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("StaticSprite2D", "Component@+ GetComponent(StringHash) const", asMETHODPR(StaticSprite2D, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
-    // template<class T> T*  Component::GetComponent() const | File: ../Scene/Component.h
-    // Not registered because template
-    // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
-    // Error: type "PODVector<Component*>&" can not automatically bind
-    // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
-    // Not registered because template
-    // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
-    // Material* StaticSprite2D::GetCustomMaterial() const | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StaticSprite2D", "Material@+ GetCustomMaterial() const", asMETHODPR(StaticSprite2D, GetCustomMaterial, () const, Material*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "Material@+ get_customMaterial() const", asMETHODPR(StaticSprite2D, GetCustomMaterial, () const, Material*), asCALL_THISCALL);
-    // ResourceRef StaticSprite2D::GetCustomMaterialAttr() const | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StaticSprite2D", "ResourceRef GetCustomMaterialAttr() const", asMETHODPR(StaticSprite2D, GetCustomMaterialAttr, () const, ResourceRef), asCALL_THISCALL);
-    // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
-    // Error: type "PODVector<Node*>&" can not automatically bind
-    // float Drawable::GetDistance() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "float GetDistance() const", asMETHODPR(StaticSprite2D, GetDistance, () const, float), asCALL_THISCALL);
-    // unsigned char Drawable::GetDrawableFlags() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "uint8 GetDrawableFlags() const", asMETHODPR(StaticSprite2D, GetDrawableFlags, () const, unsigned char), asCALL_THISCALL);
-    // float Drawable::GetDrawDistance() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "float GetDrawDistance() const", asMETHODPR(StaticSprite2D, GetDrawDistance, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "float get_drawDistance() const", asMETHODPR(StaticSprite2D, GetDrawDistance, () const, float), asCALL_THISCALL);
-    // const Rect& StaticSprite2D::GetDrawRect() const | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StaticSprite2D", "const Rect& GetDrawRect() const", asMETHODPR(StaticSprite2D, GetDrawRect, () const, const Rect&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "const Rect& get_drawRect() const", asMETHODPR(StaticSprite2D, GetDrawRect, () const, const Rect&), asCALL_THISCALL);
-    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StaticSprite2D", "VariantMap& GetEventDataMap() const", asMETHODPR(StaticSprite2D, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
-    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // Object* Object::GetEventSender() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StaticSprite2D", "Object@+ GetEventSender() const", asMETHODPR(StaticSprite2D, GetEventSender, () const, Object*), asCALL_THISCALL);
-    // Light* Drawable::GetFirstLight() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "Light@+ GetFirstLight() const", asMETHODPR(StaticSprite2D, GetFirstLight, () const, Light*), asCALL_THISCALL);
-    // bool StaticSprite2D::GetFlipX() const | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StaticSprite2D", "bool GetFlipX() const", asMETHODPR(StaticSprite2D, GetFlipX, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "bool get_flipX() const", asMETHODPR(StaticSprite2D, GetFlipX, () const, bool), asCALL_THISCALL);
-    // bool StaticSprite2D::GetFlipY() const | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StaticSprite2D", "bool GetFlipY() const", asMETHODPR(StaticSprite2D, GetFlipY, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "bool get_flipY() const", asMETHODPR(StaticSprite2D, GetFlipY, () const, bool), asCALL_THISCALL);
-    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StaticSprite2D", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(StaticSprite2D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "const Variant& get_globalVar(StringHash) const", asMETHODPR(StaticSprite2D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StaticSprite2D", "const VariantMap& GetGlobalVars() const", asMETHODPR(StaticSprite2D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "const VariantMap& get_globalVars() const", asMETHODPR(StaticSprite2D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    // const Vector2& StaticSprite2D::GetHotSpot() const | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StaticSprite2D", "const Vector2& GetHotSpot() const", asMETHODPR(StaticSprite2D, GetHotSpot, () const, const Vector2&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "const Vector2& get_hotSpot() const", asMETHODPR(StaticSprite2D, GetHotSpot, () const, const Vector2&), asCALL_THISCALL);
-    // unsigned Component::GetID() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("StaticSprite2D", "uint GetID() const", asMETHODPR(StaticSprite2D, GetID, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "uint get_id() const", asMETHODPR(StaticSprite2D, GetID, () const, unsigned), asCALL_THISCALL);
-    // bool Serializable::GetInterceptNetworkUpdate(const String& attributeName) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "bool GetInterceptNetworkUpdate(const String&in) const", asMETHODPR(StaticSprite2D, GetInterceptNetworkUpdate, (const String&) const, bool), asCALL_THISCALL);
-    // int Drawable2D::GetLayer() const | File: ../Urho2D/Drawable2D.h
-    engine->RegisterObjectMethod("StaticSprite2D", "int GetLayer() const", asMETHODPR(StaticSprite2D, GetLayer, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "int get_layer() const", asMETHODPR(StaticSprite2D, GetLayer, () const, int), asCALL_THISCALL);
-    // unsigned Drawable::GetLightMask() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "uint GetLightMask() const", asMETHODPR(StaticSprite2D, GetLightMask, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "uint get_lightMask() const", asMETHODPR(StaticSprite2D, GetLightMask, () const, unsigned), asCALL_THISCALL);
-    // const PODVector<Light*>& Drawable::GetLights() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "Array<Light@>@ GetLights() const", asFUNCTION(StaticSprite2D_GetLights_void), asCALL_CDECL_OBJFIRST);
-    // float Drawable::GetLodBias() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "float GetLodBias() const", asMETHODPR(StaticSprite2D, GetLodBias, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "float get_lodBias() const", asMETHODPR(StaticSprite2D, GetLodBias, () const, float), asCALL_THISCALL);
-    // float Drawable::GetLodDistance() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "float GetLodDistance() const", asMETHODPR(StaticSprite2D, GetLodDistance, () const, float), asCALL_THISCALL);
-    // virtual Geometry* Drawable::GetLodGeometry(unsigned batchIndex, unsigned level) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "Geometry@+ GetLodGeometry(uint, uint)", asMETHODPR(StaticSprite2D, GetLodGeometry, (unsigned, unsigned), Geometry*), asCALL_THISCALL);
-    // unsigned Drawable::GetMaxLights() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "uint GetMaxLights() const", asMETHODPR(StaticSprite2D, GetMaxLights, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "uint get_maxLights() const", asMETHODPR(StaticSprite2D, GetMaxLights, () const, unsigned), asCALL_THISCALL);
-    // float Drawable::GetMaxZ() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "float GetMaxZ() const", asMETHODPR(StaticSprite2D, GetMaxZ, () const, float), asCALL_THISCALL);
-    // float Drawable::GetMinZ() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "float GetMinZ() const", asMETHODPR(StaticSprite2D, GetMinZ, () const, float), asCALL_THISCALL);
-    // virtual const Vector<AttributeInfo>* Serializable::GetNetworkAttributes() const | File: ../Scene/Serializable.h
-    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
-    // NetworkState* Serializable::GetNetworkState() const | File: ../Scene/Serializable.h
-    // Error: type "NetworkState*" can not automatically bind
-    // Node* Component::GetNode() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("StaticSprite2D", "Node@+ GetNode() const", asMETHODPR(StaticSprite2D, GetNode, () const, Node*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "Node@+ get_node() const", asMETHODPR(StaticSprite2D, GetNode, () const, Node*), asCALL_THISCALL);
-    // unsigned Serializable::GetNumAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "uint GetNumAttributes() const", asMETHODPR(StaticSprite2D, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "uint get_numAttributes() const", asMETHODPR(StaticSprite2D, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
-    // unsigned Serializable::GetNumNetworkAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "uint GetNumNetworkAttributes() const", asMETHODPR(StaticSprite2D, GetNumNetworkAttributes, () const, unsigned), asCALL_THISCALL);
-    // virtual unsigned Drawable::GetNumOccluderTriangles() | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "uint GetNumOccluderTriangles()", asMETHODPR(StaticSprite2D, GetNumOccluderTriangles, (), unsigned), asCALL_THISCALL);
-    // ObjectAnimation* Animatable::GetObjectAnimation() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "ObjectAnimation@+ GetObjectAnimation() const", asMETHODPR(StaticSprite2D, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "ObjectAnimation@+ get_objectAnimation() const", asMETHODPR(StaticSprite2D, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
-    // ResourceRef Animatable::GetObjectAnimationAttr() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "ResourceRef GetObjectAnimationAttr() const", asMETHODPR(StaticSprite2D, GetObjectAnimationAttr, () const, ResourceRef), asCALL_THISCALL);
-    // Octant* Drawable::GetOctant() const | File: ../Graphics/Drawable.h
-    // Error: type "Octant" can not automatically bind bacause have @nobind mark
-    // int Drawable2D::GetOrderInLayer() const | File: ../Urho2D/Drawable2D.h
-    engine->RegisterObjectMethod("StaticSprite2D", "int GetOrderInLayer() const", asMETHODPR(StaticSprite2D, GetOrderInLayer, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "int get_orderInLayer() const", asMETHODPR(StaticSprite2D, GetOrderInLayer, () const, int), asCALL_THISCALL);
-    // Scene* Component::GetScene() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("StaticSprite2D", "Scene@+ GetScene() const", asMETHODPR(StaticSprite2D, GetScene, () const, Scene*), asCALL_THISCALL);
-    // float Drawable::GetShadowDistance() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "float GetShadowDistance() const", asMETHODPR(StaticSprite2D, GetShadowDistance, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "float get_shadowDistance() const", asMETHODPR(StaticSprite2D, GetShadowDistance, () const, float), asCALL_THISCALL);
-    // unsigned Drawable::GetShadowMask() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "uint GetShadowMask() const", asMETHODPR(StaticSprite2D, GetShadowMask, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "uint get_shadowMask() const", asMETHODPR(StaticSprite2D, GetShadowMask, () const, unsigned), asCALL_THISCALL);
-    // float Drawable::GetSortValue() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "float GetSortValue() const", asMETHODPR(StaticSprite2D, GetSortValue, () const, float), asCALL_THISCALL);
-    // const Vector<SourceBatch2D>& Drawable2D::GetSourceBatches() | File: ../Urho2D/Drawable2D.h
-    // Error: type "const Vector<SourceBatch2D>&" can not automatically bind
-    // Sprite2D* StaticSprite2D::GetSprite() const | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StaticSprite2D", "Sprite2D@+ GetSprite() const", asMETHODPR(StaticSprite2D, GetSprite, () const, Sprite2D*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "Sprite2D@+ get_sprite() const", asMETHODPR(StaticSprite2D, GetSprite, () const, Sprite2D*), asCALL_THISCALL);
-    // ResourceRef StaticSprite2D::GetSpriteAttr() const | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StaticSprite2D", "ResourceRef GetSpriteAttr() const", asMETHODPR(StaticSprite2D, GetSpriteAttr, () const, ResourceRef), asCALL_THISCALL);
-    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StaticSprite2D", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(StaticSprite2D, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
-    // Not registered because template
-    // bool StaticSprite2D::GetSwapXY() const | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StaticSprite2D", "bool GetSwapXY() const", asMETHODPR(StaticSprite2D, GetSwapXY, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "bool get_swapXY() const", asMETHODPR(StaticSprite2D, GetSwapXY, () const, bool), asCALL_THISCALL);
-    // const Rect& StaticSprite2D::GetTextureRect() const | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StaticSprite2D", "const Rect& GetTextureRect() const", asMETHODPR(StaticSprite2D, GetTextureRect, () const, const Rect&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "const Rect& get_textureRect() const", asMETHODPR(StaticSprite2D, GetTextureRect, () const, const Rect&), asCALL_THISCALL);
-    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StaticSprite2D", "StringHash GetType() const", asMETHODPR(StaticSprite2D, GetType, () const, StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "StringHash get_type() const", asMETHODPR(StaticSprite2D, GetType, () const, StringHash), asCALL_THISCALL);
-    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StaticSprite2D", "const String& GetTypeName() const", asMETHODPR(StaticSprite2D, GetTypeName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "const String& get_typeName() const", asMETHODPR(StaticSprite2D, GetTypeName, () const, const String&), asCALL_THISCALL);
-    // virtual UpdateGeometryType Drawable::GetUpdateGeometryType() | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "UpdateGeometryType GetUpdateGeometryType()", asMETHODPR(StaticSprite2D, GetUpdateGeometryType, (), UpdateGeometryType), asCALL_THISCALL);
-    // bool StaticSprite2D::GetUseDrawRect() const | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StaticSprite2D", "bool GetUseDrawRect() const", asMETHODPR(StaticSprite2D, GetUseDrawRect, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "bool get_useDrawRect() const", asMETHODPR(StaticSprite2D, GetUseDrawRect, () const, bool), asCALL_THISCALL);
-    // bool StaticSprite2D::GetUseHotSpot() const | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StaticSprite2D", "bool GetUseHotSpot() const", asMETHODPR(StaticSprite2D, GetUseHotSpot, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "bool get_useHotSpot() const", asMETHODPR(StaticSprite2D, GetUseHotSpot, () const, bool), asCALL_THISCALL);
-    // bool StaticSprite2D::GetUseTextureRect() const | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StaticSprite2D", "bool GetUseTextureRect() const", asMETHODPR(StaticSprite2D, GetUseTextureRect, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "bool get_useTextureRect() const", asMETHODPR(StaticSprite2D, GetUseTextureRect, () const, bool), asCALL_THISCALL);
-    // const PODVector<Light*>& Drawable::GetVertexLights() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "Array<Light@>@ GetVertexLights() const", asFUNCTION(StaticSprite2D_GetVertexLights_void), asCALL_CDECL_OBJFIRST);
-    // unsigned Drawable::GetViewMask() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "uint GetViewMask() const", asMETHODPR(StaticSprite2D, GetViewMask, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "uint get_viewMask() const", asMETHODPR(StaticSprite2D, GetViewMask, () const, unsigned), asCALL_THISCALL);
-    // const BoundingBox& Drawable::GetWorldBoundingBox() | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "const BoundingBox& GetWorldBoundingBox()", asMETHODPR(StaticSprite2D, GetWorldBoundingBox, (), const BoundingBox&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "const BoundingBox& get_worldBoundingBox()", asMETHODPR(StaticSprite2D, GetWorldBoundingBox, (), const BoundingBox&), asCALL_THISCALL);
-    // Zone* Drawable::GetZone() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "Zone@+ GetZone() const", asMETHODPR(StaticSprite2D, GetZone, () const, Zone*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "Zone@+ get_zone() const", asMETHODPR(StaticSprite2D, GetZone, () const, Zone*), asCALL_THISCALL);
-    // unsigned Drawable::GetZoneMask() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "uint GetZoneMask() const", asMETHODPR(StaticSprite2D, GetZoneMask, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "uint get_zoneMask() const", asMETHODPR(StaticSprite2D, GetZoneMask, () const, unsigned), asCALL_THISCALL);
-    // bool Drawable::HasBasePass(unsigned batchIndex) const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "bool HasBasePass(uint) const", asMETHODPR(StaticSprite2D, HasBasePass, (unsigned) const, bool), asCALL_THISCALL);
-    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StaticSprite2D", "bool HasEventHandlers() const", asMETHODPR(StaticSprite2D, HasEventHandlers, () const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StaticSprite2D", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(StaticSprite2D, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StaticSprite2D", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(StaticSprite2D, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
-    // bool Component::IsEnabled() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("StaticSprite2D", "bool IsEnabled() const", asMETHODPR(StaticSprite2D, IsEnabled, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "bool get_enabled() const", asMETHODPR(StaticSprite2D, IsEnabled, () const, bool), asCALL_THISCALL);
-    // bool Component::IsEnabledEffective() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("StaticSprite2D", "bool IsEnabledEffective() const", asMETHODPR(StaticSprite2D, IsEnabledEffective, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "bool get_enabledEffective() const", asMETHODPR(StaticSprite2D, IsEnabledEffective, () const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StaticSprite2D", "bool IsInstanceOf(StringHash) const", asMETHODPR(StaticSprite2D, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
-    // Not registered because template
-    // bool Drawable::IsInView() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "bool IsInView() const", asMETHODPR(StaticSprite2D, IsInView, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "bool get_inView() const", asMETHODPR(StaticSprite2D, IsInView, () const, bool), asCALL_THISCALL);
-    // bool Drawable::IsInView(Camera* camera) const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "bool IsInView(Camera@+) const", asMETHODPR(StaticSprite2D, IsInView, (Camera*) const, bool), asCALL_THISCALL);
-    // bool Drawable::IsInView(const FrameInfo& frame, bool anyCamera=false) const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "bool IsInView(const FrameInfo&in, bool = false) const", asMETHODPR(StaticSprite2D, IsInView, (const FrameInfo&, bool) const, bool), asCALL_THISCALL);
-    // bool Drawable::IsOccludee() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "bool IsOccludee() const", asMETHODPR(StaticSprite2D, IsOccludee, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "bool get_occludee() const", asMETHODPR(StaticSprite2D, IsOccludee, () const, bool), asCALL_THISCALL);
-    // bool Drawable::IsOccluder() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "bool IsOccluder() const", asMETHODPR(StaticSprite2D, IsOccluder, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "bool get_occluder() const", asMETHODPR(StaticSprite2D, IsOccluder, () const, bool), asCALL_THISCALL);
-    // bool Component::IsReplicated() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("StaticSprite2D", "bool IsReplicated() const", asMETHODPR(StaticSprite2D, IsReplicated, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "bool get_replicated() const", asMETHODPR(StaticSprite2D, IsReplicated, () const, bool), asCALL_THISCALL);
-    // bool Serializable::IsTemporary() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "bool IsTemporary() const", asMETHODPR(StaticSprite2D, IsTemporary, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "bool get_temporary() const", asMETHODPR(StaticSprite2D, IsTemporary, () const, bool), asCALL_THISCALL);
-    // bool Drawable::IsZoneDirty() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "bool IsZoneDirty() const", asMETHODPR(StaticSprite2D, IsZoneDirty, () const, bool), asCALL_THISCALL);
-    // void Drawable::LimitLights() | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void LimitLights()", asMETHODPR(StaticSprite2D, LimitLights, (), void), asCALL_THISCALL);
-    // void Drawable::LimitVertexLights(bool removeConvertedLights) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void LimitVertexLights(bool)", asMETHODPR(StaticSprite2D, LimitVertexLights, (bool), void), asCALL_THISCALL);
-    // virtual bool Serializable::Load(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "bool Load(Deserializer&)", asMETHODPR(StaticSprite2D, Load, (Deserializer&), bool), asCALL_THISCALL);
-    // bool Animatable::LoadJSON(const JSONValue& source) override | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "bool LoadJSON(const JSONValue&in)", asMETHODPR(StaticSprite2D, LoadJSON, (const JSONValue&), bool), asCALL_THISCALL);
-    // bool Animatable::LoadXML(const XMLElement& source) override | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "bool LoadXML(const XMLElement&in)", asMETHODPR(StaticSprite2D, LoadXML, (const XMLElement&), bool), asCALL_THISCALL);
-    // void Drawable::MarkForUpdate() | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void MarkForUpdate()", asMETHODPR(StaticSprite2D, MarkForUpdate, (), void), asCALL_THISCALL);
-    // void Drawable::MarkInView(const FrameInfo& frame) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void MarkInView(const FrameInfo&in)", asMETHODPR(StaticSprite2D, MarkInView, (const FrameInfo&), void), asCALL_THISCALL);
-    // void Drawable::MarkInView(unsigned frameNumber) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void MarkInView(uint)", asMETHODPR(StaticSprite2D, MarkInView, (unsigned), void), asCALL_THISCALL);
-    // void Component::MarkNetworkUpdate() override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void MarkNetworkUpdate()", asMETHODPR(StaticSprite2D, MarkNetworkUpdate, (), void), asCALL_THISCALL);
-    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(StaticSprite2D, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
-    // virtual void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void OnGetAttribute(const AttributeInfo&in, Variant&) const", asMETHODPR(StaticSprite2D, OnGetAttribute, (const AttributeInfo&, Variant&) const, void), asCALL_THISCALL);
-    // virtual void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void OnSetAttribute(const AttributeInfo&in, const Variant&in)", asMETHODPR(StaticSprite2D, OnSetAttribute, (const AttributeInfo&, const Variant&), void), asCALL_THISCALL);
-    // void Drawable2D::OnSetEnabled() override | File: ../Urho2D/Drawable2D.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void OnSetEnabled()", asMETHODPR(StaticSprite2D, OnSetEnabled, (), void), asCALL_THISCALL);
-    // void Component::PrepareNetworkUpdate() | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void PrepareNetworkUpdate()", asMETHODPR(StaticSprite2D, PrepareNetworkUpdate, (), void), asCALL_THISCALL);
-    // virtual void Drawable::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results) | File: ../Graphics/Drawable.h
-    // Error: type "RayOctreeQuery" can not automatically bind bacause have @nobind mark
-    // bool Serializable::ReadDeltaUpdate(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "bool ReadDeltaUpdate(Deserializer&)", asMETHODPR(StaticSprite2D, ReadDeltaUpdate, (Deserializer&), bool), asCALL_THISCALL);
-    // bool Serializable::ReadLatestDataUpdate(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "bool ReadLatestDataUpdate(Deserializer&)", asMETHODPR(StaticSprite2D, ReadLatestDataUpdate, (Deserializer&), bool), asCALL_THISCALL);
-    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
-    // Error: type "RefCount*" can not automatically bind
-    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("StaticSprite2D", "int Refs() const", asMETHODPR(StaticSprite2D, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "int get_refs() const", asMETHODPR(StaticSprite2D, Refs, () const, int), asCALL_THISCALL);
-    // static void StaticSprite2D::RegisterObject(Context* context) | File: ../Urho2D/StaticSprite2D.h
-    // Context can be used as firs parameter of constructors only
-    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("StaticSprite2D", asBEHAVE_RELEASE, "void f()", asMETHODPR(StaticSprite2D, ReleaseRef, (), void), asCALL_THISCALL);
-    // void Component::Remove() | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void Remove()", asMETHODPR(StaticSprite2D, Remove, (), void), asCALL_THISCALL);
-    // void Animatable::RemoveAttributeAnimation(const String& name) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void RemoveAttributeAnimation(const String&in)", asMETHODPR(StaticSprite2D, RemoveAttributeAnimation, (const String&), void), asCALL_THISCALL);
-    // void Serializable::RemoveInstanceDefault() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void RemoveInstanceDefault()", asMETHODPR(StaticSprite2D, RemoveInstanceDefault, (), void), asCALL_THISCALL);
-    // void Animatable::RemoveObjectAnimation() | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void RemoveObjectAnimation()", asMETHODPR(StaticSprite2D, RemoveObjectAnimation, (), void), asCALL_THISCALL);
-    // void Serializable::ResetToDefault() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void ResetToDefault()", asMETHODPR(StaticSprite2D, ResetToDefault, (), void), asCALL_THISCALL);
-    // bool Component::Save(Serializer& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("StaticSprite2D", "bool Save(Serializer&) const", asMETHODPR(StaticSprite2D, Save, (Serializer&) const, bool), asCALL_THISCALL);
-    // virtual bool Serializable::SaveDefaultAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "bool SaveDefaultAttributes() const", asMETHODPR(StaticSprite2D, SaveDefaultAttributes, () const, bool), asCALL_THISCALL);
-    // bool Component::SaveJSON(JSONValue& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("StaticSprite2D", "bool SaveJSON(JSONValue&) const", asMETHODPR(StaticSprite2D, SaveJSON, (JSONValue&) const, bool), asCALL_THISCALL);
-    // bool Component::SaveXML(XMLElement& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("StaticSprite2D", "bool SaveXML(XMLElement&) const", asMETHODPR(StaticSprite2D, SaveXML, (XMLElement&) const, bool), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SendEvent(StringHash)", asMETHODPR(StaticSprite2D, SendEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(StaticSprite2D, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
-    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
-    // Not registered because template
-    // void StaticSprite2D::SetAlpha(float alpha) | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetAlpha(float)", asMETHODPR(StaticSprite2D, SetAlpha, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "void set_alpha(float)", asMETHODPR(StaticSprite2D, SetAlpha, (float), void), asCALL_THISCALL);
-    // void Animatable::SetAnimationEnabled(bool enable) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetAnimationEnabled(bool)", asMETHODPR(StaticSprite2D, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "void set_animationEnabled(bool)", asMETHODPR(StaticSprite2D, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
-    // void Animatable::SetAnimationTime(float time) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetAnimationTime(float)", asMETHODPR(StaticSprite2D, SetAnimationTime, (float), void), asCALL_THISCALL);
-    // bool Serializable::SetAttribute(unsigned index, const Variant& value) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "bool SetAttribute(uint, const Variant&in)", asMETHODPR(StaticSprite2D, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "bool set_attributes(uint, const Variant&in)", asMETHODPR(StaticSprite2D, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
-    // bool Serializable::SetAttribute(const String& name, const Variant& value) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "bool SetAttribute(const String&in, const Variant&in)", asMETHODPR(StaticSprite2D, SetAttribute, (const String&, const Variant&), bool), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode=WM_LOOP, float speed=1.0f) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetAttributeAnimation(const String&in, ValueAnimation@+, WrapMode = WM_LOOP, float = 1.0f)", asMETHODPR(StaticSprite2D, SetAttributeAnimation, (const String&, ValueAnimation*, WrapMode, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationSpeed(const String& name, float speed) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetAttributeAnimationSpeed(const String&in, float)", asMETHODPR(StaticSprite2D, SetAttributeAnimationSpeed, (const String&, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationTime(const String& name, float time) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetAttributeAnimationTime(const String&in, float)", asMETHODPR(StaticSprite2D, SetAttributeAnimationTime, (const String&, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationWrapMode(const String& name, WrapMode wrapMode) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetAttributeAnimationWrapMode(const String&in, WrapMode)", asMETHODPR(StaticSprite2D, SetAttributeAnimationWrapMode, (const String&, WrapMode), void), asCALL_THISCALL);
-    // void Drawable::SetBasePass(unsigned batchIndex) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetBasePass(uint)", asMETHODPR(StaticSprite2D, SetBasePass, (unsigned), void), asCALL_THISCALL);
-    // void StaticSprite2D::SetBlendMode(BlendMode blendMode) | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetBlendMode(BlendMode)", asMETHODPR(StaticSprite2D, SetBlendMode, (BlendMode), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "void set_blendMode(BlendMode)", asMETHODPR(StaticSprite2D, SetBlendMode, (BlendMode), void), asCALL_THISCALL);
-    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetBlockEvents(bool)", asMETHODPR(StaticSprite2D, SetBlockEvents, (bool), void), asCALL_THISCALL);
-    // void Drawable::SetCastShadows(bool enable) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetCastShadows(bool)", asMETHODPR(StaticSprite2D, SetCastShadows, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "void set_castShadows(bool)", asMETHODPR(StaticSprite2D, SetCastShadows, (bool), void), asCALL_THISCALL);
-    // void StaticSprite2D::SetColor(const Color& color) | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetColor(const Color&in)", asMETHODPR(StaticSprite2D, SetColor, (const Color&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "void set_color(const Color&in)", asMETHODPR(StaticSprite2D, SetColor, (const Color&), void), asCALL_THISCALL);
-    // void StaticSprite2D::SetCustomMaterial(Material* customMaterial) | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetCustomMaterial(Material@+)", asMETHODPR(StaticSprite2D, SetCustomMaterial, (Material*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "void set_customMaterial(Material@+)", asMETHODPR(StaticSprite2D, SetCustomMaterial, (Material*), void), asCALL_THISCALL);
-    // void StaticSprite2D::SetCustomMaterialAttr(const ResourceRef& value) | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetCustomMaterialAttr(const ResourceRef&in)", asMETHODPR(StaticSprite2D, SetCustomMaterialAttr, (const ResourceRef&), void), asCALL_THISCALL);
-    // void Drawable::SetDrawDistance(float distance) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetDrawDistance(float)", asMETHODPR(StaticSprite2D, SetDrawDistance, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "void set_drawDistance(float)", asMETHODPR(StaticSprite2D, SetDrawDistance, (float), void), asCALL_THISCALL);
-    // void StaticSprite2D::SetDrawRect(const Rect& rect) | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetDrawRect(const Rect&in)", asMETHODPR(StaticSprite2D, SetDrawRect, (const Rect&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "void set_drawRect(const Rect&in)", asMETHODPR(StaticSprite2D, SetDrawRect, (const Rect&), void), asCALL_THISCALL);
-    // void Component::SetEnabled(bool enable) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetEnabled(bool)", asMETHODPR(StaticSprite2D, SetEnabled, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "void set_enabled(bool)", asMETHODPR(StaticSprite2D, SetEnabled, (bool), void), asCALL_THISCALL);
-    // void StaticSprite2D::SetFlip(bool flipX, bool flipY, bool swapXY=false) | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetFlip(bool, bool, bool = false)", asMETHODPR(StaticSprite2D, SetFlip, (bool, bool, bool), void), asCALL_THISCALL);
-    // void StaticSprite2D::SetFlipX(bool flipX) | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetFlipX(bool)", asMETHODPR(StaticSprite2D, SetFlipX, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "void set_flipX(bool)", asMETHODPR(StaticSprite2D, SetFlipX, (bool), void), asCALL_THISCALL);
-    // void StaticSprite2D::SetFlipY(bool flipY) | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetFlipY(bool)", asMETHODPR(StaticSprite2D, SetFlipY, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "void set_flipY(bool)", asMETHODPR(StaticSprite2D, SetFlipY, (bool), void), asCALL_THISCALL);
-    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(StaticSprite2D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(StaticSprite2D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    // void StaticSprite2D::SetHotSpot(const Vector2& hotspot) | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetHotSpot(const Vector2&in)", asMETHODPR(StaticSprite2D, SetHotSpot, (const Vector2&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "void set_hotSpot(const Vector2&in)", asMETHODPR(StaticSprite2D, SetHotSpot, (const Vector2&), void), asCALL_THISCALL);
-    // void Serializable::SetInstanceDefault(bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetInstanceDefault(bool)", asMETHODPR(StaticSprite2D, SetInstanceDefault, (bool), void), asCALL_THISCALL);
-    // void Serializable::SetInterceptNetworkUpdate(const String& attributeName, bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetInterceptNetworkUpdate(const String&in, bool)", asMETHODPR(StaticSprite2D, SetInterceptNetworkUpdate, (const String&, bool), void), asCALL_THISCALL);
-    // void Drawable2D::SetLayer(int layer) | File: ../Urho2D/Drawable2D.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetLayer(int)", asMETHODPR(StaticSprite2D, SetLayer, (int), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "void set_layer(int)", asMETHODPR(StaticSprite2D, SetLayer, (int), void), asCALL_THISCALL);
-    // void Drawable::SetLightMask(unsigned mask) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetLightMask(uint)", asMETHODPR(StaticSprite2D, SetLightMask, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "void set_lightMask(uint)", asMETHODPR(StaticSprite2D, SetLightMask, (unsigned), void), asCALL_THISCALL);
-    // void Drawable::SetLodBias(float bias) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetLodBias(float)", asMETHODPR(StaticSprite2D, SetLodBias, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "void set_lodBias(float)", asMETHODPR(StaticSprite2D, SetLodBias, (float), void), asCALL_THISCALL);
-    // void Drawable::SetMaxLights(unsigned num) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetMaxLights(uint)", asMETHODPR(StaticSprite2D, SetMaxLights, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "void set_maxLights(uint)", asMETHODPR(StaticSprite2D, SetMaxLights, (unsigned), void), asCALL_THISCALL);
-    // void Drawable::SetMinMaxZ(float minZ, float maxZ) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetMinMaxZ(float, float)", asMETHODPR(StaticSprite2D, SetMinMaxZ, (float, float), void), asCALL_THISCALL);
-    // void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetObjectAnimation(ObjectAnimation@+)", asMETHODPR(StaticSprite2D, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "void set_objectAnimation(ObjectAnimation@+)", asMETHODPR(StaticSprite2D, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
-    // void Animatable::SetObjectAnimationAttr(const ResourceRef& value) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetObjectAnimationAttr(const ResourceRef&in)", asMETHODPR(StaticSprite2D, SetObjectAnimationAttr, (const ResourceRef&), void), asCALL_THISCALL);
-    // void Drawable::SetOccludee(bool enable) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetOccludee(bool)", asMETHODPR(StaticSprite2D, SetOccludee, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "void set_occludee(bool)", asMETHODPR(StaticSprite2D, SetOccludee, (bool), void), asCALL_THISCALL);
-    // void Drawable::SetOccluder(bool enable) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetOccluder(bool)", asMETHODPR(StaticSprite2D, SetOccluder, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "void set_occluder(bool)", asMETHODPR(StaticSprite2D, SetOccluder, (bool), void), asCALL_THISCALL);
-    // void Drawable2D::SetOrderInLayer(int orderInLayer) | File: ../Urho2D/Drawable2D.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetOrderInLayer(int)", asMETHODPR(StaticSprite2D, SetOrderInLayer, (int), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "void set_orderInLayer(int)", asMETHODPR(StaticSprite2D, SetOrderInLayer, (int), void), asCALL_THISCALL);
-    // void Drawable::SetShadowDistance(float distance) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetShadowDistance(float)", asMETHODPR(StaticSprite2D, SetShadowDistance, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "void set_shadowDistance(float)", asMETHODPR(StaticSprite2D, SetShadowDistance, (float), void), asCALL_THISCALL);
-    // void Drawable::SetShadowMask(unsigned mask) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetShadowMask(uint)", asMETHODPR(StaticSprite2D, SetShadowMask, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "void set_shadowMask(uint)", asMETHODPR(StaticSprite2D, SetShadowMask, (unsigned), void), asCALL_THISCALL);
-    // void Drawable::SetSortValue(float value) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetSortValue(float)", asMETHODPR(StaticSprite2D, SetSortValue, (float), void), asCALL_THISCALL);
-    // void StaticSprite2D::SetSprite(Sprite2D* sprite) | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetSprite(Sprite2D@+)", asMETHODPR(StaticSprite2D, SetSprite, (Sprite2D*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "void set_sprite(Sprite2D@+)", asMETHODPR(StaticSprite2D, SetSprite, (Sprite2D*), void), asCALL_THISCALL);
-    // void StaticSprite2D::SetSpriteAttr(const ResourceRef& value) | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetSpriteAttr(const ResourceRef&in)", asMETHODPR(StaticSprite2D, SetSpriteAttr, (const ResourceRef&), void), asCALL_THISCALL);
-    // void StaticSprite2D::SetSwapXY(bool swapXY) | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetSwapXY(bool)", asMETHODPR(StaticSprite2D, SetSwapXY, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "void set_swapXY(bool)", asMETHODPR(StaticSprite2D, SetSwapXY, (bool), void), asCALL_THISCALL);
-    // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetTemporary(bool)", asMETHODPR(StaticSprite2D, SetTemporary, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "void set_temporary(bool)", asMETHODPR(StaticSprite2D, SetTemporary, (bool), void), asCALL_THISCALL);
-    // void StaticSprite2D::SetTextureRect(const Rect& rect) | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetTextureRect(const Rect&in)", asMETHODPR(StaticSprite2D, SetTextureRect, (const Rect&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "void set_textureRect(const Rect&in)", asMETHODPR(StaticSprite2D, SetTextureRect, (const Rect&), void), asCALL_THISCALL);
-    // void StaticSprite2D::SetUseDrawRect(bool useDrawRect) | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetUseDrawRect(bool)", asMETHODPR(StaticSprite2D, SetUseDrawRect, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "void set_useDrawRect(bool)", asMETHODPR(StaticSprite2D, SetUseDrawRect, (bool), void), asCALL_THISCALL);
-    // void StaticSprite2D::SetUseHotSpot(bool useHotSpot) | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetUseHotSpot(bool)", asMETHODPR(StaticSprite2D, SetUseHotSpot, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "void set_useHotSpot(bool)", asMETHODPR(StaticSprite2D, SetUseHotSpot, (bool), void), asCALL_THISCALL);
-    // void StaticSprite2D::SetUseTextureRect(bool useTextureRect) | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetUseTextureRect(bool)", asMETHODPR(StaticSprite2D, SetUseTextureRect, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "void set_useTextureRect(bool)", asMETHODPR(StaticSprite2D, SetUseTextureRect, (bool), void), asCALL_THISCALL);
-    // void Drawable::SetViewMask(unsigned mask) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetViewMask(uint)", asMETHODPR(StaticSprite2D, SetViewMask, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "void set_viewMask(uint)", asMETHODPR(StaticSprite2D, SetViewMask, (unsigned), void), asCALL_THISCALL);
-    // void Drawable::SetZone(Zone* zone, bool temporary=false) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetZone(Zone@+, bool = false)", asMETHODPR(StaticSprite2D, SetZone, (Zone*, bool), void), asCALL_THISCALL);
-    // void Drawable::SetZoneMask(unsigned mask) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void SetZoneMask(uint)", asMETHODPR(StaticSprite2D, SetZoneMask, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "void set_zoneMask(uint)", asMETHODPR(StaticSprite2D, SetZoneMask, (unsigned), void), asCALL_THISCALL);
-    // explicit StaticSprite2D::StaticSprite2D(Context* context) | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectBehaviour("StaticSprite2D", asBEHAVE_FACTORY, "StaticSprite2D@+ f()", asFUNCTION(StaticSprite2D_StaticSprite2D_Context), asCALL_CDECL);
-    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void UnsubscribeFromAllEvents()", asMETHODPR(StaticSprite2D, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(StaticSprite2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
-    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(StaticSprite2D, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(StaticSprite2D, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(StaticSprite2D, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
-    // virtual void Drawable::Update(const FrameInfo& frame) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void Update(const FrameInfo&in)", asMETHODPR(StaticSprite2D, Update, (const FrameInfo&), void), asCALL_THISCALL);
-    // virtual void Drawable::UpdateBatches(const FrameInfo& frame) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void UpdateBatches(const FrameInfo&in)", asMETHODPR(StaticSprite2D, UpdateBatches, (const FrameInfo&), void), asCALL_THISCALL);
-    // virtual void Drawable::UpdateGeometry(const FrameInfo& frame) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void UpdateGeometry(const FrameInfo&in)", asMETHODPR(StaticSprite2D, UpdateGeometry, (const FrameInfo&), void), asCALL_THISCALL);
-    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("StaticSprite2D", "int WeakRefs() const", asMETHODPR(StaticSprite2D, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticSprite2D", "int get_weakRefs() const", asMETHODPR(StaticSprite2D, WeakRefs, () const, int), asCALL_THISCALL);
-    // void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attributeBits, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void WriteDeltaUpdate(Serializer&, const DirtyBits&in, uint8)", asMETHODPR(StaticSprite2D, WriteDeltaUpdate, (Serializer&, const DirtyBits&, unsigned char), void), asCALL_THISCALL);
-    // void Serializable::WriteInitialDeltaUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void WriteInitialDeltaUpdate(Serializer&, uint8)", asMETHODPR(StaticSprite2D, WriteInitialDeltaUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
-    // void Serializable::WriteLatestDataUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StaticSprite2D", "void WriteLatestDataUpdate(Serializer&, uint8)", asMETHODPR(StaticSprite2D, WriteLatestDataUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
-#ifdef REGISTER_MANUAL_PART_Drawable2D
-    REGISTER_MANUAL_PART_Drawable2D(StaticSprite2D, "StaticSprite2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Drawable
-    REGISTER_MANUAL_PART_Drawable(StaticSprite2D, "StaticSprite2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Component
-    REGISTER_MANUAL_PART_Component(StaticSprite2D, "StaticSprite2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Animatable
-    REGISTER_MANUAL_PART_Animatable(StaticSprite2D, "StaticSprite2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Serializable
-    REGISTER_MANUAL_PART_Serializable(StaticSprite2D, "StaticSprite2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Object
-    REGISTER_MANUAL_PART_Object(StaticSprite2D, "StaticSprite2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(StaticSprite2D, "StaticSprite2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_StaticSprite2D
-    REGISTER_MANUAL_PART_StaticSprite2D(StaticSprite2D, "StaticSprite2D")
-#endif
-    RegisterSubclass<Drawable2D, StaticSprite2D>(engine, "Drawable2D", "StaticSprite2D");
-    RegisterSubclass<Drawable, StaticSprite2D>(engine, "Drawable", "StaticSprite2D");
-    RegisterSubclass<Component, StaticSprite2D>(engine, "Component", "StaticSprite2D");
-    RegisterSubclass<Animatable, StaticSprite2D>(engine, "Animatable", "StaticSprite2D");
-    RegisterSubclass<Serializable, StaticSprite2D>(engine, "Serializable", "StaticSprite2D");
-    RegisterSubclass<Object, StaticSprite2D>(engine, "Object", "StaticSprite2D");
-    RegisterSubclass<RefCounted, StaticSprite2D>(engine, "RefCounted", "StaticSprite2D");
-#endif
-
-    // const StringHash StringHash::ZERO | File: ../Math/StringHash.h
-    engine->SetDefaultNamespace("StringHash");
-    engine->RegisterGlobalProperty("const StringHash ZERO", (void*)&StringHash::ZERO);
-    engine->SetDefaultNamespace("");
-    // static unsigned StringHash::Calculate(const char* str, unsigned hash=0) | File: ../Math/StringHash.h
-    // Error: type "const char*" can not automatically bind
-    // static StringHashRegister* StringHash::GetGlobalStringHashRegister() | File: ../Math/StringHash.h
-    // Error: type "StringHashRegister*" can not automatically bind
-    // explicit StringHash::operator bool() const | File: ../Math/StringHash.h
-    engine->RegisterObjectMethod("StringHash", "bool opConv() const", asMETHODPR(StringHash, operator bool, () const, bool), asCALL_THISCALL);
-    // StringHash StringHash::operator+(const StringHash& rhs) const | File: ../Math/StringHash.h
-    engine->RegisterObjectMethod("StringHash", "StringHash opAdd(const StringHash&in) const", asMETHODPR(StringHash, operator+, (const StringHash&) const, StringHash), asCALL_THISCALL);
-    // StringHash& StringHash::operator+=(const StringHash& rhs) | File: ../Math/StringHash.h
-    engine->RegisterObjectMethod("StringHash", "StringHash& opAddAssign(const StringHash&in)", asMETHODPR(StringHash, operator+=, (const StringHash&), StringHash&), asCALL_THISCALL);
-    // StringHash& StringHash::operator=(const StringHash& rhs) noexcept=default | File: ../Math/StringHash.h
-    engine->RegisterObjectMethod("StringHash", "StringHash& opAssign(const StringHash&in)", asMETHODPR(StringHash, operator=, (const StringHash&), StringHash&), asCALL_THISCALL);
-    // bool StringHash::operator==(const StringHash& rhs) const | File: ../Math/StringHash.h
-    engine->RegisterObjectMethod("StringHash", "bool opEquals(const StringHash&in) const", asMETHODPR(StringHash, operator==, (const StringHash&) const, bool), asCALL_THISCALL);
-    // String StringHash::Reverse() const | File: ../Math/StringHash.h
-    engine->RegisterObjectMethod("StringHash", "String Reverse() const", asMETHODPR(StringHash, Reverse, () const, String), asCALL_THISCALL);
-    // StringHash::StringHash(const StringHash& rhs) noexcept=default | File: ../Math/StringHash.h
-    engine->RegisterObjectBehaviour("StringHash", asBEHAVE_CONSTRUCT, "void f(const StringHash&in)", asFUNCTION(StringHash_StringHash_StringHash), asCALL_CDECL_OBJFIRST);
-    // explicit StringHash::StringHash(unsigned value) noexcept | File: ../Math/StringHash.h
-    engine->RegisterObjectBehaviour("StringHash", asBEHAVE_CONSTRUCT, "void f(uint)", asFUNCTION(StringHash_StringHash_unsigned), asCALL_CDECL_OBJFIRST);
-    // StringHash::StringHash(const char* str) noexcept | File: ../Math/StringHash.h
-    // Error: type "const char*" can not automatically bind
-    // StringHash::StringHash(const String& str) noexcept | File: ../Math/StringHash.h
-    engine->RegisterObjectBehaviour("StringHash", asBEHAVE_CONSTRUCT, "void f(const String&in)", asFUNCTION(StringHash_StringHash_String), asCALL_CDECL_OBJFIRST);
-    // unsigned StringHash::ToHash() const | File: ../Math/StringHash.h
-    engine->RegisterObjectMethod("StringHash", "uint ToHash() const", asMETHODPR(StringHash, ToHash, () const, unsigned), asCALL_THISCALL);
-    // String StringHash::ToString() const | File: ../Math/StringHash.h
-    engine->RegisterObjectMethod("StringHash", "String ToString() const", asMETHODPR(StringHash, ToString, () const, String), asCALL_THISCALL);
-    // unsigned StringHash::Value() const | File: ../Math/StringHash.h
-    engine->RegisterObjectMethod("StringHash", "uint Value() const", asMETHODPR(StringHash, Value, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StringHash", "uint get_value() const", asMETHODPR(StringHash, Value, () const, unsigned), asCALL_THISCALL);
-    // bool StringHash::operator<(const StringHash& rhs) const | File: ../Math/StringHash.h
-    // bool StringHash::operator>(const StringHash& rhs) const | File: ../Math/StringHash.h
-    engine->RegisterObjectMethod("StringHash", "int opCmp(const StringHash&in) const", asFUNCTION(StringHash_Comparison), asCALL_CDECL_OBJFIRST);
-#ifdef REGISTER_MANUAL_PART_StringHash
-    REGISTER_MANUAL_PART_StringHash(StringHash, "StringHash")
-#endif
-
-#ifdef URHO3D_URHO2D
-    // void Drawable::AddLight(Light* light) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void AddLight(Light@+)", asMETHODPR(StretchableSprite2D, AddLight, (Light*), void), asCALL_THISCALL);
-    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("StretchableSprite2D", asBEHAVE_ADDREF, "void f()", asMETHODPR(StretchableSprite2D, AddRef, (), void), asCALL_THISCALL);
-    // void Component::AddReplicationState(ComponentReplicationState* state) | File: ../Scene/Component.h
-    // Error: type "ComponentReplicationState*" can not automatically bind
-    // void Drawable::AddVertexLight(Light* light) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void AddVertexLight(Light@+)", asMETHODPR(StretchableSprite2D, AddVertexLight, (Light*), void), asCALL_THISCALL);
-    // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void AllocateNetworkState()", asMETHODPR(StretchableSprite2D, AllocateNetworkState, (), void), asCALL_THISCALL);
-    // virtual void Serializable::ApplyAttributes() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void ApplyAttributes()", asMETHODPR(StretchableSprite2D, ApplyAttributes, (), void), asCALL_THISCALL);
-    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
-    // Not registered because template
-    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
-    // Not registered because template
-    // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void CleanupConnection(Connection@+)", asMETHODPR(StretchableSprite2D, CleanupConnection, (Connection*), void), asCALL_THISCALL);
-    // void Drawable::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(StretchableSprite2D, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
-    // virtual bool Drawable::DrawOcclusion(OcclusionBuffer* buffer) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool DrawOcclusion(OcclusionBuffer@+)", asMETHODPR(StretchableSprite2D, DrawOcclusion, (OcclusionBuffer*), bool), asCALL_THISCALL);
-    // float StaticSprite2D::GetAlpha() const | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "float GetAlpha() const", asMETHODPR(StretchableSprite2D, GetAlpha, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "float get_alpha() const", asMETHODPR(StretchableSprite2D, GetAlpha, () const, float), asCALL_THISCALL);
-    // bool Animatable::GetAnimationEnabled() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool GetAnimationEnabled() const", asMETHODPR(StretchableSprite2D, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool get_animationEnabled() const", asMETHODPR(StretchableSprite2D, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
-    // Variant Serializable::GetAttribute(unsigned index) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "Variant GetAttribute(uint) const", asMETHODPR(StretchableSprite2D, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "Variant get_attributes(uint) const", asMETHODPR(StretchableSprite2D, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
-    // Variant Serializable::GetAttribute(const String& name) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "Variant GetAttribute(const String&in) const", asMETHODPR(StretchableSprite2D, GetAttribute, (const String&) const, Variant), asCALL_THISCALL);
-    // ValueAnimation* Animatable::GetAttributeAnimation(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "ValueAnimation@+ GetAttributeAnimation(const String&in) const", asMETHODPR(StretchableSprite2D, GetAttributeAnimation, (const String&) const, ValueAnimation*), asCALL_THISCALL);
-    // float Animatable::GetAttributeAnimationSpeed(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "float GetAttributeAnimationSpeed(const String&in) const", asMETHODPR(StretchableSprite2D, GetAttributeAnimationSpeed, (const String&) const, float), asCALL_THISCALL);
-    // float Animatable::GetAttributeAnimationTime(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "float GetAttributeAnimationTime(const String&in) const", asMETHODPR(StretchableSprite2D, GetAttributeAnimationTime, (const String&) const, float), asCALL_THISCALL);
-    // WrapMode Animatable::GetAttributeAnimationWrapMode(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "WrapMode GetAttributeAnimationWrapMode(const String&in) const", asMETHODPR(StretchableSprite2D, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), asCALL_THISCALL);
-    // Variant Serializable::GetAttributeDefault(unsigned index) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "Variant GetAttributeDefault(uint) const", asMETHODPR(StretchableSprite2D, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "Variant get_attributeDefaults(uint) const", asMETHODPR(StretchableSprite2D, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
-    // Variant Serializable::GetAttributeDefault(const String& name) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "Variant GetAttributeDefault(const String&in) const", asMETHODPR(StretchableSprite2D, GetAttributeDefault, (const String&) const, Variant), asCALL_THISCALL);
-    // virtual const Vector<AttributeInfo>* Serializable::GetAttributes() const | File: ../Scene/Serializable.h
-    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
-    // const Vector<SourceBatch>& Drawable::GetBatches() const | File: ../Graphics/Drawable.h
-    // Error: type "const Vector<SourceBatch>&" can not automatically bind
-    // BlendMode StaticSprite2D::GetBlendMode() const | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "BlendMode GetBlendMode() const", asMETHODPR(StretchableSprite2D, GetBlendMode, () const, BlendMode), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "BlendMode get_blendMode() const", asMETHODPR(StretchableSprite2D, GetBlendMode, () const, BlendMode), asCALL_THISCALL);
-    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool GetBlockEvents() const", asMETHODPR(StretchableSprite2D, GetBlockEvents, () const, bool), asCALL_THISCALL);
-    // const IntRect& StretchableSprite2D::GetBorder() const | File: ../Urho2D/StretchableSprite2D.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "const IntRect& GetBorder() const", asMETHODPR(StretchableSprite2D, GetBorder, () const, const IntRect&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "const IntRect& get_border() const", asMETHODPR(StretchableSprite2D, GetBorder, () const, const IntRect&), asCALL_THISCALL);
-    // const BoundingBox& Drawable::GetBoundingBox() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "const BoundingBox& GetBoundingBox() const", asMETHODPR(StretchableSprite2D, GetBoundingBox, () const, const BoundingBox&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "const BoundingBox& get_boundingBox() const", asMETHODPR(StretchableSprite2D, GetBoundingBox, () const, const BoundingBox&), asCALL_THISCALL);
-    // bool Drawable::GetCastShadows() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool GetCastShadows() const", asMETHODPR(StretchableSprite2D, GetCastShadows, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool get_castShadows() const", asMETHODPR(StretchableSprite2D, GetCastShadows, () const, bool), asCALL_THISCALL);
-    // const String& Object::GetCategory() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "const String& GetCategory() const", asMETHODPR(StretchableSprite2D, GetCategory, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "const String& get_category() const", asMETHODPR(StretchableSprite2D, GetCategory, () const, const String&), asCALL_THISCALL);
-    // const Color& StaticSprite2D::GetColor() const | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "const Color& GetColor() const", asMETHODPR(StretchableSprite2D, GetColor, () const, const Color&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "const Color& get_color() const", asMETHODPR(StretchableSprite2D, GetColor, () const, const Color&), asCALL_THISCALL);
-    // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "Component@+ GetComponent(StringHash) const", asMETHODPR(StretchableSprite2D, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
-    // template<class T> T*  Component::GetComponent() const | File: ../Scene/Component.h
-    // Not registered because template
-    // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
-    // Error: type "PODVector<Component*>&" can not automatically bind
-    // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
-    // Not registered because template
-    // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
-    // Material* StaticSprite2D::GetCustomMaterial() const | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "Material@+ GetCustomMaterial() const", asMETHODPR(StretchableSprite2D, GetCustomMaterial, () const, Material*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "Material@+ get_customMaterial() const", asMETHODPR(StretchableSprite2D, GetCustomMaterial, () const, Material*), asCALL_THISCALL);
-    // ResourceRef StaticSprite2D::GetCustomMaterialAttr() const | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "ResourceRef GetCustomMaterialAttr() const", asMETHODPR(StretchableSprite2D, GetCustomMaterialAttr, () const, ResourceRef), asCALL_THISCALL);
-    // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
-    // Error: type "PODVector<Node*>&" can not automatically bind
-    // float Drawable::GetDistance() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "float GetDistance() const", asMETHODPR(StretchableSprite2D, GetDistance, () const, float), asCALL_THISCALL);
-    // unsigned char Drawable::GetDrawableFlags() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "uint8 GetDrawableFlags() const", asMETHODPR(StretchableSprite2D, GetDrawableFlags, () const, unsigned char), asCALL_THISCALL);
-    // float Drawable::GetDrawDistance() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "float GetDrawDistance() const", asMETHODPR(StretchableSprite2D, GetDrawDistance, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "float get_drawDistance() const", asMETHODPR(StretchableSprite2D, GetDrawDistance, () const, float), asCALL_THISCALL);
-    // const Rect& StaticSprite2D::GetDrawRect() const | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "const Rect& GetDrawRect() const", asMETHODPR(StretchableSprite2D, GetDrawRect, () const, const Rect&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "const Rect& get_drawRect() const", asMETHODPR(StretchableSprite2D, GetDrawRect, () const, const Rect&), asCALL_THISCALL);
-    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "VariantMap& GetEventDataMap() const", asMETHODPR(StretchableSprite2D, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
-    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // Object* Object::GetEventSender() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "Object@+ GetEventSender() const", asMETHODPR(StretchableSprite2D, GetEventSender, () const, Object*), asCALL_THISCALL);
-    // Light* Drawable::GetFirstLight() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "Light@+ GetFirstLight() const", asMETHODPR(StretchableSprite2D, GetFirstLight, () const, Light*), asCALL_THISCALL);
-    // bool StaticSprite2D::GetFlipX() const | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool GetFlipX() const", asMETHODPR(StretchableSprite2D, GetFlipX, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool get_flipX() const", asMETHODPR(StretchableSprite2D, GetFlipX, () const, bool), asCALL_THISCALL);
-    // bool StaticSprite2D::GetFlipY() const | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool GetFlipY() const", asMETHODPR(StretchableSprite2D, GetFlipY, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool get_flipY() const", asMETHODPR(StretchableSprite2D, GetFlipY, () const, bool), asCALL_THISCALL);
-    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(StretchableSprite2D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "const Variant& get_globalVar(StringHash) const", asMETHODPR(StretchableSprite2D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "const VariantMap& GetGlobalVars() const", asMETHODPR(StretchableSprite2D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "const VariantMap& get_globalVars() const", asMETHODPR(StretchableSprite2D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    // const Vector2& StaticSprite2D::GetHotSpot() const | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "const Vector2& GetHotSpot() const", asMETHODPR(StretchableSprite2D, GetHotSpot, () const, const Vector2&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "const Vector2& get_hotSpot() const", asMETHODPR(StretchableSprite2D, GetHotSpot, () const, const Vector2&), asCALL_THISCALL);
-    // unsigned Component::GetID() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "uint GetID() const", asMETHODPR(StretchableSprite2D, GetID, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "uint get_id() const", asMETHODPR(StretchableSprite2D, GetID, () const, unsigned), asCALL_THISCALL);
-    // bool Serializable::GetInterceptNetworkUpdate(const String& attributeName) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool GetInterceptNetworkUpdate(const String&in) const", asMETHODPR(StretchableSprite2D, GetInterceptNetworkUpdate, (const String&) const, bool), asCALL_THISCALL);
-    // int Drawable2D::GetLayer() const | File: ../Urho2D/Drawable2D.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "int GetLayer() const", asMETHODPR(StretchableSprite2D, GetLayer, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "int get_layer() const", asMETHODPR(StretchableSprite2D, GetLayer, () const, int), asCALL_THISCALL);
-    // unsigned Drawable::GetLightMask() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "uint GetLightMask() const", asMETHODPR(StretchableSprite2D, GetLightMask, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "uint get_lightMask() const", asMETHODPR(StretchableSprite2D, GetLightMask, () const, unsigned), asCALL_THISCALL);
-    // const PODVector<Light*>& Drawable::GetLights() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "Array<Light@>@ GetLights() const", asFUNCTION(StretchableSprite2D_GetLights_void), asCALL_CDECL_OBJFIRST);
-    // float Drawable::GetLodBias() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "float GetLodBias() const", asMETHODPR(StretchableSprite2D, GetLodBias, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "float get_lodBias() const", asMETHODPR(StretchableSprite2D, GetLodBias, () const, float), asCALL_THISCALL);
-    // float Drawable::GetLodDistance() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "float GetLodDistance() const", asMETHODPR(StretchableSprite2D, GetLodDistance, () const, float), asCALL_THISCALL);
-    // virtual Geometry* Drawable::GetLodGeometry(unsigned batchIndex, unsigned level) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "Geometry@+ GetLodGeometry(uint, uint)", asMETHODPR(StretchableSprite2D, GetLodGeometry, (unsigned, unsigned), Geometry*), asCALL_THISCALL);
-    // unsigned Drawable::GetMaxLights() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "uint GetMaxLights() const", asMETHODPR(StretchableSprite2D, GetMaxLights, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "uint get_maxLights() const", asMETHODPR(StretchableSprite2D, GetMaxLights, () const, unsigned), asCALL_THISCALL);
-    // float Drawable::GetMaxZ() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "float GetMaxZ() const", asMETHODPR(StretchableSprite2D, GetMaxZ, () const, float), asCALL_THISCALL);
-    // float Drawable::GetMinZ() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "float GetMinZ() const", asMETHODPR(StretchableSprite2D, GetMinZ, () const, float), asCALL_THISCALL);
-    // virtual const Vector<AttributeInfo>* Serializable::GetNetworkAttributes() const | File: ../Scene/Serializable.h
-    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
-    // NetworkState* Serializable::GetNetworkState() const | File: ../Scene/Serializable.h
-    // Error: type "NetworkState*" can not automatically bind
-    // Node* Component::GetNode() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "Node@+ GetNode() const", asMETHODPR(StretchableSprite2D, GetNode, () const, Node*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "Node@+ get_node() const", asMETHODPR(StretchableSprite2D, GetNode, () const, Node*), asCALL_THISCALL);
-    // unsigned Serializable::GetNumAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "uint GetNumAttributes() const", asMETHODPR(StretchableSprite2D, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "uint get_numAttributes() const", asMETHODPR(StretchableSprite2D, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
-    // unsigned Serializable::GetNumNetworkAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "uint GetNumNetworkAttributes() const", asMETHODPR(StretchableSprite2D, GetNumNetworkAttributes, () const, unsigned), asCALL_THISCALL);
-    // virtual unsigned Drawable::GetNumOccluderTriangles() | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "uint GetNumOccluderTriangles()", asMETHODPR(StretchableSprite2D, GetNumOccluderTriangles, (), unsigned), asCALL_THISCALL);
-    // ObjectAnimation* Animatable::GetObjectAnimation() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "ObjectAnimation@+ GetObjectAnimation() const", asMETHODPR(StretchableSprite2D, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "ObjectAnimation@+ get_objectAnimation() const", asMETHODPR(StretchableSprite2D, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
-    // ResourceRef Animatable::GetObjectAnimationAttr() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "ResourceRef GetObjectAnimationAttr() const", asMETHODPR(StretchableSprite2D, GetObjectAnimationAttr, () const, ResourceRef), asCALL_THISCALL);
-    // Octant* Drawable::GetOctant() const | File: ../Graphics/Drawable.h
-    // Error: type "Octant" can not automatically bind bacause have @nobind mark
-    // int Drawable2D::GetOrderInLayer() const | File: ../Urho2D/Drawable2D.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "int GetOrderInLayer() const", asMETHODPR(StretchableSprite2D, GetOrderInLayer, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "int get_orderInLayer() const", asMETHODPR(StretchableSprite2D, GetOrderInLayer, () const, int), asCALL_THISCALL);
-    // Scene* Component::GetScene() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "Scene@+ GetScene() const", asMETHODPR(StretchableSprite2D, GetScene, () const, Scene*), asCALL_THISCALL);
-    // float Drawable::GetShadowDistance() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "float GetShadowDistance() const", asMETHODPR(StretchableSprite2D, GetShadowDistance, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "float get_shadowDistance() const", asMETHODPR(StretchableSprite2D, GetShadowDistance, () const, float), asCALL_THISCALL);
-    // unsigned Drawable::GetShadowMask() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "uint GetShadowMask() const", asMETHODPR(StretchableSprite2D, GetShadowMask, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "uint get_shadowMask() const", asMETHODPR(StretchableSprite2D, GetShadowMask, () const, unsigned), asCALL_THISCALL);
-    // float Drawable::GetSortValue() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "float GetSortValue() const", asMETHODPR(StretchableSprite2D, GetSortValue, () const, float), asCALL_THISCALL);
-    // const Vector<SourceBatch2D>& Drawable2D::GetSourceBatches() | File: ../Urho2D/Drawable2D.h
-    // Error: type "const Vector<SourceBatch2D>&" can not automatically bind
-    // Sprite2D* StaticSprite2D::GetSprite() const | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "Sprite2D@+ GetSprite() const", asMETHODPR(StretchableSprite2D, GetSprite, () const, Sprite2D*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "Sprite2D@+ get_sprite() const", asMETHODPR(StretchableSprite2D, GetSprite, () const, Sprite2D*), asCALL_THISCALL);
-    // ResourceRef StaticSprite2D::GetSpriteAttr() const | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "ResourceRef GetSpriteAttr() const", asMETHODPR(StretchableSprite2D, GetSpriteAttr, () const, ResourceRef), asCALL_THISCALL);
-    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(StretchableSprite2D, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
-    // Not registered because template
-    // bool StaticSprite2D::GetSwapXY() const | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool GetSwapXY() const", asMETHODPR(StretchableSprite2D, GetSwapXY, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool get_swapXY() const", asMETHODPR(StretchableSprite2D, GetSwapXY, () const, bool), asCALL_THISCALL);
-    // const Rect& StaticSprite2D::GetTextureRect() const | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "const Rect& GetTextureRect() const", asMETHODPR(StretchableSprite2D, GetTextureRect, () const, const Rect&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "const Rect& get_textureRect() const", asMETHODPR(StretchableSprite2D, GetTextureRect, () const, const Rect&), asCALL_THISCALL);
-    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "StringHash GetType() const", asMETHODPR(StretchableSprite2D, GetType, () const, StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "StringHash get_type() const", asMETHODPR(StretchableSprite2D, GetType, () const, StringHash), asCALL_THISCALL);
-    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "const String& GetTypeName() const", asMETHODPR(StretchableSprite2D, GetTypeName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "const String& get_typeName() const", asMETHODPR(StretchableSprite2D, GetTypeName, () const, const String&), asCALL_THISCALL);
-    // virtual UpdateGeometryType Drawable::GetUpdateGeometryType() | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "UpdateGeometryType GetUpdateGeometryType()", asMETHODPR(StretchableSprite2D, GetUpdateGeometryType, (), UpdateGeometryType), asCALL_THISCALL);
-    // bool StaticSprite2D::GetUseDrawRect() const | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool GetUseDrawRect() const", asMETHODPR(StretchableSprite2D, GetUseDrawRect, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool get_useDrawRect() const", asMETHODPR(StretchableSprite2D, GetUseDrawRect, () const, bool), asCALL_THISCALL);
-    // bool StaticSprite2D::GetUseHotSpot() const | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool GetUseHotSpot() const", asMETHODPR(StretchableSprite2D, GetUseHotSpot, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool get_useHotSpot() const", asMETHODPR(StretchableSprite2D, GetUseHotSpot, () const, bool), asCALL_THISCALL);
-    // bool StaticSprite2D::GetUseTextureRect() const | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool GetUseTextureRect() const", asMETHODPR(StretchableSprite2D, GetUseTextureRect, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool get_useTextureRect() const", asMETHODPR(StretchableSprite2D, GetUseTextureRect, () const, bool), asCALL_THISCALL);
-    // const PODVector<Light*>& Drawable::GetVertexLights() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "Array<Light@>@ GetVertexLights() const", asFUNCTION(StretchableSprite2D_GetVertexLights_void), asCALL_CDECL_OBJFIRST);
-    // unsigned Drawable::GetViewMask() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "uint GetViewMask() const", asMETHODPR(StretchableSprite2D, GetViewMask, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "uint get_viewMask() const", asMETHODPR(StretchableSprite2D, GetViewMask, () const, unsigned), asCALL_THISCALL);
-    // const BoundingBox& Drawable::GetWorldBoundingBox() | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "const BoundingBox& GetWorldBoundingBox()", asMETHODPR(StretchableSprite2D, GetWorldBoundingBox, (), const BoundingBox&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "const BoundingBox& get_worldBoundingBox()", asMETHODPR(StretchableSprite2D, GetWorldBoundingBox, (), const BoundingBox&), asCALL_THISCALL);
-    // Zone* Drawable::GetZone() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "Zone@+ GetZone() const", asMETHODPR(StretchableSprite2D, GetZone, () const, Zone*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "Zone@+ get_zone() const", asMETHODPR(StretchableSprite2D, GetZone, () const, Zone*), asCALL_THISCALL);
-    // unsigned Drawable::GetZoneMask() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "uint GetZoneMask() const", asMETHODPR(StretchableSprite2D, GetZoneMask, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "uint get_zoneMask() const", asMETHODPR(StretchableSprite2D, GetZoneMask, () const, unsigned), asCALL_THISCALL);
-    // bool Drawable::HasBasePass(unsigned batchIndex) const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool HasBasePass(uint) const", asMETHODPR(StretchableSprite2D, HasBasePass, (unsigned) const, bool), asCALL_THISCALL);
-    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool HasEventHandlers() const", asMETHODPR(StretchableSprite2D, HasEventHandlers, () const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(StretchableSprite2D, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(StretchableSprite2D, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
-    // bool Component::IsEnabled() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool IsEnabled() const", asMETHODPR(StretchableSprite2D, IsEnabled, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool get_enabled() const", asMETHODPR(StretchableSprite2D, IsEnabled, () const, bool), asCALL_THISCALL);
-    // bool Component::IsEnabledEffective() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool IsEnabledEffective() const", asMETHODPR(StretchableSprite2D, IsEnabledEffective, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool get_enabledEffective() const", asMETHODPR(StretchableSprite2D, IsEnabledEffective, () const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool IsInstanceOf(StringHash) const", asMETHODPR(StretchableSprite2D, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
-    // Not registered because template
-    // bool Drawable::IsInView() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool IsInView() const", asMETHODPR(StretchableSprite2D, IsInView, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool get_inView() const", asMETHODPR(StretchableSprite2D, IsInView, () const, bool), asCALL_THISCALL);
-    // bool Drawable::IsInView(Camera* camera) const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool IsInView(Camera@+) const", asMETHODPR(StretchableSprite2D, IsInView, (Camera*) const, bool), asCALL_THISCALL);
-    // bool Drawable::IsInView(const FrameInfo& frame, bool anyCamera=false) const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool IsInView(const FrameInfo&in, bool = false) const", asMETHODPR(StretchableSprite2D, IsInView, (const FrameInfo&, bool) const, bool), asCALL_THISCALL);
-    // bool Drawable::IsOccludee() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool IsOccludee() const", asMETHODPR(StretchableSprite2D, IsOccludee, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool get_occludee() const", asMETHODPR(StretchableSprite2D, IsOccludee, () const, bool), asCALL_THISCALL);
-    // bool Drawable::IsOccluder() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool IsOccluder() const", asMETHODPR(StretchableSprite2D, IsOccluder, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool get_occluder() const", asMETHODPR(StretchableSprite2D, IsOccluder, () const, bool), asCALL_THISCALL);
-    // bool Component::IsReplicated() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool IsReplicated() const", asMETHODPR(StretchableSprite2D, IsReplicated, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool get_replicated() const", asMETHODPR(StretchableSprite2D, IsReplicated, () const, bool), asCALL_THISCALL);
-    // bool Serializable::IsTemporary() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool IsTemporary() const", asMETHODPR(StretchableSprite2D, IsTemporary, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool get_temporary() const", asMETHODPR(StretchableSprite2D, IsTemporary, () const, bool), asCALL_THISCALL);
-    // bool Drawable::IsZoneDirty() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool IsZoneDirty() const", asMETHODPR(StretchableSprite2D, IsZoneDirty, () const, bool), asCALL_THISCALL);
-    // void Drawable::LimitLights() | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void LimitLights()", asMETHODPR(StretchableSprite2D, LimitLights, (), void), asCALL_THISCALL);
-    // void Drawable::LimitVertexLights(bool removeConvertedLights) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void LimitVertexLights(bool)", asMETHODPR(StretchableSprite2D, LimitVertexLights, (bool), void), asCALL_THISCALL);
-    // virtual bool Serializable::Load(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool Load(Deserializer&)", asMETHODPR(StretchableSprite2D, Load, (Deserializer&), bool), asCALL_THISCALL);
-    // bool Animatable::LoadJSON(const JSONValue& source) override | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool LoadJSON(const JSONValue&in)", asMETHODPR(StretchableSprite2D, LoadJSON, (const JSONValue&), bool), asCALL_THISCALL);
-    // bool Animatable::LoadXML(const XMLElement& source) override | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool LoadXML(const XMLElement&in)", asMETHODPR(StretchableSprite2D, LoadXML, (const XMLElement&), bool), asCALL_THISCALL);
-    // void Drawable::MarkForUpdate() | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void MarkForUpdate()", asMETHODPR(StretchableSprite2D, MarkForUpdate, (), void), asCALL_THISCALL);
-    // void Drawable::MarkInView(const FrameInfo& frame) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void MarkInView(const FrameInfo&in)", asMETHODPR(StretchableSprite2D, MarkInView, (const FrameInfo&), void), asCALL_THISCALL);
-    // void Drawable::MarkInView(unsigned frameNumber) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void MarkInView(uint)", asMETHODPR(StretchableSprite2D, MarkInView, (unsigned), void), asCALL_THISCALL);
-    // void Component::MarkNetworkUpdate() override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void MarkNetworkUpdate()", asMETHODPR(StretchableSprite2D, MarkNetworkUpdate, (), void), asCALL_THISCALL);
-    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(StretchableSprite2D, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
-    // virtual void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void OnGetAttribute(const AttributeInfo&in, Variant&) const", asMETHODPR(StretchableSprite2D, OnGetAttribute, (const AttributeInfo&, Variant&) const, void), asCALL_THISCALL);
-    // virtual void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void OnSetAttribute(const AttributeInfo&in, const Variant&in)", asMETHODPR(StretchableSprite2D, OnSetAttribute, (const AttributeInfo&, const Variant&), void), asCALL_THISCALL);
-    // void Drawable2D::OnSetEnabled() override | File: ../Urho2D/Drawable2D.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void OnSetEnabled()", asMETHODPR(StretchableSprite2D, OnSetEnabled, (), void), asCALL_THISCALL);
-    // void Component::PrepareNetworkUpdate() | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void PrepareNetworkUpdate()", asMETHODPR(StretchableSprite2D, PrepareNetworkUpdate, (), void), asCALL_THISCALL);
-    // virtual void Drawable::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results) | File: ../Graphics/Drawable.h
-    // Error: type "RayOctreeQuery" can not automatically bind bacause have @nobind mark
-    // bool Serializable::ReadDeltaUpdate(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool ReadDeltaUpdate(Deserializer&)", asMETHODPR(StretchableSprite2D, ReadDeltaUpdate, (Deserializer&), bool), asCALL_THISCALL);
-    // bool Serializable::ReadLatestDataUpdate(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool ReadLatestDataUpdate(Deserializer&)", asMETHODPR(StretchableSprite2D, ReadLatestDataUpdate, (Deserializer&), bool), asCALL_THISCALL);
-    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
-    // Error: type "RefCount*" can not automatically bind
-    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "int Refs() const", asMETHODPR(StretchableSprite2D, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "int get_refs() const", asMETHODPR(StretchableSprite2D, Refs, () const, int), asCALL_THISCALL);
-    // static void StretchableSprite2D::RegisterObject(Context* context) | File: ../Urho2D/StretchableSprite2D.h
-    // Context can be used as firs parameter of constructors only
-    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("StretchableSprite2D", asBEHAVE_RELEASE, "void f()", asMETHODPR(StretchableSprite2D, ReleaseRef, (), void), asCALL_THISCALL);
-    // void Component::Remove() | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void Remove()", asMETHODPR(StretchableSprite2D, Remove, (), void), asCALL_THISCALL);
-    // void Animatable::RemoveAttributeAnimation(const String& name) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void RemoveAttributeAnimation(const String&in)", asMETHODPR(StretchableSprite2D, RemoveAttributeAnimation, (const String&), void), asCALL_THISCALL);
-    // void Serializable::RemoveInstanceDefault() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void RemoveInstanceDefault()", asMETHODPR(StretchableSprite2D, RemoveInstanceDefault, (), void), asCALL_THISCALL);
-    // void Animatable::RemoveObjectAnimation() | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void RemoveObjectAnimation()", asMETHODPR(StretchableSprite2D, RemoveObjectAnimation, (), void), asCALL_THISCALL);
-    // void Serializable::ResetToDefault() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void ResetToDefault()", asMETHODPR(StretchableSprite2D, ResetToDefault, (), void), asCALL_THISCALL);
-    // bool Component::Save(Serializer& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool Save(Serializer&) const", asMETHODPR(StretchableSprite2D, Save, (Serializer&) const, bool), asCALL_THISCALL);
-    // virtual bool Serializable::SaveDefaultAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool SaveDefaultAttributes() const", asMETHODPR(StretchableSprite2D, SaveDefaultAttributes, () const, bool), asCALL_THISCALL);
-    // bool Component::SaveJSON(JSONValue& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool SaveJSON(JSONValue&) const", asMETHODPR(StretchableSprite2D, SaveJSON, (JSONValue&) const, bool), asCALL_THISCALL);
-    // bool Component::SaveXML(XMLElement& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool SaveXML(XMLElement&) const", asMETHODPR(StretchableSprite2D, SaveXML, (XMLElement&) const, bool), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SendEvent(StringHash)", asMETHODPR(StretchableSprite2D, SendEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(StretchableSprite2D, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
-    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
-    // Not registered because template
-    // void StaticSprite2D::SetAlpha(float alpha) | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetAlpha(float)", asMETHODPR(StretchableSprite2D, SetAlpha, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "void set_alpha(float)", asMETHODPR(StretchableSprite2D, SetAlpha, (float), void), asCALL_THISCALL);
-    // void Animatable::SetAnimationEnabled(bool enable) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetAnimationEnabled(bool)", asMETHODPR(StretchableSprite2D, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "void set_animationEnabled(bool)", asMETHODPR(StretchableSprite2D, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
-    // void Animatable::SetAnimationTime(float time) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetAnimationTime(float)", asMETHODPR(StretchableSprite2D, SetAnimationTime, (float), void), asCALL_THISCALL);
-    // bool Serializable::SetAttribute(unsigned index, const Variant& value) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool SetAttribute(uint, const Variant&in)", asMETHODPR(StretchableSprite2D, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool set_attributes(uint, const Variant&in)", asMETHODPR(StretchableSprite2D, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
-    // bool Serializable::SetAttribute(const String& name, const Variant& value) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "bool SetAttribute(const String&in, const Variant&in)", asMETHODPR(StretchableSprite2D, SetAttribute, (const String&, const Variant&), bool), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode=WM_LOOP, float speed=1.0f) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetAttributeAnimation(const String&in, ValueAnimation@+, WrapMode = WM_LOOP, float = 1.0f)", asMETHODPR(StretchableSprite2D, SetAttributeAnimation, (const String&, ValueAnimation*, WrapMode, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationSpeed(const String& name, float speed) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetAttributeAnimationSpeed(const String&in, float)", asMETHODPR(StretchableSprite2D, SetAttributeAnimationSpeed, (const String&, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationTime(const String& name, float time) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetAttributeAnimationTime(const String&in, float)", asMETHODPR(StretchableSprite2D, SetAttributeAnimationTime, (const String&, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationWrapMode(const String& name, WrapMode wrapMode) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetAttributeAnimationWrapMode(const String&in, WrapMode)", asMETHODPR(StretchableSprite2D, SetAttributeAnimationWrapMode, (const String&, WrapMode), void), asCALL_THISCALL);
-    // void Drawable::SetBasePass(unsigned batchIndex) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetBasePass(uint)", asMETHODPR(StretchableSprite2D, SetBasePass, (unsigned), void), asCALL_THISCALL);
-    // void StaticSprite2D::SetBlendMode(BlendMode blendMode) | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetBlendMode(BlendMode)", asMETHODPR(StretchableSprite2D, SetBlendMode, (BlendMode), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "void set_blendMode(BlendMode)", asMETHODPR(StretchableSprite2D, SetBlendMode, (BlendMode), void), asCALL_THISCALL);
-    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetBlockEvents(bool)", asMETHODPR(StretchableSprite2D, SetBlockEvents, (bool), void), asCALL_THISCALL);
-    // void StretchableSprite2D::SetBorder(const IntRect& border) | File: ../Urho2D/StretchableSprite2D.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetBorder(const IntRect&in)", asMETHODPR(StretchableSprite2D, SetBorder, (const IntRect&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "void set_border(const IntRect&in)", asMETHODPR(StretchableSprite2D, SetBorder, (const IntRect&), void), asCALL_THISCALL);
-    // void Drawable::SetCastShadows(bool enable) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetCastShadows(bool)", asMETHODPR(StretchableSprite2D, SetCastShadows, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "void set_castShadows(bool)", asMETHODPR(StretchableSprite2D, SetCastShadows, (bool), void), asCALL_THISCALL);
-    // void StaticSprite2D::SetColor(const Color& color) | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetColor(const Color&in)", asMETHODPR(StretchableSprite2D, SetColor, (const Color&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "void set_color(const Color&in)", asMETHODPR(StretchableSprite2D, SetColor, (const Color&), void), asCALL_THISCALL);
-    // void StaticSprite2D::SetCustomMaterial(Material* customMaterial) | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetCustomMaterial(Material@+)", asMETHODPR(StretchableSprite2D, SetCustomMaterial, (Material*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "void set_customMaterial(Material@+)", asMETHODPR(StretchableSprite2D, SetCustomMaterial, (Material*), void), asCALL_THISCALL);
-    // void StaticSprite2D::SetCustomMaterialAttr(const ResourceRef& value) | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetCustomMaterialAttr(const ResourceRef&in)", asMETHODPR(StretchableSprite2D, SetCustomMaterialAttr, (const ResourceRef&), void), asCALL_THISCALL);
-    // void Drawable::SetDrawDistance(float distance) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetDrawDistance(float)", asMETHODPR(StretchableSprite2D, SetDrawDistance, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "void set_drawDistance(float)", asMETHODPR(StretchableSprite2D, SetDrawDistance, (float), void), asCALL_THISCALL);
-    // void StaticSprite2D::SetDrawRect(const Rect& rect) | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetDrawRect(const Rect&in)", asMETHODPR(StretchableSprite2D, SetDrawRect, (const Rect&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "void set_drawRect(const Rect&in)", asMETHODPR(StretchableSprite2D, SetDrawRect, (const Rect&), void), asCALL_THISCALL);
-    // void Component::SetEnabled(bool enable) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetEnabled(bool)", asMETHODPR(StretchableSprite2D, SetEnabled, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "void set_enabled(bool)", asMETHODPR(StretchableSprite2D, SetEnabled, (bool), void), asCALL_THISCALL);
-    // void StaticSprite2D::SetFlip(bool flipX, bool flipY, bool swapXY=false) | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetFlip(bool, bool, bool = false)", asMETHODPR(StretchableSprite2D, SetFlip, (bool, bool, bool), void), asCALL_THISCALL);
-    // void StaticSprite2D::SetFlipX(bool flipX) | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetFlipX(bool)", asMETHODPR(StretchableSprite2D, SetFlipX, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "void set_flipX(bool)", asMETHODPR(StretchableSprite2D, SetFlipX, (bool), void), asCALL_THISCALL);
-    // void StaticSprite2D::SetFlipY(bool flipY) | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetFlipY(bool)", asMETHODPR(StretchableSprite2D, SetFlipY, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "void set_flipY(bool)", asMETHODPR(StretchableSprite2D, SetFlipY, (bool), void), asCALL_THISCALL);
-    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(StretchableSprite2D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(StretchableSprite2D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    // void StaticSprite2D::SetHotSpot(const Vector2& hotspot) | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetHotSpot(const Vector2&in)", asMETHODPR(StretchableSprite2D, SetHotSpot, (const Vector2&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "void set_hotSpot(const Vector2&in)", asMETHODPR(StretchableSprite2D, SetHotSpot, (const Vector2&), void), asCALL_THISCALL);
-    // void Serializable::SetInstanceDefault(bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetInstanceDefault(bool)", asMETHODPR(StretchableSprite2D, SetInstanceDefault, (bool), void), asCALL_THISCALL);
-    // void Serializable::SetInterceptNetworkUpdate(const String& attributeName, bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetInterceptNetworkUpdate(const String&in, bool)", asMETHODPR(StretchableSprite2D, SetInterceptNetworkUpdate, (const String&, bool), void), asCALL_THISCALL);
-    // void Drawable2D::SetLayer(int layer) | File: ../Urho2D/Drawable2D.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetLayer(int)", asMETHODPR(StretchableSprite2D, SetLayer, (int), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "void set_layer(int)", asMETHODPR(StretchableSprite2D, SetLayer, (int), void), asCALL_THISCALL);
-    // void Drawable::SetLightMask(unsigned mask) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetLightMask(uint)", asMETHODPR(StretchableSprite2D, SetLightMask, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "void set_lightMask(uint)", asMETHODPR(StretchableSprite2D, SetLightMask, (unsigned), void), asCALL_THISCALL);
-    // void Drawable::SetLodBias(float bias) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetLodBias(float)", asMETHODPR(StretchableSprite2D, SetLodBias, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "void set_lodBias(float)", asMETHODPR(StretchableSprite2D, SetLodBias, (float), void), asCALL_THISCALL);
-    // void Drawable::SetMaxLights(unsigned num) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetMaxLights(uint)", asMETHODPR(StretchableSprite2D, SetMaxLights, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "void set_maxLights(uint)", asMETHODPR(StretchableSprite2D, SetMaxLights, (unsigned), void), asCALL_THISCALL);
-    // void Drawable::SetMinMaxZ(float minZ, float maxZ) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetMinMaxZ(float, float)", asMETHODPR(StretchableSprite2D, SetMinMaxZ, (float, float), void), asCALL_THISCALL);
-    // void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetObjectAnimation(ObjectAnimation@+)", asMETHODPR(StretchableSprite2D, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "void set_objectAnimation(ObjectAnimation@+)", asMETHODPR(StretchableSprite2D, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
-    // void Animatable::SetObjectAnimationAttr(const ResourceRef& value) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetObjectAnimationAttr(const ResourceRef&in)", asMETHODPR(StretchableSprite2D, SetObjectAnimationAttr, (const ResourceRef&), void), asCALL_THISCALL);
-    // void Drawable::SetOccludee(bool enable) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetOccludee(bool)", asMETHODPR(StretchableSprite2D, SetOccludee, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "void set_occludee(bool)", asMETHODPR(StretchableSprite2D, SetOccludee, (bool), void), asCALL_THISCALL);
-    // void Drawable::SetOccluder(bool enable) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetOccluder(bool)", asMETHODPR(StretchableSprite2D, SetOccluder, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "void set_occluder(bool)", asMETHODPR(StretchableSprite2D, SetOccluder, (bool), void), asCALL_THISCALL);
-    // void Drawable2D::SetOrderInLayer(int orderInLayer) | File: ../Urho2D/Drawable2D.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetOrderInLayer(int)", asMETHODPR(StretchableSprite2D, SetOrderInLayer, (int), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "void set_orderInLayer(int)", asMETHODPR(StretchableSprite2D, SetOrderInLayer, (int), void), asCALL_THISCALL);
-    // void Drawable::SetShadowDistance(float distance) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetShadowDistance(float)", asMETHODPR(StretchableSprite2D, SetShadowDistance, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "void set_shadowDistance(float)", asMETHODPR(StretchableSprite2D, SetShadowDistance, (float), void), asCALL_THISCALL);
-    // void Drawable::SetShadowMask(unsigned mask) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetShadowMask(uint)", asMETHODPR(StretchableSprite2D, SetShadowMask, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "void set_shadowMask(uint)", asMETHODPR(StretchableSprite2D, SetShadowMask, (unsigned), void), asCALL_THISCALL);
-    // void Drawable::SetSortValue(float value) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetSortValue(float)", asMETHODPR(StretchableSprite2D, SetSortValue, (float), void), asCALL_THISCALL);
-    // void StaticSprite2D::SetSprite(Sprite2D* sprite) | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetSprite(Sprite2D@+)", asMETHODPR(StretchableSprite2D, SetSprite, (Sprite2D*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "void set_sprite(Sprite2D@+)", asMETHODPR(StretchableSprite2D, SetSprite, (Sprite2D*), void), asCALL_THISCALL);
-    // void StaticSprite2D::SetSpriteAttr(const ResourceRef& value) | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetSpriteAttr(const ResourceRef&in)", asMETHODPR(StretchableSprite2D, SetSpriteAttr, (const ResourceRef&), void), asCALL_THISCALL);
-    // void StaticSprite2D::SetSwapXY(bool swapXY) | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetSwapXY(bool)", asMETHODPR(StretchableSprite2D, SetSwapXY, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "void set_swapXY(bool)", asMETHODPR(StretchableSprite2D, SetSwapXY, (bool), void), asCALL_THISCALL);
-    // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetTemporary(bool)", asMETHODPR(StretchableSprite2D, SetTemporary, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "void set_temporary(bool)", asMETHODPR(StretchableSprite2D, SetTemporary, (bool), void), asCALL_THISCALL);
-    // void StaticSprite2D::SetTextureRect(const Rect& rect) | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetTextureRect(const Rect&in)", asMETHODPR(StretchableSprite2D, SetTextureRect, (const Rect&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "void set_textureRect(const Rect&in)", asMETHODPR(StretchableSprite2D, SetTextureRect, (const Rect&), void), asCALL_THISCALL);
-    // void StaticSprite2D::SetUseDrawRect(bool useDrawRect) | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetUseDrawRect(bool)", asMETHODPR(StretchableSprite2D, SetUseDrawRect, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "void set_useDrawRect(bool)", asMETHODPR(StretchableSprite2D, SetUseDrawRect, (bool), void), asCALL_THISCALL);
-    // void StaticSprite2D::SetUseHotSpot(bool useHotSpot) | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetUseHotSpot(bool)", asMETHODPR(StretchableSprite2D, SetUseHotSpot, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "void set_useHotSpot(bool)", asMETHODPR(StretchableSprite2D, SetUseHotSpot, (bool), void), asCALL_THISCALL);
-    // void StaticSprite2D::SetUseTextureRect(bool useTextureRect) | File: ../Urho2D/StaticSprite2D.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetUseTextureRect(bool)", asMETHODPR(StretchableSprite2D, SetUseTextureRect, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "void set_useTextureRect(bool)", asMETHODPR(StretchableSprite2D, SetUseTextureRect, (bool), void), asCALL_THISCALL);
-    // void Drawable::SetViewMask(unsigned mask) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetViewMask(uint)", asMETHODPR(StretchableSprite2D, SetViewMask, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "void set_viewMask(uint)", asMETHODPR(StretchableSprite2D, SetViewMask, (unsigned), void), asCALL_THISCALL);
-    // void Drawable::SetZone(Zone* zone, bool temporary=false) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetZone(Zone@+, bool = false)", asMETHODPR(StretchableSprite2D, SetZone, (Zone*, bool), void), asCALL_THISCALL);
-    // void Drawable::SetZoneMask(unsigned mask) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void SetZoneMask(uint)", asMETHODPR(StretchableSprite2D, SetZoneMask, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "void set_zoneMask(uint)", asMETHODPR(StretchableSprite2D, SetZoneMask, (unsigned), void), asCALL_THISCALL);
-    // explicit StretchableSprite2D::StretchableSprite2D(Context* context) | File: ../Urho2D/StretchableSprite2D.h
-    engine->RegisterObjectBehaviour("StretchableSprite2D", asBEHAVE_FACTORY, "StretchableSprite2D@+ f()", asFUNCTION(StretchableSprite2D_StretchableSprite2D_Context), asCALL_CDECL);
-    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void UnsubscribeFromAllEvents()", asMETHODPR(StretchableSprite2D, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(StretchableSprite2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
-    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(StretchableSprite2D, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(StretchableSprite2D, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(StretchableSprite2D, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
-    // virtual void Drawable::Update(const FrameInfo& frame) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void Update(const FrameInfo&in)", asMETHODPR(StretchableSprite2D, Update, (const FrameInfo&), void), asCALL_THISCALL);
-    // virtual void Drawable::UpdateBatches(const FrameInfo& frame) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void UpdateBatches(const FrameInfo&in)", asMETHODPR(StretchableSprite2D, UpdateBatches, (const FrameInfo&), void), asCALL_THISCALL);
-    // virtual void Drawable::UpdateGeometry(const FrameInfo& frame) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void UpdateGeometry(const FrameInfo&in)", asMETHODPR(StretchableSprite2D, UpdateGeometry, (const FrameInfo&), void), asCALL_THISCALL);
-    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "int WeakRefs() const", asMETHODPR(StretchableSprite2D, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StretchableSprite2D", "int get_weakRefs() const", asMETHODPR(StretchableSprite2D, WeakRefs, () const, int), asCALL_THISCALL);
-    // void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attributeBits, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void WriteDeltaUpdate(Serializer&, const DirtyBits&in, uint8)", asMETHODPR(StretchableSprite2D, WriteDeltaUpdate, (Serializer&, const DirtyBits&, unsigned char), void), asCALL_THISCALL);
-    // void Serializable::WriteInitialDeltaUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void WriteInitialDeltaUpdate(Serializer&, uint8)", asMETHODPR(StretchableSprite2D, WriteInitialDeltaUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
-    // void Serializable::WriteLatestDataUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("StretchableSprite2D", "void WriteLatestDataUpdate(Serializer&, uint8)", asMETHODPR(StretchableSprite2D, WriteLatestDataUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
-#ifdef REGISTER_MANUAL_PART_StaticSprite2D
-    REGISTER_MANUAL_PART_StaticSprite2D(StretchableSprite2D, "StretchableSprite2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Drawable2D
-    REGISTER_MANUAL_PART_Drawable2D(StretchableSprite2D, "StretchableSprite2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Drawable
-    REGISTER_MANUAL_PART_Drawable(StretchableSprite2D, "StretchableSprite2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Component
-    REGISTER_MANUAL_PART_Component(StretchableSprite2D, "StretchableSprite2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Animatable
-    REGISTER_MANUAL_PART_Animatable(StretchableSprite2D, "StretchableSprite2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Serializable
-    REGISTER_MANUAL_PART_Serializable(StretchableSprite2D, "StretchableSprite2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Object
-    REGISTER_MANUAL_PART_Object(StretchableSprite2D, "StretchableSprite2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(StretchableSprite2D, "StretchableSprite2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_StretchableSprite2D
-    REGISTER_MANUAL_PART_StretchableSprite2D(StretchableSprite2D, "StretchableSprite2D")
-#endif
-    RegisterSubclass<StaticSprite2D, StretchableSprite2D>(engine, "StaticSprite2D", "StretchableSprite2D");
-    RegisterSubclass<Drawable2D, StretchableSprite2D>(engine, "Drawable2D", "StretchableSprite2D");
-    RegisterSubclass<Drawable, StretchableSprite2D>(engine, "Drawable", "StretchableSprite2D");
-    RegisterSubclass<Component, StretchableSprite2D>(engine, "Component", "StretchableSprite2D");
-    RegisterSubclass<Animatable, StretchableSprite2D>(engine, "Animatable", "StretchableSprite2D");
-    RegisterSubclass<Serializable, StretchableSprite2D>(engine, "Serializable", "StretchableSprite2D");
-    RegisterSubclass<Object, StretchableSprite2D>(engine, "Object", "StretchableSprite2D");
-    RegisterSubclass<RefCounted, StretchableSprite2D>(engine, "RefCounted", "StretchableSprite2D");
-#endif
-
     // void ResourceWithMetadata::AddMetadata(const String& name, const Variant& value) | File: ../Resource/Resource.h
     engine->RegisterObjectMethod("Sound", "void AddMetadata(const String&in, const Variant&in)", asMETHODPR(Sound, AddMetadata, (const String&, const Variant&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Sound", "void set_metadata(const String&in, const Variant&in)", asMETHODPR(Sound, AddMetadata, (const String&, const Variant&), void), asCALL_THISCALL);
@@ -4388,6 +3082,366 @@ void ASRegisterGenerated_Members_Sn_Sz(asIScriptEngine* engine)
     RegisterSubclass<Object, Sprite>(engine, "Object", "Sprite");
     RegisterSubclass<RefCounted, Sprite>(engine, "RefCounted", "Sprite");
 
+#ifdef URHO3D_URHO2D
+    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("Sprite2D", asBEHAVE_ADDREF, "void f()", asMETHODPR(Sprite2D, AddRef, (), void), asCALL_THISCALL);
+    // bool Sprite2D::BeginLoad(Deserializer& source) override | File: ../Urho2D/Sprite2D.h
+    engine->RegisterObjectMethod("Sprite2D", "bool BeginLoad(Deserializer&)", asMETHODPR(Sprite2D, BeginLoad, (Deserializer&), bool), asCALL_THISCALL);
+    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
+    // Not registered because template
+    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
+    // Not registered because template
+    // bool Sprite2D::EndLoad() override | File: ../Urho2D/Sprite2D.h
+    engine->RegisterObjectMethod("Sprite2D", "bool EndLoad()", asMETHODPR(Sprite2D, EndLoad, (), bool), asCALL_THISCALL);
+    // AsyncLoadState Resource::GetAsyncLoadState() const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Sprite2D", "AsyncLoadState GetAsyncLoadState() const", asMETHODPR(Sprite2D, GetAsyncLoadState, () const, AsyncLoadState), asCALL_THISCALL);
+    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Sprite2D", "bool GetBlockEvents() const", asMETHODPR(Sprite2D, GetBlockEvents, () const, bool), asCALL_THISCALL);
+    // const String& Object::GetCategory() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Sprite2D", "const String& GetCategory() const", asMETHODPR(Sprite2D, GetCategory, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite2D", "const String& get_category() const", asMETHODPR(Sprite2D, GetCategory, () const, const String&), asCALL_THISCALL);
+    // Context* Object::GetContext() const | File: ../Core/Object.h
+    // Error: type "Context*" can not be returned
+    // bool Sprite2D::GetDrawRectangle(Rect& rect, bool flipX=false, bool flipY=false) const | File: ../Urho2D/Sprite2D.h
+    engine->RegisterObjectMethod("Sprite2D", "bool GetDrawRectangle(Rect&, bool = false, bool = false) const", asMETHODPR(Sprite2D, GetDrawRectangle, (Rect&, bool, bool) const, bool), asCALL_THISCALL);
+    // bool Sprite2D::GetDrawRectangle(Rect& rect, const Vector2& hotSpot, bool flipX=false, bool flipY=false) const | File: ../Urho2D/Sprite2D.h
+    engine->RegisterObjectMethod("Sprite2D", "bool GetDrawRectangle(Rect&, const Vector2&in, bool = false, bool = false) const", asMETHODPR(Sprite2D, GetDrawRectangle, (Rect&, const Vector2&, bool, bool) const, bool), asCALL_THISCALL);
+    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Sprite2D", "VariantMap& GetEventDataMap() const", asMETHODPR(Sprite2D, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
+    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // Object* Object::GetEventSender() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Sprite2D", "Object@+ GetEventSender() const", asMETHODPR(Sprite2D, GetEventSender, () const, Object*), asCALL_THISCALL);
+    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Sprite2D", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(Sprite2D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite2D", "const Variant& get_globalVar(StringHash) const", asMETHODPR(Sprite2D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Sprite2D", "const VariantMap& GetGlobalVars() const", asMETHODPR(Sprite2D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite2D", "const VariantMap& get_globalVars() const", asMETHODPR(Sprite2D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    // const Vector2& Sprite2D::GetHotSpot() const | File: ../Urho2D/Sprite2D.h
+    engine->RegisterObjectMethod("Sprite2D", "const Vector2& GetHotSpot() const", asMETHODPR(Sprite2D, GetHotSpot, () const, const Vector2&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite2D", "const Vector2& get_hotSpot() const", asMETHODPR(Sprite2D, GetHotSpot, () const, const Vector2&), asCALL_THISCALL);
+    // unsigned Resource::GetMemoryUse() const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Sprite2D", "uint GetMemoryUse() const", asMETHODPR(Sprite2D, GetMemoryUse, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite2D", "uint get_memoryUse() const", asMETHODPR(Sprite2D, GetMemoryUse, () const, unsigned), asCALL_THISCALL);
+    // const String& Resource::GetName() const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Sprite2D", "const String& GetName() const", asMETHODPR(Sprite2D, GetName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite2D", "const String& get_name() const", asMETHODPR(Sprite2D, GetName, () const, const String&), asCALL_THISCALL);
+    // StringHash Resource::GetNameHash() const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Sprite2D", "StringHash GetNameHash() const", asMETHODPR(Sprite2D, GetNameHash, () const, StringHash), asCALL_THISCALL);
+    // const IntVector2& Sprite2D::GetOffset() const | File: ../Urho2D/Sprite2D.h
+    engine->RegisterObjectMethod("Sprite2D", "const IntVector2& GetOffset() const", asMETHODPR(Sprite2D, GetOffset, () const, const IntVector2&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite2D", "const IntVector2& get_offset() const", asMETHODPR(Sprite2D, GetOffset, () const, const IntVector2&), asCALL_THISCALL);
+    // const IntRect& Sprite2D::GetRectangle() const | File: ../Urho2D/Sprite2D.h
+    engine->RegisterObjectMethod("Sprite2D", "const IntRect& GetRectangle() const", asMETHODPR(Sprite2D, GetRectangle, () const, const IntRect&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite2D", "const IntRect& get_rectangle() const", asMETHODPR(Sprite2D, GetRectangle, () const, const IntRect&), asCALL_THISCALL);
+    // SpriteSheet2D* Sprite2D::GetSpriteSheet() const | File: ../Urho2D/Sprite2D.h
+    engine->RegisterObjectMethod("Sprite2D", "SpriteSheet2D@+ GetSpriteSheet() const", asMETHODPR(Sprite2D, GetSpriteSheet, () const, SpriteSheet2D*), asCALL_THISCALL);
+    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Sprite2D", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Sprite2D, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
+    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // Not registered because template
+    // Texture2D* Sprite2D::GetTexture() const | File: ../Urho2D/Sprite2D.h
+    engine->RegisterObjectMethod("Sprite2D", "Texture2D@+ GetTexture() const", asMETHODPR(Sprite2D, GetTexture, () const, Texture2D*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite2D", "Texture2D@+ get_texture() const", asMETHODPR(Sprite2D, GetTexture, () const, Texture2D*), asCALL_THISCALL);
+    // float Sprite2D::GetTextureEdgeOffset() const | File: ../Urho2D/Sprite2D.h
+    engine->RegisterObjectMethod("Sprite2D", "float GetTextureEdgeOffset() const", asMETHODPR(Sprite2D, GetTextureEdgeOffset, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite2D", "float get_textureEdgeOffset() const", asMETHODPR(Sprite2D, GetTextureEdgeOffset, () const, float), asCALL_THISCALL);
+    // bool Sprite2D::GetTextureRectangle(Rect& rect, bool flipX=false, bool flipY=false) const | File: ../Urho2D/Sprite2D.h
+    engine->RegisterObjectMethod("Sprite2D", "bool GetTextureRectangle(Rect&, bool = false, bool = false) const", asMETHODPR(Sprite2D, GetTextureRectangle, (Rect&, bool, bool) const, bool), asCALL_THISCALL);
+    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Sprite2D", "StringHash GetType() const", asMETHODPR(Sprite2D, GetType, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite2D", "StringHash get_type() const", asMETHODPR(Sprite2D, GetType, () const, StringHash), asCALL_THISCALL);
+    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Sprite2D", "const String& GetTypeName() const", asMETHODPR(Sprite2D, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite2D", "const String& get_typeName() const", asMETHODPR(Sprite2D, GetTypeName, () const, const String&), asCALL_THISCALL);
+    // unsigned Resource::GetUseTimer() | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Sprite2D", "uint GetUseTimer()", asMETHODPR(Sprite2D, GetUseTimer, (), unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite2D", "uint get_useTimer()", asMETHODPR(Sprite2D, GetUseTimer, (), unsigned), asCALL_THISCALL);
+    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Sprite2D", "bool HasEventHandlers() const", asMETHODPR(Sprite2D, HasEventHandlers, () const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Sprite2D", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(Sprite2D, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Sprite2D", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(Sprite2D, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Sprite2D", "bool IsInstanceOf(StringHash) const", asMETHODPR(Sprite2D, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
+    // Not registered because template
+    // bool Resource::Load(Deserializer& source) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Sprite2D", "bool Load(Deserializer&)", asMETHODPR(Sprite2D, Load, (Deserializer&), bool), asCALL_THISCALL);
+    // bool Resource::LoadFile(const String& fileName) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Sprite2D", "bool LoadFile(const String&in)", asMETHODPR(Sprite2D, LoadFile, (const String&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite2D", "bool Load(const String&in)", asMETHODPR(Sprite2D, LoadFile, (const String&), bool), asCALL_THISCALL);
+    // static Sprite2D* Sprite2D::LoadFromResourceRef(Object* object, const ResourceRef& value) | File: ../Urho2D/Sprite2D.h
+    engine->SetDefaultNamespace("Sprite2D");
+    engine->RegisterGlobalFunction("Sprite2D@+ LoadFromResourceRef(Object@+, const ResourceRef&in)", asFUNCTIONPR(Sprite2D::LoadFromResourceRef, (Object*, const ResourceRef&), Sprite2D*), asCALL_CDECL);
+    engine->SetDefaultNamespace("");
+    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Sprite2D", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(Sprite2D, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
+    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
+    // Error: type "RefCount*" can not automatically bind
+    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("Sprite2D", "int Refs() const", asMETHODPR(Sprite2D, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite2D", "int get_refs() const", asMETHODPR(Sprite2D, Refs, () const, int), asCALL_THISCALL);
+    // static void Sprite2D::RegisterObject(Context* context) | File: ../Urho2D/Sprite2D.h
+    // Context can be used as firs parameter of constructors only
+    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("Sprite2D", asBEHAVE_RELEASE, "void f()", asMETHODPR(Sprite2D, ReleaseRef, (), void), asCALL_THISCALL);
+    // void Resource::ResetUseTimer() | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Sprite2D", "void ResetUseTimer()", asMETHODPR(Sprite2D, ResetUseTimer, (), void), asCALL_THISCALL);
+    // virtual bool Resource::Save(Serializer& dest) const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Sprite2D", "bool Save(Serializer&) const", asMETHODPR(Sprite2D, Save, (Serializer&) const, bool), asCALL_THISCALL);
+    // virtual bool Resource::SaveFile(const String& fileName) const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Sprite2D", "bool SaveFile(const String&in) const", asMETHODPR(Sprite2D, SaveFile, (const String&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite2D", "bool Save(const String&in) const", asMETHODPR(Sprite2D, SaveFile, (const String&) const, bool), asCALL_THISCALL);
+    // static ResourceRef Sprite2D::SaveToResourceRef(Sprite2D* sprite) | File: ../Urho2D/Sprite2D.h
+    engine->SetDefaultNamespace("Sprite2D");
+    engine->RegisterGlobalFunction("ResourceRef SaveToResourceRef(Sprite2D@+)", asFUNCTIONPR(Sprite2D::SaveToResourceRef, (Sprite2D*), ResourceRef), asCALL_CDECL);
+    engine->SetDefaultNamespace("");
+    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Sprite2D", "void SendEvent(StringHash)", asMETHODPR(Sprite2D, SendEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Sprite2D", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(Sprite2D, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
+    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
+    // Not registered because template
+    // void Resource::SetAsyncLoadState(AsyncLoadState newState) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Sprite2D", "void SetAsyncLoadState(AsyncLoadState)", asMETHODPR(Sprite2D, SetAsyncLoadState, (AsyncLoadState), void), asCALL_THISCALL);
+    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Sprite2D", "void SetBlockEvents(bool)", asMETHODPR(Sprite2D, SetBlockEvents, (bool), void), asCALL_THISCALL);
+    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Sprite2D", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(Sprite2D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite2D", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(Sprite2D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    // void Sprite2D::SetHotSpot(const Vector2& hotSpot) | File: ../Urho2D/Sprite2D.h
+    engine->RegisterObjectMethod("Sprite2D", "void SetHotSpot(const Vector2&in)", asMETHODPR(Sprite2D, SetHotSpot, (const Vector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite2D", "void set_hotSpot(const Vector2&in)", asMETHODPR(Sprite2D, SetHotSpot, (const Vector2&), void), asCALL_THISCALL);
+    // void Resource::SetMemoryUse(unsigned size) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Sprite2D", "void SetMemoryUse(uint)", asMETHODPR(Sprite2D, SetMemoryUse, (unsigned), void), asCALL_THISCALL);
+    // void Resource::SetName(const String& name) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Sprite2D", "void SetName(const String&in)", asMETHODPR(Sprite2D, SetName, (const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite2D", "void set_name(const String&in)", asMETHODPR(Sprite2D, SetName, (const String&), void), asCALL_THISCALL);
+    // void Sprite2D::SetOffset(const IntVector2& offset) | File: ../Urho2D/Sprite2D.h
+    engine->RegisterObjectMethod("Sprite2D", "void SetOffset(const IntVector2&in)", asMETHODPR(Sprite2D, SetOffset, (const IntVector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite2D", "void set_offset(const IntVector2&in)", asMETHODPR(Sprite2D, SetOffset, (const IntVector2&), void), asCALL_THISCALL);
+    // void Sprite2D::SetRectangle(const IntRect& rectangle) | File: ../Urho2D/Sprite2D.h
+    engine->RegisterObjectMethod("Sprite2D", "void SetRectangle(const IntRect&in)", asMETHODPR(Sprite2D, SetRectangle, (const IntRect&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite2D", "void set_rectangle(const IntRect&in)", asMETHODPR(Sprite2D, SetRectangle, (const IntRect&), void), asCALL_THISCALL);
+    // void Sprite2D::SetSpriteSheet(SpriteSheet2D* spriteSheet) | File: ../Urho2D/Sprite2D.h
+    engine->RegisterObjectMethod("Sprite2D", "void SetSpriteSheet(SpriteSheet2D@+)", asMETHODPR(Sprite2D, SetSpriteSheet, (SpriteSheet2D*), void), asCALL_THISCALL);
+    // void Sprite2D::SetTexture(Texture2D* texture) | File: ../Urho2D/Sprite2D.h
+    engine->RegisterObjectMethod("Sprite2D", "void SetTexture(Texture2D@+)", asMETHODPR(Sprite2D, SetTexture, (Texture2D*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite2D", "void set_texture(Texture2D@+)", asMETHODPR(Sprite2D, SetTexture, (Texture2D*), void), asCALL_THISCALL);
+    // void Sprite2D::SetTextureEdgeOffset(float offset) | File: ../Urho2D/Sprite2D.h
+    engine->RegisterObjectMethod("Sprite2D", "void SetTextureEdgeOffset(float)", asMETHODPR(Sprite2D, SetTextureEdgeOffset, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite2D", "void set_textureEdgeOffset(float)", asMETHODPR(Sprite2D, SetTextureEdgeOffset, (float), void), asCALL_THISCALL);
+    // explicit Sprite2D::Sprite2D(Context* context) | File: ../Urho2D/Sprite2D.h
+    engine->RegisterObjectBehaviour("Sprite2D", asBEHAVE_FACTORY, "Sprite2D@+ f()", asFUNCTION(Sprite2D_Sprite2D_Context), asCALL_CDECL);
+    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Sprite2D", "void UnsubscribeFromAllEvents()", asMETHODPR(Sprite2D, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Sprite2D", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(Sprite2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
+    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Sprite2D", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(Sprite2D, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Sprite2D", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(Sprite2D, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Sprite2D", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(Sprite2D, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
+    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("Sprite2D", "int WeakRefs() const", asMETHODPR(Sprite2D, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite2D", "int get_weakRefs() const", asMETHODPR(Sprite2D, WeakRefs, () const, int), asCALL_THISCALL);
+#ifdef REGISTER_MANUAL_PART_Resource
+    REGISTER_MANUAL_PART_Resource(Sprite2D, "Sprite2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Object
+    REGISTER_MANUAL_PART_Object(Sprite2D, "Sprite2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_RefCounted
+    REGISTER_MANUAL_PART_RefCounted(Sprite2D, "Sprite2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Sprite2D
+    REGISTER_MANUAL_PART_Sprite2D(Sprite2D, "Sprite2D")
+#endif
+    RegisterSubclass<Resource, Sprite2D>(engine, "Resource", "Sprite2D");
+    RegisterSubclass<Object, Sprite2D>(engine, "Object", "Sprite2D");
+    RegisterSubclass<RefCounted, Sprite2D>(engine, "RefCounted", "Sprite2D");
+#endif
+
+#ifdef URHO3D_URHO2D
+    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("SpriteSheet2D", asBEHAVE_ADDREF, "void f()", asMETHODPR(SpriteSheet2D, AddRef, (), void), asCALL_THISCALL);
+    // bool SpriteSheet2D::BeginLoad(Deserializer& source) override | File: ../Urho2D/SpriteSheet2D.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "bool BeginLoad(Deserializer&)", asMETHODPR(SpriteSheet2D, BeginLoad, (Deserializer&), bool), asCALL_THISCALL);
+    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
+    // Not registered because template
+    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
+    // Not registered because template
+    // void SpriteSheet2D::DefineSprite(const String& name, const IntRect& rectangle, const Vector2& hotSpot=Vector2(0.5f, 0.5f), const IntVector2& offset=IntVector2::ZERO) | File: ../Urho2D/SpriteSheet2D.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "void DefineSprite(const String&in, const IntRect&in, const Vector2&in = Vector2(0.5f, 0.5f), const IntVector2&in = IntVector2::ZERO)", asMETHODPR(SpriteSheet2D, DefineSprite, (const String&, const IntRect&, const Vector2&, const IntVector2&), void), asCALL_THISCALL);
+    // bool SpriteSheet2D::EndLoad() override | File: ../Urho2D/SpriteSheet2D.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "bool EndLoad()", asMETHODPR(SpriteSheet2D, EndLoad, (), bool), asCALL_THISCALL);
+    // AsyncLoadState Resource::GetAsyncLoadState() const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "AsyncLoadState GetAsyncLoadState() const", asMETHODPR(SpriteSheet2D, GetAsyncLoadState, () const, AsyncLoadState), asCALL_THISCALL);
+    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "bool GetBlockEvents() const", asMETHODPR(SpriteSheet2D, GetBlockEvents, () const, bool), asCALL_THISCALL);
+    // const String& Object::GetCategory() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "const String& GetCategory() const", asMETHODPR(SpriteSheet2D, GetCategory, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SpriteSheet2D", "const String& get_category() const", asMETHODPR(SpriteSheet2D, GetCategory, () const, const String&), asCALL_THISCALL);
+    // Context* Object::GetContext() const | File: ../Core/Object.h
+    // Error: type "Context*" can not be returned
+    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "VariantMap& GetEventDataMap() const", asMETHODPR(SpriteSheet2D, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
+    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // Object* Object::GetEventSender() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "Object@+ GetEventSender() const", asMETHODPR(SpriteSheet2D, GetEventSender, () const, Object*), asCALL_THISCALL);
+    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(SpriteSheet2D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SpriteSheet2D", "const Variant& get_globalVar(StringHash) const", asMETHODPR(SpriteSheet2D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "const VariantMap& GetGlobalVars() const", asMETHODPR(SpriteSheet2D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SpriteSheet2D", "const VariantMap& get_globalVars() const", asMETHODPR(SpriteSheet2D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    // unsigned Resource::GetMemoryUse() const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "uint GetMemoryUse() const", asMETHODPR(SpriteSheet2D, GetMemoryUse, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SpriteSheet2D", "uint get_memoryUse() const", asMETHODPR(SpriteSheet2D, GetMemoryUse, () const, unsigned), asCALL_THISCALL);
+    // const String& Resource::GetName() const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "const String& GetName() const", asMETHODPR(SpriteSheet2D, GetName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SpriteSheet2D", "const String& get_name() const", asMETHODPR(SpriteSheet2D, GetName, () const, const String&), asCALL_THISCALL);
+    // StringHash Resource::GetNameHash() const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "StringHash GetNameHash() const", asMETHODPR(SpriteSheet2D, GetNameHash, () const, StringHash), asCALL_THISCALL);
+    // Sprite2D* SpriteSheet2D::GetSprite(const String& name) const | File: ../Urho2D/SpriteSheet2D.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "Sprite2D@+ GetSprite(const String&in) const", asMETHODPR(SpriteSheet2D, GetSprite, (const String&) const, Sprite2D*), asCALL_THISCALL);
+    // const HashMap<String, SharedPtr<Sprite2D>>& SpriteSheet2D::GetSpriteMapping() const | File: ../Urho2D/SpriteSheet2D.h
+    // Error: type "const HashMap<String, SharedPtr<Sprite2D>>&" can not automatically bind
+    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(SpriteSheet2D, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
+    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // Not registered because template
+    // Texture2D* SpriteSheet2D::GetTexture() const | File: ../Urho2D/SpriteSheet2D.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "Texture2D@+ GetTexture() const", asMETHODPR(SpriteSheet2D, GetTexture, () const, Texture2D*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SpriteSheet2D", "Texture2D@+ get_texture() const", asMETHODPR(SpriteSheet2D, GetTexture, () const, Texture2D*), asCALL_THISCALL);
+    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "StringHash GetType() const", asMETHODPR(SpriteSheet2D, GetType, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SpriteSheet2D", "StringHash get_type() const", asMETHODPR(SpriteSheet2D, GetType, () const, StringHash), asCALL_THISCALL);
+    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "const String& GetTypeName() const", asMETHODPR(SpriteSheet2D, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SpriteSheet2D", "const String& get_typeName() const", asMETHODPR(SpriteSheet2D, GetTypeName, () const, const String&), asCALL_THISCALL);
+    // unsigned Resource::GetUseTimer() | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "uint GetUseTimer()", asMETHODPR(SpriteSheet2D, GetUseTimer, (), unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SpriteSheet2D", "uint get_useTimer()", asMETHODPR(SpriteSheet2D, GetUseTimer, (), unsigned), asCALL_THISCALL);
+    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "bool HasEventHandlers() const", asMETHODPR(SpriteSheet2D, HasEventHandlers, () const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(SpriteSheet2D, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(SpriteSheet2D, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "bool IsInstanceOf(StringHash) const", asMETHODPR(SpriteSheet2D, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
+    // Not registered because template
+    // bool Resource::Load(Deserializer& source) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "bool Load(Deserializer&)", asMETHODPR(SpriteSheet2D, Load, (Deserializer&), bool), asCALL_THISCALL);
+    // bool Resource::LoadFile(const String& fileName) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "bool LoadFile(const String&in)", asMETHODPR(SpriteSheet2D, LoadFile, (const String&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SpriteSheet2D", "bool Load(const String&in)", asMETHODPR(SpriteSheet2D, LoadFile, (const String&), bool), asCALL_THISCALL);
+    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(SpriteSheet2D, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
+    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
+    // Error: type "RefCount*" can not automatically bind
+    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "int Refs() const", asMETHODPR(SpriteSheet2D, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SpriteSheet2D", "int get_refs() const", asMETHODPR(SpriteSheet2D, Refs, () const, int), asCALL_THISCALL);
+    // static void SpriteSheet2D::RegisterObject(Context* context) | File: ../Urho2D/SpriteSheet2D.h
+    // Context can be used as firs parameter of constructors only
+    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("SpriteSheet2D", asBEHAVE_RELEASE, "void f()", asMETHODPR(SpriteSheet2D, ReleaseRef, (), void), asCALL_THISCALL);
+    // void Resource::ResetUseTimer() | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "void ResetUseTimer()", asMETHODPR(SpriteSheet2D, ResetUseTimer, (), void), asCALL_THISCALL);
+    // virtual bool Resource::Save(Serializer& dest) const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "bool Save(Serializer&) const", asMETHODPR(SpriteSheet2D, Save, (Serializer&) const, bool), asCALL_THISCALL);
+    // virtual bool Resource::SaveFile(const String& fileName) const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "bool SaveFile(const String&in) const", asMETHODPR(SpriteSheet2D, SaveFile, (const String&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SpriteSheet2D", "bool Save(const String&in) const", asMETHODPR(SpriteSheet2D, SaveFile, (const String&) const, bool), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "void SendEvent(StringHash)", asMETHODPR(SpriteSheet2D, SendEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(SpriteSheet2D, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
+    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
+    // Not registered because template
+    // void Resource::SetAsyncLoadState(AsyncLoadState newState) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "void SetAsyncLoadState(AsyncLoadState)", asMETHODPR(SpriteSheet2D, SetAsyncLoadState, (AsyncLoadState), void), asCALL_THISCALL);
+    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "void SetBlockEvents(bool)", asMETHODPR(SpriteSheet2D, SetBlockEvents, (bool), void), asCALL_THISCALL);
+    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(SpriteSheet2D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SpriteSheet2D", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(SpriteSheet2D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    // void Resource::SetMemoryUse(unsigned size) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "void SetMemoryUse(uint)", asMETHODPR(SpriteSheet2D, SetMemoryUse, (unsigned), void), asCALL_THISCALL);
+    // void Resource::SetName(const String& name) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "void SetName(const String&in)", asMETHODPR(SpriteSheet2D, SetName, (const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SpriteSheet2D", "void set_name(const String&in)", asMETHODPR(SpriteSheet2D, SetName, (const String&), void), asCALL_THISCALL);
+    // void SpriteSheet2D::SetTexture(Texture2D* texture) | File: ../Urho2D/SpriteSheet2D.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "void SetTexture(Texture2D@+)", asMETHODPR(SpriteSheet2D, SetTexture, (Texture2D*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SpriteSheet2D", "void set_texture(Texture2D@+)", asMETHODPR(SpriteSheet2D, SetTexture, (Texture2D*), void), asCALL_THISCALL);
+    // explicit SpriteSheet2D::SpriteSheet2D(Context* context) | File: ../Urho2D/SpriteSheet2D.h
+    engine->RegisterObjectBehaviour("SpriteSheet2D", asBEHAVE_FACTORY, "SpriteSheet2D@+ f()", asFUNCTION(SpriteSheet2D_SpriteSheet2D_Context), asCALL_CDECL);
+    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "void UnsubscribeFromAllEvents()", asMETHODPR(SpriteSheet2D, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(SpriteSheet2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
+    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(SpriteSheet2D, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(SpriteSheet2D, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(SpriteSheet2D, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
+    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("SpriteSheet2D", "int WeakRefs() const", asMETHODPR(SpriteSheet2D, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SpriteSheet2D", "int get_weakRefs() const", asMETHODPR(SpriteSheet2D, WeakRefs, () const, int), asCALL_THISCALL);
+#ifdef REGISTER_MANUAL_PART_Resource
+    REGISTER_MANUAL_PART_Resource(SpriteSheet2D, "SpriteSheet2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Object
+    REGISTER_MANUAL_PART_Object(SpriteSheet2D, "SpriteSheet2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_RefCounted
+    REGISTER_MANUAL_PART_RefCounted(SpriteSheet2D, "SpriteSheet2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_SpriteSheet2D
+    REGISTER_MANUAL_PART_SpriteSheet2D(SpriteSheet2D, "SpriteSheet2D")
+#endif
+    RegisterSubclass<Resource, SpriteSheet2D>(engine, "Resource", "SpriteSheet2D");
+    RegisterSubclass<Object, SpriteSheet2D>(engine, "Object", "SpriteSheet2D");
+    RegisterSubclass<RefCounted, SpriteSheet2D>(engine, "RefCounted", "SpriteSheet2D");
+#endif
+
     // void Drawable::AddLight(Light* light) | File: ../Graphics/Drawable.h
     engine->RegisterObjectMethod("StaticModel", "void AddLight(Light@+)", asMETHODPR(StaticModel, AddLight, (Light*), void), asCALL_THISCALL);
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
@@ -4853,204 +3907,6 @@ void ASRegisterGenerated_Members_Sn_Sz(asIScriptEngine* engine)
     RegisterSubclass<Serializable, StaticModel>(engine, "Serializable", "StaticModel");
     RegisterSubclass<Object, StaticModel>(engine, "Object", "StaticModel");
     RegisterSubclass<RefCounted, StaticModel>(engine, "RefCounted", "StaticModel");
-
-#ifdef URHO3D_URHO2D
-    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("Sprite2D", asBEHAVE_ADDREF, "void f()", asMETHODPR(Sprite2D, AddRef, (), void), asCALL_THISCALL);
-    // bool Sprite2D::BeginLoad(Deserializer& source) override | File: ../Urho2D/Sprite2D.h
-    engine->RegisterObjectMethod("Sprite2D", "bool BeginLoad(Deserializer&)", asMETHODPR(Sprite2D, BeginLoad, (Deserializer&), bool), asCALL_THISCALL);
-    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
-    // Not registered because template
-    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
-    // Not registered because template
-    // bool Sprite2D::EndLoad() override | File: ../Urho2D/Sprite2D.h
-    engine->RegisterObjectMethod("Sprite2D", "bool EndLoad()", asMETHODPR(Sprite2D, EndLoad, (), bool), asCALL_THISCALL);
-    // AsyncLoadState Resource::GetAsyncLoadState() const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Sprite2D", "AsyncLoadState GetAsyncLoadState() const", asMETHODPR(Sprite2D, GetAsyncLoadState, () const, AsyncLoadState), asCALL_THISCALL);
-    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Sprite2D", "bool GetBlockEvents() const", asMETHODPR(Sprite2D, GetBlockEvents, () const, bool), asCALL_THISCALL);
-    // const String& Object::GetCategory() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Sprite2D", "const String& GetCategory() const", asMETHODPR(Sprite2D, GetCategory, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Sprite2D", "const String& get_category() const", asMETHODPR(Sprite2D, GetCategory, () const, const String&), asCALL_THISCALL);
-    // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
-    // bool Sprite2D::GetDrawRectangle(Rect& rect, bool flipX=false, bool flipY=false) const | File: ../Urho2D/Sprite2D.h
-    engine->RegisterObjectMethod("Sprite2D", "bool GetDrawRectangle(Rect&, bool = false, bool = false) const", asMETHODPR(Sprite2D, GetDrawRectangle, (Rect&, bool, bool) const, bool), asCALL_THISCALL);
-    // bool Sprite2D::GetDrawRectangle(Rect& rect, const Vector2& hotSpot, bool flipX=false, bool flipY=false) const | File: ../Urho2D/Sprite2D.h
-    engine->RegisterObjectMethod("Sprite2D", "bool GetDrawRectangle(Rect&, const Vector2&in, bool = false, bool = false) const", asMETHODPR(Sprite2D, GetDrawRectangle, (Rect&, const Vector2&, bool, bool) const, bool), asCALL_THISCALL);
-    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Sprite2D", "VariantMap& GetEventDataMap() const", asMETHODPR(Sprite2D, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
-    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // Object* Object::GetEventSender() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Sprite2D", "Object@+ GetEventSender() const", asMETHODPR(Sprite2D, GetEventSender, () const, Object*), asCALL_THISCALL);
-    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Sprite2D", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(Sprite2D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Sprite2D", "const Variant& get_globalVar(StringHash) const", asMETHODPR(Sprite2D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Sprite2D", "const VariantMap& GetGlobalVars() const", asMETHODPR(Sprite2D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Sprite2D", "const VariantMap& get_globalVars() const", asMETHODPR(Sprite2D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    // const Vector2& Sprite2D::GetHotSpot() const | File: ../Urho2D/Sprite2D.h
-    engine->RegisterObjectMethod("Sprite2D", "const Vector2& GetHotSpot() const", asMETHODPR(Sprite2D, GetHotSpot, () const, const Vector2&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Sprite2D", "const Vector2& get_hotSpot() const", asMETHODPR(Sprite2D, GetHotSpot, () const, const Vector2&), asCALL_THISCALL);
-    // unsigned Resource::GetMemoryUse() const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Sprite2D", "uint GetMemoryUse() const", asMETHODPR(Sprite2D, GetMemoryUse, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Sprite2D", "uint get_memoryUse() const", asMETHODPR(Sprite2D, GetMemoryUse, () const, unsigned), asCALL_THISCALL);
-    // const String& Resource::GetName() const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Sprite2D", "const String& GetName() const", asMETHODPR(Sprite2D, GetName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Sprite2D", "const String& get_name() const", asMETHODPR(Sprite2D, GetName, () const, const String&), asCALL_THISCALL);
-    // StringHash Resource::GetNameHash() const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Sprite2D", "StringHash GetNameHash() const", asMETHODPR(Sprite2D, GetNameHash, () const, StringHash), asCALL_THISCALL);
-    // const IntVector2& Sprite2D::GetOffset() const | File: ../Urho2D/Sprite2D.h
-    engine->RegisterObjectMethod("Sprite2D", "const IntVector2& GetOffset() const", asMETHODPR(Sprite2D, GetOffset, () const, const IntVector2&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Sprite2D", "const IntVector2& get_offset() const", asMETHODPR(Sprite2D, GetOffset, () const, const IntVector2&), asCALL_THISCALL);
-    // const IntRect& Sprite2D::GetRectangle() const | File: ../Urho2D/Sprite2D.h
-    engine->RegisterObjectMethod("Sprite2D", "const IntRect& GetRectangle() const", asMETHODPR(Sprite2D, GetRectangle, () const, const IntRect&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Sprite2D", "const IntRect& get_rectangle() const", asMETHODPR(Sprite2D, GetRectangle, () const, const IntRect&), asCALL_THISCALL);
-    // SpriteSheet2D* Sprite2D::GetSpriteSheet() const | File: ../Urho2D/Sprite2D.h
-    engine->RegisterObjectMethod("Sprite2D", "SpriteSheet2D@+ GetSpriteSheet() const", asMETHODPR(Sprite2D, GetSpriteSheet, () const, SpriteSheet2D*), asCALL_THISCALL);
-    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Sprite2D", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Sprite2D, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
-    // Not registered because template
-    // Texture2D* Sprite2D::GetTexture() const | File: ../Urho2D/Sprite2D.h
-    engine->RegisterObjectMethod("Sprite2D", "Texture2D@+ GetTexture() const", asMETHODPR(Sprite2D, GetTexture, () const, Texture2D*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Sprite2D", "Texture2D@+ get_texture() const", asMETHODPR(Sprite2D, GetTexture, () const, Texture2D*), asCALL_THISCALL);
-    // float Sprite2D::GetTextureEdgeOffset() const | File: ../Urho2D/Sprite2D.h
-    engine->RegisterObjectMethod("Sprite2D", "float GetTextureEdgeOffset() const", asMETHODPR(Sprite2D, GetTextureEdgeOffset, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Sprite2D", "float get_textureEdgeOffset() const", asMETHODPR(Sprite2D, GetTextureEdgeOffset, () const, float), asCALL_THISCALL);
-    // bool Sprite2D::GetTextureRectangle(Rect& rect, bool flipX=false, bool flipY=false) const | File: ../Urho2D/Sprite2D.h
-    engine->RegisterObjectMethod("Sprite2D", "bool GetTextureRectangle(Rect&, bool = false, bool = false) const", asMETHODPR(Sprite2D, GetTextureRectangle, (Rect&, bool, bool) const, bool), asCALL_THISCALL);
-    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Sprite2D", "StringHash GetType() const", asMETHODPR(Sprite2D, GetType, () const, StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Sprite2D", "StringHash get_type() const", asMETHODPR(Sprite2D, GetType, () const, StringHash), asCALL_THISCALL);
-    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Sprite2D", "const String& GetTypeName() const", asMETHODPR(Sprite2D, GetTypeName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Sprite2D", "const String& get_typeName() const", asMETHODPR(Sprite2D, GetTypeName, () const, const String&), asCALL_THISCALL);
-    // unsigned Resource::GetUseTimer() | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Sprite2D", "uint GetUseTimer()", asMETHODPR(Sprite2D, GetUseTimer, (), unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Sprite2D", "uint get_useTimer()", asMETHODPR(Sprite2D, GetUseTimer, (), unsigned), asCALL_THISCALL);
-    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Sprite2D", "bool HasEventHandlers() const", asMETHODPR(Sprite2D, HasEventHandlers, () const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Sprite2D", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(Sprite2D, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Sprite2D", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(Sprite2D, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Sprite2D", "bool IsInstanceOf(StringHash) const", asMETHODPR(Sprite2D, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
-    // Not registered because template
-    // bool Resource::Load(Deserializer& source) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Sprite2D", "bool Load(Deserializer&)", asMETHODPR(Sprite2D, Load, (Deserializer&), bool), asCALL_THISCALL);
-    // bool Resource::LoadFile(const String& fileName) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Sprite2D", "bool LoadFile(const String&in)", asMETHODPR(Sprite2D, LoadFile, (const String&), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Sprite2D", "bool Load(const String&in)", asMETHODPR(Sprite2D, LoadFile, (const String&), bool), asCALL_THISCALL);
-    // static Sprite2D* Sprite2D::LoadFromResourceRef(Object* object, const ResourceRef& value) | File: ../Urho2D/Sprite2D.h
-    engine->SetDefaultNamespace("Sprite2D");
-    engine->RegisterGlobalFunction("Sprite2D@+ LoadFromResourceRef(Object@+, const ResourceRef&in)", asFUNCTIONPR(Sprite2D::LoadFromResourceRef, (Object*, const ResourceRef&), Sprite2D*), asCALL_CDECL);
-    engine->SetDefaultNamespace("");
-    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Sprite2D", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(Sprite2D, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
-    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
-    // Error: type "RefCount*" can not automatically bind
-    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("Sprite2D", "int Refs() const", asMETHODPR(Sprite2D, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Sprite2D", "int get_refs() const", asMETHODPR(Sprite2D, Refs, () const, int), asCALL_THISCALL);
-    // static void Sprite2D::RegisterObject(Context* context) | File: ../Urho2D/Sprite2D.h
-    // Context can be used as firs parameter of constructors only
-    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("Sprite2D", asBEHAVE_RELEASE, "void f()", asMETHODPR(Sprite2D, ReleaseRef, (), void), asCALL_THISCALL);
-    // void Resource::ResetUseTimer() | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Sprite2D", "void ResetUseTimer()", asMETHODPR(Sprite2D, ResetUseTimer, (), void), asCALL_THISCALL);
-    // virtual bool Resource::Save(Serializer& dest) const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Sprite2D", "bool Save(Serializer&) const", asMETHODPR(Sprite2D, Save, (Serializer&) const, bool), asCALL_THISCALL);
-    // virtual bool Resource::SaveFile(const String& fileName) const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Sprite2D", "bool SaveFile(const String&in) const", asMETHODPR(Sprite2D, SaveFile, (const String&) const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Sprite2D", "bool Save(const String&in) const", asMETHODPR(Sprite2D, SaveFile, (const String&) const, bool), asCALL_THISCALL);
-    // static ResourceRef Sprite2D::SaveToResourceRef(Sprite2D* sprite) | File: ../Urho2D/Sprite2D.h
-    engine->SetDefaultNamespace("Sprite2D");
-    engine->RegisterGlobalFunction("ResourceRef SaveToResourceRef(Sprite2D@+)", asFUNCTIONPR(Sprite2D::SaveToResourceRef, (Sprite2D*), ResourceRef), asCALL_CDECL);
-    engine->SetDefaultNamespace("");
-    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Sprite2D", "void SendEvent(StringHash)", asMETHODPR(Sprite2D, SendEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Sprite2D", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(Sprite2D, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
-    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
-    // Not registered because template
-    // void Resource::SetAsyncLoadState(AsyncLoadState newState) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Sprite2D", "void SetAsyncLoadState(AsyncLoadState)", asMETHODPR(Sprite2D, SetAsyncLoadState, (AsyncLoadState), void), asCALL_THISCALL);
-    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Sprite2D", "void SetBlockEvents(bool)", asMETHODPR(Sprite2D, SetBlockEvents, (bool), void), asCALL_THISCALL);
-    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Sprite2D", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(Sprite2D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Sprite2D", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(Sprite2D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    // void Sprite2D::SetHotSpot(const Vector2& hotSpot) | File: ../Urho2D/Sprite2D.h
-    engine->RegisterObjectMethod("Sprite2D", "void SetHotSpot(const Vector2&in)", asMETHODPR(Sprite2D, SetHotSpot, (const Vector2&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Sprite2D", "void set_hotSpot(const Vector2&in)", asMETHODPR(Sprite2D, SetHotSpot, (const Vector2&), void), asCALL_THISCALL);
-    // void Resource::SetMemoryUse(unsigned size) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Sprite2D", "void SetMemoryUse(uint)", asMETHODPR(Sprite2D, SetMemoryUse, (unsigned), void), asCALL_THISCALL);
-    // void Resource::SetName(const String& name) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Sprite2D", "void SetName(const String&in)", asMETHODPR(Sprite2D, SetName, (const String&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Sprite2D", "void set_name(const String&in)", asMETHODPR(Sprite2D, SetName, (const String&), void), asCALL_THISCALL);
-    // void Sprite2D::SetOffset(const IntVector2& offset) | File: ../Urho2D/Sprite2D.h
-    engine->RegisterObjectMethod("Sprite2D", "void SetOffset(const IntVector2&in)", asMETHODPR(Sprite2D, SetOffset, (const IntVector2&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Sprite2D", "void set_offset(const IntVector2&in)", asMETHODPR(Sprite2D, SetOffset, (const IntVector2&), void), asCALL_THISCALL);
-    // void Sprite2D::SetRectangle(const IntRect& rectangle) | File: ../Urho2D/Sprite2D.h
-    engine->RegisterObjectMethod("Sprite2D", "void SetRectangle(const IntRect&in)", asMETHODPR(Sprite2D, SetRectangle, (const IntRect&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Sprite2D", "void set_rectangle(const IntRect&in)", asMETHODPR(Sprite2D, SetRectangle, (const IntRect&), void), asCALL_THISCALL);
-    // void Sprite2D::SetSpriteSheet(SpriteSheet2D* spriteSheet) | File: ../Urho2D/Sprite2D.h
-    engine->RegisterObjectMethod("Sprite2D", "void SetSpriteSheet(SpriteSheet2D@+)", asMETHODPR(Sprite2D, SetSpriteSheet, (SpriteSheet2D*), void), asCALL_THISCALL);
-    // void Sprite2D::SetTexture(Texture2D* texture) | File: ../Urho2D/Sprite2D.h
-    engine->RegisterObjectMethod("Sprite2D", "void SetTexture(Texture2D@+)", asMETHODPR(Sprite2D, SetTexture, (Texture2D*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Sprite2D", "void set_texture(Texture2D@+)", asMETHODPR(Sprite2D, SetTexture, (Texture2D*), void), asCALL_THISCALL);
-    // void Sprite2D::SetTextureEdgeOffset(float offset) | File: ../Urho2D/Sprite2D.h
-    engine->RegisterObjectMethod("Sprite2D", "void SetTextureEdgeOffset(float)", asMETHODPR(Sprite2D, SetTextureEdgeOffset, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Sprite2D", "void set_textureEdgeOffset(float)", asMETHODPR(Sprite2D, SetTextureEdgeOffset, (float), void), asCALL_THISCALL);
-    // explicit Sprite2D::Sprite2D(Context* context) | File: ../Urho2D/Sprite2D.h
-    engine->RegisterObjectBehaviour("Sprite2D", asBEHAVE_FACTORY, "Sprite2D@+ f()", asFUNCTION(Sprite2D_Sprite2D_Context), asCALL_CDECL);
-    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Sprite2D", "void UnsubscribeFromAllEvents()", asMETHODPR(Sprite2D, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Sprite2D", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(Sprite2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
-    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Sprite2D", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(Sprite2D, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Sprite2D", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(Sprite2D, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Sprite2D", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(Sprite2D, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
-    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("Sprite2D", "int WeakRefs() const", asMETHODPR(Sprite2D, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Sprite2D", "int get_weakRefs() const", asMETHODPR(Sprite2D, WeakRefs, () const, int), asCALL_THISCALL);
-#ifdef REGISTER_MANUAL_PART_Resource
-    REGISTER_MANUAL_PART_Resource(Sprite2D, "Sprite2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Object
-    REGISTER_MANUAL_PART_Object(Sprite2D, "Sprite2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(Sprite2D, "Sprite2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Sprite2D
-    REGISTER_MANUAL_PART_Sprite2D(Sprite2D, "Sprite2D")
-#endif
-    RegisterSubclass<Resource, Sprite2D>(engine, "Resource", "Sprite2D");
-    RegisterSubclass<Object, Sprite2D>(engine, "Object", "Sprite2D");
-    RegisterSubclass<RefCounted, Sprite2D>(engine, "RefCounted", "Sprite2D");
-#endif
 
     // void StaticModelGroup::AddInstanceNode(Node* node) | File: ../Graphics/StaticModelGroup.h
     engine->RegisterObjectMethod("StaticModelGroup", "void AddInstanceNode(Node@+)", asMETHODPR(StaticModelGroup, AddInstanceNode, (Node*), void), asCALL_THISCALL);
@@ -5538,6 +4394,1096 @@ void ASRegisterGenerated_Members_Sn_Sz(asIScriptEngine* engine)
     RegisterSubclass<Object, StaticModelGroup>(engine, "Object", "StaticModelGroup");
     RegisterSubclass<RefCounted, StaticModelGroup>(engine, "RefCounted", "StaticModelGroup");
 
+#ifdef URHO3D_URHO2D
+    // void Drawable::AddLight(Light* light) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void AddLight(Light@+)", asMETHODPR(StaticSprite2D, AddLight, (Light*), void), asCALL_THISCALL);
+    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("StaticSprite2D", asBEHAVE_ADDREF, "void f()", asMETHODPR(StaticSprite2D, AddRef, (), void), asCALL_THISCALL);
+    // void Component::AddReplicationState(ComponentReplicationState* state) | File: ../Scene/Component.h
+    // Error: type "ComponentReplicationState*" can not automatically bind
+    // void Drawable::AddVertexLight(Light* light) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void AddVertexLight(Light@+)", asMETHODPR(StaticSprite2D, AddVertexLight, (Light*), void), asCALL_THISCALL);
+    // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void AllocateNetworkState()", asMETHODPR(StaticSprite2D, AllocateNetworkState, (), void), asCALL_THISCALL);
+    // virtual void Serializable::ApplyAttributes() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void ApplyAttributes()", asMETHODPR(StaticSprite2D, ApplyAttributes, (), void), asCALL_THISCALL);
+    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
+    // Not registered because template
+    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
+    // Not registered because template
+    // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void CleanupConnection(Connection@+)", asMETHODPR(StaticSprite2D, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // void Drawable::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(StaticSprite2D, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
+    // virtual bool Drawable::DrawOcclusion(OcclusionBuffer* buffer) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "bool DrawOcclusion(OcclusionBuffer@+)", asMETHODPR(StaticSprite2D, DrawOcclusion, (OcclusionBuffer*), bool), asCALL_THISCALL);
+    // float StaticSprite2D::GetAlpha() const | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StaticSprite2D", "float GetAlpha() const", asMETHODPR(StaticSprite2D, GetAlpha, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "float get_alpha() const", asMETHODPR(StaticSprite2D, GetAlpha, () const, float), asCALL_THISCALL);
+    // bool Animatable::GetAnimationEnabled() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "bool GetAnimationEnabled() const", asMETHODPR(StaticSprite2D, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "bool get_animationEnabled() const", asMETHODPR(StaticSprite2D, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
+    // Variant Serializable::GetAttribute(unsigned index) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "Variant GetAttribute(uint) const", asMETHODPR(StaticSprite2D, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "Variant get_attributes(uint) const", asMETHODPR(StaticSprite2D, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
+    // Variant Serializable::GetAttribute(const String& name) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "Variant GetAttribute(const String&in) const", asMETHODPR(StaticSprite2D, GetAttribute, (const String&) const, Variant), asCALL_THISCALL);
+    // ValueAnimation* Animatable::GetAttributeAnimation(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "ValueAnimation@+ GetAttributeAnimation(const String&in) const", asMETHODPR(StaticSprite2D, GetAttributeAnimation, (const String&) const, ValueAnimation*), asCALL_THISCALL);
+    // float Animatable::GetAttributeAnimationSpeed(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "float GetAttributeAnimationSpeed(const String&in) const", asMETHODPR(StaticSprite2D, GetAttributeAnimationSpeed, (const String&) const, float), asCALL_THISCALL);
+    // float Animatable::GetAttributeAnimationTime(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "float GetAttributeAnimationTime(const String&in) const", asMETHODPR(StaticSprite2D, GetAttributeAnimationTime, (const String&) const, float), asCALL_THISCALL);
+    // WrapMode Animatable::GetAttributeAnimationWrapMode(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "WrapMode GetAttributeAnimationWrapMode(const String&in) const", asMETHODPR(StaticSprite2D, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), asCALL_THISCALL);
+    // Variant Serializable::GetAttributeDefault(unsigned index) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "Variant GetAttributeDefault(uint) const", asMETHODPR(StaticSprite2D, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "Variant get_attributeDefaults(uint) const", asMETHODPR(StaticSprite2D, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
+    // Variant Serializable::GetAttributeDefault(const String& name) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "Variant GetAttributeDefault(const String&in) const", asMETHODPR(StaticSprite2D, GetAttributeDefault, (const String&) const, Variant), asCALL_THISCALL);
+    // virtual const Vector<AttributeInfo>* Serializable::GetAttributes() const | File: ../Scene/Serializable.h
+    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
+    // const Vector<SourceBatch>& Drawable::GetBatches() const | File: ../Graphics/Drawable.h
+    // Error: type "const Vector<SourceBatch>&" can not automatically bind
+    // BlendMode StaticSprite2D::GetBlendMode() const | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StaticSprite2D", "BlendMode GetBlendMode() const", asMETHODPR(StaticSprite2D, GetBlendMode, () const, BlendMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "BlendMode get_blendMode() const", asMETHODPR(StaticSprite2D, GetBlendMode, () const, BlendMode), asCALL_THISCALL);
+    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StaticSprite2D", "bool GetBlockEvents() const", asMETHODPR(StaticSprite2D, GetBlockEvents, () const, bool), asCALL_THISCALL);
+    // const BoundingBox& Drawable::GetBoundingBox() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "const BoundingBox& GetBoundingBox() const", asMETHODPR(StaticSprite2D, GetBoundingBox, () const, const BoundingBox&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "const BoundingBox& get_boundingBox() const", asMETHODPR(StaticSprite2D, GetBoundingBox, () const, const BoundingBox&), asCALL_THISCALL);
+    // bool Drawable::GetCastShadows() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "bool GetCastShadows() const", asMETHODPR(StaticSprite2D, GetCastShadows, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "bool get_castShadows() const", asMETHODPR(StaticSprite2D, GetCastShadows, () const, bool), asCALL_THISCALL);
+    // const String& Object::GetCategory() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StaticSprite2D", "const String& GetCategory() const", asMETHODPR(StaticSprite2D, GetCategory, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "const String& get_category() const", asMETHODPR(StaticSprite2D, GetCategory, () const, const String&), asCALL_THISCALL);
+    // const Color& StaticSprite2D::GetColor() const | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StaticSprite2D", "const Color& GetColor() const", asMETHODPR(StaticSprite2D, GetColor, () const, const Color&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "const Color& get_color() const", asMETHODPR(StaticSprite2D, GetColor, () const, const Color&), asCALL_THISCALL);
+    // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("StaticSprite2D", "Component@+ GetComponent(StringHash) const", asMETHODPR(StaticSprite2D, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
+    // template<class T> T*  Component::GetComponent() const | File: ../Scene/Component.h
+    // Not registered because template
+    // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
+    // Error: type "PODVector<Component*>&" can not automatically bind
+    // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
+    // Not registered because template
+    // Context* Object::GetContext() const | File: ../Core/Object.h
+    // Error: type "Context*" can not be returned
+    // Material* StaticSprite2D::GetCustomMaterial() const | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StaticSprite2D", "Material@+ GetCustomMaterial() const", asMETHODPR(StaticSprite2D, GetCustomMaterial, () const, Material*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "Material@+ get_customMaterial() const", asMETHODPR(StaticSprite2D, GetCustomMaterial, () const, Material*), asCALL_THISCALL);
+    // ResourceRef StaticSprite2D::GetCustomMaterialAttr() const | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StaticSprite2D", "ResourceRef GetCustomMaterialAttr() const", asMETHODPR(StaticSprite2D, GetCustomMaterialAttr, () const, ResourceRef), asCALL_THISCALL);
+    // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
+    // Error: type "PODVector<Node*>&" can not automatically bind
+    // float Drawable::GetDistance() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "float GetDistance() const", asMETHODPR(StaticSprite2D, GetDistance, () const, float), asCALL_THISCALL);
+    // unsigned char Drawable::GetDrawableFlags() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "uint8 GetDrawableFlags() const", asMETHODPR(StaticSprite2D, GetDrawableFlags, () const, unsigned char), asCALL_THISCALL);
+    // float Drawable::GetDrawDistance() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "float GetDrawDistance() const", asMETHODPR(StaticSprite2D, GetDrawDistance, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "float get_drawDistance() const", asMETHODPR(StaticSprite2D, GetDrawDistance, () const, float), asCALL_THISCALL);
+    // const Rect& StaticSprite2D::GetDrawRect() const | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StaticSprite2D", "const Rect& GetDrawRect() const", asMETHODPR(StaticSprite2D, GetDrawRect, () const, const Rect&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "const Rect& get_drawRect() const", asMETHODPR(StaticSprite2D, GetDrawRect, () const, const Rect&), asCALL_THISCALL);
+    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StaticSprite2D", "VariantMap& GetEventDataMap() const", asMETHODPR(StaticSprite2D, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
+    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // Object* Object::GetEventSender() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StaticSprite2D", "Object@+ GetEventSender() const", asMETHODPR(StaticSprite2D, GetEventSender, () const, Object*), asCALL_THISCALL);
+    // Light* Drawable::GetFirstLight() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "Light@+ GetFirstLight() const", asMETHODPR(StaticSprite2D, GetFirstLight, () const, Light*), asCALL_THISCALL);
+    // bool StaticSprite2D::GetFlipX() const | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StaticSprite2D", "bool GetFlipX() const", asMETHODPR(StaticSprite2D, GetFlipX, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "bool get_flipX() const", asMETHODPR(StaticSprite2D, GetFlipX, () const, bool), asCALL_THISCALL);
+    // bool StaticSprite2D::GetFlipY() const | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StaticSprite2D", "bool GetFlipY() const", asMETHODPR(StaticSprite2D, GetFlipY, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "bool get_flipY() const", asMETHODPR(StaticSprite2D, GetFlipY, () const, bool), asCALL_THISCALL);
+    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StaticSprite2D", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(StaticSprite2D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "const Variant& get_globalVar(StringHash) const", asMETHODPR(StaticSprite2D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StaticSprite2D", "const VariantMap& GetGlobalVars() const", asMETHODPR(StaticSprite2D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "const VariantMap& get_globalVars() const", asMETHODPR(StaticSprite2D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    // const Vector2& StaticSprite2D::GetHotSpot() const | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StaticSprite2D", "const Vector2& GetHotSpot() const", asMETHODPR(StaticSprite2D, GetHotSpot, () const, const Vector2&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "const Vector2& get_hotSpot() const", asMETHODPR(StaticSprite2D, GetHotSpot, () const, const Vector2&), asCALL_THISCALL);
+    // unsigned Component::GetID() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("StaticSprite2D", "uint GetID() const", asMETHODPR(StaticSprite2D, GetID, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "uint get_id() const", asMETHODPR(StaticSprite2D, GetID, () const, unsigned), asCALL_THISCALL);
+    // bool Serializable::GetInterceptNetworkUpdate(const String& attributeName) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "bool GetInterceptNetworkUpdate(const String&in) const", asMETHODPR(StaticSprite2D, GetInterceptNetworkUpdate, (const String&) const, bool), asCALL_THISCALL);
+    // int Drawable2D::GetLayer() const | File: ../Urho2D/Drawable2D.h
+    engine->RegisterObjectMethod("StaticSprite2D", "int GetLayer() const", asMETHODPR(StaticSprite2D, GetLayer, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "int get_layer() const", asMETHODPR(StaticSprite2D, GetLayer, () const, int), asCALL_THISCALL);
+    // unsigned Drawable::GetLightMask() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "uint GetLightMask() const", asMETHODPR(StaticSprite2D, GetLightMask, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "uint get_lightMask() const", asMETHODPR(StaticSprite2D, GetLightMask, () const, unsigned), asCALL_THISCALL);
+    // const PODVector<Light*>& Drawable::GetLights() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "Array<Light@>@ GetLights() const", asFUNCTION(StaticSprite2D_GetLights_void), asCALL_CDECL_OBJFIRST);
+    // float Drawable::GetLodBias() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "float GetLodBias() const", asMETHODPR(StaticSprite2D, GetLodBias, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "float get_lodBias() const", asMETHODPR(StaticSprite2D, GetLodBias, () const, float), asCALL_THISCALL);
+    // float Drawable::GetLodDistance() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "float GetLodDistance() const", asMETHODPR(StaticSprite2D, GetLodDistance, () const, float), asCALL_THISCALL);
+    // virtual Geometry* Drawable::GetLodGeometry(unsigned batchIndex, unsigned level) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "Geometry@+ GetLodGeometry(uint, uint)", asMETHODPR(StaticSprite2D, GetLodGeometry, (unsigned, unsigned), Geometry*), asCALL_THISCALL);
+    // unsigned Drawable::GetMaxLights() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "uint GetMaxLights() const", asMETHODPR(StaticSprite2D, GetMaxLights, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "uint get_maxLights() const", asMETHODPR(StaticSprite2D, GetMaxLights, () const, unsigned), asCALL_THISCALL);
+    // float Drawable::GetMaxZ() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "float GetMaxZ() const", asMETHODPR(StaticSprite2D, GetMaxZ, () const, float), asCALL_THISCALL);
+    // float Drawable::GetMinZ() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "float GetMinZ() const", asMETHODPR(StaticSprite2D, GetMinZ, () const, float), asCALL_THISCALL);
+    // virtual const Vector<AttributeInfo>* Serializable::GetNetworkAttributes() const | File: ../Scene/Serializable.h
+    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
+    // NetworkState* Serializable::GetNetworkState() const | File: ../Scene/Serializable.h
+    // Error: type "NetworkState*" can not automatically bind
+    // Node* Component::GetNode() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("StaticSprite2D", "Node@+ GetNode() const", asMETHODPR(StaticSprite2D, GetNode, () const, Node*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "Node@+ get_node() const", asMETHODPR(StaticSprite2D, GetNode, () const, Node*), asCALL_THISCALL);
+    // unsigned Serializable::GetNumAttributes() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "uint GetNumAttributes() const", asMETHODPR(StaticSprite2D, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "uint get_numAttributes() const", asMETHODPR(StaticSprite2D, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
+    // unsigned Serializable::GetNumNetworkAttributes() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "uint GetNumNetworkAttributes() const", asMETHODPR(StaticSprite2D, GetNumNetworkAttributes, () const, unsigned), asCALL_THISCALL);
+    // virtual unsigned Drawable::GetNumOccluderTriangles() | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "uint GetNumOccluderTriangles()", asMETHODPR(StaticSprite2D, GetNumOccluderTriangles, (), unsigned), asCALL_THISCALL);
+    // ObjectAnimation* Animatable::GetObjectAnimation() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "ObjectAnimation@+ GetObjectAnimation() const", asMETHODPR(StaticSprite2D, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "ObjectAnimation@+ get_objectAnimation() const", asMETHODPR(StaticSprite2D, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
+    // ResourceRef Animatable::GetObjectAnimationAttr() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "ResourceRef GetObjectAnimationAttr() const", asMETHODPR(StaticSprite2D, GetObjectAnimationAttr, () const, ResourceRef), asCALL_THISCALL);
+    // Octant* Drawable::GetOctant() const | File: ../Graphics/Drawable.h
+    // Error: type "Octant" can not automatically bind bacause have @nobind mark
+    // int Drawable2D::GetOrderInLayer() const | File: ../Urho2D/Drawable2D.h
+    engine->RegisterObjectMethod("StaticSprite2D", "int GetOrderInLayer() const", asMETHODPR(StaticSprite2D, GetOrderInLayer, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "int get_orderInLayer() const", asMETHODPR(StaticSprite2D, GetOrderInLayer, () const, int), asCALL_THISCALL);
+    // Scene* Component::GetScene() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("StaticSprite2D", "Scene@+ GetScene() const", asMETHODPR(StaticSprite2D, GetScene, () const, Scene*), asCALL_THISCALL);
+    // float Drawable::GetShadowDistance() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "float GetShadowDistance() const", asMETHODPR(StaticSprite2D, GetShadowDistance, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "float get_shadowDistance() const", asMETHODPR(StaticSprite2D, GetShadowDistance, () const, float), asCALL_THISCALL);
+    // unsigned Drawable::GetShadowMask() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "uint GetShadowMask() const", asMETHODPR(StaticSprite2D, GetShadowMask, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "uint get_shadowMask() const", asMETHODPR(StaticSprite2D, GetShadowMask, () const, unsigned), asCALL_THISCALL);
+    // float Drawable::GetSortValue() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "float GetSortValue() const", asMETHODPR(StaticSprite2D, GetSortValue, () const, float), asCALL_THISCALL);
+    // const Vector<SourceBatch2D>& Drawable2D::GetSourceBatches() | File: ../Urho2D/Drawable2D.h
+    // Error: type "const Vector<SourceBatch2D>&" can not automatically bind
+    // Sprite2D* StaticSprite2D::GetSprite() const | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StaticSprite2D", "Sprite2D@+ GetSprite() const", asMETHODPR(StaticSprite2D, GetSprite, () const, Sprite2D*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "Sprite2D@+ get_sprite() const", asMETHODPR(StaticSprite2D, GetSprite, () const, Sprite2D*), asCALL_THISCALL);
+    // ResourceRef StaticSprite2D::GetSpriteAttr() const | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StaticSprite2D", "ResourceRef GetSpriteAttr() const", asMETHODPR(StaticSprite2D, GetSpriteAttr, () const, ResourceRef), asCALL_THISCALL);
+    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StaticSprite2D", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(StaticSprite2D, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
+    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // Not registered because template
+    // bool StaticSprite2D::GetSwapXY() const | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StaticSprite2D", "bool GetSwapXY() const", asMETHODPR(StaticSprite2D, GetSwapXY, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "bool get_swapXY() const", asMETHODPR(StaticSprite2D, GetSwapXY, () const, bool), asCALL_THISCALL);
+    // const Rect& StaticSprite2D::GetTextureRect() const | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StaticSprite2D", "const Rect& GetTextureRect() const", asMETHODPR(StaticSprite2D, GetTextureRect, () const, const Rect&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "const Rect& get_textureRect() const", asMETHODPR(StaticSprite2D, GetTextureRect, () const, const Rect&), asCALL_THISCALL);
+    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StaticSprite2D", "StringHash GetType() const", asMETHODPR(StaticSprite2D, GetType, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "StringHash get_type() const", asMETHODPR(StaticSprite2D, GetType, () const, StringHash), asCALL_THISCALL);
+    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StaticSprite2D", "const String& GetTypeName() const", asMETHODPR(StaticSprite2D, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "const String& get_typeName() const", asMETHODPR(StaticSprite2D, GetTypeName, () const, const String&), asCALL_THISCALL);
+    // virtual UpdateGeometryType Drawable::GetUpdateGeometryType() | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "UpdateGeometryType GetUpdateGeometryType()", asMETHODPR(StaticSprite2D, GetUpdateGeometryType, (), UpdateGeometryType), asCALL_THISCALL);
+    // bool StaticSprite2D::GetUseDrawRect() const | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StaticSprite2D", "bool GetUseDrawRect() const", asMETHODPR(StaticSprite2D, GetUseDrawRect, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "bool get_useDrawRect() const", asMETHODPR(StaticSprite2D, GetUseDrawRect, () const, bool), asCALL_THISCALL);
+    // bool StaticSprite2D::GetUseHotSpot() const | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StaticSprite2D", "bool GetUseHotSpot() const", asMETHODPR(StaticSprite2D, GetUseHotSpot, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "bool get_useHotSpot() const", asMETHODPR(StaticSprite2D, GetUseHotSpot, () const, bool), asCALL_THISCALL);
+    // bool StaticSprite2D::GetUseTextureRect() const | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StaticSprite2D", "bool GetUseTextureRect() const", asMETHODPR(StaticSprite2D, GetUseTextureRect, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "bool get_useTextureRect() const", asMETHODPR(StaticSprite2D, GetUseTextureRect, () const, bool), asCALL_THISCALL);
+    // const PODVector<Light*>& Drawable::GetVertexLights() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "Array<Light@>@ GetVertexLights() const", asFUNCTION(StaticSprite2D_GetVertexLights_void), asCALL_CDECL_OBJFIRST);
+    // unsigned Drawable::GetViewMask() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "uint GetViewMask() const", asMETHODPR(StaticSprite2D, GetViewMask, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "uint get_viewMask() const", asMETHODPR(StaticSprite2D, GetViewMask, () const, unsigned), asCALL_THISCALL);
+    // const BoundingBox& Drawable::GetWorldBoundingBox() | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "const BoundingBox& GetWorldBoundingBox()", asMETHODPR(StaticSprite2D, GetWorldBoundingBox, (), const BoundingBox&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "const BoundingBox& get_worldBoundingBox()", asMETHODPR(StaticSprite2D, GetWorldBoundingBox, (), const BoundingBox&), asCALL_THISCALL);
+    // Zone* Drawable::GetZone() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "Zone@+ GetZone() const", asMETHODPR(StaticSprite2D, GetZone, () const, Zone*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "Zone@+ get_zone() const", asMETHODPR(StaticSprite2D, GetZone, () const, Zone*), asCALL_THISCALL);
+    // unsigned Drawable::GetZoneMask() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "uint GetZoneMask() const", asMETHODPR(StaticSprite2D, GetZoneMask, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "uint get_zoneMask() const", asMETHODPR(StaticSprite2D, GetZoneMask, () const, unsigned), asCALL_THISCALL);
+    // bool Drawable::HasBasePass(unsigned batchIndex) const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "bool HasBasePass(uint) const", asMETHODPR(StaticSprite2D, HasBasePass, (unsigned) const, bool), asCALL_THISCALL);
+    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StaticSprite2D", "bool HasEventHandlers() const", asMETHODPR(StaticSprite2D, HasEventHandlers, () const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StaticSprite2D", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(StaticSprite2D, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StaticSprite2D", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(StaticSprite2D, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
+    // bool Component::IsEnabled() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("StaticSprite2D", "bool IsEnabled() const", asMETHODPR(StaticSprite2D, IsEnabled, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "bool get_enabled() const", asMETHODPR(StaticSprite2D, IsEnabled, () const, bool), asCALL_THISCALL);
+    // bool Component::IsEnabledEffective() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("StaticSprite2D", "bool IsEnabledEffective() const", asMETHODPR(StaticSprite2D, IsEnabledEffective, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "bool get_enabledEffective() const", asMETHODPR(StaticSprite2D, IsEnabledEffective, () const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StaticSprite2D", "bool IsInstanceOf(StringHash) const", asMETHODPR(StaticSprite2D, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
+    // Not registered because template
+    // bool Drawable::IsInView() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "bool IsInView() const", asMETHODPR(StaticSprite2D, IsInView, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "bool get_inView() const", asMETHODPR(StaticSprite2D, IsInView, () const, bool), asCALL_THISCALL);
+    // bool Drawable::IsInView(Camera* camera) const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "bool IsInView(Camera@+) const", asMETHODPR(StaticSprite2D, IsInView, (Camera*) const, bool), asCALL_THISCALL);
+    // bool Drawable::IsInView(const FrameInfo& frame, bool anyCamera=false) const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "bool IsInView(const FrameInfo&in, bool = false) const", asMETHODPR(StaticSprite2D, IsInView, (const FrameInfo&, bool) const, bool), asCALL_THISCALL);
+    // bool Drawable::IsOccludee() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "bool IsOccludee() const", asMETHODPR(StaticSprite2D, IsOccludee, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "bool get_occludee() const", asMETHODPR(StaticSprite2D, IsOccludee, () const, bool), asCALL_THISCALL);
+    // bool Drawable::IsOccluder() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "bool IsOccluder() const", asMETHODPR(StaticSprite2D, IsOccluder, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "bool get_occluder() const", asMETHODPR(StaticSprite2D, IsOccluder, () const, bool), asCALL_THISCALL);
+    // bool Component::IsReplicated() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("StaticSprite2D", "bool IsReplicated() const", asMETHODPR(StaticSprite2D, IsReplicated, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "bool get_replicated() const", asMETHODPR(StaticSprite2D, IsReplicated, () const, bool), asCALL_THISCALL);
+    // bool Serializable::IsTemporary() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "bool IsTemporary() const", asMETHODPR(StaticSprite2D, IsTemporary, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "bool get_temporary() const", asMETHODPR(StaticSprite2D, IsTemporary, () const, bool), asCALL_THISCALL);
+    // bool Drawable::IsZoneDirty() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "bool IsZoneDirty() const", asMETHODPR(StaticSprite2D, IsZoneDirty, () const, bool), asCALL_THISCALL);
+    // void Drawable::LimitLights() | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void LimitLights()", asMETHODPR(StaticSprite2D, LimitLights, (), void), asCALL_THISCALL);
+    // void Drawable::LimitVertexLights(bool removeConvertedLights) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void LimitVertexLights(bool)", asMETHODPR(StaticSprite2D, LimitVertexLights, (bool), void), asCALL_THISCALL);
+    // virtual bool Serializable::Load(Deserializer& source) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "bool Load(Deserializer&)", asMETHODPR(StaticSprite2D, Load, (Deserializer&), bool), asCALL_THISCALL);
+    // bool Animatable::LoadJSON(const JSONValue& source) override | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "bool LoadJSON(const JSONValue&in)", asMETHODPR(StaticSprite2D, LoadJSON, (const JSONValue&), bool), asCALL_THISCALL);
+    // bool Animatable::LoadXML(const XMLElement& source) override | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "bool LoadXML(const XMLElement&in)", asMETHODPR(StaticSprite2D, LoadXML, (const XMLElement&), bool), asCALL_THISCALL);
+    // void Drawable::MarkForUpdate() | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void MarkForUpdate()", asMETHODPR(StaticSprite2D, MarkForUpdate, (), void), asCALL_THISCALL);
+    // void Drawable::MarkInView(const FrameInfo& frame) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void MarkInView(const FrameInfo&in)", asMETHODPR(StaticSprite2D, MarkInView, (const FrameInfo&), void), asCALL_THISCALL);
+    // void Drawable::MarkInView(unsigned frameNumber) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void MarkInView(uint)", asMETHODPR(StaticSprite2D, MarkInView, (unsigned), void), asCALL_THISCALL);
+    // void Component::MarkNetworkUpdate() override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void MarkNetworkUpdate()", asMETHODPR(StaticSprite2D, MarkNetworkUpdate, (), void), asCALL_THISCALL);
+    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(StaticSprite2D, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
+    // virtual void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void OnGetAttribute(const AttributeInfo&in, Variant&) const", asMETHODPR(StaticSprite2D, OnGetAttribute, (const AttributeInfo&, Variant&) const, void), asCALL_THISCALL);
+    // virtual void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void OnSetAttribute(const AttributeInfo&in, const Variant&in)", asMETHODPR(StaticSprite2D, OnSetAttribute, (const AttributeInfo&, const Variant&), void), asCALL_THISCALL);
+    // void Drawable2D::OnSetEnabled() override | File: ../Urho2D/Drawable2D.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void OnSetEnabled()", asMETHODPR(StaticSprite2D, OnSetEnabled, (), void), asCALL_THISCALL);
+    // void Component::PrepareNetworkUpdate() | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void PrepareNetworkUpdate()", asMETHODPR(StaticSprite2D, PrepareNetworkUpdate, (), void), asCALL_THISCALL);
+    // virtual void Drawable::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results) | File: ../Graphics/Drawable.h
+    // Error: type "RayOctreeQuery" can not automatically bind bacause have @nobind mark
+    // bool Serializable::ReadDeltaUpdate(Deserializer& source) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "bool ReadDeltaUpdate(Deserializer&)", asMETHODPR(StaticSprite2D, ReadDeltaUpdate, (Deserializer&), bool), asCALL_THISCALL);
+    // bool Serializable::ReadLatestDataUpdate(Deserializer& source) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "bool ReadLatestDataUpdate(Deserializer&)", asMETHODPR(StaticSprite2D, ReadLatestDataUpdate, (Deserializer&), bool), asCALL_THISCALL);
+    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
+    // Error: type "RefCount*" can not automatically bind
+    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("StaticSprite2D", "int Refs() const", asMETHODPR(StaticSprite2D, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "int get_refs() const", asMETHODPR(StaticSprite2D, Refs, () const, int), asCALL_THISCALL);
+    // static void StaticSprite2D::RegisterObject(Context* context) | File: ../Urho2D/StaticSprite2D.h
+    // Context can be used as firs parameter of constructors only
+    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("StaticSprite2D", asBEHAVE_RELEASE, "void f()", asMETHODPR(StaticSprite2D, ReleaseRef, (), void), asCALL_THISCALL);
+    // void Component::Remove() | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void Remove()", asMETHODPR(StaticSprite2D, Remove, (), void), asCALL_THISCALL);
+    // void Animatable::RemoveAttributeAnimation(const String& name) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void RemoveAttributeAnimation(const String&in)", asMETHODPR(StaticSprite2D, RemoveAttributeAnimation, (const String&), void), asCALL_THISCALL);
+    // void Serializable::RemoveInstanceDefault() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void RemoveInstanceDefault()", asMETHODPR(StaticSprite2D, RemoveInstanceDefault, (), void), asCALL_THISCALL);
+    // void Animatable::RemoveObjectAnimation() | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void RemoveObjectAnimation()", asMETHODPR(StaticSprite2D, RemoveObjectAnimation, (), void), asCALL_THISCALL);
+    // void Serializable::ResetToDefault() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void ResetToDefault()", asMETHODPR(StaticSprite2D, ResetToDefault, (), void), asCALL_THISCALL);
+    // bool Component::Save(Serializer& dest) const override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("StaticSprite2D", "bool Save(Serializer&) const", asMETHODPR(StaticSprite2D, Save, (Serializer&) const, bool), asCALL_THISCALL);
+    // virtual bool Serializable::SaveDefaultAttributes() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "bool SaveDefaultAttributes() const", asMETHODPR(StaticSprite2D, SaveDefaultAttributes, () const, bool), asCALL_THISCALL);
+    // bool Component::SaveJSON(JSONValue& dest) const override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("StaticSprite2D", "bool SaveJSON(JSONValue&) const", asMETHODPR(StaticSprite2D, SaveJSON, (JSONValue&) const, bool), asCALL_THISCALL);
+    // bool Component::SaveXML(XMLElement& dest) const override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("StaticSprite2D", "bool SaveXML(XMLElement&) const", asMETHODPR(StaticSprite2D, SaveXML, (XMLElement&) const, bool), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SendEvent(StringHash)", asMETHODPR(StaticSprite2D, SendEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(StaticSprite2D, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
+    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
+    // Not registered because template
+    // void StaticSprite2D::SetAlpha(float alpha) | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetAlpha(float)", asMETHODPR(StaticSprite2D, SetAlpha, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "void set_alpha(float)", asMETHODPR(StaticSprite2D, SetAlpha, (float), void), asCALL_THISCALL);
+    // void Animatable::SetAnimationEnabled(bool enable) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetAnimationEnabled(bool)", asMETHODPR(StaticSprite2D, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "void set_animationEnabled(bool)", asMETHODPR(StaticSprite2D, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
+    // void Animatable::SetAnimationTime(float time) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetAnimationTime(float)", asMETHODPR(StaticSprite2D, SetAnimationTime, (float), void), asCALL_THISCALL);
+    // bool Serializable::SetAttribute(unsigned index, const Variant& value) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "bool SetAttribute(uint, const Variant&in)", asMETHODPR(StaticSprite2D, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "bool set_attributes(uint, const Variant&in)", asMETHODPR(StaticSprite2D, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
+    // bool Serializable::SetAttribute(const String& name, const Variant& value) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "bool SetAttribute(const String&in, const Variant&in)", asMETHODPR(StaticSprite2D, SetAttribute, (const String&, const Variant&), bool), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode=WM_LOOP, float speed=1.0f) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetAttributeAnimation(const String&in, ValueAnimation@+, WrapMode = WM_LOOP, float = 1.0f)", asMETHODPR(StaticSprite2D, SetAttributeAnimation, (const String&, ValueAnimation*, WrapMode, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationSpeed(const String& name, float speed) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetAttributeAnimationSpeed(const String&in, float)", asMETHODPR(StaticSprite2D, SetAttributeAnimationSpeed, (const String&, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationTime(const String& name, float time) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetAttributeAnimationTime(const String&in, float)", asMETHODPR(StaticSprite2D, SetAttributeAnimationTime, (const String&, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationWrapMode(const String& name, WrapMode wrapMode) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetAttributeAnimationWrapMode(const String&in, WrapMode)", asMETHODPR(StaticSprite2D, SetAttributeAnimationWrapMode, (const String&, WrapMode), void), asCALL_THISCALL);
+    // void Drawable::SetBasePass(unsigned batchIndex) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetBasePass(uint)", asMETHODPR(StaticSprite2D, SetBasePass, (unsigned), void), asCALL_THISCALL);
+    // void StaticSprite2D::SetBlendMode(BlendMode blendMode) | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetBlendMode(BlendMode)", asMETHODPR(StaticSprite2D, SetBlendMode, (BlendMode), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "void set_blendMode(BlendMode)", asMETHODPR(StaticSprite2D, SetBlendMode, (BlendMode), void), asCALL_THISCALL);
+    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetBlockEvents(bool)", asMETHODPR(StaticSprite2D, SetBlockEvents, (bool), void), asCALL_THISCALL);
+    // void Drawable::SetCastShadows(bool enable) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetCastShadows(bool)", asMETHODPR(StaticSprite2D, SetCastShadows, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "void set_castShadows(bool)", asMETHODPR(StaticSprite2D, SetCastShadows, (bool), void), asCALL_THISCALL);
+    // void StaticSprite2D::SetColor(const Color& color) | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetColor(const Color&in)", asMETHODPR(StaticSprite2D, SetColor, (const Color&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "void set_color(const Color&in)", asMETHODPR(StaticSprite2D, SetColor, (const Color&), void), asCALL_THISCALL);
+    // void StaticSprite2D::SetCustomMaterial(Material* customMaterial) | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetCustomMaterial(Material@+)", asMETHODPR(StaticSprite2D, SetCustomMaterial, (Material*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "void set_customMaterial(Material@+)", asMETHODPR(StaticSprite2D, SetCustomMaterial, (Material*), void), asCALL_THISCALL);
+    // void StaticSprite2D::SetCustomMaterialAttr(const ResourceRef& value) | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetCustomMaterialAttr(const ResourceRef&in)", asMETHODPR(StaticSprite2D, SetCustomMaterialAttr, (const ResourceRef&), void), asCALL_THISCALL);
+    // void Drawable::SetDrawDistance(float distance) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetDrawDistance(float)", asMETHODPR(StaticSprite2D, SetDrawDistance, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "void set_drawDistance(float)", asMETHODPR(StaticSprite2D, SetDrawDistance, (float), void), asCALL_THISCALL);
+    // void StaticSprite2D::SetDrawRect(const Rect& rect) | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetDrawRect(const Rect&in)", asMETHODPR(StaticSprite2D, SetDrawRect, (const Rect&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "void set_drawRect(const Rect&in)", asMETHODPR(StaticSprite2D, SetDrawRect, (const Rect&), void), asCALL_THISCALL);
+    // void Component::SetEnabled(bool enable) | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetEnabled(bool)", asMETHODPR(StaticSprite2D, SetEnabled, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "void set_enabled(bool)", asMETHODPR(StaticSprite2D, SetEnabled, (bool), void), asCALL_THISCALL);
+    // void StaticSprite2D::SetFlip(bool flipX, bool flipY, bool swapXY=false) | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetFlip(bool, bool, bool = false)", asMETHODPR(StaticSprite2D, SetFlip, (bool, bool, bool), void), asCALL_THISCALL);
+    // void StaticSprite2D::SetFlipX(bool flipX) | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetFlipX(bool)", asMETHODPR(StaticSprite2D, SetFlipX, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "void set_flipX(bool)", asMETHODPR(StaticSprite2D, SetFlipX, (bool), void), asCALL_THISCALL);
+    // void StaticSprite2D::SetFlipY(bool flipY) | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetFlipY(bool)", asMETHODPR(StaticSprite2D, SetFlipY, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "void set_flipY(bool)", asMETHODPR(StaticSprite2D, SetFlipY, (bool), void), asCALL_THISCALL);
+    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(StaticSprite2D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(StaticSprite2D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    // void StaticSprite2D::SetHotSpot(const Vector2& hotspot) | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetHotSpot(const Vector2&in)", asMETHODPR(StaticSprite2D, SetHotSpot, (const Vector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "void set_hotSpot(const Vector2&in)", asMETHODPR(StaticSprite2D, SetHotSpot, (const Vector2&), void), asCALL_THISCALL);
+    // void Serializable::SetInstanceDefault(bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetInstanceDefault(bool)", asMETHODPR(StaticSprite2D, SetInstanceDefault, (bool), void), asCALL_THISCALL);
+    // void Serializable::SetInterceptNetworkUpdate(const String& attributeName, bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetInterceptNetworkUpdate(const String&in, bool)", asMETHODPR(StaticSprite2D, SetInterceptNetworkUpdate, (const String&, bool), void), asCALL_THISCALL);
+    // void Drawable2D::SetLayer(int layer) | File: ../Urho2D/Drawable2D.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetLayer(int)", asMETHODPR(StaticSprite2D, SetLayer, (int), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "void set_layer(int)", asMETHODPR(StaticSprite2D, SetLayer, (int), void), asCALL_THISCALL);
+    // void Drawable::SetLightMask(unsigned mask) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetLightMask(uint)", asMETHODPR(StaticSprite2D, SetLightMask, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "void set_lightMask(uint)", asMETHODPR(StaticSprite2D, SetLightMask, (unsigned), void), asCALL_THISCALL);
+    // void Drawable::SetLodBias(float bias) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetLodBias(float)", asMETHODPR(StaticSprite2D, SetLodBias, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "void set_lodBias(float)", asMETHODPR(StaticSprite2D, SetLodBias, (float), void), asCALL_THISCALL);
+    // void Drawable::SetMaxLights(unsigned num) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetMaxLights(uint)", asMETHODPR(StaticSprite2D, SetMaxLights, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "void set_maxLights(uint)", asMETHODPR(StaticSprite2D, SetMaxLights, (unsigned), void), asCALL_THISCALL);
+    // void Drawable::SetMinMaxZ(float minZ, float maxZ) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetMinMaxZ(float, float)", asMETHODPR(StaticSprite2D, SetMinMaxZ, (float, float), void), asCALL_THISCALL);
+    // void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetObjectAnimation(ObjectAnimation@+)", asMETHODPR(StaticSprite2D, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "void set_objectAnimation(ObjectAnimation@+)", asMETHODPR(StaticSprite2D, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
+    // void Animatable::SetObjectAnimationAttr(const ResourceRef& value) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetObjectAnimationAttr(const ResourceRef&in)", asMETHODPR(StaticSprite2D, SetObjectAnimationAttr, (const ResourceRef&), void), asCALL_THISCALL);
+    // void Drawable::SetOccludee(bool enable) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetOccludee(bool)", asMETHODPR(StaticSprite2D, SetOccludee, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "void set_occludee(bool)", asMETHODPR(StaticSprite2D, SetOccludee, (bool), void), asCALL_THISCALL);
+    // void Drawable::SetOccluder(bool enable) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetOccluder(bool)", asMETHODPR(StaticSprite2D, SetOccluder, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "void set_occluder(bool)", asMETHODPR(StaticSprite2D, SetOccluder, (bool), void), asCALL_THISCALL);
+    // void Drawable2D::SetOrderInLayer(int orderInLayer) | File: ../Urho2D/Drawable2D.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetOrderInLayer(int)", asMETHODPR(StaticSprite2D, SetOrderInLayer, (int), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "void set_orderInLayer(int)", asMETHODPR(StaticSprite2D, SetOrderInLayer, (int), void), asCALL_THISCALL);
+    // void Drawable::SetShadowDistance(float distance) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetShadowDistance(float)", asMETHODPR(StaticSprite2D, SetShadowDistance, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "void set_shadowDistance(float)", asMETHODPR(StaticSprite2D, SetShadowDistance, (float), void), asCALL_THISCALL);
+    // void Drawable::SetShadowMask(unsigned mask) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetShadowMask(uint)", asMETHODPR(StaticSprite2D, SetShadowMask, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "void set_shadowMask(uint)", asMETHODPR(StaticSprite2D, SetShadowMask, (unsigned), void), asCALL_THISCALL);
+    // void Drawable::SetSortValue(float value) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetSortValue(float)", asMETHODPR(StaticSprite2D, SetSortValue, (float), void), asCALL_THISCALL);
+    // void StaticSprite2D::SetSprite(Sprite2D* sprite) | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetSprite(Sprite2D@+)", asMETHODPR(StaticSprite2D, SetSprite, (Sprite2D*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "void set_sprite(Sprite2D@+)", asMETHODPR(StaticSprite2D, SetSprite, (Sprite2D*), void), asCALL_THISCALL);
+    // void StaticSprite2D::SetSpriteAttr(const ResourceRef& value) | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetSpriteAttr(const ResourceRef&in)", asMETHODPR(StaticSprite2D, SetSpriteAttr, (const ResourceRef&), void), asCALL_THISCALL);
+    // void StaticSprite2D::SetSwapXY(bool swapXY) | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetSwapXY(bool)", asMETHODPR(StaticSprite2D, SetSwapXY, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "void set_swapXY(bool)", asMETHODPR(StaticSprite2D, SetSwapXY, (bool), void), asCALL_THISCALL);
+    // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetTemporary(bool)", asMETHODPR(StaticSprite2D, SetTemporary, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "void set_temporary(bool)", asMETHODPR(StaticSprite2D, SetTemporary, (bool), void), asCALL_THISCALL);
+    // void StaticSprite2D::SetTextureRect(const Rect& rect) | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetTextureRect(const Rect&in)", asMETHODPR(StaticSprite2D, SetTextureRect, (const Rect&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "void set_textureRect(const Rect&in)", asMETHODPR(StaticSprite2D, SetTextureRect, (const Rect&), void), asCALL_THISCALL);
+    // void StaticSprite2D::SetUseDrawRect(bool useDrawRect) | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetUseDrawRect(bool)", asMETHODPR(StaticSprite2D, SetUseDrawRect, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "void set_useDrawRect(bool)", asMETHODPR(StaticSprite2D, SetUseDrawRect, (bool), void), asCALL_THISCALL);
+    // void StaticSprite2D::SetUseHotSpot(bool useHotSpot) | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetUseHotSpot(bool)", asMETHODPR(StaticSprite2D, SetUseHotSpot, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "void set_useHotSpot(bool)", asMETHODPR(StaticSprite2D, SetUseHotSpot, (bool), void), asCALL_THISCALL);
+    // void StaticSprite2D::SetUseTextureRect(bool useTextureRect) | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetUseTextureRect(bool)", asMETHODPR(StaticSprite2D, SetUseTextureRect, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "void set_useTextureRect(bool)", asMETHODPR(StaticSprite2D, SetUseTextureRect, (bool), void), asCALL_THISCALL);
+    // void Drawable::SetViewMask(unsigned mask) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetViewMask(uint)", asMETHODPR(StaticSprite2D, SetViewMask, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "void set_viewMask(uint)", asMETHODPR(StaticSprite2D, SetViewMask, (unsigned), void), asCALL_THISCALL);
+    // void Drawable::SetZone(Zone* zone, bool temporary=false) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetZone(Zone@+, bool = false)", asMETHODPR(StaticSprite2D, SetZone, (Zone*, bool), void), asCALL_THISCALL);
+    // void Drawable::SetZoneMask(unsigned mask) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void SetZoneMask(uint)", asMETHODPR(StaticSprite2D, SetZoneMask, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "void set_zoneMask(uint)", asMETHODPR(StaticSprite2D, SetZoneMask, (unsigned), void), asCALL_THISCALL);
+    // explicit StaticSprite2D::StaticSprite2D(Context* context) | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectBehaviour("StaticSprite2D", asBEHAVE_FACTORY, "StaticSprite2D@+ f()", asFUNCTION(StaticSprite2D_StaticSprite2D_Context), asCALL_CDECL);
+    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void UnsubscribeFromAllEvents()", asMETHODPR(StaticSprite2D, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(StaticSprite2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
+    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(StaticSprite2D, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(StaticSprite2D, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(StaticSprite2D, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
+    // virtual void Drawable::Update(const FrameInfo& frame) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void Update(const FrameInfo&in)", asMETHODPR(StaticSprite2D, Update, (const FrameInfo&), void), asCALL_THISCALL);
+    // virtual void Drawable::UpdateBatches(const FrameInfo& frame) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void UpdateBatches(const FrameInfo&in)", asMETHODPR(StaticSprite2D, UpdateBatches, (const FrameInfo&), void), asCALL_THISCALL);
+    // virtual void Drawable::UpdateGeometry(const FrameInfo& frame) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void UpdateGeometry(const FrameInfo&in)", asMETHODPR(StaticSprite2D, UpdateGeometry, (const FrameInfo&), void), asCALL_THISCALL);
+    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("StaticSprite2D", "int WeakRefs() const", asMETHODPR(StaticSprite2D, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticSprite2D", "int get_weakRefs() const", asMETHODPR(StaticSprite2D, WeakRefs, () const, int), asCALL_THISCALL);
+    // void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attributeBits, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void WriteDeltaUpdate(Serializer&, const DirtyBits&in, uint8)", asMETHODPR(StaticSprite2D, WriteDeltaUpdate, (Serializer&, const DirtyBits&, unsigned char), void), asCALL_THISCALL);
+    // void Serializable::WriteInitialDeltaUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void WriteInitialDeltaUpdate(Serializer&, uint8)", asMETHODPR(StaticSprite2D, WriteInitialDeltaUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
+    // void Serializable::WriteLatestDataUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StaticSprite2D", "void WriteLatestDataUpdate(Serializer&, uint8)", asMETHODPR(StaticSprite2D, WriteLatestDataUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
+#ifdef REGISTER_MANUAL_PART_Drawable2D
+    REGISTER_MANUAL_PART_Drawable2D(StaticSprite2D, "StaticSprite2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Drawable
+    REGISTER_MANUAL_PART_Drawable(StaticSprite2D, "StaticSprite2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Component
+    REGISTER_MANUAL_PART_Component(StaticSprite2D, "StaticSprite2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Animatable
+    REGISTER_MANUAL_PART_Animatable(StaticSprite2D, "StaticSprite2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Serializable
+    REGISTER_MANUAL_PART_Serializable(StaticSprite2D, "StaticSprite2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Object
+    REGISTER_MANUAL_PART_Object(StaticSprite2D, "StaticSprite2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_RefCounted
+    REGISTER_MANUAL_PART_RefCounted(StaticSprite2D, "StaticSprite2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_StaticSprite2D
+    REGISTER_MANUAL_PART_StaticSprite2D(StaticSprite2D, "StaticSprite2D")
+#endif
+    RegisterSubclass<Drawable2D, StaticSprite2D>(engine, "Drawable2D", "StaticSprite2D");
+    RegisterSubclass<Drawable, StaticSprite2D>(engine, "Drawable", "StaticSprite2D");
+    RegisterSubclass<Component, StaticSprite2D>(engine, "Component", "StaticSprite2D");
+    RegisterSubclass<Animatable, StaticSprite2D>(engine, "Animatable", "StaticSprite2D");
+    RegisterSubclass<Serializable, StaticSprite2D>(engine, "Serializable", "StaticSprite2D");
+    RegisterSubclass<Object, StaticSprite2D>(engine, "Object", "StaticSprite2D");
+    RegisterSubclass<RefCounted, StaticSprite2D>(engine, "RefCounted", "StaticSprite2D");
+#endif
+
+#ifdef URHO3D_URHO2D
+    // void Drawable::AddLight(Light* light) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void AddLight(Light@+)", asMETHODPR(StretchableSprite2D, AddLight, (Light*), void), asCALL_THISCALL);
+    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("StretchableSprite2D", asBEHAVE_ADDREF, "void f()", asMETHODPR(StretchableSprite2D, AddRef, (), void), asCALL_THISCALL);
+    // void Component::AddReplicationState(ComponentReplicationState* state) | File: ../Scene/Component.h
+    // Error: type "ComponentReplicationState*" can not automatically bind
+    // void Drawable::AddVertexLight(Light* light) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void AddVertexLight(Light@+)", asMETHODPR(StretchableSprite2D, AddVertexLight, (Light*), void), asCALL_THISCALL);
+    // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void AllocateNetworkState()", asMETHODPR(StretchableSprite2D, AllocateNetworkState, (), void), asCALL_THISCALL);
+    // virtual void Serializable::ApplyAttributes() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void ApplyAttributes()", asMETHODPR(StretchableSprite2D, ApplyAttributes, (), void), asCALL_THISCALL);
+    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
+    // Not registered because template
+    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
+    // Not registered because template
+    // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void CleanupConnection(Connection@+)", asMETHODPR(StretchableSprite2D, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // void Drawable::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(StretchableSprite2D, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
+    // virtual bool Drawable::DrawOcclusion(OcclusionBuffer* buffer) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool DrawOcclusion(OcclusionBuffer@+)", asMETHODPR(StretchableSprite2D, DrawOcclusion, (OcclusionBuffer*), bool), asCALL_THISCALL);
+    // float StaticSprite2D::GetAlpha() const | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "float GetAlpha() const", asMETHODPR(StretchableSprite2D, GetAlpha, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "float get_alpha() const", asMETHODPR(StretchableSprite2D, GetAlpha, () const, float), asCALL_THISCALL);
+    // bool Animatable::GetAnimationEnabled() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool GetAnimationEnabled() const", asMETHODPR(StretchableSprite2D, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool get_animationEnabled() const", asMETHODPR(StretchableSprite2D, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
+    // Variant Serializable::GetAttribute(unsigned index) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "Variant GetAttribute(uint) const", asMETHODPR(StretchableSprite2D, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "Variant get_attributes(uint) const", asMETHODPR(StretchableSprite2D, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
+    // Variant Serializable::GetAttribute(const String& name) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "Variant GetAttribute(const String&in) const", asMETHODPR(StretchableSprite2D, GetAttribute, (const String&) const, Variant), asCALL_THISCALL);
+    // ValueAnimation* Animatable::GetAttributeAnimation(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "ValueAnimation@+ GetAttributeAnimation(const String&in) const", asMETHODPR(StretchableSprite2D, GetAttributeAnimation, (const String&) const, ValueAnimation*), asCALL_THISCALL);
+    // float Animatable::GetAttributeAnimationSpeed(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "float GetAttributeAnimationSpeed(const String&in) const", asMETHODPR(StretchableSprite2D, GetAttributeAnimationSpeed, (const String&) const, float), asCALL_THISCALL);
+    // float Animatable::GetAttributeAnimationTime(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "float GetAttributeAnimationTime(const String&in) const", asMETHODPR(StretchableSprite2D, GetAttributeAnimationTime, (const String&) const, float), asCALL_THISCALL);
+    // WrapMode Animatable::GetAttributeAnimationWrapMode(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "WrapMode GetAttributeAnimationWrapMode(const String&in) const", asMETHODPR(StretchableSprite2D, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), asCALL_THISCALL);
+    // Variant Serializable::GetAttributeDefault(unsigned index) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "Variant GetAttributeDefault(uint) const", asMETHODPR(StretchableSprite2D, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "Variant get_attributeDefaults(uint) const", asMETHODPR(StretchableSprite2D, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
+    // Variant Serializable::GetAttributeDefault(const String& name) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "Variant GetAttributeDefault(const String&in) const", asMETHODPR(StretchableSprite2D, GetAttributeDefault, (const String&) const, Variant), asCALL_THISCALL);
+    // virtual const Vector<AttributeInfo>* Serializable::GetAttributes() const | File: ../Scene/Serializable.h
+    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
+    // const Vector<SourceBatch>& Drawable::GetBatches() const | File: ../Graphics/Drawable.h
+    // Error: type "const Vector<SourceBatch>&" can not automatically bind
+    // BlendMode StaticSprite2D::GetBlendMode() const | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "BlendMode GetBlendMode() const", asMETHODPR(StretchableSprite2D, GetBlendMode, () const, BlendMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "BlendMode get_blendMode() const", asMETHODPR(StretchableSprite2D, GetBlendMode, () const, BlendMode), asCALL_THISCALL);
+    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool GetBlockEvents() const", asMETHODPR(StretchableSprite2D, GetBlockEvents, () const, bool), asCALL_THISCALL);
+    // const IntRect& StretchableSprite2D::GetBorder() const | File: ../Urho2D/StretchableSprite2D.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "const IntRect& GetBorder() const", asMETHODPR(StretchableSprite2D, GetBorder, () const, const IntRect&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "const IntRect& get_border() const", asMETHODPR(StretchableSprite2D, GetBorder, () const, const IntRect&), asCALL_THISCALL);
+    // const BoundingBox& Drawable::GetBoundingBox() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "const BoundingBox& GetBoundingBox() const", asMETHODPR(StretchableSprite2D, GetBoundingBox, () const, const BoundingBox&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "const BoundingBox& get_boundingBox() const", asMETHODPR(StretchableSprite2D, GetBoundingBox, () const, const BoundingBox&), asCALL_THISCALL);
+    // bool Drawable::GetCastShadows() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool GetCastShadows() const", asMETHODPR(StretchableSprite2D, GetCastShadows, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool get_castShadows() const", asMETHODPR(StretchableSprite2D, GetCastShadows, () const, bool), asCALL_THISCALL);
+    // const String& Object::GetCategory() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "const String& GetCategory() const", asMETHODPR(StretchableSprite2D, GetCategory, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "const String& get_category() const", asMETHODPR(StretchableSprite2D, GetCategory, () const, const String&), asCALL_THISCALL);
+    // const Color& StaticSprite2D::GetColor() const | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "const Color& GetColor() const", asMETHODPR(StretchableSprite2D, GetColor, () const, const Color&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "const Color& get_color() const", asMETHODPR(StretchableSprite2D, GetColor, () const, const Color&), asCALL_THISCALL);
+    // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "Component@+ GetComponent(StringHash) const", asMETHODPR(StretchableSprite2D, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
+    // template<class T> T*  Component::GetComponent() const | File: ../Scene/Component.h
+    // Not registered because template
+    // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
+    // Error: type "PODVector<Component*>&" can not automatically bind
+    // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
+    // Not registered because template
+    // Context* Object::GetContext() const | File: ../Core/Object.h
+    // Error: type "Context*" can not be returned
+    // Material* StaticSprite2D::GetCustomMaterial() const | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "Material@+ GetCustomMaterial() const", asMETHODPR(StretchableSprite2D, GetCustomMaterial, () const, Material*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "Material@+ get_customMaterial() const", asMETHODPR(StretchableSprite2D, GetCustomMaterial, () const, Material*), asCALL_THISCALL);
+    // ResourceRef StaticSprite2D::GetCustomMaterialAttr() const | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "ResourceRef GetCustomMaterialAttr() const", asMETHODPR(StretchableSprite2D, GetCustomMaterialAttr, () const, ResourceRef), asCALL_THISCALL);
+    // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
+    // Error: type "PODVector<Node*>&" can not automatically bind
+    // float Drawable::GetDistance() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "float GetDistance() const", asMETHODPR(StretchableSprite2D, GetDistance, () const, float), asCALL_THISCALL);
+    // unsigned char Drawable::GetDrawableFlags() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "uint8 GetDrawableFlags() const", asMETHODPR(StretchableSprite2D, GetDrawableFlags, () const, unsigned char), asCALL_THISCALL);
+    // float Drawable::GetDrawDistance() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "float GetDrawDistance() const", asMETHODPR(StretchableSprite2D, GetDrawDistance, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "float get_drawDistance() const", asMETHODPR(StretchableSprite2D, GetDrawDistance, () const, float), asCALL_THISCALL);
+    // const Rect& StaticSprite2D::GetDrawRect() const | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "const Rect& GetDrawRect() const", asMETHODPR(StretchableSprite2D, GetDrawRect, () const, const Rect&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "const Rect& get_drawRect() const", asMETHODPR(StretchableSprite2D, GetDrawRect, () const, const Rect&), asCALL_THISCALL);
+    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "VariantMap& GetEventDataMap() const", asMETHODPR(StretchableSprite2D, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
+    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // Object* Object::GetEventSender() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "Object@+ GetEventSender() const", asMETHODPR(StretchableSprite2D, GetEventSender, () const, Object*), asCALL_THISCALL);
+    // Light* Drawable::GetFirstLight() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "Light@+ GetFirstLight() const", asMETHODPR(StretchableSprite2D, GetFirstLight, () const, Light*), asCALL_THISCALL);
+    // bool StaticSprite2D::GetFlipX() const | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool GetFlipX() const", asMETHODPR(StretchableSprite2D, GetFlipX, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool get_flipX() const", asMETHODPR(StretchableSprite2D, GetFlipX, () const, bool), asCALL_THISCALL);
+    // bool StaticSprite2D::GetFlipY() const | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool GetFlipY() const", asMETHODPR(StretchableSprite2D, GetFlipY, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool get_flipY() const", asMETHODPR(StretchableSprite2D, GetFlipY, () const, bool), asCALL_THISCALL);
+    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(StretchableSprite2D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "const Variant& get_globalVar(StringHash) const", asMETHODPR(StretchableSprite2D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "const VariantMap& GetGlobalVars() const", asMETHODPR(StretchableSprite2D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "const VariantMap& get_globalVars() const", asMETHODPR(StretchableSprite2D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    // const Vector2& StaticSprite2D::GetHotSpot() const | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "const Vector2& GetHotSpot() const", asMETHODPR(StretchableSprite2D, GetHotSpot, () const, const Vector2&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "const Vector2& get_hotSpot() const", asMETHODPR(StretchableSprite2D, GetHotSpot, () const, const Vector2&), asCALL_THISCALL);
+    // unsigned Component::GetID() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "uint GetID() const", asMETHODPR(StretchableSprite2D, GetID, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "uint get_id() const", asMETHODPR(StretchableSprite2D, GetID, () const, unsigned), asCALL_THISCALL);
+    // bool Serializable::GetInterceptNetworkUpdate(const String& attributeName) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool GetInterceptNetworkUpdate(const String&in) const", asMETHODPR(StretchableSprite2D, GetInterceptNetworkUpdate, (const String&) const, bool), asCALL_THISCALL);
+    // int Drawable2D::GetLayer() const | File: ../Urho2D/Drawable2D.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "int GetLayer() const", asMETHODPR(StretchableSprite2D, GetLayer, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "int get_layer() const", asMETHODPR(StretchableSprite2D, GetLayer, () const, int), asCALL_THISCALL);
+    // unsigned Drawable::GetLightMask() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "uint GetLightMask() const", asMETHODPR(StretchableSprite2D, GetLightMask, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "uint get_lightMask() const", asMETHODPR(StretchableSprite2D, GetLightMask, () const, unsigned), asCALL_THISCALL);
+    // const PODVector<Light*>& Drawable::GetLights() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "Array<Light@>@ GetLights() const", asFUNCTION(StretchableSprite2D_GetLights_void), asCALL_CDECL_OBJFIRST);
+    // float Drawable::GetLodBias() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "float GetLodBias() const", asMETHODPR(StretchableSprite2D, GetLodBias, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "float get_lodBias() const", asMETHODPR(StretchableSprite2D, GetLodBias, () const, float), asCALL_THISCALL);
+    // float Drawable::GetLodDistance() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "float GetLodDistance() const", asMETHODPR(StretchableSprite2D, GetLodDistance, () const, float), asCALL_THISCALL);
+    // virtual Geometry* Drawable::GetLodGeometry(unsigned batchIndex, unsigned level) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "Geometry@+ GetLodGeometry(uint, uint)", asMETHODPR(StretchableSprite2D, GetLodGeometry, (unsigned, unsigned), Geometry*), asCALL_THISCALL);
+    // unsigned Drawable::GetMaxLights() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "uint GetMaxLights() const", asMETHODPR(StretchableSprite2D, GetMaxLights, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "uint get_maxLights() const", asMETHODPR(StretchableSprite2D, GetMaxLights, () const, unsigned), asCALL_THISCALL);
+    // float Drawable::GetMaxZ() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "float GetMaxZ() const", asMETHODPR(StretchableSprite2D, GetMaxZ, () const, float), asCALL_THISCALL);
+    // float Drawable::GetMinZ() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "float GetMinZ() const", asMETHODPR(StretchableSprite2D, GetMinZ, () const, float), asCALL_THISCALL);
+    // virtual const Vector<AttributeInfo>* Serializable::GetNetworkAttributes() const | File: ../Scene/Serializable.h
+    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
+    // NetworkState* Serializable::GetNetworkState() const | File: ../Scene/Serializable.h
+    // Error: type "NetworkState*" can not automatically bind
+    // Node* Component::GetNode() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "Node@+ GetNode() const", asMETHODPR(StretchableSprite2D, GetNode, () const, Node*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "Node@+ get_node() const", asMETHODPR(StretchableSprite2D, GetNode, () const, Node*), asCALL_THISCALL);
+    // unsigned Serializable::GetNumAttributes() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "uint GetNumAttributes() const", asMETHODPR(StretchableSprite2D, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "uint get_numAttributes() const", asMETHODPR(StretchableSprite2D, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
+    // unsigned Serializable::GetNumNetworkAttributes() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "uint GetNumNetworkAttributes() const", asMETHODPR(StretchableSprite2D, GetNumNetworkAttributes, () const, unsigned), asCALL_THISCALL);
+    // virtual unsigned Drawable::GetNumOccluderTriangles() | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "uint GetNumOccluderTriangles()", asMETHODPR(StretchableSprite2D, GetNumOccluderTriangles, (), unsigned), asCALL_THISCALL);
+    // ObjectAnimation* Animatable::GetObjectAnimation() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "ObjectAnimation@+ GetObjectAnimation() const", asMETHODPR(StretchableSprite2D, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "ObjectAnimation@+ get_objectAnimation() const", asMETHODPR(StretchableSprite2D, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
+    // ResourceRef Animatable::GetObjectAnimationAttr() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "ResourceRef GetObjectAnimationAttr() const", asMETHODPR(StretchableSprite2D, GetObjectAnimationAttr, () const, ResourceRef), asCALL_THISCALL);
+    // Octant* Drawable::GetOctant() const | File: ../Graphics/Drawable.h
+    // Error: type "Octant" can not automatically bind bacause have @nobind mark
+    // int Drawable2D::GetOrderInLayer() const | File: ../Urho2D/Drawable2D.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "int GetOrderInLayer() const", asMETHODPR(StretchableSprite2D, GetOrderInLayer, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "int get_orderInLayer() const", asMETHODPR(StretchableSprite2D, GetOrderInLayer, () const, int), asCALL_THISCALL);
+    // Scene* Component::GetScene() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "Scene@+ GetScene() const", asMETHODPR(StretchableSprite2D, GetScene, () const, Scene*), asCALL_THISCALL);
+    // float Drawable::GetShadowDistance() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "float GetShadowDistance() const", asMETHODPR(StretchableSprite2D, GetShadowDistance, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "float get_shadowDistance() const", asMETHODPR(StretchableSprite2D, GetShadowDistance, () const, float), asCALL_THISCALL);
+    // unsigned Drawable::GetShadowMask() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "uint GetShadowMask() const", asMETHODPR(StretchableSprite2D, GetShadowMask, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "uint get_shadowMask() const", asMETHODPR(StretchableSprite2D, GetShadowMask, () const, unsigned), asCALL_THISCALL);
+    // float Drawable::GetSortValue() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "float GetSortValue() const", asMETHODPR(StretchableSprite2D, GetSortValue, () const, float), asCALL_THISCALL);
+    // const Vector<SourceBatch2D>& Drawable2D::GetSourceBatches() | File: ../Urho2D/Drawable2D.h
+    // Error: type "const Vector<SourceBatch2D>&" can not automatically bind
+    // Sprite2D* StaticSprite2D::GetSprite() const | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "Sprite2D@+ GetSprite() const", asMETHODPR(StretchableSprite2D, GetSprite, () const, Sprite2D*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "Sprite2D@+ get_sprite() const", asMETHODPR(StretchableSprite2D, GetSprite, () const, Sprite2D*), asCALL_THISCALL);
+    // ResourceRef StaticSprite2D::GetSpriteAttr() const | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "ResourceRef GetSpriteAttr() const", asMETHODPR(StretchableSprite2D, GetSpriteAttr, () const, ResourceRef), asCALL_THISCALL);
+    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(StretchableSprite2D, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
+    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // Not registered because template
+    // bool StaticSprite2D::GetSwapXY() const | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool GetSwapXY() const", asMETHODPR(StretchableSprite2D, GetSwapXY, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool get_swapXY() const", asMETHODPR(StretchableSprite2D, GetSwapXY, () const, bool), asCALL_THISCALL);
+    // const Rect& StaticSprite2D::GetTextureRect() const | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "const Rect& GetTextureRect() const", asMETHODPR(StretchableSprite2D, GetTextureRect, () const, const Rect&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "const Rect& get_textureRect() const", asMETHODPR(StretchableSprite2D, GetTextureRect, () const, const Rect&), asCALL_THISCALL);
+    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "StringHash GetType() const", asMETHODPR(StretchableSprite2D, GetType, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "StringHash get_type() const", asMETHODPR(StretchableSprite2D, GetType, () const, StringHash), asCALL_THISCALL);
+    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "const String& GetTypeName() const", asMETHODPR(StretchableSprite2D, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "const String& get_typeName() const", asMETHODPR(StretchableSprite2D, GetTypeName, () const, const String&), asCALL_THISCALL);
+    // virtual UpdateGeometryType Drawable::GetUpdateGeometryType() | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "UpdateGeometryType GetUpdateGeometryType()", asMETHODPR(StretchableSprite2D, GetUpdateGeometryType, (), UpdateGeometryType), asCALL_THISCALL);
+    // bool StaticSprite2D::GetUseDrawRect() const | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool GetUseDrawRect() const", asMETHODPR(StretchableSprite2D, GetUseDrawRect, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool get_useDrawRect() const", asMETHODPR(StretchableSprite2D, GetUseDrawRect, () const, bool), asCALL_THISCALL);
+    // bool StaticSprite2D::GetUseHotSpot() const | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool GetUseHotSpot() const", asMETHODPR(StretchableSprite2D, GetUseHotSpot, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool get_useHotSpot() const", asMETHODPR(StretchableSprite2D, GetUseHotSpot, () const, bool), asCALL_THISCALL);
+    // bool StaticSprite2D::GetUseTextureRect() const | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool GetUseTextureRect() const", asMETHODPR(StretchableSprite2D, GetUseTextureRect, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool get_useTextureRect() const", asMETHODPR(StretchableSprite2D, GetUseTextureRect, () const, bool), asCALL_THISCALL);
+    // const PODVector<Light*>& Drawable::GetVertexLights() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "Array<Light@>@ GetVertexLights() const", asFUNCTION(StretchableSprite2D_GetVertexLights_void), asCALL_CDECL_OBJFIRST);
+    // unsigned Drawable::GetViewMask() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "uint GetViewMask() const", asMETHODPR(StretchableSprite2D, GetViewMask, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "uint get_viewMask() const", asMETHODPR(StretchableSprite2D, GetViewMask, () const, unsigned), asCALL_THISCALL);
+    // const BoundingBox& Drawable::GetWorldBoundingBox() | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "const BoundingBox& GetWorldBoundingBox()", asMETHODPR(StretchableSprite2D, GetWorldBoundingBox, (), const BoundingBox&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "const BoundingBox& get_worldBoundingBox()", asMETHODPR(StretchableSprite2D, GetWorldBoundingBox, (), const BoundingBox&), asCALL_THISCALL);
+    // Zone* Drawable::GetZone() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "Zone@+ GetZone() const", asMETHODPR(StretchableSprite2D, GetZone, () const, Zone*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "Zone@+ get_zone() const", asMETHODPR(StretchableSprite2D, GetZone, () const, Zone*), asCALL_THISCALL);
+    // unsigned Drawable::GetZoneMask() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "uint GetZoneMask() const", asMETHODPR(StretchableSprite2D, GetZoneMask, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "uint get_zoneMask() const", asMETHODPR(StretchableSprite2D, GetZoneMask, () const, unsigned), asCALL_THISCALL);
+    // bool Drawable::HasBasePass(unsigned batchIndex) const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool HasBasePass(uint) const", asMETHODPR(StretchableSprite2D, HasBasePass, (unsigned) const, bool), asCALL_THISCALL);
+    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool HasEventHandlers() const", asMETHODPR(StretchableSprite2D, HasEventHandlers, () const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(StretchableSprite2D, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(StretchableSprite2D, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
+    // bool Component::IsEnabled() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool IsEnabled() const", asMETHODPR(StretchableSprite2D, IsEnabled, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool get_enabled() const", asMETHODPR(StretchableSprite2D, IsEnabled, () const, bool), asCALL_THISCALL);
+    // bool Component::IsEnabledEffective() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool IsEnabledEffective() const", asMETHODPR(StretchableSprite2D, IsEnabledEffective, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool get_enabledEffective() const", asMETHODPR(StretchableSprite2D, IsEnabledEffective, () const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool IsInstanceOf(StringHash) const", asMETHODPR(StretchableSprite2D, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
+    // Not registered because template
+    // bool Drawable::IsInView() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool IsInView() const", asMETHODPR(StretchableSprite2D, IsInView, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool get_inView() const", asMETHODPR(StretchableSprite2D, IsInView, () const, bool), asCALL_THISCALL);
+    // bool Drawable::IsInView(Camera* camera) const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool IsInView(Camera@+) const", asMETHODPR(StretchableSprite2D, IsInView, (Camera*) const, bool), asCALL_THISCALL);
+    // bool Drawable::IsInView(const FrameInfo& frame, bool anyCamera=false) const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool IsInView(const FrameInfo&in, bool = false) const", asMETHODPR(StretchableSprite2D, IsInView, (const FrameInfo&, bool) const, bool), asCALL_THISCALL);
+    // bool Drawable::IsOccludee() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool IsOccludee() const", asMETHODPR(StretchableSprite2D, IsOccludee, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool get_occludee() const", asMETHODPR(StretchableSprite2D, IsOccludee, () const, bool), asCALL_THISCALL);
+    // bool Drawable::IsOccluder() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool IsOccluder() const", asMETHODPR(StretchableSprite2D, IsOccluder, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool get_occluder() const", asMETHODPR(StretchableSprite2D, IsOccluder, () const, bool), asCALL_THISCALL);
+    // bool Component::IsReplicated() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool IsReplicated() const", asMETHODPR(StretchableSprite2D, IsReplicated, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool get_replicated() const", asMETHODPR(StretchableSprite2D, IsReplicated, () const, bool), asCALL_THISCALL);
+    // bool Serializable::IsTemporary() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool IsTemporary() const", asMETHODPR(StretchableSprite2D, IsTemporary, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool get_temporary() const", asMETHODPR(StretchableSprite2D, IsTemporary, () const, bool), asCALL_THISCALL);
+    // bool Drawable::IsZoneDirty() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool IsZoneDirty() const", asMETHODPR(StretchableSprite2D, IsZoneDirty, () const, bool), asCALL_THISCALL);
+    // void Drawable::LimitLights() | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void LimitLights()", asMETHODPR(StretchableSprite2D, LimitLights, (), void), asCALL_THISCALL);
+    // void Drawable::LimitVertexLights(bool removeConvertedLights) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void LimitVertexLights(bool)", asMETHODPR(StretchableSprite2D, LimitVertexLights, (bool), void), asCALL_THISCALL);
+    // virtual bool Serializable::Load(Deserializer& source) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool Load(Deserializer&)", asMETHODPR(StretchableSprite2D, Load, (Deserializer&), bool), asCALL_THISCALL);
+    // bool Animatable::LoadJSON(const JSONValue& source) override | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool LoadJSON(const JSONValue&in)", asMETHODPR(StretchableSprite2D, LoadJSON, (const JSONValue&), bool), asCALL_THISCALL);
+    // bool Animatable::LoadXML(const XMLElement& source) override | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool LoadXML(const XMLElement&in)", asMETHODPR(StretchableSprite2D, LoadXML, (const XMLElement&), bool), asCALL_THISCALL);
+    // void Drawable::MarkForUpdate() | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void MarkForUpdate()", asMETHODPR(StretchableSprite2D, MarkForUpdate, (), void), asCALL_THISCALL);
+    // void Drawable::MarkInView(const FrameInfo& frame) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void MarkInView(const FrameInfo&in)", asMETHODPR(StretchableSprite2D, MarkInView, (const FrameInfo&), void), asCALL_THISCALL);
+    // void Drawable::MarkInView(unsigned frameNumber) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void MarkInView(uint)", asMETHODPR(StretchableSprite2D, MarkInView, (unsigned), void), asCALL_THISCALL);
+    // void Component::MarkNetworkUpdate() override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void MarkNetworkUpdate()", asMETHODPR(StretchableSprite2D, MarkNetworkUpdate, (), void), asCALL_THISCALL);
+    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(StretchableSprite2D, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
+    // virtual void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void OnGetAttribute(const AttributeInfo&in, Variant&) const", asMETHODPR(StretchableSprite2D, OnGetAttribute, (const AttributeInfo&, Variant&) const, void), asCALL_THISCALL);
+    // virtual void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void OnSetAttribute(const AttributeInfo&in, const Variant&in)", asMETHODPR(StretchableSprite2D, OnSetAttribute, (const AttributeInfo&, const Variant&), void), asCALL_THISCALL);
+    // void Drawable2D::OnSetEnabled() override | File: ../Urho2D/Drawable2D.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void OnSetEnabled()", asMETHODPR(StretchableSprite2D, OnSetEnabled, (), void), asCALL_THISCALL);
+    // void Component::PrepareNetworkUpdate() | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void PrepareNetworkUpdate()", asMETHODPR(StretchableSprite2D, PrepareNetworkUpdate, (), void), asCALL_THISCALL);
+    // virtual void Drawable::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results) | File: ../Graphics/Drawable.h
+    // Error: type "RayOctreeQuery" can not automatically bind bacause have @nobind mark
+    // bool Serializable::ReadDeltaUpdate(Deserializer& source) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool ReadDeltaUpdate(Deserializer&)", asMETHODPR(StretchableSprite2D, ReadDeltaUpdate, (Deserializer&), bool), asCALL_THISCALL);
+    // bool Serializable::ReadLatestDataUpdate(Deserializer& source) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool ReadLatestDataUpdate(Deserializer&)", asMETHODPR(StretchableSprite2D, ReadLatestDataUpdate, (Deserializer&), bool), asCALL_THISCALL);
+    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
+    // Error: type "RefCount*" can not automatically bind
+    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "int Refs() const", asMETHODPR(StretchableSprite2D, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "int get_refs() const", asMETHODPR(StretchableSprite2D, Refs, () const, int), asCALL_THISCALL);
+    // static void StretchableSprite2D::RegisterObject(Context* context) | File: ../Urho2D/StretchableSprite2D.h
+    // Context can be used as firs parameter of constructors only
+    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("StretchableSprite2D", asBEHAVE_RELEASE, "void f()", asMETHODPR(StretchableSprite2D, ReleaseRef, (), void), asCALL_THISCALL);
+    // void Component::Remove() | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void Remove()", asMETHODPR(StretchableSprite2D, Remove, (), void), asCALL_THISCALL);
+    // void Animatable::RemoveAttributeAnimation(const String& name) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void RemoveAttributeAnimation(const String&in)", asMETHODPR(StretchableSprite2D, RemoveAttributeAnimation, (const String&), void), asCALL_THISCALL);
+    // void Serializable::RemoveInstanceDefault() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void RemoveInstanceDefault()", asMETHODPR(StretchableSprite2D, RemoveInstanceDefault, (), void), asCALL_THISCALL);
+    // void Animatable::RemoveObjectAnimation() | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void RemoveObjectAnimation()", asMETHODPR(StretchableSprite2D, RemoveObjectAnimation, (), void), asCALL_THISCALL);
+    // void Serializable::ResetToDefault() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void ResetToDefault()", asMETHODPR(StretchableSprite2D, ResetToDefault, (), void), asCALL_THISCALL);
+    // bool Component::Save(Serializer& dest) const override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool Save(Serializer&) const", asMETHODPR(StretchableSprite2D, Save, (Serializer&) const, bool), asCALL_THISCALL);
+    // virtual bool Serializable::SaveDefaultAttributes() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool SaveDefaultAttributes() const", asMETHODPR(StretchableSprite2D, SaveDefaultAttributes, () const, bool), asCALL_THISCALL);
+    // bool Component::SaveJSON(JSONValue& dest) const override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool SaveJSON(JSONValue&) const", asMETHODPR(StretchableSprite2D, SaveJSON, (JSONValue&) const, bool), asCALL_THISCALL);
+    // bool Component::SaveXML(XMLElement& dest) const override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool SaveXML(XMLElement&) const", asMETHODPR(StretchableSprite2D, SaveXML, (XMLElement&) const, bool), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SendEvent(StringHash)", asMETHODPR(StretchableSprite2D, SendEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(StretchableSprite2D, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
+    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
+    // Not registered because template
+    // void StaticSprite2D::SetAlpha(float alpha) | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetAlpha(float)", asMETHODPR(StretchableSprite2D, SetAlpha, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "void set_alpha(float)", asMETHODPR(StretchableSprite2D, SetAlpha, (float), void), asCALL_THISCALL);
+    // void Animatable::SetAnimationEnabled(bool enable) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetAnimationEnabled(bool)", asMETHODPR(StretchableSprite2D, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "void set_animationEnabled(bool)", asMETHODPR(StretchableSprite2D, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
+    // void Animatable::SetAnimationTime(float time) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetAnimationTime(float)", asMETHODPR(StretchableSprite2D, SetAnimationTime, (float), void), asCALL_THISCALL);
+    // bool Serializable::SetAttribute(unsigned index, const Variant& value) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool SetAttribute(uint, const Variant&in)", asMETHODPR(StretchableSprite2D, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool set_attributes(uint, const Variant&in)", asMETHODPR(StretchableSprite2D, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
+    // bool Serializable::SetAttribute(const String& name, const Variant& value) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "bool SetAttribute(const String&in, const Variant&in)", asMETHODPR(StretchableSprite2D, SetAttribute, (const String&, const Variant&), bool), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode=WM_LOOP, float speed=1.0f) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetAttributeAnimation(const String&in, ValueAnimation@+, WrapMode = WM_LOOP, float = 1.0f)", asMETHODPR(StretchableSprite2D, SetAttributeAnimation, (const String&, ValueAnimation*, WrapMode, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationSpeed(const String& name, float speed) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetAttributeAnimationSpeed(const String&in, float)", asMETHODPR(StretchableSprite2D, SetAttributeAnimationSpeed, (const String&, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationTime(const String& name, float time) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetAttributeAnimationTime(const String&in, float)", asMETHODPR(StretchableSprite2D, SetAttributeAnimationTime, (const String&, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationWrapMode(const String& name, WrapMode wrapMode) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetAttributeAnimationWrapMode(const String&in, WrapMode)", asMETHODPR(StretchableSprite2D, SetAttributeAnimationWrapMode, (const String&, WrapMode), void), asCALL_THISCALL);
+    // void Drawable::SetBasePass(unsigned batchIndex) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetBasePass(uint)", asMETHODPR(StretchableSprite2D, SetBasePass, (unsigned), void), asCALL_THISCALL);
+    // void StaticSprite2D::SetBlendMode(BlendMode blendMode) | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetBlendMode(BlendMode)", asMETHODPR(StretchableSprite2D, SetBlendMode, (BlendMode), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "void set_blendMode(BlendMode)", asMETHODPR(StretchableSprite2D, SetBlendMode, (BlendMode), void), asCALL_THISCALL);
+    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetBlockEvents(bool)", asMETHODPR(StretchableSprite2D, SetBlockEvents, (bool), void), asCALL_THISCALL);
+    // void StretchableSprite2D::SetBorder(const IntRect& border) | File: ../Urho2D/StretchableSprite2D.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetBorder(const IntRect&in)", asMETHODPR(StretchableSprite2D, SetBorder, (const IntRect&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "void set_border(const IntRect&in)", asMETHODPR(StretchableSprite2D, SetBorder, (const IntRect&), void), asCALL_THISCALL);
+    // void Drawable::SetCastShadows(bool enable) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetCastShadows(bool)", asMETHODPR(StretchableSprite2D, SetCastShadows, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "void set_castShadows(bool)", asMETHODPR(StretchableSprite2D, SetCastShadows, (bool), void), asCALL_THISCALL);
+    // void StaticSprite2D::SetColor(const Color& color) | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetColor(const Color&in)", asMETHODPR(StretchableSprite2D, SetColor, (const Color&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "void set_color(const Color&in)", asMETHODPR(StretchableSprite2D, SetColor, (const Color&), void), asCALL_THISCALL);
+    // void StaticSprite2D::SetCustomMaterial(Material* customMaterial) | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetCustomMaterial(Material@+)", asMETHODPR(StretchableSprite2D, SetCustomMaterial, (Material*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "void set_customMaterial(Material@+)", asMETHODPR(StretchableSprite2D, SetCustomMaterial, (Material*), void), asCALL_THISCALL);
+    // void StaticSprite2D::SetCustomMaterialAttr(const ResourceRef& value) | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetCustomMaterialAttr(const ResourceRef&in)", asMETHODPR(StretchableSprite2D, SetCustomMaterialAttr, (const ResourceRef&), void), asCALL_THISCALL);
+    // void Drawable::SetDrawDistance(float distance) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetDrawDistance(float)", asMETHODPR(StretchableSprite2D, SetDrawDistance, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "void set_drawDistance(float)", asMETHODPR(StretchableSprite2D, SetDrawDistance, (float), void), asCALL_THISCALL);
+    // void StaticSprite2D::SetDrawRect(const Rect& rect) | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetDrawRect(const Rect&in)", asMETHODPR(StretchableSprite2D, SetDrawRect, (const Rect&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "void set_drawRect(const Rect&in)", asMETHODPR(StretchableSprite2D, SetDrawRect, (const Rect&), void), asCALL_THISCALL);
+    // void Component::SetEnabled(bool enable) | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetEnabled(bool)", asMETHODPR(StretchableSprite2D, SetEnabled, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "void set_enabled(bool)", asMETHODPR(StretchableSprite2D, SetEnabled, (bool), void), asCALL_THISCALL);
+    // void StaticSprite2D::SetFlip(bool flipX, bool flipY, bool swapXY=false) | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetFlip(bool, bool, bool = false)", asMETHODPR(StretchableSprite2D, SetFlip, (bool, bool, bool), void), asCALL_THISCALL);
+    // void StaticSprite2D::SetFlipX(bool flipX) | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetFlipX(bool)", asMETHODPR(StretchableSprite2D, SetFlipX, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "void set_flipX(bool)", asMETHODPR(StretchableSprite2D, SetFlipX, (bool), void), asCALL_THISCALL);
+    // void StaticSprite2D::SetFlipY(bool flipY) | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetFlipY(bool)", asMETHODPR(StretchableSprite2D, SetFlipY, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "void set_flipY(bool)", asMETHODPR(StretchableSprite2D, SetFlipY, (bool), void), asCALL_THISCALL);
+    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(StretchableSprite2D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(StretchableSprite2D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    // void StaticSprite2D::SetHotSpot(const Vector2& hotspot) | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetHotSpot(const Vector2&in)", asMETHODPR(StretchableSprite2D, SetHotSpot, (const Vector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "void set_hotSpot(const Vector2&in)", asMETHODPR(StretchableSprite2D, SetHotSpot, (const Vector2&), void), asCALL_THISCALL);
+    // void Serializable::SetInstanceDefault(bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetInstanceDefault(bool)", asMETHODPR(StretchableSprite2D, SetInstanceDefault, (bool), void), asCALL_THISCALL);
+    // void Serializable::SetInterceptNetworkUpdate(const String& attributeName, bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetInterceptNetworkUpdate(const String&in, bool)", asMETHODPR(StretchableSprite2D, SetInterceptNetworkUpdate, (const String&, bool), void), asCALL_THISCALL);
+    // void Drawable2D::SetLayer(int layer) | File: ../Urho2D/Drawable2D.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetLayer(int)", asMETHODPR(StretchableSprite2D, SetLayer, (int), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "void set_layer(int)", asMETHODPR(StretchableSprite2D, SetLayer, (int), void), asCALL_THISCALL);
+    // void Drawable::SetLightMask(unsigned mask) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetLightMask(uint)", asMETHODPR(StretchableSprite2D, SetLightMask, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "void set_lightMask(uint)", asMETHODPR(StretchableSprite2D, SetLightMask, (unsigned), void), asCALL_THISCALL);
+    // void Drawable::SetLodBias(float bias) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetLodBias(float)", asMETHODPR(StretchableSprite2D, SetLodBias, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "void set_lodBias(float)", asMETHODPR(StretchableSprite2D, SetLodBias, (float), void), asCALL_THISCALL);
+    // void Drawable::SetMaxLights(unsigned num) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetMaxLights(uint)", asMETHODPR(StretchableSprite2D, SetMaxLights, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "void set_maxLights(uint)", asMETHODPR(StretchableSprite2D, SetMaxLights, (unsigned), void), asCALL_THISCALL);
+    // void Drawable::SetMinMaxZ(float minZ, float maxZ) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetMinMaxZ(float, float)", asMETHODPR(StretchableSprite2D, SetMinMaxZ, (float, float), void), asCALL_THISCALL);
+    // void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetObjectAnimation(ObjectAnimation@+)", asMETHODPR(StretchableSprite2D, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "void set_objectAnimation(ObjectAnimation@+)", asMETHODPR(StretchableSprite2D, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
+    // void Animatable::SetObjectAnimationAttr(const ResourceRef& value) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetObjectAnimationAttr(const ResourceRef&in)", asMETHODPR(StretchableSprite2D, SetObjectAnimationAttr, (const ResourceRef&), void), asCALL_THISCALL);
+    // void Drawable::SetOccludee(bool enable) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetOccludee(bool)", asMETHODPR(StretchableSprite2D, SetOccludee, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "void set_occludee(bool)", asMETHODPR(StretchableSprite2D, SetOccludee, (bool), void), asCALL_THISCALL);
+    // void Drawable::SetOccluder(bool enable) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetOccluder(bool)", asMETHODPR(StretchableSprite2D, SetOccluder, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "void set_occluder(bool)", asMETHODPR(StretchableSprite2D, SetOccluder, (bool), void), asCALL_THISCALL);
+    // void Drawable2D::SetOrderInLayer(int orderInLayer) | File: ../Urho2D/Drawable2D.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetOrderInLayer(int)", asMETHODPR(StretchableSprite2D, SetOrderInLayer, (int), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "void set_orderInLayer(int)", asMETHODPR(StretchableSprite2D, SetOrderInLayer, (int), void), asCALL_THISCALL);
+    // void Drawable::SetShadowDistance(float distance) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetShadowDistance(float)", asMETHODPR(StretchableSprite2D, SetShadowDistance, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "void set_shadowDistance(float)", asMETHODPR(StretchableSprite2D, SetShadowDistance, (float), void), asCALL_THISCALL);
+    // void Drawable::SetShadowMask(unsigned mask) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetShadowMask(uint)", asMETHODPR(StretchableSprite2D, SetShadowMask, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "void set_shadowMask(uint)", asMETHODPR(StretchableSprite2D, SetShadowMask, (unsigned), void), asCALL_THISCALL);
+    // void Drawable::SetSortValue(float value) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetSortValue(float)", asMETHODPR(StretchableSprite2D, SetSortValue, (float), void), asCALL_THISCALL);
+    // void StaticSprite2D::SetSprite(Sprite2D* sprite) | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetSprite(Sprite2D@+)", asMETHODPR(StretchableSprite2D, SetSprite, (Sprite2D*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "void set_sprite(Sprite2D@+)", asMETHODPR(StretchableSprite2D, SetSprite, (Sprite2D*), void), asCALL_THISCALL);
+    // void StaticSprite2D::SetSpriteAttr(const ResourceRef& value) | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetSpriteAttr(const ResourceRef&in)", asMETHODPR(StretchableSprite2D, SetSpriteAttr, (const ResourceRef&), void), asCALL_THISCALL);
+    // void StaticSprite2D::SetSwapXY(bool swapXY) | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetSwapXY(bool)", asMETHODPR(StretchableSprite2D, SetSwapXY, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "void set_swapXY(bool)", asMETHODPR(StretchableSprite2D, SetSwapXY, (bool), void), asCALL_THISCALL);
+    // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetTemporary(bool)", asMETHODPR(StretchableSprite2D, SetTemporary, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "void set_temporary(bool)", asMETHODPR(StretchableSprite2D, SetTemporary, (bool), void), asCALL_THISCALL);
+    // void StaticSprite2D::SetTextureRect(const Rect& rect) | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetTextureRect(const Rect&in)", asMETHODPR(StretchableSprite2D, SetTextureRect, (const Rect&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "void set_textureRect(const Rect&in)", asMETHODPR(StretchableSprite2D, SetTextureRect, (const Rect&), void), asCALL_THISCALL);
+    // void StaticSprite2D::SetUseDrawRect(bool useDrawRect) | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetUseDrawRect(bool)", asMETHODPR(StretchableSprite2D, SetUseDrawRect, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "void set_useDrawRect(bool)", asMETHODPR(StretchableSprite2D, SetUseDrawRect, (bool), void), asCALL_THISCALL);
+    // void StaticSprite2D::SetUseHotSpot(bool useHotSpot) | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetUseHotSpot(bool)", asMETHODPR(StretchableSprite2D, SetUseHotSpot, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "void set_useHotSpot(bool)", asMETHODPR(StretchableSprite2D, SetUseHotSpot, (bool), void), asCALL_THISCALL);
+    // void StaticSprite2D::SetUseTextureRect(bool useTextureRect) | File: ../Urho2D/StaticSprite2D.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetUseTextureRect(bool)", asMETHODPR(StretchableSprite2D, SetUseTextureRect, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "void set_useTextureRect(bool)", asMETHODPR(StretchableSprite2D, SetUseTextureRect, (bool), void), asCALL_THISCALL);
+    // void Drawable::SetViewMask(unsigned mask) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetViewMask(uint)", asMETHODPR(StretchableSprite2D, SetViewMask, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "void set_viewMask(uint)", asMETHODPR(StretchableSprite2D, SetViewMask, (unsigned), void), asCALL_THISCALL);
+    // void Drawable::SetZone(Zone* zone, bool temporary=false) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetZone(Zone@+, bool = false)", asMETHODPR(StretchableSprite2D, SetZone, (Zone*, bool), void), asCALL_THISCALL);
+    // void Drawable::SetZoneMask(unsigned mask) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void SetZoneMask(uint)", asMETHODPR(StretchableSprite2D, SetZoneMask, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "void set_zoneMask(uint)", asMETHODPR(StretchableSprite2D, SetZoneMask, (unsigned), void), asCALL_THISCALL);
+    // explicit StretchableSprite2D::StretchableSprite2D(Context* context) | File: ../Urho2D/StretchableSprite2D.h
+    engine->RegisterObjectBehaviour("StretchableSprite2D", asBEHAVE_FACTORY, "StretchableSprite2D@+ f()", asFUNCTION(StretchableSprite2D_StretchableSprite2D_Context), asCALL_CDECL);
+    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void UnsubscribeFromAllEvents()", asMETHODPR(StretchableSprite2D, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(StretchableSprite2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
+    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(StretchableSprite2D, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(StretchableSprite2D, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(StretchableSprite2D, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
+    // virtual void Drawable::Update(const FrameInfo& frame) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void Update(const FrameInfo&in)", asMETHODPR(StretchableSprite2D, Update, (const FrameInfo&), void), asCALL_THISCALL);
+    // virtual void Drawable::UpdateBatches(const FrameInfo& frame) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void UpdateBatches(const FrameInfo&in)", asMETHODPR(StretchableSprite2D, UpdateBatches, (const FrameInfo&), void), asCALL_THISCALL);
+    // virtual void Drawable::UpdateGeometry(const FrameInfo& frame) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void UpdateGeometry(const FrameInfo&in)", asMETHODPR(StretchableSprite2D, UpdateGeometry, (const FrameInfo&), void), asCALL_THISCALL);
+    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "int WeakRefs() const", asMETHODPR(StretchableSprite2D, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StretchableSprite2D", "int get_weakRefs() const", asMETHODPR(StretchableSprite2D, WeakRefs, () const, int), asCALL_THISCALL);
+    // void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attributeBits, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void WriteDeltaUpdate(Serializer&, const DirtyBits&in, uint8)", asMETHODPR(StretchableSprite2D, WriteDeltaUpdate, (Serializer&, const DirtyBits&, unsigned char), void), asCALL_THISCALL);
+    // void Serializable::WriteInitialDeltaUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void WriteInitialDeltaUpdate(Serializer&, uint8)", asMETHODPR(StretchableSprite2D, WriteInitialDeltaUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
+    // void Serializable::WriteLatestDataUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("StretchableSprite2D", "void WriteLatestDataUpdate(Serializer&, uint8)", asMETHODPR(StretchableSprite2D, WriteLatestDataUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
+#ifdef REGISTER_MANUAL_PART_StaticSprite2D
+    REGISTER_MANUAL_PART_StaticSprite2D(StretchableSprite2D, "StretchableSprite2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Drawable2D
+    REGISTER_MANUAL_PART_Drawable2D(StretchableSprite2D, "StretchableSprite2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Drawable
+    REGISTER_MANUAL_PART_Drawable(StretchableSprite2D, "StretchableSprite2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Component
+    REGISTER_MANUAL_PART_Component(StretchableSprite2D, "StretchableSprite2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Animatable
+    REGISTER_MANUAL_PART_Animatable(StretchableSprite2D, "StretchableSprite2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Serializable
+    REGISTER_MANUAL_PART_Serializable(StretchableSprite2D, "StretchableSprite2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Object
+    REGISTER_MANUAL_PART_Object(StretchableSprite2D, "StretchableSprite2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_RefCounted
+    REGISTER_MANUAL_PART_RefCounted(StretchableSprite2D, "StretchableSprite2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_StretchableSprite2D
+    REGISTER_MANUAL_PART_StretchableSprite2D(StretchableSprite2D, "StretchableSprite2D")
+#endif
+    RegisterSubclass<StaticSprite2D, StretchableSprite2D>(engine, "StaticSprite2D", "StretchableSprite2D");
+    RegisterSubclass<Drawable2D, StretchableSprite2D>(engine, "Drawable2D", "StretchableSprite2D");
+    RegisterSubclass<Drawable, StretchableSprite2D>(engine, "Drawable", "StretchableSprite2D");
+    RegisterSubclass<Component, StretchableSprite2D>(engine, "Component", "StretchableSprite2D");
+    RegisterSubclass<Animatable, StretchableSprite2D>(engine, "Animatable", "StretchableSprite2D");
+    RegisterSubclass<Serializable, StretchableSprite2D>(engine, "Serializable", "StretchableSprite2D");
+    RegisterSubclass<Object, StretchableSprite2D>(engine, "Object", "StretchableSprite2D");
+    RegisterSubclass<RefCounted, StretchableSprite2D>(engine, "RefCounted", "StretchableSprite2D");
+#endif
+
     // const String String::EMPTY | File: ../Container/Str.h
     engine->SetDefaultNamespace("String");
     engine->RegisterGlobalProperty("const String EMPTY", (void*)&String::EMPTY);
@@ -5796,6 +5742,48 @@ void ASRegisterGenerated_Members_Sn_Sz(asIScriptEngine* engine)
     REGISTER_MANUAL_PART_String(String, "String")
 #endif
 
+    // const StringHash StringHash::ZERO | File: ../Math/StringHash.h
+    engine->SetDefaultNamespace("StringHash");
+    engine->RegisterGlobalProperty("const StringHash ZERO", (void*)&StringHash::ZERO);
+    engine->SetDefaultNamespace("");
+    // static unsigned StringHash::Calculate(const char* str, unsigned hash=0) | File: ../Math/StringHash.h
+    // Error: type "const char*" can not automatically bind
+    // static StringHashRegister* StringHash::GetGlobalStringHashRegister() | File: ../Math/StringHash.h
+    // Error: type "StringHashRegister*" can not automatically bind
+    // explicit StringHash::operator bool() const | File: ../Math/StringHash.h
+    engine->RegisterObjectMethod("StringHash", "bool opConv() const", asMETHODPR(StringHash, operator bool, () const, bool), asCALL_THISCALL);
+    // StringHash StringHash::operator+(const StringHash& rhs) const | File: ../Math/StringHash.h
+    engine->RegisterObjectMethod("StringHash", "StringHash opAdd(const StringHash&in) const", asMETHODPR(StringHash, operator+, (const StringHash&) const, StringHash), asCALL_THISCALL);
+    // StringHash& StringHash::operator+=(const StringHash& rhs) | File: ../Math/StringHash.h
+    engine->RegisterObjectMethod("StringHash", "StringHash& opAddAssign(const StringHash&in)", asMETHODPR(StringHash, operator+=, (const StringHash&), StringHash&), asCALL_THISCALL);
+    // StringHash& StringHash::operator=(const StringHash& rhs) noexcept=default | File: ../Math/StringHash.h
+    engine->RegisterObjectMethod("StringHash", "StringHash& opAssign(const StringHash&in)", asMETHODPR(StringHash, operator=, (const StringHash&), StringHash&), asCALL_THISCALL);
+    // bool StringHash::operator==(const StringHash& rhs) const | File: ../Math/StringHash.h
+    engine->RegisterObjectMethod("StringHash", "bool opEquals(const StringHash&in) const", asMETHODPR(StringHash, operator==, (const StringHash&) const, bool), asCALL_THISCALL);
+    // String StringHash::Reverse() const | File: ../Math/StringHash.h
+    engine->RegisterObjectMethod("StringHash", "String Reverse() const", asMETHODPR(StringHash, Reverse, () const, String), asCALL_THISCALL);
+    // StringHash::StringHash(const StringHash& rhs) noexcept=default | File: ../Math/StringHash.h
+    engine->RegisterObjectBehaviour("StringHash", asBEHAVE_CONSTRUCT, "void f(const StringHash&in)", asFUNCTION(StringHash_StringHash_StringHash), asCALL_CDECL_OBJFIRST);
+    // explicit StringHash::StringHash(unsigned value) noexcept | File: ../Math/StringHash.h
+    engine->RegisterObjectBehaviour("StringHash", asBEHAVE_CONSTRUCT, "void f(uint)", asFUNCTION(StringHash_StringHash_unsigned), asCALL_CDECL_OBJFIRST);
+    // StringHash::StringHash(const char* str) noexcept | File: ../Math/StringHash.h
+    // Error: type "const char*" can not automatically bind
+    // StringHash::StringHash(const String& str) noexcept | File: ../Math/StringHash.h
+    engine->RegisterObjectBehaviour("StringHash", asBEHAVE_CONSTRUCT, "void f(const String&in)", asFUNCTION(StringHash_StringHash_String), asCALL_CDECL_OBJFIRST);
+    // unsigned StringHash::ToHash() const | File: ../Math/StringHash.h
+    engine->RegisterObjectMethod("StringHash", "uint ToHash() const", asMETHODPR(StringHash, ToHash, () const, unsigned), asCALL_THISCALL);
+    // String StringHash::ToString() const | File: ../Math/StringHash.h
+    engine->RegisterObjectMethod("StringHash", "String ToString() const", asMETHODPR(StringHash, ToString, () const, String), asCALL_THISCALL);
+    // unsigned StringHash::Value() const | File: ../Math/StringHash.h
+    engine->RegisterObjectMethod("StringHash", "uint Value() const", asMETHODPR(StringHash, Value, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StringHash", "uint get_value() const", asMETHODPR(StringHash, Value, () const, unsigned), asCALL_THISCALL);
+    // bool StringHash::operator<(const StringHash& rhs) const | File: ../Math/StringHash.h
+    // bool StringHash::operator>(const StringHash& rhs) const | File: ../Math/StringHash.h
+    engine->RegisterObjectMethod("StringHash", "int opCmp(const StringHash&in) const", asFUNCTION(StringHash_Comparison), asCALL_CDECL_OBJFIRST);
+#ifdef REGISTER_MANUAL_PART_StringHash
+    REGISTER_MANUAL_PART_StringHash(StringHash, "StringHash")
+#endif
+
     // bool StringHashRegister::Contains(const StringHash& hash) const | File: ../Core/StringHashRegister.h
     engine->RegisterObjectMethod("StringHashRegister", "bool Contains(const StringHash&in) const", asMETHODPR(StringHashRegister, Contains, (const StringHash&) const, bool), asCALL_THISCALL);
     // const StringMap& StringHashRegister::GetInternalMap() const | File: ../Core/StringHashRegister.h
@@ -5860,6 +5848,18 @@ void ASRegisterGenerated_Members_Sn_Sz(asIScriptEngine* engine)
 #ifdef REGISTER_MANUAL_PART_SourceBatch2D
     REGISTER_MANUAL_PART_SourceBatch2D(SourceBatch2D, "SourceBatch2D")
 #endif
+#endif
+
+    // Vector3 StaticModelGeometryData::center_ | File: ../Graphics/StaticModel.h
+    engine->RegisterObjectProperty("StaticModelGeometryData", "Vector3 center", offsetof(StaticModelGeometryData, center_));
+    // unsigned StaticModelGeometryData::lodLevel_ | File: ../Graphics/StaticModel.h
+    engine->RegisterObjectProperty("StaticModelGeometryData", "uint lodLevel", offsetof(StaticModelGeometryData, lodLevel_));
+    // StaticModelGeometryData::~StaticModelGeometryData() | Implicitly-declared
+    engine->RegisterObjectBehaviour("StaticModelGeometryData", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(StaticModelGeometryData_Destructor), asCALL_CDECL_OBJFIRST);
+    // StaticModelGeometryData& StaticModelGeometryData::operator=(const StaticModelGeometryData&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<StaticModelGeometryData>(engine, "StaticModelGeometryData");
+#ifdef REGISTER_MANUAL_PART_StaticModelGeometryData
+    REGISTER_MANUAL_PART_StaticModelGeometryData(StaticModelGeometryData, "StaticModelGeometryData")
 #endif
 
     // bool StoredLogMessage::error_ | File: ../IO/Log.h

@@ -33,84 +33,6 @@ namespace Urho3D
 void FakeAddRef(void* ptr);
 void FakeReleaseRef(void* ptr);
 
-// ScreenModeParams::~ScreenModeParams() | Implicitly-declared 
-static void ScreenModeParams_Destructor(ScreenModeParams* ptr)
-{
-    ptr->~ScreenModeParams();
-}
-
-// ShaderVariation::ShaderVariation(Shader* owner, ShaderType type) | File: ../Graphics/ShaderVariation.h
-static ShaderVariation* ShaderVariation_ShaderVariation_Shader_ShaderType(Shader *owner, ShaderType type)
-{
-    return new ShaderVariation(owner, type);
-}
-
-// const Vector<SharedPtr<UIElement>>& UIElement::GetChildren() const | File: ../UI/UIElement.h
-static CScriptArray* ScrollBar_GetChildren_void(ScrollBar* ptr)
-{
-    const Vector<SharedPtr<UIElement>>& result = ptr->GetChildren();
-    return VectorToHandleArray(result, "Array<UIElement@>");
-}
-
-// PODVector<UIElement*> UIElement::GetChildren(bool recursive) const | File: ../UI/UIElement.h
-static CScriptArray* ScrollBar_GetChildren_bool(ScrollBar* ptr, bool recursive)
-{
-    PODVector<UIElement*> result = ptr->GetChildren(recursive);
-    return VectorToHandleArray(result, "Array<UIElement@>");
-}
-
-// PODVector<UIElement*> UIElement::GetChildrenWithTag(const String& tag, bool recursive=false) const | File: ../UI/UIElement.h
-static CScriptArray* ScrollBar_GetChildrenWithTag_String_bool(ScrollBar* ptr, const String& tag, bool recursive)
-{
-    PODVector<UIElement*> result = ptr->GetChildrenWithTag(tag, recursive);
-    return VectorToHandleArray(result, "Array<UIElement@>");
-}
-
-// const StringVector& UIElement::GetTags() const | File: ../UI/UIElement.h
-static CScriptArray* ScrollBar_GetTags_void(ScrollBar* ptr)
-{
-    const StringVector& result = ptr->GetTags();
-    return VectorToArray<String>(result, "Array<String>");
-}
-
-// explicit ScrollBar::ScrollBar(Context* context) | File: ../UI/ScrollBar.h
-static ScrollBar* ScrollBar_ScrollBar_Context()
-{
-    return new ScrollBar(GetScriptContext());
-}
-
-// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void ScrollBar_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ScrollBar* ptr, CScriptArray* exceptions, bool onlyUserData)
-{
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
-}
-
-// SceneReplicationState::~SceneReplicationState() | Implicitly-declared 
-static void SceneReplicationState_Destructor(SceneReplicationState* ptr)
-{
-    ptr->~SceneReplicationState();
-}
-
-// explicit Shader::Shader(Context* context) | File: ../Graphics/Shader.h
-static Shader* Shader_Shader_Context()
-{
-    return new Shader(GetScriptContext());
-}
-
-// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Shader_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Shader* ptr, CScriptArray* exceptions, bool onlyUserData)
-{
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
-}
-
-// ScratchBuffer::~ScratchBuffer() | Implicitly-declared 
-static void ScratchBuffer_Destructor(ScratchBuffer* ptr)
-{
-    ptr->~ScratchBuffer();
-}
-
 // const Vector<SharedPtr<Node>>& Node::GetChildren() const | File: ../Scene/Node.h
 static CScriptArray* Scene_GetChildren_void(Scene* ptr)
 {
@@ -187,6 +109,47 @@ static void SceneResolver_Destructor_SceneResolver_void(SceneResolver* ptr)
 }
 
 // const Vector<SharedPtr<UIElement>>& UIElement::GetChildren() const | File: ../UI/UIElement.h
+static CScriptArray* ScrollBar_GetChildren_void(ScrollBar* ptr)
+{
+    const Vector<SharedPtr<UIElement>>& result = ptr->GetChildren();
+    return VectorToHandleArray(result, "Array<UIElement@>");
+}
+
+// PODVector<UIElement*> UIElement::GetChildren(bool recursive) const | File: ../UI/UIElement.h
+static CScriptArray* ScrollBar_GetChildren_bool(ScrollBar* ptr, bool recursive)
+{
+    PODVector<UIElement*> result = ptr->GetChildren(recursive);
+    return VectorToHandleArray(result, "Array<UIElement@>");
+}
+
+// PODVector<UIElement*> UIElement::GetChildrenWithTag(const String& tag, bool recursive=false) const | File: ../UI/UIElement.h
+static CScriptArray* ScrollBar_GetChildrenWithTag_String_bool(ScrollBar* ptr, const String& tag, bool recursive)
+{
+    PODVector<UIElement*> result = ptr->GetChildrenWithTag(tag, recursive);
+    return VectorToHandleArray(result, "Array<UIElement@>");
+}
+
+// const StringVector& UIElement::GetTags() const | File: ../UI/UIElement.h
+static CScriptArray* ScrollBar_GetTags_void(ScrollBar* ptr)
+{
+    const StringVector& result = ptr->GetTags();
+    return VectorToArray<String>(result, "Array<String>");
+}
+
+// explicit ScrollBar::ScrollBar(Context* context) | File: ../UI/ScrollBar.h
+static ScrollBar* ScrollBar_ScrollBar_Context()
+{
+    return new ScrollBar(GetScriptContext());
+}
+
+// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+static void ScrollBar_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ScrollBar* ptr, CScriptArray* exceptions, bool onlyUserData)
+{
+    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+}
+
+// const Vector<SharedPtr<UIElement>>& UIElement::GetChildren() const | File: ../UI/UIElement.h
 static CScriptArray* ScrollView_GetChildren_void(ScrollView* ptr)
 {
     const Vector<SharedPtr<UIElement>>& result = ptr->GetChildren();
@@ -240,6 +203,19 @@ static void Serializable_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
 }
 
+// explicit Shader::Shader(Context* context) | File: ../Graphics/Shader.h
+static Shader* Shader_Shader_Context()
+{
+    return new Shader(GetScriptContext());
+}
+
+// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+static void Shader_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Shader* ptr, CScriptArray* exceptions, bool onlyUserData)
+{
+    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+}
+
 // ShaderParameterAnimationInfo::ShaderParameterAnimationInfo(Material* material, const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode, float speed) | File: ../Graphics/Material.h
 static ShaderParameterAnimationInfo* ShaderParameterAnimationInfo_ShaderParameterAnimationInfo_Material_String_ValueAnimation_WrapMode_float(Material *material, const String &name, ValueAnimation *attributeAnimation, WrapMode wrapMode, float speed)
 {
@@ -263,6 +239,12 @@ static void ShaderPrecache_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bo
 {
     PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+}
+
+// ShaderVariation::ShaderVariation(Shader* owner, ShaderType type) | File: ../Graphics/ShaderVariation.h
+static ShaderVariation* ShaderVariation_ShaderVariation_Shader_ShaderType(Shader *owner, ShaderType type)
+{
+    return new ShaderVariation(owner, type);
 }
 
 // Skeleton::Skeleton() | File: ../Graphics/Skeleton.h
@@ -352,10 +334,28 @@ static void SmoothedTransform_UnsubscribeFromAllEventsExcept_PODVectorStringHash
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
 }
 
-// SimpleNavBuildData::~SimpleNavBuildData() override | File: ../Navigation/NavBuildData.h
-static void SimpleNavBuildData_Destructor_SimpleNavBuildData_void(SimpleNavBuildData* ptr)
+// ScenePassInfo::~ScenePassInfo() | Implicitly-declared 
+static void ScenePassInfo_Destructor(ScenePassInfo* ptr)
 {
-    ptr->~SimpleNavBuildData();
+    ptr->~ScenePassInfo();
+}
+
+// SceneReplicationState::~SceneReplicationState() | Implicitly-declared 
+static void SceneReplicationState_Destructor(SceneReplicationState* ptr)
+{
+    ptr->~SceneReplicationState();
+}
+
+// ScratchBuffer::~ScratchBuffer() | Implicitly-declared 
+static void ScratchBuffer_Destructor(ScratchBuffer* ptr)
+{
+    ptr->~ScratchBuffer();
+}
+
+// ScreenModeParams::~ScreenModeParams() | Implicitly-declared 
+static void ScreenModeParams_Destructor(ScreenModeParams* ptr)
+{
+    ptr->~ScreenModeParams();
 }
 
 // ShaderParameter::ShaderParameter(const String& name, unsigned glType, int location) | File: ../Graphics/ShaderVariation.h
@@ -382,127 +382,817 @@ static void ShaderParameter_Destructor(ShaderParameter* ptr)
     ptr->~ShaderParameter();
 }
 
-// ScenePassInfo::~ScenePassInfo() | Implicitly-declared 
-static void ScenePassInfo_Destructor(ScenePassInfo* ptr)
-{
-    ptr->~ScenePassInfo();
-}
-
 // ShadowBatchQueue::~ShadowBatchQueue() | Implicitly-declared 
 static void ShadowBatchQueue_Destructor(ShadowBatchQueue* ptr)
 {
     ptr->~ShadowBatchQueue();
 }
 
+// SimpleNavBuildData::~SimpleNavBuildData() override | File: ../Navigation/NavBuildData.h
+static void SimpleNavBuildData_Destructor_SimpleNavBuildData_void(SimpleNavBuildData* ptr)
+{
+    ptr->~SimpleNavBuildData();
+}
+
 void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
 {
-    // bool ScreenModeParams::borderless_ | File: ../Graphics/Graphics.h
-    engine->RegisterObjectProperty("ScreenModeParams", "bool borderless", offsetof(ScreenModeParams, borderless_));
-    // bool ScreenModeParams::fullscreen_ | File: ../Graphics/Graphics.h
-    engine->RegisterObjectProperty("ScreenModeParams", "bool fullscreen", offsetof(ScreenModeParams, fullscreen_));
-    // bool ScreenModeParams::highDPI_ | File: ../Graphics/Graphics.h
-    engine->RegisterObjectProperty("ScreenModeParams", "bool highDPI", offsetof(ScreenModeParams, highDPI_));
-    // int ScreenModeParams::monitor_ | File: ../Graphics/Graphics.h
-    engine->RegisterObjectProperty("ScreenModeParams", "int monitor", offsetof(ScreenModeParams, monitor_));
-    // int ScreenModeParams::multiSample_ | File: ../Graphics/Graphics.h
-    engine->RegisterObjectProperty("ScreenModeParams", "int multiSample", offsetof(ScreenModeParams, multiSample_));
-    // int ScreenModeParams::refreshRate_ | File: ../Graphics/Graphics.h
-    engine->RegisterObjectProperty("ScreenModeParams", "int refreshRate", offsetof(ScreenModeParams, refreshRate_));
-    // bool ScreenModeParams::resizable_ | File: ../Graphics/Graphics.h
-    engine->RegisterObjectProperty("ScreenModeParams", "bool resizable", offsetof(ScreenModeParams, resizable_));
-    // bool ScreenModeParams::tripleBuffer_ | File: ../Graphics/Graphics.h
-    engine->RegisterObjectProperty("ScreenModeParams", "bool tripleBuffer", offsetof(ScreenModeParams, tripleBuffer_));
-    // bool ScreenModeParams::vsync_ | File: ../Graphics/Graphics.h
-    engine->RegisterObjectProperty("ScreenModeParams", "bool vsync", offsetof(ScreenModeParams, vsync_));
-    // bool ScreenModeParams::EqualsExceptVSync(const ScreenModeParams& rhs) const | File: ../Graphics/Graphics.h
-    engine->RegisterObjectMethod("ScreenModeParams", "bool EqualsExceptVSync(const ScreenModeParams&in) const", asMETHODPR(ScreenModeParams, EqualsExceptVSync, (const ScreenModeParams&) const, bool), asCALL_THISCALL);
-    // bool ScreenModeParams::operator==(const ScreenModeParams& rhs) const | File: ../Graphics/Graphics.h
-    engine->RegisterObjectMethod("ScreenModeParams", "bool opEquals(const ScreenModeParams&in) const", asMETHODPR(ScreenModeParams, operator==, (const ScreenModeParams&) const, bool), asCALL_THISCALL);
-    // ScreenModeParams::~ScreenModeParams() | Implicitly-declared
-    engine->RegisterObjectBehaviour("ScreenModeParams", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(ScreenModeParams_Destructor), asCALL_CDECL_OBJFIRST);
-    // ScreenModeParams& ScreenModeParams::operator=(const ScreenModeParams&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<ScreenModeParams>(engine, "ScreenModeParams");
-#ifdef REGISTER_MANUAL_PART_ScreenModeParams
-    REGISTER_MANUAL_PART_ScreenModeParams(ScreenModeParams, "ScreenModeParams")
-#endif
-
-    // const char* ShaderVariation::elementSemanticNames[] | File: ../Graphics/ShaderVariation.h
-    // Error: type "const char*" can not automatically bind
+    // void Node::AddChild(Node* node, unsigned index=M_MAX_UNSIGNED) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void AddChild(Node@+, uint = M_MAX_UNSIGNED)", asMETHODPR(Scene, AddChild, (Node*, unsigned), void), asCALL_THISCALL);
+    // void Node::AddComponent(Component* component, unsigned id, CreateMode mode) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void AddComponent(Component@+, uint, CreateMode)", asMETHODPR(Scene, AddComponent, (Component*, unsigned, CreateMode), void), asCALL_THISCALL);
+    // void Node::AddListener(Component* component) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void AddListener(Component@+)", asMETHODPR(Scene, AddListener, (Component*), void), asCALL_THISCALL);
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("ShaderVariation", asBEHAVE_ADDREF, "void f()", asMETHODPR(ShaderVariation, AddRef, (), void), asCALL_THISCALL);
-    // void GPUObject::ClearDataLost() | File: ../Graphics/GPUObject.h
-    engine->RegisterObjectMethod("ShaderVariation", "void ClearDataLost()", asMETHODPR(ShaderVariation, ClearDataLost, (), void), asCALL_THISCALL);
-    // bool ShaderVariation::Create() | File: ../Graphics/ShaderVariation.h
-    engine->RegisterObjectMethod("ShaderVariation", "bool Create()", asMETHODPR(ShaderVariation, Create, (), bool), asCALL_THISCALL);
-    // const PODVector<unsigned char>& ShaderVariation::GetByteCode() const | File: ../Graphics/ShaderVariation.h
+    engine->RegisterObjectBehaviour("Scene", asBEHAVE_ADDREF, "void f()", asMETHODPR(Scene, AddRef, (), void), asCALL_THISCALL);
+    // void Scene::AddReplicationState(NodeReplicationState* state) override | File: ../Scene/Scene.h
+    // Error: type "NodeReplicationState*" can not automatically bind
+    // void Scene::AddRequiredPackageFile(PackageFile* package) | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "void AddRequiredPackageFile(PackageFile@+)", asMETHODPR(Scene, AddRequiredPackageFile, (PackageFile*), void), asCALL_THISCALL);
+    // void Node::AddTag(const String& tag) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void AddTag(const String&in)", asMETHODPR(Scene, AddTag, (const String&), void), asCALL_THISCALL);
+    // void Node::AddTags(const String& tags, char separator=';') | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void AddTags(const String&in, int8 = ';')", asMETHODPR(Scene, AddTags, (const String&, char), void), asCALL_THISCALL);
+    // void Node::AddTags(const StringVector& tags) | File: ../Scene/Node.h
+    // Error: type "const StringVector&" can not automatically bind
+    // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Scene", "void AllocateNetworkState()", asMETHODPR(Scene, AllocateNetworkState, (), void), asCALL_THISCALL);
+    // void Node::ApplyAttributes() override | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void ApplyAttributes()", asMETHODPR(Scene, ApplyAttributes, (), void), asCALL_THISCALL);
+    // void Scene::BeginThreadedUpdate() | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "void BeginThreadedUpdate()", asMETHODPR(Scene, BeginThreadedUpdate, (), void), asCALL_THISCALL);
+    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
+    // Not registered because template
+    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
+    // Not registered because template
+    // void Scene::CleanupConnection(Connection* connection) | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "void CleanupConnection(Connection@+)", asMETHODPR(Scene, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // void Scene::Clear(bool clearReplicated=true, bool clearLocal=true) | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "void Clear(bool = true, bool = true)", asMETHODPR(Scene, Clear, (bool, bool), void), asCALL_THISCALL);
+    // void Scene::ClearRequiredPackageFiles() | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "void ClearRequiredPackageFiles()", asMETHODPR(Scene, ClearRequiredPackageFiles, (), void), asCALL_THISCALL);
+    // Node* Node::Clone(CreateMode mode=REPLICATED) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Node@+ Clone(CreateMode = REPLICATED)", asMETHODPR(Scene, Clone, (CreateMode), Node*), asCALL_THISCALL);
+    // Component* Node::CloneComponent(Component* component, unsigned id=0) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Component@+ CloneComponent(Component@+, uint = 0)", asMETHODPR(Scene, CloneComponent, (Component*, unsigned), Component*), asCALL_THISCALL);
+    // Component* Node::CloneComponent(Component* component, CreateMode mode, unsigned id=0) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Component@+ CloneComponent(Component@+, CreateMode, uint = 0)", asMETHODPR(Scene, CloneComponent, (Component*, CreateMode, unsigned), Component*), asCALL_THISCALL);
+    // void Scene::ComponentAdded(Component* component) | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "void ComponentAdded(Component@+)", asMETHODPR(Scene, ComponentAdded, (Component*), void), asCALL_THISCALL);
+    // void Scene::ComponentRemoved(Component* component) | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "void ComponentRemoved(Component@+)", asMETHODPR(Scene, ComponentRemoved, (Component*), void), asCALL_THISCALL);
+    // Node* Node::CreateChild(const String& name=String::EMPTY, CreateMode mode=REPLICATED, unsigned id=0, bool temporary=false) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Node@+ CreateChild(const String&in = String::EMPTY, CreateMode = REPLICATED, uint = 0, bool = false)", asMETHODPR(Scene, CreateChild, (const String&, CreateMode, unsigned, bool), Node*), asCALL_THISCALL);
+    // Node* Node::CreateChild(unsigned id, CreateMode mode, bool temporary=false) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Node@+ CreateChild(uint, CreateMode, bool = false)", asMETHODPR(Scene, CreateChild, (unsigned, CreateMode, bool), Node*), asCALL_THISCALL);
+    // Component* Node::CreateComponent(StringHash type, CreateMode mode=REPLICATED, unsigned id=0) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Component@+ CreateComponent(StringHash, CreateMode = REPLICATED, uint = 0)", asMETHODPR(Scene, CreateComponent, (StringHash, CreateMode, unsigned), Component*), asCALL_THISCALL);
+    // template<class T> T*  Node::CreateComponent(CreateMode mode=REPLICATED, unsigned id=0) | File: ../Scene/Node.h
+    // Not registered because template
+    // Node* Node::CreateTemporaryChild(const String& name=String::EMPTY, CreateMode mode=REPLICATED, unsigned id=0) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Node@+ CreateTemporaryChild(const String&in = String::EMPTY, CreateMode = REPLICATED, uint = 0)", asMETHODPR(Scene, CreateTemporaryChild, (const String&, CreateMode, unsigned), Node*), asCALL_THISCALL);
+    // void Scene::DelayedMarkedDirty(Component* component) | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "void DelayedMarkedDirty(Component@+)", asMETHODPR(Scene, DelayedMarkedDirty, (Component*), void), asCALL_THISCALL);
+    // void Scene::EndThreadedUpdate() | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "void EndThreadedUpdate()", asMETHODPR(Scene, EndThreadedUpdate, (), void), asCALL_THISCALL);
+    // bool Animatable::GetAnimationEnabled() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Scene", "bool GetAnimationEnabled() const", asMETHODPR(Scene, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "bool get_animationEnabled() const", asMETHODPR(Scene, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
+    // int Scene::GetAsyncLoadingMs() const | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "int GetAsyncLoadingMs() const", asMETHODPR(Scene, GetAsyncLoadingMs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "int get_asyncLoadingMs() const", asMETHODPR(Scene, GetAsyncLoadingMs, () const, int), asCALL_THISCALL);
+    // LoadMode Scene::GetAsyncLoadMode() const | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "LoadMode GetAsyncLoadMode() const", asMETHODPR(Scene, GetAsyncLoadMode, () const, LoadMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "LoadMode get_asyncLoadMode() const", asMETHODPR(Scene, GetAsyncLoadMode, () const, LoadMode), asCALL_THISCALL);
+    // float Scene::GetAsyncProgress() const | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "float GetAsyncProgress() const", asMETHODPR(Scene, GetAsyncProgress, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "float get_asyncProgress() const", asMETHODPR(Scene, GetAsyncProgress, () const, float), asCALL_THISCALL);
+    // Variant Serializable::GetAttribute(unsigned index) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Scene", "Variant GetAttribute(uint) const", asMETHODPR(Scene, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "Variant get_attributes(uint) const", asMETHODPR(Scene, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
+    // Variant Serializable::GetAttribute(const String& name) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Scene", "Variant GetAttribute(const String&in) const", asMETHODPR(Scene, GetAttribute, (const String&) const, Variant), asCALL_THISCALL);
+    // ValueAnimation* Animatable::GetAttributeAnimation(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Scene", "ValueAnimation@+ GetAttributeAnimation(const String&in) const", asMETHODPR(Scene, GetAttributeAnimation, (const String&) const, ValueAnimation*), asCALL_THISCALL);
+    // float Animatable::GetAttributeAnimationSpeed(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Scene", "float GetAttributeAnimationSpeed(const String&in) const", asMETHODPR(Scene, GetAttributeAnimationSpeed, (const String&) const, float), asCALL_THISCALL);
+    // float Animatable::GetAttributeAnimationTime(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Scene", "float GetAttributeAnimationTime(const String&in) const", asMETHODPR(Scene, GetAttributeAnimationTime, (const String&) const, float), asCALL_THISCALL);
+    // WrapMode Animatable::GetAttributeAnimationWrapMode(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Scene", "WrapMode GetAttributeAnimationWrapMode(const String&in) const", asMETHODPR(Scene, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), asCALL_THISCALL);
+    // Variant Serializable::GetAttributeDefault(unsigned index) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Scene", "Variant GetAttributeDefault(uint) const", asMETHODPR(Scene, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "Variant get_attributeDefaults(uint) const", asMETHODPR(Scene, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
+    // Variant Serializable::GetAttributeDefault(const String& name) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Scene", "Variant GetAttributeDefault(const String&in) const", asMETHODPR(Scene, GetAttributeDefault, (const String&) const, Variant), asCALL_THISCALL);
+    // virtual const Vector<AttributeInfo>* Serializable::GetAttributes() const | File: ../Scene/Serializable.h
+    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
+    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Scene", "bool GetBlockEvents() const", asMETHODPR(Scene, GetBlockEvents, () const, bool), asCALL_THISCALL);
+    // const String& Object::GetCategory() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Scene", "const String& GetCategory() const", asMETHODPR(Scene, GetCategory, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "const String& get_category() const", asMETHODPR(Scene, GetCategory, () const, const String&), asCALL_THISCALL);
+    // unsigned Scene::GetChecksum() const | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "uint GetChecksum() const", asMETHODPR(Scene, GetChecksum, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "uint get_checksum() const", asMETHODPR(Scene, GetChecksum, () const, unsigned), asCALL_THISCALL);
+    // Node* Node::GetChild(unsigned index) const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Node@+ GetChild(uint) const", asMETHODPR(Scene, GetChild, (unsigned) const, Node*), asCALL_THISCALL);
+    // Node* Node::GetChild(const String& name, bool recursive=false) const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Node@+ GetChild(const String&in, bool = false) const", asMETHODPR(Scene, GetChild, (const String&, bool) const, Node*), asCALL_THISCALL);
+    // Node* Node::GetChild(const char* name, bool recursive=false) const | File: ../Scene/Node.h
+    // Error: type "const char*" can not automatically bind
+    // Node* Node::GetChild(StringHash nameHash, bool recursive=false) const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Node@+ GetChild(StringHash, bool = false) const", asMETHODPR(Scene, GetChild, (StringHash, bool) const, Node*), asCALL_THISCALL);
+    // const Vector<SharedPtr<Node>>& Node::GetChildren() const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Array<Node@>@ GetChildren() const", asFUNCTION(Scene_GetChildren_void), asCALL_CDECL_OBJFIRST);
+    // void Node::GetChildren(PODVector<Node*>& dest, bool recursive=false) const | File: ../Scene/Node.h
+    // Error: type "PODVector<Node*>&" can not automatically bind
+    // PODVector<Node*> Node::GetChildren(bool recursive) const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Array<Node@>@ GetChildren(bool) const", asFUNCTION(Scene_GetChildren_bool), asCALL_CDECL_OBJFIRST);
+    // void Node::GetChildrenWithComponent(PODVector<Node*>& dest, StringHash type, bool recursive=false) const | File: ../Scene/Node.h
+    // Error: type "PODVector<Node*>&" can not automatically bind
+    // PODVector<Node*> Node::GetChildrenWithComponent(StringHash type, bool recursive=false) const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Array<Node@>@ GetChildrenWithComponent(StringHash, bool = false) const", asFUNCTION(Scene_GetChildrenWithComponent_StringHash_bool), asCALL_CDECL_OBJFIRST);
+    // template<class T> void Node::GetChildrenWithComponent(PODVector<Node*>& dest, bool recursive=false) const | File: ../Scene/Node.h
+    // Not registered because template
+    // void Node::GetChildrenWithTag(PODVector<Node*>& dest, const String& tag, bool recursive=false) const | File: ../Scene/Node.h
+    // Error: type "PODVector<Node*>&" can not automatically bind
+    // PODVector<Node*> Node::GetChildrenWithTag(const String& tag, bool recursive=false) const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Array<Node@>@ GetChildrenWithTag(const String&in, bool = false) const", asFUNCTION(Scene_GetChildrenWithTag_String_bool), asCALL_CDECL_OBJFIRST);
+    // Component* Scene::GetComponent(unsigned id) const | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "Component@+ GetComponent(uint) const", asMETHODPR(Scene, GetComponent, (unsigned) const, Component*), asCALL_THISCALL);
+    // Component* Node::GetComponent(StringHash type, bool recursive=false) const | File: ../Scene/Scene.h
+    // Not registered because have @manualbind mark
+    // template<class T> T*  Node::GetComponent(bool recursive=false) const | File: ../Scene/Scene.h
+    // Not registered because have @manualbind mark
+    // const Vector<SharedPtr<Component>>& Node::GetComponents() const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Array<Component@>@ GetComponents() const", asFUNCTION(Scene_GetComponents_void), asCALL_CDECL_OBJFIRST);
+    // void Node::GetComponents(PODVector<Component*>& dest, StringHash type, bool recursive=false) const | File: ../Scene/Node.h
+    // Error: type "PODVector<Component*>&" can not automatically bind
+    // template<class T> void Node::GetComponents(PODVector<T*>& dest, bool recursive=false) const | File: ../Scene/Node.h
+    // Not registered because template
+    // Context* Object::GetContext() const | File: ../Core/Object.h
+    // Error: type "Context*" can not be returned
+    // const PODVector<Node*>& Node::GetDependencyNodes() const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Array<Node@>@ GetDependencyNodes() const", asFUNCTION(Scene_GetDependencyNodes_void), asCALL_CDECL_OBJFIRST);
+    // template<class T> T*  Node::GetDerivedComponent(bool recursive=false) const | File: ../Scene/Node.h
+    // Not registered because template
+    // template<class T> void Node::GetDerivedComponents(PODVector<T*>& dest, bool recursive=false, bool clearVector=true) const | File: ../Scene/Node.h
+    // Not registered because template
+    // Vector3 Node::GetDirection() const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Vector3 GetDirection() const", asMETHODPR(Scene, GetDirection, () const, Vector3), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "Vector3 get_direction() const", asMETHODPR(Scene, GetDirection, () const, Vector3), asCALL_THISCALL);
+    // float Scene::GetElapsedTime() const | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "float GetElapsedTime() const", asMETHODPR(Scene, GetElapsedTime, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "float get_elapsedTime() const", asMETHODPR(Scene, GetElapsedTime, () const, float), asCALL_THISCALL);
+    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Scene", "VariantMap& GetEventDataMap() const", asMETHODPR(Scene, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
+    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // Object* Object::GetEventSender() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Scene", "Object@+ GetEventSender() const", asMETHODPR(Scene, GetEventSender, () const, Object*), asCALL_THISCALL);
+    // const String& Scene::GetFileName() const | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "const String& GetFileName() const", asMETHODPR(Scene, GetFileName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "const String& get_fileName() const", asMETHODPR(Scene, GetFileName, () const, const String&), asCALL_THISCALL);
+    // unsigned Scene::GetFreeComponentID(CreateMode mode) | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "uint GetFreeComponentID(CreateMode)", asMETHODPR(Scene, GetFreeComponentID, (CreateMode), unsigned), asCALL_THISCALL);
+    // unsigned Scene::GetFreeNodeID(CreateMode mode) | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "uint GetFreeNodeID(CreateMode)", asMETHODPR(Scene, GetFreeNodeID, (CreateMode), unsigned), asCALL_THISCALL);
+    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Scene", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(Scene, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "const Variant& get_globalVar(StringHash) const", asMETHODPR(Scene, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Scene", "const VariantMap& GetGlobalVars() const", asMETHODPR(Scene, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "const VariantMap& get_globalVars() const", asMETHODPR(Scene, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    // unsigned Node::GetID() const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "uint GetID() const", asMETHODPR(Scene, GetID, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "uint get_id() const", asMETHODPR(Scene, GetID, () const, unsigned), asCALL_THISCALL);
+    // bool Serializable::GetInterceptNetworkUpdate(const String& attributeName) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Scene", "bool GetInterceptNetworkUpdate(const String&in) const", asMETHODPR(Scene, GetInterceptNetworkUpdate, (const String&) const, bool), asCALL_THISCALL);
+    // const Vector<WeakPtr<Component>> Node::GetListeners() const | File: ../Scene/Node.h
+    // Error: type "const Vector<WeakPtr<Component>>" can not automatically bind
+    // const String& Node::GetName() const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "const String& GetName() const", asMETHODPR(Scene, GetName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "const String& get_name() const", asMETHODPR(Scene, GetName, () const, const String&), asCALL_THISCALL);
+    // StringHash Node::GetNameHash() const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "StringHash GetNameHash() const", asMETHODPR(Scene, GetNameHash, () const, StringHash), asCALL_THISCALL);
+    // const PODVector<unsigned char>& Node::GetNetParentAttr() const | File: ../Scene/Node.h
     // Error: type "const PODVector<unsigned char>&" can not automatically bind
-    // const String& ShaderVariation::GetCompilerOutput() const | File: ../Graphics/ShaderVariation.h
-    engine->RegisterObjectMethod("ShaderVariation", "const String& GetCompilerOutput() const", asMETHODPR(ShaderVariation, GetCompilerOutput, () const, const String&), asCALL_THISCALL);
-    // const unsigned* ShaderVariation::GetConstantBufferSizes() const | File: ../Graphics/ShaderVariation.h
-    // Error: type "const unsigned*" can not automatically bind
-    // const String& ShaderVariation::GetDefines() const | File: ../Graphics/ShaderVariation.h
-    engine->RegisterObjectMethod("ShaderVariation", "const String& GetDefines() const", asMETHODPR(ShaderVariation, GetDefines, () const, const String&), asCALL_THISCALL);
-    // const String& ShaderVariation::GetDefinesClipPlane() | File: ../Graphics/ShaderVariation.h
-    engine->RegisterObjectMethod("ShaderVariation", "const String& GetDefinesClipPlane()", asMETHODPR(ShaderVariation, GetDefinesClipPlane, (), const String&), asCALL_THISCALL);
-    // unsigned long long ShaderVariation::GetElementHash() const | File: ../Graphics/ShaderVariation.h
-    engine->RegisterObjectMethod("ShaderVariation", "uint64 GetElementHash() const", asMETHODPR(ShaderVariation, GetElementHash, () const, unsigned long long), asCALL_THISCALL);
-    // String ShaderVariation::GetFullName() const | File: ../Graphics/ShaderVariation.h
-    engine->RegisterObjectMethod("ShaderVariation", "String GetFullName() const", asMETHODPR(ShaderVariation, GetFullName, () const, String), asCALL_THISCALL);
-    // void* GPUObject::GetGPUObject() const | File: ../Graphics/GPUObject.h
-    // Error: type "void*" can not automatically bind
-    // unsigned GPUObject::GetGPUObjectName() const | File: ../Graphics/GPUObject.h
-    engine->RegisterObjectMethod("ShaderVariation", "uint GetGPUObjectName() const", asMETHODPR(ShaderVariation, GetGPUObjectName, () const, unsigned), asCALL_THISCALL);
-    // Graphics* GPUObject::GetGraphics() const | File: ../Graphics/GPUObject.h
-    engine->RegisterObjectMethod("ShaderVariation", "Graphics@+ GetGraphics() const", asMETHODPR(ShaderVariation, GetGraphics, () const, Graphics*), asCALL_THISCALL);
-    // const String& ShaderVariation::GetName() const | File: ../Graphics/ShaderVariation.h
-    engine->RegisterObjectMethod("ShaderVariation", "const String& GetName() const", asMETHODPR(ShaderVariation, GetName, () const, const String&), asCALL_THISCALL);
-    // Shader* ShaderVariation::GetOwner() const | File: ../Graphics/ShaderVariation.h
-    engine->RegisterObjectMethod("ShaderVariation", "Shader@+ GetOwner() const", asMETHODPR(ShaderVariation, GetOwner, () const, Shader*), asCALL_THISCALL);
-    // const HashMap<StringHash, ShaderParameter>& ShaderVariation::GetParameters() const | File: ../Graphics/ShaderVariation.h
-    // Error: type "const HashMap<StringHash, ShaderParameter>&" can not automatically bind
-    // ShaderType ShaderVariation::GetShaderType() const | File: ../Graphics/ShaderVariation.h
-    engine->RegisterObjectMethod("ShaderVariation", "ShaderType GetShaderType() const", asMETHODPR(ShaderVariation, GetShaderType, () const, ShaderType), asCALL_THISCALL);
-    // bool ShaderVariation::HasParameter(StringHash param) const | File: ../Graphics/ShaderVariation.h
-    engine->RegisterObjectMethod("ShaderVariation", "bool HasParameter(StringHash) const", asMETHODPR(ShaderVariation, HasParameter, (StringHash) const, bool), asCALL_THISCALL);
-    // bool GPUObject::HasPendingData() const | File: ../Graphics/GPUObject.h
-    engine->RegisterObjectMethod("ShaderVariation", "bool HasPendingData() const", asMETHODPR(ShaderVariation, HasPendingData, () const, bool), asCALL_THISCALL);
-    // bool ShaderVariation::HasTextureUnit(TextureUnit unit) const | File: ../Graphics/ShaderVariation.h
-    engine->RegisterObjectMethod("ShaderVariation", "bool HasTextureUnit(TextureUnit) const", asMETHODPR(ShaderVariation, HasTextureUnit, (TextureUnit) const, bool), asCALL_THISCALL);
-    // bool GPUObject::IsDataLost() const | File: ../Graphics/GPUObject.h
-    engine->RegisterObjectMethod("ShaderVariation", "bool IsDataLost() const", asMETHODPR(ShaderVariation, IsDataLost, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ShaderVariation", "bool get_dataLost() const", asMETHODPR(ShaderVariation, IsDataLost, () const, bool), asCALL_THISCALL);
-    // void ShaderVariation::OnDeviceLost() override | File: ../Graphics/ShaderVariation.h
-    engine->RegisterObjectMethod("ShaderVariation", "void OnDeviceLost()", asMETHODPR(ShaderVariation, OnDeviceLost, (), void), asCALL_THISCALL);
-    // virtual void GPUObject::OnDeviceReset() | File: ../Graphics/GPUObject.h
-    engine->RegisterObjectMethod("ShaderVariation", "void OnDeviceReset()", asMETHODPR(ShaderVariation, OnDeviceReset, (), void), asCALL_THISCALL);
+    // const Vector3& Node::GetNetPositionAttr() const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "const Vector3& GetNetPositionAttr() const", asMETHODPR(Scene, GetNetPositionAttr, () const, const Vector3&), asCALL_THISCALL);
+    // const PODVector<unsigned char>& Node::GetNetRotationAttr() const | File: ../Scene/Node.h
+    // Error: type "const PODVector<unsigned char>&" can not automatically bind
+    // virtual const Vector<AttributeInfo>* Serializable::GetNetworkAttributes() const | File: ../Scene/Serializable.h
+    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
+    // NetworkState* Serializable::GetNetworkState() const | File: ../Scene/Serializable.h
+    // Error: type "NetworkState*" can not automatically bind
+    // Node* Scene::GetNode(unsigned id) const | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "Node@+ GetNode(uint) const", asMETHODPR(Scene, GetNode, (unsigned) const, Node*), asCALL_THISCALL);
+    // bool Scene::GetNodesWithTag(PODVector<Node*>& dest, const String& tag) const | File: ../Scene/Scene.h
+    // Error: type "PODVector<Node*>&" can not automatically bind
+    // unsigned Serializable::GetNumAttributes() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Scene", "uint GetNumAttributes() const", asMETHODPR(Scene, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "uint get_numAttributes() const", asMETHODPR(Scene, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
+    // unsigned Node::GetNumChildren(bool recursive=false) const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "uint GetNumChildren(bool = false) const", asMETHODPR(Scene, GetNumChildren, (bool) const, unsigned), asCALL_THISCALL);
+    // unsigned Node::GetNumComponents() const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "uint GetNumComponents() const", asMETHODPR(Scene, GetNumComponents, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "uint get_numComponents() const", asMETHODPR(Scene, GetNumComponents, () const, unsigned), asCALL_THISCALL);
+    // unsigned Serializable::GetNumNetworkAttributes() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Scene", "uint GetNumNetworkAttributes() const", asMETHODPR(Scene, GetNumNetworkAttributes, () const, unsigned), asCALL_THISCALL);
+    // unsigned Node::GetNumNetworkComponents() const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "uint GetNumNetworkComponents() const", asMETHODPR(Scene, GetNumNetworkComponents, () const, unsigned), asCALL_THISCALL);
+    // unsigned Node::GetNumPersistentChildren() const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "uint GetNumPersistentChildren() const", asMETHODPR(Scene, GetNumPersistentChildren, () const, unsigned), asCALL_THISCALL);
+    // unsigned Node::GetNumPersistentComponents() const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "uint GetNumPersistentComponents() const", asMETHODPR(Scene, GetNumPersistentComponents, () const, unsigned), asCALL_THISCALL);
+    // ObjectAnimation* Animatable::GetObjectAnimation() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Scene", "ObjectAnimation@+ GetObjectAnimation() const", asMETHODPR(Scene, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "ObjectAnimation@+ get_objectAnimation() const", asMETHODPR(Scene, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
+    // ResourceRef Animatable::GetObjectAnimationAttr() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Scene", "ResourceRef GetObjectAnimationAttr() const", asMETHODPR(Scene, GetObjectAnimationAttr, () const, ResourceRef), asCALL_THISCALL);
+    // Component* Node::GetOrCreateComponent(StringHash type, CreateMode mode=REPLICATED, unsigned id=0) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Component@+ GetOrCreateComponent(StringHash, CreateMode = REPLICATED, uint = 0)", asMETHODPR(Scene, GetOrCreateComponent, (StringHash, CreateMode, unsigned), Component*), asCALL_THISCALL);
+    // template<class T> T*  Node::GetOrCreateComponent(CreateMode mode=REPLICATED, unsigned id=0) | File: ../Scene/Node.h
+    // Not registered because template
+    // Connection* Node::GetOwner() const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Connection@+ GetOwner() const", asMETHODPR(Scene, GetOwner, () const, Connection*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "Connection@+ get_owner() const", asMETHODPR(Scene, GetOwner, () const, Connection*), asCALL_THISCALL);
+    // Node* Node::GetParent() const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Node@+ GetParent() const", asMETHODPR(Scene, GetParent, () const, Node*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "Node@+ get_parent() const", asMETHODPR(Scene, GetParent, () const, Node*), asCALL_THISCALL);
+    // Component* Node::GetParentComponent(StringHash type, bool fullTraversal=false) const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Component@+ GetParentComponent(StringHash, bool = false) const", asMETHODPR(Scene, GetParentComponent, (StringHash, bool) const, Component*), asCALL_THISCALL);
+    // template<class T> T*  Node::GetParentComponent(bool fullTraversal=false) const | File: ../Scene/Node.h
+    // Not registered because template
+    // template<class T> T*  Node::GetParentDerivedComponent(bool fullTraversal=false) const | File: ../Scene/Node.h
+    // Not registered because template
+    // const Vector3& Node::GetPosition() const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "const Vector3& GetPosition() const", asMETHODPR(Scene, GetPosition, () const, const Vector3&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "const Vector3& get_position() const", asMETHODPR(Scene, GetPosition, () const, const Vector3&), asCALL_THISCALL);
+    // Vector2 Node::GetPosition2D() const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Vector2 GetPosition2D() const", asMETHODPR(Scene, GetPosition2D, () const, Vector2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "Vector2 get_position2D() const", asMETHODPR(Scene, GetPosition2D, () const, Vector2), asCALL_THISCALL);
+    // const Vector<SharedPtr<PackageFile>>& Scene::GetRequiredPackageFiles() const | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "Array<PackageFile@>@ GetRequiredPackageFiles() const", asFUNCTION(Scene_GetRequiredPackageFiles_void), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("Scene", "Array<PackageFile@>@ get_requiredPackageFiles() const", asFUNCTION(Scene_GetRequiredPackageFiles_void), asCALL_CDECL_OBJFIRST);
+    // Vector3 Node::GetRight() const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Vector3 GetRight() const", asMETHODPR(Scene, GetRight, () const, Vector3), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "Vector3 get_right() const", asMETHODPR(Scene, GetRight, () const, Vector3), asCALL_THISCALL);
+    // const Quaternion& Node::GetRotation() const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "const Quaternion& GetRotation() const", asMETHODPR(Scene, GetRotation, () const, const Quaternion&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "const Quaternion& get_rotation() const", asMETHODPR(Scene, GetRotation, () const, const Quaternion&), asCALL_THISCALL);
+    // float Node::GetRotation2D() const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "float GetRotation2D() const", asMETHODPR(Scene, GetRotation2D, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "float get_rotation2D() const", asMETHODPR(Scene, GetRotation2D, () const, float), asCALL_THISCALL);
+    // const Vector3& Node::GetScale() const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "const Vector3& GetScale() const", asMETHODPR(Scene, GetScale, () const, const Vector3&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "const Vector3& get_scale() const", asMETHODPR(Scene, GetScale, () const, const Vector3&), asCALL_THISCALL);
+    // Vector2 Node::GetScale2D() const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Vector2 GetScale2D() const", asMETHODPR(Scene, GetScale2D, () const, Vector2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "Vector2 get_scale2D() const", asMETHODPR(Scene, GetScale2D, () const, Vector2), asCALL_THISCALL);
+    // Scene* Node::GetScene() const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Scene@+ GetScene() const", asMETHODPR(Scene, GetScene, () const, Scene*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "Scene@+ get_scene() const", asMETHODPR(Scene, GetScene, () const, Scene*), asCALL_THISCALL);
+    // Vector3 Node::GetSignedWorldScale() const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Vector3 GetSignedWorldScale() const", asMETHODPR(Scene, GetSignedWorldScale, () const, Vector3), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "Vector3 get_signedWorldScale() const", asMETHODPR(Scene, GetSignedWorldScale, () const, Vector3), asCALL_THISCALL);
+    // float Scene::GetSmoothingConstant() const | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "float GetSmoothingConstant() const", asMETHODPR(Scene, GetSmoothingConstant, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "float get_smoothingConstant() const", asMETHODPR(Scene, GetSmoothingConstant, () const, float), asCALL_THISCALL);
+    // float Scene::GetSnapThreshold() const | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "float GetSnapThreshold() const", asMETHODPR(Scene, GetSnapThreshold, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "float get_snapThreshold() const", asMETHODPR(Scene, GetSnapThreshold, () const, float), asCALL_THISCALL);
+    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Scene", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Scene, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
+    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // Not registered because template
+    // const StringVector& Node::GetTags() const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Array<String>@ GetTags() const", asFUNCTION(Scene_GetTags_void), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("Scene", "Array<String>@ get_tags() const", asFUNCTION(Scene_GetTags_void), asCALL_CDECL_OBJFIRST);
+    // float Scene::GetTimeScale() const | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "float GetTimeScale() const", asMETHODPR(Scene, GetTimeScale, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "float get_timeScale() const", asMETHODPR(Scene, GetTimeScale, () const, float), asCALL_THISCALL);
+    // Matrix3x4 Node::GetTransform() const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Matrix3x4 GetTransform() const", asMETHODPR(Scene, GetTransform, () const, Matrix3x4), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "Matrix3x4 get_transform() const", asMETHODPR(Scene, GetTransform, () const, Matrix3x4), asCALL_THISCALL);
+    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Scene", "StringHash GetType() const", asMETHODPR(Scene, GetType, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "StringHash get_type() const", asMETHODPR(Scene, GetType, () const, StringHash), asCALL_THISCALL);
+    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Scene", "const String& GetTypeName() const", asMETHODPR(Scene, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "const String& get_typeName() const", asMETHODPR(Scene, GetTypeName, () const, const String&), asCALL_THISCALL);
+    // Vector3 Node::GetUp() const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Vector3 GetUp() const", asMETHODPR(Scene, GetUp, () const, Vector3), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "Vector3 get_up() const", asMETHODPR(Scene, GetUp, () const, Vector3), asCALL_THISCALL);
+    // const Variant& Node::GetVar(StringHash key) const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "const Variant& GetVar(StringHash) const", asMETHODPR(Scene, GetVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    // const String& Scene::GetVarName(StringHash hash) const | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "const String& GetVarName(StringHash) const", asMETHODPR(Scene, GetVarName, (StringHash) const, const String&), asCALL_THISCALL);
+    // String Scene::GetVarNamesAttr() const | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "String GetVarNamesAttr() const", asMETHODPR(Scene, GetVarNamesAttr, () const, String), asCALL_THISCALL);
+    // const VariantMap& Node::GetVars() const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "const VariantMap& GetVars() const", asMETHODPR(Scene, GetVars, () const, const VariantMap&), asCALL_THISCALL);
+    // Vector3 Node::GetWorldDirection() const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Vector3 GetWorldDirection() const", asMETHODPR(Scene, GetWorldDirection, () const, Vector3), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "Vector3 get_worldDirection() const", asMETHODPR(Scene, GetWorldDirection, () const, Vector3), asCALL_THISCALL);
+    // Vector3 Node::GetWorldPosition() const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Vector3 GetWorldPosition() const", asMETHODPR(Scene, GetWorldPosition, () const, Vector3), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "Vector3 get_worldPosition() const", asMETHODPR(Scene, GetWorldPosition, () const, Vector3), asCALL_THISCALL);
+    // Vector2 Node::GetWorldPosition2D() const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Vector2 GetWorldPosition2D() const", asMETHODPR(Scene, GetWorldPosition2D, () const, Vector2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "Vector2 get_worldPosition2D() const", asMETHODPR(Scene, GetWorldPosition2D, () const, Vector2), asCALL_THISCALL);
+    // Vector3 Node::GetWorldRight() const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Vector3 GetWorldRight() const", asMETHODPR(Scene, GetWorldRight, () const, Vector3), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "Vector3 get_worldRight() const", asMETHODPR(Scene, GetWorldRight, () const, Vector3), asCALL_THISCALL);
+    // Quaternion Node::GetWorldRotation() const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Quaternion GetWorldRotation() const", asMETHODPR(Scene, GetWorldRotation, () const, Quaternion), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "Quaternion get_worldRotation() const", asMETHODPR(Scene, GetWorldRotation, () const, Quaternion), asCALL_THISCALL);
+    // float Node::GetWorldRotation2D() const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "float GetWorldRotation2D() const", asMETHODPR(Scene, GetWorldRotation2D, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "float get_worldRotation2D() const", asMETHODPR(Scene, GetWorldRotation2D, () const, float), asCALL_THISCALL);
+    // Vector3 Node::GetWorldScale() const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Vector3 GetWorldScale() const", asMETHODPR(Scene, GetWorldScale, () const, Vector3), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "Vector3 get_worldScale() const", asMETHODPR(Scene, GetWorldScale, () const, Vector3), asCALL_THISCALL);
+    // Vector2 Node::GetWorldScale2D() const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Vector2 GetWorldScale2D() const", asMETHODPR(Scene, GetWorldScale2D, () const, Vector2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "Vector2 get_worldScale2D() const", asMETHODPR(Scene, GetWorldScale2D, () const, Vector2), asCALL_THISCALL);
+    // const Matrix3x4& Node::GetWorldTransform() const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "const Matrix3x4& GetWorldTransform() const", asMETHODPR(Scene, GetWorldTransform, () const, const Matrix3x4&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "const Matrix3x4& get_worldTransform() const", asMETHODPR(Scene, GetWorldTransform, () const, const Matrix3x4&), asCALL_THISCALL);
+    // Vector3 Node::GetWorldUp() const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Vector3 GetWorldUp() const", asMETHODPR(Scene, GetWorldUp, () const, Vector3), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "Vector3 get_worldUp() const", asMETHODPR(Scene, GetWorldUp, () const, Vector3), asCALL_THISCALL);
+    // bool Node::HasComponent(StringHash type) const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "bool HasComponent(StringHash) const", asMETHODPR(Scene, HasComponent, (StringHash) const, bool), asCALL_THISCALL);
+    // template<class T> bool Node::HasComponent() const | File: ../Scene/Node.h
+    // Not registered because template
+    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Scene", "bool HasEventHandlers() const", asMETHODPR(Scene, HasEventHandlers, () const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Scene", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(Scene, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Scene", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(Scene, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
+    // bool Node::HasTag(const String& tag) const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "bool HasTag(const String&in) const", asMETHODPR(Scene, HasTag, (const String&) const, bool), asCALL_THISCALL);
+    // Node* Scene::Instantiate(Deserializer& source, const Vector3& position, const Quaternion& rotation, CreateMode mode=REPLICATED) | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "Node@+ Instantiate(Deserializer&, const Vector3&in, const Quaternion&in, CreateMode = REPLICATED)", asMETHODPR(Scene, Instantiate, (Deserializer&, const Vector3&, const Quaternion&, CreateMode), Node*), asCALL_THISCALL);
+    // Node* Scene::InstantiateJSON(const JSONValue& source, const Vector3& position, const Quaternion& rotation, CreateMode mode=REPLICATED) | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "Node@+ InstantiateJSON(const JSONValue&in, const Vector3&in, const Quaternion&in, CreateMode = REPLICATED)", asMETHODPR(Scene, InstantiateJSON, (const JSONValue&, const Vector3&, const Quaternion&, CreateMode), Node*), asCALL_THISCALL);
+    // Node* Scene::InstantiateJSON(Deserializer& source, const Vector3& position, const Quaternion& rotation, CreateMode mode=REPLICATED) | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "Node@+ InstantiateJSON(Deserializer&, const Vector3&in, const Quaternion&in, CreateMode = REPLICATED)", asMETHODPR(Scene, InstantiateJSON, (Deserializer&, const Vector3&, const Quaternion&, CreateMode), Node*), asCALL_THISCALL);
+    // Node* Scene::InstantiateXML(const XMLElement& source, const Vector3& position, const Quaternion& rotation, CreateMode mode=REPLICATED) | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "Node@+ InstantiateXML(const XMLElement&in, const Vector3&in, const Quaternion&in, CreateMode = REPLICATED)", asMETHODPR(Scene, InstantiateXML, (const XMLElement&, const Vector3&, const Quaternion&, CreateMode), Node*), asCALL_THISCALL);
+    // Node* Scene::InstantiateXML(Deserializer& source, const Vector3& position, const Quaternion& rotation, CreateMode mode=REPLICATED) | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "Node@+ InstantiateXML(Deserializer&, const Vector3&in, const Quaternion&in, CreateMode = REPLICATED)", asMETHODPR(Scene, InstantiateXML, (Deserializer&, const Vector3&, const Quaternion&, CreateMode), Node*), asCALL_THISCALL);
+    // bool Scene::IsAsyncLoading() const | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "bool IsAsyncLoading() const", asMETHODPR(Scene, IsAsyncLoading, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "bool get_asyncLoading() const", asMETHODPR(Scene, IsAsyncLoading, () const, bool), asCALL_THISCALL);
+    // bool Node::IsChildOf(Node* node) const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "bool IsChildOf(Node@+) const", asMETHODPR(Scene, IsChildOf, (Node*) const, bool), asCALL_THISCALL);
+    // bool Node::IsDirty() const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "bool IsDirty() const", asMETHODPR(Scene, IsDirty, () const, bool), asCALL_THISCALL);
+    // bool Node::IsEnabled() const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "bool IsEnabled() const", asMETHODPR(Scene, IsEnabled, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "bool get_enabled() const", asMETHODPR(Scene, IsEnabled, () const, bool), asCALL_THISCALL);
+    // bool Node::IsEnabledSelf() const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "bool IsEnabledSelf() const", asMETHODPR(Scene, IsEnabledSelf, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "bool get_enabledSelf() const", asMETHODPR(Scene, IsEnabledSelf, () const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Scene", "bool IsInstanceOf(StringHash) const", asMETHODPR(Scene, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
+    // Not registered because template
+    // bool Node::IsReplicated() const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "bool IsReplicated() const", asMETHODPR(Scene, IsReplicated, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "bool get_replicated() const", asMETHODPR(Scene, IsReplicated, () const, bool), asCALL_THISCALL);
+    // static bool Scene::IsReplicatedID(unsigned id) | File: ../Scene/Scene.h
+    engine->SetDefaultNamespace("Scene");
+    engine->RegisterGlobalFunction("bool IsReplicatedID(uint)", asFUNCTIONPR(Scene::IsReplicatedID, (unsigned), bool), asCALL_CDECL);
+    engine->SetDefaultNamespace("");
+    // bool Serializable::IsTemporary() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Scene", "bool IsTemporary() const", asMETHODPR(Scene, IsTemporary, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "bool get_temporary() const", asMETHODPR(Scene, IsTemporary, () const, bool), asCALL_THISCALL);
+    // bool Scene::IsThreadedUpdate() const | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "bool IsThreadedUpdate() const", asMETHODPR(Scene, IsThreadedUpdate, () const, bool), asCALL_THISCALL);
+    // bool Scene::IsUpdateEnabled() const | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "bool IsUpdateEnabled() const", asMETHODPR(Scene, IsUpdateEnabled, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "bool get_updateEnabled() const", asMETHODPR(Scene, IsUpdateEnabled, () const, bool), asCALL_THISCALL);
+    // bool Scene::Load(Deserializer& source) override | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "bool Load(Deserializer&)", asMETHODPR(Scene, Load, (Deserializer&), bool), asCALL_THISCALL);
+    // bool Scene::LoadAsync(File* file, LoadMode mode=LOAD_SCENE_AND_RESOURCES) | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "bool LoadAsync(File@+, LoadMode = LOAD_SCENE_AND_RESOURCES)", asMETHODPR(Scene, LoadAsync, (File*, LoadMode), bool), asCALL_THISCALL);
+    // bool Scene::LoadAsyncJSON(File* file, LoadMode mode=LOAD_SCENE_AND_RESOURCES) | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "bool LoadAsyncJSON(File@+, LoadMode = LOAD_SCENE_AND_RESOURCES)", asMETHODPR(Scene, LoadAsyncJSON, (File*, LoadMode), bool), asCALL_THISCALL);
+    // bool Scene::LoadAsyncXML(File* file, LoadMode mode=LOAD_SCENE_AND_RESOURCES) | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "bool LoadAsyncXML(File@+, LoadMode = LOAD_SCENE_AND_RESOURCES)", asMETHODPR(Scene, LoadAsyncXML, (File*, LoadMode), bool), asCALL_THISCALL);
+    // bool Scene::LoadJSON(const JSONValue& source) override | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "bool LoadJSON(const JSONValue&in)", asMETHODPR(Scene, LoadJSON, (const JSONValue&), bool), asCALL_THISCALL);
+    // bool Scene::LoadJSON(Deserializer& source) | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "bool LoadJSON(Deserializer&)", asMETHODPR(Scene, LoadJSON, (Deserializer&), bool), asCALL_THISCALL);
+    // bool Scene::LoadXML(const XMLElement& source) override | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "bool LoadXML(const XMLElement&in)", asMETHODPR(Scene, LoadXML, (const XMLElement&), bool), asCALL_THISCALL);
+    // bool Scene::LoadXML(Deserializer& source) | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "bool LoadXML(Deserializer&)", asMETHODPR(Scene, LoadXML, (Deserializer&), bool), asCALL_THISCALL);
+    // Vector3 Node::LocalToWorld(const Vector3& position) const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Vector3 LocalToWorld(const Vector3&in) const", asMETHODPR(Scene, LocalToWorld, (const Vector3&) const, Vector3), asCALL_THISCALL);
+    // Vector3 Node::LocalToWorld(const Vector4& vector) const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Vector3 LocalToWorld(const Vector4&in) const", asMETHODPR(Scene, LocalToWorld, (const Vector4&) const, Vector3), asCALL_THISCALL);
+    // Vector2 Node::LocalToWorld2D(const Vector2& vector) const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Vector2 LocalToWorld2D(const Vector2&in) const", asMETHODPR(Scene, LocalToWorld2D, (const Vector2&) const, Vector2), asCALL_THISCALL);
+    // bool Node::LookAt(const Vector3& target, const Vector3& up=Vector3::UP, TransformSpace space=TS_WORLD) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "bool LookAt(const Vector3&in, const Vector3&in = Vector3::UP, TransformSpace = TS_WORLD)", asMETHODPR(Scene, LookAt, (const Vector3&, const Vector3&, TransformSpace), bool), asCALL_THISCALL);
+    // void Node::MarkDirty() | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void MarkDirty()", asMETHODPR(Scene, MarkDirty, (), void), asCALL_THISCALL);
+    // void Scene::MarkNetworkUpdate() override | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "void MarkNetworkUpdate()", asMETHODPR(Scene, MarkNetworkUpdate, (), void), asCALL_THISCALL);
+    // void Scene::MarkNetworkUpdate(Node* node) | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "void MarkNetworkUpdate(Node@+)", asMETHODPR(Scene, MarkNetworkUpdate, (Node*), void), asCALL_THISCALL);
+    // void Scene::MarkNetworkUpdate(Component* component) | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "void MarkNetworkUpdate(Component@+)", asMETHODPR(Scene, MarkNetworkUpdate, (Component*), void), asCALL_THISCALL);
+    // void Scene::MarkReplicationDirty(Node* node) | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "void MarkReplicationDirty(Node@+)", asMETHODPR(Scene, MarkReplicationDirty, (Node*), void), asCALL_THISCALL);
+    // void Scene::NodeAdded(Node* node) | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "void NodeAdded(Node@+)", asMETHODPR(Scene, NodeAdded, (Node*), void), asCALL_THISCALL);
+    // void Scene::NodeRemoved(Node* node) | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "void NodeRemoved(Node@+)", asMETHODPR(Scene, NodeRemoved, (Node*), void), asCALL_THISCALL);
+    // void Scene::NodeTagAdded(Node* node, const String& tag) | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "void NodeTagAdded(Node@+, const String&in)", asMETHODPR(Scene, NodeTagAdded, (Node*, const String&), void), asCALL_THISCALL);
+    // void Scene::NodeTagRemoved(Node* node, const String& tag) | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "void NodeTagRemoved(Node@+, const String&in)", asMETHODPR(Scene, NodeTagRemoved, (Node*, const String&), void), asCALL_THISCALL);
+    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Scene", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(Scene, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
+    // virtual void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Scene", "void OnGetAttribute(const AttributeInfo&in, Variant&) const", asMETHODPR(Scene, OnGetAttribute, (const AttributeInfo&, Variant&) const, void), asCALL_THISCALL);
+    // virtual void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Scene", "void OnSetAttribute(const AttributeInfo&in, const Variant&in)", asMETHODPR(Scene, OnSetAttribute, (const AttributeInfo&, const Variant&), void), asCALL_THISCALL);
+    // void Node::Pitch(float angle, TransformSpace space=TS_LOCAL) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void Pitch(float, TransformSpace = TS_LOCAL)", asMETHODPR(Scene, Pitch, (float, TransformSpace), void), asCALL_THISCALL);
+    // void Scene::PrepareNetworkUpdate() | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "void PrepareNetworkUpdate()", asMETHODPR(Scene, PrepareNetworkUpdate, (), void), asCALL_THISCALL);
+    // bool Serializable::ReadDeltaUpdate(Deserializer& source) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Scene", "bool ReadDeltaUpdate(Deserializer&)", asMETHODPR(Scene, ReadDeltaUpdate, (Deserializer&), bool), asCALL_THISCALL);
+    // bool Serializable::ReadLatestDataUpdate(Deserializer& source) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Scene", "bool ReadLatestDataUpdate(Deserializer&)", asMETHODPR(Scene, ReadLatestDataUpdate, (Deserializer&), bool), asCALL_THISCALL);
     // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
     // Error: type "RefCount*" can not automatically bind
     // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("ShaderVariation", "int Refs() const", asMETHODPR(ShaderVariation, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ShaderVariation", "int get_refs() const", asMETHODPR(ShaderVariation, Refs, () const, int), asCALL_THISCALL);
-    // void ShaderVariation::Release() override | File: ../Graphics/ShaderVariation.h
-    engine->RegisterObjectMethod("ShaderVariation", "void Release()", asMETHODPR(ShaderVariation, Release, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "int Refs() const", asMETHODPR(Scene, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "int get_refs() const", asMETHODPR(Scene, Refs, () const, int), asCALL_THISCALL);
+    // static void Scene::RegisterObject(Context* context) | File: ../Scene/Scene.h
+    // Context can be used as firs parameter of constructors only
+    // void Scene::RegisterVar(const String& name) | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "void RegisterVar(const String&in)", asMETHODPR(Scene, RegisterVar, (const String&), void), asCALL_THISCALL);
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("ShaderVariation", asBEHAVE_RELEASE, "void f()", asMETHODPR(ShaderVariation, ReleaseRef, (), void), asCALL_THISCALL);
-    // void ShaderVariation::SetDefines(const String& defines) | File: ../Graphics/ShaderVariation.h
-    engine->RegisterObjectMethod("ShaderVariation", "void SetDefines(const String&in)", asMETHODPR(ShaderVariation, SetDefines, (const String&), void), asCALL_THISCALL);
-    // void ShaderVariation::SetName(const String& name) | File: ../Graphics/ShaderVariation.h
-    engine->RegisterObjectMethod("ShaderVariation", "void SetName(const String&in)", asMETHODPR(ShaderVariation, SetName, (const String&), void), asCALL_THISCALL);
-    // ShaderVariation::ShaderVariation(Shader* owner, ShaderType type) | File: ../Graphics/ShaderVariation.h
-    engine->RegisterObjectBehaviour("ShaderVariation", asBEHAVE_FACTORY, "ShaderVariation@+ f(Shader@+, ShaderType)", asFUNCTION(ShaderVariation_ShaderVariation_Shader_ShaderType), asCALL_CDECL);
+    engine->RegisterObjectBehaviour("Scene", asBEHAVE_RELEASE, "void f()", asMETHODPR(Scene, ReleaseRef, (), void), asCALL_THISCALL);
+    // void Node::Remove() | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void Remove()", asMETHODPR(Scene, Remove, (), void), asCALL_THISCALL);
+    // void Node::RemoveAllChildren() | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void RemoveAllChildren()", asMETHODPR(Scene, RemoveAllChildren, (), void), asCALL_THISCALL);
+    // void Node::RemoveAllComponents() | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void RemoveAllComponents()", asMETHODPR(Scene, RemoveAllComponents, (), void), asCALL_THISCALL);
+    // void Node::RemoveAllTags() | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void RemoveAllTags()", asMETHODPR(Scene, RemoveAllTags, (), void), asCALL_THISCALL);
+    // void Animatable::RemoveAttributeAnimation(const String& name) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Scene", "void RemoveAttributeAnimation(const String&in)", asMETHODPR(Scene, RemoveAttributeAnimation, (const String&), void), asCALL_THISCALL);
+    // void Node::RemoveChild(Node* node) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void RemoveChild(Node@+)", asMETHODPR(Scene, RemoveChild, (Node*), void), asCALL_THISCALL);
+    // void Node::RemoveChildren(bool removeReplicated, bool removeLocal, bool recursive) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void RemoveChildren(bool, bool, bool)", asMETHODPR(Scene, RemoveChildren, (bool, bool, bool), void), asCALL_THISCALL);
+    // void Node::RemoveComponent(Component* component) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void RemoveComponent(Component@+)", asMETHODPR(Scene, RemoveComponent, (Component*), void), asCALL_THISCALL);
+    // void Node::RemoveComponent(StringHash type) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void RemoveComponent(StringHash)", asMETHODPR(Scene, RemoveComponent, (StringHash), void), asCALL_THISCALL);
+    // template<class T> void Node::RemoveComponent() | File: ../Scene/Node.h
+    // Not registered because template
+    // void Node::RemoveComponents(bool removeReplicated, bool removeLocal) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void RemoveComponents(bool, bool)", asMETHODPR(Scene, RemoveComponents, (bool, bool), void), asCALL_THISCALL);
+    // void Node::RemoveComponents(StringHash type) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void RemoveComponents(StringHash)", asMETHODPR(Scene, RemoveComponents, (StringHash), void), asCALL_THISCALL);
+    // template<class T> void Node::RemoveComponents() | File: ../Scene/Node.h
+    // Not registered because template
+    // void Serializable::RemoveInstanceDefault() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Scene", "void RemoveInstanceDefault()", asMETHODPR(Scene, RemoveInstanceDefault, (), void), asCALL_THISCALL);
+    // void Node::RemoveListener(Component* component) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void RemoveListener(Component@+)", asMETHODPR(Scene, RemoveListener, (Component*), void), asCALL_THISCALL);
+    // void Animatable::RemoveObjectAnimation() | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Scene", "void RemoveObjectAnimation()", asMETHODPR(Scene, RemoveObjectAnimation, (), void), asCALL_THISCALL);
+    // bool Node::RemoveTag(const String& tag) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "bool RemoveTag(const String&in)", asMETHODPR(Scene, RemoveTag, (const String&), bool), asCALL_THISCALL);
+    // void Node::ReorderComponent(Component* component, unsigned index) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void ReorderComponent(Component@+, uint)", asMETHODPR(Scene, ReorderComponent, (Component*, unsigned), void), asCALL_THISCALL);
+    // void Node::ResetDeepEnabled() | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void ResetDeepEnabled()", asMETHODPR(Scene, ResetDeepEnabled, (), void), asCALL_THISCALL);
+    // void Node::ResetScene() | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void ResetScene()", asMETHODPR(Scene, ResetScene, (), void), asCALL_THISCALL);
+    // void Serializable::ResetToDefault() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Scene", "void ResetToDefault()", asMETHODPR(Scene, ResetToDefault, (), void), asCALL_THISCALL);
+    // void Node::Roll(float angle, TransformSpace space=TS_LOCAL) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void Roll(float, TransformSpace = TS_LOCAL)", asMETHODPR(Scene, Roll, (float, TransformSpace), void), asCALL_THISCALL);
+    // void Node::Rotate(const Quaternion& delta, TransformSpace space=TS_LOCAL) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void Rotate(const Quaternion&in, TransformSpace = TS_LOCAL)", asMETHODPR(Scene, Rotate, (const Quaternion&, TransformSpace), void), asCALL_THISCALL);
+    // void Node::Rotate2D(float delta, TransformSpace space=TS_LOCAL) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void Rotate2D(float, TransformSpace = TS_LOCAL)", asMETHODPR(Scene, Rotate2D, (float, TransformSpace), void), asCALL_THISCALL);
+    // void Node::RotateAround(const Vector3& point, const Quaternion& delta, TransformSpace space=TS_LOCAL) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void RotateAround(const Vector3&in, const Quaternion&in, TransformSpace = TS_LOCAL)", asMETHODPR(Scene, RotateAround, (const Vector3&, const Quaternion&, TransformSpace), void), asCALL_THISCALL);
+    // void Node::RotateAround2D(const Vector2& point, float delta, TransformSpace space=TS_LOCAL) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void RotateAround2D(const Vector2&in, float, TransformSpace = TS_LOCAL)", asMETHODPR(Scene, RotateAround2D, (const Vector2&, float, TransformSpace), void), asCALL_THISCALL);
+    // bool Scene::Save(Serializer& dest) const override | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "bool Save(Serializer&) const", asMETHODPR(Scene, Save, (Serializer&) const, bool), asCALL_THISCALL);
+    // bool Node::SaveDefaultAttributes() const override | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "bool SaveDefaultAttributes() const", asMETHODPR(Scene, SaveDefaultAttributes, () const, bool), asCALL_THISCALL);
+    // bool Scene::SaveJSON(Serializer& dest, const String& indentation="\t") const | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "bool SaveJSON(Serializer&, const String&in = \"\t\") const", asMETHODPR(Scene, SaveJSON, (Serializer&, const String&) const, bool), asCALL_THISCALL);
+    // bool Node::SaveJSON(JSONValue& dest) const override | File: ../Scene/Scene.h
+    // Not registered because have @manualbind mark
+    // bool Node::SaveJSON(Serializer& dest, const String& indentation="\t") const | File: ../Scene/Scene.h
+    // Not registered because have @manualbind mark
+    // bool Scene::SaveXML(Serializer& dest, const String& indentation="\t") const | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "bool SaveXML(Serializer&, const String&in = \"\t\") const", asMETHODPR(Scene, SaveXML, (Serializer&, const String&) const, bool), asCALL_THISCALL);
+    // bool Node::SaveXML(XMLElement& dest) const override | File: ../Scene/Scene.h
+    // Not registered because have @manualbind mark
+    // bool Node::SaveXML(Serializer& dest, const String& indentation="\t") const | File: ../Scene/Scene.h
+    // Not registered because have @manualbind mark
+    // void Node::Scale(float scale) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void Scale(float)", asMETHODPR(Scene, Scale, (float), void), asCALL_THISCALL);
+    // void Node::Scale(const Vector3& scale) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void Scale(const Vector3&in)", asMETHODPR(Scene, Scale, (const Vector3&), void), asCALL_THISCALL);
+    // void Node::Scale2D(const Vector2& scale) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void Scale2D(const Vector2&in)", asMETHODPR(Scene, Scale2D, (const Vector2&), void), asCALL_THISCALL);
+    // explicit Scene::Scene(Context* context) | File: ../Scene/Scene.h
+    engine->RegisterObjectBehaviour("Scene", asBEHAVE_FACTORY, "Scene@+ f()", asFUNCTION(Scene_Scene_Context), asCALL_CDECL);
+    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Scene", "void SendEvent(StringHash)", asMETHODPR(Scene, SendEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Scene", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(Scene, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
+    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
+    // Not registered because template
+    // void Animatable::SetAnimationEnabled(bool enable) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Scene", "void SetAnimationEnabled(bool)", asMETHODPR(Scene, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void set_animationEnabled(bool)", asMETHODPR(Scene, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
+    // void Animatable::SetAnimationTime(float time) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Scene", "void SetAnimationTime(float)", asMETHODPR(Scene, SetAnimationTime, (float), void), asCALL_THISCALL);
+    // void Scene::SetAsyncLoadingMs(int ms) | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "void SetAsyncLoadingMs(int)", asMETHODPR(Scene, SetAsyncLoadingMs, (int), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void set_asyncLoadingMs(int)", asMETHODPR(Scene, SetAsyncLoadingMs, (int), void), asCALL_THISCALL);
+    // bool Serializable::SetAttribute(unsigned index, const Variant& value) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Scene", "bool SetAttribute(uint, const Variant&in)", asMETHODPR(Scene, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "bool set_attributes(uint, const Variant&in)", asMETHODPR(Scene, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
+    // bool Serializable::SetAttribute(const String& name, const Variant& value) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Scene", "bool SetAttribute(const String&in, const Variant&in)", asMETHODPR(Scene, SetAttribute, (const String&, const Variant&), bool), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode=WM_LOOP, float speed=1.0f) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Scene", "void SetAttributeAnimation(const String&in, ValueAnimation@+, WrapMode = WM_LOOP, float = 1.0f)", asMETHODPR(Scene, SetAttributeAnimation, (const String&, ValueAnimation*, WrapMode, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationSpeed(const String& name, float speed) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Scene", "void SetAttributeAnimationSpeed(const String&in, float)", asMETHODPR(Scene, SetAttributeAnimationSpeed, (const String&, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationTime(const String& name, float time) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Scene", "void SetAttributeAnimationTime(const String&in, float)", asMETHODPR(Scene, SetAttributeAnimationTime, (const String&, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationWrapMode(const String& name, WrapMode wrapMode) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Scene", "void SetAttributeAnimationWrapMode(const String&in, WrapMode)", asMETHODPR(Scene, SetAttributeAnimationWrapMode, (const String&, WrapMode), void), asCALL_THISCALL);
+    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Scene", "void SetBlockEvents(bool)", asMETHODPR(Scene, SetBlockEvents, (bool), void), asCALL_THISCALL);
+    // void Node::SetDeepEnabled(bool enable) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetDeepEnabled(bool)", asMETHODPR(Scene, SetDeepEnabled, (bool), void), asCALL_THISCALL);
+    // void Node::SetDirection(const Vector3& direction) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetDirection(const Vector3&in)", asMETHODPR(Scene, SetDirection, (const Vector3&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void set_direction(const Vector3&in)", asMETHODPR(Scene, SetDirection, (const Vector3&), void), asCALL_THISCALL);
+    // void Scene::SetElapsedTime(float time) | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "void SetElapsedTime(float)", asMETHODPR(Scene, SetElapsedTime, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void set_elapsedTime(float)", asMETHODPR(Scene, SetElapsedTime, (float), void), asCALL_THISCALL);
+    // void Node::SetEnabled(bool enable) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetEnabled(bool)", asMETHODPR(Scene, SetEnabled, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void set_enabled(bool)", asMETHODPR(Scene, SetEnabled, (bool), void), asCALL_THISCALL);
+    // void Node::SetEnabledRecursive(bool enable) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetEnabledRecursive(bool)", asMETHODPR(Scene, SetEnabledRecursive, (bool), void), asCALL_THISCALL);
+    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Scene", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(Scene, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(Scene, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    // void Node::SetID(unsigned id) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetID(uint)", asMETHODPR(Scene, SetID, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void set_id(uint)", asMETHODPR(Scene, SetID, (unsigned), void), asCALL_THISCALL);
+    // void Serializable::SetInstanceDefault(bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Scene", "void SetInstanceDefault(bool)", asMETHODPR(Scene, SetInstanceDefault, (bool), void), asCALL_THISCALL);
+    // void Serializable::SetInterceptNetworkUpdate(const String& attributeName, bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Scene", "void SetInterceptNetworkUpdate(const String&in, bool)", asMETHODPR(Scene, SetInterceptNetworkUpdate, (const String&, bool), void), asCALL_THISCALL);
+    // void Node::SetName(const String& name) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetName(const String&in)", asMETHODPR(Scene, SetName, (const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void set_name(const String&in)", asMETHODPR(Scene, SetName, (const String&), void), asCALL_THISCALL);
+    // void Node::SetNetParentAttr(const PODVector<unsigned char>& value) | File: ../Scene/Node.h
+    // Error: type "const PODVector<unsigned char>&" can not automatically bind
+    // void Node::SetNetPositionAttr(const Vector3& value) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetNetPositionAttr(const Vector3&in)", asMETHODPR(Scene, SetNetPositionAttr, (const Vector3&), void), asCALL_THISCALL);
+    // void Node::SetNetRotationAttr(const PODVector<unsigned char>& value) | File: ../Scene/Node.h
+    // Error: type "const PODVector<unsigned char>&" can not automatically bind
+    // void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Scene", "void SetObjectAnimation(ObjectAnimation@+)", asMETHODPR(Scene, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void set_objectAnimation(ObjectAnimation@+)", asMETHODPR(Scene, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
+    // void Animatable::SetObjectAnimationAttr(const ResourceRef& value) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Scene", "void SetObjectAnimationAttr(const ResourceRef&in)", asMETHODPR(Scene, SetObjectAnimationAttr, (const ResourceRef&), void), asCALL_THISCALL);
+    // void Node::SetOwner(Connection* owner) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetOwner(Connection@+)", asMETHODPR(Scene, SetOwner, (Connection*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void set_owner(Connection@+)", asMETHODPR(Scene, SetOwner, (Connection*), void), asCALL_THISCALL);
+    // void Node::SetParent(Node* parent) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetParent(Node@+)", asMETHODPR(Scene, SetParent, (Node*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void set_parent(Node@+)", asMETHODPR(Scene, SetParent, (Node*), void), asCALL_THISCALL);
+    // void Node::SetPosition(const Vector3& position) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetPosition(const Vector3&in)", asMETHODPR(Scene, SetPosition, (const Vector3&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void set_position(const Vector3&in)", asMETHODPR(Scene, SetPosition, (const Vector3&), void), asCALL_THISCALL);
+    // void Node::SetPosition2D(const Vector2& position) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetPosition2D(const Vector2&in)", asMETHODPR(Scene, SetPosition2D, (const Vector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void set_position2D(const Vector2&in)", asMETHODPR(Scene, SetPosition2D, (const Vector2&), void), asCALL_THISCALL);
+    // void Node::SetPosition2D(float x, float y) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetPosition2D(float, float)", asMETHODPR(Scene, SetPosition2D, (float, float), void), asCALL_THISCALL);
+    // void Node::SetPositionSilent(const Vector3& position) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetPositionSilent(const Vector3&in)", asMETHODPR(Scene, SetPositionSilent, (const Vector3&), void), asCALL_THISCALL);
+    // void Node::SetRotation(const Quaternion& rotation) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetRotation(const Quaternion&in)", asMETHODPR(Scene, SetRotation, (const Quaternion&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void set_rotation(const Quaternion&in)", asMETHODPR(Scene, SetRotation, (const Quaternion&), void), asCALL_THISCALL);
+    // void Node::SetRotation2D(float rotation) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetRotation2D(float)", asMETHODPR(Scene, SetRotation2D, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void set_rotation2D(float)", asMETHODPR(Scene, SetRotation2D, (float), void), asCALL_THISCALL);
+    // void Node::SetRotationSilent(const Quaternion& rotation) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetRotationSilent(const Quaternion&in)", asMETHODPR(Scene, SetRotationSilent, (const Quaternion&), void), asCALL_THISCALL);
+    // void Node::SetScale(float scale) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetScale(float)", asMETHODPR(Scene, SetScale, (float), void), asCALL_THISCALL);
+    // void Node::SetScale(const Vector3& scale) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetScale(const Vector3&in)", asMETHODPR(Scene, SetScale, (const Vector3&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void set_scale(const Vector3&in)", asMETHODPR(Scene, SetScale, (const Vector3&), void), asCALL_THISCALL);
+    // void Node::SetScale2D(const Vector2& scale) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetScale2D(const Vector2&in)", asMETHODPR(Scene, SetScale2D, (const Vector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void set_scale2D(const Vector2&in)", asMETHODPR(Scene, SetScale2D, (const Vector2&), void), asCALL_THISCALL);
+    // void Node::SetScale2D(float x, float y) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetScale2D(float, float)", asMETHODPR(Scene, SetScale2D, (float, float), void), asCALL_THISCALL);
+    // void Node::SetScaleSilent(const Vector3& scale) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetScaleSilent(const Vector3&in)", asMETHODPR(Scene, SetScaleSilent, (const Vector3&), void), asCALL_THISCALL);
+    // void Node::SetScene(Scene* scene) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetScene(Scene@+)", asMETHODPR(Scene, SetScene, (Scene*), void), asCALL_THISCALL);
+    // void Scene::SetSmoothingConstant(float constant) | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "void SetSmoothingConstant(float)", asMETHODPR(Scene, SetSmoothingConstant, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void set_smoothingConstant(float)", asMETHODPR(Scene, SetSmoothingConstant, (float), void), asCALL_THISCALL);
+    // void Scene::SetSnapThreshold(float threshold) | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "void SetSnapThreshold(float)", asMETHODPR(Scene, SetSnapThreshold, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void set_snapThreshold(float)", asMETHODPR(Scene, SetSnapThreshold, (float), void), asCALL_THISCALL);
+    // void Node::SetTags(const StringVector& tags) | File: ../Scene/Node.h
+    // Error: type "const StringVector&" can not automatically bind
+    // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Scene", "void SetTemporary(bool)", asMETHODPR(Scene, SetTemporary, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void set_temporary(bool)", asMETHODPR(Scene, SetTemporary, (bool), void), asCALL_THISCALL);
+    // void Scene::SetTimeScale(float scale) | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "void SetTimeScale(float)", asMETHODPR(Scene, SetTimeScale, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void set_timeScale(float)", asMETHODPR(Scene, SetTimeScale, (float), void), asCALL_THISCALL);
+    // void Node::SetTransform(const Vector3& position, const Quaternion& rotation) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetTransform(const Vector3&in, const Quaternion&in)", asMETHODPR(Scene, SetTransform, (const Vector3&, const Quaternion&), void), asCALL_THISCALL);
+    // void Node::SetTransform(const Vector3& position, const Quaternion& rotation, float scale) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetTransform(const Vector3&in, const Quaternion&in, float)", asMETHODPR(Scene, SetTransform, (const Vector3&, const Quaternion&, float), void), asCALL_THISCALL);
+    // void Node::SetTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetTransform(const Vector3&in, const Quaternion&in, const Vector3&in)", asMETHODPR(Scene, SetTransform, (const Vector3&, const Quaternion&, const Vector3&), void), asCALL_THISCALL);
+    // void Node::SetTransform(const Matrix3x4& matrix) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetTransform(const Matrix3x4&in)", asMETHODPR(Scene, SetTransform, (const Matrix3x4&), void), asCALL_THISCALL);
+    // void Node::SetTransform2D(const Vector2& position, float rotation) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetTransform2D(const Vector2&in, float)", asMETHODPR(Scene, SetTransform2D, (const Vector2&, float), void), asCALL_THISCALL);
+    // void Node::SetTransform2D(const Vector2& position, float rotation, float scale) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetTransform2D(const Vector2&in, float, float)", asMETHODPR(Scene, SetTransform2D, (const Vector2&, float, float), void), asCALL_THISCALL);
+    // void Node::SetTransform2D(const Vector2& position, float rotation, const Vector2& scale) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetTransform2D(const Vector2&in, float, const Vector2&in)", asMETHODPR(Scene, SetTransform2D, (const Vector2&, float, const Vector2&), void), asCALL_THISCALL);
+    // void Node::SetTransformSilent(const Vector3& position, const Quaternion& rotation, const Vector3& scale) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetTransformSilent(const Vector3&in, const Quaternion&in, const Vector3&in)", asMETHODPR(Scene, SetTransformSilent, (const Vector3&, const Quaternion&, const Vector3&), void), asCALL_THISCALL);
+    // void Scene::SetUpdateEnabled(bool enable) | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "void SetUpdateEnabled(bool)", asMETHODPR(Scene, SetUpdateEnabled, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void set_updateEnabled(bool)", asMETHODPR(Scene, SetUpdateEnabled, (bool), void), asCALL_THISCALL);
+    // void Node::SetVar(StringHash key, const Variant& value) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetVar(StringHash, const Variant&in)", asMETHODPR(Scene, SetVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    // void Scene::SetVarNamesAttr(const String& value) | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "void SetVarNamesAttr(const String&in)", asMETHODPR(Scene, SetVarNamesAttr, (const String&), void), asCALL_THISCALL);
+    // void Node::SetWorldDirection(const Vector3& direction) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetWorldDirection(const Vector3&in)", asMETHODPR(Scene, SetWorldDirection, (const Vector3&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void set_worldDirection(const Vector3&in)", asMETHODPR(Scene, SetWorldDirection, (const Vector3&), void), asCALL_THISCALL);
+    // void Node::SetWorldPosition(const Vector3& position) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetWorldPosition(const Vector3&in)", asMETHODPR(Scene, SetWorldPosition, (const Vector3&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void set_worldPosition(const Vector3&in)", asMETHODPR(Scene, SetWorldPosition, (const Vector3&), void), asCALL_THISCALL);
+    // void Node::SetWorldPosition2D(const Vector2& position) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetWorldPosition2D(const Vector2&in)", asMETHODPR(Scene, SetWorldPosition2D, (const Vector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void set_worldPosition2D(const Vector2&in)", asMETHODPR(Scene, SetWorldPosition2D, (const Vector2&), void), asCALL_THISCALL);
+    // void Node::SetWorldPosition2D(float x, float y) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetWorldPosition2D(float, float)", asMETHODPR(Scene, SetWorldPosition2D, (float, float), void), asCALL_THISCALL);
+    // void Node::SetWorldRotation(const Quaternion& rotation) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetWorldRotation(const Quaternion&in)", asMETHODPR(Scene, SetWorldRotation, (const Quaternion&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void set_worldRotation(const Quaternion&in)", asMETHODPR(Scene, SetWorldRotation, (const Quaternion&), void), asCALL_THISCALL);
+    // void Node::SetWorldRotation2D(float rotation) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetWorldRotation2D(float)", asMETHODPR(Scene, SetWorldRotation2D, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void set_worldRotation2D(float)", asMETHODPR(Scene, SetWorldRotation2D, (float), void), asCALL_THISCALL);
+    // void Node::SetWorldScale(float scale) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetWorldScale(float)", asMETHODPR(Scene, SetWorldScale, (float), void), asCALL_THISCALL);
+    // void Node::SetWorldScale(const Vector3& scale) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetWorldScale(const Vector3&in)", asMETHODPR(Scene, SetWorldScale, (const Vector3&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void set_worldScale(const Vector3&in)", asMETHODPR(Scene, SetWorldScale, (const Vector3&), void), asCALL_THISCALL);
+    // void Node::SetWorldScale2D(const Vector2& scale) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetWorldScale2D(const Vector2&in)", asMETHODPR(Scene, SetWorldScale2D, (const Vector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void set_worldScale2D(const Vector2&in)", asMETHODPR(Scene, SetWorldScale2D, (const Vector2&), void), asCALL_THISCALL);
+    // void Node::SetWorldScale2D(float x, float y) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetWorldScale2D(float, float)", asMETHODPR(Scene, SetWorldScale2D, (float, float), void), asCALL_THISCALL);
+    // void Node::SetWorldTransform(const Vector3& position, const Quaternion& rotation) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetWorldTransform(const Vector3&in, const Quaternion&in)", asMETHODPR(Scene, SetWorldTransform, (const Vector3&, const Quaternion&), void), asCALL_THISCALL);
+    // void Node::SetWorldTransform(const Vector3& position, const Quaternion& rotation, float scale) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetWorldTransform(const Vector3&in, const Quaternion&in, float)", asMETHODPR(Scene, SetWorldTransform, (const Vector3&, const Quaternion&, float), void), asCALL_THISCALL);
+    // void Node::SetWorldTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetWorldTransform(const Vector3&in, const Quaternion&in, const Vector3&in)", asMETHODPR(Scene, SetWorldTransform, (const Vector3&, const Quaternion&, const Vector3&), void), asCALL_THISCALL);
+    // void Node::SetWorldTransform(const Matrix3x4& worldTransform) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetWorldTransform(const Matrix3x4&in)", asMETHODPR(Scene, SetWorldTransform, (const Matrix3x4&), void), asCALL_THISCALL);
+    // void Node::SetWorldTransform2D(const Vector2& position, float rotation) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetWorldTransform2D(const Vector2&in, float)", asMETHODPR(Scene, SetWorldTransform2D, (const Vector2&, float), void), asCALL_THISCALL);
+    // void Node::SetWorldTransform2D(const Vector2& position, float rotation, float scale) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetWorldTransform2D(const Vector2&in, float, float)", asMETHODPR(Scene, SetWorldTransform2D, (const Vector2&, float, float), void), asCALL_THISCALL);
+    // void Node::SetWorldTransform2D(const Vector2& position, float rotation, const Vector2& scale) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void SetWorldTransform2D(const Vector2&in, float, const Vector2&in)", asMETHODPR(Scene, SetWorldTransform2D, (const Vector2&, float, const Vector2&), void), asCALL_THISCALL);
+    // void Scene::StopAsyncLoading() | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "void StopAsyncLoading()", asMETHODPR(Scene, StopAsyncLoading, (), void), asCALL_THISCALL);
+    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Node::Translate(const Vector3& delta, TransformSpace space=TS_LOCAL) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void Translate(const Vector3&in, TransformSpace = TS_LOCAL)", asMETHODPR(Scene, Translate, (const Vector3&, TransformSpace), void), asCALL_THISCALL);
+    // void Node::Translate2D(const Vector2& delta, TransformSpace space=TS_LOCAL) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void Translate2D(const Vector2&in, TransformSpace = TS_LOCAL)", asMETHODPR(Scene, Translate2D, (const Vector2&, TransformSpace), void), asCALL_THISCALL);
+    // void Scene::UnregisterAllVars() | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "void UnregisterAllVars()", asMETHODPR(Scene, UnregisterAllVars, (), void), asCALL_THISCALL);
+    // void Scene::UnregisterVar(const String& name) | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "void UnregisterVar(const String&in)", asMETHODPR(Scene, UnregisterVar, (const String&), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Scene", "void UnsubscribeFromAllEvents()", asMETHODPR(Scene, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Scene", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(Scene_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
+    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Scene", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(Scene, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Scene", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(Scene, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Scene", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(Scene, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
+    // void Scene::Update(float timeStep) | File: ../Scene/Scene.h
+    engine->RegisterObjectMethod("Scene", "void Update(float)", asMETHODPR(Scene, Update, (float), void), asCALL_THISCALL);
     // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("ShaderVariation", "int WeakRefs() const", asMETHODPR(ShaderVariation, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ShaderVariation", "int get_weakRefs() const", asMETHODPR(ShaderVariation, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "int WeakRefs() const", asMETHODPR(Scene, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "int get_weakRefs() const", asMETHODPR(Scene, WeakRefs, () const, int), asCALL_THISCALL);
+    // Vector3 Node::WorldToLocal(const Vector3& position) const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Vector3 WorldToLocal(const Vector3&in) const", asMETHODPR(Scene, WorldToLocal, (const Vector3&) const, Vector3), asCALL_THISCALL);
+    // Vector3 Node::WorldToLocal(const Vector4& vector) const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Vector3 WorldToLocal(const Vector4&in) const", asMETHODPR(Scene, WorldToLocal, (const Vector4&) const, Vector3), asCALL_THISCALL);
+    // Vector2 Node::WorldToLocal2D(const Vector2& vector) const | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "Vector2 WorldToLocal2D(const Vector2&in) const", asMETHODPR(Scene, WorldToLocal2D, (const Vector2&) const, Vector2), asCALL_THISCALL);
+    // void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attributeBits, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Scene", "void WriteDeltaUpdate(Serializer&, const DirtyBits&in, uint8)", asMETHODPR(Scene, WriteDeltaUpdate, (Serializer&, const DirtyBits&, unsigned char), void), asCALL_THISCALL);
+    // void Serializable::WriteInitialDeltaUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Scene", "void WriteInitialDeltaUpdate(Serializer&, uint8)", asMETHODPR(Scene, WriteInitialDeltaUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
+    // void Serializable::WriteLatestDataUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Scene", "void WriteLatestDataUpdate(Serializer&, uint8)", asMETHODPR(Scene, WriteLatestDataUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
+    // void Node::Yaw(float angle, TransformSpace space=TS_LOCAL) | File: ../Scene/Node.h
+    engine->RegisterObjectMethod("Scene", "void Yaw(float, TransformSpace = TS_LOCAL)", asMETHODPR(Scene, Yaw, (float, TransformSpace), void), asCALL_THISCALL);
+#ifdef REGISTER_MANUAL_PART_Node
+    REGISTER_MANUAL_PART_Node(Scene, "Scene")
+#endif
+#ifdef REGISTER_MANUAL_PART_Animatable
+    REGISTER_MANUAL_PART_Animatable(Scene, "Scene")
+#endif
+#ifdef REGISTER_MANUAL_PART_Serializable
+    REGISTER_MANUAL_PART_Serializable(Scene, "Scene")
+#endif
+#ifdef REGISTER_MANUAL_PART_Object
+    REGISTER_MANUAL_PART_Object(Scene, "Scene")
+#endif
 #ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(ShaderVariation, "ShaderVariation")
+    REGISTER_MANUAL_PART_RefCounted(Scene, "Scene")
 #endif
-#ifdef REGISTER_MANUAL_PART_GPUObject
-    REGISTER_MANUAL_PART_GPUObject(ShaderVariation, "ShaderVariation")
+#ifdef REGISTER_MANUAL_PART_Scene
+    REGISTER_MANUAL_PART_Scene(Scene, "Scene")
 #endif
-#ifdef REGISTER_MANUAL_PART_ShaderVariation
-    REGISTER_MANUAL_PART_ShaderVariation(ShaderVariation, "ShaderVariation")
+    RegisterSubclass<Node, Scene>(engine, "Node", "Scene");
+    RegisterSubclass<Animatable, Scene>(engine, "Animatable", "Scene");
+    RegisterSubclass<Serializable, Scene>(engine, "Serializable", "Scene");
+    RegisterSubclass<Object, Scene>(engine, "Object", "Scene");
+    RegisterSubclass<RefCounted, Scene>(engine, "RefCounted", "Scene");
+
+    // void SceneResolver::AddComponent(unsigned oldID, Component* component) | File: ../Scene/SceneResolver.h
+    engine->RegisterObjectMethod("SceneResolver", "void AddComponent(uint, Component@+)", asMETHODPR(SceneResolver, AddComponent, (unsigned, Component*), void), asCALL_THISCALL);
+    // void SceneResolver::AddNode(unsigned oldID, Node* node) | File: ../Scene/SceneResolver.h
+    engine->RegisterObjectMethod("SceneResolver", "void AddNode(uint, Node@+)", asMETHODPR(SceneResolver, AddNode, (unsigned, Node*), void), asCALL_THISCALL);
+    // void SceneResolver::Reset() | File: ../Scene/SceneResolver.h
+    engine->RegisterObjectMethod("SceneResolver", "void Reset()", asMETHODPR(SceneResolver, Reset, (), void), asCALL_THISCALL);
+    // void SceneResolver::Resolve() | File: ../Scene/SceneResolver.h
+    engine->RegisterObjectMethod("SceneResolver", "void Resolve()", asMETHODPR(SceneResolver, Resolve, (), void), asCALL_THISCALL);
+    // SceneResolver::~SceneResolver() | File: ../Scene/SceneResolver.h
+    engine->RegisterObjectBehaviour("SceneResolver", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(SceneResolver_Destructor_SceneResolver_void), asCALL_CDECL_OBJFIRST);
+    // SceneResolver& SceneResolver::operator=(const SceneResolver&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<SceneResolver>(engine, "SceneResolver");
+#ifdef REGISTER_MANUAL_PART_SceneResolver
+    REGISTER_MANUAL_PART_SceneResolver(SceneResolver, "SceneResolver")
 #endif
-    RegisterSubclass<RefCounted, ShaderVariation>(engine, "RefCounted", "ShaderVariation");
 
     // void UIElement::AddChild(UIElement* element) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("ScrollBar", "void AddChild(UIElement@+)", asMETHODPR(ScrollBar, AddChild, (UIElement*), void), asCALL_THISCALL);
@@ -1387,993 +2077,6 @@ void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
     RegisterSubclass<Serializable, ScrollBar>(engine, "Serializable", "ScrollBar");
     RegisterSubclass<Object, ScrollBar>(engine, "Object", "ScrollBar");
     RegisterSubclass<RefCounted, ScrollBar>(engine, "RefCounted", "ScrollBar");
-
-    // Connection* ReplicationState::connection_ | File: ../Scene/ReplicationState.h
-    // Connection* can not be registered
-    // HashSet<unsigned> SceneReplicationState::dirtyNodes_ | File: ../Scene/ReplicationState.h
-    // Error: type "HashSet<unsigned>" can not automatically bind
-    // HashMap<unsigned, NodeReplicationState> SceneReplicationState::nodeStates_ | File: ../Scene/ReplicationState.h
-    // Error: type "HashMap<unsigned, NodeReplicationState>" can not automatically bind
-    // void SceneReplicationState::Clear() | File: ../Scene/ReplicationState.h
-    engine->RegisterObjectMethod("SceneReplicationState", "void Clear()", asMETHODPR(SceneReplicationState, Clear, (), void), asCALL_THISCALL);
-    // SceneReplicationState::~SceneReplicationState() | Implicitly-declared
-    engine->RegisterObjectBehaviour("SceneReplicationState", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(SceneReplicationState_Destructor), asCALL_CDECL_OBJFIRST);
-    // SceneReplicationState& SceneReplicationState::operator=(const SceneReplicationState&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<SceneReplicationState>(engine, "SceneReplicationState");
-#ifdef REGISTER_MANUAL_PART_ReplicationState
-    REGISTER_MANUAL_PART_ReplicationState(SceneReplicationState, "SceneReplicationState")
-#endif
-#ifdef REGISTER_MANUAL_PART_SceneReplicationState
-    REGISTER_MANUAL_PART_SceneReplicationState(SceneReplicationState, "SceneReplicationState")
-#endif
-
-    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("Shader", asBEHAVE_ADDREF, "void f()", asMETHODPR(Shader, AddRef, (), void), asCALL_THISCALL);
-    // bool Shader::BeginLoad(Deserializer& source) override | File: ../Graphics/Shader.h
-    engine->RegisterObjectMethod("Shader", "bool BeginLoad(Deserializer&)", asMETHODPR(Shader, BeginLoad, (Deserializer&), bool), asCALL_THISCALL);
-    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
-    // Not registered because template
-    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
-    // Not registered because template
-    // bool Shader::EndLoad() override | File: ../Graphics/Shader.h
-    engine->RegisterObjectMethod("Shader", "bool EndLoad()", asMETHODPR(Shader, EndLoad, (), bool), asCALL_THISCALL);
-    // AsyncLoadState Resource::GetAsyncLoadState() const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Shader", "AsyncLoadState GetAsyncLoadState() const", asMETHODPR(Shader, GetAsyncLoadState, () const, AsyncLoadState), asCALL_THISCALL);
-    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Shader", "bool GetBlockEvents() const", asMETHODPR(Shader, GetBlockEvents, () const, bool), asCALL_THISCALL);
-    // const String& Object::GetCategory() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Shader", "const String& GetCategory() const", asMETHODPR(Shader, GetCategory, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Shader", "const String& get_category() const", asMETHODPR(Shader, GetCategory, () const, const String&), asCALL_THISCALL);
-    // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
-    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Shader", "VariantMap& GetEventDataMap() const", asMETHODPR(Shader, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
-    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // Object* Object::GetEventSender() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Shader", "Object@+ GetEventSender() const", asMETHODPR(Shader, GetEventSender, () const, Object*), asCALL_THISCALL);
-    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Shader", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(Shader, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Shader", "const Variant& get_globalVar(StringHash) const", asMETHODPR(Shader, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Shader", "const VariantMap& GetGlobalVars() const", asMETHODPR(Shader, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Shader", "const VariantMap& get_globalVars() const", asMETHODPR(Shader, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    // unsigned Resource::GetMemoryUse() const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Shader", "uint GetMemoryUse() const", asMETHODPR(Shader, GetMemoryUse, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Shader", "uint get_memoryUse() const", asMETHODPR(Shader, GetMemoryUse, () const, unsigned), asCALL_THISCALL);
-    // const String& Resource::GetName() const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Shader", "const String& GetName() const", asMETHODPR(Shader, GetName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Shader", "const String& get_name() const", asMETHODPR(Shader, GetName, () const, const String&), asCALL_THISCALL);
-    // StringHash Resource::GetNameHash() const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Shader", "StringHash GetNameHash() const", asMETHODPR(Shader, GetNameHash, () const, StringHash), asCALL_THISCALL);
-    // const String& Shader::GetSourceCode(ShaderType type) const | File: ../Graphics/Shader.h
-    engine->RegisterObjectMethod("Shader", "const String& GetSourceCode(ShaderType) const", asMETHODPR(Shader, GetSourceCode, (ShaderType) const, const String&), asCALL_THISCALL);
-    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Shader", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Shader, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
-    // Not registered because template
-    // unsigned Shader::GetTimeStamp() const | File: ../Graphics/Shader.h
-    engine->RegisterObjectMethod("Shader", "uint GetTimeStamp() const", asMETHODPR(Shader, GetTimeStamp, () const, unsigned), asCALL_THISCALL);
-    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Shader", "StringHash GetType() const", asMETHODPR(Shader, GetType, () const, StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Shader", "StringHash get_type() const", asMETHODPR(Shader, GetType, () const, StringHash), asCALL_THISCALL);
-    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Shader", "const String& GetTypeName() const", asMETHODPR(Shader, GetTypeName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Shader", "const String& get_typeName() const", asMETHODPR(Shader, GetTypeName, () const, const String&), asCALL_THISCALL);
-    // unsigned Resource::GetUseTimer() | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Shader", "uint GetUseTimer()", asMETHODPR(Shader, GetUseTimer, (), unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Shader", "uint get_useTimer()", asMETHODPR(Shader, GetUseTimer, (), unsigned), asCALL_THISCALL);
-    // ShaderVariation* Shader::GetVariation(ShaderType type, const String& defines) | File: ../Graphics/Shader.h
-    engine->RegisterObjectMethod("Shader", "ShaderVariation@+ GetVariation(ShaderType, const String&in)", asMETHODPR(Shader, GetVariation, (ShaderType, const String&), ShaderVariation*), asCALL_THISCALL);
-    // ShaderVariation* Shader::GetVariation(ShaderType type, const char* defines) | File: ../Graphics/Shader.h
-    // Error: type "const char*" can not automatically bind
-    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Shader", "bool HasEventHandlers() const", asMETHODPR(Shader, HasEventHandlers, () const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Shader", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(Shader, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Shader", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(Shader, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Shader", "bool IsInstanceOf(StringHash) const", asMETHODPR(Shader, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
-    // Not registered because template
-    // bool Resource::Load(Deserializer& source) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Shader", "bool Load(Deserializer&)", asMETHODPR(Shader, Load, (Deserializer&), bool), asCALL_THISCALL);
-    // bool Resource::LoadFile(const String& fileName) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Shader", "bool LoadFile(const String&in)", asMETHODPR(Shader, LoadFile, (const String&), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Shader", "bool Load(const String&in)", asMETHODPR(Shader, LoadFile, (const String&), bool), asCALL_THISCALL);
-    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Shader", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(Shader, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
-    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
-    // Error: type "RefCount*" can not automatically bind
-    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("Shader", "int Refs() const", asMETHODPR(Shader, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Shader", "int get_refs() const", asMETHODPR(Shader, Refs, () const, int), asCALL_THISCALL);
-    // static void Shader::RegisterObject(Context* context) | File: ../Graphics/Shader.h
-    // Context can be used as firs parameter of constructors only
-    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("Shader", asBEHAVE_RELEASE, "void f()", asMETHODPR(Shader, ReleaseRef, (), void), asCALL_THISCALL);
-    // void Resource::ResetUseTimer() | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Shader", "void ResetUseTimer()", asMETHODPR(Shader, ResetUseTimer, (), void), asCALL_THISCALL);
-    // virtual bool Resource::Save(Serializer& dest) const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Shader", "bool Save(Serializer&) const", asMETHODPR(Shader, Save, (Serializer&) const, bool), asCALL_THISCALL);
-    // virtual bool Resource::SaveFile(const String& fileName) const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Shader", "bool SaveFile(const String&in) const", asMETHODPR(Shader, SaveFile, (const String&) const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Shader", "bool Save(const String&in) const", asMETHODPR(Shader, SaveFile, (const String&) const, bool), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Shader", "void SendEvent(StringHash)", asMETHODPR(Shader, SendEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Shader", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(Shader, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
-    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
-    // Not registered because template
-    // void Resource::SetAsyncLoadState(AsyncLoadState newState) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Shader", "void SetAsyncLoadState(AsyncLoadState)", asMETHODPR(Shader, SetAsyncLoadState, (AsyncLoadState), void), asCALL_THISCALL);
-    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Shader", "void SetBlockEvents(bool)", asMETHODPR(Shader, SetBlockEvents, (bool), void), asCALL_THISCALL);
-    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Shader", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(Shader, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Shader", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(Shader, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    // void Resource::SetMemoryUse(unsigned size) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Shader", "void SetMemoryUse(uint)", asMETHODPR(Shader, SetMemoryUse, (unsigned), void), asCALL_THISCALL);
-    // void Resource::SetName(const String& name) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Shader", "void SetName(const String&in)", asMETHODPR(Shader, SetName, (const String&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Shader", "void set_name(const String&in)", asMETHODPR(Shader, SetName, (const String&), void), asCALL_THISCALL);
-    // explicit Shader::Shader(Context* context) | File: ../Graphics/Shader.h
-    engine->RegisterObjectBehaviour("Shader", asBEHAVE_FACTORY, "Shader@+ f()", asFUNCTION(Shader_Shader_Context), asCALL_CDECL);
-    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Shader", "void UnsubscribeFromAllEvents()", asMETHODPR(Shader, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Shader", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(Shader_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
-    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Shader", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(Shader, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Shader", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(Shader, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Shader", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(Shader, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
-    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("Shader", "int WeakRefs() const", asMETHODPR(Shader, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Shader", "int get_weakRefs() const", asMETHODPR(Shader, WeakRefs, () const, int), asCALL_THISCALL);
-#ifdef REGISTER_MANUAL_PART_Resource
-    REGISTER_MANUAL_PART_Resource(Shader, "Shader")
-#endif
-#ifdef REGISTER_MANUAL_PART_Object
-    REGISTER_MANUAL_PART_Object(Shader, "Shader")
-#endif
-#ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(Shader, "Shader")
-#endif
-#ifdef REGISTER_MANUAL_PART_Shader
-    REGISTER_MANUAL_PART_Shader(Shader, "Shader")
-#endif
-    RegisterSubclass<Resource, Shader>(engine, "Resource", "Shader");
-    RegisterSubclass<Object, Shader>(engine, "Object", "Shader");
-    RegisterSubclass<RefCounted, Shader>(engine, "RefCounted", "Shader");
-
-    // SharedArrayPtr<unsigned char> ScratchBuffer::data_ | File: ../Graphics/Graphics.h
-    // Error: type "SharedArrayPtr<unsigned char>" can not automatically bind
-    // bool ScratchBuffer::reserved_ | File: ../Graphics/Graphics.h
-    engine->RegisterObjectProperty("ScratchBuffer", "bool reserved", offsetof(ScratchBuffer, reserved_));
-    // unsigned ScratchBuffer::size_ | File: ../Graphics/Graphics.h
-    engine->RegisterObjectProperty("ScratchBuffer", "uint size", offsetof(ScratchBuffer, size_));
-    // ScratchBuffer::~ScratchBuffer() | Implicitly-declared
-    engine->RegisterObjectBehaviour("ScratchBuffer", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(ScratchBuffer_Destructor), asCALL_CDECL_OBJFIRST);
-    // ScratchBuffer& ScratchBuffer::operator=(const ScratchBuffer&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<ScratchBuffer>(engine, "ScratchBuffer");
-#ifdef REGISTER_MANUAL_PART_ScratchBuffer
-    REGISTER_MANUAL_PART_ScratchBuffer(ScratchBuffer, "ScratchBuffer")
-#endif
-
-    // void Node::AddChild(Node* node, unsigned index=M_MAX_UNSIGNED) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void AddChild(Node@+, uint = M_MAX_UNSIGNED)", asMETHODPR(Scene, AddChild, (Node*, unsigned), void), asCALL_THISCALL);
-    // void Node::AddComponent(Component* component, unsigned id, CreateMode mode) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void AddComponent(Component@+, uint, CreateMode)", asMETHODPR(Scene, AddComponent, (Component*, unsigned, CreateMode), void), asCALL_THISCALL);
-    // void Node::AddListener(Component* component) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void AddListener(Component@+)", asMETHODPR(Scene, AddListener, (Component*), void), asCALL_THISCALL);
-    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("Scene", asBEHAVE_ADDREF, "void f()", asMETHODPR(Scene, AddRef, (), void), asCALL_THISCALL);
-    // void Scene::AddReplicationState(NodeReplicationState* state) override | File: ../Scene/Scene.h
-    // Error: type "NodeReplicationState*" can not automatically bind
-    // void Scene::AddRequiredPackageFile(PackageFile* package) | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "void AddRequiredPackageFile(PackageFile@+)", asMETHODPR(Scene, AddRequiredPackageFile, (PackageFile*), void), asCALL_THISCALL);
-    // void Node::AddTag(const String& tag) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void AddTag(const String&in)", asMETHODPR(Scene, AddTag, (const String&), void), asCALL_THISCALL);
-    // void Node::AddTags(const String& tags, char separator=';') | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void AddTags(const String&in, int8 = ';')", asMETHODPR(Scene, AddTags, (const String&, char), void), asCALL_THISCALL);
-    // void Node::AddTags(const StringVector& tags) | File: ../Scene/Node.h
-    // Error: type "const StringVector&" can not automatically bind
-    // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Scene", "void AllocateNetworkState()", asMETHODPR(Scene, AllocateNetworkState, (), void), asCALL_THISCALL);
-    // void Node::ApplyAttributes() override | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void ApplyAttributes()", asMETHODPR(Scene, ApplyAttributes, (), void), asCALL_THISCALL);
-    // void Scene::BeginThreadedUpdate() | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "void BeginThreadedUpdate()", asMETHODPR(Scene, BeginThreadedUpdate, (), void), asCALL_THISCALL);
-    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
-    // Not registered because template
-    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
-    // Not registered because template
-    // void Scene::CleanupConnection(Connection* connection) | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "void CleanupConnection(Connection@+)", asMETHODPR(Scene, CleanupConnection, (Connection*), void), asCALL_THISCALL);
-    // void Scene::Clear(bool clearReplicated=true, bool clearLocal=true) | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "void Clear(bool = true, bool = true)", asMETHODPR(Scene, Clear, (bool, bool), void), asCALL_THISCALL);
-    // void Scene::ClearRequiredPackageFiles() | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "void ClearRequiredPackageFiles()", asMETHODPR(Scene, ClearRequiredPackageFiles, (), void), asCALL_THISCALL);
-    // Node* Node::Clone(CreateMode mode=REPLICATED) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Node@+ Clone(CreateMode = REPLICATED)", asMETHODPR(Scene, Clone, (CreateMode), Node*), asCALL_THISCALL);
-    // Component* Node::CloneComponent(Component* component, unsigned id=0) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Component@+ CloneComponent(Component@+, uint = 0)", asMETHODPR(Scene, CloneComponent, (Component*, unsigned), Component*), asCALL_THISCALL);
-    // Component* Node::CloneComponent(Component* component, CreateMode mode, unsigned id=0) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Component@+ CloneComponent(Component@+, CreateMode, uint = 0)", asMETHODPR(Scene, CloneComponent, (Component*, CreateMode, unsigned), Component*), asCALL_THISCALL);
-    // void Scene::ComponentAdded(Component* component) | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "void ComponentAdded(Component@+)", asMETHODPR(Scene, ComponentAdded, (Component*), void), asCALL_THISCALL);
-    // void Scene::ComponentRemoved(Component* component) | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "void ComponentRemoved(Component@+)", asMETHODPR(Scene, ComponentRemoved, (Component*), void), asCALL_THISCALL);
-    // Node* Node::CreateChild(const String& name=String::EMPTY, CreateMode mode=REPLICATED, unsigned id=0, bool temporary=false) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Node@+ CreateChild(const String&in = String::EMPTY, CreateMode = REPLICATED, uint = 0, bool = false)", asMETHODPR(Scene, CreateChild, (const String&, CreateMode, unsigned, bool), Node*), asCALL_THISCALL);
-    // Node* Node::CreateChild(unsigned id, CreateMode mode, bool temporary=false) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Node@+ CreateChild(uint, CreateMode, bool = false)", asMETHODPR(Scene, CreateChild, (unsigned, CreateMode, bool), Node*), asCALL_THISCALL);
-    // Component* Node::CreateComponent(StringHash type, CreateMode mode=REPLICATED, unsigned id=0) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Component@+ CreateComponent(StringHash, CreateMode = REPLICATED, uint = 0)", asMETHODPR(Scene, CreateComponent, (StringHash, CreateMode, unsigned), Component*), asCALL_THISCALL);
-    // template<class T> T*  Node::CreateComponent(CreateMode mode=REPLICATED, unsigned id=0) | File: ../Scene/Node.h
-    // Not registered because template
-    // Node* Node::CreateTemporaryChild(const String& name=String::EMPTY, CreateMode mode=REPLICATED, unsigned id=0) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Node@+ CreateTemporaryChild(const String&in = String::EMPTY, CreateMode = REPLICATED, uint = 0)", asMETHODPR(Scene, CreateTemporaryChild, (const String&, CreateMode, unsigned), Node*), asCALL_THISCALL);
-    // void Scene::DelayedMarkedDirty(Component* component) | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "void DelayedMarkedDirty(Component@+)", asMETHODPR(Scene, DelayedMarkedDirty, (Component*), void), asCALL_THISCALL);
-    // void Scene::EndThreadedUpdate() | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "void EndThreadedUpdate()", asMETHODPR(Scene, EndThreadedUpdate, (), void), asCALL_THISCALL);
-    // bool Animatable::GetAnimationEnabled() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Scene", "bool GetAnimationEnabled() const", asMETHODPR(Scene, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "bool get_animationEnabled() const", asMETHODPR(Scene, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
-    // int Scene::GetAsyncLoadingMs() const | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "int GetAsyncLoadingMs() const", asMETHODPR(Scene, GetAsyncLoadingMs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "int get_asyncLoadingMs() const", asMETHODPR(Scene, GetAsyncLoadingMs, () const, int), asCALL_THISCALL);
-    // LoadMode Scene::GetAsyncLoadMode() const | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "LoadMode GetAsyncLoadMode() const", asMETHODPR(Scene, GetAsyncLoadMode, () const, LoadMode), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "LoadMode get_asyncLoadMode() const", asMETHODPR(Scene, GetAsyncLoadMode, () const, LoadMode), asCALL_THISCALL);
-    // float Scene::GetAsyncProgress() const | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "float GetAsyncProgress() const", asMETHODPR(Scene, GetAsyncProgress, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "float get_asyncProgress() const", asMETHODPR(Scene, GetAsyncProgress, () const, float), asCALL_THISCALL);
-    // Variant Serializable::GetAttribute(unsigned index) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Scene", "Variant GetAttribute(uint) const", asMETHODPR(Scene, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "Variant get_attributes(uint) const", asMETHODPR(Scene, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
-    // Variant Serializable::GetAttribute(const String& name) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Scene", "Variant GetAttribute(const String&in) const", asMETHODPR(Scene, GetAttribute, (const String&) const, Variant), asCALL_THISCALL);
-    // ValueAnimation* Animatable::GetAttributeAnimation(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Scene", "ValueAnimation@+ GetAttributeAnimation(const String&in) const", asMETHODPR(Scene, GetAttributeAnimation, (const String&) const, ValueAnimation*), asCALL_THISCALL);
-    // float Animatable::GetAttributeAnimationSpeed(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Scene", "float GetAttributeAnimationSpeed(const String&in) const", asMETHODPR(Scene, GetAttributeAnimationSpeed, (const String&) const, float), asCALL_THISCALL);
-    // float Animatable::GetAttributeAnimationTime(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Scene", "float GetAttributeAnimationTime(const String&in) const", asMETHODPR(Scene, GetAttributeAnimationTime, (const String&) const, float), asCALL_THISCALL);
-    // WrapMode Animatable::GetAttributeAnimationWrapMode(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Scene", "WrapMode GetAttributeAnimationWrapMode(const String&in) const", asMETHODPR(Scene, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), asCALL_THISCALL);
-    // Variant Serializable::GetAttributeDefault(unsigned index) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Scene", "Variant GetAttributeDefault(uint) const", asMETHODPR(Scene, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "Variant get_attributeDefaults(uint) const", asMETHODPR(Scene, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
-    // Variant Serializable::GetAttributeDefault(const String& name) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Scene", "Variant GetAttributeDefault(const String&in) const", asMETHODPR(Scene, GetAttributeDefault, (const String&) const, Variant), asCALL_THISCALL);
-    // virtual const Vector<AttributeInfo>* Serializable::GetAttributes() const | File: ../Scene/Serializable.h
-    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
-    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Scene", "bool GetBlockEvents() const", asMETHODPR(Scene, GetBlockEvents, () const, bool), asCALL_THISCALL);
-    // const String& Object::GetCategory() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Scene", "const String& GetCategory() const", asMETHODPR(Scene, GetCategory, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "const String& get_category() const", asMETHODPR(Scene, GetCategory, () const, const String&), asCALL_THISCALL);
-    // unsigned Scene::GetChecksum() const | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "uint GetChecksum() const", asMETHODPR(Scene, GetChecksum, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "uint get_checksum() const", asMETHODPR(Scene, GetChecksum, () const, unsigned), asCALL_THISCALL);
-    // Node* Node::GetChild(unsigned index) const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Node@+ GetChild(uint) const", asMETHODPR(Scene, GetChild, (unsigned) const, Node*), asCALL_THISCALL);
-    // Node* Node::GetChild(const String& name, bool recursive=false) const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Node@+ GetChild(const String&in, bool = false) const", asMETHODPR(Scene, GetChild, (const String&, bool) const, Node*), asCALL_THISCALL);
-    // Node* Node::GetChild(const char* name, bool recursive=false) const | File: ../Scene/Node.h
-    // Error: type "const char*" can not automatically bind
-    // Node* Node::GetChild(StringHash nameHash, bool recursive=false) const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Node@+ GetChild(StringHash, bool = false) const", asMETHODPR(Scene, GetChild, (StringHash, bool) const, Node*), asCALL_THISCALL);
-    // const Vector<SharedPtr<Node>>& Node::GetChildren() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Array<Node@>@ GetChildren() const", asFUNCTION(Scene_GetChildren_void), asCALL_CDECL_OBJFIRST);
-    // void Node::GetChildren(PODVector<Node*>& dest, bool recursive=false) const | File: ../Scene/Node.h
-    // Error: type "PODVector<Node*>&" can not automatically bind
-    // PODVector<Node*> Node::GetChildren(bool recursive) const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Array<Node@>@ GetChildren(bool) const", asFUNCTION(Scene_GetChildren_bool), asCALL_CDECL_OBJFIRST);
-    // void Node::GetChildrenWithComponent(PODVector<Node*>& dest, StringHash type, bool recursive=false) const | File: ../Scene/Node.h
-    // Error: type "PODVector<Node*>&" can not automatically bind
-    // PODVector<Node*> Node::GetChildrenWithComponent(StringHash type, bool recursive=false) const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Array<Node@>@ GetChildrenWithComponent(StringHash, bool = false) const", asFUNCTION(Scene_GetChildrenWithComponent_StringHash_bool), asCALL_CDECL_OBJFIRST);
-    // template<class T> void Node::GetChildrenWithComponent(PODVector<Node*>& dest, bool recursive=false) const | File: ../Scene/Node.h
-    // Not registered because template
-    // void Node::GetChildrenWithTag(PODVector<Node*>& dest, const String& tag, bool recursive=false) const | File: ../Scene/Node.h
-    // Error: type "PODVector<Node*>&" can not automatically bind
-    // PODVector<Node*> Node::GetChildrenWithTag(const String& tag, bool recursive=false) const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Array<Node@>@ GetChildrenWithTag(const String&in, bool = false) const", asFUNCTION(Scene_GetChildrenWithTag_String_bool), asCALL_CDECL_OBJFIRST);
-    // Component* Scene::GetComponent(unsigned id) const | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "Component@+ GetComponent(uint) const", asMETHODPR(Scene, GetComponent, (unsigned) const, Component*), asCALL_THISCALL);
-    // Component* Node::GetComponent(StringHash type, bool recursive=false) const | File: ../Scene/Scene.h
-    // Not registered because have @manualbind mark
-    // template<class T> T*  Node::GetComponent(bool recursive=false) const | File: ../Scene/Scene.h
-    // Not registered because have @manualbind mark
-    // const Vector<SharedPtr<Component>>& Node::GetComponents() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Array<Component@>@ GetComponents() const", asFUNCTION(Scene_GetComponents_void), asCALL_CDECL_OBJFIRST);
-    // void Node::GetComponents(PODVector<Component*>& dest, StringHash type, bool recursive=false) const | File: ../Scene/Node.h
-    // Error: type "PODVector<Component*>&" can not automatically bind
-    // template<class T> void Node::GetComponents(PODVector<T*>& dest, bool recursive=false) const | File: ../Scene/Node.h
-    // Not registered because template
-    // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
-    // const PODVector<Node*>& Node::GetDependencyNodes() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Array<Node@>@ GetDependencyNodes() const", asFUNCTION(Scene_GetDependencyNodes_void), asCALL_CDECL_OBJFIRST);
-    // template<class T> T*  Node::GetDerivedComponent(bool recursive=false) const | File: ../Scene/Node.h
-    // Not registered because template
-    // template<class T> void Node::GetDerivedComponents(PODVector<T*>& dest, bool recursive=false, bool clearVector=true) const | File: ../Scene/Node.h
-    // Not registered because template
-    // Vector3 Node::GetDirection() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Vector3 GetDirection() const", asMETHODPR(Scene, GetDirection, () const, Vector3), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "Vector3 get_direction() const", asMETHODPR(Scene, GetDirection, () const, Vector3), asCALL_THISCALL);
-    // float Scene::GetElapsedTime() const | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "float GetElapsedTime() const", asMETHODPR(Scene, GetElapsedTime, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "float get_elapsedTime() const", asMETHODPR(Scene, GetElapsedTime, () const, float), asCALL_THISCALL);
-    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Scene", "VariantMap& GetEventDataMap() const", asMETHODPR(Scene, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
-    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // Object* Object::GetEventSender() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Scene", "Object@+ GetEventSender() const", asMETHODPR(Scene, GetEventSender, () const, Object*), asCALL_THISCALL);
-    // const String& Scene::GetFileName() const | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "const String& GetFileName() const", asMETHODPR(Scene, GetFileName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "const String& get_fileName() const", asMETHODPR(Scene, GetFileName, () const, const String&), asCALL_THISCALL);
-    // unsigned Scene::GetFreeComponentID(CreateMode mode) | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "uint GetFreeComponentID(CreateMode)", asMETHODPR(Scene, GetFreeComponentID, (CreateMode), unsigned), asCALL_THISCALL);
-    // unsigned Scene::GetFreeNodeID(CreateMode mode) | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "uint GetFreeNodeID(CreateMode)", asMETHODPR(Scene, GetFreeNodeID, (CreateMode), unsigned), asCALL_THISCALL);
-    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Scene", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(Scene, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "const Variant& get_globalVar(StringHash) const", asMETHODPR(Scene, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Scene", "const VariantMap& GetGlobalVars() const", asMETHODPR(Scene, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "const VariantMap& get_globalVars() const", asMETHODPR(Scene, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    // unsigned Node::GetID() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "uint GetID() const", asMETHODPR(Scene, GetID, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "uint get_id() const", asMETHODPR(Scene, GetID, () const, unsigned), asCALL_THISCALL);
-    // bool Serializable::GetInterceptNetworkUpdate(const String& attributeName) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Scene", "bool GetInterceptNetworkUpdate(const String&in) const", asMETHODPR(Scene, GetInterceptNetworkUpdate, (const String&) const, bool), asCALL_THISCALL);
-    // const Vector<WeakPtr<Component>> Node::GetListeners() const | File: ../Scene/Node.h
-    // Error: type "const Vector<WeakPtr<Component>>" can not automatically bind
-    // const String& Node::GetName() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "const String& GetName() const", asMETHODPR(Scene, GetName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "const String& get_name() const", asMETHODPR(Scene, GetName, () const, const String&), asCALL_THISCALL);
-    // StringHash Node::GetNameHash() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "StringHash GetNameHash() const", asMETHODPR(Scene, GetNameHash, () const, StringHash), asCALL_THISCALL);
-    // const PODVector<unsigned char>& Node::GetNetParentAttr() const | File: ../Scene/Node.h
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
-    // const Vector3& Node::GetNetPositionAttr() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "const Vector3& GetNetPositionAttr() const", asMETHODPR(Scene, GetNetPositionAttr, () const, const Vector3&), asCALL_THISCALL);
-    // const PODVector<unsigned char>& Node::GetNetRotationAttr() const | File: ../Scene/Node.h
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
-    // virtual const Vector<AttributeInfo>* Serializable::GetNetworkAttributes() const | File: ../Scene/Serializable.h
-    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
-    // NetworkState* Serializable::GetNetworkState() const | File: ../Scene/Serializable.h
-    // Error: type "NetworkState*" can not automatically bind
-    // Node* Scene::GetNode(unsigned id) const | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "Node@+ GetNode(uint) const", asMETHODPR(Scene, GetNode, (unsigned) const, Node*), asCALL_THISCALL);
-    // bool Scene::GetNodesWithTag(PODVector<Node*>& dest, const String& tag) const | File: ../Scene/Scene.h
-    // Error: type "PODVector<Node*>&" can not automatically bind
-    // unsigned Serializable::GetNumAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Scene", "uint GetNumAttributes() const", asMETHODPR(Scene, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "uint get_numAttributes() const", asMETHODPR(Scene, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
-    // unsigned Node::GetNumChildren(bool recursive=false) const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "uint GetNumChildren(bool = false) const", asMETHODPR(Scene, GetNumChildren, (bool) const, unsigned), asCALL_THISCALL);
-    // unsigned Node::GetNumComponents() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "uint GetNumComponents() const", asMETHODPR(Scene, GetNumComponents, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "uint get_numComponents() const", asMETHODPR(Scene, GetNumComponents, () const, unsigned), asCALL_THISCALL);
-    // unsigned Serializable::GetNumNetworkAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Scene", "uint GetNumNetworkAttributes() const", asMETHODPR(Scene, GetNumNetworkAttributes, () const, unsigned), asCALL_THISCALL);
-    // unsigned Node::GetNumNetworkComponents() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "uint GetNumNetworkComponents() const", asMETHODPR(Scene, GetNumNetworkComponents, () const, unsigned), asCALL_THISCALL);
-    // unsigned Node::GetNumPersistentChildren() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "uint GetNumPersistentChildren() const", asMETHODPR(Scene, GetNumPersistentChildren, () const, unsigned), asCALL_THISCALL);
-    // unsigned Node::GetNumPersistentComponents() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "uint GetNumPersistentComponents() const", asMETHODPR(Scene, GetNumPersistentComponents, () const, unsigned), asCALL_THISCALL);
-    // ObjectAnimation* Animatable::GetObjectAnimation() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Scene", "ObjectAnimation@+ GetObjectAnimation() const", asMETHODPR(Scene, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "ObjectAnimation@+ get_objectAnimation() const", asMETHODPR(Scene, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
-    // ResourceRef Animatable::GetObjectAnimationAttr() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Scene", "ResourceRef GetObjectAnimationAttr() const", asMETHODPR(Scene, GetObjectAnimationAttr, () const, ResourceRef), asCALL_THISCALL);
-    // Component* Node::GetOrCreateComponent(StringHash type, CreateMode mode=REPLICATED, unsigned id=0) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Component@+ GetOrCreateComponent(StringHash, CreateMode = REPLICATED, uint = 0)", asMETHODPR(Scene, GetOrCreateComponent, (StringHash, CreateMode, unsigned), Component*), asCALL_THISCALL);
-    // template<class T> T*  Node::GetOrCreateComponent(CreateMode mode=REPLICATED, unsigned id=0) | File: ../Scene/Node.h
-    // Not registered because template
-    // Connection* Node::GetOwner() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Connection@+ GetOwner() const", asMETHODPR(Scene, GetOwner, () const, Connection*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "Connection@+ get_owner() const", asMETHODPR(Scene, GetOwner, () const, Connection*), asCALL_THISCALL);
-    // Node* Node::GetParent() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Node@+ GetParent() const", asMETHODPR(Scene, GetParent, () const, Node*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "Node@+ get_parent() const", asMETHODPR(Scene, GetParent, () const, Node*), asCALL_THISCALL);
-    // Component* Node::GetParentComponent(StringHash type, bool fullTraversal=false) const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Component@+ GetParentComponent(StringHash, bool = false) const", asMETHODPR(Scene, GetParentComponent, (StringHash, bool) const, Component*), asCALL_THISCALL);
-    // template<class T> T*  Node::GetParentComponent(bool fullTraversal=false) const | File: ../Scene/Node.h
-    // Not registered because template
-    // template<class T> T*  Node::GetParentDerivedComponent(bool fullTraversal=false) const | File: ../Scene/Node.h
-    // Not registered because template
-    // const Vector3& Node::GetPosition() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "const Vector3& GetPosition() const", asMETHODPR(Scene, GetPosition, () const, const Vector3&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "const Vector3& get_position() const", asMETHODPR(Scene, GetPosition, () const, const Vector3&), asCALL_THISCALL);
-    // Vector2 Node::GetPosition2D() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Vector2 GetPosition2D() const", asMETHODPR(Scene, GetPosition2D, () const, Vector2), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "Vector2 get_position2D() const", asMETHODPR(Scene, GetPosition2D, () const, Vector2), asCALL_THISCALL);
-    // const Vector<SharedPtr<PackageFile>>& Scene::GetRequiredPackageFiles() const | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "Array<PackageFile@>@ GetRequiredPackageFiles() const", asFUNCTION(Scene_GetRequiredPackageFiles_void), asCALL_CDECL_OBJFIRST);
-    engine->RegisterObjectMethod("Scene", "Array<PackageFile@>@ get_requiredPackageFiles() const", asFUNCTION(Scene_GetRequiredPackageFiles_void), asCALL_CDECL_OBJFIRST);
-    // Vector3 Node::GetRight() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Vector3 GetRight() const", asMETHODPR(Scene, GetRight, () const, Vector3), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "Vector3 get_right() const", asMETHODPR(Scene, GetRight, () const, Vector3), asCALL_THISCALL);
-    // const Quaternion& Node::GetRotation() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "const Quaternion& GetRotation() const", asMETHODPR(Scene, GetRotation, () const, const Quaternion&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "const Quaternion& get_rotation() const", asMETHODPR(Scene, GetRotation, () const, const Quaternion&), asCALL_THISCALL);
-    // float Node::GetRotation2D() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "float GetRotation2D() const", asMETHODPR(Scene, GetRotation2D, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "float get_rotation2D() const", asMETHODPR(Scene, GetRotation2D, () const, float), asCALL_THISCALL);
-    // const Vector3& Node::GetScale() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "const Vector3& GetScale() const", asMETHODPR(Scene, GetScale, () const, const Vector3&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "const Vector3& get_scale() const", asMETHODPR(Scene, GetScale, () const, const Vector3&), asCALL_THISCALL);
-    // Vector2 Node::GetScale2D() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Vector2 GetScale2D() const", asMETHODPR(Scene, GetScale2D, () const, Vector2), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "Vector2 get_scale2D() const", asMETHODPR(Scene, GetScale2D, () const, Vector2), asCALL_THISCALL);
-    // Scene* Node::GetScene() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Scene@+ GetScene() const", asMETHODPR(Scene, GetScene, () const, Scene*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "Scene@+ get_scene() const", asMETHODPR(Scene, GetScene, () const, Scene*), asCALL_THISCALL);
-    // Vector3 Node::GetSignedWorldScale() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Vector3 GetSignedWorldScale() const", asMETHODPR(Scene, GetSignedWorldScale, () const, Vector3), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "Vector3 get_signedWorldScale() const", asMETHODPR(Scene, GetSignedWorldScale, () const, Vector3), asCALL_THISCALL);
-    // float Scene::GetSmoothingConstant() const | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "float GetSmoothingConstant() const", asMETHODPR(Scene, GetSmoothingConstant, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "float get_smoothingConstant() const", asMETHODPR(Scene, GetSmoothingConstant, () const, float), asCALL_THISCALL);
-    // float Scene::GetSnapThreshold() const | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "float GetSnapThreshold() const", asMETHODPR(Scene, GetSnapThreshold, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "float get_snapThreshold() const", asMETHODPR(Scene, GetSnapThreshold, () const, float), asCALL_THISCALL);
-    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Scene", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Scene, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
-    // Not registered because template
-    // const StringVector& Node::GetTags() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Array<String>@ GetTags() const", asFUNCTION(Scene_GetTags_void), asCALL_CDECL_OBJFIRST);
-    engine->RegisterObjectMethod("Scene", "Array<String>@ get_tags() const", asFUNCTION(Scene_GetTags_void), asCALL_CDECL_OBJFIRST);
-    // float Scene::GetTimeScale() const | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "float GetTimeScale() const", asMETHODPR(Scene, GetTimeScale, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "float get_timeScale() const", asMETHODPR(Scene, GetTimeScale, () const, float), asCALL_THISCALL);
-    // Matrix3x4 Node::GetTransform() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Matrix3x4 GetTransform() const", asMETHODPR(Scene, GetTransform, () const, Matrix3x4), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "Matrix3x4 get_transform() const", asMETHODPR(Scene, GetTransform, () const, Matrix3x4), asCALL_THISCALL);
-    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Scene", "StringHash GetType() const", asMETHODPR(Scene, GetType, () const, StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "StringHash get_type() const", asMETHODPR(Scene, GetType, () const, StringHash), asCALL_THISCALL);
-    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Scene", "const String& GetTypeName() const", asMETHODPR(Scene, GetTypeName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "const String& get_typeName() const", asMETHODPR(Scene, GetTypeName, () const, const String&), asCALL_THISCALL);
-    // Vector3 Node::GetUp() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Vector3 GetUp() const", asMETHODPR(Scene, GetUp, () const, Vector3), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "Vector3 get_up() const", asMETHODPR(Scene, GetUp, () const, Vector3), asCALL_THISCALL);
-    // const Variant& Node::GetVar(StringHash key) const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "const Variant& GetVar(StringHash) const", asMETHODPR(Scene, GetVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    // const String& Scene::GetVarName(StringHash hash) const | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "const String& GetVarName(StringHash) const", asMETHODPR(Scene, GetVarName, (StringHash) const, const String&), asCALL_THISCALL);
-    // String Scene::GetVarNamesAttr() const | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "String GetVarNamesAttr() const", asMETHODPR(Scene, GetVarNamesAttr, () const, String), asCALL_THISCALL);
-    // const VariantMap& Node::GetVars() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "const VariantMap& GetVars() const", asMETHODPR(Scene, GetVars, () const, const VariantMap&), asCALL_THISCALL);
-    // Vector3 Node::GetWorldDirection() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Vector3 GetWorldDirection() const", asMETHODPR(Scene, GetWorldDirection, () const, Vector3), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "Vector3 get_worldDirection() const", asMETHODPR(Scene, GetWorldDirection, () const, Vector3), asCALL_THISCALL);
-    // Vector3 Node::GetWorldPosition() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Vector3 GetWorldPosition() const", asMETHODPR(Scene, GetWorldPosition, () const, Vector3), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "Vector3 get_worldPosition() const", asMETHODPR(Scene, GetWorldPosition, () const, Vector3), asCALL_THISCALL);
-    // Vector2 Node::GetWorldPosition2D() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Vector2 GetWorldPosition2D() const", asMETHODPR(Scene, GetWorldPosition2D, () const, Vector2), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "Vector2 get_worldPosition2D() const", asMETHODPR(Scene, GetWorldPosition2D, () const, Vector2), asCALL_THISCALL);
-    // Vector3 Node::GetWorldRight() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Vector3 GetWorldRight() const", asMETHODPR(Scene, GetWorldRight, () const, Vector3), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "Vector3 get_worldRight() const", asMETHODPR(Scene, GetWorldRight, () const, Vector3), asCALL_THISCALL);
-    // Quaternion Node::GetWorldRotation() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Quaternion GetWorldRotation() const", asMETHODPR(Scene, GetWorldRotation, () const, Quaternion), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "Quaternion get_worldRotation() const", asMETHODPR(Scene, GetWorldRotation, () const, Quaternion), asCALL_THISCALL);
-    // float Node::GetWorldRotation2D() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "float GetWorldRotation2D() const", asMETHODPR(Scene, GetWorldRotation2D, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "float get_worldRotation2D() const", asMETHODPR(Scene, GetWorldRotation2D, () const, float), asCALL_THISCALL);
-    // Vector3 Node::GetWorldScale() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Vector3 GetWorldScale() const", asMETHODPR(Scene, GetWorldScale, () const, Vector3), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "Vector3 get_worldScale() const", asMETHODPR(Scene, GetWorldScale, () const, Vector3), asCALL_THISCALL);
-    // Vector2 Node::GetWorldScale2D() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Vector2 GetWorldScale2D() const", asMETHODPR(Scene, GetWorldScale2D, () const, Vector2), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "Vector2 get_worldScale2D() const", asMETHODPR(Scene, GetWorldScale2D, () const, Vector2), asCALL_THISCALL);
-    // const Matrix3x4& Node::GetWorldTransform() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "const Matrix3x4& GetWorldTransform() const", asMETHODPR(Scene, GetWorldTransform, () const, const Matrix3x4&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "const Matrix3x4& get_worldTransform() const", asMETHODPR(Scene, GetWorldTransform, () const, const Matrix3x4&), asCALL_THISCALL);
-    // Vector3 Node::GetWorldUp() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Vector3 GetWorldUp() const", asMETHODPR(Scene, GetWorldUp, () const, Vector3), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "Vector3 get_worldUp() const", asMETHODPR(Scene, GetWorldUp, () const, Vector3), asCALL_THISCALL);
-    // bool Node::HasComponent(StringHash type) const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "bool HasComponent(StringHash) const", asMETHODPR(Scene, HasComponent, (StringHash) const, bool), asCALL_THISCALL);
-    // template<class T> bool Node::HasComponent() const | File: ../Scene/Node.h
-    // Not registered because template
-    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Scene", "bool HasEventHandlers() const", asMETHODPR(Scene, HasEventHandlers, () const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Scene", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(Scene, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Scene", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(Scene, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
-    // bool Node::HasTag(const String& tag) const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "bool HasTag(const String&in) const", asMETHODPR(Scene, HasTag, (const String&) const, bool), asCALL_THISCALL);
-    // Node* Scene::Instantiate(Deserializer& source, const Vector3& position, const Quaternion& rotation, CreateMode mode=REPLICATED) | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "Node@+ Instantiate(Deserializer&, const Vector3&in, const Quaternion&in, CreateMode = REPLICATED)", asMETHODPR(Scene, Instantiate, (Deserializer&, const Vector3&, const Quaternion&, CreateMode), Node*), asCALL_THISCALL);
-    // Node* Scene::InstantiateJSON(const JSONValue& source, const Vector3& position, const Quaternion& rotation, CreateMode mode=REPLICATED) | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "Node@+ InstantiateJSON(const JSONValue&in, const Vector3&in, const Quaternion&in, CreateMode = REPLICATED)", asMETHODPR(Scene, InstantiateJSON, (const JSONValue&, const Vector3&, const Quaternion&, CreateMode), Node*), asCALL_THISCALL);
-    // Node* Scene::InstantiateJSON(Deserializer& source, const Vector3& position, const Quaternion& rotation, CreateMode mode=REPLICATED) | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "Node@+ InstantiateJSON(Deserializer&, const Vector3&in, const Quaternion&in, CreateMode = REPLICATED)", asMETHODPR(Scene, InstantiateJSON, (Deserializer&, const Vector3&, const Quaternion&, CreateMode), Node*), asCALL_THISCALL);
-    // Node* Scene::InstantiateXML(const XMLElement& source, const Vector3& position, const Quaternion& rotation, CreateMode mode=REPLICATED) | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "Node@+ InstantiateXML(const XMLElement&in, const Vector3&in, const Quaternion&in, CreateMode = REPLICATED)", asMETHODPR(Scene, InstantiateXML, (const XMLElement&, const Vector3&, const Quaternion&, CreateMode), Node*), asCALL_THISCALL);
-    // Node* Scene::InstantiateXML(Deserializer& source, const Vector3& position, const Quaternion& rotation, CreateMode mode=REPLICATED) | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "Node@+ InstantiateXML(Deserializer&, const Vector3&in, const Quaternion&in, CreateMode = REPLICATED)", asMETHODPR(Scene, InstantiateXML, (Deserializer&, const Vector3&, const Quaternion&, CreateMode), Node*), asCALL_THISCALL);
-    // bool Scene::IsAsyncLoading() const | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "bool IsAsyncLoading() const", asMETHODPR(Scene, IsAsyncLoading, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "bool get_asyncLoading() const", asMETHODPR(Scene, IsAsyncLoading, () const, bool), asCALL_THISCALL);
-    // bool Node::IsChildOf(Node* node) const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "bool IsChildOf(Node@+) const", asMETHODPR(Scene, IsChildOf, (Node*) const, bool), asCALL_THISCALL);
-    // bool Node::IsDirty() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "bool IsDirty() const", asMETHODPR(Scene, IsDirty, () const, bool), asCALL_THISCALL);
-    // bool Node::IsEnabled() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "bool IsEnabled() const", asMETHODPR(Scene, IsEnabled, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "bool get_enabled() const", asMETHODPR(Scene, IsEnabled, () const, bool), asCALL_THISCALL);
-    // bool Node::IsEnabledSelf() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "bool IsEnabledSelf() const", asMETHODPR(Scene, IsEnabledSelf, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "bool get_enabledSelf() const", asMETHODPR(Scene, IsEnabledSelf, () const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Scene", "bool IsInstanceOf(StringHash) const", asMETHODPR(Scene, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
-    // Not registered because template
-    // bool Node::IsReplicated() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "bool IsReplicated() const", asMETHODPR(Scene, IsReplicated, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "bool get_replicated() const", asMETHODPR(Scene, IsReplicated, () const, bool), asCALL_THISCALL);
-    // static bool Scene::IsReplicatedID(unsigned id) | File: ../Scene/Scene.h
-    engine->SetDefaultNamespace("Scene");
-    engine->RegisterGlobalFunction("bool IsReplicatedID(uint)", asFUNCTIONPR(Scene::IsReplicatedID, (unsigned), bool), asCALL_CDECL);
-    engine->SetDefaultNamespace("");
-    // bool Serializable::IsTemporary() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Scene", "bool IsTemporary() const", asMETHODPR(Scene, IsTemporary, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "bool get_temporary() const", asMETHODPR(Scene, IsTemporary, () const, bool), asCALL_THISCALL);
-    // bool Scene::IsThreadedUpdate() const | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "bool IsThreadedUpdate() const", asMETHODPR(Scene, IsThreadedUpdate, () const, bool), asCALL_THISCALL);
-    // bool Scene::IsUpdateEnabled() const | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "bool IsUpdateEnabled() const", asMETHODPR(Scene, IsUpdateEnabled, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "bool get_updateEnabled() const", asMETHODPR(Scene, IsUpdateEnabled, () const, bool), asCALL_THISCALL);
-    // bool Scene::Load(Deserializer& source) override | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "bool Load(Deserializer&)", asMETHODPR(Scene, Load, (Deserializer&), bool), asCALL_THISCALL);
-    // bool Scene::LoadAsync(File* file, LoadMode mode=LOAD_SCENE_AND_RESOURCES) | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "bool LoadAsync(File@+, LoadMode = LOAD_SCENE_AND_RESOURCES)", asMETHODPR(Scene, LoadAsync, (File*, LoadMode), bool), asCALL_THISCALL);
-    // bool Scene::LoadAsyncJSON(File* file, LoadMode mode=LOAD_SCENE_AND_RESOURCES) | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "bool LoadAsyncJSON(File@+, LoadMode = LOAD_SCENE_AND_RESOURCES)", asMETHODPR(Scene, LoadAsyncJSON, (File*, LoadMode), bool), asCALL_THISCALL);
-    // bool Scene::LoadAsyncXML(File* file, LoadMode mode=LOAD_SCENE_AND_RESOURCES) | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "bool LoadAsyncXML(File@+, LoadMode = LOAD_SCENE_AND_RESOURCES)", asMETHODPR(Scene, LoadAsyncXML, (File*, LoadMode), bool), asCALL_THISCALL);
-    // bool Scene::LoadJSON(const JSONValue& source) override | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "bool LoadJSON(const JSONValue&in)", asMETHODPR(Scene, LoadJSON, (const JSONValue&), bool), asCALL_THISCALL);
-    // bool Scene::LoadJSON(Deserializer& source) | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "bool LoadJSON(Deserializer&)", asMETHODPR(Scene, LoadJSON, (Deserializer&), bool), asCALL_THISCALL);
-    // bool Scene::LoadXML(const XMLElement& source) override | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "bool LoadXML(const XMLElement&in)", asMETHODPR(Scene, LoadXML, (const XMLElement&), bool), asCALL_THISCALL);
-    // bool Scene::LoadXML(Deserializer& source) | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "bool LoadXML(Deserializer&)", asMETHODPR(Scene, LoadXML, (Deserializer&), bool), asCALL_THISCALL);
-    // Vector3 Node::LocalToWorld(const Vector3& position) const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Vector3 LocalToWorld(const Vector3&in) const", asMETHODPR(Scene, LocalToWorld, (const Vector3&) const, Vector3), asCALL_THISCALL);
-    // Vector3 Node::LocalToWorld(const Vector4& vector) const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Vector3 LocalToWorld(const Vector4&in) const", asMETHODPR(Scene, LocalToWorld, (const Vector4&) const, Vector3), asCALL_THISCALL);
-    // Vector2 Node::LocalToWorld2D(const Vector2& vector) const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Vector2 LocalToWorld2D(const Vector2&in) const", asMETHODPR(Scene, LocalToWorld2D, (const Vector2&) const, Vector2), asCALL_THISCALL);
-    // bool Node::LookAt(const Vector3& target, const Vector3& up=Vector3::UP, TransformSpace space=TS_WORLD) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "bool LookAt(const Vector3&in, const Vector3&in = Vector3::UP, TransformSpace = TS_WORLD)", asMETHODPR(Scene, LookAt, (const Vector3&, const Vector3&, TransformSpace), bool), asCALL_THISCALL);
-    // void Node::MarkDirty() | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void MarkDirty()", asMETHODPR(Scene, MarkDirty, (), void), asCALL_THISCALL);
-    // void Scene::MarkNetworkUpdate() override | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "void MarkNetworkUpdate()", asMETHODPR(Scene, MarkNetworkUpdate, (), void), asCALL_THISCALL);
-    // void Scene::MarkNetworkUpdate(Node* node) | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "void MarkNetworkUpdate(Node@+)", asMETHODPR(Scene, MarkNetworkUpdate, (Node*), void), asCALL_THISCALL);
-    // void Scene::MarkNetworkUpdate(Component* component) | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "void MarkNetworkUpdate(Component@+)", asMETHODPR(Scene, MarkNetworkUpdate, (Component*), void), asCALL_THISCALL);
-    // void Scene::MarkReplicationDirty(Node* node) | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "void MarkReplicationDirty(Node@+)", asMETHODPR(Scene, MarkReplicationDirty, (Node*), void), asCALL_THISCALL);
-    // void Scene::NodeAdded(Node* node) | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "void NodeAdded(Node@+)", asMETHODPR(Scene, NodeAdded, (Node*), void), asCALL_THISCALL);
-    // void Scene::NodeRemoved(Node* node) | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "void NodeRemoved(Node@+)", asMETHODPR(Scene, NodeRemoved, (Node*), void), asCALL_THISCALL);
-    // void Scene::NodeTagAdded(Node* node, const String& tag) | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "void NodeTagAdded(Node@+, const String&in)", asMETHODPR(Scene, NodeTagAdded, (Node*, const String&), void), asCALL_THISCALL);
-    // void Scene::NodeTagRemoved(Node* node, const String& tag) | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "void NodeTagRemoved(Node@+, const String&in)", asMETHODPR(Scene, NodeTagRemoved, (Node*, const String&), void), asCALL_THISCALL);
-    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Scene", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(Scene, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
-    // virtual void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Scene", "void OnGetAttribute(const AttributeInfo&in, Variant&) const", asMETHODPR(Scene, OnGetAttribute, (const AttributeInfo&, Variant&) const, void), asCALL_THISCALL);
-    // virtual void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Scene", "void OnSetAttribute(const AttributeInfo&in, const Variant&in)", asMETHODPR(Scene, OnSetAttribute, (const AttributeInfo&, const Variant&), void), asCALL_THISCALL);
-    // void Node::Pitch(float angle, TransformSpace space=TS_LOCAL) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void Pitch(float, TransformSpace = TS_LOCAL)", asMETHODPR(Scene, Pitch, (float, TransformSpace), void), asCALL_THISCALL);
-    // void Scene::PrepareNetworkUpdate() | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "void PrepareNetworkUpdate()", asMETHODPR(Scene, PrepareNetworkUpdate, (), void), asCALL_THISCALL);
-    // bool Serializable::ReadDeltaUpdate(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Scene", "bool ReadDeltaUpdate(Deserializer&)", asMETHODPR(Scene, ReadDeltaUpdate, (Deserializer&), bool), asCALL_THISCALL);
-    // bool Serializable::ReadLatestDataUpdate(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Scene", "bool ReadLatestDataUpdate(Deserializer&)", asMETHODPR(Scene, ReadLatestDataUpdate, (Deserializer&), bool), asCALL_THISCALL);
-    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
-    // Error: type "RefCount*" can not automatically bind
-    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("Scene", "int Refs() const", asMETHODPR(Scene, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "int get_refs() const", asMETHODPR(Scene, Refs, () const, int), asCALL_THISCALL);
-    // static void Scene::RegisterObject(Context* context) | File: ../Scene/Scene.h
-    // Context can be used as firs parameter of constructors only
-    // void Scene::RegisterVar(const String& name) | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "void RegisterVar(const String&in)", asMETHODPR(Scene, RegisterVar, (const String&), void), asCALL_THISCALL);
-    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("Scene", asBEHAVE_RELEASE, "void f()", asMETHODPR(Scene, ReleaseRef, (), void), asCALL_THISCALL);
-    // void Node::Remove() | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void Remove()", asMETHODPR(Scene, Remove, (), void), asCALL_THISCALL);
-    // void Node::RemoveAllChildren() | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void RemoveAllChildren()", asMETHODPR(Scene, RemoveAllChildren, (), void), asCALL_THISCALL);
-    // void Node::RemoveAllComponents() | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void RemoveAllComponents()", asMETHODPR(Scene, RemoveAllComponents, (), void), asCALL_THISCALL);
-    // void Node::RemoveAllTags() | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void RemoveAllTags()", asMETHODPR(Scene, RemoveAllTags, (), void), asCALL_THISCALL);
-    // void Animatable::RemoveAttributeAnimation(const String& name) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Scene", "void RemoveAttributeAnimation(const String&in)", asMETHODPR(Scene, RemoveAttributeAnimation, (const String&), void), asCALL_THISCALL);
-    // void Node::RemoveChild(Node* node) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void RemoveChild(Node@+)", asMETHODPR(Scene, RemoveChild, (Node*), void), asCALL_THISCALL);
-    // void Node::RemoveChildren(bool removeReplicated, bool removeLocal, bool recursive) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void RemoveChildren(bool, bool, bool)", asMETHODPR(Scene, RemoveChildren, (bool, bool, bool), void), asCALL_THISCALL);
-    // void Node::RemoveComponent(Component* component) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void RemoveComponent(Component@+)", asMETHODPR(Scene, RemoveComponent, (Component*), void), asCALL_THISCALL);
-    // void Node::RemoveComponent(StringHash type) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void RemoveComponent(StringHash)", asMETHODPR(Scene, RemoveComponent, (StringHash), void), asCALL_THISCALL);
-    // template<class T> void Node::RemoveComponent() | File: ../Scene/Node.h
-    // Not registered because template
-    // void Node::RemoveComponents(bool removeReplicated, bool removeLocal) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void RemoveComponents(bool, bool)", asMETHODPR(Scene, RemoveComponents, (bool, bool), void), asCALL_THISCALL);
-    // void Node::RemoveComponents(StringHash type) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void RemoveComponents(StringHash)", asMETHODPR(Scene, RemoveComponents, (StringHash), void), asCALL_THISCALL);
-    // template<class T> void Node::RemoveComponents() | File: ../Scene/Node.h
-    // Not registered because template
-    // void Serializable::RemoveInstanceDefault() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Scene", "void RemoveInstanceDefault()", asMETHODPR(Scene, RemoveInstanceDefault, (), void), asCALL_THISCALL);
-    // void Node::RemoveListener(Component* component) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void RemoveListener(Component@+)", asMETHODPR(Scene, RemoveListener, (Component*), void), asCALL_THISCALL);
-    // void Animatable::RemoveObjectAnimation() | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Scene", "void RemoveObjectAnimation()", asMETHODPR(Scene, RemoveObjectAnimation, (), void), asCALL_THISCALL);
-    // bool Node::RemoveTag(const String& tag) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "bool RemoveTag(const String&in)", asMETHODPR(Scene, RemoveTag, (const String&), bool), asCALL_THISCALL);
-    // void Node::ReorderComponent(Component* component, unsigned index) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void ReorderComponent(Component@+, uint)", asMETHODPR(Scene, ReorderComponent, (Component*, unsigned), void), asCALL_THISCALL);
-    // void Node::ResetDeepEnabled() | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void ResetDeepEnabled()", asMETHODPR(Scene, ResetDeepEnabled, (), void), asCALL_THISCALL);
-    // void Node::ResetScene() | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void ResetScene()", asMETHODPR(Scene, ResetScene, (), void), asCALL_THISCALL);
-    // void Serializable::ResetToDefault() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Scene", "void ResetToDefault()", asMETHODPR(Scene, ResetToDefault, (), void), asCALL_THISCALL);
-    // void Node::Roll(float angle, TransformSpace space=TS_LOCAL) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void Roll(float, TransformSpace = TS_LOCAL)", asMETHODPR(Scene, Roll, (float, TransformSpace), void), asCALL_THISCALL);
-    // void Node::Rotate(const Quaternion& delta, TransformSpace space=TS_LOCAL) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void Rotate(const Quaternion&in, TransformSpace = TS_LOCAL)", asMETHODPR(Scene, Rotate, (const Quaternion&, TransformSpace), void), asCALL_THISCALL);
-    // void Node::Rotate2D(float delta, TransformSpace space=TS_LOCAL) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void Rotate2D(float, TransformSpace = TS_LOCAL)", asMETHODPR(Scene, Rotate2D, (float, TransformSpace), void), asCALL_THISCALL);
-    // void Node::RotateAround(const Vector3& point, const Quaternion& delta, TransformSpace space=TS_LOCAL) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void RotateAround(const Vector3&in, const Quaternion&in, TransformSpace = TS_LOCAL)", asMETHODPR(Scene, RotateAround, (const Vector3&, const Quaternion&, TransformSpace), void), asCALL_THISCALL);
-    // void Node::RotateAround2D(const Vector2& point, float delta, TransformSpace space=TS_LOCAL) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void RotateAround2D(const Vector2&in, float, TransformSpace = TS_LOCAL)", asMETHODPR(Scene, RotateAround2D, (const Vector2&, float, TransformSpace), void), asCALL_THISCALL);
-    // bool Scene::Save(Serializer& dest) const override | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "bool Save(Serializer&) const", asMETHODPR(Scene, Save, (Serializer&) const, bool), asCALL_THISCALL);
-    // bool Node::SaveDefaultAttributes() const override | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "bool SaveDefaultAttributes() const", asMETHODPR(Scene, SaveDefaultAttributes, () const, bool), asCALL_THISCALL);
-    // bool Scene::SaveJSON(Serializer& dest, const String& indentation="\t") const | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "bool SaveJSON(Serializer&, const String&in = \"\t\") const", asMETHODPR(Scene, SaveJSON, (Serializer&, const String&) const, bool), asCALL_THISCALL);
-    // bool Node::SaveJSON(JSONValue& dest) const override | File: ../Scene/Scene.h
-    // Not registered because have @manualbind mark
-    // bool Node::SaveJSON(Serializer& dest, const String& indentation="\t") const | File: ../Scene/Scene.h
-    // Not registered because have @manualbind mark
-    // bool Scene::SaveXML(Serializer& dest, const String& indentation="\t") const | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "bool SaveXML(Serializer&, const String&in = \"\t\") const", asMETHODPR(Scene, SaveXML, (Serializer&, const String&) const, bool), asCALL_THISCALL);
-    // bool Node::SaveXML(XMLElement& dest) const override | File: ../Scene/Scene.h
-    // Not registered because have @manualbind mark
-    // bool Node::SaveXML(Serializer& dest, const String& indentation="\t") const | File: ../Scene/Scene.h
-    // Not registered because have @manualbind mark
-    // void Node::Scale(float scale) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void Scale(float)", asMETHODPR(Scene, Scale, (float), void), asCALL_THISCALL);
-    // void Node::Scale(const Vector3& scale) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void Scale(const Vector3&in)", asMETHODPR(Scene, Scale, (const Vector3&), void), asCALL_THISCALL);
-    // void Node::Scale2D(const Vector2& scale) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void Scale2D(const Vector2&in)", asMETHODPR(Scene, Scale2D, (const Vector2&), void), asCALL_THISCALL);
-    // explicit Scene::Scene(Context* context) | File: ../Scene/Scene.h
-    engine->RegisterObjectBehaviour("Scene", asBEHAVE_FACTORY, "Scene@+ f()", asFUNCTION(Scene_Scene_Context), asCALL_CDECL);
-    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Scene", "void SendEvent(StringHash)", asMETHODPR(Scene, SendEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Scene", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(Scene, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
-    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
-    // Not registered because template
-    // void Animatable::SetAnimationEnabled(bool enable) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Scene", "void SetAnimationEnabled(bool)", asMETHODPR(Scene, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "void set_animationEnabled(bool)", asMETHODPR(Scene, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
-    // void Animatable::SetAnimationTime(float time) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Scene", "void SetAnimationTime(float)", asMETHODPR(Scene, SetAnimationTime, (float), void), asCALL_THISCALL);
-    // void Scene::SetAsyncLoadingMs(int ms) | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "void SetAsyncLoadingMs(int)", asMETHODPR(Scene, SetAsyncLoadingMs, (int), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "void set_asyncLoadingMs(int)", asMETHODPR(Scene, SetAsyncLoadingMs, (int), void), asCALL_THISCALL);
-    // bool Serializable::SetAttribute(unsigned index, const Variant& value) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Scene", "bool SetAttribute(uint, const Variant&in)", asMETHODPR(Scene, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "bool set_attributes(uint, const Variant&in)", asMETHODPR(Scene, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
-    // bool Serializable::SetAttribute(const String& name, const Variant& value) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Scene", "bool SetAttribute(const String&in, const Variant&in)", asMETHODPR(Scene, SetAttribute, (const String&, const Variant&), bool), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode=WM_LOOP, float speed=1.0f) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Scene", "void SetAttributeAnimation(const String&in, ValueAnimation@+, WrapMode = WM_LOOP, float = 1.0f)", asMETHODPR(Scene, SetAttributeAnimation, (const String&, ValueAnimation*, WrapMode, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationSpeed(const String& name, float speed) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Scene", "void SetAttributeAnimationSpeed(const String&in, float)", asMETHODPR(Scene, SetAttributeAnimationSpeed, (const String&, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationTime(const String& name, float time) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Scene", "void SetAttributeAnimationTime(const String&in, float)", asMETHODPR(Scene, SetAttributeAnimationTime, (const String&, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationWrapMode(const String& name, WrapMode wrapMode) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Scene", "void SetAttributeAnimationWrapMode(const String&in, WrapMode)", asMETHODPR(Scene, SetAttributeAnimationWrapMode, (const String&, WrapMode), void), asCALL_THISCALL);
-    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Scene", "void SetBlockEvents(bool)", asMETHODPR(Scene, SetBlockEvents, (bool), void), asCALL_THISCALL);
-    // void Node::SetDeepEnabled(bool enable) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetDeepEnabled(bool)", asMETHODPR(Scene, SetDeepEnabled, (bool), void), asCALL_THISCALL);
-    // void Node::SetDirection(const Vector3& direction) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetDirection(const Vector3&in)", asMETHODPR(Scene, SetDirection, (const Vector3&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "void set_direction(const Vector3&in)", asMETHODPR(Scene, SetDirection, (const Vector3&), void), asCALL_THISCALL);
-    // void Scene::SetElapsedTime(float time) | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "void SetElapsedTime(float)", asMETHODPR(Scene, SetElapsedTime, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "void set_elapsedTime(float)", asMETHODPR(Scene, SetElapsedTime, (float), void), asCALL_THISCALL);
-    // void Node::SetEnabled(bool enable) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetEnabled(bool)", asMETHODPR(Scene, SetEnabled, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "void set_enabled(bool)", asMETHODPR(Scene, SetEnabled, (bool), void), asCALL_THISCALL);
-    // void Node::SetEnabledRecursive(bool enable) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetEnabledRecursive(bool)", asMETHODPR(Scene, SetEnabledRecursive, (bool), void), asCALL_THISCALL);
-    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Scene", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(Scene, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(Scene, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    // void Node::SetID(unsigned id) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetID(uint)", asMETHODPR(Scene, SetID, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "void set_id(uint)", asMETHODPR(Scene, SetID, (unsigned), void), asCALL_THISCALL);
-    // void Serializable::SetInstanceDefault(bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Scene", "void SetInstanceDefault(bool)", asMETHODPR(Scene, SetInstanceDefault, (bool), void), asCALL_THISCALL);
-    // void Serializable::SetInterceptNetworkUpdate(const String& attributeName, bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Scene", "void SetInterceptNetworkUpdate(const String&in, bool)", asMETHODPR(Scene, SetInterceptNetworkUpdate, (const String&, bool), void), asCALL_THISCALL);
-    // void Node::SetName(const String& name) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetName(const String&in)", asMETHODPR(Scene, SetName, (const String&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "void set_name(const String&in)", asMETHODPR(Scene, SetName, (const String&), void), asCALL_THISCALL);
-    // void Node::SetNetParentAttr(const PODVector<unsigned char>& value) | File: ../Scene/Node.h
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
-    // void Node::SetNetPositionAttr(const Vector3& value) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetNetPositionAttr(const Vector3&in)", asMETHODPR(Scene, SetNetPositionAttr, (const Vector3&), void), asCALL_THISCALL);
-    // void Node::SetNetRotationAttr(const PODVector<unsigned char>& value) | File: ../Scene/Node.h
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
-    // void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Scene", "void SetObjectAnimation(ObjectAnimation@+)", asMETHODPR(Scene, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "void set_objectAnimation(ObjectAnimation@+)", asMETHODPR(Scene, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
-    // void Animatable::SetObjectAnimationAttr(const ResourceRef& value) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Scene", "void SetObjectAnimationAttr(const ResourceRef&in)", asMETHODPR(Scene, SetObjectAnimationAttr, (const ResourceRef&), void), asCALL_THISCALL);
-    // void Node::SetOwner(Connection* owner) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetOwner(Connection@+)", asMETHODPR(Scene, SetOwner, (Connection*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "void set_owner(Connection@+)", asMETHODPR(Scene, SetOwner, (Connection*), void), asCALL_THISCALL);
-    // void Node::SetParent(Node* parent) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetParent(Node@+)", asMETHODPR(Scene, SetParent, (Node*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "void set_parent(Node@+)", asMETHODPR(Scene, SetParent, (Node*), void), asCALL_THISCALL);
-    // void Node::SetPosition(const Vector3& position) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetPosition(const Vector3&in)", asMETHODPR(Scene, SetPosition, (const Vector3&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "void set_position(const Vector3&in)", asMETHODPR(Scene, SetPosition, (const Vector3&), void), asCALL_THISCALL);
-    // void Node::SetPosition2D(const Vector2& position) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetPosition2D(const Vector2&in)", asMETHODPR(Scene, SetPosition2D, (const Vector2&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "void set_position2D(const Vector2&in)", asMETHODPR(Scene, SetPosition2D, (const Vector2&), void), asCALL_THISCALL);
-    // void Node::SetPosition2D(float x, float y) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetPosition2D(float, float)", asMETHODPR(Scene, SetPosition2D, (float, float), void), asCALL_THISCALL);
-    // void Node::SetPositionSilent(const Vector3& position) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetPositionSilent(const Vector3&in)", asMETHODPR(Scene, SetPositionSilent, (const Vector3&), void), asCALL_THISCALL);
-    // void Node::SetRotation(const Quaternion& rotation) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetRotation(const Quaternion&in)", asMETHODPR(Scene, SetRotation, (const Quaternion&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "void set_rotation(const Quaternion&in)", asMETHODPR(Scene, SetRotation, (const Quaternion&), void), asCALL_THISCALL);
-    // void Node::SetRotation2D(float rotation) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetRotation2D(float)", asMETHODPR(Scene, SetRotation2D, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "void set_rotation2D(float)", asMETHODPR(Scene, SetRotation2D, (float), void), asCALL_THISCALL);
-    // void Node::SetRotationSilent(const Quaternion& rotation) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetRotationSilent(const Quaternion&in)", asMETHODPR(Scene, SetRotationSilent, (const Quaternion&), void), asCALL_THISCALL);
-    // void Node::SetScale(float scale) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetScale(float)", asMETHODPR(Scene, SetScale, (float), void), asCALL_THISCALL);
-    // void Node::SetScale(const Vector3& scale) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetScale(const Vector3&in)", asMETHODPR(Scene, SetScale, (const Vector3&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "void set_scale(const Vector3&in)", asMETHODPR(Scene, SetScale, (const Vector3&), void), asCALL_THISCALL);
-    // void Node::SetScale2D(const Vector2& scale) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetScale2D(const Vector2&in)", asMETHODPR(Scene, SetScale2D, (const Vector2&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "void set_scale2D(const Vector2&in)", asMETHODPR(Scene, SetScale2D, (const Vector2&), void), asCALL_THISCALL);
-    // void Node::SetScale2D(float x, float y) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetScale2D(float, float)", asMETHODPR(Scene, SetScale2D, (float, float), void), asCALL_THISCALL);
-    // void Node::SetScaleSilent(const Vector3& scale) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetScaleSilent(const Vector3&in)", asMETHODPR(Scene, SetScaleSilent, (const Vector3&), void), asCALL_THISCALL);
-    // void Node::SetScene(Scene* scene) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetScene(Scene@+)", asMETHODPR(Scene, SetScene, (Scene*), void), asCALL_THISCALL);
-    // void Scene::SetSmoothingConstant(float constant) | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "void SetSmoothingConstant(float)", asMETHODPR(Scene, SetSmoothingConstant, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "void set_smoothingConstant(float)", asMETHODPR(Scene, SetSmoothingConstant, (float), void), asCALL_THISCALL);
-    // void Scene::SetSnapThreshold(float threshold) | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "void SetSnapThreshold(float)", asMETHODPR(Scene, SetSnapThreshold, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "void set_snapThreshold(float)", asMETHODPR(Scene, SetSnapThreshold, (float), void), asCALL_THISCALL);
-    // void Node::SetTags(const StringVector& tags) | File: ../Scene/Node.h
-    // Error: type "const StringVector&" can not automatically bind
-    // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Scene", "void SetTemporary(bool)", asMETHODPR(Scene, SetTemporary, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "void set_temporary(bool)", asMETHODPR(Scene, SetTemporary, (bool), void), asCALL_THISCALL);
-    // void Scene::SetTimeScale(float scale) | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "void SetTimeScale(float)", asMETHODPR(Scene, SetTimeScale, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "void set_timeScale(float)", asMETHODPR(Scene, SetTimeScale, (float), void), asCALL_THISCALL);
-    // void Node::SetTransform(const Vector3& position, const Quaternion& rotation) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetTransform(const Vector3&in, const Quaternion&in)", asMETHODPR(Scene, SetTransform, (const Vector3&, const Quaternion&), void), asCALL_THISCALL);
-    // void Node::SetTransform(const Vector3& position, const Quaternion& rotation, float scale) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetTransform(const Vector3&in, const Quaternion&in, float)", asMETHODPR(Scene, SetTransform, (const Vector3&, const Quaternion&, float), void), asCALL_THISCALL);
-    // void Node::SetTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetTransform(const Vector3&in, const Quaternion&in, const Vector3&in)", asMETHODPR(Scene, SetTransform, (const Vector3&, const Quaternion&, const Vector3&), void), asCALL_THISCALL);
-    // void Node::SetTransform(const Matrix3x4& matrix) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetTransform(const Matrix3x4&in)", asMETHODPR(Scene, SetTransform, (const Matrix3x4&), void), asCALL_THISCALL);
-    // void Node::SetTransform2D(const Vector2& position, float rotation) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetTransform2D(const Vector2&in, float)", asMETHODPR(Scene, SetTransform2D, (const Vector2&, float), void), asCALL_THISCALL);
-    // void Node::SetTransform2D(const Vector2& position, float rotation, float scale) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetTransform2D(const Vector2&in, float, float)", asMETHODPR(Scene, SetTransform2D, (const Vector2&, float, float), void), asCALL_THISCALL);
-    // void Node::SetTransform2D(const Vector2& position, float rotation, const Vector2& scale) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetTransform2D(const Vector2&in, float, const Vector2&in)", asMETHODPR(Scene, SetTransform2D, (const Vector2&, float, const Vector2&), void), asCALL_THISCALL);
-    // void Node::SetTransformSilent(const Vector3& position, const Quaternion& rotation, const Vector3& scale) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetTransformSilent(const Vector3&in, const Quaternion&in, const Vector3&in)", asMETHODPR(Scene, SetTransformSilent, (const Vector3&, const Quaternion&, const Vector3&), void), asCALL_THISCALL);
-    // void Scene::SetUpdateEnabled(bool enable) | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "void SetUpdateEnabled(bool)", asMETHODPR(Scene, SetUpdateEnabled, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "void set_updateEnabled(bool)", asMETHODPR(Scene, SetUpdateEnabled, (bool), void), asCALL_THISCALL);
-    // void Node::SetVar(StringHash key, const Variant& value) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetVar(StringHash, const Variant&in)", asMETHODPR(Scene, SetVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    // void Scene::SetVarNamesAttr(const String& value) | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "void SetVarNamesAttr(const String&in)", asMETHODPR(Scene, SetVarNamesAttr, (const String&), void), asCALL_THISCALL);
-    // void Node::SetWorldDirection(const Vector3& direction) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetWorldDirection(const Vector3&in)", asMETHODPR(Scene, SetWorldDirection, (const Vector3&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "void set_worldDirection(const Vector3&in)", asMETHODPR(Scene, SetWorldDirection, (const Vector3&), void), asCALL_THISCALL);
-    // void Node::SetWorldPosition(const Vector3& position) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetWorldPosition(const Vector3&in)", asMETHODPR(Scene, SetWorldPosition, (const Vector3&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "void set_worldPosition(const Vector3&in)", asMETHODPR(Scene, SetWorldPosition, (const Vector3&), void), asCALL_THISCALL);
-    // void Node::SetWorldPosition2D(const Vector2& position) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetWorldPosition2D(const Vector2&in)", asMETHODPR(Scene, SetWorldPosition2D, (const Vector2&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "void set_worldPosition2D(const Vector2&in)", asMETHODPR(Scene, SetWorldPosition2D, (const Vector2&), void), asCALL_THISCALL);
-    // void Node::SetWorldPosition2D(float x, float y) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetWorldPosition2D(float, float)", asMETHODPR(Scene, SetWorldPosition2D, (float, float), void), asCALL_THISCALL);
-    // void Node::SetWorldRotation(const Quaternion& rotation) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetWorldRotation(const Quaternion&in)", asMETHODPR(Scene, SetWorldRotation, (const Quaternion&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "void set_worldRotation(const Quaternion&in)", asMETHODPR(Scene, SetWorldRotation, (const Quaternion&), void), asCALL_THISCALL);
-    // void Node::SetWorldRotation2D(float rotation) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetWorldRotation2D(float)", asMETHODPR(Scene, SetWorldRotation2D, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "void set_worldRotation2D(float)", asMETHODPR(Scene, SetWorldRotation2D, (float), void), asCALL_THISCALL);
-    // void Node::SetWorldScale(float scale) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetWorldScale(float)", asMETHODPR(Scene, SetWorldScale, (float), void), asCALL_THISCALL);
-    // void Node::SetWorldScale(const Vector3& scale) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetWorldScale(const Vector3&in)", asMETHODPR(Scene, SetWorldScale, (const Vector3&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "void set_worldScale(const Vector3&in)", asMETHODPR(Scene, SetWorldScale, (const Vector3&), void), asCALL_THISCALL);
-    // void Node::SetWorldScale2D(const Vector2& scale) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetWorldScale2D(const Vector2&in)", asMETHODPR(Scene, SetWorldScale2D, (const Vector2&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "void set_worldScale2D(const Vector2&in)", asMETHODPR(Scene, SetWorldScale2D, (const Vector2&), void), asCALL_THISCALL);
-    // void Node::SetWorldScale2D(float x, float y) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetWorldScale2D(float, float)", asMETHODPR(Scene, SetWorldScale2D, (float, float), void), asCALL_THISCALL);
-    // void Node::SetWorldTransform(const Vector3& position, const Quaternion& rotation) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetWorldTransform(const Vector3&in, const Quaternion&in)", asMETHODPR(Scene, SetWorldTransform, (const Vector3&, const Quaternion&), void), asCALL_THISCALL);
-    // void Node::SetWorldTransform(const Vector3& position, const Quaternion& rotation, float scale) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetWorldTransform(const Vector3&in, const Quaternion&in, float)", asMETHODPR(Scene, SetWorldTransform, (const Vector3&, const Quaternion&, float), void), asCALL_THISCALL);
-    // void Node::SetWorldTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetWorldTransform(const Vector3&in, const Quaternion&in, const Vector3&in)", asMETHODPR(Scene, SetWorldTransform, (const Vector3&, const Quaternion&, const Vector3&), void), asCALL_THISCALL);
-    // void Node::SetWorldTransform(const Matrix3x4& worldTransform) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetWorldTransform(const Matrix3x4&in)", asMETHODPR(Scene, SetWorldTransform, (const Matrix3x4&), void), asCALL_THISCALL);
-    // void Node::SetWorldTransform2D(const Vector2& position, float rotation) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetWorldTransform2D(const Vector2&in, float)", asMETHODPR(Scene, SetWorldTransform2D, (const Vector2&, float), void), asCALL_THISCALL);
-    // void Node::SetWorldTransform2D(const Vector2& position, float rotation, float scale) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetWorldTransform2D(const Vector2&in, float, float)", asMETHODPR(Scene, SetWorldTransform2D, (const Vector2&, float, float), void), asCALL_THISCALL);
-    // void Node::SetWorldTransform2D(const Vector2& position, float rotation, const Vector2& scale) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void SetWorldTransform2D(const Vector2&in, float, const Vector2&in)", asMETHODPR(Scene, SetWorldTransform2D, (const Vector2&, float, const Vector2&), void), asCALL_THISCALL);
-    // void Scene::StopAsyncLoading() | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "void StopAsyncLoading()", asMETHODPR(Scene, StopAsyncLoading, (), void), asCALL_THISCALL);
-    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Node::Translate(const Vector3& delta, TransformSpace space=TS_LOCAL) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void Translate(const Vector3&in, TransformSpace = TS_LOCAL)", asMETHODPR(Scene, Translate, (const Vector3&, TransformSpace), void), asCALL_THISCALL);
-    // void Node::Translate2D(const Vector2& delta, TransformSpace space=TS_LOCAL) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void Translate2D(const Vector2&in, TransformSpace = TS_LOCAL)", asMETHODPR(Scene, Translate2D, (const Vector2&, TransformSpace), void), asCALL_THISCALL);
-    // void Scene::UnregisterAllVars() | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "void UnregisterAllVars()", asMETHODPR(Scene, UnregisterAllVars, (), void), asCALL_THISCALL);
-    // void Scene::UnregisterVar(const String& name) | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "void UnregisterVar(const String&in)", asMETHODPR(Scene, UnregisterVar, (const String&), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Scene", "void UnsubscribeFromAllEvents()", asMETHODPR(Scene, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Scene", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(Scene_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
-    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Scene", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(Scene, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Scene", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(Scene, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Scene", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(Scene, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
-    // void Scene::Update(float timeStep) | File: ../Scene/Scene.h
-    engine->RegisterObjectMethod("Scene", "void Update(float)", asMETHODPR(Scene, Update, (float), void), asCALL_THISCALL);
-    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("Scene", "int WeakRefs() const", asMETHODPR(Scene, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "int get_weakRefs() const", asMETHODPR(Scene, WeakRefs, () const, int), asCALL_THISCALL);
-    // Vector3 Node::WorldToLocal(const Vector3& position) const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Vector3 WorldToLocal(const Vector3&in) const", asMETHODPR(Scene, WorldToLocal, (const Vector3&) const, Vector3), asCALL_THISCALL);
-    // Vector3 Node::WorldToLocal(const Vector4& vector) const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Vector3 WorldToLocal(const Vector4&in) const", asMETHODPR(Scene, WorldToLocal, (const Vector4&) const, Vector3), asCALL_THISCALL);
-    // Vector2 Node::WorldToLocal2D(const Vector2& vector) const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "Vector2 WorldToLocal2D(const Vector2&in) const", asMETHODPR(Scene, WorldToLocal2D, (const Vector2&) const, Vector2), asCALL_THISCALL);
-    // void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attributeBits, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Scene", "void WriteDeltaUpdate(Serializer&, const DirtyBits&in, uint8)", asMETHODPR(Scene, WriteDeltaUpdate, (Serializer&, const DirtyBits&, unsigned char), void), asCALL_THISCALL);
-    // void Serializable::WriteInitialDeltaUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Scene", "void WriteInitialDeltaUpdate(Serializer&, uint8)", asMETHODPR(Scene, WriteInitialDeltaUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
-    // void Serializable::WriteLatestDataUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Scene", "void WriteLatestDataUpdate(Serializer&, uint8)", asMETHODPR(Scene, WriteLatestDataUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
-    // void Node::Yaw(float angle, TransformSpace space=TS_LOCAL) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "void Yaw(float, TransformSpace = TS_LOCAL)", asMETHODPR(Scene, Yaw, (float, TransformSpace), void), asCALL_THISCALL);
-#ifdef REGISTER_MANUAL_PART_Node
-    REGISTER_MANUAL_PART_Node(Scene, "Scene")
-#endif
-#ifdef REGISTER_MANUAL_PART_Animatable
-    REGISTER_MANUAL_PART_Animatable(Scene, "Scene")
-#endif
-#ifdef REGISTER_MANUAL_PART_Serializable
-    REGISTER_MANUAL_PART_Serializable(Scene, "Scene")
-#endif
-#ifdef REGISTER_MANUAL_PART_Object
-    REGISTER_MANUAL_PART_Object(Scene, "Scene")
-#endif
-#ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(Scene, "Scene")
-#endif
-#ifdef REGISTER_MANUAL_PART_Scene
-    REGISTER_MANUAL_PART_Scene(Scene, "Scene")
-#endif
-    RegisterSubclass<Node, Scene>(engine, "Node", "Scene");
-    RegisterSubclass<Animatable, Scene>(engine, "Animatable", "Scene");
-    RegisterSubclass<Serializable, Scene>(engine, "Serializable", "Scene");
-    RegisterSubclass<Object, Scene>(engine, "Object", "Scene");
-    RegisterSubclass<RefCounted, Scene>(engine, "RefCounted", "Scene");
-
-    // void SceneResolver::AddComponent(unsigned oldID, Component* component) | File: ../Scene/SceneResolver.h
-    engine->RegisterObjectMethod("SceneResolver", "void AddComponent(uint, Component@+)", asMETHODPR(SceneResolver, AddComponent, (unsigned, Component*), void), asCALL_THISCALL);
-    // void SceneResolver::AddNode(unsigned oldID, Node* node) | File: ../Scene/SceneResolver.h
-    engine->RegisterObjectMethod("SceneResolver", "void AddNode(uint, Node@+)", asMETHODPR(SceneResolver, AddNode, (unsigned, Node*), void), asCALL_THISCALL);
-    // void SceneResolver::Reset() | File: ../Scene/SceneResolver.h
-    engine->RegisterObjectMethod("SceneResolver", "void Reset()", asMETHODPR(SceneResolver, Reset, (), void), asCALL_THISCALL);
-    // void SceneResolver::Resolve() | File: ../Scene/SceneResolver.h
-    engine->RegisterObjectMethod("SceneResolver", "void Resolve()", asMETHODPR(SceneResolver, Resolve, (), void), asCALL_THISCALL);
-    // SceneResolver::~SceneResolver() | File: ../Scene/SceneResolver.h
-    engine->RegisterObjectBehaviour("SceneResolver", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(SceneResolver_Destructor_SceneResolver_void), asCALL_CDECL_OBJFIRST);
-    // SceneResolver& SceneResolver::operator=(const SceneResolver&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<SceneResolver>(engine, "SceneResolver");
-#ifdef REGISTER_MANUAL_PART_SceneResolver
-    REGISTER_MANUAL_PART_SceneResolver(SceneResolver, "SceneResolver")
-#endif
 
     // void UIElement::AddChild(UIElement* element) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("ScrollView", "void AddChild(UIElement@+)", asMETHODPR(ScrollView, AddChild, (UIElement*), void), asCALL_THISCALL);
@@ -3493,6 +3196,162 @@ void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
 #endif
 
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("Shader", asBEHAVE_ADDREF, "void f()", asMETHODPR(Shader, AddRef, (), void), asCALL_THISCALL);
+    // bool Shader::BeginLoad(Deserializer& source) override | File: ../Graphics/Shader.h
+    engine->RegisterObjectMethod("Shader", "bool BeginLoad(Deserializer&)", asMETHODPR(Shader, BeginLoad, (Deserializer&), bool), asCALL_THISCALL);
+    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
+    // Not registered because template
+    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
+    // Not registered because template
+    // bool Shader::EndLoad() override | File: ../Graphics/Shader.h
+    engine->RegisterObjectMethod("Shader", "bool EndLoad()", asMETHODPR(Shader, EndLoad, (), bool), asCALL_THISCALL);
+    // AsyncLoadState Resource::GetAsyncLoadState() const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Shader", "AsyncLoadState GetAsyncLoadState() const", asMETHODPR(Shader, GetAsyncLoadState, () const, AsyncLoadState), asCALL_THISCALL);
+    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Shader", "bool GetBlockEvents() const", asMETHODPR(Shader, GetBlockEvents, () const, bool), asCALL_THISCALL);
+    // const String& Object::GetCategory() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Shader", "const String& GetCategory() const", asMETHODPR(Shader, GetCategory, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Shader", "const String& get_category() const", asMETHODPR(Shader, GetCategory, () const, const String&), asCALL_THISCALL);
+    // Context* Object::GetContext() const | File: ../Core/Object.h
+    // Error: type "Context*" can not be returned
+    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Shader", "VariantMap& GetEventDataMap() const", asMETHODPR(Shader, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
+    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // Object* Object::GetEventSender() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Shader", "Object@+ GetEventSender() const", asMETHODPR(Shader, GetEventSender, () const, Object*), asCALL_THISCALL);
+    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Shader", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(Shader, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Shader", "const Variant& get_globalVar(StringHash) const", asMETHODPR(Shader, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Shader", "const VariantMap& GetGlobalVars() const", asMETHODPR(Shader, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Shader", "const VariantMap& get_globalVars() const", asMETHODPR(Shader, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    // unsigned Resource::GetMemoryUse() const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Shader", "uint GetMemoryUse() const", asMETHODPR(Shader, GetMemoryUse, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Shader", "uint get_memoryUse() const", asMETHODPR(Shader, GetMemoryUse, () const, unsigned), asCALL_THISCALL);
+    // const String& Resource::GetName() const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Shader", "const String& GetName() const", asMETHODPR(Shader, GetName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Shader", "const String& get_name() const", asMETHODPR(Shader, GetName, () const, const String&), asCALL_THISCALL);
+    // StringHash Resource::GetNameHash() const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Shader", "StringHash GetNameHash() const", asMETHODPR(Shader, GetNameHash, () const, StringHash), asCALL_THISCALL);
+    // const String& Shader::GetSourceCode(ShaderType type) const | File: ../Graphics/Shader.h
+    engine->RegisterObjectMethod("Shader", "const String& GetSourceCode(ShaderType) const", asMETHODPR(Shader, GetSourceCode, (ShaderType) const, const String&), asCALL_THISCALL);
+    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Shader", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Shader, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
+    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // Not registered because template
+    // unsigned Shader::GetTimeStamp() const | File: ../Graphics/Shader.h
+    engine->RegisterObjectMethod("Shader", "uint GetTimeStamp() const", asMETHODPR(Shader, GetTimeStamp, () const, unsigned), asCALL_THISCALL);
+    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Shader", "StringHash GetType() const", asMETHODPR(Shader, GetType, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Shader", "StringHash get_type() const", asMETHODPR(Shader, GetType, () const, StringHash), asCALL_THISCALL);
+    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Shader", "const String& GetTypeName() const", asMETHODPR(Shader, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Shader", "const String& get_typeName() const", asMETHODPR(Shader, GetTypeName, () const, const String&), asCALL_THISCALL);
+    // unsigned Resource::GetUseTimer() | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Shader", "uint GetUseTimer()", asMETHODPR(Shader, GetUseTimer, (), unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Shader", "uint get_useTimer()", asMETHODPR(Shader, GetUseTimer, (), unsigned), asCALL_THISCALL);
+    // ShaderVariation* Shader::GetVariation(ShaderType type, const String& defines) | File: ../Graphics/Shader.h
+    engine->RegisterObjectMethod("Shader", "ShaderVariation@+ GetVariation(ShaderType, const String&in)", asMETHODPR(Shader, GetVariation, (ShaderType, const String&), ShaderVariation*), asCALL_THISCALL);
+    // ShaderVariation* Shader::GetVariation(ShaderType type, const char* defines) | File: ../Graphics/Shader.h
+    // Error: type "const char*" can not automatically bind
+    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Shader", "bool HasEventHandlers() const", asMETHODPR(Shader, HasEventHandlers, () const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Shader", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(Shader, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Shader", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(Shader, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Shader", "bool IsInstanceOf(StringHash) const", asMETHODPR(Shader, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
+    // Not registered because template
+    // bool Resource::Load(Deserializer& source) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Shader", "bool Load(Deserializer&)", asMETHODPR(Shader, Load, (Deserializer&), bool), asCALL_THISCALL);
+    // bool Resource::LoadFile(const String& fileName) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Shader", "bool LoadFile(const String&in)", asMETHODPR(Shader, LoadFile, (const String&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Shader", "bool Load(const String&in)", asMETHODPR(Shader, LoadFile, (const String&), bool), asCALL_THISCALL);
+    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Shader", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(Shader, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
+    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
+    // Error: type "RefCount*" can not automatically bind
+    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("Shader", "int Refs() const", asMETHODPR(Shader, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Shader", "int get_refs() const", asMETHODPR(Shader, Refs, () const, int), asCALL_THISCALL);
+    // static void Shader::RegisterObject(Context* context) | File: ../Graphics/Shader.h
+    // Context can be used as firs parameter of constructors only
+    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("Shader", asBEHAVE_RELEASE, "void f()", asMETHODPR(Shader, ReleaseRef, (), void), asCALL_THISCALL);
+    // void Resource::ResetUseTimer() | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Shader", "void ResetUseTimer()", asMETHODPR(Shader, ResetUseTimer, (), void), asCALL_THISCALL);
+    // virtual bool Resource::Save(Serializer& dest) const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Shader", "bool Save(Serializer&) const", asMETHODPR(Shader, Save, (Serializer&) const, bool), asCALL_THISCALL);
+    // virtual bool Resource::SaveFile(const String& fileName) const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Shader", "bool SaveFile(const String&in) const", asMETHODPR(Shader, SaveFile, (const String&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Shader", "bool Save(const String&in) const", asMETHODPR(Shader, SaveFile, (const String&) const, bool), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Shader", "void SendEvent(StringHash)", asMETHODPR(Shader, SendEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Shader", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(Shader, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
+    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
+    // Not registered because template
+    // void Resource::SetAsyncLoadState(AsyncLoadState newState) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Shader", "void SetAsyncLoadState(AsyncLoadState)", asMETHODPR(Shader, SetAsyncLoadState, (AsyncLoadState), void), asCALL_THISCALL);
+    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Shader", "void SetBlockEvents(bool)", asMETHODPR(Shader, SetBlockEvents, (bool), void), asCALL_THISCALL);
+    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Shader", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(Shader, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Shader", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(Shader, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    // void Resource::SetMemoryUse(unsigned size) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Shader", "void SetMemoryUse(uint)", asMETHODPR(Shader, SetMemoryUse, (unsigned), void), asCALL_THISCALL);
+    // void Resource::SetName(const String& name) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Shader", "void SetName(const String&in)", asMETHODPR(Shader, SetName, (const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Shader", "void set_name(const String&in)", asMETHODPR(Shader, SetName, (const String&), void), asCALL_THISCALL);
+    // explicit Shader::Shader(Context* context) | File: ../Graphics/Shader.h
+    engine->RegisterObjectBehaviour("Shader", asBEHAVE_FACTORY, "Shader@+ f()", asFUNCTION(Shader_Shader_Context), asCALL_CDECL);
+    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Shader", "void UnsubscribeFromAllEvents()", asMETHODPR(Shader, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Shader", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(Shader_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
+    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Shader", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(Shader, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Shader", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(Shader, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Shader", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(Shader, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
+    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("Shader", "int WeakRefs() const", asMETHODPR(Shader, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Shader", "int get_weakRefs() const", asMETHODPR(Shader, WeakRefs, () const, int), asCALL_THISCALL);
+#ifdef REGISTER_MANUAL_PART_Resource
+    REGISTER_MANUAL_PART_Resource(Shader, "Shader")
+#endif
+#ifdef REGISTER_MANUAL_PART_Object
+    REGISTER_MANUAL_PART_Object(Shader, "Shader")
+#endif
+#ifdef REGISTER_MANUAL_PART_RefCounted
+    REGISTER_MANUAL_PART_RefCounted(Shader, "Shader")
+#endif
+#ifdef REGISTER_MANUAL_PART_Shader
+    REGISTER_MANUAL_PART_Shader(Shader, "Shader")
+#endif
+    RegisterSubclass<Resource, Shader>(engine, "Resource", "Shader");
+    RegisterSubclass<Object, Shader>(engine, "Object", "Shader");
+    RegisterSubclass<RefCounted, Shader>(engine, "RefCounted", "Shader");
+
+    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("ShaderParameterAnimationInfo", asBEHAVE_ADDREF, "void f()", asMETHODPR(ShaderParameterAnimationInfo, AddRef, (), void), asCALL_THISCALL);
     // ValueAnimation* ValueAnimationInfo::GetAnimation() const | File: ../Scene/ValueAnimationInfo.h
     engine->RegisterObjectMethod("ShaderParameterAnimationInfo", "ValueAnimation@+ GetAnimation() const", asMETHODPR(ShaderParameterAnimationInfo, GetAnimation, () const, ValueAnimation*), asCALL_THISCALL);
@@ -3651,6 +3510,84 @@ void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
 #endif
     RegisterSubclass<Object, ShaderPrecache>(engine, "Object", "ShaderPrecache");
     RegisterSubclass<RefCounted, ShaderPrecache>(engine, "RefCounted", "ShaderPrecache");
+
+    // const char* ShaderVariation::elementSemanticNames[] | File: ../Graphics/ShaderVariation.h
+    // Error: type "const char*" can not automatically bind
+    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("ShaderVariation", asBEHAVE_ADDREF, "void f()", asMETHODPR(ShaderVariation, AddRef, (), void), asCALL_THISCALL);
+    // void GPUObject::ClearDataLost() | File: ../Graphics/GPUObject.h
+    engine->RegisterObjectMethod("ShaderVariation", "void ClearDataLost()", asMETHODPR(ShaderVariation, ClearDataLost, (), void), asCALL_THISCALL);
+    // bool ShaderVariation::Create() | File: ../Graphics/ShaderVariation.h
+    engine->RegisterObjectMethod("ShaderVariation", "bool Create()", asMETHODPR(ShaderVariation, Create, (), bool), asCALL_THISCALL);
+    // const PODVector<unsigned char>& ShaderVariation::GetByteCode() const | File: ../Graphics/ShaderVariation.h
+    // Error: type "const PODVector<unsigned char>&" can not automatically bind
+    // const String& ShaderVariation::GetCompilerOutput() const | File: ../Graphics/ShaderVariation.h
+    engine->RegisterObjectMethod("ShaderVariation", "const String& GetCompilerOutput() const", asMETHODPR(ShaderVariation, GetCompilerOutput, () const, const String&), asCALL_THISCALL);
+    // const unsigned* ShaderVariation::GetConstantBufferSizes() const | File: ../Graphics/ShaderVariation.h
+    // Error: type "const unsigned*" can not automatically bind
+    // const String& ShaderVariation::GetDefines() const | File: ../Graphics/ShaderVariation.h
+    engine->RegisterObjectMethod("ShaderVariation", "const String& GetDefines() const", asMETHODPR(ShaderVariation, GetDefines, () const, const String&), asCALL_THISCALL);
+    // const String& ShaderVariation::GetDefinesClipPlane() | File: ../Graphics/ShaderVariation.h
+    engine->RegisterObjectMethod("ShaderVariation", "const String& GetDefinesClipPlane()", asMETHODPR(ShaderVariation, GetDefinesClipPlane, (), const String&), asCALL_THISCALL);
+    // unsigned long long ShaderVariation::GetElementHash() const | File: ../Graphics/ShaderVariation.h
+    engine->RegisterObjectMethod("ShaderVariation", "uint64 GetElementHash() const", asMETHODPR(ShaderVariation, GetElementHash, () const, unsigned long long), asCALL_THISCALL);
+    // String ShaderVariation::GetFullName() const | File: ../Graphics/ShaderVariation.h
+    engine->RegisterObjectMethod("ShaderVariation", "String GetFullName() const", asMETHODPR(ShaderVariation, GetFullName, () const, String), asCALL_THISCALL);
+    // void* GPUObject::GetGPUObject() const | File: ../Graphics/GPUObject.h
+    // Error: type "void*" can not automatically bind
+    // unsigned GPUObject::GetGPUObjectName() const | File: ../Graphics/GPUObject.h
+    engine->RegisterObjectMethod("ShaderVariation", "uint GetGPUObjectName() const", asMETHODPR(ShaderVariation, GetGPUObjectName, () const, unsigned), asCALL_THISCALL);
+    // Graphics* GPUObject::GetGraphics() const | File: ../Graphics/GPUObject.h
+    engine->RegisterObjectMethod("ShaderVariation", "Graphics@+ GetGraphics() const", asMETHODPR(ShaderVariation, GetGraphics, () const, Graphics*), asCALL_THISCALL);
+    // const String& ShaderVariation::GetName() const | File: ../Graphics/ShaderVariation.h
+    engine->RegisterObjectMethod("ShaderVariation", "const String& GetName() const", asMETHODPR(ShaderVariation, GetName, () const, const String&), asCALL_THISCALL);
+    // Shader* ShaderVariation::GetOwner() const | File: ../Graphics/ShaderVariation.h
+    engine->RegisterObjectMethod("ShaderVariation", "Shader@+ GetOwner() const", asMETHODPR(ShaderVariation, GetOwner, () const, Shader*), asCALL_THISCALL);
+    // const HashMap<StringHash, ShaderParameter>& ShaderVariation::GetParameters() const | File: ../Graphics/ShaderVariation.h
+    // Error: type "const HashMap<StringHash, ShaderParameter>&" can not automatically bind
+    // ShaderType ShaderVariation::GetShaderType() const | File: ../Graphics/ShaderVariation.h
+    engine->RegisterObjectMethod("ShaderVariation", "ShaderType GetShaderType() const", asMETHODPR(ShaderVariation, GetShaderType, () const, ShaderType), asCALL_THISCALL);
+    // bool ShaderVariation::HasParameter(StringHash param) const | File: ../Graphics/ShaderVariation.h
+    engine->RegisterObjectMethod("ShaderVariation", "bool HasParameter(StringHash) const", asMETHODPR(ShaderVariation, HasParameter, (StringHash) const, bool), asCALL_THISCALL);
+    // bool GPUObject::HasPendingData() const | File: ../Graphics/GPUObject.h
+    engine->RegisterObjectMethod("ShaderVariation", "bool HasPendingData() const", asMETHODPR(ShaderVariation, HasPendingData, () const, bool), asCALL_THISCALL);
+    // bool ShaderVariation::HasTextureUnit(TextureUnit unit) const | File: ../Graphics/ShaderVariation.h
+    engine->RegisterObjectMethod("ShaderVariation", "bool HasTextureUnit(TextureUnit) const", asMETHODPR(ShaderVariation, HasTextureUnit, (TextureUnit) const, bool), asCALL_THISCALL);
+    // bool GPUObject::IsDataLost() const | File: ../Graphics/GPUObject.h
+    engine->RegisterObjectMethod("ShaderVariation", "bool IsDataLost() const", asMETHODPR(ShaderVariation, IsDataLost, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ShaderVariation", "bool get_dataLost() const", asMETHODPR(ShaderVariation, IsDataLost, () const, bool), asCALL_THISCALL);
+    // void ShaderVariation::OnDeviceLost() override | File: ../Graphics/ShaderVariation.h
+    engine->RegisterObjectMethod("ShaderVariation", "void OnDeviceLost()", asMETHODPR(ShaderVariation, OnDeviceLost, (), void), asCALL_THISCALL);
+    // virtual void GPUObject::OnDeviceReset() | File: ../Graphics/GPUObject.h
+    engine->RegisterObjectMethod("ShaderVariation", "void OnDeviceReset()", asMETHODPR(ShaderVariation, OnDeviceReset, (), void), asCALL_THISCALL);
+    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
+    // Error: type "RefCount*" can not automatically bind
+    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("ShaderVariation", "int Refs() const", asMETHODPR(ShaderVariation, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ShaderVariation", "int get_refs() const", asMETHODPR(ShaderVariation, Refs, () const, int), asCALL_THISCALL);
+    // void ShaderVariation::Release() override | File: ../Graphics/ShaderVariation.h
+    engine->RegisterObjectMethod("ShaderVariation", "void Release()", asMETHODPR(ShaderVariation, Release, (), void), asCALL_THISCALL);
+    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("ShaderVariation", asBEHAVE_RELEASE, "void f()", asMETHODPR(ShaderVariation, ReleaseRef, (), void), asCALL_THISCALL);
+    // void ShaderVariation::SetDefines(const String& defines) | File: ../Graphics/ShaderVariation.h
+    engine->RegisterObjectMethod("ShaderVariation", "void SetDefines(const String&in)", asMETHODPR(ShaderVariation, SetDefines, (const String&), void), asCALL_THISCALL);
+    // void ShaderVariation::SetName(const String& name) | File: ../Graphics/ShaderVariation.h
+    engine->RegisterObjectMethod("ShaderVariation", "void SetName(const String&in)", asMETHODPR(ShaderVariation, SetName, (const String&), void), asCALL_THISCALL);
+    // ShaderVariation::ShaderVariation(Shader* owner, ShaderType type) | File: ../Graphics/ShaderVariation.h
+    engine->RegisterObjectBehaviour("ShaderVariation", asBEHAVE_FACTORY, "ShaderVariation@+ f(Shader@+, ShaderType)", asFUNCTION(ShaderVariation_ShaderVariation_Shader_ShaderType), asCALL_CDECL);
+    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("ShaderVariation", "int WeakRefs() const", asMETHODPR(ShaderVariation, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ShaderVariation", "int get_weakRefs() const", asMETHODPR(ShaderVariation, WeakRefs, () const, int), asCALL_THISCALL);
+#ifdef REGISTER_MANUAL_PART_RefCounted
+    REGISTER_MANUAL_PART_RefCounted(ShaderVariation, "ShaderVariation")
+#endif
+#ifdef REGISTER_MANUAL_PART_GPUObject
+    REGISTER_MANUAL_PART_GPUObject(ShaderVariation, "ShaderVariation")
+#endif
+#ifdef REGISTER_MANUAL_PART_ShaderVariation
+    REGISTER_MANUAL_PART_ShaderVariation(ShaderVariation, "ShaderVariation")
+#endif
+    RegisterSubclass<RefCounted, ShaderVariation>(engine, "RefCounted", "ShaderVariation");
 
     // void Skeleton::ClearBones() | File: ../Graphics/Skeleton.h
     engine->RegisterObjectMethod("Skeleton", "void ClearBones()", asMETHODPR(Skeleton, ClearBones, (), void), asCALL_THISCALL);
@@ -5343,6 +5280,139 @@ void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
     RegisterSubclass<Object, SmoothedTransform>(engine, "Object", "SmoothedTransform");
     RegisterSubclass<RefCounted, SmoothedTransform>(engine, "RefCounted", "SmoothedTransform");
 
+    // bool ScenePassInfo::allowInstancing_ | File: ../Graphics/View.h
+    engine->RegisterObjectProperty("ScenePassInfo", "bool allowInstancing", offsetof(ScenePassInfo, allowInstancing_));
+    // BatchQueue* ScenePassInfo::batchQueue_ | File: ../Graphics/View.h
+    // BatchQueue* can not be registered
+    // bool ScenePassInfo::markToStencil_ | File: ../Graphics/View.h
+    engine->RegisterObjectProperty("ScenePassInfo", "bool markToStencil", offsetof(ScenePassInfo, markToStencil_));
+    // unsigned ScenePassInfo::passIndex_ | File: ../Graphics/View.h
+    engine->RegisterObjectProperty("ScenePassInfo", "uint passIndex", offsetof(ScenePassInfo, passIndex_));
+    // bool ScenePassInfo::vertexLights_ | File: ../Graphics/View.h
+    engine->RegisterObjectProperty("ScenePassInfo", "bool vertexLights", offsetof(ScenePassInfo, vertexLights_));
+    // ScenePassInfo::~ScenePassInfo() | Implicitly-declared
+    engine->RegisterObjectBehaviour("ScenePassInfo", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(ScenePassInfo_Destructor), asCALL_CDECL_OBJFIRST);
+    // ScenePassInfo& ScenePassInfo::operator=(const ScenePassInfo&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<ScenePassInfo>(engine, "ScenePassInfo");
+#ifdef REGISTER_MANUAL_PART_ScenePassInfo
+    REGISTER_MANUAL_PART_ScenePassInfo(ScenePassInfo, "ScenePassInfo")
+#endif
+
+    // Connection* ReplicationState::connection_ | File: ../Scene/ReplicationState.h
+    // Connection* can not be registered
+    // HashSet<unsigned> SceneReplicationState::dirtyNodes_ | File: ../Scene/ReplicationState.h
+    // Error: type "HashSet<unsigned>" can not automatically bind
+    // HashMap<unsigned, NodeReplicationState> SceneReplicationState::nodeStates_ | File: ../Scene/ReplicationState.h
+    // Error: type "HashMap<unsigned, NodeReplicationState>" can not automatically bind
+    // void SceneReplicationState::Clear() | File: ../Scene/ReplicationState.h
+    engine->RegisterObjectMethod("SceneReplicationState", "void Clear()", asMETHODPR(SceneReplicationState, Clear, (), void), asCALL_THISCALL);
+    // SceneReplicationState::~SceneReplicationState() | Implicitly-declared
+    engine->RegisterObjectBehaviour("SceneReplicationState", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(SceneReplicationState_Destructor), asCALL_CDECL_OBJFIRST);
+    // SceneReplicationState& SceneReplicationState::operator=(const SceneReplicationState&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<SceneReplicationState>(engine, "SceneReplicationState");
+#ifdef REGISTER_MANUAL_PART_ReplicationState
+    REGISTER_MANUAL_PART_ReplicationState(SceneReplicationState, "SceneReplicationState")
+#endif
+#ifdef REGISTER_MANUAL_PART_SceneReplicationState
+    REGISTER_MANUAL_PART_SceneReplicationState(SceneReplicationState, "SceneReplicationState")
+#endif
+
+    // SharedArrayPtr<unsigned char> ScratchBuffer::data_ | File: ../Graphics/Graphics.h
+    // Error: type "SharedArrayPtr<unsigned char>" can not automatically bind
+    // bool ScratchBuffer::reserved_ | File: ../Graphics/Graphics.h
+    engine->RegisterObjectProperty("ScratchBuffer", "bool reserved", offsetof(ScratchBuffer, reserved_));
+    // unsigned ScratchBuffer::size_ | File: ../Graphics/Graphics.h
+    engine->RegisterObjectProperty("ScratchBuffer", "uint size", offsetof(ScratchBuffer, size_));
+    // ScratchBuffer::~ScratchBuffer() | Implicitly-declared
+    engine->RegisterObjectBehaviour("ScratchBuffer", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(ScratchBuffer_Destructor), asCALL_CDECL_OBJFIRST);
+    // ScratchBuffer& ScratchBuffer::operator=(const ScratchBuffer&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<ScratchBuffer>(engine, "ScratchBuffer");
+#ifdef REGISTER_MANUAL_PART_ScratchBuffer
+    REGISTER_MANUAL_PART_ScratchBuffer(ScratchBuffer, "ScratchBuffer")
+#endif
+
+    // bool ScreenModeParams::borderless_ | File: ../Graphics/Graphics.h
+    engine->RegisterObjectProperty("ScreenModeParams", "bool borderless", offsetof(ScreenModeParams, borderless_));
+    // bool ScreenModeParams::fullscreen_ | File: ../Graphics/Graphics.h
+    engine->RegisterObjectProperty("ScreenModeParams", "bool fullscreen", offsetof(ScreenModeParams, fullscreen_));
+    // bool ScreenModeParams::highDPI_ | File: ../Graphics/Graphics.h
+    engine->RegisterObjectProperty("ScreenModeParams", "bool highDPI", offsetof(ScreenModeParams, highDPI_));
+    // int ScreenModeParams::monitor_ | File: ../Graphics/Graphics.h
+    engine->RegisterObjectProperty("ScreenModeParams", "int monitor", offsetof(ScreenModeParams, monitor_));
+    // int ScreenModeParams::multiSample_ | File: ../Graphics/Graphics.h
+    engine->RegisterObjectProperty("ScreenModeParams", "int multiSample", offsetof(ScreenModeParams, multiSample_));
+    // int ScreenModeParams::refreshRate_ | File: ../Graphics/Graphics.h
+    engine->RegisterObjectProperty("ScreenModeParams", "int refreshRate", offsetof(ScreenModeParams, refreshRate_));
+    // bool ScreenModeParams::resizable_ | File: ../Graphics/Graphics.h
+    engine->RegisterObjectProperty("ScreenModeParams", "bool resizable", offsetof(ScreenModeParams, resizable_));
+    // bool ScreenModeParams::tripleBuffer_ | File: ../Graphics/Graphics.h
+    engine->RegisterObjectProperty("ScreenModeParams", "bool tripleBuffer", offsetof(ScreenModeParams, tripleBuffer_));
+    // bool ScreenModeParams::vsync_ | File: ../Graphics/Graphics.h
+    engine->RegisterObjectProperty("ScreenModeParams", "bool vsync", offsetof(ScreenModeParams, vsync_));
+    // bool ScreenModeParams::EqualsExceptVSync(const ScreenModeParams& rhs) const | File: ../Graphics/Graphics.h
+    engine->RegisterObjectMethod("ScreenModeParams", "bool EqualsExceptVSync(const ScreenModeParams&in) const", asMETHODPR(ScreenModeParams, EqualsExceptVSync, (const ScreenModeParams&) const, bool), asCALL_THISCALL);
+    // bool ScreenModeParams::operator==(const ScreenModeParams& rhs) const | File: ../Graphics/Graphics.h
+    engine->RegisterObjectMethod("ScreenModeParams", "bool opEquals(const ScreenModeParams&in) const", asMETHODPR(ScreenModeParams, operator==, (const ScreenModeParams&) const, bool), asCALL_THISCALL);
+    // ScreenModeParams::~ScreenModeParams() | Implicitly-declared
+    engine->RegisterObjectBehaviour("ScreenModeParams", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(ScreenModeParams_Destructor), asCALL_CDECL_OBJFIRST);
+    // ScreenModeParams& ScreenModeParams::operator=(const ScreenModeParams&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<ScreenModeParams>(engine, "ScreenModeParams");
+#ifdef REGISTER_MANUAL_PART_ScreenModeParams
+    REGISTER_MANUAL_PART_ScreenModeParams(ScreenModeParams, "ScreenModeParams")
+#endif
+
+    // unsigned ShaderParameter::buffer_ | File: ../Graphics/ShaderVariation.h
+    engine->RegisterObjectProperty("ShaderParameter", "uint buffer", offsetof(ShaderParameter, buffer_));
+    // ConstantBuffer* ShaderParameter::bufferPtr_ | File: ../Graphics/ShaderVariation.h
+    // ConstantBuffer* can not be registered
+    // unsigned ShaderParameter::glType_ | File: ../Graphics/ShaderVariation.h
+    engine->RegisterObjectProperty("ShaderParameter", "uint glType", offsetof(ShaderParameter, glType_));
+    // int ShaderParameter::location_ | File: ../Graphics/ShaderVariation.h
+    engine->RegisterObjectProperty("ShaderParameter", "int location", offsetof(ShaderParameter, location_));
+    // String ShaderParameter::name_ | File: ../Graphics/ShaderVariation.h
+    engine->RegisterObjectProperty("ShaderParameter", "String name", offsetof(ShaderParameter, name_));
+    // unsigned ShaderParameter::offset_ | File: ../Graphics/ShaderVariation.h
+    engine->RegisterObjectProperty("ShaderParameter", "uint offset", offsetof(ShaderParameter, offset_));
+    // unsigned ShaderParameter::regCount_ | File: ../Graphics/ShaderVariation.h
+    engine->RegisterObjectProperty("ShaderParameter", "uint regCount", offsetof(ShaderParameter, regCount_));
+    // unsigned ShaderParameter::register_ | File: ../Graphics/ShaderVariation.h
+    engine->RegisterObjectProperty("ShaderParameter", "uint register", offsetof(ShaderParameter, register_));
+    // unsigned ShaderParameter::size_ | File: ../Graphics/ShaderVariation.h
+    engine->RegisterObjectProperty("ShaderParameter", "uint size", offsetof(ShaderParameter, size_));
+    // ShaderType ShaderParameter::type_ | File: ../Graphics/ShaderVariation.h
+    engine->RegisterObjectProperty("ShaderParameter", "ShaderType type", offsetof(ShaderParameter, type_));
+    // ShaderParameter::ShaderParameter(const String& name, unsigned glType, int location) | File: ../Graphics/ShaderVariation.h
+    engine->RegisterObjectBehaviour("ShaderParameter", asBEHAVE_CONSTRUCT, "void f(const String&in, uint, int)", asFUNCTION(ShaderParameter_ShaderParameter_String_unsigned_int), asCALL_CDECL_OBJFIRST);
+    // ShaderParameter::ShaderParameter(ShaderType type, const String& name, unsigned offset, unsigned size, unsigned buffer) | File: ../Graphics/ShaderVariation.h
+    engine->RegisterObjectBehaviour("ShaderParameter", asBEHAVE_CONSTRUCT, "void f(ShaderType, const String&in, uint, uint, uint)", asFUNCTION(ShaderParameter_ShaderParameter_ShaderType_String_unsigned_unsigned_unsigned), asCALL_CDECL_OBJFIRST);
+    // ShaderParameter::ShaderParameter(ShaderType type, const String& name, unsigned reg, unsigned regCount) | File: ../Graphics/ShaderVariation.h
+    engine->RegisterObjectBehaviour("ShaderParameter", asBEHAVE_CONSTRUCT, "void f(ShaderType, const String&in, uint, uint)", asFUNCTION(ShaderParameter_ShaderParameter_ShaderType_String_unsigned_unsigned), asCALL_CDECL_OBJFIRST);
+    // ShaderParameter::~ShaderParameter() | Implicitly-declared
+    engine->RegisterObjectBehaviour("ShaderParameter", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(ShaderParameter_Destructor), asCALL_CDECL_OBJFIRST);
+    // ShaderParameter& ShaderParameter::operator=(const ShaderParameter&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<ShaderParameter>(engine, "ShaderParameter");
+#ifdef REGISTER_MANUAL_PART_ShaderParameter
+    REGISTER_MANUAL_PART_ShaderParameter(ShaderParameter, "ShaderParameter")
+#endif
+
+    // float ShadowBatchQueue::farSplit_ | File: ../Graphics/Batch.h
+    engine->RegisterObjectProperty("ShadowBatchQueue", "float farSplit", offsetof(ShadowBatchQueue, farSplit_));
+    // float ShadowBatchQueue::nearSplit_ | File: ../Graphics/Batch.h
+    engine->RegisterObjectProperty("ShadowBatchQueue", "float nearSplit", offsetof(ShadowBatchQueue, nearSplit_));
+    // BatchQueue ShadowBatchQueue::shadowBatches_ | File: ../Graphics/Batch.h
+    engine->RegisterObjectProperty("ShadowBatchQueue", "BatchQueue shadowBatches", offsetof(ShadowBatchQueue, shadowBatches_));
+    // Camera* ShadowBatchQueue::shadowCamera_ | File: ../Graphics/Batch.h
+    // Camera* can not be registered
+    // IntRect ShadowBatchQueue::shadowViewport_ | File: ../Graphics/Batch.h
+    engine->RegisterObjectProperty("ShadowBatchQueue", "IntRect shadowViewport", offsetof(ShadowBatchQueue, shadowViewport_));
+    // ShadowBatchQueue::~ShadowBatchQueue() | Implicitly-declared
+    engine->RegisterObjectBehaviour("ShadowBatchQueue", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(ShadowBatchQueue_Destructor), asCALL_CDECL_OBJFIRST);
+    // ShadowBatchQueue& ShadowBatchQueue::operator=(const ShadowBatchQueue&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<ShadowBatchQueue>(engine, "ShadowBatchQueue");
+#ifdef REGISTER_MANUAL_PART_ShadowBatchQueue
+    REGISTER_MANUAL_PART_ShadowBatchQueue(ShadowBatchQueue, "ShadowBatchQueue")
+#endif
+
 #ifdef URHO3D_NAVIGATION
     // rcCompactHeightfield* NavBuildData::compactHeightField_ | File: ../Navigation/NavBuildData.h
     // rcCompactHeightfield* can not be registered
@@ -5384,76 +5454,6 @@ void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
 #ifdef REGISTER_MANUAL_PART_SimpleNavBuildData
     REGISTER_MANUAL_PART_SimpleNavBuildData(SimpleNavBuildData, "SimpleNavBuildData")
 #endif
-#endif
-
-    // unsigned ShaderParameter::buffer_ | File: ../Graphics/ShaderVariation.h
-    engine->RegisterObjectProperty("ShaderParameter", "uint buffer", offsetof(ShaderParameter, buffer_));
-    // ConstantBuffer* ShaderParameter::bufferPtr_ | File: ../Graphics/ShaderVariation.h
-    // ConstantBuffer* can not be registered
-    // unsigned ShaderParameter::glType_ | File: ../Graphics/ShaderVariation.h
-    engine->RegisterObjectProperty("ShaderParameter", "uint glType", offsetof(ShaderParameter, glType_));
-    // int ShaderParameter::location_ | File: ../Graphics/ShaderVariation.h
-    engine->RegisterObjectProperty("ShaderParameter", "int location", offsetof(ShaderParameter, location_));
-    // String ShaderParameter::name_ | File: ../Graphics/ShaderVariation.h
-    engine->RegisterObjectProperty("ShaderParameter", "String name", offsetof(ShaderParameter, name_));
-    // unsigned ShaderParameter::offset_ | File: ../Graphics/ShaderVariation.h
-    engine->RegisterObjectProperty("ShaderParameter", "uint offset", offsetof(ShaderParameter, offset_));
-    // unsigned ShaderParameter::regCount_ | File: ../Graphics/ShaderVariation.h
-    engine->RegisterObjectProperty("ShaderParameter", "uint regCount", offsetof(ShaderParameter, regCount_));
-    // unsigned ShaderParameter::register_ | File: ../Graphics/ShaderVariation.h
-    engine->RegisterObjectProperty("ShaderParameter", "uint register", offsetof(ShaderParameter, register_));
-    // unsigned ShaderParameter::size_ | File: ../Graphics/ShaderVariation.h
-    engine->RegisterObjectProperty("ShaderParameter", "uint size", offsetof(ShaderParameter, size_));
-    // ShaderType ShaderParameter::type_ | File: ../Graphics/ShaderVariation.h
-    engine->RegisterObjectProperty("ShaderParameter", "ShaderType type", offsetof(ShaderParameter, type_));
-    // ShaderParameter::ShaderParameter(const String& name, unsigned glType, int location) | File: ../Graphics/ShaderVariation.h
-    engine->RegisterObjectBehaviour("ShaderParameter", asBEHAVE_CONSTRUCT, "void f(const String&in, uint, int)", asFUNCTION(ShaderParameter_ShaderParameter_String_unsigned_int), asCALL_CDECL_OBJFIRST);
-    // ShaderParameter::ShaderParameter(ShaderType type, const String& name, unsigned offset, unsigned size, unsigned buffer) | File: ../Graphics/ShaderVariation.h
-    engine->RegisterObjectBehaviour("ShaderParameter", asBEHAVE_CONSTRUCT, "void f(ShaderType, const String&in, uint, uint, uint)", asFUNCTION(ShaderParameter_ShaderParameter_ShaderType_String_unsigned_unsigned_unsigned), asCALL_CDECL_OBJFIRST);
-    // ShaderParameter::ShaderParameter(ShaderType type, const String& name, unsigned reg, unsigned regCount) | File: ../Graphics/ShaderVariation.h
-    engine->RegisterObjectBehaviour("ShaderParameter", asBEHAVE_CONSTRUCT, "void f(ShaderType, const String&in, uint, uint)", asFUNCTION(ShaderParameter_ShaderParameter_ShaderType_String_unsigned_unsigned), asCALL_CDECL_OBJFIRST);
-    // ShaderParameter::~ShaderParameter() | Implicitly-declared
-    engine->RegisterObjectBehaviour("ShaderParameter", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(ShaderParameter_Destructor), asCALL_CDECL_OBJFIRST);
-    // ShaderParameter& ShaderParameter::operator=(const ShaderParameter&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<ShaderParameter>(engine, "ShaderParameter");
-#ifdef REGISTER_MANUAL_PART_ShaderParameter
-    REGISTER_MANUAL_PART_ShaderParameter(ShaderParameter, "ShaderParameter")
-#endif
-
-    // bool ScenePassInfo::allowInstancing_ | File: ../Graphics/View.h
-    engine->RegisterObjectProperty("ScenePassInfo", "bool allowInstancing", offsetof(ScenePassInfo, allowInstancing_));
-    // BatchQueue* ScenePassInfo::batchQueue_ | File: ../Graphics/View.h
-    // BatchQueue* can not be registered
-    // bool ScenePassInfo::markToStencil_ | File: ../Graphics/View.h
-    engine->RegisterObjectProperty("ScenePassInfo", "bool markToStencil", offsetof(ScenePassInfo, markToStencil_));
-    // unsigned ScenePassInfo::passIndex_ | File: ../Graphics/View.h
-    engine->RegisterObjectProperty("ScenePassInfo", "uint passIndex", offsetof(ScenePassInfo, passIndex_));
-    // bool ScenePassInfo::vertexLights_ | File: ../Graphics/View.h
-    engine->RegisterObjectProperty("ScenePassInfo", "bool vertexLights", offsetof(ScenePassInfo, vertexLights_));
-    // ScenePassInfo::~ScenePassInfo() | Implicitly-declared
-    engine->RegisterObjectBehaviour("ScenePassInfo", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(ScenePassInfo_Destructor), asCALL_CDECL_OBJFIRST);
-    // ScenePassInfo& ScenePassInfo::operator=(const ScenePassInfo&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<ScenePassInfo>(engine, "ScenePassInfo");
-#ifdef REGISTER_MANUAL_PART_ScenePassInfo
-    REGISTER_MANUAL_PART_ScenePassInfo(ScenePassInfo, "ScenePassInfo")
-#endif
-
-    // float ShadowBatchQueue::farSplit_ | File: ../Graphics/Batch.h
-    engine->RegisterObjectProperty("ShadowBatchQueue", "float farSplit", offsetof(ShadowBatchQueue, farSplit_));
-    // float ShadowBatchQueue::nearSplit_ | File: ../Graphics/Batch.h
-    engine->RegisterObjectProperty("ShadowBatchQueue", "float nearSplit", offsetof(ShadowBatchQueue, nearSplit_));
-    // BatchQueue ShadowBatchQueue::shadowBatches_ | File: ../Graphics/Batch.h
-    engine->RegisterObjectProperty("ShadowBatchQueue", "BatchQueue shadowBatches", offsetof(ShadowBatchQueue, shadowBatches_));
-    // Camera* ShadowBatchQueue::shadowCamera_ | File: ../Graphics/Batch.h
-    // Camera* can not be registered
-    // IntRect ShadowBatchQueue::shadowViewport_ | File: ../Graphics/Batch.h
-    engine->RegisterObjectProperty("ShadowBatchQueue", "IntRect shadowViewport", offsetof(ShadowBatchQueue, shadowViewport_));
-    // ShadowBatchQueue::~ShadowBatchQueue() | Implicitly-declared
-    engine->RegisterObjectBehaviour("ShadowBatchQueue", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(ShadowBatchQueue_Destructor), asCALL_CDECL_OBJFIRST);
-    // ShadowBatchQueue& ShadowBatchQueue::operator=(const ShadowBatchQueue&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<ShadowBatchQueue>(engine, "ShadowBatchQueue");
-#ifdef REGISTER_MANUAL_PART_ShadowBatchQueue
-    REGISTER_MANUAL_PART_ShadowBatchQueue(ShadowBatchQueue, "ShadowBatchQueue")
 #endif
 
 }

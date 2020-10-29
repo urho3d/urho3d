@@ -19,6 +19,18 @@ namespace Urho3D
 void FakeAddRef(void* ptr);
 void FakeReleaseRef(void* ptr);
 
+// explicit GPUObject::GPUObject(Graphics* graphics) | File: ../Graphics/GPUObject.h
+static void GPUObject_GPUObject_Graphics(GPUObject* ptr, Graphics *graphics)
+{
+    new(ptr) GPUObject(graphics);
+}
+
+// virtual GPUObject::~GPUObject() | File: ../Graphics/GPUObject.h
+static void GPUObject_Destructor_GPUObject_void(GPUObject* ptr)
+{
+    ptr->~GPUObject();
+}
+
 // explicit Geometry::Geometry(Context* context) | File: ../Graphics/Geometry.h
 static Geometry* Geometry_Geometry_Context()
 {
@@ -74,24 +86,6 @@ static void Graphics_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Gra
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
 }
 
-// explicit GPUObject::GPUObject(Graphics* graphics) | File: ../Graphics/GPUObject.h
-static void GPUObject_GPUObject_Graphics(GPUObject* ptr, Graphics *graphics)
-{
-    new(ptr) GPUObject(graphics);
-}
-
-// virtual GPUObject::~GPUObject() | File: ../Graphics/GPUObject.h
-static void GPUObject_Destructor_GPUObject_void(GPUObject* ptr)
-{
-    ptr->~GPUObject();
-}
-
-// GeometryDesc::~GeometryDesc() | Implicitly-declared 
-static void GeometryDesc_Destructor(GeometryDesc* ptr)
-{
-    ptr->~GeometryDesc();
-}
-
 #ifdef URHO3D_PHYSICS
 // GImpactMeshData::GImpactMeshData(Model* model, unsigned lodLevel) | File: ../Physics/CollisionShape.h
 static GImpactMeshData* GImpactMeshData_GImpactMeshData_Model_unsigned(Model *model, unsigned lodLevel)
@@ -108,8 +102,43 @@ static GImpactMeshData* GImpactMeshData_GImpactMeshData_CustomGeometry(CustomGeo
 }
 #endif
 
+// GeometryDesc::~GeometryDesc() | Implicitly-declared 
+static void GeometryDesc_Destructor(GeometryDesc* ptr)
+{
+    ptr->~GeometryDesc();
+}
+
 void ASRegisterGenerated_Members_G(asIScriptEngine* engine)
 {
+    // void GPUObject::ClearDataLost() | File: ../Graphics/GPUObject.h
+    engine->RegisterObjectMethod("GPUObject", "void ClearDataLost()", asMETHODPR(GPUObject, ClearDataLost, (), void), asCALL_THISCALL);
+    // void* GPUObject::GetGPUObject() const | File: ../Graphics/GPUObject.h
+    // Error: type "void*" can not automatically bind
+    // unsigned GPUObject::GetGPUObjectName() const | File: ../Graphics/GPUObject.h
+    engine->RegisterObjectMethod("GPUObject", "uint GetGPUObjectName() const", asMETHODPR(GPUObject, GetGPUObjectName, () const, unsigned), asCALL_THISCALL);
+    // Graphics* GPUObject::GetGraphics() const | File: ../Graphics/GPUObject.h
+    engine->RegisterObjectMethod("GPUObject", "Graphics@+ GetGraphics() const", asMETHODPR(GPUObject, GetGraphics, () const, Graphics*), asCALL_THISCALL);
+    // explicit GPUObject::GPUObject(Graphics* graphics) | File: ../Graphics/GPUObject.h
+    engine->RegisterObjectBehaviour("GPUObject", asBEHAVE_CONSTRUCT, "void f(Graphics@+)", asFUNCTION(GPUObject_GPUObject_Graphics), asCALL_CDECL_OBJFIRST);
+    // bool GPUObject::HasPendingData() const | File: ../Graphics/GPUObject.h
+    engine->RegisterObjectMethod("GPUObject", "bool HasPendingData() const", asMETHODPR(GPUObject, HasPendingData, () const, bool), asCALL_THISCALL);
+    // bool GPUObject::IsDataLost() const | File: ../Graphics/GPUObject.h
+    engine->RegisterObjectMethod("GPUObject", "bool IsDataLost() const", asMETHODPR(GPUObject, IsDataLost, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("GPUObject", "bool get_dataLost() const", asMETHODPR(GPUObject, IsDataLost, () const, bool), asCALL_THISCALL);
+    // virtual void GPUObject::OnDeviceLost() | File: ../Graphics/GPUObject.h
+    engine->RegisterObjectMethod("GPUObject", "void OnDeviceLost()", asMETHODPR(GPUObject, OnDeviceLost, (), void), asCALL_THISCALL);
+    // virtual void GPUObject::OnDeviceReset() | File: ../Graphics/GPUObject.h
+    engine->RegisterObjectMethod("GPUObject", "void OnDeviceReset()", asMETHODPR(GPUObject, OnDeviceReset, (), void), asCALL_THISCALL);
+    // virtual void GPUObject::Release() | File: ../Graphics/GPUObject.h
+    engine->RegisterObjectMethod("GPUObject", "void Release()", asMETHODPR(GPUObject, Release, (), void), asCALL_THISCALL);
+    // virtual GPUObject::~GPUObject() | File: ../Graphics/GPUObject.h
+    engine->RegisterObjectBehaviour("GPUObject", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(GPUObject_Destructor_GPUObject_void), asCALL_CDECL_OBJFIRST);
+    // GPUObject& GPUObject::operator=(const GPUObject&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<GPUObject>(engine, "GPUObject");
+#ifdef REGISTER_MANUAL_PART_GPUObject
+    REGISTER_MANUAL_PART_GPUObject(GPUObject, "GPUObject")
+#endif
+
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("Geometry", asBEHAVE_ADDREF, "void f()", asMETHODPR(Geometry, AddRef, (), void), asCALL_THISCALL);
     // template<typename T> T* Object::Cast() | File: ../Core/Object.h
@@ -880,53 +909,6 @@ void ASRegisterGenerated_Members_G(asIScriptEngine* engine)
     RegisterSubclass<Object, Graphics>(engine, "Object", "Graphics");
     RegisterSubclass<RefCounted, Graphics>(engine, "RefCounted", "Graphics");
 
-    // void GPUObject::ClearDataLost() | File: ../Graphics/GPUObject.h
-    engine->RegisterObjectMethod("GPUObject", "void ClearDataLost()", asMETHODPR(GPUObject, ClearDataLost, (), void), asCALL_THISCALL);
-    // void* GPUObject::GetGPUObject() const | File: ../Graphics/GPUObject.h
-    // Error: type "void*" can not automatically bind
-    // unsigned GPUObject::GetGPUObjectName() const | File: ../Graphics/GPUObject.h
-    engine->RegisterObjectMethod("GPUObject", "uint GetGPUObjectName() const", asMETHODPR(GPUObject, GetGPUObjectName, () const, unsigned), asCALL_THISCALL);
-    // Graphics* GPUObject::GetGraphics() const | File: ../Graphics/GPUObject.h
-    engine->RegisterObjectMethod("GPUObject", "Graphics@+ GetGraphics() const", asMETHODPR(GPUObject, GetGraphics, () const, Graphics*), asCALL_THISCALL);
-    // explicit GPUObject::GPUObject(Graphics* graphics) | File: ../Graphics/GPUObject.h
-    engine->RegisterObjectBehaviour("GPUObject", asBEHAVE_CONSTRUCT, "void f(Graphics@+)", asFUNCTION(GPUObject_GPUObject_Graphics), asCALL_CDECL_OBJFIRST);
-    // bool GPUObject::HasPendingData() const | File: ../Graphics/GPUObject.h
-    engine->RegisterObjectMethod("GPUObject", "bool HasPendingData() const", asMETHODPR(GPUObject, HasPendingData, () const, bool), asCALL_THISCALL);
-    // bool GPUObject::IsDataLost() const | File: ../Graphics/GPUObject.h
-    engine->RegisterObjectMethod("GPUObject", "bool IsDataLost() const", asMETHODPR(GPUObject, IsDataLost, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("GPUObject", "bool get_dataLost() const", asMETHODPR(GPUObject, IsDataLost, () const, bool), asCALL_THISCALL);
-    // virtual void GPUObject::OnDeviceLost() | File: ../Graphics/GPUObject.h
-    engine->RegisterObjectMethod("GPUObject", "void OnDeviceLost()", asMETHODPR(GPUObject, OnDeviceLost, (), void), asCALL_THISCALL);
-    // virtual void GPUObject::OnDeviceReset() | File: ../Graphics/GPUObject.h
-    engine->RegisterObjectMethod("GPUObject", "void OnDeviceReset()", asMETHODPR(GPUObject, OnDeviceReset, (), void), asCALL_THISCALL);
-    // virtual void GPUObject::Release() | File: ../Graphics/GPUObject.h
-    engine->RegisterObjectMethod("GPUObject", "void Release()", asMETHODPR(GPUObject, Release, (), void), asCALL_THISCALL);
-    // virtual GPUObject::~GPUObject() | File: ../Graphics/GPUObject.h
-    engine->RegisterObjectBehaviour("GPUObject", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(GPUObject_Destructor_GPUObject_void), asCALL_CDECL_OBJFIRST);
-    // GPUObject& GPUObject::operator=(const GPUObject&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<GPUObject>(engine, "GPUObject");
-#ifdef REGISTER_MANUAL_PART_GPUObject
-    REGISTER_MANUAL_PART_GPUObject(GPUObject, "GPUObject")
-#endif
-
-    // unsigned GeometryDesc::ibRef_ | File: ../Graphics/Model.h
-    engine->RegisterObjectProperty("GeometryDesc", "uint ibRef", offsetof(GeometryDesc, ibRef_));
-    // unsigned GeometryDesc::indexCount_ | File: ../Graphics/Model.h
-    engine->RegisterObjectProperty("GeometryDesc", "uint indexCount", offsetof(GeometryDesc, indexCount_));
-    // unsigned GeometryDesc::indexStart_ | File: ../Graphics/Model.h
-    engine->RegisterObjectProperty("GeometryDesc", "uint indexStart", offsetof(GeometryDesc, indexStart_));
-    // PrimitiveType GeometryDesc::type_ | File: ../Graphics/Model.h
-    engine->RegisterObjectProperty("GeometryDesc", "PrimitiveType type", offsetof(GeometryDesc, type_));
-    // unsigned GeometryDesc::vbRef_ | File: ../Graphics/Model.h
-    engine->RegisterObjectProperty("GeometryDesc", "uint vbRef", offsetof(GeometryDesc, vbRef_));
-    // GeometryDesc::~GeometryDesc() | Implicitly-declared
-    engine->RegisterObjectBehaviour("GeometryDesc", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(GeometryDesc_Destructor), asCALL_CDECL_OBJFIRST);
-    // GeometryDesc& GeometryDesc::operator=(const GeometryDesc&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<GeometryDesc>(engine, "GeometryDesc");
-#ifdef REGISTER_MANUAL_PART_GeometryDesc
-    REGISTER_MANUAL_PART_GeometryDesc(GeometryDesc, "GeometryDesc")
-#endif
-
 #ifdef URHO3D_PHYSICS
     // UniquePtr<TriangleMeshInterface> GImpactMeshData::meshInterface_ | File: ../Physics/CollisionShape.h
     // Error: type "UniquePtr<TriangleMeshInterface>" can not automatically bind
@@ -957,6 +939,24 @@ void ASRegisterGenerated_Members_G(asIScriptEngine* engine)
 #endif
     RegisterSubclass<CollisionGeometryData, GImpactMeshData>(engine, "CollisionGeometryData", "GImpactMeshData");
     RegisterSubclass<RefCounted, GImpactMeshData>(engine, "RefCounted", "GImpactMeshData");
+#endif
+
+    // unsigned GeometryDesc::ibRef_ | File: ../Graphics/Model.h
+    engine->RegisterObjectProperty("GeometryDesc", "uint ibRef", offsetof(GeometryDesc, ibRef_));
+    // unsigned GeometryDesc::indexCount_ | File: ../Graphics/Model.h
+    engine->RegisterObjectProperty("GeometryDesc", "uint indexCount", offsetof(GeometryDesc, indexCount_));
+    // unsigned GeometryDesc::indexStart_ | File: ../Graphics/Model.h
+    engine->RegisterObjectProperty("GeometryDesc", "uint indexStart", offsetof(GeometryDesc, indexStart_));
+    // PrimitiveType GeometryDesc::type_ | File: ../Graphics/Model.h
+    engine->RegisterObjectProperty("GeometryDesc", "PrimitiveType type", offsetof(GeometryDesc, type_));
+    // unsigned GeometryDesc::vbRef_ | File: ../Graphics/Model.h
+    engine->RegisterObjectProperty("GeometryDesc", "uint vbRef", offsetof(GeometryDesc, vbRef_));
+    // GeometryDesc::~GeometryDesc() | Implicitly-declared
+    engine->RegisterObjectBehaviour("GeometryDesc", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(GeometryDesc_Destructor), asCALL_CDECL_OBJFIRST);
+    // GeometryDesc& GeometryDesc::operator=(const GeometryDesc&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<GeometryDesc>(engine, "GeometryDesc");
+#ifdef REGISTER_MANUAL_PART_GeometryDesc
+    REGISTER_MANUAL_PART_GeometryDesc(GeometryDesc, "GeometryDesc")
 #endif
 
 }

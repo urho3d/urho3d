@@ -35,31 +35,6 @@ namespace Urho3D
 void FakeAddRef(void* ptr);
 void FakeReleaseRef(void* ptr);
 
-// explicit DebugHud::DebugHud(Context* context) | File: ../Engine/DebugHud.h
-static DebugHud* DebugHud_DebugHud_Context()
-{
-    return new DebugHud(GetScriptContext());
-}
-
-// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void DebugHud_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(DebugHud* ptr, CScriptArray* exceptions, bool onlyUserData)
-{
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
-}
-
-// DebugLine::DebugLine(const Vector3& start, const Vector3& end, unsigned color) | File: ../Graphics/DebugRenderer.h
-static void DebugLine_DebugLine_Vector3_Vector3_unsigned(DebugLine* ptr, const Vector3 &start, const Vector3 &end, unsigned color)
-{
-    new(ptr) DebugLine(start, end, color);
-}
-
-// DebugLine::~DebugLine() | Implicitly-declared 
-static void DebugLine_Destructor(DebugLine* ptr)
-{
-    ptr->~DebugLine();
-}
-
 #ifdef URHO3D_DATABASE
 // explicit Database::Database(Context* context) | File: ../Database/Database.h
 static Database* Database_Database_Context()
@@ -76,6 +51,19 @@ static void Database_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Dat
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
 }
 #endif
+
+// explicit DebugHud::DebugHud(Context* context) | File: ../Engine/DebugHud.h
+static DebugHud* DebugHud_DebugHud_Context()
+{
+    return new DebugHud(GetScriptContext());
+}
+
+// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+static void DebugHud_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(DebugHud* ptr, CScriptArray* exceptions, bool onlyUserData)
+{
+    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+}
 
 // explicit DebugRenderer::DebugRenderer(Context* context) | File: ../Graphics/DebugRenderer.h
 static DebugRenderer* DebugRenderer_DebugRenderer_Context()
@@ -229,6 +217,18 @@ static void DynamicNavigationMesh_UnsubscribeFromAllEventsExcept_PODVectorString
 }
 #endif
 
+// DebugLine::DebugLine(const Vector3& start, const Vector3& end, unsigned color) | File: ../Graphics/DebugRenderer.h
+static void DebugLine_DebugLine_Vector3_Vector3_unsigned(DebugLine* ptr, const Vector3 &start, const Vector3 &end, unsigned color)
+{
+    new(ptr) DebugLine(start, end, color);
+}
+
+// DebugLine::~DebugLine() | Implicitly-declared 
+static void DebugLine_Destructor(DebugLine* ptr)
+{
+    ptr->~DebugLine();
+}
+
 // DebugTriangle::DebugTriangle(const Vector3& v1, const Vector3& v2, const Vector3& v3, unsigned color) | File: ../Graphics/DebugRenderer.h
 static void DebugTriangle_DebugTriangle_Vector3_Vector3_Vector3_unsigned(DebugTriangle* ptr, const Vector3 &v1, const Vector3 &v2, const Vector3 &v3, unsigned color)
 {
@@ -240,14 +240,6 @@ static void DebugTriangle_Destructor(DebugTriangle* ptr)
 {
     ptr->~DebugTriangle();
 }
-
-#ifdef URHO3D_URHO2D
-// DelayedWorldTransform2D::~DelayedWorldTransform2D() | Implicitly-declared 
-static void DelayedWorldTransform2D_Destructor(DelayedWorldTransform2D* ptr)
-{
-    ptr->~DelayedWorldTransform2D();
-}
-#endif
 
 // Decal::~Decal() | Implicitly-declared 
 static void Decal_Destructor(Decal* ptr)
@@ -275,6 +267,14 @@ static void DelayedWorldTransform_Destructor(DelayedWorldTransform* ptr)
 }
 #endif
 
+#ifdef URHO3D_URHO2D
+// DelayedWorldTransform2D::~DelayedWorldTransform2D() | Implicitly-declared 
+static void DelayedWorldTransform2D_Destructor(DelayedWorldTransform2D* ptr)
+{
+    ptr->~DelayedWorldTransform2D();
+}
+#endif
+
 // DirtyBits::DirtyBits(const DirtyBits& bits) | File: ../Scene/ReplicationState.h
 static void DirtyBits_DirtyBits_DirtyBits(DirtyBits* ptr, const DirtyBits &bits)
 {
@@ -289,6 +289,131 @@ static void DirtyBits_Destructor(DirtyBits* ptr)
 
 void ASRegisterGenerated_Members_D(asIScriptEngine* engine)
 {
+#ifdef URHO3D_DATABASE
+    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("Database", asBEHAVE_ADDREF, "void f()", asMETHODPR(Database, AddRef, (), void), asCALL_THISCALL);
+    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
+    // Not registered because template
+    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
+    // Not registered because template
+    // DbConnection* Database::Connect(const String& connectionString) | File: ../Database/Database.h
+    engine->RegisterObjectMethod("Database", "DbConnection@+ Connect(const String&in)", asMETHODPR(Database, Connect, (const String&), DbConnection*), asCALL_THISCALL);
+    // explicit Database::Database(Context* context) | File: ../Database/Database.h
+    engine->RegisterObjectBehaviour("Database", asBEHAVE_FACTORY, "Database@+ f()", asFUNCTION(Database_Database_Context), asCALL_CDECL);
+    // void Database::Disconnect(DbConnection* connection) | File: ../Database/Database.h
+    engine->RegisterObjectMethod("Database", "void Disconnect(DbConnection@+)", asMETHODPR(Database, Disconnect, (DbConnection*), void), asCALL_THISCALL);
+    // static DBAPI Database::GetAPI() | File: ../Database/Database.h
+    engine->SetDefaultNamespace("Database");
+    engine->RegisterGlobalFunction("DBAPI GetAPI()", asFUNCTIONPR(Database::GetAPI, (), DBAPI), asCALL_CDECL);
+    engine->SetDefaultNamespace("");
+    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Database", "bool GetBlockEvents() const", asMETHODPR(Database, GetBlockEvents, () const, bool), asCALL_THISCALL);
+    // const String& Object::GetCategory() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Database", "const String& GetCategory() const", asMETHODPR(Database, GetCategory, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Database", "const String& get_category() const", asMETHODPR(Database, GetCategory, () const, const String&), asCALL_THISCALL);
+    // Context* Object::GetContext() const | File: ../Core/Object.h
+    // Error: type "Context*" can not be returned
+    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Database", "VariantMap& GetEventDataMap() const", asMETHODPR(Database, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
+    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // Object* Object::GetEventSender() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Database", "Object@+ GetEventSender() const", asMETHODPR(Database, GetEventSender, () const, Object*), asCALL_THISCALL);
+    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Database", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(Database, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Database", "const Variant& get_globalVar(StringHash) const", asMETHODPR(Database, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Database", "const VariantMap& GetGlobalVars() const", asMETHODPR(Database, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Database", "const VariantMap& get_globalVars() const", asMETHODPR(Database, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    // unsigned Database::GetPoolSize() const | File: ../Database/Database.h
+    engine->RegisterObjectMethod("Database", "uint GetPoolSize() const", asMETHODPR(Database, GetPoolSize, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Database", "uint get_poolSize() const", asMETHODPR(Database, GetPoolSize, () const, unsigned), asCALL_THISCALL);
+    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Database", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Database, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
+    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // Not registered because template
+    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Database", "StringHash GetType() const", asMETHODPR(Database, GetType, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Database", "StringHash get_type() const", asMETHODPR(Database, GetType, () const, StringHash), asCALL_THISCALL);
+    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Database", "const String& GetTypeName() const", asMETHODPR(Database, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Database", "const String& get_typeName() const", asMETHODPR(Database, GetTypeName, () const, const String&), asCALL_THISCALL);
+    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Database", "bool HasEventHandlers() const", asMETHODPR(Database, HasEventHandlers, () const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Database", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(Database, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Database", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(Database, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Database", "bool IsInstanceOf(StringHash) const", asMETHODPR(Database, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
+    // Not registered because template
+    // bool Database::IsPooling() const | File: ../Database/Database.h
+    engine->RegisterObjectMethod("Database", "bool IsPooling() const", asMETHODPR(Database, IsPooling, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Database", "bool get_pooling() const", asMETHODPR(Database, IsPooling, () const, bool), asCALL_THISCALL);
+    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Database", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(Database, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
+    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
+    // Error: type "RefCount*" can not automatically bind
+    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("Database", "int Refs() const", asMETHODPR(Database, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Database", "int get_refs() const", asMETHODPR(Database, Refs, () const, int), asCALL_THISCALL);
+    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("Database", asBEHAVE_RELEASE, "void f()", asMETHODPR(Database, ReleaseRef, (), void), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Database", "void SendEvent(StringHash)", asMETHODPR(Database, SendEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Database", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(Database, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
+    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
+    // Not registered because template
+    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Database", "void SetBlockEvents(bool)", asMETHODPR(Database, SetBlockEvents, (bool), void), asCALL_THISCALL);
+    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Database", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(Database, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Database", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(Database, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    // void Database::SetPoolSize(unsigned poolSize) | File: ../Database/Database.h
+    engine->RegisterObjectMethod("Database", "void SetPoolSize(uint)", asMETHODPR(Database, SetPoolSize, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Database", "void set_poolSize(uint)", asMETHODPR(Database, SetPoolSize, (unsigned), void), asCALL_THISCALL);
+    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Database", "void UnsubscribeFromAllEvents()", asMETHODPR(Database, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Database", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(Database_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
+    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Database", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(Database, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Database", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(Database, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Database", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(Database, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
+    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("Database", "int WeakRefs() const", asMETHODPR(Database, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Database", "int get_weakRefs() const", asMETHODPR(Database, WeakRefs, () const, int), asCALL_THISCALL);
+#ifdef REGISTER_MANUAL_PART_Object
+    REGISTER_MANUAL_PART_Object(Database, "Database")
+#endif
+#ifdef REGISTER_MANUAL_PART_RefCounted
+    REGISTER_MANUAL_PART_RefCounted(Database, "Database")
+#endif
+#ifdef REGISTER_MANUAL_PART_Database
+    REGISTER_MANUAL_PART_Database(Database, "Database")
+#endif
+    RegisterSubclass<Object, Database>(engine, "Object", "Database");
+    RegisterSubclass<RefCounted, Database>(engine, "RefCounted", "Database");
+#endif
+
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("DebugHud", asBEHAVE_ADDREF, "void f()", asMETHODPR(DebugHud, AddRef, (), void), asCALL_THISCALL);
     // template<typename T> T* Object::Cast() | File: ../Core/Object.h
@@ -450,147 +575,6 @@ void ASRegisterGenerated_Members_D(asIScriptEngine* engine)
 #endif
     RegisterSubclass<Object, DebugHud>(engine, "Object", "DebugHud");
     RegisterSubclass<RefCounted, DebugHud>(engine, "RefCounted", "DebugHud");
-
-    // unsigned DebugLine::color_ | File: ../Graphics/DebugRenderer.h
-    engine->RegisterObjectProperty("DebugLine", "uint color", offsetof(DebugLine, color_));
-    // Vector3 DebugLine::end_ | File: ../Graphics/DebugRenderer.h
-    engine->RegisterObjectProperty("DebugLine", "Vector3 end", offsetof(DebugLine, end_));
-    // Vector3 DebugLine::start_ | File: ../Graphics/DebugRenderer.h
-    engine->RegisterObjectProperty("DebugLine", "Vector3 start", offsetof(DebugLine, start_));
-    // DebugLine::DebugLine(const Vector3& start, const Vector3& end, unsigned color) | File: ../Graphics/DebugRenderer.h
-    engine->RegisterObjectBehaviour("DebugLine", asBEHAVE_CONSTRUCT, "void f(const Vector3&in, const Vector3&in, uint)", asFUNCTION(DebugLine_DebugLine_Vector3_Vector3_unsigned), asCALL_CDECL_OBJFIRST);
-    // DebugLine::~DebugLine() | Implicitly-declared
-    engine->RegisterObjectBehaviour("DebugLine", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DebugLine_Destructor), asCALL_CDECL_OBJFIRST);
-    // DebugLine& DebugLine::operator=(const DebugLine&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<DebugLine>(engine, "DebugLine");
-#ifdef REGISTER_MANUAL_PART_DebugLine
-    REGISTER_MANUAL_PART_DebugLine(DebugLine, "DebugLine")
-#endif
-
-#ifdef URHO3D_DATABASE
-    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("Database", asBEHAVE_ADDREF, "void f()", asMETHODPR(Database, AddRef, (), void), asCALL_THISCALL);
-    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
-    // Not registered because template
-    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
-    // Not registered because template
-    // DbConnection* Database::Connect(const String& connectionString) | File: ../Database/Database.h
-    engine->RegisterObjectMethod("Database", "DbConnection@+ Connect(const String&in)", asMETHODPR(Database, Connect, (const String&), DbConnection*), asCALL_THISCALL);
-    // explicit Database::Database(Context* context) | File: ../Database/Database.h
-    engine->RegisterObjectBehaviour("Database", asBEHAVE_FACTORY, "Database@+ f()", asFUNCTION(Database_Database_Context), asCALL_CDECL);
-    // void Database::Disconnect(DbConnection* connection) | File: ../Database/Database.h
-    engine->RegisterObjectMethod("Database", "void Disconnect(DbConnection@+)", asMETHODPR(Database, Disconnect, (DbConnection*), void), asCALL_THISCALL);
-    // static DBAPI Database::GetAPI() | File: ../Database/Database.h
-    engine->SetDefaultNamespace("Database");
-    engine->RegisterGlobalFunction("DBAPI GetAPI()", asFUNCTIONPR(Database::GetAPI, (), DBAPI), asCALL_CDECL);
-    engine->SetDefaultNamespace("");
-    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Database", "bool GetBlockEvents() const", asMETHODPR(Database, GetBlockEvents, () const, bool), asCALL_THISCALL);
-    // const String& Object::GetCategory() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Database", "const String& GetCategory() const", asMETHODPR(Database, GetCategory, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Database", "const String& get_category() const", asMETHODPR(Database, GetCategory, () const, const String&), asCALL_THISCALL);
-    // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
-    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Database", "VariantMap& GetEventDataMap() const", asMETHODPR(Database, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
-    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // Object* Object::GetEventSender() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Database", "Object@+ GetEventSender() const", asMETHODPR(Database, GetEventSender, () const, Object*), asCALL_THISCALL);
-    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Database", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(Database, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Database", "const Variant& get_globalVar(StringHash) const", asMETHODPR(Database, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Database", "const VariantMap& GetGlobalVars() const", asMETHODPR(Database, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Database", "const VariantMap& get_globalVars() const", asMETHODPR(Database, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    // unsigned Database::GetPoolSize() const | File: ../Database/Database.h
-    engine->RegisterObjectMethod("Database", "uint GetPoolSize() const", asMETHODPR(Database, GetPoolSize, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Database", "uint get_poolSize() const", asMETHODPR(Database, GetPoolSize, () const, unsigned), asCALL_THISCALL);
-    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Database", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Database, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
-    // Not registered because template
-    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Database", "StringHash GetType() const", asMETHODPR(Database, GetType, () const, StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Database", "StringHash get_type() const", asMETHODPR(Database, GetType, () const, StringHash), asCALL_THISCALL);
-    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Database", "const String& GetTypeName() const", asMETHODPR(Database, GetTypeName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Database", "const String& get_typeName() const", asMETHODPR(Database, GetTypeName, () const, const String&), asCALL_THISCALL);
-    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Database", "bool HasEventHandlers() const", asMETHODPR(Database, HasEventHandlers, () const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Database", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(Database, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Database", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(Database, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Database", "bool IsInstanceOf(StringHash) const", asMETHODPR(Database, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
-    // Not registered because template
-    // bool Database::IsPooling() const | File: ../Database/Database.h
-    engine->RegisterObjectMethod("Database", "bool IsPooling() const", asMETHODPR(Database, IsPooling, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Database", "bool get_pooling() const", asMETHODPR(Database, IsPooling, () const, bool), asCALL_THISCALL);
-    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Database", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(Database, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
-    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
-    // Error: type "RefCount*" can not automatically bind
-    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("Database", "int Refs() const", asMETHODPR(Database, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Database", "int get_refs() const", asMETHODPR(Database, Refs, () const, int), asCALL_THISCALL);
-    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("Database", asBEHAVE_RELEASE, "void f()", asMETHODPR(Database, ReleaseRef, (), void), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Database", "void SendEvent(StringHash)", asMETHODPR(Database, SendEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Database", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(Database, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
-    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
-    // Not registered because template
-    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Database", "void SetBlockEvents(bool)", asMETHODPR(Database, SetBlockEvents, (bool), void), asCALL_THISCALL);
-    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Database", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(Database, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Database", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(Database, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    // void Database::SetPoolSize(unsigned poolSize) | File: ../Database/Database.h
-    engine->RegisterObjectMethod("Database", "void SetPoolSize(uint)", asMETHODPR(Database, SetPoolSize, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Database", "void set_poolSize(uint)", asMETHODPR(Database, SetPoolSize, (unsigned), void), asCALL_THISCALL);
-    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Database", "void UnsubscribeFromAllEvents()", asMETHODPR(Database, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Database", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(Database_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
-    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Database", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(Database, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Database", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(Database, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Database", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(Database, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
-    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("Database", "int WeakRefs() const", asMETHODPR(Database, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Database", "int get_weakRefs() const", asMETHODPR(Database, WeakRefs, () const, int), asCALL_THISCALL);
-#ifdef REGISTER_MANUAL_PART_Object
-    REGISTER_MANUAL_PART_Object(Database, "Database")
-#endif
-#ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(Database, "Database")
-#endif
-#ifdef REGISTER_MANUAL_PART_Database
-    REGISTER_MANUAL_PART_Database(Database, "Database")
-#endif
-    RegisterSubclass<Object, Database>(engine, "Object", "Database");
-    RegisterSubclass<RefCounted, Database>(engine, "RefCounted", "Database");
-#endif
 
     // void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Color& color, bool depthTest=true, bool solid=false) | File: ../Graphics/DebugRenderer.h
     engine->RegisterObjectMethod("DebugRenderer", "void AddBoundingBox(const BoundingBox&in, const Color&in, bool = true, bool = false)", asMETHODPR(DebugRenderer, AddBoundingBox, (const BoundingBox&, const Color&, bool, bool), void), asCALL_THISCALL);
@@ -3790,14 +3774,20 @@ void ASRegisterGenerated_Members_D(asIScriptEngine* engine)
     RegisterSubclass<RefCounted, DynamicNavigationMesh>(engine, "RefCounted", "DynamicNavigationMesh");
 #endif
 
-    // int DepthValue::max_ | File: ../Graphics/OcclusionBuffer.h
-    engine->RegisterObjectProperty("DepthValue", "int max", offsetof(DepthValue, max_));
-    // int DepthValue::min_ | File: ../Graphics/OcclusionBuffer.h
-    engine->RegisterObjectProperty("DepthValue", "int min", offsetof(DepthValue, min_));
-    // DepthValue& DepthValue::operator=(const DepthValue&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<DepthValue>(engine, "DepthValue");
-#ifdef REGISTER_MANUAL_PART_DepthValue
-    REGISTER_MANUAL_PART_DepthValue(DepthValue, "DepthValue")
+    // unsigned DebugLine::color_ | File: ../Graphics/DebugRenderer.h
+    engine->RegisterObjectProperty("DebugLine", "uint color", offsetof(DebugLine, color_));
+    // Vector3 DebugLine::end_ | File: ../Graphics/DebugRenderer.h
+    engine->RegisterObjectProperty("DebugLine", "Vector3 end", offsetof(DebugLine, end_));
+    // Vector3 DebugLine::start_ | File: ../Graphics/DebugRenderer.h
+    engine->RegisterObjectProperty("DebugLine", "Vector3 start", offsetof(DebugLine, start_));
+    // DebugLine::DebugLine(const Vector3& start, const Vector3& end, unsigned color) | File: ../Graphics/DebugRenderer.h
+    engine->RegisterObjectBehaviour("DebugLine", asBEHAVE_CONSTRUCT, "void f(const Vector3&in, const Vector3&in, uint)", asFUNCTION(DebugLine_DebugLine_Vector3_Vector3_unsigned), asCALL_CDECL_OBJFIRST);
+    // DebugLine::~DebugLine() | Implicitly-declared
+    engine->RegisterObjectBehaviour("DebugLine", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DebugLine_Destructor), asCALL_CDECL_OBJFIRST);
+    // DebugLine& DebugLine::operator=(const DebugLine&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<DebugLine>(engine, "DebugLine");
+#ifdef REGISTER_MANUAL_PART_DebugLine
+    REGISTER_MANUAL_PART_DebugLine(DebugLine, "DebugLine")
 #endif
 
     // unsigned DebugTriangle::color_ | File: ../Graphics/DebugRenderer.h
@@ -3816,24 +3806,6 @@ void ASRegisterGenerated_Members_D(asIScriptEngine* engine)
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<DebugTriangle>(engine, "DebugTriangle");
 #ifdef REGISTER_MANUAL_PART_DebugTriangle
     REGISTER_MANUAL_PART_DebugTriangle(DebugTriangle, "DebugTriangle")
-#endif
-
-#ifdef URHO3D_URHO2D
-    // RigidBody2D* DelayedWorldTransform2D::parentRigidBody_ | File: ../Urho2D/PhysicsWorld2D.h
-    // RigidBody2D* can not be registered
-    // RigidBody2D* DelayedWorldTransform2D::rigidBody_ | File: ../Urho2D/PhysicsWorld2D.h
-    // RigidBody2D* can not be registered
-    // Vector3 DelayedWorldTransform2D::worldPosition_ | File: ../Urho2D/PhysicsWorld2D.h
-    engine->RegisterObjectProperty("DelayedWorldTransform2D", "Vector3 worldPosition", offsetof(DelayedWorldTransform2D, worldPosition_));
-    // Quaternion DelayedWorldTransform2D::worldRotation_ | File: ../Urho2D/PhysicsWorld2D.h
-    engine->RegisterObjectProperty("DelayedWorldTransform2D", "Quaternion worldRotation", offsetof(DelayedWorldTransform2D, worldRotation_));
-    // DelayedWorldTransform2D::~DelayedWorldTransform2D() | Implicitly-declared
-    engine->RegisterObjectBehaviour("DelayedWorldTransform2D", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DelayedWorldTransform2D_Destructor), asCALL_CDECL_OBJFIRST);
-    // DelayedWorldTransform2D& DelayedWorldTransform2D::operator=(const DelayedWorldTransform2D&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<DelayedWorldTransform2D>(engine, "DelayedWorldTransform2D");
-#ifdef REGISTER_MANUAL_PART_DelayedWorldTransform2D
-    REGISTER_MANUAL_PART_DelayedWorldTransform2D(DelayedWorldTransform2D, "DelayedWorldTransform2D")
-#endif
 #endif
 
     // BoundingBox Decal::boundingBox_ | File: ../Graphics/DecalSet.h
@@ -3898,6 +3870,34 @@ void ASRegisterGenerated_Members_D(asIScriptEngine* engine)
 #ifdef REGISTER_MANUAL_PART_DelayedWorldTransform
     REGISTER_MANUAL_PART_DelayedWorldTransform(DelayedWorldTransform, "DelayedWorldTransform")
 #endif
+#endif
+
+#ifdef URHO3D_URHO2D
+    // RigidBody2D* DelayedWorldTransform2D::parentRigidBody_ | File: ../Urho2D/PhysicsWorld2D.h
+    // RigidBody2D* can not be registered
+    // RigidBody2D* DelayedWorldTransform2D::rigidBody_ | File: ../Urho2D/PhysicsWorld2D.h
+    // RigidBody2D* can not be registered
+    // Vector3 DelayedWorldTransform2D::worldPosition_ | File: ../Urho2D/PhysicsWorld2D.h
+    engine->RegisterObjectProperty("DelayedWorldTransform2D", "Vector3 worldPosition", offsetof(DelayedWorldTransform2D, worldPosition_));
+    // Quaternion DelayedWorldTransform2D::worldRotation_ | File: ../Urho2D/PhysicsWorld2D.h
+    engine->RegisterObjectProperty("DelayedWorldTransform2D", "Quaternion worldRotation", offsetof(DelayedWorldTransform2D, worldRotation_));
+    // DelayedWorldTransform2D::~DelayedWorldTransform2D() | Implicitly-declared
+    engine->RegisterObjectBehaviour("DelayedWorldTransform2D", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DelayedWorldTransform2D_Destructor), asCALL_CDECL_OBJFIRST);
+    // DelayedWorldTransform2D& DelayedWorldTransform2D::operator=(const DelayedWorldTransform2D&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<DelayedWorldTransform2D>(engine, "DelayedWorldTransform2D");
+#ifdef REGISTER_MANUAL_PART_DelayedWorldTransform2D
+    REGISTER_MANUAL_PART_DelayedWorldTransform2D(DelayedWorldTransform2D, "DelayedWorldTransform2D")
+#endif
+#endif
+
+    // int DepthValue::max_ | File: ../Graphics/OcclusionBuffer.h
+    engine->RegisterObjectProperty("DepthValue", "int max", offsetof(DepthValue, max_));
+    // int DepthValue::min_ | File: ../Graphics/OcclusionBuffer.h
+    engine->RegisterObjectProperty("DepthValue", "int min", offsetof(DepthValue, min_));
+    // DepthValue& DepthValue::operator=(const DepthValue&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<DepthValue>(engine, "DepthValue");
+#ifdef REGISTER_MANUAL_PART_DepthValue
+    REGISTER_MANUAL_PART_DepthValue(DepthValue, "DepthValue")
 #endif
 
     // unsigned char DirtyBits::count_ | File: ../Scene/ReplicationState.h

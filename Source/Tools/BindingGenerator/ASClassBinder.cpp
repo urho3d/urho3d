@@ -1354,9 +1354,16 @@ void ProcessAllClasses(const string& outputBasePath)
     _result_Members_Other = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_Other.cpp", "ASRegisterGenerated_Members_Other");
     _result_Templates = make_shared<ASGeneratedFile_Templates>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Templates.h");
 
-    for (auto element : SourceData::classesByID_)
+    // Sorting keys to make class order compiler independent
+    vector<string> classIDs;
+    classIDs.reserve(SourceData::classesByID_.size());
+    for (pair<const string, xml_node>& it : SourceData::classesByID_)
+        classIDs.push_back(it.first);
+    sort(classIDs.begin(), classIDs.end());
+
+    for (string classID : classIDs)
     {
-        xml_node compounddef = element.second;
+        xml_node compounddef = SourceData::classesByID_[classID];
         ClassAnalyzer analyzer(compounddef);
         ProcessClass(analyzer, false);
 

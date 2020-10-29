@@ -21,6 +21,33 @@ namespace Urho3D
 void FakeAddRef(void* ptr);
 void FakeReleaseRef(void* ptr);
 
+// explicit BillboardSet::BillboardSet(Context* context) | File: ../Graphics/BillboardSet.h
+static BillboardSet* BillboardSet_BillboardSet_Context()
+{
+    return new BillboardSet(GetScriptContext());
+}
+
+// const PODVector<Light*>& Drawable::GetLights() const | File: ../Graphics/Drawable.h
+static CScriptArray* BillboardSet_GetLights_void(BillboardSet* ptr)
+{
+    const PODVector<Light*>& result = ptr->GetLights();
+    return VectorToHandleArray(result, "Array<Light@>");
+}
+
+// const PODVector<Light*>& Drawable::GetVertexLights() const | File: ../Graphics/Drawable.h
+static CScriptArray* BillboardSet_GetVertexLights_void(BillboardSet* ptr)
+{
+    const PODVector<Light*>& result = ptr->GetVertexLights();
+    return VectorToHandleArray(result, "Array<Light@>");
+}
+
+// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+static void BillboardSet_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(BillboardSet* ptr, CScriptArray* exceptions, bool onlyUserData)
+{
+    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+}
+
 // explicit BorderImage::BorderImage(Context* context) | File: ../UI/BorderImage.h
 static BorderImage* BorderImage_BorderImage_Context()
 {
@@ -57,33 +84,6 @@ static CScriptArray* BorderImage_GetTags_void(BorderImage* ptr)
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void BorderImage_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(BorderImage* ptr, CScriptArray* exceptions, bool onlyUserData)
-{
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
-}
-
-// explicit BillboardSet::BillboardSet(Context* context) | File: ../Graphics/BillboardSet.h
-static BillboardSet* BillboardSet_BillboardSet_Context()
-{
-    return new BillboardSet(GetScriptContext());
-}
-
-// const PODVector<Light*>& Drawable::GetLights() const | File: ../Graphics/Drawable.h
-static CScriptArray* BillboardSet_GetLights_void(BillboardSet* ptr)
-{
-    const PODVector<Light*>& result = ptr->GetLights();
-    return VectorToHandleArray(result, "Array<Light@>");
-}
-
-// const PODVector<Light*>& Drawable::GetVertexLights() const | File: ../Graphics/Drawable.h
-static CScriptArray* BillboardSet_GetVertexLights_void(BillboardSet* ptr)
-{
-    const PODVector<Light*>& result = ptr->GetVertexLights();
-    return VectorToHandleArray(result, "Array<Light@>");
-}
-
-// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void BillboardSet_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(BillboardSet* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
     PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
@@ -178,28 +178,10 @@ static void Button_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Butto
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
 }
 
-// BiasParameters::BiasParameters(float constantBias, float slopeScaledBias, float normalOffset=0.0f) | File: ../Graphics/Light.h
-static void BiasParameters_BiasParameters_float_float_float(BiasParameters* ptr, float constantBias, float slopeScaledBias, float normalOffset=0.0f)
+// BackgroundLoadItem::~BackgroundLoadItem() | Implicitly-declared 
+static void BackgroundLoadItem_Destructor(BackgroundLoadItem* ptr)
 {
-    new(ptr) BiasParameters(constantBias, slopeScaledBias, normalOffset);
-}
-
-// explicit BatchGroup::BatchGroup(const Batch& batch) | File: ../Graphics/Batch.h
-static void BatchGroup_BatchGroup_Batch(BatchGroup* ptr, const Batch &batch)
-{
-    new(ptr) BatchGroup(batch);
-}
-
-// BatchGroup::~BatchGroup()=default | File: ../Graphics/Batch.h
-static void BatchGroup_Destructor_BatchGroup_void(BatchGroup* ptr)
-{
-    ptr->~BatchGroup();
-}
-
-// BatchQueue::~BatchQueue() | Implicitly-declared 
-static void BatchQueue_Destructor(BatchQueue* ptr)
-{
-    ptr->~BatchQueue();
+    ptr->~BackgroundLoadItem();
 }
 
 // explicit Batch::Batch(const SourceBatch& rhs) | File: ../Graphics/Batch.h
@@ -214,10 +196,16 @@ static void Batch_Destructor(Batch* ptr)
     ptr->~Batch();
 }
 
-// BackgroundLoadItem::~BackgroundLoadItem() | Implicitly-declared 
-static void BackgroundLoadItem_Destructor(BackgroundLoadItem* ptr)
+// explicit BatchGroup::BatchGroup(const Batch& batch) | File: ../Graphics/Batch.h
+static void BatchGroup_BatchGroup_Batch(BatchGroup* ptr, const Batch &batch)
 {
-    ptr->~BackgroundLoadItem();
+    new(ptr) BatchGroup(batch);
+}
+
+// BatchGroup::~BatchGroup()=default | File: ../Graphics/Batch.h
+static void BatchGroup_Destructor_BatchGroup_void(BatchGroup* ptr)
+{
+    ptr->~BatchGroup();
 }
 
 // explicit BatchGroupKey::BatchGroupKey(const Batch& batch) | File: ../Graphics/Batch.h
@@ -232,6 +220,18 @@ static void BatchGroupKey_Destructor(BatchGroupKey* ptr)
     ptr->~BatchGroupKey();
 }
 
+// BatchQueue::~BatchQueue() | Implicitly-declared 
+static void BatchQueue_Destructor(BatchQueue* ptr)
+{
+    ptr->~BatchQueue();
+}
+
+// BiasParameters::BiasParameters(float constantBias, float slopeScaledBias, float normalOffset=0.0f) | File: ../Graphics/Light.h
+static void BiasParameters_BiasParameters_float_float_float(BiasParameters* ptr, float constantBias, float slopeScaledBias, float normalOffset=0.0f)
+{
+    new(ptr) BiasParameters(constantBias, slopeScaledBias, normalOffset);
+}
+
 // Bone::Bone() | File: ../Graphics/Skeleton.h
 static Bone* Bone_Bone_void()
 {
@@ -240,6 +240,505 @@ static Bone* Bone_Bone_void()
 
 void ASRegisterGenerated_Members_B(asIScriptEngine* engine)
 {
+    // void Drawable::AddLight(Light* light) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "void AddLight(Light@+)", asMETHODPR(BillboardSet, AddLight, (Light*), void), asCALL_THISCALL);
+    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("BillboardSet", asBEHAVE_ADDREF, "void f()", asMETHODPR(BillboardSet, AddRef, (), void), asCALL_THISCALL);
+    // void Component::AddReplicationState(ComponentReplicationState* state) | File: ../Scene/Component.h
+    // Error: type "ComponentReplicationState*" can not automatically bind
+    // void Drawable::AddVertexLight(Light* light) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "void AddVertexLight(Light@+)", asMETHODPR(BillboardSet, AddVertexLight, (Light*), void), asCALL_THISCALL);
+    // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("BillboardSet", "void AllocateNetworkState()", asMETHODPR(BillboardSet, AllocateNetworkState, (), void), asCALL_THISCALL);
+    // virtual void Serializable::ApplyAttributes() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("BillboardSet", "void ApplyAttributes()", asMETHODPR(BillboardSet, ApplyAttributes, (), void), asCALL_THISCALL);
+    // explicit BillboardSet::BillboardSet(Context* context) | File: ../Graphics/BillboardSet.h
+    engine->RegisterObjectBehaviour("BillboardSet", asBEHAVE_FACTORY, "BillboardSet@+ f()", asFUNCTION(BillboardSet_BillboardSet_Context), asCALL_CDECL);
+    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
+    // Not registered because template
+    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
+    // Not registered because template
+    // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("BillboardSet", "void CleanupConnection(Connection@+)", asMETHODPR(BillboardSet, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // void BillboardSet::Commit() | File: ../Graphics/BillboardSet.h
+    engine->RegisterObjectMethod("BillboardSet", "void Commit()", asMETHODPR(BillboardSet, Commit, (), void), asCALL_THISCALL);
+    // void Drawable::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(BillboardSet, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
+    // virtual bool Drawable::DrawOcclusion(OcclusionBuffer* buffer) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "bool DrawOcclusion(OcclusionBuffer@+)", asMETHODPR(BillboardSet, DrawOcclusion, (OcclusionBuffer*), bool), asCALL_THISCALL);
+    // bool Animatable::GetAnimationEnabled() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("BillboardSet", "bool GetAnimationEnabled() const", asMETHODPR(BillboardSet, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "bool get_animationEnabled() const", asMETHODPR(BillboardSet, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
+    // float BillboardSet::GetAnimationLodBias() const | File: ../Graphics/BillboardSet.h
+    engine->RegisterObjectMethod("BillboardSet", "float GetAnimationLodBias() const", asMETHODPR(BillboardSet, GetAnimationLodBias, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "float get_animationLodBias() const", asMETHODPR(BillboardSet, GetAnimationLodBias, () const, float), asCALL_THISCALL);
+    // Variant Serializable::GetAttribute(unsigned index) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("BillboardSet", "Variant GetAttribute(uint) const", asMETHODPR(BillboardSet, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "Variant get_attributes(uint) const", asMETHODPR(BillboardSet, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
+    // Variant Serializable::GetAttribute(const String& name) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("BillboardSet", "Variant GetAttribute(const String&in) const", asMETHODPR(BillboardSet, GetAttribute, (const String&) const, Variant), asCALL_THISCALL);
+    // ValueAnimation* Animatable::GetAttributeAnimation(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("BillboardSet", "ValueAnimation@+ GetAttributeAnimation(const String&in) const", asMETHODPR(BillboardSet, GetAttributeAnimation, (const String&) const, ValueAnimation*), asCALL_THISCALL);
+    // float Animatable::GetAttributeAnimationSpeed(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("BillboardSet", "float GetAttributeAnimationSpeed(const String&in) const", asMETHODPR(BillboardSet, GetAttributeAnimationSpeed, (const String&) const, float), asCALL_THISCALL);
+    // float Animatable::GetAttributeAnimationTime(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("BillboardSet", "float GetAttributeAnimationTime(const String&in) const", asMETHODPR(BillboardSet, GetAttributeAnimationTime, (const String&) const, float), asCALL_THISCALL);
+    // WrapMode Animatable::GetAttributeAnimationWrapMode(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("BillboardSet", "WrapMode GetAttributeAnimationWrapMode(const String&in) const", asMETHODPR(BillboardSet, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), asCALL_THISCALL);
+    // Variant Serializable::GetAttributeDefault(unsigned index) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("BillboardSet", "Variant GetAttributeDefault(uint) const", asMETHODPR(BillboardSet, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "Variant get_attributeDefaults(uint) const", asMETHODPR(BillboardSet, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
+    // Variant Serializable::GetAttributeDefault(const String& name) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("BillboardSet", "Variant GetAttributeDefault(const String&in) const", asMETHODPR(BillboardSet, GetAttributeDefault, (const String&) const, Variant), asCALL_THISCALL);
+    // virtual const Vector<AttributeInfo>* Serializable::GetAttributes() const | File: ../Scene/Serializable.h
+    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
+    // const Vector<SourceBatch>& Drawable::GetBatches() const | File: ../Graphics/Drawable.h
+    // Error: type "const Vector<SourceBatch>&" can not automatically bind
+    // Billboard* BillboardSet::GetBillboard(unsigned index) | File: ../Graphics/BillboardSet.h
+    engine->RegisterObjectMethod("BillboardSet", "Billboard@+ GetBillboard(uint)", asMETHODPR(BillboardSet, GetBillboard, (unsigned), Billboard*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "Billboard@+ get_billboards(uint)", asMETHODPR(BillboardSet, GetBillboard, (unsigned), Billboard*), asCALL_THISCALL);
+    // PODVector<Billboard>& BillboardSet::GetBillboards() | File: ../Graphics/BillboardSet.h
+    // Error: type "PODVector<Billboard>&" can not automatically bind
+    // VariantVector BillboardSet::GetBillboardsAttr() const | File: ../Graphics/BillboardSet.h
+    // Error: type "VariantVector" can not automatically bind
+    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("BillboardSet", "bool GetBlockEvents() const", asMETHODPR(BillboardSet, GetBlockEvents, () const, bool), asCALL_THISCALL);
+    // const BoundingBox& Drawable::GetBoundingBox() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "const BoundingBox& GetBoundingBox() const", asMETHODPR(BillboardSet, GetBoundingBox, () const, const BoundingBox&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "const BoundingBox& get_boundingBox() const", asMETHODPR(BillboardSet, GetBoundingBox, () const, const BoundingBox&), asCALL_THISCALL);
+    // bool Drawable::GetCastShadows() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "bool GetCastShadows() const", asMETHODPR(BillboardSet, GetCastShadows, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "bool get_castShadows() const", asMETHODPR(BillboardSet, GetCastShadows, () const, bool), asCALL_THISCALL);
+    // const String& Object::GetCategory() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("BillboardSet", "const String& GetCategory() const", asMETHODPR(BillboardSet, GetCategory, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "const String& get_category() const", asMETHODPR(BillboardSet, GetCategory, () const, const String&), asCALL_THISCALL);
+    // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("BillboardSet", "Component@+ GetComponent(StringHash) const", asMETHODPR(BillboardSet, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
+    // template<class T> T*  Component::GetComponent() const | File: ../Scene/Component.h
+    // Not registered because template
+    // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
+    // Error: type "PODVector<Component*>&" can not automatically bind
+    // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
+    // Not registered because template
+    // Context* Object::GetContext() const | File: ../Core/Object.h
+    // Error: type "Context*" can not be returned
+    // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
+    // Error: type "PODVector<Node*>&" can not automatically bind
+    // float Drawable::GetDistance() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "float GetDistance() const", asMETHODPR(BillboardSet, GetDistance, () const, float), asCALL_THISCALL);
+    // unsigned char Drawable::GetDrawableFlags() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "uint8 GetDrawableFlags() const", asMETHODPR(BillboardSet, GetDrawableFlags, () const, unsigned char), asCALL_THISCALL);
+    // float Drawable::GetDrawDistance() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "float GetDrawDistance() const", asMETHODPR(BillboardSet, GetDrawDistance, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "float get_drawDistance() const", asMETHODPR(BillboardSet, GetDrawDistance, () const, float), asCALL_THISCALL);
+    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("BillboardSet", "VariantMap& GetEventDataMap() const", asMETHODPR(BillboardSet, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
+    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // Object* Object::GetEventSender() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("BillboardSet", "Object@+ GetEventSender() const", asMETHODPR(BillboardSet, GetEventSender, () const, Object*), asCALL_THISCALL);
+    // FaceCameraMode BillboardSet::GetFaceCameraMode() const | File: ../Graphics/BillboardSet.h
+    engine->RegisterObjectMethod("BillboardSet", "FaceCameraMode GetFaceCameraMode() const", asMETHODPR(BillboardSet, GetFaceCameraMode, () const, FaceCameraMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "FaceCameraMode get_faceCameraMode() const", asMETHODPR(BillboardSet, GetFaceCameraMode, () const, FaceCameraMode), asCALL_THISCALL);
+    // Light* Drawable::GetFirstLight() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "Light@+ GetFirstLight() const", asMETHODPR(BillboardSet, GetFirstLight, () const, Light*), asCALL_THISCALL);
+    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("BillboardSet", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(BillboardSet, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "const Variant& get_globalVar(StringHash) const", asMETHODPR(BillboardSet, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("BillboardSet", "const VariantMap& GetGlobalVars() const", asMETHODPR(BillboardSet, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "const VariantMap& get_globalVars() const", asMETHODPR(BillboardSet, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    // unsigned Component::GetID() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("BillboardSet", "uint GetID() const", asMETHODPR(BillboardSet, GetID, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "uint get_id() const", asMETHODPR(BillboardSet, GetID, () const, unsigned), asCALL_THISCALL);
+    // bool Serializable::GetInterceptNetworkUpdate(const String& attributeName) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("BillboardSet", "bool GetInterceptNetworkUpdate(const String&in) const", asMETHODPR(BillboardSet, GetInterceptNetworkUpdate, (const String&) const, bool), asCALL_THISCALL);
+    // unsigned Drawable::GetLightMask() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "uint GetLightMask() const", asMETHODPR(BillboardSet, GetLightMask, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "uint get_lightMask() const", asMETHODPR(BillboardSet, GetLightMask, () const, unsigned), asCALL_THISCALL);
+    // const PODVector<Light*>& Drawable::GetLights() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "Array<Light@>@ GetLights() const", asFUNCTION(BillboardSet_GetLights_void), asCALL_CDECL_OBJFIRST);
+    // float Drawable::GetLodBias() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "float GetLodBias() const", asMETHODPR(BillboardSet, GetLodBias, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "float get_lodBias() const", asMETHODPR(BillboardSet, GetLodBias, () const, float), asCALL_THISCALL);
+    // float Drawable::GetLodDistance() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "float GetLodDistance() const", asMETHODPR(BillboardSet, GetLodDistance, () const, float), asCALL_THISCALL);
+    // virtual Geometry* Drawable::GetLodGeometry(unsigned batchIndex, unsigned level) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "Geometry@+ GetLodGeometry(uint, uint)", asMETHODPR(BillboardSet, GetLodGeometry, (unsigned, unsigned), Geometry*), asCALL_THISCALL);
+    // Material* BillboardSet::GetMaterial() const | File: ../Graphics/BillboardSet.h
+    engine->RegisterObjectMethod("BillboardSet", "Material@+ GetMaterial() const", asMETHODPR(BillboardSet, GetMaterial, () const, Material*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "Material@+ get_material() const", asMETHODPR(BillboardSet, GetMaterial, () const, Material*), asCALL_THISCALL);
+    // ResourceRef BillboardSet::GetMaterialAttr() const | File: ../Graphics/BillboardSet.h
+    engine->RegisterObjectMethod("BillboardSet", "ResourceRef GetMaterialAttr() const", asMETHODPR(BillboardSet, GetMaterialAttr, () const, ResourceRef), asCALL_THISCALL);
+    // unsigned Drawable::GetMaxLights() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "uint GetMaxLights() const", asMETHODPR(BillboardSet, GetMaxLights, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "uint get_maxLights() const", asMETHODPR(BillboardSet, GetMaxLights, () const, unsigned), asCALL_THISCALL);
+    // float Drawable::GetMaxZ() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "float GetMaxZ() const", asMETHODPR(BillboardSet, GetMaxZ, () const, float), asCALL_THISCALL);
+    // float BillboardSet::GetMinAngle() const | File: ../Graphics/BillboardSet.h
+    engine->RegisterObjectMethod("BillboardSet", "float GetMinAngle() const", asMETHODPR(BillboardSet, GetMinAngle, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "float get_minAngle() const", asMETHODPR(BillboardSet, GetMinAngle, () const, float), asCALL_THISCALL);
+    // float Drawable::GetMinZ() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "float GetMinZ() const", asMETHODPR(BillboardSet, GetMinZ, () const, float), asCALL_THISCALL);
+    // const PODVector<unsigned char>& BillboardSet::GetNetBillboardsAttr() const | File: ../Graphics/BillboardSet.h
+    // Error: type "const PODVector<unsigned char>&" can not automatically bind
+    // virtual const Vector<AttributeInfo>* Serializable::GetNetworkAttributes() const | File: ../Scene/Serializable.h
+    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
+    // NetworkState* Serializable::GetNetworkState() const | File: ../Scene/Serializable.h
+    // Error: type "NetworkState*" can not automatically bind
+    // Node* Component::GetNode() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("BillboardSet", "Node@+ GetNode() const", asMETHODPR(BillboardSet, GetNode, () const, Node*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "Node@+ get_node() const", asMETHODPR(BillboardSet, GetNode, () const, Node*), asCALL_THISCALL);
+    // unsigned Serializable::GetNumAttributes() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("BillboardSet", "uint GetNumAttributes() const", asMETHODPR(BillboardSet, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "uint get_numAttributes() const", asMETHODPR(BillboardSet, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
+    // unsigned BillboardSet::GetNumBillboards() const | File: ../Graphics/BillboardSet.h
+    engine->RegisterObjectMethod("BillboardSet", "uint GetNumBillboards() const", asMETHODPR(BillboardSet, GetNumBillboards, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "uint get_numBillboards() const", asMETHODPR(BillboardSet, GetNumBillboards, () const, unsigned), asCALL_THISCALL);
+    // unsigned Serializable::GetNumNetworkAttributes() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("BillboardSet", "uint GetNumNetworkAttributes() const", asMETHODPR(BillboardSet, GetNumNetworkAttributes, () const, unsigned), asCALL_THISCALL);
+    // virtual unsigned Drawable::GetNumOccluderTriangles() | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "uint GetNumOccluderTriangles()", asMETHODPR(BillboardSet, GetNumOccluderTriangles, (), unsigned), asCALL_THISCALL);
+    // ObjectAnimation* Animatable::GetObjectAnimation() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("BillboardSet", "ObjectAnimation@+ GetObjectAnimation() const", asMETHODPR(BillboardSet, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "ObjectAnimation@+ get_objectAnimation() const", asMETHODPR(BillboardSet, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
+    // ResourceRef Animatable::GetObjectAnimationAttr() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("BillboardSet", "ResourceRef GetObjectAnimationAttr() const", asMETHODPR(BillboardSet, GetObjectAnimationAttr, () const, ResourceRef), asCALL_THISCALL);
+    // Octant* Drawable::GetOctant() const | File: ../Graphics/Drawable.h
+    // Error: type "Octant" can not automatically bind bacause have @nobind mark
+    // Scene* Component::GetScene() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("BillboardSet", "Scene@+ GetScene() const", asMETHODPR(BillboardSet, GetScene, () const, Scene*), asCALL_THISCALL);
+    // float Drawable::GetShadowDistance() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "float GetShadowDistance() const", asMETHODPR(BillboardSet, GetShadowDistance, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "float get_shadowDistance() const", asMETHODPR(BillboardSet, GetShadowDistance, () const, float), asCALL_THISCALL);
+    // unsigned Drawable::GetShadowMask() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "uint GetShadowMask() const", asMETHODPR(BillboardSet, GetShadowMask, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "uint get_shadowMask() const", asMETHODPR(BillboardSet, GetShadowMask, () const, unsigned), asCALL_THISCALL);
+    // float Drawable::GetSortValue() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "float GetSortValue() const", asMETHODPR(BillboardSet, GetSortValue, () const, float), asCALL_THISCALL);
+    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("BillboardSet", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(BillboardSet, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
+    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // Not registered because template
+    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("BillboardSet", "StringHash GetType() const", asMETHODPR(BillboardSet, GetType, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "StringHash get_type() const", asMETHODPR(BillboardSet, GetType, () const, StringHash), asCALL_THISCALL);
+    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("BillboardSet", "const String& GetTypeName() const", asMETHODPR(BillboardSet, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "const String& get_typeName() const", asMETHODPR(BillboardSet, GetTypeName, () const, const String&), asCALL_THISCALL);
+    // UpdateGeometryType BillboardSet::GetUpdateGeometryType() override | File: ../Graphics/BillboardSet.h
+    engine->RegisterObjectMethod("BillboardSet", "UpdateGeometryType GetUpdateGeometryType()", asMETHODPR(BillboardSet, GetUpdateGeometryType, (), UpdateGeometryType), asCALL_THISCALL);
+    // const PODVector<Light*>& Drawable::GetVertexLights() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "Array<Light@>@ GetVertexLights() const", asFUNCTION(BillboardSet_GetVertexLights_void), asCALL_CDECL_OBJFIRST);
+    // unsigned Drawable::GetViewMask() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "uint GetViewMask() const", asMETHODPR(BillboardSet, GetViewMask, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "uint get_viewMask() const", asMETHODPR(BillboardSet, GetViewMask, () const, unsigned), asCALL_THISCALL);
+    // const BoundingBox& Drawable::GetWorldBoundingBox() | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "const BoundingBox& GetWorldBoundingBox()", asMETHODPR(BillboardSet, GetWorldBoundingBox, (), const BoundingBox&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "const BoundingBox& get_worldBoundingBox()", asMETHODPR(BillboardSet, GetWorldBoundingBox, (), const BoundingBox&), asCALL_THISCALL);
+    // Zone* Drawable::GetZone() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "Zone@+ GetZone() const", asMETHODPR(BillboardSet, GetZone, () const, Zone*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "Zone@+ get_zone() const", asMETHODPR(BillboardSet, GetZone, () const, Zone*), asCALL_THISCALL);
+    // unsigned Drawable::GetZoneMask() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "uint GetZoneMask() const", asMETHODPR(BillboardSet, GetZoneMask, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "uint get_zoneMask() const", asMETHODPR(BillboardSet, GetZoneMask, () const, unsigned), asCALL_THISCALL);
+    // bool Drawable::HasBasePass(unsigned batchIndex) const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "bool HasBasePass(uint) const", asMETHODPR(BillboardSet, HasBasePass, (unsigned) const, bool), asCALL_THISCALL);
+    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("BillboardSet", "bool HasEventHandlers() const", asMETHODPR(BillboardSet, HasEventHandlers, () const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("BillboardSet", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(BillboardSet, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("BillboardSet", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(BillboardSet, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
+    // bool Component::IsEnabled() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("BillboardSet", "bool IsEnabled() const", asMETHODPR(BillboardSet, IsEnabled, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "bool get_enabled() const", asMETHODPR(BillboardSet, IsEnabled, () const, bool), asCALL_THISCALL);
+    // bool Component::IsEnabledEffective() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("BillboardSet", "bool IsEnabledEffective() const", asMETHODPR(BillboardSet, IsEnabledEffective, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "bool get_enabledEffective() const", asMETHODPR(BillboardSet, IsEnabledEffective, () const, bool), asCALL_THISCALL);
+    // bool BillboardSet::IsFixedScreenSize() const | File: ../Graphics/BillboardSet.h
+    engine->RegisterObjectMethod("BillboardSet", "bool IsFixedScreenSize() const", asMETHODPR(BillboardSet, IsFixedScreenSize, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "bool get_fixedScreenSize() const", asMETHODPR(BillboardSet, IsFixedScreenSize, () const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("BillboardSet", "bool IsInstanceOf(StringHash) const", asMETHODPR(BillboardSet, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
+    // Not registered because template
+    // bool Drawable::IsInView() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "bool IsInView() const", asMETHODPR(BillboardSet, IsInView, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "bool get_inView() const", asMETHODPR(BillboardSet, IsInView, () const, bool), asCALL_THISCALL);
+    // bool Drawable::IsInView(Camera* camera) const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "bool IsInView(Camera@+) const", asMETHODPR(BillboardSet, IsInView, (Camera*) const, bool), asCALL_THISCALL);
+    // bool Drawable::IsInView(const FrameInfo& frame, bool anyCamera=false) const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "bool IsInView(const FrameInfo&in, bool = false) const", asMETHODPR(BillboardSet, IsInView, (const FrameInfo&, bool) const, bool), asCALL_THISCALL);
+    // bool Drawable::IsOccludee() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "bool IsOccludee() const", asMETHODPR(BillboardSet, IsOccludee, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "bool get_occludee() const", asMETHODPR(BillboardSet, IsOccludee, () const, bool), asCALL_THISCALL);
+    // bool Drawable::IsOccluder() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "bool IsOccluder() const", asMETHODPR(BillboardSet, IsOccluder, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "bool get_occluder() const", asMETHODPR(BillboardSet, IsOccluder, () const, bool), asCALL_THISCALL);
+    // bool BillboardSet::IsRelative() const | File: ../Graphics/BillboardSet.h
+    engine->RegisterObjectMethod("BillboardSet", "bool IsRelative() const", asMETHODPR(BillboardSet, IsRelative, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "bool get_relative() const", asMETHODPR(BillboardSet, IsRelative, () const, bool), asCALL_THISCALL);
+    // bool Component::IsReplicated() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("BillboardSet", "bool IsReplicated() const", asMETHODPR(BillboardSet, IsReplicated, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "bool get_replicated() const", asMETHODPR(BillboardSet, IsReplicated, () const, bool), asCALL_THISCALL);
+    // bool BillboardSet::IsScaled() const | File: ../Graphics/BillboardSet.h
+    engine->RegisterObjectMethod("BillboardSet", "bool IsScaled() const", asMETHODPR(BillboardSet, IsScaled, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "bool get_scaled() const", asMETHODPR(BillboardSet, IsScaled, () const, bool), asCALL_THISCALL);
+    // bool BillboardSet::IsSorted() const | File: ../Graphics/BillboardSet.h
+    engine->RegisterObjectMethod("BillboardSet", "bool IsSorted() const", asMETHODPR(BillboardSet, IsSorted, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "bool get_sorted() const", asMETHODPR(BillboardSet, IsSorted, () const, bool), asCALL_THISCALL);
+    // bool Serializable::IsTemporary() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("BillboardSet", "bool IsTemporary() const", asMETHODPR(BillboardSet, IsTemporary, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "bool get_temporary() const", asMETHODPR(BillboardSet, IsTemporary, () const, bool), asCALL_THISCALL);
+    // bool Drawable::IsZoneDirty() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "bool IsZoneDirty() const", asMETHODPR(BillboardSet, IsZoneDirty, () const, bool), asCALL_THISCALL);
+    // void Drawable::LimitLights() | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "void LimitLights()", asMETHODPR(BillboardSet, LimitLights, (), void), asCALL_THISCALL);
+    // void Drawable::LimitVertexLights(bool removeConvertedLights) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "void LimitVertexLights(bool)", asMETHODPR(BillboardSet, LimitVertexLights, (bool), void), asCALL_THISCALL);
+    // virtual bool Serializable::Load(Deserializer& source) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("BillboardSet", "bool Load(Deserializer&)", asMETHODPR(BillboardSet, Load, (Deserializer&), bool), asCALL_THISCALL);
+    // bool Animatable::LoadJSON(const JSONValue& source) override | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("BillboardSet", "bool LoadJSON(const JSONValue&in)", asMETHODPR(BillboardSet, LoadJSON, (const JSONValue&), bool), asCALL_THISCALL);
+    // bool Animatable::LoadXML(const XMLElement& source) override | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("BillboardSet", "bool LoadXML(const XMLElement&in)", asMETHODPR(BillboardSet, LoadXML, (const XMLElement&), bool), asCALL_THISCALL);
+    // void Drawable::MarkForUpdate() | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "void MarkForUpdate()", asMETHODPR(BillboardSet, MarkForUpdate, (), void), asCALL_THISCALL);
+    // void Drawable::MarkInView(const FrameInfo& frame) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "void MarkInView(const FrameInfo&in)", asMETHODPR(BillboardSet, MarkInView, (const FrameInfo&), void), asCALL_THISCALL);
+    // void Drawable::MarkInView(unsigned frameNumber) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "void MarkInView(uint)", asMETHODPR(BillboardSet, MarkInView, (unsigned), void), asCALL_THISCALL);
+    // void Component::MarkNetworkUpdate() override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("BillboardSet", "void MarkNetworkUpdate()", asMETHODPR(BillboardSet, MarkNetworkUpdate, (), void), asCALL_THISCALL);
+    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("BillboardSet", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(BillboardSet, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
+    // virtual void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("BillboardSet", "void OnGetAttribute(const AttributeInfo&in, Variant&) const", asMETHODPR(BillboardSet, OnGetAttribute, (const AttributeInfo&, Variant&) const, void), asCALL_THISCALL);
+    // virtual void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("BillboardSet", "void OnSetAttribute(const AttributeInfo&in, const Variant&in)", asMETHODPR(BillboardSet, OnSetAttribute, (const AttributeInfo&, const Variant&), void), asCALL_THISCALL);
+    // void Drawable::OnSetEnabled() override | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "void OnSetEnabled()", asMETHODPR(BillboardSet, OnSetEnabled, (), void), asCALL_THISCALL);
+    // void Component::PrepareNetworkUpdate() | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("BillboardSet", "void PrepareNetworkUpdate()", asMETHODPR(BillboardSet, PrepareNetworkUpdate, (), void), asCALL_THISCALL);
+    // void BillboardSet::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results) override | File: ../Graphics/BillboardSet.h
+    // Error: type "RayOctreeQuery" can not automatically bind bacause have @nobind mark
+    // bool Serializable::ReadDeltaUpdate(Deserializer& source) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("BillboardSet", "bool ReadDeltaUpdate(Deserializer&)", asMETHODPR(BillboardSet, ReadDeltaUpdate, (Deserializer&), bool), asCALL_THISCALL);
+    // bool Serializable::ReadLatestDataUpdate(Deserializer& source) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("BillboardSet", "bool ReadLatestDataUpdate(Deserializer&)", asMETHODPR(BillboardSet, ReadLatestDataUpdate, (Deserializer&), bool), asCALL_THISCALL);
+    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
+    // Error: type "RefCount*" can not automatically bind
+    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("BillboardSet", "int Refs() const", asMETHODPR(BillboardSet, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "int get_refs() const", asMETHODPR(BillboardSet, Refs, () const, int), asCALL_THISCALL);
+    // static void BillboardSet::RegisterObject(Context* context) | File: ../Graphics/BillboardSet.h
+    // Context can be used as firs parameter of constructors only
+    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("BillboardSet", asBEHAVE_RELEASE, "void f()", asMETHODPR(BillboardSet, ReleaseRef, (), void), asCALL_THISCALL);
+    // void Component::Remove() | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("BillboardSet", "void Remove()", asMETHODPR(BillboardSet, Remove, (), void), asCALL_THISCALL);
+    // void Animatable::RemoveAttributeAnimation(const String& name) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("BillboardSet", "void RemoveAttributeAnimation(const String&in)", asMETHODPR(BillboardSet, RemoveAttributeAnimation, (const String&), void), asCALL_THISCALL);
+    // void Serializable::RemoveInstanceDefault() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("BillboardSet", "void RemoveInstanceDefault()", asMETHODPR(BillboardSet, RemoveInstanceDefault, (), void), asCALL_THISCALL);
+    // void Animatable::RemoveObjectAnimation() | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("BillboardSet", "void RemoveObjectAnimation()", asMETHODPR(BillboardSet, RemoveObjectAnimation, (), void), asCALL_THISCALL);
+    // void Serializable::ResetToDefault() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("BillboardSet", "void ResetToDefault()", asMETHODPR(BillboardSet, ResetToDefault, (), void), asCALL_THISCALL);
+    // bool Component::Save(Serializer& dest) const override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("BillboardSet", "bool Save(Serializer&) const", asMETHODPR(BillboardSet, Save, (Serializer&) const, bool), asCALL_THISCALL);
+    // virtual bool Serializable::SaveDefaultAttributes() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("BillboardSet", "bool SaveDefaultAttributes() const", asMETHODPR(BillboardSet, SaveDefaultAttributes, () const, bool), asCALL_THISCALL);
+    // bool Component::SaveJSON(JSONValue& dest) const override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("BillboardSet", "bool SaveJSON(JSONValue&) const", asMETHODPR(BillboardSet, SaveJSON, (JSONValue&) const, bool), asCALL_THISCALL);
+    // bool Component::SaveXML(XMLElement& dest) const override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("BillboardSet", "bool SaveXML(XMLElement&) const", asMETHODPR(BillboardSet, SaveXML, (XMLElement&) const, bool), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("BillboardSet", "void SendEvent(StringHash)", asMETHODPR(BillboardSet, SendEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("BillboardSet", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(BillboardSet, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
+    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
+    // Not registered because template
+    // void Animatable::SetAnimationEnabled(bool enable) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("BillboardSet", "void SetAnimationEnabled(bool)", asMETHODPR(BillboardSet, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "void set_animationEnabled(bool)", asMETHODPR(BillboardSet, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
+    // void BillboardSet::SetAnimationLodBias(float bias) | File: ../Graphics/BillboardSet.h
+    engine->RegisterObjectMethod("BillboardSet", "void SetAnimationLodBias(float)", asMETHODPR(BillboardSet, SetAnimationLodBias, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "void set_animationLodBias(float)", asMETHODPR(BillboardSet, SetAnimationLodBias, (float), void), asCALL_THISCALL);
+    // void Animatable::SetAnimationTime(float time) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("BillboardSet", "void SetAnimationTime(float)", asMETHODPR(BillboardSet, SetAnimationTime, (float), void), asCALL_THISCALL);
+    // bool Serializable::SetAttribute(unsigned index, const Variant& value) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("BillboardSet", "bool SetAttribute(uint, const Variant&in)", asMETHODPR(BillboardSet, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "bool set_attributes(uint, const Variant&in)", asMETHODPR(BillboardSet, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
+    // bool Serializable::SetAttribute(const String& name, const Variant& value) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("BillboardSet", "bool SetAttribute(const String&in, const Variant&in)", asMETHODPR(BillboardSet, SetAttribute, (const String&, const Variant&), bool), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode=WM_LOOP, float speed=1.0f) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("BillboardSet", "void SetAttributeAnimation(const String&in, ValueAnimation@+, WrapMode = WM_LOOP, float = 1.0f)", asMETHODPR(BillboardSet, SetAttributeAnimation, (const String&, ValueAnimation*, WrapMode, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationSpeed(const String& name, float speed) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("BillboardSet", "void SetAttributeAnimationSpeed(const String&in, float)", asMETHODPR(BillboardSet, SetAttributeAnimationSpeed, (const String&, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationTime(const String& name, float time) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("BillboardSet", "void SetAttributeAnimationTime(const String&in, float)", asMETHODPR(BillboardSet, SetAttributeAnimationTime, (const String&, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationWrapMode(const String& name, WrapMode wrapMode) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("BillboardSet", "void SetAttributeAnimationWrapMode(const String&in, WrapMode)", asMETHODPR(BillboardSet, SetAttributeAnimationWrapMode, (const String&, WrapMode), void), asCALL_THISCALL);
+    // void Drawable::SetBasePass(unsigned batchIndex) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "void SetBasePass(uint)", asMETHODPR(BillboardSet, SetBasePass, (unsigned), void), asCALL_THISCALL);
+    // void BillboardSet::SetBillboardsAttr(const VariantVector& value) | File: ../Graphics/BillboardSet.h
+    // Error: type "const VariantVector&" can not automatically bind
+    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("BillboardSet", "void SetBlockEvents(bool)", asMETHODPR(BillboardSet, SetBlockEvents, (bool), void), asCALL_THISCALL);
+    // void Drawable::SetCastShadows(bool enable) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "void SetCastShadows(bool)", asMETHODPR(BillboardSet, SetCastShadows, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "void set_castShadows(bool)", asMETHODPR(BillboardSet, SetCastShadows, (bool), void), asCALL_THISCALL);
+    // void Drawable::SetDrawDistance(float distance) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "void SetDrawDistance(float)", asMETHODPR(BillboardSet, SetDrawDistance, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "void set_drawDistance(float)", asMETHODPR(BillboardSet, SetDrawDistance, (float), void), asCALL_THISCALL);
+    // void Component::SetEnabled(bool enable) | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("BillboardSet", "void SetEnabled(bool)", asMETHODPR(BillboardSet, SetEnabled, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "void set_enabled(bool)", asMETHODPR(BillboardSet, SetEnabled, (bool), void), asCALL_THISCALL);
+    // void BillboardSet::SetFaceCameraMode(FaceCameraMode mode) | File: ../Graphics/BillboardSet.h
+    engine->RegisterObjectMethod("BillboardSet", "void SetFaceCameraMode(FaceCameraMode)", asMETHODPR(BillboardSet, SetFaceCameraMode, (FaceCameraMode), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "void set_faceCameraMode(FaceCameraMode)", asMETHODPR(BillboardSet, SetFaceCameraMode, (FaceCameraMode), void), asCALL_THISCALL);
+    // void BillboardSet::SetFixedScreenSize(bool enable) | File: ../Graphics/BillboardSet.h
+    engine->RegisterObjectMethod("BillboardSet", "void SetFixedScreenSize(bool)", asMETHODPR(BillboardSet, SetFixedScreenSize, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "void set_fixedScreenSize(bool)", asMETHODPR(BillboardSet, SetFixedScreenSize, (bool), void), asCALL_THISCALL);
+    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("BillboardSet", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(BillboardSet, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(BillboardSet, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    // void Serializable::SetInstanceDefault(bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("BillboardSet", "void SetInstanceDefault(bool)", asMETHODPR(BillboardSet, SetInstanceDefault, (bool), void), asCALL_THISCALL);
+    // void Serializable::SetInterceptNetworkUpdate(const String& attributeName, bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("BillboardSet", "void SetInterceptNetworkUpdate(const String&in, bool)", asMETHODPR(BillboardSet, SetInterceptNetworkUpdate, (const String&, bool), void), asCALL_THISCALL);
+    // void Drawable::SetLightMask(unsigned mask) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "void SetLightMask(uint)", asMETHODPR(BillboardSet, SetLightMask, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "void set_lightMask(uint)", asMETHODPR(BillboardSet, SetLightMask, (unsigned), void), asCALL_THISCALL);
+    // void Drawable::SetLodBias(float bias) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "void SetLodBias(float)", asMETHODPR(BillboardSet, SetLodBias, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "void set_lodBias(float)", asMETHODPR(BillboardSet, SetLodBias, (float), void), asCALL_THISCALL);
+    // void BillboardSet::SetMaterial(Material* material) | File: ../Graphics/BillboardSet.h
+    engine->RegisterObjectMethod("BillboardSet", "void SetMaterial(Material@+)", asMETHODPR(BillboardSet, SetMaterial, (Material*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "void set_material(Material@+)", asMETHODPR(BillboardSet, SetMaterial, (Material*), void), asCALL_THISCALL);
+    // void BillboardSet::SetMaterialAttr(const ResourceRef& value) | File: ../Graphics/BillboardSet.h
+    engine->RegisterObjectMethod("BillboardSet", "void SetMaterialAttr(const ResourceRef&in)", asMETHODPR(BillboardSet, SetMaterialAttr, (const ResourceRef&), void), asCALL_THISCALL);
+    // void Drawable::SetMaxLights(unsigned num) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "void SetMaxLights(uint)", asMETHODPR(BillboardSet, SetMaxLights, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "void set_maxLights(uint)", asMETHODPR(BillboardSet, SetMaxLights, (unsigned), void), asCALL_THISCALL);
+    // void BillboardSet::SetMinAngle(float angle) | File: ../Graphics/BillboardSet.h
+    engine->RegisterObjectMethod("BillboardSet", "void SetMinAngle(float)", asMETHODPR(BillboardSet, SetMinAngle, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "void set_minAngle(float)", asMETHODPR(BillboardSet, SetMinAngle, (float), void), asCALL_THISCALL);
+    // void Drawable::SetMinMaxZ(float minZ, float maxZ) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "void SetMinMaxZ(float, float)", asMETHODPR(BillboardSet, SetMinMaxZ, (float, float), void), asCALL_THISCALL);
+    // void BillboardSet::SetNetBillboardsAttr(const PODVector<unsigned char>& value) | File: ../Graphics/BillboardSet.h
+    // Error: type "const PODVector<unsigned char>&" can not automatically bind
+    // void BillboardSet::SetNumBillboards(unsigned num) | File: ../Graphics/BillboardSet.h
+    engine->RegisterObjectMethod("BillboardSet", "void SetNumBillboards(uint)", asMETHODPR(BillboardSet, SetNumBillboards, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "void set_numBillboards(uint)", asMETHODPR(BillboardSet, SetNumBillboards, (unsigned), void), asCALL_THISCALL);
+    // void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("BillboardSet", "void SetObjectAnimation(ObjectAnimation@+)", asMETHODPR(BillboardSet, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "void set_objectAnimation(ObjectAnimation@+)", asMETHODPR(BillboardSet, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
+    // void Animatable::SetObjectAnimationAttr(const ResourceRef& value) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("BillboardSet", "void SetObjectAnimationAttr(const ResourceRef&in)", asMETHODPR(BillboardSet, SetObjectAnimationAttr, (const ResourceRef&), void), asCALL_THISCALL);
+    // void Drawable::SetOccludee(bool enable) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "void SetOccludee(bool)", asMETHODPR(BillboardSet, SetOccludee, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "void set_occludee(bool)", asMETHODPR(BillboardSet, SetOccludee, (bool), void), asCALL_THISCALL);
+    // void Drawable::SetOccluder(bool enable) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "void SetOccluder(bool)", asMETHODPR(BillboardSet, SetOccluder, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "void set_occluder(bool)", asMETHODPR(BillboardSet, SetOccluder, (bool), void), asCALL_THISCALL);
+    // void BillboardSet::SetRelative(bool enable) | File: ../Graphics/BillboardSet.h
+    engine->RegisterObjectMethod("BillboardSet", "void SetRelative(bool)", asMETHODPR(BillboardSet, SetRelative, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "void set_relative(bool)", asMETHODPR(BillboardSet, SetRelative, (bool), void), asCALL_THISCALL);
+    // void BillboardSet::SetScaled(bool enable) | File: ../Graphics/BillboardSet.h
+    engine->RegisterObjectMethod("BillboardSet", "void SetScaled(bool)", asMETHODPR(BillboardSet, SetScaled, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "void set_scaled(bool)", asMETHODPR(BillboardSet, SetScaled, (bool), void), asCALL_THISCALL);
+    // void Drawable::SetShadowDistance(float distance) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "void SetShadowDistance(float)", asMETHODPR(BillboardSet, SetShadowDistance, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "void set_shadowDistance(float)", asMETHODPR(BillboardSet, SetShadowDistance, (float), void), asCALL_THISCALL);
+    // void Drawable::SetShadowMask(unsigned mask) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "void SetShadowMask(uint)", asMETHODPR(BillboardSet, SetShadowMask, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "void set_shadowMask(uint)", asMETHODPR(BillboardSet, SetShadowMask, (unsigned), void), asCALL_THISCALL);
+    // void BillboardSet::SetSorted(bool enable) | File: ../Graphics/BillboardSet.h
+    engine->RegisterObjectMethod("BillboardSet", "void SetSorted(bool)", asMETHODPR(BillboardSet, SetSorted, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "void set_sorted(bool)", asMETHODPR(BillboardSet, SetSorted, (bool), void), asCALL_THISCALL);
+    // void Drawable::SetSortValue(float value) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "void SetSortValue(float)", asMETHODPR(BillboardSet, SetSortValue, (float), void), asCALL_THISCALL);
+    // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("BillboardSet", "void SetTemporary(bool)", asMETHODPR(BillboardSet, SetTemporary, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "void set_temporary(bool)", asMETHODPR(BillboardSet, SetTemporary, (bool), void), asCALL_THISCALL);
+    // void Drawable::SetViewMask(unsigned mask) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "void SetViewMask(uint)", asMETHODPR(BillboardSet, SetViewMask, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "void set_viewMask(uint)", asMETHODPR(BillboardSet, SetViewMask, (unsigned), void), asCALL_THISCALL);
+    // void Drawable::SetZone(Zone* zone, bool temporary=false) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "void SetZone(Zone@+, bool = false)", asMETHODPR(BillboardSet, SetZone, (Zone*, bool), void), asCALL_THISCALL);
+    // void Drawable::SetZoneMask(unsigned mask) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "void SetZoneMask(uint)", asMETHODPR(BillboardSet, SetZoneMask, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "void set_zoneMask(uint)", asMETHODPR(BillboardSet, SetZoneMask, (unsigned), void), asCALL_THISCALL);
+    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
+    engine->RegisterObjectMethod("BillboardSet", "void UnsubscribeFromAllEvents()", asMETHODPR(BillboardSet, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("BillboardSet", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(BillboardSet_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
+    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("BillboardSet", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(BillboardSet, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("BillboardSet", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(BillboardSet, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("BillboardSet", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(BillboardSet, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
+    // virtual void Drawable::Update(const FrameInfo& frame) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("BillboardSet", "void Update(const FrameInfo&in)", asMETHODPR(BillboardSet, Update, (const FrameInfo&), void), asCALL_THISCALL);
+    // void BillboardSet::UpdateBatches(const FrameInfo& frame) override | File: ../Graphics/BillboardSet.h
+    engine->RegisterObjectMethod("BillboardSet", "void UpdateBatches(const FrameInfo&in)", asMETHODPR(BillboardSet, UpdateBatches, (const FrameInfo&), void), asCALL_THISCALL);
+    // void BillboardSet::UpdateGeometry(const FrameInfo& frame) override | File: ../Graphics/BillboardSet.h
+    engine->RegisterObjectMethod("BillboardSet", "void UpdateGeometry(const FrameInfo&in)", asMETHODPR(BillboardSet, UpdateGeometry, (const FrameInfo&), void), asCALL_THISCALL);
+    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("BillboardSet", "int WeakRefs() const", asMETHODPR(BillboardSet, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "int get_weakRefs() const", asMETHODPR(BillboardSet, WeakRefs, () const, int), asCALL_THISCALL);
+    // void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attributeBits, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("BillboardSet", "void WriteDeltaUpdate(Serializer&, const DirtyBits&in, uint8)", asMETHODPR(BillboardSet, WriteDeltaUpdate, (Serializer&, const DirtyBits&, unsigned char), void), asCALL_THISCALL);
+    // void Serializable::WriteInitialDeltaUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("BillboardSet", "void WriteInitialDeltaUpdate(Serializer&, uint8)", asMETHODPR(BillboardSet, WriteInitialDeltaUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
+    // void Serializable::WriteLatestDataUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("BillboardSet", "void WriteLatestDataUpdate(Serializer&, uint8)", asMETHODPR(BillboardSet, WriteLatestDataUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
+#ifdef REGISTER_MANUAL_PART_Drawable
+    REGISTER_MANUAL_PART_Drawable(BillboardSet, "BillboardSet")
+#endif
+#ifdef REGISTER_MANUAL_PART_Component
+    REGISTER_MANUAL_PART_Component(BillboardSet, "BillboardSet")
+#endif
+#ifdef REGISTER_MANUAL_PART_Animatable
+    REGISTER_MANUAL_PART_Animatable(BillboardSet, "BillboardSet")
+#endif
+#ifdef REGISTER_MANUAL_PART_Serializable
+    REGISTER_MANUAL_PART_Serializable(BillboardSet, "BillboardSet")
+#endif
+#ifdef REGISTER_MANUAL_PART_Object
+    REGISTER_MANUAL_PART_Object(BillboardSet, "BillboardSet")
+#endif
+#ifdef REGISTER_MANUAL_PART_RefCounted
+    REGISTER_MANUAL_PART_RefCounted(BillboardSet, "BillboardSet")
+#endif
+#ifdef REGISTER_MANUAL_PART_BillboardSet
+    REGISTER_MANUAL_PART_BillboardSet(BillboardSet, "BillboardSet")
+#endif
+    RegisterSubclass<Drawable, BillboardSet>(engine, "Drawable", "BillboardSet");
+    RegisterSubclass<Component, BillboardSet>(engine, "Component", "BillboardSet");
+    RegisterSubclass<Animatable, BillboardSet>(engine, "Animatable", "BillboardSet");
+    RegisterSubclass<Serializable, BillboardSet>(engine, "Serializable", "BillboardSet");
+    RegisterSubclass<Object, BillboardSet>(engine, "Object", "BillboardSet");
+    RegisterSubclass<RefCounted, BillboardSet>(engine, "RefCounted", "BillboardSet");
+
     // void UIElement::AddChild(UIElement* element) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("BorderImage", "void AddChild(UIElement@+)", asMETHODPR(BorderImage, AddChild, (UIElement*), void), asCALL_THISCALL);
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
@@ -1071,505 +1570,6 @@ void ASRegisterGenerated_Members_B(asIScriptEngine* engine)
     RegisterSubclass<Serializable, BorderImage>(engine, "Serializable", "BorderImage");
     RegisterSubclass<Object, BorderImage>(engine, "Object", "BorderImage");
     RegisterSubclass<RefCounted, BorderImage>(engine, "RefCounted", "BorderImage");
-
-    // void Drawable::AddLight(Light* light) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "void AddLight(Light@+)", asMETHODPR(BillboardSet, AddLight, (Light*), void), asCALL_THISCALL);
-    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("BillboardSet", asBEHAVE_ADDREF, "void f()", asMETHODPR(BillboardSet, AddRef, (), void), asCALL_THISCALL);
-    // void Component::AddReplicationState(ComponentReplicationState* state) | File: ../Scene/Component.h
-    // Error: type "ComponentReplicationState*" can not automatically bind
-    // void Drawable::AddVertexLight(Light* light) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "void AddVertexLight(Light@+)", asMETHODPR(BillboardSet, AddVertexLight, (Light*), void), asCALL_THISCALL);
-    // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("BillboardSet", "void AllocateNetworkState()", asMETHODPR(BillboardSet, AllocateNetworkState, (), void), asCALL_THISCALL);
-    // virtual void Serializable::ApplyAttributes() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("BillboardSet", "void ApplyAttributes()", asMETHODPR(BillboardSet, ApplyAttributes, (), void), asCALL_THISCALL);
-    // explicit BillboardSet::BillboardSet(Context* context) | File: ../Graphics/BillboardSet.h
-    engine->RegisterObjectBehaviour("BillboardSet", asBEHAVE_FACTORY, "BillboardSet@+ f()", asFUNCTION(BillboardSet_BillboardSet_Context), asCALL_CDECL);
-    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
-    // Not registered because template
-    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
-    // Not registered because template
-    // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("BillboardSet", "void CleanupConnection(Connection@+)", asMETHODPR(BillboardSet, CleanupConnection, (Connection*), void), asCALL_THISCALL);
-    // void BillboardSet::Commit() | File: ../Graphics/BillboardSet.h
-    engine->RegisterObjectMethod("BillboardSet", "void Commit()", asMETHODPR(BillboardSet, Commit, (), void), asCALL_THISCALL);
-    // void Drawable::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(BillboardSet, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
-    // virtual bool Drawable::DrawOcclusion(OcclusionBuffer* buffer) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "bool DrawOcclusion(OcclusionBuffer@+)", asMETHODPR(BillboardSet, DrawOcclusion, (OcclusionBuffer*), bool), asCALL_THISCALL);
-    // bool Animatable::GetAnimationEnabled() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("BillboardSet", "bool GetAnimationEnabled() const", asMETHODPR(BillboardSet, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "bool get_animationEnabled() const", asMETHODPR(BillboardSet, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
-    // float BillboardSet::GetAnimationLodBias() const | File: ../Graphics/BillboardSet.h
-    engine->RegisterObjectMethod("BillboardSet", "float GetAnimationLodBias() const", asMETHODPR(BillboardSet, GetAnimationLodBias, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "float get_animationLodBias() const", asMETHODPR(BillboardSet, GetAnimationLodBias, () const, float), asCALL_THISCALL);
-    // Variant Serializable::GetAttribute(unsigned index) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("BillboardSet", "Variant GetAttribute(uint) const", asMETHODPR(BillboardSet, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "Variant get_attributes(uint) const", asMETHODPR(BillboardSet, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
-    // Variant Serializable::GetAttribute(const String& name) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("BillboardSet", "Variant GetAttribute(const String&in) const", asMETHODPR(BillboardSet, GetAttribute, (const String&) const, Variant), asCALL_THISCALL);
-    // ValueAnimation* Animatable::GetAttributeAnimation(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("BillboardSet", "ValueAnimation@+ GetAttributeAnimation(const String&in) const", asMETHODPR(BillboardSet, GetAttributeAnimation, (const String&) const, ValueAnimation*), asCALL_THISCALL);
-    // float Animatable::GetAttributeAnimationSpeed(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("BillboardSet", "float GetAttributeAnimationSpeed(const String&in) const", asMETHODPR(BillboardSet, GetAttributeAnimationSpeed, (const String&) const, float), asCALL_THISCALL);
-    // float Animatable::GetAttributeAnimationTime(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("BillboardSet", "float GetAttributeAnimationTime(const String&in) const", asMETHODPR(BillboardSet, GetAttributeAnimationTime, (const String&) const, float), asCALL_THISCALL);
-    // WrapMode Animatable::GetAttributeAnimationWrapMode(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("BillboardSet", "WrapMode GetAttributeAnimationWrapMode(const String&in) const", asMETHODPR(BillboardSet, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), asCALL_THISCALL);
-    // Variant Serializable::GetAttributeDefault(unsigned index) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("BillboardSet", "Variant GetAttributeDefault(uint) const", asMETHODPR(BillboardSet, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "Variant get_attributeDefaults(uint) const", asMETHODPR(BillboardSet, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
-    // Variant Serializable::GetAttributeDefault(const String& name) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("BillboardSet", "Variant GetAttributeDefault(const String&in) const", asMETHODPR(BillboardSet, GetAttributeDefault, (const String&) const, Variant), asCALL_THISCALL);
-    // virtual const Vector<AttributeInfo>* Serializable::GetAttributes() const | File: ../Scene/Serializable.h
-    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
-    // const Vector<SourceBatch>& Drawable::GetBatches() const | File: ../Graphics/Drawable.h
-    // Error: type "const Vector<SourceBatch>&" can not automatically bind
-    // Billboard* BillboardSet::GetBillboard(unsigned index) | File: ../Graphics/BillboardSet.h
-    engine->RegisterObjectMethod("BillboardSet", "Billboard@+ GetBillboard(uint)", asMETHODPR(BillboardSet, GetBillboard, (unsigned), Billboard*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "Billboard@+ get_billboards(uint)", asMETHODPR(BillboardSet, GetBillboard, (unsigned), Billboard*), asCALL_THISCALL);
-    // PODVector<Billboard>& BillboardSet::GetBillboards() | File: ../Graphics/BillboardSet.h
-    // Error: type "PODVector<Billboard>&" can not automatically bind
-    // VariantVector BillboardSet::GetBillboardsAttr() const | File: ../Graphics/BillboardSet.h
-    // Error: type "VariantVector" can not automatically bind
-    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("BillboardSet", "bool GetBlockEvents() const", asMETHODPR(BillboardSet, GetBlockEvents, () const, bool), asCALL_THISCALL);
-    // const BoundingBox& Drawable::GetBoundingBox() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "const BoundingBox& GetBoundingBox() const", asMETHODPR(BillboardSet, GetBoundingBox, () const, const BoundingBox&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "const BoundingBox& get_boundingBox() const", asMETHODPR(BillboardSet, GetBoundingBox, () const, const BoundingBox&), asCALL_THISCALL);
-    // bool Drawable::GetCastShadows() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "bool GetCastShadows() const", asMETHODPR(BillboardSet, GetCastShadows, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "bool get_castShadows() const", asMETHODPR(BillboardSet, GetCastShadows, () const, bool), asCALL_THISCALL);
-    // const String& Object::GetCategory() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("BillboardSet", "const String& GetCategory() const", asMETHODPR(BillboardSet, GetCategory, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "const String& get_category() const", asMETHODPR(BillboardSet, GetCategory, () const, const String&), asCALL_THISCALL);
-    // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("BillboardSet", "Component@+ GetComponent(StringHash) const", asMETHODPR(BillboardSet, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
-    // template<class T> T*  Component::GetComponent() const | File: ../Scene/Component.h
-    // Not registered because template
-    // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
-    // Error: type "PODVector<Component*>&" can not automatically bind
-    // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
-    // Not registered because template
-    // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
-    // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
-    // Error: type "PODVector<Node*>&" can not automatically bind
-    // float Drawable::GetDistance() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "float GetDistance() const", asMETHODPR(BillboardSet, GetDistance, () const, float), asCALL_THISCALL);
-    // unsigned char Drawable::GetDrawableFlags() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "uint8 GetDrawableFlags() const", asMETHODPR(BillboardSet, GetDrawableFlags, () const, unsigned char), asCALL_THISCALL);
-    // float Drawable::GetDrawDistance() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "float GetDrawDistance() const", asMETHODPR(BillboardSet, GetDrawDistance, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "float get_drawDistance() const", asMETHODPR(BillboardSet, GetDrawDistance, () const, float), asCALL_THISCALL);
-    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("BillboardSet", "VariantMap& GetEventDataMap() const", asMETHODPR(BillboardSet, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
-    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // Object* Object::GetEventSender() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("BillboardSet", "Object@+ GetEventSender() const", asMETHODPR(BillboardSet, GetEventSender, () const, Object*), asCALL_THISCALL);
-    // FaceCameraMode BillboardSet::GetFaceCameraMode() const | File: ../Graphics/BillboardSet.h
-    engine->RegisterObjectMethod("BillboardSet", "FaceCameraMode GetFaceCameraMode() const", asMETHODPR(BillboardSet, GetFaceCameraMode, () const, FaceCameraMode), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "FaceCameraMode get_faceCameraMode() const", asMETHODPR(BillboardSet, GetFaceCameraMode, () const, FaceCameraMode), asCALL_THISCALL);
-    // Light* Drawable::GetFirstLight() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "Light@+ GetFirstLight() const", asMETHODPR(BillboardSet, GetFirstLight, () const, Light*), asCALL_THISCALL);
-    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("BillboardSet", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(BillboardSet, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "const Variant& get_globalVar(StringHash) const", asMETHODPR(BillboardSet, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("BillboardSet", "const VariantMap& GetGlobalVars() const", asMETHODPR(BillboardSet, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "const VariantMap& get_globalVars() const", asMETHODPR(BillboardSet, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    // unsigned Component::GetID() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("BillboardSet", "uint GetID() const", asMETHODPR(BillboardSet, GetID, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "uint get_id() const", asMETHODPR(BillboardSet, GetID, () const, unsigned), asCALL_THISCALL);
-    // bool Serializable::GetInterceptNetworkUpdate(const String& attributeName) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("BillboardSet", "bool GetInterceptNetworkUpdate(const String&in) const", asMETHODPR(BillboardSet, GetInterceptNetworkUpdate, (const String&) const, bool), asCALL_THISCALL);
-    // unsigned Drawable::GetLightMask() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "uint GetLightMask() const", asMETHODPR(BillboardSet, GetLightMask, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "uint get_lightMask() const", asMETHODPR(BillboardSet, GetLightMask, () const, unsigned), asCALL_THISCALL);
-    // const PODVector<Light*>& Drawable::GetLights() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "Array<Light@>@ GetLights() const", asFUNCTION(BillboardSet_GetLights_void), asCALL_CDECL_OBJFIRST);
-    // float Drawable::GetLodBias() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "float GetLodBias() const", asMETHODPR(BillboardSet, GetLodBias, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "float get_lodBias() const", asMETHODPR(BillboardSet, GetLodBias, () const, float), asCALL_THISCALL);
-    // float Drawable::GetLodDistance() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "float GetLodDistance() const", asMETHODPR(BillboardSet, GetLodDistance, () const, float), asCALL_THISCALL);
-    // virtual Geometry* Drawable::GetLodGeometry(unsigned batchIndex, unsigned level) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "Geometry@+ GetLodGeometry(uint, uint)", asMETHODPR(BillboardSet, GetLodGeometry, (unsigned, unsigned), Geometry*), asCALL_THISCALL);
-    // Material* BillboardSet::GetMaterial() const | File: ../Graphics/BillboardSet.h
-    engine->RegisterObjectMethod("BillboardSet", "Material@+ GetMaterial() const", asMETHODPR(BillboardSet, GetMaterial, () const, Material*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "Material@+ get_material() const", asMETHODPR(BillboardSet, GetMaterial, () const, Material*), asCALL_THISCALL);
-    // ResourceRef BillboardSet::GetMaterialAttr() const | File: ../Graphics/BillboardSet.h
-    engine->RegisterObjectMethod("BillboardSet", "ResourceRef GetMaterialAttr() const", asMETHODPR(BillboardSet, GetMaterialAttr, () const, ResourceRef), asCALL_THISCALL);
-    // unsigned Drawable::GetMaxLights() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "uint GetMaxLights() const", asMETHODPR(BillboardSet, GetMaxLights, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "uint get_maxLights() const", asMETHODPR(BillboardSet, GetMaxLights, () const, unsigned), asCALL_THISCALL);
-    // float Drawable::GetMaxZ() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "float GetMaxZ() const", asMETHODPR(BillboardSet, GetMaxZ, () const, float), asCALL_THISCALL);
-    // float BillboardSet::GetMinAngle() const | File: ../Graphics/BillboardSet.h
-    engine->RegisterObjectMethod("BillboardSet", "float GetMinAngle() const", asMETHODPR(BillboardSet, GetMinAngle, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "float get_minAngle() const", asMETHODPR(BillboardSet, GetMinAngle, () const, float), asCALL_THISCALL);
-    // float Drawable::GetMinZ() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "float GetMinZ() const", asMETHODPR(BillboardSet, GetMinZ, () const, float), asCALL_THISCALL);
-    // const PODVector<unsigned char>& BillboardSet::GetNetBillboardsAttr() const | File: ../Graphics/BillboardSet.h
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
-    // virtual const Vector<AttributeInfo>* Serializable::GetNetworkAttributes() const | File: ../Scene/Serializable.h
-    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
-    // NetworkState* Serializable::GetNetworkState() const | File: ../Scene/Serializable.h
-    // Error: type "NetworkState*" can not automatically bind
-    // Node* Component::GetNode() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("BillboardSet", "Node@+ GetNode() const", asMETHODPR(BillboardSet, GetNode, () const, Node*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "Node@+ get_node() const", asMETHODPR(BillboardSet, GetNode, () const, Node*), asCALL_THISCALL);
-    // unsigned Serializable::GetNumAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("BillboardSet", "uint GetNumAttributes() const", asMETHODPR(BillboardSet, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "uint get_numAttributes() const", asMETHODPR(BillboardSet, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
-    // unsigned BillboardSet::GetNumBillboards() const | File: ../Graphics/BillboardSet.h
-    engine->RegisterObjectMethod("BillboardSet", "uint GetNumBillboards() const", asMETHODPR(BillboardSet, GetNumBillboards, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "uint get_numBillboards() const", asMETHODPR(BillboardSet, GetNumBillboards, () const, unsigned), asCALL_THISCALL);
-    // unsigned Serializable::GetNumNetworkAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("BillboardSet", "uint GetNumNetworkAttributes() const", asMETHODPR(BillboardSet, GetNumNetworkAttributes, () const, unsigned), asCALL_THISCALL);
-    // virtual unsigned Drawable::GetNumOccluderTriangles() | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "uint GetNumOccluderTriangles()", asMETHODPR(BillboardSet, GetNumOccluderTriangles, (), unsigned), asCALL_THISCALL);
-    // ObjectAnimation* Animatable::GetObjectAnimation() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("BillboardSet", "ObjectAnimation@+ GetObjectAnimation() const", asMETHODPR(BillboardSet, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "ObjectAnimation@+ get_objectAnimation() const", asMETHODPR(BillboardSet, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
-    // ResourceRef Animatable::GetObjectAnimationAttr() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("BillboardSet", "ResourceRef GetObjectAnimationAttr() const", asMETHODPR(BillboardSet, GetObjectAnimationAttr, () const, ResourceRef), asCALL_THISCALL);
-    // Octant* Drawable::GetOctant() const | File: ../Graphics/Drawable.h
-    // Error: type "Octant" can not automatically bind bacause have @nobind mark
-    // Scene* Component::GetScene() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("BillboardSet", "Scene@+ GetScene() const", asMETHODPR(BillboardSet, GetScene, () const, Scene*), asCALL_THISCALL);
-    // float Drawable::GetShadowDistance() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "float GetShadowDistance() const", asMETHODPR(BillboardSet, GetShadowDistance, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "float get_shadowDistance() const", asMETHODPR(BillboardSet, GetShadowDistance, () const, float), asCALL_THISCALL);
-    // unsigned Drawable::GetShadowMask() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "uint GetShadowMask() const", asMETHODPR(BillboardSet, GetShadowMask, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "uint get_shadowMask() const", asMETHODPR(BillboardSet, GetShadowMask, () const, unsigned), asCALL_THISCALL);
-    // float Drawable::GetSortValue() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "float GetSortValue() const", asMETHODPR(BillboardSet, GetSortValue, () const, float), asCALL_THISCALL);
-    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("BillboardSet", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(BillboardSet, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
-    // Not registered because template
-    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("BillboardSet", "StringHash GetType() const", asMETHODPR(BillboardSet, GetType, () const, StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "StringHash get_type() const", asMETHODPR(BillboardSet, GetType, () const, StringHash), asCALL_THISCALL);
-    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("BillboardSet", "const String& GetTypeName() const", asMETHODPR(BillboardSet, GetTypeName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "const String& get_typeName() const", asMETHODPR(BillboardSet, GetTypeName, () const, const String&), asCALL_THISCALL);
-    // UpdateGeometryType BillboardSet::GetUpdateGeometryType() override | File: ../Graphics/BillboardSet.h
-    engine->RegisterObjectMethod("BillboardSet", "UpdateGeometryType GetUpdateGeometryType()", asMETHODPR(BillboardSet, GetUpdateGeometryType, (), UpdateGeometryType), asCALL_THISCALL);
-    // const PODVector<Light*>& Drawable::GetVertexLights() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "Array<Light@>@ GetVertexLights() const", asFUNCTION(BillboardSet_GetVertexLights_void), asCALL_CDECL_OBJFIRST);
-    // unsigned Drawable::GetViewMask() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "uint GetViewMask() const", asMETHODPR(BillboardSet, GetViewMask, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "uint get_viewMask() const", asMETHODPR(BillboardSet, GetViewMask, () const, unsigned), asCALL_THISCALL);
-    // const BoundingBox& Drawable::GetWorldBoundingBox() | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "const BoundingBox& GetWorldBoundingBox()", asMETHODPR(BillboardSet, GetWorldBoundingBox, (), const BoundingBox&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "const BoundingBox& get_worldBoundingBox()", asMETHODPR(BillboardSet, GetWorldBoundingBox, (), const BoundingBox&), asCALL_THISCALL);
-    // Zone* Drawable::GetZone() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "Zone@+ GetZone() const", asMETHODPR(BillboardSet, GetZone, () const, Zone*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "Zone@+ get_zone() const", asMETHODPR(BillboardSet, GetZone, () const, Zone*), asCALL_THISCALL);
-    // unsigned Drawable::GetZoneMask() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "uint GetZoneMask() const", asMETHODPR(BillboardSet, GetZoneMask, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "uint get_zoneMask() const", asMETHODPR(BillboardSet, GetZoneMask, () const, unsigned), asCALL_THISCALL);
-    // bool Drawable::HasBasePass(unsigned batchIndex) const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "bool HasBasePass(uint) const", asMETHODPR(BillboardSet, HasBasePass, (unsigned) const, bool), asCALL_THISCALL);
-    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("BillboardSet", "bool HasEventHandlers() const", asMETHODPR(BillboardSet, HasEventHandlers, () const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("BillboardSet", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(BillboardSet, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("BillboardSet", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(BillboardSet, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
-    // bool Component::IsEnabled() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("BillboardSet", "bool IsEnabled() const", asMETHODPR(BillboardSet, IsEnabled, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "bool get_enabled() const", asMETHODPR(BillboardSet, IsEnabled, () const, bool), asCALL_THISCALL);
-    // bool Component::IsEnabledEffective() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("BillboardSet", "bool IsEnabledEffective() const", asMETHODPR(BillboardSet, IsEnabledEffective, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "bool get_enabledEffective() const", asMETHODPR(BillboardSet, IsEnabledEffective, () const, bool), asCALL_THISCALL);
-    // bool BillboardSet::IsFixedScreenSize() const | File: ../Graphics/BillboardSet.h
-    engine->RegisterObjectMethod("BillboardSet", "bool IsFixedScreenSize() const", asMETHODPR(BillboardSet, IsFixedScreenSize, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "bool get_fixedScreenSize() const", asMETHODPR(BillboardSet, IsFixedScreenSize, () const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("BillboardSet", "bool IsInstanceOf(StringHash) const", asMETHODPR(BillboardSet, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
-    // Not registered because template
-    // bool Drawable::IsInView() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "bool IsInView() const", asMETHODPR(BillboardSet, IsInView, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "bool get_inView() const", asMETHODPR(BillboardSet, IsInView, () const, bool), asCALL_THISCALL);
-    // bool Drawable::IsInView(Camera* camera) const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "bool IsInView(Camera@+) const", asMETHODPR(BillboardSet, IsInView, (Camera*) const, bool), asCALL_THISCALL);
-    // bool Drawable::IsInView(const FrameInfo& frame, bool anyCamera=false) const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "bool IsInView(const FrameInfo&in, bool = false) const", asMETHODPR(BillboardSet, IsInView, (const FrameInfo&, bool) const, bool), asCALL_THISCALL);
-    // bool Drawable::IsOccludee() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "bool IsOccludee() const", asMETHODPR(BillboardSet, IsOccludee, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "bool get_occludee() const", asMETHODPR(BillboardSet, IsOccludee, () const, bool), asCALL_THISCALL);
-    // bool Drawable::IsOccluder() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "bool IsOccluder() const", asMETHODPR(BillboardSet, IsOccluder, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "bool get_occluder() const", asMETHODPR(BillboardSet, IsOccluder, () const, bool), asCALL_THISCALL);
-    // bool BillboardSet::IsRelative() const | File: ../Graphics/BillboardSet.h
-    engine->RegisterObjectMethod("BillboardSet", "bool IsRelative() const", asMETHODPR(BillboardSet, IsRelative, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "bool get_relative() const", asMETHODPR(BillboardSet, IsRelative, () const, bool), asCALL_THISCALL);
-    // bool Component::IsReplicated() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("BillboardSet", "bool IsReplicated() const", asMETHODPR(BillboardSet, IsReplicated, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "bool get_replicated() const", asMETHODPR(BillboardSet, IsReplicated, () const, bool), asCALL_THISCALL);
-    // bool BillboardSet::IsScaled() const | File: ../Graphics/BillboardSet.h
-    engine->RegisterObjectMethod("BillboardSet", "bool IsScaled() const", asMETHODPR(BillboardSet, IsScaled, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "bool get_scaled() const", asMETHODPR(BillboardSet, IsScaled, () const, bool), asCALL_THISCALL);
-    // bool BillboardSet::IsSorted() const | File: ../Graphics/BillboardSet.h
-    engine->RegisterObjectMethod("BillboardSet", "bool IsSorted() const", asMETHODPR(BillboardSet, IsSorted, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "bool get_sorted() const", asMETHODPR(BillboardSet, IsSorted, () const, bool), asCALL_THISCALL);
-    // bool Serializable::IsTemporary() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("BillboardSet", "bool IsTemporary() const", asMETHODPR(BillboardSet, IsTemporary, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "bool get_temporary() const", asMETHODPR(BillboardSet, IsTemporary, () const, bool), asCALL_THISCALL);
-    // bool Drawable::IsZoneDirty() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "bool IsZoneDirty() const", asMETHODPR(BillboardSet, IsZoneDirty, () const, bool), asCALL_THISCALL);
-    // void Drawable::LimitLights() | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "void LimitLights()", asMETHODPR(BillboardSet, LimitLights, (), void), asCALL_THISCALL);
-    // void Drawable::LimitVertexLights(bool removeConvertedLights) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "void LimitVertexLights(bool)", asMETHODPR(BillboardSet, LimitVertexLights, (bool), void), asCALL_THISCALL);
-    // virtual bool Serializable::Load(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("BillboardSet", "bool Load(Deserializer&)", asMETHODPR(BillboardSet, Load, (Deserializer&), bool), asCALL_THISCALL);
-    // bool Animatable::LoadJSON(const JSONValue& source) override | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("BillboardSet", "bool LoadJSON(const JSONValue&in)", asMETHODPR(BillboardSet, LoadJSON, (const JSONValue&), bool), asCALL_THISCALL);
-    // bool Animatable::LoadXML(const XMLElement& source) override | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("BillboardSet", "bool LoadXML(const XMLElement&in)", asMETHODPR(BillboardSet, LoadXML, (const XMLElement&), bool), asCALL_THISCALL);
-    // void Drawable::MarkForUpdate() | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "void MarkForUpdate()", asMETHODPR(BillboardSet, MarkForUpdate, (), void), asCALL_THISCALL);
-    // void Drawable::MarkInView(const FrameInfo& frame) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "void MarkInView(const FrameInfo&in)", asMETHODPR(BillboardSet, MarkInView, (const FrameInfo&), void), asCALL_THISCALL);
-    // void Drawable::MarkInView(unsigned frameNumber) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "void MarkInView(uint)", asMETHODPR(BillboardSet, MarkInView, (unsigned), void), asCALL_THISCALL);
-    // void Component::MarkNetworkUpdate() override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("BillboardSet", "void MarkNetworkUpdate()", asMETHODPR(BillboardSet, MarkNetworkUpdate, (), void), asCALL_THISCALL);
-    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("BillboardSet", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(BillboardSet, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
-    // virtual void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("BillboardSet", "void OnGetAttribute(const AttributeInfo&in, Variant&) const", asMETHODPR(BillboardSet, OnGetAttribute, (const AttributeInfo&, Variant&) const, void), asCALL_THISCALL);
-    // virtual void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("BillboardSet", "void OnSetAttribute(const AttributeInfo&in, const Variant&in)", asMETHODPR(BillboardSet, OnSetAttribute, (const AttributeInfo&, const Variant&), void), asCALL_THISCALL);
-    // void Drawable::OnSetEnabled() override | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "void OnSetEnabled()", asMETHODPR(BillboardSet, OnSetEnabled, (), void), asCALL_THISCALL);
-    // void Component::PrepareNetworkUpdate() | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("BillboardSet", "void PrepareNetworkUpdate()", asMETHODPR(BillboardSet, PrepareNetworkUpdate, (), void), asCALL_THISCALL);
-    // void BillboardSet::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results) override | File: ../Graphics/BillboardSet.h
-    // Error: type "RayOctreeQuery" can not automatically bind bacause have @nobind mark
-    // bool Serializable::ReadDeltaUpdate(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("BillboardSet", "bool ReadDeltaUpdate(Deserializer&)", asMETHODPR(BillboardSet, ReadDeltaUpdate, (Deserializer&), bool), asCALL_THISCALL);
-    // bool Serializable::ReadLatestDataUpdate(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("BillboardSet", "bool ReadLatestDataUpdate(Deserializer&)", asMETHODPR(BillboardSet, ReadLatestDataUpdate, (Deserializer&), bool), asCALL_THISCALL);
-    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
-    // Error: type "RefCount*" can not automatically bind
-    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("BillboardSet", "int Refs() const", asMETHODPR(BillboardSet, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "int get_refs() const", asMETHODPR(BillboardSet, Refs, () const, int), asCALL_THISCALL);
-    // static void BillboardSet::RegisterObject(Context* context) | File: ../Graphics/BillboardSet.h
-    // Context can be used as firs parameter of constructors only
-    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("BillboardSet", asBEHAVE_RELEASE, "void f()", asMETHODPR(BillboardSet, ReleaseRef, (), void), asCALL_THISCALL);
-    // void Component::Remove() | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("BillboardSet", "void Remove()", asMETHODPR(BillboardSet, Remove, (), void), asCALL_THISCALL);
-    // void Animatable::RemoveAttributeAnimation(const String& name) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("BillboardSet", "void RemoveAttributeAnimation(const String&in)", asMETHODPR(BillboardSet, RemoveAttributeAnimation, (const String&), void), asCALL_THISCALL);
-    // void Serializable::RemoveInstanceDefault() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("BillboardSet", "void RemoveInstanceDefault()", asMETHODPR(BillboardSet, RemoveInstanceDefault, (), void), asCALL_THISCALL);
-    // void Animatable::RemoveObjectAnimation() | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("BillboardSet", "void RemoveObjectAnimation()", asMETHODPR(BillboardSet, RemoveObjectAnimation, (), void), asCALL_THISCALL);
-    // void Serializable::ResetToDefault() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("BillboardSet", "void ResetToDefault()", asMETHODPR(BillboardSet, ResetToDefault, (), void), asCALL_THISCALL);
-    // bool Component::Save(Serializer& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("BillboardSet", "bool Save(Serializer&) const", asMETHODPR(BillboardSet, Save, (Serializer&) const, bool), asCALL_THISCALL);
-    // virtual bool Serializable::SaveDefaultAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("BillboardSet", "bool SaveDefaultAttributes() const", asMETHODPR(BillboardSet, SaveDefaultAttributes, () const, bool), asCALL_THISCALL);
-    // bool Component::SaveJSON(JSONValue& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("BillboardSet", "bool SaveJSON(JSONValue&) const", asMETHODPR(BillboardSet, SaveJSON, (JSONValue&) const, bool), asCALL_THISCALL);
-    // bool Component::SaveXML(XMLElement& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("BillboardSet", "bool SaveXML(XMLElement&) const", asMETHODPR(BillboardSet, SaveXML, (XMLElement&) const, bool), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("BillboardSet", "void SendEvent(StringHash)", asMETHODPR(BillboardSet, SendEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("BillboardSet", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(BillboardSet, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
-    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
-    // Not registered because template
-    // void Animatable::SetAnimationEnabled(bool enable) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("BillboardSet", "void SetAnimationEnabled(bool)", asMETHODPR(BillboardSet, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "void set_animationEnabled(bool)", asMETHODPR(BillboardSet, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
-    // void BillboardSet::SetAnimationLodBias(float bias) | File: ../Graphics/BillboardSet.h
-    engine->RegisterObjectMethod("BillboardSet", "void SetAnimationLodBias(float)", asMETHODPR(BillboardSet, SetAnimationLodBias, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "void set_animationLodBias(float)", asMETHODPR(BillboardSet, SetAnimationLodBias, (float), void), asCALL_THISCALL);
-    // void Animatable::SetAnimationTime(float time) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("BillboardSet", "void SetAnimationTime(float)", asMETHODPR(BillboardSet, SetAnimationTime, (float), void), asCALL_THISCALL);
-    // bool Serializable::SetAttribute(unsigned index, const Variant& value) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("BillboardSet", "bool SetAttribute(uint, const Variant&in)", asMETHODPR(BillboardSet, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "bool set_attributes(uint, const Variant&in)", asMETHODPR(BillboardSet, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
-    // bool Serializable::SetAttribute(const String& name, const Variant& value) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("BillboardSet", "bool SetAttribute(const String&in, const Variant&in)", asMETHODPR(BillboardSet, SetAttribute, (const String&, const Variant&), bool), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode=WM_LOOP, float speed=1.0f) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("BillboardSet", "void SetAttributeAnimation(const String&in, ValueAnimation@+, WrapMode = WM_LOOP, float = 1.0f)", asMETHODPR(BillboardSet, SetAttributeAnimation, (const String&, ValueAnimation*, WrapMode, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationSpeed(const String& name, float speed) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("BillboardSet", "void SetAttributeAnimationSpeed(const String&in, float)", asMETHODPR(BillboardSet, SetAttributeAnimationSpeed, (const String&, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationTime(const String& name, float time) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("BillboardSet", "void SetAttributeAnimationTime(const String&in, float)", asMETHODPR(BillboardSet, SetAttributeAnimationTime, (const String&, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationWrapMode(const String& name, WrapMode wrapMode) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("BillboardSet", "void SetAttributeAnimationWrapMode(const String&in, WrapMode)", asMETHODPR(BillboardSet, SetAttributeAnimationWrapMode, (const String&, WrapMode), void), asCALL_THISCALL);
-    // void Drawable::SetBasePass(unsigned batchIndex) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "void SetBasePass(uint)", asMETHODPR(BillboardSet, SetBasePass, (unsigned), void), asCALL_THISCALL);
-    // void BillboardSet::SetBillboardsAttr(const VariantVector& value) | File: ../Graphics/BillboardSet.h
-    // Error: type "const VariantVector&" can not automatically bind
-    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("BillboardSet", "void SetBlockEvents(bool)", asMETHODPR(BillboardSet, SetBlockEvents, (bool), void), asCALL_THISCALL);
-    // void Drawable::SetCastShadows(bool enable) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "void SetCastShadows(bool)", asMETHODPR(BillboardSet, SetCastShadows, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "void set_castShadows(bool)", asMETHODPR(BillboardSet, SetCastShadows, (bool), void), asCALL_THISCALL);
-    // void Drawable::SetDrawDistance(float distance) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "void SetDrawDistance(float)", asMETHODPR(BillboardSet, SetDrawDistance, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "void set_drawDistance(float)", asMETHODPR(BillboardSet, SetDrawDistance, (float), void), asCALL_THISCALL);
-    // void Component::SetEnabled(bool enable) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("BillboardSet", "void SetEnabled(bool)", asMETHODPR(BillboardSet, SetEnabled, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "void set_enabled(bool)", asMETHODPR(BillboardSet, SetEnabled, (bool), void), asCALL_THISCALL);
-    // void BillboardSet::SetFaceCameraMode(FaceCameraMode mode) | File: ../Graphics/BillboardSet.h
-    engine->RegisterObjectMethod("BillboardSet", "void SetFaceCameraMode(FaceCameraMode)", asMETHODPR(BillboardSet, SetFaceCameraMode, (FaceCameraMode), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "void set_faceCameraMode(FaceCameraMode)", asMETHODPR(BillboardSet, SetFaceCameraMode, (FaceCameraMode), void), asCALL_THISCALL);
-    // void BillboardSet::SetFixedScreenSize(bool enable) | File: ../Graphics/BillboardSet.h
-    engine->RegisterObjectMethod("BillboardSet", "void SetFixedScreenSize(bool)", asMETHODPR(BillboardSet, SetFixedScreenSize, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "void set_fixedScreenSize(bool)", asMETHODPR(BillboardSet, SetFixedScreenSize, (bool), void), asCALL_THISCALL);
-    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("BillboardSet", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(BillboardSet, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(BillboardSet, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    // void Serializable::SetInstanceDefault(bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("BillboardSet", "void SetInstanceDefault(bool)", asMETHODPR(BillboardSet, SetInstanceDefault, (bool), void), asCALL_THISCALL);
-    // void Serializable::SetInterceptNetworkUpdate(const String& attributeName, bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("BillboardSet", "void SetInterceptNetworkUpdate(const String&in, bool)", asMETHODPR(BillboardSet, SetInterceptNetworkUpdate, (const String&, bool), void), asCALL_THISCALL);
-    // void Drawable::SetLightMask(unsigned mask) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "void SetLightMask(uint)", asMETHODPR(BillboardSet, SetLightMask, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "void set_lightMask(uint)", asMETHODPR(BillboardSet, SetLightMask, (unsigned), void), asCALL_THISCALL);
-    // void Drawable::SetLodBias(float bias) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "void SetLodBias(float)", asMETHODPR(BillboardSet, SetLodBias, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "void set_lodBias(float)", asMETHODPR(BillboardSet, SetLodBias, (float), void), asCALL_THISCALL);
-    // void BillboardSet::SetMaterial(Material* material) | File: ../Graphics/BillboardSet.h
-    engine->RegisterObjectMethod("BillboardSet", "void SetMaterial(Material@+)", asMETHODPR(BillboardSet, SetMaterial, (Material*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "void set_material(Material@+)", asMETHODPR(BillboardSet, SetMaterial, (Material*), void), asCALL_THISCALL);
-    // void BillboardSet::SetMaterialAttr(const ResourceRef& value) | File: ../Graphics/BillboardSet.h
-    engine->RegisterObjectMethod("BillboardSet", "void SetMaterialAttr(const ResourceRef&in)", asMETHODPR(BillboardSet, SetMaterialAttr, (const ResourceRef&), void), asCALL_THISCALL);
-    // void Drawable::SetMaxLights(unsigned num) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "void SetMaxLights(uint)", asMETHODPR(BillboardSet, SetMaxLights, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "void set_maxLights(uint)", asMETHODPR(BillboardSet, SetMaxLights, (unsigned), void), asCALL_THISCALL);
-    // void BillboardSet::SetMinAngle(float angle) | File: ../Graphics/BillboardSet.h
-    engine->RegisterObjectMethod("BillboardSet", "void SetMinAngle(float)", asMETHODPR(BillboardSet, SetMinAngle, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "void set_minAngle(float)", asMETHODPR(BillboardSet, SetMinAngle, (float), void), asCALL_THISCALL);
-    // void Drawable::SetMinMaxZ(float minZ, float maxZ) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "void SetMinMaxZ(float, float)", asMETHODPR(BillboardSet, SetMinMaxZ, (float, float), void), asCALL_THISCALL);
-    // void BillboardSet::SetNetBillboardsAttr(const PODVector<unsigned char>& value) | File: ../Graphics/BillboardSet.h
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
-    // void BillboardSet::SetNumBillboards(unsigned num) | File: ../Graphics/BillboardSet.h
-    engine->RegisterObjectMethod("BillboardSet", "void SetNumBillboards(uint)", asMETHODPR(BillboardSet, SetNumBillboards, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "void set_numBillboards(uint)", asMETHODPR(BillboardSet, SetNumBillboards, (unsigned), void), asCALL_THISCALL);
-    // void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("BillboardSet", "void SetObjectAnimation(ObjectAnimation@+)", asMETHODPR(BillboardSet, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "void set_objectAnimation(ObjectAnimation@+)", asMETHODPR(BillboardSet, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
-    // void Animatable::SetObjectAnimationAttr(const ResourceRef& value) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("BillboardSet", "void SetObjectAnimationAttr(const ResourceRef&in)", asMETHODPR(BillboardSet, SetObjectAnimationAttr, (const ResourceRef&), void), asCALL_THISCALL);
-    // void Drawable::SetOccludee(bool enable) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "void SetOccludee(bool)", asMETHODPR(BillboardSet, SetOccludee, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "void set_occludee(bool)", asMETHODPR(BillboardSet, SetOccludee, (bool), void), asCALL_THISCALL);
-    // void Drawable::SetOccluder(bool enable) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "void SetOccluder(bool)", asMETHODPR(BillboardSet, SetOccluder, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "void set_occluder(bool)", asMETHODPR(BillboardSet, SetOccluder, (bool), void), asCALL_THISCALL);
-    // void BillboardSet::SetRelative(bool enable) | File: ../Graphics/BillboardSet.h
-    engine->RegisterObjectMethod("BillboardSet", "void SetRelative(bool)", asMETHODPR(BillboardSet, SetRelative, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "void set_relative(bool)", asMETHODPR(BillboardSet, SetRelative, (bool), void), asCALL_THISCALL);
-    // void BillboardSet::SetScaled(bool enable) | File: ../Graphics/BillboardSet.h
-    engine->RegisterObjectMethod("BillboardSet", "void SetScaled(bool)", asMETHODPR(BillboardSet, SetScaled, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "void set_scaled(bool)", asMETHODPR(BillboardSet, SetScaled, (bool), void), asCALL_THISCALL);
-    // void Drawable::SetShadowDistance(float distance) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "void SetShadowDistance(float)", asMETHODPR(BillboardSet, SetShadowDistance, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "void set_shadowDistance(float)", asMETHODPR(BillboardSet, SetShadowDistance, (float), void), asCALL_THISCALL);
-    // void Drawable::SetShadowMask(unsigned mask) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "void SetShadowMask(uint)", asMETHODPR(BillboardSet, SetShadowMask, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "void set_shadowMask(uint)", asMETHODPR(BillboardSet, SetShadowMask, (unsigned), void), asCALL_THISCALL);
-    // void BillboardSet::SetSorted(bool enable) | File: ../Graphics/BillboardSet.h
-    engine->RegisterObjectMethod("BillboardSet", "void SetSorted(bool)", asMETHODPR(BillboardSet, SetSorted, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "void set_sorted(bool)", asMETHODPR(BillboardSet, SetSorted, (bool), void), asCALL_THISCALL);
-    // void Drawable::SetSortValue(float value) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "void SetSortValue(float)", asMETHODPR(BillboardSet, SetSortValue, (float), void), asCALL_THISCALL);
-    // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("BillboardSet", "void SetTemporary(bool)", asMETHODPR(BillboardSet, SetTemporary, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "void set_temporary(bool)", asMETHODPR(BillboardSet, SetTemporary, (bool), void), asCALL_THISCALL);
-    // void Drawable::SetViewMask(unsigned mask) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "void SetViewMask(uint)", asMETHODPR(BillboardSet, SetViewMask, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "void set_viewMask(uint)", asMETHODPR(BillboardSet, SetViewMask, (unsigned), void), asCALL_THISCALL);
-    // void Drawable::SetZone(Zone* zone, bool temporary=false) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "void SetZone(Zone@+, bool = false)", asMETHODPR(BillboardSet, SetZone, (Zone*, bool), void), asCALL_THISCALL);
-    // void Drawable::SetZoneMask(unsigned mask) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "void SetZoneMask(uint)", asMETHODPR(BillboardSet, SetZoneMask, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "void set_zoneMask(uint)", asMETHODPR(BillboardSet, SetZoneMask, (unsigned), void), asCALL_THISCALL);
-    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
-    engine->RegisterObjectMethod("BillboardSet", "void UnsubscribeFromAllEvents()", asMETHODPR(BillboardSet, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("BillboardSet", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(BillboardSet_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
-    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("BillboardSet", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(BillboardSet, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("BillboardSet", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(BillboardSet, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("BillboardSet", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(BillboardSet, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
-    // virtual void Drawable::Update(const FrameInfo& frame) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("BillboardSet", "void Update(const FrameInfo&in)", asMETHODPR(BillboardSet, Update, (const FrameInfo&), void), asCALL_THISCALL);
-    // void BillboardSet::UpdateBatches(const FrameInfo& frame) override | File: ../Graphics/BillboardSet.h
-    engine->RegisterObjectMethod("BillboardSet", "void UpdateBatches(const FrameInfo&in)", asMETHODPR(BillboardSet, UpdateBatches, (const FrameInfo&), void), asCALL_THISCALL);
-    // void BillboardSet::UpdateGeometry(const FrameInfo& frame) override | File: ../Graphics/BillboardSet.h
-    engine->RegisterObjectMethod("BillboardSet", "void UpdateGeometry(const FrameInfo&in)", asMETHODPR(BillboardSet, UpdateGeometry, (const FrameInfo&), void), asCALL_THISCALL);
-    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("BillboardSet", "int WeakRefs() const", asMETHODPR(BillboardSet, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "int get_weakRefs() const", asMETHODPR(BillboardSet, WeakRefs, () const, int), asCALL_THISCALL);
-    // void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attributeBits, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("BillboardSet", "void WriteDeltaUpdate(Serializer&, const DirtyBits&in, uint8)", asMETHODPR(BillboardSet, WriteDeltaUpdate, (Serializer&, const DirtyBits&, unsigned char), void), asCALL_THISCALL);
-    // void Serializable::WriteInitialDeltaUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("BillboardSet", "void WriteInitialDeltaUpdate(Serializer&, uint8)", asMETHODPR(BillboardSet, WriteInitialDeltaUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
-    // void Serializable::WriteLatestDataUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("BillboardSet", "void WriteLatestDataUpdate(Serializer&, uint8)", asMETHODPR(BillboardSet, WriteLatestDataUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
-#ifdef REGISTER_MANUAL_PART_Drawable
-    REGISTER_MANUAL_PART_Drawable(BillboardSet, "BillboardSet")
-#endif
-#ifdef REGISTER_MANUAL_PART_Component
-    REGISTER_MANUAL_PART_Component(BillboardSet, "BillboardSet")
-#endif
-#ifdef REGISTER_MANUAL_PART_Animatable
-    REGISTER_MANUAL_PART_Animatable(BillboardSet, "BillboardSet")
-#endif
-#ifdef REGISTER_MANUAL_PART_Serializable
-    REGISTER_MANUAL_PART_Serializable(BillboardSet, "BillboardSet")
-#endif
-#ifdef REGISTER_MANUAL_PART_Object
-    REGISTER_MANUAL_PART_Object(BillboardSet, "BillboardSet")
-#endif
-#ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(BillboardSet, "BillboardSet")
-#endif
-#ifdef REGISTER_MANUAL_PART_BillboardSet
-    REGISTER_MANUAL_PART_BillboardSet(BillboardSet, "BillboardSet")
-#endif
-    RegisterSubclass<Drawable, BillboardSet>(engine, "Drawable", "BillboardSet");
-    RegisterSubclass<Component, BillboardSet>(engine, "Component", "BillboardSet");
-    RegisterSubclass<Animatable, BillboardSet>(engine, "Animatable", "BillboardSet");
-    RegisterSubclass<Serializable, BillboardSet>(engine, "Serializable", "BillboardSet");
-    RegisterSubclass<Object, BillboardSet>(engine, "Object", "BillboardSet");
-    RegisterSubclass<RefCounted, BillboardSet>(engine, "RefCounted", "BillboardSet");
 
     // float BoundingBox::dummyMax_ | File: ../Math/BoundingBox.h
     engine->RegisterObjectProperty("BoundingBox", "float dummyMax", offsetof(BoundingBox, dummyMax_));
@@ -2601,20 +2601,68 @@ void ASRegisterGenerated_Members_B(asIScriptEngine* engine)
     RegisterSubclass<Object, Button>(engine, "Object", "Button");
     RegisterSubclass<RefCounted, Button>(engine, "RefCounted", "Button");
 
-    // float BiasParameters::constantBias_ | File: ../Graphics/Light.h
-    engine->RegisterObjectProperty("BiasParameters", "float constantBias", offsetof(BiasParameters, constantBias_));
-    // float BiasParameters::normalOffset_ | File: ../Graphics/Light.h
-    engine->RegisterObjectProperty("BiasParameters", "float normalOffset", offsetof(BiasParameters, normalOffset_));
-    // float BiasParameters::slopeScaledBias_ | File: ../Graphics/Light.h
-    engine->RegisterObjectProperty("BiasParameters", "float slopeScaledBias", offsetof(BiasParameters, slopeScaledBias_));
-    // BiasParameters::BiasParameters(float constantBias, float slopeScaledBias, float normalOffset=0.0f) | File: ../Graphics/Light.h
-    engine->RegisterObjectBehaviour("BiasParameters", asBEHAVE_CONSTRUCT, "void f(float, float, float = 0.0f)", asFUNCTION(BiasParameters_BiasParameters_float_float_float), asCALL_CDECL_OBJFIRST);
-    // void BiasParameters::Validate() | File: ../Graphics/Light.h
-    engine->RegisterObjectMethod("BiasParameters", "void Validate()", asMETHODPR(BiasParameters, Validate, (), void), asCALL_THISCALL);
-    // BiasParameters& BiasParameters::operator=(const BiasParameters&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<BiasParameters>(engine, "BiasParameters");
-#ifdef REGISTER_MANUAL_PART_BiasParameters
-    REGISTER_MANUAL_PART_BiasParameters(BiasParameters, "BiasParameters")
+    // HashSet<Pair<StringHash, StringHash> > BackgroundLoadItem::dependencies_ | File: ../Resource/BackgroundLoader.h
+    // Error: type "HashSet<Pair<StringHash, StringHash>>" can not automatically bind
+    // HashSet<Pair<StringHash, StringHash> > BackgroundLoadItem::dependents_ | File: ../Resource/BackgroundLoader.h
+    // Error: type "HashSet<Pair<StringHash, StringHash>>" can not automatically bind
+    // SharedPtr<Resource> BackgroundLoadItem::resource_ | File: ../Resource/BackgroundLoader.h
+    // Error: type "SharedPtr<Resource>" can not automatically bind
+    // bool BackgroundLoadItem::sendEventOnFailure_ | File: ../Resource/BackgroundLoader.h
+    engine->RegisterObjectProperty("BackgroundLoadItem", "bool sendEventOnFailure", offsetof(BackgroundLoadItem, sendEventOnFailure_));
+    // BackgroundLoadItem::~BackgroundLoadItem() | Implicitly-declared
+    engine->RegisterObjectBehaviour("BackgroundLoadItem", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(BackgroundLoadItem_Destructor), asCALL_CDECL_OBJFIRST);
+    // BackgroundLoadItem& BackgroundLoadItem::operator=(const BackgroundLoadItem&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<BackgroundLoadItem>(engine, "BackgroundLoadItem");
+#ifdef REGISTER_MANUAL_PART_BackgroundLoadItem
+    REGISTER_MANUAL_PART_BackgroundLoadItem(BackgroundLoadItem, "BackgroundLoadItem")
+#endif
+
+    // float Batch::distance_ | File: ../Graphics/Batch.h
+    engine->RegisterObjectProperty("Batch", "float distance", offsetof(Batch, distance_));
+    // Geometry* Batch::geometry_ | File: ../Graphics/Batch.h
+    // Geometry* can not be registered
+    // GeometryType Batch::geometryType_ | File: ../Graphics/Batch.h
+    engine->RegisterObjectProperty("Batch", "GeometryType geometryType", offsetof(Batch, geometryType_));
+    // void* Batch::instancingData_ | File: ../Graphics/Batch.h
+    // void* can not be registered
+    // bool Batch::isBase_ | File: ../Graphics/Batch.h
+    engine->RegisterObjectProperty("Batch", "bool isBase", offsetof(Batch, isBase_));
+    // unsigned char Batch::lightMask_ | File: ../Graphics/Batch.h
+    engine->RegisterObjectProperty("Batch", "uint8 lightMask", offsetof(Batch, lightMask_));
+    // LightBatchQueue* Batch::lightQueue_ | File: ../Graphics/Batch.h
+    // LightBatchQueue* can not be registered
+    // Material* Batch::material_ | File: ../Graphics/Batch.h
+    // Material* can not be registered
+    // unsigned Batch::numWorldTransforms_ | File: ../Graphics/Batch.h
+    engine->RegisterObjectProperty("Batch", "uint numWorldTransforms", offsetof(Batch, numWorldTransforms_));
+    // Pass* Batch::pass_ | File: ../Graphics/Batch.h
+    // Pass* can not be registered
+    // ShaderVariation* Batch::pixelShader_ | File: ../Graphics/Batch.h
+    // ShaderVariation* can not be registered
+    // unsigned char Batch::renderOrder_ | File: ../Graphics/Batch.h
+    engine->RegisterObjectProperty("Batch", "uint8 renderOrder", offsetof(Batch, renderOrder_));
+    // unsigned long long Batch::sortKey_ | File: ../Graphics/Batch.h
+    engine->RegisterObjectProperty("Batch", "uint64 sortKey", offsetof(Batch, sortKey_));
+    // ShaderVariation* Batch::vertexShader_ | File: ../Graphics/Batch.h
+    // ShaderVariation* can not be registered
+    // const Matrix3x4* Batch::worldTransform_ | File: ../Graphics/Batch.h
+    // const Matrix3x4* can not be registered
+    // Zone* Batch::zone_ | File: ../Graphics/Batch.h
+    // Zone* can not be registered
+    // explicit Batch::Batch(const SourceBatch& rhs) | File: ../Graphics/Batch.h
+    engine->RegisterObjectBehaviour("Batch", asBEHAVE_CONSTRUCT, "void f(const SourceBatch&in)", asFUNCTION(Batch_Batch_SourceBatch), asCALL_CDECL_OBJFIRST);
+    // void Batch::CalculateSortKey() | File: ../Graphics/Batch.h
+    engine->RegisterObjectMethod("Batch", "void CalculateSortKey()", asMETHODPR(Batch, CalculateSortKey, (), void), asCALL_THISCALL);
+    // void Batch::Draw(View* view, Camera* camera, bool allowDepthWrite) const | File: ../Graphics/Batch.h
+    engine->RegisterObjectMethod("Batch", "void Draw(View@+, Camera@+, bool) const", asMETHODPR(Batch, Draw, (View*, Camera*, bool) const, void), asCALL_THISCALL);
+    // void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool allowDepthWrite) const | File: ../Graphics/Batch.h
+    engine->RegisterObjectMethod("Batch", "void Prepare(View@+, Camera@+, bool, bool) const", asMETHODPR(Batch, Prepare, (View*, Camera*, bool, bool) const, void), asCALL_THISCALL);
+    // Batch::~Batch() | Implicitly-declared
+    engine->RegisterObjectBehaviour("Batch", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(Batch_Destructor), asCALL_CDECL_OBJFIRST);
+    // Batch& Batch::operator=(const Batch&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<Batch>(engine, "Batch");
+#ifdef REGISTER_MANUAL_PART_Batch
+    REGISTER_MANUAL_PART_Batch(Batch, "Batch")
 #endif
 
     // float Batch::distance_ | File: ../Graphics/Batch.h
@@ -2676,6 +2724,32 @@ void ASRegisterGenerated_Members_B(asIScriptEngine* engine)
     REGISTER_MANUAL_PART_BatchGroup(BatchGroup, "BatchGroup")
 #endif
 
+    // Geometry* BatchGroupKey::geometry_ | File: ../Graphics/Batch.h
+    // Geometry* can not be registered
+    // LightBatchQueue* BatchGroupKey::lightQueue_ | File: ../Graphics/Batch.h
+    // LightBatchQueue* can not be registered
+    // Material* BatchGroupKey::material_ | File: ../Graphics/Batch.h
+    // Material* can not be registered
+    // Pass* BatchGroupKey::pass_ | File: ../Graphics/Batch.h
+    // Pass* can not be registered
+    // unsigned char BatchGroupKey::renderOrder_ | File: ../Graphics/Batch.h
+    engine->RegisterObjectProperty("BatchGroupKey", "uint8 renderOrder", offsetof(BatchGroupKey, renderOrder_));
+    // Zone* BatchGroupKey::zone_ | File: ../Graphics/Batch.h
+    // Zone* can not be registered
+    // explicit BatchGroupKey::BatchGroupKey(const Batch& batch) | File: ../Graphics/Batch.h
+    engine->RegisterObjectBehaviour("BatchGroupKey", asBEHAVE_CONSTRUCT, "void f(const Batch&in)", asFUNCTION(BatchGroupKey_BatchGroupKey_Batch), asCALL_CDECL_OBJFIRST);
+    // bool BatchGroupKey::operator==(const BatchGroupKey& rhs) const | File: ../Graphics/Batch.h
+    engine->RegisterObjectMethod("BatchGroupKey", "bool opEquals(const BatchGroupKey&in) const", asMETHODPR(BatchGroupKey, operator==, (const BatchGroupKey&) const, bool), asCALL_THISCALL);
+    // unsigned BatchGroupKey::ToHash() const | File: ../Graphics/Batch.h
+    engine->RegisterObjectMethod("BatchGroupKey", "uint ToHash() const", asMETHODPR(BatchGroupKey, ToHash, () const, unsigned), asCALL_THISCALL);
+    // BatchGroupKey::~BatchGroupKey() | Implicitly-declared
+    engine->RegisterObjectBehaviour("BatchGroupKey", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(BatchGroupKey_Destructor), asCALL_CDECL_OBJFIRST);
+    // BatchGroupKey& BatchGroupKey::operator=(const BatchGroupKey&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<BatchGroupKey>(engine, "BatchGroupKey");
+#ifdef REGISTER_MANUAL_PART_BatchGroupKey
+    REGISTER_MANUAL_PART_BatchGroupKey(BatchGroupKey, "BatchGroupKey")
+#endif
+
     // PODVector<Batch> BatchQueue::batches_ | File: ../Graphics/Batch.h
     // Error: type "PODVector<Batch>" can not automatically bind
     // HashMap<BatchGroupKey, BatchGroup> BatchQueue::batchGroups_ | File: ../Graphics/Batch.h
@@ -2726,94 +2800,20 @@ void ASRegisterGenerated_Members_B(asIScriptEngine* engine)
     REGISTER_MANUAL_PART_BatchQueue(BatchQueue, "BatchQueue")
 #endif
 
-    // float Batch::distance_ | File: ../Graphics/Batch.h
-    engine->RegisterObjectProperty("Batch", "float distance", offsetof(Batch, distance_));
-    // Geometry* Batch::geometry_ | File: ../Graphics/Batch.h
-    // Geometry* can not be registered
-    // GeometryType Batch::geometryType_ | File: ../Graphics/Batch.h
-    engine->RegisterObjectProperty("Batch", "GeometryType geometryType", offsetof(Batch, geometryType_));
-    // void* Batch::instancingData_ | File: ../Graphics/Batch.h
-    // void* can not be registered
-    // bool Batch::isBase_ | File: ../Graphics/Batch.h
-    engine->RegisterObjectProperty("Batch", "bool isBase", offsetof(Batch, isBase_));
-    // unsigned char Batch::lightMask_ | File: ../Graphics/Batch.h
-    engine->RegisterObjectProperty("Batch", "uint8 lightMask", offsetof(Batch, lightMask_));
-    // LightBatchQueue* Batch::lightQueue_ | File: ../Graphics/Batch.h
-    // LightBatchQueue* can not be registered
-    // Material* Batch::material_ | File: ../Graphics/Batch.h
-    // Material* can not be registered
-    // unsigned Batch::numWorldTransforms_ | File: ../Graphics/Batch.h
-    engine->RegisterObjectProperty("Batch", "uint numWorldTransforms", offsetof(Batch, numWorldTransforms_));
-    // Pass* Batch::pass_ | File: ../Graphics/Batch.h
-    // Pass* can not be registered
-    // ShaderVariation* Batch::pixelShader_ | File: ../Graphics/Batch.h
-    // ShaderVariation* can not be registered
-    // unsigned char Batch::renderOrder_ | File: ../Graphics/Batch.h
-    engine->RegisterObjectProperty("Batch", "uint8 renderOrder", offsetof(Batch, renderOrder_));
-    // unsigned long long Batch::sortKey_ | File: ../Graphics/Batch.h
-    engine->RegisterObjectProperty("Batch", "uint64 sortKey", offsetof(Batch, sortKey_));
-    // ShaderVariation* Batch::vertexShader_ | File: ../Graphics/Batch.h
-    // ShaderVariation* can not be registered
-    // const Matrix3x4* Batch::worldTransform_ | File: ../Graphics/Batch.h
-    // const Matrix3x4* can not be registered
-    // Zone* Batch::zone_ | File: ../Graphics/Batch.h
-    // Zone* can not be registered
-    // explicit Batch::Batch(const SourceBatch& rhs) | File: ../Graphics/Batch.h
-    engine->RegisterObjectBehaviour("Batch", asBEHAVE_CONSTRUCT, "void f(const SourceBatch&in)", asFUNCTION(Batch_Batch_SourceBatch), asCALL_CDECL_OBJFIRST);
-    // void Batch::CalculateSortKey() | File: ../Graphics/Batch.h
-    engine->RegisterObjectMethod("Batch", "void CalculateSortKey()", asMETHODPR(Batch, CalculateSortKey, (), void), asCALL_THISCALL);
-    // void Batch::Draw(View* view, Camera* camera, bool allowDepthWrite) const | File: ../Graphics/Batch.h
-    engine->RegisterObjectMethod("Batch", "void Draw(View@+, Camera@+, bool) const", asMETHODPR(Batch, Draw, (View*, Camera*, bool) const, void), asCALL_THISCALL);
-    // void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool allowDepthWrite) const | File: ../Graphics/Batch.h
-    engine->RegisterObjectMethod("Batch", "void Prepare(View@+, Camera@+, bool, bool) const", asMETHODPR(Batch, Prepare, (View*, Camera*, bool, bool) const, void), asCALL_THISCALL);
-    // Batch::~Batch() | Implicitly-declared
-    engine->RegisterObjectBehaviour("Batch", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(Batch_Destructor), asCALL_CDECL_OBJFIRST);
-    // Batch& Batch::operator=(const Batch&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<Batch>(engine, "Batch");
-#ifdef REGISTER_MANUAL_PART_Batch
-    REGISTER_MANUAL_PART_Batch(Batch, "Batch")
-#endif
-
-    // HashSet<Pair<StringHash, StringHash> > BackgroundLoadItem::dependencies_ | File: ../Resource/BackgroundLoader.h
-    // Error: type "HashSet<Pair<StringHash, StringHash>>" can not automatically bind
-    // HashSet<Pair<StringHash, StringHash> > BackgroundLoadItem::dependents_ | File: ../Resource/BackgroundLoader.h
-    // Error: type "HashSet<Pair<StringHash, StringHash>>" can not automatically bind
-    // SharedPtr<Resource> BackgroundLoadItem::resource_ | File: ../Resource/BackgroundLoader.h
-    // Error: type "SharedPtr<Resource>" can not automatically bind
-    // bool BackgroundLoadItem::sendEventOnFailure_ | File: ../Resource/BackgroundLoader.h
-    engine->RegisterObjectProperty("BackgroundLoadItem", "bool sendEventOnFailure", offsetof(BackgroundLoadItem, sendEventOnFailure_));
-    // BackgroundLoadItem::~BackgroundLoadItem() | Implicitly-declared
-    engine->RegisterObjectBehaviour("BackgroundLoadItem", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(BackgroundLoadItem_Destructor), asCALL_CDECL_OBJFIRST);
-    // BackgroundLoadItem& BackgroundLoadItem::operator=(const BackgroundLoadItem&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<BackgroundLoadItem>(engine, "BackgroundLoadItem");
-#ifdef REGISTER_MANUAL_PART_BackgroundLoadItem
-    REGISTER_MANUAL_PART_BackgroundLoadItem(BackgroundLoadItem, "BackgroundLoadItem")
-#endif
-
-    // Geometry* BatchGroupKey::geometry_ | File: ../Graphics/Batch.h
-    // Geometry* can not be registered
-    // LightBatchQueue* BatchGroupKey::lightQueue_ | File: ../Graphics/Batch.h
-    // LightBatchQueue* can not be registered
-    // Material* BatchGroupKey::material_ | File: ../Graphics/Batch.h
-    // Material* can not be registered
-    // Pass* BatchGroupKey::pass_ | File: ../Graphics/Batch.h
-    // Pass* can not be registered
-    // unsigned char BatchGroupKey::renderOrder_ | File: ../Graphics/Batch.h
-    engine->RegisterObjectProperty("BatchGroupKey", "uint8 renderOrder", offsetof(BatchGroupKey, renderOrder_));
-    // Zone* BatchGroupKey::zone_ | File: ../Graphics/Batch.h
-    // Zone* can not be registered
-    // explicit BatchGroupKey::BatchGroupKey(const Batch& batch) | File: ../Graphics/Batch.h
-    engine->RegisterObjectBehaviour("BatchGroupKey", asBEHAVE_CONSTRUCT, "void f(const Batch&in)", asFUNCTION(BatchGroupKey_BatchGroupKey_Batch), asCALL_CDECL_OBJFIRST);
-    // bool BatchGroupKey::operator==(const BatchGroupKey& rhs) const | File: ../Graphics/Batch.h
-    engine->RegisterObjectMethod("BatchGroupKey", "bool opEquals(const BatchGroupKey&in) const", asMETHODPR(BatchGroupKey, operator==, (const BatchGroupKey&) const, bool), asCALL_THISCALL);
-    // unsigned BatchGroupKey::ToHash() const | File: ../Graphics/Batch.h
-    engine->RegisterObjectMethod("BatchGroupKey", "uint ToHash() const", asMETHODPR(BatchGroupKey, ToHash, () const, unsigned), asCALL_THISCALL);
-    // BatchGroupKey::~BatchGroupKey() | Implicitly-declared
-    engine->RegisterObjectBehaviour("BatchGroupKey", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(BatchGroupKey_Destructor), asCALL_CDECL_OBJFIRST);
-    // BatchGroupKey& BatchGroupKey::operator=(const BatchGroupKey&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<BatchGroupKey>(engine, "BatchGroupKey");
-#ifdef REGISTER_MANUAL_PART_BatchGroupKey
-    REGISTER_MANUAL_PART_BatchGroupKey(BatchGroupKey, "BatchGroupKey")
+    // float BiasParameters::constantBias_ | File: ../Graphics/Light.h
+    engine->RegisterObjectProperty("BiasParameters", "float constantBias", offsetof(BiasParameters, constantBias_));
+    // float BiasParameters::normalOffset_ | File: ../Graphics/Light.h
+    engine->RegisterObjectProperty("BiasParameters", "float normalOffset", offsetof(BiasParameters, normalOffset_));
+    // float BiasParameters::slopeScaledBias_ | File: ../Graphics/Light.h
+    engine->RegisterObjectProperty("BiasParameters", "float slopeScaledBias", offsetof(BiasParameters, slopeScaledBias_));
+    // BiasParameters::BiasParameters(float constantBias, float slopeScaledBias, float normalOffset=0.0f) | File: ../Graphics/Light.h
+    engine->RegisterObjectBehaviour("BiasParameters", asBEHAVE_CONSTRUCT, "void f(float, float, float = 0.0f)", asFUNCTION(BiasParameters_BiasParameters_float_float_float), asCALL_CDECL_OBJFIRST);
+    // void BiasParameters::Validate() | File: ../Graphics/Light.h
+    engine->RegisterObjectMethod("BiasParameters", "void Validate()", asMETHODPR(BiasParameters, Validate, (), void), asCALL_THISCALL);
+    // BiasParameters& BiasParameters::operator=(const BiasParameters&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<BiasParameters>(engine, "BiasParameters");
+#ifdef REGISTER_MANUAL_PART_BiasParameters
+    REGISTER_MANUAL_PART_BiasParameters(BiasParameters, "BiasParameters")
 #endif
 
     // Color Billboard::color_ | File: ../Graphics/BillboardSet.h

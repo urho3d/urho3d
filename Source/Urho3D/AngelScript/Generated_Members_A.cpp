@@ -44,87 +44,6 @@ static void Animatable_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(A
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
 }
 
-// explicit Animation::Animation(Context* context) | File: ../Graphics/Animation.h
-static Animation* Animation_Animation_Context()
-{
-    return new Animation(GetScriptContext());
-}
-
-// SharedPtr<Animation> Animation::Clone(const String& cloneName=String::EMPTY) const | File: ../Graphics/Animation.h
-static Animation* Animation_Clone_String(Animation* ptr, const String& cloneName)
-{
-    SharedPtr<Animation> result = ptr->Clone(cloneName);
-    return result.Detach();
-}
-
-// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Animation_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Animation* ptr, CScriptArray* exceptions, bool onlyUserData)
-{
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
-}
-
-// explicit Application::Application(Context* context) | File: ../Engine/Application.h
-static Application* Application_Application_Context()
-{
-    return new Application(GetScriptContext());
-}
-
-// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Application_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Application* ptr, CScriptArray* exceptions, bool onlyUserData)
-{
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
-}
-
-#ifdef URHO3D_URHO2D
-// explicit AnimatedSprite2D::AnimatedSprite2D(Context* context) | File: ../Urho2D/AnimatedSprite2D.h
-static AnimatedSprite2D* AnimatedSprite2D_AnimatedSprite2D_Context()
-{
-    return new AnimatedSprite2D(GetScriptContext());
-}
-#endif
-
-#ifdef URHO3D_URHO2D
-// const PODVector<Light*>& Drawable::GetLights() const | File: ../Graphics/Drawable.h
-static CScriptArray* AnimatedSprite2D_GetLights_void(AnimatedSprite2D* ptr)
-{
-    const PODVector<Light*>& result = ptr->GetLights();
-    return VectorToHandleArray(result, "Array<Light@>");
-}
-#endif
-
-#ifdef URHO3D_URHO2D
-// const PODVector<Light*>& Drawable::GetVertexLights() const | File: ../Graphics/Drawable.h
-static CScriptArray* AnimatedSprite2D_GetVertexLights_void(AnimatedSprite2D* ptr)
-{
-    const PODVector<Light*>& result = ptr->GetVertexLights();
-    return VectorToHandleArray(result, "Array<Light@>");
-}
-#endif
-
-#ifdef URHO3D_URHO2D
-// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void AnimatedSprite2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(AnimatedSprite2D* ptr, CScriptArray* exceptions, bool onlyUserData)
-{
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
-}
-#endif
-
-// explicit AnimationController::AnimationController(Context* context) | File: ../Graphics/AnimationController.h
-static AnimationController* AnimationController_AnimationController_Context()
-{
-    return new AnimationController(GetScriptContext());
-}
-
-// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void AnimationController_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(AnimationController* ptr, CScriptArray* exceptions, bool onlyUserData)
-{
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
-}
-
 // explicit AnimatedModel::AnimatedModel(Context* context) | File: ../Graphics/AnimatedModel.h
 static AnimatedModel* AnimatedModel_AnimatedModel_Context()
 {
@@ -167,6 +86,74 @@ static void AnimatedModel_UnsubscribeFromAllEventsExcept_PODVectorStringHash_boo
 }
 
 #ifdef URHO3D_URHO2D
+// explicit AnimatedSprite2D::AnimatedSprite2D(Context* context) | File: ../Urho2D/AnimatedSprite2D.h
+static AnimatedSprite2D* AnimatedSprite2D_AnimatedSprite2D_Context()
+{
+    return new AnimatedSprite2D(GetScriptContext());
+}
+#endif
+
+#ifdef URHO3D_URHO2D
+// const PODVector<Light*>& Drawable::GetLights() const | File: ../Graphics/Drawable.h
+static CScriptArray* AnimatedSprite2D_GetLights_void(AnimatedSprite2D* ptr)
+{
+    const PODVector<Light*>& result = ptr->GetLights();
+    return VectorToHandleArray(result, "Array<Light@>");
+}
+#endif
+
+#ifdef URHO3D_URHO2D
+// const PODVector<Light*>& Drawable::GetVertexLights() const | File: ../Graphics/Drawable.h
+static CScriptArray* AnimatedSprite2D_GetVertexLights_void(AnimatedSprite2D* ptr)
+{
+    const PODVector<Light*>& result = ptr->GetVertexLights();
+    return VectorToHandleArray(result, "Array<Light@>");
+}
+#endif
+
+#ifdef URHO3D_URHO2D
+// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+static void AnimatedSprite2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(AnimatedSprite2D* ptr, CScriptArray* exceptions, bool onlyUserData)
+{
+    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+}
+#endif
+
+// explicit Animation::Animation(Context* context) | File: ../Graphics/Animation.h
+static Animation* Animation_Animation_Context()
+{
+    return new Animation(GetScriptContext());
+}
+
+// SharedPtr<Animation> Animation::Clone(const String& cloneName=String::EMPTY) const | File: ../Graphics/Animation.h
+static Animation* Animation_Clone_String(Animation* ptr, const String& cloneName)
+{
+    SharedPtr<Animation> result = ptr->Clone(cloneName);
+    return result.Detach();
+}
+
+// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+static void Animation_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Animation* ptr, CScriptArray* exceptions, bool onlyUserData)
+{
+    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+}
+
+// explicit AnimationController::AnimationController(Context* context) | File: ../Graphics/AnimationController.h
+static AnimationController* AnimationController_AnimationController_Context()
+{
+    return new AnimationController(GetScriptContext());
+}
+
+// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+static void AnimationController_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(AnimationController* ptr, CScriptArray* exceptions, bool onlyUserData)
+{
+    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+}
+
+#ifdef URHO3D_URHO2D
 // explicit AnimationSet2D::AnimationSet2D(Context* context) | File: ../Urho2D/AnimationSet2D.h
 static AnimationSet2D* AnimationSet2D_AnimationSet2D_Context()
 {
@@ -193,6 +180,19 @@ static AnimationState* AnimationState_AnimationState_AnimatedModel_Animation(Ani
 static AnimationState* AnimationState_AnimationState_Node_Animation(Node *node, Animation *animation)
 {
     return new AnimationState(node, animation);
+}
+
+// explicit Application::Application(Context* context) | File: ../Engine/Application.h
+static Application* Application_Application_Context()
+{
+    return new Application(GetScriptContext());
+}
+
+// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+static void Application_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Application* ptr, CScriptArray* exceptions, bool onlyUserData)
+{
+    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
 }
 
 // AreaAllocator::AreaAllocator(int width, int height, bool fastMode=true) | File: ../Math/AreaAllocator.h
@@ -251,10 +251,10 @@ static void AllocatorBlock_Destructor(AllocatorBlock* ptr)
     ptr->~AllocatorBlock();
 }
 
-// AnimationStateTrack::~AnimationStateTrack() | File: ../Graphics/AnimationState.h
-static void AnimationStateTrack_Destructor_AnimationStateTrack_void(AnimationStateTrack* ptr)
+// AllocatorNode::~AllocatorNode() | Implicitly-declared 
+static void AllocatorNode_Destructor(AllocatorNode* ptr)
 {
-    ptr->~AnimationStateTrack();
+    ptr->~AllocatorNode();
 }
 
 // AnimationControl::AnimationControl() | File: ../Graphics/AnimationController.h
@@ -263,16 +263,16 @@ static AnimationControl* AnimationControl_AnimationControl_void()
     return new AnimationControl();
 }
 
-// AllocatorNode::~AllocatorNode() | Implicitly-declared 
-static void AllocatorNode_Destructor(AllocatorNode* ptr)
-{
-    ptr->~AllocatorNode();
-}
-
 // AnimationKeyFrame::~AnimationKeyFrame() | Implicitly-declared 
 static void AnimationKeyFrame_Destructor(AnimationKeyFrame* ptr)
 {
     ptr->~AnimationKeyFrame();
+}
+
+// AnimationStateTrack::~AnimationStateTrack() | File: ../Graphics/AnimationState.h
+static void AnimationStateTrack_Destructor_AnimationStateTrack_void(AnimationStateTrack* ptr)
+{
+    ptr->~AnimationStateTrack();
 }
 
 // AnimationTrack::AnimationTrack() | File: ../Graphics/Animation.h
@@ -726,185 +726,497 @@ void ASRegisterGenerated_Members_A(asIScriptEngine* engine)
     RegisterSubclass<Object, Animatable>(engine, "Object", "Animatable");
     RegisterSubclass<RefCounted, Animatable>(engine, "RefCounted", "Animatable");
 
-    // void ResourceWithMetadata::AddMetadata(const String& name, const Variant& value) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Animation", "void AddMetadata(const String&in, const Variant&in)", asMETHODPR(Animation, AddMetadata, (const String&, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Animation", "void set_metadata(const String&in, const Variant&in)", asMETHODPR(Animation, AddMetadata, (const String&, const Variant&), void), asCALL_THISCALL);
+    // AnimationState* AnimatedModel::AddAnimationState(Animation* animation) | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "AnimationState@+ AddAnimationState(Animation@+)", asMETHODPR(AnimatedModel, AddAnimationState, (Animation*), AnimationState*), asCALL_THISCALL);
+    // void Drawable::AddLight(Light* light) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void AddLight(Light@+)", asMETHODPR(AnimatedModel, AddLight, (Light*), void), asCALL_THISCALL);
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("Animation", asBEHAVE_ADDREF, "void f()", asMETHODPR(Animation, AddRef, (), void), asCALL_THISCALL);
-    // void Animation::AddTrigger(const AnimationTriggerPoint& trigger) | File: ../Graphics/Animation.h
-    engine->RegisterObjectMethod("Animation", "void AddTrigger(const AnimationTriggerPoint&in)", asMETHODPR(Animation, AddTrigger, (const AnimationTriggerPoint&), void), asCALL_THISCALL);
-    // void Animation::AddTrigger(float time, bool timeIsNormalized, const Variant& data) | File: ../Graphics/Animation.h
-    engine->RegisterObjectMethod("Animation", "void AddTrigger(float, bool, const Variant&in)", asMETHODPR(Animation, AddTrigger, (float, bool, const Variant&), void), asCALL_THISCALL);
-    // explicit Animation::Animation(Context* context) | File: ../Graphics/Animation.h
-    engine->RegisterObjectBehaviour("Animation", asBEHAVE_FACTORY, "Animation@+ f()", asFUNCTION(Animation_Animation_Context), asCALL_CDECL);
-    // bool Animation::BeginLoad(Deserializer& source) override | File: ../Graphics/Animation.h
-    engine->RegisterObjectMethod("Animation", "bool BeginLoad(Deserializer&)", asMETHODPR(Animation, BeginLoad, (Deserializer&), bool), asCALL_THISCALL);
+    engine->RegisterObjectBehaviour("AnimatedModel", asBEHAVE_ADDREF, "void f()", asMETHODPR(AnimatedModel, AddRef, (), void), asCALL_THISCALL);
+    // void Component::AddReplicationState(ComponentReplicationState* state) | File: ../Scene/Component.h
+    // Error: type "ComponentReplicationState*" can not automatically bind
+    // void Drawable::AddVertexLight(Light* light) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void AddVertexLight(Light@+)", asMETHODPR(AnimatedModel, AddVertexLight, (Light*), void), asCALL_THISCALL);
+    // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void AllocateNetworkState()", asMETHODPR(AnimatedModel, AllocateNetworkState, (), void), asCALL_THISCALL);
+    // explicit AnimatedModel::AnimatedModel(Context* context) | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectBehaviour("AnimatedModel", asBEHAVE_FACTORY, "AnimatedModel@+ f()", asFUNCTION(AnimatedModel_AnimatedModel_Context), asCALL_CDECL);
+    // void AnimatedModel::ApplyAnimation() | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "void ApplyAnimation()", asMETHODPR(AnimatedModel, ApplyAnimation, (), void), asCALL_THISCALL);
+    // void AnimatedModel::ApplyAttributes() override | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "void ApplyAttributes()", asMETHODPR(AnimatedModel, ApplyAttributes, (), void), asCALL_THISCALL);
+    // void StaticModel::ApplyMaterialList(const String& fileName=String::EMPTY) | File: ../Graphics/StaticModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "void ApplyMaterialList(const String&in = String::EMPTY)", asMETHODPR(AnimatedModel, ApplyMaterialList, (const String&), void), asCALL_THISCALL);
     // template<typename T> T* Object::Cast() | File: ../Core/Object.h
     // Not registered because template
     // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
     // Not registered because template
-    // SharedPtr<Animation> Animation::Clone(const String& cloneName=String::EMPTY) const | File: ../Graphics/Animation.h
-    engine->RegisterObjectMethod("Animation", "Animation@+ Clone(const String&in = String::EMPTY) const", asFUNCTION(Animation_Clone_String), asCALL_CDECL_OBJFIRST);
-    // AnimationTrack* Animation::CreateTrack(const String& name) | File: ../Graphics/Animation.h
-    engine->RegisterObjectMethod("Animation", "AnimationTrack@+ CreateTrack(const String&in)", asMETHODPR(Animation, CreateTrack, (const String&), AnimationTrack*), asCALL_THISCALL);
-    // virtual bool Resource::EndLoad() | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Animation", "bool EndLoad()", asMETHODPR(Animation, EndLoad, (), bool), asCALL_THISCALL);
-    // const String& Animation::GetAnimationName() const | File: ../Graphics/Animation.h
-    engine->RegisterObjectMethod("Animation", "const String& GetAnimationName() const", asMETHODPR(Animation, GetAnimationName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Animation", "const String& get_animationName() const", asMETHODPR(Animation, GetAnimationName, () const, const String&), asCALL_THISCALL);
-    // StringHash Animation::GetAnimationNameHash() const | File: ../Graphics/Animation.h
-    engine->RegisterObjectMethod("Animation", "StringHash GetAnimationNameHash() const", asMETHODPR(Animation, GetAnimationNameHash, () const, StringHash), asCALL_THISCALL);
-    // AsyncLoadState Resource::GetAsyncLoadState() const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Animation", "AsyncLoadState GetAsyncLoadState() const", asMETHODPR(Animation, GetAsyncLoadState, () const, AsyncLoadState), asCALL_THISCALL);
+    // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("AnimatedModel", "void CleanupConnection(Connection@+)", asMETHODPR(AnimatedModel, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // void AnimatedModel::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(AnimatedModel, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
+    // bool StaticModel::DrawOcclusion(OcclusionBuffer* buffer) override | File: ../Graphics/StaticModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "bool DrawOcclusion(OcclusionBuffer@+)", asMETHODPR(AnimatedModel, DrawOcclusion, (OcclusionBuffer*), bool), asCALL_THISCALL);
+    // bool Animatable::GetAnimationEnabled() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("AnimatedModel", "bool GetAnimationEnabled() const", asMETHODPR(AnimatedModel, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "bool get_animationEnabled() const", asMETHODPR(AnimatedModel, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
+    // float AnimatedModel::GetAnimationLodBias() const | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "float GetAnimationLodBias() const", asMETHODPR(AnimatedModel, GetAnimationLodBias, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "float get_animationLodBias() const", asMETHODPR(AnimatedModel, GetAnimationLodBias, () const, float), asCALL_THISCALL);
+    // AnimationState* AnimatedModel::GetAnimationState(Animation* animation) const | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "AnimationState@+ GetAnimationState(Animation@+) const", asMETHODPR(AnimatedModel, GetAnimationState, (Animation*) const, AnimationState*), asCALL_THISCALL);
+    // AnimationState* AnimatedModel::GetAnimationState(const String& animationName) const | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "AnimationState@+ GetAnimationState(const String&in) const", asMETHODPR(AnimatedModel, GetAnimationState, (const String&) const, AnimationState*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "AnimationState@+ get_animationStates(const String&in) const", asMETHODPR(AnimatedModel, GetAnimationState, (const String&) const, AnimationState*), asCALL_THISCALL);
+    // AnimationState* AnimatedModel::GetAnimationState(StringHash animationNameHash) const | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "AnimationState@+ GetAnimationState(StringHash) const", asMETHODPR(AnimatedModel, GetAnimationState, (StringHash) const, AnimationState*), asCALL_THISCALL);
+    // AnimationState* AnimatedModel::GetAnimationState(unsigned index) const | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "AnimationState@+ GetAnimationState(uint) const", asMETHODPR(AnimatedModel, GetAnimationState, (unsigned) const, AnimationState*), asCALL_THISCALL);
+    // const Vector<SharedPtr<AnimationState>>& AnimatedModel::GetAnimationStates() const | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "Array<AnimationState@>@ GetAnimationStates() const", asFUNCTION(AnimatedModel_GetAnimationStates_void), asCALL_CDECL_OBJFIRST);
+    // VariantVector AnimatedModel::GetAnimationStatesAttr() const | File: ../Graphics/AnimatedModel.h
+    // Error: type "VariantVector" can not automatically bind
+    // Variant Serializable::GetAttribute(unsigned index) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("AnimatedModel", "Variant GetAttribute(uint) const", asMETHODPR(AnimatedModel, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "Variant get_attributes(uint) const", asMETHODPR(AnimatedModel, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
+    // Variant Serializable::GetAttribute(const String& name) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("AnimatedModel", "Variant GetAttribute(const String&in) const", asMETHODPR(AnimatedModel, GetAttribute, (const String&) const, Variant), asCALL_THISCALL);
+    // ValueAnimation* Animatable::GetAttributeAnimation(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("AnimatedModel", "ValueAnimation@+ GetAttributeAnimation(const String&in) const", asMETHODPR(AnimatedModel, GetAttributeAnimation, (const String&) const, ValueAnimation*), asCALL_THISCALL);
+    // float Animatable::GetAttributeAnimationSpeed(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("AnimatedModel", "float GetAttributeAnimationSpeed(const String&in) const", asMETHODPR(AnimatedModel, GetAttributeAnimationSpeed, (const String&) const, float), asCALL_THISCALL);
+    // float Animatable::GetAttributeAnimationTime(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("AnimatedModel", "float GetAttributeAnimationTime(const String&in) const", asMETHODPR(AnimatedModel, GetAttributeAnimationTime, (const String&) const, float), asCALL_THISCALL);
+    // WrapMode Animatable::GetAttributeAnimationWrapMode(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("AnimatedModel", "WrapMode GetAttributeAnimationWrapMode(const String&in) const", asMETHODPR(AnimatedModel, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), asCALL_THISCALL);
+    // Variant Serializable::GetAttributeDefault(unsigned index) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("AnimatedModel", "Variant GetAttributeDefault(uint) const", asMETHODPR(AnimatedModel, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "Variant get_attributeDefaults(uint) const", asMETHODPR(AnimatedModel, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
+    // Variant Serializable::GetAttributeDefault(const String& name) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("AnimatedModel", "Variant GetAttributeDefault(const String&in) const", asMETHODPR(AnimatedModel, GetAttributeDefault, (const String&) const, Variant), asCALL_THISCALL);
+    // virtual const Vector<AttributeInfo>* Serializable::GetAttributes() const | File: ../Scene/Serializable.h
+    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
+    // const Vector<SourceBatch>& Drawable::GetBatches() const | File: ../Graphics/Drawable.h
+    // Error: type "const Vector<SourceBatch>&" can not automatically bind
     // bool Object::GetBlockEvents() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Animation", "bool GetBlockEvents() const", asMETHODPR(Animation, GetBlockEvents, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "bool GetBlockEvents() const", asMETHODPR(AnimatedModel, GetBlockEvents, () const, bool), asCALL_THISCALL);
+    // VariantVector AnimatedModel::GetBonesEnabledAttr() const | File: ../Graphics/AnimatedModel.h
+    // Error: type "VariantVector" can not automatically bind
+    // const BoundingBox& Drawable::GetBoundingBox() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "const BoundingBox& GetBoundingBox() const", asMETHODPR(AnimatedModel, GetBoundingBox, () const, const BoundingBox&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "const BoundingBox& get_boundingBox() const", asMETHODPR(AnimatedModel, GetBoundingBox, () const, const BoundingBox&), asCALL_THISCALL);
+    // bool Drawable::GetCastShadows() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "bool GetCastShadows() const", asMETHODPR(AnimatedModel, GetCastShadows, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "bool get_castShadows() const", asMETHODPR(AnimatedModel, GetCastShadows, () const, bool), asCALL_THISCALL);
     // const String& Object::GetCategory() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Animation", "const String& GetCategory() const", asMETHODPR(Animation, GetCategory, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Animation", "const String& get_category() const", asMETHODPR(Animation, GetCategory, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "const String& GetCategory() const", asMETHODPR(AnimatedModel, GetCategory, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "const String& get_category() const", asMETHODPR(AnimatedModel, GetCategory, () const, const String&), asCALL_THISCALL);
+    // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("AnimatedModel", "Component@+ GetComponent(StringHash) const", asMETHODPR(AnimatedModel, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
+    // template<class T> T*  Component::GetComponent() const | File: ../Scene/Component.h
+    // Not registered because template
+    // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
+    // Error: type "PODVector<Component*>&" can not automatically bind
+    // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
+    // Not registered because template
     // Context* Object::GetContext() const | File: ../Core/Object.h
     // Error: type "Context*" can not be returned
+    // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
+    // Error: type "PODVector<Node*>&" can not automatically bind
+    // float Drawable::GetDistance() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "float GetDistance() const", asMETHODPR(AnimatedModel, GetDistance, () const, float), asCALL_THISCALL);
+    // unsigned char Drawable::GetDrawableFlags() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "uint8 GetDrawableFlags() const", asMETHODPR(AnimatedModel, GetDrawableFlags, () const, unsigned char), asCALL_THISCALL);
+    // float Drawable::GetDrawDistance() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "float GetDrawDistance() const", asMETHODPR(AnimatedModel, GetDrawDistance, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "float get_drawDistance() const", asMETHODPR(AnimatedModel, GetDrawDistance, () const, float), asCALL_THISCALL);
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Animation", "VariantMap& GetEventDataMap() const", asMETHODPR(Animation, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "VariantMap& GetEventDataMap() const", asMETHODPR(AnimatedModel, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
     // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
     // Error: type "EventHandler*" can not automatically bind
     // Object* Object::GetEventSender() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Animation", "Object@+ GetEventSender() const", asMETHODPR(Animation, GetEventSender, () const, Object*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "Object@+ GetEventSender() const", asMETHODPR(AnimatedModel, GetEventSender, () const, Object*), asCALL_THISCALL);
+    // Light* Drawable::GetFirstLight() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "Light@+ GetFirstLight() const", asMETHODPR(AnimatedModel, GetFirstLight, () const, Light*), asCALL_THISCALL);
+    // const Vector<PODVector<unsigned>>& AnimatedModel::GetGeometryBoneMappings() const | File: ../Graphics/AnimatedModel.h
+    // Error: type "const Vector<PODVector<unsigned>>&" can not automatically bind
+    // const Vector<PODVector<Matrix3x4>>& AnimatedModel::GetGeometrySkinMatrices() const | File: ../Graphics/AnimatedModel.h
+    // Error: type "const Vector<PODVector<Matrix3x4>>&" can not automatically bind
     // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Animation", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(Animation, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Animation", "const Variant& get_globalVar(StringHash) const", asMETHODPR(Animation, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(AnimatedModel, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "const Variant& get_globalVar(StringHash) const", asMETHODPR(AnimatedModel, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
     // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Animation", "const VariantMap& GetGlobalVars() const", asMETHODPR(Animation, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Animation", "const VariantMap& get_globalVars() const", asMETHODPR(Animation, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    // float Animation::GetLength() const | File: ../Graphics/Animation.h
-    engine->RegisterObjectMethod("Animation", "float GetLength() const", asMETHODPR(Animation, GetLength, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Animation", "float get_length() const", asMETHODPR(Animation, GetLength, () const, float), asCALL_THISCALL);
-    // unsigned Resource::GetMemoryUse() const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Animation", "uint GetMemoryUse() const", asMETHODPR(Animation, GetMemoryUse, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Animation", "uint get_memoryUse() const", asMETHODPR(Animation, GetMemoryUse, () const, unsigned), asCALL_THISCALL);
-    // const Variant& ResourceWithMetadata::GetMetadata(const String& name) const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Animation", "const Variant& GetMetadata(const String&in) const", asMETHODPR(Animation, GetMetadata, (const String&) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Animation", "const Variant& get_metadata(const String&in) const", asMETHODPR(Animation, GetMetadata, (const String&) const, const Variant&), asCALL_THISCALL);
-    // const String& Resource::GetName() const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Animation", "const String& GetName() const", asMETHODPR(Animation, GetName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Animation", "const String& get_name() const", asMETHODPR(Animation, GetName, () const, const String&), asCALL_THISCALL);
-    // StringHash Resource::GetNameHash() const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Animation", "StringHash GetNameHash() const", asMETHODPR(Animation, GetNameHash, () const, StringHash), asCALL_THISCALL);
-    // unsigned Animation::GetNumTracks() const | File: ../Graphics/Animation.h
-    engine->RegisterObjectMethod("Animation", "uint GetNumTracks() const", asMETHODPR(Animation, GetNumTracks, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Animation", "uint get_numTracks() const", asMETHODPR(Animation, GetNumTracks, () const, unsigned), asCALL_THISCALL);
-    // unsigned Animation::GetNumTriggers() const | File: ../Graphics/Animation.h
-    engine->RegisterObjectMethod("Animation", "uint GetNumTriggers() const", asMETHODPR(Animation, GetNumTriggers, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Animation", "uint get_numTriggers() const", asMETHODPR(Animation, GetNumTriggers, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "const VariantMap& GetGlobalVars() const", asMETHODPR(AnimatedModel, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "const VariantMap& get_globalVars() const", asMETHODPR(AnimatedModel, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    // unsigned Component::GetID() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("AnimatedModel", "uint GetID() const", asMETHODPR(AnimatedModel, GetID, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "uint get_id() const", asMETHODPR(AnimatedModel, GetID, () const, unsigned), asCALL_THISCALL);
+    // bool Serializable::GetInterceptNetworkUpdate(const String& attributeName) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("AnimatedModel", "bool GetInterceptNetworkUpdate(const String&in) const", asMETHODPR(AnimatedModel, GetInterceptNetworkUpdate, (const String&) const, bool), asCALL_THISCALL);
+    // unsigned Drawable::GetLightMask() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "uint GetLightMask() const", asMETHODPR(AnimatedModel, GetLightMask, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "uint get_lightMask() const", asMETHODPR(AnimatedModel, GetLightMask, () const, unsigned), asCALL_THISCALL);
+    // const PODVector<Light*>& Drawable::GetLights() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "Array<Light@>@ GetLights() const", asFUNCTION(AnimatedModel_GetLights_void), asCALL_CDECL_OBJFIRST);
+    // float Drawable::GetLodBias() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "float GetLodBias() const", asMETHODPR(AnimatedModel, GetLodBias, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "float get_lodBias() const", asMETHODPR(AnimatedModel, GetLodBias, () const, float), asCALL_THISCALL);
+    // float Drawable::GetLodDistance() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "float GetLodDistance() const", asMETHODPR(AnimatedModel, GetLodDistance, () const, float), asCALL_THISCALL);
+    // Geometry* StaticModel::GetLodGeometry(unsigned batchIndex, unsigned level) override | File: ../Graphics/StaticModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "Geometry@+ GetLodGeometry(uint, uint)", asMETHODPR(AnimatedModel, GetLodGeometry, (unsigned, unsigned), Geometry*), asCALL_THISCALL);
+    // virtual Material* StaticModel::GetMaterial() const | File: ../Graphics/StaticModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "Material@+ GetMaterial() const", asMETHODPR(AnimatedModel, GetMaterial, () const, Material*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "Material@+ get_material() const", asMETHODPR(AnimatedModel, GetMaterial, () const, Material*), asCALL_THISCALL);
+    // virtual Material* StaticModel::GetMaterial(unsigned index) const | File: ../Graphics/StaticModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "Material@+ GetMaterial(uint) const", asMETHODPR(AnimatedModel, GetMaterial, (unsigned) const, Material*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "Material@+ get_materials(uint) const", asMETHODPR(AnimatedModel, GetMaterial, (unsigned) const, Material*), asCALL_THISCALL);
+    // const ResourceRefList& StaticModel::GetMaterialsAttr() const | File: ../Graphics/StaticModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "const ResourceRefList& GetMaterialsAttr() const", asMETHODPR(AnimatedModel, GetMaterialsAttr, () const, const ResourceRefList&), asCALL_THISCALL);
+    // unsigned Drawable::GetMaxLights() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "uint GetMaxLights() const", asMETHODPR(AnimatedModel, GetMaxLights, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "uint get_maxLights() const", asMETHODPR(AnimatedModel, GetMaxLights, () const, unsigned), asCALL_THISCALL);
+    // float Drawable::GetMaxZ() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "float GetMaxZ() const", asMETHODPR(AnimatedModel, GetMaxZ, () const, float), asCALL_THISCALL);
+    // float Drawable::GetMinZ() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "float GetMinZ() const", asMETHODPR(AnimatedModel, GetMinZ, () const, float), asCALL_THISCALL);
+    // Model* StaticModel::GetModel() const | File: ../Graphics/StaticModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "Model@+ GetModel() const", asMETHODPR(AnimatedModel, GetModel, () const, Model*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "Model@+ get_model() const", asMETHODPR(AnimatedModel, GetModel, () const, Model*), asCALL_THISCALL);
+    // ResourceRef AnimatedModel::GetModelAttr() const | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "ResourceRef GetModelAttr() const", asMETHODPR(AnimatedModel, GetModelAttr, () const, ResourceRef), asCALL_THISCALL);
+    // const Vector<ModelMorph>& AnimatedModel::GetMorphs() const | File: ../Graphics/AnimatedModel.h
+    // Error: type "const Vector<ModelMorph>&" can not automatically bind
+    // const PODVector<unsigned char>& AnimatedModel::GetMorphsAttr() const | File: ../Graphics/AnimatedModel.h
+    // Error: type "const PODVector<unsigned char>&" can not automatically bind
+    // const Vector<SharedPtr<VertexBuffer>>& AnimatedModel::GetMorphVertexBuffers() const | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "Array<VertexBuffer@>@ GetMorphVertexBuffers() const", asFUNCTION(AnimatedModel_GetMorphVertexBuffers_void), asCALL_CDECL_OBJFIRST);
+    // float AnimatedModel::GetMorphWeight(unsigned index) const | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "float GetMorphWeight(uint) const", asMETHODPR(AnimatedModel, GetMorphWeight, (unsigned) const, float), asCALL_THISCALL);
+    // float AnimatedModel::GetMorphWeight(const String& name) const | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "float GetMorphWeight(const String&in) const", asMETHODPR(AnimatedModel, GetMorphWeight, (const String&) const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "float get_morphWeights(const String&in) const", asMETHODPR(AnimatedModel, GetMorphWeight, (const String&) const, float), asCALL_THISCALL);
+    // float AnimatedModel::GetMorphWeight(StringHash nameHash) const | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "float GetMorphWeight(StringHash) const", asMETHODPR(AnimatedModel, GetMorphWeight, (StringHash) const, float), asCALL_THISCALL);
+    // virtual const Vector<AttributeInfo>* Serializable::GetNetworkAttributes() const | File: ../Scene/Serializable.h
+    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
+    // NetworkState* Serializable::GetNetworkState() const | File: ../Scene/Serializable.h
+    // Error: type "NetworkState*" can not automatically bind
+    // Node* Component::GetNode() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("AnimatedModel", "Node@+ GetNode() const", asMETHODPR(AnimatedModel, GetNode, () const, Node*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "Node@+ get_node() const", asMETHODPR(AnimatedModel, GetNode, () const, Node*), asCALL_THISCALL);
+    // unsigned AnimatedModel::GetNumAnimationStates() const | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "uint GetNumAnimationStates() const", asMETHODPR(AnimatedModel, GetNumAnimationStates, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "uint get_numAnimationStates() const", asMETHODPR(AnimatedModel, GetNumAnimationStates, () const, unsigned), asCALL_THISCALL);
+    // unsigned Serializable::GetNumAttributes() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("AnimatedModel", "uint GetNumAttributes() const", asMETHODPR(AnimatedModel, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "uint get_numAttributes() const", asMETHODPR(AnimatedModel, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
+    // unsigned StaticModel::GetNumGeometries() const | File: ../Graphics/StaticModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "uint GetNumGeometries() const", asMETHODPR(AnimatedModel, GetNumGeometries, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "uint get_numGeometries() const", asMETHODPR(AnimatedModel, GetNumGeometries, () const, unsigned), asCALL_THISCALL);
+    // unsigned AnimatedModel::GetNumMorphs() const | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "uint GetNumMorphs() const", asMETHODPR(AnimatedModel, GetNumMorphs, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "uint get_numMorphs() const", asMETHODPR(AnimatedModel, GetNumMorphs, () const, unsigned), asCALL_THISCALL);
+    // unsigned Serializable::GetNumNetworkAttributes() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("AnimatedModel", "uint GetNumNetworkAttributes() const", asMETHODPR(AnimatedModel, GetNumNetworkAttributes, () const, unsigned), asCALL_THISCALL);
+    // unsigned StaticModel::GetNumOccluderTriangles() override | File: ../Graphics/StaticModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "uint GetNumOccluderTriangles()", asMETHODPR(AnimatedModel, GetNumOccluderTriangles, (), unsigned), asCALL_THISCALL);
+    // ObjectAnimation* Animatable::GetObjectAnimation() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("AnimatedModel", "ObjectAnimation@+ GetObjectAnimation() const", asMETHODPR(AnimatedModel, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "ObjectAnimation@+ get_objectAnimation() const", asMETHODPR(AnimatedModel, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
+    // ResourceRef Animatable::GetObjectAnimationAttr() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("AnimatedModel", "ResourceRef GetObjectAnimationAttr() const", asMETHODPR(AnimatedModel, GetObjectAnimationAttr, () const, ResourceRef), asCALL_THISCALL);
+    // unsigned StaticModel::GetOcclusionLodLevel() const | File: ../Graphics/StaticModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "uint GetOcclusionLodLevel() const", asMETHODPR(AnimatedModel, GetOcclusionLodLevel, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "uint get_occlusionLodLevel() const", asMETHODPR(AnimatedModel, GetOcclusionLodLevel, () const, unsigned), asCALL_THISCALL);
+    // Octant* Drawable::GetOctant() const | File: ../Graphics/Drawable.h
+    // Error: type "Octant" can not automatically bind bacause have @nobind mark
+    // Scene* Component::GetScene() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("AnimatedModel", "Scene@+ GetScene() const", asMETHODPR(AnimatedModel, GetScene, () const, Scene*), asCALL_THISCALL);
+    // float Drawable::GetShadowDistance() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "float GetShadowDistance() const", asMETHODPR(AnimatedModel, GetShadowDistance, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "float get_shadowDistance() const", asMETHODPR(AnimatedModel, GetShadowDistance, () const, float), asCALL_THISCALL);
+    // unsigned Drawable::GetShadowMask() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "uint GetShadowMask() const", asMETHODPR(AnimatedModel, GetShadowMask, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "uint get_shadowMask() const", asMETHODPR(AnimatedModel, GetShadowMask, () const, unsigned), asCALL_THISCALL);
+    // Skeleton& AnimatedModel::GetSkeleton() | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "Skeleton& GetSkeleton()", asMETHODPR(AnimatedModel, GetSkeleton, (), Skeleton&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "Skeleton& get_skeleton()", asMETHODPR(AnimatedModel, GetSkeleton, (), Skeleton&), asCALL_THISCALL);
+    // float Drawable::GetSortValue() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "float GetSortValue() const", asMETHODPR(AnimatedModel, GetSortValue, () const, float), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Animation", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Animation, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(AnimatedModel, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
     // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
-    // AnimationTrack* Animation::GetTrack(unsigned index) | File: ../Graphics/Animation.h
-    engine->RegisterObjectMethod("Animation", "AnimationTrack@+ GetTrack(uint)", asMETHODPR(Animation, GetTrack, (unsigned), AnimationTrack*), asCALL_THISCALL);
-    // AnimationTrack* Animation::GetTrack(const String& name) | File: ../Graphics/Animation.h
-    engine->RegisterObjectMethod("Animation", "AnimationTrack@+ GetTrack(const String&in)", asMETHODPR(Animation, GetTrack, (const String&), AnimationTrack*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Animation", "AnimationTrack@+ get_tracks(const String&in)", asMETHODPR(Animation, GetTrack, (const String&), AnimationTrack*), asCALL_THISCALL);
-    // AnimationTrack* Animation::GetTrack(StringHash nameHash) | File: ../Graphics/Animation.h
-    engine->RegisterObjectMethod("Animation", "AnimationTrack@+ GetTrack(StringHash)", asMETHODPR(Animation, GetTrack, (StringHash), AnimationTrack*), asCALL_THISCALL);
-    // const HashMap<StringHash, AnimationTrack>& Animation::GetTracks() const | File: ../Graphics/Animation.h
-    // Error: type "const HashMap<StringHash, AnimationTrack>&" can not automatically bind
-    // AnimationTriggerPoint* Animation::GetTrigger(unsigned index) | File: ../Graphics/Animation.h
-    // Error: type "AnimationTriggerPoint*" can not automatically bind
-    // const Vector<AnimationTriggerPoint>& Animation::GetTriggers() const | File: ../Graphics/Animation.h
-    // Error: type "const Vector<AnimationTriggerPoint>&" can not automatically bind
     // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Animation", "StringHash GetType() const", asMETHODPR(Animation, GetType, () const, StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Animation", "StringHash get_type() const", asMETHODPR(Animation, GetType, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "StringHash GetType() const", asMETHODPR(AnimatedModel, GetType, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "StringHash get_type() const", asMETHODPR(AnimatedModel, GetType, () const, StringHash), asCALL_THISCALL);
     // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
     // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
     // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
     // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
     // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Animation", "const String& GetTypeName() const", asMETHODPR(Animation, GetTypeName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Animation", "const String& get_typeName() const", asMETHODPR(Animation, GetTypeName, () const, const String&), asCALL_THISCALL);
-    // unsigned Resource::GetUseTimer() | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Animation", "uint GetUseTimer()", asMETHODPR(Animation, GetUseTimer, (), unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Animation", "uint get_useTimer()", asMETHODPR(Animation, GetUseTimer, (), unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "const String& GetTypeName() const", asMETHODPR(AnimatedModel, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "const String& get_typeName() const", asMETHODPR(AnimatedModel, GetTypeName, () const, const String&), asCALL_THISCALL);
+    // UpdateGeometryType AnimatedModel::GetUpdateGeometryType() override | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "UpdateGeometryType GetUpdateGeometryType()", asMETHODPR(AnimatedModel, GetUpdateGeometryType, (), UpdateGeometryType), asCALL_THISCALL);
+    // bool AnimatedModel::GetUpdateInvisible() const | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "bool GetUpdateInvisible() const", asMETHODPR(AnimatedModel, GetUpdateInvisible, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "bool get_updateInvisible() const", asMETHODPR(AnimatedModel, GetUpdateInvisible, () const, bool), asCALL_THISCALL);
+    // const PODVector<Light*>& Drawable::GetVertexLights() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "Array<Light@>@ GetVertexLights() const", asFUNCTION(AnimatedModel_GetVertexLights_void), asCALL_CDECL_OBJFIRST);
+    // unsigned Drawable::GetViewMask() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "uint GetViewMask() const", asMETHODPR(AnimatedModel, GetViewMask, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "uint get_viewMask() const", asMETHODPR(AnimatedModel, GetViewMask, () const, unsigned), asCALL_THISCALL);
+    // const BoundingBox& Drawable::GetWorldBoundingBox() | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "const BoundingBox& GetWorldBoundingBox()", asMETHODPR(AnimatedModel, GetWorldBoundingBox, (), const BoundingBox&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "const BoundingBox& get_worldBoundingBox()", asMETHODPR(AnimatedModel, GetWorldBoundingBox, (), const BoundingBox&), asCALL_THISCALL);
+    // Zone* Drawable::GetZone() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "Zone@+ GetZone() const", asMETHODPR(AnimatedModel, GetZone, () const, Zone*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "Zone@+ get_zone() const", asMETHODPR(AnimatedModel, GetZone, () const, Zone*), asCALL_THISCALL);
+    // unsigned Drawable::GetZoneMask() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "uint GetZoneMask() const", asMETHODPR(AnimatedModel, GetZoneMask, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "uint get_zoneMask() const", asMETHODPR(AnimatedModel, GetZoneMask, () const, unsigned), asCALL_THISCALL);
+    // bool Drawable::HasBasePass(unsigned batchIndex) const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "bool HasBasePass(uint) const", asMETHODPR(AnimatedModel, HasBasePass, (unsigned) const, bool), asCALL_THISCALL);
     // bool Object::HasEventHandlers() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Animation", "bool HasEventHandlers() const", asMETHODPR(Animation, HasEventHandlers, () const, bool), asCALL_THISCALL);
-    // bool ResourceWithMetadata::HasMetadata() const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Animation", "bool HasMetadata() const", asMETHODPR(Animation, HasMetadata, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Animation", "bool get_hasMetadata() const", asMETHODPR(Animation, HasMetadata, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "bool HasEventHandlers() const", asMETHODPR(AnimatedModel, HasEventHandlers, () const, bool), asCALL_THISCALL);
     // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Animation", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(Animation, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(AnimatedModel, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
     // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Animation", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(Animation, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(AnimatedModel, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
+    // bool Component::IsEnabled() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("AnimatedModel", "bool IsEnabled() const", asMETHODPR(AnimatedModel, IsEnabled, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "bool get_enabled() const", asMETHODPR(AnimatedModel, IsEnabled, () const, bool), asCALL_THISCALL);
+    // bool Component::IsEnabledEffective() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("AnimatedModel", "bool IsEnabledEffective() const", asMETHODPR(AnimatedModel, IsEnabledEffective, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "bool get_enabledEffective() const", asMETHODPR(AnimatedModel, IsEnabledEffective, () const, bool), asCALL_THISCALL);
+    // bool StaticModel::IsInside(const Vector3& point) const | File: ../Graphics/StaticModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "bool IsInside(const Vector3&in) const", asMETHODPR(AnimatedModel, IsInside, (const Vector3&) const, bool), asCALL_THISCALL);
+    // bool StaticModel::IsInsideLocal(const Vector3& point) const | File: ../Graphics/StaticModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "bool IsInsideLocal(const Vector3&in) const", asMETHODPR(AnimatedModel, IsInsideLocal, (const Vector3&) const, bool), asCALL_THISCALL);
     // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Animation", "bool IsInstanceOf(StringHash) const", asMETHODPR(Animation, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "bool IsInstanceOf(StringHash) const", asMETHODPR(AnimatedModel, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
     // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
     // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
     // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
     // Not registered because template
-    // bool Resource::Load(Deserializer& source) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Animation", "bool Load(Deserializer&)", asMETHODPR(Animation, Load, (Deserializer&), bool), asCALL_THISCALL);
-    // bool Resource::LoadFile(const String& fileName) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Animation", "bool LoadFile(const String&in)", asMETHODPR(Animation, LoadFile, (const String&), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Animation", "bool Load(const String&in)", asMETHODPR(Animation, LoadFile, (const String&), bool), asCALL_THISCALL);
+    // bool Drawable::IsInView() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "bool IsInView() const", asMETHODPR(AnimatedModel, IsInView, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "bool get_inView() const", asMETHODPR(AnimatedModel, IsInView, () const, bool), asCALL_THISCALL);
+    // bool Drawable::IsInView(Camera* camera) const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "bool IsInView(Camera@+) const", asMETHODPR(AnimatedModel, IsInView, (Camera*) const, bool), asCALL_THISCALL);
+    // bool Drawable::IsInView(const FrameInfo& frame, bool anyCamera=false) const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "bool IsInView(const FrameInfo&in, bool = false) const", asMETHODPR(AnimatedModel, IsInView, (const FrameInfo&, bool) const, bool), asCALL_THISCALL);
+    // bool AnimatedModel::IsMaster() const | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "bool IsMaster() const", asMETHODPR(AnimatedModel, IsMaster, () const, bool), asCALL_THISCALL);
+    // bool Drawable::IsOccludee() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "bool IsOccludee() const", asMETHODPR(AnimatedModel, IsOccludee, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "bool get_occludee() const", asMETHODPR(AnimatedModel, IsOccludee, () const, bool), asCALL_THISCALL);
+    // bool Drawable::IsOccluder() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "bool IsOccluder() const", asMETHODPR(AnimatedModel, IsOccluder, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "bool get_occluder() const", asMETHODPR(AnimatedModel, IsOccluder, () const, bool), asCALL_THISCALL);
+    // bool Component::IsReplicated() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("AnimatedModel", "bool IsReplicated() const", asMETHODPR(AnimatedModel, IsReplicated, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "bool get_replicated() const", asMETHODPR(AnimatedModel, IsReplicated, () const, bool), asCALL_THISCALL);
+    // bool Serializable::IsTemporary() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("AnimatedModel", "bool IsTemporary() const", asMETHODPR(AnimatedModel, IsTemporary, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "bool get_temporary() const", asMETHODPR(AnimatedModel, IsTemporary, () const, bool), asCALL_THISCALL);
+    // bool Drawable::IsZoneDirty() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "bool IsZoneDirty() const", asMETHODPR(AnimatedModel, IsZoneDirty, () const, bool), asCALL_THISCALL);
+    // void Drawable::LimitLights() | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void LimitLights()", asMETHODPR(AnimatedModel, LimitLights, (), void), asCALL_THISCALL);
+    // void Drawable::LimitVertexLights(bool removeConvertedLights) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void LimitVertexLights(bool)", asMETHODPR(AnimatedModel, LimitVertexLights, (bool), void), asCALL_THISCALL);
+    // bool AnimatedModel::Load(Deserializer& source) override | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "bool Load(Deserializer&)", asMETHODPR(AnimatedModel, Load, (Deserializer&), bool), asCALL_THISCALL);
+    // bool AnimatedModel::LoadJSON(const JSONValue& source) override | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "bool LoadJSON(const JSONValue&in)", asMETHODPR(AnimatedModel, LoadJSON, (const JSONValue&), bool), asCALL_THISCALL);
+    // bool AnimatedModel::LoadXML(const XMLElement& source) override | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "bool LoadXML(const XMLElement&in)", asMETHODPR(AnimatedModel, LoadXML, (const XMLElement&), bool), asCALL_THISCALL);
+    // void Drawable::MarkForUpdate() | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void MarkForUpdate()", asMETHODPR(AnimatedModel, MarkForUpdate, (), void), asCALL_THISCALL);
+    // void Drawable::MarkInView(const FrameInfo& frame) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void MarkInView(const FrameInfo&in)", asMETHODPR(AnimatedModel, MarkInView, (const FrameInfo&), void), asCALL_THISCALL);
+    // void Drawable::MarkInView(unsigned frameNumber) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void MarkInView(uint)", asMETHODPR(AnimatedModel, MarkInView, (unsigned), void), asCALL_THISCALL);
+    // void Component::MarkNetworkUpdate() override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("AnimatedModel", "void MarkNetworkUpdate()", asMETHODPR(AnimatedModel, MarkNetworkUpdate, (), void), asCALL_THISCALL);
     // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Animation", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(Animation, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(AnimatedModel, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
+    // virtual void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void OnGetAttribute(const AttributeInfo&in, Variant&) const", asMETHODPR(AnimatedModel, OnGetAttribute, (const AttributeInfo&, Variant&) const, void), asCALL_THISCALL);
+    // virtual void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void OnSetAttribute(const AttributeInfo&in, const Variant&in)", asMETHODPR(AnimatedModel, OnSetAttribute, (const AttributeInfo&, const Variant&), void), asCALL_THISCALL);
+    // void Drawable::OnSetEnabled() override | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void OnSetEnabled()", asMETHODPR(AnimatedModel, OnSetEnabled, (), void), asCALL_THISCALL);
+    // void Component::PrepareNetworkUpdate() | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("AnimatedModel", "void PrepareNetworkUpdate()", asMETHODPR(AnimatedModel, PrepareNetworkUpdate, (), void), asCALL_THISCALL);
+    // void AnimatedModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results) override | File: ../Graphics/AnimatedModel.h
+    // Error: type "RayOctreeQuery" can not automatically bind bacause have @nobind mark
+    // bool Serializable::ReadDeltaUpdate(Deserializer& source) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("AnimatedModel", "bool ReadDeltaUpdate(Deserializer&)", asMETHODPR(AnimatedModel, ReadDeltaUpdate, (Deserializer&), bool), asCALL_THISCALL);
+    // bool Serializable::ReadLatestDataUpdate(Deserializer& source) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("AnimatedModel", "bool ReadLatestDataUpdate(Deserializer&)", asMETHODPR(AnimatedModel, ReadLatestDataUpdate, (Deserializer&), bool), asCALL_THISCALL);
     // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
     // Error: type "RefCount*" can not automatically bind
     // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("Animation", "int Refs() const", asMETHODPR(Animation, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Animation", "int get_refs() const", asMETHODPR(Animation, Refs, () const, int), asCALL_THISCALL);
-    // static void Animation::RegisterObject(Context* context) | File: ../Graphics/Animation.h
+    engine->RegisterObjectMethod("AnimatedModel", "int Refs() const", asMETHODPR(AnimatedModel, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "int get_refs() const", asMETHODPR(AnimatedModel, Refs, () const, int), asCALL_THISCALL);
+    // static void AnimatedModel::RegisterObject(Context* context) | File: ../Graphics/AnimatedModel.h
     // Context can be used as firs parameter of constructors only
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("Animation", asBEHAVE_RELEASE, "void f()", asMETHODPR(Animation, ReleaseRef, (), void), asCALL_THISCALL);
-    // void ResourceWithMetadata::RemoveAllMetadata() | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Animation", "void RemoveAllMetadata()", asMETHODPR(Animation, RemoveAllMetadata, (), void), asCALL_THISCALL);
-    // void Animation::RemoveAllTracks() | File: ../Graphics/Animation.h
-    engine->RegisterObjectMethod("Animation", "void RemoveAllTracks()", asMETHODPR(Animation, RemoveAllTracks, (), void), asCALL_THISCALL);
-    // void Animation::RemoveAllTriggers() | File: ../Graphics/Animation.h
-    engine->RegisterObjectMethod("Animation", "void RemoveAllTriggers()", asMETHODPR(Animation, RemoveAllTriggers, (), void), asCALL_THISCALL);
-    // void ResourceWithMetadata::RemoveMetadata(const String& name) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Animation", "void RemoveMetadata(const String&in)", asMETHODPR(Animation, RemoveMetadata, (const String&), void), asCALL_THISCALL);
-    // bool Animation::RemoveTrack(const String& name) | File: ../Graphics/Animation.h
-    engine->RegisterObjectMethod("Animation", "bool RemoveTrack(const String&in)", asMETHODPR(Animation, RemoveTrack, (const String&), bool), asCALL_THISCALL);
-    // void Animation::RemoveTrigger(unsigned index) | File: ../Graphics/Animation.h
-    engine->RegisterObjectMethod("Animation", "void RemoveTrigger(uint)", asMETHODPR(Animation, RemoveTrigger, (unsigned), void), asCALL_THISCALL);
-    // void Resource::ResetUseTimer() | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Animation", "void ResetUseTimer()", asMETHODPR(Animation, ResetUseTimer, (), void), asCALL_THISCALL);
-    // bool Animation::Save(Serializer& dest) const override | File: ../Graphics/Animation.h
-    engine->RegisterObjectMethod("Animation", "bool Save(Serializer&) const", asMETHODPR(Animation, Save, (Serializer&) const, bool), asCALL_THISCALL);
-    // virtual bool Resource::SaveFile(const String& fileName) const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Animation", "bool SaveFile(const String&in) const", asMETHODPR(Animation, SaveFile, (const String&) const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Animation", "bool Save(const String&in) const", asMETHODPR(Animation, SaveFile, (const String&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectBehaviour("AnimatedModel", asBEHAVE_RELEASE, "void f()", asMETHODPR(AnimatedModel, ReleaseRef, (), void), asCALL_THISCALL);
+    // void Component::Remove() | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("AnimatedModel", "void Remove()", asMETHODPR(AnimatedModel, Remove, (), void), asCALL_THISCALL);
+    // void AnimatedModel::RemoveAllAnimationStates() | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "void RemoveAllAnimationStates()", asMETHODPR(AnimatedModel, RemoveAllAnimationStates, (), void), asCALL_THISCALL);
+    // void AnimatedModel::RemoveAnimationState(Animation* animation) | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "void RemoveAnimationState(Animation@+)", asMETHODPR(AnimatedModel, RemoveAnimationState, (Animation*), void), asCALL_THISCALL);
+    // void AnimatedModel::RemoveAnimationState(const String& animationName) | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "void RemoveAnimationState(const String&in)", asMETHODPR(AnimatedModel, RemoveAnimationState, (const String&), void), asCALL_THISCALL);
+    // void AnimatedModel::RemoveAnimationState(StringHash animationNameHash) | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "void RemoveAnimationState(StringHash)", asMETHODPR(AnimatedModel, RemoveAnimationState, (StringHash), void), asCALL_THISCALL);
+    // void AnimatedModel::RemoveAnimationState(AnimationState* state) | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "void RemoveAnimationState(AnimationState@+)", asMETHODPR(AnimatedModel, RemoveAnimationState, (AnimationState*), void), asCALL_THISCALL);
+    // void AnimatedModel::RemoveAnimationState(unsigned index) | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "void RemoveAnimationState(uint)", asMETHODPR(AnimatedModel, RemoveAnimationState, (unsigned), void), asCALL_THISCALL);
+    // void Animatable::RemoveAttributeAnimation(const String& name) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void RemoveAttributeAnimation(const String&in)", asMETHODPR(AnimatedModel, RemoveAttributeAnimation, (const String&), void), asCALL_THISCALL);
+    // void Serializable::RemoveInstanceDefault() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void RemoveInstanceDefault()", asMETHODPR(AnimatedModel, RemoveInstanceDefault, (), void), asCALL_THISCALL);
+    // void Animatable::RemoveObjectAnimation() | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void RemoveObjectAnimation()", asMETHODPR(AnimatedModel, RemoveObjectAnimation, (), void), asCALL_THISCALL);
+    // void AnimatedModel::ResetMorphWeights() | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "void ResetMorphWeights()", asMETHODPR(AnimatedModel, ResetMorphWeights, (), void), asCALL_THISCALL);
+    // void Serializable::ResetToDefault() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void ResetToDefault()", asMETHODPR(AnimatedModel, ResetToDefault, (), void), asCALL_THISCALL);
+    // bool Component::Save(Serializer& dest) const override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("AnimatedModel", "bool Save(Serializer&) const", asMETHODPR(AnimatedModel, Save, (Serializer&) const, bool), asCALL_THISCALL);
+    // virtual bool Serializable::SaveDefaultAttributes() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("AnimatedModel", "bool SaveDefaultAttributes() const", asMETHODPR(AnimatedModel, SaveDefaultAttributes, () const, bool), asCALL_THISCALL);
+    // bool Component::SaveJSON(JSONValue& dest) const override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("AnimatedModel", "bool SaveJSON(JSONValue&) const", asMETHODPR(AnimatedModel, SaveJSON, (JSONValue&) const, bool), asCALL_THISCALL);
+    // bool Component::SaveXML(XMLElement& dest) const override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("AnimatedModel", "bool SaveXML(XMLElement&) const", asMETHODPR(AnimatedModel, SaveXML, (XMLElement&) const, bool), asCALL_THISCALL);
     // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Animation", "void SendEvent(StringHash)", asMETHODPR(Animation, SendEvent, (StringHash), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "void SendEvent(StringHash)", asMETHODPR(AnimatedModel, SendEvent, (StringHash), void), asCALL_THISCALL);
     // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Animation", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(Animation, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(AnimatedModel, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
     // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
     // Not registered because template
-    // void Animation::SetAnimationName(const String& name) | File: ../Graphics/Animation.h
-    engine->RegisterObjectMethod("Animation", "void SetAnimationName(const String&in)", asMETHODPR(Animation, SetAnimationName, (const String&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Animation", "void set_animationName(const String&in)", asMETHODPR(Animation, SetAnimationName, (const String&), void), asCALL_THISCALL);
-    // void Resource::SetAsyncLoadState(AsyncLoadState newState) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Animation", "void SetAsyncLoadState(AsyncLoadState)", asMETHODPR(Animation, SetAsyncLoadState, (AsyncLoadState), void), asCALL_THISCALL);
+    // void Animatable::SetAnimationEnabled(bool enable) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void SetAnimationEnabled(bool)", asMETHODPR(AnimatedModel, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "void set_animationEnabled(bool)", asMETHODPR(AnimatedModel, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
+    // void AnimatedModel::SetAnimationLodBias(float bias) | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "void SetAnimationLodBias(float)", asMETHODPR(AnimatedModel, SetAnimationLodBias, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "void set_animationLodBias(float)", asMETHODPR(AnimatedModel, SetAnimationLodBias, (float), void), asCALL_THISCALL);
+    // void AnimatedModel::SetAnimationStatesAttr(const VariantVector& value) | File: ../Graphics/AnimatedModel.h
+    // Error: type "const VariantVector&" can not automatically bind
+    // void Animatable::SetAnimationTime(float time) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void SetAnimationTime(float)", asMETHODPR(AnimatedModel, SetAnimationTime, (float), void), asCALL_THISCALL);
+    // bool Serializable::SetAttribute(unsigned index, const Variant& value) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("AnimatedModel", "bool SetAttribute(uint, const Variant&in)", asMETHODPR(AnimatedModel, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "bool set_attributes(uint, const Variant&in)", asMETHODPR(AnimatedModel, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
+    // bool Serializable::SetAttribute(const String& name, const Variant& value) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("AnimatedModel", "bool SetAttribute(const String&in, const Variant&in)", asMETHODPR(AnimatedModel, SetAttribute, (const String&, const Variant&), bool), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode=WM_LOOP, float speed=1.0f) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void SetAttributeAnimation(const String&in, ValueAnimation@+, WrapMode = WM_LOOP, float = 1.0f)", asMETHODPR(AnimatedModel, SetAttributeAnimation, (const String&, ValueAnimation*, WrapMode, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationSpeed(const String& name, float speed) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void SetAttributeAnimationSpeed(const String&in, float)", asMETHODPR(AnimatedModel, SetAttributeAnimationSpeed, (const String&, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationTime(const String& name, float time) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void SetAttributeAnimationTime(const String&in, float)", asMETHODPR(AnimatedModel, SetAttributeAnimationTime, (const String&, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationWrapMode(const String& name, WrapMode wrapMode) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void SetAttributeAnimationWrapMode(const String&in, WrapMode)", asMETHODPR(AnimatedModel, SetAttributeAnimationWrapMode, (const String&, WrapMode), void), asCALL_THISCALL);
+    // void Drawable::SetBasePass(unsigned batchIndex) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void SetBasePass(uint)", asMETHODPR(AnimatedModel, SetBasePass, (unsigned), void), asCALL_THISCALL);
     // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Animation", "void SetBlockEvents(bool)", asMETHODPR(Animation, SetBlockEvents, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "void SetBlockEvents(bool)", asMETHODPR(AnimatedModel, SetBlockEvents, (bool), void), asCALL_THISCALL);
+    // void AnimatedModel::SetBonesEnabledAttr(const VariantVector& value) | File: ../Graphics/AnimatedModel.h
+    // Error: type "const VariantVector&" can not automatically bind
+    // void Drawable::SetCastShadows(bool enable) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void SetCastShadows(bool)", asMETHODPR(AnimatedModel, SetCastShadows, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "void set_castShadows(bool)", asMETHODPR(AnimatedModel, SetCastShadows, (bool), void), asCALL_THISCALL);
+    // void Drawable::SetDrawDistance(float distance) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void SetDrawDistance(float)", asMETHODPR(AnimatedModel, SetDrawDistance, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "void set_drawDistance(float)", asMETHODPR(AnimatedModel, SetDrawDistance, (float), void), asCALL_THISCALL);
+    // void Component::SetEnabled(bool enable) | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("AnimatedModel", "void SetEnabled(bool)", asMETHODPR(AnimatedModel, SetEnabled, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "void set_enabled(bool)", asMETHODPR(AnimatedModel, SetEnabled, (bool), void), asCALL_THISCALL);
     // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Animation", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(Animation, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Animation", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(Animation, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    // void Animation::SetLength(float length) | File: ../Graphics/Animation.h
-    engine->RegisterObjectMethod("Animation", "void SetLength(float)", asMETHODPR(Animation, SetLength, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Animation", "void set_length(float)", asMETHODPR(Animation, SetLength, (float), void), asCALL_THISCALL);
-    // void Resource::SetMemoryUse(unsigned size) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Animation", "void SetMemoryUse(uint)", asMETHODPR(Animation, SetMemoryUse, (unsigned), void), asCALL_THISCALL);
-    // void Resource::SetName(const String& name) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Animation", "void SetName(const String&in)", asMETHODPR(Animation, SetName, (const String&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Animation", "void set_name(const String&in)", asMETHODPR(Animation, SetName, (const String&), void), asCALL_THISCALL);
-    // void Animation::SetNumTriggers(unsigned num) | File: ../Graphics/Animation.h
-    engine->RegisterObjectMethod("Animation", "void SetNumTriggers(uint)", asMETHODPR(Animation, SetNumTriggers, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Animation", "void set_numTriggers(uint)", asMETHODPR(Animation, SetNumTriggers, (unsigned), void), asCALL_THISCALL);
-    // void Animation::SetTrigger(unsigned index, const AnimationTriggerPoint& trigger) | File: ../Graphics/Animation.h
-    engine->RegisterObjectMethod("Animation", "void SetTrigger(uint, const AnimationTriggerPoint&in)", asMETHODPR(Animation, SetTrigger, (unsigned, const AnimationTriggerPoint&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Animation", "void set_triggers(uint, const AnimationTriggerPoint&in)", asMETHODPR(Animation, SetTrigger, (unsigned, const AnimationTriggerPoint&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(AnimatedModel, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(AnimatedModel, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    // void Serializable::SetInstanceDefault(bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void SetInstanceDefault(bool)", asMETHODPR(AnimatedModel, SetInstanceDefault, (bool), void), asCALL_THISCALL);
+    // void Serializable::SetInterceptNetworkUpdate(const String& attributeName, bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void SetInterceptNetworkUpdate(const String&in, bool)", asMETHODPR(AnimatedModel, SetInterceptNetworkUpdate, (const String&, bool), void), asCALL_THISCALL);
+    // void Drawable::SetLightMask(unsigned mask) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void SetLightMask(uint)", asMETHODPR(AnimatedModel, SetLightMask, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "void set_lightMask(uint)", asMETHODPR(AnimatedModel, SetLightMask, (unsigned), void), asCALL_THISCALL);
+    // void Drawable::SetLodBias(float bias) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void SetLodBias(float)", asMETHODPR(AnimatedModel, SetLodBias, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "void set_lodBias(float)", asMETHODPR(AnimatedModel, SetLodBias, (float), void), asCALL_THISCALL);
+    // virtual void StaticModel::SetMaterial(Material* material) | File: ../Graphics/StaticModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "void SetMaterial(Material@+)", asMETHODPR(AnimatedModel, SetMaterial, (Material*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "void set_material(Material@+)", asMETHODPR(AnimatedModel, SetMaterial, (Material*), void), asCALL_THISCALL);
+    // virtual bool StaticModel::SetMaterial(unsigned index, Material* material) | File: ../Graphics/StaticModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "bool SetMaterial(uint, Material@+)", asMETHODPR(AnimatedModel, SetMaterial, (unsigned, Material*), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "bool set_materials(uint, Material@+)", asMETHODPR(AnimatedModel, SetMaterial, (unsigned, Material*), bool), asCALL_THISCALL);
+    // void StaticModel::SetMaterialsAttr(const ResourceRefList& value) | File: ../Graphics/StaticModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "void SetMaterialsAttr(const ResourceRefList&in)", asMETHODPR(AnimatedModel, SetMaterialsAttr, (const ResourceRefList&), void), asCALL_THISCALL);
+    // void Drawable::SetMaxLights(unsigned num) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void SetMaxLights(uint)", asMETHODPR(AnimatedModel, SetMaxLights, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "void set_maxLights(uint)", asMETHODPR(AnimatedModel, SetMaxLights, (unsigned), void), asCALL_THISCALL);
+    // void Drawable::SetMinMaxZ(float minZ, float maxZ) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void SetMinMaxZ(float, float)", asMETHODPR(AnimatedModel, SetMinMaxZ, (float, float), void), asCALL_THISCALL);
+    // void AnimatedModel::SetModel(Model* model, bool createBones=true) | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "void SetModel(Model@+, bool = true)", asMETHODPR(AnimatedModel, SetModel, (Model*, bool), void), asCALL_THISCALL);
+    // void AnimatedModel::SetModelAttr(const ResourceRef& value) | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "void SetModelAttr(const ResourceRef&in)", asMETHODPR(AnimatedModel, SetModelAttr, (const ResourceRef&), void), asCALL_THISCALL);
+    // void AnimatedModel::SetMorphsAttr(const PODVector<unsigned char>& value) | File: ../Graphics/AnimatedModel.h
+    // Error: type "const PODVector<unsigned char>&" can not automatically bind
+    // void AnimatedModel::SetMorphWeight(unsigned index, float weight) | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "void SetMorphWeight(uint, float)", asMETHODPR(AnimatedModel, SetMorphWeight, (unsigned, float), void), asCALL_THISCALL);
+    // void AnimatedModel::SetMorphWeight(const String& name, float weight) | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "void SetMorphWeight(const String&in, float)", asMETHODPR(AnimatedModel, SetMorphWeight, (const String&, float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "void set_morphWeights(const String&in, float)", asMETHODPR(AnimatedModel, SetMorphWeight, (const String&, float), void), asCALL_THISCALL);
+    // void AnimatedModel::SetMorphWeight(StringHash nameHash, float weight) | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "void SetMorphWeight(StringHash, float)", asMETHODPR(AnimatedModel, SetMorphWeight, (StringHash, float), void), asCALL_THISCALL);
+    // void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void SetObjectAnimation(ObjectAnimation@+)", asMETHODPR(AnimatedModel, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "void set_objectAnimation(ObjectAnimation@+)", asMETHODPR(AnimatedModel, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
+    // void Animatable::SetObjectAnimationAttr(const ResourceRef& value) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void SetObjectAnimationAttr(const ResourceRef&in)", asMETHODPR(AnimatedModel, SetObjectAnimationAttr, (const ResourceRef&), void), asCALL_THISCALL);
+    // void Drawable::SetOccludee(bool enable) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void SetOccludee(bool)", asMETHODPR(AnimatedModel, SetOccludee, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "void set_occludee(bool)", asMETHODPR(AnimatedModel, SetOccludee, (bool), void), asCALL_THISCALL);
+    // void Drawable::SetOccluder(bool enable) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void SetOccluder(bool)", asMETHODPR(AnimatedModel, SetOccluder, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "void set_occluder(bool)", asMETHODPR(AnimatedModel, SetOccluder, (bool), void), asCALL_THISCALL);
+    // void StaticModel::SetOcclusionLodLevel(unsigned level) | File: ../Graphics/StaticModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "void SetOcclusionLodLevel(uint)", asMETHODPR(AnimatedModel, SetOcclusionLodLevel, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "void set_occlusionLodLevel(uint)", asMETHODPR(AnimatedModel, SetOcclusionLodLevel, (unsigned), void), asCALL_THISCALL);
+    // void Drawable::SetShadowDistance(float distance) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void SetShadowDistance(float)", asMETHODPR(AnimatedModel, SetShadowDistance, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "void set_shadowDistance(float)", asMETHODPR(AnimatedModel, SetShadowDistance, (float), void), asCALL_THISCALL);
+    // void Drawable::SetShadowMask(unsigned mask) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void SetShadowMask(uint)", asMETHODPR(AnimatedModel, SetShadowMask, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "void set_shadowMask(uint)", asMETHODPR(AnimatedModel, SetShadowMask, (unsigned), void), asCALL_THISCALL);
+    // void Drawable::SetSortValue(float value) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void SetSortValue(float)", asMETHODPR(AnimatedModel, SetSortValue, (float), void), asCALL_THISCALL);
+    // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void SetTemporary(bool)", asMETHODPR(AnimatedModel, SetTemporary, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "void set_temporary(bool)", asMETHODPR(AnimatedModel, SetTemporary, (bool), void), asCALL_THISCALL);
+    // void AnimatedModel::SetUpdateInvisible(bool enable) | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "void SetUpdateInvisible(bool)", asMETHODPR(AnimatedModel, SetUpdateInvisible, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "void set_updateInvisible(bool)", asMETHODPR(AnimatedModel, SetUpdateInvisible, (bool), void), asCALL_THISCALL);
+    // void Drawable::SetViewMask(unsigned mask) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void SetViewMask(uint)", asMETHODPR(AnimatedModel, SetViewMask, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "void set_viewMask(uint)", asMETHODPR(AnimatedModel, SetViewMask, (unsigned), void), asCALL_THISCALL);
+    // void Drawable::SetZone(Zone* zone, bool temporary=false) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void SetZone(Zone@+, bool = false)", asMETHODPR(AnimatedModel, SetZone, (Zone*, bool), void), asCALL_THISCALL);
+    // void Drawable::SetZoneMask(unsigned mask) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void SetZoneMask(uint)", asMETHODPR(AnimatedModel, SetZoneMask, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "void set_zoneMask(uint)", asMETHODPR(AnimatedModel, SetZoneMask, (unsigned), void), asCALL_THISCALL);
     // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
     // Error: type "EventHandler*" can not automatically bind
     // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
@@ -914,153 +1226,63 @@ void ASRegisterGenerated_Members_A(asIScriptEngine* engine)
     // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
     // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
     // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Animation", "void UnsubscribeFromAllEvents()", asMETHODPR(Animation, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "void UnsubscribeFromAllEvents()", asMETHODPR(AnimatedModel, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
     // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Animation", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(Animation_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("AnimatedModel", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(AnimatedModel_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
     // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Animation", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(Animation, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(AnimatedModel, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
     // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Animation", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(Animation, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(AnimatedModel, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
     // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Animation", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(Animation, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(AnimatedModel, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
+    // void AnimatedModel::Update(const FrameInfo& frame) override | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "void Update(const FrameInfo&in)", asMETHODPR(AnimatedModel, Update, (const FrameInfo&), void), asCALL_THISCALL);
+    // void AnimatedModel::UpdateBatches(const FrameInfo& frame) override | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "void UpdateBatches(const FrameInfo&in)", asMETHODPR(AnimatedModel, UpdateBatches, (const FrameInfo&), void), asCALL_THISCALL);
+    // void AnimatedModel::UpdateBoneBoundingBox() | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "void UpdateBoneBoundingBox()", asMETHODPR(AnimatedModel, UpdateBoneBoundingBox, (), void), asCALL_THISCALL);
+    // void AnimatedModel::UpdateGeometry(const FrameInfo& frame) override | File: ../Graphics/AnimatedModel.h
+    engine->RegisterObjectMethod("AnimatedModel", "void UpdateGeometry(const FrameInfo&in)", asMETHODPR(AnimatedModel, UpdateGeometry, (const FrameInfo&), void), asCALL_THISCALL);
     // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("Animation", "int WeakRefs() const", asMETHODPR(Animation, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Animation", "int get_weakRefs() const", asMETHODPR(Animation, WeakRefs, () const, int), asCALL_THISCALL);
-#ifdef REGISTER_MANUAL_PART_ResourceWithMetadata
-    REGISTER_MANUAL_PART_ResourceWithMetadata(Animation, "Animation")
+    engine->RegisterObjectMethod("AnimatedModel", "int WeakRefs() const", asMETHODPR(AnimatedModel, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "int get_weakRefs() const", asMETHODPR(AnimatedModel, WeakRefs, () const, int), asCALL_THISCALL);
+    // void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attributeBits, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void WriteDeltaUpdate(Serializer&, const DirtyBits&in, uint8)", asMETHODPR(AnimatedModel, WriteDeltaUpdate, (Serializer&, const DirtyBits&, unsigned char), void), asCALL_THISCALL);
+    // void Serializable::WriteInitialDeltaUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void WriteInitialDeltaUpdate(Serializer&, uint8)", asMETHODPR(AnimatedModel, WriteInitialDeltaUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
+    // void Serializable::WriteLatestDataUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("AnimatedModel", "void WriteLatestDataUpdate(Serializer&, uint8)", asMETHODPR(AnimatedModel, WriteLatestDataUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
+#ifdef REGISTER_MANUAL_PART_StaticModel
+    REGISTER_MANUAL_PART_StaticModel(AnimatedModel, "AnimatedModel")
 #endif
-#ifdef REGISTER_MANUAL_PART_Resource
-    REGISTER_MANUAL_PART_Resource(Animation, "Animation")
+#ifdef REGISTER_MANUAL_PART_Drawable
+    REGISTER_MANUAL_PART_Drawable(AnimatedModel, "AnimatedModel")
+#endif
+#ifdef REGISTER_MANUAL_PART_Component
+    REGISTER_MANUAL_PART_Component(AnimatedModel, "AnimatedModel")
+#endif
+#ifdef REGISTER_MANUAL_PART_Animatable
+    REGISTER_MANUAL_PART_Animatable(AnimatedModel, "AnimatedModel")
+#endif
+#ifdef REGISTER_MANUAL_PART_Serializable
+    REGISTER_MANUAL_PART_Serializable(AnimatedModel, "AnimatedModel")
 #endif
 #ifdef REGISTER_MANUAL_PART_Object
-    REGISTER_MANUAL_PART_Object(Animation, "Animation")
+    REGISTER_MANUAL_PART_Object(AnimatedModel, "AnimatedModel")
 #endif
 #ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(Animation, "Animation")
+    REGISTER_MANUAL_PART_RefCounted(AnimatedModel, "AnimatedModel")
 #endif
-#ifdef REGISTER_MANUAL_PART_Animation
-    REGISTER_MANUAL_PART_Animation(Animation, "Animation")
+#ifdef REGISTER_MANUAL_PART_AnimatedModel
+    REGISTER_MANUAL_PART_AnimatedModel(AnimatedModel, "AnimatedModel")
 #endif
-    RegisterSubclass<ResourceWithMetadata, Animation>(engine, "ResourceWithMetadata", "Animation");
-    RegisterSubclass<Resource, Animation>(engine, "Resource", "Animation");
-    RegisterSubclass<Object, Animation>(engine, "Object", "Animation");
-    RegisterSubclass<RefCounted, Animation>(engine, "RefCounted", "Animation");
-
-    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("Application", asBEHAVE_ADDREF, "void f()", asMETHODPR(Application, AddRef, (), void), asCALL_THISCALL);
-    // explicit Application::Application(Context* context) | File: ../Engine/Application.h
-    engine->RegisterObjectBehaviour("Application", asBEHAVE_FACTORY, "Application@+ f()", asFUNCTION(Application_Application_Context), asCALL_CDECL);
-    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
-    // Not registered because template
-    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
-    // Not registered because template
-    // void Application::ErrorExit(const String& message=String::EMPTY) | File: ../Engine/Application.h
-    engine->RegisterObjectMethod("Application", "void ErrorExit(const String&in = String::EMPTY)", asMETHODPR(Application, ErrorExit, (const String&), void), asCALL_THISCALL);
-    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "bool GetBlockEvents() const", asMETHODPR(Application, GetBlockEvents, () const, bool), asCALL_THISCALL);
-    // const String& Object::GetCategory() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "const String& GetCategory() const", asMETHODPR(Application, GetCategory, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Application", "const String& get_category() const", asMETHODPR(Application, GetCategory, () const, const String&), asCALL_THISCALL);
-    // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
-    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "VariantMap& GetEventDataMap() const", asMETHODPR(Application, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
-    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // Object* Object::GetEventSender() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "Object@+ GetEventSender() const", asMETHODPR(Application, GetEventSender, () const, Object*), asCALL_THISCALL);
-    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(Application, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Application", "const Variant& get_globalVar(StringHash) const", asMETHODPR(Application, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "const VariantMap& GetGlobalVars() const", asMETHODPR(Application, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Application", "const VariantMap& get_globalVars() const", asMETHODPR(Application, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Application, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
-    // Not registered because template
-    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "StringHash GetType() const", asMETHODPR(Application, GetType, () const, StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Application", "StringHash get_type() const", asMETHODPR(Application, GetType, () const, StringHash), asCALL_THISCALL);
-    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "const String& GetTypeName() const", asMETHODPR(Application, GetTypeName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Application", "const String& get_typeName() const", asMETHODPR(Application, GetTypeName, () const, const String&), asCALL_THISCALL);
-    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "bool HasEventHandlers() const", asMETHODPR(Application, HasEventHandlers, () const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(Application, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(Application, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "bool IsInstanceOf(StringHash) const", asMETHODPR(Application, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
-    // Not registered because template
-    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(Application, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
-    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
-    // Error: type "RefCount*" can not automatically bind
-    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("Application", "int Refs() const", asMETHODPR(Application, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Application", "int get_refs() const", asMETHODPR(Application, Refs, () const, int), asCALL_THISCALL);
-    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("Application", asBEHAVE_RELEASE, "void f()", asMETHODPR(Application, ReleaseRef, (), void), asCALL_THISCALL);
-    // int Application::Run() | File: ../Engine/Application.h
-    engine->RegisterObjectMethod("Application", "int Run()", asMETHODPR(Application, Run, (), int), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "void SendEvent(StringHash)", asMETHODPR(Application, SendEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(Application, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
-    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
-    // Not registered because template
-    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "void SetBlockEvents(bool)", asMETHODPR(Application, SetBlockEvents, (bool), void), asCALL_THISCALL);
-    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(Application, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Application", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(Application, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    // virtual void Application::Setup() | File: ../Engine/Application.h
-    engine->RegisterObjectMethod("Application", "void Setup()", asMETHODPR(Application, Setup, (), void), asCALL_THISCALL);
-    // virtual void Application::Start() | File: ../Engine/Application.h
-    engine->RegisterObjectMethod("Application", "void Start()", asMETHODPR(Application, Start, (), void), asCALL_THISCALL);
-    // virtual void Application::Stop() | File: ../Engine/Application.h
-    engine->RegisterObjectMethod("Application", "void Stop()", asMETHODPR(Application, Stop, (), void), asCALL_THISCALL);
-    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "void UnsubscribeFromAllEvents()", asMETHODPR(Application, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(Application_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
-    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(Application, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(Application, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(Application, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
-    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("Application", "int WeakRefs() const", asMETHODPR(Application, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Application", "int get_weakRefs() const", asMETHODPR(Application, WeakRefs, () const, int), asCALL_THISCALL);
-#ifdef REGISTER_MANUAL_PART_Object
-    REGISTER_MANUAL_PART_Object(Application, "Application")
-#endif
-#ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(Application, "Application")
-#endif
-#ifdef REGISTER_MANUAL_PART_Application
-    REGISTER_MANUAL_PART_Application(Application, "Application")
-#endif
-    RegisterSubclass<Object, Application>(engine, "Object", "Application");
-    RegisterSubclass<RefCounted, Application>(engine, "RefCounted", "Application");
+    RegisterSubclass<StaticModel, AnimatedModel>(engine, "StaticModel", "AnimatedModel");
+    RegisterSubclass<Drawable, AnimatedModel>(engine, "Drawable", "AnimatedModel");
+    RegisterSubclass<Component, AnimatedModel>(engine, "Component", "AnimatedModel");
+    RegisterSubclass<Animatable, AnimatedModel>(engine, "Animatable", "AnimatedModel");
+    RegisterSubclass<Serializable, AnimatedModel>(engine, "Serializable", "AnimatedModel");
+    RegisterSubclass<Object, AnimatedModel>(engine, "Object", "AnimatedModel");
+    RegisterSubclass<RefCounted, AnimatedModel>(engine, "RefCounted", "AnimatedModel");
 
 #ifdef URHO3D_URHO2D
     // void Drawable::AddLight(Light* light) | File: ../Graphics/Drawable.h
@@ -1642,6 +1864,226 @@ void ASRegisterGenerated_Members_A(asIScriptEngine* engine)
     RegisterSubclass<RefCounted, AnimatedSprite2D>(engine, "RefCounted", "AnimatedSprite2D");
 #endif
 
+    // void ResourceWithMetadata::AddMetadata(const String& name, const Variant& value) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Animation", "void AddMetadata(const String&in, const Variant&in)", asMETHODPR(Animation, AddMetadata, (const String&, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "void set_metadata(const String&in, const Variant&in)", asMETHODPR(Animation, AddMetadata, (const String&, const Variant&), void), asCALL_THISCALL);
+    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("Animation", asBEHAVE_ADDREF, "void f()", asMETHODPR(Animation, AddRef, (), void), asCALL_THISCALL);
+    // void Animation::AddTrigger(const AnimationTriggerPoint& trigger) | File: ../Graphics/Animation.h
+    engine->RegisterObjectMethod("Animation", "void AddTrigger(const AnimationTriggerPoint&in)", asMETHODPR(Animation, AddTrigger, (const AnimationTriggerPoint&), void), asCALL_THISCALL);
+    // void Animation::AddTrigger(float time, bool timeIsNormalized, const Variant& data) | File: ../Graphics/Animation.h
+    engine->RegisterObjectMethod("Animation", "void AddTrigger(float, bool, const Variant&in)", asMETHODPR(Animation, AddTrigger, (float, bool, const Variant&), void), asCALL_THISCALL);
+    // explicit Animation::Animation(Context* context) | File: ../Graphics/Animation.h
+    engine->RegisterObjectBehaviour("Animation", asBEHAVE_FACTORY, "Animation@+ f()", asFUNCTION(Animation_Animation_Context), asCALL_CDECL);
+    // bool Animation::BeginLoad(Deserializer& source) override | File: ../Graphics/Animation.h
+    engine->RegisterObjectMethod("Animation", "bool BeginLoad(Deserializer&)", asMETHODPR(Animation, BeginLoad, (Deserializer&), bool), asCALL_THISCALL);
+    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
+    // Not registered because template
+    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
+    // Not registered because template
+    // SharedPtr<Animation> Animation::Clone(const String& cloneName=String::EMPTY) const | File: ../Graphics/Animation.h
+    engine->RegisterObjectMethod("Animation", "Animation@+ Clone(const String&in = String::EMPTY) const", asFUNCTION(Animation_Clone_String), asCALL_CDECL_OBJFIRST);
+    // AnimationTrack* Animation::CreateTrack(const String& name) | File: ../Graphics/Animation.h
+    engine->RegisterObjectMethod("Animation", "AnimationTrack@+ CreateTrack(const String&in)", asMETHODPR(Animation, CreateTrack, (const String&), AnimationTrack*), asCALL_THISCALL);
+    // virtual bool Resource::EndLoad() | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Animation", "bool EndLoad()", asMETHODPR(Animation, EndLoad, (), bool), asCALL_THISCALL);
+    // const String& Animation::GetAnimationName() const | File: ../Graphics/Animation.h
+    engine->RegisterObjectMethod("Animation", "const String& GetAnimationName() const", asMETHODPR(Animation, GetAnimationName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "const String& get_animationName() const", asMETHODPR(Animation, GetAnimationName, () const, const String&), asCALL_THISCALL);
+    // StringHash Animation::GetAnimationNameHash() const | File: ../Graphics/Animation.h
+    engine->RegisterObjectMethod("Animation", "StringHash GetAnimationNameHash() const", asMETHODPR(Animation, GetAnimationNameHash, () const, StringHash), asCALL_THISCALL);
+    // AsyncLoadState Resource::GetAsyncLoadState() const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Animation", "AsyncLoadState GetAsyncLoadState() const", asMETHODPR(Animation, GetAsyncLoadState, () const, AsyncLoadState), asCALL_THISCALL);
+    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Animation", "bool GetBlockEvents() const", asMETHODPR(Animation, GetBlockEvents, () const, bool), asCALL_THISCALL);
+    // const String& Object::GetCategory() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Animation", "const String& GetCategory() const", asMETHODPR(Animation, GetCategory, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "const String& get_category() const", asMETHODPR(Animation, GetCategory, () const, const String&), asCALL_THISCALL);
+    // Context* Object::GetContext() const | File: ../Core/Object.h
+    // Error: type "Context*" can not be returned
+    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Animation", "VariantMap& GetEventDataMap() const", asMETHODPR(Animation, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
+    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // Object* Object::GetEventSender() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Animation", "Object@+ GetEventSender() const", asMETHODPR(Animation, GetEventSender, () const, Object*), asCALL_THISCALL);
+    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Animation", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(Animation, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "const Variant& get_globalVar(StringHash) const", asMETHODPR(Animation, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Animation", "const VariantMap& GetGlobalVars() const", asMETHODPR(Animation, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "const VariantMap& get_globalVars() const", asMETHODPR(Animation, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    // float Animation::GetLength() const | File: ../Graphics/Animation.h
+    engine->RegisterObjectMethod("Animation", "float GetLength() const", asMETHODPR(Animation, GetLength, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "float get_length() const", asMETHODPR(Animation, GetLength, () const, float), asCALL_THISCALL);
+    // unsigned Resource::GetMemoryUse() const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Animation", "uint GetMemoryUse() const", asMETHODPR(Animation, GetMemoryUse, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "uint get_memoryUse() const", asMETHODPR(Animation, GetMemoryUse, () const, unsigned), asCALL_THISCALL);
+    // const Variant& ResourceWithMetadata::GetMetadata(const String& name) const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Animation", "const Variant& GetMetadata(const String&in) const", asMETHODPR(Animation, GetMetadata, (const String&) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "const Variant& get_metadata(const String&in) const", asMETHODPR(Animation, GetMetadata, (const String&) const, const Variant&), asCALL_THISCALL);
+    // const String& Resource::GetName() const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Animation", "const String& GetName() const", asMETHODPR(Animation, GetName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "const String& get_name() const", asMETHODPR(Animation, GetName, () const, const String&), asCALL_THISCALL);
+    // StringHash Resource::GetNameHash() const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Animation", "StringHash GetNameHash() const", asMETHODPR(Animation, GetNameHash, () const, StringHash), asCALL_THISCALL);
+    // unsigned Animation::GetNumTracks() const | File: ../Graphics/Animation.h
+    engine->RegisterObjectMethod("Animation", "uint GetNumTracks() const", asMETHODPR(Animation, GetNumTracks, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "uint get_numTracks() const", asMETHODPR(Animation, GetNumTracks, () const, unsigned), asCALL_THISCALL);
+    // unsigned Animation::GetNumTriggers() const | File: ../Graphics/Animation.h
+    engine->RegisterObjectMethod("Animation", "uint GetNumTriggers() const", asMETHODPR(Animation, GetNumTriggers, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "uint get_numTriggers() const", asMETHODPR(Animation, GetNumTriggers, () const, unsigned), asCALL_THISCALL);
+    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Animation", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Animation, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
+    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // Not registered because template
+    // AnimationTrack* Animation::GetTrack(unsigned index) | File: ../Graphics/Animation.h
+    engine->RegisterObjectMethod("Animation", "AnimationTrack@+ GetTrack(uint)", asMETHODPR(Animation, GetTrack, (unsigned), AnimationTrack*), asCALL_THISCALL);
+    // AnimationTrack* Animation::GetTrack(const String& name) | File: ../Graphics/Animation.h
+    engine->RegisterObjectMethod("Animation", "AnimationTrack@+ GetTrack(const String&in)", asMETHODPR(Animation, GetTrack, (const String&), AnimationTrack*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "AnimationTrack@+ get_tracks(const String&in)", asMETHODPR(Animation, GetTrack, (const String&), AnimationTrack*), asCALL_THISCALL);
+    // AnimationTrack* Animation::GetTrack(StringHash nameHash) | File: ../Graphics/Animation.h
+    engine->RegisterObjectMethod("Animation", "AnimationTrack@+ GetTrack(StringHash)", asMETHODPR(Animation, GetTrack, (StringHash), AnimationTrack*), asCALL_THISCALL);
+    // const HashMap<StringHash, AnimationTrack>& Animation::GetTracks() const | File: ../Graphics/Animation.h
+    // Error: type "const HashMap<StringHash, AnimationTrack>&" can not automatically bind
+    // AnimationTriggerPoint* Animation::GetTrigger(unsigned index) | File: ../Graphics/Animation.h
+    // Error: type "AnimationTriggerPoint*" can not automatically bind
+    // const Vector<AnimationTriggerPoint>& Animation::GetTriggers() const | File: ../Graphics/Animation.h
+    // Error: type "const Vector<AnimationTriggerPoint>&" can not automatically bind
+    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Animation", "StringHash GetType() const", asMETHODPR(Animation, GetType, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "StringHash get_type() const", asMETHODPR(Animation, GetType, () const, StringHash), asCALL_THISCALL);
+    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Animation", "const String& GetTypeName() const", asMETHODPR(Animation, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "const String& get_typeName() const", asMETHODPR(Animation, GetTypeName, () const, const String&), asCALL_THISCALL);
+    // unsigned Resource::GetUseTimer() | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Animation", "uint GetUseTimer()", asMETHODPR(Animation, GetUseTimer, (), unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "uint get_useTimer()", asMETHODPR(Animation, GetUseTimer, (), unsigned), asCALL_THISCALL);
+    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Animation", "bool HasEventHandlers() const", asMETHODPR(Animation, HasEventHandlers, () const, bool), asCALL_THISCALL);
+    // bool ResourceWithMetadata::HasMetadata() const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Animation", "bool HasMetadata() const", asMETHODPR(Animation, HasMetadata, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "bool get_hasMetadata() const", asMETHODPR(Animation, HasMetadata, () const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Animation", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(Animation, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Animation", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(Animation, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Animation", "bool IsInstanceOf(StringHash) const", asMETHODPR(Animation, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
+    // Not registered because template
+    // bool Resource::Load(Deserializer& source) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Animation", "bool Load(Deserializer&)", asMETHODPR(Animation, Load, (Deserializer&), bool), asCALL_THISCALL);
+    // bool Resource::LoadFile(const String& fileName) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Animation", "bool LoadFile(const String&in)", asMETHODPR(Animation, LoadFile, (const String&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "bool Load(const String&in)", asMETHODPR(Animation, LoadFile, (const String&), bool), asCALL_THISCALL);
+    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Animation", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(Animation, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
+    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
+    // Error: type "RefCount*" can not automatically bind
+    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("Animation", "int Refs() const", asMETHODPR(Animation, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "int get_refs() const", asMETHODPR(Animation, Refs, () const, int), asCALL_THISCALL);
+    // static void Animation::RegisterObject(Context* context) | File: ../Graphics/Animation.h
+    // Context can be used as firs parameter of constructors only
+    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("Animation", asBEHAVE_RELEASE, "void f()", asMETHODPR(Animation, ReleaseRef, (), void), asCALL_THISCALL);
+    // void ResourceWithMetadata::RemoveAllMetadata() | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Animation", "void RemoveAllMetadata()", asMETHODPR(Animation, RemoveAllMetadata, (), void), asCALL_THISCALL);
+    // void Animation::RemoveAllTracks() | File: ../Graphics/Animation.h
+    engine->RegisterObjectMethod("Animation", "void RemoveAllTracks()", asMETHODPR(Animation, RemoveAllTracks, (), void), asCALL_THISCALL);
+    // void Animation::RemoveAllTriggers() | File: ../Graphics/Animation.h
+    engine->RegisterObjectMethod("Animation", "void RemoveAllTriggers()", asMETHODPR(Animation, RemoveAllTriggers, (), void), asCALL_THISCALL);
+    // void ResourceWithMetadata::RemoveMetadata(const String& name) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Animation", "void RemoveMetadata(const String&in)", asMETHODPR(Animation, RemoveMetadata, (const String&), void), asCALL_THISCALL);
+    // bool Animation::RemoveTrack(const String& name) | File: ../Graphics/Animation.h
+    engine->RegisterObjectMethod("Animation", "bool RemoveTrack(const String&in)", asMETHODPR(Animation, RemoveTrack, (const String&), bool), asCALL_THISCALL);
+    // void Animation::RemoveTrigger(unsigned index) | File: ../Graphics/Animation.h
+    engine->RegisterObjectMethod("Animation", "void RemoveTrigger(uint)", asMETHODPR(Animation, RemoveTrigger, (unsigned), void), asCALL_THISCALL);
+    // void Resource::ResetUseTimer() | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Animation", "void ResetUseTimer()", asMETHODPR(Animation, ResetUseTimer, (), void), asCALL_THISCALL);
+    // bool Animation::Save(Serializer& dest) const override | File: ../Graphics/Animation.h
+    engine->RegisterObjectMethod("Animation", "bool Save(Serializer&) const", asMETHODPR(Animation, Save, (Serializer&) const, bool), asCALL_THISCALL);
+    // virtual bool Resource::SaveFile(const String& fileName) const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Animation", "bool SaveFile(const String&in) const", asMETHODPR(Animation, SaveFile, (const String&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "bool Save(const String&in) const", asMETHODPR(Animation, SaveFile, (const String&) const, bool), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Animation", "void SendEvent(StringHash)", asMETHODPR(Animation, SendEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Animation", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(Animation, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
+    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
+    // Not registered because template
+    // void Animation::SetAnimationName(const String& name) | File: ../Graphics/Animation.h
+    engine->RegisterObjectMethod("Animation", "void SetAnimationName(const String&in)", asMETHODPR(Animation, SetAnimationName, (const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "void set_animationName(const String&in)", asMETHODPR(Animation, SetAnimationName, (const String&), void), asCALL_THISCALL);
+    // void Resource::SetAsyncLoadState(AsyncLoadState newState) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Animation", "void SetAsyncLoadState(AsyncLoadState)", asMETHODPR(Animation, SetAsyncLoadState, (AsyncLoadState), void), asCALL_THISCALL);
+    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Animation", "void SetBlockEvents(bool)", asMETHODPR(Animation, SetBlockEvents, (bool), void), asCALL_THISCALL);
+    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Animation", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(Animation, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(Animation, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    // void Animation::SetLength(float length) | File: ../Graphics/Animation.h
+    engine->RegisterObjectMethod("Animation", "void SetLength(float)", asMETHODPR(Animation, SetLength, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "void set_length(float)", asMETHODPR(Animation, SetLength, (float), void), asCALL_THISCALL);
+    // void Resource::SetMemoryUse(unsigned size) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Animation", "void SetMemoryUse(uint)", asMETHODPR(Animation, SetMemoryUse, (unsigned), void), asCALL_THISCALL);
+    // void Resource::SetName(const String& name) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Animation", "void SetName(const String&in)", asMETHODPR(Animation, SetName, (const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "void set_name(const String&in)", asMETHODPR(Animation, SetName, (const String&), void), asCALL_THISCALL);
+    // void Animation::SetNumTriggers(unsigned num) | File: ../Graphics/Animation.h
+    engine->RegisterObjectMethod("Animation", "void SetNumTriggers(uint)", asMETHODPR(Animation, SetNumTriggers, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "void set_numTriggers(uint)", asMETHODPR(Animation, SetNumTriggers, (unsigned), void), asCALL_THISCALL);
+    // void Animation::SetTrigger(unsigned index, const AnimationTriggerPoint& trigger) | File: ../Graphics/Animation.h
+    engine->RegisterObjectMethod("Animation", "void SetTrigger(uint, const AnimationTriggerPoint&in)", asMETHODPR(Animation, SetTrigger, (unsigned, const AnimationTriggerPoint&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "void set_triggers(uint, const AnimationTriggerPoint&in)", asMETHODPR(Animation, SetTrigger, (unsigned, const AnimationTriggerPoint&), void), asCALL_THISCALL);
+    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Animation", "void UnsubscribeFromAllEvents()", asMETHODPR(Animation, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Animation", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(Animation_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
+    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Animation", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(Animation, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Animation", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(Animation, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Animation", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(Animation, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
+    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("Animation", "int WeakRefs() const", asMETHODPR(Animation, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "int get_weakRefs() const", asMETHODPR(Animation, WeakRefs, () const, int), asCALL_THISCALL);
+#ifdef REGISTER_MANUAL_PART_ResourceWithMetadata
+    REGISTER_MANUAL_PART_ResourceWithMetadata(Animation, "Animation")
+#endif
+#ifdef REGISTER_MANUAL_PART_Resource
+    REGISTER_MANUAL_PART_Resource(Animation, "Animation")
+#endif
+#ifdef REGISTER_MANUAL_PART_Object
+    REGISTER_MANUAL_PART_Object(Animation, "Animation")
+#endif
+#ifdef REGISTER_MANUAL_PART_RefCounted
+    REGISTER_MANUAL_PART_RefCounted(Animation, "Animation")
+#endif
+#ifdef REGISTER_MANUAL_PART_Animation
+    REGISTER_MANUAL_PART_Animation(Animation, "Animation")
+#endif
+    RegisterSubclass<ResourceWithMetadata, Animation>(engine, "ResourceWithMetadata", "Animation");
+    RegisterSubclass<Resource, Animation>(engine, "Resource", "Animation");
+    RegisterSubclass<Object, Animation>(engine, "Object", "Animation");
+    RegisterSubclass<RefCounted, Animation>(engine, "RefCounted", "Animation");
+
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("AnimationController", asBEHAVE_ADDREF, "void f()", asMETHODPR(AnimationController, AddRef, (), void), asCALL_THISCALL);
     // void Component::AddReplicationState(ComponentReplicationState* state) | File: ../Scene/Component.h
@@ -2006,588 +2448,6 @@ void ASRegisterGenerated_Members_A(asIScriptEngine* engine)
     RegisterSubclass<Object, AnimationController>(engine, "Object", "AnimationController");
     RegisterSubclass<RefCounted, AnimationController>(engine, "RefCounted", "AnimationController");
 
-    // AnimationState* AnimatedModel::AddAnimationState(Animation* animation) | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "AnimationState@+ AddAnimationState(Animation@+)", asMETHODPR(AnimatedModel, AddAnimationState, (Animation*), AnimationState*), asCALL_THISCALL);
-    // void Drawable::AddLight(Light* light) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void AddLight(Light@+)", asMETHODPR(AnimatedModel, AddLight, (Light*), void), asCALL_THISCALL);
-    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("AnimatedModel", asBEHAVE_ADDREF, "void f()", asMETHODPR(AnimatedModel, AddRef, (), void), asCALL_THISCALL);
-    // void Component::AddReplicationState(ComponentReplicationState* state) | File: ../Scene/Component.h
-    // Error: type "ComponentReplicationState*" can not automatically bind
-    // void Drawable::AddVertexLight(Light* light) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void AddVertexLight(Light@+)", asMETHODPR(AnimatedModel, AddVertexLight, (Light*), void), asCALL_THISCALL);
-    // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void AllocateNetworkState()", asMETHODPR(AnimatedModel, AllocateNetworkState, (), void), asCALL_THISCALL);
-    // explicit AnimatedModel::AnimatedModel(Context* context) | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectBehaviour("AnimatedModel", asBEHAVE_FACTORY, "AnimatedModel@+ f()", asFUNCTION(AnimatedModel_AnimatedModel_Context), asCALL_CDECL);
-    // void AnimatedModel::ApplyAnimation() | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "void ApplyAnimation()", asMETHODPR(AnimatedModel, ApplyAnimation, (), void), asCALL_THISCALL);
-    // void AnimatedModel::ApplyAttributes() override | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "void ApplyAttributes()", asMETHODPR(AnimatedModel, ApplyAttributes, (), void), asCALL_THISCALL);
-    // void StaticModel::ApplyMaterialList(const String& fileName=String::EMPTY) | File: ../Graphics/StaticModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "void ApplyMaterialList(const String&in = String::EMPTY)", asMETHODPR(AnimatedModel, ApplyMaterialList, (const String&), void), asCALL_THISCALL);
-    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
-    // Not registered because template
-    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
-    // Not registered because template
-    // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("AnimatedModel", "void CleanupConnection(Connection@+)", asMETHODPR(AnimatedModel, CleanupConnection, (Connection*), void), asCALL_THISCALL);
-    // void AnimatedModel::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(AnimatedModel, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
-    // bool StaticModel::DrawOcclusion(OcclusionBuffer* buffer) override | File: ../Graphics/StaticModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "bool DrawOcclusion(OcclusionBuffer@+)", asMETHODPR(AnimatedModel, DrawOcclusion, (OcclusionBuffer*), bool), asCALL_THISCALL);
-    // bool Animatable::GetAnimationEnabled() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("AnimatedModel", "bool GetAnimationEnabled() const", asMETHODPR(AnimatedModel, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "bool get_animationEnabled() const", asMETHODPR(AnimatedModel, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
-    // float AnimatedModel::GetAnimationLodBias() const | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "float GetAnimationLodBias() const", asMETHODPR(AnimatedModel, GetAnimationLodBias, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "float get_animationLodBias() const", asMETHODPR(AnimatedModel, GetAnimationLodBias, () const, float), asCALL_THISCALL);
-    // AnimationState* AnimatedModel::GetAnimationState(Animation* animation) const | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "AnimationState@+ GetAnimationState(Animation@+) const", asMETHODPR(AnimatedModel, GetAnimationState, (Animation*) const, AnimationState*), asCALL_THISCALL);
-    // AnimationState* AnimatedModel::GetAnimationState(const String& animationName) const | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "AnimationState@+ GetAnimationState(const String&in) const", asMETHODPR(AnimatedModel, GetAnimationState, (const String&) const, AnimationState*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "AnimationState@+ get_animationStates(const String&in) const", asMETHODPR(AnimatedModel, GetAnimationState, (const String&) const, AnimationState*), asCALL_THISCALL);
-    // AnimationState* AnimatedModel::GetAnimationState(StringHash animationNameHash) const | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "AnimationState@+ GetAnimationState(StringHash) const", asMETHODPR(AnimatedModel, GetAnimationState, (StringHash) const, AnimationState*), asCALL_THISCALL);
-    // AnimationState* AnimatedModel::GetAnimationState(unsigned index) const | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "AnimationState@+ GetAnimationState(uint) const", asMETHODPR(AnimatedModel, GetAnimationState, (unsigned) const, AnimationState*), asCALL_THISCALL);
-    // const Vector<SharedPtr<AnimationState>>& AnimatedModel::GetAnimationStates() const | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "Array<AnimationState@>@ GetAnimationStates() const", asFUNCTION(AnimatedModel_GetAnimationStates_void), asCALL_CDECL_OBJFIRST);
-    // VariantVector AnimatedModel::GetAnimationStatesAttr() const | File: ../Graphics/AnimatedModel.h
-    // Error: type "VariantVector" can not automatically bind
-    // Variant Serializable::GetAttribute(unsigned index) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("AnimatedModel", "Variant GetAttribute(uint) const", asMETHODPR(AnimatedModel, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "Variant get_attributes(uint) const", asMETHODPR(AnimatedModel, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
-    // Variant Serializable::GetAttribute(const String& name) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("AnimatedModel", "Variant GetAttribute(const String&in) const", asMETHODPR(AnimatedModel, GetAttribute, (const String&) const, Variant), asCALL_THISCALL);
-    // ValueAnimation* Animatable::GetAttributeAnimation(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("AnimatedModel", "ValueAnimation@+ GetAttributeAnimation(const String&in) const", asMETHODPR(AnimatedModel, GetAttributeAnimation, (const String&) const, ValueAnimation*), asCALL_THISCALL);
-    // float Animatable::GetAttributeAnimationSpeed(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("AnimatedModel", "float GetAttributeAnimationSpeed(const String&in) const", asMETHODPR(AnimatedModel, GetAttributeAnimationSpeed, (const String&) const, float), asCALL_THISCALL);
-    // float Animatable::GetAttributeAnimationTime(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("AnimatedModel", "float GetAttributeAnimationTime(const String&in) const", asMETHODPR(AnimatedModel, GetAttributeAnimationTime, (const String&) const, float), asCALL_THISCALL);
-    // WrapMode Animatable::GetAttributeAnimationWrapMode(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("AnimatedModel", "WrapMode GetAttributeAnimationWrapMode(const String&in) const", asMETHODPR(AnimatedModel, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), asCALL_THISCALL);
-    // Variant Serializable::GetAttributeDefault(unsigned index) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("AnimatedModel", "Variant GetAttributeDefault(uint) const", asMETHODPR(AnimatedModel, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "Variant get_attributeDefaults(uint) const", asMETHODPR(AnimatedModel, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
-    // Variant Serializable::GetAttributeDefault(const String& name) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("AnimatedModel", "Variant GetAttributeDefault(const String&in) const", asMETHODPR(AnimatedModel, GetAttributeDefault, (const String&) const, Variant), asCALL_THISCALL);
-    // virtual const Vector<AttributeInfo>* Serializable::GetAttributes() const | File: ../Scene/Serializable.h
-    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
-    // const Vector<SourceBatch>& Drawable::GetBatches() const | File: ../Graphics/Drawable.h
-    // Error: type "const Vector<SourceBatch>&" can not automatically bind
-    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("AnimatedModel", "bool GetBlockEvents() const", asMETHODPR(AnimatedModel, GetBlockEvents, () const, bool), asCALL_THISCALL);
-    // VariantVector AnimatedModel::GetBonesEnabledAttr() const | File: ../Graphics/AnimatedModel.h
-    // Error: type "VariantVector" can not automatically bind
-    // const BoundingBox& Drawable::GetBoundingBox() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "const BoundingBox& GetBoundingBox() const", asMETHODPR(AnimatedModel, GetBoundingBox, () const, const BoundingBox&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "const BoundingBox& get_boundingBox() const", asMETHODPR(AnimatedModel, GetBoundingBox, () const, const BoundingBox&), asCALL_THISCALL);
-    // bool Drawable::GetCastShadows() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "bool GetCastShadows() const", asMETHODPR(AnimatedModel, GetCastShadows, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "bool get_castShadows() const", asMETHODPR(AnimatedModel, GetCastShadows, () const, bool), asCALL_THISCALL);
-    // const String& Object::GetCategory() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("AnimatedModel", "const String& GetCategory() const", asMETHODPR(AnimatedModel, GetCategory, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "const String& get_category() const", asMETHODPR(AnimatedModel, GetCategory, () const, const String&), asCALL_THISCALL);
-    // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("AnimatedModel", "Component@+ GetComponent(StringHash) const", asMETHODPR(AnimatedModel, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
-    // template<class T> T*  Component::GetComponent() const | File: ../Scene/Component.h
-    // Not registered because template
-    // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
-    // Error: type "PODVector<Component*>&" can not automatically bind
-    // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
-    // Not registered because template
-    // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
-    // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
-    // Error: type "PODVector<Node*>&" can not automatically bind
-    // float Drawable::GetDistance() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "float GetDistance() const", asMETHODPR(AnimatedModel, GetDistance, () const, float), asCALL_THISCALL);
-    // unsigned char Drawable::GetDrawableFlags() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "uint8 GetDrawableFlags() const", asMETHODPR(AnimatedModel, GetDrawableFlags, () const, unsigned char), asCALL_THISCALL);
-    // float Drawable::GetDrawDistance() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "float GetDrawDistance() const", asMETHODPR(AnimatedModel, GetDrawDistance, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "float get_drawDistance() const", asMETHODPR(AnimatedModel, GetDrawDistance, () const, float), asCALL_THISCALL);
-    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("AnimatedModel", "VariantMap& GetEventDataMap() const", asMETHODPR(AnimatedModel, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
-    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // Object* Object::GetEventSender() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("AnimatedModel", "Object@+ GetEventSender() const", asMETHODPR(AnimatedModel, GetEventSender, () const, Object*), asCALL_THISCALL);
-    // Light* Drawable::GetFirstLight() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "Light@+ GetFirstLight() const", asMETHODPR(AnimatedModel, GetFirstLight, () const, Light*), asCALL_THISCALL);
-    // const Vector<PODVector<unsigned>>& AnimatedModel::GetGeometryBoneMappings() const | File: ../Graphics/AnimatedModel.h
-    // Error: type "const Vector<PODVector<unsigned>>&" can not automatically bind
-    // const Vector<PODVector<Matrix3x4>>& AnimatedModel::GetGeometrySkinMatrices() const | File: ../Graphics/AnimatedModel.h
-    // Error: type "const Vector<PODVector<Matrix3x4>>&" can not automatically bind
-    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("AnimatedModel", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(AnimatedModel, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "const Variant& get_globalVar(StringHash) const", asMETHODPR(AnimatedModel, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("AnimatedModel", "const VariantMap& GetGlobalVars() const", asMETHODPR(AnimatedModel, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "const VariantMap& get_globalVars() const", asMETHODPR(AnimatedModel, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    // unsigned Component::GetID() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("AnimatedModel", "uint GetID() const", asMETHODPR(AnimatedModel, GetID, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "uint get_id() const", asMETHODPR(AnimatedModel, GetID, () const, unsigned), asCALL_THISCALL);
-    // bool Serializable::GetInterceptNetworkUpdate(const String& attributeName) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("AnimatedModel", "bool GetInterceptNetworkUpdate(const String&in) const", asMETHODPR(AnimatedModel, GetInterceptNetworkUpdate, (const String&) const, bool), asCALL_THISCALL);
-    // unsigned Drawable::GetLightMask() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "uint GetLightMask() const", asMETHODPR(AnimatedModel, GetLightMask, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "uint get_lightMask() const", asMETHODPR(AnimatedModel, GetLightMask, () const, unsigned), asCALL_THISCALL);
-    // const PODVector<Light*>& Drawable::GetLights() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "Array<Light@>@ GetLights() const", asFUNCTION(AnimatedModel_GetLights_void), asCALL_CDECL_OBJFIRST);
-    // float Drawable::GetLodBias() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "float GetLodBias() const", asMETHODPR(AnimatedModel, GetLodBias, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "float get_lodBias() const", asMETHODPR(AnimatedModel, GetLodBias, () const, float), asCALL_THISCALL);
-    // float Drawable::GetLodDistance() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "float GetLodDistance() const", asMETHODPR(AnimatedModel, GetLodDistance, () const, float), asCALL_THISCALL);
-    // Geometry* StaticModel::GetLodGeometry(unsigned batchIndex, unsigned level) override | File: ../Graphics/StaticModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "Geometry@+ GetLodGeometry(uint, uint)", asMETHODPR(AnimatedModel, GetLodGeometry, (unsigned, unsigned), Geometry*), asCALL_THISCALL);
-    // virtual Material* StaticModel::GetMaterial() const | File: ../Graphics/StaticModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "Material@+ GetMaterial() const", asMETHODPR(AnimatedModel, GetMaterial, () const, Material*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "Material@+ get_material() const", asMETHODPR(AnimatedModel, GetMaterial, () const, Material*), asCALL_THISCALL);
-    // virtual Material* StaticModel::GetMaterial(unsigned index) const | File: ../Graphics/StaticModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "Material@+ GetMaterial(uint) const", asMETHODPR(AnimatedModel, GetMaterial, (unsigned) const, Material*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "Material@+ get_materials(uint) const", asMETHODPR(AnimatedModel, GetMaterial, (unsigned) const, Material*), asCALL_THISCALL);
-    // const ResourceRefList& StaticModel::GetMaterialsAttr() const | File: ../Graphics/StaticModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "const ResourceRefList& GetMaterialsAttr() const", asMETHODPR(AnimatedModel, GetMaterialsAttr, () const, const ResourceRefList&), asCALL_THISCALL);
-    // unsigned Drawable::GetMaxLights() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "uint GetMaxLights() const", asMETHODPR(AnimatedModel, GetMaxLights, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "uint get_maxLights() const", asMETHODPR(AnimatedModel, GetMaxLights, () const, unsigned), asCALL_THISCALL);
-    // float Drawable::GetMaxZ() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "float GetMaxZ() const", asMETHODPR(AnimatedModel, GetMaxZ, () const, float), asCALL_THISCALL);
-    // float Drawable::GetMinZ() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "float GetMinZ() const", asMETHODPR(AnimatedModel, GetMinZ, () const, float), asCALL_THISCALL);
-    // Model* StaticModel::GetModel() const | File: ../Graphics/StaticModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "Model@+ GetModel() const", asMETHODPR(AnimatedModel, GetModel, () const, Model*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "Model@+ get_model() const", asMETHODPR(AnimatedModel, GetModel, () const, Model*), asCALL_THISCALL);
-    // ResourceRef AnimatedModel::GetModelAttr() const | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "ResourceRef GetModelAttr() const", asMETHODPR(AnimatedModel, GetModelAttr, () const, ResourceRef), asCALL_THISCALL);
-    // const Vector<ModelMorph>& AnimatedModel::GetMorphs() const | File: ../Graphics/AnimatedModel.h
-    // Error: type "const Vector<ModelMorph>&" can not automatically bind
-    // const PODVector<unsigned char>& AnimatedModel::GetMorphsAttr() const | File: ../Graphics/AnimatedModel.h
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
-    // const Vector<SharedPtr<VertexBuffer>>& AnimatedModel::GetMorphVertexBuffers() const | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "Array<VertexBuffer@>@ GetMorphVertexBuffers() const", asFUNCTION(AnimatedModel_GetMorphVertexBuffers_void), asCALL_CDECL_OBJFIRST);
-    // float AnimatedModel::GetMorphWeight(unsigned index) const | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "float GetMorphWeight(uint) const", asMETHODPR(AnimatedModel, GetMorphWeight, (unsigned) const, float), asCALL_THISCALL);
-    // float AnimatedModel::GetMorphWeight(const String& name) const | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "float GetMorphWeight(const String&in) const", asMETHODPR(AnimatedModel, GetMorphWeight, (const String&) const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "float get_morphWeights(const String&in) const", asMETHODPR(AnimatedModel, GetMorphWeight, (const String&) const, float), asCALL_THISCALL);
-    // float AnimatedModel::GetMorphWeight(StringHash nameHash) const | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "float GetMorphWeight(StringHash) const", asMETHODPR(AnimatedModel, GetMorphWeight, (StringHash) const, float), asCALL_THISCALL);
-    // virtual const Vector<AttributeInfo>* Serializable::GetNetworkAttributes() const | File: ../Scene/Serializable.h
-    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
-    // NetworkState* Serializable::GetNetworkState() const | File: ../Scene/Serializable.h
-    // Error: type "NetworkState*" can not automatically bind
-    // Node* Component::GetNode() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("AnimatedModel", "Node@+ GetNode() const", asMETHODPR(AnimatedModel, GetNode, () const, Node*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "Node@+ get_node() const", asMETHODPR(AnimatedModel, GetNode, () const, Node*), asCALL_THISCALL);
-    // unsigned AnimatedModel::GetNumAnimationStates() const | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "uint GetNumAnimationStates() const", asMETHODPR(AnimatedModel, GetNumAnimationStates, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "uint get_numAnimationStates() const", asMETHODPR(AnimatedModel, GetNumAnimationStates, () const, unsigned), asCALL_THISCALL);
-    // unsigned Serializable::GetNumAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("AnimatedModel", "uint GetNumAttributes() const", asMETHODPR(AnimatedModel, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "uint get_numAttributes() const", asMETHODPR(AnimatedModel, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
-    // unsigned StaticModel::GetNumGeometries() const | File: ../Graphics/StaticModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "uint GetNumGeometries() const", asMETHODPR(AnimatedModel, GetNumGeometries, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "uint get_numGeometries() const", asMETHODPR(AnimatedModel, GetNumGeometries, () const, unsigned), asCALL_THISCALL);
-    // unsigned AnimatedModel::GetNumMorphs() const | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "uint GetNumMorphs() const", asMETHODPR(AnimatedModel, GetNumMorphs, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "uint get_numMorphs() const", asMETHODPR(AnimatedModel, GetNumMorphs, () const, unsigned), asCALL_THISCALL);
-    // unsigned Serializable::GetNumNetworkAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("AnimatedModel", "uint GetNumNetworkAttributes() const", asMETHODPR(AnimatedModel, GetNumNetworkAttributes, () const, unsigned), asCALL_THISCALL);
-    // unsigned StaticModel::GetNumOccluderTriangles() override | File: ../Graphics/StaticModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "uint GetNumOccluderTriangles()", asMETHODPR(AnimatedModel, GetNumOccluderTriangles, (), unsigned), asCALL_THISCALL);
-    // ObjectAnimation* Animatable::GetObjectAnimation() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("AnimatedModel", "ObjectAnimation@+ GetObjectAnimation() const", asMETHODPR(AnimatedModel, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "ObjectAnimation@+ get_objectAnimation() const", asMETHODPR(AnimatedModel, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
-    // ResourceRef Animatable::GetObjectAnimationAttr() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("AnimatedModel", "ResourceRef GetObjectAnimationAttr() const", asMETHODPR(AnimatedModel, GetObjectAnimationAttr, () const, ResourceRef), asCALL_THISCALL);
-    // unsigned StaticModel::GetOcclusionLodLevel() const | File: ../Graphics/StaticModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "uint GetOcclusionLodLevel() const", asMETHODPR(AnimatedModel, GetOcclusionLodLevel, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "uint get_occlusionLodLevel() const", asMETHODPR(AnimatedModel, GetOcclusionLodLevel, () const, unsigned), asCALL_THISCALL);
-    // Octant* Drawable::GetOctant() const | File: ../Graphics/Drawable.h
-    // Error: type "Octant" can not automatically bind bacause have @nobind mark
-    // Scene* Component::GetScene() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("AnimatedModel", "Scene@+ GetScene() const", asMETHODPR(AnimatedModel, GetScene, () const, Scene*), asCALL_THISCALL);
-    // float Drawable::GetShadowDistance() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "float GetShadowDistance() const", asMETHODPR(AnimatedModel, GetShadowDistance, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "float get_shadowDistance() const", asMETHODPR(AnimatedModel, GetShadowDistance, () const, float), asCALL_THISCALL);
-    // unsigned Drawable::GetShadowMask() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "uint GetShadowMask() const", asMETHODPR(AnimatedModel, GetShadowMask, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "uint get_shadowMask() const", asMETHODPR(AnimatedModel, GetShadowMask, () const, unsigned), asCALL_THISCALL);
-    // Skeleton& AnimatedModel::GetSkeleton() | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "Skeleton& GetSkeleton()", asMETHODPR(AnimatedModel, GetSkeleton, (), Skeleton&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "Skeleton& get_skeleton()", asMETHODPR(AnimatedModel, GetSkeleton, (), Skeleton&), asCALL_THISCALL);
-    // float Drawable::GetSortValue() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "float GetSortValue() const", asMETHODPR(AnimatedModel, GetSortValue, () const, float), asCALL_THISCALL);
-    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("AnimatedModel", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(AnimatedModel, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
-    // Not registered because template
-    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("AnimatedModel", "StringHash GetType() const", asMETHODPR(AnimatedModel, GetType, () const, StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "StringHash get_type() const", asMETHODPR(AnimatedModel, GetType, () const, StringHash), asCALL_THISCALL);
-    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("AnimatedModel", "const String& GetTypeName() const", asMETHODPR(AnimatedModel, GetTypeName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "const String& get_typeName() const", asMETHODPR(AnimatedModel, GetTypeName, () const, const String&), asCALL_THISCALL);
-    // UpdateGeometryType AnimatedModel::GetUpdateGeometryType() override | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "UpdateGeometryType GetUpdateGeometryType()", asMETHODPR(AnimatedModel, GetUpdateGeometryType, (), UpdateGeometryType), asCALL_THISCALL);
-    // bool AnimatedModel::GetUpdateInvisible() const | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "bool GetUpdateInvisible() const", asMETHODPR(AnimatedModel, GetUpdateInvisible, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "bool get_updateInvisible() const", asMETHODPR(AnimatedModel, GetUpdateInvisible, () const, bool), asCALL_THISCALL);
-    // const PODVector<Light*>& Drawable::GetVertexLights() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "Array<Light@>@ GetVertexLights() const", asFUNCTION(AnimatedModel_GetVertexLights_void), asCALL_CDECL_OBJFIRST);
-    // unsigned Drawable::GetViewMask() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "uint GetViewMask() const", asMETHODPR(AnimatedModel, GetViewMask, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "uint get_viewMask() const", asMETHODPR(AnimatedModel, GetViewMask, () const, unsigned), asCALL_THISCALL);
-    // const BoundingBox& Drawable::GetWorldBoundingBox() | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "const BoundingBox& GetWorldBoundingBox()", asMETHODPR(AnimatedModel, GetWorldBoundingBox, (), const BoundingBox&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "const BoundingBox& get_worldBoundingBox()", asMETHODPR(AnimatedModel, GetWorldBoundingBox, (), const BoundingBox&), asCALL_THISCALL);
-    // Zone* Drawable::GetZone() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "Zone@+ GetZone() const", asMETHODPR(AnimatedModel, GetZone, () const, Zone*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "Zone@+ get_zone() const", asMETHODPR(AnimatedModel, GetZone, () const, Zone*), asCALL_THISCALL);
-    // unsigned Drawable::GetZoneMask() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "uint GetZoneMask() const", asMETHODPR(AnimatedModel, GetZoneMask, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "uint get_zoneMask() const", asMETHODPR(AnimatedModel, GetZoneMask, () const, unsigned), asCALL_THISCALL);
-    // bool Drawable::HasBasePass(unsigned batchIndex) const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "bool HasBasePass(uint) const", asMETHODPR(AnimatedModel, HasBasePass, (unsigned) const, bool), asCALL_THISCALL);
-    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("AnimatedModel", "bool HasEventHandlers() const", asMETHODPR(AnimatedModel, HasEventHandlers, () const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("AnimatedModel", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(AnimatedModel, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("AnimatedModel", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(AnimatedModel, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
-    // bool Component::IsEnabled() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("AnimatedModel", "bool IsEnabled() const", asMETHODPR(AnimatedModel, IsEnabled, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "bool get_enabled() const", asMETHODPR(AnimatedModel, IsEnabled, () const, bool), asCALL_THISCALL);
-    // bool Component::IsEnabledEffective() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("AnimatedModel", "bool IsEnabledEffective() const", asMETHODPR(AnimatedModel, IsEnabledEffective, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "bool get_enabledEffective() const", asMETHODPR(AnimatedModel, IsEnabledEffective, () const, bool), asCALL_THISCALL);
-    // bool StaticModel::IsInside(const Vector3& point) const | File: ../Graphics/StaticModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "bool IsInside(const Vector3&in) const", asMETHODPR(AnimatedModel, IsInside, (const Vector3&) const, bool), asCALL_THISCALL);
-    // bool StaticModel::IsInsideLocal(const Vector3& point) const | File: ../Graphics/StaticModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "bool IsInsideLocal(const Vector3&in) const", asMETHODPR(AnimatedModel, IsInsideLocal, (const Vector3&) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("AnimatedModel", "bool IsInstanceOf(StringHash) const", asMETHODPR(AnimatedModel, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
-    // Not registered because template
-    // bool Drawable::IsInView() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "bool IsInView() const", asMETHODPR(AnimatedModel, IsInView, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "bool get_inView() const", asMETHODPR(AnimatedModel, IsInView, () const, bool), asCALL_THISCALL);
-    // bool Drawable::IsInView(Camera* camera) const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "bool IsInView(Camera@+) const", asMETHODPR(AnimatedModel, IsInView, (Camera*) const, bool), asCALL_THISCALL);
-    // bool Drawable::IsInView(const FrameInfo& frame, bool anyCamera=false) const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "bool IsInView(const FrameInfo&in, bool = false) const", asMETHODPR(AnimatedModel, IsInView, (const FrameInfo&, bool) const, bool), asCALL_THISCALL);
-    // bool AnimatedModel::IsMaster() const | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "bool IsMaster() const", asMETHODPR(AnimatedModel, IsMaster, () const, bool), asCALL_THISCALL);
-    // bool Drawable::IsOccludee() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "bool IsOccludee() const", asMETHODPR(AnimatedModel, IsOccludee, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "bool get_occludee() const", asMETHODPR(AnimatedModel, IsOccludee, () const, bool), asCALL_THISCALL);
-    // bool Drawable::IsOccluder() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "bool IsOccluder() const", asMETHODPR(AnimatedModel, IsOccluder, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "bool get_occluder() const", asMETHODPR(AnimatedModel, IsOccluder, () const, bool), asCALL_THISCALL);
-    // bool Component::IsReplicated() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("AnimatedModel", "bool IsReplicated() const", asMETHODPR(AnimatedModel, IsReplicated, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "bool get_replicated() const", asMETHODPR(AnimatedModel, IsReplicated, () const, bool), asCALL_THISCALL);
-    // bool Serializable::IsTemporary() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("AnimatedModel", "bool IsTemporary() const", asMETHODPR(AnimatedModel, IsTemporary, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "bool get_temporary() const", asMETHODPR(AnimatedModel, IsTemporary, () const, bool), asCALL_THISCALL);
-    // bool Drawable::IsZoneDirty() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "bool IsZoneDirty() const", asMETHODPR(AnimatedModel, IsZoneDirty, () const, bool), asCALL_THISCALL);
-    // void Drawable::LimitLights() | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void LimitLights()", asMETHODPR(AnimatedModel, LimitLights, (), void), asCALL_THISCALL);
-    // void Drawable::LimitVertexLights(bool removeConvertedLights) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void LimitVertexLights(bool)", asMETHODPR(AnimatedModel, LimitVertexLights, (bool), void), asCALL_THISCALL);
-    // bool AnimatedModel::Load(Deserializer& source) override | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "bool Load(Deserializer&)", asMETHODPR(AnimatedModel, Load, (Deserializer&), bool), asCALL_THISCALL);
-    // bool AnimatedModel::LoadJSON(const JSONValue& source) override | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "bool LoadJSON(const JSONValue&in)", asMETHODPR(AnimatedModel, LoadJSON, (const JSONValue&), bool), asCALL_THISCALL);
-    // bool AnimatedModel::LoadXML(const XMLElement& source) override | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "bool LoadXML(const XMLElement&in)", asMETHODPR(AnimatedModel, LoadXML, (const XMLElement&), bool), asCALL_THISCALL);
-    // void Drawable::MarkForUpdate() | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void MarkForUpdate()", asMETHODPR(AnimatedModel, MarkForUpdate, (), void), asCALL_THISCALL);
-    // void Drawable::MarkInView(const FrameInfo& frame) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void MarkInView(const FrameInfo&in)", asMETHODPR(AnimatedModel, MarkInView, (const FrameInfo&), void), asCALL_THISCALL);
-    // void Drawable::MarkInView(unsigned frameNumber) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void MarkInView(uint)", asMETHODPR(AnimatedModel, MarkInView, (unsigned), void), asCALL_THISCALL);
-    // void Component::MarkNetworkUpdate() override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("AnimatedModel", "void MarkNetworkUpdate()", asMETHODPR(AnimatedModel, MarkNetworkUpdate, (), void), asCALL_THISCALL);
-    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("AnimatedModel", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(AnimatedModel, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
-    // virtual void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void OnGetAttribute(const AttributeInfo&in, Variant&) const", asMETHODPR(AnimatedModel, OnGetAttribute, (const AttributeInfo&, Variant&) const, void), asCALL_THISCALL);
-    // virtual void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void OnSetAttribute(const AttributeInfo&in, const Variant&in)", asMETHODPR(AnimatedModel, OnSetAttribute, (const AttributeInfo&, const Variant&), void), asCALL_THISCALL);
-    // void Drawable::OnSetEnabled() override | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void OnSetEnabled()", asMETHODPR(AnimatedModel, OnSetEnabled, (), void), asCALL_THISCALL);
-    // void Component::PrepareNetworkUpdate() | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("AnimatedModel", "void PrepareNetworkUpdate()", asMETHODPR(AnimatedModel, PrepareNetworkUpdate, (), void), asCALL_THISCALL);
-    // void AnimatedModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results) override | File: ../Graphics/AnimatedModel.h
-    // Error: type "RayOctreeQuery" can not automatically bind bacause have @nobind mark
-    // bool Serializable::ReadDeltaUpdate(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("AnimatedModel", "bool ReadDeltaUpdate(Deserializer&)", asMETHODPR(AnimatedModel, ReadDeltaUpdate, (Deserializer&), bool), asCALL_THISCALL);
-    // bool Serializable::ReadLatestDataUpdate(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("AnimatedModel", "bool ReadLatestDataUpdate(Deserializer&)", asMETHODPR(AnimatedModel, ReadLatestDataUpdate, (Deserializer&), bool), asCALL_THISCALL);
-    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
-    // Error: type "RefCount*" can not automatically bind
-    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("AnimatedModel", "int Refs() const", asMETHODPR(AnimatedModel, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "int get_refs() const", asMETHODPR(AnimatedModel, Refs, () const, int), asCALL_THISCALL);
-    // static void AnimatedModel::RegisterObject(Context* context) | File: ../Graphics/AnimatedModel.h
-    // Context can be used as firs parameter of constructors only
-    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("AnimatedModel", asBEHAVE_RELEASE, "void f()", asMETHODPR(AnimatedModel, ReleaseRef, (), void), asCALL_THISCALL);
-    // void Component::Remove() | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("AnimatedModel", "void Remove()", asMETHODPR(AnimatedModel, Remove, (), void), asCALL_THISCALL);
-    // void AnimatedModel::RemoveAllAnimationStates() | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "void RemoveAllAnimationStates()", asMETHODPR(AnimatedModel, RemoveAllAnimationStates, (), void), asCALL_THISCALL);
-    // void AnimatedModel::RemoveAnimationState(Animation* animation) | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "void RemoveAnimationState(Animation@+)", asMETHODPR(AnimatedModel, RemoveAnimationState, (Animation*), void), asCALL_THISCALL);
-    // void AnimatedModel::RemoveAnimationState(const String& animationName) | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "void RemoveAnimationState(const String&in)", asMETHODPR(AnimatedModel, RemoveAnimationState, (const String&), void), asCALL_THISCALL);
-    // void AnimatedModel::RemoveAnimationState(StringHash animationNameHash) | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "void RemoveAnimationState(StringHash)", asMETHODPR(AnimatedModel, RemoveAnimationState, (StringHash), void), asCALL_THISCALL);
-    // void AnimatedModel::RemoveAnimationState(AnimationState* state) | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "void RemoveAnimationState(AnimationState@+)", asMETHODPR(AnimatedModel, RemoveAnimationState, (AnimationState*), void), asCALL_THISCALL);
-    // void AnimatedModel::RemoveAnimationState(unsigned index) | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "void RemoveAnimationState(uint)", asMETHODPR(AnimatedModel, RemoveAnimationState, (unsigned), void), asCALL_THISCALL);
-    // void Animatable::RemoveAttributeAnimation(const String& name) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void RemoveAttributeAnimation(const String&in)", asMETHODPR(AnimatedModel, RemoveAttributeAnimation, (const String&), void), asCALL_THISCALL);
-    // void Serializable::RemoveInstanceDefault() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void RemoveInstanceDefault()", asMETHODPR(AnimatedModel, RemoveInstanceDefault, (), void), asCALL_THISCALL);
-    // void Animatable::RemoveObjectAnimation() | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void RemoveObjectAnimation()", asMETHODPR(AnimatedModel, RemoveObjectAnimation, (), void), asCALL_THISCALL);
-    // void AnimatedModel::ResetMorphWeights() | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "void ResetMorphWeights()", asMETHODPR(AnimatedModel, ResetMorphWeights, (), void), asCALL_THISCALL);
-    // void Serializable::ResetToDefault() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void ResetToDefault()", asMETHODPR(AnimatedModel, ResetToDefault, (), void), asCALL_THISCALL);
-    // bool Component::Save(Serializer& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("AnimatedModel", "bool Save(Serializer&) const", asMETHODPR(AnimatedModel, Save, (Serializer&) const, bool), asCALL_THISCALL);
-    // virtual bool Serializable::SaveDefaultAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("AnimatedModel", "bool SaveDefaultAttributes() const", asMETHODPR(AnimatedModel, SaveDefaultAttributes, () const, bool), asCALL_THISCALL);
-    // bool Component::SaveJSON(JSONValue& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("AnimatedModel", "bool SaveJSON(JSONValue&) const", asMETHODPR(AnimatedModel, SaveJSON, (JSONValue&) const, bool), asCALL_THISCALL);
-    // bool Component::SaveXML(XMLElement& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("AnimatedModel", "bool SaveXML(XMLElement&) const", asMETHODPR(AnimatedModel, SaveXML, (XMLElement&) const, bool), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("AnimatedModel", "void SendEvent(StringHash)", asMETHODPR(AnimatedModel, SendEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("AnimatedModel", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(AnimatedModel, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
-    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
-    // Not registered because template
-    // void Animatable::SetAnimationEnabled(bool enable) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void SetAnimationEnabled(bool)", asMETHODPR(AnimatedModel, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "void set_animationEnabled(bool)", asMETHODPR(AnimatedModel, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
-    // void AnimatedModel::SetAnimationLodBias(float bias) | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "void SetAnimationLodBias(float)", asMETHODPR(AnimatedModel, SetAnimationLodBias, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "void set_animationLodBias(float)", asMETHODPR(AnimatedModel, SetAnimationLodBias, (float), void), asCALL_THISCALL);
-    // void AnimatedModel::SetAnimationStatesAttr(const VariantVector& value) | File: ../Graphics/AnimatedModel.h
-    // Error: type "const VariantVector&" can not automatically bind
-    // void Animatable::SetAnimationTime(float time) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void SetAnimationTime(float)", asMETHODPR(AnimatedModel, SetAnimationTime, (float), void), asCALL_THISCALL);
-    // bool Serializable::SetAttribute(unsigned index, const Variant& value) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("AnimatedModel", "bool SetAttribute(uint, const Variant&in)", asMETHODPR(AnimatedModel, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "bool set_attributes(uint, const Variant&in)", asMETHODPR(AnimatedModel, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
-    // bool Serializable::SetAttribute(const String& name, const Variant& value) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("AnimatedModel", "bool SetAttribute(const String&in, const Variant&in)", asMETHODPR(AnimatedModel, SetAttribute, (const String&, const Variant&), bool), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode=WM_LOOP, float speed=1.0f) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void SetAttributeAnimation(const String&in, ValueAnimation@+, WrapMode = WM_LOOP, float = 1.0f)", asMETHODPR(AnimatedModel, SetAttributeAnimation, (const String&, ValueAnimation*, WrapMode, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationSpeed(const String& name, float speed) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void SetAttributeAnimationSpeed(const String&in, float)", asMETHODPR(AnimatedModel, SetAttributeAnimationSpeed, (const String&, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationTime(const String& name, float time) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void SetAttributeAnimationTime(const String&in, float)", asMETHODPR(AnimatedModel, SetAttributeAnimationTime, (const String&, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationWrapMode(const String& name, WrapMode wrapMode) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void SetAttributeAnimationWrapMode(const String&in, WrapMode)", asMETHODPR(AnimatedModel, SetAttributeAnimationWrapMode, (const String&, WrapMode), void), asCALL_THISCALL);
-    // void Drawable::SetBasePass(unsigned batchIndex) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void SetBasePass(uint)", asMETHODPR(AnimatedModel, SetBasePass, (unsigned), void), asCALL_THISCALL);
-    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("AnimatedModel", "void SetBlockEvents(bool)", asMETHODPR(AnimatedModel, SetBlockEvents, (bool), void), asCALL_THISCALL);
-    // void AnimatedModel::SetBonesEnabledAttr(const VariantVector& value) | File: ../Graphics/AnimatedModel.h
-    // Error: type "const VariantVector&" can not automatically bind
-    // void Drawable::SetCastShadows(bool enable) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void SetCastShadows(bool)", asMETHODPR(AnimatedModel, SetCastShadows, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "void set_castShadows(bool)", asMETHODPR(AnimatedModel, SetCastShadows, (bool), void), asCALL_THISCALL);
-    // void Drawable::SetDrawDistance(float distance) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void SetDrawDistance(float)", asMETHODPR(AnimatedModel, SetDrawDistance, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "void set_drawDistance(float)", asMETHODPR(AnimatedModel, SetDrawDistance, (float), void), asCALL_THISCALL);
-    // void Component::SetEnabled(bool enable) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("AnimatedModel", "void SetEnabled(bool)", asMETHODPR(AnimatedModel, SetEnabled, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "void set_enabled(bool)", asMETHODPR(AnimatedModel, SetEnabled, (bool), void), asCALL_THISCALL);
-    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("AnimatedModel", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(AnimatedModel, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(AnimatedModel, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    // void Serializable::SetInstanceDefault(bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void SetInstanceDefault(bool)", asMETHODPR(AnimatedModel, SetInstanceDefault, (bool), void), asCALL_THISCALL);
-    // void Serializable::SetInterceptNetworkUpdate(const String& attributeName, bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void SetInterceptNetworkUpdate(const String&in, bool)", asMETHODPR(AnimatedModel, SetInterceptNetworkUpdate, (const String&, bool), void), asCALL_THISCALL);
-    // void Drawable::SetLightMask(unsigned mask) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void SetLightMask(uint)", asMETHODPR(AnimatedModel, SetLightMask, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "void set_lightMask(uint)", asMETHODPR(AnimatedModel, SetLightMask, (unsigned), void), asCALL_THISCALL);
-    // void Drawable::SetLodBias(float bias) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void SetLodBias(float)", asMETHODPR(AnimatedModel, SetLodBias, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "void set_lodBias(float)", asMETHODPR(AnimatedModel, SetLodBias, (float), void), asCALL_THISCALL);
-    // virtual void StaticModel::SetMaterial(Material* material) | File: ../Graphics/StaticModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "void SetMaterial(Material@+)", asMETHODPR(AnimatedModel, SetMaterial, (Material*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "void set_material(Material@+)", asMETHODPR(AnimatedModel, SetMaterial, (Material*), void), asCALL_THISCALL);
-    // virtual bool StaticModel::SetMaterial(unsigned index, Material* material) | File: ../Graphics/StaticModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "bool SetMaterial(uint, Material@+)", asMETHODPR(AnimatedModel, SetMaterial, (unsigned, Material*), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "bool set_materials(uint, Material@+)", asMETHODPR(AnimatedModel, SetMaterial, (unsigned, Material*), bool), asCALL_THISCALL);
-    // void StaticModel::SetMaterialsAttr(const ResourceRefList& value) | File: ../Graphics/StaticModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "void SetMaterialsAttr(const ResourceRefList&in)", asMETHODPR(AnimatedModel, SetMaterialsAttr, (const ResourceRefList&), void), asCALL_THISCALL);
-    // void Drawable::SetMaxLights(unsigned num) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void SetMaxLights(uint)", asMETHODPR(AnimatedModel, SetMaxLights, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "void set_maxLights(uint)", asMETHODPR(AnimatedModel, SetMaxLights, (unsigned), void), asCALL_THISCALL);
-    // void Drawable::SetMinMaxZ(float minZ, float maxZ) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void SetMinMaxZ(float, float)", asMETHODPR(AnimatedModel, SetMinMaxZ, (float, float), void), asCALL_THISCALL);
-    // void AnimatedModel::SetModel(Model* model, bool createBones=true) | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "void SetModel(Model@+, bool = true)", asMETHODPR(AnimatedModel, SetModel, (Model*, bool), void), asCALL_THISCALL);
-    // void AnimatedModel::SetModelAttr(const ResourceRef& value) | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "void SetModelAttr(const ResourceRef&in)", asMETHODPR(AnimatedModel, SetModelAttr, (const ResourceRef&), void), asCALL_THISCALL);
-    // void AnimatedModel::SetMorphsAttr(const PODVector<unsigned char>& value) | File: ../Graphics/AnimatedModel.h
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
-    // void AnimatedModel::SetMorphWeight(unsigned index, float weight) | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "void SetMorphWeight(uint, float)", asMETHODPR(AnimatedModel, SetMorphWeight, (unsigned, float), void), asCALL_THISCALL);
-    // void AnimatedModel::SetMorphWeight(const String& name, float weight) | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "void SetMorphWeight(const String&in, float)", asMETHODPR(AnimatedModel, SetMorphWeight, (const String&, float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "void set_morphWeights(const String&in, float)", asMETHODPR(AnimatedModel, SetMorphWeight, (const String&, float), void), asCALL_THISCALL);
-    // void AnimatedModel::SetMorphWeight(StringHash nameHash, float weight) | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "void SetMorphWeight(StringHash, float)", asMETHODPR(AnimatedModel, SetMorphWeight, (StringHash, float), void), asCALL_THISCALL);
-    // void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void SetObjectAnimation(ObjectAnimation@+)", asMETHODPR(AnimatedModel, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "void set_objectAnimation(ObjectAnimation@+)", asMETHODPR(AnimatedModel, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
-    // void Animatable::SetObjectAnimationAttr(const ResourceRef& value) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void SetObjectAnimationAttr(const ResourceRef&in)", asMETHODPR(AnimatedModel, SetObjectAnimationAttr, (const ResourceRef&), void), asCALL_THISCALL);
-    // void Drawable::SetOccludee(bool enable) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void SetOccludee(bool)", asMETHODPR(AnimatedModel, SetOccludee, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "void set_occludee(bool)", asMETHODPR(AnimatedModel, SetOccludee, (bool), void), asCALL_THISCALL);
-    // void Drawable::SetOccluder(bool enable) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void SetOccluder(bool)", asMETHODPR(AnimatedModel, SetOccluder, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "void set_occluder(bool)", asMETHODPR(AnimatedModel, SetOccluder, (bool), void), asCALL_THISCALL);
-    // void StaticModel::SetOcclusionLodLevel(unsigned level) | File: ../Graphics/StaticModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "void SetOcclusionLodLevel(uint)", asMETHODPR(AnimatedModel, SetOcclusionLodLevel, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "void set_occlusionLodLevel(uint)", asMETHODPR(AnimatedModel, SetOcclusionLodLevel, (unsigned), void), asCALL_THISCALL);
-    // void Drawable::SetShadowDistance(float distance) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void SetShadowDistance(float)", asMETHODPR(AnimatedModel, SetShadowDistance, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "void set_shadowDistance(float)", asMETHODPR(AnimatedModel, SetShadowDistance, (float), void), asCALL_THISCALL);
-    // void Drawable::SetShadowMask(unsigned mask) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void SetShadowMask(uint)", asMETHODPR(AnimatedModel, SetShadowMask, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "void set_shadowMask(uint)", asMETHODPR(AnimatedModel, SetShadowMask, (unsigned), void), asCALL_THISCALL);
-    // void Drawable::SetSortValue(float value) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void SetSortValue(float)", asMETHODPR(AnimatedModel, SetSortValue, (float), void), asCALL_THISCALL);
-    // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void SetTemporary(bool)", asMETHODPR(AnimatedModel, SetTemporary, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "void set_temporary(bool)", asMETHODPR(AnimatedModel, SetTemporary, (bool), void), asCALL_THISCALL);
-    // void AnimatedModel::SetUpdateInvisible(bool enable) | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "void SetUpdateInvisible(bool)", asMETHODPR(AnimatedModel, SetUpdateInvisible, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "void set_updateInvisible(bool)", asMETHODPR(AnimatedModel, SetUpdateInvisible, (bool), void), asCALL_THISCALL);
-    // void Drawable::SetViewMask(unsigned mask) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void SetViewMask(uint)", asMETHODPR(AnimatedModel, SetViewMask, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "void set_viewMask(uint)", asMETHODPR(AnimatedModel, SetViewMask, (unsigned), void), asCALL_THISCALL);
-    // void Drawable::SetZone(Zone* zone, bool temporary=false) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void SetZone(Zone@+, bool = false)", asMETHODPR(AnimatedModel, SetZone, (Zone*, bool), void), asCALL_THISCALL);
-    // void Drawable::SetZoneMask(unsigned mask) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void SetZoneMask(uint)", asMETHODPR(AnimatedModel, SetZoneMask, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "void set_zoneMask(uint)", asMETHODPR(AnimatedModel, SetZoneMask, (unsigned), void), asCALL_THISCALL);
-    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
-    engine->RegisterObjectMethod("AnimatedModel", "void UnsubscribeFromAllEvents()", asMETHODPR(AnimatedModel, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("AnimatedModel", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(AnimatedModel_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
-    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("AnimatedModel", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(AnimatedModel, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("AnimatedModel", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(AnimatedModel, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("AnimatedModel", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(AnimatedModel, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
-    // void AnimatedModel::Update(const FrameInfo& frame) override | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "void Update(const FrameInfo&in)", asMETHODPR(AnimatedModel, Update, (const FrameInfo&), void), asCALL_THISCALL);
-    // void AnimatedModel::UpdateBatches(const FrameInfo& frame) override | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "void UpdateBatches(const FrameInfo&in)", asMETHODPR(AnimatedModel, UpdateBatches, (const FrameInfo&), void), asCALL_THISCALL);
-    // void AnimatedModel::UpdateBoneBoundingBox() | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "void UpdateBoneBoundingBox()", asMETHODPR(AnimatedModel, UpdateBoneBoundingBox, (), void), asCALL_THISCALL);
-    // void AnimatedModel::UpdateGeometry(const FrameInfo& frame) override | File: ../Graphics/AnimatedModel.h
-    engine->RegisterObjectMethod("AnimatedModel", "void UpdateGeometry(const FrameInfo&in)", asMETHODPR(AnimatedModel, UpdateGeometry, (const FrameInfo&), void), asCALL_THISCALL);
-    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("AnimatedModel", "int WeakRefs() const", asMETHODPR(AnimatedModel, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "int get_weakRefs() const", asMETHODPR(AnimatedModel, WeakRefs, () const, int), asCALL_THISCALL);
-    // void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attributeBits, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void WriteDeltaUpdate(Serializer&, const DirtyBits&in, uint8)", asMETHODPR(AnimatedModel, WriteDeltaUpdate, (Serializer&, const DirtyBits&, unsigned char), void), asCALL_THISCALL);
-    // void Serializable::WriteInitialDeltaUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void WriteInitialDeltaUpdate(Serializer&, uint8)", asMETHODPR(AnimatedModel, WriteInitialDeltaUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
-    // void Serializable::WriteLatestDataUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("AnimatedModel", "void WriteLatestDataUpdate(Serializer&, uint8)", asMETHODPR(AnimatedModel, WriteLatestDataUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
-#ifdef REGISTER_MANUAL_PART_StaticModel
-    REGISTER_MANUAL_PART_StaticModel(AnimatedModel, "AnimatedModel")
-#endif
-#ifdef REGISTER_MANUAL_PART_Drawable
-    REGISTER_MANUAL_PART_Drawable(AnimatedModel, "AnimatedModel")
-#endif
-#ifdef REGISTER_MANUAL_PART_Component
-    REGISTER_MANUAL_PART_Component(AnimatedModel, "AnimatedModel")
-#endif
-#ifdef REGISTER_MANUAL_PART_Animatable
-    REGISTER_MANUAL_PART_Animatable(AnimatedModel, "AnimatedModel")
-#endif
-#ifdef REGISTER_MANUAL_PART_Serializable
-    REGISTER_MANUAL_PART_Serializable(AnimatedModel, "AnimatedModel")
-#endif
-#ifdef REGISTER_MANUAL_PART_Object
-    REGISTER_MANUAL_PART_Object(AnimatedModel, "AnimatedModel")
-#endif
-#ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(AnimatedModel, "AnimatedModel")
-#endif
-#ifdef REGISTER_MANUAL_PART_AnimatedModel
-    REGISTER_MANUAL_PART_AnimatedModel(AnimatedModel, "AnimatedModel")
-#endif
-    RegisterSubclass<StaticModel, AnimatedModel>(engine, "StaticModel", "AnimatedModel");
-    RegisterSubclass<Drawable, AnimatedModel>(engine, "Drawable", "AnimatedModel");
-    RegisterSubclass<Component, AnimatedModel>(engine, "Component", "AnimatedModel");
-    RegisterSubclass<Animatable, AnimatedModel>(engine, "Animatable", "AnimatedModel");
-    RegisterSubclass<Serializable, AnimatedModel>(engine, "Serializable", "AnimatedModel");
-    RegisterSubclass<Object, AnimatedModel>(engine, "Object", "AnimatedModel");
-    RegisterSubclass<RefCounted, AnimatedModel>(engine, "RefCounted", "AnimatedModel");
-
-    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("AttributeAccessor", asBEHAVE_ADDREF, "void f()", asMETHODPR(AttributeAccessor, AddRef, (), void), asCALL_THISCALL);
-    // virtual void AttributeAccessor::Get(const Serializable* ptr, Variant& dest) const =0 | File: ../Core/Attribute.h
-    engine->RegisterObjectMethod("AttributeAccessor", "void Get(Serializable@+, Variant&) const", asMETHODPR(AttributeAccessor, Get, (const Serializable*, Variant&) const, void), asCALL_THISCALL);
-    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
-    // Error: type "RefCount*" can not automatically bind
-    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("AttributeAccessor", "int Refs() const", asMETHODPR(AttributeAccessor, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AttributeAccessor", "int get_refs() const", asMETHODPR(AttributeAccessor, Refs, () const, int), asCALL_THISCALL);
-    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("AttributeAccessor", asBEHAVE_RELEASE, "void f()", asMETHODPR(AttributeAccessor, ReleaseRef, (), void), asCALL_THISCALL);
-    // virtual void AttributeAccessor::Set(Serializable* ptr, const Variant& src)=0 | File: ../Core/Attribute.h
-    engine->RegisterObjectMethod("AttributeAccessor", "void Set(Serializable@+, const Variant&in)", asMETHODPR(AttributeAccessor, Set, (Serializable*, const Variant&), void), asCALL_THISCALL);
-    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("AttributeAccessor", "int WeakRefs() const", asMETHODPR(AttributeAccessor, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AttributeAccessor", "int get_weakRefs() const", asMETHODPR(AttributeAccessor, WeakRefs, () const, int), asCALL_THISCALL);
-#ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(AttributeAccessor, "AttributeAccessor")
-#endif
-#ifdef REGISTER_MANUAL_PART_AttributeAccessor
-    REGISTER_MANUAL_PART_AttributeAccessor(AttributeAccessor, "AttributeAccessor")
-#endif
-    RegisterSubclass<RefCounted, AttributeAccessor>(engine, "RefCounted", "AttributeAccessor");
-
 #ifdef URHO3D_URHO2D
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("AnimationSet2D", asBEHAVE_ADDREF, "void f()", asMETHODPR(AnimationSet2D, AddRef, (), void), asCALL_THISCALL);
@@ -2851,6 +2711,122 @@ void ASRegisterGenerated_Members_A(asIScriptEngine* engine)
 #endif
     RegisterSubclass<RefCounted, AnimationState>(engine, "RefCounted", "AnimationState");
 
+    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("Application", asBEHAVE_ADDREF, "void f()", asMETHODPR(Application, AddRef, (), void), asCALL_THISCALL);
+    // explicit Application::Application(Context* context) | File: ../Engine/Application.h
+    engine->RegisterObjectBehaviour("Application", asBEHAVE_FACTORY, "Application@+ f()", asFUNCTION(Application_Application_Context), asCALL_CDECL);
+    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
+    // Not registered because template
+    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
+    // Not registered because template
+    // void Application::ErrorExit(const String& message=String::EMPTY) | File: ../Engine/Application.h
+    engine->RegisterObjectMethod("Application", "void ErrorExit(const String&in = String::EMPTY)", asMETHODPR(Application, ErrorExit, (const String&), void), asCALL_THISCALL);
+    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Application", "bool GetBlockEvents() const", asMETHODPR(Application, GetBlockEvents, () const, bool), asCALL_THISCALL);
+    // const String& Object::GetCategory() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Application", "const String& GetCategory() const", asMETHODPR(Application, GetCategory, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Application", "const String& get_category() const", asMETHODPR(Application, GetCategory, () const, const String&), asCALL_THISCALL);
+    // Context* Object::GetContext() const | File: ../Core/Object.h
+    // Error: type "Context*" can not be returned
+    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Application", "VariantMap& GetEventDataMap() const", asMETHODPR(Application, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
+    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // Object* Object::GetEventSender() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Application", "Object@+ GetEventSender() const", asMETHODPR(Application, GetEventSender, () const, Object*), asCALL_THISCALL);
+    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Application", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(Application, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Application", "const Variant& get_globalVar(StringHash) const", asMETHODPR(Application, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Application", "const VariantMap& GetGlobalVars() const", asMETHODPR(Application, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Application", "const VariantMap& get_globalVars() const", asMETHODPR(Application, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Application", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Application, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
+    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // Not registered because template
+    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Application", "StringHash GetType() const", asMETHODPR(Application, GetType, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Application", "StringHash get_type() const", asMETHODPR(Application, GetType, () const, StringHash), asCALL_THISCALL);
+    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Application", "const String& GetTypeName() const", asMETHODPR(Application, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Application", "const String& get_typeName() const", asMETHODPR(Application, GetTypeName, () const, const String&), asCALL_THISCALL);
+    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Application", "bool HasEventHandlers() const", asMETHODPR(Application, HasEventHandlers, () const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Application", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(Application, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Application", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(Application, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Application", "bool IsInstanceOf(StringHash) const", asMETHODPR(Application, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
+    // Not registered because template
+    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Application", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(Application, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
+    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
+    // Error: type "RefCount*" can not automatically bind
+    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("Application", "int Refs() const", asMETHODPR(Application, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Application", "int get_refs() const", asMETHODPR(Application, Refs, () const, int), asCALL_THISCALL);
+    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("Application", asBEHAVE_RELEASE, "void f()", asMETHODPR(Application, ReleaseRef, (), void), asCALL_THISCALL);
+    // int Application::Run() | File: ../Engine/Application.h
+    engine->RegisterObjectMethod("Application", "int Run()", asMETHODPR(Application, Run, (), int), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Application", "void SendEvent(StringHash)", asMETHODPR(Application, SendEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Application", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(Application, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
+    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
+    // Not registered because template
+    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Application", "void SetBlockEvents(bool)", asMETHODPR(Application, SetBlockEvents, (bool), void), asCALL_THISCALL);
+    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Application", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(Application, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Application", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(Application, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    // virtual void Application::Setup() | File: ../Engine/Application.h
+    engine->RegisterObjectMethod("Application", "void Setup()", asMETHODPR(Application, Setup, (), void), asCALL_THISCALL);
+    // virtual void Application::Start() | File: ../Engine/Application.h
+    engine->RegisterObjectMethod("Application", "void Start()", asMETHODPR(Application, Start, (), void), asCALL_THISCALL);
+    // virtual void Application::Stop() | File: ../Engine/Application.h
+    engine->RegisterObjectMethod("Application", "void Stop()", asMETHODPR(Application, Stop, (), void), asCALL_THISCALL);
+    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Application", "void UnsubscribeFromAllEvents()", asMETHODPR(Application, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Application", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(Application_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
+    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Application", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(Application, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Application", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(Application, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Application", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(Application, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
+    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("Application", "int WeakRefs() const", asMETHODPR(Application, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Application", "int get_weakRefs() const", asMETHODPR(Application, WeakRefs, () const, int), asCALL_THISCALL);
+#ifdef REGISTER_MANUAL_PART_Object
+    REGISTER_MANUAL_PART_Object(Application, "Application")
+#endif
+#ifdef REGISTER_MANUAL_PART_RefCounted
+    REGISTER_MANUAL_PART_RefCounted(Application, "Application")
+#endif
+#ifdef REGISTER_MANUAL_PART_Application
+    REGISTER_MANUAL_PART_Application(Application, "Application")
+#endif
+    RegisterSubclass<Object, Application>(engine, "Object", "Application");
+    RegisterSubclass<RefCounted, Application>(engine, "RefCounted", "Application");
+
     // bool AreaAllocator::Allocate(int width, int height, int& x, int& y) | File: ../Math/AreaAllocator.h
     engine->RegisterObjectMethod("AreaAllocator", "bool Allocate(int, int, int&, int&)", asMETHODPR(AreaAllocator, Allocate, (int, int, int&, int&), bool), asCALL_THISCALL);
     // AreaAllocator::AreaAllocator(int width, int height, bool fastMode=true) | File: ../Math/AreaAllocator.h
@@ -2872,6 +2848,30 @@ void ASRegisterGenerated_Members_A(asIScriptEngine* engine)
 #ifdef REGISTER_MANUAL_PART_AreaAllocator
     REGISTER_MANUAL_PART_AreaAllocator(AreaAllocator, "AreaAllocator")
 #endif
+
+    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("AttributeAccessor", asBEHAVE_ADDREF, "void f()", asMETHODPR(AttributeAccessor, AddRef, (), void), asCALL_THISCALL);
+    // virtual void AttributeAccessor::Get(const Serializable* ptr, Variant& dest) const =0 | File: ../Core/Attribute.h
+    engine->RegisterObjectMethod("AttributeAccessor", "void Get(Serializable@+, Variant&) const", asMETHODPR(AttributeAccessor, Get, (const Serializable*, Variant&) const, void), asCALL_THISCALL);
+    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
+    // Error: type "RefCount*" can not automatically bind
+    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("AttributeAccessor", "int Refs() const", asMETHODPR(AttributeAccessor, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AttributeAccessor", "int get_refs() const", asMETHODPR(AttributeAccessor, Refs, () const, int), asCALL_THISCALL);
+    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("AttributeAccessor", asBEHAVE_RELEASE, "void f()", asMETHODPR(AttributeAccessor, ReleaseRef, (), void), asCALL_THISCALL);
+    // virtual void AttributeAccessor::Set(Serializable* ptr, const Variant& src)=0 | File: ../Core/Attribute.h
+    engine->RegisterObjectMethod("AttributeAccessor", "void Set(Serializable@+, const Variant&in)", asMETHODPR(AttributeAccessor, Set, (Serializable*, const Variant&), void), asCALL_THISCALL);
+    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("AttributeAccessor", "int WeakRefs() const", asMETHODPR(AttributeAccessor, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AttributeAccessor", "int get_weakRefs() const", asMETHODPR(AttributeAccessor, WeakRefs, () const, int), asCALL_THISCALL);
+#ifdef REGISTER_MANUAL_PART_RefCounted
+    REGISTER_MANUAL_PART_RefCounted(AttributeAccessor, "AttributeAccessor")
+#endif
+#ifdef REGISTER_MANUAL_PART_AttributeAccessor
+    REGISTER_MANUAL_PART_AttributeAccessor(AttributeAccessor, "AttributeAccessor")
+#endif
+    RegisterSubclass<RefCounted, AttributeAccessor>(engine, "RefCounted", "AttributeAccessor");
 
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("AttributeAnimationInfo", asBEHAVE_ADDREF, "void f()", asMETHODPR(AttributeAnimationInfo, AddRef, (), void), asCALL_THISCALL);
@@ -3105,22 +3105,14 @@ void ASRegisterGenerated_Members_A(asIScriptEngine* engine)
     REGISTER_MANUAL_PART_AllocatorBlock(AllocatorBlock, "AllocatorBlock")
 #endif
 
-    // Bone* AnimationStateTrack::bone_ | File: ../Graphics/AnimationState.h
-    // Bone* can not be registered
-    // unsigned AnimationStateTrack::keyFrame_ | File: ../Graphics/AnimationState.h
-    engine->RegisterObjectProperty("AnimationStateTrack", "uint keyFrame", offsetof(AnimationStateTrack, keyFrame_));
-    // WeakPtr<Node> AnimationStateTrack::node_ | File: ../Graphics/AnimationState.h
-    // Error: type "WeakPtr<Node>" can not automatically bind
-    // const AnimationTrack* AnimationStateTrack::track_ | File: ../Graphics/AnimationState.h
-    // const AnimationTrack* can not be registered
-    // float AnimationStateTrack::weight_ | File: ../Graphics/AnimationState.h
-    engine->RegisterObjectProperty("AnimationStateTrack", "float weight", offsetof(AnimationStateTrack, weight_));
-    // AnimationStateTrack::~AnimationStateTrack() | File: ../Graphics/AnimationState.h
-    engine->RegisterObjectBehaviour("AnimationStateTrack", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(AnimationStateTrack_Destructor_AnimationStateTrack_void), asCALL_CDECL_OBJFIRST);
-    // AnimationStateTrack& AnimationStateTrack::operator=(const AnimationStateTrack&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<AnimationStateTrack>(engine, "AnimationStateTrack");
-#ifdef REGISTER_MANUAL_PART_AnimationStateTrack
-    REGISTER_MANUAL_PART_AnimationStateTrack(AnimationStateTrack, "AnimationStateTrack")
+    // AllocatorNode* AllocatorNode::next_ | File: ../Container/Allocator.h
+    // AllocatorNode* can not be registered
+    // AllocatorNode::~AllocatorNode() | Implicitly-declared
+    engine->RegisterObjectBehaviour("AllocatorNode", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(AllocatorNode_Destructor), asCALL_CDECL_OBJFIRST);
+    // AllocatorNode& AllocatorNode::operator=(const AllocatorNode&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<AllocatorNode>(engine, "AllocatorNode");
+#ifdef REGISTER_MANUAL_PART_AllocatorNode
+    REGISTER_MANUAL_PART_AllocatorNode(AllocatorNode, "AllocatorNode")
 #endif
 
     // float AnimationControl::autoFadeTime_ | File: ../Graphics/AnimationController.h
@@ -3159,16 +3151,6 @@ void ASRegisterGenerated_Members_A(asIScriptEngine* engine)
     REGISTER_MANUAL_PART_AnimationControl(AnimationControl, "AnimationControl")
 #endif
 
-    // AllocatorNode* AllocatorNode::next_ | File: ../Container/Allocator.h
-    // AllocatorNode* can not be registered
-    // AllocatorNode::~AllocatorNode() | Implicitly-declared
-    engine->RegisterObjectBehaviour("AllocatorNode", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(AllocatorNode_Destructor), asCALL_CDECL_OBJFIRST);
-    // AllocatorNode& AllocatorNode::operator=(const AllocatorNode&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<AllocatorNode>(engine, "AllocatorNode");
-#ifdef REGISTER_MANUAL_PART_AllocatorNode
-    REGISTER_MANUAL_PART_AllocatorNode(AllocatorNode, "AllocatorNode")
-#endif
-
     // Vector3 AnimationKeyFrame::position_ | File: ../Graphics/Animation.h
     engine->RegisterObjectProperty("AnimationKeyFrame", "Vector3 position", offsetof(AnimationKeyFrame, position_));
     // Quaternion AnimationKeyFrame::rotation_ | File: ../Graphics/Animation.h
@@ -3183,6 +3165,24 @@ void ASRegisterGenerated_Members_A(asIScriptEngine* engine)
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<AnimationKeyFrame>(engine, "AnimationKeyFrame");
 #ifdef REGISTER_MANUAL_PART_AnimationKeyFrame
     REGISTER_MANUAL_PART_AnimationKeyFrame(AnimationKeyFrame, "AnimationKeyFrame")
+#endif
+
+    // Bone* AnimationStateTrack::bone_ | File: ../Graphics/AnimationState.h
+    // Bone* can not be registered
+    // unsigned AnimationStateTrack::keyFrame_ | File: ../Graphics/AnimationState.h
+    engine->RegisterObjectProperty("AnimationStateTrack", "uint keyFrame", offsetof(AnimationStateTrack, keyFrame_));
+    // WeakPtr<Node> AnimationStateTrack::node_ | File: ../Graphics/AnimationState.h
+    // Error: type "WeakPtr<Node>" can not automatically bind
+    // const AnimationTrack* AnimationStateTrack::track_ | File: ../Graphics/AnimationState.h
+    // const AnimationTrack* can not be registered
+    // float AnimationStateTrack::weight_ | File: ../Graphics/AnimationState.h
+    engine->RegisterObjectProperty("AnimationStateTrack", "float weight", offsetof(AnimationStateTrack, weight_));
+    // AnimationStateTrack::~AnimationStateTrack() | File: ../Graphics/AnimationState.h
+    engine->RegisterObjectBehaviour("AnimationStateTrack", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(AnimationStateTrack_Destructor_AnimationStateTrack_void), asCALL_CDECL_OBJFIRST);
+    // AnimationStateTrack& AnimationStateTrack::operator=(const AnimationStateTrack&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<AnimationStateTrack>(engine, "AnimationStateTrack");
+#ifdef REGISTER_MANUAL_PART_AnimationStateTrack
+    REGISTER_MANUAL_PART_AnimationStateTrack(AnimationStateTrack, "AnimationStateTrack")
 #endif
 
     // AnimationChannelFlags AnimationTrack::channelMask_ | File: ../Graphics/Animation.h
