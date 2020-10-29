@@ -477,7 +477,7 @@ void ASRegisterGenerated_Classes(asIScriptEngine* engine)
     // class Audio | File: ../Audio/Audio.h
     engine->RegisterObjectType("Audio", 0, asOBJ_REF);
     // class BackgroundLoader | File: ../Resource/BackgroundLoader.h
-    engine->RegisterObjectType("BackgroundLoader", 0, asOBJ_REF);
+    // Not registered because have @nobind mark
     // class AutoProfileBlock | File: ../Core/Profiler.h
     // Not registered because have @nobind mark
     // class BillboardSet | File: ../Graphics/BillboardSet.h
