@@ -62,12 +62,6 @@ static void BorderImage_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
 }
 
-// explicit BackgroundLoader::BackgroundLoader(ResourceCache* owner) | File: ../Resource/BackgroundLoader.h
-static BackgroundLoader* BackgroundLoader_BackgroundLoader_ResourceCache(ResourceCache *owner)
-{
-    return new BackgroundLoader(owner);
-}
-
 // explicit BillboardSet::BillboardSet(Context* context) | File: ../Graphics/BillboardSet.h
 static BillboardSet* BillboardSet_BillboardSet_Context()
 {
@@ -1077,59 +1071,6 @@ void ASRegisterGenerated_Members_B(asIScriptEngine* engine)
     RegisterSubclass<Serializable, BorderImage>(engine, "Serializable", "BorderImage");
     RegisterSubclass<Object, BorderImage>(engine, "Object", "BorderImage");
     RegisterSubclass<RefCounted, BorderImage>(engine, "RefCounted", "BorderImage");
-
-    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("BackgroundLoader", asBEHAVE_ADDREF, "void f()", asMETHODPR(BackgroundLoader, AddRef, (), void), asCALL_THISCALL);
-    // explicit BackgroundLoader::BackgroundLoader(ResourceCache* owner) | File: ../Resource/BackgroundLoader.h
-    engine->RegisterObjectBehaviour("BackgroundLoader", asBEHAVE_FACTORY, "BackgroundLoader@+ f(ResourceCache@+)", asFUNCTION(BackgroundLoader_BackgroundLoader_ResourceCache), asCALL_CDECL);
-    // void BackgroundLoader::FinishResources(int maxMs) | File: ../Resource/BackgroundLoader.h
-    engine->RegisterObjectMethod("BackgroundLoader", "void FinishResources(int)", asMETHODPR(BackgroundLoader, FinishResources, (int), void), asCALL_THISCALL);
-    // static ThreadID Thread::GetCurrentThreadID() | File: ../Core/Thread.h
-    // Not registered because have @nobind mark
-    // unsigned BackgroundLoader::GetNumQueuedResources() const | File: ../Resource/BackgroundLoader.h
-    engine->RegisterObjectMethod("BackgroundLoader", "uint GetNumQueuedResources() const", asMETHODPR(BackgroundLoader, GetNumQueuedResources, () const, unsigned), asCALL_THISCALL);
-    // static bool Thread::IsMainThread() | File: ../Core/Thread.h
-    engine->SetDefaultNamespace("BackgroundLoader");
-    engine->RegisterGlobalFunction("bool IsMainThread()", asFUNCTIONPR(BackgroundLoader::IsMainThread, (), bool), asCALL_CDECL);
-    engine->SetDefaultNamespace("");
-    // bool Thread::IsStarted() const | File: ../Core/Thread.h
-    engine->RegisterObjectMethod("BackgroundLoader", "bool IsStarted() const", asMETHODPR(BackgroundLoader, IsStarted, () const, bool), asCALL_THISCALL);
-    // bool BackgroundLoader::QueueResource(StringHash type, const String& name, bool sendEventOnFailure, Resource* caller) | File: ../Resource/BackgroundLoader.h
-    engine->RegisterObjectMethod("BackgroundLoader", "bool QueueResource(StringHash, const String&in, bool, Resource@+)", asMETHODPR(BackgroundLoader, QueueResource, (StringHash, const String&, bool, Resource*), bool), asCALL_THISCALL);
-    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
-    // Error: type "RefCount*" can not automatically bind
-    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("BackgroundLoader", "int Refs() const", asMETHODPR(BackgroundLoader, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BackgroundLoader", "int get_refs() const", asMETHODPR(BackgroundLoader, Refs, () const, int), asCALL_THISCALL);
-    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("BackgroundLoader", asBEHAVE_RELEASE, "void f()", asMETHODPR(BackgroundLoader, ReleaseRef, (), void), asCALL_THISCALL);
-    // bool Thread::Run() | File: ../Core/Thread.h
-    engine->RegisterObjectMethod("BackgroundLoader", "bool Run()", asMETHODPR(BackgroundLoader, Run, (), bool), asCALL_THISCALL);
-    // static void Thread::SetMainThread() | File: ../Core/Thread.h
-    engine->SetDefaultNamespace("BackgroundLoader");
-    engine->RegisterGlobalFunction("void SetMainThread()", asFUNCTIONPR(BackgroundLoader::SetMainThread, (), void), asCALL_CDECL);
-    engine->SetDefaultNamespace("");
-    // void Thread::SetPriority(int priority) | File: ../Core/Thread.h
-    engine->RegisterObjectMethod("BackgroundLoader", "void SetPriority(int)", asMETHODPR(BackgroundLoader, SetPriority, (int), void), asCALL_THISCALL);
-    // void Thread::Stop() | File: ../Core/Thread.h
-    engine->RegisterObjectMethod("BackgroundLoader", "void Stop()", asMETHODPR(BackgroundLoader, Stop, (), void), asCALL_THISCALL);
-    // void BackgroundLoader::ThreadFunction() override | File: ../Resource/BackgroundLoader.h
-    engine->RegisterObjectMethod("BackgroundLoader", "void ThreadFunction()", asMETHODPR(BackgroundLoader, ThreadFunction, (), void), asCALL_THISCALL);
-    // void BackgroundLoader::WaitForResource(StringHash type, StringHash nameHash) | File: ../Resource/BackgroundLoader.h
-    engine->RegisterObjectMethod("BackgroundLoader", "void WaitForResource(StringHash, StringHash)", asMETHODPR(BackgroundLoader, WaitForResource, (StringHash, StringHash), void), asCALL_THISCALL);
-    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("BackgroundLoader", "int WeakRefs() const", asMETHODPR(BackgroundLoader, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BackgroundLoader", "int get_weakRefs() const", asMETHODPR(BackgroundLoader, WeakRefs, () const, int), asCALL_THISCALL);
-#ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(BackgroundLoader, "BackgroundLoader")
-#endif
-#ifdef REGISTER_MANUAL_PART_Thread
-    REGISTER_MANUAL_PART_Thread(BackgroundLoader, "BackgroundLoader")
-#endif
-#ifdef REGISTER_MANUAL_PART_BackgroundLoader
-    REGISTER_MANUAL_PART_BackgroundLoader(BackgroundLoader, "BackgroundLoader")
-#endif
-    RegisterSubclass<RefCounted, BackgroundLoader>(engine, "RefCounted", "BackgroundLoader");
 
     // void Drawable::AddLight(Light* light) | File: ../Graphics/Drawable.h
     engine->RegisterObjectMethod("BillboardSet", "void AddLight(Light@+)", asMETHODPR(BillboardSet, AddLight, (Light*), void), asCALL_THISCALL);
