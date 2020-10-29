@@ -1,5 +1,8 @@
+// Modified by Yao Wei Tjong for Urho3D
+
 package org.libsdl.app;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
@@ -7,6 +10,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
+import android.os.Build;
 import android.util.Log;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -104,36 +108,8 @@ public class HIDDeviceManager {
     private HIDDeviceManager(final Context context) {
         mContext = context;
 
-        // Make sure we have the HIDAPI library loaded with the native functions
-        try {
-            SDL.loadLibrary("hidapi");
-        } catch (Throwable e) {
-            Log.w(TAG, "Couldn't load hidapi: " + e.toString());
+        // Urho3D - HIDAPI is built-in inside our custom SDL library, so no need to load libhidapi.so
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            builder.setCancelable(false);
-            builder.setTitle("SDL HIDAPI Error");
-            builder.setMessage("Please report the following error to the SDL maintainers: " + e.getMessage());
-            builder.setNegativeButton("Quit", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    try {
-                        // If our context is an activity, exit rather than crashing when we can't
-                        // call our native functions.
-                        Activity activity = (Activity)context;
-        
-                        activity.finish();
-                    }
-                    catch (ClassCastException cce) {
-                        // Context wasn't an activity, there's nothing we can do.  Give up and return.
-                    }
-                }
-            });
-            builder.show();
-
-            return;
-        }
-        
         HIDDeviceRegisterCallback();
 
         mSharedPreferences = mContext.getSharedPreferences("hidapi", Context.MODE_PRIVATE);
@@ -150,7 +126,11 @@ public class HIDDeviceManager {
         }
 
         initializeUSB();
-        initializeBluetooth();
+
+        // Urho3D - check first if Bluetooth is available
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            initializeBluetooth();
+        }
     }
 
     public Context getContext() {
@@ -365,6 +345,8 @@ public class HIDDeviceManager {
         }
     }
 
+    // Urho3D - suppress lint error
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     private void initializeBluetooth() {
         Log.d(TAG, "Initializing Bluetooth");
 
@@ -427,6 +409,8 @@ public class HIDDeviceManager {
     // Chromebooks do not pass along ACTION_ACL_CONNECTED / ACTION_ACL_DISCONNECTED properly.
     // This function provides a sort of dummy version of that, watching for changes in the
     // connected devices and attempting to add controllers as things change.
+    // Urho3D - suppress lint error
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public void chromebookConnectionHandler() {
         if (!mIsChromebook) {
             return;
@@ -501,6 +485,8 @@ public class HIDDeviceManager {
         }
     }
 
+    // Urho3D - suppress lint error
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public boolean isSteamController(BluetoothDevice bluetoothDevice) {
         // Sanity check.  If you pass in a null device, by definition it is never a Steam Controller.
         if (bluetoothDevice == null) {

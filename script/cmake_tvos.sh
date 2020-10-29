@@ -21,6 +21,6 @@
 # THE SOFTWARE.
 #
 
-$(dirname $0)/cmake_generic.sh "$@" -G Xcode -DTVOS=1
+$(dirname $0)/cmake_generic.sh "$@" -G Xcode -D TVOS=1
 
 # vi: set ts=4 sw=4 expandtab:

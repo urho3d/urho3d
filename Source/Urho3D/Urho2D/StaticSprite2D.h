@@ -43,76 +43,104 @@ public:
     static void RegisterObject(Context* context);
 
     /// Set sprite.
+    /// @property
     void SetSprite(Sprite2D* sprite);
     /// Set draw rectangle.
+    /// @property
     void SetDrawRect(const Rect &rect);
     /// Set texture rectangle.
+    /// @property
     void SetTextureRect(const Rect &rect);
     /// Set blend mode.
+    /// @property
     void SetBlendMode(BlendMode blendMode);
     /// Set flip.
     void SetFlip(bool flipX, bool flipY, bool swapXY = false);
     /// Set flip X.
+    /// @property
     void SetFlipX(bool flipX);
     /// Set flip Y.
+    /// @property
     void SetFlipY(bool flipY);
     /// Set swap X and Y.
+    /// @property
     void SetSwapXY(bool swapXY);
     /// Set color.
+    /// @property
     void SetColor(const Color& color);
     /// Set alpha.
+    /// @property
     void SetAlpha(float alpha);
     /// Set whether to use custom-defined hot spot.
+    /// @property
     void SetUseHotSpot(bool useHotSpot);
     /// Set whether to use custom-defined draw rectangle.
+    /// @property
     void SetUseDrawRect(bool useDrawRect);
     /// Set whether to use custom-defined texture rectangle.
+    /// @property
     void SetUseTextureRect(bool useTextureRect);
     /// Set hot spot.
+    /// @property
     void SetHotSpot(const Vector2& hotspot);
     /// Set custom material.
+    /// @property
     void SetCustomMaterial(Material* customMaterial);
 
     /// Return sprite.
+    /// @property
     Sprite2D* GetSprite() const;
 
     /// Return draw rect.
+    /// @property
     const Rect& GetDrawRect() const { return drawRect_; }
 
     /// Return texture rect.
+    /// @property
     const Rect& GetTextureRect() const { return textureRect_; }
 
     /// Return blend mode.
+    /// @property
     BlendMode GetBlendMode() const { return blendMode_; }
 
     /// Return flip X.
+    /// @property
     bool GetFlipX() const { return flipX_; }
 
     /// Return flip Y.
+    /// @property
     bool GetFlipY() const { return flipY_; }
 
     /// Return swap X and Y.
+    /// @property
     bool GetSwapXY() const { return swapXY_; }
 
     /// Return color.
+    /// @property
     const Color& GetColor() const { return color_; }
 
     /// Return alpha.
+    /// @property
     float GetAlpha() const { return color_.a_; }
 
     /// Return whether to use custom-defined hot spot.
+    /// @property
     bool GetUseHotSpot() const { return useHotSpot_; }
 
     /// Return whether to use custom-defined draw rectangle.
+    /// @property
     bool GetUseDrawRect() const { return useDrawRect_; }
 
     /// Return whether to use custom-defined texture rectangle.
+    /// @property
     bool GetUseTextureRect() const { return useTextureRect_; }
 
     /// Return hot spot.
+    /// @property
     const Vector2& GetHotSpot() const { return hotSpot_; }
 
     /// Return custom material.
+    /// @property
     Material* GetCustomMaterial() const;
 
     /// Set sprite attribute.

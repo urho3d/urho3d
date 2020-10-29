@@ -24,9 +24,12 @@
  * SDL_x11vulkan.c.
  */
 
+// Modified by Yao Wei Tjong for Urho3D
+
 #include "../../SDL_internal.h"
 
-#if SDL_VIDEO_VULKAN && SDL_VIDEO_DRIVER_UIKIT
+// Urho3D - iOS/tvOS simulator does not have Metal support
+#if SDL_VIDEO_VULKAN && SDL_VIDEO_DRIVER_UIKIT && !defined(TARGET_IPHONE_SIMULATOR)
 
 #include "SDL_uikitvideo.h"
 #include "SDL_uikitwindow.h"

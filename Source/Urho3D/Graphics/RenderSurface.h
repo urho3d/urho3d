@@ -44,14 +44,19 @@ public:
     ~RenderSurface() override;
 
     /// Set number of viewports.
+    /// @property
     void SetNumViewports(unsigned num);
     /// Set viewport.
+    /// @property{set_viewports}
     void SetViewport(unsigned index, Viewport* viewport);
     /// Set viewport update mode. Default is to update when visible.
+    /// @property
     void SetUpdateMode(RenderSurfaceUpdateMode mode);
     /// Set linked color rendertarget.
+    /// @property
     void SetLinkedRenderTarget(RenderSurface* renderTarget);
     /// Set linked depth-stencil surface.
+    /// @property
     void SetLinkedDepthStencil(RenderSurface* depthStencil);
     /// Queue manual update of the viewport(s).
     void QueueUpdate();
@@ -63,12 +68,15 @@ public:
     bool CreateRenderBuffer(unsigned width, unsigned height, unsigned format, int multiSample);
 
     /// Return width.
+    /// @property
     int GetWidth() const;
 
     /// Return height.
+    /// @property
     int GetHeight() const;
 
     /// Return usage.
+    /// @property
     TextureUsage GetUsage() const;
 
     /// Return multisampling level.
@@ -78,18 +86,23 @@ public:
     bool GetAutoResolve() const;
 
     /// Return number of viewports.
+    /// @property
     unsigned GetNumViewports() const { return viewports_.Size(); }
 
     /// Return viewport by index.
+    /// @property{get_viewports}
     Viewport* GetViewport(unsigned index) const;
 
     /// Return viewport update mode.
+    /// @property
     RenderSurfaceUpdateMode GetUpdateMode() const { return updateMode_; }
 
     /// Return linked color rendertarget.
+    /// @property
     RenderSurface* GetLinkedRenderTarget() const { return linkedRenderTarget_; }
 
     /// Return linked depth-stencil surface.
+    /// @property
     RenderSurface* GetLinkedDepthStencil() const { return linkedDepthStencil_; }
 
     /// Return whether manual update queued. Called internally.
@@ -99,6 +112,7 @@ public:
     void ResetUpdateQueued();
 
     /// Return parent texture.
+    /// @property
     Texture* GetParentTexture() const { return parentTexture_; }
 
     /// Return Direct3D9 surface.
@@ -117,6 +131,7 @@ public:
     unsigned GetRenderBuffer() const { return renderBuffer_; }
 
     /// Return whether multisampled rendertarget needs resolve.
+    /// @property
     bool IsResolveDirty() const { return resolveDirty_; }
 
     /// Set or clear the need resolve flag. Called internally by Graphics.
@@ -126,21 +141,28 @@ private:
     /// Parent texture.
     Texture* parentTexture_;
 
+    // https://github.com/doxygen/doxygen/issues/7623
     union
     {
         /// Direct3D9 surface.
+        /// @nobind
         void* surface_;
         /// Direct3D11 rendertarget or depth-stencil view.
+        /// @nobind
         void* renderTargetView_;
         /// OpenGL renderbuffer name.
+        /// @nobind
         unsigned renderBuffer_;
     };
 
+    // https://github.com/doxygen/doxygen/issues/7623
     union
     {
         /// Direct3D11 read-only depth-stencil view. Present only on depth-stencil surfaces.
+        /// @nobind
         void* readOnlyView_;
         /// OpenGL target.
+        /// @nobind
         unsigned target_;
     };
 

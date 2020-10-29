@@ -23,8 +23,6 @@
 # Define target name
 set (TARGET_NAME Urho3D)
 
-setup_lint ()
-
 # Prevent ICE from old MinGW versions, workaround from the GCC bugzilla https://gcc.gnu.org/bugzilla/show_bug.cgi?id=61189
 if (MINGW AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.9.1 AND NOT URHO3D_64BIT)
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mpreferred-stack-boundary=2")
@@ -156,9 +154,185 @@ endif ()
 string (REPLACE ";" "/[^;]+;" EXCLUDE_PATTERNS "${EXCLUDED_SOURCE_DIRS};")
 define_source_files (EXCLUDE_PATTERNS ${EXCLUDE_PATTERNS} GLOB_CPP_PATTERNS *.cpp ${GLOB_OBJC_PATTERN} RECURSE GROUP)
 
+if (URHO3D_GENERATEBINDINGS)
+    set (SOURCE_FILES_WITHOUT_GENERATED "${SOURCE_FILES}")
+    list(REMOVE_ITEM SOURCE_FILES_WITHOUT_GENERATED "AngelScript/Generated_Enums.cpp"
+                                                    "AngelScript/Generated_Classes.cpp"
+                                                    "AngelScript/Generated_Members_HighPriority.cpp"
+                                                    "AngelScript/Generated_Members_A.cpp"
+                                                    "AngelScript/Generated_Members_B.cpp"
+                                                    "AngelScript/Generated_Members_Constraint.cpp"
+                                                    "AngelScript/Generated_Members_Ca_Cm.cpp"
+                                                    "AngelScript/Generated_Members_Cn_Cz.cpp"
+                                                    "AngelScript/Generated_Members_D.cpp"
+                                                    "AngelScript/Generated_Members_E.cpp"
+                                                    "AngelScript/Generated_Members_F.cpp"
+                                                    "AngelScript/Generated_Members_G.cpp"
+                                                    "AngelScript/Generated_Members_H.cpp"
+                                                    "AngelScript/Generated_Members_I.cpp"
+                                                    "AngelScript/Generated_Members_J.cpp"
+                                                    "AngelScript/Generated_Members_K.cpp"
+                                                    "AngelScript/Generated_Members_L.cpp"
+                                                    "AngelScript/Generated_Members_M.cpp"
+                                                    "AngelScript/Generated_Members_N.cpp"
+                                                    "AngelScript/Generated_Members_O.cpp"
+                                                    "AngelScript/Generated_Members_P.cpp"
+                                                    "AngelScript/Generated_Members_Q.cpp"
+                                                    "AngelScript/Generated_Members_R.cpp"
+                                                    "AngelScript/Generated_Members_Sa_Sm.cpp"
+                                                    "AngelScript/Generated_Members_Sn_Sz.cpp"
+                                                    "AngelScript/Generated_Members_T.cpp"
+                                                    "AngelScript/Generated_Members_U.cpp"
+                                                    "AngelScript/Generated_Members_V.cpp"
+                                                    "AngelScript/Generated_Members_W.cpp"
+                                                    "AngelScript/Generated_Members_X.cpp"
+                                                    "AngelScript/Generated_Members_Y.cpp"
+                                                    "AngelScript/Generated_Members_X.cpp"
+                                                    "AngelScript/Generated_Members_Other.cpp"
+                                                    "AngelScript/Generated_GlobalVariables.cpp"
+                                                    "AngelScript/Generated_GlobalFunctions.cpp"
+                                                    "AngelScript/Generated_Templates.h")
+
+    find_package (Doxygen REQUIRED)
+    
+    if (NOT DOXYGEN_FOUND)
+        message (FATAL_ERROR Doxygen required to generate bindings)
+    endif ()
+    
+    # Generating Doxyfile
+    configure_file (${CMAKE_SOURCE_DIR}/Source/Tools/BindingGenerator/Doxyfile.in ${CMAKE_BINARY_DIR}/Source/Tools/BindingGenerator/generated/Doxyfile)
+
+    
+    set (XML_AST_DIR ${CMAKE_BINARY_DIR}/Source/Tools/BindingGenerator/generated/xml)
+    
+    # Generate xmls and run BindingGenerator
+    add_custom_command (OUTPUT ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Enums.cpp
+                               ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Classes.cpp
+                               ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_HighPriority.cpp
+                               ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_A.cpp
+                               ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_B.cpp
+                               ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Constraint.cpp
+                               ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Ca_Cm.cpp
+                               ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Cn_Cz.cpp
+                               ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_D.cpp
+                               ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_E.cpp
+                               ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_F.cpp
+                               ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_G.cpp
+                               ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_H.cpp
+                               ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_I.cpp
+                               ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_J.cpp
+                               ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_K.cpp
+                               ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_L.cpp
+                               ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_M.cpp
+                               ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_N.cpp
+                               ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_O.cpp
+                               ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_P.cpp
+                               ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Q.cpp
+                               ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_R.cpp
+                               ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Sa_Sm.cpp
+                               ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Sn_Sz.cpp
+                               ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_T.cpp
+                               ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_U.cpp
+                               ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_V.cpp
+                               ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_W.cpp
+                               ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_X.cpp
+                               ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Y.cpp
+                               ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Z.cpp
+                               ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Other.cpp
+                               ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_GlobalVariables.cpp
+                               ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_GlobalFunctions.cpp
+                               ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Templates.h
+                               #${CMAKE_SOURCE_DIR}/Source/Urho3D/Lua/Generated.cpp
+                               #${CMAKE_SOURCE_DIR}/Source/Urho3D/JavaScript/Generated.cpp
+                               #${CMAKE_SOURCE_DIR}/Source/Urho3D/CSharp/Generated.cpp
+                               #fake_output_to_force_run_every_time
+                        COMMAND ${CMAKE_COMMAND} -E echo "Generating XMLs with AST to ${XML_AST_DIR}"
+                        COMMAND ${DOXYGEN_EXECUTABLE} "${CMAKE_BINARY_DIR}/Source/Tools/BindingGenerator/generated/Doxyfile"
+                        COMMAND ${CMAKE_COMMAND} -E echo "Running ${CMAKE_BINARY_DIR}/bin/tool/BindingGenerator ${XML_AST_DIR} ${CMAKE_SOURCE_DIR}"
+                        COMMAND ${CMAKE_BINARY_DIR}/bin/tool/BindingGenerator "${XML_AST_DIR}" "${CMAKE_SOURCE_DIR}"
+                        DEPENDS BindingGenerator ${CMAKE_BINARY_DIR}/Source/Tools/BindingGenerator/generated/Doxyfile "${SOURCE_FILES_WITHOUT_GENERATED}"
+                        COMMENT "Generating bindings to script languages")
+
+    if (URHO3D_ANGELSCRIPT)
+        list (APPEND SOURCE_FILES ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Enums.cpp
+                                  ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Classes.cpp
+                                  ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_HighPriority.cpp
+                                  ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_A.cpp
+                                  ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_B.cpp
+                                  ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Constraint.cpp
+                                  ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Ca_Cm.cpp
+                                  ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Cn_Cz.cpp
+                                  ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_D.cpp
+                                  ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_E.cpp
+                                  ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_F.cpp
+                                  ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_G.cpp
+                                  ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_H.cpp
+                                  ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_I.cpp
+                                  ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_J.cpp
+                                  ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_K.cpp
+                                  ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_L.cpp
+                                  ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_M.cpp
+                                  ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_N.cpp
+                                  ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_O.cpp
+                                  ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_P.cpp
+                                  ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Q.cpp
+                                  ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_R.cpp
+                                  ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Sa_Sm.cpp
+                                  ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Sn_Sz.cpp
+                                  ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_T.cpp
+                                  ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_U.cpp
+                                  ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_V.cpp
+                                  ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_W.cpp
+                                  ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_X.cpp
+                                  ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Y.cpp
+                                  ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Z.cpp
+                                  ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Other.cpp
+                                  ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_GlobalVariables.cpp
+                                  ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_GlobalFunctions.cpp
+                                  ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Templates.h)
+                                  
+        source_group ("Source Files\\AngelScript" FILES ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Enums.cpp
+                                                        ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Classes.cpp
+                                                        ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_HighPriority.cpp
+                                                        ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_A.cpp
+                                                        ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_B.cpp
+                                                        ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Constraint.cpp
+                                                        ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Ca_Cm.cpp
+                                                        ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Cn_Cz.cpp
+                                                        ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_D.cpp
+                                                        ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_E.cpp
+                                                        ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_F.cpp
+                                                        ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_G.cpp
+                                                        ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_H.cpp
+                                                        ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_I.cpp
+                                                        ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_J.cpp
+                                                        ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_K.cpp
+                                                        ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_L.cpp
+                                                        ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_M.cpp
+                                                        ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_N.cpp
+                                                        ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_O.cpp
+                                                        ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_P.cpp
+                                                        ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Q.cpp
+                                                        ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_R.cpp
+                                                        ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Sa_Sm.cpp
+                                                        ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Sn_Sz.cpp
+                                                        ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_T.cpp
+                                                        ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_U.cpp
+                                                        ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_V.cpp
+                                                        ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_W.cpp
+                                                        ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_X.cpp
+                                                        ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Y.cpp
+                                                        ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Z.cpp
+                                                        ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Other.cpp
+                                                        ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_GlobalVariables.cpp
+                                                        ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_GlobalFunctions.cpp
+                                                        ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Templates.h)
+    endif()
+endif ()
+
 # Define generated source files
 if (NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/librevision.h)
-    execute_process (COMMAND ${CMAKE_COMMAND} -DFILENAME=${CMAKE_CURRENT_BINARY_DIR}/librevision.h -P CMake/Modules/GetUrhoRevision.cmake
+    execute_process (COMMAND ${CMAKE_COMMAND} -DFILENAME=${CMAKE_CURRENT_BINARY_DIR}/librevision.h -P cmake/Modules/GetUrhoRevision.cmake
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} OUTPUT_QUIET ERROR_QUIET)
 endif ()
 set (URHO3D_DEPS ${STATIC_LIBRARY_TARGETS})
@@ -172,10 +346,10 @@ if (TARGET LuaJIT_universal)
 endif ()
 set_source_files_properties (${SYMBOLIC_SOURCES} PROPERTIES SYMBOLIC TRUE)
 add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/librevision.h
-    COMMAND ${CMAKE_COMMAND} -DFILENAME=${CMAKE_CURRENT_BINARY_DIR}/librevision.h.new -P CMake/Modules/GetUrhoRevision.cmake
+    COMMAND ${CMAKE_COMMAND} -DFILENAME=${CMAKE_CURRENT_BINARY_DIR}/librevision.h.new -P cmake/Modules/GetUrhoRevision.cmake
     COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/librevision.h.new ${CMAKE_CURRENT_BINARY_DIR}/librevision.h
     COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_CURRENT_BINARY_DIR}/librevision.h.new
-    DEPENDS ${URHO3D_DEPS} ${CMAKE_SOURCE_DIR}/CMake/Modules/GetUrhoRevision.cmake
+    DEPENDS ${URHO3D_DEPS} ${CMAKE_SOURCE_DIR}/cmake/Modules/GetUrhoRevision.cmake
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     COMMENT "")     # Suppress the comment as the header file may or may not be re-generated
 source_group ("Source Files\\Generated" FILES ${CMAKE_CURRENT_BINARY_DIR}/librevision.h)
@@ -193,7 +367,7 @@ if (URHO3D_BINDINGS)
     endif ()
     ExternalProject_Add (AutoBinder
         SOURCE_DIR ${CMAKE_SOURCE_DIR}/Source/Clang-Tools
-        CMAKE_ARGS -DURHO3D_CLANG_TOOLS=AutoBinder -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool/clang -DDEST_INCLUDE_DIR=${DEST_INCLUDE_DIR} -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} -DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
+        CMAKE_ARGS -D URHO3D_CLANG_TOOLS=AutoBinder -D URHO3D_DEPLOYMENT_TARGET=generic -D DEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool/clang -D DEST_INCLUDE_DIR=${DEST_INCLUDE_DIR} -D BAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} -D CMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
         ${ALTERNATE_COMMAND})
     add_make_clean_files (${CMAKE_BINARY_DIR}/bin/tool/clang/AutoBinder)
     file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated/generated)
@@ -228,7 +402,7 @@ if (URHO3D_LUA)
         endif ()
         ExternalProject_Add (tolua++
             SOURCE_DIR ${CMAKE_SOURCE_DIR}/Source/ThirdParty/toluapp/src/bin
-            CMAKE_ARGS -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} -DURHO3D_UPDATE_SOURCE_TREE=${URHO3D_UPDATE_SOURCE_TREE} -DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
+            CMAKE_ARGS -D URHO3D_DEPLOYMENT_TARGET=generic -D DEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool -D BAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} -D URHO3D_UPDATE_SOURCE_TREE=${URHO3D_UPDATE_SOURCE_TREE} -D CMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
             ${TRAVIS_ANDROID_FIX}
             ${ALTERNATE_COMMAND})
         add_make_clean_files (${CMAKE_BINARY_DIR}/bin/tool/tolua++)
@@ -258,6 +432,9 @@ if (URHO3D_LUA)
             COMMENT "Generating tolua++ API binding on the fly for ${DIR}")
     endforeach ()
     source_group ("Source Files\\LuaScript\\Generated" FILES ${LUA_GEN_CPP_FILES})
+    if (URHO3D_LINT)
+        execute_process (COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/.clang-tidy ${CMAKE_CURRENT_BINARY_DIR}/LuaScript/generated)
+    endif ()
 endif ()
 
 # Aggregate all source files
@@ -286,11 +463,7 @@ if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 5.3.
 endif ()
 
 # Setup library output path
-if (ANDROID)
-    # Let SDK's android.toolchain.cmake controls where are the output directories
-else ()
-    set_output_directories (${CMAKE_BINARY_DIR}/lib ARCHIVE LIBRARY)
-endif ()
+set_output_directories (${CMAKE_BINARY_DIR}/lib ARCHIVE LIBRARY)
 
 # Setup target
 if (IOS OR TVOS)
@@ -539,7 +712,7 @@ string (REPLACE "${SYSROOT}" "\${pc_sysrootdir}" CLEANED_CMAKE_CXX_FLAGS "${CLEA
 string (REPLACE "${SYSROOT}" "\${pc_sysrootdir}" CLEANED_CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Urho3D.pc.in ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.pc${PC_SUFFIX} @ONLY)
 if (MSVC)
-    add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -DLIB_NAME=$<TARGET_LINKER_FILE_NAME:${TARGET_NAME}> -P ${CMAKE_SOURCE_DIR}/CMake/Modules/AdjustPkgConfigForMSVC.cmake)
+    add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -DLIB_NAME=$<TARGET_LINKER_FILE_NAME:${TARGET_NAME}> -P ${CMAKE_SOURCE_DIR}/cmake/Modules/AdjustPkgConfigForMSVC.cmake)
 endif ()
 if (ANDROID)
     # After migration to Gradle build system we do not support Android cross-compiling build via pkgconfig anymore, however, this file is still being provided as reference only
@@ -548,23 +721,6 @@ endif ()
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.pc DESTINATION ${DEST_PKGCONFIG_DIR} ${RENAME})
 
 # Define post build steps
-if (ANDROID AND GRADLE_BUILD_DIR)
-    # Copy the library to URHO3D_HOME directory
-    set (ABI_LIB_DIR ${GRADLE_BUILD_DIR}/tree/${CMAKE_BUILD_TYPE}/${ANDROID_ABI}/lib)
-    file (MAKE_DIRECTORY ${ABI_LIB_DIR})
-    # Workaround execute_process does not support generator expression
-    if (URHO3D_LIB_TYPE STREQUAL STATIC)
-        set (LIB_EXT .a)
-    else ()
-        set (LIB_EXT .so)
-    endif ()
-    # Put a placeholder during Gradle configuration phase so that initial IDE "gradle sync" works cleanly
-    execute_process (COMMAND ${CMAKE_COMMAND} -E touch ${ABI_LIB_DIR}/lib${TARGET_NAME}${LIB_EXT})
-    # Replace the placeholder with the actual target file during Gradle execution phase
-    add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${TARGET_NAME}> ${ABI_LIB_DIR}
-        COMMENT "Copying Urho3D library to URHO3D_HOME directory")
-    add_make_clean_files (${ABI_LIB_DIR}/$<TARGET_FILE_NAME:${TARGET_NAME}>)
-endif ()
 if (URHO3D_LIB_TYPE STREQUAL SHARED AND ARM)
     # Strip the output shared library for embedded ARM platforms (we don't do this for Android anymore, assuming Android plugin will take care of it)
     add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${TARGET_NAME}>

@@ -1,3 +1,5 @@
+// Modified by Yao Wei Tjong for Urho3D
+
 package org.libsdl.app;
 
 import java.util.ArrayList;
@@ -5,6 +7,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.*;
 import android.view.*;
@@ -292,6 +295,8 @@ class SDLJoystickHandler_API16 extends SDLJoystickHandler {
     }
 }
 
+// Urho3D - suppress lint error
+@TargetApi(Build.VERSION_CODES.KITKAT)
 class SDLJoystickHandler_API19 extends SDLJoystickHandler_API16 {
 
     @Override
@@ -398,6 +403,8 @@ class SDLJoystickHandler_API19 extends SDLJoystickHandler_API16 {
     }
 }
 
+// Urho3D - suppress lint error
+@TargetApi(Build.VERSION_CODES.O)
 class SDLHapticHandler_API26 extends SDLHapticHandler {
     @Override
     public void run(int device_id, float intensity, int length) {
@@ -610,6 +617,8 @@ class SDLGenericMotionListener_API12 implements View.OnGenericMotionListener {
 
 }
 
+// Urho3D - suppress lint error
+@TargetApi(Build.VERSION_CODES.N)
 class SDLGenericMotionListener_API24 extends SDLGenericMotionListener_API12 {
     // Generic Motion (mouse hover, joystick...) events go here
 
@@ -673,6 +682,8 @@ class SDLGenericMotionListener_API24 extends SDLGenericMotionListener_API12 {
 }
 
 
+// Urho3D - suppress lint error
+@TargetApi(Build.VERSION_CODES.O)
 class SDLGenericMotionListener_API26 extends SDLGenericMotionListener_API24 {
     // Generic Motion (mouse hover, joystick...) events go here
     private boolean mRelativeModeEnabled;

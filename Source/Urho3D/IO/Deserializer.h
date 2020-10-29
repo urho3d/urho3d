@@ -30,6 +30,7 @@ namespace Urho3D
 {
 
 /// Abstract stream for reading.
+/// @fakeref
 class URHO3D_API Deserializer
 {
 public:
@@ -45,20 +46,25 @@ public:
     /// Set position from the beginning of the stream. Return actual new position.
     virtual unsigned Seek(unsigned position) = 0;
     /// Return name of the stream.
+    /// @property
     virtual const String& GetName() const;
     /// Return a checksum if applicable.
+    /// @property
     virtual unsigned GetChecksum();
     /// Return whether the end of stream has been reached.
+    /// @property
     virtual bool IsEof() const { return position_ >= size_; }
 
     /// Set position relative to current position. Return actual new position.
     unsigned SeekRelative(int delta);
     /// Return current position.
+    /// @property
     unsigned GetPosition() const { return position_; }
     /// Return current position.
     unsigned Tell() const { return position_; }
 
     /// Return size.
+    /// @property
     unsigned GetSize() const { return size_; }
 
     /// Read a 64-bit integer.

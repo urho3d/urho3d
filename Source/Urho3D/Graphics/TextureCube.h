@@ -71,6 +71,7 @@ public:
     SharedPtr<Image> GetImage(CubeMapFace face) const;
 
     /// Return render surface for one face.
+    /// @property{get_renderSurfaces}
     RenderSurface* GetRenderSurface(CubeMapFace face) const { return renderSurfaces_[face]; }
 
 protected:

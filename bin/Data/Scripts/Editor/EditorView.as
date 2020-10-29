@@ -100,6 +100,14 @@ enum SnapScaleMode
     SNAP_SCALE_QUARTER
 }
 
+void ResizeString(String& str, uint newSize)
+{
+    uint oldSize = str.Length();
+    str.Resize(newSize);
+    for (uint i = oldSize; i < newSize; ++i)
+        str[i] = ' ';
+}
+
 // Holds info about a viewport such as camera settings and splits up shared resources
 class ViewportContext
 {
@@ -276,9 +284,9 @@ class ViewportContext
         String xText(cameraPos.x);
         String yText(cameraPos.y);
         String zText(cameraPos.z);
-        xText.Resize(8);
-        yText.Resize(8);
-        zText.Resize(8);
+        ResizeString(xText, 8);
+        ResizeString(yText, 8);
+        ResizeString(zText, 8);
 
         cameraPosText.text = String(
             "Pos: " + xText + " " + yText + " " + zText +

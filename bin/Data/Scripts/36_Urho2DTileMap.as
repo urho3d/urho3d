@@ -64,7 +64,7 @@ void CreateScene()
     tileMap.tmxFile = tmxFile;
 
     // Set camera's position;
-    TileMapInfo2D@ info = tileMap.info;
+    const TileMapInfo2D@ info = tileMap.info;
     float x = info.mapWidth * 0.5f;
     float y = info.mapHeight * 0.5f;
     cameraNode.position = Vector3(x, y, -10.0f);

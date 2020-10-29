@@ -1,11 +1,13 @@
+// Modified by Lasse Oorni and Yao Wei Tjong for Urho3D
+
 package org.libsdl.app;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Hashtable;
 import java.lang.reflect.Method;
 import java.lang.Math;
+import java.util.List;
 
 import android.app.*;
 import android.content.*;
@@ -30,6 +32,8 @@ import android.hardware.*;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ApplicationInfo;
+
+import io.urho3d.UrhoActivity;
 
 /**
     SDL Activity
@@ -104,19 +108,16 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
         return mMotionListener;
     }
 
+    // Urho3D - default implementation returns the last shared lib being loaded
+    private static String mMainSharedLib;
+
     /**
      * This method returns the name of the shared object with the application entry point
      * It can be overridden by derived classes.
      */
     protected String getMainSharedObject() {
-        String library;
-        String[] libraries = SDLActivity.mSingleton.getLibraries();
-        if (libraries.length > 0) {
-            library = "lib" + libraries[libraries.length - 1] + ".so";
-        } else {
-            library = "libmain.so";
-        }
-        return getContext().getApplicationInfo().nativeLibraryDir + "/" + library;
+        // Urho3D - should not be called before the library is loaded.
+        return mMainSharedLib;
     }
 
     /**
@@ -127,31 +128,12 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
         return "SDL_main";
     }
 
-    /**
-     * This method is called by SDL before loading the native shared libraries.
-     * It can be overridden to provide names of shared libraries to be loaded.
-     * The default implementation returns the defaults. It never returns null.
-     * An array returned by a new implementation must at least contain "SDL2".
-     * Also keep in mind that the order the libraries are loaded may matter.
-     * @return names of shared libraries to be loaded (e.g. "SDL2", "main").
-     */
-    protected String[] getLibraries() {
-        return new String[] {
-            "hidapi",
-            "SDL2",
-            // "SDL2_image",
-            // "SDL2_mixer",
-            // "SDL2_net",
-            // "SDL2_ttf",
-            "main"
-        };
-    }
-
-    // Load the .so
-    public void loadLibraries() {
-       for (String lib : getLibraries()) {
-          SDL.loadLibrary(lib);
-       }
+    // Urho3D - avoid hardcoding of the library list
+    protected void onLoadLibrary(List<String> libraryNames) {
+        for (final String name : libraryNames) {
+            SDL.loadLibrary(name);
+        }
+        mMainSharedLib = "lib" + libraryNames.get(libraryNames.size() - 1) + ".so";
     }
 
     /**
@@ -161,7 +143,8 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
      * @return arguments for the native application.
      */
     protected String[] getArguments() {
-        return new String[0];
+        // Urho3D - the default implementation returns the "app_process" as the first argument instead of empty array
+        return new String[]{"app_process"};
     }
 
     public static void initialize() {
@@ -196,16 +179,11 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
             Log.v(TAG, "modify thread properties failed " + e.toString());
         }
 
-        // Load shared libraries
+        // Urho3D - auto load all the shared libraries available in the library path
         String errorMsgBrokenLib = "";
         try {
-            loadLibraries();
-        } catch(UnsatisfiedLinkError e) {
-            System.err.println(e.getMessage());
-            mBrokenLibraries = true;
-            errorMsgBrokenLib = e.getMessage();
+            onLoadLibrary(UrhoActivity.getLibraryNames(this));
         } catch(Exception e) {
-            System.err.println(e.getMessage());
             mBrokenLibraries = true;
             errorMsgBrokenLib = e.getMessage();
         }
@@ -283,6 +261,10 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
             return;
         }
 
+        if (mHIDDeviceManager != null) {
+            mHIDDeviceManager.setFrozen(true);
+        }
+
         SDLActivity.handleNativeState();
     }
 
@@ -294,6 +276,10 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
            return;
         }
 
+        if (mHIDDeviceManager != null) {
+            mHIDDeviceManager.setFrozen(false);
+        }
+
         SDLActivity.handleNativeState();
     }
 
@@ -302,10 +288,6 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
     protected void onPause() {
         Log.v(TAG, "onPause()");
         super.onPause();
-
-        if (mHIDDeviceManager != null) {
-            mHIDDeviceManager.setFrozen(true);
-        }
         if (!mHasMultiWindow) {
             pauseNativeThread();
         }
@@ -315,10 +297,6 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
     protected void onResume() {
         Log.v(TAG, "onResume()");
         super.onResume();
-
-        if (mHIDDeviceManager != null) {
-            mHIDDeviceManager.setFrozen(false);
-        }
         if (!mHasMultiWindow) {
             resumeNativeThread();
         }
@@ -453,9 +431,7 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
         }
 
         // Default system back button behavior.
-        if (!isFinishing()) {
-            super.onBackPressed();
-        }
+        super.onBackPressed();
     }
 
     // Called by JNI from SDL.
@@ -468,9 +444,7 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (!SDLActivity.this.isFinishing()) {
-                    SDLActivity.this.superOnBackPressed();
-                }
+                SDLActivity.this.superOnBackPressed();
             }
         });
     }
@@ -489,8 +463,10 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
 
         int keyCode = event.getKeyCode();
         // Ignore certain special keys so they're handled by Android
+        // Urho3D - also ignore the Home key
         if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN ||
             keyCode == KeyEvent.KEYCODE_VOLUME_UP ||
+            keyCode == KeyEvent.KEYCODE_HOME ||
             keyCode == KeyEvent.KEYCODE_CAMERA ||
             keyCode == KeyEvent.KEYCODE_ZOOM_IN || /* API 11 */
             keyCode == KeyEvent.KEYCODE_ZOOM_OUT /* API 11 */
@@ -637,8 +613,6 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
                     imm.hideSoftInputFromWindow(mTextEdit.getWindowToken(), 0);
 
                     mScreenKeyboardShown = false;
-
-                    mSurface.requestFocus();
                 }
                 break;
             case COMMAND_SET_KEEP_SCREEN_ON:
@@ -730,7 +704,7 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
                 }
             }
 
-            if (bShouldWait && (SDLActivity.getContext() != null)) {
+            if (bShouldWait) {
                 // We'll wait for the surfaceChanged() method, which will notify us
                 // when called.  That way, we know our current size is really the
                 // size we need, instead of grabbing a size that's still got
@@ -783,7 +757,6 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
     public static native void nativeSetenv(String name, String value);
     public static native void onNativeOrientationChanged(int orientation);
     public static native void nativeAddTouch(int touchId, String name);
-    public static native void nativePermissionResult(int requestCode, boolean result);
 
     /**
      * This method is called by SDL using JNI.
@@ -818,62 +791,39 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
      */
     public void setOrientationBis(int w, int h, boolean resizable, String hint)
     {
-        int orientation_landscape = -1;
-        int orientation_portrait = -1;
+        int orientation = -1;
 
-        /* If set, hint "explicitly controls which UI orientations are allowed". */
         if (hint.contains("LandscapeRight") && hint.contains("LandscapeLeft")) {
-            orientation_landscape = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
+            orientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
         } else if (hint.contains("LandscapeRight")) {
-            orientation_landscape = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
+            orientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
         } else if (hint.contains("LandscapeLeft")) {
-            orientation_landscape = ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE;
-        }
-
-        if (hint.contains("Portrait") && hint.contains("PortraitUpsideDown")) {
-            orientation_portrait = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT;
+            orientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE;
+        } else if (hint.contains("Portrait") && hint.contains("PortraitUpsideDown")) {
+            orientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT;
         } else if (hint.contains("Portrait")) {
-            orientation_portrait = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+            orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
         } else if (hint.contains("PortraitUpsideDown")) {
-            orientation_portrait = ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT;
+            orientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT;
         }
 
-        boolean is_landscape_allowed = (orientation_landscape == -1 ? false : true);
-        boolean is_portrait_allowed = (orientation_portrait == -1 ? false : true);
-        int req = -1; /* Requested orientation */
-
-        /* No valid hint, nothing is explicitly allowed */
-        if (!is_portrait_allowed && !is_landscape_allowed) {
+        /* no valid hint */
+        if (orientation == -1) {
             if (resizable) {
-                /* All orientations are allowed */
-                req = ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR;
+                /* no fixed orientation */
             } else {
-                /* Fixed window and nothing specified. Get orientation from w/h of created window */
-                req = (w > h ? ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
-            }
-        } else {
-            /* At least one orientation is allowed */
-            if (resizable) {
-                if (is_portrait_allowed && is_landscape_allowed) {
-                    /* hint allows both landscape and portrait, promote to full sensor */
-                    req = ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR;
+                if (w > h) {
+                    orientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
                 } else {
-                    /* Use the only one allowed "orientation" */
-                    req = (is_landscape_allowed ? orientation_landscape : orientation_portrait);
-                }
-            } else {
-                /* Fixed window and both orientations are allowed. Choose one. */
-                if (is_portrait_allowed && is_landscape_allowed) {
-                    req = (w > h ? orientation_landscape : orientation_portrait);
-                } else {
-                    /* Use the only one allowed "orientation" */
-                    req = (is_landscape_allowed ? orientation_landscape : orientation_portrait);
+                    orientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT;
                 }
             }
         }
 
-        Log.v("SDL", "setOrientation() requestedOrientation=" + req + " width=" + w +" height="+ h +" resizable=" + resizable + " hint=" + hint);
-        mSingleton.setRequestedOrientation(req);
+        Log.v("SDL", "setOrientation() orientation=" + orientation + " width=" + w +" height="+ h +" resizable=" + resizable + " hint=" + hint);
+        if (orientation != -1) {
+            mSingleton.setRequestedOrientation(orientation);
+        }
     }
 
     /**
@@ -1000,9 +950,6 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
         if (Build.MANUFACTURER.equals("Amlogic") && Build.MODEL.equals("X96-W")) {
             return true;
         }
-        if (Build.MANUFACTURER.equals("Amlogic") && Build.MODEL.startsWith("TV")) {
-            return true;
-        }
         return false;
     }
 
@@ -1012,9 +959,6 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
     public static boolean isTablet() {
         DisplayMetrics metrics = new DisplayMetrics();
         Activity activity = (Activity)getContext();
-        if (activity == null) {
-            return false;
-        }
         activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
         double dWidthInches = metrics.widthPixels / (double)metrics.xdpi;
@@ -1030,9 +974,6 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
      * This method is called by SDL using JNI.
      */
     public static boolean isChromebook() {
-        if (getContext() == null) {
-            return false;
-        }
         return getContext().getPackageManager().hasSystemFeature("org.chromium.arc.device_management");
     }
 
@@ -1604,32 +1545,6 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
         }
         return true;
     }
-
-    /**
-     * This method is called by SDL using JNI.
-     */
-    public static void requestPermission(String permission, int requestCode) {
-        if (Build.VERSION.SDK_INT < 23) {
-            nativePermissionResult(requestCode, true);
-            return;
-        }
-
-        Activity activity = (Activity)getContext();
-        if (activity.checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
-            activity.requestPermissions(new String[]{permission}, requestCode);
-        } else {
-            nativePermissionResult(requestCode, true);
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            nativePermissionResult(requestCode, true);
-        } else {
-            nativePermissionResult(requestCode, false);
-        }
-    }
 }
 
 /**
@@ -1655,7 +1570,7 @@ class SDLMain implements Runnable {
 
         Log.v("SDL", "Finished main function");
 
-        if (SDLActivity.mSingleton == null || SDLActivity.mSingleton.isFinishing()) {
+        if (SDLActivity.mSingleton.isFinishing()) {
             // Activity is already being destroyed
         } else {
             // Let's finish the Activity
@@ -1890,9 +1805,7 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
 
         if (source == InputDevice.SOURCE_UNKNOWN) {
             InputDevice device = InputDevice.getDevice(deviceId);
-            if (device != null) {
-                source = device.getSources();
-            }
+            source = device.getSources();
         }
 
         if ((source & InputDevice.SOURCE_KEYBOARD) != 0) {
