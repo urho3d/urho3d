@@ -2097,7 +2097,7 @@ class DummyEdit extends View implements View.OnKeyListener {
     @Override
     public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
         ic = new SDLInputConnection(this, true);
-
+        // Urho3D - Has TYPE_TEXT_VARIATION_VISIBLE_PASSWORD Android IME will be disabled input wide byte characters. For example, Chinese.
         outAttrs.inputType = InputType.TYPE_CLASS_TEXT;//| InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD;
         outAttrs.imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI
                 | EditorInfo.IME_FLAG_NO_FULLSCREEN /* API 11 */;
