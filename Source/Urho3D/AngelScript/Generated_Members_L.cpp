@@ -22,31 +22,6 @@ namespace Urho3D
 void FakeAddRef(void* ptr);
 void FakeReleaseRef(void* ptr);
 
-// ListNodeBase::~ListNodeBase() | Implicitly-declared 
-static void ListNodeBase_Destructor(ListNodeBase* ptr)
-{
-    ptr->~ListNodeBase();
-}
-
-// explicit Log::Log(Context* context) | File: ../IO/Log.h
-static Log* Log_Log_Context()
-{
-    return new Log(GetScriptContext());
-}
-
-// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Log_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Log* ptr, CScriptArray* exceptions, bool onlyUserData)
-{
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
-}
-
-// ListIteratorBase::~ListIteratorBase() | Implicitly-declared 
-static void ListIteratorBase_Destructor(ListIteratorBase* ptr)
-{
-    ptr->~ListIteratorBase();
-}
-
 // const PODVector<Light*>& Drawable::GetLights() const | File: ../Graphics/Drawable.h
 static CScriptArray* Light_GetLights_void(Light* ptr)
 {
@@ -203,6 +178,19 @@ static void Localization_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
 }
 
+// explicit Log::Log(Context* context) | File: ../IO/Log.h
+static Log* Log_Log_Context()
+{
+    return new Log(GetScriptContext());
+}
+
+// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+static void Log_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Log* ptr, CScriptArray* exceptions, bool onlyUserData)
+{
+    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+}
+
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void LogicComponent_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(LogicComponent* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
@@ -228,175 +216,20 @@ static void LinkedListNode_Destructor(LinkedListNode* ptr)
     ptr->~LinkedListNode();
 }
 
+// ListIteratorBase::~ListIteratorBase() | Implicitly-declared 
+static void ListIteratorBase_Destructor(ListIteratorBase* ptr)
+{
+    ptr->~ListIteratorBase();
+}
+
+// ListNodeBase::~ListNodeBase() | Implicitly-declared 
+static void ListNodeBase_Destructor(ListNodeBase* ptr)
+{
+    ptr->~ListNodeBase();
+}
+
 void ASRegisterGenerated_Members_L(asIScriptEngine* engine)
 {
-    // ListNodeBase* ListNodeBase::next_ | File: ../Container/ListBase.h
-    // ListNodeBase* can not be registered
-    // ListNodeBase* ListNodeBase::prev_ | File: ../Container/ListBase.h
-    // ListNodeBase* can not be registered
-    // ListNodeBase::~ListNodeBase() | Implicitly-declared
-    engine->RegisterObjectBehaviour("ListNodeBase", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(ListNodeBase_Destructor), asCALL_CDECL_OBJFIRST);
-    // ListNodeBase& ListNodeBase::operator=(const ListNodeBase&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<ListNodeBase>(engine, "ListNodeBase");
-#ifdef REGISTER_MANUAL_PART_ListNodeBase
-    REGISTER_MANUAL_PART_ListNodeBase(ListNodeBase, "ListNodeBase")
-#endif
-
-    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("Log", asBEHAVE_ADDREF, "void f()", asMETHODPR(Log, AddRef, (), void), asCALL_THISCALL);
-    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
-    // Not registered because template
-    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
-    // Not registered because template
-    // void Log::Close() | File: ../IO/Log.h
-    engine->RegisterObjectMethod("Log", "void Close()", asMETHODPR(Log, Close, (), void), asCALL_THISCALL);
-    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Log", "bool GetBlockEvents() const", asMETHODPR(Log, GetBlockEvents, () const, bool), asCALL_THISCALL);
-    // const String& Object::GetCategory() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Log", "const String& GetCategory() const", asMETHODPR(Log, GetCategory, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Log", "const String& get_category() const", asMETHODPR(Log, GetCategory, () const, const String&), asCALL_THISCALL);
-    // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
-    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Log", "VariantMap& GetEventDataMap() const", asMETHODPR(Log, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
-    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // Object* Object::GetEventSender() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Log", "Object@+ GetEventSender() const", asMETHODPR(Log, GetEventSender, () const, Object*), asCALL_THISCALL);
-    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Log", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(Log, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Log", "const Variant& get_globalVar(StringHash) const", asMETHODPR(Log, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Log", "const VariantMap& GetGlobalVars() const", asMETHODPR(Log, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Log", "const VariantMap& get_globalVars() const", asMETHODPR(Log, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    // String Log::GetLastMessage() const | File: ../IO/Log.h
-    engine->RegisterObjectMethod("Log", "String GetLastMessage() const", asMETHODPR(Log, GetLastMessage, () const, String), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Log", "String get_lastMessage() const", asMETHODPR(Log, GetLastMessage, () const, String), asCALL_THISCALL);
-    // int Log::GetLevel() const | File: ../IO/Log.h
-    engine->RegisterObjectMethod("Log", "int GetLevel() const", asMETHODPR(Log, GetLevel, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Log", "int get_level() const", asMETHODPR(Log, GetLevel, () const, int), asCALL_THISCALL);
-    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Log", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Log, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
-    // Not registered because template
-    // bool Log::GetTimeStamp() const | File: ../IO/Log.h
-    engine->RegisterObjectMethod("Log", "bool GetTimeStamp() const", asMETHODPR(Log, GetTimeStamp, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Log", "bool get_timeStamp() const", asMETHODPR(Log, GetTimeStamp, () const, bool), asCALL_THISCALL);
-    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Log", "StringHash GetType() const", asMETHODPR(Log, GetType, () const, StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Log", "StringHash get_type() const", asMETHODPR(Log, GetType, () const, StringHash), asCALL_THISCALL);
-    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Log", "const String& GetTypeName() const", asMETHODPR(Log, GetTypeName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Log", "const String& get_typeName() const", asMETHODPR(Log, GetTypeName, () const, const String&), asCALL_THISCALL);
-    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Log", "bool HasEventHandlers() const", asMETHODPR(Log, HasEventHandlers, () const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Log", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(Log, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Log", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(Log, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Log", "bool IsInstanceOf(StringHash) const", asMETHODPR(Log, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
-    // Not registered because template
-    // bool Log::IsQuiet() const | File: ../IO/Log.h
-    engine->RegisterObjectMethod("Log", "bool IsQuiet() const", asMETHODPR(Log, IsQuiet, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Log", "bool get_quiet() const", asMETHODPR(Log, IsQuiet, () const, bool), asCALL_THISCALL);
-    // explicit Log::Log(Context* context) | File: ../IO/Log.h
-    engine->RegisterObjectBehaviour("Log", asBEHAVE_FACTORY, "Log@+ f()", asFUNCTION(Log_Log_Context), asCALL_CDECL);
-    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Log", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(Log, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
-    // void Log::Open(const String& fileName) | File: ../IO/Log.h
-    engine->RegisterObjectMethod("Log", "void Open(const String&in)", asMETHODPR(Log, Open, (const String&), void), asCALL_THISCALL);
-    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
-    // Error: type "RefCount*" can not automatically bind
-    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("Log", "int Refs() const", asMETHODPR(Log, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Log", "int get_refs() const", asMETHODPR(Log, Refs, () const, int), asCALL_THISCALL);
-    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("Log", asBEHAVE_RELEASE, "void f()", asMETHODPR(Log, ReleaseRef, (), void), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Log", "void SendEvent(StringHash)", asMETHODPR(Log, SendEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Log", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(Log, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
-    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
-    // Not registered because template
-    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Log", "void SetBlockEvents(bool)", asMETHODPR(Log, SetBlockEvents, (bool), void), asCALL_THISCALL);
-    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Log", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(Log, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Log", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(Log, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    // void Log::SetLevel(int level) | File: ../IO/Log.h
-    engine->RegisterObjectMethod("Log", "void SetLevel(int)", asMETHODPR(Log, SetLevel, (int), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Log", "void set_level(int)", asMETHODPR(Log, SetLevel, (int), void), asCALL_THISCALL);
-    // void Log::SetQuiet(bool quiet) | File: ../IO/Log.h
-    engine->RegisterObjectMethod("Log", "void SetQuiet(bool)", asMETHODPR(Log, SetQuiet, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Log", "void set_quiet(bool)", asMETHODPR(Log, SetQuiet, (bool), void), asCALL_THISCALL);
-    // void Log::SetTimeStamp(bool enable) | File: ../IO/Log.h
-    engine->RegisterObjectMethod("Log", "void SetTimeStamp(bool)", asMETHODPR(Log, SetTimeStamp, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Log", "void set_timeStamp(bool)", asMETHODPR(Log, SetTimeStamp, (bool), void), asCALL_THISCALL);
-    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Log", "void UnsubscribeFromAllEvents()", asMETHODPR(Log, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Log", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(Log_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
-    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Log", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(Log, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Log", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(Log, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Log", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(Log, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
-    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("Log", "int WeakRefs() const", asMETHODPR(Log, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Log", "int get_weakRefs() const", asMETHODPR(Log, WeakRefs, () const, int), asCALL_THISCALL);
-    // static void Log::Write(int level, const String& message) | File: ../IO/Log.h
-    // Not registered because have @nobind mark
-    // static void Log::WriteRaw(const String& message, bool error=false) | File: ../IO/Log.h
-    engine->SetDefaultNamespace("Log");
-    engine->RegisterGlobalFunction("void WriteRaw(const String&in, bool = false)", asFUNCTIONPR(Log::WriteRaw, (const String&, bool), void), asCALL_CDECL);
-    engine->SetDefaultNamespace("");
-#ifdef REGISTER_MANUAL_PART_Object
-    REGISTER_MANUAL_PART_Object(Log, "Log")
-#endif
-#ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(Log, "Log")
-#endif
-#ifdef REGISTER_MANUAL_PART_Log
-    REGISTER_MANUAL_PART_Log(Log, "Log")
-#endif
-    RegisterSubclass<Object, Log>(engine, "Object", "Log");
-    RegisterSubclass<RefCounted, Log>(engine, "RefCounted", "Log");
-
-    // ListNodeBase* ListIteratorBase::ptr_ | File: ../Container/ListBase.h
-    // ListNodeBase* can not be registered
-    // void ListIteratorBase::GotoNext() | File: ../Container/ListBase.h
-    engine->RegisterObjectMethod("ListIteratorBase", "void GotoNext()", asMETHODPR(ListIteratorBase, GotoNext, (), void), asCALL_THISCALL);
-    // void ListIteratorBase::GotoPrev() | File: ../Container/ListBase.h
-    engine->RegisterObjectMethod("ListIteratorBase", "void GotoPrev()", asMETHODPR(ListIteratorBase, GotoPrev, (), void), asCALL_THISCALL);
-    // explicit ListIteratorBase::ListIteratorBase(ListNodeBase* ptr) | File: ../Container/ListBase.h
-    // Error: type "ListNodeBase*" can not automatically bind
-    // bool ListIteratorBase::operator==(const ListIteratorBase& rhs) const | File: ../Container/ListBase.h
-    engine->RegisterObjectMethod("ListIteratorBase", "bool opEquals(const ListIteratorBase&in) const", asMETHODPR(ListIteratorBase, operator==, (const ListIteratorBase&) const, bool), asCALL_THISCALL);
-    // ListIteratorBase::~ListIteratorBase() | Implicitly-declared
-    engine->RegisterObjectBehaviour("ListIteratorBase", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(ListIteratorBase_Destructor), asCALL_CDECL_OBJFIRST);
-    // ListIteratorBase& ListIteratorBase::operator=(const ListIteratorBase&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<ListIteratorBase>(engine, "ListIteratorBase");
-#ifdef REGISTER_MANUAL_PART_ListIteratorBase
-    REGISTER_MANUAL_PART_ListIteratorBase(ListIteratorBase, "ListIteratorBase")
-#endif
-
     // void Drawable::AddLight(Light* light) | File: ../Graphics/Drawable.h
     engine->RegisterObjectMethod("Light", "void AddLight(Light@+)", asMETHODPR(Light, AddLight, (Light*), void), asCALL_THISCALL);
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
@@ -2988,6 +2821,143 @@ void ASRegisterGenerated_Members_L(asIScriptEngine* engine)
     RegisterSubclass<RefCounted, Localization>(engine, "RefCounted", "Localization");
 
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("Log", asBEHAVE_ADDREF, "void f()", asMETHODPR(Log, AddRef, (), void), asCALL_THISCALL);
+    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
+    // Not registered because template
+    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
+    // Not registered because template
+    // void Log::Close() | File: ../IO/Log.h
+    engine->RegisterObjectMethod("Log", "void Close()", asMETHODPR(Log, Close, (), void), asCALL_THISCALL);
+    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Log", "bool GetBlockEvents() const", asMETHODPR(Log, GetBlockEvents, () const, bool), asCALL_THISCALL);
+    // const String& Object::GetCategory() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Log", "const String& GetCategory() const", asMETHODPR(Log, GetCategory, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Log", "const String& get_category() const", asMETHODPR(Log, GetCategory, () const, const String&), asCALL_THISCALL);
+    // Context* Object::GetContext() const | File: ../Core/Object.h
+    // Error: type "Context*" can not be returned
+    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Log", "VariantMap& GetEventDataMap() const", asMETHODPR(Log, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
+    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // Object* Object::GetEventSender() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Log", "Object@+ GetEventSender() const", asMETHODPR(Log, GetEventSender, () const, Object*), asCALL_THISCALL);
+    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Log", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(Log, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Log", "const Variant& get_globalVar(StringHash) const", asMETHODPR(Log, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Log", "const VariantMap& GetGlobalVars() const", asMETHODPR(Log, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Log", "const VariantMap& get_globalVars() const", asMETHODPR(Log, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    // String Log::GetLastMessage() const | File: ../IO/Log.h
+    engine->RegisterObjectMethod("Log", "String GetLastMessage() const", asMETHODPR(Log, GetLastMessage, () const, String), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Log", "String get_lastMessage() const", asMETHODPR(Log, GetLastMessage, () const, String), asCALL_THISCALL);
+    // int Log::GetLevel() const | File: ../IO/Log.h
+    engine->RegisterObjectMethod("Log", "int GetLevel() const", asMETHODPR(Log, GetLevel, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Log", "int get_level() const", asMETHODPR(Log, GetLevel, () const, int), asCALL_THISCALL);
+    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Log", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Log, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
+    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // Not registered because template
+    // bool Log::GetTimeStamp() const | File: ../IO/Log.h
+    engine->RegisterObjectMethod("Log", "bool GetTimeStamp() const", asMETHODPR(Log, GetTimeStamp, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Log", "bool get_timeStamp() const", asMETHODPR(Log, GetTimeStamp, () const, bool), asCALL_THISCALL);
+    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Log", "StringHash GetType() const", asMETHODPR(Log, GetType, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Log", "StringHash get_type() const", asMETHODPR(Log, GetType, () const, StringHash), asCALL_THISCALL);
+    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Log", "const String& GetTypeName() const", asMETHODPR(Log, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Log", "const String& get_typeName() const", asMETHODPR(Log, GetTypeName, () const, const String&), asCALL_THISCALL);
+    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Log", "bool HasEventHandlers() const", asMETHODPR(Log, HasEventHandlers, () const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Log", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(Log, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Log", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(Log, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Log", "bool IsInstanceOf(StringHash) const", asMETHODPR(Log, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
+    // Not registered because template
+    // bool Log::IsQuiet() const | File: ../IO/Log.h
+    engine->RegisterObjectMethod("Log", "bool IsQuiet() const", asMETHODPR(Log, IsQuiet, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Log", "bool get_quiet() const", asMETHODPR(Log, IsQuiet, () const, bool), asCALL_THISCALL);
+    // explicit Log::Log(Context* context) | File: ../IO/Log.h
+    engine->RegisterObjectBehaviour("Log", asBEHAVE_FACTORY, "Log@+ f()", asFUNCTION(Log_Log_Context), asCALL_CDECL);
+    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Log", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(Log, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
+    // void Log::Open(const String& fileName) | File: ../IO/Log.h
+    engine->RegisterObjectMethod("Log", "void Open(const String&in)", asMETHODPR(Log, Open, (const String&), void), asCALL_THISCALL);
+    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
+    // Error: type "RefCount*" can not automatically bind
+    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("Log", "int Refs() const", asMETHODPR(Log, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Log", "int get_refs() const", asMETHODPR(Log, Refs, () const, int), asCALL_THISCALL);
+    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("Log", asBEHAVE_RELEASE, "void f()", asMETHODPR(Log, ReleaseRef, (), void), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Log", "void SendEvent(StringHash)", asMETHODPR(Log, SendEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Log", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(Log, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
+    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
+    // Not registered because template
+    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Log", "void SetBlockEvents(bool)", asMETHODPR(Log, SetBlockEvents, (bool), void), asCALL_THISCALL);
+    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Log", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(Log, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Log", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(Log, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    // void Log::SetLevel(int level) | File: ../IO/Log.h
+    engine->RegisterObjectMethod("Log", "void SetLevel(int)", asMETHODPR(Log, SetLevel, (int), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Log", "void set_level(int)", asMETHODPR(Log, SetLevel, (int), void), asCALL_THISCALL);
+    // void Log::SetQuiet(bool quiet) | File: ../IO/Log.h
+    engine->RegisterObjectMethod("Log", "void SetQuiet(bool)", asMETHODPR(Log, SetQuiet, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Log", "void set_quiet(bool)", asMETHODPR(Log, SetQuiet, (bool), void), asCALL_THISCALL);
+    // void Log::SetTimeStamp(bool enable) | File: ../IO/Log.h
+    engine->RegisterObjectMethod("Log", "void SetTimeStamp(bool)", asMETHODPR(Log, SetTimeStamp, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Log", "void set_timeStamp(bool)", asMETHODPR(Log, SetTimeStamp, (bool), void), asCALL_THISCALL);
+    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Log", "void UnsubscribeFromAllEvents()", asMETHODPR(Log, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Log", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(Log_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
+    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Log", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(Log, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Log", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(Log, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Log", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(Log, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
+    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("Log", "int WeakRefs() const", asMETHODPR(Log, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Log", "int get_weakRefs() const", asMETHODPR(Log, WeakRefs, () const, int), asCALL_THISCALL);
+    // static void Log::Write(int level, const String& message) | File: ../IO/Log.h
+    // Not registered because have @nobind mark
+    // static void Log::WriteRaw(const String& message, bool error=false) | File: ../IO/Log.h
+    engine->SetDefaultNamespace("Log");
+    engine->RegisterGlobalFunction("void WriteRaw(const String&in, bool = false)", asFUNCTIONPR(Log::WriteRaw, (const String&, bool), void), asCALL_CDECL);
+    engine->SetDefaultNamespace("");
+#ifdef REGISTER_MANUAL_PART_Object
+    REGISTER_MANUAL_PART_Object(Log, "Log")
+#endif
+#ifdef REGISTER_MANUAL_PART_RefCounted
+    REGISTER_MANUAL_PART_RefCounted(Log, "Log")
+#endif
+#ifdef REGISTER_MANUAL_PART_Log
+    REGISTER_MANUAL_PART_Log(Log, "Log")
+#endif
+    RegisterSubclass<Object, Log>(engine, "Object", "Log");
+    RegisterSubclass<RefCounted, Log>(engine, "RefCounted", "Log");
+
+    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("LogicComponent", asBEHAVE_ADDREF, "void f()", asMETHODPR(LogicComponent, AddRef, (), void), asCALL_THISCALL);
     // void Component::AddReplicationState(ComponentReplicationState* state) | File: ../Scene/Component.h
     // Error: type "ComponentReplicationState*" can not automatically bind
@@ -3319,6 +3289,36 @@ void ASRegisterGenerated_Members_L(asIScriptEngine* engine)
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<LinkedListNode>(engine, "LinkedListNode");
 #ifdef REGISTER_MANUAL_PART_LinkedListNode
     REGISTER_MANUAL_PART_LinkedListNode(LinkedListNode, "LinkedListNode")
+#endif
+
+    // ListNodeBase* ListIteratorBase::ptr_ | File: ../Container/ListBase.h
+    // ListNodeBase* can not be registered
+    // void ListIteratorBase::GotoNext() | File: ../Container/ListBase.h
+    engine->RegisterObjectMethod("ListIteratorBase", "void GotoNext()", asMETHODPR(ListIteratorBase, GotoNext, (), void), asCALL_THISCALL);
+    // void ListIteratorBase::GotoPrev() | File: ../Container/ListBase.h
+    engine->RegisterObjectMethod("ListIteratorBase", "void GotoPrev()", asMETHODPR(ListIteratorBase, GotoPrev, (), void), asCALL_THISCALL);
+    // explicit ListIteratorBase::ListIteratorBase(ListNodeBase* ptr) | File: ../Container/ListBase.h
+    // Error: type "ListNodeBase*" can not automatically bind
+    // bool ListIteratorBase::operator==(const ListIteratorBase& rhs) const | File: ../Container/ListBase.h
+    engine->RegisterObjectMethod("ListIteratorBase", "bool opEquals(const ListIteratorBase&in) const", asMETHODPR(ListIteratorBase, operator==, (const ListIteratorBase&) const, bool), asCALL_THISCALL);
+    // ListIteratorBase::~ListIteratorBase() | Implicitly-declared
+    engine->RegisterObjectBehaviour("ListIteratorBase", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(ListIteratorBase_Destructor), asCALL_CDECL_OBJFIRST);
+    // ListIteratorBase& ListIteratorBase::operator=(const ListIteratorBase&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<ListIteratorBase>(engine, "ListIteratorBase");
+#ifdef REGISTER_MANUAL_PART_ListIteratorBase
+    REGISTER_MANUAL_PART_ListIteratorBase(ListIteratorBase, "ListIteratorBase")
+#endif
+
+    // ListNodeBase* ListNodeBase::next_ | File: ../Container/ListBase.h
+    // ListNodeBase* can not be registered
+    // ListNodeBase* ListNodeBase::prev_ | File: ../Container/ListBase.h
+    // ListNodeBase* can not be registered
+    // ListNodeBase::~ListNodeBase() | Implicitly-declared
+    engine->RegisterObjectBehaviour("ListNodeBase", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(ListNodeBase_Destructor), asCALL_CDECL_OBJFIRST);
+    // ListNodeBase& ListNodeBase::operator=(const ListNodeBase&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<ListNodeBase>(engine, "ListNodeBase");
+#ifdef REGISTER_MANUAL_PART_ListNodeBase
+    REGISTER_MANUAL_PART_ListNodeBase(ListNodeBase, "ListNodeBase")
 #endif
 
 }

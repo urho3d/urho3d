@@ -33,14 +33,6 @@ namespace Urho3D
 void FakeAddRef(void* ptr);
 void FakeReleaseRef(void* ptr);
 
-#ifdef URHO3D_NAVIGATION
-// NavigationGeometryInfo::~NavigationGeometryInfo() | Implicitly-declared 
-static void NavigationGeometryInfo_Destructor(NavigationGeometryInfo* ptr)
-{
-    ptr->~NavigationGeometryInfo();
-}
-#endif
-
 // explicit NamedPipe::NamedPipe(Context* context) | File: ../IO/NamedPipe.h
 static NamedPipe* NamedPipe_NamedPipe_Context()
 {
@@ -66,6 +58,15 @@ static void NamedPipe_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Na
     PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
 }
+
+#ifdef URHO3D_NAVIGATION
+// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+static void NavArea_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(NavArea* ptr, CScriptArray* exceptions, bool onlyUserData)
+{
+    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+}
+#endif
 
 #ifdef URHO3D_NAVIGATION
 // explicit Navigable::Navigable(Context* context) | File: ../Navigation/Navigable.h
@@ -95,15 +96,6 @@ static NavigationMesh* NavigationMesh_NavigationMesh_Context()
 #ifdef URHO3D_NAVIGATION
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void NavigationMesh_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(NavigationMesh* ptr, CScriptArray* exceptions, bool onlyUserData)
-{
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
-}
-#endif
-
-#ifdef URHO3D_NAVIGATION
-// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void NavArea_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(NavArea* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
     PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
@@ -225,17 +217,27 @@ static void Node_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Node* p
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
 }
 
+#ifdef URHO3D_NAVIGATION
+// NavAreaStub::~NavAreaStub() | Implicitly-declared 
+static void NavAreaStub_Destructor(NavAreaStub* ptr)
+{
+    ptr->~NavAreaStub();
+}
+#endif
+
 // virtual NavBuildData::~NavBuildData() | File: ../Navigation/NavBuildData.h
 static void NavBuildData_Destructor_NavBuildData_void(NavBuildData* ptr)
 {
     ptr->~NavBuildData();
 }
 
-// NetworkState::~NetworkState() | Implicitly-declared 
-static void NetworkState_Destructor(NetworkState* ptr)
+#ifdef URHO3D_NAVIGATION
+// NavigationGeometryInfo::~NavigationGeometryInfo() | Implicitly-declared 
+static void NavigationGeometryInfo_Destructor(NavigationGeometryInfo* ptr)
 {
-    ptr->~NetworkState();
+    ptr->~NavigationGeometryInfo();
 }
+#endif
 
 #ifdef URHO3D_NAVIGATION
 // NavigationPathPoint::~NavigationPathPoint() | Implicitly-declared 
@@ -245,13 +247,11 @@ static void NavigationPathPoint_Destructor(NavigationPathPoint* ptr)
 }
 #endif
 
-#ifdef URHO3D_NAVIGATION
-// NavAreaStub::~NavAreaStub() | Implicitly-declared 
-static void NavAreaStub_Destructor(NavAreaStub* ptr)
+// NetworkState::~NetworkState() | Implicitly-declared 
+static void NetworkState_Destructor(NetworkState* ptr)
 {
-    ptr->~NavAreaStub();
+    ptr->~NetworkState();
 }
-#endif
 
 // NodeImpl::~NodeImpl() | Implicitly-declared 
 static void NodeImpl_Destructor(NodeImpl* ptr)
@@ -267,24 +267,6 @@ static void NodeReplicationState_Destructor(NodeReplicationState* ptr)
 
 void ASRegisterGenerated_Members_N(asIScriptEngine* engine)
 {
-#ifdef URHO3D_NAVIGATION
-    // BoundingBox NavigationGeometryInfo::boundingBox_ | File: ../Navigation/NavigationMesh.h
-    engine->RegisterObjectProperty("NavigationGeometryInfo", "BoundingBox boundingBox", offsetof(NavigationGeometryInfo, boundingBox_));
-    // Component* NavigationGeometryInfo::component_ | File: ../Navigation/NavigationMesh.h
-    // Component* can not be registered
-    // unsigned NavigationGeometryInfo::lodLevel_ | File: ../Navigation/NavigationMesh.h
-    engine->RegisterObjectProperty("NavigationGeometryInfo", "uint lodLevel", offsetof(NavigationGeometryInfo, lodLevel_));
-    // Matrix3x4 NavigationGeometryInfo::transform_ | File: ../Navigation/NavigationMesh.h
-    engine->RegisterObjectProperty("NavigationGeometryInfo", "Matrix3x4 transform", offsetof(NavigationGeometryInfo, transform_));
-    // NavigationGeometryInfo::~NavigationGeometryInfo() | Implicitly-declared
-    engine->RegisterObjectBehaviour("NavigationGeometryInfo", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(NavigationGeometryInfo_Destructor), asCALL_CDECL_OBJFIRST);
-    // NavigationGeometryInfo& NavigationGeometryInfo::operator=(const NavigationGeometryInfo&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<NavigationGeometryInfo>(engine, "NavigationGeometryInfo");
-#ifdef REGISTER_MANUAL_PART_NavigationGeometryInfo
-    REGISTER_MANUAL_PART_NavigationGeometryInfo(NavigationGeometryInfo, "NavigationGeometryInfo")
-#endif
-#endif
-
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("NamedPipe", asBEHAVE_ADDREF, "void f()", asMETHODPR(NamedPipe, AddRef, (), void), asCALL_THISCALL);
     // template<typename T> T* Object::Cast() | File: ../Core/Object.h
@@ -599,6 +581,299 @@ void ASRegisterGenerated_Members_N(asIScriptEngine* engine)
     RegisterSubclass<AbstractFile, NamedPipe>(engine, "AbstractFile", "NamedPipe");
     RegisterSubclass<Deserializer, NamedPipe>(engine, "Deserializer", "NamedPipe");
     RegisterSubclass<Serializer, NamedPipe>(engine, "Serializer", "NamedPipe");
+
+#ifdef URHO3D_NAVIGATION
+    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("NavArea", asBEHAVE_ADDREF, "void f()", asMETHODPR(NavArea, AddRef, (), void), asCALL_THISCALL);
+    // void Component::AddReplicationState(ComponentReplicationState* state) | File: ../Scene/Component.h
+    // Error: type "ComponentReplicationState*" can not automatically bind
+    // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("NavArea", "void AllocateNetworkState()", asMETHODPR(NavArea, AllocateNetworkState, (), void), asCALL_THISCALL);
+    // virtual void Serializable::ApplyAttributes() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("NavArea", "void ApplyAttributes()", asMETHODPR(NavArea, ApplyAttributes, (), void), asCALL_THISCALL);
+    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
+    // Not registered because template
+    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
+    // Not registered because template
+    // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("NavArea", "void CleanupConnection(Connection@+)", asMETHODPR(NavArea, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // void NavArea::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override | File: ../Navigation/NavArea.h
+    engine->RegisterObjectMethod("NavArea", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(NavArea, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
+    // bool Animatable::GetAnimationEnabled() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("NavArea", "bool GetAnimationEnabled() const", asMETHODPR(NavArea, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavArea", "bool get_animationEnabled() const", asMETHODPR(NavArea, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
+    // unsigned NavArea::GetAreaID() const | File: ../Navigation/NavArea.h
+    engine->RegisterObjectMethod("NavArea", "uint GetAreaID() const", asMETHODPR(NavArea, GetAreaID, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavArea", "uint get_areaID() const", asMETHODPR(NavArea, GetAreaID, () const, unsigned), asCALL_THISCALL);
+    // Variant Serializable::GetAttribute(unsigned index) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("NavArea", "Variant GetAttribute(uint) const", asMETHODPR(NavArea, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavArea", "Variant get_attributes(uint) const", asMETHODPR(NavArea, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
+    // Variant Serializable::GetAttribute(const String& name) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("NavArea", "Variant GetAttribute(const String&in) const", asMETHODPR(NavArea, GetAttribute, (const String&) const, Variant), asCALL_THISCALL);
+    // ValueAnimation* Animatable::GetAttributeAnimation(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("NavArea", "ValueAnimation@+ GetAttributeAnimation(const String&in) const", asMETHODPR(NavArea, GetAttributeAnimation, (const String&) const, ValueAnimation*), asCALL_THISCALL);
+    // float Animatable::GetAttributeAnimationSpeed(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("NavArea", "float GetAttributeAnimationSpeed(const String&in) const", asMETHODPR(NavArea, GetAttributeAnimationSpeed, (const String&) const, float), asCALL_THISCALL);
+    // float Animatable::GetAttributeAnimationTime(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("NavArea", "float GetAttributeAnimationTime(const String&in) const", asMETHODPR(NavArea, GetAttributeAnimationTime, (const String&) const, float), asCALL_THISCALL);
+    // WrapMode Animatable::GetAttributeAnimationWrapMode(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("NavArea", "WrapMode GetAttributeAnimationWrapMode(const String&in) const", asMETHODPR(NavArea, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), asCALL_THISCALL);
+    // Variant Serializable::GetAttributeDefault(unsigned index) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("NavArea", "Variant GetAttributeDefault(uint) const", asMETHODPR(NavArea, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavArea", "Variant get_attributeDefaults(uint) const", asMETHODPR(NavArea, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
+    // Variant Serializable::GetAttributeDefault(const String& name) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("NavArea", "Variant GetAttributeDefault(const String&in) const", asMETHODPR(NavArea, GetAttributeDefault, (const String&) const, Variant), asCALL_THISCALL);
+    // virtual const Vector<AttributeInfo>* Serializable::GetAttributes() const | File: ../Scene/Serializable.h
+    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
+    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("NavArea", "bool GetBlockEvents() const", asMETHODPR(NavArea, GetBlockEvents, () const, bool), asCALL_THISCALL);
+    // BoundingBox NavArea::GetBoundingBox() const | File: ../Navigation/NavArea.h
+    engine->RegisterObjectMethod("NavArea", "BoundingBox GetBoundingBox() const", asMETHODPR(NavArea, GetBoundingBox, () const, BoundingBox), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavArea", "BoundingBox get_boundingBox() const", asMETHODPR(NavArea, GetBoundingBox, () const, BoundingBox), asCALL_THISCALL);
+    // const String& Object::GetCategory() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("NavArea", "const String& GetCategory() const", asMETHODPR(NavArea, GetCategory, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavArea", "const String& get_category() const", asMETHODPR(NavArea, GetCategory, () const, const String&), asCALL_THISCALL);
+    // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("NavArea", "Component@+ GetComponent(StringHash) const", asMETHODPR(NavArea, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
+    // template<class T> T*  Component::GetComponent() const | File: ../Scene/Component.h
+    // Not registered because template
+    // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
+    // Error: type "PODVector<Component*>&" can not automatically bind
+    // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
+    // Not registered because template
+    // Context* Object::GetContext() const | File: ../Core/Object.h
+    // Error: type "Context*" can not be returned
+    // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
+    // Error: type "PODVector<Node*>&" can not automatically bind
+    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("NavArea", "VariantMap& GetEventDataMap() const", asMETHODPR(NavArea, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
+    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // Object* Object::GetEventSender() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("NavArea", "Object@+ GetEventSender() const", asMETHODPR(NavArea, GetEventSender, () const, Object*), asCALL_THISCALL);
+    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("NavArea", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(NavArea, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavArea", "const Variant& get_globalVar(StringHash) const", asMETHODPR(NavArea, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("NavArea", "const VariantMap& GetGlobalVars() const", asMETHODPR(NavArea, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavArea", "const VariantMap& get_globalVars() const", asMETHODPR(NavArea, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    // unsigned Component::GetID() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("NavArea", "uint GetID() const", asMETHODPR(NavArea, GetID, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavArea", "uint get_id() const", asMETHODPR(NavArea, GetID, () const, unsigned), asCALL_THISCALL);
+    // bool Serializable::GetInterceptNetworkUpdate(const String& attributeName) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("NavArea", "bool GetInterceptNetworkUpdate(const String&in) const", asMETHODPR(NavArea, GetInterceptNetworkUpdate, (const String&) const, bool), asCALL_THISCALL);
+    // virtual const Vector<AttributeInfo>* Serializable::GetNetworkAttributes() const | File: ../Scene/Serializable.h
+    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
+    // NetworkState* Serializable::GetNetworkState() const | File: ../Scene/Serializable.h
+    // Error: type "NetworkState*" can not automatically bind
+    // Node* Component::GetNode() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("NavArea", "Node@+ GetNode() const", asMETHODPR(NavArea, GetNode, () const, Node*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavArea", "Node@+ get_node() const", asMETHODPR(NavArea, GetNode, () const, Node*), asCALL_THISCALL);
+    // unsigned Serializable::GetNumAttributes() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("NavArea", "uint GetNumAttributes() const", asMETHODPR(NavArea, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavArea", "uint get_numAttributes() const", asMETHODPR(NavArea, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
+    // unsigned Serializable::GetNumNetworkAttributes() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("NavArea", "uint GetNumNetworkAttributes() const", asMETHODPR(NavArea, GetNumNetworkAttributes, () const, unsigned), asCALL_THISCALL);
+    // ObjectAnimation* Animatable::GetObjectAnimation() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("NavArea", "ObjectAnimation@+ GetObjectAnimation() const", asMETHODPR(NavArea, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavArea", "ObjectAnimation@+ get_objectAnimation() const", asMETHODPR(NavArea, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
+    // ResourceRef Animatable::GetObjectAnimationAttr() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("NavArea", "ResourceRef GetObjectAnimationAttr() const", asMETHODPR(NavArea, GetObjectAnimationAttr, () const, ResourceRef), asCALL_THISCALL);
+    // Scene* Component::GetScene() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("NavArea", "Scene@+ GetScene() const", asMETHODPR(NavArea, GetScene, () const, Scene*), asCALL_THISCALL);
+    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("NavArea", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(NavArea, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
+    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // Not registered because template
+    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("NavArea", "StringHash GetType() const", asMETHODPR(NavArea, GetType, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavArea", "StringHash get_type() const", asMETHODPR(NavArea, GetType, () const, StringHash), asCALL_THISCALL);
+    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("NavArea", "const String& GetTypeName() const", asMETHODPR(NavArea, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavArea", "const String& get_typeName() const", asMETHODPR(NavArea, GetTypeName, () const, const String&), asCALL_THISCALL);
+    // BoundingBox NavArea::GetWorldBoundingBox() const | File: ../Navigation/NavArea.h
+    engine->RegisterObjectMethod("NavArea", "BoundingBox GetWorldBoundingBox() const", asMETHODPR(NavArea, GetWorldBoundingBox, () const, BoundingBox), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavArea", "BoundingBox get_worldBoundingBox() const", asMETHODPR(NavArea, GetWorldBoundingBox, () const, BoundingBox), asCALL_THISCALL);
+    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("NavArea", "bool HasEventHandlers() const", asMETHODPR(NavArea, HasEventHandlers, () const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("NavArea", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(NavArea, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("NavArea", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(NavArea, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
+    // bool Component::IsEnabled() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("NavArea", "bool IsEnabled() const", asMETHODPR(NavArea, IsEnabled, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavArea", "bool get_enabled() const", asMETHODPR(NavArea, IsEnabled, () const, bool), asCALL_THISCALL);
+    // bool Component::IsEnabledEffective() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("NavArea", "bool IsEnabledEffective() const", asMETHODPR(NavArea, IsEnabledEffective, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavArea", "bool get_enabledEffective() const", asMETHODPR(NavArea, IsEnabledEffective, () const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("NavArea", "bool IsInstanceOf(StringHash) const", asMETHODPR(NavArea, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
+    // Not registered because template
+    // bool Component::IsReplicated() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("NavArea", "bool IsReplicated() const", asMETHODPR(NavArea, IsReplicated, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavArea", "bool get_replicated() const", asMETHODPR(NavArea, IsReplicated, () const, bool), asCALL_THISCALL);
+    // bool Serializable::IsTemporary() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("NavArea", "bool IsTemporary() const", asMETHODPR(NavArea, IsTemporary, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavArea", "bool get_temporary() const", asMETHODPR(NavArea, IsTemporary, () const, bool), asCALL_THISCALL);
+    // virtual bool Serializable::Load(Deserializer& source) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("NavArea", "bool Load(Deserializer&)", asMETHODPR(NavArea, Load, (Deserializer&), bool), asCALL_THISCALL);
+    // bool Animatable::LoadJSON(const JSONValue& source) override | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("NavArea", "bool LoadJSON(const JSONValue&in)", asMETHODPR(NavArea, LoadJSON, (const JSONValue&), bool), asCALL_THISCALL);
+    // bool Animatable::LoadXML(const XMLElement& source) override | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("NavArea", "bool LoadXML(const XMLElement&in)", asMETHODPR(NavArea, LoadXML, (const XMLElement&), bool), asCALL_THISCALL);
+    // void Component::MarkNetworkUpdate() override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("NavArea", "void MarkNetworkUpdate()", asMETHODPR(NavArea, MarkNetworkUpdate, (), void), asCALL_THISCALL);
+    // explicit NavArea::NavArea(Context*) | File: ../Navigation/NavArea.h
+    // Error: context can be only first
+    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("NavArea", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(NavArea, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
+    // virtual void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("NavArea", "void OnGetAttribute(const AttributeInfo&in, Variant&) const", asMETHODPR(NavArea, OnGetAttribute, (const AttributeInfo&, Variant&) const, void), asCALL_THISCALL);
+    // virtual void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("NavArea", "void OnSetAttribute(const AttributeInfo&in, const Variant&in)", asMETHODPR(NavArea, OnSetAttribute, (const AttributeInfo&, const Variant&), void), asCALL_THISCALL);
+    // virtual void Component::OnSetEnabled() | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("NavArea", "void OnSetEnabled()", asMETHODPR(NavArea, OnSetEnabled, (), void), asCALL_THISCALL);
+    // void Component::PrepareNetworkUpdate() | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("NavArea", "void PrepareNetworkUpdate()", asMETHODPR(NavArea, PrepareNetworkUpdate, (), void), asCALL_THISCALL);
+    // bool Serializable::ReadDeltaUpdate(Deserializer& source) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("NavArea", "bool ReadDeltaUpdate(Deserializer&)", asMETHODPR(NavArea, ReadDeltaUpdate, (Deserializer&), bool), asCALL_THISCALL);
+    // bool Serializable::ReadLatestDataUpdate(Deserializer& source) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("NavArea", "bool ReadLatestDataUpdate(Deserializer&)", asMETHODPR(NavArea, ReadLatestDataUpdate, (Deserializer&), bool), asCALL_THISCALL);
+    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
+    // Error: type "RefCount*" can not automatically bind
+    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("NavArea", "int Refs() const", asMETHODPR(NavArea, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavArea", "int get_refs() const", asMETHODPR(NavArea, Refs, () const, int), asCALL_THISCALL);
+    // static void NavArea::RegisterObject(Context*) | File: ../Navigation/NavArea.h
+    // Context can be used as firs parameter of constructors only
+    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("NavArea", asBEHAVE_RELEASE, "void f()", asMETHODPR(NavArea, ReleaseRef, (), void), asCALL_THISCALL);
+    // void Component::Remove() | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("NavArea", "void Remove()", asMETHODPR(NavArea, Remove, (), void), asCALL_THISCALL);
+    // void Animatable::RemoveAttributeAnimation(const String& name) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("NavArea", "void RemoveAttributeAnimation(const String&in)", asMETHODPR(NavArea, RemoveAttributeAnimation, (const String&), void), asCALL_THISCALL);
+    // void Serializable::RemoveInstanceDefault() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("NavArea", "void RemoveInstanceDefault()", asMETHODPR(NavArea, RemoveInstanceDefault, (), void), asCALL_THISCALL);
+    // void Animatable::RemoveObjectAnimation() | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("NavArea", "void RemoveObjectAnimation()", asMETHODPR(NavArea, RemoveObjectAnimation, (), void), asCALL_THISCALL);
+    // void Serializable::ResetToDefault() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("NavArea", "void ResetToDefault()", asMETHODPR(NavArea, ResetToDefault, (), void), asCALL_THISCALL);
+    // bool Component::Save(Serializer& dest) const override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("NavArea", "bool Save(Serializer&) const", asMETHODPR(NavArea, Save, (Serializer&) const, bool), asCALL_THISCALL);
+    // virtual bool Serializable::SaveDefaultAttributes() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("NavArea", "bool SaveDefaultAttributes() const", asMETHODPR(NavArea, SaveDefaultAttributes, () const, bool), asCALL_THISCALL);
+    // bool Component::SaveJSON(JSONValue& dest) const override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("NavArea", "bool SaveJSON(JSONValue&) const", asMETHODPR(NavArea, SaveJSON, (JSONValue&) const, bool), asCALL_THISCALL);
+    // bool Component::SaveXML(XMLElement& dest) const override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("NavArea", "bool SaveXML(XMLElement&) const", asMETHODPR(NavArea, SaveXML, (XMLElement&) const, bool), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("NavArea", "void SendEvent(StringHash)", asMETHODPR(NavArea, SendEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("NavArea", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(NavArea, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
+    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
+    // Not registered because template
+    // void Animatable::SetAnimationEnabled(bool enable) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("NavArea", "void SetAnimationEnabled(bool)", asMETHODPR(NavArea, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavArea", "void set_animationEnabled(bool)", asMETHODPR(NavArea, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
+    // void Animatable::SetAnimationTime(float time) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("NavArea", "void SetAnimationTime(float)", asMETHODPR(NavArea, SetAnimationTime, (float), void), asCALL_THISCALL);
+    // void NavArea::SetAreaID(unsigned newID) | File: ../Navigation/NavArea.h
+    engine->RegisterObjectMethod("NavArea", "void SetAreaID(uint)", asMETHODPR(NavArea, SetAreaID, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavArea", "void set_areaID(uint)", asMETHODPR(NavArea, SetAreaID, (unsigned), void), asCALL_THISCALL);
+    // bool Serializable::SetAttribute(unsigned index, const Variant& value) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("NavArea", "bool SetAttribute(uint, const Variant&in)", asMETHODPR(NavArea, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavArea", "bool set_attributes(uint, const Variant&in)", asMETHODPR(NavArea, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
+    // bool Serializable::SetAttribute(const String& name, const Variant& value) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("NavArea", "bool SetAttribute(const String&in, const Variant&in)", asMETHODPR(NavArea, SetAttribute, (const String&, const Variant&), bool), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode=WM_LOOP, float speed=1.0f) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("NavArea", "void SetAttributeAnimation(const String&in, ValueAnimation@+, WrapMode = WM_LOOP, float = 1.0f)", asMETHODPR(NavArea, SetAttributeAnimation, (const String&, ValueAnimation*, WrapMode, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationSpeed(const String& name, float speed) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("NavArea", "void SetAttributeAnimationSpeed(const String&in, float)", asMETHODPR(NavArea, SetAttributeAnimationSpeed, (const String&, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationTime(const String& name, float time) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("NavArea", "void SetAttributeAnimationTime(const String&in, float)", asMETHODPR(NavArea, SetAttributeAnimationTime, (const String&, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationWrapMode(const String& name, WrapMode wrapMode) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("NavArea", "void SetAttributeAnimationWrapMode(const String&in, WrapMode)", asMETHODPR(NavArea, SetAttributeAnimationWrapMode, (const String&, WrapMode), void), asCALL_THISCALL);
+    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("NavArea", "void SetBlockEvents(bool)", asMETHODPR(NavArea, SetBlockEvents, (bool), void), asCALL_THISCALL);
+    // void NavArea::SetBoundingBox(const BoundingBox& bnds) | File: ../Navigation/NavArea.h
+    engine->RegisterObjectMethod("NavArea", "void SetBoundingBox(const BoundingBox&in)", asMETHODPR(NavArea, SetBoundingBox, (const BoundingBox&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavArea", "void set_boundingBox(const BoundingBox&in)", asMETHODPR(NavArea, SetBoundingBox, (const BoundingBox&), void), asCALL_THISCALL);
+    // void Component::SetEnabled(bool enable) | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("NavArea", "void SetEnabled(bool)", asMETHODPR(NavArea, SetEnabled, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavArea", "void set_enabled(bool)", asMETHODPR(NavArea, SetEnabled, (bool), void), asCALL_THISCALL);
+    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("NavArea", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(NavArea, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavArea", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(NavArea, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    // void Serializable::SetInstanceDefault(bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("NavArea", "void SetInstanceDefault(bool)", asMETHODPR(NavArea, SetInstanceDefault, (bool), void), asCALL_THISCALL);
+    // void Serializable::SetInterceptNetworkUpdate(const String& attributeName, bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("NavArea", "void SetInterceptNetworkUpdate(const String&in, bool)", asMETHODPR(NavArea, SetInterceptNetworkUpdate, (const String&, bool), void), asCALL_THISCALL);
+    // void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("NavArea", "void SetObjectAnimation(ObjectAnimation@+)", asMETHODPR(NavArea, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavArea", "void set_objectAnimation(ObjectAnimation@+)", asMETHODPR(NavArea, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
+    // void Animatable::SetObjectAnimationAttr(const ResourceRef& value) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("NavArea", "void SetObjectAnimationAttr(const ResourceRef&in)", asMETHODPR(NavArea, SetObjectAnimationAttr, (const ResourceRef&), void), asCALL_THISCALL);
+    // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("NavArea", "void SetTemporary(bool)", asMETHODPR(NavArea, SetTemporary, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavArea", "void set_temporary(bool)", asMETHODPR(NavArea, SetTemporary, (bool), void), asCALL_THISCALL);
+    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
+    engine->RegisterObjectMethod("NavArea", "void UnsubscribeFromAllEvents()", asMETHODPR(NavArea, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("NavArea", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(NavArea_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
+    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("NavArea", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(NavArea, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("NavArea", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(NavArea, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("NavArea", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(NavArea, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
+    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("NavArea", "int WeakRefs() const", asMETHODPR(NavArea, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavArea", "int get_weakRefs() const", asMETHODPR(NavArea, WeakRefs, () const, int), asCALL_THISCALL);
+    // void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attributeBits, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("NavArea", "void WriteDeltaUpdate(Serializer&, const DirtyBits&in, uint8)", asMETHODPR(NavArea, WriteDeltaUpdate, (Serializer&, const DirtyBits&, unsigned char), void), asCALL_THISCALL);
+    // void Serializable::WriteInitialDeltaUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("NavArea", "void WriteInitialDeltaUpdate(Serializer&, uint8)", asMETHODPR(NavArea, WriteInitialDeltaUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
+    // void Serializable::WriteLatestDataUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("NavArea", "void WriteLatestDataUpdate(Serializer&, uint8)", asMETHODPR(NavArea, WriteLatestDataUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
+#ifdef REGISTER_MANUAL_PART_Component
+    REGISTER_MANUAL_PART_Component(NavArea, "NavArea")
+#endif
+#ifdef REGISTER_MANUAL_PART_Animatable
+    REGISTER_MANUAL_PART_Animatable(NavArea, "NavArea")
+#endif
+#ifdef REGISTER_MANUAL_PART_Serializable
+    REGISTER_MANUAL_PART_Serializable(NavArea, "NavArea")
+#endif
+#ifdef REGISTER_MANUAL_PART_Object
+    REGISTER_MANUAL_PART_Object(NavArea, "NavArea")
+#endif
+#ifdef REGISTER_MANUAL_PART_RefCounted
+    REGISTER_MANUAL_PART_RefCounted(NavArea, "NavArea")
+#endif
+#ifdef REGISTER_MANUAL_PART_NavArea
+    REGISTER_MANUAL_PART_NavArea(NavArea, "NavArea")
+#endif
+    RegisterSubclass<Component, NavArea>(engine, "Component", "NavArea");
+    RegisterSubclass<Animatable, NavArea>(engine, "Animatable", "NavArea");
+    RegisterSubclass<Serializable, NavArea>(engine, "Serializable", "NavArea");
+    RegisterSubclass<Object, NavArea>(engine, "Object", "NavArea");
+    RegisterSubclass<RefCounted, NavArea>(engine, "RefCounted", "NavArea");
+#endif
 
 #ifdef URHO3D_NAVIGATION
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
@@ -1326,299 +1601,6 @@ void ASRegisterGenerated_Members_N(asIScriptEngine* engine)
     RegisterSubclass<Serializable, NavigationMesh>(engine, "Serializable", "NavigationMesh");
     RegisterSubclass<Object, NavigationMesh>(engine, "Object", "NavigationMesh");
     RegisterSubclass<RefCounted, NavigationMesh>(engine, "RefCounted", "NavigationMesh");
-#endif
-
-#ifdef URHO3D_NAVIGATION
-    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("NavArea", asBEHAVE_ADDREF, "void f()", asMETHODPR(NavArea, AddRef, (), void), asCALL_THISCALL);
-    // void Component::AddReplicationState(ComponentReplicationState* state) | File: ../Scene/Component.h
-    // Error: type "ComponentReplicationState*" can not automatically bind
-    // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("NavArea", "void AllocateNetworkState()", asMETHODPR(NavArea, AllocateNetworkState, (), void), asCALL_THISCALL);
-    // virtual void Serializable::ApplyAttributes() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("NavArea", "void ApplyAttributes()", asMETHODPR(NavArea, ApplyAttributes, (), void), asCALL_THISCALL);
-    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
-    // Not registered because template
-    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
-    // Not registered because template
-    // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("NavArea", "void CleanupConnection(Connection@+)", asMETHODPR(NavArea, CleanupConnection, (Connection*), void), asCALL_THISCALL);
-    // void NavArea::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override | File: ../Navigation/NavArea.h
-    engine->RegisterObjectMethod("NavArea", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(NavArea, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
-    // bool Animatable::GetAnimationEnabled() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("NavArea", "bool GetAnimationEnabled() const", asMETHODPR(NavArea, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("NavArea", "bool get_animationEnabled() const", asMETHODPR(NavArea, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
-    // unsigned NavArea::GetAreaID() const | File: ../Navigation/NavArea.h
-    engine->RegisterObjectMethod("NavArea", "uint GetAreaID() const", asMETHODPR(NavArea, GetAreaID, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("NavArea", "uint get_areaID() const", asMETHODPR(NavArea, GetAreaID, () const, unsigned), asCALL_THISCALL);
-    // Variant Serializable::GetAttribute(unsigned index) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("NavArea", "Variant GetAttribute(uint) const", asMETHODPR(NavArea, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
-    engine->RegisterObjectMethod("NavArea", "Variant get_attributes(uint) const", asMETHODPR(NavArea, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
-    // Variant Serializable::GetAttribute(const String& name) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("NavArea", "Variant GetAttribute(const String&in) const", asMETHODPR(NavArea, GetAttribute, (const String&) const, Variant), asCALL_THISCALL);
-    // ValueAnimation* Animatable::GetAttributeAnimation(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("NavArea", "ValueAnimation@+ GetAttributeAnimation(const String&in) const", asMETHODPR(NavArea, GetAttributeAnimation, (const String&) const, ValueAnimation*), asCALL_THISCALL);
-    // float Animatable::GetAttributeAnimationSpeed(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("NavArea", "float GetAttributeAnimationSpeed(const String&in) const", asMETHODPR(NavArea, GetAttributeAnimationSpeed, (const String&) const, float), asCALL_THISCALL);
-    // float Animatable::GetAttributeAnimationTime(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("NavArea", "float GetAttributeAnimationTime(const String&in) const", asMETHODPR(NavArea, GetAttributeAnimationTime, (const String&) const, float), asCALL_THISCALL);
-    // WrapMode Animatable::GetAttributeAnimationWrapMode(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("NavArea", "WrapMode GetAttributeAnimationWrapMode(const String&in) const", asMETHODPR(NavArea, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), asCALL_THISCALL);
-    // Variant Serializable::GetAttributeDefault(unsigned index) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("NavArea", "Variant GetAttributeDefault(uint) const", asMETHODPR(NavArea, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
-    engine->RegisterObjectMethod("NavArea", "Variant get_attributeDefaults(uint) const", asMETHODPR(NavArea, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
-    // Variant Serializable::GetAttributeDefault(const String& name) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("NavArea", "Variant GetAttributeDefault(const String&in) const", asMETHODPR(NavArea, GetAttributeDefault, (const String&) const, Variant), asCALL_THISCALL);
-    // virtual const Vector<AttributeInfo>* Serializable::GetAttributes() const | File: ../Scene/Serializable.h
-    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
-    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("NavArea", "bool GetBlockEvents() const", asMETHODPR(NavArea, GetBlockEvents, () const, bool), asCALL_THISCALL);
-    // BoundingBox NavArea::GetBoundingBox() const | File: ../Navigation/NavArea.h
-    engine->RegisterObjectMethod("NavArea", "BoundingBox GetBoundingBox() const", asMETHODPR(NavArea, GetBoundingBox, () const, BoundingBox), asCALL_THISCALL);
-    engine->RegisterObjectMethod("NavArea", "BoundingBox get_boundingBox() const", asMETHODPR(NavArea, GetBoundingBox, () const, BoundingBox), asCALL_THISCALL);
-    // const String& Object::GetCategory() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("NavArea", "const String& GetCategory() const", asMETHODPR(NavArea, GetCategory, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("NavArea", "const String& get_category() const", asMETHODPR(NavArea, GetCategory, () const, const String&), asCALL_THISCALL);
-    // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("NavArea", "Component@+ GetComponent(StringHash) const", asMETHODPR(NavArea, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
-    // template<class T> T*  Component::GetComponent() const | File: ../Scene/Component.h
-    // Not registered because template
-    // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
-    // Error: type "PODVector<Component*>&" can not automatically bind
-    // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
-    // Not registered because template
-    // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
-    // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
-    // Error: type "PODVector<Node*>&" can not automatically bind
-    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("NavArea", "VariantMap& GetEventDataMap() const", asMETHODPR(NavArea, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
-    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // Object* Object::GetEventSender() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("NavArea", "Object@+ GetEventSender() const", asMETHODPR(NavArea, GetEventSender, () const, Object*), asCALL_THISCALL);
-    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("NavArea", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(NavArea, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("NavArea", "const Variant& get_globalVar(StringHash) const", asMETHODPR(NavArea, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("NavArea", "const VariantMap& GetGlobalVars() const", asMETHODPR(NavArea, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("NavArea", "const VariantMap& get_globalVars() const", asMETHODPR(NavArea, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    // unsigned Component::GetID() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("NavArea", "uint GetID() const", asMETHODPR(NavArea, GetID, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("NavArea", "uint get_id() const", asMETHODPR(NavArea, GetID, () const, unsigned), asCALL_THISCALL);
-    // bool Serializable::GetInterceptNetworkUpdate(const String& attributeName) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("NavArea", "bool GetInterceptNetworkUpdate(const String&in) const", asMETHODPR(NavArea, GetInterceptNetworkUpdate, (const String&) const, bool), asCALL_THISCALL);
-    // virtual const Vector<AttributeInfo>* Serializable::GetNetworkAttributes() const | File: ../Scene/Serializable.h
-    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
-    // NetworkState* Serializable::GetNetworkState() const | File: ../Scene/Serializable.h
-    // Error: type "NetworkState*" can not automatically bind
-    // Node* Component::GetNode() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("NavArea", "Node@+ GetNode() const", asMETHODPR(NavArea, GetNode, () const, Node*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("NavArea", "Node@+ get_node() const", asMETHODPR(NavArea, GetNode, () const, Node*), asCALL_THISCALL);
-    // unsigned Serializable::GetNumAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("NavArea", "uint GetNumAttributes() const", asMETHODPR(NavArea, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("NavArea", "uint get_numAttributes() const", asMETHODPR(NavArea, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
-    // unsigned Serializable::GetNumNetworkAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("NavArea", "uint GetNumNetworkAttributes() const", asMETHODPR(NavArea, GetNumNetworkAttributes, () const, unsigned), asCALL_THISCALL);
-    // ObjectAnimation* Animatable::GetObjectAnimation() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("NavArea", "ObjectAnimation@+ GetObjectAnimation() const", asMETHODPR(NavArea, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("NavArea", "ObjectAnimation@+ get_objectAnimation() const", asMETHODPR(NavArea, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
-    // ResourceRef Animatable::GetObjectAnimationAttr() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("NavArea", "ResourceRef GetObjectAnimationAttr() const", asMETHODPR(NavArea, GetObjectAnimationAttr, () const, ResourceRef), asCALL_THISCALL);
-    // Scene* Component::GetScene() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("NavArea", "Scene@+ GetScene() const", asMETHODPR(NavArea, GetScene, () const, Scene*), asCALL_THISCALL);
-    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("NavArea", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(NavArea, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
-    // Not registered because template
-    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("NavArea", "StringHash GetType() const", asMETHODPR(NavArea, GetType, () const, StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod("NavArea", "StringHash get_type() const", asMETHODPR(NavArea, GetType, () const, StringHash), asCALL_THISCALL);
-    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("NavArea", "const String& GetTypeName() const", asMETHODPR(NavArea, GetTypeName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("NavArea", "const String& get_typeName() const", asMETHODPR(NavArea, GetTypeName, () const, const String&), asCALL_THISCALL);
-    // BoundingBox NavArea::GetWorldBoundingBox() const | File: ../Navigation/NavArea.h
-    engine->RegisterObjectMethod("NavArea", "BoundingBox GetWorldBoundingBox() const", asMETHODPR(NavArea, GetWorldBoundingBox, () const, BoundingBox), asCALL_THISCALL);
-    engine->RegisterObjectMethod("NavArea", "BoundingBox get_worldBoundingBox() const", asMETHODPR(NavArea, GetWorldBoundingBox, () const, BoundingBox), asCALL_THISCALL);
-    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("NavArea", "bool HasEventHandlers() const", asMETHODPR(NavArea, HasEventHandlers, () const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("NavArea", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(NavArea, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("NavArea", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(NavArea, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
-    // bool Component::IsEnabled() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("NavArea", "bool IsEnabled() const", asMETHODPR(NavArea, IsEnabled, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("NavArea", "bool get_enabled() const", asMETHODPR(NavArea, IsEnabled, () const, bool), asCALL_THISCALL);
-    // bool Component::IsEnabledEffective() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("NavArea", "bool IsEnabledEffective() const", asMETHODPR(NavArea, IsEnabledEffective, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("NavArea", "bool get_enabledEffective() const", asMETHODPR(NavArea, IsEnabledEffective, () const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("NavArea", "bool IsInstanceOf(StringHash) const", asMETHODPR(NavArea, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
-    // Not registered because template
-    // bool Component::IsReplicated() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("NavArea", "bool IsReplicated() const", asMETHODPR(NavArea, IsReplicated, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("NavArea", "bool get_replicated() const", asMETHODPR(NavArea, IsReplicated, () const, bool), asCALL_THISCALL);
-    // bool Serializable::IsTemporary() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("NavArea", "bool IsTemporary() const", asMETHODPR(NavArea, IsTemporary, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("NavArea", "bool get_temporary() const", asMETHODPR(NavArea, IsTemporary, () const, bool), asCALL_THISCALL);
-    // virtual bool Serializable::Load(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("NavArea", "bool Load(Deserializer&)", asMETHODPR(NavArea, Load, (Deserializer&), bool), asCALL_THISCALL);
-    // bool Animatable::LoadJSON(const JSONValue& source) override | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("NavArea", "bool LoadJSON(const JSONValue&in)", asMETHODPR(NavArea, LoadJSON, (const JSONValue&), bool), asCALL_THISCALL);
-    // bool Animatable::LoadXML(const XMLElement& source) override | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("NavArea", "bool LoadXML(const XMLElement&in)", asMETHODPR(NavArea, LoadXML, (const XMLElement&), bool), asCALL_THISCALL);
-    // void Component::MarkNetworkUpdate() override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("NavArea", "void MarkNetworkUpdate()", asMETHODPR(NavArea, MarkNetworkUpdate, (), void), asCALL_THISCALL);
-    // explicit NavArea::NavArea(Context*) | File: ../Navigation/NavArea.h
-    // Error: context can be only first
-    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("NavArea", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(NavArea, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
-    // virtual void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("NavArea", "void OnGetAttribute(const AttributeInfo&in, Variant&) const", asMETHODPR(NavArea, OnGetAttribute, (const AttributeInfo&, Variant&) const, void), asCALL_THISCALL);
-    // virtual void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("NavArea", "void OnSetAttribute(const AttributeInfo&in, const Variant&in)", asMETHODPR(NavArea, OnSetAttribute, (const AttributeInfo&, const Variant&), void), asCALL_THISCALL);
-    // virtual void Component::OnSetEnabled() | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("NavArea", "void OnSetEnabled()", asMETHODPR(NavArea, OnSetEnabled, (), void), asCALL_THISCALL);
-    // void Component::PrepareNetworkUpdate() | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("NavArea", "void PrepareNetworkUpdate()", asMETHODPR(NavArea, PrepareNetworkUpdate, (), void), asCALL_THISCALL);
-    // bool Serializable::ReadDeltaUpdate(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("NavArea", "bool ReadDeltaUpdate(Deserializer&)", asMETHODPR(NavArea, ReadDeltaUpdate, (Deserializer&), bool), asCALL_THISCALL);
-    // bool Serializable::ReadLatestDataUpdate(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("NavArea", "bool ReadLatestDataUpdate(Deserializer&)", asMETHODPR(NavArea, ReadLatestDataUpdate, (Deserializer&), bool), asCALL_THISCALL);
-    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
-    // Error: type "RefCount*" can not automatically bind
-    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("NavArea", "int Refs() const", asMETHODPR(NavArea, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("NavArea", "int get_refs() const", asMETHODPR(NavArea, Refs, () const, int), asCALL_THISCALL);
-    // static void NavArea::RegisterObject(Context*) | File: ../Navigation/NavArea.h
-    // Context can be used as firs parameter of constructors only
-    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("NavArea", asBEHAVE_RELEASE, "void f()", asMETHODPR(NavArea, ReleaseRef, (), void), asCALL_THISCALL);
-    // void Component::Remove() | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("NavArea", "void Remove()", asMETHODPR(NavArea, Remove, (), void), asCALL_THISCALL);
-    // void Animatable::RemoveAttributeAnimation(const String& name) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("NavArea", "void RemoveAttributeAnimation(const String&in)", asMETHODPR(NavArea, RemoveAttributeAnimation, (const String&), void), asCALL_THISCALL);
-    // void Serializable::RemoveInstanceDefault() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("NavArea", "void RemoveInstanceDefault()", asMETHODPR(NavArea, RemoveInstanceDefault, (), void), asCALL_THISCALL);
-    // void Animatable::RemoveObjectAnimation() | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("NavArea", "void RemoveObjectAnimation()", asMETHODPR(NavArea, RemoveObjectAnimation, (), void), asCALL_THISCALL);
-    // void Serializable::ResetToDefault() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("NavArea", "void ResetToDefault()", asMETHODPR(NavArea, ResetToDefault, (), void), asCALL_THISCALL);
-    // bool Component::Save(Serializer& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("NavArea", "bool Save(Serializer&) const", asMETHODPR(NavArea, Save, (Serializer&) const, bool), asCALL_THISCALL);
-    // virtual bool Serializable::SaveDefaultAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("NavArea", "bool SaveDefaultAttributes() const", asMETHODPR(NavArea, SaveDefaultAttributes, () const, bool), asCALL_THISCALL);
-    // bool Component::SaveJSON(JSONValue& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("NavArea", "bool SaveJSON(JSONValue&) const", asMETHODPR(NavArea, SaveJSON, (JSONValue&) const, bool), asCALL_THISCALL);
-    // bool Component::SaveXML(XMLElement& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("NavArea", "bool SaveXML(XMLElement&) const", asMETHODPR(NavArea, SaveXML, (XMLElement&) const, bool), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("NavArea", "void SendEvent(StringHash)", asMETHODPR(NavArea, SendEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("NavArea", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(NavArea, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
-    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
-    // Not registered because template
-    // void Animatable::SetAnimationEnabled(bool enable) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("NavArea", "void SetAnimationEnabled(bool)", asMETHODPR(NavArea, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("NavArea", "void set_animationEnabled(bool)", asMETHODPR(NavArea, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
-    // void Animatable::SetAnimationTime(float time) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("NavArea", "void SetAnimationTime(float)", asMETHODPR(NavArea, SetAnimationTime, (float), void), asCALL_THISCALL);
-    // void NavArea::SetAreaID(unsigned newID) | File: ../Navigation/NavArea.h
-    engine->RegisterObjectMethod("NavArea", "void SetAreaID(uint)", asMETHODPR(NavArea, SetAreaID, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("NavArea", "void set_areaID(uint)", asMETHODPR(NavArea, SetAreaID, (unsigned), void), asCALL_THISCALL);
-    // bool Serializable::SetAttribute(unsigned index, const Variant& value) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("NavArea", "bool SetAttribute(uint, const Variant&in)", asMETHODPR(NavArea, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("NavArea", "bool set_attributes(uint, const Variant&in)", asMETHODPR(NavArea, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
-    // bool Serializable::SetAttribute(const String& name, const Variant& value) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("NavArea", "bool SetAttribute(const String&in, const Variant&in)", asMETHODPR(NavArea, SetAttribute, (const String&, const Variant&), bool), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode=WM_LOOP, float speed=1.0f) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("NavArea", "void SetAttributeAnimation(const String&in, ValueAnimation@+, WrapMode = WM_LOOP, float = 1.0f)", asMETHODPR(NavArea, SetAttributeAnimation, (const String&, ValueAnimation*, WrapMode, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationSpeed(const String& name, float speed) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("NavArea", "void SetAttributeAnimationSpeed(const String&in, float)", asMETHODPR(NavArea, SetAttributeAnimationSpeed, (const String&, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationTime(const String& name, float time) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("NavArea", "void SetAttributeAnimationTime(const String&in, float)", asMETHODPR(NavArea, SetAttributeAnimationTime, (const String&, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationWrapMode(const String& name, WrapMode wrapMode) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("NavArea", "void SetAttributeAnimationWrapMode(const String&in, WrapMode)", asMETHODPR(NavArea, SetAttributeAnimationWrapMode, (const String&, WrapMode), void), asCALL_THISCALL);
-    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("NavArea", "void SetBlockEvents(bool)", asMETHODPR(NavArea, SetBlockEvents, (bool), void), asCALL_THISCALL);
-    // void NavArea::SetBoundingBox(const BoundingBox& bnds) | File: ../Navigation/NavArea.h
-    engine->RegisterObjectMethod("NavArea", "void SetBoundingBox(const BoundingBox&in)", asMETHODPR(NavArea, SetBoundingBox, (const BoundingBox&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("NavArea", "void set_boundingBox(const BoundingBox&in)", asMETHODPR(NavArea, SetBoundingBox, (const BoundingBox&), void), asCALL_THISCALL);
-    // void Component::SetEnabled(bool enable) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("NavArea", "void SetEnabled(bool)", asMETHODPR(NavArea, SetEnabled, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("NavArea", "void set_enabled(bool)", asMETHODPR(NavArea, SetEnabled, (bool), void), asCALL_THISCALL);
-    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("NavArea", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(NavArea, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("NavArea", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(NavArea, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    // void Serializable::SetInstanceDefault(bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("NavArea", "void SetInstanceDefault(bool)", asMETHODPR(NavArea, SetInstanceDefault, (bool), void), asCALL_THISCALL);
-    // void Serializable::SetInterceptNetworkUpdate(const String& attributeName, bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("NavArea", "void SetInterceptNetworkUpdate(const String&in, bool)", asMETHODPR(NavArea, SetInterceptNetworkUpdate, (const String&, bool), void), asCALL_THISCALL);
-    // void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("NavArea", "void SetObjectAnimation(ObjectAnimation@+)", asMETHODPR(NavArea, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("NavArea", "void set_objectAnimation(ObjectAnimation@+)", asMETHODPR(NavArea, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
-    // void Animatable::SetObjectAnimationAttr(const ResourceRef& value) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("NavArea", "void SetObjectAnimationAttr(const ResourceRef&in)", asMETHODPR(NavArea, SetObjectAnimationAttr, (const ResourceRef&), void), asCALL_THISCALL);
-    // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("NavArea", "void SetTemporary(bool)", asMETHODPR(NavArea, SetTemporary, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("NavArea", "void set_temporary(bool)", asMETHODPR(NavArea, SetTemporary, (bool), void), asCALL_THISCALL);
-    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
-    engine->RegisterObjectMethod("NavArea", "void UnsubscribeFromAllEvents()", asMETHODPR(NavArea, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("NavArea", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(NavArea_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
-    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("NavArea", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(NavArea, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("NavArea", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(NavArea, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("NavArea", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(NavArea, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
-    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("NavArea", "int WeakRefs() const", asMETHODPR(NavArea, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("NavArea", "int get_weakRefs() const", asMETHODPR(NavArea, WeakRefs, () const, int), asCALL_THISCALL);
-    // void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attributeBits, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("NavArea", "void WriteDeltaUpdate(Serializer&, const DirtyBits&in, uint8)", asMETHODPR(NavArea, WriteDeltaUpdate, (Serializer&, const DirtyBits&, unsigned char), void), asCALL_THISCALL);
-    // void Serializable::WriteInitialDeltaUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("NavArea", "void WriteInitialDeltaUpdate(Serializer&, uint8)", asMETHODPR(NavArea, WriteInitialDeltaUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
-    // void Serializable::WriteLatestDataUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("NavArea", "void WriteLatestDataUpdate(Serializer&, uint8)", asMETHODPR(NavArea, WriteLatestDataUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
-#ifdef REGISTER_MANUAL_PART_Component
-    REGISTER_MANUAL_PART_Component(NavArea, "NavArea")
-#endif
-#ifdef REGISTER_MANUAL_PART_Animatable
-    REGISTER_MANUAL_PART_Animatable(NavArea, "NavArea")
-#endif
-#ifdef REGISTER_MANUAL_PART_Serializable
-    REGISTER_MANUAL_PART_Serializable(NavArea, "NavArea")
-#endif
-#ifdef REGISTER_MANUAL_PART_Object
-    REGISTER_MANUAL_PART_Object(NavArea, "NavArea")
-#endif
-#ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(NavArea, "NavArea")
-#endif
-#ifdef REGISTER_MANUAL_PART_NavArea
-    REGISTER_MANUAL_PART_NavArea(NavArea, "NavArea")
-#endif
-    RegisterSubclass<Component, NavArea>(engine, "Component", "NavArea");
-    RegisterSubclass<Animatable, NavArea>(engine, "Animatable", "NavArea");
-    RegisterSubclass<Serializable, NavArea>(engine, "Serializable", "NavArea");
-    RegisterSubclass<Object, NavArea>(engine, "Object", "NavArea");
-    RegisterSubclass<RefCounted, NavArea>(engine, "RefCounted", "NavArea");
 #endif
 
 #ifdef URHO3D_NETWORK
@@ -2772,6 +2754,20 @@ void ASRegisterGenerated_Members_N(asIScriptEngine* engine)
     RegisterSubclass<RefCounted, Node>(engine, "RefCounted", "Node");
 
 #ifdef URHO3D_NAVIGATION
+    // unsigned char NavAreaStub::areaID_ | File: ../Navigation/NavBuildData.h
+    engine->RegisterObjectProperty("NavAreaStub", "uint8 areaID", offsetof(NavAreaStub, areaID_));
+    // BoundingBox NavAreaStub::bounds_ | File: ../Navigation/NavBuildData.h
+    engine->RegisterObjectProperty("NavAreaStub", "BoundingBox bounds", offsetof(NavAreaStub, bounds_));
+    // NavAreaStub::~NavAreaStub() | Implicitly-declared
+    engine->RegisterObjectBehaviour("NavAreaStub", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(NavAreaStub_Destructor), asCALL_CDECL_OBJFIRST);
+    // NavAreaStub& NavAreaStub::operator=(const NavAreaStub&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<NavAreaStub>(engine, "NavAreaStub");
+#ifdef REGISTER_MANUAL_PART_NavAreaStub
+    REGISTER_MANUAL_PART_NavAreaStub(NavAreaStub, "NavAreaStub")
+#endif
+#endif
+
+#ifdef URHO3D_NAVIGATION
     // rcCompactHeightfield* NavBuildData::compactHeightField_ | File: ../Navigation/NavBuildData.h
     // rcCompactHeightfield* can not be registered
     // rcContext* NavBuildData::ctx_ | File: ../Navigation/NavBuildData.h
@@ -2805,24 +2801,22 @@ void ASRegisterGenerated_Members_N(asIScriptEngine* engine)
 #endif
 #endif
 
-    // const Vector<AttributeInfo>* NetworkState::attributes_ | File: ../Scene/ReplicationState.h
-    // const Vector<AttributeInfo>* can not be registered
-    // Vector<Variant> NetworkState::currentValues_ | File: ../Scene/ReplicationState.h
-    // Error: type "Vector<Variant>" can not automatically bind
-    // unsigned long long NetworkState::interceptMask_ | File: ../Scene/ReplicationState.h
-    engine->RegisterObjectProperty("NetworkState", "uint64 interceptMask", offsetof(NetworkState, interceptMask_));
-    // Vector<Variant> NetworkState::previousValues_ | File: ../Scene/ReplicationState.h
-    // Error: type "Vector<Variant>" can not automatically bind
-    // VariantMap NetworkState::previousVars_ | File: ../Scene/ReplicationState.h
-    engine->RegisterObjectProperty("NetworkState", "VariantMap previousVars", offsetof(NetworkState, previousVars_));
-    // PODVector<ReplicationState*> NetworkState::replicationStates_ | File: ../Scene/ReplicationState.h
-    // Error: type "PODVector<ReplicationState*>" can not automatically bind
-    // NetworkState::~NetworkState() | Implicitly-declared
-    engine->RegisterObjectBehaviour("NetworkState", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(NetworkState_Destructor), asCALL_CDECL_OBJFIRST);
-    // NetworkState& NetworkState::operator=(const NetworkState&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<NetworkState>(engine, "NetworkState");
-#ifdef REGISTER_MANUAL_PART_NetworkState
-    REGISTER_MANUAL_PART_NetworkState(NetworkState, "NetworkState")
+#ifdef URHO3D_NAVIGATION
+    // BoundingBox NavigationGeometryInfo::boundingBox_ | File: ../Navigation/NavigationMesh.h
+    engine->RegisterObjectProperty("NavigationGeometryInfo", "BoundingBox boundingBox", offsetof(NavigationGeometryInfo, boundingBox_));
+    // Component* NavigationGeometryInfo::component_ | File: ../Navigation/NavigationMesh.h
+    // Component* can not be registered
+    // unsigned NavigationGeometryInfo::lodLevel_ | File: ../Navigation/NavigationMesh.h
+    engine->RegisterObjectProperty("NavigationGeometryInfo", "uint lodLevel", offsetof(NavigationGeometryInfo, lodLevel_));
+    // Matrix3x4 NavigationGeometryInfo::transform_ | File: ../Navigation/NavigationMesh.h
+    engine->RegisterObjectProperty("NavigationGeometryInfo", "Matrix3x4 transform", offsetof(NavigationGeometryInfo, transform_));
+    // NavigationGeometryInfo::~NavigationGeometryInfo() | Implicitly-declared
+    engine->RegisterObjectBehaviour("NavigationGeometryInfo", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(NavigationGeometryInfo_Destructor), asCALL_CDECL_OBJFIRST);
+    // NavigationGeometryInfo& NavigationGeometryInfo::operator=(const NavigationGeometryInfo&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<NavigationGeometryInfo>(engine, "NavigationGeometryInfo");
+#ifdef REGISTER_MANUAL_PART_NavigationGeometryInfo
+    REGISTER_MANUAL_PART_NavigationGeometryInfo(NavigationGeometryInfo, "NavigationGeometryInfo")
+#endif
 #endif
 
 #ifdef URHO3D_NAVIGATION
@@ -2841,18 +2835,24 @@ void ASRegisterGenerated_Members_N(asIScriptEngine* engine)
 #endif
 #endif
 
-#ifdef URHO3D_NAVIGATION
-    // unsigned char NavAreaStub::areaID_ | File: ../Navigation/NavBuildData.h
-    engine->RegisterObjectProperty("NavAreaStub", "uint8 areaID", offsetof(NavAreaStub, areaID_));
-    // BoundingBox NavAreaStub::bounds_ | File: ../Navigation/NavBuildData.h
-    engine->RegisterObjectProperty("NavAreaStub", "BoundingBox bounds", offsetof(NavAreaStub, bounds_));
-    // NavAreaStub::~NavAreaStub() | Implicitly-declared
-    engine->RegisterObjectBehaviour("NavAreaStub", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(NavAreaStub_Destructor), asCALL_CDECL_OBJFIRST);
-    // NavAreaStub& NavAreaStub::operator=(const NavAreaStub&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<NavAreaStub>(engine, "NavAreaStub");
-#ifdef REGISTER_MANUAL_PART_NavAreaStub
-    REGISTER_MANUAL_PART_NavAreaStub(NavAreaStub, "NavAreaStub")
-#endif
+    // const Vector<AttributeInfo>* NetworkState::attributes_ | File: ../Scene/ReplicationState.h
+    // const Vector<AttributeInfo>* can not be registered
+    // Vector<Variant> NetworkState::currentValues_ | File: ../Scene/ReplicationState.h
+    // Error: type "Vector<Variant>" can not automatically bind
+    // unsigned long long NetworkState::interceptMask_ | File: ../Scene/ReplicationState.h
+    engine->RegisterObjectProperty("NetworkState", "uint64 interceptMask", offsetof(NetworkState, interceptMask_));
+    // Vector<Variant> NetworkState::previousValues_ | File: ../Scene/ReplicationState.h
+    // Error: type "Vector<Variant>" can not automatically bind
+    // VariantMap NetworkState::previousVars_ | File: ../Scene/ReplicationState.h
+    engine->RegisterObjectProperty("NetworkState", "VariantMap previousVars", offsetof(NetworkState, previousVars_));
+    // PODVector<ReplicationState*> NetworkState::replicationStates_ | File: ../Scene/ReplicationState.h
+    // Error: type "PODVector<ReplicationState*>" can not automatically bind
+    // NetworkState::~NetworkState() | Implicitly-declared
+    engine->RegisterObjectBehaviour("NetworkState", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(NetworkState_Destructor), asCALL_CDECL_OBJFIRST);
+    // NetworkState& NetworkState::operator=(const NetworkState&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<NetworkState>(engine, "NetworkState");
+#ifdef REGISTER_MANUAL_PART_NetworkState
+    REGISTER_MANUAL_PART_NetworkState(NetworkState, "NetworkState")
 #endif
 
     // VectorBuffer NodeImpl::attrBuffer_ | File: ../Scene/Node.h

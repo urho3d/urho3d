@@ -42,6 +42,24 @@ static ValueAnimation* ValueAnimation_ValueAnimation_Context()
     return new ValueAnimation(GetScriptContext());
 }
 
+// ValueAnimationInfo::ValueAnimationInfo(ValueAnimation* animation, WrapMode wrapMode, float speed) | File: ../Scene/ValueAnimationInfo.h
+static ValueAnimationInfo* ValueAnimationInfo_ValueAnimationInfo_ValueAnimation_WrapMode_float(ValueAnimation *animation, WrapMode wrapMode, float speed)
+{
+    return new ValueAnimationInfo(animation, wrapMode, speed);
+}
+
+// ValueAnimationInfo::ValueAnimationInfo(Object* target, ValueAnimation* animation, WrapMode wrapMode, float speed) | File: ../Scene/ValueAnimationInfo.h
+static ValueAnimationInfo* ValueAnimationInfo_ValueAnimationInfo_Object_ValueAnimation_WrapMode_float(Object *target, ValueAnimation *animation, WrapMode wrapMode, float speed)
+{
+    return new ValueAnimationInfo(target, animation, wrapMode, speed);
+}
+
+// ValueAnimationInfo::ValueAnimationInfo(const ValueAnimationInfo& other) | File: ../Scene/ValueAnimationInfo.h
+static ValueAnimationInfo* ValueAnimationInfo_ValueAnimationInfo_ValueAnimationInfo(const ValueAnimationInfo &other)
+{
+    return new ValueAnimationInfo(other);
+}
+
 // const StringVector& Variant::GetStringVector() const | File: ../Core/Variant.h
 static CScriptArray* Variant_GetStringVector_void(Variant* ptr)
 {
@@ -229,12 +247,6 @@ static void Variant_Destructor_Variant_void(Variant* ptr)
     ptr->~Variant();
 }
 
-// VAnimKeyFrame::~VAnimKeyFrame() | Implicitly-declared 
-static void VAnimKeyFrame_Destructor(VAnimKeyFrame* ptr)
-{
-    ptr->~VAnimKeyFrame();
-}
-
 // Vector2::Vector2(const Vector2& vector) noexcept=default | File: ../Math/Vector2.h
 static void Vector2_Vector2_Vector2(Vector2* ptr, const Vector2 &vector)
 {
@@ -251,6 +263,85 @@ static void Vector2_Vector2_IntVector2(Vector2* ptr, const IntVector2 &vector)
 static void Vector2_Vector2_float_float(Vector2* ptr, float x, float y)
 {
     new(ptr) Vector2(x, y);
+}
+
+// Vector3::Vector3(const Vector3& vector) noexcept=default | File: ../Math/Vector3.h
+static void Vector3_Vector3_Vector3(Vector3* ptr, const Vector3 &vector)
+{
+    new(ptr) Vector3(vector);
+}
+
+// Vector3::Vector3(const Vector2& vector, float z) noexcept | File: ../Math/Vector3.h
+static void Vector3_Vector3_Vector2_float(Vector3* ptr, const Vector2 &vector, float z)
+{
+    new(ptr) Vector3(vector, z);
+}
+
+// explicit Vector3::Vector3(const Vector2& vector) noexcept | File: ../Math/Vector3.h
+static void Vector3_Vector3_Vector2(Vector3* ptr, const Vector2 &vector)
+{
+    new(ptr) Vector3(vector);
+}
+
+// explicit Vector3::Vector3(const IntVector3& vector) noexcept | File: ../Math/Vector3.h
+static void Vector3_Vector3_IntVector3(Vector3* ptr, const IntVector3 &vector)
+{
+    new(ptr) Vector3(vector);
+}
+
+// Vector3::Vector3(float x, float y, float z) noexcept | File: ../Math/Vector3.h
+static void Vector3_Vector3_float_float_float(Vector3* ptr, float x, float y, float z)
+{
+    new(ptr) Vector3(x, y, z);
+}
+
+// Vector3::Vector3(float x, float y) noexcept | File: ../Math/Vector3.h
+static void Vector3_Vector3_float_float(Vector3* ptr, float x, float y)
+{
+    new(ptr) Vector3(x, y);
+}
+
+// Vector4::Vector4(const Vector4& vector) noexcept=default | File: ../Math/Vector4.h
+static void Vector4_Vector4_Vector4(Vector4* ptr, const Vector4 &vector)
+{
+    new(ptr) Vector4(vector);
+}
+
+// Vector4::Vector4(const Vector3& vector, float w) noexcept | File: ../Math/Vector4.h
+static void Vector4_Vector4_Vector3_float(Vector4* ptr, const Vector3 &vector, float w)
+{
+    new(ptr) Vector4(vector, w);
+}
+
+// Vector4::Vector4(float x, float y, float z, float w) noexcept | File: ../Math/Vector4.h
+static void Vector4_Vector4_float_float_float_float(Vector4* ptr, float x, float y, float z, float w)
+{
+    new(ptr) Vector4(x, y, z, w);
+}
+
+// VectorBase::~VectorBase() | Implicitly-declared 
+static void VectorBase_Destructor(VectorBase* ptr)
+{
+    ptr->~VectorBase();
+}
+
+// StringVector Deserializer::ReadStringVector() | File: ../IO/Deserializer.h
+static CScriptArray* VectorBuffer_ReadStringVector_void(VectorBuffer* ptr)
+{
+    StringVector result = ptr->ReadStringVector();
+    return VectorToArray<String>(result, "Array<String>");
+}
+
+// VectorBuffer::VectorBuffer(Deserializer& source, unsigned size) | File: ../IO/VectorBuffer.h
+static void VectorBuffer_VectorBuffer_Deserializer_unsigned(VectorBuffer* ptr, Deserializer &source, unsigned size)
+{
+    new(ptr) VectorBuffer(source, size);
+}
+
+// VectorBuffer::~VectorBuffer() | Implicitly-declared 
+static void VectorBuffer_Destructor(VectorBuffer* ptr)
+{
+    ptr->~VectorBuffer();
 }
 
 // static unsigned VertexBuffer::GetElementOffset(const PODVector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index=0) | File: ../Graphics/VertexBuffer.h
@@ -310,121 +401,6 @@ static void VertexBuffer_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool
 static VertexBuffer* VertexBuffer_VertexBuffer_Context_bool(bool forceHeadless=false)
 {
     return new VertexBuffer(GetScriptContext(), forceHeadless);
-}
-
-// Vector4::Vector4(const Vector4& vector) noexcept=default | File: ../Math/Vector4.h
-static void Vector4_Vector4_Vector4(Vector4* ptr, const Vector4 &vector)
-{
-    new(ptr) Vector4(vector);
-}
-
-// Vector4::Vector4(const Vector3& vector, float w) noexcept | File: ../Math/Vector4.h
-static void Vector4_Vector4_Vector3_float(Vector4* ptr, const Vector3 &vector, float w)
-{
-    new(ptr) Vector4(vector, w);
-}
-
-// Vector4::Vector4(float x, float y, float z, float w) noexcept | File: ../Math/Vector4.h
-static void Vector4_Vector4_float_float_float_float(Vector4* ptr, float x, float y, float z, float w)
-{
-    new(ptr) Vector4(x, y, z, w);
-}
-
-// VertexBufferDesc::~VertexBufferDesc() | Implicitly-declared 
-static void VertexBufferDesc_Destructor(VertexBufferDesc* ptr)
-{
-    ptr->~VertexBufferDesc();
-}
-
-// ValueAnimationInfo::ValueAnimationInfo(ValueAnimation* animation, WrapMode wrapMode, float speed) | File: ../Scene/ValueAnimationInfo.h
-static ValueAnimationInfo* ValueAnimationInfo_ValueAnimationInfo_ValueAnimation_WrapMode_float(ValueAnimation *animation, WrapMode wrapMode, float speed)
-{
-    return new ValueAnimationInfo(animation, wrapMode, speed);
-}
-
-// ValueAnimationInfo::ValueAnimationInfo(Object* target, ValueAnimation* animation, WrapMode wrapMode, float speed) | File: ../Scene/ValueAnimationInfo.h
-static ValueAnimationInfo* ValueAnimationInfo_ValueAnimationInfo_Object_ValueAnimation_WrapMode_float(Object *target, ValueAnimation *animation, WrapMode wrapMode, float speed)
-{
-    return new ValueAnimationInfo(target, animation, wrapMode, speed);
-}
-
-// ValueAnimationInfo::ValueAnimationInfo(const ValueAnimationInfo& other) | File: ../Scene/ValueAnimationInfo.h
-static ValueAnimationInfo* ValueAnimationInfo_ValueAnimationInfo_ValueAnimationInfo(const ValueAnimationInfo &other)
-{
-    return new ValueAnimationInfo(other);
-}
-
-// VertexElement::VertexElement(VertexElementType type, VertexElementSemantic semantic, unsigned char index=0, bool perInstance=false) noexcept | File: ../Graphics/GraphicsDefs.h
-static void VertexElement_VertexElement_VertexElementType_VertexElementSemantic_unsignedchar_bool(VertexElement* ptr, VertexElementType type, VertexElementSemantic semantic, unsigned char index=0, bool perInstance=false)
-{
-    new(ptr) VertexElement(type, semantic, index, perInstance);
-}
-
-// VertexElement::~VertexElement() | Implicitly-declared 
-static void VertexElement_Destructor(VertexElement* ptr)
-{
-    ptr->~VertexElement();
-}
-
-// Vector3::Vector3(const Vector3& vector) noexcept=default | File: ../Math/Vector3.h
-static void Vector3_Vector3_Vector3(Vector3* ptr, const Vector3 &vector)
-{
-    new(ptr) Vector3(vector);
-}
-
-// Vector3::Vector3(const Vector2& vector, float z) noexcept | File: ../Math/Vector3.h
-static void Vector3_Vector3_Vector2_float(Vector3* ptr, const Vector2 &vector, float z)
-{
-    new(ptr) Vector3(vector, z);
-}
-
-// explicit Vector3::Vector3(const Vector2& vector) noexcept | File: ../Math/Vector3.h
-static void Vector3_Vector3_Vector2(Vector3* ptr, const Vector2 &vector)
-{
-    new(ptr) Vector3(vector);
-}
-
-// explicit Vector3::Vector3(const IntVector3& vector) noexcept | File: ../Math/Vector3.h
-static void Vector3_Vector3_IntVector3(Vector3* ptr, const IntVector3 &vector)
-{
-    new(ptr) Vector3(vector);
-}
-
-// Vector3::Vector3(float x, float y, float z) noexcept | File: ../Math/Vector3.h
-static void Vector3_Vector3_float_float_float(Vector3* ptr, float x, float y, float z)
-{
-    new(ptr) Vector3(x, y, z);
-}
-
-// Vector3::Vector3(float x, float y) noexcept | File: ../Math/Vector3.h
-static void Vector3_Vector3_float_float(Vector3* ptr, float x, float y)
-{
-    new(ptr) Vector3(x, y);
-}
-
-// VectorBase::~VectorBase() | Implicitly-declared 
-static void VectorBase_Destructor(VectorBase* ptr)
-{
-    ptr->~VectorBase();
-}
-
-// StringVector Deserializer::ReadStringVector() | File: ../IO/Deserializer.h
-static CScriptArray* VectorBuffer_ReadStringVector_void(VectorBuffer* ptr)
-{
-    StringVector result = ptr->ReadStringVector();
-    return VectorToArray<String>(result, "Array<String>");
-}
-
-// VectorBuffer::VectorBuffer(Deserializer& source, unsigned size) | File: ../IO/VectorBuffer.h
-static void VectorBuffer_VectorBuffer_Deserializer_unsigned(VectorBuffer* ptr, Deserializer &source, unsigned size)
-{
-    new(ptr) VectorBuffer(source, size);
-}
-
-// VectorBuffer::~VectorBuffer() | Implicitly-declared 
-static void VectorBuffer_Destructor(VectorBuffer* ptr)
-{
-    ptr->~VectorBuffer();
 }
 
 // const PODVector<Drawable*>& View::GetGeometries() const | File: ../Graphics/View.h
@@ -527,6 +503,18 @@ static Viewport* Viewport_Viewport_Context_Scene_Camera_IntRect_RenderPath(Scene
     return new Viewport(GetScriptContext(), scene, camera, rect, renderPath);
 }
 
+// VAnimEventFrame::~VAnimEventFrame() | Implicitly-declared 
+static void VAnimEventFrame_Destructor(VAnimEventFrame* ptr)
+{
+    ptr->~VAnimEventFrame();
+}
+
+// VAnimKeyFrame::~VAnimKeyFrame() | Implicitly-declared 
+static void VAnimKeyFrame_Destructor(VAnimKeyFrame* ptr)
+{
+    ptr->~VAnimKeyFrame();
+}
+
 #ifdef URHO3D_URHO2D
 // Vertex2D::~Vertex2D() | Implicitly-declared 
 static void Vertex2D_Destructor(Vertex2D* ptr)
@@ -535,16 +523,28 @@ static void Vertex2D_Destructor(Vertex2D* ptr)
 }
 #endif
 
+// VertexBufferDesc::~VertexBufferDesc() | Implicitly-declared 
+static void VertexBufferDesc_Destructor(VertexBufferDesc* ptr)
+{
+    ptr->~VertexBufferDesc();
+}
+
 // VertexBufferMorph::~VertexBufferMorph() | Implicitly-declared 
 static void VertexBufferMorph_Destructor(VertexBufferMorph* ptr)
 {
     ptr->~VertexBufferMorph();
 }
 
-// VAnimEventFrame::~VAnimEventFrame() | Implicitly-declared 
-static void VAnimEventFrame_Destructor(VAnimEventFrame* ptr)
+// VertexElement::VertexElement(VertexElementType type, VertexElementSemantic semantic, unsigned char index=0, bool perInstance=false) noexcept | File: ../Graphics/GraphicsDefs.h
+static void VertexElement_VertexElement_VertexElementType_VertexElementSemantic_unsignedchar_bool(VertexElement* ptr, VertexElementType type, VertexElementSemantic semantic, unsigned char index=0, bool perInstance=false)
 {
-    ptr->~VAnimEventFrame();
+    new(ptr) VertexElement(type, semantic, index, perInstance);
+}
+
+// VertexElement::~VertexElement() | Implicitly-declared 
+static void VertexElement_Destructor(VertexElement* ptr)
+{
+    ptr->~VertexElement();
 }
 
 void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
@@ -744,6 +744,50 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
     RegisterSubclass<Resource, ValueAnimation>(engine, "Resource", "ValueAnimation");
     RegisterSubclass<Object, ValueAnimation>(engine, "Object", "ValueAnimation");
     RegisterSubclass<RefCounted, ValueAnimation>(engine, "RefCounted", "ValueAnimation");
+
+    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("ValueAnimationInfo", asBEHAVE_ADDREF, "void f()", asMETHODPR(ValueAnimationInfo, AddRef, (), void), asCALL_THISCALL);
+    // ValueAnimation* ValueAnimationInfo::GetAnimation() const | File: ../Scene/ValueAnimationInfo.h
+    engine->RegisterObjectMethod("ValueAnimationInfo", "ValueAnimation@+ GetAnimation() const", asMETHODPR(ValueAnimationInfo, GetAnimation, () const, ValueAnimation*), asCALL_THISCALL);
+    // float ValueAnimationInfo::GetSpeed() const | File: ../Scene/ValueAnimationInfo.h
+    engine->RegisterObjectMethod("ValueAnimationInfo", "float GetSpeed() const", asMETHODPR(ValueAnimationInfo, GetSpeed, () const, float), asCALL_THISCALL);
+    // Object* ValueAnimationInfo::GetTarget() const | File: ../Scene/ValueAnimationInfo.h
+    engine->RegisterObjectMethod("ValueAnimationInfo", "Object@+ GetTarget() const", asMETHODPR(ValueAnimationInfo, GetTarget, () const, Object*), asCALL_THISCALL);
+    // float ValueAnimationInfo::GetTime() const | File: ../Scene/ValueAnimationInfo.h
+    engine->RegisterObjectMethod("ValueAnimationInfo", "float GetTime() const", asMETHODPR(ValueAnimationInfo, GetTime, () const, float), asCALL_THISCALL);
+    // WrapMode ValueAnimationInfo::GetWrapMode() const | File: ../Scene/ValueAnimationInfo.h
+    engine->RegisterObjectMethod("ValueAnimationInfo", "WrapMode GetWrapMode() const", asMETHODPR(ValueAnimationInfo, GetWrapMode, () const, WrapMode), asCALL_THISCALL);
+    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
+    // Error: type "RefCount*" can not automatically bind
+    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("ValueAnimationInfo", "int Refs() const", asMETHODPR(ValueAnimationInfo, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ValueAnimationInfo", "int get_refs() const", asMETHODPR(ValueAnimationInfo, Refs, () const, int), asCALL_THISCALL);
+    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("ValueAnimationInfo", asBEHAVE_RELEASE, "void f()", asMETHODPR(ValueAnimationInfo, ReleaseRef, (), void), asCALL_THISCALL);
+    // void ValueAnimationInfo::SetSpeed(float speed) | File: ../Scene/ValueAnimationInfo.h
+    engine->RegisterObjectMethod("ValueAnimationInfo", "void SetSpeed(float)", asMETHODPR(ValueAnimationInfo, SetSpeed, (float), void), asCALL_THISCALL);
+    // bool ValueAnimationInfo::SetTime(float time) | File: ../Scene/ValueAnimationInfo.h
+    engine->RegisterObjectMethod("ValueAnimationInfo", "bool SetTime(float)", asMETHODPR(ValueAnimationInfo, SetTime, (float), bool), asCALL_THISCALL);
+    // void ValueAnimationInfo::SetWrapMode(WrapMode wrapMode) | File: ../Scene/ValueAnimationInfo.h
+    engine->RegisterObjectMethod("ValueAnimationInfo", "void SetWrapMode(WrapMode)", asMETHODPR(ValueAnimationInfo, SetWrapMode, (WrapMode), void), asCALL_THISCALL);
+    // bool ValueAnimationInfo::Update(float timeStep) | File: ../Scene/ValueAnimationInfo.h
+    engine->RegisterObjectMethod("ValueAnimationInfo", "bool Update(float)", asMETHODPR(ValueAnimationInfo, Update, (float), bool), asCALL_THISCALL);
+    // ValueAnimationInfo::ValueAnimationInfo(ValueAnimation* animation, WrapMode wrapMode, float speed) | File: ../Scene/ValueAnimationInfo.h
+    engine->RegisterObjectBehaviour("ValueAnimationInfo", asBEHAVE_FACTORY, "ValueAnimationInfo@+ f(ValueAnimation@+, WrapMode, float)", asFUNCTION(ValueAnimationInfo_ValueAnimationInfo_ValueAnimation_WrapMode_float), asCALL_CDECL);
+    // ValueAnimationInfo::ValueAnimationInfo(Object* target, ValueAnimation* animation, WrapMode wrapMode, float speed) | File: ../Scene/ValueAnimationInfo.h
+    engine->RegisterObjectBehaviour("ValueAnimationInfo", asBEHAVE_FACTORY, "ValueAnimationInfo@+ f(Object@+, ValueAnimation@+, WrapMode, float)", asFUNCTION(ValueAnimationInfo_ValueAnimationInfo_Object_ValueAnimation_WrapMode_float), asCALL_CDECL);
+    // ValueAnimationInfo::ValueAnimationInfo(const ValueAnimationInfo& other) | File: ../Scene/ValueAnimationInfo.h
+    engine->RegisterObjectBehaviour("ValueAnimationInfo", asBEHAVE_FACTORY, "ValueAnimationInfo@+ f(const ValueAnimationInfo&in)", asFUNCTION(ValueAnimationInfo_ValueAnimationInfo_ValueAnimationInfo), asCALL_CDECL);
+    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("ValueAnimationInfo", "int WeakRefs() const", asMETHODPR(ValueAnimationInfo, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ValueAnimationInfo", "int get_weakRefs() const", asMETHODPR(ValueAnimationInfo, WeakRefs, () const, int), asCALL_THISCALL);
+#ifdef REGISTER_MANUAL_PART_RefCounted
+    REGISTER_MANUAL_PART_RefCounted(ValueAnimationInfo, "ValueAnimationInfo")
+#endif
+#ifdef REGISTER_MANUAL_PART_ValueAnimationInfo
+    REGISTER_MANUAL_PART_ValueAnimationInfo(ValueAnimationInfo, "ValueAnimationInfo")
+#endif
+    RegisterSubclass<RefCounted, ValueAnimationInfo>(engine, "RefCounted", "ValueAnimationInfo");
 
     // const Variant Variant::EMPTY | File: ../Core/Variant.h
     engine->SetDefaultNamespace("Variant");
@@ -1183,18 +1227,6 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
     REGISTER_MANUAL_PART_Variant(Variant, "Variant")
 #endif
 
-    // float VAnimKeyFrame::time_ | File: ../Scene/ValueAnimation.h
-    engine->RegisterObjectProperty("VAnimKeyFrame", "float time", offsetof(VAnimKeyFrame, time_));
-    // Variant VAnimKeyFrame::value_ | File: ../Scene/ValueAnimation.h
-    engine->RegisterObjectProperty("VAnimKeyFrame", "Variant value", offsetof(VAnimKeyFrame, value_));
-    // VAnimKeyFrame::~VAnimKeyFrame() | Implicitly-declared
-    engine->RegisterObjectBehaviour("VAnimKeyFrame", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(VAnimKeyFrame_Destructor), asCALL_CDECL_OBJFIRST);
-    // VAnimKeyFrame& VAnimKeyFrame::operator=(const VAnimKeyFrame&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<VAnimKeyFrame>(engine, "VAnimKeyFrame");
-#ifdef REGISTER_MANUAL_PART_VAnimKeyFrame
-    REGISTER_MANUAL_PART_VAnimKeyFrame(VAnimKeyFrame, "VAnimKeyFrame")
-#endif
-
     // const Vector2 Vector2::DOWN | File: ../Math/Vector2.h
     engine->SetDefaultNamespace("Vector2");
     engine->RegisterGlobalProperty("const Vector2 DOWN", (void*)&Vector2::DOWN);
@@ -1299,381 +1331,6 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
     // Error: type "const float*" can not automatically bind
 #ifdef REGISTER_MANUAL_PART_Vector2
     REGISTER_MANUAL_PART_Vector2(Vector2, "Vector2")
-#endif
-
-    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("VertexBuffer", asBEHAVE_ADDREF, "void f()", asMETHODPR(VertexBuffer, AddRef, (), void), asCALL_THISCALL);
-    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
-    // Not registered because template
-    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
-    // Not registered because template
-    // void GPUObject::ClearDataLost() | File: ../Graphics/GPUObject.h
-    engine->RegisterObjectMethod("VertexBuffer", "void ClearDataLost()", asMETHODPR(VertexBuffer, ClearDataLost, (), void), asCALL_THISCALL);
-    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("VertexBuffer", "bool GetBlockEvents() const", asMETHODPR(VertexBuffer, GetBlockEvents, () const, bool), asCALL_THISCALL);
-    // unsigned long long VertexBuffer::GetBufferHash(unsigned streamIndex) | File: ../Graphics/VertexBuffer.h
-    engine->RegisterObjectMethod("VertexBuffer", "uint64 GetBufferHash(uint)", asMETHODPR(VertexBuffer, GetBufferHash, (unsigned), unsigned long long), asCALL_THISCALL);
-    // const String& Object::GetCategory() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("VertexBuffer", "const String& GetCategory() const", asMETHODPR(VertexBuffer, GetCategory, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("VertexBuffer", "const String& get_category() const", asMETHODPR(VertexBuffer, GetCategory, () const, const String&), asCALL_THISCALL);
-    // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
-    // const VertexElement* VertexBuffer::GetElement(VertexElementSemantic semantic, unsigned char index=0) const | File: ../Graphics/VertexBuffer.h
-    // Error: type "const VertexElement*" can not automatically bind
-    // const VertexElement* VertexBuffer::GetElement(VertexElementType type, VertexElementSemantic semantic, unsigned char index=0) const | File: ../Graphics/VertexBuffer.h
-    // Error: type "const VertexElement*" can not automatically bind
-    // static const VertexElement* VertexBuffer::GetElement(const PODVector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index=0) | File: ../Graphics/VertexBuffer.h
-    // Error: type "const VertexElement*" can not automatically bind
-    // VertexMaskFlags VertexBuffer::GetElementMask() const | File: ../Graphics/VertexBuffer.h
-    engine->RegisterObjectMethod("VertexBuffer", "VertexMaskFlags GetElementMask() const", asMETHODPR(VertexBuffer, GetElementMask, () const, VertexMaskFlags), asCALL_THISCALL);
-    engine->RegisterObjectMethod("VertexBuffer", "VertexMaskFlags get_elementMask() const", asMETHODPR(VertexBuffer, GetElementMask, () const, VertexMaskFlags), asCALL_THISCALL);
-    // unsigned VertexBuffer::GetElementOffset(VertexElementSemantic semantic, unsigned char index=0) const | File: ../Graphics/VertexBuffer.h
-    engine->RegisterObjectMethod("VertexBuffer", "uint GetElementOffset(VertexElementSemantic, uint8 = 0) const", asMETHODPR(VertexBuffer, GetElementOffset, (VertexElementSemantic, unsigned char) const, unsigned), asCALL_THISCALL);
-    // unsigned VertexBuffer::GetElementOffset(VertexElementType type, VertexElementSemantic semantic, unsigned char index=0) const | File: ../Graphics/VertexBuffer.h
-    engine->RegisterObjectMethod("VertexBuffer", "uint GetElementOffset(VertexElementType, VertexElementSemantic, uint8 = 0) const", asMETHODPR(VertexBuffer, GetElementOffset, (VertexElementType, VertexElementSemantic, unsigned char) const, unsigned), asCALL_THISCALL);
-    // static unsigned VertexBuffer::GetElementOffset(const PODVector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index=0) | File: ../Graphics/VertexBuffer.h
-    engine->SetDefaultNamespace("VertexBuffer");
-    engine->RegisterGlobalFunction("uint GetElementOffset(Array<VertexElement>@+, VertexElementType, VertexElementSemantic, uint8 = 0)", asFUNCTION(VertexBuffer_GetElementOffset_PODVectorVertexElement_VertexElementType_VertexElementSemantic_unsignedchar), asCALL_CDECL);
-    engine->SetDefaultNamespace("");
-    // const PODVector<VertexElement>& VertexBuffer::GetElements() const | File: ../Graphics/VertexBuffer.h
-    engine->RegisterObjectMethod("VertexBuffer", "Array<VertexElement>@ GetElements() const", asFUNCTION(VertexBuffer_GetElements_void), asCALL_CDECL_OBJFIRST);
-    engine->RegisterObjectMethod("VertexBuffer", "Array<VertexElement>@ get_elements() const", asFUNCTION(VertexBuffer_GetElements_void), asCALL_CDECL_OBJFIRST);
-    // static PODVector<VertexElement> VertexBuffer::GetElements(unsigned elementMask) | File: ../Graphics/VertexBuffer.h
-    engine->SetDefaultNamespace("VertexBuffer");
-    engine->RegisterGlobalFunction("Array<VertexElement>@ GetElements(uint)", asFUNCTION(VertexBuffer_GetElements_unsigned), asCALL_CDECL);
-    engine->SetDefaultNamespace("");
-    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("VertexBuffer", "VariantMap& GetEventDataMap() const", asMETHODPR(VertexBuffer, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
-    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // Object* Object::GetEventSender() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("VertexBuffer", "Object@+ GetEventSender() const", asMETHODPR(VertexBuffer, GetEventSender, () const, Object*), asCALL_THISCALL);
-    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("VertexBuffer", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(VertexBuffer, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("VertexBuffer", "const Variant& get_globalVar(StringHash) const", asMETHODPR(VertexBuffer, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("VertexBuffer", "const VariantMap& GetGlobalVars() const", asMETHODPR(VertexBuffer, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("VertexBuffer", "const VariantMap& get_globalVars() const", asMETHODPR(VertexBuffer, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    // void* GPUObject::GetGPUObject() const | File: ../Graphics/GPUObject.h
-    // Error: type "void*" can not automatically bind
-    // unsigned GPUObject::GetGPUObjectName() const | File: ../Graphics/GPUObject.h
-    engine->RegisterObjectMethod("VertexBuffer", "uint GetGPUObjectName() const", asMETHODPR(VertexBuffer, GetGPUObjectName, () const, unsigned), asCALL_THISCALL);
-    // Graphics* GPUObject::GetGraphics() const | File: ../Graphics/GPUObject.h
-    engine->RegisterObjectMethod("VertexBuffer", "Graphics@+ GetGraphics() const", asMETHODPR(VertexBuffer, GetGraphics, () const, Graphics*), asCALL_THISCALL);
-    // unsigned char* VertexBuffer::GetShadowData() const | File: ../Graphics/VertexBuffer.h
-    // Error: type "unsigned char*" can not automatically bind
-    // SharedArrayPtr<unsigned char> VertexBuffer::GetShadowDataShared() const | File: ../Graphics/VertexBuffer.h
-    // Error: type "SharedArrayPtr<unsigned char>" can not automatically bind
-    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("VertexBuffer", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(VertexBuffer, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
-    // Not registered because template
-    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("VertexBuffer", "StringHash GetType() const", asMETHODPR(VertexBuffer, GetType, () const, StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod("VertexBuffer", "StringHash get_type() const", asMETHODPR(VertexBuffer, GetType, () const, StringHash), asCALL_THISCALL);
-    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("VertexBuffer", "const String& GetTypeName() const", asMETHODPR(VertexBuffer, GetTypeName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("VertexBuffer", "const String& get_typeName() const", asMETHODPR(VertexBuffer, GetTypeName, () const, const String&), asCALL_THISCALL);
-    // unsigned VertexBuffer::GetVertexCount() const | File: ../Graphics/VertexBuffer.h
-    engine->RegisterObjectMethod("VertexBuffer", "uint GetVertexCount() const", asMETHODPR(VertexBuffer, GetVertexCount, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("VertexBuffer", "uint get_vertexCount() const", asMETHODPR(VertexBuffer, GetVertexCount, () const, unsigned), asCALL_THISCALL);
-    // unsigned VertexBuffer::GetVertexSize() const | File: ../Graphics/VertexBuffer.h
-    engine->RegisterObjectMethod("VertexBuffer", "uint GetVertexSize() const", asMETHODPR(VertexBuffer, GetVertexSize, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("VertexBuffer", "uint get_vertexSize() const", asMETHODPR(VertexBuffer, GetVertexSize, () const, unsigned), asCALL_THISCALL);
-    // static unsigned VertexBuffer::GetVertexSize(const PODVector<VertexElement>& elements) | File: ../Graphics/VertexBuffer.h
-    engine->SetDefaultNamespace("VertexBuffer");
-    engine->RegisterGlobalFunction("uint GetVertexSize(Array<VertexElement>@+)", asFUNCTION(VertexBuffer_GetVertexSize_PODVectorVertexElement), asCALL_CDECL);
-    engine->SetDefaultNamespace("");
-    // static unsigned VertexBuffer::GetVertexSize(unsigned elementMask) | File: ../Graphics/VertexBuffer.h
-    engine->SetDefaultNamespace("VertexBuffer");
-    engine->RegisterGlobalFunction("uint GetVertexSize(uint)", asFUNCTIONPR(VertexBuffer::GetVertexSize, (unsigned), unsigned), asCALL_CDECL);
-    engine->SetDefaultNamespace("");
-    // bool VertexBuffer::HasElement(VertexElementSemantic semantic, unsigned char index=0) const | File: ../Graphics/VertexBuffer.h
-    engine->RegisterObjectMethod("VertexBuffer", "bool HasElement(VertexElementSemantic, uint8 = 0) const", asMETHODPR(VertexBuffer, HasElement, (VertexElementSemantic, unsigned char) const, bool), asCALL_THISCALL);
-    // bool VertexBuffer::HasElement(VertexElementType type, VertexElementSemantic semantic, unsigned char index=0) const | File: ../Graphics/VertexBuffer.h
-    engine->RegisterObjectMethod("VertexBuffer", "bool HasElement(VertexElementType, VertexElementSemantic, uint8 = 0) const", asMETHODPR(VertexBuffer, HasElement, (VertexElementType, VertexElementSemantic, unsigned char) const, bool), asCALL_THISCALL);
-    // static bool VertexBuffer::HasElement(const PODVector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index=0) | File: ../Graphics/VertexBuffer.h
-    engine->SetDefaultNamespace("VertexBuffer");
-    engine->RegisterGlobalFunction("bool HasElement(Array<VertexElement>@+, VertexElementType, VertexElementSemantic, uint8 = 0)", asFUNCTION(VertexBuffer_HasElement_PODVectorVertexElement_VertexElementType_VertexElementSemantic_unsignedchar), asCALL_CDECL);
-    engine->SetDefaultNamespace("");
-    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("VertexBuffer", "bool HasEventHandlers() const", asMETHODPR(VertexBuffer, HasEventHandlers, () const, bool), asCALL_THISCALL);
-    // bool GPUObject::HasPendingData() const | File: ../Graphics/GPUObject.h
-    engine->RegisterObjectMethod("VertexBuffer", "bool HasPendingData() const", asMETHODPR(VertexBuffer, HasPendingData, () const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("VertexBuffer", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(VertexBuffer, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("VertexBuffer", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(VertexBuffer, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
-    // bool GPUObject::IsDataLost() const | File: ../Graphics/GPUObject.h
-    engine->RegisterObjectMethod("VertexBuffer", "bool IsDataLost() const", asMETHODPR(VertexBuffer, IsDataLost, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("VertexBuffer", "bool get_dataLost() const", asMETHODPR(VertexBuffer, IsDataLost, () const, bool), asCALL_THISCALL);
-    // bool VertexBuffer::IsDynamic() const | File: ../Graphics/VertexBuffer.h
-    engine->RegisterObjectMethod("VertexBuffer", "bool IsDynamic() const", asMETHODPR(VertexBuffer, IsDynamic, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("VertexBuffer", "bool get_dynamic() const", asMETHODPR(VertexBuffer, IsDynamic, () const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("VertexBuffer", "bool IsInstanceOf(StringHash) const", asMETHODPR(VertexBuffer, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
-    // Not registered because template
-    // bool VertexBuffer::IsLocked() const | File: ../Graphics/VertexBuffer.h
-    engine->RegisterObjectMethod("VertexBuffer", "bool IsLocked() const", asMETHODPR(VertexBuffer, IsLocked, () const, bool), asCALL_THISCALL);
-    // bool VertexBuffer::IsShadowed() const | File: ../Graphics/VertexBuffer.h
-    engine->RegisterObjectMethod("VertexBuffer", "bool IsShadowed() const", asMETHODPR(VertexBuffer, IsShadowed, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("VertexBuffer", "bool get_shadowed() const", asMETHODPR(VertexBuffer, IsShadowed, () const, bool), asCALL_THISCALL);
-    // void* VertexBuffer::Lock(unsigned start, unsigned count, bool discard=false) | File: ../Graphics/VertexBuffer.h
-    // Error: type "void*" can not automatically bind
-    // void VertexBuffer::OnDeviceLost() override | File: ../Graphics/VertexBuffer.h
-    engine->RegisterObjectMethod("VertexBuffer", "void OnDeviceLost()", asMETHODPR(VertexBuffer, OnDeviceLost, (), void), asCALL_THISCALL);
-    // void VertexBuffer::OnDeviceReset() override | File: ../Graphics/VertexBuffer.h
-    engine->RegisterObjectMethod("VertexBuffer", "void OnDeviceReset()", asMETHODPR(VertexBuffer, OnDeviceReset, (), void), asCALL_THISCALL);
-    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("VertexBuffer", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(VertexBuffer, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
-    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
-    // Error: type "RefCount*" can not automatically bind
-    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("VertexBuffer", "int Refs() const", asMETHODPR(VertexBuffer, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("VertexBuffer", "int get_refs() const", asMETHODPR(VertexBuffer, Refs, () const, int), asCALL_THISCALL);
-    // void VertexBuffer::Release() override | File: ../Graphics/VertexBuffer.h
-    engine->RegisterObjectMethod("VertexBuffer", "void Release()", asMETHODPR(VertexBuffer, Release, (), void), asCALL_THISCALL);
-    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("VertexBuffer", asBEHAVE_RELEASE, "void f()", asMETHODPR(VertexBuffer, ReleaseRef, (), void), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("VertexBuffer", "void SendEvent(StringHash)", asMETHODPR(VertexBuffer, SendEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("VertexBuffer", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(VertexBuffer, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
-    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
-    // Not registered because template
-    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("VertexBuffer", "void SetBlockEvents(bool)", asMETHODPR(VertexBuffer, SetBlockEvents, (bool), void), asCALL_THISCALL);
-    // bool VertexBuffer::SetData(const void* data) | File: ../Graphics/VertexBuffer.h
-    // Error: type "void*" can not automatically bind
-    // bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count, bool discard=false) | File: ../Graphics/VertexBuffer.h
-    // Error: type "void*" can not automatically bind
-    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("VertexBuffer", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(VertexBuffer, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("VertexBuffer", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(VertexBuffer, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    // void VertexBuffer::SetShadowed(bool enable) | File: ../Graphics/VertexBuffer.h
-    engine->RegisterObjectMethod("VertexBuffer", "void SetShadowed(bool)", asMETHODPR(VertexBuffer, SetShadowed, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("VertexBuffer", "void set_shadowed(bool)", asMETHODPR(VertexBuffer, SetShadowed, (bool), void), asCALL_THISCALL);
-    // bool VertexBuffer::SetSize(unsigned vertexCount, const PODVector<VertexElement>& elements, bool dynamic=false) | File: ../Graphics/VertexBuffer.h
-    engine->RegisterObjectMethod("VertexBuffer", "bool SetSize(uint, Array<VertexElement>@+, bool = false)", asFUNCTION(VertexBuffer_SetSize_unsigned_PODVectorVertexElement_bool), asCALL_CDECL_OBJFIRST);
-    // bool VertexBuffer::SetSize(unsigned vertexCount, unsigned elementMask, bool dynamic=false) | File: ../Graphics/VertexBuffer.h
-    engine->RegisterObjectMethod("VertexBuffer", "bool SetSize(uint, uint, bool = false)", asMETHODPR(VertexBuffer, SetSize, (unsigned, unsigned, bool), bool), asCALL_THISCALL);
-    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void VertexBuffer::Unlock() | File: ../Graphics/VertexBuffer.h
-    engine->RegisterObjectMethod("VertexBuffer", "void Unlock()", asMETHODPR(VertexBuffer, Unlock, (), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
-    engine->RegisterObjectMethod("VertexBuffer", "void UnsubscribeFromAllEvents()", asMETHODPR(VertexBuffer, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("VertexBuffer", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(VertexBuffer_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
-    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("VertexBuffer", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(VertexBuffer, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("VertexBuffer", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(VertexBuffer, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("VertexBuffer", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(VertexBuffer, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
-    // static void VertexBuffer::UpdateOffsets(PODVector<VertexElement>& elements) | File: ../Graphics/VertexBuffer.h
-    // Error: type "PODVector<VertexElement>&" can not automatically bind
-    // explicit VertexBuffer::VertexBuffer(Context* context, bool forceHeadless=false) | File: ../Graphics/VertexBuffer.h
-    engine->RegisterObjectBehaviour("VertexBuffer", asBEHAVE_FACTORY, "VertexBuffer@+ f(bool = false)", asFUNCTION(VertexBuffer_VertexBuffer_Context_bool), asCALL_CDECL);
-    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("VertexBuffer", "int WeakRefs() const", asMETHODPR(VertexBuffer, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("VertexBuffer", "int get_weakRefs() const", asMETHODPR(VertexBuffer, WeakRefs, () const, int), asCALL_THISCALL);
-#ifdef REGISTER_MANUAL_PART_Object
-    REGISTER_MANUAL_PART_Object(VertexBuffer, "VertexBuffer")
-#endif
-#ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(VertexBuffer, "VertexBuffer")
-#endif
-#ifdef REGISTER_MANUAL_PART_GPUObject
-    REGISTER_MANUAL_PART_GPUObject(VertexBuffer, "VertexBuffer")
-#endif
-#ifdef REGISTER_MANUAL_PART_VertexBuffer
-    REGISTER_MANUAL_PART_VertexBuffer(VertexBuffer, "VertexBuffer")
-#endif
-    RegisterSubclass<Object, VertexBuffer>(engine, "Object", "VertexBuffer");
-    RegisterSubclass<RefCounted, VertexBuffer>(engine, "RefCounted", "VertexBuffer");
-
-    // const Vector4 Vector4::ONE | File: ../Math/Vector4.h
-    engine->SetDefaultNamespace("Vector4");
-    engine->RegisterGlobalProperty("const Vector4 ONE", (void*)&Vector4::ONE);
-    engine->SetDefaultNamespace("");
-    // float Vector4::w_ | File: ../Math/Vector4.h
-    engine->RegisterObjectProperty("Vector4", "float w", offsetof(Vector4, w_));
-    // float Vector4::x_ | File: ../Math/Vector4.h
-    engine->RegisterObjectProperty("Vector4", "float x", offsetof(Vector4, x_));
-    // float Vector4::y_ | File: ../Math/Vector4.h
-    engine->RegisterObjectProperty("Vector4", "float y", offsetof(Vector4, y_));
-    // float Vector4::z_ | File: ../Math/Vector4.h
-    engine->RegisterObjectProperty("Vector4", "float z", offsetof(Vector4, z_));
-    // const Vector4 Vector4::ZERO | File: ../Math/Vector4.h
-    engine->SetDefaultNamespace("Vector4");
-    engine->RegisterGlobalProperty("const Vector4 ZERO", (void*)&Vector4::ZERO);
-    engine->SetDefaultNamespace("");
-    // Vector4 Vector4::Abs() const | File: ../Math/Vector4.h
-    engine->RegisterObjectMethod("Vector4", "Vector4 Abs() const", asMETHODPR(Vector4, Abs, () const, Vector4), asCALL_THISCALL);
-    // float Vector4::AbsDotProduct(const Vector4& rhs) const | File: ../Math/Vector4.h
-    engine->RegisterObjectMethod("Vector4", "float AbsDotProduct(const Vector4&in) const", asMETHODPR(Vector4, AbsDotProduct, (const Vector4&) const, float), asCALL_THISCALL);
-    // const float* Vector4::Data() const | File: ../Math/Vector4.h
-    // Error: type "const float*" can not automatically bind
-    // float Vector4::DotProduct(const Vector4& rhs) const | File: ../Math/Vector4.h
-    engine->RegisterObjectMethod("Vector4", "float DotProduct(const Vector4&in) const", asMETHODPR(Vector4, DotProduct, (const Vector4&) const, float), asCALL_THISCALL);
-    // bool Vector4::Equals(const Vector4& rhs) const | File: ../Math/Vector4.h
-    engine->RegisterObjectMethod("Vector4", "bool Equals(const Vector4&in) const", asMETHODPR(Vector4, Equals, (const Vector4&) const, bool), asCALL_THISCALL);
-    // bool Vector4::IsInf() const | File: ../Math/Vector4.h
-    engine->RegisterObjectMethod("Vector4", "bool IsInf() const", asMETHODPR(Vector4, IsInf, () const, bool), asCALL_THISCALL);
-    // bool Vector4::IsNaN() const | File: ../Math/Vector4.h
-    engine->RegisterObjectMethod("Vector4", "bool IsNaN() const", asMETHODPR(Vector4, IsNaN, () const, bool), asCALL_THISCALL);
-    // Vector4 Vector4::Lerp(const Vector4& rhs, float t) const | File: ../Math/Vector4.h
-    engine->RegisterObjectMethod("Vector4", "Vector4 Lerp(const Vector4&in, float) const", asMETHODPR(Vector4, Lerp, (const Vector4&, float) const, Vector4), asCALL_THISCALL);
-    // explicit Vector4::operator Vector2() const | File: ../Math/Vector4.h
-    engine->RegisterObjectMethod("Vector4", "Vector2 opConv() const", asMETHODPR(Vector4, operator Vector2, () const, Vector2), asCALL_THISCALL);
-    // explicit Vector4::operator Vector3() const | File: ../Math/Vector4.h
-    engine->RegisterObjectMethod("Vector4", "Vector3 opConv() const", asMETHODPR(Vector4, operator Vector3, () const, Vector3), asCALL_THISCALL);
-    // Vector4 Vector4::operator*(float rhs) const | File: ../Math/Vector4.h
-    engine->RegisterObjectMethod("Vector4", "Vector4 opMul(float) const", asMETHODPR(Vector4, operator*, (float) const, Vector4), asCALL_THISCALL);
-    // Vector4 Vector4::operator*(const Vector4& rhs) const | File: ../Math/Vector4.h
-    engine->RegisterObjectMethod("Vector4", "Vector4 opMul(const Vector4&in) const", asMETHODPR(Vector4, operator*, (const Vector4&) const, Vector4), asCALL_THISCALL);
-    // Vector4& Vector4::operator*=(float rhs) | File: ../Math/Vector4.h
-    engine->RegisterObjectMethod("Vector4", "Vector4& opMulAssign(float)", asMETHODPR(Vector4, operator*=, (float), Vector4&), asCALL_THISCALL);
-    // Vector4& Vector4::operator*=(const Vector4& rhs) | File: ../Math/Vector4.h
-    engine->RegisterObjectMethod("Vector4", "Vector4& opMulAssign(const Vector4&in)", asMETHODPR(Vector4, operator*=, (const Vector4&), Vector4&), asCALL_THISCALL);
-    // Vector4 Vector4::operator+(const Vector4& rhs) const | File: ../Math/Vector4.h
-    engine->RegisterObjectMethod("Vector4", "Vector4 opAdd(const Vector4&in) const", asMETHODPR(Vector4, operator+, (const Vector4&) const, Vector4), asCALL_THISCALL);
-    // Vector4& Vector4::operator+=(const Vector4& rhs) | File: ../Math/Vector4.h
-    engine->RegisterObjectMethod("Vector4", "Vector4& opAddAssign(const Vector4&in)", asMETHODPR(Vector4, operator+=, (const Vector4&), Vector4&), asCALL_THISCALL);
-    // Vector4 Vector4::operator-() const | File: ../Math/Vector4.h
-    engine->RegisterObjectMethod("Vector4", "Vector4 opNeg() const", asMETHODPR(Vector4, operator-, () const, Vector4), asCALL_THISCALL);
-    // Vector4 Vector4::operator-(const Vector4& rhs) const | File: ../Math/Vector4.h
-    engine->RegisterObjectMethod("Vector4", "Vector4 opSub(const Vector4&in) const", asMETHODPR(Vector4, operator-, (const Vector4&) const, Vector4), asCALL_THISCALL);
-    // Vector4& Vector4::operator-=(const Vector4& rhs) | File: ../Math/Vector4.h
-    engine->RegisterObjectMethod("Vector4", "Vector4& opSubAssign(const Vector4&in)", asMETHODPR(Vector4, operator-=, (const Vector4&), Vector4&), asCALL_THISCALL);
-    // Vector4 Vector4::operator/(float rhs) const | File: ../Math/Vector4.h
-    engine->RegisterObjectMethod("Vector4", "Vector4 opDiv(float) const", asMETHODPR(Vector4, operator/, (float) const, Vector4), asCALL_THISCALL);
-    // Vector4 Vector4::operator/(const Vector4& rhs) const | File: ../Math/Vector4.h
-    engine->RegisterObjectMethod("Vector4", "Vector4 opDiv(const Vector4&in) const", asMETHODPR(Vector4, operator/, (const Vector4&) const, Vector4), asCALL_THISCALL);
-    // Vector4& Vector4::operator/=(float rhs) | File: ../Math/Vector4.h
-    engine->RegisterObjectMethod("Vector4", "Vector4& opDivAssign(float)", asMETHODPR(Vector4, operator/=, (float), Vector4&), asCALL_THISCALL);
-    // Vector4& Vector4::operator/=(const Vector4& rhs) | File: ../Math/Vector4.h
-    engine->RegisterObjectMethod("Vector4", "Vector4& opDivAssign(const Vector4&in)", asMETHODPR(Vector4, operator/=, (const Vector4&), Vector4&), asCALL_THISCALL);
-    // Vector4& Vector4::operator=(const Vector4& rhs) noexcept=default | File: ../Math/Vector4.h
-    engine->RegisterObjectMethod("Vector4", "Vector4& opAssign(const Vector4&in)", asMETHODPR(Vector4, operator=, (const Vector4&), Vector4&), asCALL_THISCALL);
-    // bool Vector4::operator==(const Vector4& rhs) const | File: ../Math/Vector4.h
-    engine->RegisterObjectMethod("Vector4", "bool opEquals(const Vector4&in) const", asMETHODPR(Vector4, operator==, (const Vector4&) const, bool), asCALL_THISCALL);
-    // float Vector4::operator[](unsigned index) const | File: ../Math/Vector4.h
-    engine->RegisterObjectMethod("Vector4", "float opIndex(uint) const", asMETHODPR(Vector4, operator[], (unsigned) const, float), asCALL_THISCALL);
-    // float& Vector4::operator[](unsigned index) | File: ../Math/Vector4.h
-    engine->RegisterObjectMethod("Vector4", "float& opIndex(uint)", asMETHODPR(Vector4, operator[], (unsigned), float&), asCALL_THISCALL);
-    // float Vector4::ProjectOntoAxis(const Vector3& axis) const | File: ../Math/Vector4.h
-    engine->RegisterObjectMethod("Vector4", "float ProjectOntoAxis(const Vector3&in) const", asMETHODPR(Vector4, ProjectOntoAxis, (const Vector3&) const, float), asCALL_THISCALL);
-    // unsigned Vector4::ToHash() const | File: ../Math/Vector4.h
-    engine->RegisterObjectMethod("Vector4", "uint ToHash() const", asMETHODPR(Vector4, ToHash, () const, unsigned), asCALL_THISCALL);
-    // String Vector4::ToString() const | File: ../Math/Vector4.h
-    engine->RegisterObjectMethod("Vector4", "String ToString() const", asMETHODPR(Vector4, ToString, () const, String), asCALL_THISCALL);
-    // Vector4::Vector4(const Vector4& vector) noexcept=default | File: ../Math/Vector4.h
-    engine->RegisterObjectBehaviour("Vector4", asBEHAVE_CONSTRUCT, "void f(const Vector4&in)", asFUNCTION(Vector4_Vector4_Vector4), asCALL_CDECL_OBJFIRST);
-    // Vector4::Vector4(const Vector3& vector, float w) noexcept | File: ../Math/Vector4.h
-    engine->RegisterObjectBehaviour("Vector4", asBEHAVE_CONSTRUCT, "void f(const Vector3&in, float)", asFUNCTION(Vector4_Vector4_Vector3_float), asCALL_CDECL_OBJFIRST);
-    // Vector4::Vector4(float x, float y, float z, float w) noexcept | File: ../Math/Vector4.h
-    engine->RegisterObjectBehaviour("Vector4", asBEHAVE_CONSTRUCT, "void f(float, float, float, float)", asFUNCTION(Vector4_Vector4_float_float_float_float), asCALL_CDECL_OBJFIRST);
-    // explicit Vector4::Vector4(const float* data) noexcept | File: ../Math/Vector4.h
-    // Error: type "const float*" can not automatically bind
-#ifdef REGISTER_MANUAL_PART_Vector4
-    REGISTER_MANUAL_PART_Vector4(Vector4, "Vector4")
-#endif
-
-    // SharedArrayPtr<unsigned char> VertexBufferDesc::data_ | File: ../Graphics/Model.h
-    // Error: type "SharedArrayPtr<unsigned char>" can not automatically bind
-    // unsigned VertexBufferDesc::dataSize_ | File: ../Graphics/Model.h
-    engine->RegisterObjectProperty("VertexBufferDesc", "uint dataSize", offsetof(VertexBufferDesc, dataSize_));
-    // unsigned VertexBufferDesc::vertexCount_ | File: ../Graphics/Model.h
-    engine->RegisterObjectProperty("VertexBufferDesc", "uint vertexCount", offsetof(VertexBufferDesc, vertexCount_));
-    // PODVector<VertexElement> VertexBufferDesc::vertexElements_ | File: ../Graphics/Model.h
-    // Error: type "PODVector<VertexElement>" can not automatically bind
-    // VertexBufferDesc::~VertexBufferDesc() | Implicitly-declared
-    engine->RegisterObjectBehaviour("VertexBufferDesc", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(VertexBufferDesc_Destructor), asCALL_CDECL_OBJFIRST);
-    // VertexBufferDesc& VertexBufferDesc::operator=(const VertexBufferDesc&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<VertexBufferDesc>(engine, "VertexBufferDesc");
-#ifdef REGISTER_MANUAL_PART_VertexBufferDesc
-    REGISTER_MANUAL_PART_VertexBufferDesc(VertexBufferDesc, "VertexBufferDesc")
-#endif
-
-    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("ValueAnimationInfo", asBEHAVE_ADDREF, "void f()", asMETHODPR(ValueAnimationInfo, AddRef, (), void), asCALL_THISCALL);
-    // ValueAnimation* ValueAnimationInfo::GetAnimation() const | File: ../Scene/ValueAnimationInfo.h
-    engine->RegisterObjectMethod("ValueAnimationInfo", "ValueAnimation@+ GetAnimation() const", asMETHODPR(ValueAnimationInfo, GetAnimation, () const, ValueAnimation*), asCALL_THISCALL);
-    // float ValueAnimationInfo::GetSpeed() const | File: ../Scene/ValueAnimationInfo.h
-    engine->RegisterObjectMethod("ValueAnimationInfo", "float GetSpeed() const", asMETHODPR(ValueAnimationInfo, GetSpeed, () const, float), asCALL_THISCALL);
-    // Object* ValueAnimationInfo::GetTarget() const | File: ../Scene/ValueAnimationInfo.h
-    engine->RegisterObjectMethod("ValueAnimationInfo", "Object@+ GetTarget() const", asMETHODPR(ValueAnimationInfo, GetTarget, () const, Object*), asCALL_THISCALL);
-    // float ValueAnimationInfo::GetTime() const | File: ../Scene/ValueAnimationInfo.h
-    engine->RegisterObjectMethod("ValueAnimationInfo", "float GetTime() const", asMETHODPR(ValueAnimationInfo, GetTime, () const, float), asCALL_THISCALL);
-    // WrapMode ValueAnimationInfo::GetWrapMode() const | File: ../Scene/ValueAnimationInfo.h
-    engine->RegisterObjectMethod("ValueAnimationInfo", "WrapMode GetWrapMode() const", asMETHODPR(ValueAnimationInfo, GetWrapMode, () const, WrapMode), asCALL_THISCALL);
-    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
-    // Error: type "RefCount*" can not automatically bind
-    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("ValueAnimationInfo", "int Refs() const", asMETHODPR(ValueAnimationInfo, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ValueAnimationInfo", "int get_refs() const", asMETHODPR(ValueAnimationInfo, Refs, () const, int), asCALL_THISCALL);
-    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("ValueAnimationInfo", asBEHAVE_RELEASE, "void f()", asMETHODPR(ValueAnimationInfo, ReleaseRef, (), void), asCALL_THISCALL);
-    // void ValueAnimationInfo::SetSpeed(float speed) | File: ../Scene/ValueAnimationInfo.h
-    engine->RegisterObjectMethod("ValueAnimationInfo", "void SetSpeed(float)", asMETHODPR(ValueAnimationInfo, SetSpeed, (float), void), asCALL_THISCALL);
-    // bool ValueAnimationInfo::SetTime(float time) | File: ../Scene/ValueAnimationInfo.h
-    engine->RegisterObjectMethod("ValueAnimationInfo", "bool SetTime(float)", asMETHODPR(ValueAnimationInfo, SetTime, (float), bool), asCALL_THISCALL);
-    // void ValueAnimationInfo::SetWrapMode(WrapMode wrapMode) | File: ../Scene/ValueAnimationInfo.h
-    engine->RegisterObjectMethod("ValueAnimationInfo", "void SetWrapMode(WrapMode)", asMETHODPR(ValueAnimationInfo, SetWrapMode, (WrapMode), void), asCALL_THISCALL);
-    // bool ValueAnimationInfo::Update(float timeStep) | File: ../Scene/ValueAnimationInfo.h
-    engine->RegisterObjectMethod("ValueAnimationInfo", "bool Update(float)", asMETHODPR(ValueAnimationInfo, Update, (float), bool), asCALL_THISCALL);
-    // ValueAnimationInfo::ValueAnimationInfo(ValueAnimation* animation, WrapMode wrapMode, float speed) | File: ../Scene/ValueAnimationInfo.h
-    engine->RegisterObjectBehaviour("ValueAnimationInfo", asBEHAVE_FACTORY, "ValueAnimationInfo@+ f(ValueAnimation@+, WrapMode, float)", asFUNCTION(ValueAnimationInfo_ValueAnimationInfo_ValueAnimation_WrapMode_float), asCALL_CDECL);
-    // ValueAnimationInfo::ValueAnimationInfo(Object* target, ValueAnimation* animation, WrapMode wrapMode, float speed) | File: ../Scene/ValueAnimationInfo.h
-    engine->RegisterObjectBehaviour("ValueAnimationInfo", asBEHAVE_FACTORY, "ValueAnimationInfo@+ f(Object@+, ValueAnimation@+, WrapMode, float)", asFUNCTION(ValueAnimationInfo_ValueAnimationInfo_Object_ValueAnimation_WrapMode_float), asCALL_CDECL);
-    // ValueAnimationInfo::ValueAnimationInfo(const ValueAnimationInfo& other) | File: ../Scene/ValueAnimationInfo.h
-    engine->RegisterObjectBehaviour("ValueAnimationInfo", asBEHAVE_FACTORY, "ValueAnimationInfo@+ f(const ValueAnimationInfo&in)", asFUNCTION(ValueAnimationInfo_ValueAnimationInfo_ValueAnimationInfo), asCALL_CDECL);
-    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("ValueAnimationInfo", "int WeakRefs() const", asMETHODPR(ValueAnimationInfo, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ValueAnimationInfo", "int get_weakRefs() const", asMETHODPR(ValueAnimationInfo, WeakRefs, () const, int), asCALL_THISCALL);
-#ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(ValueAnimationInfo, "ValueAnimationInfo")
-#endif
-#ifdef REGISTER_MANUAL_PART_ValueAnimationInfo
-    REGISTER_MANUAL_PART_ValueAnimationInfo(ValueAnimationInfo, "ValueAnimationInfo")
-#endif
-    RegisterSubclass<RefCounted, ValueAnimationInfo>(engine, "RefCounted", "ValueAnimationInfo");
-
-    // unsigned char VertexElement::index_ | File: ../Graphics/GraphicsDefs.h
-    engine->RegisterObjectProperty("VertexElement", "uint8 index", offsetof(VertexElement, index_));
-    // unsigned VertexElement::offset_ | File: ../Graphics/GraphicsDefs.h
-    engine->RegisterObjectProperty("VertexElement", "uint offset", offsetof(VertexElement, offset_));
-    // bool VertexElement::perInstance_ | File: ../Graphics/GraphicsDefs.h
-    engine->RegisterObjectProperty("VertexElement", "bool perInstance", offsetof(VertexElement, perInstance_));
-    // VertexElementSemantic VertexElement::semantic_ | File: ../Graphics/GraphicsDefs.h
-    engine->RegisterObjectProperty("VertexElement", "VertexElementSemantic semantic", offsetof(VertexElement, semantic_));
-    // VertexElementType VertexElement::type_ | File: ../Graphics/GraphicsDefs.h
-    engine->RegisterObjectProperty("VertexElement", "VertexElementType type", offsetof(VertexElement, type_));
-    // bool VertexElement::operator==(const VertexElement& rhs) const | File: ../Graphics/GraphicsDefs.h
-    engine->RegisterObjectMethod("VertexElement", "bool opEquals(const VertexElement&in) const", asMETHODPR(VertexElement, operator==, (const VertexElement&) const, bool), asCALL_THISCALL);
-    // VertexElement::VertexElement(VertexElementType type, VertexElementSemantic semantic, unsigned char index=0, bool perInstance=false) noexcept | File: ../Graphics/GraphicsDefs.h
-    engine->RegisterObjectBehaviour("VertexElement", asBEHAVE_CONSTRUCT, "void f(VertexElementType, VertexElementSemantic, uint8 = 0, bool = false)", asFUNCTION(VertexElement_VertexElement_VertexElementType_VertexElementSemantic_unsignedchar_bool), asCALL_CDECL_OBJFIRST);
-    // VertexElement::~VertexElement() | Implicitly-declared
-    engine->RegisterObjectBehaviour("VertexElement", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(VertexElement_Destructor), asCALL_CDECL_OBJFIRST);
-    // VertexElement& VertexElement::operator=(const VertexElement&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<VertexElement>(engine, "VertexElement");
-#ifdef REGISTER_MANUAL_PART_VertexElement
-    REGISTER_MANUAL_PART_VertexElement(VertexElement, "VertexElement")
 #endif
 
     // const Vector3 Vector3::BACK | File: ../Math/Vector3.h
@@ -1810,6 +1467,94 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
     // Error: type "const float*" can not automatically bind
 #ifdef REGISTER_MANUAL_PART_Vector3
     REGISTER_MANUAL_PART_Vector3(Vector3, "Vector3")
+#endif
+
+    // const Vector4 Vector4::ONE | File: ../Math/Vector4.h
+    engine->SetDefaultNamespace("Vector4");
+    engine->RegisterGlobalProperty("const Vector4 ONE", (void*)&Vector4::ONE);
+    engine->SetDefaultNamespace("");
+    // float Vector4::w_ | File: ../Math/Vector4.h
+    engine->RegisterObjectProperty("Vector4", "float w", offsetof(Vector4, w_));
+    // float Vector4::x_ | File: ../Math/Vector4.h
+    engine->RegisterObjectProperty("Vector4", "float x", offsetof(Vector4, x_));
+    // float Vector4::y_ | File: ../Math/Vector4.h
+    engine->RegisterObjectProperty("Vector4", "float y", offsetof(Vector4, y_));
+    // float Vector4::z_ | File: ../Math/Vector4.h
+    engine->RegisterObjectProperty("Vector4", "float z", offsetof(Vector4, z_));
+    // const Vector4 Vector4::ZERO | File: ../Math/Vector4.h
+    engine->SetDefaultNamespace("Vector4");
+    engine->RegisterGlobalProperty("const Vector4 ZERO", (void*)&Vector4::ZERO);
+    engine->SetDefaultNamespace("");
+    // Vector4 Vector4::Abs() const | File: ../Math/Vector4.h
+    engine->RegisterObjectMethod("Vector4", "Vector4 Abs() const", asMETHODPR(Vector4, Abs, () const, Vector4), asCALL_THISCALL);
+    // float Vector4::AbsDotProduct(const Vector4& rhs) const | File: ../Math/Vector4.h
+    engine->RegisterObjectMethod("Vector4", "float AbsDotProduct(const Vector4&in) const", asMETHODPR(Vector4, AbsDotProduct, (const Vector4&) const, float), asCALL_THISCALL);
+    // const float* Vector4::Data() const | File: ../Math/Vector4.h
+    // Error: type "const float*" can not automatically bind
+    // float Vector4::DotProduct(const Vector4& rhs) const | File: ../Math/Vector4.h
+    engine->RegisterObjectMethod("Vector4", "float DotProduct(const Vector4&in) const", asMETHODPR(Vector4, DotProduct, (const Vector4&) const, float), asCALL_THISCALL);
+    // bool Vector4::Equals(const Vector4& rhs) const | File: ../Math/Vector4.h
+    engine->RegisterObjectMethod("Vector4", "bool Equals(const Vector4&in) const", asMETHODPR(Vector4, Equals, (const Vector4&) const, bool), asCALL_THISCALL);
+    // bool Vector4::IsInf() const | File: ../Math/Vector4.h
+    engine->RegisterObjectMethod("Vector4", "bool IsInf() const", asMETHODPR(Vector4, IsInf, () const, bool), asCALL_THISCALL);
+    // bool Vector4::IsNaN() const | File: ../Math/Vector4.h
+    engine->RegisterObjectMethod("Vector4", "bool IsNaN() const", asMETHODPR(Vector4, IsNaN, () const, bool), asCALL_THISCALL);
+    // Vector4 Vector4::Lerp(const Vector4& rhs, float t) const | File: ../Math/Vector4.h
+    engine->RegisterObjectMethod("Vector4", "Vector4 Lerp(const Vector4&in, float) const", asMETHODPR(Vector4, Lerp, (const Vector4&, float) const, Vector4), asCALL_THISCALL);
+    // explicit Vector4::operator Vector2() const | File: ../Math/Vector4.h
+    engine->RegisterObjectMethod("Vector4", "Vector2 opConv() const", asMETHODPR(Vector4, operator Vector2, () const, Vector2), asCALL_THISCALL);
+    // explicit Vector4::operator Vector3() const | File: ../Math/Vector4.h
+    engine->RegisterObjectMethod("Vector4", "Vector3 opConv() const", asMETHODPR(Vector4, operator Vector3, () const, Vector3), asCALL_THISCALL);
+    // Vector4 Vector4::operator*(float rhs) const | File: ../Math/Vector4.h
+    engine->RegisterObjectMethod("Vector4", "Vector4 opMul(float) const", asMETHODPR(Vector4, operator*, (float) const, Vector4), asCALL_THISCALL);
+    // Vector4 Vector4::operator*(const Vector4& rhs) const | File: ../Math/Vector4.h
+    engine->RegisterObjectMethod("Vector4", "Vector4 opMul(const Vector4&in) const", asMETHODPR(Vector4, operator*, (const Vector4&) const, Vector4), asCALL_THISCALL);
+    // Vector4& Vector4::operator*=(float rhs) | File: ../Math/Vector4.h
+    engine->RegisterObjectMethod("Vector4", "Vector4& opMulAssign(float)", asMETHODPR(Vector4, operator*=, (float), Vector4&), asCALL_THISCALL);
+    // Vector4& Vector4::operator*=(const Vector4& rhs) | File: ../Math/Vector4.h
+    engine->RegisterObjectMethod("Vector4", "Vector4& opMulAssign(const Vector4&in)", asMETHODPR(Vector4, operator*=, (const Vector4&), Vector4&), asCALL_THISCALL);
+    // Vector4 Vector4::operator+(const Vector4& rhs) const | File: ../Math/Vector4.h
+    engine->RegisterObjectMethod("Vector4", "Vector4 opAdd(const Vector4&in) const", asMETHODPR(Vector4, operator+, (const Vector4&) const, Vector4), asCALL_THISCALL);
+    // Vector4& Vector4::operator+=(const Vector4& rhs) | File: ../Math/Vector4.h
+    engine->RegisterObjectMethod("Vector4", "Vector4& opAddAssign(const Vector4&in)", asMETHODPR(Vector4, operator+=, (const Vector4&), Vector4&), asCALL_THISCALL);
+    // Vector4 Vector4::operator-() const | File: ../Math/Vector4.h
+    engine->RegisterObjectMethod("Vector4", "Vector4 opNeg() const", asMETHODPR(Vector4, operator-, () const, Vector4), asCALL_THISCALL);
+    // Vector4 Vector4::operator-(const Vector4& rhs) const | File: ../Math/Vector4.h
+    engine->RegisterObjectMethod("Vector4", "Vector4 opSub(const Vector4&in) const", asMETHODPR(Vector4, operator-, (const Vector4&) const, Vector4), asCALL_THISCALL);
+    // Vector4& Vector4::operator-=(const Vector4& rhs) | File: ../Math/Vector4.h
+    engine->RegisterObjectMethod("Vector4", "Vector4& opSubAssign(const Vector4&in)", asMETHODPR(Vector4, operator-=, (const Vector4&), Vector4&), asCALL_THISCALL);
+    // Vector4 Vector4::operator/(float rhs) const | File: ../Math/Vector4.h
+    engine->RegisterObjectMethod("Vector4", "Vector4 opDiv(float) const", asMETHODPR(Vector4, operator/, (float) const, Vector4), asCALL_THISCALL);
+    // Vector4 Vector4::operator/(const Vector4& rhs) const | File: ../Math/Vector4.h
+    engine->RegisterObjectMethod("Vector4", "Vector4 opDiv(const Vector4&in) const", asMETHODPR(Vector4, operator/, (const Vector4&) const, Vector4), asCALL_THISCALL);
+    // Vector4& Vector4::operator/=(float rhs) | File: ../Math/Vector4.h
+    engine->RegisterObjectMethod("Vector4", "Vector4& opDivAssign(float)", asMETHODPR(Vector4, operator/=, (float), Vector4&), asCALL_THISCALL);
+    // Vector4& Vector4::operator/=(const Vector4& rhs) | File: ../Math/Vector4.h
+    engine->RegisterObjectMethod("Vector4", "Vector4& opDivAssign(const Vector4&in)", asMETHODPR(Vector4, operator/=, (const Vector4&), Vector4&), asCALL_THISCALL);
+    // Vector4& Vector4::operator=(const Vector4& rhs) noexcept=default | File: ../Math/Vector4.h
+    engine->RegisterObjectMethod("Vector4", "Vector4& opAssign(const Vector4&in)", asMETHODPR(Vector4, operator=, (const Vector4&), Vector4&), asCALL_THISCALL);
+    // bool Vector4::operator==(const Vector4& rhs) const | File: ../Math/Vector4.h
+    engine->RegisterObjectMethod("Vector4", "bool opEquals(const Vector4&in) const", asMETHODPR(Vector4, operator==, (const Vector4&) const, bool), asCALL_THISCALL);
+    // float Vector4::operator[](unsigned index) const | File: ../Math/Vector4.h
+    engine->RegisterObjectMethod("Vector4", "float opIndex(uint) const", asMETHODPR(Vector4, operator[], (unsigned) const, float), asCALL_THISCALL);
+    // float& Vector4::operator[](unsigned index) | File: ../Math/Vector4.h
+    engine->RegisterObjectMethod("Vector4", "float& opIndex(uint)", asMETHODPR(Vector4, operator[], (unsigned), float&), asCALL_THISCALL);
+    // float Vector4::ProjectOntoAxis(const Vector3& axis) const | File: ../Math/Vector4.h
+    engine->RegisterObjectMethod("Vector4", "float ProjectOntoAxis(const Vector3&in) const", asMETHODPR(Vector4, ProjectOntoAxis, (const Vector3&) const, float), asCALL_THISCALL);
+    // unsigned Vector4::ToHash() const | File: ../Math/Vector4.h
+    engine->RegisterObjectMethod("Vector4", "uint ToHash() const", asMETHODPR(Vector4, ToHash, () const, unsigned), asCALL_THISCALL);
+    // String Vector4::ToString() const | File: ../Math/Vector4.h
+    engine->RegisterObjectMethod("Vector4", "String ToString() const", asMETHODPR(Vector4, ToString, () const, String), asCALL_THISCALL);
+    // Vector4::Vector4(const Vector4& vector) noexcept=default | File: ../Math/Vector4.h
+    engine->RegisterObjectBehaviour("Vector4", asBEHAVE_CONSTRUCT, "void f(const Vector4&in)", asFUNCTION(Vector4_Vector4_Vector4), asCALL_CDECL_OBJFIRST);
+    // Vector4::Vector4(const Vector3& vector, float w) noexcept | File: ../Math/Vector4.h
+    engine->RegisterObjectBehaviour("Vector4", asBEHAVE_CONSTRUCT, "void f(const Vector3&in, float)", asFUNCTION(Vector4_Vector4_Vector3_float), asCALL_CDECL_OBJFIRST);
+    // Vector4::Vector4(float x, float y, float z, float w) noexcept | File: ../Math/Vector4.h
+    engine->RegisterObjectBehaviour("Vector4", asBEHAVE_CONSTRUCT, "void f(float, float, float, float)", asFUNCTION(Vector4_Vector4_float_float_float_float), asCALL_CDECL_OBJFIRST);
+    // explicit Vector4::Vector4(const float* data) noexcept | File: ../Math/Vector4.h
+    // Error: type "const float*" can not automatically bind
+#ifdef REGISTER_MANUAL_PART_Vector4
+    REGISTER_MANUAL_PART_Vector4(Vector4, "Vector4")
 #endif
 
     // void VectorBase::Swap(VectorBase& rhs) | File: ../Container/VectorBase.h
@@ -2045,6 +1790,211 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
 #ifdef REGISTER_MANUAL_PART_VectorBuffer
     REGISTER_MANUAL_PART_VectorBuffer(VectorBuffer, "VectorBuffer")
 #endif
+
+    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("VertexBuffer", asBEHAVE_ADDREF, "void f()", asMETHODPR(VertexBuffer, AddRef, (), void), asCALL_THISCALL);
+    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
+    // Not registered because template
+    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
+    // Not registered because template
+    // void GPUObject::ClearDataLost() | File: ../Graphics/GPUObject.h
+    engine->RegisterObjectMethod("VertexBuffer", "void ClearDataLost()", asMETHODPR(VertexBuffer, ClearDataLost, (), void), asCALL_THISCALL);
+    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("VertexBuffer", "bool GetBlockEvents() const", asMETHODPR(VertexBuffer, GetBlockEvents, () const, bool), asCALL_THISCALL);
+    // unsigned long long VertexBuffer::GetBufferHash(unsigned streamIndex) | File: ../Graphics/VertexBuffer.h
+    engine->RegisterObjectMethod("VertexBuffer", "uint64 GetBufferHash(uint)", asMETHODPR(VertexBuffer, GetBufferHash, (unsigned), unsigned long long), asCALL_THISCALL);
+    // const String& Object::GetCategory() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("VertexBuffer", "const String& GetCategory() const", asMETHODPR(VertexBuffer, GetCategory, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("VertexBuffer", "const String& get_category() const", asMETHODPR(VertexBuffer, GetCategory, () const, const String&), asCALL_THISCALL);
+    // Context* Object::GetContext() const | File: ../Core/Object.h
+    // Error: type "Context*" can not be returned
+    // const VertexElement* VertexBuffer::GetElement(VertexElementSemantic semantic, unsigned char index=0) const | File: ../Graphics/VertexBuffer.h
+    // Error: type "const VertexElement*" can not automatically bind
+    // const VertexElement* VertexBuffer::GetElement(VertexElementType type, VertexElementSemantic semantic, unsigned char index=0) const | File: ../Graphics/VertexBuffer.h
+    // Error: type "const VertexElement*" can not automatically bind
+    // static const VertexElement* VertexBuffer::GetElement(const PODVector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index=0) | File: ../Graphics/VertexBuffer.h
+    // Error: type "const VertexElement*" can not automatically bind
+    // VertexMaskFlags VertexBuffer::GetElementMask() const | File: ../Graphics/VertexBuffer.h
+    engine->RegisterObjectMethod("VertexBuffer", "VertexMaskFlags GetElementMask() const", asMETHODPR(VertexBuffer, GetElementMask, () const, VertexMaskFlags), asCALL_THISCALL);
+    engine->RegisterObjectMethod("VertexBuffer", "VertexMaskFlags get_elementMask() const", asMETHODPR(VertexBuffer, GetElementMask, () const, VertexMaskFlags), asCALL_THISCALL);
+    // unsigned VertexBuffer::GetElementOffset(VertexElementSemantic semantic, unsigned char index=0) const | File: ../Graphics/VertexBuffer.h
+    engine->RegisterObjectMethod("VertexBuffer", "uint GetElementOffset(VertexElementSemantic, uint8 = 0) const", asMETHODPR(VertexBuffer, GetElementOffset, (VertexElementSemantic, unsigned char) const, unsigned), asCALL_THISCALL);
+    // unsigned VertexBuffer::GetElementOffset(VertexElementType type, VertexElementSemantic semantic, unsigned char index=0) const | File: ../Graphics/VertexBuffer.h
+    engine->RegisterObjectMethod("VertexBuffer", "uint GetElementOffset(VertexElementType, VertexElementSemantic, uint8 = 0) const", asMETHODPR(VertexBuffer, GetElementOffset, (VertexElementType, VertexElementSemantic, unsigned char) const, unsigned), asCALL_THISCALL);
+    // static unsigned VertexBuffer::GetElementOffset(const PODVector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index=0) | File: ../Graphics/VertexBuffer.h
+    engine->SetDefaultNamespace("VertexBuffer");
+    engine->RegisterGlobalFunction("uint GetElementOffset(Array<VertexElement>@+, VertexElementType, VertexElementSemantic, uint8 = 0)", asFUNCTION(VertexBuffer_GetElementOffset_PODVectorVertexElement_VertexElementType_VertexElementSemantic_unsignedchar), asCALL_CDECL);
+    engine->SetDefaultNamespace("");
+    // const PODVector<VertexElement>& VertexBuffer::GetElements() const | File: ../Graphics/VertexBuffer.h
+    engine->RegisterObjectMethod("VertexBuffer", "Array<VertexElement>@ GetElements() const", asFUNCTION(VertexBuffer_GetElements_void), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("VertexBuffer", "Array<VertexElement>@ get_elements() const", asFUNCTION(VertexBuffer_GetElements_void), asCALL_CDECL_OBJFIRST);
+    // static PODVector<VertexElement> VertexBuffer::GetElements(unsigned elementMask) | File: ../Graphics/VertexBuffer.h
+    engine->SetDefaultNamespace("VertexBuffer");
+    engine->RegisterGlobalFunction("Array<VertexElement>@ GetElements(uint)", asFUNCTION(VertexBuffer_GetElements_unsigned), asCALL_CDECL);
+    engine->SetDefaultNamespace("");
+    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("VertexBuffer", "VariantMap& GetEventDataMap() const", asMETHODPR(VertexBuffer, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
+    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // Object* Object::GetEventSender() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("VertexBuffer", "Object@+ GetEventSender() const", asMETHODPR(VertexBuffer, GetEventSender, () const, Object*), asCALL_THISCALL);
+    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("VertexBuffer", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(VertexBuffer, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("VertexBuffer", "const Variant& get_globalVar(StringHash) const", asMETHODPR(VertexBuffer, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("VertexBuffer", "const VariantMap& GetGlobalVars() const", asMETHODPR(VertexBuffer, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("VertexBuffer", "const VariantMap& get_globalVars() const", asMETHODPR(VertexBuffer, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    // void* GPUObject::GetGPUObject() const | File: ../Graphics/GPUObject.h
+    // Error: type "void*" can not automatically bind
+    // unsigned GPUObject::GetGPUObjectName() const | File: ../Graphics/GPUObject.h
+    engine->RegisterObjectMethod("VertexBuffer", "uint GetGPUObjectName() const", asMETHODPR(VertexBuffer, GetGPUObjectName, () const, unsigned), asCALL_THISCALL);
+    // Graphics* GPUObject::GetGraphics() const | File: ../Graphics/GPUObject.h
+    engine->RegisterObjectMethod("VertexBuffer", "Graphics@+ GetGraphics() const", asMETHODPR(VertexBuffer, GetGraphics, () const, Graphics*), asCALL_THISCALL);
+    // unsigned char* VertexBuffer::GetShadowData() const | File: ../Graphics/VertexBuffer.h
+    // Error: type "unsigned char*" can not automatically bind
+    // SharedArrayPtr<unsigned char> VertexBuffer::GetShadowDataShared() const | File: ../Graphics/VertexBuffer.h
+    // Error: type "SharedArrayPtr<unsigned char>" can not automatically bind
+    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("VertexBuffer", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(VertexBuffer, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
+    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // Not registered because template
+    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("VertexBuffer", "StringHash GetType() const", asMETHODPR(VertexBuffer, GetType, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("VertexBuffer", "StringHash get_type() const", asMETHODPR(VertexBuffer, GetType, () const, StringHash), asCALL_THISCALL);
+    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("VertexBuffer", "const String& GetTypeName() const", asMETHODPR(VertexBuffer, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("VertexBuffer", "const String& get_typeName() const", asMETHODPR(VertexBuffer, GetTypeName, () const, const String&), asCALL_THISCALL);
+    // unsigned VertexBuffer::GetVertexCount() const | File: ../Graphics/VertexBuffer.h
+    engine->RegisterObjectMethod("VertexBuffer", "uint GetVertexCount() const", asMETHODPR(VertexBuffer, GetVertexCount, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("VertexBuffer", "uint get_vertexCount() const", asMETHODPR(VertexBuffer, GetVertexCount, () const, unsigned), asCALL_THISCALL);
+    // unsigned VertexBuffer::GetVertexSize() const | File: ../Graphics/VertexBuffer.h
+    engine->RegisterObjectMethod("VertexBuffer", "uint GetVertexSize() const", asMETHODPR(VertexBuffer, GetVertexSize, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("VertexBuffer", "uint get_vertexSize() const", asMETHODPR(VertexBuffer, GetVertexSize, () const, unsigned), asCALL_THISCALL);
+    // static unsigned VertexBuffer::GetVertexSize(const PODVector<VertexElement>& elements) | File: ../Graphics/VertexBuffer.h
+    engine->SetDefaultNamespace("VertexBuffer");
+    engine->RegisterGlobalFunction("uint GetVertexSize(Array<VertexElement>@+)", asFUNCTION(VertexBuffer_GetVertexSize_PODVectorVertexElement), asCALL_CDECL);
+    engine->SetDefaultNamespace("");
+    // static unsigned VertexBuffer::GetVertexSize(unsigned elementMask) | File: ../Graphics/VertexBuffer.h
+    engine->SetDefaultNamespace("VertexBuffer");
+    engine->RegisterGlobalFunction("uint GetVertexSize(uint)", asFUNCTIONPR(VertexBuffer::GetVertexSize, (unsigned), unsigned), asCALL_CDECL);
+    engine->SetDefaultNamespace("");
+    // bool VertexBuffer::HasElement(VertexElementSemantic semantic, unsigned char index=0) const | File: ../Graphics/VertexBuffer.h
+    engine->RegisterObjectMethod("VertexBuffer", "bool HasElement(VertexElementSemantic, uint8 = 0) const", asMETHODPR(VertexBuffer, HasElement, (VertexElementSemantic, unsigned char) const, bool), asCALL_THISCALL);
+    // bool VertexBuffer::HasElement(VertexElementType type, VertexElementSemantic semantic, unsigned char index=0) const | File: ../Graphics/VertexBuffer.h
+    engine->RegisterObjectMethod("VertexBuffer", "bool HasElement(VertexElementType, VertexElementSemantic, uint8 = 0) const", asMETHODPR(VertexBuffer, HasElement, (VertexElementType, VertexElementSemantic, unsigned char) const, bool), asCALL_THISCALL);
+    // static bool VertexBuffer::HasElement(const PODVector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index=0) | File: ../Graphics/VertexBuffer.h
+    engine->SetDefaultNamespace("VertexBuffer");
+    engine->RegisterGlobalFunction("bool HasElement(Array<VertexElement>@+, VertexElementType, VertexElementSemantic, uint8 = 0)", asFUNCTION(VertexBuffer_HasElement_PODVectorVertexElement_VertexElementType_VertexElementSemantic_unsignedchar), asCALL_CDECL);
+    engine->SetDefaultNamespace("");
+    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("VertexBuffer", "bool HasEventHandlers() const", asMETHODPR(VertexBuffer, HasEventHandlers, () const, bool), asCALL_THISCALL);
+    // bool GPUObject::HasPendingData() const | File: ../Graphics/GPUObject.h
+    engine->RegisterObjectMethod("VertexBuffer", "bool HasPendingData() const", asMETHODPR(VertexBuffer, HasPendingData, () const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("VertexBuffer", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(VertexBuffer, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("VertexBuffer", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(VertexBuffer, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
+    // bool GPUObject::IsDataLost() const | File: ../Graphics/GPUObject.h
+    engine->RegisterObjectMethod("VertexBuffer", "bool IsDataLost() const", asMETHODPR(VertexBuffer, IsDataLost, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("VertexBuffer", "bool get_dataLost() const", asMETHODPR(VertexBuffer, IsDataLost, () const, bool), asCALL_THISCALL);
+    // bool VertexBuffer::IsDynamic() const | File: ../Graphics/VertexBuffer.h
+    engine->RegisterObjectMethod("VertexBuffer", "bool IsDynamic() const", asMETHODPR(VertexBuffer, IsDynamic, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("VertexBuffer", "bool get_dynamic() const", asMETHODPR(VertexBuffer, IsDynamic, () const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("VertexBuffer", "bool IsInstanceOf(StringHash) const", asMETHODPR(VertexBuffer, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
+    // Not registered because template
+    // bool VertexBuffer::IsLocked() const | File: ../Graphics/VertexBuffer.h
+    engine->RegisterObjectMethod("VertexBuffer", "bool IsLocked() const", asMETHODPR(VertexBuffer, IsLocked, () const, bool), asCALL_THISCALL);
+    // bool VertexBuffer::IsShadowed() const | File: ../Graphics/VertexBuffer.h
+    engine->RegisterObjectMethod("VertexBuffer", "bool IsShadowed() const", asMETHODPR(VertexBuffer, IsShadowed, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("VertexBuffer", "bool get_shadowed() const", asMETHODPR(VertexBuffer, IsShadowed, () const, bool), asCALL_THISCALL);
+    // void* VertexBuffer::Lock(unsigned start, unsigned count, bool discard=false) | File: ../Graphics/VertexBuffer.h
+    // Error: type "void*" can not automatically bind
+    // void VertexBuffer::OnDeviceLost() override | File: ../Graphics/VertexBuffer.h
+    engine->RegisterObjectMethod("VertexBuffer", "void OnDeviceLost()", asMETHODPR(VertexBuffer, OnDeviceLost, (), void), asCALL_THISCALL);
+    // void VertexBuffer::OnDeviceReset() override | File: ../Graphics/VertexBuffer.h
+    engine->RegisterObjectMethod("VertexBuffer", "void OnDeviceReset()", asMETHODPR(VertexBuffer, OnDeviceReset, (), void), asCALL_THISCALL);
+    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("VertexBuffer", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(VertexBuffer, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
+    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
+    // Error: type "RefCount*" can not automatically bind
+    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("VertexBuffer", "int Refs() const", asMETHODPR(VertexBuffer, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("VertexBuffer", "int get_refs() const", asMETHODPR(VertexBuffer, Refs, () const, int), asCALL_THISCALL);
+    // void VertexBuffer::Release() override | File: ../Graphics/VertexBuffer.h
+    engine->RegisterObjectMethod("VertexBuffer", "void Release()", asMETHODPR(VertexBuffer, Release, (), void), asCALL_THISCALL);
+    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("VertexBuffer", asBEHAVE_RELEASE, "void f()", asMETHODPR(VertexBuffer, ReleaseRef, (), void), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("VertexBuffer", "void SendEvent(StringHash)", asMETHODPR(VertexBuffer, SendEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("VertexBuffer", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(VertexBuffer, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
+    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
+    // Not registered because template
+    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("VertexBuffer", "void SetBlockEvents(bool)", asMETHODPR(VertexBuffer, SetBlockEvents, (bool), void), asCALL_THISCALL);
+    // bool VertexBuffer::SetData(const void* data) | File: ../Graphics/VertexBuffer.h
+    // Error: type "void*" can not automatically bind
+    // bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count, bool discard=false) | File: ../Graphics/VertexBuffer.h
+    // Error: type "void*" can not automatically bind
+    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("VertexBuffer", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(VertexBuffer, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("VertexBuffer", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(VertexBuffer, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    // void VertexBuffer::SetShadowed(bool enable) | File: ../Graphics/VertexBuffer.h
+    engine->RegisterObjectMethod("VertexBuffer", "void SetShadowed(bool)", asMETHODPR(VertexBuffer, SetShadowed, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("VertexBuffer", "void set_shadowed(bool)", asMETHODPR(VertexBuffer, SetShadowed, (bool), void), asCALL_THISCALL);
+    // bool VertexBuffer::SetSize(unsigned vertexCount, const PODVector<VertexElement>& elements, bool dynamic=false) | File: ../Graphics/VertexBuffer.h
+    engine->RegisterObjectMethod("VertexBuffer", "bool SetSize(uint, Array<VertexElement>@+, bool = false)", asFUNCTION(VertexBuffer_SetSize_unsigned_PODVectorVertexElement_bool), asCALL_CDECL_OBJFIRST);
+    // bool VertexBuffer::SetSize(unsigned vertexCount, unsigned elementMask, bool dynamic=false) | File: ../Graphics/VertexBuffer.h
+    engine->RegisterObjectMethod("VertexBuffer", "bool SetSize(uint, uint, bool = false)", asMETHODPR(VertexBuffer, SetSize, (unsigned, unsigned, bool), bool), asCALL_THISCALL);
+    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void VertexBuffer::Unlock() | File: ../Graphics/VertexBuffer.h
+    engine->RegisterObjectMethod("VertexBuffer", "void Unlock()", asMETHODPR(VertexBuffer, Unlock, (), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
+    engine->RegisterObjectMethod("VertexBuffer", "void UnsubscribeFromAllEvents()", asMETHODPR(VertexBuffer, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("VertexBuffer", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(VertexBuffer_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
+    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("VertexBuffer", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(VertexBuffer, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("VertexBuffer", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(VertexBuffer, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("VertexBuffer", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(VertexBuffer, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
+    // static void VertexBuffer::UpdateOffsets(PODVector<VertexElement>& elements) | File: ../Graphics/VertexBuffer.h
+    // Error: type "PODVector<VertexElement>&" can not automatically bind
+    // explicit VertexBuffer::VertexBuffer(Context* context, bool forceHeadless=false) | File: ../Graphics/VertexBuffer.h
+    engine->RegisterObjectBehaviour("VertexBuffer", asBEHAVE_FACTORY, "VertexBuffer@+ f(bool = false)", asFUNCTION(VertexBuffer_VertexBuffer_Context_bool), asCALL_CDECL);
+    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("VertexBuffer", "int WeakRefs() const", asMETHODPR(VertexBuffer, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("VertexBuffer", "int get_weakRefs() const", asMETHODPR(VertexBuffer, WeakRefs, () const, int), asCALL_THISCALL);
+#ifdef REGISTER_MANUAL_PART_Object
+    REGISTER_MANUAL_PART_Object(VertexBuffer, "VertexBuffer")
+#endif
+#ifdef REGISTER_MANUAL_PART_RefCounted
+    REGISTER_MANUAL_PART_RefCounted(VertexBuffer, "VertexBuffer")
+#endif
+#ifdef REGISTER_MANUAL_PART_GPUObject
+    REGISTER_MANUAL_PART_GPUObject(VertexBuffer, "VertexBuffer")
+#endif
+#ifdef REGISTER_MANUAL_PART_VertexBuffer
+    REGISTER_MANUAL_PART_VertexBuffer(VertexBuffer, "VertexBuffer")
+#endif
+    RegisterSubclass<Object, VertexBuffer>(engine, "Object", "VertexBuffer");
+    RegisterSubclass<RefCounted, VertexBuffer>(engine, "RefCounted", "VertexBuffer");
 
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("View", asBEHAVE_ADDREF, "void f()", asMETHODPR(View, AddRef, (), void), asCALL_THISCALL);
@@ -3295,6 +3245,32 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
     RegisterSubclass<Object, Viewport>(engine, "Object", "Viewport");
     RegisterSubclass<RefCounted, Viewport>(engine, "RefCounted", "Viewport");
 
+    // VariantMap VAnimEventFrame::eventData_ | File: ../Scene/ValueAnimation.h
+    engine->RegisterObjectProperty("VAnimEventFrame", "VariantMap eventData", offsetof(VAnimEventFrame, eventData_));
+    // StringHash VAnimEventFrame::eventType_ | File: ../Scene/ValueAnimation.h
+    engine->RegisterObjectProperty("VAnimEventFrame", "StringHash eventType", offsetof(VAnimEventFrame, eventType_));
+    // float VAnimEventFrame::time_ | File: ../Scene/ValueAnimation.h
+    engine->RegisterObjectProperty("VAnimEventFrame", "float time", offsetof(VAnimEventFrame, time_));
+    // VAnimEventFrame::~VAnimEventFrame() | Implicitly-declared
+    engine->RegisterObjectBehaviour("VAnimEventFrame", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(VAnimEventFrame_Destructor), asCALL_CDECL_OBJFIRST);
+    // VAnimEventFrame& VAnimEventFrame::operator=(const VAnimEventFrame&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<VAnimEventFrame>(engine, "VAnimEventFrame");
+#ifdef REGISTER_MANUAL_PART_VAnimEventFrame
+    REGISTER_MANUAL_PART_VAnimEventFrame(VAnimEventFrame, "VAnimEventFrame")
+#endif
+
+    // float VAnimKeyFrame::time_ | File: ../Scene/ValueAnimation.h
+    engine->RegisterObjectProperty("VAnimKeyFrame", "float time", offsetof(VAnimKeyFrame, time_));
+    // Variant VAnimKeyFrame::value_ | File: ../Scene/ValueAnimation.h
+    engine->RegisterObjectProperty("VAnimKeyFrame", "Variant value", offsetof(VAnimKeyFrame, value_));
+    // VAnimKeyFrame::~VAnimKeyFrame() | Implicitly-declared
+    engine->RegisterObjectBehaviour("VAnimKeyFrame", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(VAnimKeyFrame_Destructor), asCALL_CDECL_OBJFIRST);
+    // VAnimKeyFrame& VAnimKeyFrame::operator=(const VAnimKeyFrame&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<VAnimKeyFrame>(engine, "VAnimKeyFrame");
+#ifdef REGISTER_MANUAL_PART_VAnimKeyFrame
+    REGISTER_MANUAL_PART_VAnimKeyFrame(VAnimKeyFrame, "VAnimKeyFrame")
+#endif
+
 #ifdef URHO3D_URHO2D
     // unsigned Vertex2D::color_ | File: ../Urho2D/Drawable2D.h
     engine->RegisterObjectProperty("Vertex2D", "uint color", offsetof(Vertex2D, color_));
@@ -3309,6 +3285,22 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
 #ifdef REGISTER_MANUAL_PART_Vertex2D
     REGISTER_MANUAL_PART_Vertex2D(Vertex2D, "Vertex2D")
 #endif
+#endif
+
+    // SharedArrayPtr<unsigned char> VertexBufferDesc::data_ | File: ../Graphics/Model.h
+    // Error: type "SharedArrayPtr<unsigned char>" can not automatically bind
+    // unsigned VertexBufferDesc::dataSize_ | File: ../Graphics/Model.h
+    engine->RegisterObjectProperty("VertexBufferDesc", "uint dataSize", offsetof(VertexBufferDesc, dataSize_));
+    // unsigned VertexBufferDesc::vertexCount_ | File: ../Graphics/Model.h
+    engine->RegisterObjectProperty("VertexBufferDesc", "uint vertexCount", offsetof(VertexBufferDesc, vertexCount_));
+    // PODVector<VertexElement> VertexBufferDesc::vertexElements_ | File: ../Graphics/Model.h
+    // Error: type "PODVector<VertexElement>" can not automatically bind
+    // VertexBufferDesc::~VertexBufferDesc() | Implicitly-declared
+    engine->RegisterObjectBehaviour("VertexBufferDesc", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(VertexBufferDesc_Destructor), asCALL_CDECL_OBJFIRST);
+    // VertexBufferDesc& VertexBufferDesc::operator=(const VertexBufferDesc&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<VertexBufferDesc>(engine, "VertexBufferDesc");
+#ifdef REGISTER_MANUAL_PART_VertexBufferDesc
+    REGISTER_MANUAL_PART_VertexBufferDesc(VertexBufferDesc, "VertexBufferDesc")
 #endif
 
     // unsigned VertexBufferMorph::dataSize_ | File: ../Graphics/Model.h
@@ -3327,18 +3319,26 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
     REGISTER_MANUAL_PART_VertexBufferMorph(VertexBufferMorph, "VertexBufferMorph")
 #endif
 
-    // VariantMap VAnimEventFrame::eventData_ | File: ../Scene/ValueAnimation.h
-    engine->RegisterObjectProperty("VAnimEventFrame", "VariantMap eventData", offsetof(VAnimEventFrame, eventData_));
-    // StringHash VAnimEventFrame::eventType_ | File: ../Scene/ValueAnimation.h
-    engine->RegisterObjectProperty("VAnimEventFrame", "StringHash eventType", offsetof(VAnimEventFrame, eventType_));
-    // float VAnimEventFrame::time_ | File: ../Scene/ValueAnimation.h
-    engine->RegisterObjectProperty("VAnimEventFrame", "float time", offsetof(VAnimEventFrame, time_));
-    // VAnimEventFrame::~VAnimEventFrame() | Implicitly-declared
-    engine->RegisterObjectBehaviour("VAnimEventFrame", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(VAnimEventFrame_Destructor), asCALL_CDECL_OBJFIRST);
-    // VAnimEventFrame& VAnimEventFrame::operator=(const VAnimEventFrame&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<VAnimEventFrame>(engine, "VAnimEventFrame");
-#ifdef REGISTER_MANUAL_PART_VAnimEventFrame
-    REGISTER_MANUAL_PART_VAnimEventFrame(VAnimEventFrame, "VAnimEventFrame")
+    // unsigned char VertexElement::index_ | File: ../Graphics/GraphicsDefs.h
+    engine->RegisterObjectProperty("VertexElement", "uint8 index", offsetof(VertexElement, index_));
+    // unsigned VertexElement::offset_ | File: ../Graphics/GraphicsDefs.h
+    engine->RegisterObjectProperty("VertexElement", "uint offset", offsetof(VertexElement, offset_));
+    // bool VertexElement::perInstance_ | File: ../Graphics/GraphicsDefs.h
+    engine->RegisterObjectProperty("VertexElement", "bool perInstance", offsetof(VertexElement, perInstance_));
+    // VertexElementSemantic VertexElement::semantic_ | File: ../Graphics/GraphicsDefs.h
+    engine->RegisterObjectProperty("VertexElement", "VertexElementSemantic semantic", offsetof(VertexElement, semantic_));
+    // VertexElementType VertexElement::type_ | File: ../Graphics/GraphicsDefs.h
+    engine->RegisterObjectProperty("VertexElement", "VertexElementType type", offsetof(VertexElement, type_));
+    // bool VertexElement::operator==(const VertexElement& rhs) const | File: ../Graphics/GraphicsDefs.h
+    engine->RegisterObjectMethod("VertexElement", "bool opEquals(const VertexElement&in) const", asMETHODPR(VertexElement, operator==, (const VertexElement&) const, bool), asCALL_THISCALL);
+    // VertexElement::VertexElement(VertexElementType type, VertexElementSemantic semantic, unsigned char index=0, bool perInstance=false) noexcept | File: ../Graphics/GraphicsDefs.h
+    engine->RegisterObjectBehaviour("VertexElement", asBEHAVE_CONSTRUCT, "void f(VertexElementType, VertexElementSemantic, uint8 = 0, bool = false)", asFUNCTION(VertexElement_VertexElement_VertexElementType_VertexElementSemantic_unsignedchar_bool), asCALL_CDECL_OBJFIRST);
+    // VertexElement::~VertexElement() | Implicitly-declared
+    engine->RegisterObjectBehaviour("VertexElement", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(VertexElement_Destructor), asCALL_CDECL_OBJFIRST);
+    // VertexElement& VertexElement::operator=(const VertexElement&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<VertexElement>(engine, "VertexElement");
+#ifdef REGISTER_MANUAL_PART_VertexElement
+    REGISTER_MANUAL_PART_VertexElement(VertexElement, "VertexElement")
 #endif
 
 }

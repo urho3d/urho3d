@@ -23,67 +23,6 @@ namespace Urho3D
 void FakeAddRef(void* ptr);
 void FakeReleaseRef(void* ptr);
 
-// explicit FileSystem::FileSystem(Context* context) | File: ../IO/FileSystem.h
-static FileSystem* FileSystem_FileSystem_Context()
-{
-    return new FileSystem(GetScriptContext());
-}
-
-// int FileSystem::SystemRun(const String& fileName, const Vector<String>& arguments) | File: ../IO/FileSystem.h
-static int FileSystem_SystemRun_String_VectorString(FileSystem* ptr, const String& fileName, CScriptArray* arguments)
-{
-    Vector<String> param1 = ArrayToVector<String>(arguments);
-    int result = ptr->SystemRun(fileName, param1);
-    return result;
-}
-
-// unsigned FileSystem::SystemRunAsync(const String& fileName, const Vector<String>& arguments) | File: ../IO/FileSystem.h
-static unsigned FileSystem_SystemRunAsync_String_VectorString(FileSystem* ptr, const String& fileName, CScriptArray* arguments)
-{
-    Vector<String> param1 = ArrayToVector<String>(arguments);
-    unsigned result = ptr->SystemRunAsync(fileName, param1);
-    return result;
-}
-
-// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void FileSystem_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(FileSystem* ptr, CScriptArray* exceptions, bool onlyUserData)
-{
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
-}
-
-// explicit FileSelector::FileSelector(Context* context) | File: ../UI/FileSelector.h
-static FileSelector* FileSelector_FileSelector_Context()
-{
-    return new FileSelector(GetScriptContext());
-}
-
-// void FileSelector::SetFilters(const Vector<String>& filters, unsigned defaultIndex) | File: ../UI/FileSelector.h
-static void FileSelector_SetFilters_VectorString_unsigned(FileSelector* ptr, CScriptArray* filters, unsigned defaultIndex)
-{
-    Vector<String> param0 = ArrayToVector<String>(filters);
-    ptr->SetFilters(param0, defaultIndex);
-}
-
-// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void FileSelector_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(FileSelector* ptr, CScriptArray* exceptions, bool onlyUserData)
-{
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
-}
-
-// Frustum::Frustum(const Frustum& frustum) noexcept | File: ../Math/Frustum.h
-static void Frustum_Frustum_Frustum(Frustum* ptr, const Frustum &frustum)
-{
-    new(ptr) Frustum(frustum);
-}
-
-// Frustum::~Frustum() | Implicitly-declared 
-static void Frustum_Destructor(Frustum* ptr)
-{
-    ptr->~Frustum();
-}
-
 // explicit File::File(Context* context) | File: ../IO/File.h
 static File* File_File_Context()
 {
@@ -111,6 +50,55 @@ static CScriptArray* File_ReadStringVector_void(File* ptr)
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void File_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(File* ptr, CScriptArray* exceptions, bool onlyUserData)
+{
+    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+}
+
+// explicit FileSelector::FileSelector(Context* context) | File: ../UI/FileSelector.h
+static FileSelector* FileSelector_FileSelector_Context()
+{
+    return new FileSelector(GetScriptContext());
+}
+
+// void FileSelector::SetFilters(const Vector<String>& filters, unsigned defaultIndex) | File: ../UI/FileSelector.h
+static void FileSelector_SetFilters_VectorString_unsigned(FileSelector* ptr, CScriptArray* filters, unsigned defaultIndex)
+{
+    Vector<String> param0 = ArrayToVector<String>(filters);
+    ptr->SetFilters(param0, defaultIndex);
+}
+
+// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+static void FileSelector_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(FileSelector* ptr, CScriptArray* exceptions, bool onlyUserData)
+{
+    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+}
+
+// explicit FileSystem::FileSystem(Context* context) | File: ../IO/FileSystem.h
+static FileSystem* FileSystem_FileSystem_Context()
+{
+    return new FileSystem(GetScriptContext());
+}
+
+// int FileSystem::SystemRun(const String& fileName, const Vector<String>& arguments) | File: ../IO/FileSystem.h
+static int FileSystem_SystemRun_String_VectorString(FileSystem* ptr, const String& fileName, CScriptArray* arguments)
+{
+    Vector<String> param1 = ArrayToVector<String>(arguments);
+    int result = ptr->SystemRun(fileName, param1);
+    return result;
+}
+
+// unsigned FileSystem::SystemRunAsync(const String& fileName, const Vector<String>& arguments) | File: ../IO/FileSystem.h
+static unsigned FileSystem_SystemRunAsync_String_VectorString(FileSystem* ptr, const String& fileName, CScriptArray* arguments)
+{
+    Vector<String> param1 = ArrayToVector<String>(arguments);
+    unsigned result = ptr->SystemRunAsync(fileName, param1);
+    return result;
+}
+
+// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+static void FileSystem_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(FileSystem* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
     PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
@@ -175,6 +163,18 @@ static CScriptArray* FontFaceFreeType_GetTextures_void(FontFaceFreeType* ptr)
     return VectorToHandleArray(result, "Array<Texture2D@>");
 }
 
+// Frustum::Frustum(const Frustum& frustum) noexcept | File: ../Math/Frustum.h
+static void Frustum_Frustum_Frustum(Frustum* ptr, const Frustum &frustum)
+{
+    new(ptr) Frustum(frustum);
+}
+
+// Frustum::~Frustum() | Implicitly-declared 
+static void Frustum_Destructor(Frustum* ptr)
+{
+    ptr->~Frustum();
+}
+
 // FileSelectorEntry::~FileSelectorEntry() | Implicitly-declared 
 static void FileSelectorEntry_Destructor(FileSelectorEntry* ptr)
 {
@@ -201,395 +201,6 @@ static void FrameInfo_Destructor(FrameInfo* ptr)
 
 void ASRegisterGenerated_Members_F(asIScriptEngine* engine)
 {
-    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("FileSystem", asBEHAVE_ADDREF, "void f()", asMETHODPR(FileSystem, AddRef, (), void), asCALL_THISCALL);
-    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
-    // Not registered because template
-    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
-    // Not registered because template
-    // bool FileSystem::CheckAccess(const String& pathName) const | File: ../IO/FileSystem.h
-    engine->RegisterObjectMethod("FileSystem", "bool CheckAccess(const String&in) const", asMETHODPR(FileSystem, CheckAccess, (const String&) const, bool), asCALL_THISCALL);
-    // bool FileSystem::Copy(const String& srcFileName, const String& destFileName) | File: ../IO/FileSystem.h
-    engine->RegisterObjectMethod("FileSystem", "bool Copy(const String&in, const String&in)", asMETHODPR(FileSystem, Copy, (const String&, const String&), bool), asCALL_THISCALL);
-    // bool FileSystem::CreateDir(const String& pathName) | File: ../IO/FileSystem.h
-    engine->RegisterObjectMethod("FileSystem", "bool CreateDir(const String&in)", asMETHODPR(FileSystem, CreateDir, (const String&), bool), asCALL_THISCALL);
-    // bool FileSystem::Delete(const String& fileName) | File: ../IO/FileSystem.h
-    engine->RegisterObjectMethod("FileSystem", "bool Delete(const String&in)", asMETHODPR(FileSystem, Delete, (const String&), bool), asCALL_THISCALL);
-    // bool FileSystem::DirExists(const String& pathName) const | File: ../IO/FileSystem.h
-    engine->RegisterObjectMethod("FileSystem", "bool DirExists(const String&in) const", asMETHODPR(FileSystem, DirExists, (const String&) const, bool), asCALL_THISCALL);
-    // bool FileSystem::FileExists(const String& fileName) const | File: ../IO/FileSystem.h
-    engine->RegisterObjectMethod("FileSystem", "bool FileExists(const String&in) const", asMETHODPR(FileSystem, FileExists, (const String&) const, bool), asCALL_THISCALL);
-    // explicit FileSystem::FileSystem(Context* context) | File: ../IO/FileSystem.h
-    engine->RegisterObjectBehaviour("FileSystem", asBEHAVE_FACTORY, "FileSystem@+ f()", asFUNCTION(FileSystem_FileSystem_Context), asCALL_CDECL);
-    // String FileSystem::GetAppPreferencesDir(const String& org, const String& app) const | File: ../IO/FileSystem.h
-    engine->RegisterObjectMethod("FileSystem", "String GetAppPreferencesDir(const String&in, const String&in) const", asMETHODPR(FileSystem, GetAppPreferencesDir, (const String&, const String&) const, String), asCALL_THISCALL);
-    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSystem", "bool GetBlockEvents() const", asMETHODPR(FileSystem, GetBlockEvents, () const, bool), asCALL_THISCALL);
-    // const String& Object::GetCategory() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSystem", "const String& GetCategory() const", asMETHODPR(FileSystem, GetCategory, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSystem", "const String& get_category() const", asMETHODPR(FileSystem, GetCategory, () const, const String&), asCALL_THISCALL);
-    // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
-    // String FileSystem::GetCurrentDir() const | File: ../IO/FileSystem.h
-    engine->RegisterObjectMethod("FileSystem", "String GetCurrentDir() const", asMETHODPR(FileSystem, GetCurrentDir, () const, String), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSystem", "String get_currentDir() const", asMETHODPR(FileSystem, GetCurrentDir, () const, String), asCALL_THISCALL);
-    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSystem", "VariantMap& GetEventDataMap() const", asMETHODPR(FileSystem, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
-    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // Object* Object::GetEventSender() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSystem", "Object@+ GetEventSender() const", asMETHODPR(FileSystem, GetEventSender, () const, Object*), asCALL_THISCALL);
-    // bool FileSystem::GetExecuteConsoleCommands() const | File: ../IO/FileSystem.h
-    engine->RegisterObjectMethod("FileSystem", "bool GetExecuteConsoleCommands() const", asMETHODPR(FileSystem, GetExecuteConsoleCommands, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSystem", "bool get_executeConsoleCommands() const", asMETHODPR(FileSystem, GetExecuteConsoleCommands, () const, bool), asCALL_THISCALL);
-    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSystem", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(FileSystem, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSystem", "const Variant& get_globalVar(StringHash) const", asMETHODPR(FileSystem, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSystem", "const VariantMap& GetGlobalVars() const", asMETHODPR(FileSystem, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSystem", "const VariantMap& get_globalVars() const", asMETHODPR(FileSystem, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    // unsigned FileSystem::GetLastModifiedTime(const String& fileName) const | File: ../IO/FileSystem.h
-    engine->RegisterObjectMethod("FileSystem", "uint GetLastModifiedTime(const String&in) const", asMETHODPR(FileSystem, GetLastModifiedTime, (const String&) const, unsigned), asCALL_THISCALL);
-    // String FileSystem::GetProgramDir() const | File: ../IO/FileSystem.h
-    engine->RegisterObjectMethod("FileSystem", "String GetProgramDir() const", asMETHODPR(FileSystem, GetProgramDir, () const, String), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSystem", "String get_programDir() const", asMETHODPR(FileSystem, GetProgramDir, () const, String), asCALL_THISCALL);
-    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSystem", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(FileSystem, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
-    // Not registered because template
-    // String FileSystem::GetTemporaryDir() const | File: ../IO/FileSystem.h
-    engine->RegisterObjectMethod("FileSystem", "String GetTemporaryDir() const", asMETHODPR(FileSystem, GetTemporaryDir, () const, String), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSystem", "String get_temporaryDir() const", asMETHODPR(FileSystem, GetTemporaryDir, () const, String), asCALL_THISCALL);
-    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSystem", "StringHash GetType() const", asMETHODPR(FileSystem, GetType, () const, StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSystem", "StringHash get_type() const", asMETHODPR(FileSystem, GetType, () const, StringHash), asCALL_THISCALL);
-    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSystem", "const String& GetTypeName() const", asMETHODPR(FileSystem, GetTypeName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSystem", "const String& get_typeName() const", asMETHODPR(FileSystem, GetTypeName, () const, const String&), asCALL_THISCALL);
-    // String FileSystem::GetUserDocumentsDir() const | File: ../IO/FileSystem.h
-    engine->RegisterObjectMethod("FileSystem", "String GetUserDocumentsDir() const", asMETHODPR(FileSystem, GetUserDocumentsDir, () const, String), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSystem", "String get_userDocumentsDir() const", asMETHODPR(FileSystem, GetUserDocumentsDir, () const, String), asCALL_THISCALL);
-    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSystem", "bool HasEventHandlers() const", asMETHODPR(FileSystem, HasEventHandlers, () const, bool), asCALL_THISCALL);
-    // bool FileSystem::HasRegisteredPaths() const | File: ../IO/FileSystem.h
-    engine->RegisterObjectMethod("FileSystem", "bool HasRegisteredPaths() const", asMETHODPR(FileSystem, HasRegisteredPaths, () const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSystem", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(FileSystem, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSystem", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(FileSystem, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSystem", "bool IsInstanceOf(StringHash) const", asMETHODPR(FileSystem, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
-    // Not registered because template
-    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSystem", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(FileSystem, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
-    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
-    // Error: type "RefCount*" can not automatically bind
-    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("FileSystem", "int Refs() const", asMETHODPR(FileSystem, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSystem", "int get_refs() const", asMETHODPR(FileSystem, Refs, () const, int), asCALL_THISCALL);
-    // void FileSystem::RegisterPath(const String& pathName) | File: ../IO/FileSystem.h
-    engine->RegisterObjectMethod("FileSystem", "void RegisterPath(const String&in)", asMETHODPR(FileSystem, RegisterPath, (const String&), void), asCALL_THISCALL);
-    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("FileSystem", asBEHAVE_RELEASE, "void f()", asMETHODPR(FileSystem, ReleaseRef, (), void), asCALL_THISCALL);
-    // bool FileSystem::Rename(const String& srcFileName, const String& destFileName) | File: ../IO/FileSystem.h
-    engine->RegisterObjectMethod("FileSystem", "bool Rename(const String&in, const String&in)", asMETHODPR(FileSystem, Rename, (const String&, const String&), bool), asCALL_THISCALL);
-    // void FileSystem::ScanDir(Vector<String>& result, const String& pathName, const String& filter, unsigned flags, bool recursive) const | File: ../IO/FileSystem.h
-    // Error: type "Vector<String>&" can not automatically bind
-    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSystem", "void SendEvent(StringHash)", asMETHODPR(FileSystem, SendEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSystem", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(FileSystem, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
-    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
-    // Not registered because template
-    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSystem", "void SetBlockEvents(bool)", asMETHODPR(FileSystem, SetBlockEvents, (bool), void), asCALL_THISCALL);
-    // bool FileSystem::SetCurrentDir(const String& pathName) | File: ../IO/FileSystem.h
-    engine->RegisterObjectMethod("FileSystem", "bool SetCurrentDir(const String&in)", asMETHODPR(FileSystem, SetCurrentDir, (const String&), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSystem", "bool set_currentDir(const String&in)", asMETHODPR(FileSystem, SetCurrentDir, (const String&), bool), asCALL_THISCALL);
-    // void FileSystem::SetExecuteConsoleCommands(bool enable) | File: ../IO/FileSystem.h
-    engine->RegisterObjectMethod("FileSystem", "void SetExecuteConsoleCommands(bool)", asMETHODPR(FileSystem, SetExecuteConsoleCommands, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSystem", "void set_executeConsoleCommands(bool)", asMETHODPR(FileSystem, SetExecuteConsoleCommands, (bool), void), asCALL_THISCALL);
-    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSystem", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(FileSystem, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSystem", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(FileSystem, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    // bool FileSystem::SetLastModifiedTime(const String& fileName, unsigned newTime) | File: ../IO/FileSystem.h
-    engine->RegisterObjectMethod("FileSystem", "bool SetLastModifiedTime(const String&in, uint)", asMETHODPR(FileSystem, SetLastModifiedTime, (const String&, unsigned), bool), asCALL_THISCALL);
-    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // int FileSystem::SystemCommand(const String& commandLine, bool redirectStdOutToLog=false) | File: ../IO/FileSystem.h
-    engine->RegisterObjectMethod("FileSystem", "int SystemCommand(const String&in, bool = false)", asMETHODPR(FileSystem, SystemCommand, (const String&, bool), int), asCALL_THISCALL);
-    // unsigned FileSystem::SystemCommandAsync(const String& commandLine) | File: ../IO/FileSystem.h
-    engine->RegisterObjectMethod("FileSystem", "uint SystemCommandAsync(const String&in)", asMETHODPR(FileSystem, SystemCommandAsync, (const String&), unsigned), asCALL_THISCALL);
-    // bool FileSystem::SystemOpen(const String& fileName, const String& mode=String::EMPTY) | File: ../IO/FileSystem.h
-    engine->RegisterObjectMethod("FileSystem", "bool SystemOpen(const String&in, const String&in = String::EMPTY)", asMETHODPR(FileSystem, SystemOpen, (const String&, const String&), bool), asCALL_THISCALL);
-    // int FileSystem::SystemRun(const String& fileName, const Vector<String>& arguments) | File: ../IO/FileSystem.h
-    engine->RegisterObjectMethod("FileSystem", "int SystemRun(const String&in, Array<String>@+)", asFUNCTION(FileSystem_SystemRun_String_VectorString), asCALL_CDECL_OBJFIRST);
-    // unsigned FileSystem::SystemRunAsync(const String& fileName, const Vector<String>& arguments) | File: ../IO/FileSystem.h
-    engine->RegisterObjectMethod("FileSystem", "uint SystemRunAsync(const String&in, Array<String>@+)", asFUNCTION(FileSystem_SystemRunAsync_String_VectorString), asCALL_CDECL_OBJFIRST);
-    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSystem", "void UnsubscribeFromAllEvents()", asMETHODPR(FileSystem, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSystem", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(FileSystem_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
-    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSystem", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(FileSystem, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSystem", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(FileSystem, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSystem", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(FileSystem, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
-    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("FileSystem", "int WeakRefs() const", asMETHODPR(FileSystem, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSystem", "int get_weakRefs() const", asMETHODPR(FileSystem, WeakRefs, () const, int), asCALL_THISCALL);
-#ifdef REGISTER_MANUAL_PART_Object
-    REGISTER_MANUAL_PART_Object(FileSystem, "FileSystem")
-#endif
-#ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(FileSystem, "FileSystem")
-#endif
-#ifdef REGISTER_MANUAL_PART_FileSystem
-    REGISTER_MANUAL_PART_FileSystem(FileSystem, "FileSystem")
-#endif
-    RegisterSubclass<Object, FileSystem>(engine, "Object", "FileSystem");
-    RegisterSubclass<RefCounted, FileSystem>(engine, "RefCounted", "FileSystem");
-
-    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("FileSelector", asBEHAVE_ADDREF, "void f()", asMETHODPR(FileSelector, AddRef, (), void), asCALL_THISCALL);
-    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
-    // Not registered because template
-    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
-    // Not registered because template
-    // explicit FileSelector::FileSelector(Context* context) | File: ../UI/FileSelector.h
-    engine->RegisterObjectBehaviour("FileSelector", asBEHAVE_FACTORY, "FileSelector@+ f()", asFUNCTION(FileSelector_FileSelector_Context), asCALL_CDECL);
-    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSelector", "bool GetBlockEvents() const", asMETHODPR(FileSelector, GetBlockEvents, () const, bool), asCALL_THISCALL);
-    // Button* FileSelector::GetCancelButton() const | File: ../UI/FileSelector.h
-    engine->RegisterObjectMethod("FileSelector", "Button@+ GetCancelButton() const", asMETHODPR(FileSelector, GetCancelButton, () const, Button*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSelector", "Button@+ get_cancelButton() const", asMETHODPR(FileSelector, GetCancelButton, () const, Button*), asCALL_THISCALL);
-    // const String& Object::GetCategory() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSelector", "const String& GetCategory() const", asMETHODPR(FileSelector, GetCategory, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSelector", "const String& get_category() const", asMETHODPR(FileSelector, GetCategory, () const, const String&), asCALL_THISCALL);
-    // Button* FileSelector::GetCloseButton() const | File: ../UI/FileSelector.h
-    engine->RegisterObjectMethod("FileSelector", "Button@+ GetCloseButton() const", asMETHODPR(FileSelector, GetCloseButton, () const, Button*), asCALL_THISCALL);
-    // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
-    // XMLFile* FileSelector::GetDefaultStyle() const | File: ../UI/FileSelector.h
-    engine->RegisterObjectMethod("FileSelector", "XMLFile@+ GetDefaultStyle() const", asMETHODPR(FileSelector, GetDefaultStyle, () const, XMLFile*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSelector", "XMLFile@+ get_defaultStyle() const", asMETHODPR(FileSelector, GetDefaultStyle, () const, XMLFile*), asCALL_THISCALL);
-    // bool FileSelector::GetDirectoryMode() const | File: ../UI/FileSelector.h
-    engine->RegisterObjectMethod("FileSelector", "bool GetDirectoryMode() const", asMETHODPR(FileSelector, GetDirectoryMode, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSelector", "bool get_directoryMode() const", asMETHODPR(FileSelector, GetDirectoryMode, () const, bool), asCALL_THISCALL);
-    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSelector", "VariantMap& GetEventDataMap() const", asMETHODPR(FileSelector, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
-    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // Object* Object::GetEventSender() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSelector", "Object@+ GetEventSender() const", asMETHODPR(FileSelector, GetEventSender, () const, Object*), asCALL_THISCALL);
-    // ListView* FileSelector::GetFileList() const | File: ../UI/FileSelector.h
-    engine->RegisterObjectMethod("FileSelector", "ListView@+ GetFileList() const", asMETHODPR(FileSelector, GetFileList, () const, ListView*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSelector", "ListView@+ get_fileList() const", asMETHODPR(FileSelector, GetFileList, () const, ListView*), asCALL_THISCALL);
-    // const String& FileSelector::GetFileName() const | File: ../UI/FileSelector.h
-    engine->RegisterObjectMethod("FileSelector", "const String& GetFileName() const", asMETHODPR(FileSelector, GetFileName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSelector", "const String& get_fileName() const", asMETHODPR(FileSelector, GetFileName, () const, const String&), asCALL_THISCALL);
-    // LineEdit* FileSelector::GetFileNameEdit() const | File: ../UI/FileSelector.h
-    engine->RegisterObjectMethod("FileSelector", "LineEdit@+ GetFileNameEdit() const", asMETHODPR(FileSelector, GetFileNameEdit, () const, LineEdit*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSelector", "LineEdit@+ get_fileNameEdit() const", asMETHODPR(FileSelector, GetFileNameEdit, () const, LineEdit*), asCALL_THISCALL);
-    // const String& FileSelector::GetFilter() const | File: ../UI/FileSelector.h
-    engine->RegisterObjectMethod("FileSelector", "const String& GetFilter() const", asMETHODPR(FileSelector, GetFilter, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSelector", "const String& get_filter() const", asMETHODPR(FileSelector, GetFilter, () const, const String&), asCALL_THISCALL);
-    // unsigned FileSelector::GetFilterIndex() const | File: ../UI/FileSelector.h
-    engine->RegisterObjectMethod("FileSelector", "uint GetFilterIndex() const", asMETHODPR(FileSelector, GetFilterIndex, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSelector", "uint get_filterIndex() const", asMETHODPR(FileSelector, GetFilterIndex, () const, unsigned), asCALL_THISCALL);
-    // DropDownList* FileSelector::GetFilterList() const | File: ../UI/FileSelector.h
-    engine->RegisterObjectMethod("FileSelector", "DropDownList@+ GetFilterList() const", asMETHODPR(FileSelector, GetFilterList, () const, DropDownList*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSelector", "DropDownList@+ get_filterList() const", asMETHODPR(FileSelector, GetFilterList, () const, DropDownList*), asCALL_THISCALL);
-    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSelector", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(FileSelector, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSelector", "const Variant& get_globalVar(StringHash) const", asMETHODPR(FileSelector, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSelector", "const VariantMap& GetGlobalVars() const", asMETHODPR(FileSelector, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSelector", "const VariantMap& get_globalVars() const", asMETHODPR(FileSelector, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    // Button* FileSelector::GetOKButton() const | File: ../UI/FileSelector.h
-    engine->RegisterObjectMethod("FileSelector", "Button@+ GetOKButton() const", asMETHODPR(FileSelector, GetOKButton, () const, Button*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSelector", "Button@+ get_okButton() const", asMETHODPR(FileSelector, GetOKButton, () const, Button*), asCALL_THISCALL);
-    // const String& FileSelector::GetPath() const | File: ../UI/FileSelector.h
-    engine->RegisterObjectMethod("FileSelector", "const String& GetPath() const", asMETHODPR(FileSelector, GetPath, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSelector", "const String& get_path() const", asMETHODPR(FileSelector, GetPath, () const, const String&), asCALL_THISCALL);
-    // LineEdit* FileSelector::GetPathEdit() const | File: ../UI/FileSelector.h
-    engine->RegisterObjectMethod("FileSelector", "LineEdit@+ GetPathEdit() const", asMETHODPR(FileSelector, GetPathEdit, () const, LineEdit*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSelector", "LineEdit@+ get_pathEdit() const", asMETHODPR(FileSelector, GetPathEdit, () const, LineEdit*), asCALL_THISCALL);
-    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSelector", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(FileSelector, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
-    // Not registered because template
-    // const String& FileSelector::GetTitle() const | File: ../UI/FileSelector.h
-    engine->RegisterObjectMethod("FileSelector", "const String& GetTitle() const", asMETHODPR(FileSelector, GetTitle, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSelector", "const String& get_title() const", asMETHODPR(FileSelector, GetTitle, () const, const String&), asCALL_THISCALL);
-    // Text* FileSelector::GetTitleText() const | File: ../UI/FileSelector.h
-    engine->RegisterObjectMethod("FileSelector", "Text@+ GetTitleText() const", asMETHODPR(FileSelector, GetTitleText, () const, Text*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSelector", "Text@+ get_titleText() const", asMETHODPR(FileSelector, GetTitleText, () const, Text*), asCALL_THISCALL);
-    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSelector", "StringHash GetType() const", asMETHODPR(FileSelector, GetType, () const, StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSelector", "StringHash get_type() const", asMETHODPR(FileSelector, GetType, () const, StringHash), asCALL_THISCALL);
-    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSelector", "const String& GetTypeName() const", asMETHODPR(FileSelector, GetTypeName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSelector", "const String& get_typeName() const", asMETHODPR(FileSelector, GetTypeName, () const, const String&), asCALL_THISCALL);
-    // Window* FileSelector::GetWindow() const | File: ../UI/FileSelector.h
-    engine->RegisterObjectMethod("FileSelector", "Window@+ GetWindow() const", asMETHODPR(FileSelector, GetWindow, () const, Window*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSelector", "Window@+ get_window() const", asMETHODPR(FileSelector, GetWindow, () const, Window*), asCALL_THISCALL);
-    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSelector", "bool HasEventHandlers() const", asMETHODPR(FileSelector, HasEventHandlers, () const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSelector", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(FileSelector, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSelector", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(FileSelector, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSelector", "bool IsInstanceOf(StringHash) const", asMETHODPR(FileSelector, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
-    // Not registered because template
-    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSelector", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(FileSelector, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
-    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
-    // Error: type "RefCount*" can not automatically bind
-    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("FileSelector", "int Refs() const", asMETHODPR(FileSelector, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSelector", "int get_refs() const", asMETHODPR(FileSelector, Refs, () const, int), asCALL_THISCALL);
-    // static void FileSelector::RegisterObject(Context* context) | File: ../UI/FileSelector.h
-    // Context can be used as firs parameter of constructors only
-    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("FileSelector", asBEHAVE_RELEASE, "void f()", asMETHODPR(FileSelector, ReleaseRef, (), void), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSelector", "void SendEvent(StringHash)", asMETHODPR(FileSelector, SendEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSelector", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(FileSelector, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
-    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
-    // Not registered because template
-    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSelector", "void SetBlockEvents(bool)", asMETHODPR(FileSelector, SetBlockEvents, (bool), void), asCALL_THISCALL);
-    // void FileSelector::SetButtonTexts(const String& okText, const String& cancelText) | File: ../UI/FileSelector.h
-    engine->RegisterObjectMethod("FileSelector", "void SetButtonTexts(const String&in, const String&in)", asMETHODPR(FileSelector, SetButtonTexts, (const String&, const String&), void), asCALL_THISCALL);
-    // void FileSelector::SetDefaultStyle(XMLFile* style) | File: ../UI/FileSelector.h
-    engine->RegisterObjectMethod("FileSelector", "void SetDefaultStyle(XMLFile@+)", asMETHODPR(FileSelector, SetDefaultStyle, (XMLFile*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSelector", "void set_defaultStyle(XMLFile@+)", asMETHODPR(FileSelector, SetDefaultStyle, (XMLFile*), void), asCALL_THISCALL);
-    // void FileSelector::SetDirectoryMode(bool enable) | File: ../UI/FileSelector.h
-    engine->RegisterObjectMethod("FileSelector", "void SetDirectoryMode(bool)", asMETHODPR(FileSelector, SetDirectoryMode, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSelector", "void set_directoryMode(bool)", asMETHODPR(FileSelector, SetDirectoryMode, (bool), void), asCALL_THISCALL);
-    // void FileSelector::SetFileName(const String& fileName) | File: ../UI/FileSelector.h
-    engine->RegisterObjectMethod("FileSelector", "void SetFileName(const String&in)", asMETHODPR(FileSelector, SetFileName, (const String&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSelector", "void set_fileName(const String&in)", asMETHODPR(FileSelector, SetFileName, (const String&), void), asCALL_THISCALL);
-    // void FileSelector::SetFilters(const Vector<String>& filters, unsigned defaultIndex) | File: ../UI/FileSelector.h
-    engine->RegisterObjectMethod("FileSelector", "void SetFilters(Array<String>@+, uint)", asFUNCTION(FileSelector_SetFilters_VectorString_unsigned), asCALL_CDECL_OBJFIRST);
-    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSelector", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(FileSelector, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSelector", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(FileSelector, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    // void FileSelector::SetPath(const String& path) | File: ../UI/FileSelector.h
-    engine->RegisterObjectMethod("FileSelector", "void SetPath(const String&in)", asMETHODPR(FileSelector, SetPath, (const String&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSelector", "void set_path(const String&in)", asMETHODPR(FileSelector, SetPath, (const String&), void), asCALL_THISCALL);
-    // void FileSelector::SetTitle(const String& text) | File: ../UI/FileSelector.h
-    engine->RegisterObjectMethod("FileSelector", "void SetTitle(const String&in)", asMETHODPR(FileSelector, SetTitle, (const String&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSelector", "void set_title(const String&in)", asMETHODPR(FileSelector, SetTitle, (const String&), void), asCALL_THISCALL);
-    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSelector", "void UnsubscribeFromAllEvents()", asMETHODPR(FileSelector, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSelector", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(FileSelector_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
-    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSelector", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(FileSelector, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSelector", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(FileSelector, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("FileSelector", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(FileSelector, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
-    // void FileSelector::UpdateElements() | File: ../UI/FileSelector.h
-    engine->RegisterObjectMethod("FileSelector", "void UpdateElements()", asMETHODPR(FileSelector, UpdateElements, (), void), asCALL_THISCALL);
-    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("FileSelector", "int WeakRefs() const", asMETHODPR(FileSelector, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSelector", "int get_weakRefs() const", asMETHODPR(FileSelector, WeakRefs, () const, int), asCALL_THISCALL);
-#ifdef REGISTER_MANUAL_PART_Object
-    REGISTER_MANUAL_PART_Object(FileSelector, "FileSelector")
-#endif
-#ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(FileSelector, "FileSelector")
-#endif
-#ifdef REGISTER_MANUAL_PART_FileSelector
-    REGISTER_MANUAL_PART_FileSelector(FileSelector, "FileSelector")
-#endif
-    RegisterSubclass<Object, FileSelector>(engine, "Object", "FileSelector");
-    RegisterSubclass<RefCounted, FileSelector>(engine, "RefCounted", "FileSelector");
-
-    // Plane Frustum::planes_[NUM_FRUSTUM_PLANES] | File: ../Math/Frustum.h
-    // Not registered because array
-    // Vector3 Frustum::vertices_[NUM_FRUSTUM_VERTICES] | File: ../Math/Frustum.h
-    // Not registered because array
-    // void Frustum::Define(float fov, float aspectRatio, float zoom, float nearZ, float farZ, const Matrix3x4& transform=Matrix3x4::IDENTITY) | File: ../Math/Frustum.h
-    engine->RegisterObjectMethod("Frustum", "void Define(float, float, float, float, float, const Matrix3x4&in = Matrix3x4::IDENTITY)", asMETHODPR(Frustum, Define, (float, float, float, float, float, const Matrix3x4&), void), asCALL_THISCALL);
-    // void Frustum::Define(const Vector3& near, const Vector3& far, const Matrix3x4& transform=Matrix3x4::IDENTITY) | File: ../Math/Frustum.h
-    engine->RegisterObjectMethod("Frustum", "void Define(const Vector3&in, const Vector3&in, const Matrix3x4&in = Matrix3x4::IDENTITY)", asMETHODPR(Frustum, Define, (const Vector3&, const Vector3&, const Matrix3x4&), void), asCALL_THISCALL);
-    // void Frustum::Define(const BoundingBox& box, const Matrix3x4& transform=Matrix3x4::IDENTITY) | File: ../Math/Frustum.h
-    engine->RegisterObjectMethod("Frustum", "void Define(const BoundingBox&in, const Matrix3x4&in = Matrix3x4::IDENTITY)", asMETHODPR(Frustum, Define, (const BoundingBox&, const Matrix3x4&), void), asCALL_THISCALL);
-    // void Frustum::Define(const Matrix4& projection) | File: ../Math/Frustum.h
-    engine->RegisterObjectMethod("Frustum", "void Define(const Matrix4&in)", asMETHODPR(Frustum, Define, (const Matrix4&), void), asCALL_THISCALL);
-    // void Frustum::DefineOrtho(float orthoSize, float aspectRatio, float zoom, float nearZ, float farZ, const Matrix3x4& transform=Matrix3x4::IDENTITY) | File: ../Math/Frustum.h
-    engine->RegisterObjectMethod("Frustum", "void DefineOrtho(float, float, float, float, float, const Matrix3x4&in = Matrix3x4::IDENTITY)", asMETHODPR(Frustum, DefineOrtho, (float, float, float, float, float, const Matrix3x4&), void), asCALL_THISCALL);
-    // void Frustum::DefineSplit(const Matrix4& projection, float near, float far) | File: ../Math/Frustum.h
-    engine->RegisterObjectMethod("Frustum", "void DefineSplit(const Matrix4&in, float, float)", asMETHODPR(Frustum, DefineSplit, (const Matrix4&, float, float), void), asCALL_THISCALL);
-    // float Frustum::Distance(const Vector3& point) const | File: ../Math/Frustum.h
-    engine->RegisterObjectMethod("Frustum", "float Distance(const Vector3&in) const", asMETHODPR(Frustum, Distance, (const Vector3&) const, float), asCALL_THISCALL);
-    // Frustum::Frustum(const Frustum& frustum) noexcept | File: ../Math/Frustum.h
-    engine->RegisterObjectBehaviour("Frustum", asBEHAVE_CONSTRUCT, "void f(const Frustum&in)", asFUNCTION(Frustum_Frustum_Frustum), asCALL_CDECL_OBJFIRST);
-    // Intersection Frustum::IsInside(const Vector3& point) const | File: ../Math/Frustum.h
-    engine->RegisterObjectMethod("Frustum", "Intersection IsInside(const Vector3&in) const", asMETHODPR(Frustum, IsInside, (const Vector3&) const, Intersection), asCALL_THISCALL);
-    // Intersection Frustum::IsInside(const Sphere& sphere) const | File: ../Math/Frustum.h
-    engine->RegisterObjectMethod("Frustum", "Intersection IsInside(const Sphere&in) const", asMETHODPR(Frustum, IsInside, (const Sphere&) const, Intersection), asCALL_THISCALL);
-    // Intersection Frustum::IsInside(const BoundingBox& box) const | File: ../Math/Frustum.h
-    engine->RegisterObjectMethod("Frustum", "Intersection IsInside(const BoundingBox&in) const", asMETHODPR(Frustum, IsInside, (const BoundingBox&) const, Intersection), asCALL_THISCALL);
-    // Intersection Frustum::IsInsideFast(const Sphere& sphere) const | File: ../Math/Frustum.h
-    engine->RegisterObjectMethod("Frustum", "Intersection IsInsideFast(const Sphere&in) const", asMETHODPR(Frustum, IsInsideFast, (const Sphere&) const, Intersection), asCALL_THISCALL);
-    // Intersection Frustum::IsInsideFast(const BoundingBox& box) const | File: ../Math/Frustum.h
-    engine->RegisterObjectMethod("Frustum", "Intersection IsInsideFast(const BoundingBox&in) const", asMETHODPR(Frustum, IsInsideFast, (const BoundingBox&) const, Intersection), asCALL_THISCALL);
-    // Frustum& Frustum::operator=(const Frustum& rhs) noexcept | File: ../Math/Frustum.h
-    engine->RegisterObjectMethod("Frustum", "Frustum& opAssign(const Frustum&in)", asMETHODPR(Frustum, operator=, (const Frustum&), Frustum&), asCALL_THISCALL);
-    // Rect Frustum::Projected(const Matrix4& projection) const | File: ../Math/Frustum.h
-    engine->RegisterObjectMethod("Frustum", "Rect Projected(const Matrix4&in) const", asMETHODPR(Frustum, Projected, (const Matrix4&) const, Rect), asCALL_THISCALL);
-    // void Frustum::Transform(const Matrix3& transform) | File: ../Math/Frustum.h
-    engine->RegisterObjectMethod("Frustum", "void Transform(const Matrix3&in)", asMETHODPR(Frustum, Transform, (const Matrix3&), void), asCALL_THISCALL);
-    // void Frustum::Transform(const Matrix3x4& transform) | File: ../Math/Frustum.h
-    engine->RegisterObjectMethod("Frustum", "void Transform(const Matrix3x4&in)", asMETHODPR(Frustum, Transform, (const Matrix3x4&), void), asCALL_THISCALL);
-    // Frustum Frustum::Transformed(const Matrix3& transform) const | File: ../Math/Frustum.h
-    engine->RegisterObjectMethod("Frustum", "Frustum Transformed(const Matrix3&in) const", asMETHODPR(Frustum, Transformed, (const Matrix3&) const, Frustum), asCALL_THISCALL);
-    // Frustum Frustum::Transformed(const Matrix3x4& transform) const | File: ../Math/Frustum.h
-    engine->RegisterObjectMethod("Frustum", "Frustum Transformed(const Matrix3x4&in) const", asMETHODPR(Frustum, Transformed, (const Matrix3x4&) const, Frustum), asCALL_THISCALL);
-    // void Frustum::UpdatePlanes() | File: ../Math/Frustum.h
-    engine->RegisterObjectMethod("Frustum", "void UpdatePlanes()", asMETHODPR(Frustum, UpdatePlanes, (), void), asCALL_THISCALL);
-    // Frustum::~Frustum() | Implicitly-declared
-    engine->RegisterObjectBehaviour("Frustum", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(Frustum_Destructor), asCALL_CDECL_OBJFIRST);
-#ifdef REGISTER_MANUAL_PART_Frustum
-    REGISTER_MANUAL_PART_Frustum(Frustum, "Frustum")
-#endif
-
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("File", asBEHAVE_ADDREF, "void f()", asMETHODPR(File, AddRef, (), void), asCALL_THISCALL);
     // template<typename T> T* Object::Cast() | File: ../Core/Object.h
@@ -917,6 +528,345 @@ void ASRegisterGenerated_Members_F(asIScriptEngine* engine)
     RegisterSubclass<AbstractFile, File>(engine, "AbstractFile", "File");
     RegisterSubclass<Deserializer, File>(engine, "Deserializer", "File");
     RegisterSubclass<Serializer, File>(engine, "Serializer", "File");
+
+    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("FileSelector", asBEHAVE_ADDREF, "void f()", asMETHODPR(FileSelector, AddRef, (), void), asCALL_THISCALL);
+    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
+    // Not registered because template
+    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
+    // Not registered because template
+    // explicit FileSelector::FileSelector(Context* context) | File: ../UI/FileSelector.h
+    engine->RegisterObjectBehaviour("FileSelector", asBEHAVE_FACTORY, "FileSelector@+ f()", asFUNCTION(FileSelector_FileSelector_Context), asCALL_CDECL);
+    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSelector", "bool GetBlockEvents() const", asMETHODPR(FileSelector, GetBlockEvents, () const, bool), asCALL_THISCALL);
+    // Button* FileSelector::GetCancelButton() const | File: ../UI/FileSelector.h
+    engine->RegisterObjectMethod("FileSelector", "Button@+ GetCancelButton() const", asMETHODPR(FileSelector, GetCancelButton, () const, Button*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "Button@+ get_cancelButton() const", asMETHODPR(FileSelector, GetCancelButton, () const, Button*), asCALL_THISCALL);
+    // const String& Object::GetCategory() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSelector", "const String& GetCategory() const", asMETHODPR(FileSelector, GetCategory, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "const String& get_category() const", asMETHODPR(FileSelector, GetCategory, () const, const String&), asCALL_THISCALL);
+    // Button* FileSelector::GetCloseButton() const | File: ../UI/FileSelector.h
+    engine->RegisterObjectMethod("FileSelector", "Button@+ GetCloseButton() const", asMETHODPR(FileSelector, GetCloseButton, () const, Button*), asCALL_THISCALL);
+    // Context* Object::GetContext() const | File: ../Core/Object.h
+    // Error: type "Context*" can not be returned
+    // XMLFile* FileSelector::GetDefaultStyle() const | File: ../UI/FileSelector.h
+    engine->RegisterObjectMethod("FileSelector", "XMLFile@+ GetDefaultStyle() const", asMETHODPR(FileSelector, GetDefaultStyle, () const, XMLFile*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "XMLFile@+ get_defaultStyle() const", asMETHODPR(FileSelector, GetDefaultStyle, () const, XMLFile*), asCALL_THISCALL);
+    // bool FileSelector::GetDirectoryMode() const | File: ../UI/FileSelector.h
+    engine->RegisterObjectMethod("FileSelector", "bool GetDirectoryMode() const", asMETHODPR(FileSelector, GetDirectoryMode, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "bool get_directoryMode() const", asMETHODPR(FileSelector, GetDirectoryMode, () const, bool), asCALL_THISCALL);
+    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSelector", "VariantMap& GetEventDataMap() const", asMETHODPR(FileSelector, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
+    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // Object* Object::GetEventSender() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSelector", "Object@+ GetEventSender() const", asMETHODPR(FileSelector, GetEventSender, () const, Object*), asCALL_THISCALL);
+    // ListView* FileSelector::GetFileList() const | File: ../UI/FileSelector.h
+    engine->RegisterObjectMethod("FileSelector", "ListView@+ GetFileList() const", asMETHODPR(FileSelector, GetFileList, () const, ListView*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "ListView@+ get_fileList() const", asMETHODPR(FileSelector, GetFileList, () const, ListView*), asCALL_THISCALL);
+    // const String& FileSelector::GetFileName() const | File: ../UI/FileSelector.h
+    engine->RegisterObjectMethod("FileSelector", "const String& GetFileName() const", asMETHODPR(FileSelector, GetFileName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "const String& get_fileName() const", asMETHODPR(FileSelector, GetFileName, () const, const String&), asCALL_THISCALL);
+    // LineEdit* FileSelector::GetFileNameEdit() const | File: ../UI/FileSelector.h
+    engine->RegisterObjectMethod("FileSelector", "LineEdit@+ GetFileNameEdit() const", asMETHODPR(FileSelector, GetFileNameEdit, () const, LineEdit*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "LineEdit@+ get_fileNameEdit() const", asMETHODPR(FileSelector, GetFileNameEdit, () const, LineEdit*), asCALL_THISCALL);
+    // const String& FileSelector::GetFilter() const | File: ../UI/FileSelector.h
+    engine->RegisterObjectMethod("FileSelector", "const String& GetFilter() const", asMETHODPR(FileSelector, GetFilter, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "const String& get_filter() const", asMETHODPR(FileSelector, GetFilter, () const, const String&), asCALL_THISCALL);
+    // unsigned FileSelector::GetFilterIndex() const | File: ../UI/FileSelector.h
+    engine->RegisterObjectMethod("FileSelector", "uint GetFilterIndex() const", asMETHODPR(FileSelector, GetFilterIndex, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "uint get_filterIndex() const", asMETHODPR(FileSelector, GetFilterIndex, () const, unsigned), asCALL_THISCALL);
+    // DropDownList* FileSelector::GetFilterList() const | File: ../UI/FileSelector.h
+    engine->RegisterObjectMethod("FileSelector", "DropDownList@+ GetFilterList() const", asMETHODPR(FileSelector, GetFilterList, () const, DropDownList*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "DropDownList@+ get_filterList() const", asMETHODPR(FileSelector, GetFilterList, () const, DropDownList*), asCALL_THISCALL);
+    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSelector", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(FileSelector, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "const Variant& get_globalVar(StringHash) const", asMETHODPR(FileSelector, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSelector", "const VariantMap& GetGlobalVars() const", asMETHODPR(FileSelector, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "const VariantMap& get_globalVars() const", asMETHODPR(FileSelector, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    // Button* FileSelector::GetOKButton() const | File: ../UI/FileSelector.h
+    engine->RegisterObjectMethod("FileSelector", "Button@+ GetOKButton() const", asMETHODPR(FileSelector, GetOKButton, () const, Button*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "Button@+ get_okButton() const", asMETHODPR(FileSelector, GetOKButton, () const, Button*), asCALL_THISCALL);
+    // const String& FileSelector::GetPath() const | File: ../UI/FileSelector.h
+    engine->RegisterObjectMethod("FileSelector", "const String& GetPath() const", asMETHODPR(FileSelector, GetPath, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "const String& get_path() const", asMETHODPR(FileSelector, GetPath, () const, const String&), asCALL_THISCALL);
+    // LineEdit* FileSelector::GetPathEdit() const | File: ../UI/FileSelector.h
+    engine->RegisterObjectMethod("FileSelector", "LineEdit@+ GetPathEdit() const", asMETHODPR(FileSelector, GetPathEdit, () const, LineEdit*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "LineEdit@+ get_pathEdit() const", asMETHODPR(FileSelector, GetPathEdit, () const, LineEdit*), asCALL_THISCALL);
+    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSelector", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(FileSelector, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
+    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // Not registered because template
+    // const String& FileSelector::GetTitle() const | File: ../UI/FileSelector.h
+    engine->RegisterObjectMethod("FileSelector", "const String& GetTitle() const", asMETHODPR(FileSelector, GetTitle, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "const String& get_title() const", asMETHODPR(FileSelector, GetTitle, () const, const String&), asCALL_THISCALL);
+    // Text* FileSelector::GetTitleText() const | File: ../UI/FileSelector.h
+    engine->RegisterObjectMethod("FileSelector", "Text@+ GetTitleText() const", asMETHODPR(FileSelector, GetTitleText, () const, Text*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "Text@+ get_titleText() const", asMETHODPR(FileSelector, GetTitleText, () const, Text*), asCALL_THISCALL);
+    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSelector", "StringHash GetType() const", asMETHODPR(FileSelector, GetType, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "StringHash get_type() const", asMETHODPR(FileSelector, GetType, () const, StringHash), asCALL_THISCALL);
+    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSelector", "const String& GetTypeName() const", asMETHODPR(FileSelector, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "const String& get_typeName() const", asMETHODPR(FileSelector, GetTypeName, () const, const String&), asCALL_THISCALL);
+    // Window* FileSelector::GetWindow() const | File: ../UI/FileSelector.h
+    engine->RegisterObjectMethod("FileSelector", "Window@+ GetWindow() const", asMETHODPR(FileSelector, GetWindow, () const, Window*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "Window@+ get_window() const", asMETHODPR(FileSelector, GetWindow, () const, Window*), asCALL_THISCALL);
+    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSelector", "bool HasEventHandlers() const", asMETHODPR(FileSelector, HasEventHandlers, () const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSelector", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(FileSelector, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSelector", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(FileSelector, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSelector", "bool IsInstanceOf(StringHash) const", asMETHODPR(FileSelector, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
+    // Not registered because template
+    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSelector", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(FileSelector, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
+    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
+    // Error: type "RefCount*" can not automatically bind
+    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("FileSelector", "int Refs() const", asMETHODPR(FileSelector, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "int get_refs() const", asMETHODPR(FileSelector, Refs, () const, int), asCALL_THISCALL);
+    // static void FileSelector::RegisterObject(Context* context) | File: ../UI/FileSelector.h
+    // Context can be used as firs parameter of constructors only
+    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("FileSelector", asBEHAVE_RELEASE, "void f()", asMETHODPR(FileSelector, ReleaseRef, (), void), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSelector", "void SendEvent(StringHash)", asMETHODPR(FileSelector, SendEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSelector", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(FileSelector, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
+    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
+    // Not registered because template
+    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSelector", "void SetBlockEvents(bool)", asMETHODPR(FileSelector, SetBlockEvents, (bool), void), asCALL_THISCALL);
+    // void FileSelector::SetButtonTexts(const String& okText, const String& cancelText) | File: ../UI/FileSelector.h
+    engine->RegisterObjectMethod("FileSelector", "void SetButtonTexts(const String&in, const String&in)", asMETHODPR(FileSelector, SetButtonTexts, (const String&, const String&), void), asCALL_THISCALL);
+    // void FileSelector::SetDefaultStyle(XMLFile* style) | File: ../UI/FileSelector.h
+    engine->RegisterObjectMethod("FileSelector", "void SetDefaultStyle(XMLFile@+)", asMETHODPR(FileSelector, SetDefaultStyle, (XMLFile*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "void set_defaultStyle(XMLFile@+)", asMETHODPR(FileSelector, SetDefaultStyle, (XMLFile*), void), asCALL_THISCALL);
+    // void FileSelector::SetDirectoryMode(bool enable) | File: ../UI/FileSelector.h
+    engine->RegisterObjectMethod("FileSelector", "void SetDirectoryMode(bool)", asMETHODPR(FileSelector, SetDirectoryMode, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "void set_directoryMode(bool)", asMETHODPR(FileSelector, SetDirectoryMode, (bool), void), asCALL_THISCALL);
+    // void FileSelector::SetFileName(const String& fileName) | File: ../UI/FileSelector.h
+    engine->RegisterObjectMethod("FileSelector", "void SetFileName(const String&in)", asMETHODPR(FileSelector, SetFileName, (const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "void set_fileName(const String&in)", asMETHODPR(FileSelector, SetFileName, (const String&), void), asCALL_THISCALL);
+    // void FileSelector::SetFilters(const Vector<String>& filters, unsigned defaultIndex) | File: ../UI/FileSelector.h
+    engine->RegisterObjectMethod("FileSelector", "void SetFilters(Array<String>@+, uint)", asFUNCTION(FileSelector_SetFilters_VectorString_unsigned), asCALL_CDECL_OBJFIRST);
+    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSelector", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(FileSelector, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(FileSelector, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    // void FileSelector::SetPath(const String& path) | File: ../UI/FileSelector.h
+    engine->RegisterObjectMethod("FileSelector", "void SetPath(const String&in)", asMETHODPR(FileSelector, SetPath, (const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "void set_path(const String&in)", asMETHODPR(FileSelector, SetPath, (const String&), void), asCALL_THISCALL);
+    // void FileSelector::SetTitle(const String& text) | File: ../UI/FileSelector.h
+    engine->RegisterObjectMethod("FileSelector", "void SetTitle(const String&in)", asMETHODPR(FileSelector, SetTitle, (const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "void set_title(const String&in)", asMETHODPR(FileSelector, SetTitle, (const String&), void), asCALL_THISCALL);
+    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSelector", "void UnsubscribeFromAllEvents()", asMETHODPR(FileSelector, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSelector", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(FileSelector_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
+    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSelector", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(FileSelector, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSelector", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(FileSelector, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSelector", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(FileSelector, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
+    // void FileSelector::UpdateElements() | File: ../UI/FileSelector.h
+    engine->RegisterObjectMethod("FileSelector", "void UpdateElements()", asMETHODPR(FileSelector, UpdateElements, (), void), asCALL_THISCALL);
+    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("FileSelector", "int WeakRefs() const", asMETHODPR(FileSelector, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "int get_weakRefs() const", asMETHODPR(FileSelector, WeakRefs, () const, int), asCALL_THISCALL);
+#ifdef REGISTER_MANUAL_PART_Object
+    REGISTER_MANUAL_PART_Object(FileSelector, "FileSelector")
+#endif
+#ifdef REGISTER_MANUAL_PART_RefCounted
+    REGISTER_MANUAL_PART_RefCounted(FileSelector, "FileSelector")
+#endif
+#ifdef REGISTER_MANUAL_PART_FileSelector
+    REGISTER_MANUAL_PART_FileSelector(FileSelector, "FileSelector")
+#endif
+    RegisterSubclass<Object, FileSelector>(engine, "Object", "FileSelector");
+    RegisterSubclass<RefCounted, FileSelector>(engine, "RefCounted", "FileSelector");
+
+    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("FileSystem", asBEHAVE_ADDREF, "void f()", asMETHODPR(FileSystem, AddRef, (), void), asCALL_THISCALL);
+    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
+    // Not registered because template
+    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
+    // Not registered because template
+    // bool FileSystem::CheckAccess(const String& pathName) const | File: ../IO/FileSystem.h
+    engine->RegisterObjectMethod("FileSystem", "bool CheckAccess(const String&in) const", asMETHODPR(FileSystem, CheckAccess, (const String&) const, bool), asCALL_THISCALL);
+    // bool FileSystem::Copy(const String& srcFileName, const String& destFileName) | File: ../IO/FileSystem.h
+    engine->RegisterObjectMethod("FileSystem", "bool Copy(const String&in, const String&in)", asMETHODPR(FileSystem, Copy, (const String&, const String&), bool), asCALL_THISCALL);
+    // bool FileSystem::CreateDir(const String& pathName) | File: ../IO/FileSystem.h
+    engine->RegisterObjectMethod("FileSystem", "bool CreateDir(const String&in)", asMETHODPR(FileSystem, CreateDir, (const String&), bool), asCALL_THISCALL);
+    // bool FileSystem::Delete(const String& fileName) | File: ../IO/FileSystem.h
+    engine->RegisterObjectMethod("FileSystem", "bool Delete(const String&in)", asMETHODPR(FileSystem, Delete, (const String&), bool), asCALL_THISCALL);
+    // bool FileSystem::DirExists(const String& pathName) const | File: ../IO/FileSystem.h
+    engine->RegisterObjectMethod("FileSystem", "bool DirExists(const String&in) const", asMETHODPR(FileSystem, DirExists, (const String&) const, bool), asCALL_THISCALL);
+    // bool FileSystem::FileExists(const String& fileName) const | File: ../IO/FileSystem.h
+    engine->RegisterObjectMethod("FileSystem", "bool FileExists(const String&in) const", asMETHODPR(FileSystem, FileExists, (const String&) const, bool), asCALL_THISCALL);
+    // explicit FileSystem::FileSystem(Context* context) | File: ../IO/FileSystem.h
+    engine->RegisterObjectBehaviour("FileSystem", asBEHAVE_FACTORY, "FileSystem@+ f()", asFUNCTION(FileSystem_FileSystem_Context), asCALL_CDECL);
+    // String FileSystem::GetAppPreferencesDir(const String& org, const String& app) const | File: ../IO/FileSystem.h
+    engine->RegisterObjectMethod("FileSystem", "String GetAppPreferencesDir(const String&in, const String&in) const", asMETHODPR(FileSystem, GetAppPreferencesDir, (const String&, const String&) const, String), asCALL_THISCALL);
+    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSystem", "bool GetBlockEvents() const", asMETHODPR(FileSystem, GetBlockEvents, () const, bool), asCALL_THISCALL);
+    // const String& Object::GetCategory() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSystem", "const String& GetCategory() const", asMETHODPR(FileSystem, GetCategory, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "const String& get_category() const", asMETHODPR(FileSystem, GetCategory, () const, const String&), asCALL_THISCALL);
+    // Context* Object::GetContext() const | File: ../Core/Object.h
+    // Error: type "Context*" can not be returned
+    // String FileSystem::GetCurrentDir() const | File: ../IO/FileSystem.h
+    engine->RegisterObjectMethod("FileSystem", "String GetCurrentDir() const", asMETHODPR(FileSystem, GetCurrentDir, () const, String), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "String get_currentDir() const", asMETHODPR(FileSystem, GetCurrentDir, () const, String), asCALL_THISCALL);
+    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSystem", "VariantMap& GetEventDataMap() const", asMETHODPR(FileSystem, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
+    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // Object* Object::GetEventSender() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSystem", "Object@+ GetEventSender() const", asMETHODPR(FileSystem, GetEventSender, () const, Object*), asCALL_THISCALL);
+    // bool FileSystem::GetExecuteConsoleCommands() const | File: ../IO/FileSystem.h
+    engine->RegisterObjectMethod("FileSystem", "bool GetExecuteConsoleCommands() const", asMETHODPR(FileSystem, GetExecuteConsoleCommands, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "bool get_executeConsoleCommands() const", asMETHODPR(FileSystem, GetExecuteConsoleCommands, () const, bool), asCALL_THISCALL);
+    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSystem", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(FileSystem, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "const Variant& get_globalVar(StringHash) const", asMETHODPR(FileSystem, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSystem", "const VariantMap& GetGlobalVars() const", asMETHODPR(FileSystem, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "const VariantMap& get_globalVars() const", asMETHODPR(FileSystem, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    // unsigned FileSystem::GetLastModifiedTime(const String& fileName) const | File: ../IO/FileSystem.h
+    engine->RegisterObjectMethod("FileSystem", "uint GetLastModifiedTime(const String&in) const", asMETHODPR(FileSystem, GetLastModifiedTime, (const String&) const, unsigned), asCALL_THISCALL);
+    // String FileSystem::GetProgramDir() const | File: ../IO/FileSystem.h
+    engine->RegisterObjectMethod("FileSystem", "String GetProgramDir() const", asMETHODPR(FileSystem, GetProgramDir, () const, String), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "String get_programDir() const", asMETHODPR(FileSystem, GetProgramDir, () const, String), asCALL_THISCALL);
+    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSystem", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(FileSystem, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
+    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // Not registered because template
+    // String FileSystem::GetTemporaryDir() const | File: ../IO/FileSystem.h
+    engine->RegisterObjectMethod("FileSystem", "String GetTemporaryDir() const", asMETHODPR(FileSystem, GetTemporaryDir, () const, String), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "String get_temporaryDir() const", asMETHODPR(FileSystem, GetTemporaryDir, () const, String), asCALL_THISCALL);
+    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSystem", "StringHash GetType() const", asMETHODPR(FileSystem, GetType, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "StringHash get_type() const", asMETHODPR(FileSystem, GetType, () const, StringHash), asCALL_THISCALL);
+    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSystem", "const String& GetTypeName() const", asMETHODPR(FileSystem, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "const String& get_typeName() const", asMETHODPR(FileSystem, GetTypeName, () const, const String&), asCALL_THISCALL);
+    // String FileSystem::GetUserDocumentsDir() const | File: ../IO/FileSystem.h
+    engine->RegisterObjectMethod("FileSystem", "String GetUserDocumentsDir() const", asMETHODPR(FileSystem, GetUserDocumentsDir, () const, String), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "String get_userDocumentsDir() const", asMETHODPR(FileSystem, GetUserDocumentsDir, () const, String), asCALL_THISCALL);
+    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSystem", "bool HasEventHandlers() const", asMETHODPR(FileSystem, HasEventHandlers, () const, bool), asCALL_THISCALL);
+    // bool FileSystem::HasRegisteredPaths() const | File: ../IO/FileSystem.h
+    engine->RegisterObjectMethod("FileSystem", "bool HasRegisteredPaths() const", asMETHODPR(FileSystem, HasRegisteredPaths, () const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSystem", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(FileSystem, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSystem", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(FileSystem, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSystem", "bool IsInstanceOf(StringHash) const", asMETHODPR(FileSystem, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
+    // Not registered because template
+    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSystem", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(FileSystem, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
+    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
+    // Error: type "RefCount*" can not automatically bind
+    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("FileSystem", "int Refs() const", asMETHODPR(FileSystem, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "int get_refs() const", asMETHODPR(FileSystem, Refs, () const, int), asCALL_THISCALL);
+    // void FileSystem::RegisterPath(const String& pathName) | File: ../IO/FileSystem.h
+    engine->RegisterObjectMethod("FileSystem", "void RegisterPath(const String&in)", asMETHODPR(FileSystem, RegisterPath, (const String&), void), asCALL_THISCALL);
+    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("FileSystem", asBEHAVE_RELEASE, "void f()", asMETHODPR(FileSystem, ReleaseRef, (), void), asCALL_THISCALL);
+    // bool FileSystem::Rename(const String& srcFileName, const String& destFileName) | File: ../IO/FileSystem.h
+    engine->RegisterObjectMethod("FileSystem", "bool Rename(const String&in, const String&in)", asMETHODPR(FileSystem, Rename, (const String&, const String&), bool), asCALL_THISCALL);
+    // void FileSystem::ScanDir(Vector<String>& result, const String& pathName, const String& filter, unsigned flags, bool recursive) const | File: ../IO/FileSystem.h
+    // Error: type "Vector<String>&" can not automatically bind
+    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSystem", "void SendEvent(StringHash)", asMETHODPR(FileSystem, SendEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSystem", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(FileSystem, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
+    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
+    // Not registered because template
+    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSystem", "void SetBlockEvents(bool)", asMETHODPR(FileSystem, SetBlockEvents, (bool), void), asCALL_THISCALL);
+    // bool FileSystem::SetCurrentDir(const String& pathName) | File: ../IO/FileSystem.h
+    engine->RegisterObjectMethod("FileSystem", "bool SetCurrentDir(const String&in)", asMETHODPR(FileSystem, SetCurrentDir, (const String&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "bool set_currentDir(const String&in)", asMETHODPR(FileSystem, SetCurrentDir, (const String&), bool), asCALL_THISCALL);
+    // void FileSystem::SetExecuteConsoleCommands(bool enable) | File: ../IO/FileSystem.h
+    engine->RegisterObjectMethod("FileSystem", "void SetExecuteConsoleCommands(bool)", asMETHODPR(FileSystem, SetExecuteConsoleCommands, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "void set_executeConsoleCommands(bool)", asMETHODPR(FileSystem, SetExecuteConsoleCommands, (bool), void), asCALL_THISCALL);
+    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSystem", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(FileSystem, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(FileSystem, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    // bool FileSystem::SetLastModifiedTime(const String& fileName, unsigned newTime) | File: ../IO/FileSystem.h
+    engine->RegisterObjectMethod("FileSystem", "bool SetLastModifiedTime(const String&in, uint)", asMETHODPR(FileSystem, SetLastModifiedTime, (const String&, unsigned), bool), asCALL_THISCALL);
+    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // int FileSystem::SystemCommand(const String& commandLine, bool redirectStdOutToLog=false) | File: ../IO/FileSystem.h
+    engine->RegisterObjectMethod("FileSystem", "int SystemCommand(const String&in, bool = false)", asMETHODPR(FileSystem, SystemCommand, (const String&, bool), int), asCALL_THISCALL);
+    // unsigned FileSystem::SystemCommandAsync(const String& commandLine) | File: ../IO/FileSystem.h
+    engine->RegisterObjectMethod("FileSystem", "uint SystemCommandAsync(const String&in)", asMETHODPR(FileSystem, SystemCommandAsync, (const String&), unsigned), asCALL_THISCALL);
+    // bool FileSystem::SystemOpen(const String& fileName, const String& mode=String::EMPTY) | File: ../IO/FileSystem.h
+    engine->RegisterObjectMethod("FileSystem", "bool SystemOpen(const String&in, const String&in = String::EMPTY)", asMETHODPR(FileSystem, SystemOpen, (const String&, const String&), bool), asCALL_THISCALL);
+    // int FileSystem::SystemRun(const String& fileName, const Vector<String>& arguments) | File: ../IO/FileSystem.h
+    engine->RegisterObjectMethod("FileSystem", "int SystemRun(const String&in, Array<String>@+)", asFUNCTION(FileSystem_SystemRun_String_VectorString), asCALL_CDECL_OBJFIRST);
+    // unsigned FileSystem::SystemRunAsync(const String& fileName, const Vector<String>& arguments) | File: ../IO/FileSystem.h
+    engine->RegisterObjectMethod("FileSystem", "uint SystemRunAsync(const String&in, Array<String>@+)", asFUNCTION(FileSystem_SystemRunAsync_String_VectorString), asCALL_CDECL_OBJFIRST);
+    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSystem", "void UnsubscribeFromAllEvents()", asMETHODPR(FileSystem, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSystem", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(FileSystem_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
+    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSystem", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(FileSystem, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSystem", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(FileSystem, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("FileSystem", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(FileSystem, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
+    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("FileSystem", "int WeakRefs() const", asMETHODPR(FileSystem, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "int get_weakRefs() const", asMETHODPR(FileSystem, WeakRefs, () const, int), asCALL_THISCALL);
+#ifdef REGISTER_MANUAL_PART_Object
+    REGISTER_MANUAL_PART_Object(FileSystem, "FileSystem")
+#endif
+#ifdef REGISTER_MANUAL_PART_RefCounted
+    REGISTER_MANUAL_PART_RefCounted(FileSystem, "FileSystem")
+#endif
+#ifdef REGISTER_MANUAL_PART_FileSystem
+    REGISTER_MANUAL_PART_FileSystem(FileSystem, "FileSystem")
+#endif
+    RegisterSubclass<Object, FileSystem>(engine, "Object", "FileSystem");
+    RegisterSubclass<RefCounted, FileSystem>(engine, "RefCounted", "FileSystem");
 
     // void FileWatcher::AddChange(const String& fileName) | File: ../IO/FileWatcher.h
     engine->RegisterObjectMethod("FileWatcher", "void AddChange(const String&in)", asMETHODPR(FileWatcher, AddChange, (const String&), void), asCALL_THISCALL);
@@ -1357,6 +1307,56 @@ void ASRegisterGenerated_Members_F(asIScriptEngine* engine)
 #endif
     RegisterSubclass<FontFace, FontFaceFreeType>(engine, "FontFace", "FontFaceFreeType");
     RegisterSubclass<RefCounted, FontFaceFreeType>(engine, "RefCounted", "FontFaceFreeType");
+
+    // Plane Frustum::planes_[NUM_FRUSTUM_PLANES] | File: ../Math/Frustum.h
+    // Not registered because array
+    // Vector3 Frustum::vertices_[NUM_FRUSTUM_VERTICES] | File: ../Math/Frustum.h
+    // Not registered because array
+    // void Frustum::Define(float fov, float aspectRatio, float zoom, float nearZ, float farZ, const Matrix3x4& transform=Matrix3x4::IDENTITY) | File: ../Math/Frustum.h
+    engine->RegisterObjectMethod("Frustum", "void Define(float, float, float, float, float, const Matrix3x4&in = Matrix3x4::IDENTITY)", asMETHODPR(Frustum, Define, (float, float, float, float, float, const Matrix3x4&), void), asCALL_THISCALL);
+    // void Frustum::Define(const Vector3& near, const Vector3& far, const Matrix3x4& transform=Matrix3x4::IDENTITY) | File: ../Math/Frustum.h
+    engine->RegisterObjectMethod("Frustum", "void Define(const Vector3&in, const Vector3&in, const Matrix3x4&in = Matrix3x4::IDENTITY)", asMETHODPR(Frustum, Define, (const Vector3&, const Vector3&, const Matrix3x4&), void), asCALL_THISCALL);
+    // void Frustum::Define(const BoundingBox& box, const Matrix3x4& transform=Matrix3x4::IDENTITY) | File: ../Math/Frustum.h
+    engine->RegisterObjectMethod("Frustum", "void Define(const BoundingBox&in, const Matrix3x4&in = Matrix3x4::IDENTITY)", asMETHODPR(Frustum, Define, (const BoundingBox&, const Matrix3x4&), void), asCALL_THISCALL);
+    // void Frustum::Define(const Matrix4& projection) | File: ../Math/Frustum.h
+    engine->RegisterObjectMethod("Frustum", "void Define(const Matrix4&in)", asMETHODPR(Frustum, Define, (const Matrix4&), void), asCALL_THISCALL);
+    // void Frustum::DefineOrtho(float orthoSize, float aspectRatio, float zoom, float nearZ, float farZ, const Matrix3x4& transform=Matrix3x4::IDENTITY) | File: ../Math/Frustum.h
+    engine->RegisterObjectMethod("Frustum", "void DefineOrtho(float, float, float, float, float, const Matrix3x4&in = Matrix3x4::IDENTITY)", asMETHODPR(Frustum, DefineOrtho, (float, float, float, float, float, const Matrix3x4&), void), asCALL_THISCALL);
+    // void Frustum::DefineSplit(const Matrix4& projection, float near, float far) | File: ../Math/Frustum.h
+    engine->RegisterObjectMethod("Frustum", "void DefineSplit(const Matrix4&in, float, float)", asMETHODPR(Frustum, DefineSplit, (const Matrix4&, float, float), void), asCALL_THISCALL);
+    // float Frustum::Distance(const Vector3& point) const | File: ../Math/Frustum.h
+    engine->RegisterObjectMethod("Frustum", "float Distance(const Vector3&in) const", asMETHODPR(Frustum, Distance, (const Vector3&) const, float), asCALL_THISCALL);
+    // Frustum::Frustum(const Frustum& frustum) noexcept | File: ../Math/Frustum.h
+    engine->RegisterObjectBehaviour("Frustum", asBEHAVE_CONSTRUCT, "void f(const Frustum&in)", asFUNCTION(Frustum_Frustum_Frustum), asCALL_CDECL_OBJFIRST);
+    // Intersection Frustum::IsInside(const Vector3& point) const | File: ../Math/Frustum.h
+    engine->RegisterObjectMethod("Frustum", "Intersection IsInside(const Vector3&in) const", asMETHODPR(Frustum, IsInside, (const Vector3&) const, Intersection), asCALL_THISCALL);
+    // Intersection Frustum::IsInside(const Sphere& sphere) const | File: ../Math/Frustum.h
+    engine->RegisterObjectMethod("Frustum", "Intersection IsInside(const Sphere&in) const", asMETHODPR(Frustum, IsInside, (const Sphere&) const, Intersection), asCALL_THISCALL);
+    // Intersection Frustum::IsInside(const BoundingBox& box) const | File: ../Math/Frustum.h
+    engine->RegisterObjectMethod("Frustum", "Intersection IsInside(const BoundingBox&in) const", asMETHODPR(Frustum, IsInside, (const BoundingBox&) const, Intersection), asCALL_THISCALL);
+    // Intersection Frustum::IsInsideFast(const Sphere& sphere) const | File: ../Math/Frustum.h
+    engine->RegisterObjectMethod("Frustum", "Intersection IsInsideFast(const Sphere&in) const", asMETHODPR(Frustum, IsInsideFast, (const Sphere&) const, Intersection), asCALL_THISCALL);
+    // Intersection Frustum::IsInsideFast(const BoundingBox& box) const | File: ../Math/Frustum.h
+    engine->RegisterObjectMethod("Frustum", "Intersection IsInsideFast(const BoundingBox&in) const", asMETHODPR(Frustum, IsInsideFast, (const BoundingBox&) const, Intersection), asCALL_THISCALL);
+    // Frustum& Frustum::operator=(const Frustum& rhs) noexcept | File: ../Math/Frustum.h
+    engine->RegisterObjectMethod("Frustum", "Frustum& opAssign(const Frustum&in)", asMETHODPR(Frustum, operator=, (const Frustum&), Frustum&), asCALL_THISCALL);
+    // Rect Frustum::Projected(const Matrix4& projection) const | File: ../Math/Frustum.h
+    engine->RegisterObjectMethod("Frustum", "Rect Projected(const Matrix4&in) const", asMETHODPR(Frustum, Projected, (const Matrix4&) const, Rect), asCALL_THISCALL);
+    // void Frustum::Transform(const Matrix3& transform) | File: ../Math/Frustum.h
+    engine->RegisterObjectMethod("Frustum", "void Transform(const Matrix3&in)", asMETHODPR(Frustum, Transform, (const Matrix3&), void), asCALL_THISCALL);
+    // void Frustum::Transform(const Matrix3x4& transform) | File: ../Math/Frustum.h
+    engine->RegisterObjectMethod("Frustum", "void Transform(const Matrix3x4&in)", asMETHODPR(Frustum, Transform, (const Matrix3x4&), void), asCALL_THISCALL);
+    // Frustum Frustum::Transformed(const Matrix3& transform) const | File: ../Math/Frustum.h
+    engine->RegisterObjectMethod("Frustum", "Frustum Transformed(const Matrix3&in) const", asMETHODPR(Frustum, Transformed, (const Matrix3&) const, Frustum), asCALL_THISCALL);
+    // Frustum Frustum::Transformed(const Matrix3x4& transform) const | File: ../Math/Frustum.h
+    engine->RegisterObjectMethod("Frustum", "Frustum Transformed(const Matrix3x4&in) const", asMETHODPR(Frustum, Transformed, (const Matrix3x4&) const, Frustum), asCALL_THISCALL);
+    // void Frustum::UpdatePlanes() | File: ../Math/Frustum.h
+    engine->RegisterObjectMethod("Frustum", "void UpdatePlanes()", asMETHODPR(Frustum, UpdatePlanes, (), void), asCALL_THISCALL);
+    // Frustum::~Frustum() | Implicitly-declared
+    engine->RegisterObjectBehaviour("Frustum", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(Frustum_Destructor), asCALL_CDECL_OBJFIRST);
+#ifdef REGISTER_MANUAL_PART_Frustum
+    REGISTER_MANUAL_PART_Frustum(Frustum, "Frustum")
+#endif
 
     // bool FileSelectorEntry::directory_ | File: ../UI/FileSelector.h
     engine->RegisterObjectProperty("FileSelectorEntry", "bool directory", offsetof(FileSelectorEntry, directory_));

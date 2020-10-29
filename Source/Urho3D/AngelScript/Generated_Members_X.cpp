@@ -14,18 +14,6 @@ namespace Urho3D
 void FakeAddRef(void* ptr);
 void FakeReleaseRef(void* ptr);
 
-// XPathResultSet::XPathResultSet(const XPathResultSet& rhs) | File: ../Resource/XMLElement.h
-static void XPathResultSet_XPathResultSet_XPathResultSet(XPathResultSet* ptr, const XPathResultSet &rhs)
-{
-    new(ptr) XPathResultSet(rhs);
-}
-
-// XPathResultSet::~XPathResultSet() | File: ../Resource/XMLElement.h
-static void XPathResultSet_Destructor_XPathResultSet_void(XPathResultSet* ptr)
-{
-    ptr->~XPathResultSet();
-}
-
 // Vector<String> XMLElement::GetAttributeNames() const | File: ../Resource/XMLElement.h
 static CScriptArray* XMLElement_GetAttributeNames_void(XMLElement* ptr)
 {
@@ -77,33 +65,20 @@ static void XPathQuery_Destructor_XPathQuery_void(XPathQuery* ptr)
     ptr->~XPathQuery();
 }
 
+// XPathResultSet::XPathResultSet(const XPathResultSet& rhs) | File: ../Resource/XMLElement.h
+static void XPathResultSet_XPathResultSet_XPathResultSet(XPathResultSet* ptr, const XPathResultSet &rhs)
+{
+    new(ptr) XPathResultSet(rhs);
+}
+
+// XPathResultSet::~XPathResultSet() | File: ../Resource/XMLElement.h
+static void XPathResultSet_Destructor_XPathResultSet_void(XPathResultSet* ptr)
+{
+    ptr->~XPathResultSet();
+}
+
 void ASRegisterGenerated_Members_X(asIScriptEngine* engine)
 {
-    // bool XPathResultSet::Empty() const | File: ../Resource/XMLElement.h
-    engine->RegisterObjectMethod("XPathResultSet", "bool Empty() const", asMETHODPR(XPathResultSet, Empty, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XPathResultSet", "bool get_empty() const", asMETHODPR(XPathResultSet, Empty, () const, bool), asCALL_THISCALL);
-    // XMLElement XPathResultSet::FirstResult() | File: ../Resource/XMLElement.h
-    engine->RegisterObjectMethod("XPathResultSet", "XMLElement FirstResult()", asMETHODPR(XPathResultSet, FirstResult, (), XMLElement), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XPathResultSet", "XMLElement get_firstResult()", asMETHODPR(XPathResultSet, FirstResult, (), XMLElement), asCALL_THISCALL);
-    // pugi::xpath_node_set* XPathResultSet::GetXPathNodeSet() const | File: ../Resource/XMLElement.h
-    // Error: type "pugi::xpath_node_set*" can not automatically bind
-    // XPathResultSet& XPathResultSet::operator=(const XPathResultSet& rhs) | File: ../Resource/XMLElement.h
-    engine->RegisterObjectMethod("XPathResultSet", "XPathResultSet& opAssign(const XPathResultSet&in)", asMETHODPR(XPathResultSet, operator=, (const XPathResultSet&), XPathResultSet&), asCALL_THISCALL);
-    // XMLElement XPathResultSet::operator[](unsigned index) const | File: ../Resource/XMLElement.h
-    engine->RegisterObjectMethod("XPathResultSet", "XMLElement opIndex(uint) const", asMETHODPR(XPathResultSet, operator[], (unsigned) const, XMLElement), asCALL_THISCALL);
-    // unsigned XPathResultSet::Size() const | File: ../Resource/XMLElement.h
-    engine->RegisterObjectMethod("XPathResultSet", "uint Size() const", asMETHODPR(XPathResultSet, Size, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XPathResultSet", "uint get_size() const", asMETHODPR(XPathResultSet, Size, () const, unsigned), asCALL_THISCALL);
-    // XPathResultSet::XPathResultSet(XMLFile* file, pugi::xpath_node_set* resultSet) | File: ../Resource/XMLElement.h
-    // Error: type "pugi::xpath_node_set*" can not automatically bind
-    // XPathResultSet::XPathResultSet(const XPathResultSet& rhs) | File: ../Resource/XMLElement.h
-    engine->RegisterObjectBehaviour("XPathResultSet", asBEHAVE_CONSTRUCT, "void f(const XPathResultSet&in)", asFUNCTION(XPathResultSet_XPathResultSet_XPathResultSet), asCALL_CDECL_OBJFIRST);
-    // XPathResultSet::~XPathResultSet() | File: ../Resource/XMLElement.h
-    engine->RegisterObjectBehaviour("XPathResultSet", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(XPathResultSet_Destructor_XPathResultSet_void), asCALL_CDECL_OBJFIRST);
-#ifdef REGISTER_MANUAL_PART_XPathResultSet
-    REGISTER_MANUAL_PART_XPathResultSet(XPathResultSet, "XPathResultSet")
-#endif
-
     // const XMLElement XMLElement::EMPTY | File: ../Resource/XMLElement.h
     engine->SetDefaultNamespace("XMLElement");
     engine->RegisterGlobalProperty("const XMLElement EMPTY", (void*)&XMLElement::EMPTY);
@@ -564,6 +539,31 @@ void ASRegisterGenerated_Members_X(asIScriptEngine* engine)
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<XPathQuery>(engine, "XPathQuery");
 #ifdef REGISTER_MANUAL_PART_XPathQuery
     REGISTER_MANUAL_PART_XPathQuery(XPathQuery, "XPathQuery")
+#endif
+
+    // bool XPathResultSet::Empty() const | File: ../Resource/XMLElement.h
+    engine->RegisterObjectMethod("XPathResultSet", "bool Empty() const", asMETHODPR(XPathResultSet, Empty, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XPathResultSet", "bool get_empty() const", asMETHODPR(XPathResultSet, Empty, () const, bool), asCALL_THISCALL);
+    // XMLElement XPathResultSet::FirstResult() | File: ../Resource/XMLElement.h
+    engine->RegisterObjectMethod("XPathResultSet", "XMLElement FirstResult()", asMETHODPR(XPathResultSet, FirstResult, (), XMLElement), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XPathResultSet", "XMLElement get_firstResult()", asMETHODPR(XPathResultSet, FirstResult, (), XMLElement), asCALL_THISCALL);
+    // pugi::xpath_node_set* XPathResultSet::GetXPathNodeSet() const | File: ../Resource/XMLElement.h
+    // Error: type "pugi::xpath_node_set*" can not automatically bind
+    // XPathResultSet& XPathResultSet::operator=(const XPathResultSet& rhs) | File: ../Resource/XMLElement.h
+    engine->RegisterObjectMethod("XPathResultSet", "XPathResultSet& opAssign(const XPathResultSet&in)", asMETHODPR(XPathResultSet, operator=, (const XPathResultSet&), XPathResultSet&), asCALL_THISCALL);
+    // XMLElement XPathResultSet::operator[](unsigned index) const | File: ../Resource/XMLElement.h
+    engine->RegisterObjectMethod("XPathResultSet", "XMLElement opIndex(uint) const", asMETHODPR(XPathResultSet, operator[], (unsigned) const, XMLElement), asCALL_THISCALL);
+    // unsigned XPathResultSet::Size() const | File: ../Resource/XMLElement.h
+    engine->RegisterObjectMethod("XPathResultSet", "uint Size() const", asMETHODPR(XPathResultSet, Size, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XPathResultSet", "uint get_size() const", asMETHODPR(XPathResultSet, Size, () const, unsigned), asCALL_THISCALL);
+    // XPathResultSet::XPathResultSet(XMLFile* file, pugi::xpath_node_set* resultSet) | File: ../Resource/XMLElement.h
+    // Error: type "pugi::xpath_node_set*" can not automatically bind
+    // XPathResultSet::XPathResultSet(const XPathResultSet& rhs) | File: ../Resource/XMLElement.h
+    engine->RegisterObjectBehaviour("XPathResultSet", asBEHAVE_CONSTRUCT, "void f(const XPathResultSet&in)", asFUNCTION(XPathResultSet_XPathResultSet_XPathResultSet), asCALL_CDECL_OBJFIRST);
+    // XPathResultSet::~XPathResultSet() | File: ../Resource/XMLElement.h
+    engine->RegisterObjectBehaviour("XPathResultSet", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(XPathResultSet_Destructor_XPathResultSet_void), asCALL_CDECL_OBJFIRST);
+#ifdef REGISTER_MANUAL_PART_XPathResultSet
+    REGISTER_MANUAL_PART_XPathResultSet(XPathResultSet, "XPathResultSet")
 #endif
 
 }

@@ -24,31 +24,6 @@ namespace Urho3D
 void FakeAddRef(void* ptr);
 void FakeReleaseRef(void* ptr);
 
-// explicit MutexLock::MutexLock(Mutex& mutex) | File: ../Core/Mutex.h
-static void MutexLock_MutexLock_Mutex(MutexLock* ptr, Mutex &mutex)
-{
-    new(ptr) MutexLock(mutex);
-}
-
-// MutexLock::~MutexLock() | File: ../Core/Mutex.h
-static void MutexLock_Destructor_MutexLock_void(MutexLock* ptr)
-{
-    ptr->~MutexLock();
-}
-
-// explicit MessageBox::MessageBox(Context* context, const String& messageString=String::EMPTY, const String& titleString=String::EMPTY, XMLFile* layoutFile=nullptr, XMLFile* styleFile=nullptr) | File: ../UI/MessageBox.h
-static MessageBox* MessageBox_MessageBox_Context_String_String_XMLFile_XMLFile(const String &messageString=String::EMPTY, const String &titleString=String::EMPTY, XMLFile *layoutFile=nullptr, XMLFile *styleFile=nullptr)
-{
-    return new MessageBox(GetScriptContext(), messageString, titleString, layoutFile, styleFile);
-}
-
-// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void MessageBox_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(MessageBox* ptr, CScriptArray* exceptions, bool onlyUserData)
-{
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
-}
-
 // SharedPtr<Material> Material::Clone(const String& cloneName=String::EMPTY) const | File: ../Graphics/Material.h
 static Material* Material_Clone_String(Material* ptr, const String& cloneName)
 {
@@ -188,6 +163,19 @@ static void Menu_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Menu* p
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
 }
 
+// explicit MessageBox::MessageBox(Context* context, const String& messageString=String::EMPTY, const String& titleString=String::EMPTY, XMLFile* layoutFile=nullptr, XMLFile* styleFile=nullptr) | File: ../UI/MessageBox.h
+static MessageBox* MessageBox_MessageBox_Context_String_String_XMLFile_XMLFile(const String &messageString=String::EMPTY, const String &titleString=String::EMPTY, XMLFile *layoutFile=nullptr, XMLFile *styleFile=nullptr)
+{
+    return new MessageBox(GetScriptContext(), messageString, titleString, layoutFile, styleFile);
+}
+
+// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+static void MessageBox_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(MessageBox* ptr, CScriptArray* exceptions, bool onlyUserData)
+{
+    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+}
+
 // SharedPtr<Model> Model::Clone(const String& cloneName=String::EMPTY) const | File: ../Graphics/Model.h
 static Model* Model_Clone_String(Model* ptr, const String& cloneName)
 {
@@ -253,10 +241,16 @@ static void Mutex_Destructor_Mutex_void(Mutex* ptr)
     ptr->~Mutex();
 }
 
-// ModelMorph::~ModelMorph() | Implicitly-declared 
-static void ModelMorph_Destructor(ModelMorph* ptr)
+// explicit MutexLock::MutexLock(Mutex& mutex) | File: ../Core/Mutex.h
+static void MutexLock_MutexLock_Mutex(MutexLock* ptr, Mutex &mutex)
 {
-    ptr->~ModelMorph();
+    new(ptr) MutexLock(mutex);
+}
+
+// MutexLock::~MutexLock() | File: ../Core/Mutex.h
+static void MutexLock_Destructor_MutexLock_void(MutexLock* ptr)
+{
+    ptr->~MutexLock();
 }
 
 #ifdef URHO3D_PHYSICS
@@ -273,139 +267,14 @@ static void MaterialShaderParameter_Destructor(MaterialShaderParameter* ptr)
     ptr->~MaterialShaderParameter();
 }
 
+// ModelMorph::~ModelMorph() | Implicitly-declared 
+static void ModelMorph_Destructor(ModelMorph* ptr)
+{
+    ptr->~ModelMorph();
+}
+
 void ASRegisterGenerated_Members_M(asIScriptEngine* engine)
 {
-    // explicit MutexLock::MutexLock(Mutex& mutex) | File: ../Core/Mutex.h
-    engine->RegisterObjectBehaviour("MutexLock", asBEHAVE_CONSTRUCT, "void f(Mutex&)", asFUNCTION(MutexLock_MutexLock_Mutex), asCALL_CDECL_OBJFIRST);
-    // MutexLock::~MutexLock() | File: ../Core/Mutex.h
-    engine->RegisterObjectBehaviour("MutexLock", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(MutexLock_Destructor_MutexLock_void), asCALL_CDECL_OBJFIRST);
-#ifdef REGISTER_MANUAL_PART_MutexLock
-    REGISTER_MANUAL_PART_MutexLock(MutexLock, "MutexLock")
-#endif
-
-    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("MessageBox", asBEHAVE_ADDREF, "void f()", asMETHODPR(MessageBox, AddRef, (), void), asCALL_THISCALL);
-    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
-    // Not registered because template
-    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
-    // Not registered because template
-    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("MessageBox", "bool GetBlockEvents() const", asMETHODPR(MessageBox, GetBlockEvents, () const, bool), asCALL_THISCALL);
-    // const String& Object::GetCategory() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("MessageBox", "const String& GetCategory() const", asMETHODPR(MessageBox, GetCategory, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("MessageBox", "const String& get_category() const", asMETHODPR(MessageBox, GetCategory, () const, const String&), asCALL_THISCALL);
-    // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
-    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("MessageBox", "VariantMap& GetEventDataMap() const", asMETHODPR(MessageBox, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
-    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // Object* Object::GetEventSender() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("MessageBox", "Object@+ GetEventSender() const", asMETHODPR(MessageBox, GetEventSender, () const, Object*), asCALL_THISCALL);
-    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("MessageBox", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(MessageBox, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("MessageBox", "const Variant& get_globalVar(StringHash) const", asMETHODPR(MessageBox, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("MessageBox", "const VariantMap& GetGlobalVars() const", asMETHODPR(MessageBox, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("MessageBox", "const VariantMap& get_globalVars() const", asMETHODPR(MessageBox, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    // const String& MessageBox::GetMessage() const | File: ../UI/MessageBox.h
-    engine->RegisterObjectMethod("MessageBox", "const String& GetMessage() const", asMETHODPR(MessageBox, GetMessage, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("MessageBox", "const String& get_message() const", asMETHODPR(MessageBox, GetMessage, () const, const String&), asCALL_THISCALL);
-    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("MessageBox", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(MessageBox, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
-    // Not registered because template
-    // const String& MessageBox::GetTitle() const | File: ../UI/MessageBox.h
-    engine->RegisterObjectMethod("MessageBox", "const String& GetTitle() const", asMETHODPR(MessageBox, GetTitle, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("MessageBox", "const String& get_title() const", asMETHODPR(MessageBox, GetTitle, () const, const String&), asCALL_THISCALL);
-    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("MessageBox", "StringHash GetType() const", asMETHODPR(MessageBox, GetType, () const, StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod("MessageBox", "StringHash get_type() const", asMETHODPR(MessageBox, GetType, () const, StringHash), asCALL_THISCALL);
-    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("MessageBox", "const String& GetTypeName() const", asMETHODPR(MessageBox, GetTypeName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("MessageBox", "const String& get_typeName() const", asMETHODPR(MessageBox, GetTypeName, () const, const String&), asCALL_THISCALL);
-    // UIElement* MessageBox::GetWindow() const | File: ../UI/MessageBox.h
-    engine->RegisterObjectMethod("MessageBox", "UIElement@+ GetWindow() const", asMETHODPR(MessageBox, GetWindow, () const, UIElement*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("MessageBox", "UIElement@+ get_window() const", asMETHODPR(MessageBox, GetWindow, () const, UIElement*), asCALL_THISCALL);
-    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("MessageBox", "bool HasEventHandlers() const", asMETHODPR(MessageBox, HasEventHandlers, () const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("MessageBox", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(MessageBox, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("MessageBox", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(MessageBox, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("MessageBox", "bool IsInstanceOf(StringHash) const", asMETHODPR(MessageBox, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
-    // Not registered because template
-    // explicit MessageBox::MessageBox(Context* context, const String& messageString=String::EMPTY, const String& titleString=String::EMPTY, XMLFile* layoutFile=nullptr, XMLFile* styleFile=nullptr) | File: ../UI/MessageBox.h
-    engine->RegisterObjectBehaviour("MessageBox", asBEHAVE_FACTORY, "MessageBox@+ f(const String&in = String::EMPTY, const String&in = String::EMPTY, XMLFile@+ = null, XMLFile@+ = null)", asFUNCTION(MessageBox_MessageBox_Context_String_String_XMLFile_XMLFile), asCALL_CDECL);
-    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("MessageBox", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(MessageBox, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
-    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
-    // Error: type "RefCount*" can not automatically bind
-    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("MessageBox", "int Refs() const", asMETHODPR(MessageBox, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("MessageBox", "int get_refs() const", asMETHODPR(MessageBox, Refs, () const, int), asCALL_THISCALL);
-    // static void MessageBox::RegisterObject(Context* context) | File: ../UI/MessageBox.h
-    // Context can be used as firs parameter of constructors only
-    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("MessageBox", asBEHAVE_RELEASE, "void f()", asMETHODPR(MessageBox, ReleaseRef, (), void), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("MessageBox", "void SendEvent(StringHash)", asMETHODPR(MessageBox, SendEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("MessageBox", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(MessageBox, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
-    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
-    // Not registered because template
-    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("MessageBox", "void SetBlockEvents(bool)", asMETHODPR(MessageBox, SetBlockEvents, (bool), void), asCALL_THISCALL);
-    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("MessageBox", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(MessageBox, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("MessageBox", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(MessageBox, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    // void MessageBox::SetMessage(const String& text) | File: ../UI/MessageBox.h
-    engine->RegisterObjectMethod("MessageBox", "void SetMessage(const String&in)", asMETHODPR(MessageBox, SetMessage, (const String&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("MessageBox", "void set_message(const String&in)", asMETHODPR(MessageBox, SetMessage, (const String&), void), asCALL_THISCALL);
-    // void MessageBox::SetTitle(const String& text) | File: ../UI/MessageBox.h
-    engine->RegisterObjectMethod("MessageBox", "void SetTitle(const String&in)", asMETHODPR(MessageBox, SetTitle, (const String&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("MessageBox", "void set_title(const String&in)", asMETHODPR(MessageBox, SetTitle, (const String&), void), asCALL_THISCALL);
-    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
-    engine->RegisterObjectMethod("MessageBox", "void UnsubscribeFromAllEvents()", asMETHODPR(MessageBox, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("MessageBox", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(MessageBox_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
-    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("MessageBox", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(MessageBox, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("MessageBox", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(MessageBox, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("MessageBox", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(MessageBox, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
-    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("MessageBox", "int WeakRefs() const", asMETHODPR(MessageBox, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("MessageBox", "int get_weakRefs() const", asMETHODPR(MessageBox, WeakRefs, () const, int), asCALL_THISCALL);
-#ifdef REGISTER_MANUAL_PART_Object
-    REGISTER_MANUAL_PART_Object(MessageBox, "MessageBox")
-#endif
-#ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(MessageBox, "MessageBox")
-#endif
-#ifdef REGISTER_MANUAL_PART_MessageBox
-    REGISTER_MANUAL_PART_MessageBox(MessageBox, "MessageBox")
-#endif
-    RegisterSubclass<Object, MessageBox>(engine, "Object", "MessageBox");
-    RegisterSubclass<RefCounted, MessageBox>(engine, "RefCounted", "MessageBox");
-
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("Material", asBEHAVE_ADDREF, "void f()", asMETHODPR(Material, AddRef, (), void), asCALL_THISCALL);
     // bool Material::BeginLoad(Deserializer& source) override | File: ../Graphics/Material.h
@@ -1974,6 +1843,129 @@ void ASRegisterGenerated_Members_M(asIScriptEngine* engine)
     RegisterSubclass<Object, Menu>(engine, "Object", "Menu");
     RegisterSubclass<RefCounted, Menu>(engine, "RefCounted", "Menu");
 
+    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("MessageBox", asBEHAVE_ADDREF, "void f()", asMETHODPR(MessageBox, AddRef, (), void), asCALL_THISCALL);
+    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
+    // Not registered because template
+    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
+    // Not registered because template
+    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("MessageBox", "bool GetBlockEvents() const", asMETHODPR(MessageBox, GetBlockEvents, () const, bool), asCALL_THISCALL);
+    // const String& Object::GetCategory() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("MessageBox", "const String& GetCategory() const", asMETHODPR(MessageBox, GetCategory, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("MessageBox", "const String& get_category() const", asMETHODPR(MessageBox, GetCategory, () const, const String&), asCALL_THISCALL);
+    // Context* Object::GetContext() const | File: ../Core/Object.h
+    // Error: type "Context*" can not be returned
+    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("MessageBox", "VariantMap& GetEventDataMap() const", asMETHODPR(MessageBox, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
+    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // Object* Object::GetEventSender() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("MessageBox", "Object@+ GetEventSender() const", asMETHODPR(MessageBox, GetEventSender, () const, Object*), asCALL_THISCALL);
+    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("MessageBox", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(MessageBox, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("MessageBox", "const Variant& get_globalVar(StringHash) const", asMETHODPR(MessageBox, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("MessageBox", "const VariantMap& GetGlobalVars() const", asMETHODPR(MessageBox, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("MessageBox", "const VariantMap& get_globalVars() const", asMETHODPR(MessageBox, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    // const String& MessageBox::GetMessage() const | File: ../UI/MessageBox.h
+    engine->RegisterObjectMethod("MessageBox", "const String& GetMessage() const", asMETHODPR(MessageBox, GetMessage, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("MessageBox", "const String& get_message() const", asMETHODPR(MessageBox, GetMessage, () const, const String&), asCALL_THISCALL);
+    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("MessageBox", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(MessageBox, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
+    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // Not registered because template
+    // const String& MessageBox::GetTitle() const | File: ../UI/MessageBox.h
+    engine->RegisterObjectMethod("MessageBox", "const String& GetTitle() const", asMETHODPR(MessageBox, GetTitle, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("MessageBox", "const String& get_title() const", asMETHODPR(MessageBox, GetTitle, () const, const String&), asCALL_THISCALL);
+    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("MessageBox", "StringHash GetType() const", asMETHODPR(MessageBox, GetType, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("MessageBox", "StringHash get_type() const", asMETHODPR(MessageBox, GetType, () const, StringHash), asCALL_THISCALL);
+    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("MessageBox", "const String& GetTypeName() const", asMETHODPR(MessageBox, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("MessageBox", "const String& get_typeName() const", asMETHODPR(MessageBox, GetTypeName, () const, const String&), asCALL_THISCALL);
+    // UIElement* MessageBox::GetWindow() const | File: ../UI/MessageBox.h
+    engine->RegisterObjectMethod("MessageBox", "UIElement@+ GetWindow() const", asMETHODPR(MessageBox, GetWindow, () const, UIElement*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("MessageBox", "UIElement@+ get_window() const", asMETHODPR(MessageBox, GetWindow, () const, UIElement*), asCALL_THISCALL);
+    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("MessageBox", "bool HasEventHandlers() const", asMETHODPR(MessageBox, HasEventHandlers, () const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("MessageBox", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(MessageBox, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("MessageBox", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(MessageBox, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("MessageBox", "bool IsInstanceOf(StringHash) const", asMETHODPR(MessageBox, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
+    // Not registered because template
+    // explicit MessageBox::MessageBox(Context* context, const String& messageString=String::EMPTY, const String& titleString=String::EMPTY, XMLFile* layoutFile=nullptr, XMLFile* styleFile=nullptr) | File: ../UI/MessageBox.h
+    engine->RegisterObjectBehaviour("MessageBox", asBEHAVE_FACTORY, "MessageBox@+ f(const String&in = String::EMPTY, const String&in = String::EMPTY, XMLFile@+ = null, XMLFile@+ = null)", asFUNCTION(MessageBox_MessageBox_Context_String_String_XMLFile_XMLFile), asCALL_CDECL);
+    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("MessageBox", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(MessageBox, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
+    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
+    // Error: type "RefCount*" can not automatically bind
+    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("MessageBox", "int Refs() const", asMETHODPR(MessageBox, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("MessageBox", "int get_refs() const", asMETHODPR(MessageBox, Refs, () const, int), asCALL_THISCALL);
+    // static void MessageBox::RegisterObject(Context* context) | File: ../UI/MessageBox.h
+    // Context can be used as firs parameter of constructors only
+    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("MessageBox", asBEHAVE_RELEASE, "void f()", asMETHODPR(MessageBox, ReleaseRef, (), void), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("MessageBox", "void SendEvent(StringHash)", asMETHODPR(MessageBox, SendEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("MessageBox", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(MessageBox, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
+    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
+    // Not registered because template
+    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("MessageBox", "void SetBlockEvents(bool)", asMETHODPR(MessageBox, SetBlockEvents, (bool), void), asCALL_THISCALL);
+    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("MessageBox", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(MessageBox, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("MessageBox", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(MessageBox, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    // void MessageBox::SetMessage(const String& text) | File: ../UI/MessageBox.h
+    engine->RegisterObjectMethod("MessageBox", "void SetMessage(const String&in)", asMETHODPR(MessageBox, SetMessage, (const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("MessageBox", "void set_message(const String&in)", asMETHODPR(MessageBox, SetMessage, (const String&), void), asCALL_THISCALL);
+    // void MessageBox::SetTitle(const String& text) | File: ../UI/MessageBox.h
+    engine->RegisterObjectMethod("MessageBox", "void SetTitle(const String&in)", asMETHODPR(MessageBox, SetTitle, (const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("MessageBox", "void set_title(const String&in)", asMETHODPR(MessageBox, SetTitle, (const String&), void), asCALL_THISCALL);
+    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
+    engine->RegisterObjectMethod("MessageBox", "void UnsubscribeFromAllEvents()", asMETHODPR(MessageBox, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("MessageBox", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(MessageBox_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
+    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("MessageBox", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(MessageBox, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("MessageBox", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(MessageBox, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("MessageBox", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(MessageBox, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
+    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("MessageBox", "int WeakRefs() const", asMETHODPR(MessageBox, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("MessageBox", "int get_weakRefs() const", asMETHODPR(MessageBox, WeakRefs, () const, int), asCALL_THISCALL);
+#ifdef REGISTER_MANUAL_PART_Object
+    REGISTER_MANUAL_PART_Object(MessageBox, "MessageBox")
+#endif
+#ifdef REGISTER_MANUAL_PART_RefCounted
+    REGISTER_MANUAL_PART_RefCounted(MessageBox, "MessageBox")
+#endif
+#ifdef REGISTER_MANUAL_PART_MessageBox
+    REGISTER_MANUAL_PART_MessageBox(MessageBox, "MessageBox")
+#endif
+    RegisterSubclass<Object, MessageBox>(engine, "Object", "MessageBox");
+    RegisterSubclass<RefCounted, MessageBox>(engine, "RefCounted", "MessageBox");
+
     // void ResourceWithMetadata::AddMetadata(const String& name, const Variant& value) | File: ../Resource/Resource.h
     engine->RegisterObjectMethod("Model", "void AddMetadata(const String&in, const Variant&in)", asMETHODPR(Model, AddMetadata, (const String&, const Variant&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Model", "void set_metadata(const String&in, const Variant&in)", asMETHODPR(Model, AddMetadata, (const String&, const Variant&), void), asCALL_THISCALL);
@@ -2221,20 +2213,12 @@ void ASRegisterGenerated_Members_M(asIScriptEngine* engine)
     REGISTER_MANUAL_PART_Mutex(Mutex, "Mutex")
 #endif
 
-    // HashMap<unsigned, VertexBufferMorph> ModelMorph::buffers_ | File: ../Graphics/Model.h
-    // Error: type "HashMap<unsigned, VertexBufferMorph>" can not automatically bind
-    // String ModelMorph::name_ | File: ../Graphics/Model.h
-    engine->RegisterObjectProperty("ModelMorph", "String name", offsetof(ModelMorph, name_));
-    // StringHash ModelMorph::nameHash_ | File: ../Graphics/Model.h
-    engine->RegisterObjectProperty("ModelMorph", "StringHash nameHash", offsetof(ModelMorph, nameHash_));
-    // float ModelMorph::weight_ | File: ../Graphics/Model.h
-    engine->RegisterObjectProperty("ModelMorph", "float weight", offsetof(ModelMorph, weight_));
-    // ModelMorph::~ModelMorph() | Implicitly-declared
-    engine->RegisterObjectBehaviour("ModelMorph", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(ModelMorph_Destructor), asCALL_CDECL_OBJFIRST);
-    // ModelMorph& ModelMorph::operator=(const ModelMorph&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<ModelMorph>(engine, "ModelMorph");
-#ifdef REGISTER_MANUAL_PART_ModelMorph
-    REGISTER_MANUAL_PART_ModelMorph(ModelMorph, "ModelMorph")
+    // explicit MutexLock::MutexLock(Mutex& mutex) | File: ../Core/Mutex.h
+    engine->RegisterObjectBehaviour("MutexLock", asBEHAVE_CONSTRUCT, "void f(Mutex&)", asFUNCTION(MutexLock_MutexLock_Mutex), asCALL_CDECL_OBJFIRST);
+    // MutexLock::~MutexLock() | File: ../Core/Mutex.h
+    engine->RegisterObjectBehaviour("MutexLock", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(MutexLock_Destructor_MutexLock_void), asCALL_CDECL_OBJFIRST);
+#ifdef REGISTER_MANUAL_PART_MutexLock
+    REGISTER_MANUAL_PART_MutexLock(MutexLock, "MutexLock")
 #endif
 
 #ifdef URHO3D_PHYSICS
@@ -2261,6 +2245,22 @@ void ASRegisterGenerated_Members_M(asIScriptEngine* engine)
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<MaterialShaderParameter>(engine, "MaterialShaderParameter");
 #ifdef REGISTER_MANUAL_PART_MaterialShaderParameter
     REGISTER_MANUAL_PART_MaterialShaderParameter(MaterialShaderParameter, "MaterialShaderParameter")
+#endif
+
+    // HashMap<unsigned, VertexBufferMorph> ModelMorph::buffers_ | File: ../Graphics/Model.h
+    // Error: type "HashMap<unsigned, VertexBufferMorph>" can not automatically bind
+    // String ModelMorph::name_ | File: ../Graphics/Model.h
+    engine->RegisterObjectProperty("ModelMorph", "String name", offsetof(ModelMorph, name_));
+    // StringHash ModelMorph::nameHash_ | File: ../Graphics/Model.h
+    engine->RegisterObjectProperty("ModelMorph", "StringHash nameHash", offsetof(ModelMorph, nameHash_));
+    // float ModelMorph::weight_ | File: ../Graphics/Model.h
+    engine->RegisterObjectProperty("ModelMorph", "float weight", offsetof(ModelMorph, weight_));
+    // ModelMorph::~ModelMorph() | Implicitly-declared
+    engine->RegisterObjectBehaviour("ModelMorph", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(ModelMorph_Destructor), asCALL_CDECL_OBJFIRST);
+    // ModelMorph& ModelMorph::operator=(const ModelMorph&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<ModelMorph>(engine, "ModelMorph");
+#ifdef REGISTER_MANUAL_PART_ModelMorph
+    REGISTER_MANUAL_PART_ModelMorph(ModelMorph, "ModelMorph")
 #endif
 
 }

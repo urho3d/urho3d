@@ -39,102 +39,6 @@ namespace Urho3D
 void FakeAddRef(void* ptr);
 void FakeReleaseRef(void* ptr);
 
-#ifdef URHO3D_PHYSICS
-// PhysicsWorldConfig::~PhysicsWorldConfig() | Implicitly-declared 
-static void PhysicsWorldConfig_Destructor(PhysicsWorldConfig* ptr)
-{
-    ptr->~PhysicsWorldConfig();
-}
-#endif
-
-// const PODVector<Light*>& Drawable::GetLights() const | File: ../Graphics/Drawable.h
-static CScriptArray* ParticleEmitter_GetLights_void(ParticleEmitter* ptr)
-{
-    const PODVector<Light*>& result = ptr->GetLights();
-    return VectorToHandleArray(result, "Array<Light@>");
-}
-
-// const PODVector<Light*>& Drawable::GetVertexLights() const | File: ../Graphics/Drawable.h
-static CScriptArray* ParticleEmitter_GetVertexLights_void(ParticleEmitter* ptr)
-{
-    const PODVector<Light*>& result = ptr->GetVertexLights();
-    return VectorToHandleArray(result, "Array<Light@>");
-}
-
-// explicit ParticleEmitter::ParticleEmitter(Context* context) | File: ../Graphics/ParticleEmitter.h
-static ParticleEmitter* ParticleEmitter_ParticleEmitter_Context()
-{
-    return new ParticleEmitter(GetScriptContext());
-}
-
-// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void ParticleEmitter_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ParticleEmitter* ptr, CScriptArray* exceptions, bool onlyUserData)
-{
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
-}
-
-#ifdef URHO3D_URHO2D
-// SharedPtr<ParticleEffect2D> ParticleEffect2D::Clone(const String& cloneName=String::EMPTY) const | File: ../Urho2D/ParticleEffect2D.h
-static ParticleEffect2D* ParticleEffect2D_Clone_String(ParticleEffect2D* ptr, const String& cloneName)
-{
-    SharedPtr<ParticleEffect2D> result = ptr->Clone(cloneName);
-    return result.Detach();
-}
-#endif
-
-#ifdef URHO3D_URHO2D
-// explicit ParticleEffect2D::ParticleEffect2D(Context* context) | File: ../Urho2D/ParticleEffect2D.h
-static ParticleEffect2D* ParticleEffect2D_ParticleEffect2D_Context()
-{
-    return new ParticleEffect2D(GetScriptContext());
-}
-#endif
-
-#ifdef URHO3D_URHO2D
-// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void ParticleEffect2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ParticleEffect2D* ptr, CScriptArray* exceptions, bool onlyUserData)
-{
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
-}
-#endif
-
-#ifdef URHO3D_URHO2D
-// const PODVector<Light*>& Drawable::GetLights() const | File: ../Graphics/Drawable.h
-static CScriptArray* ParticleEmitter2D_GetLights_void(ParticleEmitter2D* ptr)
-{
-    const PODVector<Light*>& result = ptr->GetLights();
-    return VectorToHandleArray(result, "Array<Light@>");
-}
-#endif
-
-#ifdef URHO3D_URHO2D
-// const PODVector<Light*>& Drawable::GetVertexLights() const | File: ../Graphics/Drawable.h
-static CScriptArray* ParticleEmitter2D_GetVertexLights_void(ParticleEmitter2D* ptr)
-{
-    const PODVector<Light*>& result = ptr->GetVertexLights();
-    return VectorToHandleArray(result, "Array<Light@>");
-}
-#endif
-
-#ifdef URHO3D_URHO2D
-// explicit ParticleEmitter2D::ParticleEmitter2D(Context* context) | File: ../Urho2D/ParticleEmitter2D.h
-static ParticleEmitter2D* ParticleEmitter2D_ParticleEmitter2D_Context()
-{
-    return new ParticleEmitter2D(GetScriptContext());
-}
-#endif
-
-#ifdef URHO3D_URHO2D
-// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void ParticleEmitter2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ParticleEmitter2D* ptr, CScriptArray* exceptions, bool onlyUserData)
-{
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
-}
-#endif
-
 // const Vector<String> PackageFile::GetEntryNames() const | File: ../IO/PackageFile.h
 static CScriptArray* PackageFile_GetEntryNames_void(PackageFile* ptr)
 {
@@ -180,6 +84,94 @@ static void ParticleEffect_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bo
     PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
 }
+
+#ifdef URHO3D_URHO2D
+// SharedPtr<ParticleEffect2D> ParticleEffect2D::Clone(const String& cloneName=String::EMPTY) const | File: ../Urho2D/ParticleEffect2D.h
+static ParticleEffect2D* ParticleEffect2D_Clone_String(ParticleEffect2D* ptr, const String& cloneName)
+{
+    SharedPtr<ParticleEffect2D> result = ptr->Clone(cloneName);
+    return result.Detach();
+}
+#endif
+
+#ifdef URHO3D_URHO2D
+// explicit ParticleEffect2D::ParticleEffect2D(Context* context) | File: ../Urho2D/ParticleEffect2D.h
+static ParticleEffect2D* ParticleEffect2D_ParticleEffect2D_Context()
+{
+    return new ParticleEffect2D(GetScriptContext());
+}
+#endif
+
+#ifdef URHO3D_URHO2D
+// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+static void ParticleEffect2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ParticleEffect2D* ptr, CScriptArray* exceptions, bool onlyUserData)
+{
+    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+}
+#endif
+
+// const PODVector<Light*>& Drawable::GetLights() const | File: ../Graphics/Drawable.h
+static CScriptArray* ParticleEmitter_GetLights_void(ParticleEmitter* ptr)
+{
+    const PODVector<Light*>& result = ptr->GetLights();
+    return VectorToHandleArray(result, "Array<Light@>");
+}
+
+// const PODVector<Light*>& Drawable::GetVertexLights() const | File: ../Graphics/Drawable.h
+static CScriptArray* ParticleEmitter_GetVertexLights_void(ParticleEmitter* ptr)
+{
+    const PODVector<Light*>& result = ptr->GetVertexLights();
+    return VectorToHandleArray(result, "Array<Light@>");
+}
+
+// explicit ParticleEmitter::ParticleEmitter(Context* context) | File: ../Graphics/ParticleEmitter.h
+static ParticleEmitter* ParticleEmitter_ParticleEmitter_Context()
+{
+    return new ParticleEmitter(GetScriptContext());
+}
+
+// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+static void ParticleEmitter_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ParticleEmitter* ptr, CScriptArray* exceptions, bool onlyUserData)
+{
+    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+}
+
+#ifdef URHO3D_URHO2D
+// const PODVector<Light*>& Drawable::GetLights() const | File: ../Graphics/Drawable.h
+static CScriptArray* ParticleEmitter2D_GetLights_void(ParticleEmitter2D* ptr)
+{
+    const PODVector<Light*>& result = ptr->GetLights();
+    return VectorToHandleArray(result, "Array<Light@>");
+}
+#endif
+
+#ifdef URHO3D_URHO2D
+// const PODVector<Light*>& Drawable::GetVertexLights() const | File: ../Graphics/Drawable.h
+static CScriptArray* ParticleEmitter2D_GetVertexLights_void(ParticleEmitter2D* ptr)
+{
+    const PODVector<Light*>& result = ptr->GetVertexLights();
+    return VectorToHandleArray(result, "Array<Light@>");
+}
+#endif
+
+#ifdef URHO3D_URHO2D
+// explicit ParticleEmitter2D::ParticleEmitter2D(Context* context) | File: ../Urho2D/ParticleEmitter2D.h
+static ParticleEmitter2D* ParticleEmitter2D_ParticleEmitter2D_Context()
+{
+    return new ParticleEmitter2D(GetScriptContext());
+}
+#endif
+
+#ifdef URHO3D_URHO2D
+// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+static void ParticleEmitter2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ParticleEmitter2D* ptr, CScriptArray* exceptions, bool onlyUserData)
+{
+    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+}
+#endif
 
 // Vector<SharedPtr<ShaderVariation>>& Pass::GetPixelShaders() | File: ../Graphics/Technique.h
 static CScriptArray* Pass_GetPixelShaders_void(Pass* ptr)
@@ -304,6 +296,19 @@ static void Polyhedron_Destructor_Polyhedron_void(Polyhedron* ptr)
     ptr->~Polyhedron();
 }
 
+// explicit Profiler::Profiler(Context* context) | File: ../Core/Profiler.h
+static Profiler* Profiler_Profiler_Context()
+{
+    return new Profiler(GetScriptContext());
+}
+
+// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+static void Profiler_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Profiler* ptr, CScriptArray* exceptions, bool onlyUserData)
+{
+    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+}
+
 // const Vector<SharedPtr<UIElement>>& UIElement::GetChildren() const | File: ../UI/UIElement.h
 static CScriptArray* ProgressBar_GetChildren_void(ProgressBar* ptr)
 {
@@ -345,19 +350,6 @@ static void ProgressBar_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
 }
 
-// explicit Profiler::Profiler(Context* context) | File: ../Core/Profiler.h
-static Profiler* Profiler_Profiler_Context()
-{
-    return new Profiler(GetScriptContext());
-}
-
-// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Profiler_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Profiler* ptr, CScriptArray* exceptions, bool onlyUserData)
-{
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
-}
-
 #ifdef URHO3D_URHO2D
 // PropertySet2D::PropertySet2D() | File: ../Urho2D/TileMapDefs2D.h
 static PropertySet2D* PropertySet2D_PropertySet2D_void()
@@ -365,12 +357,6 @@ static PropertySet2D* PropertySet2D_PropertySet2D_void()
     return new PropertySet2D();
 }
 #endif
-
-// PerThreadSceneResult::~PerThreadSceneResult() | Implicitly-declared 
-static void PerThreadSceneResult_Destructor(PerThreadSceneResult* ptr)
-{
-    ptr->~PerThreadSceneResult();
-}
 
 #ifdef URHO3D_NETWORK
 // PackageDownload::~PackageDownload() | Implicitly-declared 
@@ -402,6 +388,12 @@ static void Particle2D_Destructor(Particle2D* ptr)
 }
 #endif
 
+// PerThreadSceneResult::~PerThreadSceneResult() | Implicitly-declared 
+static void PerThreadSceneResult_Destructor(PerThreadSceneResult* ptr)
+{
+    ptr->~PerThreadSceneResult();
+}
+
 #ifdef URHO3D_PHYSICS
 // PhysicsRaycastResult::~PhysicsRaycastResult() | Implicitly-declared 
 static void PhysicsRaycastResult_Destructor(PhysicsRaycastResult* ptr)
@@ -418,18 +410,838 @@ static void PhysicsRaycastResult2D_Destructor(PhysicsRaycastResult2D* ptr)
 }
 #endif
 
+#ifdef URHO3D_PHYSICS
+// PhysicsWorldConfig::~PhysicsWorldConfig() | Implicitly-declared 
+static void PhysicsWorldConfig_Destructor(PhysicsWorldConfig* ptr)
+{
+    ptr->~PhysicsWorldConfig();
+}
+#endif
+
 void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
 {
-#ifdef URHO3D_PHYSICS
-    // btCollisionConfiguration* PhysicsWorldConfig::collisionConfig_ | File: ../Physics/PhysicsWorld.h
-    // btCollisionConfiguration* can not be registered
-    // PhysicsWorldConfig::~PhysicsWorldConfig() | Implicitly-declared
-    engine->RegisterObjectBehaviour("PhysicsWorldConfig", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(PhysicsWorldConfig_Destructor), asCALL_CDECL_OBJFIRST);
-    // PhysicsWorldConfig& PhysicsWorldConfig::operator=(const PhysicsWorldConfig&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<PhysicsWorldConfig>(engine, "PhysicsWorldConfig");
-#ifdef REGISTER_MANUAL_PART_PhysicsWorldConfig
-    REGISTER_MANUAL_PART_PhysicsWorldConfig(PhysicsWorldConfig, "PhysicsWorldConfig")
+    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("PackageFile", asBEHAVE_ADDREF, "void f()", asMETHODPR(PackageFile, AddRef, (), void), asCALL_THISCALL);
+    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
+    // Not registered because template
+    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
+    // Not registered because template
+    // bool PackageFile::Exists(const String& fileName) const | File: ../IO/PackageFile.h
+    engine->RegisterObjectMethod("PackageFile", "bool Exists(const String&in) const", asMETHODPR(PackageFile, Exists, (const String&) const, bool), asCALL_THISCALL);
+    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("PackageFile", "bool GetBlockEvents() const", asMETHODPR(PackageFile, GetBlockEvents, () const, bool), asCALL_THISCALL);
+    // const String& Object::GetCategory() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("PackageFile", "const String& GetCategory() const", asMETHODPR(PackageFile, GetCategory, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PackageFile", "const String& get_category() const", asMETHODPR(PackageFile, GetCategory, () const, const String&), asCALL_THISCALL);
+    // unsigned PackageFile::GetChecksum() const | File: ../IO/PackageFile.h
+    engine->RegisterObjectMethod("PackageFile", "uint GetChecksum() const", asMETHODPR(PackageFile, GetChecksum, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PackageFile", "uint get_checksum() const", asMETHODPR(PackageFile, GetChecksum, () const, unsigned), asCALL_THISCALL);
+    // Context* Object::GetContext() const | File: ../Core/Object.h
+    // Error: type "Context*" can not be returned
+    // const HashMap<String, PackageEntry>& PackageFile::GetEntries() const | File: ../IO/PackageFile.h
+    // Error: type "const HashMap<String, PackageEntry>&" can not automatically bind
+    // const PackageEntry* PackageFile::GetEntry(const String& fileName) const | File: ../IO/PackageFile.h
+    // Error: type "const PackageEntry*" can not automatically bind
+    // const Vector<String> PackageFile::GetEntryNames() const | File: ../IO/PackageFile.h
+    engine->RegisterObjectMethod("PackageFile", "Array<String>@ GetEntryNames() const", asFUNCTION(PackageFile_GetEntryNames_void), asCALL_CDECL_OBJFIRST);
+    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("PackageFile", "VariantMap& GetEventDataMap() const", asMETHODPR(PackageFile, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
+    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // Object* Object::GetEventSender() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("PackageFile", "Object@+ GetEventSender() const", asMETHODPR(PackageFile, GetEventSender, () const, Object*), asCALL_THISCALL);
+    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("PackageFile", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(PackageFile, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PackageFile", "const Variant& get_globalVar(StringHash) const", asMETHODPR(PackageFile, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("PackageFile", "const VariantMap& GetGlobalVars() const", asMETHODPR(PackageFile, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PackageFile", "const VariantMap& get_globalVars() const", asMETHODPR(PackageFile, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    // const String& PackageFile::GetName() const | File: ../IO/PackageFile.h
+    engine->RegisterObjectMethod("PackageFile", "const String& GetName() const", asMETHODPR(PackageFile, GetName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PackageFile", "const String& get_name() const", asMETHODPR(PackageFile, GetName, () const, const String&), asCALL_THISCALL);
+    // StringHash PackageFile::GetNameHash() const | File: ../IO/PackageFile.h
+    engine->RegisterObjectMethod("PackageFile", "StringHash GetNameHash() const", asMETHODPR(PackageFile, GetNameHash, () const, StringHash), asCALL_THISCALL);
+    // unsigned PackageFile::GetNumFiles() const | File: ../IO/PackageFile.h
+    engine->RegisterObjectMethod("PackageFile", "uint GetNumFiles() const", asMETHODPR(PackageFile, GetNumFiles, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PackageFile", "uint get_numFiles() const", asMETHODPR(PackageFile, GetNumFiles, () const, unsigned), asCALL_THISCALL);
+    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("PackageFile", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(PackageFile, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
+    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // Not registered because template
+    // unsigned PackageFile::GetTotalDataSize() const | File: ../IO/PackageFile.h
+    engine->RegisterObjectMethod("PackageFile", "uint GetTotalDataSize() const", asMETHODPR(PackageFile, GetTotalDataSize, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PackageFile", "uint get_totalDataSize() const", asMETHODPR(PackageFile, GetTotalDataSize, () const, unsigned), asCALL_THISCALL);
+    // unsigned PackageFile::GetTotalSize() const | File: ../IO/PackageFile.h
+    engine->RegisterObjectMethod("PackageFile", "uint GetTotalSize() const", asMETHODPR(PackageFile, GetTotalSize, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PackageFile", "uint get_totalSize() const", asMETHODPR(PackageFile, GetTotalSize, () const, unsigned), asCALL_THISCALL);
+    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("PackageFile", "StringHash GetType() const", asMETHODPR(PackageFile, GetType, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PackageFile", "StringHash get_type() const", asMETHODPR(PackageFile, GetType, () const, StringHash), asCALL_THISCALL);
+    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("PackageFile", "const String& GetTypeName() const", asMETHODPR(PackageFile, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PackageFile", "const String& get_typeName() const", asMETHODPR(PackageFile, GetTypeName, () const, const String&), asCALL_THISCALL);
+    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("PackageFile", "bool HasEventHandlers() const", asMETHODPR(PackageFile, HasEventHandlers, () const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("PackageFile", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(PackageFile, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("PackageFile", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(PackageFile, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
+    // bool PackageFile::IsCompressed() const | File: ../IO/PackageFile.h
+    engine->RegisterObjectMethod("PackageFile", "bool IsCompressed() const", asMETHODPR(PackageFile, IsCompressed, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PackageFile", "bool get_compressed() const", asMETHODPR(PackageFile, IsCompressed, () const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("PackageFile", "bool IsInstanceOf(StringHash) const", asMETHODPR(PackageFile, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
+    // Not registered because template
+    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("PackageFile", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(PackageFile, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
+    // bool PackageFile::Open(const String& fileName, unsigned startOffset=0) | File: ../IO/PackageFile.h
+    engine->RegisterObjectMethod("PackageFile", "bool Open(const String&in, uint = 0)", asMETHODPR(PackageFile, Open, (const String&, unsigned), bool), asCALL_THISCALL);
+    // explicit PackageFile::PackageFile(Context* context) | File: ../IO/PackageFile.h
+    engine->RegisterObjectBehaviour("PackageFile", asBEHAVE_FACTORY, "PackageFile@+ f()", asFUNCTION(PackageFile_PackageFile_Context), asCALL_CDECL);
+    // PackageFile::PackageFile(Context* context, const String& fileName, unsigned startOffset=0) | File: ../IO/PackageFile.h
+    engine->RegisterObjectBehaviour("PackageFile", asBEHAVE_FACTORY, "PackageFile@+ f(const String&in, uint = 0)", asFUNCTION(PackageFile_PackageFile_Context_String_unsigned), asCALL_CDECL);
+    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
+    // Error: type "RefCount*" can not automatically bind
+    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("PackageFile", "int Refs() const", asMETHODPR(PackageFile, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PackageFile", "int get_refs() const", asMETHODPR(PackageFile, Refs, () const, int), asCALL_THISCALL);
+    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("PackageFile", asBEHAVE_RELEASE, "void f()", asMETHODPR(PackageFile, ReleaseRef, (), void), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("PackageFile", "void SendEvent(StringHash)", asMETHODPR(PackageFile, SendEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("PackageFile", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(PackageFile, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
+    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
+    // Not registered because template
+    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("PackageFile", "void SetBlockEvents(bool)", asMETHODPR(PackageFile, SetBlockEvents, (bool), void), asCALL_THISCALL);
+    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("PackageFile", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(PackageFile, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PackageFile", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(PackageFile, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
+    engine->RegisterObjectMethod("PackageFile", "void UnsubscribeFromAllEvents()", asMETHODPR(PackageFile, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("PackageFile", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(PackageFile_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
+    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("PackageFile", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(PackageFile, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("PackageFile", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(PackageFile, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("PackageFile", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(PackageFile, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
+    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("PackageFile", "int WeakRefs() const", asMETHODPR(PackageFile, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PackageFile", "int get_weakRefs() const", asMETHODPR(PackageFile, WeakRefs, () const, int), asCALL_THISCALL);
+#ifdef REGISTER_MANUAL_PART_Object
+    REGISTER_MANUAL_PART_Object(PackageFile, "PackageFile")
 #endif
+#ifdef REGISTER_MANUAL_PART_RefCounted
+    REGISTER_MANUAL_PART_RefCounted(PackageFile, "PackageFile")
+#endif
+#ifdef REGISTER_MANUAL_PART_PackageFile
+    REGISTER_MANUAL_PART_PackageFile(PackageFile, "PackageFile")
+#endif
+    RegisterSubclass<Object, PackageFile>(engine, "Object", "PackageFile");
+    RegisterSubclass<RefCounted, PackageFile>(engine, "RefCounted", "PackageFile");
+
+    // void ParticleEffect::AddColorFrame(const ColorFrame& colorFrame) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void AddColorFrame(const ColorFrame&in)", asMETHODPR(ParticleEffect, AddColorFrame, (const ColorFrame&), void), asCALL_THISCALL);
+    // void ParticleEffect::AddColorTime(const Color& color, float time) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void AddColorTime(const Color&in, float)", asMETHODPR(ParticleEffect, AddColorTime, (const Color&, float), void), asCALL_THISCALL);
+    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("ParticleEffect", asBEHAVE_ADDREF, "void f()", asMETHODPR(ParticleEffect, AddRef, (), void), asCALL_THISCALL);
+    // void ParticleEffect::AddTextureFrame(const TextureFrame& textureFrame) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void AddTextureFrame(const TextureFrame&in)", asMETHODPR(ParticleEffect, AddTextureFrame, (const TextureFrame&), void), asCALL_THISCALL);
+    // void ParticleEffect::AddTextureTime(const Rect& uv, float time) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void AddTextureTime(const Rect&in, float)", asMETHODPR(ParticleEffect, AddTextureTime, (const Rect&, float), void), asCALL_THISCALL);
+    // bool ParticleEffect::BeginLoad(Deserializer& source) override | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "bool BeginLoad(Deserializer&)", asMETHODPR(ParticleEffect, BeginLoad, (Deserializer&), bool), asCALL_THISCALL);
+    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
+    // Not registered because template
+    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
+    // Not registered because template
+    // SharedPtr<ParticleEffect> ParticleEffect::Clone(const String& cloneName=String::EMPTY) const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "ParticleEffect@+ Clone(const String&in = String::EMPTY) const", asFUNCTION(ParticleEffect_Clone_String), asCALL_CDECL_OBJFIRST);
+    // bool ParticleEffect::EndLoad() override | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "bool EndLoad()", asMETHODPR(ParticleEffect, EndLoad, (), bool), asCALL_THISCALL);
+    // float ParticleEffect::GetActiveTime() const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "float GetActiveTime() const", asMETHODPR(ParticleEffect, GetActiveTime, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "float get_activeTime() const", asMETHODPR(ParticleEffect, GetActiveTime, () const, float), asCALL_THISCALL);
+    // float ParticleEffect::GetAnimationLodBias() const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "float GetAnimationLodBias() const", asMETHODPR(ParticleEffect, GetAnimationLodBias, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "float get_animationLodBias() const", asMETHODPR(ParticleEffect, GetAnimationLodBias, () const, float), asCALL_THISCALL);
+    // AsyncLoadState Resource::GetAsyncLoadState() const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("ParticleEffect", "AsyncLoadState GetAsyncLoadState() const", asMETHODPR(ParticleEffect, GetAsyncLoadState, () const, AsyncLoadState), asCALL_THISCALL);
+    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect", "bool GetBlockEvents() const", asMETHODPR(ParticleEffect, GetBlockEvents, () const, bool), asCALL_THISCALL);
+    // const String& Object::GetCategory() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect", "const String& GetCategory() const", asMETHODPR(ParticleEffect, GetCategory, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "const String& get_category() const", asMETHODPR(ParticleEffect, GetCategory, () const, const String&), asCALL_THISCALL);
+    // const ColorFrame* ParticleEffect::GetColorFrame(unsigned index) const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "ColorFrame@+ GetColorFrame(uint) const", asMETHODPR(ParticleEffect, GetColorFrame, (unsigned) const, const ColorFrame*), asCALL_THISCALL);
+    // const Vector<ColorFrame>& ParticleEffect::GetColorFrames() const | File: ../Graphics/ParticleEffect.h
+    // Error: type "const Vector<ColorFrame>&" can not automatically bind
+    // const Vector3& ParticleEffect::GetConstantForce() const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "const Vector3& GetConstantForce() const", asMETHODPR(ParticleEffect, GetConstantForce, () const, const Vector3&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "const Vector3& get_constantForce() const", asMETHODPR(ParticleEffect, GetConstantForce, () const, const Vector3&), asCALL_THISCALL);
+    // Context* Object::GetContext() const | File: ../Core/Object.h
+    // Error: type "Context*" can not be returned
+    // float ParticleEffect::GetDampingForce() const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "float GetDampingForce() const", asMETHODPR(ParticleEffect, GetDampingForce, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "float get_dampingForce() const", asMETHODPR(ParticleEffect, GetDampingForce, () const, float), asCALL_THISCALL);
+    // const Vector3& ParticleEffect::GetEmitterSize() const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "const Vector3& GetEmitterSize() const", asMETHODPR(ParticleEffect, GetEmitterSize, () const, const Vector3&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "const Vector3& get_emitterSize() const", asMETHODPR(ParticleEffect, GetEmitterSize, () const, const Vector3&), asCALL_THISCALL);
+    // EmitterType ParticleEffect::GetEmitterType() const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "EmitterType GetEmitterType() const", asMETHODPR(ParticleEffect, GetEmitterType, () const, EmitterType), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "EmitterType get_emitterType() const", asMETHODPR(ParticleEffect, GetEmitterType, () const, EmitterType), asCALL_THISCALL);
+    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect", "VariantMap& GetEventDataMap() const", asMETHODPR(ParticleEffect, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
+    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // Object* Object::GetEventSender() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect", "Object@+ GetEventSender() const", asMETHODPR(ParticleEffect, GetEventSender, () const, Object*), asCALL_THISCALL);
+    // FaceCameraMode ParticleEffect::GetFaceCameraMode() const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "FaceCameraMode GetFaceCameraMode() const", asMETHODPR(ParticleEffect, GetFaceCameraMode, () const, FaceCameraMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "FaceCameraMode get_faceCameraMode() const", asMETHODPR(ParticleEffect, GetFaceCameraMode, () const, FaceCameraMode), asCALL_THISCALL);
+    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(ParticleEffect, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "const Variant& get_globalVar(StringHash) const", asMETHODPR(ParticleEffect, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect", "const VariantMap& GetGlobalVars() const", asMETHODPR(ParticleEffect, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "const VariantMap& get_globalVars() const", asMETHODPR(ParticleEffect, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    // float ParticleEffect::GetInactiveTime() const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "float GetInactiveTime() const", asMETHODPR(ParticleEffect, GetInactiveTime, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "float get_inactiveTime() const", asMETHODPR(ParticleEffect, GetInactiveTime, () const, float), asCALL_THISCALL);
+    // Material* ParticleEffect::GetMaterial() const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "Material@+ GetMaterial() const", asMETHODPR(ParticleEffect, GetMaterial, () const, Material*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "Material@+ get_material() const", asMETHODPR(ParticleEffect, GetMaterial, () const, Material*), asCALL_THISCALL);
+    // const Vector3& ParticleEffect::GetMaxDirection() const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "const Vector3& GetMaxDirection() const", asMETHODPR(ParticleEffect, GetMaxDirection, () const, const Vector3&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "const Vector3& get_maxDirection() const", asMETHODPR(ParticleEffect, GetMaxDirection, () const, const Vector3&), asCALL_THISCALL);
+    // float ParticleEffect::GetMaxEmissionRate() const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "float GetMaxEmissionRate() const", asMETHODPR(ParticleEffect, GetMaxEmissionRate, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "float get_maxEmissionRate() const", asMETHODPR(ParticleEffect, GetMaxEmissionRate, () const, float), asCALL_THISCALL);
+    // const Vector2& ParticleEffect::GetMaxParticleSize() const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "const Vector2& GetMaxParticleSize() const", asMETHODPR(ParticleEffect, GetMaxParticleSize, () const, const Vector2&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "const Vector2& get_maxParticleSize() const", asMETHODPR(ParticleEffect, GetMaxParticleSize, () const, const Vector2&), asCALL_THISCALL);
+    // float ParticleEffect::GetMaxRotation() const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "float GetMaxRotation() const", asMETHODPR(ParticleEffect, GetMaxRotation, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "float get_maxRotation() const", asMETHODPR(ParticleEffect, GetMaxRotation, () const, float), asCALL_THISCALL);
+    // float ParticleEffect::GetMaxRotationSpeed() const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "float GetMaxRotationSpeed() const", asMETHODPR(ParticleEffect, GetMaxRotationSpeed, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "float get_maxRotationSpeed() const", asMETHODPR(ParticleEffect, GetMaxRotationSpeed, () const, float), asCALL_THISCALL);
+    // float ParticleEffect::GetMaxTimeToLive() const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "float GetMaxTimeToLive() const", asMETHODPR(ParticleEffect, GetMaxTimeToLive, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "float get_maxTimeToLive() const", asMETHODPR(ParticleEffect, GetMaxTimeToLive, () const, float), asCALL_THISCALL);
+    // float ParticleEffect::GetMaxVelocity() const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "float GetMaxVelocity() const", asMETHODPR(ParticleEffect, GetMaxVelocity, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "float get_maxVelocity() const", asMETHODPR(ParticleEffect, GetMaxVelocity, () const, float), asCALL_THISCALL);
+    // unsigned Resource::GetMemoryUse() const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("ParticleEffect", "uint GetMemoryUse() const", asMETHODPR(ParticleEffect, GetMemoryUse, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "uint get_memoryUse() const", asMETHODPR(ParticleEffect, GetMemoryUse, () const, unsigned), asCALL_THISCALL);
+    // const Vector3& ParticleEffect::GetMinDirection() const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "const Vector3& GetMinDirection() const", asMETHODPR(ParticleEffect, GetMinDirection, () const, const Vector3&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "const Vector3& get_minDirection() const", asMETHODPR(ParticleEffect, GetMinDirection, () const, const Vector3&), asCALL_THISCALL);
+    // float ParticleEffect::GetMinEmissionRate() const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "float GetMinEmissionRate() const", asMETHODPR(ParticleEffect, GetMinEmissionRate, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "float get_minEmissionRate() const", asMETHODPR(ParticleEffect, GetMinEmissionRate, () const, float), asCALL_THISCALL);
+    // const Vector2& ParticleEffect::GetMinParticleSize() const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "const Vector2& GetMinParticleSize() const", asMETHODPR(ParticleEffect, GetMinParticleSize, () const, const Vector2&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "const Vector2& get_minParticleSize() const", asMETHODPR(ParticleEffect, GetMinParticleSize, () const, const Vector2&), asCALL_THISCALL);
+    // float ParticleEffect::GetMinRotation() const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "float GetMinRotation() const", asMETHODPR(ParticleEffect, GetMinRotation, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "float get_minRotation() const", asMETHODPR(ParticleEffect, GetMinRotation, () const, float), asCALL_THISCALL);
+    // float ParticleEffect::GetMinRotationSpeed() const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "float GetMinRotationSpeed() const", asMETHODPR(ParticleEffect, GetMinRotationSpeed, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "float get_minRotationSpeed() const", asMETHODPR(ParticleEffect, GetMinRotationSpeed, () const, float), asCALL_THISCALL);
+    // float ParticleEffect::GetMinTimeToLive() const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "float GetMinTimeToLive() const", asMETHODPR(ParticleEffect, GetMinTimeToLive, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "float get_minTimeToLive() const", asMETHODPR(ParticleEffect, GetMinTimeToLive, () const, float), asCALL_THISCALL);
+    // float ParticleEffect::GetMinVelocity() const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "float GetMinVelocity() const", asMETHODPR(ParticleEffect, GetMinVelocity, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "float get_minVelocity() const", asMETHODPR(ParticleEffect, GetMinVelocity, () const, float), asCALL_THISCALL);
+    // const String& Resource::GetName() const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("ParticleEffect", "const String& GetName() const", asMETHODPR(ParticleEffect, GetName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "const String& get_name() const", asMETHODPR(ParticleEffect, GetName, () const, const String&), asCALL_THISCALL);
+    // StringHash Resource::GetNameHash() const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("ParticleEffect", "StringHash GetNameHash() const", asMETHODPR(ParticleEffect, GetNameHash, () const, StringHash), asCALL_THISCALL);
+    // unsigned ParticleEffect::GetNumColorFrames() const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "uint GetNumColorFrames() const", asMETHODPR(ParticleEffect, GetNumColorFrames, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "uint get_numColorFrames() const", asMETHODPR(ParticleEffect, GetNumColorFrames, () const, unsigned), asCALL_THISCALL);
+    // unsigned ParticleEffect::GetNumParticles() const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "uint GetNumParticles() const", asMETHODPR(ParticleEffect, GetNumParticles, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "uint get_numParticles() const", asMETHODPR(ParticleEffect, GetNumParticles, () const, unsigned), asCALL_THISCALL);
+    // unsigned ParticleEffect::GetNumTextureFrames() const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "uint GetNumTextureFrames() const", asMETHODPR(ParticleEffect, GetNumTextureFrames, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "uint get_numTextureFrames() const", asMETHODPR(ParticleEffect, GetNumTextureFrames, () const, unsigned), asCALL_THISCALL);
+    // Vector3 ParticleEffect::GetRandomDirection() const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "Vector3 GetRandomDirection() const", asMETHODPR(ParticleEffect, GetRandomDirection, () const, Vector3), asCALL_THISCALL);
+    // float ParticleEffect::GetRandomRotation() const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "float GetRandomRotation() const", asMETHODPR(ParticleEffect, GetRandomRotation, () const, float), asCALL_THISCALL);
+    // float ParticleEffect::GetRandomRotationSpeed() const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "float GetRandomRotationSpeed() const", asMETHODPR(ParticleEffect, GetRandomRotationSpeed, () const, float), asCALL_THISCALL);
+    // Vector2 ParticleEffect::GetRandomSize() const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "Vector2 GetRandomSize() const", asMETHODPR(ParticleEffect, GetRandomSize, () const, Vector2), asCALL_THISCALL);
+    // float ParticleEffect::GetRandomTimeToLive() const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "float GetRandomTimeToLive() const", asMETHODPR(ParticleEffect, GetRandomTimeToLive, () const, float), asCALL_THISCALL);
+    // float ParticleEffect::GetRandomVelocity() const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "float GetRandomVelocity() const", asMETHODPR(ParticleEffect, GetRandomVelocity, () const, float), asCALL_THISCALL);
+    // float ParticleEffect::GetSizeAdd() const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "float GetSizeAdd() const", asMETHODPR(ParticleEffect, GetSizeAdd, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "float get_sizeAdd() const", asMETHODPR(ParticleEffect, GetSizeAdd, () const, float), asCALL_THISCALL);
+    // float ParticleEffect::GetSizeMul() const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "float GetSizeMul() const", asMETHODPR(ParticleEffect, GetSizeMul, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "float get_sizeMul() const", asMETHODPR(ParticleEffect, GetSizeMul, () const, float), asCALL_THISCALL);
+    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(ParticleEffect, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
+    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // Not registered because template
+    // const TextureFrame* ParticleEffect::GetTextureFrame(unsigned index) const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "TextureFrame@+ GetTextureFrame(uint) const", asMETHODPR(ParticleEffect, GetTextureFrame, (unsigned) const, const TextureFrame*), asCALL_THISCALL);
+    // const Vector<TextureFrame>& ParticleEffect::GetTextureFrames() const | File: ../Graphics/ParticleEffect.h
+    // Error: type "const Vector<TextureFrame>&" can not automatically bind
+    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect", "StringHash GetType() const", asMETHODPR(ParticleEffect, GetType, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "StringHash get_type() const", asMETHODPR(ParticleEffect, GetType, () const, StringHash), asCALL_THISCALL);
+    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect", "const String& GetTypeName() const", asMETHODPR(ParticleEffect, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "const String& get_typeName() const", asMETHODPR(ParticleEffect, GetTypeName, () const, const String&), asCALL_THISCALL);
+    // bool ParticleEffect::GetUpdateInvisible() const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "bool GetUpdateInvisible() const", asMETHODPR(ParticleEffect, GetUpdateInvisible, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "bool get_updateInvisible() const", asMETHODPR(ParticleEffect, GetUpdateInvisible, () const, bool), asCALL_THISCALL);
+    // unsigned Resource::GetUseTimer() | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("ParticleEffect", "uint GetUseTimer()", asMETHODPR(ParticleEffect, GetUseTimer, (), unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "uint get_useTimer()", asMETHODPR(ParticleEffect, GetUseTimer, (), unsigned), asCALL_THISCALL);
+    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect", "bool HasEventHandlers() const", asMETHODPR(ParticleEffect, HasEventHandlers, () const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(ParticleEffect, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(ParticleEffect, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
+    // bool ParticleEffect::IsFixedScreenSize() const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "bool IsFixedScreenSize() const", asMETHODPR(ParticleEffect, IsFixedScreenSize, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "bool get_fixedScreenSize() const", asMETHODPR(ParticleEffect, IsFixedScreenSize, () const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect", "bool IsInstanceOf(StringHash) const", asMETHODPR(ParticleEffect, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
+    // Not registered because template
+    // bool ParticleEffect::IsRelative() const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "bool IsRelative() const", asMETHODPR(ParticleEffect, IsRelative, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "bool get_relative() const", asMETHODPR(ParticleEffect, IsRelative, () const, bool), asCALL_THISCALL);
+    // bool ParticleEffect::IsScaled() const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "bool IsScaled() const", asMETHODPR(ParticleEffect, IsScaled, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "bool get_scaled() const", asMETHODPR(ParticleEffect, IsScaled, () const, bool), asCALL_THISCALL);
+    // bool ParticleEffect::IsSorted() const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "bool IsSorted() const", asMETHODPR(ParticleEffect, IsSorted, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "bool get_sorted() const", asMETHODPR(ParticleEffect, IsSorted, () const, bool), asCALL_THISCALL);
+    // bool ParticleEffect::Load(const XMLElement& source) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "bool Load(const XMLElement&in)", asMETHODPR(ParticleEffect, Load, (const XMLElement&), bool), asCALL_THISCALL);
+    // bool Resource::LoadFile(const String& fileName) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("ParticleEffect", "bool LoadFile(const String&in)", asMETHODPR(ParticleEffect, LoadFile, (const String&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "bool Load(const String&in)", asMETHODPR(ParticleEffect, LoadFile, (const String&), bool), asCALL_THISCALL);
+    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(ParticleEffect, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
+    // explicit ParticleEffect::ParticleEffect(Context* context) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectBehaviour("ParticleEffect", asBEHAVE_FACTORY, "ParticleEffect@+ f()", asFUNCTION(ParticleEffect_ParticleEffect_Context), asCALL_CDECL);
+    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
+    // Error: type "RefCount*" can not automatically bind
+    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("ParticleEffect", "int Refs() const", asMETHODPR(ParticleEffect, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "int get_refs() const", asMETHODPR(ParticleEffect, Refs, () const, int), asCALL_THISCALL);
+    // static void ParticleEffect::RegisterObject(Context* context) | File: ../Graphics/ParticleEffect.h
+    // Context can be used as firs parameter of constructors only
+    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("ParticleEffect", asBEHAVE_RELEASE, "void f()", asMETHODPR(ParticleEffect, ReleaseRef, (), void), asCALL_THISCALL);
+    // void ParticleEffect::RemoveColorFrame(unsigned index) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void RemoveColorFrame(uint)", asMETHODPR(ParticleEffect, RemoveColorFrame, (unsigned), void), asCALL_THISCALL);
+    // void ParticleEffect::RemoveTextureFrame(unsigned index) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void RemoveTextureFrame(uint)", asMETHODPR(ParticleEffect, RemoveTextureFrame, (unsigned), void), asCALL_THISCALL);
+    // void Resource::ResetUseTimer() | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("ParticleEffect", "void ResetUseTimer()", asMETHODPR(ParticleEffect, ResetUseTimer, (), void), asCALL_THISCALL);
+    // bool ParticleEffect::Save(Serializer& dest) const override | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "bool Save(Serializer&) const", asMETHODPR(ParticleEffect, Save, (Serializer&) const, bool), asCALL_THISCALL);
+    // bool ParticleEffect::Save(XMLElement& dest) const | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "bool Save(XMLElement&) const", asMETHODPR(ParticleEffect, Save, (XMLElement&) const, bool), asCALL_THISCALL);
+    // virtual bool Resource::SaveFile(const String& fileName) const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("ParticleEffect", "bool SaveFile(const String&in) const", asMETHODPR(ParticleEffect, SaveFile, (const String&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "bool Save(const String&in) const", asMETHODPR(ParticleEffect, SaveFile, (const String&) const, bool), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SendEvent(StringHash)", asMETHODPR(ParticleEffect, SendEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(ParticleEffect, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
+    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
+    // Not registered because template
+    // void ParticleEffect::SetActiveTime(float time) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SetActiveTime(float)", asMETHODPR(ParticleEffect, SetActiveTime, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void set_activeTime(float)", asMETHODPR(ParticleEffect, SetActiveTime, (float), void), asCALL_THISCALL);
+    // void ParticleEffect::SetAnimationLodBias(float lodBias) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SetAnimationLodBias(float)", asMETHODPR(ParticleEffect, SetAnimationLodBias, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void set_animationLodBias(float)", asMETHODPR(ParticleEffect, SetAnimationLodBias, (float), void), asCALL_THISCALL);
+    // void Resource::SetAsyncLoadState(AsyncLoadState newState) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SetAsyncLoadState(AsyncLoadState)", asMETHODPR(ParticleEffect, SetAsyncLoadState, (AsyncLoadState), void), asCALL_THISCALL);
+    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SetBlockEvents(bool)", asMETHODPR(ParticleEffect, SetBlockEvents, (bool), void), asCALL_THISCALL);
+    // void ParticleEffect::SetColorFrame(unsigned index, const ColorFrame& colorFrame) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SetColorFrame(uint, const ColorFrame&in)", asMETHODPR(ParticleEffect, SetColorFrame, (unsigned, const ColorFrame&), void), asCALL_THISCALL);
+    // void ParticleEffect::SetColorFrames(const Vector<ColorFrame>& colorFrames) | File: ../Graphics/ParticleEffect.h
+    // Error: type "const Vector<ColorFrame>&" can not automatically bind
+    // void ParticleEffect::SetConstantForce(const Vector3& force) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SetConstantForce(const Vector3&in)", asMETHODPR(ParticleEffect, SetConstantForce, (const Vector3&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void set_constantForce(const Vector3&in)", asMETHODPR(ParticleEffect, SetConstantForce, (const Vector3&), void), asCALL_THISCALL);
+    // void ParticleEffect::SetDampingForce(float force) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SetDampingForce(float)", asMETHODPR(ParticleEffect, SetDampingForce, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void set_dampingForce(float)", asMETHODPR(ParticleEffect, SetDampingForce, (float), void), asCALL_THISCALL);
+    // void ParticleEffect::SetEmitterSize(const Vector3& size) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SetEmitterSize(const Vector3&in)", asMETHODPR(ParticleEffect, SetEmitterSize, (const Vector3&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void set_emitterSize(const Vector3&in)", asMETHODPR(ParticleEffect, SetEmitterSize, (const Vector3&), void), asCALL_THISCALL);
+    // void ParticleEffect::SetEmitterType(EmitterType type) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SetEmitterType(EmitterType)", asMETHODPR(ParticleEffect, SetEmitterType, (EmitterType), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void set_emitterType(EmitterType)", asMETHODPR(ParticleEffect, SetEmitterType, (EmitterType), void), asCALL_THISCALL);
+    // void ParticleEffect::SetFaceCameraMode(FaceCameraMode mode) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SetFaceCameraMode(FaceCameraMode)", asMETHODPR(ParticleEffect, SetFaceCameraMode, (FaceCameraMode), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void set_faceCameraMode(FaceCameraMode)", asMETHODPR(ParticleEffect, SetFaceCameraMode, (FaceCameraMode), void), asCALL_THISCALL);
+    // void ParticleEffect::SetFixedScreenSize(bool enable) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SetFixedScreenSize(bool)", asMETHODPR(ParticleEffect, SetFixedScreenSize, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void set_fixedScreenSize(bool)", asMETHODPR(ParticleEffect, SetFixedScreenSize, (bool), void), asCALL_THISCALL);
+    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(ParticleEffect, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(ParticleEffect, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    // void ParticleEffect::SetInactiveTime(float time) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SetInactiveTime(float)", asMETHODPR(ParticleEffect, SetInactiveTime, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void set_inactiveTime(float)", asMETHODPR(ParticleEffect, SetInactiveTime, (float), void), asCALL_THISCALL);
+    // void ParticleEffect::SetMaterial(Material* material) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SetMaterial(Material@+)", asMETHODPR(ParticleEffect, SetMaterial, (Material*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void set_material(Material@+)", asMETHODPR(ParticleEffect, SetMaterial, (Material*), void), asCALL_THISCALL);
+    // void ParticleEffect::SetMaxDirection(const Vector3& direction) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SetMaxDirection(const Vector3&in)", asMETHODPR(ParticleEffect, SetMaxDirection, (const Vector3&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void set_maxDirection(const Vector3&in)", asMETHODPR(ParticleEffect, SetMaxDirection, (const Vector3&), void), asCALL_THISCALL);
+    // void ParticleEffect::SetMaxEmissionRate(float rate) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SetMaxEmissionRate(float)", asMETHODPR(ParticleEffect, SetMaxEmissionRate, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void set_maxEmissionRate(float)", asMETHODPR(ParticleEffect, SetMaxEmissionRate, (float), void), asCALL_THISCALL);
+    // void ParticleEffect::SetMaxParticleSize(const Vector2& size) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SetMaxParticleSize(const Vector2&in)", asMETHODPR(ParticleEffect, SetMaxParticleSize, (const Vector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void set_maxParticleSize(const Vector2&in)", asMETHODPR(ParticleEffect, SetMaxParticleSize, (const Vector2&), void), asCALL_THISCALL);
+    // void ParticleEffect::SetMaxRotation(float rotation) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SetMaxRotation(float)", asMETHODPR(ParticleEffect, SetMaxRotation, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void set_maxRotation(float)", asMETHODPR(ParticleEffect, SetMaxRotation, (float), void), asCALL_THISCALL);
+    // void ParticleEffect::SetMaxRotationSpeed(float speed) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SetMaxRotationSpeed(float)", asMETHODPR(ParticleEffect, SetMaxRotationSpeed, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void set_maxRotationSpeed(float)", asMETHODPR(ParticleEffect, SetMaxRotationSpeed, (float), void), asCALL_THISCALL);
+    // void ParticleEffect::SetMaxTimeToLive(float time) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SetMaxTimeToLive(float)", asMETHODPR(ParticleEffect, SetMaxTimeToLive, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void set_maxTimeToLive(float)", asMETHODPR(ParticleEffect, SetMaxTimeToLive, (float), void), asCALL_THISCALL);
+    // void ParticleEffect::SetMaxVelocity(float velocity) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SetMaxVelocity(float)", asMETHODPR(ParticleEffect, SetMaxVelocity, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void set_maxVelocity(float)", asMETHODPR(ParticleEffect, SetMaxVelocity, (float), void), asCALL_THISCALL);
+    // void Resource::SetMemoryUse(unsigned size) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SetMemoryUse(uint)", asMETHODPR(ParticleEffect, SetMemoryUse, (unsigned), void), asCALL_THISCALL);
+    // void ParticleEffect::SetMinDirection(const Vector3& direction) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SetMinDirection(const Vector3&in)", asMETHODPR(ParticleEffect, SetMinDirection, (const Vector3&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void set_minDirection(const Vector3&in)", asMETHODPR(ParticleEffect, SetMinDirection, (const Vector3&), void), asCALL_THISCALL);
+    // void ParticleEffect::SetMinEmissionRate(float rate) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SetMinEmissionRate(float)", asMETHODPR(ParticleEffect, SetMinEmissionRate, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void set_minEmissionRate(float)", asMETHODPR(ParticleEffect, SetMinEmissionRate, (float), void), asCALL_THISCALL);
+    // void ParticleEffect::SetMinParticleSize(const Vector2& size) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SetMinParticleSize(const Vector2&in)", asMETHODPR(ParticleEffect, SetMinParticleSize, (const Vector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void set_minParticleSize(const Vector2&in)", asMETHODPR(ParticleEffect, SetMinParticleSize, (const Vector2&), void), asCALL_THISCALL);
+    // void ParticleEffect::SetMinRotation(float rotation) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SetMinRotation(float)", asMETHODPR(ParticleEffect, SetMinRotation, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void set_minRotation(float)", asMETHODPR(ParticleEffect, SetMinRotation, (float), void), asCALL_THISCALL);
+    // void ParticleEffect::SetMinRotationSpeed(float speed) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SetMinRotationSpeed(float)", asMETHODPR(ParticleEffect, SetMinRotationSpeed, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void set_minRotationSpeed(float)", asMETHODPR(ParticleEffect, SetMinRotationSpeed, (float), void), asCALL_THISCALL);
+    // void ParticleEffect::SetMinTimeToLive(float time) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SetMinTimeToLive(float)", asMETHODPR(ParticleEffect, SetMinTimeToLive, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void set_minTimeToLive(float)", asMETHODPR(ParticleEffect, SetMinTimeToLive, (float), void), asCALL_THISCALL);
+    // void ParticleEffect::SetMinVelocity(float velocity) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SetMinVelocity(float)", asMETHODPR(ParticleEffect, SetMinVelocity, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void set_minVelocity(float)", asMETHODPR(ParticleEffect, SetMinVelocity, (float), void), asCALL_THISCALL);
+    // void Resource::SetName(const String& name) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SetName(const String&in)", asMETHODPR(ParticleEffect, SetName, (const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void set_name(const String&in)", asMETHODPR(ParticleEffect, SetName, (const String&), void), asCALL_THISCALL);
+    // void ParticleEffect::SetNumColorFrames(unsigned number) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SetNumColorFrames(uint)", asMETHODPR(ParticleEffect, SetNumColorFrames, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void set_numColorFrames(uint)", asMETHODPR(ParticleEffect, SetNumColorFrames, (unsigned), void), asCALL_THISCALL);
+    // void ParticleEffect::SetNumParticles(unsigned num) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SetNumParticles(uint)", asMETHODPR(ParticleEffect, SetNumParticles, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void set_numParticles(uint)", asMETHODPR(ParticleEffect, SetNumParticles, (unsigned), void), asCALL_THISCALL);
+    // void ParticleEffect::SetNumTextureFrames(unsigned number) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SetNumTextureFrames(uint)", asMETHODPR(ParticleEffect, SetNumTextureFrames, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void set_numTextureFrames(uint)", asMETHODPR(ParticleEffect, SetNumTextureFrames, (unsigned), void), asCALL_THISCALL);
+    // void ParticleEffect::SetRelative(bool enable) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SetRelative(bool)", asMETHODPR(ParticleEffect, SetRelative, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void set_relative(bool)", asMETHODPR(ParticleEffect, SetRelative, (bool), void), asCALL_THISCALL);
+    // void ParticleEffect::SetScaled(bool enable) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SetScaled(bool)", asMETHODPR(ParticleEffect, SetScaled, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void set_scaled(bool)", asMETHODPR(ParticleEffect, SetScaled, (bool), void), asCALL_THISCALL);
+    // void ParticleEffect::SetSizeAdd(float sizeAdd) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SetSizeAdd(float)", asMETHODPR(ParticleEffect, SetSizeAdd, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void set_sizeAdd(float)", asMETHODPR(ParticleEffect, SetSizeAdd, (float), void), asCALL_THISCALL);
+    // void ParticleEffect::SetSizeMul(float sizeMul) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SetSizeMul(float)", asMETHODPR(ParticleEffect, SetSizeMul, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void set_sizeMul(float)", asMETHODPR(ParticleEffect, SetSizeMul, (float), void), asCALL_THISCALL);
+    // void ParticleEffect::SetSorted(bool enable) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SetSorted(bool)", asMETHODPR(ParticleEffect, SetSorted, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void set_sorted(bool)", asMETHODPR(ParticleEffect, SetSorted, (bool), void), asCALL_THISCALL);
+    // void ParticleEffect::SetTextureFrame(unsigned index, const TextureFrame& textureFrame) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SetTextureFrame(uint, const TextureFrame&in)", asMETHODPR(ParticleEffect, SetTextureFrame, (unsigned, const TextureFrame&), void), asCALL_THISCALL);
+    // void ParticleEffect::SetTextureFrames(const Vector<TextureFrame>& textureFrames) | File: ../Graphics/ParticleEffect.h
+    // Error: type "const Vector<TextureFrame>&" can not automatically bind
+    // void ParticleEffect::SetUpdateInvisible(bool enable) | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SetUpdateInvisible(bool)", asMETHODPR(ParticleEffect, SetUpdateInvisible, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "void set_updateInvisible(bool)", asMETHODPR(ParticleEffect, SetUpdateInvisible, (bool), void), asCALL_THISCALL);
+    // void ParticleEffect::SortColorFrames() | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SortColorFrames()", asMETHODPR(ParticleEffect, SortColorFrames, (), void), asCALL_THISCALL);
+    // void ParticleEffect::SortTextureFrames() | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectMethod("ParticleEffect", "void SortTextureFrames()", asMETHODPR(ParticleEffect, SortTextureFrames, (), void), asCALL_THISCALL);
+    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect", "void UnsubscribeFromAllEvents()", asMETHODPR(ParticleEffect, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(ParticleEffect_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
+    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(ParticleEffect, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(ParticleEffect, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(ParticleEffect, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
+    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("ParticleEffect", "int WeakRefs() const", asMETHODPR(ParticleEffect, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "int get_weakRefs() const", asMETHODPR(ParticleEffect, WeakRefs, () const, int), asCALL_THISCALL);
+#ifdef REGISTER_MANUAL_PART_Resource
+    REGISTER_MANUAL_PART_Resource(ParticleEffect, "ParticleEffect")
+#endif
+#ifdef REGISTER_MANUAL_PART_Object
+    REGISTER_MANUAL_PART_Object(ParticleEffect, "ParticleEffect")
+#endif
+#ifdef REGISTER_MANUAL_PART_RefCounted
+    REGISTER_MANUAL_PART_RefCounted(ParticleEffect, "ParticleEffect")
+#endif
+#ifdef REGISTER_MANUAL_PART_ParticleEffect
+    REGISTER_MANUAL_PART_ParticleEffect(ParticleEffect, "ParticleEffect")
+#endif
+    RegisterSubclass<Resource, ParticleEffect>(engine, "Resource", "ParticleEffect");
+    RegisterSubclass<Object, ParticleEffect>(engine, "Object", "ParticleEffect");
+    RegisterSubclass<RefCounted, ParticleEffect>(engine, "RefCounted", "ParticleEffect");
+
+#ifdef URHO3D_URHO2D
+    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("ParticleEffect2D", asBEHAVE_ADDREF, "void f()", asMETHODPR(ParticleEffect2D, AddRef, (), void), asCALL_THISCALL);
+    // bool ParticleEffect2D::BeginLoad(Deserializer& source) override | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "bool BeginLoad(Deserializer&)", asMETHODPR(ParticleEffect2D, BeginLoad, (Deserializer&), bool), asCALL_THISCALL);
+    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
+    // Not registered because template
+    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
+    // Not registered because template
+    // SharedPtr<ParticleEffect2D> ParticleEffect2D::Clone(const String& cloneName=String::EMPTY) const | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "ParticleEffect2D@+ Clone(const String&in = String::EMPTY) const", asFUNCTION(ParticleEffect2D_Clone_String), asCALL_CDECL_OBJFIRST);
+    // bool ParticleEffect2D::EndLoad() override | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "bool EndLoad()", asMETHODPR(ParticleEffect2D, EndLoad, (), bool), asCALL_THISCALL);
+    // float ParticleEffect2D::GetAngle() const | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "float GetAngle() const", asMETHODPR(ParticleEffect2D, GetAngle, () const, float), asCALL_THISCALL);
+    // float ParticleEffect2D::GetAngleVariance() const | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "float GetAngleVariance() const", asMETHODPR(ParticleEffect2D, GetAngleVariance, () const, float), asCALL_THISCALL);
+    // AsyncLoadState Resource::GetAsyncLoadState() const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "AsyncLoadState GetAsyncLoadState() const", asMETHODPR(ParticleEffect2D, GetAsyncLoadState, () const, AsyncLoadState), asCALL_THISCALL);
+    // BlendMode ParticleEffect2D::GetBlendMode() const | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "BlendMode GetBlendMode() const", asMETHODPR(ParticleEffect2D, GetBlendMode, () const, BlendMode), asCALL_THISCALL);
+    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "bool GetBlockEvents() const", asMETHODPR(ParticleEffect2D, GetBlockEvents, () const, bool), asCALL_THISCALL);
+    // const String& Object::GetCategory() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "const String& GetCategory() const", asMETHODPR(ParticleEffect2D, GetCategory, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect2D", "const String& get_category() const", asMETHODPR(ParticleEffect2D, GetCategory, () const, const String&), asCALL_THISCALL);
+    // Context* Object::GetContext() const | File: ../Core/Object.h
+    // Error: type "Context*" can not be returned
+    // float ParticleEffect2D::GetDuration() const | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "float GetDuration() const", asMETHODPR(ParticleEffect2D, GetDuration, () const, float), asCALL_THISCALL);
+    // EmitterType2D ParticleEffect2D::GetEmitterType() const | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "EmitterType2D GetEmitterType() const", asMETHODPR(ParticleEffect2D, GetEmitterType, () const, EmitterType2D), asCALL_THISCALL);
+    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "VariantMap& GetEventDataMap() const", asMETHODPR(ParticleEffect2D, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
+    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // Object* Object::GetEventSender() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "Object@+ GetEventSender() const", asMETHODPR(ParticleEffect2D, GetEventSender, () const, Object*), asCALL_THISCALL);
+    // const Color& ParticleEffect2D::GetFinishColor() const | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "const Color& GetFinishColor() const", asMETHODPR(ParticleEffect2D, GetFinishColor, () const, const Color&), asCALL_THISCALL);
+    // const Color& ParticleEffect2D::GetFinishColorVariance() const | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "const Color& GetFinishColorVariance() const", asMETHODPR(ParticleEffect2D, GetFinishColorVariance, () const, const Color&), asCALL_THISCALL);
+    // float ParticleEffect2D::GetFinishParticleSize() const | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "float GetFinishParticleSize() const", asMETHODPR(ParticleEffect2D, GetFinishParticleSize, () const, float), asCALL_THISCALL);
+    // float ParticleEffect2D::GetFinishParticleSizeVariance() const | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "float GetFinishParticleSizeVariance() const", asMETHODPR(ParticleEffect2D, GetFinishParticleSizeVariance, () const, float), asCALL_THISCALL);
+    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(ParticleEffect2D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect2D", "const Variant& get_globalVar(StringHash) const", asMETHODPR(ParticleEffect2D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "const VariantMap& GetGlobalVars() const", asMETHODPR(ParticleEffect2D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect2D", "const VariantMap& get_globalVars() const", asMETHODPR(ParticleEffect2D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    // const Vector2& ParticleEffect2D::GetGravity() const | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "const Vector2& GetGravity() const", asMETHODPR(ParticleEffect2D, GetGravity, () const, const Vector2&), asCALL_THISCALL);
+    // int ParticleEffect2D::GetMaxParticles() const | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "int GetMaxParticles() const", asMETHODPR(ParticleEffect2D, GetMaxParticles, () const, int), asCALL_THISCALL);
+    // float ParticleEffect2D::GetMaxRadius() const | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "float GetMaxRadius() const", asMETHODPR(ParticleEffect2D, GetMaxRadius, () const, float), asCALL_THISCALL);
+    // float ParticleEffect2D::GetMaxRadiusVariance() const | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "float GetMaxRadiusVariance() const", asMETHODPR(ParticleEffect2D, GetMaxRadiusVariance, () const, float), asCALL_THISCALL);
+    // unsigned Resource::GetMemoryUse() const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "uint GetMemoryUse() const", asMETHODPR(ParticleEffect2D, GetMemoryUse, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect2D", "uint get_memoryUse() const", asMETHODPR(ParticleEffect2D, GetMemoryUse, () const, unsigned), asCALL_THISCALL);
+    // float ParticleEffect2D::GetMinRadius() const | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "float GetMinRadius() const", asMETHODPR(ParticleEffect2D, GetMinRadius, () const, float), asCALL_THISCALL);
+    // float ParticleEffect2D::GetMinRadiusVariance() const | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "float GetMinRadiusVariance() const", asMETHODPR(ParticleEffect2D, GetMinRadiusVariance, () const, float), asCALL_THISCALL);
+    // const String& Resource::GetName() const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "const String& GetName() const", asMETHODPR(ParticleEffect2D, GetName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect2D", "const String& get_name() const", asMETHODPR(ParticleEffect2D, GetName, () const, const String&), asCALL_THISCALL);
+    // StringHash Resource::GetNameHash() const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "StringHash GetNameHash() const", asMETHODPR(ParticleEffect2D, GetNameHash, () const, StringHash), asCALL_THISCALL);
+    // float ParticleEffect2D::GetParticleLifeSpan() const | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "float GetParticleLifeSpan() const", asMETHODPR(ParticleEffect2D, GetParticleLifeSpan, () const, float), asCALL_THISCALL);
+    // float ParticleEffect2D::GetParticleLifespanVariance() const | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "float GetParticleLifespanVariance() const", asMETHODPR(ParticleEffect2D, GetParticleLifespanVariance, () const, float), asCALL_THISCALL);
+    // float ParticleEffect2D::GetRadialAcceleration() const | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "float GetRadialAcceleration() const", asMETHODPR(ParticleEffect2D, GetRadialAcceleration, () const, float), asCALL_THISCALL);
+    // float ParticleEffect2D::GetRadialAccelVariance() const | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "float GetRadialAccelVariance() const", asMETHODPR(ParticleEffect2D, GetRadialAccelVariance, () const, float), asCALL_THISCALL);
+    // float ParticleEffect2D::GetRotatePerSecond() const | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "float GetRotatePerSecond() const", asMETHODPR(ParticleEffect2D, GetRotatePerSecond, () const, float), asCALL_THISCALL);
+    // float ParticleEffect2D::GetRotatePerSecondVariance() const | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "float GetRotatePerSecondVariance() const", asMETHODPR(ParticleEffect2D, GetRotatePerSecondVariance, () const, float), asCALL_THISCALL);
+    // float ParticleEffect2D::GetRotationEnd() const | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "float GetRotationEnd() const", asMETHODPR(ParticleEffect2D, GetRotationEnd, () const, float), asCALL_THISCALL);
+    // float ParticleEffect2D::GetRotationEndVariance() const | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "float GetRotationEndVariance() const", asMETHODPR(ParticleEffect2D, GetRotationEndVariance, () const, float), asCALL_THISCALL);
+    // float ParticleEffect2D::GetRotationStart() const | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "float GetRotationStart() const", asMETHODPR(ParticleEffect2D, GetRotationStart, () const, float), asCALL_THISCALL);
+    // float ParticleEffect2D::GetRotationStartVariance() const | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "float GetRotationStartVariance() const", asMETHODPR(ParticleEffect2D, GetRotationStartVariance, () const, float), asCALL_THISCALL);
+    // const Vector2& ParticleEffect2D::GetSourcePositionVariance() const | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "const Vector2& GetSourcePositionVariance() const", asMETHODPR(ParticleEffect2D, GetSourcePositionVariance, () const, const Vector2&), asCALL_THISCALL);
+    // float ParticleEffect2D::GetSpeed() const | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "float GetSpeed() const", asMETHODPR(ParticleEffect2D, GetSpeed, () const, float), asCALL_THISCALL);
+    // float ParticleEffect2D::GetSpeedVariance() const | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "float GetSpeedVariance() const", asMETHODPR(ParticleEffect2D, GetSpeedVariance, () const, float), asCALL_THISCALL);
+    // Sprite2D* ParticleEffect2D::GetSprite() const | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "Sprite2D@+ GetSprite() const", asMETHODPR(ParticleEffect2D, GetSprite, () const, Sprite2D*), asCALL_THISCALL);
+    // const Color& ParticleEffect2D::GetStartColor() const | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "const Color& GetStartColor() const", asMETHODPR(ParticleEffect2D, GetStartColor, () const, const Color&), asCALL_THISCALL);
+    // const Color& ParticleEffect2D::GetStartColorVariance() const | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "const Color& GetStartColorVariance() const", asMETHODPR(ParticleEffect2D, GetStartColorVariance, () const, const Color&), asCALL_THISCALL);
+    // float ParticleEffect2D::GetStartParticleSize() const | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "float GetStartParticleSize() const", asMETHODPR(ParticleEffect2D, GetStartParticleSize, () const, float), asCALL_THISCALL);
+    // float ParticleEffect2D::GetStartParticleSizeVariance() const | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "float GetStartParticleSizeVariance() const", asMETHODPR(ParticleEffect2D, GetStartParticleSizeVariance, () const, float), asCALL_THISCALL);
+    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(ParticleEffect2D, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
+    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // Not registered because template
+    // float ParticleEffect2D::GetTangentialAcceleration() const | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "float GetTangentialAcceleration() const", asMETHODPR(ParticleEffect2D, GetTangentialAcceleration, () const, float), asCALL_THISCALL);
+    // float ParticleEffect2D::GetTangentialAccelVariance() const | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "float GetTangentialAccelVariance() const", asMETHODPR(ParticleEffect2D, GetTangentialAccelVariance, () const, float), asCALL_THISCALL);
+    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "StringHash GetType() const", asMETHODPR(ParticleEffect2D, GetType, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect2D", "StringHash get_type() const", asMETHODPR(ParticleEffect2D, GetType, () const, StringHash), asCALL_THISCALL);
+    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "const String& GetTypeName() const", asMETHODPR(ParticleEffect2D, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect2D", "const String& get_typeName() const", asMETHODPR(ParticleEffect2D, GetTypeName, () const, const String&), asCALL_THISCALL);
+    // unsigned Resource::GetUseTimer() | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "uint GetUseTimer()", asMETHODPR(ParticleEffect2D, GetUseTimer, (), unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect2D", "uint get_useTimer()", asMETHODPR(ParticleEffect2D, GetUseTimer, (), unsigned), asCALL_THISCALL);
+    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "bool HasEventHandlers() const", asMETHODPR(ParticleEffect2D, HasEventHandlers, () const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(ParticleEffect2D, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(ParticleEffect2D, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "bool IsInstanceOf(StringHash) const", asMETHODPR(ParticleEffect2D, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
+    // Not registered because template
+    // bool Resource::Load(Deserializer& source) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "bool Load(Deserializer&)", asMETHODPR(ParticleEffect2D, Load, (Deserializer&), bool), asCALL_THISCALL);
+    // bool Resource::LoadFile(const String& fileName) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "bool LoadFile(const String&in)", asMETHODPR(ParticleEffect2D, LoadFile, (const String&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect2D", "bool Load(const String&in)", asMETHODPR(ParticleEffect2D, LoadFile, (const String&), bool), asCALL_THISCALL);
+    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(ParticleEffect2D, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
+    // explicit ParticleEffect2D::ParticleEffect2D(Context* context) | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectBehaviour("ParticleEffect2D", asBEHAVE_FACTORY, "ParticleEffect2D@+ f()", asFUNCTION(ParticleEffect2D_ParticleEffect2D_Context), asCALL_CDECL);
+    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
+    // Error: type "RefCount*" can not automatically bind
+    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "int Refs() const", asMETHODPR(ParticleEffect2D, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect2D", "int get_refs() const", asMETHODPR(ParticleEffect2D, Refs, () const, int), asCALL_THISCALL);
+    // static void ParticleEffect2D::RegisterObject(Context* context) | File: ../Urho2D/ParticleEffect2D.h
+    // Context can be used as firs parameter of constructors only
+    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("ParticleEffect2D", asBEHAVE_RELEASE, "void f()", asMETHODPR(ParticleEffect2D, ReleaseRef, (), void), asCALL_THISCALL);
+    // void Resource::ResetUseTimer() | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void ResetUseTimer()", asMETHODPR(ParticleEffect2D, ResetUseTimer, (), void), asCALL_THISCALL);
+    // bool ParticleEffect2D::Save(Serializer& dest) const override | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "bool Save(Serializer&) const", asMETHODPR(ParticleEffect2D, Save, (Serializer&) const, bool), asCALL_THISCALL);
+    // virtual bool Resource::SaveFile(const String& fileName) const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "bool SaveFile(const String&in) const", asMETHODPR(ParticleEffect2D, SaveFile, (const String&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect2D", "bool Save(const String&in) const", asMETHODPR(ParticleEffect2D, SaveFile, (const String&) const, bool), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SendEvent(StringHash)", asMETHODPR(ParticleEffect2D, SendEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(ParticleEffect2D, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
+    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
+    // Not registered because template
+    // void ParticleEffect2D::SetAngle(float angle) | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SetAngle(float)", asMETHODPR(ParticleEffect2D, SetAngle, (float), void), asCALL_THISCALL);
+    // void ParticleEffect2D::SetAngleVariance(float angleVariance) | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SetAngleVariance(float)", asMETHODPR(ParticleEffect2D, SetAngleVariance, (float), void), asCALL_THISCALL);
+    // void Resource::SetAsyncLoadState(AsyncLoadState newState) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SetAsyncLoadState(AsyncLoadState)", asMETHODPR(ParticleEffect2D, SetAsyncLoadState, (AsyncLoadState), void), asCALL_THISCALL);
+    // void ParticleEffect2D::SetBlendMode(BlendMode blendMode) | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SetBlendMode(BlendMode)", asMETHODPR(ParticleEffect2D, SetBlendMode, (BlendMode), void), asCALL_THISCALL);
+    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SetBlockEvents(bool)", asMETHODPR(ParticleEffect2D, SetBlockEvents, (bool), void), asCALL_THISCALL);
+    // void ParticleEffect2D::SetDuration(float duration) | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SetDuration(float)", asMETHODPR(ParticleEffect2D, SetDuration, (float), void), asCALL_THISCALL);
+    // void ParticleEffect2D::SetEmitterType(EmitterType2D emitterType) | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SetEmitterType(EmitterType2D)", asMETHODPR(ParticleEffect2D, SetEmitterType, (EmitterType2D), void), asCALL_THISCALL);
+    // void ParticleEffect2D::SetFinishColor(const Color& finishColor) | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SetFinishColor(const Color&in)", asMETHODPR(ParticleEffect2D, SetFinishColor, (const Color&), void), asCALL_THISCALL);
+    // void ParticleEffect2D::SetFinishColorVariance(const Color& finishColorVariance) | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SetFinishColorVariance(const Color&in)", asMETHODPR(ParticleEffect2D, SetFinishColorVariance, (const Color&), void), asCALL_THISCALL);
+    // void ParticleEffect2D::SetFinishParticleSize(float finishParticleSize) | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SetFinishParticleSize(float)", asMETHODPR(ParticleEffect2D, SetFinishParticleSize, (float), void), asCALL_THISCALL);
+    // void ParticleEffect2D::SetFinishParticleSizeVariance(float finishParticleSizeVariance) | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SetFinishParticleSizeVariance(float)", asMETHODPR(ParticleEffect2D, SetFinishParticleSizeVariance, (float), void), asCALL_THISCALL);
+    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(ParticleEffect2D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect2D", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(ParticleEffect2D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    // void ParticleEffect2D::SetGravity(const Vector2& gravity) | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SetGravity(const Vector2&in)", asMETHODPR(ParticleEffect2D, SetGravity, (const Vector2&), void), asCALL_THISCALL);
+    // void ParticleEffect2D::SetMaxParticles(int maxParticles) | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SetMaxParticles(int)", asMETHODPR(ParticleEffect2D, SetMaxParticles, (int), void), asCALL_THISCALL);
+    // void ParticleEffect2D::SetMaxRadius(float maxRadius) | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SetMaxRadius(float)", asMETHODPR(ParticleEffect2D, SetMaxRadius, (float), void), asCALL_THISCALL);
+    // void ParticleEffect2D::SetMaxRadiusVariance(float maxRadiusVariance) | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SetMaxRadiusVariance(float)", asMETHODPR(ParticleEffect2D, SetMaxRadiusVariance, (float), void), asCALL_THISCALL);
+    // void Resource::SetMemoryUse(unsigned size) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SetMemoryUse(uint)", asMETHODPR(ParticleEffect2D, SetMemoryUse, (unsigned), void), asCALL_THISCALL);
+    // void ParticleEffect2D::SetMinRadius(float minRadius) | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SetMinRadius(float)", asMETHODPR(ParticleEffect2D, SetMinRadius, (float), void), asCALL_THISCALL);
+    // void ParticleEffect2D::SetMinRadiusVariance(float minRadiusVariance) | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SetMinRadiusVariance(float)", asMETHODPR(ParticleEffect2D, SetMinRadiusVariance, (float), void), asCALL_THISCALL);
+    // void Resource::SetName(const String& name) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SetName(const String&in)", asMETHODPR(ParticleEffect2D, SetName, (const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect2D", "void set_name(const String&in)", asMETHODPR(ParticleEffect2D, SetName, (const String&), void), asCALL_THISCALL);
+    // void ParticleEffect2D::SetParticleLifeSpan(float particleLifeSpan) | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SetParticleLifeSpan(float)", asMETHODPR(ParticleEffect2D, SetParticleLifeSpan, (float), void), asCALL_THISCALL);
+    // void ParticleEffect2D::SetParticleLifespanVariance(float particleLifespanVariance) | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SetParticleLifespanVariance(float)", asMETHODPR(ParticleEffect2D, SetParticleLifespanVariance, (float), void), asCALL_THISCALL);
+    // void ParticleEffect2D::SetRadialAcceleration(float radialAcceleration) | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SetRadialAcceleration(float)", asMETHODPR(ParticleEffect2D, SetRadialAcceleration, (float), void), asCALL_THISCALL);
+    // void ParticleEffect2D::SetRadialAccelVariance(float radialAccelVariance) | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SetRadialAccelVariance(float)", asMETHODPR(ParticleEffect2D, SetRadialAccelVariance, (float), void), asCALL_THISCALL);
+    // void ParticleEffect2D::SetRotatePerSecond(float rotatePerSecond) | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SetRotatePerSecond(float)", asMETHODPR(ParticleEffect2D, SetRotatePerSecond, (float), void), asCALL_THISCALL);
+    // void ParticleEffect2D::SetRotatePerSecondVariance(float rotatePerSecondVariance) | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SetRotatePerSecondVariance(float)", asMETHODPR(ParticleEffect2D, SetRotatePerSecondVariance, (float), void), asCALL_THISCALL);
+    // void ParticleEffect2D::SetRotationEnd(float rotationEnd) | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SetRotationEnd(float)", asMETHODPR(ParticleEffect2D, SetRotationEnd, (float), void), asCALL_THISCALL);
+    // void ParticleEffect2D::SetRotationEndVariance(float rotationEndVariance) | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SetRotationEndVariance(float)", asMETHODPR(ParticleEffect2D, SetRotationEndVariance, (float), void), asCALL_THISCALL);
+    // void ParticleEffect2D::SetRotationStart(float rotationStart) | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SetRotationStart(float)", asMETHODPR(ParticleEffect2D, SetRotationStart, (float), void), asCALL_THISCALL);
+    // void ParticleEffect2D::SetRotationStartVariance(float rotationStartVariance) | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SetRotationStartVariance(float)", asMETHODPR(ParticleEffect2D, SetRotationStartVariance, (float), void), asCALL_THISCALL);
+    // void ParticleEffect2D::SetSourcePositionVariance(const Vector2& sourcePositionVariance) | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SetSourcePositionVariance(const Vector2&in)", asMETHODPR(ParticleEffect2D, SetSourcePositionVariance, (const Vector2&), void), asCALL_THISCALL);
+    // void ParticleEffect2D::SetSpeed(float speed) | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SetSpeed(float)", asMETHODPR(ParticleEffect2D, SetSpeed, (float), void), asCALL_THISCALL);
+    // void ParticleEffect2D::SetSpeedVariance(float speedVariance) | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SetSpeedVariance(float)", asMETHODPR(ParticleEffect2D, SetSpeedVariance, (float), void), asCALL_THISCALL);
+    // void ParticleEffect2D::SetSprite(Sprite2D* sprite) | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SetSprite(Sprite2D@+)", asMETHODPR(ParticleEffect2D, SetSprite, (Sprite2D*), void), asCALL_THISCALL);
+    // void ParticleEffect2D::SetStartColor(const Color& startColor) | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SetStartColor(const Color&in)", asMETHODPR(ParticleEffect2D, SetStartColor, (const Color&), void), asCALL_THISCALL);
+    // void ParticleEffect2D::SetStartColorVariance(const Color& startColorVariance) | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SetStartColorVariance(const Color&in)", asMETHODPR(ParticleEffect2D, SetStartColorVariance, (const Color&), void), asCALL_THISCALL);
+    // void ParticleEffect2D::SetStartParticleSize(float startParticleSize) | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SetStartParticleSize(float)", asMETHODPR(ParticleEffect2D, SetStartParticleSize, (float), void), asCALL_THISCALL);
+    // void ParticleEffect2D::SetStartParticleSizeVariance(float startParticleSizeVariance) | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SetStartParticleSizeVariance(float)", asMETHODPR(ParticleEffect2D, SetStartParticleSizeVariance, (float), void), asCALL_THISCALL);
+    // void ParticleEffect2D::SetTangentialAcceleration(float tangentialAcceleration) | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SetTangentialAcceleration(float)", asMETHODPR(ParticleEffect2D, SetTangentialAcceleration, (float), void), asCALL_THISCALL);
+    // void ParticleEffect2D::SetTangentialAccelVariance(float tangentialAccelVariance) | File: ../Urho2D/ParticleEffect2D.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void SetTangentialAccelVariance(float)", asMETHODPR(ParticleEffect2D, SetTangentialAccelVariance, (float), void), asCALL_THISCALL);
+    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void UnsubscribeFromAllEvents()", asMETHODPR(ParticleEffect2D, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(ParticleEffect2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
+    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(ParticleEffect2D, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(ParticleEffect2D, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(ParticleEffect2D, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
+    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("ParticleEffect2D", "int WeakRefs() const", asMETHODPR(ParticleEffect2D, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect2D", "int get_weakRefs() const", asMETHODPR(ParticleEffect2D, WeakRefs, () const, int), asCALL_THISCALL);
+#ifdef REGISTER_MANUAL_PART_Resource
+    REGISTER_MANUAL_PART_Resource(ParticleEffect2D, "ParticleEffect2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Object
+    REGISTER_MANUAL_PART_Object(ParticleEffect2D, "ParticleEffect2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_RefCounted
+    REGISTER_MANUAL_PART_RefCounted(ParticleEffect2D, "ParticleEffect2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_ParticleEffect2D
+    REGISTER_MANUAL_PART_ParticleEffect2D(ParticleEffect2D, "ParticleEffect2D")
+#endif
+    RegisterSubclass<Resource, ParticleEffect2D>(engine, "Resource", "ParticleEffect2D");
+    RegisterSubclass<Object, ParticleEffect2D>(engine, "Object", "ParticleEffect2D");
+    RegisterSubclass<RefCounted, ParticleEffect2D>(engine, "RefCounted", "ParticleEffect2D");
 #endif
 
     // void Drawable::AddLight(Light* light) | File: ../Graphics/Drawable.h
@@ -984,298 +1796,6 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     RegisterSubclass<RefCounted, ParticleEmitter>(engine, "RefCounted", "ParticleEmitter");
 
 #ifdef URHO3D_URHO2D
-    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("ParticleEffect2D", asBEHAVE_ADDREF, "void f()", asMETHODPR(ParticleEffect2D, AddRef, (), void), asCALL_THISCALL);
-    // bool ParticleEffect2D::BeginLoad(Deserializer& source) override | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "bool BeginLoad(Deserializer&)", asMETHODPR(ParticleEffect2D, BeginLoad, (Deserializer&), bool), asCALL_THISCALL);
-    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
-    // Not registered because template
-    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
-    // Not registered because template
-    // SharedPtr<ParticleEffect2D> ParticleEffect2D::Clone(const String& cloneName=String::EMPTY) const | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "ParticleEffect2D@+ Clone(const String&in = String::EMPTY) const", asFUNCTION(ParticleEffect2D_Clone_String), asCALL_CDECL_OBJFIRST);
-    // bool ParticleEffect2D::EndLoad() override | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "bool EndLoad()", asMETHODPR(ParticleEffect2D, EndLoad, (), bool), asCALL_THISCALL);
-    // float ParticleEffect2D::GetAngle() const | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "float GetAngle() const", asMETHODPR(ParticleEffect2D, GetAngle, () const, float), asCALL_THISCALL);
-    // float ParticleEffect2D::GetAngleVariance() const | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "float GetAngleVariance() const", asMETHODPR(ParticleEffect2D, GetAngleVariance, () const, float), asCALL_THISCALL);
-    // AsyncLoadState Resource::GetAsyncLoadState() const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "AsyncLoadState GetAsyncLoadState() const", asMETHODPR(ParticleEffect2D, GetAsyncLoadState, () const, AsyncLoadState), asCALL_THISCALL);
-    // BlendMode ParticleEffect2D::GetBlendMode() const | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "BlendMode GetBlendMode() const", asMETHODPR(ParticleEffect2D, GetBlendMode, () const, BlendMode), asCALL_THISCALL);
-    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "bool GetBlockEvents() const", asMETHODPR(ParticleEffect2D, GetBlockEvents, () const, bool), asCALL_THISCALL);
-    // const String& Object::GetCategory() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "const String& GetCategory() const", asMETHODPR(ParticleEffect2D, GetCategory, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect2D", "const String& get_category() const", asMETHODPR(ParticleEffect2D, GetCategory, () const, const String&), asCALL_THISCALL);
-    // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
-    // float ParticleEffect2D::GetDuration() const | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "float GetDuration() const", asMETHODPR(ParticleEffect2D, GetDuration, () const, float), asCALL_THISCALL);
-    // EmitterType2D ParticleEffect2D::GetEmitterType() const | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "EmitterType2D GetEmitterType() const", asMETHODPR(ParticleEffect2D, GetEmitterType, () const, EmitterType2D), asCALL_THISCALL);
-    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "VariantMap& GetEventDataMap() const", asMETHODPR(ParticleEffect2D, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
-    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // Object* Object::GetEventSender() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "Object@+ GetEventSender() const", asMETHODPR(ParticleEffect2D, GetEventSender, () const, Object*), asCALL_THISCALL);
-    // const Color& ParticleEffect2D::GetFinishColor() const | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "const Color& GetFinishColor() const", asMETHODPR(ParticleEffect2D, GetFinishColor, () const, const Color&), asCALL_THISCALL);
-    // const Color& ParticleEffect2D::GetFinishColorVariance() const | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "const Color& GetFinishColorVariance() const", asMETHODPR(ParticleEffect2D, GetFinishColorVariance, () const, const Color&), asCALL_THISCALL);
-    // float ParticleEffect2D::GetFinishParticleSize() const | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "float GetFinishParticleSize() const", asMETHODPR(ParticleEffect2D, GetFinishParticleSize, () const, float), asCALL_THISCALL);
-    // float ParticleEffect2D::GetFinishParticleSizeVariance() const | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "float GetFinishParticleSizeVariance() const", asMETHODPR(ParticleEffect2D, GetFinishParticleSizeVariance, () const, float), asCALL_THISCALL);
-    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(ParticleEffect2D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect2D", "const Variant& get_globalVar(StringHash) const", asMETHODPR(ParticleEffect2D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "const VariantMap& GetGlobalVars() const", asMETHODPR(ParticleEffect2D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect2D", "const VariantMap& get_globalVars() const", asMETHODPR(ParticleEffect2D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    // const Vector2& ParticleEffect2D::GetGravity() const | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "const Vector2& GetGravity() const", asMETHODPR(ParticleEffect2D, GetGravity, () const, const Vector2&), asCALL_THISCALL);
-    // int ParticleEffect2D::GetMaxParticles() const | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "int GetMaxParticles() const", asMETHODPR(ParticleEffect2D, GetMaxParticles, () const, int), asCALL_THISCALL);
-    // float ParticleEffect2D::GetMaxRadius() const | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "float GetMaxRadius() const", asMETHODPR(ParticleEffect2D, GetMaxRadius, () const, float), asCALL_THISCALL);
-    // float ParticleEffect2D::GetMaxRadiusVariance() const | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "float GetMaxRadiusVariance() const", asMETHODPR(ParticleEffect2D, GetMaxRadiusVariance, () const, float), asCALL_THISCALL);
-    // unsigned Resource::GetMemoryUse() const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "uint GetMemoryUse() const", asMETHODPR(ParticleEffect2D, GetMemoryUse, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect2D", "uint get_memoryUse() const", asMETHODPR(ParticleEffect2D, GetMemoryUse, () const, unsigned), asCALL_THISCALL);
-    // float ParticleEffect2D::GetMinRadius() const | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "float GetMinRadius() const", asMETHODPR(ParticleEffect2D, GetMinRadius, () const, float), asCALL_THISCALL);
-    // float ParticleEffect2D::GetMinRadiusVariance() const | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "float GetMinRadiusVariance() const", asMETHODPR(ParticleEffect2D, GetMinRadiusVariance, () const, float), asCALL_THISCALL);
-    // const String& Resource::GetName() const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "const String& GetName() const", asMETHODPR(ParticleEffect2D, GetName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect2D", "const String& get_name() const", asMETHODPR(ParticleEffect2D, GetName, () const, const String&), asCALL_THISCALL);
-    // StringHash Resource::GetNameHash() const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "StringHash GetNameHash() const", asMETHODPR(ParticleEffect2D, GetNameHash, () const, StringHash), asCALL_THISCALL);
-    // float ParticleEffect2D::GetParticleLifeSpan() const | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "float GetParticleLifeSpan() const", asMETHODPR(ParticleEffect2D, GetParticleLifeSpan, () const, float), asCALL_THISCALL);
-    // float ParticleEffect2D::GetParticleLifespanVariance() const | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "float GetParticleLifespanVariance() const", asMETHODPR(ParticleEffect2D, GetParticleLifespanVariance, () const, float), asCALL_THISCALL);
-    // float ParticleEffect2D::GetRadialAcceleration() const | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "float GetRadialAcceleration() const", asMETHODPR(ParticleEffect2D, GetRadialAcceleration, () const, float), asCALL_THISCALL);
-    // float ParticleEffect2D::GetRadialAccelVariance() const | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "float GetRadialAccelVariance() const", asMETHODPR(ParticleEffect2D, GetRadialAccelVariance, () const, float), asCALL_THISCALL);
-    // float ParticleEffect2D::GetRotatePerSecond() const | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "float GetRotatePerSecond() const", asMETHODPR(ParticleEffect2D, GetRotatePerSecond, () const, float), asCALL_THISCALL);
-    // float ParticleEffect2D::GetRotatePerSecondVariance() const | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "float GetRotatePerSecondVariance() const", asMETHODPR(ParticleEffect2D, GetRotatePerSecondVariance, () const, float), asCALL_THISCALL);
-    // float ParticleEffect2D::GetRotationEnd() const | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "float GetRotationEnd() const", asMETHODPR(ParticleEffect2D, GetRotationEnd, () const, float), asCALL_THISCALL);
-    // float ParticleEffect2D::GetRotationEndVariance() const | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "float GetRotationEndVariance() const", asMETHODPR(ParticleEffect2D, GetRotationEndVariance, () const, float), asCALL_THISCALL);
-    // float ParticleEffect2D::GetRotationStart() const | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "float GetRotationStart() const", asMETHODPR(ParticleEffect2D, GetRotationStart, () const, float), asCALL_THISCALL);
-    // float ParticleEffect2D::GetRotationStartVariance() const | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "float GetRotationStartVariance() const", asMETHODPR(ParticleEffect2D, GetRotationStartVariance, () const, float), asCALL_THISCALL);
-    // const Vector2& ParticleEffect2D::GetSourcePositionVariance() const | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "const Vector2& GetSourcePositionVariance() const", asMETHODPR(ParticleEffect2D, GetSourcePositionVariance, () const, const Vector2&), asCALL_THISCALL);
-    // float ParticleEffect2D::GetSpeed() const | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "float GetSpeed() const", asMETHODPR(ParticleEffect2D, GetSpeed, () const, float), asCALL_THISCALL);
-    // float ParticleEffect2D::GetSpeedVariance() const | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "float GetSpeedVariance() const", asMETHODPR(ParticleEffect2D, GetSpeedVariance, () const, float), asCALL_THISCALL);
-    // Sprite2D* ParticleEffect2D::GetSprite() const | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "Sprite2D@+ GetSprite() const", asMETHODPR(ParticleEffect2D, GetSprite, () const, Sprite2D*), asCALL_THISCALL);
-    // const Color& ParticleEffect2D::GetStartColor() const | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "const Color& GetStartColor() const", asMETHODPR(ParticleEffect2D, GetStartColor, () const, const Color&), asCALL_THISCALL);
-    // const Color& ParticleEffect2D::GetStartColorVariance() const | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "const Color& GetStartColorVariance() const", asMETHODPR(ParticleEffect2D, GetStartColorVariance, () const, const Color&), asCALL_THISCALL);
-    // float ParticleEffect2D::GetStartParticleSize() const | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "float GetStartParticleSize() const", asMETHODPR(ParticleEffect2D, GetStartParticleSize, () const, float), asCALL_THISCALL);
-    // float ParticleEffect2D::GetStartParticleSizeVariance() const | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "float GetStartParticleSizeVariance() const", asMETHODPR(ParticleEffect2D, GetStartParticleSizeVariance, () const, float), asCALL_THISCALL);
-    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(ParticleEffect2D, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
-    // Not registered because template
-    // float ParticleEffect2D::GetTangentialAcceleration() const | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "float GetTangentialAcceleration() const", asMETHODPR(ParticleEffect2D, GetTangentialAcceleration, () const, float), asCALL_THISCALL);
-    // float ParticleEffect2D::GetTangentialAccelVariance() const | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "float GetTangentialAccelVariance() const", asMETHODPR(ParticleEffect2D, GetTangentialAccelVariance, () const, float), asCALL_THISCALL);
-    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "StringHash GetType() const", asMETHODPR(ParticleEffect2D, GetType, () const, StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect2D", "StringHash get_type() const", asMETHODPR(ParticleEffect2D, GetType, () const, StringHash), asCALL_THISCALL);
-    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "const String& GetTypeName() const", asMETHODPR(ParticleEffect2D, GetTypeName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect2D", "const String& get_typeName() const", asMETHODPR(ParticleEffect2D, GetTypeName, () const, const String&), asCALL_THISCALL);
-    // unsigned Resource::GetUseTimer() | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "uint GetUseTimer()", asMETHODPR(ParticleEffect2D, GetUseTimer, (), unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect2D", "uint get_useTimer()", asMETHODPR(ParticleEffect2D, GetUseTimer, (), unsigned), asCALL_THISCALL);
-    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "bool HasEventHandlers() const", asMETHODPR(ParticleEffect2D, HasEventHandlers, () const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(ParticleEffect2D, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(ParticleEffect2D, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "bool IsInstanceOf(StringHash) const", asMETHODPR(ParticleEffect2D, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
-    // Not registered because template
-    // bool Resource::Load(Deserializer& source) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "bool Load(Deserializer&)", asMETHODPR(ParticleEffect2D, Load, (Deserializer&), bool), asCALL_THISCALL);
-    // bool Resource::LoadFile(const String& fileName) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "bool LoadFile(const String&in)", asMETHODPR(ParticleEffect2D, LoadFile, (const String&), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect2D", "bool Load(const String&in)", asMETHODPR(ParticleEffect2D, LoadFile, (const String&), bool), asCALL_THISCALL);
-    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(ParticleEffect2D, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
-    // explicit ParticleEffect2D::ParticleEffect2D(Context* context) | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectBehaviour("ParticleEffect2D", asBEHAVE_FACTORY, "ParticleEffect2D@+ f()", asFUNCTION(ParticleEffect2D_ParticleEffect2D_Context), asCALL_CDECL);
-    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
-    // Error: type "RefCount*" can not automatically bind
-    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "int Refs() const", asMETHODPR(ParticleEffect2D, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect2D", "int get_refs() const", asMETHODPR(ParticleEffect2D, Refs, () const, int), asCALL_THISCALL);
-    // static void ParticleEffect2D::RegisterObject(Context* context) | File: ../Urho2D/ParticleEffect2D.h
-    // Context can be used as firs parameter of constructors only
-    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("ParticleEffect2D", asBEHAVE_RELEASE, "void f()", asMETHODPR(ParticleEffect2D, ReleaseRef, (), void), asCALL_THISCALL);
-    // void Resource::ResetUseTimer() | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void ResetUseTimer()", asMETHODPR(ParticleEffect2D, ResetUseTimer, (), void), asCALL_THISCALL);
-    // bool ParticleEffect2D::Save(Serializer& dest) const override | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "bool Save(Serializer&) const", asMETHODPR(ParticleEffect2D, Save, (Serializer&) const, bool), asCALL_THISCALL);
-    // virtual bool Resource::SaveFile(const String& fileName) const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "bool SaveFile(const String&in) const", asMETHODPR(ParticleEffect2D, SaveFile, (const String&) const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect2D", "bool Save(const String&in) const", asMETHODPR(ParticleEffect2D, SaveFile, (const String&) const, bool), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SendEvent(StringHash)", asMETHODPR(ParticleEffect2D, SendEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(ParticleEffect2D, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
-    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
-    // Not registered because template
-    // void ParticleEffect2D::SetAngle(float angle) | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SetAngle(float)", asMETHODPR(ParticleEffect2D, SetAngle, (float), void), asCALL_THISCALL);
-    // void ParticleEffect2D::SetAngleVariance(float angleVariance) | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SetAngleVariance(float)", asMETHODPR(ParticleEffect2D, SetAngleVariance, (float), void), asCALL_THISCALL);
-    // void Resource::SetAsyncLoadState(AsyncLoadState newState) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SetAsyncLoadState(AsyncLoadState)", asMETHODPR(ParticleEffect2D, SetAsyncLoadState, (AsyncLoadState), void), asCALL_THISCALL);
-    // void ParticleEffect2D::SetBlendMode(BlendMode blendMode) | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SetBlendMode(BlendMode)", asMETHODPR(ParticleEffect2D, SetBlendMode, (BlendMode), void), asCALL_THISCALL);
-    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SetBlockEvents(bool)", asMETHODPR(ParticleEffect2D, SetBlockEvents, (bool), void), asCALL_THISCALL);
-    // void ParticleEffect2D::SetDuration(float duration) | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SetDuration(float)", asMETHODPR(ParticleEffect2D, SetDuration, (float), void), asCALL_THISCALL);
-    // void ParticleEffect2D::SetEmitterType(EmitterType2D emitterType) | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SetEmitterType(EmitterType2D)", asMETHODPR(ParticleEffect2D, SetEmitterType, (EmitterType2D), void), asCALL_THISCALL);
-    // void ParticleEffect2D::SetFinishColor(const Color& finishColor) | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SetFinishColor(const Color&in)", asMETHODPR(ParticleEffect2D, SetFinishColor, (const Color&), void), asCALL_THISCALL);
-    // void ParticleEffect2D::SetFinishColorVariance(const Color& finishColorVariance) | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SetFinishColorVariance(const Color&in)", asMETHODPR(ParticleEffect2D, SetFinishColorVariance, (const Color&), void), asCALL_THISCALL);
-    // void ParticleEffect2D::SetFinishParticleSize(float finishParticleSize) | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SetFinishParticleSize(float)", asMETHODPR(ParticleEffect2D, SetFinishParticleSize, (float), void), asCALL_THISCALL);
-    // void ParticleEffect2D::SetFinishParticleSizeVariance(float finishParticleSizeVariance) | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SetFinishParticleSizeVariance(float)", asMETHODPR(ParticleEffect2D, SetFinishParticleSizeVariance, (float), void), asCALL_THISCALL);
-    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(ParticleEffect2D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect2D", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(ParticleEffect2D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    // void ParticleEffect2D::SetGravity(const Vector2& gravity) | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SetGravity(const Vector2&in)", asMETHODPR(ParticleEffect2D, SetGravity, (const Vector2&), void), asCALL_THISCALL);
-    // void ParticleEffect2D::SetMaxParticles(int maxParticles) | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SetMaxParticles(int)", asMETHODPR(ParticleEffect2D, SetMaxParticles, (int), void), asCALL_THISCALL);
-    // void ParticleEffect2D::SetMaxRadius(float maxRadius) | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SetMaxRadius(float)", asMETHODPR(ParticleEffect2D, SetMaxRadius, (float), void), asCALL_THISCALL);
-    // void ParticleEffect2D::SetMaxRadiusVariance(float maxRadiusVariance) | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SetMaxRadiusVariance(float)", asMETHODPR(ParticleEffect2D, SetMaxRadiusVariance, (float), void), asCALL_THISCALL);
-    // void Resource::SetMemoryUse(unsigned size) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SetMemoryUse(uint)", asMETHODPR(ParticleEffect2D, SetMemoryUse, (unsigned), void), asCALL_THISCALL);
-    // void ParticleEffect2D::SetMinRadius(float minRadius) | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SetMinRadius(float)", asMETHODPR(ParticleEffect2D, SetMinRadius, (float), void), asCALL_THISCALL);
-    // void ParticleEffect2D::SetMinRadiusVariance(float minRadiusVariance) | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SetMinRadiusVariance(float)", asMETHODPR(ParticleEffect2D, SetMinRadiusVariance, (float), void), asCALL_THISCALL);
-    // void Resource::SetName(const String& name) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SetName(const String&in)", asMETHODPR(ParticleEffect2D, SetName, (const String&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect2D", "void set_name(const String&in)", asMETHODPR(ParticleEffect2D, SetName, (const String&), void), asCALL_THISCALL);
-    // void ParticleEffect2D::SetParticleLifeSpan(float particleLifeSpan) | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SetParticleLifeSpan(float)", asMETHODPR(ParticleEffect2D, SetParticleLifeSpan, (float), void), asCALL_THISCALL);
-    // void ParticleEffect2D::SetParticleLifespanVariance(float particleLifespanVariance) | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SetParticleLifespanVariance(float)", asMETHODPR(ParticleEffect2D, SetParticleLifespanVariance, (float), void), asCALL_THISCALL);
-    // void ParticleEffect2D::SetRadialAcceleration(float radialAcceleration) | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SetRadialAcceleration(float)", asMETHODPR(ParticleEffect2D, SetRadialAcceleration, (float), void), asCALL_THISCALL);
-    // void ParticleEffect2D::SetRadialAccelVariance(float radialAccelVariance) | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SetRadialAccelVariance(float)", asMETHODPR(ParticleEffect2D, SetRadialAccelVariance, (float), void), asCALL_THISCALL);
-    // void ParticleEffect2D::SetRotatePerSecond(float rotatePerSecond) | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SetRotatePerSecond(float)", asMETHODPR(ParticleEffect2D, SetRotatePerSecond, (float), void), asCALL_THISCALL);
-    // void ParticleEffect2D::SetRotatePerSecondVariance(float rotatePerSecondVariance) | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SetRotatePerSecondVariance(float)", asMETHODPR(ParticleEffect2D, SetRotatePerSecondVariance, (float), void), asCALL_THISCALL);
-    // void ParticleEffect2D::SetRotationEnd(float rotationEnd) | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SetRotationEnd(float)", asMETHODPR(ParticleEffect2D, SetRotationEnd, (float), void), asCALL_THISCALL);
-    // void ParticleEffect2D::SetRotationEndVariance(float rotationEndVariance) | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SetRotationEndVariance(float)", asMETHODPR(ParticleEffect2D, SetRotationEndVariance, (float), void), asCALL_THISCALL);
-    // void ParticleEffect2D::SetRotationStart(float rotationStart) | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SetRotationStart(float)", asMETHODPR(ParticleEffect2D, SetRotationStart, (float), void), asCALL_THISCALL);
-    // void ParticleEffect2D::SetRotationStartVariance(float rotationStartVariance) | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SetRotationStartVariance(float)", asMETHODPR(ParticleEffect2D, SetRotationStartVariance, (float), void), asCALL_THISCALL);
-    // void ParticleEffect2D::SetSourcePositionVariance(const Vector2& sourcePositionVariance) | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SetSourcePositionVariance(const Vector2&in)", asMETHODPR(ParticleEffect2D, SetSourcePositionVariance, (const Vector2&), void), asCALL_THISCALL);
-    // void ParticleEffect2D::SetSpeed(float speed) | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SetSpeed(float)", asMETHODPR(ParticleEffect2D, SetSpeed, (float), void), asCALL_THISCALL);
-    // void ParticleEffect2D::SetSpeedVariance(float speedVariance) | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SetSpeedVariance(float)", asMETHODPR(ParticleEffect2D, SetSpeedVariance, (float), void), asCALL_THISCALL);
-    // void ParticleEffect2D::SetSprite(Sprite2D* sprite) | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SetSprite(Sprite2D@+)", asMETHODPR(ParticleEffect2D, SetSprite, (Sprite2D*), void), asCALL_THISCALL);
-    // void ParticleEffect2D::SetStartColor(const Color& startColor) | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SetStartColor(const Color&in)", asMETHODPR(ParticleEffect2D, SetStartColor, (const Color&), void), asCALL_THISCALL);
-    // void ParticleEffect2D::SetStartColorVariance(const Color& startColorVariance) | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SetStartColorVariance(const Color&in)", asMETHODPR(ParticleEffect2D, SetStartColorVariance, (const Color&), void), asCALL_THISCALL);
-    // void ParticleEffect2D::SetStartParticleSize(float startParticleSize) | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SetStartParticleSize(float)", asMETHODPR(ParticleEffect2D, SetStartParticleSize, (float), void), asCALL_THISCALL);
-    // void ParticleEffect2D::SetStartParticleSizeVariance(float startParticleSizeVariance) | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SetStartParticleSizeVariance(float)", asMETHODPR(ParticleEffect2D, SetStartParticleSizeVariance, (float), void), asCALL_THISCALL);
-    // void ParticleEffect2D::SetTangentialAcceleration(float tangentialAcceleration) | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SetTangentialAcceleration(float)", asMETHODPR(ParticleEffect2D, SetTangentialAcceleration, (float), void), asCALL_THISCALL);
-    // void ParticleEffect2D::SetTangentialAccelVariance(float tangentialAccelVariance) | File: ../Urho2D/ParticleEffect2D.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void SetTangentialAccelVariance(float)", asMETHODPR(ParticleEffect2D, SetTangentialAccelVariance, (float), void), asCALL_THISCALL);
-    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void UnsubscribeFromAllEvents()", asMETHODPR(ParticleEffect2D, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(ParticleEffect2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
-    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(ParticleEffect2D, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(ParticleEffect2D, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(ParticleEffect2D, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
-    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("ParticleEffect2D", "int WeakRefs() const", asMETHODPR(ParticleEffect2D, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect2D", "int get_weakRefs() const", asMETHODPR(ParticleEffect2D, WeakRefs, () const, int), asCALL_THISCALL);
-#ifdef REGISTER_MANUAL_PART_Resource
-    REGISTER_MANUAL_PART_Resource(ParticleEffect2D, "ParticleEffect2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Object
-    REGISTER_MANUAL_PART_Object(ParticleEffect2D, "ParticleEffect2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(ParticleEffect2D, "ParticleEffect2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_ParticleEffect2D
-    REGISTER_MANUAL_PART_ParticleEffect2D(ParticleEffect2D, "ParticleEffect2D")
-#endif
-    RegisterSubclass<Resource, ParticleEffect2D>(engine, "Resource", "ParticleEffect2D");
-    RegisterSubclass<Object, ParticleEffect2D>(engine, "Object", "ParticleEffect2D");
-    RegisterSubclass<RefCounted, ParticleEffect2D>(engine, "RefCounted", "ParticleEffect2D");
-#endif
-
-#ifdef URHO3D_URHO2D
     // void Drawable::AddLight(Light* light) | File: ../Graphics/Drawable.h
     engine->RegisterObjectMethod("ParticleEmitter2D", "void AddLight(Light@+)", asMETHODPR(ParticleEmitter2D, AddLight, (Light*), void), asCALL_THISCALL);
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
@@ -1754,538 +2274,6 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     RegisterSubclass<Object, ParticleEmitter2D>(engine, "Object", "ParticleEmitter2D");
     RegisterSubclass<RefCounted, ParticleEmitter2D>(engine, "RefCounted", "ParticleEmitter2D");
 #endif
-
-    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("PackageFile", asBEHAVE_ADDREF, "void f()", asMETHODPR(PackageFile, AddRef, (), void), asCALL_THISCALL);
-    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
-    // Not registered because template
-    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
-    // Not registered because template
-    // bool PackageFile::Exists(const String& fileName) const | File: ../IO/PackageFile.h
-    engine->RegisterObjectMethod("PackageFile", "bool Exists(const String&in) const", asMETHODPR(PackageFile, Exists, (const String&) const, bool), asCALL_THISCALL);
-    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("PackageFile", "bool GetBlockEvents() const", asMETHODPR(PackageFile, GetBlockEvents, () const, bool), asCALL_THISCALL);
-    // const String& Object::GetCategory() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("PackageFile", "const String& GetCategory() const", asMETHODPR(PackageFile, GetCategory, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PackageFile", "const String& get_category() const", asMETHODPR(PackageFile, GetCategory, () const, const String&), asCALL_THISCALL);
-    // unsigned PackageFile::GetChecksum() const | File: ../IO/PackageFile.h
-    engine->RegisterObjectMethod("PackageFile", "uint GetChecksum() const", asMETHODPR(PackageFile, GetChecksum, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PackageFile", "uint get_checksum() const", asMETHODPR(PackageFile, GetChecksum, () const, unsigned), asCALL_THISCALL);
-    // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
-    // const HashMap<String, PackageEntry>& PackageFile::GetEntries() const | File: ../IO/PackageFile.h
-    // Error: type "const HashMap<String, PackageEntry>&" can not automatically bind
-    // const PackageEntry* PackageFile::GetEntry(const String& fileName) const | File: ../IO/PackageFile.h
-    // Error: type "const PackageEntry*" can not automatically bind
-    // const Vector<String> PackageFile::GetEntryNames() const | File: ../IO/PackageFile.h
-    engine->RegisterObjectMethod("PackageFile", "Array<String>@ GetEntryNames() const", asFUNCTION(PackageFile_GetEntryNames_void), asCALL_CDECL_OBJFIRST);
-    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("PackageFile", "VariantMap& GetEventDataMap() const", asMETHODPR(PackageFile, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
-    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // Object* Object::GetEventSender() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("PackageFile", "Object@+ GetEventSender() const", asMETHODPR(PackageFile, GetEventSender, () const, Object*), asCALL_THISCALL);
-    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("PackageFile", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(PackageFile, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PackageFile", "const Variant& get_globalVar(StringHash) const", asMETHODPR(PackageFile, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("PackageFile", "const VariantMap& GetGlobalVars() const", asMETHODPR(PackageFile, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PackageFile", "const VariantMap& get_globalVars() const", asMETHODPR(PackageFile, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    // const String& PackageFile::GetName() const | File: ../IO/PackageFile.h
-    engine->RegisterObjectMethod("PackageFile", "const String& GetName() const", asMETHODPR(PackageFile, GetName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PackageFile", "const String& get_name() const", asMETHODPR(PackageFile, GetName, () const, const String&), asCALL_THISCALL);
-    // StringHash PackageFile::GetNameHash() const | File: ../IO/PackageFile.h
-    engine->RegisterObjectMethod("PackageFile", "StringHash GetNameHash() const", asMETHODPR(PackageFile, GetNameHash, () const, StringHash), asCALL_THISCALL);
-    // unsigned PackageFile::GetNumFiles() const | File: ../IO/PackageFile.h
-    engine->RegisterObjectMethod("PackageFile", "uint GetNumFiles() const", asMETHODPR(PackageFile, GetNumFiles, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PackageFile", "uint get_numFiles() const", asMETHODPR(PackageFile, GetNumFiles, () const, unsigned), asCALL_THISCALL);
-    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("PackageFile", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(PackageFile, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
-    // Not registered because template
-    // unsigned PackageFile::GetTotalDataSize() const | File: ../IO/PackageFile.h
-    engine->RegisterObjectMethod("PackageFile", "uint GetTotalDataSize() const", asMETHODPR(PackageFile, GetTotalDataSize, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PackageFile", "uint get_totalDataSize() const", asMETHODPR(PackageFile, GetTotalDataSize, () const, unsigned), asCALL_THISCALL);
-    // unsigned PackageFile::GetTotalSize() const | File: ../IO/PackageFile.h
-    engine->RegisterObjectMethod("PackageFile", "uint GetTotalSize() const", asMETHODPR(PackageFile, GetTotalSize, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PackageFile", "uint get_totalSize() const", asMETHODPR(PackageFile, GetTotalSize, () const, unsigned), asCALL_THISCALL);
-    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("PackageFile", "StringHash GetType() const", asMETHODPR(PackageFile, GetType, () const, StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PackageFile", "StringHash get_type() const", asMETHODPR(PackageFile, GetType, () const, StringHash), asCALL_THISCALL);
-    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("PackageFile", "const String& GetTypeName() const", asMETHODPR(PackageFile, GetTypeName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PackageFile", "const String& get_typeName() const", asMETHODPR(PackageFile, GetTypeName, () const, const String&), asCALL_THISCALL);
-    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("PackageFile", "bool HasEventHandlers() const", asMETHODPR(PackageFile, HasEventHandlers, () const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("PackageFile", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(PackageFile, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("PackageFile", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(PackageFile, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
-    // bool PackageFile::IsCompressed() const | File: ../IO/PackageFile.h
-    engine->RegisterObjectMethod("PackageFile", "bool IsCompressed() const", asMETHODPR(PackageFile, IsCompressed, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PackageFile", "bool get_compressed() const", asMETHODPR(PackageFile, IsCompressed, () const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("PackageFile", "bool IsInstanceOf(StringHash) const", asMETHODPR(PackageFile, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
-    // Not registered because template
-    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("PackageFile", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(PackageFile, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
-    // bool PackageFile::Open(const String& fileName, unsigned startOffset=0) | File: ../IO/PackageFile.h
-    engine->RegisterObjectMethod("PackageFile", "bool Open(const String&in, uint = 0)", asMETHODPR(PackageFile, Open, (const String&, unsigned), bool), asCALL_THISCALL);
-    // explicit PackageFile::PackageFile(Context* context) | File: ../IO/PackageFile.h
-    engine->RegisterObjectBehaviour("PackageFile", asBEHAVE_FACTORY, "PackageFile@+ f()", asFUNCTION(PackageFile_PackageFile_Context), asCALL_CDECL);
-    // PackageFile::PackageFile(Context* context, const String& fileName, unsigned startOffset=0) | File: ../IO/PackageFile.h
-    engine->RegisterObjectBehaviour("PackageFile", asBEHAVE_FACTORY, "PackageFile@+ f(const String&in, uint = 0)", asFUNCTION(PackageFile_PackageFile_Context_String_unsigned), asCALL_CDECL);
-    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
-    // Error: type "RefCount*" can not automatically bind
-    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("PackageFile", "int Refs() const", asMETHODPR(PackageFile, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PackageFile", "int get_refs() const", asMETHODPR(PackageFile, Refs, () const, int), asCALL_THISCALL);
-    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("PackageFile", asBEHAVE_RELEASE, "void f()", asMETHODPR(PackageFile, ReleaseRef, (), void), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("PackageFile", "void SendEvent(StringHash)", asMETHODPR(PackageFile, SendEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("PackageFile", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(PackageFile, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
-    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
-    // Not registered because template
-    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("PackageFile", "void SetBlockEvents(bool)", asMETHODPR(PackageFile, SetBlockEvents, (bool), void), asCALL_THISCALL);
-    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("PackageFile", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(PackageFile, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PackageFile", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(PackageFile, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
-    engine->RegisterObjectMethod("PackageFile", "void UnsubscribeFromAllEvents()", asMETHODPR(PackageFile, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("PackageFile", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(PackageFile_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
-    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("PackageFile", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(PackageFile, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("PackageFile", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(PackageFile, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("PackageFile", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(PackageFile, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
-    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("PackageFile", "int WeakRefs() const", asMETHODPR(PackageFile, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PackageFile", "int get_weakRefs() const", asMETHODPR(PackageFile, WeakRefs, () const, int), asCALL_THISCALL);
-#ifdef REGISTER_MANUAL_PART_Object
-    REGISTER_MANUAL_PART_Object(PackageFile, "PackageFile")
-#endif
-#ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(PackageFile, "PackageFile")
-#endif
-#ifdef REGISTER_MANUAL_PART_PackageFile
-    REGISTER_MANUAL_PART_PackageFile(PackageFile, "PackageFile")
-#endif
-    RegisterSubclass<Object, PackageFile>(engine, "Object", "PackageFile");
-    RegisterSubclass<RefCounted, PackageFile>(engine, "RefCounted", "PackageFile");
-
-    // void ParticleEffect::AddColorFrame(const ColorFrame& colorFrame) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void AddColorFrame(const ColorFrame&in)", asMETHODPR(ParticleEffect, AddColorFrame, (const ColorFrame&), void), asCALL_THISCALL);
-    // void ParticleEffect::AddColorTime(const Color& color, float time) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void AddColorTime(const Color&in, float)", asMETHODPR(ParticleEffect, AddColorTime, (const Color&, float), void), asCALL_THISCALL);
-    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("ParticleEffect", asBEHAVE_ADDREF, "void f()", asMETHODPR(ParticleEffect, AddRef, (), void), asCALL_THISCALL);
-    // void ParticleEffect::AddTextureFrame(const TextureFrame& textureFrame) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void AddTextureFrame(const TextureFrame&in)", asMETHODPR(ParticleEffect, AddTextureFrame, (const TextureFrame&), void), asCALL_THISCALL);
-    // void ParticleEffect::AddTextureTime(const Rect& uv, float time) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void AddTextureTime(const Rect&in, float)", asMETHODPR(ParticleEffect, AddTextureTime, (const Rect&, float), void), asCALL_THISCALL);
-    // bool ParticleEffect::BeginLoad(Deserializer& source) override | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "bool BeginLoad(Deserializer&)", asMETHODPR(ParticleEffect, BeginLoad, (Deserializer&), bool), asCALL_THISCALL);
-    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
-    // Not registered because template
-    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
-    // Not registered because template
-    // SharedPtr<ParticleEffect> ParticleEffect::Clone(const String& cloneName=String::EMPTY) const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "ParticleEffect@+ Clone(const String&in = String::EMPTY) const", asFUNCTION(ParticleEffect_Clone_String), asCALL_CDECL_OBJFIRST);
-    // bool ParticleEffect::EndLoad() override | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "bool EndLoad()", asMETHODPR(ParticleEffect, EndLoad, (), bool), asCALL_THISCALL);
-    // float ParticleEffect::GetActiveTime() const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "float GetActiveTime() const", asMETHODPR(ParticleEffect, GetActiveTime, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "float get_activeTime() const", asMETHODPR(ParticleEffect, GetActiveTime, () const, float), asCALL_THISCALL);
-    // float ParticleEffect::GetAnimationLodBias() const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "float GetAnimationLodBias() const", asMETHODPR(ParticleEffect, GetAnimationLodBias, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "float get_animationLodBias() const", asMETHODPR(ParticleEffect, GetAnimationLodBias, () const, float), asCALL_THISCALL);
-    // AsyncLoadState Resource::GetAsyncLoadState() const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("ParticleEffect", "AsyncLoadState GetAsyncLoadState() const", asMETHODPR(ParticleEffect, GetAsyncLoadState, () const, AsyncLoadState), asCALL_THISCALL);
-    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect", "bool GetBlockEvents() const", asMETHODPR(ParticleEffect, GetBlockEvents, () const, bool), asCALL_THISCALL);
-    // const String& Object::GetCategory() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect", "const String& GetCategory() const", asMETHODPR(ParticleEffect, GetCategory, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "const String& get_category() const", asMETHODPR(ParticleEffect, GetCategory, () const, const String&), asCALL_THISCALL);
-    // const ColorFrame* ParticleEffect::GetColorFrame(unsigned index) const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "ColorFrame@+ GetColorFrame(uint) const", asMETHODPR(ParticleEffect, GetColorFrame, (unsigned) const, const ColorFrame*), asCALL_THISCALL);
-    // const Vector<ColorFrame>& ParticleEffect::GetColorFrames() const | File: ../Graphics/ParticleEffect.h
-    // Error: type "const Vector<ColorFrame>&" can not automatically bind
-    // const Vector3& ParticleEffect::GetConstantForce() const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "const Vector3& GetConstantForce() const", asMETHODPR(ParticleEffect, GetConstantForce, () const, const Vector3&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "const Vector3& get_constantForce() const", asMETHODPR(ParticleEffect, GetConstantForce, () const, const Vector3&), asCALL_THISCALL);
-    // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
-    // float ParticleEffect::GetDampingForce() const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "float GetDampingForce() const", asMETHODPR(ParticleEffect, GetDampingForce, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "float get_dampingForce() const", asMETHODPR(ParticleEffect, GetDampingForce, () const, float), asCALL_THISCALL);
-    // const Vector3& ParticleEffect::GetEmitterSize() const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "const Vector3& GetEmitterSize() const", asMETHODPR(ParticleEffect, GetEmitterSize, () const, const Vector3&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "const Vector3& get_emitterSize() const", asMETHODPR(ParticleEffect, GetEmitterSize, () const, const Vector3&), asCALL_THISCALL);
-    // EmitterType ParticleEffect::GetEmitterType() const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "EmitterType GetEmitterType() const", asMETHODPR(ParticleEffect, GetEmitterType, () const, EmitterType), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "EmitterType get_emitterType() const", asMETHODPR(ParticleEffect, GetEmitterType, () const, EmitterType), asCALL_THISCALL);
-    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect", "VariantMap& GetEventDataMap() const", asMETHODPR(ParticleEffect, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
-    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // Object* Object::GetEventSender() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect", "Object@+ GetEventSender() const", asMETHODPR(ParticleEffect, GetEventSender, () const, Object*), asCALL_THISCALL);
-    // FaceCameraMode ParticleEffect::GetFaceCameraMode() const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "FaceCameraMode GetFaceCameraMode() const", asMETHODPR(ParticleEffect, GetFaceCameraMode, () const, FaceCameraMode), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "FaceCameraMode get_faceCameraMode() const", asMETHODPR(ParticleEffect, GetFaceCameraMode, () const, FaceCameraMode), asCALL_THISCALL);
-    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(ParticleEffect, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "const Variant& get_globalVar(StringHash) const", asMETHODPR(ParticleEffect, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect", "const VariantMap& GetGlobalVars() const", asMETHODPR(ParticleEffect, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "const VariantMap& get_globalVars() const", asMETHODPR(ParticleEffect, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    // float ParticleEffect::GetInactiveTime() const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "float GetInactiveTime() const", asMETHODPR(ParticleEffect, GetInactiveTime, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "float get_inactiveTime() const", asMETHODPR(ParticleEffect, GetInactiveTime, () const, float), asCALL_THISCALL);
-    // Material* ParticleEffect::GetMaterial() const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "Material@+ GetMaterial() const", asMETHODPR(ParticleEffect, GetMaterial, () const, Material*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "Material@+ get_material() const", asMETHODPR(ParticleEffect, GetMaterial, () const, Material*), asCALL_THISCALL);
-    // const Vector3& ParticleEffect::GetMaxDirection() const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "const Vector3& GetMaxDirection() const", asMETHODPR(ParticleEffect, GetMaxDirection, () const, const Vector3&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "const Vector3& get_maxDirection() const", asMETHODPR(ParticleEffect, GetMaxDirection, () const, const Vector3&), asCALL_THISCALL);
-    // float ParticleEffect::GetMaxEmissionRate() const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "float GetMaxEmissionRate() const", asMETHODPR(ParticleEffect, GetMaxEmissionRate, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "float get_maxEmissionRate() const", asMETHODPR(ParticleEffect, GetMaxEmissionRate, () const, float), asCALL_THISCALL);
-    // const Vector2& ParticleEffect::GetMaxParticleSize() const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "const Vector2& GetMaxParticleSize() const", asMETHODPR(ParticleEffect, GetMaxParticleSize, () const, const Vector2&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "const Vector2& get_maxParticleSize() const", asMETHODPR(ParticleEffect, GetMaxParticleSize, () const, const Vector2&), asCALL_THISCALL);
-    // float ParticleEffect::GetMaxRotation() const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "float GetMaxRotation() const", asMETHODPR(ParticleEffect, GetMaxRotation, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "float get_maxRotation() const", asMETHODPR(ParticleEffect, GetMaxRotation, () const, float), asCALL_THISCALL);
-    // float ParticleEffect::GetMaxRotationSpeed() const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "float GetMaxRotationSpeed() const", asMETHODPR(ParticleEffect, GetMaxRotationSpeed, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "float get_maxRotationSpeed() const", asMETHODPR(ParticleEffect, GetMaxRotationSpeed, () const, float), asCALL_THISCALL);
-    // float ParticleEffect::GetMaxTimeToLive() const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "float GetMaxTimeToLive() const", asMETHODPR(ParticleEffect, GetMaxTimeToLive, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "float get_maxTimeToLive() const", asMETHODPR(ParticleEffect, GetMaxTimeToLive, () const, float), asCALL_THISCALL);
-    // float ParticleEffect::GetMaxVelocity() const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "float GetMaxVelocity() const", asMETHODPR(ParticleEffect, GetMaxVelocity, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "float get_maxVelocity() const", asMETHODPR(ParticleEffect, GetMaxVelocity, () const, float), asCALL_THISCALL);
-    // unsigned Resource::GetMemoryUse() const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("ParticleEffect", "uint GetMemoryUse() const", asMETHODPR(ParticleEffect, GetMemoryUse, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "uint get_memoryUse() const", asMETHODPR(ParticleEffect, GetMemoryUse, () const, unsigned), asCALL_THISCALL);
-    // const Vector3& ParticleEffect::GetMinDirection() const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "const Vector3& GetMinDirection() const", asMETHODPR(ParticleEffect, GetMinDirection, () const, const Vector3&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "const Vector3& get_minDirection() const", asMETHODPR(ParticleEffect, GetMinDirection, () const, const Vector3&), asCALL_THISCALL);
-    // float ParticleEffect::GetMinEmissionRate() const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "float GetMinEmissionRate() const", asMETHODPR(ParticleEffect, GetMinEmissionRate, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "float get_minEmissionRate() const", asMETHODPR(ParticleEffect, GetMinEmissionRate, () const, float), asCALL_THISCALL);
-    // const Vector2& ParticleEffect::GetMinParticleSize() const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "const Vector2& GetMinParticleSize() const", asMETHODPR(ParticleEffect, GetMinParticleSize, () const, const Vector2&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "const Vector2& get_minParticleSize() const", asMETHODPR(ParticleEffect, GetMinParticleSize, () const, const Vector2&), asCALL_THISCALL);
-    // float ParticleEffect::GetMinRotation() const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "float GetMinRotation() const", asMETHODPR(ParticleEffect, GetMinRotation, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "float get_minRotation() const", asMETHODPR(ParticleEffect, GetMinRotation, () const, float), asCALL_THISCALL);
-    // float ParticleEffect::GetMinRotationSpeed() const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "float GetMinRotationSpeed() const", asMETHODPR(ParticleEffect, GetMinRotationSpeed, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "float get_minRotationSpeed() const", asMETHODPR(ParticleEffect, GetMinRotationSpeed, () const, float), asCALL_THISCALL);
-    // float ParticleEffect::GetMinTimeToLive() const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "float GetMinTimeToLive() const", asMETHODPR(ParticleEffect, GetMinTimeToLive, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "float get_minTimeToLive() const", asMETHODPR(ParticleEffect, GetMinTimeToLive, () const, float), asCALL_THISCALL);
-    // float ParticleEffect::GetMinVelocity() const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "float GetMinVelocity() const", asMETHODPR(ParticleEffect, GetMinVelocity, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "float get_minVelocity() const", asMETHODPR(ParticleEffect, GetMinVelocity, () const, float), asCALL_THISCALL);
-    // const String& Resource::GetName() const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("ParticleEffect", "const String& GetName() const", asMETHODPR(ParticleEffect, GetName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "const String& get_name() const", asMETHODPR(ParticleEffect, GetName, () const, const String&), asCALL_THISCALL);
-    // StringHash Resource::GetNameHash() const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("ParticleEffect", "StringHash GetNameHash() const", asMETHODPR(ParticleEffect, GetNameHash, () const, StringHash), asCALL_THISCALL);
-    // unsigned ParticleEffect::GetNumColorFrames() const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "uint GetNumColorFrames() const", asMETHODPR(ParticleEffect, GetNumColorFrames, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "uint get_numColorFrames() const", asMETHODPR(ParticleEffect, GetNumColorFrames, () const, unsigned), asCALL_THISCALL);
-    // unsigned ParticleEffect::GetNumParticles() const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "uint GetNumParticles() const", asMETHODPR(ParticleEffect, GetNumParticles, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "uint get_numParticles() const", asMETHODPR(ParticleEffect, GetNumParticles, () const, unsigned), asCALL_THISCALL);
-    // unsigned ParticleEffect::GetNumTextureFrames() const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "uint GetNumTextureFrames() const", asMETHODPR(ParticleEffect, GetNumTextureFrames, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "uint get_numTextureFrames() const", asMETHODPR(ParticleEffect, GetNumTextureFrames, () const, unsigned), asCALL_THISCALL);
-    // Vector3 ParticleEffect::GetRandomDirection() const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "Vector3 GetRandomDirection() const", asMETHODPR(ParticleEffect, GetRandomDirection, () const, Vector3), asCALL_THISCALL);
-    // float ParticleEffect::GetRandomRotation() const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "float GetRandomRotation() const", asMETHODPR(ParticleEffect, GetRandomRotation, () const, float), asCALL_THISCALL);
-    // float ParticleEffect::GetRandomRotationSpeed() const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "float GetRandomRotationSpeed() const", asMETHODPR(ParticleEffect, GetRandomRotationSpeed, () const, float), asCALL_THISCALL);
-    // Vector2 ParticleEffect::GetRandomSize() const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "Vector2 GetRandomSize() const", asMETHODPR(ParticleEffect, GetRandomSize, () const, Vector2), asCALL_THISCALL);
-    // float ParticleEffect::GetRandomTimeToLive() const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "float GetRandomTimeToLive() const", asMETHODPR(ParticleEffect, GetRandomTimeToLive, () const, float), asCALL_THISCALL);
-    // float ParticleEffect::GetRandomVelocity() const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "float GetRandomVelocity() const", asMETHODPR(ParticleEffect, GetRandomVelocity, () const, float), asCALL_THISCALL);
-    // float ParticleEffect::GetSizeAdd() const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "float GetSizeAdd() const", asMETHODPR(ParticleEffect, GetSizeAdd, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "float get_sizeAdd() const", asMETHODPR(ParticleEffect, GetSizeAdd, () const, float), asCALL_THISCALL);
-    // float ParticleEffect::GetSizeMul() const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "float GetSizeMul() const", asMETHODPR(ParticleEffect, GetSizeMul, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "float get_sizeMul() const", asMETHODPR(ParticleEffect, GetSizeMul, () const, float), asCALL_THISCALL);
-    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(ParticleEffect, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
-    // Not registered because template
-    // const TextureFrame* ParticleEffect::GetTextureFrame(unsigned index) const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "TextureFrame@+ GetTextureFrame(uint) const", asMETHODPR(ParticleEffect, GetTextureFrame, (unsigned) const, const TextureFrame*), asCALL_THISCALL);
-    // const Vector<TextureFrame>& ParticleEffect::GetTextureFrames() const | File: ../Graphics/ParticleEffect.h
-    // Error: type "const Vector<TextureFrame>&" can not automatically bind
-    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect", "StringHash GetType() const", asMETHODPR(ParticleEffect, GetType, () const, StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "StringHash get_type() const", asMETHODPR(ParticleEffect, GetType, () const, StringHash), asCALL_THISCALL);
-    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect", "const String& GetTypeName() const", asMETHODPR(ParticleEffect, GetTypeName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "const String& get_typeName() const", asMETHODPR(ParticleEffect, GetTypeName, () const, const String&), asCALL_THISCALL);
-    // bool ParticleEffect::GetUpdateInvisible() const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "bool GetUpdateInvisible() const", asMETHODPR(ParticleEffect, GetUpdateInvisible, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "bool get_updateInvisible() const", asMETHODPR(ParticleEffect, GetUpdateInvisible, () const, bool), asCALL_THISCALL);
-    // unsigned Resource::GetUseTimer() | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("ParticleEffect", "uint GetUseTimer()", asMETHODPR(ParticleEffect, GetUseTimer, (), unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "uint get_useTimer()", asMETHODPR(ParticleEffect, GetUseTimer, (), unsigned), asCALL_THISCALL);
-    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect", "bool HasEventHandlers() const", asMETHODPR(ParticleEffect, HasEventHandlers, () const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(ParticleEffect, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(ParticleEffect, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
-    // bool ParticleEffect::IsFixedScreenSize() const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "bool IsFixedScreenSize() const", asMETHODPR(ParticleEffect, IsFixedScreenSize, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "bool get_fixedScreenSize() const", asMETHODPR(ParticleEffect, IsFixedScreenSize, () const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect", "bool IsInstanceOf(StringHash) const", asMETHODPR(ParticleEffect, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
-    // Not registered because template
-    // bool ParticleEffect::IsRelative() const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "bool IsRelative() const", asMETHODPR(ParticleEffect, IsRelative, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "bool get_relative() const", asMETHODPR(ParticleEffect, IsRelative, () const, bool), asCALL_THISCALL);
-    // bool ParticleEffect::IsScaled() const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "bool IsScaled() const", asMETHODPR(ParticleEffect, IsScaled, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "bool get_scaled() const", asMETHODPR(ParticleEffect, IsScaled, () const, bool), asCALL_THISCALL);
-    // bool ParticleEffect::IsSorted() const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "bool IsSorted() const", asMETHODPR(ParticleEffect, IsSorted, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "bool get_sorted() const", asMETHODPR(ParticleEffect, IsSorted, () const, bool), asCALL_THISCALL);
-    // bool ParticleEffect::Load(const XMLElement& source) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "bool Load(const XMLElement&in)", asMETHODPR(ParticleEffect, Load, (const XMLElement&), bool), asCALL_THISCALL);
-    // bool Resource::LoadFile(const String& fileName) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("ParticleEffect", "bool LoadFile(const String&in)", asMETHODPR(ParticleEffect, LoadFile, (const String&), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "bool Load(const String&in)", asMETHODPR(ParticleEffect, LoadFile, (const String&), bool), asCALL_THISCALL);
-    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(ParticleEffect, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
-    // explicit ParticleEffect::ParticleEffect(Context* context) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectBehaviour("ParticleEffect", asBEHAVE_FACTORY, "ParticleEffect@+ f()", asFUNCTION(ParticleEffect_ParticleEffect_Context), asCALL_CDECL);
-    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
-    // Error: type "RefCount*" can not automatically bind
-    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("ParticleEffect", "int Refs() const", asMETHODPR(ParticleEffect, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "int get_refs() const", asMETHODPR(ParticleEffect, Refs, () const, int), asCALL_THISCALL);
-    // static void ParticleEffect::RegisterObject(Context* context) | File: ../Graphics/ParticleEffect.h
-    // Context can be used as firs parameter of constructors only
-    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("ParticleEffect", asBEHAVE_RELEASE, "void f()", asMETHODPR(ParticleEffect, ReleaseRef, (), void), asCALL_THISCALL);
-    // void ParticleEffect::RemoveColorFrame(unsigned index) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void RemoveColorFrame(uint)", asMETHODPR(ParticleEffect, RemoveColorFrame, (unsigned), void), asCALL_THISCALL);
-    // void ParticleEffect::RemoveTextureFrame(unsigned index) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void RemoveTextureFrame(uint)", asMETHODPR(ParticleEffect, RemoveTextureFrame, (unsigned), void), asCALL_THISCALL);
-    // void Resource::ResetUseTimer() | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("ParticleEffect", "void ResetUseTimer()", asMETHODPR(ParticleEffect, ResetUseTimer, (), void), asCALL_THISCALL);
-    // bool ParticleEffect::Save(Serializer& dest) const override | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "bool Save(Serializer&) const", asMETHODPR(ParticleEffect, Save, (Serializer&) const, bool), asCALL_THISCALL);
-    // bool ParticleEffect::Save(XMLElement& dest) const | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "bool Save(XMLElement&) const", asMETHODPR(ParticleEffect, Save, (XMLElement&) const, bool), asCALL_THISCALL);
-    // virtual bool Resource::SaveFile(const String& fileName) const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("ParticleEffect", "bool SaveFile(const String&in) const", asMETHODPR(ParticleEffect, SaveFile, (const String&) const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "bool Save(const String&in) const", asMETHODPR(ParticleEffect, SaveFile, (const String&) const, bool), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SendEvent(StringHash)", asMETHODPR(ParticleEffect, SendEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(ParticleEffect, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
-    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
-    // Not registered because template
-    // void ParticleEffect::SetActiveTime(float time) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SetActiveTime(float)", asMETHODPR(ParticleEffect, SetActiveTime, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "void set_activeTime(float)", asMETHODPR(ParticleEffect, SetActiveTime, (float), void), asCALL_THISCALL);
-    // void ParticleEffect::SetAnimationLodBias(float lodBias) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SetAnimationLodBias(float)", asMETHODPR(ParticleEffect, SetAnimationLodBias, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "void set_animationLodBias(float)", asMETHODPR(ParticleEffect, SetAnimationLodBias, (float), void), asCALL_THISCALL);
-    // void Resource::SetAsyncLoadState(AsyncLoadState newState) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SetAsyncLoadState(AsyncLoadState)", asMETHODPR(ParticleEffect, SetAsyncLoadState, (AsyncLoadState), void), asCALL_THISCALL);
-    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SetBlockEvents(bool)", asMETHODPR(ParticleEffect, SetBlockEvents, (bool), void), asCALL_THISCALL);
-    // void ParticleEffect::SetColorFrame(unsigned index, const ColorFrame& colorFrame) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SetColorFrame(uint, const ColorFrame&in)", asMETHODPR(ParticleEffect, SetColorFrame, (unsigned, const ColorFrame&), void), asCALL_THISCALL);
-    // void ParticleEffect::SetColorFrames(const Vector<ColorFrame>& colorFrames) | File: ../Graphics/ParticleEffect.h
-    // Error: type "const Vector<ColorFrame>&" can not automatically bind
-    // void ParticleEffect::SetConstantForce(const Vector3& force) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SetConstantForce(const Vector3&in)", asMETHODPR(ParticleEffect, SetConstantForce, (const Vector3&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "void set_constantForce(const Vector3&in)", asMETHODPR(ParticleEffect, SetConstantForce, (const Vector3&), void), asCALL_THISCALL);
-    // void ParticleEffect::SetDampingForce(float force) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SetDampingForce(float)", asMETHODPR(ParticleEffect, SetDampingForce, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "void set_dampingForce(float)", asMETHODPR(ParticleEffect, SetDampingForce, (float), void), asCALL_THISCALL);
-    // void ParticleEffect::SetEmitterSize(const Vector3& size) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SetEmitterSize(const Vector3&in)", asMETHODPR(ParticleEffect, SetEmitterSize, (const Vector3&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "void set_emitterSize(const Vector3&in)", asMETHODPR(ParticleEffect, SetEmitterSize, (const Vector3&), void), asCALL_THISCALL);
-    // void ParticleEffect::SetEmitterType(EmitterType type) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SetEmitterType(EmitterType)", asMETHODPR(ParticleEffect, SetEmitterType, (EmitterType), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "void set_emitterType(EmitterType)", asMETHODPR(ParticleEffect, SetEmitterType, (EmitterType), void), asCALL_THISCALL);
-    // void ParticleEffect::SetFaceCameraMode(FaceCameraMode mode) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SetFaceCameraMode(FaceCameraMode)", asMETHODPR(ParticleEffect, SetFaceCameraMode, (FaceCameraMode), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "void set_faceCameraMode(FaceCameraMode)", asMETHODPR(ParticleEffect, SetFaceCameraMode, (FaceCameraMode), void), asCALL_THISCALL);
-    // void ParticleEffect::SetFixedScreenSize(bool enable) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SetFixedScreenSize(bool)", asMETHODPR(ParticleEffect, SetFixedScreenSize, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "void set_fixedScreenSize(bool)", asMETHODPR(ParticleEffect, SetFixedScreenSize, (bool), void), asCALL_THISCALL);
-    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(ParticleEffect, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(ParticleEffect, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    // void ParticleEffect::SetInactiveTime(float time) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SetInactiveTime(float)", asMETHODPR(ParticleEffect, SetInactiveTime, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "void set_inactiveTime(float)", asMETHODPR(ParticleEffect, SetInactiveTime, (float), void), asCALL_THISCALL);
-    // void ParticleEffect::SetMaterial(Material* material) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SetMaterial(Material@+)", asMETHODPR(ParticleEffect, SetMaterial, (Material*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "void set_material(Material@+)", asMETHODPR(ParticleEffect, SetMaterial, (Material*), void), asCALL_THISCALL);
-    // void ParticleEffect::SetMaxDirection(const Vector3& direction) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SetMaxDirection(const Vector3&in)", asMETHODPR(ParticleEffect, SetMaxDirection, (const Vector3&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "void set_maxDirection(const Vector3&in)", asMETHODPR(ParticleEffect, SetMaxDirection, (const Vector3&), void), asCALL_THISCALL);
-    // void ParticleEffect::SetMaxEmissionRate(float rate) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SetMaxEmissionRate(float)", asMETHODPR(ParticleEffect, SetMaxEmissionRate, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "void set_maxEmissionRate(float)", asMETHODPR(ParticleEffect, SetMaxEmissionRate, (float), void), asCALL_THISCALL);
-    // void ParticleEffect::SetMaxParticleSize(const Vector2& size) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SetMaxParticleSize(const Vector2&in)", asMETHODPR(ParticleEffect, SetMaxParticleSize, (const Vector2&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "void set_maxParticleSize(const Vector2&in)", asMETHODPR(ParticleEffect, SetMaxParticleSize, (const Vector2&), void), asCALL_THISCALL);
-    // void ParticleEffect::SetMaxRotation(float rotation) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SetMaxRotation(float)", asMETHODPR(ParticleEffect, SetMaxRotation, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "void set_maxRotation(float)", asMETHODPR(ParticleEffect, SetMaxRotation, (float), void), asCALL_THISCALL);
-    // void ParticleEffect::SetMaxRotationSpeed(float speed) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SetMaxRotationSpeed(float)", asMETHODPR(ParticleEffect, SetMaxRotationSpeed, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "void set_maxRotationSpeed(float)", asMETHODPR(ParticleEffect, SetMaxRotationSpeed, (float), void), asCALL_THISCALL);
-    // void ParticleEffect::SetMaxTimeToLive(float time) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SetMaxTimeToLive(float)", asMETHODPR(ParticleEffect, SetMaxTimeToLive, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "void set_maxTimeToLive(float)", asMETHODPR(ParticleEffect, SetMaxTimeToLive, (float), void), asCALL_THISCALL);
-    // void ParticleEffect::SetMaxVelocity(float velocity) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SetMaxVelocity(float)", asMETHODPR(ParticleEffect, SetMaxVelocity, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "void set_maxVelocity(float)", asMETHODPR(ParticleEffect, SetMaxVelocity, (float), void), asCALL_THISCALL);
-    // void Resource::SetMemoryUse(unsigned size) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SetMemoryUse(uint)", asMETHODPR(ParticleEffect, SetMemoryUse, (unsigned), void), asCALL_THISCALL);
-    // void ParticleEffect::SetMinDirection(const Vector3& direction) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SetMinDirection(const Vector3&in)", asMETHODPR(ParticleEffect, SetMinDirection, (const Vector3&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "void set_minDirection(const Vector3&in)", asMETHODPR(ParticleEffect, SetMinDirection, (const Vector3&), void), asCALL_THISCALL);
-    // void ParticleEffect::SetMinEmissionRate(float rate) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SetMinEmissionRate(float)", asMETHODPR(ParticleEffect, SetMinEmissionRate, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "void set_minEmissionRate(float)", asMETHODPR(ParticleEffect, SetMinEmissionRate, (float), void), asCALL_THISCALL);
-    // void ParticleEffect::SetMinParticleSize(const Vector2& size) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SetMinParticleSize(const Vector2&in)", asMETHODPR(ParticleEffect, SetMinParticleSize, (const Vector2&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "void set_minParticleSize(const Vector2&in)", asMETHODPR(ParticleEffect, SetMinParticleSize, (const Vector2&), void), asCALL_THISCALL);
-    // void ParticleEffect::SetMinRotation(float rotation) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SetMinRotation(float)", asMETHODPR(ParticleEffect, SetMinRotation, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "void set_minRotation(float)", asMETHODPR(ParticleEffect, SetMinRotation, (float), void), asCALL_THISCALL);
-    // void ParticleEffect::SetMinRotationSpeed(float speed) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SetMinRotationSpeed(float)", asMETHODPR(ParticleEffect, SetMinRotationSpeed, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "void set_minRotationSpeed(float)", asMETHODPR(ParticleEffect, SetMinRotationSpeed, (float), void), asCALL_THISCALL);
-    // void ParticleEffect::SetMinTimeToLive(float time) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SetMinTimeToLive(float)", asMETHODPR(ParticleEffect, SetMinTimeToLive, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "void set_minTimeToLive(float)", asMETHODPR(ParticleEffect, SetMinTimeToLive, (float), void), asCALL_THISCALL);
-    // void ParticleEffect::SetMinVelocity(float velocity) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SetMinVelocity(float)", asMETHODPR(ParticleEffect, SetMinVelocity, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "void set_minVelocity(float)", asMETHODPR(ParticleEffect, SetMinVelocity, (float), void), asCALL_THISCALL);
-    // void Resource::SetName(const String& name) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SetName(const String&in)", asMETHODPR(ParticleEffect, SetName, (const String&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "void set_name(const String&in)", asMETHODPR(ParticleEffect, SetName, (const String&), void), asCALL_THISCALL);
-    // void ParticleEffect::SetNumColorFrames(unsigned number) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SetNumColorFrames(uint)", asMETHODPR(ParticleEffect, SetNumColorFrames, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "void set_numColorFrames(uint)", asMETHODPR(ParticleEffect, SetNumColorFrames, (unsigned), void), asCALL_THISCALL);
-    // void ParticleEffect::SetNumParticles(unsigned num) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SetNumParticles(uint)", asMETHODPR(ParticleEffect, SetNumParticles, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "void set_numParticles(uint)", asMETHODPR(ParticleEffect, SetNumParticles, (unsigned), void), asCALL_THISCALL);
-    // void ParticleEffect::SetNumTextureFrames(unsigned number) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SetNumTextureFrames(uint)", asMETHODPR(ParticleEffect, SetNumTextureFrames, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "void set_numTextureFrames(uint)", asMETHODPR(ParticleEffect, SetNumTextureFrames, (unsigned), void), asCALL_THISCALL);
-    // void ParticleEffect::SetRelative(bool enable) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SetRelative(bool)", asMETHODPR(ParticleEffect, SetRelative, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "void set_relative(bool)", asMETHODPR(ParticleEffect, SetRelative, (bool), void), asCALL_THISCALL);
-    // void ParticleEffect::SetScaled(bool enable) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SetScaled(bool)", asMETHODPR(ParticleEffect, SetScaled, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "void set_scaled(bool)", asMETHODPR(ParticleEffect, SetScaled, (bool), void), asCALL_THISCALL);
-    // void ParticleEffect::SetSizeAdd(float sizeAdd) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SetSizeAdd(float)", asMETHODPR(ParticleEffect, SetSizeAdd, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "void set_sizeAdd(float)", asMETHODPR(ParticleEffect, SetSizeAdd, (float), void), asCALL_THISCALL);
-    // void ParticleEffect::SetSizeMul(float sizeMul) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SetSizeMul(float)", asMETHODPR(ParticleEffect, SetSizeMul, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "void set_sizeMul(float)", asMETHODPR(ParticleEffect, SetSizeMul, (float), void), asCALL_THISCALL);
-    // void ParticleEffect::SetSorted(bool enable) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SetSorted(bool)", asMETHODPR(ParticleEffect, SetSorted, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "void set_sorted(bool)", asMETHODPR(ParticleEffect, SetSorted, (bool), void), asCALL_THISCALL);
-    // void ParticleEffect::SetTextureFrame(unsigned index, const TextureFrame& textureFrame) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SetTextureFrame(uint, const TextureFrame&in)", asMETHODPR(ParticleEffect, SetTextureFrame, (unsigned, const TextureFrame&), void), asCALL_THISCALL);
-    // void ParticleEffect::SetTextureFrames(const Vector<TextureFrame>& textureFrames) | File: ../Graphics/ParticleEffect.h
-    // Error: type "const Vector<TextureFrame>&" can not automatically bind
-    // void ParticleEffect::SetUpdateInvisible(bool enable) | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SetUpdateInvisible(bool)", asMETHODPR(ParticleEffect, SetUpdateInvisible, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "void set_updateInvisible(bool)", asMETHODPR(ParticleEffect, SetUpdateInvisible, (bool), void), asCALL_THISCALL);
-    // void ParticleEffect::SortColorFrames() | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SortColorFrames()", asMETHODPR(ParticleEffect, SortColorFrames, (), void), asCALL_THISCALL);
-    // void ParticleEffect::SortTextureFrames() | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectMethod("ParticleEffect", "void SortTextureFrames()", asMETHODPR(ParticleEffect, SortTextureFrames, (), void), asCALL_THISCALL);
-    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect", "void UnsubscribeFromAllEvents()", asMETHODPR(ParticleEffect, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(ParticleEffect_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
-    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(ParticleEffect, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(ParticleEffect, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ParticleEffect", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(ParticleEffect, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
-    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("ParticleEffect", "int WeakRefs() const", asMETHODPR(ParticleEffect, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "int get_weakRefs() const", asMETHODPR(ParticleEffect, WeakRefs, () const, int), asCALL_THISCALL);
-#ifdef REGISTER_MANUAL_PART_Resource
-    REGISTER_MANUAL_PART_Resource(ParticleEffect, "ParticleEffect")
-#endif
-#ifdef REGISTER_MANUAL_PART_Object
-    REGISTER_MANUAL_PART_Object(ParticleEffect, "ParticleEffect")
-#endif
-#ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(ParticleEffect, "ParticleEffect")
-#endif
-#ifdef REGISTER_MANUAL_PART_ParticleEffect
-    REGISTER_MANUAL_PART_ParticleEffect(ParticleEffect, "ParticleEffect")
-#endif
-    RegisterSubclass<Resource, ParticleEffect>(engine, "Resource", "ParticleEffect");
-    RegisterSubclass<Object, ParticleEffect>(engine, "Object", "ParticleEffect");
-    RegisterSubclass<RefCounted, ParticleEffect>(engine, "RefCounted", "ParticleEffect");
 
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("Pass", asBEHAVE_ADDREF, "void f()", asMETHODPR(Pass, AddRef, (), void), asCALL_THISCALL);
@@ -3324,6 +3312,128 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     REGISTER_MANUAL_PART_Polyhedron(Polyhedron, "Polyhedron")
 #endif
 
+    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("Profiler", asBEHAVE_ADDREF, "void f()", asMETHODPR(Profiler, AddRef, (), void), asCALL_THISCALL);
+    // void Profiler::BeginBlock(const char* name) | File: ../Core/Profiler.h
+    // Error: type "const char*" can not automatically bind
+    // void Profiler::BeginFrame() | File: ../Core/Profiler.h
+    engine->RegisterObjectMethod("Profiler", "void BeginFrame()", asMETHODPR(Profiler, BeginFrame, (), void), asCALL_THISCALL);
+    // void Profiler::BeginInterval() | File: ../Core/Profiler.h
+    engine->RegisterObjectMethod("Profiler", "void BeginInterval()", asMETHODPR(Profiler, BeginInterval, (), void), asCALL_THISCALL);
+    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
+    // Not registered because template
+    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
+    // Not registered because template
+    // void Profiler::EndBlock() | File: ../Core/Profiler.h
+    engine->RegisterObjectMethod("Profiler", "void EndBlock()", asMETHODPR(Profiler, EndBlock, (), void), asCALL_THISCALL);
+    // void Profiler::EndFrame() | File: ../Core/Profiler.h
+    engine->RegisterObjectMethod("Profiler", "void EndFrame()", asMETHODPR(Profiler, EndFrame, (), void), asCALL_THISCALL);
+    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Profiler", "bool GetBlockEvents() const", asMETHODPR(Profiler, GetBlockEvents, () const, bool), asCALL_THISCALL);
+    // const String& Object::GetCategory() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Profiler", "const String& GetCategory() const", asMETHODPR(Profiler, GetCategory, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Profiler", "const String& get_category() const", asMETHODPR(Profiler, GetCategory, () const, const String&), asCALL_THISCALL);
+    // Context* Object::GetContext() const | File: ../Core/Object.h
+    // Error: type "Context*" can not be returned
+    // const ProfilerBlock* Profiler::GetCurrentBlock() | File: ../Core/Profiler.h
+    // Error: type "ProfilerBlock" can not automatically bind bacause have @nobind mark
+    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Profiler", "VariantMap& GetEventDataMap() const", asMETHODPR(Profiler, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
+    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // Object* Object::GetEventSender() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Profiler", "Object@+ GetEventSender() const", asMETHODPR(Profiler, GetEventSender, () const, Object*), asCALL_THISCALL);
+    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Profiler", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(Profiler, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Profiler", "const Variant& get_globalVar(StringHash) const", asMETHODPR(Profiler, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Profiler", "const VariantMap& GetGlobalVars() const", asMETHODPR(Profiler, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Profiler", "const VariantMap& get_globalVars() const", asMETHODPR(Profiler, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    // const ProfilerBlock* Profiler::GetRootBlock() | File: ../Core/Profiler.h
+    // Error: type "ProfilerBlock" can not automatically bind bacause have @nobind mark
+    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Profiler", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Profiler, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
+    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // Not registered because template
+    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Profiler", "StringHash GetType() const", asMETHODPR(Profiler, GetType, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Profiler", "StringHash get_type() const", asMETHODPR(Profiler, GetType, () const, StringHash), asCALL_THISCALL);
+    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Profiler", "const String& GetTypeName() const", asMETHODPR(Profiler, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Profiler", "const String& get_typeName() const", asMETHODPR(Profiler, GetTypeName, () const, const String&), asCALL_THISCALL);
+    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Profiler", "bool HasEventHandlers() const", asMETHODPR(Profiler, HasEventHandlers, () const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Profiler", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(Profiler, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Profiler", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(Profiler, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Profiler", "bool IsInstanceOf(StringHash) const", asMETHODPR(Profiler, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
+    // Not registered because template
+    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Profiler", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(Profiler, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
+    // const String& Profiler::PrintData(bool showUnused=false, bool showTotal=false, unsigned maxDepth=M_MAX_UNSIGNED) const | File: ../Core/Profiler.h
+    engine->RegisterObjectMethod("Profiler", "const String& PrintData(bool = false, bool = false, uint = M_MAX_UNSIGNED) const", asMETHODPR(Profiler, PrintData, (bool, bool, unsigned) const, const String&), asCALL_THISCALL);
+    // explicit Profiler::Profiler(Context* context) | File: ../Core/Profiler.h
+    engine->RegisterObjectBehaviour("Profiler", asBEHAVE_FACTORY, "Profiler@+ f()", asFUNCTION(Profiler_Profiler_Context), asCALL_CDECL);
+    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
+    // Error: type "RefCount*" can not automatically bind
+    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("Profiler", "int Refs() const", asMETHODPR(Profiler, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Profiler", "int get_refs() const", asMETHODPR(Profiler, Refs, () const, int), asCALL_THISCALL);
+    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("Profiler", asBEHAVE_RELEASE, "void f()", asMETHODPR(Profiler, ReleaseRef, (), void), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Profiler", "void SendEvent(StringHash)", asMETHODPR(Profiler, SendEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Profiler", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(Profiler, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
+    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
+    // Not registered because template
+    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Profiler", "void SetBlockEvents(bool)", asMETHODPR(Profiler, SetBlockEvents, (bool), void), asCALL_THISCALL);
+    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Profiler", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(Profiler, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Profiler", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(Profiler, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Profiler", "void UnsubscribeFromAllEvents()", asMETHODPR(Profiler, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Profiler", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(Profiler_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
+    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Profiler", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(Profiler, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Profiler", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(Profiler, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Profiler", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(Profiler, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
+    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("Profiler", "int WeakRefs() const", asMETHODPR(Profiler, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Profiler", "int get_weakRefs() const", asMETHODPR(Profiler, WeakRefs, () const, int), asCALL_THISCALL);
+#ifdef REGISTER_MANUAL_PART_Object
+    REGISTER_MANUAL_PART_Object(Profiler, "Profiler")
+#endif
+#ifdef REGISTER_MANUAL_PART_RefCounted
+    REGISTER_MANUAL_PART_RefCounted(Profiler, "Profiler")
+#endif
+#ifdef REGISTER_MANUAL_PART_Profiler
+    REGISTER_MANUAL_PART_Profiler(Profiler, "Profiler")
+#endif
+    RegisterSubclass<Object, Profiler>(engine, "Object", "Profiler");
+    RegisterSubclass<RefCounted, Profiler>(engine, "RefCounted", "Profiler");
+
     // void UIElement::AddChild(UIElement* element) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("ProgressBar", "void AddChild(UIElement@+)", asMETHODPR(ProgressBar, AddChild, (UIElement*), void), asCALL_THISCALL);
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
@@ -4193,128 +4303,6 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     RegisterSubclass<Object, ProgressBar>(engine, "Object", "ProgressBar");
     RegisterSubclass<RefCounted, ProgressBar>(engine, "RefCounted", "ProgressBar");
 
-    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("Profiler", asBEHAVE_ADDREF, "void f()", asMETHODPR(Profiler, AddRef, (), void), asCALL_THISCALL);
-    // void Profiler::BeginBlock(const char* name) | File: ../Core/Profiler.h
-    // Error: type "const char*" can not automatically bind
-    // void Profiler::BeginFrame() | File: ../Core/Profiler.h
-    engine->RegisterObjectMethod("Profiler", "void BeginFrame()", asMETHODPR(Profiler, BeginFrame, (), void), asCALL_THISCALL);
-    // void Profiler::BeginInterval() | File: ../Core/Profiler.h
-    engine->RegisterObjectMethod("Profiler", "void BeginInterval()", asMETHODPR(Profiler, BeginInterval, (), void), asCALL_THISCALL);
-    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
-    // Not registered because template
-    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
-    // Not registered because template
-    // void Profiler::EndBlock() | File: ../Core/Profiler.h
-    engine->RegisterObjectMethod("Profiler", "void EndBlock()", asMETHODPR(Profiler, EndBlock, (), void), asCALL_THISCALL);
-    // void Profiler::EndFrame() | File: ../Core/Profiler.h
-    engine->RegisterObjectMethod("Profiler", "void EndFrame()", asMETHODPR(Profiler, EndFrame, (), void), asCALL_THISCALL);
-    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Profiler", "bool GetBlockEvents() const", asMETHODPR(Profiler, GetBlockEvents, () const, bool), asCALL_THISCALL);
-    // const String& Object::GetCategory() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Profiler", "const String& GetCategory() const", asMETHODPR(Profiler, GetCategory, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Profiler", "const String& get_category() const", asMETHODPR(Profiler, GetCategory, () const, const String&), asCALL_THISCALL);
-    // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
-    // const ProfilerBlock* Profiler::GetCurrentBlock() | File: ../Core/Profiler.h
-    // Error: type "ProfilerBlock" can not automatically bind bacause have @nobind mark
-    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Profiler", "VariantMap& GetEventDataMap() const", asMETHODPR(Profiler, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
-    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // Object* Object::GetEventSender() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Profiler", "Object@+ GetEventSender() const", asMETHODPR(Profiler, GetEventSender, () const, Object*), asCALL_THISCALL);
-    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Profiler", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(Profiler, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Profiler", "const Variant& get_globalVar(StringHash) const", asMETHODPR(Profiler, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Profiler", "const VariantMap& GetGlobalVars() const", asMETHODPR(Profiler, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Profiler", "const VariantMap& get_globalVars() const", asMETHODPR(Profiler, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    // const ProfilerBlock* Profiler::GetRootBlock() | File: ../Core/Profiler.h
-    // Error: type "ProfilerBlock" can not automatically bind bacause have @nobind mark
-    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Profiler", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Profiler, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
-    // Not registered because template
-    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Profiler", "StringHash GetType() const", asMETHODPR(Profiler, GetType, () const, StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Profiler", "StringHash get_type() const", asMETHODPR(Profiler, GetType, () const, StringHash), asCALL_THISCALL);
-    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Profiler", "const String& GetTypeName() const", asMETHODPR(Profiler, GetTypeName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Profiler", "const String& get_typeName() const", asMETHODPR(Profiler, GetTypeName, () const, const String&), asCALL_THISCALL);
-    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Profiler", "bool HasEventHandlers() const", asMETHODPR(Profiler, HasEventHandlers, () const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Profiler", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(Profiler, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Profiler", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(Profiler, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Profiler", "bool IsInstanceOf(StringHash) const", asMETHODPR(Profiler, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
-    // Not registered because template
-    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Profiler", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(Profiler, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
-    // const String& Profiler::PrintData(bool showUnused=false, bool showTotal=false, unsigned maxDepth=M_MAX_UNSIGNED) const | File: ../Core/Profiler.h
-    engine->RegisterObjectMethod("Profiler", "const String& PrintData(bool = false, bool = false, uint = M_MAX_UNSIGNED) const", asMETHODPR(Profiler, PrintData, (bool, bool, unsigned) const, const String&), asCALL_THISCALL);
-    // explicit Profiler::Profiler(Context* context) | File: ../Core/Profiler.h
-    engine->RegisterObjectBehaviour("Profiler", asBEHAVE_FACTORY, "Profiler@+ f()", asFUNCTION(Profiler_Profiler_Context), asCALL_CDECL);
-    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
-    // Error: type "RefCount*" can not automatically bind
-    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("Profiler", "int Refs() const", asMETHODPR(Profiler, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Profiler", "int get_refs() const", asMETHODPR(Profiler, Refs, () const, int), asCALL_THISCALL);
-    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("Profiler", asBEHAVE_RELEASE, "void f()", asMETHODPR(Profiler, ReleaseRef, (), void), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Profiler", "void SendEvent(StringHash)", asMETHODPR(Profiler, SendEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Profiler", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(Profiler, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
-    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
-    // Not registered because template
-    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Profiler", "void SetBlockEvents(bool)", asMETHODPR(Profiler, SetBlockEvents, (bool), void), asCALL_THISCALL);
-    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Profiler", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(Profiler, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Profiler", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(Profiler, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Profiler", "void UnsubscribeFromAllEvents()", asMETHODPR(Profiler, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Profiler", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(Profiler_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
-    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Profiler", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(Profiler, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Profiler", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(Profiler, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Profiler", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(Profiler, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
-    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("Profiler", "int WeakRefs() const", asMETHODPR(Profiler, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Profiler", "int get_weakRefs() const", asMETHODPR(Profiler, WeakRefs, () const, int), asCALL_THISCALL);
-#ifdef REGISTER_MANUAL_PART_Object
-    REGISTER_MANUAL_PART_Object(Profiler, "Profiler")
-#endif
-#ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(Profiler, "Profiler")
-#endif
-#ifdef REGISTER_MANUAL_PART_Profiler
-    REGISTER_MANUAL_PART_Profiler(Profiler, "Profiler")
-#endif
-    RegisterSubclass<Object, Profiler>(engine, "Object", "Profiler");
-    RegisterSubclass<RefCounted, Profiler>(engine, "RefCounted", "Profiler");
-
 #ifdef URHO3D_URHO2D
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("PropertySet2D", asBEHAVE_ADDREF, "void f()", asMETHODPR(PropertySet2D, AddRef, (), void), asCALL_THISCALL);
@@ -4343,22 +4331,6 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     REGISTER_MANUAL_PART_PropertySet2D(PropertySet2D, "PropertySet2D")
 #endif
     RegisterSubclass<RefCounted, PropertySet2D>(engine, "RefCounted", "PropertySet2D");
-#endif
-
-    // PODVector<Drawable*> PerThreadSceneResult::geometries_ | File: ../Graphics/View.h
-    // Error: type "PODVector<Drawable*>" can not automatically bind
-    // PODVector<Light*> PerThreadSceneResult::lights_ | File: ../Graphics/View.h
-    // Error: type "PODVector<Light*>" can not automatically bind
-    // float PerThreadSceneResult::maxZ_ | File: ../Graphics/View.h
-    engine->RegisterObjectProperty("PerThreadSceneResult", "float maxZ", offsetof(PerThreadSceneResult, maxZ_));
-    // float PerThreadSceneResult::minZ_ | File: ../Graphics/View.h
-    engine->RegisterObjectProperty("PerThreadSceneResult", "float minZ", offsetof(PerThreadSceneResult, minZ_));
-    // PerThreadSceneResult::~PerThreadSceneResult() | Implicitly-declared
-    engine->RegisterObjectBehaviour("PerThreadSceneResult", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(PerThreadSceneResult_Destructor), asCALL_CDECL_OBJFIRST);
-    // PerThreadSceneResult& PerThreadSceneResult::operator=(const PerThreadSceneResult&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<PerThreadSceneResult>(engine, "PerThreadSceneResult");
-#ifdef REGISTER_MANUAL_PART_PerThreadSceneResult
-    REGISTER_MANUAL_PART_PerThreadSceneResult(PerThreadSceneResult, "PerThreadSceneResult")
 #endif
 
 #ifdef URHO3D_NETWORK
@@ -4477,6 +4449,22 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
 #endif
 #endif
 
+    // PODVector<Drawable*> PerThreadSceneResult::geometries_ | File: ../Graphics/View.h
+    // Error: type "PODVector<Drawable*>" can not automatically bind
+    // PODVector<Light*> PerThreadSceneResult::lights_ | File: ../Graphics/View.h
+    // Error: type "PODVector<Light*>" can not automatically bind
+    // float PerThreadSceneResult::maxZ_ | File: ../Graphics/View.h
+    engine->RegisterObjectProperty("PerThreadSceneResult", "float maxZ", offsetof(PerThreadSceneResult, maxZ_));
+    // float PerThreadSceneResult::minZ_ | File: ../Graphics/View.h
+    engine->RegisterObjectProperty("PerThreadSceneResult", "float minZ", offsetof(PerThreadSceneResult, minZ_));
+    // PerThreadSceneResult::~PerThreadSceneResult() | Implicitly-declared
+    engine->RegisterObjectBehaviour("PerThreadSceneResult", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(PerThreadSceneResult_Destructor), asCALL_CDECL_OBJFIRST);
+    // PerThreadSceneResult& PerThreadSceneResult::operator=(const PerThreadSceneResult&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<PerThreadSceneResult>(engine, "PerThreadSceneResult");
+#ifdef REGISTER_MANUAL_PART_PerThreadSceneResult
+    REGISTER_MANUAL_PART_PerThreadSceneResult(PerThreadSceneResult, "PerThreadSceneResult")
+#endif
+
 #ifdef URHO3D_PHYSICS
     // RigidBody* PhysicsRaycastResult::body_ | File: ../Physics/PhysicsWorld.h
     // RigidBody* can not be registered
@@ -4512,6 +4500,18 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<PhysicsRaycastResult2D>(engine, "PhysicsRaycastResult2D");
 #ifdef REGISTER_MANUAL_PART_PhysicsRaycastResult2D
     REGISTER_MANUAL_PART_PhysicsRaycastResult2D(PhysicsRaycastResult2D, "PhysicsRaycastResult2D")
+#endif
+#endif
+
+#ifdef URHO3D_PHYSICS
+    // btCollisionConfiguration* PhysicsWorldConfig::collisionConfig_ | File: ../Physics/PhysicsWorld.h
+    // btCollisionConfiguration* can not be registered
+    // PhysicsWorldConfig::~PhysicsWorldConfig() | Implicitly-declared
+    engine->RegisterObjectBehaviour("PhysicsWorldConfig", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(PhysicsWorldConfig_Destructor), asCALL_CDECL_OBJFIRST);
+    // PhysicsWorldConfig& PhysicsWorldConfig::operator=(const PhysicsWorldConfig&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<PhysicsWorldConfig>(engine, "PhysicsWorldConfig");
+#ifdef REGISTER_MANUAL_PART_PhysicsWorldConfig
+    REGISTER_MANUAL_PART_PhysicsWorldConfig(PhysicsWorldConfig, "PhysicsWorldConfig")
 #endif
 #endif
 

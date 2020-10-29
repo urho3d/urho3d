@@ -18,61 +18,6 @@ namespace Urho3D
 void FakeAddRef(void* ptr);
 void FakeReleaseRef(void* ptr);
 
-// const Vector<SharedPtr<UIElement>>& UIElement::GetChildren() const | File: ../UI/UIElement.h
-static CScriptArray* UIElement_GetChildren_void(UIElement* ptr)
-{
-    const Vector<SharedPtr<UIElement>>& result = ptr->GetChildren();
-    return VectorToHandleArray(result, "Array<UIElement@>");
-}
-
-// PODVector<UIElement*> UIElement::GetChildren(bool recursive) const | File: ../UI/UIElement.h
-static CScriptArray* UIElement_GetChildren_bool(UIElement* ptr, bool recursive)
-{
-    PODVector<UIElement*> result = ptr->GetChildren(recursive);
-    return VectorToHandleArray(result, "Array<UIElement@>");
-}
-
-// PODVector<UIElement*> UIElement::GetChildrenWithTag(const String& tag, bool recursive=false) const | File: ../UI/UIElement.h
-static CScriptArray* UIElement_GetChildrenWithTag_String_bool(UIElement* ptr, const String& tag, bool recursive)
-{
-    PODVector<UIElement*> result = ptr->GetChildrenWithTag(tag, recursive);
-    return VectorToHandleArray(result, "Array<UIElement@>");
-}
-
-// const StringVector& UIElement::GetTags() const | File: ../UI/UIElement.h
-static CScriptArray* UIElement_GetTags_void(UIElement* ptr)
-{
-    const StringVector& result = ptr->GetTags();
-    return VectorToArray<String>(result, "Array<String>");
-}
-
-// explicit UIElement::UIElement(Context* context) | File: ../UI/UIElement.h
-static UIElement* UIElement_UIElement_Context()
-{
-    return new UIElement(GetScriptContext());
-}
-
-// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void UIElement_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(UIElement* ptr, CScriptArray* exceptions, bool onlyUserData)
-{
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
-}
-
-// const Vector<String>& UnknownComponent::GetXMLAttributes() const | File: ../Scene/UnknownComponent.h
-static CScriptArray* UnknownComponent_GetXMLAttributes_void(UnknownComponent* ptr)
-{
-    const Vector<String>& result = ptr->GetXMLAttributes();
-    return VectorToArray<String>(result, "Array<String>");
-}
-
-// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void UnknownComponent_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(UnknownComponent* ptr, CScriptArray* exceptions, bool onlyUserData)
-{
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
-}
-
 // SharedPtr<UIElement> UI::LoadLayout(Deserializer& source, XMLFile* styleFile=nullptr) | File: ../UI/UI.h
 static UIElement* UI_LoadLayout_Deserializer_XMLFile(UI* ptr, Deserializer& source, XMLFile* styleFile)
 {
@@ -120,6 +65,47 @@ static void UIComponent_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(
 }
 
 // const Vector<SharedPtr<UIElement>>& UIElement::GetChildren() const | File: ../UI/UIElement.h
+static CScriptArray* UIElement_GetChildren_void(UIElement* ptr)
+{
+    const Vector<SharedPtr<UIElement>>& result = ptr->GetChildren();
+    return VectorToHandleArray(result, "Array<UIElement@>");
+}
+
+// PODVector<UIElement*> UIElement::GetChildren(bool recursive) const | File: ../UI/UIElement.h
+static CScriptArray* UIElement_GetChildren_bool(UIElement* ptr, bool recursive)
+{
+    PODVector<UIElement*> result = ptr->GetChildren(recursive);
+    return VectorToHandleArray(result, "Array<UIElement@>");
+}
+
+// PODVector<UIElement*> UIElement::GetChildrenWithTag(const String& tag, bool recursive=false) const | File: ../UI/UIElement.h
+static CScriptArray* UIElement_GetChildrenWithTag_String_bool(UIElement* ptr, const String& tag, bool recursive)
+{
+    PODVector<UIElement*> result = ptr->GetChildrenWithTag(tag, recursive);
+    return VectorToHandleArray(result, "Array<UIElement@>");
+}
+
+// const StringVector& UIElement::GetTags() const | File: ../UI/UIElement.h
+static CScriptArray* UIElement_GetTags_void(UIElement* ptr)
+{
+    const StringVector& result = ptr->GetTags();
+    return VectorToArray<String>(result, "Array<String>");
+}
+
+// explicit UIElement::UIElement(Context* context) | File: ../UI/UIElement.h
+static UIElement* UIElement_UIElement_Context()
+{
+    return new UIElement(GetScriptContext());
+}
+
+// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+static void UIElement_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(UIElement* ptr, CScriptArray* exceptions, bool onlyUserData)
+{
+    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+}
+
+// const Vector<SharedPtr<UIElement>>& UIElement::GetChildren() const | File: ../UI/UIElement.h
 static CScriptArray* UISelectable_GetChildren_void(UISelectable* ptr)
 {
     const Vector<SharedPtr<UIElement>>& result = ptr->GetChildren();
@@ -154,8 +140,642 @@ static void UISelectable_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
 }
 
+// const Vector<String>& UnknownComponent::GetXMLAttributes() const | File: ../Scene/UnknownComponent.h
+static CScriptArray* UnknownComponent_GetXMLAttributes_void(UnknownComponent* ptr)
+{
+    const Vector<String>& result = ptr->GetXMLAttributes();
+    return VectorToArray<String>(result, "Array<String>");
+}
+
+// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+static void UnknownComponent_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(UnknownComponent* ptr, CScriptArray* exceptions, bool onlyUserData)
+{
+    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+}
+
 void ASRegisterGenerated_Members_U(asIScriptEngine* engine)
 {
+    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("UI", asBEHAVE_ADDREF, "void f()", asMETHODPR(UI, AddRef, (), void), asCALL_THISCALL);
+    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
+    // Not registered because template
+    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
+    // Not registered because template
+    // void UI::Clear() | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "void Clear()", asMETHODPR(UI, Clear, (), void), asCALL_THISCALL);
+    // IntVector2 UI::ConvertSystemToUI(const IntVector2& systemPos) const | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "IntVector2 ConvertSystemToUI(const IntVector2&in) const", asMETHODPR(UI, ConvertSystemToUI, (const IntVector2&) const, IntVector2), asCALL_THISCALL);
+    // IntVector2 UI::ConvertUIToSystem(const IntVector2& uiPos) const | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "IntVector2 ConvertUIToSystem(const IntVector2&in) const", asMETHODPR(UI, ConvertUIToSystem, (const IntVector2&) const, IntVector2), asCALL_THISCALL);
+    // void UI::DebugDraw(UIElement* element) | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "void DebugDraw(UIElement@+)", asMETHODPR(UI, DebugDraw, (UIElement*), void), asCALL_THISCALL);
+    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UI", "bool GetBlockEvents() const", asMETHODPR(UI, GetBlockEvents, () const, bool), asCALL_THISCALL);
+    // const String& Object::GetCategory() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UI", "const String& GetCategory() const", asMETHODPR(UI, GetCategory, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "const String& get_category() const", asMETHODPR(UI, GetCategory, () const, const String&), asCALL_THISCALL);
+    // const String& UI::GetClipboardText() const | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "const String& GetClipboardText() const", asMETHODPR(UI, GetClipboardText, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "const String& get_clipboardText() const", asMETHODPR(UI, GetClipboardText, () const, const String&), asCALL_THISCALL);
+    // Context* Object::GetContext() const | File: ../Core/Object.h
+    // Error: type "Context*" can not be returned
+    // Cursor* UI::GetCursor() const | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "Cursor@+ GetCursor() const", asMETHODPR(UI, GetCursor, () const, Cursor*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "Cursor@+ get_cursor() const", asMETHODPR(UI, GetCursor, () const, Cursor*), asCALL_THISCALL);
+    // IntVector2 UI::GetCursorPosition() const | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "IntVector2 GetCursorPosition() const", asMETHODPR(UI, GetCursorPosition, () const, IntVector2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "IntVector2 get_cursorPosition() const", asMETHODPR(UI, GetCursorPosition, () const, IntVector2), asCALL_THISCALL);
+    // const IntVector2& UI::GetCustomSize() const | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "const IntVector2& GetCustomSize() const", asMETHODPR(UI, GetCustomSize, () const, const IntVector2&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "const IntVector2& get_customSize() const", asMETHODPR(UI, GetCustomSize, () const, const IntVector2&), asCALL_THISCALL);
+    // float UI::GetDefaultToolTipDelay() const | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "float GetDefaultToolTipDelay() const", asMETHODPR(UI, GetDefaultToolTipDelay, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "float get_defaultToolTipDelay() const", asMETHODPR(UI, GetDefaultToolTipDelay, () const, float), asCALL_THISCALL);
+    // float UI::GetDoubleClickInterval() const | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "float GetDoubleClickInterval() const", asMETHODPR(UI, GetDoubleClickInterval, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "float get_doubleClickInterval() const", asMETHODPR(UI, GetDoubleClickInterval, () const, float), asCALL_THISCALL);
+    // int UI::GetDragBeginDistance() const | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "int GetDragBeginDistance() const", asMETHODPR(UI, GetDragBeginDistance, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "int get_dragBeginDistance() const", asMETHODPR(UI, GetDragBeginDistance, () const, int), asCALL_THISCALL);
+    // float UI::GetDragBeginInterval() const | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "float GetDragBeginInterval() const", asMETHODPR(UI, GetDragBeginInterval, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "float get_dragBeginInterval() const", asMETHODPR(UI, GetDragBeginInterval, () const, float), asCALL_THISCALL);
+    // UIElement* UI::GetDragElement(unsigned index) | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "UIElement@+ GetDragElement(uint)", asMETHODPR(UI, GetDragElement, (unsigned), UIElement*), asCALL_THISCALL);
+    // const Vector<UIElement*> UI::GetDragElements() | File: ../UI/UI.h
+    // Error: type "const Vector<UIElement*>" can not automatically bind
+    // UIElement* UI::GetElementAt(const IntVector2& position, bool enabledOnly=true) | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "UIElement@+ GetElementAt(const IntVector2&in, bool = true)", asMETHODPR(UI, GetElementAt, (const IntVector2&, bool), UIElement*), asCALL_THISCALL);
+    // UIElement* UI::GetElementAt(int x, int y, bool enabledOnly=true) | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "UIElement@+ GetElementAt(int, int, bool = true)", asMETHODPR(UI, GetElementAt, (int, int, bool), UIElement*), asCALL_THISCALL);
+    // UIElement* UI::GetElementAt(UIElement* root, const IntVector2& position, bool enabledOnly=true) | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "UIElement@+ GetElementAt(UIElement@+, const IntVector2&in, bool = true)", asMETHODPR(UI, GetElementAt, (UIElement*, const IntVector2&, bool), UIElement*), asCALL_THISCALL);
+    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UI", "VariantMap& GetEventDataMap() const", asMETHODPR(UI, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
+    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // Object* Object::GetEventSender() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UI", "Object@+ GetEventSender() const", asMETHODPR(UI, GetEventSender, () const, Object*), asCALL_THISCALL);
+    // UIElement* UI::GetFocusElement() const | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "UIElement@+ GetFocusElement() const", asMETHODPR(UI, GetFocusElement, () const, UIElement*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "UIElement@+ get_focusElement() const", asMETHODPR(UI, GetFocusElement, () const, UIElement*), asCALL_THISCALL);
+    // FontHintLevel UI::GetFontHintLevel() const | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "FontHintLevel GetFontHintLevel() const", asMETHODPR(UI, GetFontHintLevel, () const, FontHintLevel), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "FontHintLevel get_fontHintLevel() const", asMETHODPR(UI, GetFontHintLevel, () const, FontHintLevel), asCALL_THISCALL);
+    // int UI::GetFontOversampling() const | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "int GetFontOversampling() const", asMETHODPR(UI, GetFontOversampling, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "int get_fontOversampling() const", asMETHODPR(UI, GetFontOversampling, () const, int), asCALL_THISCALL);
+    // float UI::GetFontSubpixelThreshold() const | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "float GetFontSubpixelThreshold() const", asMETHODPR(UI, GetFontSubpixelThreshold, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "float get_fontSubpixelThreshold() const", asMETHODPR(UI, GetFontSubpixelThreshold, () const, float), asCALL_THISCALL);
+    // bool UI::GetForceAutoHint() const | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "bool GetForceAutoHint() const", asMETHODPR(UI, GetForceAutoHint, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "bool get_forceAutoHint() const", asMETHODPR(UI, GetForceAutoHint, () const, bool), asCALL_THISCALL);
+    // UIElement* UI::GetFrontElement() const | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "UIElement@+ GetFrontElement() const", asMETHODPR(UI, GetFrontElement, () const, UIElement*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "UIElement@+ get_frontElement() const", asMETHODPR(UI, GetFrontElement, () const, UIElement*), asCALL_THISCALL);
+    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UI", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(UI, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "const Variant& get_globalVar(StringHash) const", asMETHODPR(UI, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UI", "const VariantMap& GetGlobalVars() const", asMETHODPR(UI, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "const VariantMap& get_globalVars() const", asMETHODPR(UI, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    // float UI::GetMaxDoubleClickDistance() const | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "float GetMaxDoubleClickDistance() const", asMETHODPR(UI, GetMaxDoubleClickDistance, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "float get_maxDoubleClickDistance() const", asMETHODPR(UI, GetMaxDoubleClickDistance, () const, float), asCALL_THISCALL);
+    // int UI::GetMaxFontTextureSize() const | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "int GetMaxFontTextureSize() const", asMETHODPR(UI, GetMaxFontTextureSize, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "int get_maxFontTextureSize() const", asMETHODPR(UI, GetMaxFontTextureSize, () const, int), asCALL_THISCALL);
+    // unsigned UI::GetNumDragElements() const | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "uint GetNumDragElements() const", asMETHODPR(UI, GetNumDragElements, () const, unsigned), asCALL_THISCALL);
+    // UIElement* UI::GetRoot() const | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "UIElement@+ GetRoot() const", asMETHODPR(UI, GetRoot, () const, UIElement*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "UIElement@+ get_root() const", asMETHODPR(UI, GetRoot, () const, UIElement*), asCALL_THISCALL);
+    // UIElement* UI::GetRootModalElement() const | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "UIElement@+ GetRootModalElement() const", asMETHODPR(UI, GetRootModalElement, () const, UIElement*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "UIElement@+ get_modalRoot() const", asMETHODPR(UI, GetRootModalElement, () const, UIElement*), asCALL_THISCALL);
+    // float UI::GetScale() const | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "float GetScale() const", asMETHODPR(UI, GetScale, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "float get_scale() const", asMETHODPR(UI, GetScale, () const, float), asCALL_THISCALL);
+    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UI", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(UI, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
+    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // Not registered because template
+    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UI", "StringHash GetType() const", asMETHODPR(UI, GetType, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "StringHash get_type() const", asMETHODPR(UI, GetType, () const, StringHash), asCALL_THISCALL);
+    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UI", "const String& GetTypeName() const", asMETHODPR(UI, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "const String& get_typeName() const", asMETHODPR(UI, GetTypeName, () const, const String&), asCALL_THISCALL);
+    // bool UI::GetUseMutableGlyphs() const | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "bool GetUseMutableGlyphs() const", asMETHODPR(UI, GetUseMutableGlyphs, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "bool get_useMutableGlyphs() const", asMETHODPR(UI, GetUseMutableGlyphs, () const, bool), asCALL_THISCALL);
+    // bool UI::GetUseScreenKeyboard() const | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "bool GetUseScreenKeyboard() const", asMETHODPR(UI, GetUseScreenKeyboard, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "bool get_useScreenKeyboard() const", asMETHODPR(UI, GetUseScreenKeyboard, () const, bool), asCALL_THISCALL);
+    // bool UI::GetUseSystemClipboard() const | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "bool GetUseSystemClipboard() const", asMETHODPR(UI, GetUseSystemClipboard, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "bool get_useSystemClipboard() const", asMETHODPR(UI, GetUseSystemClipboard, () const, bool), asCALL_THISCALL);
+    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UI", "bool HasEventHandlers() const", asMETHODPR(UI, HasEventHandlers, () const, bool), asCALL_THISCALL);
+    // bool UI::HasModalElement() const | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "bool HasModalElement() const", asMETHODPR(UI, HasModalElement, () const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UI", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(UI, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UI", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(UI, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
+    // bool UI::IsDragging() const | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "bool IsDragging() const", asMETHODPR(UI, IsDragging, () const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UI", "bool IsInstanceOf(StringHash) const", asMETHODPR(UI, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
+    // Not registered because template
+    // bool UI::IsNonFocusedMouseWheel() const | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "bool IsNonFocusedMouseWheel() const", asMETHODPR(UI, IsNonFocusedMouseWheel, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "bool get_nonFocusedMouseWheel() const", asMETHODPR(UI, IsNonFocusedMouseWheel, () const, bool), asCALL_THISCALL);
+    // SharedPtr<UIElement> UI::LoadLayout(Deserializer& source, XMLFile* styleFile=nullptr) | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "UIElement@+ LoadLayout(Deserializer&, XMLFile@+ = null)", asFUNCTION(UI_LoadLayout_Deserializer_XMLFile), asCALL_CDECL_OBJFIRST);
+    // SharedPtr<UIElement> UI::LoadLayout(XMLFile* file, XMLFile* styleFile=nullptr) | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "UIElement@+ LoadLayout(XMLFile@+, XMLFile@+ = null)", asFUNCTION(UI_LoadLayout_XMLFile_XMLFile), asCALL_CDECL_OBJFIRST);
+    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UI", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(UI, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
+    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
+    // Error: type "RefCount*" can not automatically bind
+    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("UI", "int Refs() const", asMETHODPR(UI, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "int get_refs() const", asMETHODPR(UI, Refs, () const, int), asCALL_THISCALL);
+    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("UI", asBEHAVE_RELEASE, "void f()", asMETHODPR(UI, ReleaseRef, (), void), asCALL_THISCALL);
+    // void UI::Render(bool renderUICommand=false) | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "void Render(bool = false)", asMETHODPR(UI, Render, (bool), void), asCALL_THISCALL);
+    // void UI::RenderUpdate() | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "void RenderUpdate()", asMETHODPR(UI, RenderUpdate, (), void), asCALL_THISCALL);
+    // bool UI::SaveLayout(Serializer& dest, UIElement* element) | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "bool SaveLayout(Serializer&, UIElement@+)", asMETHODPR(UI, SaveLayout, (Serializer&, UIElement*), bool), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UI", "void SendEvent(StringHash)", asMETHODPR(UI, SendEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UI", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(UI, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
+    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
+    // Not registered because template
+    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UI", "void SetBlockEvents(bool)", asMETHODPR(UI, SetBlockEvents, (bool), void), asCALL_THISCALL);
+    // void UI::SetClipboardText(const String& text) | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "void SetClipboardText(const String&in)", asMETHODPR(UI, SetClipboardText, (const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_clipboardText(const String&in)", asMETHODPR(UI, SetClipboardText, (const String&), void), asCALL_THISCALL);
+    // void UI::SetCursor(Cursor* cursor) | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "void SetCursor(Cursor@+)", asMETHODPR(UI, SetCursor, (Cursor*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_cursor(Cursor@+)", asMETHODPR(UI, SetCursor, (Cursor*), void), asCALL_THISCALL);
+    // void UI::SetCustomSize(const IntVector2& size) | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "void SetCustomSize(const IntVector2&in)", asMETHODPR(UI, SetCustomSize, (const IntVector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_customSize(const IntVector2&in)", asMETHODPR(UI, SetCustomSize, (const IntVector2&), void), asCALL_THISCALL);
+    // void UI::SetCustomSize(int width, int height) | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "void SetCustomSize(int, int)", asMETHODPR(UI, SetCustomSize, (int, int), void), asCALL_THISCALL);
+    // void UI::SetDefaultToolTipDelay(float delay) | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "void SetDefaultToolTipDelay(float)", asMETHODPR(UI, SetDefaultToolTipDelay, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_defaultToolTipDelay(float)", asMETHODPR(UI, SetDefaultToolTipDelay, (float), void), asCALL_THISCALL);
+    // void UI::SetDoubleClickInterval(float interval) | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "void SetDoubleClickInterval(float)", asMETHODPR(UI, SetDoubleClickInterval, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_doubleClickInterval(float)", asMETHODPR(UI, SetDoubleClickInterval, (float), void), asCALL_THISCALL);
+    // void UI::SetDragBeginDistance(int pixels) | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "void SetDragBeginDistance(int)", asMETHODPR(UI, SetDragBeginDistance, (int), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_dragBeginDistance(int)", asMETHODPR(UI, SetDragBeginDistance, (int), void), asCALL_THISCALL);
+    // void UI::SetDragBeginInterval(float interval) | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "void SetDragBeginInterval(float)", asMETHODPR(UI, SetDragBeginInterval, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_dragBeginInterval(float)", asMETHODPR(UI, SetDragBeginInterval, (float), void), asCALL_THISCALL);
+    // void UI::SetElementRenderTexture(UIElement* element, Texture2D* texture) | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "void SetElementRenderTexture(UIElement@+, Texture2D@+)", asMETHODPR(UI, SetElementRenderTexture, (UIElement*, Texture2D*), void), asCALL_THISCALL);
+    // void UI::SetFocusElement(UIElement* element, bool byKey=false) | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "void SetFocusElement(UIElement@+, bool = false)", asMETHODPR(UI, SetFocusElement, (UIElement*, bool), void), asCALL_THISCALL);
+    // void UI::SetFontHintLevel(FontHintLevel level) | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "void SetFontHintLevel(FontHintLevel)", asMETHODPR(UI, SetFontHintLevel, (FontHintLevel), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_fontHintLevel(FontHintLevel)", asMETHODPR(UI, SetFontHintLevel, (FontHintLevel), void), asCALL_THISCALL);
+    // void UI::SetFontOversampling(int oversampling) | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "void SetFontOversampling(int)", asMETHODPR(UI, SetFontOversampling, (int), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_fontOversampling(int)", asMETHODPR(UI, SetFontOversampling, (int), void), asCALL_THISCALL);
+    // void UI::SetFontSubpixelThreshold(float threshold) | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "void SetFontSubpixelThreshold(float)", asMETHODPR(UI, SetFontSubpixelThreshold, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_fontSubpixelThreshold(float)", asMETHODPR(UI, SetFontSubpixelThreshold, (float), void), asCALL_THISCALL);
+    // void UI::SetForceAutoHint(bool enable) | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "void SetForceAutoHint(bool)", asMETHODPR(UI, SetForceAutoHint, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_forceAutoHint(bool)", asMETHODPR(UI, SetForceAutoHint, (bool), void), asCALL_THISCALL);
+    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UI", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(UI, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(UI, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    // void UI::SetHeight(float height) | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "void SetHeight(float)", asMETHODPR(UI, SetHeight, (float), void), asCALL_THISCALL);
+    // void UI::SetMaxDoubleClickDistance(float distPixels) | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "void SetMaxDoubleClickDistance(float)", asMETHODPR(UI, SetMaxDoubleClickDistance, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_maxDoubleClickDistance(float)", asMETHODPR(UI, SetMaxDoubleClickDistance, (float), void), asCALL_THISCALL);
+    // void UI::SetMaxFontTextureSize(int size) | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "void SetMaxFontTextureSize(int)", asMETHODPR(UI, SetMaxFontTextureSize, (int), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_maxFontTextureSize(int)", asMETHODPR(UI, SetMaxFontTextureSize, (int), void), asCALL_THISCALL);
+    // bool UI::SetModalElement(UIElement* modalElement, bool enable) | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "bool SetModalElement(UIElement@+, bool)", asMETHODPR(UI, SetModalElement, (UIElement*, bool), bool), asCALL_THISCALL);
+    // void UI::SetNonFocusedMouseWheel(bool nonFocusedMouseWheel) | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "void SetNonFocusedMouseWheel(bool)", asMETHODPR(UI, SetNonFocusedMouseWheel, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_nonFocusedMouseWheel(bool)", asMETHODPR(UI, SetNonFocusedMouseWheel, (bool), void), asCALL_THISCALL);
+    // void UI::SetScale(float scale) | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "void SetScale(float)", asMETHODPR(UI, SetScale, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_scale(float)", asMETHODPR(UI, SetScale, (float), void), asCALL_THISCALL);
+    // void UI::SetUseMutableGlyphs(bool enable) | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "void SetUseMutableGlyphs(bool)", asMETHODPR(UI, SetUseMutableGlyphs, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_useMutableGlyphs(bool)", asMETHODPR(UI, SetUseMutableGlyphs, (bool), void), asCALL_THISCALL);
+    // void UI::SetUseScreenKeyboard(bool enable) | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "void SetUseScreenKeyboard(bool)", asMETHODPR(UI, SetUseScreenKeyboard, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_useScreenKeyboard(bool)", asMETHODPR(UI, SetUseScreenKeyboard, (bool), void), asCALL_THISCALL);
+    // void UI::SetUseSystemClipboard(bool enable) | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "void SetUseSystemClipboard(bool)", asMETHODPR(UI, SetUseSystemClipboard, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_useSystemClipboard(bool)", asMETHODPR(UI, SetUseSystemClipboard, (bool), void), asCALL_THISCALL);
+    // void UI::SetWidth(float width) | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "void SetWidth(float)", asMETHODPR(UI, SetWidth, (float), void), asCALL_THISCALL);
+    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // explicit UI::UI(Context* context) | File: ../UI/UI.h
+    engine->RegisterObjectBehaviour("UI", asBEHAVE_FACTORY, "UI@+ f()", asFUNCTION(UI_UI_Context), asCALL_CDECL);
+    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UI", "void UnsubscribeFromAllEvents()", asMETHODPR(UI, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UI", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(UI_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
+    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UI", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(UI, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UI", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(UI, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UI", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(UI, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
+    // void UI::Update(float timeStep) | File: ../UI/UI.h
+    engine->RegisterObjectMethod("UI", "void Update(float)", asMETHODPR(UI, Update, (float), void), asCALL_THISCALL);
+    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("UI", "int WeakRefs() const", asMETHODPR(UI, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "int get_weakRefs() const", asMETHODPR(UI, WeakRefs, () const, int), asCALL_THISCALL);
+#ifdef REGISTER_MANUAL_PART_Object
+    REGISTER_MANUAL_PART_Object(UI, "UI")
+#endif
+#ifdef REGISTER_MANUAL_PART_RefCounted
+    REGISTER_MANUAL_PART_RefCounted(UI, "UI")
+#endif
+#ifdef REGISTER_MANUAL_PART_UI
+    REGISTER_MANUAL_PART_UI(UI, "UI")
+#endif
+    RegisterSubclass<Object, UI>(engine, "Object", "UI");
+    RegisterSubclass<RefCounted, UI>(engine, "RefCounted", "UI");
+
+    // BlendMode UIBatch::blendMode_ | File: ../UI/UIBatch.h
+    engine->RegisterObjectProperty("UIBatch", "BlendMode blendMode", offsetof(UIBatch, blendMode_));
+    // unsigned UIBatch::color_ | File: ../UI/UIBatch.h
+    engine->RegisterObjectProperty("UIBatch", "uint color", offsetof(UIBatch, color_));
+    // Material* UIBatch::customMaterial_ | File: ../UI/UIBatch.h
+    // Material* can not be registered
+    // UIElement* UIBatch::element_ | File: ../UI/UIBatch.h
+    // UIElement* can not be registered
+    // Vector2 UIBatch::invTextureSize_ | File: ../UI/UIBatch.h
+    engine->RegisterObjectProperty("UIBatch", "Vector2 invTextureSize", offsetof(UIBatch, invTextureSize_));
+    // Vector3 UIBatch::posAdjust | File: ../UI/UIBatch.h
+    engine->SetDefaultNamespace("UIBatch");
+    engine->RegisterGlobalProperty("Vector3 posAdjust", (void*)&UIBatch::posAdjust);
+    engine->SetDefaultNamespace("");
+    // IntRect UIBatch::scissor_ | File: ../UI/UIBatch.h
+    engine->RegisterObjectProperty("UIBatch", "IntRect scissor", offsetof(UIBatch, scissor_));
+    // Texture* UIBatch::texture_ | File: ../UI/UIBatch.h
+    // Texture* can not be registered
+    // bool UIBatch::useGradient_ | File: ../UI/UIBatch.h
+    engine->RegisterObjectProperty("UIBatch", "bool useGradient", offsetof(UIBatch, useGradient_));
+    // PODVector<float>* UIBatch::vertexData_ | File: ../UI/UIBatch.h
+    // PODVector<float>* can not be registered
+    // unsigned UIBatch::vertexEnd_ | File: ../UI/UIBatch.h
+    engine->RegisterObjectProperty("UIBatch", "uint vertexEnd", offsetof(UIBatch, vertexEnd_));
+    // unsigned UIBatch::vertexStart_ | File: ../UI/UIBatch.h
+    engine->RegisterObjectProperty("UIBatch", "uint vertexStart", offsetof(UIBatch, vertexStart_));
+    // static void UIBatch::AddOrMerge(const UIBatch& batch, PODVector<UIBatch>& batches) | File: ../UI/UIBatch.h
+    // Error: type "PODVector<UIBatch>&" can not automatically bind
+    // void UIBatch::AddQuad(float x, float y, float width, float height, int texOffsetX, int texOffsetY, int texWidth=0, int texHeight=0) | File: ../UI/UIBatch.h
+    engine->RegisterObjectMethod("UIBatch", "void AddQuad(float, float, float, float, int, int, int = 0, int = 0)", asMETHODPR(UIBatch, AddQuad, (float, float, float, float, int, int, int, int), void), asCALL_THISCALL);
+    // void UIBatch::AddQuad(const Matrix3x4& transform, int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth=0, int texHeight=0) | File: ../UI/UIBatch.h
+    engine->RegisterObjectMethod("UIBatch", "void AddQuad(const Matrix3x4&in, int, int, int, int, int, int, int = 0, int = 0)", asMETHODPR(UIBatch, AddQuad, (const Matrix3x4&, int, int, int, int, int, int, int, int), void), asCALL_THISCALL);
+    // void UIBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight, bool tiled) | File: ../UI/UIBatch.h
+    engine->RegisterObjectMethod("UIBatch", "void AddQuad(int, int, int, int, int, int, int, int, bool)", asMETHODPR(UIBatch, AddQuad, (int, int, int, int, int, int, int, int, bool), void), asCALL_THISCALL);
+    // void UIBatch::AddQuad(const Matrix3x4& transform, const IntVector2& a, const IntVector2& b, const IntVector2& c, const IntVector2& d, const IntVector2& texA, const IntVector2& texB, const IntVector2& texC, const IntVector2& texD) | File: ../UI/UIBatch.h
+    engine->RegisterObjectMethod("UIBatch", "void AddQuad(const Matrix3x4&in, const IntVector2&in, const IntVector2&in, const IntVector2&in, const IntVector2&in, const IntVector2&in, const IntVector2&in, const IntVector2&in, const IntVector2&in)", asMETHODPR(UIBatch, AddQuad, (const Matrix3x4&, const IntVector2&, const IntVector2&, const IntVector2&, const IntVector2&, const IntVector2&, const IntVector2&, const IntVector2&, const IntVector2&), void), asCALL_THISCALL);
+    // void UIBatch::AddQuad(const Matrix3x4& transform, const IntVector2& a, const IntVector2& b, const IntVector2& c, const IntVector2& d, const IntVector2& texA, const IntVector2& texB, const IntVector2& texC, const IntVector2& texD, const Color& colA, const Color& colB, const Color& colC, const Color& colD) | File: ../UI/UIBatch.h
+    engine->RegisterObjectMethod("UIBatch", "void AddQuad(const Matrix3x4&in, const IntVector2&in, const IntVector2&in, const IntVector2&in, const IntVector2&in, const IntVector2&in, const IntVector2&in, const IntVector2&in, const IntVector2&in, const Color&in, const Color&in, const Color&in, const Color&in)", asMETHODPR(UIBatch, AddQuad, (const Matrix3x4&, const IntVector2&, const IntVector2&, const IntVector2&, const IntVector2&, const IntVector2&, const IntVector2&, const IntVector2&, const IntVector2&, const Color&, const Color&, const Color&, const Color&), void), asCALL_THISCALL);
+    // unsigned UIBatch::GetInterpolatedColor(float x, float y) | File: ../UI/UIBatch.h
+    engine->RegisterObjectMethod("UIBatch", "uint GetInterpolatedColor(float, float)", asMETHODPR(UIBatch, GetInterpolatedColor, (float, float), unsigned), asCALL_THISCALL);
+    // bool UIBatch::Merge(const UIBatch& batch) | File: ../UI/UIBatch.h
+    engine->RegisterObjectMethod("UIBatch", "bool Merge(const UIBatch&in)", asMETHODPR(UIBatch, Merge, (const UIBatch&), bool), asCALL_THISCALL);
+    // void UIBatch::SetColor(const Color& color, bool overrideAlpha=false) | File: ../UI/UIBatch.h
+    engine->RegisterObjectMethod("UIBatch", "void SetColor(const Color&in, bool = false)", asMETHODPR(UIBatch, SetColor, (const Color&, bool), void), asCALL_THISCALL);
+    // void UIBatch::SetDefaultColor() | File: ../UI/UIBatch.h
+    engine->RegisterObjectMethod("UIBatch", "void SetDefaultColor()", asMETHODPR(UIBatch, SetDefaultColor, (), void), asCALL_THISCALL);
+    // UIBatch::UIBatch(UIElement* element, BlendMode blendMode, const IntRect& scissor, Texture* texture, PODVector<float>* vertexData) | File: ../UI/UIBatch.h
+    // Error: type "PODVector<float>*" can not automatically bind
+    // UIBatch::~UIBatch() | Implicitly-declared
+    engine->RegisterObjectBehaviour("UIBatch", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(UIBatch_Destructor), asCALL_CDECL_OBJFIRST);
+    // UIBatch& UIBatch::operator=(const UIBatch&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<UIBatch>(engine, "UIBatch");
+#ifdef REGISTER_MANUAL_PART_UIBatch
+    REGISTER_MANUAL_PART_UIBatch(UIBatch, "UIBatch")
+#endif
+
+    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("UIComponent", asBEHAVE_ADDREF, "void f()", asMETHODPR(UIComponent, AddRef, (), void), asCALL_THISCALL);
+    // void Component::AddReplicationState(ComponentReplicationState* state) | File: ../Scene/Component.h
+    // Error: type "ComponentReplicationState*" can not automatically bind
+    // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UIComponent", "void AllocateNetworkState()", asMETHODPR(UIComponent, AllocateNetworkState, (), void), asCALL_THISCALL);
+    // virtual void Serializable::ApplyAttributes() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UIComponent", "void ApplyAttributes()", asMETHODPR(UIComponent, ApplyAttributes, (), void), asCALL_THISCALL);
+    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
+    // Not registered because template
+    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
+    // Not registered because template
+    // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("UIComponent", "void CleanupConnection(Connection@+)", asMETHODPR(UIComponent, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // virtual void Component::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("UIComponent", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(UIComponent, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
+    // bool Animatable::GetAnimationEnabled() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("UIComponent", "bool GetAnimationEnabled() const", asMETHODPR(UIComponent, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UIComponent", "bool get_animationEnabled() const", asMETHODPR(UIComponent, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
+    // Variant Serializable::GetAttribute(unsigned index) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UIComponent", "Variant GetAttribute(uint) const", asMETHODPR(UIComponent, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UIComponent", "Variant get_attributes(uint) const", asMETHODPR(UIComponent, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
+    // Variant Serializable::GetAttribute(const String& name) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UIComponent", "Variant GetAttribute(const String&in) const", asMETHODPR(UIComponent, GetAttribute, (const String&) const, Variant), asCALL_THISCALL);
+    // ValueAnimation* Animatable::GetAttributeAnimation(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("UIComponent", "ValueAnimation@+ GetAttributeAnimation(const String&in) const", asMETHODPR(UIComponent, GetAttributeAnimation, (const String&) const, ValueAnimation*), asCALL_THISCALL);
+    // float Animatable::GetAttributeAnimationSpeed(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("UIComponent", "float GetAttributeAnimationSpeed(const String&in) const", asMETHODPR(UIComponent, GetAttributeAnimationSpeed, (const String&) const, float), asCALL_THISCALL);
+    // float Animatable::GetAttributeAnimationTime(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("UIComponent", "float GetAttributeAnimationTime(const String&in) const", asMETHODPR(UIComponent, GetAttributeAnimationTime, (const String&) const, float), asCALL_THISCALL);
+    // WrapMode Animatable::GetAttributeAnimationWrapMode(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("UIComponent", "WrapMode GetAttributeAnimationWrapMode(const String&in) const", asMETHODPR(UIComponent, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), asCALL_THISCALL);
+    // Variant Serializable::GetAttributeDefault(unsigned index) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UIComponent", "Variant GetAttributeDefault(uint) const", asMETHODPR(UIComponent, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UIComponent", "Variant get_attributeDefaults(uint) const", asMETHODPR(UIComponent, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
+    // Variant Serializable::GetAttributeDefault(const String& name) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UIComponent", "Variant GetAttributeDefault(const String&in) const", asMETHODPR(UIComponent, GetAttributeDefault, (const String&) const, Variant), asCALL_THISCALL);
+    // virtual const Vector<AttributeInfo>* Serializable::GetAttributes() const | File: ../Scene/Serializable.h
+    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
+    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UIComponent", "bool GetBlockEvents() const", asMETHODPR(UIComponent, GetBlockEvents, () const, bool), asCALL_THISCALL);
+    // const String& Object::GetCategory() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UIComponent", "const String& GetCategory() const", asMETHODPR(UIComponent, GetCategory, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UIComponent", "const String& get_category() const", asMETHODPR(UIComponent, GetCategory, () const, const String&), asCALL_THISCALL);
+    // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("UIComponent", "Component@+ GetComponent(StringHash) const", asMETHODPR(UIComponent, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
+    // template<class T> T*  Component::GetComponent() const | File: ../Scene/Component.h
+    // Not registered because template
+    // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
+    // Error: type "PODVector<Component*>&" can not automatically bind
+    // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
+    // Not registered because template
+    // Context* Object::GetContext() const | File: ../Core/Object.h
+    // Error: type "Context*" can not be returned
+    // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
+    // Error: type "PODVector<Node*>&" can not automatically bind
+    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UIComponent", "VariantMap& GetEventDataMap() const", asMETHODPR(UIComponent, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
+    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // Object* Object::GetEventSender() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UIComponent", "Object@+ GetEventSender() const", asMETHODPR(UIComponent, GetEventSender, () const, Object*), asCALL_THISCALL);
+    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UIComponent", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(UIComponent, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UIComponent", "const Variant& get_globalVar(StringHash) const", asMETHODPR(UIComponent, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UIComponent", "const VariantMap& GetGlobalVars() const", asMETHODPR(UIComponent, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UIComponent", "const VariantMap& get_globalVars() const", asMETHODPR(UIComponent, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    // unsigned Component::GetID() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("UIComponent", "uint GetID() const", asMETHODPR(UIComponent, GetID, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UIComponent", "uint get_id() const", asMETHODPR(UIComponent, GetID, () const, unsigned), asCALL_THISCALL);
+    // bool Serializable::GetInterceptNetworkUpdate(const String& attributeName) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UIComponent", "bool GetInterceptNetworkUpdate(const String&in) const", asMETHODPR(UIComponent, GetInterceptNetworkUpdate, (const String&) const, bool), asCALL_THISCALL);
+    // Material* UIComponent::GetMaterial() const | File: ../UI/UIComponent.h
+    engine->RegisterObjectMethod("UIComponent", "Material@+ GetMaterial() const", asMETHODPR(UIComponent, GetMaterial, () const, Material*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UIComponent", "Material@+ get_material() const", asMETHODPR(UIComponent, GetMaterial, () const, Material*), asCALL_THISCALL);
+    // virtual const Vector<AttributeInfo>* Serializable::GetNetworkAttributes() const | File: ../Scene/Serializable.h
+    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
+    // NetworkState* Serializable::GetNetworkState() const | File: ../Scene/Serializable.h
+    // Error: type "NetworkState*" can not automatically bind
+    // Node* Component::GetNode() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("UIComponent", "Node@+ GetNode() const", asMETHODPR(UIComponent, GetNode, () const, Node*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UIComponent", "Node@+ get_node() const", asMETHODPR(UIComponent, GetNode, () const, Node*), asCALL_THISCALL);
+    // unsigned Serializable::GetNumAttributes() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UIComponent", "uint GetNumAttributes() const", asMETHODPR(UIComponent, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UIComponent", "uint get_numAttributes() const", asMETHODPR(UIComponent, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
+    // unsigned Serializable::GetNumNetworkAttributes() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UIComponent", "uint GetNumNetworkAttributes() const", asMETHODPR(UIComponent, GetNumNetworkAttributes, () const, unsigned), asCALL_THISCALL);
+    // ObjectAnimation* Animatable::GetObjectAnimation() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("UIComponent", "ObjectAnimation@+ GetObjectAnimation() const", asMETHODPR(UIComponent, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UIComponent", "ObjectAnimation@+ get_objectAnimation() const", asMETHODPR(UIComponent, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
+    // ResourceRef Animatable::GetObjectAnimationAttr() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("UIComponent", "ResourceRef GetObjectAnimationAttr() const", asMETHODPR(UIComponent, GetObjectAnimationAttr, () const, ResourceRef), asCALL_THISCALL);
+    // UIElement* UIComponent::GetRoot() const | File: ../UI/UIComponent.h
+    engine->RegisterObjectMethod("UIComponent", "UIElement@+ GetRoot() const", asMETHODPR(UIComponent, GetRoot, () const, UIElement*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UIComponent", "UIElement@+ get_root() const", asMETHODPR(UIComponent, GetRoot, () const, UIElement*), asCALL_THISCALL);
+    // Scene* Component::GetScene() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("UIComponent", "Scene@+ GetScene() const", asMETHODPR(UIComponent, GetScene, () const, Scene*), asCALL_THISCALL);
+    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UIComponent", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(UIComponent, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
+    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // Not registered because template
+    // Texture2D* UIComponent::GetTexture() const | File: ../UI/UIComponent.h
+    engine->RegisterObjectMethod("UIComponent", "Texture2D@+ GetTexture() const", asMETHODPR(UIComponent, GetTexture, () const, Texture2D*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UIComponent", "Texture2D@+ get_texture() const", asMETHODPR(UIComponent, GetTexture, () const, Texture2D*), asCALL_THISCALL);
+    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UIComponent", "StringHash GetType() const", asMETHODPR(UIComponent, GetType, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UIComponent", "StringHash get_type() const", asMETHODPR(UIComponent, GetType, () const, StringHash), asCALL_THISCALL);
+    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UIComponent", "const String& GetTypeName() const", asMETHODPR(UIComponent, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UIComponent", "const String& get_typeName() const", asMETHODPR(UIComponent, GetTypeName, () const, const String&), asCALL_THISCALL);
+    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UIComponent", "bool HasEventHandlers() const", asMETHODPR(UIComponent, HasEventHandlers, () const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UIComponent", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(UIComponent, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UIComponent", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(UIComponent, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
+    // bool Component::IsEnabled() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("UIComponent", "bool IsEnabled() const", asMETHODPR(UIComponent, IsEnabled, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UIComponent", "bool get_enabled() const", asMETHODPR(UIComponent, IsEnabled, () const, bool), asCALL_THISCALL);
+    // bool Component::IsEnabledEffective() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("UIComponent", "bool IsEnabledEffective() const", asMETHODPR(UIComponent, IsEnabledEffective, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UIComponent", "bool get_enabledEffective() const", asMETHODPR(UIComponent, IsEnabledEffective, () const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UIComponent", "bool IsInstanceOf(StringHash) const", asMETHODPR(UIComponent, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
+    // Not registered because template
+    // bool Component::IsReplicated() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("UIComponent", "bool IsReplicated() const", asMETHODPR(UIComponent, IsReplicated, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UIComponent", "bool get_replicated() const", asMETHODPR(UIComponent, IsReplicated, () const, bool), asCALL_THISCALL);
+    // bool Serializable::IsTemporary() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UIComponent", "bool IsTemporary() const", asMETHODPR(UIComponent, IsTemporary, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UIComponent", "bool get_temporary() const", asMETHODPR(UIComponent, IsTemporary, () const, bool), asCALL_THISCALL);
+    // virtual bool Serializable::Load(Deserializer& source) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UIComponent", "bool Load(Deserializer&)", asMETHODPR(UIComponent, Load, (Deserializer&), bool), asCALL_THISCALL);
+    // bool Animatable::LoadJSON(const JSONValue& source) override | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("UIComponent", "bool LoadJSON(const JSONValue&in)", asMETHODPR(UIComponent, LoadJSON, (const JSONValue&), bool), asCALL_THISCALL);
+    // bool Animatable::LoadXML(const XMLElement& source) override | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("UIComponent", "bool LoadXML(const XMLElement&in)", asMETHODPR(UIComponent, LoadXML, (const XMLElement&), bool), asCALL_THISCALL);
+    // void Component::MarkNetworkUpdate() override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("UIComponent", "void MarkNetworkUpdate()", asMETHODPR(UIComponent, MarkNetworkUpdate, (), void), asCALL_THISCALL);
+    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UIComponent", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(UIComponent, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
+    // virtual void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UIComponent", "void OnGetAttribute(const AttributeInfo&in, Variant&) const", asMETHODPR(UIComponent, OnGetAttribute, (const AttributeInfo&, Variant&) const, void), asCALL_THISCALL);
+    // virtual void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UIComponent", "void OnSetAttribute(const AttributeInfo&in, const Variant&in)", asMETHODPR(UIComponent, OnSetAttribute, (const AttributeInfo&, const Variant&), void), asCALL_THISCALL);
+    // virtual void Component::OnSetEnabled() | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("UIComponent", "void OnSetEnabled()", asMETHODPR(UIComponent, OnSetEnabled, (), void), asCALL_THISCALL);
+    // void Component::PrepareNetworkUpdate() | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("UIComponent", "void PrepareNetworkUpdate()", asMETHODPR(UIComponent, PrepareNetworkUpdate, (), void), asCALL_THISCALL);
+    // bool Serializable::ReadDeltaUpdate(Deserializer& source) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UIComponent", "bool ReadDeltaUpdate(Deserializer&)", asMETHODPR(UIComponent, ReadDeltaUpdate, (Deserializer&), bool), asCALL_THISCALL);
+    // bool Serializable::ReadLatestDataUpdate(Deserializer& source) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UIComponent", "bool ReadLatestDataUpdate(Deserializer&)", asMETHODPR(UIComponent, ReadLatestDataUpdate, (Deserializer&), bool), asCALL_THISCALL);
+    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
+    // Error: type "RefCount*" can not automatically bind
+    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("UIComponent", "int Refs() const", asMETHODPR(UIComponent, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UIComponent", "int get_refs() const", asMETHODPR(UIComponent, Refs, () const, int), asCALL_THISCALL);
+    // static void UIComponent::RegisterObject(Context* context) | File: ../UI/UIComponent.h
+    // Context can be used as firs parameter of constructors only
+    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("UIComponent", asBEHAVE_RELEASE, "void f()", asMETHODPR(UIComponent, ReleaseRef, (), void), asCALL_THISCALL);
+    // void Component::Remove() | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("UIComponent", "void Remove()", asMETHODPR(UIComponent, Remove, (), void), asCALL_THISCALL);
+    // void Animatable::RemoveAttributeAnimation(const String& name) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("UIComponent", "void RemoveAttributeAnimation(const String&in)", asMETHODPR(UIComponent, RemoveAttributeAnimation, (const String&), void), asCALL_THISCALL);
+    // void Serializable::RemoveInstanceDefault() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UIComponent", "void RemoveInstanceDefault()", asMETHODPR(UIComponent, RemoveInstanceDefault, (), void), asCALL_THISCALL);
+    // void Animatable::RemoveObjectAnimation() | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("UIComponent", "void RemoveObjectAnimation()", asMETHODPR(UIComponent, RemoveObjectAnimation, (), void), asCALL_THISCALL);
+    // void Serializable::ResetToDefault() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UIComponent", "void ResetToDefault()", asMETHODPR(UIComponent, ResetToDefault, (), void), asCALL_THISCALL);
+    // bool Component::Save(Serializer& dest) const override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("UIComponent", "bool Save(Serializer&) const", asMETHODPR(UIComponent, Save, (Serializer&) const, bool), asCALL_THISCALL);
+    // virtual bool Serializable::SaveDefaultAttributes() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UIComponent", "bool SaveDefaultAttributes() const", asMETHODPR(UIComponent, SaveDefaultAttributes, () const, bool), asCALL_THISCALL);
+    // bool Component::SaveJSON(JSONValue& dest) const override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("UIComponent", "bool SaveJSON(JSONValue&) const", asMETHODPR(UIComponent, SaveJSON, (JSONValue&) const, bool), asCALL_THISCALL);
+    // bool Component::SaveXML(XMLElement& dest) const override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("UIComponent", "bool SaveXML(XMLElement&) const", asMETHODPR(UIComponent, SaveXML, (XMLElement&) const, bool), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UIComponent", "void SendEvent(StringHash)", asMETHODPR(UIComponent, SendEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UIComponent", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(UIComponent, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
+    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
+    // Not registered because template
+    // void Animatable::SetAnimationEnabled(bool enable) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("UIComponent", "void SetAnimationEnabled(bool)", asMETHODPR(UIComponent, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UIComponent", "void set_animationEnabled(bool)", asMETHODPR(UIComponent, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
+    // void Animatable::SetAnimationTime(float time) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("UIComponent", "void SetAnimationTime(float)", asMETHODPR(UIComponent, SetAnimationTime, (float), void), asCALL_THISCALL);
+    // bool Serializable::SetAttribute(unsigned index, const Variant& value) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UIComponent", "bool SetAttribute(uint, const Variant&in)", asMETHODPR(UIComponent, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UIComponent", "bool set_attributes(uint, const Variant&in)", asMETHODPR(UIComponent, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
+    // bool Serializable::SetAttribute(const String& name, const Variant& value) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UIComponent", "bool SetAttribute(const String&in, const Variant&in)", asMETHODPR(UIComponent, SetAttribute, (const String&, const Variant&), bool), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode=WM_LOOP, float speed=1.0f) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("UIComponent", "void SetAttributeAnimation(const String&in, ValueAnimation@+, WrapMode = WM_LOOP, float = 1.0f)", asMETHODPR(UIComponent, SetAttributeAnimation, (const String&, ValueAnimation*, WrapMode, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationSpeed(const String& name, float speed) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("UIComponent", "void SetAttributeAnimationSpeed(const String&in, float)", asMETHODPR(UIComponent, SetAttributeAnimationSpeed, (const String&, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationTime(const String& name, float time) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("UIComponent", "void SetAttributeAnimationTime(const String&in, float)", asMETHODPR(UIComponent, SetAttributeAnimationTime, (const String&, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationWrapMode(const String& name, WrapMode wrapMode) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("UIComponent", "void SetAttributeAnimationWrapMode(const String&in, WrapMode)", asMETHODPR(UIComponent, SetAttributeAnimationWrapMode, (const String&, WrapMode), void), asCALL_THISCALL);
+    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UIComponent", "void SetBlockEvents(bool)", asMETHODPR(UIComponent, SetBlockEvents, (bool), void), asCALL_THISCALL);
+    // void Component::SetEnabled(bool enable) | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("UIComponent", "void SetEnabled(bool)", asMETHODPR(UIComponent, SetEnabled, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UIComponent", "void set_enabled(bool)", asMETHODPR(UIComponent, SetEnabled, (bool), void), asCALL_THISCALL);
+    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UIComponent", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(UIComponent, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UIComponent", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(UIComponent, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    // void Serializable::SetInstanceDefault(bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UIComponent", "void SetInstanceDefault(bool)", asMETHODPR(UIComponent, SetInstanceDefault, (bool), void), asCALL_THISCALL);
+    // void Serializable::SetInterceptNetworkUpdate(const String& attributeName, bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UIComponent", "void SetInterceptNetworkUpdate(const String&in, bool)", asMETHODPR(UIComponent, SetInterceptNetworkUpdate, (const String&, bool), void), asCALL_THISCALL);
+    // void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("UIComponent", "void SetObjectAnimation(ObjectAnimation@+)", asMETHODPR(UIComponent, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UIComponent", "void set_objectAnimation(ObjectAnimation@+)", asMETHODPR(UIComponent, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
+    // void Animatable::SetObjectAnimationAttr(const ResourceRef& value) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("UIComponent", "void SetObjectAnimationAttr(const ResourceRef&in)", asMETHODPR(UIComponent, SetObjectAnimationAttr, (const ResourceRef&), void), asCALL_THISCALL);
+    // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UIComponent", "void SetTemporary(bool)", asMETHODPR(UIComponent, SetTemporary, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UIComponent", "void set_temporary(bool)", asMETHODPR(UIComponent, SetTemporary, (bool), void), asCALL_THISCALL);
+    // void UIComponent::SetViewportIndex(unsigned index) | File: ../UI/UIComponent.h
+    engine->RegisterObjectMethod("UIComponent", "void SetViewportIndex(uint)", asMETHODPR(UIComponent, SetViewportIndex, (unsigned), void), asCALL_THISCALL);
+    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // explicit UIComponent::UIComponent(Context* context) | File: ../UI/UIComponent.h
+    engine->RegisterObjectBehaviour("UIComponent", asBEHAVE_FACTORY, "UIComponent@+ f()", asFUNCTION(UIComponent_UIComponent_Context), asCALL_CDECL);
+    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UIComponent", "void UnsubscribeFromAllEvents()", asMETHODPR(UIComponent, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UIComponent", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(UIComponent_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
+    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UIComponent", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(UIComponent, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UIComponent", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(UIComponent, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UIComponent", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(UIComponent, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
+    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("UIComponent", "int WeakRefs() const", asMETHODPR(UIComponent, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UIComponent", "int get_weakRefs() const", asMETHODPR(UIComponent, WeakRefs, () const, int), asCALL_THISCALL);
+    // void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attributeBits, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UIComponent", "void WriteDeltaUpdate(Serializer&, const DirtyBits&in, uint8)", asMETHODPR(UIComponent, WriteDeltaUpdate, (Serializer&, const DirtyBits&, unsigned char), void), asCALL_THISCALL);
+    // void Serializable::WriteInitialDeltaUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UIComponent", "void WriteInitialDeltaUpdate(Serializer&, uint8)", asMETHODPR(UIComponent, WriteInitialDeltaUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
+    // void Serializable::WriteLatestDataUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UIComponent", "void WriteLatestDataUpdate(Serializer&, uint8)", asMETHODPR(UIComponent, WriteLatestDataUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
+#ifdef REGISTER_MANUAL_PART_Component
+    REGISTER_MANUAL_PART_Component(UIComponent, "UIComponent")
+#endif
+#ifdef REGISTER_MANUAL_PART_Animatable
+    REGISTER_MANUAL_PART_Animatable(UIComponent, "UIComponent")
+#endif
+#ifdef REGISTER_MANUAL_PART_Serializable
+    REGISTER_MANUAL_PART_Serializable(UIComponent, "UIComponent")
+#endif
+#ifdef REGISTER_MANUAL_PART_Object
+    REGISTER_MANUAL_PART_Object(UIComponent, "UIComponent")
+#endif
+#ifdef REGISTER_MANUAL_PART_RefCounted
+    REGISTER_MANUAL_PART_RefCounted(UIComponent, "UIComponent")
+#endif
+#ifdef REGISTER_MANUAL_PART_UIComponent
+    REGISTER_MANUAL_PART_UIComponent(UIComponent, "UIComponent")
+#endif
+    RegisterSubclass<Component, UIComponent>(engine, "Component", "UIComponent");
+    RegisterSubclass<Animatable, UIComponent>(engine, "Animatable", "UIComponent");
+    RegisterSubclass<Serializable, UIComponent>(engine, "Serializable", "UIComponent");
+    RegisterSubclass<Object, UIComponent>(engine, "Object", "UIComponent");
+    RegisterSubclass<RefCounted, UIComponent>(engine, "RefCounted", "UIComponent");
+
     // void UIElement::AddChild(UIElement* element) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("UIElement", "void AddChild(UIElement@+)", asMETHODPR(UIElement, AddChild, (UIElement*), void), asCALL_THISCALL);
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
@@ -915,914 +1535,6 @@ void ASRegisterGenerated_Members_U(asIScriptEngine* engine)
     RegisterSubclass<Serializable, UIElement>(engine, "Serializable", "UIElement");
     RegisterSubclass<Object, UIElement>(engine, "Object", "UIElement");
     RegisterSubclass<RefCounted, UIElement>(engine, "RefCounted", "UIElement");
-
-    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("UnknownComponent", asBEHAVE_ADDREF, "void f()", asMETHODPR(UnknownComponent, AddRef, (), void), asCALL_THISCALL);
-    // void Component::AddReplicationState(ComponentReplicationState* state) | File: ../Scene/Component.h
-    // Error: type "ComponentReplicationState*" can not automatically bind
-    // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UnknownComponent", "void AllocateNetworkState()", asMETHODPR(UnknownComponent, AllocateNetworkState, (), void), asCALL_THISCALL);
-    // virtual void Serializable::ApplyAttributes() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UnknownComponent", "void ApplyAttributes()", asMETHODPR(UnknownComponent, ApplyAttributes, (), void), asCALL_THISCALL);
-    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
-    // Not registered because template
-    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
-    // Not registered because template
-    // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("UnknownComponent", "void CleanupConnection(Connection@+)", asMETHODPR(UnknownComponent, CleanupConnection, (Connection*), void), asCALL_THISCALL);
-    // virtual void Component::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("UnknownComponent", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(UnknownComponent, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
-    // bool Animatable::GetAnimationEnabled() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("UnknownComponent", "bool GetAnimationEnabled() const", asMETHODPR(UnknownComponent, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UnknownComponent", "bool get_animationEnabled() const", asMETHODPR(UnknownComponent, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
-    // Variant Serializable::GetAttribute(unsigned index) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UnknownComponent", "Variant GetAttribute(uint) const", asMETHODPR(UnknownComponent, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UnknownComponent", "Variant get_attributes(uint) const", asMETHODPR(UnknownComponent, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
-    // Variant Serializable::GetAttribute(const String& name) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UnknownComponent", "Variant GetAttribute(const String&in) const", asMETHODPR(UnknownComponent, GetAttribute, (const String&) const, Variant), asCALL_THISCALL);
-    // ValueAnimation* Animatable::GetAttributeAnimation(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("UnknownComponent", "ValueAnimation@+ GetAttributeAnimation(const String&in) const", asMETHODPR(UnknownComponent, GetAttributeAnimation, (const String&) const, ValueAnimation*), asCALL_THISCALL);
-    // float Animatable::GetAttributeAnimationSpeed(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("UnknownComponent", "float GetAttributeAnimationSpeed(const String&in) const", asMETHODPR(UnknownComponent, GetAttributeAnimationSpeed, (const String&) const, float), asCALL_THISCALL);
-    // float Animatable::GetAttributeAnimationTime(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("UnknownComponent", "float GetAttributeAnimationTime(const String&in) const", asMETHODPR(UnknownComponent, GetAttributeAnimationTime, (const String&) const, float), asCALL_THISCALL);
-    // WrapMode Animatable::GetAttributeAnimationWrapMode(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("UnknownComponent", "WrapMode GetAttributeAnimationWrapMode(const String&in) const", asMETHODPR(UnknownComponent, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), asCALL_THISCALL);
-    // Variant Serializable::GetAttributeDefault(unsigned index) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UnknownComponent", "Variant GetAttributeDefault(uint) const", asMETHODPR(UnknownComponent, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UnknownComponent", "Variant get_attributeDefaults(uint) const", asMETHODPR(UnknownComponent, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
-    // Variant Serializable::GetAttributeDefault(const String& name) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UnknownComponent", "Variant GetAttributeDefault(const String&in) const", asMETHODPR(UnknownComponent, GetAttributeDefault, (const String&) const, Variant), asCALL_THISCALL);
-    // const Vector<AttributeInfo>* UnknownComponent::GetAttributes() const override | File: ../Scene/UnknownComponent.h
-    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
-    // const PODVector<unsigned char>& UnknownComponent::GetBinaryAttributes() const | File: ../Scene/UnknownComponent.h
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
-    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UnknownComponent", "bool GetBlockEvents() const", asMETHODPR(UnknownComponent, GetBlockEvents, () const, bool), asCALL_THISCALL);
-    // const String& Object::GetCategory() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UnknownComponent", "const String& GetCategory() const", asMETHODPR(UnknownComponent, GetCategory, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UnknownComponent", "const String& get_category() const", asMETHODPR(UnknownComponent, GetCategory, () const, const String&), asCALL_THISCALL);
-    // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("UnknownComponent", "Component@+ GetComponent(StringHash) const", asMETHODPR(UnknownComponent, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
-    // template<class T> T*  Component::GetComponent() const | File: ../Scene/Component.h
-    // Not registered because template
-    // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
-    // Error: type "PODVector<Component*>&" can not automatically bind
-    // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
-    // Not registered because template
-    // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
-    // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
-    // Error: type "PODVector<Node*>&" can not automatically bind
-    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UnknownComponent", "VariantMap& GetEventDataMap() const", asMETHODPR(UnknownComponent, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
-    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // Object* Object::GetEventSender() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UnknownComponent", "Object@+ GetEventSender() const", asMETHODPR(UnknownComponent, GetEventSender, () const, Object*), asCALL_THISCALL);
-    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UnknownComponent", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(UnknownComponent, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UnknownComponent", "const Variant& get_globalVar(StringHash) const", asMETHODPR(UnknownComponent, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UnknownComponent", "const VariantMap& GetGlobalVars() const", asMETHODPR(UnknownComponent, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UnknownComponent", "const VariantMap& get_globalVars() const", asMETHODPR(UnknownComponent, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    // unsigned Component::GetID() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("UnknownComponent", "uint GetID() const", asMETHODPR(UnknownComponent, GetID, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UnknownComponent", "uint get_id() const", asMETHODPR(UnknownComponent, GetID, () const, unsigned), asCALL_THISCALL);
-    // bool Serializable::GetInterceptNetworkUpdate(const String& attributeName) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UnknownComponent", "bool GetInterceptNetworkUpdate(const String&in) const", asMETHODPR(UnknownComponent, GetInterceptNetworkUpdate, (const String&) const, bool), asCALL_THISCALL);
-    // virtual const Vector<AttributeInfo>* Serializable::GetNetworkAttributes() const | File: ../Scene/Serializable.h
-    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
-    // NetworkState* Serializable::GetNetworkState() const | File: ../Scene/Serializable.h
-    // Error: type "NetworkState*" can not automatically bind
-    // Node* Component::GetNode() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("UnknownComponent", "Node@+ GetNode() const", asMETHODPR(UnknownComponent, GetNode, () const, Node*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UnknownComponent", "Node@+ get_node() const", asMETHODPR(UnknownComponent, GetNode, () const, Node*), asCALL_THISCALL);
-    // unsigned Serializable::GetNumAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UnknownComponent", "uint GetNumAttributes() const", asMETHODPR(UnknownComponent, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UnknownComponent", "uint get_numAttributes() const", asMETHODPR(UnknownComponent, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
-    // unsigned Serializable::GetNumNetworkAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UnknownComponent", "uint GetNumNetworkAttributes() const", asMETHODPR(UnknownComponent, GetNumNetworkAttributes, () const, unsigned), asCALL_THISCALL);
-    // ObjectAnimation* Animatable::GetObjectAnimation() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("UnknownComponent", "ObjectAnimation@+ GetObjectAnimation() const", asMETHODPR(UnknownComponent, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UnknownComponent", "ObjectAnimation@+ get_objectAnimation() const", asMETHODPR(UnknownComponent, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
-    // ResourceRef Animatable::GetObjectAnimationAttr() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("UnknownComponent", "ResourceRef GetObjectAnimationAttr() const", asMETHODPR(UnknownComponent, GetObjectAnimationAttr, () const, ResourceRef), asCALL_THISCALL);
-    // Scene* Component::GetScene() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("UnknownComponent", "Scene@+ GetScene() const", asMETHODPR(UnknownComponent, GetScene, () const, Scene*), asCALL_THISCALL);
-    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UnknownComponent", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(UnknownComponent, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
-    // Not registered because template
-    // StringHash UnknownComponent::GetType() const override | File: ../Scene/UnknownComponent.h
-    engine->RegisterObjectMethod("UnknownComponent", "StringHash GetType() const", asMETHODPR(UnknownComponent, GetType, () const, StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UnknownComponent", "StringHash get_type() const", asMETHODPR(UnknownComponent, GetType, () const, StringHash), asCALL_THISCALL);
-    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // const String& UnknownComponent::GetTypeName() const override | File: ../Scene/UnknownComponent.h
-    engine->RegisterObjectMethod("UnknownComponent", "const String& GetTypeName() const", asMETHODPR(UnknownComponent, GetTypeName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UnknownComponent", "const String& get_typeName() const", asMETHODPR(UnknownComponent, GetTypeName, () const, const String&), asCALL_THISCALL);
-    // static const Urho3D::String& UnknownComponent::GetTypeNameStatic() | File: ../Scene/UnknownComponent.h
-    // Error: type "const Urho3D::String&" can not automatically bind
-    // static Urho3D::StringHash UnknownComponent::GetTypeStatic() | File: ../Scene/UnknownComponent.h
-    // Error: type "Urho3D::StringHash" can not automatically bind
-    // bool UnknownComponent::GetUseXML() const | File: ../Scene/UnknownComponent.h
-    engine->RegisterObjectMethod("UnknownComponent", "bool GetUseXML() const", asMETHODPR(UnknownComponent, GetUseXML, () const, bool), asCALL_THISCALL);
-    // const Vector<String>& UnknownComponent::GetXMLAttributes() const | File: ../Scene/UnknownComponent.h
-    engine->RegisterObjectMethod("UnknownComponent", "Array<String>@ GetXMLAttributes() const", asFUNCTION(UnknownComponent_GetXMLAttributes_void), asCALL_CDECL_OBJFIRST);
-    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UnknownComponent", "bool HasEventHandlers() const", asMETHODPR(UnknownComponent, HasEventHandlers, () const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UnknownComponent", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(UnknownComponent, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UnknownComponent", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(UnknownComponent, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
-    // bool Component::IsEnabled() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("UnknownComponent", "bool IsEnabled() const", asMETHODPR(UnknownComponent, IsEnabled, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UnknownComponent", "bool get_enabled() const", asMETHODPR(UnknownComponent, IsEnabled, () const, bool), asCALL_THISCALL);
-    // bool Component::IsEnabledEffective() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("UnknownComponent", "bool IsEnabledEffective() const", asMETHODPR(UnknownComponent, IsEnabledEffective, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UnknownComponent", "bool get_enabledEffective() const", asMETHODPR(UnknownComponent, IsEnabledEffective, () const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UnknownComponent", "bool IsInstanceOf(StringHash) const", asMETHODPR(UnknownComponent, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
-    // Not registered because template
-    // bool Component::IsReplicated() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("UnknownComponent", "bool IsReplicated() const", asMETHODPR(UnknownComponent, IsReplicated, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UnknownComponent", "bool get_replicated() const", asMETHODPR(UnknownComponent, IsReplicated, () const, bool), asCALL_THISCALL);
-    // bool Serializable::IsTemporary() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UnknownComponent", "bool IsTemporary() const", asMETHODPR(UnknownComponent, IsTemporary, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UnknownComponent", "bool get_temporary() const", asMETHODPR(UnknownComponent, IsTemporary, () const, bool), asCALL_THISCALL);
-    // bool UnknownComponent::Load(Deserializer& source) override | File: ../Scene/UnknownComponent.h
-    engine->RegisterObjectMethod("UnknownComponent", "bool Load(Deserializer&)", asMETHODPR(UnknownComponent, Load, (Deserializer&), bool), asCALL_THISCALL);
-    // bool UnknownComponent::LoadJSON(const JSONValue& source) override | File: ../Scene/UnknownComponent.h
-    engine->RegisterObjectMethod("UnknownComponent", "bool LoadJSON(const JSONValue&in)", asMETHODPR(UnknownComponent, LoadJSON, (const JSONValue&), bool), asCALL_THISCALL);
-    // bool UnknownComponent::LoadXML(const XMLElement& source) override | File: ../Scene/UnknownComponent.h
-    engine->RegisterObjectMethod("UnknownComponent", "bool LoadXML(const XMLElement&in)", asMETHODPR(UnknownComponent, LoadXML, (const XMLElement&), bool), asCALL_THISCALL);
-    // void Component::MarkNetworkUpdate() override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("UnknownComponent", "void MarkNetworkUpdate()", asMETHODPR(UnknownComponent, MarkNetworkUpdate, (), void), asCALL_THISCALL);
-    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UnknownComponent", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(UnknownComponent, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
-    // virtual void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UnknownComponent", "void OnGetAttribute(const AttributeInfo&in, Variant&) const", asMETHODPR(UnknownComponent, OnGetAttribute, (const AttributeInfo&, Variant&) const, void), asCALL_THISCALL);
-    // virtual void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UnknownComponent", "void OnSetAttribute(const AttributeInfo&in, const Variant&in)", asMETHODPR(UnknownComponent, OnSetAttribute, (const AttributeInfo&, const Variant&), void), asCALL_THISCALL);
-    // virtual void Component::OnSetEnabled() | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("UnknownComponent", "void OnSetEnabled()", asMETHODPR(UnknownComponent, OnSetEnabled, (), void), asCALL_THISCALL);
-    // void Component::PrepareNetworkUpdate() | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("UnknownComponent", "void PrepareNetworkUpdate()", asMETHODPR(UnknownComponent, PrepareNetworkUpdate, (), void), asCALL_THISCALL);
-    // bool Serializable::ReadDeltaUpdate(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UnknownComponent", "bool ReadDeltaUpdate(Deserializer&)", asMETHODPR(UnknownComponent, ReadDeltaUpdate, (Deserializer&), bool), asCALL_THISCALL);
-    // bool Serializable::ReadLatestDataUpdate(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UnknownComponent", "bool ReadLatestDataUpdate(Deserializer&)", asMETHODPR(UnknownComponent, ReadLatestDataUpdate, (Deserializer&), bool), asCALL_THISCALL);
-    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
-    // Error: type "RefCount*" can not automatically bind
-    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("UnknownComponent", "int Refs() const", asMETHODPR(UnknownComponent, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UnknownComponent", "int get_refs() const", asMETHODPR(UnknownComponent, Refs, () const, int), asCALL_THISCALL);
-    // static void UnknownComponent::RegisterObject(Context* context) | File: ../Scene/UnknownComponent.h
-    // Context can be used as firs parameter of constructors only
-    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("UnknownComponent", asBEHAVE_RELEASE, "void f()", asMETHODPR(UnknownComponent, ReleaseRef, (), void), asCALL_THISCALL);
-    // void Component::Remove() | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("UnknownComponent", "void Remove()", asMETHODPR(UnknownComponent, Remove, (), void), asCALL_THISCALL);
-    // void Animatable::RemoveAttributeAnimation(const String& name) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("UnknownComponent", "void RemoveAttributeAnimation(const String&in)", asMETHODPR(UnknownComponent, RemoveAttributeAnimation, (const String&), void), asCALL_THISCALL);
-    // void Serializable::RemoveInstanceDefault() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UnknownComponent", "void RemoveInstanceDefault()", asMETHODPR(UnknownComponent, RemoveInstanceDefault, (), void), asCALL_THISCALL);
-    // void Animatable::RemoveObjectAnimation() | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("UnknownComponent", "void RemoveObjectAnimation()", asMETHODPR(UnknownComponent, RemoveObjectAnimation, (), void), asCALL_THISCALL);
-    // void Serializable::ResetToDefault() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UnknownComponent", "void ResetToDefault()", asMETHODPR(UnknownComponent, ResetToDefault, (), void), asCALL_THISCALL);
-    // bool UnknownComponent::Save(Serializer& dest) const override | File: ../Scene/UnknownComponent.h
-    engine->RegisterObjectMethod("UnknownComponent", "bool Save(Serializer&) const", asMETHODPR(UnknownComponent, Save, (Serializer&) const, bool), asCALL_THISCALL);
-    // virtual bool Serializable::SaveDefaultAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UnknownComponent", "bool SaveDefaultAttributes() const", asMETHODPR(UnknownComponent, SaveDefaultAttributes, () const, bool), asCALL_THISCALL);
-    // bool UnknownComponent::SaveJSON(JSONValue& dest) const override | File: ../Scene/UnknownComponent.h
-    engine->RegisterObjectMethod("UnknownComponent", "bool SaveJSON(JSONValue&) const", asMETHODPR(UnknownComponent, SaveJSON, (JSONValue&) const, bool), asCALL_THISCALL);
-    // bool UnknownComponent::SaveXML(XMLElement& dest) const override | File: ../Scene/UnknownComponent.h
-    engine->RegisterObjectMethod("UnknownComponent", "bool SaveXML(XMLElement&) const", asMETHODPR(UnknownComponent, SaveXML, (XMLElement&) const, bool), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UnknownComponent", "void SendEvent(StringHash)", asMETHODPR(UnknownComponent, SendEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UnknownComponent", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(UnknownComponent, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
-    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
-    // Not registered because template
-    // void Animatable::SetAnimationEnabled(bool enable) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("UnknownComponent", "void SetAnimationEnabled(bool)", asMETHODPR(UnknownComponent, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UnknownComponent", "void set_animationEnabled(bool)", asMETHODPR(UnknownComponent, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
-    // void Animatable::SetAnimationTime(float time) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("UnknownComponent", "void SetAnimationTime(float)", asMETHODPR(UnknownComponent, SetAnimationTime, (float), void), asCALL_THISCALL);
-    // bool Serializable::SetAttribute(unsigned index, const Variant& value) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UnknownComponent", "bool SetAttribute(uint, const Variant&in)", asMETHODPR(UnknownComponent, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UnknownComponent", "bool set_attributes(uint, const Variant&in)", asMETHODPR(UnknownComponent, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
-    // bool Serializable::SetAttribute(const String& name, const Variant& value) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UnknownComponent", "bool SetAttribute(const String&in, const Variant&in)", asMETHODPR(UnknownComponent, SetAttribute, (const String&, const Variant&), bool), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode=WM_LOOP, float speed=1.0f) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("UnknownComponent", "void SetAttributeAnimation(const String&in, ValueAnimation@+, WrapMode = WM_LOOP, float = 1.0f)", asMETHODPR(UnknownComponent, SetAttributeAnimation, (const String&, ValueAnimation*, WrapMode, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationSpeed(const String& name, float speed) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("UnknownComponent", "void SetAttributeAnimationSpeed(const String&in, float)", asMETHODPR(UnknownComponent, SetAttributeAnimationSpeed, (const String&, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationTime(const String& name, float time) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("UnknownComponent", "void SetAttributeAnimationTime(const String&in, float)", asMETHODPR(UnknownComponent, SetAttributeAnimationTime, (const String&, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationWrapMode(const String& name, WrapMode wrapMode) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("UnknownComponent", "void SetAttributeAnimationWrapMode(const String&in, WrapMode)", asMETHODPR(UnknownComponent, SetAttributeAnimationWrapMode, (const String&, WrapMode), void), asCALL_THISCALL);
-    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UnknownComponent", "void SetBlockEvents(bool)", asMETHODPR(UnknownComponent, SetBlockEvents, (bool), void), asCALL_THISCALL);
-    // void Component::SetEnabled(bool enable) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("UnknownComponent", "void SetEnabled(bool)", asMETHODPR(UnknownComponent, SetEnabled, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UnknownComponent", "void set_enabled(bool)", asMETHODPR(UnknownComponent, SetEnabled, (bool), void), asCALL_THISCALL);
-    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UnknownComponent", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(UnknownComponent, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UnknownComponent", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(UnknownComponent, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    // void Serializable::SetInstanceDefault(bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UnknownComponent", "void SetInstanceDefault(bool)", asMETHODPR(UnknownComponent, SetInstanceDefault, (bool), void), asCALL_THISCALL);
-    // void Serializable::SetInterceptNetworkUpdate(const String& attributeName, bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UnknownComponent", "void SetInterceptNetworkUpdate(const String&in, bool)", asMETHODPR(UnknownComponent, SetInterceptNetworkUpdate, (const String&, bool), void), asCALL_THISCALL);
-    // void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("UnknownComponent", "void SetObjectAnimation(ObjectAnimation@+)", asMETHODPR(UnknownComponent, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UnknownComponent", "void set_objectAnimation(ObjectAnimation@+)", asMETHODPR(UnknownComponent, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
-    // void Animatable::SetObjectAnimationAttr(const ResourceRef& value) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("UnknownComponent", "void SetObjectAnimationAttr(const ResourceRef&in)", asMETHODPR(UnknownComponent, SetObjectAnimationAttr, (const ResourceRef&), void), asCALL_THISCALL);
-    // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UnknownComponent", "void SetTemporary(bool)", asMETHODPR(UnknownComponent, SetTemporary, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UnknownComponent", "void set_temporary(bool)", asMETHODPR(UnknownComponent, SetTemporary, (bool), void), asCALL_THISCALL);
-    // void UnknownComponent::SetType(StringHash typeHash) | File: ../Scene/UnknownComponent.h
-    engine->RegisterObjectMethod("UnknownComponent", "void SetType(StringHash)", asMETHODPR(UnknownComponent, SetType, (StringHash), void), asCALL_THISCALL);
-    // void UnknownComponent::SetTypeName(const String& typeName) | File: ../Scene/UnknownComponent.h
-    engine->RegisterObjectMethod("UnknownComponent", "void SetTypeName(const String&in)", asMETHODPR(UnknownComponent, SetTypeName, (const String&), void), asCALL_THISCALL);
-    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UnknownComponent", "void UnsubscribeFromAllEvents()", asMETHODPR(UnknownComponent, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UnknownComponent", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(UnknownComponent_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
-    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UnknownComponent", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(UnknownComponent, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UnknownComponent", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(UnknownComponent, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UnknownComponent", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(UnknownComponent, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
-    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("UnknownComponent", "int WeakRefs() const", asMETHODPR(UnknownComponent, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UnknownComponent", "int get_weakRefs() const", asMETHODPR(UnknownComponent, WeakRefs, () const, int), asCALL_THISCALL);
-    // void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attributeBits, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UnknownComponent", "void WriteDeltaUpdate(Serializer&, const DirtyBits&in, uint8)", asMETHODPR(UnknownComponent, WriteDeltaUpdate, (Serializer&, const DirtyBits&, unsigned char), void), asCALL_THISCALL);
-    // void Serializable::WriteInitialDeltaUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UnknownComponent", "void WriteInitialDeltaUpdate(Serializer&, uint8)", asMETHODPR(UnknownComponent, WriteInitialDeltaUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
-    // void Serializable::WriteLatestDataUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UnknownComponent", "void WriteLatestDataUpdate(Serializer&, uint8)", asMETHODPR(UnknownComponent, WriteLatestDataUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
-#ifdef REGISTER_MANUAL_PART_Component
-    REGISTER_MANUAL_PART_Component(UnknownComponent, "UnknownComponent")
-#endif
-#ifdef REGISTER_MANUAL_PART_Animatable
-    REGISTER_MANUAL_PART_Animatable(UnknownComponent, "UnknownComponent")
-#endif
-#ifdef REGISTER_MANUAL_PART_Serializable
-    REGISTER_MANUAL_PART_Serializable(UnknownComponent, "UnknownComponent")
-#endif
-#ifdef REGISTER_MANUAL_PART_Object
-    REGISTER_MANUAL_PART_Object(UnknownComponent, "UnknownComponent")
-#endif
-#ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(UnknownComponent, "UnknownComponent")
-#endif
-#ifdef REGISTER_MANUAL_PART_UnknownComponent
-    REGISTER_MANUAL_PART_UnknownComponent(UnknownComponent, "UnknownComponent")
-#endif
-    RegisterSubclass<Component, UnknownComponent>(engine, "Component", "UnknownComponent");
-    RegisterSubclass<Animatable, UnknownComponent>(engine, "Animatable", "UnknownComponent");
-    RegisterSubclass<Serializable, UnknownComponent>(engine, "Serializable", "UnknownComponent");
-    RegisterSubclass<Object, UnknownComponent>(engine, "Object", "UnknownComponent");
-    RegisterSubclass<RefCounted, UnknownComponent>(engine, "RefCounted", "UnknownComponent");
-
-    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("UI", asBEHAVE_ADDREF, "void f()", asMETHODPR(UI, AddRef, (), void), asCALL_THISCALL);
-    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
-    // Not registered because template
-    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
-    // Not registered because template
-    // void UI::Clear() | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "void Clear()", asMETHODPR(UI, Clear, (), void), asCALL_THISCALL);
-    // IntVector2 UI::ConvertSystemToUI(const IntVector2& systemPos) const | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "IntVector2 ConvertSystemToUI(const IntVector2&in) const", asMETHODPR(UI, ConvertSystemToUI, (const IntVector2&) const, IntVector2), asCALL_THISCALL);
-    // IntVector2 UI::ConvertUIToSystem(const IntVector2& uiPos) const | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "IntVector2 ConvertUIToSystem(const IntVector2&in) const", asMETHODPR(UI, ConvertUIToSystem, (const IntVector2&) const, IntVector2), asCALL_THISCALL);
-    // void UI::DebugDraw(UIElement* element) | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "void DebugDraw(UIElement@+)", asMETHODPR(UI, DebugDraw, (UIElement*), void), asCALL_THISCALL);
-    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UI", "bool GetBlockEvents() const", asMETHODPR(UI, GetBlockEvents, () const, bool), asCALL_THISCALL);
-    // const String& Object::GetCategory() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UI", "const String& GetCategory() const", asMETHODPR(UI, GetCategory, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "const String& get_category() const", asMETHODPR(UI, GetCategory, () const, const String&), asCALL_THISCALL);
-    // const String& UI::GetClipboardText() const | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "const String& GetClipboardText() const", asMETHODPR(UI, GetClipboardText, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "const String& get_clipboardText() const", asMETHODPR(UI, GetClipboardText, () const, const String&), asCALL_THISCALL);
-    // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
-    // Cursor* UI::GetCursor() const | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "Cursor@+ GetCursor() const", asMETHODPR(UI, GetCursor, () const, Cursor*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "Cursor@+ get_cursor() const", asMETHODPR(UI, GetCursor, () const, Cursor*), asCALL_THISCALL);
-    // IntVector2 UI::GetCursorPosition() const | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "IntVector2 GetCursorPosition() const", asMETHODPR(UI, GetCursorPosition, () const, IntVector2), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "IntVector2 get_cursorPosition() const", asMETHODPR(UI, GetCursorPosition, () const, IntVector2), asCALL_THISCALL);
-    // const IntVector2& UI::GetCustomSize() const | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "const IntVector2& GetCustomSize() const", asMETHODPR(UI, GetCustomSize, () const, const IntVector2&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "const IntVector2& get_customSize() const", asMETHODPR(UI, GetCustomSize, () const, const IntVector2&), asCALL_THISCALL);
-    // float UI::GetDefaultToolTipDelay() const | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "float GetDefaultToolTipDelay() const", asMETHODPR(UI, GetDefaultToolTipDelay, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "float get_defaultToolTipDelay() const", asMETHODPR(UI, GetDefaultToolTipDelay, () const, float), asCALL_THISCALL);
-    // float UI::GetDoubleClickInterval() const | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "float GetDoubleClickInterval() const", asMETHODPR(UI, GetDoubleClickInterval, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "float get_doubleClickInterval() const", asMETHODPR(UI, GetDoubleClickInterval, () const, float), asCALL_THISCALL);
-    // int UI::GetDragBeginDistance() const | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "int GetDragBeginDistance() const", asMETHODPR(UI, GetDragBeginDistance, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "int get_dragBeginDistance() const", asMETHODPR(UI, GetDragBeginDistance, () const, int), asCALL_THISCALL);
-    // float UI::GetDragBeginInterval() const | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "float GetDragBeginInterval() const", asMETHODPR(UI, GetDragBeginInterval, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "float get_dragBeginInterval() const", asMETHODPR(UI, GetDragBeginInterval, () const, float), asCALL_THISCALL);
-    // UIElement* UI::GetDragElement(unsigned index) | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "UIElement@+ GetDragElement(uint)", asMETHODPR(UI, GetDragElement, (unsigned), UIElement*), asCALL_THISCALL);
-    // const Vector<UIElement*> UI::GetDragElements() | File: ../UI/UI.h
-    // Error: type "const Vector<UIElement*>" can not automatically bind
-    // UIElement* UI::GetElementAt(const IntVector2& position, bool enabledOnly=true) | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "UIElement@+ GetElementAt(const IntVector2&in, bool = true)", asMETHODPR(UI, GetElementAt, (const IntVector2&, bool), UIElement*), asCALL_THISCALL);
-    // UIElement* UI::GetElementAt(int x, int y, bool enabledOnly=true) | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "UIElement@+ GetElementAt(int, int, bool = true)", asMETHODPR(UI, GetElementAt, (int, int, bool), UIElement*), asCALL_THISCALL);
-    // UIElement* UI::GetElementAt(UIElement* root, const IntVector2& position, bool enabledOnly=true) | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "UIElement@+ GetElementAt(UIElement@+, const IntVector2&in, bool = true)", asMETHODPR(UI, GetElementAt, (UIElement*, const IntVector2&, bool), UIElement*), asCALL_THISCALL);
-    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UI", "VariantMap& GetEventDataMap() const", asMETHODPR(UI, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
-    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // Object* Object::GetEventSender() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UI", "Object@+ GetEventSender() const", asMETHODPR(UI, GetEventSender, () const, Object*), asCALL_THISCALL);
-    // UIElement* UI::GetFocusElement() const | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "UIElement@+ GetFocusElement() const", asMETHODPR(UI, GetFocusElement, () const, UIElement*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "UIElement@+ get_focusElement() const", asMETHODPR(UI, GetFocusElement, () const, UIElement*), asCALL_THISCALL);
-    // FontHintLevel UI::GetFontHintLevel() const | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "FontHintLevel GetFontHintLevel() const", asMETHODPR(UI, GetFontHintLevel, () const, FontHintLevel), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "FontHintLevel get_fontHintLevel() const", asMETHODPR(UI, GetFontHintLevel, () const, FontHintLevel), asCALL_THISCALL);
-    // int UI::GetFontOversampling() const | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "int GetFontOversampling() const", asMETHODPR(UI, GetFontOversampling, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "int get_fontOversampling() const", asMETHODPR(UI, GetFontOversampling, () const, int), asCALL_THISCALL);
-    // float UI::GetFontSubpixelThreshold() const | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "float GetFontSubpixelThreshold() const", asMETHODPR(UI, GetFontSubpixelThreshold, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "float get_fontSubpixelThreshold() const", asMETHODPR(UI, GetFontSubpixelThreshold, () const, float), asCALL_THISCALL);
-    // bool UI::GetForceAutoHint() const | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "bool GetForceAutoHint() const", asMETHODPR(UI, GetForceAutoHint, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "bool get_forceAutoHint() const", asMETHODPR(UI, GetForceAutoHint, () const, bool), asCALL_THISCALL);
-    // UIElement* UI::GetFrontElement() const | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "UIElement@+ GetFrontElement() const", asMETHODPR(UI, GetFrontElement, () const, UIElement*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "UIElement@+ get_frontElement() const", asMETHODPR(UI, GetFrontElement, () const, UIElement*), asCALL_THISCALL);
-    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UI", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(UI, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "const Variant& get_globalVar(StringHash) const", asMETHODPR(UI, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UI", "const VariantMap& GetGlobalVars() const", asMETHODPR(UI, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "const VariantMap& get_globalVars() const", asMETHODPR(UI, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    // float UI::GetMaxDoubleClickDistance() const | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "float GetMaxDoubleClickDistance() const", asMETHODPR(UI, GetMaxDoubleClickDistance, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "float get_maxDoubleClickDistance() const", asMETHODPR(UI, GetMaxDoubleClickDistance, () const, float), asCALL_THISCALL);
-    // int UI::GetMaxFontTextureSize() const | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "int GetMaxFontTextureSize() const", asMETHODPR(UI, GetMaxFontTextureSize, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "int get_maxFontTextureSize() const", asMETHODPR(UI, GetMaxFontTextureSize, () const, int), asCALL_THISCALL);
-    // unsigned UI::GetNumDragElements() const | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "uint GetNumDragElements() const", asMETHODPR(UI, GetNumDragElements, () const, unsigned), asCALL_THISCALL);
-    // UIElement* UI::GetRoot() const | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "UIElement@+ GetRoot() const", asMETHODPR(UI, GetRoot, () const, UIElement*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "UIElement@+ get_root() const", asMETHODPR(UI, GetRoot, () const, UIElement*), asCALL_THISCALL);
-    // UIElement* UI::GetRootModalElement() const | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "UIElement@+ GetRootModalElement() const", asMETHODPR(UI, GetRootModalElement, () const, UIElement*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "UIElement@+ get_modalRoot() const", asMETHODPR(UI, GetRootModalElement, () const, UIElement*), asCALL_THISCALL);
-    // float UI::GetScale() const | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "float GetScale() const", asMETHODPR(UI, GetScale, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "float get_scale() const", asMETHODPR(UI, GetScale, () const, float), asCALL_THISCALL);
-    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UI", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(UI, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
-    // Not registered because template
-    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UI", "StringHash GetType() const", asMETHODPR(UI, GetType, () const, StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "StringHash get_type() const", asMETHODPR(UI, GetType, () const, StringHash), asCALL_THISCALL);
-    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UI", "const String& GetTypeName() const", asMETHODPR(UI, GetTypeName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "const String& get_typeName() const", asMETHODPR(UI, GetTypeName, () const, const String&), asCALL_THISCALL);
-    // bool UI::GetUseMutableGlyphs() const | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "bool GetUseMutableGlyphs() const", asMETHODPR(UI, GetUseMutableGlyphs, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "bool get_useMutableGlyphs() const", asMETHODPR(UI, GetUseMutableGlyphs, () const, bool), asCALL_THISCALL);
-    // bool UI::GetUseScreenKeyboard() const | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "bool GetUseScreenKeyboard() const", asMETHODPR(UI, GetUseScreenKeyboard, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "bool get_useScreenKeyboard() const", asMETHODPR(UI, GetUseScreenKeyboard, () const, bool), asCALL_THISCALL);
-    // bool UI::GetUseSystemClipboard() const | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "bool GetUseSystemClipboard() const", asMETHODPR(UI, GetUseSystemClipboard, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "bool get_useSystemClipboard() const", asMETHODPR(UI, GetUseSystemClipboard, () const, bool), asCALL_THISCALL);
-    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UI", "bool HasEventHandlers() const", asMETHODPR(UI, HasEventHandlers, () const, bool), asCALL_THISCALL);
-    // bool UI::HasModalElement() const | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "bool HasModalElement() const", asMETHODPR(UI, HasModalElement, () const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UI", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(UI, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UI", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(UI, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
-    // bool UI::IsDragging() const | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "bool IsDragging() const", asMETHODPR(UI, IsDragging, () const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UI", "bool IsInstanceOf(StringHash) const", asMETHODPR(UI, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
-    // Not registered because template
-    // bool UI::IsNonFocusedMouseWheel() const | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "bool IsNonFocusedMouseWheel() const", asMETHODPR(UI, IsNonFocusedMouseWheel, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "bool get_nonFocusedMouseWheel() const", asMETHODPR(UI, IsNonFocusedMouseWheel, () const, bool), asCALL_THISCALL);
-    // SharedPtr<UIElement> UI::LoadLayout(Deserializer& source, XMLFile* styleFile=nullptr) | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "UIElement@+ LoadLayout(Deserializer&, XMLFile@+ = null)", asFUNCTION(UI_LoadLayout_Deserializer_XMLFile), asCALL_CDECL_OBJFIRST);
-    // SharedPtr<UIElement> UI::LoadLayout(XMLFile* file, XMLFile* styleFile=nullptr) | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "UIElement@+ LoadLayout(XMLFile@+, XMLFile@+ = null)", asFUNCTION(UI_LoadLayout_XMLFile_XMLFile), asCALL_CDECL_OBJFIRST);
-    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UI", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(UI, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
-    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
-    // Error: type "RefCount*" can not automatically bind
-    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("UI", "int Refs() const", asMETHODPR(UI, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "int get_refs() const", asMETHODPR(UI, Refs, () const, int), asCALL_THISCALL);
-    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("UI", asBEHAVE_RELEASE, "void f()", asMETHODPR(UI, ReleaseRef, (), void), asCALL_THISCALL);
-    // void UI::Render(bool renderUICommand=false) | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "void Render(bool = false)", asMETHODPR(UI, Render, (bool), void), asCALL_THISCALL);
-    // void UI::RenderUpdate() | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "void RenderUpdate()", asMETHODPR(UI, RenderUpdate, (), void), asCALL_THISCALL);
-    // bool UI::SaveLayout(Serializer& dest, UIElement* element) | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "bool SaveLayout(Serializer&, UIElement@+)", asMETHODPR(UI, SaveLayout, (Serializer&, UIElement*), bool), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UI", "void SendEvent(StringHash)", asMETHODPR(UI, SendEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UI", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(UI, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
-    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
-    // Not registered because template
-    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UI", "void SetBlockEvents(bool)", asMETHODPR(UI, SetBlockEvents, (bool), void), asCALL_THISCALL);
-    // void UI::SetClipboardText(const String& text) | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "void SetClipboardText(const String&in)", asMETHODPR(UI, SetClipboardText, (const String&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "void set_clipboardText(const String&in)", asMETHODPR(UI, SetClipboardText, (const String&), void), asCALL_THISCALL);
-    // void UI::SetCursor(Cursor* cursor) | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "void SetCursor(Cursor@+)", asMETHODPR(UI, SetCursor, (Cursor*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "void set_cursor(Cursor@+)", asMETHODPR(UI, SetCursor, (Cursor*), void), asCALL_THISCALL);
-    // void UI::SetCustomSize(const IntVector2& size) | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "void SetCustomSize(const IntVector2&in)", asMETHODPR(UI, SetCustomSize, (const IntVector2&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "void set_customSize(const IntVector2&in)", asMETHODPR(UI, SetCustomSize, (const IntVector2&), void), asCALL_THISCALL);
-    // void UI::SetCustomSize(int width, int height) | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "void SetCustomSize(int, int)", asMETHODPR(UI, SetCustomSize, (int, int), void), asCALL_THISCALL);
-    // void UI::SetDefaultToolTipDelay(float delay) | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "void SetDefaultToolTipDelay(float)", asMETHODPR(UI, SetDefaultToolTipDelay, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "void set_defaultToolTipDelay(float)", asMETHODPR(UI, SetDefaultToolTipDelay, (float), void), asCALL_THISCALL);
-    // void UI::SetDoubleClickInterval(float interval) | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "void SetDoubleClickInterval(float)", asMETHODPR(UI, SetDoubleClickInterval, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "void set_doubleClickInterval(float)", asMETHODPR(UI, SetDoubleClickInterval, (float), void), asCALL_THISCALL);
-    // void UI::SetDragBeginDistance(int pixels) | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "void SetDragBeginDistance(int)", asMETHODPR(UI, SetDragBeginDistance, (int), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "void set_dragBeginDistance(int)", asMETHODPR(UI, SetDragBeginDistance, (int), void), asCALL_THISCALL);
-    // void UI::SetDragBeginInterval(float interval) | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "void SetDragBeginInterval(float)", asMETHODPR(UI, SetDragBeginInterval, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "void set_dragBeginInterval(float)", asMETHODPR(UI, SetDragBeginInterval, (float), void), asCALL_THISCALL);
-    // void UI::SetElementRenderTexture(UIElement* element, Texture2D* texture) | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "void SetElementRenderTexture(UIElement@+, Texture2D@+)", asMETHODPR(UI, SetElementRenderTexture, (UIElement*, Texture2D*), void), asCALL_THISCALL);
-    // void UI::SetFocusElement(UIElement* element, bool byKey=false) | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "void SetFocusElement(UIElement@+, bool = false)", asMETHODPR(UI, SetFocusElement, (UIElement*, bool), void), asCALL_THISCALL);
-    // void UI::SetFontHintLevel(FontHintLevel level) | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "void SetFontHintLevel(FontHintLevel)", asMETHODPR(UI, SetFontHintLevel, (FontHintLevel), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "void set_fontHintLevel(FontHintLevel)", asMETHODPR(UI, SetFontHintLevel, (FontHintLevel), void), asCALL_THISCALL);
-    // void UI::SetFontOversampling(int oversampling) | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "void SetFontOversampling(int)", asMETHODPR(UI, SetFontOversampling, (int), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "void set_fontOversampling(int)", asMETHODPR(UI, SetFontOversampling, (int), void), asCALL_THISCALL);
-    // void UI::SetFontSubpixelThreshold(float threshold) | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "void SetFontSubpixelThreshold(float)", asMETHODPR(UI, SetFontSubpixelThreshold, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "void set_fontSubpixelThreshold(float)", asMETHODPR(UI, SetFontSubpixelThreshold, (float), void), asCALL_THISCALL);
-    // void UI::SetForceAutoHint(bool enable) | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "void SetForceAutoHint(bool)", asMETHODPR(UI, SetForceAutoHint, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "void set_forceAutoHint(bool)", asMETHODPR(UI, SetForceAutoHint, (bool), void), asCALL_THISCALL);
-    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UI", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(UI, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(UI, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    // void UI::SetHeight(float height) | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "void SetHeight(float)", asMETHODPR(UI, SetHeight, (float), void), asCALL_THISCALL);
-    // void UI::SetMaxDoubleClickDistance(float distPixels) | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "void SetMaxDoubleClickDistance(float)", asMETHODPR(UI, SetMaxDoubleClickDistance, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "void set_maxDoubleClickDistance(float)", asMETHODPR(UI, SetMaxDoubleClickDistance, (float), void), asCALL_THISCALL);
-    // void UI::SetMaxFontTextureSize(int size) | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "void SetMaxFontTextureSize(int)", asMETHODPR(UI, SetMaxFontTextureSize, (int), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "void set_maxFontTextureSize(int)", asMETHODPR(UI, SetMaxFontTextureSize, (int), void), asCALL_THISCALL);
-    // bool UI::SetModalElement(UIElement* modalElement, bool enable) | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "bool SetModalElement(UIElement@+, bool)", asMETHODPR(UI, SetModalElement, (UIElement*, bool), bool), asCALL_THISCALL);
-    // void UI::SetNonFocusedMouseWheel(bool nonFocusedMouseWheel) | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "void SetNonFocusedMouseWheel(bool)", asMETHODPR(UI, SetNonFocusedMouseWheel, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "void set_nonFocusedMouseWheel(bool)", asMETHODPR(UI, SetNonFocusedMouseWheel, (bool), void), asCALL_THISCALL);
-    // void UI::SetScale(float scale) | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "void SetScale(float)", asMETHODPR(UI, SetScale, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "void set_scale(float)", asMETHODPR(UI, SetScale, (float), void), asCALL_THISCALL);
-    // void UI::SetUseMutableGlyphs(bool enable) | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "void SetUseMutableGlyphs(bool)", asMETHODPR(UI, SetUseMutableGlyphs, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "void set_useMutableGlyphs(bool)", asMETHODPR(UI, SetUseMutableGlyphs, (bool), void), asCALL_THISCALL);
-    // void UI::SetUseScreenKeyboard(bool enable) | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "void SetUseScreenKeyboard(bool)", asMETHODPR(UI, SetUseScreenKeyboard, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "void set_useScreenKeyboard(bool)", asMETHODPR(UI, SetUseScreenKeyboard, (bool), void), asCALL_THISCALL);
-    // void UI::SetUseSystemClipboard(bool enable) | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "void SetUseSystemClipboard(bool)", asMETHODPR(UI, SetUseSystemClipboard, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "void set_useSystemClipboard(bool)", asMETHODPR(UI, SetUseSystemClipboard, (bool), void), asCALL_THISCALL);
-    // void UI::SetWidth(float width) | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "void SetWidth(float)", asMETHODPR(UI, SetWidth, (float), void), asCALL_THISCALL);
-    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // explicit UI::UI(Context* context) | File: ../UI/UI.h
-    engine->RegisterObjectBehaviour("UI", asBEHAVE_FACTORY, "UI@+ f()", asFUNCTION(UI_UI_Context), asCALL_CDECL);
-    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UI", "void UnsubscribeFromAllEvents()", asMETHODPR(UI, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UI", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(UI_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
-    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UI", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(UI, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UI", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(UI, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UI", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(UI, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
-    // void UI::Update(float timeStep) | File: ../UI/UI.h
-    engine->RegisterObjectMethod("UI", "void Update(float)", asMETHODPR(UI, Update, (float), void), asCALL_THISCALL);
-    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("UI", "int WeakRefs() const", asMETHODPR(UI, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "int get_weakRefs() const", asMETHODPR(UI, WeakRefs, () const, int), asCALL_THISCALL);
-#ifdef REGISTER_MANUAL_PART_Object
-    REGISTER_MANUAL_PART_Object(UI, "UI")
-#endif
-#ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(UI, "UI")
-#endif
-#ifdef REGISTER_MANUAL_PART_UI
-    REGISTER_MANUAL_PART_UI(UI, "UI")
-#endif
-    RegisterSubclass<Object, UI>(engine, "Object", "UI");
-    RegisterSubclass<RefCounted, UI>(engine, "RefCounted", "UI");
-
-    // BlendMode UIBatch::blendMode_ | File: ../UI/UIBatch.h
-    engine->RegisterObjectProperty("UIBatch", "BlendMode blendMode", offsetof(UIBatch, blendMode_));
-    // unsigned UIBatch::color_ | File: ../UI/UIBatch.h
-    engine->RegisterObjectProperty("UIBatch", "uint color", offsetof(UIBatch, color_));
-    // Material* UIBatch::customMaterial_ | File: ../UI/UIBatch.h
-    // Material* can not be registered
-    // UIElement* UIBatch::element_ | File: ../UI/UIBatch.h
-    // UIElement* can not be registered
-    // Vector2 UIBatch::invTextureSize_ | File: ../UI/UIBatch.h
-    engine->RegisterObjectProperty("UIBatch", "Vector2 invTextureSize", offsetof(UIBatch, invTextureSize_));
-    // Vector3 UIBatch::posAdjust | File: ../UI/UIBatch.h
-    engine->SetDefaultNamespace("UIBatch");
-    engine->RegisterGlobalProperty("Vector3 posAdjust", (void*)&UIBatch::posAdjust);
-    engine->SetDefaultNamespace("");
-    // IntRect UIBatch::scissor_ | File: ../UI/UIBatch.h
-    engine->RegisterObjectProperty("UIBatch", "IntRect scissor", offsetof(UIBatch, scissor_));
-    // Texture* UIBatch::texture_ | File: ../UI/UIBatch.h
-    // Texture* can not be registered
-    // bool UIBatch::useGradient_ | File: ../UI/UIBatch.h
-    engine->RegisterObjectProperty("UIBatch", "bool useGradient", offsetof(UIBatch, useGradient_));
-    // PODVector<float>* UIBatch::vertexData_ | File: ../UI/UIBatch.h
-    // PODVector<float>* can not be registered
-    // unsigned UIBatch::vertexEnd_ | File: ../UI/UIBatch.h
-    engine->RegisterObjectProperty("UIBatch", "uint vertexEnd", offsetof(UIBatch, vertexEnd_));
-    // unsigned UIBatch::vertexStart_ | File: ../UI/UIBatch.h
-    engine->RegisterObjectProperty("UIBatch", "uint vertexStart", offsetof(UIBatch, vertexStart_));
-    // static void UIBatch::AddOrMerge(const UIBatch& batch, PODVector<UIBatch>& batches) | File: ../UI/UIBatch.h
-    // Error: type "PODVector<UIBatch>&" can not automatically bind
-    // void UIBatch::AddQuad(float x, float y, float width, float height, int texOffsetX, int texOffsetY, int texWidth=0, int texHeight=0) | File: ../UI/UIBatch.h
-    engine->RegisterObjectMethod("UIBatch", "void AddQuad(float, float, float, float, int, int, int = 0, int = 0)", asMETHODPR(UIBatch, AddQuad, (float, float, float, float, int, int, int, int), void), asCALL_THISCALL);
-    // void UIBatch::AddQuad(const Matrix3x4& transform, int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth=0, int texHeight=0) | File: ../UI/UIBatch.h
-    engine->RegisterObjectMethod("UIBatch", "void AddQuad(const Matrix3x4&in, int, int, int, int, int, int, int = 0, int = 0)", asMETHODPR(UIBatch, AddQuad, (const Matrix3x4&, int, int, int, int, int, int, int, int), void), asCALL_THISCALL);
-    // void UIBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight, bool tiled) | File: ../UI/UIBatch.h
-    engine->RegisterObjectMethod("UIBatch", "void AddQuad(int, int, int, int, int, int, int, int, bool)", asMETHODPR(UIBatch, AddQuad, (int, int, int, int, int, int, int, int, bool), void), asCALL_THISCALL);
-    // void UIBatch::AddQuad(const Matrix3x4& transform, const IntVector2& a, const IntVector2& b, const IntVector2& c, const IntVector2& d, const IntVector2& texA, const IntVector2& texB, const IntVector2& texC, const IntVector2& texD) | File: ../UI/UIBatch.h
-    engine->RegisterObjectMethod("UIBatch", "void AddQuad(const Matrix3x4&in, const IntVector2&in, const IntVector2&in, const IntVector2&in, const IntVector2&in, const IntVector2&in, const IntVector2&in, const IntVector2&in, const IntVector2&in)", asMETHODPR(UIBatch, AddQuad, (const Matrix3x4&, const IntVector2&, const IntVector2&, const IntVector2&, const IntVector2&, const IntVector2&, const IntVector2&, const IntVector2&, const IntVector2&), void), asCALL_THISCALL);
-    // void UIBatch::AddQuad(const Matrix3x4& transform, const IntVector2& a, const IntVector2& b, const IntVector2& c, const IntVector2& d, const IntVector2& texA, const IntVector2& texB, const IntVector2& texC, const IntVector2& texD, const Color& colA, const Color& colB, const Color& colC, const Color& colD) | File: ../UI/UIBatch.h
-    engine->RegisterObjectMethod("UIBatch", "void AddQuad(const Matrix3x4&in, const IntVector2&in, const IntVector2&in, const IntVector2&in, const IntVector2&in, const IntVector2&in, const IntVector2&in, const IntVector2&in, const IntVector2&in, const Color&in, const Color&in, const Color&in, const Color&in)", asMETHODPR(UIBatch, AddQuad, (const Matrix3x4&, const IntVector2&, const IntVector2&, const IntVector2&, const IntVector2&, const IntVector2&, const IntVector2&, const IntVector2&, const IntVector2&, const Color&, const Color&, const Color&, const Color&), void), asCALL_THISCALL);
-    // unsigned UIBatch::GetInterpolatedColor(float x, float y) | File: ../UI/UIBatch.h
-    engine->RegisterObjectMethod("UIBatch", "uint GetInterpolatedColor(float, float)", asMETHODPR(UIBatch, GetInterpolatedColor, (float, float), unsigned), asCALL_THISCALL);
-    // bool UIBatch::Merge(const UIBatch& batch) | File: ../UI/UIBatch.h
-    engine->RegisterObjectMethod("UIBatch", "bool Merge(const UIBatch&in)", asMETHODPR(UIBatch, Merge, (const UIBatch&), bool), asCALL_THISCALL);
-    // void UIBatch::SetColor(const Color& color, bool overrideAlpha=false) | File: ../UI/UIBatch.h
-    engine->RegisterObjectMethod("UIBatch", "void SetColor(const Color&in, bool = false)", asMETHODPR(UIBatch, SetColor, (const Color&, bool), void), asCALL_THISCALL);
-    // void UIBatch::SetDefaultColor() | File: ../UI/UIBatch.h
-    engine->RegisterObjectMethod("UIBatch", "void SetDefaultColor()", asMETHODPR(UIBatch, SetDefaultColor, (), void), asCALL_THISCALL);
-    // UIBatch::UIBatch(UIElement* element, BlendMode blendMode, const IntRect& scissor, Texture* texture, PODVector<float>* vertexData) | File: ../UI/UIBatch.h
-    // Error: type "PODVector<float>*" can not automatically bind
-    // UIBatch::~UIBatch() | Implicitly-declared
-    engine->RegisterObjectBehaviour("UIBatch", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(UIBatch_Destructor), asCALL_CDECL_OBJFIRST);
-    // UIBatch& UIBatch::operator=(const UIBatch&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<UIBatch>(engine, "UIBatch");
-#ifdef REGISTER_MANUAL_PART_UIBatch
-    REGISTER_MANUAL_PART_UIBatch(UIBatch, "UIBatch")
-#endif
-
-    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("UIComponent", asBEHAVE_ADDREF, "void f()", asMETHODPR(UIComponent, AddRef, (), void), asCALL_THISCALL);
-    // void Component::AddReplicationState(ComponentReplicationState* state) | File: ../Scene/Component.h
-    // Error: type "ComponentReplicationState*" can not automatically bind
-    // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UIComponent", "void AllocateNetworkState()", asMETHODPR(UIComponent, AllocateNetworkState, (), void), asCALL_THISCALL);
-    // virtual void Serializable::ApplyAttributes() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UIComponent", "void ApplyAttributes()", asMETHODPR(UIComponent, ApplyAttributes, (), void), asCALL_THISCALL);
-    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
-    // Not registered because template
-    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
-    // Not registered because template
-    // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("UIComponent", "void CleanupConnection(Connection@+)", asMETHODPR(UIComponent, CleanupConnection, (Connection*), void), asCALL_THISCALL);
-    // virtual void Component::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("UIComponent", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(UIComponent, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
-    // bool Animatable::GetAnimationEnabled() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("UIComponent", "bool GetAnimationEnabled() const", asMETHODPR(UIComponent, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UIComponent", "bool get_animationEnabled() const", asMETHODPR(UIComponent, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
-    // Variant Serializable::GetAttribute(unsigned index) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UIComponent", "Variant GetAttribute(uint) const", asMETHODPR(UIComponent, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UIComponent", "Variant get_attributes(uint) const", asMETHODPR(UIComponent, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
-    // Variant Serializable::GetAttribute(const String& name) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UIComponent", "Variant GetAttribute(const String&in) const", asMETHODPR(UIComponent, GetAttribute, (const String&) const, Variant), asCALL_THISCALL);
-    // ValueAnimation* Animatable::GetAttributeAnimation(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("UIComponent", "ValueAnimation@+ GetAttributeAnimation(const String&in) const", asMETHODPR(UIComponent, GetAttributeAnimation, (const String&) const, ValueAnimation*), asCALL_THISCALL);
-    // float Animatable::GetAttributeAnimationSpeed(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("UIComponent", "float GetAttributeAnimationSpeed(const String&in) const", asMETHODPR(UIComponent, GetAttributeAnimationSpeed, (const String&) const, float), asCALL_THISCALL);
-    // float Animatable::GetAttributeAnimationTime(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("UIComponent", "float GetAttributeAnimationTime(const String&in) const", asMETHODPR(UIComponent, GetAttributeAnimationTime, (const String&) const, float), asCALL_THISCALL);
-    // WrapMode Animatable::GetAttributeAnimationWrapMode(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("UIComponent", "WrapMode GetAttributeAnimationWrapMode(const String&in) const", asMETHODPR(UIComponent, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), asCALL_THISCALL);
-    // Variant Serializable::GetAttributeDefault(unsigned index) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UIComponent", "Variant GetAttributeDefault(uint) const", asMETHODPR(UIComponent, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UIComponent", "Variant get_attributeDefaults(uint) const", asMETHODPR(UIComponent, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
-    // Variant Serializable::GetAttributeDefault(const String& name) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UIComponent", "Variant GetAttributeDefault(const String&in) const", asMETHODPR(UIComponent, GetAttributeDefault, (const String&) const, Variant), asCALL_THISCALL);
-    // virtual const Vector<AttributeInfo>* Serializable::GetAttributes() const | File: ../Scene/Serializable.h
-    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
-    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UIComponent", "bool GetBlockEvents() const", asMETHODPR(UIComponent, GetBlockEvents, () const, bool), asCALL_THISCALL);
-    // const String& Object::GetCategory() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UIComponent", "const String& GetCategory() const", asMETHODPR(UIComponent, GetCategory, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UIComponent", "const String& get_category() const", asMETHODPR(UIComponent, GetCategory, () const, const String&), asCALL_THISCALL);
-    // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("UIComponent", "Component@+ GetComponent(StringHash) const", asMETHODPR(UIComponent, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
-    // template<class T> T*  Component::GetComponent() const | File: ../Scene/Component.h
-    // Not registered because template
-    // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
-    // Error: type "PODVector<Component*>&" can not automatically bind
-    // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
-    // Not registered because template
-    // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
-    // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
-    // Error: type "PODVector<Node*>&" can not automatically bind
-    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UIComponent", "VariantMap& GetEventDataMap() const", asMETHODPR(UIComponent, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
-    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // Object* Object::GetEventSender() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UIComponent", "Object@+ GetEventSender() const", asMETHODPR(UIComponent, GetEventSender, () const, Object*), asCALL_THISCALL);
-    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UIComponent", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(UIComponent, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UIComponent", "const Variant& get_globalVar(StringHash) const", asMETHODPR(UIComponent, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UIComponent", "const VariantMap& GetGlobalVars() const", asMETHODPR(UIComponent, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UIComponent", "const VariantMap& get_globalVars() const", asMETHODPR(UIComponent, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    // unsigned Component::GetID() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("UIComponent", "uint GetID() const", asMETHODPR(UIComponent, GetID, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UIComponent", "uint get_id() const", asMETHODPR(UIComponent, GetID, () const, unsigned), asCALL_THISCALL);
-    // bool Serializable::GetInterceptNetworkUpdate(const String& attributeName) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UIComponent", "bool GetInterceptNetworkUpdate(const String&in) const", asMETHODPR(UIComponent, GetInterceptNetworkUpdate, (const String&) const, bool), asCALL_THISCALL);
-    // Material* UIComponent::GetMaterial() const | File: ../UI/UIComponent.h
-    engine->RegisterObjectMethod("UIComponent", "Material@+ GetMaterial() const", asMETHODPR(UIComponent, GetMaterial, () const, Material*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UIComponent", "Material@+ get_material() const", asMETHODPR(UIComponent, GetMaterial, () const, Material*), asCALL_THISCALL);
-    // virtual const Vector<AttributeInfo>* Serializable::GetNetworkAttributes() const | File: ../Scene/Serializable.h
-    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
-    // NetworkState* Serializable::GetNetworkState() const | File: ../Scene/Serializable.h
-    // Error: type "NetworkState*" can not automatically bind
-    // Node* Component::GetNode() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("UIComponent", "Node@+ GetNode() const", asMETHODPR(UIComponent, GetNode, () const, Node*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UIComponent", "Node@+ get_node() const", asMETHODPR(UIComponent, GetNode, () const, Node*), asCALL_THISCALL);
-    // unsigned Serializable::GetNumAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UIComponent", "uint GetNumAttributes() const", asMETHODPR(UIComponent, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UIComponent", "uint get_numAttributes() const", asMETHODPR(UIComponent, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
-    // unsigned Serializable::GetNumNetworkAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UIComponent", "uint GetNumNetworkAttributes() const", asMETHODPR(UIComponent, GetNumNetworkAttributes, () const, unsigned), asCALL_THISCALL);
-    // ObjectAnimation* Animatable::GetObjectAnimation() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("UIComponent", "ObjectAnimation@+ GetObjectAnimation() const", asMETHODPR(UIComponent, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UIComponent", "ObjectAnimation@+ get_objectAnimation() const", asMETHODPR(UIComponent, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
-    // ResourceRef Animatable::GetObjectAnimationAttr() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("UIComponent", "ResourceRef GetObjectAnimationAttr() const", asMETHODPR(UIComponent, GetObjectAnimationAttr, () const, ResourceRef), asCALL_THISCALL);
-    // UIElement* UIComponent::GetRoot() const | File: ../UI/UIComponent.h
-    engine->RegisterObjectMethod("UIComponent", "UIElement@+ GetRoot() const", asMETHODPR(UIComponent, GetRoot, () const, UIElement*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UIComponent", "UIElement@+ get_root() const", asMETHODPR(UIComponent, GetRoot, () const, UIElement*), asCALL_THISCALL);
-    // Scene* Component::GetScene() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("UIComponent", "Scene@+ GetScene() const", asMETHODPR(UIComponent, GetScene, () const, Scene*), asCALL_THISCALL);
-    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UIComponent", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(UIComponent, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
-    // Not registered because template
-    // Texture2D* UIComponent::GetTexture() const | File: ../UI/UIComponent.h
-    engine->RegisterObjectMethod("UIComponent", "Texture2D@+ GetTexture() const", asMETHODPR(UIComponent, GetTexture, () const, Texture2D*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UIComponent", "Texture2D@+ get_texture() const", asMETHODPR(UIComponent, GetTexture, () const, Texture2D*), asCALL_THISCALL);
-    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UIComponent", "StringHash GetType() const", asMETHODPR(UIComponent, GetType, () const, StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UIComponent", "StringHash get_type() const", asMETHODPR(UIComponent, GetType, () const, StringHash), asCALL_THISCALL);
-    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UIComponent", "const String& GetTypeName() const", asMETHODPR(UIComponent, GetTypeName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UIComponent", "const String& get_typeName() const", asMETHODPR(UIComponent, GetTypeName, () const, const String&), asCALL_THISCALL);
-    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UIComponent", "bool HasEventHandlers() const", asMETHODPR(UIComponent, HasEventHandlers, () const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UIComponent", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(UIComponent, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UIComponent", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(UIComponent, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
-    // bool Component::IsEnabled() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("UIComponent", "bool IsEnabled() const", asMETHODPR(UIComponent, IsEnabled, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UIComponent", "bool get_enabled() const", asMETHODPR(UIComponent, IsEnabled, () const, bool), asCALL_THISCALL);
-    // bool Component::IsEnabledEffective() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("UIComponent", "bool IsEnabledEffective() const", asMETHODPR(UIComponent, IsEnabledEffective, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UIComponent", "bool get_enabledEffective() const", asMETHODPR(UIComponent, IsEnabledEffective, () const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UIComponent", "bool IsInstanceOf(StringHash) const", asMETHODPR(UIComponent, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
-    // Not registered because template
-    // bool Component::IsReplicated() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("UIComponent", "bool IsReplicated() const", asMETHODPR(UIComponent, IsReplicated, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UIComponent", "bool get_replicated() const", asMETHODPR(UIComponent, IsReplicated, () const, bool), asCALL_THISCALL);
-    // bool Serializable::IsTemporary() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UIComponent", "bool IsTemporary() const", asMETHODPR(UIComponent, IsTemporary, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UIComponent", "bool get_temporary() const", asMETHODPR(UIComponent, IsTemporary, () const, bool), asCALL_THISCALL);
-    // virtual bool Serializable::Load(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UIComponent", "bool Load(Deserializer&)", asMETHODPR(UIComponent, Load, (Deserializer&), bool), asCALL_THISCALL);
-    // bool Animatable::LoadJSON(const JSONValue& source) override | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("UIComponent", "bool LoadJSON(const JSONValue&in)", asMETHODPR(UIComponent, LoadJSON, (const JSONValue&), bool), asCALL_THISCALL);
-    // bool Animatable::LoadXML(const XMLElement& source) override | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("UIComponent", "bool LoadXML(const XMLElement&in)", asMETHODPR(UIComponent, LoadXML, (const XMLElement&), bool), asCALL_THISCALL);
-    // void Component::MarkNetworkUpdate() override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("UIComponent", "void MarkNetworkUpdate()", asMETHODPR(UIComponent, MarkNetworkUpdate, (), void), asCALL_THISCALL);
-    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UIComponent", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(UIComponent, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
-    // virtual void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UIComponent", "void OnGetAttribute(const AttributeInfo&in, Variant&) const", asMETHODPR(UIComponent, OnGetAttribute, (const AttributeInfo&, Variant&) const, void), asCALL_THISCALL);
-    // virtual void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UIComponent", "void OnSetAttribute(const AttributeInfo&in, const Variant&in)", asMETHODPR(UIComponent, OnSetAttribute, (const AttributeInfo&, const Variant&), void), asCALL_THISCALL);
-    // virtual void Component::OnSetEnabled() | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("UIComponent", "void OnSetEnabled()", asMETHODPR(UIComponent, OnSetEnabled, (), void), asCALL_THISCALL);
-    // void Component::PrepareNetworkUpdate() | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("UIComponent", "void PrepareNetworkUpdate()", asMETHODPR(UIComponent, PrepareNetworkUpdate, (), void), asCALL_THISCALL);
-    // bool Serializable::ReadDeltaUpdate(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UIComponent", "bool ReadDeltaUpdate(Deserializer&)", asMETHODPR(UIComponent, ReadDeltaUpdate, (Deserializer&), bool), asCALL_THISCALL);
-    // bool Serializable::ReadLatestDataUpdate(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UIComponent", "bool ReadLatestDataUpdate(Deserializer&)", asMETHODPR(UIComponent, ReadLatestDataUpdate, (Deserializer&), bool), asCALL_THISCALL);
-    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
-    // Error: type "RefCount*" can not automatically bind
-    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("UIComponent", "int Refs() const", asMETHODPR(UIComponent, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UIComponent", "int get_refs() const", asMETHODPR(UIComponent, Refs, () const, int), asCALL_THISCALL);
-    // static void UIComponent::RegisterObject(Context* context) | File: ../UI/UIComponent.h
-    // Context can be used as firs parameter of constructors only
-    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("UIComponent", asBEHAVE_RELEASE, "void f()", asMETHODPR(UIComponent, ReleaseRef, (), void), asCALL_THISCALL);
-    // void Component::Remove() | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("UIComponent", "void Remove()", asMETHODPR(UIComponent, Remove, (), void), asCALL_THISCALL);
-    // void Animatable::RemoveAttributeAnimation(const String& name) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("UIComponent", "void RemoveAttributeAnimation(const String&in)", asMETHODPR(UIComponent, RemoveAttributeAnimation, (const String&), void), asCALL_THISCALL);
-    // void Serializable::RemoveInstanceDefault() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UIComponent", "void RemoveInstanceDefault()", asMETHODPR(UIComponent, RemoveInstanceDefault, (), void), asCALL_THISCALL);
-    // void Animatable::RemoveObjectAnimation() | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("UIComponent", "void RemoveObjectAnimation()", asMETHODPR(UIComponent, RemoveObjectAnimation, (), void), asCALL_THISCALL);
-    // void Serializable::ResetToDefault() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UIComponent", "void ResetToDefault()", asMETHODPR(UIComponent, ResetToDefault, (), void), asCALL_THISCALL);
-    // bool Component::Save(Serializer& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("UIComponent", "bool Save(Serializer&) const", asMETHODPR(UIComponent, Save, (Serializer&) const, bool), asCALL_THISCALL);
-    // virtual bool Serializable::SaveDefaultAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UIComponent", "bool SaveDefaultAttributes() const", asMETHODPR(UIComponent, SaveDefaultAttributes, () const, bool), asCALL_THISCALL);
-    // bool Component::SaveJSON(JSONValue& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("UIComponent", "bool SaveJSON(JSONValue&) const", asMETHODPR(UIComponent, SaveJSON, (JSONValue&) const, bool), asCALL_THISCALL);
-    // bool Component::SaveXML(XMLElement& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("UIComponent", "bool SaveXML(XMLElement&) const", asMETHODPR(UIComponent, SaveXML, (XMLElement&) const, bool), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UIComponent", "void SendEvent(StringHash)", asMETHODPR(UIComponent, SendEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UIComponent", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(UIComponent, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
-    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
-    // Not registered because template
-    // void Animatable::SetAnimationEnabled(bool enable) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("UIComponent", "void SetAnimationEnabled(bool)", asMETHODPR(UIComponent, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UIComponent", "void set_animationEnabled(bool)", asMETHODPR(UIComponent, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
-    // void Animatable::SetAnimationTime(float time) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("UIComponent", "void SetAnimationTime(float)", asMETHODPR(UIComponent, SetAnimationTime, (float), void), asCALL_THISCALL);
-    // bool Serializable::SetAttribute(unsigned index, const Variant& value) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UIComponent", "bool SetAttribute(uint, const Variant&in)", asMETHODPR(UIComponent, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UIComponent", "bool set_attributes(uint, const Variant&in)", asMETHODPR(UIComponent, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
-    // bool Serializable::SetAttribute(const String& name, const Variant& value) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UIComponent", "bool SetAttribute(const String&in, const Variant&in)", asMETHODPR(UIComponent, SetAttribute, (const String&, const Variant&), bool), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode=WM_LOOP, float speed=1.0f) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("UIComponent", "void SetAttributeAnimation(const String&in, ValueAnimation@+, WrapMode = WM_LOOP, float = 1.0f)", asMETHODPR(UIComponent, SetAttributeAnimation, (const String&, ValueAnimation*, WrapMode, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationSpeed(const String& name, float speed) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("UIComponent", "void SetAttributeAnimationSpeed(const String&in, float)", asMETHODPR(UIComponent, SetAttributeAnimationSpeed, (const String&, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationTime(const String& name, float time) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("UIComponent", "void SetAttributeAnimationTime(const String&in, float)", asMETHODPR(UIComponent, SetAttributeAnimationTime, (const String&, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationWrapMode(const String& name, WrapMode wrapMode) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("UIComponent", "void SetAttributeAnimationWrapMode(const String&in, WrapMode)", asMETHODPR(UIComponent, SetAttributeAnimationWrapMode, (const String&, WrapMode), void), asCALL_THISCALL);
-    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UIComponent", "void SetBlockEvents(bool)", asMETHODPR(UIComponent, SetBlockEvents, (bool), void), asCALL_THISCALL);
-    // void Component::SetEnabled(bool enable) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("UIComponent", "void SetEnabled(bool)", asMETHODPR(UIComponent, SetEnabled, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UIComponent", "void set_enabled(bool)", asMETHODPR(UIComponent, SetEnabled, (bool), void), asCALL_THISCALL);
-    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UIComponent", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(UIComponent, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UIComponent", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(UIComponent, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    // void Serializable::SetInstanceDefault(bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UIComponent", "void SetInstanceDefault(bool)", asMETHODPR(UIComponent, SetInstanceDefault, (bool), void), asCALL_THISCALL);
-    // void Serializable::SetInterceptNetworkUpdate(const String& attributeName, bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UIComponent", "void SetInterceptNetworkUpdate(const String&in, bool)", asMETHODPR(UIComponent, SetInterceptNetworkUpdate, (const String&, bool), void), asCALL_THISCALL);
-    // void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("UIComponent", "void SetObjectAnimation(ObjectAnimation@+)", asMETHODPR(UIComponent, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UIComponent", "void set_objectAnimation(ObjectAnimation@+)", asMETHODPR(UIComponent, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
-    // void Animatable::SetObjectAnimationAttr(const ResourceRef& value) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("UIComponent", "void SetObjectAnimationAttr(const ResourceRef&in)", asMETHODPR(UIComponent, SetObjectAnimationAttr, (const ResourceRef&), void), asCALL_THISCALL);
-    // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UIComponent", "void SetTemporary(bool)", asMETHODPR(UIComponent, SetTemporary, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UIComponent", "void set_temporary(bool)", asMETHODPR(UIComponent, SetTemporary, (bool), void), asCALL_THISCALL);
-    // void UIComponent::SetViewportIndex(unsigned index) | File: ../UI/UIComponent.h
-    engine->RegisterObjectMethod("UIComponent", "void SetViewportIndex(uint)", asMETHODPR(UIComponent, SetViewportIndex, (unsigned), void), asCALL_THISCALL);
-    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // explicit UIComponent::UIComponent(Context* context) | File: ../UI/UIComponent.h
-    engine->RegisterObjectBehaviour("UIComponent", asBEHAVE_FACTORY, "UIComponent@+ f()", asFUNCTION(UIComponent_UIComponent_Context), asCALL_CDECL);
-    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UIComponent", "void UnsubscribeFromAllEvents()", asMETHODPR(UIComponent, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UIComponent", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(UIComponent_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
-    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UIComponent", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(UIComponent, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UIComponent", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(UIComponent, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("UIComponent", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(UIComponent, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
-    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("UIComponent", "int WeakRefs() const", asMETHODPR(UIComponent, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UIComponent", "int get_weakRefs() const", asMETHODPR(UIComponent, WeakRefs, () const, int), asCALL_THISCALL);
-    // void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attributeBits, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UIComponent", "void WriteDeltaUpdate(Serializer&, const DirtyBits&in, uint8)", asMETHODPR(UIComponent, WriteDeltaUpdate, (Serializer&, const DirtyBits&, unsigned char), void), asCALL_THISCALL);
-    // void Serializable::WriteInitialDeltaUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UIComponent", "void WriteInitialDeltaUpdate(Serializer&, uint8)", asMETHODPR(UIComponent, WriteInitialDeltaUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
-    // void Serializable::WriteLatestDataUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("UIComponent", "void WriteLatestDataUpdate(Serializer&, uint8)", asMETHODPR(UIComponent, WriteLatestDataUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
-#ifdef REGISTER_MANUAL_PART_Component
-    REGISTER_MANUAL_PART_Component(UIComponent, "UIComponent")
-#endif
-#ifdef REGISTER_MANUAL_PART_Animatable
-    REGISTER_MANUAL_PART_Animatable(UIComponent, "UIComponent")
-#endif
-#ifdef REGISTER_MANUAL_PART_Serializable
-    REGISTER_MANUAL_PART_Serializable(UIComponent, "UIComponent")
-#endif
-#ifdef REGISTER_MANUAL_PART_Object
-    REGISTER_MANUAL_PART_Object(UIComponent, "UIComponent")
-#endif
-#ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(UIComponent, "UIComponent")
-#endif
-#ifdef REGISTER_MANUAL_PART_UIComponent
-    REGISTER_MANUAL_PART_UIComponent(UIComponent, "UIComponent")
-#endif
-    RegisterSubclass<Component, UIComponent>(engine, "Component", "UIComponent");
-    RegisterSubclass<Animatable, UIComponent>(engine, "Animatable", "UIComponent");
-    RegisterSubclass<Serializable, UIComponent>(engine, "Serializable", "UIComponent");
-    RegisterSubclass<Object, UIComponent>(engine, "Object", "UIComponent");
-    RegisterSubclass<RefCounted, UIComponent>(engine, "RefCounted", "UIComponent");
 
     // void UIElement::AddChild(UIElement* element) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("UISelectable", "void AddChild(UIElement@+)", asMETHODPR(UISelectable, AddChild, (UIElement*), void), asCALL_THISCALL);
@@ -2597,6 +2309,294 @@ void ASRegisterGenerated_Members_U(asIScriptEngine* engine)
     RegisterSubclass<Serializable, UISelectable>(engine, "Serializable", "UISelectable");
     RegisterSubclass<Object, UISelectable>(engine, "Object", "UISelectable");
     RegisterSubclass<RefCounted, UISelectable>(engine, "RefCounted", "UISelectable");
+
+    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("UnknownComponent", asBEHAVE_ADDREF, "void f()", asMETHODPR(UnknownComponent, AddRef, (), void), asCALL_THISCALL);
+    // void Component::AddReplicationState(ComponentReplicationState* state) | File: ../Scene/Component.h
+    // Error: type "ComponentReplicationState*" can not automatically bind
+    // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UnknownComponent", "void AllocateNetworkState()", asMETHODPR(UnknownComponent, AllocateNetworkState, (), void), asCALL_THISCALL);
+    // virtual void Serializable::ApplyAttributes() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UnknownComponent", "void ApplyAttributes()", asMETHODPR(UnknownComponent, ApplyAttributes, (), void), asCALL_THISCALL);
+    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
+    // Not registered because template
+    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
+    // Not registered because template
+    // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("UnknownComponent", "void CleanupConnection(Connection@+)", asMETHODPR(UnknownComponent, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // virtual void Component::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("UnknownComponent", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(UnknownComponent, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
+    // bool Animatable::GetAnimationEnabled() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("UnknownComponent", "bool GetAnimationEnabled() const", asMETHODPR(UnknownComponent, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UnknownComponent", "bool get_animationEnabled() const", asMETHODPR(UnknownComponent, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
+    // Variant Serializable::GetAttribute(unsigned index) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UnknownComponent", "Variant GetAttribute(uint) const", asMETHODPR(UnknownComponent, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UnknownComponent", "Variant get_attributes(uint) const", asMETHODPR(UnknownComponent, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
+    // Variant Serializable::GetAttribute(const String& name) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UnknownComponent", "Variant GetAttribute(const String&in) const", asMETHODPR(UnknownComponent, GetAttribute, (const String&) const, Variant), asCALL_THISCALL);
+    // ValueAnimation* Animatable::GetAttributeAnimation(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("UnknownComponent", "ValueAnimation@+ GetAttributeAnimation(const String&in) const", asMETHODPR(UnknownComponent, GetAttributeAnimation, (const String&) const, ValueAnimation*), asCALL_THISCALL);
+    // float Animatable::GetAttributeAnimationSpeed(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("UnknownComponent", "float GetAttributeAnimationSpeed(const String&in) const", asMETHODPR(UnknownComponent, GetAttributeAnimationSpeed, (const String&) const, float), asCALL_THISCALL);
+    // float Animatable::GetAttributeAnimationTime(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("UnknownComponent", "float GetAttributeAnimationTime(const String&in) const", asMETHODPR(UnknownComponent, GetAttributeAnimationTime, (const String&) const, float), asCALL_THISCALL);
+    // WrapMode Animatable::GetAttributeAnimationWrapMode(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("UnknownComponent", "WrapMode GetAttributeAnimationWrapMode(const String&in) const", asMETHODPR(UnknownComponent, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), asCALL_THISCALL);
+    // Variant Serializable::GetAttributeDefault(unsigned index) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UnknownComponent", "Variant GetAttributeDefault(uint) const", asMETHODPR(UnknownComponent, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UnknownComponent", "Variant get_attributeDefaults(uint) const", asMETHODPR(UnknownComponent, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
+    // Variant Serializable::GetAttributeDefault(const String& name) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UnknownComponent", "Variant GetAttributeDefault(const String&in) const", asMETHODPR(UnknownComponent, GetAttributeDefault, (const String&) const, Variant), asCALL_THISCALL);
+    // const Vector<AttributeInfo>* UnknownComponent::GetAttributes() const override | File: ../Scene/UnknownComponent.h
+    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
+    // const PODVector<unsigned char>& UnknownComponent::GetBinaryAttributes() const | File: ../Scene/UnknownComponent.h
+    // Error: type "const PODVector<unsigned char>&" can not automatically bind
+    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UnknownComponent", "bool GetBlockEvents() const", asMETHODPR(UnknownComponent, GetBlockEvents, () const, bool), asCALL_THISCALL);
+    // const String& Object::GetCategory() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UnknownComponent", "const String& GetCategory() const", asMETHODPR(UnknownComponent, GetCategory, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UnknownComponent", "const String& get_category() const", asMETHODPR(UnknownComponent, GetCategory, () const, const String&), asCALL_THISCALL);
+    // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("UnknownComponent", "Component@+ GetComponent(StringHash) const", asMETHODPR(UnknownComponent, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
+    // template<class T> T*  Component::GetComponent() const | File: ../Scene/Component.h
+    // Not registered because template
+    // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
+    // Error: type "PODVector<Component*>&" can not automatically bind
+    // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
+    // Not registered because template
+    // Context* Object::GetContext() const | File: ../Core/Object.h
+    // Error: type "Context*" can not be returned
+    // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
+    // Error: type "PODVector<Node*>&" can not automatically bind
+    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UnknownComponent", "VariantMap& GetEventDataMap() const", asMETHODPR(UnknownComponent, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
+    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // Object* Object::GetEventSender() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UnknownComponent", "Object@+ GetEventSender() const", asMETHODPR(UnknownComponent, GetEventSender, () const, Object*), asCALL_THISCALL);
+    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UnknownComponent", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(UnknownComponent, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UnknownComponent", "const Variant& get_globalVar(StringHash) const", asMETHODPR(UnknownComponent, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UnknownComponent", "const VariantMap& GetGlobalVars() const", asMETHODPR(UnknownComponent, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UnknownComponent", "const VariantMap& get_globalVars() const", asMETHODPR(UnknownComponent, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    // unsigned Component::GetID() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("UnknownComponent", "uint GetID() const", asMETHODPR(UnknownComponent, GetID, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UnknownComponent", "uint get_id() const", asMETHODPR(UnknownComponent, GetID, () const, unsigned), asCALL_THISCALL);
+    // bool Serializable::GetInterceptNetworkUpdate(const String& attributeName) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UnknownComponent", "bool GetInterceptNetworkUpdate(const String&in) const", asMETHODPR(UnknownComponent, GetInterceptNetworkUpdate, (const String&) const, bool), asCALL_THISCALL);
+    // virtual const Vector<AttributeInfo>* Serializable::GetNetworkAttributes() const | File: ../Scene/Serializable.h
+    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
+    // NetworkState* Serializable::GetNetworkState() const | File: ../Scene/Serializable.h
+    // Error: type "NetworkState*" can not automatically bind
+    // Node* Component::GetNode() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("UnknownComponent", "Node@+ GetNode() const", asMETHODPR(UnknownComponent, GetNode, () const, Node*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UnknownComponent", "Node@+ get_node() const", asMETHODPR(UnknownComponent, GetNode, () const, Node*), asCALL_THISCALL);
+    // unsigned Serializable::GetNumAttributes() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UnknownComponent", "uint GetNumAttributes() const", asMETHODPR(UnknownComponent, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UnknownComponent", "uint get_numAttributes() const", asMETHODPR(UnknownComponent, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
+    // unsigned Serializable::GetNumNetworkAttributes() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UnknownComponent", "uint GetNumNetworkAttributes() const", asMETHODPR(UnknownComponent, GetNumNetworkAttributes, () const, unsigned), asCALL_THISCALL);
+    // ObjectAnimation* Animatable::GetObjectAnimation() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("UnknownComponent", "ObjectAnimation@+ GetObjectAnimation() const", asMETHODPR(UnknownComponent, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UnknownComponent", "ObjectAnimation@+ get_objectAnimation() const", asMETHODPR(UnknownComponent, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
+    // ResourceRef Animatable::GetObjectAnimationAttr() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("UnknownComponent", "ResourceRef GetObjectAnimationAttr() const", asMETHODPR(UnknownComponent, GetObjectAnimationAttr, () const, ResourceRef), asCALL_THISCALL);
+    // Scene* Component::GetScene() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("UnknownComponent", "Scene@+ GetScene() const", asMETHODPR(UnknownComponent, GetScene, () const, Scene*), asCALL_THISCALL);
+    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UnknownComponent", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(UnknownComponent, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
+    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // Not registered because template
+    // StringHash UnknownComponent::GetType() const override | File: ../Scene/UnknownComponent.h
+    engine->RegisterObjectMethod("UnknownComponent", "StringHash GetType() const", asMETHODPR(UnknownComponent, GetType, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UnknownComponent", "StringHash get_type() const", asMETHODPR(UnknownComponent, GetType, () const, StringHash), asCALL_THISCALL);
+    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // const String& UnknownComponent::GetTypeName() const override | File: ../Scene/UnknownComponent.h
+    engine->RegisterObjectMethod("UnknownComponent", "const String& GetTypeName() const", asMETHODPR(UnknownComponent, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UnknownComponent", "const String& get_typeName() const", asMETHODPR(UnknownComponent, GetTypeName, () const, const String&), asCALL_THISCALL);
+    // static const Urho3D::String& UnknownComponent::GetTypeNameStatic() | File: ../Scene/UnknownComponent.h
+    // Error: type "const Urho3D::String&" can not automatically bind
+    // static Urho3D::StringHash UnknownComponent::GetTypeStatic() | File: ../Scene/UnknownComponent.h
+    // Error: type "Urho3D::StringHash" can not automatically bind
+    // bool UnknownComponent::GetUseXML() const | File: ../Scene/UnknownComponent.h
+    engine->RegisterObjectMethod("UnknownComponent", "bool GetUseXML() const", asMETHODPR(UnknownComponent, GetUseXML, () const, bool), asCALL_THISCALL);
+    // const Vector<String>& UnknownComponent::GetXMLAttributes() const | File: ../Scene/UnknownComponent.h
+    engine->RegisterObjectMethod("UnknownComponent", "Array<String>@ GetXMLAttributes() const", asFUNCTION(UnknownComponent_GetXMLAttributes_void), asCALL_CDECL_OBJFIRST);
+    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UnknownComponent", "bool HasEventHandlers() const", asMETHODPR(UnknownComponent, HasEventHandlers, () const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UnknownComponent", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(UnknownComponent, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UnknownComponent", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(UnknownComponent, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
+    // bool Component::IsEnabled() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("UnknownComponent", "bool IsEnabled() const", asMETHODPR(UnknownComponent, IsEnabled, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UnknownComponent", "bool get_enabled() const", asMETHODPR(UnknownComponent, IsEnabled, () const, bool), asCALL_THISCALL);
+    // bool Component::IsEnabledEffective() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("UnknownComponent", "bool IsEnabledEffective() const", asMETHODPR(UnknownComponent, IsEnabledEffective, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UnknownComponent", "bool get_enabledEffective() const", asMETHODPR(UnknownComponent, IsEnabledEffective, () const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UnknownComponent", "bool IsInstanceOf(StringHash) const", asMETHODPR(UnknownComponent, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
+    // Not registered because template
+    // bool Component::IsReplicated() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("UnknownComponent", "bool IsReplicated() const", asMETHODPR(UnknownComponent, IsReplicated, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UnknownComponent", "bool get_replicated() const", asMETHODPR(UnknownComponent, IsReplicated, () const, bool), asCALL_THISCALL);
+    // bool Serializable::IsTemporary() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UnknownComponent", "bool IsTemporary() const", asMETHODPR(UnknownComponent, IsTemporary, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UnknownComponent", "bool get_temporary() const", asMETHODPR(UnknownComponent, IsTemporary, () const, bool), asCALL_THISCALL);
+    // bool UnknownComponent::Load(Deserializer& source) override | File: ../Scene/UnknownComponent.h
+    engine->RegisterObjectMethod("UnknownComponent", "bool Load(Deserializer&)", asMETHODPR(UnknownComponent, Load, (Deserializer&), bool), asCALL_THISCALL);
+    // bool UnknownComponent::LoadJSON(const JSONValue& source) override | File: ../Scene/UnknownComponent.h
+    engine->RegisterObjectMethod("UnknownComponent", "bool LoadJSON(const JSONValue&in)", asMETHODPR(UnknownComponent, LoadJSON, (const JSONValue&), bool), asCALL_THISCALL);
+    // bool UnknownComponent::LoadXML(const XMLElement& source) override | File: ../Scene/UnknownComponent.h
+    engine->RegisterObjectMethod("UnknownComponent", "bool LoadXML(const XMLElement&in)", asMETHODPR(UnknownComponent, LoadXML, (const XMLElement&), bool), asCALL_THISCALL);
+    // void Component::MarkNetworkUpdate() override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("UnknownComponent", "void MarkNetworkUpdate()", asMETHODPR(UnknownComponent, MarkNetworkUpdate, (), void), asCALL_THISCALL);
+    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UnknownComponent", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(UnknownComponent, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
+    // virtual void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UnknownComponent", "void OnGetAttribute(const AttributeInfo&in, Variant&) const", asMETHODPR(UnknownComponent, OnGetAttribute, (const AttributeInfo&, Variant&) const, void), asCALL_THISCALL);
+    // virtual void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UnknownComponent", "void OnSetAttribute(const AttributeInfo&in, const Variant&in)", asMETHODPR(UnknownComponent, OnSetAttribute, (const AttributeInfo&, const Variant&), void), asCALL_THISCALL);
+    // virtual void Component::OnSetEnabled() | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("UnknownComponent", "void OnSetEnabled()", asMETHODPR(UnknownComponent, OnSetEnabled, (), void), asCALL_THISCALL);
+    // void Component::PrepareNetworkUpdate() | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("UnknownComponent", "void PrepareNetworkUpdate()", asMETHODPR(UnknownComponent, PrepareNetworkUpdate, (), void), asCALL_THISCALL);
+    // bool Serializable::ReadDeltaUpdate(Deserializer& source) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UnknownComponent", "bool ReadDeltaUpdate(Deserializer&)", asMETHODPR(UnknownComponent, ReadDeltaUpdate, (Deserializer&), bool), asCALL_THISCALL);
+    // bool Serializable::ReadLatestDataUpdate(Deserializer& source) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UnknownComponent", "bool ReadLatestDataUpdate(Deserializer&)", asMETHODPR(UnknownComponent, ReadLatestDataUpdate, (Deserializer&), bool), asCALL_THISCALL);
+    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
+    // Error: type "RefCount*" can not automatically bind
+    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("UnknownComponent", "int Refs() const", asMETHODPR(UnknownComponent, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UnknownComponent", "int get_refs() const", asMETHODPR(UnknownComponent, Refs, () const, int), asCALL_THISCALL);
+    // static void UnknownComponent::RegisterObject(Context* context) | File: ../Scene/UnknownComponent.h
+    // Context can be used as firs parameter of constructors only
+    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("UnknownComponent", asBEHAVE_RELEASE, "void f()", asMETHODPR(UnknownComponent, ReleaseRef, (), void), asCALL_THISCALL);
+    // void Component::Remove() | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("UnknownComponent", "void Remove()", asMETHODPR(UnknownComponent, Remove, (), void), asCALL_THISCALL);
+    // void Animatable::RemoveAttributeAnimation(const String& name) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("UnknownComponent", "void RemoveAttributeAnimation(const String&in)", asMETHODPR(UnknownComponent, RemoveAttributeAnimation, (const String&), void), asCALL_THISCALL);
+    // void Serializable::RemoveInstanceDefault() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UnknownComponent", "void RemoveInstanceDefault()", asMETHODPR(UnknownComponent, RemoveInstanceDefault, (), void), asCALL_THISCALL);
+    // void Animatable::RemoveObjectAnimation() | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("UnknownComponent", "void RemoveObjectAnimation()", asMETHODPR(UnknownComponent, RemoveObjectAnimation, (), void), asCALL_THISCALL);
+    // void Serializable::ResetToDefault() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UnknownComponent", "void ResetToDefault()", asMETHODPR(UnknownComponent, ResetToDefault, (), void), asCALL_THISCALL);
+    // bool UnknownComponent::Save(Serializer& dest) const override | File: ../Scene/UnknownComponent.h
+    engine->RegisterObjectMethod("UnknownComponent", "bool Save(Serializer&) const", asMETHODPR(UnknownComponent, Save, (Serializer&) const, bool), asCALL_THISCALL);
+    // virtual bool Serializable::SaveDefaultAttributes() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UnknownComponent", "bool SaveDefaultAttributes() const", asMETHODPR(UnknownComponent, SaveDefaultAttributes, () const, bool), asCALL_THISCALL);
+    // bool UnknownComponent::SaveJSON(JSONValue& dest) const override | File: ../Scene/UnknownComponent.h
+    engine->RegisterObjectMethod("UnknownComponent", "bool SaveJSON(JSONValue&) const", asMETHODPR(UnknownComponent, SaveJSON, (JSONValue&) const, bool), asCALL_THISCALL);
+    // bool UnknownComponent::SaveXML(XMLElement& dest) const override | File: ../Scene/UnknownComponent.h
+    engine->RegisterObjectMethod("UnknownComponent", "bool SaveXML(XMLElement&) const", asMETHODPR(UnknownComponent, SaveXML, (XMLElement&) const, bool), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UnknownComponent", "void SendEvent(StringHash)", asMETHODPR(UnknownComponent, SendEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UnknownComponent", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(UnknownComponent, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
+    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
+    // Not registered because template
+    // void Animatable::SetAnimationEnabled(bool enable) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("UnknownComponent", "void SetAnimationEnabled(bool)", asMETHODPR(UnknownComponent, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UnknownComponent", "void set_animationEnabled(bool)", asMETHODPR(UnknownComponent, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
+    // void Animatable::SetAnimationTime(float time) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("UnknownComponent", "void SetAnimationTime(float)", asMETHODPR(UnknownComponent, SetAnimationTime, (float), void), asCALL_THISCALL);
+    // bool Serializable::SetAttribute(unsigned index, const Variant& value) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UnknownComponent", "bool SetAttribute(uint, const Variant&in)", asMETHODPR(UnknownComponent, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UnknownComponent", "bool set_attributes(uint, const Variant&in)", asMETHODPR(UnknownComponent, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
+    // bool Serializable::SetAttribute(const String& name, const Variant& value) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UnknownComponent", "bool SetAttribute(const String&in, const Variant&in)", asMETHODPR(UnknownComponent, SetAttribute, (const String&, const Variant&), bool), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode=WM_LOOP, float speed=1.0f) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("UnknownComponent", "void SetAttributeAnimation(const String&in, ValueAnimation@+, WrapMode = WM_LOOP, float = 1.0f)", asMETHODPR(UnknownComponent, SetAttributeAnimation, (const String&, ValueAnimation*, WrapMode, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationSpeed(const String& name, float speed) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("UnknownComponent", "void SetAttributeAnimationSpeed(const String&in, float)", asMETHODPR(UnknownComponent, SetAttributeAnimationSpeed, (const String&, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationTime(const String& name, float time) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("UnknownComponent", "void SetAttributeAnimationTime(const String&in, float)", asMETHODPR(UnknownComponent, SetAttributeAnimationTime, (const String&, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationWrapMode(const String& name, WrapMode wrapMode) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("UnknownComponent", "void SetAttributeAnimationWrapMode(const String&in, WrapMode)", asMETHODPR(UnknownComponent, SetAttributeAnimationWrapMode, (const String&, WrapMode), void), asCALL_THISCALL);
+    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UnknownComponent", "void SetBlockEvents(bool)", asMETHODPR(UnknownComponent, SetBlockEvents, (bool), void), asCALL_THISCALL);
+    // void Component::SetEnabled(bool enable) | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("UnknownComponent", "void SetEnabled(bool)", asMETHODPR(UnknownComponent, SetEnabled, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UnknownComponent", "void set_enabled(bool)", asMETHODPR(UnknownComponent, SetEnabled, (bool), void), asCALL_THISCALL);
+    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UnknownComponent", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(UnknownComponent, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UnknownComponent", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(UnknownComponent, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    // void Serializable::SetInstanceDefault(bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UnknownComponent", "void SetInstanceDefault(bool)", asMETHODPR(UnknownComponent, SetInstanceDefault, (bool), void), asCALL_THISCALL);
+    // void Serializable::SetInterceptNetworkUpdate(const String& attributeName, bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UnknownComponent", "void SetInterceptNetworkUpdate(const String&in, bool)", asMETHODPR(UnknownComponent, SetInterceptNetworkUpdate, (const String&, bool), void), asCALL_THISCALL);
+    // void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("UnknownComponent", "void SetObjectAnimation(ObjectAnimation@+)", asMETHODPR(UnknownComponent, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UnknownComponent", "void set_objectAnimation(ObjectAnimation@+)", asMETHODPR(UnknownComponent, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
+    // void Animatable::SetObjectAnimationAttr(const ResourceRef& value) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("UnknownComponent", "void SetObjectAnimationAttr(const ResourceRef&in)", asMETHODPR(UnknownComponent, SetObjectAnimationAttr, (const ResourceRef&), void), asCALL_THISCALL);
+    // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UnknownComponent", "void SetTemporary(bool)", asMETHODPR(UnknownComponent, SetTemporary, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UnknownComponent", "void set_temporary(bool)", asMETHODPR(UnknownComponent, SetTemporary, (bool), void), asCALL_THISCALL);
+    // void UnknownComponent::SetType(StringHash typeHash) | File: ../Scene/UnknownComponent.h
+    engine->RegisterObjectMethod("UnknownComponent", "void SetType(StringHash)", asMETHODPR(UnknownComponent, SetType, (StringHash), void), asCALL_THISCALL);
+    // void UnknownComponent::SetTypeName(const String& typeName) | File: ../Scene/UnknownComponent.h
+    engine->RegisterObjectMethod("UnknownComponent", "void SetTypeName(const String&in)", asMETHODPR(UnknownComponent, SetTypeName, (const String&), void), asCALL_THISCALL);
+    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UnknownComponent", "void UnsubscribeFromAllEvents()", asMETHODPR(UnknownComponent, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UnknownComponent", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(UnknownComponent_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
+    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UnknownComponent", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(UnknownComponent, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UnknownComponent", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(UnknownComponent, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("UnknownComponent", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(UnknownComponent, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
+    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("UnknownComponent", "int WeakRefs() const", asMETHODPR(UnknownComponent, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UnknownComponent", "int get_weakRefs() const", asMETHODPR(UnknownComponent, WeakRefs, () const, int), asCALL_THISCALL);
+    // void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attributeBits, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UnknownComponent", "void WriteDeltaUpdate(Serializer&, const DirtyBits&in, uint8)", asMETHODPR(UnknownComponent, WriteDeltaUpdate, (Serializer&, const DirtyBits&, unsigned char), void), asCALL_THISCALL);
+    // void Serializable::WriteInitialDeltaUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UnknownComponent", "void WriteInitialDeltaUpdate(Serializer&, uint8)", asMETHODPR(UnknownComponent, WriteInitialDeltaUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
+    // void Serializable::WriteLatestDataUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("UnknownComponent", "void WriteLatestDataUpdate(Serializer&, uint8)", asMETHODPR(UnknownComponent, WriteLatestDataUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
+#ifdef REGISTER_MANUAL_PART_Component
+    REGISTER_MANUAL_PART_Component(UnknownComponent, "UnknownComponent")
+#endif
+#ifdef REGISTER_MANUAL_PART_Animatable
+    REGISTER_MANUAL_PART_Animatable(UnknownComponent, "UnknownComponent")
+#endif
+#ifdef REGISTER_MANUAL_PART_Serializable
+    REGISTER_MANUAL_PART_Serializable(UnknownComponent, "UnknownComponent")
+#endif
+#ifdef REGISTER_MANUAL_PART_Object
+    REGISTER_MANUAL_PART_Object(UnknownComponent, "UnknownComponent")
+#endif
+#ifdef REGISTER_MANUAL_PART_RefCounted
+    REGISTER_MANUAL_PART_RefCounted(UnknownComponent, "UnknownComponent")
+#endif
+#ifdef REGISTER_MANUAL_PART_UnknownComponent
+    REGISTER_MANUAL_PART_UnknownComponent(UnknownComponent, "UnknownComponent")
+#endif
+    RegisterSubclass<Component, UnknownComponent>(engine, "Component", "UnknownComponent");
+    RegisterSubclass<Animatable, UnknownComponent>(engine, "Animatable", "UnknownComponent");
+    RegisterSubclass<Serializable, UnknownComponent>(engine, "Serializable", "UnknownComponent");
+    RegisterSubclass<Object, UnknownComponent>(engine, "Object", "UnknownComponent");
+    RegisterSubclass<RefCounted, UnknownComponent>(engine, "RefCounted", "UnknownComponent");
 
 }
 

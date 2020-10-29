@@ -43,59 +43,6 @@ namespace Urho3D
 void FakeAddRef(void* ptr);
 void FakeReleaseRef(void* ptr);
 
-#ifdef URHO3D_URHO2D
-// Tile2D::Tile2D() | File: ../Urho2D/TileMapDefs2D.h
-static Tile2D* Tile2D_Tile2D_void()
-{
-    return new Tile2D();
-}
-#endif
-
-#ifdef URHO3D_URHO2D
-// TileMapObject2D::TileMapObject2D() | File: ../Urho2D/TileMapDefs2D.h
-static TileMapObject2D* TileMapObject2D_TileMapObject2D_void()
-{
-    return new TileMapObject2D();
-}
-#endif
-
-// explicit Texture::Texture(Context* context) | File: ../Graphics/Texture.h
-static Texture* Texture_Texture_Context()
-{
-    return new Texture(GetScriptContext());
-}
-
-// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Texture_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Texture* ptr, CScriptArray* exceptions, bool onlyUserData)
-{
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
-}
-
-#ifdef URHO3D_PHYSICS
-// TriangleMeshData::TriangleMeshData(Model* model, unsigned lodLevel) | File: ../Physics/CollisionShape.h
-static TriangleMeshData* TriangleMeshData_TriangleMeshData_Model_unsigned(Model *model, unsigned lodLevel)
-{
-    return new TriangleMeshData(model, lodLevel);
-}
-#endif
-
-#ifdef URHO3D_PHYSICS
-// explicit TriangleMeshData::TriangleMeshData(CustomGeometry* custom) | File: ../Physics/CollisionShape.h
-static TriangleMeshData* TriangleMeshData_TriangleMeshData_CustomGeometry(CustomGeometry *custom)
-{
-    return new TriangleMeshData(custom);
-}
-#endif
-
-#ifdef URHO3D_URHO2D
-// explicit TmxObjectGroup2D::TmxObjectGroup2D(TmxFile2D* tmxFile) | File: ../Urho2D/TmxFile2D.h
-static TmxObjectGroup2D* TmxObjectGroup2D_TmxObjectGroup2D_TmxFile2D(TmxFile2D *tmxFile)
-{
-    return new TmxObjectGroup2D(tmxFile);
-}
-#endif
-
 // SharedPtr<Technique> Technique::Clone(const String& cloneName=String::EMPTY) const | File: ../Graphics/Technique.h
 static Technique* Technique_Clone_String(Technique* ptr, const String& cloneName)
 {
@@ -132,52 +79,6 @@ static Technique* Technique_Technique_Context()
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void Technique_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Technique* ptr, CScriptArray* exceptions, bool onlyUserData)
-{
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
-}
-
-// TextureFrame::TextureFrame() | File: ../Graphics/ParticleEffect.h
-static TextureFrame* TextureFrame_TextureFrame_void()
-{
-    return new TextureFrame();
-}
-
-// const PODVector<Light*>& Drawable::GetLights() const | File: ../Graphics/Drawable.h
-static CScriptArray* Text3D_GetLights_void(Text3D* ptr)
-{
-    const PODVector<Light*>& result = ptr->GetLights();
-    return VectorToHandleArray(result, "Array<Light@>");
-}
-
-// const PODVector<Light*>& Drawable::GetVertexLights() const | File: ../Graphics/Drawable.h
-static CScriptArray* Text3D_GetVertexLights_void(Text3D* ptr)
-{
-    const PODVector<Light*>& result = ptr->GetVertexLights();
-    return VectorToHandleArray(result, "Array<Light@>");
-}
-
-// explicit Text3D::Text3D(Context* context) | File: ../UI/Text3D.h
-static Text3D* Text3D_Text3D_Context()
-{
-    return new Text3D(GetScriptContext());
-}
-
-// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Text3D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Text3D* ptr, CScriptArray* exceptions, bool onlyUserData)
-{
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
-}
-
-// explicit Texture3D::Texture3D(Context* context) | File: ../Graphics/Texture3D.h
-static Texture3D* Texture3D_Texture3D_Context()
-{
-    return new Texture3D(GetScriptContext());
-}
-
-// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Texture3D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Texture3D* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
     PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
@@ -264,6 +165,46 @@ static void Text_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Text* p
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
 }
 
+// const PODVector<Light*>& Drawable::GetLights() const | File: ../Graphics/Drawable.h
+static CScriptArray* Text3D_GetLights_void(Text3D* ptr)
+{
+    const PODVector<Light*>& result = ptr->GetLights();
+    return VectorToHandleArray(result, "Array<Light@>");
+}
+
+// const PODVector<Light*>& Drawable::GetVertexLights() const | File: ../Graphics/Drawable.h
+static CScriptArray* Text3D_GetVertexLights_void(Text3D* ptr)
+{
+    const PODVector<Light*>& result = ptr->GetVertexLights();
+    return VectorToHandleArray(result, "Array<Light@>");
+}
+
+// explicit Text3D::Text3D(Context* context) | File: ../UI/Text3D.h
+static Text3D* Text3D_Text3D_Context()
+{
+    return new Text3D(GetScriptContext());
+}
+
+// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+static void Text3D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Text3D* ptr, CScriptArray* exceptions, bool onlyUserData)
+{
+    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+}
+
+// explicit Texture::Texture(Context* context) | File: ../Graphics/Texture.h
+static Texture* Texture_Texture_Context()
+{
+    return new Texture(GetScriptContext());
+}
+
+// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+static void Texture_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Texture* ptr, CScriptArray* exceptions, bool onlyUserData)
+{
+    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+}
+
 // SharedPtr<Image> Texture2D::GetImage() const | File: ../Graphics/Texture2D.h
 static Image* Texture2D_GetImage_void(Texture2D* ptr)
 {
@@ -297,6 +238,19 @@ static void Texture2DArray_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bo
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
 }
 
+// explicit Texture3D::Texture3D(Context* context) | File: ../Graphics/Texture3D.h
+static Texture3D* Texture3D_Texture3D_Context()
+{
+    return new Texture3D(GetScriptContext());
+}
+
+// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+static void Texture3D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Texture3D* ptr, CScriptArray* exceptions, bool onlyUserData)
+{
+    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+}
+
 // SharedPtr<Image> TextureCube::GetImage(CubeMapFace face) const | File: ../Graphics/TextureCube.h
 static Image* TextureCube_GetImage_CubeMapFace(TextureCube* ptr, CubeMapFace face)
 {
@@ -316,6 +270,14 @@ static void TextureCube_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(
     PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
 }
+
+#ifdef URHO3D_URHO2D
+// Tile2D::Tile2D() | File: ../Urho2D/TileMapDefs2D.h
+static Tile2D* Tile2D_Tile2D_void()
+{
+    return new Tile2D();
+}
+#endif
 
 #ifdef URHO3D_URHO2D
 // Vector<SharedPtr<TileMapObject2D>> TileMap2D::GetTileCollisionShapes(unsigned gid) const | File: ../Urho2D/TileMap2D.h
@@ -357,6 +319,14 @@ static void TileMapLayer2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bo
 {
     PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+}
+#endif
+
+#ifdef URHO3D_URHO2D
+// TileMapObject2D::TileMapObject2D() | File: ../Urho2D/TileMapDefs2D.h
+static TileMapObject2D* TileMapObject2D_TileMapObject2D_void()
+{
+    return new TileMapObject2D();
 }
 #endif
 
@@ -412,6 +382,14 @@ static TmxImageLayer2D* TmxImageLayer2D_TmxImageLayer2D_TmxFile2D(TmxFile2D *tmx
 static TmxLayer2D* TmxLayer2D_TmxLayer2D_TmxFile2D_TileMapLayerType2D(TmxFile2D *tmxFile, TileMapLayerType2D type)
 {
     return new TmxLayer2D(tmxFile, type);
+}
+#endif
+
+#ifdef URHO3D_URHO2D
+// explicit TmxObjectGroup2D::TmxObjectGroup2D(TmxFile2D* tmxFile) | File: ../Urho2D/TmxFile2D.h
+static TmxObjectGroup2D* TmxObjectGroup2D_TmxObjectGroup2D_TmxFile2D(TmxFile2D *tmxFile)
+{
+    return new TmxObjectGroup2D(tmxFile);
 }
 #endif
 
@@ -476,6 +454,12 @@ static void TechniqueEntry_Destructor_TechniqueEntry_void(TechniqueEntry* ptr)
     ptr->~TechniqueEntry();
 }
 
+// TextureFrame::TextureFrame() | File: ../Graphics/ParticleEffect.h
+static TextureFrame* TextureFrame_TextureFrame_void()
+{
+    return new TextureFrame();
+}
+
 // TrailPoint::TrailPoint(const Vector3& position, const Vector3& forward) | File: ../Graphics/RibbonTrail.h
 static void TrailPoint_TrailPoint_Vector3_Vector3(TrailPoint* ptr, const Vector3 &position, const Vector3 &forward)
 {
@@ -488,558 +472,24 @@ static void TrailPoint_Destructor(TrailPoint* ptr)
     ptr->~TrailPoint();
 }
 
-void ASRegisterGenerated_Members_T(asIScriptEngine* engine)
+#ifdef URHO3D_PHYSICS
+// TriangleMeshData::TriangleMeshData(Model* model, unsigned lodLevel) | File: ../Physics/CollisionShape.h
+static TriangleMeshData* TriangleMeshData_TriangleMeshData_Model_unsigned(Model *model, unsigned lodLevel)
 {
-#ifdef URHO3D_URHO2D
-    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("Tile2D", asBEHAVE_ADDREF, "void f()", asMETHODPR(Tile2D, AddRef, (), void), asCALL_THISCALL);
-    // bool Tile2D::GetFlipX() const | File: ../Urho2D/TileMapDefs2D.h
-    engine->RegisterObjectMethod("Tile2D", "bool GetFlipX() const", asMETHODPR(Tile2D, GetFlipX, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Tile2D", "bool get_flipX() const", asMETHODPR(Tile2D, GetFlipX, () const, bool), asCALL_THISCALL);
-    // bool Tile2D::GetFlipY() const | File: ../Urho2D/TileMapDefs2D.h
-    engine->RegisterObjectMethod("Tile2D", "bool GetFlipY() const", asMETHODPR(Tile2D, GetFlipY, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Tile2D", "bool get_flipY() const", asMETHODPR(Tile2D, GetFlipY, () const, bool), asCALL_THISCALL);
-    // unsigned Tile2D::GetGid() const | File: ../Urho2D/TileMapDefs2D.h
-    engine->RegisterObjectMethod("Tile2D", "uint GetGid() const", asMETHODPR(Tile2D, GetGid, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Tile2D", "uint get_gid() const", asMETHODPR(Tile2D, GetGid, () const, unsigned), asCALL_THISCALL);
-    // const String& Tile2D::GetProperty(const String& name) const | File: ../Urho2D/TileMapDefs2D.h
-    engine->RegisterObjectMethod("Tile2D", "const String& GetProperty(const String&in) const", asMETHODPR(Tile2D, GetProperty, (const String&) const, const String&), asCALL_THISCALL);
-    // Sprite2D* Tile2D::GetSprite() const | File: ../Urho2D/TileMapDefs2D.h
-    engine->RegisterObjectMethod("Tile2D", "Sprite2D@+ GetSprite() const", asMETHODPR(Tile2D, GetSprite, () const, Sprite2D*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Tile2D", "Sprite2D@+ get_sprite() const", asMETHODPR(Tile2D, GetSprite, () const, Sprite2D*), asCALL_THISCALL);
-    // bool Tile2D::GetSwapXY() const | File: ../Urho2D/TileMapDefs2D.h
-    engine->RegisterObjectMethod("Tile2D", "bool GetSwapXY() const", asMETHODPR(Tile2D, GetSwapXY, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Tile2D", "bool get_swapXY() const", asMETHODPR(Tile2D, GetSwapXY, () const, bool), asCALL_THISCALL);
-    // bool Tile2D::HasProperty(const String& name) const | File: ../Urho2D/TileMapDefs2D.h
-    engine->RegisterObjectMethod("Tile2D", "bool HasProperty(const String&in) const", asMETHODPR(Tile2D, HasProperty, (const String&) const, bool), asCALL_THISCALL);
-    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
-    // Error: type "RefCount*" can not automatically bind
-    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("Tile2D", "int Refs() const", asMETHODPR(Tile2D, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Tile2D", "int get_refs() const", asMETHODPR(Tile2D, Refs, () const, int), asCALL_THISCALL);
-    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("Tile2D", asBEHAVE_RELEASE, "void f()", asMETHODPR(Tile2D, ReleaseRef, (), void), asCALL_THISCALL);
-    // Tile2D::Tile2D() | File: ../Urho2D/TileMapDefs2D.h
-    engine->RegisterObjectBehaviour("Tile2D", asBEHAVE_FACTORY, "Tile2D@+ f()", asFUNCTION(Tile2D_Tile2D_void), asCALL_CDECL);
-    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("Tile2D", "int WeakRefs() const", asMETHODPR(Tile2D, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Tile2D", "int get_weakRefs() const", asMETHODPR(Tile2D, WeakRefs, () const, int), asCALL_THISCALL);
-#ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(Tile2D, "Tile2D")
+    return new TriangleMeshData(model, lodLevel);
+}
 #endif
-#ifdef REGISTER_MANUAL_PART_Tile2D
-    REGISTER_MANUAL_PART_Tile2D(Tile2D, "Tile2D")
-#endif
-    RegisterSubclass<RefCounted, Tile2D>(engine, "RefCounted", "Tile2D");
-#endif
-
-#ifdef URHO3D_URHO2D
-    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("TileMapObject2D", asBEHAVE_ADDREF, "void f()", asMETHODPR(TileMapObject2D, AddRef, (), void), asCALL_THISCALL);
-    // const String& TileMapObject2D::GetName() const | File: ../Urho2D/TileMapDefs2D.h
-    engine->RegisterObjectMethod("TileMapObject2D", "const String& GetName() const", asMETHODPR(TileMapObject2D, GetName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("TileMapObject2D", "const String& get_name() const", asMETHODPR(TileMapObject2D, GetName, () const, const String&), asCALL_THISCALL);
-    // unsigned TileMapObject2D::GetNumPoints() const | File: ../Urho2D/TileMapDefs2D.h
-    engine->RegisterObjectMethod("TileMapObject2D", "uint GetNumPoints() const", asMETHODPR(TileMapObject2D, GetNumPoints, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("TileMapObject2D", "uint get_numPoints() const", asMETHODPR(TileMapObject2D, GetNumPoints, () const, unsigned), asCALL_THISCALL);
-    // TileMapObjectType2D TileMapObject2D::GetObjectType() const | File: ../Urho2D/TileMapDefs2D.h
-    engine->RegisterObjectMethod("TileMapObject2D", "TileMapObjectType2D GetObjectType() const", asMETHODPR(TileMapObject2D, GetObjectType, () const, TileMapObjectType2D), asCALL_THISCALL);
-    engine->RegisterObjectMethod("TileMapObject2D", "TileMapObjectType2D get_objectType() const", asMETHODPR(TileMapObject2D, GetObjectType, () const, TileMapObjectType2D), asCALL_THISCALL);
-    // const Vector2& TileMapObject2D::GetPoint(unsigned index) const | File: ../Urho2D/TileMapDefs2D.h
-    engine->RegisterObjectMethod("TileMapObject2D", "const Vector2& GetPoint(uint) const", asMETHODPR(TileMapObject2D, GetPoint, (unsigned) const, const Vector2&), asCALL_THISCALL);
-    // const Vector2& TileMapObject2D::GetPosition() const | File: ../Urho2D/TileMapDefs2D.h
-    engine->RegisterObjectMethod("TileMapObject2D", "const Vector2& GetPosition() const", asMETHODPR(TileMapObject2D, GetPosition, () const, const Vector2&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("TileMapObject2D", "const Vector2& get_position() const", asMETHODPR(TileMapObject2D, GetPosition, () const, const Vector2&), asCALL_THISCALL);
-    // const String& TileMapObject2D::GetProperty(const String& name) const | File: ../Urho2D/TileMapDefs2D.h
-    engine->RegisterObjectMethod("TileMapObject2D", "const String& GetProperty(const String&in) const", asMETHODPR(TileMapObject2D, GetProperty, (const String&) const, const String&), asCALL_THISCALL);
-    // const Vector2& TileMapObject2D::GetSize() const | File: ../Urho2D/TileMapDefs2D.h
-    engine->RegisterObjectMethod("TileMapObject2D", "const Vector2& GetSize() const", asMETHODPR(TileMapObject2D, GetSize, () const, const Vector2&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("TileMapObject2D", "const Vector2& get_size() const", asMETHODPR(TileMapObject2D, GetSize, () const, const Vector2&), asCALL_THISCALL);
-    // bool TileMapObject2D::GetTileFlipX() const | File: ../Urho2D/TileMapDefs2D.h
-    engine->RegisterObjectMethod("TileMapObject2D", "bool GetTileFlipX() const", asMETHODPR(TileMapObject2D, GetTileFlipX, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("TileMapObject2D", "bool get_tileFlipX() const", asMETHODPR(TileMapObject2D, GetTileFlipX, () const, bool), asCALL_THISCALL);
-    // bool TileMapObject2D::GetTileFlipY() const | File: ../Urho2D/TileMapDefs2D.h
-    engine->RegisterObjectMethod("TileMapObject2D", "bool GetTileFlipY() const", asMETHODPR(TileMapObject2D, GetTileFlipY, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("TileMapObject2D", "bool get_tileFlipY() const", asMETHODPR(TileMapObject2D, GetTileFlipY, () const, bool), asCALL_THISCALL);
-    // unsigned TileMapObject2D::GetTileGid() const | File: ../Urho2D/TileMapDefs2D.h
-    engine->RegisterObjectMethod("TileMapObject2D", "uint GetTileGid() const", asMETHODPR(TileMapObject2D, GetTileGid, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("TileMapObject2D", "uint get_tileGid() const", asMETHODPR(TileMapObject2D, GetTileGid, () const, unsigned), asCALL_THISCALL);
-    // Sprite2D* TileMapObject2D::GetTileSprite() const | File: ../Urho2D/TileMapDefs2D.h
-    engine->RegisterObjectMethod("TileMapObject2D", "Sprite2D@+ GetTileSprite() const", asMETHODPR(TileMapObject2D, GetTileSprite, () const, Sprite2D*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("TileMapObject2D", "Sprite2D@+ get_tileSprite() const", asMETHODPR(TileMapObject2D, GetTileSprite, () const, Sprite2D*), asCALL_THISCALL);
-    // bool TileMapObject2D::GetTileSwapXY() const | File: ../Urho2D/TileMapDefs2D.h
-    engine->RegisterObjectMethod("TileMapObject2D", "bool GetTileSwapXY() const", asMETHODPR(TileMapObject2D, GetTileSwapXY, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("TileMapObject2D", "bool get_tileSwapXY() const", asMETHODPR(TileMapObject2D, GetTileSwapXY, () const, bool), asCALL_THISCALL);
-    // const String& TileMapObject2D::GetType() const | File: ../Urho2D/TileMapDefs2D.h
-    engine->RegisterObjectMethod("TileMapObject2D", "const String& GetType() const", asMETHODPR(TileMapObject2D, GetType, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("TileMapObject2D", "const String& get_type() const", asMETHODPR(TileMapObject2D, GetType, () const, const String&), asCALL_THISCALL);
-    // bool TileMapObject2D::HasProperty(const String& name) const | File: ../Urho2D/TileMapDefs2D.h
-    engine->RegisterObjectMethod("TileMapObject2D", "bool HasProperty(const String&in) const", asMETHODPR(TileMapObject2D, HasProperty, (const String&) const, bool), asCALL_THISCALL);
-    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
-    // Error: type "RefCount*" can not automatically bind
-    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("TileMapObject2D", "int Refs() const", asMETHODPR(TileMapObject2D, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("TileMapObject2D", "int get_refs() const", asMETHODPR(TileMapObject2D, Refs, () const, int), asCALL_THISCALL);
-    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("TileMapObject2D", asBEHAVE_RELEASE, "void f()", asMETHODPR(TileMapObject2D, ReleaseRef, (), void), asCALL_THISCALL);
-    // TileMapObject2D::TileMapObject2D() | File: ../Urho2D/TileMapDefs2D.h
-    engine->RegisterObjectBehaviour("TileMapObject2D", asBEHAVE_FACTORY, "TileMapObject2D@+ f()", asFUNCTION(TileMapObject2D_TileMapObject2D_void), asCALL_CDECL);
-    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("TileMapObject2D", "int WeakRefs() const", asMETHODPR(TileMapObject2D, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("TileMapObject2D", "int get_weakRefs() const", asMETHODPR(TileMapObject2D, WeakRefs, () const, int), asCALL_THISCALL);
-#ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(TileMapObject2D, "TileMapObject2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_TileMapObject2D
-    REGISTER_MANUAL_PART_TileMapObject2D(TileMapObject2D, "TileMapObject2D")
-#endif
-    RegisterSubclass<RefCounted, TileMapObject2D>(engine, "RefCounted", "TileMapObject2D");
-#endif
-
-#ifdef URHO3D_URHO2D
-    // int TileMapInfo2D::height_ | File: ../Urho2D/TileMapDefs2D.h
-    engine->RegisterObjectProperty("TileMapInfo2D", "int height", offsetof(TileMapInfo2D, height_));
-    // Orientation2D TileMapInfo2D::orientation_ | File: ../Urho2D/TileMapDefs2D.h
-    engine->RegisterObjectProperty("TileMapInfo2D", "Orientation2D orientation", offsetof(TileMapInfo2D, orientation_));
-    // float TileMapInfo2D::tileHeight_ | File: ../Urho2D/TileMapDefs2D.h
-    engine->RegisterObjectProperty("TileMapInfo2D", "float tileHeight", offsetof(TileMapInfo2D, tileHeight_));
-    // float TileMapInfo2D::tileWidth_ | File: ../Urho2D/TileMapDefs2D.h
-    engine->RegisterObjectProperty("TileMapInfo2D", "float tileWidth", offsetof(TileMapInfo2D, tileWidth_));
-    // int TileMapInfo2D::width_ | File: ../Urho2D/TileMapDefs2D.h
-    engine->RegisterObjectProperty("TileMapInfo2D", "int width", offsetof(TileMapInfo2D, width_));
-    // Vector2 TileMapInfo2D::ConvertPosition(const Vector2& position) const | File: ../Urho2D/TileMapDefs2D.h
-    engine->RegisterObjectMethod("TileMapInfo2D", "Vector2 ConvertPosition(const Vector2&in) const", asMETHODPR(TileMapInfo2D, ConvertPosition, (const Vector2&) const, Vector2), asCALL_THISCALL);
-    // float TileMapInfo2D::GetMapHeight() const | File: ../Urho2D/TileMapDefs2D.h
-    engine->RegisterObjectMethod("TileMapInfo2D", "float GetMapHeight() const", asMETHODPR(TileMapInfo2D, GetMapHeight, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("TileMapInfo2D", "float get_mapHeight() const", asMETHODPR(TileMapInfo2D, GetMapHeight, () const, float), asCALL_THISCALL);
-    // float TileMapInfo2D::GetMapWidth() const | File: ../Urho2D/TileMapDefs2D.h
-    engine->RegisterObjectMethod("TileMapInfo2D", "float GetMapWidth() const", asMETHODPR(TileMapInfo2D, GetMapWidth, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("TileMapInfo2D", "float get_mapWidth() const", asMETHODPR(TileMapInfo2D, GetMapWidth, () const, float), asCALL_THISCALL);
-    // bool TileMapInfo2D::PositionToTileIndex(int& x, int& y, const Vector2& position) const | File: ../Urho2D/TileMapDefs2D.h
-    engine->RegisterObjectMethod("TileMapInfo2D", "bool PositionToTileIndex(int&, int&, const Vector2&in) const", asMETHODPR(TileMapInfo2D, PositionToTileIndex, (int&, int&, const Vector2&) const, bool), asCALL_THISCALL);
-    // Vector2 TileMapInfo2D::TileIndexToPosition(int x, int y) const | File: ../Urho2D/TileMapDefs2D.h
-    engine->RegisterObjectMethod("TileMapInfo2D", "Vector2 TileIndexToPosition(int, int) const", asMETHODPR(TileMapInfo2D, TileIndexToPosition, (int, int) const, Vector2), asCALL_THISCALL);
-    // TileMapInfo2D& TileMapInfo2D::operator=(const TileMapInfo2D&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<TileMapInfo2D>(engine, "TileMapInfo2D");
-    engine->RegisterObjectBehaviour("TileMapInfo2D", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("TileMapInfo2D", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
-#ifdef REGISTER_MANUAL_PART_TileMapInfo2D
-    REGISTER_MANUAL_PART_TileMapInfo2D(TileMapInfo2D, "TileMapInfo2D")
-#endif
-#endif
-
-    // void ResourceWithMetadata::AddMetadata(const String& name, const Variant& value) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Texture", "void AddMetadata(const String&in, const Variant&in)", asMETHODPR(Texture, AddMetadata, (const String&, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "void set_metadata(const String&in, const Variant&in)", asMETHODPR(Texture, AddMetadata, (const String&, const Variant&), void), asCALL_THISCALL);
-    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("Texture", asBEHAVE_ADDREF, "void f()", asMETHODPR(Texture, AddRef, (), void), asCALL_THISCALL);
-    // virtual bool Resource::BeginLoad(Deserializer& source) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Texture", "bool BeginLoad(Deserializer&)", asMETHODPR(Texture, BeginLoad, (Deserializer&), bool), asCALL_THISCALL);
-    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
-    // Not registered because template
-    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
-    // Not registered because template
-    // static unsigned Texture::CheckMaxLevels(int width, int height, unsigned requestedLevels) | File: ../Graphics/Texture.h
-    engine->SetDefaultNamespace("Texture");
-    engine->RegisterGlobalFunction("uint CheckMaxLevels(int, int, uint)", asFUNCTIONPR(Texture::CheckMaxLevels, (int, int, unsigned), unsigned), asCALL_CDECL);
-    engine->SetDefaultNamespace("");
-    // static unsigned Texture::CheckMaxLevels(int width, int height, int depth, unsigned requestedLevels) | File: ../Graphics/Texture.h
-    engine->SetDefaultNamespace("Texture");
-    engine->RegisterGlobalFunction("uint CheckMaxLevels(int, int, int, uint)", asFUNCTIONPR(Texture::CheckMaxLevels, (int, int, int, unsigned), unsigned), asCALL_CDECL);
-    engine->SetDefaultNamespace("");
-    // void GPUObject::ClearDataLost() | File: ../Graphics/GPUObject.h
-    engine->RegisterObjectMethod("Texture", "void ClearDataLost()", asMETHODPR(Texture, ClearDataLost, (), void), asCALL_THISCALL);
-    // virtual bool Resource::EndLoad() | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Texture", "bool EndLoad()", asMETHODPR(Texture, EndLoad, (), bool), asCALL_THISCALL);
-    // TextureAddressMode Texture::GetAddressMode(TextureCoordinate coord) const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "TextureAddressMode GetAddressMode(TextureCoordinate) const", asMETHODPR(Texture, GetAddressMode, (TextureCoordinate) const, TextureAddressMode), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "TextureAddressMode get_addressMode(TextureCoordinate) const", asMETHODPR(Texture, GetAddressMode, (TextureCoordinate) const, TextureAddressMode), asCALL_THISCALL);
-    // unsigned Texture::GetAnisotropy() const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "uint GetAnisotropy() const", asMETHODPR(Texture, GetAnisotropy, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "uint get_anisotropy() const", asMETHODPR(Texture, GetAnisotropy, () const, unsigned), asCALL_THISCALL);
-    // AsyncLoadState Resource::GetAsyncLoadState() const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Texture", "AsyncLoadState GetAsyncLoadState() const", asMETHODPR(Texture, GetAsyncLoadState, () const, AsyncLoadState), asCALL_THISCALL);
-    // bool Texture::GetAutoResolve() const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "bool GetAutoResolve() const", asMETHODPR(Texture, GetAutoResolve, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "bool get_autoResolve() const", asMETHODPR(Texture, GetAutoResolve, () const, bool), asCALL_THISCALL);
-    // Texture* Texture::GetBackupTexture() const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "Texture@+ GetBackupTexture() const", asMETHODPR(Texture, GetBackupTexture, () const, Texture*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "Texture@+ get_backupTexture() const", asMETHODPR(Texture, GetBackupTexture, () const, Texture*), asCALL_THISCALL);
-    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture", "bool GetBlockEvents() const", asMETHODPR(Texture, GetBlockEvents, () const, bool), asCALL_THISCALL);
-    // const Color& Texture::GetBorderColor() const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "const Color& GetBorderColor() const", asMETHODPR(Texture, GetBorderColor, () const, const Color&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "const Color& get_borderColor() const", asMETHODPR(Texture, GetBorderColor, () const, const Color&), asCALL_THISCALL);
-    // const String& Object::GetCategory() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture", "const String& GetCategory() const", asMETHODPR(Texture, GetCategory, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "const String& get_category() const", asMETHODPR(Texture, GetCategory, () const, const String&), asCALL_THISCALL);
-    // unsigned Texture::GetComponents() const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "uint GetComponents() const", asMETHODPR(Texture, GetComponents, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "uint get_components() const", asMETHODPR(Texture, GetComponents, () const, unsigned), asCALL_THISCALL);
-    // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
-    // unsigned Texture::GetDataSize(int width, int height) const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "uint GetDataSize(int, int) const", asMETHODPR(Texture, GetDataSize, (int, int) const, unsigned), asCALL_THISCALL);
-    // unsigned Texture::GetDataSize(int width, int height, int depth) const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "uint GetDataSize(int, int, int) const", asMETHODPR(Texture, GetDataSize, (int, int, int) const, unsigned), asCALL_THISCALL);
-    // static unsigned Texture::GetDataType(unsigned format) | File: ../Graphics/Texture.h
-    // Not registered because have @nobind mark
-    // int Texture::GetDepth() const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "int GetDepth() const", asMETHODPR(Texture, GetDepth, () const, int), asCALL_THISCALL);
-    // static unsigned Texture::GetDSVFormat(unsigned format) | File: ../Graphics/Texture.h
-    // Not registered because have @nobind mark
-    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture", "VariantMap& GetEventDataMap() const", asMETHODPR(Texture, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
-    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // Object* Object::GetEventSender() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture", "Object@+ GetEventSender() const", asMETHODPR(Texture, GetEventSender, () const, Object*), asCALL_THISCALL);
-    // static unsigned Texture::GetExternalFormat(unsigned format) | File: ../Graphics/Texture.h
-    // Not registered because have @nobind mark
-    // TextureFilterMode Texture::GetFilterMode() const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "TextureFilterMode GetFilterMode() const", asMETHODPR(Texture, GetFilterMode, () const, TextureFilterMode), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "TextureFilterMode get_filterMode() const", asMETHODPR(Texture, GetFilterMode, () const, TextureFilterMode), asCALL_THISCALL);
-    // unsigned Texture::GetFormat() const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "uint GetFormat() const", asMETHODPR(Texture, GetFormat, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "uint get_format() const", asMETHODPR(Texture, GetFormat, () const, unsigned), asCALL_THISCALL);
-    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(Texture, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "const Variant& get_globalVar(StringHash) const", asMETHODPR(Texture, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture", "const VariantMap& GetGlobalVars() const", asMETHODPR(Texture, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "const VariantMap& get_globalVars() const", asMETHODPR(Texture, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    // void* GPUObject::GetGPUObject() const | File: ../Graphics/GPUObject.h
-    // Error: type "void*" can not automatically bind
-    // unsigned GPUObject::GetGPUObjectName() const | File: ../Graphics/GPUObject.h
-    engine->RegisterObjectMethod("Texture", "uint GetGPUObjectName() const", asMETHODPR(Texture, GetGPUObjectName, () const, unsigned), asCALL_THISCALL);
-    // Graphics* GPUObject::GetGraphics() const | File: ../Graphics/GPUObject.h
-    engine->RegisterObjectMethod("Texture", "Graphics@+ GetGraphics() const", asMETHODPR(Texture, GetGraphics, () const, Graphics*), asCALL_THISCALL);
-    // int Texture::GetHeight() const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "int GetHeight() const", asMETHODPR(Texture, GetHeight, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "int get_height() const", asMETHODPR(Texture, GetHeight, () const, int), asCALL_THISCALL);
-    // int Texture::GetLevelDepth(unsigned level) const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "int GetLevelDepth(uint) const", asMETHODPR(Texture, GetLevelDepth, (unsigned) const, int), asCALL_THISCALL);
-    // int Texture::GetLevelHeight(unsigned level) const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "int GetLevelHeight(uint) const", asMETHODPR(Texture, GetLevelHeight, (unsigned) const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "int get_levelHeight(uint) const", asMETHODPR(Texture, GetLevelHeight, (unsigned) const, int), asCALL_THISCALL);
-    // unsigned Texture::GetLevels() const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "uint GetLevels() const", asMETHODPR(Texture, GetLevels, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "uint get_levels() const", asMETHODPR(Texture, GetLevels, () const, unsigned), asCALL_THISCALL);
-    // bool Texture::GetLevelsDirty() const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "bool GetLevelsDirty() const", asMETHODPR(Texture, GetLevelsDirty, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "bool get_levelsDirty() const", asMETHODPR(Texture, GetLevelsDirty, () const, bool), asCALL_THISCALL);
-    // int Texture::GetLevelWidth(unsigned level) const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "int GetLevelWidth(uint) const", asMETHODPR(Texture, GetLevelWidth, (unsigned) const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "int get_levelWidth(uint) const", asMETHODPR(Texture, GetLevelWidth, (unsigned) const, int), asCALL_THISCALL);
-    // unsigned Resource::GetMemoryUse() const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Texture", "uint GetMemoryUse() const", asMETHODPR(Texture, GetMemoryUse, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "uint get_memoryUse() const", asMETHODPR(Texture, GetMemoryUse, () const, unsigned), asCALL_THISCALL);
-    // const Variant& ResourceWithMetadata::GetMetadata(const String& name) const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Texture", "const Variant& GetMetadata(const String&in) const", asMETHODPR(Texture, GetMetadata, (const String&) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "const Variant& get_metadata(const String&in) const", asMETHODPR(Texture, GetMetadata, (const String&) const, const Variant&), asCALL_THISCALL);
-    // int Texture::GetMipsToSkip(MaterialQuality quality) const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "int GetMipsToSkip(MaterialQuality) const", asMETHODPR(Texture, GetMipsToSkip, (MaterialQuality) const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "int get_mipsToSkip(MaterialQuality) const", asMETHODPR(Texture, GetMipsToSkip, (MaterialQuality) const, int), asCALL_THISCALL);
-    // int Texture::GetMultiSample() const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "int GetMultiSample() const", asMETHODPR(Texture, GetMultiSample, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "int get_multiSample() const", asMETHODPR(Texture, GetMultiSample, () const, int), asCALL_THISCALL);
-    // const String& Resource::GetName() const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Texture", "const String& GetName() const", asMETHODPR(Texture, GetName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "const String& get_name() const", asMETHODPR(Texture, GetName, () const, const String&), asCALL_THISCALL);
-    // StringHash Resource::GetNameHash() const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Texture", "StringHash GetNameHash() const", asMETHODPR(Texture, GetNameHash, () const, StringHash), asCALL_THISCALL);
-    // bool Texture::GetParametersDirty() const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "bool GetParametersDirty() const", asMETHODPR(Texture, GetParametersDirty, () const, bool), asCALL_THISCALL);
-    // void* Texture::GetResolveTexture() const | File: ../Graphics/Texture.h
-    // Error: type "void*" can not automatically bind
-    // unsigned Texture::GetRowDataSize(int width) const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "uint GetRowDataSize(int) const", asMETHODPR(Texture, GetRowDataSize, (int) const, unsigned), asCALL_THISCALL);
-    // void* Texture::GetSampler() const | File: ../Graphics/Texture.h
-    // Error: type "void*" can not automatically bind
-    // void* Texture::GetShaderResourceView() const | File: ../Graphics/Texture.h
-    // Error: type "void*" can not automatically bind
-    // bool Texture::GetShadowCompare() const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "bool GetShadowCompare() const", asMETHODPR(Texture, GetShadowCompare, () const, bool), asCALL_THISCALL);
-    // bool Texture::GetSRGB() const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "bool GetSRGB() const", asMETHODPR(Texture, GetSRGB, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "bool get_sRGB() const", asMETHODPR(Texture, GetSRGB, () const, bool), asCALL_THISCALL);
-    // unsigned Texture::GetSRGBFormat(unsigned format) | File: ../Graphics/Texture.h
-    // Not registered because have @nobind mark
-    // static unsigned Texture::GetSRVFormat(unsigned format) | File: ../Graphics/Texture.h
-    // Not registered because have @nobind mark
-    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Texture, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
-    // Not registered because template
-    // unsigned Texture::GetTarget() const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "uint GetTarget() const", asMETHODPR(Texture, GetTarget, () const, unsigned), asCALL_THISCALL);
-    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture", "StringHash GetType() const", asMETHODPR(Texture, GetType, () const, StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "StringHash get_type() const", asMETHODPR(Texture, GetType, () const, StringHash), asCALL_THISCALL);
-    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture", "const String& GetTypeName() const", asMETHODPR(Texture, GetTypeName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "const String& get_typeName() const", asMETHODPR(Texture, GetTypeName, () const, const String&), asCALL_THISCALL);
-    // TextureUsage Texture::GetUsage() const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "TextureUsage GetUsage() const", asMETHODPR(Texture, GetUsage, () const, TextureUsage), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "TextureUsage get_usage() const", asMETHODPR(Texture, GetUsage, () const, TextureUsage), asCALL_THISCALL);
-    // unsigned Resource::GetUseTimer() | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Texture", "uint GetUseTimer()", asMETHODPR(Texture, GetUseTimer, (), unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "uint get_useTimer()", asMETHODPR(Texture, GetUseTimer, (), unsigned), asCALL_THISCALL);
-    // int Texture::GetWidth() const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "int GetWidth() const", asMETHODPR(Texture, GetWidth, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "int get_width() const", asMETHODPR(Texture, GetWidth, () const, int), asCALL_THISCALL);
-    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture", "bool HasEventHandlers() const", asMETHODPR(Texture, HasEventHandlers, () const, bool), asCALL_THISCALL);
-    // bool ResourceWithMetadata::HasMetadata() const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Texture", "bool HasMetadata() const", asMETHODPR(Texture, HasMetadata, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "bool get_hasMetadata() const", asMETHODPR(Texture, HasMetadata, () const, bool), asCALL_THISCALL);
-    // bool GPUObject::HasPendingData() const | File: ../Graphics/GPUObject.h
-    engine->RegisterObjectMethod("Texture", "bool HasPendingData() const", asMETHODPR(Texture, HasPendingData, () const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(Texture, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(Texture, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
-    // bool Texture::IsCompressed() const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "bool IsCompressed() const", asMETHODPR(Texture, IsCompressed, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "bool get_compressed() const", asMETHODPR(Texture, IsCompressed, () const, bool), asCALL_THISCALL);
-    // bool GPUObject::IsDataLost() const | File: ../Graphics/GPUObject.h
-    engine->RegisterObjectMethod("Texture", "bool IsDataLost() const", asMETHODPR(Texture, IsDataLost, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "bool get_dataLost() const", asMETHODPR(Texture, IsDataLost, () const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture", "bool IsInstanceOf(StringHash) const", asMETHODPR(Texture, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
-    // Not registered because template
-    // bool Texture::IsResolveDirty() const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "bool IsResolveDirty() const", asMETHODPR(Texture, IsResolveDirty, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "bool get_resolveDirty() const", asMETHODPR(Texture, IsResolveDirty, () const, bool), asCALL_THISCALL);
-    // bool Resource::Load(Deserializer& source) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Texture", "bool Load(Deserializer&)", asMETHODPR(Texture, Load, (Deserializer&), bool), asCALL_THISCALL);
-    // bool Resource::LoadFile(const String& fileName) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Texture", "bool LoadFile(const String&in)", asMETHODPR(Texture, LoadFile, (const String&), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "bool Load(const String&in)", asMETHODPR(Texture, LoadFile, (const String&), bool), asCALL_THISCALL);
-    // virtual void GPUObject::OnDeviceLost() | File: ../Graphics/GPUObject.h
-    engine->RegisterObjectMethod("Texture", "void OnDeviceLost()", asMETHODPR(Texture, OnDeviceLost, (), void), asCALL_THISCALL);
-    // virtual void GPUObject::OnDeviceReset() | File: ../Graphics/GPUObject.h
-    engine->RegisterObjectMethod("Texture", "void OnDeviceReset()", asMETHODPR(Texture, OnDeviceReset, (), void), asCALL_THISCALL);
-    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(Texture, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
-    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
-    // Error: type "RefCount*" can not automatically bind
-    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("Texture", "int Refs() const", asMETHODPR(Texture, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "int get_refs() const", asMETHODPR(Texture, Refs, () const, int), asCALL_THISCALL);
-    // void Texture::RegenerateLevels() | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "void RegenerateLevels()", asMETHODPR(Texture, RegenerateLevels, (), void), asCALL_THISCALL);
-    // virtual void GPUObject::Release() | File: ../Graphics/GPUObject.h
-    engine->RegisterObjectMethod("Texture", "void Release()", asMETHODPR(Texture, Release, (), void), asCALL_THISCALL);
-    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("Texture", asBEHAVE_RELEASE, "void f()", asMETHODPR(Texture, ReleaseRef, (), void), asCALL_THISCALL);
-    // void ResourceWithMetadata::RemoveAllMetadata() | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Texture", "void RemoveAllMetadata()", asMETHODPR(Texture, RemoveAllMetadata, (), void), asCALL_THISCALL);
-    // void ResourceWithMetadata::RemoveMetadata(const String& name) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Texture", "void RemoveMetadata(const String&in)", asMETHODPR(Texture, RemoveMetadata, (const String&), void), asCALL_THISCALL);
-    // void Resource::ResetUseTimer() | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Texture", "void ResetUseTimer()", asMETHODPR(Texture, ResetUseTimer, (), void), asCALL_THISCALL);
-    // virtual bool Resource::Save(Serializer& dest) const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Texture", "bool Save(Serializer&) const", asMETHODPR(Texture, Save, (Serializer&) const, bool), asCALL_THISCALL);
-    // virtual bool Resource::SaveFile(const String& fileName) const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Texture", "bool SaveFile(const String&in) const", asMETHODPR(Texture, SaveFile, (const String&) const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "bool Save(const String&in) const", asMETHODPR(Texture, SaveFile, (const String&) const, bool), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture", "void SendEvent(StringHash)", asMETHODPR(Texture, SendEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(Texture, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
-    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
-    // Not registered because template
-    // void Texture::SetAddressMode(TextureCoordinate coord, TextureAddressMode mode) | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "void SetAddressMode(TextureCoordinate, TextureAddressMode)", asMETHODPR(Texture, SetAddressMode, (TextureCoordinate, TextureAddressMode), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "void set_addressMode(TextureCoordinate, TextureAddressMode)", asMETHODPR(Texture, SetAddressMode, (TextureCoordinate, TextureAddressMode), void), asCALL_THISCALL);
-    // void Texture::SetAnisotropy(unsigned level) | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "void SetAnisotropy(uint)", asMETHODPR(Texture, SetAnisotropy, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "void set_anisotropy(uint)", asMETHODPR(Texture, SetAnisotropy, (unsigned), void), asCALL_THISCALL);
-    // void Resource::SetAsyncLoadState(AsyncLoadState newState) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Texture", "void SetAsyncLoadState(AsyncLoadState)", asMETHODPR(Texture, SetAsyncLoadState, (AsyncLoadState), void), asCALL_THISCALL);
-    // void Texture::SetBackupTexture(Texture* texture) | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "void SetBackupTexture(Texture@+)", asMETHODPR(Texture, SetBackupTexture, (Texture*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "void set_backupTexture(Texture@+)", asMETHODPR(Texture, SetBackupTexture, (Texture*), void), asCALL_THISCALL);
-    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture", "void SetBlockEvents(bool)", asMETHODPR(Texture, SetBlockEvents, (bool), void), asCALL_THISCALL);
-    // void Texture::SetBorderColor(const Color& color) | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "void SetBorderColor(const Color&in)", asMETHODPR(Texture, SetBorderColor, (const Color&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "void set_borderColor(const Color&in)", asMETHODPR(Texture, SetBorderColor, (const Color&), void), asCALL_THISCALL);
-    // void Texture::SetFilterMode(TextureFilterMode mode) | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "void SetFilterMode(TextureFilterMode)", asMETHODPR(Texture, SetFilterMode, (TextureFilterMode), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "void set_filterMode(TextureFilterMode)", asMETHODPR(Texture, SetFilterMode, (TextureFilterMode), void), asCALL_THISCALL);
-    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(Texture, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(Texture, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    // void Texture::SetLevelsDirty() | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "void SetLevelsDirty()", asMETHODPR(Texture, SetLevelsDirty, (), void), asCALL_THISCALL);
-    // void Resource::SetMemoryUse(unsigned size) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Texture", "void SetMemoryUse(uint)", asMETHODPR(Texture, SetMemoryUse, (unsigned), void), asCALL_THISCALL);
-    // void Texture::SetMipsToSkip(MaterialQuality quality, int toSkip) | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "void SetMipsToSkip(MaterialQuality, int)", asMETHODPR(Texture, SetMipsToSkip, (MaterialQuality, int), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "void set_mipsToSkip(MaterialQuality, int)", asMETHODPR(Texture, SetMipsToSkip, (MaterialQuality, int), void), asCALL_THISCALL);
-    // void Resource::SetName(const String& name) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Texture", "void SetName(const String&in)", asMETHODPR(Texture, SetName, (const String&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "void set_name(const String&in)", asMETHODPR(Texture, SetName, (const String&), void), asCALL_THISCALL);
-    // void Texture::SetNumLevels(unsigned levels) | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "void SetNumLevels(uint)", asMETHODPR(Texture, SetNumLevels, (unsigned), void), asCALL_THISCALL);
-    // void Texture::SetParameters(XMLFile* file) | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "void SetParameters(XMLFile@+)", asMETHODPR(Texture, SetParameters, (XMLFile*), void), asCALL_THISCALL);
-    // void Texture::SetParameters(const XMLElement& element) | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "void SetParameters(const XMLElement&in)", asMETHODPR(Texture, SetParameters, (const XMLElement&), void), asCALL_THISCALL);
-    // void Texture::SetParametersDirty() | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "void SetParametersDirty()", asMETHODPR(Texture, SetParametersDirty, (), void), asCALL_THISCALL);
-    // void Texture::SetResolveDirty(bool enable) | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "void SetResolveDirty(bool)", asMETHODPR(Texture, SetResolveDirty, (bool), void), asCALL_THISCALL);
-    // void Texture::SetShadowCompare(bool enable) | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "void SetShadowCompare(bool)", asMETHODPR(Texture, SetShadowCompare, (bool), void), asCALL_THISCALL);
-    // void Texture::SetSRGB(bool enable) | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "void SetSRGB(bool)", asMETHODPR(Texture, SetSRGB, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "void set_sRGB(bool)", asMETHODPR(Texture, SetSRGB, (bool), void), asCALL_THISCALL);
-    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // explicit Texture::Texture(Context* context) | File: ../Graphics/Texture.h
-    engine->RegisterObjectBehaviour("Texture", asBEHAVE_FACTORY, "Texture@+ f()", asFUNCTION(Texture_Texture_Context), asCALL_CDECL);
-    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture", "void UnsubscribeFromAllEvents()", asMETHODPR(Texture, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(Texture_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
-    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(Texture, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(Texture, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(Texture, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
-    // void Texture::UpdateParameters() | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture", "void UpdateParameters()", asMETHODPR(Texture, UpdateParameters, (), void), asCALL_THISCALL);
-    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("Texture", "int WeakRefs() const", asMETHODPR(Texture, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture", "int get_weakRefs() const", asMETHODPR(Texture, WeakRefs, () const, int), asCALL_THISCALL);
-#ifdef REGISTER_MANUAL_PART_ResourceWithMetadata
-    REGISTER_MANUAL_PART_ResourceWithMetadata(Texture, "Texture")
-#endif
-#ifdef REGISTER_MANUAL_PART_Resource
-    REGISTER_MANUAL_PART_Resource(Texture, "Texture")
-#endif
-#ifdef REGISTER_MANUAL_PART_Object
-    REGISTER_MANUAL_PART_Object(Texture, "Texture")
-#endif
-#ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(Texture, "Texture")
-#endif
-#ifdef REGISTER_MANUAL_PART_GPUObject
-    REGISTER_MANUAL_PART_GPUObject(Texture, "Texture")
-#endif
-#ifdef REGISTER_MANUAL_PART_Texture
-    REGISTER_MANUAL_PART_Texture(Texture, "Texture")
-#endif
-    RegisterSubclass<ResourceWithMetadata, Texture>(engine, "ResourceWithMetadata", "Texture");
-    RegisterSubclass<Resource, Texture>(engine, "Resource", "Texture");
-    RegisterSubclass<Object, Texture>(engine, "Object", "Texture");
-    RegisterSubclass<RefCounted, Texture>(engine, "RefCounted", "Texture");
 
 #ifdef URHO3D_PHYSICS
-    // UniquePtr<btTriangleInfoMap> TriangleMeshData::infoMap_ | File: ../Physics/CollisionShape.h
-    // Error: type "UniquePtr<btTriangleInfoMap>" can not automatically bind
-    // UniquePtr<TriangleMeshInterface> TriangleMeshData::meshInterface_ | File: ../Physics/CollisionShape.h
-    // Error: type "UniquePtr<TriangleMeshInterface>" can not automatically bind
-    // UniquePtr<btBvhTriangleMeshShape> TriangleMeshData::shape_ | File: ../Physics/CollisionShape.h
-    // Error: type "UniquePtr<btBvhTriangleMeshShape>" can not automatically bind
-    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("TriangleMeshData", asBEHAVE_ADDREF, "void f()", asMETHODPR(TriangleMeshData, AddRef, (), void), asCALL_THISCALL);
-    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
-    // Error: type "RefCount*" can not automatically bind
-    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("TriangleMeshData", "int Refs() const", asMETHODPR(TriangleMeshData, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("TriangleMeshData", "int get_refs() const", asMETHODPR(TriangleMeshData, Refs, () const, int), asCALL_THISCALL);
-    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("TriangleMeshData", asBEHAVE_RELEASE, "void f()", asMETHODPR(TriangleMeshData, ReleaseRef, (), void), asCALL_THISCALL);
-    // TriangleMeshData::TriangleMeshData(Model* model, unsigned lodLevel) | File: ../Physics/CollisionShape.h
-    engine->RegisterObjectBehaviour("TriangleMeshData", asBEHAVE_FACTORY, "TriangleMeshData@+ f(Model@+, uint)", asFUNCTION(TriangleMeshData_TriangleMeshData_Model_unsigned), asCALL_CDECL);
-    // explicit TriangleMeshData::TriangleMeshData(CustomGeometry* custom) | File: ../Physics/CollisionShape.h
-    engine->RegisterObjectBehaviour("TriangleMeshData", asBEHAVE_FACTORY, "TriangleMeshData@+ f(CustomGeometry@+)", asFUNCTION(TriangleMeshData_TriangleMeshData_CustomGeometry), asCALL_CDECL);
-    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("TriangleMeshData", "int WeakRefs() const", asMETHODPR(TriangleMeshData, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("TriangleMeshData", "int get_weakRefs() const", asMETHODPR(TriangleMeshData, WeakRefs, () const, int), asCALL_THISCALL);
-#ifdef REGISTER_MANUAL_PART_CollisionGeometryData
-    REGISTER_MANUAL_PART_CollisionGeometryData(TriangleMeshData, "TriangleMeshData")
-#endif
-#ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(TriangleMeshData, "TriangleMeshData")
-#endif
-#ifdef REGISTER_MANUAL_PART_TriangleMeshData
-    REGISTER_MANUAL_PART_TriangleMeshData(TriangleMeshData, "TriangleMeshData")
-#endif
-    RegisterSubclass<CollisionGeometryData, TriangleMeshData>(engine, "CollisionGeometryData", "TriangleMeshData");
-    RegisterSubclass<RefCounted, TriangleMeshData>(engine, "RefCounted", "TriangleMeshData");
+// explicit TriangleMeshData::TriangleMeshData(CustomGeometry* custom) | File: ../Physics/CollisionShape.h
+static TriangleMeshData* TriangleMeshData_TriangleMeshData_CustomGeometry(CustomGeometry *custom)
+{
+    return new TriangleMeshData(custom);
+}
 #endif
 
-#ifdef URHO3D_URHO2D
-    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("TmxObjectGroup2D", asBEHAVE_ADDREF, "void f()", asMETHODPR(TmxObjectGroup2D, AddRef, (), void), asCALL_THISCALL);
-    // int TmxLayer2D::GetHeight() const | File: ../Urho2D/TmxFile2D.h
-    engine->RegisterObjectMethod("TmxObjectGroup2D", "int GetHeight() const", asMETHODPR(TmxObjectGroup2D, GetHeight, () const, int), asCALL_THISCALL);
-    // const String& TmxLayer2D::GetName() const | File: ../Urho2D/TmxFile2D.h
-    engine->RegisterObjectMethod("TmxObjectGroup2D", "const String& GetName() const", asMETHODPR(TmxObjectGroup2D, GetName, () const, const String&), asCALL_THISCALL);
-    // unsigned TmxObjectGroup2D::GetNumObjects() const | File: ../Urho2D/TmxFile2D.h
-    engine->RegisterObjectMethod("TmxObjectGroup2D", "uint GetNumObjects() const", asMETHODPR(TmxObjectGroup2D, GetNumObjects, () const, unsigned), asCALL_THISCALL);
-    // TileMapObject2D* TmxObjectGroup2D::GetObject(unsigned index) const | File: ../Urho2D/TmxFile2D.h
-    engine->RegisterObjectMethod("TmxObjectGroup2D", "TileMapObject2D@+ GetObject(uint) const", asMETHODPR(TmxObjectGroup2D, GetObject, (unsigned) const, TileMapObject2D*), asCALL_THISCALL);
-    // const String& TmxLayer2D::GetProperty(const String& name) const | File: ../Urho2D/TmxFile2D.h
-    engine->RegisterObjectMethod("TmxObjectGroup2D", "const String& GetProperty(const String&in) const", asMETHODPR(TmxObjectGroup2D, GetProperty, (const String&) const, const String&), asCALL_THISCALL);
-    // TmxFile2D* TmxLayer2D::GetTmxFile() const | File: ../Urho2D/TmxFile2D.h
-    engine->RegisterObjectMethod("TmxObjectGroup2D", "TmxFile2D@+ GetTmxFile() const", asMETHODPR(TmxObjectGroup2D, GetTmxFile, () const, TmxFile2D*), asCALL_THISCALL);
-    // TileMapLayerType2D TmxLayer2D::GetType() const | File: ../Urho2D/TmxFile2D.h
-    engine->RegisterObjectMethod("TmxObjectGroup2D", "TileMapLayerType2D GetType() const", asMETHODPR(TmxObjectGroup2D, GetType, () const, TileMapLayerType2D), asCALL_THISCALL);
-    // int TmxLayer2D::GetWidth() const | File: ../Urho2D/TmxFile2D.h
-    engine->RegisterObjectMethod("TmxObjectGroup2D", "int GetWidth() const", asMETHODPR(TmxObjectGroup2D, GetWidth, () const, int), asCALL_THISCALL);
-    // bool TmxLayer2D::HasProperty(const String& name) const | File: ../Urho2D/TmxFile2D.h
-    engine->RegisterObjectMethod("TmxObjectGroup2D", "bool HasProperty(const String&in) const", asMETHODPR(TmxObjectGroup2D, HasProperty, (const String&) const, bool), asCALL_THISCALL);
-    // bool TmxLayer2D::IsVisible() const | File: ../Urho2D/TmxFile2D.h
-    engine->RegisterObjectMethod("TmxObjectGroup2D", "bool IsVisible() const", asMETHODPR(TmxObjectGroup2D, IsVisible, () const, bool), asCALL_THISCALL);
-    // bool TmxObjectGroup2D::Load(const XMLElement& element, const TileMapInfo2D& info) | File: ../Urho2D/TmxFile2D.h
-    engine->RegisterObjectMethod("TmxObjectGroup2D", "bool Load(const XMLElement&in, const TileMapInfo2D&in)", asMETHODPR(TmxObjectGroup2D, Load, (const XMLElement&, const TileMapInfo2D&), bool), asCALL_THISCALL);
-    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
-    // Error: type "RefCount*" can not automatically bind
-    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("TmxObjectGroup2D", "int Refs() const", asMETHODPR(TmxObjectGroup2D, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("TmxObjectGroup2D", "int get_refs() const", asMETHODPR(TmxObjectGroup2D, Refs, () const, int), asCALL_THISCALL);
-    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("TmxObjectGroup2D", asBEHAVE_RELEASE, "void f()", asMETHODPR(TmxObjectGroup2D, ReleaseRef, (), void), asCALL_THISCALL);
-    // void TmxObjectGroup2D::StoreObject(const XMLElement& objectElem, const SharedPtr<TileMapObject2D>& object, const TileMapInfo2D& info, bool isTile=false) | File: ../Urho2D/TmxFile2D.h
-    // Error: type "const SharedPtr<TileMapObject2D>&" can not automatically bind
-    // explicit TmxObjectGroup2D::TmxObjectGroup2D(TmxFile2D* tmxFile) | File: ../Urho2D/TmxFile2D.h
-    engine->RegisterObjectBehaviour("TmxObjectGroup2D", asBEHAVE_FACTORY, "TmxObjectGroup2D@+ f(TmxFile2D@+)", asFUNCTION(TmxObjectGroup2D_TmxObjectGroup2D_TmxFile2D), asCALL_CDECL);
-    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("TmxObjectGroup2D", "int WeakRefs() const", asMETHODPR(TmxObjectGroup2D, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("TmxObjectGroup2D", "int get_weakRefs() const", asMETHODPR(TmxObjectGroup2D, WeakRefs, () const, int), asCALL_THISCALL);
-#ifdef REGISTER_MANUAL_PART_TmxLayer2D
-    REGISTER_MANUAL_PART_TmxLayer2D(TmxObjectGroup2D, "TmxObjectGroup2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(TmxObjectGroup2D, "TmxObjectGroup2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_TmxObjectGroup2D
-    REGISTER_MANUAL_PART_TmxObjectGroup2D(TmxObjectGroup2D, "TmxObjectGroup2D")
-#endif
-    RegisterSubclass<TmxLayer2D, TmxObjectGroup2D>(engine, "TmxLayer2D", "TmxObjectGroup2D");
-    RegisterSubclass<RefCounted, TmxObjectGroup2D>(engine, "RefCounted", "TmxObjectGroup2D");
-#endif
-
+void ASRegisterGenerated_Members_T(asIScriptEngine* engine)
+{
     // unsigned Technique::alphaPassIndex | File: ../Graphics/Technique.h
     engine->SetDefaultNamespace("Technique");
     engine->RegisterGlobalProperty("uint alphaPassIndex", (void*)&Technique::alphaPassIndex);
@@ -1263,955 +713,6 @@ void ASRegisterGenerated_Members_T(asIScriptEngine* engine)
     RegisterSubclass<Resource, Technique>(engine, "Resource", "Technique");
     RegisterSubclass<Object, Technique>(engine, "Object", "Technique");
     RegisterSubclass<RefCounted, Technique>(engine, "RefCounted", "Technique");
-
-    // unsigned Timer::GetMSec(bool reset) | File: ../Core/Timer.h
-    engine->RegisterObjectMethod("Timer", "uint GetMSec(bool)", asMETHODPR(Timer, GetMSec, (bool), unsigned), asCALL_THISCALL);
-    // void Timer::Reset() | File: ../Core/Timer.h
-    engine->RegisterObjectMethod("Timer", "void Reset()", asMETHODPR(Timer, Reset, (), void), asCALL_THISCALL);
-    // Timer& Timer::operator=(const Timer&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<Timer>(engine, "Timer");
-#ifdef REGISTER_MANUAL_PART_Timer
-    REGISTER_MANUAL_PART_Timer(Timer, "Timer")
-#endif
-
-    // float TextureFrame::time_ | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectProperty("TextureFrame", "float time", offsetof(TextureFrame, time_));
-    // Rect TextureFrame::uv_ | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectProperty("TextureFrame", "Rect uv", offsetof(TextureFrame, uv_));
-    // TextureFrame::TextureFrame() | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectBehaviour("TextureFrame", asBEHAVE_FACTORY, "TextureFrame@+ f()", asFUNCTION(TextureFrame_TextureFrame_void), asCALL_CDECL);
-    // TextureFrame& TextureFrame::operator=(const TextureFrame&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<TextureFrame>(engine, "TextureFrame");
-    engine->RegisterObjectBehaviour("TextureFrame", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("TextureFrame", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
-#ifdef REGISTER_MANUAL_PART_TextureFrame
-    REGISTER_MANUAL_PART_TextureFrame(TextureFrame, "TextureFrame")
-#endif
-
-    // void Drawable::AddLight(Light* light) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "void AddLight(Light@+)", asMETHODPR(Text3D, AddLight, (Light*), void), asCALL_THISCALL);
-    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("Text3D", asBEHAVE_ADDREF, "void f()", asMETHODPR(Text3D, AddRef, (), void), asCALL_THISCALL);
-    // void Component::AddReplicationState(ComponentReplicationState* state) | File: ../Scene/Component.h
-    // Error: type "ComponentReplicationState*" can not automatically bind
-    // void Drawable::AddVertexLight(Light* light) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "void AddVertexLight(Light@+)", asMETHODPR(Text3D, AddVertexLight, (Light*), void), asCALL_THISCALL);
-    // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Text3D", "void AllocateNetworkState()", asMETHODPR(Text3D, AllocateNetworkState, (), void), asCALL_THISCALL);
-    // void Text3D::ApplyAttributes() override | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "void ApplyAttributes()", asMETHODPR(Text3D, ApplyAttributes, (), void), asCALL_THISCALL);
-    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
-    // Not registered because template
-    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
-    // Not registered because template
-    // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("Text3D", "void CleanupConnection(Connection@+)", asMETHODPR(Text3D, CleanupConnection, (Connection*), void), asCALL_THISCALL);
-    // void Drawable::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(Text3D, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
-    // virtual bool Drawable::DrawOcclusion(OcclusionBuffer* buffer) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "bool DrawOcclusion(OcclusionBuffer@+)", asMETHODPR(Text3D, DrawOcclusion, (OcclusionBuffer*), bool), asCALL_THISCALL);
-    // bool Animatable::GetAnimationEnabled() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Text3D", "bool GetAnimationEnabled() const", asMETHODPR(Text3D, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "bool get_animationEnabled() const", asMETHODPR(Text3D, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
-    // Variant Serializable::GetAttribute(unsigned index) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Text3D", "Variant GetAttribute(uint) const", asMETHODPR(Text3D, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "Variant get_attributes(uint) const", asMETHODPR(Text3D, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
-    // Variant Serializable::GetAttribute(const String& name) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Text3D", "Variant GetAttribute(const String&in) const", asMETHODPR(Text3D, GetAttribute, (const String&) const, Variant), asCALL_THISCALL);
-    // ValueAnimation* Animatable::GetAttributeAnimation(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Text3D", "ValueAnimation@+ GetAttributeAnimation(const String&in) const", asMETHODPR(Text3D, GetAttributeAnimation, (const String&) const, ValueAnimation*), asCALL_THISCALL);
-    // float Animatable::GetAttributeAnimationSpeed(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Text3D", "float GetAttributeAnimationSpeed(const String&in) const", asMETHODPR(Text3D, GetAttributeAnimationSpeed, (const String&) const, float), asCALL_THISCALL);
-    // float Animatable::GetAttributeAnimationTime(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Text3D", "float GetAttributeAnimationTime(const String&in) const", asMETHODPR(Text3D, GetAttributeAnimationTime, (const String&) const, float), asCALL_THISCALL);
-    // WrapMode Animatable::GetAttributeAnimationWrapMode(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Text3D", "WrapMode GetAttributeAnimationWrapMode(const String&in) const", asMETHODPR(Text3D, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), asCALL_THISCALL);
-    // Variant Serializable::GetAttributeDefault(unsigned index) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Text3D", "Variant GetAttributeDefault(uint) const", asMETHODPR(Text3D, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "Variant get_attributeDefaults(uint) const", asMETHODPR(Text3D, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
-    // Variant Serializable::GetAttributeDefault(const String& name) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Text3D", "Variant GetAttributeDefault(const String&in) const", asMETHODPR(Text3D, GetAttributeDefault, (const String&) const, Variant), asCALL_THISCALL);
-    // virtual const Vector<AttributeInfo>* Serializable::GetAttributes() const | File: ../Scene/Serializable.h
-    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
-    // const Vector<SourceBatch>& Drawable::GetBatches() const | File: ../Graphics/Drawable.h
-    // Error: type "const Vector<SourceBatch>&" can not automatically bind
-    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Text3D", "bool GetBlockEvents() const", asMETHODPR(Text3D, GetBlockEvents, () const, bool), asCALL_THISCALL);
-    // const BoundingBox& Drawable::GetBoundingBox() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "const BoundingBox& GetBoundingBox() const", asMETHODPR(Text3D, GetBoundingBox, () const, const BoundingBox&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "const BoundingBox& get_boundingBox() const", asMETHODPR(Text3D, GetBoundingBox, () const, const BoundingBox&), asCALL_THISCALL);
-    // bool Drawable::GetCastShadows() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "bool GetCastShadows() const", asMETHODPR(Text3D, GetCastShadows, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "bool get_castShadows() const", asMETHODPR(Text3D, GetCastShadows, () const, bool), asCALL_THISCALL);
-    // const String& Object::GetCategory() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Text3D", "const String& GetCategory() const", asMETHODPR(Text3D, GetCategory, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "const String& get_category() const", asMETHODPR(Text3D, GetCategory, () const, const String&), asCALL_THISCALL);
-    // Vector2 Text3D::GetCharPosition(unsigned index) | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "Vector2 GetCharPosition(uint)", asMETHODPR(Text3D, GetCharPosition, (unsigned), Vector2), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "Vector2 get_charPositions(uint)", asMETHODPR(Text3D, GetCharPosition, (unsigned), Vector2), asCALL_THISCALL);
-    // Vector2 Text3D::GetCharSize(unsigned index) | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "Vector2 GetCharSize(uint)", asMETHODPR(Text3D, GetCharSize, (unsigned), Vector2), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "Vector2 get_charSizes(uint)", asMETHODPR(Text3D, GetCharSize, (unsigned), Vector2), asCALL_THISCALL);
-    // const Color& Text3D::GetColor(Corner corner) const | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "const Color& GetColor(Corner) const", asMETHODPR(Text3D, GetColor, (Corner) const, const Color&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "const Color& get_colors(Corner) const", asMETHODPR(Text3D, GetColor, (Corner) const, const Color&), asCALL_THISCALL);
-    // const Color& Text3D::GetColorAttr() const | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "const Color& GetColorAttr() const", asMETHODPR(Text3D, GetColorAttr, () const, const Color&), asCALL_THISCALL);
-    // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("Text3D", "Component@+ GetComponent(StringHash) const", asMETHODPR(Text3D, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
-    // template<class T> T*  Component::GetComponent() const | File: ../Scene/Component.h
-    // Not registered because template
-    // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
-    // Error: type "PODVector<Component*>&" can not automatically bind
-    // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
-    // Not registered because template
-    // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
-    // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
-    // Error: type "PODVector<Node*>&" can not automatically bind
-    // float Drawable::GetDistance() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "float GetDistance() const", asMETHODPR(Text3D, GetDistance, () const, float), asCALL_THISCALL);
-    // unsigned char Drawable::GetDrawableFlags() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "uint8 GetDrawableFlags() const", asMETHODPR(Text3D, GetDrawableFlags, () const, unsigned char), asCALL_THISCALL);
-    // float Drawable::GetDrawDistance() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "float GetDrawDistance() const", asMETHODPR(Text3D, GetDrawDistance, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "float get_drawDistance() const", asMETHODPR(Text3D, GetDrawDistance, () const, float), asCALL_THISCALL);
-    // const Color& Text3D::GetEffectColor() const | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "const Color& GetEffectColor() const", asMETHODPR(Text3D, GetEffectColor, () const, const Color&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "const Color& get_effectColor() const", asMETHODPR(Text3D, GetEffectColor, () const, const Color&), asCALL_THISCALL);
-    // float Text3D::GetEffectDepthBias() const | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "float GetEffectDepthBias() const", asMETHODPR(Text3D, GetEffectDepthBias, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "float get_effectDepthBias() const", asMETHODPR(Text3D, GetEffectDepthBias, () const, float), asCALL_THISCALL);
-    // bool Text3D::GetEffectRoundStroke() const | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "bool GetEffectRoundStroke() const", asMETHODPR(Text3D, GetEffectRoundStroke, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "bool get_effectRoundStroke() const", asMETHODPR(Text3D, GetEffectRoundStroke, () const, bool), asCALL_THISCALL);
-    // const IntVector2& Text3D::GetEffectShadowOffset() const | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "const IntVector2& GetEffectShadowOffset() const", asMETHODPR(Text3D, GetEffectShadowOffset, () const, const IntVector2&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "const IntVector2& get_effectShadowOffset() const", asMETHODPR(Text3D, GetEffectShadowOffset, () const, const IntVector2&), asCALL_THISCALL);
-    // int Text3D::GetEffectStrokeThickness() const | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "int GetEffectStrokeThickness() const", asMETHODPR(Text3D, GetEffectStrokeThickness, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "int get_effectStrokeThickness() const", asMETHODPR(Text3D, GetEffectStrokeThickness, () const, int), asCALL_THISCALL);
-    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Text3D", "VariantMap& GetEventDataMap() const", asMETHODPR(Text3D, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
-    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // Object* Object::GetEventSender() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Text3D", "Object@+ GetEventSender() const", asMETHODPR(Text3D, GetEventSender, () const, Object*), asCALL_THISCALL);
-    // FaceCameraMode Text3D::GetFaceCameraMode() const | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "FaceCameraMode GetFaceCameraMode() const", asMETHODPR(Text3D, GetFaceCameraMode, () const, FaceCameraMode), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "FaceCameraMode get_faceCameraMode() const", asMETHODPR(Text3D, GetFaceCameraMode, () const, FaceCameraMode), asCALL_THISCALL);
-    // Light* Drawable::GetFirstLight() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "Light@+ GetFirstLight() const", asMETHODPR(Text3D, GetFirstLight, () const, Light*), asCALL_THISCALL);
-    // Font* Text3D::GetFont() const | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "Font@+ GetFont() const", asMETHODPR(Text3D, GetFont, () const, Font*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "Font@+ get_font() const", asMETHODPR(Text3D, GetFont, () const, Font*), asCALL_THISCALL);
-    // ResourceRef Text3D::GetFontAttr() const | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "ResourceRef GetFontAttr() const", asMETHODPR(Text3D, GetFontAttr, () const, ResourceRef), asCALL_THISCALL);
-    // float Text3D::GetFontSize() const | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "float GetFontSize() const", asMETHODPR(Text3D, GetFontSize, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "float get_fontSize() const", asMETHODPR(Text3D, GetFontSize, () const, float), asCALL_THISCALL);
-    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Text3D", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(Text3D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "const Variant& get_globalVar(StringHash) const", asMETHODPR(Text3D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Text3D", "const VariantMap& GetGlobalVars() const", asMETHODPR(Text3D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "const VariantMap& get_globalVars() const", asMETHODPR(Text3D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    // int Text3D::GetHeight() const | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "int GetHeight() const", asMETHODPR(Text3D, GetHeight, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "int get_height() const", asMETHODPR(Text3D, GetHeight, () const, int), asCALL_THISCALL);
-    // HorizontalAlignment Text3D::GetHorizontalAlignment() const | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "HorizontalAlignment GetHorizontalAlignment() const", asMETHODPR(Text3D, GetHorizontalAlignment, () const, HorizontalAlignment), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "HorizontalAlignment get_horizontalAlignment() const", asMETHODPR(Text3D, GetHorizontalAlignment, () const, HorizontalAlignment), asCALL_THISCALL);
-    // unsigned Component::GetID() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("Text3D", "uint GetID() const", asMETHODPR(Text3D, GetID, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "uint get_id() const", asMETHODPR(Text3D, GetID, () const, unsigned), asCALL_THISCALL);
-    // bool Serializable::GetInterceptNetworkUpdate(const String& attributeName) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Text3D", "bool GetInterceptNetworkUpdate(const String&in) const", asMETHODPR(Text3D, GetInterceptNetworkUpdate, (const String&) const, bool), asCALL_THISCALL);
-    // unsigned Drawable::GetLightMask() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "uint GetLightMask() const", asMETHODPR(Text3D, GetLightMask, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "uint get_lightMask() const", asMETHODPR(Text3D, GetLightMask, () const, unsigned), asCALL_THISCALL);
-    // const PODVector<Light*>& Drawable::GetLights() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "Array<Light@>@ GetLights() const", asFUNCTION(Text3D_GetLights_void), asCALL_CDECL_OBJFIRST);
-    // float Drawable::GetLodBias() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "float GetLodBias() const", asMETHODPR(Text3D, GetLodBias, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "float get_lodBias() const", asMETHODPR(Text3D, GetLodBias, () const, float), asCALL_THISCALL);
-    // float Drawable::GetLodDistance() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "float GetLodDistance() const", asMETHODPR(Text3D, GetLodDistance, () const, float), asCALL_THISCALL);
-    // virtual Geometry* Drawable::GetLodGeometry(unsigned batchIndex, unsigned level) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "Geometry@+ GetLodGeometry(uint, uint)", asMETHODPR(Text3D, GetLodGeometry, (unsigned, unsigned), Geometry*), asCALL_THISCALL);
-    // Material* Text3D::GetMaterial() const | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "Material@+ GetMaterial() const", asMETHODPR(Text3D, GetMaterial, () const, Material*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "Material@+ get_material() const", asMETHODPR(Text3D, GetMaterial, () const, Material*), asCALL_THISCALL);
-    // ResourceRef Text3D::GetMaterialAttr() const | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "ResourceRef GetMaterialAttr() const", asMETHODPR(Text3D, GetMaterialAttr, () const, ResourceRef), asCALL_THISCALL);
-    // unsigned Drawable::GetMaxLights() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "uint GetMaxLights() const", asMETHODPR(Text3D, GetMaxLights, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "uint get_maxLights() const", asMETHODPR(Text3D, GetMaxLights, () const, unsigned), asCALL_THISCALL);
-    // float Drawable::GetMaxZ() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "float GetMaxZ() const", asMETHODPR(Text3D, GetMaxZ, () const, float), asCALL_THISCALL);
-    // float Drawable::GetMinZ() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "float GetMinZ() const", asMETHODPR(Text3D, GetMinZ, () const, float), asCALL_THISCALL);
-    // virtual const Vector<AttributeInfo>* Serializable::GetNetworkAttributes() const | File: ../Scene/Serializable.h
-    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
-    // NetworkState* Serializable::GetNetworkState() const | File: ../Scene/Serializable.h
-    // Error: type "NetworkState*" can not automatically bind
-    // Node* Component::GetNode() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("Text3D", "Node@+ GetNode() const", asMETHODPR(Text3D, GetNode, () const, Node*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "Node@+ get_node() const", asMETHODPR(Text3D, GetNode, () const, Node*), asCALL_THISCALL);
-    // unsigned Serializable::GetNumAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Text3D", "uint GetNumAttributes() const", asMETHODPR(Text3D, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "uint get_numAttributes() const", asMETHODPR(Text3D, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
-    // unsigned Text3D::GetNumChars() const | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "uint GetNumChars() const", asMETHODPR(Text3D, GetNumChars, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "uint get_numChars() const", asMETHODPR(Text3D, GetNumChars, () const, unsigned), asCALL_THISCALL);
-    // unsigned Serializable::GetNumNetworkAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Text3D", "uint GetNumNetworkAttributes() const", asMETHODPR(Text3D, GetNumNetworkAttributes, () const, unsigned), asCALL_THISCALL);
-    // virtual unsigned Drawable::GetNumOccluderTriangles() | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "uint GetNumOccluderTriangles()", asMETHODPR(Text3D, GetNumOccluderTriangles, (), unsigned), asCALL_THISCALL);
-    // unsigned Text3D::GetNumRows() const | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "uint GetNumRows() const", asMETHODPR(Text3D, GetNumRows, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "uint get_numRows() const", asMETHODPR(Text3D, GetNumRows, () const, unsigned), asCALL_THISCALL);
-    // ObjectAnimation* Animatable::GetObjectAnimation() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Text3D", "ObjectAnimation@+ GetObjectAnimation() const", asMETHODPR(Text3D, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "ObjectAnimation@+ get_objectAnimation() const", asMETHODPR(Text3D, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
-    // ResourceRef Animatable::GetObjectAnimationAttr() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Text3D", "ResourceRef GetObjectAnimationAttr() const", asMETHODPR(Text3D, GetObjectAnimationAttr, () const, ResourceRef), asCALL_THISCALL);
-    // Octant* Drawable::GetOctant() const | File: ../Graphics/Drawable.h
-    // Error: type "Octant" can not automatically bind bacause have @nobind mark
-    // float Text3D::GetOpacity() const | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "float GetOpacity() const", asMETHODPR(Text3D, GetOpacity, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "float get_opacity() const", asMETHODPR(Text3D, GetOpacity, () const, float), asCALL_THISCALL);
-    // int Text3D::GetRowHeight() const | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "int GetRowHeight() const", asMETHODPR(Text3D, GetRowHeight, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "int get_rowHeight() const", asMETHODPR(Text3D, GetRowHeight, () const, int), asCALL_THISCALL);
-    // float Text3D::GetRowSpacing() const | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "float GetRowSpacing() const", asMETHODPR(Text3D, GetRowSpacing, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "float get_rowSpacing() const", asMETHODPR(Text3D, GetRowSpacing, () const, float), asCALL_THISCALL);
-    // int Text3D::GetRowWidth(unsigned index) const | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "int GetRowWidth(uint) const", asMETHODPR(Text3D, GetRowWidth, (unsigned) const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "int get_rowWidths(uint) const", asMETHODPR(Text3D, GetRowWidth, (unsigned) const, int), asCALL_THISCALL);
-    // Scene* Component::GetScene() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("Text3D", "Scene@+ GetScene() const", asMETHODPR(Text3D, GetScene, () const, Scene*), asCALL_THISCALL);
-    // float Drawable::GetShadowDistance() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "float GetShadowDistance() const", asMETHODPR(Text3D, GetShadowDistance, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "float get_shadowDistance() const", asMETHODPR(Text3D, GetShadowDistance, () const, float), asCALL_THISCALL);
-    // unsigned Drawable::GetShadowMask() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "uint GetShadowMask() const", asMETHODPR(Text3D, GetShadowMask, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "uint get_shadowMask() const", asMETHODPR(Text3D, GetShadowMask, () const, unsigned), asCALL_THISCALL);
-    // float Drawable::GetSortValue() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "float GetSortValue() const", asMETHODPR(Text3D, GetSortValue, () const, float), asCALL_THISCALL);
-    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Text3D", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Text3D, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
-    // Not registered because template
-    // const String& Text3D::GetText() const | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "const String& GetText() const", asMETHODPR(Text3D, GetText, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "const String& get_text() const", asMETHODPR(Text3D, GetText, () const, const String&), asCALL_THISCALL);
-    // HorizontalAlignment Text3D::GetTextAlignment() const | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "HorizontalAlignment GetTextAlignment() const", asMETHODPR(Text3D, GetTextAlignment, () const, HorizontalAlignment), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "HorizontalAlignment get_textAlignment() const", asMETHODPR(Text3D, GetTextAlignment, () const, HorizontalAlignment), asCALL_THISCALL);
-    // String Text3D::GetTextAttr() const | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "String GetTextAttr() const", asMETHODPR(Text3D, GetTextAttr, () const, String), asCALL_THISCALL);
-    // TextEffect Text3D::GetTextEffect() const | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "TextEffect GetTextEffect() const", asMETHODPR(Text3D, GetTextEffect, () const, TextEffect), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "TextEffect get_textEffect() const", asMETHODPR(Text3D, GetTextEffect, () const, TextEffect), asCALL_THISCALL);
-    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Text3D", "StringHash GetType() const", asMETHODPR(Text3D, GetType, () const, StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "StringHash get_type() const", asMETHODPR(Text3D, GetType, () const, StringHash), asCALL_THISCALL);
-    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Text3D", "const String& GetTypeName() const", asMETHODPR(Text3D, GetTypeName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "const String& get_typeName() const", asMETHODPR(Text3D, GetTypeName, () const, const String&), asCALL_THISCALL);
-    // UpdateGeometryType Text3D::GetUpdateGeometryType() override | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "UpdateGeometryType GetUpdateGeometryType()", asMETHODPR(Text3D, GetUpdateGeometryType, (), UpdateGeometryType), asCALL_THISCALL);
-    // const PODVector<Light*>& Drawable::GetVertexLights() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "Array<Light@>@ GetVertexLights() const", asFUNCTION(Text3D_GetVertexLights_void), asCALL_CDECL_OBJFIRST);
-    // VerticalAlignment Text3D::GetVerticalAlignment() const | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "VerticalAlignment GetVerticalAlignment() const", asMETHODPR(Text3D, GetVerticalAlignment, () const, VerticalAlignment), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "VerticalAlignment get_verticalAlignment() const", asMETHODPR(Text3D, GetVerticalAlignment, () const, VerticalAlignment), asCALL_THISCALL);
-    // unsigned Drawable::GetViewMask() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "uint GetViewMask() const", asMETHODPR(Text3D, GetViewMask, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "uint get_viewMask() const", asMETHODPR(Text3D, GetViewMask, () const, unsigned), asCALL_THISCALL);
-    // int Text3D::GetWidth() const | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "int GetWidth() const", asMETHODPR(Text3D, GetWidth, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "int get_width() const", asMETHODPR(Text3D, GetWidth, () const, int), asCALL_THISCALL);
-    // bool Text3D::GetWordwrap() const | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "bool GetWordwrap() const", asMETHODPR(Text3D, GetWordwrap, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "bool get_wordwrap() const", asMETHODPR(Text3D, GetWordwrap, () const, bool), asCALL_THISCALL);
-    // const BoundingBox& Drawable::GetWorldBoundingBox() | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "const BoundingBox& GetWorldBoundingBox()", asMETHODPR(Text3D, GetWorldBoundingBox, (), const BoundingBox&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "const BoundingBox& get_worldBoundingBox()", asMETHODPR(Text3D, GetWorldBoundingBox, (), const BoundingBox&), asCALL_THISCALL);
-    // Zone* Drawable::GetZone() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "Zone@+ GetZone() const", asMETHODPR(Text3D, GetZone, () const, Zone*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "Zone@+ get_zone() const", asMETHODPR(Text3D, GetZone, () const, Zone*), asCALL_THISCALL);
-    // unsigned Drawable::GetZoneMask() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "uint GetZoneMask() const", asMETHODPR(Text3D, GetZoneMask, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "uint get_zoneMask() const", asMETHODPR(Text3D, GetZoneMask, () const, unsigned), asCALL_THISCALL);
-    // bool Drawable::HasBasePass(unsigned batchIndex) const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "bool HasBasePass(uint) const", asMETHODPR(Text3D, HasBasePass, (unsigned) const, bool), asCALL_THISCALL);
-    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Text3D", "bool HasEventHandlers() const", asMETHODPR(Text3D, HasEventHandlers, () const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Text3D", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(Text3D, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Text3D", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(Text3D, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
-    // bool Component::IsEnabled() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("Text3D", "bool IsEnabled() const", asMETHODPR(Text3D, IsEnabled, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "bool get_enabled() const", asMETHODPR(Text3D, IsEnabled, () const, bool), asCALL_THISCALL);
-    // bool Component::IsEnabledEffective() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("Text3D", "bool IsEnabledEffective() const", asMETHODPR(Text3D, IsEnabledEffective, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "bool get_enabledEffective() const", asMETHODPR(Text3D, IsEnabledEffective, () const, bool), asCALL_THISCALL);
-    // bool Text3D::IsFixedScreenSize() const | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "bool IsFixedScreenSize() const", asMETHODPR(Text3D, IsFixedScreenSize, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "bool get_fixedScreenSize() const", asMETHODPR(Text3D, IsFixedScreenSize, () const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Text3D", "bool IsInstanceOf(StringHash) const", asMETHODPR(Text3D, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
-    // Not registered because template
-    // bool Drawable::IsInView() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "bool IsInView() const", asMETHODPR(Text3D, IsInView, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "bool get_inView() const", asMETHODPR(Text3D, IsInView, () const, bool), asCALL_THISCALL);
-    // bool Drawable::IsInView(Camera* camera) const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "bool IsInView(Camera@+) const", asMETHODPR(Text3D, IsInView, (Camera*) const, bool), asCALL_THISCALL);
-    // bool Drawable::IsInView(const FrameInfo& frame, bool anyCamera=false) const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "bool IsInView(const FrameInfo&in, bool = false) const", asMETHODPR(Text3D, IsInView, (const FrameInfo&, bool) const, bool), asCALL_THISCALL);
-    // bool Drawable::IsOccludee() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "bool IsOccludee() const", asMETHODPR(Text3D, IsOccludee, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "bool get_occludee() const", asMETHODPR(Text3D, IsOccludee, () const, bool), asCALL_THISCALL);
-    // bool Drawable::IsOccluder() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "bool IsOccluder() const", asMETHODPR(Text3D, IsOccluder, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "bool get_occluder() const", asMETHODPR(Text3D, IsOccluder, () const, bool), asCALL_THISCALL);
-    // bool Component::IsReplicated() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("Text3D", "bool IsReplicated() const", asMETHODPR(Text3D, IsReplicated, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "bool get_replicated() const", asMETHODPR(Text3D, IsReplicated, () const, bool), asCALL_THISCALL);
-    // bool Serializable::IsTemporary() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Text3D", "bool IsTemporary() const", asMETHODPR(Text3D, IsTemporary, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "bool get_temporary() const", asMETHODPR(Text3D, IsTemporary, () const, bool), asCALL_THISCALL);
-    // bool Drawable::IsZoneDirty() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "bool IsZoneDirty() const", asMETHODPR(Text3D, IsZoneDirty, () const, bool), asCALL_THISCALL);
-    // void Drawable::LimitLights() | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "void LimitLights()", asMETHODPR(Text3D, LimitLights, (), void), asCALL_THISCALL);
-    // void Drawable::LimitVertexLights(bool removeConvertedLights) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "void LimitVertexLights(bool)", asMETHODPR(Text3D, LimitVertexLights, (bool), void), asCALL_THISCALL);
-    // virtual bool Serializable::Load(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Text3D", "bool Load(Deserializer&)", asMETHODPR(Text3D, Load, (Deserializer&), bool), asCALL_THISCALL);
-    // bool Animatable::LoadJSON(const JSONValue& source) override | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Text3D", "bool LoadJSON(const JSONValue&in)", asMETHODPR(Text3D, LoadJSON, (const JSONValue&), bool), asCALL_THISCALL);
-    // bool Animatable::LoadXML(const XMLElement& source) override | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Text3D", "bool LoadXML(const XMLElement&in)", asMETHODPR(Text3D, LoadXML, (const XMLElement&), bool), asCALL_THISCALL);
-    // void Drawable::MarkForUpdate() | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "void MarkForUpdate()", asMETHODPR(Text3D, MarkForUpdate, (), void), asCALL_THISCALL);
-    // void Drawable::MarkInView(const FrameInfo& frame) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "void MarkInView(const FrameInfo&in)", asMETHODPR(Text3D, MarkInView, (const FrameInfo&), void), asCALL_THISCALL);
-    // void Drawable::MarkInView(unsigned frameNumber) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "void MarkInView(uint)", asMETHODPR(Text3D, MarkInView, (unsigned), void), asCALL_THISCALL);
-    // void Component::MarkNetworkUpdate() override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("Text3D", "void MarkNetworkUpdate()", asMETHODPR(Text3D, MarkNetworkUpdate, (), void), asCALL_THISCALL);
-    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Text3D", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(Text3D, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
-    // virtual void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Text3D", "void OnGetAttribute(const AttributeInfo&in, Variant&) const", asMETHODPR(Text3D, OnGetAttribute, (const AttributeInfo&, Variant&) const, void), asCALL_THISCALL);
-    // virtual void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Text3D", "void OnSetAttribute(const AttributeInfo&in, const Variant&in)", asMETHODPR(Text3D, OnSetAttribute, (const AttributeInfo&, const Variant&), void), asCALL_THISCALL);
-    // void Drawable::OnSetEnabled() override | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "void OnSetEnabled()", asMETHODPR(Text3D, OnSetEnabled, (), void), asCALL_THISCALL);
-    // void Component::PrepareNetworkUpdate() | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("Text3D", "void PrepareNetworkUpdate()", asMETHODPR(Text3D, PrepareNetworkUpdate, (), void), asCALL_THISCALL);
-    // virtual void Drawable::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results) | File: ../Graphics/Drawable.h
-    // Error: type "RayOctreeQuery" can not automatically bind bacause have @nobind mark
-    // bool Serializable::ReadDeltaUpdate(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Text3D", "bool ReadDeltaUpdate(Deserializer&)", asMETHODPR(Text3D, ReadDeltaUpdate, (Deserializer&), bool), asCALL_THISCALL);
-    // bool Serializable::ReadLatestDataUpdate(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Text3D", "bool ReadLatestDataUpdate(Deserializer&)", asMETHODPR(Text3D, ReadLatestDataUpdate, (Deserializer&), bool), asCALL_THISCALL);
-    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
-    // Error: type "RefCount*" can not automatically bind
-    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("Text3D", "int Refs() const", asMETHODPR(Text3D, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "int get_refs() const", asMETHODPR(Text3D, Refs, () const, int), asCALL_THISCALL);
-    // static void Text3D::RegisterObject(Context* context) | File: ../UI/Text3D.h
-    // Context can be used as firs parameter of constructors only
-    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("Text3D", asBEHAVE_RELEASE, "void f()", asMETHODPR(Text3D, ReleaseRef, (), void), asCALL_THISCALL);
-    // void Component::Remove() | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("Text3D", "void Remove()", asMETHODPR(Text3D, Remove, (), void), asCALL_THISCALL);
-    // void Animatable::RemoveAttributeAnimation(const String& name) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Text3D", "void RemoveAttributeAnimation(const String&in)", asMETHODPR(Text3D, RemoveAttributeAnimation, (const String&), void), asCALL_THISCALL);
-    // void Serializable::RemoveInstanceDefault() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Text3D", "void RemoveInstanceDefault()", asMETHODPR(Text3D, RemoveInstanceDefault, (), void), asCALL_THISCALL);
-    // void Animatable::RemoveObjectAnimation() | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Text3D", "void RemoveObjectAnimation()", asMETHODPR(Text3D, RemoveObjectAnimation, (), void), asCALL_THISCALL);
-    // void Serializable::ResetToDefault() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Text3D", "void ResetToDefault()", asMETHODPR(Text3D, ResetToDefault, (), void), asCALL_THISCALL);
-    // bool Component::Save(Serializer& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("Text3D", "bool Save(Serializer&) const", asMETHODPR(Text3D, Save, (Serializer&) const, bool), asCALL_THISCALL);
-    // virtual bool Serializable::SaveDefaultAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Text3D", "bool SaveDefaultAttributes() const", asMETHODPR(Text3D, SaveDefaultAttributes, () const, bool), asCALL_THISCALL);
-    // bool Component::SaveJSON(JSONValue& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("Text3D", "bool SaveJSON(JSONValue&) const", asMETHODPR(Text3D, SaveJSON, (JSONValue&) const, bool), asCALL_THISCALL);
-    // bool Component::SaveXML(XMLElement& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("Text3D", "bool SaveXML(XMLElement&) const", asMETHODPR(Text3D, SaveXML, (XMLElement&) const, bool), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Text3D", "void SendEvent(StringHash)", asMETHODPR(Text3D, SendEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Text3D", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(Text3D, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
-    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
-    // Not registered because template
-    // void Text3D::SetAlignment(HorizontalAlignment hAlign, VerticalAlignment vAlign) | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "void SetAlignment(HorizontalAlignment, VerticalAlignment)", asMETHODPR(Text3D, SetAlignment, (HorizontalAlignment, VerticalAlignment), void), asCALL_THISCALL);
-    // void Animatable::SetAnimationEnabled(bool enable) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Text3D", "void SetAnimationEnabled(bool)", asMETHODPR(Text3D, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "void set_animationEnabled(bool)", asMETHODPR(Text3D, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
-    // void Animatable::SetAnimationTime(float time) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Text3D", "void SetAnimationTime(float)", asMETHODPR(Text3D, SetAnimationTime, (float), void), asCALL_THISCALL);
-    // bool Serializable::SetAttribute(unsigned index, const Variant& value) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Text3D", "bool SetAttribute(uint, const Variant&in)", asMETHODPR(Text3D, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "bool set_attributes(uint, const Variant&in)", asMETHODPR(Text3D, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
-    // bool Serializable::SetAttribute(const String& name, const Variant& value) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Text3D", "bool SetAttribute(const String&in, const Variant&in)", asMETHODPR(Text3D, SetAttribute, (const String&, const Variant&), bool), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode=WM_LOOP, float speed=1.0f) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Text3D", "void SetAttributeAnimation(const String&in, ValueAnimation@+, WrapMode = WM_LOOP, float = 1.0f)", asMETHODPR(Text3D, SetAttributeAnimation, (const String&, ValueAnimation*, WrapMode, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationSpeed(const String& name, float speed) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Text3D", "void SetAttributeAnimationSpeed(const String&in, float)", asMETHODPR(Text3D, SetAttributeAnimationSpeed, (const String&, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationTime(const String& name, float time) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Text3D", "void SetAttributeAnimationTime(const String&in, float)", asMETHODPR(Text3D, SetAttributeAnimationTime, (const String&, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationWrapMode(const String& name, WrapMode wrapMode) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Text3D", "void SetAttributeAnimationWrapMode(const String&in, WrapMode)", asMETHODPR(Text3D, SetAttributeAnimationWrapMode, (const String&, WrapMode), void), asCALL_THISCALL);
-    // void Drawable::SetBasePass(unsigned batchIndex) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "void SetBasePass(uint)", asMETHODPR(Text3D, SetBasePass, (unsigned), void), asCALL_THISCALL);
-    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Text3D", "void SetBlockEvents(bool)", asMETHODPR(Text3D, SetBlockEvents, (bool), void), asCALL_THISCALL);
-    // void Drawable::SetCastShadows(bool enable) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "void SetCastShadows(bool)", asMETHODPR(Text3D, SetCastShadows, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "void set_castShadows(bool)", asMETHODPR(Text3D, SetCastShadows, (bool), void), asCALL_THISCALL);
-    // void Text3D::SetColor(const Color& color) | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "void SetColor(const Color&in)", asMETHODPR(Text3D, SetColor, (const Color&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "void set_color(const Color&in)", asMETHODPR(Text3D, SetColor, (const Color&), void), asCALL_THISCALL);
-    // void Text3D::SetColor(Corner corner, const Color& color) | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "void SetColor(Corner, const Color&in)", asMETHODPR(Text3D, SetColor, (Corner, const Color&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "void set_colors(Corner, const Color&in)", asMETHODPR(Text3D, SetColor, (Corner, const Color&), void), asCALL_THISCALL);
-    // void Drawable::SetDrawDistance(float distance) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "void SetDrawDistance(float)", asMETHODPR(Text3D, SetDrawDistance, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "void set_drawDistance(float)", asMETHODPR(Text3D, SetDrawDistance, (float), void), asCALL_THISCALL);
-    // void Text3D::SetEffectColor(const Color& effectColor) | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "void SetEffectColor(const Color&in)", asMETHODPR(Text3D, SetEffectColor, (const Color&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "void set_effectColor(const Color&in)", asMETHODPR(Text3D, SetEffectColor, (const Color&), void), asCALL_THISCALL);
-    // void Text3D::SetEffectDepthBias(float bias) | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "void SetEffectDepthBias(float)", asMETHODPR(Text3D, SetEffectDepthBias, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "void set_effectDepthBias(float)", asMETHODPR(Text3D, SetEffectDepthBias, (float), void), asCALL_THISCALL);
-    // void Text3D::SetEffectRoundStroke(bool roundStroke) | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "void SetEffectRoundStroke(bool)", asMETHODPR(Text3D, SetEffectRoundStroke, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "void set_effectRoundStroke(bool)", asMETHODPR(Text3D, SetEffectRoundStroke, (bool), void), asCALL_THISCALL);
-    // void Text3D::SetEffectShadowOffset(const IntVector2& offset) | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "void SetEffectShadowOffset(const IntVector2&in)", asMETHODPR(Text3D, SetEffectShadowOffset, (const IntVector2&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "void set_effectShadowOffset(const IntVector2&in)", asMETHODPR(Text3D, SetEffectShadowOffset, (const IntVector2&), void), asCALL_THISCALL);
-    // void Text3D::SetEffectStrokeThickness(int thickness) | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "void SetEffectStrokeThickness(int)", asMETHODPR(Text3D, SetEffectStrokeThickness, (int), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "void set_effectStrokeThickness(int)", asMETHODPR(Text3D, SetEffectStrokeThickness, (int), void), asCALL_THISCALL);
-    // void Component::SetEnabled(bool enable) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("Text3D", "void SetEnabled(bool)", asMETHODPR(Text3D, SetEnabled, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "void set_enabled(bool)", asMETHODPR(Text3D, SetEnabled, (bool), void), asCALL_THISCALL);
-    // void Text3D::SetFaceCameraMode(FaceCameraMode mode) | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "void SetFaceCameraMode(FaceCameraMode)", asMETHODPR(Text3D, SetFaceCameraMode, (FaceCameraMode), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "void set_faceCameraMode(FaceCameraMode)", asMETHODPR(Text3D, SetFaceCameraMode, (FaceCameraMode), void), asCALL_THISCALL);
-    // void Text3D::SetFixedScreenSize(bool enable) | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "void SetFixedScreenSize(bool)", asMETHODPR(Text3D, SetFixedScreenSize, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "void set_fixedScreenSize(bool)", asMETHODPR(Text3D, SetFixedScreenSize, (bool), void), asCALL_THISCALL);
-    // bool Text3D::SetFont(const String& fontName, float size=DEFAULT_FONT_SIZE) | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "bool SetFont(const String&in, float = DEFAULT_FONT_SIZE)", asMETHODPR(Text3D, SetFont, (const String&, float), bool), asCALL_THISCALL);
-    // bool Text3D::SetFont(Font* font, float size=DEFAULT_FONT_SIZE) | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "bool SetFont(Font@+, float = DEFAULT_FONT_SIZE)", asMETHODPR(Text3D, SetFont, (Font*, float), bool), asCALL_THISCALL);
-    // void Text3D::SetFontAttr(const ResourceRef& value) | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "void SetFontAttr(const ResourceRef&in)", asMETHODPR(Text3D, SetFontAttr, (const ResourceRef&), void), asCALL_THISCALL);
-    // bool Text3D::SetFontSize(float size) | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "bool SetFontSize(float)", asMETHODPR(Text3D, SetFontSize, (float), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "bool set_fontSize(float)", asMETHODPR(Text3D, SetFontSize, (float), bool), asCALL_THISCALL);
-    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Text3D", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(Text3D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(Text3D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    // void Text3D::SetHorizontalAlignment(HorizontalAlignment align) | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "void SetHorizontalAlignment(HorizontalAlignment)", asMETHODPR(Text3D, SetHorizontalAlignment, (HorizontalAlignment), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "void set_horizontalAlignment(HorizontalAlignment)", asMETHODPR(Text3D, SetHorizontalAlignment, (HorizontalAlignment), void), asCALL_THISCALL);
-    // void Serializable::SetInstanceDefault(bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Text3D", "void SetInstanceDefault(bool)", asMETHODPR(Text3D, SetInstanceDefault, (bool), void), asCALL_THISCALL);
-    // void Serializable::SetInterceptNetworkUpdate(const String& attributeName, bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Text3D", "void SetInterceptNetworkUpdate(const String&in, bool)", asMETHODPR(Text3D, SetInterceptNetworkUpdate, (const String&, bool), void), asCALL_THISCALL);
-    // void Drawable::SetLightMask(unsigned mask) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "void SetLightMask(uint)", asMETHODPR(Text3D, SetLightMask, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "void set_lightMask(uint)", asMETHODPR(Text3D, SetLightMask, (unsigned), void), asCALL_THISCALL);
-    // void Drawable::SetLodBias(float bias) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "void SetLodBias(float)", asMETHODPR(Text3D, SetLodBias, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "void set_lodBias(float)", asMETHODPR(Text3D, SetLodBias, (float), void), asCALL_THISCALL);
-    // void Text3D::SetMaterial(Material* material) | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "void SetMaterial(Material@+)", asMETHODPR(Text3D, SetMaterial, (Material*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "void set_material(Material@+)", asMETHODPR(Text3D, SetMaterial, (Material*), void), asCALL_THISCALL);
-    // void Text3D::SetMaterialAttr(const ResourceRef& value) | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "void SetMaterialAttr(const ResourceRef&in)", asMETHODPR(Text3D, SetMaterialAttr, (const ResourceRef&), void), asCALL_THISCALL);
-    // void Drawable::SetMaxLights(unsigned num) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "void SetMaxLights(uint)", asMETHODPR(Text3D, SetMaxLights, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "void set_maxLights(uint)", asMETHODPR(Text3D, SetMaxLights, (unsigned), void), asCALL_THISCALL);
-    // void Drawable::SetMinMaxZ(float minZ, float maxZ) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "void SetMinMaxZ(float, float)", asMETHODPR(Text3D, SetMinMaxZ, (float, float), void), asCALL_THISCALL);
-    // void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Text3D", "void SetObjectAnimation(ObjectAnimation@+)", asMETHODPR(Text3D, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "void set_objectAnimation(ObjectAnimation@+)", asMETHODPR(Text3D, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
-    // void Animatable::SetObjectAnimationAttr(const ResourceRef& value) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Text3D", "void SetObjectAnimationAttr(const ResourceRef&in)", asMETHODPR(Text3D, SetObjectAnimationAttr, (const ResourceRef&), void), asCALL_THISCALL);
-    // void Drawable::SetOccludee(bool enable) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "void SetOccludee(bool)", asMETHODPR(Text3D, SetOccludee, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "void set_occludee(bool)", asMETHODPR(Text3D, SetOccludee, (bool), void), asCALL_THISCALL);
-    // void Drawable::SetOccluder(bool enable) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "void SetOccluder(bool)", asMETHODPR(Text3D, SetOccluder, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "void set_occluder(bool)", asMETHODPR(Text3D, SetOccluder, (bool), void), asCALL_THISCALL);
-    // void Text3D::SetOpacity(float opacity) | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "void SetOpacity(float)", asMETHODPR(Text3D, SetOpacity, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "void set_opacity(float)", asMETHODPR(Text3D, SetOpacity, (float), void), asCALL_THISCALL);
-    // void Text3D::SetRowSpacing(float spacing) | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "void SetRowSpacing(float)", asMETHODPR(Text3D, SetRowSpacing, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "void set_rowSpacing(float)", asMETHODPR(Text3D, SetRowSpacing, (float), void), asCALL_THISCALL);
-    // void Drawable::SetShadowDistance(float distance) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "void SetShadowDistance(float)", asMETHODPR(Text3D, SetShadowDistance, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "void set_shadowDistance(float)", asMETHODPR(Text3D, SetShadowDistance, (float), void), asCALL_THISCALL);
-    // void Drawable::SetShadowMask(unsigned mask) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "void SetShadowMask(uint)", asMETHODPR(Text3D, SetShadowMask, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "void set_shadowMask(uint)", asMETHODPR(Text3D, SetShadowMask, (unsigned), void), asCALL_THISCALL);
-    // void Drawable::SetSortValue(float value) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "void SetSortValue(float)", asMETHODPR(Text3D, SetSortValue, (float), void), asCALL_THISCALL);
-    // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Text3D", "void SetTemporary(bool)", asMETHODPR(Text3D, SetTemporary, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "void set_temporary(bool)", asMETHODPR(Text3D, SetTemporary, (bool), void), asCALL_THISCALL);
-    // void Text3D::SetText(const String& text) | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "void SetText(const String&in)", asMETHODPR(Text3D, SetText, (const String&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "void set_text(const String&in)", asMETHODPR(Text3D, SetText, (const String&), void), asCALL_THISCALL);
-    // void Text3D::SetTextAlignment(HorizontalAlignment align) | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "void SetTextAlignment(HorizontalAlignment)", asMETHODPR(Text3D, SetTextAlignment, (HorizontalAlignment), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "void set_textAlignment(HorizontalAlignment)", asMETHODPR(Text3D, SetTextAlignment, (HorizontalAlignment), void), asCALL_THISCALL);
-    // void Text3D::SetTextAttr(const String& value) | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "void SetTextAttr(const String&in)", asMETHODPR(Text3D, SetTextAttr, (const String&), void), asCALL_THISCALL);
-    // void Text3D::SetTextEffect(TextEffect textEffect) | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "void SetTextEffect(TextEffect)", asMETHODPR(Text3D, SetTextEffect, (TextEffect), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "void set_textEffect(TextEffect)", asMETHODPR(Text3D, SetTextEffect, (TextEffect), void), asCALL_THISCALL);
-    // void Text3D::SetVerticalAlignment(VerticalAlignment align) | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "void SetVerticalAlignment(VerticalAlignment)", asMETHODPR(Text3D, SetVerticalAlignment, (VerticalAlignment), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "void set_verticalAlignment(VerticalAlignment)", asMETHODPR(Text3D, SetVerticalAlignment, (VerticalAlignment), void), asCALL_THISCALL);
-    // void Drawable::SetViewMask(unsigned mask) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "void SetViewMask(uint)", asMETHODPR(Text3D, SetViewMask, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "void set_viewMask(uint)", asMETHODPR(Text3D, SetViewMask, (unsigned), void), asCALL_THISCALL);
-    // void Text3D::SetWidth(int width) | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "void SetWidth(int)", asMETHODPR(Text3D, SetWidth, (int), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "void set_width(int)", asMETHODPR(Text3D, SetWidth, (int), void), asCALL_THISCALL);
-    // void Text3D::SetWordwrap(bool enable) | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "void SetWordwrap(bool)", asMETHODPR(Text3D, SetWordwrap, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "void set_wordwrap(bool)", asMETHODPR(Text3D, SetWordwrap, (bool), void), asCALL_THISCALL);
-    // void Drawable::SetZone(Zone* zone, bool temporary=false) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "void SetZone(Zone@+, bool = false)", asMETHODPR(Text3D, SetZone, (Zone*, bool), void), asCALL_THISCALL);
-    // void Drawable::SetZoneMask(unsigned mask) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "void SetZoneMask(uint)", asMETHODPR(Text3D, SetZoneMask, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "void set_zoneMask(uint)", asMETHODPR(Text3D, SetZoneMask, (unsigned), void), asCALL_THISCALL);
-    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // explicit Text3D::Text3D(Context* context) | File: ../UI/Text3D.h
-    engine->RegisterObjectBehaviour("Text3D", asBEHAVE_FACTORY, "Text3D@+ f()", asFUNCTION(Text3D_Text3D_Context), asCALL_CDECL);
-    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Text3D", "void UnsubscribeFromAllEvents()", asMETHODPR(Text3D, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Text3D", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(Text3D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
-    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Text3D", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(Text3D, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Text3D", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(Text3D, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Text3D", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(Text3D, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
-    // virtual void Drawable::Update(const FrameInfo& frame) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Text3D", "void Update(const FrameInfo&in)", asMETHODPR(Text3D, Update, (const FrameInfo&), void), asCALL_THISCALL);
-    // void Text3D::UpdateBatches(const FrameInfo& frame) override | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "void UpdateBatches(const FrameInfo&in)", asMETHODPR(Text3D, UpdateBatches, (const FrameInfo&), void), asCALL_THISCALL);
-    // void Text3D::UpdateGeometry(const FrameInfo& frame) override | File: ../UI/Text3D.h
-    engine->RegisterObjectMethod("Text3D", "void UpdateGeometry(const FrameInfo&in)", asMETHODPR(Text3D, UpdateGeometry, (const FrameInfo&), void), asCALL_THISCALL);
-    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("Text3D", "int WeakRefs() const", asMETHODPR(Text3D, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "int get_weakRefs() const", asMETHODPR(Text3D, WeakRefs, () const, int), asCALL_THISCALL);
-    // void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attributeBits, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Text3D", "void WriteDeltaUpdate(Serializer&, const DirtyBits&in, uint8)", asMETHODPR(Text3D, WriteDeltaUpdate, (Serializer&, const DirtyBits&, unsigned char), void), asCALL_THISCALL);
-    // void Serializable::WriteInitialDeltaUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Text3D", "void WriteInitialDeltaUpdate(Serializer&, uint8)", asMETHODPR(Text3D, WriteInitialDeltaUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
-    // void Serializable::WriteLatestDataUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Text3D", "void WriteLatestDataUpdate(Serializer&, uint8)", asMETHODPR(Text3D, WriteLatestDataUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
-#ifdef REGISTER_MANUAL_PART_Drawable
-    REGISTER_MANUAL_PART_Drawable(Text3D, "Text3D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Component
-    REGISTER_MANUAL_PART_Component(Text3D, "Text3D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Animatable
-    REGISTER_MANUAL_PART_Animatable(Text3D, "Text3D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Serializable
-    REGISTER_MANUAL_PART_Serializable(Text3D, "Text3D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Object
-    REGISTER_MANUAL_PART_Object(Text3D, "Text3D")
-#endif
-#ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(Text3D, "Text3D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Text3D
-    REGISTER_MANUAL_PART_Text3D(Text3D, "Text3D")
-#endif
-    RegisterSubclass<Drawable, Text3D>(engine, "Drawable", "Text3D");
-    RegisterSubclass<Component, Text3D>(engine, "Component", "Text3D");
-    RegisterSubclass<Animatable, Text3D>(engine, "Animatable", "Text3D");
-    RegisterSubclass<Serializable, Text3D>(engine, "Serializable", "Text3D");
-    RegisterSubclass<Object, Text3D>(engine, "Object", "Text3D");
-    RegisterSubclass<RefCounted, Text3D>(engine, "RefCounted", "Text3D");
-
-    // void ResourceWithMetadata::AddMetadata(const String& name, const Variant& value) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Texture3D", "void AddMetadata(const String&in, const Variant&in)", asMETHODPR(Texture3D, AddMetadata, (const String&, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "void set_metadata(const String&in, const Variant&in)", asMETHODPR(Texture3D, AddMetadata, (const String&, const Variant&), void), asCALL_THISCALL);
-    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("Texture3D", asBEHAVE_ADDREF, "void f()", asMETHODPR(Texture3D, AddRef, (), void), asCALL_THISCALL);
-    // bool Texture3D::BeginLoad(Deserializer& source) override | File: ../Graphics/Texture3D.h
-    engine->RegisterObjectMethod("Texture3D", "bool BeginLoad(Deserializer&)", asMETHODPR(Texture3D, BeginLoad, (Deserializer&), bool), asCALL_THISCALL);
-    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
-    // Not registered because template
-    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
-    // Not registered because template
-    // static unsigned Texture::CheckMaxLevels(int width, int height, unsigned requestedLevels) | File: ../Graphics/Texture.h
-    engine->SetDefaultNamespace("Texture3D");
-    engine->RegisterGlobalFunction("uint CheckMaxLevels(int, int, uint)", asFUNCTIONPR(Texture3D::CheckMaxLevels, (int, int, unsigned), unsigned), asCALL_CDECL);
-    engine->SetDefaultNamespace("");
-    // static unsigned Texture::CheckMaxLevels(int width, int height, int depth, unsigned requestedLevels) | File: ../Graphics/Texture.h
-    engine->SetDefaultNamespace("Texture3D");
-    engine->RegisterGlobalFunction("uint CheckMaxLevels(int, int, int, uint)", asFUNCTIONPR(Texture3D::CheckMaxLevels, (int, int, int, unsigned), unsigned), asCALL_CDECL);
-    engine->SetDefaultNamespace("");
-    // void GPUObject::ClearDataLost() | File: ../Graphics/GPUObject.h
-    engine->RegisterObjectMethod("Texture3D", "void ClearDataLost()", asMETHODPR(Texture3D, ClearDataLost, (), void), asCALL_THISCALL);
-    // bool Texture3D::EndLoad() override | File: ../Graphics/Texture3D.h
-    engine->RegisterObjectMethod("Texture3D", "bool EndLoad()", asMETHODPR(Texture3D, EndLoad, (), bool), asCALL_THISCALL);
-    // TextureAddressMode Texture::GetAddressMode(TextureCoordinate coord) const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "TextureAddressMode GetAddressMode(TextureCoordinate) const", asMETHODPR(Texture3D, GetAddressMode, (TextureCoordinate) const, TextureAddressMode), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "TextureAddressMode get_addressMode(TextureCoordinate) const", asMETHODPR(Texture3D, GetAddressMode, (TextureCoordinate) const, TextureAddressMode), asCALL_THISCALL);
-    // unsigned Texture::GetAnisotropy() const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "uint GetAnisotropy() const", asMETHODPR(Texture3D, GetAnisotropy, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "uint get_anisotropy() const", asMETHODPR(Texture3D, GetAnisotropy, () const, unsigned), asCALL_THISCALL);
-    // AsyncLoadState Resource::GetAsyncLoadState() const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Texture3D", "AsyncLoadState GetAsyncLoadState() const", asMETHODPR(Texture3D, GetAsyncLoadState, () const, AsyncLoadState), asCALL_THISCALL);
-    // bool Texture::GetAutoResolve() const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "bool GetAutoResolve() const", asMETHODPR(Texture3D, GetAutoResolve, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "bool get_autoResolve() const", asMETHODPR(Texture3D, GetAutoResolve, () const, bool), asCALL_THISCALL);
-    // Texture* Texture::GetBackupTexture() const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "Texture@+ GetBackupTexture() const", asMETHODPR(Texture3D, GetBackupTexture, () const, Texture*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "Texture@+ get_backupTexture() const", asMETHODPR(Texture3D, GetBackupTexture, () const, Texture*), asCALL_THISCALL);
-    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture3D", "bool GetBlockEvents() const", asMETHODPR(Texture3D, GetBlockEvents, () const, bool), asCALL_THISCALL);
-    // const Color& Texture::GetBorderColor() const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "const Color& GetBorderColor() const", asMETHODPR(Texture3D, GetBorderColor, () const, const Color&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "const Color& get_borderColor() const", asMETHODPR(Texture3D, GetBorderColor, () const, const Color&), asCALL_THISCALL);
-    // const String& Object::GetCategory() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture3D", "const String& GetCategory() const", asMETHODPR(Texture3D, GetCategory, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "const String& get_category() const", asMETHODPR(Texture3D, GetCategory, () const, const String&), asCALL_THISCALL);
-    // unsigned Texture::GetComponents() const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "uint GetComponents() const", asMETHODPR(Texture3D, GetComponents, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "uint get_components() const", asMETHODPR(Texture3D, GetComponents, () const, unsigned), asCALL_THISCALL);
-    // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
-    // bool Texture3D::GetData(unsigned level, void* dest) const | File: ../Graphics/Texture3D.h
-    // Error: type "void*" can not automatically bind
-    // unsigned Texture::GetDataSize(int width, int height) const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "uint GetDataSize(int, int) const", asMETHODPR(Texture3D, GetDataSize, (int, int) const, unsigned), asCALL_THISCALL);
-    // unsigned Texture::GetDataSize(int width, int height, int depth) const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "uint GetDataSize(int, int, int) const", asMETHODPR(Texture3D, GetDataSize, (int, int, int) const, unsigned), asCALL_THISCALL);
-    // static unsigned Texture::GetDataType(unsigned format) | File: ../Graphics/Texture.h
-    // Not registered because have @nobind mark
-    // int Texture::GetDepth() const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "int GetDepth() const", asMETHODPR(Texture3D, GetDepth, () const, int), asCALL_THISCALL);
-    // static unsigned Texture::GetDSVFormat(unsigned format) | File: ../Graphics/Texture.h
-    // Not registered because have @nobind mark
-    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture3D", "VariantMap& GetEventDataMap() const", asMETHODPR(Texture3D, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
-    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // Object* Object::GetEventSender() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture3D", "Object@+ GetEventSender() const", asMETHODPR(Texture3D, GetEventSender, () const, Object*), asCALL_THISCALL);
-    // static unsigned Texture::GetExternalFormat(unsigned format) | File: ../Graphics/Texture.h
-    // Not registered because have @nobind mark
-    // TextureFilterMode Texture::GetFilterMode() const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "TextureFilterMode GetFilterMode() const", asMETHODPR(Texture3D, GetFilterMode, () const, TextureFilterMode), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "TextureFilterMode get_filterMode() const", asMETHODPR(Texture3D, GetFilterMode, () const, TextureFilterMode), asCALL_THISCALL);
-    // unsigned Texture::GetFormat() const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "uint GetFormat() const", asMETHODPR(Texture3D, GetFormat, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "uint get_format() const", asMETHODPR(Texture3D, GetFormat, () const, unsigned), asCALL_THISCALL);
-    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture3D", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(Texture3D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "const Variant& get_globalVar(StringHash) const", asMETHODPR(Texture3D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture3D", "const VariantMap& GetGlobalVars() const", asMETHODPR(Texture3D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "const VariantMap& get_globalVars() const", asMETHODPR(Texture3D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    // void* GPUObject::GetGPUObject() const | File: ../Graphics/GPUObject.h
-    // Error: type "void*" can not automatically bind
-    // unsigned GPUObject::GetGPUObjectName() const | File: ../Graphics/GPUObject.h
-    engine->RegisterObjectMethod("Texture3D", "uint GetGPUObjectName() const", asMETHODPR(Texture3D, GetGPUObjectName, () const, unsigned), asCALL_THISCALL);
-    // Graphics* GPUObject::GetGraphics() const | File: ../Graphics/GPUObject.h
-    engine->RegisterObjectMethod("Texture3D", "Graphics@+ GetGraphics() const", asMETHODPR(Texture3D, GetGraphics, () const, Graphics*), asCALL_THISCALL);
-    // int Texture::GetHeight() const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "int GetHeight() const", asMETHODPR(Texture3D, GetHeight, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "int get_height() const", asMETHODPR(Texture3D, GetHeight, () const, int), asCALL_THISCALL);
-    // int Texture::GetLevelDepth(unsigned level) const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "int GetLevelDepth(uint) const", asMETHODPR(Texture3D, GetLevelDepth, (unsigned) const, int), asCALL_THISCALL);
-    // int Texture::GetLevelHeight(unsigned level) const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "int GetLevelHeight(uint) const", asMETHODPR(Texture3D, GetLevelHeight, (unsigned) const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "int get_levelHeight(uint) const", asMETHODPR(Texture3D, GetLevelHeight, (unsigned) const, int), asCALL_THISCALL);
-    // unsigned Texture::GetLevels() const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "uint GetLevels() const", asMETHODPR(Texture3D, GetLevels, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "uint get_levels() const", asMETHODPR(Texture3D, GetLevels, () const, unsigned), asCALL_THISCALL);
-    // bool Texture::GetLevelsDirty() const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "bool GetLevelsDirty() const", asMETHODPR(Texture3D, GetLevelsDirty, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "bool get_levelsDirty() const", asMETHODPR(Texture3D, GetLevelsDirty, () const, bool), asCALL_THISCALL);
-    // int Texture::GetLevelWidth(unsigned level) const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "int GetLevelWidth(uint) const", asMETHODPR(Texture3D, GetLevelWidth, (unsigned) const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "int get_levelWidth(uint) const", asMETHODPR(Texture3D, GetLevelWidth, (unsigned) const, int), asCALL_THISCALL);
-    // unsigned Resource::GetMemoryUse() const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Texture3D", "uint GetMemoryUse() const", asMETHODPR(Texture3D, GetMemoryUse, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "uint get_memoryUse() const", asMETHODPR(Texture3D, GetMemoryUse, () const, unsigned), asCALL_THISCALL);
-    // const Variant& ResourceWithMetadata::GetMetadata(const String& name) const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Texture3D", "const Variant& GetMetadata(const String&in) const", asMETHODPR(Texture3D, GetMetadata, (const String&) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "const Variant& get_metadata(const String&in) const", asMETHODPR(Texture3D, GetMetadata, (const String&) const, const Variant&), asCALL_THISCALL);
-    // int Texture::GetMipsToSkip(MaterialQuality quality) const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "int GetMipsToSkip(MaterialQuality) const", asMETHODPR(Texture3D, GetMipsToSkip, (MaterialQuality) const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "int get_mipsToSkip(MaterialQuality) const", asMETHODPR(Texture3D, GetMipsToSkip, (MaterialQuality) const, int), asCALL_THISCALL);
-    // int Texture::GetMultiSample() const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "int GetMultiSample() const", asMETHODPR(Texture3D, GetMultiSample, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "int get_multiSample() const", asMETHODPR(Texture3D, GetMultiSample, () const, int), asCALL_THISCALL);
-    // const String& Resource::GetName() const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Texture3D", "const String& GetName() const", asMETHODPR(Texture3D, GetName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "const String& get_name() const", asMETHODPR(Texture3D, GetName, () const, const String&), asCALL_THISCALL);
-    // StringHash Resource::GetNameHash() const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Texture3D", "StringHash GetNameHash() const", asMETHODPR(Texture3D, GetNameHash, () const, StringHash), asCALL_THISCALL);
-    // bool Texture::GetParametersDirty() const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "bool GetParametersDirty() const", asMETHODPR(Texture3D, GetParametersDirty, () const, bool), asCALL_THISCALL);
-    // void* Texture::GetResolveTexture() const | File: ../Graphics/Texture.h
-    // Error: type "void*" can not automatically bind
-    // unsigned Texture::GetRowDataSize(int width) const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "uint GetRowDataSize(int) const", asMETHODPR(Texture3D, GetRowDataSize, (int) const, unsigned), asCALL_THISCALL);
-    // void* Texture::GetSampler() const | File: ../Graphics/Texture.h
-    // Error: type "void*" can not automatically bind
-    // void* Texture::GetShaderResourceView() const | File: ../Graphics/Texture.h
-    // Error: type "void*" can not automatically bind
-    // bool Texture::GetShadowCompare() const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "bool GetShadowCompare() const", asMETHODPR(Texture3D, GetShadowCompare, () const, bool), asCALL_THISCALL);
-    // bool Texture::GetSRGB() const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "bool GetSRGB() const", asMETHODPR(Texture3D, GetSRGB, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "bool get_sRGB() const", asMETHODPR(Texture3D, GetSRGB, () const, bool), asCALL_THISCALL);
-    // unsigned Texture::GetSRGBFormat(unsigned format) | File: ../Graphics/Texture.h
-    // Not registered because have @nobind mark
-    // static unsigned Texture::GetSRVFormat(unsigned format) | File: ../Graphics/Texture.h
-    // Not registered because have @nobind mark
-    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture3D", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Texture3D, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
-    // Not registered because template
-    // unsigned Texture::GetTarget() const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "uint GetTarget() const", asMETHODPR(Texture3D, GetTarget, () const, unsigned), asCALL_THISCALL);
-    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture3D", "StringHash GetType() const", asMETHODPR(Texture3D, GetType, () const, StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "StringHash get_type() const", asMETHODPR(Texture3D, GetType, () const, StringHash), asCALL_THISCALL);
-    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture3D", "const String& GetTypeName() const", asMETHODPR(Texture3D, GetTypeName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "const String& get_typeName() const", asMETHODPR(Texture3D, GetTypeName, () const, const String&), asCALL_THISCALL);
-    // TextureUsage Texture::GetUsage() const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "TextureUsage GetUsage() const", asMETHODPR(Texture3D, GetUsage, () const, TextureUsage), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "TextureUsage get_usage() const", asMETHODPR(Texture3D, GetUsage, () const, TextureUsage), asCALL_THISCALL);
-    // unsigned Resource::GetUseTimer() | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Texture3D", "uint GetUseTimer()", asMETHODPR(Texture3D, GetUseTimer, (), unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "uint get_useTimer()", asMETHODPR(Texture3D, GetUseTimer, (), unsigned), asCALL_THISCALL);
-    // int Texture::GetWidth() const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "int GetWidth() const", asMETHODPR(Texture3D, GetWidth, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "int get_width() const", asMETHODPR(Texture3D, GetWidth, () const, int), asCALL_THISCALL);
-    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture3D", "bool HasEventHandlers() const", asMETHODPR(Texture3D, HasEventHandlers, () const, bool), asCALL_THISCALL);
-    // bool ResourceWithMetadata::HasMetadata() const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Texture3D", "bool HasMetadata() const", asMETHODPR(Texture3D, HasMetadata, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "bool get_hasMetadata() const", asMETHODPR(Texture3D, HasMetadata, () const, bool), asCALL_THISCALL);
-    // bool GPUObject::HasPendingData() const | File: ../Graphics/GPUObject.h
-    engine->RegisterObjectMethod("Texture3D", "bool HasPendingData() const", asMETHODPR(Texture3D, HasPendingData, () const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture3D", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(Texture3D, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture3D", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(Texture3D, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
-    // bool Texture::IsCompressed() const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "bool IsCompressed() const", asMETHODPR(Texture3D, IsCompressed, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "bool get_compressed() const", asMETHODPR(Texture3D, IsCompressed, () const, bool), asCALL_THISCALL);
-    // bool GPUObject::IsDataLost() const | File: ../Graphics/GPUObject.h
-    engine->RegisterObjectMethod("Texture3D", "bool IsDataLost() const", asMETHODPR(Texture3D, IsDataLost, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "bool get_dataLost() const", asMETHODPR(Texture3D, IsDataLost, () const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture3D", "bool IsInstanceOf(StringHash) const", asMETHODPR(Texture3D, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
-    // Not registered because template
-    // bool Texture::IsResolveDirty() const | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "bool IsResolveDirty() const", asMETHODPR(Texture3D, IsResolveDirty, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "bool get_resolveDirty() const", asMETHODPR(Texture3D, IsResolveDirty, () const, bool), asCALL_THISCALL);
-    // bool Resource::Load(Deserializer& source) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Texture3D", "bool Load(Deserializer&)", asMETHODPR(Texture3D, Load, (Deserializer&), bool), asCALL_THISCALL);
-    // bool Resource::LoadFile(const String& fileName) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Texture3D", "bool LoadFile(const String&in)", asMETHODPR(Texture3D, LoadFile, (const String&), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "bool Load(const String&in)", asMETHODPR(Texture3D, LoadFile, (const String&), bool), asCALL_THISCALL);
-    // void Texture3D::OnDeviceLost() override | File: ../Graphics/Texture3D.h
-    engine->RegisterObjectMethod("Texture3D", "void OnDeviceLost()", asMETHODPR(Texture3D, OnDeviceLost, (), void), asCALL_THISCALL);
-    // void Texture3D::OnDeviceReset() override | File: ../Graphics/Texture3D.h
-    engine->RegisterObjectMethod("Texture3D", "void OnDeviceReset()", asMETHODPR(Texture3D, OnDeviceReset, (), void), asCALL_THISCALL);
-    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture3D", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(Texture3D, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
-    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
-    // Error: type "RefCount*" can not automatically bind
-    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("Texture3D", "int Refs() const", asMETHODPR(Texture3D, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "int get_refs() const", asMETHODPR(Texture3D, Refs, () const, int), asCALL_THISCALL);
-    // void Texture::RegenerateLevels() | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "void RegenerateLevels()", asMETHODPR(Texture3D, RegenerateLevels, (), void), asCALL_THISCALL);
-    // static void Texture3D::RegisterObject(Context* context) | File: ../Graphics/Texture3D.h
-    // Context can be used as firs parameter of constructors only
-    // void Texture3D::Release() override | File: ../Graphics/Texture3D.h
-    engine->RegisterObjectMethod("Texture3D", "void Release()", asMETHODPR(Texture3D, Release, (), void), asCALL_THISCALL);
-    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("Texture3D", asBEHAVE_RELEASE, "void f()", asMETHODPR(Texture3D, ReleaseRef, (), void), asCALL_THISCALL);
-    // void ResourceWithMetadata::RemoveAllMetadata() | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Texture3D", "void RemoveAllMetadata()", asMETHODPR(Texture3D, RemoveAllMetadata, (), void), asCALL_THISCALL);
-    // void ResourceWithMetadata::RemoveMetadata(const String& name) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Texture3D", "void RemoveMetadata(const String&in)", asMETHODPR(Texture3D, RemoveMetadata, (const String&), void), asCALL_THISCALL);
-    // void Resource::ResetUseTimer() | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Texture3D", "void ResetUseTimer()", asMETHODPR(Texture3D, ResetUseTimer, (), void), asCALL_THISCALL);
-    // virtual bool Resource::Save(Serializer& dest) const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Texture3D", "bool Save(Serializer&) const", asMETHODPR(Texture3D, Save, (Serializer&) const, bool), asCALL_THISCALL);
-    // virtual bool Resource::SaveFile(const String& fileName) const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Texture3D", "bool SaveFile(const String&in) const", asMETHODPR(Texture3D, SaveFile, (const String&) const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "bool Save(const String&in) const", asMETHODPR(Texture3D, SaveFile, (const String&) const, bool), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture3D", "void SendEvent(StringHash)", asMETHODPR(Texture3D, SendEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture3D", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(Texture3D, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
-    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
-    // Not registered because template
-    // void Texture::SetAddressMode(TextureCoordinate coord, TextureAddressMode mode) | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "void SetAddressMode(TextureCoordinate, TextureAddressMode)", asMETHODPR(Texture3D, SetAddressMode, (TextureCoordinate, TextureAddressMode), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "void set_addressMode(TextureCoordinate, TextureAddressMode)", asMETHODPR(Texture3D, SetAddressMode, (TextureCoordinate, TextureAddressMode), void), asCALL_THISCALL);
-    // void Texture::SetAnisotropy(unsigned level) | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "void SetAnisotropy(uint)", asMETHODPR(Texture3D, SetAnisotropy, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "void set_anisotropy(uint)", asMETHODPR(Texture3D, SetAnisotropy, (unsigned), void), asCALL_THISCALL);
-    // void Resource::SetAsyncLoadState(AsyncLoadState newState) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Texture3D", "void SetAsyncLoadState(AsyncLoadState)", asMETHODPR(Texture3D, SetAsyncLoadState, (AsyncLoadState), void), asCALL_THISCALL);
-    // void Texture::SetBackupTexture(Texture* texture) | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "void SetBackupTexture(Texture@+)", asMETHODPR(Texture3D, SetBackupTexture, (Texture*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "void set_backupTexture(Texture@+)", asMETHODPR(Texture3D, SetBackupTexture, (Texture*), void), asCALL_THISCALL);
-    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture3D", "void SetBlockEvents(bool)", asMETHODPR(Texture3D, SetBlockEvents, (bool), void), asCALL_THISCALL);
-    // void Texture::SetBorderColor(const Color& color) | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "void SetBorderColor(const Color&in)", asMETHODPR(Texture3D, SetBorderColor, (const Color&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "void set_borderColor(const Color&in)", asMETHODPR(Texture3D, SetBorderColor, (const Color&), void), asCALL_THISCALL);
-    // bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int height, int depth, const void* data) | File: ../Graphics/Texture3D.h
-    // Error: type "void*" can not automatically bind
-    // bool Texture3D::SetData(Image* image, bool useAlpha=false) | File: ../Graphics/Texture3D.h
-    engine->RegisterObjectMethod("Texture3D", "bool SetData(Image@+, bool = false)", asMETHODPR(Texture3D, SetData, (Image*, bool), bool), asCALL_THISCALL);
-    // void Texture::SetFilterMode(TextureFilterMode mode) | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "void SetFilterMode(TextureFilterMode)", asMETHODPR(Texture3D, SetFilterMode, (TextureFilterMode), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "void set_filterMode(TextureFilterMode)", asMETHODPR(Texture3D, SetFilterMode, (TextureFilterMode), void), asCALL_THISCALL);
-    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture3D", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(Texture3D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(Texture3D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    // void Texture::SetLevelsDirty() | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "void SetLevelsDirty()", asMETHODPR(Texture3D, SetLevelsDirty, (), void), asCALL_THISCALL);
-    // void Resource::SetMemoryUse(unsigned size) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Texture3D", "void SetMemoryUse(uint)", asMETHODPR(Texture3D, SetMemoryUse, (unsigned), void), asCALL_THISCALL);
-    // void Texture::SetMipsToSkip(MaterialQuality quality, int toSkip) | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "void SetMipsToSkip(MaterialQuality, int)", asMETHODPR(Texture3D, SetMipsToSkip, (MaterialQuality, int), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "void set_mipsToSkip(MaterialQuality, int)", asMETHODPR(Texture3D, SetMipsToSkip, (MaterialQuality, int), void), asCALL_THISCALL);
-    // void Resource::SetName(const String& name) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Texture3D", "void SetName(const String&in)", asMETHODPR(Texture3D, SetName, (const String&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "void set_name(const String&in)", asMETHODPR(Texture3D, SetName, (const String&), void), asCALL_THISCALL);
-    // void Texture::SetNumLevels(unsigned levels) | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "void SetNumLevels(uint)", asMETHODPR(Texture3D, SetNumLevels, (unsigned), void), asCALL_THISCALL);
-    // void Texture::SetParameters(XMLFile* file) | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "void SetParameters(XMLFile@+)", asMETHODPR(Texture3D, SetParameters, (XMLFile*), void), asCALL_THISCALL);
-    // void Texture::SetParameters(const XMLElement& element) | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "void SetParameters(const XMLElement&in)", asMETHODPR(Texture3D, SetParameters, (const XMLElement&), void), asCALL_THISCALL);
-    // void Texture::SetParametersDirty() | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "void SetParametersDirty()", asMETHODPR(Texture3D, SetParametersDirty, (), void), asCALL_THISCALL);
-    // void Texture::SetResolveDirty(bool enable) | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "void SetResolveDirty(bool)", asMETHODPR(Texture3D, SetResolveDirty, (bool), void), asCALL_THISCALL);
-    // void Texture::SetShadowCompare(bool enable) | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "void SetShadowCompare(bool)", asMETHODPR(Texture3D, SetShadowCompare, (bool), void), asCALL_THISCALL);
-    // bool Texture3D::SetSize(int width, int height, int depth, unsigned format, TextureUsage usage=TEXTURE_STATIC) | File: ../Graphics/Texture3D.h
-    engine->RegisterObjectMethod("Texture3D", "bool SetSize(int, int, int, uint, TextureUsage = TEXTURE_STATIC)", asMETHODPR(Texture3D, SetSize, (int, int, int, unsigned, TextureUsage), bool), asCALL_THISCALL);
-    // void Texture::SetSRGB(bool enable) | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "void SetSRGB(bool)", asMETHODPR(Texture3D, SetSRGB, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "void set_sRGB(bool)", asMETHODPR(Texture3D, SetSRGB, (bool), void), asCALL_THISCALL);
-    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // explicit Texture3D::Texture3D(Context* context) | File: ../Graphics/Texture3D.h
-    engine->RegisterObjectBehaviour("Texture3D", asBEHAVE_FACTORY, "Texture3D@+ f()", asFUNCTION(Texture3D_Texture3D_Context), asCALL_CDECL);
-    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture3D", "void UnsubscribeFromAllEvents()", asMETHODPR(Texture3D, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture3D", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(Texture3D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
-    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture3D", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(Texture3D, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture3D", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(Texture3D, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Texture3D", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(Texture3D, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
-    // void Texture::UpdateParameters() | File: ../Graphics/Texture.h
-    engine->RegisterObjectMethod("Texture3D", "void UpdateParameters()", asMETHODPR(Texture3D, UpdateParameters, (), void), asCALL_THISCALL);
-    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("Texture3D", "int WeakRefs() const", asMETHODPR(Texture3D, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture3D", "int get_weakRefs() const", asMETHODPR(Texture3D, WeakRefs, () const, int), asCALL_THISCALL);
-#ifdef REGISTER_MANUAL_PART_Texture
-    REGISTER_MANUAL_PART_Texture(Texture3D, "Texture3D")
-#endif
-#ifdef REGISTER_MANUAL_PART_ResourceWithMetadata
-    REGISTER_MANUAL_PART_ResourceWithMetadata(Texture3D, "Texture3D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Resource
-    REGISTER_MANUAL_PART_Resource(Texture3D, "Texture3D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Object
-    REGISTER_MANUAL_PART_Object(Texture3D, "Texture3D")
-#endif
-#ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(Texture3D, "Texture3D")
-#endif
-#ifdef REGISTER_MANUAL_PART_GPUObject
-    REGISTER_MANUAL_PART_GPUObject(Texture3D, "Texture3D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Texture3D
-    REGISTER_MANUAL_PART_Texture3D(Texture3D, "Texture3D")
-#endif
-    RegisterSubclass<Texture, Texture3D>(engine, "Texture", "Texture3D");
-    RegisterSubclass<ResourceWithMetadata, Texture3D>(engine, "ResourceWithMetadata", "Texture3D");
-    RegisterSubclass<Resource, Texture3D>(engine, "Resource", "Texture3D");
-    RegisterSubclass<Object, Texture3D>(engine, "Object", "Texture3D");
-    RegisterSubclass<RefCounted, Texture3D>(engine, "RefCounted", "Texture3D");
 
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("Terrain", asBEHAVE_ADDREF, "void f()", asMETHODPR(Terrain, AddRef, (), void), asCALL_THISCALL);
@@ -4023,6 +2524,917 @@ void ASRegisterGenerated_Members_T(asIScriptEngine* engine)
     RegisterSubclass<Object, Text>(engine, "Object", "Text");
     RegisterSubclass<RefCounted, Text>(engine, "RefCounted", "Text");
 
+    // void Drawable::AddLight(Light* light) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "void AddLight(Light@+)", asMETHODPR(Text3D, AddLight, (Light*), void), asCALL_THISCALL);
+    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("Text3D", asBEHAVE_ADDREF, "void f()", asMETHODPR(Text3D, AddRef, (), void), asCALL_THISCALL);
+    // void Component::AddReplicationState(ComponentReplicationState* state) | File: ../Scene/Component.h
+    // Error: type "ComponentReplicationState*" can not automatically bind
+    // void Drawable::AddVertexLight(Light* light) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "void AddVertexLight(Light@+)", asMETHODPR(Text3D, AddVertexLight, (Light*), void), asCALL_THISCALL);
+    // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Text3D", "void AllocateNetworkState()", asMETHODPR(Text3D, AllocateNetworkState, (), void), asCALL_THISCALL);
+    // void Text3D::ApplyAttributes() override | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "void ApplyAttributes()", asMETHODPR(Text3D, ApplyAttributes, (), void), asCALL_THISCALL);
+    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
+    // Not registered because template
+    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
+    // Not registered because template
+    // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("Text3D", "void CleanupConnection(Connection@+)", asMETHODPR(Text3D, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // void Drawable::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(Text3D, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
+    // virtual bool Drawable::DrawOcclusion(OcclusionBuffer* buffer) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "bool DrawOcclusion(OcclusionBuffer@+)", asMETHODPR(Text3D, DrawOcclusion, (OcclusionBuffer*), bool), asCALL_THISCALL);
+    // bool Animatable::GetAnimationEnabled() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Text3D", "bool GetAnimationEnabled() const", asMETHODPR(Text3D, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "bool get_animationEnabled() const", asMETHODPR(Text3D, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
+    // Variant Serializable::GetAttribute(unsigned index) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Text3D", "Variant GetAttribute(uint) const", asMETHODPR(Text3D, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "Variant get_attributes(uint) const", asMETHODPR(Text3D, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
+    // Variant Serializable::GetAttribute(const String& name) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Text3D", "Variant GetAttribute(const String&in) const", asMETHODPR(Text3D, GetAttribute, (const String&) const, Variant), asCALL_THISCALL);
+    // ValueAnimation* Animatable::GetAttributeAnimation(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Text3D", "ValueAnimation@+ GetAttributeAnimation(const String&in) const", asMETHODPR(Text3D, GetAttributeAnimation, (const String&) const, ValueAnimation*), asCALL_THISCALL);
+    // float Animatable::GetAttributeAnimationSpeed(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Text3D", "float GetAttributeAnimationSpeed(const String&in) const", asMETHODPR(Text3D, GetAttributeAnimationSpeed, (const String&) const, float), asCALL_THISCALL);
+    // float Animatable::GetAttributeAnimationTime(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Text3D", "float GetAttributeAnimationTime(const String&in) const", asMETHODPR(Text3D, GetAttributeAnimationTime, (const String&) const, float), asCALL_THISCALL);
+    // WrapMode Animatable::GetAttributeAnimationWrapMode(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Text3D", "WrapMode GetAttributeAnimationWrapMode(const String&in) const", asMETHODPR(Text3D, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), asCALL_THISCALL);
+    // Variant Serializable::GetAttributeDefault(unsigned index) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Text3D", "Variant GetAttributeDefault(uint) const", asMETHODPR(Text3D, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "Variant get_attributeDefaults(uint) const", asMETHODPR(Text3D, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
+    // Variant Serializable::GetAttributeDefault(const String& name) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Text3D", "Variant GetAttributeDefault(const String&in) const", asMETHODPR(Text3D, GetAttributeDefault, (const String&) const, Variant), asCALL_THISCALL);
+    // virtual const Vector<AttributeInfo>* Serializable::GetAttributes() const | File: ../Scene/Serializable.h
+    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
+    // const Vector<SourceBatch>& Drawable::GetBatches() const | File: ../Graphics/Drawable.h
+    // Error: type "const Vector<SourceBatch>&" can not automatically bind
+    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Text3D", "bool GetBlockEvents() const", asMETHODPR(Text3D, GetBlockEvents, () const, bool), asCALL_THISCALL);
+    // const BoundingBox& Drawable::GetBoundingBox() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "const BoundingBox& GetBoundingBox() const", asMETHODPR(Text3D, GetBoundingBox, () const, const BoundingBox&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "const BoundingBox& get_boundingBox() const", asMETHODPR(Text3D, GetBoundingBox, () const, const BoundingBox&), asCALL_THISCALL);
+    // bool Drawable::GetCastShadows() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "bool GetCastShadows() const", asMETHODPR(Text3D, GetCastShadows, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "bool get_castShadows() const", asMETHODPR(Text3D, GetCastShadows, () const, bool), asCALL_THISCALL);
+    // const String& Object::GetCategory() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Text3D", "const String& GetCategory() const", asMETHODPR(Text3D, GetCategory, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "const String& get_category() const", asMETHODPR(Text3D, GetCategory, () const, const String&), asCALL_THISCALL);
+    // Vector2 Text3D::GetCharPosition(unsigned index) | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "Vector2 GetCharPosition(uint)", asMETHODPR(Text3D, GetCharPosition, (unsigned), Vector2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "Vector2 get_charPositions(uint)", asMETHODPR(Text3D, GetCharPosition, (unsigned), Vector2), asCALL_THISCALL);
+    // Vector2 Text3D::GetCharSize(unsigned index) | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "Vector2 GetCharSize(uint)", asMETHODPR(Text3D, GetCharSize, (unsigned), Vector2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "Vector2 get_charSizes(uint)", asMETHODPR(Text3D, GetCharSize, (unsigned), Vector2), asCALL_THISCALL);
+    // const Color& Text3D::GetColor(Corner corner) const | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "const Color& GetColor(Corner) const", asMETHODPR(Text3D, GetColor, (Corner) const, const Color&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "const Color& get_colors(Corner) const", asMETHODPR(Text3D, GetColor, (Corner) const, const Color&), asCALL_THISCALL);
+    // const Color& Text3D::GetColorAttr() const | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "const Color& GetColorAttr() const", asMETHODPR(Text3D, GetColorAttr, () const, const Color&), asCALL_THISCALL);
+    // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("Text3D", "Component@+ GetComponent(StringHash) const", asMETHODPR(Text3D, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
+    // template<class T> T*  Component::GetComponent() const | File: ../Scene/Component.h
+    // Not registered because template
+    // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
+    // Error: type "PODVector<Component*>&" can not automatically bind
+    // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
+    // Not registered because template
+    // Context* Object::GetContext() const | File: ../Core/Object.h
+    // Error: type "Context*" can not be returned
+    // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
+    // Error: type "PODVector<Node*>&" can not automatically bind
+    // float Drawable::GetDistance() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "float GetDistance() const", asMETHODPR(Text3D, GetDistance, () const, float), asCALL_THISCALL);
+    // unsigned char Drawable::GetDrawableFlags() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "uint8 GetDrawableFlags() const", asMETHODPR(Text3D, GetDrawableFlags, () const, unsigned char), asCALL_THISCALL);
+    // float Drawable::GetDrawDistance() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "float GetDrawDistance() const", asMETHODPR(Text3D, GetDrawDistance, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "float get_drawDistance() const", asMETHODPR(Text3D, GetDrawDistance, () const, float), asCALL_THISCALL);
+    // const Color& Text3D::GetEffectColor() const | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "const Color& GetEffectColor() const", asMETHODPR(Text3D, GetEffectColor, () const, const Color&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "const Color& get_effectColor() const", asMETHODPR(Text3D, GetEffectColor, () const, const Color&), asCALL_THISCALL);
+    // float Text3D::GetEffectDepthBias() const | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "float GetEffectDepthBias() const", asMETHODPR(Text3D, GetEffectDepthBias, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "float get_effectDepthBias() const", asMETHODPR(Text3D, GetEffectDepthBias, () const, float), asCALL_THISCALL);
+    // bool Text3D::GetEffectRoundStroke() const | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "bool GetEffectRoundStroke() const", asMETHODPR(Text3D, GetEffectRoundStroke, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "bool get_effectRoundStroke() const", asMETHODPR(Text3D, GetEffectRoundStroke, () const, bool), asCALL_THISCALL);
+    // const IntVector2& Text3D::GetEffectShadowOffset() const | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "const IntVector2& GetEffectShadowOffset() const", asMETHODPR(Text3D, GetEffectShadowOffset, () const, const IntVector2&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "const IntVector2& get_effectShadowOffset() const", asMETHODPR(Text3D, GetEffectShadowOffset, () const, const IntVector2&), asCALL_THISCALL);
+    // int Text3D::GetEffectStrokeThickness() const | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "int GetEffectStrokeThickness() const", asMETHODPR(Text3D, GetEffectStrokeThickness, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "int get_effectStrokeThickness() const", asMETHODPR(Text3D, GetEffectStrokeThickness, () const, int), asCALL_THISCALL);
+    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Text3D", "VariantMap& GetEventDataMap() const", asMETHODPR(Text3D, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
+    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // Object* Object::GetEventSender() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Text3D", "Object@+ GetEventSender() const", asMETHODPR(Text3D, GetEventSender, () const, Object*), asCALL_THISCALL);
+    // FaceCameraMode Text3D::GetFaceCameraMode() const | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "FaceCameraMode GetFaceCameraMode() const", asMETHODPR(Text3D, GetFaceCameraMode, () const, FaceCameraMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "FaceCameraMode get_faceCameraMode() const", asMETHODPR(Text3D, GetFaceCameraMode, () const, FaceCameraMode), asCALL_THISCALL);
+    // Light* Drawable::GetFirstLight() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "Light@+ GetFirstLight() const", asMETHODPR(Text3D, GetFirstLight, () const, Light*), asCALL_THISCALL);
+    // Font* Text3D::GetFont() const | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "Font@+ GetFont() const", asMETHODPR(Text3D, GetFont, () const, Font*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "Font@+ get_font() const", asMETHODPR(Text3D, GetFont, () const, Font*), asCALL_THISCALL);
+    // ResourceRef Text3D::GetFontAttr() const | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "ResourceRef GetFontAttr() const", asMETHODPR(Text3D, GetFontAttr, () const, ResourceRef), asCALL_THISCALL);
+    // float Text3D::GetFontSize() const | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "float GetFontSize() const", asMETHODPR(Text3D, GetFontSize, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "float get_fontSize() const", asMETHODPR(Text3D, GetFontSize, () const, float), asCALL_THISCALL);
+    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Text3D", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(Text3D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "const Variant& get_globalVar(StringHash) const", asMETHODPR(Text3D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Text3D", "const VariantMap& GetGlobalVars() const", asMETHODPR(Text3D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "const VariantMap& get_globalVars() const", asMETHODPR(Text3D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    // int Text3D::GetHeight() const | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "int GetHeight() const", asMETHODPR(Text3D, GetHeight, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "int get_height() const", asMETHODPR(Text3D, GetHeight, () const, int), asCALL_THISCALL);
+    // HorizontalAlignment Text3D::GetHorizontalAlignment() const | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "HorizontalAlignment GetHorizontalAlignment() const", asMETHODPR(Text3D, GetHorizontalAlignment, () const, HorizontalAlignment), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "HorizontalAlignment get_horizontalAlignment() const", asMETHODPR(Text3D, GetHorizontalAlignment, () const, HorizontalAlignment), asCALL_THISCALL);
+    // unsigned Component::GetID() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("Text3D", "uint GetID() const", asMETHODPR(Text3D, GetID, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "uint get_id() const", asMETHODPR(Text3D, GetID, () const, unsigned), asCALL_THISCALL);
+    // bool Serializable::GetInterceptNetworkUpdate(const String& attributeName) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Text3D", "bool GetInterceptNetworkUpdate(const String&in) const", asMETHODPR(Text3D, GetInterceptNetworkUpdate, (const String&) const, bool), asCALL_THISCALL);
+    // unsigned Drawable::GetLightMask() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "uint GetLightMask() const", asMETHODPR(Text3D, GetLightMask, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "uint get_lightMask() const", asMETHODPR(Text3D, GetLightMask, () const, unsigned), asCALL_THISCALL);
+    // const PODVector<Light*>& Drawable::GetLights() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "Array<Light@>@ GetLights() const", asFUNCTION(Text3D_GetLights_void), asCALL_CDECL_OBJFIRST);
+    // float Drawable::GetLodBias() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "float GetLodBias() const", asMETHODPR(Text3D, GetLodBias, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "float get_lodBias() const", asMETHODPR(Text3D, GetLodBias, () const, float), asCALL_THISCALL);
+    // float Drawable::GetLodDistance() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "float GetLodDistance() const", asMETHODPR(Text3D, GetLodDistance, () const, float), asCALL_THISCALL);
+    // virtual Geometry* Drawable::GetLodGeometry(unsigned batchIndex, unsigned level) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "Geometry@+ GetLodGeometry(uint, uint)", asMETHODPR(Text3D, GetLodGeometry, (unsigned, unsigned), Geometry*), asCALL_THISCALL);
+    // Material* Text3D::GetMaterial() const | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "Material@+ GetMaterial() const", asMETHODPR(Text3D, GetMaterial, () const, Material*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "Material@+ get_material() const", asMETHODPR(Text3D, GetMaterial, () const, Material*), asCALL_THISCALL);
+    // ResourceRef Text3D::GetMaterialAttr() const | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "ResourceRef GetMaterialAttr() const", asMETHODPR(Text3D, GetMaterialAttr, () const, ResourceRef), asCALL_THISCALL);
+    // unsigned Drawable::GetMaxLights() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "uint GetMaxLights() const", asMETHODPR(Text3D, GetMaxLights, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "uint get_maxLights() const", asMETHODPR(Text3D, GetMaxLights, () const, unsigned), asCALL_THISCALL);
+    // float Drawable::GetMaxZ() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "float GetMaxZ() const", asMETHODPR(Text3D, GetMaxZ, () const, float), asCALL_THISCALL);
+    // float Drawable::GetMinZ() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "float GetMinZ() const", asMETHODPR(Text3D, GetMinZ, () const, float), asCALL_THISCALL);
+    // virtual const Vector<AttributeInfo>* Serializable::GetNetworkAttributes() const | File: ../Scene/Serializable.h
+    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
+    // NetworkState* Serializable::GetNetworkState() const | File: ../Scene/Serializable.h
+    // Error: type "NetworkState*" can not automatically bind
+    // Node* Component::GetNode() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("Text3D", "Node@+ GetNode() const", asMETHODPR(Text3D, GetNode, () const, Node*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "Node@+ get_node() const", asMETHODPR(Text3D, GetNode, () const, Node*), asCALL_THISCALL);
+    // unsigned Serializable::GetNumAttributes() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Text3D", "uint GetNumAttributes() const", asMETHODPR(Text3D, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "uint get_numAttributes() const", asMETHODPR(Text3D, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
+    // unsigned Text3D::GetNumChars() const | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "uint GetNumChars() const", asMETHODPR(Text3D, GetNumChars, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "uint get_numChars() const", asMETHODPR(Text3D, GetNumChars, () const, unsigned), asCALL_THISCALL);
+    // unsigned Serializable::GetNumNetworkAttributes() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Text3D", "uint GetNumNetworkAttributes() const", asMETHODPR(Text3D, GetNumNetworkAttributes, () const, unsigned), asCALL_THISCALL);
+    // virtual unsigned Drawable::GetNumOccluderTriangles() | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "uint GetNumOccluderTriangles()", asMETHODPR(Text3D, GetNumOccluderTriangles, (), unsigned), asCALL_THISCALL);
+    // unsigned Text3D::GetNumRows() const | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "uint GetNumRows() const", asMETHODPR(Text3D, GetNumRows, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "uint get_numRows() const", asMETHODPR(Text3D, GetNumRows, () const, unsigned), asCALL_THISCALL);
+    // ObjectAnimation* Animatable::GetObjectAnimation() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Text3D", "ObjectAnimation@+ GetObjectAnimation() const", asMETHODPR(Text3D, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "ObjectAnimation@+ get_objectAnimation() const", asMETHODPR(Text3D, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
+    // ResourceRef Animatable::GetObjectAnimationAttr() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Text3D", "ResourceRef GetObjectAnimationAttr() const", asMETHODPR(Text3D, GetObjectAnimationAttr, () const, ResourceRef), asCALL_THISCALL);
+    // Octant* Drawable::GetOctant() const | File: ../Graphics/Drawable.h
+    // Error: type "Octant" can not automatically bind bacause have @nobind mark
+    // float Text3D::GetOpacity() const | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "float GetOpacity() const", asMETHODPR(Text3D, GetOpacity, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "float get_opacity() const", asMETHODPR(Text3D, GetOpacity, () const, float), asCALL_THISCALL);
+    // int Text3D::GetRowHeight() const | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "int GetRowHeight() const", asMETHODPR(Text3D, GetRowHeight, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "int get_rowHeight() const", asMETHODPR(Text3D, GetRowHeight, () const, int), asCALL_THISCALL);
+    // float Text3D::GetRowSpacing() const | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "float GetRowSpacing() const", asMETHODPR(Text3D, GetRowSpacing, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "float get_rowSpacing() const", asMETHODPR(Text3D, GetRowSpacing, () const, float), asCALL_THISCALL);
+    // int Text3D::GetRowWidth(unsigned index) const | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "int GetRowWidth(uint) const", asMETHODPR(Text3D, GetRowWidth, (unsigned) const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "int get_rowWidths(uint) const", asMETHODPR(Text3D, GetRowWidth, (unsigned) const, int), asCALL_THISCALL);
+    // Scene* Component::GetScene() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("Text3D", "Scene@+ GetScene() const", asMETHODPR(Text3D, GetScene, () const, Scene*), asCALL_THISCALL);
+    // float Drawable::GetShadowDistance() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "float GetShadowDistance() const", asMETHODPR(Text3D, GetShadowDistance, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "float get_shadowDistance() const", asMETHODPR(Text3D, GetShadowDistance, () const, float), asCALL_THISCALL);
+    // unsigned Drawable::GetShadowMask() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "uint GetShadowMask() const", asMETHODPR(Text3D, GetShadowMask, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "uint get_shadowMask() const", asMETHODPR(Text3D, GetShadowMask, () const, unsigned), asCALL_THISCALL);
+    // float Drawable::GetSortValue() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "float GetSortValue() const", asMETHODPR(Text3D, GetSortValue, () const, float), asCALL_THISCALL);
+    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Text3D", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Text3D, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
+    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // Not registered because template
+    // const String& Text3D::GetText() const | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "const String& GetText() const", asMETHODPR(Text3D, GetText, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "const String& get_text() const", asMETHODPR(Text3D, GetText, () const, const String&), asCALL_THISCALL);
+    // HorizontalAlignment Text3D::GetTextAlignment() const | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "HorizontalAlignment GetTextAlignment() const", asMETHODPR(Text3D, GetTextAlignment, () const, HorizontalAlignment), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "HorizontalAlignment get_textAlignment() const", asMETHODPR(Text3D, GetTextAlignment, () const, HorizontalAlignment), asCALL_THISCALL);
+    // String Text3D::GetTextAttr() const | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "String GetTextAttr() const", asMETHODPR(Text3D, GetTextAttr, () const, String), asCALL_THISCALL);
+    // TextEffect Text3D::GetTextEffect() const | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "TextEffect GetTextEffect() const", asMETHODPR(Text3D, GetTextEffect, () const, TextEffect), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "TextEffect get_textEffect() const", asMETHODPR(Text3D, GetTextEffect, () const, TextEffect), asCALL_THISCALL);
+    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Text3D", "StringHash GetType() const", asMETHODPR(Text3D, GetType, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "StringHash get_type() const", asMETHODPR(Text3D, GetType, () const, StringHash), asCALL_THISCALL);
+    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Text3D", "const String& GetTypeName() const", asMETHODPR(Text3D, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "const String& get_typeName() const", asMETHODPR(Text3D, GetTypeName, () const, const String&), asCALL_THISCALL);
+    // UpdateGeometryType Text3D::GetUpdateGeometryType() override | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "UpdateGeometryType GetUpdateGeometryType()", asMETHODPR(Text3D, GetUpdateGeometryType, (), UpdateGeometryType), asCALL_THISCALL);
+    // const PODVector<Light*>& Drawable::GetVertexLights() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "Array<Light@>@ GetVertexLights() const", asFUNCTION(Text3D_GetVertexLights_void), asCALL_CDECL_OBJFIRST);
+    // VerticalAlignment Text3D::GetVerticalAlignment() const | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "VerticalAlignment GetVerticalAlignment() const", asMETHODPR(Text3D, GetVerticalAlignment, () const, VerticalAlignment), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "VerticalAlignment get_verticalAlignment() const", asMETHODPR(Text3D, GetVerticalAlignment, () const, VerticalAlignment), asCALL_THISCALL);
+    // unsigned Drawable::GetViewMask() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "uint GetViewMask() const", asMETHODPR(Text3D, GetViewMask, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "uint get_viewMask() const", asMETHODPR(Text3D, GetViewMask, () const, unsigned), asCALL_THISCALL);
+    // int Text3D::GetWidth() const | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "int GetWidth() const", asMETHODPR(Text3D, GetWidth, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "int get_width() const", asMETHODPR(Text3D, GetWidth, () const, int), asCALL_THISCALL);
+    // bool Text3D::GetWordwrap() const | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "bool GetWordwrap() const", asMETHODPR(Text3D, GetWordwrap, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "bool get_wordwrap() const", asMETHODPR(Text3D, GetWordwrap, () const, bool), asCALL_THISCALL);
+    // const BoundingBox& Drawable::GetWorldBoundingBox() | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "const BoundingBox& GetWorldBoundingBox()", asMETHODPR(Text3D, GetWorldBoundingBox, (), const BoundingBox&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "const BoundingBox& get_worldBoundingBox()", asMETHODPR(Text3D, GetWorldBoundingBox, (), const BoundingBox&), asCALL_THISCALL);
+    // Zone* Drawable::GetZone() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "Zone@+ GetZone() const", asMETHODPR(Text3D, GetZone, () const, Zone*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "Zone@+ get_zone() const", asMETHODPR(Text3D, GetZone, () const, Zone*), asCALL_THISCALL);
+    // unsigned Drawable::GetZoneMask() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "uint GetZoneMask() const", asMETHODPR(Text3D, GetZoneMask, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "uint get_zoneMask() const", asMETHODPR(Text3D, GetZoneMask, () const, unsigned), asCALL_THISCALL);
+    // bool Drawable::HasBasePass(unsigned batchIndex) const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "bool HasBasePass(uint) const", asMETHODPR(Text3D, HasBasePass, (unsigned) const, bool), asCALL_THISCALL);
+    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Text3D", "bool HasEventHandlers() const", asMETHODPR(Text3D, HasEventHandlers, () const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Text3D", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(Text3D, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Text3D", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(Text3D, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
+    // bool Component::IsEnabled() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("Text3D", "bool IsEnabled() const", asMETHODPR(Text3D, IsEnabled, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "bool get_enabled() const", asMETHODPR(Text3D, IsEnabled, () const, bool), asCALL_THISCALL);
+    // bool Component::IsEnabledEffective() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("Text3D", "bool IsEnabledEffective() const", asMETHODPR(Text3D, IsEnabledEffective, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "bool get_enabledEffective() const", asMETHODPR(Text3D, IsEnabledEffective, () const, bool), asCALL_THISCALL);
+    // bool Text3D::IsFixedScreenSize() const | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "bool IsFixedScreenSize() const", asMETHODPR(Text3D, IsFixedScreenSize, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "bool get_fixedScreenSize() const", asMETHODPR(Text3D, IsFixedScreenSize, () const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Text3D", "bool IsInstanceOf(StringHash) const", asMETHODPR(Text3D, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
+    // Not registered because template
+    // bool Drawable::IsInView() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "bool IsInView() const", asMETHODPR(Text3D, IsInView, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "bool get_inView() const", asMETHODPR(Text3D, IsInView, () const, bool), asCALL_THISCALL);
+    // bool Drawable::IsInView(Camera* camera) const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "bool IsInView(Camera@+) const", asMETHODPR(Text3D, IsInView, (Camera*) const, bool), asCALL_THISCALL);
+    // bool Drawable::IsInView(const FrameInfo& frame, bool anyCamera=false) const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "bool IsInView(const FrameInfo&in, bool = false) const", asMETHODPR(Text3D, IsInView, (const FrameInfo&, bool) const, bool), asCALL_THISCALL);
+    // bool Drawable::IsOccludee() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "bool IsOccludee() const", asMETHODPR(Text3D, IsOccludee, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "bool get_occludee() const", asMETHODPR(Text3D, IsOccludee, () const, bool), asCALL_THISCALL);
+    // bool Drawable::IsOccluder() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "bool IsOccluder() const", asMETHODPR(Text3D, IsOccluder, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "bool get_occluder() const", asMETHODPR(Text3D, IsOccluder, () const, bool), asCALL_THISCALL);
+    // bool Component::IsReplicated() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("Text3D", "bool IsReplicated() const", asMETHODPR(Text3D, IsReplicated, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "bool get_replicated() const", asMETHODPR(Text3D, IsReplicated, () const, bool), asCALL_THISCALL);
+    // bool Serializable::IsTemporary() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Text3D", "bool IsTemporary() const", asMETHODPR(Text3D, IsTemporary, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "bool get_temporary() const", asMETHODPR(Text3D, IsTemporary, () const, bool), asCALL_THISCALL);
+    // bool Drawable::IsZoneDirty() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "bool IsZoneDirty() const", asMETHODPR(Text3D, IsZoneDirty, () const, bool), asCALL_THISCALL);
+    // void Drawable::LimitLights() | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "void LimitLights()", asMETHODPR(Text3D, LimitLights, (), void), asCALL_THISCALL);
+    // void Drawable::LimitVertexLights(bool removeConvertedLights) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "void LimitVertexLights(bool)", asMETHODPR(Text3D, LimitVertexLights, (bool), void), asCALL_THISCALL);
+    // virtual bool Serializable::Load(Deserializer& source) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Text3D", "bool Load(Deserializer&)", asMETHODPR(Text3D, Load, (Deserializer&), bool), asCALL_THISCALL);
+    // bool Animatable::LoadJSON(const JSONValue& source) override | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Text3D", "bool LoadJSON(const JSONValue&in)", asMETHODPR(Text3D, LoadJSON, (const JSONValue&), bool), asCALL_THISCALL);
+    // bool Animatable::LoadXML(const XMLElement& source) override | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Text3D", "bool LoadXML(const XMLElement&in)", asMETHODPR(Text3D, LoadXML, (const XMLElement&), bool), asCALL_THISCALL);
+    // void Drawable::MarkForUpdate() | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "void MarkForUpdate()", asMETHODPR(Text3D, MarkForUpdate, (), void), asCALL_THISCALL);
+    // void Drawable::MarkInView(const FrameInfo& frame) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "void MarkInView(const FrameInfo&in)", asMETHODPR(Text3D, MarkInView, (const FrameInfo&), void), asCALL_THISCALL);
+    // void Drawable::MarkInView(unsigned frameNumber) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "void MarkInView(uint)", asMETHODPR(Text3D, MarkInView, (unsigned), void), asCALL_THISCALL);
+    // void Component::MarkNetworkUpdate() override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("Text3D", "void MarkNetworkUpdate()", asMETHODPR(Text3D, MarkNetworkUpdate, (), void), asCALL_THISCALL);
+    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Text3D", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(Text3D, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
+    // virtual void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Text3D", "void OnGetAttribute(const AttributeInfo&in, Variant&) const", asMETHODPR(Text3D, OnGetAttribute, (const AttributeInfo&, Variant&) const, void), asCALL_THISCALL);
+    // virtual void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Text3D", "void OnSetAttribute(const AttributeInfo&in, const Variant&in)", asMETHODPR(Text3D, OnSetAttribute, (const AttributeInfo&, const Variant&), void), asCALL_THISCALL);
+    // void Drawable::OnSetEnabled() override | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "void OnSetEnabled()", asMETHODPR(Text3D, OnSetEnabled, (), void), asCALL_THISCALL);
+    // void Component::PrepareNetworkUpdate() | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("Text3D", "void PrepareNetworkUpdate()", asMETHODPR(Text3D, PrepareNetworkUpdate, (), void), asCALL_THISCALL);
+    // virtual void Drawable::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results) | File: ../Graphics/Drawable.h
+    // Error: type "RayOctreeQuery" can not automatically bind bacause have @nobind mark
+    // bool Serializable::ReadDeltaUpdate(Deserializer& source) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Text3D", "bool ReadDeltaUpdate(Deserializer&)", asMETHODPR(Text3D, ReadDeltaUpdate, (Deserializer&), bool), asCALL_THISCALL);
+    // bool Serializable::ReadLatestDataUpdate(Deserializer& source) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Text3D", "bool ReadLatestDataUpdate(Deserializer&)", asMETHODPR(Text3D, ReadLatestDataUpdate, (Deserializer&), bool), asCALL_THISCALL);
+    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
+    // Error: type "RefCount*" can not automatically bind
+    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("Text3D", "int Refs() const", asMETHODPR(Text3D, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "int get_refs() const", asMETHODPR(Text3D, Refs, () const, int), asCALL_THISCALL);
+    // static void Text3D::RegisterObject(Context* context) | File: ../UI/Text3D.h
+    // Context can be used as firs parameter of constructors only
+    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("Text3D", asBEHAVE_RELEASE, "void f()", asMETHODPR(Text3D, ReleaseRef, (), void), asCALL_THISCALL);
+    // void Component::Remove() | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("Text3D", "void Remove()", asMETHODPR(Text3D, Remove, (), void), asCALL_THISCALL);
+    // void Animatable::RemoveAttributeAnimation(const String& name) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Text3D", "void RemoveAttributeAnimation(const String&in)", asMETHODPR(Text3D, RemoveAttributeAnimation, (const String&), void), asCALL_THISCALL);
+    // void Serializable::RemoveInstanceDefault() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Text3D", "void RemoveInstanceDefault()", asMETHODPR(Text3D, RemoveInstanceDefault, (), void), asCALL_THISCALL);
+    // void Animatable::RemoveObjectAnimation() | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Text3D", "void RemoveObjectAnimation()", asMETHODPR(Text3D, RemoveObjectAnimation, (), void), asCALL_THISCALL);
+    // void Serializable::ResetToDefault() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Text3D", "void ResetToDefault()", asMETHODPR(Text3D, ResetToDefault, (), void), asCALL_THISCALL);
+    // bool Component::Save(Serializer& dest) const override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("Text3D", "bool Save(Serializer&) const", asMETHODPR(Text3D, Save, (Serializer&) const, bool), asCALL_THISCALL);
+    // virtual bool Serializable::SaveDefaultAttributes() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Text3D", "bool SaveDefaultAttributes() const", asMETHODPR(Text3D, SaveDefaultAttributes, () const, bool), asCALL_THISCALL);
+    // bool Component::SaveJSON(JSONValue& dest) const override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("Text3D", "bool SaveJSON(JSONValue&) const", asMETHODPR(Text3D, SaveJSON, (JSONValue&) const, bool), asCALL_THISCALL);
+    // bool Component::SaveXML(XMLElement& dest) const override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("Text3D", "bool SaveXML(XMLElement&) const", asMETHODPR(Text3D, SaveXML, (XMLElement&) const, bool), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Text3D", "void SendEvent(StringHash)", asMETHODPR(Text3D, SendEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Text3D", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(Text3D, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
+    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
+    // Not registered because template
+    // void Text3D::SetAlignment(HorizontalAlignment hAlign, VerticalAlignment vAlign) | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "void SetAlignment(HorizontalAlignment, VerticalAlignment)", asMETHODPR(Text3D, SetAlignment, (HorizontalAlignment, VerticalAlignment), void), asCALL_THISCALL);
+    // void Animatable::SetAnimationEnabled(bool enable) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Text3D", "void SetAnimationEnabled(bool)", asMETHODPR(Text3D, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_animationEnabled(bool)", asMETHODPR(Text3D, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
+    // void Animatable::SetAnimationTime(float time) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Text3D", "void SetAnimationTime(float)", asMETHODPR(Text3D, SetAnimationTime, (float), void), asCALL_THISCALL);
+    // bool Serializable::SetAttribute(unsigned index, const Variant& value) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Text3D", "bool SetAttribute(uint, const Variant&in)", asMETHODPR(Text3D, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "bool set_attributes(uint, const Variant&in)", asMETHODPR(Text3D, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
+    // bool Serializable::SetAttribute(const String& name, const Variant& value) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Text3D", "bool SetAttribute(const String&in, const Variant&in)", asMETHODPR(Text3D, SetAttribute, (const String&, const Variant&), bool), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode=WM_LOOP, float speed=1.0f) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Text3D", "void SetAttributeAnimation(const String&in, ValueAnimation@+, WrapMode = WM_LOOP, float = 1.0f)", asMETHODPR(Text3D, SetAttributeAnimation, (const String&, ValueAnimation*, WrapMode, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationSpeed(const String& name, float speed) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Text3D", "void SetAttributeAnimationSpeed(const String&in, float)", asMETHODPR(Text3D, SetAttributeAnimationSpeed, (const String&, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationTime(const String& name, float time) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Text3D", "void SetAttributeAnimationTime(const String&in, float)", asMETHODPR(Text3D, SetAttributeAnimationTime, (const String&, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationWrapMode(const String& name, WrapMode wrapMode) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Text3D", "void SetAttributeAnimationWrapMode(const String&in, WrapMode)", asMETHODPR(Text3D, SetAttributeAnimationWrapMode, (const String&, WrapMode), void), asCALL_THISCALL);
+    // void Drawable::SetBasePass(unsigned batchIndex) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "void SetBasePass(uint)", asMETHODPR(Text3D, SetBasePass, (unsigned), void), asCALL_THISCALL);
+    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Text3D", "void SetBlockEvents(bool)", asMETHODPR(Text3D, SetBlockEvents, (bool), void), asCALL_THISCALL);
+    // void Drawable::SetCastShadows(bool enable) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "void SetCastShadows(bool)", asMETHODPR(Text3D, SetCastShadows, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_castShadows(bool)", asMETHODPR(Text3D, SetCastShadows, (bool), void), asCALL_THISCALL);
+    // void Text3D::SetColor(const Color& color) | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "void SetColor(const Color&in)", asMETHODPR(Text3D, SetColor, (const Color&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_color(const Color&in)", asMETHODPR(Text3D, SetColor, (const Color&), void), asCALL_THISCALL);
+    // void Text3D::SetColor(Corner corner, const Color& color) | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "void SetColor(Corner, const Color&in)", asMETHODPR(Text3D, SetColor, (Corner, const Color&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_colors(Corner, const Color&in)", asMETHODPR(Text3D, SetColor, (Corner, const Color&), void), asCALL_THISCALL);
+    // void Drawable::SetDrawDistance(float distance) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "void SetDrawDistance(float)", asMETHODPR(Text3D, SetDrawDistance, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_drawDistance(float)", asMETHODPR(Text3D, SetDrawDistance, (float), void), asCALL_THISCALL);
+    // void Text3D::SetEffectColor(const Color& effectColor) | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "void SetEffectColor(const Color&in)", asMETHODPR(Text3D, SetEffectColor, (const Color&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_effectColor(const Color&in)", asMETHODPR(Text3D, SetEffectColor, (const Color&), void), asCALL_THISCALL);
+    // void Text3D::SetEffectDepthBias(float bias) | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "void SetEffectDepthBias(float)", asMETHODPR(Text3D, SetEffectDepthBias, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_effectDepthBias(float)", asMETHODPR(Text3D, SetEffectDepthBias, (float), void), asCALL_THISCALL);
+    // void Text3D::SetEffectRoundStroke(bool roundStroke) | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "void SetEffectRoundStroke(bool)", asMETHODPR(Text3D, SetEffectRoundStroke, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_effectRoundStroke(bool)", asMETHODPR(Text3D, SetEffectRoundStroke, (bool), void), asCALL_THISCALL);
+    // void Text3D::SetEffectShadowOffset(const IntVector2& offset) | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "void SetEffectShadowOffset(const IntVector2&in)", asMETHODPR(Text3D, SetEffectShadowOffset, (const IntVector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_effectShadowOffset(const IntVector2&in)", asMETHODPR(Text3D, SetEffectShadowOffset, (const IntVector2&), void), asCALL_THISCALL);
+    // void Text3D::SetEffectStrokeThickness(int thickness) | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "void SetEffectStrokeThickness(int)", asMETHODPR(Text3D, SetEffectStrokeThickness, (int), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_effectStrokeThickness(int)", asMETHODPR(Text3D, SetEffectStrokeThickness, (int), void), asCALL_THISCALL);
+    // void Component::SetEnabled(bool enable) | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("Text3D", "void SetEnabled(bool)", asMETHODPR(Text3D, SetEnabled, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_enabled(bool)", asMETHODPR(Text3D, SetEnabled, (bool), void), asCALL_THISCALL);
+    // void Text3D::SetFaceCameraMode(FaceCameraMode mode) | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "void SetFaceCameraMode(FaceCameraMode)", asMETHODPR(Text3D, SetFaceCameraMode, (FaceCameraMode), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_faceCameraMode(FaceCameraMode)", asMETHODPR(Text3D, SetFaceCameraMode, (FaceCameraMode), void), asCALL_THISCALL);
+    // void Text3D::SetFixedScreenSize(bool enable) | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "void SetFixedScreenSize(bool)", asMETHODPR(Text3D, SetFixedScreenSize, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_fixedScreenSize(bool)", asMETHODPR(Text3D, SetFixedScreenSize, (bool), void), asCALL_THISCALL);
+    // bool Text3D::SetFont(const String& fontName, float size=DEFAULT_FONT_SIZE) | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "bool SetFont(const String&in, float = DEFAULT_FONT_SIZE)", asMETHODPR(Text3D, SetFont, (const String&, float), bool), asCALL_THISCALL);
+    // bool Text3D::SetFont(Font* font, float size=DEFAULT_FONT_SIZE) | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "bool SetFont(Font@+, float = DEFAULT_FONT_SIZE)", asMETHODPR(Text3D, SetFont, (Font*, float), bool), asCALL_THISCALL);
+    // void Text3D::SetFontAttr(const ResourceRef& value) | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "void SetFontAttr(const ResourceRef&in)", asMETHODPR(Text3D, SetFontAttr, (const ResourceRef&), void), asCALL_THISCALL);
+    // bool Text3D::SetFontSize(float size) | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "bool SetFontSize(float)", asMETHODPR(Text3D, SetFontSize, (float), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "bool set_fontSize(float)", asMETHODPR(Text3D, SetFontSize, (float), bool), asCALL_THISCALL);
+    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Text3D", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(Text3D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(Text3D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    // void Text3D::SetHorizontalAlignment(HorizontalAlignment align) | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "void SetHorizontalAlignment(HorizontalAlignment)", asMETHODPR(Text3D, SetHorizontalAlignment, (HorizontalAlignment), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_horizontalAlignment(HorizontalAlignment)", asMETHODPR(Text3D, SetHorizontalAlignment, (HorizontalAlignment), void), asCALL_THISCALL);
+    // void Serializable::SetInstanceDefault(bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Text3D", "void SetInstanceDefault(bool)", asMETHODPR(Text3D, SetInstanceDefault, (bool), void), asCALL_THISCALL);
+    // void Serializable::SetInterceptNetworkUpdate(const String& attributeName, bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Text3D", "void SetInterceptNetworkUpdate(const String&in, bool)", asMETHODPR(Text3D, SetInterceptNetworkUpdate, (const String&, bool), void), asCALL_THISCALL);
+    // void Drawable::SetLightMask(unsigned mask) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "void SetLightMask(uint)", asMETHODPR(Text3D, SetLightMask, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_lightMask(uint)", asMETHODPR(Text3D, SetLightMask, (unsigned), void), asCALL_THISCALL);
+    // void Drawable::SetLodBias(float bias) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "void SetLodBias(float)", asMETHODPR(Text3D, SetLodBias, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_lodBias(float)", asMETHODPR(Text3D, SetLodBias, (float), void), asCALL_THISCALL);
+    // void Text3D::SetMaterial(Material* material) | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "void SetMaterial(Material@+)", asMETHODPR(Text3D, SetMaterial, (Material*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_material(Material@+)", asMETHODPR(Text3D, SetMaterial, (Material*), void), asCALL_THISCALL);
+    // void Text3D::SetMaterialAttr(const ResourceRef& value) | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "void SetMaterialAttr(const ResourceRef&in)", asMETHODPR(Text3D, SetMaterialAttr, (const ResourceRef&), void), asCALL_THISCALL);
+    // void Drawable::SetMaxLights(unsigned num) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "void SetMaxLights(uint)", asMETHODPR(Text3D, SetMaxLights, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_maxLights(uint)", asMETHODPR(Text3D, SetMaxLights, (unsigned), void), asCALL_THISCALL);
+    // void Drawable::SetMinMaxZ(float minZ, float maxZ) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "void SetMinMaxZ(float, float)", asMETHODPR(Text3D, SetMinMaxZ, (float, float), void), asCALL_THISCALL);
+    // void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Text3D", "void SetObjectAnimation(ObjectAnimation@+)", asMETHODPR(Text3D, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_objectAnimation(ObjectAnimation@+)", asMETHODPR(Text3D, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
+    // void Animatable::SetObjectAnimationAttr(const ResourceRef& value) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Text3D", "void SetObjectAnimationAttr(const ResourceRef&in)", asMETHODPR(Text3D, SetObjectAnimationAttr, (const ResourceRef&), void), asCALL_THISCALL);
+    // void Drawable::SetOccludee(bool enable) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "void SetOccludee(bool)", asMETHODPR(Text3D, SetOccludee, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_occludee(bool)", asMETHODPR(Text3D, SetOccludee, (bool), void), asCALL_THISCALL);
+    // void Drawable::SetOccluder(bool enable) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "void SetOccluder(bool)", asMETHODPR(Text3D, SetOccluder, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_occluder(bool)", asMETHODPR(Text3D, SetOccluder, (bool), void), asCALL_THISCALL);
+    // void Text3D::SetOpacity(float opacity) | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "void SetOpacity(float)", asMETHODPR(Text3D, SetOpacity, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_opacity(float)", asMETHODPR(Text3D, SetOpacity, (float), void), asCALL_THISCALL);
+    // void Text3D::SetRowSpacing(float spacing) | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "void SetRowSpacing(float)", asMETHODPR(Text3D, SetRowSpacing, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_rowSpacing(float)", asMETHODPR(Text3D, SetRowSpacing, (float), void), asCALL_THISCALL);
+    // void Drawable::SetShadowDistance(float distance) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "void SetShadowDistance(float)", asMETHODPR(Text3D, SetShadowDistance, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_shadowDistance(float)", asMETHODPR(Text3D, SetShadowDistance, (float), void), asCALL_THISCALL);
+    // void Drawable::SetShadowMask(unsigned mask) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "void SetShadowMask(uint)", asMETHODPR(Text3D, SetShadowMask, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_shadowMask(uint)", asMETHODPR(Text3D, SetShadowMask, (unsigned), void), asCALL_THISCALL);
+    // void Drawable::SetSortValue(float value) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "void SetSortValue(float)", asMETHODPR(Text3D, SetSortValue, (float), void), asCALL_THISCALL);
+    // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Text3D", "void SetTemporary(bool)", asMETHODPR(Text3D, SetTemporary, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_temporary(bool)", asMETHODPR(Text3D, SetTemporary, (bool), void), asCALL_THISCALL);
+    // void Text3D::SetText(const String& text) | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "void SetText(const String&in)", asMETHODPR(Text3D, SetText, (const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_text(const String&in)", asMETHODPR(Text3D, SetText, (const String&), void), asCALL_THISCALL);
+    // void Text3D::SetTextAlignment(HorizontalAlignment align) | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "void SetTextAlignment(HorizontalAlignment)", asMETHODPR(Text3D, SetTextAlignment, (HorizontalAlignment), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_textAlignment(HorizontalAlignment)", asMETHODPR(Text3D, SetTextAlignment, (HorizontalAlignment), void), asCALL_THISCALL);
+    // void Text3D::SetTextAttr(const String& value) | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "void SetTextAttr(const String&in)", asMETHODPR(Text3D, SetTextAttr, (const String&), void), asCALL_THISCALL);
+    // void Text3D::SetTextEffect(TextEffect textEffect) | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "void SetTextEffect(TextEffect)", asMETHODPR(Text3D, SetTextEffect, (TextEffect), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_textEffect(TextEffect)", asMETHODPR(Text3D, SetTextEffect, (TextEffect), void), asCALL_THISCALL);
+    // void Text3D::SetVerticalAlignment(VerticalAlignment align) | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "void SetVerticalAlignment(VerticalAlignment)", asMETHODPR(Text3D, SetVerticalAlignment, (VerticalAlignment), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_verticalAlignment(VerticalAlignment)", asMETHODPR(Text3D, SetVerticalAlignment, (VerticalAlignment), void), asCALL_THISCALL);
+    // void Drawable::SetViewMask(unsigned mask) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "void SetViewMask(uint)", asMETHODPR(Text3D, SetViewMask, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_viewMask(uint)", asMETHODPR(Text3D, SetViewMask, (unsigned), void), asCALL_THISCALL);
+    // void Text3D::SetWidth(int width) | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "void SetWidth(int)", asMETHODPR(Text3D, SetWidth, (int), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_width(int)", asMETHODPR(Text3D, SetWidth, (int), void), asCALL_THISCALL);
+    // void Text3D::SetWordwrap(bool enable) | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "void SetWordwrap(bool)", asMETHODPR(Text3D, SetWordwrap, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_wordwrap(bool)", asMETHODPR(Text3D, SetWordwrap, (bool), void), asCALL_THISCALL);
+    // void Drawable::SetZone(Zone* zone, bool temporary=false) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "void SetZone(Zone@+, bool = false)", asMETHODPR(Text3D, SetZone, (Zone*, bool), void), asCALL_THISCALL);
+    // void Drawable::SetZoneMask(unsigned mask) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "void SetZoneMask(uint)", asMETHODPR(Text3D, SetZoneMask, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_zoneMask(uint)", asMETHODPR(Text3D, SetZoneMask, (unsigned), void), asCALL_THISCALL);
+    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // explicit Text3D::Text3D(Context* context) | File: ../UI/Text3D.h
+    engine->RegisterObjectBehaviour("Text3D", asBEHAVE_FACTORY, "Text3D@+ f()", asFUNCTION(Text3D_Text3D_Context), asCALL_CDECL);
+    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Text3D", "void UnsubscribeFromAllEvents()", asMETHODPR(Text3D, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Text3D", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(Text3D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
+    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Text3D", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(Text3D, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Text3D", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(Text3D, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Text3D", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(Text3D, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
+    // virtual void Drawable::Update(const FrameInfo& frame) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Text3D", "void Update(const FrameInfo&in)", asMETHODPR(Text3D, Update, (const FrameInfo&), void), asCALL_THISCALL);
+    // void Text3D::UpdateBatches(const FrameInfo& frame) override | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "void UpdateBatches(const FrameInfo&in)", asMETHODPR(Text3D, UpdateBatches, (const FrameInfo&), void), asCALL_THISCALL);
+    // void Text3D::UpdateGeometry(const FrameInfo& frame) override | File: ../UI/Text3D.h
+    engine->RegisterObjectMethod("Text3D", "void UpdateGeometry(const FrameInfo&in)", asMETHODPR(Text3D, UpdateGeometry, (const FrameInfo&), void), asCALL_THISCALL);
+    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("Text3D", "int WeakRefs() const", asMETHODPR(Text3D, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "int get_weakRefs() const", asMETHODPR(Text3D, WeakRefs, () const, int), asCALL_THISCALL);
+    // void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attributeBits, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Text3D", "void WriteDeltaUpdate(Serializer&, const DirtyBits&in, uint8)", asMETHODPR(Text3D, WriteDeltaUpdate, (Serializer&, const DirtyBits&, unsigned char), void), asCALL_THISCALL);
+    // void Serializable::WriteInitialDeltaUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Text3D", "void WriteInitialDeltaUpdate(Serializer&, uint8)", asMETHODPR(Text3D, WriteInitialDeltaUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
+    // void Serializable::WriteLatestDataUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Text3D", "void WriteLatestDataUpdate(Serializer&, uint8)", asMETHODPR(Text3D, WriteLatestDataUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
+#ifdef REGISTER_MANUAL_PART_Drawable
+    REGISTER_MANUAL_PART_Drawable(Text3D, "Text3D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Component
+    REGISTER_MANUAL_PART_Component(Text3D, "Text3D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Animatable
+    REGISTER_MANUAL_PART_Animatable(Text3D, "Text3D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Serializable
+    REGISTER_MANUAL_PART_Serializable(Text3D, "Text3D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Object
+    REGISTER_MANUAL_PART_Object(Text3D, "Text3D")
+#endif
+#ifdef REGISTER_MANUAL_PART_RefCounted
+    REGISTER_MANUAL_PART_RefCounted(Text3D, "Text3D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Text3D
+    REGISTER_MANUAL_PART_Text3D(Text3D, "Text3D")
+#endif
+    RegisterSubclass<Drawable, Text3D>(engine, "Drawable", "Text3D");
+    RegisterSubclass<Component, Text3D>(engine, "Component", "Text3D");
+    RegisterSubclass<Animatable, Text3D>(engine, "Animatable", "Text3D");
+    RegisterSubclass<Serializable, Text3D>(engine, "Serializable", "Text3D");
+    RegisterSubclass<Object, Text3D>(engine, "Object", "Text3D");
+    RegisterSubclass<RefCounted, Text3D>(engine, "RefCounted", "Text3D");
+
+    // void ResourceWithMetadata::AddMetadata(const String& name, const Variant& value) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Texture", "void AddMetadata(const String&in, const Variant&in)", asMETHODPR(Texture, AddMetadata, (const String&, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "void set_metadata(const String&in, const Variant&in)", asMETHODPR(Texture, AddMetadata, (const String&, const Variant&), void), asCALL_THISCALL);
+    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("Texture", asBEHAVE_ADDREF, "void f()", asMETHODPR(Texture, AddRef, (), void), asCALL_THISCALL);
+    // virtual bool Resource::BeginLoad(Deserializer& source) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Texture", "bool BeginLoad(Deserializer&)", asMETHODPR(Texture, BeginLoad, (Deserializer&), bool), asCALL_THISCALL);
+    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
+    // Not registered because template
+    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
+    // Not registered because template
+    // static unsigned Texture::CheckMaxLevels(int width, int height, unsigned requestedLevels) | File: ../Graphics/Texture.h
+    engine->SetDefaultNamespace("Texture");
+    engine->RegisterGlobalFunction("uint CheckMaxLevels(int, int, uint)", asFUNCTIONPR(Texture::CheckMaxLevels, (int, int, unsigned), unsigned), asCALL_CDECL);
+    engine->SetDefaultNamespace("");
+    // static unsigned Texture::CheckMaxLevels(int width, int height, int depth, unsigned requestedLevels) | File: ../Graphics/Texture.h
+    engine->SetDefaultNamespace("Texture");
+    engine->RegisterGlobalFunction("uint CheckMaxLevels(int, int, int, uint)", asFUNCTIONPR(Texture::CheckMaxLevels, (int, int, int, unsigned), unsigned), asCALL_CDECL);
+    engine->SetDefaultNamespace("");
+    // void GPUObject::ClearDataLost() | File: ../Graphics/GPUObject.h
+    engine->RegisterObjectMethod("Texture", "void ClearDataLost()", asMETHODPR(Texture, ClearDataLost, (), void), asCALL_THISCALL);
+    // virtual bool Resource::EndLoad() | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Texture", "bool EndLoad()", asMETHODPR(Texture, EndLoad, (), bool), asCALL_THISCALL);
+    // TextureAddressMode Texture::GetAddressMode(TextureCoordinate coord) const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "TextureAddressMode GetAddressMode(TextureCoordinate) const", asMETHODPR(Texture, GetAddressMode, (TextureCoordinate) const, TextureAddressMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "TextureAddressMode get_addressMode(TextureCoordinate) const", asMETHODPR(Texture, GetAddressMode, (TextureCoordinate) const, TextureAddressMode), asCALL_THISCALL);
+    // unsigned Texture::GetAnisotropy() const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "uint GetAnisotropy() const", asMETHODPR(Texture, GetAnisotropy, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "uint get_anisotropy() const", asMETHODPR(Texture, GetAnisotropy, () const, unsigned), asCALL_THISCALL);
+    // AsyncLoadState Resource::GetAsyncLoadState() const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Texture", "AsyncLoadState GetAsyncLoadState() const", asMETHODPR(Texture, GetAsyncLoadState, () const, AsyncLoadState), asCALL_THISCALL);
+    // bool Texture::GetAutoResolve() const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "bool GetAutoResolve() const", asMETHODPR(Texture, GetAutoResolve, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "bool get_autoResolve() const", asMETHODPR(Texture, GetAutoResolve, () const, bool), asCALL_THISCALL);
+    // Texture* Texture::GetBackupTexture() const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "Texture@+ GetBackupTexture() const", asMETHODPR(Texture, GetBackupTexture, () const, Texture*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "Texture@+ get_backupTexture() const", asMETHODPR(Texture, GetBackupTexture, () const, Texture*), asCALL_THISCALL);
+    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture", "bool GetBlockEvents() const", asMETHODPR(Texture, GetBlockEvents, () const, bool), asCALL_THISCALL);
+    // const Color& Texture::GetBorderColor() const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "const Color& GetBorderColor() const", asMETHODPR(Texture, GetBorderColor, () const, const Color&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "const Color& get_borderColor() const", asMETHODPR(Texture, GetBorderColor, () const, const Color&), asCALL_THISCALL);
+    // const String& Object::GetCategory() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture", "const String& GetCategory() const", asMETHODPR(Texture, GetCategory, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "const String& get_category() const", asMETHODPR(Texture, GetCategory, () const, const String&), asCALL_THISCALL);
+    // unsigned Texture::GetComponents() const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "uint GetComponents() const", asMETHODPR(Texture, GetComponents, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "uint get_components() const", asMETHODPR(Texture, GetComponents, () const, unsigned), asCALL_THISCALL);
+    // Context* Object::GetContext() const | File: ../Core/Object.h
+    // Error: type "Context*" can not be returned
+    // unsigned Texture::GetDataSize(int width, int height) const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "uint GetDataSize(int, int) const", asMETHODPR(Texture, GetDataSize, (int, int) const, unsigned), asCALL_THISCALL);
+    // unsigned Texture::GetDataSize(int width, int height, int depth) const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "uint GetDataSize(int, int, int) const", asMETHODPR(Texture, GetDataSize, (int, int, int) const, unsigned), asCALL_THISCALL);
+    // static unsigned Texture::GetDataType(unsigned format) | File: ../Graphics/Texture.h
+    // Not registered because have @nobind mark
+    // int Texture::GetDepth() const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "int GetDepth() const", asMETHODPR(Texture, GetDepth, () const, int), asCALL_THISCALL);
+    // static unsigned Texture::GetDSVFormat(unsigned format) | File: ../Graphics/Texture.h
+    // Not registered because have @nobind mark
+    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture", "VariantMap& GetEventDataMap() const", asMETHODPR(Texture, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
+    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // Object* Object::GetEventSender() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture", "Object@+ GetEventSender() const", asMETHODPR(Texture, GetEventSender, () const, Object*), asCALL_THISCALL);
+    // static unsigned Texture::GetExternalFormat(unsigned format) | File: ../Graphics/Texture.h
+    // Not registered because have @nobind mark
+    // TextureFilterMode Texture::GetFilterMode() const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "TextureFilterMode GetFilterMode() const", asMETHODPR(Texture, GetFilterMode, () const, TextureFilterMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "TextureFilterMode get_filterMode() const", asMETHODPR(Texture, GetFilterMode, () const, TextureFilterMode), asCALL_THISCALL);
+    // unsigned Texture::GetFormat() const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "uint GetFormat() const", asMETHODPR(Texture, GetFormat, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "uint get_format() const", asMETHODPR(Texture, GetFormat, () const, unsigned), asCALL_THISCALL);
+    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(Texture, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "const Variant& get_globalVar(StringHash) const", asMETHODPR(Texture, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture", "const VariantMap& GetGlobalVars() const", asMETHODPR(Texture, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "const VariantMap& get_globalVars() const", asMETHODPR(Texture, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    // void* GPUObject::GetGPUObject() const | File: ../Graphics/GPUObject.h
+    // Error: type "void*" can not automatically bind
+    // unsigned GPUObject::GetGPUObjectName() const | File: ../Graphics/GPUObject.h
+    engine->RegisterObjectMethod("Texture", "uint GetGPUObjectName() const", asMETHODPR(Texture, GetGPUObjectName, () const, unsigned), asCALL_THISCALL);
+    // Graphics* GPUObject::GetGraphics() const | File: ../Graphics/GPUObject.h
+    engine->RegisterObjectMethod("Texture", "Graphics@+ GetGraphics() const", asMETHODPR(Texture, GetGraphics, () const, Graphics*), asCALL_THISCALL);
+    // int Texture::GetHeight() const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "int GetHeight() const", asMETHODPR(Texture, GetHeight, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "int get_height() const", asMETHODPR(Texture, GetHeight, () const, int), asCALL_THISCALL);
+    // int Texture::GetLevelDepth(unsigned level) const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "int GetLevelDepth(uint) const", asMETHODPR(Texture, GetLevelDepth, (unsigned) const, int), asCALL_THISCALL);
+    // int Texture::GetLevelHeight(unsigned level) const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "int GetLevelHeight(uint) const", asMETHODPR(Texture, GetLevelHeight, (unsigned) const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "int get_levelHeight(uint) const", asMETHODPR(Texture, GetLevelHeight, (unsigned) const, int), asCALL_THISCALL);
+    // unsigned Texture::GetLevels() const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "uint GetLevels() const", asMETHODPR(Texture, GetLevels, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "uint get_levels() const", asMETHODPR(Texture, GetLevels, () const, unsigned), asCALL_THISCALL);
+    // bool Texture::GetLevelsDirty() const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "bool GetLevelsDirty() const", asMETHODPR(Texture, GetLevelsDirty, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "bool get_levelsDirty() const", asMETHODPR(Texture, GetLevelsDirty, () const, bool), asCALL_THISCALL);
+    // int Texture::GetLevelWidth(unsigned level) const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "int GetLevelWidth(uint) const", asMETHODPR(Texture, GetLevelWidth, (unsigned) const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "int get_levelWidth(uint) const", asMETHODPR(Texture, GetLevelWidth, (unsigned) const, int), asCALL_THISCALL);
+    // unsigned Resource::GetMemoryUse() const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Texture", "uint GetMemoryUse() const", asMETHODPR(Texture, GetMemoryUse, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "uint get_memoryUse() const", asMETHODPR(Texture, GetMemoryUse, () const, unsigned), asCALL_THISCALL);
+    // const Variant& ResourceWithMetadata::GetMetadata(const String& name) const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Texture", "const Variant& GetMetadata(const String&in) const", asMETHODPR(Texture, GetMetadata, (const String&) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "const Variant& get_metadata(const String&in) const", asMETHODPR(Texture, GetMetadata, (const String&) const, const Variant&), asCALL_THISCALL);
+    // int Texture::GetMipsToSkip(MaterialQuality quality) const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "int GetMipsToSkip(MaterialQuality) const", asMETHODPR(Texture, GetMipsToSkip, (MaterialQuality) const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "int get_mipsToSkip(MaterialQuality) const", asMETHODPR(Texture, GetMipsToSkip, (MaterialQuality) const, int), asCALL_THISCALL);
+    // int Texture::GetMultiSample() const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "int GetMultiSample() const", asMETHODPR(Texture, GetMultiSample, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "int get_multiSample() const", asMETHODPR(Texture, GetMultiSample, () const, int), asCALL_THISCALL);
+    // const String& Resource::GetName() const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Texture", "const String& GetName() const", asMETHODPR(Texture, GetName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "const String& get_name() const", asMETHODPR(Texture, GetName, () const, const String&), asCALL_THISCALL);
+    // StringHash Resource::GetNameHash() const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Texture", "StringHash GetNameHash() const", asMETHODPR(Texture, GetNameHash, () const, StringHash), asCALL_THISCALL);
+    // bool Texture::GetParametersDirty() const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "bool GetParametersDirty() const", asMETHODPR(Texture, GetParametersDirty, () const, bool), asCALL_THISCALL);
+    // void* Texture::GetResolveTexture() const | File: ../Graphics/Texture.h
+    // Error: type "void*" can not automatically bind
+    // unsigned Texture::GetRowDataSize(int width) const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "uint GetRowDataSize(int) const", asMETHODPR(Texture, GetRowDataSize, (int) const, unsigned), asCALL_THISCALL);
+    // void* Texture::GetSampler() const | File: ../Graphics/Texture.h
+    // Error: type "void*" can not automatically bind
+    // void* Texture::GetShaderResourceView() const | File: ../Graphics/Texture.h
+    // Error: type "void*" can not automatically bind
+    // bool Texture::GetShadowCompare() const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "bool GetShadowCompare() const", asMETHODPR(Texture, GetShadowCompare, () const, bool), asCALL_THISCALL);
+    // bool Texture::GetSRGB() const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "bool GetSRGB() const", asMETHODPR(Texture, GetSRGB, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "bool get_sRGB() const", asMETHODPR(Texture, GetSRGB, () const, bool), asCALL_THISCALL);
+    // unsigned Texture::GetSRGBFormat(unsigned format) | File: ../Graphics/Texture.h
+    // Not registered because have @nobind mark
+    // static unsigned Texture::GetSRVFormat(unsigned format) | File: ../Graphics/Texture.h
+    // Not registered because have @nobind mark
+    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Texture, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
+    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // Not registered because template
+    // unsigned Texture::GetTarget() const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "uint GetTarget() const", asMETHODPR(Texture, GetTarget, () const, unsigned), asCALL_THISCALL);
+    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture", "StringHash GetType() const", asMETHODPR(Texture, GetType, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "StringHash get_type() const", asMETHODPR(Texture, GetType, () const, StringHash), asCALL_THISCALL);
+    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture", "const String& GetTypeName() const", asMETHODPR(Texture, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "const String& get_typeName() const", asMETHODPR(Texture, GetTypeName, () const, const String&), asCALL_THISCALL);
+    // TextureUsage Texture::GetUsage() const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "TextureUsage GetUsage() const", asMETHODPR(Texture, GetUsage, () const, TextureUsage), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "TextureUsage get_usage() const", asMETHODPR(Texture, GetUsage, () const, TextureUsage), asCALL_THISCALL);
+    // unsigned Resource::GetUseTimer() | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Texture", "uint GetUseTimer()", asMETHODPR(Texture, GetUseTimer, (), unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "uint get_useTimer()", asMETHODPR(Texture, GetUseTimer, (), unsigned), asCALL_THISCALL);
+    // int Texture::GetWidth() const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "int GetWidth() const", asMETHODPR(Texture, GetWidth, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "int get_width() const", asMETHODPR(Texture, GetWidth, () const, int), asCALL_THISCALL);
+    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture", "bool HasEventHandlers() const", asMETHODPR(Texture, HasEventHandlers, () const, bool), asCALL_THISCALL);
+    // bool ResourceWithMetadata::HasMetadata() const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Texture", "bool HasMetadata() const", asMETHODPR(Texture, HasMetadata, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "bool get_hasMetadata() const", asMETHODPR(Texture, HasMetadata, () const, bool), asCALL_THISCALL);
+    // bool GPUObject::HasPendingData() const | File: ../Graphics/GPUObject.h
+    engine->RegisterObjectMethod("Texture", "bool HasPendingData() const", asMETHODPR(Texture, HasPendingData, () const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(Texture, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(Texture, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
+    // bool Texture::IsCompressed() const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "bool IsCompressed() const", asMETHODPR(Texture, IsCompressed, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "bool get_compressed() const", asMETHODPR(Texture, IsCompressed, () const, bool), asCALL_THISCALL);
+    // bool GPUObject::IsDataLost() const | File: ../Graphics/GPUObject.h
+    engine->RegisterObjectMethod("Texture", "bool IsDataLost() const", asMETHODPR(Texture, IsDataLost, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "bool get_dataLost() const", asMETHODPR(Texture, IsDataLost, () const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture", "bool IsInstanceOf(StringHash) const", asMETHODPR(Texture, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
+    // Not registered because template
+    // bool Texture::IsResolveDirty() const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "bool IsResolveDirty() const", asMETHODPR(Texture, IsResolveDirty, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "bool get_resolveDirty() const", asMETHODPR(Texture, IsResolveDirty, () const, bool), asCALL_THISCALL);
+    // bool Resource::Load(Deserializer& source) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Texture", "bool Load(Deserializer&)", asMETHODPR(Texture, Load, (Deserializer&), bool), asCALL_THISCALL);
+    // bool Resource::LoadFile(const String& fileName) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Texture", "bool LoadFile(const String&in)", asMETHODPR(Texture, LoadFile, (const String&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "bool Load(const String&in)", asMETHODPR(Texture, LoadFile, (const String&), bool), asCALL_THISCALL);
+    // virtual void GPUObject::OnDeviceLost() | File: ../Graphics/GPUObject.h
+    engine->RegisterObjectMethod("Texture", "void OnDeviceLost()", asMETHODPR(Texture, OnDeviceLost, (), void), asCALL_THISCALL);
+    // virtual void GPUObject::OnDeviceReset() | File: ../Graphics/GPUObject.h
+    engine->RegisterObjectMethod("Texture", "void OnDeviceReset()", asMETHODPR(Texture, OnDeviceReset, (), void), asCALL_THISCALL);
+    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(Texture, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
+    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
+    // Error: type "RefCount*" can not automatically bind
+    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("Texture", "int Refs() const", asMETHODPR(Texture, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "int get_refs() const", asMETHODPR(Texture, Refs, () const, int), asCALL_THISCALL);
+    // void Texture::RegenerateLevels() | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "void RegenerateLevels()", asMETHODPR(Texture, RegenerateLevels, (), void), asCALL_THISCALL);
+    // virtual void GPUObject::Release() | File: ../Graphics/GPUObject.h
+    engine->RegisterObjectMethod("Texture", "void Release()", asMETHODPR(Texture, Release, (), void), asCALL_THISCALL);
+    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("Texture", asBEHAVE_RELEASE, "void f()", asMETHODPR(Texture, ReleaseRef, (), void), asCALL_THISCALL);
+    // void ResourceWithMetadata::RemoveAllMetadata() | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Texture", "void RemoveAllMetadata()", asMETHODPR(Texture, RemoveAllMetadata, (), void), asCALL_THISCALL);
+    // void ResourceWithMetadata::RemoveMetadata(const String& name) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Texture", "void RemoveMetadata(const String&in)", asMETHODPR(Texture, RemoveMetadata, (const String&), void), asCALL_THISCALL);
+    // void Resource::ResetUseTimer() | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Texture", "void ResetUseTimer()", asMETHODPR(Texture, ResetUseTimer, (), void), asCALL_THISCALL);
+    // virtual bool Resource::Save(Serializer& dest) const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Texture", "bool Save(Serializer&) const", asMETHODPR(Texture, Save, (Serializer&) const, bool), asCALL_THISCALL);
+    // virtual bool Resource::SaveFile(const String& fileName) const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Texture", "bool SaveFile(const String&in) const", asMETHODPR(Texture, SaveFile, (const String&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "bool Save(const String&in) const", asMETHODPR(Texture, SaveFile, (const String&) const, bool), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture", "void SendEvent(StringHash)", asMETHODPR(Texture, SendEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(Texture, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
+    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
+    // Not registered because template
+    // void Texture::SetAddressMode(TextureCoordinate coord, TextureAddressMode mode) | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "void SetAddressMode(TextureCoordinate, TextureAddressMode)", asMETHODPR(Texture, SetAddressMode, (TextureCoordinate, TextureAddressMode), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "void set_addressMode(TextureCoordinate, TextureAddressMode)", asMETHODPR(Texture, SetAddressMode, (TextureCoordinate, TextureAddressMode), void), asCALL_THISCALL);
+    // void Texture::SetAnisotropy(unsigned level) | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "void SetAnisotropy(uint)", asMETHODPR(Texture, SetAnisotropy, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "void set_anisotropy(uint)", asMETHODPR(Texture, SetAnisotropy, (unsigned), void), asCALL_THISCALL);
+    // void Resource::SetAsyncLoadState(AsyncLoadState newState) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Texture", "void SetAsyncLoadState(AsyncLoadState)", asMETHODPR(Texture, SetAsyncLoadState, (AsyncLoadState), void), asCALL_THISCALL);
+    // void Texture::SetBackupTexture(Texture* texture) | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "void SetBackupTexture(Texture@+)", asMETHODPR(Texture, SetBackupTexture, (Texture*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "void set_backupTexture(Texture@+)", asMETHODPR(Texture, SetBackupTexture, (Texture*), void), asCALL_THISCALL);
+    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture", "void SetBlockEvents(bool)", asMETHODPR(Texture, SetBlockEvents, (bool), void), asCALL_THISCALL);
+    // void Texture::SetBorderColor(const Color& color) | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "void SetBorderColor(const Color&in)", asMETHODPR(Texture, SetBorderColor, (const Color&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "void set_borderColor(const Color&in)", asMETHODPR(Texture, SetBorderColor, (const Color&), void), asCALL_THISCALL);
+    // void Texture::SetFilterMode(TextureFilterMode mode) | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "void SetFilterMode(TextureFilterMode)", asMETHODPR(Texture, SetFilterMode, (TextureFilterMode), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "void set_filterMode(TextureFilterMode)", asMETHODPR(Texture, SetFilterMode, (TextureFilterMode), void), asCALL_THISCALL);
+    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(Texture, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(Texture, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    // void Texture::SetLevelsDirty() | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "void SetLevelsDirty()", asMETHODPR(Texture, SetLevelsDirty, (), void), asCALL_THISCALL);
+    // void Resource::SetMemoryUse(unsigned size) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Texture", "void SetMemoryUse(uint)", asMETHODPR(Texture, SetMemoryUse, (unsigned), void), asCALL_THISCALL);
+    // void Texture::SetMipsToSkip(MaterialQuality quality, int toSkip) | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "void SetMipsToSkip(MaterialQuality, int)", asMETHODPR(Texture, SetMipsToSkip, (MaterialQuality, int), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "void set_mipsToSkip(MaterialQuality, int)", asMETHODPR(Texture, SetMipsToSkip, (MaterialQuality, int), void), asCALL_THISCALL);
+    // void Resource::SetName(const String& name) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Texture", "void SetName(const String&in)", asMETHODPR(Texture, SetName, (const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "void set_name(const String&in)", asMETHODPR(Texture, SetName, (const String&), void), asCALL_THISCALL);
+    // void Texture::SetNumLevels(unsigned levels) | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "void SetNumLevels(uint)", asMETHODPR(Texture, SetNumLevels, (unsigned), void), asCALL_THISCALL);
+    // void Texture::SetParameters(XMLFile* file) | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "void SetParameters(XMLFile@+)", asMETHODPR(Texture, SetParameters, (XMLFile*), void), asCALL_THISCALL);
+    // void Texture::SetParameters(const XMLElement& element) | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "void SetParameters(const XMLElement&in)", asMETHODPR(Texture, SetParameters, (const XMLElement&), void), asCALL_THISCALL);
+    // void Texture::SetParametersDirty() | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "void SetParametersDirty()", asMETHODPR(Texture, SetParametersDirty, (), void), asCALL_THISCALL);
+    // void Texture::SetResolveDirty(bool enable) | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "void SetResolveDirty(bool)", asMETHODPR(Texture, SetResolveDirty, (bool), void), asCALL_THISCALL);
+    // void Texture::SetShadowCompare(bool enable) | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "void SetShadowCompare(bool)", asMETHODPR(Texture, SetShadowCompare, (bool), void), asCALL_THISCALL);
+    // void Texture::SetSRGB(bool enable) | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "void SetSRGB(bool)", asMETHODPR(Texture, SetSRGB, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "void set_sRGB(bool)", asMETHODPR(Texture, SetSRGB, (bool), void), asCALL_THISCALL);
+    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // explicit Texture::Texture(Context* context) | File: ../Graphics/Texture.h
+    engine->RegisterObjectBehaviour("Texture", asBEHAVE_FACTORY, "Texture@+ f()", asFUNCTION(Texture_Texture_Context), asCALL_CDECL);
+    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture", "void UnsubscribeFromAllEvents()", asMETHODPR(Texture, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(Texture_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
+    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(Texture, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(Texture, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(Texture, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
+    // void Texture::UpdateParameters() | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture", "void UpdateParameters()", asMETHODPR(Texture, UpdateParameters, (), void), asCALL_THISCALL);
+    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("Texture", "int WeakRefs() const", asMETHODPR(Texture, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture", "int get_weakRefs() const", asMETHODPR(Texture, WeakRefs, () const, int), asCALL_THISCALL);
+#ifdef REGISTER_MANUAL_PART_ResourceWithMetadata
+    REGISTER_MANUAL_PART_ResourceWithMetadata(Texture, "Texture")
+#endif
+#ifdef REGISTER_MANUAL_PART_Resource
+    REGISTER_MANUAL_PART_Resource(Texture, "Texture")
+#endif
+#ifdef REGISTER_MANUAL_PART_Object
+    REGISTER_MANUAL_PART_Object(Texture, "Texture")
+#endif
+#ifdef REGISTER_MANUAL_PART_RefCounted
+    REGISTER_MANUAL_PART_RefCounted(Texture, "Texture")
+#endif
+#ifdef REGISTER_MANUAL_PART_GPUObject
+    REGISTER_MANUAL_PART_GPUObject(Texture, "Texture")
+#endif
+#ifdef REGISTER_MANUAL_PART_Texture
+    REGISTER_MANUAL_PART_Texture(Texture, "Texture")
+#endif
+    RegisterSubclass<ResourceWithMetadata, Texture>(engine, "ResourceWithMetadata", "Texture");
+    RegisterSubclass<Resource, Texture>(engine, "Resource", "Texture");
+    RegisterSubclass<Object, Texture>(engine, "Object", "Texture");
+    RegisterSubclass<RefCounted, Texture>(engine, "RefCounted", "Texture");
+
     // void ResourceWithMetadata::AddMetadata(const String& name, const Variant& value) | File: ../Resource/Resource.h
     engine->RegisterObjectMethod("Texture2D", "void AddMetadata(const String&in, const Variant&in)", asMETHODPR(Texture2D, AddMetadata, (const String&, const Variant&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Texture2D", "void set_metadata(const String&in, const Variant&in)", asMETHODPR(Texture2D, AddMetadata, (const String&, const Variant&), void), asCALL_THISCALL);
@@ -4718,6 +4130,344 @@ void ASRegisterGenerated_Members_T(asIScriptEngine* engine)
     RegisterSubclass<RefCounted, Texture2DArray>(engine, "RefCounted", "Texture2DArray");
 
     // void ResourceWithMetadata::AddMetadata(const String& name, const Variant& value) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Texture3D", "void AddMetadata(const String&in, const Variant&in)", asMETHODPR(Texture3D, AddMetadata, (const String&, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "void set_metadata(const String&in, const Variant&in)", asMETHODPR(Texture3D, AddMetadata, (const String&, const Variant&), void), asCALL_THISCALL);
+    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("Texture3D", asBEHAVE_ADDREF, "void f()", asMETHODPR(Texture3D, AddRef, (), void), asCALL_THISCALL);
+    // bool Texture3D::BeginLoad(Deserializer& source) override | File: ../Graphics/Texture3D.h
+    engine->RegisterObjectMethod("Texture3D", "bool BeginLoad(Deserializer&)", asMETHODPR(Texture3D, BeginLoad, (Deserializer&), bool), asCALL_THISCALL);
+    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
+    // Not registered because template
+    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
+    // Not registered because template
+    // static unsigned Texture::CheckMaxLevels(int width, int height, unsigned requestedLevels) | File: ../Graphics/Texture.h
+    engine->SetDefaultNamespace("Texture3D");
+    engine->RegisterGlobalFunction("uint CheckMaxLevels(int, int, uint)", asFUNCTIONPR(Texture3D::CheckMaxLevels, (int, int, unsigned), unsigned), asCALL_CDECL);
+    engine->SetDefaultNamespace("");
+    // static unsigned Texture::CheckMaxLevels(int width, int height, int depth, unsigned requestedLevels) | File: ../Graphics/Texture.h
+    engine->SetDefaultNamespace("Texture3D");
+    engine->RegisterGlobalFunction("uint CheckMaxLevels(int, int, int, uint)", asFUNCTIONPR(Texture3D::CheckMaxLevels, (int, int, int, unsigned), unsigned), asCALL_CDECL);
+    engine->SetDefaultNamespace("");
+    // void GPUObject::ClearDataLost() | File: ../Graphics/GPUObject.h
+    engine->RegisterObjectMethod("Texture3D", "void ClearDataLost()", asMETHODPR(Texture3D, ClearDataLost, (), void), asCALL_THISCALL);
+    // bool Texture3D::EndLoad() override | File: ../Graphics/Texture3D.h
+    engine->RegisterObjectMethod("Texture3D", "bool EndLoad()", asMETHODPR(Texture3D, EndLoad, (), bool), asCALL_THISCALL);
+    // TextureAddressMode Texture::GetAddressMode(TextureCoordinate coord) const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "TextureAddressMode GetAddressMode(TextureCoordinate) const", asMETHODPR(Texture3D, GetAddressMode, (TextureCoordinate) const, TextureAddressMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "TextureAddressMode get_addressMode(TextureCoordinate) const", asMETHODPR(Texture3D, GetAddressMode, (TextureCoordinate) const, TextureAddressMode), asCALL_THISCALL);
+    // unsigned Texture::GetAnisotropy() const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "uint GetAnisotropy() const", asMETHODPR(Texture3D, GetAnisotropy, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "uint get_anisotropy() const", asMETHODPR(Texture3D, GetAnisotropy, () const, unsigned), asCALL_THISCALL);
+    // AsyncLoadState Resource::GetAsyncLoadState() const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Texture3D", "AsyncLoadState GetAsyncLoadState() const", asMETHODPR(Texture3D, GetAsyncLoadState, () const, AsyncLoadState), asCALL_THISCALL);
+    // bool Texture::GetAutoResolve() const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "bool GetAutoResolve() const", asMETHODPR(Texture3D, GetAutoResolve, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "bool get_autoResolve() const", asMETHODPR(Texture3D, GetAutoResolve, () const, bool), asCALL_THISCALL);
+    // Texture* Texture::GetBackupTexture() const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "Texture@+ GetBackupTexture() const", asMETHODPR(Texture3D, GetBackupTexture, () const, Texture*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "Texture@+ get_backupTexture() const", asMETHODPR(Texture3D, GetBackupTexture, () const, Texture*), asCALL_THISCALL);
+    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture3D", "bool GetBlockEvents() const", asMETHODPR(Texture3D, GetBlockEvents, () const, bool), asCALL_THISCALL);
+    // const Color& Texture::GetBorderColor() const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "const Color& GetBorderColor() const", asMETHODPR(Texture3D, GetBorderColor, () const, const Color&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "const Color& get_borderColor() const", asMETHODPR(Texture3D, GetBorderColor, () const, const Color&), asCALL_THISCALL);
+    // const String& Object::GetCategory() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture3D", "const String& GetCategory() const", asMETHODPR(Texture3D, GetCategory, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "const String& get_category() const", asMETHODPR(Texture3D, GetCategory, () const, const String&), asCALL_THISCALL);
+    // unsigned Texture::GetComponents() const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "uint GetComponents() const", asMETHODPR(Texture3D, GetComponents, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "uint get_components() const", asMETHODPR(Texture3D, GetComponents, () const, unsigned), asCALL_THISCALL);
+    // Context* Object::GetContext() const | File: ../Core/Object.h
+    // Error: type "Context*" can not be returned
+    // bool Texture3D::GetData(unsigned level, void* dest) const | File: ../Graphics/Texture3D.h
+    // Error: type "void*" can not automatically bind
+    // unsigned Texture::GetDataSize(int width, int height) const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "uint GetDataSize(int, int) const", asMETHODPR(Texture3D, GetDataSize, (int, int) const, unsigned), asCALL_THISCALL);
+    // unsigned Texture::GetDataSize(int width, int height, int depth) const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "uint GetDataSize(int, int, int) const", asMETHODPR(Texture3D, GetDataSize, (int, int, int) const, unsigned), asCALL_THISCALL);
+    // static unsigned Texture::GetDataType(unsigned format) | File: ../Graphics/Texture.h
+    // Not registered because have @nobind mark
+    // int Texture::GetDepth() const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "int GetDepth() const", asMETHODPR(Texture3D, GetDepth, () const, int), asCALL_THISCALL);
+    // static unsigned Texture::GetDSVFormat(unsigned format) | File: ../Graphics/Texture.h
+    // Not registered because have @nobind mark
+    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture3D", "VariantMap& GetEventDataMap() const", asMETHODPR(Texture3D, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
+    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // Object* Object::GetEventSender() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture3D", "Object@+ GetEventSender() const", asMETHODPR(Texture3D, GetEventSender, () const, Object*), asCALL_THISCALL);
+    // static unsigned Texture::GetExternalFormat(unsigned format) | File: ../Graphics/Texture.h
+    // Not registered because have @nobind mark
+    // TextureFilterMode Texture::GetFilterMode() const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "TextureFilterMode GetFilterMode() const", asMETHODPR(Texture3D, GetFilterMode, () const, TextureFilterMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "TextureFilterMode get_filterMode() const", asMETHODPR(Texture3D, GetFilterMode, () const, TextureFilterMode), asCALL_THISCALL);
+    // unsigned Texture::GetFormat() const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "uint GetFormat() const", asMETHODPR(Texture3D, GetFormat, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "uint get_format() const", asMETHODPR(Texture3D, GetFormat, () const, unsigned), asCALL_THISCALL);
+    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture3D", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(Texture3D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "const Variant& get_globalVar(StringHash) const", asMETHODPR(Texture3D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture3D", "const VariantMap& GetGlobalVars() const", asMETHODPR(Texture3D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "const VariantMap& get_globalVars() const", asMETHODPR(Texture3D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    // void* GPUObject::GetGPUObject() const | File: ../Graphics/GPUObject.h
+    // Error: type "void*" can not automatically bind
+    // unsigned GPUObject::GetGPUObjectName() const | File: ../Graphics/GPUObject.h
+    engine->RegisterObjectMethod("Texture3D", "uint GetGPUObjectName() const", asMETHODPR(Texture3D, GetGPUObjectName, () const, unsigned), asCALL_THISCALL);
+    // Graphics* GPUObject::GetGraphics() const | File: ../Graphics/GPUObject.h
+    engine->RegisterObjectMethod("Texture3D", "Graphics@+ GetGraphics() const", asMETHODPR(Texture3D, GetGraphics, () const, Graphics*), asCALL_THISCALL);
+    // int Texture::GetHeight() const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "int GetHeight() const", asMETHODPR(Texture3D, GetHeight, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "int get_height() const", asMETHODPR(Texture3D, GetHeight, () const, int), asCALL_THISCALL);
+    // int Texture::GetLevelDepth(unsigned level) const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "int GetLevelDepth(uint) const", asMETHODPR(Texture3D, GetLevelDepth, (unsigned) const, int), asCALL_THISCALL);
+    // int Texture::GetLevelHeight(unsigned level) const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "int GetLevelHeight(uint) const", asMETHODPR(Texture3D, GetLevelHeight, (unsigned) const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "int get_levelHeight(uint) const", asMETHODPR(Texture3D, GetLevelHeight, (unsigned) const, int), asCALL_THISCALL);
+    // unsigned Texture::GetLevels() const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "uint GetLevels() const", asMETHODPR(Texture3D, GetLevels, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "uint get_levels() const", asMETHODPR(Texture3D, GetLevels, () const, unsigned), asCALL_THISCALL);
+    // bool Texture::GetLevelsDirty() const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "bool GetLevelsDirty() const", asMETHODPR(Texture3D, GetLevelsDirty, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "bool get_levelsDirty() const", asMETHODPR(Texture3D, GetLevelsDirty, () const, bool), asCALL_THISCALL);
+    // int Texture::GetLevelWidth(unsigned level) const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "int GetLevelWidth(uint) const", asMETHODPR(Texture3D, GetLevelWidth, (unsigned) const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "int get_levelWidth(uint) const", asMETHODPR(Texture3D, GetLevelWidth, (unsigned) const, int), asCALL_THISCALL);
+    // unsigned Resource::GetMemoryUse() const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Texture3D", "uint GetMemoryUse() const", asMETHODPR(Texture3D, GetMemoryUse, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "uint get_memoryUse() const", asMETHODPR(Texture3D, GetMemoryUse, () const, unsigned), asCALL_THISCALL);
+    // const Variant& ResourceWithMetadata::GetMetadata(const String& name) const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Texture3D", "const Variant& GetMetadata(const String&in) const", asMETHODPR(Texture3D, GetMetadata, (const String&) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "const Variant& get_metadata(const String&in) const", asMETHODPR(Texture3D, GetMetadata, (const String&) const, const Variant&), asCALL_THISCALL);
+    // int Texture::GetMipsToSkip(MaterialQuality quality) const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "int GetMipsToSkip(MaterialQuality) const", asMETHODPR(Texture3D, GetMipsToSkip, (MaterialQuality) const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "int get_mipsToSkip(MaterialQuality) const", asMETHODPR(Texture3D, GetMipsToSkip, (MaterialQuality) const, int), asCALL_THISCALL);
+    // int Texture::GetMultiSample() const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "int GetMultiSample() const", asMETHODPR(Texture3D, GetMultiSample, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "int get_multiSample() const", asMETHODPR(Texture3D, GetMultiSample, () const, int), asCALL_THISCALL);
+    // const String& Resource::GetName() const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Texture3D", "const String& GetName() const", asMETHODPR(Texture3D, GetName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "const String& get_name() const", asMETHODPR(Texture3D, GetName, () const, const String&), asCALL_THISCALL);
+    // StringHash Resource::GetNameHash() const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Texture3D", "StringHash GetNameHash() const", asMETHODPR(Texture3D, GetNameHash, () const, StringHash), asCALL_THISCALL);
+    // bool Texture::GetParametersDirty() const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "bool GetParametersDirty() const", asMETHODPR(Texture3D, GetParametersDirty, () const, bool), asCALL_THISCALL);
+    // void* Texture::GetResolveTexture() const | File: ../Graphics/Texture.h
+    // Error: type "void*" can not automatically bind
+    // unsigned Texture::GetRowDataSize(int width) const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "uint GetRowDataSize(int) const", asMETHODPR(Texture3D, GetRowDataSize, (int) const, unsigned), asCALL_THISCALL);
+    // void* Texture::GetSampler() const | File: ../Graphics/Texture.h
+    // Error: type "void*" can not automatically bind
+    // void* Texture::GetShaderResourceView() const | File: ../Graphics/Texture.h
+    // Error: type "void*" can not automatically bind
+    // bool Texture::GetShadowCompare() const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "bool GetShadowCompare() const", asMETHODPR(Texture3D, GetShadowCompare, () const, bool), asCALL_THISCALL);
+    // bool Texture::GetSRGB() const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "bool GetSRGB() const", asMETHODPR(Texture3D, GetSRGB, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "bool get_sRGB() const", asMETHODPR(Texture3D, GetSRGB, () const, bool), asCALL_THISCALL);
+    // unsigned Texture::GetSRGBFormat(unsigned format) | File: ../Graphics/Texture.h
+    // Not registered because have @nobind mark
+    // static unsigned Texture::GetSRVFormat(unsigned format) | File: ../Graphics/Texture.h
+    // Not registered because have @nobind mark
+    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture3D", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Texture3D, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
+    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // Not registered because template
+    // unsigned Texture::GetTarget() const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "uint GetTarget() const", asMETHODPR(Texture3D, GetTarget, () const, unsigned), asCALL_THISCALL);
+    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture3D", "StringHash GetType() const", asMETHODPR(Texture3D, GetType, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "StringHash get_type() const", asMETHODPR(Texture3D, GetType, () const, StringHash), asCALL_THISCALL);
+    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture3D", "const String& GetTypeName() const", asMETHODPR(Texture3D, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "const String& get_typeName() const", asMETHODPR(Texture3D, GetTypeName, () const, const String&), asCALL_THISCALL);
+    // TextureUsage Texture::GetUsage() const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "TextureUsage GetUsage() const", asMETHODPR(Texture3D, GetUsage, () const, TextureUsage), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "TextureUsage get_usage() const", asMETHODPR(Texture3D, GetUsage, () const, TextureUsage), asCALL_THISCALL);
+    // unsigned Resource::GetUseTimer() | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Texture3D", "uint GetUseTimer()", asMETHODPR(Texture3D, GetUseTimer, (), unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "uint get_useTimer()", asMETHODPR(Texture3D, GetUseTimer, (), unsigned), asCALL_THISCALL);
+    // int Texture::GetWidth() const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "int GetWidth() const", asMETHODPR(Texture3D, GetWidth, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "int get_width() const", asMETHODPR(Texture3D, GetWidth, () const, int), asCALL_THISCALL);
+    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture3D", "bool HasEventHandlers() const", asMETHODPR(Texture3D, HasEventHandlers, () const, bool), asCALL_THISCALL);
+    // bool ResourceWithMetadata::HasMetadata() const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Texture3D", "bool HasMetadata() const", asMETHODPR(Texture3D, HasMetadata, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "bool get_hasMetadata() const", asMETHODPR(Texture3D, HasMetadata, () const, bool), asCALL_THISCALL);
+    // bool GPUObject::HasPendingData() const | File: ../Graphics/GPUObject.h
+    engine->RegisterObjectMethod("Texture3D", "bool HasPendingData() const", asMETHODPR(Texture3D, HasPendingData, () const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture3D", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(Texture3D, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture3D", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(Texture3D, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
+    // bool Texture::IsCompressed() const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "bool IsCompressed() const", asMETHODPR(Texture3D, IsCompressed, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "bool get_compressed() const", asMETHODPR(Texture3D, IsCompressed, () const, bool), asCALL_THISCALL);
+    // bool GPUObject::IsDataLost() const | File: ../Graphics/GPUObject.h
+    engine->RegisterObjectMethod("Texture3D", "bool IsDataLost() const", asMETHODPR(Texture3D, IsDataLost, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "bool get_dataLost() const", asMETHODPR(Texture3D, IsDataLost, () const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture3D", "bool IsInstanceOf(StringHash) const", asMETHODPR(Texture3D, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
+    // Not registered because template
+    // bool Texture::IsResolveDirty() const | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "bool IsResolveDirty() const", asMETHODPR(Texture3D, IsResolveDirty, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "bool get_resolveDirty() const", asMETHODPR(Texture3D, IsResolveDirty, () const, bool), asCALL_THISCALL);
+    // bool Resource::Load(Deserializer& source) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Texture3D", "bool Load(Deserializer&)", asMETHODPR(Texture3D, Load, (Deserializer&), bool), asCALL_THISCALL);
+    // bool Resource::LoadFile(const String& fileName) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Texture3D", "bool LoadFile(const String&in)", asMETHODPR(Texture3D, LoadFile, (const String&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "bool Load(const String&in)", asMETHODPR(Texture3D, LoadFile, (const String&), bool), asCALL_THISCALL);
+    // void Texture3D::OnDeviceLost() override | File: ../Graphics/Texture3D.h
+    engine->RegisterObjectMethod("Texture3D", "void OnDeviceLost()", asMETHODPR(Texture3D, OnDeviceLost, (), void), asCALL_THISCALL);
+    // void Texture3D::OnDeviceReset() override | File: ../Graphics/Texture3D.h
+    engine->RegisterObjectMethod("Texture3D", "void OnDeviceReset()", asMETHODPR(Texture3D, OnDeviceReset, (), void), asCALL_THISCALL);
+    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture3D", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(Texture3D, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
+    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
+    // Error: type "RefCount*" can not automatically bind
+    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("Texture3D", "int Refs() const", asMETHODPR(Texture3D, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "int get_refs() const", asMETHODPR(Texture3D, Refs, () const, int), asCALL_THISCALL);
+    // void Texture::RegenerateLevels() | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "void RegenerateLevels()", asMETHODPR(Texture3D, RegenerateLevels, (), void), asCALL_THISCALL);
+    // static void Texture3D::RegisterObject(Context* context) | File: ../Graphics/Texture3D.h
+    // Context can be used as firs parameter of constructors only
+    // void Texture3D::Release() override | File: ../Graphics/Texture3D.h
+    engine->RegisterObjectMethod("Texture3D", "void Release()", asMETHODPR(Texture3D, Release, (), void), asCALL_THISCALL);
+    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("Texture3D", asBEHAVE_RELEASE, "void f()", asMETHODPR(Texture3D, ReleaseRef, (), void), asCALL_THISCALL);
+    // void ResourceWithMetadata::RemoveAllMetadata() | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Texture3D", "void RemoveAllMetadata()", asMETHODPR(Texture3D, RemoveAllMetadata, (), void), asCALL_THISCALL);
+    // void ResourceWithMetadata::RemoveMetadata(const String& name) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Texture3D", "void RemoveMetadata(const String&in)", asMETHODPR(Texture3D, RemoveMetadata, (const String&), void), asCALL_THISCALL);
+    // void Resource::ResetUseTimer() | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Texture3D", "void ResetUseTimer()", asMETHODPR(Texture3D, ResetUseTimer, (), void), asCALL_THISCALL);
+    // virtual bool Resource::Save(Serializer& dest) const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Texture3D", "bool Save(Serializer&) const", asMETHODPR(Texture3D, Save, (Serializer&) const, bool), asCALL_THISCALL);
+    // virtual bool Resource::SaveFile(const String& fileName) const | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Texture3D", "bool SaveFile(const String&in) const", asMETHODPR(Texture3D, SaveFile, (const String&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "bool Save(const String&in) const", asMETHODPR(Texture3D, SaveFile, (const String&) const, bool), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture3D", "void SendEvent(StringHash)", asMETHODPR(Texture3D, SendEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture3D", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(Texture3D, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
+    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
+    // Not registered because template
+    // void Texture::SetAddressMode(TextureCoordinate coord, TextureAddressMode mode) | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "void SetAddressMode(TextureCoordinate, TextureAddressMode)", asMETHODPR(Texture3D, SetAddressMode, (TextureCoordinate, TextureAddressMode), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "void set_addressMode(TextureCoordinate, TextureAddressMode)", asMETHODPR(Texture3D, SetAddressMode, (TextureCoordinate, TextureAddressMode), void), asCALL_THISCALL);
+    // void Texture::SetAnisotropy(unsigned level) | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "void SetAnisotropy(uint)", asMETHODPR(Texture3D, SetAnisotropy, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "void set_anisotropy(uint)", asMETHODPR(Texture3D, SetAnisotropy, (unsigned), void), asCALL_THISCALL);
+    // void Resource::SetAsyncLoadState(AsyncLoadState newState) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Texture3D", "void SetAsyncLoadState(AsyncLoadState)", asMETHODPR(Texture3D, SetAsyncLoadState, (AsyncLoadState), void), asCALL_THISCALL);
+    // void Texture::SetBackupTexture(Texture* texture) | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "void SetBackupTexture(Texture@+)", asMETHODPR(Texture3D, SetBackupTexture, (Texture*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "void set_backupTexture(Texture@+)", asMETHODPR(Texture3D, SetBackupTexture, (Texture*), void), asCALL_THISCALL);
+    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture3D", "void SetBlockEvents(bool)", asMETHODPR(Texture3D, SetBlockEvents, (bool), void), asCALL_THISCALL);
+    // void Texture::SetBorderColor(const Color& color) | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "void SetBorderColor(const Color&in)", asMETHODPR(Texture3D, SetBorderColor, (const Color&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "void set_borderColor(const Color&in)", asMETHODPR(Texture3D, SetBorderColor, (const Color&), void), asCALL_THISCALL);
+    // bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int height, int depth, const void* data) | File: ../Graphics/Texture3D.h
+    // Error: type "void*" can not automatically bind
+    // bool Texture3D::SetData(Image* image, bool useAlpha=false) | File: ../Graphics/Texture3D.h
+    engine->RegisterObjectMethod("Texture3D", "bool SetData(Image@+, bool = false)", asMETHODPR(Texture3D, SetData, (Image*, bool), bool), asCALL_THISCALL);
+    // void Texture::SetFilterMode(TextureFilterMode mode) | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "void SetFilterMode(TextureFilterMode)", asMETHODPR(Texture3D, SetFilterMode, (TextureFilterMode), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "void set_filterMode(TextureFilterMode)", asMETHODPR(Texture3D, SetFilterMode, (TextureFilterMode), void), asCALL_THISCALL);
+    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture3D", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(Texture3D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(Texture3D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    // void Texture::SetLevelsDirty() | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "void SetLevelsDirty()", asMETHODPR(Texture3D, SetLevelsDirty, (), void), asCALL_THISCALL);
+    // void Resource::SetMemoryUse(unsigned size) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Texture3D", "void SetMemoryUse(uint)", asMETHODPR(Texture3D, SetMemoryUse, (unsigned), void), asCALL_THISCALL);
+    // void Texture::SetMipsToSkip(MaterialQuality quality, int toSkip) | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "void SetMipsToSkip(MaterialQuality, int)", asMETHODPR(Texture3D, SetMipsToSkip, (MaterialQuality, int), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "void set_mipsToSkip(MaterialQuality, int)", asMETHODPR(Texture3D, SetMipsToSkip, (MaterialQuality, int), void), asCALL_THISCALL);
+    // void Resource::SetName(const String& name) | File: ../Resource/Resource.h
+    engine->RegisterObjectMethod("Texture3D", "void SetName(const String&in)", asMETHODPR(Texture3D, SetName, (const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "void set_name(const String&in)", asMETHODPR(Texture3D, SetName, (const String&), void), asCALL_THISCALL);
+    // void Texture::SetNumLevels(unsigned levels) | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "void SetNumLevels(uint)", asMETHODPR(Texture3D, SetNumLevels, (unsigned), void), asCALL_THISCALL);
+    // void Texture::SetParameters(XMLFile* file) | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "void SetParameters(XMLFile@+)", asMETHODPR(Texture3D, SetParameters, (XMLFile*), void), asCALL_THISCALL);
+    // void Texture::SetParameters(const XMLElement& element) | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "void SetParameters(const XMLElement&in)", asMETHODPR(Texture3D, SetParameters, (const XMLElement&), void), asCALL_THISCALL);
+    // void Texture::SetParametersDirty() | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "void SetParametersDirty()", asMETHODPR(Texture3D, SetParametersDirty, (), void), asCALL_THISCALL);
+    // void Texture::SetResolveDirty(bool enable) | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "void SetResolveDirty(bool)", asMETHODPR(Texture3D, SetResolveDirty, (bool), void), asCALL_THISCALL);
+    // void Texture::SetShadowCompare(bool enable) | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "void SetShadowCompare(bool)", asMETHODPR(Texture3D, SetShadowCompare, (bool), void), asCALL_THISCALL);
+    // bool Texture3D::SetSize(int width, int height, int depth, unsigned format, TextureUsage usage=TEXTURE_STATIC) | File: ../Graphics/Texture3D.h
+    engine->RegisterObjectMethod("Texture3D", "bool SetSize(int, int, int, uint, TextureUsage = TEXTURE_STATIC)", asMETHODPR(Texture3D, SetSize, (int, int, int, unsigned, TextureUsage), bool), asCALL_THISCALL);
+    // void Texture::SetSRGB(bool enable) | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "void SetSRGB(bool)", asMETHODPR(Texture3D, SetSRGB, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "void set_sRGB(bool)", asMETHODPR(Texture3D, SetSRGB, (bool), void), asCALL_THISCALL);
+    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // explicit Texture3D::Texture3D(Context* context) | File: ../Graphics/Texture3D.h
+    engine->RegisterObjectBehaviour("Texture3D", asBEHAVE_FACTORY, "Texture3D@+ f()", asFUNCTION(Texture3D_Texture3D_Context), asCALL_CDECL);
+    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture3D", "void UnsubscribeFromAllEvents()", asMETHODPR(Texture3D, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture3D", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(Texture3D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
+    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture3D", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(Texture3D, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture3D", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(Texture3D, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Texture3D", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(Texture3D, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
+    // void Texture::UpdateParameters() | File: ../Graphics/Texture.h
+    engine->RegisterObjectMethod("Texture3D", "void UpdateParameters()", asMETHODPR(Texture3D, UpdateParameters, (), void), asCALL_THISCALL);
+    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("Texture3D", "int WeakRefs() const", asMETHODPR(Texture3D, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "int get_weakRefs() const", asMETHODPR(Texture3D, WeakRefs, () const, int), asCALL_THISCALL);
+#ifdef REGISTER_MANUAL_PART_Texture
+    REGISTER_MANUAL_PART_Texture(Texture3D, "Texture3D")
+#endif
+#ifdef REGISTER_MANUAL_PART_ResourceWithMetadata
+    REGISTER_MANUAL_PART_ResourceWithMetadata(Texture3D, "Texture3D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Resource
+    REGISTER_MANUAL_PART_Resource(Texture3D, "Texture3D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Object
+    REGISTER_MANUAL_PART_Object(Texture3D, "Texture3D")
+#endif
+#ifdef REGISTER_MANUAL_PART_RefCounted
+    REGISTER_MANUAL_PART_RefCounted(Texture3D, "Texture3D")
+#endif
+#ifdef REGISTER_MANUAL_PART_GPUObject
+    REGISTER_MANUAL_PART_GPUObject(Texture3D, "Texture3D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Texture3D
+    REGISTER_MANUAL_PART_Texture3D(Texture3D, "Texture3D")
+#endif
+    RegisterSubclass<Texture, Texture3D>(engine, "Texture", "Texture3D");
+    RegisterSubclass<ResourceWithMetadata, Texture3D>(engine, "ResourceWithMetadata", "Texture3D");
+    RegisterSubclass<Resource, Texture3D>(engine, "Resource", "Texture3D");
+    RegisterSubclass<Object, Texture3D>(engine, "Object", "Texture3D");
+    RegisterSubclass<RefCounted, Texture3D>(engine, "RefCounted", "Texture3D");
+
+    // void ResourceWithMetadata::AddMetadata(const String& name, const Variant& value) | File: ../Resource/Resource.h
     engine->RegisterObjectMethod("TextureCube", "void AddMetadata(const String&in, const Variant&in)", asMETHODPR(TextureCube, AddMetadata, (const String&, const Variant&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("TextureCube", "void set_metadata(const String&in, const Variant&in)", asMETHODPR(TextureCube, AddMetadata, (const String&, const Variant&), void), asCALL_THISCALL);
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
@@ -5061,6 +4811,49 @@ void ASRegisterGenerated_Members_T(asIScriptEngine* engine)
     RegisterSubclass<Resource, TextureCube>(engine, "Resource", "TextureCube");
     RegisterSubclass<Object, TextureCube>(engine, "Object", "TextureCube");
     RegisterSubclass<RefCounted, TextureCube>(engine, "RefCounted", "TextureCube");
+
+#ifdef URHO3D_URHO2D
+    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("Tile2D", asBEHAVE_ADDREF, "void f()", asMETHODPR(Tile2D, AddRef, (), void), asCALL_THISCALL);
+    // bool Tile2D::GetFlipX() const | File: ../Urho2D/TileMapDefs2D.h
+    engine->RegisterObjectMethod("Tile2D", "bool GetFlipX() const", asMETHODPR(Tile2D, GetFlipX, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Tile2D", "bool get_flipX() const", asMETHODPR(Tile2D, GetFlipX, () const, bool), asCALL_THISCALL);
+    // bool Tile2D::GetFlipY() const | File: ../Urho2D/TileMapDefs2D.h
+    engine->RegisterObjectMethod("Tile2D", "bool GetFlipY() const", asMETHODPR(Tile2D, GetFlipY, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Tile2D", "bool get_flipY() const", asMETHODPR(Tile2D, GetFlipY, () const, bool), asCALL_THISCALL);
+    // unsigned Tile2D::GetGid() const | File: ../Urho2D/TileMapDefs2D.h
+    engine->RegisterObjectMethod("Tile2D", "uint GetGid() const", asMETHODPR(Tile2D, GetGid, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Tile2D", "uint get_gid() const", asMETHODPR(Tile2D, GetGid, () const, unsigned), asCALL_THISCALL);
+    // const String& Tile2D::GetProperty(const String& name) const | File: ../Urho2D/TileMapDefs2D.h
+    engine->RegisterObjectMethod("Tile2D", "const String& GetProperty(const String&in) const", asMETHODPR(Tile2D, GetProperty, (const String&) const, const String&), asCALL_THISCALL);
+    // Sprite2D* Tile2D::GetSprite() const | File: ../Urho2D/TileMapDefs2D.h
+    engine->RegisterObjectMethod("Tile2D", "Sprite2D@+ GetSprite() const", asMETHODPR(Tile2D, GetSprite, () const, Sprite2D*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Tile2D", "Sprite2D@+ get_sprite() const", asMETHODPR(Tile2D, GetSprite, () const, Sprite2D*), asCALL_THISCALL);
+    // bool Tile2D::GetSwapXY() const | File: ../Urho2D/TileMapDefs2D.h
+    engine->RegisterObjectMethod("Tile2D", "bool GetSwapXY() const", asMETHODPR(Tile2D, GetSwapXY, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Tile2D", "bool get_swapXY() const", asMETHODPR(Tile2D, GetSwapXY, () const, bool), asCALL_THISCALL);
+    // bool Tile2D::HasProperty(const String& name) const | File: ../Urho2D/TileMapDefs2D.h
+    engine->RegisterObjectMethod("Tile2D", "bool HasProperty(const String&in) const", asMETHODPR(Tile2D, HasProperty, (const String&) const, bool), asCALL_THISCALL);
+    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
+    // Error: type "RefCount*" can not automatically bind
+    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("Tile2D", "int Refs() const", asMETHODPR(Tile2D, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Tile2D", "int get_refs() const", asMETHODPR(Tile2D, Refs, () const, int), asCALL_THISCALL);
+    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("Tile2D", asBEHAVE_RELEASE, "void f()", asMETHODPR(Tile2D, ReleaseRef, (), void), asCALL_THISCALL);
+    // Tile2D::Tile2D() | File: ../Urho2D/TileMapDefs2D.h
+    engine->RegisterObjectBehaviour("Tile2D", asBEHAVE_FACTORY, "Tile2D@+ f()", asFUNCTION(Tile2D_Tile2D_void), asCALL_CDECL);
+    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("Tile2D", "int WeakRefs() const", asMETHODPR(Tile2D, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Tile2D", "int get_weakRefs() const", asMETHODPR(Tile2D, WeakRefs, () const, int), asCALL_THISCALL);
+#ifdef REGISTER_MANUAL_PART_RefCounted
+    REGISTER_MANUAL_PART_RefCounted(Tile2D, "Tile2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Tile2D
+    REGISTER_MANUAL_PART_Tile2D(Tile2D, "Tile2D")
+#endif
+    RegisterSubclass<RefCounted, Tile2D>(engine, "RefCounted", "Tile2D");
+#endif
 
 #ifdef URHO3D_URHO2D
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
@@ -5689,6 +5482,69 @@ void ASRegisterGenerated_Members_T(asIScriptEngine* engine)
     RegisterSubclass<RefCounted, TileMapLayer2D>(engine, "RefCounted", "TileMapLayer2D");
 #endif
 
+#ifdef URHO3D_URHO2D
+    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("TileMapObject2D", asBEHAVE_ADDREF, "void f()", asMETHODPR(TileMapObject2D, AddRef, (), void), asCALL_THISCALL);
+    // const String& TileMapObject2D::GetName() const | File: ../Urho2D/TileMapDefs2D.h
+    engine->RegisterObjectMethod("TileMapObject2D", "const String& GetName() const", asMETHODPR(TileMapObject2D, GetName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TileMapObject2D", "const String& get_name() const", asMETHODPR(TileMapObject2D, GetName, () const, const String&), asCALL_THISCALL);
+    // unsigned TileMapObject2D::GetNumPoints() const | File: ../Urho2D/TileMapDefs2D.h
+    engine->RegisterObjectMethod("TileMapObject2D", "uint GetNumPoints() const", asMETHODPR(TileMapObject2D, GetNumPoints, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TileMapObject2D", "uint get_numPoints() const", asMETHODPR(TileMapObject2D, GetNumPoints, () const, unsigned), asCALL_THISCALL);
+    // TileMapObjectType2D TileMapObject2D::GetObjectType() const | File: ../Urho2D/TileMapDefs2D.h
+    engine->RegisterObjectMethod("TileMapObject2D", "TileMapObjectType2D GetObjectType() const", asMETHODPR(TileMapObject2D, GetObjectType, () const, TileMapObjectType2D), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TileMapObject2D", "TileMapObjectType2D get_objectType() const", asMETHODPR(TileMapObject2D, GetObjectType, () const, TileMapObjectType2D), asCALL_THISCALL);
+    // const Vector2& TileMapObject2D::GetPoint(unsigned index) const | File: ../Urho2D/TileMapDefs2D.h
+    engine->RegisterObjectMethod("TileMapObject2D", "const Vector2& GetPoint(uint) const", asMETHODPR(TileMapObject2D, GetPoint, (unsigned) const, const Vector2&), asCALL_THISCALL);
+    // const Vector2& TileMapObject2D::GetPosition() const | File: ../Urho2D/TileMapDefs2D.h
+    engine->RegisterObjectMethod("TileMapObject2D", "const Vector2& GetPosition() const", asMETHODPR(TileMapObject2D, GetPosition, () const, const Vector2&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TileMapObject2D", "const Vector2& get_position() const", asMETHODPR(TileMapObject2D, GetPosition, () const, const Vector2&), asCALL_THISCALL);
+    // const String& TileMapObject2D::GetProperty(const String& name) const | File: ../Urho2D/TileMapDefs2D.h
+    engine->RegisterObjectMethod("TileMapObject2D", "const String& GetProperty(const String&in) const", asMETHODPR(TileMapObject2D, GetProperty, (const String&) const, const String&), asCALL_THISCALL);
+    // const Vector2& TileMapObject2D::GetSize() const | File: ../Urho2D/TileMapDefs2D.h
+    engine->RegisterObjectMethod("TileMapObject2D", "const Vector2& GetSize() const", asMETHODPR(TileMapObject2D, GetSize, () const, const Vector2&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TileMapObject2D", "const Vector2& get_size() const", asMETHODPR(TileMapObject2D, GetSize, () const, const Vector2&), asCALL_THISCALL);
+    // bool TileMapObject2D::GetTileFlipX() const | File: ../Urho2D/TileMapDefs2D.h
+    engine->RegisterObjectMethod("TileMapObject2D", "bool GetTileFlipX() const", asMETHODPR(TileMapObject2D, GetTileFlipX, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TileMapObject2D", "bool get_tileFlipX() const", asMETHODPR(TileMapObject2D, GetTileFlipX, () const, bool), asCALL_THISCALL);
+    // bool TileMapObject2D::GetTileFlipY() const | File: ../Urho2D/TileMapDefs2D.h
+    engine->RegisterObjectMethod("TileMapObject2D", "bool GetTileFlipY() const", asMETHODPR(TileMapObject2D, GetTileFlipY, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TileMapObject2D", "bool get_tileFlipY() const", asMETHODPR(TileMapObject2D, GetTileFlipY, () const, bool), asCALL_THISCALL);
+    // unsigned TileMapObject2D::GetTileGid() const | File: ../Urho2D/TileMapDefs2D.h
+    engine->RegisterObjectMethod("TileMapObject2D", "uint GetTileGid() const", asMETHODPR(TileMapObject2D, GetTileGid, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TileMapObject2D", "uint get_tileGid() const", asMETHODPR(TileMapObject2D, GetTileGid, () const, unsigned), asCALL_THISCALL);
+    // Sprite2D* TileMapObject2D::GetTileSprite() const | File: ../Urho2D/TileMapDefs2D.h
+    engine->RegisterObjectMethod("TileMapObject2D", "Sprite2D@+ GetTileSprite() const", asMETHODPR(TileMapObject2D, GetTileSprite, () const, Sprite2D*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TileMapObject2D", "Sprite2D@+ get_tileSprite() const", asMETHODPR(TileMapObject2D, GetTileSprite, () const, Sprite2D*), asCALL_THISCALL);
+    // bool TileMapObject2D::GetTileSwapXY() const | File: ../Urho2D/TileMapDefs2D.h
+    engine->RegisterObjectMethod("TileMapObject2D", "bool GetTileSwapXY() const", asMETHODPR(TileMapObject2D, GetTileSwapXY, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TileMapObject2D", "bool get_tileSwapXY() const", asMETHODPR(TileMapObject2D, GetTileSwapXY, () const, bool), asCALL_THISCALL);
+    // const String& TileMapObject2D::GetType() const | File: ../Urho2D/TileMapDefs2D.h
+    engine->RegisterObjectMethod("TileMapObject2D", "const String& GetType() const", asMETHODPR(TileMapObject2D, GetType, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TileMapObject2D", "const String& get_type() const", asMETHODPR(TileMapObject2D, GetType, () const, const String&), asCALL_THISCALL);
+    // bool TileMapObject2D::HasProperty(const String& name) const | File: ../Urho2D/TileMapDefs2D.h
+    engine->RegisterObjectMethod("TileMapObject2D", "bool HasProperty(const String&in) const", asMETHODPR(TileMapObject2D, HasProperty, (const String&) const, bool), asCALL_THISCALL);
+    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
+    // Error: type "RefCount*" can not automatically bind
+    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("TileMapObject2D", "int Refs() const", asMETHODPR(TileMapObject2D, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TileMapObject2D", "int get_refs() const", asMETHODPR(TileMapObject2D, Refs, () const, int), asCALL_THISCALL);
+    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("TileMapObject2D", asBEHAVE_RELEASE, "void f()", asMETHODPR(TileMapObject2D, ReleaseRef, (), void), asCALL_THISCALL);
+    // TileMapObject2D::TileMapObject2D() | File: ../Urho2D/TileMapDefs2D.h
+    engine->RegisterObjectBehaviour("TileMapObject2D", asBEHAVE_FACTORY, "TileMapObject2D@+ f()", asFUNCTION(TileMapObject2D_TileMapObject2D_void), asCALL_CDECL);
+    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("TileMapObject2D", "int WeakRefs() const", asMETHODPR(TileMapObject2D, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TileMapObject2D", "int get_weakRefs() const", asMETHODPR(TileMapObject2D, WeakRefs, () const, int), asCALL_THISCALL);
+#ifdef REGISTER_MANUAL_PART_RefCounted
+    REGISTER_MANUAL_PART_RefCounted(TileMapObject2D, "TileMapObject2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_TileMapObject2D
+    REGISTER_MANUAL_PART_TileMapObject2D(TileMapObject2D, "TileMapObject2D")
+#endif
+    RegisterSubclass<RefCounted, TileMapObject2D>(engine, "RefCounted", "TileMapObject2D");
+#endif
+
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("Time", asBEHAVE_ADDREF, "void f()", asMETHODPR(Time, AddRef, (), void), asCALL_THISCALL);
     // void Time::BeginFrame(float timeStep) | File: ../Core/Timer.h
@@ -5830,6 +5686,16 @@ void ASRegisterGenerated_Members_T(asIScriptEngine* engine)
 #endif
     RegisterSubclass<Object, Time>(engine, "Object", "Time");
     RegisterSubclass<RefCounted, Time>(engine, "RefCounted", "Time");
+
+    // unsigned Timer::GetMSec(bool reset) | File: ../Core/Timer.h
+    engine->RegisterObjectMethod("Timer", "uint GetMSec(bool)", asMETHODPR(Timer, GetMSec, (bool), unsigned), asCALL_THISCALL);
+    // void Timer::Reset() | File: ../Core/Timer.h
+    engine->RegisterObjectMethod("Timer", "void Reset()", asMETHODPR(Timer, Reset, (), void), asCALL_THISCALL);
+    // Timer& Timer::operator=(const Timer&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<Timer>(engine, "Timer");
+#ifdef REGISTER_MANUAL_PART_Timer
+    REGISTER_MANUAL_PART_Timer(Timer, "Timer")
+#endif
 
 #ifdef URHO3D_URHO2D
     // void TmxFile2D::AddLayer(unsigned index, TmxLayer2D* layer) | File: ../Urho2D/TmxFile2D.h
@@ -6095,6 +5961,58 @@ void ASRegisterGenerated_Members_T(asIScriptEngine* engine)
     REGISTER_MANUAL_PART_TmxLayer2D(TmxLayer2D, "TmxLayer2D")
 #endif
     RegisterSubclass<RefCounted, TmxLayer2D>(engine, "RefCounted", "TmxLayer2D");
+#endif
+
+#ifdef URHO3D_URHO2D
+    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("TmxObjectGroup2D", asBEHAVE_ADDREF, "void f()", asMETHODPR(TmxObjectGroup2D, AddRef, (), void), asCALL_THISCALL);
+    // int TmxLayer2D::GetHeight() const | File: ../Urho2D/TmxFile2D.h
+    engine->RegisterObjectMethod("TmxObjectGroup2D", "int GetHeight() const", asMETHODPR(TmxObjectGroup2D, GetHeight, () const, int), asCALL_THISCALL);
+    // const String& TmxLayer2D::GetName() const | File: ../Urho2D/TmxFile2D.h
+    engine->RegisterObjectMethod("TmxObjectGroup2D", "const String& GetName() const", asMETHODPR(TmxObjectGroup2D, GetName, () const, const String&), asCALL_THISCALL);
+    // unsigned TmxObjectGroup2D::GetNumObjects() const | File: ../Urho2D/TmxFile2D.h
+    engine->RegisterObjectMethod("TmxObjectGroup2D", "uint GetNumObjects() const", asMETHODPR(TmxObjectGroup2D, GetNumObjects, () const, unsigned), asCALL_THISCALL);
+    // TileMapObject2D* TmxObjectGroup2D::GetObject(unsigned index) const | File: ../Urho2D/TmxFile2D.h
+    engine->RegisterObjectMethod("TmxObjectGroup2D", "TileMapObject2D@+ GetObject(uint) const", asMETHODPR(TmxObjectGroup2D, GetObject, (unsigned) const, TileMapObject2D*), asCALL_THISCALL);
+    // const String& TmxLayer2D::GetProperty(const String& name) const | File: ../Urho2D/TmxFile2D.h
+    engine->RegisterObjectMethod("TmxObjectGroup2D", "const String& GetProperty(const String&in) const", asMETHODPR(TmxObjectGroup2D, GetProperty, (const String&) const, const String&), asCALL_THISCALL);
+    // TmxFile2D* TmxLayer2D::GetTmxFile() const | File: ../Urho2D/TmxFile2D.h
+    engine->RegisterObjectMethod("TmxObjectGroup2D", "TmxFile2D@+ GetTmxFile() const", asMETHODPR(TmxObjectGroup2D, GetTmxFile, () const, TmxFile2D*), asCALL_THISCALL);
+    // TileMapLayerType2D TmxLayer2D::GetType() const | File: ../Urho2D/TmxFile2D.h
+    engine->RegisterObjectMethod("TmxObjectGroup2D", "TileMapLayerType2D GetType() const", asMETHODPR(TmxObjectGroup2D, GetType, () const, TileMapLayerType2D), asCALL_THISCALL);
+    // int TmxLayer2D::GetWidth() const | File: ../Urho2D/TmxFile2D.h
+    engine->RegisterObjectMethod("TmxObjectGroup2D", "int GetWidth() const", asMETHODPR(TmxObjectGroup2D, GetWidth, () const, int), asCALL_THISCALL);
+    // bool TmxLayer2D::HasProperty(const String& name) const | File: ../Urho2D/TmxFile2D.h
+    engine->RegisterObjectMethod("TmxObjectGroup2D", "bool HasProperty(const String&in) const", asMETHODPR(TmxObjectGroup2D, HasProperty, (const String&) const, bool), asCALL_THISCALL);
+    // bool TmxLayer2D::IsVisible() const | File: ../Urho2D/TmxFile2D.h
+    engine->RegisterObjectMethod("TmxObjectGroup2D", "bool IsVisible() const", asMETHODPR(TmxObjectGroup2D, IsVisible, () const, bool), asCALL_THISCALL);
+    // bool TmxObjectGroup2D::Load(const XMLElement& element, const TileMapInfo2D& info) | File: ../Urho2D/TmxFile2D.h
+    engine->RegisterObjectMethod("TmxObjectGroup2D", "bool Load(const XMLElement&in, const TileMapInfo2D&in)", asMETHODPR(TmxObjectGroup2D, Load, (const XMLElement&, const TileMapInfo2D&), bool), asCALL_THISCALL);
+    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
+    // Error: type "RefCount*" can not automatically bind
+    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("TmxObjectGroup2D", "int Refs() const", asMETHODPR(TmxObjectGroup2D, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TmxObjectGroup2D", "int get_refs() const", asMETHODPR(TmxObjectGroup2D, Refs, () const, int), asCALL_THISCALL);
+    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("TmxObjectGroup2D", asBEHAVE_RELEASE, "void f()", asMETHODPR(TmxObjectGroup2D, ReleaseRef, (), void), asCALL_THISCALL);
+    // void TmxObjectGroup2D::StoreObject(const XMLElement& objectElem, const SharedPtr<TileMapObject2D>& object, const TileMapInfo2D& info, bool isTile=false) | File: ../Urho2D/TmxFile2D.h
+    // Error: type "const SharedPtr<TileMapObject2D>&" can not automatically bind
+    // explicit TmxObjectGroup2D::TmxObjectGroup2D(TmxFile2D* tmxFile) | File: ../Urho2D/TmxFile2D.h
+    engine->RegisterObjectBehaviour("TmxObjectGroup2D", asBEHAVE_FACTORY, "TmxObjectGroup2D@+ f(TmxFile2D@+)", asFUNCTION(TmxObjectGroup2D_TmxObjectGroup2D_TmxFile2D), asCALL_CDECL);
+    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("TmxObjectGroup2D", "int WeakRefs() const", asMETHODPR(TmxObjectGroup2D, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TmxObjectGroup2D", "int get_weakRefs() const", asMETHODPR(TmxObjectGroup2D, WeakRefs, () const, int), asCALL_THISCALL);
+#ifdef REGISTER_MANUAL_PART_TmxLayer2D
+    REGISTER_MANUAL_PART_TmxLayer2D(TmxObjectGroup2D, "TmxObjectGroup2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_RefCounted
+    REGISTER_MANUAL_PART_RefCounted(TmxObjectGroup2D, "TmxObjectGroup2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_TmxObjectGroup2D
+    REGISTER_MANUAL_PART_TmxObjectGroup2D(TmxObjectGroup2D, "TmxObjectGroup2D")
+#endif
+    RegisterSubclass<TmxLayer2D, TmxObjectGroup2D>(engine, "TmxLayer2D", "TmxObjectGroup2D");
+    RegisterSubclass<RefCounted, TmxObjectGroup2D>(engine, "RefCounted", "TmxObjectGroup2D");
 #endif
 
 #ifdef URHO3D_URHO2D
@@ -6919,6 +6837,70 @@ void ASRegisterGenerated_Members_T(asIScriptEngine* engine)
     RegisterSubclass<Object, ToolTip>(engine, "Object", "ToolTip");
     RegisterSubclass<RefCounted, ToolTip>(engine, "RefCounted", "ToolTip");
 
+    // float TechniqueEntry::lodDistance_ | File: ../Graphics/Material.h
+    engine->RegisterObjectProperty("TechniqueEntry", "float lodDistance", offsetof(TechniqueEntry, lodDistance_));
+    // SharedPtr<Technique> TechniqueEntry::original_ | File: ../Graphics/Material.h
+    // Error: type "SharedPtr<Technique>" can not automatically bind
+    // MaterialQuality TechniqueEntry::qualityLevel_ | File: ../Graphics/Material.h
+    engine->RegisterObjectProperty("TechniqueEntry", "MaterialQuality qualityLevel", offsetof(TechniqueEntry, qualityLevel_));
+    // SharedPtr<Technique> TechniqueEntry::technique_ | File: ../Graphics/Material.h
+    // Error: type "SharedPtr<Technique>" can not automatically bind
+    // TechniqueEntry::TechniqueEntry(Technique* tech, MaterialQuality qualityLevel, float lodDistance) noexcept | File: ../Graphics/Material.h
+    engine->RegisterObjectBehaviour("TechniqueEntry", asBEHAVE_CONSTRUCT, "void f(Technique@+, MaterialQuality, float)", asFUNCTION(TechniqueEntry_TechniqueEntry_Technique_MaterialQuality_float), asCALL_CDECL_OBJFIRST);
+    // TechniqueEntry::~TechniqueEntry() noexcept=default | File: ../Graphics/Material.h
+    engine->RegisterObjectBehaviour("TechniqueEntry", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(TechniqueEntry_Destructor_TechniqueEntry_void), asCALL_CDECL_OBJFIRST);
+    // TechniqueEntry& TechniqueEntry::operator=(const TechniqueEntry&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<TechniqueEntry>(engine, "TechniqueEntry");
+#ifdef REGISTER_MANUAL_PART_TechniqueEntry
+    REGISTER_MANUAL_PART_TechniqueEntry(TechniqueEntry, "TechniqueEntry")
+#endif
+
+    // float TextureFrame::time_ | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectProperty("TextureFrame", "float time", offsetof(TextureFrame, time_));
+    // Rect TextureFrame::uv_ | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectProperty("TextureFrame", "Rect uv", offsetof(TextureFrame, uv_));
+    // TextureFrame::TextureFrame() | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectBehaviour("TextureFrame", asBEHAVE_FACTORY, "TextureFrame@+ f()", asFUNCTION(TextureFrame_TextureFrame_void), asCALL_CDECL);
+    // TextureFrame& TextureFrame::operator=(const TextureFrame&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<TextureFrame>(engine, "TextureFrame");
+    engine->RegisterObjectBehaviour("TextureFrame", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("TextureFrame", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
+#ifdef REGISTER_MANUAL_PART_TextureFrame
+    REGISTER_MANUAL_PART_TextureFrame(TextureFrame, "TextureFrame")
+#endif
+
+#ifdef URHO3D_URHO2D
+    // int TileMapInfo2D::height_ | File: ../Urho2D/TileMapDefs2D.h
+    engine->RegisterObjectProperty("TileMapInfo2D", "int height", offsetof(TileMapInfo2D, height_));
+    // Orientation2D TileMapInfo2D::orientation_ | File: ../Urho2D/TileMapDefs2D.h
+    engine->RegisterObjectProperty("TileMapInfo2D", "Orientation2D orientation", offsetof(TileMapInfo2D, orientation_));
+    // float TileMapInfo2D::tileHeight_ | File: ../Urho2D/TileMapDefs2D.h
+    engine->RegisterObjectProperty("TileMapInfo2D", "float tileHeight", offsetof(TileMapInfo2D, tileHeight_));
+    // float TileMapInfo2D::tileWidth_ | File: ../Urho2D/TileMapDefs2D.h
+    engine->RegisterObjectProperty("TileMapInfo2D", "float tileWidth", offsetof(TileMapInfo2D, tileWidth_));
+    // int TileMapInfo2D::width_ | File: ../Urho2D/TileMapDefs2D.h
+    engine->RegisterObjectProperty("TileMapInfo2D", "int width", offsetof(TileMapInfo2D, width_));
+    // Vector2 TileMapInfo2D::ConvertPosition(const Vector2& position) const | File: ../Urho2D/TileMapDefs2D.h
+    engine->RegisterObjectMethod("TileMapInfo2D", "Vector2 ConvertPosition(const Vector2&in) const", asMETHODPR(TileMapInfo2D, ConvertPosition, (const Vector2&) const, Vector2), asCALL_THISCALL);
+    // float TileMapInfo2D::GetMapHeight() const | File: ../Urho2D/TileMapDefs2D.h
+    engine->RegisterObjectMethod("TileMapInfo2D", "float GetMapHeight() const", asMETHODPR(TileMapInfo2D, GetMapHeight, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TileMapInfo2D", "float get_mapHeight() const", asMETHODPR(TileMapInfo2D, GetMapHeight, () const, float), asCALL_THISCALL);
+    // float TileMapInfo2D::GetMapWidth() const | File: ../Urho2D/TileMapDefs2D.h
+    engine->RegisterObjectMethod("TileMapInfo2D", "float GetMapWidth() const", asMETHODPR(TileMapInfo2D, GetMapWidth, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TileMapInfo2D", "float get_mapWidth() const", asMETHODPR(TileMapInfo2D, GetMapWidth, () const, float), asCALL_THISCALL);
+    // bool TileMapInfo2D::PositionToTileIndex(int& x, int& y, const Vector2& position) const | File: ../Urho2D/TileMapDefs2D.h
+    engine->RegisterObjectMethod("TileMapInfo2D", "bool PositionToTileIndex(int&, int&, const Vector2&in) const", asMETHODPR(TileMapInfo2D, PositionToTileIndex, (int&, int&, const Vector2&) const, bool), asCALL_THISCALL);
+    // Vector2 TileMapInfo2D::TileIndexToPosition(int x, int y) const | File: ../Urho2D/TileMapDefs2D.h
+    engine->RegisterObjectMethod("TileMapInfo2D", "Vector2 TileIndexToPosition(int, int) const", asMETHODPR(TileMapInfo2D, TileIndexToPosition, (int, int) const, Vector2), asCALL_THISCALL);
+    // TileMapInfo2D& TileMapInfo2D::operator=(const TileMapInfo2D&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<TileMapInfo2D>(engine, "TileMapInfo2D");
+    engine->RegisterObjectBehaviour("TileMapInfo2D", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("TileMapInfo2D", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
+#ifdef REGISTER_MANUAL_PART_TileMapInfo2D
+    REGISTER_MANUAL_PART_TileMapInfo2D(TileMapInfo2D, "TileMapInfo2D")
+#endif
+#endif
+
     // IntVector2 TouchState::delta_ | File: ../Input/Input.h
     engine->RegisterObjectProperty("TouchState", "IntVector2 delta", offsetof(TouchState, delta_));
     // IntVector2 TouchState::lastPosition_ | File: ../Input/Input.h
@@ -6940,24 +6922,6 @@ void ASRegisterGenerated_Members_T(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("TouchState", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
 #ifdef REGISTER_MANUAL_PART_TouchState
     REGISTER_MANUAL_PART_TouchState(TouchState, "TouchState")
-#endif
-
-    // float TechniqueEntry::lodDistance_ | File: ../Graphics/Material.h
-    engine->RegisterObjectProperty("TechniqueEntry", "float lodDistance", offsetof(TechniqueEntry, lodDistance_));
-    // SharedPtr<Technique> TechniqueEntry::original_ | File: ../Graphics/Material.h
-    // Error: type "SharedPtr<Technique>" can not automatically bind
-    // MaterialQuality TechniqueEntry::qualityLevel_ | File: ../Graphics/Material.h
-    engine->RegisterObjectProperty("TechniqueEntry", "MaterialQuality qualityLevel", offsetof(TechniqueEntry, qualityLevel_));
-    // SharedPtr<Technique> TechniqueEntry::technique_ | File: ../Graphics/Material.h
-    // Error: type "SharedPtr<Technique>" can not automatically bind
-    // TechniqueEntry::TechniqueEntry(Technique* tech, MaterialQuality qualityLevel, float lodDistance) noexcept | File: ../Graphics/Material.h
-    engine->RegisterObjectBehaviour("TechniqueEntry", asBEHAVE_CONSTRUCT, "void f(Technique@+, MaterialQuality, float)", asFUNCTION(TechniqueEntry_TechniqueEntry_Technique_MaterialQuality_float), asCALL_CDECL_OBJFIRST);
-    // TechniqueEntry::~TechniqueEntry() noexcept=default | File: ../Graphics/Material.h
-    engine->RegisterObjectBehaviour("TechniqueEntry", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(TechniqueEntry_Destructor_TechniqueEntry_void), asCALL_CDECL_OBJFIRST);
-    // TechniqueEntry& TechniqueEntry::operator=(const TechniqueEntry&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<TechniqueEntry>(engine, "TechniqueEntry");
-#ifdef REGISTER_MANUAL_PART_TechniqueEntry
-    REGISTER_MANUAL_PART_TechniqueEntry(TechniqueEntry, "TechniqueEntry")
 #endif
 
     // float TrailPoint::elapsedLength_ | File: ../Graphics/RibbonTrail.h
@@ -6982,6 +6946,42 @@ void ASRegisterGenerated_Members_T(asIScriptEngine* engine)
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<TrailPoint>(engine, "TrailPoint");
 #ifdef REGISTER_MANUAL_PART_TrailPoint
     REGISTER_MANUAL_PART_TrailPoint(TrailPoint, "TrailPoint")
+#endif
+
+#ifdef URHO3D_PHYSICS
+    // UniquePtr<btTriangleInfoMap> TriangleMeshData::infoMap_ | File: ../Physics/CollisionShape.h
+    // Error: type "UniquePtr<btTriangleInfoMap>" can not automatically bind
+    // UniquePtr<TriangleMeshInterface> TriangleMeshData::meshInterface_ | File: ../Physics/CollisionShape.h
+    // Error: type "UniquePtr<TriangleMeshInterface>" can not automatically bind
+    // UniquePtr<btBvhTriangleMeshShape> TriangleMeshData::shape_ | File: ../Physics/CollisionShape.h
+    // Error: type "UniquePtr<btBvhTriangleMeshShape>" can not automatically bind
+    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("TriangleMeshData", asBEHAVE_ADDREF, "void f()", asMETHODPR(TriangleMeshData, AddRef, (), void), asCALL_THISCALL);
+    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
+    // Error: type "RefCount*" can not automatically bind
+    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("TriangleMeshData", "int Refs() const", asMETHODPR(TriangleMeshData, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TriangleMeshData", "int get_refs() const", asMETHODPR(TriangleMeshData, Refs, () const, int), asCALL_THISCALL);
+    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("TriangleMeshData", asBEHAVE_RELEASE, "void f()", asMETHODPR(TriangleMeshData, ReleaseRef, (), void), asCALL_THISCALL);
+    // TriangleMeshData::TriangleMeshData(Model* model, unsigned lodLevel) | File: ../Physics/CollisionShape.h
+    engine->RegisterObjectBehaviour("TriangleMeshData", asBEHAVE_FACTORY, "TriangleMeshData@+ f(Model@+, uint)", asFUNCTION(TriangleMeshData_TriangleMeshData_Model_unsigned), asCALL_CDECL);
+    // explicit TriangleMeshData::TriangleMeshData(CustomGeometry* custom) | File: ../Physics/CollisionShape.h
+    engine->RegisterObjectBehaviour("TriangleMeshData", asBEHAVE_FACTORY, "TriangleMeshData@+ f(CustomGeometry@+)", asFUNCTION(TriangleMeshData_TriangleMeshData_CustomGeometry), asCALL_CDECL);
+    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("TriangleMeshData", "int WeakRefs() const", asMETHODPR(TriangleMeshData, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TriangleMeshData", "int get_weakRefs() const", asMETHODPR(TriangleMeshData, WeakRefs, () const, int), asCALL_THISCALL);
+#ifdef REGISTER_MANUAL_PART_CollisionGeometryData
+    REGISTER_MANUAL_PART_CollisionGeometryData(TriangleMeshData, "TriangleMeshData")
+#endif
+#ifdef REGISTER_MANUAL_PART_RefCounted
+    REGISTER_MANUAL_PART_RefCounted(TriangleMeshData, "TriangleMeshData")
+#endif
+#ifdef REGISTER_MANUAL_PART_TriangleMeshData
+    REGISTER_MANUAL_PART_TriangleMeshData(TriangleMeshData, "TriangleMeshData")
+#endif
+    RegisterSubclass<CollisionGeometryData, TriangleMeshData>(engine, "CollisionGeometryData", "TriangleMeshData");
+    RegisterSubclass<RefCounted, TriangleMeshData>(engine, "RefCounted", "TriangleMeshData");
 #endif
 
 }

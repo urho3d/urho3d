@@ -39,41 +39,6 @@ namespace Urho3D
 void FakeAddRef(void* ptr);
 void FakeReleaseRef(void* ptr);
 
-#ifdef URHO3D_URHO2D
-// const PODVector<Light*>& Drawable::GetLights() const | File: ../Graphics/Drawable.h
-static CScriptArray* Renderer2D_GetLights_void(Renderer2D* ptr)
-{
-    const PODVector<Light*>& result = ptr->GetLights();
-    return VectorToHandleArray(result, "Array<Light@>");
-}
-#endif
-
-#ifdef URHO3D_URHO2D
-// const PODVector<Light*>& Drawable::GetVertexLights() const | File: ../Graphics/Drawable.h
-static CScriptArray* Renderer2D_GetVertexLights_void(Renderer2D* ptr)
-{
-    const PODVector<Light*>& result = ptr->GetVertexLights();
-    return VectorToHandleArray(result, "Array<Light@>");
-}
-#endif
-
-#ifdef URHO3D_URHO2D
-// explicit Renderer2D::Renderer2D(Context* context) | File: ../Urho2D/Renderer2D.h
-static Renderer2D* Renderer2D_Renderer2D_Context()
-{
-    return new Renderer2D(GetScriptContext());
-}
-#endif
-
-#ifdef URHO3D_URHO2D
-// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Renderer2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Renderer2D* ptr, CScriptArray* exceptions, bool onlyUserData)
-{
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
-}
-#endif
-
 // Ray::Ray(const Vector3& origin, const Vector3& direction) noexcept | File: ../Math/Ray.h
 static void Ray_Ray_Vector3_Vector3(Ray* ptr, const Vector3 &origin, const Vector3 &direction)
 {
@@ -125,19 +90,6 @@ static RefCounted* RefCounted_RefCounted_void()
     return new RefCounted();
 }
 
-// explicit Renderer::Renderer(Context* context) | File: ../Graphics/Renderer.h
-static Renderer* Renderer_Renderer_Context()
-{
-    return new Renderer(GetScriptContext());
-}
-
-// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Renderer_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Renderer* ptr, CScriptArray* exceptions, bool onlyUserData)
-{
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
-}
-
 // SharedPtr<RenderPath> RenderPath::Clone() | File: ../Graphics/RenderPath.h
 static RenderPath* RenderPath_Clone_void(RenderPath* ptr)
 {
@@ -156,6 +108,54 @@ static RenderSurface* RenderSurface_RenderSurface_Texture(Texture *parentTexture
 {
     return new RenderSurface(parentTexture);
 }
+
+// explicit Renderer::Renderer(Context* context) | File: ../Graphics/Renderer.h
+static Renderer* Renderer_Renderer_Context()
+{
+    return new Renderer(GetScriptContext());
+}
+
+// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+static void Renderer_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Renderer* ptr, CScriptArray* exceptions, bool onlyUserData)
+{
+    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+}
+
+#ifdef URHO3D_URHO2D
+// const PODVector<Light*>& Drawable::GetLights() const | File: ../Graphics/Drawable.h
+static CScriptArray* Renderer2D_GetLights_void(Renderer2D* ptr)
+{
+    const PODVector<Light*>& result = ptr->GetLights();
+    return VectorToHandleArray(result, "Array<Light@>");
+}
+#endif
+
+#ifdef URHO3D_URHO2D
+// const PODVector<Light*>& Drawable::GetVertexLights() const | File: ../Graphics/Drawable.h
+static CScriptArray* Renderer2D_GetVertexLights_void(Renderer2D* ptr)
+{
+    const PODVector<Light*>& result = ptr->GetVertexLights();
+    return VectorToHandleArray(result, "Array<Light@>");
+}
+#endif
+
+#ifdef URHO3D_URHO2D
+// explicit Renderer2D::Renderer2D(Context* context) | File: ../Urho2D/Renderer2D.h
+static Renderer2D* Renderer2D_Renderer2D_Context()
+{
+    return new Renderer2D(GetScriptContext());
+}
+#endif
+
+#ifdef URHO3D_URHO2D
+// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+static void Renderer2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Renderer2D* ptr, CScriptArray* exceptions, bool onlyUserData)
+{
+    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+}
+#endif
 
 // explicit Resource::Resource(Context* context) | File: ../Resource/Resource.h
 static Resource* Resource_Resource_Context()
@@ -291,18 +291,6 @@ static void RayQueryResult_Destructor(RayQueryResult* ptr)
     ptr->~RayQueryResult();
 }
 
-// ReplicationState::~ReplicationState() | Implicitly-declared 
-static void ReplicationState_Destructor(ReplicationState* ptr)
-{
-    ptr->~ReplicationState();
-}
-
-// ResourceGroup::~ResourceGroup() | Implicitly-declared 
-static void ResourceGroup_Destructor(ResourceGroup* ptr)
-{
-    ptr->~ResourceGroup();
-}
-
 // RefCount::~RefCount() | File: ../Container/RefCounted.h
 static void RefCount_Destructor_RefCount_void(RefCount* ptr)
 {
@@ -327,6 +315,18 @@ static void RenderPathCommand_Destructor(RenderPathCommand* ptr)
 static void RenderTargetInfo_Destructor(RenderTargetInfo* ptr)
 {
     ptr->~RenderTargetInfo();
+}
+
+// ReplicationState::~ReplicationState() | Implicitly-declared 
+static void ReplicationState_Destructor(ReplicationState* ptr)
+{
+    ptr->~ReplicationState();
+}
+
+// ResourceGroup::~ResourceGroup() | Implicitly-declared 
+static void ResourceGroup_Destructor(ResourceGroup* ptr)
+{
+    ptr->~ResourceGroup();
 }
 
 // explicit ResourceRef::ResourceRef(StringHash type) | File: ../Core/Variant.h
@@ -373,442 +373,6 @@ static void ResourceRefList_Destructor(ResourceRefList* ptr)
 
 void ASRegisterGenerated_Members_R(asIScriptEngine* engine)
 {
-#ifdef URHO3D_URHO2D
-    // void Renderer2D::AddDrawable(Drawable2D* drawable) | File: ../Urho2D/Renderer2D.h
-    engine->RegisterObjectMethod("Renderer2D", "void AddDrawable(Drawable2D@+)", asMETHODPR(Renderer2D, AddDrawable, (Drawable2D*), void), asCALL_THISCALL);
-    // void Drawable::AddLight(Light* light) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "void AddLight(Light@+)", asMETHODPR(Renderer2D, AddLight, (Light*), void), asCALL_THISCALL);
-    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("Renderer2D", asBEHAVE_ADDREF, "void f()", asMETHODPR(Renderer2D, AddRef, (), void), asCALL_THISCALL);
-    // void Component::AddReplicationState(ComponentReplicationState* state) | File: ../Scene/Component.h
-    // Error: type "ComponentReplicationState*" can not automatically bind
-    // void Drawable::AddVertexLight(Light* light) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "void AddVertexLight(Light@+)", asMETHODPR(Renderer2D, AddVertexLight, (Light*), void), asCALL_THISCALL);
-    // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Renderer2D", "void AllocateNetworkState()", asMETHODPR(Renderer2D, AllocateNetworkState, (), void), asCALL_THISCALL);
-    // virtual void Serializable::ApplyAttributes() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Renderer2D", "void ApplyAttributes()", asMETHODPR(Renderer2D, ApplyAttributes, (), void), asCALL_THISCALL);
-    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
-    // Not registered because template
-    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
-    // Not registered because template
-    // bool Renderer2D::CheckVisibility(Drawable2D* drawable) const | File: ../Urho2D/Renderer2D.h
-    engine->RegisterObjectMethod("Renderer2D", "bool CheckVisibility(Drawable2D@+) const", asMETHODPR(Renderer2D, CheckVisibility, (Drawable2D*) const, bool), asCALL_THISCALL);
-    // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("Renderer2D", "void CleanupConnection(Connection@+)", asMETHODPR(Renderer2D, CleanupConnection, (Connection*), void), asCALL_THISCALL);
-    // void Drawable::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(Renderer2D, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
-    // virtual bool Drawable::DrawOcclusion(OcclusionBuffer* buffer) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "bool DrawOcclusion(OcclusionBuffer@+)", asMETHODPR(Renderer2D, DrawOcclusion, (OcclusionBuffer*), bool), asCALL_THISCALL);
-    // bool Animatable::GetAnimationEnabled() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Renderer2D", "bool GetAnimationEnabled() const", asMETHODPR(Renderer2D, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "bool get_animationEnabled() const", asMETHODPR(Renderer2D, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
-    // Variant Serializable::GetAttribute(unsigned index) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Renderer2D", "Variant GetAttribute(uint) const", asMETHODPR(Renderer2D, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "Variant get_attributes(uint) const", asMETHODPR(Renderer2D, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
-    // Variant Serializable::GetAttribute(const String& name) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Renderer2D", "Variant GetAttribute(const String&in) const", asMETHODPR(Renderer2D, GetAttribute, (const String&) const, Variant), asCALL_THISCALL);
-    // ValueAnimation* Animatable::GetAttributeAnimation(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Renderer2D", "ValueAnimation@+ GetAttributeAnimation(const String&in) const", asMETHODPR(Renderer2D, GetAttributeAnimation, (const String&) const, ValueAnimation*), asCALL_THISCALL);
-    // float Animatable::GetAttributeAnimationSpeed(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Renderer2D", "float GetAttributeAnimationSpeed(const String&in) const", asMETHODPR(Renderer2D, GetAttributeAnimationSpeed, (const String&) const, float), asCALL_THISCALL);
-    // float Animatable::GetAttributeAnimationTime(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Renderer2D", "float GetAttributeAnimationTime(const String&in) const", asMETHODPR(Renderer2D, GetAttributeAnimationTime, (const String&) const, float), asCALL_THISCALL);
-    // WrapMode Animatable::GetAttributeAnimationWrapMode(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Renderer2D", "WrapMode GetAttributeAnimationWrapMode(const String&in) const", asMETHODPR(Renderer2D, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), asCALL_THISCALL);
-    // Variant Serializable::GetAttributeDefault(unsigned index) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Renderer2D", "Variant GetAttributeDefault(uint) const", asMETHODPR(Renderer2D, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "Variant get_attributeDefaults(uint) const", asMETHODPR(Renderer2D, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
-    // Variant Serializable::GetAttributeDefault(const String& name) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Renderer2D", "Variant GetAttributeDefault(const String&in) const", asMETHODPR(Renderer2D, GetAttributeDefault, (const String&) const, Variant), asCALL_THISCALL);
-    // virtual const Vector<AttributeInfo>* Serializable::GetAttributes() const | File: ../Scene/Serializable.h
-    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
-    // const Vector<SourceBatch>& Drawable::GetBatches() const | File: ../Graphics/Drawable.h
-    // Error: type "const Vector<SourceBatch>&" can not automatically bind
-    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Renderer2D", "bool GetBlockEvents() const", asMETHODPR(Renderer2D, GetBlockEvents, () const, bool), asCALL_THISCALL);
-    // const BoundingBox& Drawable::GetBoundingBox() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "const BoundingBox& GetBoundingBox() const", asMETHODPR(Renderer2D, GetBoundingBox, () const, const BoundingBox&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "const BoundingBox& get_boundingBox() const", asMETHODPR(Renderer2D, GetBoundingBox, () const, const BoundingBox&), asCALL_THISCALL);
-    // bool Drawable::GetCastShadows() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "bool GetCastShadows() const", asMETHODPR(Renderer2D, GetCastShadows, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "bool get_castShadows() const", asMETHODPR(Renderer2D, GetCastShadows, () const, bool), asCALL_THISCALL);
-    // const String& Object::GetCategory() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Renderer2D", "const String& GetCategory() const", asMETHODPR(Renderer2D, GetCategory, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "const String& get_category() const", asMETHODPR(Renderer2D, GetCategory, () const, const String&), asCALL_THISCALL);
-    // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("Renderer2D", "Component@+ GetComponent(StringHash) const", asMETHODPR(Renderer2D, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
-    // template<class T> T*  Component::GetComponent() const | File: ../Scene/Component.h
-    // Not registered because template
-    // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
-    // Error: type "PODVector<Component*>&" can not automatically bind
-    // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
-    // Not registered because template
-    // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
-    // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
-    // Error: type "PODVector<Node*>&" can not automatically bind
-    // float Drawable::GetDistance() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "float GetDistance() const", asMETHODPR(Renderer2D, GetDistance, () const, float), asCALL_THISCALL);
-    // unsigned char Drawable::GetDrawableFlags() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "uint8 GetDrawableFlags() const", asMETHODPR(Renderer2D, GetDrawableFlags, () const, unsigned char), asCALL_THISCALL);
-    // float Drawable::GetDrawDistance() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "float GetDrawDistance() const", asMETHODPR(Renderer2D, GetDrawDistance, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "float get_drawDistance() const", asMETHODPR(Renderer2D, GetDrawDistance, () const, float), asCALL_THISCALL);
-    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Renderer2D", "VariantMap& GetEventDataMap() const", asMETHODPR(Renderer2D, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
-    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // Object* Object::GetEventSender() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Renderer2D", "Object@+ GetEventSender() const", asMETHODPR(Renderer2D, GetEventSender, () const, Object*), asCALL_THISCALL);
-    // Light* Drawable::GetFirstLight() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "Light@+ GetFirstLight() const", asMETHODPR(Renderer2D, GetFirstLight, () const, Light*), asCALL_THISCALL);
-    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Renderer2D", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(Renderer2D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "const Variant& get_globalVar(StringHash) const", asMETHODPR(Renderer2D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Renderer2D", "const VariantMap& GetGlobalVars() const", asMETHODPR(Renderer2D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "const VariantMap& get_globalVars() const", asMETHODPR(Renderer2D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    // unsigned Component::GetID() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("Renderer2D", "uint GetID() const", asMETHODPR(Renderer2D, GetID, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "uint get_id() const", asMETHODPR(Renderer2D, GetID, () const, unsigned), asCALL_THISCALL);
-    // bool Serializable::GetInterceptNetworkUpdate(const String& attributeName) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Renderer2D", "bool GetInterceptNetworkUpdate(const String&in) const", asMETHODPR(Renderer2D, GetInterceptNetworkUpdate, (const String&) const, bool), asCALL_THISCALL);
-    // unsigned Drawable::GetLightMask() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "uint GetLightMask() const", asMETHODPR(Renderer2D, GetLightMask, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "uint get_lightMask() const", asMETHODPR(Renderer2D, GetLightMask, () const, unsigned), asCALL_THISCALL);
-    // const PODVector<Light*>& Drawable::GetLights() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "Array<Light@>@ GetLights() const", asFUNCTION(Renderer2D_GetLights_void), asCALL_CDECL_OBJFIRST);
-    // float Drawable::GetLodBias() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "float GetLodBias() const", asMETHODPR(Renderer2D, GetLodBias, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "float get_lodBias() const", asMETHODPR(Renderer2D, GetLodBias, () const, float), asCALL_THISCALL);
-    // float Drawable::GetLodDistance() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "float GetLodDistance() const", asMETHODPR(Renderer2D, GetLodDistance, () const, float), asCALL_THISCALL);
-    // virtual Geometry* Drawable::GetLodGeometry(unsigned batchIndex, unsigned level) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "Geometry@+ GetLodGeometry(uint, uint)", asMETHODPR(Renderer2D, GetLodGeometry, (unsigned, unsigned), Geometry*), asCALL_THISCALL);
-    // Material* Renderer2D::GetMaterial(Texture2D* texture, BlendMode blendMode) | File: ../Urho2D/Renderer2D.h
-    engine->RegisterObjectMethod("Renderer2D", "Material@+ GetMaterial(Texture2D@+, BlendMode)", asMETHODPR(Renderer2D, GetMaterial, (Texture2D*, BlendMode), Material*), asCALL_THISCALL);
-    // unsigned Drawable::GetMaxLights() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "uint GetMaxLights() const", asMETHODPR(Renderer2D, GetMaxLights, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "uint get_maxLights() const", asMETHODPR(Renderer2D, GetMaxLights, () const, unsigned), asCALL_THISCALL);
-    // float Drawable::GetMaxZ() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "float GetMaxZ() const", asMETHODPR(Renderer2D, GetMaxZ, () const, float), asCALL_THISCALL);
-    // float Drawable::GetMinZ() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "float GetMinZ() const", asMETHODPR(Renderer2D, GetMinZ, () const, float), asCALL_THISCALL);
-    // virtual const Vector<AttributeInfo>* Serializable::GetNetworkAttributes() const | File: ../Scene/Serializable.h
-    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
-    // NetworkState* Serializable::GetNetworkState() const | File: ../Scene/Serializable.h
-    // Error: type "NetworkState*" can not automatically bind
-    // Node* Component::GetNode() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("Renderer2D", "Node@+ GetNode() const", asMETHODPR(Renderer2D, GetNode, () const, Node*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "Node@+ get_node() const", asMETHODPR(Renderer2D, GetNode, () const, Node*), asCALL_THISCALL);
-    // unsigned Serializable::GetNumAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Renderer2D", "uint GetNumAttributes() const", asMETHODPR(Renderer2D, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "uint get_numAttributes() const", asMETHODPR(Renderer2D, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
-    // unsigned Serializable::GetNumNetworkAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Renderer2D", "uint GetNumNetworkAttributes() const", asMETHODPR(Renderer2D, GetNumNetworkAttributes, () const, unsigned), asCALL_THISCALL);
-    // virtual unsigned Drawable::GetNumOccluderTriangles() | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "uint GetNumOccluderTriangles()", asMETHODPR(Renderer2D, GetNumOccluderTriangles, (), unsigned), asCALL_THISCALL);
-    // ObjectAnimation* Animatable::GetObjectAnimation() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Renderer2D", "ObjectAnimation@+ GetObjectAnimation() const", asMETHODPR(Renderer2D, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "ObjectAnimation@+ get_objectAnimation() const", asMETHODPR(Renderer2D, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
-    // ResourceRef Animatable::GetObjectAnimationAttr() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Renderer2D", "ResourceRef GetObjectAnimationAttr() const", asMETHODPR(Renderer2D, GetObjectAnimationAttr, () const, ResourceRef), asCALL_THISCALL);
-    // Octant* Drawable::GetOctant() const | File: ../Graphics/Drawable.h
-    // Error: type "Octant" can not automatically bind bacause have @nobind mark
-    // Scene* Component::GetScene() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("Renderer2D", "Scene@+ GetScene() const", asMETHODPR(Renderer2D, GetScene, () const, Scene*), asCALL_THISCALL);
-    // float Drawable::GetShadowDistance() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "float GetShadowDistance() const", asMETHODPR(Renderer2D, GetShadowDistance, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "float get_shadowDistance() const", asMETHODPR(Renderer2D, GetShadowDistance, () const, float), asCALL_THISCALL);
-    // unsigned Drawable::GetShadowMask() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "uint GetShadowMask() const", asMETHODPR(Renderer2D, GetShadowMask, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "uint get_shadowMask() const", asMETHODPR(Renderer2D, GetShadowMask, () const, unsigned), asCALL_THISCALL);
-    // float Drawable::GetSortValue() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "float GetSortValue() const", asMETHODPR(Renderer2D, GetSortValue, () const, float), asCALL_THISCALL);
-    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Renderer2D", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Renderer2D, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
-    // Not registered because template
-    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Renderer2D", "StringHash GetType() const", asMETHODPR(Renderer2D, GetType, () const, StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "StringHash get_type() const", asMETHODPR(Renderer2D, GetType, () const, StringHash), asCALL_THISCALL);
-    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Renderer2D", "const String& GetTypeName() const", asMETHODPR(Renderer2D, GetTypeName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "const String& get_typeName() const", asMETHODPR(Renderer2D, GetTypeName, () const, const String&), asCALL_THISCALL);
-    // UpdateGeometryType Renderer2D::GetUpdateGeometryType() override | File: ../Urho2D/Renderer2D.h
-    engine->RegisterObjectMethod("Renderer2D", "UpdateGeometryType GetUpdateGeometryType()", asMETHODPR(Renderer2D, GetUpdateGeometryType, (), UpdateGeometryType), asCALL_THISCALL);
-    // const PODVector<Light*>& Drawable::GetVertexLights() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "Array<Light@>@ GetVertexLights() const", asFUNCTION(Renderer2D_GetVertexLights_void), asCALL_CDECL_OBJFIRST);
-    // unsigned Drawable::GetViewMask() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "uint GetViewMask() const", asMETHODPR(Renderer2D, GetViewMask, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "uint get_viewMask() const", asMETHODPR(Renderer2D, GetViewMask, () const, unsigned), asCALL_THISCALL);
-    // const BoundingBox& Drawable::GetWorldBoundingBox() | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "const BoundingBox& GetWorldBoundingBox()", asMETHODPR(Renderer2D, GetWorldBoundingBox, (), const BoundingBox&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "const BoundingBox& get_worldBoundingBox()", asMETHODPR(Renderer2D, GetWorldBoundingBox, (), const BoundingBox&), asCALL_THISCALL);
-    // Zone* Drawable::GetZone() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "Zone@+ GetZone() const", asMETHODPR(Renderer2D, GetZone, () const, Zone*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "Zone@+ get_zone() const", asMETHODPR(Renderer2D, GetZone, () const, Zone*), asCALL_THISCALL);
-    // unsigned Drawable::GetZoneMask() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "uint GetZoneMask() const", asMETHODPR(Renderer2D, GetZoneMask, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "uint get_zoneMask() const", asMETHODPR(Renderer2D, GetZoneMask, () const, unsigned), asCALL_THISCALL);
-    // bool Drawable::HasBasePass(unsigned batchIndex) const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "bool HasBasePass(uint) const", asMETHODPR(Renderer2D, HasBasePass, (unsigned) const, bool), asCALL_THISCALL);
-    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Renderer2D", "bool HasEventHandlers() const", asMETHODPR(Renderer2D, HasEventHandlers, () const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Renderer2D", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(Renderer2D, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Renderer2D", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(Renderer2D, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
-    // bool Component::IsEnabled() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("Renderer2D", "bool IsEnabled() const", asMETHODPR(Renderer2D, IsEnabled, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "bool get_enabled() const", asMETHODPR(Renderer2D, IsEnabled, () const, bool), asCALL_THISCALL);
-    // bool Component::IsEnabledEffective() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("Renderer2D", "bool IsEnabledEffective() const", asMETHODPR(Renderer2D, IsEnabledEffective, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "bool get_enabledEffective() const", asMETHODPR(Renderer2D, IsEnabledEffective, () const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Renderer2D", "bool IsInstanceOf(StringHash) const", asMETHODPR(Renderer2D, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
-    // Not registered because template
-    // bool Drawable::IsInView() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "bool IsInView() const", asMETHODPR(Renderer2D, IsInView, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "bool get_inView() const", asMETHODPR(Renderer2D, IsInView, () const, bool), asCALL_THISCALL);
-    // bool Drawable::IsInView(Camera* camera) const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "bool IsInView(Camera@+) const", asMETHODPR(Renderer2D, IsInView, (Camera*) const, bool), asCALL_THISCALL);
-    // bool Drawable::IsInView(const FrameInfo& frame, bool anyCamera=false) const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "bool IsInView(const FrameInfo&in, bool = false) const", asMETHODPR(Renderer2D, IsInView, (const FrameInfo&, bool) const, bool), asCALL_THISCALL);
-    // bool Drawable::IsOccludee() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "bool IsOccludee() const", asMETHODPR(Renderer2D, IsOccludee, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "bool get_occludee() const", asMETHODPR(Renderer2D, IsOccludee, () const, bool), asCALL_THISCALL);
-    // bool Drawable::IsOccluder() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "bool IsOccluder() const", asMETHODPR(Renderer2D, IsOccluder, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "bool get_occluder() const", asMETHODPR(Renderer2D, IsOccluder, () const, bool), asCALL_THISCALL);
-    // bool Component::IsReplicated() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("Renderer2D", "bool IsReplicated() const", asMETHODPR(Renderer2D, IsReplicated, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "bool get_replicated() const", asMETHODPR(Renderer2D, IsReplicated, () const, bool), asCALL_THISCALL);
-    // bool Serializable::IsTemporary() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Renderer2D", "bool IsTemporary() const", asMETHODPR(Renderer2D, IsTemporary, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "bool get_temporary() const", asMETHODPR(Renderer2D, IsTemporary, () const, bool), asCALL_THISCALL);
-    // bool Drawable::IsZoneDirty() const | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "bool IsZoneDirty() const", asMETHODPR(Renderer2D, IsZoneDirty, () const, bool), asCALL_THISCALL);
-    // void Drawable::LimitLights() | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "void LimitLights()", asMETHODPR(Renderer2D, LimitLights, (), void), asCALL_THISCALL);
-    // void Drawable::LimitVertexLights(bool removeConvertedLights) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "void LimitVertexLights(bool)", asMETHODPR(Renderer2D, LimitVertexLights, (bool), void), asCALL_THISCALL);
-    // virtual bool Serializable::Load(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Renderer2D", "bool Load(Deserializer&)", asMETHODPR(Renderer2D, Load, (Deserializer&), bool), asCALL_THISCALL);
-    // bool Animatable::LoadJSON(const JSONValue& source) override | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Renderer2D", "bool LoadJSON(const JSONValue&in)", asMETHODPR(Renderer2D, LoadJSON, (const JSONValue&), bool), asCALL_THISCALL);
-    // bool Animatable::LoadXML(const XMLElement& source) override | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Renderer2D", "bool LoadXML(const XMLElement&in)", asMETHODPR(Renderer2D, LoadXML, (const XMLElement&), bool), asCALL_THISCALL);
-    // void Drawable::MarkForUpdate() | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "void MarkForUpdate()", asMETHODPR(Renderer2D, MarkForUpdate, (), void), asCALL_THISCALL);
-    // void Drawable::MarkInView(const FrameInfo& frame) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "void MarkInView(const FrameInfo&in)", asMETHODPR(Renderer2D, MarkInView, (const FrameInfo&), void), asCALL_THISCALL);
-    // void Drawable::MarkInView(unsigned frameNumber) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "void MarkInView(uint)", asMETHODPR(Renderer2D, MarkInView, (unsigned), void), asCALL_THISCALL);
-    // void Component::MarkNetworkUpdate() override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("Renderer2D", "void MarkNetworkUpdate()", asMETHODPR(Renderer2D, MarkNetworkUpdate, (), void), asCALL_THISCALL);
-    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Renderer2D", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(Renderer2D, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
-    // virtual void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Renderer2D", "void OnGetAttribute(const AttributeInfo&in, Variant&) const", asMETHODPR(Renderer2D, OnGetAttribute, (const AttributeInfo&, Variant&) const, void), asCALL_THISCALL);
-    // virtual void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Renderer2D", "void OnSetAttribute(const AttributeInfo&in, const Variant&in)", asMETHODPR(Renderer2D, OnSetAttribute, (const AttributeInfo&, const Variant&), void), asCALL_THISCALL);
-    // void Drawable::OnSetEnabled() override | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "void OnSetEnabled()", asMETHODPR(Renderer2D, OnSetEnabled, (), void), asCALL_THISCALL);
-    // void Component::PrepareNetworkUpdate() | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("Renderer2D", "void PrepareNetworkUpdate()", asMETHODPR(Renderer2D, PrepareNetworkUpdate, (), void), asCALL_THISCALL);
-    // void Renderer2D::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results) override | File: ../Urho2D/Renderer2D.h
-    // Error: type "RayOctreeQuery" can not automatically bind bacause have @nobind mark
-    // bool Serializable::ReadDeltaUpdate(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Renderer2D", "bool ReadDeltaUpdate(Deserializer&)", asMETHODPR(Renderer2D, ReadDeltaUpdate, (Deserializer&), bool), asCALL_THISCALL);
-    // bool Serializable::ReadLatestDataUpdate(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Renderer2D", "bool ReadLatestDataUpdate(Deserializer&)", asMETHODPR(Renderer2D, ReadLatestDataUpdate, (Deserializer&), bool), asCALL_THISCALL);
-    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
-    // Error: type "RefCount*" can not automatically bind
-    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("Renderer2D", "int Refs() const", asMETHODPR(Renderer2D, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "int get_refs() const", asMETHODPR(Renderer2D, Refs, () const, int), asCALL_THISCALL);
-    // static void Renderer2D::RegisterObject(Context* context) | File: ../Urho2D/Renderer2D.h
-    // Context can be used as firs parameter of constructors only
-    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("Renderer2D", asBEHAVE_RELEASE, "void f()", asMETHODPR(Renderer2D, ReleaseRef, (), void), asCALL_THISCALL);
-    // void Component::Remove() | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("Renderer2D", "void Remove()", asMETHODPR(Renderer2D, Remove, (), void), asCALL_THISCALL);
-    // void Animatable::RemoveAttributeAnimation(const String& name) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Renderer2D", "void RemoveAttributeAnimation(const String&in)", asMETHODPR(Renderer2D, RemoveAttributeAnimation, (const String&), void), asCALL_THISCALL);
-    // void Renderer2D::RemoveDrawable(Drawable2D* drawable) | File: ../Urho2D/Renderer2D.h
-    engine->RegisterObjectMethod("Renderer2D", "void RemoveDrawable(Drawable2D@+)", asMETHODPR(Renderer2D, RemoveDrawable, (Drawable2D*), void), asCALL_THISCALL);
-    // void Serializable::RemoveInstanceDefault() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Renderer2D", "void RemoveInstanceDefault()", asMETHODPR(Renderer2D, RemoveInstanceDefault, (), void), asCALL_THISCALL);
-    // void Animatable::RemoveObjectAnimation() | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Renderer2D", "void RemoveObjectAnimation()", asMETHODPR(Renderer2D, RemoveObjectAnimation, (), void), asCALL_THISCALL);
-    // explicit Renderer2D::Renderer2D(Context* context) | File: ../Urho2D/Renderer2D.h
-    engine->RegisterObjectBehaviour("Renderer2D", asBEHAVE_FACTORY, "Renderer2D@+ f()", asFUNCTION(Renderer2D_Renderer2D_Context), asCALL_CDECL);
-    // void Serializable::ResetToDefault() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Renderer2D", "void ResetToDefault()", asMETHODPR(Renderer2D, ResetToDefault, (), void), asCALL_THISCALL);
-    // bool Component::Save(Serializer& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("Renderer2D", "bool Save(Serializer&) const", asMETHODPR(Renderer2D, Save, (Serializer&) const, bool), asCALL_THISCALL);
-    // virtual bool Serializable::SaveDefaultAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Renderer2D", "bool SaveDefaultAttributes() const", asMETHODPR(Renderer2D, SaveDefaultAttributes, () const, bool), asCALL_THISCALL);
-    // bool Component::SaveJSON(JSONValue& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("Renderer2D", "bool SaveJSON(JSONValue&) const", asMETHODPR(Renderer2D, SaveJSON, (JSONValue&) const, bool), asCALL_THISCALL);
-    // bool Component::SaveXML(XMLElement& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("Renderer2D", "bool SaveXML(XMLElement&) const", asMETHODPR(Renderer2D, SaveXML, (XMLElement&) const, bool), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Renderer2D", "void SendEvent(StringHash)", asMETHODPR(Renderer2D, SendEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Renderer2D", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(Renderer2D, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
-    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
-    // Not registered because template
-    // void Animatable::SetAnimationEnabled(bool enable) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Renderer2D", "void SetAnimationEnabled(bool)", asMETHODPR(Renderer2D, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "void set_animationEnabled(bool)", asMETHODPR(Renderer2D, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
-    // void Animatable::SetAnimationTime(float time) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Renderer2D", "void SetAnimationTime(float)", asMETHODPR(Renderer2D, SetAnimationTime, (float), void), asCALL_THISCALL);
-    // bool Serializable::SetAttribute(unsigned index, const Variant& value) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Renderer2D", "bool SetAttribute(uint, const Variant&in)", asMETHODPR(Renderer2D, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "bool set_attributes(uint, const Variant&in)", asMETHODPR(Renderer2D, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
-    // bool Serializable::SetAttribute(const String& name, const Variant& value) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Renderer2D", "bool SetAttribute(const String&in, const Variant&in)", asMETHODPR(Renderer2D, SetAttribute, (const String&, const Variant&), bool), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode=WM_LOOP, float speed=1.0f) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Renderer2D", "void SetAttributeAnimation(const String&in, ValueAnimation@+, WrapMode = WM_LOOP, float = 1.0f)", asMETHODPR(Renderer2D, SetAttributeAnimation, (const String&, ValueAnimation*, WrapMode, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationSpeed(const String& name, float speed) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Renderer2D", "void SetAttributeAnimationSpeed(const String&in, float)", asMETHODPR(Renderer2D, SetAttributeAnimationSpeed, (const String&, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationTime(const String& name, float time) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Renderer2D", "void SetAttributeAnimationTime(const String&in, float)", asMETHODPR(Renderer2D, SetAttributeAnimationTime, (const String&, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationWrapMode(const String& name, WrapMode wrapMode) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Renderer2D", "void SetAttributeAnimationWrapMode(const String&in, WrapMode)", asMETHODPR(Renderer2D, SetAttributeAnimationWrapMode, (const String&, WrapMode), void), asCALL_THISCALL);
-    // void Drawable::SetBasePass(unsigned batchIndex) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "void SetBasePass(uint)", asMETHODPR(Renderer2D, SetBasePass, (unsigned), void), asCALL_THISCALL);
-    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Renderer2D", "void SetBlockEvents(bool)", asMETHODPR(Renderer2D, SetBlockEvents, (bool), void), asCALL_THISCALL);
-    // void Drawable::SetCastShadows(bool enable) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "void SetCastShadows(bool)", asMETHODPR(Renderer2D, SetCastShadows, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "void set_castShadows(bool)", asMETHODPR(Renderer2D, SetCastShadows, (bool), void), asCALL_THISCALL);
-    // void Drawable::SetDrawDistance(float distance) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "void SetDrawDistance(float)", asMETHODPR(Renderer2D, SetDrawDistance, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "void set_drawDistance(float)", asMETHODPR(Renderer2D, SetDrawDistance, (float), void), asCALL_THISCALL);
-    // void Component::SetEnabled(bool enable) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("Renderer2D", "void SetEnabled(bool)", asMETHODPR(Renderer2D, SetEnabled, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "void set_enabled(bool)", asMETHODPR(Renderer2D, SetEnabled, (bool), void), asCALL_THISCALL);
-    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Renderer2D", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(Renderer2D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(Renderer2D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    // void Serializable::SetInstanceDefault(bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Renderer2D", "void SetInstanceDefault(bool)", asMETHODPR(Renderer2D, SetInstanceDefault, (bool), void), asCALL_THISCALL);
-    // void Serializable::SetInterceptNetworkUpdate(const String& attributeName, bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Renderer2D", "void SetInterceptNetworkUpdate(const String&in, bool)", asMETHODPR(Renderer2D, SetInterceptNetworkUpdate, (const String&, bool), void), asCALL_THISCALL);
-    // void Drawable::SetLightMask(unsigned mask) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "void SetLightMask(uint)", asMETHODPR(Renderer2D, SetLightMask, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "void set_lightMask(uint)", asMETHODPR(Renderer2D, SetLightMask, (unsigned), void), asCALL_THISCALL);
-    // void Drawable::SetLodBias(float bias) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "void SetLodBias(float)", asMETHODPR(Renderer2D, SetLodBias, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "void set_lodBias(float)", asMETHODPR(Renderer2D, SetLodBias, (float), void), asCALL_THISCALL);
-    // void Drawable::SetMaxLights(unsigned num) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "void SetMaxLights(uint)", asMETHODPR(Renderer2D, SetMaxLights, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "void set_maxLights(uint)", asMETHODPR(Renderer2D, SetMaxLights, (unsigned), void), asCALL_THISCALL);
-    // void Drawable::SetMinMaxZ(float minZ, float maxZ) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "void SetMinMaxZ(float, float)", asMETHODPR(Renderer2D, SetMinMaxZ, (float, float), void), asCALL_THISCALL);
-    // void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Renderer2D", "void SetObjectAnimation(ObjectAnimation@+)", asMETHODPR(Renderer2D, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "void set_objectAnimation(ObjectAnimation@+)", asMETHODPR(Renderer2D, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
-    // void Animatable::SetObjectAnimationAttr(const ResourceRef& value) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("Renderer2D", "void SetObjectAnimationAttr(const ResourceRef&in)", asMETHODPR(Renderer2D, SetObjectAnimationAttr, (const ResourceRef&), void), asCALL_THISCALL);
-    // void Drawable::SetOccludee(bool enable) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "void SetOccludee(bool)", asMETHODPR(Renderer2D, SetOccludee, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "void set_occludee(bool)", asMETHODPR(Renderer2D, SetOccludee, (bool), void), asCALL_THISCALL);
-    // void Drawable::SetOccluder(bool enable) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "void SetOccluder(bool)", asMETHODPR(Renderer2D, SetOccluder, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "void set_occluder(bool)", asMETHODPR(Renderer2D, SetOccluder, (bool), void), asCALL_THISCALL);
-    // void Drawable::SetShadowDistance(float distance) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "void SetShadowDistance(float)", asMETHODPR(Renderer2D, SetShadowDistance, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "void set_shadowDistance(float)", asMETHODPR(Renderer2D, SetShadowDistance, (float), void), asCALL_THISCALL);
-    // void Drawable::SetShadowMask(unsigned mask) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "void SetShadowMask(uint)", asMETHODPR(Renderer2D, SetShadowMask, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "void set_shadowMask(uint)", asMETHODPR(Renderer2D, SetShadowMask, (unsigned), void), asCALL_THISCALL);
-    // void Drawable::SetSortValue(float value) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "void SetSortValue(float)", asMETHODPR(Renderer2D, SetSortValue, (float), void), asCALL_THISCALL);
-    // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Renderer2D", "void SetTemporary(bool)", asMETHODPR(Renderer2D, SetTemporary, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "void set_temporary(bool)", asMETHODPR(Renderer2D, SetTemporary, (bool), void), asCALL_THISCALL);
-    // void Drawable::SetViewMask(unsigned mask) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "void SetViewMask(uint)", asMETHODPR(Renderer2D, SetViewMask, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "void set_viewMask(uint)", asMETHODPR(Renderer2D, SetViewMask, (unsigned), void), asCALL_THISCALL);
-    // void Drawable::SetZone(Zone* zone, bool temporary=false) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "void SetZone(Zone@+, bool = false)", asMETHODPR(Renderer2D, SetZone, (Zone*, bool), void), asCALL_THISCALL);
-    // void Drawable::SetZoneMask(unsigned mask) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "void SetZoneMask(uint)", asMETHODPR(Renderer2D, SetZoneMask, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "void set_zoneMask(uint)", asMETHODPR(Renderer2D, SetZoneMask, (unsigned), void), asCALL_THISCALL);
-    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Renderer2D", "void UnsubscribeFromAllEvents()", asMETHODPR(Renderer2D, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Renderer2D", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(Renderer2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
-    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Renderer2D", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(Renderer2D, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Renderer2D", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(Renderer2D, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Renderer2D", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(Renderer2D, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
-    // virtual void Drawable::Update(const FrameInfo& frame) | File: ../Graphics/Drawable.h
-    engine->RegisterObjectMethod("Renderer2D", "void Update(const FrameInfo&in)", asMETHODPR(Renderer2D, Update, (const FrameInfo&), void), asCALL_THISCALL);
-    // void Renderer2D::UpdateBatches(const FrameInfo& frame) override | File: ../Urho2D/Renderer2D.h
-    engine->RegisterObjectMethod("Renderer2D", "void UpdateBatches(const FrameInfo&in)", asMETHODPR(Renderer2D, UpdateBatches, (const FrameInfo&), void), asCALL_THISCALL);
-    // void Renderer2D::UpdateGeometry(const FrameInfo& frame) override | File: ../Urho2D/Renderer2D.h
-    engine->RegisterObjectMethod("Renderer2D", "void UpdateGeometry(const FrameInfo&in)", asMETHODPR(Renderer2D, UpdateGeometry, (const FrameInfo&), void), asCALL_THISCALL);
-    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("Renderer2D", "int WeakRefs() const", asMETHODPR(Renderer2D, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer2D", "int get_weakRefs() const", asMETHODPR(Renderer2D, WeakRefs, () const, int), asCALL_THISCALL);
-    // void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attributeBits, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Renderer2D", "void WriteDeltaUpdate(Serializer&, const DirtyBits&in, uint8)", asMETHODPR(Renderer2D, WriteDeltaUpdate, (Serializer&, const DirtyBits&, unsigned char), void), asCALL_THISCALL);
-    // void Serializable::WriteInitialDeltaUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Renderer2D", "void WriteInitialDeltaUpdate(Serializer&, uint8)", asMETHODPR(Renderer2D, WriteInitialDeltaUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
-    // void Serializable::WriteLatestDataUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("Renderer2D", "void WriteLatestDataUpdate(Serializer&, uint8)", asMETHODPR(Renderer2D, WriteLatestDataUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
-#ifdef REGISTER_MANUAL_PART_Drawable
-    REGISTER_MANUAL_PART_Drawable(Renderer2D, "Renderer2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Component
-    REGISTER_MANUAL_PART_Component(Renderer2D, "Renderer2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Animatable
-    REGISTER_MANUAL_PART_Animatable(Renderer2D, "Renderer2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Serializable
-    REGISTER_MANUAL_PART_Serializable(Renderer2D, "Renderer2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Object
-    REGISTER_MANUAL_PART_Object(Renderer2D, "Renderer2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(Renderer2D, "Renderer2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Renderer2D
-    REGISTER_MANUAL_PART_Renderer2D(Renderer2D, "Renderer2D")
-#endif
-    RegisterSubclass<Drawable, Renderer2D>(engine, "Drawable", "Renderer2D");
-    RegisterSubclass<Component, Renderer2D>(engine, "Component", "Renderer2D");
-    RegisterSubclass<Animatable, Renderer2D>(engine, "Animatable", "Renderer2D");
-    RegisterSubclass<Serializable, Renderer2D>(engine, "Serializable", "Renderer2D");
-    RegisterSubclass<Object, Renderer2D>(engine, "Object", "Renderer2D");
-    RegisterSubclass<RefCounted, Renderer2D>(engine, "RefCounted", "Renderer2D");
-#endif
-
     // Vector3 Ray::direction_ | File: ../Math/Ray.h
     engine->RegisterObjectProperty("Ray", "Vector3 direction", offsetof(Ray, direction_));
     // Vector3 Ray::origin_ | File: ../Math/Ray.h
@@ -1403,6 +967,189 @@ void ASRegisterGenerated_Members_R(asIScriptEngine* engine)
     REGISTER_MANUAL_PART_RefCounted(RefCounted, "RefCounted")
 #endif
 
+    // Vector<RenderPathCommand> RenderPath::commands_ | File: ../Graphics/RenderPath.h
+    // Error: type "Vector<RenderPathCommand>" can not automatically bind
+    // Vector<RenderTargetInfo> RenderPath::renderTargets_ | File: ../Graphics/RenderPath.h
+    // Error: type "Vector<RenderTargetInfo>" can not automatically bind
+    // void RenderPath::AddCommand(const RenderPathCommand& command) | File: ../Graphics/RenderPath.h
+    engine->RegisterObjectMethod("RenderPath", "void AddCommand(const RenderPathCommand&in)", asMETHODPR(RenderPath, AddCommand, (const RenderPathCommand&), void), asCALL_THISCALL);
+    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("RenderPath", asBEHAVE_ADDREF, "void f()", asMETHODPR(RenderPath, AddRef, (), void), asCALL_THISCALL);
+    // void RenderPath::AddRenderTarget(const RenderTargetInfo& info) | File: ../Graphics/RenderPath.h
+    engine->RegisterObjectMethod("RenderPath", "void AddRenderTarget(const RenderTargetInfo&in)", asMETHODPR(RenderPath, AddRenderTarget, (const RenderTargetInfo&), void), asCALL_THISCALL);
+    // bool RenderPath::Append(XMLFile* file) | File: ../Graphics/RenderPath.h
+    engine->RegisterObjectMethod("RenderPath", "bool Append(XMLFile@+)", asMETHODPR(RenderPath, Append, (XMLFile*), bool), asCALL_THISCALL);
+    // SharedPtr<RenderPath> RenderPath::Clone() | File: ../Graphics/RenderPath.h
+    engine->RegisterObjectMethod("RenderPath", "RenderPath@+ Clone()", asFUNCTION(RenderPath_Clone_void), asCALL_CDECL_OBJFIRST);
+    // RenderPathCommand* RenderPath::GetCommand(unsigned index) | File: ../Graphics/RenderPath.h
+    // Error: type "RenderPathCommand*" can not automatically bind
+    // unsigned RenderPath::GetNumCommands() const | File: ../Graphics/RenderPath.h
+    engine->RegisterObjectMethod("RenderPath", "uint GetNumCommands() const", asMETHODPR(RenderPath, GetNumCommands, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPath", "uint get_numCommands() const", asMETHODPR(RenderPath, GetNumCommands, () const, unsigned), asCALL_THISCALL);
+    // unsigned RenderPath::GetNumRenderTargets() const | File: ../Graphics/RenderPath.h
+    engine->RegisterObjectMethod("RenderPath", "uint GetNumRenderTargets() const", asMETHODPR(RenderPath, GetNumRenderTargets, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPath", "uint get_numRenderTargets() const", asMETHODPR(RenderPath, GetNumRenderTargets, () const, unsigned), asCALL_THISCALL);
+    // const Variant& RenderPath::GetShaderParameter(const String& name) const | File: ../Graphics/RenderPath.h
+    engine->RegisterObjectMethod("RenderPath", "const Variant& GetShaderParameter(const String&in) const", asMETHODPR(RenderPath, GetShaderParameter, (const String&) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPath", "const Variant& get_shaderParameters(const String&in) const", asMETHODPR(RenderPath, GetShaderParameter, (const String&) const, const Variant&), asCALL_THISCALL);
+    // void RenderPath::InsertCommand(unsigned index, const RenderPathCommand& command) | File: ../Graphics/RenderPath.h
+    engine->RegisterObjectMethod("RenderPath", "void InsertCommand(uint, const RenderPathCommand&in)", asMETHODPR(RenderPath, InsertCommand, (unsigned, const RenderPathCommand&), void), asCALL_THISCALL);
+    // bool RenderPath::IsAdded(const String& tag) const | File: ../Graphics/RenderPath.h
+    engine->RegisterObjectMethod("RenderPath", "bool IsAdded(const String&in) const", asMETHODPR(RenderPath, IsAdded, (const String&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPath", "bool get_added(const String&in) const", asMETHODPR(RenderPath, IsAdded, (const String&) const, bool), asCALL_THISCALL);
+    // bool RenderPath::IsEnabled(const String& tag) const | File: ../Graphics/RenderPath.h
+    engine->RegisterObjectMethod("RenderPath", "bool IsEnabled(const String&in) const", asMETHODPR(RenderPath, IsEnabled, (const String&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPath", "bool get_enabled(const String&in) const", asMETHODPR(RenderPath, IsEnabled, (const String&) const, bool), asCALL_THISCALL);
+    // bool RenderPath::Load(XMLFile* file) | File: ../Graphics/RenderPath.h
+    engine->RegisterObjectMethod("RenderPath", "bool Load(XMLFile@+)", asMETHODPR(RenderPath, Load, (XMLFile*), bool), asCALL_THISCALL);
+    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
+    // Error: type "RefCount*" can not automatically bind
+    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("RenderPath", "int Refs() const", asMETHODPR(RenderPath, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPath", "int get_refs() const", asMETHODPR(RenderPath, Refs, () const, int), asCALL_THISCALL);
+    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("RenderPath", asBEHAVE_RELEASE, "void f()", asMETHODPR(RenderPath, ReleaseRef, (), void), asCALL_THISCALL);
+    // void RenderPath::RemoveCommand(unsigned index) | File: ../Graphics/RenderPath.h
+    engine->RegisterObjectMethod("RenderPath", "void RemoveCommand(uint)", asMETHODPR(RenderPath, RemoveCommand, (unsigned), void), asCALL_THISCALL);
+    // void RenderPath::RemoveCommands(const String& tag) | File: ../Graphics/RenderPath.h
+    engine->RegisterObjectMethod("RenderPath", "void RemoveCommands(const String&in)", asMETHODPR(RenderPath, RemoveCommands, (const String&), void), asCALL_THISCALL);
+    // void RenderPath::RemoveRenderTarget(unsigned index) | File: ../Graphics/RenderPath.h
+    engine->RegisterObjectMethod("RenderPath", "void RemoveRenderTarget(uint)", asMETHODPR(RenderPath, RemoveRenderTarget, (unsigned), void), asCALL_THISCALL);
+    // void RenderPath::RemoveRenderTarget(const String& name) | File: ../Graphics/RenderPath.h
+    engine->RegisterObjectMethod("RenderPath", "void RemoveRenderTarget(const String&in)", asMETHODPR(RenderPath, RemoveRenderTarget, (const String&), void), asCALL_THISCALL);
+    // void RenderPath::RemoveRenderTargets(const String& tag) | File: ../Graphics/RenderPath.h
+    engine->RegisterObjectMethod("RenderPath", "void RemoveRenderTargets(const String&in)", asMETHODPR(RenderPath, RemoveRenderTargets, (const String&), void), asCALL_THISCALL);
+    // RenderPath::RenderPath() | File: ../Graphics/RenderPath.h
+    engine->RegisterObjectBehaviour("RenderPath", asBEHAVE_FACTORY, "RenderPath@+ f()", asFUNCTION(RenderPath_RenderPath_void), asCALL_CDECL);
+    // void RenderPath::SetCommand(unsigned index, const RenderPathCommand& command) | File: ../Graphics/RenderPath.h
+    engine->RegisterObjectMethod("RenderPath", "void SetCommand(uint, const RenderPathCommand&in)", asMETHODPR(RenderPath, SetCommand, (unsigned, const RenderPathCommand&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPath", "void set_commands(uint, const RenderPathCommand&in)", asMETHODPR(RenderPath, SetCommand, (unsigned, const RenderPathCommand&), void), asCALL_THISCALL);
+    // void RenderPath::SetEnabled(const String& tag, bool active) | File: ../Graphics/RenderPath.h
+    engine->RegisterObjectMethod("RenderPath", "void SetEnabled(const String&in, bool)", asMETHODPR(RenderPath, SetEnabled, (const String&, bool), void), asCALL_THISCALL);
+    // void RenderPath::SetRenderTarget(unsigned index, const RenderTargetInfo& info) | File: ../Graphics/RenderPath.h
+    engine->RegisterObjectMethod("RenderPath", "void SetRenderTarget(uint, const RenderTargetInfo&in)", asMETHODPR(RenderPath, SetRenderTarget, (unsigned, const RenderTargetInfo&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPath", "void set_renderTargets(uint, const RenderTargetInfo&in)", asMETHODPR(RenderPath, SetRenderTarget, (unsigned, const RenderTargetInfo&), void), asCALL_THISCALL);
+    // void RenderPath::SetShaderParameter(const String& name, const Variant& value) | File: ../Graphics/RenderPath.h
+    engine->RegisterObjectMethod("RenderPath", "void SetShaderParameter(const String&in, const Variant&in)", asMETHODPR(RenderPath, SetShaderParameter, (const String&, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPath", "void set_shaderParameters(const String&in, const Variant&in)", asMETHODPR(RenderPath, SetShaderParameter, (const String&, const Variant&), void), asCALL_THISCALL);
+    // void RenderPath::ToggleEnabled(const String& tag) | File: ../Graphics/RenderPath.h
+    engine->RegisterObjectMethod("RenderPath", "void ToggleEnabled(const String&in)", asMETHODPR(RenderPath, ToggleEnabled, (const String&), void), asCALL_THISCALL);
+    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("RenderPath", "int WeakRefs() const", asMETHODPR(RenderPath, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPath", "int get_weakRefs() const", asMETHODPR(RenderPath, WeakRefs, () const, int), asCALL_THISCALL);
+#ifdef REGISTER_MANUAL_PART_RefCounted
+    REGISTER_MANUAL_PART_RefCounted(RenderPath, "RenderPath")
+#endif
+#ifdef REGISTER_MANUAL_PART_RenderPath
+    REGISTER_MANUAL_PART_RenderPath(RenderPath, "RenderPath")
+#endif
+    RegisterSubclass<RefCounted, RenderPath>(engine, "RefCounted", "RenderPath");
+
+    // void* RenderSurface::readOnlyView_ | File: ../Graphics/RenderSurface.h
+    // Not registered because have @nobind mark
+    // unsigned RenderSurface::renderBuffer_ | File: ../Graphics/RenderSurface.h
+    // Not registered because have @nobind mark
+    // void* RenderSurface::renderTargetView_ | File: ../Graphics/RenderSurface.h
+    // Not registered because have @nobind mark
+    // void* RenderSurface::surface_ | File: ../Graphics/RenderSurface.h
+    // Not registered because have @nobind mark
+    // unsigned RenderSurface::target_ | File: ../Graphics/RenderSurface.h
+    // Not registered because have @nobind mark
+    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("RenderSurface", asBEHAVE_ADDREF, "void f()", asMETHODPR(RenderSurface, AddRef, (), void), asCALL_THISCALL);
+    // bool RenderSurface::CreateRenderBuffer(unsigned width, unsigned height, unsigned format, int multiSample) | File: ../Graphics/RenderSurface.h
+    engine->RegisterObjectMethod("RenderSurface", "bool CreateRenderBuffer(uint, uint, uint, int)", asMETHODPR(RenderSurface, CreateRenderBuffer, (unsigned, unsigned, unsigned, int), bool), asCALL_THISCALL);
+    // bool RenderSurface::GetAutoResolve() const | File: ../Graphics/RenderSurface.h
+    engine->RegisterObjectMethod("RenderSurface", "bool GetAutoResolve() const", asMETHODPR(RenderSurface, GetAutoResolve, () const, bool), asCALL_THISCALL);
+    // int RenderSurface::GetHeight() const | File: ../Graphics/RenderSurface.h
+    engine->RegisterObjectMethod("RenderSurface", "int GetHeight() const", asMETHODPR(RenderSurface, GetHeight, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderSurface", "int get_height() const", asMETHODPR(RenderSurface, GetHeight, () const, int), asCALL_THISCALL);
+    // RenderSurface* RenderSurface::GetLinkedDepthStencil() const | File: ../Graphics/RenderSurface.h
+    engine->RegisterObjectMethod("RenderSurface", "RenderSurface@+ GetLinkedDepthStencil() const", asMETHODPR(RenderSurface, GetLinkedDepthStencil, () const, RenderSurface*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderSurface", "RenderSurface@+ get_linkedDepthStencil() const", asMETHODPR(RenderSurface, GetLinkedDepthStencil, () const, RenderSurface*), asCALL_THISCALL);
+    // RenderSurface* RenderSurface::GetLinkedRenderTarget() const | File: ../Graphics/RenderSurface.h
+    engine->RegisterObjectMethod("RenderSurface", "RenderSurface@+ GetLinkedRenderTarget() const", asMETHODPR(RenderSurface, GetLinkedRenderTarget, () const, RenderSurface*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderSurface", "RenderSurface@+ get_linkedRenderTarget() const", asMETHODPR(RenderSurface, GetLinkedRenderTarget, () const, RenderSurface*), asCALL_THISCALL);
+    // int RenderSurface::GetMultiSample() const | File: ../Graphics/RenderSurface.h
+    engine->RegisterObjectMethod("RenderSurface", "int GetMultiSample() const", asMETHODPR(RenderSurface, GetMultiSample, () const, int), asCALL_THISCALL);
+    // unsigned RenderSurface::GetNumViewports() const | File: ../Graphics/RenderSurface.h
+    engine->RegisterObjectMethod("RenderSurface", "uint GetNumViewports() const", asMETHODPR(RenderSurface, GetNumViewports, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderSurface", "uint get_numViewports() const", asMETHODPR(RenderSurface, GetNumViewports, () const, unsigned), asCALL_THISCALL);
+    // Texture* RenderSurface::GetParentTexture() const | File: ../Graphics/RenderSurface.h
+    engine->RegisterObjectMethod("RenderSurface", "Texture@+ GetParentTexture() const", asMETHODPR(RenderSurface, GetParentTexture, () const, Texture*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderSurface", "Texture@+ get_parentTexture() const", asMETHODPR(RenderSurface, GetParentTexture, () const, Texture*), asCALL_THISCALL);
+    // void* RenderSurface::GetReadOnlyView() const | File: ../Graphics/RenderSurface.h
+    // Error: type "void*" can not automatically bind
+    // unsigned RenderSurface::GetRenderBuffer() const | File: ../Graphics/RenderSurface.h
+    engine->RegisterObjectMethod("RenderSurface", "uint GetRenderBuffer() const", asMETHODPR(RenderSurface, GetRenderBuffer, () const, unsigned), asCALL_THISCALL);
+    // void* RenderSurface::GetRenderTargetView() const | File: ../Graphics/RenderSurface.h
+    // Error: type "void*" can not automatically bind
+    // void* RenderSurface::GetSurface() const | File: ../Graphics/RenderSurface.h
+    // Error: type "void*" can not automatically bind
+    // unsigned RenderSurface::GetTarget() const | File: ../Graphics/RenderSurface.h
+    engine->RegisterObjectMethod("RenderSurface", "uint GetTarget() const", asMETHODPR(RenderSurface, GetTarget, () const, unsigned), asCALL_THISCALL);
+    // RenderSurfaceUpdateMode RenderSurface::GetUpdateMode() const | File: ../Graphics/RenderSurface.h
+    engine->RegisterObjectMethod("RenderSurface", "RenderSurfaceUpdateMode GetUpdateMode() const", asMETHODPR(RenderSurface, GetUpdateMode, () const, RenderSurfaceUpdateMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderSurface", "RenderSurfaceUpdateMode get_updateMode() const", asMETHODPR(RenderSurface, GetUpdateMode, () const, RenderSurfaceUpdateMode), asCALL_THISCALL);
+    // TextureUsage RenderSurface::GetUsage() const | File: ../Graphics/RenderSurface.h
+    engine->RegisterObjectMethod("RenderSurface", "TextureUsage GetUsage() const", asMETHODPR(RenderSurface, GetUsage, () const, TextureUsage), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderSurface", "TextureUsage get_usage() const", asMETHODPR(RenderSurface, GetUsage, () const, TextureUsage), asCALL_THISCALL);
+    // Viewport* RenderSurface::GetViewport(unsigned index) const | File: ../Graphics/RenderSurface.h
+    engine->RegisterObjectMethod("RenderSurface", "Viewport@+ GetViewport(uint) const", asMETHODPR(RenderSurface, GetViewport, (unsigned) const, Viewport*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderSurface", "Viewport@+ get_viewports(uint) const", asMETHODPR(RenderSurface, GetViewport, (unsigned) const, Viewport*), asCALL_THISCALL);
+    // int RenderSurface::GetWidth() const | File: ../Graphics/RenderSurface.h
+    engine->RegisterObjectMethod("RenderSurface", "int GetWidth() const", asMETHODPR(RenderSurface, GetWidth, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderSurface", "int get_width() const", asMETHODPR(RenderSurface, GetWidth, () const, int), asCALL_THISCALL);
+    // bool RenderSurface::IsResolveDirty() const | File: ../Graphics/RenderSurface.h
+    engine->RegisterObjectMethod("RenderSurface", "bool IsResolveDirty() const", asMETHODPR(RenderSurface, IsResolveDirty, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderSurface", "bool get_resolveDirty() const", asMETHODPR(RenderSurface, IsResolveDirty, () const, bool), asCALL_THISCALL);
+    // bool RenderSurface::IsUpdateQueued() const | File: ../Graphics/RenderSurface.h
+    engine->RegisterObjectMethod("RenderSurface", "bool IsUpdateQueued() const", asMETHODPR(RenderSurface, IsUpdateQueued, () const, bool), asCALL_THISCALL);
+    // void RenderSurface::OnDeviceLost() | File: ../Graphics/RenderSurface.h
+    engine->RegisterObjectMethod("RenderSurface", "void OnDeviceLost()", asMETHODPR(RenderSurface, OnDeviceLost, (), void), asCALL_THISCALL);
+    // void RenderSurface::QueueUpdate() | File: ../Graphics/RenderSurface.h
+    engine->RegisterObjectMethod("RenderSurface", "void QueueUpdate()", asMETHODPR(RenderSurface, QueueUpdate, (), void), asCALL_THISCALL);
+    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
+    // Error: type "RefCount*" can not automatically bind
+    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("RenderSurface", "int Refs() const", asMETHODPR(RenderSurface, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderSurface", "int get_refs() const", asMETHODPR(RenderSurface, Refs, () const, int), asCALL_THISCALL);
+    // void RenderSurface::Release() | File: ../Graphics/RenderSurface.h
+    engine->RegisterObjectMethod("RenderSurface", "void Release()", asMETHODPR(RenderSurface, Release, (), void), asCALL_THISCALL);
+    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("RenderSurface", asBEHAVE_RELEASE, "void f()", asMETHODPR(RenderSurface, ReleaseRef, (), void), asCALL_THISCALL);
+    // explicit RenderSurface::RenderSurface(Texture* parentTexture) | File: ../Graphics/RenderSurface.h
+    engine->RegisterObjectBehaviour("RenderSurface", asBEHAVE_FACTORY, "RenderSurface@+ f(Texture@+)", asFUNCTION(RenderSurface_RenderSurface_Texture), asCALL_CDECL);
+    // void RenderSurface::ResetUpdateQueued() | File: ../Graphics/RenderSurface.h
+    engine->RegisterObjectMethod("RenderSurface", "void ResetUpdateQueued()", asMETHODPR(RenderSurface, ResetUpdateQueued, (), void), asCALL_THISCALL);
+    // void RenderSurface::SetLinkedDepthStencil(RenderSurface* depthStencil) | File: ../Graphics/RenderSurface.h
+    engine->RegisterObjectMethod("RenderSurface", "void SetLinkedDepthStencil(RenderSurface@+)", asMETHODPR(RenderSurface, SetLinkedDepthStencil, (RenderSurface*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderSurface", "void set_linkedDepthStencil(RenderSurface@+)", asMETHODPR(RenderSurface, SetLinkedDepthStencil, (RenderSurface*), void), asCALL_THISCALL);
+    // void RenderSurface::SetLinkedRenderTarget(RenderSurface* renderTarget) | File: ../Graphics/RenderSurface.h
+    engine->RegisterObjectMethod("RenderSurface", "void SetLinkedRenderTarget(RenderSurface@+)", asMETHODPR(RenderSurface, SetLinkedRenderTarget, (RenderSurface*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderSurface", "void set_linkedRenderTarget(RenderSurface@+)", asMETHODPR(RenderSurface, SetLinkedRenderTarget, (RenderSurface*), void), asCALL_THISCALL);
+    // void RenderSurface::SetNumViewports(unsigned num) | File: ../Graphics/RenderSurface.h
+    engine->RegisterObjectMethod("RenderSurface", "void SetNumViewports(uint)", asMETHODPR(RenderSurface, SetNumViewports, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderSurface", "void set_numViewports(uint)", asMETHODPR(RenderSurface, SetNumViewports, (unsigned), void), asCALL_THISCALL);
+    // void RenderSurface::SetResolveDirty(bool enable) | File: ../Graphics/RenderSurface.h
+    engine->RegisterObjectMethod("RenderSurface", "void SetResolveDirty(bool)", asMETHODPR(RenderSurface, SetResolveDirty, (bool), void), asCALL_THISCALL);
+    // void RenderSurface::SetUpdateMode(RenderSurfaceUpdateMode mode) | File: ../Graphics/RenderSurface.h
+    engine->RegisterObjectMethod("RenderSurface", "void SetUpdateMode(RenderSurfaceUpdateMode)", asMETHODPR(RenderSurface, SetUpdateMode, (RenderSurfaceUpdateMode), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderSurface", "void set_updateMode(RenderSurfaceUpdateMode)", asMETHODPR(RenderSurface, SetUpdateMode, (RenderSurfaceUpdateMode), void), asCALL_THISCALL);
+    // void RenderSurface::SetViewport(unsigned index, Viewport* viewport) | File: ../Graphics/RenderSurface.h
+    engine->RegisterObjectMethod("RenderSurface", "void SetViewport(uint, Viewport@+)", asMETHODPR(RenderSurface, SetViewport, (unsigned, Viewport*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderSurface", "void set_viewports(uint, Viewport@+)", asMETHODPR(RenderSurface, SetViewport, (unsigned, Viewport*), void), asCALL_THISCALL);
+    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("RenderSurface", "int WeakRefs() const", asMETHODPR(RenderSurface, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderSurface", "int get_weakRefs() const", asMETHODPR(RenderSurface, WeakRefs, () const, int), asCALL_THISCALL);
+#ifdef REGISTER_MANUAL_PART_RefCounted
+    REGISTER_MANUAL_PART_RefCounted(RenderSurface, "RenderSurface")
+#endif
+#ifdef REGISTER_MANUAL_PART_RenderSurface
+    REGISTER_MANUAL_PART_RenderSurface(RenderSurface, "RenderSurface")
+#endif
+    RegisterSubclass<RefCounted, RenderSurface>(engine, "RefCounted", "RenderSurface");
+
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("Renderer", asBEHAVE_ADDREF, "void f()", asMETHODPR(Renderer, AddRef, (), void), asCALL_THISCALL);
     // void Renderer::ApplyShadowMapFilter(View* view, Texture2D* shadowMap, float blurScale) | File: ../Graphics/Renderer.h
@@ -1779,188 +1526,441 @@ void ASRegisterGenerated_Members_R(asIScriptEngine* engine)
     RegisterSubclass<Object, Renderer>(engine, "Object", "Renderer");
     RegisterSubclass<RefCounted, Renderer>(engine, "RefCounted", "Renderer");
 
-    // Vector<RenderPathCommand> RenderPath::commands_ | File: ../Graphics/RenderPath.h
-    // Error: type "Vector<RenderPathCommand>" can not automatically bind
-    // Vector<RenderTargetInfo> RenderPath::renderTargets_ | File: ../Graphics/RenderPath.h
-    // Error: type "Vector<RenderTargetInfo>" can not automatically bind
-    // void RenderPath::AddCommand(const RenderPathCommand& command) | File: ../Graphics/RenderPath.h
-    engine->RegisterObjectMethod("RenderPath", "void AddCommand(const RenderPathCommand&in)", asMETHODPR(RenderPath, AddCommand, (const RenderPathCommand&), void), asCALL_THISCALL);
+#ifdef URHO3D_URHO2D
+    // void Renderer2D::AddDrawable(Drawable2D* drawable) | File: ../Urho2D/Renderer2D.h
+    engine->RegisterObjectMethod("Renderer2D", "void AddDrawable(Drawable2D@+)", asMETHODPR(Renderer2D, AddDrawable, (Drawable2D*), void), asCALL_THISCALL);
+    // void Drawable::AddLight(Light* light) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "void AddLight(Light@+)", asMETHODPR(Renderer2D, AddLight, (Light*), void), asCALL_THISCALL);
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("RenderPath", asBEHAVE_ADDREF, "void f()", asMETHODPR(RenderPath, AddRef, (), void), asCALL_THISCALL);
-    // void RenderPath::AddRenderTarget(const RenderTargetInfo& info) | File: ../Graphics/RenderPath.h
-    engine->RegisterObjectMethod("RenderPath", "void AddRenderTarget(const RenderTargetInfo&in)", asMETHODPR(RenderPath, AddRenderTarget, (const RenderTargetInfo&), void), asCALL_THISCALL);
-    // bool RenderPath::Append(XMLFile* file) | File: ../Graphics/RenderPath.h
-    engine->RegisterObjectMethod("RenderPath", "bool Append(XMLFile@+)", asMETHODPR(RenderPath, Append, (XMLFile*), bool), asCALL_THISCALL);
-    // SharedPtr<RenderPath> RenderPath::Clone() | File: ../Graphics/RenderPath.h
-    engine->RegisterObjectMethod("RenderPath", "RenderPath@+ Clone()", asFUNCTION(RenderPath_Clone_void), asCALL_CDECL_OBJFIRST);
-    // RenderPathCommand* RenderPath::GetCommand(unsigned index) | File: ../Graphics/RenderPath.h
-    // Error: type "RenderPathCommand*" can not automatically bind
-    // unsigned RenderPath::GetNumCommands() const | File: ../Graphics/RenderPath.h
-    engine->RegisterObjectMethod("RenderPath", "uint GetNumCommands() const", asMETHODPR(RenderPath, GetNumCommands, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderPath", "uint get_numCommands() const", asMETHODPR(RenderPath, GetNumCommands, () const, unsigned), asCALL_THISCALL);
-    // unsigned RenderPath::GetNumRenderTargets() const | File: ../Graphics/RenderPath.h
-    engine->RegisterObjectMethod("RenderPath", "uint GetNumRenderTargets() const", asMETHODPR(RenderPath, GetNumRenderTargets, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderPath", "uint get_numRenderTargets() const", asMETHODPR(RenderPath, GetNumRenderTargets, () const, unsigned), asCALL_THISCALL);
-    // const Variant& RenderPath::GetShaderParameter(const String& name) const | File: ../Graphics/RenderPath.h
-    engine->RegisterObjectMethod("RenderPath", "const Variant& GetShaderParameter(const String&in) const", asMETHODPR(RenderPath, GetShaderParameter, (const String&) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderPath", "const Variant& get_shaderParameters(const String&in) const", asMETHODPR(RenderPath, GetShaderParameter, (const String&) const, const Variant&), asCALL_THISCALL);
-    // void RenderPath::InsertCommand(unsigned index, const RenderPathCommand& command) | File: ../Graphics/RenderPath.h
-    engine->RegisterObjectMethod("RenderPath", "void InsertCommand(uint, const RenderPathCommand&in)", asMETHODPR(RenderPath, InsertCommand, (unsigned, const RenderPathCommand&), void), asCALL_THISCALL);
-    // bool RenderPath::IsAdded(const String& tag) const | File: ../Graphics/RenderPath.h
-    engine->RegisterObjectMethod("RenderPath", "bool IsAdded(const String&in) const", asMETHODPR(RenderPath, IsAdded, (const String&) const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderPath", "bool get_added(const String&in) const", asMETHODPR(RenderPath, IsAdded, (const String&) const, bool), asCALL_THISCALL);
-    // bool RenderPath::IsEnabled(const String& tag) const | File: ../Graphics/RenderPath.h
-    engine->RegisterObjectMethod("RenderPath", "bool IsEnabled(const String&in) const", asMETHODPR(RenderPath, IsEnabled, (const String&) const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderPath", "bool get_enabled(const String&in) const", asMETHODPR(RenderPath, IsEnabled, (const String&) const, bool), asCALL_THISCALL);
-    // bool RenderPath::Load(XMLFile* file) | File: ../Graphics/RenderPath.h
-    engine->RegisterObjectMethod("RenderPath", "bool Load(XMLFile@+)", asMETHODPR(RenderPath, Load, (XMLFile*), bool), asCALL_THISCALL);
+    engine->RegisterObjectBehaviour("Renderer2D", asBEHAVE_ADDREF, "void f()", asMETHODPR(Renderer2D, AddRef, (), void), asCALL_THISCALL);
+    // void Component::AddReplicationState(ComponentReplicationState* state) | File: ../Scene/Component.h
+    // Error: type "ComponentReplicationState*" can not automatically bind
+    // void Drawable::AddVertexLight(Light* light) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "void AddVertexLight(Light@+)", asMETHODPR(Renderer2D, AddVertexLight, (Light*), void), asCALL_THISCALL);
+    // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Renderer2D", "void AllocateNetworkState()", asMETHODPR(Renderer2D, AllocateNetworkState, (), void), asCALL_THISCALL);
+    // virtual void Serializable::ApplyAttributes() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Renderer2D", "void ApplyAttributes()", asMETHODPR(Renderer2D, ApplyAttributes, (), void), asCALL_THISCALL);
+    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
+    // Not registered because template
+    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
+    // Not registered because template
+    // bool Renderer2D::CheckVisibility(Drawable2D* drawable) const | File: ../Urho2D/Renderer2D.h
+    engine->RegisterObjectMethod("Renderer2D", "bool CheckVisibility(Drawable2D@+) const", asMETHODPR(Renderer2D, CheckVisibility, (Drawable2D*) const, bool), asCALL_THISCALL);
+    // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("Renderer2D", "void CleanupConnection(Connection@+)", asMETHODPR(Renderer2D, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // void Drawable::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(Renderer2D, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
+    // virtual bool Drawable::DrawOcclusion(OcclusionBuffer* buffer) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "bool DrawOcclusion(OcclusionBuffer@+)", asMETHODPR(Renderer2D, DrawOcclusion, (OcclusionBuffer*), bool), asCALL_THISCALL);
+    // bool Animatable::GetAnimationEnabled() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Renderer2D", "bool GetAnimationEnabled() const", asMETHODPR(Renderer2D, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "bool get_animationEnabled() const", asMETHODPR(Renderer2D, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
+    // Variant Serializable::GetAttribute(unsigned index) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Renderer2D", "Variant GetAttribute(uint) const", asMETHODPR(Renderer2D, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "Variant get_attributes(uint) const", asMETHODPR(Renderer2D, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
+    // Variant Serializable::GetAttribute(const String& name) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Renderer2D", "Variant GetAttribute(const String&in) const", asMETHODPR(Renderer2D, GetAttribute, (const String&) const, Variant), asCALL_THISCALL);
+    // ValueAnimation* Animatable::GetAttributeAnimation(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Renderer2D", "ValueAnimation@+ GetAttributeAnimation(const String&in) const", asMETHODPR(Renderer2D, GetAttributeAnimation, (const String&) const, ValueAnimation*), asCALL_THISCALL);
+    // float Animatable::GetAttributeAnimationSpeed(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Renderer2D", "float GetAttributeAnimationSpeed(const String&in) const", asMETHODPR(Renderer2D, GetAttributeAnimationSpeed, (const String&) const, float), asCALL_THISCALL);
+    // float Animatable::GetAttributeAnimationTime(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Renderer2D", "float GetAttributeAnimationTime(const String&in) const", asMETHODPR(Renderer2D, GetAttributeAnimationTime, (const String&) const, float), asCALL_THISCALL);
+    // WrapMode Animatable::GetAttributeAnimationWrapMode(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Renderer2D", "WrapMode GetAttributeAnimationWrapMode(const String&in) const", asMETHODPR(Renderer2D, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), asCALL_THISCALL);
+    // Variant Serializable::GetAttributeDefault(unsigned index) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Renderer2D", "Variant GetAttributeDefault(uint) const", asMETHODPR(Renderer2D, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "Variant get_attributeDefaults(uint) const", asMETHODPR(Renderer2D, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
+    // Variant Serializable::GetAttributeDefault(const String& name) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Renderer2D", "Variant GetAttributeDefault(const String&in) const", asMETHODPR(Renderer2D, GetAttributeDefault, (const String&) const, Variant), asCALL_THISCALL);
+    // virtual const Vector<AttributeInfo>* Serializable::GetAttributes() const | File: ../Scene/Serializable.h
+    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
+    // const Vector<SourceBatch>& Drawable::GetBatches() const | File: ../Graphics/Drawable.h
+    // Error: type "const Vector<SourceBatch>&" can not automatically bind
+    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Renderer2D", "bool GetBlockEvents() const", asMETHODPR(Renderer2D, GetBlockEvents, () const, bool), asCALL_THISCALL);
+    // const BoundingBox& Drawable::GetBoundingBox() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "const BoundingBox& GetBoundingBox() const", asMETHODPR(Renderer2D, GetBoundingBox, () const, const BoundingBox&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "const BoundingBox& get_boundingBox() const", asMETHODPR(Renderer2D, GetBoundingBox, () const, const BoundingBox&), asCALL_THISCALL);
+    // bool Drawable::GetCastShadows() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "bool GetCastShadows() const", asMETHODPR(Renderer2D, GetCastShadows, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "bool get_castShadows() const", asMETHODPR(Renderer2D, GetCastShadows, () const, bool), asCALL_THISCALL);
+    // const String& Object::GetCategory() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Renderer2D", "const String& GetCategory() const", asMETHODPR(Renderer2D, GetCategory, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "const String& get_category() const", asMETHODPR(Renderer2D, GetCategory, () const, const String&), asCALL_THISCALL);
+    // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("Renderer2D", "Component@+ GetComponent(StringHash) const", asMETHODPR(Renderer2D, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
+    // template<class T> T*  Component::GetComponent() const | File: ../Scene/Component.h
+    // Not registered because template
+    // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
+    // Error: type "PODVector<Component*>&" can not automatically bind
+    // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
+    // Not registered because template
+    // Context* Object::GetContext() const | File: ../Core/Object.h
+    // Error: type "Context*" can not be returned
+    // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
+    // Error: type "PODVector<Node*>&" can not automatically bind
+    // float Drawable::GetDistance() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "float GetDistance() const", asMETHODPR(Renderer2D, GetDistance, () const, float), asCALL_THISCALL);
+    // unsigned char Drawable::GetDrawableFlags() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "uint8 GetDrawableFlags() const", asMETHODPR(Renderer2D, GetDrawableFlags, () const, unsigned char), asCALL_THISCALL);
+    // float Drawable::GetDrawDistance() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "float GetDrawDistance() const", asMETHODPR(Renderer2D, GetDrawDistance, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "float get_drawDistance() const", asMETHODPR(Renderer2D, GetDrawDistance, () const, float), asCALL_THISCALL);
+    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Renderer2D", "VariantMap& GetEventDataMap() const", asMETHODPR(Renderer2D, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
+    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // Object* Object::GetEventSender() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Renderer2D", "Object@+ GetEventSender() const", asMETHODPR(Renderer2D, GetEventSender, () const, Object*), asCALL_THISCALL);
+    // Light* Drawable::GetFirstLight() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "Light@+ GetFirstLight() const", asMETHODPR(Renderer2D, GetFirstLight, () const, Light*), asCALL_THISCALL);
+    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Renderer2D", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(Renderer2D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "const Variant& get_globalVar(StringHash) const", asMETHODPR(Renderer2D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Renderer2D", "const VariantMap& GetGlobalVars() const", asMETHODPR(Renderer2D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "const VariantMap& get_globalVars() const", asMETHODPR(Renderer2D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    // unsigned Component::GetID() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("Renderer2D", "uint GetID() const", asMETHODPR(Renderer2D, GetID, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "uint get_id() const", asMETHODPR(Renderer2D, GetID, () const, unsigned), asCALL_THISCALL);
+    // bool Serializable::GetInterceptNetworkUpdate(const String& attributeName) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Renderer2D", "bool GetInterceptNetworkUpdate(const String&in) const", asMETHODPR(Renderer2D, GetInterceptNetworkUpdate, (const String&) const, bool), asCALL_THISCALL);
+    // unsigned Drawable::GetLightMask() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "uint GetLightMask() const", asMETHODPR(Renderer2D, GetLightMask, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "uint get_lightMask() const", asMETHODPR(Renderer2D, GetLightMask, () const, unsigned), asCALL_THISCALL);
+    // const PODVector<Light*>& Drawable::GetLights() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "Array<Light@>@ GetLights() const", asFUNCTION(Renderer2D_GetLights_void), asCALL_CDECL_OBJFIRST);
+    // float Drawable::GetLodBias() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "float GetLodBias() const", asMETHODPR(Renderer2D, GetLodBias, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "float get_lodBias() const", asMETHODPR(Renderer2D, GetLodBias, () const, float), asCALL_THISCALL);
+    // float Drawable::GetLodDistance() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "float GetLodDistance() const", asMETHODPR(Renderer2D, GetLodDistance, () const, float), asCALL_THISCALL);
+    // virtual Geometry* Drawable::GetLodGeometry(unsigned batchIndex, unsigned level) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "Geometry@+ GetLodGeometry(uint, uint)", asMETHODPR(Renderer2D, GetLodGeometry, (unsigned, unsigned), Geometry*), asCALL_THISCALL);
+    // Material* Renderer2D::GetMaterial(Texture2D* texture, BlendMode blendMode) | File: ../Urho2D/Renderer2D.h
+    engine->RegisterObjectMethod("Renderer2D", "Material@+ GetMaterial(Texture2D@+, BlendMode)", asMETHODPR(Renderer2D, GetMaterial, (Texture2D*, BlendMode), Material*), asCALL_THISCALL);
+    // unsigned Drawable::GetMaxLights() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "uint GetMaxLights() const", asMETHODPR(Renderer2D, GetMaxLights, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "uint get_maxLights() const", asMETHODPR(Renderer2D, GetMaxLights, () const, unsigned), asCALL_THISCALL);
+    // float Drawable::GetMaxZ() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "float GetMaxZ() const", asMETHODPR(Renderer2D, GetMaxZ, () const, float), asCALL_THISCALL);
+    // float Drawable::GetMinZ() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "float GetMinZ() const", asMETHODPR(Renderer2D, GetMinZ, () const, float), asCALL_THISCALL);
+    // virtual const Vector<AttributeInfo>* Serializable::GetNetworkAttributes() const | File: ../Scene/Serializable.h
+    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
+    // NetworkState* Serializable::GetNetworkState() const | File: ../Scene/Serializable.h
+    // Error: type "NetworkState*" can not automatically bind
+    // Node* Component::GetNode() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("Renderer2D", "Node@+ GetNode() const", asMETHODPR(Renderer2D, GetNode, () const, Node*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "Node@+ get_node() const", asMETHODPR(Renderer2D, GetNode, () const, Node*), asCALL_THISCALL);
+    // unsigned Serializable::GetNumAttributes() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Renderer2D", "uint GetNumAttributes() const", asMETHODPR(Renderer2D, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "uint get_numAttributes() const", asMETHODPR(Renderer2D, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
+    // unsigned Serializable::GetNumNetworkAttributes() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Renderer2D", "uint GetNumNetworkAttributes() const", asMETHODPR(Renderer2D, GetNumNetworkAttributes, () const, unsigned), asCALL_THISCALL);
+    // virtual unsigned Drawable::GetNumOccluderTriangles() | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "uint GetNumOccluderTriangles()", asMETHODPR(Renderer2D, GetNumOccluderTriangles, (), unsigned), asCALL_THISCALL);
+    // ObjectAnimation* Animatable::GetObjectAnimation() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Renderer2D", "ObjectAnimation@+ GetObjectAnimation() const", asMETHODPR(Renderer2D, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "ObjectAnimation@+ get_objectAnimation() const", asMETHODPR(Renderer2D, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
+    // ResourceRef Animatable::GetObjectAnimationAttr() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Renderer2D", "ResourceRef GetObjectAnimationAttr() const", asMETHODPR(Renderer2D, GetObjectAnimationAttr, () const, ResourceRef), asCALL_THISCALL);
+    // Octant* Drawable::GetOctant() const | File: ../Graphics/Drawable.h
+    // Error: type "Octant" can not automatically bind bacause have @nobind mark
+    // Scene* Component::GetScene() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("Renderer2D", "Scene@+ GetScene() const", asMETHODPR(Renderer2D, GetScene, () const, Scene*), asCALL_THISCALL);
+    // float Drawable::GetShadowDistance() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "float GetShadowDistance() const", asMETHODPR(Renderer2D, GetShadowDistance, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "float get_shadowDistance() const", asMETHODPR(Renderer2D, GetShadowDistance, () const, float), asCALL_THISCALL);
+    // unsigned Drawable::GetShadowMask() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "uint GetShadowMask() const", asMETHODPR(Renderer2D, GetShadowMask, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "uint get_shadowMask() const", asMETHODPR(Renderer2D, GetShadowMask, () const, unsigned), asCALL_THISCALL);
+    // float Drawable::GetSortValue() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "float GetSortValue() const", asMETHODPR(Renderer2D, GetSortValue, () const, float), asCALL_THISCALL);
+    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Renderer2D", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Renderer2D, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
+    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // Not registered because template
+    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Renderer2D", "StringHash GetType() const", asMETHODPR(Renderer2D, GetType, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "StringHash get_type() const", asMETHODPR(Renderer2D, GetType, () const, StringHash), asCALL_THISCALL);
+    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Renderer2D", "const String& GetTypeName() const", asMETHODPR(Renderer2D, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "const String& get_typeName() const", asMETHODPR(Renderer2D, GetTypeName, () const, const String&), asCALL_THISCALL);
+    // UpdateGeometryType Renderer2D::GetUpdateGeometryType() override | File: ../Urho2D/Renderer2D.h
+    engine->RegisterObjectMethod("Renderer2D", "UpdateGeometryType GetUpdateGeometryType()", asMETHODPR(Renderer2D, GetUpdateGeometryType, (), UpdateGeometryType), asCALL_THISCALL);
+    // const PODVector<Light*>& Drawable::GetVertexLights() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "Array<Light@>@ GetVertexLights() const", asFUNCTION(Renderer2D_GetVertexLights_void), asCALL_CDECL_OBJFIRST);
+    // unsigned Drawable::GetViewMask() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "uint GetViewMask() const", asMETHODPR(Renderer2D, GetViewMask, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "uint get_viewMask() const", asMETHODPR(Renderer2D, GetViewMask, () const, unsigned), asCALL_THISCALL);
+    // const BoundingBox& Drawable::GetWorldBoundingBox() | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "const BoundingBox& GetWorldBoundingBox()", asMETHODPR(Renderer2D, GetWorldBoundingBox, (), const BoundingBox&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "const BoundingBox& get_worldBoundingBox()", asMETHODPR(Renderer2D, GetWorldBoundingBox, (), const BoundingBox&), asCALL_THISCALL);
+    // Zone* Drawable::GetZone() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "Zone@+ GetZone() const", asMETHODPR(Renderer2D, GetZone, () const, Zone*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "Zone@+ get_zone() const", asMETHODPR(Renderer2D, GetZone, () const, Zone*), asCALL_THISCALL);
+    // unsigned Drawable::GetZoneMask() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "uint GetZoneMask() const", asMETHODPR(Renderer2D, GetZoneMask, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "uint get_zoneMask() const", asMETHODPR(Renderer2D, GetZoneMask, () const, unsigned), asCALL_THISCALL);
+    // bool Drawable::HasBasePass(unsigned batchIndex) const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "bool HasBasePass(uint) const", asMETHODPR(Renderer2D, HasBasePass, (unsigned) const, bool), asCALL_THISCALL);
+    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Renderer2D", "bool HasEventHandlers() const", asMETHODPR(Renderer2D, HasEventHandlers, () const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Renderer2D", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(Renderer2D, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Renderer2D", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(Renderer2D, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
+    // bool Component::IsEnabled() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("Renderer2D", "bool IsEnabled() const", asMETHODPR(Renderer2D, IsEnabled, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "bool get_enabled() const", asMETHODPR(Renderer2D, IsEnabled, () const, bool), asCALL_THISCALL);
+    // bool Component::IsEnabledEffective() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("Renderer2D", "bool IsEnabledEffective() const", asMETHODPR(Renderer2D, IsEnabledEffective, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "bool get_enabledEffective() const", asMETHODPR(Renderer2D, IsEnabledEffective, () const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Renderer2D", "bool IsInstanceOf(StringHash) const", asMETHODPR(Renderer2D, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
+    // Not registered because template
+    // bool Drawable::IsInView() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "bool IsInView() const", asMETHODPR(Renderer2D, IsInView, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "bool get_inView() const", asMETHODPR(Renderer2D, IsInView, () const, bool), asCALL_THISCALL);
+    // bool Drawable::IsInView(Camera* camera) const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "bool IsInView(Camera@+) const", asMETHODPR(Renderer2D, IsInView, (Camera*) const, bool), asCALL_THISCALL);
+    // bool Drawable::IsInView(const FrameInfo& frame, bool anyCamera=false) const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "bool IsInView(const FrameInfo&in, bool = false) const", asMETHODPR(Renderer2D, IsInView, (const FrameInfo&, bool) const, bool), asCALL_THISCALL);
+    // bool Drawable::IsOccludee() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "bool IsOccludee() const", asMETHODPR(Renderer2D, IsOccludee, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "bool get_occludee() const", asMETHODPR(Renderer2D, IsOccludee, () const, bool), asCALL_THISCALL);
+    // bool Drawable::IsOccluder() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "bool IsOccluder() const", asMETHODPR(Renderer2D, IsOccluder, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "bool get_occluder() const", asMETHODPR(Renderer2D, IsOccluder, () const, bool), asCALL_THISCALL);
+    // bool Component::IsReplicated() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("Renderer2D", "bool IsReplicated() const", asMETHODPR(Renderer2D, IsReplicated, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "bool get_replicated() const", asMETHODPR(Renderer2D, IsReplicated, () const, bool), asCALL_THISCALL);
+    // bool Serializable::IsTemporary() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Renderer2D", "bool IsTemporary() const", asMETHODPR(Renderer2D, IsTemporary, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "bool get_temporary() const", asMETHODPR(Renderer2D, IsTemporary, () const, bool), asCALL_THISCALL);
+    // bool Drawable::IsZoneDirty() const | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "bool IsZoneDirty() const", asMETHODPR(Renderer2D, IsZoneDirty, () const, bool), asCALL_THISCALL);
+    // void Drawable::LimitLights() | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "void LimitLights()", asMETHODPR(Renderer2D, LimitLights, (), void), asCALL_THISCALL);
+    // void Drawable::LimitVertexLights(bool removeConvertedLights) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "void LimitVertexLights(bool)", asMETHODPR(Renderer2D, LimitVertexLights, (bool), void), asCALL_THISCALL);
+    // virtual bool Serializable::Load(Deserializer& source) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Renderer2D", "bool Load(Deserializer&)", asMETHODPR(Renderer2D, Load, (Deserializer&), bool), asCALL_THISCALL);
+    // bool Animatable::LoadJSON(const JSONValue& source) override | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Renderer2D", "bool LoadJSON(const JSONValue&in)", asMETHODPR(Renderer2D, LoadJSON, (const JSONValue&), bool), asCALL_THISCALL);
+    // bool Animatable::LoadXML(const XMLElement& source) override | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Renderer2D", "bool LoadXML(const XMLElement&in)", asMETHODPR(Renderer2D, LoadXML, (const XMLElement&), bool), asCALL_THISCALL);
+    // void Drawable::MarkForUpdate() | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "void MarkForUpdate()", asMETHODPR(Renderer2D, MarkForUpdate, (), void), asCALL_THISCALL);
+    // void Drawable::MarkInView(const FrameInfo& frame) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "void MarkInView(const FrameInfo&in)", asMETHODPR(Renderer2D, MarkInView, (const FrameInfo&), void), asCALL_THISCALL);
+    // void Drawable::MarkInView(unsigned frameNumber) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "void MarkInView(uint)", asMETHODPR(Renderer2D, MarkInView, (unsigned), void), asCALL_THISCALL);
+    // void Component::MarkNetworkUpdate() override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("Renderer2D", "void MarkNetworkUpdate()", asMETHODPR(Renderer2D, MarkNetworkUpdate, (), void), asCALL_THISCALL);
+    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Renderer2D", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(Renderer2D, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
+    // virtual void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Renderer2D", "void OnGetAttribute(const AttributeInfo&in, Variant&) const", asMETHODPR(Renderer2D, OnGetAttribute, (const AttributeInfo&, Variant&) const, void), asCALL_THISCALL);
+    // virtual void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Renderer2D", "void OnSetAttribute(const AttributeInfo&in, const Variant&in)", asMETHODPR(Renderer2D, OnSetAttribute, (const AttributeInfo&, const Variant&), void), asCALL_THISCALL);
+    // void Drawable::OnSetEnabled() override | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "void OnSetEnabled()", asMETHODPR(Renderer2D, OnSetEnabled, (), void), asCALL_THISCALL);
+    // void Component::PrepareNetworkUpdate() | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("Renderer2D", "void PrepareNetworkUpdate()", asMETHODPR(Renderer2D, PrepareNetworkUpdate, (), void), asCALL_THISCALL);
+    // void Renderer2D::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results) override | File: ../Urho2D/Renderer2D.h
+    // Error: type "RayOctreeQuery" can not automatically bind bacause have @nobind mark
+    // bool Serializable::ReadDeltaUpdate(Deserializer& source) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Renderer2D", "bool ReadDeltaUpdate(Deserializer&)", asMETHODPR(Renderer2D, ReadDeltaUpdate, (Deserializer&), bool), asCALL_THISCALL);
+    // bool Serializable::ReadLatestDataUpdate(Deserializer& source) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Renderer2D", "bool ReadLatestDataUpdate(Deserializer&)", asMETHODPR(Renderer2D, ReadLatestDataUpdate, (Deserializer&), bool), asCALL_THISCALL);
     // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
     // Error: type "RefCount*" can not automatically bind
     // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("RenderPath", "int Refs() const", asMETHODPR(RenderPath, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderPath", "int get_refs() const", asMETHODPR(RenderPath, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "int Refs() const", asMETHODPR(Renderer2D, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "int get_refs() const", asMETHODPR(Renderer2D, Refs, () const, int), asCALL_THISCALL);
+    // static void Renderer2D::RegisterObject(Context* context) | File: ../Urho2D/Renderer2D.h
+    // Context can be used as firs parameter of constructors only
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("RenderPath", asBEHAVE_RELEASE, "void f()", asMETHODPR(RenderPath, ReleaseRef, (), void), asCALL_THISCALL);
-    // void RenderPath::RemoveCommand(unsigned index) | File: ../Graphics/RenderPath.h
-    engine->RegisterObjectMethod("RenderPath", "void RemoveCommand(uint)", asMETHODPR(RenderPath, RemoveCommand, (unsigned), void), asCALL_THISCALL);
-    // void RenderPath::RemoveCommands(const String& tag) | File: ../Graphics/RenderPath.h
-    engine->RegisterObjectMethod("RenderPath", "void RemoveCommands(const String&in)", asMETHODPR(RenderPath, RemoveCommands, (const String&), void), asCALL_THISCALL);
-    // void RenderPath::RemoveRenderTarget(unsigned index) | File: ../Graphics/RenderPath.h
-    engine->RegisterObjectMethod("RenderPath", "void RemoveRenderTarget(uint)", asMETHODPR(RenderPath, RemoveRenderTarget, (unsigned), void), asCALL_THISCALL);
-    // void RenderPath::RemoveRenderTarget(const String& name) | File: ../Graphics/RenderPath.h
-    engine->RegisterObjectMethod("RenderPath", "void RemoveRenderTarget(const String&in)", asMETHODPR(RenderPath, RemoveRenderTarget, (const String&), void), asCALL_THISCALL);
-    // void RenderPath::RemoveRenderTargets(const String& tag) | File: ../Graphics/RenderPath.h
-    engine->RegisterObjectMethod("RenderPath", "void RemoveRenderTargets(const String&in)", asMETHODPR(RenderPath, RemoveRenderTargets, (const String&), void), asCALL_THISCALL);
-    // RenderPath::RenderPath() | File: ../Graphics/RenderPath.h
-    engine->RegisterObjectBehaviour("RenderPath", asBEHAVE_FACTORY, "RenderPath@+ f()", asFUNCTION(RenderPath_RenderPath_void), asCALL_CDECL);
-    // void RenderPath::SetCommand(unsigned index, const RenderPathCommand& command) | File: ../Graphics/RenderPath.h
-    engine->RegisterObjectMethod("RenderPath", "void SetCommand(uint, const RenderPathCommand&in)", asMETHODPR(RenderPath, SetCommand, (unsigned, const RenderPathCommand&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderPath", "void set_commands(uint, const RenderPathCommand&in)", asMETHODPR(RenderPath, SetCommand, (unsigned, const RenderPathCommand&), void), asCALL_THISCALL);
-    // void RenderPath::SetEnabled(const String& tag, bool active) | File: ../Graphics/RenderPath.h
-    engine->RegisterObjectMethod("RenderPath", "void SetEnabled(const String&in, bool)", asMETHODPR(RenderPath, SetEnabled, (const String&, bool), void), asCALL_THISCALL);
-    // void RenderPath::SetRenderTarget(unsigned index, const RenderTargetInfo& info) | File: ../Graphics/RenderPath.h
-    engine->RegisterObjectMethod("RenderPath", "void SetRenderTarget(uint, const RenderTargetInfo&in)", asMETHODPR(RenderPath, SetRenderTarget, (unsigned, const RenderTargetInfo&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderPath", "void set_renderTargets(uint, const RenderTargetInfo&in)", asMETHODPR(RenderPath, SetRenderTarget, (unsigned, const RenderTargetInfo&), void), asCALL_THISCALL);
-    // void RenderPath::SetShaderParameter(const String& name, const Variant& value) | File: ../Graphics/RenderPath.h
-    engine->RegisterObjectMethod("RenderPath", "void SetShaderParameter(const String&in, const Variant&in)", asMETHODPR(RenderPath, SetShaderParameter, (const String&, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderPath", "void set_shaderParameters(const String&in, const Variant&in)", asMETHODPR(RenderPath, SetShaderParameter, (const String&, const Variant&), void), asCALL_THISCALL);
-    // void RenderPath::ToggleEnabled(const String& tag) | File: ../Graphics/RenderPath.h
-    engine->RegisterObjectMethod("RenderPath", "void ToggleEnabled(const String&in)", asMETHODPR(RenderPath, ToggleEnabled, (const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectBehaviour("Renderer2D", asBEHAVE_RELEASE, "void f()", asMETHODPR(Renderer2D, ReleaseRef, (), void), asCALL_THISCALL);
+    // void Component::Remove() | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("Renderer2D", "void Remove()", asMETHODPR(Renderer2D, Remove, (), void), asCALL_THISCALL);
+    // void Animatable::RemoveAttributeAnimation(const String& name) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Renderer2D", "void RemoveAttributeAnimation(const String&in)", asMETHODPR(Renderer2D, RemoveAttributeAnimation, (const String&), void), asCALL_THISCALL);
+    // void Renderer2D::RemoveDrawable(Drawable2D* drawable) | File: ../Urho2D/Renderer2D.h
+    engine->RegisterObjectMethod("Renderer2D", "void RemoveDrawable(Drawable2D@+)", asMETHODPR(Renderer2D, RemoveDrawable, (Drawable2D*), void), asCALL_THISCALL);
+    // void Serializable::RemoveInstanceDefault() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Renderer2D", "void RemoveInstanceDefault()", asMETHODPR(Renderer2D, RemoveInstanceDefault, (), void), asCALL_THISCALL);
+    // void Animatable::RemoveObjectAnimation() | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Renderer2D", "void RemoveObjectAnimation()", asMETHODPR(Renderer2D, RemoveObjectAnimation, (), void), asCALL_THISCALL);
+    // explicit Renderer2D::Renderer2D(Context* context) | File: ../Urho2D/Renderer2D.h
+    engine->RegisterObjectBehaviour("Renderer2D", asBEHAVE_FACTORY, "Renderer2D@+ f()", asFUNCTION(Renderer2D_Renderer2D_Context), asCALL_CDECL);
+    // void Serializable::ResetToDefault() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Renderer2D", "void ResetToDefault()", asMETHODPR(Renderer2D, ResetToDefault, (), void), asCALL_THISCALL);
+    // bool Component::Save(Serializer& dest) const override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("Renderer2D", "bool Save(Serializer&) const", asMETHODPR(Renderer2D, Save, (Serializer&) const, bool), asCALL_THISCALL);
+    // virtual bool Serializable::SaveDefaultAttributes() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Renderer2D", "bool SaveDefaultAttributes() const", asMETHODPR(Renderer2D, SaveDefaultAttributes, () const, bool), asCALL_THISCALL);
+    // bool Component::SaveJSON(JSONValue& dest) const override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("Renderer2D", "bool SaveJSON(JSONValue&) const", asMETHODPR(Renderer2D, SaveJSON, (JSONValue&) const, bool), asCALL_THISCALL);
+    // bool Component::SaveXML(XMLElement& dest) const override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("Renderer2D", "bool SaveXML(XMLElement&) const", asMETHODPR(Renderer2D, SaveXML, (XMLElement&) const, bool), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Renderer2D", "void SendEvent(StringHash)", asMETHODPR(Renderer2D, SendEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Renderer2D", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(Renderer2D, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
+    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
+    // Not registered because template
+    // void Animatable::SetAnimationEnabled(bool enable) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Renderer2D", "void SetAnimationEnabled(bool)", asMETHODPR(Renderer2D, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "void set_animationEnabled(bool)", asMETHODPR(Renderer2D, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
+    // void Animatable::SetAnimationTime(float time) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Renderer2D", "void SetAnimationTime(float)", asMETHODPR(Renderer2D, SetAnimationTime, (float), void), asCALL_THISCALL);
+    // bool Serializable::SetAttribute(unsigned index, const Variant& value) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Renderer2D", "bool SetAttribute(uint, const Variant&in)", asMETHODPR(Renderer2D, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "bool set_attributes(uint, const Variant&in)", asMETHODPR(Renderer2D, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
+    // bool Serializable::SetAttribute(const String& name, const Variant& value) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Renderer2D", "bool SetAttribute(const String&in, const Variant&in)", asMETHODPR(Renderer2D, SetAttribute, (const String&, const Variant&), bool), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode=WM_LOOP, float speed=1.0f) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Renderer2D", "void SetAttributeAnimation(const String&in, ValueAnimation@+, WrapMode = WM_LOOP, float = 1.0f)", asMETHODPR(Renderer2D, SetAttributeAnimation, (const String&, ValueAnimation*, WrapMode, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationSpeed(const String& name, float speed) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Renderer2D", "void SetAttributeAnimationSpeed(const String&in, float)", asMETHODPR(Renderer2D, SetAttributeAnimationSpeed, (const String&, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationTime(const String& name, float time) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Renderer2D", "void SetAttributeAnimationTime(const String&in, float)", asMETHODPR(Renderer2D, SetAttributeAnimationTime, (const String&, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationWrapMode(const String& name, WrapMode wrapMode) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Renderer2D", "void SetAttributeAnimationWrapMode(const String&in, WrapMode)", asMETHODPR(Renderer2D, SetAttributeAnimationWrapMode, (const String&, WrapMode), void), asCALL_THISCALL);
+    // void Drawable::SetBasePass(unsigned batchIndex) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "void SetBasePass(uint)", asMETHODPR(Renderer2D, SetBasePass, (unsigned), void), asCALL_THISCALL);
+    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Renderer2D", "void SetBlockEvents(bool)", asMETHODPR(Renderer2D, SetBlockEvents, (bool), void), asCALL_THISCALL);
+    // void Drawable::SetCastShadows(bool enable) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "void SetCastShadows(bool)", asMETHODPR(Renderer2D, SetCastShadows, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "void set_castShadows(bool)", asMETHODPR(Renderer2D, SetCastShadows, (bool), void), asCALL_THISCALL);
+    // void Drawable::SetDrawDistance(float distance) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "void SetDrawDistance(float)", asMETHODPR(Renderer2D, SetDrawDistance, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "void set_drawDistance(float)", asMETHODPR(Renderer2D, SetDrawDistance, (float), void), asCALL_THISCALL);
+    // void Component::SetEnabled(bool enable) | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("Renderer2D", "void SetEnabled(bool)", asMETHODPR(Renderer2D, SetEnabled, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "void set_enabled(bool)", asMETHODPR(Renderer2D, SetEnabled, (bool), void), asCALL_THISCALL);
+    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Renderer2D", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(Renderer2D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(Renderer2D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    // void Serializable::SetInstanceDefault(bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Renderer2D", "void SetInstanceDefault(bool)", asMETHODPR(Renderer2D, SetInstanceDefault, (bool), void), asCALL_THISCALL);
+    // void Serializable::SetInterceptNetworkUpdate(const String& attributeName, bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Renderer2D", "void SetInterceptNetworkUpdate(const String&in, bool)", asMETHODPR(Renderer2D, SetInterceptNetworkUpdate, (const String&, bool), void), asCALL_THISCALL);
+    // void Drawable::SetLightMask(unsigned mask) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "void SetLightMask(uint)", asMETHODPR(Renderer2D, SetLightMask, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "void set_lightMask(uint)", asMETHODPR(Renderer2D, SetLightMask, (unsigned), void), asCALL_THISCALL);
+    // void Drawable::SetLodBias(float bias) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "void SetLodBias(float)", asMETHODPR(Renderer2D, SetLodBias, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "void set_lodBias(float)", asMETHODPR(Renderer2D, SetLodBias, (float), void), asCALL_THISCALL);
+    // void Drawable::SetMaxLights(unsigned num) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "void SetMaxLights(uint)", asMETHODPR(Renderer2D, SetMaxLights, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "void set_maxLights(uint)", asMETHODPR(Renderer2D, SetMaxLights, (unsigned), void), asCALL_THISCALL);
+    // void Drawable::SetMinMaxZ(float minZ, float maxZ) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "void SetMinMaxZ(float, float)", asMETHODPR(Renderer2D, SetMinMaxZ, (float, float), void), asCALL_THISCALL);
+    // void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Renderer2D", "void SetObjectAnimation(ObjectAnimation@+)", asMETHODPR(Renderer2D, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "void set_objectAnimation(ObjectAnimation@+)", asMETHODPR(Renderer2D, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
+    // void Animatable::SetObjectAnimationAttr(const ResourceRef& value) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("Renderer2D", "void SetObjectAnimationAttr(const ResourceRef&in)", asMETHODPR(Renderer2D, SetObjectAnimationAttr, (const ResourceRef&), void), asCALL_THISCALL);
+    // void Drawable::SetOccludee(bool enable) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "void SetOccludee(bool)", asMETHODPR(Renderer2D, SetOccludee, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "void set_occludee(bool)", asMETHODPR(Renderer2D, SetOccludee, (bool), void), asCALL_THISCALL);
+    // void Drawable::SetOccluder(bool enable) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "void SetOccluder(bool)", asMETHODPR(Renderer2D, SetOccluder, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "void set_occluder(bool)", asMETHODPR(Renderer2D, SetOccluder, (bool), void), asCALL_THISCALL);
+    // void Drawable::SetShadowDistance(float distance) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "void SetShadowDistance(float)", asMETHODPR(Renderer2D, SetShadowDistance, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "void set_shadowDistance(float)", asMETHODPR(Renderer2D, SetShadowDistance, (float), void), asCALL_THISCALL);
+    // void Drawable::SetShadowMask(unsigned mask) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "void SetShadowMask(uint)", asMETHODPR(Renderer2D, SetShadowMask, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "void set_shadowMask(uint)", asMETHODPR(Renderer2D, SetShadowMask, (unsigned), void), asCALL_THISCALL);
+    // void Drawable::SetSortValue(float value) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "void SetSortValue(float)", asMETHODPR(Renderer2D, SetSortValue, (float), void), asCALL_THISCALL);
+    // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Renderer2D", "void SetTemporary(bool)", asMETHODPR(Renderer2D, SetTemporary, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "void set_temporary(bool)", asMETHODPR(Renderer2D, SetTemporary, (bool), void), asCALL_THISCALL);
+    // void Drawable::SetViewMask(unsigned mask) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "void SetViewMask(uint)", asMETHODPR(Renderer2D, SetViewMask, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "void set_viewMask(uint)", asMETHODPR(Renderer2D, SetViewMask, (unsigned), void), asCALL_THISCALL);
+    // void Drawable::SetZone(Zone* zone, bool temporary=false) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "void SetZone(Zone@+, bool = false)", asMETHODPR(Renderer2D, SetZone, (Zone*, bool), void), asCALL_THISCALL);
+    // void Drawable::SetZoneMask(unsigned mask) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "void SetZoneMask(uint)", asMETHODPR(Renderer2D, SetZoneMask, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "void set_zoneMask(uint)", asMETHODPR(Renderer2D, SetZoneMask, (unsigned), void), asCALL_THISCALL);
+    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Renderer2D", "void UnsubscribeFromAllEvents()", asMETHODPR(Renderer2D, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Renderer2D", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(Renderer2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
+    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Renderer2D", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(Renderer2D, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Renderer2D", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(Renderer2D, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("Renderer2D", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(Renderer2D, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
+    // virtual void Drawable::Update(const FrameInfo& frame) | File: ../Graphics/Drawable.h
+    engine->RegisterObjectMethod("Renderer2D", "void Update(const FrameInfo&in)", asMETHODPR(Renderer2D, Update, (const FrameInfo&), void), asCALL_THISCALL);
+    // void Renderer2D::UpdateBatches(const FrameInfo& frame) override | File: ../Urho2D/Renderer2D.h
+    engine->RegisterObjectMethod("Renderer2D", "void UpdateBatches(const FrameInfo&in)", asMETHODPR(Renderer2D, UpdateBatches, (const FrameInfo&), void), asCALL_THISCALL);
+    // void Renderer2D::UpdateGeometry(const FrameInfo& frame) override | File: ../Urho2D/Renderer2D.h
+    engine->RegisterObjectMethod("Renderer2D", "void UpdateGeometry(const FrameInfo&in)", asMETHODPR(Renderer2D, UpdateGeometry, (const FrameInfo&), void), asCALL_THISCALL);
     // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("RenderPath", "int WeakRefs() const", asMETHODPR(RenderPath, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderPath", "int get_weakRefs() const", asMETHODPR(RenderPath, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "int WeakRefs() const", asMETHODPR(Renderer2D, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer2D", "int get_weakRefs() const", asMETHODPR(Renderer2D, WeakRefs, () const, int), asCALL_THISCALL);
+    // void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attributeBits, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Renderer2D", "void WriteDeltaUpdate(Serializer&, const DirtyBits&in, uint8)", asMETHODPR(Renderer2D, WriteDeltaUpdate, (Serializer&, const DirtyBits&, unsigned char), void), asCALL_THISCALL);
+    // void Serializable::WriteInitialDeltaUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Renderer2D", "void WriteInitialDeltaUpdate(Serializer&, uint8)", asMETHODPR(Renderer2D, WriteInitialDeltaUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
+    // void Serializable::WriteLatestDataUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("Renderer2D", "void WriteLatestDataUpdate(Serializer&, uint8)", asMETHODPR(Renderer2D, WriteLatestDataUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
+#ifdef REGISTER_MANUAL_PART_Drawable
+    REGISTER_MANUAL_PART_Drawable(Renderer2D, "Renderer2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Component
+    REGISTER_MANUAL_PART_Component(Renderer2D, "Renderer2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Animatable
+    REGISTER_MANUAL_PART_Animatable(Renderer2D, "Renderer2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Serializable
+    REGISTER_MANUAL_PART_Serializable(Renderer2D, "Renderer2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Object
+    REGISTER_MANUAL_PART_Object(Renderer2D, "Renderer2D")
+#endif
 #ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(RenderPath, "RenderPath")
+    REGISTER_MANUAL_PART_RefCounted(Renderer2D, "Renderer2D")
 #endif
-#ifdef REGISTER_MANUAL_PART_RenderPath
-    REGISTER_MANUAL_PART_RenderPath(RenderPath, "RenderPath")
+#ifdef REGISTER_MANUAL_PART_Renderer2D
+    REGISTER_MANUAL_PART_Renderer2D(Renderer2D, "Renderer2D")
 #endif
-    RegisterSubclass<RefCounted, RenderPath>(engine, "RefCounted", "RenderPath");
-
-    // void* RenderSurface::readOnlyView_ | File: ../Graphics/RenderSurface.h
-    // Not registered because have @nobind mark
-    // unsigned RenderSurface::renderBuffer_ | File: ../Graphics/RenderSurface.h
-    // Not registered because have @nobind mark
-    // void* RenderSurface::renderTargetView_ | File: ../Graphics/RenderSurface.h
-    // Not registered because have @nobind mark
-    // void* RenderSurface::surface_ | File: ../Graphics/RenderSurface.h
-    // Not registered because have @nobind mark
-    // unsigned RenderSurface::target_ | File: ../Graphics/RenderSurface.h
-    // Not registered because have @nobind mark
-    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("RenderSurface", asBEHAVE_ADDREF, "void f()", asMETHODPR(RenderSurface, AddRef, (), void), asCALL_THISCALL);
-    // bool RenderSurface::CreateRenderBuffer(unsigned width, unsigned height, unsigned format, int multiSample) | File: ../Graphics/RenderSurface.h
-    engine->RegisterObjectMethod("RenderSurface", "bool CreateRenderBuffer(uint, uint, uint, int)", asMETHODPR(RenderSurface, CreateRenderBuffer, (unsigned, unsigned, unsigned, int), bool), asCALL_THISCALL);
-    // bool RenderSurface::GetAutoResolve() const | File: ../Graphics/RenderSurface.h
-    engine->RegisterObjectMethod("RenderSurface", "bool GetAutoResolve() const", asMETHODPR(RenderSurface, GetAutoResolve, () const, bool), asCALL_THISCALL);
-    // int RenderSurface::GetHeight() const | File: ../Graphics/RenderSurface.h
-    engine->RegisterObjectMethod("RenderSurface", "int GetHeight() const", asMETHODPR(RenderSurface, GetHeight, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderSurface", "int get_height() const", asMETHODPR(RenderSurface, GetHeight, () const, int), asCALL_THISCALL);
-    // RenderSurface* RenderSurface::GetLinkedDepthStencil() const | File: ../Graphics/RenderSurface.h
-    engine->RegisterObjectMethod("RenderSurface", "RenderSurface@+ GetLinkedDepthStencil() const", asMETHODPR(RenderSurface, GetLinkedDepthStencil, () const, RenderSurface*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderSurface", "RenderSurface@+ get_linkedDepthStencil() const", asMETHODPR(RenderSurface, GetLinkedDepthStencil, () const, RenderSurface*), asCALL_THISCALL);
-    // RenderSurface* RenderSurface::GetLinkedRenderTarget() const | File: ../Graphics/RenderSurface.h
-    engine->RegisterObjectMethod("RenderSurface", "RenderSurface@+ GetLinkedRenderTarget() const", asMETHODPR(RenderSurface, GetLinkedRenderTarget, () const, RenderSurface*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderSurface", "RenderSurface@+ get_linkedRenderTarget() const", asMETHODPR(RenderSurface, GetLinkedRenderTarget, () const, RenderSurface*), asCALL_THISCALL);
-    // int RenderSurface::GetMultiSample() const | File: ../Graphics/RenderSurface.h
-    engine->RegisterObjectMethod("RenderSurface", "int GetMultiSample() const", asMETHODPR(RenderSurface, GetMultiSample, () const, int), asCALL_THISCALL);
-    // unsigned RenderSurface::GetNumViewports() const | File: ../Graphics/RenderSurface.h
-    engine->RegisterObjectMethod("RenderSurface", "uint GetNumViewports() const", asMETHODPR(RenderSurface, GetNumViewports, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderSurface", "uint get_numViewports() const", asMETHODPR(RenderSurface, GetNumViewports, () const, unsigned), asCALL_THISCALL);
-    // Texture* RenderSurface::GetParentTexture() const | File: ../Graphics/RenderSurface.h
-    engine->RegisterObjectMethod("RenderSurface", "Texture@+ GetParentTexture() const", asMETHODPR(RenderSurface, GetParentTexture, () const, Texture*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderSurface", "Texture@+ get_parentTexture() const", asMETHODPR(RenderSurface, GetParentTexture, () const, Texture*), asCALL_THISCALL);
-    // void* RenderSurface::GetReadOnlyView() const | File: ../Graphics/RenderSurface.h
-    // Error: type "void*" can not automatically bind
-    // unsigned RenderSurface::GetRenderBuffer() const | File: ../Graphics/RenderSurface.h
-    engine->RegisterObjectMethod("RenderSurface", "uint GetRenderBuffer() const", asMETHODPR(RenderSurface, GetRenderBuffer, () const, unsigned), asCALL_THISCALL);
-    // void* RenderSurface::GetRenderTargetView() const | File: ../Graphics/RenderSurface.h
-    // Error: type "void*" can not automatically bind
-    // void* RenderSurface::GetSurface() const | File: ../Graphics/RenderSurface.h
-    // Error: type "void*" can not automatically bind
-    // unsigned RenderSurface::GetTarget() const | File: ../Graphics/RenderSurface.h
-    engine->RegisterObjectMethod("RenderSurface", "uint GetTarget() const", asMETHODPR(RenderSurface, GetTarget, () const, unsigned), asCALL_THISCALL);
-    // RenderSurfaceUpdateMode RenderSurface::GetUpdateMode() const | File: ../Graphics/RenderSurface.h
-    engine->RegisterObjectMethod("RenderSurface", "RenderSurfaceUpdateMode GetUpdateMode() const", asMETHODPR(RenderSurface, GetUpdateMode, () const, RenderSurfaceUpdateMode), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderSurface", "RenderSurfaceUpdateMode get_updateMode() const", asMETHODPR(RenderSurface, GetUpdateMode, () const, RenderSurfaceUpdateMode), asCALL_THISCALL);
-    // TextureUsage RenderSurface::GetUsage() const | File: ../Graphics/RenderSurface.h
-    engine->RegisterObjectMethod("RenderSurface", "TextureUsage GetUsage() const", asMETHODPR(RenderSurface, GetUsage, () const, TextureUsage), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderSurface", "TextureUsage get_usage() const", asMETHODPR(RenderSurface, GetUsage, () const, TextureUsage), asCALL_THISCALL);
-    // Viewport* RenderSurface::GetViewport(unsigned index) const | File: ../Graphics/RenderSurface.h
-    engine->RegisterObjectMethod("RenderSurface", "Viewport@+ GetViewport(uint) const", asMETHODPR(RenderSurface, GetViewport, (unsigned) const, Viewport*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderSurface", "Viewport@+ get_viewports(uint) const", asMETHODPR(RenderSurface, GetViewport, (unsigned) const, Viewport*), asCALL_THISCALL);
-    // int RenderSurface::GetWidth() const | File: ../Graphics/RenderSurface.h
-    engine->RegisterObjectMethod("RenderSurface", "int GetWidth() const", asMETHODPR(RenderSurface, GetWidth, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderSurface", "int get_width() const", asMETHODPR(RenderSurface, GetWidth, () const, int), asCALL_THISCALL);
-    // bool RenderSurface::IsResolveDirty() const | File: ../Graphics/RenderSurface.h
-    engine->RegisterObjectMethod("RenderSurface", "bool IsResolveDirty() const", asMETHODPR(RenderSurface, IsResolveDirty, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderSurface", "bool get_resolveDirty() const", asMETHODPR(RenderSurface, IsResolveDirty, () const, bool), asCALL_THISCALL);
-    // bool RenderSurface::IsUpdateQueued() const | File: ../Graphics/RenderSurface.h
-    engine->RegisterObjectMethod("RenderSurface", "bool IsUpdateQueued() const", asMETHODPR(RenderSurface, IsUpdateQueued, () const, bool), asCALL_THISCALL);
-    // void RenderSurface::OnDeviceLost() | File: ../Graphics/RenderSurface.h
-    engine->RegisterObjectMethod("RenderSurface", "void OnDeviceLost()", asMETHODPR(RenderSurface, OnDeviceLost, (), void), asCALL_THISCALL);
-    // void RenderSurface::QueueUpdate() | File: ../Graphics/RenderSurface.h
-    engine->RegisterObjectMethod("RenderSurface", "void QueueUpdate()", asMETHODPR(RenderSurface, QueueUpdate, (), void), asCALL_THISCALL);
-    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
-    // Error: type "RefCount*" can not automatically bind
-    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("RenderSurface", "int Refs() const", asMETHODPR(RenderSurface, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderSurface", "int get_refs() const", asMETHODPR(RenderSurface, Refs, () const, int), asCALL_THISCALL);
-    // void RenderSurface::Release() | File: ../Graphics/RenderSurface.h
-    engine->RegisterObjectMethod("RenderSurface", "void Release()", asMETHODPR(RenderSurface, Release, (), void), asCALL_THISCALL);
-    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("RenderSurface", asBEHAVE_RELEASE, "void f()", asMETHODPR(RenderSurface, ReleaseRef, (), void), asCALL_THISCALL);
-    // explicit RenderSurface::RenderSurface(Texture* parentTexture) | File: ../Graphics/RenderSurface.h
-    engine->RegisterObjectBehaviour("RenderSurface", asBEHAVE_FACTORY, "RenderSurface@+ f(Texture@+)", asFUNCTION(RenderSurface_RenderSurface_Texture), asCALL_CDECL);
-    // void RenderSurface::ResetUpdateQueued() | File: ../Graphics/RenderSurface.h
-    engine->RegisterObjectMethod("RenderSurface", "void ResetUpdateQueued()", asMETHODPR(RenderSurface, ResetUpdateQueued, (), void), asCALL_THISCALL);
-    // void RenderSurface::SetLinkedDepthStencil(RenderSurface* depthStencil) | File: ../Graphics/RenderSurface.h
-    engine->RegisterObjectMethod("RenderSurface", "void SetLinkedDepthStencil(RenderSurface@+)", asMETHODPR(RenderSurface, SetLinkedDepthStencil, (RenderSurface*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderSurface", "void set_linkedDepthStencil(RenderSurface@+)", asMETHODPR(RenderSurface, SetLinkedDepthStencil, (RenderSurface*), void), asCALL_THISCALL);
-    // void RenderSurface::SetLinkedRenderTarget(RenderSurface* renderTarget) | File: ../Graphics/RenderSurface.h
-    engine->RegisterObjectMethod("RenderSurface", "void SetLinkedRenderTarget(RenderSurface@+)", asMETHODPR(RenderSurface, SetLinkedRenderTarget, (RenderSurface*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderSurface", "void set_linkedRenderTarget(RenderSurface@+)", asMETHODPR(RenderSurface, SetLinkedRenderTarget, (RenderSurface*), void), asCALL_THISCALL);
-    // void RenderSurface::SetNumViewports(unsigned num) | File: ../Graphics/RenderSurface.h
-    engine->RegisterObjectMethod("RenderSurface", "void SetNumViewports(uint)", asMETHODPR(RenderSurface, SetNumViewports, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderSurface", "void set_numViewports(uint)", asMETHODPR(RenderSurface, SetNumViewports, (unsigned), void), asCALL_THISCALL);
-    // void RenderSurface::SetResolveDirty(bool enable) | File: ../Graphics/RenderSurface.h
-    engine->RegisterObjectMethod("RenderSurface", "void SetResolveDirty(bool)", asMETHODPR(RenderSurface, SetResolveDirty, (bool), void), asCALL_THISCALL);
-    // void RenderSurface::SetUpdateMode(RenderSurfaceUpdateMode mode) | File: ../Graphics/RenderSurface.h
-    engine->RegisterObjectMethod("RenderSurface", "void SetUpdateMode(RenderSurfaceUpdateMode)", asMETHODPR(RenderSurface, SetUpdateMode, (RenderSurfaceUpdateMode), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderSurface", "void set_updateMode(RenderSurfaceUpdateMode)", asMETHODPR(RenderSurface, SetUpdateMode, (RenderSurfaceUpdateMode), void), asCALL_THISCALL);
-    // void RenderSurface::SetViewport(unsigned index, Viewport* viewport) | File: ../Graphics/RenderSurface.h
-    engine->RegisterObjectMethod("RenderSurface", "void SetViewport(uint, Viewport@+)", asMETHODPR(RenderSurface, SetViewport, (unsigned, Viewport*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderSurface", "void set_viewports(uint, Viewport@+)", asMETHODPR(RenderSurface, SetViewport, (unsigned, Viewport*), void), asCALL_THISCALL);
-    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("RenderSurface", "int WeakRefs() const", asMETHODPR(RenderSurface, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderSurface", "int get_weakRefs() const", asMETHODPR(RenderSurface, WeakRefs, () const, int), asCALL_THISCALL);
-#ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(RenderSurface, "RenderSurface")
+    RegisterSubclass<Drawable, Renderer2D>(engine, "Drawable", "Renderer2D");
+    RegisterSubclass<Component, Renderer2D>(engine, "Component", "Renderer2D");
+    RegisterSubclass<Animatable, Renderer2D>(engine, "Animatable", "Renderer2D");
+    RegisterSubclass<Serializable, Renderer2D>(engine, "Serializable", "Renderer2D");
+    RegisterSubclass<Object, Renderer2D>(engine, "Object", "Renderer2D");
+    RegisterSubclass<RefCounted, Renderer2D>(engine, "RefCounted", "Renderer2D");
 #endif
-#ifdef REGISTER_MANUAL_PART_RenderSurface
-    REGISTER_MANUAL_PART_RenderSurface(RenderSurface, "RenderSurface")
-#endif
-    RegisterSubclass<RefCounted, RenderSurface>(engine, "RefCounted", "RenderSurface");
 
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("Resource", asBEHAVE_ADDREF, "void f()", asMETHODPR(Resource, AddRef, (), void), asCALL_THISCALL);
@@ -3914,30 +3914,6 @@ void ASRegisterGenerated_Members_R(asIScriptEngine* engine)
     REGISTER_MANUAL_PART_RayQueryResult(RayQueryResult, "RayQueryResult")
 #endif
 
-    // Connection* ReplicationState::connection_ | File: ../Scene/ReplicationState.h
-    // Connection* can not be registered
-    // ReplicationState::~ReplicationState() | Implicitly-declared
-    engine->RegisterObjectBehaviour("ReplicationState", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(ReplicationState_Destructor), asCALL_CDECL_OBJFIRST);
-    // ReplicationState& ReplicationState::operator=(const ReplicationState&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<ReplicationState>(engine, "ReplicationState");
-#ifdef REGISTER_MANUAL_PART_ReplicationState
-    REGISTER_MANUAL_PART_ReplicationState(ReplicationState, "ReplicationState")
-#endif
-
-    // unsigned long long ResourceGroup::memoryBudget_ | File: ../Resource/ResourceCache.h
-    engine->RegisterObjectProperty("ResourceGroup", "uint64 memoryBudget", offsetof(ResourceGroup, memoryBudget_));
-    // unsigned long long ResourceGroup::memoryUse_ | File: ../Resource/ResourceCache.h
-    engine->RegisterObjectProperty("ResourceGroup", "uint64 memoryUse", offsetof(ResourceGroup, memoryUse_));
-    // HashMap<StringHash, SharedPtr<Resource> > ResourceGroup::resources_ | File: ../Resource/ResourceCache.h
-    // Error: type "HashMap<StringHash, SharedPtr<Resource>>" can not automatically bind
-    // ResourceGroup::~ResourceGroup() | Implicitly-declared
-    engine->RegisterObjectBehaviour("ResourceGroup", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(ResourceGroup_Destructor), asCALL_CDECL_OBJFIRST);
-    // ResourceGroup& ResourceGroup::operator=(const ResourceGroup&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<ResourceGroup>(engine, "ResourceGroup");
-#ifdef REGISTER_MANUAL_PART_ResourceGroup
-    REGISTER_MANUAL_PART_ResourceGroup(ResourceGroup, "ResourceGroup")
-#endif
-
     // int RefCount::refs_ | File: ../Container/RefCounted.h
     engine->RegisterObjectProperty("RefCount", "int refs", offsetof(RefCount, refs_));
     // int RefCount::weakRefs_ | File: ../Container/RefCounted.h
@@ -4100,6 +4076,30 @@ void ASRegisterGenerated_Members_R(asIScriptEngine* engine)
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<RenderTargetInfo>(engine, "RenderTargetInfo");
 #ifdef REGISTER_MANUAL_PART_RenderTargetInfo
     REGISTER_MANUAL_PART_RenderTargetInfo(RenderTargetInfo, "RenderTargetInfo")
+#endif
+
+    // Connection* ReplicationState::connection_ | File: ../Scene/ReplicationState.h
+    // Connection* can not be registered
+    // ReplicationState::~ReplicationState() | Implicitly-declared
+    engine->RegisterObjectBehaviour("ReplicationState", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(ReplicationState_Destructor), asCALL_CDECL_OBJFIRST);
+    // ReplicationState& ReplicationState::operator=(const ReplicationState&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<ReplicationState>(engine, "ReplicationState");
+#ifdef REGISTER_MANUAL_PART_ReplicationState
+    REGISTER_MANUAL_PART_ReplicationState(ReplicationState, "ReplicationState")
+#endif
+
+    // unsigned long long ResourceGroup::memoryBudget_ | File: ../Resource/ResourceCache.h
+    engine->RegisterObjectProperty("ResourceGroup", "uint64 memoryBudget", offsetof(ResourceGroup, memoryBudget_));
+    // unsigned long long ResourceGroup::memoryUse_ | File: ../Resource/ResourceCache.h
+    engine->RegisterObjectProperty("ResourceGroup", "uint64 memoryUse", offsetof(ResourceGroup, memoryUse_));
+    // HashMap<StringHash, SharedPtr<Resource> > ResourceGroup::resources_ | File: ../Resource/ResourceCache.h
+    // Error: type "HashMap<StringHash, SharedPtr<Resource>>" can not automatically bind
+    // ResourceGroup::~ResourceGroup() | Implicitly-declared
+    engine->RegisterObjectBehaviour("ResourceGroup", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(ResourceGroup_Destructor), asCALL_CDECL_OBJFIRST);
+    // ResourceGroup& ResourceGroup::operator=(const ResourceGroup&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<ResourceGroup>(engine, "ResourceGroup");
+#ifdef REGISTER_MANUAL_PART_ResourceGroup
+    REGISTER_MANUAL_PART_ResourceGroup(ResourceGroup, "ResourceGroup")
 #endif
 
     // String ResourceRef::name_ | File: ../Core/Variant.h

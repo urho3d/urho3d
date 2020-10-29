@@ -51,23 +51,6 @@ namespace Urho3D
 void FakeAddRef(void* ptr);
 void FakeReleaseRef(void* ptr);
 
-#ifdef URHO3D_URHO2D
-// explicit ConstraintFriction2D::ConstraintFriction2D(Context* context) | File: ../Urho2D/ConstraintFriction2D.h
-static ConstraintFriction2D* ConstraintFriction2D_ConstraintFriction2D_Context()
-{
-    return new ConstraintFriction2D(GetScriptContext());
-}
-#endif
-
-#ifdef URHO3D_URHO2D
-// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void ConstraintFriction2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ConstraintFriction2D* ptr, CScriptArray* exceptions, bool onlyUserData)
-{
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
-}
-#endif
-
 #ifdef URHO3D_PHYSICS
 // explicit Constraint::Constraint(Context* context) | File: ../Physics/Constraint.h
 static Constraint* Constraint_Constraint_Context()
@@ -79,57 +62,6 @@ static Constraint* Constraint_Constraint_Context()
 #ifdef URHO3D_PHYSICS
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void Constraint_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Constraint* ptr, CScriptArray* exceptions, bool onlyUserData)
-{
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
-}
-#endif
-
-#ifdef URHO3D_URHO2D
-// explicit ConstraintGear2D::ConstraintGear2D(Context* context) | File: ../Urho2D/ConstraintGear2D.h
-static ConstraintGear2D* ConstraintGear2D_ConstraintGear2D_Context()
-{
-    return new ConstraintGear2D(GetScriptContext());
-}
-#endif
-
-#ifdef URHO3D_URHO2D
-// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void ConstraintGear2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ConstraintGear2D* ptr, CScriptArray* exceptions, bool onlyUserData)
-{
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
-}
-#endif
-
-#ifdef URHO3D_URHO2D
-// explicit ConstraintRevolute2D::ConstraintRevolute2D(Context* context) | File: ../Urho2D/ConstraintRevolute2D.h
-static ConstraintRevolute2D* ConstraintRevolute2D_ConstraintRevolute2D_Context()
-{
-    return new ConstraintRevolute2D(GetScriptContext());
-}
-#endif
-
-#ifdef URHO3D_URHO2D
-// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void ConstraintRevolute2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ConstraintRevolute2D* ptr, CScriptArray* exceptions, bool onlyUserData)
-{
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
-}
-#endif
-
-#ifdef URHO3D_URHO2D
-// explicit ConstraintPrismatic2D::ConstraintPrismatic2D(Context* context) | File: ../Urho2D/ConstraintPrismatic2D.h
-static ConstraintPrismatic2D* ConstraintPrismatic2D_ConstraintPrismatic2D_Context()
-{
-    return new ConstraintPrismatic2D(GetScriptContext());
-}
-#endif
-
-#ifdef URHO3D_URHO2D
-// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void ConstraintPrismatic2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ConstraintPrismatic2D* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
     PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
@@ -171,6 +103,40 @@ static void ConstraintDistance2D_UnsubscribeFromAllEventsExcept_PODVectorStringH
 #endif
 
 #ifdef URHO3D_URHO2D
+// explicit ConstraintFriction2D::ConstraintFriction2D(Context* context) | File: ../Urho2D/ConstraintFriction2D.h
+static ConstraintFriction2D* ConstraintFriction2D_ConstraintFriction2D_Context()
+{
+    return new ConstraintFriction2D(GetScriptContext());
+}
+#endif
+
+#ifdef URHO3D_URHO2D
+// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+static void ConstraintFriction2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ConstraintFriction2D* ptr, CScriptArray* exceptions, bool onlyUserData)
+{
+    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+}
+#endif
+
+#ifdef URHO3D_URHO2D
+// explicit ConstraintGear2D::ConstraintGear2D(Context* context) | File: ../Urho2D/ConstraintGear2D.h
+static ConstraintGear2D* ConstraintGear2D_ConstraintGear2D_Context()
+{
+    return new ConstraintGear2D(GetScriptContext());
+}
+#endif
+
+#ifdef URHO3D_URHO2D
+// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+static void ConstraintGear2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ConstraintGear2D* ptr, CScriptArray* exceptions, bool onlyUserData)
+{
+    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+}
+#endif
+
+#ifdef URHO3D_URHO2D
 // explicit ConstraintMotor2D::ConstraintMotor2D(Context* context) | File: ../Urho2D/ConstraintMotor2D.h
 static ConstraintMotor2D* ConstraintMotor2D_ConstraintMotor2D_Context()
 {
@@ -205,6 +171,23 @@ static void ConstraintMouse2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash
 #endif
 
 #ifdef URHO3D_URHO2D
+// explicit ConstraintPrismatic2D::ConstraintPrismatic2D(Context* context) | File: ../Urho2D/ConstraintPrismatic2D.h
+static ConstraintPrismatic2D* ConstraintPrismatic2D_ConstraintPrismatic2D_Context()
+{
+    return new ConstraintPrismatic2D(GetScriptContext());
+}
+#endif
+
+#ifdef URHO3D_URHO2D
+// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+static void ConstraintPrismatic2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ConstraintPrismatic2D* ptr, CScriptArray* exceptions, bool onlyUserData)
+{
+    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+}
+#endif
+
+#ifdef URHO3D_URHO2D
 // explicit ConstraintPulley2D::ConstraintPulley2D(Context* context) | File: ../Urho2D/ConstraintPulley2D.h
 static ConstraintPulley2D* ConstraintPulley2D_ConstraintPulley2D_Context()
 {
@@ -215,6 +198,23 @@ static ConstraintPulley2D* ConstraintPulley2D_ConstraintPulley2D_Context()
 #ifdef URHO3D_URHO2D
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void ConstraintPulley2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ConstraintPulley2D* ptr, CScriptArray* exceptions, bool onlyUserData)
+{
+    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+}
+#endif
+
+#ifdef URHO3D_URHO2D
+// explicit ConstraintRevolute2D::ConstraintRevolute2D(Context* context) | File: ../Urho2D/ConstraintRevolute2D.h
+static ConstraintRevolute2D* ConstraintRevolute2D_ConstraintRevolute2D_Context()
+{
+    return new ConstraintRevolute2D(GetScriptContext());
+}
+#endif
+
+#ifdef URHO3D_URHO2D
+// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+static void ConstraintRevolute2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ConstraintRevolute2D* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
     PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
@@ -274,331 +274,6 @@ static void ConstraintWheel2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash
 
 void ASRegisterGenerated_Members_Constraint(asIScriptEngine* engine)
 {
-#ifdef URHO3D_URHO2D
-    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("ConstraintFriction2D", asBEHAVE_ADDREF, "void f()", asMETHODPR(ConstraintFriction2D, AddRef, (), void), asCALL_THISCALL);
-    // void Component::AddReplicationState(ComponentReplicationState* state) | File: ../Scene/Component.h
-    // Error: type "ComponentReplicationState*" can not automatically bind
-    // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void AllocateNetworkState()", asMETHODPR(ConstraintFriction2D, AllocateNetworkState, (), void), asCALL_THISCALL);
-    // void Constraint2D::ApplyAttributes() override | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void ApplyAttributes()", asMETHODPR(ConstraintFriction2D, ApplyAttributes, (), void), asCALL_THISCALL);
-    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
-    // Not registered because template
-    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
-    // Not registered because template
-    // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void CleanupConnection(Connection@+)", asMETHODPR(ConstraintFriction2D, CleanupConnection, (Connection*), void), asCALL_THISCALL);
-    // explicit ConstraintFriction2D::ConstraintFriction2D(Context* context) | File: ../Urho2D/ConstraintFriction2D.h
-    engine->RegisterObjectBehaviour("ConstraintFriction2D", asBEHAVE_FACTORY, "ConstraintFriction2D@+ f()", asFUNCTION(ConstraintFriction2D_ConstraintFriction2D_Context), asCALL_CDECL);
-    // void Constraint2D::CreateJoint() | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void CreateJoint()", asMETHODPR(ConstraintFriction2D, CreateJoint, (), void), asCALL_THISCALL);
-    // virtual void Component::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(ConstraintFriction2D, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
-    // const Vector2& ConstraintFriction2D::GetAnchor() const | File: ../Urho2D/ConstraintFriction2D.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "const Vector2& GetAnchor() const", asMETHODPR(ConstraintFriction2D, GetAnchor, () const, const Vector2&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintFriction2D", "const Vector2& get_anchor() const", asMETHODPR(ConstraintFriction2D, GetAnchor, () const, const Vector2&), asCALL_THISCALL);
-    // bool Animatable::GetAnimationEnabled() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "bool GetAnimationEnabled() const", asMETHODPR(ConstraintFriction2D, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintFriction2D", "bool get_animationEnabled() const", asMETHODPR(ConstraintFriction2D, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
-    // Constraint2D* Constraint2D::GetAttachedConstraint() const | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "Constraint2D@+ GetAttachedConstraint() const", asMETHODPR(ConstraintFriction2D, GetAttachedConstraint, () const, Constraint2D*), asCALL_THISCALL);
-    // Variant Serializable::GetAttribute(unsigned index) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "Variant GetAttribute(uint) const", asMETHODPR(ConstraintFriction2D, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintFriction2D", "Variant get_attributes(uint) const", asMETHODPR(ConstraintFriction2D, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
-    // Variant Serializable::GetAttribute(const String& name) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "Variant GetAttribute(const String&in) const", asMETHODPR(ConstraintFriction2D, GetAttribute, (const String&) const, Variant), asCALL_THISCALL);
-    // ValueAnimation* Animatable::GetAttributeAnimation(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "ValueAnimation@+ GetAttributeAnimation(const String&in) const", asMETHODPR(ConstraintFriction2D, GetAttributeAnimation, (const String&) const, ValueAnimation*), asCALL_THISCALL);
-    // float Animatable::GetAttributeAnimationSpeed(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "float GetAttributeAnimationSpeed(const String&in) const", asMETHODPR(ConstraintFriction2D, GetAttributeAnimationSpeed, (const String&) const, float), asCALL_THISCALL);
-    // float Animatable::GetAttributeAnimationTime(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "float GetAttributeAnimationTime(const String&in) const", asMETHODPR(ConstraintFriction2D, GetAttributeAnimationTime, (const String&) const, float), asCALL_THISCALL);
-    // WrapMode Animatable::GetAttributeAnimationWrapMode(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "WrapMode GetAttributeAnimationWrapMode(const String&in) const", asMETHODPR(ConstraintFriction2D, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), asCALL_THISCALL);
-    // Variant Serializable::GetAttributeDefault(unsigned index) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "Variant GetAttributeDefault(uint) const", asMETHODPR(ConstraintFriction2D, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintFriction2D", "Variant get_attributeDefaults(uint) const", asMETHODPR(ConstraintFriction2D, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
-    // Variant Serializable::GetAttributeDefault(const String& name) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "Variant GetAttributeDefault(const String&in) const", asMETHODPR(ConstraintFriction2D, GetAttributeDefault, (const String&) const, Variant), asCALL_THISCALL);
-    // virtual const Vector<AttributeInfo>* Serializable::GetAttributes() const | File: ../Scene/Serializable.h
-    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
-    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "bool GetBlockEvents() const", asMETHODPR(ConstraintFriction2D, GetBlockEvents, () const, bool), asCALL_THISCALL);
-    // const String& Object::GetCategory() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "const String& GetCategory() const", asMETHODPR(ConstraintFriction2D, GetCategory, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintFriction2D", "const String& get_category() const", asMETHODPR(ConstraintFriction2D, GetCategory, () const, const String&), asCALL_THISCALL);
-    // bool Constraint2D::GetCollideConnected() const | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "bool GetCollideConnected() const", asMETHODPR(ConstraintFriction2D, GetCollideConnected, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintFriction2D", "bool get_collideConnected() const", asMETHODPR(ConstraintFriction2D, GetCollideConnected, () const, bool), asCALL_THISCALL);
-    // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "Component@+ GetComponent(StringHash) const", asMETHODPR(ConstraintFriction2D, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
-    // template<class T> T*  Component::GetComponent() const | File: ../Scene/Component.h
-    // Not registered because template
-    // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
-    // Error: type "PODVector<Component*>&" can not automatically bind
-    // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
-    // Not registered because template
-    // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
-    // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
-    // Error: type "PODVector<Node*>&" can not automatically bind
-    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "VariantMap& GetEventDataMap() const", asMETHODPR(ConstraintFriction2D, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
-    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // Object* Object::GetEventSender() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "Object@+ GetEventSender() const", asMETHODPR(ConstraintFriction2D, GetEventSender, () const, Object*), asCALL_THISCALL);
-    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(ConstraintFriction2D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintFriction2D", "const Variant& get_globalVar(StringHash) const", asMETHODPR(ConstraintFriction2D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "const VariantMap& GetGlobalVars() const", asMETHODPR(ConstraintFriction2D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintFriction2D", "const VariantMap& get_globalVars() const", asMETHODPR(ConstraintFriction2D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    // unsigned Component::GetID() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "uint GetID() const", asMETHODPR(ConstraintFriction2D, GetID, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintFriction2D", "uint get_id() const", asMETHODPR(ConstraintFriction2D, GetID, () const, unsigned), asCALL_THISCALL);
-    // bool Serializable::GetInterceptNetworkUpdate(const String& attributeName) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "bool GetInterceptNetworkUpdate(const String&in) const", asMETHODPR(ConstraintFriction2D, GetInterceptNetworkUpdate, (const String&) const, bool), asCALL_THISCALL);
-    // b2Joint* Constraint2D::GetJoint() const | File: ../Urho2D/Constraint2D.h
-    // Error: type "b2Joint*" can not automatically bind
-    // float ConstraintFriction2D::GetMaxForce() const | File: ../Urho2D/ConstraintFriction2D.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "float GetMaxForce() const", asMETHODPR(ConstraintFriction2D, GetMaxForce, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintFriction2D", "float get_maxForce() const", asMETHODPR(ConstraintFriction2D, GetMaxForce, () const, float), asCALL_THISCALL);
-    // float ConstraintFriction2D::GetMaxTorque() const | File: ../Urho2D/ConstraintFriction2D.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "float GetMaxTorque() const", asMETHODPR(ConstraintFriction2D, GetMaxTorque, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintFriction2D", "float get_maxTorque() const", asMETHODPR(ConstraintFriction2D, GetMaxTorque, () const, float), asCALL_THISCALL);
-    // virtual const Vector<AttributeInfo>* Serializable::GetNetworkAttributes() const | File: ../Scene/Serializable.h
-    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
-    // NetworkState* Serializable::GetNetworkState() const | File: ../Scene/Serializable.h
-    // Error: type "NetworkState*" can not automatically bind
-    // Node* Component::GetNode() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "Node@+ GetNode() const", asMETHODPR(ConstraintFriction2D, GetNode, () const, Node*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintFriction2D", "Node@+ get_node() const", asMETHODPR(ConstraintFriction2D, GetNode, () const, Node*), asCALL_THISCALL);
-    // unsigned Serializable::GetNumAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "uint GetNumAttributes() const", asMETHODPR(ConstraintFriction2D, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintFriction2D", "uint get_numAttributes() const", asMETHODPR(ConstraintFriction2D, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
-    // unsigned Serializable::GetNumNetworkAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "uint GetNumNetworkAttributes() const", asMETHODPR(ConstraintFriction2D, GetNumNetworkAttributes, () const, unsigned), asCALL_THISCALL);
-    // ObjectAnimation* Animatable::GetObjectAnimation() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "ObjectAnimation@+ GetObjectAnimation() const", asMETHODPR(ConstraintFriction2D, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintFriction2D", "ObjectAnimation@+ get_objectAnimation() const", asMETHODPR(ConstraintFriction2D, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
-    // ResourceRef Animatable::GetObjectAnimationAttr() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "ResourceRef GetObjectAnimationAttr() const", asMETHODPR(ConstraintFriction2D, GetObjectAnimationAttr, () const, ResourceRef), asCALL_THISCALL);
-    // RigidBody2D* Constraint2D::GetOtherBody() const | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "RigidBody2D@+ GetOtherBody() const", asMETHODPR(ConstraintFriction2D, GetOtherBody, () const, RigidBody2D*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintFriction2D", "RigidBody2D@+ get_otherBody() const", asMETHODPR(ConstraintFriction2D, GetOtherBody, () const, RigidBody2D*), asCALL_THISCALL);
-    // RigidBody2D* Constraint2D::GetOwnerBody() const | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "RigidBody2D@+ GetOwnerBody() const", asMETHODPR(ConstraintFriction2D, GetOwnerBody, () const, RigidBody2D*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintFriction2D", "RigidBody2D@+ get_ownerBody() const", asMETHODPR(ConstraintFriction2D, GetOwnerBody, () const, RigidBody2D*), asCALL_THISCALL);
-    // Scene* Component::GetScene() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "Scene@+ GetScene() const", asMETHODPR(ConstraintFriction2D, GetScene, () const, Scene*), asCALL_THISCALL);
-    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(ConstraintFriction2D, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
-    // Not registered because template
-    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "StringHash GetType() const", asMETHODPR(ConstraintFriction2D, GetType, () const, StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintFriction2D", "StringHash get_type() const", asMETHODPR(ConstraintFriction2D, GetType, () const, StringHash), asCALL_THISCALL);
-    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "const String& GetTypeName() const", asMETHODPR(ConstraintFriction2D, GetTypeName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintFriction2D", "const String& get_typeName() const", asMETHODPR(ConstraintFriction2D, GetTypeName, () const, const String&), asCALL_THISCALL);
-    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "bool HasEventHandlers() const", asMETHODPR(ConstraintFriction2D, HasEventHandlers, () const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(ConstraintFriction2D, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(ConstraintFriction2D, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
-    // bool Component::IsEnabled() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "bool IsEnabled() const", asMETHODPR(ConstraintFriction2D, IsEnabled, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintFriction2D", "bool get_enabled() const", asMETHODPR(ConstraintFriction2D, IsEnabled, () const, bool), asCALL_THISCALL);
-    // bool Component::IsEnabledEffective() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "bool IsEnabledEffective() const", asMETHODPR(ConstraintFriction2D, IsEnabledEffective, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintFriction2D", "bool get_enabledEffective() const", asMETHODPR(ConstraintFriction2D, IsEnabledEffective, () const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "bool IsInstanceOf(StringHash) const", asMETHODPR(ConstraintFriction2D, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
-    // Not registered because template
-    // bool Component::IsReplicated() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "bool IsReplicated() const", asMETHODPR(ConstraintFriction2D, IsReplicated, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintFriction2D", "bool get_replicated() const", asMETHODPR(ConstraintFriction2D, IsReplicated, () const, bool), asCALL_THISCALL);
-    // bool Serializable::IsTemporary() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "bool IsTemporary() const", asMETHODPR(ConstraintFriction2D, IsTemporary, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintFriction2D", "bool get_temporary() const", asMETHODPR(ConstraintFriction2D, IsTemporary, () const, bool), asCALL_THISCALL);
-    // virtual bool Serializable::Load(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "bool Load(Deserializer&)", asMETHODPR(ConstraintFriction2D, Load, (Deserializer&), bool), asCALL_THISCALL);
-    // bool Animatable::LoadJSON(const JSONValue& source) override | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "bool LoadJSON(const JSONValue&in)", asMETHODPR(ConstraintFriction2D, LoadJSON, (const JSONValue&), bool), asCALL_THISCALL);
-    // bool Animatable::LoadXML(const XMLElement& source) override | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "bool LoadXML(const XMLElement&in)", asMETHODPR(ConstraintFriction2D, LoadXML, (const XMLElement&), bool), asCALL_THISCALL);
-    // void Component::MarkNetworkUpdate() override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void MarkNetworkUpdate()", asMETHODPR(ConstraintFriction2D, MarkNetworkUpdate, (), void), asCALL_THISCALL);
-    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(ConstraintFriction2D, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
-    // virtual void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void OnGetAttribute(const AttributeInfo&in, Variant&) const", asMETHODPR(ConstraintFriction2D, OnGetAttribute, (const AttributeInfo&, Variant&) const, void), asCALL_THISCALL);
-    // virtual void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void OnSetAttribute(const AttributeInfo&in, const Variant&in)", asMETHODPR(ConstraintFriction2D, OnSetAttribute, (const AttributeInfo&, const Variant&), void), asCALL_THISCALL);
-    // void Constraint2D::OnSetEnabled() override | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void OnSetEnabled()", asMETHODPR(ConstraintFriction2D, OnSetEnabled, (), void), asCALL_THISCALL);
-    // void Component::PrepareNetworkUpdate() | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void PrepareNetworkUpdate()", asMETHODPR(ConstraintFriction2D, PrepareNetworkUpdate, (), void), asCALL_THISCALL);
-    // bool Serializable::ReadDeltaUpdate(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "bool ReadDeltaUpdate(Deserializer&)", asMETHODPR(ConstraintFriction2D, ReadDeltaUpdate, (Deserializer&), bool), asCALL_THISCALL);
-    // bool Serializable::ReadLatestDataUpdate(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "bool ReadLatestDataUpdate(Deserializer&)", asMETHODPR(ConstraintFriction2D, ReadLatestDataUpdate, (Deserializer&), bool), asCALL_THISCALL);
-    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
-    // Error: type "RefCount*" can not automatically bind
-    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "int Refs() const", asMETHODPR(ConstraintFriction2D, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintFriction2D", "int get_refs() const", asMETHODPR(ConstraintFriction2D, Refs, () const, int), asCALL_THISCALL);
-    // static void ConstraintFriction2D::RegisterObject(Context* context) | File: ../Urho2D/ConstraintFriction2D.h
-    // Context can be used as firs parameter of constructors only
-    // void Constraint2D::ReleaseJoint() | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void ReleaseJoint()", asMETHODPR(ConstraintFriction2D, ReleaseJoint, (), void), asCALL_THISCALL);
-    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("ConstraintFriction2D", asBEHAVE_RELEASE, "void f()", asMETHODPR(ConstraintFriction2D, ReleaseRef, (), void), asCALL_THISCALL);
-    // void Component::Remove() | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void Remove()", asMETHODPR(ConstraintFriction2D, Remove, (), void), asCALL_THISCALL);
-    // void Animatable::RemoveAttributeAnimation(const String& name) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void RemoveAttributeAnimation(const String&in)", asMETHODPR(ConstraintFriction2D, RemoveAttributeAnimation, (const String&), void), asCALL_THISCALL);
-    // void Serializable::RemoveInstanceDefault() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void RemoveInstanceDefault()", asMETHODPR(ConstraintFriction2D, RemoveInstanceDefault, (), void), asCALL_THISCALL);
-    // void Animatable::RemoveObjectAnimation() | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void RemoveObjectAnimation()", asMETHODPR(ConstraintFriction2D, RemoveObjectAnimation, (), void), asCALL_THISCALL);
-    // void Serializable::ResetToDefault() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void ResetToDefault()", asMETHODPR(ConstraintFriction2D, ResetToDefault, (), void), asCALL_THISCALL);
-    // bool Component::Save(Serializer& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "bool Save(Serializer&) const", asMETHODPR(ConstraintFriction2D, Save, (Serializer&) const, bool), asCALL_THISCALL);
-    // virtual bool Serializable::SaveDefaultAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "bool SaveDefaultAttributes() const", asMETHODPR(ConstraintFriction2D, SaveDefaultAttributes, () const, bool), asCALL_THISCALL);
-    // bool Component::SaveJSON(JSONValue& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "bool SaveJSON(JSONValue&) const", asMETHODPR(ConstraintFriction2D, SaveJSON, (JSONValue&) const, bool), asCALL_THISCALL);
-    // bool Component::SaveXML(XMLElement& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "bool SaveXML(XMLElement&) const", asMETHODPR(ConstraintFriction2D, SaveXML, (XMLElement&) const, bool), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void SendEvent(StringHash)", asMETHODPR(ConstraintFriction2D, SendEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(ConstraintFriction2D, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
-    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
-    // Not registered because template
-    // void ConstraintFriction2D::SetAnchor(const Vector2& anchor) | File: ../Urho2D/ConstraintFriction2D.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void SetAnchor(const Vector2&in)", asMETHODPR(ConstraintFriction2D, SetAnchor, (const Vector2&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void set_anchor(const Vector2&in)", asMETHODPR(ConstraintFriction2D, SetAnchor, (const Vector2&), void), asCALL_THISCALL);
-    // void Animatable::SetAnimationEnabled(bool enable) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void SetAnimationEnabled(bool)", asMETHODPR(ConstraintFriction2D, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void set_animationEnabled(bool)", asMETHODPR(ConstraintFriction2D, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
-    // void Animatable::SetAnimationTime(float time) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void SetAnimationTime(float)", asMETHODPR(ConstraintFriction2D, SetAnimationTime, (float), void), asCALL_THISCALL);
-    // void Constraint2D::SetAttachedConstraint(Constraint2D* constraint) | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void SetAttachedConstraint(Constraint2D@+)", asMETHODPR(ConstraintFriction2D, SetAttachedConstraint, (Constraint2D*), void), asCALL_THISCALL);
-    // bool Serializable::SetAttribute(unsigned index, const Variant& value) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "bool SetAttribute(uint, const Variant&in)", asMETHODPR(ConstraintFriction2D, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintFriction2D", "bool set_attributes(uint, const Variant&in)", asMETHODPR(ConstraintFriction2D, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
-    // bool Serializable::SetAttribute(const String& name, const Variant& value) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "bool SetAttribute(const String&in, const Variant&in)", asMETHODPR(ConstraintFriction2D, SetAttribute, (const String&, const Variant&), bool), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode=WM_LOOP, float speed=1.0f) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void SetAttributeAnimation(const String&in, ValueAnimation@+, WrapMode = WM_LOOP, float = 1.0f)", asMETHODPR(ConstraintFriction2D, SetAttributeAnimation, (const String&, ValueAnimation*, WrapMode, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationSpeed(const String& name, float speed) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void SetAttributeAnimationSpeed(const String&in, float)", asMETHODPR(ConstraintFriction2D, SetAttributeAnimationSpeed, (const String&, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationTime(const String& name, float time) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void SetAttributeAnimationTime(const String&in, float)", asMETHODPR(ConstraintFriction2D, SetAttributeAnimationTime, (const String&, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationWrapMode(const String& name, WrapMode wrapMode) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void SetAttributeAnimationWrapMode(const String&in, WrapMode)", asMETHODPR(ConstraintFriction2D, SetAttributeAnimationWrapMode, (const String&, WrapMode), void), asCALL_THISCALL);
-    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void SetBlockEvents(bool)", asMETHODPR(ConstraintFriction2D, SetBlockEvents, (bool), void), asCALL_THISCALL);
-    // void Constraint2D::SetCollideConnected(bool collideConnected) | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void SetCollideConnected(bool)", asMETHODPR(ConstraintFriction2D, SetCollideConnected, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void set_collideConnected(bool)", asMETHODPR(ConstraintFriction2D, SetCollideConnected, (bool), void), asCALL_THISCALL);
-    // void Component::SetEnabled(bool enable) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void SetEnabled(bool)", asMETHODPR(ConstraintFriction2D, SetEnabled, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void set_enabled(bool)", asMETHODPR(ConstraintFriction2D, SetEnabled, (bool), void), asCALL_THISCALL);
-    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(ConstraintFriction2D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(ConstraintFriction2D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    // void Serializable::SetInstanceDefault(bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void SetInstanceDefault(bool)", asMETHODPR(ConstraintFriction2D, SetInstanceDefault, (bool), void), asCALL_THISCALL);
-    // void Serializable::SetInterceptNetworkUpdate(const String& attributeName, bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void SetInterceptNetworkUpdate(const String&in, bool)", asMETHODPR(ConstraintFriction2D, SetInterceptNetworkUpdate, (const String&, bool), void), asCALL_THISCALL);
-    // void ConstraintFriction2D::SetMaxForce(float maxForce) | File: ../Urho2D/ConstraintFriction2D.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void SetMaxForce(float)", asMETHODPR(ConstraintFriction2D, SetMaxForce, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void set_maxForce(float)", asMETHODPR(ConstraintFriction2D, SetMaxForce, (float), void), asCALL_THISCALL);
-    // void ConstraintFriction2D::SetMaxTorque(float maxTorque) | File: ../Urho2D/ConstraintFriction2D.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void SetMaxTorque(float)", asMETHODPR(ConstraintFriction2D, SetMaxTorque, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void set_maxTorque(float)", asMETHODPR(ConstraintFriction2D, SetMaxTorque, (float), void), asCALL_THISCALL);
-    // void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void SetObjectAnimation(ObjectAnimation@+)", asMETHODPR(ConstraintFriction2D, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void set_objectAnimation(ObjectAnimation@+)", asMETHODPR(ConstraintFriction2D, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
-    // void Animatable::SetObjectAnimationAttr(const ResourceRef& value) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void SetObjectAnimationAttr(const ResourceRef&in)", asMETHODPR(ConstraintFriction2D, SetObjectAnimationAttr, (const ResourceRef&), void), asCALL_THISCALL);
-    // void Constraint2D::SetOtherBody(RigidBody2D* body) | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void SetOtherBody(RigidBody2D@+)", asMETHODPR(ConstraintFriction2D, SetOtherBody, (RigidBody2D*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void set_otherBody(RigidBody2D@+)", asMETHODPR(ConstraintFriction2D, SetOtherBody, (RigidBody2D*), void), asCALL_THISCALL);
-    // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void SetTemporary(bool)", asMETHODPR(ConstraintFriction2D, SetTemporary, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void set_temporary(bool)", asMETHODPR(ConstraintFriction2D, SetTemporary, (bool), void), asCALL_THISCALL);
-    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void UnsubscribeFromAllEvents()", asMETHODPR(ConstraintFriction2D, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(ConstraintFriction2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
-    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(ConstraintFriction2D, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(ConstraintFriction2D, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(ConstraintFriction2D, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
-    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "int WeakRefs() const", asMETHODPR(ConstraintFriction2D, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintFriction2D", "int get_weakRefs() const", asMETHODPR(ConstraintFriction2D, WeakRefs, () const, int), asCALL_THISCALL);
-    // void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attributeBits, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void WriteDeltaUpdate(Serializer&, const DirtyBits&in, uint8)", asMETHODPR(ConstraintFriction2D, WriteDeltaUpdate, (Serializer&, const DirtyBits&, unsigned char), void), asCALL_THISCALL);
-    // void Serializable::WriteInitialDeltaUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void WriteInitialDeltaUpdate(Serializer&, uint8)", asMETHODPR(ConstraintFriction2D, WriteInitialDeltaUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
-    // void Serializable::WriteLatestDataUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void WriteLatestDataUpdate(Serializer&, uint8)", asMETHODPR(ConstraintFriction2D, WriteLatestDataUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
-#ifdef REGISTER_MANUAL_PART_Constraint2D
-    REGISTER_MANUAL_PART_Constraint2D(ConstraintFriction2D, "ConstraintFriction2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Component
-    REGISTER_MANUAL_PART_Component(ConstraintFriction2D, "ConstraintFriction2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Animatable
-    REGISTER_MANUAL_PART_Animatable(ConstraintFriction2D, "ConstraintFriction2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Serializable
-    REGISTER_MANUAL_PART_Serializable(ConstraintFriction2D, "ConstraintFriction2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Object
-    REGISTER_MANUAL_PART_Object(ConstraintFriction2D, "ConstraintFriction2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(ConstraintFriction2D, "ConstraintFriction2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_ConstraintFriction2D
-    REGISTER_MANUAL_PART_ConstraintFriction2D(ConstraintFriction2D, "ConstraintFriction2D")
-#endif
-    RegisterSubclass<Constraint2D, ConstraintFriction2D>(engine, "Constraint2D", "ConstraintFriction2D");
-    RegisterSubclass<Component, ConstraintFriction2D>(engine, "Component", "ConstraintFriction2D");
-    RegisterSubclass<Animatable, ConstraintFriction2D>(engine, "Animatable", "ConstraintFriction2D");
-    RegisterSubclass<Serializable, ConstraintFriction2D>(engine, "Serializable", "ConstraintFriction2D");
-    RegisterSubclass<Object, ConstraintFriction2D>(engine, "Object", "ConstraintFriction2D");
-    RegisterSubclass<RefCounted, ConstraintFriction2D>(engine, "RefCounted", "ConstraintFriction2D");
-#endif
-
 #ifdef URHO3D_PHYSICS
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("Constraint", asBEHAVE_ADDREF, "void f()", asMETHODPR(Constraint, AddRef, (), void), asCALL_THISCALL);
@@ -964,1035 +639,6 @@ void ASRegisterGenerated_Members_Constraint(asIScriptEngine* engine)
     RegisterSubclass<Serializable, Constraint>(engine, "Serializable", "Constraint");
     RegisterSubclass<Object, Constraint>(engine, "Object", "Constraint");
     RegisterSubclass<RefCounted, Constraint>(engine, "RefCounted", "Constraint");
-#endif
-
-#ifdef URHO3D_URHO2D
-    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("ConstraintGear2D", asBEHAVE_ADDREF, "void f()", asMETHODPR(ConstraintGear2D, AddRef, (), void), asCALL_THISCALL);
-    // void Component::AddReplicationState(ComponentReplicationState* state) | File: ../Scene/Component.h
-    // Error: type "ComponentReplicationState*" can not automatically bind
-    // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void AllocateNetworkState()", asMETHODPR(ConstraintGear2D, AllocateNetworkState, (), void), asCALL_THISCALL);
-    // void Constraint2D::ApplyAttributes() override | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void ApplyAttributes()", asMETHODPR(ConstraintGear2D, ApplyAttributes, (), void), asCALL_THISCALL);
-    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
-    // Not registered because template
-    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
-    // Not registered because template
-    // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void CleanupConnection(Connection@+)", asMETHODPR(ConstraintGear2D, CleanupConnection, (Connection*), void), asCALL_THISCALL);
-    // explicit ConstraintGear2D::ConstraintGear2D(Context* context) | File: ../Urho2D/ConstraintGear2D.h
-    engine->RegisterObjectBehaviour("ConstraintGear2D", asBEHAVE_FACTORY, "ConstraintGear2D@+ f()", asFUNCTION(ConstraintGear2D_ConstraintGear2D_Context), asCALL_CDECL);
-    // void Constraint2D::CreateJoint() | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void CreateJoint()", asMETHODPR(ConstraintGear2D, CreateJoint, (), void), asCALL_THISCALL);
-    // virtual void Component::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(ConstraintGear2D, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
-    // bool Animatable::GetAnimationEnabled() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "bool GetAnimationEnabled() const", asMETHODPR(ConstraintGear2D, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintGear2D", "bool get_animationEnabled() const", asMETHODPR(ConstraintGear2D, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
-    // Constraint2D* Constraint2D::GetAttachedConstraint() const | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "Constraint2D@+ GetAttachedConstraint() const", asMETHODPR(ConstraintGear2D, GetAttachedConstraint, () const, Constraint2D*), asCALL_THISCALL);
-    // Variant Serializable::GetAttribute(unsigned index) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "Variant GetAttribute(uint) const", asMETHODPR(ConstraintGear2D, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintGear2D", "Variant get_attributes(uint) const", asMETHODPR(ConstraintGear2D, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
-    // Variant Serializable::GetAttribute(const String& name) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "Variant GetAttribute(const String&in) const", asMETHODPR(ConstraintGear2D, GetAttribute, (const String&) const, Variant), asCALL_THISCALL);
-    // ValueAnimation* Animatable::GetAttributeAnimation(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "ValueAnimation@+ GetAttributeAnimation(const String&in) const", asMETHODPR(ConstraintGear2D, GetAttributeAnimation, (const String&) const, ValueAnimation*), asCALL_THISCALL);
-    // float Animatable::GetAttributeAnimationSpeed(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "float GetAttributeAnimationSpeed(const String&in) const", asMETHODPR(ConstraintGear2D, GetAttributeAnimationSpeed, (const String&) const, float), asCALL_THISCALL);
-    // float Animatable::GetAttributeAnimationTime(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "float GetAttributeAnimationTime(const String&in) const", asMETHODPR(ConstraintGear2D, GetAttributeAnimationTime, (const String&) const, float), asCALL_THISCALL);
-    // WrapMode Animatable::GetAttributeAnimationWrapMode(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "WrapMode GetAttributeAnimationWrapMode(const String&in) const", asMETHODPR(ConstraintGear2D, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), asCALL_THISCALL);
-    // Variant Serializable::GetAttributeDefault(unsigned index) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "Variant GetAttributeDefault(uint) const", asMETHODPR(ConstraintGear2D, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintGear2D", "Variant get_attributeDefaults(uint) const", asMETHODPR(ConstraintGear2D, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
-    // Variant Serializable::GetAttributeDefault(const String& name) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "Variant GetAttributeDefault(const String&in) const", asMETHODPR(ConstraintGear2D, GetAttributeDefault, (const String&) const, Variant), asCALL_THISCALL);
-    // virtual const Vector<AttributeInfo>* Serializable::GetAttributes() const | File: ../Scene/Serializable.h
-    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
-    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "bool GetBlockEvents() const", asMETHODPR(ConstraintGear2D, GetBlockEvents, () const, bool), asCALL_THISCALL);
-    // const String& Object::GetCategory() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "const String& GetCategory() const", asMETHODPR(ConstraintGear2D, GetCategory, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintGear2D", "const String& get_category() const", asMETHODPR(ConstraintGear2D, GetCategory, () const, const String&), asCALL_THISCALL);
-    // bool Constraint2D::GetCollideConnected() const | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "bool GetCollideConnected() const", asMETHODPR(ConstraintGear2D, GetCollideConnected, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintGear2D", "bool get_collideConnected() const", asMETHODPR(ConstraintGear2D, GetCollideConnected, () const, bool), asCALL_THISCALL);
-    // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "Component@+ GetComponent(StringHash) const", asMETHODPR(ConstraintGear2D, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
-    // template<class T> T*  Component::GetComponent() const | File: ../Scene/Component.h
-    // Not registered because template
-    // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
-    // Error: type "PODVector<Component*>&" can not automatically bind
-    // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
-    // Not registered because template
-    // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
-    // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
-    // Error: type "PODVector<Node*>&" can not automatically bind
-    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "VariantMap& GetEventDataMap() const", asMETHODPR(ConstraintGear2D, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
-    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // Object* Object::GetEventSender() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "Object@+ GetEventSender() const", asMETHODPR(ConstraintGear2D, GetEventSender, () const, Object*), asCALL_THISCALL);
-    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(ConstraintGear2D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintGear2D", "const Variant& get_globalVar(StringHash) const", asMETHODPR(ConstraintGear2D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "const VariantMap& GetGlobalVars() const", asMETHODPR(ConstraintGear2D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintGear2D", "const VariantMap& get_globalVars() const", asMETHODPR(ConstraintGear2D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    // unsigned Component::GetID() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "uint GetID() const", asMETHODPR(ConstraintGear2D, GetID, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintGear2D", "uint get_id() const", asMETHODPR(ConstraintGear2D, GetID, () const, unsigned), asCALL_THISCALL);
-    // bool Serializable::GetInterceptNetworkUpdate(const String& attributeName) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "bool GetInterceptNetworkUpdate(const String&in) const", asMETHODPR(ConstraintGear2D, GetInterceptNetworkUpdate, (const String&) const, bool), asCALL_THISCALL);
-    // b2Joint* Constraint2D::GetJoint() const | File: ../Urho2D/Constraint2D.h
-    // Error: type "b2Joint*" can not automatically bind
-    // virtual const Vector<AttributeInfo>* Serializable::GetNetworkAttributes() const | File: ../Scene/Serializable.h
-    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
-    // NetworkState* Serializable::GetNetworkState() const | File: ../Scene/Serializable.h
-    // Error: type "NetworkState*" can not automatically bind
-    // Node* Component::GetNode() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "Node@+ GetNode() const", asMETHODPR(ConstraintGear2D, GetNode, () const, Node*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintGear2D", "Node@+ get_node() const", asMETHODPR(ConstraintGear2D, GetNode, () const, Node*), asCALL_THISCALL);
-    // unsigned Serializable::GetNumAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "uint GetNumAttributes() const", asMETHODPR(ConstraintGear2D, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintGear2D", "uint get_numAttributes() const", asMETHODPR(ConstraintGear2D, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
-    // unsigned Serializable::GetNumNetworkAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "uint GetNumNetworkAttributes() const", asMETHODPR(ConstraintGear2D, GetNumNetworkAttributes, () const, unsigned), asCALL_THISCALL);
-    // ObjectAnimation* Animatable::GetObjectAnimation() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "ObjectAnimation@+ GetObjectAnimation() const", asMETHODPR(ConstraintGear2D, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintGear2D", "ObjectAnimation@+ get_objectAnimation() const", asMETHODPR(ConstraintGear2D, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
-    // ResourceRef Animatable::GetObjectAnimationAttr() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "ResourceRef GetObjectAnimationAttr() const", asMETHODPR(ConstraintGear2D, GetObjectAnimationAttr, () const, ResourceRef), asCALL_THISCALL);
-    // RigidBody2D* Constraint2D::GetOtherBody() const | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "RigidBody2D@+ GetOtherBody() const", asMETHODPR(ConstraintGear2D, GetOtherBody, () const, RigidBody2D*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintGear2D", "RigidBody2D@+ get_otherBody() const", asMETHODPR(ConstraintGear2D, GetOtherBody, () const, RigidBody2D*), asCALL_THISCALL);
-    // Constraint2D* ConstraintGear2D::GetOtherConstraint() const | File: ../Urho2D/ConstraintGear2D.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "Constraint2D@+ GetOtherConstraint() const", asMETHODPR(ConstraintGear2D, GetOtherConstraint, () const, Constraint2D*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintGear2D", "Constraint2D@+ get_otherConstraint() const", asMETHODPR(ConstraintGear2D, GetOtherConstraint, () const, Constraint2D*), asCALL_THISCALL);
-    // RigidBody2D* Constraint2D::GetOwnerBody() const | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "RigidBody2D@+ GetOwnerBody() const", asMETHODPR(ConstraintGear2D, GetOwnerBody, () const, RigidBody2D*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintGear2D", "RigidBody2D@+ get_ownerBody() const", asMETHODPR(ConstraintGear2D, GetOwnerBody, () const, RigidBody2D*), asCALL_THISCALL);
-    // Constraint2D* ConstraintGear2D::GetOwnerConstraint() const | File: ../Urho2D/ConstraintGear2D.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "Constraint2D@+ GetOwnerConstraint() const", asMETHODPR(ConstraintGear2D, GetOwnerConstraint, () const, Constraint2D*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintGear2D", "Constraint2D@+ get_ownerConstraint() const", asMETHODPR(ConstraintGear2D, GetOwnerConstraint, () const, Constraint2D*), asCALL_THISCALL);
-    // float ConstraintGear2D::GetRatio() const | File: ../Urho2D/ConstraintGear2D.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "float GetRatio() const", asMETHODPR(ConstraintGear2D, GetRatio, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintGear2D", "float get_ratio() const", asMETHODPR(ConstraintGear2D, GetRatio, () const, float), asCALL_THISCALL);
-    // Scene* Component::GetScene() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "Scene@+ GetScene() const", asMETHODPR(ConstraintGear2D, GetScene, () const, Scene*), asCALL_THISCALL);
-    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(ConstraintGear2D, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
-    // Not registered because template
-    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "StringHash GetType() const", asMETHODPR(ConstraintGear2D, GetType, () const, StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintGear2D", "StringHash get_type() const", asMETHODPR(ConstraintGear2D, GetType, () const, StringHash), asCALL_THISCALL);
-    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "const String& GetTypeName() const", asMETHODPR(ConstraintGear2D, GetTypeName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintGear2D", "const String& get_typeName() const", asMETHODPR(ConstraintGear2D, GetTypeName, () const, const String&), asCALL_THISCALL);
-    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "bool HasEventHandlers() const", asMETHODPR(ConstraintGear2D, HasEventHandlers, () const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(ConstraintGear2D, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(ConstraintGear2D, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
-    // bool Component::IsEnabled() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "bool IsEnabled() const", asMETHODPR(ConstraintGear2D, IsEnabled, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintGear2D", "bool get_enabled() const", asMETHODPR(ConstraintGear2D, IsEnabled, () const, bool), asCALL_THISCALL);
-    // bool Component::IsEnabledEffective() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "bool IsEnabledEffective() const", asMETHODPR(ConstraintGear2D, IsEnabledEffective, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintGear2D", "bool get_enabledEffective() const", asMETHODPR(ConstraintGear2D, IsEnabledEffective, () const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "bool IsInstanceOf(StringHash) const", asMETHODPR(ConstraintGear2D, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
-    // Not registered because template
-    // bool Component::IsReplicated() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "bool IsReplicated() const", asMETHODPR(ConstraintGear2D, IsReplicated, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintGear2D", "bool get_replicated() const", asMETHODPR(ConstraintGear2D, IsReplicated, () const, bool), asCALL_THISCALL);
-    // bool Serializable::IsTemporary() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "bool IsTemporary() const", asMETHODPR(ConstraintGear2D, IsTemporary, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintGear2D", "bool get_temporary() const", asMETHODPR(ConstraintGear2D, IsTemporary, () const, bool), asCALL_THISCALL);
-    // virtual bool Serializable::Load(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "bool Load(Deserializer&)", asMETHODPR(ConstraintGear2D, Load, (Deserializer&), bool), asCALL_THISCALL);
-    // bool Animatable::LoadJSON(const JSONValue& source) override | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "bool LoadJSON(const JSONValue&in)", asMETHODPR(ConstraintGear2D, LoadJSON, (const JSONValue&), bool), asCALL_THISCALL);
-    // bool Animatable::LoadXML(const XMLElement& source) override | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "bool LoadXML(const XMLElement&in)", asMETHODPR(ConstraintGear2D, LoadXML, (const XMLElement&), bool), asCALL_THISCALL);
-    // void Component::MarkNetworkUpdate() override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void MarkNetworkUpdate()", asMETHODPR(ConstraintGear2D, MarkNetworkUpdate, (), void), asCALL_THISCALL);
-    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(ConstraintGear2D, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
-    // virtual void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void OnGetAttribute(const AttributeInfo&in, Variant&) const", asMETHODPR(ConstraintGear2D, OnGetAttribute, (const AttributeInfo&, Variant&) const, void), asCALL_THISCALL);
-    // virtual void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void OnSetAttribute(const AttributeInfo&in, const Variant&in)", asMETHODPR(ConstraintGear2D, OnSetAttribute, (const AttributeInfo&, const Variant&), void), asCALL_THISCALL);
-    // void Constraint2D::OnSetEnabled() override | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void OnSetEnabled()", asMETHODPR(ConstraintGear2D, OnSetEnabled, (), void), asCALL_THISCALL);
-    // void Component::PrepareNetworkUpdate() | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void PrepareNetworkUpdate()", asMETHODPR(ConstraintGear2D, PrepareNetworkUpdate, (), void), asCALL_THISCALL);
-    // bool Serializable::ReadDeltaUpdate(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "bool ReadDeltaUpdate(Deserializer&)", asMETHODPR(ConstraintGear2D, ReadDeltaUpdate, (Deserializer&), bool), asCALL_THISCALL);
-    // bool Serializable::ReadLatestDataUpdate(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "bool ReadLatestDataUpdate(Deserializer&)", asMETHODPR(ConstraintGear2D, ReadLatestDataUpdate, (Deserializer&), bool), asCALL_THISCALL);
-    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
-    // Error: type "RefCount*" can not automatically bind
-    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "int Refs() const", asMETHODPR(ConstraintGear2D, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintGear2D", "int get_refs() const", asMETHODPR(ConstraintGear2D, Refs, () const, int), asCALL_THISCALL);
-    // static void ConstraintGear2D::RegisterObject(Context* context) | File: ../Urho2D/ConstraintGear2D.h
-    // Context can be used as firs parameter of constructors only
-    // void Constraint2D::ReleaseJoint() | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void ReleaseJoint()", asMETHODPR(ConstraintGear2D, ReleaseJoint, (), void), asCALL_THISCALL);
-    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("ConstraintGear2D", asBEHAVE_RELEASE, "void f()", asMETHODPR(ConstraintGear2D, ReleaseRef, (), void), asCALL_THISCALL);
-    // void Component::Remove() | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void Remove()", asMETHODPR(ConstraintGear2D, Remove, (), void), asCALL_THISCALL);
-    // void Animatable::RemoveAttributeAnimation(const String& name) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void RemoveAttributeAnimation(const String&in)", asMETHODPR(ConstraintGear2D, RemoveAttributeAnimation, (const String&), void), asCALL_THISCALL);
-    // void Serializable::RemoveInstanceDefault() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void RemoveInstanceDefault()", asMETHODPR(ConstraintGear2D, RemoveInstanceDefault, (), void), asCALL_THISCALL);
-    // void Animatable::RemoveObjectAnimation() | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void RemoveObjectAnimation()", asMETHODPR(ConstraintGear2D, RemoveObjectAnimation, (), void), asCALL_THISCALL);
-    // void Serializable::ResetToDefault() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void ResetToDefault()", asMETHODPR(ConstraintGear2D, ResetToDefault, (), void), asCALL_THISCALL);
-    // bool Component::Save(Serializer& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "bool Save(Serializer&) const", asMETHODPR(ConstraintGear2D, Save, (Serializer&) const, bool), asCALL_THISCALL);
-    // virtual bool Serializable::SaveDefaultAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "bool SaveDefaultAttributes() const", asMETHODPR(ConstraintGear2D, SaveDefaultAttributes, () const, bool), asCALL_THISCALL);
-    // bool Component::SaveJSON(JSONValue& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "bool SaveJSON(JSONValue&) const", asMETHODPR(ConstraintGear2D, SaveJSON, (JSONValue&) const, bool), asCALL_THISCALL);
-    // bool Component::SaveXML(XMLElement& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "bool SaveXML(XMLElement&) const", asMETHODPR(ConstraintGear2D, SaveXML, (XMLElement&) const, bool), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void SendEvent(StringHash)", asMETHODPR(ConstraintGear2D, SendEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(ConstraintGear2D, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
-    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
-    // Not registered because template
-    // void Animatable::SetAnimationEnabled(bool enable) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void SetAnimationEnabled(bool)", asMETHODPR(ConstraintGear2D, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintGear2D", "void set_animationEnabled(bool)", asMETHODPR(ConstraintGear2D, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
-    // void Animatable::SetAnimationTime(float time) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void SetAnimationTime(float)", asMETHODPR(ConstraintGear2D, SetAnimationTime, (float), void), asCALL_THISCALL);
-    // void Constraint2D::SetAttachedConstraint(Constraint2D* constraint) | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void SetAttachedConstraint(Constraint2D@+)", asMETHODPR(ConstraintGear2D, SetAttachedConstraint, (Constraint2D*), void), asCALL_THISCALL);
-    // bool Serializable::SetAttribute(unsigned index, const Variant& value) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "bool SetAttribute(uint, const Variant&in)", asMETHODPR(ConstraintGear2D, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintGear2D", "bool set_attributes(uint, const Variant&in)", asMETHODPR(ConstraintGear2D, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
-    // bool Serializable::SetAttribute(const String& name, const Variant& value) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "bool SetAttribute(const String&in, const Variant&in)", asMETHODPR(ConstraintGear2D, SetAttribute, (const String&, const Variant&), bool), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode=WM_LOOP, float speed=1.0f) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void SetAttributeAnimation(const String&in, ValueAnimation@+, WrapMode = WM_LOOP, float = 1.0f)", asMETHODPR(ConstraintGear2D, SetAttributeAnimation, (const String&, ValueAnimation*, WrapMode, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationSpeed(const String& name, float speed) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void SetAttributeAnimationSpeed(const String&in, float)", asMETHODPR(ConstraintGear2D, SetAttributeAnimationSpeed, (const String&, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationTime(const String& name, float time) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void SetAttributeAnimationTime(const String&in, float)", asMETHODPR(ConstraintGear2D, SetAttributeAnimationTime, (const String&, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationWrapMode(const String& name, WrapMode wrapMode) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void SetAttributeAnimationWrapMode(const String&in, WrapMode)", asMETHODPR(ConstraintGear2D, SetAttributeAnimationWrapMode, (const String&, WrapMode), void), asCALL_THISCALL);
-    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void SetBlockEvents(bool)", asMETHODPR(ConstraintGear2D, SetBlockEvents, (bool), void), asCALL_THISCALL);
-    // void Constraint2D::SetCollideConnected(bool collideConnected) | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void SetCollideConnected(bool)", asMETHODPR(ConstraintGear2D, SetCollideConnected, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintGear2D", "void set_collideConnected(bool)", asMETHODPR(ConstraintGear2D, SetCollideConnected, (bool), void), asCALL_THISCALL);
-    // void Component::SetEnabled(bool enable) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void SetEnabled(bool)", asMETHODPR(ConstraintGear2D, SetEnabled, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintGear2D", "void set_enabled(bool)", asMETHODPR(ConstraintGear2D, SetEnabled, (bool), void), asCALL_THISCALL);
-    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(ConstraintGear2D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintGear2D", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(ConstraintGear2D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    // void Serializable::SetInstanceDefault(bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void SetInstanceDefault(bool)", asMETHODPR(ConstraintGear2D, SetInstanceDefault, (bool), void), asCALL_THISCALL);
-    // void Serializable::SetInterceptNetworkUpdate(const String& attributeName, bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void SetInterceptNetworkUpdate(const String&in, bool)", asMETHODPR(ConstraintGear2D, SetInterceptNetworkUpdate, (const String&, bool), void), asCALL_THISCALL);
-    // void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void SetObjectAnimation(ObjectAnimation@+)", asMETHODPR(ConstraintGear2D, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintGear2D", "void set_objectAnimation(ObjectAnimation@+)", asMETHODPR(ConstraintGear2D, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
-    // void Animatable::SetObjectAnimationAttr(const ResourceRef& value) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void SetObjectAnimationAttr(const ResourceRef&in)", asMETHODPR(ConstraintGear2D, SetObjectAnimationAttr, (const ResourceRef&), void), asCALL_THISCALL);
-    // void Constraint2D::SetOtherBody(RigidBody2D* body) | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void SetOtherBody(RigidBody2D@+)", asMETHODPR(ConstraintGear2D, SetOtherBody, (RigidBody2D*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintGear2D", "void set_otherBody(RigidBody2D@+)", asMETHODPR(ConstraintGear2D, SetOtherBody, (RigidBody2D*), void), asCALL_THISCALL);
-    // void ConstraintGear2D::SetOtherConstraint(Constraint2D* constraint) | File: ../Urho2D/ConstraintGear2D.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void SetOtherConstraint(Constraint2D@+)", asMETHODPR(ConstraintGear2D, SetOtherConstraint, (Constraint2D*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintGear2D", "void set_otherConstraint(Constraint2D@+)", asMETHODPR(ConstraintGear2D, SetOtherConstraint, (Constraint2D*), void), asCALL_THISCALL);
-    // void ConstraintGear2D::SetOwnerConstraint(Constraint2D* constraint) | File: ../Urho2D/ConstraintGear2D.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void SetOwnerConstraint(Constraint2D@+)", asMETHODPR(ConstraintGear2D, SetOwnerConstraint, (Constraint2D*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintGear2D", "void set_ownerConstraint(Constraint2D@+)", asMETHODPR(ConstraintGear2D, SetOwnerConstraint, (Constraint2D*), void), asCALL_THISCALL);
-    // void ConstraintGear2D::SetRatio(float ratio) | File: ../Urho2D/ConstraintGear2D.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void SetRatio(float)", asMETHODPR(ConstraintGear2D, SetRatio, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintGear2D", "void set_ratio(float)", asMETHODPR(ConstraintGear2D, SetRatio, (float), void), asCALL_THISCALL);
-    // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void SetTemporary(bool)", asMETHODPR(ConstraintGear2D, SetTemporary, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintGear2D", "void set_temporary(bool)", asMETHODPR(ConstraintGear2D, SetTemporary, (bool), void), asCALL_THISCALL);
-    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void UnsubscribeFromAllEvents()", asMETHODPR(ConstraintGear2D, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(ConstraintGear2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
-    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(ConstraintGear2D, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(ConstraintGear2D, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(ConstraintGear2D, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
-    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "int WeakRefs() const", asMETHODPR(ConstraintGear2D, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintGear2D", "int get_weakRefs() const", asMETHODPR(ConstraintGear2D, WeakRefs, () const, int), asCALL_THISCALL);
-    // void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attributeBits, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void WriteDeltaUpdate(Serializer&, const DirtyBits&in, uint8)", asMETHODPR(ConstraintGear2D, WriteDeltaUpdate, (Serializer&, const DirtyBits&, unsigned char), void), asCALL_THISCALL);
-    // void Serializable::WriteInitialDeltaUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void WriteInitialDeltaUpdate(Serializer&, uint8)", asMETHODPR(ConstraintGear2D, WriteInitialDeltaUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
-    // void Serializable::WriteLatestDataUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void WriteLatestDataUpdate(Serializer&, uint8)", asMETHODPR(ConstraintGear2D, WriteLatestDataUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
-#ifdef REGISTER_MANUAL_PART_Constraint2D
-    REGISTER_MANUAL_PART_Constraint2D(ConstraintGear2D, "ConstraintGear2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Component
-    REGISTER_MANUAL_PART_Component(ConstraintGear2D, "ConstraintGear2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Animatable
-    REGISTER_MANUAL_PART_Animatable(ConstraintGear2D, "ConstraintGear2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Serializable
-    REGISTER_MANUAL_PART_Serializable(ConstraintGear2D, "ConstraintGear2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Object
-    REGISTER_MANUAL_PART_Object(ConstraintGear2D, "ConstraintGear2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(ConstraintGear2D, "ConstraintGear2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_ConstraintGear2D
-    REGISTER_MANUAL_PART_ConstraintGear2D(ConstraintGear2D, "ConstraintGear2D")
-#endif
-    RegisterSubclass<Constraint2D, ConstraintGear2D>(engine, "Constraint2D", "ConstraintGear2D");
-    RegisterSubclass<Component, ConstraintGear2D>(engine, "Component", "ConstraintGear2D");
-    RegisterSubclass<Animatable, ConstraintGear2D>(engine, "Animatable", "ConstraintGear2D");
-    RegisterSubclass<Serializable, ConstraintGear2D>(engine, "Serializable", "ConstraintGear2D");
-    RegisterSubclass<Object, ConstraintGear2D>(engine, "Object", "ConstraintGear2D");
-    RegisterSubclass<RefCounted, ConstraintGear2D>(engine, "RefCounted", "ConstraintGear2D");
-#endif
-
-#ifdef URHO3D_URHO2D
-    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("ConstraintRevolute2D", asBEHAVE_ADDREF, "void f()", asMETHODPR(ConstraintRevolute2D, AddRef, (), void), asCALL_THISCALL);
-    // void Component::AddReplicationState(ComponentReplicationState* state) | File: ../Scene/Component.h
-    // Error: type "ComponentReplicationState*" can not automatically bind
-    // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void AllocateNetworkState()", asMETHODPR(ConstraintRevolute2D, AllocateNetworkState, (), void), asCALL_THISCALL);
-    // void Constraint2D::ApplyAttributes() override | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void ApplyAttributes()", asMETHODPR(ConstraintRevolute2D, ApplyAttributes, (), void), asCALL_THISCALL);
-    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
-    // Not registered because template
-    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
-    // Not registered because template
-    // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void CleanupConnection(Connection@+)", asMETHODPR(ConstraintRevolute2D, CleanupConnection, (Connection*), void), asCALL_THISCALL);
-    // explicit ConstraintRevolute2D::ConstraintRevolute2D(Context* context) | File: ../Urho2D/ConstraintRevolute2D.h
-    engine->RegisterObjectBehaviour("ConstraintRevolute2D", asBEHAVE_FACTORY, "ConstraintRevolute2D@+ f()", asFUNCTION(ConstraintRevolute2D_ConstraintRevolute2D_Context), asCALL_CDECL);
-    // void Constraint2D::CreateJoint() | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void CreateJoint()", asMETHODPR(ConstraintRevolute2D, CreateJoint, (), void), asCALL_THISCALL);
-    // virtual void Component::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(ConstraintRevolute2D, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
-    // const Vector2& ConstraintRevolute2D::GetAnchor() const | File: ../Urho2D/ConstraintRevolute2D.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "const Vector2& GetAnchor() const", asMETHODPR(ConstraintRevolute2D, GetAnchor, () const, const Vector2&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "const Vector2& get_anchor() const", asMETHODPR(ConstraintRevolute2D, GetAnchor, () const, const Vector2&), asCALL_THISCALL);
-    // bool Animatable::GetAnimationEnabled() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool GetAnimationEnabled() const", asMETHODPR(ConstraintRevolute2D, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool get_animationEnabled() const", asMETHODPR(ConstraintRevolute2D, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
-    // Constraint2D* Constraint2D::GetAttachedConstraint() const | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "Constraint2D@+ GetAttachedConstraint() const", asMETHODPR(ConstraintRevolute2D, GetAttachedConstraint, () const, Constraint2D*), asCALL_THISCALL);
-    // Variant Serializable::GetAttribute(unsigned index) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "Variant GetAttribute(uint) const", asMETHODPR(ConstraintRevolute2D, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "Variant get_attributes(uint) const", asMETHODPR(ConstraintRevolute2D, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
-    // Variant Serializable::GetAttribute(const String& name) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "Variant GetAttribute(const String&in) const", asMETHODPR(ConstraintRevolute2D, GetAttribute, (const String&) const, Variant), asCALL_THISCALL);
-    // ValueAnimation* Animatable::GetAttributeAnimation(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "ValueAnimation@+ GetAttributeAnimation(const String&in) const", asMETHODPR(ConstraintRevolute2D, GetAttributeAnimation, (const String&) const, ValueAnimation*), asCALL_THISCALL);
-    // float Animatable::GetAttributeAnimationSpeed(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "float GetAttributeAnimationSpeed(const String&in) const", asMETHODPR(ConstraintRevolute2D, GetAttributeAnimationSpeed, (const String&) const, float), asCALL_THISCALL);
-    // float Animatable::GetAttributeAnimationTime(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "float GetAttributeAnimationTime(const String&in) const", asMETHODPR(ConstraintRevolute2D, GetAttributeAnimationTime, (const String&) const, float), asCALL_THISCALL);
-    // WrapMode Animatable::GetAttributeAnimationWrapMode(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "WrapMode GetAttributeAnimationWrapMode(const String&in) const", asMETHODPR(ConstraintRevolute2D, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), asCALL_THISCALL);
-    // Variant Serializable::GetAttributeDefault(unsigned index) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "Variant GetAttributeDefault(uint) const", asMETHODPR(ConstraintRevolute2D, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "Variant get_attributeDefaults(uint) const", asMETHODPR(ConstraintRevolute2D, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
-    // Variant Serializable::GetAttributeDefault(const String& name) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "Variant GetAttributeDefault(const String&in) const", asMETHODPR(ConstraintRevolute2D, GetAttributeDefault, (const String&) const, Variant), asCALL_THISCALL);
-    // virtual const Vector<AttributeInfo>* Serializable::GetAttributes() const | File: ../Scene/Serializable.h
-    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
-    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool GetBlockEvents() const", asMETHODPR(ConstraintRevolute2D, GetBlockEvents, () const, bool), asCALL_THISCALL);
-    // const String& Object::GetCategory() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "const String& GetCategory() const", asMETHODPR(ConstraintRevolute2D, GetCategory, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "const String& get_category() const", asMETHODPR(ConstraintRevolute2D, GetCategory, () const, const String&), asCALL_THISCALL);
-    // bool Constraint2D::GetCollideConnected() const | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool GetCollideConnected() const", asMETHODPR(ConstraintRevolute2D, GetCollideConnected, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool get_collideConnected() const", asMETHODPR(ConstraintRevolute2D, GetCollideConnected, () const, bool), asCALL_THISCALL);
-    // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "Component@+ GetComponent(StringHash) const", asMETHODPR(ConstraintRevolute2D, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
-    // template<class T> T*  Component::GetComponent() const | File: ../Scene/Component.h
-    // Not registered because template
-    // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
-    // Error: type "PODVector<Component*>&" can not automatically bind
-    // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
-    // Not registered because template
-    // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
-    // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
-    // Error: type "PODVector<Node*>&" can not automatically bind
-    // bool ConstraintRevolute2D::GetEnableLimit() const | File: ../Urho2D/ConstraintRevolute2D.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool GetEnableLimit() const", asMETHODPR(ConstraintRevolute2D, GetEnableLimit, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool get_enableLimit() const", asMETHODPR(ConstraintRevolute2D, GetEnableLimit, () const, bool), asCALL_THISCALL);
-    // bool ConstraintRevolute2D::GetEnableMotor() const | File: ../Urho2D/ConstraintRevolute2D.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool GetEnableMotor() const", asMETHODPR(ConstraintRevolute2D, GetEnableMotor, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool get_enableMotor() const", asMETHODPR(ConstraintRevolute2D, GetEnableMotor, () const, bool), asCALL_THISCALL);
-    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "VariantMap& GetEventDataMap() const", asMETHODPR(ConstraintRevolute2D, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
-    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // Object* Object::GetEventSender() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "Object@+ GetEventSender() const", asMETHODPR(ConstraintRevolute2D, GetEventSender, () const, Object*), asCALL_THISCALL);
-    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(ConstraintRevolute2D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "const Variant& get_globalVar(StringHash) const", asMETHODPR(ConstraintRevolute2D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "const VariantMap& GetGlobalVars() const", asMETHODPR(ConstraintRevolute2D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "const VariantMap& get_globalVars() const", asMETHODPR(ConstraintRevolute2D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    // unsigned Component::GetID() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "uint GetID() const", asMETHODPR(ConstraintRevolute2D, GetID, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "uint get_id() const", asMETHODPR(ConstraintRevolute2D, GetID, () const, unsigned), asCALL_THISCALL);
-    // bool Serializable::GetInterceptNetworkUpdate(const String& attributeName) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool GetInterceptNetworkUpdate(const String&in) const", asMETHODPR(ConstraintRevolute2D, GetInterceptNetworkUpdate, (const String&) const, bool), asCALL_THISCALL);
-    // b2Joint* Constraint2D::GetJoint() const | File: ../Urho2D/Constraint2D.h
-    // Error: type "b2Joint*" can not automatically bind
-    // float ConstraintRevolute2D::GetLowerAngle() const | File: ../Urho2D/ConstraintRevolute2D.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "float GetLowerAngle() const", asMETHODPR(ConstraintRevolute2D, GetLowerAngle, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "float get_lowerAngle() const", asMETHODPR(ConstraintRevolute2D, GetLowerAngle, () const, float), asCALL_THISCALL);
-    // float ConstraintRevolute2D::GetMaxMotorTorque() const | File: ../Urho2D/ConstraintRevolute2D.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "float GetMaxMotorTorque() const", asMETHODPR(ConstraintRevolute2D, GetMaxMotorTorque, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "float get_maxMotorTorque() const", asMETHODPR(ConstraintRevolute2D, GetMaxMotorTorque, () const, float), asCALL_THISCALL);
-    // float ConstraintRevolute2D::GetMotorSpeed() const | File: ../Urho2D/ConstraintRevolute2D.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "float GetMotorSpeed() const", asMETHODPR(ConstraintRevolute2D, GetMotorSpeed, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "float get_motorSpeed() const", asMETHODPR(ConstraintRevolute2D, GetMotorSpeed, () const, float), asCALL_THISCALL);
-    // virtual const Vector<AttributeInfo>* Serializable::GetNetworkAttributes() const | File: ../Scene/Serializable.h
-    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
-    // NetworkState* Serializable::GetNetworkState() const | File: ../Scene/Serializable.h
-    // Error: type "NetworkState*" can not automatically bind
-    // Node* Component::GetNode() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "Node@+ GetNode() const", asMETHODPR(ConstraintRevolute2D, GetNode, () const, Node*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "Node@+ get_node() const", asMETHODPR(ConstraintRevolute2D, GetNode, () const, Node*), asCALL_THISCALL);
-    // unsigned Serializable::GetNumAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "uint GetNumAttributes() const", asMETHODPR(ConstraintRevolute2D, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "uint get_numAttributes() const", asMETHODPR(ConstraintRevolute2D, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
-    // unsigned Serializable::GetNumNetworkAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "uint GetNumNetworkAttributes() const", asMETHODPR(ConstraintRevolute2D, GetNumNetworkAttributes, () const, unsigned), asCALL_THISCALL);
-    // ObjectAnimation* Animatable::GetObjectAnimation() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "ObjectAnimation@+ GetObjectAnimation() const", asMETHODPR(ConstraintRevolute2D, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "ObjectAnimation@+ get_objectAnimation() const", asMETHODPR(ConstraintRevolute2D, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
-    // ResourceRef Animatable::GetObjectAnimationAttr() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "ResourceRef GetObjectAnimationAttr() const", asMETHODPR(ConstraintRevolute2D, GetObjectAnimationAttr, () const, ResourceRef), asCALL_THISCALL);
-    // RigidBody2D* Constraint2D::GetOtherBody() const | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "RigidBody2D@+ GetOtherBody() const", asMETHODPR(ConstraintRevolute2D, GetOtherBody, () const, RigidBody2D*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "RigidBody2D@+ get_otherBody() const", asMETHODPR(ConstraintRevolute2D, GetOtherBody, () const, RigidBody2D*), asCALL_THISCALL);
-    // RigidBody2D* Constraint2D::GetOwnerBody() const | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "RigidBody2D@+ GetOwnerBody() const", asMETHODPR(ConstraintRevolute2D, GetOwnerBody, () const, RigidBody2D*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "RigidBody2D@+ get_ownerBody() const", asMETHODPR(ConstraintRevolute2D, GetOwnerBody, () const, RigidBody2D*), asCALL_THISCALL);
-    // Scene* Component::GetScene() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "Scene@+ GetScene() const", asMETHODPR(ConstraintRevolute2D, GetScene, () const, Scene*), asCALL_THISCALL);
-    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(ConstraintRevolute2D, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
-    // Not registered because template
-    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "StringHash GetType() const", asMETHODPR(ConstraintRevolute2D, GetType, () const, StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "StringHash get_type() const", asMETHODPR(ConstraintRevolute2D, GetType, () const, StringHash), asCALL_THISCALL);
-    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "const String& GetTypeName() const", asMETHODPR(ConstraintRevolute2D, GetTypeName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "const String& get_typeName() const", asMETHODPR(ConstraintRevolute2D, GetTypeName, () const, const String&), asCALL_THISCALL);
-    // float ConstraintRevolute2D::GetUpperAngle() const | File: ../Urho2D/ConstraintRevolute2D.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "float GetUpperAngle() const", asMETHODPR(ConstraintRevolute2D, GetUpperAngle, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "float get_upperAngle() const", asMETHODPR(ConstraintRevolute2D, GetUpperAngle, () const, float), asCALL_THISCALL);
-    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool HasEventHandlers() const", asMETHODPR(ConstraintRevolute2D, HasEventHandlers, () const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(ConstraintRevolute2D, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(ConstraintRevolute2D, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
-    // bool Component::IsEnabled() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool IsEnabled() const", asMETHODPR(ConstraintRevolute2D, IsEnabled, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool get_enabled() const", asMETHODPR(ConstraintRevolute2D, IsEnabled, () const, bool), asCALL_THISCALL);
-    // bool Component::IsEnabledEffective() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool IsEnabledEffective() const", asMETHODPR(ConstraintRevolute2D, IsEnabledEffective, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool get_enabledEffective() const", asMETHODPR(ConstraintRevolute2D, IsEnabledEffective, () const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool IsInstanceOf(StringHash) const", asMETHODPR(ConstraintRevolute2D, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
-    // Not registered because template
-    // bool Component::IsReplicated() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool IsReplicated() const", asMETHODPR(ConstraintRevolute2D, IsReplicated, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool get_replicated() const", asMETHODPR(ConstraintRevolute2D, IsReplicated, () const, bool), asCALL_THISCALL);
-    // bool Serializable::IsTemporary() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool IsTemporary() const", asMETHODPR(ConstraintRevolute2D, IsTemporary, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool get_temporary() const", asMETHODPR(ConstraintRevolute2D, IsTemporary, () const, bool), asCALL_THISCALL);
-    // virtual bool Serializable::Load(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool Load(Deserializer&)", asMETHODPR(ConstraintRevolute2D, Load, (Deserializer&), bool), asCALL_THISCALL);
-    // bool Animatable::LoadJSON(const JSONValue& source) override | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool LoadJSON(const JSONValue&in)", asMETHODPR(ConstraintRevolute2D, LoadJSON, (const JSONValue&), bool), asCALL_THISCALL);
-    // bool Animatable::LoadXML(const XMLElement& source) override | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool LoadXML(const XMLElement&in)", asMETHODPR(ConstraintRevolute2D, LoadXML, (const XMLElement&), bool), asCALL_THISCALL);
-    // void Component::MarkNetworkUpdate() override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void MarkNetworkUpdate()", asMETHODPR(ConstraintRevolute2D, MarkNetworkUpdate, (), void), asCALL_THISCALL);
-    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(ConstraintRevolute2D, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
-    // virtual void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void OnGetAttribute(const AttributeInfo&in, Variant&) const", asMETHODPR(ConstraintRevolute2D, OnGetAttribute, (const AttributeInfo&, Variant&) const, void), asCALL_THISCALL);
-    // virtual void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void OnSetAttribute(const AttributeInfo&in, const Variant&in)", asMETHODPR(ConstraintRevolute2D, OnSetAttribute, (const AttributeInfo&, const Variant&), void), asCALL_THISCALL);
-    // void Constraint2D::OnSetEnabled() override | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void OnSetEnabled()", asMETHODPR(ConstraintRevolute2D, OnSetEnabled, (), void), asCALL_THISCALL);
-    // void Component::PrepareNetworkUpdate() | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void PrepareNetworkUpdate()", asMETHODPR(ConstraintRevolute2D, PrepareNetworkUpdate, (), void), asCALL_THISCALL);
-    // bool Serializable::ReadDeltaUpdate(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool ReadDeltaUpdate(Deserializer&)", asMETHODPR(ConstraintRevolute2D, ReadDeltaUpdate, (Deserializer&), bool), asCALL_THISCALL);
-    // bool Serializable::ReadLatestDataUpdate(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool ReadLatestDataUpdate(Deserializer&)", asMETHODPR(ConstraintRevolute2D, ReadLatestDataUpdate, (Deserializer&), bool), asCALL_THISCALL);
-    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
-    // Error: type "RefCount*" can not automatically bind
-    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "int Refs() const", asMETHODPR(ConstraintRevolute2D, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "int get_refs() const", asMETHODPR(ConstraintRevolute2D, Refs, () const, int), asCALL_THISCALL);
-    // static void ConstraintRevolute2D::RegisterObject(Context* context) | File: ../Urho2D/ConstraintRevolute2D.h
-    // Context can be used as firs parameter of constructors only
-    // void Constraint2D::ReleaseJoint() | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void ReleaseJoint()", asMETHODPR(ConstraintRevolute2D, ReleaseJoint, (), void), asCALL_THISCALL);
-    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("ConstraintRevolute2D", asBEHAVE_RELEASE, "void f()", asMETHODPR(ConstraintRevolute2D, ReleaseRef, (), void), asCALL_THISCALL);
-    // void Component::Remove() | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void Remove()", asMETHODPR(ConstraintRevolute2D, Remove, (), void), asCALL_THISCALL);
-    // void Animatable::RemoveAttributeAnimation(const String& name) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void RemoveAttributeAnimation(const String&in)", asMETHODPR(ConstraintRevolute2D, RemoveAttributeAnimation, (const String&), void), asCALL_THISCALL);
-    // void Serializable::RemoveInstanceDefault() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void RemoveInstanceDefault()", asMETHODPR(ConstraintRevolute2D, RemoveInstanceDefault, (), void), asCALL_THISCALL);
-    // void Animatable::RemoveObjectAnimation() | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void RemoveObjectAnimation()", asMETHODPR(ConstraintRevolute2D, RemoveObjectAnimation, (), void), asCALL_THISCALL);
-    // void Serializable::ResetToDefault() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void ResetToDefault()", asMETHODPR(ConstraintRevolute2D, ResetToDefault, (), void), asCALL_THISCALL);
-    // bool Component::Save(Serializer& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool Save(Serializer&) const", asMETHODPR(ConstraintRevolute2D, Save, (Serializer&) const, bool), asCALL_THISCALL);
-    // virtual bool Serializable::SaveDefaultAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool SaveDefaultAttributes() const", asMETHODPR(ConstraintRevolute2D, SaveDefaultAttributes, () const, bool), asCALL_THISCALL);
-    // bool Component::SaveJSON(JSONValue& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool SaveJSON(JSONValue&) const", asMETHODPR(ConstraintRevolute2D, SaveJSON, (JSONValue&) const, bool), asCALL_THISCALL);
-    // bool Component::SaveXML(XMLElement& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool SaveXML(XMLElement&) const", asMETHODPR(ConstraintRevolute2D, SaveXML, (XMLElement&) const, bool), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SendEvent(StringHash)", asMETHODPR(ConstraintRevolute2D, SendEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(ConstraintRevolute2D, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
-    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
-    // Not registered because template
-    // void ConstraintRevolute2D::SetAnchor(const Vector2& anchor) | File: ../Urho2D/ConstraintRevolute2D.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetAnchor(const Vector2&in)", asMETHODPR(ConstraintRevolute2D, SetAnchor, (const Vector2&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void set_anchor(const Vector2&in)", asMETHODPR(ConstraintRevolute2D, SetAnchor, (const Vector2&), void), asCALL_THISCALL);
-    // void Animatable::SetAnimationEnabled(bool enable) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetAnimationEnabled(bool)", asMETHODPR(ConstraintRevolute2D, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void set_animationEnabled(bool)", asMETHODPR(ConstraintRevolute2D, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
-    // void Animatable::SetAnimationTime(float time) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetAnimationTime(float)", asMETHODPR(ConstraintRevolute2D, SetAnimationTime, (float), void), asCALL_THISCALL);
-    // void Constraint2D::SetAttachedConstraint(Constraint2D* constraint) | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetAttachedConstraint(Constraint2D@+)", asMETHODPR(ConstraintRevolute2D, SetAttachedConstraint, (Constraint2D*), void), asCALL_THISCALL);
-    // bool Serializable::SetAttribute(unsigned index, const Variant& value) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool SetAttribute(uint, const Variant&in)", asMETHODPR(ConstraintRevolute2D, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool set_attributes(uint, const Variant&in)", asMETHODPR(ConstraintRevolute2D, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
-    // bool Serializable::SetAttribute(const String& name, const Variant& value) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool SetAttribute(const String&in, const Variant&in)", asMETHODPR(ConstraintRevolute2D, SetAttribute, (const String&, const Variant&), bool), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode=WM_LOOP, float speed=1.0f) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetAttributeAnimation(const String&in, ValueAnimation@+, WrapMode = WM_LOOP, float = 1.0f)", asMETHODPR(ConstraintRevolute2D, SetAttributeAnimation, (const String&, ValueAnimation*, WrapMode, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationSpeed(const String& name, float speed) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetAttributeAnimationSpeed(const String&in, float)", asMETHODPR(ConstraintRevolute2D, SetAttributeAnimationSpeed, (const String&, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationTime(const String& name, float time) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetAttributeAnimationTime(const String&in, float)", asMETHODPR(ConstraintRevolute2D, SetAttributeAnimationTime, (const String&, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationWrapMode(const String& name, WrapMode wrapMode) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetAttributeAnimationWrapMode(const String&in, WrapMode)", asMETHODPR(ConstraintRevolute2D, SetAttributeAnimationWrapMode, (const String&, WrapMode), void), asCALL_THISCALL);
-    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetBlockEvents(bool)", asMETHODPR(ConstraintRevolute2D, SetBlockEvents, (bool), void), asCALL_THISCALL);
-    // void Constraint2D::SetCollideConnected(bool collideConnected) | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetCollideConnected(bool)", asMETHODPR(ConstraintRevolute2D, SetCollideConnected, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void set_collideConnected(bool)", asMETHODPR(ConstraintRevolute2D, SetCollideConnected, (bool), void), asCALL_THISCALL);
-    // void Component::SetEnabled(bool enable) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetEnabled(bool)", asMETHODPR(ConstraintRevolute2D, SetEnabled, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void set_enabled(bool)", asMETHODPR(ConstraintRevolute2D, SetEnabled, (bool), void), asCALL_THISCALL);
-    // void ConstraintRevolute2D::SetEnableLimit(bool enableLimit) | File: ../Urho2D/ConstraintRevolute2D.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetEnableLimit(bool)", asMETHODPR(ConstraintRevolute2D, SetEnableLimit, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void set_enableLimit(bool)", asMETHODPR(ConstraintRevolute2D, SetEnableLimit, (bool), void), asCALL_THISCALL);
-    // void ConstraintRevolute2D::SetEnableMotor(bool enableMotor) | File: ../Urho2D/ConstraintRevolute2D.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetEnableMotor(bool)", asMETHODPR(ConstraintRevolute2D, SetEnableMotor, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void set_enableMotor(bool)", asMETHODPR(ConstraintRevolute2D, SetEnableMotor, (bool), void), asCALL_THISCALL);
-    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(ConstraintRevolute2D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(ConstraintRevolute2D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    // void Serializable::SetInstanceDefault(bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetInstanceDefault(bool)", asMETHODPR(ConstraintRevolute2D, SetInstanceDefault, (bool), void), asCALL_THISCALL);
-    // void Serializable::SetInterceptNetworkUpdate(const String& attributeName, bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetInterceptNetworkUpdate(const String&in, bool)", asMETHODPR(ConstraintRevolute2D, SetInterceptNetworkUpdate, (const String&, bool), void), asCALL_THISCALL);
-    // void ConstraintRevolute2D::SetLowerAngle(float lowerAngle) | File: ../Urho2D/ConstraintRevolute2D.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetLowerAngle(float)", asMETHODPR(ConstraintRevolute2D, SetLowerAngle, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void set_lowerAngle(float)", asMETHODPR(ConstraintRevolute2D, SetLowerAngle, (float), void), asCALL_THISCALL);
-    // void ConstraintRevolute2D::SetMaxMotorTorque(float maxMotorTorque) | File: ../Urho2D/ConstraintRevolute2D.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetMaxMotorTorque(float)", asMETHODPR(ConstraintRevolute2D, SetMaxMotorTorque, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void set_maxMotorTorque(float)", asMETHODPR(ConstraintRevolute2D, SetMaxMotorTorque, (float), void), asCALL_THISCALL);
-    // void ConstraintRevolute2D::SetMotorSpeed(float motorSpeed) | File: ../Urho2D/ConstraintRevolute2D.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetMotorSpeed(float)", asMETHODPR(ConstraintRevolute2D, SetMotorSpeed, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void set_motorSpeed(float)", asMETHODPR(ConstraintRevolute2D, SetMotorSpeed, (float), void), asCALL_THISCALL);
-    // void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetObjectAnimation(ObjectAnimation@+)", asMETHODPR(ConstraintRevolute2D, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void set_objectAnimation(ObjectAnimation@+)", asMETHODPR(ConstraintRevolute2D, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
-    // void Animatable::SetObjectAnimationAttr(const ResourceRef& value) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetObjectAnimationAttr(const ResourceRef&in)", asMETHODPR(ConstraintRevolute2D, SetObjectAnimationAttr, (const ResourceRef&), void), asCALL_THISCALL);
-    // void Constraint2D::SetOtherBody(RigidBody2D* body) | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetOtherBody(RigidBody2D@+)", asMETHODPR(ConstraintRevolute2D, SetOtherBody, (RigidBody2D*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void set_otherBody(RigidBody2D@+)", asMETHODPR(ConstraintRevolute2D, SetOtherBody, (RigidBody2D*), void), asCALL_THISCALL);
-    // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetTemporary(bool)", asMETHODPR(ConstraintRevolute2D, SetTemporary, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void set_temporary(bool)", asMETHODPR(ConstraintRevolute2D, SetTemporary, (bool), void), asCALL_THISCALL);
-    // void ConstraintRevolute2D::SetUpperAngle(float upperAngle) | File: ../Urho2D/ConstraintRevolute2D.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetUpperAngle(float)", asMETHODPR(ConstraintRevolute2D, SetUpperAngle, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void set_upperAngle(float)", asMETHODPR(ConstraintRevolute2D, SetUpperAngle, (float), void), asCALL_THISCALL);
-    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void UnsubscribeFromAllEvents()", asMETHODPR(ConstraintRevolute2D, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(ConstraintRevolute2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
-    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(ConstraintRevolute2D, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(ConstraintRevolute2D, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(ConstraintRevolute2D, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
-    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "int WeakRefs() const", asMETHODPR(ConstraintRevolute2D, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "int get_weakRefs() const", asMETHODPR(ConstraintRevolute2D, WeakRefs, () const, int), asCALL_THISCALL);
-    // void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attributeBits, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void WriteDeltaUpdate(Serializer&, const DirtyBits&in, uint8)", asMETHODPR(ConstraintRevolute2D, WriteDeltaUpdate, (Serializer&, const DirtyBits&, unsigned char), void), asCALL_THISCALL);
-    // void Serializable::WriteInitialDeltaUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void WriteInitialDeltaUpdate(Serializer&, uint8)", asMETHODPR(ConstraintRevolute2D, WriteInitialDeltaUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
-    // void Serializable::WriteLatestDataUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void WriteLatestDataUpdate(Serializer&, uint8)", asMETHODPR(ConstraintRevolute2D, WriteLatestDataUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
-#ifdef REGISTER_MANUAL_PART_Constraint2D
-    REGISTER_MANUAL_PART_Constraint2D(ConstraintRevolute2D, "ConstraintRevolute2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Component
-    REGISTER_MANUAL_PART_Component(ConstraintRevolute2D, "ConstraintRevolute2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Animatable
-    REGISTER_MANUAL_PART_Animatable(ConstraintRevolute2D, "ConstraintRevolute2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Serializable
-    REGISTER_MANUAL_PART_Serializable(ConstraintRevolute2D, "ConstraintRevolute2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Object
-    REGISTER_MANUAL_PART_Object(ConstraintRevolute2D, "ConstraintRevolute2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(ConstraintRevolute2D, "ConstraintRevolute2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_ConstraintRevolute2D
-    REGISTER_MANUAL_PART_ConstraintRevolute2D(ConstraintRevolute2D, "ConstraintRevolute2D")
-#endif
-    RegisterSubclass<Constraint2D, ConstraintRevolute2D>(engine, "Constraint2D", "ConstraintRevolute2D");
-    RegisterSubclass<Component, ConstraintRevolute2D>(engine, "Component", "ConstraintRevolute2D");
-    RegisterSubclass<Animatable, ConstraintRevolute2D>(engine, "Animatable", "ConstraintRevolute2D");
-    RegisterSubclass<Serializable, ConstraintRevolute2D>(engine, "Serializable", "ConstraintRevolute2D");
-    RegisterSubclass<Object, ConstraintRevolute2D>(engine, "Object", "ConstraintRevolute2D");
-    RegisterSubclass<RefCounted, ConstraintRevolute2D>(engine, "RefCounted", "ConstraintRevolute2D");
-#endif
-
-#ifdef URHO3D_URHO2D
-    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("ConstraintPrismatic2D", asBEHAVE_ADDREF, "void f()", asMETHODPR(ConstraintPrismatic2D, AddRef, (), void), asCALL_THISCALL);
-    // void Component::AddReplicationState(ComponentReplicationState* state) | File: ../Scene/Component.h
-    // Error: type "ComponentReplicationState*" can not automatically bind
-    // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void AllocateNetworkState()", asMETHODPR(ConstraintPrismatic2D, AllocateNetworkState, (), void), asCALL_THISCALL);
-    // void Constraint2D::ApplyAttributes() override | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void ApplyAttributes()", asMETHODPR(ConstraintPrismatic2D, ApplyAttributes, (), void), asCALL_THISCALL);
-    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
-    // Not registered because template
-    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
-    // Not registered because template
-    // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void CleanupConnection(Connection@+)", asMETHODPR(ConstraintPrismatic2D, CleanupConnection, (Connection*), void), asCALL_THISCALL);
-    // explicit ConstraintPrismatic2D::ConstraintPrismatic2D(Context* context) | File: ../Urho2D/ConstraintPrismatic2D.h
-    engine->RegisterObjectBehaviour("ConstraintPrismatic2D", asBEHAVE_FACTORY, "ConstraintPrismatic2D@+ f()", asFUNCTION(ConstraintPrismatic2D_ConstraintPrismatic2D_Context), asCALL_CDECL);
-    // void Constraint2D::CreateJoint() | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void CreateJoint()", asMETHODPR(ConstraintPrismatic2D, CreateJoint, (), void), asCALL_THISCALL);
-    // virtual void Component::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(ConstraintPrismatic2D, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
-    // const Vector2& ConstraintPrismatic2D::GetAnchor() const | File: ../Urho2D/ConstraintPrismatic2D.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "const Vector2& GetAnchor() const", asMETHODPR(ConstraintPrismatic2D, GetAnchor, () const, const Vector2&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "const Vector2& get_anchor() const", asMETHODPR(ConstraintPrismatic2D, GetAnchor, () const, const Vector2&), asCALL_THISCALL);
-    // bool Animatable::GetAnimationEnabled() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool GetAnimationEnabled() const", asMETHODPR(ConstraintPrismatic2D, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool get_animationEnabled() const", asMETHODPR(ConstraintPrismatic2D, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
-    // Constraint2D* Constraint2D::GetAttachedConstraint() const | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "Constraint2D@+ GetAttachedConstraint() const", asMETHODPR(ConstraintPrismatic2D, GetAttachedConstraint, () const, Constraint2D*), asCALL_THISCALL);
-    // Variant Serializable::GetAttribute(unsigned index) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "Variant GetAttribute(uint) const", asMETHODPR(ConstraintPrismatic2D, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "Variant get_attributes(uint) const", asMETHODPR(ConstraintPrismatic2D, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
-    // Variant Serializable::GetAttribute(const String& name) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "Variant GetAttribute(const String&in) const", asMETHODPR(ConstraintPrismatic2D, GetAttribute, (const String&) const, Variant), asCALL_THISCALL);
-    // ValueAnimation* Animatable::GetAttributeAnimation(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "ValueAnimation@+ GetAttributeAnimation(const String&in) const", asMETHODPR(ConstraintPrismatic2D, GetAttributeAnimation, (const String&) const, ValueAnimation*), asCALL_THISCALL);
-    // float Animatable::GetAttributeAnimationSpeed(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "float GetAttributeAnimationSpeed(const String&in) const", asMETHODPR(ConstraintPrismatic2D, GetAttributeAnimationSpeed, (const String&) const, float), asCALL_THISCALL);
-    // float Animatable::GetAttributeAnimationTime(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "float GetAttributeAnimationTime(const String&in) const", asMETHODPR(ConstraintPrismatic2D, GetAttributeAnimationTime, (const String&) const, float), asCALL_THISCALL);
-    // WrapMode Animatable::GetAttributeAnimationWrapMode(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "WrapMode GetAttributeAnimationWrapMode(const String&in) const", asMETHODPR(ConstraintPrismatic2D, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), asCALL_THISCALL);
-    // Variant Serializable::GetAttributeDefault(unsigned index) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "Variant GetAttributeDefault(uint) const", asMETHODPR(ConstraintPrismatic2D, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "Variant get_attributeDefaults(uint) const", asMETHODPR(ConstraintPrismatic2D, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
-    // Variant Serializable::GetAttributeDefault(const String& name) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "Variant GetAttributeDefault(const String&in) const", asMETHODPR(ConstraintPrismatic2D, GetAttributeDefault, (const String&) const, Variant), asCALL_THISCALL);
-    // virtual const Vector<AttributeInfo>* Serializable::GetAttributes() const | File: ../Scene/Serializable.h
-    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
-    // const Vector2& ConstraintPrismatic2D::GetAxis() const | File: ../Urho2D/ConstraintPrismatic2D.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "const Vector2& GetAxis() const", asMETHODPR(ConstraintPrismatic2D, GetAxis, () const, const Vector2&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "const Vector2& get_axis() const", asMETHODPR(ConstraintPrismatic2D, GetAxis, () const, const Vector2&), asCALL_THISCALL);
-    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool GetBlockEvents() const", asMETHODPR(ConstraintPrismatic2D, GetBlockEvents, () const, bool), asCALL_THISCALL);
-    // const String& Object::GetCategory() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "const String& GetCategory() const", asMETHODPR(ConstraintPrismatic2D, GetCategory, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "const String& get_category() const", asMETHODPR(ConstraintPrismatic2D, GetCategory, () const, const String&), asCALL_THISCALL);
-    // bool Constraint2D::GetCollideConnected() const | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool GetCollideConnected() const", asMETHODPR(ConstraintPrismatic2D, GetCollideConnected, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool get_collideConnected() const", asMETHODPR(ConstraintPrismatic2D, GetCollideConnected, () const, bool), asCALL_THISCALL);
-    // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "Component@+ GetComponent(StringHash) const", asMETHODPR(ConstraintPrismatic2D, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
-    // template<class T> T*  Component::GetComponent() const | File: ../Scene/Component.h
-    // Not registered because template
-    // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
-    // Error: type "PODVector<Component*>&" can not automatically bind
-    // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
-    // Not registered because template
-    // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
-    // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
-    // Error: type "PODVector<Node*>&" can not automatically bind
-    // bool ConstraintPrismatic2D::GetEnableLimit() const | File: ../Urho2D/ConstraintPrismatic2D.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool GetEnableLimit() const", asMETHODPR(ConstraintPrismatic2D, GetEnableLimit, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool get_enableLimit() const", asMETHODPR(ConstraintPrismatic2D, GetEnableLimit, () const, bool), asCALL_THISCALL);
-    // bool ConstraintPrismatic2D::GetEnableMotor() const | File: ../Urho2D/ConstraintPrismatic2D.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool GetEnableMotor() const", asMETHODPR(ConstraintPrismatic2D, GetEnableMotor, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool get_enableMotor() const", asMETHODPR(ConstraintPrismatic2D, GetEnableMotor, () const, bool), asCALL_THISCALL);
-    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "VariantMap& GetEventDataMap() const", asMETHODPR(ConstraintPrismatic2D, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
-    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // Object* Object::GetEventSender() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "Object@+ GetEventSender() const", asMETHODPR(ConstraintPrismatic2D, GetEventSender, () const, Object*), asCALL_THISCALL);
-    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(ConstraintPrismatic2D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "const Variant& get_globalVar(StringHash) const", asMETHODPR(ConstraintPrismatic2D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "const VariantMap& GetGlobalVars() const", asMETHODPR(ConstraintPrismatic2D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "const VariantMap& get_globalVars() const", asMETHODPR(ConstraintPrismatic2D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    // unsigned Component::GetID() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "uint GetID() const", asMETHODPR(ConstraintPrismatic2D, GetID, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "uint get_id() const", asMETHODPR(ConstraintPrismatic2D, GetID, () const, unsigned), asCALL_THISCALL);
-    // bool Serializable::GetInterceptNetworkUpdate(const String& attributeName) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool GetInterceptNetworkUpdate(const String&in) const", asMETHODPR(ConstraintPrismatic2D, GetInterceptNetworkUpdate, (const String&) const, bool), asCALL_THISCALL);
-    // b2Joint* Constraint2D::GetJoint() const | File: ../Urho2D/Constraint2D.h
-    // Error: type "b2Joint*" can not automatically bind
-    // float ConstraintPrismatic2D::GetLowerTranslation() const | File: ../Urho2D/ConstraintPrismatic2D.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "float GetLowerTranslation() const", asMETHODPR(ConstraintPrismatic2D, GetLowerTranslation, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "float get_lowerTranslation() const", asMETHODPR(ConstraintPrismatic2D, GetLowerTranslation, () const, float), asCALL_THISCALL);
-    // float ConstraintPrismatic2D::GetMaxMotorForce() const | File: ../Urho2D/ConstraintPrismatic2D.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "float GetMaxMotorForce() const", asMETHODPR(ConstraintPrismatic2D, GetMaxMotorForce, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "float get_maxMotorForce() const", asMETHODPR(ConstraintPrismatic2D, GetMaxMotorForce, () const, float), asCALL_THISCALL);
-    // float ConstraintPrismatic2D::GetMotorSpeed() const | File: ../Urho2D/ConstraintPrismatic2D.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "float GetMotorSpeed() const", asMETHODPR(ConstraintPrismatic2D, GetMotorSpeed, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "float get_motorSpeed() const", asMETHODPR(ConstraintPrismatic2D, GetMotorSpeed, () const, float), asCALL_THISCALL);
-    // virtual const Vector<AttributeInfo>* Serializable::GetNetworkAttributes() const | File: ../Scene/Serializable.h
-    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
-    // NetworkState* Serializable::GetNetworkState() const | File: ../Scene/Serializable.h
-    // Error: type "NetworkState*" can not automatically bind
-    // Node* Component::GetNode() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "Node@+ GetNode() const", asMETHODPR(ConstraintPrismatic2D, GetNode, () const, Node*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "Node@+ get_node() const", asMETHODPR(ConstraintPrismatic2D, GetNode, () const, Node*), asCALL_THISCALL);
-    // unsigned Serializable::GetNumAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "uint GetNumAttributes() const", asMETHODPR(ConstraintPrismatic2D, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "uint get_numAttributes() const", asMETHODPR(ConstraintPrismatic2D, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
-    // unsigned Serializable::GetNumNetworkAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "uint GetNumNetworkAttributes() const", asMETHODPR(ConstraintPrismatic2D, GetNumNetworkAttributes, () const, unsigned), asCALL_THISCALL);
-    // ObjectAnimation* Animatable::GetObjectAnimation() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "ObjectAnimation@+ GetObjectAnimation() const", asMETHODPR(ConstraintPrismatic2D, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "ObjectAnimation@+ get_objectAnimation() const", asMETHODPR(ConstraintPrismatic2D, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
-    // ResourceRef Animatable::GetObjectAnimationAttr() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "ResourceRef GetObjectAnimationAttr() const", asMETHODPR(ConstraintPrismatic2D, GetObjectAnimationAttr, () const, ResourceRef), asCALL_THISCALL);
-    // RigidBody2D* Constraint2D::GetOtherBody() const | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "RigidBody2D@+ GetOtherBody() const", asMETHODPR(ConstraintPrismatic2D, GetOtherBody, () const, RigidBody2D*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "RigidBody2D@+ get_otherBody() const", asMETHODPR(ConstraintPrismatic2D, GetOtherBody, () const, RigidBody2D*), asCALL_THISCALL);
-    // RigidBody2D* Constraint2D::GetOwnerBody() const | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "RigidBody2D@+ GetOwnerBody() const", asMETHODPR(ConstraintPrismatic2D, GetOwnerBody, () const, RigidBody2D*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "RigidBody2D@+ get_ownerBody() const", asMETHODPR(ConstraintPrismatic2D, GetOwnerBody, () const, RigidBody2D*), asCALL_THISCALL);
-    // Scene* Component::GetScene() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "Scene@+ GetScene() const", asMETHODPR(ConstraintPrismatic2D, GetScene, () const, Scene*), asCALL_THISCALL);
-    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(ConstraintPrismatic2D, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
-    // Not registered because template
-    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "StringHash GetType() const", asMETHODPR(ConstraintPrismatic2D, GetType, () const, StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "StringHash get_type() const", asMETHODPR(ConstraintPrismatic2D, GetType, () const, StringHash), asCALL_THISCALL);
-    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "const String& GetTypeName() const", asMETHODPR(ConstraintPrismatic2D, GetTypeName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "const String& get_typeName() const", asMETHODPR(ConstraintPrismatic2D, GetTypeName, () const, const String&), asCALL_THISCALL);
-    // float ConstraintPrismatic2D::GetUpperTranslation() const | File: ../Urho2D/ConstraintPrismatic2D.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "float GetUpperTranslation() const", asMETHODPR(ConstraintPrismatic2D, GetUpperTranslation, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "float get_upperTranslation() const", asMETHODPR(ConstraintPrismatic2D, GetUpperTranslation, () const, float), asCALL_THISCALL);
-    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool HasEventHandlers() const", asMETHODPR(ConstraintPrismatic2D, HasEventHandlers, () const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(ConstraintPrismatic2D, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(ConstraintPrismatic2D, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
-    // bool Component::IsEnabled() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool IsEnabled() const", asMETHODPR(ConstraintPrismatic2D, IsEnabled, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool get_enabled() const", asMETHODPR(ConstraintPrismatic2D, IsEnabled, () const, bool), asCALL_THISCALL);
-    // bool Component::IsEnabledEffective() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool IsEnabledEffective() const", asMETHODPR(ConstraintPrismatic2D, IsEnabledEffective, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool get_enabledEffective() const", asMETHODPR(ConstraintPrismatic2D, IsEnabledEffective, () const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool IsInstanceOf(StringHash) const", asMETHODPR(ConstraintPrismatic2D, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
-    // Not registered because template
-    // bool Component::IsReplicated() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool IsReplicated() const", asMETHODPR(ConstraintPrismatic2D, IsReplicated, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool get_replicated() const", asMETHODPR(ConstraintPrismatic2D, IsReplicated, () const, bool), asCALL_THISCALL);
-    // bool Serializable::IsTemporary() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool IsTemporary() const", asMETHODPR(ConstraintPrismatic2D, IsTemporary, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool get_temporary() const", asMETHODPR(ConstraintPrismatic2D, IsTemporary, () const, bool), asCALL_THISCALL);
-    // virtual bool Serializable::Load(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool Load(Deserializer&)", asMETHODPR(ConstraintPrismatic2D, Load, (Deserializer&), bool), asCALL_THISCALL);
-    // bool Animatable::LoadJSON(const JSONValue& source) override | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool LoadJSON(const JSONValue&in)", asMETHODPR(ConstraintPrismatic2D, LoadJSON, (const JSONValue&), bool), asCALL_THISCALL);
-    // bool Animatable::LoadXML(const XMLElement& source) override | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool LoadXML(const XMLElement&in)", asMETHODPR(ConstraintPrismatic2D, LoadXML, (const XMLElement&), bool), asCALL_THISCALL);
-    // void Component::MarkNetworkUpdate() override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void MarkNetworkUpdate()", asMETHODPR(ConstraintPrismatic2D, MarkNetworkUpdate, (), void), asCALL_THISCALL);
-    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(ConstraintPrismatic2D, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
-    // virtual void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void OnGetAttribute(const AttributeInfo&in, Variant&) const", asMETHODPR(ConstraintPrismatic2D, OnGetAttribute, (const AttributeInfo&, Variant&) const, void), asCALL_THISCALL);
-    // virtual void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void OnSetAttribute(const AttributeInfo&in, const Variant&in)", asMETHODPR(ConstraintPrismatic2D, OnSetAttribute, (const AttributeInfo&, const Variant&), void), asCALL_THISCALL);
-    // void Constraint2D::OnSetEnabled() override | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void OnSetEnabled()", asMETHODPR(ConstraintPrismatic2D, OnSetEnabled, (), void), asCALL_THISCALL);
-    // void Component::PrepareNetworkUpdate() | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void PrepareNetworkUpdate()", asMETHODPR(ConstraintPrismatic2D, PrepareNetworkUpdate, (), void), asCALL_THISCALL);
-    // bool Serializable::ReadDeltaUpdate(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool ReadDeltaUpdate(Deserializer&)", asMETHODPR(ConstraintPrismatic2D, ReadDeltaUpdate, (Deserializer&), bool), asCALL_THISCALL);
-    // bool Serializable::ReadLatestDataUpdate(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool ReadLatestDataUpdate(Deserializer&)", asMETHODPR(ConstraintPrismatic2D, ReadLatestDataUpdate, (Deserializer&), bool), asCALL_THISCALL);
-    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
-    // Error: type "RefCount*" can not automatically bind
-    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "int Refs() const", asMETHODPR(ConstraintPrismatic2D, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "int get_refs() const", asMETHODPR(ConstraintPrismatic2D, Refs, () const, int), asCALL_THISCALL);
-    // static void ConstraintPrismatic2D::RegisterObject(Context* context) | File: ../Urho2D/ConstraintPrismatic2D.h
-    // Context can be used as firs parameter of constructors only
-    // void Constraint2D::ReleaseJoint() | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void ReleaseJoint()", asMETHODPR(ConstraintPrismatic2D, ReleaseJoint, (), void), asCALL_THISCALL);
-    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("ConstraintPrismatic2D", asBEHAVE_RELEASE, "void f()", asMETHODPR(ConstraintPrismatic2D, ReleaseRef, (), void), asCALL_THISCALL);
-    // void Component::Remove() | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void Remove()", asMETHODPR(ConstraintPrismatic2D, Remove, (), void), asCALL_THISCALL);
-    // void Animatable::RemoveAttributeAnimation(const String& name) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void RemoveAttributeAnimation(const String&in)", asMETHODPR(ConstraintPrismatic2D, RemoveAttributeAnimation, (const String&), void), asCALL_THISCALL);
-    // void Serializable::RemoveInstanceDefault() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void RemoveInstanceDefault()", asMETHODPR(ConstraintPrismatic2D, RemoveInstanceDefault, (), void), asCALL_THISCALL);
-    // void Animatable::RemoveObjectAnimation() | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void RemoveObjectAnimation()", asMETHODPR(ConstraintPrismatic2D, RemoveObjectAnimation, (), void), asCALL_THISCALL);
-    // void Serializable::ResetToDefault() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void ResetToDefault()", asMETHODPR(ConstraintPrismatic2D, ResetToDefault, (), void), asCALL_THISCALL);
-    // bool Component::Save(Serializer& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool Save(Serializer&) const", asMETHODPR(ConstraintPrismatic2D, Save, (Serializer&) const, bool), asCALL_THISCALL);
-    // virtual bool Serializable::SaveDefaultAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool SaveDefaultAttributes() const", asMETHODPR(ConstraintPrismatic2D, SaveDefaultAttributes, () const, bool), asCALL_THISCALL);
-    // bool Component::SaveJSON(JSONValue& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool SaveJSON(JSONValue&) const", asMETHODPR(ConstraintPrismatic2D, SaveJSON, (JSONValue&) const, bool), asCALL_THISCALL);
-    // bool Component::SaveXML(XMLElement& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool SaveXML(XMLElement&) const", asMETHODPR(ConstraintPrismatic2D, SaveXML, (XMLElement&) const, bool), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SendEvent(StringHash)", asMETHODPR(ConstraintPrismatic2D, SendEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(ConstraintPrismatic2D, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
-    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
-    // Not registered because template
-    // void ConstraintPrismatic2D::SetAnchor(const Vector2& anchor) | File: ../Urho2D/ConstraintPrismatic2D.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetAnchor(const Vector2&in)", asMETHODPR(ConstraintPrismatic2D, SetAnchor, (const Vector2&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void set_anchor(const Vector2&in)", asMETHODPR(ConstraintPrismatic2D, SetAnchor, (const Vector2&), void), asCALL_THISCALL);
-    // void Animatable::SetAnimationEnabled(bool enable) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetAnimationEnabled(bool)", asMETHODPR(ConstraintPrismatic2D, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void set_animationEnabled(bool)", asMETHODPR(ConstraintPrismatic2D, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
-    // void Animatable::SetAnimationTime(float time) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetAnimationTime(float)", asMETHODPR(ConstraintPrismatic2D, SetAnimationTime, (float), void), asCALL_THISCALL);
-    // void Constraint2D::SetAttachedConstraint(Constraint2D* constraint) | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetAttachedConstraint(Constraint2D@+)", asMETHODPR(ConstraintPrismatic2D, SetAttachedConstraint, (Constraint2D*), void), asCALL_THISCALL);
-    // bool Serializable::SetAttribute(unsigned index, const Variant& value) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool SetAttribute(uint, const Variant&in)", asMETHODPR(ConstraintPrismatic2D, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool set_attributes(uint, const Variant&in)", asMETHODPR(ConstraintPrismatic2D, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
-    // bool Serializable::SetAttribute(const String& name, const Variant& value) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool SetAttribute(const String&in, const Variant&in)", asMETHODPR(ConstraintPrismatic2D, SetAttribute, (const String&, const Variant&), bool), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode=WM_LOOP, float speed=1.0f) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetAttributeAnimation(const String&in, ValueAnimation@+, WrapMode = WM_LOOP, float = 1.0f)", asMETHODPR(ConstraintPrismatic2D, SetAttributeAnimation, (const String&, ValueAnimation*, WrapMode, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationSpeed(const String& name, float speed) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetAttributeAnimationSpeed(const String&in, float)", asMETHODPR(ConstraintPrismatic2D, SetAttributeAnimationSpeed, (const String&, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationTime(const String& name, float time) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetAttributeAnimationTime(const String&in, float)", asMETHODPR(ConstraintPrismatic2D, SetAttributeAnimationTime, (const String&, float), void), asCALL_THISCALL);
-    // void Animatable::SetAttributeAnimationWrapMode(const String& name, WrapMode wrapMode) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetAttributeAnimationWrapMode(const String&in, WrapMode)", asMETHODPR(ConstraintPrismatic2D, SetAttributeAnimationWrapMode, (const String&, WrapMode), void), asCALL_THISCALL);
-    // void ConstraintPrismatic2D::SetAxis(const Vector2& axis) | File: ../Urho2D/ConstraintPrismatic2D.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetAxis(const Vector2&in)", asMETHODPR(ConstraintPrismatic2D, SetAxis, (const Vector2&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void set_axis(const Vector2&in)", asMETHODPR(ConstraintPrismatic2D, SetAxis, (const Vector2&), void), asCALL_THISCALL);
-    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetBlockEvents(bool)", asMETHODPR(ConstraintPrismatic2D, SetBlockEvents, (bool), void), asCALL_THISCALL);
-    // void Constraint2D::SetCollideConnected(bool collideConnected) | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetCollideConnected(bool)", asMETHODPR(ConstraintPrismatic2D, SetCollideConnected, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void set_collideConnected(bool)", asMETHODPR(ConstraintPrismatic2D, SetCollideConnected, (bool), void), asCALL_THISCALL);
-    // void Component::SetEnabled(bool enable) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetEnabled(bool)", asMETHODPR(ConstraintPrismatic2D, SetEnabled, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void set_enabled(bool)", asMETHODPR(ConstraintPrismatic2D, SetEnabled, (bool), void), asCALL_THISCALL);
-    // void ConstraintPrismatic2D::SetEnableLimit(bool enableLimit) | File: ../Urho2D/ConstraintPrismatic2D.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetEnableLimit(bool)", asMETHODPR(ConstraintPrismatic2D, SetEnableLimit, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void set_enableLimit(bool)", asMETHODPR(ConstraintPrismatic2D, SetEnableLimit, (bool), void), asCALL_THISCALL);
-    // void ConstraintPrismatic2D::SetEnableMotor(bool enableMotor) | File: ../Urho2D/ConstraintPrismatic2D.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetEnableMotor(bool)", asMETHODPR(ConstraintPrismatic2D, SetEnableMotor, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void set_enableMotor(bool)", asMETHODPR(ConstraintPrismatic2D, SetEnableMotor, (bool), void), asCALL_THISCALL);
-    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(ConstraintPrismatic2D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(ConstraintPrismatic2D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    // void Serializable::SetInstanceDefault(bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetInstanceDefault(bool)", asMETHODPR(ConstraintPrismatic2D, SetInstanceDefault, (bool), void), asCALL_THISCALL);
-    // void Serializable::SetInterceptNetworkUpdate(const String& attributeName, bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetInterceptNetworkUpdate(const String&in, bool)", asMETHODPR(ConstraintPrismatic2D, SetInterceptNetworkUpdate, (const String&, bool), void), asCALL_THISCALL);
-    // void ConstraintPrismatic2D::SetLowerTranslation(float lowerTranslation) | File: ../Urho2D/ConstraintPrismatic2D.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetLowerTranslation(float)", asMETHODPR(ConstraintPrismatic2D, SetLowerTranslation, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void set_lowerTranslation(float)", asMETHODPR(ConstraintPrismatic2D, SetLowerTranslation, (float), void), asCALL_THISCALL);
-    // void ConstraintPrismatic2D::SetMaxMotorForce(float maxMotorForce) | File: ../Urho2D/ConstraintPrismatic2D.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetMaxMotorForce(float)", asMETHODPR(ConstraintPrismatic2D, SetMaxMotorForce, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void set_maxMotorForce(float)", asMETHODPR(ConstraintPrismatic2D, SetMaxMotorForce, (float), void), asCALL_THISCALL);
-    // void ConstraintPrismatic2D::SetMotorSpeed(float motorSpeed) | File: ../Urho2D/ConstraintPrismatic2D.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetMotorSpeed(float)", asMETHODPR(ConstraintPrismatic2D, SetMotorSpeed, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void set_motorSpeed(float)", asMETHODPR(ConstraintPrismatic2D, SetMotorSpeed, (float), void), asCALL_THISCALL);
-    // void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetObjectAnimation(ObjectAnimation@+)", asMETHODPR(ConstraintPrismatic2D, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void set_objectAnimation(ObjectAnimation@+)", asMETHODPR(ConstraintPrismatic2D, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
-    // void Animatable::SetObjectAnimationAttr(const ResourceRef& value) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetObjectAnimationAttr(const ResourceRef&in)", asMETHODPR(ConstraintPrismatic2D, SetObjectAnimationAttr, (const ResourceRef&), void), asCALL_THISCALL);
-    // void Constraint2D::SetOtherBody(RigidBody2D* body) | File: ../Urho2D/Constraint2D.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetOtherBody(RigidBody2D@+)", asMETHODPR(ConstraintPrismatic2D, SetOtherBody, (RigidBody2D*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void set_otherBody(RigidBody2D@+)", asMETHODPR(ConstraintPrismatic2D, SetOtherBody, (RigidBody2D*), void), asCALL_THISCALL);
-    // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetTemporary(bool)", asMETHODPR(ConstraintPrismatic2D, SetTemporary, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void set_temporary(bool)", asMETHODPR(ConstraintPrismatic2D, SetTemporary, (bool), void), asCALL_THISCALL);
-    // void ConstraintPrismatic2D::SetUpperTranslation(float upperTranslation) | File: ../Urho2D/ConstraintPrismatic2D.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetUpperTranslation(float)", asMETHODPR(ConstraintPrismatic2D, SetUpperTranslation, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void set_upperTranslation(float)", asMETHODPR(ConstraintPrismatic2D, SetUpperTranslation, (float), void), asCALL_THISCALL);
-    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void UnsubscribeFromAllEvents()", asMETHODPR(ConstraintPrismatic2D, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(ConstraintPrismatic2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
-    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(ConstraintPrismatic2D, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(ConstraintPrismatic2D, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(ConstraintPrismatic2D, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
-    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "int WeakRefs() const", asMETHODPR(ConstraintPrismatic2D, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "int get_weakRefs() const", asMETHODPR(ConstraintPrismatic2D, WeakRefs, () const, int), asCALL_THISCALL);
-    // void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attributeBits, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void WriteDeltaUpdate(Serializer&, const DirtyBits&in, uint8)", asMETHODPR(ConstraintPrismatic2D, WriteDeltaUpdate, (Serializer&, const DirtyBits&, unsigned char), void), asCALL_THISCALL);
-    // void Serializable::WriteInitialDeltaUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void WriteInitialDeltaUpdate(Serializer&, uint8)", asMETHODPR(ConstraintPrismatic2D, WriteInitialDeltaUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
-    // void Serializable::WriteLatestDataUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void WriteLatestDataUpdate(Serializer&, uint8)", asMETHODPR(ConstraintPrismatic2D, WriteLatestDataUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
-#ifdef REGISTER_MANUAL_PART_Constraint2D
-    REGISTER_MANUAL_PART_Constraint2D(ConstraintPrismatic2D, "ConstraintPrismatic2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Component
-    REGISTER_MANUAL_PART_Component(ConstraintPrismatic2D, "ConstraintPrismatic2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Animatable
-    REGISTER_MANUAL_PART_Animatable(ConstraintPrismatic2D, "ConstraintPrismatic2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Serializable
-    REGISTER_MANUAL_PART_Serializable(ConstraintPrismatic2D, "ConstraintPrismatic2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_Object
-    REGISTER_MANUAL_PART_Object(ConstraintPrismatic2D, "ConstraintPrismatic2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(ConstraintPrismatic2D, "ConstraintPrismatic2D")
-#endif
-#ifdef REGISTER_MANUAL_PART_ConstraintPrismatic2D
-    REGISTER_MANUAL_PART_ConstraintPrismatic2D(ConstraintPrismatic2D, "ConstraintPrismatic2D")
-#endif
-    RegisterSubclass<Constraint2D, ConstraintPrismatic2D>(engine, "Constraint2D", "ConstraintPrismatic2D");
-    RegisterSubclass<Component, ConstraintPrismatic2D>(engine, "Component", "ConstraintPrismatic2D");
-    RegisterSubclass<Animatable, ConstraintPrismatic2D>(engine, "Animatable", "ConstraintPrismatic2D");
-    RegisterSubclass<Serializable, ConstraintPrismatic2D>(engine, "Serializable", "ConstraintPrismatic2D");
-    RegisterSubclass<Object, ConstraintPrismatic2D>(engine, "Object", "ConstraintPrismatic2D");
-    RegisterSubclass<RefCounted, ConstraintPrismatic2D>(engine, "RefCounted", "ConstraintPrismatic2D");
 #endif
 
 #ifdef URHO3D_URHO2D
@@ -2633,6 +1279,656 @@ void ASRegisterGenerated_Members_Constraint(asIScriptEngine* engine)
     RegisterSubclass<Serializable, ConstraintDistance2D>(engine, "Serializable", "ConstraintDistance2D");
     RegisterSubclass<Object, ConstraintDistance2D>(engine, "Object", "ConstraintDistance2D");
     RegisterSubclass<RefCounted, ConstraintDistance2D>(engine, "RefCounted", "ConstraintDistance2D");
+#endif
+
+#ifdef URHO3D_URHO2D
+    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("ConstraintFriction2D", asBEHAVE_ADDREF, "void f()", asMETHODPR(ConstraintFriction2D, AddRef, (), void), asCALL_THISCALL);
+    // void Component::AddReplicationState(ComponentReplicationState* state) | File: ../Scene/Component.h
+    // Error: type "ComponentReplicationState*" can not automatically bind
+    // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void AllocateNetworkState()", asMETHODPR(ConstraintFriction2D, AllocateNetworkState, (), void), asCALL_THISCALL);
+    // void Constraint2D::ApplyAttributes() override | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void ApplyAttributes()", asMETHODPR(ConstraintFriction2D, ApplyAttributes, (), void), asCALL_THISCALL);
+    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
+    // Not registered because template
+    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
+    // Not registered because template
+    // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void CleanupConnection(Connection@+)", asMETHODPR(ConstraintFriction2D, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // explicit ConstraintFriction2D::ConstraintFriction2D(Context* context) | File: ../Urho2D/ConstraintFriction2D.h
+    engine->RegisterObjectBehaviour("ConstraintFriction2D", asBEHAVE_FACTORY, "ConstraintFriction2D@+ f()", asFUNCTION(ConstraintFriction2D_ConstraintFriction2D_Context), asCALL_CDECL);
+    // void Constraint2D::CreateJoint() | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void CreateJoint()", asMETHODPR(ConstraintFriction2D, CreateJoint, (), void), asCALL_THISCALL);
+    // virtual void Component::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(ConstraintFriction2D, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
+    // const Vector2& ConstraintFriction2D::GetAnchor() const | File: ../Urho2D/ConstraintFriction2D.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "const Vector2& GetAnchor() const", asMETHODPR(ConstraintFriction2D, GetAnchor, () const, const Vector2&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintFriction2D", "const Vector2& get_anchor() const", asMETHODPR(ConstraintFriction2D, GetAnchor, () const, const Vector2&), asCALL_THISCALL);
+    // bool Animatable::GetAnimationEnabled() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "bool GetAnimationEnabled() const", asMETHODPR(ConstraintFriction2D, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintFriction2D", "bool get_animationEnabled() const", asMETHODPR(ConstraintFriction2D, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
+    // Constraint2D* Constraint2D::GetAttachedConstraint() const | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "Constraint2D@+ GetAttachedConstraint() const", asMETHODPR(ConstraintFriction2D, GetAttachedConstraint, () const, Constraint2D*), asCALL_THISCALL);
+    // Variant Serializable::GetAttribute(unsigned index) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "Variant GetAttribute(uint) const", asMETHODPR(ConstraintFriction2D, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintFriction2D", "Variant get_attributes(uint) const", asMETHODPR(ConstraintFriction2D, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
+    // Variant Serializable::GetAttribute(const String& name) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "Variant GetAttribute(const String&in) const", asMETHODPR(ConstraintFriction2D, GetAttribute, (const String&) const, Variant), asCALL_THISCALL);
+    // ValueAnimation* Animatable::GetAttributeAnimation(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "ValueAnimation@+ GetAttributeAnimation(const String&in) const", asMETHODPR(ConstraintFriction2D, GetAttributeAnimation, (const String&) const, ValueAnimation*), asCALL_THISCALL);
+    // float Animatable::GetAttributeAnimationSpeed(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "float GetAttributeAnimationSpeed(const String&in) const", asMETHODPR(ConstraintFriction2D, GetAttributeAnimationSpeed, (const String&) const, float), asCALL_THISCALL);
+    // float Animatable::GetAttributeAnimationTime(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "float GetAttributeAnimationTime(const String&in) const", asMETHODPR(ConstraintFriction2D, GetAttributeAnimationTime, (const String&) const, float), asCALL_THISCALL);
+    // WrapMode Animatable::GetAttributeAnimationWrapMode(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "WrapMode GetAttributeAnimationWrapMode(const String&in) const", asMETHODPR(ConstraintFriction2D, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), asCALL_THISCALL);
+    // Variant Serializable::GetAttributeDefault(unsigned index) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "Variant GetAttributeDefault(uint) const", asMETHODPR(ConstraintFriction2D, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintFriction2D", "Variant get_attributeDefaults(uint) const", asMETHODPR(ConstraintFriction2D, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
+    // Variant Serializable::GetAttributeDefault(const String& name) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "Variant GetAttributeDefault(const String&in) const", asMETHODPR(ConstraintFriction2D, GetAttributeDefault, (const String&) const, Variant), asCALL_THISCALL);
+    // virtual const Vector<AttributeInfo>* Serializable::GetAttributes() const | File: ../Scene/Serializable.h
+    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
+    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "bool GetBlockEvents() const", asMETHODPR(ConstraintFriction2D, GetBlockEvents, () const, bool), asCALL_THISCALL);
+    // const String& Object::GetCategory() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "const String& GetCategory() const", asMETHODPR(ConstraintFriction2D, GetCategory, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintFriction2D", "const String& get_category() const", asMETHODPR(ConstraintFriction2D, GetCategory, () const, const String&), asCALL_THISCALL);
+    // bool Constraint2D::GetCollideConnected() const | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "bool GetCollideConnected() const", asMETHODPR(ConstraintFriction2D, GetCollideConnected, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintFriction2D", "bool get_collideConnected() const", asMETHODPR(ConstraintFriction2D, GetCollideConnected, () const, bool), asCALL_THISCALL);
+    // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "Component@+ GetComponent(StringHash) const", asMETHODPR(ConstraintFriction2D, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
+    // template<class T> T*  Component::GetComponent() const | File: ../Scene/Component.h
+    // Not registered because template
+    // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
+    // Error: type "PODVector<Component*>&" can not automatically bind
+    // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
+    // Not registered because template
+    // Context* Object::GetContext() const | File: ../Core/Object.h
+    // Error: type "Context*" can not be returned
+    // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
+    // Error: type "PODVector<Node*>&" can not automatically bind
+    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "VariantMap& GetEventDataMap() const", asMETHODPR(ConstraintFriction2D, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
+    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // Object* Object::GetEventSender() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "Object@+ GetEventSender() const", asMETHODPR(ConstraintFriction2D, GetEventSender, () const, Object*), asCALL_THISCALL);
+    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(ConstraintFriction2D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintFriction2D", "const Variant& get_globalVar(StringHash) const", asMETHODPR(ConstraintFriction2D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "const VariantMap& GetGlobalVars() const", asMETHODPR(ConstraintFriction2D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintFriction2D", "const VariantMap& get_globalVars() const", asMETHODPR(ConstraintFriction2D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    // unsigned Component::GetID() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "uint GetID() const", asMETHODPR(ConstraintFriction2D, GetID, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintFriction2D", "uint get_id() const", asMETHODPR(ConstraintFriction2D, GetID, () const, unsigned), asCALL_THISCALL);
+    // bool Serializable::GetInterceptNetworkUpdate(const String& attributeName) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "bool GetInterceptNetworkUpdate(const String&in) const", asMETHODPR(ConstraintFriction2D, GetInterceptNetworkUpdate, (const String&) const, bool), asCALL_THISCALL);
+    // b2Joint* Constraint2D::GetJoint() const | File: ../Urho2D/Constraint2D.h
+    // Error: type "b2Joint*" can not automatically bind
+    // float ConstraintFriction2D::GetMaxForce() const | File: ../Urho2D/ConstraintFriction2D.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "float GetMaxForce() const", asMETHODPR(ConstraintFriction2D, GetMaxForce, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintFriction2D", "float get_maxForce() const", asMETHODPR(ConstraintFriction2D, GetMaxForce, () const, float), asCALL_THISCALL);
+    // float ConstraintFriction2D::GetMaxTorque() const | File: ../Urho2D/ConstraintFriction2D.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "float GetMaxTorque() const", asMETHODPR(ConstraintFriction2D, GetMaxTorque, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintFriction2D", "float get_maxTorque() const", asMETHODPR(ConstraintFriction2D, GetMaxTorque, () const, float), asCALL_THISCALL);
+    // virtual const Vector<AttributeInfo>* Serializable::GetNetworkAttributes() const | File: ../Scene/Serializable.h
+    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
+    // NetworkState* Serializable::GetNetworkState() const | File: ../Scene/Serializable.h
+    // Error: type "NetworkState*" can not automatically bind
+    // Node* Component::GetNode() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "Node@+ GetNode() const", asMETHODPR(ConstraintFriction2D, GetNode, () const, Node*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintFriction2D", "Node@+ get_node() const", asMETHODPR(ConstraintFriction2D, GetNode, () const, Node*), asCALL_THISCALL);
+    // unsigned Serializable::GetNumAttributes() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "uint GetNumAttributes() const", asMETHODPR(ConstraintFriction2D, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintFriction2D", "uint get_numAttributes() const", asMETHODPR(ConstraintFriction2D, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
+    // unsigned Serializable::GetNumNetworkAttributes() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "uint GetNumNetworkAttributes() const", asMETHODPR(ConstraintFriction2D, GetNumNetworkAttributes, () const, unsigned), asCALL_THISCALL);
+    // ObjectAnimation* Animatable::GetObjectAnimation() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "ObjectAnimation@+ GetObjectAnimation() const", asMETHODPR(ConstraintFriction2D, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintFriction2D", "ObjectAnimation@+ get_objectAnimation() const", asMETHODPR(ConstraintFriction2D, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
+    // ResourceRef Animatable::GetObjectAnimationAttr() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "ResourceRef GetObjectAnimationAttr() const", asMETHODPR(ConstraintFriction2D, GetObjectAnimationAttr, () const, ResourceRef), asCALL_THISCALL);
+    // RigidBody2D* Constraint2D::GetOtherBody() const | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "RigidBody2D@+ GetOtherBody() const", asMETHODPR(ConstraintFriction2D, GetOtherBody, () const, RigidBody2D*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintFriction2D", "RigidBody2D@+ get_otherBody() const", asMETHODPR(ConstraintFriction2D, GetOtherBody, () const, RigidBody2D*), asCALL_THISCALL);
+    // RigidBody2D* Constraint2D::GetOwnerBody() const | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "RigidBody2D@+ GetOwnerBody() const", asMETHODPR(ConstraintFriction2D, GetOwnerBody, () const, RigidBody2D*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintFriction2D", "RigidBody2D@+ get_ownerBody() const", asMETHODPR(ConstraintFriction2D, GetOwnerBody, () const, RigidBody2D*), asCALL_THISCALL);
+    // Scene* Component::GetScene() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "Scene@+ GetScene() const", asMETHODPR(ConstraintFriction2D, GetScene, () const, Scene*), asCALL_THISCALL);
+    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(ConstraintFriction2D, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
+    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // Not registered because template
+    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "StringHash GetType() const", asMETHODPR(ConstraintFriction2D, GetType, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintFriction2D", "StringHash get_type() const", asMETHODPR(ConstraintFriction2D, GetType, () const, StringHash), asCALL_THISCALL);
+    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "const String& GetTypeName() const", asMETHODPR(ConstraintFriction2D, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintFriction2D", "const String& get_typeName() const", asMETHODPR(ConstraintFriction2D, GetTypeName, () const, const String&), asCALL_THISCALL);
+    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "bool HasEventHandlers() const", asMETHODPR(ConstraintFriction2D, HasEventHandlers, () const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(ConstraintFriction2D, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(ConstraintFriction2D, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
+    // bool Component::IsEnabled() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "bool IsEnabled() const", asMETHODPR(ConstraintFriction2D, IsEnabled, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintFriction2D", "bool get_enabled() const", asMETHODPR(ConstraintFriction2D, IsEnabled, () const, bool), asCALL_THISCALL);
+    // bool Component::IsEnabledEffective() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "bool IsEnabledEffective() const", asMETHODPR(ConstraintFriction2D, IsEnabledEffective, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintFriction2D", "bool get_enabledEffective() const", asMETHODPR(ConstraintFriction2D, IsEnabledEffective, () const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "bool IsInstanceOf(StringHash) const", asMETHODPR(ConstraintFriction2D, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
+    // Not registered because template
+    // bool Component::IsReplicated() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "bool IsReplicated() const", asMETHODPR(ConstraintFriction2D, IsReplicated, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintFriction2D", "bool get_replicated() const", asMETHODPR(ConstraintFriction2D, IsReplicated, () const, bool), asCALL_THISCALL);
+    // bool Serializable::IsTemporary() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "bool IsTemporary() const", asMETHODPR(ConstraintFriction2D, IsTemporary, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintFriction2D", "bool get_temporary() const", asMETHODPR(ConstraintFriction2D, IsTemporary, () const, bool), asCALL_THISCALL);
+    // virtual bool Serializable::Load(Deserializer& source) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "bool Load(Deserializer&)", asMETHODPR(ConstraintFriction2D, Load, (Deserializer&), bool), asCALL_THISCALL);
+    // bool Animatable::LoadJSON(const JSONValue& source) override | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "bool LoadJSON(const JSONValue&in)", asMETHODPR(ConstraintFriction2D, LoadJSON, (const JSONValue&), bool), asCALL_THISCALL);
+    // bool Animatable::LoadXML(const XMLElement& source) override | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "bool LoadXML(const XMLElement&in)", asMETHODPR(ConstraintFriction2D, LoadXML, (const XMLElement&), bool), asCALL_THISCALL);
+    // void Component::MarkNetworkUpdate() override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void MarkNetworkUpdate()", asMETHODPR(ConstraintFriction2D, MarkNetworkUpdate, (), void), asCALL_THISCALL);
+    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(ConstraintFriction2D, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
+    // virtual void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void OnGetAttribute(const AttributeInfo&in, Variant&) const", asMETHODPR(ConstraintFriction2D, OnGetAttribute, (const AttributeInfo&, Variant&) const, void), asCALL_THISCALL);
+    // virtual void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void OnSetAttribute(const AttributeInfo&in, const Variant&in)", asMETHODPR(ConstraintFriction2D, OnSetAttribute, (const AttributeInfo&, const Variant&), void), asCALL_THISCALL);
+    // void Constraint2D::OnSetEnabled() override | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void OnSetEnabled()", asMETHODPR(ConstraintFriction2D, OnSetEnabled, (), void), asCALL_THISCALL);
+    // void Component::PrepareNetworkUpdate() | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void PrepareNetworkUpdate()", asMETHODPR(ConstraintFriction2D, PrepareNetworkUpdate, (), void), asCALL_THISCALL);
+    // bool Serializable::ReadDeltaUpdate(Deserializer& source) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "bool ReadDeltaUpdate(Deserializer&)", asMETHODPR(ConstraintFriction2D, ReadDeltaUpdate, (Deserializer&), bool), asCALL_THISCALL);
+    // bool Serializable::ReadLatestDataUpdate(Deserializer& source) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "bool ReadLatestDataUpdate(Deserializer&)", asMETHODPR(ConstraintFriction2D, ReadLatestDataUpdate, (Deserializer&), bool), asCALL_THISCALL);
+    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
+    // Error: type "RefCount*" can not automatically bind
+    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "int Refs() const", asMETHODPR(ConstraintFriction2D, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintFriction2D", "int get_refs() const", asMETHODPR(ConstraintFriction2D, Refs, () const, int), asCALL_THISCALL);
+    // static void ConstraintFriction2D::RegisterObject(Context* context) | File: ../Urho2D/ConstraintFriction2D.h
+    // Context can be used as firs parameter of constructors only
+    // void Constraint2D::ReleaseJoint() | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void ReleaseJoint()", asMETHODPR(ConstraintFriction2D, ReleaseJoint, (), void), asCALL_THISCALL);
+    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("ConstraintFriction2D", asBEHAVE_RELEASE, "void f()", asMETHODPR(ConstraintFriction2D, ReleaseRef, (), void), asCALL_THISCALL);
+    // void Component::Remove() | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void Remove()", asMETHODPR(ConstraintFriction2D, Remove, (), void), asCALL_THISCALL);
+    // void Animatable::RemoveAttributeAnimation(const String& name) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void RemoveAttributeAnimation(const String&in)", asMETHODPR(ConstraintFriction2D, RemoveAttributeAnimation, (const String&), void), asCALL_THISCALL);
+    // void Serializable::RemoveInstanceDefault() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void RemoveInstanceDefault()", asMETHODPR(ConstraintFriction2D, RemoveInstanceDefault, (), void), asCALL_THISCALL);
+    // void Animatable::RemoveObjectAnimation() | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void RemoveObjectAnimation()", asMETHODPR(ConstraintFriction2D, RemoveObjectAnimation, (), void), asCALL_THISCALL);
+    // void Serializable::ResetToDefault() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void ResetToDefault()", asMETHODPR(ConstraintFriction2D, ResetToDefault, (), void), asCALL_THISCALL);
+    // bool Component::Save(Serializer& dest) const override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "bool Save(Serializer&) const", asMETHODPR(ConstraintFriction2D, Save, (Serializer&) const, bool), asCALL_THISCALL);
+    // virtual bool Serializable::SaveDefaultAttributes() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "bool SaveDefaultAttributes() const", asMETHODPR(ConstraintFriction2D, SaveDefaultAttributes, () const, bool), asCALL_THISCALL);
+    // bool Component::SaveJSON(JSONValue& dest) const override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "bool SaveJSON(JSONValue&) const", asMETHODPR(ConstraintFriction2D, SaveJSON, (JSONValue&) const, bool), asCALL_THISCALL);
+    // bool Component::SaveXML(XMLElement& dest) const override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "bool SaveXML(XMLElement&) const", asMETHODPR(ConstraintFriction2D, SaveXML, (XMLElement&) const, bool), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void SendEvent(StringHash)", asMETHODPR(ConstraintFriction2D, SendEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(ConstraintFriction2D, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
+    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
+    // Not registered because template
+    // void ConstraintFriction2D::SetAnchor(const Vector2& anchor) | File: ../Urho2D/ConstraintFriction2D.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void SetAnchor(const Vector2&in)", asMETHODPR(ConstraintFriction2D, SetAnchor, (const Vector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void set_anchor(const Vector2&in)", asMETHODPR(ConstraintFriction2D, SetAnchor, (const Vector2&), void), asCALL_THISCALL);
+    // void Animatable::SetAnimationEnabled(bool enable) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void SetAnimationEnabled(bool)", asMETHODPR(ConstraintFriction2D, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void set_animationEnabled(bool)", asMETHODPR(ConstraintFriction2D, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
+    // void Animatable::SetAnimationTime(float time) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void SetAnimationTime(float)", asMETHODPR(ConstraintFriction2D, SetAnimationTime, (float), void), asCALL_THISCALL);
+    // void Constraint2D::SetAttachedConstraint(Constraint2D* constraint) | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void SetAttachedConstraint(Constraint2D@+)", asMETHODPR(ConstraintFriction2D, SetAttachedConstraint, (Constraint2D*), void), asCALL_THISCALL);
+    // bool Serializable::SetAttribute(unsigned index, const Variant& value) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "bool SetAttribute(uint, const Variant&in)", asMETHODPR(ConstraintFriction2D, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintFriction2D", "bool set_attributes(uint, const Variant&in)", asMETHODPR(ConstraintFriction2D, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
+    // bool Serializable::SetAttribute(const String& name, const Variant& value) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "bool SetAttribute(const String&in, const Variant&in)", asMETHODPR(ConstraintFriction2D, SetAttribute, (const String&, const Variant&), bool), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode=WM_LOOP, float speed=1.0f) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void SetAttributeAnimation(const String&in, ValueAnimation@+, WrapMode = WM_LOOP, float = 1.0f)", asMETHODPR(ConstraintFriction2D, SetAttributeAnimation, (const String&, ValueAnimation*, WrapMode, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationSpeed(const String& name, float speed) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void SetAttributeAnimationSpeed(const String&in, float)", asMETHODPR(ConstraintFriction2D, SetAttributeAnimationSpeed, (const String&, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationTime(const String& name, float time) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void SetAttributeAnimationTime(const String&in, float)", asMETHODPR(ConstraintFriction2D, SetAttributeAnimationTime, (const String&, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationWrapMode(const String& name, WrapMode wrapMode) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void SetAttributeAnimationWrapMode(const String&in, WrapMode)", asMETHODPR(ConstraintFriction2D, SetAttributeAnimationWrapMode, (const String&, WrapMode), void), asCALL_THISCALL);
+    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void SetBlockEvents(bool)", asMETHODPR(ConstraintFriction2D, SetBlockEvents, (bool), void), asCALL_THISCALL);
+    // void Constraint2D::SetCollideConnected(bool collideConnected) | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void SetCollideConnected(bool)", asMETHODPR(ConstraintFriction2D, SetCollideConnected, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void set_collideConnected(bool)", asMETHODPR(ConstraintFriction2D, SetCollideConnected, (bool), void), asCALL_THISCALL);
+    // void Component::SetEnabled(bool enable) | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void SetEnabled(bool)", asMETHODPR(ConstraintFriction2D, SetEnabled, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void set_enabled(bool)", asMETHODPR(ConstraintFriction2D, SetEnabled, (bool), void), asCALL_THISCALL);
+    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(ConstraintFriction2D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(ConstraintFriction2D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    // void Serializable::SetInstanceDefault(bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void SetInstanceDefault(bool)", asMETHODPR(ConstraintFriction2D, SetInstanceDefault, (bool), void), asCALL_THISCALL);
+    // void Serializable::SetInterceptNetworkUpdate(const String& attributeName, bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void SetInterceptNetworkUpdate(const String&in, bool)", asMETHODPR(ConstraintFriction2D, SetInterceptNetworkUpdate, (const String&, bool), void), asCALL_THISCALL);
+    // void ConstraintFriction2D::SetMaxForce(float maxForce) | File: ../Urho2D/ConstraintFriction2D.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void SetMaxForce(float)", asMETHODPR(ConstraintFriction2D, SetMaxForce, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void set_maxForce(float)", asMETHODPR(ConstraintFriction2D, SetMaxForce, (float), void), asCALL_THISCALL);
+    // void ConstraintFriction2D::SetMaxTorque(float maxTorque) | File: ../Urho2D/ConstraintFriction2D.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void SetMaxTorque(float)", asMETHODPR(ConstraintFriction2D, SetMaxTorque, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void set_maxTorque(float)", asMETHODPR(ConstraintFriction2D, SetMaxTorque, (float), void), asCALL_THISCALL);
+    // void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void SetObjectAnimation(ObjectAnimation@+)", asMETHODPR(ConstraintFriction2D, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void set_objectAnimation(ObjectAnimation@+)", asMETHODPR(ConstraintFriction2D, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
+    // void Animatable::SetObjectAnimationAttr(const ResourceRef& value) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void SetObjectAnimationAttr(const ResourceRef&in)", asMETHODPR(ConstraintFriction2D, SetObjectAnimationAttr, (const ResourceRef&), void), asCALL_THISCALL);
+    // void Constraint2D::SetOtherBody(RigidBody2D* body) | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void SetOtherBody(RigidBody2D@+)", asMETHODPR(ConstraintFriction2D, SetOtherBody, (RigidBody2D*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void set_otherBody(RigidBody2D@+)", asMETHODPR(ConstraintFriction2D, SetOtherBody, (RigidBody2D*), void), asCALL_THISCALL);
+    // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void SetTemporary(bool)", asMETHODPR(ConstraintFriction2D, SetTemporary, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void set_temporary(bool)", asMETHODPR(ConstraintFriction2D, SetTemporary, (bool), void), asCALL_THISCALL);
+    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void UnsubscribeFromAllEvents()", asMETHODPR(ConstraintFriction2D, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(ConstraintFriction2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
+    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(ConstraintFriction2D, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(ConstraintFriction2D, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(ConstraintFriction2D, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
+    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "int WeakRefs() const", asMETHODPR(ConstraintFriction2D, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintFriction2D", "int get_weakRefs() const", asMETHODPR(ConstraintFriction2D, WeakRefs, () const, int), asCALL_THISCALL);
+    // void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attributeBits, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void WriteDeltaUpdate(Serializer&, const DirtyBits&in, uint8)", asMETHODPR(ConstraintFriction2D, WriteDeltaUpdate, (Serializer&, const DirtyBits&, unsigned char), void), asCALL_THISCALL);
+    // void Serializable::WriteInitialDeltaUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void WriteInitialDeltaUpdate(Serializer&, uint8)", asMETHODPR(ConstraintFriction2D, WriteInitialDeltaUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
+    // void Serializable::WriteLatestDataUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintFriction2D", "void WriteLatestDataUpdate(Serializer&, uint8)", asMETHODPR(ConstraintFriction2D, WriteLatestDataUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
+#ifdef REGISTER_MANUAL_PART_Constraint2D
+    REGISTER_MANUAL_PART_Constraint2D(ConstraintFriction2D, "ConstraintFriction2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Component
+    REGISTER_MANUAL_PART_Component(ConstraintFriction2D, "ConstraintFriction2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Animatable
+    REGISTER_MANUAL_PART_Animatable(ConstraintFriction2D, "ConstraintFriction2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Serializable
+    REGISTER_MANUAL_PART_Serializable(ConstraintFriction2D, "ConstraintFriction2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Object
+    REGISTER_MANUAL_PART_Object(ConstraintFriction2D, "ConstraintFriction2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_RefCounted
+    REGISTER_MANUAL_PART_RefCounted(ConstraintFriction2D, "ConstraintFriction2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_ConstraintFriction2D
+    REGISTER_MANUAL_PART_ConstraintFriction2D(ConstraintFriction2D, "ConstraintFriction2D")
+#endif
+    RegisterSubclass<Constraint2D, ConstraintFriction2D>(engine, "Constraint2D", "ConstraintFriction2D");
+    RegisterSubclass<Component, ConstraintFriction2D>(engine, "Component", "ConstraintFriction2D");
+    RegisterSubclass<Animatable, ConstraintFriction2D>(engine, "Animatable", "ConstraintFriction2D");
+    RegisterSubclass<Serializable, ConstraintFriction2D>(engine, "Serializable", "ConstraintFriction2D");
+    RegisterSubclass<Object, ConstraintFriction2D>(engine, "Object", "ConstraintFriction2D");
+    RegisterSubclass<RefCounted, ConstraintFriction2D>(engine, "RefCounted", "ConstraintFriction2D");
+#endif
+
+#ifdef URHO3D_URHO2D
+    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("ConstraintGear2D", asBEHAVE_ADDREF, "void f()", asMETHODPR(ConstraintGear2D, AddRef, (), void), asCALL_THISCALL);
+    // void Component::AddReplicationState(ComponentReplicationState* state) | File: ../Scene/Component.h
+    // Error: type "ComponentReplicationState*" can not automatically bind
+    // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void AllocateNetworkState()", asMETHODPR(ConstraintGear2D, AllocateNetworkState, (), void), asCALL_THISCALL);
+    // void Constraint2D::ApplyAttributes() override | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void ApplyAttributes()", asMETHODPR(ConstraintGear2D, ApplyAttributes, (), void), asCALL_THISCALL);
+    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
+    // Not registered because template
+    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
+    // Not registered because template
+    // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void CleanupConnection(Connection@+)", asMETHODPR(ConstraintGear2D, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // explicit ConstraintGear2D::ConstraintGear2D(Context* context) | File: ../Urho2D/ConstraintGear2D.h
+    engine->RegisterObjectBehaviour("ConstraintGear2D", asBEHAVE_FACTORY, "ConstraintGear2D@+ f()", asFUNCTION(ConstraintGear2D_ConstraintGear2D_Context), asCALL_CDECL);
+    // void Constraint2D::CreateJoint() | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void CreateJoint()", asMETHODPR(ConstraintGear2D, CreateJoint, (), void), asCALL_THISCALL);
+    // virtual void Component::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(ConstraintGear2D, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
+    // bool Animatable::GetAnimationEnabled() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "bool GetAnimationEnabled() const", asMETHODPR(ConstraintGear2D, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintGear2D", "bool get_animationEnabled() const", asMETHODPR(ConstraintGear2D, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
+    // Constraint2D* Constraint2D::GetAttachedConstraint() const | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "Constraint2D@+ GetAttachedConstraint() const", asMETHODPR(ConstraintGear2D, GetAttachedConstraint, () const, Constraint2D*), asCALL_THISCALL);
+    // Variant Serializable::GetAttribute(unsigned index) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "Variant GetAttribute(uint) const", asMETHODPR(ConstraintGear2D, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintGear2D", "Variant get_attributes(uint) const", asMETHODPR(ConstraintGear2D, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
+    // Variant Serializable::GetAttribute(const String& name) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "Variant GetAttribute(const String&in) const", asMETHODPR(ConstraintGear2D, GetAttribute, (const String&) const, Variant), asCALL_THISCALL);
+    // ValueAnimation* Animatable::GetAttributeAnimation(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "ValueAnimation@+ GetAttributeAnimation(const String&in) const", asMETHODPR(ConstraintGear2D, GetAttributeAnimation, (const String&) const, ValueAnimation*), asCALL_THISCALL);
+    // float Animatable::GetAttributeAnimationSpeed(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "float GetAttributeAnimationSpeed(const String&in) const", asMETHODPR(ConstraintGear2D, GetAttributeAnimationSpeed, (const String&) const, float), asCALL_THISCALL);
+    // float Animatable::GetAttributeAnimationTime(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "float GetAttributeAnimationTime(const String&in) const", asMETHODPR(ConstraintGear2D, GetAttributeAnimationTime, (const String&) const, float), asCALL_THISCALL);
+    // WrapMode Animatable::GetAttributeAnimationWrapMode(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "WrapMode GetAttributeAnimationWrapMode(const String&in) const", asMETHODPR(ConstraintGear2D, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), asCALL_THISCALL);
+    // Variant Serializable::GetAttributeDefault(unsigned index) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "Variant GetAttributeDefault(uint) const", asMETHODPR(ConstraintGear2D, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintGear2D", "Variant get_attributeDefaults(uint) const", asMETHODPR(ConstraintGear2D, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
+    // Variant Serializable::GetAttributeDefault(const String& name) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "Variant GetAttributeDefault(const String&in) const", asMETHODPR(ConstraintGear2D, GetAttributeDefault, (const String&) const, Variant), asCALL_THISCALL);
+    // virtual const Vector<AttributeInfo>* Serializable::GetAttributes() const | File: ../Scene/Serializable.h
+    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
+    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "bool GetBlockEvents() const", asMETHODPR(ConstraintGear2D, GetBlockEvents, () const, bool), asCALL_THISCALL);
+    // const String& Object::GetCategory() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "const String& GetCategory() const", asMETHODPR(ConstraintGear2D, GetCategory, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintGear2D", "const String& get_category() const", asMETHODPR(ConstraintGear2D, GetCategory, () const, const String&), asCALL_THISCALL);
+    // bool Constraint2D::GetCollideConnected() const | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "bool GetCollideConnected() const", asMETHODPR(ConstraintGear2D, GetCollideConnected, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintGear2D", "bool get_collideConnected() const", asMETHODPR(ConstraintGear2D, GetCollideConnected, () const, bool), asCALL_THISCALL);
+    // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "Component@+ GetComponent(StringHash) const", asMETHODPR(ConstraintGear2D, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
+    // template<class T> T*  Component::GetComponent() const | File: ../Scene/Component.h
+    // Not registered because template
+    // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
+    // Error: type "PODVector<Component*>&" can not automatically bind
+    // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
+    // Not registered because template
+    // Context* Object::GetContext() const | File: ../Core/Object.h
+    // Error: type "Context*" can not be returned
+    // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
+    // Error: type "PODVector<Node*>&" can not automatically bind
+    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "VariantMap& GetEventDataMap() const", asMETHODPR(ConstraintGear2D, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
+    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // Object* Object::GetEventSender() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "Object@+ GetEventSender() const", asMETHODPR(ConstraintGear2D, GetEventSender, () const, Object*), asCALL_THISCALL);
+    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(ConstraintGear2D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintGear2D", "const Variant& get_globalVar(StringHash) const", asMETHODPR(ConstraintGear2D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "const VariantMap& GetGlobalVars() const", asMETHODPR(ConstraintGear2D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintGear2D", "const VariantMap& get_globalVars() const", asMETHODPR(ConstraintGear2D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    // unsigned Component::GetID() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "uint GetID() const", asMETHODPR(ConstraintGear2D, GetID, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintGear2D", "uint get_id() const", asMETHODPR(ConstraintGear2D, GetID, () const, unsigned), asCALL_THISCALL);
+    // bool Serializable::GetInterceptNetworkUpdate(const String& attributeName) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "bool GetInterceptNetworkUpdate(const String&in) const", asMETHODPR(ConstraintGear2D, GetInterceptNetworkUpdate, (const String&) const, bool), asCALL_THISCALL);
+    // b2Joint* Constraint2D::GetJoint() const | File: ../Urho2D/Constraint2D.h
+    // Error: type "b2Joint*" can not automatically bind
+    // virtual const Vector<AttributeInfo>* Serializable::GetNetworkAttributes() const | File: ../Scene/Serializable.h
+    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
+    // NetworkState* Serializable::GetNetworkState() const | File: ../Scene/Serializable.h
+    // Error: type "NetworkState*" can not automatically bind
+    // Node* Component::GetNode() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "Node@+ GetNode() const", asMETHODPR(ConstraintGear2D, GetNode, () const, Node*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintGear2D", "Node@+ get_node() const", asMETHODPR(ConstraintGear2D, GetNode, () const, Node*), asCALL_THISCALL);
+    // unsigned Serializable::GetNumAttributes() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "uint GetNumAttributes() const", asMETHODPR(ConstraintGear2D, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintGear2D", "uint get_numAttributes() const", asMETHODPR(ConstraintGear2D, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
+    // unsigned Serializable::GetNumNetworkAttributes() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "uint GetNumNetworkAttributes() const", asMETHODPR(ConstraintGear2D, GetNumNetworkAttributes, () const, unsigned), asCALL_THISCALL);
+    // ObjectAnimation* Animatable::GetObjectAnimation() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "ObjectAnimation@+ GetObjectAnimation() const", asMETHODPR(ConstraintGear2D, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintGear2D", "ObjectAnimation@+ get_objectAnimation() const", asMETHODPR(ConstraintGear2D, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
+    // ResourceRef Animatable::GetObjectAnimationAttr() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "ResourceRef GetObjectAnimationAttr() const", asMETHODPR(ConstraintGear2D, GetObjectAnimationAttr, () const, ResourceRef), asCALL_THISCALL);
+    // RigidBody2D* Constraint2D::GetOtherBody() const | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "RigidBody2D@+ GetOtherBody() const", asMETHODPR(ConstraintGear2D, GetOtherBody, () const, RigidBody2D*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintGear2D", "RigidBody2D@+ get_otherBody() const", asMETHODPR(ConstraintGear2D, GetOtherBody, () const, RigidBody2D*), asCALL_THISCALL);
+    // Constraint2D* ConstraintGear2D::GetOtherConstraint() const | File: ../Urho2D/ConstraintGear2D.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "Constraint2D@+ GetOtherConstraint() const", asMETHODPR(ConstraintGear2D, GetOtherConstraint, () const, Constraint2D*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintGear2D", "Constraint2D@+ get_otherConstraint() const", asMETHODPR(ConstraintGear2D, GetOtherConstraint, () const, Constraint2D*), asCALL_THISCALL);
+    // RigidBody2D* Constraint2D::GetOwnerBody() const | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "RigidBody2D@+ GetOwnerBody() const", asMETHODPR(ConstraintGear2D, GetOwnerBody, () const, RigidBody2D*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintGear2D", "RigidBody2D@+ get_ownerBody() const", asMETHODPR(ConstraintGear2D, GetOwnerBody, () const, RigidBody2D*), asCALL_THISCALL);
+    // Constraint2D* ConstraintGear2D::GetOwnerConstraint() const | File: ../Urho2D/ConstraintGear2D.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "Constraint2D@+ GetOwnerConstraint() const", asMETHODPR(ConstraintGear2D, GetOwnerConstraint, () const, Constraint2D*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintGear2D", "Constraint2D@+ get_ownerConstraint() const", asMETHODPR(ConstraintGear2D, GetOwnerConstraint, () const, Constraint2D*), asCALL_THISCALL);
+    // float ConstraintGear2D::GetRatio() const | File: ../Urho2D/ConstraintGear2D.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "float GetRatio() const", asMETHODPR(ConstraintGear2D, GetRatio, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintGear2D", "float get_ratio() const", asMETHODPR(ConstraintGear2D, GetRatio, () const, float), asCALL_THISCALL);
+    // Scene* Component::GetScene() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "Scene@+ GetScene() const", asMETHODPR(ConstraintGear2D, GetScene, () const, Scene*), asCALL_THISCALL);
+    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(ConstraintGear2D, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
+    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // Not registered because template
+    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "StringHash GetType() const", asMETHODPR(ConstraintGear2D, GetType, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintGear2D", "StringHash get_type() const", asMETHODPR(ConstraintGear2D, GetType, () const, StringHash), asCALL_THISCALL);
+    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "const String& GetTypeName() const", asMETHODPR(ConstraintGear2D, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintGear2D", "const String& get_typeName() const", asMETHODPR(ConstraintGear2D, GetTypeName, () const, const String&), asCALL_THISCALL);
+    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "bool HasEventHandlers() const", asMETHODPR(ConstraintGear2D, HasEventHandlers, () const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(ConstraintGear2D, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(ConstraintGear2D, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
+    // bool Component::IsEnabled() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "bool IsEnabled() const", asMETHODPR(ConstraintGear2D, IsEnabled, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintGear2D", "bool get_enabled() const", asMETHODPR(ConstraintGear2D, IsEnabled, () const, bool), asCALL_THISCALL);
+    // bool Component::IsEnabledEffective() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "bool IsEnabledEffective() const", asMETHODPR(ConstraintGear2D, IsEnabledEffective, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintGear2D", "bool get_enabledEffective() const", asMETHODPR(ConstraintGear2D, IsEnabledEffective, () const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "bool IsInstanceOf(StringHash) const", asMETHODPR(ConstraintGear2D, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
+    // Not registered because template
+    // bool Component::IsReplicated() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "bool IsReplicated() const", asMETHODPR(ConstraintGear2D, IsReplicated, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintGear2D", "bool get_replicated() const", asMETHODPR(ConstraintGear2D, IsReplicated, () const, bool), asCALL_THISCALL);
+    // bool Serializable::IsTemporary() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "bool IsTemporary() const", asMETHODPR(ConstraintGear2D, IsTemporary, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintGear2D", "bool get_temporary() const", asMETHODPR(ConstraintGear2D, IsTemporary, () const, bool), asCALL_THISCALL);
+    // virtual bool Serializable::Load(Deserializer& source) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "bool Load(Deserializer&)", asMETHODPR(ConstraintGear2D, Load, (Deserializer&), bool), asCALL_THISCALL);
+    // bool Animatable::LoadJSON(const JSONValue& source) override | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "bool LoadJSON(const JSONValue&in)", asMETHODPR(ConstraintGear2D, LoadJSON, (const JSONValue&), bool), asCALL_THISCALL);
+    // bool Animatable::LoadXML(const XMLElement& source) override | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "bool LoadXML(const XMLElement&in)", asMETHODPR(ConstraintGear2D, LoadXML, (const XMLElement&), bool), asCALL_THISCALL);
+    // void Component::MarkNetworkUpdate() override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void MarkNetworkUpdate()", asMETHODPR(ConstraintGear2D, MarkNetworkUpdate, (), void), asCALL_THISCALL);
+    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(ConstraintGear2D, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
+    // virtual void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void OnGetAttribute(const AttributeInfo&in, Variant&) const", asMETHODPR(ConstraintGear2D, OnGetAttribute, (const AttributeInfo&, Variant&) const, void), asCALL_THISCALL);
+    // virtual void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void OnSetAttribute(const AttributeInfo&in, const Variant&in)", asMETHODPR(ConstraintGear2D, OnSetAttribute, (const AttributeInfo&, const Variant&), void), asCALL_THISCALL);
+    // void Constraint2D::OnSetEnabled() override | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void OnSetEnabled()", asMETHODPR(ConstraintGear2D, OnSetEnabled, (), void), asCALL_THISCALL);
+    // void Component::PrepareNetworkUpdate() | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void PrepareNetworkUpdate()", asMETHODPR(ConstraintGear2D, PrepareNetworkUpdate, (), void), asCALL_THISCALL);
+    // bool Serializable::ReadDeltaUpdate(Deserializer& source) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "bool ReadDeltaUpdate(Deserializer&)", asMETHODPR(ConstraintGear2D, ReadDeltaUpdate, (Deserializer&), bool), asCALL_THISCALL);
+    // bool Serializable::ReadLatestDataUpdate(Deserializer& source) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "bool ReadLatestDataUpdate(Deserializer&)", asMETHODPR(ConstraintGear2D, ReadLatestDataUpdate, (Deserializer&), bool), asCALL_THISCALL);
+    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
+    // Error: type "RefCount*" can not automatically bind
+    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "int Refs() const", asMETHODPR(ConstraintGear2D, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintGear2D", "int get_refs() const", asMETHODPR(ConstraintGear2D, Refs, () const, int), asCALL_THISCALL);
+    // static void ConstraintGear2D::RegisterObject(Context* context) | File: ../Urho2D/ConstraintGear2D.h
+    // Context can be used as firs parameter of constructors only
+    // void Constraint2D::ReleaseJoint() | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void ReleaseJoint()", asMETHODPR(ConstraintGear2D, ReleaseJoint, (), void), asCALL_THISCALL);
+    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("ConstraintGear2D", asBEHAVE_RELEASE, "void f()", asMETHODPR(ConstraintGear2D, ReleaseRef, (), void), asCALL_THISCALL);
+    // void Component::Remove() | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void Remove()", asMETHODPR(ConstraintGear2D, Remove, (), void), asCALL_THISCALL);
+    // void Animatable::RemoveAttributeAnimation(const String& name) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void RemoveAttributeAnimation(const String&in)", asMETHODPR(ConstraintGear2D, RemoveAttributeAnimation, (const String&), void), asCALL_THISCALL);
+    // void Serializable::RemoveInstanceDefault() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void RemoveInstanceDefault()", asMETHODPR(ConstraintGear2D, RemoveInstanceDefault, (), void), asCALL_THISCALL);
+    // void Animatable::RemoveObjectAnimation() | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void RemoveObjectAnimation()", asMETHODPR(ConstraintGear2D, RemoveObjectAnimation, (), void), asCALL_THISCALL);
+    // void Serializable::ResetToDefault() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void ResetToDefault()", asMETHODPR(ConstraintGear2D, ResetToDefault, (), void), asCALL_THISCALL);
+    // bool Component::Save(Serializer& dest) const override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "bool Save(Serializer&) const", asMETHODPR(ConstraintGear2D, Save, (Serializer&) const, bool), asCALL_THISCALL);
+    // virtual bool Serializable::SaveDefaultAttributes() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "bool SaveDefaultAttributes() const", asMETHODPR(ConstraintGear2D, SaveDefaultAttributes, () const, bool), asCALL_THISCALL);
+    // bool Component::SaveJSON(JSONValue& dest) const override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "bool SaveJSON(JSONValue&) const", asMETHODPR(ConstraintGear2D, SaveJSON, (JSONValue&) const, bool), asCALL_THISCALL);
+    // bool Component::SaveXML(XMLElement& dest) const override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "bool SaveXML(XMLElement&) const", asMETHODPR(ConstraintGear2D, SaveXML, (XMLElement&) const, bool), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void SendEvent(StringHash)", asMETHODPR(ConstraintGear2D, SendEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(ConstraintGear2D, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
+    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
+    // Not registered because template
+    // void Animatable::SetAnimationEnabled(bool enable) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void SetAnimationEnabled(bool)", asMETHODPR(ConstraintGear2D, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintGear2D", "void set_animationEnabled(bool)", asMETHODPR(ConstraintGear2D, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
+    // void Animatable::SetAnimationTime(float time) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void SetAnimationTime(float)", asMETHODPR(ConstraintGear2D, SetAnimationTime, (float), void), asCALL_THISCALL);
+    // void Constraint2D::SetAttachedConstraint(Constraint2D* constraint) | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void SetAttachedConstraint(Constraint2D@+)", asMETHODPR(ConstraintGear2D, SetAttachedConstraint, (Constraint2D*), void), asCALL_THISCALL);
+    // bool Serializable::SetAttribute(unsigned index, const Variant& value) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "bool SetAttribute(uint, const Variant&in)", asMETHODPR(ConstraintGear2D, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintGear2D", "bool set_attributes(uint, const Variant&in)", asMETHODPR(ConstraintGear2D, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
+    // bool Serializable::SetAttribute(const String& name, const Variant& value) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "bool SetAttribute(const String&in, const Variant&in)", asMETHODPR(ConstraintGear2D, SetAttribute, (const String&, const Variant&), bool), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode=WM_LOOP, float speed=1.0f) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void SetAttributeAnimation(const String&in, ValueAnimation@+, WrapMode = WM_LOOP, float = 1.0f)", asMETHODPR(ConstraintGear2D, SetAttributeAnimation, (const String&, ValueAnimation*, WrapMode, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationSpeed(const String& name, float speed) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void SetAttributeAnimationSpeed(const String&in, float)", asMETHODPR(ConstraintGear2D, SetAttributeAnimationSpeed, (const String&, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationTime(const String& name, float time) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void SetAttributeAnimationTime(const String&in, float)", asMETHODPR(ConstraintGear2D, SetAttributeAnimationTime, (const String&, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationWrapMode(const String& name, WrapMode wrapMode) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void SetAttributeAnimationWrapMode(const String&in, WrapMode)", asMETHODPR(ConstraintGear2D, SetAttributeAnimationWrapMode, (const String&, WrapMode), void), asCALL_THISCALL);
+    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void SetBlockEvents(bool)", asMETHODPR(ConstraintGear2D, SetBlockEvents, (bool), void), asCALL_THISCALL);
+    // void Constraint2D::SetCollideConnected(bool collideConnected) | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void SetCollideConnected(bool)", asMETHODPR(ConstraintGear2D, SetCollideConnected, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintGear2D", "void set_collideConnected(bool)", asMETHODPR(ConstraintGear2D, SetCollideConnected, (bool), void), asCALL_THISCALL);
+    // void Component::SetEnabled(bool enable) | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void SetEnabled(bool)", asMETHODPR(ConstraintGear2D, SetEnabled, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintGear2D", "void set_enabled(bool)", asMETHODPR(ConstraintGear2D, SetEnabled, (bool), void), asCALL_THISCALL);
+    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(ConstraintGear2D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintGear2D", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(ConstraintGear2D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    // void Serializable::SetInstanceDefault(bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void SetInstanceDefault(bool)", asMETHODPR(ConstraintGear2D, SetInstanceDefault, (bool), void), asCALL_THISCALL);
+    // void Serializable::SetInterceptNetworkUpdate(const String& attributeName, bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void SetInterceptNetworkUpdate(const String&in, bool)", asMETHODPR(ConstraintGear2D, SetInterceptNetworkUpdate, (const String&, bool), void), asCALL_THISCALL);
+    // void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void SetObjectAnimation(ObjectAnimation@+)", asMETHODPR(ConstraintGear2D, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintGear2D", "void set_objectAnimation(ObjectAnimation@+)", asMETHODPR(ConstraintGear2D, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
+    // void Animatable::SetObjectAnimationAttr(const ResourceRef& value) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void SetObjectAnimationAttr(const ResourceRef&in)", asMETHODPR(ConstraintGear2D, SetObjectAnimationAttr, (const ResourceRef&), void), asCALL_THISCALL);
+    // void Constraint2D::SetOtherBody(RigidBody2D* body) | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void SetOtherBody(RigidBody2D@+)", asMETHODPR(ConstraintGear2D, SetOtherBody, (RigidBody2D*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintGear2D", "void set_otherBody(RigidBody2D@+)", asMETHODPR(ConstraintGear2D, SetOtherBody, (RigidBody2D*), void), asCALL_THISCALL);
+    // void ConstraintGear2D::SetOtherConstraint(Constraint2D* constraint) | File: ../Urho2D/ConstraintGear2D.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void SetOtherConstraint(Constraint2D@+)", asMETHODPR(ConstraintGear2D, SetOtherConstraint, (Constraint2D*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintGear2D", "void set_otherConstraint(Constraint2D@+)", asMETHODPR(ConstraintGear2D, SetOtherConstraint, (Constraint2D*), void), asCALL_THISCALL);
+    // void ConstraintGear2D::SetOwnerConstraint(Constraint2D* constraint) | File: ../Urho2D/ConstraintGear2D.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void SetOwnerConstraint(Constraint2D@+)", asMETHODPR(ConstraintGear2D, SetOwnerConstraint, (Constraint2D*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintGear2D", "void set_ownerConstraint(Constraint2D@+)", asMETHODPR(ConstraintGear2D, SetOwnerConstraint, (Constraint2D*), void), asCALL_THISCALL);
+    // void ConstraintGear2D::SetRatio(float ratio) | File: ../Urho2D/ConstraintGear2D.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void SetRatio(float)", asMETHODPR(ConstraintGear2D, SetRatio, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintGear2D", "void set_ratio(float)", asMETHODPR(ConstraintGear2D, SetRatio, (float), void), asCALL_THISCALL);
+    // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void SetTemporary(bool)", asMETHODPR(ConstraintGear2D, SetTemporary, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintGear2D", "void set_temporary(bool)", asMETHODPR(ConstraintGear2D, SetTemporary, (bool), void), asCALL_THISCALL);
+    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void UnsubscribeFromAllEvents()", asMETHODPR(ConstraintGear2D, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(ConstraintGear2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
+    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(ConstraintGear2D, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(ConstraintGear2D, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(ConstraintGear2D, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
+    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "int WeakRefs() const", asMETHODPR(ConstraintGear2D, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintGear2D", "int get_weakRefs() const", asMETHODPR(ConstraintGear2D, WeakRefs, () const, int), asCALL_THISCALL);
+    // void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attributeBits, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void WriteDeltaUpdate(Serializer&, const DirtyBits&in, uint8)", asMETHODPR(ConstraintGear2D, WriteDeltaUpdate, (Serializer&, const DirtyBits&, unsigned char), void), asCALL_THISCALL);
+    // void Serializable::WriteInitialDeltaUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void WriteInitialDeltaUpdate(Serializer&, uint8)", asMETHODPR(ConstraintGear2D, WriteInitialDeltaUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
+    // void Serializable::WriteLatestDataUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintGear2D", "void WriteLatestDataUpdate(Serializer&, uint8)", asMETHODPR(ConstraintGear2D, WriteLatestDataUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
+#ifdef REGISTER_MANUAL_PART_Constraint2D
+    REGISTER_MANUAL_PART_Constraint2D(ConstraintGear2D, "ConstraintGear2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Component
+    REGISTER_MANUAL_PART_Component(ConstraintGear2D, "ConstraintGear2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Animatable
+    REGISTER_MANUAL_PART_Animatable(ConstraintGear2D, "ConstraintGear2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Serializable
+    REGISTER_MANUAL_PART_Serializable(ConstraintGear2D, "ConstraintGear2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Object
+    REGISTER_MANUAL_PART_Object(ConstraintGear2D, "ConstraintGear2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_RefCounted
+    REGISTER_MANUAL_PART_RefCounted(ConstraintGear2D, "ConstraintGear2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_ConstraintGear2D
+    REGISTER_MANUAL_PART_ConstraintGear2D(ConstraintGear2D, "ConstraintGear2D")
+#endif
+    RegisterSubclass<Constraint2D, ConstraintGear2D>(engine, "Constraint2D", "ConstraintGear2D");
+    RegisterSubclass<Component, ConstraintGear2D>(engine, "Component", "ConstraintGear2D");
+    RegisterSubclass<Animatable, ConstraintGear2D>(engine, "Animatable", "ConstraintGear2D");
+    RegisterSubclass<Serializable, ConstraintGear2D>(engine, "Serializable", "ConstraintGear2D");
+    RegisterSubclass<Object, ConstraintGear2D>(engine, "Object", "ConstraintGear2D");
+    RegisterSubclass<RefCounted, ConstraintGear2D>(engine, "RefCounted", "ConstraintGear2D");
 #endif
 
 #ifdef URHO3D_URHO2D
@@ -3305,6 +2601,361 @@ void ASRegisterGenerated_Members_Constraint(asIScriptEngine* engine)
 
 #ifdef URHO3D_URHO2D
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("ConstraintPrismatic2D", asBEHAVE_ADDREF, "void f()", asMETHODPR(ConstraintPrismatic2D, AddRef, (), void), asCALL_THISCALL);
+    // void Component::AddReplicationState(ComponentReplicationState* state) | File: ../Scene/Component.h
+    // Error: type "ComponentReplicationState*" can not automatically bind
+    // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void AllocateNetworkState()", asMETHODPR(ConstraintPrismatic2D, AllocateNetworkState, (), void), asCALL_THISCALL);
+    // void Constraint2D::ApplyAttributes() override | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void ApplyAttributes()", asMETHODPR(ConstraintPrismatic2D, ApplyAttributes, (), void), asCALL_THISCALL);
+    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
+    // Not registered because template
+    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
+    // Not registered because template
+    // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void CleanupConnection(Connection@+)", asMETHODPR(ConstraintPrismatic2D, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // explicit ConstraintPrismatic2D::ConstraintPrismatic2D(Context* context) | File: ../Urho2D/ConstraintPrismatic2D.h
+    engine->RegisterObjectBehaviour("ConstraintPrismatic2D", asBEHAVE_FACTORY, "ConstraintPrismatic2D@+ f()", asFUNCTION(ConstraintPrismatic2D_ConstraintPrismatic2D_Context), asCALL_CDECL);
+    // void Constraint2D::CreateJoint() | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void CreateJoint()", asMETHODPR(ConstraintPrismatic2D, CreateJoint, (), void), asCALL_THISCALL);
+    // virtual void Component::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(ConstraintPrismatic2D, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
+    // const Vector2& ConstraintPrismatic2D::GetAnchor() const | File: ../Urho2D/ConstraintPrismatic2D.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "const Vector2& GetAnchor() const", asMETHODPR(ConstraintPrismatic2D, GetAnchor, () const, const Vector2&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "const Vector2& get_anchor() const", asMETHODPR(ConstraintPrismatic2D, GetAnchor, () const, const Vector2&), asCALL_THISCALL);
+    // bool Animatable::GetAnimationEnabled() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool GetAnimationEnabled() const", asMETHODPR(ConstraintPrismatic2D, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool get_animationEnabled() const", asMETHODPR(ConstraintPrismatic2D, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
+    // Constraint2D* Constraint2D::GetAttachedConstraint() const | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "Constraint2D@+ GetAttachedConstraint() const", asMETHODPR(ConstraintPrismatic2D, GetAttachedConstraint, () const, Constraint2D*), asCALL_THISCALL);
+    // Variant Serializable::GetAttribute(unsigned index) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "Variant GetAttribute(uint) const", asMETHODPR(ConstraintPrismatic2D, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "Variant get_attributes(uint) const", asMETHODPR(ConstraintPrismatic2D, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
+    // Variant Serializable::GetAttribute(const String& name) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "Variant GetAttribute(const String&in) const", asMETHODPR(ConstraintPrismatic2D, GetAttribute, (const String&) const, Variant), asCALL_THISCALL);
+    // ValueAnimation* Animatable::GetAttributeAnimation(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "ValueAnimation@+ GetAttributeAnimation(const String&in) const", asMETHODPR(ConstraintPrismatic2D, GetAttributeAnimation, (const String&) const, ValueAnimation*), asCALL_THISCALL);
+    // float Animatable::GetAttributeAnimationSpeed(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "float GetAttributeAnimationSpeed(const String&in) const", asMETHODPR(ConstraintPrismatic2D, GetAttributeAnimationSpeed, (const String&) const, float), asCALL_THISCALL);
+    // float Animatable::GetAttributeAnimationTime(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "float GetAttributeAnimationTime(const String&in) const", asMETHODPR(ConstraintPrismatic2D, GetAttributeAnimationTime, (const String&) const, float), asCALL_THISCALL);
+    // WrapMode Animatable::GetAttributeAnimationWrapMode(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "WrapMode GetAttributeAnimationWrapMode(const String&in) const", asMETHODPR(ConstraintPrismatic2D, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), asCALL_THISCALL);
+    // Variant Serializable::GetAttributeDefault(unsigned index) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "Variant GetAttributeDefault(uint) const", asMETHODPR(ConstraintPrismatic2D, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "Variant get_attributeDefaults(uint) const", asMETHODPR(ConstraintPrismatic2D, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
+    // Variant Serializable::GetAttributeDefault(const String& name) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "Variant GetAttributeDefault(const String&in) const", asMETHODPR(ConstraintPrismatic2D, GetAttributeDefault, (const String&) const, Variant), asCALL_THISCALL);
+    // virtual const Vector<AttributeInfo>* Serializable::GetAttributes() const | File: ../Scene/Serializable.h
+    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
+    // const Vector2& ConstraintPrismatic2D::GetAxis() const | File: ../Urho2D/ConstraintPrismatic2D.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "const Vector2& GetAxis() const", asMETHODPR(ConstraintPrismatic2D, GetAxis, () const, const Vector2&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "const Vector2& get_axis() const", asMETHODPR(ConstraintPrismatic2D, GetAxis, () const, const Vector2&), asCALL_THISCALL);
+    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool GetBlockEvents() const", asMETHODPR(ConstraintPrismatic2D, GetBlockEvents, () const, bool), asCALL_THISCALL);
+    // const String& Object::GetCategory() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "const String& GetCategory() const", asMETHODPR(ConstraintPrismatic2D, GetCategory, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "const String& get_category() const", asMETHODPR(ConstraintPrismatic2D, GetCategory, () const, const String&), asCALL_THISCALL);
+    // bool Constraint2D::GetCollideConnected() const | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool GetCollideConnected() const", asMETHODPR(ConstraintPrismatic2D, GetCollideConnected, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool get_collideConnected() const", asMETHODPR(ConstraintPrismatic2D, GetCollideConnected, () const, bool), asCALL_THISCALL);
+    // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "Component@+ GetComponent(StringHash) const", asMETHODPR(ConstraintPrismatic2D, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
+    // template<class T> T*  Component::GetComponent() const | File: ../Scene/Component.h
+    // Not registered because template
+    // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
+    // Error: type "PODVector<Component*>&" can not automatically bind
+    // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
+    // Not registered because template
+    // Context* Object::GetContext() const | File: ../Core/Object.h
+    // Error: type "Context*" can not be returned
+    // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
+    // Error: type "PODVector<Node*>&" can not automatically bind
+    // bool ConstraintPrismatic2D::GetEnableLimit() const | File: ../Urho2D/ConstraintPrismatic2D.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool GetEnableLimit() const", asMETHODPR(ConstraintPrismatic2D, GetEnableLimit, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool get_enableLimit() const", asMETHODPR(ConstraintPrismatic2D, GetEnableLimit, () const, bool), asCALL_THISCALL);
+    // bool ConstraintPrismatic2D::GetEnableMotor() const | File: ../Urho2D/ConstraintPrismatic2D.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool GetEnableMotor() const", asMETHODPR(ConstraintPrismatic2D, GetEnableMotor, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool get_enableMotor() const", asMETHODPR(ConstraintPrismatic2D, GetEnableMotor, () const, bool), asCALL_THISCALL);
+    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "VariantMap& GetEventDataMap() const", asMETHODPR(ConstraintPrismatic2D, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
+    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // Object* Object::GetEventSender() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "Object@+ GetEventSender() const", asMETHODPR(ConstraintPrismatic2D, GetEventSender, () const, Object*), asCALL_THISCALL);
+    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(ConstraintPrismatic2D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "const Variant& get_globalVar(StringHash) const", asMETHODPR(ConstraintPrismatic2D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "const VariantMap& GetGlobalVars() const", asMETHODPR(ConstraintPrismatic2D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "const VariantMap& get_globalVars() const", asMETHODPR(ConstraintPrismatic2D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    // unsigned Component::GetID() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "uint GetID() const", asMETHODPR(ConstraintPrismatic2D, GetID, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "uint get_id() const", asMETHODPR(ConstraintPrismatic2D, GetID, () const, unsigned), asCALL_THISCALL);
+    // bool Serializable::GetInterceptNetworkUpdate(const String& attributeName) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool GetInterceptNetworkUpdate(const String&in) const", asMETHODPR(ConstraintPrismatic2D, GetInterceptNetworkUpdate, (const String&) const, bool), asCALL_THISCALL);
+    // b2Joint* Constraint2D::GetJoint() const | File: ../Urho2D/Constraint2D.h
+    // Error: type "b2Joint*" can not automatically bind
+    // float ConstraintPrismatic2D::GetLowerTranslation() const | File: ../Urho2D/ConstraintPrismatic2D.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "float GetLowerTranslation() const", asMETHODPR(ConstraintPrismatic2D, GetLowerTranslation, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "float get_lowerTranslation() const", asMETHODPR(ConstraintPrismatic2D, GetLowerTranslation, () const, float), asCALL_THISCALL);
+    // float ConstraintPrismatic2D::GetMaxMotorForce() const | File: ../Urho2D/ConstraintPrismatic2D.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "float GetMaxMotorForce() const", asMETHODPR(ConstraintPrismatic2D, GetMaxMotorForce, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "float get_maxMotorForce() const", asMETHODPR(ConstraintPrismatic2D, GetMaxMotorForce, () const, float), asCALL_THISCALL);
+    // float ConstraintPrismatic2D::GetMotorSpeed() const | File: ../Urho2D/ConstraintPrismatic2D.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "float GetMotorSpeed() const", asMETHODPR(ConstraintPrismatic2D, GetMotorSpeed, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "float get_motorSpeed() const", asMETHODPR(ConstraintPrismatic2D, GetMotorSpeed, () const, float), asCALL_THISCALL);
+    // virtual const Vector<AttributeInfo>* Serializable::GetNetworkAttributes() const | File: ../Scene/Serializable.h
+    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
+    // NetworkState* Serializable::GetNetworkState() const | File: ../Scene/Serializable.h
+    // Error: type "NetworkState*" can not automatically bind
+    // Node* Component::GetNode() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "Node@+ GetNode() const", asMETHODPR(ConstraintPrismatic2D, GetNode, () const, Node*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "Node@+ get_node() const", asMETHODPR(ConstraintPrismatic2D, GetNode, () const, Node*), asCALL_THISCALL);
+    // unsigned Serializable::GetNumAttributes() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "uint GetNumAttributes() const", asMETHODPR(ConstraintPrismatic2D, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "uint get_numAttributes() const", asMETHODPR(ConstraintPrismatic2D, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
+    // unsigned Serializable::GetNumNetworkAttributes() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "uint GetNumNetworkAttributes() const", asMETHODPR(ConstraintPrismatic2D, GetNumNetworkAttributes, () const, unsigned), asCALL_THISCALL);
+    // ObjectAnimation* Animatable::GetObjectAnimation() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "ObjectAnimation@+ GetObjectAnimation() const", asMETHODPR(ConstraintPrismatic2D, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "ObjectAnimation@+ get_objectAnimation() const", asMETHODPR(ConstraintPrismatic2D, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
+    // ResourceRef Animatable::GetObjectAnimationAttr() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "ResourceRef GetObjectAnimationAttr() const", asMETHODPR(ConstraintPrismatic2D, GetObjectAnimationAttr, () const, ResourceRef), asCALL_THISCALL);
+    // RigidBody2D* Constraint2D::GetOtherBody() const | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "RigidBody2D@+ GetOtherBody() const", asMETHODPR(ConstraintPrismatic2D, GetOtherBody, () const, RigidBody2D*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "RigidBody2D@+ get_otherBody() const", asMETHODPR(ConstraintPrismatic2D, GetOtherBody, () const, RigidBody2D*), asCALL_THISCALL);
+    // RigidBody2D* Constraint2D::GetOwnerBody() const | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "RigidBody2D@+ GetOwnerBody() const", asMETHODPR(ConstraintPrismatic2D, GetOwnerBody, () const, RigidBody2D*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "RigidBody2D@+ get_ownerBody() const", asMETHODPR(ConstraintPrismatic2D, GetOwnerBody, () const, RigidBody2D*), asCALL_THISCALL);
+    // Scene* Component::GetScene() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "Scene@+ GetScene() const", asMETHODPR(ConstraintPrismatic2D, GetScene, () const, Scene*), asCALL_THISCALL);
+    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(ConstraintPrismatic2D, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
+    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // Not registered because template
+    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "StringHash GetType() const", asMETHODPR(ConstraintPrismatic2D, GetType, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "StringHash get_type() const", asMETHODPR(ConstraintPrismatic2D, GetType, () const, StringHash), asCALL_THISCALL);
+    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "const String& GetTypeName() const", asMETHODPR(ConstraintPrismatic2D, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "const String& get_typeName() const", asMETHODPR(ConstraintPrismatic2D, GetTypeName, () const, const String&), asCALL_THISCALL);
+    // float ConstraintPrismatic2D::GetUpperTranslation() const | File: ../Urho2D/ConstraintPrismatic2D.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "float GetUpperTranslation() const", asMETHODPR(ConstraintPrismatic2D, GetUpperTranslation, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "float get_upperTranslation() const", asMETHODPR(ConstraintPrismatic2D, GetUpperTranslation, () const, float), asCALL_THISCALL);
+    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool HasEventHandlers() const", asMETHODPR(ConstraintPrismatic2D, HasEventHandlers, () const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(ConstraintPrismatic2D, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(ConstraintPrismatic2D, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
+    // bool Component::IsEnabled() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool IsEnabled() const", asMETHODPR(ConstraintPrismatic2D, IsEnabled, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool get_enabled() const", asMETHODPR(ConstraintPrismatic2D, IsEnabled, () const, bool), asCALL_THISCALL);
+    // bool Component::IsEnabledEffective() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool IsEnabledEffective() const", asMETHODPR(ConstraintPrismatic2D, IsEnabledEffective, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool get_enabledEffective() const", asMETHODPR(ConstraintPrismatic2D, IsEnabledEffective, () const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool IsInstanceOf(StringHash) const", asMETHODPR(ConstraintPrismatic2D, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
+    // Not registered because template
+    // bool Component::IsReplicated() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool IsReplicated() const", asMETHODPR(ConstraintPrismatic2D, IsReplicated, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool get_replicated() const", asMETHODPR(ConstraintPrismatic2D, IsReplicated, () const, bool), asCALL_THISCALL);
+    // bool Serializable::IsTemporary() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool IsTemporary() const", asMETHODPR(ConstraintPrismatic2D, IsTemporary, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool get_temporary() const", asMETHODPR(ConstraintPrismatic2D, IsTemporary, () const, bool), asCALL_THISCALL);
+    // virtual bool Serializable::Load(Deserializer& source) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool Load(Deserializer&)", asMETHODPR(ConstraintPrismatic2D, Load, (Deserializer&), bool), asCALL_THISCALL);
+    // bool Animatable::LoadJSON(const JSONValue& source) override | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool LoadJSON(const JSONValue&in)", asMETHODPR(ConstraintPrismatic2D, LoadJSON, (const JSONValue&), bool), asCALL_THISCALL);
+    // bool Animatable::LoadXML(const XMLElement& source) override | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool LoadXML(const XMLElement&in)", asMETHODPR(ConstraintPrismatic2D, LoadXML, (const XMLElement&), bool), asCALL_THISCALL);
+    // void Component::MarkNetworkUpdate() override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void MarkNetworkUpdate()", asMETHODPR(ConstraintPrismatic2D, MarkNetworkUpdate, (), void), asCALL_THISCALL);
+    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(ConstraintPrismatic2D, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
+    // virtual void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void OnGetAttribute(const AttributeInfo&in, Variant&) const", asMETHODPR(ConstraintPrismatic2D, OnGetAttribute, (const AttributeInfo&, Variant&) const, void), asCALL_THISCALL);
+    // virtual void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void OnSetAttribute(const AttributeInfo&in, const Variant&in)", asMETHODPR(ConstraintPrismatic2D, OnSetAttribute, (const AttributeInfo&, const Variant&), void), asCALL_THISCALL);
+    // void Constraint2D::OnSetEnabled() override | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void OnSetEnabled()", asMETHODPR(ConstraintPrismatic2D, OnSetEnabled, (), void), asCALL_THISCALL);
+    // void Component::PrepareNetworkUpdate() | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void PrepareNetworkUpdate()", asMETHODPR(ConstraintPrismatic2D, PrepareNetworkUpdate, (), void), asCALL_THISCALL);
+    // bool Serializable::ReadDeltaUpdate(Deserializer& source) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool ReadDeltaUpdate(Deserializer&)", asMETHODPR(ConstraintPrismatic2D, ReadDeltaUpdate, (Deserializer&), bool), asCALL_THISCALL);
+    // bool Serializable::ReadLatestDataUpdate(Deserializer& source) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool ReadLatestDataUpdate(Deserializer&)", asMETHODPR(ConstraintPrismatic2D, ReadLatestDataUpdate, (Deserializer&), bool), asCALL_THISCALL);
+    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
+    // Error: type "RefCount*" can not automatically bind
+    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "int Refs() const", asMETHODPR(ConstraintPrismatic2D, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "int get_refs() const", asMETHODPR(ConstraintPrismatic2D, Refs, () const, int), asCALL_THISCALL);
+    // static void ConstraintPrismatic2D::RegisterObject(Context* context) | File: ../Urho2D/ConstraintPrismatic2D.h
+    // Context can be used as firs parameter of constructors only
+    // void Constraint2D::ReleaseJoint() | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void ReleaseJoint()", asMETHODPR(ConstraintPrismatic2D, ReleaseJoint, (), void), asCALL_THISCALL);
+    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("ConstraintPrismatic2D", asBEHAVE_RELEASE, "void f()", asMETHODPR(ConstraintPrismatic2D, ReleaseRef, (), void), asCALL_THISCALL);
+    // void Component::Remove() | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void Remove()", asMETHODPR(ConstraintPrismatic2D, Remove, (), void), asCALL_THISCALL);
+    // void Animatable::RemoveAttributeAnimation(const String& name) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void RemoveAttributeAnimation(const String&in)", asMETHODPR(ConstraintPrismatic2D, RemoveAttributeAnimation, (const String&), void), asCALL_THISCALL);
+    // void Serializable::RemoveInstanceDefault() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void RemoveInstanceDefault()", asMETHODPR(ConstraintPrismatic2D, RemoveInstanceDefault, (), void), asCALL_THISCALL);
+    // void Animatable::RemoveObjectAnimation() | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void RemoveObjectAnimation()", asMETHODPR(ConstraintPrismatic2D, RemoveObjectAnimation, (), void), asCALL_THISCALL);
+    // void Serializable::ResetToDefault() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void ResetToDefault()", asMETHODPR(ConstraintPrismatic2D, ResetToDefault, (), void), asCALL_THISCALL);
+    // bool Component::Save(Serializer& dest) const override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool Save(Serializer&) const", asMETHODPR(ConstraintPrismatic2D, Save, (Serializer&) const, bool), asCALL_THISCALL);
+    // virtual bool Serializable::SaveDefaultAttributes() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool SaveDefaultAttributes() const", asMETHODPR(ConstraintPrismatic2D, SaveDefaultAttributes, () const, bool), asCALL_THISCALL);
+    // bool Component::SaveJSON(JSONValue& dest) const override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool SaveJSON(JSONValue&) const", asMETHODPR(ConstraintPrismatic2D, SaveJSON, (JSONValue&) const, bool), asCALL_THISCALL);
+    // bool Component::SaveXML(XMLElement& dest) const override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool SaveXML(XMLElement&) const", asMETHODPR(ConstraintPrismatic2D, SaveXML, (XMLElement&) const, bool), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SendEvent(StringHash)", asMETHODPR(ConstraintPrismatic2D, SendEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(ConstraintPrismatic2D, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
+    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
+    // Not registered because template
+    // void ConstraintPrismatic2D::SetAnchor(const Vector2& anchor) | File: ../Urho2D/ConstraintPrismatic2D.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetAnchor(const Vector2&in)", asMETHODPR(ConstraintPrismatic2D, SetAnchor, (const Vector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void set_anchor(const Vector2&in)", asMETHODPR(ConstraintPrismatic2D, SetAnchor, (const Vector2&), void), asCALL_THISCALL);
+    // void Animatable::SetAnimationEnabled(bool enable) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetAnimationEnabled(bool)", asMETHODPR(ConstraintPrismatic2D, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void set_animationEnabled(bool)", asMETHODPR(ConstraintPrismatic2D, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
+    // void Animatable::SetAnimationTime(float time) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetAnimationTime(float)", asMETHODPR(ConstraintPrismatic2D, SetAnimationTime, (float), void), asCALL_THISCALL);
+    // void Constraint2D::SetAttachedConstraint(Constraint2D* constraint) | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetAttachedConstraint(Constraint2D@+)", asMETHODPR(ConstraintPrismatic2D, SetAttachedConstraint, (Constraint2D*), void), asCALL_THISCALL);
+    // bool Serializable::SetAttribute(unsigned index, const Variant& value) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool SetAttribute(uint, const Variant&in)", asMETHODPR(ConstraintPrismatic2D, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool set_attributes(uint, const Variant&in)", asMETHODPR(ConstraintPrismatic2D, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
+    // bool Serializable::SetAttribute(const String& name, const Variant& value) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "bool SetAttribute(const String&in, const Variant&in)", asMETHODPR(ConstraintPrismatic2D, SetAttribute, (const String&, const Variant&), bool), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode=WM_LOOP, float speed=1.0f) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetAttributeAnimation(const String&in, ValueAnimation@+, WrapMode = WM_LOOP, float = 1.0f)", asMETHODPR(ConstraintPrismatic2D, SetAttributeAnimation, (const String&, ValueAnimation*, WrapMode, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationSpeed(const String& name, float speed) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetAttributeAnimationSpeed(const String&in, float)", asMETHODPR(ConstraintPrismatic2D, SetAttributeAnimationSpeed, (const String&, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationTime(const String& name, float time) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetAttributeAnimationTime(const String&in, float)", asMETHODPR(ConstraintPrismatic2D, SetAttributeAnimationTime, (const String&, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationWrapMode(const String& name, WrapMode wrapMode) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetAttributeAnimationWrapMode(const String&in, WrapMode)", asMETHODPR(ConstraintPrismatic2D, SetAttributeAnimationWrapMode, (const String&, WrapMode), void), asCALL_THISCALL);
+    // void ConstraintPrismatic2D::SetAxis(const Vector2& axis) | File: ../Urho2D/ConstraintPrismatic2D.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetAxis(const Vector2&in)", asMETHODPR(ConstraintPrismatic2D, SetAxis, (const Vector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void set_axis(const Vector2&in)", asMETHODPR(ConstraintPrismatic2D, SetAxis, (const Vector2&), void), asCALL_THISCALL);
+    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetBlockEvents(bool)", asMETHODPR(ConstraintPrismatic2D, SetBlockEvents, (bool), void), asCALL_THISCALL);
+    // void Constraint2D::SetCollideConnected(bool collideConnected) | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetCollideConnected(bool)", asMETHODPR(ConstraintPrismatic2D, SetCollideConnected, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void set_collideConnected(bool)", asMETHODPR(ConstraintPrismatic2D, SetCollideConnected, (bool), void), asCALL_THISCALL);
+    // void Component::SetEnabled(bool enable) | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetEnabled(bool)", asMETHODPR(ConstraintPrismatic2D, SetEnabled, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void set_enabled(bool)", asMETHODPR(ConstraintPrismatic2D, SetEnabled, (bool), void), asCALL_THISCALL);
+    // void ConstraintPrismatic2D::SetEnableLimit(bool enableLimit) | File: ../Urho2D/ConstraintPrismatic2D.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetEnableLimit(bool)", asMETHODPR(ConstraintPrismatic2D, SetEnableLimit, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void set_enableLimit(bool)", asMETHODPR(ConstraintPrismatic2D, SetEnableLimit, (bool), void), asCALL_THISCALL);
+    // void ConstraintPrismatic2D::SetEnableMotor(bool enableMotor) | File: ../Urho2D/ConstraintPrismatic2D.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetEnableMotor(bool)", asMETHODPR(ConstraintPrismatic2D, SetEnableMotor, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void set_enableMotor(bool)", asMETHODPR(ConstraintPrismatic2D, SetEnableMotor, (bool), void), asCALL_THISCALL);
+    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(ConstraintPrismatic2D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(ConstraintPrismatic2D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    // void Serializable::SetInstanceDefault(bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetInstanceDefault(bool)", asMETHODPR(ConstraintPrismatic2D, SetInstanceDefault, (bool), void), asCALL_THISCALL);
+    // void Serializable::SetInterceptNetworkUpdate(const String& attributeName, bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetInterceptNetworkUpdate(const String&in, bool)", asMETHODPR(ConstraintPrismatic2D, SetInterceptNetworkUpdate, (const String&, bool), void), asCALL_THISCALL);
+    // void ConstraintPrismatic2D::SetLowerTranslation(float lowerTranslation) | File: ../Urho2D/ConstraintPrismatic2D.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetLowerTranslation(float)", asMETHODPR(ConstraintPrismatic2D, SetLowerTranslation, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void set_lowerTranslation(float)", asMETHODPR(ConstraintPrismatic2D, SetLowerTranslation, (float), void), asCALL_THISCALL);
+    // void ConstraintPrismatic2D::SetMaxMotorForce(float maxMotorForce) | File: ../Urho2D/ConstraintPrismatic2D.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetMaxMotorForce(float)", asMETHODPR(ConstraintPrismatic2D, SetMaxMotorForce, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void set_maxMotorForce(float)", asMETHODPR(ConstraintPrismatic2D, SetMaxMotorForce, (float), void), asCALL_THISCALL);
+    // void ConstraintPrismatic2D::SetMotorSpeed(float motorSpeed) | File: ../Urho2D/ConstraintPrismatic2D.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetMotorSpeed(float)", asMETHODPR(ConstraintPrismatic2D, SetMotorSpeed, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void set_motorSpeed(float)", asMETHODPR(ConstraintPrismatic2D, SetMotorSpeed, (float), void), asCALL_THISCALL);
+    // void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetObjectAnimation(ObjectAnimation@+)", asMETHODPR(ConstraintPrismatic2D, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void set_objectAnimation(ObjectAnimation@+)", asMETHODPR(ConstraintPrismatic2D, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
+    // void Animatable::SetObjectAnimationAttr(const ResourceRef& value) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetObjectAnimationAttr(const ResourceRef&in)", asMETHODPR(ConstraintPrismatic2D, SetObjectAnimationAttr, (const ResourceRef&), void), asCALL_THISCALL);
+    // void Constraint2D::SetOtherBody(RigidBody2D* body) | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetOtherBody(RigidBody2D@+)", asMETHODPR(ConstraintPrismatic2D, SetOtherBody, (RigidBody2D*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void set_otherBody(RigidBody2D@+)", asMETHODPR(ConstraintPrismatic2D, SetOtherBody, (RigidBody2D*), void), asCALL_THISCALL);
+    // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetTemporary(bool)", asMETHODPR(ConstraintPrismatic2D, SetTemporary, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void set_temporary(bool)", asMETHODPR(ConstraintPrismatic2D, SetTemporary, (bool), void), asCALL_THISCALL);
+    // void ConstraintPrismatic2D::SetUpperTranslation(float upperTranslation) | File: ../Urho2D/ConstraintPrismatic2D.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void SetUpperTranslation(float)", asMETHODPR(ConstraintPrismatic2D, SetUpperTranslation, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void set_upperTranslation(float)", asMETHODPR(ConstraintPrismatic2D, SetUpperTranslation, (float), void), asCALL_THISCALL);
+    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void UnsubscribeFromAllEvents()", asMETHODPR(ConstraintPrismatic2D, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(ConstraintPrismatic2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
+    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(ConstraintPrismatic2D, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(ConstraintPrismatic2D, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(ConstraintPrismatic2D, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
+    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "int WeakRefs() const", asMETHODPR(ConstraintPrismatic2D, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "int get_weakRefs() const", asMETHODPR(ConstraintPrismatic2D, WeakRefs, () const, int), asCALL_THISCALL);
+    // void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attributeBits, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void WriteDeltaUpdate(Serializer&, const DirtyBits&in, uint8)", asMETHODPR(ConstraintPrismatic2D, WriteDeltaUpdate, (Serializer&, const DirtyBits&, unsigned char), void), asCALL_THISCALL);
+    // void Serializable::WriteInitialDeltaUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void WriteInitialDeltaUpdate(Serializer&, uint8)", asMETHODPR(ConstraintPrismatic2D, WriteInitialDeltaUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
+    // void Serializable::WriteLatestDataUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void WriteLatestDataUpdate(Serializer&, uint8)", asMETHODPR(ConstraintPrismatic2D, WriteLatestDataUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
+#ifdef REGISTER_MANUAL_PART_Constraint2D
+    REGISTER_MANUAL_PART_Constraint2D(ConstraintPrismatic2D, "ConstraintPrismatic2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Component
+    REGISTER_MANUAL_PART_Component(ConstraintPrismatic2D, "ConstraintPrismatic2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Animatable
+    REGISTER_MANUAL_PART_Animatable(ConstraintPrismatic2D, "ConstraintPrismatic2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Serializable
+    REGISTER_MANUAL_PART_Serializable(ConstraintPrismatic2D, "ConstraintPrismatic2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Object
+    REGISTER_MANUAL_PART_Object(ConstraintPrismatic2D, "ConstraintPrismatic2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_RefCounted
+    REGISTER_MANUAL_PART_RefCounted(ConstraintPrismatic2D, "ConstraintPrismatic2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_ConstraintPrismatic2D
+    REGISTER_MANUAL_PART_ConstraintPrismatic2D(ConstraintPrismatic2D, "ConstraintPrismatic2D")
+#endif
+    RegisterSubclass<Constraint2D, ConstraintPrismatic2D>(engine, "Constraint2D", "ConstraintPrismatic2D");
+    RegisterSubclass<Component, ConstraintPrismatic2D>(engine, "Component", "ConstraintPrismatic2D");
+    RegisterSubclass<Animatable, ConstraintPrismatic2D>(engine, "Animatable", "ConstraintPrismatic2D");
+    RegisterSubclass<Serializable, ConstraintPrismatic2D>(engine, "Serializable", "ConstraintPrismatic2D");
+    RegisterSubclass<Object, ConstraintPrismatic2D>(engine, "Object", "ConstraintPrismatic2D");
+    RegisterSubclass<RefCounted, ConstraintPrismatic2D>(engine, "RefCounted", "ConstraintPrismatic2D");
+#endif
+
+#ifdef URHO3D_URHO2D
+    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("ConstraintPulley2D", asBEHAVE_ADDREF, "void f()", asMETHODPR(ConstraintPulley2D, AddRef, (), void), asCALL_THISCALL);
     // void Component::AddReplicationState(ComponentReplicationState* state) | File: ../Scene/Component.h
     // Error: type "ComponentReplicationState*" can not automatically bind
@@ -3638,6 +3289,355 @@ void ASRegisterGenerated_Members_Constraint(asIScriptEngine* engine)
     RegisterSubclass<Serializable, ConstraintPulley2D>(engine, "Serializable", "ConstraintPulley2D");
     RegisterSubclass<Object, ConstraintPulley2D>(engine, "Object", "ConstraintPulley2D");
     RegisterSubclass<RefCounted, ConstraintPulley2D>(engine, "RefCounted", "ConstraintPulley2D");
+#endif
+
+#ifdef URHO3D_URHO2D
+    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("ConstraintRevolute2D", asBEHAVE_ADDREF, "void f()", asMETHODPR(ConstraintRevolute2D, AddRef, (), void), asCALL_THISCALL);
+    // void Component::AddReplicationState(ComponentReplicationState* state) | File: ../Scene/Component.h
+    // Error: type "ComponentReplicationState*" can not automatically bind
+    // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void AllocateNetworkState()", asMETHODPR(ConstraintRevolute2D, AllocateNetworkState, (), void), asCALL_THISCALL);
+    // void Constraint2D::ApplyAttributes() override | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void ApplyAttributes()", asMETHODPR(ConstraintRevolute2D, ApplyAttributes, (), void), asCALL_THISCALL);
+    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
+    // Not registered because template
+    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
+    // Not registered because template
+    // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void CleanupConnection(Connection@+)", asMETHODPR(ConstraintRevolute2D, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // explicit ConstraintRevolute2D::ConstraintRevolute2D(Context* context) | File: ../Urho2D/ConstraintRevolute2D.h
+    engine->RegisterObjectBehaviour("ConstraintRevolute2D", asBEHAVE_FACTORY, "ConstraintRevolute2D@+ f()", asFUNCTION(ConstraintRevolute2D_ConstraintRevolute2D_Context), asCALL_CDECL);
+    // void Constraint2D::CreateJoint() | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void CreateJoint()", asMETHODPR(ConstraintRevolute2D, CreateJoint, (), void), asCALL_THISCALL);
+    // virtual void Component::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(ConstraintRevolute2D, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
+    // const Vector2& ConstraintRevolute2D::GetAnchor() const | File: ../Urho2D/ConstraintRevolute2D.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "const Vector2& GetAnchor() const", asMETHODPR(ConstraintRevolute2D, GetAnchor, () const, const Vector2&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "const Vector2& get_anchor() const", asMETHODPR(ConstraintRevolute2D, GetAnchor, () const, const Vector2&), asCALL_THISCALL);
+    // bool Animatable::GetAnimationEnabled() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool GetAnimationEnabled() const", asMETHODPR(ConstraintRevolute2D, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool get_animationEnabled() const", asMETHODPR(ConstraintRevolute2D, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
+    // Constraint2D* Constraint2D::GetAttachedConstraint() const | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "Constraint2D@+ GetAttachedConstraint() const", asMETHODPR(ConstraintRevolute2D, GetAttachedConstraint, () const, Constraint2D*), asCALL_THISCALL);
+    // Variant Serializable::GetAttribute(unsigned index) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "Variant GetAttribute(uint) const", asMETHODPR(ConstraintRevolute2D, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "Variant get_attributes(uint) const", asMETHODPR(ConstraintRevolute2D, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
+    // Variant Serializable::GetAttribute(const String& name) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "Variant GetAttribute(const String&in) const", asMETHODPR(ConstraintRevolute2D, GetAttribute, (const String&) const, Variant), asCALL_THISCALL);
+    // ValueAnimation* Animatable::GetAttributeAnimation(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "ValueAnimation@+ GetAttributeAnimation(const String&in) const", asMETHODPR(ConstraintRevolute2D, GetAttributeAnimation, (const String&) const, ValueAnimation*), asCALL_THISCALL);
+    // float Animatable::GetAttributeAnimationSpeed(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "float GetAttributeAnimationSpeed(const String&in) const", asMETHODPR(ConstraintRevolute2D, GetAttributeAnimationSpeed, (const String&) const, float), asCALL_THISCALL);
+    // float Animatable::GetAttributeAnimationTime(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "float GetAttributeAnimationTime(const String&in) const", asMETHODPR(ConstraintRevolute2D, GetAttributeAnimationTime, (const String&) const, float), asCALL_THISCALL);
+    // WrapMode Animatable::GetAttributeAnimationWrapMode(const String& name) const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "WrapMode GetAttributeAnimationWrapMode(const String&in) const", asMETHODPR(ConstraintRevolute2D, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), asCALL_THISCALL);
+    // Variant Serializable::GetAttributeDefault(unsigned index) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "Variant GetAttributeDefault(uint) const", asMETHODPR(ConstraintRevolute2D, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "Variant get_attributeDefaults(uint) const", asMETHODPR(ConstraintRevolute2D, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
+    // Variant Serializable::GetAttributeDefault(const String& name) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "Variant GetAttributeDefault(const String&in) const", asMETHODPR(ConstraintRevolute2D, GetAttributeDefault, (const String&) const, Variant), asCALL_THISCALL);
+    // virtual const Vector<AttributeInfo>* Serializable::GetAttributes() const | File: ../Scene/Serializable.h
+    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
+    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool GetBlockEvents() const", asMETHODPR(ConstraintRevolute2D, GetBlockEvents, () const, bool), asCALL_THISCALL);
+    // const String& Object::GetCategory() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "const String& GetCategory() const", asMETHODPR(ConstraintRevolute2D, GetCategory, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "const String& get_category() const", asMETHODPR(ConstraintRevolute2D, GetCategory, () const, const String&), asCALL_THISCALL);
+    // bool Constraint2D::GetCollideConnected() const | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool GetCollideConnected() const", asMETHODPR(ConstraintRevolute2D, GetCollideConnected, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool get_collideConnected() const", asMETHODPR(ConstraintRevolute2D, GetCollideConnected, () const, bool), asCALL_THISCALL);
+    // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "Component@+ GetComponent(StringHash) const", asMETHODPR(ConstraintRevolute2D, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
+    // template<class T> T*  Component::GetComponent() const | File: ../Scene/Component.h
+    // Not registered because template
+    // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
+    // Error: type "PODVector<Component*>&" can not automatically bind
+    // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
+    // Not registered because template
+    // Context* Object::GetContext() const | File: ../Core/Object.h
+    // Error: type "Context*" can not be returned
+    // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
+    // Error: type "PODVector<Node*>&" can not automatically bind
+    // bool ConstraintRevolute2D::GetEnableLimit() const | File: ../Urho2D/ConstraintRevolute2D.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool GetEnableLimit() const", asMETHODPR(ConstraintRevolute2D, GetEnableLimit, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool get_enableLimit() const", asMETHODPR(ConstraintRevolute2D, GetEnableLimit, () const, bool), asCALL_THISCALL);
+    // bool ConstraintRevolute2D::GetEnableMotor() const | File: ../Urho2D/ConstraintRevolute2D.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool GetEnableMotor() const", asMETHODPR(ConstraintRevolute2D, GetEnableMotor, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool get_enableMotor() const", asMETHODPR(ConstraintRevolute2D, GetEnableMotor, () const, bool), asCALL_THISCALL);
+    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "VariantMap& GetEventDataMap() const", asMETHODPR(ConstraintRevolute2D, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
+    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // Object* Object::GetEventSender() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "Object@+ GetEventSender() const", asMETHODPR(ConstraintRevolute2D, GetEventSender, () const, Object*), asCALL_THISCALL);
+    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(ConstraintRevolute2D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "const Variant& get_globalVar(StringHash) const", asMETHODPR(ConstraintRevolute2D, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "const VariantMap& GetGlobalVars() const", asMETHODPR(ConstraintRevolute2D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "const VariantMap& get_globalVars() const", asMETHODPR(ConstraintRevolute2D, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    // unsigned Component::GetID() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "uint GetID() const", asMETHODPR(ConstraintRevolute2D, GetID, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "uint get_id() const", asMETHODPR(ConstraintRevolute2D, GetID, () const, unsigned), asCALL_THISCALL);
+    // bool Serializable::GetInterceptNetworkUpdate(const String& attributeName) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool GetInterceptNetworkUpdate(const String&in) const", asMETHODPR(ConstraintRevolute2D, GetInterceptNetworkUpdate, (const String&) const, bool), asCALL_THISCALL);
+    // b2Joint* Constraint2D::GetJoint() const | File: ../Urho2D/Constraint2D.h
+    // Error: type "b2Joint*" can not automatically bind
+    // float ConstraintRevolute2D::GetLowerAngle() const | File: ../Urho2D/ConstraintRevolute2D.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "float GetLowerAngle() const", asMETHODPR(ConstraintRevolute2D, GetLowerAngle, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "float get_lowerAngle() const", asMETHODPR(ConstraintRevolute2D, GetLowerAngle, () const, float), asCALL_THISCALL);
+    // float ConstraintRevolute2D::GetMaxMotorTorque() const | File: ../Urho2D/ConstraintRevolute2D.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "float GetMaxMotorTorque() const", asMETHODPR(ConstraintRevolute2D, GetMaxMotorTorque, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "float get_maxMotorTorque() const", asMETHODPR(ConstraintRevolute2D, GetMaxMotorTorque, () const, float), asCALL_THISCALL);
+    // float ConstraintRevolute2D::GetMotorSpeed() const | File: ../Urho2D/ConstraintRevolute2D.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "float GetMotorSpeed() const", asMETHODPR(ConstraintRevolute2D, GetMotorSpeed, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "float get_motorSpeed() const", asMETHODPR(ConstraintRevolute2D, GetMotorSpeed, () const, float), asCALL_THISCALL);
+    // virtual const Vector<AttributeInfo>* Serializable::GetNetworkAttributes() const | File: ../Scene/Serializable.h
+    // Error: type "const Vector<AttributeInfo>*" can not automatically bind
+    // NetworkState* Serializable::GetNetworkState() const | File: ../Scene/Serializable.h
+    // Error: type "NetworkState*" can not automatically bind
+    // Node* Component::GetNode() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "Node@+ GetNode() const", asMETHODPR(ConstraintRevolute2D, GetNode, () const, Node*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "Node@+ get_node() const", asMETHODPR(ConstraintRevolute2D, GetNode, () const, Node*), asCALL_THISCALL);
+    // unsigned Serializable::GetNumAttributes() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "uint GetNumAttributes() const", asMETHODPR(ConstraintRevolute2D, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "uint get_numAttributes() const", asMETHODPR(ConstraintRevolute2D, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
+    // unsigned Serializable::GetNumNetworkAttributes() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "uint GetNumNetworkAttributes() const", asMETHODPR(ConstraintRevolute2D, GetNumNetworkAttributes, () const, unsigned), asCALL_THISCALL);
+    // ObjectAnimation* Animatable::GetObjectAnimation() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "ObjectAnimation@+ GetObjectAnimation() const", asMETHODPR(ConstraintRevolute2D, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "ObjectAnimation@+ get_objectAnimation() const", asMETHODPR(ConstraintRevolute2D, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
+    // ResourceRef Animatable::GetObjectAnimationAttr() const | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "ResourceRef GetObjectAnimationAttr() const", asMETHODPR(ConstraintRevolute2D, GetObjectAnimationAttr, () const, ResourceRef), asCALL_THISCALL);
+    // RigidBody2D* Constraint2D::GetOtherBody() const | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "RigidBody2D@+ GetOtherBody() const", asMETHODPR(ConstraintRevolute2D, GetOtherBody, () const, RigidBody2D*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "RigidBody2D@+ get_otherBody() const", asMETHODPR(ConstraintRevolute2D, GetOtherBody, () const, RigidBody2D*), asCALL_THISCALL);
+    // RigidBody2D* Constraint2D::GetOwnerBody() const | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "RigidBody2D@+ GetOwnerBody() const", asMETHODPR(ConstraintRevolute2D, GetOwnerBody, () const, RigidBody2D*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "RigidBody2D@+ get_ownerBody() const", asMETHODPR(ConstraintRevolute2D, GetOwnerBody, () const, RigidBody2D*), asCALL_THISCALL);
+    // Scene* Component::GetScene() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "Scene@+ GetScene() const", asMETHODPR(ConstraintRevolute2D, GetScene, () const, Scene*), asCALL_THISCALL);
+    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(ConstraintRevolute2D, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
+    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // Not registered because template
+    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "StringHash GetType() const", asMETHODPR(ConstraintRevolute2D, GetType, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "StringHash get_type() const", asMETHODPR(ConstraintRevolute2D, GetType, () const, StringHash), asCALL_THISCALL);
+    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "const String& GetTypeName() const", asMETHODPR(ConstraintRevolute2D, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "const String& get_typeName() const", asMETHODPR(ConstraintRevolute2D, GetTypeName, () const, const String&), asCALL_THISCALL);
+    // float ConstraintRevolute2D::GetUpperAngle() const | File: ../Urho2D/ConstraintRevolute2D.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "float GetUpperAngle() const", asMETHODPR(ConstraintRevolute2D, GetUpperAngle, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "float get_upperAngle() const", asMETHODPR(ConstraintRevolute2D, GetUpperAngle, () const, float), asCALL_THISCALL);
+    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool HasEventHandlers() const", asMETHODPR(ConstraintRevolute2D, HasEventHandlers, () const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(ConstraintRevolute2D, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(ConstraintRevolute2D, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
+    // bool Component::IsEnabled() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool IsEnabled() const", asMETHODPR(ConstraintRevolute2D, IsEnabled, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool get_enabled() const", asMETHODPR(ConstraintRevolute2D, IsEnabled, () const, bool), asCALL_THISCALL);
+    // bool Component::IsEnabledEffective() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool IsEnabledEffective() const", asMETHODPR(ConstraintRevolute2D, IsEnabledEffective, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool get_enabledEffective() const", asMETHODPR(ConstraintRevolute2D, IsEnabledEffective, () const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool IsInstanceOf(StringHash) const", asMETHODPR(ConstraintRevolute2D, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
+    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
+    // Not registered because template
+    // bool Component::IsReplicated() const | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool IsReplicated() const", asMETHODPR(ConstraintRevolute2D, IsReplicated, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool get_replicated() const", asMETHODPR(ConstraintRevolute2D, IsReplicated, () const, bool), asCALL_THISCALL);
+    // bool Serializable::IsTemporary() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool IsTemporary() const", asMETHODPR(ConstraintRevolute2D, IsTemporary, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool get_temporary() const", asMETHODPR(ConstraintRevolute2D, IsTemporary, () const, bool), asCALL_THISCALL);
+    // virtual bool Serializable::Load(Deserializer& source) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool Load(Deserializer&)", asMETHODPR(ConstraintRevolute2D, Load, (Deserializer&), bool), asCALL_THISCALL);
+    // bool Animatable::LoadJSON(const JSONValue& source) override | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool LoadJSON(const JSONValue&in)", asMETHODPR(ConstraintRevolute2D, LoadJSON, (const JSONValue&), bool), asCALL_THISCALL);
+    // bool Animatable::LoadXML(const XMLElement& source) override | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool LoadXML(const XMLElement&in)", asMETHODPR(ConstraintRevolute2D, LoadXML, (const XMLElement&), bool), asCALL_THISCALL);
+    // void Component::MarkNetworkUpdate() override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void MarkNetworkUpdate()", asMETHODPR(ConstraintRevolute2D, MarkNetworkUpdate, (), void), asCALL_THISCALL);
+    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(ConstraintRevolute2D, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
+    // virtual void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void OnGetAttribute(const AttributeInfo&in, Variant&) const", asMETHODPR(ConstraintRevolute2D, OnGetAttribute, (const AttributeInfo&, Variant&) const, void), asCALL_THISCALL);
+    // virtual void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void OnSetAttribute(const AttributeInfo&in, const Variant&in)", asMETHODPR(ConstraintRevolute2D, OnSetAttribute, (const AttributeInfo&, const Variant&), void), asCALL_THISCALL);
+    // void Constraint2D::OnSetEnabled() override | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void OnSetEnabled()", asMETHODPR(ConstraintRevolute2D, OnSetEnabled, (), void), asCALL_THISCALL);
+    // void Component::PrepareNetworkUpdate() | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void PrepareNetworkUpdate()", asMETHODPR(ConstraintRevolute2D, PrepareNetworkUpdate, (), void), asCALL_THISCALL);
+    // bool Serializable::ReadDeltaUpdate(Deserializer& source) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool ReadDeltaUpdate(Deserializer&)", asMETHODPR(ConstraintRevolute2D, ReadDeltaUpdate, (Deserializer&), bool), asCALL_THISCALL);
+    // bool Serializable::ReadLatestDataUpdate(Deserializer& source) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool ReadLatestDataUpdate(Deserializer&)", asMETHODPR(ConstraintRevolute2D, ReadLatestDataUpdate, (Deserializer&), bool), asCALL_THISCALL);
+    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
+    // Error: type "RefCount*" can not automatically bind
+    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "int Refs() const", asMETHODPR(ConstraintRevolute2D, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "int get_refs() const", asMETHODPR(ConstraintRevolute2D, Refs, () const, int), asCALL_THISCALL);
+    // static void ConstraintRevolute2D::RegisterObject(Context* context) | File: ../Urho2D/ConstraintRevolute2D.h
+    // Context can be used as firs parameter of constructors only
+    // void Constraint2D::ReleaseJoint() | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void ReleaseJoint()", asMETHODPR(ConstraintRevolute2D, ReleaseJoint, (), void), asCALL_THISCALL);
+    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("ConstraintRevolute2D", asBEHAVE_RELEASE, "void f()", asMETHODPR(ConstraintRevolute2D, ReleaseRef, (), void), asCALL_THISCALL);
+    // void Component::Remove() | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void Remove()", asMETHODPR(ConstraintRevolute2D, Remove, (), void), asCALL_THISCALL);
+    // void Animatable::RemoveAttributeAnimation(const String& name) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void RemoveAttributeAnimation(const String&in)", asMETHODPR(ConstraintRevolute2D, RemoveAttributeAnimation, (const String&), void), asCALL_THISCALL);
+    // void Serializable::RemoveInstanceDefault() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void RemoveInstanceDefault()", asMETHODPR(ConstraintRevolute2D, RemoveInstanceDefault, (), void), asCALL_THISCALL);
+    // void Animatable::RemoveObjectAnimation() | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void RemoveObjectAnimation()", asMETHODPR(ConstraintRevolute2D, RemoveObjectAnimation, (), void), asCALL_THISCALL);
+    // void Serializable::ResetToDefault() | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void ResetToDefault()", asMETHODPR(ConstraintRevolute2D, ResetToDefault, (), void), asCALL_THISCALL);
+    // bool Component::Save(Serializer& dest) const override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool Save(Serializer&) const", asMETHODPR(ConstraintRevolute2D, Save, (Serializer&) const, bool), asCALL_THISCALL);
+    // virtual bool Serializable::SaveDefaultAttributes() const | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool SaveDefaultAttributes() const", asMETHODPR(ConstraintRevolute2D, SaveDefaultAttributes, () const, bool), asCALL_THISCALL);
+    // bool Component::SaveJSON(JSONValue& dest) const override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool SaveJSON(JSONValue&) const", asMETHODPR(ConstraintRevolute2D, SaveJSON, (JSONValue&) const, bool), asCALL_THISCALL);
+    // bool Component::SaveXML(XMLElement& dest) const override | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool SaveXML(XMLElement&) const", asMETHODPR(ConstraintRevolute2D, SaveXML, (XMLElement&) const, bool), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SendEvent(StringHash)", asMETHODPR(ConstraintRevolute2D, SendEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(ConstraintRevolute2D, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
+    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
+    // Not registered because template
+    // void ConstraintRevolute2D::SetAnchor(const Vector2& anchor) | File: ../Urho2D/ConstraintRevolute2D.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetAnchor(const Vector2&in)", asMETHODPR(ConstraintRevolute2D, SetAnchor, (const Vector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void set_anchor(const Vector2&in)", asMETHODPR(ConstraintRevolute2D, SetAnchor, (const Vector2&), void), asCALL_THISCALL);
+    // void Animatable::SetAnimationEnabled(bool enable) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetAnimationEnabled(bool)", asMETHODPR(ConstraintRevolute2D, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void set_animationEnabled(bool)", asMETHODPR(ConstraintRevolute2D, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
+    // void Animatable::SetAnimationTime(float time) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetAnimationTime(float)", asMETHODPR(ConstraintRevolute2D, SetAnimationTime, (float), void), asCALL_THISCALL);
+    // void Constraint2D::SetAttachedConstraint(Constraint2D* constraint) | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetAttachedConstraint(Constraint2D@+)", asMETHODPR(ConstraintRevolute2D, SetAttachedConstraint, (Constraint2D*), void), asCALL_THISCALL);
+    // bool Serializable::SetAttribute(unsigned index, const Variant& value) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool SetAttribute(uint, const Variant&in)", asMETHODPR(ConstraintRevolute2D, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool set_attributes(uint, const Variant&in)", asMETHODPR(ConstraintRevolute2D, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
+    // bool Serializable::SetAttribute(const String& name, const Variant& value) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "bool SetAttribute(const String&in, const Variant&in)", asMETHODPR(ConstraintRevolute2D, SetAttribute, (const String&, const Variant&), bool), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode=WM_LOOP, float speed=1.0f) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetAttributeAnimation(const String&in, ValueAnimation@+, WrapMode = WM_LOOP, float = 1.0f)", asMETHODPR(ConstraintRevolute2D, SetAttributeAnimation, (const String&, ValueAnimation*, WrapMode, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationSpeed(const String& name, float speed) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetAttributeAnimationSpeed(const String&in, float)", asMETHODPR(ConstraintRevolute2D, SetAttributeAnimationSpeed, (const String&, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationTime(const String& name, float time) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetAttributeAnimationTime(const String&in, float)", asMETHODPR(ConstraintRevolute2D, SetAttributeAnimationTime, (const String&, float), void), asCALL_THISCALL);
+    // void Animatable::SetAttributeAnimationWrapMode(const String& name, WrapMode wrapMode) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetAttributeAnimationWrapMode(const String&in, WrapMode)", asMETHODPR(ConstraintRevolute2D, SetAttributeAnimationWrapMode, (const String&, WrapMode), void), asCALL_THISCALL);
+    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetBlockEvents(bool)", asMETHODPR(ConstraintRevolute2D, SetBlockEvents, (bool), void), asCALL_THISCALL);
+    // void Constraint2D::SetCollideConnected(bool collideConnected) | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetCollideConnected(bool)", asMETHODPR(ConstraintRevolute2D, SetCollideConnected, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void set_collideConnected(bool)", asMETHODPR(ConstraintRevolute2D, SetCollideConnected, (bool), void), asCALL_THISCALL);
+    // void Component::SetEnabled(bool enable) | File: ../Scene/Component.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetEnabled(bool)", asMETHODPR(ConstraintRevolute2D, SetEnabled, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void set_enabled(bool)", asMETHODPR(ConstraintRevolute2D, SetEnabled, (bool), void), asCALL_THISCALL);
+    // void ConstraintRevolute2D::SetEnableLimit(bool enableLimit) | File: ../Urho2D/ConstraintRevolute2D.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetEnableLimit(bool)", asMETHODPR(ConstraintRevolute2D, SetEnableLimit, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void set_enableLimit(bool)", asMETHODPR(ConstraintRevolute2D, SetEnableLimit, (bool), void), asCALL_THISCALL);
+    // void ConstraintRevolute2D::SetEnableMotor(bool enableMotor) | File: ../Urho2D/ConstraintRevolute2D.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetEnableMotor(bool)", asMETHODPR(ConstraintRevolute2D, SetEnableMotor, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void set_enableMotor(bool)", asMETHODPR(ConstraintRevolute2D, SetEnableMotor, (bool), void), asCALL_THISCALL);
+    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(ConstraintRevolute2D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(ConstraintRevolute2D, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    // void Serializable::SetInstanceDefault(bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetInstanceDefault(bool)", asMETHODPR(ConstraintRevolute2D, SetInstanceDefault, (bool), void), asCALL_THISCALL);
+    // void Serializable::SetInterceptNetworkUpdate(const String& attributeName, bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetInterceptNetworkUpdate(const String&in, bool)", asMETHODPR(ConstraintRevolute2D, SetInterceptNetworkUpdate, (const String&, bool), void), asCALL_THISCALL);
+    // void ConstraintRevolute2D::SetLowerAngle(float lowerAngle) | File: ../Urho2D/ConstraintRevolute2D.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetLowerAngle(float)", asMETHODPR(ConstraintRevolute2D, SetLowerAngle, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void set_lowerAngle(float)", asMETHODPR(ConstraintRevolute2D, SetLowerAngle, (float), void), asCALL_THISCALL);
+    // void ConstraintRevolute2D::SetMaxMotorTorque(float maxMotorTorque) | File: ../Urho2D/ConstraintRevolute2D.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetMaxMotorTorque(float)", asMETHODPR(ConstraintRevolute2D, SetMaxMotorTorque, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void set_maxMotorTorque(float)", asMETHODPR(ConstraintRevolute2D, SetMaxMotorTorque, (float), void), asCALL_THISCALL);
+    // void ConstraintRevolute2D::SetMotorSpeed(float motorSpeed) | File: ../Urho2D/ConstraintRevolute2D.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetMotorSpeed(float)", asMETHODPR(ConstraintRevolute2D, SetMotorSpeed, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void set_motorSpeed(float)", asMETHODPR(ConstraintRevolute2D, SetMotorSpeed, (float), void), asCALL_THISCALL);
+    // void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetObjectAnimation(ObjectAnimation@+)", asMETHODPR(ConstraintRevolute2D, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void set_objectAnimation(ObjectAnimation@+)", asMETHODPR(ConstraintRevolute2D, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
+    // void Animatable::SetObjectAnimationAttr(const ResourceRef& value) | File: ../Scene/Animatable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetObjectAnimationAttr(const ResourceRef&in)", asMETHODPR(ConstraintRevolute2D, SetObjectAnimationAttr, (const ResourceRef&), void), asCALL_THISCALL);
+    // void Constraint2D::SetOtherBody(RigidBody2D* body) | File: ../Urho2D/Constraint2D.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetOtherBody(RigidBody2D@+)", asMETHODPR(ConstraintRevolute2D, SetOtherBody, (RigidBody2D*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void set_otherBody(RigidBody2D@+)", asMETHODPR(ConstraintRevolute2D, SetOtherBody, (RigidBody2D*), void), asCALL_THISCALL);
+    // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetTemporary(bool)", asMETHODPR(ConstraintRevolute2D, SetTemporary, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void set_temporary(bool)", asMETHODPR(ConstraintRevolute2D, SetTemporary, (bool), void), asCALL_THISCALL);
+    // void ConstraintRevolute2D::SetUpperAngle(float upperAngle) | File: ../Urho2D/ConstraintRevolute2D.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void SetUpperAngle(float)", asMETHODPR(ConstraintRevolute2D, SetUpperAngle, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void set_upperAngle(float)", asMETHODPR(ConstraintRevolute2D, SetUpperAngle, (float), void), asCALL_THISCALL);
+    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
+    // Error: type "EventHandler*" can not automatically bind
+    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void UnsubscribeFromAllEvents()", asMETHODPR(ConstraintRevolute2D, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(ConstraintRevolute2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
+    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(ConstraintRevolute2D, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(ConstraintRevolute2D, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
+    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(ConstraintRevolute2D, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
+    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "int WeakRefs() const", asMETHODPR(ConstraintRevolute2D, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "int get_weakRefs() const", asMETHODPR(ConstraintRevolute2D, WeakRefs, () const, int), asCALL_THISCALL);
+    // void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attributeBits, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void WriteDeltaUpdate(Serializer&, const DirtyBits&in, uint8)", asMETHODPR(ConstraintRevolute2D, WriteDeltaUpdate, (Serializer&, const DirtyBits&, unsigned char), void), asCALL_THISCALL);
+    // void Serializable::WriteInitialDeltaUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void WriteInitialDeltaUpdate(Serializer&, uint8)", asMETHODPR(ConstraintRevolute2D, WriteInitialDeltaUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
+    // void Serializable::WriteLatestDataUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
+    engine->RegisterObjectMethod("ConstraintRevolute2D", "void WriteLatestDataUpdate(Serializer&, uint8)", asMETHODPR(ConstraintRevolute2D, WriteLatestDataUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
+#ifdef REGISTER_MANUAL_PART_Constraint2D
+    REGISTER_MANUAL_PART_Constraint2D(ConstraintRevolute2D, "ConstraintRevolute2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Component
+    REGISTER_MANUAL_PART_Component(ConstraintRevolute2D, "ConstraintRevolute2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Animatable
+    REGISTER_MANUAL_PART_Animatable(ConstraintRevolute2D, "ConstraintRevolute2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Serializable
+    REGISTER_MANUAL_PART_Serializable(ConstraintRevolute2D, "ConstraintRevolute2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_Object
+    REGISTER_MANUAL_PART_Object(ConstraintRevolute2D, "ConstraintRevolute2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_RefCounted
+    REGISTER_MANUAL_PART_RefCounted(ConstraintRevolute2D, "ConstraintRevolute2D")
+#endif
+#ifdef REGISTER_MANUAL_PART_ConstraintRevolute2D
+    REGISTER_MANUAL_PART_ConstraintRevolute2D(ConstraintRevolute2D, "ConstraintRevolute2D")
+#endif
+    RegisterSubclass<Constraint2D, ConstraintRevolute2D>(engine, "Constraint2D", "ConstraintRevolute2D");
+    RegisterSubclass<Component, ConstraintRevolute2D>(engine, "Component", "ConstraintRevolute2D");
+    RegisterSubclass<Animatable, ConstraintRevolute2D>(engine, "Animatable", "ConstraintRevolute2D");
+    RegisterSubclass<Serializable, ConstraintRevolute2D>(engine, "Serializable", "ConstraintRevolute2D");
+    RegisterSubclass<Object, ConstraintRevolute2D>(engine, "Object", "ConstraintRevolute2D");
+    RegisterSubclass<RefCounted, ConstraintRevolute2D>(engine, "RefCounted", "ConstraintRevolute2D");
 #endif
 
 #ifdef URHO3D_URHO2D

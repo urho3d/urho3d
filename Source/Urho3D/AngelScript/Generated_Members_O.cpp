@@ -31,12 +31,6 @@ static void Object_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Objec
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
 }
 
-// OcclusionBatch::~OcclusionBatch() | Implicitly-declared 
-static void OcclusionBatch_Destructor(OcclusionBatch* ptr)
-{
-    ptr->~OcclusionBatch();
-}
-
 // explicit ObjectAnimation::ObjectAnimation(Context* context) | File: ../Scene/ObjectAnimation.h
 static ObjectAnimation* ObjectAnimation_ObjectAnimation_Context()
 {
@@ -121,6 +115,12 @@ static void OffMeshConnection_UnsubscribeFromAllEventsExcept_PODVectorStringHash
 static OggVorbisSoundStream* OggVorbisSoundStream_OggVorbisSoundStream_Sound(const Sound *sound)
 {
     return new OggVorbisSoundStream(sound);
+}
+
+// OcclusionBatch::~OcclusionBatch() | Implicitly-declared 
+static void OcclusionBatch_Destructor(OcclusionBatch* ptr)
+{
+    ptr->~OcclusionBatch();
 }
 
 // OcclusionBufferData::~OcclusionBufferData() | Implicitly-declared 
@@ -236,28 +236,6 @@ void ASRegisterGenerated_Members_O(asIScriptEngine* engine)
     REGISTER_MANUAL_PART_Object(Object, "Object")
 #endif
     RegisterSubclass<RefCounted, Object>(engine, "RefCounted", "Object");
-
-    // unsigned OcclusionBatch::drawCount_ | File: ../Graphics/OcclusionBuffer.h
-    engine->RegisterObjectProperty("OcclusionBatch", "uint drawCount", offsetof(OcclusionBatch, drawCount_));
-    // unsigned OcclusionBatch::drawStart_ | File: ../Graphics/OcclusionBuffer.h
-    engine->RegisterObjectProperty("OcclusionBatch", "uint drawStart", offsetof(OcclusionBatch, drawStart_));
-    // const void* OcclusionBatch::indexData_ | File: ../Graphics/OcclusionBuffer.h
-    // const void* can not be registered
-    // unsigned OcclusionBatch::indexSize_ | File: ../Graphics/OcclusionBuffer.h
-    engine->RegisterObjectProperty("OcclusionBatch", "uint indexSize", offsetof(OcclusionBatch, indexSize_));
-    // Matrix3x4 OcclusionBatch::model_ | File: ../Graphics/OcclusionBuffer.h
-    engine->RegisterObjectProperty("OcclusionBatch", "Matrix3x4 model", offsetof(OcclusionBatch, model_));
-    // const void* OcclusionBatch::vertexData_ | File: ../Graphics/OcclusionBuffer.h
-    // const void* can not be registered
-    // unsigned OcclusionBatch::vertexSize_ | File: ../Graphics/OcclusionBuffer.h
-    engine->RegisterObjectProperty("OcclusionBatch", "uint vertexSize", offsetof(OcclusionBatch, vertexSize_));
-    // OcclusionBatch::~OcclusionBatch() | Implicitly-declared
-    engine->RegisterObjectBehaviour("OcclusionBatch", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(OcclusionBatch_Destructor), asCALL_CDECL_OBJFIRST);
-    // OcclusionBatch& OcclusionBatch::operator=(const OcclusionBatch&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<OcclusionBatch>(engine, "OcclusionBatch");
-#ifdef REGISTER_MANUAL_PART_OcclusionBatch
-    REGISTER_MANUAL_PART_OcclusionBatch(OcclusionBatch, "OcclusionBatch")
-#endif
 
     // void ObjectAnimation::AddAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode=WM_LOOP, float speed=1.0f) | File: ../Scene/ObjectAnimation.h
     engine->RegisterObjectMethod("ObjectAnimation", "void AddAttributeAnimation(const String&in, ValueAnimation@+, WrapMode = WM_LOOP, float = 1.0f)", asMETHODPR(ObjectAnimation, AddAttributeAnimation, (const String&, ValueAnimation*, WrapMode, float), void), asCALL_THISCALL);
@@ -1595,6 +1573,28 @@ void ASRegisterGenerated_Members_O(asIScriptEngine* engine)
 #endif
     RegisterSubclass<SoundStream, OggVorbisSoundStream>(engine, "SoundStream", "OggVorbisSoundStream");
     RegisterSubclass<RefCounted, OggVorbisSoundStream>(engine, "RefCounted", "OggVorbisSoundStream");
+
+    // unsigned OcclusionBatch::drawCount_ | File: ../Graphics/OcclusionBuffer.h
+    engine->RegisterObjectProperty("OcclusionBatch", "uint drawCount", offsetof(OcclusionBatch, drawCount_));
+    // unsigned OcclusionBatch::drawStart_ | File: ../Graphics/OcclusionBuffer.h
+    engine->RegisterObjectProperty("OcclusionBatch", "uint drawStart", offsetof(OcclusionBatch, drawStart_));
+    // const void* OcclusionBatch::indexData_ | File: ../Graphics/OcclusionBuffer.h
+    // const void* can not be registered
+    // unsigned OcclusionBatch::indexSize_ | File: ../Graphics/OcclusionBuffer.h
+    engine->RegisterObjectProperty("OcclusionBatch", "uint indexSize", offsetof(OcclusionBatch, indexSize_));
+    // Matrix3x4 OcclusionBatch::model_ | File: ../Graphics/OcclusionBuffer.h
+    engine->RegisterObjectProperty("OcclusionBatch", "Matrix3x4 model", offsetof(OcclusionBatch, model_));
+    // const void* OcclusionBatch::vertexData_ | File: ../Graphics/OcclusionBuffer.h
+    // const void* can not be registered
+    // unsigned OcclusionBatch::vertexSize_ | File: ../Graphics/OcclusionBuffer.h
+    engine->RegisterObjectProperty("OcclusionBatch", "uint vertexSize", offsetof(OcclusionBatch, vertexSize_));
+    // OcclusionBatch::~OcclusionBatch() | Implicitly-declared
+    engine->RegisterObjectBehaviour("OcclusionBatch", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(OcclusionBatch_Destructor), asCALL_CDECL_OBJFIRST);
+    // OcclusionBatch& OcclusionBatch::operator=(const OcclusionBatch&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<OcclusionBatch>(engine, "OcclusionBatch");
+#ifdef REGISTER_MANUAL_PART_OcclusionBatch
+    REGISTER_MANUAL_PART_OcclusionBatch(OcclusionBatch, "OcclusionBatch")
+#endif
 
     // int* OcclusionBufferData::data_ | File: ../Graphics/OcclusionBuffer.h
     // int* can not be registered
