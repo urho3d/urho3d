@@ -62,7 +62,8 @@ static shared_ptr<ASGeneratedFile_Members> _result_Members_Q;
 static shared_ptr<ASGeneratedFile_Members> _result_Members_R;
 static shared_ptr<ASGeneratedFile_Members> _result_Members_Sa_Sm;
 static shared_ptr<ASGeneratedFile_Members> _result_Members_Sn_Sz;
-static shared_ptr<ASGeneratedFile_Members> _result_Members_T;
+static shared_ptr<ASGeneratedFile_Members> _result_Members_Ta_Tm;
+static shared_ptr<ASGeneratedFile_Members> _result_Members_Tn_Tz;
 static shared_ptr<ASGeneratedFile_Members> _result_Members_U;
 static shared_ptr<ASGeneratedFile_Members> _result_Members_V;
 static shared_ptr<ASGeneratedFile_Members> _result_Members_W;
@@ -156,7 +157,17 @@ static shared_ptr<ASGeneratedFile_Members> GetGeneratedFile(const string& classN
     }
 
     if (StartsWith(className, "T"))
-        return _result_Members_T;
+    {
+        if (className.length() < 2)
+            return _result_Members_Ta_Tm;
+
+        char secondChar = className[1];
+        
+        if (secondChar >= 'n')
+            return _result_Members_Tn_Tz;
+        
+        return _result_Members_Ta_Tm;
+    }
 
     if (StartsWith(className, "U"))
         return _result_Members_U;
@@ -1342,7 +1353,8 @@ void ProcessAllClasses(const string& outputBasePath)
     _result_Members_R = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_R.cpp", "ASRegisterGenerated_Members_R");
     _result_Members_Sa_Sm = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_Sa_Sm.cpp", "ASRegisterGenerated_Members_Sa_Sm");
     _result_Members_Sn_Sz = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_Sn_Sz.cpp", "ASRegisterGenerated_Members_Sn_Sz");
-    _result_Members_T = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_T.cpp", "ASRegisterGenerated_Members_T");
+    _result_Members_Ta_Tm = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_Ta_Tm.cpp", "ASRegisterGenerated_Members_Ta_Tm");
+    _result_Members_Tn_Tz = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_Tn_Tz.cpp", "ASRegisterGenerated_Members_Tn_Tz");
     _result_Members_U = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_U.cpp", "ASRegisterGenerated_Members_U");
     _result_Members_V = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_V.cpp", "ASRegisterGenerated_Members_V");
     _result_Members_W = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_W.cpp", "ASRegisterGenerated_Members_W");
@@ -1396,7 +1408,8 @@ void ProcessAllClasses(const string& outputBasePath)
     _result_Members_R->Save();
     _result_Members_Sa_Sm->Save();
     _result_Members_Sn_Sz->Save();
-    _result_Members_T->Save();
+    _result_Members_Ta_Tm->Save();
+    _result_Members_Tn_Tz->Save();
     _result_Members_U->Save();
     _result_Members_V->Save();
     _result_Members_W->Save();

@@ -181,7 +181,8 @@ if (URHO3D_GENERATEBINDINGS)
                                                     "AngelScript/Generated_Members_R.cpp"
                                                     "AngelScript/Generated_Members_Sa_Sm.cpp"
                                                     "AngelScript/Generated_Members_Sn_Sz.cpp"
-                                                    "AngelScript/Generated_Members_T.cpp"
+                                                    "AngelScript/Generated_Members_Ta_Tm.cpp"
+                                                    "AngelScript/Generated_Members_Tn_Tz.cpp"
                                                     "AngelScript/Generated_Members_U.cpp"
                                                     "AngelScript/Generated_Members_V.cpp"
                                                     "AngelScript/Generated_Members_W.cpp"
@@ -231,7 +232,8 @@ if (URHO3D_GENERATEBINDINGS)
                                ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_R.cpp
                                ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Sa_Sm.cpp
                                ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Sn_Sz.cpp
-                               ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_T.cpp
+                               ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Ta_Tm.cpp
+                               ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Tn_Tz.cpp
                                ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_U.cpp
                                ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_V.cpp
                                ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_W.cpp
@@ -279,7 +281,8 @@ if (URHO3D_GENERATEBINDINGS)
                                   ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_R.cpp
                                   ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Sa_Sm.cpp
                                   ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Sn_Sz.cpp
-                                  ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_T.cpp
+                                  ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Ta_Tm.cpp
+                                  ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Tn_Tz.cpp
                                   ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_U.cpp
                                   ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_V.cpp
                                   ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_W.cpp
@@ -316,7 +319,8 @@ if (URHO3D_GENERATEBINDINGS)
                                                         ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_R.cpp
                                                         ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Sa_Sm.cpp
                                                         ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Sn_Sz.cpp
-                                                        ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_T.cpp
+                                                        ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Ta_Tm.cpp
+                                                        ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_Tn_Tz.cpp
                                                         ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_U.cpp
                                                         ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_V.cpp
                                                         ${CMAKE_SOURCE_DIR}/Source/Urho3D/AngelScript/Generated_Members_W.cpp
