@@ -29,55 +29,13 @@ namespace Urho3D
 
 class Context;
 
-/// Register the Math library to script.
-void RegisterMathAPI(asIScriptEngine* engine);
 /// Register the Core library to script.
 void RegisterCoreAPI(asIScriptEngine* engine);
-/// Register the IO library to script.
-void RegisterIOAPI(asIScriptEngine* engine);
-/// Register the Resource library to script.
-void RegisterResourceAPI(asIScriptEngine* engine);
 /// Register the Scene library to script.
 void RegisterSceneAPI(asIScriptEngine* engine);
-/// Register the Graphics library to script.
-void RegisterGraphicsAPI(asIScriptEngine* engine);
-/// Register the Input library to script.
-void RegisterInputAPI(asIScriptEngine* engine);
-/// Register the Audio library to script.
-void RegisterAudioAPI(asIScriptEngine* engine);
-/// Register the UI library to script.
-void RegisterUIAPI(asIScriptEngine* engine);
-#ifdef URHO3D_NETWORK
-/// Register the Network library to script.
-void RegisterNetworkAPI(asIScriptEngine* engine);
-#endif
-#ifdef URHO3D_DATABASE
-/// Register the Database library to script.
-void RegisterDatabaseAPI(asIScriptEngine* engine);
-#endif
-#ifdef URHO3D_IK
-/// Register the inverse kinematics library to script.
-void RegisterIKAPI(asIScriptEngine* engine);
-#endif
-#ifdef URHO3D_PHYSICS
-/// Register the Physics library to script.
-void RegisterPhysicsAPI(asIScriptEngine* engine);
-/// Register RaycastVehicle component to script.
-void RegisterRaycastVehicleAPI(asIScriptEngine* engine);
-#endif
-#ifdef URHO3D_NAVIGATION
-/// Register the Navigation library to script.
-void RegisterNavigationAPI(asIScriptEngine* engine);
-#endif
-#ifdef URHO3D_URHO2D
-/// Register the Urho2D library to script.
-void RegisterUrho2DAPI(asIScriptEngine* engine);
-#endif
 /// Register the Script interfaces to script.
 void RegisterScriptInterfaceAPI(asIScriptEngine* engine);
 /// Register the Script library to script.
 void RegisterScriptAPI(asIScriptEngine* engine);
-/// Register the Engine library to script.
-void RegisterEngineAPI(asIScriptEngine* engine);
 
 }

@@ -41,24 +41,32 @@ public:
     static void RegisterObject(Context* context);
 
     /// Set target.
+    /// @property
     void SetTarget(const Vector2& target);
     /// Set max force.
+    /// @property
     void SetMaxForce(float maxForce);
     /// Set frequency Hz.
+    /// @property
     void SetFrequencyHz(float frequencyHz);
     /// Set damping ratio.
+    /// @property
     void SetDampingRatio(float dampingRatio);
 
     /// Return target.
+    /// @property
     const Vector2& GetTarget() const { return target_; }
 
     /// Return max force.
+    /// @property
     float GetMaxForce() const { return jointDef_.maxForce; }
 
     /// Return frequency Hz.
+    /// @property
     float GetFrequencyHz() const { return jointDef_.frequencyHz; }
 
     /// Return damping ratio.
+    /// @property
     float GetDampingRatio() const { return jointDef_.dampingRatio; }
 
 private:

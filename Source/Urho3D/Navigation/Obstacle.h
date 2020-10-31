@@ -50,18 +50,23 @@ public:
     void OnSetEnabled() override;
 
     /// Get the height of this obstacle.
+    /// @property
     float GetHeight() const { return height_; }
 
     /// Set the height of this obstacle.
+    /// @property
     void SetHeight(float newHeight);
 
     /// Get the blocking radius of this obstacle.
+    /// @property
     float GetRadius() const { return radius_; }
 
     /// Set the blocking radius of this obstacle.
+    /// @property
     void SetRadius(float newRadius);
 
     /// Get the internal obstacle ID.
+    /// @property{get_obstacleId}
     unsigned GetObstacleID() const { return obstacleId_; }
 
     /// Render debug information.

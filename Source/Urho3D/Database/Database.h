@@ -56,12 +56,15 @@ public:
     void Disconnect(DbConnection* connection);
 
     /// Return true when using internal database connection pool. The internal database pool is managed by the Database subsystem itself and should not be confused with ODBC connection pool option when ODBC is being used.
+    /// @property
     bool IsPooling() const { return (bool)poolSize_; }
 
     /// Get internal database connection pool size.
+    /// @property
     unsigned GetPoolSize() const { return poolSize_; }
 
     /// Set internal database connection pool size.
+    /// @property
     void SetPoolSize(unsigned poolSize) { poolSize_ = poolSize; }
 
 private:

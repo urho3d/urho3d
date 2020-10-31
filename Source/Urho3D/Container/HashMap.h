@@ -273,7 +273,6 @@ public:
     /// Move-assign a hash map.
     HashMap& operator =(HashMap<T, U> && rhs) noexcept
     {
-        assert(&rhs != this);
         Swap(rhs);
         return *this;
     }

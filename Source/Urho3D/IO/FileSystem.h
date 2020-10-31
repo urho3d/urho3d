@@ -50,10 +50,12 @@ public:
     ~FileSystem() override;
 
     /// Set the current working directory.
+    /// @property
     bool SetCurrentDir(const String& pathName);
     /// Create a directory.
     bool CreateDir(const String& pathName);
     /// Set whether to execute engine console commands as OS-specific system command.
+    /// @property
     void SetExecuteConsoleCommands(bool enable);
     /// Run a program using the command interpreter, block until it exits and return the exit code. Will fail if any allowed paths are defined.
     int SystemCommand(const String& commandLine, bool redirectStdOutToLog = false);
@@ -77,9 +79,11 @@ public:
     bool SetLastModifiedTime(const String& fileName, unsigned newTime);
 
     /// Return the absolute current working directory.
+    /// @property
     String GetCurrentDir() const;
 
     /// Return whether is executing engine console commands as OS-specific system command.
+    /// @property
     bool GetExecuteConsoleCommands() const { return executeConsoleCommands_; }
 
     /// Return whether paths have been registered.
@@ -96,12 +100,15 @@ public:
     /// Scan a directory for specified files.
     void ScanDir(Vector<String>& result, const String& pathName, const String& filter, unsigned flags, bool recursive) const;
     /// Return the program's directory.
+    /// @property
     String GetProgramDir() const;
     /// Return the user documents directory.
+    /// @property
     String GetUserDocumentsDir() const;
     /// Return the application preferences directory.
     String GetAppPreferencesDir(const String& org, const String& app) const;
     /// Return path of temporary directory. Path always ends with a forward slash.
+    /// @property
     String GetTemporaryDir() const;
 
 private:

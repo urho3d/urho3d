@@ -51,16 +51,21 @@ public:
     void OnSetEditable() override;
 
     /// Set orientation type.
+    /// @property
     void SetOrientation(Orientation orientation);
     /// Set slider range maximum value (minimum value is always 0).
+    /// @property
     void SetRange(float range);
     /// Set slider current value.
+    /// @property
     void SetValue(float value);
     /// Change slider current value by a delta.
     void ChangeValue(float delta);
     /// Set button scroll step.
+    /// @property
     void SetScrollStep(float step);
     /// Set button step factor, can be used to adjust the step for constant pixel size.
+    /// @property
     void SetStepFactor(float factor);
     /// Scroll back one step.
     void StepBack();
@@ -68,28 +73,37 @@ public:
     void StepForward();
 
     /// Return scrollbar orientation.
+    /// @property
     Orientation GetOrientation() const;
     /// Return slider range.
+    /// @property
     float GetRange() const;
     /// Return slider current value.
+    /// @property
     float GetValue() const;
 
     /// Return button scroll step.
+    /// @property
     float GetScrollStep() const { return scrollStep_; }
 
     /// Return button step factor.
+    /// @property
     float GetStepFactor() const { return stepFactor_; }
 
     /// Return scroll step multiplied by factor.
+    /// @property
     float GetEffectiveScrollStep() const;
 
     /// Return back button element.
+    /// @property
     Button* GetBackButton() const { return backButton_; }
 
     /// Return forward button element.
+    /// @property
     Button* GetForwardButton() const { return forwardButton_; }
 
     /// Return slider element.
+    /// @property
     Slider* GetSlider() const { return slider_; }
 
 protected:

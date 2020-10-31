@@ -230,7 +230,6 @@ public:
     /// Move-assign a hash set.
     HashSet& operator =(HashSet<T> && rhs) noexcept
     {
-        assert(&rhs != this);
         Swap(rhs);
         return *this;
     }

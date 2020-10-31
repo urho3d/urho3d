@@ -100,6 +100,7 @@ public:
     /// Start NAT punchtrough client to allow remote connections.
     void StartNATClient();
     /// Get local server GUID.
+    /// @property{get_guid}
     const String& GetGUID() const { return guid_; }
     /// Attempt to connect to NAT server.
     void AttemptNATPunchtrough(const String& guid, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
@@ -114,10 +115,13 @@ public:
     /// Broadcast a remote event with the specified node as a sender. Is sent to all client connections in the node's scene.
     void BroadcastRemoteEvent(Node* node, StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
     /// Set network update FPS.
+    /// @property
     void SetUpdateFps(int fps);
     /// Set simulated latency in milliseconds. This adds a fixed delay before sending each packet.
+    /// @property
     void SetSimulatedLatency(int ms);
     /// Set simulated packet loss probability between 0.0 - 1.0.
+    /// @property
     void SetSimulatedPacketLoss(float probability);
     /// Register a remote event as allowed to be received. There is also a fixed blacklist of events that can not be allowed in any case, such as ConsoleCommand.
     void RegisterRemoteEvent(StringHash eventType);
@@ -126,6 +130,7 @@ public:
     /// Unregister all remote events.
     void UnregisterAllRemoteEvents();
     /// Set the package download cache directory.
+    /// @property
     void SetPackageCacheDir(const String& path);
     /// Trigger all client connections in the specified scene to download a package file from the server. Can be used to download additional resource packages when clients are already joined in the scene. The package must have been added as a requirement to the scene, or else the eventual download will fail.
     void SendPackageToClients(Scene* scene, PackageFile* package);
@@ -134,12 +139,15 @@ public:
     /// Ban specific IP addresses.
     void BanAddress(const String& address);
     /// Return network update FPS.
+    /// @property
     int GetUpdateFps() const { return updateFps_; }
 
     /// Return simulated latency in milliseconds.
+    /// @property
     int GetSimulatedLatency() const { return simulatedLatency_; }
 
     /// Return simulated packet loss probability.
+    /// @property
     float GetSimulatedPacketLoss() const { return simulatedPacketLoss_; }
 
 #ifndef __EMSCRIPTEN__
@@ -147,10 +155,13 @@ public:
     Connection* GetConnection(const SLNet::AddressOrGUID& connection) const;
 #endif
     /// Return the connection to the server. Null if not connected.
+    /// @property
     Connection* GetServerConnection() const;
     /// Return all client connections.
+    /// @property
     Vector<SharedPtr<Connection> > GetClientConnections() const;
     /// Return whether the server is running.
+    /// @property
     bool IsServerRunning() const;
     /// Return whether the UDP server is running.
     bool IsUDPServerRunning() const;
@@ -160,6 +171,7 @@ public:
     bool CheckRemoteEvent(StringHash eventType) const;
 
     /// Return the package download cache directory.
+    /// @property
     const String& GetPackageCacheDir() const { return packageCacheDir_; }
 
     /// Process incoming messages from connections. Called by HandleBeginFrame.

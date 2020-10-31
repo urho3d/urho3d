@@ -136,10 +136,13 @@ public:
     /// Save in WebP format with minimum (fastest) or specified compression. Return true if successful. Fails always if WebP support is not compiled in.
     bool SaveWEBP(const String& fileName, float compression = 0.0f) const;
     /// Whether this texture is detected as a cubemap, only relevant for DDS.
+    /// @property
     bool IsCubemap() const { return cubemap_; }
     /// Whether this texture has been detected as a volume, only relevant for DDS.
+    /// @property
     bool IsArray() const { return array_; }
     /// Whether this texture is in sRGB, only relevant for DDS.
+    /// @property
     bool IsSRGB() const { return sRGB_; }
 
     /// Return a 2D pixel color.
@@ -156,27 +159,34 @@ public:
     Color GetPixelTrilinear(float x, float y, float z) const;
 
     /// Return width.
+    /// @property
     int GetWidth() const { return width_; }
 
     /// Return height.
+    /// @property
     int GetHeight() const { return height_; }
 
     /// Return depth.
+    /// @property
     int GetDepth() const { return depth_; }
 
     /// Return number of color components.
+    /// @property
     unsigned GetComponents() const { return components_; }
 
     /// Return pixel data.
     unsigned char* GetData() const { return data_; }
 
     /// Return whether is compressed.
+    /// @property
     bool IsCompressed() const { return compressedFormat_ != CF_NONE; }
 
     /// Return compressed format.
+    /// @property
     CompressedFormat GetCompressedFormat() const { return compressedFormat_; }
 
     /// Return number of compressed mip levels. Returns 0 if the image is has not been loaded from a source file containing multiple mip levels.
+    /// @property
     unsigned GetNumCompressedLevels() const { return numCompressedLevels_; }
 
     /// Return next mip level by bilinear filtering. Note that if the image is already 1x1x1, will keep returning an image of that size.
@@ -196,6 +206,7 @@ public:
     /// Precalculate the mip levels. Used by asynchronous texture loading.
     void PrecalculateLevels();
     /// Whether this texture has an alpha channel.
+    /// @property
     bool HasAlphaChannel() const;
     /// Copy contents of the image into the defined rect, scaling if necessary. This image should already be large enough to include the rect. Compressed and 3D images are not supported.
     bool SetSubimage(const Image* image, const IntRect& rect);

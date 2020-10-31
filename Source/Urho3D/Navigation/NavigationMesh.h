@@ -107,32 +107,46 @@ public:
     void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
     /// Set tile size.
+    /// @property
     void SetTileSize(int size);
     /// Set cell size.
+    /// @property
     void SetCellSize(float size);
     /// Set cell height.
+    /// @property
     void SetCellHeight(float height);
     /// Set navigation agent height.
+    /// @property
     void SetAgentHeight(float height);
     /// Set navigation agent radius.
+    /// @property
     void SetAgentRadius(float radius);
     /// Set navigation agent max vertical climb.
+    /// @property
     void SetAgentMaxClimb(float maxClimb);
     /// Set navigation agent max slope.
+    /// @property
     void SetAgentMaxSlope(float maxSlope);
     /// Set region minimum size.
+    /// @property
     void SetRegionMinSize(float size);
     /// Set region merge size.
+    /// @property
     void SetRegionMergeSize(float size);
     /// Set edge max length.
+    /// @property
     void SetEdgeMaxLength(float length);
     /// Set edge max error.
+    /// @property
     void SetEdgeMaxError(float error);
     /// Set detail sampling distance.
+    /// @property
     void SetDetailSampleDistance(float distance);
     /// Set detail sampling maximum error.
+    /// @property
     void SetDetailSampleMaxError(float error);
     /// Set padding of the navigation mesh bounding box. Having enough padding allows to add geometry on the extremities of the navigation mesh when doing partial rebuilds.
+    /// @property
     void SetPadding(const Vector3& padding);
     /// Set the cost of an area.
     void SetAreaCost(unsigned areaID, float cost);
@@ -195,66 +209,86 @@ public:
     void SetMeshName(const String& newName);
 
     /// Return tile size.
+    /// @property
     int GetTileSize() const { return tileSize_; }
 
     /// Return cell size.
+    /// @property
     float GetCellSize() const { return cellSize_; }
 
     /// Return cell height.
+    /// @property
     float GetCellHeight() const { return cellHeight_; }
 
     /// Return navigation agent height.
+    /// @property
     float GetAgentHeight() const { return agentHeight_; }
 
     /// Return navigation agent radius.
+    /// @property
     float GetAgentRadius() const { return agentRadius_; }
 
     /// Return navigation agent max vertical climb.
+    /// @property
     float GetAgentMaxClimb() const { return agentMaxClimb_; }
 
     /// Return navigation agent max slope.
+    /// @property
     float GetAgentMaxSlope() const { return agentMaxSlope_; }
 
     /// Return region minimum size.
+    /// @property
     float GetRegionMinSize() const { return regionMinSize_; }
 
     /// Return region merge size.
+    /// @property
     float GetRegionMergeSize() const { return regionMergeSize_; }
 
     /// Return edge max length.
+    /// @property
     float GetEdgeMaxLength() const { return edgeMaxLength_; }
 
     /// Return edge max error.
+    /// @property
     float GetEdgeMaxError() const { return edgeMaxError_; }
 
     /// Return detail sampling distance.
+    /// @property
     float GetDetailSampleDistance() const { return detailSampleDistance_; }
 
     /// Return detail sampling maximum error.
+    /// @property
     float GetDetailSampleMaxError() const { return detailSampleMaxError_; }
 
     /// Return navigation mesh bounding box padding.
+    /// @property
     const Vector3& GetPadding() const { return padding_; }
 
     /// Get the current cost of an area.
     float GetAreaCost(unsigned areaID) const;
 
     /// Return whether has been initialized with valid navigation data.
+    /// @property
     bool IsInitialized() const { return navMesh_ != nullptr; }
 
     /// Return local space bounding box of the navigation mesh.
+    /// @property
     const BoundingBox& GetBoundingBox() const { return boundingBox_; }
 
     /// Return world space bounding box of the navigation mesh.
+    /// @property
     BoundingBox GetWorldBoundingBox() const;
 
     /// Return number of tiles.
+    /// @property
     IntVector2 GetNumTiles() const { return IntVector2(numTilesX_, numTilesZ_); }
 
     /// Set the partition type used for polygon generation.
+    /// @property
     void SetPartitionType(NavmeshPartitionType partitionType);
 
     /// Return Partition Type.
+    /// @property
     NavmeshPartitionType GetPartitionType() const { return partitionType_; }
 
     /// Set navigation data attribute.
@@ -263,15 +297,19 @@ public:
     virtual PODVector<unsigned char> GetNavigationDataAttr() const;
 
     /// Draw debug geometry for OffMeshConnection components.
+    /// @property
     void SetDrawOffMeshConnections(bool enable) { drawOffMeshConnections_ = enable; }
 
     /// Return whether to draw OffMeshConnection components.
+    /// @property
     bool GetDrawOffMeshConnections() const { return drawOffMeshConnections_; }
 
     /// Draw debug geometry for NavArea components.
+    /// @property
     void SetDrawNavAreas(bool enable) { drawNavAreas_ = enable; }
 
     /// Return whether to draw NavArea components.
+    /// @property
     bool GetDrawNavAreas() const { return drawNavAreas_; }
 
 private:

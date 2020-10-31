@@ -219,7 +219,6 @@ public:
     /// Move-assign from another list.
     List& operator =(List<T> && rhs) noexcept
     {
-        assert(&rhs != this);
         Swap(rhs);
         return *this;
     }
