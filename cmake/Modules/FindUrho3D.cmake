@@ -239,8 +239,8 @@ else ()
                     set (CMAKE_TRY_COMPILE_CONFIGURATION Debug)
                 endif ()
             elseif (APPLE AND ARM)
-                # Debug build does not produce universal binary library, so we could not test compile against the library
-                execute_process (COMMAND lipo -info ${URHO3D_LIBRARIES} COMMAND grep -cq arm RESULT_VARIABLE SKIP_COMPILE_TEST OUTPUT_QUIET ERROR_QUIET)
+                # Apple does not support 32-bit ARM anymore so skip the test and always assume to be arm64
+                set (SKIP_COMPILE_TEST 1)
             endif ()
             set (COMPILER_FLAGS "${COMPILER_32BIT_FLAG} ${CMAKE_REQUIRED_FLAGS}")
             if (SKIP_COMPILE_TEST)
@@ -266,13 +266,8 @@ else ()
             if (URHO3D_COMPILE_RESULT)
                 # Auto-discover build options used by the found library and export header
                 file (READ ${URHO3D_BASE_INCLUDE_DIR}/Urho3D.h EXPORT_HEADER)
-                if (APPLE AND ARM)
-                    # Since Urho3D library for Apple/ARM platforms is a universal binary (except when it was a Debug build), we need another way to find out the compiler ABI the library was built for
-                    execute_process (COMMAND lipo -info ${URHO3D_LIBRARIES} COMMAND grep -c x86_64 OUTPUT_VARIABLE ABI_64BIT ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
-                elseif (MSVC)
-                    if (COMPILER_STATIC_RUNTIME_FLAGS)
-                        set (EXPORT_HEADER "${EXPORT_HEADER}#define URHO3D_STATIC_RUNTIME\n")
-                    endif ()
+                if (MSVC AND COMPILER_STATIC_RUNTIME_FLAGS)
+                    set (EXPORT_HEADER "${EXPORT_HEADER}#define URHO3D_STATIC_RUNTIME\n")
                 endif ()
                 set (URHO3D_64BIT ${ABI_64BIT} CACHE BOOL "Enable 64-bit build, the value is auto-discovered based on the found Urho3D library" FORCE) # Force it as it is more authoritative than user-specified option
                 set (URHO3D_LIB_TYPE ${URHO3D_LIB_TYPE} CACHE STRING "Urho3D library type, the value is auto-discovered based on the found Urho3D library" FORCE) # Use the Force, Luke
