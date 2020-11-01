@@ -5,23 +5,28 @@
 
 #include "LinearMath/btScalar.h"
 
-#include <string.h>//memset
-#ifdef  USE_SIMD
+#include <string.h>  //memset
+#ifdef USE_SIMD
 #include <emmintrin.h>
 #ifdef BT_ALLOW_SSE4
 #include <intrin.h>
-#endif //BT_ALLOW_SSE4
-#endif //USE_SIMD
+#endif  //BT_ALLOW_SSE4
+#endif  //USE_SIMD
 
 #if defined BT_USE_NEON
-#define ARM_NEON_GCC_COMPATIBILITY  1
+#define ARM_NEON_GCC_COMPATIBILITY 1
 #include <arm_neon.h>
 #include <sys/types.h>
-// Urho3D - enable NEON on generic ARM
+
+// Urho3D: enable NEON on generic ARM
 #ifdef __APPLE__
-#include <sys/sysctl.h> //for sysctlbyname
+
+#include <sys/sysctl.h>  //for sysctlbyname
+
+// Urho3D
 #endif //__APPLE__
-#endif //BT_USE_NEON
+
+#endif                   //BT_USE_NEON
 
 ///Rudimentary btCpuFeatureUtility for CPU features: only report the features that Bullet actually uses (SSE4/FMA3, NEON_HPFP)
 ///We assume SSE2 in case BT_USE_SSE2 is defined in LinearMath/btScalar.h
@@ -30,14 +35,13 @@ class btCpuFeatureUtility
 public:
 	enum btCpuFeature
 	{
-		CPU_FEATURE_FMA3=1,
-		CPU_FEATURE_SSE4_1=2,
-		CPU_FEATURE_NEON_HPFP=4
+		CPU_FEATURE_FMA3 = 1,
+		CPU_FEATURE_SSE4_1 = 2,
+		CPU_FEATURE_NEON_HPFP = 4
 	};
 
 	static int getCpuFeatures()
 	{
-
 		static int capabilities = 0;
 		static bool testedCapabilities = false;
 		if (0 != testedCapabilities)
@@ -46,8 +50,10 @@ public:
 		}
 
 #ifdef BT_USE_NEON
-// Urho3D - enable NEON on generic ARM
+
+// Urho3D: enable NEON on generic ARM
 #ifdef __APPLE__
+
 		{
 			uint32_t hasFeature = 0;
 			size_t featureSize = sizeof(hasFeature);
@@ -55,16 +61,19 @@ public:
 			if (0 == err && hasFeature)
 				capabilities |= CPU_FEATURE_NEON_HPFP;
 		}
-#endif //__APPLE__
-#endif //BT_USE_NEON
 
-#ifdef  BT_ALLOW_SSE4
+// Urho3D
+#endif //__APPLE__
+
+#endif  //BT_USE_NEON
+
+#ifdef BT_ALLOW_SSE4
 		{
-			int					cpuInfo[4];
+			int cpuInfo[4];
 			memset(cpuInfo, 0, sizeof(cpuInfo));
-			unsigned long long	sseExt = 0;
+			unsigned long long sseExt = 0;
 			__cpuid(cpuInfo, 1);
-			
+
 			bool osUsesXSAVE_XRSTORE = cpuInfo[2] & (1 << 27) || false;
 			bool cpuAVXSuport = cpuInfo[2] & (1 << 28) || false;
 
@@ -86,14 +95,11 @@ public:
 				capabilities |= btCpuFeatureUtility::CPU_FEATURE_SSE4_1;
 			}
 		}
-#endif//BT_ALLOW_SSE4
+#endif  //BT_ALLOW_SSE4
 
 		testedCapabilities = true;
 		return capabilities;
 	}
-
-
 };
 
-
-#endif //BT_CPU_UTILITY_H
+#endif  //BT_CPU_UTILITY_H
