@@ -44,13 +44,13 @@ namespace Urho3D
 
 extern const char* GEOMETRY_CATEGORY;
 
-CustomGeometry::CustomGeometry(Context* context) :
-    Drawable(context, DRAWABLE_GEOMETRY),
-    vertexBuffer_(new VertexBuffer(context)),
-    elementMask_(MASK_POSITION),
-    geometryIndex_(0),
-    materialsAttr_(Material::GetTypeStatic()),
-    dynamic_(false)
+CustomGeometry::CustomGeometry(Context* context)
+    : Drawable(context, DRAWABLE_GEOMETRY)
+    , vertexBuffer_(new VertexBuffer(context))
+    , elementMask_(MASK_POSITION)
+    , geometryIndex_(0)
+    , materialsAttr_(Material::GetTypeStatic())
+    , dynamic_(false)
 {
     vertexBuffer_->SetShadowed(true);
     SetNumGeometries(1);
@@ -65,9 +65,9 @@ void CustomGeometry::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Dynamic Vertex Buffer", bool, dynamic_, false, AM_DEFAULT);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Geometry Data", GetGeometryDataAttr, SetGeometryDataAttr, PODVector<unsigned char>,
-        Variant::emptyBuffer, AM_FILE | AM_NOEDIT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Materials", GetMaterialsAttr, SetMaterialsAttr, ResourceRefList, ResourceRefList(Material::GetTypeStatic()),
-        AM_DEFAULT);
+                                    Variant::emptyBuffer, AM_FILE | AM_NOEDIT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Materials", GetMaterialsAttr, SetMaterialsAttr, ResourceRefList,
+                              ResourceRefList(Material::GetTypeStatic()), AM_DEFAULT);
     URHO3D_ATTRIBUTE("Is Occluder", bool, occluder_, false, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Cast Shadows", bool, castShadows_, false, AM_DEFAULT);
@@ -89,45 +89,45 @@ void CustomGeometry::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQ
 
     case RAY_OBB:
     case RAY_TRIANGLE:
+    {
+        Matrix3x4 inverse(node_->GetWorldTransform().Inverse());
+        Ray localRay = query.ray_.Transformed(inverse);
+        float distance = localRay.HitDistance(boundingBox_);
+        Vector3 normal = -query.ray_.direction_;
+
+        if (level == RAY_TRIANGLE && distance < query.maxDistance_)
         {
-            Matrix3x4 inverse(node_->GetWorldTransform().Inverse());
-            Ray localRay = query.ray_.Transformed(inverse);
-            float distance = localRay.HitDistance(boundingBox_);
-            Vector3 normal = -query.ray_.direction_;
+            distance = M_INFINITY;
 
-            if (level == RAY_TRIANGLE && distance < query.maxDistance_)
+            for (unsigned i = 0; i < batches_.Size(); ++i)
             {
-                distance = M_INFINITY;
-
-                for (unsigned i = 0; i < batches_.Size(); ++i)
+                Geometry* geometry = batches_[i].geometry_;
+                if (geometry)
                 {
-                    Geometry* geometry = batches_[i].geometry_;
-                    if (geometry)
+                    Vector3 geometryNormal;
+                    float geometryDistance = geometry->GetHitDistance(localRay, &geometryNormal);
+                    if (geometryDistance < query.maxDistance_ && geometryDistance < distance)
                     {
-                        Vector3 geometryNormal;
-                        float geometryDistance = geometry->GetHitDistance(localRay, &geometryNormal);
-                        if (geometryDistance < query.maxDistance_ && geometryDistance < distance)
-                        {
-                            distance = geometryDistance;
-                            normal = (node_->GetWorldTransform() * Vector4(geometryNormal, 0.0f)).Normalized();
-                        }
+                        distance = geometryDistance;
+                        normal = (node_->GetWorldTransform() * Vector4(geometryNormal, 0.0f)).Normalized();
                     }
                 }
             }
-
-            if (distance < query.maxDistance_)
-            {
-                RayQueryResult result;
-                result.position_ = query.ray_.origin_ + distance * query.ray_.direction_;
-                result.normal_ = normal;
-                result.distance_ = distance;
-                result.drawable_ = this;
-                result.node_ = node_;
-                result.subObject_ = M_MAX_UNSIGNED;
-                results.Push(result);
-            }
         }
-        break;
+
+        if (distance < query.maxDistance_)
+        {
+            RayQueryResult result;
+            result.position_ = query.ray_.origin_ + distance * query.ray_.direction_;
+            result.normal_ = normal;
+            result.distance_ = distance;
+            result.drawable_ = this;
+            result.node_ = node_;
+            result.subObject_ = M_MAX_UNSIGNED;
+            results.Push(result);
+        }
+    }
+    break;
 
     case RAY_TRIANGLE_UV:
         URHO3D_LOGWARNING("RAY_TRIANGLE_UV query level is not supported for CustomGeometry component");
@@ -195,7 +195,7 @@ bool CustomGeometry::DrawOcclusion(OcclusionBuffer* buffer)
 
         // Draw and check for running out of triangles
         success = buffer->AddTriangles(node_->GetWorldTransform(), vertexData, vertexSize, geometry->GetVertexStart(),
-            geometry->GetVertexCount());
+                                       geometry->GetVertexCount());
 
         if (!success)
             break;
@@ -211,7 +211,7 @@ Vector<Vector3> CustomGeometry::GetCircleShape(float radius, size_t iterations, 
     for (int i = 0; i < iterations; i++)
     {
         float curTheta1 = startTheta + ((float)i * stepSize);
-        float curTheta2 = startTheta + ((float)(i+1) * stepSize);
+        float curTheta2 = startTheta + ((float)(i + 1) * stepSize);
         float curX1 = radius * cos(curTheta1);
         float curY1 = radius * sin(curTheta1);
         float curX2 = radius * cos(curTheta2);
@@ -223,7 +223,7 @@ Vector<Vector3> CustomGeometry::GetCircleShape(float radius, size_t iterations, 
         if (i >= iterations - 1)
         {
             float curTheta = 0;
-            if (Abs(endTheta - startTheta) < (2*M_PI))
+            if (Abs(endTheta - startTheta) < (2 * M_PI))
                 curTheta = endTheta;
             float curX = radius * cos(curTheta);
             float curY = radius * sin(curTheta);
@@ -235,20 +235,21 @@ Vector<Vector3> CustomGeometry::GetCircleShape(float radius, size_t iterations, 
 
 Vector<Vector3> CustomGeometry::GetSquareShape(float size)
 {
-    Vector<Vector3> mSquareList = { Urho3D::Vector3(-(size / 2.0f),0,(size / 2.0f)),Urho3D::Vector3(-(size / 2.0f),0,-(size / 2.0f)),
-        Urho3D::Vector3((size / 2.0f), 0, -(size / 2.0f)),Urho3D::Vector3((size / 2.0f), 0, (size / 2.0f)) };
+    Vector<Vector3> mSquareList = {
+        Urho3D::Vector3(-(size / 2.0f), 0, (size / 2.0f)), Urho3D::Vector3(-(size / 2.0f), 0, -(size / 2.0f)),
+        Urho3D::Vector3((size / 2.0f), 0, -(size / 2.0f)), Urho3D::Vector3((size / 2.0f), 0, (size / 2.0f))};
     return mSquareList;
 }
 
-void CustomGeometry::MakeCircle(float radius, size_t iterations, float startTheta,
-    float endTheta, bool clear, int geomNum)
+void CustomGeometry::MakeCircle(float radius, size_t iterations, float startTheta, float endTheta, bool clear,
+                                int geomNum)
 {
     Vector<Vector3> mCircleShape = GetCircleShape(radius, iterations, startTheta, endTheta);
-    FillShape(mCircleShape,false,clear,geomNum);
+    FillShape(mCircleShape, false, clear, geomNum);
 }
 
-void CustomGeometry::MakeCircleGraph(const Vector<Pair<float, Urho3D::SharedPtr<Urho3D::Material> > >& parts,
-    int radius, int iterations)
+void CustomGeometry::MakeCircleGraph(const Vector<Pair<float, Urho3D::SharedPtr<Urho3D::Material>>>& parts, int radius,
+                                     int iterations)
 {
     if (parts.Size() > 0)
     {
@@ -269,8 +270,8 @@ void CustomGeometry::MakeCircleGraph(const Vector<Pair<float, Urho3D::SharedPtr<
         while (it != parts.End())
         {
             const auto current = (*it);
-            currentEndTheta = ((current.first_ / totalWeight)*(2 * M_PI)) + currentStartTheta;
-            MakeCircle(radius, (iterations / parts.Size()), currentStartTheta, currentEndTheta,false,count);
+            currentEndTheta = ((current.first_ / totalWeight) * (2 * M_PI)) + currentStartTheta;
+            MakeCircle(radius, (iterations / parts.Size()), currentStartTheta, currentEndTheta, false, count);
             if (current.second_.NotNull())
                 SetMaterial(count, current.second_);
             it++;
@@ -280,7 +281,7 @@ void CustomGeometry::MakeCircleGraph(const Vector<Pair<float, Urho3D::SharedPtr<
     }
 }
 
-void CustomGeometry::MakeShape(const Vector<Vector3>& pointList , bool connectTail)
+void CustomGeometry::MakeShape(const Vector<Vector3>& pointList, bool connectTail)
 {
     Clear();
     SetNumGeometries(1);
@@ -298,23 +299,25 @@ void CustomGeometry::MakeShape(const Vector<Vector3>& pointList , bool connectTa
             DefineVertex(current);
             DefineVertex(next);
         }
-
     }
     Commit();
 }
 
 void CustomGeometry::FillShape(const Vector<Vector3>& shapeList, bool connectTail, bool clear, int geomNum)
 {
-    if (shapeList.Size() > 0) {
+    if (shapeList.Size() > 0)
+    {
         int usedGeomNum = geomNum;
-        if (clear) {
+        if (clear)
+        {
             Clear();
             SetNumGeometries(1);
             usedGeomNum = 0;
         }
         BeginGeometry(usedGeomNum, PrimitiveType::TRIANGLE_STRIP);
         auto centerPoint = Vector3(0, 0, 0);
-        if (connectTail) {
+        if (connectTail)
+        {
             auto centerPoint = Average(shapeList.Begin(), shapeList.End());
         }
         Vector<Vector3> vertices(3);
@@ -323,20 +326,23 @@ void CustomGeometry::FillShape(const Vector<Vector3>& shapeList, bool connectTai
         Vector3 normal;
         auto it = shapeList.Begin();
         auto nextIt = it;
-        while (it != shapeList.End()) {
+        while (it != shapeList.End())
+        {
             nextIt = it + 1;
             if ((connectTail && nextIt == shapeList.End()) || nextIt != shapeList.End())
             {
                 current = (*it);
 
-                if (nextIt != shapeList.End()) {
+                if (nextIt != shapeList.End())
+                {
                     next = (*nextIt);
                 }
-                else {
+                else
+                {
                     next = (*shapeList.Begin());
                 }
 
-                vertices = { centerPoint, current, next };
+                vertices = {centerPoint, current, next};
 
                 normal = Average(vertices.Begin(), vertices.End());
                 normal.Normalize();
@@ -358,53 +364,58 @@ void CustomGeometry::FillShape(const Vector<Vector3>& shapeList, bool connectTai
 
 void CustomGeometry::MakeSphere(float radius, size_t iterations)
 {
-    //Create the geometry buffer
+    // Create the geometry buffer
     float angleStepSize = (2.0f * M_PI) / (float)iterations;
     Vector<Vector3> m_xyPoints;
-    for (int i = 0; i < iterations; i++) {
+    for (int i = 0; i < iterations; i++)
+    {
         float curTheta = i * angleStepSize;
-        for (int j = 0; j < iterations; j++) {
+        for (int j = 0; j < iterations; j++)
+        {
             float curPhi = j * angleStepSize;
             float curX = radius * cos(curTheta) * sin(curPhi);
             float curY = radius * sin(curTheta) * sin(curPhi);
             float curZ = radius * cos(curPhi);
-            m_xyPoints.Push(Vector3(curX,curY,curZ));
+            m_xyPoints.Push(Vector3(curX, curY, curZ));
         }
     }
 
     CreateQuadsFromBuffer(m_xyPoints, iterations, iterations, true);
 }
 
-void CustomGeometry::ProtrudeShape(const Vector<Vector3>& mShapeList,
-    const Vector<Vector3>& mPointList, bool connectTail)
+void CustomGeometry::ProtrudeShape(const Vector<Vector3>& mShapeList, const Vector<Vector3>& mPointList,
+                                   bool connectTail)
 {
     Vector3 centerPoint = Average(mShapeList.Begin(), mShapeList.End());
     Vector3 pointCurrent;
     Vector3 shapeCurrent;
     Vector3 shapePointVec;
     Vector3 shapePointDir;
-    Vector<Vector3> mPointBuffer(mShapeList.Size()*mPointList.Size()+mShapeList.Size());
+    Vector<Vector3> mPointBuffer(mShapeList.Size() * mPointList.Size() + mShapeList.Size());
 
     Vector<Vector3> mLastShapePos = mShapeList;
     auto pointIter = mPointList.Begin();
     auto shapeIter = mLastShapePos.Begin();
 
     int bufferCount = 0;
-    while (shapeIter != mLastShapePos.End()) {
+    while (shapeIter != mLastShapePos.End())
+    {
         mPointBuffer.At(bufferCount) = (*shapeIter);
         shapeIter++;
         bufferCount++;
     }
 
-
     int count = 0;
-    while (pointIter != mPointList.End()) {
+    while (pointIter != mPointList.End())
+    {
         shapeIter = mLastShapePos.Begin();
         pointCurrent = (*pointIter);
         count = 0;
-        while (shapeIter != mLastShapePos.End()) {
+        while (shapeIter != mLastShapePos.End())
+        {
             shapeCurrent = (*shapeIter);
-            if (shapeIter == mLastShapePos.Begin()) { //protrude from first point of the shape and create dir Vector to point
+            if (shapeIter == mLastShapePos.Begin())
+            { // protrude from first point of the shape and create dir Vector to point
                 shapePointVec = pointCurrent - centerPoint;
                 centerPoint = pointCurrent;
             }
@@ -423,33 +434,40 @@ void CustomGeometry::ProtrudeShape(const Vector<Vector3>& mShapeList,
     CreateQuadsFromBuffer(mPointBuffer, mPointList.Size() + 1, mShapeList.Size(), connectTail);
 }
 
-void CustomGeometry::CreateQuadsFromBuffer(const Vector<Vector3>& pointList, size_t zIterations,
-    size_t thetaIterations, bool connectTail)
+void CustomGeometry::CreateQuadsFromBuffer(const Vector<Vector3>& pointList, size_t zIterations, size_t thetaIterations,
+                                           bool connectTail)
 {
-    if (!connectTail) {
+    if (!connectTail)
+    {
         SetNumGeometries(3);
     }
-    else {
+    else
+    {
         SetNumGeometries(1);
     }
 
-    //Create the quads from the buffer
+    // Create the quads from the buffer
     BeginGeometry(0, Urho3D::PrimitiveType::TRIANGLE_STRIP);
-    for (size_t i = 0; i < zIterations; i++) {
-        if ((i >= zIterations - 1 && connectTail) || i < zIterations - 1) {
-            for (size_t j = 0; j < thetaIterations; j++) {
-                //if at the end connect to the beginning to complete pass
+    for (size_t i = 0; i < zIterations; i++)
+    {
+        if ((i >= zIterations - 1 && connectTail) || i < zIterations - 1)
+        {
+            for (size_t j = 0; j < thetaIterations; j++)
+            {
+                // if at the end connect to the beginning to complete pass
                 size_t iplus = i + 1;
                 size_t jplus = j + 1;
-                if (i >= zIterations - 1) {
+                if (i >= zIterations - 1)
+                {
                     iplus = 0;
                 }
-                if (j >= thetaIterations - 1) {
+                if (j >= thetaIterations - 1)
+                {
                     jplus = 0;
                 }
                 Vector<Vector3> avList;
-                avList = { pointList.At((i*thetaIterations) + j) ,pointList.At((iplus*thetaIterations)+
-                    j) ,pointList.At((i*thetaIterations) + jplus) };
+                avList = {pointList.At((i * thetaIterations) + j), pointList.At((iplus * thetaIterations) + j),
+                          pointList.At((i * thetaIterations) + jplus)};
                 Vector3 normal = Average(avList.Begin(), avList.End());
                 normal.Normalize();
                 DefineVertex(avList.At(0));
@@ -458,8 +476,8 @@ void CustomGeometry::CreateQuadsFromBuffer(const Vector<Vector3>& pointList, siz
                 DefineNormal(normal);
                 avList.Clear();
 
-                avList = { pointList.At((i*thetaIterations) + j) ,pointList.At((iplus*thetaIterations)+
-                    j) ,pointList.At((iplus*thetaIterations) + jplus) };
+                avList = {pointList.At((i * thetaIterations) + j), pointList.At((iplus * thetaIterations) + j),
+                          pointList.At((iplus * thetaIterations) + jplus)};
                 normal = Average(avList.Begin(), avList.End());
                 normal.Normalize();
                 DefineVertex(avList.At(0));
@@ -472,8 +490,9 @@ void CustomGeometry::CreateQuadsFromBuffer(const Vector<Vector3>& pointList, siz
     }
     Commit();
 
-    if (!connectTail) {
-        //fill in the head and tail
+    if (!connectTail)
+    {
+        // fill in the head and tail
         auto tailBegin = pointList.Begin();
         auto tailEnd = pointList.Begin() + thetaIterations;
         Vector<Vector3> tail(tailBegin, tailEnd);
@@ -488,9 +507,10 @@ void CustomGeometry::CreateQuadsFromBuffer(const Vector<Vector3>& pointList, siz
 
 void CustomGeometry::MakeSquare(float size)
 {
-    Vector<Vector3> mSquareList = { Urho3D::Vector3(-(size / 2.0f),0,(size / 2.0f)),Urho3D::Vector3(-(size / 2.0f),0,-(size / 2.0f)),
-        Urho3D::Vector3((size / 2.0f), 0, -(size / 2.0f)),Urho3D::Vector3((size / 2.0f), 0, (size / 2.0f)) };
-    FillShape(mSquareList,true);
+    Vector<Vector3> mSquareList = {
+        Urho3D::Vector3(-(size / 2.0f), 0, (size / 2.0f)), Urho3D::Vector3(-(size / 2.0f), 0, -(size / 2.0f)),
+        Urho3D::Vector3((size / 2.0f), 0, -(size / 2.0f)), Urho3D::Vector3((size / 2.0f), 0, (size / 2.0f))};
+    FillShape(mSquareList, true);
 }
 
 void CustomGeometry::Clear()
@@ -587,8 +607,8 @@ void CustomGeometry::DefineTangent(const Vector4& tangent)
     elementMask_ |= MASK_TANGENT;
 }
 
-void CustomGeometry::DefineGeometry(unsigned index, PrimitiveType type, unsigned numVertices, bool hasNormals, bool hasColors,
-    bool hasTexCoords, bool hasTangents)
+void CustomGeometry::DefineGeometry(unsigned index, PrimitiveType type, unsigned numVertices, bool hasNormals,
+                                    bool hasColors, bool hasTexCoords, bool hasTangents)
 {
     if (index > geometries_.Size())
     {
@@ -731,8 +751,9 @@ Material* CustomGeometry::GetMaterial(unsigned index) const
 
 CustomGeometryVertex* CustomGeometry::GetVertex(unsigned geometryIndex, unsigned vertexNum)
 {
-    return (geometryIndex < vertices_.Size() && vertexNum < vertices_[geometryIndex].Size()) ?
-           &vertices_[geometryIndex][vertexNum] : nullptr;
+    return (geometryIndex < vertices_.Size() && vertexNum < vertices_[geometryIndex].Size())
+               ? &vertices_[geometryIndex][vertexNum]
+               : nullptr;
 }
 
 void CustomGeometry::SetGeometryDataAttr(const PODVector<unsigned char>& value)
@@ -821,4 +842,4 @@ void CustomGeometry::OnWorldBoundingBoxUpdate()
     worldBoundingBox_ = boundingBox_.Transformed(node_->GetWorldTransform());
 }
 
-}
+} // namespace Urho3D
