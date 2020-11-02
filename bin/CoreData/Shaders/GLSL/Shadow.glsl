@@ -13,10 +13,15 @@ void VS()
     mat4 modelMatrix = iModelMatrix;
     vec3 worldPos = GetWorldPos(modelMatrix);
     gl_Position = GetClipPos(worldPos);
-    #ifdef VSM_SHADOW
-        vTexCoord = vec4(GetTexCoord(iTexCoord), gl_Position.z, gl_Position.w);
+
+    #ifdef NOUV
+        vTexCoord.xy = vec2(0.0, 0.0);
     #else
-        vTexCoord = GetTexCoord(iTexCoord);
+        vTexCoord.xy = GetTexCoord(iTexCoord);
+    #endif
+
+    #ifdef VSM_SHADOW
+        vTexCoord.zw = gl_Position.zw;
     #endif
 }
 

@@ -253,7 +253,7 @@ void PS(
         float3 lightDir;
         float3 lightColor;
         float3 finalColor;
-        float atten = 1;
+        float atten = 1.0;
 
         #if defined(DIRLIGHT)
             atten = GetAtten(normal, iWorldPos.xyz, lightDir);

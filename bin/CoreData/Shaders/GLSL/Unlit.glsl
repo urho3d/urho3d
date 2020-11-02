@@ -15,7 +15,11 @@ void VS()
     mat4 modelMatrix = iModelMatrix;
     vec3 worldPos = GetWorldPos(modelMatrix);
     gl_Position = GetClipPos(worldPos);
-    vTexCoord = GetTexCoord(iTexCoord);
+    #ifdef NOUV
+        vTexCoord = vec2(0.0, 0.0);
+    #else
+        vTexCoord = GetTexCoord(iTexCoord);
+    #endif
     vWorldPos = vec4(worldPos, GetDepth(gl_Position));
 
     #ifdef VERTEXCOLOR

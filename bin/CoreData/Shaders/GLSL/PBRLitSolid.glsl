@@ -57,13 +57,17 @@ void VS()
         vColor = iColor;
     #endif
 
+    #ifdef NOUV
+        vTexCoord.xy = vec2(0.0, 0.0);
+    #else
+        vTexCoord.xy = GetTexCoord(iTexCoord);
+    #endif
+
     #if defined(NORMALMAP) || defined(DIRBILLBOARD)
         vec4 tangent = GetWorldTangent(modelMatrix);
         vec3 bitangent = cross(tangent.xyz, vNormal) * tangent.w;
-        vTexCoord = vec4(GetTexCoord(iTexCoord), bitangent.xy);
+        vTexCoord.zw = bitangent.xy;
         vTangent = vec4(tangent.xyz, bitangent.z);
-    #else
-        vTexCoord = GetTexCoord(iTexCoord);
     #endif
 
     #ifdef PERPIXEL
@@ -174,7 +178,7 @@ void PS()
         vec3 lightDir;
         vec3 finalColor;
 
-        float atten = 1;
+        float atten = 1.0;
 
         #if defined(DIRLIGHT)
             atten = GetAtten(normal, vWorldPos.xyz, lightDir);

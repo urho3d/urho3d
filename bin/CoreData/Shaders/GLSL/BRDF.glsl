@@ -28,7 +28,7 @@
         float f0 = (ior - airIor) / (ior + airIor);
         float max_ior = 2.5;
         f0 = clamp(f0 * f0, 0.0, (max_ior - airIor) / (max_ior + airIor));
-        return specular * (f0   + (1 - f0) * pow(2, (-5.55473 * LdotH - 6.98316) * LdotH));
+        return specular * (f0   + (1.0 - f0) * pow(2.0, (-5.55473 * LdotH - 6.98316) * LdotH));
     }
 
     //Get Fresnel

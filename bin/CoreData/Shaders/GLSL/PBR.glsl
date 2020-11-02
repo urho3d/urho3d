@@ -10,9 +10,9 @@
 
     vec3 SphereLight(vec3 worldPos, vec3 lightVec, vec3 normal, vec3 toCamera, float roughness, vec3 specColor, vec3 diffColor, out float ndl)
     {
-        float specEnergy = 1.0f;
+        float specEnergy = 1.0;
 
-        float radius = cLightRad / 100;
+        float radius = cLightRad / 100.0;
         float rough2 = max(roughness, 0.08);
         rough2 *= rough2;
 
@@ -27,7 +27,7 @@
         if(ndl < sinAlpha)
         {
             ndl = max(ndl, -sinAlpha);
-            ndl = ((sinAlpha + ndl) * (sinAlpha + ndl)) / (4 * sinAlpha);
+            ndl = ((sinAlpha + ndl) * (sinAlpha + ndl)) / (4.0 * sinAlpha);
         }
 
         float sphereAngle = clamp(radius * invDistToLight, 0.0, 1.0);
@@ -35,7 +35,7 @@
         specEnergy = rough2 / (rough2 + 0.5f * sphereAngle);
         specEnergy *= specEnergy;                           
 
-        vec3 R = 2 * dot(toCamera, normal) * normal - toCamera;
+        vec3 R = 2.0 * dot(toCamera, normal) * normal - toCamera;
         R = GetSpecularDominantDir(normal, R, roughness);
 
         // Find closest point on sphere to ray
@@ -63,8 +63,8 @@
 
     vec3 TubeLight(vec3 worldPos, vec3 lightVec, vec3 normal, vec3 toCamera, float roughness, vec3 specColor, vec3 diffColor, out float ndl)
     {
-        float radius      = cLightRad / 100;
-        float len         = cLightLength / 10; 
+        float radius      = cLightRad / 100.0;
+        float len         = cLightLength / 10.0; 
         vec3 pos         = (cLightPosPS.xyz - worldPos);
         vec3 reflectVec  = reflect(-toCamera, normal);
         

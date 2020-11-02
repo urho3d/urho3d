@@ -9,7 +9,12 @@ void VS()
     mat4 modelMatrix = iModelMatrix;
     vec3 worldPos = GetWorldPos(modelMatrix);
     gl_Position = GetClipPos(worldPos);
-    vTexCoord = vec3(GetTexCoord(iTexCoord), GetDepth(gl_Position));
+    #ifdef NOUV
+        vTexCoord.xy = vec2(0.0, 0.0);
+    #else
+        vTexCoord.xy = GetTexCoord(iTexCoord);
+    #endif
+    vTexCoord.z = GetDepth(gl_Position);
 }
 
 void PS()

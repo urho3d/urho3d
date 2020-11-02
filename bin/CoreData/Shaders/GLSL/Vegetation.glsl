@@ -70,13 +70,17 @@ void VS()
         vColor = iColor;
     #endif
 
+    #ifdef NOUV
+        vTexCoord.xy = vec2(0.0, 0.0);
+    #else
+        vTexCoord.xy = GetTexCoord(iTexCoord);
+    #endif
+
     #ifdef NORMALMAP
         vec4 tangent = GetWorldTangent(modelMatrix);
         vec3 bitangent = cross(tangent.xyz, vNormal) * tangent.w;
-        vTexCoord = vec4(GetTexCoord(iTexCoord), bitangent.xy);
+        vTexCoord.zw = bitangent.xy;
         vTangent = vec4(tangent.xyz, bitangent.z);
-    #else
-        vTexCoord = GetTexCoord(iTexCoord);
     #endif
 
     #ifdef PERPIXEL
