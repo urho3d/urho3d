@@ -39,6 +39,14 @@ public:
     explicit AbstractFile(unsigned int size) : Deserializer(size) { }
     /// Destruct.
     ~AbstractFile() override = default;
+    /// Change the file name. Used by the resource system.
+    void SetName(const String& name);
+    /// Return the file name.
+    const String& GetName() const override { return fileName_; }
+
+private:
+    /// File name.
+    String fileName_;
 };
 
 }

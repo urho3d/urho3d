@@ -144,7 +144,7 @@ bool File::Open(PackageFile* package, const String& fileName)
         return false;
     }
 
-    fileName_ = fileName;
+    SetName(fileName);
     offset_ = entry->offset_;
     checksum_ = entry->checksum_;
     size_ = entry->size_;
@@ -411,11 +411,6 @@ void File::Flush()
         fflush((FILE*)handle_);
 }
 
-void File::SetName(const String& name)
-{
-    fileName_ = name;
-}
-
 bool File::IsOpen() const
 {
 #ifdef __ANDROID__
@@ -515,7 +510,7 @@ bool File::OpenInternal(const String& fileName, FileMode mode, bool fromPackage)
         offset_ = 0;
     }
 
-    fileName_ = fileName;
+    SetName(fileName);
     mode_ = mode;
     position_ = 0;
     checksum_ = 0;
