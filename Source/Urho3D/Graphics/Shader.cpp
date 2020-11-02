@@ -183,11 +183,10 @@ bool Shader::ProcessSource(String& code, Deserializer& source)
         if (line.StartsWith("#include"))
         {
             String includeFileName;
-            if (source.GetName().Empty()) {
+            if (source.GetName().Empty())
                 includeFileName = GetPath(GetName()) + line.Substring(9).Replaced("\"", "").Trimmed();
-            } else {
+            else
                 includeFileName = GetPath(source.GetName()) + line.Substring(9).Replaced("\"", "").Trimmed();
-            }
 
             SharedPtr<File> includeFile = cache->GetFile(includeFileName);
             if (!includeFile)
