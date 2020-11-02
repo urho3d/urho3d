@@ -208,7 +208,8 @@ Vector<Vector3> CustomGeometry::GetCircleShape(float radius, size_t iterations, 
 {
     float stepSize = (endTheta - startTheta) / (float)iterations;
     Vector<Vector3> shapeList;
-    for (int i = 0; i < iterations; i++) {
+    for (int i = 0; i < iterations; i++)
+    {
         float curTheta1 = startTheta + ((float)i * stepSize);
         float curTheta2 = startTheta + ((float)(i+1) * stepSize);
         float curX1 = radius * cos(curTheta1);
@@ -219,14 +220,14 @@ Vector<Vector3> CustomGeometry::GetCircleShape(float radius, size_t iterations, 
         shapeList.Push(Urho3D::Vector3(curX1, 0, curY1));
         shapeList.Push(Urho3D::Vector3(curX2, 0, curY2));
 
-        if (i >= iterations - 1) {
-            float curTheta =0;
-            if (Abs(endTheta - startTheta) < (2*M_PI)) {
+        if (i >= iterations - 1)
+        {
+            float curTheta = 0;
+            if (Abs(endTheta - startTheta) < (2*M_PI))
                 curTheta = endTheta;
-            }
             float curX = radius * cos(curTheta);
             float curY = radius * sin(curTheta);
-            shapeList.Push(Urho3D::Vector3(curX, 0, curY));
+            shapeList.Push(Vector3(curX, 0, curY));
         }
     }
     return shapeList;
@@ -249,11 +250,13 @@ void CustomGeometry::MakeCircle(float radius, size_t iterations, float startThet
 void CustomGeometry::MakeCircleGraph(const Vector<Pair<float, Urho3D::SharedPtr<Urho3D::Material> > >& parts,
     int radius, int iterations)
 {
-    if (parts.Size() > 0) {
+    if (parts.Size() > 0)
+    {
         float totalWeight = 0;
         SetNumGeometries(parts.Size());
         auto it = parts.Begin();
-        while (it != parts.End()) {
+        while (it != parts.End())
+        {
             const auto current = (*it);
             totalWeight += current.first_;
             it++;
@@ -263,13 +266,13 @@ void CustomGeometry::MakeCircleGraph(const Vector<Pair<float, Urho3D::SharedPtr<
         float currentStartTheta = 0;
         float currentEndTheta = 0;
         int count = 0;
-        while (it != parts.End()) {
+        while (it != parts.End())
+        {
             const auto current = (*it);
             currentEndTheta = ((current.first_ / totalWeight)*(2 * M_PI)) + currentStartTheta;
             MakeCircle(radius, (iterations / parts.Size()), currentStartTheta, currentEndTheta,false,count);
-            if (current.second_.NotNull()) {
+            if (current.second_.NotNull())
                 SetMaterial(count, current.second_);
-            }
             it++;
             count++;
             currentStartTheta = currentEndTheta;
@@ -284,13 +287,14 @@ void CustomGeometry::MakeShape(const Vector<Vector3>& pointList , bool connectTa
     BeginGeometry(0, Urho3D::PrimitiveType::LINE_STRIP);
     Vector3 current;
     Vector3 next;
-    for (size_t i = 0; i < pointList.Size(); i++) {
-        if ((connectTail && i >= pointList.Size() - 1) || i < pointList.Size() - 1) {
+    for (size_t i = 0; i < pointList.Size(); i++)
+    {
+        if ((connectTail && i >= pointList.Size() - 1) || i < pointList.Size() - 1)
+        {
             current = pointList[i];
             next = pointList[0];
-            if (i < pointList.Size() - 1) {
+            if (i < pointList.Size() - 1)
                 next = pointList[i + 1];
-            }
             DefineVertex(current);
             DefineVertex(next);
         }
