@@ -140,7 +140,7 @@ jobs:
             android/urho3d-lib/build/distributions/*.zip
             android/urho3d-lib/build/libs/*.jar
             build/*.out
-        if: github.event_name == 'push' || matrix.platform == 'linux-clang-tidy' == matrix.platform != 'linux-clang-format'
+        if: github.event_name == 'push'
       - name: Publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
