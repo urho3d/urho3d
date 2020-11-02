@@ -458,7 +458,7 @@ bool File::OpenInternal(const String& fileName, FileMode mode, bool fromPackage)
         }
         else
         {
-            fileName_ = fileName;
+            SetName(fileName);
             mode_ = mode;
             position_ = 0;
             if (!fromPackage)
