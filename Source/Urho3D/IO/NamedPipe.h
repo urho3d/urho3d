@@ -54,8 +54,8 @@ public:
     unsigned Write(const void* data, unsigned size) override;
     /// Return whether pipe has no data available.
     bool IsEof() const override;
-    /// Return the pipe name.
-    const String& GetName() const override { return pipeName_; }
+    /// Sets the name of the pipe
+    void SetName(const String& name) override;
 
     /// Open the pipe in either server or client mode. If already open, the existing pipe is closed. For a client end to open successfully the server end must already to be open. Return true if successful.
     bool Open(const String& pipeName, bool isServer);
@@ -70,8 +70,6 @@ public:
     bool IsServer() const { return isServer_; }
 
 private:
-    /// Pipe name.
-    String pipeName_;
     /// Server mode flag.
     bool isServer_;
     /// Pipe handle.

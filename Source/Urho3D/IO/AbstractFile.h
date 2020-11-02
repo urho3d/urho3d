@@ -40,13 +40,13 @@ public:
     /// Destruct.
     ~AbstractFile() override = default;
     /// Change the file name. Used by the resource system.
-    void SetName(const String& name);
+    virtual void SetName(const String& name) { name_ = name; }
     /// Return the file name.
-    const String& GetName() const override { return fileName_; }
+    const String& GetName() const override { return name_; }
 
-private:
+protected:
     /// File name.
-    String fileName_;
+    String name_;
 };
 
 }
