@@ -144,7 +144,7 @@ bool File::Open(PackageFile* package, const String& fileName)
         return false;
     }
 
-    SetName(fileName);
+    name_ = fileName;
     offset_ = entry->offset_;
     checksum_ = entry->checksum_;
     size_ = entry->size_;
@@ -458,7 +458,7 @@ bool File::OpenInternal(const String& fileName, FileMode mode, bool fromPackage)
         }
         else
         {
-            SetName(fileName);
+            name_ = fileName;
             mode_ = mode;
             position_ = 0;
             if (!fromPackage)
@@ -510,7 +510,7 @@ bool File::OpenInternal(const String& fileName, FileMode mode, bool fromPackage)
         offset_ = 0;
     }
 
-    SetName(fileName);
+    name_ = fileName;
     mode_ = mode;
     position_ = 0;
     checksum_ = 0;
