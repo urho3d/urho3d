@@ -194,12 +194,12 @@ if (URHO3D_GENERATEBINDINGS)
                                                     "AngelScript/Generated_GlobalFunctions.cpp"
                                                     "AngelScript/Generated_Templates.h")
 
-    find_package (Doxygen REQUIRED)
-    
+    find_package (Doxygen 1.8.17 REQUIRED)
+
     if (NOT DOXYGEN_FOUND)
-        message (FATAL_ERROR Doxygen required to generate bindings)
+        message (FATAL_ERROR "Doxygen >= 1.8.17 required to generate bindings")
     endif ()
-    
+
     # Generating Doxyfile
     configure_file (${CMAKE_SOURCE_DIR}/Source/Tools/BindingGenerator/Doxyfile.in ${CMAKE_BINARY_DIR}/Source/Tools/BindingGenerator/generated/Doxyfile)
 
