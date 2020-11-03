@@ -26,6 +26,9 @@ desc 'Invoke CMake to configure and generate a build tree'
 task :cmake => [:init] do
   if ENV['CI']
     system 'cmake --version' or abort 'Failed to find CMake'
+    if ENV['USE_CCACHE'] && /\[cache clear\]/ =~ `git log --format=%B -n1`
+      system 'bash', '-c', 'rm -rf ~/.{ccache,gradle}' or abort 'Failed to clear the build cache'
+    end
   end
   next if ENV['PLATFORM'] == 'android' || (Dir.exist?("#{build_tree}") and not ARGV.include?('cmake'))
   script = "script/cmake_#{ENV['GENERATOR']}#{ENV['OS'] ? '.bat' : '.sh'}"
@@ -196,9 +199,6 @@ task :ci do
   ENV['URHO3D_STYLE'] = '1' if ENV['MODIFIER'] == 'clang-format'
   # Enable all the bells and whistles
   %w[URHO3D_DATABASE_SQLITE URHO3D_EXTRAS].each { |it| ENV[it] = '1' }
-  if ENV['USE_CCACHE'] && /\[cache clear\]/ =~ `git log --format=%B -n1`
-    system 'bash', '-c', 'rm -rf ~/.{ccache,gradle}' or abort 'Failed to clear the build cache'
-  end
 end
 
 task :ci_publish_web do
