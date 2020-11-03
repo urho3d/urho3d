@@ -23,9 +23,6 @@
 # Define target name
 set (TARGET_NAME Urho3D)
 
-setup_lint ()
-
-
 if ((APPLE AND NOT ARM) OR WIN32)
     
     set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake/Modules)
