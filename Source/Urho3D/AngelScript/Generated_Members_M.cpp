@@ -2,19 +2,8 @@
 
 #include "../Precompiled.h"
 #include "../AngelScript/APITemplates.h"
-
-#include "../Core/Mutex.h"
-#include "../Graphics/Material.h"
-#include "../Graphics/Model.h"
-#include "../Math/Matrix2.h"
-#include "../Math/Matrix3.h"
-#include "../Math/Matrix3x4.h"
-#include "../Math/Matrix4.h"
-#ifdef URHO3D_PHYSICS
-#include "../Physics/PhysicsWorld.h"
-#endif
-#include "../UI/Menu.h"
-#include "../UI/MessageBox.h"
+#include "../AngelScript/GeneratedIncludes.h"
+#include "../AngelScript/GeneratedGlue.h"
 
 #include "../AngelScript/Manual.h"
 

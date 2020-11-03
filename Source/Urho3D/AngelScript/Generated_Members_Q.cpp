@@ -2,8 +2,8 @@
 
 #include "../Precompiled.h"
 #include "../AngelScript/APITemplates.h"
-
-#include "../Math/Quaternion.h"
+#include "../AngelScript/GeneratedIncludes.h"
+#include "../AngelScript/GeneratedGlue.h"
 
 #include "../AngelScript/Manual.h"
 

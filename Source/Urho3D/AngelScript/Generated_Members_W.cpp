@@ -2,10 +2,8 @@
 
 #include "../Precompiled.h"
 #include "../AngelScript/APITemplates.h"
-
-#include "../Core/WorkQueue.h"
-#include "../Graphics/Graphics.h"
-#include "../UI/Window.h"
+#include "../AngelScript/GeneratedIncludes.h"
+#include "../AngelScript/GeneratedGlue.h"
 
 #include "../AngelScript/Manual.h"
 

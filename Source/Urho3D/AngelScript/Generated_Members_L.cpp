@@ -2,17 +2,8 @@
 
 #include "../Precompiled.h"
 #include "../AngelScript/APITemplates.h"
-
-#include "../Container/LinkedList.h"
-#include "../Container/ListBase.h"
-#include "../Graphics/Batch.h"
-#include "../Graphics/Light.h"
-#include "../Graphics/View.h"
-#include "../IO/Log.h"
-#include "../Resource/Localization.h"
-#include "../Scene/LogicComponent.h"
-#include "../UI/LineEdit.h"
-#include "../UI/ListView.h"
+#include "../AngelScript/GeneratedIncludes.h"
+#include "../AngelScript/GeneratedGlue.h"
 
 #include "../AngelScript/Manual.h"
 

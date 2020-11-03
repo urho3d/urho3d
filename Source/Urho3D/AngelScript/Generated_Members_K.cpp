@@ -2,6 +2,8 @@
 
 #include "../Precompiled.h"
 #include "../AngelScript/APITemplates.h"
+#include "../AngelScript/GeneratedIncludes.h"
+#include "../AngelScript/GeneratedGlue.h"
 
 #include "../AngelScript/Manual.h"
 

@@ -2,15 +2,8 @@
 
 #include "../Precompiled.h"
 #include "../AngelScript/APITemplates.h"
-
-#include "../Container/HashBase.h"
-#include "../Core/Timer.h"
-#ifdef URHO3D_NETWORK
-#include "../Network/HttpRequest.h"
-#endif
-#ifdef URHO3D_PHYSICS
-#include "../Physics/CollisionShape.h"
-#endif
+#include "../AngelScript/GeneratedIncludes.h"
+#include "../AngelScript/GeneratedGlue.h"
 
 #include "../AngelScript/Manual.h"
 

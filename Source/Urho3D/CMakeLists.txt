@@ -203,8 +203,11 @@ if (URHO3D_GENERATEBINDINGS)
                             "AngelScript/Generated_Members_Z.cpp"
                             "AngelScript/Generated_Members_Other.cpp"
                             "AngelScript/Generated_GlobalVariables.cpp"
-                            "AngelScript/Generated_GlobalFunctions.cpp"
-                            "AngelScript/Generated_Templates.h")
+                            "AngelScript/GeneratedGlobalFunctions.cpp"
+                            "AngelScript/GeneratedGlue.cpp"
+                            "AngelScript/GeneratedGlue.h"                                                    
+                            "AngelScript/Generated_Templates.h"
+                            "AngelScript/GeneratedIncludes.h")
 
     set (AS_GENERATED_FILES_FULL_PATHS "${AS_GENERATED_FILES}")
     # Add "${CMAKE_SOURCE_DIR}/Source/Urho3D/" to every item in list

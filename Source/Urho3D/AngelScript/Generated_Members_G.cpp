@@ -2,14 +2,8 @@
 
 #include "../Precompiled.h"
 #include "../AngelScript/APITemplates.h"
-
-#include "../Graphics/GPUObject.h"
-#include "../Graphics/Geometry.h"
-#include "../Graphics/Graphics.h"
-#include "../Graphics/Model.h"
-#ifdef URHO3D_PHYSICS
-#include "../Physics/CollisionShape.h"
-#endif
+#include "../AngelScript/GeneratedIncludes.h"
+#include "../AngelScript/GeneratedGlue.h"
 
 #include "../AngelScript/Manual.h"
 

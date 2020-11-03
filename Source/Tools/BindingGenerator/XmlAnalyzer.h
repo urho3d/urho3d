@@ -34,6 +34,9 @@
 using namespace pugi;
 using namespace std;
 
+// <type>...</type> | <defval>...</defval> | <para>...</para>
+string RemoveRefs(xml_node node);
+
 // <type>...</type>
 class TypeAnalyzer
 {
@@ -50,6 +53,9 @@ private:
 
 public:
     TypeAnalyzer(xml_node type, const map<string, string>& templateSpecialization = map<string, string>());
+    
+    // Used for doxygen bug workaround https://github.com/doxygen/doxygen/issues/7732
+    TypeAnalyzer(const string& typeName);
 
     string ToString() const { return fullType_; }
     string GetName() const { return name_; }
@@ -76,7 +82,8 @@ public:
     ParamAnalyzer(xml_node param, const map<string, string>& templateSpecialization = map<string, string>());
 
     xml_node GetNode() const { return node_; }
-    string ToString() const; // "type name"
+    
+    string ToString() const;
 
     // <param>
     //     <type>....</type>
@@ -88,7 +95,7 @@ public:
 
     // <param>
     //     <defval>....</defval>
-    string GetDefval() const; // Default value
+    string GetDefaultValue() const;
 };
 
 // <memberdef>
@@ -128,12 +135,6 @@ string ExtractDefinition(xml_node memberdef);
 //     <argsstring>...</argsstring>
 string ExtractArgsstring(xml_node memberdef);
 
-// <memberdef kind="function">
-//     <templateparamlist>
-//         <param>...</param>
-//         <param>...</param>
-vector<string> ExtractTemplateParams(xml_node memberdef);
-
 // <memberdef prot="...">
 string ExtractProt(xml_node memberdef);
 
@@ -151,6 +152,10 @@ vector<ParamAnalyzer> ExtractParams(xml_node memberdef, const map<string, string
 //     <param>...</param>
 string JoinParamsTypes(xml_node memberdef, const map<string, string>& templateSpecialization = map<string, string>());
 string JoinParamsNames(xml_node memberdef, bool skipContext = false);
+
+// <memberdef kind="function">
+//     ...
+string GetFunctionLocation(xml_node memberdef);
 
 // <compounddef|memberdef id="...">
 string ExtractID(xml_node node);
@@ -185,7 +190,11 @@ string ExtractHeaderFile(xml_node node);
 //     <templateparamlist>
 bool IsTemplate(xml_node node);
 
-// ============================================================================
+// <compounddef|memberdef>
+//     <templateparamlist>
+//         <param>...</param>
+//         <param>...</param>
+vector<string> ExtractTemplateParams(xml_node node);
 
 // <compounddef kind="namespace">
 //     <sectiondef kind="enum">
@@ -211,8 +220,6 @@ public:
 
 };
 
-// ============================================================================
-
 // <compounddef kind="namespace">
 //     <sectiondef kind="var">
 //         <memberdef kind="variable">...</memberdef>
@@ -231,7 +238,17 @@ public:
     string GetLocation() const;
 };
 
-// ============================================================================
+struct ClassTemplateSpecialization
+{
+    string alias_;
+    map<string, string> specialization_;
+
+    ClassTemplateSpecialization(const string& alias = string(), const map<string, string>& templateSpecialization = map<string, string>())
+        : alias_(alias)
+        , specialization_(templateSpecialization)
+    {
+    }
+};
 
 class ClassFunctionAnalyzer;
 class ClassVariableAnalyzer;
@@ -241,37 +258,50 @@ class ClassAnalyzer
 {
 private:
     xml_node compounddef_;
+    string alias_;
+    map<string, string> templateSpecialization_;
     
     vector<xml_node> GetMemberdefs() const;
 
 public:
-    ClassAnalyzer(xml_node compounddef);
+    string usingLocation_;
+
+    ClassAnalyzer(xml_node compounddef, const string& alias = string(), const map<string, string>& templateSpecialization = map<string, string>());
+    ClassAnalyzer(xml_node compounddef, const ClassTemplateSpecialization& specialization) : ClassAnalyzer(compounddef, specialization.alias_, specialization.specialization_) {}
+
+    xml_node GetCompounddef() const { return compounddef_; }
+    const map<string, string>& GetTemplateSpecialization() const { return templateSpecialization_; }
 
     string GetClassName() const;
-    string GetComment() const { return ExtractComment(compounddef_); }
-    string GetHeaderFile() const { return ExtractHeaderFile(compounddef_); }
-    string GetKind() const { return ExtractKind(compounddef_); }
-    bool IsInternal() const;
-    bool IsTemplate() const { return ::IsTemplate(compounddef_); }
-    vector<ClassFunctionAnalyzer> GetFunctions() const;
-    vector<ClassVariableAnalyzer> GetVariables() const;
-    bool ContainsFunction(const string& name) const;
-    ClassFunctionAnalyzer GetFunction(const string& name) const;
-    int NumFunctions(const string& name) const;
-    bool IsRefCounted() const { return ContainsFunction("AddRef") && ContainsFunction("ReleaseRef"); }
-    bool HasDestructor() const { return ContainsFunction("~" + GetClassName()); }
-    bool HasThisConstructor() const;
-    bool IsAbstract() const;
-    string GetLocation() const { return GetKind() + " " + GetClassName() + " | File: " + GetHeaderFile(); }
+    bool IsRefCounted() const;
     bool AllFloats() const;
     bool AllInts() const;
     bool IsPod() const;
+    bool HasThisConstructor() const;
+    bool IsAbstract() const;
+    bool IsInternal() const;
+    int NumFunctions(const string& name) const;
     shared_ptr<ClassAnalyzer> GetBaseClass() const;
     vector<ClassAnalyzer> GetBaseClasses() const;
     vector<ClassAnalyzer> GetAllBaseClasses() const;
-};
+    string GetNameWithTemplateSpecialization() const;
+    vector<ClassFunctionAnalyzer> GetFunctions() const;
+    vector<ClassFunctionAnalyzer> GetThisFunctions() const;
+    vector<ClassVariableAnalyzer> GetVariables() const;
+    bool ContainsFunction(const string& name) const;
+    ClassFunctionAnalyzer GetFunction(const string& name) const;
 
-// ============================================================================
+    string GetBindedClassName() const { return alias_.empty() ? GetClassName() : alias_; }
+    string GetComment() const { return ExtractComment(compounddef_); }
+    string GetHeaderFile() const { return ExtractHeaderFile(compounddef_); }
+    string GetKind() const { return ExtractKind(compounddef_); }
+    bool IsTemplate() const { return ::IsTemplate(compounddef_); }
+    bool HasDestructor() const { return ContainsFunction("~" + GetClassName()); }
+    string GetLocation() const { return JoinNonEmpty({ usingLocation_, GetKind() + " " + GetClassName() + " | File: " + GetHeaderFile() }, " | "); }
+    vector<string> GetTemplateParams() const { return ExtractTemplateParams(compounddef_); }
+    bool HasDerivedClasses() const { return compounddef_.child("derivedcompoundref"); }
+    string GenerateIdentifier() const { return ToIdentifier(GetNameWithTemplateSpecialization()); }
+};
 
 // <compounddef kind="class|struct">
 //     <sectiondef>
@@ -286,6 +316,8 @@ public:
     ClassAnalyzer GetClass() const { return classAnalyzer_; }
     xml_node GetMemberdef() const { return memberdef_; }
 
+    map<string, string> GetTemplateSpecialization() { return classAnalyzer_.GetTemplateSpecialization(); }
+
     // <memberdef kind="function" virt="...">
     string GetVirt() const;
     bool IsPureVirtual() const { return GetVirt() == "pure-virtual"; }
@@ -299,6 +331,8 @@ public:
 
     string GetName() const { return ExtractName(memberdef_); }
     string GetClassName() const { return classAnalyzer_.GetClassName(); }
+    string GetBindedClassName() const { return classAnalyzer_.GetBindedClassName(); }
+    string GetNameWithTemplateSpecialization() const { return classAnalyzer_.GetNameWithTemplateSpecialization(); }
     string GetContainsClassName() const; // May this function defined in parent class, so return name o class, real define this function
     string GetLine() const { return ExtractLine(memberdef_); }
     string GetColumn() const { return ExtractColumn(memberdef_); }
@@ -309,7 +343,7 @@ public:
     bool IsParentConstructor() const;
     bool IsThisDestructor() const { return GetName() == "~" + GetClassName(); }
     bool IsParentDestructor() const;
-    string GetLocation() const;
+    string GetLocation() const { return JoinNonEmpty({ classAnalyzer_.usingLocation_, GetFunctionLocation(memberdef_) }, " | "); }
     string GetHeaderFile() const { return ExtractHeaderFile(memberdef_); }
     TypeAnalyzer GetReturnType(const map<string, string>& templateSpecialization = map<string, string>()) const { return ExtractType(memberdef_, templateSpecialization); }
     bool CanBeGetProperty() const;
@@ -319,12 +353,10 @@ public:
     bool IsDefine() const { return CONTAINS(SourceData::defines_, GetName()); }
     bool IsDeleted() const { return EndsWith(ExtractArgsstring(memberdef_), "=delete"); }
     bool IsConsversionOperator() const { return StartsWith(GetName(), "operator "); }
-    vector<ParamAnalyzer> GetParams() const { return ExtractParams(memberdef_); }
+    vector<ParamAnalyzer> GetParams(const map<string, string>& templateSpecialization = map<string, string>()) const { return ExtractParams(memberdef_, templateSpecialization); }
     string JoinParamsNames(bool skipContext = false) const { return ::JoinParamsNames(memberdef_, skipContext); }
     string JoinParamsTypes() const { return ::JoinParamsTypes(memberdef_); }
 };
-
-// ============================================================================
 
 // <compounddef kind="class|struct">
 //     <sectiondef>
@@ -348,33 +380,32 @@ public:
     bool IsArray() const { return StartsWith(ExtractArgsstring(memberdef_), "["); };
 };
 
-// ============================================================================
-
 // <compounddef kind="namespace">
 //     <sectiondef kind="func">
 //         <memberdef kind="function">...</memberdef>
 class GlobalFunctionAnalyzer
 {
     xml_node memberdef_;
+    map<string, string> templateSpecialization_;
 
 public:
-    GlobalFunctionAnalyzer(xml_node memberdef);
+    GlobalFunctionAnalyzer(xml_node memberdef, const map<string, string>& templateSpecialization = map<string, string>());
+
+    xml_node GetMemberdef() const { return memberdef_; }
+    const map<string, string>& GetTemplateSpecialization() const { return templateSpecialization_; }
 
     string GetName() const { return ExtractName(memberdef_); }
     string GetHeaderFile() const { return ExtractHeaderFile(memberdef_); }
     bool IsTemplate() const { return ::IsTemplate(memberdef_); }
     string GetComment() const { return ExtractComment(memberdef_); }
-    vector<ParamAnalyzer> GetParams(const map<string, string>& templateSpecialization = map<string, string>()) const { return ExtractParams(memberdef_, templateSpecialization); }
-    TypeAnalyzer GetReturnType(const map<string, string>& templateSpecialization = map<string, string>()) const { return ExtractType(memberdef_, templateSpecialization); }
-    xml_node GetMemberdef() const { return memberdef_; }
+    vector<ParamAnalyzer> GetParams() const { return ExtractParams(memberdef_, templateSpecialization_); }
+    TypeAnalyzer GetReturnType() const { return ExtractType(memberdef_, templateSpecialization_); }
     vector<string> GetTemplateParams() const { return ExtractTemplateParams(memberdef_); }
     string JoinParamsNames() const { return ::JoinParamsNames(memberdef_); }
     string JoinParamsTypes() const { return ::JoinParamsTypes(memberdef_); }
     bool IsDefine() const { return CONTAINS(SourceData::defines_, GetName()); }
-    string GetLocation() const;
+    string GetLocation() const { return GetFunctionLocation(memberdef_); }
 };
-
-// ============================================================================
 
 // <compounddef kind="class|struct">
 //     <sectiondef kind="public-static-func">
@@ -385,7 +416,7 @@ class ClassStaticFunctionAnalyzer
     xml_node memberdef_;
 
 public:
-    ClassStaticFunctionAnalyzer(ClassAnalyzer classAnalyzer, xml_node memberdef);
+    ClassStaticFunctionAnalyzer(const ClassAnalyzer& classAnalyzer, xml_node memberdef);
 
     string GetName() const { return ExtractName(memberdef_); }
     string GetHeaderFile() const { return ExtractHeaderFile(memberdef_); }
@@ -399,10 +430,8 @@ public:
     bool IsDefine() const { return CONTAINS(SourceData::defines_, GetName()); };
     string JoinParamsNames() const { return ::JoinParamsNames(memberdef_); }
     string JoinParamsTypes() const { return ::JoinParamsTypes(memberdef_); };
-    string GetLocation() const;
+    string GetLocation() const { return GetFunctionLocation(memberdef_); }
 };
-
-// ============================================================================
 
 // <memberdef kind="typedef">
 //     <definition>using ...</definition>
@@ -414,10 +443,12 @@ private:
 public:
     UsingAnalyzer(xml_node memberdef);
 
-    string GetIdentifier() const;
+    string GetName() const { return ExtractName(memberdef_); }
+    string GetHeaderFile() const { return ExtractHeaderFile(memberdef_); }
+    TypeAnalyzer GetType() const { return ExtractType(memberdef_); }
+    string GetComment() const { return ExtractComment(memberdef_); }
+    string GetLocation() const { return "using " + GetName() + " = " + GetType().ToString() + " | File: " + GetHeaderFile(); }
 };
-
-// ============================================================================
 
 // <compounddef kind = "namespace">...</compounddef>
 class NamespaceAnalyzer

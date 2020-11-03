@@ -2,34 +2,8 @@
 
 #include "../Precompiled.h"
 #include "../AngelScript/APITemplates.h"
-
-#include "../Container/RefCounted.h"
-#include "../Core/Variant.h"
-#include "../Graphics/OctreeQuery.h"
-#include "../Graphics/RenderPath.h"
-#include "../Graphics/RenderSurface.h"
-#include "../Graphics/Renderer.h"
-#include "../Graphics/RibbonTrail.h"
-#include "../Math/Ray.h"
-#include "../Math/Rect.h"
-#ifdef URHO3D_NETWORK
-#include "../Network/Connection.h"
-#endif
-#ifdef URHO3D_PHYSICS
-#include "../Physics/RaycastVehicle.h"
-#endif
-#ifdef URHO3D_PHYSICS
-#include "../Physics/RigidBody.h"
-#endif
-#include "../Resource/Resource.h"
-#include "../Resource/ResourceCache.h"
-#include "../Scene/ReplicationState.h"
-#ifdef URHO3D_URHO2D
-#include "../Urho2D/Renderer2D.h"
-#endif
-#ifdef URHO3D_URHO2D
-#include "../Urho2D/RigidBody2D.h"
-#endif
+#include "../AngelScript/GeneratedIncludes.h"
+#include "../AngelScript/GeneratedGlue.h"
 
 #include "../AngelScript/Manual.h"
 

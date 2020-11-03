@@ -2,13 +2,8 @@
 
 #include "../Precompiled.h"
 #include "../AngelScript/APITemplates.h"
-
-#include "../Scene/UnknownComponent.h"
-#include "../UI/UI.h"
-#include "../UI/UIBatch.h"
-#include "../UI/UIComponent.h"
-#include "../UI/UIElement.h"
-#include "../UI/UISelectable.h"
+#include "../AngelScript/GeneratedIncludes.h"
+#include "../AngelScript/GeneratedGlue.h"
 
 #include "../AngelScript/Manual.h"
 

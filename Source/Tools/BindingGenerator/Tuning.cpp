@@ -29,24 +29,22 @@
 // Some parts of the engine are compiled only if there are defines
 string InsideDefine(const string& headerFile)
 {
-    string dir = WithoutFileName(headerFile);
-
-    if (dir == "../Network")
+    if (StartsWith(headerFile, "../Network/"))
         return "URHO3D_NETWORK";
 
-    if (dir == "../Database")
+    if (StartsWith(headerFile, "../Database/"))
         return "URHO3D_DATABASE";
 
-    if (dir == "../IK")
+    if (StartsWith(headerFile, "../IK/"))
         return "URHO3D_IK";
 
-    if (dir == "../Physics")
+    if (StartsWith(headerFile, "../Physics/"))
         return "URHO3D_PHYSICS";
 
-    if (dir == "../Navigation")
+    if (StartsWith(headerFile, "../Navigation/"))
         return "URHO3D_NAVIGATION";
 
-    if (dir == "../Urho2D")
+    if (StartsWith(headerFile, "../Urho2D/"))
         return "URHO3D_URHO2D";
 
     return string();
