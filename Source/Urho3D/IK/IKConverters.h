@@ -20,6 +20,9 @@
 // THE SOFTWARE.
 //
 
+/// \file
+/// @nobindfile
+
 #pragma once
 
 #include "../Math/Quaternion.h"

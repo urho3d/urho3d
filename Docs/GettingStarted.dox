@@ -44,7 +44,7 @@ Although all required third-party libraries are included as source code, there a
 
 - For macOS, iOS, and tvOS, the Xcode developer tools package should include everything necessary. Make sure that the Xcode command line tools are also installed. Homebrew is required to install 'cmake' and some of the optional development packages, such as ccache, doxygen, graphviz, and readline.
 
-- For Android, the Android Studio (version 3.1.3 or later) should include everything necessary. Make sure that Android SDK build tool (26.1.1 or later), SDK-bundled CMake (3.6.4111459 or later), and Android NDK (r17 or later) are also installed.
+- For Android, the Android Studio (version 4.0 or later) should include everything necessary. Make sure the Android NDK r21d is installed with the Android SDK Manager and CMake version 3.17.3 is installed on the host machine. Adjust the "buildSrc/src/main/kotlin/UrhoCommon.kt" accordingly if your host has different NDK and CMake version.
 
 - For Web, the Emscripten SDK (version 1.39.0 or later) needs to be installed with the upstream LLVM WASM backend is activated. On Windows host also MinGW-W64 compiler toolchain is required.
 
@@ -111,7 +111,7 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_64BIT         |*|Enable 64-bit build, the default is set based on the native ABI of the chosen compiler toolchain|
 |URHO3D_ANGELSCRIPT   |1|Enable AngelScript scripting support|
 |URHO3D_LUA           |1|Enable Lua scripting support|
-|URHO3D_LUAJIT        |0|Enable Lua scripting support using LuaJIT (check LuaJIT's CMakeLists.txt for more options)|
+|URHO3D_LUAJIT        |1|Enable Lua scripting support using LuaJIT (check LuaJIT's CMakeLists.txt for more options)|
 |URHO3D_LUAJIT_AMALG  |*|Enable LuaJIT amalgamated build (LuaJIT only); default to true when LuaJIT is enabled|
 |URHO3D_SAFE_LUA      |0|Enable Lua C++ wrapper safety checks (Lua/LuaJIT only)|
 |URHO3D_LUA_RAW_SCRIPT_LOADER  |0|Prefer loading raw script files from the file system before falling back on Urho3D resource cache. Useful for debugging (e.g. breakpoints), but less performant (Lua/LuaJIT only)|
@@ -152,6 +152,7 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_LIB_TYPE      |STATIC|Specify Urho3D library type, possible values are STATIC (default) and SHARED (not available for Emscripten)|
 |URHO3D_SCP_TO_TARGET |-|Use scp to transfer executables to target system (RPI and generic ARM cross-compiling build only), SSH digital key must be setup first for this to work, typical value has a pattern of usr@tgt:remote-loc|
 |URHO3D_UPDATE_SOURCE_TREE|0|Enable commands to copy back some of the generated build artifacts from build tree to source tree to facilitate devs to push them as part of a commit (for library devs with push right only)|
+|URHO3D_GENERATEBINDINGS|0|Enable script API binding generation|
 |URHO3D_USE_LIB64_RPM |0|Enable 64-bit RPM CPack generator using /usr/lib64 and disable all other generators (Debian-based host only, which uses /usr/lib by default)|
 |URHO3D_USE_LIB_DEB   |0|Enable 64-bit DEB CPack generator using /usr/lib and disable all other generators (Redhat-based host only, which uses /usr/lib64 by default)|
 |URHO3D_HOME          |-|Path to Urho3D build tree or SDK installation location (downstream project only)|
@@ -168,7 +169,7 @@ A number of build options can be defined when invoking the build scripts or when
 |DIRECT3D_DLL_REDIST_SEARCH_PATHS|-|Additional search paths to find DirectX runtime DLL (MinGW only); should only be used for older MinGW version that still uses 'd3dcompiler_43.dll' or 'd3dcompiler_42.dll'.|
 |RPI_PREFIX           |-|Prefix path to Raspberry Pi cross-compiler tools (RPI cross-compiling build only)|
 |RPI_SYSROOT          |-|Path to Raspberry Pi system root (RPI cross-compiling build only)|
-|RPI_ABI              |*|Specify target ABI (RPI platform only), possible values are armeabi-v6 (default for RPI 1), armeabi-v7a (default for RPI 2), armeabi-v7a with NEON, and armeabi-v7a with VFPV4|
+|RPI_ABI              |*|Specify target ABI (RPI platform only), possible values are RPI0, RPI1, RPI2, RPI3, RPI4|
 |ARM_PREFIX           |-|Prefix path to ARM cross-compiler tools (ARM on Linux cross-compiling build only)|
 |ARM_SYSROOT          |-|Path to ARM system root (ARM on Linux cross-compiling build only)|
 |ARM_ABI_FLAGS        |-|Specify ABI compiler flags (ARM on Linux platform only); e.g. Orange-Pi Mini 2 could use '-mcpu=cortex-a7 -mfpu=neon-vfpv4'|
@@ -241,34 +242,15 @@ gradlew.bat build
 
 After the command finishes successfully, the AAR (Android library) and the APK (Android application) should have been generated in the "build/output" directory of the respective Gradle modules.
 
-For Android Studio user, open the project using the IDE. It should prompt you to auto-import the Gradle project, accept the default. After the “gradle sync” completes without any error, press Ctrl+F9 to build the project or Shift+F10 to run the launcher app in the Android device or emulator.
+For Android Studio and IntelliJ IDEA users, open the project using the IDE. It should prompt you to auto-import the Gradle project, accept the default. After the “gradle sync” completes without any error (you may have to retry a few times to get the IDE sync-ed up with the Gradle), press Ctrl+F9 to build the project or Shift+F10 to run the launcher app in the Android device or emulator.
 
-The Gradle build script has been setup to automatically pass the matching Gradle properties as CMake build options. The following is the list of supported Gradle properties.
+The Gradle build script has been setup to automatically pass the matching environment variable as CMake build options, e.g.: "URHO3D_LIB_TYPE=SHARED ./gradlew build". Additionally, it also supports the following Gradle properties.
 
 |Gradle Property|Description    |
 |---------------|---------------|
 |ANDROID_ABI|A comma-separated list of ABIs for split build configuration; when not specified defaults to universal build|
-|URHO3D_ANGELSCRIPT|Pass-through as CMake build option|
-|URHO3D_DATABASE_SQLITE|Pass-through as CMake build option|
-|URHO3D_FILEWATCHER|Pass-through as CMake build option|
-|URHO3D_IK|Pass-through as CMake build option|
-|URHO3D_LIB_TYPE|Pass-through as CMake build option|
-|URHO3D_LUA|Pass-through as CMake build option|
-|URHO3D_LUAJIT|Pass-through as CMake build option|
-|URHO3D_LUAJIT_AMALG|Pass-through as CMake build option|
-|URHO3D_LOGGING|Pass-through as CMake build option|
-|URHO3D_NAVIGATION|Pass-through as CMake build option|
-|URHO3D_NETWORK|Pass-through as CMake build option|
-|URHO3D_PCH|Pass-through as CMake build option|
-|URHO3D_PLAYER|Pass-through as CMake build option|
-|URHO3D_PHYSICS|Pass-through as CMake build option|
-|URHO3D_PROFILING|Pass-through as CMake build option|
-|URHO3D_SAMPLES|Pass-through as CMake build option|
-|URHO3D_THREADING|Pass-through as CMake build option|
-|URHO3D_URHO2D|Pass-through as CMake build option|
-|URHO3D_WEBP|Pass-through as CMake build option|
 
-The Gradle properties can be passed by using "-P" Gradle option, e.g.: "./gradlew -P URHO3D_LUA=0 build" to build without Lua subsystem.
+The Gradle properties can be passed by using "-P" Gradle option, e.g.: "./gradlew -P ANDROID_ABI=x86 build".
 
 \section Building_iOS_tvOS iOS and tvOS build process (tvOS is still EXPERIMENTAL)
 
@@ -381,11 +363,11 @@ OpenGL does not depend on a separate shader compiler DLL.
 
 \section Dockerized_Build_Environment Dockerized build environment (EXPERIMENTAL on *nix host only)
 
-The building prerequisites are understandably different for each target platform. If you want to target multiple platforms with a single build/host system then you have to not only install all of the prequisites in your host system, but also have to be able to configure your build environment properly so that they do not interfere with each other. Rather than configuring the build environment manually, we have now provided a new build mechanism that we called "dockerized build environment" which addresses both hurdles above. Currently the dockerized build environment, or DBE for short, supports the following platforms: native (Linux), MinGW (Windows), Android, Raspberry-Pi, generic ARM, and Web.
+The building prerequisites are understandably different for each target platform. If you want to target multiple platforms with a single build/host system then you have to not only install all of the prerequisites in your host system, but also have to be able to configure your build environment properly so that they do not interfere with each other. Rather than configuring the build environment manually, we have now provided a new build mechanism that we called "dockerized build environment" which addresses both hurdles above. Currently the dockerized build environment, or DBE for short, supports the following platforms: Linux, MinGW (Windows), Android, Raspberry-Pi, generic ARM, and Web.
 
 The DBE requires podman (from repository provided by your distro, recommended) or Docker-CE (from https://docs.docker.com/install/) to be installed in the host system and that's all it needs.
 
-To use the DBE, execute script/dockerized.sh in the project root directory, specify the platform name (native|mingw|android|rpi|arm|web) as the mandatory parameter, and optionally followed by an alternative command to be invoked in the docker container. By default the command is to generate a build tree for the specified target platform and then build it. The Urho3D build options can be specified by using environment variables in the host system before executing the dockerized.sh. It could be done just in time as well, e.g. "URHO3D_LIB_TYPE=SHARED script/dockerized.sh mingw". The build artifact from DBE can be found in the usual location as the normal build environment. In fact the build artifacts should function and work as if they are built using conventional way too.
+To use the DBE, execute script/dockerized.sh in the project root directory, specify the platform name (linux|mingw|android|rpi|arm|web) as the mandatory parameter, and optionally followed by an alternative command to be invoked in the docker container. By default the command is to generate a build tree for the specified target platform and then build it. The Urho3D build options can be specified by using environment variables in the host system before executing the dockerized.sh. It could be done just in time as well, e.g. "URHO3D_LIB_TYPE=SHARED script/dockerized.sh mingw". The build artifact from DBE can be found in the usual location as the normal build environment. In fact the build artifacts should function and work as if they are built using conventional way too.
 
 The DBE is designed to be used by Urho3D project and its downstream projects which reuse Urho3D build system.
 
@@ -609,7 +591,7 @@ cmake_minimum_required (VERSION 3.10.2)
 project (MyProjectName)
 
 # Set CMake modules search path
-set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake/Modules)
+set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 
 # Include UrhoCommon.cmake module after setting project name
 include (UrhoCommon)
@@ -728,7 +710,7 @@ rake make [<platform>] [<option>=<value> [<option>=<value>]] [[<platform>_]build
 
 The default <generator> when not specified is 'generic', which let CMake to detect and choose what generator is available in the host to use. The possible values are: 'codeblocks', 'eclipse', 'ninja', 'vs2015', 'vs2017', 'vs2019', 'xcode'.
 
-The default <platform> when not specified is 'native'. The possible values are: 'android', 'web', 'ios', 'tvos', 'mingw', 'rpi'. Naturally this influences the compiler toolchain being used in the generated build tree.
+The default <platform> when not specified is the native platform of the build host, 'linux', 'macOS', 'win'. The other possible values are: 'android', 'web', 'ios', 'tvos', 'mingw', 'rpi'. Naturally this influences the compiler toolchain being used in the generated build tree.
 
 When using the 'rake cmake' task, the <option>=\<value> pairs are optional build options supported by our build scripts as usual. However, the format here does not expect a leading '-D' for each pair. When using the 'rake make' task, the <option>=\<value> pairs are optional build options supported by the respective build tools. For example on iOS/tvOS platform using 'xcodebuild' build tool, one could pass the '-sdk' option as follows: 'rake make ios sdk=iphonesimulator'. Note the absence of leading '-' character in the example. To build a specific built-in target in the project, use the 'target' option, e.g. 'rake make target=install'. In a multi-config project, such as Xcode project or VS solution, use the 'config' option to choose which build configuration to use, e.g. 'rake make config=Release'. For Xcode project building using 'rake make' task, you may optional install the 'xcpretty' filter to address the verbosity of the 'xcodebuild' tool from its standard output stream. On the other hand, pass the 'unfilter' option to get the output from 'xcodebuild' tool unfiltered regardless the 'xcpretty' is installed or not. You can pass the 'clean_first' option to perform a clean build. By default this task invokes the respective build tool to use all the logical CPU cores available, but you can use the 'numjobs' option to override this default.
 

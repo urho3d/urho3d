@@ -133,14 +133,18 @@ public:
     bool Save(JSONValue& dest) const;
 
     /// Set number of techniques.
+    /// @property
     void SetNumTechniques(unsigned num);
     /// Set technique.
     void SetTechnique(unsigned index, Technique* tech, MaterialQuality qualityLevel = QUALITY_LOW, float lodDistance = 0.0f);
     /// Set additional vertex shader defines. Separate multiple defines with spaces. Setting defines at the material level causes technique(s) to be cloned as necessary.
+    /// @property
     void SetVertexShaderDefines(const String& defines);
     /// Set additional pixel shader defines. Separate multiple defines with spaces. Setting defines at the material level causes technique(s) to be cloned as necessary.
+    /// @property
     void SetPixelShaderDefines(const String& defines);
     /// Set shader parameter.
+    /// @property{set_shaderParameters}
     void SetShaderParameter(const String& name, const Variant& value);
     /// Set shader parameter animation.
     void
@@ -150,28 +154,38 @@ public:
     /// Set shader parameter animation speed.
     void SetShaderParameterAnimationSpeed(const String& name, float speed);
     /// Set texture.
+    /// @property{set_textures}
     void SetTexture(TextureUnit unit, Texture* texture);
     /// Set texture coordinate transform.
     void SetUVTransform(const Vector2& offset, float rotation, const Vector2& repeat);
     /// Set texture coordinate transform.
     void SetUVTransform(const Vector2& offset, float rotation, float repeat);
     /// Set culling mode.
+    /// @property
     void SetCullMode(CullMode mode);
     /// Set culling mode for shadows.
+    /// @property
     void SetShadowCullMode(CullMode mode);
     /// Set polygon fill mode. Interacts with the camera's fill mode setting so that the "least filled" mode will be used.
+    /// @property
     void SetFillMode(FillMode mode);
     /// Set depth bias parameters for depth write and compare. Note that the normal offset parameter is not used and will not be saved, as it affects only shadow map sampling during light rendering.
+    /// @property
     void SetDepthBias(const BiasParameters& parameters);
     /// Set alpha-to-coverage mode on all passes.
+    /// @property
     void SetAlphaToCoverage(bool enable);
     /// Set line antialiasing on/off. Has effect only on models that consist of line lists.
+    /// @property
     void SetLineAntiAlias(bool enable);
     /// Set 8-bit render order within pass. Default 128. Lower values will render earlier and higher values later, taking precedence over e.g. state and distance sorting.
+    /// @property
     void SetRenderOrder(unsigned char order);
     /// Set whether to use in occlusion rendering. Default true.
+    /// @property
     void SetOcclusion(bool enable);
     /// Associate the material with a scene to ensure that shader parameter animation happens in sync with scene update, respecting the scene time scale. If no scene is set, the global update events will be used.
+    /// @property
     void SetScene(Scene* scene);
     /// Remove shader parameter.
     void RemoveShaderParameter(const String& name);
@@ -185,6 +199,7 @@ public:
     void MarkForAuxView(unsigned frameNumber);
 
     /// Return number of techniques.
+    /// @property
     unsigned GetNumTechniques() const { return techniques_.Size(); }
 
     /// Return all techniques.
@@ -193,21 +208,26 @@ public:
     /// Return technique entry by index.
     const TechniqueEntry& GetTechniqueEntry(unsigned index) const;
     /// Return technique by index.
+    /// @property{get_techniques}
     Technique* GetTechnique(unsigned index) const;
     /// Return pass by technique index and pass name.
     Pass* GetPass(unsigned index, const String& passName) const;
     /// Return texture by unit.
+    /// @property{get_textures}
     Texture* GetTexture(TextureUnit unit) const;
 
     /// Return all textures.
     const HashMap<TextureUnit, SharedPtr<Texture> >& GetTextures() const { return textures_; }
 
     /// Return additional vertex shader defines.
+    /// @property
     const String& GetVertexShaderDefines() const { return vertexShaderDefines_; }
     /// Return additional pixel shader defines.
+    /// @property
     const String& GetPixelShaderDefines() const { return pixelShaderDefines_; }
 
     /// Return shader parameter.
+    /// @property{get_shaderParameters}
     const Variant& GetShaderParameter(const String& name) const;
     /// Return shader parameter animation.
     ValueAnimation* GetShaderParameterAnimation(const String& name) const;
@@ -220,36 +240,45 @@ public:
     const HashMap<StringHash, MaterialShaderParameter>& GetShaderParameters() const { return shaderParameters_; }
 
     /// Return normal culling mode.
+    /// @property
     CullMode GetCullMode() const { return cullMode_; }
 
     /// Return culling mode for shadows.
+    /// @property
     CullMode GetShadowCullMode() const { return shadowCullMode_; }
 
     /// Return polygon fill mode.
+    /// @property
     FillMode GetFillMode() const { return fillMode_; }
 
     /// Return depth bias.
+    /// @property
     const BiasParameters& GetDepthBias() const { return depthBias_; }
 
     /// Return alpha-to-coverage mode.
+    /// @property
     bool GetAlphaToCoverage() const { return alphaToCoverage_; }
 
     /// Return whether line antialiasing is enabled.
+    /// @property
     bool GetLineAntiAlias() const { return lineAntiAlias_; }
 
     /// Return render order.
+    /// @property
     unsigned char GetRenderOrder() const { return renderOrder_; }
 
     /// Return last auxiliary view rendered frame number.
     unsigned GetAuxViewFrameNumber() const { return auxViewFrameNumber_; }
 
     /// Return whether should render occlusion.
+    /// @property
     bool GetOcclusion() const { return occlusion_; }
 
     /// Return whether should render specular.
     bool GetSpecular() const { return specular_; }
 
     /// Return the scene associated with the material for shader parameter animation updates.
+    /// @property
     Scene* GetScene() const;
 
     /// Return shader parameter hash value. Used as an optimization to avoid setting shader parameters unnecessarily.

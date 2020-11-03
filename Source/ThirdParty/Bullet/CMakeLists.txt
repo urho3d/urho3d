@@ -23,27 +23,19 @@
 # Define target name
 set (TARGET_NAME Bullet)
 
-# Workaround for MinGW 6.1.0 and above where it throws ICE (internal compilation error) when -O3 is used
-if (MINGW AND (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 6.1.0 OR CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 6.1.0))  # 6.1.0 is the last known bad version
-    string (REPLACE -O3 -O2 CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+# Define preprocessor macros
+if (BT_USE_DOUBLE_PRECISION)
+    add_definitions (-DBT_USE_DOUBLE_PRECISION)
+endif ()
+if (BT_THREADSAFE)
+    add_definitions (-DBT_THREADSAFE=1)
+endif ()
+if (BT_USE_OPENMP)
+    add_definitions (-DBT_USE_OPENMP=1)
 endif ()
 
 # Define source files
-file (GLOB CPP_FILES src/BulletCollision/BroadphaseCollision/*.cpp
-    src/BulletCollision/CollisionDispatch/*.cpp src/BulletCollision/CollisionShapes/*.cpp
-    src/BulletCollision/Gimpact/*.cpp src/BulletCollision/NarrowPhaseCollision/*.cpp
-    src/BulletDynamics/Character/*.cpp src/BulletDynamics/ConstraintSolver/*.cpp
-    src/BulletDynamics/Dynamics/*.cpp src/BulletDynamics/Featherstone/*.cpp
-    src/BulletDynamics/MLCPSolvers/*.cpp src/BulletDynamics/Vehicle/*.cpp src/BulletSoftBody/*.cpp
-    src/LinearMath/*.cpp)
-file (GLOB H_FILES *.h src/BulletCollision/BroadphaseCollision/*.h
-    src/BulletCollision/CollisionDispatch/*.h src/BulletCollision/CollisionShapes/*.h
-    src/BulletCollision/Gimpact/*.h src/BulletCollision/NarrowPhaseCollision/*.h
-    src/BulletDynamics/Character/*.h src/BulletDynamics/ConstraintSolver/*.h
-    src/BulletDynamics/Dynamics/*.h src/BulletDynamics/Featherstone/*.h
-    src/BulletDynamics/MLCPSolvers/*.h src/BulletDynamics/Vehicle/*.h src/BulletSoftBody/*.h
-    src/LinearMath/*.h)
-set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
+define_source_files (RECURSE GLOB_CPP_PATTERNS src/*.cpp GLOB_H_PATTERNS src/*.h src/*.hpp)
 
 # Define dependency libs
 set (INCLUDE_DIRS src)

@@ -20,4 +20,4 @@
 :: THE SOFTWARE.
 ::
 
-@"%~dp0cmake_generic.bat" %* -DMINGW=1
+@"%~dp0cmake_generic.bat" %* -D MINGW=1

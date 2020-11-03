@@ -31,7 +31,7 @@ namespace Urho3D
 /// Tooltip %UI element.
 class URHO3D_API ToolTip : public UIElement
 {
-    URHO3D_OBJECT(ToolTip, UIElement)
+    URHO3D_OBJECT(ToolTip, UIElement);
 
 public:
     /// Construct.
@@ -51,9 +51,11 @@ public:
     void AddAltTarget(UIElement* target);
 
     /// Set the delay in seconds until the tooltip shows once hovering. Set zero to use the default from the UI subsystem.
+    /// @property
     void SetDelay(float delay);
 
     /// Return the delay in seconds until the tooltip shows once hovering.
+    /// @property
     float GetDelay() const { return delay_; }
 
 private:

@@ -26,6 +26,7 @@
 #include "../AngelScript/ScriptAPI.h"
 #include "../AngelScript/ScriptFile.h"
 #include "../Resource/ResourceCache.h"
+#include "../AngelScript/Generated_Templates.h"
 
 namespace Urho3D
 {

@@ -49,31 +49,41 @@ public:
     bool EndLoad() override;
 
     /// Set texture.
+    /// @property
     void SetTexture(Texture2D* texture);
     /// Set rectangle.
+    /// @property
     void SetRectangle(const IntRect& rectangle);
     /// Set hot spot.
+    /// @property
     void SetHotSpot(const Vector2& hotSpot);
     /// Set offset.
+    /// @property
     void SetOffset(const IntVector2& offset);
     /// Set texture edge offset in pixels. This affects the left/right and top/bottom edges equally to prevent edge sampling artifacts. Default 0.
+    /// @property
     void SetTextureEdgeOffset(float offset);
     /// Set sprite sheet.
     void SetSpriteSheet(SpriteSheet2D* spriteSheet);
 
     /// Return texture.
+    /// @property
     Texture2D* GetTexture() const { return texture_; }
 
     /// Return rectangle.
+    /// @property
     const IntRect& GetRectangle() const { return rectangle_; }
 
     /// Return hot spot.
+    /// @property
     const Vector2& GetHotSpot() const { return hotSpot_; }
 
     /// Return offset.
+    /// @property
     const IntVector2& GetOffset() const { return offset_; }
 
     /// Return texture edge offset.
+    /// @property
     float GetTextureEdgeOffset() const { return edgeOffset_; }
 
     /// Return sprite sheet.

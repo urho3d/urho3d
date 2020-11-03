@@ -46,18 +46,26 @@ set "BUILD_OPTS="
 set "arch="
 :loop
 if not "%~1" == "" (
-    if "%~1" == "-DANDROID" if "%~2" == "1" (echo For Android platform, use Gradle build system instead of invoking CMake build tool directly! && exit /B 1)
-    if "%~1" == "-DWEB" if "%~2" == "1" set "OPTS=-G "MinGW Makefiles" -DCMAKE_TOOLCHAIN_FILE="%TOOLCHAINS%\Emscripten.cmake""
-    if "%~1" == "-DMINGW" if "%~2" == "1" set "OPTS=-G "MinGW Makefiles""
-    if "%~1" == "-DURHO3D_64BIT" if "%~2" == "1" set "arch=-A x64"
-    if "%~1" == "-DURHO3D_64BIT" if "%~2" == "0" set "arch=-A Win32"
-    if "%~1" == "-VS" set "OPTS=-G "Visual Studio %~2" %arch% %TOOLSET%"
-    if "%~1" == "-G" set "OPTS=%OPTS% %~1 %2"
-    set "ARG1=%~1"
-    set "ARG2=%~2"
-    if "%ARG1:~0,2%" == "-D" set "BUILD_OPTS=%BUILD_OPTS% %ARG1%=%ARG2%"
-    shift
-    shift
+    if "%~1" == "-D" (
+        if "%~2" == "WEB" if "%~3" == "1" set "OPTS=-G "MinGW Makefiles" -D CMAKE_TOOLCHAIN_FILE="%TOOLCHAINS%\Emscripten.cmake""
+        if "%~2" == "MINGW" if "%~3" == "1" set "OPTS=-G "MinGW Makefiles""
+        if "%~2" == "URHO3D_64BIT" if "%~3" == "1" set "arch=-A x64"
+        if "%~2" == "URHO3D_64BIT" if "%~3" == "0" set "arch=-A Win32"
+        set "BUILD_OPTS=%BUILD_OPTS% -D %~2=%~3"
+        shift
+        shift
+        shift
+    )
+    if "%~1" == "-VS" (
+        set "OPTS=-G "Visual Studio %~2" %arch% %TOOLSET%"
+        shift
+        shift
+    )
+    if "%~1" == "-G" (
+        set "OPTS=%OPTS% -G %~2"
+        shift
+        shift
+    )
     goto loop
 )
 if exist "%BUILD%\CMakeCache.txt" set "OPTS="

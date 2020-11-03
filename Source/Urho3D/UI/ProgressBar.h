@@ -48,27 +48,34 @@ public:
     void OnResize(const IntVector2& newSize, const IntVector2& delta) override;
 
     /// Set orientation type.
+    /// @property
     void SetOrientation(Orientation orientation);
 
     /// Set ProgressBar range maximum value (minimum value is always 0).
+    /// @property
     void SetRange(float range);
 
     /// Set ProgressBar current value.
+    /// @property
     void SetValue(float value);
 
     /// Change value by a delta.
     void ChangeValue(float delta);
 
     /// Return orientation type.
+    /// @property
     Orientation GetOrientation() const { return orientation_; }
 
     /// Return ProgressBar range.
+    /// @property
     float GetRange() const { return range_; }
 
     /// Return ProgressBar current value.
+    /// @property
     float GetValue() const { return value_; }
 
     /// Return knob element.
+    /// @property
     BorderImage *GetKnob() const { return knob_; }
 
     /// Sets the loading percent style.
@@ -78,9 +85,11 @@ public:
     const String& GetLoadingPercentStyle() const { return loadingPercentStyle_; }
 
     /// Sets the flag to display the percent text.
+    /// @property
     void SetShowPercentText(bool enable);
 
     /// Returns the flag to display the percent text.
+    /// @property
     bool GetShowPercentText() const { return showPercentText_; }
 
 protected:

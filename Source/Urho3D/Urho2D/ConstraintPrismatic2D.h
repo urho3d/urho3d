@@ -41,44 +41,60 @@ public:
     static void RegisterObject(Context* context);
 
     /// Set anchor.
+    /// @property
     void SetAnchor(const Vector2& anchor);
     /// Set axis.
+    /// @property
     void SetAxis(const Vector2& axis);
     /// Set enable limit.
+    /// @property
     void SetEnableLimit(bool enableLimit);
     /// Set lower translation.
+    /// @property
     void SetLowerTranslation(float lowerTranslation);
     /// Set upper translation.
+    /// @property
     void SetUpperTranslation(float upperTranslation);
     /// Set enable motor.
+    /// @property
     void SetEnableMotor(bool enableMotor);
     /// Set maxmotor force.
+    /// @property
     void SetMaxMotorForce(float maxMotorForce);
     /// Set motor speed.
+    /// @property
     void SetMotorSpeed(float motorSpeed);
 
     /// Return anchor.
+    /// @property
     const Vector2& GetAnchor() const { return anchor_; }
 
     /// Return axis.
+    /// @property
     const Vector2& GetAxis() const { return axis_; }
 
     /// Return enable limit.
+    /// @property
     bool GetEnableLimit() const { return jointDef_.enableLimit; }
 
     /// Return lower translation.
+    /// @property
     float GetLowerTranslation() const { return jointDef_.lowerTranslation; }
 
     /// Return upper translation.
+    /// @property
     float GetUpperTranslation() const { return jointDef_.upperTranslation; }
 
     /// Return enable motor.
+    /// @property
     bool GetEnableMotor() const { return jointDef_.enableMotor; }
 
     /// Return maxmotor force.
+    /// @property
     float GetMaxMotorForce() const { return jointDef_.maxMotorForce; }
 
     /// Return motor speed.
+    /// @property
     float GetMotorSpeed() const { return jointDef_.motorSpeed; }
 
 private:

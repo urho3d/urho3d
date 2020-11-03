@@ -74,10 +74,15 @@ void ToolTip::Update(float timeStep)
             SharedPtr<UIElement> target = it->Lock();
             if (!target)
                 it = altTargets_.Erase(it);
-            else if (hovering = target->IsHovering() && target->IsVisibleEffective())
-                break;
             else
-                ++it;
+            {
+                hovering = target->IsHovering() && target->IsVisibleEffective();
+
+                if (hovering)
+                    break;
+                else
+                    ++it;
+            }
         }
     }
 

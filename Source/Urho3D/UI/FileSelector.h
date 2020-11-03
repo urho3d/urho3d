@@ -61,66 +61,86 @@ public:
     static void RegisterObject(Context* context);
 
     /// Set fileselector UI style.
+    /// @property
     void SetDefaultStyle(XMLFile* style);
     /// Set title text.
+    /// @property
     void SetTitle(const String& text);
     /// Set button texts.
     void SetButtonTexts(const String& okText, const String& cancelText);
     /// Set current path.
+    /// @property
     void SetPath(const String& path);
     /// Set current filename.
+    /// @property
     void SetFileName(const String& fileName);
     /// Set filters.
     void SetFilters(const Vector<String>& filters, unsigned defaultIndex);
     /// Set directory selection mode. Default false.
+    /// @property
     void SetDirectoryMode(bool enable);
     /// Update elements to layout properly. Call this after manually adjusting the sub-elements.
     void UpdateElements();
 
     /// Return the UI style file.
+    /// @property
     XMLFile* GetDefaultStyle() const;
 
     /// Return fileselector window.
+    /// @property
     Window* GetWindow() const { return window_; }
 
     /// Return window title text element.
+    /// @property
     Text* GetTitleText() const { return titleText_; }
 
     /// Return file list.
+    /// @property
     ListView* GetFileList() const { return fileList_; }
 
     /// Return path editor.
+    /// @property
     LineEdit* GetPathEdit() const { return pathEdit_; }
 
     /// Return filename editor.
+    /// @property
     LineEdit* GetFileNameEdit() const { return fileNameEdit_; }
 
     /// Return filter dropdown.
+    /// @property
     DropDownList* GetFilterList() const { return filterList_; }
 
     /// Return OK button.
+    /// @property{get_okButton}
     Button* GetOKButton() const { return okButton_; }
 
     /// Return cancel button.
+    /// @property
     Button* GetCancelButton() const { return cancelButton_; }
 
     /// Return close button.
     Button* GetCloseButton() const { return closeButton_; }
 
     /// Return window title.
+    /// @property
     const String& GetTitle() const;
 
     /// Return current path.
+    /// @property
     const String& GetPath() const { return path_; }
 
     /// Return current filename.
+    /// @property
     const String& GetFileName() const;
     /// Return current filter.
+    /// @property
     const String& GetFilter() const;
     /// Return current filter index.
+    /// @property
     unsigned GetFilterIndex() const;
 
     /// Return directory mode flag.
+    /// @property
     bool GetDirectoryMode() const { return directoryMode_; }
 
 private:

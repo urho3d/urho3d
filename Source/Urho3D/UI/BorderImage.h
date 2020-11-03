@@ -48,55 +48,73 @@ public:
     void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor) override;
 
     /// Set texture.
+    /// @property
     void SetTexture(Texture* texture);
     /// Set part of texture to use as the image.
+    /// @property
     void SetImageRect(const IntRect& rect);
     /// Use whole texture as the image.
     void SetFullImageRect();
     /// Set border dimensions on the screen.
+    /// @property
     void SetBorder(const IntRect& rect);
     /// Set border dimensions on the image. If zero (default) uses the screen dimensions, resulting in pixel-perfect borders.
+    /// @property
     void SetImageBorder(const IntRect& rect);
     /// Set offset to image rectangle used on hover.
+    /// @property
     void SetHoverOffset(const IntVector2& offset);
     /// Set offset to image rectangle used on hover.
     void SetHoverOffset(int x, int y);
     /// Set offset to image rectangle used when disabled.
+    /// @property
     void SetDisabledOffset(const IntVector2& offset);
     /// Set offset to image rectangle used when disabled.
     void SetDisabledOffset(int x, int y);
     /// Set blend mode.
+    /// @property
     void SetBlendMode(BlendMode mode);
     /// Set tiled mode.
+    /// @property
     void SetTiled(bool enable);
     /// Set material for custom rendering.
+    /// @property
     void SetMaterial(Material* material);
 
     /// Return texture.
+    /// @property
     Texture* GetTexture() const { return texture_; }
 
     /// Return image rectangle.
+    /// @property
     const IntRect& GetImageRect() const { return imageRect_; }
 
     /// Return border screen dimensions.
+    /// @property
     const IntRect& GetBorder() const { return border_; }
 
     /// Return border image dimensions. Zero rect uses border screen dimensions.
+    /// @property
     const IntRect& GetImageBorder() const { return imageBorder_; }
 
     /// Return offset to image rectangle used on hover.
+    /// @property
     const IntVector2& GetHoverOffset() const { return hoverOffset_; }
 
     /// Return offset to image rectangle used when disabled.
+    /// @property
     const IntVector2& GetDisabledOffset() const { return disabledOffset_; }
 
     /// Return blend mode.
+    /// @property
     BlendMode GetBlendMode() const { return blendMode_; }
 
     /// Return whether is tiled.
+    /// @property
     bool IsTiled() const { return tiled_; }
 
     /// Get material used for custom rendering.
+    /// @property
     Material* GetMaterial() const;
 
     /// Set texture attribute.

@@ -32,7 +32,7 @@ class ListView;
 /// %Menu %UI element that displays a popup list view.
 class URHO3D_API DropDownList : public Menu
 {
-    URHO3D_OBJECT(DropDownList, Menu)
+    URHO3D_OBJECT(DropDownList, Menu);
 
 public:
     /// Construct.
@@ -64,33 +64,44 @@ public:
     /// Remove all items.
     void RemoveAllItems();
     /// Set selection.
+    /// @property
     void SetSelection(unsigned index);
     /// Set place holder text. This is the text shown when there is no selection (-1) in drop down list. Note that if the list has items, the default is to show the first item, so the "no selection" state has to be set explicitly.
+    /// @property
     void SetPlaceholderText(const String& text);
     /// Set whether popup should be automatically resized to match the dropdown button width.
+    /// @property
     void SetResizePopup(bool enable);
 
     /// Return number of items.
+    /// @property
     unsigned GetNumItems() const;
     /// Return item at index.
+    /// @property{get_items}
     UIElement* GetItem(unsigned index) const;
     /// Return all items.
     PODVector<UIElement*> GetItems() const;
     /// Return selection index, or M_MAX_UNSIGNED if none selected.
+    /// @property
     unsigned GetSelection() const;
     /// Return selected item, or null if none selected.
+    /// @property
     UIElement* GetSelectedItem() const;
 
     /// Return listview element.
+    /// @property
     ListView* GetListView() const { return listView_; }
 
     /// Return selected item placeholder element.
+    /// @property
     UIElement* GetPlaceholder() const { return placeholder_; }
 
     /// Return place holder text.
+    /// @property
     const String& GetPlaceholderText() const;
 
     /// Return whether popup should be automatically resized.
+    /// @property
     bool GetResizePopup() const { return resizePopup_; }
 
     /// Set selection attribute.

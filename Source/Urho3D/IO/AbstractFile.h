@@ -29,6 +29,7 @@ namespace Urho3D
 {
 
 /// A common root class for objects that implement both Serializer and Deserializer.
+/// @fakeref
 class URHO3D_API AbstractFile : public Deserializer, public Serializer
 {
 public:

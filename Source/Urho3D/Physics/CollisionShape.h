@@ -192,20 +192,27 @@ public:
     /// Set as a terrain. Only works if the same scene node contains a Terrain component.
     void SetTerrain(unsigned lodLevel = 0);
     /// Set shape type.
+    /// @property
     void SetShapeType(ShapeType type);
     /// Set shape size.
+    /// @property
     void SetSize(const Vector3& size);
     /// Set offset position.
+    /// @property
     void SetPosition(const Vector3& position);
     /// Set offset rotation.
+    /// @property
     void SetRotation(const Quaternion& rotation);
     /// Set offset transform.
     void SetTransform(const Vector3& position, const Quaternion& rotation);
     /// Set collision margin.
+    /// @property
     void SetMargin(float margin);
     /// Set triangle mesh / convex hull model.
+    /// @property
     void SetModel(Model* model);
     /// Set model LOD level.
+    /// @property
     void SetLodLevel(unsigned lodLevel);
 
     /// Return Bullet collision shape.
@@ -218,27 +225,35 @@ public:
     PhysicsWorld* GetPhysicsWorld() const { return physicsWorld_; }
 
     /// Return shape type.
+    /// @property
     ShapeType GetShapeType() const { return shapeType_; }
 
     /// Return shape size.
+    /// @property
     const Vector3& GetSize() const { return size_; }
 
     /// Return offset position.
+    /// @property
     const Vector3& GetPosition() const { return position_; }
 
     /// Return offset rotation.
+    /// @property
     const Quaternion& GetRotation() const { return rotation_; }
 
     /// Return collision margin.
+    /// @property
     float GetMargin() const { return margin_; }
 
     /// Return triangle mesh / convex hull model.
+    /// @property
     Model* GetModel() const { return model_; }
 
     /// Return model LOD level.
+    /// @property
     unsigned GetLodLevel() const { return lodLevel_; }
 
     /// Return world-space bounding box.
+    /// @property
     BoundingBox GetWorldBoundingBox() const;
 
     /// Update the new collision shape to the RigidBody.

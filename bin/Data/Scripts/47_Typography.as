@@ -167,8 +167,8 @@ void HandleWhiteBackground(StringHash eventType, VariantMap& eventData)
     CheckBox@ box = eventData["Element"].GetPtr();
     bool checked = box.checked;
 
-    Color fg = checked ? BLACK : WHITE;
-    Color bg = checked ? WHITE : BLACK;
+    Color fg = checked ? Color::BLACK : Color::WHITE;
+    Color bg = checked ? Color::WHITE : Color::BLACK;
     
     renderer.defaultZone.fogColor = bg;
 

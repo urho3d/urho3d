@@ -32,7 +32,7 @@ struct RaycastVehicleData;
 
 class URHO3D_API RaycastVehicle : public LogicComponent
 {
-    URHO3D_OBJECT(RaycastVehicle, LogicComponent)
+    URHO3D_OBJECT(RaycastVehicle, LogicComponent);
 
 public:
     /// Construct.
@@ -88,12 +88,15 @@ public:
     /// Set wheel axle vector.
     void SetWheelAxle(int wheel, Vector3 axle);
     /// Set side speed which is considered sliding.
+    /// @property
     void SetMaxSideSlipSpeed(float speed);
     /// Set cumulative skid info.
     void SetWheelSkidInfoCumulative(int wheel, float skid);
     /// Set revolution per minute value for when wheel doesn't touch ground. If set to 0 (or not set), calculated from engine force (probably not what you want).
+    /// @property
     void SetInAirRPM(float rpm);
     /// Set the coordinate system. The default is (0, 1, 2).
+    /// @property
     void SetCoordinateSystem(const IntVector3& coordinateSystem = RIGHT_FORWARD_UP);
     /// Init the vehicle component after creation.
     void Init();
@@ -111,6 +114,7 @@ public:
     /// Get wheel connection point relative to RigidBody.
     Vector3 GetWheelConnectionPoint(int wheel) const;
     /// Get number of attached wheels.
+    /// @property
     int GetNumWheels() const;
     /// Get node of the wheel.
     Node* GetWheelNode(int wheel) const;
@@ -145,6 +149,7 @@ public:
     /// Get wheel slide speed.
     float GetWheelSideSlipSpeed(int wheel) const;
     /// Get side speed which is considered sliding.
+    /// @property
     float GetMaxSideSlipSpeed() const;
     /// Sliding factor 0 <= x <= 1.
     float GetWheelSkidInfo(int wheel) const;
@@ -159,8 +164,10 @@ public:
     /// Get contact normal.
     Vector3 GetContactNormal(int wheel) const;
     /// Get revolution per minute value for when wheel doesn't touch ground.
+    /// @property
     float GetInAirRPM() const;
     /// Get the coordinate system.
+    /// @property
     IntVector3 GetCoordinateSystem() const { return coordinateSystem_; }
 
     /// Get wheel data attribute for serialization.

@@ -30,46 +30,30 @@ if [[ "$BUILD" == "." ]]; then BUILD=$(pwd); fi
 . "$SOURCE"/script/.bash_helpers.sh
 
 # Detect CMake toolchains directory if it is not provided explicitly
-[ "$TOOLCHAINS" == "" ] && TOOLCHAINS="$SOURCE"/CMake/Toolchains
-[ ! -d "$TOOLCHAINS" -a -d "$URHO3D_HOME"/share/Urho3D/CMake/Toolchains ] && TOOLCHAINS="$URHO3D_HOME"/share/Urho3D/CMake/Toolchains
+[ "$TOOLCHAINS" == "" ] && TOOLCHAINS="$SOURCE"/cmake/Toolchains
+[ ! -d "$TOOLCHAINS" -a -d "$URHO3D_HOME"/share/Urho3D/cmake/Toolchains ] && TOOLCHAINS="$URHO3D_HOME"/share/Urho3D/cmake/Toolchains
 
 # Default to native generator and toolchain if none is specified explicitly
 IFS=#
 OPTS=
 for a in $@; do
-    case $a in
-        --fix-scm)
-            FIX_SCM=1
+    case ${a#-D} in
+        RPI=1)
+            if [[ ! $(uname -m) =~ ^(arm|aarch64) ]]; then OPTS=(-D CMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/RaspberryPi.cmake); fi
             ;;
-        Eclipse\ CDT4\ -\ Unix\ Makefiles)
-            ECLIPSE=1
+        ARM=1)
+            if [[ ! $(uname -m) =~ ^(arm|aarch64) ]]; then OPTS=(-D CMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/Arm.cmake); fi
             ;;
-        -DIOS=1)
-            IOS=1
+        MINGW=1)
+            OPTS=(-D CMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/MinGW.cmake)
             ;;
-        -DTVOS=1)
-            TVOS=1
-            ;;
-        -DANDROID=1)
-            echo For Android platform, use Gradle build system instead of invoking CMake build system directly!
-            exit 1
-            ;;
-        -DRPI=1)
-            if [[ ! $(uname -m) =~ ^arm ]]; then OPTS="-DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/RaspberryPi.cmake"; fi
-            ;;
-        -DARM=1)
-            if [[ ! $(uname -m) =~ ^(arm|aarch64) ]]; then OPTS="-DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/Arm.cmake"; fi
-            ;;
-        -DMINGW=1)
-            OPTS="-DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/MinGW.cmake"
-            ;;
-        -DWEB=1)
-            OPTS="-DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/Emscripten.cmake"
+        WEB=1)
+            OPTS=(-D CMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/Emscripten.cmake)
             ;;
     esac
 done
 
 # Create project with the chosen CMake generator and toolchain
-cmake -E make_directory "$BUILD" && cmake -E chdir "$BUILD" cmake $OPTS $@ "$SOURCE" && post_cmake
+cmake -E make_directory "$BUILD" && cmake -E chdir "$BUILD" cmake ${OPTS[*]} $@ "$SOURCE" && post_cmake
 
 # vi: set ts=4 sw=4 expandtab:

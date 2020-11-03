@@ -53,9 +53,9 @@
 #endif
 
 #ifdef __EMSCRIPTEN__
-#include "../Input/Input.h"
-#include "../UI/Cursor.h"
-#include "../UI/UI.h"
+#include "../../Input/Input.h"
+#include "../../UI/Cursor.h"
+#include "../../UI/UI.h"
 #include <emscripten/emscripten.h>
 #include <emscripten/bind.h>
 

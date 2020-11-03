@@ -1,4 +1,4 @@
-# Doxyfile 1.8.13
+# Doxyfile 1.8.17
 
 # This file describes the settings to be used by the documentation system
 # doxygen (www.doxygen.org) for a project.
@@ -1259,7 +1259,7 @@ DOCSET_FEEDNAME        = "Urho3D Documentation"
 # The default value is: org.doxygen.Project.
 # This tag requires that the tag GENERATE_DOCSET is set to YES.
 
-DOCSET_BUNDLE_ID       = com.github.urho3d.Urho3D.@URHO3D_VERSION@
+DOCSET_BUNDLE_ID       = io.urho3d.Urho3D.@URHO3D_VERSION@
 
 # The DOCSET_PUBLISHER_ID tag specifies a string that should uniquely identify
 # the documentation publisher. This should be a reverse domain-name style
@@ -1267,7 +1267,7 @@ DOCSET_BUNDLE_ID       = com.github.urho3d.Urho3D.@URHO3D_VERSION@
 # The default value is: org.doxygen.Publisher.
 # This tag requires that the tag GENERATE_DOCSET is set to YES.
 
-DOCSET_PUBLISHER_ID    = com.github.urho3d.Urho3D
+DOCSET_PUBLISHER_ID    = io.urho3d.Urho3D
 
 # The DOCSET_PUBLISHER_NAME tag identifies the documentation publisher.
 # The default value is: Publisher.
@@ -1358,7 +1358,7 @@ QCH_FILE               =
 # The default value is: org.doxygen.Project.
 # This tag requires that the tag GENERATE_QHP is set to YES.
 
-QHP_NAMESPACE          = com.github.urho3d.Urho3D.@URHO3D_VERSION@
+QHP_NAMESPACE          = io.urho3d.Urho3D.@URHO3D_VERSION@
 
 # The QHP_VIRTUAL_FOLDER tag specifies the namespace to use when generating Qt
 # Help Project output. For more information please see Qt Help Project / Virtual
@@ -1417,7 +1417,7 @@ GENERATE_ECLIPSEHELP   = @Eclipse_HELP@
 # The default value is: org.doxygen.Project.
 # This tag requires that the tag GENERATE_ECLIPSEHELP is set to YES.
 
-ECLIPSE_DOC_ID         = com.github.urho3d.Urho3D.@URHO3D_VERSION@
+ECLIPSE_DOC_ID         = io.urho3d.Urho3D.@URHO3D_VERSION@
 
 # If you want full control over the layout of the generated HTML pages it might
 # be necessary to disable the index and replace it with your own. The
@@ -2459,3 +2459,19 @@ GENERATE_LEGEND        = YES
 # This tag requires that the tag HAVE_DOT is set to YES.
 
 DOT_CLEANUP            = YES
+
+ALIASES += manualbind=""
+ALIASES += nobind=""
+ALIASES += nobindtemp=""
+ALIASES += nobindfile=""
+ALIASES += fakeref=""
+ALIASES += pod=""
+ALIASES += templateversion=""
+ALIASES += allints=""
+ALIASES += allfloats=""
+ALIASES += property=""
+ALIASES += property{1}=""
+ALIASES += alias{1}=""
+ALIASES += specialization{1}=""
+ALIASES += specialization{2}=""
+ALIASES += specialization{3}=""
