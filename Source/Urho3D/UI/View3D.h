@@ -52,27 +52,36 @@ public:
     /// Define the scene and camera to use in rendering. When ownScene is true the View3D will take ownership of them with shared pointers.
     void SetView(Scene* scene, Camera* camera, bool ownScene = true);
     /// Set render texture pixel format. Default is RGB.
+    /// @property
     void SetFormat(unsigned format);
     /// Set render target auto update mode. Default is true.
+    /// @property
     void SetAutoUpdate(bool enable);
     /// Queue manual update on the render texture.
     void QueueUpdate();
 
     /// Return render texture pixel format.
+    /// @property
     unsigned GetFormat() const { return rttFormat_; }
 
     /// Return whether render target updates automatically.
+    /// @property
     bool GetAutoUpdate() const { return autoUpdate_; }
 
     /// Return scene.
+    /// @property
     Scene* GetScene() const;
     /// Return camera scene node.
+    /// @property
     Node* GetCameraNode() const;
     /// Return render texture.
+    /// @property
     Texture2D* GetRenderTexture() const;
     /// Return depth stencil texture.
+    /// @property
     Texture2D* GetDepthTexture() const;
     /// Return viewport.
+    /// @property
     Viewport* GetViewport() const;
 
 private:

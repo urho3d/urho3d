@@ -119,7 +119,7 @@ class EditorCubeCapture : ScriptObject // script object in order to get events
     {
         // Construct render surface 
         renderImage_ = Texture2D();
-        renderImage_.SetSize(cubeMapGen_Size, cubeMapGen_Size, GetRGBAFormat(), TEXTURE_RENDERTARGET);
+        renderImage_.SetSize(cubeMapGen_Size, cubeMapGen_Size, Graphics::GetRGBAFormat(), TEXTURE_RENDERTARGET);
         
         renderSurface_ = renderImage_.renderSurface;
         renderSurface_.viewports[0] = viewport_;

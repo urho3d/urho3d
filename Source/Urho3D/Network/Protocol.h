@@ -64,6 +64,9 @@ static const int MSG_REMOTENODEEVENT = 0x97;
 /// Server->client: info about package.
 static const int MSG_PACKAGEINFO = 0x98;
 
+/// Packet that includes all the above messages
+static const int MSG_PACKED_MESSAGE = 0x99;
+
 /// Fixed content ID for client controls update.
 static const unsigned CONTROLS_CONTENT_ID = 1;
 /// Package file fragment size.

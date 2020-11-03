@@ -50,6 +50,7 @@ struct BackgroundLoadItem
 };
 
 /// Background loader of resources. Owned by the ResourceCache.
+/// @nobind
 class BackgroundLoader : public RefCounted, public Thread
 {
 public:

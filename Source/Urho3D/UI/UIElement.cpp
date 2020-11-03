@@ -1607,6 +1607,13 @@ void UIElement::GetChildren(PODVector<UIElement*>& dest, bool recursive) const
         GetChildrenRecursive(dest);
 }
 
+PODVector<UIElement*> UIElement::GetChildren(bool recursive) const
+{
+    PODVector<UIElement*> dest;
+    GetChildren(dest, recursive);
+    return dest;
+}
+
 unsigned UIElement::GetNumChildren(bool recursive) const
 {
     if (!recursive)

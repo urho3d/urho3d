@@ -41,7 +41,7 @@ class IKEffector;
  */
 class URHO3D_API IKSolver : public Component
 {
-    URHO3D_OBJECT(IKSolver, Component)
+    URHO3D_OBJECT(IKSolver, Component);
 
 public:
 
@@ -173,9 +173,11 @@ public:
     static void RegisterObject(Context* context);
 
     /// Returns the active algorithm.
+    /// @manualbind
     Algorithm GetAlgorithm() const;
 
     /*!
+     * @manualbind
      * @brief Selects the solver algorithm. Default is FABRIK. Note that this
      * may not be the most efficient algorithm available. The specialized
      * solvers will be a lot faster.
@@ -193,14 +195,18 @@ public:
     void SetAlgorithm(Algorithm algorithm);
 
     /// Test if a certain feature is enabled (see IKSolver::Feature).
+    /// @nobind
     bool GetFeature(Feature feature) const;
     /// Enable or disable a certain feature (see IKSolver::Feature).
+    /// @nobind
     void SetFeature(Feature feature, bool enable);
 
     /// Returns the configured maximum number of iterations.
+    /// @property
     unsigned GetMaximumIterations() const;
 
     /*!
+     * @property
      * @brief Sets the maximum number of iterations the solver is allowed to
      * perform before applying the result.
      *
@@ -220,9 +226,11 @@ public:
     void SetMaximumIterations(unsigned iterations);
 
     /// Returns the configured tolerance.
+    /// @property
     float GetTolerance() const;
 
     /*!
+     * @property
      * @brief Sets the distance at which the effector is "close enough" to the
      * target node, at which point the algorithm will stop iterating.
      *
@@ -350,20 +358,34 @@ private:
 
     // Need these wrapper functions flags of GetFeature/SetFeature can be correctly exposed to the editor and to AngelScript and lua
 public:
+    /// @property{get_JOINT_ROTATIONS}
     bool GetJOINT_ROTATIONS() const;
+    /// @property{get_TARGET_ROTATIONS}
     bool GetTARGET_ROTATIONS() const;
+    /// @property{get_UPDATE_ORIGINAL_POSE}
     bool GetUPDATE_ORIGINAL_POSE() const;
+    /// @property{get_UPDATE_ACTIVE_POSE(}
     bool GetUPDATE_ACTIVE_POSE() const;
+    /// @property{get_USE_ORIGINAL_POSE}
     bool GetUSE_ORIGINAL_POSE() const;
+    /// @property{get_CONSTRAINTS}
     bool GetCONSTRAINTS() const;
+    /// @property{get_AUTO_SOLVE}
     bool GetAUTO_SOLVE() const;
 
+    /// @property{set_JOINT_ROTATIONS}
     void SetJOINT_ROTATIONS(bool enable);
+    /// @property{set_TARGET_ROTATIONS}
     void SetTARGET_ROTATIONS(bool enable);
+    /// @property{set_UPDATE_ORIGINAL_POSE}
     void SetUPDATE_ORIGINAL_POSE(bool enable);
+    /// @property{set_UPDATE_ACTIVE_POSE}
     void SetUPDATE_ACTIVE_POSE(bool enable);
+    /// @property{set_USE_ORIGINAL_POSE}
     void SetUSE_ORIGINAL_POSE(bool enable);
+    /// @property{set_CONSTRAINTS}
     void SetCONSTRAINTS(bool enable);
+    /// @property{set_AUTO_SOLVE}
     void SetAUTO_SOLVE(bool enable);
 
 private:

@@ -28,8 +28,8 @@
 namespace Urho3D
 {
 
-Database::Database(Context* context_) :
-    Object(context_),
+Database::Database(Context* context) :
+    Object(context),
 #ifdef ODBC_3_OR_LATER
     poolSize_(0)
 #else

@@ -12,7 +12,7 @@ const StringHash ANIMATEDMODEL_TYPE("AnimatedModel");
 const StringHash STATICMODELGROUP_TYPE("StaticModelGroup");
 const StringHash SPLINEPATH_TYPE("SplinePath");
 const StringHash CONSTRAINT_TYPE("Constraint");
-const String NO_CHANGE(uint8(0));
+const String NO_CHANGE(0);
 const StringHash TYPE_VAR("Type");
 const StringHash NODE_ID_VAR("NodeID");
 const StringHash COMPONENT_ID_VAR("ComponentID");

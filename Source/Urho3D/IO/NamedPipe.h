@@ -63,8 +63,10 @@ public:
     void Close();
 
     /// Return whether is open.
+    /// @property
     bool IsOpen() const;
     /// Return whether is in server mode.
+    /// @property
     bool IsServer() const { return isServer_; }
 
 private:

@@ -55,14 +55,19 @@ public:
     /// Update. Called by HandlePostUpdate().
     void Update();
     /// Set UI elements' style from an XML file.
+    /// @property
     void SetDefaultStyle(XMLFile* style);
     /// Set elements to show.
+    /// @property
     void SetMode(unsigned mode);
     /// Set maximum profiler block depth, default unlimited.
+    /// @property
     void SetProfilerMaxDepth(unsigned depth);
     /// Set profiler accumulation interval in seconds.
+    /// @property
     void SetProfilerInterval(float interval);
     /// Set whether to show 3D geometry primitive/batch count only. Default false.
+    /// @property
     void SetUseRendererStats(bool enable);
     /// Toggle elements.
     void Toggle(unsigned mode);
@@ -70,30 +75,39 @@ public:
     void ToggleAll();
 
     /// Return the UI style file.
+    /// @property
     XMLFile* GetDefaultStyle() const;
 
     /// Return rendering stats text.
+    /// @property
     Text* GetStatsText() const { return statsText_; }
 
     /// Return rendering mode text.
+    /// @property
     Text* GetModeText() const { return modeText_; }
 
     /// Return profiler text.
+    /// @property
     Text* GetProfilerText() const { return profilerText_; }
 
     /// Return memory text.
+    /// @property
     Text* GetMemoryText() const { return memoryText_; }
 
     /// Return currently shown elements.
+    /// @property
     unsigned GetMode() const { return mode_; }
 
     /// Return maximum profiler block depth.
+    /// @property
     unsigned GetProfilerMaxDepth() const { return profilerMaxDepth_; }
 
     /// Return profiler accumulation interval in seconds.
+    /// @property
     float GetProfilerInterval() const;
 
     /// Return whether showing 3D geometry primitive/batch count only.
+    /// @property
     bool GetUseRendererStats() const { return useRendererStats_; }
 
     /// Set application-specific stats.

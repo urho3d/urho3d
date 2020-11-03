@@ -49,16 +49,20 @@ public:
     void OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifiers) override;
 
     /// Set checked state.
+    /// @property
     void SetChecked(bool enable);
     /// Set checked image offset.
+    /// @property
     void SetCheckedOffset(const IntVector2& offset);
     /// Set checked image offset.
     void SetCheckedOffset(int x, int y);
 
     /// Return whether is checked.
+    /// @property
     bool IsChecked() const { return checked_; }
 
     /// Return checked image offset.
+    /// @property
     const IntVector2& GetCheckedOffset() const { return checkedOffset_; }
 
 protected:

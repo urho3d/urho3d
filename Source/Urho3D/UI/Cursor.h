@@ -111,16 +111,20 @@ public:
     /// Define a shape.
     void DefineShape(CursorShape shape, Image* image, const IntRect& imageRect, const IntVector2& hotSpot);
     /// Set current shape.
+    /// @property
     void SetShape(const String& shape);
     /// Set current shape.
     void SetShape(CursorShape shape);
     /// Set whether to use system default shapes. Is only possible when the OS mouse cursor has been set visible from the Input subsystem.
+    /// @property
     void SetUseSystemShapes(bool enable);
 
     /// Get current shape.
+    /// @property
     const String& GetShape() const { return shape_; }
 
     /// Return whether is using system default shapes.
+    /// @property
     bool GetUseSystemShapes() const { return useSystemShapes_; }
 
     /// Set shapes attribute.

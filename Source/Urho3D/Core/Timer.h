@@ -93,18 +93,22 @@ public:
     void SetTimerPeriod(unsigned mSec);
 
     /// Return frame number, starting from 1 once BeginFrame() is called for the first time.
+    /// @property
     unsigned GetFrameNumber() const { return frameNumber_; }
 
     /// Return current frame timestep as seconds.
+    /// @property
     float GetTimeStep() const { return timeStep_; }
 
     /// Return current low-resolution timer period in milliseconds.
     unsigned GetTimerPeriod() const { return timerPeriod_; }
 
     /// Return elapsed time from program start as seconds.
+    /// @property
     float GetElapsedTime();
 
     /// Return current frames per second.
+    /// @property
     float GetFramesPerSecond() const;
 
     /// Get system time as milliseconds.

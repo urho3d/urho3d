@@ -55,19 +55,24 @@ public:
     void ReleaseJoint();
 
     /// Set other rigid body.
+    /// @property
     void SetOtherBody(RigidBody2D* body);
     /// Set collide connected.
+    /// @property
     void SetCollideConnected(bool collideConnected);
     /// Set attached constriant (for gear).
     void SetAttachedConstraint(Constraint2D* constraint);
 
     /// Return owner body.
+    /// @property
     RigidBody2D* GetOwnerBody() const { return ownerBody_; }
 
     /// Return other body.
+    /// @property
     RigidBody2D* GetOtherBody() const { return otherBody_; }
 
     /// Return collide connected.
+    /// @property
     bool GetCollideConnected() const { return collideConnected_; }
 
     /// Return attached constraint (for gear).

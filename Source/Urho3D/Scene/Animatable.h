@@ -82,11 +82,13 @@ public:
     bool SaveJSON(JSONValue& dest) const override;
 
     /// Set automatic update of animation, default true.
+    /// @property
     void SetAnimationEnabled(bool enable);
     /// Set time position of all attribute animations or an object animation manually. Automatic update should be disabled in this case.
     void SetAnimationTime(float time);
 
     /// Set object animation.
+    /// @property
     void SetObjectAnimation(ObjectAnimation* objectAnimation);
     /// Set attribute animation.
     void SetAttributeAnimation
@@ -103,9 +105,11 @@ public:
     void RemoveAttributeAnimation(const String& name);
 
     /// Return animation enabled.
+    /// @property
     bool GetAnimationEnabled() const { return animationEnabled_; }
 
     /// Return object animation.
+    /// @property
     ObjectAnimation* GetObjectAnimation() const;
     /// Return attribute animation.
     ValueAnimation* GetAttributeAnimation(const String& name) const;

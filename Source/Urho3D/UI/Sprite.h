@@ -55,49 +55,63 @@ public:
     IntVector2 ElementToScreen(const IntVector2& position) override;
 
     /// Set floating point position.
+    /// @property
     void SetPosition(const Vector2& position);
     /// Set floating point position.
     void SetPosition(float x, float y);
     /// Set hotspot for positioning and rotation.
+    /// @property
     void SetHotSpot(const IntVector2& hotSpot);
     /// Set hotspot for positioning and rotation.
     void SetHotSpot(int x, int y);
     /// Set scale. Scale also affects child sprites.
+    /// @property
     void SetScale(const Vector2& scale);
     /// Set scale. Scale also affects child sprites.
     void SetScale(float x, float y);
     /// Set uniform scale. Scale also affects child sprites.
     void SetScale(float scale);
     /// Set rotation angle.
+    /// @property
     void SetRotation(float angle);
     /// Set texture.
+    /// @property
     void SetTexture(Texture* texture);
     /// Set part of texture to use as the image.
+    /// @property
     void SetImageRect(const IntRect& rect);
     /// Use whole texture as the image.
     void SetFullImageRect();
     /// Set blend mode.
+    /// @property
     void SetBlendMode(BlendMode mode);
 
     /// Return floating point position.
+    /// @property
     const Vector2& GetPosition() const { return floatPosition_; }
 
     /// Return hotspot.
+    /// @property
     const IntVector2& GetHotSpot() const { return hotSpot_; }
 
     /// Return scale.
+    /// @property
     const Vector2& GetScale() const { return scale_; }
 
     /// Return rotation angle.
+    /// @property
     float GetRotation() const { return rotation_; }
 
     /// Return texture.
+    /// @property
     Texture* GetTexture() const { return texture_; }
 
     /// Return image rectangle.
+    /// @property
     const IntRect& GetImageRect() const { return imageRect_; }
 
     /// Return blend mode.
+    /// @property
     BlendMode GetBlendMode() const { return blendMode_; }
 
     /// Set texture attribute.

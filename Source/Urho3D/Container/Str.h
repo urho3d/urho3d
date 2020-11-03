@@ -129,6 +129,7 @@ public:
     /// Construct from a short integer.
     explicit String(short value);
     /// Construct from a long integer.
+    /// @nobind
     explicit String(long value);
     /// Construct from a long long integer.
     explicit String(long long value);
@@ -137,6 +138,7 @@ public:
     /// Construct from an unsigned short integer.
     explicit String(unsigned short value);
     /// Construct from an unsigned long integer.
+    /// @nobind
     explicit String(unsigned long value);
     /// Construct from an unsigned long long integer.
     explicit String(unsigned long long value);
@@ -182,7 +184,6 @@ public:
     /// Move-assign a string.
     String& operator =(String && rhs) noexcept
     {
-        assert(&rhs != this);
         Swap(rhs);
         return *this;
     }
@@ -233,6 +234,7 @@ public:
     /// Add-assign (concatenate as string) a short integer.
     String& operator +=(short rhs);
     /// Add-assign (concatenate as string) a long integer.
+    /// @nobind
     String& operator +=(long rhs);
     /// Add-assign (concatenate as string) a long long integer.
     String& operator +=(long long rhs);
@@ -241,6 +243,7 @@ public:
     /// Add-assign (concatenate as string) a short unsigned integer.
     String& operator +=(unsigned short rhs);
     /// Add-assign (concatenate as string) a long unsigned integer.
+    /// @nobind
     String& operator +=(unsigned long rhs);
     /// Add-assign (concatenate as string) a long long unsigned integer.
     String& operator +=(unsigned long long rhs);
@@ -425,12 +428,14 @@ public:
     const char* CString() const { return buffer_; }
 
     /// Return length.
+    /// @property
     unsigned Length() const { return length_; }
 
     /// Return buffer capacity.
     unsigned Capacity() const { return capacity_; }
 
     /// Return whether the string is empty.
+    /// @property
     bool Empty() const { return length_ == 0; }
 
     /// Return comparison result with a string.
@@ -449,6 +454,7 @@ public:
     /// Construct UTF8 content from wide characters.
     void SetUTF8FromWChar(const wchar_t* str);
     /// Calculate number of characters in UTF8 content.
+    /// @property{get_utf8Length}
     unsigned LengthUTF8() const;
     /// Return byte offset to char in UTF8 content.
     unsigned ByteOffsetUTF8(unsigned index) const;
@@ -482,6 +488,7 @@ public:
     /// Return substrings split by a separator char. By default don't return empty strings.
     static Vector<String> Split(const char* str, char separator, bool keepEmptyStrings = false);
     /// Return a string by joining substrings with a 'glue' string.
+    /// @manualbind
     static String Joined(const Vector<String>& subStrings, const String& glue);
     /// Encode Unicode character to UTF8. Pointer will be incremented.
     static void EncodeUTF8(char*& dest, unsigned unicodeChar);
@@ -568,6 +575,7 @@ inline String operator +(const wchar_t* lhs, const String& rhs)
 }
 
 /// Wide character string. Only meant for converting from String and passing to the operating system where necessary.
+/// @nobind
 class URHO3D_API WString
 {
 public:

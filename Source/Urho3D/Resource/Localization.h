@@ -40,14 +40,17 @@ public:
     ~Localization() override;
 
     /// Return the number of languages.
+    /// @property
     int GetNumLanguages() const { return (int)languages_.Size(); }
 
     /// Return the index number of current language. The index is determined by the order of loading.
+    /// @property
     int GetLanguageIndex() const { return languageIndex_; }
 
     /// Return the index number of language. The index is determined by the order of loading.
     int GetLanguageIndex(const String& language);
     /// Return the name of current language.
+    /// @property
     String GetLanguage();
     /// Return the name of language.
     String GetLanguage(int index);

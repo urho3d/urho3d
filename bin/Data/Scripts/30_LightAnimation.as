@@ -52,11 +52,11 @@ void CreateScene()
 
     // Create light color animation
     ValueAnimation@ colorAnimation = ValueAnimation();
-    colorAnimation.SetKeyFrame(0.0f, Variant(WHITE));
-    colorAnimation.SetKeyFrame(1.0f, Variant(RED));
-    colorAnimation.SetKeyFrame(2.0f, Variant(YELLOW));
-    colorAnimation.SetKeyFrame(3.0f, Variant(GREEN));
-    colorAnimation.SetKeyFrame(4.0f, Variant(WHITE));
+    colorAnimation.SetKeyFrame(0.0f, Variant(Color::WHITE));
+    colorAnimation.SetKeyFrame(1.0f, Variant(Color::RED));
+    colorAnimation.SetKeyFrame(2.0f, Variant(Color::YELLOW));
+    colorAnimation.SetKeyFrame(3.0f, Variant(Color::GREEN));
+    colorAnimation.SetKeyFrame(4.0f, Variant(Color::WHITE));
     light.SetAttributeAnimation("Color", colorAnimation);
 
     // Create text animation

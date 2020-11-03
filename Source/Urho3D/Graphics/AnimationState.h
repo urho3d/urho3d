@@ -79,14 +79,19 @@ public:
     ~AnimationState() override;
 
     /// Set start bone. Not supported in node animation mode. Resets any assigned per-bone weights.
+    /// @property
     void SetStartBone(Bone* startBone);
     /// Set looping enabled/disabled.
+    /// @property
     void SetLooped(bool looped);
     /// Set blending weight.
+    /// @property
     void SetWeight(float weight);
     /// Set blending mode.
+    /// @property
     void SetBlendMode(AnimationBlendMode mode);
     /// Set time position. Does not fire animation triggers.
+    /// @property
     void SetTime(float time);
     /// Set per-bone blending weight by track index. Default is 1.0 (full), is multiplied  with the state's blending weight when applying the animation. Optionally recurses to child bones.
     void SetBoneWeight(unsigned index, float weight, bool recursive = false);
@@ -99,20 +104,26 @@ public:
     /// Modify time position. %Animation triggers will be fired.
     void AddTime(float delta);
     /// Set blending layer.
+    /// @property
     void SetLayer(unsigned char layer);
 
     /// Return animation.
+    /// @property
     Animation* GetAnimation() const { return animation_; }
 
     /// Return animated model this state belongs to (model mode).
+    /// @property
     AnimatedModel* GetModel() const;
     /// Return root scene node this state controls (node hierarchy mode).
+    /// @property
     Node* GetNode() const;
     /// Return start bone.
+    /// @property
     Bone* GetStartBone() const;
     /// Return per-bone blending weight by track index.
     float GetBoneWeight(unsigned index) const;
     /// Return per-bone blending weight by name.
+    /// @property{get_boneWeights}
     float GetBoneWeight(const String& name) const;
     /// Return per-bone blending weight by name.
     float GetBoneWeight(StringHash nameHash) const;
@@ -124,24 +135,31 @@ public:
     unsigned GetTrackIndex(StringHash nameHash) const;
 
     /// Return whether weight is nonzero.
+    /// @property
     bool IsEnabled() const { return weight_ > 0.0f; }
 
     /// Return whether looped.
+    /// @property
     bool IsLooped() const { return looped_; }
 
     /// Return blending weight.
+    /// @property
     float GetWeight() const { return weight_; }
 
     /// Return blending mode.
+    /// @property
     AnimationBlendMode GetBlendMode() const { return blendingMode_; }
 
     /// Return time position.
+    /// @property
     float GetTime() const { return time_; }
 
     /// Return animation length.
+    /// @property
     float GetLength() const;
 
     /// Return blending layer.
+    /// @property
     unsigned char GetLayer() const { return layer_; }
 
     /// Apply the animation at the current time position.
