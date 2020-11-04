@@ -39,10 +39,10 @@ static NamedPipe* NamedPipe_NamedPipe_Context()
     return new NamedPipe(GetScriptContext());
 }
 
-// NamedPipe::NamedPipe(Context* context, const String& pipeName, bool isServer) | File: ../IO/NamedPipe.h
-static NamedPipe* NamedPipe_NamedPipe_Context_String_bool(const String &pipeName, bool isServer)
+// NamedPipe::NamedPipe(Context* context, const String& name, bool isServer) | File: ../IO/NamedPipe.h
+static NamedPipe* NamedPipe_NamedPipe_Context_String_bool(const String &name, bool isServer)
 {
-    return new NamedPipe(GetScriptContext(), pipeName, isServer);
+    return new NamedPipe(GetScriptContext(), name, isServer);
 }
 
 // StringVector Deserializer::ReadStringVector() | File: ../IO/Deserializer.h
@@ -297,7 +297,7 @@ void ASRegisterGenerated_Members_N(asIScriptEngine* engine)
     // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
     engine->RegisterObjectMethod("NamedPipe", "const VariantMap& GetGlobalVars() const", asMETHODPR(NamedPipe, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
     engine->RegisterObjectMethod("NamedPipe", "const VariantMap& get_globalVars() const", asMETHODPR(NamedPipe, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    // const String& NamedPipe::GetName() const override | File: ../IO/NamedPipe.h
+    // const String& AbstractFile::GetName() const override | File: ../IO/AbstractFile.h
     engine->RegisterObjectMethod("NamedPipe", "const String& GetName() const", asMETHODPR(NamedPipe, GetName, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod("NamedPipe", "const String& get_name() const", asMETHODPR(NamedPipe, GetName, () const, const String&), asCALL_THISCALL);
     // unsigned Deserializer::GetPosition() const | File: ../IO/Deserializer.h
@@ -343,11 +343,11 @@ void ASRegisterGenerated_Members_N(asIScriptEngine* engine)
     engine->RegisterObjectMethod("NamedPipe", "bool get_server() const", asMETHODPR(NamedPipe, IsServer, () const, bool), asCALL_THISCALL);
     // explicit NamedPipe::NamedPipe(Context* context) | File: ../IO/NamedPipe.h
     engine->RegisterObjectBehaviour("NamedPipe", asBEHAVE_FACTORY, "NamedPipe@+ f()", asFUNCTION(NamedPipe_NamedPipe_Context), asCALL_CDECL);
-    // NamedPipe::NamedPipe(Context* context, const String& pipeName, bool isServer) | File: ../IO/NamedPipe.h
+    // NamedPipe::NamedPipe(Context* context, const String& name, bool isServer) | File: ../IO/NamedPipe.h
     engine->RegisterObjectBehaviour("NamedPipe", asBEHAVE_FACTORY, "NamedPipe@+ f(const String&in, bool)", asFUNCTION(NamedPipe_NamedPipe_Context_String_bool), asCALL_CDECL);
     // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
     engine->RegisterObjectMethod("NamedPipe", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(NamedPipe, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
-    // bool NamedPipe::Open(const String& pipeName, bool isServer) | File: ../IO/NamedPipe.h
+    // bool NamedPipe::Open(const String& name, bool isServer) | File: ../IO/NamedPipe.h
     engine->RegisterObjectMethod("NamedPipe", "bool Open(const String&in, bool)", asMETHODPR(NamedPipe, Open, (const String&, bool), bool), asCALL_THISCALL);
     // unsigned NamedPipe::Read(void* dest, unsigned size) override | File: ../IO/NamedPipe.h
     // Error: type "void*" can not automatically bind
@@ -453,6 +453,9 @@ void ASRegisterGenerated_Members_N(asIScriptEngine* engine)
     // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
     engine->RegisterObjectMethod("NamedPipe", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(NamedPipe, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("NamedPipe", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(NamedPipe, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    // void NamedPipe::SetName(const String& name) override | File: ../IO/NamedPipe.h
+    engine->RegisterObjectMethod("NamedPipe", "void SetName(const String&in)", asMETHODPR(NamedPipe, SetName, (const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NamedPipe", "void set_name(const String&in)", asMETHODPR(NamedPipe, SetName, (const String&), void), asCALL_THISCALL);
     // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
     // Error: type "EventHandler*" can not automatically bind
     // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
