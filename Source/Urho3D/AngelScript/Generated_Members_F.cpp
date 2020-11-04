@@ -244,7 +244,7 @@ void ASRegisterGenerated_Members_F(asIScriptEngine* engine)
     // FileMode File::GetMode() const | File: ../IO/File.h
     engine->RegisterObjectMethod("File", "FileMode GetMode() const", asMETHODPR(File, GetMode, () const, FileMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("File", "FileMode get_mode() const", asMETHODPR(File, GetMode, () const, FileMode), asCALL_THISCALL);
-    // const String& File::GetName() const override | File: ../IO/File.h
+    // const String& AbstractFile::GetName() const override | File: ../IO/AbstractFile.h
     engine->RegisterObjectMethod("File", "const String& GetName() const", asMETHODPR(File, GetName, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod("File", "const String& get_name() const", asMETHODPR(File, GetName, () const, const String&), asCALL_THISCALL);
     // unsigned Deserializer::GetPosition() const | File: ../IO/Deserializer.h
@@ -398,8 +398,9 @@ void ASRegisterGenerated_Members_F(asIScriptEngine* engine)
     // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
     engine->RegisterObjectMethod("File", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(File, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("File", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(File, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    // void File::SetName(const String& name) | File: ../IO/File.h
+    // virtual void AbstractFile::SetName(const String& name) | File: ../IO/AbstractFile.h
     engine->RegisterObjectMethod("File", "void SetName(const String&in)", asMETHODPR(File, SetName, (const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("File", "void set_name(const String&in)", asMETHODPR(File, SetName, (const String&), void), asCALL_THISCALL);
     // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
     // Error: type "EventHandler*" can not automatically bind
     // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
