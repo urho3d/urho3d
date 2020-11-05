@@ -141,7 +141,7 @@ jobs:
             android/urho3d-lib/build/distributions/*.zip
             android/urho3d-lib/build/libs/*.jar
             build/*.out
-        if: github.event_name == 'push' || (failure() && (matrix.platform == 'linux-clang-tidy' || matrix.platform == 'linux-clang-format'))
+        if: (success() && github.event_name == 'push') || (failure() && (matrix.platform == 'linux-clang-tidy' || matrix.platform == 'linux-clang-format'))
         continue-on-error: ${{ !startsWith(github.ref, 'refs/tags/') }}
       - name: Publish
         env:
