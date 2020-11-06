@@ -26,7 +26,7 @@ desc 'Invoke CMake to configure and generate a build tree'
 task :cmake => [:init] do
   if ENV['CI']
     system 'cmake --version' or abort 'Failed to find CMake'
-    if ENV['USE_CCACHE'] && /\[cache clear\]/ =~ `git log --format=%B -n1`
+    if ENV['USE_CCACHE'] && /\[cache clear\]/ =~ `git log --format=%B -n1 2>/dev/null`
       system 'bash', '-c', 'rm -rf ~/.{ccache,gradle}' or abort 'Failed to clear the build cache'
     end
   end
@@ -404,7 +404,8 @@ def app_build_gradle_kts(name)
   template = File.readlines('android/launcher-app/build.gradle.kts')
   sdk_version = first_match(/compileSdkVersion\((\d+)\)/, template)
   min_sdk_version = first_match(/minSdkVersion\((\d+)\)/, template)
-  aar_version = first_match(/AAR version: (.+)/, `#{ENV['OS'] ? 'gradlew.bat' : './gradlew'} aarVersion 2>#{ENV['OS'] ? 'null' : '/dev/null'}`)
+  aar_version = ENV['CI'] && ENV['PLATFORM'] != 'android' ? 'unknown' : # Skip using gradle all together when on CI, unless for Android build
+                    first_match(/AAR version: (.+)/, `#{ENV['OS'] ? 'gradlew.bat' : './gradlew'} aarVersion 2>#{ENV['OS'] ? 'null' : '/dev/null'}`)
   type = ENV.fetch('URHO3D_LIB_TYPE', 'STATIC').downcase
   <<-EOF
 plugins {

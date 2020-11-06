@@ -1578,7 +1578,7 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
     // Error: type "const unsigned char*" can not automatically bind
     // unsigned char* VectorBuffer::GetModifiableData() | File: ../IO/VectorBuffer.h
     // Error: type "unsigned char*" can not automatically bind
-    // virtual const String& Deserializer::GetName() const | File: ../IO/Deserializer.h
+    // const String& AbstractFile::GetName() const override | File: ../IO/AbstractFile.h
     engine->RegisterObjectMethod("VectorBuffer", "const String& GetName() const", asMETHODPR(VectorBuffer, GetName, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod("VectorBuffer", "const String& get_name() const", asMETHODPR(VectorBuffer, GetName, () const, const String&), asCALL_THISCALL);
     // unsigned Deserializer::GetPosition() const | File: ../IO/Deserializer.h
@@ -1684,6 +1684,9 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
     // Error: type "void*" can not automatically bind
     // void VectorBuffer::SetData(Deserializer& source, unsigned size) | File: ../IO/VectorBuffer.h
     engine->RegisterObjectMethod("VectorBuffer", "void SetData(Deserializer&, uint)", asMETHODPR(VectorBuffer, SetData, (Deserializer&, unsigned), void), asCALL_THISCALL);
+    // virtual void AbstractFile::SetName(const String& name) | File: ../IO/AbstractFile.h
+    engine->RegisterObjectMethod("VectorBuffer", "void SetName(const String&in)", asMETHODPR(VectorBuffer, SetName, (const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("VectorBuffer", "void set_name(const String&in)", asMETHODPR(VectorBuffer, SetName, (const String&), void), asCALL_THISCALL);
     // unsigned Deserializer::Tell() const | File: ../IO/Deserializer.h
     engine->RegisterObjectMethod("VectorBuffer", "uint Tell() const", asMETHODPR(VectorBuffer, Tell, () const, unsigned), asCALL_THISCALL);
     // explicit VectorBuffer::VectorBuffer(const PODVector<unsigned char>& data) | File: ../IO/VectorBuffer.h

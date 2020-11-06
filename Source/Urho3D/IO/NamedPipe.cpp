@@ -54,7 +54,7 @@ NamedPipe::NamedPipe(Context* context) :
 {
 }
 
-NamedPipe::NamedPipe(Context* context, const String& pipeName, bool isServer) :
+NamedPipe::NamedPipe(Context* context, const String& name, bool isServer) :
     Object(context),
     isServer_(false),
 #ifdef _WIN32
@@ -64,7 +64,7 @@ NamedPipe::NamedPipe(Context* context, const String& pipeName, bool isServer) :
     writeHandle_(-1)
 #endif
 {
-    Open(pipeName, isServer);
+    Open(name, isServer);
 }
 
 NamedPipe::~NamedPipe()
@@ -81,7 +81,7 @@ unsigned NamedPipe::Seek(unsigned position)
 
 static const char* pipePath = "\\\\.\\pipe\\";
 
-bool NamedPipe::Open(const String& pipeName, bool isServer)
+bool NamedPipe::Open(const String& name, bool isServer)
 {
     URHO3D_PROFILE(OpenNamedPipe);
 
@@ -91,7 +91,7 @@ bool NamedPipe::Open(const String& pipeName, bool isServer)
 
     if (isServer)
     {
-        handle_ = CreateNamedPipeW(WString(pipePath + pipeName).CString(),
+        handle_ = CreateNamedPipeW(WString(pipePath + name).CString(),
             PIPE_ACCESS_DUPLEX,
             PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_NOWAIT,
             1,
@@ -103,13 +103,13 @@ bool NamedPipe::Open(const String& pipeName, bool isServer)
 
         if (handle_ == INVALID_HANDLE_VALUE)
         {
-            URHO3D_LOGERROR("Failed to create named pipe " + pipeName);
+            URHO3D_LOGERROR("Failed to create named pipe " + name);
             return false;
         }
         else
         {
-            URHO3D_LOGDEBUG("Created named pipe " + pipeName);
-            pipeName_ = pipeName;
+            URHO3D_LOGDEBUG("Created named pipe " + name);
+            name_ = name;
             isServer_ = true;
             return true;
         }
@@ -117,7 +117,7 @@ bool NamedPipe::Open(const String& pipeName, bool isServer)
     else
     {
         handle_ = CreateFileW(
-            WString(pipePath + pipeName).CString(),
+            WString(pipePath + name).CString(),
             GENERIC_READ | GENERIC_WRITE,
             0,
             nullptr,
@@ -128,13 +128,13 @@ bool NamedPipe::Open(const String& pipeName, bool isServer)
 
         if (handle_ == INVALID_HANDLE_VALUE)
         {
-            URHO3D_LOGERROR("Failed to connect to named pipe " + pipeName);
+            URHO3D_LOGERROR("Failed to connect to named pipe " + name);
             return false;
         }
         else
         {
-            URHO3D_LOGDEBUG("Connected to named pipe " + pipeName);
-            pipeName_ = pipeName;
+            URHO3D_LOGDEBUG("Connected to named pipe " + name);
+            name_ = name;
             return true;
         }
     }
@@ -178,9 +178,9 @@ void NamedPipe::Close()
 
         CloseHandle(handle_);
         handle_ = INVALID_HANDLE_VALUE;
-        pipeName_.Clear();
+        name_.Clear();
 
-        URHO3D_LOGDEBUG("Closed named pipe " + pipeName_);
+        URHO3D_LOGDEBUG("Closed named pipe " + name_);
     }
 }
 
@@ -207,7 +207,7 @@ static const char* pipePath = "/tmp/";
 
 #define SAFE_CLOSE(handle) if ((handle) != -1) { close(handle); (handle) = -1; }
 
-bool NamedPipe::Open(const String& pipeName, bool isServer)
+bool NamedPipe::Open(const String& name, bool isServer)
 {
 #ifdef __EMSCRIPTEN__
     URHO3D_LOGERROR("Opening a named pipe not supported on Web platform");
@@ -219,8 +219,8 @@ bool NamedPipe::Open(const String& pipeName, bool isServer)
 
     isServer_ = false;
 
-    String serverReadName = pipePath + pipeName + "SR";
-    String clientReadName = pipePath + pipeName + "CR";
+    String serverReadName = pipePath + name + "SR";
+    String clientReadName = pipePath + name + "CR";
 
     // Make sure SIGPIPE is ignored and will not lead to process termination
     signal(SIGPIPE, SIG_IGN);
@@ -235,7 +235,7 @@ bool NamedPipe::Open(const String& pipeName, bool isServer)
 
         if (readHandle_ == -1 && writeHandle_ == -1)
         {
-            URHO3D_LOGERROR("Failed to create named pipe " + pipeName);
+            URHO3D_LOGERROR("Failed to create named pipe " + name);
             SAFE_CLOSE(readHandle_);
             SAFE_CLOSE(writeHandle_);
             unlink(serverReadName.CString());
@@ -244,8 +244,8 @@ bool NamedPipe::Open(const String& pipeName, bool isServer)
         }
         else
         {
-            URHO3D_LOGDEBUG("Created named pipe " + pipeName);
-            pipeName_ = pipeName;
+            URHO3D_LOGDEBUG("Created named pipe " + name);
+            name_ = name;
             isServer_ = true;
             return true;
         }
@@ -256,15 +256,15 @@ bool NamedPipe::Open(const String& pipeName, bool isServer)
         writeHandle_ = open(serverReadName.CString(), O_WRONLY | O_NDELAY);
         if (readHandle_ == -1 && writeHandle_ == -1)
         {
-            URHO3D_LOGERROR("Failed to connect to named pipe " + pipeName);
+            URHO3D_LOGERROR("Failed to connect to named pipe " + name);
             SAFE_CLOSE(readHandle_);
             SAFE_CLOSE(writeHandle_);
             return false;
         }
         else
         {
-            URHO3D_LOGDEBUG("Connected to named pipe " + pipeName);
-            pipeName_ = pipeName;
+            URHO3D_LOGDEBUG("Connected to named pipe " + name);
+            name_ = name;
             return true;
         }
     }
@@ -277,9 +277,9 @@ unsigned NamedPipe::Read(void* dest, unsigned size)
     if (readHandle_ == -1 && writeHandle_ != -1)
     {
         if (isServer_)
-            readHandle_ = open((pipePath + pipeName_ + "SR").CString(), O_RDONLY | O_NDELAY);
+            readHandle_ = open((pipePath + name_ + "SR").CString(), O_RDONLY | O_NDELAY);
         else
-            readHandle_ = open((pipePath + pipeName_ + "CR").CString(), O_RDONLY | O_NDELAY);
+            readHandle_ = open((pipePath + name_ + "CR").CString(), O_RDONLY | O_NDELAY);
     }
 
     if (readHandle_ != -1)
@@ -297,9 +297,9 @@ unsigned NamedPipe::Write(const void* data, unsigned size)
     if (writeHandle_ == -1 && readHandle_ != -1)
     {
         if (isServer_)
-            writeHandle_ = open((pipePath + pipeName_ + "CR").CString(), O_WRONLY | O_NDELAY);
+            writeHandle_ = open((pipePath + name_ + "CR").CString(), O_WRONLY | O_NDELAY);
         else
-            writeHandle_ = open((pipePath + pipeName_ + "SR").CString(), O_WRONLY | O_NDELAY);
+            writeHandle_ = open((pipePath + name_ + "SR").CString(), O_WRONLY | O_NDELAY);
     }
 
     // Loop until all bytes written in case of partial write
@@ -330,14 +330,14 @@ void NamedPipe::Close()
 
         if (isServer_)
         {
-            String serverReadName = pipePath + pipeName_ + "SR";
-            String clientReadName = pipePath + pipeName_ + "CR";
+            String serverReadName = pipePath + name_ + "SR";
+            String clientReadName = pipePath + name_ + "CR";
             unlink(serverReadName.CString());
             unlink(clientReadName.CString());
             isServer_ = false;
         }
 
-        pipeName_.Clear();
+        name_.Clear();
     }
 }
 
@@ -355,9 +355,9 @@ bool NamedPipe::IsEof() const
     if (readHandle_ == -1 && writeHandle_ != -1)
     {
         if (isServer_)
-            readHandle_ = open((pipePath + pipeName_ + "SR").CString(), O_RDONLY | O_NDELAY);
+            readHandle_ = open((pipePath + name_ + "SR").CString(), O_RDONLY | O_NDELAY);
         else
-            readHandle_ = open((pipePath + pipeName_ + "CR").CString(), O_RDONLY | O_NDELAY);
+            readHandle_ = open((pipePath + name_ + "CR").CString(), O_RDONLY | O_NDELAY);
     }
 
     if (readHandle_ != -1)
@@ -375,5 +375,11 @@ bool NamedPipe::IsEof() const
 #endif
 }
 #endif
+
+void NamedPipe::SetName(const String &name)
+{
+    URHO3D_LOGERROR("Cannot change name of the NamedPipe!");
+    assert(0);
+}
 
 }

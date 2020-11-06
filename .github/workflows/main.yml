@@ -59,7 +59,7 @@ jobs:
       BUILD_TYPE: ${{ matrix.build-type }}
       LIB_TYPE: ${{ matrix.lib-type }}
       ARCH: ${{ matrix.architecture }}
-      DBE_TAG: latest
+      DBE_TAG: master
     steps:
       - name: Checkout
         uses: actions/checkout@v2

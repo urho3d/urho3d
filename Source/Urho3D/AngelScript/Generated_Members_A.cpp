@@ -304,7 +304,7 @@ void ASRegisterGenerated_Members_A(asIScriptEngine* engine)
     // virtual unsigned Deserializer::GetChecksum() | File: ../IO/Deserializer.h
     engine->RegisterObjectMethod("AbstractFile", "uint GetChecksum()", asMETHODPR(AbstractFile, GetChecksum, (), unsigned), asCALL_THISCALL);
     engine->RegisterObjectMethod("AbstractFile", "uint get_checksum()", asMETHODPR(AbstractFile, GetChecksum, (), unsigned), asCALL_THISCALL);
-    // virtual const String& Deserializer::GetName() const | File: ../IO/Deserializer.h
+    // const String& AbstractFile::GetName() const override | File: ../IO/AbstractFile.h
     engine->RegisterObjectMethod("AbstractFile", "const String& GetName() const", asMETHODPR(AbstractFile, GetName, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod("AbstractFile", "const String& get_name() const", asMETHODPR(AbstractFile, GetName, () const, const String&), asCALL_THISCALL);
     // unsigned Deserializer::GetPosition() const | File: ../IO/Deserializer.h
@@ -402,6 +402,9 @@ void ASRegisterGenerated_Members_A(asIScriptEngine* engine)
     engine->RegisterObjectMethod("AbstractFile", "uint Seek(uint)", asMETHODPR(AbstractFile, Seek, (unsigned), unsigned), asCALL_THISCALL);
     // unsigned Deserializer::SeekRelative(int delta) | File: ../IO/Deserializer.h
     engine->RegisterObjectMethod("AbstractFile", "uint SeekRelative(int)", asMETHODPR(AbstractFile, SeekRelative, (int), unsigned), asCALL_THISCALL);
+    // virtual void AbstractFile::SetName(const String& name) | File: ../IO/AbstractFile.h
+    engine->RegisterObjectMethod("AbstractFile", "void SetName(const String&in)", asMETHODPR(AbstractFile, SetName, (const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AbstractFile", "void set_name(const String&in)", asMETHODPR(AbstractFile, SetName, (const String&), void), asCALL_THISCALL);
     // unsigned Deserializer::Tell() const | File: ../IO/Deserializer.h
     engine->RegisterObjectMethod("AbstractFile", "uint Tell() const", asMETHODPR(AbstractFile, Tell, () const, unsigned), asCALL_THISCALL);
     // virtual unsigned Serializer::Write(const void* data, unsigned size)=0 | File: ../IO/Serializer.h
