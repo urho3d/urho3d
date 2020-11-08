@@ -29,6 +29,9 @@ project (Urho3D)
 # Set CMake modules search path
 set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 
+set (URHO3D_WEBSOCKETS TRUE)
+#set (URHO3D_PCH FALSE)
+
 # Include UrhoCommon.cmake module after setting project name
 include (UrhoCommon)
 
