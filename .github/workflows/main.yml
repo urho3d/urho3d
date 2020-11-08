@@ -51,8 +51,6 @@ jobs:
           - { platform: web, lib-type: static, architecture: wasm, build-type: dbg }
           - { platform: android, lib-type: static, architecture: all, build-type: both }
           - { platform: android, lib-type: shared, architecture: all, build-type: both }
-          - { platform: linux-clang-tidy }
-          - { platform: linux-clang-format }
     env:
       HOST: ${{ github.job }}
       PLATFORM: ${{ matrix.platform }}
