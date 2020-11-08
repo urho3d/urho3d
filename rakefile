@@ -189,6 +189,7 @@ task :ci do
   case ENV['PLATFORM']
   when 'web'
     ENV['EMSCRIPTEN_SHARE_DATA'] = '1'
+    $max_jobs = 1 if ENV['BUILD_TYPE'] == 'dbg'
     $publish_task = 'ci_publish_web'
   else
     # Do nothing
@@ -264,18 +265,20 @@ task :init do
   Rake::Task[:ci].invoke if ENV['CI']
   case build_host
   when /linux/
-    $max_jobs = `grep -c processor /proc/cpuinfo`.chomp
+    $max_jobs = `grep -c processor /proc/cpuinfo`.chomp unless $max_jobs
     ENV['GENERATOR'] = 'generic' unless ENV['GENERATOR']
     ENV['PLATFORM'] = 'linux' unless ENV['PLATFORM']
   when /darwin|macOS/
-    $max_jobs = `sysctl -n hw.logicalcpu`.chomp
+    $max_jobs = `sysctl -n hw.logicalcpu`.chomp unless $max_jobs
     ENV['GENERATOR'] = 'xcode' unless ENV['GENERATOR']
     ENV['PLATFORM'] = 'macOS' unless ENV['PLATFORM']
   when /win32|mingw|mswin|windows/
-    require 'win32ole'
-    WIN32OLE.connect('winmgmts://').ExecQuery("select NumberOfLogicalProcessors from Win32_ComputerSystem").each { |it|
-      $max_jobs = it.NumberOfLogicalProcessors
-    }
+    unless $max_jobs
+      require 'win32ole'
+      WIN32OLE.connect('winmgmts://').ExecQuery("select NumberOfLogicalProcessors from Win32_ComputerSystem").each { |it|
+        $max_jobs = it.NumberOfLogicalProcessors
+      }
+    end
     ENV['GENERATOR'] = 'vs' unless ENV['GENERATOR']
     ENV['PLATFORM'] = 'win' unless ENV['PLATFORM']
   else
