@@ -323,8 +323,11 @@ macro(add_subdir_include_dirs arg1)
 endmacro()
 ########
 
-include(cmake/LwsCheckRequirements.cmake)
-require_pthreads(requirements)
+if (NOT WIN32)
+    include(cmake/LwsCheckRequirements.cmake)
+    require_pthreads(requirements)
+endif ()
+
 # Define source files
 add_subdirectory(lib)
 
