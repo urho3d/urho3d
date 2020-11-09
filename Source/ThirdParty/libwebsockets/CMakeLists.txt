@@ -114,7 +114,7 @@ option(LWS_CTEST_INTERNET_AVAILABLE "CTest will performs tests that need the Int
 #
 # TLS library options... all except mbedTLS are basically OpenSSL variants.
 #
-option(LWS_WITH_SSL "Include SSL support (defaults to OpenSSL or similar, mbedTLS if LWS_WITH_MBEDTLS is set)" ON)
+option(LWS_WITH_SSL "Include SSL support (defaults to OpenSSL or similar, mbedTLS if LWS_WITH_MBEDTLS is set)" OFF)
 option(LWS_WITH_MBEDTLS "Use mbedTLS (>=2.0) replacement for OpenSSL. When setting this, you also may need to specify LWS_MBEDTLS_LIBRARIES and LWS_MBEDTLS_INCLUDE_DIRS" OFF)
 option(LWS_WITH_BORINGSSL "Use BoringSSL replacement for OpenSSL" OFF)
 option(LWS_WITH_CYASSL "Use CyaSSL replacement for OpenSSL. When setting this, you also need to specify LWS_CYASSL_LIBRARIES and LWS_CYASSL_INCLUDE_DIRS" OFF)
@@ -244,11 +244,35 @@ set(LWS_LIBRARY_VERSION_MAJOR 4)
 set(LWS_LIBRARY_VERSION_MINOR 1)
 set(LWS_LIBRARY_VERSION_PATCH 3)
 
+CHECK_FUNCTION_EXISTS(fork LWS_HAVE_FORK)
+CHECK_FUNCTION_EXISTS(getenv LWS_HAVE_GETENV)
+CHECK_FUNCTION_EXISTS(malloc LWS_HAVE_MALLOC)
+CHECK_FUNCTION_EXISTS(memset LWS_HAVE_MEMSET)
+CHECK_FUNCTION_EXISTS(realloc LWS_HAVE_REALLOC)
+CHECK_FUNCTION_EXISTS(socket LWS_HAVE_SOCKET)
+CHECK_FUNCTION_EXISTS(strerror LWS_HAVE_STRERROR)
+CHECK_FUNCTION_EXISTS(vfork LWS_HAVE_VFORK)
+CHECK_FUNCTION_EXISTS(execvpe LWS_HAVE_EXECVPE)
+CHECK_FUNCTION_EXISTS(getifaddrs LWS_HAVE_GETIFADDRS)
+CHECK_FUNCTION_EXISTS(snprintf LWS_HAVE_SNPRINTF)
+CHECK_FUNCTION_EXISTS(_snprintf LWS_HAVE__SNPRINTF)
+CHECK_FUNCTION_EXISTS(_vsnprintf LWS_HAVE__VSNPRINTF)
+CHECK_FUNCTION_EXISTS(getloadavg LWS_HAVE_GETLOADAVG)
+CHECK_FUNCTION_EXISTS(atoll LWS_HAVE_ATOLL)
+CHECK_FUNCTION_EXISTS(_atoi64 LWS_HAVE__ATOI64)
+CHECK_FUNCTION_EXISTS(_stat32i64 LWS_HAVE__STAT32I64)
+CHECK_FUNCTION_EXISTS(clock_gettime LWS_HAVE_CLOCK_GETTIME)
+
 # Modfied for Urho3D to allow building libwebsockets with SSL support
 if (URHO3D_SSL)
     message(STATUS "Adding SSL support for libwebsockets")
-    set(LWS_OPENSSL_SUPPORT 1)
-    set(LWS_WITH_SSL 1)
+    set(LWS_OPENSSL_SUPPORT ON)
+    set(LWS_WITH_SSL ON)
+    set(LWS_WITH_TLS ON)
+else ()
+    set(LWS_OPENSSL_SUPPORT OFF)
+    set(LWS_WITH_SSL OFF)
+    set(LWS_WITH_TLS OFF)
 endif ()
 
 include(CMakeLists-implied-options.txt)
@@ -299,34 +323,37 @@ macro(add_subdir_include_dirs arg1)
 endmacro()
 ########
 
+include(cmake/LwsCheckRequirements.cmake)
+require_pthreads(requirements)
 # Define source files
 add_subdirectory(lib)
+
 #define_source_files (RECURSE GLOB_CPP_PATTERNS lib/*.c GLOB_H_PATTERNS src/*.h)
 
 # Generate libwebsockets configuration file with defined macros
 configure_file(
-        cmake/lws_config.h.in
-        "${PROJECT_BINARY_DIR}/Source/ThirdParty/libwebsockets/include/lws_config.h")
+        ${CMAKE_CURRENT_SOURCE_DIR}/cmake/lws_config.h.in
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/lws_config.h")
 
 configure_file(
-        cmake/lws_config_private.h.in
-        "${PROJECT_BINARY_DIR}/Source/ThirdParty/libwebsockets/include/lws_config_private.h")
+        ${CMAKE_CURRENT_SOURCE_DIR}/cmake/lws_config_private.h.in
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/lws_config_private.h")
 
-add_custom_command(
-        OUTPUT ${PROJECT_BINARY_DIR}/include/lws_config.h
-        ${PROJECT_BINARY_DIR}/include/libwebsockets
-        ${PROJECT_BINARY_DIR}/include/libwebsockets.h
-        COMMENT "Creating build include dir"
-        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/include/libwebsockets.h
-        ${CMAKE_CURRENT_BINARY_DIR}/include/libwebsockets.h
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/include/libwebsockets/
-        ${CMAKE_CURRENT_BINARY_DIR}/include/libwebsockets
-        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/lws_config.h
-        ${CMAKE_CURRENT_BINARY_DIR}/include/lws_config.h
-        MAIN_DEPENDENCY ${PROJECT_BINARY_DIR}/lws_config.h
-)
+#add_custom_command(
+#        OUTPUT include/lws_config.h
+#        ${CMAKE_SOURCE_DIR}/include/libwebsockets
+#        ${CMAKE_SOURCE_DIR}/include/libwebsockets.h
+#        COMMENT "Creating build include dir"
+#        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/include/libwebsockets.h
+#        ${CMAKE_CURRENT_BINARY_DIR}/include/libwebsockets.h
+#        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/include/libwebsockets/
+#        ${CMAKE_CURRENT_BINARY_DIR}/include/libwebsockets
+#        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/lws_config.h
+#        ${CMAKE_CURRENT_BINARY_DIR}/include/lws_config.h
+#        MAIN_DEPENDENCY ${PROJECT_BINARY_DIR}/lws_config.h
+#)
 
-list (APPEND INCLUDE_DIRS ${PROJECT_BINARY_DIR}/Source/ThirdParty/libwebsockets/include)
+list (APPEND INCLUDE_DIRS include)
 
 message (STATUS SOURCEFILES "${SOURCE_FILESs} - ${INCLUDE_DIRS}")
 # Setup target

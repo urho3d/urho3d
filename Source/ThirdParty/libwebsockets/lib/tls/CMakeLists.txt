@@ -348,7 +348,7 @@ endif()
 
 if (LWS_WITH_SSL AND NOT LWS_WITH_WOLFSSL)
 	message("Searching for OpenSSL executable and dlls")
-	find_package(OpenSSLbins)
+	find_package(OpenSSL)
 	if (DEFINED OPENSSL_EXECUTABLE)
 		message("OpenSSL executable: ${OPENSSL_EXECUTABLE}")
 		

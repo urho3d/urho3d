@@ -223,9 +223,9 @@ endif()
 
 if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR COMPILER_IS_CLANG)
 	foreach(lib ${LWS_LIBRARIES})
-		set_target_properties(${lib}
-			PROPERTIES
-			SOVERSION ${SOVERSION})
+#		set_target_properties(${lib}
+#			PROPERTIES
+#			SOVERSION ${SOVERSION})
 	endforeach()
 endif()
 
