@@ -134,17 +134,40 @@ namespace ResultIncludes
     void AddHeader(const string& headerFile);
 }
 
-namespace Result
+namespace ResultClasses
 {
     // GeneratedGlue.h
-    //extern stringstream glueH_;
+    extern stringstream glueH_;
 
     // GeneratedGlue.cpp
-    //extern stringstream glueCpp_;
+    extern stringstream glueCpp_;
+
+    // GeneratedTemplates.h
+    extern stringstream templates_;
+
+    // TODO
+    extern stringstream members_;
+}
+
+
+
+struct Registration
+{
+    string function_; // engine->Register...(...);
+    string glue_;
+    string comment_;
+    string insideDefine_;
+    string message_; // Warning or error. If not empty then used instead function_
+    bool success_;
+};
+
+namespace Result
+{
+//    extern vector<ClassProcessor> processedClasses_;
 
     extern stringstream objectTypes_;
     extern stringstream highPriority_;
-    extern stringstream templates_;
 }
+
 
 }

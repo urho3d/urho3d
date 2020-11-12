@@ -74,6 +74,122 @@ static shared_ptr<ASGeneratedFile_Members> _result_Members_Other;
 
 static shared_ptr<ASGeneratedFile_Templates> _result_Templates;
 
+class ProcessedClass
+{
+public:
+    ClassAnalyzer classAnalyzer_;
+
+    // engine->RegisterObjectType(...);
+    Registration objectType_;
+
+    ProcessedClass(const ClassAnalyzer& classAnalyzer)
+        : classAnalyzer_(classAnalyzer)
+    {
+    }
+
+    bool CanBeRegistered() { return true; }
+};
+
+namespace Result
+{
+    vector<string> internalClassLocations_;
+    vector<string> abstractNotRefCountedClassLocations_;
+    vector<string> noBindedClassLocations_;
+    vector<string> manualBindedClassLocations_;
+    
+    vector<ProcessedClass> processedClasses_;
+
+    static void SaveClasses(const string& outputBasePath)
+    {
+        ofstream ofsObjectTypes(outputBasePath + "/Source/Urho3D/AngelScript/GeneratedClasses.cpp");
+
+        ofsObjectTypes <<
+            "// DO NOT EDIT. This file is generated\n"
+            "\n"
+            "// We need register all types before registration of any members because members can use any types\n"
+            "\n"
+            "#include \"../Precompiled.h\"\n"
+            "#include \"../AngelScript/APITemplates.h\"\n"
+            "#include \"../AngelScript/GeneratedIncludes.h\"\n"
+            "\n"
+            "namespace Urho3D\n"
+            "{\n"
+            "\n";
+
+        if (internalClassLocations_.size() > 0)
+        {
+            ofsObjectTypes << "// Internal classes\n";
+
+            for (const string& location : internalClassLocations_)
+                ofsObjectTypes << "// " << location << "\n";
+
+            ofsObjectTypes << "\n";
+        }
+
+        if (abstractNotRefCountedClassLocations_.size() > 0)
+        {
+            ofsObjectTypes << "// Abstract not RefCounted classes\n";
+
+            for (const string& location : abstractNotRefCountedClassLocations_)
+                ofsObjectTypes << "// " << location << "\n";
+
+            ofsObjectTypes << "\n";
+        }
+
+        if (noBindedClassLocations_.size() > 0)
+        {
+            ofsObjectTypes << "// Classes winh @nobind mark\n";
+
+            for (const string& location : noBindedClassLocations_)
+                ofsObjectTypes << "// " << location << "\n";
+
+            ofsObjectTypes << "\n";
+        }
+
+        if (manualBindedClassLocations_.size() > 0)
+        {
+            ofsObjectTypes << "// Classes winh @manualbind mark\n";
+
+            for (const string& location : manualBindedClassLocations_)
+                ofsObjectTypes << "// " << location << "\n";
+
+            ofsObjectTypes << "\n";
+        }
+
+        ofsObjectTypes <<
+            "void ASRegisterGenerated_Classes(asIScriptEngine* engine)\n"
+            "{\n";
+
+        bool first = true;
+
+        for (const ProcessedClass& processedClass : processedClasses_)
+        {
+            Registration reg = processedClass.objectType_;
+
+            if (!first)
+                ofsObjectTypes << "\n";
+
+            if (!reg.insideDefine_.empty())
+                ofsObjectTypes << "#ifdef " << reg.insideDefine_ << "\n";
+
+            ofsObjectTypes <<
+                "    // " << processedClass.objectType_.comment_ << "\n"
+                "    " << processedClass.objectType_.function_ << "\n"
+                "";
+
+            if (!reg.insideDefine_.empty())
+                ofsObjectTypes << "#endif\n";
+
+            first = false;
+        }
+
+        ofsObjectTypes <<
+            "}\n"
+            "\n"
+            "}\n";
+    }
+}
+
 static shared_ptr<ASGeneratedFile_Members> GetGeneratedFile(const string& className)
 {
     if (StartsWith(className, "A"))
@@ -191,6 +307,49 @@ static shared_ptr<ASGeneratedFile_Members> GetGeneratedFile(const string& classN
         return _result_Members_W;
 
     return _result_Members_Other;
+}
+
+static vector<ClassTemplateSpecialization> GetSpecializations(const ClassAnalyzer& classAnalyzer)
+{
+    vector<string> templateParams = classAnalyzer.GetTemplateParams();
+
+    vector<ClassTemplateSpecialization> result;
+    string comment = classAnalyzer.GetComment();
+    smatch match;
+
+    if (templateParams.size() == 1)
+    {
+        // First param is class name
+        regex rgx("\\bSPECIALIZATION_([^_]+?)_([^_]+?)\\b");
+
+        string::const_iterator searchStart(comment.cbegin());
+        while (regex_search(searchStart, comment.cend(), match, rgx))
+        {
+            ClassTemplateSpecialization specialization;
+            specialization.alias_ = match[1].str();
+            specialization.specialization_[templateParams[0]] = match[2].str();
+            searchStart = match.suffix().first;
+            result.push_back(specialization);
+        }
+    }
+
+    else if (templateParams.size() == 2)
+    {
+        regex rgx("\\bSPECIALIZATION_([^_]+?)_([^_]+?)_([^_]+?)\\b");
+
+        string::const_iterator searchStart(comment.cbegin());
+        while (regex_search(searchStart, comment.cend(), match, rgx))
+        {
+            ClassTemplateSpecialization specialization;
+            specialization.alias_ = match[1].str();
+            specialization.specialization_[templateParams[0]] = match[2].str();
+            specialization.specialization_[templateParams[1]] = match[3].str();
+            searchStart = match.suffix().first;
+            result.push_back(specialization);
+        }
+    }
+
+    return result;
 }
 
 //static void RegisterStaticFunction(const ClassStaticFunctionAnalyzer& functionAnalyzer, shared_ptr<ASGeneratedFile_Members> result)
@@ -1246,6 +1405,41 @@ static void RegisterObjectMembers(const ClassAnalyzer& classAnalyzer, bool templ
         result->reg_ << "\n";
 }
 
+static Registration RegisterObjectTypeNew(const ClassAnalyzer& classAnalyzer)
+{
+    Registration result;
+
+    string header = classAnalyzer.GetHeaderFile();
+    result.insideDefine_ = InsideDefine(header);
+
+    result.comment_ = classAnalyzer.GetLocation();
+
+    string className = classAnalyzer.GetClassName();
+
+    if (classAnalyzer.IsRefCounted() || Contains(classAnalyzer.GetComment(), "FAKE_REF"))
+    {
+        result.function_ = "engine->RegisterObjectType(\"" + className + "\", 0, asOBJ_REF);";
+    }
+    else // Value type
+    {
+        string flags = "asOBJ_VALUE | asGetTypeTraits<" + className + ">()";
+
+        if (classAnalyzer.IsPod())
+        {
+            flags += " | asOBJ_POD";
+
+            if (classAnalyzer.AllFloats())
+                flags += " | asOBJ_APP_CLASS_ALLFLOATS";
+            else if (classAnalyzer.AllInts())
+                flags += " | asOBJ_APP_CLASS_ALLINTS";
+        }
+
+        result.function_ = "engine->RegisterObjectType(\"" + className + "\", sizeof(" + className + "), " + flags + ");";
+    }
+
+    return result;
+}
+
 static void RegisterObjectType(const ClassAnalyzer& classAnalyzer, bool templateVersion)
 {
     string header = classAnalyzer.GetHeaderFile();
@@ -1334,6 +1528,271 @@ static void ProcessClass(const ClassAnalyzer& classAnalyzer, bool templateVersio
         _result_Templates->reg_ << "}\n\n";
 }
 
+static void RegisterRegularMethodNew(ClassFunctionAnalyzer& functionAnalyzer)
+{
+    if (functionAnalyzer.IsTemplate())
+        return; // TODO: убрать?
+
+    ResultClasses::templates_ << "    // " << functionAnalyzer.GetLocation() << "\n";
+
+    map<string, string> spec = functionAnalyzer.GetClass().GetTemplateSpecialization();
+
+    vector<ParamAnalyzer> params = functionAnalyzer.GetParams(spec);
+    vector<shared_ptr<FuncParamConv> > convertedParams;
+    bool needWrapper = false;
+
+    for (size_t i = 0; i < params.size(); i++)
+    {
+        ParamAnalyzer param = params[i];
+        shared_ptr<FuncParamConv> conv = CppFunctionParamToAS(i, param);
+        if (!conv->success_)
+        {
+            ResultClasses::templates_ << "    // " << conv->errorMessage_ << "\n\n";
+            return;
+        }
+
+        if (conv->NeedWrapper())
+            needWrapper = true;
+
+        convertedParams.push_back(conv);
+    }
+
+    shared_ptr<FuncReturnTypeConv> retConv = CppFunctionReturnTypeToAS(functionAnalyzer.GetReturnType(spec));
+    if (!retConv->success_)
+    {
+        ResultClasses::templates_ << "    // " << retConv->errorMessage_ << "\n\n";
+        return;
+    }
+
+    if (retConv->needWrapper_)
+        needWrapper = true;
+
+    string declParams = "";
+
+    for (shared_ptr<FuncParamConv> conv : convertedParams)
+    {
+        if (declParams.length() > 0)
+            declParams += ", ";
+
+        declParams += conv->asDecl_;
+    }
+
+    string asReturnType = retConv->asReturnType_;
+
+    string asFunctionName = functionAnalyzer.GetName();
+    if (functionAnalyzer.IsConsversionOperator())
+        asReturnType = CutStart(asFunctionName, "operator ");
+
+    bool outSuccess;
+    asFunctionName = CppMethodNameToAS(functionAnalyzer, outSuccess);
+
+    if (!outSuccess)
+    {
+        ResultClasses::templates_ << "    // " << GetLastErrorMessage() << "\n\n";
+        return;
+    }
+
+    if (needWrapper)
+    {
+        string outDeclaration, outDefinition;
+        GenerateWrapperNew(functionAnalyzer, convertedParams, retConv, outDeclaration, outDefinition);
+        ResultClasses::glueH_ << outDeclaration;
+        ResultClasses::glueCpp_ << outDefinition;
+    }
+
+    string decl = asReturnType + " " + asFunctionName + "(" + declParams + ")";
+
+    if (functionAnalyzer.IsConst())
+        decl += " const";
+
+    ResultClasses::templates_ << "    engine->RegisterObjectMethod(className, \"" << decl << "\", ";
+
+    if (needWrapper)
+        ResultClasses::templates_ << "asFUNCTION(" << GenerateWrapperName(functionAnalyzer, true) << "), asCALL_CDECL_OBJFIRST);\n";
+    else
+        ResultClasses::templates_ << Generate_asMETHODPR(functionAnalyzer, true,
+            functionAnalyzer.GetTemplateSpecialization())
+        << ", asCALL_THISCALL);\n";
+    //ResultClasses::templates_ << "\n"; // TODO remove
+
+    // Also register as property if needed
+    string propertyMark = GetPropertyMark(functionAnalyzer);
+    if (!propertyMark.empty())
+    {
+        if (StartsWith(propertyMark, "BIND_AS_ALIAS_"))
+        {
+            asFunctionName = CutStart(propertyMark, "BIND_AS_ALIAS_");
+        }
+        else
+        {
+            asFunctionName = CppMethodNameToASProperty(functionAnalyzer, outSuccess);
+            if (!outSuccess)
+            {
+                ResultClasses::templates_ << "    // " << GetLastErrorMessage() << "\n\n";
+                return;
+            }
+        }
+
+        decl = asReturnType + " " + asFunctionName + "(" + declParams + ")";
+
+        if (functionAnalyzer.IsConst())
+            decl += " const";
+
+        ResultClasses::templates_ << "    engine->RegisterObjectMethod(className, \"" << decl << "\", ";
+
+        if (needWrapper)
+            ResultClasses::templates_ << "asFUNCTION(" << GenerateWrapperName(functionAnalyzer, true) << "), asCALL_CDECL_OBJFIRST);\n";
+        else
+            ResultClasses::templates_ << Generate_asMETHODPR(functionAnalyzer, true,
+                functionAnalyzer.GetTemplateSpecialization())
+            << ", asCALL_THISCALL);\n";
+    }
+
+    ResultClasses::templates_ << "\n";
+
+}
+
+static void RegisterMethodNew(ClassFunctionAnalyzer& functionAnalyzer)
+{
+    if (functionAnalyzer.IsDefine()) // URHO3D_OBJECT
+        return;
+
+    if (!functionAnalyzer.IsPublic())
+        return;
+
+    if (functionAnalyzer.IsParentDestructor())
+        return;
+
+    if (functionAnalyzer.IsParentConstructor())
+        return;
+
+    if (HaveMark(functionAnalyzer, "NO_BIND"))
+    {
+        ResultClasses::templates_ <<
+            "    // " << functionAnalyzer.GetLocation() << "\n"
+            "    // Not registered because have @nobind mark\n"
+            "\n";
+
+        return;
+    }
+
+    if (HaveMark(functionAnalyzer, "MANUAL_BIND"))
+    {
+        ResultClasses::templates_ <<
+            "    // " << functionAnalyzer.GetLocation() << "\n"
+            "    // Not registered because have @manualbind mark\n"
+            "\n";
+
+        return;
+    }
+
+    if (functionAnalyzer.IsThisConstructor())
+        return; // TODO регать
+
+    if (functionAnalyzer.IsThisDestructor())
+        return; // TODO регать
+
+    RegisterRegularMethodNew(functionAnalyzer);
+}
+
+static void RegisterMembersNew(const ClassAnalyzer& classAnalyzer)
+{
+    vector<ClassFunctionAnalyzer> thisFunctions = classAnalyzer.GetThisFunctions();
+    for (ClassFunctionAnalyzer& function : thisFunctions)
+        RegisterMethodNew(function);
+}
+
+static void BindClassNew(const ClassAnalyzer& classAnalyzer)
+{
+    ProcessedClass processedClass(classAnalyzer);
+
+
+
+    processedClass.objectType_ = RegisterObjectTypeNew(classAnalyzer);
+    Result::processedClasses_.push_back(processedClass);
+
+
+    /*
+    string header = classAnalyzer.GetHeaderFile();
+
+    string insideDefine = InsideDefine(header);
+    if (!insideDefine.empty())
+        ResultClasses::templates_ << "#ifdef " << insideDefine << "\n";
+
+    ResultClasses::templates_ <<
+        "template <class T> void Register" << classAnalyzer.GenerateIdentifier() << "(asIScriptEngine* engine, const char* className)\n"
+        "{\n";
+
+    vector<ClassAnalyzer> baseClassList = classAnalyzer.GetBaseClasses();
+    for (ClassAnalyzer& baseClass : baseClassList)
+    {
+        string baseClassName = baseClass.GenerateIdentifier();
+        ResultClasses::templates_ << "    Register" << baseClassName << "<T>(engine, className);\n\n";
+    }
+
+    RegisterMembersNew(classAnalyzer);
+
+    ResultClasses::templates_ << "}\n";
+
+    if (!insideDefine.empty())
+        ResultClasses::templates_ << "#endif\n";
+
+    ResultClasses::templates_ << "\n";
+    */
+}
+
+static void ProcessClassNew(const ClassAnalyzer& classAnalyzer)
+{
+    if (classAnalyzer.GetClassName() == "RefCounted") // TODO добавить @manualbind
+        return;
+
+    if (classAnalyzer.IsInternal())
+    {
+        Result::internalClassLocations_.push_back(classAnalyzer.GetLocation());
+        return;
+    }
+
+    if (classAnalyzer.IsAbstract() && !(classAnalyzer.IsRefCounted() || Contains(classAnalyzer.GetComment(), "FAKE_REF")))
+    {
+        Result::abstractNotRefCountedClassLocations_.push_back(classAnalyzer.GetLocation());
+        return;
+    }
+
+    string header = classAnalyzer.GetHeaderFile();
+    if (IsIgnoredHeader(header))
+    {
+        ResultIncludes::AddHeader(header);
+        return;
+    }
+
+    if (Contains(classAnalyzer.GetComment(), "NO_BIND"))
+    {
+        Result::noBindedClassLocations_.push_back(classAnalyzer.GetLocation());
+        return;
+    }
+
+    if (Contains(classAnalyzer.GetComment(), "MANUAL_BIND"))
+    {
+        Result::manualBindedClassLocations_.push_back(classAnalyzer.GetLocation());
+        return;
+    }
+
+    if (classAnalyzer.IsTemplate())
+    {
+        vector<ClassTemplateSpecialization> specializations = GetSpecializations(classAnalyzer);
+
+        for (ClassTemplateSpecialization& specialization : specializations)
+        {
+            ClassAnalyzer specializedClass(classAnalyzer.GetCompounddef(), specialization);
+            BindClassNew(specializedClass);
+        }
+    }
+    else
+    {
+        BindClassNew(classAnalyzer);
+    }
+}
+
 void ProcessAllClasses(const string& outputBasePath)
 {
     _outputBasePath = outputBasePath;
@@ -1391,6 +1850,14 @@ void ProcessAllClasses(const string& outputBasePath)
             ProcessClass(analyzer, true);
     }
 
+    // Новый вариант
+    for (string classID : classIDs)
+    {
+        xml_node compounddef = SourceData::classesByID_[classID];
+        ClassAnalyzer analyzer(compounddef);
+        ProcessClassNew(analyzer);
+    }
+
     _result_Classes->Save();
     _result_Members_HighPriority->Save();
     _result_Members_A->Save();
@@ -1425,6 +1892,8 @@ void ProcessAllClasses(const string& outputBasePath)
     _result_Members_Z->Save();
     _result_Members_Other->Save();
     _result_Templates->Save();
+
+    Result::SaveClasses(outputBasePath);
 }
 
 }

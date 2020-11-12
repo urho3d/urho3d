@@ -397,20 +397,36 @@ namespace ResultIncludes
     }
 }
 
-namespace Result
+// GeneratedMembers.cpp
+namespace ResultMembers
+{
+    stringstream glue_;
+    stringstream reg_;
+
+    static void Save(const string& outputBasePath)
+    {
+
+    }
+}
+
+namespace ResultClasses
 {
     // GeneratedGlue.h
-    //stringstream glueH_;
+    stringstream glueH_;
 
     // GeneratedGlue.cpp
-    //stringstream glueCpp_;
+    stringstream glueCpp_;
+
+    // GeneratedTemplates.h
+    stringstream templates_;
+
+    stringstream members_;
 
     // Write result to files
-    static void SaveGlue(const string& outputBasePath)
+    static void Save(const string& outputBasePath)
     {
         ofstream ofsH(outputBasePath + "/Source/Urho3D/AngelScript/GeneratedGlue.h");
 
-        /*
         ofsH <<
             "// DO NOT EDIT. This file is generated\n"
             "\n"
@@ -421,11 +437,11 @@ namespace Result
             "\n"
             << glueH_.str() <<
             "\n"
-            "}\n";*/
+            "}\n";
 
         ofstream ofsCpp(outputBasePath + "/Source/Urho3D/AngelScript/GeneratedGlue.cpp");
 
-        /*ofsCpp <<
+        ofsCpp <<
             "// DO NOT EDIT. This file is generated\n"
             "\n"
             "#include \"../Precompiled.h\"\n"
@@ -441,21 +457,53 @@ namespace Result
             "\n"
             << glueCpp_.str() <<
             "}\n";
-            */
+
+        ofstream ofsTemplates(outputBasePath + "/Source/Urho3D/AngelScript/GeneratedTemplates.h");
+
+        ofsTemplates <<
+            "// DO NOT EDIT. This file is generated\n"
+            "\n"
+            "#pragma once\n"
+            "\n"
+            "namespace Urho3D\n"
+            "{\n"
+            "\n"
+            << templates_.str() <<
+            "}\n";
+
+        ofstream ofsMembers(outputBasePath + "/Source/Urho3D/AngelScript/GeneratedMembers.cpp");
+
+        ofsMembers <<
+            "// DO NOT EDIT. This file is generated\n"
+            "\n"
+            "#include \"../Precompiled.h\"\n"
+            "\n"
+            "#include \"../AngelScript/APITemplates.h\"\n"
+            "#include \"../AngelScript/GeneratedIncludes.h\"\n"
+            "#include \"../AngelScript/GeneratedTemplates.h\"\n"
+            "\n"
+            "namespace Urho3D\n"
+            "{\n"
+            "\n"
+            "void FakeAddRef(void* ptr);\n"
+            "void FakeReleaseRef(void* ptr);\n"
+            "\n"
+            << members_.str() <<
+            "}\n";
     }
+}
 
-    // ============================================================================
-
-    stringstream objectTypes_;
-    stringstream highPriority_;
-    stringstream templates_;
+namespace Result
+{
+    
 }
 
 void SaveResult(const string& outputBasePath)
 {
     ResultIncludes::Save(outputBasePath);
-    Result::SaveGlue(outputBasePath);
+    ResultClasses::Save(outputBasePath);
     ResultGlobalFunctions::Save(outputBasePath);
+    //Result::SaveClasses(outputBasePath);
     /*ResultEnums::Save(outputBasePath);
     Result::Save(outputBasePath);
     ResultClasses::Save(outputBasePath);*/

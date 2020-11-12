@@ -4,6 +4,7 @@
 
 #include "../AngelScript/APITemplates.h"
 #include "../AngelScript/GeneratedIncludes.h"
+#include "../AngelScript/GeneratedTemplates.h"
 
 namespace Urho3D
 {

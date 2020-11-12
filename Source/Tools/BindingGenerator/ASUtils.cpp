@@ -753,6 +753,74 @@ string GenerateWrapper(const ClassFunctionAnalyzer& functionAnalyzer, bool templ
     return result;
 }
 
+void GenerateWrapperNew(const ClassFunctionAnalyzer& functionAnalyzer, vector<shared_ptr<FuncParamConv>>& convertedParams, shared_ptr<FuncReturnTypeConv> convertedReturn, string& outDeclaration, string& outDefinition)
+{
+    string insideDefine = InsideDefine(functionAnalyzer.GetClass().GetHeaderFile());
+
+    if (!insideDefine.empty())
+    {
+        outDeclaration = "#ifdef " + insideDefine + "\n";
+        outDefinition = "#ifdef " + insideDefine + "\n";
+    }
+
+    outDeclaration +=
+        "// " + functionAnalyzer.GetLocation() + "\n"
+        + convertedReturn->glueReturnType_ + " " + GenerateWrapperName(functionAnalyzer, true) + "(" + functionAnalyzer.GetNameWithTemplateSpecialization() + "* ptr";
+
+    outDefinition +=
+        "// " + functionAnalyzer.GetLocation() + "\n"
+        + convertedReturn->glueReturnType_ + " " + GenerateWrapperName(functionAnalyzer, true) + "(" + functionAnalyzer.GetNameWithTemplateSpecialization() + "* ptr";
+
+    for (size_t i = 0; i < convertedParams.size(); i++)
+    {
+        outDeclaration += ", " + convertedParams[i]->cppType_ + " " + convertedParams[i]->inputVarName_;
+        outDefinition += ", " + convertedParams[i]->cppType_ + " " + convertedParams[i]->inputVarName_;
+    }
+
+    outDeclaration += ");\n";
+
+    outDefinition +=
+        ")\n"
+        "{\n";
+
+    for (size_t i = 0; i < convertedParams.size(); i++)
+        outDefinition += convertedParams[i]->glue_;
+
+    if (convertedReturn->glueReturnType_ != "void")
+    {
+        map<string, string> spec = functionAnalyzer.GetClass().GetTemplateSpecialization();
+        outDefinition += "    " + functionAnalyzer.GetReturnType(spec).ToString() + " result = ";
+    }
+    else
+        outDefinition += "    ";
+
+    outDefinition += "ptr->" + functionAnalyzer.GetName() + "(";
+
+    for (size_t i = 0; i < convertedParams.size(); i++)
+    {
+        if (i != 0)
+            outDefinition += ", ";
+
+        outDefinition += convertedParams[i]->convertedVarName_;
+    }
+
+    outDefinition += ");\n";
+
+    if (convertedReturn->glueReturnType_ != "void")
+        outDefinition += "    " + convertedReturn->glueReturn_;
+
+    outDefinition += "}\n";
+
+    if (!insideDefine.empty())
+    {
+        outDeclaration += "#endif\n";
+        outDefinition += "#endif\n";
+    }
+
+    outDeclaration += "\n";
+    outDefinition += "\n";
+}
+
 // =================================================================================
 
 string Generate_asFUNCTIONPR(const GlobalFunctionAnalyzer& functionAnalyzer)

@@ -110,7 +110,7 @@ static void BindGlobalFunction(const GlobalFunctionAnalyzer& functionAnalyzer)
     bool needWrapper = false;
     string wrapperName;
 
-    vector<shared_ptr<FuncParamConv> > convertedParams;
+    vector<shared_ptr<FuncParamConv>> convertedParams;
 
     for (size_t i = 0; i < params.size(); i++)
     {
@@ -156,8 +156,6 @@ static void BindGlobalFunction(const GlobalFunctionAnalyzer& functionAnalyzer)
     string asFunctionName = functionAnalyzer.GetName();
 
     string decl = asReturnType + " " + asFunctionName + "(" + declParams + ")";
-
-    
 
     ResultGlobalFunctions::reg_ << "    engine->RegisterGlobalFunction(\"" << decl << "\", ";
 
