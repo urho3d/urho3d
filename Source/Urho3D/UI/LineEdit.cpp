@@ -238,8 +238,9 @@ void LineEdit::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifier
         if (editable_ && textCopyable_ && qualifiers & QUAL_CTRL)
         {
             const String& clipBoard = GetSubsystem<UI>()->GetClipboardText();
-            if (!clipBoard.Empty())
-            {
+            if (!clipBoard.Empty() &&
+                (line_.LengthUTF8() - text_->GetSelectionLength() + clipBoard.LengthUTF8() <= maxLength_))
+	    {
                 // Remove selected text first
                 if (text_->GetSelectionLength() > 0)
                 {
