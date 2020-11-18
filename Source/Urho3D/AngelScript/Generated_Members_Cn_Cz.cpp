@@ -5721,8 +5721,6 @@ void ASRegisterGenerated_Members_Cn_Cz(asIScriptEngine* engine)
     engine->RegisterObjectMethod("CustomGeometry", "void Clear()", asMETHODPR(CustomGeometry, Clear, (), void), asCALL_THISCALL);
     // void CustomGeometry::Commit() | File: ../Graphics/CustomGeometry.h
     engine->RegisterObjectMethod("CustomGeometry", "void Commit()", asMETHODPR(CustomGeometry, Commit, (), void), asCALL_THISCALL);
-    // void CustomGeometry::CreateQuadsFromBuffer(const Vector<Vector3>& pointList, size_t zIterations, size_t thetaIterations, bool connectTail=false) | File: ../Graphics/CustomGeometry.h
-    // Error: type "const Vector<Vector3>&" can not automatically bind
     // explicit CustomGeometry::CustomGeometry(Context* context) | File: ../Graphics/CustomGeometry.h
     engine->RegisterObjectBehaviour("CustomGeometry", asBEHAVE_FACTORY, "CustomGeometry@+ f()", asFUNCTION(CustomGeometry_CustomGeometry_Context), asCALL_CDECL);
     // void CustomGeometry::DefineColor(const Color& color) | File: ../Graphics/CustomGeometry.h
@@ -5741,8 +5739,6 @@ void ASRegisterGenerated_Members_Cn_Cz(asIScriptEngine* engine)
     engine->RegisterObjectMethod("CustomGeometry", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(CustomGeometry, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
     // bool CustomGeometry::DrawOcclusion(OcclusionBuffer* buffer) override | File: ../Graphics/CustomGeometry.h
     engine->RegisterObjectMethod("CustomGeometry", "bool DrawOcclusion(OcclusionBuffer@+)", asMETHODPR(CustomGeometry, DrawOcclusion, (OcclusionBuffer*), bool), asCALL_THISCALL);
-    // void CustomGeometry::FillShape(const Vector<Vector3>& shapeList, bool connectTail=true, bool clear=true, int geomNum=0) | File: ../Graphics/CustomGeometry.h
-    // Error: type "const Vector<Vector3>&" can not automatically bind
     // bool Animatable::GetAnimationEnabled() const | File: ../Scene/Animatable.h
     engine->RegisterObjectMethod("CustomGeometry", "bool GetAnimationEnabled() const", asMETHODPR(CustomGeometry, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("CustomGeometry", "bool get_animationEnabled() const", asMETHODPR(CustomGeometry, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
@@ -5779,8 +5775,6 @@ void ASRegisterGenerated_Members_Cn_Cz(asIScriptEngine* engine)
     // const String& Object::GetCategory() const | File: ../Core/Object.h
     engine->RegisterObjectMethod("CustomGeometry", "const String& GetCategory() const", asMETHODPR(CustomGeometry, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod("CustomGeometry", "const String& get_category() const", asMETHODPR(CustomGeometry, GetCategory, () const, const String&), asCALL_THISCALL);
-    // static Vector<Vector3> CustomGeometry::GetCircleShape(float radius=1, size_t iterations=100, float startTheta=0, float endTheta=2* M_PI) | File: ../Graphics/CustomGeometry.h
-    // Error: type "Vector<Vector3>" can not automatically bind
     // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
     engine->RegisterObjectMethod("CustomGeometry", "Component@+ GetComponent(StringHash) const", asMETHODPR(CustomGeometry, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
     // template<class T> T*  Component::GetComponent() const | File: ../Scene/Component.h
@@ -5882,8 +5876,6 @@ void ASRegisterGenerated_Members_Cn_Cz(asIScriptEngine* engine)
     engine->RegisterObjectMethod("CustomGeometry", "uint get_shadowMask() const", asMETHODPR(CustomGeometry, GetShadowMask, () const, unsigned), asCALL_THISCALL);
     // float Drawable::GetSortValue() const | File: ../Graphics/Drawable.h
     engine->RegisterObjectMethod("CustomGeometry", "float GetSortValue() const", asMETHODPR(CustomGeometry, GetSortValue, () const, float), asCALL_THISCALL);
-    // static Vector<Vector3> CustomGeometry::GetSquareShape(float size) | File: ../Graphics/CustomGeometry.h
-    // Error: type "Vector<Vector3>" can not automatically bind
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("CustomGeometry", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(CustomGeometry, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
     // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
@@ -5972,16 +5964,6 @@ void ASRegisterGenerated_Members_Cn_Cz(asIScriptEngine* engine)
     engine->RegisterObjectMethod("CustomGeometry", "bool LoadJSON(const JSONValue&in)", asMETHODPR(CustomGeometry, LoadJSON, (const JSONValue&), bool), asCALL_THISCALL);
     // bool Animatable::LoadXML(const XMLElement& source) override | File: ../Scene/Animatable.h
     engine->RegisterObjectMethod("CustomGeometry", "bool LoadXML(const XMLElement&in)", asMETHODPR(CustomGeometry, LoadXML, (const XMLElement&), bool), asCALL_THISCALL);
-    // void CustomGeometry::MakeCircle(float radius=1, size_t iterations=300, float startTheta=0, float endTheta=2* M_PI, bool clear=true, int geomNum=0) | File: ../Graphics/CustomGeometry.h
-    engine->RegisterObjectMethod("CustomGeometry", "void MakeCircle(float = 1, size_t = 300, float = 0, float = 2 *M_PI, bool = true, int = 0)", asMETHODPR(CustomGeometry, MakeCircle, (float, size_t, float, float, bool, int), void), asCALL_THISCALL);
-    // void CustomGeometry::MakeCircleGraph(const Vector<Pair<float, Urho3D::SharedPtr<Urho3D::Material>>>& parts, int radius=1, int iterations=300) | File: ../Graphics/CustomGeometry.h
-    // Error: type "const Vector<Pair<float, Urho3D::SharedPtr<Urho3D::Material>>>&" can not automatically bind
-    // void CustomGeometry::MakeShape(const Vector<Urho3D::Vector3>& pointList, bool connectTail=true) | File: ../Graphics/CustomGeometry.h
-    // Error: type "const Vector<Urho3D::Vector3>&" can not automatically bind
-    // void CustomGeometry::MakeSphere(float radius=1, size_t iterations=200) | File: ../Graphics/CustomGeometry.h
-    engine->RegisterObjectMethod("CustomGeometry", "void MakeSphere(float = 1, size_t = 200)", asMETHODPR(CustomGeometry, MakeSphere, (float, size_t), void), asCALL_THISCALL);
-    // void CustomGeometry::MakeSquare(float size) | File: ../Graphics/CustomGeometry.h
-    engine->RegisterObjectMethod("CustomGeometry", "void MakeSquare(float)", asMETHODPR(CustomGeometry, MakeSquare, (float), void), asCALL_THISCALL);
     // void Drawable::MarkForUpdate() | File: ../Graphics/Drawable.h
     engine->RegisterObjectMethod("CustomGeometry", "void MarkForUpdate()", asMETHODPR(CustomGeometry, MarkForUpdate, (), void), asCALL_THISCALL);
     // void Drawable::MarkInView(const FrameInfo& frame) | File: ../Graphics/Drawable.h
@@ -6002,8 +5984,6 @@ void ASRegisterGenerated_Members_Cn_Cz(asIScriptEngine* engine)
     engine->RegisterObjectMethod("CustomGeometry", "void PrepareNetworkUpdate()", asMETHODPR(CustomGeometry, PrepareNetworkUpdate, (), void), asCALL_THISCALL);
     // void CustomGeometry::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results) override | File: ../Graphics/CustomGeometry.h
     // Error: type "RayOctreeQuery" can not automatically bind bacause have @nobind mark
-    // void CustomGeometry::ProtrudeShape(const Vector<Vector3>& mShapeList, const Vector<Vector3>& mPointList, bool connectTail=false) | File: ../Graphics/CustomGeometry.h
-    // Error: type "const Vector<Vector3>&" can not automatically bind
     // bool Serializable::ReadDeltaUpdate(Deserializer& source) | File: ../Scene/Serializable.h
     engine->RegisterObjectMethod("CustomGeometry", "bool ReadDeltaUpdate(Deserializer&)", asMETHODPR(CustomGeometry, ReadDeltaUpdate, (Deserializer&), bool), asCALL_THISCALL);
     // bool Serializable::ReadLatestDataUpdate(Deserializer& source) | File: ../Scene/Serializable.h
