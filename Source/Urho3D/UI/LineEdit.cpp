@@ -572,6 +572,13 @@ void LineEdit::UpdateText()
 {
     unsigned utf8Length = line_.LengthUTF8();
 
+    // truncate line to enforce length limit
+    if (utf8Length > maxLength_)
+    {
+      line_ = line_.SubstringUTF8(0, maxLength_);
+      utf8Length = maxLength_;
+    }
+
     if (!echoCharacter_)
         text_->SetText(line_);
     else
