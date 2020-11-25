@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by UkoeHB for Urho3D
+
 #include "../../SDL_internal.h"
 
 #ifndef SDL_cocoavideo_h_
@@ -116,6 +119,11 @@ extern NSImage * Cocoa_CreateImage(SDL_Surface * surface);
 /* Fix build with the 10.10 SDK */
 #if MAC_OS_X_VERSION_MAX_ALLOWED < 101100
 #define NSEventSubtypeTouch NSTouchEventSubtype
+// Urho3D: begin edit (fixes build failure on El Capitan, OSX 10.12)
+#endif
+/* Fix build with the 10.11 SDK */
+#if MAC_OS_X_VERSION_MAX_ALLOWED < 101200
+// Urho3D: end edit
 #define NSEventSubtypeMouseEvent NSMouseEventSubtype
 #endif
 
