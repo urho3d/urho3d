@@ -429,7 +429,8 @@ int btDiscreteDynamicsWorld::stepSimulation(btScalar timeStep, int maxSubSteps, 
 
 		saveKinematicState(fixedTimeStep * clampedSimulationSteps);
 
-		applyGravity();
+		// Urho3D: commented out original
+		//applyGravity();
 
 		for (int i = 0; i < clampedSimulationSteps; i++)
 		{
