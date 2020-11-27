@@ -50,8 +50,13 @@ android {
                 arguments.apply {
                     System.getenv("ANDROID_CCACHE")?.let { add("-D ANDROID_CCACHE=$it") }
                     // Pass along matching env-vars as CMake build options
-                    addAll(project.file("../../script/.build-options")
+                    val vars = project.file("../../script/.build-options")
                         .readLines()
+                    addAll(vars
+                        .filter { project.hasProperty(it) }
+                        .map { "-D $it=${project.property(it)}" }
+                    )
+                    addAll(vars
                         .mapNotNull { variable -> System.getenv(variable)?.let { "-D $variable=$it" } }
                     )
                 }
