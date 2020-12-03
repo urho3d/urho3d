@@ -218,6 +218,23 @@ void Font::LoadParameters()
         scaledOffset_.x_ = scaledElem.GetFloat("x");
         scaledOffset_.y_ = scaledElem.GetFloat("y");
     }
+
+    XMLElement preCacheElem = rootElem.GetChild("precache");
+    if (preCacheElem)
+    {
+        String characters = preCacheElem.GetValue();
+        unsigned len = characters.Length();
+        unsigned byteOffset = 0;
+        unsigned charCode = 0;
+
+        while (byteOffset < len)
+        {
+            charCode = characters.NextUTF8Char(byteOffset);
+            if (charCode == '\n' || charCode == '\r' || charCode == '\t')
+                continue;
+            precacheChars_.Insert(charCode);
+        }
+    }
 }
 
 FontFace* Font::GetFaceFreeType(float pointSize)

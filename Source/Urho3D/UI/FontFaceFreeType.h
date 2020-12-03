@@ -51,7 +51,7 @@ private:
     /// Setup next texture.
     bool SetupNextTexture(int textureWidth, int textureHeight);
     /// Load char glyph.
-    bool LoadCharGlyph(unsigned charCode, Image* image = nullptr);
+    FontGlyph* LoadCharGlyph(unsigned charCode, Image* image = nullptr);
     /// Smooth one row of a horizontally oversampled glyph image.
     void BoxFilter(unsigned char* dest, size_t destSize, const unsigned char* src, size_t srcSize);
 

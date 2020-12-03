@@ -92,6 +92,9 @@ public:
     /// Release font faces and recreate them next time when requested. Called when font textures lost or global font properties change.
     void ReleaseFaces();
 
+    /// Get all of characters which are defined by user for caching.
+    const HashSet<unsigned>& GetPreCacheCharacters() const { return precacheChars_; }
+
 private:
     /// Load font glyph offset parameters from an optional XML file. Called internally when loading TrueType fonts.
     void LoadParameters();
@@ -114,6 +117,8 @@ private:
     FontType fontType_;
     /// Signed distance field font flag.
     bool sdfFont_;
+    /// Pre-Cache charaters
+    HashSet<unsigned> precacheChars_;
 };
 
 }
