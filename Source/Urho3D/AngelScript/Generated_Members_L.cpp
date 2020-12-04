@@ -2941,6 +2941,8 @@ void ASRegisterGenerated_Members_L(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Log", "int get_weakRefs() const", asMETHODPR(Log, WeakRefs, () const, int), asCALL_THISCALL);
     // static void Log::Write(int level, const String& message) | File: ../IO/Log.h
     // Not registered because have @nobind mark
+    // static void Log::WriteFormat(int level, const char* format,...) | File: ../IO/Log.h
+    // Error: type "const char*" can not automatically bind
     // static void Log::WriteRaw(const String& message, bool error=false) | File: ../IO/Log.h
     engine->SetDefaultNamespace("Log");
     engine->RegisterGlobalFunction("void WriteRaw(const String&in, bool = false)", asFUNCTIONPR(Log::WriteRaw, (const String&, bool), void), asCALL_CDECL);
