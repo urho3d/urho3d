@@ -1,5 +1,9 @@
 #ifdef COMPILEVS
 
+// Silence WARNING: Shader ... does not use the define NOUV
+#ifdef NOUV
+#endif
+
 // Silence GLSL 150 deprecation warnings
 #ifdef GL3
 #define attribute in
