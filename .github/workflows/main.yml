@@ -177,6 +177,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with: { fetch-depth: 0 }
+      - name: Select xcode
+        run: sudo xcode-select -s '/Applications/Xcode_12.app'
       - name: Install dependencies
         run: while ! brew install doxygen graphviz; do sleep 1; done
       - name: CMake
