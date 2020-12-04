@@ -754,7 +754,7 @@ void ASRegisterGenerated_Members_A(asIScriptEngine* engine)
     // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
     // Not registered because template
     // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("AnimatedModel", "void CleanupConnection(Connection@+)", asMETHODPR(AnimatedModel, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // Not registered because have @manualbind mark
     // void AnimatedModel::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override | File: ../Graphics/AnimatedModel.h
     engine->RegisterObjectMethod("AnimatedModel", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(AnimatedModel, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
     // bool StaticModel::DrawOcclusion(OcclusionBuffer* buffer) override | File: ../Graphics/StaticModel.h
@@ -1307,7 +1307,7 @@ void ASRegisterGenerated_Members_A(asIScriptEngine* engine)
     // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
     // Not registered because template
     // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("AnimatedSprite2D", "void CleanupConnection(Connection@+)", asMETHODPR(AnimatedSprite2D, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // Not registered because have @manualbind mark
     // void Drawable::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override | File: ../Graphics/Drawable.h
     engine->RegisterObjectMethod("AnimatedSprite2D", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(AnimatedSprite2D, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
     // virtual bool Drawable::DrawOcclusion(OcclusionBuffer* buffer) | File: ../Graphics/Drawable.h
@@ -2102,7 +2102,7 @@ void ASRegisterGenerated_Members_A(asIScriptEngine* engine)
     // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
     // Not registered because template
     // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("AnimationController", "void CleanupConnection(Connection@+)", asMETHODPR(AnimationController, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // Not registered because have @manualbind mark
     // virtual void Component::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) | File: ../Scene/Component.h
     engine->RegisterObjectMethod("AnimationController", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(AnimationController, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
     // bool AnimationController::Fade(const String& name, float targetWeight, float fadeTime) | File: ../Graphics/AnimationController.h

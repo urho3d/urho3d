@@ -31,6 +31,12 @@
 namespace Urho3D
 {
 
+#ifdef URHO3D_NETWORK
+    static const bool URHO3D_NETWORK_DEFINED = true;
+#else
+    static const bool URHO3D_NETWORK_DEFINED = false;
+#endif
+
 const AttributeInfo& SerializableGetAttributeInfo(unsigned index, Serializable* ptr);
 
 #define REGISTER_MANUAL_PART_Serializable(T, className) \
@@ -96,7 +102,19 @@ Component* NodeGetComponent(unsigned index, Node* ptr);
     /* const Vector<SharedPtr<Component> >& Node::GetComponents() const | File: ../Scene/Node.h */ \
     engine->RegisterObjectMethod(className, "Component@+ get_components(uint) const", asFUNCTION(NodeGetComponent), asCALL_CDECL_OBJLAST); \
     /* const VariantMap& Node::GetVars() const | File: ../Scene/Node.h */ \
-    engine->RegisterObjectMethod(className, "VariantMap& get_vars()", asFUNCTION(NodeGetVars), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "VariantMap& get_vars()", asFUNCTION(NodeGetVars), asCALL_CDECL_OBJLAST); \
+    /* Workarounds for Connection that used outside URHO3D_NETWORK define */ \
+    if (URHO3D_NETWORK_DEFINED) \
+    { \
+        /* void Node::SetOwner(Connection* owner) | File: ../Scene/Node.h */ \
+        engine->RegisterObjectMethod(className, "void SetOwner(Connection@+)", asMETHODPR(T, SetOwner, (Connection*), void), asCALL_THISCALL); \
+        engine->RegisterObjectMethod(className, "void set_owner(Connection@+)", asMETHODPR(T, SetOwner, (Connection*), void), asCALL_THISCALL); \
+        /* Connection* Node::GetOwner() const | File: ../Scene/Node.h * \
+        engine->RegisterObjectMethod(className, "Connection@+ GetOwner() const", asMETHODPR(T, GetOwner, () const, Connection*), asCALL_THISCALL); \
+        engine->RegisterObjectMethod(className, "Connection@+ get_owner() const", asMETHODPR(T, GetOwner, () const, Connection*), asCALL_THISCALL); \
+        /* void Node::CleanupConnection(Connection* connection) | File: ../Scene/Node.h */ \
+        engine->RegisterObjectMethod(className, "void CleanupConnection(Connection@+)", asMETHODPR(T, CleanupConnection, (Connection*), void), asCALL_THISCALL); \
+    }
 
 // ========================================================================================
 
@@ -184,5 +202,15 @@ void BoneSetNode(Node* node, Bone* ptr);
     engine->RegisterObjectMethod(className, "void set_node(Node@+)", asFUNCTION(BoneSetNode), asCALL_CDECL_OBJLAST); \
     /* WeakPtr<Node> Bone::node_ | File: ../Graphics/Skeleton.h */ \
     engine->RegisterObjectMethod(className, "Node@+ get_node() const", asFUNCTION(BoneGetNode), asCALL_CDECL_OBJLAST);
+    
+// ========================================================================================
+
+#define REGISTER_MANUAL_PART_Component(T, className) \
+    /* Workarounds for Connection that used outside URHO3D_NETWORK define */ \
+    if (URHO3D_NETWORK_DEFINED) \
+    { \
+        /* void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h */ \
+        engine->RegisterObjectMethod(className, "void CleanupConnection(Connection@+)", asMETHODPR(T, CleanupConnection, (Connection*), void), asCALL_THISCALL); \
+    }
 
 }

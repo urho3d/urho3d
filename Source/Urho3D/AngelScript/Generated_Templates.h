@@ -67,7 +67,7 @@ template <class T> void RegisterComponent(asIScriptEngine* engine, const char* c
     // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
     // Not registered because template
     // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod(className, "void CleanupConnection(Connection@+)", asMETHODPR(T, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // Not registered because have @manualbind mark
     // explicit Component::Component(Context* context) | File: ../Scene/Component.h
     {
         String declFactory(String(className) + "@ f()");

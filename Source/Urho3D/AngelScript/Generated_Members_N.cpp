@@ -599,7 +599,7 @@ void ASRegisterGenerated_Members_N(asIScriptEngine* engine)
     // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
     // Not registered because template
     // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("NavArea", "void CleanupConnection(Connection@+)", asMETHODPR(NavArea, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // Not registered because have @manualbind mark
     // void NavArea::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override | File: ../Navigation/NavArea.h
     engine->RegisterObjectMethod("NavArea", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(NavArea, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
     // bool Animatable::GetAnimationEnabled() const | File: ../Scene/Animatable.h
@@ -892,7 +892,7 @@ void ASRegisterGenerated_Members_N(asIScriptEngine* engine)
     // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
     // Not registered because template
     // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("Navigable", "void CleanupConnection(Connection@+)", asMETHODPR(Navigable, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // Not registered because have @manualbind mark
     // virtual void Component::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) | File: ../Scene/Component.h
     engine->RegisterObjectMethod("Navigable", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(Navigable, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
     // bool Animatable::GetAnimationEnabled() const | File: ../Scene/Animatable.h
@@ -1186,7 +1186,7 @@ void ASRegisterGenerated_Members_N(asIScriptEngine* engine)
     // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
     // Not registered because template
     // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("NavigationMesh", "void CleanupConnection(Connection@+)", asMETHODPR(NavigationMesh, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // Not registered because have @manualbind mark
     // void NavigationMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override | File: ../Navigation/NavigationMesh.h
     engine->RegisterObjectMethod("NavigationMesh", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(NavigationMesh, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
     // void NavigationMesh::DrawDebugGeometry(bool depthTest) | File: ../Navigation/NavigationMesh.h
@@ -1822,7 +1822,7 @@ void ASRegisterGenerated_Members_N(asIScriptEngine* engine)
     // bool NetworkPriority::CheckUpdate(float distance, float& accumulator) | File: ../Network/NetworkPriority.h
     engine->RegisterObjectMethod("NetworkPriority", "bool CheckUpdate(float, float&)", asMETHODPR(NetworkPriority, CheckUpdate, (float, float&), bool), asCALL_THISCALL);
     // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("NetworkPriority", "void CleanupConnection(Connection@+)", asMETHODPR(NetworkPriority, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // Not registered because have @manualbind mark
     // virtual void Component::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) | File: ../Scene/Component.h
     engine->RegisterObjectMethod("NetworkPriority", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(NetworkPriority, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
     // bool NetworkPriority::GetAlwaysUpdateOwner() const | File: ../Network/NetworkPriority.h
@@ -2135,7 +2135,7 @@ void ASRegisterGenerated_Members_N(asIScriptEngine* engine)
     // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
     // Not registered because template
     // void Node::CleanupConnection(Connection* connection) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Node", "void CleanupConnection(Connection@+)", asMETHODPR(Node, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // Not registered because have @manualbind mark
     // Node* Node::Clone(CreateMode mode=REPLICATED) | File: ../Scene/Node.h
     engine->RegisterObjectMethod("Node", "Node@+ Clone(CreateMode = REPLICATED)", asMETHODPR(Node, Clone, (CreateMode), Node*), asCALL_THISCALL);
     // Component* Node::CloneComponent(Component* component, unsigned id=0) | File: ../Scene/Node.h
@@ -2285,8 +2285,7 @@ void ASRegisterGenerated_Members_N(asIScriptEngine* engine)
     // template<class T> T*  Node::GetOrCreateComponent(CreateMode mode=REPLICATED, unsigned id=0) | File: ../Scene/Node.h
     // Not registered because template
     // Connection* Node::GetOwner() const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Node", "Connection@+ GetOwner() const", asMETHODPR(Node, GetOwner, () const, Connection*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Node", "Connection@+ get_owner() const", asMETHODPR(Node, GetOwner, () const, Connection*), asCALL_THISCALL);
+    // Not registered because have @manualbind mark
     // Node* Node::GetParent() const | File: ../Scene/Node.h
     engine->RegisterObjectMethod("Node", "Node@+ GetParent() const", asMETHODPR(Node, GetParent, () const, Node*), asCALL_THISCALL);
     engine->RegisterObjectMethod("Node", "Node@+ get_parent() const", asMETHODPR(Node, GetParent, () const, Node*), asCALL_THISCALL);
@@ -2596,8 +2595,7 @@ void ASRegisterGenerated_Members_N(asIScriptEngine* engine)
     // void Animatable::SetObjectAnimationAttr(const ResourceRef& value) | File: ../Scene/Animatable.h
     engine->RegisterObjectMethod("Node", "void SetObjectAnimationAttr(const ResourceRef&in)", asMETHODPR(Node, SetObjectAnimationAttr, (const ResourceRef&), void), asCALL_THISCALL);
     // void Node::SetOwner(Connection* owner) | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Node", "void SetOwner(Connection@+)", asMETHODPR(Node, SetOwner, (Connection*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Node", "void set_owner(Connection@+)", asMETHODPR(Node, SetOwner, (Connection*), void), asCALL_THISCALL);
+    // Not registered because have @manualbind mark
     // void Node::SetParent(Node* parent) | File: ../Scene/Node.h
     engine->RegisterObjectMethod("Node", "void SetParent(Node@+)", asMETHODPR(Node, SetParent, (Node*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Node", "void set_parent(Node@+)", asMETHODPR(Node, SetParent, (Node*), void), asCALL_THISCALL);

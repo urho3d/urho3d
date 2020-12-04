@@ -259,7 +259,7 @@ void ASRegisterGenerated_Members_B(asIScriptEngine* engine)
     // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
     // Not registered because template
     // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("BillboardSet", "void CleanupConnection(Connection@+)", asMETHODPR(BillboardSet, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // Not registered because have @manualbind mark
     // void BillboardSet::Commit() | File: ../Graphics/BillboardSet.h
     engine->RegisterObjectMethod("BillboardSet", "void Commit()", asMETHODPR(BillboardSet, Commit, (), void), asCALL_THISCALL);
     // void Drawable::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override | File: ../Graphics/Drawable.h
