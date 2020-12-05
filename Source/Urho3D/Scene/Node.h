@@ -298,7 +298,7 @@ public:
     /// Set enabled state on self and child nodes. Unlike SetDeepEnabled this does not remember the nodes' own enabled state, but overwrites it.
     void SetEnabledRecursive(bool enable);
     /// Set owner connection for networking.
-    /// @property
+    /// @manualbind
     void SetOwner(Connection* owner);
     /// Mark node and child nodes to need world transform recalculation. Notify listener components.
     void MarkDirty();
@@ -397,7 +397,7 @@ public:
     bool IsEnabledSelf() const { return enabledPrev_; }
 
     /// Return owner connection in networking.
-    /// @property
+    /// @manualbind
     Connection* GetOwner() const { return impl_->owner_; }
 
     /// Return position in parent space.
@@ -659,6 +659,7 @@ public:
     /// Prepare network update by comparing attributes and marking replication states dirty as necessary.
     void PrepareNetworkUpdate();
     /// Clean up all references to a network connection that is about to be removed.
+    /// @manualbind
     void CleanupConnection(Connection* connection);
     /// Mark node dirty in scene replication states.
     void MarkReplicationDirty();

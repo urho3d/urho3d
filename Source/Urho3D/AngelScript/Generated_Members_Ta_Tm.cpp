@@ -654,7 +654,7 @@ void ASRegisterGenerated_Members_Ta_Tm(asIScriptEngine* engine)
     // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
     // Not registered because template
     // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("Terrain", "void CleanupConnection(Connection@+)", asMETHODPR(Terrain, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // Not registered because have @manualbind mark
     // void Terrain::CreatePatchGeometry(TerrainPatch* patch) | File: ../Graphics/Terrain.h
     engine->RegisterObjectMethod("Terrain", "void CreatePatchGeometry(TerrainPatch@+)", asMETHODPR(Terrain, CreatePatchGeometry, (TerrainPatch*), void), asCALL_THISCALL);
     // virtual void Component::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) | File: ../Scene/Component.h
@@ -1111,7 +1111,7 @@ void ASRegisterGenerated_Members_Ta_Tm(asIScriptEngine* engine)
     // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
     // Not registered because template
     // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("TerrainPatch", "void CleanupConnection(Connection@+)", asMETHODPR(TerrainPatch, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // Not registered because have @manualbind mark
     // void TerrainPatch::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override | File: ../Graphics/TerrainPatch.h
     engine->RegisterObjectMethod("TerrainPatch", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(TerrainPatch, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
     // bool TerrainPatch::DrawOcclusion(OcclusionBuffer* buffer) override | File: ../Graphics/TerrainPatch.h
@@ -2466,7 +2466,7 @@ void ASRegisterGenerated_Members_Ta_Tm(asIScriptEngine* engine)
     // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
     // Not registered because template
     // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("Text3D", "void CleanupConnection(Connection@+)", asMETHODPR(Text3D, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // Not registered because have @manualbind mark
     // void Drawable::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override | File: ../Graphics/Drawable.h
     engine->RegisterObjectMethod("Text3D", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(Text3D, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
     // virtual bool Drawable::DrawOcclusion(OcclusionBuffer* buffer) | File: ../Graphics/Drawable.h
@@ -4794,7 +4794,7 @@ void ASRegisterGenerated_Members_Ta_Tm(asIScriptEngine* engine)
     // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
     // Not registered because template
     // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("TileMap2D", "void CleanupConnection(Connection@+)", asMETHODPR(TileMap2D, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // Not registered because have @manualbind mark
     // void TileMap2D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override | File: ../Urho2D/TileMap2D.h
     engine->RegisterObjectMethod("TileMap2D", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(TileMap2D, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
     // void TileMap2D::DrawDebugGeometry() | File: ../Urho2D/TileMap2D.h
@@ -5098,7 +5098,7 @@ void ASRegisterGenerated_Members_Ta_Tm(asIScriptEngine* engine)
     // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
     // Not registered because template
     // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("TileMapLayer2D", "void CleanupConnection(Connection@+)", asMETHODPR(TileMapLayer2D, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // Not registered because have @manualbind mark
     // void TileMapLayer2D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override | File: ../Urho2D/TileMapLayer2D.h
     engine->RegisterObjectMethod("TileMapLayer2D", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(TileMapLayer2D, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
     // bool Animatable::GetAnimationEnabled() const | File: ../Scene/Animatable.h

@@ -247,7 +247,7 @@ void ASRegisterGenerated_Members_L(asIScriptEngine* engine)
     // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
     // Not registered because template
     // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("Light", "void CleanupConnection(Connection@+)", asMETHODPR(Light, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // Not registered because have @manualbind mark
     // void Light::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override | File: ../Graphics/Light.h
     engine->RegisterObjectMethod("Light", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(Light, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
     // virtual bool Drawable::DrawOcclusion(OcclusionBuffer* buffer) | File: ../Graphics/Drawable.h
@@ -2972,7 +2972,7 @@ void ASRegisterGenerated_Members_L(asIScriptEngine* engine)
     // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
     // Not registered because template
     // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("LogicComponent", "void CleanupConnection(Connection@+)", asMETHODPR(LogicComponent, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // Not registered because have @manualbind mark
     // virtual void Component::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) | File: ../Scene/Component.h
     engine->RegisterObjectMethod("LogicComponent", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(LogicComponent, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
     // bool Animatable::GetAnimationEnabled() const | File: ../Scene/Animatable.h

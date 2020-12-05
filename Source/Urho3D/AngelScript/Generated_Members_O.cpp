@@ -456,7 +456,7 @@ void ASRegisterGenerated_Members_O(asIScriptEngine* engine)
     // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
     // Not registered because template
     // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("Obstacle", "void CleanupConnection(Connection@+)", asMETHODPR(Obstacle, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // Not registered because have @manualbind mark
     // void Obstacle::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override | File: ../Navigation/Obstacle.h
     engine->RegisterObjectMethod("Obstacle", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(Obstacle, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
     // void Obstacle::DrawDebugGeometry(bool depthTest) | File: ../Navigation/Obstacle.h
@@ -910,7 +910,7 @@ void ASRegisterGenerated_Members_O(asIScriptEngine* engine)
     // bool Octant::CheckDrawableFit(const BoundingBox& box) const | File: ../Graphics/Octree.h
     engine->RegisterObjectMethod("Octree", "bool CheckDrawableFit(const BoundingBox&in) const", asMETHODPR(Octree, CheckDrawableFit, (const BoundingBox&) const, bool), asCALL_THISCALL);
     // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("Octree", "void CleanupConnection(Connection@+)", asMETHODPR(Octree, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // Not registered because have @manualbind mark
     // void Octant::DeleteChild(unsigned index) | File: ../Graphics/Octree.h
     engine->RegisterObjectMethod("Octree", "void DeleteChild(uint)", asMETHODPR(Octree, DeleteChild, (unsigned), void), asCALL_THISCALL);
     // void Octree::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override | File: ../Graphics/Octree.h
@@ -1234,7 +1234,7 @@ void ASRegisterGenerated_Members_O(asIScriptEngine* engine)
     // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
     // Not registered because template
     // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("OffMeshConnection", "void CleanupConnection(Connection@+)", asMETHODPR(OffMeshConnection, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // Not registered because have @manualbind mark
     // void OffMeshConnection::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override | File: ../Navigation/OffMeshConnection.h
     engine->RegisterObjectMethod("OffMeshConnection", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(OffMeshConnection, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
     // bool Animatable::GetAnimationEnabled() const | File: ../Scene/Animatable.h

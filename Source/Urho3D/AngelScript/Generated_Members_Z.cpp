@@ -59,7 +59,7 @@ void ASRegisterGenerated_Members_Z(asIScriptEngine* engine)
     // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
     // Not registered because template
     // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("Zone", "void CleanupConnection(Connection@+)", asMETHODPR(Zone, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // Not registered because have @manualbind mark
     // void Zone::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override | File: ../Graphics/Zone.h
     engine->RegisterObjectMethod("Zone", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(Zone, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
     // virtual bool Drawable::DrawOcclusion(OcclusionBuffer* buffer) | File: ../Graphics/Drawable.h

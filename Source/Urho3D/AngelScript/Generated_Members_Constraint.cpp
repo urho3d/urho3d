@@ -290,7 +290,7 @@ void ASRegisterGenerated_Members_Constraint(asIScriptEngine* engine)
     // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
     // Not registered because template
     // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("Constraint", "void CleanupConnection(Connection@+)", asMETHODPR(Constraint, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // Not registered because have @manualbind mark
     // explicit Constraint::Constraint(Context* context) | File: ../Physics/Constraint.h
     engine->RegisterObjectBehaviour("Constraint", asBEHAVE_FACTORY, "Constraint@+ f()", asFUNCTION(Constraint_Constraint_Context), asCALL_CDECL);
     // void Constraint::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override | File: ../Physics/Constraint.h
@@ -655,7 +655,7 @@ void ASRegisterGenerated_Members_Constraint(asIScriptEngine* engine)
     // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
     // Not registered because template
     // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("Constraint2D", "void CleanupConnection(Connection@+)", asMETHODPR(Constraint2D, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // Not registered because have @manualbind mark
     // explicit Constraint2D::Constraint2D(Context* context) | File: ../Urho2D/Constraint2D.h
     engine->RegisterObjectBehaviour("Constraint2D", asBEHAVE_FACTORY, "Constraint2D@+ f()", asFUNCTION(Constraint2D_Constraint2D_Context), asCALL_CDECL);
     // void Constraint2D::CreateJoint() | File: ../Urho2D/Constraint2D.h
@@ -958,7 +958,7 @@ void ASRegisterGenerated_Members_Constraint(asIScriptEngine* engine)
     // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
     // Not registered because template
     // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintDistance2D", "void CleanupConnection(Connection@+)", asMETHODPR(ConstraintDistance2D, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // Not registered because have @manualbind mark
     // explicit ConstraintDistance2D::ConstraintDistance2D(Context* context) | File: ../Urho2D/ConstraintDistance2D.h
     engine->RegisterObjectBehaviour("ConstraintDistance2D", asBEHAVE_FACTORY, "ConstraintDistance2D@+ f()", asFUNCTION(ConstraintDistance2D_ConstraintDistance2D_Context), asCALL_CDECL);
     // void Constraint2D::CreateJoint() | File: ../Urho2D/Constraint2D.h
@@ -1295,7 +1295,7 @@ void ASRegisterGenerated_Members_Constraint(asIScriptEngine* engine)
     // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
     // Not registered because template
     // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintFriction2D", "void CleanupConnection(Connection@+)", asMETHODPR(ConstraintFriction2D, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // Not registered because have @manualbind mark
     // explicit ConstraintFriction2D::ConstraintFriction2D(Context* context) | File: ../Urho2D/ConstraintFriction2D.h
     engine->RegisterObjectBehaviour("ConstraintFriction2D", asBEHAVE_FACTORY, "ConstraintFriction2D@+ f()", asFUNCTION(ConstraintFriction2D_ConstraintFriction2D_Context), asCALL_CDECL);
     // void Constraint2D::CreateJoint() | File: ../Urho2D/Constraint2D.h
@@ -1620,7 +1620,7 @@ void ASRegisterGenerated_Members_Constraint(asIScriptEngine* engine)
     // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
     // Not registered because template
     // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintGear2D", "void CleanupConnection(Connection@+)", asMETHODPR(ConstraintGear2D, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // Not registered because have @manualbind mark
     // explicit ConstraintGear2D::ConstraintGear2D(Context* context) | File: ../Urho2D/ConstraintGear2D.h
     engine->RegisterObjectBehaviour("ConstraintGear2D", asBEHAVE_FACTORY, "ConstraintGear2D@+ f()", asFUNCTION(ConstraintGear2D_ConstraintGear2D_Context), asCALL_CDECL);
     // void Constraint2D::CreateJoint() | File: ../Urho2D/Constraint2D.h
@@ -1945,7 +1945,7 @@ void ASRegisterGenerated_Members_Constraint(asIScriptEngine* engine)
     // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
     // Not registered because template
     // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintMotor2D", "void CleanupConnection(Connection@+)", asMETHODPR(ConstraintMotor2D, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // Not registered because have @manualbind mark
     // explicit ConstraintMotor2D::ConstraintMotor2D(Context* context) | File: ../Urho2D/ConstraintMotor2D.h
     engine->RegisterObjectBehaviour("ConstraintMotor2D", asBEHAVE_FACTORY, "ConstraintMotor2D@+ f()", asFUNCTION(ConstraintMotor2D_ConstraintMotor2D_Context), asCALL_CDECL);
     // void Constraint2D::CreateJoint() | File: ../Urho2D/Constraint2D.h
@@ -2282,7 +2282,7 @@ void ASRegisterGenerated_Members_Constraint(asIScriptEngine* engine)
     // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
     // Not registered because template
     // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintMouse2D", "void CleanupConnection(Connection@+)", asMETHODPR(ConstraintMouse2D, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // Not registered because have @manualbind mark
     // explicit ConstraintMouse2D::ConstraintMouse2D(Context* context) | File: ../Urho2D/ConstraintMouse2D.h
     engine->RegisterObjectBehaviour("ConstraintMouse2D", asBEHAVE_FACTORY, "ConstraintMouse2D@+ f()", asFUNCTION(ConstraintMouse2D_ConstraintMouse2D_Context), asCALL_CDECL);
     // void Constraint2D::CreateJoint() | File: ../Urho2D/Constraint2D.h
@@ -2613,7 +2613,7 @@ void ASRegisterGenerated_Members_Constraint(asIScriptEngine* engine)
     // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
     // Not registered because template
     // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintPrismatic2D", "void CleanupConnection(Connection@+)", asMETHODPR(ConstraintPrismatic2D, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // Not registered because have @manualbind mark
     // explicit ConstraintPrismatic2D::ConstraintPrismatic2D(Context* context) | File: ../Urho2D/ConstraintPrismatic2D.h
     engine->RegisterObjectBehaviour("ConstraintPrismatic2D", asBEHAVE_FACTORY, "ConstraintPrismatic2D@+ f()", asFUNCTION(ConstraintPrismatic2D_ConstraintPrismatic2D_Context), asCALL_CDECL);
     // void Constraint2D::CreateJoint() | File: ../Urho2D/Constraint2D.h
@@ -2968,7 +2968,7 @@ void ASRegisterGenerated_Members_Constraint(asIScriptEngine* engine)
     // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
     // Not registered because template
     // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintPulley2D", "void CleanupConnection(Connection@+)", asMETHODPR(ConstraintPulley2D, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // Not registered because have @manualbind mark
     // explicit ConstraintPulley2D::ConstraintPulley2D(Context* context) | File: ../Urho2D/ConstraintPulley2D.h
     engine->RegisterObjectBehaviour("ConstraintPulley2D", asBEHAVE_FACTORY, "ConstraintPulley2D@+ f()", asFUNCTION(ConstraintPulley2D_ConstraintPulley2D_Context), asCALL_CDECL);
     // void Constraint2D::CreateJoint() | File: ../Urho2D/Constraint2D.h
@@ -3305,7 +3305,7 @@ void ASRegisterGenerated_Members_Constraint(asIScriptEngine* engine)
     // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
     // Not registered because template
     // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintRevolute2D", "void CleanupConnection(Connection@+)", asMETHODPR(ConstraintRevolute2D, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // Not registered because have @manualbind mark
     // explicit ConstraintRevolute2D::ConstraintRevolute2D(Context* context) | File: ../Urho2D/ConstraintRevolute2D.h
     engine->RegisterObjectBehaviour("ConstraintRevolute2D", asBEHAVE_FACTORY, "ConstraintRevolute2D@+ f()", asFUNCTION(ConstraintRevolute2D_ConstraintRevolute2D_Context), asCALL_CDECL);
     // void Constraint2D::CreateJoint() | File: ../Urho2D/Constraint2D.h
@@ -3654,7 +3654,7 @@ void ASRegisterGenerated_Members_Constraint(asIScriptEngine* engine)
     // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
     // Not registered because template
     // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintRope2D", "void CleanupConnection(Connection@+)", asMETHODPR(ConstraintRope2D, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // Not registered because have @manualbind mark
     // explicit ConstraintRope2D::ConstraintRope2D(Context* context) | File: ../Urho2D/ConstraintRope2D.h
     engine->RegisterObjectBehaviour("ConstraintRope2D", asBEHAVE_FACTORY, "ConstraintRope2D@+ f()", asFUNCTION(ConstraintRope2D_ConstraintRope2D_Context), asCALL_CDECL);
     // void Constraint2D::CreateJoint() | File: ../Urho2D/Constraint2D.h
@@ -3979,7 +3979,7 @@ void ASRegisterGenerated_Members_Constraint(asIScriptEngine* engine)
     // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
     // Not registered because template
     // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintWeld2D", "void CleanupConnection(Connection@+)", asMETHODPR(ConstraintWeld2D, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // Not registered because have @manualbind mark
     // explicit ConstraintWeld2D::ConstraintWeld2D(Context* context) | File: ../Urho2D/ConstraintWeld2D.h
     engine->RegisterObjectBehaviour("ConstraintWeld2D", asBEHAVE_FACTORY, "ConstraintWeld2D@+ f()", asFUNCTION(ConstraintWeld2D_ConstraintWeld2D_Context), asCALL_CDECL);
     // void Constraint2D::CreateJoint() | File: ../Urho2D/Constraint2D.h
@@ -4304,7 +4304,7 @@ void ASRegisterGenerated_Members_Constraint(asIScriptEngine* engine)
     // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
     // Not registered because template
     // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("ConstraintWheel2D", "void CleanupConnection(Connection@+)", asMETHODPR(ConstraintWheel2D, CleanupConnection, (Connection*), void), asCALL_THISCALL);
+    // Not registered because have @manualbind mark
     // explicit ConstraintWheel2D::ConstraintWheel2D(Context* context) | File: ../Urho2D/ConstraintWheel2D.h
     engine->RegisterObjectBehaviour("ConstraintWheel2D", asBEHAVE_FACTORY, "ConstraintWheel2D@+ f()", asFUNCTION(ConstraintWheel2D_ConstraintWheel2D_Context), asCALL_CDECL);
     // void Constraint2D::CreateJoint() | File: ../Urho2D/Constraint2D.h
