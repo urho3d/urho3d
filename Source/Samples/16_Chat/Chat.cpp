@@ -32,6 +32,7 @@
 #include <Urho3D/IO/VectorBuffer.h>
 #include <Urho3D/Network/Network.h>
 #include <Urho3D/Network/NetworkEvents.h>
+#include <Urho3D/Network/Protocol.h>
 #include <Urho3D/Resource/ResourceCache.h>
 #include <Urho3D/Scene/Scene.h>
 #include <Urho3D/UI/Button.h>
@@ -51,7 +52,7 @@
 #endif
 
 // Identifier for the chat network messages
-const int MSG_CHAT = 154;
+const int MSG_CHAT = MSG_USER + 0;
 // UDP port we will use
 const unsigned short CHAT_SERVER_PORT = 2345;
 
