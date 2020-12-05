@@ -6,7 +6,7 @@
 #include "Scripts/Utilities/Sample.as"
 
 // Identifier for the chat network messages
-const int MSG_CHAT = 153;
+const int MSG_CHAT = MSG_USER + 0;
 // UDP port we will use
 const uint CHAT_SERVER_PORT = 2345;
 

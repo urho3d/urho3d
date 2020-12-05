@@ -509,6 +509,10 @@ void ASRegisterGenerated_GlobalVariables(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const int MSG_PACKED_MESSAGE", (void*)&MSG_PACKED_MESSAGE);
 #endif
 #ifdef URHO3D_NETWORK
+    // static const int MSG_USER | File: ../Network/Protocol.h
+    engine->RegisterGlobalProperty("const int MSG_USER", (void*)&MSG_USER);
+#endif
+#ifdef URHO3D_NETWORK
     // static const unsigned CONTROLS_CONTENT_ID | File: ../Network/Protocol.h
     engine->RegisterGlobalProperty("const uint CONTROLS_CONTENT_ID", (void*)&CONTROLS_CONTENT_ID);
 #endif
