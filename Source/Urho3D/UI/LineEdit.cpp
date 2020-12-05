@@ -566,15 +566,17 @@ void LineEdit::UpdateText()
 {
     unsigned utf8Length = line_.LengthUTF8();
 
-    // if maxLength_ nonzero, truncate line to enforce length
-    if (maxLength_ > 0 && utf8Length > maxLength_)
+    // If maxLength_ nonzero, truncate line to enforce length
+    if (maxLength_ && utf8Length > maxLength_)
     {
-      line_ = line_.SubstringUTF8(0, maxLength_);
-      utf8Length = maxLength_;
+        line_ = line_.SubstringUTF8(0, maxLength_);
+        utf8Length = maxLength_;
     }
 
     if (!echoCharacter_)
+    {
         text_->SetText(line_);
+    }
     else
     {
         String echoText;
@@ -582,6 +584,7 @@ void LineEdit::UpdateText()
             echoText.AppendUTF8(echoCharacter_);
         text_->SetText(echoText);
     }
+
     if (cursorPosition_ > utf8Length)
     {
         cursorPosition_ = utf8Length;
