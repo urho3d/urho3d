@@ -179,7 +179,7 @@ void PS()
         #elif defined(SPOTLIGHT)
             float atten = GetAttenSpot(normal, vWorldPos.xyz, lightDir);
         #else
-            foat atten = GetAttenPoint(normal, vWorldPos.xyz, lightDir);
+            float atten = GetAttenPoint(normal, vWorldPos.xyz, lightDir);
         #endif
 
         float shadow = 1.0;
