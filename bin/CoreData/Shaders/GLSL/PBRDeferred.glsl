@@ -87,14 +87,12 @@ void PS()
 
     vec3 lightDir;
 
-    float atten = 1;
-
     #if defined(DIRLIGHT)
-        atten = GetAtten(normal, worldPos, lightDir);
+        float atten = GetAtten(normal, worldPos, lightDir);
     #elif defined(SPOTLIGHT)
-        atten = GetAttenSpot(normal, worldPos, lightDir);
+        float atten = GetAttenSpot(normal, worldPos, lightDir);
     #else
-        atten = GetAttenPoint(normal, worldPos, lightDir);
+        float atten = GetAttenPoint(normal, worldPos, lightDir);
     #endif
 
     float shadow = 1;
