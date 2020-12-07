@@ -37,11 +37,7 @@ void VS()
     mat4 modelMatrix = iModelMatrix;
     vec3 worldPos = GetWorldPos(modelMatrix);
     gl_Position = GetClipPos(worldPos);
-    #ifdef NOUV
-        vTexCoord = vec2(0.0, 0.0);
-    #else
-        vTexCoord = GetTexCoord(iTexCoord);
-    #endif
+    vTexCoord = GetTexCoord(iTexCoord);
     vWorldPos = vec4(worldPos, GetDepth(gl_Position));
 
     #ifdef SOFTPARTICLES
