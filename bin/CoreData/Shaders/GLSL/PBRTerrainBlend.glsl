@@ -153,14 +153,12 @@ void PS()
         vec3 lightDir;
         vec3 finalColor;
 
-        float atten = 1;
-
         #if defined(DIRLIGHT)
-            atten = GetAtten(normal, vWorldPos.xyz, lightDir);
+            float atten = GetAtten(normal, vWorldPos.xyz, lightDir);
         #elif defined(SPOTLIGHT)
-            atten = GetAttenSpot(normal, vWorldPos.xyz, lightDir);
+            float atten = GetAttenSpot(normal, vWorldPos.xyz, lightDir);
         #else
-            atten = GetAttenPoint(normal, vWorldPos.xyz, lightDir);
+            float atten = GetAttenPoint(normal, vWorldPos.xyz, lightDir);
         #endif
 
         float shadow = 1.0;
@@ -192,7 +190,7 @@ void PS()
         #endif
     #elif defined(DEFERRED)
         // Fill deferred G-buffer
-        const vec3 spareData = vec3(0,0,0); // Can be used to pass more data to deferred renderer
+        const vec3 spareData = vec3(0.0, 0.0, 0.0); // Can be used to pass more data to deferred renderer
         gl_FragData[0] = vec4(specColor, spareData.r);
         gl_FragData[1] = vec4(diffColor.rgb, spareData.g);
         gl_FragData[2] = vec4(normal * roughness, spareData.b);
