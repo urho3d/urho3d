@@ -95,7 +95,7 @@ void PS()
         float atten = GetAttenPoint(normal, worldPos, lightDir);
     #endif
 
-    float shadow = 1;
+    float shadow = 1.0;
     #ifdef SHADOW
         shadow *= GetShadowDeferred(projWorldPos, normal, depth);
     #endif
