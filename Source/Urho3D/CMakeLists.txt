@@ -204,6 +204,7 @@ if (URHO3D_GENERATEBINDINGS)
                             "AngelScript/Generated_Members_Other.cpp"
                             "AngelScript/Generated_GlobalVariables.cpp"
                             "AngelScript/Generated_GlobalFunctions.cpp"
+                            "AngelScript/GeneratedIncludes.h"
                             "AngelScript/Generated_Templates.h")
 
     set (AS_GENERATED_FILES_FULL_PATHS "${AS_GENERATED_FILES}")

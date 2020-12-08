@@ -3,10 +3,7 @@
 #include "../Precompiled.h"
 #include "../AngelScript/APITemplates.h"
 
-#include "../Input/Input.h"
-#include "../Resource/JSONFile.h"
-#include "../Resource/JSONValue.h"
-
+#include "../AngelScript/GeneratedIncludes.h"
 #include "../AngelScript/Manual.h"
 
 namespace Urho3D

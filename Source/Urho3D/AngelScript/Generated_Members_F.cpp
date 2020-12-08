@@ -3,18 +3,7 @@
 #include "../Precompiled.h"
 #include "../AngelScript/APITemplates.h"
 
-#include "../Graphics/Drawable.h"
-#include "../Graphics/Light.h"
-#include "../IO/File.h"
-#include "../IO/FileSystem.h"
-#include "../IO/FileWatcher.h"
-#include "../Math/Frustum.h"
-#include "../UI/FileSelector.h"
-#include "../UI/Font.h"
-#include "../UI/FontFace.h"
-#include "../UI/FontFaceBitmap.h"
-#include "../UI/FontFaceFreeType.h"
-
+#include "../AngelScript/GeneratedIncludes.h"
 #include "../AngelScript/Manual.h"
 
 namespace Urho3D

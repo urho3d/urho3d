@@ -3,16 +3,7 @@
 #include "../Precompiled.h"
 #include "../AngelScript/APITemplates.h"
 
-#include "../Audio/BufferedSoundStream.h"
-#include "../Graphics/Batch.h"
-#include "../Graphics/BillboardSet.h"
-#include "../Graphics/Light.h"
-#include "../Graphics/Skeleton.h"
-#include "../Math/BoundingBox.h"
-#include "../Resource/BackgroundLoader.h"
-#include "../UI/BorderImage.h"
-#include "../UI/Button.h"
-
+#include "../AngelScript/GeneratedIncludes.h"
 #include "../AngelScript/Manual.h"
 
 namespace Urho3D

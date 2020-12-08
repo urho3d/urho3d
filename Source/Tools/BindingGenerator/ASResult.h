@@ -34,16 +34,8 @@ namespace ASBindingGenerator
 class ASGeneratedFile_Base
 {
 protected:
-    // List of all required header files
-    vector<string> headers_;
-
-    // Discarded header files for statistic
-    vector<string> ignoredHeaders_;
-
     // Result file path
     string outputFilePath_;
-
-    void WriteHeaders(ofstream& stream);
 
 public:
     // Wrappers
@@ -51,10 +43,6 @@ public:
 
     // Registration function body
     stringstream reg_;
-
-    // Add header to list if not added yet
-    void AddHeader(const string& headerFile);
-    void AddIgnoredHeader(const string& headerFile);
 
     // Write result to file
     virtual void Save() {};
@@ -127,5 +115,11 @@ public:
     // Write result to file
     void Save() override;
 };
+
+namespace ResultIncludes
+{
+    // Add header to lists if not added yet
+    void AddHeader(const string& headerFile);
+}
 
 }

@@ -3,28 +3,7 @@
 #include "../Precompiled.h"
 #include "../AngelScript/APITemplates.h"
 
-#include "../Graphics/Batch.h"
-#include "../Graphics/Graphics.h"
-#include "../Graphics/Material.h"
-#include "../Graphics/Shader.h"
-#include "../Graphics/ShaderPrecache.h"
-#include "../Graphics/ShaderVariation.h"
-#include "../Graphics/Skeleton.h"
-#include "../Graphics/Skybox.h"
-#include "../Graphics/View.h"
-#include "../IO/Serializer.h"
-#ifdef URHO3D_NAVIGATION
-#include "../Navigation/NavBuildData.h"
-#endif
-#include "../Scene/ReplicationState.h"
-#include "../Scene/Scene.h"
-#include "../Scene/SceneResolver.h"
-#include "../Scene/Serializable.h"
-#include "../Scene/SmoothedTransform.h"
-#include "../UI/ScrollBar.h"
-#include "../UI/ScrollView.h"
-#include "../UI/Slider.h"
-
+#include "../AngelScript/GeneratedIncludes.h"
 #include "../AngelScript/Manual.h"
 
 namespace Urho3D

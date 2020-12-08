@@ -3,55 +3,7 @@
 #include "../Precompiled.h"
 #include "../AngelScript/APITemplates.h"
 
-// Ignored headers
-//#ifdef URHO3D_IK
-//#include "../IK/IKConverters.h"
-//#endif
-//#ifdef URHO3D_PHYSICS
-//#include "../Physics/PhysicsUtils.h"
-//#endif
-//#ifdef URHO3D_URHO2D
-//#include "../Urho2D/PhysicsUtils2D.h"
-//#endif
-
-#include "../Audio/Audio.h"
-#include "../Container/Allocator.h"
-#include "../Container/Hash.h"
-#include "../Core/Object.h"
-#include "../Core/ProcessUtils.h"
-#include "../Core/StringUtils.h"
-#include "../Graphics/Drawable.h"
-#include "../Graphics/Graphics.h"
-#include "../Graphics/Light.h"
-#include "../Graphics/Tangent.h"
-#ifdef URHO3D_IK
-#include "../IK/IK.h"
-#endif
-#include "../IO/Compression.h"
-#include "../IO/FileSystem.h"
-#include "../LibraryInfo.h"
-#include "../Math/MathDefs.h"
-#include "../Math/Random.h"
-#include "../Math/Vector2.h"
-#include "../Math/Vector3.h"
-#include "../Math/Vector4.h"
-#ifdef URHO3D_NAVIGATION
-#include "../Navigation/NavigationMesh.h"
-#endif
-#ifdef URHO3D_NETWORK
-#include "../Network/Network.h"
-#endif
-#ifdef URHO3D_PHYSICS
-#include "../Physics/PhysicsWorld.h"
-#endif
-#include "../Resource/Decompress.h"
-#include "../Resource/Resource.h"
-#include "../Resource/ResourceCache.h"
-#include "../Scene/Scene.h"
-#include "../UI/UI.h"
-#ifdef URHO3D_URHO2D
-#include "../Urho2D/Urho2D.h"
-#endif
+#include "../AngelScript/GeneratedIncludes.h"
 
 namespace Urho3D
 {

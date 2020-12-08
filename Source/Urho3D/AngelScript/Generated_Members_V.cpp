@@ -3,24 +3,7 @@
 #include "../Precompiled.h"
 #include "../AngelScript/APITemplates.h"
 
-#include "../Container/VectorBase.h"
-#include "../Core/Variant.h"
-#include "../Graphics/GraphicsDefs.h"
-#include "../Graphics/Model.h"
-#include "../Graphics/VertexBuffer.h"
-#include "../Graphics/View.h"
-#include "../Graphics/Viewport.h"
-#include "../IO/VectorBuffer.h"
-#include "../Math/Vector2.h"
-#include "../Math/Vector3.h"
-#include "../Math/Vector4.h"
-#include "../Scene/ValueAnimation.h"
-#include "../Scene/ValueAnimationInfo.h"
-#include "../UI/View3D.h"
-#ifdef URHO3D_URHO2D
-#include "../Urho2D/Drawable2D.h"
-#endif
-
+#include "../AngelScript/GeneratedIncludes.h"
 #include "../AngelScript/Manual.h"
 
 namespace Urho3D

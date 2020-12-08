@@ -37,6 +37,7 @@ namespace ASBindingGenerator
     void ProcessAllClasses(const string& outputBasePath);
     void ProcessAllGlobalVariables(const string& outputBasePath);
     void ProcessAllGlobalFunctions(const string& outputBasePath);
+    void SaveResult(const string& outputBasePath);
 
     void GenerateBindings(const string& outputBasePath)
     {
@@ -44,6 +45,7 @@ namespace ASBindingGenerator
         ProcessAllClasses(outputBasePath);
         ProcessAllGlobalVariables(outputBasePath);
         ProcessAllGlobalFunctions(outputBasePath);
+        SaveResult(outputBasePath);
     }
 }
 

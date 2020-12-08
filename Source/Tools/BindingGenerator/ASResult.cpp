@@ -29,60 +29,6 @@
 namespace ASBindingGenerator
 {
 
-void ASGeneratedFile_Base::AddHeader(const string& headerFile)
-{
-    if (!CONTAINS(headers_, headerFile))
-        headers_.push_back(headerFile);
-}
-
-void ASGeneratedFile_Base::AddIgnoredHeader(const string& headerFile)
-{
-    if (!CONTAINS(ignoredHeaders_, headerFile))
-        ignoredHeaders_.push_back(headerFile);
-}
-
-void ASGeneratedFile_Base::WriteHeaders(ofstream& out)
-{
-    sort(ignoredHeaders_.begin(), ignoredHeaders_.end());
-    sort(headers_.begin(), headers_.end());
-
-    if (ignoredHeaders_.size() > 0)
-    {
-        out << "// Ignored headers\n";
-
-        for (string header : ignoredHeaders_)
-        {
-            string insideDefine = InsideDefine(header);
-            if (!insideDefine.empty())
-                out << "//#ifdef " << insideDefine << "\n";
-
-            out << "//#include \"" << header << "\"\n";
-
-            if (!insideDefine.empty())
-                out << "//#endif\n";
-        }
-
-        out << "\n";
-    }
-
-    for (string header : headers_)
-    {
-        string insideDefine = InsideDefine(header);
-        if (!insideDefine.empty())
-            out << "#ifdef " << insideDefine << "\n";
-
-        out << "#include \"" << header << "\"\n";
-
-        if (!insideDefine.empty())
-            out << "#endif\n";
-    }
-
-    if (headers_.size() > 0)
-        out << "\n";
-}
-
-// ============================================================================
-
 ASGeneratedFile_WithRegistrationFunction::ASGeneratedFile_WithRegistrationFunction(const string& outputFilePath, const string& functionName)
 {
     outputFilePath_ = outputFilePath;
@@ -102,11 +48,9 @@ void ASGeneratedFile_Enums::Save()
         "\n"
         "#include \"../Precompiled.h\"\n"
         "#include \"../AngelScript/APITemplates.h\"\n"
-        "\n";
-
-    WriteHeaders(out);
-
-    out <<
+        "\n"
+        "#include \"../AngelScript/GeneratedIncludes.h\"\n"
+        "\n"
         "namespace Urho3D\n"
         "{\n"
         "\n"
@@ -132,11 +76,9 @@ void ASGeneratedFile_Classes::Save()
         "\n"
         "#include \"../Precompiled.h\"\n"
         "#include \"../AngelScript/APITemplates.h\"\n"
-        "\n";
-
-    WriteHeaders(out);
-
-    out <<
+        "\n"
+        "#include \"../AngelScript/GeneratedIncludes.h\"\n"
+        "\n"
         "namespace Urho3D\n"
         "{\n"
         "\n"
@@ -161,11 +103,9 @@ void ASGeneratedFile_Members_HighPriority::Save()
         "\n"
         "#include \"../Precompiled.h\"\n"
         "#include \"../AngelScript/APITemplates.h\"\n"
-        "\n";
-
-    WriteHeaders(out);
-
-    out <<
+        "\n"
+        "#include \"../AngelScript/GeneratedIncludes.h\"\n"
+        "\n"
         "namespace Urho3D\n"
         "{\n"
         "\n"
@@ -192,11 +132,8 @@ void ASGeneratedFile_Members::Save()
         "\n"
         "#include \"../Precompiled.h\"\n"
         "#include \"../AngelScript/APITemplates.h\"\n"
-        "\n";
-
-    WriteHeaders(out);
-
-    out <<
+        "\n"
+        "#include \"../AngelScript/GeneratedIncludes.h\"\n"
         "#include \"../AngelScript/Manual.h\"\n"
         "\n"
         "namespace Urho3D\n"
@@ -225,16 +162,12 @@ void ASGeneratedFile_GlobalVariables::Save()
         "\n"
         "#include \"../Precompiled.h\"\n"
         "#include \"../AngelScript/APITemplates.h\"\n"
-        "\n";
-
-    WriteHeaders(out);
-
-    out <<
+        "\n"
+        "#include \"../AngelScript/GeneratedIncludes.h\"\n"
+        "\n"
         "// Some headers could re-define M_PI, ensure that it's undefined\n"
         "#undef M_PI\n"
-        "\n";
-
-    out <<
+        "\n"
         "namespace Urho3D\n"
         "{\n"
         "\n"
@@ -258,11 +191,9 @@ void ASGeneratedFile_GlobalFunctions::Save()
         "\n"
         "#include \"../Precompiled.h\"\n"
         "#include \"../AngelScript/APITemplates.h\"\n"
-        "\n";
-
-    WriteHeaders(out);
-
-    out <<
+        "\n"
+        "#include \"../AngelScript/GeneratedIncludes.h\"\n"
+        "\n"
         "namespace Urho3D\n"
         "{\n"
         "\n"
@@ -293,11 +224,9 @@ void ASGeneratedFile_Templates::Save()
         "\n"
         "#include \"../Precompiled.h\"\n"
         "#include \"../AngelScript/APITemplates.h\"\n"
-        "\n";
-
-    WriteHeaders(out);
-
-    out <<
+        "\n"
+        "#include \"../AngelScript/GeneratedIncludes.h\"\n"
+        "\n"
         "#include \"../AngelScript/Manual.h\"\n"
         "\n"
         "namespace Urho3D\n"
@@ -309,6 +238,121 @@ void ASGeneratedFile_Templates::Save()
         << glue_.str()
         << reg_.str() <<
         "}\n";
+}
+
+namespace ResultIncludes
+{
+    // List of all required header files
+    static vector<string> headers_;
+
+    // Discarded header files for statistic
+    static vector<string> ignoredHeaders_;
+
+    // Add header to lists if not added yet
+    void AddHeader(const string& headerFile)
+    {
+        if (IsIgnoredHeader(headerFile))
+        {
+            if (!CONTAINS(ignoredHeaders_, headerFile))
+                ignoredHeaders_.push_back(headerFile);
+        }
+        else
+        {
+            if (!CONTAINS(headers_, headerFile))
+                headers_.push_back(headerFile);
+        }
+    }
+
+    // Write result to file
+    static void Save(const string& outputBasePath)
+    {
+        ofstream ofs(outputBasePath + "/Source/Urho3D/AngelScript/GeneratedIncludes.h");
+        sort(headers_.begin(), headers_.end());
+        sort(ignoredHeaders_.begin(), ignoredHeaders_.end());
+
+        ofs <<
+            "// DO NOT EDIT. This file is generated\n"
+            "\n"
+            "#pragma once\n"
+            "\n";
+
+        string openedDefine;
+        bool isFirst = true;
+
+        for (const string& header : headers_)
+        {
+            string insideDefine = InsideDefine(header);
+
+            if (insideDefine != openedDefine)
+            {
+                if (!openedDefine.empty())
+                {
+                    ofs << "#endif\n";
+                    openedDefine.clear();
+                }
+
+                if (!isFirst) // First include can be guarded. Avoid print \n before it
+                    ofs << "\n";
+
+                if (!insideDefine.empty())
+                {
+                    ofs << "#ifdef " << insideDefine << "\n";
+                    openedDefine = insideDefine;
+                }
+            }
+
+            ofs << "#include \"" << header << "\"\n";
+            isFirst = false;
+        }
+
+        if (!openedDefine.empty())
+        {
+            ofs << "#endif\n";
+            openedDefine.clear();
+        }
+
+        if (headers_.size() > 0)
+            ofs << "\n";
+
+        if (ignoredHeaders_.size() > 0)
+            ofs << "// Ignored headers\n\n";
+
+        isFirst = true;
+
+        for (string header : ignoredHeaders_)
+        {
+            string insideDefine = InsideDefine(header);
+
+            if (insideDefine != openedDefine)
+            {
+                if (!openedDefine.empty())
+                {
+                    ofs << "//#endif\n";
+                    openedDefine.clear();
+                }
+
+                if (!isFirst) // First include can be guarded. Avoid print \n before it
+                    ofs << "\n";
+
+                if (!insideDefine.empty())
+                {
+                    ofs << "//#ifdef " << insideDefine << "\n";
+                    openedDefine = insideDefine;
+                }
+            }
+
+            ofs << "//#include \"" << header << "\"\n";
+            isFirst = false;
+        }
+
+        if (!openedDefine.empty())
+            ofs << "//#endif\n";
+    }
+}
+
+void SaveResult(const string& outputBasePath)
+{
+    ResultIncludes::Save(outputBasePath);
 }
 
 }
