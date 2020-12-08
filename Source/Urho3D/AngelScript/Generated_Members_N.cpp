@@ -3,28 +3,7 @@
 #include "../Precompiled.h"
 #include "../AngelScript/APITemplates.h"
 
-#include "../IO/NamedPipe.h"
-#ifdef URHO3D_NAVIGATION
-#include "../Navigation/NavArea.h"
-#endif
-#ifdef URHO3D_NAVIGATION
-#include "../Navigation/NavBuildData.h"
-#endif
-#ifdef URHO3D_NAVIGATION
-#include "../Navigation/Navigable.h"
-#endif
-#ifdef URHO3D_NAVIGATION
-#include "../Navigation/NavigationMesh.h"
-#endif
-#ifdef URHO3D_NETWORK
-#include "../Network/Network.h"
-#endif
-#ifdef URHO3D_NETWORK
-#include "../Network/NetworkPriority.h"
-#endif
-#include "../Scene/Node.h"
-#include "../Scene/ReplicationState.h"
-
+#include "../AngelScript/GeneratedIncludes.h"
 #include "../AngelScript/Manual.h"
 
 namespace Urho3D

@@ -3,30 +3,7 @@
 #include "../Precompiled.h"
 #include "../AngelScript/APITemplates.h"
 
-#ifdef URHO3D_DATABASE
-#include "../Database/Database.h"
-#endif
-#include "../Engine/DebugHud.h"
-#include "../Graphics/DebugRenderer.h"
-#include "../Graphics/DecalSet.h"
-#include "../Graphics/Drawable.h"
-#include "../Graphics/OcclusionBuffer.h"
-#include "../IO/Deserializer.h"
-#ifdef URHO3D_NAVIGATION
-#include "../Navigation/DynamicNavigationMesh.h"
-#endif
-#ifdef URHO3D_PHYSICS
-#include "../Physics/PhysicsWorld.h"
-#endif
-#include "../Scene/ReplicationState.h"
-#include "../UI/DropDownList.h"
-#ifdef URHO3D_URHO2D
-#include "../Urho2D/Drawable2D.h"
-#endif
-#ifdef URHO3D_URHO2D
-#include "../Urho2D/PhysicsWorld2D.h"
-#endif
-
+#include "../AngelScript/GeneratedIncludes.h"
 #include "../AngelScript/Manual.h"
 
 namespace Urho3D

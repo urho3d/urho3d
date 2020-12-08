@@ -3,48 +3,7 @@
 #include "../Precompiled.h"
 #include "../AngelScript/APITemplates.h"
 
-#include "../Audio/AudioDefs.h"
-#include "../Audio/SoundSource.h"
-#include "../Container/Sort.h"
-#include "../Container/Str.h"
-#include "../Core/Variant.h"
-#include "../Engine/DebugHud.h"
-#include "../Engine/EngineDefs.h"
-#include "../Graphics/Camera.h"
-#include "../Graphics/Drawable.h"
-#include "../Graphics/GraphicsDefs.h"
-#include "../Graphics/Light.h"
-#include "../Graphics/Material.h"
-#include "../Graphics/OcclusionBuffer.h"
-#include "../Graphics/Octree.h"
-#include "../Graphics/ParticleEffect.h"
-#include "../Graphics/Renderer.h"
-#include "../Graphics/Texture.h"
-#include "../Graphics/View.h"
-#include "../IO/FileSystem.h"
-#include "../IO/Log.h"
-#include "../Input/Input.h"
-#include "../Math/Frustum.h"
-#include "../Math/MathDefs.h"
-#ifdef URHO3D_NETWORK
-#include "../Network/Protocol.h"
-#endif
-#ifdef URHO3D_PHYSICS
-#include "../Physics/PhysicsWorld.h"
-#endif
-#include "../Resource/Image.h"
-#include "../Resource/ResourceCache.h"
-#include "../Scene/ReplicationState.h"
-#include "../Scene/Scene.h"
-#include "../UI/Font.h"
-#include "../UI/Text.h"
-#include "../UI/UIBatch.h"
-#ifdef URHO3D_URHO2D
-#include "../Urho2D/Drawable2D.h"
-#endif
-#ifdef URHO3D_URHO2D
-#include "../Urho2D/TileMapDefs2D.h"
-#endif
+#include "../AngelScript/GeneratedIncludes.h"
 
 // Some headers could re-define M_PI, ensure that it's undefined
 #undef M_PI

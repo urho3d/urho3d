@@ -3,32 +3,7 @@
 #include "../Precompiled.h"
 #include "../AngelScript/APITemplates.h"
 
-#include "../Core/Timer.h"
-#include "../Graphics/Material.h"
-#include "../Graphics/ParticleEffect.h"
-#include "../Graphics/Technique.h"
-#include "../Graphics/Terrain.h"
-#include "../Graphics/TerrainPatch.h"
-#include "../Graphics/Texture.h"
-#include "../Graphics/Texture2D.h"
-#include "../Graphics/Texture2DArray.h"
-#include "../Graphics/Texture3D.h"
-#include "../Graphics/TextureCube.h"
-#include "../UI/Text.h"
-#include "../UI/Text3D.h"
-#ifdef URHO3D_URHO2D
-#include "../Urho2D/TileMap2D.h"
-#endif
-#ifdef URHO3D_URHO2D
-#include "../Urho2D/TileMapDefs2D.h"
-#endif
-#ifdef URHO3D_URHO2D
-#include "../Urho2D/TileMapLayer2D.h"
-#endif
-#ifdef URHO3D_URHO2D
-#include "../Urho2D/TmxFile2D.h"
-#endif
-
+#include "../AngelScript/GeneratedIncludes.h"
 #include "../AngelScript/Manual.h"
 
 namespace Urho3D

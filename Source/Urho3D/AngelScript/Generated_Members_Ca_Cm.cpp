@@ -3,11 +3,7 @@
 #include "../Precompiled.h"
 #include "../AngelScript/APITemplates.h"
 
-#include "../Graphics/Camera.h"
-#include "../Graphics/Light.h"
-#include "../UI/CheckBox.h"
-#include "../UI/Text.h"
-
+#include "../AngelScript/GeneratedIncludes.h"
 #include "../AngelScript/Manual.h"
 
 namespace Urho3D

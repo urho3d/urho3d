@@ -3,34 +3,7 @@
 #include "../Precompiled.h"
 #include "../AngelScript/APITemplates.h"
 
-#include "../Core/Profiler.h"
-#include "../Graphics/ParticleEffect.h"
-#include "../Graphics/ParticleEmitter.h"
-#include "../Graphics/Technique.h"
-#include "../Graphics/View.h"
-#include "../IO/PackageFile.h"
-#include "../Math/Plane.h"
-#include "../Math/Polyhedron.h"
-#ifdef URHO3D_NETWORK
-#include "../Network/Connection.h"
-#endif
-#ifdef URHO3D_PHYSICS
-#include "../Physics/PhysicsWorld.h"
-#endif
-#include "../UI/ProgressBar.h"
-#ifdef URHO3D_URHO2D
-#include "../Urho2D/ParticleEffect2D.h"
-#endif
-#ifdef URHO3D_URHO2D
-#include "../Urho2D/ParticleEmitter2D.h"
-#endif
-#ifdef URHO3D_URHO2D
-#include "../Urho2D/PhysicsWorld2D.h"
-#endif
-#ifdef URHO3D_URHO2D
-#include "../Urho2D/TileMapDefs2D.h"
-#endif
-
+#include "../AngelScript/GeneratedIncludes.h"
 #include "../AngelScript/Manual.h"
 
 namespace Urho3D

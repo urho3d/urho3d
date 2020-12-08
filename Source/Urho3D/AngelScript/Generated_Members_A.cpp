@@ -3,25 +3,7 @@
 #include "../Precompiled.h"
 #include "../AngelScript/APITemplates.h"
 
-#include "../Audio/Audio.h"
-#include "../Container/Allocator.h"
-#include "../Core/Attribute.h"
-#include "../Engine/Application.h"
-#include "../Graphics/AnimatedModel.h"
-#include "../Graphics/Animation.h"
-#include "../Graphics/AnimationController.h"
-#include "../Graphics/AnimationState.h"
-#include "../IO/AbstractFile.h"
-#include "../Math/AreaAllocator.h"
-#include "../Scene/Animatable.h"
-#include "../Scene/Scene.h"
-#ifdef URHO3D_URHO2D
-#include "../Urho2D/AnimatedSprite2D.h"
-#endif
-#ifdef URHO3D_URHO2D
-#include "../Urho2D/AnimationSet2D.h"
-#endif
-
+#include "../AngelScript/GeneratedIncludes.h"
 #include "../AngelScript/Manual.h"
 
 namespace Urho3D
@@ -180,19 +162,6 @@ static AnimationState* AnimationState_AnimationState_AnimatedModel_Animation(Ani
 static AnimationState* AnimationState_AnimationState_Node_Animation(Node *node, Animation *animation)
 {
     return new AnimationState(node, animation);
-}
-
-// explicit Application::Application(Context* context) | File: ../Engine/Application.h
-static Application* Application_Application_Context()
-{
-    return new Application(GetScriptContext());
-}
-
-// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Application_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Application* ptr, CScriptArray* exceptions, bool onlyUserData)
-{
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
 }
 
 // AreaAllocator::AreaAllocator(int width, int height, bool fastMode=true) | File: ../Math/AreaAllocator.h
@@ -2713,122 +2682,6 @@ void ASRegisterGenerated_Members_A(asIScriptEngine* engine)
     REGISTER_MANUAL_PART_AnimationState(AnimationState, "AnimationState")
 #endif
     RegisterSubclass<RefCounted, AnimationState>(engine, "RefCounted", "AnimationState");
-
-    // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("Application", asBEHAVE_ADDREF, "void f()", asMETHODPR(Application, AddRef, (), void), asCALL_THISCALL);
-    // explicit Application::Application(Context* context) | File: ../Engine/Application.h
-    engine->RegisterObjectBehaviour("Application", asBEHAVE_FACTORY, "Application@+ f()", asFUNCTION(Application_Application_Context), asCALL_CDECL);
-    // template<typename T> T* Object::Cast() | File: ../Core/Object.h
-    // Not registered because template
-    // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
-    // Not registered because template
-    // void Application::ErrorExit(const String& message=String::EMPTY) | File: ../Engine/Application.h
-    engine->RegisterObjectMethod("Application", "void ErrorExit(const String&in = String::EMPTY)", asMETHODPR(Application, ErrorExit, (const String&), void), asCALL_THISCALL);
-    // bool Object::GetBlockEvents() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "bool GetBlockEvents() const", asMETHODPR(Application, GetBlockEvents, () const, bool), asCALL_THISCALL);
-    // const String& Object::GetCategory() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "const String& GetCategory() const", asMETHODPR(Application, GetCategory, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Application", "const String& get_category() const", asMETHODPR(Application, GetCategory, () const, const String&), asCALL_THISCALL);
-    // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
-    // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "VariantMap& GetEventDataMap() const", asMETHODPR(Application, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
-    // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // Object* Object::GetEventSender() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "Object@+ GetEventSender() const", asMETHODPR(Application, GetEventSender, () const, Object*), asCALL_THISCALL);
-    // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(Application, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Application", "const Variant& get_globalVar(StringHash) const", asMETHODPR(Application, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "const VariantMap& GetGlobalVars() const", asMETHODPR(Application, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Application", "const VariantMap& get_globalVars() const", asMETHODPR(Application, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Application, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
-    // Not registered because template
-    // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "StringHash GetType() const", asMETHODPR(Application, GetType, () const, StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Application", "StringHash get_type() const", asMETHODPR(Application, GetType, () const, StringHash), asCALL_THISCALL);
-    // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "const String& GetTypeName() const", asMETHODPR(Application, GetTypeName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Application", "const String& get_typeName() const", asMETHODPR(Application, GetTypeName, () const, const String&), asCALL_THISCALL);
-    // bool Object::HasEventHandlers() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "bool HasEventHandlers() const", asMETHODPR(Application, HasEventHandlers, () const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(Application, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(Application, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "bool IsInstanceOf(StringHash) const", asMETHODPR(Application, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
-    // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
-    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
-    // Not registered because template
-    // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(Application, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
-    // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
-    // Error: type "RefCount*" can not automatically bind
-    // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("Application", "int Refs() const", asMETHODPR(Application, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Application", "int get_refs() const", asMETHODPR(Application, Refs, () const, int), asCALL_THISCALL);
-    // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("Application", asBEHAVE_RELEASE, "void f()", asMETHODPR(Application, ReleaseRef, (), void), asCALL_THISCALL);
-    // int Application::Run() | File: ../Engine/Application.h
-    engine->RegisterObjectMethod("Application", "int Run()", asMETHODPR(Application, Run, (), int), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "void SendEvent(StringHash)", asMETHODPR(Application, SendEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(Application, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
-    // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
-    // Not registered because template
-    // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "void SetBlockEvents(bool)", asMETHODPR(Application, SetBlockEvents, (bool), void), asCALL_THISCALL);
-    // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(Application, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Application", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(Application, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    // virtual void Application::Setup() | File: ../Engine/Application.h
-    engine->RegisterObjectMethod("Application", "void Setup()", asMETHODPR(Application, Setup, (), void), asCALL_THISCALL);
-    // virtual void Application::Start() | File: ../Engine/Application.h
-    engine->RegisterObjectMethod("Application", "void Start()", asMETHODPR(Application, Start, (), void), asCALL_THISCALL);
-    // virtual void Application::Stop() | File: ../Engine/Application.h
-    engine->RegisterObjectMethod("Application", "void Stop()", asMETHODPR(Application, Stop, (), void), asCALL_THISCALL);
-    // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
-    // Error: type "EventHandler*" can not automatically bind
-    // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
-    // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "void UnsubscribeFromAllEvents()", asMETHODPR(Application, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(Application_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
-    // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(Application, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(Application, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
-    // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Application", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(Application, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
-    // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("Application", "int WeakRefs() const", asMETHODPR(Application, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Application", "int get_weakRefs() const", asMETHODPR(Application, WeakRefs, () const, int), asCALL_THISCALL);
-#ifdef REGISTER_MANUAL_PART_Object
-    REGISTER_MANUAL_PART_Object(Application, "Application")
-#endif
-#ifdef REGISTER_MANUAL_PART_RefCounted
-    REGISTER_MANUAL_PART_RefCounted(Application, "Application")
-#endif
-#ifdef REGISTER_MANUAL_PART_Application
-    REGISTER_MANUAL_PART_Application(Application, "Application")
-#endif
-    RegisterSubclass<Object, Application>(engine, "Object", "Application");
-    RegisterSubclass<RefCounted, Application>(engine, "RefCounted", "Application");
 
     // bool AreaAllocator::Allocate(int width, int height, int& x, int& y) | File: ../Math/AreaAllocator.h
     engine->RegisterObjectMethod("AreaAllocator", "bool Allocate(int, int, int&, int&)", asMETHODPR(AreaAllocator, Allocate, (int, int, int&, int&), bool), asCALL_THISCALL);

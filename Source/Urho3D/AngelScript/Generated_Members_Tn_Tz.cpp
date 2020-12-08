@@ -3,13 +3,7 @@
 #include "../Precompiled.h"
 #include "../AngelScript/APITemplates.h"
 
-#include "../Graphics/RibbonTrail.h"
-#include "../Input/Input.h"
-#ifdef URHO3D_PHYSICS
-#include "../Physics/CollisionShape.h"
-#endif
-#include "../UI/ToolTip.h"
-
+#include "../AngelScript/GeneratedIncludes.h"
 #include "../AngelScript/Manual.h"
 
 namespace Urho3D

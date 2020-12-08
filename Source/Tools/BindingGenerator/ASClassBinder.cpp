@@ -468,7 +468,7 @@ static void RegisterValueConstructor(const ClassFunctionAnalyzer& functionAnalyz
     glue << "\n";
 
     if (isDefaultConstructor)
-        _result_Members_HighPriority->AddHeader(header);
+        ResultIncludes::AddHeader(header);
 }
 
 static void RegisterValueDestructor(const ClassFunctionAnalyzer& functionAnalyzer, bool templateVersion)
@@ -521,7 +521,7 @@ static void RegisterImplicitlyDeclaredConstructor(const ClassAnalyzer& classAnal
     string insideDefine = InsideDefine(header);
     string className = classAnalyzer.GetClassName();
     string wrapperName = className + "_Constructor";
-    _result_Members_HighPriority->AddHeader(header);
+    ResultIncludes::AddHeader(header);
 
     if (!insideDefine.empty())
     {
@@ -1152,7 +1152,7 @@ static void RegisterObjectMembers(const ClassAnalyzer& classAnalyzer, bool templ
     
     ASGeneratedFile_Base* result = templateVersion ? (ASGeneratedFile_Base*)_result_Templates.get() : (ASGeneratedFile_Base*)GetGeneratedFile(classAnalyzer.GetClassName()).get();
 
-    result->AddHeader(header);
+    ResultIncludes::AddHeader(header);
 
     string insideDefine = InsideDefine(header);
     if (!insideDefine.empty())
@@ -1245,7 +1245,7 @@ static void RegisterObjectType(const ClassAnalyzer& classAnalyzer, bool template
 
     ASGeneratedFile_Base* result = templateVersion ? (ASGeneratedFile_Base*)_result_Templates.get() : (ASGeneratedFile_Base*)_result_Classes.get();
 
-    result->AddHeader(header);
+    ResultIncludes::AddHeader(header);
 
     string insideDefine = InsideDefine(header);
     if (!insideDefine.empty())
@@ -1310,7 +1310,7 @@ static void ProcessClass(const ClassAnalyzer& classAnalyzer, bool templateVersio
     string header = classAnalyzer.GetHeaderFile();
     if (IsIgnoredHeader(header))
     {
-        _result_Classes->AddIgnoredHeader(header);
+        ResultIncludes::AddHeader(header);
         return;
     }
 
