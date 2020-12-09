@@ -80,7 +80,7 @@ static void ProcessEnum(const EnumAnalyzer& analyzer)
 
         processedEnum.registration_.push_back("engine->RegisterTypedef(\"" + enumTypeName + "\", \"" + asEnumBaseType + "\");");
 
-        for (string enumerator : analyzer.GetEnumerators())
+        for (const string& enumerator : analyzer.GetEnumerators())
         {
             string constName = enumTypeName + "_" + enumerator;
             processedEnum.glue_.push_back("static const " + cppEnumBaseType + " " + constName + " = " + enumerator + ";");
@@ -123,12 +123,12 @@ void ProcessAllEnums()
     NamespaceAnalyzer namespaceAnalyzer(SourceData::namespaceUrho3D_);
     vector<EnumAnalyzer> enumAnalyzers = namespaceAnalyzer.GetEnums();
 
-    for (EnumAnalyzer enumAnalyzer : enumAnalyzers)
+    for (const EnumAnalyzer& enumAnalyzer : enumAnalyzers)
         ProcessEnum(enumAnalyzer);
 
     vector<GlobalFunctionAnalyzer> globalFunctionAnalyzers = namespaceAnalyzer.GetFunctions();
 
-    for (GlobalFunctionAnalyzer globalFunctionAnalyzer : globalFunctionAnalyzers)
+    for (const GlobalFunctionAnalyzer& globalFunctionAnalyzer : globalFunctionAnalyzers)
     {
         string functionName = globalFunctionAnalyzer.GetName();
 

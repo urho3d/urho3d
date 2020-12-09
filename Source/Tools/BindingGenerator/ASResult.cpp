@@ -37,34 +37,6 @@ ASGeneratedFile_WithRegistrationFunction::ASGeneratedFile_WithRegistrationFuncti
 
 // ============================================================================
 
-void ASGeneratedFile_Enums::Save()
-{
-    ofstream out(outputFilePath_);
-
-    out <<
-        "// DO NOT EDIT. This file is generated\n"
-        "\n"
-        "// We need register all enums before registration of any members because members can use any enums\n"
-        "\n"
-        "#include \"../Precompiled.h\"\n"
-        "#include \"../AngelScript/APITemplates.h\"\n"
-        "\n"
-        "#include \"../AngelScript/GeneratedIncludes.h\"\n"
-        "\n"
-        "namespace Urho3D\n"
-        "{\n"
-        "\n"
-        << glue_.str() <<
-        "void " << functionName_ << "(asIScriptEngine* engine)\n"
-        "{\n"
-        << reg_.str() <<
-        "}\n"
-        "\n"
-        "}\n";
-}
-
-// ============================================================================
-
 void ASGeneratedFile_Classes::Save()
 {
     ofstream out(outputFilePath_);
@@ -240,7 +212,7 @@ void ASGeneratedFile_Templates::Save()
         "}\n";
 }
 
-bool ProcessedEnum::operator < (const ProcessedEnum& rhs) const
+bool ProcessedEnum::operator <(const ProcessedEnum& rhs) const
 {
     if (insideDefine_ == rhs.insideDefine_)
         return name_ < rhs.name_;
@@ -413,7 +385,7 @@ namespace Result
 
         isFirst = true;
 
-        for (string header : ignoredHeaders_)
+        for (const string& header : ignoredHeaders_)
         {
             string insideDefine = InsideDefine(header);
 

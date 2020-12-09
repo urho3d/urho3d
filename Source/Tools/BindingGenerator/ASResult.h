@@ -58,14 +58,6 @@ public:
     ASGeneratedFile_WithRegistrationFunction(const string& outputFilePath, const string& functionName);
 };
 
-class ASGeneratedFile_Enums : public ASGeneratedFile_WithRegistrationFunction
-{
-public:
-    using ASGeneratedFile_WithRegistrationFunction::ASGeneratedFile_WithRegistrationFunction;
-    
-    void Save() override;
-};
-
 class ASGeneratedFile_Classes : public ASGeneratedFile_WithRegistrationFunction
 {
 public:
