@@ -116,10 +116,26 @@ public:
     void Save() override;
 };
 
-namespace ResultIncludes
+struct ProcessedEnum
 {
+    // Used for alphabetical sorting
+    string name_;
+
+    string comment_;
+    vector<string> glue_; // Can be empty
+    string insideDefine_; // Can be empty
+    vector<string> registration_;
+
+    // Used for alphabetical sorting
+    bool operator <(const ProcessedEnum& rhs) const;
+};
+
+namespace Result
+{
+    extern vector<ProcessedEnum> enums_;
+
     // Add header to lists if not added yet
     void AddHeader(const string& headerFile);
 }
 
-}
+} // namespace ASBindingGenerator
