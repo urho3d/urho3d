@@ -66,7 +66,7 @@ class ScriptResourceRouter : public ResourceRouter
 };
 
 void ASRegisterManualFirst(asIScriptEngine* engine);
-void ASRegisterGenerated_Enums(asIScriptEngine* engine);
+void ASRegisterGeneratedEnums(asIScriptEngine* engine);
 void ASRegisterGenerated_Classes(asIScriptEngine* engine);
 void ASRegisterGenerated_Members_HighPriority(asIScriptEngine* engine);
 
@@ -150,7 +150,7 @@ Script::Script(Context* context) :
     RegisterScriptInterfaceAPI(scriptEngine_);
 
     ASRegisterManualFirst(scriptEngine_);
-    ASRegisterGenerated_Enums(scriptEngine_);
+    ASRegisterGeneratedEnums(scriptEngine_);
     ASRegisterGenerated_Classes(scriptEngine_);
     ASRegisterGenerated_Members_HighPriority(scriptEngine_);
     

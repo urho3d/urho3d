@@ -240,8 +240,101 @@ void ASGeneratedFile_Templates::Save()
         "}\n";
 }
 
-namespace ResultIncludes
+bool ProcessedEnum::operator < (const ProcessedEnum& rhs) const
 {
+    if (insideDefine_ == rhs.insideDefine_)
+        return name_ < rhs.name_;
+
+    return insideDefine_ < rhs.insideDefine_;
+}
+
+namespace Result
+{
+    vector<ProcessedEnum> enums_;
+
+    // Write result to GeneratedEnums.cpp
+    static void SaveEnums(const string& outputBasePath)
+    {
+        sort(enums_.begin(), enums_.end());
+
+        ofstream ofs(outputBasePath + "/Source/Urho3D/AngelScript/GeneratedEnums.cpp");
+
+        ofs <<
+            "// DO NOT EDIT. This file is generated\n"
+            "\n"
+            "// We need register all enums before registration of any members because members can use any enums\n"
+            "\n"
+            "#include \"../Precompiled.h\"\n"
+            "#include \"../AngelScript/APITemplates.h\"\n"
+            "\n"
+            "#include \"../AngelScript/GeneratedIncludes.h\"\n"
+            "\n"
+            "namespace Urho3D\n"
+            "{\n"
+            "\n";
+
+        for (const ProcessedEnum& processedEnum : enums_)
+        {
+            if (!processedEnum.glue_.size())
+                continue;
+
+            if (!processedEnum.insideDefine_.empty())
+                ofs << "#ifdef " << processedEnum.insideDefine_ << "\n";
+
+            ofs << "// " << processedEnum.comment_ << "\n";
+
+            for (const string& glue : processedEnum.glue_)
+                ofs << glue << "\n";
+
+            if (!processedEnum.insideDefine_.empty())
+                ofs << "#endif\n";
+
+            ofs << "\n";
+        }
+
+        ofs <<
+            "void ASRegisterGeneratedEnums(asIScriptEngine* engine)\n"
+            "{\n";
+
+        bool isFirst = true;
+        string openedDefine;
+
+        for (const ProcessedEnum& processedEnum : enums_)
+        {
+            if (processedEnum.insideDefine_ != openedDefine && !openedDefine.empty())
+            {
+                ofs << "#endif\n";
+                openedDefine.clear();
+            }
+
+            if (!isFirst)
+                ofs << "\n";
+
+            if (processedEnum.insideDefine_ != openedDefine && !processedEnum.insideDefine_.empty())
+            {
+                ofs << "#ifdef " << processedEnum.insideDefine_ << "\n";
+                openedDefine = processedEnum.insideDefine_;
+            }
+
+            ofs << "    // " << processedEnum.comment_ << "\n";
+
+            for (const string& registration : processedEnum.registration_)
+                ofs << "    "  << registration << "\n";
+
+            isFirst = false;
+        }
+
+        if (!openedDefine.empty())
+            ofs << "#endif\n";
+
+        ofs <<
+            "}\n"
+            "\n"
+            "}\n";
+    }
+
+    // ============================================================================
+
     // List of all required header files
     static vector<string> headers_;
 
@@ -263,12 +356,13 @@ namespace ResultIncludes
         }
     }
 
-    // Write result to file
-    static void Save(const string& outputBasePath)
+    // Write result to GeneratedIncludes.h
+    static void SaveIncludes(const string& outputBasePath)
     {
-        ofstream ofs(outputBasePath + "/Source/Urho3D/AngelScript/GeneratedIncludes.h");
         sort(headers_.begin(), headers_.end());
         sort(ignoredHeaders_.begin(), ignoredHeaders_.end());
+
+        ofstream ofs(outputBasePath + "/Source/Urho3D/AngelScript/GeneratedIncludes.h");
 
         ofs <<
             "// DO NOT EDIT. This file is generated\n"
@@ -352,7 +446,8 @@ namespace ResultIncludes
 
 void SaveResult(const string& outputBasePath)
 {
-    ResultIncludes::Save(outputBasePath);
+    Result::SaveEnums(outputBasePath);
+    Result::SaveIncludes(outputBasePath);
 }
 
 }

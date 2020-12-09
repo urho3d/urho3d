@@ -38,7 +38,7 @@ static void ProcessGlobalVariable(GlobalVariableAnalyzer varAnalyzer)
    
     if (IsIgnoredHeader(header))
     {
-        ResultIncludes::AddHeader(header);
+        Result::AddHeader(header);
         return;
     }
 
@@ -59,7 +59,7 @@ static void ProcessGlobalVariable(GlobalVariableAnalyzer varAnalyzer)
         return;
     }
 
-    ResultIncludes::AddHeader(header);
+    Result::AddHeader(header);
 
     if (!insideDefine.empty())
         _result->reg_ << "#ifdef " << insideDefine << "\n";
