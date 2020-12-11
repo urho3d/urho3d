@@ -277,12 +277,16 @@ bool Engine::Initialize(const VariantMap& parameters)
 
         if (GetParameter(parameters, EP_SOUND, true).GetBool())
         {
-            GetSubsystem<Audio>()->SetMode(
-                GetParameter(parameters, EP_SOUND_BUFFER, 100).GetInt(),
-                GetParameter(parameters, EP_SOUND_MIX_RATE, 44100).GetInt(),
-                GetParameter(parameters, EP_SOUND_STEREO, true).GetBool(),
-                GetParameter(parameters, EP_SOUND_INTERPOLATION, true).GetBool()
-            );
+            auto* audio = GetSubsystem<Audio>();
+            if (audio)
+            {
+                audio->SetMode(
+                    GetParameter(parameters, EP_SOUND_BUFFER, 100).GetInt(),
+                    GetParameter(parameters, EP_SOUND_MIX_RATE, 44100).GetInt(),
+                    GetParameter(parameters, EP_SOUND_STEREO, true).GetBool(),
+                    GetParameter(parameters, EP_SOUND_INTERPOLATION, true).GetBool()
+                );
+            }
         }
     }
 
@@ -499,7 +503,7 @@ void Engine::RunFrame()
     // If pause when minimized -mode is in use, stop updates and audio as necessary
     if (pauseMinimized_ && input->IsMinimized())
     {
-        if (audio->IsPlaying())
+        if (audio && audio->IsPlaying())
         {
             audio->Stop();
             audioPaused_ = true;
@@ -508,7 +512,7 @@ void Engine::RunFrame()
     else
     {
         // Only unpause when it was paused by the engine
-        if (audioPaused_)
+        if (audio && audioPaused_)
         {
             audio->Play();
             audioPaused_ = false;
