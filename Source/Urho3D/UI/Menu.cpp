@@ -88,7 +88,7 @@ void Menu::Update(float timeStep)
     }
 }
 
-void Menu::OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
+void Menu::OnHover(const IntVector2& position, const IntVector2& screenPosition, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor)
 {
     Button::OnHover(position, screenPosition, buttons, qualifiers, cursor);
 

@@ -418,34 +418,34 @@ const IntVector2& UIElement::GetScreenPosition() const
     return screenPosition_;
 }
 
-void UIElement::OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
+void UIElement::OnHover(const IntVector2& position, const IntVector2& screenPosition, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor)
 {
     hovering_ = true;
 }
 
-void UIElement::OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers,
+void UIElement::OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, MouseButtonFlags buttons, QualifierFlags qualifiers,
     Cursor* cursor)
 {
     dragButtonCombo_ = buttons;
     dragButtonCount_ = CountSetBits((unsigned)dragButtonCombo_);
 }
 
-void UIElement::OnDragMove(const IntVector2& position, const IntVector2& screenPosition, const IntVector2& deltaPos, int buttons,
-    int qualifiers, Cursor* cursor)
+void UIElement::OnDragMove(const IntVector2& position, const IntVector2& screenPosition, const IntVector2& deltaPos, MouseButtonFlags buttons,
+    QualifierFlags qualifiers, Cursor* cursor)
 {
 }
 
-void UIElement::OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, int /*dragButtons*/, int /*releaseButton*/,
+void UIElement::OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, MouseButtonFlags /*dragButtons*/, MouseButtonFlags /*releaseButtons*/,
     Cursor* /*cursor*/)
 {
-    dragButtonCombo_ = 0;
+    dragButtonCombo_ = MOUSEB_NONE;
     dragButtonCount_ = 0;
 }
 
-void UIElement::OnDragCancel(const IntVector2& position, const IntVector2& screenPosition, int /*dragButtons*/, int /*cancelButton*/,
+void UIElement::OnDragCancel(const IntVector2& position, const IntVector2& screenPosition, MouseButtonFlags /*dragButtons*/, MouseButtonFlags /*cancelButtons*/,
     Cursor* /*cursor*/)
 {
-    dragButtonCombo_ = 0;
+    dragButtonCombo_ = MOUSEB_NONE;
     dragButtonCount_ = 0;
 }
 
@@ -1605,6 +1605,13 @@ void UIElement::GetChildren(PODVector<UIElement*>& dest, bool recursive) const
     }
     else
         GetChildrenRecursive(dest);
+}
+
+PODVector<UIElement*> UIElement::GetChildren(bool recursive) const
+{
+    PODVector<UIElement*> dest;
+    GetChildren(dest, recursive);
+    return dest;
 }
 
 unsigned UIElement::GetNumChildren(bool recursive) const

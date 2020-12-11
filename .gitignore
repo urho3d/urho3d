@@ -116,3 +116,7 @@ configure*
 *.bak
 Thumbs.db
 .directory
+
+# Doxygen mess from absence of 'dot' dependency
+CMakeDoxyFile.in
+CMakeDoxygenDefaults.cmake

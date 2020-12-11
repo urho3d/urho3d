@@ -2,6 +2,7 @@ $pfile "Network/Connection.pkg"
 $pfile "Network/HttpRequest.pkg"
 $pfile "Network/Network.pkg"
 $pfile "Network/NetworkPriority.pkg"
+$pfile "Network/Protocol.pkg"
 
 $using namespace Urho3D;
 $#pragma warning(disable:4800)

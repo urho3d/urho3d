@@ -318,11 +318,4 @@ private:
     StringMap map_;
 };
 
-/// Register the array type to script.
-void RegisterArray(asIScriptEngine* engine);
-/// Register the dictionary type to script.
-void RegisterDictionary(asIScriptEngine* engine);
-/// Register String to script.
-void RegisterString(asIScriptEngine* engine);
-
 }

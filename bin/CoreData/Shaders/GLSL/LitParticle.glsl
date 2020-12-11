@@ -55,7 +55,7 @@ void VS()
         #ifdef SHADOW
             // Shadow projection: transform from world space to shadow space
             for (int i = 0; i < NUMCASCADES; i++)
-                vShadowPos[i] = GetShadowPos(i, vec3(0, 0, 0), projWorldPos);
+                vShadowPos[i] = GetShadowPos(i, vec3(0.0, 0.0, 0.0), projWorldPos);
         #endif
 
         #ifdef SPOTLIGHT

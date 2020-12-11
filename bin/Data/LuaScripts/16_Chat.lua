@@ -6,7 +6,7 @@
 require "LuaScripts/Utilities/Sample"
 
 -- Identifier for the chat network messages
-local MSG_CHAT = 153
+local MSG_CHAT = MSG_USER + 0
 -- UDP port we will use
 local CHAT_SERVER_PORT = 2345
 

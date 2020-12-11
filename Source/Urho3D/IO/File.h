@@ -80,9 +80,6 @@ public:
     /// Write bytes to the file. Return number of bytes actually written.
     unsigned Write(const void* data, unsigned size) override;
 
-    /// Return the file name.
-    const String& GetName() const override { return fileName_; }
-
     /// Return a checksum of the file contents using the SDBM hash algorithm.
     unsigned GetChecksum() override;
 
@@ -94,19 +91,20 @@ public:
     void Close();
     /// Flush any buffered output to the file.
     void Flush();
-    /// Change the file name. Used by the resource system.
-    void SetName(const String& name);
 
     /// Return the open mode.
+    /// @property
     FileMode GetMode() const { return mode_; }
 
     /// Return whether is open.
+    /// @property
     bool IsOpen() const;
 
     /// Return the file handle.
     void* GetHandle() const { return handle_; }
 
     /// Return whether the file originates from a package.
+    /// @property
     bool IsPackaged() const { return offset_ != 0; }
 
 private:
@@ -117,8 +115,6 @@ private:
     /// Seek in file internally using either C standard IO functions or SDL RWops for Android asset files.
     void SeekInternal(unsigned newPosition);
 
-    /// File name.
-    String fileName_;
     /// Open mode.
     FileMode mode_;
     /// File handle.

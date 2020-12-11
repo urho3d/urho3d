@@ -159,9 +159,11 @@ public:
     void FromHSV(float h, float s, float v, float a = 1.0f);
 
     /// Return RGB as a three-dimensional vector.
+    /// @property{get_rgb}
     Vector3 ToVector3() const { return Vector3(r_, g_, b_); }
 
     /// Return RGBA as a four-dimensional vector.
+    /// @property{get_rgba}
     Vector4 ToVector4() const { return Vector4(r_, g_, b_, a_); }
 
     /// Return sum of RGB components.

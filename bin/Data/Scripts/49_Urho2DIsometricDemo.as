@@ -52,7 +52,7 @@ void CreateScene()
     Node@ tileMapNode = scene_.CreateChild("TileMap");
     TileMap2D@ tileMap = tileMapNode.CreateComponent("TileMap2D");
     tileMap.tmxFile = tmxFile;
-    TileMapInfo2D@ info = tileMap.info;
+    const TileMapInfo2D@ info = tileMap.info;
 
     // Create Spriter Imp character (from sample 33_SpriterAnimation)
     CreateCharacter(info, true, 0.0f, Vector3(-5.0f, 11.0f, 0.0f), 0.15f);

@@ -82,6 +82,7 @@ public:
     virtual void MarkNetworkUpdate() { }
 
     /// Set attribute by index. Return true if successfully set.
+    /// @property{set_attributes}
     bool SetAttribute(unsigned index, const Variant& value);
     /// Set attribute by name. Return true if successfully set.
     bool SetAttribute(const String& name, const Variant& value);
@@ -92,6 +93,7 @@ public:
     /// Remove instance's default values if they are set previously.
     void RemoveInstanceDefault();
     /// Set temporary flag. Temporary objects will not be saved.
+    /// @property
     void SetTemporary(bool enable);
     /// Enable interception of an attribute from network updates. Intercepted attributes are sent as events instead of applying directly. This can be used to implement client side prediction.
     void SetInterceptNetworkUpdate(const String& attributeName, bool enable);
@@ -109,19 +111,23 @@ public:
     bool ReadLatestDataUpdate(Deserializer& source);
 
     /// Return attribute value by index. Return empty if illegal index.
+    /// @property{get_attributes}
     Variant GetAttribute(unsigned index) const;
     /// Return attribute value by name. Return empty if not found.
     Variant GetAttribute(const String& name) const;
     /// Return attribute default value by index. Return empty if illegal index.
+    /// @property{get_attributeDefaults}
     Variant GetAttributeDefault(unsigned index) const;
     /// Return attribute default value by name. Return empty if not found.
     Variant GetAttributeDefault(const String& name) const;
     /// Return number of attributes.
+    /// @property
     unsigned GetNumAttributes() const;
     /// Return number of network replication attributes.
     unsigned GetNumNetworkAttributes() const;
 
     /// Return whether is temporary.
+    /// @property
     bool IsTemporary() const { return temporary_; }
 
     /// Return whether an attribute's network updates are being intercepted.

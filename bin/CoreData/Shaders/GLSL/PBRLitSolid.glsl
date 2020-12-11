@@ -40,7 +40,7 @@ varying vec4 vWorldPos;
     #ifdef ENVCUBEMAP
         varying vec3 vReflectionVec;
     #endif
-    #if defined(LIGHTMAP) || defined(AO)
+    #if defined(LIGHTMAP)
         varying vec2 vTexCoord2;
     #endif
 #endif
@@ -86,11 +86,13 @@ void VS()
         #endif
     #else
         // Ambient & per-vertex lighting
-        #if defined(LIGHTMAP) || defined(AO)
+        #if defined(LIGHTMAP)
             // If using lightmap, disregard zone ambient light
-            // If using AO, calculate ambient in the PS
             vVertexLight = vec3(0.0, 0.0, 0.0);
             vTexCoord2 = iTexCoord1;
+        #elif defined(AO)
+            // If using AO, calculate ambient in the PS
+            vVertexLight = vec3(0.0, 0.0, 0.0);
         #else
             vVertexLight = GetAmbient(GetZonePos(worldPos));
         #endif
@@ -172,14 +174,12 @@ void PS()
         vec3 lightDir;
         vec3 finalColor;
 
-        float atten = 1;
-
         #if defined(DIRLIGHT)
-            atten = GetAtten(normal, vWorldPos.xyz, lightDir);
+            float atten = GetAtten(normal, vWorldPos.xyz, lightDir);
         #elif defined(SPOTLIGHT)
-            atten = GetAttenSpot(normal, vWorldPos.xyz, lightDir);
+            float atten = GetAttenSpot(normal, vWorldPos.xyz, lightDir);
         #else
-            atten = GetAttenPoint(normal, vWorldPos.xyz, lightDir);
+            float atten = GetAttenPoint(normal, vWorldPos.xyz, lightDir);
         #endif
 
         float shadow = 1.0;
@@ -211,7 +211,7 @@ void PS()
         #endif
     #elif defined(DEFERRED)
         // Fill deferred G-buffer
-        const vec3 spareData = vec3(0,0,0); // Can be used to pass more data to deferred renderer
+        const vec3 spareData = vec3(0.0, 0.0, 0.0); // Can be used to pass more data to deferred renderer
         gl_FragData[0] = vec4(specColor, spareData.r);
         gl_FragData[1] = vec4(diffColor.rgb, spareData.g);
         gl_FragData[2] = vec4(normal * roughness, spareData.b);
@@ -219,9 +219,11 @@ void PS()
     #else
         // Ambient & per-vertex lighting
         vec3 finalColor = vVertexLight * diffColor.rgb;
+        vec3 ambientOcclusion = vec3(1.0, 1.0, 1.0);
         #ifdef AO
             // If using AO, the vertex light ambient is black, calculate occluded ambient here
-            finalColor += texture2D(sEmissiveMap, vTexCoord2).rgb * cAmbientColor.rgb * diffColor.rgb;
+            ambientOcclusion = texture2D(sEmissiveMap, vTexCoord.xy).rgb;
+            finalColor += ambientOcclusion * cAmbientColor.rgb * diffColor.rgb;
         #endif
 
         #ifdef MATERIAL
@@ -240,8 +242,7 @@ void PS()
 
         #ifdef IBL
           vec3 iblColor = ImageBasedLighting(reflection, normal, toCamera, diffColor.rgb, specColor.rgb, roughness, cubeColor);
-          float gamma = 0.0;
-          finalColor.rgb += iblColor;
+          finalColor.rgb += iblColor * ambientOcclusion;
         #endif
 
         #ifdef ENVCUBEMAP

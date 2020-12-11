@@ -1,0 +1,11 @@
+<material>
+    <technique name="Techniques/PBR/PBRTerrainBlend.xml" />
+    <texture unit="0" name="Textures/TerrainWeights.dds" />
+    <texture unit="1" name="Textures/PBR/Sand/Albedo.jpg" />
+    <texture unit="2" name="Textures/PBR/Mud/Albedo.jpg" />
+    <texture unit="3" name="Textures/PBR/Concrete/Albedo.jpg" />
+    <parameter name="MatSpecColor" value="0.0 0.0 0.0 0.0" />
+    <parameter name="DetailTiling" value="32 32" />
+    <parameter name="Roughness" value="1" />
+    <parameter name="Metallic" value="0" />
+</material>

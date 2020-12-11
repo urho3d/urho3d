@@ -63,6 +63,7 @@ struct AnimationKeyFrame
 };
 
 /// Skeletal animation track, stores keyframes of a single bone.
+/// @fakeref
 struct URHO3D_API AnimationTrack
 {
     /// Construct.
@@ -71,6 +72,7 @@ struct URHO3D_API AnimationTrack
     }
 
     /// Assign keyframe at index.
+    /// @property{set_keyFrames}
     void SetKeyFrame(unsigned index, const AnimationKeyFrame& keyFrame);
     /// Add a keyframe at the end.
     void AddKeyFrame(const AnimationKeyFrame& keyFrame);
@@ -84,6 +86,7 @@ struct URHO3D_API AnimationTrack
     /// Return keyframe at index, or null if not found.
     AnimationKeyFrame* GetKeyFrame(unsigned index);
     /// Return number of keyframes.
+    /// @property
     unsigned GetNumKeyFrames() const { return keyFrames_.Size(); }
     /// Return keyframe index based on time and previous index. Return false if animation is empty.
     bool GetKeyFrameIndex(float time, unsigned& index) const;
@@ -132,8 +135,10 @@ public:
     bool Save(Serializer& dest) const override;
 
     /// Set animation name.
+    /// @property
     void SetAnimationName(const String& name);
     /// Set animation length.
+    /// @property
     void SetLength(float length);
     /// Create and return a track by name. If track by same name already exists, returns the existing.
     AnimationTrack* CreateTrack(const String& name);
@@ -142,6 +147,7 @@ public:
     /// Remove all tracks. This is unsafe if the animation is currently used in playback.
     void RemoveAllTracks();
     /// Set a trigger point at index.
+    /// @property{set_triggers}
     void SetTrigger(unsigned index, const AnimationTriggerPoint& trigger);
     /// Add a trigger point.
     void AddTrigger(const AnimationTriggerPoint& trigger);
@@ -152,29 +158,34 @@ public:
     /// Remove all trigger points.
     void RemoveAllTriggers();
     /// Resize trigger point vector.
+    /// @property
     void SetNumTriggers(unsigned num);
     /// Clone the animation.
     SharedPtr<Animation> Clone(const String& cloneName = String::EMPTY) const;
 
     /// Return animation name.
+    /// @property
     const String& GetAnimationName() const { return animationName_; }
 
     /// Return animation name hash.
     StringHash GetAnimationNameHash() const { return animationNameHash_; }
 
     /// Return animation length.
+    /// @property
     float GetLength() const { return length_; }
 
     /// Return all animation tracks.
     const HashMap<StringHash, AnimationTrack>& GetTracks() const { return tracks_; }
 
     /// Return number of animation tracks.
+    /// @property
     unsigned GetNumTracks() const { return tracks_.Size(); }
 
     /// Return animation track by index.
     AnimationTrack *GetTrack(unsigned index);
 
     /// Return animation track by name.
+    /// @property{get_tracks}
     AnimationTrack* GetTrack(const String& name);
     /// Return animation track by name hash.
     AnimationTrack* GetTrack(StringHash nameHash);
@@ -183,6 +194,7 @@ public:
     const Vector<AnimationTriggerPoint>& GetTriggers() const { return triggers_; }
 
     /// Return number of animation trigger points.
+    /// @property
     unsigned GetNumTriggers() const { return triggers_.Size(); }
 
     /// Return a trigger point by index.

@@ -21,6 +21,6 @@
 # THE SOFTWARE.
 #
 
-$(dirname $0)/cmake_generic.sh "$@" -DARM=1
+$(dirname $0)/cmake_generic.sh "$@" -D ARM=1
 
 # vi: set ts=4 sw=4 expandtab:

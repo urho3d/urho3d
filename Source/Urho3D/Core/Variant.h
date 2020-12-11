@@ -165,6 +165,7 @@ struct URHO3D_API ResourceRefList
 };
 
 /// Custom variant value. This type is not abstract to store it in the VariantValue by value.
+/// @nobindtemp
 class CustomVariantValue
 {
     // GetValuePtr expects that CustomVariantValue is always convertible to CustomVariantValueImpl<T>.
@@ -1326,16 +1327,20 @@ public:
     }
 
     /// Return value's type.
+    /// @property
     VariantType GetType() const { return type_; }
 
     /// Return value's type name.
+    /// @property
     String GetTypeName() const;
     /// Convert value to string. Pointers are returned as null, and VariantBuffer or VariantMap are not supported and return empty.
     String ToString() const;
     /// Return true when the variant value is considered zero according to its actual type.
+    /// @property
     bool IsZero() const;
 
     /// Return true when the variant is empty (i.e. not initialized yet).
+    /// @property
     bool IsEmpty() const { return type_ == VAR_NONE; }
 
     /// Return true when the variant stores custom type.

@@ -342,9 +342,11 @@ public:
     }
 
     /// Return length.
+    /// @property
     float Length() const { return sqrtf(x_ * x_ + y_ * y_ + z_ * z_); }
 
     /// Return squared length.
+    /// @property
     float LengthSquared() const { return x_ * x_ + y_ * y_ + z_ * z_; }
 
     /// Calculate dot product.

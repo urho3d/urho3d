@@ -43,51 +43,60 @@ public:
     /// Perform UI element update.
     void Update(float timeStep) override;
     /// React to mouse hover.
-    void OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor) override;
+    void OnHover(const IntVector2& position, const IntVector2& screenPosition, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor) override;
     /// React to mouse click begin.
     void OnClickBegin
-        (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor) override;
+        (const IntVector2& position, const IntVector2& screenPosition, MouseButton button, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor) override;
     /// React to mouse click end.
     void OnClickEnd
-        (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor,
+        (const IntVector2& position, const IntVector2& screenPosition, MouseButton button, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor,
             UIElement* beginElement) override;
     /// React to mouse drag begin.
     void
-        OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor) override;
+        OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor) override;
     /// React to mouse drag motion.
     void OnDragMove
-        (const IntVector2& position, const IntVector2& screenPosition, const IntVector2& deltaPos, int buttons, int qualifiers,
+        (const IntVector2& position, const IntVector2& screenPosition, const IntVector2& deltaPos, MouseButtonFlags buttons, QualifierFlags qualifiers,
             Cursor* cursor) override;
     /// React to mouse drag end.
     void
-        OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, int dragButtons, int buttons, Cursor* cursor) override;
+        OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, MouseButtonFlags dragButtons, MouseButtonFlags releaseButtons, Cursor* cursor) override;
     /// React to resize.
     void OnResize(const IntVector2& newSize, const IntVector2& delta) override;
 
     /// Set orientation type.
+    /// @property
     void SetOrientation(Orientation orientation);
     /// Set slider range maximum value (minimum value is always 0).
+    /// @property
     void SetRange(float range);
     /// Set slider current value.
+    /// @property
     void SetValue(float value);
     /// Change value by a delta.
     void ChangeValue(float delta);
     /// Set paging minimum repeat rate (number of events per second).
+    /// @property
     void SetRepeatRate(float rate);
 
     /// Return orientation type.
+    /// @property
     Orientation GetOrientation() const { return orientation_; }
 
     /// Return slider range.
+    /// @property
     float GetRange() const { return range_; }
 
     /// Return slider current value.
+    /// @property
     float GetValue() const { return value_; }
 
     /// Return knob element.
+    /// @property
     BorderImage* GetKnob() const { return knob_; }
 
     /// Return paging minimum repeat rate (number of events per second).
+    /// @property
     float GetRepeatRate() const { return repeatRate_; }
 
 protected:

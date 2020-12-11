@@ -130,7 +130,7 @@ void ScrollView::Update(float timeStep)
         for (unsigned i = 0; i < dragElements.Size(); i++)
         {
             UIElement* dragElement = dragElements[i];
-            int dragButtons = dragElement->GetDragButtonCombo();
+            MouseButtonFlags dragButtons = dragElement->GetDragButtonCombo();
 
             if (dragButtons != MOUSEB_LEFT)
                 continue;

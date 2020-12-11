@@ -35,6 +35,7 @@ class Context;
 class EventHandler;
 
 /// Type info.
+/// @nobind
 class URHO3D_API TypeInfo
 {
 public:
@@ -75,9 +76,10 @@ private:
         virtual const Urho3D::TypeInfo* GetTypeInfo() const override { return GetTypeInfoStatic(); } \
         static Urho3D::StringHash GetTypeStatic() { return GetTypeInfoStatic()->GetType(); } \
         static const Urho3D::String& GetTypeNameStatic() { return GetTypeInfoStatic()->GetTypeName(); } \
-        static const Urho3D::TypeInfo* GetTypeInfoStatic() { static const Urho3D::TypeInfo typeInfoStatic(#typeName, BaseClassName::GetTypeInfoStatic()); return &typeInfoStatic; } \
+        static const Urho3D::TypeInfo* GetTypeInfoStatic() { static const Urho3D::TypeInfo typeInfoStatic(#typeName, BaseClassName::GetTypeInfoStatic()); return &typeInfoStatic; }
 
 /// Base class for objects with type identification, subsystem access and event sending/receiving capability.
+/// @templateversion
 class URHO3D_API Object : public RefCounted
 {
     friend class Context;
@@ -89,8 +91,10 @@ public:
     ~Object() override;
 
     /// Return type hash.
+    /// @property
     virtual StringHash GetType() const = 0;
     /// Return type name.
+    /// @property
     virtual const String& GetTypeName() const = 0;
     /// Return type info.
     virtual const TypeInfo* GetTypeInfo() const = 0;
@@ -143,10 +147,13 @@ public:
     /// Return execution context.
     Context* GetContext() const { return context_; }
     /// Return global variable based on key.
+    /// @property
     const Variant& GetGlobalVar(StringHash key) const;
     /// Return all global variables.
+    /// @property
     const VariantMap& GetGlobalVars() const;
     /// Set global variable with the respective key and value.
+    /// @property
     void SetGlobalVar(StringHash key, const Variant& value);
     /// Return subsystem by type.
     Object* GetSubsystem(StringHash type) const;
@@ -165,6 +172,7 @@ public:
     /// Template version of returning a subsystem.
     template <class T> T* GetSubsystem() const;
     /// Return object category. Categories are (optionally) registered along with the object factory. Return an empty string if the object category is not registered.
+    /// @property
     const String& GetCategory() const;
 
     /// Block object from sending and receiving events.
@@ -327,6 +335,7 @@ private:
 };
 
 /// Template implementation of the event handler invoke helper (std::function instance).
+/// @nobind
 class EventHandler11Impl : public EventHandler
 {
 public:

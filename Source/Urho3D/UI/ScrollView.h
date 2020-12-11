@@ -58,76 +58,101 @@ public:
     bool IsWheelHandler() const override { return true; }
 
     /// Set content element.
+    /// @property
     void SetContentElement(UIElement* element);
     /// Set view offset from the top-left corner.
+    /// @property
     void SetViewPosition(const IntVector2& position);
     /// Set view offset from the top-left corner.
     void SetViewPosition(int x, int y);
     /// Set scrollbars' visibility manually. Disables scrollbar autoshow/hide.
     void SetScrollBarsVisible(bool horizontal, bool vertical);
     /// Set horizontal scrollbar visibility manually. Disables scrollbar autoshow/hide.
+    /// @property
     void SetHorizontalScrollBarVisible(bool visible);
     /// Set vertical scrollbar visibility manually. Disables scrollbar autoshow/hide.
+    /// @property
     void SetVerticalScrollBarVisible(bool visible);
     /// Set whether to automatically show/hide scrollbars. Default true.
+    /// @property
     void SetScrollBarsAutoVisible(bool enable);
     /// Set arrow key scroll step. Also sets it on the scrollbars.
+    /// @property
     void SetScrollStep(float step);
     /// Set arrow key page step.
+    /// @property
     void SetPageStep(float step);
 
     /// Set scroll deceleration.
+    /// @property
     void SetScrollDeceleration(float deceleration) { scrollDeceleration_ = deceleration; }
 
     /// Set scroll snap epsilon.
+    /// @property
     void SetScrollSnapEpsilon(float snap) { scrollSnapEpsilon_ = snap; }
 
     /// Set whether child elements should be disabled while touch scrolling.
+    /// @property
     void SetAutoDisableChildren(bool disable) { autoDisableChildren_ = disable; };
 
     /// Set how much touch movement is needed to trigger child element disabling.
+    /// @property
     void SetAutoDisableThreshold(float amount) { autoDisableThreshold_ = amount; };
 
     /// Return view offset from the top-left corner.
+    /// @property
     const IntVector2& GetViewPosition() const { return viewPosition_; }
 
     /// Return content element.
+    /// @property
     UIElement* GetContentElement() const { return contentElement_; }
 
     /// Return horizontal scroll bar.
+    /// @property
     ScrollBar* GetHorizontalScrollBar() const { return horizontalScrollBar_; }
 
     /// Return vertical scroll bar.
+    /// @property
     ScrollBar* GetVerticalScrollBar() const { return verticalScrollBar_; }
 
     /// Return scroll panel.
+    /// @property
     BorderImage* GetScrollPanel() const { return scrollPanel_; }
 
     /// Return whether scrollbars are automatically shown/hidden.
+    /// @property
     bool GetScrollBarsAutoVisible() const { return scrollBarsAutoVisible_; }
 
     /// Return whether the horizontal scrollbar is visible.
+    /// @property
     bool GetHorizontalScrollBarVisible() const;
 
     /// Return whether the vertical scrollbar is visible.
+    /// @property
     bool GetVerticalScrollBarVisible() const;
 
     /// Return arrow key scroll step.
+    /// @property
     float GetScrollStep() const;
 
     /// Return arrow key page step.
+    /// @property
     float GetPageStep() const { return pageStep_; }
 
     /// Return scroll deceleration.
+    /// @property
     float GetScrollDeceleration() const { return scrollDeceleration_; }
 
     /// Return scroll snap epsilon.
+    /// @property
     float GetScrollSnapEpsilon() const { return scrollSnapEpsilon_; }
 
     /// Return whether child element will be disabled while touch scrolling.
+    /// @property
     bool GetAutoDisableChildren() const { return autoDisableChildren_; }
 
     /// Return how much touch movement is needed to trigger child element disabling.
+    /// @property
     float GetAutoDisableThreshold() const { return autoDisableThreshold_; }
 
     /// Set view position attribute.

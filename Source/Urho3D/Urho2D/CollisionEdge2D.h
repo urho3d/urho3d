@@ -41,16 +41,20 @@ public:
     static void RegisterObject(Context* context);
 
     /// Set vertex 1.
+    /// @property
     void SetVertex1(const Vector2& vertex);
     /// Set vertex 2.
+    /// @property
     void SetVertex2(const Vector2& vertex);
     /// Set vertices.
     void SetVertices(const Vector2& vertex1, const Vector2& vertex2);
 
     /// Return vertex 1.
+    /// @property
     const Vector2& GetVertex1() const { return vertex1_; }
 
     /// Return vertex 2.
+    /// @property
     const Vector2& GetVertex2() const { return vertex2_; }
 
 private:

@@ -44,6 +44,7 @@ enum AutoRemoveMode
 };
 
 /// Base class for components. Components can be created to scene nodes.
+/// @templateversion
 class URHO3D_API Component : public Animatable
 {
     URHO3D_OBJECT(Component, Animatable);
@@ -74,24 +75,30 @@ public:
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
 
     /// Set enabled/disabled state.
+    /// @property
     void SetEnabled(bool enable);
     /// Remove from the scene node. If no other shared pointer references exist, causes immediate deletion.
     void Remove();
 
     /// Return ID.
+    /// @property{get_id}
     unsigned GetID() const { return id_; }
     /// Return whether the component is replicated or local to a scene.
+    /// @property
     bool IsReplicated() const;
 
     /// Return scene node.
+    /// @property
     Node* GetNode() const { return node_; }
 
     /// Return the scene the node belongs to.
     Scene* GetScene() const;
 
     /// Return whether is enabled.
+    /// @property
     bool IsEnabled() const { return enabled_; }
     /// Return whether is effectively enabled (node is also enabled).
+    /// @property
     bool IsEnabledEffective() const;
 
     /// Return component in the same scene node by type. If there are several, returns the first.
@@ -108,6 +115,7 @@ public:
     /// Prepare network update by comparing attributes and marking replication states dirty as necessary.
     void PrepareNetworkUpdate();
     /// Clean up all references to a network connection that is about to be removed.
+    /// @manualbind
     void CleanupConnection(Connection* connection);
 
 protected:
@@ -124,6 +132,7 @@ protected:
     /// Handle scene node enabled status changing.
     virtual void OnNodeSetEnabled(Node* node);
     /// Set ID. Called by Scene.
+    /// @property{set_id}
     void SetID(unsigned id);
     /// Set scene node. Called by Node when creating the component.
     void SetNode(Node* node);

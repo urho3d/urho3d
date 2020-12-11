@@ -42,7 +42,7 @@ public:
     /// Construct.
     explicit NamedPipe(Context* context);
     /// Construct and open in either server or client mode.
-    NamedPipe(Context* context, const String& pipeName, bool isServer);
+    NamedPipe(Context* context, const String& name, bool isServer);
     /// Destruct and close.
     ~NamedPipe() override;
 
@@ -54,22 +54,22 @@ public:
     unsigned Write(const void* data, unsigned size) override;
     /// Return whether pipe has no data available.
     bool IsEof() const override;
-    /// Return the pipe name.
-    const String& GetName() const override { return pipeName_; }
+    /// Not supported.
+    void SetName(const String& name) override;
 
     /// Open the pipe in either server or client mode. If already open, the existing pipe is closed. For a client end to open successfully the server end must already to be open. Return true if successful.
-    bool Open(const String& pipeName, bool isServer);
+    bool Open(const String& name, bool isServer);
     /// Close the pipe. Note that once a client has disconnected, the server needs to close and reopen the pipe so that another client can connect. At least on Windows this is not possible to detect automatically, so the communication protocol should include a "bye" message to handle this situation.
     void Close();
 
     /// Return whether is open.
+    /// @property
     bool IsOpen() const;
     /// Return whether is in server mode.
+    /// @property
     bool IsServer() const { return isServer_; }
 
 private:
-    /// Pipe name.
-    String pipeName_;
     /// Server mode flag.
     bool isServer_;
     /// Pipe handle.

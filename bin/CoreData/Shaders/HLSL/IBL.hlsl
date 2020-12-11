@@ -16,14 +16,15 @@
         return specColor * AB.x + AB.y;
     }
 
-    float3 FixCubeLookup(float3 v) 
+    // https://web.archive.org/web/20200228213025/http://the-witness.net/news/2012/02/seamless-cube-map-filtering/
+    float3 FixCubeLookup(float3 v, float cubeMapSize)
     {
         float M = max(max(abs(v.x), abs(v.y)), abs(v.z));
-        float scale = (1024 - 1) / 1024;
+        float scale = (cubeMapSize - 1.0) / cubeMapSize;
 
-        if (abs(v.x) != M) v.x += scale;
-        if (abs(v.y) != M) v.y += scale;
-        if (abs(v.z) != M) v.z += scale; 
+        if (abs(v.x) != M) v.x *= scale;
+        if (abs(v.y) != M) v.y *= scale;
+        if (abs(v.z) != M) v.z *= scale; 
 
         return v;
     }
@@ -55,8 +56,9 @@
         // reflectVec = intersectionPos - ((cZoneMin + cZoneMax )/ 2);
 
         const float mipSelect = GetMipFromRoughness(roughness);
-        float3 cube = SampleCubeLOD(ZoneCubeMap, float4(FixCubeLookup(reflectVec), mipSelect)).rgb;
-        float3 cubeD = SampleCubeLOD(ZoneCubeMap, float4(FixCubeLookup(wsNormal), 9.0)).rgb;
+        const float cubeMapSize = 1024.0; // TODO This only works with textures of a given size
+        float3 cube = SampleCubeLOD(ZoneCubeMap, float4(FixCubeLookup(reflectVec, cubeMapSize), mipSelect)).rgb;
+        float3 cubeD = SampleCubeLOD(ZoneCubeMap, float4(FixCubeLookup(wsNormal, cubeMapSize), 9.0)).rgb;
         
         // Fake the HDR texture
         float brightness = clamp(cAmbientColor.a, 0.0, 1.0);

@@ -44,21 +44,25 @@ public:
     void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor) override;
     /// React to mouse click begin.
     void OnClickBegin
-        (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor) override;
+        (const IntVector2& position, const IntVector2& screenPosition, MouseButton button, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor) override;
     /// React to a key press.
     void OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifiers) override;
 
     /// Set checked state.
+    /// @property
     void SetChecked(bool enable);
     /// Set checked image offset.
+    /// @property
     void SetCheckedOffset(const IntVector2& offset);
     /// Set checked image offset.
     void SetCheckedOffset(int x, int y);
 
     /// Return whether is checked.
+    /// @property
     bool IsChecked() const { return checked_; }
 
     /// Return checked image offset.
+    /// @property
     const IntVector2& GetCheckedOffset() const { return checkedOffset_; }
 
 protected:

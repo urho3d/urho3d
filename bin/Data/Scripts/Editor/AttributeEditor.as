@@ -314,7 +314,7 @@ UIElement@ CreateIntAttributeEditor(ListView@ list, Array<Serializable@>@ serial
         LineEdit@ attrEdit = CreateAttributeLineEdit(parent, serializables, index, subIndex);
         CreateDragSlider(attrEdit);
         // If the attribute is a counter for things like billboards or animation states, disable apply at each change
-        if (info.name.Find(" Count", 0, false) == NPOS)
+        if (info.name.Find(" Count", 0, false) == String::NPOS)
             SubscribeToEvent(attrEdit, "TextChanged", "EditAttribute");
         SubscribeToEvent(attrEdit, "TextFinished", "EditAttribute");
         // If the attribute is a node ID, make it a drag/drop target

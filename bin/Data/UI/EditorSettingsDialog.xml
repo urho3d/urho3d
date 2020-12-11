@@ -341,7 +341,7 @@
                         <attribute name="Name" value="GammaCorrectionToggle" />
                     </element>
                     <element type="Text">
-                        <attribute name="Text" value="Gamma correction" />
+                        <attribute name="Text" value="Gamma correction postproc" />
                     </element>
                 </element>
                 <element style="ListRow">
@@ -351,6 +351,15 @@
                     </element>
                     <element type="Text">
                         <attribute name="Text" value="HDR rendering" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="8" />
+                    <element type="CheckBox">
+                        <attribute name="Name" value="SRGBToggle" />
+                    </element>
+                    <element type="Text">
+                        <attribute name="Text" value="sRGB" />
                     </element>
                 </element>
                 <element style="ListRow">

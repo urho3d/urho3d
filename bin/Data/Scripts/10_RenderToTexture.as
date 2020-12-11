@@ -133,7 +133,7 @@ void CreateScene()
 
             // Create a renderable texture (1024x768, RGB format), enable bilinear filtering on it
             Texture2D@ renderTexture = Texture2D();
-            renderTexture.SetSize(1024, 768, GetRGBFormat(), TEXTURE_RENDERTARGET);
+            renderTexture.SetSize(1024, 768, Graphics::GetRGBFormat(), TEXTURE_RENDERTARGET);
             renderTexture.filterMode = FILTER_BILINEAR;
 
             // Create a new material from scratch, use the diffuse unlit technique, assign the render texture

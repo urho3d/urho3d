@@ -53,83 +53,109 @@ public:
      */
     void SetNumLevels(unsigned levels);
     /// Set filtering mode.
+    /// @property
     void SetFilterMode(TextureFilterMode mode);
     /// Set addressing mode by texture coordinate.
+    /// @property
     void SetAddressMode(TextureCoordinate coord, TextureAddressMode mode);
     /// Set texture max. anisotropy level. No effect if not using anisotropic filtering. Value 0 (default) uses the default setting from Renderer.
+    /// @property
     void SetAnisotropy(unsigned level);
     /// Set shadow compare mode. Not used on Direct3D9.
     void SetShadowCompare(bool enable);
     /// Set border color for border addressing mode.
+    /// @property
     void SetBorderColor(const Color& color);
     /// Set sRGB sampling and writing mode.
+    /// @property
     void SetSRGB(bool enable);
     /// Set backup texture to use when rendering to this texture.
+    /// @property
     void SetBackupTexture(Texture* texture);
     /// Set mip levels to skip on a quality setting when loading. Ensures higher quality levels do not skip more.
+    /// @property
     void SetMipsToSkip(MaterialQuality quality, int toSkip);
 
     /// Return API-specific texture format.
+    /// @property
     unsigned GetFormat() const { return format_; }
 
     /// Return whether the texture format is compressed.
+    /// @property
     bool IsCompressed() const;
 
     /// Return number of mip levels.
+    /// @property
     unsigned GetLevels() const { return levels_; }
 
     /// Return width.
+    /// @property
     int GetWidth() const { return width_; }
 
     /// Return height.
+    /// @property
     int GetHeight() const { return height_; }
 
     /// Return depth.
     int GetDepth() const { return depth_; }
 
     /// Return filtering mode.
+    /// @property
     TextureFilterMode GetFilterMode() const { return filterMode_; }
 
     /// Return addressing mode by texture coordinate.
+    /// @property
     TextureAddressMode GetAddressMode(TextureCoordinate coord) const { return addressModes_[coord]; }
 
     /// Return texture max. anisotropy level. Value 0 means to use the default value from Renderer.
+    /// @property
     unsigned GetAnisotropy() const { return anisotropy_; }
 
     /// Return whether shadow compare is enabled. Not used on Direct3D9.
     bool GetShadowCompare() const { return shadowCompare_; }
 
     /// Return border color.
+    /// @property
     const Color& GetBorderColor() const { return borderColor_; }
 
     /// Return whether is using sRGB sampling and writing.
+    /// @property
     bool GetSRGB() const { return sRGB_; }
 
     /// Return texture multisampling level (1 = no multisampling).
+    /// @property
     int GetMultiSample() const { return multiSample_; }
 
     /// Return texture multisampling autoresolve mode. When true, the texture is resolved before being sampled on SetTexture(). When false, the texture will not be resolved and must be read as individual samples in the shader.
+    /// @property
     bool GetAutoResolve() const { return autoResolve_; }
 
     /// Return whether multisampled texture needs resolve.
+    /// @property
     bool IsResolveDirty() const { return resolveDirty_; }
 
     /// Return whether rendertarget mipmap levels need regenration.
+    /// @property
     bool GetLevelsDirty() const { return levelsDirty_; }
 
     /// Return backup texture.
+    /// @property
     Texture* GetBackupTexture() const { return backupTexture_; }
 
     /// Return mip levels to skip on a quality setting when loading.
+    /// @property
     int GetMipsToSkip(MaterialQuality quality) const;
     /// Return mip level width, or 0 if level does not exist.
+    /// @property
     int GetLevelWidth(unsigned level) const;
     /// Return mip level width, or 0 if level does not exist.
+    /// @property
     int GetLevelHeight(unsigned level) const;
     /// Return mip level depth, or 0 if level does not exist.
     int GetLevelDepth(unsigned level) const;
 
     /// Return texture usage type.
+    /// @property
     TextureUsage GetUsage() const { return usage_; }
 
     /// Return data size in bytes for a rectangular region.
@@ -139,6 +165,7 @@ public:
     /// Return data size in bytes for a pixel or block row.
     unsigned GetRowDataSize(int width) const;
     /// Return number of image components required to receive pixel data from GetData(), or 0 for compressed images.
+    /// @property
     unsigned GetComponents() const;
 
     /// Return whether the parameters are dirty.
@@ -166,6 +193,7 @@ public:
     unsigned GetTarget() const { return target_; }
 
     /// Convert format to sRGB. Not used on Direct3D9.
+    /// @nobind
     unsigned GetSRGBFormat(unsigned format);
 
     /// Set or clear the need resolve flag. Called internally by Graphics.
@@ -181,12 +209,16 @@ public:
     /// Check maximum allowed mip levels for a specific 3D texture size.
     static unsigned CheckMaxLevels(int width, int height, int depth, unsigned requestedLevels);
     /// Return the shader resource view format corresponding to a texture format. Handles conversion of typeless depth texture formats. Only used on Direct3D11.
+    /// @nobind
     static unsigned GetSRVFormat(unsigned format);
     /// Return the depth-stencil view format corresponding to a texture format. Handles conversion of typeless depth texture formats. Only used on Direct3D11.
+    /// @nobind
     static unsigned GetDSVFormat(unsigned format);
     /// Return the non-internal texture format corresponding to an OpenGL internal format.
+    /// @nobind
     static unsigned GetExternalFormat(unsigned format);
     /// Return the data type corresponding to an OpenGL internal format.
+    /// @nobind
     static unsigned GetDataType(unsigned format);
 
 protected:

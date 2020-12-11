@@ -126,12 +126,16 @@ public:
     UpdateGeometryType GetUpdateGeometryType() override;
 
     /// Set material. The material should use a small negative depth bias to avoid Z-fighting.
+    /// @property
     void SetMaterial(Material* material);
     /// Set maximum number of decal vertices.
+    /// @property
     void SetMaxVertices(unsigned num);
     /// Set maximum number of decal vertex indices.
+    /// @property
     void SetMaxIndices(unsigned num);
     /// Set whether to optimize GPU buffer sizes according to current amount of decals. Default false, which will size the buffers according to the maximum vertices/indices. When true, buffers will be reallocated whenever decals are added/removed, which can be worse for performance.
+    /// @property
     void SetOptimizeBufferSize(bool enable);
     /// Add a decal at world coordinates, using a target drawable's geometry for reference. If the decal needs to move with the target, the decal component should be created to the target's node. Return true if successful.
     bool AddDecal(Drawable* target, const Vector3& worldPosition, const Quaternion& worldRotation, float size, float aspectRatio,
@@ -143,24 +147,31 @@ public:
     void RemoveAllDecals();
 
     /// Return material.
+    /// @property
     Material* GetMaterial() const;
 
     /// Return number of decals.
+    /// @property
     unsigned GetNumDecals() const { return decals_.Size(); }
 
     /// Retur number of vertices in the decals.
+    /// @property
     unsigned GetNumVertices() const { return numVertices_; }
 
     /// Retur number of vertex indices in the decals.
+    /// @property
     unsigned GetNumIndices() const { return numIndices_; }
 
     /// Return maximum number of decal vertices.
+    /// @property
     unsigned GetMaxVertices() const { return maxVertices_; }
 
     /// Return maximum number of decal vertex indices.
+    /// @property
     unsigned GetMaxIndices() const { return maxIndices_; }
 
     /// Return whether is optimizing GPU buffer sizes according to current amount of decals.
+    /// @property
     bool GetOptimizeBufferSize() const { return optimizeBufferSize_; }
 
     /// Set material attribute.

@@ -50,25 +50,33 @@ public:
     ~Console() override;
 
     /// Set UI elements' style from an XML file.
+    /// @property
     void SetDefaultStyle(XMLFile* style);
     /// Show or hide.
+    /// @property
     void SetVisible(bool enable);
     /// Toggle visibility.
     void Toggle();
 
     /// Automatically set console to visible when receiving an error log message.
+    /// @property
     void SetAutoVisibleOnError(bool enable) { autoVisibleOnError_ = enable; }
 
     /// Set the command interpreter.
+    /// @property
     void SetCommandInterpreter(const String& interpreter) { commandInterpreter_ = interpreter; }
 
     /// Set number of buffered rows.
+    /// @property
     void SetNumBufferedRows(unsigned rows);
     /// Set number of displayed rows.
+    /// @property
     void SetNumRows(unsigned rows);
     /// Set command history maximum size, 0 disables history.
+    /// @property
     void SetNumHistoryRows(unsigned rows);
     /// Set whether to automatically focus the line edit when showing. Default true on desktops and false on mobile devices, as on mobiles it would pop up the screen keyboard.
+    /// @property
     void SetFocusOnShow(bool enable);
     /// Add auto complete option.
     void AddAutoComplete(const String& option);
@@ -78,45 +86,58 @@ public:
     void UpdateElements();
 
     /// Return the UI style file.
+    /// @property
     XMLFile* GetDefaultStyle() const;
 
     /// Return the background element.
+    /// @property
     BorderImage* GetBackground() const { return background_; }
 
     /// Return the line edit element.
+    /// @property
     LineEdit* GetLineEdit() const { return lineEdit_; }
 
     /// Return the close butoon element.
+    /// @property
     Button* GetCloseButton() const { return closeButton_; }
 
     /// Return whether is visible.
+    /// @property
     bool IsVisible() const;
 
     /// Return true when console is set to automatically visible when receiving an error log message.
+    /// @property
     bool IsAutoVisibleOnError() const { return autoVisibleOnError_; }
 
     /// Return the last used command interpreter.
+    /// @property
     const String& GetCommandInterpreter() const { return commandInterpreter_; }
 
     /// Return number of buffered rows.
+    /// @property
     unsigned GetNumBufferedRows() const;
 
     /// Return number of displayed rows.
+    /// @property
     unsigned GetNumRows() const { return displayedRows_; }
 
     /// Copy selected rows to system clipboard.
     void CopySelectedRows() const;
 
     /// Return history maximum size.
+    /// @property
     unsigned GetNumHistoryRows() const { return historyRows_; }
 
     /// Return current history position.
+    /// @property
     unsigned GetHistoryPosition() const { return historyPosition_; }
 
     /// Return history row at index.
+    /// @property
     const String& GetHistoryRow(unsigned index) const;
 
     /// Return whether automatically focuses the line edit when showing.
+    /// @property
     bool GetFocusOnShow() const { return focusOnShow_; }
 
 private:

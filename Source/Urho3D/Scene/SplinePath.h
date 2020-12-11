@@ -38,7 +38,7 @@ namespace Urho3D
 /// Spline for creating smooth movement based on Speed along a set of Control Points modified by the Interpolation Mode.
 class URHO3D_API SplinePath : public Component
 {
-    URHO3D_OBJECT(SplinePath, Component)
+    URHO3D_OBJECT(SplinePath, Component);
 
 public:
     /// Construct an Empty SplinePath.
@@ -62,29 +62,36 @@ public:
     void ClearControlPoints();
 
     /// Set the Interpolation Mode.
+    /// @property
     void SetInterpolationMode(InterpolationMode interpolationMode);
 
     /// Set the movement Speed.
+    /// @property
     void SetSpeed(float speed) { speed_ = speed; }
 
     /// Set the controlled Node's position on the SplinePath.
     void SetPosition(float factor);
     /// Set the Node to be moved along the SplinePath.
+    /// @property
     void SetControlledNode(Node* controlled);
 
     /// Get the Interpolation Mode.
+    /// @property
     InterpolationMode GetInterpolationMode() const { return spline_.GetInterpolationMode(); }
 
     /// Get the movement Speed.
+    /// @property
     float GetSpeed() const { return speed_; }
 
     /// Get the length of SplinePath.
+    /// @property
     float GetLength() const { return length_; }
 
     /// Get the parent Node's last position on the spline.
     Vector3 GetPosition() const { return GetPoint(traveled_); }
 
     /// Get the controlled Node.
+    /// @property
     Node* GetControlledNode() const { return controlledNode_; }
 
     /// Get a point on the SplinePath from 0.f to 1.f where 0 is the start and 1 is the end.
@@ -96,6 +103,7 @@ public:
     void Reset();
 
     /// Returns whether the movement along the SplinePath is complete.
+    /// @property{get_isFinished}
     bool IsFinished() const { return traveled_ >= 1.0f; }
 
     /// Set Control Point Node IDs attribute.

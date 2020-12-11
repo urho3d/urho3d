@@ -62,23 +62,28 @@ public:
     /// Save resource as a new bitmap font type in XML format. Return true if successful.
     bool SaveXML(Serializer& dest, int pointSize, bool usedGlyphs = false, const String& indentation = "\t");
     /// Set absolute (in pixels) position adjustment for glyphs.
+    /// @property
     void SetAbsoluteGlyphOffset(const IntVector2& offset);
     /// Set point size scaled position adjustment for glyphs.
+    /// @property
     void SetScaledGlyphOffset(const Vector2& offset);
 
     /// Return font face. Pack and render to a texture if not rendered yet. Return null on error.
     FontFace* GetFace(float pointSize);
 
     /// Return font type.
+    /// @property
     FontType GetFontType() const { return fontType_; }
 
     /// Is signed distance field font.
     bool IsSDFFont() const { return sdfFont_; }
 
     /// Return absolute position adjustment for glyphs.
+    /// @property
     const IntVector2& GetAbsoluteGlyphOffset() const { return absoluteOffset_; }
 
     /// Return point size scaled position adjustment for glyphs.
+    /// @property
     const Vector2& GetScaledGlyphOffset() const { return scaledOffset_; }
 
     /// Return the total effective offset for a point size.

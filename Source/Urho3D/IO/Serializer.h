@@ -41,6 +41,7 @@ class Vector3;
 class Vector4;
 
 /// Abstract stream for writing.
+/// @fakeref
 class URHO3D_API Serializer
 {
 public:

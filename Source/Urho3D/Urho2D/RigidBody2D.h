@@ -60,30 +60,43 @@ public:
     void OnSetEnabled() override;
 
     /// Set body type.
+    /// @property
     void SetBodyType(BodyType2D type);
     /// Set mass.
+    /// @property
     void SetMass(float mass);
     /// Set inertia.
+    /// @property
     void SetInertia(float inertia);
     /// Set mass center.
+    /// @property
     void SetMassCenter(const Vector2& center);
     /// Set whether to automatically calculate mass and inertia from collision shapes. Default true.
+    /// @property
     void SetUseFixtureMass(bool useFixtureMass);
     /// Set linear damping.
+    /// @property
     void SetLinearDamping(float linearDamping);
     /// Set angular damping.
+    /// @property
     void SetAngularDamping(float angularDamping);
     /// Set allow sleep.
+    /// @property
     void SetAllowSleep(bool allowSleep);
     /// Set fixed rotation.
+    /// @property
     void SetFixedRotation(bool fixedRotation);
     /// Set bullet mode.
+    /// @property
     void SetBullet(bool bullet);
     /// Set gravity scale.
+    /// @property
     void SetGravityScale(float gravityScale);
     /// Set awake.
+    /// @property
     void SetAwake(bool awake);
     /// Set linear velocity.
+    /// @property
     void SetLinearVelocity(const Vector2& linearVelocity);
     /// Set angular velocity.
     void SetAngularVelocity(float angularVelocity);
@@ -119,39 +132,52 @@ public:
     void RemoveConstraint2D(Constraint2D* constraint);
 
     /// Return body type.
+    /// @property
     BodyType2D GetBodyType() const { return body_ ? (BodyType2D)body_->GetType() : (BodyType2D)bodyDef_.type; }
 
     /// Return mass.
+    /// @property
     float GetMass() const;
     /// Return inertia.
+    /// @property
     float GetInertia() const;
     /// Return mass center.
+    /// @property
     Vector2 GetMassCenter() const;
 
     /// Return whether to calculate mass and inertia from collision shapes automatically.
+    /// @property
     bool GetUseFixtureMass() const { return useFixtureMass_; }
 
     /// Return linear damping.
+    /// @property
     float GetLinearDamping() const { return body_ ? body_->GetLinearDamping() : bodyDef_.linearDamping; }
 
     /// Return angular damping.
+    /// @property
     float GetAngularDamping() const { return body_ ? body_->GetAngularDamping() : bodyDef_.angularDamping; }
 
     /// Return allow sleep.
+    /// @property
     bool IsAllowSleep() const { return body_ ? body_->IsSleepingAllowed() : bodyDef_.allowSleep; }
 
     /// Return fixed rotation.
+    /// @property
     bool IsFixedRotation() const { return body_ ? body_->IsFixedRotation() : bodyDef_.fixedRotation; }
 
     /// Return bullet mode.
+    /// @property
     bool IsBullet() const { return body_ ? body_->IsBullet() : bodyDef_.bullet; }
 
     /// Return gravity scale.
+    /// @property
     float GetGravityScale() const { return body_ ? body_->GetGravityScale() : bodyDef_.gravityScale; }
 
     /// Return awake.
+    /// @property
     bool IsAwake() const;
     /// Return linear velocity.
+    /// @property
     Vector2 GetLinearVelocity() const;
     /// Return angular velocity.
     float GetAngularVelocity() const;

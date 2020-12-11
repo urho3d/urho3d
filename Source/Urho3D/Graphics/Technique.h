@@ -50,30 +50,43 @@ public:
     ~Pass() override;
 
     /// Set blend mode.
+    /// @property
     void SetBlendMode(BlendMode mode);
     /// Set culling mode override. By default culling mode is read from the material instead. Set the illegal culling mode MAX_CULLMODES to disable override again.
+    /// @property
     void SetCullMode(CullMode mode);
     /// Set depth compare mode.
+    /// @property
     void SetDepthTestMode(CompareMode mode);
     /// Set pass lighting mode, affects what shader variations will be attempted to be loaded.
+    /// @property
     void SetLightingMode(PassLightingMode mode);
     /// Set depth write on/off.
+    /// @property
     void SetDepthWrite(bool enable);
     /// Set alpha-to-coverage on/off.
+    /// @property
     void SetAlphaToCoverage(bool enable);
     /// Set whether requires desktop level hardware.
+    /// @property{set_desktop}
     void SetIsDesktop(bool enable);
     /// Set vertex shader name.
+    /// @property
     void SetVertexShader(const String& name);
     /// Set pixel shader name.
+    /// @property
     void SetPixelShader(const String& name);
     /// Set vertex shader defines. Separate multiple defines with spaces.
+    /// @property
     void SetVertexShaderDefines(const String& defines);
     /// Set pixel shader defines. Separate multiple defines with spaces.
+    /// @property
     void SetPixelShaderDefines(const String& defines);
     /// Set vertex shader define excludes. Use to mark defines that the shader code will not recognize, to prevent compiling redundant shader variations.
+    /// @property
     void SetVertexShaderDefineExcludes(const String& excludes);
     /// Set pixel shader define excludes. Use to mark defines that the shader code will not recognize, to prevent compiling redundant shader variations.
+    /// @property
     void SetPixelShaderDefineExcludes(const String& excludes);
     /// Reset shader pointers.
     void ReleaseShaders();
@@ -87,45 +100,58 @@ public:
     unsigned GetIndex() const { return index_; }
 
     /// Return blend mode.
+    /// @property
     BlendMode GetBlendMode() const { return blendMode_; }
 
     /// Return culling mode override. If pass is not overriding culling mode (default), the illegal mode MAX_CULLMODES is returned.
+    /// @property
     CullMode GetCullMode() const { return cullMode_; }
 
     /// Return depth compare mode.
+    /// @property
     CompareMode GetDepthTestMode() const { return depthTestMode_; }
 
     /// Return pass lighting mode.
+    /// @property
     PassLightingMode GetLightingMode() const { return lightingMode_; }
 
     /// Return last shaders loaded frame number.
     unsigned GetShadersLoadedFrameNumber() const { return shadersLoadedFrameNumber_; }
 
     /// Return depth write mode.
+    /// @property
     bool GetDepthWrite() const { return depthWrite_; }
 
     /// Return alpha-to-coverage mode.
+    /// @property
     bool GetAlphaToCoverage() const { return alphaToCoverage_; }
 
     /// Return whether requires desktop level hardware.
+    /// @property
     bool IsDesktop() const { return isDesktop_; }
 
     /// Return vertex shader name.
+    /// @property
     const String& GetVertexShader() const { return vertexShaderName_; }
 
     /// Return pixel shader name.
+    /// @property
     const String& GetPixelShader() const { return pixelShaderName_; }
 
     /// Return vertex shader defines.
+    /// @property
     const String& GetVertexShaderDefines() const { return vertexShaderDefines_; }
 
     /// Return pixel shader defines.
+    /// @property
     const String& GetPixelShaderDefines() const { return pixelShaderDefines_; }
 
     /// Return vertex shader define excludes.
+    /// @property
     const String& GetVertexShaderDefineExcludes() const { return vertexShaderDefineExcludes_; }
 
     /// Return pixel shader define excludes.
+    /// @property
     const String& GetPixelShaderDefineExcludes() const { return pixelShaderDefineExcludes_; }
 
     /// Return vertex shaders.
@@ -205,6 +231,7 @@ public:
     bool BeginLoad(Deserializer& source) override;
 
     /// Set whether requires desktop level hardware.
+    /// @property{set_desktop}
     void SetIsDesktop(bool enable);
     /// Create a new pass.
     Pass* CreatePass(const String& name);
@@ -216,9 +243,11 @@ public:
     SharedPtr<Technique> Clone(const String& cloneName = String::EMPTY) const;
 
     /// Return whether requires desktop level hardware.
+    /// @property
     bool IsDesktop() const { return isDesktop_; }
 
     /// Return whether technique is supported by the current hardware.
+    /// @property
     bool IsSupported() const { return !isDesktop_ || desktopSupport_; }
 
     /// Return whether has a pass.
@@ -244,10 +273,13 @@ public:
     Pass* GetSupportedPass(const String& name) const;
 
     /// Return number of passes.
+    /// @property
     unsigned GetNumPasses() const;
     /// Return all pass names.
+    /// @property
     Vector<String> GetPassNames() const;
     /// Return all passes.
+    /// @property
     PODVector<Pass*> GetPasses() const;
 
     /// Return a clone with added shader compilation defines. Called internally by Material.
