@@ -92,7 +92,6 @@ static bool IsUsing(const string& identifier)
 bool IsKnownType(const string& name)
 {
     static vector<string> _knownTypes = {
-        "", // TODO: fix opConv()
         "void",
         "bool",
         "size_t",
@@ -773,10 +772,6 @@ string Generate_asMETHODPR(const ClassFunctionAnalyzer& functionAnalyzer, bool t
 
     string returnType = functionAnalyzer.GetReturnType(templateSpecialization).ToString();
     
-    // Extracting type from function name (workaround for https://github.com/doxygen/doxygen/issues/7732)
-    if (functionAnalyzer.IsConsversionOperator())
-        returnType = CutStart(functionName, "operator ");
-
     if (templateVersion)
         return "asMETHODPR(T, " + functionName + ", " + cppParams + ", " + returnType + ")";
     else

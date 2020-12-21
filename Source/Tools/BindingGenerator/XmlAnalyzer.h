@@ -34,6 +34,9 @@
 using namespace pugi;
 using namespace std;
 
+// <type>...</type> | <defval>...</defval> | <para>...</para>
+string RemoveRefs(xml_node node);
+
 // <type>...</type>
 class TypeAnalyzer
 {
@@ -50,6 +53,9 @@ private:
 
 public:
     TypeAnalyzer(xml_node type, const map<string, string>& templateSpecialization = map<string, string>());
+
+    // Used for doxygen bug workaround https://github.com/doxygen/doxygen/issues/7732
+    TypeAnalyzer(const string& typeName);
 
     string ToString() const { return fullType_; }
     string GetName() const { return name_; }
