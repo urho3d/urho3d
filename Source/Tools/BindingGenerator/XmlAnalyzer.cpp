@@ -27,18 +27,28 @@
 #include <cassert>
 #include <regex>
 
+string RemoveRefs(xml_node node)
+{
+    assert(node.name() == string("type") || node.name() == string("defval") || node.name() == string("para"));
+
+    string result;
+
+    for (xml_node part : node.children())
+    {
+        if (part.name() == string("ref"))
+            result += part.child_value();
+        else
+            result += part.value();
+    }
+
+    return result;
+}
+
 TypeAnalyzer::TypeAnalyzer(xml_node type, const map<string, string>& templateSpecialization)
 {
     assert(type.name() == string("type"));
 
-    for (xml_node part : type.children())
-    {
-        if (part.name() == string("ref"))
-            fullType_ += part.child_value();
-        else
-            fullType_ += part.value();
-    }
-
+    fullType_ = RemoveRefs(type);
     fullType_ = RemoveFirst(fullType_, "URHO3D_API ");
     fullType_ = CutStart(fullType_, "constexpr ");
     fullType_ = ReplaceAll(fullType_, " *", "*");
@@ -76,6 +86,18 @@ TypeAnalyzer::TypeAnalyzer(xml_node type, const map<string, string>& templateSpe
         templateParams_ = match[2].str();
         name_ = match[1].str();
     }
+}
+
+TypeAnalyzer::TypeAnalyzer(const string& typeName)
+{
+    fullType_ = typeName;
+    name_ = typeName;
+    isConst_ = false;
+    isPointer_ = false;
+    isReference_ = false;
+    isRvalueReference_ = false;
+    isDoublePointer_ = false;
+    isRefToPoiner_ = false;
 }
 
 // ============================================================================
@@ -116,18 +138,12 @@ string ParamAnalyzer::GetDeclname() const
 
 string ParamAnalyzer::GetDefval() const
 {
-    string result;
-
     xml_node defval = node_.child("defval");
-    for (xml_node part : defval.children())
-    {
-        if (part.name() == string("ref"))
-            result += part.child_value();
-        else
-            result += part.value();
-    }
 
-    return result;
+    if (defval)
+        return RemoveRefs(defval);
+
+    return "";
 }
 
 // ============================================================================
@@ -232,6 +248,15 @@ TypeAnalyzer ExtractType(xml_node memberdef, const map<string, string>& template
 
     xml_node type = memberdef.child("type");
     assert(type);
+
+    // Doxygen bug workaround https://github.com/doxygen/doxygen/issues/7732
+    // For user-defined conversion operator exract return type from function name
+    if (RemoveRefs(type).empty() && ExtractKind(memberdef) == "function")
+    {
+        string functionName = ExtractName(memberdef);
+        if (StartsWith(functionName, "operator "))
+            return TypeAnalyzer(CutStart(functionName, "operator "));
+    }
 
     return TypeAnalyzer(type, templateSpecialization);
 }
@@ -351,14 +376,7 @@ static string DescriptionToString(xml_node description)
 
     for (xml_node para : description.children("para"))
     {
-        for (xml_node part : para.children())
-        {
-            if (part.name() == string("ref"))
-                result += part.child_value();
-            else
-                result += part.value();
-        }
-
+        result += RemoveRefs(para);
         result += " "; // To avoid gluing words from different paragraphs
     }
 
