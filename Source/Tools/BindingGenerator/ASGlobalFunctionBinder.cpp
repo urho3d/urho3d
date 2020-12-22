@@ -27,9 +27,9 @@
 #include "XmlAnalyzer.h"
 #include "XmlSourceData.h"
 
-#include <regex>
 #include <cassert>
 #include <map>
+#include <regex>
 
 namespace ASBindingGenerator
 {
@@ -46,11 +46,11 @@ static string GetAliasMark(const GlobalFunctionAnalyzer& functionAnalyzer)
     return "";
 }
 
-static vector<map<string, string> > GetSpecializations(const GlobalFunctionAnalyzer& functionAnalyzer)
+static vector<map<string, string>> GetSpecializations(const GlobalFunctionAnalyzer& functionAnalyzer)
 {
     vector<string> templateParams = functionAnalyzer.GetTemplateParams();
 
-    vector<map<string, string> > result;
+    vector<map<string, string>> result;
     string comment = functionAnalyzer.GetComment();
     smatch match;
 
@@ -200,11 +200,11 @@ static void ProcessGlobalFunction(const GlobalFunctionAnalyzer& functionAnalyzer
     string header = functionAnalyzer.GetHeaderFile();
     if (IsIgnoredHeader(header))
     {
-        Result::AddHeader(header); (header);
+        Result::AddHeader(header);
         return;
     }
 
-    Result::AddHeader(header); (header);
+    Result::AddHeader(header);
 
     string insideDefine = InsideDefine(header);
     if (!insideDefine.empty())
@@ -222,7 +222,7 @@ static void ProcessGlobalFunction(const GlobalFunctionAnalyzer& functionAnalyzer
 
     if (functionAnalyzer.IsTemplate())
     {
-        for (map<string, string> specialization : specializations)
+        for (const map<string, string>& specialization : specializations)
             BindGlobalFunction(functionAnalyzer, specialization);
     }
     else
@@ -243,7 +243,7 @@ void ProcessAllGlobalFunctions(const string& outputBasePath)
 
     _result = make_shared<ASGeneratedFile_GlobalFunctions>(outputPath, "ASRegisterGenerated_GlobalFunctions");
 
-    for (GlobalFunctionAnalyzer globalFunctionAnalyzer : globalFunctionAnalyzers)
+    for (const GlobalFunctionAnalyzer& globalFunctionAnalyzer : globalFunctionAnalyzers)
         ProcessGlobalFunction(globalFunctionAnalyzer);
 
     _result->Save();

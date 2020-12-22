@@ -82,7 +82,7 @@ static bool IsUsing(const string& identifier)
     {
         UsingAnalyzer usingAnalyzer(memberdef);
         
-        if (usingAnalyzer.GetIdentifier() == identifier)
+        if (usingAnalyzer.GetName() == identifier)
             return true;
     }
 
