@@ -82,7 +82,8 @@ public:
     ParamAnalyzer(xml_node param, const map<string, string>& templateSpecialization = map<string, string>());
 
     xml_node GetNode() const { return node_; }
-    string ToString() const; // "type name"
+
+    string ToString() const;
 
     // <param>
     //     <type>....</type>
@@ -158,6 +159,10 @@ vector<ParamAnalyzer> ExtractParams(xml_node memberdef, const map<string, string
 string JoinParamsTypes(xml_node memberdef, const map<string, string>& templateSpecialization = map<string, string>());
 string JoinParamsNames(xml_node memberdef, bool skipContext = false);
 
+// <memberdef kind="function">
+//     ...
+string GetFunctionLocation(xml_node memberdef);
+
 // <compounddef|memberdef id="...">
 string ExtractID(xml_node node);
 
@@ -191,8 +196,6 @@ string ExtractHeaderFile(xml_node node);
 //     <templateparamlist>
 bool IsTemplate(xml_node node);
 
-// ============================================================================
-
 // <compounddef kind="namespace">
 //     <sectiondef kind="enum">
 //         <memberdef kind="enum">...</memberdef>
@@ -217,8 +220,6 @@ public:
 
 };
 
-// ============================================================================
-
 // <compounddef kind="namespace">
 //     <sectiondef kind="var">
 //         <memberdef kind="variable">...</memberdef>
@@ -236,8 +237,6 @@ public:
     bool IsArray() const { return StartsWith(ExtractArgsstring(memberdef_), "["); }
     string GetLocation() const;
 };
-
-// ============================================================================
 
 class ClassFunctionAnalyzer;
 class ClassVariableAnalyzer;
@@ -276,8 +275,6 @@ public:
     vector<ClassAnalyzer> GetBaseClasses() const;
     vector<ClassAnalyzer> GetAllBaseClasses() const;
 };
-
-// ============================================================================
 
 // <compounddef kind="class|struct">
 //     <sectiondef>
@@ -330,8 +327,6 @@ public:
     string JoinParamsTypes() const { return ::JoinParamsTypes(memberdef_); }
 };
 
-// ============================================================================
-
 // <compounddef kind="class|struct">
 //     <sectiondef>
 //         <memberdef kind="variable">...</memberdef>
@@ -354,8 +349,6 @@ public:
     bool IsArray() const { return StartsWith(ExtractArgsstring(memberdef_), "["); };
 };
 
-// ============================================================================
-
 // <compounddef kind="namespace">
 //     <sectiondef kind="func">
 //         <memberdef kind="function">...</memberdef>
@@ -377,10 +370,8 @@ public:
     string JoinParamsNames() const { return ::JoinParamsNames(memberdef_); }
     string JoinParamsTypes() const { return ::JoinParamsTypes(memberdef_); }
     bool IsDefine() const { return CONTAINS(SourceData::defines_, GetName()); }
-    string GetLocation() const;
+    string GetLocation() const { return GetFunctionLocation(memberdef_); }
 };
-
-// ============================================================================
 
 // <compounddef kind="class|struct">
 //     <sectiondef kind="public-static-func">
@@ -391,7 +382,7 @@ class ClassStaticFunctionAnalyzer
     xml_node memberdef_;
 
 public:
-    ClassStaticFunctionAnalyzer(ClassAnalyzer classAnalyzer, xml_node memberdef);
+    ClassStaticFunctionAnalyzer(const ClassAnalyzer& classAnalyzer, xml_node memberdef);
 
     string GetName() const { return ExtractName(memberdef_); }
     string GetHeaderFile() const { return ExtractHeaderFile(memberdef_); }
@@ -405,10 +396,8 @@ public:
     bool IsDefine() const { return CONTAINS(SourceData::defines_, GetName()); };
     string JoinParamsNames() const { return ::JoinParamsNames(memberdef_); }
     string JoinParamsTypes() const { return ::JoinParamsTypes(memberdef_); };
-    string GetLocation() const;
+    string GetLocation() const { return GetFunctionLocation(memberdef_); }
 };
-
-// ============================================================================
 
 // <memberdef kind="typedef">
 //     <definition>using ...</definition>
@@ -420,10 +409,12 @@ private:
 public:
     UsingAnalyzer(xml_node memberdef);
 
-    string GetIdentifier() const;
+    string GetComment() const { return ExtractComment(memberdef_); }
+    string GetHeaderFile() const { return ExtractHeaderFile(memberdef_); }
+    string GetLocation() const { return "using " + GetName() + " = " + GetType().ToString() + " | File: " + GetHeaderFile(); }
+    string GetName() const { return ExtractName(memberdef_); }
+    TypeAnalyzer GetType() const { return ExtractType(memberdef_); }
 };
-
-// ============================================================================
 
 // <compounddef kind = "namespace">...</compounddef>
 class NamespaceAnalyzer

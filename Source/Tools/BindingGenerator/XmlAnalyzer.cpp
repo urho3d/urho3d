@@ -282,7 +282,7 @@ string JoinParamsTypes(xml_node memberdef, const map<string, string>& templateSp
     string result;
 
     vector<ParamAnalyzer> params = ExtractParams(memberdef, templateSpecialization);
-    for (ParamAnalyzer param : params)
+    for (const ParamAnalyzer& param : params)
     {
         if (!result.empty())
             result += ", ";
@@ -580,7 +580,7 @@ bool ClassAnalyzer::ContainsFunction(const string& name) const
 {
     vector<ClassFunctionAnalyzer> functions = GetFunctions();
 
-    for (ClassFunctionAnalyzer function : functions)
+    for (const ClassFunctionAnalyzer& function : functions)
     {
         if (function.GetName() == name)
             return true;
@@ -593,7 +593,7 @@ ClassFunctionAnalyzer ClassAnalyzer::GetFunction(const string& name) const
 {
     vector<ClassFunctionAnalyzer> functions = GetFunctions();
 
-    for (ClassFunctionAnalyzer function : functions)
+    for (const ClassFunctionAnalyzer& function : functions)
     {
         if (function.GetName() == name)
             return function;
@@ -609,7 +609,7 @@ int ClassAnalyzer::NumFunctions(const string& name) const
 
     vector<ClassFunctionAnalyzer> functions = GetFunctions();
 
-    for (ClassFunctionAnalyzer function : functions)
+    for (const ClassFunctionAnalyzer& function : functions)
     {
         if (function.GetName() == name)
             result++;
@@ -622,7 +622,7 @@ bool ClassAnalyzer::IsAbstract() const
 {
     vector<ClassFunctionAnalyzer> functions = GetFunctions();
 
-    for (ClassFunctionAnalyzer function : functions)
+    for (const ClassFunctionAnalyzer& function : functions)
     {
         if (function.IsPureVirtual())
         {
@@ -651,7 +651,7 @@ bool ClassAnalyzer::AllFloats() const
 
     vector<ClassVariableAnalyzer> variables = GetVariables();
 
-    for (ClassVariableAnalyzer variable : variables)
+    for (const ClassVariableAnalyzer& variable : variables)
     {
         if (variable.IsStatic())
             continue;
@@ -671,7 +671,7 @@ bool ClassAnalyzer::AllInts() const
 
     vector<ClassVariableAnalyzer> variables = GetVariables();
 
-    for (ClassVariableAnalyzer variable : variables)
+    for (const ClassVariableAnalyzer& variable : variables)
     {
         if (variable.IsStatic())
             continue;
@@ -735,7 +735,7 @@ vector<ClassAnalyzer> ClassAnalyzer::GetBaseClasses() const
 
 static void RecursivelyGetBaseClasses(const ClassAnalyzer& analyzer, vector<ClassAnalyzer>& outResult)
 {
-    for (ClassAnalyzer baseClass : analyzer.GetBaseClasses())
+    for (const ClassAnalyzer& baseClass : analyzer.GetBaseClasses())
     {
         outResult.push_back(baseClass);
         RecursivelyGetBaseClasses(baseClass, outResult);
@@ -755,7 +755,7 @@ bool ClassAnalyzer::HasThisConstructor() const
 {
     vector<ClassFunctionAnalyzer> functions = GetFunctions();
 
-    for (ClassFunctionAnalyzer function : functions)
+    for (const ClassFunctionAnalyzer& function : functions)
     {
         if (function.IsThisConstructor())
             return true;
@@ -797,8 +797,11 @@ string ClassFunctionAnalyzer::GetContainsClassName() const
     return result;
 }
 
-static string GetFunctionLocation(xml_node memberdef)
+string GetFunctionLocation(xml_node memberdef)
 {
+    assert(IsMemberdef(memberdef));
+    assert(ExtractKind(memberdef) == "function");
+
     string argsstring = ExtractArgsstring(memberdef);
     assert(!argsstring.empty());
 
@@ -845,6 +848,7 @@ static string GetFunctionLocation(xml_node memberdef)
     result = ReplaceAll(result, " &", "& ");
     result = ReplaceAll(result, " )", ")");
     result = ReplaceAll(result, "< ", "<");
+    
     while (Contains(result, " >"))
         result = ReplaceAll(result, " >", ">");
 
@@ -1019,18 +1023,6 @@ UsingAnalyzer::UsingAnalyzer(xml_node memberdef)
     assert(ExtractKind(memberdef) == "typedef");
 }
 
-string UsingAnalyzer::GetIdentifier() const
-{
-    string definition = ExtractDefinition(memberdef_);
-
-    assert(StartsWith(definition, "using Urho3D::"));
-    string result = CutStart(definition, "using Urho3D::");
-
-    result = GetFirstWord(result);
-
-    return result;
-}
-
 // ============================================================================
 
 GlobalFunctionAnalyzer::GlobalFunctionAnalyzer(xml_node memberdef)
@@ -1040,23 +1032,13 @@ GlobalFunctionAnalyzer::GlobalFunctionAnalyzer(xml_node memberdef)
     assert(ExtractKind(memberdef) == "function");
 }
 
-string GlobalFunctionAnalyzer::GetLocation() const
-{
-    return GetFunctionLocation(memberdef_);
-}
-
 // ============================================================================
 
-ClassStaticFunctionAnalyzer::ClassStaticFunctionAnalyzer(ClassAnalyzer classAnalyzer, xml_node memberdef)
+ClassStaticFunctionAnalyzer::ClassStaticFunctionAnalyzer(const ClassAnalyzer& classAnalyzer, xml_node memberdef)
     : classAnalyzer_(classAnalyzer)
     , memberdef_(memberdef)
 {
     assert(IsMemberdef(memberdef));
     assert(ExtractKind(memberdef) == "function");
     assert(IsStatic(memberdef));
-}
-
-string ClassStaticFunctionAnalyzer::GetLocation() const
-{
-    return GetFunctionLocation(memberdef_);
 }
