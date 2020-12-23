@@ -576,14 +576,7 @@ string GenerateWrapper(const GlobalFunctionAnalyzer& functionAnalyzer, vector<sh
 {
     string result;
     
-    string insideDefine = InsideDefine(functionAnalyzer.GetHeaderFile());
-
-    if (!insideDefine.empty())
-        result += "#ifdef " + insideDefine + "\n";
-
-    result +=
-        "// " + functionAnalyzer.GetLocation() + "\n"
-        "static " + convertedReturn->glueReturnType_ + " " + GenerateWrapperName(functionAnalyzer) + "(";
+    result = "static " + convertedReturn->glueReturnType_ + " " + GenerateWrapperName(functionAnalyzer) + "(";
 
     for (size_t i = 0; i < convertedParams.size(); i++)
     {
@@ -620,12 +613,7 @@ string GenerateWrapper(const GlobalFunctionAnalyzer& functionAnalyzer, vector<sh
     if (convertedReturn->glueReturnType_ != "void")
         result += "    " + convertedReturn->glueReturn_;
 
-    result += "}\n";
-
-    if (!insideDefine.empty())
-        result += "#endif\n";
-
-    result += "\n";
+    result += "}";
 
     return result;
 }

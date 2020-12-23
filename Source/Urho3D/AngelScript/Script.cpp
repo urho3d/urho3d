@@ -104,7 +104,7 @@ void ASRegisterGenerated_Members_Z(asIScriptEngine* engine);
 void ASRegisterGenerated_Members_Other(asIScriptEngine* engine);
 
 void ASRegisterGenerated_GlobalVariables(asIScriptEngine* engine);
-void ASRegisterGenerated_GlobalFunctions(asIScriptEngine* engine);
+void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine);
 
 void ASRegisterManualLast(asIScriptEngine* engine);
 
@@ -188,7 +188,7 @@ Script::Script(Context* context) :
     ASRegisterGenerated_Members_Other(scriptEngine_);
     
     ASRegisterGenerated_GlobalVariables(scriptEngine_);
-    ASRegisterGenerated_GlobalFunctions(scriptEngine_);
+    ASRegisterGeneratedGlobalFunctions(scriptEngine_);
     
     ASRegisterManualLast(scriptEngine_);
 

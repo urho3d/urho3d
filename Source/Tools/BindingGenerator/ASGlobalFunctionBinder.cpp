@@ -102,8 +102,6 @@ static vector<map<string, string>> GetSpecializations(const GlobalFunctionAnalyz
     return result;
 }
 
-static shared_ptr<ASGeneratedFile_GlobalFunctions> _result;
-
 static void BindGlobalFunction(const GlobalFunctionAnalyzer& functionAnalyzer, const map<string, string>& templateSpecialization = map<string, string>())
 {
     string declParams = "";
@@ -112,7 +110,12 @@ static void BindGlobalFunction(const GlobalFunctionAnalyzer& functionAnalyzer, c
 
     bool needWrapper = false;
 
-    vector<shared_ptr<FuncParamConv> > convertedParams;
+    vector<shared_ptr<FuncParamConv>> convertedParams;
+
+    ProcessedGlobalFunction processedGlobalFunction;
+    processedGlobalFunction.name_ = functionAnalyzer.GetName();
+    processedGlobalFunction.comment_ = functionAnalyzer.GetLocation();
+    processedGlobalFunction.insideDefine_ = InsideDefine(functionAnalyzer.GetHeaderFile());
 
     for (size_t i = 0; i < params.size(); i++)
     {
@@ -120,7 +123,8 @@ static void BindGlobalFunction(const GlobalFunctionAnalyzer& functionAnalyzer, c
         shared_ptr<FuncParamConv> conv = CppFunctionParamToAS(i, param);
         if (!conv->success_)
         {
-            _result->reg_ << "    // " << conv->errorMessage_ << "\n";
+            processedGlobalFunction.registration_ = "// " + conv->errorMessage_;
+            Result::globalFunctions_.push_back(processedGlobalFunction);
             return;
         }
 
@@ -138,7 +142,8 @@ static void BindGlobalFunction(const GlobalFunctionAnalyzer& functionAnalyzer, c
     shared_ptr<FuncReturnTypeConv> retConv = CppFunctionReturnTypeToAS(functionAnalyzer.GetReturnType(templateSpecialization));
     if (!retConv->success_)
     {
-        _result->reg_ << "    // " << GetLastErrorMessage() << "\n";
+        processedGlobalFunction.registration_ = "// " + GetLastErrorMessage();
+        Result::globalFunctions_.push_back(processedGlobalFunction);
         return;
     }
     
@@ -146,7 +151,7 @@ static void BindGlobalFunction(const GlobalFunctionAnalyzer& functionAnalyzer, c
         needWrapper = true;
 
     if (needWrapper)
-        _result->glue_ << GenerateWrapper(functionAnalyzer, convertedParams, retConv);
+        processedGlobalFunction.glue_ = GenerateWrapper(functionAnalyzer, convertedParams, retConv);
 
     string asReturnType = retConv->asReturnType_;
 
@@ -154,12 +159,14 @@ static void BindGlobalFunction(const GlobalFunctionAnalyzer& functionAnalyzer, c
 
     string decl = asReturnType + " " + asFunctionName + "(" + declParams + ")";
 
-    _result->reg_ << "    engine->RegisterGlobalFunction(\"" << decl << "\", ";
+    processedGlobalFunction.registration_ = "engine->RegisterGlobalFunction(\"" + decl + "\", ";
 
     if (needWrapper)
-        _result->reg_ << "asFUNCTION(" << GenerateWrapperName(functionAnalyzer) << "), asCALL_CDECL);\n";
+        processedGlobalFunction.registration_ += "asFUNCTION(" + GenerateWrapperName(functionAnalyzer) + "), asCALL_CDECL);";
     else
-        _result->reg_ << Generate_asFUNCTIONPR(functionAnalyzer, templateSpecialization) << ", asCALL_CDECL);\n";
+        processedGlobalFunction.registration_ += Generate_asFUNCTIONPR(functionAnalyzer, templateSpecialization) + ", asCALL_CDECL);";
+
+    Result::globalFunctions_.push_back(processedGlobalFunction);
 
     // Also register alias if needed
     string aliasMark = GetAliasMark(functionAnalyzer);
@@ -170,83 +177,70 @@ static void BindGlobalFunction(const GlobalFunctionAnalyzer& functionAnalyzer, c
 
         decl = asReturnType + " " + asFunctionName + "(" + declParams + ")";
 
-        _result->reg_ << "    engine->RegisterGlobalFunction(\"" << decl << "\", ";
+        processedGlobalFunction.registration_ = "engine->RegisterGlobalFunction(\"" + decl + "\", ";
 
         if (needWrapper)
-            _result->reg_ << "asFUNCTION(" << GenerateWrapperName(functionAnalyzer) << "), asCALL_CDECL);\n";
+            processedGlobalFunction.registration_ += "asFUNCTION(" + GenerateWrapperName(functionAnalyzer) + "), asCALL_CDECL);";
         else
-            _result->reg_ << Generate_asFUNCTIONPR(functionAnalyzer, templateSpecialization) << ", asCALL_CDECL);\n";
+            processedGlobalFunction.registration_ += Generate_asFUNCTIONPR(functionAnalyzer, templateSpecialization) + ", asCALL_CDECL);";
+
+        Result::globalFunctions_.push_back(processedGlobalFunction);
     }
 }
 
-static void ProcessGlobalFunction(const GlobalFunctionAnalyzer& functionAnalyzer)
+static void ProcessGlobalFunction(const GlobalFunctionAnalyzer& globalFunctionAnalyzer)
 {
-    if (functionAnalyzer.IsDefine())
+    if (globalFunctionAnalyzer.IsDefine())
         return;
 
-    vector<map<string, string> > specializations;
+    vector<map<string, string>> specializations;
 
-    if (functionAnalyzer.IsTemplate())
+    if (globalFunctionAnalyzer.IsTemplate())
     {
-        specializations = GetSpecializations(functionAnalyzer);
+        specializations = GetSpecializations(globalFunctionAnalyzer);
 
         if (!specializations.size())
             return;
     }
 
-    if (Contains(functionAnalyzer.GetName(), "operator"))
+    if (Contains(globalFunctionAnalyzer.GetName(), "operator"))
         return;
 
-    string header = functionAnalyzer.GetHeaderFile();
-    if (IsIgnoredHeader(header))
-    {
-        Result::AddHeader(header);
-        return;
-    }
-
+    string header = globalFunctionAnalyzer.GetHeaderFile();
     Result::AddHeader(header);
 
-    string insideDefine = InsideDefine(header);
-    if (!insideDefine.empty())
-        _result->reg_ << "#ifdef " << insideDefine << "\n";
+    if (IsIgnoredHeader(header))
+        return;
 
-    _result->reg_ << "    // " << functionAnalyzer.GetLocation() << "\n";
-
-    if (Contains(functionAnalyzer.GetComment(), "NO_BIND"))
+    if (Contains(globalFunctionAnalyzer.GetComment(), "NO_BIND"))
     {
-        _result->reg_ << "    // Not registered because have @nobind mark\n";
-        if (!insideDefine.empty())
-            _result->reg_ << "#endif\n";
+        ProcessedGlobalFunction processedGlobalFunction;
+        processedGlobalFunction.name_ = globalFunctionAnalyzer.GetName();
+        processedGlobalFunction.insideDefine_ = InsideDefine(header);
+        processedGlobalFunction.comment_ = globalFunctionAnalyzer.GetLocation();
+        processedGlobalFunction.registration_ = "// Not registered because have @nobind mark";
+        Result::globalFunctions_.push_back(processedGlobalFunction);
         return;
     }
 
-    if (functionAnalyzer.IsTemplate())
+    if (globalFunctionAnalyzer.IsTemplate())
     {
         for (const map<string, string>& specialization : specializations)
-            BindGlobalFunction(functionAnalyzer, specialization);
+            BindGlobalFunction(globalFunctionAnalyzer, specialization);
     }
     else
     {
-        BindGlobalFunction(functionAnalyzer);
+        BindGlobalFunction(globalFunctionAnalyzer);
     }
-
-    if (!insideDefine.empty())
-        _result->reg_ << "#endif\n";
 }
 
-void ProcessAllGlobalFunctions(const string& outputBasePath)
+void ProcessAllGlobalFunctions()
 {
-    string outputPath = outputBasePath + "/Source/Urho3D/AngelScript/Generated_GlobalFunctions.cpp";
-
     NamespaceAnalyzer namespaceAnalyzer(SourceData::namespaceUrho3D_);
     vector<GlobalFunctionAnalyzer> globalFunctionAnalyzers = namespaceAnalyzer.GetFunctions();
 
-    _result = make_shared<ASGeneratedFile_GlobalFunctions>(outputPath, "ASRegisterGenerated_GlobalFunctions");
-
     for (const GlobalFunctionAnalyzer& globalFunctionAnalyzer : globalFunctionAnalyzers)
         ProcessGlobalFunction(globalFunctionAnalyzer);
-
-    _result->Save();
 }
 
 }

@@ -90,14 +90,6 @@ public:
     void Save() override;
 };
 
-class ASGeneratedFile_GlobalFunctions : public ASGeneratedFile_WithRegistrationFunction
-{
-public:
-    using ASGeneratedFile_WithRegistrationFunction::ASGeneratedFile_WithRegistrationFunction;
-
-    void Save() override;
-};
-
 class ASGeneratedFile_Templates : public ASGeneratedFile_Base
 {
 
@@ -110,21 +102,32 @@ public:
 
 struct ProcessedEnum
 {
-    // Used for alphabetical sorting
-    string name_;
-
+    string name_; // Used for sorting
     string comment_;
     vector<string> glue_; // Can be empty
     string insideDefine_; // Can be empty
     vector<string> registration_;
 
-    // Used for alphabetical sorting
+    // Used for sorting
     bool operator <(const ProcessedEnum& rhs) const;
+};
+
+struct ProcessedGlobalFunction
+{
+    string name_; // Used for sorting
+    string comment_;
+    string glue_; // Can be empty
+    string insideDefine_; // Can be empty
+    string registration_;
+
+    // Used for sorting
+    bool operator <(const ProcessedGlobalFunction& rhs) const;
 };
 
 namespace Result
 {
     extern vector<ProcessedEnum> enums_;
+    extern vector<ProcessedGlobalFunction> globalFunctions_;
 
     // Add header to lists if not added yet
     void AddHeader(const string& headerFile);
