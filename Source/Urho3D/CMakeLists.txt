@@ -211,10 +211,11 @@ if (URHO3D_GENERATEBINDINGS)
     # Add "${CMAKE_SOURCE_DIR}/Source/Urho3D/" to every item in list
     list(TRANSFORM AS_GENERATED_FILES_FULL_PATHS PREPEND "${CMAKE_SOURCE_DIR}/Source/Urho3D/")
 
-    # If generated files already exists they will be in list SOURCE_FILES already.
-    # We need list without generated files to solve circular dependency
-    set (SOURCE_FILES_WITHOUT_GENERATED "${SOURCE_FILES}")
-    list (REMOVE_ITEM SOURCE_FILES_WITHOUT_GENERATED ${AS_GENERATED_FILES})
+    set (BINDED_HEADER_FILES "${SOURCE_FILES}")
+    # Header files only are used when generating bindings
+    list (FILTER BINDED_HEADER_FILES INCLUDE REGEX ".*\.h$")
+    # Exclude files from AngelScript directory to solve circular dependency
+    list (FILTER BINDED_HEADER_FILES EXCLUDE REGEX "^AngelScript/")
 
     # Generate xmls and run BindingGenerator
     add_custom_command (OUTPUT ${AS_GENERATED_FILES_FULL_PATHS}
@@ -226,13 +227,16 @@ if (URHO3D_GENERATEBINDINGS)
                         COMMAND ${DOXYGEN_EXECUTABLE} "${DOXYFILE_PATH}"
                         COMMAND ${CMAKE_COMMAND} -E echo "Running ${BINDING_GENERATOR_PATH} ${XML_AST_DIR} ${CMAKE_SOURCE_DIR}"
                         COMMAND "${BINDING_GENERATOR_PATH}" "${XML_AST_DIR}" "${CMAKE_SOURCE_DIR}"
-                        DEPENDS BindingGenerator "${DOXYFILE_PATH}" "${SOURCE_FILES_WITHOUT_GENERATED}"
+                        DEPENDS BindingGenerator "${DOXYFILE_PATH}" "${BINDED_HEADER_FILES}"
                         COMMENT "Generating bindings to script languages")
 
     if (URHO3D_ANGELSCRIPT)
-        # Make sure we have generated files in SOURCE_FILES
-        set (SOURCE_FILES "${SOURCE_FILES_WITHOUT_GENERATED}")
+        # If generated files already exists they will be in list SOURCE_FILES already.
+        # But they can also be removed.
+        # Make sure we have generated files in SOURCE_FILES in a single copy
+        list (REMOVE_ITEM SOURCE_FILES ${AS_GENERATED_FILES})
         list (APPEND SOURCE_FILES ${AS_GENERATED_FILES})
+        
         source_group ("Source Files\\AngelScript" FILES ${AS_GENERATED_FILES})
     endif()
 
