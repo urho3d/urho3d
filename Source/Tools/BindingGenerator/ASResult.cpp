@@ -391,30 +391,30 @@ namespace Result
         string openedDefine;
         string lastComment;
 
-        for (const ProcessedGlobalVariable& globalVeriable : globalVariables_)
+        for (const ProcessedGlobalVariable& globalVariable : globalVariables_)
         {
-            if (globalVeriable.insideDefine_ != openedDefine && !openedDefine.empty())
+            if (globalVariable.insideDefine_ != openedDefine && !openedDefine.empty())
             {
                 ofs << "#endif\n";
                 openedDefine.clear();
             }
 
-            if (!isFirst && lastComment != globalVeriable.comment_)
+            if (!isFirst && lastComment != globalVariable.comment_)
                 ofs << "\n";
 
-            if (globalVeriable.insideDefine_ != openedDefine && !globalVeriable.insideDefine_.empty())
+            if (globalVariable.insideDefine_ != openedDefine && !globalVariable.insideDefine_.empty())
             {
-                ofs << "#ifdef " << globalVeriable.insideDefine_ << "\n";
-                openedDefine = globalVeriable.insideDefine_;
+                ofs << "#ifdef " << globalVariable.insideDefine_ << "\n";
+                openedDefine = globalVariable.insideDefine_;
             }
 
-            if (lastComment != globalVeriable.comment_)
-                ofs << "    // " << globalVeriable.comment_ << "\n";
+            if (lastComment != globalVariable.comment_)
+                ofs << "    // " << globalVariable.comment_ << "\n";
 
-            ofs << "    " << globalVeriable.registration_ << "\n";
+            ofs << "    " << globalVariable.registration_ << "\n";
 
             isFirst = false;
-            lastComment = globalVeriable.comment_;
+            lastComment = globalVariable.comment_;
         }
 
         if (!openedDefine.empty())
