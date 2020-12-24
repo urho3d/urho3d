@@ -203,7 +203,7 @@ if (URHO3D_GENERATEBINDINGS)
                             "AngelScript/Generated_Members_Z.cpp"
                             "AngelScript/Generated_Members_Other.cpp"
                             "AngelScript/Generated_GlobalVariables.cpp"
-                            "AngelScript/Generated_GlobalFunctions.cpp"
+                            "AngelScript/GeneratedGlobalFunctions.cpp"
                             "AngelScript/GeneratedIncludes.h"
                             "AngelScript/Generated_Templates.h")
 

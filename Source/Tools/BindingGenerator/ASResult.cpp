@@ -154,32 +154,6 @@ void ASGeneratedFile_GlobalVariables::Save()
 
 // ============================================================================
 
-void ASGeneratedFile_GlobalFunctions::Save()
-{
-    ofstream out(outputFilePath_);
-
-    out <<
-        "// DO NOT EDIT. This file is generated\n"
-        "\n"
-        "#include \"../Precompiled.h\"\n"
-        "#include \"../AngelScript/APITemplates.h\"\n"
-        "\n"
-        "#include \"../AngelScript/GeneratedIncludes.h\"\n"
-        "\n"
-        "namespace Urho3D\n"
-        "{\n"
-        "\n"
-        << glue_.str() <<
-        "void " << functionName_ << "(asIScriptEngine* engine)\n"
-        "{\n"
-        << reg_.str() <<
-        "}\n"
-        "\n"
-        "}\n";
-}
-
-// ============================================================================
-
 ASGeneratedFile_Templates::ASGeneratedFile_Templates(const string& outputFilePath)
 {
     outputFilePath_ = outputFilePath;
@@ -214,10 +188,26 @@ void ASGeneratedFile_Templates::Save()
 
 bool ProcessedEnum::operator <(const ProcessedEnum& rhs) const
 {
-    if (insideDefine_ == rhs.insideDefine_)
+    if (insideDefine_ != rhs.insideDefine_)
+        return insideDefine_ < rhs.insideDefine_;
+
+    return name_ < rhs.name_;
+}
+
+bool ProcessedGlobalFunction::operator <(const ProcessedGlobalFunction& rhs) const
+{
+    if (insideDefine_ != rhs.insideDefine_)
+        return insideDefine_ < rhs.insideDefine_;
+
+    if (name_ != rhs.name_)
         return name_ < rhs.name_;
 
-    return insideDefine_ < rhs.insideDefine_;
+    // Overloads with the same name may exist
+    if (comment_ != rhs.comment_)
+        return comment_ < rhs.comment_;
+
+    // Different specializations of the same template and aliases have the same comment
+    return registration_ < rhs.registration_;
 }
 
 namespace Result
@@ -291,9 +281,92 @@ namespace Result
             ofs << "    // " << processedEnum.comment_ << "\n";
 
             for (const string& registration : processedEnum.registration_)
-                ofs << "    "  << registration << "\n";
+                ofs << "    " << registration << "\n";
 
             isFirst = false;
+        }
+
+        if (!openedDefine.empty())
+            ofs << "#endif\n";
+
+        ofs <<
+            "}\n"
+            "\n"
+            "}\n";
+    }
+
+    // ============================================================================
+
+    vector<ProcessedGlobalFunction> globalFunctions_;
+
+    // Write result to GlobalFunctions.cpp
+    static void SaveGlobalFunctions(const string& outputBasePath)
+    {
+        sort(globalFunctions_.begin(), globalFunctions_.end());
+
+        ofstream ofs(outputBasePath + "/Source/Urho3D/AngelScript/GeneratedGlobalFunctions.cpp");
+
+        ofs <<
+            "// DO NOT EDIT. This file is generated\n"
+            "\n"
+            "#include \"../Precompiled.h\"\n"
+            "#include \"../AngelScript/APITemplates.h\"\n"
+            "\n"
+            "#include \"../AngelScript/GeneratedIncludes.h\"\n"
+            "\n"
+            "namespace Urho3D\n"
+            "{\n"
+            "\n";
+
+        for (const ProcessedGlobalFunction& globalFunction : globalFunctions_)
+        {
+            if (globalFunction.glue_.empty())
+                continue;
+
+            if (!globalFunction.insideDefine_.empty())
+                ofs << "#ifdef " << globalFunction.insideDefine_ << "\n";
+
+            ofs << "// " << globalFunction.comment_ << "\n";
+            ofs << globalFunction.glue_ << "\n";
+
+            if (!globalFunction.insideDefine_.empty())
+                ofs << "#endif\n";
+
+            ofs << "\n";
+        }
+
+        ofs <<
+            "void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)\n"
+            "{\n";
+
+        bool isFirst = true;
+        string openedDefine;
+        string lastComment;
+
+        for (const ProcessedGlobalFunction& globalFunction : globalFunctions_)
+        {
+            if (globalFunction.insideDefine_ != openedDefine && !openedDefine.empty())
+            {
+                ofs << "#endif\n";
+                openedDefine.clear();
+            }
+
+            if (!isFirst && lastComment != globalFunction.comment_)
+                ofs << "\n";
+
+            if (globalFunction.insideDefine_ != openedDefine && !globalFunction.insideDefine_.empty())
+            {
+                ofs << "#ifdef " << globalFunction.insideDefine_ << "\n";
+                openedDefine = globalFunction.insideDefine_;
+            }
+
+            if (lastComment != globalFunction.comment_)
+                ofs << "    // " << globalFunction.comment_ << "\n";
+
+            ofs << "    " << globalFunction.registration_ << "\n";
+
+            isFirst = false;
+            lastComment = globalFunction.comment_;
         }
 
         if (!openedDefine.empty())
@@ -419,6 +492,7 @@ namespace Result
 void SaveResult(const string& outputBasePath)
 {
     Result::SaveEnums(outputBasePath);
+    Result::SaveGlobalFunctions(outputBasePath);
     Result::SaveIncludes(outputBasePath);
 }
 
