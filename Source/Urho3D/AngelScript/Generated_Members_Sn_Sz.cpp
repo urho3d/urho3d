@@ -113,7 +113,7 @@ static void Spline_Spline_Spline(Spline* ptr, const Spline &rhs)
     new(ptr) Spline(rhs);
 }
 
-// Spline::~Spline() | Implicitly-declared 
+// Spline::~Spline() | Implicitly-declared
 static void Spline_Destructor(Spline* ptr)
 {
     ptr->~Spline();
@@ -492,14 +492,14 @@ static void SourceBatch_Destructor_SourceBatch_void(SourceBatch* ptr)
 }
 
 #ifdef URHO3D_URHO2D
-// SourceBatch2D::~SourceBatch2D() | Implicitly-declared 
+// SourceBatch2D::~SourceBatch2D() | Implicitly-declared
 static void SourceBatch2D_Destructor(SourceBatch2D* ptr)
 {
     ptr->~SourceBatch2D();
 }
 #endif
 
-// StaticModelGeometryData::~StaticModelGeometryData() | Implicitly-declared 
+// StaticModelGeometryData::~StaticModelGeometryData() | Implicitly-declared
 static void StaticModelGeometryData_Destructor(StaticModelGeometryData* ptr)
 {
     ptr->~StaticModelGeometryData();
@@ -511,7 +511,7 @@ static void StoredLogMessage_StoredLogMessage_String_int_bool(StoredLogMessage* 
     new(ptr) StoredLogMessage(message, level, error);
 }
 
-// StoredLogMessage::~StoredLogMessage() | Implicitly-declared 
+// StoredLogMessage::~StoredLogMessage() | Implicitly-declared
 static void StoredLogMessage_Destructor(StoredLogMessage* ptr)
 {
     ptr->~StoredLogMessage();

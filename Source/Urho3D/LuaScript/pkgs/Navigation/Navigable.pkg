@@ -4,6 +4,6 @@ class Navigable : public Component
 {
     void SetRecursive(bool enable);
     bool IsRecursive() const;
-    
+
     tolua_property__is_set bool recursive;
 };

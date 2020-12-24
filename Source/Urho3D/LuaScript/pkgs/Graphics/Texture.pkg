@@ -10,7 +10,7 @@ class Texture : public ResourceWithMetadata
     void SetSRGB(bool enable);
     void SetBackupTexture(Texture* texture);
     void SetMipsToSkip(MaterialQuality quality, int toSkip);
-    
+
     unsigned GetFormat() const;
     bool IsCompressed() const;
     unsigned GetLevels() const;

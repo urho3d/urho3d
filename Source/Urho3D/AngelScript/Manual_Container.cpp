@@ -143,7 +143,7 @@ void ASRegisterManualLast_Container(asIScriptEngine* engine)
 {
     static StringFactory stringFactory;
     engine->RegisterStringFactory("String", &stringFactory);
-    
+
     engine->RegisterObjectMethod("String", "String& opAssign(int)", asFUNCTION(StringAssignInt), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "String opAdd(int) const", asFUNCTION(StringAddInt), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "String opAdd_r(int) const", asFUNCTION(StringAddIntReverse), asCALL_CDECL_OBJLAST);

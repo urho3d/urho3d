@@ -4,14 +4,14 @@ class CheckBox : public BorderImage
 {
     CheckBox();
     virtual ~CheckBox();
-    
+
     void SetChecked(bool enable);
     void SetCheckedOffset(const IntVector2& rect);
     void SetCheckedOffset(int x, int y);
-    
+
     bool IsChecked() const;
     const IntVector2& GetCheckedOffset() const;
-    
+
     tolua_property__is_set bool checked;
     tolua_property__get_set IntVector2& checkedOffset;
 };

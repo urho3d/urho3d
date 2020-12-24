@@ -59,7 +59,7 @@ static void TrailPoint_TrailPoint_Vector3_Vector3(TrailPoint* ptr, const Vector3
     new(ptr) TrailPoint(position, forward);
 }
 
-// TrailPoint::~TrailPoint() | Implicitly-declared 
+// TrailPoint::~TrailPoint() | Implicitly-declared
 static void TrailPoint_Destructor(TrailPoint* ptr)
 {
     ptr->~TrailPoint();

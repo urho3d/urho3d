@@ -220,7 +220,7 @@ template <class A, class B> B* RefCast(A* a)
 {
     if (!a)
         return nullptr;
-    
+
     B* b = dynamic_cast<B*>(a);
 
     return b;
@@ -232,10 +232,10 @@ template <class BaseType, class DerivedType> void RegisterSubclass(asIScriptEngi
 {
     if (!strcmp(baseClassName, derivedClassName))
         return;
-    
+
     String declReturnBase(String(baseClassName) + "@+ opImplCast()");
     engine->RegisterObjectMethod(derivedClassName, declReturnBase.CString(), asFUNCTION((RefCast<DerivedType, BaseType>)), asCALL_CDECL_OBJLAST);
-    
+
     String declReturnBaseConst("const " + String(baseClassName) + "@+ opImplCast() const");
     engine->RegisterObjectMethod(derivedClassName, declReturnBaseConst.CString(), asFUNCTION((RefCast<DerivedType, BaseType>)), asCALL_CDECL_OBJLAST);
 
@@ -259,14 +259,14 @@ template <class SrcClass, class DstClass> DstClass* ValCast(SrcClass* src)
 {
     if (!src)
         return nullptr;
-    
+
     return dynamic_cast<DstClass*>(src);
 }
 
 template <class baseClass, class subclass> void RegisterSubclassValue(asIScriptEngine* engine, const char* baseClassName, const char* subclassName)
 {
     assert(!strcmp(baseClassName, subclassName));
-    
+
     String decl(String(baseClassName) + " opImplConvCast() const");
     engine->RegisterObjectMethod(subclassName, decl.CString(), asFUNCTION((ValCast<subclass, baseClass>)), asCALL_CDECL_OBJLAST);
 }

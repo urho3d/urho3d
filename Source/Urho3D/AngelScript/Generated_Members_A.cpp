@@ -176,7 +176,7 @@ static void AreaAllocator_AreaAllocator_int_int_int_int_bool(AreaAllocator* ptr,
     new(ptr) AreaAllocator(width, height, maxWidth, maxHeight, fastMode);
 }
 
-// AreaAllocator::~AreaAllocator() | Implicitly-declared 
+// AreaAllocator::~AreaAllocator() | Implicitly-declared
 static void AreaAllocator_Destructor(AreaAllocator* ptr)
 {
     ptr->~AreaAllocator();
@@ -214,13 +214,13 @@ static void Audio_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Audio*
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
 }
 
-// AllocatorBlock::~AllocatorBlock() | Implicitly-declared 
+// AllocatorBlock::~AllocatorBlock() | Implicitly-declared
 static void AllocatorBlock_Destructor(AllocatorBlock* ptr)
 {
     ptr->~AllocatorBlock();
 }
 
-// AllocatorNode::~AllocatorNode() | Implicitly-declared 
+// AllocatorNode::~AllocatorNode() | Implicitly-declared
 static void AllocatorNode_Destructor(AllocatorNode* ptr)
 {
     ptr->~AllocatorNode();
@@ -232,7 +232,7 @@ static AnimationControl* AnimationControl_AnimationControl_void()
     return new AnimationControl();
 }
 
-// AnimationKeyFrame::~AnimationKeyFrame() | Implicitly-declared 
+// AnimationKeyFrame::~AnimationKeyFrame() | Implicitly-declared
 static void AnimationKeyFrame_Destructor(AnimationKeyFrame* ptr)
 {
     ptr->~AnimationKeyFrame();
@@ -250,19 +250,19 @@ static AnimationTrack* AnimationTrack_AnimationTrack_void()
     return new AnimationTrack();
 }
 
-// AnimationTriggerPoint::~AnimationTriggerPoint() | Implicitly-declared 
+// AnimationTriggerPoint::~AnimationTriggerPoint() | Implicitly-declared
 static void AnimationTriggerPoint_Destructor(AnimationTriggerPoint* ptr)
 {
     ptr->~AnimationTriggerPoint();
 }
 
-// AsyncProgress::~AsyncProgress() | Implicitly-declared 
+// AsyncProgress::~AsyncProgress() | Implicitly-declared
 static void AsyncProgress_Destructor(AsyncProgress* ptr)
 {
     ptr->~AsyncProgress();
 }
 
-// AttributeInfo::~AttributeInfo() | Implicitly-declared 
+// AttributeInfo::~AttributeInfo() | Implicitly-declared
 static void AttributeInfo_Destructor(AttributeInfo* ptr)
 {
     ptr->~AttributeInfo();

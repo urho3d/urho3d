@@ -9,7 +9,7 @@ class Plane
     Plane(const Vector3& normal, const Vector3& point);
     Plane(const Vector4& plane);
     ~Plane();
-    
+
     void Define(const Vector3& v0, const Vector3& v1, const Vector3& v2);
     void Define(const Vector3& normal, const Vector3& point);
     void Define(const Vector4& plane);
@@ -29,6 +29,6 @@ class Plane
     Vector3 normal_ @ normal;
     Vector3 absNormal_ @ absNormal;
     float d_ @ d;
-    
+
     static const Plane UP;
 };

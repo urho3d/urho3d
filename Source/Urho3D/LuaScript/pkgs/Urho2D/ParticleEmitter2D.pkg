@@ -1,7 +1,7 @@
 $#include "Urho2D/ParticleEmitter2D.h"
 
 class ParticleEmitter2D : public Drawable2D
-{    
+{
 public:
     void SetEffect(ParticleEffect2D* effect);
     void SetSprite(Sprite2D* sprite);

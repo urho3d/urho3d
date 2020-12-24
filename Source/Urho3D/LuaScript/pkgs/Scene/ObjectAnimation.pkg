@@ -11,7 +11,7 @@ class ObjectAnimation : Resource
 {
     ObjectAnimation();
     virtual ~ObjectAnimation();
-    
+
     void AddAttributeAnimation(const String name, ValueAnimation* attributeAnimation, WrapMode wrapMode = WM_LOOP, float speed = 1.0f);
     void RemoveAttributeAnimation(const String name);
     void RemoveAttributeAnimation(ValueAnimation* attributeAnimation);

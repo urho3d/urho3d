@@ -153,7 +153,7 @@ Script::Script(Context* context) :
     ASRegisterGeneratedEnums(scriptEngine_);
     ASRegisterGenerated_Classes(scriptEngine_);
     ASRegisterGenerated_Members_HighPriority(scriptEngine_);
-    
+
     ASRegisterGenerated_Members_A(scriptEngine_);
     ASRegisterGenerated_Members_B(scriptEngine_);
     ASRegisterGenerated_Members_Ca_Cm(scriptEngine_);
@@ -186,10 +186,10 @@ Script::Script(Context* context) :
     ASRegisterGenerated_Members_Z(scriptEngine_);
 
     ASRegisterGenerated_Members_Other(scriptEngine_);
-    
+
     ASRegisterGeneratedGlobalVariables(scriptEngine_);
     ASRegisterGeneratedGlobalFunctions(scriptEngine_);
-    
+
     ASRegisterManualLast(scriptEngine_);
 
     // Register the rest of the script API

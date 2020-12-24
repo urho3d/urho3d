@@ -12,7 +12,7 @@ class RenderSurface
     void SetLinkedDepthStencil(RenderSurface* depthStencil);
     void QueueUpdate();
     void Release();
-    
+
     Texture* GetParentTexture() const;
     int GetWidth() const;
     int GetHeight() const;
@@ -23,7 +23,7 @@ class RenderSurface
     RenderSurface* GetLinkedRenderTarget() const;
     RenderSurface* GetLinkedDepthStencil() const;
     bool IsResolveDirty() const;
-    
+
     tolua_readonly tolua_property__get_set Texture* parentTexture;
     tolua_readonly tolua_property__get_set int width;
     tolua_readonly tolua_property__get_set int height;

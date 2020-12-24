@@ -62,7 +62,7 @@ function coroutine.sendevent(event)
     end
 
     waitEventCoroutines_[event] = nil
-    
+
     for _, co in ipairs(coroutines) do
         coroutine.resume(co)
     end

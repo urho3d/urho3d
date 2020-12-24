@@ -4,31 +4,31 @@ class DropDownList : public Menu
 {
     DropDownList();
     ~DropDownList();
-    
+
     void AddItem(UIElement* item);
     void InsertItem(unsigned index, UIElement* item);
     void RemoveItem(UIElement* item);
     void RemoveItem(unsigned index);
     void RemoveAllItems();
     void SetSelection(unsigned index);
-    
+
     void SetPlaceholderText(const String text);
-    
+
     void SetResizePopup(bool enable);
-   
+
     unsigned GetNumItems() const;
     UIElement* GetItem(unsigned index) const;
-    
+
     // PODVector<UIElement*> GetItems() const;
     tolua_outside const PODVector<UIElement*>& DropDownListGetItems @ GetItems() const;
-    
+
     unsigned GetSelection() const;
     UIElement* GetSelectedItem() const;
     ListView* GetListView() const;
     UIElement* GetPlaceholder() const;
     const String GetPlaceholderText() const;
     bool GetResizePopup() const;
-    
+
     tolua_readonly tolua_property__get_set unsigned numItems;
     tolua_property__get_set unsigned selection;
     tolua_readonly tolua_property__get_set UIElement* selectedItem;

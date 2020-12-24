@@ -4,19 +4,19 @@ class Slider : public BorderImage
 {
     Slider();
     virtual ~Slider();
-    
+
     void SetOrientation(Orientation orientation);
     void SetRange(float range);
     void SetValue(float value);
     void ChangeValue(float delta);
     void SetRepeatRate(float rate);
-    
+
     Orientation GetOrientation() const;
     float GetRange() const;
     float GetValue() const;
     BorderImage* GetKnob() const;
     float GetRepeatRate() const;
-    
+
     tolua_property__get_set Orientation orientation;
     tolua_property__get_set float range;
     tolua_property__get_set float value;

@@ -2416,7 +2416,7 @@ void RegisterString(asIScriptEngine *engine)
     //static StringFactory stringFactory;
     //engine->RegisterGlobalProperty("const uint NPOS", (void*)&NPOS);
     //engine->RegisterStringFactory("String", &stringFactory);
-    
+
     // TODO Обертку с контролем размера массива
     //engine->RegisterObjectMethod("String", "uint8 &opIndex(uint)", asFUNCTION(StringCharAt), asCALL_CDECL_OBJLAST);
     //engine->RegisterObjectMethod("String", "const uint8 &opIndex(uint) const", asFUNCTION(StringCharAt), asCALL_CDECL_OBJLAST);
@@ -2425,14 +2425,14 @@ void RegisterString(asIScriptEngine *engine)
     //engine->RegisterObjectMethod("String", "void Replace(uint8, uint8, bool caseSensitive = true)", asMETHODPR(String, Replace, (char, char, bool), void), asCALL_THISCALL);
     //engine->RegisterObjectMethod("String", "String Replaced(uint8, uint8, bool caseSensitive = true) const", asMETHODPR(String, Replaced, (char, char, bool) const, String), asCALL_THISCALL);
     //engine->RegisterObjectMethod("String", "uint Find(uint8, uint start = 0, bool caseSensitive = true) const", asMETHODPR(String, Find, (char, unsigned, bool) const, unsigned), asCALL_THISCALL);
-    
+
     // NPOS починить
     //engine->RegisterObjectMethod("String", "uint FindLast(const String&in, uint start = 0xffffffff, bool caseSensitive = true) const", asMETHODPR(String, FindLast, (const String&, unsigned, bool) const, unsigned), asCALL_THISCALL);
     //engine->RegisterObjectMethod("String", "uint FindLast(uint8, uint start = 0xffffffff, bool caseSensitive = true) const", asMETHODPR(String, FindLast, (char, unsigned, bool) const, unsigned), asCALL_THISCALL);
-    
+
     // ручная привязка
     //engine->RegisterObjectMethod("String", "void SetUTF8FromLatin1(const String& in)", asFUNCTION(StringSetUTF8FromLatin1), asCALL_CDECL_OBJLAST);
-    
+
     // TODO у меня int8
     //engine->RegisterObjectMethod("String", "bool Contains(uint8, bool caseSensitive = true) const", asMETHODPR(String, Contains, (char, bool) const, bool), asCALL_THISCALL);
 
@@ -2473,7 +2473,7 @@ void ASRegisterManualFirst_Addons(asIScriptEngine* engine)
     engine->SetTypeInfoUserDataCleanupCallback(CleanupTypeInfoArrayCache, ARRAY_CACHE);
     engine->RegisterObjectType("Array<class T>", 0, asOBJ_REF | asOBJ_TEMPLATE);
     RegisterArray(engine);
-    
+
     engine->RegisterObjectType("DictionaryValue", sizeof(CScriptDictValue), asOBJ_VALUE | asOBJ_ASHANDLE | asOBJ_APP_CLASS_CD);
 }
 

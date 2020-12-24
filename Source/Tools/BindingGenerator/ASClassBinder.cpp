@@ -499,7 +499,7 @@ static void RegisterImplicitlyDeclaredDestructor(const ClassAnalyzer& classAnaly
         result->glue_ << "#ifdef " << insideDefine << "\n";
 
     result->glue_ <<
-        "// " << className << "::~" << className << "() | Implicitly-declared \n"
+        "// " << className << "::~" << className << "() | Implicitly-declared\n"
         "static void " << wrapperName << "(" << className << "* ptr)\n"
         "{\n"
         "    ptr->~" << className << "();\n"

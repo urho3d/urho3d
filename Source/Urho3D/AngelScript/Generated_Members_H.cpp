@@ -12,13 +12,13 @@ namespace Urho3D
 void FakeAddRef(void* ptr);
 void FakeReleaseRef(void* ptr);
 
-// HashBase::~HashBase() | Implicitly-declared 
+// HashBase::~HashBase() | Implicitly-declared
 static void HashBase_Destructor(HashBase* ptr)
 {
     ptr->~HashBase();
 }
 
-// HiresTimer::~HiresTimer() | Implicitly-declared 
+// HiresTimer::~HiresTimer() | Implicitly-declared
 static void HiresTimer_Destructor(HiresTimer* ptr)
 {
     ptr->~HiresTimer();
@@ -33,13 +33,13 @@ static CScriptArray* HttpRequest_ReadStringVector_void(HttpRequest* ptr)
 }
 #endif
 
-// HashIteratorBase::~HashIteratorBase() | Implicitly-declared 
+// HashIteratorBase::~HashIteratorBase() | Implicitly-declared
 static void HashIteratorBase_Destructor(HashIteratorBase* ptr)
 {
     ptr->~HashIteratorBase();
 }
 
-// HashNodeBase::~HashNodeBase() | Implicitly-declared 
+// HashNodeBase::~HashNodeBase() | Implicitly-declared
 static void HashNodeBase_Destructor(HashNodeBase* ptr)
 {
     ptr->~HashNodeBase();

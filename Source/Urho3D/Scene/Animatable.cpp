@@ -244,10 +244,10 @@ bool Animatable::SaveJSON(JSONValue& dest) const
 
         attributeAnimationValue.Set(attr.name_, attributeValue);
     }
-    
+
     if (!attributeAnimationValue.IsNull())
         dest.Set("attributeanimation", attributeAnimationValue);
-    
+
     return true;
 }
 

@@ -39,7 +39,7 @@ static void UI_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(UI* ptr, 
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
 }
 
-// UIBatch::~UIBatch() | Implicitly-declared 
+// UIBatch::~UIBatch() | Implicitly-declared
 static void UIBatch_Destructor(UIBatch* ptr)
 {
     ptr->~UIBatch();

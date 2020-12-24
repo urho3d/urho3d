@@ -53,7 +53,7 @@ namespace Urho3D
 {
 
 static const char* RAKNET_MESSAGEID_STRINGS[] = {
-    "ID_CONNECTED_PING",  
+    "ID_CONNECTED_PING",
     "ID_UNCONNECTED_PING",
     "ID_UNCONNECTED_PING_OPEN_CONNECTIONS",
     "ID_CONNECTED_PONG",
@@ -424,7 +424,7 @@ bool Network::StartServer(unsigned short port, unsigned int maxConnections)
         return true;
 
     URHO3D_PROFILE(StartServer);
-    
+
     SLNet::SocketDescriptor socket;//(port, AF_INET);
     socket.port = port;
     socket.socketFamily = AF_INET;
@@ -518,7 +518,7 @@ void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const Vec
 void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes,
     unsigned contentID)
 {
-    if (!rakPeer_) 
+    if (!rakPeer_)
         return;
 
     VectorBuffer msgData;
@@ -838,7 +838,7 @@ void Network::HandleIncomingPacket(SLNet::Packet* packet, bool isServer)
         if (!isServer)
         {
             using namespace NetworkHostDiscovered;
-            
+
             dataStart += sizeof(SLNet::TimeMS);
             VariantMap& eventMap = context_->GetEventDataMap();
             if (packet->length > packet->length - dataStart) {

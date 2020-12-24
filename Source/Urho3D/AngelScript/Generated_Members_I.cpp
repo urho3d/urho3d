@@ -166,13 +166,13 @@ static void IntVector3_IntVector3_IntVector3(IntVector3* ptr, const IntVector3 &
     new(ptr) IntVector3(rhs);
 }
 
-// IndexBufferDesc::~IndexBufferDesc() | Implicitly-declared 
+// IndexBufferDesc::~IndexBufferDesc() | Implicitly-declared
 static void IndexBufferDesc_Destructor(IndexBufferDesc* ptr)
 {
     ptr->~IndexBufferDesc();
 }
 
-// InstanceData::~InstanceData() | Implicitly-declared 
+// InstanceData::~InstanceData() | Implicitly-declared
 static void InstanceData_Destructor(InstanceData* ptr)
 {
     ptr->~InstanceData();

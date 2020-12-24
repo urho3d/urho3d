@@ -109,7 +109,7 @@ void ASRegisterManualLast_Graphics(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Skybox", "void set_model(Model@+)", asFUNCTION(StaticModelSetModel), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("StaticModelGroup", "void SetModel(Model@+)", asFUNCTION(StaticModelSetModel), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("StaticModelGroup", "void set_model(Model@+)", asFUNCTION(StaticModelSetModel), asCALL_CDECL_OBJLAST);
-    
+
     // template<class T> T * Object::GetSubsystem() const | File: ../Core/Object.h
     engine->RegisterGlobalFunction("Graphics@+ get_graphics()", asFUNCTION(GetGraphics), asCALL_CDECL);
     // template<class T> T * Object::GetSubsystem() const | File: ../Core/Object.h
@@ -424,8 +424,8 @@ CScriptArray* OctreeGetAllDrawables(unsigned char drawableFlags, unsigned viewMa
 }
 
 // ========================================================================================
- 
-// void Renderer::SetVSMShadowParameters(float minVariance, float lightBleedingReduction) | File: ../Graphics/Renderer.h 
+
+// void Renderer::SetVSMShadowParameters(float minVariance, float lightBleedingReduction) | File: ../Graphics/Renderer.h
 void RendererSetVSMShadowParameters(const Vector2& parameters, Renderer* ptr)
 {
     ptr->SetVSMShadowParameters(parameters.x_, parameters.y_);

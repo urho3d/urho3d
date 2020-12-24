@@ -25,9 +25,9 @@ class FileSystem : public Object
     unsigned GetLastModifiedTime(const String fileName) const;
     bool FileExists(const String fileName) const;
     bool DirExists(const String pathName) const;
-    
+
     tolua_outside const Vector<String>& FileSystemScanDir @ ScanDir(const String pathName, const String filter, unsigned flags, bool recursive) const;
-    
+
     String GetProgramDir() const;
     String GetUserDocumentsDir() const;
     String GetAppPreferencesDir(const String org, const String app) const;

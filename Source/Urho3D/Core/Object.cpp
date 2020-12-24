@@ -60,7 +60,7 @@ bool TypeInfo::IsTypeOf(const TypeInfo* typeInfo) const
 {
     if (typeInfo == nullptr)
         return false;
-    
+
     const TypeInfo* current = this;
     while (current)
     {

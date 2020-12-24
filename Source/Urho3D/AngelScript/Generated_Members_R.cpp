@@ -258,7 +258,7 @@ static void RigidBody2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(
 }
 #endif
 
-// RayQueryResult::~RayQueryResult() | Implicitly-declared 
+// RayQueryResult::~RayQueryResult() | Implicitly-declared
 static void RayQueryResult_Destructor(RayQueryResult* ptr)
 {
     ptr->~RayQueryResult();
@@ -271,32 +271,32 @@ static void RefCount_Destructor_RefCount_void(RefCount* ptr)
 }
 
 #ifdef URHO3D_NETWORK
-// RemoteEvent::~RemoteEvent() | Implicitly-declared 
+// RemoteEvent::~RemoteEvent() | Implicitly-declared
 static void RemoteEvent_Destructor(RemoteEvent* ptr)
 {
     ptr->~RemoteEvent();
 }
 #endif
 
-// RenderPathCommand::~RenderPathCommand() | Implicitly-declared 
+// RenderPathCommand::~RenderPathCommand() | Implicitly-declared
 static void RenderPathCommand_Destructor(RenderPathCommand* ptr)
 {
     ptr->~RenderPathCommand();
 }
 
-// RenderTargetInfo::~RenderTargetInfo() | Implicitly-declared 
+// RenderTargetInfo::~RenderTargetInfo() | Implicitly-declared
 static void RenderTargetInfo_Destructor(RenderTargetInfo* ptr)
 {
     ptr->~RenderTargetInfo();
 }
 
-// ReplicationState::~ReplicationState() | Implicitly-declared 
+// ReplicationState::~ReplicationState() | Implicitly-declared
 static void ReplicationState_Destructor(ReplicationState* ptr)
 {
     ptr->~ReplicationState();
 }
 
-// ResourceGroup::~ResourceGroup() | Implicitly-declared 
+// ResourceGroup::~ResourceGroup() | Implicitly-declared
 static void ResourceGroup_Destructor(ResourceGroup* ptr)
 {
     ptr->~ResourceGroup();
@@ -326,7 +326,7 @@ static void ResourceRef_ResourceRef_ResourceRef(ResourceRef* ptr, const Resource
     new(ptr) ResourceRef(rhs);
 }
 
-// ResourceRef::~ResourceRef() | Implicitly-declared 
+// ResourceRef::~ResourceRef() | Implicitly-declared
 static void ResourceRef_Destructor(ResourceRef* ptr)
 {
     ptr->~ResourceRef();
@@ -338,7 +338,7 @@ static void ResourceRefList_ResourceRefList_StringHash(ResourceRefList* ptr, Str
     new(ptr) ResourceRefList(type);
 }
 
-// ResourceRefList::~ResourceRefList() | Implicitly-declared 
+// ResourceRefList::~ResourceRefList() | Implicitly-declared
 static void ResourceRefList_Destructor(ResourceRefList* ptr)
 {
     ptr->~ResourceRefList();

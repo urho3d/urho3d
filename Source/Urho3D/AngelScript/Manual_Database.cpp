@@ -112,7 +112,7 @@ void ASRegisterManualLast_Database(asIScriptEngine* engine)
 {
     RegisterDbResult(engine);
     RegisterDbConnection(engine);
-    
+
     engine->RegisterGlobalFunction("Database@+ get_database()", asFUNCTION(GetDatabase), asCALL_CDECL);
     engine->RegisterGlobalFunction("DBAPI get_DBAPI()", asFUNCTION(GetDBAPI), asCALL_CDECL);
 }

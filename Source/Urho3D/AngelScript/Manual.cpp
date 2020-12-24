@@ -25,7 +25,7 @@
 
 namespace Urho3D
 {
-    
+
 void ASRegisterManualFirst_Addons(asIScriptEngine* engine);
 void ASRegisterManualLast_Addons(asIScriptEngine* engine);
 

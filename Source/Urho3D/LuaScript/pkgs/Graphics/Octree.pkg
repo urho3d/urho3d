@@ -1,7 +1,7 @@
 $#include "Graphics/Octree.h"
 
 class Octree : public Component
-{    
+{
     void SetSize(const BoundingBox& box, unsigned numLevels);
     void Update(const FrameInfo& frame);
     void AddManualDrawable(Drawable* drawable);
@@ -18,9 +18,9 @@ class Octree : public Component
     tolua_outside const PODVector<RayQueryResult>& OctreeRaycast @ Raycast(const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags, unsigned viewMask = DEFAULT_VIEWMASK) const;
     // void RaycastSingle(RayOctreeQuery& query) const;
     tolua_outside RayQueryResult OctreeRaycastSingle @ RaycastSingle(const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags, unsigned viewMask = DEFAULT_VIEWMASK) const;
-    
+
     unsigned GetNumLevels() const;
-    
+
     void QueueUpdate(Drawable* drawable);
     void DrawDebugGeometry(bool depthTest);
 
@@ -33,7 +33,7 @@ static const PODVector<OctreeQueryResult>& OctreeGetDrawablesPoint(const Octree*
     PODVector<Drawable*> drawableResult;
     PointOctreeQuery query(drawableResult, point, drawableFlags, viewMask);
     octree->GetDrawables(query);
-    
+
     static PODVector<OctreeQueryResult> result;
     result.Resize(drawableResult.Size());
     for (unsigned i = 0; i < drawableResult.Size(); ++i)

@@ -236,7 +236,7 @@ if (URHO3D_GENERATEBINDINGS)
         # Make sure we have generated files in SOURCE_FILES in a single copy
         list (REMOVE_ITEM SOURCE_FILES ${AS_GENERATED_FILES})
         list (APPEND SOURCE_FILES ${AS_GENERATED_FILES})
-        
+
         source_group ("Source Files\\AngelScript" FILES ${AS_GENERATED_FILES})
     endif()
 

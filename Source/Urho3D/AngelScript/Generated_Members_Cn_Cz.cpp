@@ -397,13 +397,13 @@ static ColorFrame* ColorFrame_ColorFrame_Color_float(const Color &color, float t
     return new ColorFrame(color, time);
 }
 
-// ComponentReplicationState::~ComponentReplicationState() | Implicitly-declared 
+// ComponentReplicationState::~ComponentReplicationState() | Implicitly-declared
 static void ComponentReplicationState_Destructor(ComponentReplicationState* ptr)
 {
     ptr->~ComponentReplicationState();
 }
 
-// CompressedLevel::~CompressedLevel() | Implicitly-declared 
+// CompressedLevel::~CompressedLevel() | Implicitly-declared
 static void CompressedLevel_Destructor(CompressedLevel* ptr)
 {
     ptr->~CompressedLevel();
@@ -440,7 +440,7 @@ static void CursorShapeInfo_CursorShapeInfo_int(CursorShapeInfo* ptr, int system
     new(ptr) CursorShapeInfo(systemCursor);
 }
 
-// CursorShapeInfo::~CursorShapeInfo() | Implicitly-declared 
+// CursorShapeInfo::~CursorShapeInfo() | Implicitly-declared
 static void CursorShapeInfo_Destructor(CursorShapeInfo* ptr)
 {
     ptr->~CursorShapeInfo();

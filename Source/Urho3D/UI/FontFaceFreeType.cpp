@@ -189,7 +189,7 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
     HashMap<FT_UInt, FT_ULong> charCodes;
     FT_UInt glyphIndex;
     FT_ULong charCode = FT_Get_First_Char(face, &glyphIndex);
-    
+
     while (glyphIndex != 0)
     {
         if (!LoadCharGlyph(charCode, image))

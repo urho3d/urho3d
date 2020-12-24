@@ -158,13 +158,13 @@ static void Frustum_Frustum_Frustum(Frustum* ptr, const Frustum &frustum)
     new(ptr) Frustum(frustum);
 }
 
-// Frustum::~Frustum() | Implicitly-declared 
+// Frustum::~Frustum() | Implicitly-declared
 static void Frustum_Destructor(Frustum* ptr)
 {
     ptr->~Frustum();
 }
 
-// FileSelectorEntry::~FileSelectorEntry() | Implicitly-declared 
+// FileSelectorEntry::~FileSelectorEntry() | Implicitly-declared
 static void FileSelectorEntry_Destructor(FileSelectorEntry* ptr)
 {
     ptr->~FileSelectorEntry();
@@ -176,13 +176,13 @@ static void FocusParameters_FocusParameters_bool_bool_bool_float_float(FocusPara
     new(ptr) FocusParameters(focus, nonUniform, autoSize, quantize, minView);
 }
 
-// FontGlyph::~FontGlyph() | Implicitly-declared 
+// FontGlyph::~FontGlyph() | Implicitly-declared
 static void FontGlyph_Destructor(FontGlyph* ptr)
 {
     ptr->~FontGlyph();
 }
 
-// FrameInfo::~FrameInfo() | Implicitly-declared 
+// FrameInfo::~FrameInfo() | Implicitly-declared
 static void FrameInfo_Destructor(FrameInfo* ptr)
 {
     ptr->~FrameInfo();

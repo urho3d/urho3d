@@ -332,7 +332,7 @@ static PropertySet2D* PropertySet2D_PropertySet2D_void()
 #endif
 
 #ifdef URHO3D_NETWORK
-// PackageDownload::~PackageDownload() | Implicitly-declared 
+// PackageDownload::~PackageDownload() | Implicitly-declared
 static void PackageDownload_Destructor(PackageDownload* ptr)
 {
     ptr->~PackageDownload();
@@ -340,35 +340,35 @@ static void PackageDownload_Destructor(PackageDownload* ptr)
 #endif
 
 #ifdef URHO3D_NETWORK
-// PackageUpload::~PackageUpload() | Implicitly-declared 
+// PackageUpload::~PackageUpload() | Implicitly-declared
 static void PackageUpload_Destructor(PackageUpload* ptr)
 {
     ptr->~PackageUpload();
 }
 #endif
 
-// Particle::~Particle() | Implicitly-declared 
+// Particle::~Particle() | Implicitly-declared
 static void Particle_Destructor(Particle* ptr)
 {
     ptr->~Particle();
 }
 
 #ifdef URHO3D_URHO2D
-// Particle2D::~Particle2D() | Implicitly-declared 
+// Particle2D::~Particle2D() | Implicitly-declared
 static void Particle2D_Destructor(Particle2D* ptr)
 {
     ptr->~Particle2D();
 }
 #endif
 
-// PerThreadSceneResult::~PerThreadSceneResult() | Implicitly-declared 
+// PerThreadSceneResult::~PerThreadSceneResult() | Implicitly-declared
 static void PerThreadSceneResult_Destructor(PerThreadSceneResult* ptr)
 {
     ptr->~PerThreadSceneResult();
 }
 
 #ifdef URHO3D_PHYSICS
-// PhysicsRaycastResult::~PhysicsRaycastResult() | Implicitly-declared 
+// PhysicsRaycastResult::~PhysicsRaycastResult() | Implicitly-declared
 static void PhysicsRaycastResult_Destructor(PhysicsRaycastResult* ptr)
 {
     ptr->~PhysicsRaycastResult();
@@ -376,7 +376,7 @@ static void PhysicsRaycastResult_Destructor(PhysicsRaycastResult* ptr)
 #endif
 
 #ifdef URHO3D_URHO2D
-// PhysicsRaycastResult2D::~PhysicsRaycastResult2D() | Implicitly-declared 
+// PhysicsRaycastResult2D::~PhysicsRaycastResult2D() | Implicitly-declared
 static void PhysicsRaycastResult2D_Destructor(PhysicsRaycastResult2D* ptr)
 {
     ptr->~PhysicsRaycastResult2D();
@@ -384,7 +384,7 @@ static void PhysicsRaycastResult2D_Destructor(PhysicsRaycastResult2D* ptr)
 #endif
 
 #ifdef URHO3D_PHYSICS
-// PhysicsWorldConfig::~PhysicsWorldConfig() | Implicitly-declared 
+// PhysicsWorldConfig::~PhysicsWorldConfig() | Implicitly-declared
 static void PhysicsWorldConfig_Destructor(PhysicsWorldConfig* ptr)
 {
     ptr->~PhysicsWorldConfig();

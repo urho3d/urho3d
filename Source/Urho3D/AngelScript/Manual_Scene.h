@@ -202,7 +202,7 @@ void BoneSetNode(Node* node, Bone* ptr);
     engine->RegisterObjectMethod(className, "void set_node(Node@+)", asFUNCTION(BoneSetNode), asCALL_CDECL_OBJLAST); \
     /* WeakPtr<Node> Bone::node_ | File: ../Graphics/Skeleton.h */ \
     engine->RegisterObjectMethod(className, "Node@+ get_node() const", asFUNCTION(BoneGetNode), asCALL_CDECL_OBJLAST);
-    
+
 // ========================================================================================
 
 #define REGISTER_MANUAL_PART_Component(T, className) \

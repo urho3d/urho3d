@@ -313,25 +313,25 @@ static void SmoothedTransform_UnsubscribeFromAllEventsExcept_PODVectorStringHash
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
 }
 
-// ScenePassInfo::~ScenePassInfo() | Implicitly-declared 
+// ScenePassInfo::~ScenePassInfo() | Implicitly-declared
 static void ScenePassInfo_Destructor(ScenePassInfo* ptr)
 {
     ptr->~ScenePassInfo();
 }
 
-// SceneReplicationState::~SceneReplicationState() | Implicitly-declared 
+// SceneReplicationState::~SceneReplicationState() | Implicitly-declared
 static void SceneReplicationState_Destructor(SceneReplicationState* ptr)
 {
     ptr->~SceneReplicationState();
 }
 
-// ScratchBuffer::~ScratchBuffer() | Implicitly-declared 
+// ScratchBuffer::~ScratchBuffer() | Implicitly-declared
 static void ScratchBuffer_Destructor(ScratchBuffer* ptr)
 {
     ptr->~ScratchBuffer();
 }
 
-// ScreenModeParams::~ScreenModeParams() | Implicitly-declared 
+// ScreenModeParams::~ScreenModeParams() | Implicitly-declared
 static void ScreenModeParams_Destructor(ScreenModeParams* ptr)
 {
     ptr->~ScreenModeParams();
@@ -355,13 +355,13 @@ static void ShaderParameter_ShaderParameter_ShaderType_String_unsigned_unsigned(
     new(ptr) ShaderParameter(type, name, reg, regCount);
 }
 
-// ShaderParameter::~ShaderParameter() | Implicitly-declared 
+// ShaderParameter::~ShaderParameter() | Implicitly-declared
 static void ShaderParameter_Destructor(ShaderParameter* ptr)
 {
     ptr->~ShaderParameter();
 }
 
-// ShadowBatchQueue::~ShadowBatchQueue() | Implicitly-declared 
+// ShadowBatchQueue::~ShadowBatchQueue() | Implicitly-declared
 static void ShadowBatchQueue_Destructor(ShadowBatchQueue* ptr)
 {
     ptr->~ShadowBatchQueue();

@@ -200,7 +200,7 @@ static void DebugLine_DebugLine_Vector3_Vector3_unsigned(DebugLine* ptr, const V
     new(ptr) DebugLine(start, end, color);
 }
 
-// DebugLine::~DebugLine() | Implicitly-declared 
+// DebugLine::~DebugLine() | Implicitly-declared
 static void DebugLine_Destructor(DebugLine* ptr)
 {
     ptr->~DebugLine();
@@ -212,13 +212,13 @@ static void DebugTriangle_DebugTriangle_Vector3_Vector3_Vector3_unsigned(DebugTr
     new(ptr) DebugTriangle(v1, v2, v3, color);
 }
 
-// DebugTriangle::~DebugTriangle() | Implicitly-declared 
+// DebugTriangle::~DebugTriangle() | Implicitly-declared
 static void DebugTriangle_Destructor(DebugTriangle* ptr)
 {
     ptr->~DebugTriangle();
 }
 
-// Decal::~Decal() | Implicitly-declared 
+// Decal::~Decal() | Implicitly-declared
 static void Decal_Destructor(Decal* ptr)
 {
     ptr->~Decal();
@@ -230,14 +230,14 @@ static void DecalVertex_DecalVertex_Vector3_Vector3(DecalVertex* ptr, const Vect
     new(ptr) DecalVertex(position, normal);
 }
 
-// DecalVertex::~DecalVertex() | Implicitly-declared 
+// DecalVertex::~DecalVertex() | Implicitly-declared
 static void DecalVertex_Destructor(DecalVertex* ptr)
 {
     ptr->~DecalVertex();
 }
 
 #ifdef URHO3D_PHYSICS
-// DelayedWorldTransform::~DelayedWorldTransform() | Implicitly-declared 
+// DelayedWorldTransform::~DelayedWorldTransform() | Implicitly-declared
 static void DelayedWorldTransform_Destructor(DelayedWorldTransform* ptr)
 {
     ptr->~DelayedWorldTransform();
@@ -245,7 +245,7 @@ static void DelayedWorldTransform_Destructor(DelayedWorldTransform* ptr)
 #endif
 
 #ifdef URHO3D_URHO2D
-// DelayedWorldTransform2D::~DelayedWorldTransform2D() | Implicitly-declared 
+// DelayedWorldTransform2D::~DelayedWorldTransform2D() | Implicitly-declared
 static void DelayedWorldTransform2D_Destructor(DelayedWorldTransform2D* ptr)
 {
     ptr->~DelayedWorldTransform2D();
@@ -258,7 +258,7 @@ static void DirtyBits_DirtyBits_DirtyBits(DirtyBits* ptr, const DirtyBits &bits)
     new(ptr) DirtyBits(bits);
 }
 
-// DirtyBits::~DirtyBits() | Implicitly-declared 
+// DirtyBits::~DirtyBits() | Implicitly-declared
 static void DirtyBits_Destructor(DirtyBits* ptr)
 {
     ptr->~DirtyBits();

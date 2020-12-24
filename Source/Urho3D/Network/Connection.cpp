@@ -1653,12 +1653,13 @@ void Connection::ProcessUnknownMessage(int msgID, MemoryBuffer& msg)
     SendEvent(E_NETWORKMESSAGE, eventData);
 }
 
-String Connection::GetAddress() const {
-    return String(address_->ToString(false /*write port*/)); 
+String Connection::GetAddress() const
+{
+    return String(address_->ToString(false /*write port*/));
 }
 
 void Connection::SetAddressOrGUID(const SLNet::AddressOrGUID& addr)
-{ 
+{
     delete address_;
     address_ = nullptr;
     address_ = new SLNet::AddressOrGUID(addr);

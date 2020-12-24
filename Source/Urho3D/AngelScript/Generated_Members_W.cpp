@@ -66,7 +66,7 @@ static WorkQueue* WorkQueue_WorkQueue_Context()
     return new WorkQueue(GetScriptContext());
 }
 
-// WindowModeParams::~WindowModeParams() | Implicitly-declared 
+// WindowModeParams::~WindowModeParams() | Implicitly-declared
 static void WindowModeParams_Destructor(WindowModeParams* ptr)
 {
     ptr->~WindowModeParams();

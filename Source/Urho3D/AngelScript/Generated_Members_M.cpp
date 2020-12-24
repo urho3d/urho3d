@@ -242,20 +242,20 @@ static void MutexLock_Destructor_MutexLock_void(MutexLock* ptr)
 }
 
 #ifdef URHO3D_PHYSICS
-// ManifoldPair::~ManifoldPair() | Implicitly-declared 
+// ManifoldPair::~ManifoldPair() | Implicitly-declared
 static void ManifoldPair_Destructor(ManifoldPair* ptr)
 {
     ptr->~ManifoldPair();
 }
 #endif
 
-// MaterialShaderParameter::~MaterialShaderParameter() | Implicitly-declared 
+// MaterialShaderParameter::~MaterialShaderParameter() | Implicitly-declared
 static void MaterialShaderParameter_Destructor(MaterialShaderParameter* ptr)
 {
     ptr->~MaterialShaderParameter();
 }
 
-// ModelMorph::~ModelMorph() | Implicitly-declared 
+// ModelMorph::~ModelMorph() | Implicitly-declared
 static void ModelMorph_Destructor(ModelMorph* ptr)
 {
     ptr->~ModelMorph();

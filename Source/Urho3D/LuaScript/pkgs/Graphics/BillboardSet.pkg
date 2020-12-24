@@ -34,7 +34,7 @@ class BillboardSet : public Drawable
     FaceCameraMode GetFaceCameraMode() const;
     float GetMinAngle() const;
     float GetAnimationLodBias() const;
-    
+
     tolua_property__get_set Material* material;
     tolua_property__get_set unsigned numBillboards;
     tolua_property__is_set bool relative;

@@ -95,7 +95,7 @@ static GImpactMeshData* GImpactMeshData_GImpactMeshData_CustomGeometry(CustomGeo
 }
 #endif
 
-// GeometryDesc::~GeometryDesc() | Implicitly-declared 
+// GeometryDesc::~GeometryDesc() | Implicitly-declared
 static void GeometryDesc_Destructor(GeometryDesc* ptr)
 {
     ptr->~GeometryDesc();

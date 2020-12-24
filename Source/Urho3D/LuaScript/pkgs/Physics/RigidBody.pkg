@@ -48,7 +48,7 @@ class RigidBody : public Component
     void ResetForces();
     void Activate();
     void ReAddBodyToWorld();
-    
+
     PhysicsWorld* GetPhysicsWorld() const;
     float GetMass() const;
     Vector3 GetPosition() const;

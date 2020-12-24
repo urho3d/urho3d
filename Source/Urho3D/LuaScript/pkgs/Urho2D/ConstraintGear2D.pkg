@@ -9,7 +9,7 @@ class ConstraintGear2D : Constraint2D
     Constraint2D* GetOwnerConstraint() const;
     Constraint2D* GetOtherConstraint() const;
     float GetRatio() const;
-    
+
     tolua_property__get_set Constraint2D* ownerConstraint;
     tolua_property__get_set Constraint2D* otherConstraint;
     tolua_property__get_set float ratio;

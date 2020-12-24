@@ -13,18 +13,18 @@ class File : public Object
     File(const String fileName, FileMode mode = FILE_READ);
     File(PackageFile* package, const String fileName);
     ~File();
-    
+
     bool Open(const String fileName, FileMode mode = FILE_READ);
     bool Open(PackageFile* package, const String fileName);
     void Close();
     void Flush();
     void SetName(const String name);
-    
+
     FileMode GetMode() const;
     bool IsOpen() const;
     void* GetHandle() const;
     bool IsPackaged() const;
-    
+
     // From Deserializer
     // unsigned Read(void* dest, unsigned size);
     tolua_outside VectorBuffer DeserializerRead @ Read(unsigned size);
@@ -36,7 +36,7 @@ class File : public Object
     unsigned Tell() const;
     unsigned GetSize() const;
     bool IsEof() const;
-    
+
     int ReadInt();
     long long ReadInt64();
     short ReadShort();
@@ -66,10 +66,10 @@ class File : public Object
     String ReadString();
     String ReadFileID();
     StringHash ReadStringHash();
-    
+
     // PODVector<unsigned char> ReadBuffer();
     VectorBuffer ReadBuffer();
-    
+
     ResourceRef ReadResourceRef();
     ResourceRefList ReadResourceRefList();
     Variant ReadVariant();
@@ -79,11 +79,11 @@ class File : public Object
     unsigned ReadVLE();
     unsigned ReadNetID();
     String ReadLine();
-    
+
     // From Serializer
     // unsigned Write(const void* data, unsigned size);
     tolua_outside unsigned SerializerWrite @ Write(const VectorBuffer& buffer);
-    
+
     bool WriteInt(int value);
     bool WriteInt64(long long value);
     bool WriteShort(short value);
@@ -113,10 +113,10 @@ class File : public Object
     bool WriteString(const String value);
     bool WriteFileID(const String value);
     bool WriteStringHash(const StringHash& value);
-    
+
     // bool WriteBuffer(const PODVector<unsigned char>& buffer);
     tolua_outside bool SerializerWriteBuffer @ WriteBuffer(const VectorBuffer& buffer);
-    
+
     bool WriteResourceRef(const ResourceRef& value);
     bool WriteResourceRefList(const ResourceRefList& value);
     bool WriteVariant(const Variant& value);
@@ -126,11 +126,11 @@ class File : public Object
     bool WriteVLE(unsigned value);
     bool WriteNetID(unsigned value);
     bool WriteLine(const String value);
-    
+
     tolua_readonly tolua_property__get_set FileMode mode;
     tolua_readonly tolua_property__is_set bool open;
     tolua_readonly tolua_property__is_set bool packaged;
-    
+
     // From Deserializer
     tolua_readonly tolua_property__get_set String name;
     tolua_readonly tolua_property__get_set unsigned checksum;

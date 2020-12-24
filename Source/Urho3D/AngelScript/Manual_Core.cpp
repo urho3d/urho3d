@@ -324,7 +324,7 @@ void ASRegisterManualLast_Core(asIScriptEngine* engine)
     RegisterVariantMap(engine);
     RegisterWeakHandle(engine);
     RegisterVariant(engine);
-    
+
     // template<class T> T * Object::GetSubsystem() const | File: ../Core/Object.h
     engine->RegisterGlobalFunction("Time@+ get_time()", asFUNCTION(GetTime), asCALL_CDECL);
 }

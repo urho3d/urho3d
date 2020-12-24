@@ -924,9 +924,9 @@ void DecompressImageETC(unsigned char* dstImage, const void* blocks, int width, 
 
     unsigned char buffer4x4[4 * 4 * 4];
 
-    for (int y = 0; y < h4; ++y) 
+    for (int y = 0; y < h4; ++y)
     {
-        for (int x = 0; x < w4; ++x) 
+        for (int x = 0; x < w4; ++x)
         {
             memset(&buffer4x4[0], 0xFF, 4 * 4 * 4);
             if (hasAlpha)

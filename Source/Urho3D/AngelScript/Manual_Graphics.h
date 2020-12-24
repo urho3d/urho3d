@@ -228,8 +228,8 @@ CScriptArray* OctreeGetAllDrawables(unsigned char drawableFlags, unsigned viewMa
     engine->RegisterObjectMethod(className, "Array<Drawable@>@ GetAllDrawables(uint8 drawableFlags = DRAWABLE_ANY, uint viewMask = DEFAULT_VIEWMASK)", asFUNCTION(OctreeGetAllDrawables), asCALL_CDECL_OBJLAST);
 
 // ========================================================================================
- 
-// void Renderer::SetVSMShadowParameters(float minVariance, float lightBleedingReduction) | File: ../Graphics/Renderer.h 
+
+// void Renderer::SetVSMShadowParameters(float minVariance, float lightBleedingReduction) | File: ../Graphics/Renderer.h
 void RendererSetVSMShadowParameters(const Vector2& parameters, Renderer* ptr);
 
 #define REGISTER_MANUAL_PART_Renderer(T, className) \

@@ -1,14 +1,14 @@
 $#include "Resource/ResourceCache.h"
 
 class ResourceCache
-{    
+{
     void ReleaseAllResources(bool force = false);
     bool ReloadResource(Resource* resource);
     void ReloadResourceWithDependencies(const String fileName);
 
     void SetMemoryBudget(StringHash type, unsigned long long budget);
     void SetMemoryBudget(const String type, unsigned long long budget);
-    
+
     void SetAutoReloadResources(bool enable);
     void SetReturnFailedResources(bool enable);
     void SetSearchPackagesFirst(bool value);
