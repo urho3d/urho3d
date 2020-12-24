@@ -24,7 +24,7 @@ function Start()
     SetupViewport()
 
     -- Set the mouse mode to use in the sample
-    SampleInitMouseMode(MM_RELATIVE)
+    SampleInitMouseMode(MM_FREE)
 
     -- Hook up to the frame update events
     SubscribeToEvents()
@@ -159,8 +159,12 @@ function HandleMouseButtonDown(eventType, eventData)
             -- Swap grass and water
             if layer:GetTile(x, y).gid < 9 then -- First 8 sprites in the "isometric_grass_and_water.png" tileset are mostly grass and from 9 to 24 they are mostly water
                 sprite.sprite = layer:GetTile(0, 0).sprite -- Replace grass by water sprite used in top tile
-            else sprite.sprite = layer:GetTile(24, 24).sprite end -- Replace water by grass sprite used in bottom tile
-        else sprite.sprite = nil end -- 'Remove' sprite
+            else
+                sprite.sprite = layer:GetTile(24, 24).sprite -- Replace water by grass sprite used in bottom tile
+            end
+        else
+            sprite.sprite = nil -- 'Remove' sprite
+        end
     end
 end
 

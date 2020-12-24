@@ -68,7 +68,7 @@ void Urho2DTileMap::Start()
     SubscribeToEvents();
 
     // Set the mouse mode to use in the sample
-    Sample::InitMouseMode(MM_RELATIVE);
+    Sample::InitMouseMode(MM_FREE);
 }
 
 void Urho2DTileMap::CreateScene()
@@ -213,9 +213,13 @@ void Urho2DTileMap::HandleMouseButtonDown(StringHash eventType, VariantMap& even
             // Swap grass and water
             if (layer->GetTile(x, y)->GetGid() < 9) // First 8 sprites in the "isometric_grass_and_water.png" tileset are mostly grass and from 9 to 24 they are mostly water
                 sprite->SetSprite(layer->GetTile(0, 0)->GetSprite()); // Replace grass by water sprite used in top tile
-            else sprite->SetSprite(layer->GetTile(24, 24)->GetSprite()); // Replace water by grass sprite used in bottom tile
+            else
+                sprite->SetSprite(layer->GetTile(24, 24)->GetSprite()); // Replace water by grass sprite used in bottom tile
         }
-        else sprite->SetSprite(nullptr); // 'Remove' sprite
+        else
+        {
+            sprite->SetSprite(nullptr); // 'Remove' sprite
+        }
     }
 }
 
