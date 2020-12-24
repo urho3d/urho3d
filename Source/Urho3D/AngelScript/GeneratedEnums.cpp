@@ -1,6 +1,6 @@
 // DO NOT EDIT. This file is generated
 
-// We need register all enums before registration of any members because members can use any enums
+// We need register all enums before registration of any functions because functions can use any enums
 
 #include "../Precompiled.h"
 #include "../AngelScript/APITemplates.h"

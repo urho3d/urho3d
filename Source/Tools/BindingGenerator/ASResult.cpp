@@ -44,7 +44,7 @@ void ASGeneratedFile_Classes::Save()
     out <<
         "// DO NOT EDIT. This file is generated\n"
         "\n"
-        "// We need register all types before registration of any members because members can use any types\n"
+        "// We need register all types before registration of any functions because functions can use any types\n"
         "\n"
         "#include \"../Precompiled.h\"\n"
         "#include \"../AngelScript/APITemplates.h\"\n"
@@ -125,35 +125,6 @@ void ASGeneratedFile_Members::Save()
 
 // ============================================================================
 
-void ASGeneratedFile_GlobalVariables::Save()
-{
-    ofstream out(outputFilePath_);
-
-    out <<
-        "// DO NOT EDIT. This file is generated\n"
-        "\n"
-        "#include \"../Precompiled.h\"\n"
-        "#include \"../AngelScript/APITemplates.h\"\n"
-        "\n"
-        "#include \"../AngelScript/GeneratedIncludes.h\"\n"
-        "\n"
-        "// Some headers could re-define M_PI, ensure that it's undefined\n"
-        "#undef M_PI\n"
-        "\n"
-        "namespace Urho3D\n"
-        "{\n"
-        "\n"
-        << glue_.str() <<
-        "void " << functionName_ << "(asIScriptEngine* engine)\n"
-        "{\n"
-        << reg_.str() <<
-        "}\n"
-        "\n"
-        "}\n";
-}
-
-// ============================================================================
-
 ASGeneratedFile_Templates::ASGeneratedFile_Templates(const string& outputFilePath)
 {
     outputFilePath_ = outputFilePath;
@@ -210,6 +181,14 @@ bool ProcessedGlobalFunction::operator <(const ProcessedGlobalFunction& rhs) con
     return registration_ < rhs.registration_;
 }
 
+bool ProcessedGlobalVariable::operator <(const ProcessedGlobalVariable& rhs) const
+{
+    if (insideDefine_ != rhs.insideDefine_)
+        return insideDefine_ < rhs.insideDefine_;
+
+    return name_ < rhs.name_;
+}
+
 namespace Result
 {
     vector<ProcessedEnum> enums_;
@@ -224,7 +203,7 @@ namespace Result
         ofs <<
             "// DO NOT EDIT. This file is generated\n"
             "\n"
-            "// We need register all enums before registration of any members because members can use any enums\n"
+            "// We need register all enums before registration of any functions because functions can use any enums\n"
             "\n"
             "#include \"../Precompiled.h\"\n"
             "#include \"../AngelScript/APITemplates.h\"\n"
@@ -380,6 +359,75 @@ namespace Result
 
     // ============================================================================
 
+    vector<ProcessedGlobalVariable> globalVariables_;
+
+    // Write result to GlobalVariables.cpp
+    static void SaveGlobalVariables(const string& outputBasePath)
+    {
+        sort(globalVariables_.begin(), globalVariables_.end());
+
+        ofstream ofs(outputBasePath + "/Source/Urho3D/AngelScript/GeneratedGlobalVariables.cpp");
+
+        ofs <<
+            "// DO NOT EDIT. This file is generated\n"
+            "\n"
+            "#include \"../Precompiled.h\"\n"
+            "#include \"../AngelScript/APITemplates.h\"\n"
+            "\n"
+            "#include \"../AngelScript/GeneratedIncludes.h\"\n"
+            "\n"
+            "// Some headers could re-define M_PI, ensure that it's undefined\n"
+            "#undef M_PI\n"
+            "\n"
+            "namespace Urho3D\n"
+            "{\n"
+            "\n";
+
+        ofs <<
+            "void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)\n"
+            "{\n";
+
+        bool isFirst = true;
+        string openedDefine;
+        string lastComment;
+
+        for (const ProcessedGlobalVariable& globalVeriable : globalVariables_)
+        {
+            if (globalVeriable.insideDefine_ != openedDefine && !openedDefine.empty())
+            {
+                ofs << "#endif\n";
+                openedDefine.clear();
+            }
+
+            if (!isFirst && lastComment != globalVeriable.comment_)
+                ofs << "\n";
+
+            if (globalVeriable.insideDefine_ != openedDefine && !globalVeriable.insideDefine_.empty())
+            {
+                ofs << "#ifdef " << globalVeriable.insideDefine_ << "\n";
+                openedDefine = globalVeriable.insideDefine_;
+            }
+
+            if (lastComment != globalVeriable.comment_)
+                ofs << "    // " << globalVeriable.comment_ << "\n";
+
+            ofs << "    " << globalVeriable.registration_ << "\n";
+
+            isFirst = false;
+            lastComment = globalVeriable.comment_;
+        }
+
+        if (!openedDefine.empty())
+            ofs << "#endif\n";
+
+        ofs <<
+            "}\n"
+            "\n"
+            "}\n";
+    }
+
+    // ============================================================================
+
     // List of all required header files
     static vector<string> headers_;
 
@@ -493,6 +541,7 @@ void SaveResult(const string& outputBasePath)
 {
     Result::SaveEnums(outputBasePath);
     Result::SaveGlobalFunctions(outputBasePath);
+    Result::SaveGlobalVariables(outputBasePath);
     Result::SaveIncludes(outputBasePath);
 }
 

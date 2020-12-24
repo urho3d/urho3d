@@ -1,6 +1,6 @@
 // DO NOT EDIT. This file is generated
 
-// We need register all types before registration of any members because members can use any types
+// We need register all types before registration of any functions because functions can use any types
 
 #include "../Precompiled.h"
 #include "../AngelScript/APITemplates.h"

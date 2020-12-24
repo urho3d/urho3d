@@ -82,14 +82,6 @@ public:
     void Save() override;
 };
 
-class ASGeneratedFile_GlobalVariables : public ASGeneratedFile_WithRegistrationFunction
-{
-public:
-    using ASGeneratedFile_WithRegistrationFunction::ASGeneratedFile_WithRegistrationFunction;
-
-    void Save() override;
-};
-
 class ASGeneratedFile_Templates : public ASGeneratedFile_Base
 {
 
@@ -124,10 +116,22 @@ struct ProcessedGlobalFunction
     bool operator <(const ProcessedGlobalFunction& rhs) const;
 };
 
+struct ProcessedGlobalVariable
+{
+    string name_; // Used for sorting
+    string comment_;
+    string insideDefine_; // Can be empty
+    string registration_;
+
+    // Used for sorting
+    bool operator <(const ProcessedGlobalVariable& rhs) const;
+};
+
 namespace Result
 {
     extern vector<ProcessedEnum> enums_;
     extern vector<ProcessedGlobalFunction> globalFunctions_;
+    extern vector<ProcessedGlobalVariable> globalVariables_;
 
     // Add header to lists if not added yet
     void AddHeader(const string& headerFile);
