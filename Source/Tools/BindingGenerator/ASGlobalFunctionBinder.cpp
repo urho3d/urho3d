@@ -102,10 +102,10 @@ static vector<map<string, string>> GetSpecializations(const GlobalFunctionAnalyz
     return result;
 }
 
-static void BindGlobalFunction(const GlobalFunctionAnalyzer& functionAnalyzer, const map<string, string>& templateSpecialization = map<string, string>())
+static void BindGlobalFunction(const GlobalFunctionAnalyzer& functionAnalyzer)
 {
     string declParams = "";
-    vector<ParamAnalyzer> params = functionAnalyzer.GetParams(templateSpecialization);
+    vector<ParamAnalyzer> params = functionAnalyzer.GetParams();
     string outGlue;
 
     bool needWrapper = false;
@@ -139,7 +139,7 @@ static void BindGlobalFunction(const GlobalFunctionAnalyzer& functionAnalyzer, c
         convertedParams.push_back(conv);
     }
 
-    shared_ptr<FuncReturnTypeConv> retConv = CppFunctionReturnTypeToAS(functionAnalyzer.GetReturnType(templateSpecialization));
+    shared_ptr<FuncReturnTypeConv> retConv = CppFunctionReturnTypeToAS(functionAnalyzer.GetReturnType());
     if (!retConv->success_)
     {
         processedGlobalFunction.registration_ = "// " + GetLastErrorMessage();
@@ -164,7 +164,7 @@ static void BindGlobalFunction(const GlobalFunctionAnalyzer& functionAnalyzer, c
     if (needWrapper)
         processedGlobalFunction.registration_ += "asFUNCTION(" + GenerateWrapperName(functionAnalyzer) + "), asCALL_CDECL);";
     else
-        processedGlobalFunction.registration_ += Generate_asFUNCTIONPR(functionAnalyzer, templateSpecialization) + ", asCALL_CDECL);";
+        processedGlobalFunction.registration_ += Generate_asFUNCTIONPR(functionAnalyzer) + ", asCALL_CDECL);";
 
     Result::globalFunctions_.push_back(processedGlobalFunction);
 
@@ -182,7 +182,7 @@ static void BindGlobalFunction(const GlobalFunctionAnalyzer& functionAnalyzer, c
         if (needWrapper)
             processedGlobalFunction.registration_ += "asFUNCTION(" + GenerateWrapperName(functionAnalyzer) + "), asCALL_CDECL);";
         else
-            processedGlobalFunction.registration_ += Generate_asFUNCTIONPR(functionAnalyzer, templateSpecialization) + ", asCALL_CDECL);";
+            processedGlobalFunction.registration_ += Generate_asFUNCTIONPR(functionAnalyzer) + ", asCALL_CDECL);";
 
         Result::globalFunctions_.push_back(processedGlobalFunction);
     }
@@ -226,7 +226,10 @@ static void ProcessGlobalFunction(const GlobalFunctionAnalyzer& globalFunctionAn
     if (globalFunctionAnalyzer.IsTemplate())
     {
         for (const map<string, string>& specialization : specializations)
-            BindGlobalFunction(globalFunctionAnalyzer, specialization);
+        {
+            GlobalFunctionAnalyzer specializedAnalyzer(globalFunctionAnalyzer.GetMemberdef(), specialization);
+            BindGlobalFunction(specializedAnalyzer);
+        }
     }
     else
     {

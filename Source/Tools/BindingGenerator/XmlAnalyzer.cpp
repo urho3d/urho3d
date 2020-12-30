@@ -213,25 +213,6 @@ string ExtractArgsstring(xml_node memberdef)
     return argsstring.child_value();
 }
 
-vector<string> ExtractTemplateParams(xml_node memberdef)
-{
-    assert(IsMemberdef(memberdef));
-
-    vector<string> result;
-
-    xml_node templateparamlist = memberdef.child("templateparamlist");
-    for (xml_node param : templateparamlist.children("param"))
-    {
-        string type = param.child_value("type");
-        type = CutStart(type, "class ");
-        type = CutStart(type, "typename ");
-        
-        result.push_back(type);
-    }
-
-    return result;
-}
-
 string ExtractProt(xml_node memberdef)
 {
     assert(IsMemberdef(memberdef));
@@ -427,6 +408,25 @@ bool IsTemplate(xml_node node)
     assert(IsMemberdef(node) || IsCompounddef(node));
 
     return node.child("templateparamlist");
+}
+
+vector<string> ExtractTemplateParams(xml_node node)
+{
+    assert(IsMemberdef(node) || IsCompounddef(node));
+
+    vector<string> result;
+
+    xml_node templateparamlist = node.child("templateparamlist");
+    for (xml_node param : templateparamlist.children("param"))
+    {
+        string type = param.child_value("type");
+        type = CutStart(type, "class ");
+        type = CutStart(type, "typename ");
+
+        result.push_back(type);
+    }
+
+    return result;
 }
 
 // ============================================================================
@@ -764,6 +764,22 @@ bool ClassAnalyzer::HasThisConstructor() const
     return false;
 }
 
+bool ClassAnalyzer::IsRefCounted() const
+{
+    if (GetClassName() == "RefCounted")
+        return true;
+
+    vector<ClassAnalyzer> baseClasses = GetAllBaseClasses();
+
+    for (const ClassAnalyzer& classAnalyzer : baseClasses)
+    {
+        if (classAnalyzer.GetClassName() == "RefCounted")
+            return true;
+    }
+
+    return false;
+}
+
 // ============================================================================
 
 ClassFunctionAnalyzer::ClassFunctionAnalyzer(ClassAnalyzer classAnalyzer, xml_node memberdef)
@@ -853,11 +869,6 @@ string GetFunctionLocation(xml_node memberdef)
         result = ReplaceAll(result, " >", ">");
 
     return result;
-}
-
-string ClassFunctionAnalyzer::GetLocation() const
-{
-    return GetFunctionLocation(memberdef_);
 }
 
 bool ClassFunctionAnalyzer::IsConst() const
@@ -954,6 +965,9 @@ string ClassVariableAnalyzer::GetLocation() const
 
     result += " | File: " + GetHeaderFile();
 
+    if (!classAnalyzer_.usingLocation_.empty())
+        result = classAnalyzer_.usingLocation_ + " | " + result;
+
     return result;
 }
 
@@ -990,10 +1004,7 @@ vector<GlobalVariableAnalyzer> NamespaceAnalyzer::GetVariables()
     vector<GlobalVariableAnalyzer> result;
 
     for (xml_node memberdef : sectiondef.children("memberdef"))
-    {
-        GlobalVariableAnalyzer analyzer(memberdef);
-        result.push_back(analyzer);
-    }
+        result.push_back(GlobalVariableAnalyzer(memberdef));
 
     return result;
 }
@@ -1006,10 +1017,7 @@ vector<GlobalFunctionAnalyzer> NamespaceAnalyzer::GetFunctions()
     vector<GlobalFunctionAnalyzer> result;
 
     for (xml_node memberdef : sectiondef.children("memberdef"))
-    {
-        GlobalFunctionAnalyzer analyzer(memberdef);
-        result.push_back(analyzer);
-    }
+        result.push_back(GlobalFunctionAnalyzer(memberdef));
 
     return result;
 }
@@ -1025,8 +1033,9 @@ UsingAnalyzer::UsingAnalyzer(xml_node memberdef)
 
 // ============================================================================
 
-GlobalFunctionAnalyzer::GlobalFunctionAnalyzer(xml_node memberdef)
+GlobalFunctionAnalyzer::GlobalFunctionAnalyzer(xml_node memberdef, const map<string, string>& templateSpecialization)
     : memberdef_(memberdef)
+    , templateSpecialization_(templateSpecialization)
 {
     assert(IsMemberdef(memberdef));
     assert(ExtractKind(memberdef) == "function");

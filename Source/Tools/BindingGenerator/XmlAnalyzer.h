@@ -135,12 +135,6 @@ string ExtractDefinition(xml_node memberdef);
 //     <argsstring>...</argsstring>
 string ExtractArgsstring(xml_node memberdef);
 
-// <memberdef kind="function">
-//     <templateparamlist>
-//         <param>...</param>
-//         <param>...</param>
-vector<string> ExtractTemplateParams(xml_node memberdef);
-
 // <memberdef prot="...">
 string ExtractProt(xml_node memberdef);
 
@@ -196,6 +190,12 @@ string ExtractHeaderFile(xml_node node);
 //     <templateparamlist>
 bool IsTemplate(xml_node node);
 
+// <compounddef|memberdef>
+//     <templateparamlist>
+//         <param>...</param>
+//         <param>...</param>
+vector<string> ExtractTemplateParams(xml_node node);
+
 // <compounddef kind="namespace">
 //     <sectiondef kind="enum">
 //         <memberdef kind="enum">...</memberdef>
@@ -250,6 +250,8 @@ private:
     vector<xml_node> GetMemberdefs() const;
 
 public:
+    string usingLocation_;
+
     ClassAnalyzer(xml_node compounddef);
 
     string GetClassName() const;
@@ -263,7 +265,7 @@ public:
     bool ContainsFunction(const string& name) const;
     ClassFunctionAnalyzer GetFunction(const string& name) const;
     int NumFunctions(const string& name) const;
-    bool IsRefCounted() const { return ContainsFunction("AddRef") && ContainsFunction("ReleaseRef"); }
+    bool IsRefCounted() const;
     bool HasDestructor() const { return ContainsFunction("~" + GetClassName()); }
     bool HasThisConstructor() const;
     bool IsAbstract() const;
@@ -312,7 +314,7 @@ public:
     bool IsParentConstructor() const;
     bool IsThisDestructor() const { return GetName() == "~" + GetClassName(); }
     bool IsParentDestructor() const;
-    string GetLocation() const;
+    string GetLocation() const { return JoinNonEmpty({ classAnalyzer_.usingLocation_, GetFunctionLocation(memberdef_) }, " | "); }
     string GetHeaderFile() const { return ExtractHeaderFile(memberdef_); }
     TypeAnalyzer GetReturnType(const map<string, string>& templateSpecialization = map<string, string>()) const { return ExtractType(memberdef_, templateSpecialization); }
     bool CanBeGetProperty() const;
@@ -355,17 +357,20 @@ public:
 class GlobalFunctionAnalyzer
 {
     xml_node memberdef_;
+    map<string, string> templateSpecialization_;
 
 public:
-    GlobalFunctionAnalyzer(xml_node memberdef);
+    GlobalFunctionAnalyzer(xml_node memberdef, const map<string, string>& templateSpecialization = map<string, string>());
+
+    xml_node GetMemberdef() const { return memberdef_; }
+    const map<string, string>& GetTemplateSpecialization() const { return templateSpecialization_; }
 
     string GetName() const { return ExtractName(memberdef_); }
     string GetHeaderFile() const { return ExtractHeaderFile(memberdef_); }
     bool IsTemplate() const { return ::IsTemplate(memberdef_); }
     string GetComment() const { return ExtractComment(memberdef_); }
-    vector<ParamAnalyzer> GetParams(const map<string, string>& templateSpecialization = map<string, string>()) const { return ExtractParams(memberdef_, templateSpecialization); }
-    TypeAnalyzer GetReturnType(const map<string, string>& templateSpecialization = map<string, string>()) const { return ExtractType(memberdef_, templateSpecialization); }
-    xml_node GetMemberdef() const { return memberdef_; }
+    vector<ParamAnalyzer> GetParams() const { return ExtractParams(memberdef_, templateSpecialization_); }
+    TypeAnalyzer GetReturnType() const { return ExtractType(memberdef_, templateSpecialization_); }
     vector<string> GetTemplateParams() const { return ExtractTemplateParams(memberdef_); }
     string JoinParamsNames() const { return ::JoinParamsNames(memberdef_); }
     string JoinParamsTypes() const { return ::JoinParamsTypes(memberdef_); }

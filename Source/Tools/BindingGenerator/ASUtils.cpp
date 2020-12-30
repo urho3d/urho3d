@@ -67,7 +67,7 @@ shared_ptr<EnumAnalyzer> FindEnum(const string& name)
     NamespaceAnalyzer namespaceAnalyzer(SourceData::namespaceUrho3D_);
     vector<EnumAnalyzer> enumAnalyzers = namespaceAnalyzer.GetEnums();
 
-    for (EnumAnalyzer enumAnalyzer : enumAnalyzers)
+    for (const EnumAnalyzer& enumAnalyzer : enumAnalyzers)
     {
         if (enumAnalyzer.GetTypeName() == name)
             return make_shared<EnumAnalyzer>(enumAnalyzer);
@@ -731,11 +731,11 @@ string GenerateWrapper(const ClassFunctionAnalyzer& functionAnalyzer, bool templ
 
 // =================================================================================
 
-string Generate_asFUNCTIONPR(const GlobalFunctionAnalyzer& functionAnalyzer, const map<string, string>& templateSpecialization)
+string Generate_asFUNCTIONPR(const GlobalFunctionAnalyzer& functionAnalyzer)
 {
     string functionName = functionAnalyzer.GetName();
-    string cppParams = "(" + JoinParamsTypes(functionAnalyzer.GetMemberdef(), templateSpecialization) + ")";
-    string returnType = functionAnalyzer.GetReturnType(templateSpecialization).ToString();
+    string cppParams = "(" + JoinParamsTypes(functionAnalyzer.GetMemberdef(), functionAnalyzer.GetTemplateSpecialization()) + ")";
+    string returnType = functionAnalyzer.GetReturnType().ToString();
     return "asFUNCTIONPR(" + functionName + ", " + cppParams + ", " + returnType + ")";
 }
 
