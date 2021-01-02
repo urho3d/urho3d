@@ -38,7 +38,6 @@ namespace ASBindingGenerator
 
 static string _outputBasePath;
 
-static shared_ptr<ASGeneratedFile_Classes> _result_Classes;
 static shared_ptr<ASGeneratedFile_Members_HighPriority> _result_Members_HighPriority;
 static shared_ptr<ASGeneratedFile_Members> _result_Members_A;
 static shared_ptr<ASGeneratedFile_Members> _result_Members_B;
@@ -1239,11 +1238,12 @@ static void RegisterObjectMembers(const ClassAnalyzer& classAnalyzer, bool templ
         result->reg_ << "\n";
 }
 
-static void RegisterObjectType(const ClassAnalyzer& classAnalyzer, bool templateVersion)
+// Only template version
+static void RegisterObjectType(const ClassAnalyzer& classAnalyzer/*, bool templateVersion*/)
 {
     string header = classAnalyzer.GetHeaderFile();
 
-    ASGeneratedFile_Base* result = templateVersion ? (ASGeneratedFile_Base*)_result_Templates.get() : (ASGeneratedFile_Base*)_result_Classes.get();
+    ASGeneratedFile_Base* result = (ASGeneratedFile_Base*)_result_Templates.get();
 
     Result::AddHeader(header);
 
@@ -1257,16 +1257,16 @@ static void RegisterObjectType(const ClassAnalyzer& classAnalyzer, bool template
 
     if (classAnalyzer.IsRefCounted() || Contains(classAnalyzer.GetComment(), "FAKE_REF"))
     {
-        if (templateVersion)
+        //if (templateVersion)
             result->reg_ << "    engine->RegisterObjectType(className, 0, asOBJ_REF);\n";
-        else
-            result->reg_ << "    engine->RegisterObjectType(\"" << className << "\", 0, asOBJ_REF);\n";
+        //else
+          //  result->reg_ << "    engine->RegisterObjectType(\"" << className << "\", 0, asOBJ_REF);\n";
     }
     else // Value type
     {
         // TODO templateversion
 
-        string flags = "asOBJ_VALUE | asGetTypeTraits<" + className + ">()";
+       /* string flags = "asOBJ_VALUE | asGetTypeTraits<" + className + ">()";
 
         if (classAnalyzer.IsPod())
         {
@@ -1278,7 +1278,7 @@ static void RegisterObjectType(const ClassAnalyzer& classAnalyzer, bool template
                 flags += " | asOBJ_APP_CLASS_ALLINTS";
         }
 
-        result->reg_ << "    engine->RegisterObjectType(\"" << className << "\", sizeof(" << className << "), " << flags << ");\n";
+        result->reg_ << "    engine->RegisterObjectType(\"" << className << "\", sizeof(" << className << "), " << flags << ");\n";*/
     }
 
     if (!insideDefine.empty())
@@ -1295,15 +1295,15 @@ static void ProcessClass(const ClassAnalyzer& classAnalyzer, bool templateVersio
     
     if (Contains(classAnalyzer.GetComment(), "NO_BIND"))
     {
-        _result_Classes->reg_ << "    // " << classAnalyzer.GetLocation() << "\n";
-        _result_Classes->reg_ << "    // Not registered because have @nobind mark\n";
+        //_result_Classes->reg_ << "    // " << classAnalyzer.GetLocation() << "\n";
+        //_result_Classes->reg_ << "    // Not registered because have @nobind mark\n";
         return;
     }
 
     if (Contains(classAnalyzer.GetComment(), "MANUAL_BIND"))
     {
-        _result_Classes->reg_ << "    // " << classAnalyzer.GetLocation() << "\n";
-        _result_Classes->reg_ << "    // Not registered because have @manualbind mark\n";
+        //_result_Classes->reg_ << "    // " << classAnalyzer.GetLocation() << "\n";
+        //_result_Classes->reg_ << "    // Not registered because have @manualbind mark\n";
         return;
     }
 
@@ -1320,7 +1320,9 @@ static void ProcessClass(const ClassAnalyzer& classAnalyzer, bool templateVersio
     if (templateVersion)
         _result_Templates->reg_ << "template <class T> void Register" << classAnalyzer.GetClassName() << "(asIScriptEngine* engine, const char* className)\n{\n";
 
-    RegisterObjectType(classAnalyzer, templateVersion);
+    if (templateVersion)
+        RegisterObjectType(classAnalyzer);
+
     RegisterObjectMembers(classAnalyzer, templateVersion);
 
     if (templateVersion)
@@ -1361,7 +1363,6 @@ void ProcessAllClasses(const string& outputBasePath)
     _result_Members_X = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_X.cpp", "ASRegisterGenerated_Members_X");
     _result_Members_Y = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_Y.cpp", "ASRegisterGenerated_Members_Y");
     _result_Members_Z = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_Z.cpp", "ASRegisterGenerated_Members_Z");
-    _result_Classes = make_shared<ASGeneratedFile_Classes>(outputBasePath + "/Source/Urho3D/AngelScript/Generated_Classes.cpp", "ASRegisterGenerated_Classes");
     _result_Members_HighPriority = make_shared<ASGeneratedFile_Members_HighPriority>(outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_HighPriority.cpp", "ASRegisterGenerated_Members_HighPriority");
     _result_Members_Other = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_Other.cpp", "ASRegisterGenerated_Members_Other");
     _result_Templates = make_shared<ASGeneratedFile_Templates>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Templates.h");
@@ -1384,7 +1385,6 @@ void ProcessAllClasses(const string& outputBasePath)
             ProcessClass(analyzer, true);
     }
 
-    _result_Classes->Save();
     _result_Members_HighPriority->Save();
     _result_Members_A->Save();
     _result_Members_B->Save();
