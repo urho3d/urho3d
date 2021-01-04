@@ -107,6 +107,7 @@
 #include "../IO/FileSystem.h"
 #include "../IO/FileWatcher.h"
 #include "../IO/Log.h"
+#include "../IO/MemoryBuffer.h"
 #include "../IO/NamedPipe.h"
 #include "../IO/PackageFile.h"
 #include "../IO/Serializer.h"
