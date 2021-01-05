@@ -25,6 +25,7 @@
 #include "../Core/Context.h"
 #include "../Core/ProcessUtils.h"
 #include "../Core/Thread.h"
+#include "../Core/Profiler.h"
 #include "../IO/Log.h"
 
 #include "../DebugNew.h"
@@ -307,6 +308,13 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
 
     if (blockEvents_)
         return;
+
+#ifdef URHO3D_TRACY_PROFILING
+    URHO3D_PROFILE_COLOR(SendEvent, URHO3D_PROFILE_EVENT_COLOR);
+
+    const String& eventName = GetEventNameRegister().GetString(eventType);
+    URHO3D_PROFILE_STR(eventName.CString(), eventName.Length());
+#endif
 
     // Make a weak pointer to self to check for destruction during event handling
     WeakPtr<Object> self(this);

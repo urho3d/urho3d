@@ -454,12 +454,14 @@ void Context::RemoveEventReceiver(Object* receiver, Object* sender, StringHash e
 void Context::BeginSendEvent(Object* sender, StringHash eventType)
 {
 #ifdef URHO3D_PROFILING
+#ifndef URHO3D_TRACY_PROFILING
     if (EventProfiler::IsActive())
     {
         auto* eventProfiler = GetSubsystem<EventProfiler>();
         if (eventProfiler)
             eventProfiler->BeginBlock(eventType);
     }
+#endif
 #endif
 
     eventSenders_.Push(sender);
@@ -470,12 +472,14 @@ void Context::EndSendEvent()
     eventSenders_.Pop();
 
 #ifdef URHO3D_PROFILING
+#ifndef URHO3D_TRACY_PROFILING
     if (EventProfiler::IsActive())
     {
         auto* eventProfiler = GetSubsystem<EventProfiler>();
         if (eventProfiler)
             eventProfiler->EndBlock();
     }
+#endif
 #endif
 }
 

@@ -43,11 +43,18 @@ bool Resource::Load(Deserializer& source)
     // Because BeginLoad() / EndLoad() can be called from worker threads, where profiling would be a no-op,
     // create a type name -based profile block here
 #ifdef URHO3D_PROFILING
+#ifdef URHO3D_TRACY_PROFILING
+    URHO3D_PROFILE_COLOR(Load, URHO3D_PROFILE_RESOURCE_COLOR);
+
+    String profileBlockName("Load" + GetTypeName());
+    URHO3D_PROFILE_STR(profileBlockName.CString(), profileBlockName.Length());
+#else
     String profileBlockName("Load" + GetTypeName());
 
     auto* profiler = GetSubsystem<Profiler>();
     if (profiler)
         profiler->BeginBlock(profileBlockName.CString());
+#endif
 #endif
 
     // If we are loading synchronously in a non-main thread, behave as if async loading (for example use
@@ -59,8 +66,10 @@ bool Resource::Load(Deserializer& source)
     SetAsyncLoadState(ASYNC_DONE);
 
 #ifdef URHO3D_PROFILING
+#ifndef URHO3D_TRACY_PROFILING
     if (profiler)
         profiler->EndBlock();
+#endif
 #endif
 
     return success;
