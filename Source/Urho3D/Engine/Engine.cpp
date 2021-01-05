@@ -122,7 +122,9 @@ Engine::Engine(Context* context) :
     context_->RegisterSubsystem(new Time(context_));
     context_->RegisterSubsystem(new WorkQueue(context_));
 #ifdef URHO3D_PROFILING
+#ifndef URHO3D_TRACY_PROFILING
     context_->RegisterSubsystem(new Profiler(context_));
+#endif
 #endif
     context_->RegisterSubsystem(new FileSystem(context_));
 #ifdef URHO3D_LOGGING
@@ -305,11 +307,13 @@ bool Engine::Initialize(const VariantMap& parameters)
 #endif
 
 #ifdef URHO3D_PROFILING
+#ifndef URHO3D_TRACY_PROFILING
     if (GetParameter(parameters, EP_EVENT_PROFILER, true).GetBool())
     {
         context_->RegisterSubsystem(new EventProfiler(context_));
         EventProfiler::SetActive(true);
     }
+#endif
 #endif
     frameTimer_.Reset();
 
@@ -486,12 +490,14 @@ void Engine::RunFrame()
     auto* audio = GetSubsystem<Audio>();
 
 #ifdef URHO3D_PROFILING
+#ifndef URHO3D_TRACY_PROFILING
     if (EventProfiler::IsActive())
     {
         auto* eventProfiler = GetSubsystem<EventProfiler>();
         if (eventProfiler)
             eventProfiler->BeginFrame();
     }
+#endif
 #endif
 
     time->BeginFrame(timeStep_);
@@ -521,6 +527,9 @@ void Engine::RunFrame()
     ApplyFrameLimit();
 
     time->EndFrame();
+
+    // Mark a frame for profiling
+    URHO3D_PROFILE_FRAME();
 }
 
 Console* Engine::CreateConsole()

@@ -45,6 +45,11 @@ public:
     /// Process work items until stopped.
     void ThreadFunction() override
     {
+#ifdef URHO3D_TRACY_PROFILING
+        String name;
+        name.AppendWithFormat("WorkerThread #%d", index_);
+        URHO3D_PROFILE_THREAD(name.CString());
+#endif
         // Init FPU state first
         InitFPU();
         owner_->ProcessItems(index_);

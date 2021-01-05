@@ -254,6 +254,8 @@ endif ()
 cmake_dependent_option (URHO3D_PACKAGING "Enable resources packaging support" FALSE "NOT WEB" TRUE)
 # Enable profiling by default. If disabled, autoprofileblocks become no-ops and the Profiler subsystem is not instantiated.
 option (URHO3D_PROFILING "Enable profiling support" TRUE)
+# Enable Tracy profiling by default. Tracy profiling only works if URHO3D_PROFILING is set to be true.
+option (URHO3D_TRACY_PROFILING "Enable Tracy support for extended profiling. Tracy profiling only works if URHO3D_PROFILING is on" FALSE)
 # Enable logging by default. If disabled, LOGXXXX macros become no-ops and the Log subsystem is not instantiated.
 option (URHO3D_LOGGING "Enable logging support" TRUE)
 # Enable threading by default, except for Emscripten because its thread support is yet experimental
@@ -417,7 +419,7 @@ if (URHO3D_CLANG_TOOLS)
             URHO3D_URHO2D)
         set (${OPT} 1)
     endforeach ()
-    foreach (OPT URHO3D_TESTING URHO3D_LUAJIT URHO3D_DATABASE_ODBC)
+    foreach (OPT URHO3D_TESTING URHO3D_LUAJIT URHO3D_DATABASE_ODBC URHO3D_TRACY_PROFILING)
         set (${OPT} 0)
     endforeach ()
 endif ()
@@ -470,6 +472,7 @@ foreach (OPT
         URHO3D_NETWORK
         URHO3D_PHYSICS
         URHO3D_PROFILING
+        URHO3D_TRACY_PROFILING
         URHO3D_THREADING
         URHO3D_URHO2D
         URHO3D_WEBP
