@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2018 Andreas Jonsson
+   Copyright (c) 2003-2020 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -28,7 +28,7 @@
    andreas@angelcode.com
 */
 
-// Modified by Lasse Oorni, Nathanial Lydick, Yao Wei Tjong and Ramil Sattarov for Urho3D
+// Modified for Urho3D
 
 //
 // angelscript.h
@@ -64,8 +64,8 @@ BEGIN_AS_NAMESPACE
 
 // AngelScript version
 
-#define ANGELSCRIPT_VERSION        23300
-#define ANGELSCRIPT_VERSION_STRING "2.33.0"
+#define ANGELSCRIPT_VERSION        23500
+#define ANGELSCRIPT_VERSION_STRING "2.35.0"
 
 // Data types
 
@@ -201,6 +201,7 @@ enum asEObjTypeFlags
 	asOBJ_APP_CLASS_A                = (asOBJ_APP_CLASS + asOBJ_APP_CLASS_ASSIGNMENT),
 	asOBJ_APP_CLASS_AK               = (asOBJ_APP_CLASS + asOBJ_APP_CLASS_ASSIGNMENT + asOBJ_APP_CLASS_COPY_CONSTRUCTOR),
 	asOBJ_APP_CLASS_K                = (asOBJ_APP_CLASS + asOBJ_APP_CLASS_COPY_CONSTRUCTOR),
+	asOBJ_APP_CLASS_MORE_CONSTRUCTORS = (1<<31),
 	asOBJ_APP_PRIMITIVE              = (1<<13),
 	asOBJ_APP_FLOAT                  = (1<<14),
 	asOBJ_APP_ARRAY                  = (1<<15),
@@ -209,7 +210,7 @@ enum asEObjTypeFlags
 	asOBJ_NOCOUNT                    = (1<<18),
 	asOBJ_APP_CLASS_ALIGN8           = (1<<19),
 	asOBJ_IMPLICIT_HANDLE            = (1<<20),
-	asOBJ_MASK_VALID_FLAGS           = 0x1FFFFF,
+	asOBJ_MASK_VALID_FLAGS           = 0x801FFFFF,
 	// Internal flags
 	asOBJ_SCRIPT_OBJECT              = (1<<21),
 	asOBJ_SHARED                     = (1<<22),
@@ -391,7 +392,7 @@ typedef unsigned int   asUINT;
 #endif
 
 // Is the target a 64bit system?
-#if defined(__LP64__) || defined(__amd64__) || defined(__x86_64__) || defined(_M_X64)
+#if defined(__LP64__) || defined(__amd64__) || defined(__x86_64__) || defined(_M_X64) || defined(__aarch64__) || defined(_M_ARM64)
 	#ifndef AS_64BIT_PTR
 		#define AS_64BIT_PTR
 	#endif
@@ -593,15 +594,25 @@ BEGIN_AS_NAMESPACE
 template<typename T>
 asUINT asGetTypeTraits()
 {
-// Urho3D - Clang compiler built with old GCC's libstdc++ suffers the same pre-standard templates problem as old GCC compiler
+// Urho3D: commented out original
+//#if defined(_MSC_VER) || defined(_LIBCPP_TYPE_TRAITS) || (__GNUC__ >= 5) || defined(__clang__)
+
+// Urho3D: Clang compiler built with old GCC's libstdc++ suffers the same pre-standard templates problem as old GCC compiler
 #if defined(_MSC_VER) || defined(_LIBCPP_TYPE_TRAITS) || (__GNUC__ >= 5) || (defined(__clang__) && !defined(CLANG_PRE_STANDARD))
+
 	// MSVC, XCode/Clang, and gnuc 5+
 	// C++11 compliant code
 	bool hasConstructor        = std::is_default_constructible<T>::value && !std::is_trivially_default_constructible<T>::value;
 	bool hasDestructor         = std::is_destructible<T>::value          && !std::is_trivially_destructible<T>::value;
 	bool hasAssignmentOperator = std::is_copy_assignable<T>::value       && !std::is_trivially_copy_assignable<T>::value;
 	bool hasCopyConstructor    = std::is_copy_constructible<T>::value    && !std::is_trivially_copy_constructible<T>::value;
+
+// Urho3D: commented out original
+//#elif defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 8))
+
+// Urho3D
 #elif (defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 8))) || defined(__clang__)
+
 	// gnuc 4.8 is using a mix of C++11 standard and pre-standard templates
 	bool hasConstructor        = std::is_default_constructible<T>::value && !std::has_trivial_default_constructor<T>::value;
 	bool hasDestructor         = std::is_destructible<T>::value          && !std::is_trivially_destructible<T>::value;
@@ -1022,7 +1033,7 @@ public:
 
 	// Miscellaneous
 	virtual asIScriptEngine *GetEngine() const = 0;
-	virtual int              CopyFrom(asIScriptObject *other) = 0;
+	virtual int              CopyFrom(const asIScriptObject *other) = 0;
 
 	// User data
 	virtual void *SetUserData(void *data, asPWORD type = 0) = 0;
@@ -1137,6 +1148,7 @@ public:
 	virtual bool             IsOverride() const = 0;
 	virtual bool             IsShared() const = 0;
 	virtual bool             IsExplicit() const = 0;
+	virtual bool             IsProperty() const = 0;
 	virtual asUINT           GetParamCount() const = 0;
 	virtual int              GetParam(asUINT index, int *typeId, asDWORD *flags = 0, const char **name = 0, const char **defaultArg = 0) const = 0;
 	virtual int              GetReturnTypeId(asDWORD *flags = 0) const = 0;

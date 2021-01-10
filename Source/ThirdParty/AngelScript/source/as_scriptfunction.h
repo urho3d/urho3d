@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2018 Andreas Jonsson
+   Copyright (c) 2003-2019 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -109,7 +109,8 @@ enum asEFuncTrait
 	asTRAIT_OVERRIDE    = 64,
 	asTRAIT_SHARED      = 128,
 	asTRAIT_EXTERNAL    = 256,
-	asTRAIT_EXPLICIT    = 512
+	asTRAIT_EXPLICIT    = 512,
+	asTRAIT_PROPERTY    = 1024
 };
 
 struct asSFunctionTraits
@@ -175,6 +176,7 @@ public:
 	bool                 IsOverride() const;
 	bool                 IsShared() const;
 	bool                 IsExplicit() const;
+	bool                 IsProperty() const;
 	asUINT               GetParamCount() const;
 	int                  GetParam(asUINT index, int *typeId, asDWORD *flags = 0, const char **name = 0, const char **defaultArg = 0) const;
 	int                  GetReturnTypeId(asDWORD *flags = 0) const;
@@ -212,6 +214,7 @@ public:
 	void SetExplicit(bool set) { traits.SetTrait(asTRAIT_EXPLICIT, set); }
 	void SetProtected(bool set) { traits.SetTrait(asTRAIT_PROTECTED, set); }
 	void SetPrivate(bool set) { traits.SetTrait(asTRAIT_PRIVATE, set); }
+	void SetProperty(bool set) { traits.SetTrait(asTRAIT_PROPERTY, set); }
 
 	asCScriptFunction(asCScriptEngine *engine, asCModule *mod, asEFuncType funcType);
 	~asCScriptFunction();
