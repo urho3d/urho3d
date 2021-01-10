@@ -127,6 +127,7 @@ Script::Script(Context* context) :
     scriptEngine_->SetEngineProperty(asEP_ALLOW_UNSAFE_REFERENCES, (asPWORD)true);
     scriptEngine_->SetEngineProperty(asEP_ALLOW_IMPLICIT_HANDLE_TYPES, (asPWORD)true);
     scriptEngine_->SetEngineProperty(asEP_BUILD_WITHOUT_LINE_CUES, (asPWORD)true);
+    scriptEngine_->SetEngineProperty(asEP_PROPERTY_ACCESSOR_MODE, 1);
 // Use the copy of the original asMETHOD macro in a web build (for some reason it still works, presumably because the signature of the function is known)
 #ifdef AS_MAX_PORTABILITY
     scriptEngine_->SetMessageCallback(_asMETHOD(Script, MessageCallback), this, asCALL_THISCALL);

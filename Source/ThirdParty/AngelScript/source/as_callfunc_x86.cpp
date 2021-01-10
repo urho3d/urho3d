@@ -28,7 +28,7 @@
    andreas@angelcode.com
 */
 
-// Modified by Lasse Oorni for Urho3D
+// Modified for Urho3D
 
 //
 // as_callfunc_x86.cpp

@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2018 Andreas Jonsson
+   Copyright (c) 2003-2019 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -305,6 +305,8 @@ public:
 
 	asCFuncdefType    *FindMatchingFuncdef(asCScriptFunction *func, asCModule *mod);
 
+	int                DetermineNameAndNamespace(const char *in_name, asSNameSpace *implicitNs, asCString &out_name, asSNameSpace *&out_ns) const;
+	
 	// Global property management
 	asCGlobalProperty *AllocateGlobalProperty();
 	void RemoveGlobalProperty(asCGlobalProperty *prop);

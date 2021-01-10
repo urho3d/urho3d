@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2018 Andreas Jonsson
+   Copyright (c) 2003-2019 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -154,6 +154,7 @@
 #define TXT_INVALID_OP_ON_METHOD                   "Invalid operation on method"
 #define TXT_INVALID_REF_PROP_ACCESS                "Invalid reference. Property accessors cannot be used in combined read/write operations"
 #define TXT_INVALID_SCOPE                          "Invalid scope resolution"
+#define TXT_INVALID_SIG_FOR_VIRTPROP               "Invalid signature for virtual property"
 #define TXT_INVALID_TYPE                           "Invalid type"
 #define TXT_INVALID_UNICODE_FORMAT_EXPECTED_d      "Invalid unicode escape sequence, expected %d hex digits"
 #define TXT_INVALID_UNICODE_VALUE                  "Invalid unicode code point"
@@ -186,6 +187,7 @@
 #define TXT_NAME_CONFLICT_s_IS_FUNCDEF             "Name conflict. '%s' is a funcdef."
 #define TXT_NAME_CONFLICT_s_IS_FUNCTION            "Name conflict. '%s' is a global function."
 #define TXT_NAME_CONFLICT_s_IS_MIXIN               "Name conflict. '%s' is a mixin class."
+#define TXT_NAME_CONFLICT_s_IS_VIRTPROP            "Name conflict. '%s' is a virtual property."
 #define TXT_NAME_CONFLICT_s_STRUCT                 "Name conflict. '%s' is a class."
 #define TXT_NAME_CONFLICT_s_OBJ_PROPERTY           "Name conflict. '%s' is an object property."
 #define TXT_NAME_CONFLICT_s_METHOD                 "Name conflict. '%s' is a class method."
