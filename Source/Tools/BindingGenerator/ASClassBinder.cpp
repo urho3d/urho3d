@@ -38,7 +38,6 @@ namespace ASBindingGenerator
 
 static string _outputBasePath;
 
-static shared_ptr<ASGeneratedFile_Members_HighPriority> _result_Members_HighPriority;
 static shared_ptr<ASGeneratedFile_Members> _result_Members_A;
 static shared_ptr<ASGeneratedFile_Members> _result_Members_B;
 static shared_ptr<ASGeneratedFile_Members> _result_Members_Constraint;
@@ -393,8 +392,12 @@ static void RegisterValueConstructor(const ClassFunctionAnalyzer& functionAnalyz
     shared_ptr<ASGeneratedFile_Members> result = GetGeneratedFile(className);
 
     bool isDefaultConstructor = args.empty();
-    stringstream& reg = isDefaultConstructor ? _result_Members_HighPriority->reg_ : result->reg_;
-    stringstream& glue = isDefaultConstructor ? _result_Members_HighPriority->glue_ : result->glue_;
+
+    if (isDefaultConstructor)
+        return;
+
+    stringstream& reg = result->reg_;
+    stringstream& glue = result->glue_;
 
     string decl = "";
     vector<ParamAnalyzer> params = functionAnalyzer.GetParams();
@@ -514,40 +517,6 @@ static void RegisterImplicitlyDeclaredDestructor(const ClassAnalyzer& classAnaly
         "    engine->RegisterObjectBehaviour(\"" << className << "\", asBEHAVE_DESTRUCT, \"void f()\", asFUNCTION(" << wrapperName << "), asCALL_CDECL_OBJFIRST);\n";
 }
 
-static void RegisterImplicitlyDeclaredConstructor(const ClassAnalyzer& classAnalyzer)
-{
-    string header = classAnalyzer.GetHeaderFile();
-    string insideDefine = InsideDefine(header);
-    string className = classAnalyzer.GetClassName();
-    string wrapperName = className + "_Constructor";
-    Result::AddHeader(header);
-
-    if (!insideDefine.empty())
-    {
-        _result_Members_HighPriority->glue_ << "#ifdef " << insideDefine << "\n";
-        _result_Members_HighPriority->reg_ << "#ifdef " << insideDefine << "\n";
-    }
-
-    _result_Members_HighPriority->glue_ <<
-        "// " << className << "::" << className << "() | Implicitly-declared\n"
-        "static void " << wrapperName << "(" << className << "* ptr)\n"
-        "{\n"
-        "    new(ptr) " << className << "();\n"
-        "}\n";
-
-    _result_Members_HighPriority->reg_ <<
-        "    // " << className << "::" << className << "() | Implicitly-declared\n"
-        "    engine->RegisterObjectBehaviour(\"" << className << "\", asBEHAVE_CONSTRUCT, \"void f()\", asFUNCTION(" << wrapperName << "), asCALL_CDECL_OBJFIRST);\n";
-
-    if (!insideDefine.empty())
-    {
-        _result_Members_HighPriority->glue_ << "#endif\n";
-        _result_Members_HighPriority->reg_ << "#endif\n";
-    }
-
-    _result_Members_HighPriority->glue_ << "\n";
-}
-
 static void TryRegisterImplicitlyDeclaredAssignOperator(const ClassAnalyzer& classAnalyzer)
 {
     string className = classAnalyzer.GetClassName();
@@ -589,9 +558,6 @@ static bool IsConstructorRequired(const ClassAnalyzer& classAnalyzer)
 // Some required methods can not be bound automatically when processing class because implicitly-declared
 static void RegisterImplicitlyDeclaredMethods(const ClassAnalyzer& classAnalyzer)
 {
-    if (!classAnalyzer.HasThisConstructor() && IsConstructorRequired(classAnalyzer))
-        RegisterImplicitlyDeclaredConstructor(classAnalyzer);
-
     if (!classAnalyzer.HasDestructor() && IsDestructorRequired(classAnalyzer))
         RegisterImplicitlyDeclaredDestructor(classAnalyzer);
 
@@ -1363,7 +1329,6 @@ void ProcessAllClasses(const string& outputBasePath)
     _result_Members_X = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_X.cpp", "ASRegisterGenerated_Members_X");
     _result_Members_Y = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_Y.cpp", "ASRegisterGenerated_Members_Y");
     _result_Members_Z = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_Z.cpp", "ASRegisterGenerated_Members_Z");
-    _result_Members_HighPriority = make_shared<ASGeneratedFile_Members_HighPriority>(outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_HighPriority.cpp", "ASRegisterGenerated_Members_HighPriority");
     _result_Members_Other = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_Other.cpp", "ASRegisterGenerated_Members_Other");
     _result_Templates = make_shared<ASGeneratedFile_Templates>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Templates.h");
 
@@ -1385,7 +1350,6 @@ void ProcessAllClasses(const string& outputBasePath)
             ProcessClass(analyzer, true);
     }
 
-    _result_Members_HighPriority->Save();
     _result_Members_A->Save();
     _result_Members_B->Save();
     _result_Members_Constraint->Save();

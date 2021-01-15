@@ -58,14 +58,6 @@ public:
     ASGeneratedFile_WithRegistrationFunction(const string& outputFilePath, const string& functionName);
 };
 
-class ASGeneratedFile_Members_HighPriority : public ASGeneratedFile_WithRegistrationFunction
-{
-public:
-    using ASGeneratedFile_WithRegistrationFunction::ASGeneratedFile_WithRegistrationFunction;
-
-    void Save() override;
-};
-
 class ASGeneratedFile_Members : public ASGeneratedFile_WithRegistrationFunction
 {
 public:
@@ -119,15 +111,25 @@ struct ProcessedGlobalVariable
     bool operator <(const ProcessedGlobalVariable& rhs) const;
 };
 
-struct ProcessedClass
+struct ClassMemberRegistration
 {
     string name_; // Used for sorting
+    string comment_; // Location
+    string glue_; // Can be empty
+    string registration_; // Or warning message
+};
+
+struct ProcessedClass
+{
+    string name_;
     string insideDefine_; // Can be empty
     string comment_; // Class location
     string objectTypeRegistration_; // engine->RegisterObjectType(...); or warning message
 
     // Used for sorting
     bool operator <(const ProcessedClass& rhs) const;
+
+    shared_ptr<ClassMemberRegistration> defaultConstructor_;
 };
 
 namespace Result

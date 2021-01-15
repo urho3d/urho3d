@@ -10,7 +10,7 @@
 namespace Urho3D
 {
 
-void ASRegisterGeneratedClasses(asIScriptEngine* engine)
+void ASRegisterGeneratedObjectTypes(asIScriptEngine* engine)
 {
     // class AbstractFile | File: ../IO/AbstractFile.h
     engine->RegisterObjectType("AbstractFile", 0, asOBJ_REF);
