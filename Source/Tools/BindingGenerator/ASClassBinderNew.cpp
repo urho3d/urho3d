@@ -62,6 +62,57 @@ static void RegisterObjectType(const ClassAnalyzer& classAnalyzer, ProcessedClas
     }
 }
 
+static bool IsConstructorRequired(const ClassAnalyzer& classAnalyzer)
+{
+    if (classAnalyzer.IsRefCounted())
+        return false;
+
+    if (Contains(classAnalyzer.GetComment(), "FAKE_REF"))
+        return false;
+
+    if (classAnalyzer.IsPod())
+        return false;
+
+    return true;
+}
+
+static void RegisterDefaultConstructor(const ClassAnalyzer& classAnalyzer, ProcessedClass& inoutProcessedClass)
+{
+    if (classAnalyzer.IsRefCounted())
+        return;
+
+    if (Contains(classAnalyzer.GetComment(), "FAKE_REF"))
+        return;
+
+    string className = classAnalyzer.GetClassName();
+    string wrapperName = className + "_Constructor";
+
+    shared_ptr<ClassMemberRegistration> result = make_shared<ClassMemberRegistration>();
+
+    result->name_ = className;
+
+    result->glue_ =
+        "static void " + wrapperName + "(" + className + "* ptr)\n"
+        "{\n"
+        "    new(ptr) " + className + "();\n"
+        "}\n";
+
+    result->registration_ = "engine->RegisterObjectBehaviour(\"" + className + "\", asBEHAVE_CONSTRUCT, \"void f()\", asFUNCTION(" + wrapperName + "), asCALL_CDECL_OBJFIRST);";
+
+    shared_ptr<ClassFunctionAnalyzer> defaultConstructor = classAnalyzer.GetDefinedDefaultConstructor();
+
+    if (defaultConstructor)
+    {
+        result->comment_ = defaultConstructor->GetLocation();
+        inoutProcessedClass.defaultConstructor_ = result;
+    }
+    else if (!classAnalyzer.HasThisConstructor() && IsConstructorRequired(classAnalyzer))
+    {
+        result->comment_ = className + "::" + className + "() | Implicitly-declared";
+        inoutProcessedClass.defaultConstructor_ = result;
+    }
+}
+
 static void ProcessClass(const ClassAnalyzer& classAnalyzer)
 {
     if (classAnalyzer.IsInternal())
@@ -103,17 +154,34 @@ static void ProcessClass(const ClassAnalyzer& classAnalyzer)
     }
 
     RegisterObjectType(classAnalyzer, processedClass);
+    RegisterDefaultConstructor(classAnalyzer, processedClass);
     Result::classes_.push_back(processedClass);
 }
 
 void ProcessAllClassesNew()
 {
+#if 0
+    // Old order of classes for tests
+    vector<string> classIDs;
+    classIDs.reserve(SourceData::classesByID_.size());
+    for (pair<const string, xml_node>& it : SourceData::classesByID_)
+        classIDs.push_back(it.first);
+    sort(classIDs.begin(), classIDs.end());
+
+    for (string classID : classIDs)
+    {
+        xml_node compounddef = SourceData::classesByID_[classID];
+        ClassAnalyzer analyzer(compounddef);
+        ProcessClass(analyzer);
+    }
+#else
     for (auto element : SourceData::classesByID_)
     {
         xml_node compounddef = element.second;
         ClassAnalyzer analyzer(compounddef);
         ProcessClass(analyzer);
     }
+#endif
 }
 
 } // namespace ASBindingGenerator

@@ -135,6 +135,12 @@ string ExtractDefinition(xml_node memberdef);
 //     <argsstring>...</argsstring>
 string ExtractArgsstring(xml_node memberdef);
 
+// <memberdef kind="function">
+//     <argsstring>(...)</argsstring>
+//     <argsstring>(...) xxx</argsstring>
+//         where xxx can be of const, override, =default, =delete, =0 or their combination
+string ExtractCleanedFunctionArgsstring(xml_node memberdef);
+
 // <memberdef prot="...">
 string ExtractProt(xml_node memberdef);
 
@@ -276,6 +282,10 @@ public:
     shared_ptr<ClassAnalyzer> GetBaseClass() const;
     vector<ClassAnalyzer> GetBaseClasses() const;
     vector<ClassAnalyzer> GetAllBaseClasses() const;
+    
+    // Return null if default constructor is implicitly-declared.
+    // Return pointer if default constructor is deleted
+    shared_ptr<ClassFunctionAnalyzer> GetDefinedDefaultConstructor() const;
 };
 
 // <compounddef kind="class|struct">

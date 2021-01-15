@@ -213,6 +213,19 @@ string ExtractArgsstring(xml_node memberdef)
     return argsstring.child_value();
 }
 
+string ExtractCleanedFunctionArgsstring(xml_node memberdef)
+{
+    assert(ExtractKind(memberdef) == "function");
+
+    string argsstring = ExtractArgsstring(memberdef);
+    assert(StartsWith(argsstring, "("));
+
+    size_t endPos = argsstring.find_last_of(')');
+    assert(endPos != string::npos);
+
+    return argsstring.substr(1, endPos - 1);
+}
+
 string ExtractProt(xml_node memberdef)
 {
     assert(IsMemberdef(memberdef));
@@ -778,6 +791,19 @@ bool ClassAnalyzer::IsRefCounted() const
     }
 
     return false;
+}
+
+shared_ptr<ClassFunctionAnalyzer> ClassAnalyzer::GetDefinedDefaultConstructor() const
+{
+    vector<ClassFunctionAnalyzer> functions = GetFunctions();
+
+    for (const ClassFunctionAnalyzer& function : functions)
+    {
+        if (function.IsThisConstructor() && ExtractCleanedFunctionArgsstring(function.GetMemberdef()).empty())
+            return make_shared<ClassFunctionAnalyzer>(function);
+    }
+
+    return nullptr;
 }
 
 // ============================================================================
