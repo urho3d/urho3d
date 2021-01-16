@@ -51,10 +51,12 @@ bool ResourceSaveVectorBuffer(VectorBuffer& buffer, Resource* ptr);
 
 // ========================================================================================
 
+// bool XPathQuery::SetQuery(const String &queryString, const String &variableString=String::EMPTY, bool bind=true) | File: ../Resource/XMLElement.h
+bool XPathQuery_SetQuery(const String& queryString, XPathQuery* ptr);
+
 #define REGISTER_MANUAL_PART_XPathQuery(T, className) \
     /* bool XPathQuery::SetQuery(const String &queryString, const String &variableString=String::EMPTY, bool bind=true) | File: ../Resource/XMLElement.h */ \
-    /* TODO Is need wrapping function? */ \
-    engine->RegisterObjectMethod(className, "void set_query(const String&)", asMETHOD(T, SetQuery), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_query(const String&)", asFUNCTION(XPathQuery_SetQuery), asCALL_CDECL_OBJLAST);
 
 // ========================================================================================
 
@@ -67,6 +69,10 @@ XMLElement XMLFileGetRootDefault(XMLFile* ptr);
 
 // ========================================================================================
 
+// XMLElement XMLElement::SelectSingle(const String &query, pugi::xpath_variable_set *variables=nullptr) const | File: ../Resource/XMLElement.h
+XMLElement XMLElement_SelectSingle(const String& query, XMLElement* ptr);
+// XPathResultSet XMLElement::Select(const String &query, pugi::xpath_variable_set *variables=nullptr) const | File: ../Resource/XMLElement.h
+XPathResultSet XMLElement_Select(const String& query, XMLElement* ptr);
 // bool XMLElement::SetVariantVector(const VariantVector &value) | File: ../Resource/XMLElement.h
 bool XMLElementSetVariantVector(CScriptArray* value, XMLElement* ptr);
 // VariantVector XMLElement::GetVariantVector() const | File: ../Resource/XMLElement.h
@@ -74,9 +80,9 @@ CScriptArray* XMLElementGetVariantVector(XMLElement* ptr);
 
 #define REGISTER_MANUAL_PART_XMLElement(T, className) \
     /* XMLElement XMLElement::SelectSingle(const String &query, pugi::xpath_variable_set *variables=nullptr) const | File: ../Resource/XMLElement.h */ \
-    engine->RegisterObjectMethod(className, "XMLElement SelectSingle(const String&in)", asMETHOD(T, SelectSingle), asCALL_THISCALL); \
+    engine->RegisterObjectMethod(className, "XMLElement SelectSingle(const String&in)", asFUNCTION(XMLElement_SelectSingle), asCALL_CDECL_OBJLAST); \
     /* XPathResultSet XMLElement::Select(const String &query, pugi::xpath_variable_set *variables=nullptr) const | File: ../Resource/XMLElement.h */ \
-    engine->RegisterObjectMethod(className, "XPathResultSet Select(const String&in)", asMETHOD(T, Select), asCALL_THISCALL); \
+    engine->RegisterObjectMethod(className, "XPathResultSet Select(const String&in)", asFUNCTION(XMLElement_Select), asCALL_CDECL_OBJLAST); \
     /* bool XMLElement::SetVariantVector(const VariantVector &value) | File: ../Resource/XMLElement.h */ \
     engine->RegisterObjectMethod(className, "bool SetVariantVector(Array<Variant>@+)", asFUNCTION(XMLElementSetVariantVector), asCALL_CDECL_OBJLAST); \
     /* VariantVector XMLElement::GetVariantVector() const | File: ../Resource/XMLElement.h */ \

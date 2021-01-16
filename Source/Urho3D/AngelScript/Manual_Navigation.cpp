@@ -102,6 +102,24 @@ Vector3 CrowdManagerRandomPointInCircle(const Vector3& center, float radius, int
     return manager->GetRandomPointInCircle(center, radius, queryFilterType);
 }
 
+// Vector3 CrowdManager::FindNearestPoint(const Vector3 &point, int queryFilterType, dtPolyRef *nearestRef=nullptr) | File: ../Navigation/CrowdManager.h
+Vector3 CrowdManager_FindNearestPoint(const Vector3& point, int queryFilterType, CrowdManager* ptr)
+{
+    return ptr->FindNearestPoint(point, queryFilterType);
+}
+
+// float CrowdManager::GetDistanceToWall(const Vector3 &point, float radius, int queryFilterType, Vector3 *hitPos=nullptr, Vector3 *hitNormal=nullptr) | File: ../Navigation/CrowdManager.h
+float CrowdManager_GetDistanceToWall(const Vector3& point, float radius, int queryFilterType, CrowdManager* ptr)
+{
+    return ptr->GetDistanceToWall(point, radius, queryFilterType);
+}
+
+// Vector3 CrowdManager::Raycast(const Vector3 &start, const Vector3 &end, int queryFilterType, Vector3 *hitNormal=nullptr) | File: ../Navigation/CrowdManager.h
+Vector3 CrowdManager_Raycast(const Vector3& start, const Vector3& end, int queryFilterType, CrowdManager* ptr)
+{
+    return ptr->Raycast(start, end, queryFilterType);
+}
+
 }
 
 #endif // def URHO3D_NAVIGATION

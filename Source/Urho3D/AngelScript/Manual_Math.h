@@ -23,6 +23,7 @@
 #pragma once
 
 #include "../Math/Polyhedron.h"
+#include "../Math/Ray.h"
 
 namespace Urho3D
 {
@@ -118,9 +119,12 @@ CScriptArray* ColorData(Color* ptr);
 
 // ========================================================================================
 
+// float Ray::HitDistance(const Vector3 &v0, const Vector3 &v1, const Vector3 &v2, Vector3 *outNormal=nullptr, Vector3 *outBary=nullptr) const | File: ../Math/Ray.h
+float Ray_HitDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2, Ray* ptr);
+
 #define REGISTER_MANUAL_PART_Ray(T, className) \
     /* float Ray::HitDistance(const Vector3 &v0, const Vector3 &v1, const Vector3 &v2, Vector3 *outNormal=nullptr, Vector3 *outBary=nullptr) const | File: ../Math/Ray.h */ \
-    engine->RegisterObjectMethod(className, "float HitDistance(const Vector3&in, const Vector3&in, const Vector3&in) const", asMETHODPR(T, HitDistance, (const Vector3&, const Vector3&, const Vector3&, Vector3*, Vector3*) const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "float HitDistance(const Vector3&in, const Vector3&in, const Vector3&in) const", asFUNCTION(Ray_HitDistance), asCALL_CDECL_OBJLAST);
 
 // ========================================================================================
 

@@ -76,6 +76,12 @@ CScriptArray* NavigationMeshFindPath(const Vector3& start, const Vector3& end, c
 Vector3 CrowdManagerGetRandomPoint(int queryFilterType, CrowdManager* crowdManager);
 // Vector3 CrowdManager::GetRandomPointInCircle(const Vector3 &center, float radius, int queryFilterType, dtPolyRef *randomRef=nullptr) | File: ../Navigation/CrowdManager.h
 Vector3 CrowdManagerRandomPointInCircle(const Vector3& center, float radius, int queryFilterType, CrowdManager* manager);
+// Vector3 CrowdManager::FindNearestPoint(const Vector3 &point, int queryFilterType, dtPolyRef *nearestRef=nullptr) | File: ../Navigation/CrowdManager.h
+Vector3 CrowdManager_FindNearestPoint(const Vector3& point, int queryFilterType, CrowdManager* ptr);
+// float CrowdManager::GetDistanceToWall(const Vector3 &point, float radius, int queryFilterType, Vector3 *hitPos=nullptr, Vector3 *hitNormal=nullptr) | File: ../Navigation/CrowdManager.h
+float CrowdManager_GetDistanceToWall(const Vector3& point, float radius, int queryFilterType, CrowdManager* ptr);
+// Vector3 CrowdManager::Raycast(const Vector3 &start, const Vector3 &end, int queryFilterType, Vector3 *hitNormal=nullptr) | File: ../Navigation/CrowdManager.h
+Vector3 CrowdManager_Raycast(const Vector3& start, const Vector3& end, int queryFilterType, CrowdManager* ptr);
 
 #define REGISTER_MANUAL_PART_CrowdManager(T, className) \
     /* Vector3 CrowdManager::GetRandomPoint(int queryFilterType, dtPolyRef *randomRef=nullptr) | File: ../Navigation/CrowdManager.h */ \
@@ -83,11 +89,11 @@ Vector3 CrowdManagerRandomPointInCircle(const Vector3& center, float radius, int
     /* Vector3 CrowdManager::GetRandomPointInCircle(const Vector3 &center, float radius, int queryFilterType, dtPolyRef *randomRef=nullptr) | File: ../Navigation/CrowdManager.h */ \
     engine->RegisterObjectMethod(className, "Vector3 GetRandomPointInCircle(const Vector3&in, float, int)", asFUNCTION(CrowdManagerRandomPointInCircle), asCALL_CDECL_OBJLAST); \
     /* Vector3 CrowdManager::FindNearestPoint(const Vector3 &point, int queryFilterType, dtPolyRef *nearestRef=nullptr) | File: ../Navigation/CrowdManager.h */ \
-    engine->RegisterObjectMethod("CrowdManager", "Vector3 FindNearestPoint(const Vector3&in, int)", asMETHOD(CrowdManager, FindNearestPoint), asCALL_THISCALL); \
+    engine->RegisterObjectMethod("CrowdManager", "Vector3 FindNearestPoint(const Vector3&in, int)", asFUNCTION(CrowdManager_FindNearestPoint), asCALL_CDECL_OBJLAST); \
     /* float CrowdManager::GetDistanceToWall(const Vector3 &point, float radius, int queryFilterType, Vector3 *hitPos=nullptr, Vector3 *hitNormal=nullptr) | File: ../Navigation/CrowdManager.h */ \
-    engine->RegisterObjectMethod("CrowdManager", "float GetDistanceToWall(const Vector3&in, float, int)", asMETHOD(CrowdManager, GetDistanceToWall), asCALL_THISCALL); \
+    engine->RegisterObjectMethod("CrowdManager", "float GetDistanceToWall(const Vector3&in, float, int)", asFUNCTION(CrowdManager_GetDistanceToWall), asCALL_CDECL_OBJLAST); \
     /* Vector3 CrowdManager::Raycast(const Vector3 &start, const Vector3 &end, int queryFilterType, Vector3 *hitNormal=nullptr) | File: ../Navigation/CrowdManager.h */ \
-    engine->RegisterObjectMethod("CrowdManager", "Vector3 Raycast(const Vector3&in, const Vector3&in, int)", asMETHOD(CrowdManager, Raycast), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdManager", "Vector3 Raycast(const Vector3&in, const Vector3&in, int)", asFUNCTION(CrowdManager_Raycast), asCALL_CDECL_OBJLAST);
 
 }
 

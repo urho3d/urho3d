@@ -142,6 +142,14 @@ CScriptArray* ColorData(Color* ptr)
 
 // ========================================================================================
 
+// float Ray::HitDistance(const Vector3 &v0, const Vector3 &v1, const Vector3 &v2, Vector3 *outNormal=nullptr, Vector3 *outBary=nullptr) const | File: ../Math/Ray.h
+float Ray_HitDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2, Ray* ptr)
+{
+    return ptr->HitDistance(v0, v1, v2);
+}
+
+// ========================================================================================
+
 // Vector3 Frustum::vertices_[NUM_FRUSTUM_VERTICES] | File: ../Math/Frustum.h
 Vector3 FrustumGetVertex(unsigned index, Frustum* ptr)
 {
