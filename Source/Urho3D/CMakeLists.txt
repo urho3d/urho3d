@@ -463,12 +463,17 @@ endif ()
 if (APPLE)
     set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_LIBRARIES -force_load)
 elseif (MSVC)
-    if (URHO3D_64BIT) # Works only for 64 bit currently https://github.com/urho3d/Urho3D/issues/2760
-        set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_OPTIONS /FORCE /WHOLEARCHIVE)  # Require VS 2015 Update 2 onward
-    endif ()
+    foreach (THIRD_PARTY_LIB ${STATIC_LIBRARY_TARGETS})
+        if (NOT ${THIRD_PARTY_LIB} MATCHES boost|rapidjson|STB)  # Exclude header-only "fake" static libs
+            # Must be specified for each library https://github.com/urho3d/Urho3D/issues/2760
+            set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_OPTIONS /WHOLEARCHIVE:${THIRD_PARTY_LIB})  # Require VS 2015 Update 2 onward
+        endif ()
+    endforeach ()
+    set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_OPTIONS /FORCE)
 else ()
     set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_LIBRARIES -Wl,--whole-archive)
 endif ()
+
 foreach (TARGET ${STATIC_LIBRARY_TARGETS})
     set (ARCHIVE $<TARGET_FILE:${TARGET}>)
     if (NOT ${TARGET} MATCHES boost|rapidjson|STB)  # Exclude header-only "fake" static lib targets
