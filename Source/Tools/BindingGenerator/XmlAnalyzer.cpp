@@ -44,7 +44,7 @@ string RemoveRefs(xml_node node)
     return result;
 }
 
-TypeAnalyzer::TypeAnalyzer(xml_node type, const map<string, string>& templateSpecialization)
+TypeAnalyzer::TypeAnalyzer(xml_node type, const TemplateSpecialization& specialization)
 {
     assert(type.name() == string("type"));
 
@@ -56,7 +56,7 @@ TypeAnalyzer::TypeAnalyzer(xml_node type, const map<string, string>& templateSpe
     fullType_ = ReplaceAll(fullType_, "< ", "<");
     fullType_ = ReplaceAll(fullType_, " >", ">");
 
-    for (pair<string, string> it : templateSpecialization)
+    for (pair<const string, string> it : specialization)
     {
         regex rgx("\\b" + it.first + "\\b");
         fullType_ = regex_replace(fullType_, rgx, it.second);
@@ -102,9 +102,9 @@ TypeAnalyzer::TypeAnalyzer(const string& typeName)
 
 // ============================================================================
 
-ParamAnalyzer::ParamAnalyzer(xml_node param, const map<string, string>& templateSpecialization)
+ParamAnalyzer::ParamAnalyzer(xml_node param, const TemplateSpecialization& specialization)
     : node_(param)
-    , templateSpecialization_(templateSpecialization)
+    , specialization_(specialization)
 {
     assert(node_.name() == string("param"));
 }
@@ -125,7 +125,7 @@ TypeAnalyzer ParamAnalyzer::GetType() const
     xml_node type = node_.child("type");
     assert(type);
 
-    return TypeAnalyzer(type, templateSpecialization_);
+    return TypeAnalyzer(type, specialization_);
 }
 
 string ParamAnalyzer::GetDeclname() const
@@ -236,7 +236,7 @@ string ExtractProt(xml_node memberdef)
     return result;
 }
 
-TypeAnalyzer ExtractType(xml_node memberdef, const map<string, string>& templateSpecialization)
+TypeAnalyzer ExtractType(xml_node memberdef, const TemplateSpecialization& specialization)
 {
     assert(IsMemberdef(memberdef));
 
@@ -252,10 +252,10 @@ TypeAnalyzer ExtractType(xml_node memberdef, const map<string, string>& template
             return TypeAnalyzer(CutStart(functionName, "operator "));
     }
 
-    return TypeAnalyzer(type, templateSpecialization);
+    return TypeAnalyzer(type, specialization);
 }
 
-vector<ParamAnalyzer> ExtractParams(xml_node memberdef, const map<string, string>& templateSpecialization)
+vector<ParamAnalyzer> ExtractParams(xml_node memberdef, const TemplateSpecialization& specialization)
 {
     assert(IsMemberdef(memberdef));
     assert(ExtractKind(memberdef) == "function");
@@ -263,19 +263,19 @@ vector<ParamAnalyzer> ExtractParams(xml_node memberdef, const map<string, string
     vector<ParamAnalyzer> result;
 
     for (xml_node param : memberdef.children("param"))
-        result.push_back(ParamAnalyzer(param, templateSpecialization));
+        result.push_back(ParamAnalyzer(param, specialization));
 
     return result;
 }
 
-string JoinParamsTypes(xml_node memberdef, const map<string, string>& templateSpecialization)
+string JoinParamsTypes(xml_node memberdef, const TemplateSpecialization& specialization)
 {
     assert(IsMemberdef(memberdef));
     assert(ExtractKind(memberdef) == "function");
 
     string result;
 
-    vector<ParamAnalyzer> params = ExtractParams(memberdef, templateSpecialization);
+    vector<ParamAnalyzer> params = ExtractParams(memberdef, specialization);
     for (const ParamAnalyzer& param : params)
     {
         if (!result.empty())
@@ -509,8 +509,9 @@ string GlobalVariableAnalyzer::GetLocation() const
 
 // ============================================================================
 
-ClassAnalyzer::ClassAnalyzer(xml_node compounddef)
+ClassAnalyzer::ClassAnalyzer(xml_node compounddef, const TemplateSpecialization& specialization)
     : compounddef_(compounddef)
+    , specialization_(specialization)
 {
     assert(IsCompounddef(compounddef));
 }
@@ -821,12 +822,22 @@ vector<ClassFunctionAnalyzer> ClassAnalyzer::GetThisNonDefaultConstructors() con
 
 // ============================================================================
 
-ClassFunctionAnalyzer::ClassFunctionAnalyzer(ClassAnalyzer classAnalyzer, xml_node memberdef)
-    : classAnalyzer_(classAnalyzer)
-    , memberdef_(memberdef)
+FunctionAnalyzer::FunctionAnalyzer(xml_node memberdef, const TemplateSpecialization& specialization)
+    : memberdef_(memberdef)
+    , specialization_(specialization)
 {
     assert(IsMemberdef(memberdef));
     assert(ExtractKind(memberdef) == "function");
+}
+
+// ============================================================================
+
+ClassFunctionAnalyzer::ClassFunctionAnalyzer(const ClassAnalyzer& classAnalyzer, xml_node memberdef, const TemplateSpecialization& specialization)
+    : FunctionAnalyzer(memberdef, specialization)
+    , classAnalyzer_(classAnalyzer)
+{
+    // Append template specialization from class
+    specialization_.insert(classAnalyzer.GetSpecialization().begin(), classAnalyzer.GetSpecialization().end());
 }
 
 string ClassFunctionAnalyzer::GetVirt() const
@@ -1072,21 +1083,16 @@ UsingAnalyzer::UsingAnalyzer(xml_node memberdef)
 
 // ============================================================================
 
-GlobalFunctionAnalyzer::GlobalFunctionAnalyzer(xml_node memberdef, const map<string, string>& templateSpecialization)
-    : memberdef_(memberdef)
-    , templateSpecialization_(templateSpecialization)
+GlobalFunctionAnalyzer::GlobalFunctionAnalyzer(xml_node memberdef, const TemplateSpecialization& specialization)
+    : FunctionAnalyzer(memberdef, specialization)
 {
-    assert(IsMemberdef(memberdef));
-    assert(ExtractKind(memberdef) == "function");
 }
 
 // ============================================================================
 
-ClassStaticFunctionAnalyzer::ClassStaticFunctionAnalyzer(const ClassAnalyzer& classAnalyzer, xml_node memberdef)
-    : classAnalyzer_(classAnalyzer)
-    , memberdef_(memberdef)
+ClassStaticFunctionAnalyzer::ClassStaticFunctionAnalyzer(const ClassAnalyzer& classAnalyzer, xml_node memberdef, const TemplateSpecialization& specialization)
+    : FunctionAnalyzer(memberdef, specialization)
+    , classAnalyzer_(classAnalyzer)
 {
-    assert(IsMemberdef(memberdef));
-    assert(ExtractKind(memberdef) == "function");
     assert(IsStatic(memberdef));
 }
