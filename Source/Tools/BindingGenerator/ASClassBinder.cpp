@@ -264,12 +264,7 @@ static void RegisterRefCountedConstructor(const ClassFunctionAnalyzer& functionA
     string header = functionAnalyzer.GetClass().GetHeaderFile();
     string insideDefine = InsideDefine(header);
 
-    string args = ExtractArgsstring(functionAnalyzer.GetMemberdef());
-    assert(!args.empty());
-    assert(StartsWith(args, "("));
-    size_t endPos = args.find_last_of(')'); // After ')' can be " override"
-    assert(endPos != string::npos);
-    args = args.substr(1, endPos - 1);
+    string args = ExtractCleanedFunctionArgsstring(functionAnalyzer.GetMemberdef());
 
     //shared_ptr<ASGeneratedFile_Members> result = GetGeneratedFile(functionAnalyzer.GetClass().GetClassName());
     ASGeneratedFile_Base* result = templateVersion ? (ASGeneratedFile_Base*)_result_Templates.get() : (ASGeneratedFile_Base*)GetGeneratedFile(functionAnalyzer.GetClass().GetClassName()).get();
@@ -382,12 +377,7 @@ static void RegisterValueConstructor(const ClassFunctionAnalyzer& functionAnalyz
     string className = functionAnalyzer.GetClassName();
     string wrapperName = GenerateWrapperName(functionAnalyzer, templateVersion);
     
-    string args = ExtractArgsstring(functionAnalyzer.GetMemberdef());
-    assert(!args.empty());
-    assert(StartsWith(args, "("));
-    size_t endPos = args.find_last_of(')'); // After ')' can be " override"
-    assert(endPos != string::npos);
-    args = args.substr(1, endPos - 1);
+    string args = ExtractCleanedFunctionArgsstring(functionAnalyzer.GetMemberdef());
 
     shared_ptr<ASGeneratedFile_Members> result = GetGeneratedFile(className);
 
@@ -473,50 +463,6 @@ static void RegisterValueConstructor(const ClassFunctionAnalyzer& functionAnalyz
         Result::AddHeader(header);
 }
 
-static void RegisterValueDestructor(const ClassFunctionAnalyzer& functionAnalyzer, bool templateVersion)
-{
-    string className = functionAnalyzer.GetClassName();
-    string wrapperName = GenerateWrapperName(functionAnalyzer, templateVersion);
-    shared_ptr<ASGeneratedFile_Members> result = GetGeneratedFile(className);
-
-    result->glue_ <<
-        "// " << functionAnalyzer.GetLocation() << "\n"
-        "static void " << wrapperName << "(" << className << "* ptr)\n"
-        "{\n"
-        "    ptr->~" << className << "();\n"
-        "}\n\n";
-
-    result->reg_ << "    engine->RegisterObjectBehaviour(\"" << className << "\", asBEHAVE_DESTRUCT, \"void f()\", asFUNCTION(" << wrapperName << "), asCALL_CDECL_OBJFIRST);\n";
-}
-
-static void RegisterImplicitlyDeclaredDestructor(const ClassAnalyzer& classAnalyzer)
-{
-    string className = classAnalyzer.GetClassName();
-    string wrapperName = className + "_Destructor";
-    shared_ptr<ASGeneratedFile_Members> result = GetGeneratedFile(className);
-    string header = classAnalyzer.GetHeaderFile();
-    string insideDefine = InsideDefine(header);
-
-    if (!insideDefine.empty())
-        result->glue_ << "#ifdef " << insideDefine << "\n";
-
-    result->glue_ <<
-        "// " << className << "::~" << className << "() | Implicitly-declared\n"
-        "static void " << wrapperName << "(" << className << "* ptr)\n"
-        "{\n"
-        "    ptr->~" << className << "();\n"
-        "}\n";
-
-    if (!insideDefine.empty())
-        result->glue_ << "#endif\n";
-
-    result->glue_ << "\n";
-
-    result->reg_ <<
-        "    // " << className << "::~" << className << "() | Implicitly-declared\n"
-        "    engine->RegisterObjectBehaviour(\"" << className << "\", asBEHAVE_DESTRUCT, \"void f()\", asFUNCTION(" << wrapperName << "), asCALL_CDECL_OBJFIRST);\n";
-}
-
 static void TryRegisterImplicitlyDeclaredAssignOperator(const ClassAnalyzer& classAnalyzer)
 {
     string className = classAnalyzer.GetClassName();
@@ -527,40 +473,9 @@ static void TryRegisterImplicitlyDeclaredAssignOperator(const ClassAnalyzer& cla
         "    RegisterImplicitlyDeclaredAssignOperatorIfPossible<" << className << ">(engine, \"" << className << "\");\n";
 }
 
-static bool IsDestructorRequired(const ClassAnalyzer& classAnalyzer)
-{
-    if (classAnalyzer.IsRefCounted())
-        return false;
-
-    if (Contains(classAnalyzer.GetComment(), "FAKE_REF"))
-        return false;
-
-    if (classAnalyzer.IsPod())
-        return false;
-
-    return true;
-}
-
-static bool IsConstructorRequired(const ClassAnalyzer& classAnalyzer)
-{
-    if (classAnalyzer.IsRefCounted())
-        return false;
-
-    if (Contains(classAnalyzer.GetComment(), "FAKE_REF"))
-        return false;
-
-    if (classAnalyzer.IsPod())
-        return false;
-
-    return true;
-}
-
 // Some required methods can not be bound automatically when processing class because implicitly-declared
 static void RegisterImplicitlyDeclaredMethods(const ClassAnalyzer& classAnalyzer)
 {
-    if (!classAnalyzer.HasDestructor() && IsDestructorRequired(classAnalyzer))
-        RegisterImplicitlyDeclaredDestructor(classAnalyzer);
-
     if (!classAnalyzer.ContainsFunction("operator="))
         TryRegisterImplicitlyDeclaredAssignOperator(classAnalyzer);
 
@@ -571,8 +486,8 @@ static void RegisterComparisonOperator(const ClassAnalyzer& classAnalyzer)
 {
     string className = classAnalyzer.GetClassName();
     string wrapperName = className + "_Comparison";
-    string operatorLessLocation = classAnalyzer.GetFunction("operator<").GetLocation();
-    string operatorGreaterLocation = classAnalyzer.GetFunction("operator>").GetLocation();
+    string operatorLessLocation = classAnalyzer.GetFunction("operator<")->GetLocation();
+    string operatorGreaterLocation = classAnalyzer.GetFunction("operator>")->GetLocation();
     shared_ptr<ASGeneratedFile_Members> result = GetGeneratedFile(className);
 
     result->glue_ <<
@@ -902,16 +817,10 @@ static void RegisterMethod(const ClassFunctionAnalyzer& functionAnalyzer, bool t
         return;
     }
 
-    result->reg_ << "    // " << functionAnalyzer.GetLocation() << "\n";
-    
     if (functionAnalyzer.IsThisDestructor())
-    {
-        // Do not register destructor for reference type
-        if (!functionAnalyzer.GetClass().IsRefCounted())
-            RegisterValueDestructor(functionAnalyzer, templateVersion);
-
         return;
-    }
+
+    result->reg_ << "    // " << functionAnalyzer.GetLocation() << "\n";
 
     vector<ParamAnalyzer> params = functionAnalyzer.GetParams();
     vector<shared_ptr<FuncParamConv> > convertedParams;

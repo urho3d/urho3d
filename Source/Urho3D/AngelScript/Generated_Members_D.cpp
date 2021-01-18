@@ -200,28 +200,10 @@ static void DebugLine_DebugLine_Vector3_Vector3_unsigned(DebugLine* ptr, const V
     new(ptr) DebugLine(start, end, color);
 }
 
-// DebugLine::~DebugLine() | Implicitly-declared
-static void DebugLine_Destructor(DebugLine* ptr)
-{
-    ptr->~DebugLine();
-}
-
 // DebugTriangle::DebugTriangle(const Vector3& v1, const Vector3& v2, const Vector3& v3, unsigned color) | File: ../Graphics/DebugRenderer.h
 static void DebugTriangle_DebugTriangle_Vector3_Vector3_Vector3_unsigned(DebugTriangle* ptr, const Vector3 &v1, const Vector3 &v2, const Vector3 &v3, unsigned color)
 {
     new(ptr) DebugTriangle(v1, v2, v3, color);
-}
-
-// DebugTriangle::~DebugTriangle() | Implicitly-declared
-static void DebugTriangle_Destructor(DebugTriangle* ptr)
-{
-    ptr->~DebugTriangle();
-}
-
-// Decal::~Decal() | Implicitly-declared
-static void Decal_Destructor(Decal* ptr)
-{
-    ptr->~Decal();
 }
 
 // DecalVertex::DecalVertex(const Vector3& position, const Vector3& normal) | File: ../Graphics/DecalSet.h
@@ -230,38 +212,10 @@ static void DecalVertex_DecalVertex_Vector3_Vector3(DecalVertex* ptr, const Vect
     new(ptr) DecalVertex(position, normal);
 }
 
-// DecalVertex::~DecalVertex() | Implicitly-declared
-static void DecalVertex_Destructor(DecalVertex* ptr)
-{
-    ptr->~DecalVertex();
-}
-
-#ifdef URHO3D_PHYSICS
-// DelayedWorldTransform::~DelayedWorldTransform() | Implicitly-declared
-static void DelayedWorldTransform_Destructor(DelayedWorldTransform* ptr)
-{
-    ptr->~DelayedWorldTransform();
-}
-#endif
-
-#ifdef URHO3D_URHO2D
-// DelayedWorldTransform2D::~DelayedWorldTransform2D() | Implicitly-declared
-static void DelayedWorldTransform2D_Destructor(DelayedWorldTransform2D* ptr)
-{
-    ptr->~DelayedWorldTransform2D();
-}
-#endif
-
 // DirtyBits::DirtyBits(const DirtyBits& bits) | File: ../Scene/ReplicationState.h
 static void DirtyBits_DirtyBits_DirtyBits(DirtyBits* ptr, const DirtyBits &bits)
 {
     new(ptr) DirtyBits(bits);
-}
-
-// DirtyBits::~DirtyBits() | Implicitly-declared
-static void DirtyBits_Destructor(DirtyBits* ptr)
-{
-    ptr->~DirtyBits();
 }
 
 void ASRegisterGenerated_Members_D(asIScriptEngine* engine)
@@ -3759,8 +3713,6 @@ void ASRegisterGenerated_Members_D(asIScriptEngine* engine)
     engine->RegisterObjectProperty("DebugLine", "Vector3 start", offsetof(DebugLine, start_));
     // DebugLine::DebugLine(const Vector3& start, const Vector3& end, unsigned color) | File: ../Graphics/DebugRenderer.h
     engine->RegisterObjectBehaviour("DebugLine", asBEHAVE_CONSTRUCT, "void f(const Vector3&in, const Vector3&in, uint)", asFUNCTION(DebugLine_DebugLine_Vector3_Vector3_unsigned), asCALL_CDECL_OBJFIRST);
-    // DebugLine::~DebugLine() | Implicitly-declared
-    engine->RegisterObjectBehaviour("DebugLine", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DebugLine_Destructor), asCALL_CDECL_OBJFIRST);
     // DebugLine& DebugLine::operator=(const DebugLine&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<DebugLine>(engine, "DebugLine");
 #ifdef REGISTER_MANUAL_PART_DebugLine
@@ -3777,8 +3729,6 @@ void ASRegisterGenerated_Members_D(asIScriptEngine* engine)
     engine->RegisterObjectProperty("DebugTriangle", "Vector3 v3", offsetof(DebugTriangle, v3_));
     // DebugTriangle::DebugTriangle(const Vector3& v1, const Vector3& v2, const Vector3& v3, unsigned color) | File: ../Graphics/DebugRenderer.h
     engine->RegisterObjectBehaviour("DebugTriangle", asBEHAVE_CONSTRUCT, "void f(const Vector3&in, const Vector3&in, const Vector3&in, uint)", asFUNCTION(DebugTriangle_DebugTriangle_Vector3_Vector3_Vector3_unsigned), asCALL_CDECL_OBJFIRST);
-    // DebugTriangle::~DebugTriangle() | Implicitly-declared
-    engine->RegisterObjectBehaviour("DebugTriangle", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DebugTriangle_Destructor), asCALL_CDECL_OBJFIRST);
     // DebugTriangle& DebugTriangle::operator=(const DebugTriangle&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<DebugTriangle>(engine, "DebugTriangle");
 #ifdef REGISTER_MANUAL_PART_DebugTriangle
@@ -3799,8 +3749,6 @@ void ASRegisterGenerated_Members_D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Decal", "void AddVertex(const DecalVertex&in)", asMETHODPR(Decal, AddVertex, (const DecalVertex&), void), asCALL_THISCALL);
     // void Decal::CalculateBoundingBox() | File: ../Graphics/DecalSet.h
     engine->RegisterObjectMethod("Decal", "void CalculateBoundingBox()", asMETHODPR(Decal, CalculateBoundingBox, (), void), asCALL_THISCALL);
-    // Decal::~Decal() | Implicitly-declared
-    engine->RegisterObjectBehaviour("Decal", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(Decal_Destructor), asCALL_CDECL_OBJFIRST);
     // Decal& Decal::operator=(const Decal&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<Decal>(engine, "Decal");
 #ifdef REGISTER_MANUAL_PART_Decal
@@ -3823,8 +3771,6 @@ void ASRegisterGenerated_Members_D(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("DecalVertex", asBEHAVE_CONSTRUCT, "void f(const Vector3&in, const Vector3&in)", asFUNCTION(DecalVertex_DecalVertex_Vector3_Vector3), asCALL_CDECL_OBJFIRST);
     // DecalVertex::DecalVertex(const Vector3& position, const Vector3& normal, const float* blendWeights, const unsigned char* blendIndices) | File: ../Graphics/DecalSet.h
     // Error: type "const float*" can not automatically bind
-    // DecalVertex::~DecalVertex() | Implicitly-declared
-    engine->RegisterObjectBehaviour("DecalVertex", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DecalVertex_Destructor), asCALL_CDECL_OBJFIRST);
     // DecalVertex& DecalVertex::operator=(const DecalVertex&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<DecalVertex>(engine, "DecalVertex");
 #ifdef REGISTER_MANUAL_PART_DecalVertex
@@ -3840,8 +3786,6 @@ void ASRegisterGenerated_Members_D(asIScriptEngine* engine)
     engine->RegisterObjectProperty("DelayedWorldTransform", "Vector3 worldPosition", offsetof(DelayedWorldTransform, worldPosition_));
     // Quaternion DelayedWorldTransform::worldRotation_ | File: ../Physics/PhysicsWorld.h
     engine->RegisterObjectProperty("DelayedWorldTransform", "Quaternion worldRotation", offsetof(DelayedWorldTransform, worldRotation_));
-    // DelayedWorldTransform::~DelayedWorldTransform() | Implicitly-declared
-    engine->RegisterObjectBehaviour("DelayedWorldTransform", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DelayedWorldTransform_Destructor), asCALL_CDECL_OBJFIRST);
     // DelayedWorldTransform& DelayedWorldTransform::operator=(const DelayedWorldTransform&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<DelayedWorldTransform>(engine, "DelayedWorldTransform");
 #ifdef REGISTER_MANUAL_PART_DelayedWorldTransform
@@ -3858,8 +3802,6 @@ void ASRegisterGenerated_Members_D(asIScriptEngine* engine)
     engine->RegisterObjectProperty("DelayedWorldTransform2D", "Vector3 worldPosition", offsetof(DelayedWorldTransform2D, worldPosition_));
     // Quaternion DelayedWorldTransform2D::worldRotation_ | File: ../Urho2D/PhysicsWorld2D.h
     engine->RegisterObjectProperty("DelayedWorldTransform2D", "Quaternion worldRotation", offsetof(DelayedWorldTransform2D, worldRotation_));
-    // DelayedWorldTransform2D::~DelayedWorldTransform2D() | Implicitly-declared
-    engine->RegisterObjectBehaviour("DelayedWorldTransform2D", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DelayedWorldTransform2D_Destructor), asCALL_CDECL_OBJFIRST);
     // DelayedWorldTransform2D& DelayedWorldTransform2D::operator=(const DelayedWorldTransform2D&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<DelayedWorldTransform2D>(engine, "DelayedWorldTransform2D");
 #ifdef REGISTER_MANUAL_PART_DelayedWorldTransform2D
@@ -3893,8 +3835,6 @@ void ASRegisterGenerated_Members_D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("DirtyBits", "bool IsSet(uint) const", asMETHODPR(DirtyBits, IsSet, (unsigned) const, bool), asCALL_THISCALL);
     // void DirtyBits::Set(unsigned index) | File: ../Scene/ReplicationState.h
     engine->RegisterObjectMethod("DirtyBits", "void Set(uint)", asMETHODPR(DirtyBits, Set, (unsigned), void), asCALL_THISCALL);
-    // DirtyBits::~DirtyBits() | Implicitly-declared
-    engine->RegisterObjectBehaviour("DirtyBits", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DirtyBits_Destructor), asCALL_CDECL_OBJFIRST);
     // DirtyBits& DirtyBits::operator=(const DirtyBits&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<DirtyBits>(engine, "DirtyBits");
 #ifdef REGISTER_MANUAL_PART_DirtyBits

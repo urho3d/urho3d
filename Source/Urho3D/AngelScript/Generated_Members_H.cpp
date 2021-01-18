@@ -12,18 +12,6 @@ namespace Urho3D
 void FakeAddRef(void* ptr);
 void FakeReleaseRef(void* ptr);
 
-// HashBase::~HashBase() | Implicitly-declared
-static void HashBase_Destructor(HashBase* ptr)
-{
-    ptr->~HashBase();
-}
-
-// HiresTimer::~HiresTimer() | Implicitly-declared
-static void HiresTimer_Destructor(HiresTimer* ptr)
-{
-    ptr->~HiresTimer();
-}
-
 #ifdef URHO3D_NETWORK
 // StringVector Deserializer::ReadStringVector() | File: ../IO/Deserializer.h
 static CScriptArray* HttpRequest_ReadStringVector_void(HttpRequest* ptr)
@@ -32,18 +20,6 @@ static CScriptArray* HttpRequest_ReadStringVector_void(HttpRequest* ptr)
     return VectorToArray<String>(result, "Array<String>");
 }
 #endif
-
-// HashIteratorBase::~HashIteratorBase() | Implicitly-declared
-static void HashIteratorBase_Destructor(HashIteratorBase* ptr)
-{
-    ptr->~HashIteratorBase();
-}
-
-// HashNodeBase::~HashNodeBase() | Implicitly-declared
-static void HashNodeBase_Destructor(HashNodeBase* ptr)
-{
-    ptr->~HashNodeBase();
-}
 
 #ifdef URHO3D_PHYSICS
 // HeightfieldData::HeightfieldData(Terrain* terrain, unsigned lodLevel) | File: ../Physics/CollisionShape.h
@@ -71,8 +47,6 @@ void ASRegisterGenerated_Members_H(asIScriptEngine* engine)
     engine->RegisterObjectMethod("HashBase", "uint Size() const", asMETHODPR(HashBase, Size, () const, unsigned), asCALL_THISCALL);
     // void HashBase::Swap(HashBase& rhs) | File: ../Container/HashBase.h
     engine->RegisterObjectMethod("HashBase", "void Swap(HashBase&)", asMETHODPR(HashBase, Swap, (HashBase&), void), asCALL_THISCALL);
-    // HashBase::~HashBase() | Implicitly-declared
-    engine->RegisterObjectBehaviour("HashBase", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(HashBase_Destructor), asCALL_CDECL_OBJFIRST);
     // HashBase& HashBase::operator=(const HashBase&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<HashBase>(engine, "HashBase");
 #ifdef REGISTER_MANUAL_PART_HashBase
@@ -91,8 +65,6 @@ void ASRegisterGenerated_Members_H(asIScriptEngine* engine)
     engine->SetDefaultNamespace("");
     // void HiresTimer::Reset() | File: ../Core/Timer.h
     engine->RegisterObjectMethod("HiresTimer", "void Reset()", asMETHODPR(HiresTimer, Reset, (), void), asCALL_THISCALL);
-    // HiresTimer::~HiresTimer() | Implicitly-declared
-    engine->RegisterObjectBehaviour("HiresTimer", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(HiresTimer_Destructor), asCALL_CDECL_OBJFIRST);
     // HiresTimer& HiresTimer::operator=(const HiresTimer&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<HiresTimer>(engine, "HiresTimer");
 #ifdef REGISTER_MANUAL_PART_HiresTimer
@@ -281,8 +253,6 @@ void ASRegisterGenerated_Members_H(asIScriptEngine* engine)
     // Error: type "HashNodeBase*" can not automatically bind
     // bool HashIteratorBase::operator==(const HashIteratorBase& rhs) const | File: ../Container/HashBase.h
     engine->RegisterObjectMethod("HashIteratorBase", "bool opEquals(const HashIteratorBase&in) const", asMETHODPR(HashIteratorBase, operator==, (const HashIteratorBase&) const, bool), asCALL_THISCALL);
-    // HashIteratorBase::~HashIteratorBase() | Implicitly-declared
-    engine->RegisterObjectBehaviour("HashIteratorBase", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(HashIteratorBase_Destructor), asCALL_CDECL_OBJFIRST);
     // HashIteratorBase& HashIteratorBase::operator=(const HashIteratorBase&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<HashIteratorBase>(engine, "HashIteratorBase");
 #ifdef REGISTER_MANUAL_PART_HashIteratorBase
@@ -295,8 +265,6 @@ void ASRegisterGenerated_Members_H(asIScriptEngine* engine)
     // HashNodeBase* can not be registered
     // HashNodeBase* HashNodeBase::prev_ | File: ../Container/HashBase.h
     // HashNodeBase* can not be registered
-    // HashNodeBase::~HashNodeBase() | Implicitly-declared
-    engine->RegisterObjectBehaviour("HashNodeBase", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(HashNodeBase_Destructor), asCALL_CDECL_OBJFIRST);
     // HashNodeBase& HashNodeBase::operator=(const HashNodeBase&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<HashNodeBase>(engine, "HashNodeBase");
 #ifdef REGISTER_MANUAL_PART_HashNodeBase

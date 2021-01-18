@@ -67,12 +67,6 @@ static void JSONValue_JSONValue_JSONValue(JSONValue* ptr, const JSONValue &value
     new(ptr) JSONValue(value);
 }
 
-// JSONValue::~JSONValue() | File: ../Resource/JSONValue.h
-static void JSONValue_Destructor_JSONValue_void(JSONValue* ptr)
-{
-    ptr->~JSONValue();
-}
-
 void ASRegisterGenerated_Members_J(asIScriptEngine* engine)
 {
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
@@ -417,8 +411,6 @@ void ASRegisterGenerated_Members_J(asIScriptEngine* engine)
     // unsigned JSONValue::Size() const | File: ../Resource/JSONValue.h
     engine->RegisterObjectMethod("JSONValue", "uint Size() const", asMETHODPR(JSONValue, Size, () const, unsigned), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "uint get_size() const", asMETHODPR(JSONValue, Size, () const, unsigned), asCALL_THISCALL);
-    // JSONValue::~JSONValue() | File: ../Resource/JSONValue.h
-    engine->RegisterObjectBehaviour("JSONValue", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(JSONValue_Destructor_JSONValue_void), asCALL_CDECL_OBJFIRST);
 #ifdef REGISTER_MANUAL_PART_JSONValue
     REGISTER_MANUAL_PART_JSONValue(JSONValue, "JSONValue")
 #endif

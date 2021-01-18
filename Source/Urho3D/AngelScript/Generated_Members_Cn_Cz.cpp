@@ -208,12 +208,6 @@ static void Component_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Co
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
 }
 
-// Condition::~Condition() | File: ../Core/Condition.h
-static void Condition_Destructor_Condition_void(Condition* ptr)
-{
-    ptr->~Condition();
-}
-
 #ifdef URHO3D_NETWORK
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void Connection_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Connection* ptr, CScriptArray* exceptions, bool onlyUserData)
@@ -260,12 +254,6 @@ static Object* Context_CreateObject_StringHash(Context* ptr, StringHash objectTy
 {
     SharedPtr<Object> result = ptr->CreateObject(objectType);
     return result.Detach();
-}
-
-// Controls::~Controls() | File: ../Input/Controls.h
-static void Controls_Destructor_Controls_void(Controls* ptr)
-{
-    ptr->~Controls();
 }
 
 #ifdef URHO3D_NAVIGATION
@@ -397,18 +385,6 @@ static ColorFrame* ColorFrame_ColorFrame_Color_float(const Color &color, float t
     return new ColorFrame(color, time);
 }
 
-// ComponentReplicationState::~ComponentReplicationState() | Implicitly-declared
-static void ComponentReplicationState_Destructor(ComponentReplicationState* ptr)
-{
-    ptr->~ComponentReplicationState();
-}
-
-// CompressedLevel::~CompressedLevel() | Implicitly-declared
-static void CompressedLevel_Destructor(CompressedLevel* ptr)
-{
-    ptr->~CompressedLevel();
-}
-
 #ifdef URHO3D_PHYSICS
 // void ConvexData::BuildHull(const PODVector<Vector3>& vertices) | File: ../Physics/CollisionShape.h
 static void ConvexData_BuildHull_PODVectorVector3(ConvexData* ptr, CScriptArray* vertices)
@@ -438,12 +414,6 @@ static ConvexData* ConvexData_ConvexData_CustomGeometry(CustomGeometry *custom)
 static void CursorShapeInfo_CursorShapeInfo_int(CursorShapeInfo* ptr, int systemCursor)
 {
     new(ptr) CursorShapeInfo(systemCursor);
-}
-
-// CursorShapeInfo::~CursorShapeInfo() | Implicitly-declared
-static void CursorShapeInfo_Destructor(CursorShapeInfo* ptr)
-{
-    ptr->~CursorShapeInfo();
 }
 
 void ASRegisterGenerated_Members_Cn_Cz(asIScriptEngine* engine)
@@ -3373,8 +3343,6 @@ void ASRegisterGenerated_Members_Cn_Cz(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Condition", "void Set()", asMETHODPR(Condition, Set, (), void), asCALL_THISCALL);
     // void Condition::Wait() | File: ../Core/Condition.h
     engine->RegisterObjectMethod("Condition", "void Wait()", asMETHODPR(Condition, Wait, (), void), asCALL_THISCALL);
-    // Condition::~Condition() | File: ../Core/Condition.h
-    engine->RegisterObjectBehaviour("Condition", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(Condition_Destructor_Condition_void), asCALL_CDECL_OBJFIRST);
     // Condition& Condition::operator=(const Condition&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<Condition>(engine, "Condition");
 #ifdef REGISTER_MANUAL_PART_Condition
@@ -4057,8 +4025,6 @@ void ASRegisterGenerated_Members_Cn_Cz(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Controls", "void Reset()", asMETHODPR(Controls, Reset, (), void), asCALL_THISCALL);
     // void Controls::Set(unsigned buttons, bool down=true) | File: ../Input/Controls.h
     engine->RegisterObjectMethod("Controls", "void Set(uint, bool = true)", asMETHODPR(Controls, Set, (unsigned, bool), void), asCALL_THISCALL);
-    // Controls::~Controls() | File: ../Input/Controls.h
-    engine->RegisterObjectBehaviour("Controls", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(Controls_Destructor_Controls_void), asCALL_CDECL_OBJFIRST);
     // Controls& Controls::operator=(const Controls&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<Controls>(engine, "Controls");
 #ifdef REGISTER_MANUAL_PART_Controls
@@ -6185,8 +6151,6 @@ void ASRegisterGenerated_Members_Cn_Cz(asIScriptEngine* engine)
     engine->RegisterObjectProperty("ComponentReplicationState", "DirtyBits dirtyAttributes", offsetof(ComponentReplicationState, dirtyAttributes_));
     // NodeReplicationState* ComponentReplicationState::nodeState_ | File: ../Scene/ReplicationState.h
     // NodeReplicationState* can not be registered
-    // ComponentReplicationState::~ComponentReplicationState() | Implicitly-declared
-    engine->RegisterObjectBehaviour("ComponentReplicationState", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(ComponentReplicationState_Destructor), asCALL_CDECL_OBJFIRST);
     // ComponentReplicationState& ComponentReplicationState::operator=(const ComponentReplicationState&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<ComponentReplicationState>(engine, "ComponentReplicationState");
 #ifdef REGISTER_MANUAL_PART_ReplicationState
@@ -6216,8 +6180,6 @@ void ASRegisterGenerated_Members_Cn_Cz(asIScriptEngine* engine)
     engine->RegisterObjectProperty("CompressedLevel", "int width", offsetof(CompressedLevel, width_));
     // bool CompressedLevel::Decompress(unsigned char* dest) const | File: ../Resource/Image.h
     // Error: type "unsigned char*" can not automatically bind
-    // CompressedLevel::~CompressedLevel() | Implicitly-declared
-    engine->RegisterObjectBehaviour("CompressedLevel", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(CompressedLevel_Destructor), asCALL_CDECL_OBJFIRST);
     // CompressedLevel& CompressedLevel::operator=(const CompressedLevel&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<CompressedLevel>(engine, "CompressedLevel");
 #ifdef REGISTER_MANUAL_PART_CompressedLevel
@@ -6308,8 +6270,6 @@ void ASRegisterGenerated_Members_Cn_Cz(asIScriptEngine* engine)
     // Error: type "SharedPtr<Texture>" can not automatically bind
     // explicit CursorShapeInfo::CursorShapeInfo(int systemCursor) | File: ../UI/Cursor.h
     engine->RegisterObjectBehaviour("CursorShapeInfo", asBEHAVE_CONSTRUCT, "void f(int)", asFUNCTION(CursorShapeInfo_CursorShapeInfo_int), asCALL_CDECL_OBJFIRST);
-    // CursorShapeInfo::~CursorShapeInfo() | Implicitly-declared
-    engine->RegisterObjectBehaviour("CursorShapeInfo", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(CursorShapeInfo_Destructor), asCALL_CDECL_OBJFIRST);
     // CursorShapeInfo& CursorShapeInfo::operator=(const CursorShapeInfo&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<CursorShapeInfo>(engine, "CursorShapeInfo");
 #ifdef REGISTER_MANUAL_PART_CursorShapeInfo

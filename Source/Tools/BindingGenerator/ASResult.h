@@ -131,6 +131,12 @@ struct ProcessedClass
     bool operator <(const ProcessedClass& rhs) const;
 
     shared_ptr<ClassMemberRegistration> defaultConstructor_;
+    shared_ptr<ClassMemberRegistration> destructor_;
+
+    // Tests
+    vector<string> nonDefaultConstructors_;
+    vector<string> commonMembers_;
+    vector<string> personalMembers_;
 };
 
 namespace Result

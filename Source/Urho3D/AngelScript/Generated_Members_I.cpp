@@ -166,18 +166,6 @@ static void IntVector3_IntVector3_IntVector3(IntVector3* ptr, const IntVector3 &
     new(ptr) IntVector3(rhs);
 }
 
-// IndexBufferDesc::~IndexBufferDesc() | Implicitly-declared
-static void IndexBufferDesc_Destructor(IndexBufferDesc* ptr)
-{
-    ptr->~IndexBufferDesc();
-}
-
-// InstanceData::~InstanceData() | Implicitly-declared
-static void InstanceData_Destructor(InstanceData* ptr)
-{
-    ptr->~InstanceData();
-}
-
 void ASRegisterGenerated_Members_I(asIScriptEngine* engine)
 {
 #ifdef URHO3D_IK
@@ -2100,8 +2088,6 @@ void ASRegisterGenerated_Members_I(asIScriptEngine* engine)
     engine->RegisterObjectProperty("IndexBufferDesc", "uint indexCount", offsetof(IndexBufferDesc, indexCount_));
     // unsigned IndexBufferDesc::indexSize_ | File: ../Graphics/Model.h
     engine->RegisterObjectProperty("IndexBufferDesc", "uint indexSize", offsetof(IndexBufferDesc, indexSize_));
-    // IndexBufferDesc::~IndexBufferDesc() | Implicitly-declared
-    engine->RegisterObjectBehaviour("IndexBufferDesc", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(IndexBufferDesc_Destructor), asCALL_CDECL_OBJFIRST);
     // IndexBufferDesc& IndexBufferDesc::operator=(const IndexBufferDesc&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<IndexBufferDesc>(engine, "IndexBufferDesc");
 #ifdef REGISTER_MANUAL_PART_IndexBufferDesc
@@ -2116,8 +2102,6 @@ void ASRegisterGenerated_Members_I(asIScriptEngine* engine)
     // const Matrix3x4* can not be registered
     // InstanceData::InstanceData(const Matrix3x4* worldTransform, const void* instancingData, float distance) | File: ../Graphics/Batch.h
     // Error: type "const Matrix3x4*" can not automatically bind
-    // InstanceData::~InstanceData() | Implicitly-declared
-    engine->RegisterObjectBehaviour("InstanceData", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(InstanceData_Destructor), asCALL_CDECL_OBJFIRST);
     // InstanceData& InstanceData::operator=(const InstanceData&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<InstanceData>(engine, "InstanceData");
 #ifdef REGISTER_MANUAL_PART_InstanceData

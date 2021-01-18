@@ -263,12 +263,6 @@ static void Polyhedron_Polyhedron_Frustum(Polyhedron* ptr, const Frustum &frustu
     new(ptr) Polyhedron(frustum);
 }
 
-// Polyhedron::~Polyhedron() noexcept=default | File: ../Math/Polyhedron.h
-static void Polyhedron_Destructor_Polyhedron_void(Polyhedron* ptr)
-{
-    ptr->~Polyhedron();
-}
-
 // explicit Profiler::Profiler(Context* context) | File: ../Core/Profiler.h
 static Profiler* Profiler_Profiler_Context()
 {
@@ -328,66 +322,6 @@ static void ProgressBar_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(
 static PropertySet2D* PropertySet2D_PropertySet2D_void()
 {
     return new PropertySet2D();
-}
-#endif
-
-#ifdef URHO3D_NETWORK
-// PackageDownload::~PackageDownload() | Implicitly-declared
-static void PackageDownload_Destructor(PackageDownload* ptr)
-{
-    ptr->~PackageDownload();
-}
-#endif
-
-#ifdef URHO3D_NETWORK
-// PackageUpload::~PackageUpload() | Implicitly-declared
-static void PackageUpload_Destructor(PackageUpload* ptr)
-{
-    ptr->~PackageUpload();
-}
-#endif
-
-// Particle::~Particle() | Implicitly-declared
-static void Particle_Destructor(Particle* ptr)
-{
-    ptr->~Particle();
-}
-
-#ifdef URHO3D_URHO2D
-// Particle2D::~Particle2D() | Implicitly-declared
-static void Particle2D_Destructor(Particle2D* ptr)
-{
-    ptr->~Particle2D();
-}
-#endif
-
-// PerThreadSceneResult::~PerThreadSceneResult() | Implicitly-declared
-static void PerThreadSceneResult_Destructor(PerThreadSceneResult* ptr)
-{
-    ptr->~PerThreadSceneResult();
-}
-
-#ifdef URHO3D_PHYSICS
-// PhysicsRaycastResult::~PhysicsRaycastResult() | Implicitly-declared
-static void PhysicsRaycastResult_Destructor(PhysicsRaycastResult* ptr)
-{
-    ptr->~PhysicsRaycastResult();
-}
-#endif
-
-#ifdef URHO3D_URHO2D
-// PhysicsRaycastResult2D::~PhysicsRaycastResult2D() | Implicitly-declared
-static void PhysicsRaycastResult2D_Destructor(PhysicsRaycastResult2D* ptr)
-{
-    ptr->~PhysicsRaycastResult2D();
-}
-#endif
-
-#ifdef URHO3D_PHYSICS
-// PhysicsWorldConfig::~PhysicsWorldConfig() | Implicitly-declared
-static void PhysicsWorldConfig_Destructor(PhysicsWorldConfig* ptr)
-{
-    ptr->~PhysicsWorldConfig();
 }
 #endif
 
@@ -3279,8 +3213,6 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Polyhedron", "Polyhedron Transformed(const Matrix3&in) const", asMETHODPR(Polyhedron, Transformed, (const Matrix3&) const, Polyhedron), asCALL_THISCALL);
     // Polyhedron Polyhedron::Transformed(const Matrix3x4& transform) const | File: ../Math/Polyhedron.h
     engine->RegisterObjectMethod("Polyhedron", "Polyhedron Transformed(const Matrix3x4&in) const", asMETHODPR(Polyhedron, Transformed, (const Matrix3x4&) const, Polyhedron), asCALL_THISCALL);
-    // Polyhedron::~Polyhedron() noexcept=default | File: ../Math/Polyhedron.h
-    engine->RegisterObjectBehaviour("Polyhedron", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(Polyhedron_Destructor_Polyhedron_void), asCALL_CDECL_OBJFIRST);
 #ifdef REGISTER_MANUAL_PART_Polyhedron
     REGISTER_MANUAL_PART_Polyhedron(Polyhedron, "Polyhedron")
 #endif
@@ -4319,8 +4251,6 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     // Error: type "HashSet<unsigned>" can not automatically bind
     // unsigned PackageDownload::totalFragments_ | File: ../Network/Connection.h
     engine->RegisterObjectProperty("PackageDownload", "uint totalFragments", offsetof(PackageDownload, totalFragments_));
-    // PackageDownload::~PackageDownload() | Implicitly-declared
-    engine->RegisterObjectBehaviour("PackageDownload", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(PackageDownload_Destructor), asCALL_CDECL_OBJFIRST);
     // PackageDownload& PackageDownload::operator=(const PackageDownload&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<PackageDownload>(engine, "PackageDownload");
 #ifdef REGISTER_MANUAL_PART_PackageDownload
@@ -4347,8 +4277,6 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     engine->RegisterObjectProperty("PackageUpload", "uint fragment", offsetof(PackageUpload, fragment_));
     // unsigned PackageUpload::totalFragments_ | File: ../Network/Connection.h
     engine->RegisterObjectProperty("PackageUpload", "uint totalFragments", offsetof(PackageUpload, totalFragments_));
-    // PackageUpload::~PackageUpload() | Implicitly-declared
-    engine->RegisterObjectBehaviour("PackageUpload", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(PackageUpload_Destructor), asCALL_CDECL_OBJFIRST);
     // PackageUpload& PackageUpload::operator=(const PackageUpload&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<PackageUpload>(engine, "PackageUpload");
 #ifdef REGISTER_MANUAL_PART_PackageUpload
@@ -4372,8 +4300,6 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     engine->RegisterObjectProperty("Particle", "float timeToLive", offsetof(Particle, timeToLive_));
     // Vector3 Particle::velocity_ | File: ../Graphics/ParticleEmitter.h
     engine->RegisterObjectProperty("Particle", "Vector3 velocity", offsetof(Particle, velocity_));
-    // Particle::~Particle() | Implicitly-declared
-    engine->RegisterObjectBehaviour("Particle", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(Particle_Destructor), asCALL_CDECL_OBJFIRST);
     // Particle& Particle::operator=(const Particle&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<Particle>(engine, "Particle");
 #ifdef REGISTER_MANUAL_PART_Particle
@@ -4413,8 +4339,6 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     engine->RegisterObjectProperty("Particle2D", "float timeToLive", offsetof(Particle2D, timeToLive_));
     // Vector2 Particle2D::velocity_ | File: ../Urho2D/ParticleEmitter2D.h
     engine->RegisterObjectProperty("Particle2D", "Vector2 velocity", offsetof(Particle2D, velocity_));
-    // Particle2D::~Particle2D() | Implicitly-declared
-    engine->RegisterObjectBehaviour("Particle2D", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(Particle2D_Destructor), asCALL_CDECL_OBJFIRST);
     // Particle2D& Particle2D::operator=(const Particle2D&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<Particle2D>(engine, "Particle2D");
 #ifdef REGISTER_MANUAL_PART_Particle2D
@@ -4430,8 +4354,6 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     engine->RegisterObjectProperty("PerThreadSceneResult", "float maxZ", offsetof(PerThreadSceneResult, maxZ_));
     // float PerThreadSceneResult::minZ_ | File: ../Graphics/View.h
     engine->RegisterObjectProperty("PerThreadSceneResult", "float minZ", offsetof(PerThreadSceneResult, minZ_));
-    // PerThreadSceneResult::~PerThreadSceneResult() | Implicitly-declared
-    engine->RegisterObjectBehaviour("PerThreadSceneResult", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(PerThreadSceneResult_Destructor), asCALL_CDECL_OBJFIRST);
     // PerThreadSceneResult& PerThreadSceneResult::operator=(const PerThreadSceneResult&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<PerThreadSceneResult>(engine, "PerThreadSceneResult");
 #ifdef REGISTER_MANUAL_PART_PerThreadSceneResult
@@ -4449,8 +4371,6 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     engine->RegisterObjectProperty("PhysicsRaycastResult", "Vector3 normal", offsetof(PhysicsRaycastResult, normal_));
     // Vector3 PhysicsRaycastResult::position_ | File: ../Physics/PhysicsWorld.h
     engine->RegisterObjectProperty("PhysicsRaycastResult", "Vector3 position", offsetof(PhysicsRaycastResult, position_));
-    // PhysicsRaycastResult::~PhysicsRaycastResult() | Implicitly-declared
-    engine->RegisterObjectBehaviour("PhysicsRaycastResult", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(PhysicsRaycastResult_Destructor), asCALL_CDECL_OBJFIRST);
     // PhysicsRaycastResult& PhysicsRaycastResult::operator=(const PhysicsRaycastResult&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<PhysicsRaycastResult>(engine, "PhysicsRaycastResult");
 #ifdef REGISTER_MANUAL_PART_PhysicsRaycastResult
@@ -4467,8 +4387,6 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     engine->RegisterObjectProperty("PhysicsRaycastResult2D", "Vector2 normal", offsetof(PhysicsRaycastResult2D, normal_));
     // Vector2 PhysicsRaycastResult2D::position_ | File: ../Urho2D/PhysicsWorld2D.h
     engine->RegisterObjectProperty("PhysicsRaycastResult2D", "Vector2 position", offsetof(PhysicsRaycastResult2D, position_));
-    // PhysicsRaycastResult2D::~PhysicsRaycastResult2D() | Implicitly-declared
-    engine->RegisterObjectBehaviour("PhysicsRaycastResult2D", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(PhysicsRaycastResult2D_Destructor), asCALL_CDECL_OBJFIRST);
     // PhysicsRaycastResult2D& PhysicsRaycastResult2D::operator=(const PhysicsRaycastResult2D&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<PhysicsRaycastResult2D>(engine, "PhysicsRaycastResult2D");
 #ifdef REGISTER_MANUAL_PART_PhysicsRaycastResult2D
@@ -4479,8 +4397,6 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
 #ifdef URHO3D_PHYSICS
     // btCollisionConfiguration* PhysicsWorldConfig::collisionConfig_ | File: ../Physics/PhysicsWorld.h
     // btCollisionConfiguration* can not be registered
-    // PhysicsWorldConfig::~PhysicsWorldConfig() | Implicitly-declared
-    engine->RegisterObjectBehaviour("PhysicsWorldConfig", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(PhysicsWorldConfig_Destructor), asCALL_CDECL_OBJFIRST);
     // PhysicsWorldConfig& PhysicsWorldConfig::operator=(const PhysicsWorldConfig&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<PhysicsWorldConfig>(engine, "PhysicsWorldConfig");
 #ifdef REGISTER_MANUAL_PART_PhysicsWorldConfig

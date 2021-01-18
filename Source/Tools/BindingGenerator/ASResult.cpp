@@ -474,8 +474,8 @@ namespace Result
             }
 
              ofs <<
-                 "// " << processedClass.defaultConstructor_->comment_ << "\n"
-                 << processedClass.defaultConstructor_->glue_;
+                 "// " << processedClass.defaultConstructor_->comment_ << "\n" <<
+                 processedClass.defaultConstructor_->glue_;
         }
 
         if (!openedDefine.empty())
@@ -527,11 +527,122 @@ namespace Result
             "}\n";
     }
 
+    // Write result to GeneratedClasses.cpp
+    static void SaveGeneratedClasses(const string& outputBasePath)
+    {
+        ofstream ofs(outputBasePath + "/Source/Urho3D/AngelScript/GeneratedClasses.cpp");
+
+        ofs <<
+            "// DO NOT EDIT. This file is generated\n"
+            "\n"
+            "#include \"../Precompiled.h\"\n"
+            "#include \"../AngelScript/APITemplates.h\"\n"
+            "\n"
+            "#include \"../AngelScript/GeneratedIncludes.h\"\n"
+            "#include \"../AngelScript/Manual.h\"\n"
+            "\n"
+            "namespace Urho3D\n"
+            "{\n"
+            "\n"
+            "void FakeAddRef(void* ptr);\n"
+            "void FakeReleaseRef(void* ptr);\n";
+
+        string openedDefine;
+        
+        for (const ProcessedClass& processedClass : classes_)
+        {
+            if (processedClass.insideDefine_ != openedDefine && !openedDefine.empty())
+            {
+                ofs << "\n#endif // def " << openedDefine << "\n";
+                openedDefine.clear();
+            }
+
+            ofs << "\n";
+
+            if (processedClass.insideDefine_ != openedDefine && !processedClass.insideDefine_.empty())
+            {
+                ofs << "#ifdef " << processedClass.insideDefine_ << "\n\n";
+                openedDefine = processedClass.insideDefine_;
+            }
+
+            if (processedClass.destructor_)
+            {
+                ofs <<
+                    "// " << processedClass.destructor_->comment_ << "\n"
+                    << processedClass.destructor_->glue_ <<
+                    "\n";
+            }
+
+            ofs <<
+                "static void Register" << processedClass.name_ << "(asIScriptEngine* engine)\n"
+                "{\n";
+
+            /*
+            for (string nonDefaultConstructor : processedClass.nonDefaultConstructors_)
+                ofs << "    // " << nonDefaultConstructor << "\n";
+                */
+
+            if (processedClass.destructor_)
+            {
+                ofs <<
+                    "    // " << processedClass.destructor_->comment_ << "\n"
+                    "    " << processedClass.destructor_->registration_ << "\n";
+            }
+
+            ofs << "}\n";
+
+        }
+
+        if (!openedDefine.empty())
+        {
+            ofs << "\n#endif // def " << openedDefine << "\n";
+            openedDefine.clear();
+        }
+
+        ofs <<
+            "\n"
+            "void ASRegisterGeneratedClasses(asIScriptEngine* engine)\n"
+            "{\n";
+
+        bool isFirst = true;
+
+        for (const ProcessedClass& processedClass : classes_)
+        {
+            if (processedClass.insideDefine_ != openedDefine && !openedDefine.empty())
+            {
+                ofs << "#endif\n";
+                openedDefine.clear();
+            }
+
+            if (processedClass.insideDefine_ != openedDefine && !processedClass.insideDefine_.empty())
+            {
+                if (!isFirst)
+                    ofs << "\n";
+
+                ofs << "#ifdef " << processedClass.insideDefine_ << "\n";
+                openedDefine = processedClass.insideDefine_;
+            }
+
+            ofs << "    Register" << processedClass.name_ << "(engine);\n";
+
+            isFirst = false;
+        }
+
+        if (!openedDefine.empty())
+            ofs << "#endif\n";
+
+        ofs <<
+            "}\n"
+            "\n"
+            "}\n";
+    }
+
     static void SaveClasses(const string& outputBasePath)
     {
         sort(classes_.begin(), classes_.end());
         SaveObjectTypes(outputBasePath);
         SaveDefaultConstructors(outputBasePath);
+        SaveGeneratedClasses(outputBasePath);
     }
 
     // ============================================================================

@@ -39,12 +39,6 @@ static void UI_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(UI* ptr, 
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
 }
 
-// UIBatch::~UIBatch() | Implicitly-declared
-static void UIBatch_Destructor(UIBatch* ptr)
-{
-    ptr->~UIBatch();
-}
-
 // explicit UIComponent::UIComponent(Context* context) | File: ../UI/UIComponent.h
 static UIComponent* UIComponent_UIComponent_Context()
 {
@@ -475,8 +469,6 @@ void ASRegisterGenerated_Members_U(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UIBatch", "void SetDefaultColor()", asMETHODPR(UIBatch, SetDefaultColor, (), void), asCALL_THISCALL);
     // UIBatch::UIBatch(UIElement* element, BlendMode blendMode, const IntRect& scissor, Texture* texture, PODVector<float>* vertexData) | File: ../UI/UIBatch.h
     // Error: type "PODVector<float>*" can not automatically bind
-    // UIBatch::~UIBatch() | Implicitly-declared
-    engine->RegisterObjectBehaviour("UIBatch", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(UIBatch_Destructor), asCALL_CDECL_OBJFIRST);
     // UIBatch& UIBatch::operator=(const UIBatch&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<UIBatch>(engine, "UIBatch");
 #ifdef REGISTER_MANUAL_PART_UIBatch

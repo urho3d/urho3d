@@ -72,12 +72,6 @@ static void CascadeParameters_CascadeParameters_float_float_float_float_float_fl
     new(ptr) CascadeParameters(split1, split2, split3, split4, fadeStart, biasAutoAdjust);
 }
 
-// CharLocation::~CharLocation() | Implicitly-declared
-static void CharLocation_Destructor(CharLocation* ptr)
-{
-    ptr->~CharLocation();
-}
-
 void ASRegisterGenerated_Members_Ca_Cm(asIScriptEngine* engine)
 {
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
@@ -1396,8 +1390,6 @@ void ASRegisterGenerated_Members_Ca_Cm(asIScriptEngine* engine)
     engine->RegisterObjectProperty("CharLocation", "Vector2 position", offsetof(CharLocation, position_));
     // Vector2 CharLocation::size_ | File: ../UI/Text.h
     engine->RegisterObjectProperty("CharLocation", "Vector2 size", offsetof(CharLocation, size_));
-    // CharLocation::~CharLocation() | Implicitly-declared
-    engine->RegisterObjectBehaviour("CharLocation", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(CharLocation_Destructor), asCALL_CDECL_OBJFIRST);
     // CharLocation& CharLocation::operator=(const CharLocation&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<CharLocation>(engine, "CharLocation");
 #ifdef REGISTER_MANUAL_PART_CharLocation

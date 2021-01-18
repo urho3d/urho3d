@@ -113,12 +113,6 @@ static void Spline_Spline_Spline(Spline* ptr, const Spline &rhs)
     new(ptr) Spline(rhs);
 }
 
-// Spline::~Spline() | Implicitly-declared
-static void Spline_Destructor(Spline* ptr)
-{
-    ptr->~Spline();
-}
-
 // explicit SplinePath::SplinePath(Context* context) | File: ../Scene/SplinePath.h
 static SplinePath* SplinePath_SplinePath_Context()
 {
@@ -417,12 +411,6 @@ static void String_String_char_unsigned(String* ptr, char value, unsigned length
     new(ptr) String(value, length);
 }
 
-// String::~String() | File: ../Container/Str.h
-static void String_Destructor_String_void(String* ptr)
-{
-    ptr->~String();
-}
-
 // bool String::operator<(const String& rhs) const | File: ../Container/Str.h
 // bool String::operator>(const String& rhs) const | File: ../Container/Str.h
 static int String_Comparison(const String& lhs, const String& rhs)
@@ -473,48 +461,16 @@ static void StringHashRegister_StringHashRegister_bool(StringHashRegister* ptr, 
     new(ptr) StringHashRegister(threadSafe);
 }
 
-// StringHashRegister::~StringHashRegister() | File: ../Core/StringHashRegister.h
-static void StringHashRegister_Destructor_StringHashRegister_void(StringHashRegister* ptr)
-{
-    ptr->~StringHashRegister();
-}
-
 // SourceBatch::SourceBatch(const SourceBatch& batch) | File: ../Graphics/Drawable.h
 static void SourceBatch_SourceBatch_SourceBatch(SourceBatch* ptr, const SourceBatch &batch)
 {
     new(ptr) SourceBatch(batch);
 }
 
-// SourceBatch::~SourceBatch() | File: ../Graphics/Drawable.h
-static void SourceBatch_Destructor_SourceBatch_void(SourceBatch* ptr)
-{
-    ptr->~SourceBatch();
-}
-
-#ifdef URHO3D_URHO2D
-// SourceBatch2D::~SourceBatch2D() | Implicitly-declared
-static void SourceBatch2D_Destructor(SourceBatch2D* ptr)
-{
-    ptr->~SourceBatch2D();
-}
-#endif
-
-// StaticModelGeometryData::~StaticModelGeometryData() | Implicitly-declared
-static void StaticModelGeometryData_Destructor(StaticModelGeometryData* ptr)
-{
-    ptr->~StaticModelGeometryData();
-}
-
 // StoredLogMessage::StoredLogMessage(const String& message, int level, bool error) | File: ../IO/Log.h
 static void StoredLogMessage_StoredLogMessage_String_int_bool(StoredLogMessage* ptr, const String &message, int level, bool error)
 {
     new(ptr) StoredLogMessage(message, level, error);
-}
-
-// StoredLogMessage::~StoredLogMessage() | Implicitly-declared
-static void StoredLogMessage_Destructor(StoredLogMessage* ptr)
-{
-    ptr->~StoredLogMessage();
 }
 
 void ASRegisterGenerated_Members_Sn_Sz(asIScriptEngine* engine)
@@ -1907,8 +1863,6 @@ void ASRegisterGenerated_Members_Sn_Sz(asIScriptEngine* engine)
     // Error: type "const Vector<Variant>&" can not automatically bind
     // Spline::Spline(const Spline& rhs)=default | File: ../Core/Spline.h
     engine->RegisterObjectBehaviour("Spline", asBEHAVE_CONSTRUCT, "void f(const Spline&in)", asFUNCTION(Spline_Spline_Spline), asCALL_CDECL_OBJFIRST);
-    // Spline::~Spline() | Implicitly-declared
-    engine->RegisterObjectBehaviour("Spline", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(Spline_Destructor), asCALL_CDECL_OBJFIRST);
 #ifdef REGISTER_MANUAL_PART_Spline
     REGISTER_MANUAL_PART_Spline(Spline, "Spline")
 #endif
@@ -5702,8 +5656,6 @@ void ASRegisterGenerated_Members_Sn_Sz(asIScriptEngine* engine)
     engine->RegisterObjectMethod("String", "String ToUpper() const", asMETHODPR(String, ToUpper, () const, String), asCALL_THISCALL);
     // String String::Trimmed() const | File: ../Container/Str.h
     engine->RegisterObjectMethod("String", "String Trimmed() const", asMETHODPR(String, Trimmed, () const, String), asCALL_THISCALL);
-    // String::~String() | File: ../Container/Str.h
-    engine->RegisterObjectBehaviour("String", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(String_Destructor_String_void), asCALL_CDECL_OBJFIRST);
     // bool String::operator<(const String& rhs) const | File: ../Container/Str.h
     // bool String::operator>(const String& rhs) const | File: ../Container/Str.h
     engine->RegisterObjectMethod("String", "int opCmp(const String&in) const", asFUNCTION(String_Comparison), asCALL_CDECL_OBJFIRST);
@@ -5767,8 +5719,6 @@ void ASRegisterGenerated_Members_Sn_Sz(asIScriptEngine* engine)
     // Error: type "const char*" can not automatically bind
     // StringHashRegister::StringHashRegister(bool threadSafe) | File: ../Core/StringHashRegister.h
     engine->RegisterObjectBehaviour("StringHashRegister", asBEHAVE_CONSTRUCT, "void f(bool)", asFUNCTION(StringHashRegister_StringHashRegister_bool), asCALL_CDECL_OBJFIRST);
-    // StringHashRegister::~StringHashRegister() | File: ../Core/StringHashRegister.h
-    engine->RegisterObjectBehaviour("StringHashRegister", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(StringHashRegister_Destructor_StringHashRegister_void), asCALL_CDECL_OBJFIRST);
     // StringHashRegister& StringHashRegister::operator=(const StringHashRegister&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<StringHashRegister>(engine, "StringHashRegister");
 #ifdef REGISTER_MANUAL_PART_StringHashRegister
@@ -5793,8 +5743,6 @@ void ASRegisterGenerated_Members_Sn_Sz(asIScriptEngine* engine)
     engine->RegisterObjectMethod("SourceBatch", "SourceBatch& opAssign(const SourceBatch&in)", asMETHODPR(SourceBatch, operator=, (const SourceBatch&), SourceBatch&), asCALL_THISCALL);
     // SourceBatch::SourceBatch(const SourceBatch& batch) | File: ../Graphics/Drawable.h
     engine->RegisterObjectBehaviour("SourceBatch", asBEHAVE_CONSTRUCT, "void f(const SourceBatch&in)", asFUNCTION(SourceBatch_SourceBatch_SourceBatch), asCALL_CDECL_OBJFIRST);
-    // SourceBatch::~SourceBatch() | File: ../Graphics/Drawable.h
-    engine->RegisterObjectBehaviour("SourceBatch", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(SourceBatch_Destructor_SourceBatch_void), asCALL_CDECL_OBJFIRST);
 #ifdef REGISTER_MANUAL_PART_SourceBatch
     REGISTER_MANUAL_PART_SourceBatch(SourceBatch, "SourceBatch")
 #endif
@@ -5810,8 +5758,6 @@ void ASRegisterGenerated_Members_Sn_Sz(asIScriptEngine* engine)
     // Error: type "WeakPtr<Drawable2D>" can not automatically bind
     // Vector<Vertex2D> SourceBatch2D::vertices_ | File: ../Urho2D/Drawable2D.h
     // Error: type "Vector<Vertex2D>" can not automatically bind
-    // SourceBatch2D::~SourceBatch2D() | Implicitly-declared
-    engine->RegisterObjectBehaviour("SourceBatch2D", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(SourceBatch2D_Destructor), asCALL_CDECL_OBJFIRST);
     // SourceBatch2D& SourceBatch2D::operator=(const SourceBatch2D&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<SourceBatch2D>(engine, "SourceBatch2D");
 #ifdef REGISTER_MANUAL_PART_SourceBatch2D
@@ -5823,8 +5769,6 @@ void ASRegisterGenerated_Members_Sn_Sz(asIScriptEngine* engine)
     engine->RegisterObjectProperty("StaticModelGeometryData", "Vector3 center", offsetof(StaticModelGeometryData, center_));
     // unsigned StaticModelGeometryData::lodLevel_ | File: ../Graphics/StaticModel.h
     engine->RegisterObjectProperty("StaticModelGeometryData", "uint lodLevel", offsetof(StaticModelGeometryData, lodLevel_));
-    // StaticModelGeometryData::~StaticModelGeometryData() | Implicitly-declared
-    engine->RegisterObjectBehaviour("StaticModelGeometryData", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(StaticModelGeometryData_Destructor), asCALL_CDECL_OBJFIRST);
     // StaticModelGeometryData& StaticModelGeometryData::operator=(const StaticModelGeometryData&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<StaticModelGeometryData>(engine, "StaticModelGeometryData");
 #ifdef REGISTER_MANUAL_PART_StaticModelGeometryData
@@ -5839,8 +5783,6 @@ void ASRegisterGenerated_Members_Sn_Sz(asIScriptEngine* engine)
     engine->RegisterObjectProperty("StoredLogMessage", "String message", offsetof(StoredLogMessage, message_));
     // StoredLogMessage::StoredLogMessage(const String& message, int level, bool error) | File: ../IO/Log.h
     engine->RegisterObjectBehaviour("StoredLogMessage", asBEHAVE_CONSTRUCT, "void f(const String&in, int, bool)", asFUNCTION(StoredLogMessage_StoredLogMessage_String_int_bool), asCALL_CDECL_OBJFIRST);
-    // StoredLogMessage::~StoredLogMessage() | Implicitly-declared
-    engine->RegisterObjectBehaviour("StoredLogMessage", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(StoredLogMessage_Destructor), asCALL_CDECL_OBJFIRST);
     // StoredLogMessage& StoredLogMessage::operator=(const StoredLogMessage&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<StoredLogMessage>(engine, "StoredLogMessage");
 #ifdef REGISTER_MANUAL_PART_StoredLogMessage

@@ -69,6 +69,7 @@ void ASRegisterManualFirst(asIScriptEngine* engine);
 void ASRegisterGeneratedEnums(asIScriptEngine* engine);
 void ASRegisterGeneratedObjectTypes(asIScriptEngine* engine);
 void ASRegisterGeneratedDefaultConstructors(asIScriptEngine* engine);
+void ASRegisterGeneratedClasses(asIScriptEngine* engine);
 
 void ASRegisterGenerated_Members_A(asIScriptEngine* engine);
 void ASRegisterGenerated_Members_B(asIScriptEngine* engine);
@@ -154,6 +155,7 @@ Script::Script(Context* context) :
     ASRegisterGeneratedEnums(scriptEngine_);
     ASRegisterGeneratedObjectTypes(scriptEngine_);
     ASRegisterGeneratedDefaultConstructors(scriptEngine_);
+    ASRegisterGeneratedClasses(scriptEngine_);
 
     ASRegisterGenerated_Members_A(scriptEngine_);
     ASRegisterGenerated_Members_B(scriptEngine_);

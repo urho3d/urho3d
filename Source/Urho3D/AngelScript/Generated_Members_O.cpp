@@ -105,24 +105,6 @@ static OggVorbisSoundStream* OggVorbisSoundStream_OggVorbisSoundStream_Sound(con
     return new OggVorbisSoundStream(sound);
 }
 
-// OcclusionBatch::~OcclusionBatch() | Implicitly-declared
-static void OcclusionBatch_Destructor(OcclusionBatch* ptr)
-{
-    ptr->~OcclusionBatch();
-}
-
-// OcclusionBufferData::~OcclusionBufferData() | Implicitly-declared
-static void OcclusionBufferData_Destructor(OcclusionBufferData* ptr)
-{
-    ptr->~OcclusionBufferData();
-}
-
-// OctreeQueryResult::~OctreeQueryResult() | Implicitly-declared
-static void OctreeQueryResult_Destructor(OctreeQueryResult* ptr)
-{
-    ptr->~OctreeQueryResult();
-}
-
 void ASRegisterGenerated_Members_O(asIScriptEngine* engine)
 {
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
@@ -1576,8 +1558,6 @@ void ASRegisterGenerated_Members_O(asIScriptEngine* engine)
     // const void* can not be registered
     // unsigned OcclusionBatch::vertexSize_ | File: ../Graphics/OcclusionBuffer.h
     engine->RegisterObjectProperty("OcclusionBatch", "uint vertexSize", offsetof(OcclusionBatch, vertexSize_));
-    // OcclusionBatch::~OcclusionBatch() | Implicitly-declared
-    engine->RegisterObjectBehaviour("OcclusionBatch", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(OcclusionBatch_Destructor), asCALL_CDECL_OBJFIRST);
     // OcclusionBatch& OcclusionBatch::operator=(const OcclusionBatch&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<OcclusionBatch>(engine, "OcclusionBatch");
 #ifdef REGISTER_MANUAL_PART_OcclusionBatch
@@ -1590,8 +1570,6 @@ void ASRegisterGenerated_Members_O(asIScriptEngine* engine)
     // Error: type "SharedArrayPtr<int>" can not automatically bind
     // bool OcclusionBufferData::used_ | File: ../Graphics/OcclusionBuffer.h
     engine->RegisterObjectProperty("OcclusionBufferData", "bool used", offsetof(OcclusionBufferData, used_));
-    // OcclusionBufferData::~OcclusionBufferData() | Implicitly-declared
-    engine->RegisterObjectBehaviour("OcclusionBufferData", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(OcclusionBufferData_Destructor), asCALL_CDECL_OBJFIRST);
     // OcclusionBufferData& OcclusionBufferData::operator=(const OcclusionBufferData&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<OcclusionBufferData>(engine, "OcclusionBufferData");
 #ifdef REGISTER_MANUAL_PART_OcclusionBufferData
@@ -1602,8 +1580,6 @@ void ASRegisterGenerated_Members_O(asIScriptEngine* engine)
     // Drawable* can not be registered
     // Node* OctreeQueryResult::node_ | File: ../Graphics/OctreeQuery.h
     // Node* can not be registered
-    // OctreeQueryResult::~OctreeQueryResult() | Implicitly-declared
-    engine->RegisterObjectBehaviour("OctreeQueryResult", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(OctreeQueryResult_Destructor), asCALL_CDECL_OBJFIRST);
     // OctreeQueryResult& OctreeQueryResult::operator=(const OctreeQueryResult&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<OctreeQueryResult>(engine, "OctreeQueryResult");
 #ifdef REGISTER_MANUAL_PART_OctreeQueryResult

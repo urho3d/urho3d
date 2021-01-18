@@ -66,12 +66,6 @@ static WorkQueue* WorkQueue_WorkQueue_Context()
     return new WorkQueue(GetScriptContext());
 }
 
-// WindowModeParams::~WindowModeParams() | Implicitly-declared
-static void WindowModeParams_Destructor(WindowModeParams* ptr)
-{
-    ptr->~WindowModeParams();
-}
-
 void ASRegisterGenerated_Members_W(asIScriptEngine* engine)
 {
     // void UIElement::AddChild(UIElement* element) | File: ../UI/UIElement.h
@@ -1112,8 +1106,6 @@ void ASRegisterGenerated_Members_W(asIScriptEngine* engine)
     engine->RegisterObjectProperty("WindowModeParams", "ScreenModeParams screenParams", offsetof(WindowModeParams, screenParams_));
     // int WindowModeParams::width_ | File: ../Graphics/Graphics.h
     engine->RegisterObjectProperty("WindowModeParams", "int width", offsetof(WindowModeParams, width_));
-    // WindowModeParams::~WindowModeParams() | Implicitly-declared
-    engine->RegisterObjectBehaviour("WindowModeParams", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(WindowModeParams_Destructor), asCALL_CDECL_OBJFIRST);
     // WindowModeParams& WindowModeParams::operator=(const WindowModeParams&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<WindowModeParams>(engine, "WindowModeParams");
 #ifdef REGISTER_MANUAL_PART_WindowModeParams

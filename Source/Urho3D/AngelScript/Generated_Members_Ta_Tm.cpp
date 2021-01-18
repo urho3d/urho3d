@@ -376,12 +376,6 @@ static void TechniqueEntry_TechniqueEntry_Technique_MaterialQuality_float(Techni
     new(ptr) TechniqueEntry(tech, qualityLevel, lodDistance);
 }
 
-// TechniqueEntry::~TechniqueEntry() noexcept=default | File: ../Graphics/Material.h
-static void TechniqueEntry_Destructor_TechniqueEntry_void(TechniqueEntry* ptr)
-{
-    ptr->~TechniqueEntry();
-}
-
 // TextureFrame::TextureFrame() | File: ../Graphics/ParticleEffect.h
 static TextureFrame* TextureFrame_TextureFrame_void()
 {
@@ -5973,8 +5967,6 @@ void ASRegisterGenerated_Members_Ta_Tm(asIScriptEngine* engine)
     // Error: type "SharedPtr<Technique>" can not automatically bind
     // TechniqueEntry::TechniqueEntry(Technique* tech, MaterialQuality qualityLevel, float lodDistance) noexcept | File: ../Graphics/Material.h
     engine->RegisterObjectBehaviour("TechniqueEntry", asBEHAVE_CONSTRUCT, "void f(Technique@+, MaterialQuality, float)", asFUNCTION(TechniqueEntry_TechniqueEntry_Technique_MaterialQuality_float), asCALL_CDECL_OBJFIRST);
-    // TechniqueEntry::~TechniqueEntry() noexcept=default | File: ../Graphics/Material.h
-    engine->RegisterObjectBehaviour("TechniqueEntry", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(TechniqueEntry_Destructor_TechniqueEntry_void), asCALL_CDECL_OBJFIRST);
     // TechniqueEntry& TechniqueEntry::operator=(const TechniqueEntry&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<TechniqueEntry>(engine, "TechniqueEntry");
 #ifdef REGISTER_MANUAL_PART_TechniqueEntry

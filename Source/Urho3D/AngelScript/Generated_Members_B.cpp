@@ -169,22 +169,10 @@ static void Button_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Butto
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
 }
 
-// BackgroundLoadItem::~BackgroundLoadItem() | Implicitly-declared
-static void BackgroundLoadItem_Destructor(BackgroundLoadItem* ptr)
-{
-    ptr->~BackgroundLoadItem();
-}
-
 // explicit Batch::Batch(const SourceBatch& rhs) | File: ../Graphics/Batch.h
 static void Batch_Batch_SourceBatch(Batch* ptr, const SourceBatch &rhs)
 {
     new(ptr) Batch(rhs);
-}
-
-// Batch::~Batch() | Implicitly-declared
-static void Batch_Destructor(Batch* ptr)
-{
-    ptr->~Batch();
 }
 
 // explicit BatchGroup::BatchGroup(const Batch& batch) | File: ../Graphics/Batch.h
@@ -193,28 +181,10 @@ static void BatchGroup_BatchGroup_Batch(BatchGroup* ptr, const Batch &batch)
     new(ptr) BatchGroup(batch);
 }
 
-// BatchGroup::~BatchGroup()=default | File: ../Graphics/Batch.h
-static void BatchGroup_Destructor_BatchGroup_void(BatchGroup* ptr)
-{
-    ptr->~BatchGroup();
-}
-
 // explicit BatchGroupKey::BatchGroupKey(const Batch& batch) | File: ../Graphics/Batch.h
 static void BatchGroupKey_BatchGroupKey_Batch(BatchGroupKey* ptr, const Batch &batch)
 {
     new(ptr) BatchGroupKey(batch);
-}
-
-// BatchGroupKey::~BatchGroupKey() | Implicitly-declared
-static void BatchGroupKey_Destructor(BatchGroupKey* ptr)
-{
-    ptr->~BatchGroupKey();
-}
-
-// BatchQueue::~BatchQueue() | Implicitly-declared
-static void BatchQueue_Destructor(BatchQueue* ptr)
-{
-    ptr->~BatchQueue();
 }
 
 // BiasParameters::BiasParameters(float constantBias, float slopeScaledBias, float normalOffset=0.0f) | File: ../Graphics/Light.h
@@ -2600,8 +2570,6 @@ void ASRegisterGenerated_Members_B(asIScriptEngine* engine)
     // Error: type "SharedPtr<Resource>" can not automatically bind
     // bool BackgroundLoadItem::sendEventOnFailure_ | File: ../Resource/BackgroundLoader.h
     engine->RegisterObjectProperty("BackgroundLoadItem", "bool sendEventOnFailure", offsetof(BackgroundLoadItem, sendEventOnFailure_));
-    // BackgroundLoadItem::~BackgroundLoadItem() | Implicitly-declared
-    engine->RegisterObjectBehaviour("BackgroundLoadItem", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(BackgroundLoadItem_Destructor), asCALL_CDECL_OBJFIRST);
     // BackgroundLoadItem& BackgroundLoadItem::operator=(const BackgroundLoadItem&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<BackgroundLoadItem>(engine, "BackgroundLoadItem");
 #ifdef REGISTER_MANUAL_PART_BackgroundLoadItem
@@ -2648,8 +2616,6 @@ void ASRegisterGenerated_Members_B(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Batch", "void Draw(View@+, Camera@+, bool) const", asMETHODPR(Batch, Draw, (View*, Camera*, bool) const, void), asCALL_THISCALL);
     // void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool allowDepthWrite) const | File: ../Graphics/Batch.h
     engine->RegisterObjectMethod("Batch", "void Prepare(View@+, Camera@+, bool, bool) const", asMETHODPR(Batch, Prepare, (View*, Camera*, bool, bool) const, void), asCALL_THISCALL);
-    // Batch::~Batch() | Implicitly-declared
-    engine->RegisterObjectBehaviour("Batch", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(Batch_Destructor), asCALL_CDECL_OBJFIRST);
     // Batch& Batch::operator=(const Batch&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<Batch>(engine, "Batch");
 #ifdef REGISTER_MANUAL_PART_Batch
@@ -2704,8 +2670,6 @@ void ASRegisterGenerated_Members_B(asIScriptEngine* engine)
     engine->RegisterObjectMethod("BatchGroup", "void Prepare(View@+, Camera@+, bool, bool) const", asMETHODPR(BatchGroup, Prepare, (View*, Camera*, bool, bool) const, void), asCALL_THISCALL);
     // void BatchGroup::SetInstancingData(void* lockedData, unsigned stride, unsigned& freeIndex) | File: ../Graphics/Batch.h
     // Error: type "void*" can not automatically bind
-    // BatchGroup::~BatchGroup()=default | File: ../Graphics/Batch.h
-    engine->RegisterObjectBehaviour("BatchGroup", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(BatchGroup_Destructor_BatchGroup_void), asCALL_CDECL_OBJFIRST);
     // BatchGroup& BatchGroup::operator=(const BatchGroup&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<BatchGroup>(engine, "BatchGroup");
 #ifdef REGISTER_MANUAL_PART_Batch
@@ -2733,8 +2697,6 @@ void ASRegisterGenerated_Members_B(asIScriptEngine* engine)
     engine->RegisterObjectMethod("BatchGroupKey", "bool opEquals(const BatchGroupKey&in) const", asMETHODPR(BatchGroupKey, operator==, (const BatchGroupKey&) const, bool), asCALL_THISCALL);
     // unsigned BatchGroupKey::ToHash() const | File: ../Graphics/Batch.h
     engine->RegisterObjectMethod("BatchGroupKey", "uint ToHash() const", asMETHODPR(BatchGroupKey, ToHash, () const, unsigned), asCALL_THISCALL);
-    // BatchGroupKey::~BatchGroupKey() | Implicitly-declared
-    engine->RegisterObjectBehaviour("BatchGroupKey", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(BatchGroupKey_Destructor), asCALL_CDECL_OBJFIRST);
     // BatchGroupKey& BatchGroupKey::operator=(const BatchGroupKey&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<BatchGroupKey>(engine, "BatchGroupKey");
 #ifdef REGISTER_MANUAL_PART_BatchGroupKey
@@ -2783,8 +2745,6 @@ void ASRegisterGenerated_Members_B(asIScriptEngine* engine)
     engine->RegisterObjectMethod("BatchQueue", "void SortFrontToBack()", asMETHODPR(BatchQueue, SortFrontToBack, (), void), asCALL_THISCALL);
     // void BatchQueue::SortFrontToBack2Pass(PODVector<Batch*>& batches) | File: ../Graphics/Batch.h
     // Error: type "PODVector<Batch*>&" can not automatically bind
-    // BatchQueue::~BatchQueue() | Implicitly-declared
-    engine->RegisterObjectBehaviour("BatchQueue", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(BatchQueue_Destructor), asCALL_CDECL_OBJFIRST);
     // BatchQueue& BatchQueue::operator=(const BatchQueue&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<BatchQueue>(engine, "BatchQueue");
 #ifdef REGISTER_MANUAL_PART_BatchQueue

@@ -81,12 +81,6 @@ static void Scene_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Scene*
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
 }
 
-// SceneResolver::~SceneResolver() | File: ../Scene/SceneResolver.h
-static void SceneResolver_Destructor_SceneResolver_void(SceneResolver* ptr)
-{
-    ptr->~SceneResolver();
-}
-
 // const Vector<SharedPtr<UIElement>>& UIElement::GetChildren() const | File: ../UI/UIElement.h
 static CScriptArray* ScrollBar_GetChildren_void(ScrollBar* ptr)
 {
@@ -313,30 +307,6 @@ static void SmoothedTransform_UnsubscribeFromAllEventsExcept_PODVectorStringHash
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
 }
 
-// ScenePassInfo::~ScenePassInfo() | Implicitly-declared
-static void ScenePassInfo_Destructor(ScenePassInfo* ptr)
-{
-    ptr->~ScenePassInfo();
-}
-
-// SceneReplicationState::~SceneReplicationState() | Implicitly-declared
-static void SceneReplicationState_Destructor(SceneReplicationState* ptr)
-{
-    ptr->~SceneReplicationState();
-}
-
-// ScratchBuffer::~ScratchBuffer() | Implicitly-declared
-static void ScratchBuffer_Destructor(ScratchBuffer* ptr)
-{
-    ptr->~ScratchBuffer();
-}
-
-// ScreenModeParams::~ScreenModeParams() | Implicitly-declared
-static void ScreenModeParams_Destructor(ScreenModeParams* ptr)
-{
-    ptr->~ScreenModeParams();
-}
-
 // ShaderParameter::ShaderParameter(const String& name, unsigned glType, int location) | File: ../Graphics/ShaderVariation.h
 static void ShaderParameter_ShaderParameter_String_unsigned_int(ShaderParameter* ptr, const String &name, unsigned glType, int location)
 {
@@ -353,24 +323,6 @@ static void ShaderParameter_ShaderParameter_ShaderType_String_unsigned_unsigned_
 static void ShaderParameter_ShaderParameter_ShaderType_String_unsigned_unsigned(ShaderParameter* ptr, ShaderType type, const String &name, unsigned reg, unsigned regCount)
 {
     new(ptr) ShaderParameter(type, name, reg, regCount);
-}
-
-// ShaderParameter::~ShaderParameter() | Implicitly-declared
-static void ShaderParameter_Destructor(ShaderParameter* ptr)
-{
-    ptr->~ShaderParameter();
-}
-
-// ShadowBatchQueue::~ShadowBatchQueue() | Implicitly-declared
-static void ShadowBatchQueue_Destructor(ShadowBatchQueue* ptr)
-{
-    ptr->~ShadowBatchQueue();
-}
-
-// SimpleNavBuildData::~SimpleNavBuildData() override | File: ../Navigation/NavBuildData.h
-static void SimpleNavBuildData_Destructor_SimpleNavBuildData_void(SimpleNavBuildData* ptr)
-{
-    ptr->~SimpleNavBuildData();
 }
 
 void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
@@ -1163,8 +1115,6 @@ void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
     engine->RegisterObjectMethod("SceneResolver", "void Reset()", asMETHODPR(SceneResolver, Reset, (), void), asCALL_THISCALL);
     // void SceneResolver::Resolve() | File: ../Scene/SceneResolver.h
     engine->RegisterObjectMethod("SceneResolver", "void Resolve()", asMETHODPR(SceneResolver, Resolve, (), void), asCALL_THISCALL);
-    // SceneResolver::~SceneResolver() | File: ../Scene/SceneResolver.h
-    engine->RegisterObjectBehaviour("SceneResolver", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(SceneResolver_Destructor_SceneResolver_void), asCALL_CDECL_OBJFIRST);
     // SceneResolver& SceneResolver::operator=(const SceneResolver&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<SceneResolver>(engine, "SceneResolver");
 #ifdef REGISTER_MANUAL_PART_SceneResolver
@@ -5267,8 +5217,6 @@ void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
     engine->RegisterObjectProperty("ScenePassInfo", "uint passIndex", offsetof(ScenePassInfo, passIndex_));
     // bool ScenePassInfo::vertexLights_ | File: ../Graphics/View.h
     engine->RegisterObjectProperty("ScenePassInfo", "bool vertexLights", offsetof(ScenePassInfo, vertexLights_));
-    // ScenePassInfo::~ScenePassInfo() | Implicitly-declared
-    engine->RegisterObjectBehaviour("ScenePassInfo", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(ScenePassInfo_Destructor), asCALL_CDECL_OBJFIRST);
     // ScenePassInfo& ScenePassInfo::operator=(const ScenePassInfo&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<ScenePassInfo>(engine, "ScenePassInfo");
 #ifdef REGISTER_MANUAL_PART_ScenePassInfo
@@ -5283,8 +5231,6 @@ void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
     // Error: type "HashMap<unsigned, NodeReplicationState>" can not automatically bind
     // void SceneReplicationState::Clear() | File: ../Scene/ReplicationState.h
     engine->RegisterObjectMethod("SceneReplicationState", "void Clear()", asMETHODPR(SceneReplicationState, Clear, (), void), asCALL_THISCALL);
-    // SceneReplicationState::~SceneReplicationState() | Implicitly-declared
-    engine->RegisterObjectBehaviour("SceneReplicationState", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(SceneReplicationState_Destructor), asCALL_CDECL_OBJFIRST);
     // SceneReplicationState& SceneReplicationState::operator=(const SceneReplicationState&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<SceneReplicationState>(engine, "SceneReplicationState");
 #ifdef REGISTER_MANUAL_PART_ReplicationState
@@ -5300,8 +5246,6 @@ void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
     engine->RegisterObjectProperty("ScratchBuffer", "bool reserved", offsetof(ScratchBuffer, reserved_));
     // unsigned ScratchBuffer::size_ | File: ../Graphics/Graphics.h
     engine->RegisterObjectProperty("ScratchBuffer", "uint size", offsetof(ScratchBuffer, size_));
-    // ScratchBuffer::~ScratchBuffer() | Implicitly-declared
-    engine->RegisterObjectBehaviour("ScratchBuffer", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(ScratchBuffer_Destructor), asCALL_CDECL_OBJFIRST);
     // ScratchBuffer& ScratchBuffer::operator=(const ScratchBuffer&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<ScratchBuffer>(engine, "ScratchBuffer");
 #ifdef REGISTER_MANUAL_PART_ScratchBuffer
@@ -5330,8 +5274,6 @@ void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ScreenModeParams", "bool EqualsExceptVSync(const ScreenModeParams&in) const", asMETHODPR(ScreenModeParams, EqualsExceptVSync, (const ScreenModeParams&) const, bool), asCALL_THISCALL);
     // bool ScreenModeParams::operator==(const ScreenModeParams& rhs) const | File: ../Graphics/Graphics.h
     engine->RegisterObjectMethod("ScreenModeParams", "bool opEquals(const ScreenModeParams&in) const", asMETHODPR(ScreenModeParams, operator==, (const ScreenModeParams&) const, bool), asCALL_THISCALL);
-    // ScreenModeParams::~ScreenModeParams() | Implicitly-declared
-    engine->RegisterObjectBehaviour("ScreenModeParams", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(ScreenModeParams_Destructor), asCALL_CDECL_OBJFIRST);
     // ScreenModeParams& ScreenModeParams::operator=(const ScreenModeParams&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<ScreenModeParams>(engine, "ScreenModeParams");
 #ifdef REGISTER_MANUAL_PART_ScreenModeParams
@@ -5364,8 +5306,6 @@ void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("ShaderParameter", asBEHAVE_CONSTRUCT, "void f(ShaderType, const String&in, uint, uint, uint)", asFUNCTION(ShaderParameter_ShaderParameter_ShaderType_String_unsigned_unsigned_unsigned), asCALL_CDECL_OBJFIRST);
     // ShaderParameter::ShaderParameter(ShaderType type, const String& name, unsigned reg, unsigned regCount) | File: ../Graphics/ShaderVariation.h
     engine->RegisterObjectBehaviour("ShaderParameter", asBEHAVE_CONSTRUCT, "void f(ShaderType, const String&in, uint, uint)", asFUNCTION(ShaderParameter_ShaderParameter_ShaderType_String_unsigned_unsigned), asCALL_CDECL_OBJFIRST);
-    // ShaderParameter::~ShaderParameter() | Implicitly-declared
-    engine->RegisterObjectBehaviour("ShaderParameter", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(ShaderParameter_Destructor), asCALL_CDECL_OBJFIRST);
     // ShaderParameter& ShaderParameter::operator=(const ShaderParameter&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<ShaderParameter>(engine, "ShaderParameter");
 #ifdef REGISTER_MANUAL_PART_ShaderParameter
@@ -5382,8 +5322,6 @@ void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
     // Camera* can not be registered
     // IntRect ShadowBatchQueue::shadowViewport_ | File: ../Graphics/Batch.h
     engine->RegisterObjectProperty("ShadowBatchQueue", "IntRect shadowViewport", offsetof(ShadowBatchQueue, shadowViewport_));
-    // ShadowBatchQueue::~ShadowBatchQueue() | Implicitly-declared
-    engine->RegisterObjectBehaviour("ShadowBatchQueue", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(ShadowBatchQueue_Destructor), asCALL_CDECL_OBJFIRST);
     // ShadowBatchQueue& ShadowBatchQueue::operator=(const ShadowBatchQueue&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<ShadowBatchQueue>(engine, "ShadowBatchQueue");
 #ifdef REGISTER_MANUAL_PART_ShadowBatchQueue
@@ -5421,8 +5359,6 @@ void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
     // Error: type "PODVector<Vector3>" can not automatically bind
     // BoundingBox NavBuildData::worldBoundingBox_ | File: ../Navigation/NavBuildData.h
     engine->RegisterObjectProperty("SimpleNavBuildData", "BoundingBox worldBoundingBox", offsetof(SimpleNavBuildData, worldBoundingBox_));
-    // SimpleNavBuildData::~SimpleNavBuildData() override | File: ../Navigation/NavBuildData.h
-    engine->RegisterObjectBehaviour("SimpleNavBuildData", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(SimpleNavBuildData_Destructor_SimpleNavBuildData_void), asCALL_CDECL_OBJFIRST);
     // SimpleNavBuildData& SimpleNavBuildData::operator=(const SimpleNavBuildData&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<SimpleNavBuildData>(engine, "SimpleNavBuildData");
 #ifdef REGISTER_MANUAL_PART_NavBuildData

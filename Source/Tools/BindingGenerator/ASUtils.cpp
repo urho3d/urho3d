@@ -528,7 +528,7 @@ shared_ptr<FuncReturnTypeConv> CppFunctionReturnTypeToAS(const TypeAnalyzer& typ
 static string GenerateFunctionWrapperName(xml_node memberdef)
 {
     string result = ExtractName(memberdef);
-    result = ReplaceFirst(result, "~", "Destructor_");
+
     vector<ParamAnalyzer> params = ExtractParams(memberdef);
 
     if (params.size() == 0)
