@@ -32,12 +32,6 @@ static void XMLElement_XMLElement_XMLElement(XMLElement* ptr, const XMLElement &
     new(ptr) XMLElement(rhs);
 }
 
-// XMLElement::~XMLElement() | File: ../Resource/XMLElement.h
-static void XMLElement_Destructor_XMLElement_void(XMLElement* ptr)
-{
-    ptr->~XMLElement();
-}
-
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void XMLFile_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(XMLFile* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
@@ -57,22 +51,10 @@ static void XPathQuery_XPathQuery_String_String(XPathQuery* ptr, const String &q
     new(ptr) XPathQuery(queryString, variableString);
 }
 
-// XPathQuery::~XPathQuery() | File: ../Resource/XMLElement.h
-static void XPathQuery_Destructor_XPathQuery_void(XPathQuery* ptr)
-{
-    ptr->~XPathQuery();
-}
-
 // XPathResultSet::XPathResultSet(const XPathResultSet& rhs) | File: ../Resource/XMLElement.h
 static void XPathResultSet_XPathResultSet_XPathResultSet(XPathResultSet* ptr, const XPathResultSet &rhs)
 {
     new(ptr) XPathResultSet(rhs);
-}
-
-// XPathResultSet::~XPathResultSet() | File: ../Resource/XMLElement.h
-static void XPathResultSet_Destructor_XPathResultSet_void(XPathResultSet* ptr)
-{
-    ptr->~XPathResultSet();
 }
 
 void ASRegisterGenerated_Members_X(asIScriptEngine* engine)
@@ -326,8 +308,6 @@ void ASRegisterGenerated_Members_X(asIScriptEngine* engine)
     // Error: type "const XPathResultSet*" can not automatically bind
     // XMLElement::XMLElement(const XMLElement& rhs) | File: ../Resource/XMLElement.h
     engine->RegisterObjectBehaviour("XMLElement", asBEHAVE_CONSTRUCT, "void f(const XMLElement&in)", asFUNCTION(XMLElement_XMLElement_XMLElement), asCALL_CDECL_OBJFIRST);
-    // XMLElement::~XMLElement() | File: ../Resource/XMLElement.h
-    engine->RegisterObjectBehaviour("XMLElement", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(XMLElement_Destructor_XMLElement_void), asCALL_CDECL_OBJFIRST);
 #ifdef REGISTER_MANUAL_PART_XMLElement
     REGISTER_MANUAL_PART_XMLElement(XMLElement, "XMLElement")
 #endif
@@ -531,8 +511,6 @@ void ASRegisterGenerated_Members_X(asIScriptEngine* engine)
     engine->RegisterObjectMethod("XPathQuery", "bool SetVariable(const String&in, const XPathResultSet&in)", asMETHODPR(XPathQuery, SetVariable, (const String&, const XPathResultSet&), bool), asCALL_THISCALL);
     // explicit XPathQuery::XPathQuery(const String& queryString, const String& variableString=String::EMPTY) | File: ../Resource/XMLElement.h
     engine->RegisterObjectBehaviour("XPathQuery", asBEHAVE_CONSTRUCT, "void f(const String&in, const String&in = String::EMPTY)", asFUNCTION(XPathQuery_XPathQuery_String_String), asCALL_CDECL_OBJFIRST);
-    // XPathQuery::~XPathQuery() | File: ../Resource/XMLElement.h
-    engine->RegisterObjectBehaviour("XPathQuery", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(XPathQuery_Destructor_XPathQuery_void), asCALL_CDECL_OBJFIRST);
     // XPathQuery& XPathQuery::operator=(const XPathQuery&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<XPathQuery>(engine, "XPathQuery");
 #ifdef REGISTER_MANUAL_PART_XPathQuery
@@ -558,8 +536,6 @@ void ASRegisterGenerated_Members_X(asIScriptEngine* engine)
     // Error: type "pugi::xpath_node_set*" can not automatically bind
     // XPathResultSet::XPathResultSet(const XPathResultSet& rhs) | File: ../Resource/XMLElement.h
     engine->RegisterObjectBehaviour("XPathResultSet", asBEHAVE_CONSTRUCT, "void f(const XPathResultSet&in)", asFUNCTION(XPathResultSet_XPathResultSet_XPathResultSet), asCALL_CDECL_OBJFIRST);
-    // XPathResultSet::~XPathResultSet() | File: ../Resource/XMLElement.h
-    engine->RegisterObjectBehaviour("XPathResultSet", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(XPathResultSet_Destructor_XPathResultSet_void), asCALL_CDECL_OBJFIRST);
 #ifdef REGISTER_MANUAL_PART_XPathResultSet
     REGISTER_MANUAL_PART_XPathResultSet(XPathResultSet, "XPathResultSet")
 #endif

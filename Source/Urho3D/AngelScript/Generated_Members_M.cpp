@@ -223,42 +223,10 @@ static void Model_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Model*
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
 }
 
-// Mutex::~Mutex() | File: ../Core/Mutex.h
-static void Mutex_Destructor_Mutex_void(Mutex* ptr)
-{
-    ptr->~Mutex();
-}
-
 // explicit MutexLock::MutexLock(Mutex& mutex) | File: ../Core/Mutex.h
 static void MutexLock_MutexLock_Mutex(MutexLock* ptr, Mutex &mutex)
 {
     new(ptr) MutexLock(mutex);
-}
-
-// MutexLock::~MutexLock() | File: ../Core/Mutex.h
-static void MutexLock_Destructor_MutexLock_void(MutexLock* ptr)
-{
-    ptr->~MutexLock();
-}
-
-#ifdef URHO3D_PHYSICS
-// ManifoldPair::~ManifoldPair() | Implicitly-declared
-static void ManifoldPair_Destructor(ManifoldPair* ptr)
-{
-    ptr->~ManifoldPair();
-}
-#endif
-
-// MaterialShaderParameter::~MaterialShaderParameter() | Implicitly-declared
-static void MaterialShaderParameter_Destructor(MaterialShaderParameter* ptr)
-{
-    ptr->~MaterialShaderParameter();
-}
-
-// ModelMorph::~ModelMorph() | Implicitly-declared
-static void ModelMorph_Destructor(ModelMorph* ptr)
-{
-    ptr->~ModelMorph();
 }
 
 void ASRegisterGenerated_Members_M(asIScriptEngine* engine)
@@ -2193,8 +2161,6 @@ void ASRegisterGenerated_Members_M(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Mutex", "void Release()", asMETHODPR(Mutex, Release, (), void), asCALL_THISCALL);
     // bool Mutex::TryAcquire() | File: ../Core/Mutex.h
     engine->RegisterObjectMethod("Mutex", "bool TryAcquire()", asMETHODPR(Mutex, TryAcquire, (), bool), asCALL_THISCALL);
-    // Mutex::~Mutex() | File: ../Core/Mutex.h
-    engine->RegisterObjectBehaviour("Mutex", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(Mutex_Destructor_Mutex_void), asCALL_CDECL_OBJFIRST);
     // Mutex& Mutex::operator=(const Mutex&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<Mutex>(engine, "Mutex");
 #ifdef REGISTER_MANUAL_PART_Mutex
@@ -2203,8 +2169,6 @@ void ASRegisterGenerated_Members_M(asIScriptEngine* engine)
 
     // explicit MutexLock::MutexLock(Mutex& mutex) | File: ../Core/Mutex.h
     engine->RegisterObjectBehaviour("MutexLock", asBEHAVE_CONSTRUCT, "void f(Mutex&)", asFUNCTION(MutexLock_MutexLock_Mutex), asCALL_CDECL_OBJFIRST);
-    // MutexLock::~MutexLock() | File: ../Core/Mutex.h
-    engine->RegisterObjectBehaviour("MutexLock", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(MutexLock_Destructor_MutexLock_void), asCALL_CDECL_OBJFIRST);
 #ifdef REGISTER_MANUAL_PART_MutexLock
     REGISTER_MANUAL_PART_MutexLock(MutexLock, "MutexLock")
 #endif
@@ -2214,8 +2178,6 @@ void ASRegisterGenerated_Members_M(asIScriptEngine* engine)
     // btPersistentManifold* can not be registered
     // btPersistentManifold* ManifoldPair::manifold_ | File: ../Physics/PhysicsWorld.h
     // btPersistentManifold* can not be registered
-    // ManifoldPair::~ManifoldPair() | Implicitly-declared
-    engine->RegisterObjectBehaviour("ManifoldPair", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(ManifoldPair_Destructor), asCALL_CDECL_OBJFIRST);
     // ManifoldPair& ManifoldPair::operator=(const ManifoldPair&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<ManifoldPair>(engine, "ManifoldPair");
 #ifdef REGISTER_MANUAL_PART_ManifoldPair
@@ -2227,8 +2189,6 @@ void ASRegisterGenerated_Members_M(asIScriptEngine* engine)
     engine->RegisterObjectProperty("MaterialShaderParameter", "String name", offsetof(MaterialShaderParameter, name_));
     // Variant MaterialShaderParameter::value_ | File: ../Graphics/Material.h
     engine->RegisterObjectProperty("MaterialShaderParameter", "Variant value", offsetof(MaterialShaderParameter, value_));
-    // MaterialShaderParameter::~MaterialShaderParameter() | Implicitly-declared
-    engine->RegisterObjectBehaviour("MaterialShaderParameter", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(MaterialShaderParameter_Destructor), asCALL_CDECL_OBJFIRST);
     // MaterialShaderParameter& MaterialShaderParameter::operator=(const MaterialShaderParameter&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<MaterialShaderParameter>(engine, "MaterialShaderParameter");
 #ifdef REGISTER_MANUAL_PART_MaterialShaderParameter
@@ -2243,8 +2203,6 @@ void ASRegisterGenerated_Members_M(asIScriptEngine* engine)
     engine->RegisterObjectProperty("ModelMorph", "StringHash nameHash", offsetof(ModelMorph, nameHash_));
     // float ModelMorph::weight_ | File: ../Graphics/Model.h
     engine->RegisterObjectProperty("ModelMorph", "float weight", offsetof(ModelMorph, weight_));
-    // ModelMorph::~ModelMorph() | Implicitly-declared
-    engine->RegisterObjectBehaviour("ModelMorph", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(ModelMorph_Destructor), asCALL_CDECL_OBJFIRST);
     // ModelMorph& ModelMorph::operator=(const ModelMorph&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<ModelMorph>(engine, "ModelMorph");
 #ifdef REGISTER_MANUAL_PART_ModelMorph

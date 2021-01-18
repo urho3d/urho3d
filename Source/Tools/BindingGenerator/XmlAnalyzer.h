@@ -269,10 +269,10 @@ public:
     vector<ClassFunctionAnalyzer> GetFunctions() const;
     vector<ClassVariableAnalyzer> GetVariables() const;
     bool ContainsFunction(const string& name) const;
-    ClassFunctionAnalyzer GetFunction(const string& name) const;
+    shared_ptr<ClassFunctionAnalyzer> GetFunction(const string& name) const;
     int NumFunctions(const string& name) const;
     bool IsRefCounted() const;
-    bool HasDestructor() const { return ContainsFunction("~" + GetClassName()); }
+    bool HasThisDestructor() const { return ContainsFunction("~" + GetClassName()); }
     bool HasThisConstructor() const;
     bool IsAbstract() const;
     string GetLocation() const { return GetKind() + " " + GetClassName() + " | File: " + GetHeaderFile(); }
@@ -285,7 +285,13 @@ public:
     
     // Return null if default constructor is implicitly-declared.
     // Return pointer if default constructor is deleted
-    shared_ptr<ClassFunctionAnalyzer> GetDefinedDefaultConstructor() const;
+    shared_ptr<ClassFunctionAnalyzer> GetDefinedThisDefaultConstructor() const;
+
+    vector<ClassFunctionAnalyzer> GetThisNonDefaultConstructors() const;
+
+    // Return null if destructor is implicitly-declared.
+    // Return pointer if destructor is deleted
+    shared_ptr<ClassFunctionAnalyzer> GetDefinedThisDestructor() const { return GetFunction("~" + GetClassName()); }
 };
 
 // <compounddef kind="class|struct">
@@ -321,6 +327,8 @@ public:
     bool IsStatic() const { return ::IsStatic(memberdef_); }
     bool IsPublic() const { return ExtractProt(memberdef_) == "public"; }
     bool IsThisConstructor() const { return GetName() == GetClassName(); }
+    bool IsThisDefaultConstructor() const { return IsThisConstructor() && ExtractCleanedFunctionArgsstring(memberdef_).empty(); }
+    bool IsThisNonDefaultConstructor() const { return IsThisConstructor() && !ExtractCleanedFunctionArgsstring(memberdef_).empty(); }
     bool IsParentConstructor() const;
     bool IsThisDestructor() const { return GetName() == "~" + GetClassName(); }
     bool IsParentDestructor() const;

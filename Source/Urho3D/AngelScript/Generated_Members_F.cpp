@@ -158,34 +158,10 @@ static void Frustum_Frustum_Frustum(Frustum* ptr, const Frustum &frustum)
     new(ptr) Frustum(frustum);
 }
 
-// Frustum::~Frustum() | Implicitly-declared
-static void Frustum_Destructor(Frustum* ptr)
-{
-    ptr->~Frustum();
-}
-
-// FileSelectorEntry::~FileSelectorEntry() | Implicitly-declared
-static void FileSelectorEntry_Destructor(FileSelectorEntry* ptr)
-{
-    ptr->~FileSelectorEntry();
-}
-
 // FocusParameters::FocusParameters(bool focus, bool nonUniform, bool autoSize, float quantize, float minView) | File: ../Graphics/Light.h
 static void FocusParameters_FocusParameters_bool_bool_bool_float_float(FocusParameters* ptr, bool focus, bool nonUniform, bool autoSize, float quantize, float minView)
 {
     new(ptr) FocusParameters(focus, nonUniform, autoSize, quantize, minView);
-}
-
-// FontGlyph::~FontGlyph() | Implicitly-declared
-static void FontGlyph_Destructor(FontGlyph* ptr)
-{
-    ptr->~FontGlyph();
-}
-
-// FrameInfo::~FrameInfo() | Implicitly-declared
-static void FrameInfo_Destructor(FrameInfo* ptr)
-{
-    ptr->~FrameInfo();
 }
 
 void ASRegisterGenerated_Members_F(asIScriptEngine* engine)
@@ -1342,8 +1318,6 @@ void ASRegisterGenerated_Members_F(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Frustum", "Frustum Transformed(const Matrix3x4&in) const", asMETHODPR(Frustum, Transformed, (const Matrix3x4&) const, Frustum), asCALL_THISCALL);
     // void Frustum::UpdatePlanes() | File: ../Math/Frustum.h
     engine->RegisterObjectMethod("Frustum", "void UpdatePlanes()", asMETHODPR(Frustum, UpdatePlanes, (), void), asCALL_THISCALL);
-    // Frustum::~Frustum() | Implicitly-declared
-    engine->RegisterObjectBehaviour("Frustum", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(Frustum_Destructor), asCALL_CDECL_OBJFIRST);
 #ifdef REGISTER_MANUAL_PART_Frustum
     REGISTER_MANUAL_PART_Frustum(Frustum, "Frustum")
 #endif
@@ -1352,8 +1326,6 @@ void ASRegisterGenerated_Members_F(asIScriptEngine* engine)
     engine->RegisterObjectProperty("FileSelectorEntry", "bool directory", offsetof(FileSelectorEntry, directory_));
     // String FileSelectorEntry::name_ | File: ../UI/FileSelector.h
     engine->RegisterObjectProperty("FileSelectorEntry", "String name", offsetof(FileSelectorEntry, name_));
-    // FileSelectorEntry::~FileSelectorEntry() | Implicitly-declared
-    engine->RegisterObjectBehaviour("FileSelectorEntry", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(FileSelectorEntry_Destructor), asCALL_CDECL_OBJFIRST);
     // FileSelectorEntry& FileSelectorEntry::operator=(const FileSelectorEntry&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<FileSelectorEntry>(engine, "FileSelectorEntry");
 #ifdef REGISTER_MANUAL_PART_FileSelectorEntry
@@ -1402,8 +1374,6 @@ void ASRegisterGenerated_Members_F(asIScriptEngine* engine)
     engine->RegisterObjectProperty("FontGlyph", "int16 x", offsetof(FontGlyph, x_));
     // short FontGlyph::y_ | File: ../UI/FontFace.h
     engine->RegisterObjectProperty("FontGlyph", "int16 y", offsetof(FontGlyph, y_));
-    // FontGlyph::~FontGlyph() | Implicitly-declared
-    engine->RegisterObjectBehaviour("FontGlyph", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(FontGlyph_Destructor), asCALL_CDECL_OBJFIRST);
     // FontGlyph& FontGlyph::operator=(const FontGlyph&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<FontGlyph>(engine, "FontGlyph");
 #ifdef REGISTER_MANUAL_PART_FontGlyph
@@ -1418,8 +1388,6 @@ void ASRegisterGenerated_Members_F(asIScriptEngine* engine)
     engine->RegisterObjectProperty("FrameInfo", "float timeStep", offsetof(FrameInfo, timeStep_));
     // IntVector2 FrameInfo::viewSize_ | File: ../Graphics/Drawable.h
     engine->RegisterObjectProperty("FrameInfo", "IntVector2 viewSize", offsetof(FrameInfo, viewSize_));
-    // FrameInfo::~FrameInfo() | Implicitly-declared
-    engine->RegisterObjectBehaviour("FrameInfo", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(FrameInfo_Destructor), asCALL_CDECL_OBJFIRST);
     // FrameInfo& FrameInfo::operator=(const FrameInfo&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<FrameInfo>(engine, "FrameInfo");
 #ifdef REGISTER_MANUAL_PART_FrameInfo

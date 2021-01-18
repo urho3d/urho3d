@@ -171,6 +171,7 @@ if (URHO3D_GENERATEBINDINGS)
     set (AS_GENERATED_FILES "AngelScript/GeneratedEnums.cpp"
                             "AngelScript/GeneratedObjectTypes.cpp"
                             "AngelScript/GeneratedDefaultConstructors.cpp"
+                            "AngelScript/GeneratedClasses.cpp"
                             "AngelScript/Generated_Members_A.cpp"
                             "AngelScript/Generated_Members_B.cpp"
                             "AngelScript/Generated_Members_Constraint.cpp"

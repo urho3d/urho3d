@@ -176,12 +176,6 @@ static void AreaAllocator_AreaAllocator_int_int_int_int_bool(AreaAllocator* ptr,
     new(ptr) AreaAllocator(width, height, maxWidth, maxHeight, fastMode);
 }
 
-// AreaAllocator::~AreaAllocator() | Implicitly-declared
-static void AreaAllocator_Destructor(AreaAllocator* ptr)
-{
-    ptr->~AreaAllocator();
-}
-
 // AttributeAnimationInfo::AttributeAnimationInfo(Animatable* animatable, const AttributeInfo& attributeInfo, ValueAnimation* attributeAnimation, WrapMode wrapMode, float speed) | File: ../Scene/Animatable.h
 static AttributeAnimationInfo* AttributeAnimationInfo_AttributeAnimationInfo_Animatable_AttributeInfo_ValueAnimation_WrapMode_float(Animatable *animatable, const AttributeInfo &attributeInfo, ValueAnimation *attributeAnimation, WrapMode wrapMode, float speed)
 {
@@ -214,58 +208,16 @@ static void Audio_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Audio*
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
 }
 
-// AllocatorBlock::~AllocatorBlock() | Implicitly-declared
-static void AllocatorBlock_Destructor(AllocatorBlock* ptr)
-{
-    ptr->~AllocatorBlock();
-}
-
-// AllocatorNode::~AllocatorNode() | Implicitly-declared
-static void AllocatorNode_Destructor(AllocatorNode* ptr)
-{
-    ptr->~AllocatorNode();
-}
-
 // AnimationControl::AnimationControl() | File: ../Graphics/AnimationController.h
 static AnimationControl* AnimationControl_AnimationControl_void()
 {
     return new AnimationControl();
 }
 
-// AnimationKeyFrame::~AnimationKeyFrame() | Implicitly-declared
-static void AnimationKeyFrame_Destructor(AnimationKeyFrame* ptr)
-{
-    ptr->~AnimationKeyFrame();
-}
-
-// AnimationStateTrack::~AnimationStateTrack() | File: ../Graphics/AnimationState.h
-static void AnimationStateTrack_Destructor_AnimationStateTrack_void(AnimationStateTrack* ptr)
-{
-    ptr->~AnimationStateTrack();
-}
-
 // AnimationTrack::AnimationTrack() | File: ../Graphics/Animation.h
 static AnimationTrack* AnimationTrack_AnimationTrack_void()
 {
     return new AnimationTrack();
-}
-
-// AnimationTriggerPoint::~AnimationTriggerPoint() | Implicitly-declared
-static void AnimationTriggerPoint_Destructor(AnimationTriggerPoint* ptr)
-{
-    ptr->~AnimationTriggerPoint();
-}
-
-// AsyncProgress::~AsyncProgress() | Implicitly-declared
-static void AsyncProgress_Destructor(AsyncProgress* ptr)
-{
-    ptr->~AsyncProgress();
-}
-
-// AttributeInfo::~AttributeInfo() | Implicitly-declared
-static void AttributeInfo_Destructor(AttributeInfo* ptr)
-{
-    ptr->~AttributeInfo();
 }
 
 void ASRegisterGenerated_Members_A(asIScriptEngine* engine)
@@ -2697,8 +2649,6 @@ void ASRegisterGenerated_Members_A(asIScriptEngine* engine)
     engine->RegisterObjectMethod("AreaAllocator", "int GetWidth() const", asMETHODPR(AreaAllocator, GetWidth, () const, int), asCALL_THISCALL);
     // void AreaAllocator::Reset(int width, int height, int maxWidth=0, int maxHeight=0, bool fastMode=true) | File: ../Math/AreaAllocator.h
     engine->RegisterObjectMethod("AreaAllocator", "void Reset(int, int, int = 0, int = 0, bool = true)", asMETHODPR(AreaAllocator, Reset, (int, int, int, int, bool), void), asCALL_THISCALL);
-    // AreaAllocator::~AreaAllocator() | Implicitly-declared
-    engine->RegisterObjectBehaviour("AreaAllocator", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(AreaAllocator_Destructor), asCALL_CDECL_OBJFIRST);
     // AreaAllocator& AreaAllocator::operator=(const AreaAllocator&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<AreaAllocator>(engine, "AreaAllocator");
 #ifdef REGISTER_MANUAL_PART_AreaAllocator
@@ -2953,8 +2903,6 @@ void ASRegisterGenerated_Members_A(asIScriptEngine* engine)
     // AllocatorBlock* can not be registered
     // unsigned AllocatorBlock::nodeSize_ | File: ../Container/Allocator.h
     engine->RegisterObjectProperty("AllocatorBlock", "uint nodeSize", offsetof(AllocatorBlock, nodeSize_));
-    // AllocatorBlock::~AllocatorBlock() | Implicitly-declared
-    engine->RegisterObjectBehaviour("AllocatorBlock", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(AllocatorBlock_Destructor), asCALL_CDECL_OBJFIRST);
     // AllocatorBlock& AllocatorBlock::operator=(const AllocatorBlock&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<AllocatorBlock>(engine, "AllocatorBlock");
 #ifdef REGISTER_MANUAL_PART_AllocatorBlock
@@ -2963,8 +2911,6 @@ void ASRegisterGenerated_Members_A(asIScriptEngine* engine)
 
     // AllocatorNode* AllocatorNode::next_ | File: ../Container/Allocator.h
     // AllocatorNode* can not be registered
-    // AllocatorNode::~AllocatorNode() | Implicitly-declared
-    engine->RegisterObjectBehaviour("AllocatorNode", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(AllocatorNode_Destructor), asCALL_CDECL_OBJFIRST);
     // AllocatorNode& AllocatorNode::operator=(const AllocatorNode&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<AllocatorNode>(engine, "AllocatorNode");
 #ifdef REGISTER_MANUAL_PART_AllocatorNode
@@ -3015,8 +2961,6 @@ void ASRegisterGenerated_Members_A(asIScriptEngine* engine)
     engine->RegisterObjectProperty("AnimationKeyFrame", "Vector3 scale", offsetof(AnimationKeyFrame, scale_));
     // float AnimationKeyFrame::time_ | File: ../Graphics/Animation.h
     engine->RegisterObjectProperty("AnimationKeyFrame", "float time", offsetof(AnimationKeyFrame, time_));
-    // AnimationKeyFrame::~AnimationKeyFrame() | Implicitly-declared
-    engine->RegisterObjectBehaviour("AnimationKeyFrame", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(AnimationKeyFrame_Destructor), asCALL_CDECL_OBJFIRST);
     // AnimationKeyFrame& AnimationKeyFrame::operator=(const AnimationKeyFrame&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<AnimationKeyFrame>(engine, "AnimationKeyFrame");
 #ifdef REGISTER_MANUAL_PART_AnimationKeyFrame
@@ -3033,8 +2977,6 @@ void ASRegisterGenerated_Members_A(asIScriptEngine* engine)
     // const AnimationTrack* can not be registered
     // float AnimationStateTrack::weight_ | File: ../Graphics/AnimationState.h
     engine->RegisterObjectProperty("AnimationStateTrack", "float weight", offsetof(AnimationStateTrack, weight_));
-    // AnimationStateTrack::~AnimationStateTrack() | File: ../Graphics/AnimationState.h
-    engine->RegisterObjectBehaviour("AnimationStateTrack", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(AnimationStateTrack_Destructor_AnimationStateTrack_void), asCALL_CDECL_OBJFIRST);
     // AnimationStateTrack& AnimationStateTrack::operator=(const AnimationStateTrack&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<AnimationStateTrack>(engine, "AnimationStateTrack");
 #ifdef REGISTER_MANUAL_PART_AnimationStateTrack
@@ -3081,8 +3023,6 @@ void ASRegisterGenerated_Members_A(asIScriptEngine* engine)
     engine->RegisterObjectProperty("AnimationTriggerPoint", "Variant data", offsetof(AnimationTriggerPoint, data_));
     // float AnimationTriggerPoint::time_ | File: ../Graphics/Animation.h
     engine->RegisterObjectProperty("AnimationTriggerPoint", "float time", offsetof(AnimationTriggerPoint, time_));
-    // AnimationTriggerPoint::~AnimationTriggerPoint() | Implicitly-declared
-    engine->RegisterObjectBehaviour("AnimationTriggerPoint", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(AnimationTriggerPoint_Destructor), asCALL_CDECL_OBJFIRST);
     // AnimationTriggerPoint& AnimationTriggerPoint::operator=(const AnimationTriggerPoint&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<AnimationTriggerPoint>(engine, "AnimationTriggerPoint");
 #ifdef REGISTER_MANUAL_PART_AnimationTriggerPoint
@@ -3111,8 +3051,6 @@ void ASRegisterGenerated_Members_A(asIScriptEngine* engine)
     engine->RegisterObjectProperty("AsyncProgress", "XMLElement xmlElement", offsetof(AsyncProgress, xmlElement_));
     // SharedPtr<XMLFile> AsyncProgress::xmlFile_ | File: ../Scene/Scene.h
     // Error: type "SharedPtr<XMLFile>" can not automatically bind
-    // AsyncProgress::~AsyncProgress() | Implicitly-declared
-    engine->RegisterObjectBehaviour("AsyncProgress", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(AsyncProgress_Destructor), asCALL_CDECL_OBJFIRST);
     // AsyncProgress& AsyncProgress::operator=(const AsyncProgress&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<AsyncProgress>(engine, "AsyncProgress");
 #ifdef REGISTER_MANUAL_PART_AsyncProgress
@@ -3141,8 +3079,6 @@ void ASRegisterGenerated_Members_A(asIScriptEngine* engine)
     engine->RegisterObjectMethod("AttributeInfo", "const Variant& GetMetadata(const StringHash&in) const", asMETHODPR(AttributeInfo, GetMetadata, (const StringHash&) const, const Variant&), asCALL_THISCALL);
     // template<class T> T AttributeInfo::GetMetadata(const StringHash& key) const | File: ../Core/Attribute.h
     // Not registered because template
-    // AttributeInfo::~AttributeInfo() | Implicitly-declared
-    engine->RegisterObjectBehaviour("AttributeInfo", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(AttributeInfo_Destructor), asCALL_CDECL_OBJFIRST);
     // AttributeInfo& AttributeInfo::operator=(const AttributeInfo&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<AttributeInfo>(engine, "AttributeInfo");
 #ifdef REGISTER_MANUAL_PART_AttributeInfo

@@ -224,12 +224,6 @@ static void Variant_Variant_Variant(Variant* ptr, const Variant &value)
     new(ptr) Variant(value);
 }
 
-// Variant::~Variant() | File: ../Core/Variant.h
-static void Variant_Destructor_Variant_void(Variant* ptr)
-{
-    ptr->~Variant();
-}
-
 // Vector2::Vector2(const Vector2& vector) noexcept=default | File: ../Math/Vector2.h
 static void Vector2_Vector2_Vector2(Vector2* ptr, const Vector2 &vector)
 {
@@ -302,12 +296,6 @@ static void Vector4_Vector4_float_float_float_float(Vector4* ptr, float x, float
     new(ptr) Vector4(x, y, z, w);
 }
 
-// VectorBase::~VectorBase() | Implicitly-declared
-static void VectorBase_Destructor(VectorBase* ptr)
-{
-    ptr->~VectorBase();
-}
-
 // StringVector Deserializer::ReadStringVector() | File: ../IO/Deserializer.h
 static CScriptArray* VectorBuffer_ReadStringVector_void(VectorBuffer* ptr)
 {
@@ -319,12 +307,6 @@ static CScriptArray* VectorBuffer_ReadStringVector_void(VectorBuffer* ptr)
 static void VectorBuffer_VectorBuffer_Deserializer_unsigned(VectorBuffer* ptr, Deserializer &source, unsigned size)
 {
     new(ptr) VectorBuffer(source, size);
-}
-
-// VectorBuffer::~VectorBuffer() | Implicitly-declared
-static void VectorBuffer_Destructor(VectorBuffer* ptr)
-{
-    ptr->~VectorBuffer();
 }
 
 // static unsigned VertexBuffer::GetElementOffset(const PODVector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index=0) | File: ../Graphics/VertexBuffer.h
@@ -486,48 +468,10 @@ static Viewport* Viewport_Viewport_Context_Scene_Camera_IntRect_RenderPath(Scene
     return new Viewport(GetScriptContext(), scene, camera, rect, renderPath);
 }
 
-// VAnimEventFrame::~VAnimEventFrame() | Implicitly-declared
-static void VAnimEventFrame_Destructor(VAnimEventFrame* ptr)
-{
-    ptr->~VAnimEventFrame();
-}
-
-// VAnimKeyFrame::~VAnimKeyFrame() | Implicitly-declared
-static void VAnimKeyFrame_Destructor(VAnimKeyFrame* ptr)
-{
-    ptr->~VAnimKeyFrame();
-}
-
-#ifdef URHO3D_URHO2D
-// Vertex2D::~Vertex2D() | Implicitly-declared
-static void Vertex2D_Destructor(Vertex2D* ptr)
-{
-    ptr->~Vertex2D();
-}
-#endif
-
-// VertexBufferDesc::~VertexBufferDesc() | Implicitly-declared
-static void VertexBufferDesc_Destructor(VertexBufferDesc* ptr)
-{
-    ptr->~VertexBufferDesc();
-}
-
-// VertexBufferMorph::~VertexBufferMorph() | Implicitly-declared
-static void VertexBufferMorph_Destructor(VertexBufferMorph* ptr)
-{
-    ptr->~VertexBufferMorph();
-}
-
 // VertexElement::VertexElement(VertexElementType type, VertexElementSemantic semantic, unsigned char index=0, bool perInstance=false) noexcept | File: ../Graphics/GraphicsDefs.h
 static void VertexElement_VertexElement_VertexElementType_VertexElementSemantic_unsignedchar_bool(VertexElement* ptr, VertexElementType type, VertexElementSemantic semantic, unsigned char index=0, bool perInstance=false)
 {
     new(ptr) VertexElement(type, semantic, index, perInstance);
-}
-
-// VertexElement::~VertexElement() | Implicitly-declared
-static void VertexElement_Destructor(VertexElement* ptr)
-{
-    ptr->~VertexElement();
 }
 
 void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
@@ -1204,8 +1148,6 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
     // Error: type "const char*" can not automatically bind
     // Variant::Variant(const Variant& value) | File: ../Core/Variant.h
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const Variant&in)", asFUNCTION(Variant_Variant_Variant), asCALL_CDECL_OBJFIRST);
-    // Variant::~Variant() | File: ../Core/Variant.h
-    engine->RegisterObjectBehaviour("Variant", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(Variant_Destructor_Variant_void), asCALL_CDECL_OBJFIRST);
 #ifdef REGISTER_MANUAL_PART_Variant
     REGISTER_MANUAL_PART_Variant(Variant, "Variant")
 #endif
@@ -1542,8 +1484,6 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
 
     // void VectorBase::Swap(VectorBase& rhs) | File: ../Container/VectorBase.h
     engine->RegisterObjectMethod("VectorBase", "void Swap(VectorBase&)", asMETHODPR(VectorBase, Swap, (VectorBase&), void), asCALL_THISCALL);
-    // VectorBase::~VectorBase() | Implicitly-declared
-    engine->RegisterObjectBehaviour("VectorBase", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(VectorBase_Destructor), asCALL_CDECL_OBJFIRST);
     // VectorBase& VectorBase::operator=(const VectorBase&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<VectorBase>(engine, "VectorBase");
 #ifdef REGISTER_MANUAL_PART_VectorBase
@@ -1760,8 +1700,6 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
     engine->RegisterObjectMethod("VectorBuffer", "bool WriteVector4(const Vector4&in)", asMETHODPR(VectorBuffer, WriteVector4, (const Vector4&), bool), asCALL_THISCALL);
     // bool Serializer::WriteVLE(unsigned value) | File: ../IO/Serializer.h
     engine->RegisterObjectMethod("VectorBuffer", "bool WriteVLE(uint)", asMETHODPR(VectorBuffer, WriteVLE, (unsigned), bool), asCALL_THISCALL);
-    // VectorBuffer::~VectorBuffer() | Implicitly-declared
-    engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(VectorBuffer_Destructor), asCALL_CDECL_OBJFIRST);
     // VectorBuffer& VectorBuffer::operator=(const VectorBuffer&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<VectorBuffer>(engine, "VectorBuffer");
 #ifdef REGISTER_MANUAL_PART_AbstractFile
@@ -3237,8 +3175,6 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
     engine->RegisterObjectProperty("VAnimEventFrame", "StringHash eventType", offsetof(VAnimEventFrame, eventType_));
     // float VAnimEventFrame::time_ | File: ../Scene/ValueAnimation.h
     engine->RegisterObjectProperty("VAnimEventFrame", "float time", offsetof(VAnimEventFrame, time_));
-    // VAnimEventFrame::~VAnimEventFrame() | Implicitly-declared
-    engine->RegisterObjectBehaviour("VAnimEventFrame", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(VAnimEventFrame_Destructor), asCALL_CDECL_OBJFIRST);
     // VAnimEventFrame& VAnimEventFrame::operator=(const VAnimEventFrame&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<VAnimEventFrame>(engine, "VAnimEventFrame");
 #ifdef REGISTER_MANUAL_PART_VAnimEventFrame
@@ -3249,8 +3185,6 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
     engine->RegisterObjectProperty("VAnimKeyFrame", "float time", offsetof(VAnimKeyFrame, time_));
     // Variant VAnimKeyFrame::value_ | File: ../Scene/ValueAnimation.h
     engine->RegisterObjectProperty("VAnimKeyFrame", "Variant value", offsetof(VAnimKeyFrame, value_));
-    // VAnimKeyFrame::~VAnimKeyFrame() | Implicitly-declared
-    engine->RegisterObjectBehaviour("VAnimKeyFrame", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(VAnimKeyFrame_Destructor), asCALL_CDECL_OBJFIRST);
     // VAnimKeyFrame& VAnimKeyFrame::operator=(const VAnimKeyFrame&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<VAnimKeyFrame>(engine, "VAnimKeyFrame");
 #ifdef REGISTER_MANUAL_PART_VAnimKeyFrame
@@ -3264,8 +3198,6 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
     engine->RegisterObjectProperty("Vertex2D", "Vector3 position", offsetof(Vertex2D, position_));
     // Vector2 Vertex2D::uv_ | File: ../Urho2D/Drawable2D.h
     engine->RegisterObjectProperty("Vertex2D", "Vector2 uv", offsetof(Vertex2D, uv_));
-    // Vertex2D::~Vertex2D() | Implicitly-declared
-    engine->RegisterObjectBehaviour("Vertex2D", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(Vertex2D_Destructor), asCALL_CDECL_OBJFIRST);
     // Vertex2D& Vertex2D::operator=(const Vertex2D&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<Vertex2D>(engine, "Vertex2D");
 #ifdef REGISTER_MANUAL_PART_Vertex2D
@@ -3281,8 +3213,6 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
     engine->RegisterObjectProperty("VertexBufferDesc", "uint vertexCount", offsetof(VertexBufferDesc, vertexCount_));
     // PODVector<VertexElement> VertexBufferDesc::vertexElements_ | File: ../Graphics/Model.h
     // Error: type "PODVector<VertexElement>" can not automatically bind
-    // VertexBufferDesc::~VertexBufferDesc() | Implicitly-declared
-    engine->RegisterObjectBehaviour("VertexBufferDesc", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(VertexBufferDesc_Destructor), asCALL_CDECL_OBJFIRST);
     // VertexBufferDesc& VertexBufferDesc::operator=(const VertexBufferDesc&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<VertexBufferDesc>(engine, "VertexBufferDesc");
 #ifdef REGISTER_MANUAL_PART_VertexBufferDesc
@@ -3297,8 +3227,6 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
     // Error: type "SharedArrayPtr<unsigned char>" can not automatically bind
     // unsigned VertexBufferMorph::vertexCount_ | File: ../Graphics/Model.h
     engine->RegisterObjectProperty("VertexBufferMorph", "uint vertexCount", offsetof(VertexBufferMorph, vertexCount_));
-    // VertexBufferMorph::~VertexBufferMorph() | Implicitly-declared
-    engine->RegisterObjectBehaviour("VertexBufferMorph", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(VertexBufferMorph_Destructor), asCALL_CDECL_OBJFIRST);
     // VertexBufferMorph& VertexBufferMorph::operator=(const VertexBufferMorph&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<VertexBufferMorph>(engine, "VertexBufferMorph");
 #ifdef REGISTER_MANUAL_PART_VertexBufferMorph
@@ -3319,8 +3247,6 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
     engine->RegisterObjectMethod("VertexElement", "bool opEquals(const VertexElement&in) const", asMETHODPR(VertexElement, operator==, (const VertexElement&) const, bool), asCALL_THISCALL);
     // VertexElement::VertexElement(VertexElementType type, VertexElementSemantic semantic, unsigned char index=0, bool perInstance=false) noexcept | File: ../Graphics/GraphicsDefs.h
     engine->RegisterObjectBehaviour("VertexElement", asBEHAVE_CONSTRUCT, "void f(VertexElementType, VertexElementSemantic, uint8 = 0, bool = false)", asFUNCTION(VertexElement_VertexElement_VertexElementType_VertexElementSemantic_unsignedchar_bool), asCALL_CDECL_OBJFIRST);
-    // VertexElement::~VertexElement() | Implicitly-declared
-    engine->RegisterObjectBehaviour("VertexElement", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(VertexElement_Destructor), asCALL_CDECL_OBJFIRST);
     // VertexElement& VertexElement::operator=(const VertexElement&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<VertexElement>(engine, "VertexElement");
 #ifdef REGISTER_MANUAL_PART_VertexElement

@@ -80,12 +80,6 @@ static void LineEdit_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Lin
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
 }
 
-// ListBase::~ListBase() | Implicitly-declared
-static void ListBase_Destructor(ListBase* ptr)
-{
-    ptr->~ListBase();
-}
-
 // const Vector<SharedPtr<UIElement>>& UIElement::GetChildren() const | File: ../UI/UIElement.h
 static CScriptArray* ListView_GetChildren_void(ListView* ptr)
 {
@@ -186,36 +180,6 @@ static void LogicComponent_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bo
 {
     PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
-}
-
-// LightBatchQueue::~LightBatchQueue() | Implicitly-declared
-static void LightBatchQueue_Destructor(LightBatchQueue* ptr)
-{
-    ptr->~LightBatchQueue();
-}
-
-// LightQueryResult::~LightQueryResult() | Implicitly-declared
-static void LightQueryResult_Destructor(LightQueryResult* ptr)
-{
-    ptr->~LightQueryResult();
-}
-
-// LinkedListNode::~LinkedListNode() | Implicitly-declared
-static void LinkedListNode_Destructor(LinkedListNode* ptr)
-{
-    ptr->~LinkedListNode();
-}
-
-// ListIteratorBase::~ListIteratorBase() | Implicitly-declared
-static void ListIteratorBase_Destructor(ListIteratorBase* ptr)
-{
-    ptr->~ListIteratorBase();
-}
-
-// ListNodeBase::~ListNodeBase() | Implicitly-declared
-static void ListNodeBase_Destructor(ListNodeBase* ptr)
-{
-    ptr->~ListNodeBase();
 }
 
 void ASRegisterGenerated_Members_L(asIScriptEngine* engine)
@@ -1720,8 +1684,6 @@ void ASRegisterGenerated_Members_L(asIScriptEngine* engine)
 
     // void ListBase::Swap(ListBase& rhs) | File: ../Container/ListBase.h
     engine->RegisterObjectMethod("ListBase", "void Swap(ListBase&)", asMETHODPR(ListBase, Swap, (ListBase&), void), asCALL_THISCALL);
-    // ListBase::~ListBase() | Implicitly-declared
-    engine->RegisterObjectBehaviour("ListBase", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(ListBase_Destructor), asCALL_CDECL_OBJFIRST);
     // ListBase& ListBase::operator=(const ListBase&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<ListBase>(engine, "ListBase");
 #ifdef REGISTER_MANUAL_PART_ListBase
@@ -3237,8 +3199,6 @@ void ASRegisterGenerated_Members_L(asIScriptEngine* engine)
     // Error: type "PODVector<Light*>" can not automatically bind
     // PODVector<Batch> LightBatchQueue::volumeBatches_ | File: ../Graphics/Batch.h
     // Error: type "PODVector<Batch>" can not automatically bind
-    // LightBatchQueue::~LightBatchQueue() | Implicitly-declared
-    engine->RegisterObjectBehaviour("LightBatchQueue", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(LightBatchQueue_Destructor), asCALL_CDECL_OBJFIRST);
     // LightBatchQueue& LightBatchQueue::operator=(const LightBatchQueue&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<LightBatchQueue>(engine, "LightBatchQueue");
 #ifdef REGISTER_MANUAL_PART_LightBatchQueue
@@ -3265,8 +3225,6 @@ void ASRegisterGenerated_Members_L(asIScriptEngine* engine)
     // Not registered because array
     // float LightQueryResult::shadowNearSplits_[MAX_LIGHT_SPLITS] | File: ../Graphics/View.h
     // Not registered because array
-    // LightQueryResult::~LightQueryResult() | Implicitly-declared
-    engine->RegisterObjectBehaviour("LightQueryResult", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(LightQueryResult_Destructor), asCALL_CDECL_OBJFIRST);
     // LightQueryResult& LightQueryResult::operator=(const LightQueryResult&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<LightQueryResult>(engine, "LightQueryResult");
 #ifdef REGISTER_MANUAL_PART_LightQueryResult
@@ -3275,8 +3233,6 @@ void ASRegisterGenerated_Members_L(asIScriptEngine* engine)
 
     // LinkedListNode* LinkedListNode::next_ | File: ../Container/LinkedList.h
     // LinkedListNode* can not be registered
-    // LinkedListNode::~LinkedListNode() | Implicitly-declared
-    engine->RegisterObjectBehaviour("LinkedListNode", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(LinkedListNode_Destructor), asCALL_CDECL_OBJFIRST);
     // LinkedListNode& LinkedListNode::operator=(const LinkedListNode&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<LinkedListNode>(engine, "LinkedListNode");
 #ifdef REGISTER_MANUAL_PART_LinkedListNode
@@ -3293,8 +3249,6 @@ void ASRegisterGenerated_Members_L(asIScriptEngine* engine)
     // Error: type "ListNodeBase*" can not automatically bind
     // bool ListIteratorBase::operator==(const ListIteratorBase& rhs) const | File: ../Container/ListBase.h
     engine->RegisterObjectMethod("ListIteratorBase", "bool opEquals(const ListIteratorBase&in) const", asMETHODPR(ListIteratorBase, operator==, (const ListIteratorBase&) const, bool), asCALL_THISCALL);
-    // ListIteratorBase::~ListIteratorBase() | Implicitly-declared
-    engine->RegisterObjectBehaviour("ListIteratorBase", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(ListIteratorBase_Destructor), asCALL_CDECL_OBJFIRST);
     // ListIteratorBase& ListIteratorBase::operator=(const ListIteratorBase&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<ListIteratorBase>(engine, "ListIteratorBase");
 #ifdef REGISTER_MANUAL_PART_ListIteratorBase
@@ -3305,8 +3259,6 @@ void ASRegisterGenerated_Members_L(asIScriptEngine* engine)
     // ListNodeBase* can not be registered
     // ListNodeBase* ListNodeBase::prev_ | File: ../Container/ListBase.h
     // ListNodeBase* can not be registered
-    // ListNodeBase::~ListNodeBase() | Implicitly-declared
-    engine->RegisterObjectBehaviour("ListNodeBase", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(ListNodeBase_Destructor), asCALL_CDECL_OBJFIRST);
     // ListNodeBase& ListNodeBase::operator=(const ListNodeBase&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<ListNodeBase>(engine, "ListNodeBase");
 #ifdef REGISTER_MANUAL_PART_ListNodeBase

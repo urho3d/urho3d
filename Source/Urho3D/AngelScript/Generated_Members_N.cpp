@@ -196,54 +196,6 @@ static void Node_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Node* p
     ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
 }
 
-#ifdef URHO3D_NAVIGATION
-// NavAreaStub::~NavAreaStub() | Implicitly-declared
-static void NavAreaStub_Destructor(NavAreaStub* ptr)
-{
-    ptr->~NavAreaStub();
-}
-#endif
-
-// virtual NavBuildData::~NavBuildData() | File: ../Navigation/NavBuildData.h
-static void NavBuildData_Destructor_NavBuildData_void(NavBuildData* ptr)
-{
-    ptr->~NavBuildData();
-}
-
-#ifdef URHO3D_NAVIGATION
-// NavigationGeometryInfo::~NavigationGeometryInfo() | Implicitly-declared
-static void NavigationGeometryInfo_Destructor(NavigationGeometryInfo* ptr)
-{
-    ptr->~NavigationGeometryInfo();
-}
-#endif
-
-#ifdef URHO3D_NAVIGATION
-// NavigationPathPoint::~NavigationPathPoint() | Implicitly-declared
-static void NavigationPathPoint_Destructor(NavigationPathPoint* ptr)
-{
-    ptr->~NavigationPathPoint();
-}
-#endif
-
-// NetworkState::~NetworkState() | Implicitly-declared
-static void NetworkState_Destructor(NetworkState* ptr)
-{
-    ptr->~NetworkState();
-}
-
-// NodeImpl::~NodeImpl() | Implicitly-declared
-static void NodeImpl_Destructor(NodeImpl* ptr)
-{
-    ptr->~NodeImpl();
-}
-
-// NodeReplicationState::~NodeReplicationState() | Implicitly-declared
-static void NodeReplicationState_Destructor(NodeReplicationState* ptr)
-{
-    ptr->~NodeReplicationState();
-}
-
 void ASRegisterGenerated_Members_N(asIScriptEngine* engine)
 {
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
@@ -2738,8 +2690,6 @@ void ASRegisterGenerated_Members_N(asIScriptEngine* engine)
     engine->RegisterObjectProperty("NavAreaStub", "uint8 areaID", offsetof(NavAreaStub, areaID_));
     // BoundingBox NavAreaStub::bounds_ | File: ../Navigation/NavBuildData.h
     engine->RegisterObjectProperty("NavAreaStub", "BoundingBox bounds", offsetof(NavAreaStub, bounds_));
-    // NavAreaStub::~NavAreaStub() | Implicitly-declared
-    engine->RegisterObjectBehaviour("NavAreaStub", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(NavAreaStub_Destructor), asCALL_CDECL_OBJFIRST);
     // NavAreaStub& NavAreaStub::operator=(const NavAreaStub&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<NavAreaStub>(engine, "NavAreaStub");
 #ifdef REGISTER_MANUAL_PART_NavAreaStub
@@ -2772,8 +2722,6 @@ void ASRegisterGenerated_Members_N(asIScriptEngine* engine)
     // Error: type "PODVector<Vector3>" can not automatically bind
     // BoundingBox NavBuildData::worldBoundingBox_ | File: ../Navigation/NavBuildData.h
     engine->RegisterObjectProperty("NavBuildData", "BoundingBox worldBoundingBox", offsetof(NavBuildData, worldBoundingBox_));
-    // virtual NavBuildData::~NavBuildData() | File: ../Navigation/NavBuildData.h
-    engine->RegisterObjectBehaviour("NavBuildData", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(NavBuildData_Destructor_NavBuildData_void), asCALL_CDECL_OBJFIRST);
     // NavBuildData& NavBuildData::operator=(const NavBuildData&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<NavBuildData>(engine, "NavBuildData");
 #ifdef REGISTER_MANUAL_PART_NavBuildData
@@ -2790,8 +2738,6 @@ void ASRegisterGenerated_Members_N(asIScriptEngine* engine)
     engine->RegisterObjectProperty("NavigationGeometryInfo", "uint lodLevel", offsetof(NavigationGeometryInfo, lodLevel_));
     // Matrix3x4 NavigationGeometryInfo::transform_ | File: ../Navigation/NavigationMesh.h
     engine->RegisterObjectProperty("NavigationGeometryInfo", "Matrix3x4 transform", offsetof(NavigationGeometryInfo, transform_));
-    // NavigationGeometryInfo::~NavigationGeometryInfo() | Implicitly-declared
-    engine->RegisterObjectBehaviour("NavigationGeometryInfo", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(NavigationGeometryInfo_Destructor), asCALL_CDECL_OBJFIRST);
     // NavigationGeometryInfo& NavigationGeometryInfo::operator=(const NavigationGeometryInfo&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<NavigationGeometryInfo>(engine, "NavigationGeometryInfo");
 #ifdef REGISTER_MANUAL_PART_NavigationGeometryInfo
@@ -2806,8 +2752,6 @@ void ASRegisterGenerated_Members_N(asIScriptEngine* engine)
     engine->RegisterObjectProperty("NavigationPathPoint", "NavigationPathPointFlag flag", offsetof(NavigationPathPoint, flag_));
     // Vector3 NavigationPathPoint::position_ | File: ../Navigation/NavigationMesh.h
     engine->RegisterObjectProperty("NavigationPathPoint", "Vector3 position", offsetof(NavigationPathPoint, position_));
-    // NavigationPathPoint::~NavigationPathPoint() | Implicitly-declared
-    engine->RegisterObjectBehaviour("NavigationPathPoint", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(NavigationPathPoint_Destructor), asCALL_CDECL_OBJFIRST);
     // NavigationPathPoint& NavigationPathPoint::operator=(const NavigationPathPoint&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<NavigationPathPoint>(engine, "NavigationPathPoint");
 #ifdef REGISTER_MANUAL_PART_NavigationPathPoint
@@ -2827,8 +2771,6 @@ void ASRegisterGenerated_Members_N(asIScriptEngine* engine)
     engine->RegisterObjectProperty("NetworkState", "VariantMap previousVars", offsetof(NetworkState, previousVars_));
     // PODVector<ReplicationState*> NetworkState::replicationStates_ | File: ../Scene/ReplicationState.h
     // Error: type "PODVector<ReplicationState*>" can not automatically bind
-    // NetworkState::~NetworkState() | Implicitly-declared
-    engine->RegisterObjectBehaviour("NetworkState", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(NetworkState_Destructor), asCALL_CDECL_OBJFIRST);
     // NetworkState& NetworkState::operator=(const NetworkState&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<NetworkState>(engine, "NetworkState");
 #ifdef REGISTER_MANUAL_PART_NetworkState
@@ -2847,8 +2789,6 @@ void ASRegisterGenerated_Members_N(asIScriptEngine* engine)
     // Connection* can not be registered
     // StringVector NodeImpl::tags_ | File: ../Scene/Node.h
     // Error: type "StringVector" can not automatically bind
-    // NodeImpl::~NodeImpl() | Implicitly-declared
-    engine->RegisterObjectBehaviour("NodeImpl", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(NodeImpl_Destructor), asCALL_CDECL_OBJFIRST);
     // NodeImpl& NodeImpl::operator=(const NodeImpl&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<NodeImpl>(engine, "NodeImpl");
 #ifdef REGISTER_MANUAL_PART_NodeImpl
@@ -2871,8 +2811,6 @@ void ASRegisterGenerated_Members_N(asIScriptEngine* engine)
     engine->RegisterObjectProperty("NodeReplicationState", "float priorityAcc", offsetof(NodeReplicationState, priorityAcc_));
     // SceneReplicationState* NodeReplicationState::sceneState_ | File: ../Scene/ReplicationState.h
     // SceneReplicationState* can not be registered
-    // NodeReplicationState::~NodeReplicationState() | Implicitly-declared
-    engine->RegisterObjectBehaviour("NodeReplicationState", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(NodeReplicationState_Destructor), asCALL_CDECL_OBJFIRST);
     // NodeReplicationState& NodeReplicationState::operator=(const NodeReplicationState&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<NodeReplicationState>(engine, "NodeReplicationState");
 #ifdef REGISTER_MANUAL_PART_ReplicationState

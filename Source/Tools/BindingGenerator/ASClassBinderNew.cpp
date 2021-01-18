@@ -76,7 +76,21 @@ static bool IsConstructorRequired(const ClassAnalyzer& classAnalyzer)
     return true;
 }
 
-static void RegisterDefaultConstructor(const ClassAnalyzer& classAnalyzer, ProcessedClass& inoutProcessedClass)
+static bool IsDestructorRequired(const ClassAnalyzer& classAnalyzer)
+{
+    if (classAnalyzer.IsRefCounted())
+        return false;
+
+    if (Contains(classAnalyzer.GetComment(), "FAKE_REF"))
+        return false;
+
+    if (classAnalyzer.IsPod())
+        return false;
+
+    return true;
+}
+
+static void RegisterDefaultConstructor(const ClassAnalyzer& classAnalyzer, ProcessedClass& processedClass)
 {
     if (classAnalyzer.IsRefCounted())
         return;
@@ -99,18 +113,60 @@ static void RegisterDefaultConstructor(const ClassAnalyzer& classAnalyzer, Proce
 
     result->registration_ = "engine->RegisterObjectBehaviour(\"" + className + "\", asBEHAVE_CONSTRUCT, \"void f()\", asFUNCTION(" + wrapperName + "), asCALL_CDECL_OBJFIRST);";
 
-    shared_ptr<ClassFunctionAnalyzer> defaultConstructor = classAnalyzer.GetDefinedDefaultConstructor();
+    shared_ptr<ClassFunctionAnalyzer> defaultConstructor = classAnalyzer.GetDefinedThisDefaultConstructor();
 
     if (defaultConstructor)
     {
         result->comment_ = defaultConstructor->GetLocation();
-        inoutProcessedClass.defaultConstructor_ = result;
+        processedClass.defaultConstructor_ = result;
     }
     else if (!classAnalyzer.HasThisConstructor() && IsConstructorRequired(classAnalyzer))
     {
         result->comment_ = className + "::" + className + "() | Implicitly-declared";
-        inoutProcessedClass.defaultConstructor_ = result;
+        processedClass.defaultConstructor_ = result;
     }
+}
+
+static void RegisterDestructor(const ClassAnalyzer& classAnalyzer, ProcessedClass& processedClass)
+{
+    if (classAnalyzer.IsRefCounted())
+        return;
+
+    if (Contains(classAnalyzer.GetComment(), "FAKE_REF"))
+        return;
+
+    string className = classAnalyzer.GetClassName();
+    string wrapperName = className + "_Destructor";
+
+    shared_ptr<ClassMemberRegistration> result = make_shared<ClassMemberRegistration>();
+
+    result->name_ = "~" + className;
+
+    result->glue_ =
+        "static void " + wrapperName + "(" + className + "* ptr)\n"
+        "{\n"
+        "    ptr->~" + className + "();\n"
+        "}\n";
+
+    result->registration_ = "engine->RegisterObjectBehaviour(\"" + className + "\", asBEHAVE_DESTRUCT, \"void f()\", asFUNCTION(" + wrapperName + "), asCALL_CDECL_OBJFIRST);";
+
+    shared_ptr<ClassFunctionAnalyzer> thisDestructor = classAnalyzer.GetDefinedThisDestructor();
+
+    if (thisDestructor)
+    {
+        result->comment_ = thisDestructor->GetLocation();
+        processedClass.destructor_ = result;
+    }
+    else if (!classAnalyzer.HasThisDestructor() && IsDestructorRequired(classAnalyzer))
+    {
+        result->comment_ = className + "::~" + className + "() | Implicitly-declared";
+        processedClass.destructor_ = result;
+    }
+}
+
+static void RegisterNonDefaultConstructor(const ClassFunctionAnalyzer& classFunctionAnalyzer, ProcessedClass& processedClass)
+{
+    processedClass.nonDefaultConstructors_.push_back(classFunctionAnalyzer.GetLocation());
 }
 
 static void ProcessClass(const ClassAnalyzer& classAnalyzer)
@@ -155,6 +211,13 @@ static void ProcessClass(const ClassAnalyzer& classAnalyzer)
 
     RegisterObjectType(classAnalyzer, processedClass);
     RegisterDefaultConstructor(classAnalyzer, processedClass);
+
+    vector<ClassFunctionAnalyzer> nonDefaultConstructors = classAnalyzer.GetThisNonDefaultConstructors();
+    for (const ClassFunctionAnalyzer& classFunctionAnalyzer : nonDefaultConstructors)
+        RegisterNonDefaultConstructor(classFunctionAnalyzer, processedClass);
+
+    RegisterDestructor(classAnalyzer, processedClass);
+
     Result::classes_.push_back(processedClass);
 }
 

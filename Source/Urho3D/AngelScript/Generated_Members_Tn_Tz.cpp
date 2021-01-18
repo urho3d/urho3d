@@ -59,12 +59,6 @@ static void TrailPoint_TrailPoint_Vector3_Vector3(TrailPoint* ptr, const Vector3
     new(ptr) TrailPoint(position, forward);
 }
 
-// TrailPoint::~TrailPoint() | Implicitly-declared
-static void TrailPoint_Destructor(TrailPoint* ptr)
-{
-    ptr->~TrailPoint();
-}
-
 #ifdef URHO3D_PHYSICS
 // TriangleMeshData::TriangleMeshData(Model* model, unsigned lodLevel) | File: ../Physics/CollisionShape.h
 static TriangleMeshData* TriangleMeshData_TriangleMeshData_Model_unsigned(Model *model, unsigned lodLevel)
@@ -896,8 +890,6 @@ void ASRegisterGenerated_Members_Tn_Tz(asIScriptEngine* engine)
     engine->RegisterObjectProperty("TrailPoint", "float sortDistance", offsetof(TrailPoint, sortDistance_));
     // TrailPoint::TrailPoint(const Vector3& position, const Vector3& forward) | File: ../Graphics/RibbonTrail.h
     engine->RegisterObjectBehaviour("TrailPoint", asBEHAVE_CONSTRUCT, "void f(const Vector3&in, const Vector3&in)", asFUNCTION(TrailPoint_TrailPoint_Vector3_Vector3), asCALL_CDECL_OBJFIRST);
-    // TrailPoint::~TrailPoint() | Implicitly-declared
-    engine->RegisterObjectBehaviour("TrailPoint", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(TrailPoint_Destructor), asCALL_CDECL_OBJFIRST);
     // TrailPoint& TrailPoint::operator=(const TrailPoint&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<TrailPoint>(engine, "TrailPoint");
 #ifdef REGISTER_MANUAL_PART_TrailPoint

@@ -18,12 +18,6 @@ static void GPUObject_GPUObject_Graphics(GPUObject* ptr, Graphics *graphics)
     new(ptr) GPUObject(graphics);
 }
 
-// virtual GPUObject::~GPUObject() | File: ../Graphics/GPUObject.h
-static void GPUObject_Destructor_GPUObject_void(GPUObject* ptr)
-{
-    ptr->~GPUObject();
-}
-
 // explicit Geometry::Geometry(Context* context) | File: ../Graphics/Geometry.h
 static Geometry* Geometry_Geometry_Context()
 {
@@ -95,12 +89,6 @@ static GImpactMeshData* GImpactMeshData_GImpactMeshData_CustomGeometry(CustomGeo
 }
 #endif
 
-// GeometryDesc::~GeometryDesc() | Implicitly-declared
-static void GeometryDesc_Destructor(GeometryDesc* ptr)
-{
-    ptr->~GeometryDesc();
-}
-
 void ASRegisterGenerated_Members_G(asIScriptEngine* engine)
 {
     // void GPUObject::ClearDataLost() | File: ../Graphics/GPUObject.h
@@ -124,8 +112,6 @@ void ASRegisterGenerated_Members_G(asIScriptEngine* engine)
     engine->RegisterObjectMethod("GPUObject", "void OnDeviceReset()", asMETHODPR(GPUObject, OnDeviceReset, (), void), asCALL_THISCALL);
     // virtual void GPUObject::Release() | File: ../Graphics/GPUObject.h
     engine->RegisterObjectMethod("GPUObject", "void Release()", asMETHODPR(GPUObject, Release, (), void), asCALL_THISCALL);
-    // virtual GPUObject::~GPUObject() | File: ../Graphics/GPUObject.h
-    engine->RegisterObjectBehaviour("GPUObject", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(GPUObject_Destructor_GPUObject_void), asCALL_CDECL_OBJFIRST);
     // GPUObject& GPUObject::operator=(const GPUObject&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<GPUObject>(engine, "GPUObject");
 #ifdef REGISTER_MANUAL_PART_GPUObject
@@ -944,8 +930,6 @@ void ASRegisterGenerated_Members_G(asIScriptEngine* engine)
     engine->RegisterObjectProperty("GeometryDesc", "PrimitiveType type", offsetof(GeometryDesc, type_));
     // unsigned GeometryDesc::vbRef_ | File: ../Graphics/Model.h
     engine->RegisterObjectProperty("GeometryDesc", "uint vbRef", offsetof(GeometryDesc, vbRef_));
-    // GeometryDesc::~GeometryDesc() | Implicitly-declared
-    engine->RegisterObjectBehaviour("GeometryDesc", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(GeometryDesc_Destructor), asCALL_CDECL_OBJFIRST);
     // GeometryDesc& GeometryDesc::operator=(const GeometryDesc&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<GeometryDesc>(engine, "GeometryDesc");
 #ifdef REGISTER_MANUAL_PART_GeometryDesc

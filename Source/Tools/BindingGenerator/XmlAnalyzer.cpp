@@ -602,18 +602,17 @@ bool ClassAnalyzer::ContainsFunction(const string& name) const
     return false;
 }
 
-ClassFunctionAnalyzer ClassAnalyzer::GetFunction(const string& name) const
+shared_ptr<ClassFunctionAnalyzer> ClassAnalyzer::GetFunction(const string& name) const
 {
     vector<ClassFunctionAnalyzer> functions = GetFunctions();
 
     for (const ClassFunctionAnalyzer& function : functions)
     {
         if (function.GetName() == name)
-            return function;
+            return make_shared<ClassFunctionAnalyzer>(function);
     }
 
-    assert(false);
-    return (ClassFunctionAnalyzer(*this, xml_node())); // xml_node can not be empty, so here we return incorrect value
+    return nullptr;
 }
 
 int ClassAnalyzer::NumFunctions(const string& name) const
@@ -793,17 +792,31 @@ bool ClassAnalyzer::IsRefCounted() const
     return false;
 }
 
-shared_ptr<ClassFunctionAnalyzer> ClassAnalyzer::GetDefinedDefaultConstructor() const
+shared_ptr<ClassFunctionAnalyzer> ClassAnalyzer::GetDefinedThisDefaultConstructor() const
 {
     vector<ClassFunctionAnalyzer> functions = GetFunctions();
 
     for (const ClassFunctionAnalyzer& function : functions)
     {
-        if (function.IsThisConstructor() && ExtractCleanedFunctionArgsstring(function.GetMemberdef()).empty())
+        if (function.IsThisDefaultConstructor())
             return make_shared<ClassFunctionAnalyzer>(function);
     }
 
     return nullptr;
+}
+
+vector<ClassFunctionAnalyzer> ClassAnalyzer::GetThisNonDefaultConstructors() const
+{
+    vector<ClassFunctionAnalyzer> result;
+    vector<ClassFunctionAnalyzer> functions = GetFunctions();
+
+    for (const ClassFunctionAnalyzer& function : functions)
+    {
+        if (function.IsThisNonDefaultConstructor())
+            result.push_back(function);
+    }
+
+    return result;
 }
 
 // ============================================================================
