@@ -225,7 +225,7 @@ static void ProcessGlobalFunction(const GlobalFunctionAnalyzer& globalFunctionAn
 
     if (globalFunctionAnalyzer.IsTemplate())
     {
-        for (const map<string, string>& specialization : specializations)
+        for (const TemplateSpecialization& specialization : specializations)
         {
             GlobalFunctionAnalyzer specializedAnalyzer(globalFunctionAnalyzer.GetMemberdef(), specialization);
             BindGlobalFunction(specializedAnalyzer);

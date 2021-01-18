@@ -734,31 +734,31 @@ string GenerateWrapper(const ClassFunctionAnalyzer& functionAnalyzer, bool templ
 string Generate_asFUNCTIONPR(const GlobalFunctionAnalyzer& functionAnalyzer)
 {
     string functionName = functionAnalyzer.GetName();
-    string cppParams = "(" + JoinParamsTypes(functionAnalyzer.GetMemberdef(), functionAnalyzer.GetTemplateSpecialization()) + ")";
+    string cppParams = "(" + JoinParamsTypes(functionAnalyzer.GetMemberdef(), functionAnalyzer.GetSpecialization()) + ")";
     string returnType = functionAnalyzer.GetReturnType().ToString();
     return "asFUNCTIONPR(" + functionName + ", " + cppParams + ", " + returnType + ")";
 }
 
-string Generate_asFUNCTIONPR(const ClassStaticFunctionAnalyzer& functionAnalyzer, const map<string, string>& templateSpecialization)
+string Generate_asFUNCTIONPR(const ClassStaticFunctionAnalyzer& functionAnalyzer)
 {
     string className = functionAnalyzer.GetClassName();
     string functionName = functionAnalyzer.GetName();
-    string cppParams = "(" + JoinParamsTypes(functionAnalyzer.GetMemberdef(), templateSpecialization) + ")";
-    string returnType = functionAnalyzer.GetReturnType(templateSpecialization).ToString();
+    string cppParams = "(" + JoinParamsTypes(functionAnalyzer.GetMemberdef(), functionAnalyzer.GetSpecialization()) + ")";
+    string returnType = functionAnalyzer.GetReturnType().ToString();
     return "asFUNCTIONPR(" + className + "::" + functionName + ", " + cppParams + ", " + returnType + ")";
 }
 
-string Generate_asMETHODPR(const ClassFunctionAnalyzer& functionAnalyzer, bool templateVersion, const map<string, string>& templateSpecialization)
+string Generate_asMETHODPR(const ClassFunctionAnalyzer& functionAnalyzer, bool templateVersion)
 {
     string className = functionAnalyzer.GetClassName();
     string functionName = functionAnalyzer.GetName();
 
-    string cppParams = "(" + JoinParamsTypes(functionAnalyzer.GetMemberdef(), templateSpecialization) + ")";
+    string cppParams = "(" + JoinParamsTypes(functionAnalyzer.GetMemberdef(), functionAnalyzer.GetSpecialization()) + ")";
 
     if (functionAnalyzer.IsConst())
         cppParams += " const";
 
-    string returnType = functionAnalyzer.GetReturnType(templateSpecialization).ToString();
+    string returnType = functionAnalyzer.GetReturnType().ToString();
     
     if (templateVersion)
         return "asMETHODPR(T, " + functionName + ", " + cppParams + ", " + returnType + ")";

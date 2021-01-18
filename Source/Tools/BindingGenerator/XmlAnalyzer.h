@@ -34,6 +34,8 @@
 using namespace pugi;
 using namespace std;
 
+using TemplateSpecialization = map<string, string>;
+
 // <type>...</type> | <defval>...</defval> | <para>...</para>
 string RemoveRefs(xml_node node);
 
@@ -52,7 +54,7 @@ private:
     string templateParams_;
 
 public:
-    TypeAnalyzer(xml_node type, const map<string, string>& templateSpecialization = map<string, string>());
+    TypeAnalyzer(xml_node type, const TemplateSpecialization& specialization = {});
 
     // Used for doxygen bug workaround https://github.com/doxygen/doxygen/issues/7732
     TypeAnalyzer(const string& typeName);
@@ -76,10 +78,10 @@ class ParamAnalyzer
 {
 private:
     xml_node node_;
-    map<string, string> templateSpecialization_;
+    TemplateSpecialization specialization_; 
 
 public:
-    ParamAnalyzer(xml_node param, const map<string, string>& templateSpecialization = map<string, string>());
+    ParamAnalyzer(xml_node param, const TemplateSpecialization& specialization = {});
 
     xml_node GetNode() const { return node_; }
 
@@ -146,17 +148,17 @@ string ExtractProt(xml_node memberdef);
 
 // <memberdef>
 //     <type>...</type>
-TypeAnalyzer ExtractType(xml_node memberdef, const map<string, string>& templateSpecialization = map<string, string>());
+TypeAnalyzer ExtractType(xml_node memberdef, const TemplateSpecialization& specialization = {});
 
 // <memberdef kind="function">
 //     <param>...</param>
 //     <param>...</param>
-vector<ParamAnalyzer> ExtractParams(xml_node memberdef, const map<string, string>& templateSpecialization = map<string, string>());
+vector<ParamAnalyzer> ExtractParams(xml_node memberdef, const TemplateSpecialization& specialization = {});
 
 // <memberdef kind="function">
 //     <param>...</param>
 //     <param>...</param>
-string JoinParamsTypes(xml_node memberdef, const map<string, string>& templateSpecialization = map<string, string>());
+string JoinParamsTypes(xml_node memberdef, const TemplateSpecialization& specialization = {});
 string JoinParamsNames(xml_node memberdef, bool skipContext = false);
 
 // <memberdef kind="function">
@@ -252,13 +254,16 @@ class ClassAnalyzer
 {
 private:
     xml_node compounddef_;
+    TemplateSpecialization specialization_;
     
     vector<xml_node> GetMemberdefs() const;
 
 public:
     string usingLocation_;
 
-    ClassAnalyzer(xml_node compounddef);
+    ClassAnalyzer(xml_node compounddef, const TemplateSpecialization& specialization = {});
+
+    const TemplateSpecialization& GetSpecialization() const { return specialization_; }
 
     string GetClassName() const;
     string GetComment() const { return ExtractComment(compounddef_); }
@@ -294,18 +299,44 @@ public:
     shared_ptr<ClassFunctionAnalyzer> GetDefinedThisDestructor() const { return GetFunction("~" + GetClassName()); }
 };
 
+// <memberdef kind="function">...</memberdef>
+class FunctionAnalyzer
+{
+protected:
+    xml_node memberdef_;
+    TemplateSpecialization specialization_;
+
+public:
+    FunctionAnalyzer(xml_node memberdef, const TemplateSpecialization& specialization = {});
+    
+    xml_node GetMemberdef() const { return memberdef_; }
+    const TemplateSpecialization& GetSpecialization() const { return specialization_; }
+
+    string GetComment() const { return ExtractComment(memberdef_); }
+    string GetHeaderFile() const { return ExtractHeaderFile(memberdef_); }
+    string GetName() const { return ExtractName(memberdef_); }
+    vector<ParamAnalyzer> GetParams() const { return ExtractParams(memberdef_, specialization_); }
+    TypeAnalyzer GetReturnType() const { return ExtractType(memberdef_, specialization_); }
+    vector<string> GetTemplateParams() const { return ExtractTemplateParams(memberdef_); }
+    bool IsDefine() const { return CONTAINS(SourceData::defines_, GetName()); }
+    bool IsTemplate() const { return ::IsTemplate(memberdef_); }
+    string JoinParamsNames(bool skipContext = false) const { return ::JoinParamsNames(memberdef_, skipContext); }
+    string JoinParamsTypes() const { return ::JoinParamsTypes(memberdef_, specialization_); }
+
+    virtual string GetLocation() const { return GetFunctionLocation(memberdef_); }
+};
+
 // <compounddef kind="class|struct">
 //     <sectiondef>
 //         <memberdef kind="function">...</memberdef>
-class ClassFunctionAnalyzer
+class ClassFunctionAnalyzer : public FunctionAnalyzer
 {
     ClassAnalyzer classAnalyzer_;
-    xml_node memberdef_;
 
 public:
-    ClassFunctionAnalyzer(ClassAnalyzer classAnalyzer, xml_node memberdef);
+    ClassFunctionAnalyzer(const ClassAnalyzer& classAnalyzer, xml_node memberdef, const TemplateSpecialization& specialization = {});
+
     ClassAnalyzer GetClass() const { return classAnalyzer_; }
-    xml_node GetMemberdef() const { return memberdef_; }
 
     // <memberdef kind="function" virt="...">
     string GetVirt() const;
@@ -318,12 +349,8 @@ public:
     // <reimplements refid="..."></reimplements>
     shared_ptr<ClassFunctionAnalyzer> Reimplements() const;
 
-    string GetName() const { return ExtractName(memberdef_); }
     string GetClassName() const { return classAnalyzer_.GetClassName(); }
     string GetContainsClassName() const; // May this function defined in parent class, so return name o class, real define this function
-    string GetLine() const { return ExtractLine(memberdef_); }
-    string GetColumn() const { return ExtractColumn(memberdef_); }
-    string GetComment() const { return ExtractComment(memberdef_); }
     bool IsStatic() const { return ::IsStatic(memberdef_); }
     bool IsPublic() const { return ExtractProt(memberdef_) == "public"; }
     bool IsThisConstructor() const { return GetName() == GetClassName(); }
@@ -332,19 +359,13 @@ public:
     bool IsParentConstructor() const;
     bool IsThisDestructor() const { return GetName() == "~" + GetClassName(); }
     bool IsParentDestructor() const;
-    string GetLocation() const { return JoinNonEmpty({ classAnalyzer_.usingLocation_, GetFunctionLocation(memberdef_) }, " | "); }
-    string GetHeaderFile() const { return ExtractHeaderFile(memberdef_); }
-    TypeAnalyzer GetReturnType(const map<string, string>& templateSpecialization = map<string, string>()) const { return ExtractType(memberdef_, templateSpecialization); }
     bool CanBeGetProperty() const;
     bool CanBeSetProperty() const;
-    bool IsTemplate() const { return ::IsTemplate(memberdef_); }
     bool IsExplicit() const { return ::IsExplicit(memberdef_); }
-    bool IsDefine() const { return CONTAINS(SourceData::defines_, GetName()); }
     bool IsDeleted() const { return EndsWith(ExtractArgsstring(memberdef_), "=delete"); }
     bool IsConsversionOperator() const { return StartsWith(GetName(), "operator "); }
-    vector<ParamAnalyzer> GetParams() const { return ExtractParams(memberdef_); }
-    string JoinParamsNames(bool skipContext = false) const { return ::JoinParamsNames(memberdef_, skipContext); }
-    string JoinParamsTypes() const { return ::JoinParamsTypes(memberdef_); }
+
+    string GetLocation() const override { return JoinNonEmpty({ classAnalyzer_.usingLocation_, GetFunctionLocation(memberdef_) }, " | "); }
 };
 
 // <compounddef kind="class|struct">
@@ -372,54 +393,23 @@ public:
 // <compounddef kind="namespace">
 //     <sectiondef kind="func">
 //         <memberdef kind="function">...</memberdef>
-class GlobalFunctionAnalyzer
+class GlobalFunctionAnalyzer : public FunctionAnalyzer
 {
-    xml_node memberdef_;
-    map<string, string> templateSpecialization_;
-
 public:
-    GlobalFunctionAnalyzer(xml_node memberdef, const map<string, string>& templateSpecialization = map<string, string>());
-
-    xml_node GetMemberdef() const { return memberdef_; }
-    const map<string, string>& GetTemplateSpecialization() const { return templateSpecialization_; }
-
-    string GetName() const { return ExtractName(memberdef_); }
-    string GetHeaderFile() const { return ExtractHeaderFile(memberdef_); }
-    bool IsTemplate() const { return ::IsTemplate(memberdef_); }
-    string GetComment() const { return ExtractComment(memberdef_); }
-    vector<ParamAnalyzer> GetParams() const { return ExtractParams(memberdef_, templateSpecialization_); }
-    TypeAnalyzer GetReturnType() const { return ExtractType(memberdef_, templateSpecialization_); }
-    vector<string> GetTemplateParams() const { return ExtractTemplateParams(memberdef_); }
-    string JoinParamsNames() const { return ::JoinParamsNames(memberdef_); }
-    string JoinParamsTypes() const { return ::JoinParamsTypes(memberdef_); }
-    bool IsDefine() const { return CONTAINS(SourceData::defines_, GetName()); }
-    string GetLocation() const { return GetFunctionLocation(memberdef_); }
+    GlobalFunctionAnalyzer(xml_node memberdef, const TemplateSpecialization& specialization = {});
 };
 
 // <compounddef kind="class|struct">
 //     <sectiondef kind="public-static-func">
 //         <memberdef kind="function" prot="public" static="yes">...</memberdef>
-class ClassStaticFunctionAnalyzer
+class ClassStaticFunctionAnalyzer : public FunctionAnalyzer
 {
     ClassAnalyzer classAnalyzer_;
-    xml_node memberdef_;
 
 public:
-    ClassStaticFunctionAnalyzer(const ClassAnalyzer& classAnalyzer, xml_node memberdef);
+    ClassStaticFunctionAnalyzer(const ClassAnalyzer& classAnalyzer, xml_node memberdef, const TemplateSpecialization& specialization = {});
 
-    string GetName() const { return ExtractName(memberdef_); }
-    string GetHeaderFile() const { return ExtractHeaderFile(memberdef_); }
-    bool IsTemplate() const { return ::IsTemplate(memberdef_); }
-    string GetComment() const { return ExtractComment(memberdef_); }
-    vector<ParamAnalyzer> GetParams(const map<string, string>& templateSpecialization = map<string, string>()) const { return ExtractParams(memberdef_, templateSpecialization); }
-    TypeAnalyzer GetReturnType(const map<string, string>& templateSpecialization = map<string, string>()) const { return ExtractType(memberdef_, templateSpecialization); }
-    xml_node GetMemberdef() const { return memberdef_; }
-    vector<string> GetTemplateParams() const { return ExtractTemplateParams(memberdef_); }
     string GetClassName() const { return classAnalyzer_.GetClassName(); }
-    bool IsDefine() const { return CONTAINS(SourceData::defines_, GetName()); };
-    string JoinParamsNames() const { return ::JoinParamsNames(memberdef_); }
-    string JoinParamsTypes() const { return ::JoinParamsTypes(memberdef_); };
-    string GetLocation() const { return GetFunctionLocation(memberdef_); }
 };
 
 // <memberdef kind="typedef">
