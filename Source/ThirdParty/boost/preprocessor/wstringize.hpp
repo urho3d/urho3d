@@ -23,7 +23,7 @@
 #    define BOOST_PP_WSTRINGIZE_OO(par) BOOST_PP_WSTRINGIZE_I ## par
 # endif
 #
-# define BOOST_PP_WSTRINGIZE_I(text) BOOST_PP_WSTRINGIZE_II(#text)
+# define BOOST_PP_WSTRINGIZE_I(...) BOOST_PP_WSTRINGIZE_II(#__VA_ARGS__)
 # define BOOST_PP_WSTRINGIZE_II(str) L ## str
 #
 # endif
