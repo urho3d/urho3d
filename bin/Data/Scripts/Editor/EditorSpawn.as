@@ -414,11 +414,10 @@ Vector3 RandomizeSpawnPosition(const Vector3&in position, float randomRadius)
 void SpawnObject()
 {
     Node@ selectedNode = null;
-    
-    if (spawnOnSelection)
+
     if (selectedNodes.length > 0)
         selectedNode = selectedNodes[0];
-        
+
     if (spawnedObjectsNames.length == 0)
         return;
         
