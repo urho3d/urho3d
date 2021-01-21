@@ -415,10 +415,12 @@ void SpawnObject()
 {
     Node@ selectedNode = null;
     
-    if (spawnOnSelection)
-    if (selectedNodes.length > 0)
-        selectedNode = selectedNodes[0];
-        
+    if (spawnOnSelection) {
+        if (selectedNodes.length > 0) {
+            selectedNode = selectedNodes[0];
+		}
+	}
+	
     if (spawnedObjectsNames.length == 0)
         return;
         
