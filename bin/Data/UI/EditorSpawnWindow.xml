@@ -239,7 +239,7 @@
 						<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
 						<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
 						<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
-						<attribute name="Text" value="Spawn on selected node surface" />
+						<attribute name="Text" value="Spawn on selected node's surface" />
 					</element>
 				</element>
 				<element style="ListRow">
