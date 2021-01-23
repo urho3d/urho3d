@@ -1,25 +1,20 @@
 <?xml version="1.0"?>
 <element type="Window">
 	<attribute name="Name" value="EditorSpawnDialog" />
-	<attribute name="Position" value="520 221" />
+	<attribute name="Position" value="500 300" />
 	<attribute name="Size" value="320 301" />
 	<attribute name="Max Size" value="470 2147483647" />
-	<attribute name="Pivot" value="0 0" />
 	<attribute name="Layout Mode" value="Vertical" />
 	<attribute name="Layout Spacing" value="4" />
 	<attribute name="Layout Border" value="6 6 6 6" />
-	<attribute name="Image Rect" value="48 0 64 16" />
-	<attribute name="Border" value="4 4 4 4" />
 	<attribute name="Resize Border" value="0 6 0 6" />
 	<attribute name="Is Movable" value="true" />
 	<attribute name="Is Resizable" value="true" />
 	<element>
 		<attribute name="Min Size" value="128 16" />
 		<attribute name="Max Size" value="2147483647 16" />
-		<attribute name="Pivot" value="0 0" />
 		<attribute name="Layout Mode" value="Horizontal" />
 		<element type="Text">
-			<attribute name="Pivot" value="0 0" />
 			<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
 			<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
 			<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
@@ -29,125 +24,41 @@
 		</element>
 		<element type="Button" style="CloseButton">
 			<attribute name="Name" value="CloseButton" />
-			<attribute name="Min Size" value="16 16" />
-			<attribute name="Max Size" value="16 16" />
-			<attribute name="Pivot" value="0 0" />
-			<attribute name="Focus Mode" value="NotFocusable" />
-			<attribute name="Image Rect" value="144 0 160 16" />
-			<attribute name="Border" value="4 4 4 4" />
-			<attribute name="Hover Image Offset" value="0 16" />
-			<attribute name="Pressed Image Offset" value="16 0" />
-			<attribute name="Pressed Child Offset" value="-1 1" />
 		</element>
 	</element>
-	<element type="BorderImage" style="EditorDivider">
-		<attribute name="Min Size" value="0 11" />
-		<attribute name="Max Size" value="2147483647 11" />
-		<attribute name="Pivot" value="0 0" />
-		<attribute name="Image Rect" value="144 32 160 43" />
-		<attribute name="Border" value="4 4 4 4" />
-	</element>
+	<element type="BorderImage" style="EditorDivider" />
 	<element type="ListView" style="PanelView">
 		<attribute name="Min Size" value="0 60" />
-		<attribute name="Pivot" value="0 0" />
 		<element type="ScrollBar" internal="true" style="none">
-			<attribute name="Size" value="292 16" />
-			<attribute name="Min Anchor" value="0 1" />
-			<attribute name="Max Anchor" value="0 1" />
-			<attribute name="Pivot" value="0 1" />
-			<attribute name="Color" value="0 0 0 0" />
-			<attribute name="Top Left Color" value="0 0 0 0" />
-			<attribute name="Top Right Color" value="0 0 0 0" />
-			<attribute name="Bottom Left Color" value="0 0 0 0" />
-			<attribute name="Bottom Right Color" value="0 0 0 0" />
-			<element type="Button" internal="true" style="none">
-				<attribute name="Size" value="16 16" />
-				<attribute name="Pivot" value="0 0" />
-				<attribute name="Border" value="4 4 4 4" />
-				<attribute name="Hover Image Offset" value="0 16" />
-				<attribute name="Pressed Image Offset" value="64 0" />
-				<attribute name="Pressed Child Offset" value="-1 1" />
-			</element>
+			<attribute name="Size" value="308 16" />
+			<element type="Button" internal="true" style="none" />
 			<element type="Slider" internal="true" style="none">
 				<attribute name="Position" value="16 0" />
-				<attribute name="Size" value="260 16" />
-				<attribute name="Pivot" value="0 0" />
-				<attribute name="Image Rect" value="48 0 64 16" />
-				<attribute name="Border" value="4 4 4 4" />
-				<element type="BorderImage" internal="true" style="none">
-					<attribute name="Pivot" value="0 0" />
-					<attribute name="Image Rect" value="16 0 32 16" />
-					<attribute name="Border" value="4 4 4 4" />
-					<attribute name="Hover Image Offset" value="0 16" />
-				</element>
+				<attribute name="Size" value="276 16" />
+				<element type="BorderImage" internal="true" style="none" />
 			</element>
 			<element type="Button" internal="true" style="none">
-				<attribute name="Position" value="276 0" />
-				<attribute name="Size" value="16 16" />
-				<attribute name="Pivot" value="0 0" />
-				<attribute name="Border" value="4 4 4 4" />
-				<attribute name="Hover Image Offset" value="0 16" />
-				<attribute name="Pressed Image Offset" value="64 0" />
-				<attribute name="Pressed Child Offset" value="-1 1" />
+				<attribute name="Position" value="292 0" />
 			</element>
 		</element>
 		<element type="ScrollBar" internal="true" style="none">
 			<attribute name="Size" value="16 254" />
-			<attribute name="Min Anchor" value="1 0" />
-			<attribute name="Max Anchor" value="1 0" />
-			<attribute name="Pivot" value="1 0" />
-			<attribute name="Color" value="0 0 0 0" />
-			<attribute name="Top Left Color" value="0 0 0 0" />
-			<attribute name="Top Right Color" value="0 0 0 0" />
-			<attribute name="Bottom Left Color" value="0 0 0 0" />
-			<attribute name="Bottom Right Color" value="0 0 0 0" />
-			<element type="Button" internal="true" style="none">
-				<attribute name="Size" value="16 16" />
-				<attribute name="Pivot" value="0 0" />
-				<attribute name="Border" value="4 4 4 4" />
-				<attribute name="Hover Image Offset" value="0 16" />
-				<attribute name="Pressed Image Offset" value="64 0" />
-				<attribute name="Pressed Child Offset" value="-1 1" />
-			</element>
+			<element type="Button" internal="true" style="none" />
 			<element type="Slider" internal="true" style="none">
 				<attribute name="Position" value="0 16" />
 				<attribute name="Size" value="16 222" />
-				<attribute name="Pivot" value="0 0" />
-				<attribute name="Image Rect" value="48 0 64 16" />
-				<attribute name="Border" value="4 4 4 4" />
-				<element type="BorderImage" internal="true" style="none">
-					<attribute name="Pivot" value="0 0" />
-					<attribute name="Image Rect" value="16 0 32 16" />
-					<attribute name="Border" value="4 4 4 4" />
-					<attribute name="Hover Image Offset" value="0 16" />
-				</element>
+				<element type="BorderImage" internal="true" style="none" />
 			</element>
 			<element type="Button" internal="true" style="none">
 				<attribute name="Position" value="0 238" />
-				<attribute name="Size" value="16 16" />
-				<attribute name="Pivot" value="0 0" />
-				<attribute name="Border" value="4 4 4 4" />
-				<attribute name="Hover Image Offset" value="0 16" />
-				<attribute name="Pressed Image Offset" value="64 0" />
-				<attribute name="Pressed Child Offset" value="-1 1" />
 			</element>
 		</element>
 		<element type="BorderImage" internal="true" style="none">
-			<attribute name="Pivot" value="0 0" />
-			<attribute name="Clip Border" value="2 2 2 2" />
-			<attribute name="Image Rect" value="48 16 64 32" />
-			<attribute name="Border" value="4 4 4 4" />
-			<attribute name="Hover Image Offset" value="80 32" />
 			<element internal="true" style="none">
-				<attribute name="Pivot" value="0 0" />
-				<attribute name="Layout Spacing" value="4" />
-				<attribute name="Layout Border" value="4 4 4 4" />
 				<element style="ListRow">
 					<attribute name="Min Size" value="270 17" />
-					<attribute name="Pivot" value="0 0" />
 					<attribute name="Layout Spacing" value="10" />
 					<element type="Text">
-						<attribute name="Pivot" value="0 0" />
 						<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
 						<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
 						<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
@@ -158,90 +69,49 @@
 						<attribute name="Name" value="PositionOffset.x" />
 						<attribute name="Min Size" value="40 0" />
 						<attribute name="Max Size" value="40 2147483647" />
-						<attribute name="Pivot" value="0 0" />
-						<attribute name="Image Rect" value="64 0 80 16" />
-						<attribute name="Border" value="4 4 4 4" />
-						<attribute name="Hover Image Offset" value="0 16" />
 						<element type="Text" internal="true" style="none">
-							<attribute name="Min Anchor" value="0 0.5" />
-							<attribute name="Max Anchor" value="0 0.5" />
-							<attribute name="Pivot" value="0 0.5" />
-							<attribute name="Color" value="0.9 1 0.9 1" />
 							<attribute name="Top Left Color" value="0.9 1 0.9 1" />
 							<attribute name="Top Right Color" value="0.9 1 0.9 1" />
 							<attribute name="Bottom Left Color" value="0.9 1 0.9 1" />
 							<attribute name="Bottom Right Color" value="0.9 1 0.9 1" />
-							<attribute name="Selection Color" value="0.3 0.4 0.32 1" />
 						</element>
 						<element type="BorderImage" internal="true" style="none">
 							<attribute name="Size" value="4 15" />
-							<attribute name="Min Anchor" value="0 0.5" />
-							<attribute name="Max Anchor" value="0 0.5" />
-							<attribute name="Pivot" value="0 0.5" />
-							<attribute name="Image Rect" value="12 0 16 16" />
 						</element>
 					</element>
 					<element type="LineEdit">
 						<attribute name="Name" value="PositionOffset.y" />
 						<attribute name="Min Size" value="40 0" />
 						<attribute name="Max Size" value="40 2147483647" />
-						<attribute name="Pivot" value="0 0" />
-						<attribute name="Image Rect" value="64 0 80 16" />
-						<attribute name="Border" value="4 4 4 4" />
-						<attribute name="Hover Image Offset" value="0 16" />
 						<element type="Text" internal="true" style="none">
-							<attribute name="Min Anchor" value="0 0.5" />
-							<attribute name="Max Anchor" value="0 0.5" />
-							<attribute name="Pivot" value="0 0.5" />
-							<attribute name="Color" value="0.9 1 0.9 1" />
 							<attribute name="Top Left Color" value="0.9 1 0.9 1" />
 							<attribute name="Top Right Color" value="0.9 1 0.9 1" />
 							<attribute name="Bottom Left Color" value="0.9 1 0.9 1" />
 							<attribute name="Bottom Right Color" value="0.9 1 0.9 1" />
-							<attribute name="Selection Color" value="0.3 0.4 0.32 1" />
 						</element>
 						<element type="BorderImage" internal="true" style="none">
 							<attribute name="Size" value="4 15" />
-							<attribute name="Min Anchor" value="0 0.5" />
-							<attribute name="Max Anchor" value="0 0.5" />
-							<attribute name="Pivot" value="0 0.5" />
-							<attribute name="Image Rect" value="12 0 16 16" />
 						</element>
 					</element>
 					<element type="LineEdit">
 						<attribute name="Name" value="PositionOffset.z" />
 						<attribute name="Min Size" value="40 0" />
 						<attribute name="Max Size" value="40 2147483647" />
-						<attribute name="Pivot" value="0 0" />
-						<attribute name="Image Rect" value="64 0 80 16" />
-						<attribute name="Border" value="4 4 4 4" />
-						<attribute name="Hover Image Offset" value="0 16" />
 						<element type="Text" internal="true" style="none">
-							<attribute name="Min Anchor" value="0 0.5" />
-							<attribute name="Max Anchor" value="0 0.5" />
-							<attribute name="Pivot" value="0 0.5" />
-							<attribute name="Color" value="0.9 1 0.9 1" />
 							<attribute name="Top Left Color" value="0.9 1 0.9 1" />
 							<attribute name="Top Right Color" value="0.9 1 0.9 1" />
 							<attribute name="Bottom Left Color" value="0.9 1 0.9 1" />
 							<attribute name="Bottom Right Color" value="0.9 1 0.9 1" />
-							<attribute name="Selection Color" value="0.3 0.4 0.32 1" />
 						</element>
 						<element type="BorderImage" internal="true" style="none">
 							<attribute name="Size" value="4 15" />
-							<attribute name="Min Anchor" value="0 0.5" />
-							<attribute name="Max Anchor" value="0 0.5" />
-							<attribute name="Pivot" value="0 0.5" />
-							<attribute name="Image Rect" value="12 0 16 16" />
 						</element>
 					</element>
 				</element>
 				<element style="ListRow">
 					<attribute name="Min Size" value="270 17" />
-					<attribute name="Pivot" value="0 0" />
 					<attribute name="Layout Spacing" value="10" />
 					<element type="Text">
-						<attribute name="Pivot" value="0 0" />
 						<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
 						<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
 						<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
@@ -252,90 +122,49 @@
 						<attribute name="Name" value="RandomRotation.x" />
 						<attribute name="Min Size" value="40 0" />
 						<attribute name="Max Size" value="40 2147483647" />
-						<attribute name="Pivot" value="0 0" />
-						<attribute name="Image Rect" value="64 0 80 16" />
-						<attribute name="Border" value="4 4 4 4" />
-						<attribute name="Hover Image Offset" value="0 16" />
 						<element type="Text" internal="true" style="none">
-							<attribute name="Min Anchor" value="0 0.5" />
-							<attribute name="Max Anchor" value="0 0.5" />
-							<attribute name="Pivot" value="0 0.5" />
-							<attribute name="Color" value="0.9 1 0.9 1" />
 							<attribute name="Top Left Color" value="0.9 1 0.9 1" />
 							<attribute name="Top Right Color" value="0.9 1 0.9 1" />
 							<attribute name="Bottom Left Color" value="0.9 1 0.9 1" />
 							<attribute name="Bottom Right Color" value="0.9 1 0.9 1" />
-							<attribute name="Selection Color" value="0.3 0.4 0.32 1" />
 						</element>
 						<element type="BorderImage" internal="true" style="none">
 							<attribute name="Size" value="4 15" />
-							<attribute name="Min Anchor" value="0 0.5" />
-							<attribute name="Max Anchor" value="0 0.5" />
-							<attribute name="Pivot" value="0 0.5" />
-							<attribute name="Image Rect" value="12 0 16 16" />
 						</element>
 					</element>
 					<element type="LineEdit">
 						<attribute name="Name" value="RandomRotation.y" />
 						<attribute name="Min Size" value="40 0" />
 						<attribute name="Max Size" value="40 2147483647" />
-						<attribute name="Pivot" value="0 0" />
-						<attribute name="Image Rect" value="64 0 80 16" />
-						<attribute name="Border" value="4 4 4 4" />
-						<attribute name="Hover Image Offset" value="0 16" />
 						<element type="Text" internal="true" style="none">
-							<attribute name="Min Anchor" value="0 0.5" />
-							<attribute name="Max Anchor" value="0 0.5" />
-							<attribute name="Pivot" value="0 0.5" />
-							<attribute name="Color" value="0.9 1 0.9 1" />
 							<attribute name="Top Left Color" value="0.9 1 0.9 1" />
 							<attribute name="Top Right Color" value="0.9 1 0.9 1" />
 							<attribute name="Bottom Left Color" value="0.9 1 0.9 1" />
 							<attribute name="Bottom Right Color" value="0.9 1 0.9 1" />
-							<attribute name="Selection Color" value="0.3 0.4 0.32 1" />
 						</element>
 						<element type="BorderImage" internal="true" style="none">
 							<attribute name="Size" value="4 15" />
-							<attribute name="Min Anchor" value="0 0.5" />
-							<attribute name="Max Anchor" value="0 0.5" />
-							<attribute name="Pivot" value="0 0.5" />
-							<attribute name="Image Rect" value="12 0 16 16" />
 						</element>
 					</element>
 					<element type="LineEdit">
 						<attribute name="Name" value="RandomRotation.z" />
 						<attribute name="Min Size" value="40 0" />
 						<attribute name="Max Size" value="40 2147483647" />
-						<attribute name="Pivot" value="0 0" />
-						<attribute name="Image Rect" value="64 0 80 16" />
-						<attribute name="Border" value="4 4 4 4" />
-						<attribute name="Hover Image Offset" value="0 16" />
 						<element type="Text" internal="true" style="none">
-							<attribute name="Min Anchor" value="0 0.5" />
-							<attribute name="Max Anchor" value="0 0.5" />
-							<attribute name="Pivot" value="0 0.5" />
-							<attribute name="Color" value="0.9 1 0.9 1" />
 							<attribute name="Top Left Color" value="0.9 1 0.9 1" />
 							<attribute name="Top Right Color" value="0.9 1 0.9 1" />
 							<attribute name="Bottom Left Color" value="0.9 1 0.9 1" />
 							<attribute name="Bottom Right Color" value="0.9 1 0.9 1" />
-							<attribute name="Selection Color" value="0.3 0.4 0.32 1" />
 						</element>
 						<element type="BorderImage" internal="true" style="none">
 							<attribute name="Size" value="4 15" />
-							<attribute name="Min Anchor" value="0 0.5" />
-							<attribute name="Max Anchor" value="0 0.5" />
-							<attribute name="Pivot" value="0 0.5" />
-							<attribute name="Image Rect" value="12 0 16 16" />
 						</element>
 					</element>
 				</element>
 				<element style="ListRow">
 					<attribute name="Min Size" value="260 17" />
-					<attribute name="Pivot" value="0 0" />
 					<attribute name="Layout Spacing" value="10" />
 					<element type="Text">
-						<attribute name="Pivot" value="0 0" />
 						<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
 						<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
 						<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
@@ -346,73 +175,38 @@
 						<attribute name="Name" value="RandomScaleMin" />
 						<attribute name="Min Size" value="40 0" />
 						<attribute name="Max Size" value="40 2147483647" />
-						<attribute name="Pivot" value="0 0" />
-						<attribute name="Image Rect" value="64 0 80 16" />
-						<attribute name="Border" value="4 4 4 4" />
-						<attribute name="Hover Image Offset" value="0 16" />
 						<element type="Text" internal="true" style="none">
-							<attribute name="Min Anchor" value="0 0.5" />
-							<attribute name="Max Anchor" value="0 0.5" />
-							<attribute name="Pivot" value="0 0.5" />
-							<attribute name="Color" value="0.9 1 0.9 1" />
 							<attribute name="Top Left Color" value="0.9 1 0.9 1" />
 							<attribute name="Top Right Color" value="0.9 1 0.9 1" />
 							<attribute name="Bottom Left Color" value="0.9 1 0.9 1" />
 							<attribute name="Bottom Right Color" value="0.9 1 0.9 1" />
-							<attribute name="Selection Color" value="0.3 0.4 0.32 1" />
 						</element>
 						<element type="BorderImage" internal="true" style="none">
 							<attribute name="Size" value="4 15" />
-							<attribute name="Min Anchor" value="0 0.5" />
-							<attribute name="Max Anchor" value="0 0.5" />
-							<attribute name="Pivot" value="0 0.5" />
-							<attribute name="Image Rect" value="12 0 16 16" />
 						</element>
 					</element>
 					<element type="LineEdit">
 						<attribute name="Name" value="RandomScaleMax" />
 						<attribute name="Min Size" value="40 0" />
 						<attribute name="Max Size" value="40 2147483647" />
-						<attribute name="Pivot" value="0 0" />
-						<attribute name="Image Rect" value="64 0 80 16" />
-						<attribute name="Border" value="4 4 4 4" />
-						<attribute name="Hover Image Offset" value="0 16" />
 						<element type="Text" internal="true" style="none">
-							<attribute name="Min Anchor" value="0 0.5" />
-							<attribute name="Max Anchor" value="0 0.5" />
-							<attribute name="Pivot" value="0 0.5" />
-							<attribute name="Color" value="0.9 1 0.9 1" />
 							<attribute name="Top Left Color" value="0.9 1 0.9 1" />
 							<attribute name="Top Right Color" value="0.9 1 0.9 1" />
 							<attribute name="Bottom Left Color" value="0.9 1 0.9 1" />
 							<attribute name="Bottom Right Color" value="0.9 1 0.9 1" />
-							<attribute name="Selection Color" value="0.3 0.4 0.32 1" />
 						</element>
 						<element type="BorderImage" internal="true" style="none">
 							<attribute name="Size" value="4 15" />
-							<attribute name="Min Anchor" value="0 0.5" />
-							<attribute name="Max Anchor" value="0 0.5" />
-							<attribute name="Pivot" value="0 0.5" />
-							<attribute name="Image Rect" value="12 0 16 16" />
 						</element>
 					</element>
 				</element>
 				<element style="ListRow">
 					<attribute name="Min Size" value="200 17" />
-					<attribute name="Pivot" value="0 0" />
 					<attribute name="Layout Spacing" value="8" />
 					<element type="CheckBox">
 						<attribute name="Name" value="UseNormal" />
-						<attribute name="Min Size" value="16 16" />
-						<attribute name="Max Size" value="16 16" />
-						<attribute name="Pivot" value="0 0" />
-						<attribute name="Image Rect" value="80 0 96 16" />
-						<attribute name="Border" value="4 4 4 4" />
-						<attribute name="Hover Image Offset" value="0 16" />
-						<attribute name="Checked Image Offset" value="16 0" />
 					</element>
 					<element type="Text">
-						<attribute name="Pivot" value="0 0" />
 						<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
 						<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
 						<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
@@ -422,20 +216,11 @@
 				</element>
 				<element style="ListRow">
 					<attribute name="Min Size" value="200 17" />
-					<attribute name="Pivot" value="0 0" />
 					<attribute name="Layout Spacing" value="8" />
 					<element type="CheckBox">
 						<attribute name="Name" value="AlignToAABBBottom" />
-						<attribute name="Min Size" value="16 16" />
-						<attribute name="Max Size" value="16 16" />
-						<attribute name="Pivot" value="0 0" />
-						<attribute name="Image Rect" value="80 0 96 16" />
-						<attribute name="Border" value="4 4 4 4" />
-						<attribute name="Hover Image Offset" value="0 16" />
-						<attribute name="Checked Image Offset" value="16 0" />
 					</element>
 					<element type="Text">
-						<attribute name="Pivot" value="0 0" />
 						<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
 						<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
 						<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
@@ -445,56 +230,22 @@
 				</element>
 				<element style="ListRow">
 					<attribute name="Min Size" value="200 17" />
-					<attribute name="Pivot" value="0 0" />
 					<attribute name="Layout Spacing" value="8" />
 					<element type="CheckBox">
 						<attribute name="Name" value="SpawnOnSelected" />
-						<attribute name="Min Size" value="16 16" />
-						<attribute name="Max Size" value="16 16" />
-						<attribute name="Pivot" value="0 0" />
-						<attribute name="Image Rect" value="80 0 96 16" />
-						<attribute name="Border" value="4 4 4 4" />
-						<attribute name="Hover Image Offset" value="0 16" />
-						<attribute name="Checked Image Offset" value="16 0" />
 					</element>
 					<element type="Text">
-						<attribute name="Pivot" value="0 0" />
 						<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
 						<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
 						<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
 						<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
-						<attribute name="Text" value="Spawn on selected node surface" />
-					</element>
-				</element>
-				<element style="ListRow">
-					<attribute name="Min Size" value="200 17" />
-					<attribute name="Pivot" value="0 0" />
-					<attribute name="Layout Spacing" value="8" />
-					<element type="CheckBox">
-						<attribute name="Name" value="ParentToSelected" />
-						<attribute name="Min Size" value="16 16" />
-						<attribute name="Max Size" value="16 16" />
-						<attribute name="Pivot" value="0 0" />
-						<attribute name="Image Rect" value="80 0 96 16" />
-						<attribute name="Border" value="4 4 4 4" />
-						<attribute name="Hover Image Offset" value="0 16" />
-						<attribute name="Checked Image Offset" value="16 0" />
-					</element>
-					<element type="Text">
-						<attribute name="Pivot" value="0 0" />
-						<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
-						<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
-						<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
-						<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
-						<attribute name="Text" value="Parent to selected node" />
+						<attribute name="Text" value="Spawn on selected node" />
 					</element>
 				</element>
 				<element style="ListRow">
 					<attribute name="Min Size" value="220 17" />
-					<attribute name="Pivot" value="0 0" />
 					<attribute name="Layout Spacing" value="20" />
 					<element type="Text">
-						<attribute name="Pivot" value="0 0" />
 						<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
 						<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
 						<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
@@ -505,31 +256,17 @@
 						<attribute name="Name" value="SpawnRadius" />
 						<attribute name="Min Size" value="50 0" />
 						<attribute name="Max Size" value="50 2147483647" />
-						<attribute name="Pivot" value="0 0" />
-						<attribute name="Image Rect" value="64 0 80 16" />
-						<attribute name="Border" value="4 4 4 4" />
-						<attribute name="Hover Image Offset" value="0 16" />
 						<element type="Text" internal="true" style="none">
-							<attribute name="Min Anchor" value="0 0.5" />
-							<attribute name="Max Anchor" value="0 0.5" />
-							<attribute name="Pivot" value="0 0.5" />
-							<attribute name="Color" value="0.9 1 0.9 1" />
 							<attribute name="Top Left Color" value="0.9 1 0.9 1" />
 							<attribute name="Top Right Color" value="0.9 1 0.9 1" />
 							<attribute name="Bottom Left Color" value="0.9 1 0.9 1" />
 							<attribute name="Bottom Right Color" value="0.9 1 0.9 1" />
-							<attribute name="Selection Color" value="0.3 0.4 0.32 1" />
 						</element>
 						<element type="BorderImage" internal="true" style="none">
 							<attribute name="Size" value="4 15" />
-							<attribute name="Min Anchor" value="0 0.5" />
-							<attribute name="Max Anchor" value="0 0.5" />
-							<attribute name="Pivot" value="0 0.5" />
-							<attribute name="Image Rect" value="12 0 16 16" />
 						</element>
 					</element>
 					<element type="Text">
-						<attribute name="Pivot" value="0 0" />
 						<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
 						<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
 						<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
@@ -540,63 +277,35 @@
 						<attribute name="Name" value="SpawnCount" />
 						<attribute name="Min Size" value="50 0" />
 						<attribute name="Max Size" value="50 2147483647" />
-						<attribute name="Pivot" value="0 0" />
-						<attribute name="Image Rect" value="64 0 80 16" />
-						<attribute name="Border" value="4 4 4 4" />
-						<attribute name="Hover Image Offset" value="0 16" />
 						<element type="Text" internal="true" style="none">
-							<attribute name="Min Anchor" value="0 0.5" />
-							<attribute name="Max Anchor" value="0 0.5" />
-							<attribute name="Pivot" value="0 0.5" />
-							<attribute name="Color" value="0.9 1 0.9 1" />
 							<attribute name="Top Left Color" value="0.9 1 0.9 1" />
 							<attribute name="Top Right Color" value="0.9 1 0.9 1" />
 							<attribute name="Bottom Left Color" value="0.9 1 0.9 1" />
 							<attribute name="Bottom Right Color" value="0.9 1 0.9 1" />
-							<attribute name="Selection Color" value="0.3 0.4 0.32 1" />
 						</element>
 						<element type="BorderImage" internal="true" style="none">
 							<attribute name="Size" value="4 15" />
-							<attribute name="Min Anchor" value="0 0.5" />
-							<attribute name="Max Anchor" value="0 0.5" />
-							<attribute name="Pivot" value="0 0.5" />
-							<attribute name="Image Rect" value="12 0 16 16" />
 						</element>
 					</element>
 				</element>
 				<element type="Button">
-					<attribute name="Name" value="SetSpawnMode" />
-					<attribute name="Pivot" value="0 0" />
-					<attribute name="Layout Mode" value="Horizontal" />
-					<attribute name="Layout Border" value="1 1 1 1" />
-					<attribute name="Image Rect" value="16 0 32 16" />
-					<attribute name="Border" value="4 4 4 4" />
-					<attribute name="Hover Image Offset" value="0 16" />
-					<attribute name="Pressed Image Offset" value="16 0" />
-					<attribute name="Pressed Child Offset" value="-1 1" />
-					<element type="Text">
-						<attribute name="Pivot" value="0 0" />
-						<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
-						<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
-						<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
-						<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
-						<attribute name="Text" value="Spawn mode" />
-						<attribute name="Text Alignment" value="Center" />
-					</element>
+						<attribute name="Name" value="SetSpawnMode" />
+						<attribute name="Layout Mode" value="Horizontal" />
+						<attribute name="Layout Border" value="1 1 1 1" />
+						<element type="Text">
+							<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
+							<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
+							<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
+							<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
+							<attribute name="Text" value="Spawn mode" />
+							<attribute name="Text Alignment" value="Center" />
+						</element>
 				</element>
-				<element type="BorderImage" style="EditorDivider">
-					<attribute name="Min Size" value="0 11" />
-					<attribute name="Max Size" value="2147483647 11" />
-					<attribute name="Pivot" value="0 0" />
-					<attribute name="Image Rect" value="144 32 160 43" />
-					<attribute name="Border" value="4 4 4 4" />
-				</element>
+				<element type="BorderImage" style="EditorDivider" />
 				<element style="ListRow">
 					<attribute name="Min Size" value="270 17" />
-					<attribute name="Pivot" value="0 0" />
 					<attribute name="Layout Spacing" value="20" />
 					<element type="Text">
-						<attribute name="Pivot" value="0 0" />
 						<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
 						<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
 						<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
@@ -607,125 +316,46 @@
 						<attribute name="Name" value="NumberSpawnedObjects" />
 						<attribute name="Min Size" value="50 0" />
 						<attribute name="Max Size" value="50 2147483647" />
-						<attribute name="Pivot" value="0 0" />
-						<attribute name="Image Rect" value="64 0 80 16" />
-						<attribute name="Border" value="4 4 4 4" />
-						<attribute name="Hover Image Offset" value="0 16" />
 						<element type="Text" internal="true" style="none">
-							<attribute name="Min Anchor" value="0 0.5" />
-							<attribute name="Max Anchor" value="0 0.5" />
-							<attribute name="Pivot" value="0 0.5" />
-							<attribute name="Color" value="0.9 1 0.9 1" />
 							<attribute name="Top Left Color" value="0.9 1 0.9 1" />
 							<attribute name="Top Right Color" value="0.9 1 0.9 1" />
 							<attribute name="Bottom Left Color" value="0.9 1 0.9 1" />
 							<attribute name="Bottom Right Color" value="0.9 1 0.9 1" />
-							<attribute name="Selection Color" value="0.3 0.4 0.32 1" />
 						</element>
 						<element type="BorderImage" internal="true" style="none">
 							<attribute name="Size" value="4 15" />
-							<attribute name="Min Anchor" value="0 0.5" />
-							<attribute name="Max Anchor" value="0 0.5" />
-							<attribute name="Pivot" value="0 0.5" />
-							<attribute name="Image Rect" value="12 0 16 16" />
 						</element>
 					</element>
 				</element>
 				<element type="ListView">
 					<attribute name="Name" value="SpawnedObjects" />
 					<attribute name="Min Size" value="0 120" />
-					<attribute name="Pivot" value="0 0" />
 					<element type="ScrollBar" internal="true" style="none">
-						<attribute name="Size" value="280 16" />
-						<attribute name="Min Anchor" value="0 1" />
-						<attribute name="Max Anchor" value="0 1" />
-						<attribute name="Pivot" value="0 1" />
-						<attribute name="Color" value="0 0 0 0" />
-						<attribute name="Top Left Color" value="0 0 0 0" />
-						<attribute name="Top Right Color" value="0 0 0 0" />
-						<attribute name="Bottom Left Color" value="0 0 0 0" />
-						<attribute name="Bottom Right Color" value="0 0 0 0" />
-						<element type="Button" internal="true" style="none">
-							<attribute name="Size" value="16 16" />
-							<attribute name="Pivot" value="0 0" />
-							<attribute name="Border" value="4 4 4 4" />
-							<attribute name="Hover Image Offset" value="0 16" />
-							<attribute name="Pressed Image Offset" value="64 0" />
-							<attribute name="Pressed Child Offset" value="-1 1" />
-						</element>
+						<attribute name="Size" value="296 16" />
+						<element type="Button" internal="true" style="none" />
 						<element type="Slider" internal="true" style="none">
 							<attribute name="Position" value="16 0" />
-							<attribute name="Size" value="248 16" />
-							<attribute name="Pivot" value="0 0" />
-							<attribute name="Image Rect" value="48 0 64 16" />
-							<attribute name="Border" value="4 4 4 4" />
-							<element type="BorderImage" internal="true" style="none">
-								<attribute name="Pivot" value="0 0" />
-								<attribute name="Image Rect" value="16 0 32 16" />
-								<attribute name="Border" value="4 4 4 4" />
-								<attribute name="Hover Image Offset" value="0 16" />
-							</element>
+							<attribute name="Size" value="264 16" />
+							<element type="BorderImage" internal="true" style="none" />
 						</element>
 						<element type="Button" internal="true" style="none">
-							<attribute name="Position" value="264 0" />
-							<attribute name="Size" value="16 16" />
-							<attribute name="Pivot" value="0 0" />
-							<attribute name="Border" value="4 4 4 4" />
-							<attribute name="Hover Image Offset" value="0 16" />
-							<attribute name="Pressed Image Offset" value="64 0" />
-							<attribute name="Pressed Child Offset" value="-1 1" />
+							<attribute name="Position" value="280 0" />
 						</element>
 					</element>
 					<element type="ScrollBar" internal="true" style="none">
 						<attribute name="Size" value="16 120" />
-						<attribute name="Min Anchor" value="1 0" />
-						<attribute name="Max Anchor" value="1 0" />
-						<attribute name="Pivot" value="1 0" />
-						<attribute name="Color" value="0 0 0 0" />
-						<attribute name="Top Left Color" value="0 0 0 0" />
-						<attribute name="Top Right Color" value="0 0 0 0" />
-						<attribute name="Bottom Left Color" value="0 0 0 0" />
-						<attribute name="Bottom Right Color" value="0 0 0 0" />
-						<element type="Button" internal="true" style="none">
-							<attribute name="Size" value="16 16" />
-							<attribute name="Pivot" value="0 0" />
-							<attribute name="Border" value="4 4 4 4" />
-							<attribute name="Hover Image Offset" value="0 16" />
-							<attribute name="Pressed Image Offset" value="64 0" />
-							<attribute name="Pressed Child Offset" value="-1 1" />
-						</element>
+						<element type="Button" internal="true" style="none" />
 						<element type="Slider" internal="true" style="none">
 							<attribute name="Position" value="0 16" />
 							<attribute name="Size" value="16 88" />
-							<attribute name="Pivot" value="0 0" />
-							<attribute name="Image Rect" value="48 0 64 16" />
-							<attribute name="Border" value="4 4 4 4" />
-							<element type="BorderImage" internal="true" style="none">
-								<attribute name="Pivot" value="0 0" />
-								<attribute name="Image Rect" value="16 0 32 16" />
-								<attribute name="Border" value="4 4 4 4" />
-								<attribute name="Hover Image Offset" value="0 16" />
-							</element>
+							<element type="BorderImage" internal="true" style="none" />
 						</element>
 						<element type="Button" internal="true" style="none">
 							<attribute name="Position" value="0 104" />
-							<attribute name="Size" value="16 16" />
-							<attribute name="Pivot" value="0 0" />
-							<attribute name="Border" value="4 4 4 4" />
-							<attribute name="Hover Image Offset" value="0 16" />
-							<attribute name="Pressed Image Offset" value="64 0" />
-							<attribute name="Pressed Child Offset" value="-1 1" />
 						</element>
 					</element>
 					<element type="BorderImage" internal="true" style="none">
-						<attribute name="Pivot" value="0 0" />
-						<attribute name="Clip Border" value="2 2 2 2" />
-						<attribute name="Image Rect" value="48 0 64 16" />
-						<attribute name="Border" value="4 4 4 4" />
-						<attribute name="Hover Image Offset" value="16 16" />
-						<element internal="true" style="none">
-							<attribute name="Pivot" value="0 0" />
-						</element>
+						<element internal="true" style="none" />
 					</element>
 				</element>
 			</element>
