@@ -22,6 +22,7 @@ float spawnRadius = 0;
 bool useNormal = true;
 bool alignToAABBBottom = true;
 bool spawnOnSelection = false;
+bool parentToSelection = true;
 uint numberSpawnedObjects = 1;
 Array<String> spawnedObjectsNames;
 
@@ -62,7 +63,9 @@ void CreateSpawnEditor()
     CheckBox@ alignToAABBBottomToggle = spawnWindow.GetChild("AlignToAABBBottom", true);
     alignToAABBBottomToggle.checked = alignToAABBBottom;
     CheckBox@ spawnOnSelectionToggle = spawnWindow.GetChild("SpawnOnSelected", true);
-    spawnOnSelectionToggle.checked = spawnOnSelection;    
+    spawnOnSelectionToggle.checked = spawnOnSelection;
+	CheckBox@ parentToSelectionToggle = spawnWindow.GetChild("ParentToSelected", true);
+	parentToSelectionToggle.checked = parentToSelection;
 
     numberSpawnedObjectsEdit = spawnWindow.GetChild("NumberSpawnedObjects", true);
     numberSpawnedObjectsEdit.text = String(numberSpawnedObjects);
@@ -85,6 +88,7 @@ void CreateSpawnEditor()
     SubscribeToEvent(useNormalToggle, "Toggled", "ToggleUseNormal");
     SubscribeToEvent(alignToAABBBottomToggle, "Toggled", "ToggleAlignToAABBBottom");
     SubscribeToEvent(spawnOnSelectionToggle, "Toggled", "ToggleSpawnOnSelected");
+	SubscribeToEvent(parentToSelectionToggle, "Toggled", "ToggleParentToSelected");
     SubscribeToEvent(numberSpawnedObjectsEdit, "TextFinished", "UpdateNumberSpawnedObjects");
     SubscribeToEvent(spawnWindow.GetChild("SetSpawnMode", true), "Released", "SetSpawnMode");
     RefreshPickedObjects();
@@ -158,6 +162,11 @@ void ToggleAlignToAABBBottom(StringHash eventType, VariantMap& eventData)
 void ToggleSpawnOnSelected(StringHash eventType, VariantMap& eventData)
 {
     spawnOnSelection = cast<CheckBox>(eventData["Element"].GetPtr()).checked;
+}
+
+void ToggleParentToSelected(StringHash eventType, VariantMap& eventData)
+{
+	parentToSelection = cast<CheckBox>(eventData["Element"].GetPtr()).checked;
 }
 
 void UpdateNumberSpawnedObjects(StringHash eventType, VariantMap& eventData)
@@ -273,6 +282,14 @@ void PlaceObject(Vector3 spawnPosition, Vector3 normal)
         RefreshPickedObjects();
         return;
     }
+	    
+    
+	if(parentToSelection && selectedNodes.length > 0) {
+		Node@ selectedNode = selectedNodes[0];
+		if(selectedNode !is null) {
+			selectedNode.AddChild(spawnedObject);
+		}
+	}
 }
 
 bool GetSpawnPosition(const Ray&in cameraRay, float maxDistance, Vector3&out position, Vector3&out normal, float randomRadius = 0.0,
