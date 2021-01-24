@@ -284,9 +284,11 @@ void PlaceObject(Vector3 spawnPosition, Vector3 normal)
     }
         
     
-    if(parentToSelection && selectedNodes.length > 0) {
+    if(parentToSelection && selectedNodes.length > 0)
+	{
         Node@ selectedNode = selectedNodes[0];
-        if(selectedNode !is null) {
+        if(selectedNode !is null)
+		{
             selectedNode.AddChild(spawnedObject);
         }
     }
