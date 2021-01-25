@@ -22,7 +22,7 @@ float spawnRadius = 0;
 bool useNormal = true;
 bool alignToAABBBottom = true;
 bool spawnOnSelection = false;
-bool parentToSelection = true;
+bool parentToSelection = false;
 uint numberSpawnedObjects = 1;
 Array<String> spawnedObjectsNames;
 
