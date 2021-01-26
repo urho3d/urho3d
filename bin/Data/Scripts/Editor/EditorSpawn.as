@@ -272,20 +272,19 @@ void PlaceObject(Vector3 spawnPosition, Vector3 normal)
     spawnRotation = Quaternion(Random(-randomRotation.x, randomRotation.x),
         Random(-randomRotation.y, randomRotation.y), Random(-randomRotation.z, randomRotation.z)) * spawnRotation;
 
+    Node@ parent = null;
+    if (parentToSelection && selectedNodes.length > 0)
+        parent = selectedNodes[0];
+
     int number = RandomInt(0, spawnedObjectsNames.length);
     File@ file = cache.GetFile(spawnedObjectsNames[number]);
-    Node@ spawnedObject = InstantiateNodeFromFile(file, spawnPosition + (spawnRotation * positionOffset), spawnRotation, Random(randomScaleMin, randomScaleMax));
+    Node@ spawnedObject = InstantiateNodeFromFile(file, spawnPosition + (spawnRotation * positionOffset), spawnRotation, Random(randomScaleMin, randomScaleMax), parent);
     if (spawnedObject is null)
     {
         spawnedObjectsNames[number] = spawnedObjectsNames[spawnedObjectsNames.length - 1];
         --numberSpawnedObjects;
         RefreshPickedObjects();
         return;
-    }
-
-    if (parentToSelection && selectedNodes.length > 0)
-    {
-        selectedNodes[0].AddChild(spawnedObject);
     }
 }
 
