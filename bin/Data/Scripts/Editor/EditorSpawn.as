@@ -22,6 +22,7 @@ float spawnRadius = 0;
 bool useNormal = true;
 bool alignToAABBBottom = true;
 bool spawnOnSelection = false;
+bool parentToSelection = false;
 uint numberSpawnedObjects = 1;
 Array<String> spawnedObjectsNames;
 
@@ -62,7 +63,9 @@ void CreateSpawnEditor()
     CheckBox@ alignToAABBBottomToggle = spawnWindow.GetChild("AlignToAABBBottom", true);
     alignToAABBBottomToggle.checked = alignToAABBBottom;
     CheckBox@ spawnOnSelectionToggle = spawnWindow.GetChild("SpawnOnSelected", true);
-    spawnOnSelectionToggle.checked = spawnOnSelection;    
+    spawnOnSelectionToggle.checked = spawnOnSelection;
+    CheckBox@ parentToSelectionToggle = spawnWindow.GetChild("ParentToSelected", true);
+    parentToSelectionToggle.checked = parentToSelection;
 
     numberSpawnedObjectsEdit = spawnWindow.GetChild("NumberSpawnedObjects", true);
     numberSpawnedObjectsEdit.text = String(numberSpawnedObjects);
@@ -85,6 +88,7 @@ void CreateSpawnEditor()
     SubscribeToEvent(useNormalToggle, "Toggled", "ToggleUseNormal");
     SubscribeToEvent(alignToAABBBottomToggle, "Toggled", "ToggleAlignToAABBBottom");
     SubscribeToEvent(spawnOnSelectionToggle, "Toggled", "ToggleSpawnOnSelected");
+    SubscribeToEvent(parentToSelectionToggle, "Toggled", "ToggleParentToSelected");
     SubscribeToEvent(numberSpawnedObjectsEdit, "TextFinished", "UpdateNumberSpawnedObjects");
     SubscribeToEvent(spawnWindow.GetChild("SetSpawnMode", true), "Released", "SetSpawnMode");
     RefreshPickedObjects();
@@ -158,6 +162,11 @@ void ToggleAlignToAABBBottom(StringHash eventType, VariantMap& eventData)
 void ToggleSpawnOnSelected(StringHash eventType, VariantMap& eventData)
 {
     spawnOnSelection = cast<CheckBox>(eventData["Element"].GetPtr()).checked;
+}
+
+void ToggleParentToSelected(StringHash eventType, VariantMap& eventData)
+{
+    parentToSelection = cast<CheckBox>(eventData["Element"].GetPtr()).checked;
 }
 
 void UpdateNumberSpawnedObjects(StringHash eventType, VariantMap& eventData)
@@ -263,9 +272,13 @@ void PlaceObject(Vector3 spawnPosition, Vector3 normal)
     spawnRotation = Quaternion(Random(-randomRotation.x, randomRotation.x),
         Random(-randomRotation.y, randomRotation.y), Random(-randomRotation.z, randomRotation.z)) * spawnRotation;
 
+    Node@ parent = null;
+    if (parentToSelection && selectedNodes.length > 0)
+        parent = selectedNodes[0];
+
     int number = RandomInt(0, spawnedObjectsNames.length);
     File@ file = cache.GetFile(spawnedObjectsNames[number]);
-    Node@ spawnedObject = InstantiateNodeFromFile(file, spawnPosition + (spawnRotation * positionOffset), spawnRotation, Random(randomScaleMin, randomScaleMax));
+    Node@ spawnedObject = InstantiateNodeFromFile(file, spawnPosition + (spawnRotation * positionOffset), spawnRotation, Random(randomScaleMin, randomScaleMax), parent);
     if (spawnedObject is null)
     {
         spawnedObjectsNames[number] = spawnedObjectsNames[spawnedObjectsNames.length - 1];
