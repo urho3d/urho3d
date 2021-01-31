@@ -97,11 +97,26 @@ bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpo
 
     // Intentionally disallow format change so that the obtained format will always be the desired format, even though that format
     // is not matching the device format, however in doing it will enable the SDL's internal audio stream with audio conversion
-    deviceID_ = SDL_OpenAudioDevice(nullptr, SDL_FALSE, &desired, &obtained, SDL_AUDIO_ALLOW_ANY_CHANGE&~SDL_AUDIO_ALLOW_FORMAT_CHANGE);
+    deviceID_ = SDL_OpenAudioDevice(nullptr, SDL_FALSE, &desired, &obtained, SDL_AUDIO_ALLOW_ANY_CHANGE & ~SDL_AUDIO_ALLOW_FORMAT_CHANGE);
     if (!deviceID_)
     {
         URHO3D_LOGERROR("Could not initialize audio output");
         return false;
+    }
+
+    // If device was created with greater number of channels then requested (for instance 5.1 channels when only 2 stereo channels were requested) then limit the number to requested one.
+    if (obtained.channels > desired.channels)
+    {
+        // Close previously created device.
+        SDL_CloseAudioDevice(deviceID_);
+
+        // Create new device with limited number of channels.
+        deviceID_ = SDL_OpenAudioDevice(nullptr, SDL_FALSE, &desired, &obtained, SDL_AUDIO_ALLOW_ANY_CHANGE & ~SDL_AUDIO_ALLOW_FORMAT_CHANGE & ~SDL_AUDIO_ALLOW_CHANNELS_CHANGE);
+        if (!deviceID_)
+        {
+            URHO3D_LOGERROR("Could not initialize audio output");
+            return false;
+        }
     }
 
     if (obtained.format != AUDIO_S16)
