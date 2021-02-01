@@ -1,3 +1,6 @@
+// https://www.khronos.org/registry/OpenGL/extensions/OES/OES_standard_derivatives.txt
+#extension GL_OES_standard_derivatives : enable
+
 #include "Uniforms.glsl"
 #include "Samplers.glsl"
 #include "Transform.glsl"
