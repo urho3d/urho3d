@@ -255,10 +255,8 @@ void CharacterDemo::SubscribeToEvents()
     UnsubscribeFromEvent(E_SCENEUPDATE);
 }
 
-void CharacterDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
+void CharacterDemo::UpdateControls()
 {
-    using namespace Update;
-
     auto* input = GetSubsystem<Input>();
 
     if (character_)
@@ -306,35 +304,104 @@ void CharacterDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
                 character_->controls_.yaw_ += (float)input->GetMouseMoveX() * YAW_SENSITIVITY;
                 character_->controls_.pitch_ += (float)input->GetMouseMoveY() * YAW_SENSITIVITY;
             }
+
+            // Handle gamepad input
+            if (input->GetNumJoysticks() > 0)
+            {
+                JoystickState* joystick = touchEnabled_ ? input->GetJoystick(screenJoystickIndex_) : input->GetJoystickByIndex(0);
+                if (joystick)
+                {
+                    if (joystick->GetNumButtons() > 0)
+                    {
+                        if (joystick->GetButtonDown(0))
+                            character_->controls_.Set(CTRL_JUMP);
+                    }
+                    if (joystick->GetNumHats() > 0)
+                    {
+                        const int hatPosition = joystick->GetHatPosition(0);
+                        if (hatPosition & HAT_LEFT)
+                            character_->controls_.Set(CTRL_LEFT, true);
+                        if (hatPosition & HAT_RIGHT)
+                            character_->controls_.Set(CTRL_RIGHT, true);
+                        if (hatPosition & HAT_UP)
+                            character_->controls_.Set(CTRL_FORWARD, true);
+                        if (hatPosition & HAT_DOWN)
+                            character_->controls_.Set(CTRL_BACK, true);
+                    }
+                    const float axisDeadZone = 0.2f;
+                    if (joystick->GetNumAxes() >= 2)
+                    {
+                        const float axis0 = joystick->GetAxisPosition(0);
+                        const float axis1 = joystick->GetAxisPosition(1);
+                        if (axis0 < -axisDeadZone)
+                            character_->controls_.Set(CTRL_LEFT, true);
+                        if (axis0 > axisDeadZone)
+                            character_->controls_.Set(CTRL_RIGHT, true);
+                        if (axis1 < -axisDeadZone)
+                            character_->controls_.Set(CTRL_FORWARD, true);
+                        if (axis1 > axisDeadZone)
+                            character_->controls_.Set(CTRL_BACK, true);
+                    }
+                    if (joystick->GetNumAxes() >= 4)
+                    {
+                        const float lookX = joystick->GetAxisPosition(2);
+                        const float lookY = joystick->GetAxisPosition(3);
+                        if (lookX < -axisDeadZone)
+                            character_->controls_.yaw_ -= axisDeadZone * lookX * lookX;
+                        if (lookX > axisDeadZone)
+                            character_->controls_.yaw_ += axisDeadZone * lookX * lookX;
+                        if (lookY < -axisDeadZone)
+                            character_->controls_.pitch_ -= axisDeadZone * lookY * lookY;
+                        if (lookY > axisDeadZone)
+                            character_->controls_.pitch_ += axisDeadZone * lookY * lookY;
+                    }
+                }
+            }
+
             // Limit pitch
             character_->controls_.pitch_ = Clamp(character_->controls_.pitch_, -80.0f, 80.0f);
             // Set rotation already here so that it's updated every rendering frame instead of every physics frame
             character_->GetNode()->SetRotation(Quaternion(character_->controls_.yaw_, Vector3::UP));
+        }
+    }
+}
 
-            // Switch between 1st and 3rd person
-            if (input->GetKeyPress(KEY_F))
-                firstPerson_ = !firstPerson_;
 
-            // Turn on/off gyroscope on mobile platform
-            if (touch_ && input->GetKeyPress(KEY_G))
-                touch_->useGyroscope_ = !touch_->useGyroscope_;
+void CharacterDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
+{
+    using namespace Update;
 
-            // Check for loading / saving the scene
-            if (input->GetKeyPress(KEY_F5))
-            {
-                File saveFile(context_, GetSubsystem<FileSystem>()->GetProgramDir() + "Data/Scenes/CharacterDemo.xml", FILE_WRITE);
-                scene_->SaveXML(saveFile);
-            }
-            if (input->GetKeyPress(KEY_F7))
-            {
-                File loadFile(context_, GetSubsystem<FileSystem>()->GetProgramDir() + "Data/Scenes/CharacterDemo.xml", FILE_READ);
-                scene_->LoadXML(loadFile);
-                // After loading we have to reacquire the weak pointer to the Character component, as it has been recreated
-                // Simply find the character's scene node by name as there's only one of them
-                Node* characterNode = scene_->GetChild("Jack", true);
-                if (characterNode)
-                    character_ = characterNode->GetComponent<Character>();
-            }
+    auto* input = GetSubsystem<Input>();
+
+    UpdateControls();
+
+    // Apply controls to the character
+    auto* ui = GetSubsystem<UI>();
+    if (!ui->GetFocusElement())
+    {
+        // Switch between 1st and 3rd person
+        if (input->GetKeyPress(KEY_F))
+            firstPerson_ = !firstPerson_;
+
+        // Turn on/off gyroscope on mobile platform
+        if (touch_ && input->GetKeyPress(KEY_G))
+            touch_->useGyroscope_ = !touch_->useGyroscope_;
+
+        // Check for loading / saving the scene
+        if (input->GetKeyPress(KEY_F5))
+        {
+            File saveFile(context_, GetSubsystem<FileSystem>()->GetProgramDir() + "Data/Scenes/CharacterDemo.xml", FILE_WRITE);
+            scene_->SaveXML(saveFile);
+        }
+        if (input->GetKeyPress(KEY_F7))
+        {
+            File loadFile(context_, GetSubsystem<FileSystem>()->GetProgramDir() + "Data/Scenes/CharacterDemo.xml", FILE_READ);
+            scene_->LoadXML(loadFile);
+            // After loading we have to reacquire the weak pointer to the Character component, as it has been recreated
+            // Simply find the character's scene node by name as there's only one of them
+            Node* characterNode = scene_->GetChild("Jack", true);
+            if (characterNode)
+                character_ = characterNode->GetComponent<Character>();
         }
     }
 }

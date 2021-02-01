@@ -87,6 +87,8 @@ protected:
     float pitch_;
     /// Flag to indicate whether touch input has been enabled.
     bool touchEnabled_;
+    /// Screen joystick index for navigational controls (mobile platforms only).
+    unsigned screenJoystickIndex_;
     /// Mouse mode option to use in the sample.
     MouseMode useMouseMode_;
 
@@ -110,8 +112,6 @@ private:
     /// Handle touch begin event to initialize touch input on desktop platform.
     void HandleTouchBegin(StringHash eventType, VariantMap& eventData);
 
-    /// Screen joystick index for navigational controls (mobile platforms only).
-    unsigned screenJoystickIndex_;
     /// Screen joystick index for settings (mobile platforms only).
     unsigned screenJoystickSettingsIndex_;
     /// Pause flag.
