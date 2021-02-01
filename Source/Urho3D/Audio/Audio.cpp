@@ -95,7 +95,7 @@ bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpo
         desired.samples /= 2;
 
     // Intentionally disallow format change so that the obtained format will always be the desired format, even though that format
-    // is not matching the device format, however in doing it will enable the SDL's internal audio stream with audio conversio.
+    // is not matching the device format, however in doing it will enable the SDL's internal audio stream with audio conversion.
     // Also disallow channels change to avoid issues on multichannel audio device (5.1, 7.1, etc)
     int allowedChanges = SDL_AUDIO_ALLOW_ANY_CHANGE & ~SDL_AUDIO_ALLOW_FORMAT_CHANGE & ~SDL_AUDIO_ALLOW_CHANNELS_CHANGE;
 
