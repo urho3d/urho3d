@@ -35,8 +35,8 @@ static void XMLElement_XMLElement_XMLElement(XMLElement* ptr, const XMLElement &
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void XMLFile_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(XMLFile* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 
 // explicit XMLFile::XMLFile(Context* context) | File: ../Resource/XMLFile.h

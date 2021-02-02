@@ -15,8 +15,8 @@ void FakeReleaseRef(void* ptr);
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void Object_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Object* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 
 // explicit ObjectAnimation::ObjectAnimation(Context* context) | File: ../Scene/ObjectAnimation.h
@@ -28,8 +28,8 @@ static ObjectAnimation* ObjectAnimation_ObjectAnimation_Context()
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void ObjectAnimation_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ObjectAnimation* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 
 // virtual SharedPtr<Object> ObjectFactory::CreateObject()=0 | File: ../Core/Object.h
@@ -51,8 +51,8 @@ static Obstacle* Obstacle_Obstacle_Context()
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void Obstacle_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Obstacle* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 #endif
 
@@ -65,8 +65,8 @@ static OcclusionBuffer* OcclusionBuffer_OcclusionBuffer_Context()
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void OcclusionBuffer_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(OcclusionBuffer* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 
 // explicit Octree::Octree(Context* context) | File: ../Graphics/Octree.h
@@ -78,8 +78,8 @@ static Octree* Octree_Octree_Context()
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void Octree_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Octree* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 
 #ifdef URHO3D_NAVIGATION
@@ -94,8 +94,8 @@ static OffMeshConnection* OffMeshConnection_OffMeshConnection_Context()
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void OffMeshConnection_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(OffMeshConnection* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 #endif
 

@@ -49,8 +49,8 @@ static ToolTip* ToolTip_ToolTip_Context()
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void ToolTip_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ToolTip* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 
 // TrailPoint::TrailPoint(const Vector3& position, const Vector3& forward) | File: ../Graphics/RibbonTrail.h

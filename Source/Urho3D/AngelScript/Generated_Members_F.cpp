@@ -40,8 +40,8 @@ static CScriptArray* File_ReadStringVector_void(File* ptr)
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void File_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(File* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 
 // explicit FileSelector::FileSelector(Context* context) | File: ../UI/FileSelector.h
@@ -53,15 +53,15 @@ static FileSelector* FileSelector_FileSelector_Context()
 // void FileSelector::SetFilters(const Vector<String>& filters, unsigned defaultIndex) | File: ../UI/FileSelector.h
 static void FileSelector_SetFilters_VectorString_unsigned(FileSelector* ptr, CScriptArray* filters, unsigned defaultIndex)
 {
-    Vector<String> param0 = ArrayToVector<String>(filters);
-    ptr->SetFilters(param0, defaultIndex);
+    Vector<String> filters_conv = ArrayToVector<String>(filters);
+    ptr->SetFilters(filters_conv, defaultIndex);
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void FileSelector_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(FileSelector* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 
 // explicit FileSystem::FileSystem(Context* context) | File: ../IO/FileSystem.h
@@ -73,24 +73,24 @@ static FileSystem* FileSystem_FileSystem_Context()
 // int FileSystem::SystemRun(const String& fileName, const Vector<String>& arguments) | File: ../IO/FileSystem.h
 static int FileSystem_SystemRun_String_VectorString(FileSystem* ptr, const String& fileName, CScriptArray* arguments)
 {
-    Vector<String> param1 = ArrayToVector<String>(arguments);
-    int result = ptr->SystemRun(fileName, param1);
+    Vector<String> arguments_conv = ArrayToVector<String>(arguments);
+    int result = ptr->SystemRun(fileName, arguments_conv);
     return result;
 }
 
 // unsigned FileSystem::SystemRunAsync(const String& fileName, const Vector<String>& arguments) | File: ../IO/FileSystem.h
 static unsigned FileSystem_SystemRunAsync_String_VectorString(FileSystem* ptr, const String& fileName, CScriptArray* arguments)
 {
-    Vector<String> param1 = ArrayToVector<String>(arguments);
-    unsigned result = ptr->SystemRunAsync(fileName, param1);
+    Vector<String> arguments_conv = ArrayToVector<String>(arguments);
+    unsigned result = ptr->SystemRunAsync(fileName, arguments_conv);
     return result;
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void FileSystem_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(FileSystem* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 
 // explicit FileWatcher::FileWatcher(Context* context) | File: ../IO/FileWatcher.h
@@ -102,8 +102,8 @@ static FileWatcher* FileWatcher_FileWatcher_Context()
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void FileWatcher_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(FileWatcher* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 
 // explicit Font::Font(Context* context) | File: ../UI/Font.h
@@ -115,8 +115,8 @@ static Font* Font_Font_Context()
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void Font_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Font* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 
 // const Vector<SharedPtr<Texture2D>>& FontFace::GetTextures() const | File: ../UI/FontFace.h

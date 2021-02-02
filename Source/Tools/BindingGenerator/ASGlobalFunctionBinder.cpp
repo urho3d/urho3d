@@ -117,10 +117,9 @@ static void BindGlobalFunction(const GlobalFunctionAnalyzer& functionAnalyzer)
     processedGlobalFunction.comment_ = functionAnalyzer.GetLocation();
     processedGlobalFunction.insideDefine_ = InsideDefine(functionAnalyzer.GetHeaderFile());
 
-    for (size_t i = 0; i < params.size(); i++)
+    for (const ParamAnalyzer& param : params)
     {
-        ParamAnalyzer param = params[i];
-        shared_ptr<FuncParamConv> conv = CppFunctionParamToAS(i, param);
+        shared_ptr<FuncParamConv> conv = CppFunctionParamToAS(param);
         if (!conv->success_)
         {
             processedGlobalFunction.registration_ = "// " + conv->errorMessage_;

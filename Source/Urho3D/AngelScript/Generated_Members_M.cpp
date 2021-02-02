@@ -28,8 +28,8 @@ static Material* Material_Material_Context()
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void Material_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Material* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 
 // Matrix2::Matrix2(const Matrix2& matrix) noexcept=default | File: ../Math/Matrix2.h
@@ -147,8 +147,8 @@ static Menu* Menu_Menu_Context()
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void Menu_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Menu* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 
 // explicit MessageBox::MessageBox(Context* context, const String& messageString=String::EMPTY, const String& titleString=String::EMPTY, XMLFile* layoutFile=nullptr, XMLFile* styleFile=nullptr) | File: ../UI/MessageBox.h
@@ -160,8 +160,8 @@ static MessageBox* MessageBox_MessageBox_Context_String_String_XMLFile_XMLFile(c
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void MessageBox_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(MessageBox* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 
 // SharedPtr<Model> Model::Clone(const String& cloneName=String::EMPTY) const | File: ../Graphics/Model.h
@@ -201,26 +201,26 @@ static Model* Model_Model_Context()
 // bool Model::SetIndexBuffers(const Vector<SharedPtr<IndexBuffer>>& buffers) | File: ../Graphics/Model.h
 static bool Model_SetIndexBuffers_VectorSharedPtrIndexBuffer(Model* ptr, CScriptArray* buffers)
 {
-    Vector<SharedPtr<IndexBuffer> > param0 = HandleArrayToVector<IndexBuffer>(buffers);
-    bool result = ptr->SetIndexBuffers(param0);
+    Vector<SharedPtr<IndexBuffer> > buffers_conv = HandleArrayToVector<IndexBuffer>(buffers);
+    bool result = ptr->SetIndexBuffers(buffers_conv);
     return result;
 }
 
 // bool Model::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer>>& buffers, const PODVector<unsigned>& morphRangeStarts, const PODVector<unsigned>& morphRangeCounts) | File: ../Graphics/Model.h
 static bool Model_SetVertexBuffers_VectorSharedPtrVertexBuffer_PODVectorunsigned_PODVectorunsigned(Model* ptr, CScriptArray* buffers, CScriptArray* morphRangeStarts, CScriptArray* morphRangeCounts)
 {
-    Vector<SharedPtr<VertexBuffer> > param0 = HandleArrayToVector<VertexBuffer>(buffers);
-    PODVector<unsigned> param1 = ArrayToPODVector<unsigned>(morphRangeStarts);
-    PODVector<unsigned> param2 = ArrayToPODVector<unsigned>(morphRangeCounts);
-    bool result = ptr->SetVertexBuffers(param0, param1, param2);
+    Vector<SharedPtr<VertexBuffer> > buffers_conv = HandleArrayToVector<VertexBuffer>(buffers);
+    PODVector<unsigned> morphRangeStarts_conv = ArrayToPODVector<unsigned>(morphRangeStarts);
+    PODVector<unsigned> morphRangeCounts_conv = ArrayToPODVector<unsigned>(morphRangeCounts);
+    bool result = ptr->SetVertexBuffers(buffers_conv, morphRangeStarts_conv, morphRangeCounts_conv);
     return result;
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void Model_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Model* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 
 // explicit MutexLock::MutexLock(Mutex& mutex) | File: ../Core/Mutex.h
