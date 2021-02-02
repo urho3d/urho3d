@@ -34,8 +34,8 @@ static CScriptArray* Geometry_GetVertexBuffers_void(Geometry* ptr)
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void Geometry_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Geometry* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 
 // PODVector<int> Graphics::GetMultiSampleLevels() const | File: ../Graphics/Graphics.h
@@ -61,16 +61,16 @@ static Graphics* Graphics_Graphics_Context()
 // bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer>>& buffers, unsigned instanceOffset=0) | File: ../Graphics/Graphics.h
 static bool Graphics_SetVertexBuffers_VectorSharedPtrVertexBuffer_unsigned(Graphics* ptr, CScriptArray* buffers, unsigned instanceOffset)
 {
-    Vector<SharedPtr<VertexBuffer> > param0 = HandleArrayToVector<VertexBuffer>(buffers);
-    bool result = ptr->SetVertexBuffers(param0, instanceOffset);
+    Vector<SharedPtr<VertexBuffer> > buffers_conv = HandleArrayToVector<VertexBuffer>(buffers);
+    bool result = ptr->SetVertexBuffers(buffers_conv, instanceOffset);
     return result;
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void Graphics_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Graphics* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 
 #ifdef URHO3D_PHYSICS

@@ -24,8 +24,8 @@ static CollisionBox2D* CollisionBox2D_CollisionBox2D_Context()
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void CollisionBox2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(CollisionBox2D* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 #endif
 
@@ -50,8 +50,8 @@ static CScriptArray* CollisionChain2D_GetVertices_void(CollisionChain2D* ptr)
 // void CollisionChain2D::SetVertices(const PODVector<Vector2>& vertices) | File: ../Urho2D/CollisionChain2D.h
 static void CollisionChain2D_SetVertices_PODVectorVector2(CollisionChain2D* ptr, CScriptArray* vertices)
 {
-    PODVector<Vector2> param0 = ArrayToPODVector<Vector2>(vertices);
-    ptr->SetVertices(param0);
+    PODVector<Vector2> vertices_conv = ArrayToPODVector<Vector2>(vertices);
+    ptr->SetVertices(vertices_conv);
 }
 #endif
 
@@ -59,8 +59,8 @@ static void CollisionChain2D_SetVertices_PODVectorVector2(CollisionChain2D* ptr,
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void CollisionChain2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(CollisionChain2D* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 #endif
 
@@ -76,8 +76,8 @@ static CollisionCircle2D* CollisionCircle2D_CollisionCircle2D_Context()
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void CollisionCircle2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(CollisionCircle2D* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 #endif
 
@@ -93,8 +93,8 @@ static CollisionEdge2D* CollisionEdge2D_CollisionEdge2D_Context()
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void CollisionEdge2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(CollisionEdge2D* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 #endif
 
@@ -119,8 +119,8 @@ static CScriptArray* CollisionPolygon2D_GetVertices_void(CollisionPolygon2D* ptr
 // void CollisionPolygon2D::SetVertices(const PODVector<Vector2>& vertices) | File: ../Urho2D/CollisionPolygon2D.h
 static void CollisionPolygon2D_SetVertices_PODVectorVector2(CollisionPolygon2D* ptr, CScriptArray* vertices)
 {
-    PODVector<Vector2> param0 = ArrayToPODVector<Vector2>(vertices);
-    ptr->SetVertices(param0);
+    PODVector<Vector2> vertices_conv = ArrayToPODVector<Vector2>(vertices);
+    ptr->SetVertices(vertices_conv);
 }
 #endif
 
@@ -128,8 +128,8 @@ static void CollisionPolygon2D_SetVertices_PODVectorVector2(CollisionPolygon2D* 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void CollisionPolygon2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(CollisionPolygon2D* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 #endif
 
@@ -145,8 +145,8 @@ static CollisionShape* CollisionShape_CollisionShape_Context()
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void CollisionShape_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(CollisionShape* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 #endif
 
@@ -154,8 +154,8 @@ static void CollisionShape_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bo
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void CollisionShape2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(CollisionShape2D* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 #endif
 
@@ -204,16 +204,16 @@ static Component* Component_Component_Context()
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void Component_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Component* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 
 #ifdef URHO3D_NETWORK
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void Connection_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Connection* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 #endif
 
@@ -226,8 +226,8 @@ static Console* Console_Console_Context()
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void Console_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Console* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 
 // explicit ConstantBuffer::ConstantBuffer(Context* context) | File: ../Graphics/ConstantBuffer.h
@@ -239,8 +239,8 @@ static ConstantBuffer* ConstantBuffer_ConstantBuffer_Context()
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void ConstantBuffer_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ConstantBuffer* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 
 // Context::Context() | File: ../Core/Context.h
@@ -268,8 +268,8 @@ static CrowdAgent* CrowdAgent_CrowdAgent_Context()
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void CrowdAgent_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(CrowdAgent* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 #endif
 
@@ -294,8 +294,8 @@ static CScriptArray* CrowdManager_GetAgents_Node_bool(CrowdManager* ptr, Node* n
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void CrowdManager_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(CrowdManager* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 #endif
 
@@ -336,8 +336,8 @@ static CScriptArray* Cursor_GetTags_void(Cursor* ptr)
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void Cursor_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Cursor* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 
 // explicit CustomGeometry::CustomGeometry(Context* context) | File: ../Graphics/CustomGeometry.h
@@ -363,8 +363,8 @@ static CScriptArray* CustomGeometry_GetVertexLights_void(CustomGeometry* ptr)
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void CustomGeometry_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(CustomGeometry* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 
 // ColorFrame::ColorFrame() | File: ../Graphics/ParticleEffect.h
@@ -389,8 +389,8 @@ static ColorFrame* ColorFrame_ColorFrame_Color_float(const Color &color, float t
 // void ConvexData::BuildHull(const PODVector<Vector3>& vertices) | File: ../Physics/CollisionShape.h
 static void ConvexData_BuildHull_PODVectorVector3(ConvexData* ptr, CScriptArray* vertices)
 {
-    PODVector<Vector3> param0 = ArrayToPODVector<Vector3>(vertices);
-    ptr->BuildHull(param0);
+    PODVector<Vector3> vertices_conv = ArrayToPODVector<Vector3>(vertices);
+    ptr->BuildHull(vertices_conv);
 }
 #endif
 

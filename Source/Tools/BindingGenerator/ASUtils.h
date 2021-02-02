@@ -50,7 +50,7 @@ struct FuncParamConv
     bool NeedWrapper() const { return !glue_.empty(); }
 };
 
-shared_ptr<FuncParamConv> CppFunctionParamToAS(int paramIndex, ParamAnalyzer& paramAnalyzer);
+shared_ptr<FuncParamConv> CppFunctionParamToAS(const ParamAnalyzer& paramAnalyzer);
 
 struct FuncReturnTypeConv
 {

@@ -34,8 +34,8 @@ static PackageFile* PackageFile_PackageFile_Context_String_unsigned(const String
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void PackageFile_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(PackageFile* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 
 // SharedPtr<ParticleEffect> ParticleEffect::Clone(const String& cloneName=String::EMPTY) const | File: ../Graphics/ParticleEffect.h
@@ -54,8 +54,8 @@ static ParticleEffect* ParticleEffect_ParticleEffect_Context()
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void ParticleEffect_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ParticleEffect* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 
 #ifdef URHO3D_URHO2D
@@ -79,8 +79,8 @@ static ParticleEffect2D* ParticleEffect2D_ParticleEffect2D_Context()
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void ParticleEffect2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ParticleEffect2D* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 #endif
 
@@ -107,8 +107,8 @@ static ParticleEmitter* ParticleEmitter_ParticleEmitter_Context()
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void ParticleEmitter_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ParticleEmitter* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 
 #ifdef URHO3D_URHO2D
@@ -141,8 +141,8 @@ static ParticleEmitter2D* ParticleEmitter2D_ParticleEmitter2D_Context()
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void ParticleEmitter2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ParticleEmitter2D* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 #endif
 
@@ -192,8 +192,8 @@ static PhysicsWorld* PhysicsWorld_PhysicsWorld_Context()
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void PhysicsWorld_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(PhysicsWorld* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 #endif
 
@@ -209,8 +209,8 @@ static PhysicsWorld2D* PhysicsWorld2D_PhysicsWorld2D_Context()
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void PhysicsWorld2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(PhysicsWorld2D* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 #endif
 
@@ -241,8 +241,8 @@ static void Plane_Plane_Vector4(Plane* ptr, const Vector4 &plane)
 // void Polyhedron::AddFace(const PODVector<Vector3>& face) | File: ../Math/Polyhedron.h
 static void Polyhedron_AddFace_PODVectorVector3(Polyhedron* ptr, CScriptArray* face)
 {
-    PODVector<Vector3> param0 = ArrayToPODVector<Vector3>(face);
-    ptr->AddFace(param0);
+    PODVector<Vector3> face_conv = ArrayToPODVector<Vector3>(face);
+    ptr->AddFace(face_conv);
 }
 
 // Polyhedron::Polyhedron(const Polyhedron& polyhedron) | File: ../Math/Polyhedron.h
@@ -272,8 +272,8 @@ static Profiler* Profiler_Profiler_Context()
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void Profiler_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Profiler* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 
 // const Vector<SharedPtr<UIElement>>& UIElement::GetChildren() const | File: ../UI/UIElement.h
@@ -313,8 +313,8 @@ static ProgressBar* ProgressBar_ProgressBar_Context()
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void ProgressBar_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ProgressBar* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 
 #ifdef URHO3D_URHO2D

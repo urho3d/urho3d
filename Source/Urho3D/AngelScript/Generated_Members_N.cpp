@@ -34,16 +34,16 @@ static CScriptArray* NamedPipe_ReadStringVector_void(NamedPipe* ptr)
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void NamedPipe_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(NamedPipe* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 
 #ifdef URHO3D_NAVIGATION
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void NavArea_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(NavArea* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 #endif
 
@@ -59,8 +59,8 @@ static Navigable* Navigable_Navigable_Context()
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void Navigable_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Navigable* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 #endif
 
@@ -76,8 +76,8 @@ static NavigationMesh* NavigationMesh_NavigationMesh_Context()
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void NavigationMesh_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(NavigationMesh* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 #endif
 
@@ -94,8 +94,8 @@ static CScriptArray* Network_GetClientConnections_void(Network* ptr)
 // SharedPtr<HttpRequest> Network::MakeHttpRequest(const String& url, const String& verb=String::EMPTY, const Vector<String>& headers=Vector<String>(), const String& postData=String::EMPTY) | File: ../Network/Network.h
 static HttpRequest* Network_MakeHttpRequest_String_String_VectorString_String(Network* ptr, const String& url, const String& verb, CScriptArray* headers, const String& postData)
 {
-    Vector<String> param2 = ArrayToVector<String>(headers);
-    SharedPtr<HttpRequest> result = ptr->MakeHttpRequest(url, verb, param2, postData);
+    Vector<String> headers_conv = ArrayToVector<String>(headers);
+    SharedPtr<HttpRequest> result = ptr->MakeHttpRequest(url, verb, headers_conv, postData);
     return result.Detach();
 }
 #endif
@@ -112,8 +112,8 @@ static Network* Network_Network_Context()
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void Network_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Network* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 #endif
 
@@ -129,8 +129,8 @@ static NetworkPriority* NetworkPriority_NetworkPriority_Context()
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void NetworkPriority_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(NetworkPriority* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 #endif
 
@@ -192,8 +192,8 @@ static Node* Node_Node_Context()
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void Node_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Node* ptr, CScriptArray* exceptions, bool onlyUserData)
 {
-    PODVector<StringHash> param0 = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(param0, onlyUserData);
+    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
 }
 
 void ASRegisterGenerated_Members_N(asIScriptEngine* engine)

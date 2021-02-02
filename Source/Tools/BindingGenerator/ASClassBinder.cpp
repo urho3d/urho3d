@@ -201,10 +201,9 @@ static void RegisterStaticFunction(const ClassStaticFunctionAnalyzer& functionAn
     string outGlue;
     bool needWrapper = false;
 
-    for (size_t i = 0; i < params.size(); i++)
+    for (const ParamAnalyzer& param : params)
     {
-        ParamAnalyzer param = params[i];
-        shared_ptr<FuncParamConv> conv = CppFunctionParamToAS(i, param);
+        shared_ptr<FuncParamConv> conv = CppFunctionParamToAS(param);
         if (!conv->success_)
         {
             result->reg_ << "    // " << conv->errorMessage_ << "\n";
@@ -826,10 +825,9 @@ static void RegisterMethod(const ClassFunctionAnalyzer& functionAnalyzer, bool t
     vector<shared_ptr<FuncParamConv> > convertedParams;
     bool needWrapper = false;
 
-    for (size_t i = 0; i < params.size(); i++)
+    for (const ParamAnalyzer& param : params)
     {
-        ParamAnalyzer param = params[i];
-        shared_ptr<FuncParamConv> conv = CppFunctionParamToAS(i, param);
+        shared_ptr<FuncParamConv> conv = CppFunctionParamToAS(param);
         if (!conv->success_)
         {
             result->reg_ << "    // " << conv->errorMessage_ << "\n";

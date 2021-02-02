@@ -283,7 +283,7 @@ string CppValueToAS(const string& cppValue)
 
 // =================================================================================
 
-shared_ptr<FuncParamConv> CppFunctionParamToAS(int paramIndex, ParamAnalyzer& paramAnalyzer)
+shared_ptr<FuncParamConv> CppFunctionParamToAS(const ParamAnalyzer& paramAnalyzer)
 {
     shared_ptr<FuncParamConv> result = make_shared<FuncParamConv>();
 
@@ -300,7 +300,7 @@ shared_ptr<FuncParamConv> CppFunctionParamToAS(int paramIndex, ParamAnalyzer& pa
     {
         result->success_ = true;
         result->inputVarName_ = paramAnalyzer.GetDeclname();
-        result->convertedVarName_ = "param" + to_string(paramIndex);
+        result->convertedVarName_ = result->inputVarName_ + "_conv";
         result->glue_ = "    Vector<String> " + result->convertedVarName_ + " = ArrayToVector<String>(" + result->inputVarName_ + ");\n";
         result->cppType_ = "CScriptArray*";
         //result->asDecl_ = "String[]&";
@@ -326,7 +326,7 @@ shared_ptr<FuncParamConv> CppFunctionParamToAS(int paramIndex, ParamAnalyzer& pa
 
         result->success_ = true;
         result->inputVarName_ = paramAnalyzer.GetDeclname();
-        result->convertedVarName_ = "param" + to_string(paramIndex);
+        result->convertedVarName_ = result->inputVarName_ + "_conv";
         result->glue_ = "    PODVector<" + cppTypeName + "> " + result->convertedVarName_ + " = ArrayToPODVector<" + cppTypeName + ">(" + result->inputVarName_ + ");\n";
         result->cppType_ = "CScriptArray*";
         result->asDecl_ = "Array<" + asTypeName + ">@+";
@@ -346,7 +346,7 @@ shared_ptr<FuncParamConv> CppFunctionParamToAS(int paramIndex, ParamAnalyzer& pa
 
         result->success_ = true;
         result->inputVarName_ = paramAnalyzer.GetDeclname();
-        result->convertedVarName_ = "param" + to_string(paramIndex);
+        result->convertedVarName_ = result->inputVarName_ + "_conv";
         result->glue_ = "    PODVector<" + cppTypeName + "*> " + result->convertedVarName_ + " = ArrayToPODVector<" + cppTypeName + "*>(" + result->inputVarName_ + ");\n";
         result->cppType_ = "CScriptArray*";
         result->asDecl_ = "Array<" + asTypeName + "@>@";
@@ -371,7 +371,7 @@ shared_ptr<FuncParamConv> CppFunctionParamToAS(int paramIndex, ParamAnalyzer& pa
 
         result->success_ = true;
         result->inputVarName_ = paramAnalyzer.GetDeclname();
-        result->convertedVarName_ = "param" + to_string(paramIndex);
+        result->convertedVarName_ = result->inputVarName_ + "_conv";
         result->glue_ = "    Vector<SharedPtr<" + cppTypeName + "> > " + result->convertedVarName_ + " = HandleArrayToVector<" + cppTypeName + ">(" + result->inputVarName_ + ");\n";
         result->cppType_ = "CScriptArray*";
         result->asDecl_ = "Array<" + asTypeName + "@>@+";
