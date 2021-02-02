@@ -33,6 +33,7 @@ namespace ASBindingGenerator
 {
 
 // https://www.angelcode.com/angelscript/sdk/docs/manual/doc_datatypes_primitives.html
+// https://en.cppreference.com/w/cpp/language/types
 string CppFundamentalTypeToAS(const string& cppType)
 {
     if (cppType == "char" || cppType == "signed char")
@@ -47,10 +48,10 @@ string CppFundamentalTypeToAS(const string& cppType)
     if (cppType == "unsigned short")
         return "uint16";
 
-    if (cppType == "int" || cppType == "long")
+    if (cppType == "int")
         return "int";
 
-    if (cppType == "unsigned" || cppType == "unsigned int" || cppType == "unsigned long")
+    if (cppType == "unsigned" || cppType == "unsigned int")
         return "uint";
 
     if (cppType == "long long")
@@ -58,6 +59,16 @@ string CppFundamentalTypeToAS(const string& cppType)
 
     if (cppType == "unsigned long long")
         return "uint64";
+
+    // Types below have different width on different systems and are registered in Manual.cpp
+    if (cppType == "long")
+        return "long";
+
+    if (cppType == "unsigned long")
+        return "ulong";
+
+    if (cppType == "size_t")
+        return "size_t";
 
     return cppType;
 }
