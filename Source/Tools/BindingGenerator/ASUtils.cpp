@@ -36,6 +36,10 @@ namespace ASBindingGenerator
 // https://en.cppreference.com/w/cpp/language/types
 string CppFundamentalTypeToAS(const string& cppType)
 {
+    // AngelScript itself detect width of bool type (look AS_SIZEOF_BOOL define)
+    if (cppType == "bool")
+        return "bool";
+
     if (cppType == "char" || cppType == "signed char")
         return "int8";
 
@@ -60,6 +64,12 @@ string CppFundamentalTypeToAS(const string& cppType)
     if (cppType == "unsigned long long")
         return "uint64";
 
+    if (cppType == "float")
+        return "float";
+
+    if (cppType == "double")
+        return "double";
+
     // Types below have different width on different systems and are registered in Manual.cpp
     if (cppType == "long")
         return "long";
@@ -70,7 +80,7 @@ string CppFundamentalTypeToAS(const string& cppType)
     if (cppType == "size_t")
         return "size_t";
 
-    return cppType;
+    throw Exception(cppType + " not a fundamental type");
 }
 
 shared_ptr<EnumAnalyzer> FindEnum(const string& name)
@@ -100,7 +110,7 @@ static bool IsUsing(const string& identifier)
     return false;
 }
 
-bool IsKnownType(const string& name)
+bool IsKnownCppType(const string& name)
 {
     static vector<string> _knownTypes = {
         "void",
@@ -169,87 +179,57 @@ shared_ptr<ClassAnalyzer> FindClassByID(const string& id)
     return shared_ptr<ClassAnalyzer>();
 }
 
-string CppTypeToAS(const TypeAnalyzer& type, bool returnType, bool& outSuccess)
+string CppTypeToAS(const TypeAnalyzer& type, bool returnType)
 {
     if (type.IsRvalueReference() || type.IsDoublePointer() || type.IsRefToPointer())
-    {
-        outSuccess = false;
-        SetLastErrorMessage("Error: type \"" + type.ToString() + "\" can not automatically bind");
-        return "ERROR";
-    }
+        throw Exception("Error: type \"" + type.ToString() + "\" can not automatically bind");
 
     string cppTypeName = type.GetNameWithTemplateParams();
 
     if (cppTypeName == "Context" && returnType)
-    {
-        outSuccess = false;
-        SetLastErrorMessage("Error: type \"" + type.ToString() + "\" can not be returned");
-        return "ERROR";
-    }
+        throw Exception("Error: type \"" + type.ToString() + "\" can not be returned");
 
-    if (!IsKnownType(type.GetNameWithTemplateParams()))
-    {
-        outSuccess = false;
-        SetLastErrorMessage("Error: type \"" + type.ToString() + "\" can not automatically bind");
-        return "ERROR";
-    }
+    if (!IsKnownCppType(type.GetNameWithTemplateParams()))
+        throw Exception("Error: type \"" + type.ToString() + "\" can not automatically bind");
 
     shared_ptr<ClassAnalyzer> analyzer = FindClassByName(type.GetNameWithTemplateParams());
     if (analyzer && analyzer->IsInternal())
-    {
-        outSuccess = false;
-        SetLastErrorMessage("Error: type \"" + type.ToString() + "\" can not automatically bind bacause internal");
-        return "ERROR";
-    }
+        throw Exception("Error: type \"" + type.ToString() + "\" can not automatically bind bacause internal");
 
     if (analyzer && Contains(analyzer->GetComment(), "NO_BIND"))
-    {
-        outSuccess = false;
-        SetLastErrorMessage("Error: type \"" + cppTypeName + "\" can not automatically bind bacause have @nobind mark");
-        return "ERROR";
-    }
+        throw Exception("Error: type \"" + cppTypeName + "\" can not automatically bind bacause have @nobind mark");
 
     // analyzer can be null for simple types (int, float) or if type "using VariantVector = Vector<Variant>"
     // TODO add to type info "IsUsing"
     // TODO add description to TypeAnalyzer::GetClass()
 
     if (IsUsing(cppTypeName) && cppTypeName != "VariantMap")
-    {
-        outSuccess = false;
-        SetLastErrorMessage("Error: using \"" + cppTypeName + "\" can not automatically bind");
-        return "ERROR";
-    }
+        throw Exception("Using \"" + cppTypeName + "\" can not automatically bind");
 
-    string asTypeName = CppFundamentalTypeToAS(cppTypeName);
+    string asTypeName;
+    
+    try
+    {
+        asTypeName = CppFundamentalTypeToAS(cppTypeName);
+    }
+    catch (...)
+    {
+        asTypeName = cppTypeName;
+    }
 
     if (asTypeName == "void" && type.IsPointer())
-    {
-        outSuccess = false;
-        SetLastErrorMessage("Error: type \"void*\" can not automatically bind");
-        return "ERROR";
-    }
+        throw Exception("Error: type \"void*\" can not automatically bind");
 
     if (asTypeName.find('<') != string::npos)
-    {
-        outSuccess = false;
-        SetLastErrorMessage("Error: type \"" + type.ToString() + "\" can not automatically bind");
-        return "ERROR";
-    }
+        throw Exception("Error: type \"" + type.ToString() + "\" can not automatically bind");
 
     if (Contains(type.ToString(), "::"))
-    {
-        outSuccess = false;
-        SetLastErrorMessage("Error: type \"" + type.ToString() + "\" can not automatically bind bacause internal");
-        return "ERROR";
-    }
+        throw Exception("Error: type \"" + type.ToString() + "\" can not automatically bind bacause internal");
 
     if (type.IsConst() && type.IsReference() && !returnType)
-    {
-        outSuccess = true;
-        return "const " + CppFundamentalTypeToAS(cppTypeName) + "&in";
-    }
+        return "const " + asTypeName + "&in";
 
-    string result = CppFundamentalTypeToAS(cppTypeName);
+    string result = asTypeName;
 
     if (type.IsReference())
     {
@@ -260,21 +240,14 @@ string CppTypeToAS(const TypeAnalyzer& type, bool returnType, bool& outSuccess)
         shared_ptr<ClassAnalyzer> analyzer = FindClassByName(type.GetNameWithTemplateParams());
 
         if (analyzer && (analyzer->IsRefCounted() || Contains(analyzer->GetComment(), "FAKE_REF")))
-        {
             result += "@+";
-        }
         else
-        {
-            outSuccess = false;
-            SetLastErrorMessage("Error: type \"" + type.ToString() + "\" can not automatically bind");
-            return "ERROR";
-        }
+            throw Exception("Error: type \"" + type.ToString() + "\" can not automatically bind");
     }
 
     if (returnType && type.IsConst() && !type.IsPointer())
         result = "const " + result;
 
-    outSuccess = true;
     return result;
 }
 
@@ -333,7 +306,17 @@ shared_ptr<FuncParamConv> CppFunctionParamToAS(const ParamAnalyzer& paramAnalyze
     if (match.size() == 2 && typeAnalyzer.IsConst() && typeAnalyzer.IsReference())
     {
         string cppTypeName = match[1].str();
-        string asTypeName = CppFundamentalTypeToAS(cppTypeName);
+        
+        string asTypeName;
+        
+        try
+        {
+            asTypeName = CppFundamentalTypeToAS(cppTypeName);
+        }
+        catch (...)
+        {
+            asTypeName = cppTypeName;
+        }
 
         result->success_ = true;
         result->inputVarName_ = paramAnalyzer.GetDeclname();
@@ -353,7 +336,17 @@ shared_ptr<FuncParamConv> CppFunctionParamToAS(const ParamAnalyzer& paramAnalyze
     if (match.size() == 2 && typeAnalyzer.IsConst() && typeAnalyzer.IsReference())
     {
         string cppTypeName = match[1].str();
-        string asTypeName = CppFundamentalTypeToAS(cppTypeName);
+        
+        string asTypeName;
+
+        try
+        {
+            asTypeName = CppFundamentalTypeToAS(cppTypeName);
+        }
+        catch (...)
+        {
+            asTypeName = cppTypeName;
+        }
 
         result->success_ = true;
         result->inputVarName_ = paramAnalyzer.GetDeclname();
@@ -372,7 +365,17 @@ shared_ptr<FuncParamConv> CppFunctionParamToAS(const ParamAnalyzer& paramAnalyze
     if (match.size() == 2 && typeAnalyzer.IsConst() && typeAnalyzer.IsReference())
     {
         string cppTypeName = match[1].str();
-        string asTypeName = CppFundamentalTypeToAS(cppTypeName);
+        
+        string asTypeName;
+
+        try
+        {
+            asTypeName = CppFundamentalTypeToAS(cppTypeName);
+        }
+        catch (...)
+        {
+            asTypeName = cppTypeName;
+        }
 
         if (cppTypeName == "WorkItem") // TODO autodetect
         {
@@ -393,15 +396,16 @@ shared_ptr<FuncParamConv> CppFunctionParamToAS(const ParamAnalyzer& paramAnalyze
         return result;
     }
 
-    bool outSuccess;
-    string asType = CppTypeToAS(typeAnalyzer, false, outSuccess);
-    if (!outSuccess)
+    try
     {
-        result->errorMessage_ = GetLastErrorMessage();
+        string asType = CppTypeToAS(typeAnalyzer, false);
+        result->asDecl_ = asType;
+    }
+    catch (const Exception& e)
+    {
+        result->errorMessage_ = e.what();
         return result;
     }
-
-    result->asDecl_ = asType;
 
     string defval = paramAnalyzer.GetDefval();
     if (!defval.empty())
@@ -454,10 +458,20 @@ shared_ptr<FuncReturnTypeConv> CppFunctionReturnTypeToAS(const TypeAnalyzer& typ
     regex_match(cppTypeName, match, regex("SharedPtr<(\\w+)>"));
     if (match.size() == 2)
     {
-        string typeName = match[1].str();
-        typeName = CppFundamentalTypeToAS(typeName);
+        string cppTypeName = match[1].str();
+        
+        string asTypeName;
 
-        if (typeName == "WorkItem") // TODO autodetect
+        try
+        {
+            asTypeName = CppFundamentalTypeToAS(cppTypeName);
+        }
+        catch (...)
+        {
+            asTypeName = cppTypeName;
+        }
+
+        if (cppTypeName == "WorkItem") // TODO autodetect
         {
             result->errorMessage_ = "TODO";
             return result;
@@ -465,8 +479,8 @@ shared_ptr<FuncReturnTypeConv> CppFunctionReturnTypeToAS(const TypeAnalyzer& typ
 
         result->success_ = true;
         result->needWrapper_ = true;
-        result->asReturnType_ = typeName + "@+";
-        result->glueReturnType_ = typeName + "*";
+        result->asReturnType_ = asTypeName + "@+";
+        result->glueReturnType_ = cppTypeName + "*";
         result->glueReturn_ = "return result.Detach();\n";
         return result;
     }
@@ -474,19 +488,29 @@ shared_ptr<FuncReturnTypeConv> CppFunctionReturnTypeToAS(const TypeAnalyzer& typ
     regex_match(cppTypeName, match, regex("Vector<SharedPtr<(\\w+)>>"));
     if (match.size() == 2)
     {
-        string typeName = match[1].str();
-        typeName = CppFundamentalTypeToAS(typeName);
+        string cppTypeName = match[1].str();
+        
+        string asTypeName;
+
+        try
+        {
+            asTypeName = CppFundamentalTypeToAS(cppTypeName);
+        }
+        catch (...)
+        {
+            asTypeName = cppTypeName;
+        }
 
         result->success_ = true;
         result->needWrapper_ = true;
-        result->asReturnType_ = "Array<" + typeName + "@>@";
+        result->asReturnType_ = "Array<" + asTypeName + "@>@";
         result->glueReturnType_ = "CScriptArray*";
 
         // Which variant is correct/better?
 #if 0
-        result->glueResult_ = "return VectorToArray<SharedPtr<" + typeName + "> >(result, \"Array<" + typeName + "@>@\");\n";
+        result->glueResult_ = "return VectorToArray<SharedPtr<" + cppTypeName + "> >(result, \"Array<" + cppTypeName + "@>@\");\n";
 #else
-        result->glueReturn_ = "return VectorToHandleArray(result, \"Array<" + typeName + "@>\");\n";
+        result->glueReturn_ = "return VectorToHandleArray(result, \"Array<" + cppTypeName + "@>\");\n";
 #endif
         return result;
     }
@@ -494,41 +518,63 @@ shared_ptr<FuncReturnTypeConv> CppFunctionReturnTypeToAS(const TypeAnalyzer& typ
     regex_match(cppTypeName, match, regex("PODVector<(\\w+)\\*>"));
     if (match.size() == 2)
     {
-        string typeName = match[1].str();
-        typeName = CppFundamentalTypeToAS(typeName);
+        string cppTypeName = match[1].str();
+        
+        string asTypeName;
+
+        try
+        {
+            asTypeName = CppFundamentalTypeToAS(cppTypeName);
+        }
+        catch (...)
+        {
+            asTypeName = cppTypeName;
+        }
 
         result->success_ = true;
         result->needWrapper_ = true;
-        result->asReturnType_ = "Array<" + typeName + "@>@";
+        result->asReturnType_ = "Array<" + asTypeName + "@>@";
         result->glueReturnType_ = "CScriptArray*";
-        result->glueReturn_ = "return VectorToHandleArray(result, \"Array<" + typeName + "@>\");\n";
+        result->glueReturn_ = "return VectorToHandleArray(result, \"Array<" + cppTypeName + "@>\");\n";
         return result;
     }
 
     regex_match(cppTypeName, match, regex("PODVector<(\\w+)>"));
     if (match.size() == 2 && (typeAnalyzer.IsConst() == typeAnalyzer.IsReference()))
     {
-        string typeName = match[1].str();
-        typeName = CppFundamentalTypeToAS(typeName);
+        string cppTypeName = match[1].str();
+        
+        string asTypeName;
+
+        try
+        {
+            asTypeName = CppFundamentalTypeToAS(cppTypeName);
+        }
+        catch (...)
+        {
+            asTypeName = cppTypeName;
+        }
 
         result->success_ = true;
         result->needWrapper_ = true;
-        result->asReturnType_ = "Array<" + typeName + ">@";
+        result->asReturnType_ = "Array<" + asTypeName + ">@";
         result->glueReturnType_ = "CScriptArray*";
-        result->glueReturn_ = "return VectorToArray(result, \"Array<" + typeName + ">\");\n";
+        result->glueReturn_ = "return VectorToArray(result, \"Array<" + asTypeName + ">\");\n";
         return result;
     }
 
-    bool outSuccess;
-    string asType = CppTypeToAS(typeAnalyzer, true, outSuccess);
-    if (!outSuccess)
+    try
     {
-        result->errorMessage_ = GetLastErrorMessage();
+        string asType = CppTypeToAS(typeAnalyzer, true);
+        result->asReturnType_ = asType;
+    }
+    catch (const Exception& e)
+    {
+        result->errorMessage_ = e.what();
         return result;
     }
 
     result->success_ = true;
-    result->asReturnType_ = asType;
     result->glueReturn_ = "return result;\n";
     result->glueReturnType_ = typeAnalyzer.ToString();
     return result;

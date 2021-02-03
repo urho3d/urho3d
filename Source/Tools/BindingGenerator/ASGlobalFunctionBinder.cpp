@@ -141,7 +141,7 @@ static void BindGlobalFunction(const GlobalFunctionAnalyzer& functionAnalyzer)
     shared_ptr<FuncReturnTypeConv> retConv = CppFunctionReturnTypeToAS(functionAnalyzer.GetReturnType());
     if (!retConv->success_)
     {
-        processedGlobalFunction.registration_ = "// " + GetLastErrorMessage();
+        processedGlobalFunction.registration_ = "// " + retConv->errorMessage_;
         Result::globalFunctions_.push_back(processedGlobalFunction);
         return;
     }

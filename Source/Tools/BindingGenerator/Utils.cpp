@@ -25,18 +25,6 @@
 #include <cassert>
 #include <sstream>
 
-static string _lastErrorMessage;
-
-string GetLastErrorMessage()
-{
-    return _lastErrorMessage;
-}
-
-void SetLastErrorMessage(const string& message)
-{
-    _lastErrorMessage = message;
-}
-
 string Trim(const string& str)
 {
     size_t trimStart = 0;

@@ -53,7 +53,16 @@ static void ProcessGlobalVariable(GlobalVariableAnalyzer varAnalyzer)
 
     TypeAnalyzer typeAnalyzer = varAnalyzer.GetType();
 
-    string asType = CppFundamentalTypeToAS(typeAnalyzer.GetName());
+    string asType;
+
+    try
+    {
+        asType = CppFundamentalTypeToAS(typeAnalyzer.GetName());
+    }
+    catch (...)
+    {
+        asType = typeAnalyzer.GetName();
+    }
 
     if (typeAnalyzer.IsConst())
         asType = "const " + asType;

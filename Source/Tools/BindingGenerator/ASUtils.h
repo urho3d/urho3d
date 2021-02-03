@@ -24,8 +24,9 @@
 
 #include "XmlAnalyzer.h"
 
-#include <string>
 #include <map>
+#include <stdexcept>
+#include <string>
 
 using namespace std;
 
@@ -34,8 +35,17 @@ namespace ASBindingGenerator
 
 shared_ptr<EnumAnalyzer> FindEnum(const string& name);
 string CppFundamentalTypeToAS(const string& cppType);
-string CppTypeToAS(const TypeAnalyzer& type, bool returnType, bool& outSuccess);
+string CppTypeToAS(const TypeAnalyzer& type, bool returnType);
 string CppValueToAS(const string& cppValue);
+
+class Exception : public exception
+{
+public:
+    Exception(string message)
+        : exception(message.c_str())
+    {
+    }
+};
 
 struct FuncParamConv
 {
@@ -62,7 +72,7 @@ struct FuncReturnTypeConv
     string glueReturn_ = "TODO";
 };
 
-bool IsKnownType(const string& name);
+bool IsKnownCppType(const string& name);
 
 shared_ptr<ClassAnalyzer> FindClassByName(const string& name);
 shared_ptr<ClassAnalyzer> FindClassByID(const string& name);
