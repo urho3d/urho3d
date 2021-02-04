@@ -57,7 +57,7 @@ static void ProcessGlobalVariable(GlobalVariableAnalyzer varAnalyzer)
 
     try
     {
-        asType = CppFundamentalTypeToAS(typeAnalyzer.GetName());
+        asType = CppPrimitiveTypeToAS(typeAnalyzer.GetName());
     }
     catch (...)
     {

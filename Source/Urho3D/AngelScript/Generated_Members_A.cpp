@@ -20,10 +20,10 @@ static CScriptArray* AbstractFile_ReadStringVector_void(AbstractFile* ptr)
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Animatable_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Animatable* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void Animatable_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Animatable* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // explicit AnimatedModel::AnimatedModel(Context* context) | File: ../Graphics/AnimatedModel.h
@@ -61,10 +61,10 @@ static CScriptArray* AnimatedModel_GetVertexLights_void(AnimatedModel* ptr)
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void AnimatedModel_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(AnimatedModel* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void AnimatedModel_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(AnimatedModel* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 #ifdef URHO3D_URHO2D
@@ -95,10 +95,10 @@ static CScriptArray* AnimatedSprite2D_GetVertexLights_void(AnimatedSprite2D* ptr
 
 #ifdef URHO3D_URHO2D
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void AnimatedSprite2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(AnimatedSprite2D* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void AnimatedSprite2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(AnimatedSprite2D* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 #endif
 
@@ -116,10 +116,10 @@ static Animation* Animation_Clone_String(Animation* ptr, const String& cloneName
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Animation_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Animation* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void Animation_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Animation* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // explicit AnimationController::AnimationController(Context* context) | File: ../Graphics/AnimationController.h
@@ -129,10 +129,10 @@ static AnimationController* AnimationController_AnimationController_Context()
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void AnimationController_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(AnimationController* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void AnimationController_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(AnimationController* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 #ifdef URHO3D_URHO2D
@@ -145,10 +145,10 @@ static AnimationSet2D* AnimationSet2D_AnimationSet2D_Context()
 
 #ifdef URHO3D_URHO2D
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void AnimationSet2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(AnimationSet2D* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void AnimationSet2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(AnimationSet2D* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 #endif
 
@@ -202,10 +202,10 @@ static CScriptArray* Audio_GetSoundSources_void(Audio* ptr)
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Audio_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Audio* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void Audio_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Audio* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // AnimationControl::AnimationControl() | File: ../Graphics/AnimationController.h

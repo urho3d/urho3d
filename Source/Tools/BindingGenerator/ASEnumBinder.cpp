@@ -76,7 +76,7 @@ static void ProcessEnum(const EnumAnalyzer& analyzer)
     }
     else // If enum is not int then register as typedef. But this type can not be used in switch
     {
-        string asEnumBaseType = CppFundamentalTypeToAS(cppEnumBaseType);
+        string asEnumBaseType = CppPrimitiveTypeToAS(cppEnumBaseType);
 
         processedEnum.registration_.push_back("engine->RegisterTypedef(\"" + enumTypeName + "\", \"" + asEnumBaseType + "\");");
 
@@ -107,7 +107,7 @@ static void ProcessFlagset(const GlobalFunctionAnalyzer& analyzer)
     shared_ptr<EnumAnalyzer> enumAnalyzer = FindEnum(enumTypeName);
     assert(enumAnalyzer);
     string cppEnumBaseType = enumAnalyzer->GetBaseType();
-    string asEnumBaseType = CppFundamentalTypeToAS(cppEnumBaseType);
+    string asEnumBaseType = CppPrimitiveTypeToAS(cppEnumBaseType);
 
     ProcessedEnum processedEnum;
     processedEnum.name_ = flagsetName;

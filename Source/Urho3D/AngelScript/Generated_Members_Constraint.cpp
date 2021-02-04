@@ -22,10 +22,10 @@ static Constraint* Constraint_Constraint_Context()
 
 #ifdef URHO3D_PHYSICS
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Constraint_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Constraint* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void Constraint_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Constraint* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 #endif
 
@@ -39,10 +39,10 @@ static Constraint2D* Constraint2D_Constraint2D_Context()
 
 #ifdef URHO3D_URHO2D
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Constraint2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Constraint2D* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void Constraint2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Constraint2D* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 #endif
 
@@ -56,10 +56,10 @@ static ConstraintDistance2D* ConstraintDistance2D_ConstraintDistance2D_Context()
 
 #ifdef URHO3D_URHO2D
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void ConstraintDistance2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ConstraintDistance2D* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void ConstraintDistance2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ConstraintDistance2D* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 #endif
 
@@ -73,10 +73,10 @@ static ConstraintFriction2D* ConstraintFriction2D_ConstraintFriction2D_Context()
 
 #ifdef URHO3D_URHO2D
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void ConstraintFriction2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ConstraintFriction2D* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void ConstraintFriction2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ConstraintFriction2D* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 #endif
 
@@ -90,10 +90,10 @@ static ConstraintGear2D* ConstraintGear2D_ConstraintGear2D_Context()
 
 #ifdef URHO3D_URHO2D
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void ConstraintGear2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ConstraintGear2D* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void ConstraintGear2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ConstraintGear2D* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 #endif
 
@@ -107,10 +107,10 @@ static ConstraintMotor2D* ConstraintMotor2D_ConstraintMotor2D_Context()
 
 #ifdef URHO3D_URHO2D
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void ConstraintMotor2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ConstraintMotor2D* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void ConstraintMotor2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ConstraintMotor2D* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 #endif
 
@@ -124,10 +124,10 @@ static ConstraintMouse2D* ConstraintMouse2D_ConstraintMouse2D_Context()
 
 #ifdef URHO3D_URHO2D
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void ConstraintMouse2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ConstraintMouse2D* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void ConstraintMouse2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ConstraintMouse2D* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 #endif
 
@@ -141,10 +141,10 @@ static ConstraintPrismatic2D* ConstraintPrismatic2D_ConstraintPrismatic2D_Contex
 
 #ifdef URHO3D_URHO2D
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void ConstraintPrismatic2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ConstraintPrismatic2D* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void ConstraintPrismatic2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ConstraintPrismatic2D* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 #endif
 
@@ -158,10 +158,10 @@ static ConstraintPulley2D* ConstraintPulley2D_ConstraintPulley2D_Context()
 
 #ifdef URHO3D_URHO2D
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void ConstraintPulley2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ConstraintPulley2D* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void ConstraintPulley2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ConstraintPulley2D* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 #endif
 
@@ -175,10 +175,10 @@ static ConstraintRevolute2D* ConstraintRevolute2D_ConstraintRevolute2D_Context()
 
 #ifdef URHO3D_URHO2D
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void ConstraintRevolute2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ConstraintRevolute2D* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void ConstraintRevolute2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ConstraintRevolute2D* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 #endif
 
@@ -192,10 +192,10 @@ static ConstraintRope2D* ConstraintRope2D_ConstraintRope2D_Context()
 
 #ifdef URHO3D_URHO2D
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void ConstraintRope2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ConstraintRope2D* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void ConstraintRope2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ConstraintRope2D* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 #endif
 
@@ -209,10 +209,10 @@ static ConstraintWeld2D* ConstraintWeld2D_ConstraintWeld2D_Context()
 
 #ifdef URHO3D_URHO2D
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void ConstraintWeld2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ConstraintWeld2D* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void ConstraintWeld2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ConstraintWeld2D* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 #endif
 
@@ -226,10 +226,10 @@ static ConstraintWheel2D* ConstraintWheel2D_ConstraintWheel2D_Context()
 
 #ifdef URHO3D_URHO2D
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void ConstraintWheel2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ConstraintWheel2D* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void ConstraintWheel2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ConstraintWheel2D* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 #endif
 

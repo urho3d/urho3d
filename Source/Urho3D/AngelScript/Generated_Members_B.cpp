@@ -33,10 +33,10 @@ static CScriptArray* BillboardSet_GetVertexLights_void(BillboardSet* ptr)
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void BillboardSet_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(BillboardSet* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void BillboardSet_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(BillboardSet* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // explicit BorderImage::BorderImage(Context* context) | File: ../UI/BorderImage.h
@@ -74,10 +74,10 @@ static CScriptArray* BorderImage_GetTags_void(BorderImage* ptr)
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void BorderImage_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(BorderImage* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void BorderImage_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(BorderImage* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // BoundingBox::BoundingBox(const BoundingBox& box) noexcept | File: ../Math/BoundingBox.h
@@ -163,10 +163,10 @@ static CScriptArray* Button_GetTags_void(Button* ptr)
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Button_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Button* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void Button_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Button* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // explicit Batch::Batch(const SourceBatch& rhs) | File: ../Graphics/Batch.h

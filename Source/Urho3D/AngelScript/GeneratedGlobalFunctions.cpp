@@ -23,10 +23,10 @@ static CScriptArray* ParseArguments_String_bool(const String& cmdLine, bool skip
 }
 
 // bool WriteDrawablesToOBJ(const PODVector<Drawable*>& drawables, File* outputFile, bool asZUp, bool asRightHanded, bool writeLightmapUV=false) | File: ../Graphics/Drawable.h
-static bool WriteDrawablesToOBJ_PODVectorDrawable_File_bool_bool_bool(CScriptArray* drawables, File* outputFile, bool asZUp, bool asRightHanded, bool writeLightmapUV)
+static bool WriteDrawablesToOBJ_PODVectorDrawable_File_bool_bool_bool(CScriptArray* drawables_conv, File* outputFile, bool asZUp, bool asRightHanded, bool writeLightmapUV)
 {
-    PODVector<Drawable*> drawables_conv = ArrayToPODVector<Drawable*>(drawables);
-    bool result = WriteDrawablesToOBJ(drawables_conv, outputFile, asZUp, asRightHanded, writeLightmapUV);
+    PODVector<Drawable*> drawables = ArrayToPODVector<Drawable*>(drawables_conv);
+    bool result = WriteDrawablesToOBJ(drawables, outputFile, asZUp, asRightHanded, writeLightmapUV);
     return result;
 }
 

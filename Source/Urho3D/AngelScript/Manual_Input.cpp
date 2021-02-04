@@ -31,7 +31,6 @@ namespace Urho3D
 // This function is called before ASRegisterGenerated()
 void ASRegisterManualFirst_Input(asIScriptEngine* engine)
 {
-    engine->RegisterTypedef("SDL_JoystickID", "int");
 }
 
 // ========================================================================================

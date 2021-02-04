@@ -75,8 +75,8 @@ namespace CSBindingGenerator
 int main(int argc, char* argv[])
 {
 #ifdef DEVELOP
-    string inputDir = R"(G:/MyGames/Urho3DFork2_TestOrg/Build/Source/Tools/BindingGenerator/generated/xml)";
-    string outputBasePath = R"(G:/MyGames/Urho3DFork2_TestOrg/Urho3D)";
+    string inputDir = R"(G:/MyGames/Urho3DCurrent/Build/Source/Tools/BindingGenerator/generated/xml)";
+    string outputBasePath = R"(G:/MyGames/Urho3DCurrent/Urho3D)";
 #else
     if (argc != 3)
         return -1;

@@ -33,9 +33,38 @@ using namespace std;
 namespace ASBindingGenerator
 {
 
+enum class TypeUsage
+{
+    FunctionParameter = 0,
+    FunctionReturn,
+    ClassStaticVariable,
+    ClassVariable,
+};
+
+struct ConvertedVariable
+{
+    string asDeclaration_;
+
+    string newCppDeclaration_;
+    string glue_;
+
+    bool NeedWrapper() const { return !glue_.empty() || !newCppDeclaration_.empty(); }
+};
+
+enum class VariableUsage
+{
+    FunctionParameter = 0,
+    FunctionReturn,
+    ClassStaticVariable,
+    ClassVariable,
+};
+
+ConvertedVariable CppVariableToAS(const TypeAnalyzer& type, const string& name, VariableUsage usage, string defaultValue = "");
+
+string CppTypeToAS(const TypeAnalyzer& type, TypeUsage typeUsage);
+
 shared_ptr<EnumAnalyzer> FindEnum(const string& name);
-string CppFundamentalTypeToAS(const string& cppType);
-string CppTypeToAS(const TypeAnalyzer& type, bool returnType);
+string CppPrimitiveTypeToAS(const string& cppType);
 string CppValueToAS(const string& cppValue);
 
 class Exception : public exception
@@ -47,45 +76,18 @@ public:
     }
 };
 
-struct FuncParamConv
-{
-    bool success_ = false;
-    string errorMessage_ = "TODO";
-    string asDecl_ = "TODO";
-    string cppType_ = "TODO";
-    string inputVarName_ = "TODO";
-    string convertedVarName_ = "TODO";
-    string glue_ = "";
-
-    bool NeedWrapper() const { return !glue_.empty(); }
-};
-
-shared_ptr<FuncParamConv> CppFunctionParamToAS(const ParamAnalyzer& paramAnalyzer);
-
-struct FuncReturnTypeConv
-{
-    bool success_ = false;
-    bool needWrapper_ = false;
-    string errorMessage_ = "TODO";
-    string asReturnType_ = "TODO";
-    string glueReturnType_ = "TODO";
-    string glueReturn_ = "TODO";
-};
-
 bool IsKnownCppType(const string& name);
 
 shared_ptr<ClassAnalyzer> FindClassByName(const string& name);
 shared_ptr<ClassAnalyzer> FindClassByID(const string& name);
 
-shared_ptr<FuncReturnTypeConv> CppFunctionReturnTypeToAS(const TypeAnalyzer& typeAnalyzer);
-
 string GenerateWrapperName(const GlobalFunctionAnalyzer& functionAnalyzer);
 string GenerateWrapperName(const ClassStaticFunctionAnalyzer& functionAnalyzer);
 string GenerateWrapperName(const ClassFunctionAnalyzer& functionAnalyzer, bool templateVersion);
 
-string GenerateWrapper(const GlobalFunctionAnalyzer& functionAnalyzer, vector<shared_ptr<FuncParamConv> >& convertedParams, shared_ptr<FuncReturnTypeConv> convertedReturn);
-string GenerateWrapper(const ClassStaticFunctionAnalyzer& functionAnalyzer, vector<shared_ptr<FuncParamConv> >& convertedParams, shared_ptr<FuncReturnTypeConv> convertedReturn);
-string GenerateWrapper(const ClassFunctionAnalyzer& functionAnalyzer, bool templateVersion, vector<shared_ptr<FuncParamConv> >& convertedParams, shared_ptr<FuncReturnTypeConv> convertedReturn);
+string GenerateWrapper(const GlobalFunctionAnalyzer& functionAnalyzer, const vector<ConvertedVariable>& convertedParams, const ConvertedVariable& convertedReturn);
+string GenerateWrapper(const ClassStaticFunctionAnalyzer& functionAnalyzer, const vector<ConvertedVariable>& convertedParams, const ConvertedVariable& convertedReturn);
+string GenerateWrapper(const ClassFunctionAnalyzer& functionAnalyzer, bool templateVersion, const vector<ConvertedVariable>& convertedParams, const ConvertedVariable& convertedReturn);
 
 string Generate_asFUNCTIONPR(const GlobalFunctionAnalyzer& functionAnalyzer);
 string Generate_asFUNCTIONPR(const ClassStaticFunctionAnalyzer& functionAnalyzer);

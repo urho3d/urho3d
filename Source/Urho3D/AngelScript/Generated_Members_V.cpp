@@ -13,10 +13,10 @@ void FakeAddRef(void* ptr);
 void FakeReleaseRef(void* ptr);
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void ValueAnimation_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ValueAnimation* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void ValueAnimation_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ValueAnimation* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // explicit ValueAnimation::ValueAnimation(Context* context) | File: ../Scene/ValueAnimation.h
@@ -310,10 +310,10 @@ static void VectorBuffer_VectorBuffer_Deserializer_unsigned(VectorBuffer* ptr, D
 }
 
 // static unsigned VertexBuffer::GetElementOffset(const PODVector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index=0) | File: ../Graphics/VertexBuffer.h
-static unsigned VertexBuffer_GetElementOffset_PODVectorVertexElement_VertexElementType_VertexElementSemantic_unsignedchar(CScriptArray* elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index)
+static unsigned VertexBuffer_GetElementOffset_PODVectorVertexElement_VertexElementType_VertexElementSemantic_unsignedchar(CScriptArray* elements_conv, VertexElementType type, VertexElementSemantic semantic, unsigned char index)
 {
-    PODVector<VertexElement> elements_conv = ArrayToPODVector<VertexElement>(elements);
-    unsigned result = VertexBuffer::GetElementOffset(elements_conv, type, semantic, index);
+    PODVector<VertexElement> elements = ArrayToPODVector<VertexElement>(elements_conv);
+    unsigned result = VertexBuffer::GetElementOffset(elements, type, semantic, index);
     return result;
 }
 
@@ -332,34 +332,34 @@ static CScriptArray* VertexBuffer_GetElements_unsigned(unsigned elementMask)
 }
 
 // static unsigned VertexBuffer::GetVertexSize(const PODVector<VertexElement>& elements) | File: ../Graphics/VertexBuffer.h
-static unsigned VertexBuffer_GetVertexSize_PODVectorVertexElement(CScriptArray* elements)
+static unsigned VertexBuffer_GetVertexSize_PODVectorVertexElement(CScriptArray* elements_conv)
 {
-    PODVector<VertexElement> elements_conv = ArrayToPODVector<VertexElement>(elements);
-    unsigned result = VertexBuffer::GetVertexSize(elements_conv);
+    PODVector<VertexElement> elements = ArrayToPODVector<VertexElement>(elements_conv);
+    unsigned result = VertexBuffer::GetVertexSize(elements);
     return result;
 }
 
 // static bool VertexBuffer::HasElement(const PODVector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index=0) | File: ../Graphics/VertexBuffer.h
-static bool VertexBuffer_HasElement_PODVectorVertexElement_VertexElementType_VertexElementSemantic_unsignedchar(CScriptArray* elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index)
+static bool VertexBuffer_HasElement_PODVectorVertexElement_VertexElementType_VertexElementSemantic_unsignedchar(CScriptArray* elements_conv, VertexElementType type, VertexElementSemantic semantic, unsigned char index)
 {
-    PODVector<VertexElement> elements_conv = ArrayToPODVector<VertexElement>(elements);
-    bool result = VertexBuffer::HasElement(elements_conv, type, semantic, index);
+    PODVector<VertexElement> elements = ArrayToPODVector<VertexElement>(elements_conv);
+    bool result = VertexBuffer::HasElement(elements, type, semantic, index);
     return result;
 }
 
 // bool VertexBuffer::SetSize(unsigned vertexCount, const PODVector<VertexElement>& elements, bool dynamic=false) | File: ../Graphics/VertexBuffer.h
-static bool VertexBuffer_SetSize_unsigned_PODVectorVertexElement_bool(VertexBuffer* ptr, unsigned vertexCount, CScriptArray* elements, bool dynamic)
+static bool VertexBuffer_SetSize_unsigned_PODVectorVertexElement_bool(VertexBuffer* ptr, unsigned vertexCount, CScriptArray* elements_conv, bool dynamic)
 {
-    PODVector<VertexElement> elements_conv = ArrayToPODVector<VertexElement>(elements);
-    bool result = ptr->SetSize(vertexCount, elements_conv, dynamic);
+    PODVector<VertexElement> elements = ArrayToPODVector<VertexElement>(elements_conv);
+    bool result = ptr->SetSize(vertexCount, elements, dynamic);
     return result;
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void VertexBuffer_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(VertexBuffer* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void VertexBuffer_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(VertexBuffer* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // explicit VertexBuffer::VertexBuffer(Context* context, bool forceHeadless=false) | File: ../Graphics/VertexBuffer.h
@@ -390,10 +390,10 @@ static CScriptArray* View_GetOccluders_void(View* ptr)
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void View_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(View* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void View_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(View* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // explicit View::View(Context* context) | File: ../Graphics/View.h
@@ -431,10 +431,10 @@ static CScriptArray* View3D_GetTags_void(View3D* ptr)
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void View3D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(View3D* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void View3D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(View3D* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // explicit View3D::View3D(Context* context) | File: ../UI/View3D.h
@@ -444,10 +444,10 @@ static View3D* View3D_View3D_Context()
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Viewport_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Viewport* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void Viewport_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Viewport* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // explicit Viewport::Viewport(Context* context) | File: ../Graphics/Viewport.h

@@ -34,9 +34,8 @@ namespace ASBindingGenerator
 
 // https://www.angelcode.com/angelscript/sdk/docs/manual/doc_datatypes_primitives.html
 // https://en.cppreference.com/w/cpp/language/types
-string CppFundamentalTypeToAS(const string& cppType)
+string CppPrimitiveTypeToAS(const string& cppType)
 {
-    // AngelScript itself detect width of bool type (look AS_SIZEOF_BOOL define)
     if (cppType == "bool")
         return "bool";
 
@@ -70,7 +69,8 @@ string CppFundamentalTypeToAS(const string& cppType)
     if (cppType == "double")
         return "double";
 
-    // Types below have different width on different systems and are registered in Manual.cpp
+    // Types below are registered in Manual.cpp
+    
     if (cppType == "long")
         return "long";
 
@@ -80,7 +80,10 @@ string CppFundamentalTypeToAS(const string& cppType)
     if (cppType == "size_t")
         return "size_t";
 
-    throw Exception(cppType + " not a fundamental type");
+    if (cppType == "SDL_JoystickID")
+        return "SDL_JoystickID";
+
+    throw Exception(cppType + " not a primitive type");
 }
 
 shared_ptr<EnumAnalyzer> FindEnum(const string& name)
@@ -179,14 +182,333 @@ shared_ptr<ClassAnalyzer> FindClassByID(const string& id)
     return shared_ptr<ClassAnalyzer>();
 }
 
-string CppTypeToAS(const TypeAnalyzer& type, bool returnType)
+// Variable name can be empty for function return type
+ConvertedVariable CppVariableToAS(const TypeAnalyzer& type, const string& name, VariableUsage usage, string defaultValue)
+{
+    ConvertedVariable result;
+
+    if (type.IsRvalueReference() || type.IsDoublePointer() || type.IsRefToPointer())
+        throw Exception("Error: type \"" + type.ToString() + "\" can not automatically bind");
+
+    string cppTypeName = type.GetNameWithTemplateParams();
+
+    if (cppTypeName == "void" && !type.IsPointer() && usage == VariableUsage::FunctionReturn)
+    {
+        result.asDeclaration_ = "void";
+        return result;
+    }
+
+    // Works with both Vector<String> and Vector<String>&
+    if ((cppTypeName == "Vector<String>" || cppTypeName == "StringVector") && !type.IsPointer() && usage == VariableUsage::FunctionReturn)
+    {
+        result.asDeclaration_ = "Array<String>@";
+        result.newCppDeclaration_ = "CScriptArray*";
+        result.glue_ = "return VectorToArray<String>(result, \"Array<String>\");\n";
+        return result;
+    }
+
+    smatch match;
+    regex_match(cppTypeName, match, regex("SharedPtr<(\\w+)>"));
+    if (match.size() == 2 && usage == VariableUsage::FunctionReturn)
+    {
+        string cppSubtypeName = match[1].str();
+
+        string asSubtypeName;
+
+        try
+        {
+            asSubtypeName = CppPrimitiveTypeToAS(cppSubtypeName);
+        }
+        catch (...)
+        {
+            asSubtypeName = cppSubtypeName;
+        }
+
+        if (cppSubtypeName == "WorkItem") // TODO autodetect
+            throw Exception("Error: type \"" + type.ToString() + "\" can not automatically bind");
+
+        result.asDeclaration_ = asSubtypeName + "@+";
+        result.newCppDeclaration_ = cppSubtypeName + "*";
+        result.glue_ = "return result.Detach();\n";
+        return result;
+    }
+
+    regex_match(cppTypeName, match, regex("Vector<SharedPtr<(\\w+)>>"));
+    if (match.size() == 2 && usage == VariableUsage::FunctionReturn)
+    {
+        string cppSubtypeName = match[1].str();
+
+        string asSubtypeName;
+
+        try
+        {
+            asSubtypeName = CppPrimitiveTypeToAS(cppSubtypeName);
+        }
+        catch (...)
+        {
+            asSubtypeName = cppSubtypeName;
+        }
+
+        result.asDeclaration_ = "Array<" + asSubtypeName + "@>@";
+        result.newCppDeclaration_ = "CScriptArray*";
+
+        // Which variant is correct/better?
+#if 0
+        result->glueResult_ = "return VectorToArray<SharedPtr<" + cppTypeName + "> >(result, \"Array<" + asTypeName + "@>@\");\n";
+#else
+        result.glue_ = "return VectorToHandleArray(result, \"Array<" + asSubtypeName + "@>\");\n";
+#endif
+        return result;
+    }
+
+    regex_match(cppTypeName, match, regex("PODVector<(\\w+)\\*>"));
+    if (match.size() == 2 && usage == VariableUsage::FunctionReturn)
+    {
+        string cppSubtypeName = match[1].str();
+
+        string asSubtypeName;
+
+        try
+        {
+            asSubtypeName = CppPrimitiveTypeToAS(cppSubtypeName);
+        }
+        catch (...)
+        {
+            asSubtypeName = cppSubtypeName;
+        }
+
+        result.asDeclaration_ = "Array<" + asSubtypeName + "@>@";
+        result.newCppDeclaration_ = "CScriptArray*";
+        result.glue_ = "return VectorToHandleArray(result, \"Array<" + asSubtypeName + "@>\");\n";
+        return result;
+    }
+
+    regex_match(cppTypeName, match, regex("PODVector<(\\w+)>"));
+    if (match.size() == 2 && type.IsConst() == type.IsReference() && usage == VariableUsage::FunctionReturn)
+    {
+        string cppSubtypeName = match[1].str();
+
+        string asSubtypeName;
+
+        try
+        {
+            asSubtypeName = CppPrimitiveTypeToAS(cppSubtypeName);
+        }
+        catch (...)
+        {
+            asSubtypeName = cppSubtypeName;
+        }
+
+        result.asDeclaration_ = "Array<" + asSubtypeName + ">@";
+        result.newCppDeclaration_ = "CScriptArray*";
+        result.glue_ = "return VectorToArray(result, \"Array<" + asSubtypeName + ">\");\n";
+        return result;
+    }
+
+    // =============================================================================
+    
+    if (cppTypeName == "Context" && usage == VariableUsage::FunctionParameter)
+        throw Exception("Context can be used as firs parameter of constructors only");
+
+    if (cppTypeName == "Vector<String>" && type.IsConst() && type.IsReference() && usage == VariableUsage::FunctionParameter)
+    {
+        string newCppVarName = name + "_conv";
+        //result->asDecl_ = "String[]&";
+        result.asDeclaration_ = "Array<String>@+";
+        result.newCppDeclaration_ = "CScriptArray* " + newCppVarName;
+        result.glue_ = "    " + cppTypeName + " " + name + " = ArrayToVector<String>(" + newCppVarName + ");\n";
+
+        if (!defaultValue.empty())
+        {
+            assert(defaultValue == "Vector< String >()");
+            //result->asDecl_ += " = Array<String>()";
+            result.asDeclaration_ += " = null";
+        }
+
+        return result;
+    }
+
+    regex_match(cppTypeName, match, regex("PODVector<(\\w+)>"));
+    if (match.size() == 2 && type.IsConst() && type.IsReference() && usage == VariableUsage::FunctionParameter)
+    {
+        string cppSubtypeName = match[1].str();
+
+        string asSubtypeName;
+
+        try
+        {
+            asSubtypeName = CppPrimitiveTypeToAS(cppSubtypeName);
+        }
+        catch (...)
+        {
+            asSubtypeName = cppSubtypeName;
+        }
+
+        string newCppVarName = name + "_conv";
+        result.asDeclaration_ = "Array<" + asSubtypeName + ">@+";
+        result.newCppDeclaration_ = "CScriptArray* " + newCppVarName;
+        result.glue_ = "    " + cppTypeName + " " + name + " = ArrayToPODVector<" + cppSubtypeName + ">(" + newCppVarName + ");\n";
+
+        assert(defaultValue.empty()); // TODO: make
+
+        return result;
+    }
+
+    regex_match(cppTypeName, match, regex("PODVector<(\\w+)\\*>"));
+    // TODO check \\w is refcounted
+    if (match.size() == 2 && type.IsConst() && type.IsReference() && usage == VariableUsage::FunctionParameter)
+    {
+        string cppSubtypeName = match[1].str();
+
+        string asSubtypeName;
+
+        try
+        {
+            asSubtypeName = CppPrimitiveTypeToAS(cppSubtypeName);
+        }
+        catch (...)
+        {
+            asSubtypeName = cppSubtypeName;
+        }
+
+        string newCppVarName = name + "_conv";
+        result.asDeclaration_ = "Array<" + asSubtypeName + "@>@";
+        result.newCppDeclaration_ = "CScriptArray* " + newCppVarName;
+        result.glue_ = "    " + cppTypeName + " " + name + " = ArrayToPODVector<" + cppSubtypeName + "*>(" + newCppVarName + ");\n";
+
+        assert(defaultValue.empty()); // TODO: make
+
+        return result;
+    }
+
+    regex_match(cppTypeName, match, regex("Vector<SharedPtr<(\\w+)>>"));
+    if (match.size() == 2 && type.IsConst() && type.IsReference() && usage == VariableUsage::FunctionParameter)
+    {
+        string cppSubtypeName = match[1].str();
+
+        string asSubtypeName;
+
+        try
+        {
+            asSubtypeName = CppPrimitiveTypeToAS(cppSubtypeName);
+        }
+        catch (...)
+        {
+            asSubtypeName = cppSubtypeName;
+        }
+
+        if (cppSubtypeName == "WorkItem") // TODO autodetect
+            throw Exception("Error: type \"" + type.ToString() + "\" can not automatically bind");
+
+        string newCppVarName = name + "_conv";
+        result.asDeclaration_ = "Array<" + asSubtypeName + "@>@+";
+        result.newCppDeclaration_ = "CScriptArray* " + newCppVarName;
+        result.glue_ = "    " + cppTypeName + " " + name + " = HandleArrayToVector<" + cppSubtypeName + ">(" + newCppVarName + ");\n";
+        
+        assert(defaultValue.empty()); // TODO: make
+
+        return result;
+    }
+
+    // =============================================================================
+
+    if (cppTypeName == "Context" && usage == VariableUsage::FunctionReturn)
+        throw Exception("Error: type \"" + type.ToString() + "\" can not be returned");
+
+    if (!IsKnownCppType(cppTypeName))
+        throw Exception("Error: type \"" + type.ToString() + "\" can not automatically bind");
+
+    shared_ptr<ClassAnalyzer> analyzer = FindClassByName(cppTypeName);
+    if (analyzer && analyzer->IsInternal())
+        throw Exception("Error: type \"" + type.ToString() + "\" can not automatically bind bacause internal");
+
+    if (analyzer && Contains(analyzer->GetComment(), "NO_BIND"))
+        throw Exception("Error: type \"" + cppTypeName + "\" can not automatically bind bacause have @nobind mark");
+
+    // analyzer can be null for simple types (int, float) or if type "using VariantVector = Vector<Variant>"
+    // TODO add to type info "IsUsing"
+    // TODO add description to TypeAnalyzer::GetClass()
+
+    if (IsUsing(cppTypeName) && cppTypeName != "VariantMap")
+        throw Exception("Using \"" + cppTypeName + "\" can not automatically bind");
+
+    string asTypeName;
+
+    try
+    {
+        asTypeName = CppPrimitiveTypeToAS(cppTypeName);
+    }
+    catch (...)
+    {
+        asTypeName = cppTypeName;
+    }
+
+    if (asTypeName == "void" && type.IsPointer())
+        throw Exception("Error: type \"void*\" can not automatically bind");
+
+    if (asTypeName.find('<') != string::npos)
+        throw Exception("Error: type \"" + type.ToString() + "\" can not automatically bind");
+
+    if (Contains(type.ToString(), "::"))
+        throw Exception("Error: type \"" + type.ToString() + "\" can not automatically bind bacause internal");
+
+    if (type.IsConst() && type.IsReference() && usage == VariableUsage::FunctionParameter)
+    {
+        result.asDeclaration_ = "const " + asTypeName + "&in";
+
+        if (!defaultValue.empty())
+        {
+            defaultValue = CppValueToAS(defaultValue);
+            defaultValue = ReplaceAll(defaultValue, "\"", "\\\"");
+            result.asDeclaration_ += " = " + defaultValue;
+        }
+
+        //if (!name.empty())
+        //    result.asDeclaration_ += result.asDeclaration_ + " " + name;
+        
+        return result;
+    }
+
+    result.asDeclaration_ = asTypeName;
+
+    if (type.IsReference())
+    {
+        result.asDeclaration_ += "&";
+    }
+    else if (type.IsPointer())
+    {
+        shared_ptr<ClassAnalyzer> analyzer = FindClassByName(cppTypeName);
+
+        if (analyzer && (analyzer->IsRefCounted() || Contains(analyzer->GetComment(), "FAKE_REF")))
+            result.asDeclaration_ += "@+";
+        else
+            throw Exception("Error: type \"" + type.ToString() + "\" can not automatically bind");
+    }
+
+    if (usage == VariableUsage::FunctionReturn && type.IsConst() && !type.IsPointer())
+        result.asDeclaration_ = "const " + result.asDeclaration_;
+
+    //if (!name.empty())
+    //    result.asDeclaration_ += result.asDeclaration_ + " " + name;
+
+    if (!defaultValue.empty())
+    {
+        defaultValue = CppValueToAS(defaultValue);
+        defaultValue = ReplaceAll(defaultValue, "\"", "\\\"");
+        result.asDeclaration_ += " = " + defaultValue;
+    }
+
+    return result;
+}
+
+string CppTypeToAS(const TypeAnalyzer& type, TypeUsage typeUsage)
 {
     if (type.IsRvalueReference() || type.IsDoublePointer() || type.IsRefToPointer())
         throw Exception("Error: type \"" + type.ToString() + "\" can not automatically bind");
 
     string cppTypeName = type.GetNameWithTemplateParams();
 
-    if (cppTypeName == "Context" && returnType)
+    if (cppTypeName == "Context" && typeUsage == TypeUsage::FunctionReturn)
         throw Exception("Error: type \"" + type.ToString() + "\" can not be returned");
 
     if (!IsKnownCppType(type.GetNameWithTemplateParams()))
@@ -210,7 +532,7 @@ string CppTypeToAS(const TypeAnalyzer& type, bool returnType)
     
     try
     {
-        asTypeName = CppFundamentalTypeToAS(cppTypeName);
+        asTypeName = CppPrimitiveTypeToAS(cppTypeName);
     }
     catch (...)
     {
@@ -226,7 +548,7 @@ string CppTypeToAS(const TypeAnalyzer& type, bool returnType)
     if (Contains(type.ToString(), "::"))
         throw Exception("Error: type \"" + type.ToString() + "\" can not automatically bind bacause internal");
 
-    if (type.IsConst() && type.IsReference() && !returnType)
+    if (type.IsConst() && type.IsReference() && typeUsage == TypeUsage::FunctionParameter)
         return "const " + asTypeName + "&in";
 
     string result = asTypeName;
@@ -245,7 +567,7 @@ string CppTypeToAS(const TypeAnalyzer& type, bool returnType)
             throw Exception("Error: type \"" + type.ToString() + "\" can not automatically bind");
     }
 
-    if (returnType && type.IsConst() && !type.IsPointer())
+    if (typeUsage == TypeUsage::FunctionReturn && type.IsConst() && !type.IsPointer())
         result = "const " + result;
 
     return result;
@@ -263,321 +585,6 @@ string CppValueToAS(const string& cppValue)
         return "String::NPOS";
 
     return cppValue;
-}
-
-// =================================================================================
-
-shared_ptr<FuncParamConv> CppFunctionParamToAS(const ParamAnalyzer& paramAnalyzer)
-{
-    shared_ptr<FuncParamConv> result = make_shared<FuncParamConv>();
-
-    TypeAnalyzer typeAnalyzer = paramAnalyzer.GetType();
-    string cppTypeName = typeAnalyzer.GetNameWithTemplateParams();
-
-    if (cppTypeName == "Context")
-    {
-        result->errorMessage_ = "Context can be used as firs parameter of constructors only";
-        return result;
-    }
-
-    if (cppTypeName == "Vector<String>" && typeAnalyzer.IsConst() && typeAnalyzer.IsReference())
-    {
-        result->success_ = true;
-        result->inputVarName_ = paramAnalyzer.GetDeclname();
-        result->convertedVarName_ = result->inputVarName_ + "_conv";
-        result->glue_ = "    Vector<String> " + result->convertedVarName_ + " = ArrayToVector<String>(" + result->inputVarName_ + ");\n";
-        result->cppType_ = "CScriptArray*";
-        //result->asDecl_ = "String[]&";
-        result->asDecl_ = "Array<String>@+";
-
-        string defval = paramAnalyzer.GetDefval();
-        if (!defval.empty())
-        {
-            assert(defval == "Vector< String >()");
-            //result->asDecl_ += " = Array<String>()";
-            result->asDecl_ += " = null";
-        }
-
-        return result;
-    }
-
-    smatch match;
-    regex_match(cppTypeName, match, regex("PODVector<(\\w+)>"));
-    if (match.size() == 2 && typeAnalyzer.IsConst() && typeAnalyzer.IsReference())
-    {
-        string cppTypeName = match[1].str();
-        
-        string asTypeName;
-        
-        try
-        {
-            asTypeName = CppFundamentalTypeToAS(cppTypeName);
-        }
-        catch (...)
-        {
-            asTypeName = cppTypeName;
-        }
-
-        result->success_ = true;
-        result->inputVarName_ = paramAnalyzer.GetDeclname();
-        result->convertedVarName_ = result->inputVarName_ + "_conv";
-        result->glue_ = "    PODVector<" + cppTypeName + "> " + result->convertedVarName_ + " = ArrayToPODVector<" + cppTypeName + ">(" + result->inputVarName_ + ");\n";
-        result->cppType_ = "CScriptArray*";
-        result->asDecl_ = "Array<" + asTypeName + ">@+";
-
-        string defval = paramAnalyzer.GetDefval();
-        assert(defval.empty()); // TODO: make
-
-        return result;
-    }
-
-    regex_match(cppTypeName, match, regex("PODVector<(\\w+)\\*>"));
-    // TODO check \\w is refcounted
-    if (match.size() == 2 && typeAnalyzer.IsConst() && typeAnalyzer.IsReference())
-    {
-        string cppTypeName = match[1].str();
-        
-        string asTypeName;
-
-        try
-        {
-            asTypeName = CppFundamentalTypeToAS(cppTypeName);
-        }
-        catch (...)
-        {
-            asTypeName = cppTypeName;
-        }
-
-        result->success_ = true;
-        result->inputVarName_ = paramAnalyzer.GetDeclname();
-        result->convertedVarName_ = result->inputVarName_ + "_conv";
-        result->glue_ = "    PODVector<" + cppTypeName + "*> " + result->convertedVarName_ + " = ArrayToPODVector<" + cppTypeName + "*>(" + result->inputVarName_ + ");\n";
-        result->cppType_ = "CScriptArray*";
-        result->asDecl_ = "Array<" + asTypeName + "@>@";
-
-        string defval = paramAnalyzer.GetDefval();
-        assert(defval.empty()); // TODO: make
-
-        return result;
-    }
-
-    regex_match(cppTypeName, match, regex("Vector<SharedPtr<(\\w+)>>"));
-    if (match.size() == 2 && typeAnalyzer.IsConst() && typeAnalyzer.IsReference())
-    {
-        string cppTypeName = match[1].str();
-        
-        string asTypeName;
-
-        try
-        {
-            asTypeName = CppFundamentalTypeToAS(cppTypeName);
-        }
-        catch (...)
-        {
-            asTypeName = cppTypeName;
-        }
-
-        if (cppTypeName == "WorkItem") // TODO autodetect
-        {
-            result->errorMessage_ = "TODO";
-            return result;
-        }
-
-        result->success_ = true;
-        result->inputVarName_ = paramAnalyzer.GetDeclname();
-        result->convertedVarName_ = result->inputVarName_ + "_conv";
-        result->glue_ = "    Vector<SharedPtr<" + cppTypeName + "> > " + result->convertedVarName_ + " = HandleArrayToVector<" + cppTypeName + ">(" + result->inputVarName_ + ");\n";
-        result->cppType_ = "CScriptArray*";
-        result->asDecl_ = "Array<" + asTypeName + "@>@+";
-
-        string defval = paramAnalyzer.GetDefval();
-        assert(defval.empty()); // TODO: make
-
-        return result;
-    }
-
-    try
-    {
-        string asType = CppTypeToAS(typeAnalyzer, false);
-        result->asDecl_ = asType;
-    }
-    catch (const Exception& e)
-    {
-        result->errorMessage_ = e.what();
-        return result;
-    }
-
-    string defval = paramAnalyzer.GetDefval();
-    if (!defval.empty())
-    {
-        defval = CppValueToAS(defval);
-        defval = ReplaceAll(defval, "\"", "\\\"");
-        result->asDecl_ += " = " + defval;
-    }
-
-    result->success_ = true;
-    result->cppType_ = typeAnalyzer.ToString();
-    result->inputVarName_ = paramAnalyzer.GetDeclname();
-    result->convertedVarName_ = result->inputVarName_;
-    return result;
-}
-
-shared_ptr<FuncReturnTypeConv> CppFunctionReturnTypeToAS(const TypeAnalyzer& typeAnalyzer)
-{
-    shared_ptr<FuncReturnTypeConv> result = make_shared<FuncReturnTypeConv>();
-
-    string cppTypeName = typeAnalyzer.GetNameWithTemplateParams();
-
-    if (cppTypeName == "void" && !typeAnalyzer.IsPointer())
-    {
-        result->success_ = true;
-        result->asReturnType_ = "void";
-        result->glueReturnType_ = "void";
-        result->glueReturn_ = "";
-        return result;
-    }
-    
-    if (cppTypeName == "Context")
-    {
-        result->errorMessage_ = "Error: type \"" + typeAnalyzer.ToString() + "\" can not be returned";
-        return result;
-    }
-
-    // Works with both Vector<String> and Vector<String>&
-    if ((cppTypeName == "Vector<String>" || cppTypeName == "StringVector") && !typeAnalyzer.IsPointer())
-    {
-        result->success_ = true;
-        result->needWrapper_ = true;
-        result->asReturnType_ = "Array<String>@";
-        result->glueReturnType_ = "CScriptArray*";
-        result->glueReturn_ = "return VectorToArray<String>(result, \"Array<String>\");\n";
-        return result;
-    }
-
-    smatch match;
-    regex_match(cppTypeName, match, regex("SharedPtr<(\\w+)>"));
-    if (match.size() == 2)
-    {
-        string cppTypeName = match[1].str();
-        
-        string asTypeName;
-
-        try
-        {
-            asTypeName = CppFundamentalTypeToAS(cppTypeName);
-        }
-        catch (...)
-        {
-            asTypeName = cppTypeName;
-        }
-
-        if (cppTypeName == "WorkItem") // TODO autodetect
-        {
-            result->errorMessage_ = "TODO";
-            return result;
-        }
-
-        result->success_ = true;
-        result->needWrapper_ = true;
-        result->asReturnType_ = asTypeName + "@+";
-        result->glueReturnType_ = cppTypeName + "*";
-        result->glueReturn_ = "return result.Detach();\n";
-        return result;
-    }
-
-    regex_match(cppTypeName, match, regex("Vector<SharedPtr<(\\w+)>>"));
-    if (match.size() == 2)
-    {
-        string cppTypeName = match[1].str();
-        
-        string asTypeName;
-
-        try
-        {
-            asTypeName = CppFundamentalTypeToAS(cppTypeName);
-        }
-        catch (...)
-        {
-            asTypeName = cppTypeName;
-        }
-
-        result->success_ = true;
-        result->needWrapper_ = true;
-        result->asReturnType_ = "Array<" + asTypeName + "@>@";
-        result->glueReturnType_ = "CScriptArray*";
-
-        // Which variant is correct/better?
-#if 0
-        result->glueResult_ = "return VectorToArray<SharedPtr<" + cppTypeName + "> >(result, \"Array<" + cppTypeName + "@>@\");\n";
-#else
-        result->glueReturn_ = "return VectorToHandleArray(result, \"Array<" + cppTypeName + "@>\");\n";
-#endif
-        return result;
-    }
-
-    regex_match(cppTypeName, match, regex("PODVector<(\\w+)\\*>"));
-    if (match.size() == 2)
-    {
-        string cppTypeName = match[1].str();
-        
-        string asTypeName;
-
-        try
-        {
-            asTypeName = CppFundamentalTypeToAS(cppTypeName);
-        }
-        catch (...)
-        {
-            asTypeName = cppTypeName;
-        }
-
-        result->success_ = true;
-        result->needWrapper_ = true;
-        result->asReturnType_ = "Array<" + asTypeName + "@>@";
-        result->glueReturnType_ = "CScriptArray*";
-        result->glueReturn_ = "return VectorToHandleArray(result, \"Array<" + cppTypeName + "@>\");\n";
-        return result;
-    }
-
-    regex_match(cppTypeName, match, regex("PODVector<(\\w+)>"));
-    if (match.size() == 2 && (typeAnalyzer.IsConst() == typeAnalyzer.IsReference()))
-    {
-        string cppTypeName = match[1].str();
-        
-        string asTypeName;
-
-        try
-        {
-            asTypeName = CppFundamentalTypeToAS(cppTypeName);
-        }
-        catch (...)
-        {
-            asTypeName = cppTypeName;
-        }
-
-        result->success_ = true;
-        result->needWrapper_ = true;
-        result->asReturnType_ = "Array<" + asTypeName + ">@";
-        result->glueReturnType_ = "CScriptArray*";
-        result->glueReturn_ = "return VectorToArray(result, \"Array<" + asTypeName + ">\");\n";
-        return result;
-    }
-
-    try
-    {
-        string asType = CppTypeToAS(typeAnalyzer, true);
-        result->asReturnType_ = asType;
-    }
-    catch (const Exception& e)
-    {
-        result->errorMessage_ = e.what();
-        return result;
-    }
-
-    result->success_ = true;
-    result->glueReturn_ = "return result;\n";
-    result->glueReturnType_ = typeAnalyzer.ToString();
-    return result;
 }
 
 // =================================================================================
@@ -629,18 +636,34 @@ string GenerateWrapperName(const ClassFunctionAnalyzer& functionAnalyzer, bool t
 
 // =================================================================================
 
-string GenerateWrapper(const GlobalFunctionAnalyzer& functionAnalyzer, vector<shared_ptr<FuncParamConv> >& convertedParams, shared_ptr<FuncReturnTypeConv> convertedReturn)
+string GenerateWrapper(const GlobalFunctionAnalyzer& functionAnalyzer, const vector<ConvertedVariable>& convertedParams, const ConvertedVariable& convertedReturn)
 {
     string result;
+
+    string glueReturnType;
+
+    if (!convertedReturn.newCppDeclaration_.empty())
+        glueReturnType = convertedReturn.newCppDeclaration_;
+    else
+        glueReturnType = functionAnalyzer.GetReturnType().ToString();
+
+    vector<ParamAnalyzer> params = functionAnalyzer.GetParams();
     
-    result = "static " + convertedReturn->glueReturnType_ + " " + GenerateWrapperName(functionAnalyzer) + "(";
+    result = "static " + glueReturnType + " " + GenerateWrapperName(functionAnalyzer) + "(";
 
     for (size_t i = 0; i < convertedParams.size(); i++)
     {
         if (i != 0)
             result += ", ";
 
-        result += convertedParams[i]->cppType_ + " " + convertedParams[i]->inputVarName_;
+        string paramDecl;
+
+        if (!convertedParams[i].newCppDeclaration_.empty())
+            paramDecl = convertedParams[i].newCppDeclaration_;
+        else
+            paramDecl = params[i].GetType().ToString() + " " + params[i].GetDeclname();
+
+        result += paramDecl;
     }
 
     result +=
@@ -648,9 +671,9 @@ string GenerateWrapper(const GlobalFunctionAnalyzer& functionAnalyzer, vector<sh
         "{\n";
 
     for (size_t i = 0; i < convertedParams.size(); i++)
-        result += convertedParams[i]->glue_;
+        result += convertedParams[i].glue_;
 
-    if (convertedReturn->glueReturnType_ != "void")
+    if (glueReturnType != "void")
         result += "    " + functionAnalyzer.GetReturnType().ToString() + " result = ";
     else
         result += "    ";
@@ -662,22 +685,31 @@ string GenerateWrapper(const GlobalFunctionAnalyzer& functionAnalyzer, vector<sh
         if (i != 0)
             result += ", ";
 
-        result += convertedParams[i]->convertedVarName_;
+        result += params[i].GetDeclname();
     }
 
     result += ");\n";
 
-    if (convertedReturn->glueReturnType_ != "void")
-        result += "    " + convertedReturn->glueReturn_;
+    if (!convertedReturn.glue_.empty())
+        result += "    " + convertedReturn.glue_;
+    else if (glueReturnType != "void")
+        result += "    return result;\n";
 
     result += "}";
 
     return result;
 }
 
-string GenerateWrapper(const ClassStaticFunctionAnalyzer& functionAnalyzer, vector<shared_ptr<FuncParamConv> >& convertedParams, shared_ptr<FuncReturnTypeConv> convertedReturn)
+string GenerateWrapper(const ClassStaticFunctionAnalyzer& functionAnalyzer, const vector<ConvertedVariable>& convertedParams, const ConvertedVariable& convertedReturn)
 {
     string result;
+
+    string glueReturnType;
+
+    if (!convertedReturn.newCppDeclaration_.empty())
+        glueReturnType = convertedReturn.newCppDeclaration_;
+    else
+        glueReturnType = functionAnalyzer.GetReturnType().ToString();
     
     string insideDefine = InsideDefine(functionAnalyzer.GetHeaderFile());
 
@@ -686,14 +718,23 @@ string GenerateWrapper(const ClassStaticFunctionAnalyzer& functionAnalyzer, vect
 
     result +=
         "// " + functionAnalyzer.GetLocation() + "\n"
-        "static " + convertedReturn->glueReturnType_ + " " + GenerateWrapperName(functionAnalyzer) + "(";
+        "static " + glueReturnType + " " + GenerateWrapperName(functionAnalyzer) + "(";
+
+    vector<ParamAnalyzer> params = functionAnalyzer.GetParams();
 
     for (size_t i = 0; i < convertedParams.size(); i++)
     {
         if (i != 0)
             result += ", ";
 
-        result += convertedParams[i]->cppType_ + " " + convertedParams[i]->inputVarName_;
+        string paramDecl;
+
+        if (!convertedParams[i].newCppDeclaration_.empty())
+            paramDecl = convertedParams[i].newCppDeclaration_;
+        else
+            paramDecl = params[i].GetType().ToString() + " " + params[i].GetDeclname();
+
+        result += paramDecl;
     }
 
     result +=
@@ -701,9 +742,9 @@ string GenerateWrapper(const ClassStaticFunctionAnalyzer& functionAnalyzer, vect
         "{\n";
 
     for (size_t i = 0; i < convertedParams.size(); i++)
-        result += convertedParams[i]->glue_;
+        result += convertedParams[i].glue_;
 
-    if (convertedReturn->glueReturnType_ != "void")
+    if (glueReturnType != "void")
         result += "    " + functionAnalyzer.GetReturnType().ToString() + " result = ";
     else
         result += "    ";
@@ -715,13 +756,15 @@ string GenerateWrapper(const ClassStaticFunctionAnalyzer& functionAnalyzer, vect
         if (i != 0)
             result += ", ";
 
-        result += convertedParams[i]->convertedVarName_;
+        result += params[i].GetDeclname();
     }
 
     result += ");\n";
 
-    if (convertedReturn->glueReturnType_ != "void")
-        result += "    " + convertedReturn->glueReturn_;
+    if (!convertedReturn.glue_.empty())
+        result += "    " + convertedReturn.glue_;
+    else if (glueReturnType != "void")
+        result += "    return result;\n";
 
     result += "}\n";
 
@@ -733,7 +776,7 @@ string GenerateWrapper(const ClassStaticFunctionAnalyzer& functionAnalyzer, vect
     return result;
 }
 
-string GenerateWrapper(const ClassFunctionAnalyzer& functionAnalyzer, bool templateVersion, vector<shared_ptr<FuncParamConv> >& convertedParams, shared_ptr<FuncReturnTypeConv> convertedReturn)
+string GenerateWrapper(const ClassFunctionAnalyzer& functionAnalyzer, bool templateVersion, const vector<ConvertedVariable>& convertedParams, const ConvertedVariable& convertedReturn)
 {
     string result;
 
@@ -742,21 +785,41 @@ string GenerateWrapper(const ClassFunctionAnalyzer& functionAnalyzer, bool templ
     if (!insideDefine.empty())
         result += "#ifdef " + insideDefine + "\n";
 
+    string glueReturnType;
+
+    if (!convertedReturn.newCppDeclaration_.empty())
+        glueReturnType = convertedReturn.newCppDeclaration_;
+    else
+        glueReturnType = functionAnalyzer.GetReturnType().ToString();
+
     result +=
         "// " + functionAnalyzer.GetLocation() + "\n"
-        "static " + convertedReturn->glueReturnType_ + " " + GenerateWrapperName(functionAnalyzer, templateVersion) + "(" + functionAnalyzer.GetClassName() + "* ptr";
+        "static " + glueReturnType + " " + GenerateWrapperName(functionAnalyzer, templateVersion) + "(" + functionAnalyzer.GetClassName() + "* ptr";
+
+    vector<ParamAnalyzer> params = functionAnalyzer.GetParams();
 
     for (size_t i = 0; i < convertedParams.size(); i++)
-        result += ", " + convertedParams[i]->cppType_ + " " + convertedParams[i]->inputVarName_;
+    {
+        result += ", ";
+
+        string paramDecl;
+
+        if (!convertedParams[i].newCppDeclaration_.empty())
+            paramDecl = convertedParams[i].newCppDeclaration_;
+        else
+            paramDecl = params[i].GetType().ToString() + " " + params[i].GetDeclname();
+
+        result += paramDecl;
+    }
 
     result +=
         ")\n"
         "{\n";
 
     for (size_t i = 0; i < convertedParams.size(); i++)
-        result += convertedParams[i]->glue_;
+        result += convertedParams[i].glue_;
 
-    if (convertedReturn->glueReturnType_ != "void")
+    if (glueReturnType != "void")
         result += "    " + functionAnalyzer.GetReturnType().ToString() + " result = ";
     else
         result += "    ";
@@ -768,13 +831,15 @@ string GenerateWrapper(const ClassFunctionAnalyzer& functionAnalyzer, bool templ
         if (i != 0)
             result += ", ";
 
-        result += convertedParams[i]->convertedVarName_;
+        result += params[i].GetDeclname();
     }
 
     result += ");\n";
 
-    if (convertedReturn->glueReturnType_ != "void")
-        result += "    " + convertedReturn->glueReturn_;
+    if (!convertedReturn.glue_.empty())
+        result += "    " + convertedReturn.glue_;
+    else if (glueReturnType != "void")
+        result += "    return result;\n";
 
     result += "}\n";
 

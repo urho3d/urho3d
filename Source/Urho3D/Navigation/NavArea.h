@@ -34,11 +34,11 @@ class URHO3D_API NavArea : public Component
 
 public:
     /// Construct.
-    explicit NavArea(Context*);
+    explicit NavArea(Context* context);
     /// Destruct.
     ~NavArea() override;
     /// Register object factory and attributes.
-    static void RegisterObject(Context*);
+    static void RegisterObject(Context* context);
 
     /// Render debug geometry for the bounds.
     void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;

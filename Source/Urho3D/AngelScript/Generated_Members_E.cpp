@@ -19,18 +19,18 @@ static Engine* Engine_Engine_Context()
 }
 
 // static VariantMap Engine::ParseParameters(const Vector<String>& arguments) | File: ../Engine/Engine.h
-static VariantMap Engine_ParseParameters_VectorString(CScriptArray* arguments)
+static VariantMap Engine_ParseParameters_VectorString(CScriptArray* arguments_conv)
 {
-    Vector<String> arguments_conv = ArrayToVector<String>(arguments);
-    VariantMap result = Engine::ParseParameters(arguments_conv);
+    Vector<String> arguments = ArrayToVector<String>(arguments_conv);
+    VariantMap result = Engine::ParseParameters(arguments);
     return result;
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Engine_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Engine* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void Engine_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Engine* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // explicit EventProfiler::EventProfiler(Context* context) | File: ../Core/EventProfiler.h
@@ -40,10 +40,10 @@ static EventProfiler* EventProfiler_EventProfiler_Context()
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void EventProfiler_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(EventProfiler* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void EventProfiler_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(EventProfiler* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // EventReceiverGroup::EventReceiverGroup() | File: ../Core/Context.h

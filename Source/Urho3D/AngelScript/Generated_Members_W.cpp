@@ -41,10 +41,10 @@ static CScriptArray* Window_GetTags_void(Window* ptr)
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Window_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Window* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void Window_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Window* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // explicit Window::Window(Context* context) | File: ../UI/Window.h
@@ -54,10 +54,10 @@ static Window* Window_Window_Context()
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void WorkQueue_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(WorkQueue* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void WorkQueue_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(WorkQueue* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // explicit WorkQueue::WorkQueue(Context* context) | File: ../Core/WorkQueue.h
@@ -990,7 +990,7 @@ void ASRegisterGenerated_Members_W(asIScriptEngine* engine)
     // Object* Object::GetEventSender() const | File: ../Core/Object.h
     engine->RegisterObjectMethod("WorkQueue", "Object@+ GetEventSender() const", asMETHODPR(WorkQueue, GetEventSender, () const, Object*), asCALL_THISCALL);
     // SharedPtr<WorkItem> WorkQueue::GetFreeItem() | File: ../Core/WorkQueue.h
-    // TODO
+    // Error: type "SharedPtr<WorkItem>" can not automatically bind
     // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("WorkQueue", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(WorkQueue, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
     engine->RegisterObjectMethod("WorkQueue", "const Variant& get_globalVar(StringHash) const", asMETHODPR(WorkQueue, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
@@ -1047,7 +1047,7 @@ void ASRegisterGenerated_Members_W(asIScriptEngine* engine)
     // bool WorkQueue::RemoveWorkItem(SharedPtr<WorkItem> item) | File: ../Core/WorkQueue.h
     // Error: type "SharedPtr<WorkItem>" can not automatically bind
     // unsigned WorkQueue::RemoveWorkItems(const Vector<SharedPtr<WorkItem>>& items) | File: ../Core/WorkQueue.h
-    // TODO
+    // Error: type "const Vector<SharedPtr<WorkItem>>&" can not automatically bind
     // void WorkQueue::Resume() | File: ../Core/WorkQueue.h
     engine->RegisterObjectMethod("WorkQueue", "void Resume()", asMETHODPR(WorkQueue, Resume, (), void), asCALL_THISCALL);
     // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h

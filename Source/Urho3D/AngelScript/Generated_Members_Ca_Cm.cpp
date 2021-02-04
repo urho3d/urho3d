@@ -19,10 +19,10 @@ static Camera* Camera_Camera_Context()
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Camera_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Camera* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void Camera_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Camera* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // explicit CheckBox::CheckBox(Context* context) | File: ../UI/CheckBox.h
@@ -60,10 +60,10 @@ static CScriptArray* CheckBox_GetTags_void(CheckBox* ptr)
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void CheckBox_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(CheckBox* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void CheckBox_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(CheckBox* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // CascadeParameters::CascadeParameters(float split1, float split2, float split3, float split4, float fadeStart, float biasAutoAdjust=1.0f) | File: ../Graphics/Light.h

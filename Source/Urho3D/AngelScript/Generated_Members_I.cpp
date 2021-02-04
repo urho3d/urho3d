@@ -22,10 +22,10 @@ static IKConstraint* IKConstraint_IKConstraint_Context()
 
 #ifdef URHO3D_IK
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void IKConstraint_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(IKConstraint* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void IKConstraint_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(IKConstraint* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 #endif
 
@@ -39,10 +39,10 @@ static IKEffector* IKEffector_IKEffector_Context()
 
 #ifdef URHO3D_IK
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void IKEffector_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(IKEffector* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void IKEffector_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(IKEffector* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 #endif
 
@@ -56,10 +56,10 @@ static IKSolver* IKSolver_IKSolver_Context()
 
 #ifdef URHO3D_IK
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void IKSolver_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(IKSolver* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void IKSolver_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(IKSolver* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 #endif
 
@@ -98,10 +98,10 @@ static Image* Image_Image_Context()
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Image_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Image* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void Image_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Image* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // explicit IndexBuffer::IndexBuffer(Context* context, bool forceHeadless=false) | File: ../Graphics/IndexBuffer.h
@@ -111,10 +111,10 @@ static IndexBuffer* IndexBuffer_IndexBuffer_Context_bool(bool forceHeadless=fals
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void IndexBuffer_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(IndexBuffer* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void IndexBuffer_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(IndexBuffer* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // explicit Input::Input(Context* context) | File: ../Input/Input.h
@@ -124,10 +124,10 @@ static Input* Input_Input_Context()
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Input_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Input* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void Input_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Input* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // IntRect::IntRect(const IntVector2& min, const IntVector2& max) noexcept | File: ../Math/Rect.h

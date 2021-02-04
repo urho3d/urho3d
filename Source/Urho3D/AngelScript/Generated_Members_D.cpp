@@ -22,10 +22,10 @@ static Database* Database_Database_Context()
 
 #ifdef URHO3D_DATABASE
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Database_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Database* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void Database_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Database* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 #endif
 
@@ -36,10 +36,10 @@ static DebugHud* DebugHud_DebugHud_Context()
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void DebugHud_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(DebugHud* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void DebugHud_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(DebugHud* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // explicit DebugRenderer::DebugRenderer(Context* context) | File: ../Graphics/DebugRenderer.h
@@ -49,10 +49,10 @@ static DebugRenderer* DebugRenderer_DebugRenderer_Context()
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void DebugRenderer_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(DebugRenderer* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void DebugRenderer_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(DebugRenderer* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // explicit DecalSet::DecalSet(Context* context) | File: ../Graphics/DecalSet.h
@@ -76,10 +76,10 @@ static CScriptArray* DecalSet_GetVertexLights_void(DecalSet* ptr)
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void DecalSet_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(DecalSet* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void DecalSet_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(DecalSet* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // StringVector Deserializer::ReadStringVector() | File: ../IO/Deserializer.h
@@ -104,10 +104,10 @@ static CScriptArray* Drawable_GetVertexLights_void(Drawable* ptr)
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Drawable_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Drawable* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void Drawable_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Drawable* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 #ifdef URHO3D_URHO2D
@@ -130,10 +130,10 @@ static CScriptArray* Drawable2D_GetVertexLights_void(Drawable2D* ptr)
 
 #ifdef URHO3D_URHO2D
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Drawable2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Drawable2D* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void Drawable2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Drawable2D* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 #endif
 
@@ -179,18 +179,26 @@ static CScriptArray* DropDownList_GetTags_void(DropDownList* ptr)
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void DropDownList_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(DropDownList* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void DropDownList_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(DropDownList* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 #ifdef URHO3D_NAVIGATION
-// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void DynamicNavigationMesh_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(DynamicNavigationMesh* ptr, CScriptArray* exceptions, bool onlyUserData)
+// explicit DynamicNavigationMesh::DynamicNavigationMesh(Context* context) | File: ../Navigation/DynamicNavigationMesh.h
+static DynamicNavigationMesh* DynamicNavigationMesh_DynamicNavigationMesh_Context()
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    return new DynamicNavigationMesh(GetScriptContext());
+}
+#endif
+
+#ifdef URHO3D_NAVIGATION
+// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
+static void DynamicNavigationMesh_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(DynamicNavigationMesh* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
+{
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 #endif
 
@@ -3266,8 +3274,8 @@ void ASRegisterGenerated_Members_D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("DynamicNavigationMesh", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(DynamicNavigationMesh, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
     // void DynamicNavigationMesh::DrawDebugGeometry(bool depthTest) | File: ../Navigation/DynamicNavigationMesh.h
     engine->RegisterObjectMethod("DynamicNavigationMesh", "void DrawDebugGeometry(bool)", asMETHODPR(DynamicNavigationMesh, DrawDebugGeometry, (bool), void), asCALL_THISCALL);
-    // explicit DynamicNavigationMesh::DynamicNavigationMesh(Context*) | File: ../Navigation/DynamicNavigationMesh.h
-    // Error: context can be only first
+    // explicit DynamicNavigationMesh::DynamicNavigationMesh(Context* context) | File: ../Navigation/DynamicNavigationMesh.h
+    engine->RegisterObjectBehaviour("DynamicNavigationMesh", asBEHAVE_FACTORY, "DynamicNavigationMesh@+ f()", asFUNCTION(DynamicNavigationMesh_DynamicNavigationMesh_Context), asCALL_CDECL);
     // Vector3 NavigationMesh::FindNearestPoint(const Vector3& point, const Vector3& extents=Vector3::ONE, const dtQueryFilter* filter=nullptr, dtPolyRef* nearestRef=nullptr) | File: ../Navigation/NavigationMesh.h
     // Error: type "const dtQueryFilter*" can not automatically bind
     // void NavigationMesh::FindPath(PODVector<Vector3>& dest, const Vector3& start, const Vector3& end, const Vector3& extents=Vector3::ONE, const dtQueryFilter* filter=nullptr) | File: ../Navigation/NavigationMesh.h
@@ -3513,7 +3521,7 @@ void ASRegisterGenerated_Members_D(asIScriptEngine* engine)
     // int RefCounted::Refs() const | File: ../Container/RefCounted.h
     engine->RegisterObjectMethod("DynamicNavigationMesh", "int Refs() const", asMETHODPR(DynamicNavigationMesh, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("DynamicNavigationMesh", "int get_refs() const", asMETHODPR(DynamicNavigationMesh, Refs, () const, int), asCALL_THISCALL);
-    // static void DynamicNavigationMesh::RegisterObject(Context*) | File: ../Navigation/DynamicNavigationMesh.h
+    // static void DynamicNavigationMesh::RegisterObject(Context* context) | File: ../Navigation/DynamicNavigationMesh.h
     // Context can be used as firs parameter of constructors only
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("DynamicNavigationMesh", asBEHAVE_RELEASE, "void f()", asMETHODPR(DynamicNavigationMesh, ReleaseRef, (), void), asCALL_THISCALL);

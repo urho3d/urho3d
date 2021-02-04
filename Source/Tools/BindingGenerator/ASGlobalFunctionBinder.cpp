@@ -110,7 +110,7 @@ static void BindGlobalFunction(const GlobalFunctionAnalyzer& functionAnalyzer)
 
     bool needWrapper = false;
 
-    vector<shared_ptr<FuncParamConv>> convertedParams;
+    vector<ConvertedVariable> convertedParams;
 
     ProcessedGlobalFunction processedGlobalFunction;
     processedGlobalFunction.name_ = functionAnalyzer.GetName();
@@ -119,10 +119,15 @@ static void BindGlobalFunction(const GlobalFunctionAnalyzer& functionAnalyzer)
 
     for (const ParamAnalyzer& param : params)
     {
-        shared_ptr<FuncParamConv> conv = CppFunctionParamToAS(param);
-        if (!conv->success_)
+        ConvertedVariable conv;
+        
+        try
         {
-            processedGlobalFunction.registration_ = "// " + conv->errorMessage_;
+            conv = CppVariableToAS(param.GetType(), param.GetDeclname(), VariableUsage::FunctionParameter, param.GetDefval());
+        }
+        catch (const Exception& e)
+        {
+            processedGlobalFunction.registration_ = "// " + string(e.what());
             Result::globalFunctions_.push_back(processedGlobalFunction);
             return;
         }
@@ -130,29 +135,34 @@ static void BindGlobalFunction(const GlobalFunctionAnalyzer& functionAnalyzer)
         if (declParams.length() > 0)
             declParams += ", ";
 
-        declParams += conv->asDecl_;
+        declParams += conv.asDeclaration_;
 
-        if (conv->NeedWrapper())
+        if (conv.NeedWrapper())
             needWrapper = true;
 
         convertedParams.push_back(conv);
     }
 
-    shared_ptr<FuncReturnTypeConv> retConv = CppFunctionReturnTypeToAS(functionAnalyzer.GetReturnType());
-    if (!retConv->success_)
+    ConvertedVariable retConv;
+
+    try
     {
-        processedGlobalFunction.registration_ = "// " + retConv->errorMessage_;
+        retConv = CppVariableToAS(functionAnalyzer.GetReturnType(), "", VariableUsage::FunctionReturn);
+    }
+    catch (const Exception& e)
+    {
+        processedGlobalFunction.registration_ = "// " + string(e.what());
         Result::globalFunctions_.push_back(processedGlobalFunction);
         return;
     }
-    
-    if (retConv->needWrapper_)
+
+    if (retConv.NeedWrapper())
         needWrapper = true;
 
     if (needWrapper)
         processedGlobalFunction.glue_ = GenerateWrapper(functionAnalyzer, convertedParams, retConv);
 
-    string asReturnType = retConv->asReturnType_;
+    string asReturnType = retConv.asDeclaration_;
 
     string asFunctionName = functionAnalyzer.GetName();
 

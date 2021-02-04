@@ -32,10 +32,10 @@ static CScriptArray* Geometry_GetVertexBuffers_void(Geometry* ptr)
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Geometry_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Geometry* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void Geometry_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Geometry* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // PODVector<int> Graphics::GetMultiSampleLevels() const | File: ../Graphics/Graphics.h
@@ -59,18 +59,18 @@ static Graphics* Graphics_Graphics_Context()
 }
 
 // bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer>>& buffers, unsigned instanceOffset=0) | File: ../Graphics/Graphics.h
-static bool Graphics_SetVertexBuffers_VectorSharedPtrVertexBuffer_unsigned(Graphics* ptr, CScriptArray* buffers, unsigned instanceOffset)
+static bool Graphics_SetVertexBuffers_VectorSharedPtrVertexBuffer_unsigned(Graphics* ptr, CScriptArray* buffers_conv, unsigned instanceOffset)
 {
-    Vector<SharedPtr<VertexBuffer> > buffers_conv = HandleArrayToVector<VertexBuffer>(buffers);
-    bool result = ptr->SetVertexBuffers(buffers_conv, instanceOffset);
+    Vector<SharedPtr<VertexBuffer>> buffers = HandleArrayToVector<VertexBuffer>(buffers_conv);
+    bool result = ptr->SetVertexBuffers(buffers, instanceOffset);
     return result;
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Graphics_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Graphics* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void Graphics_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Graphics* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 #ifdef URHO3D_PHYSICS

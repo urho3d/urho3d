@@ -47,10 +47,10 @@ static Technique* Technique_Technique_Context()
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Technique_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Technique* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void Technique_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Technique* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // explicit Terrain::Terrain(Context* context) | File: ../Graphics/Terrain.h
@@ -60,10 +60,10 @@ static Terrain* Terrain_Terrain_Context()
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Terrain_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Terrain* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void Terrain_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Terrain* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // const PODVector<Light*>& Drawable::GetLights() const | File: ../Graphics/Drawable.h
@@ -87,10 +87,10 @@ static TerrainPatch* TerrainPatch_TerrainPatch_Context()
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void TerrainPatch_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(TerrainPatch* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void TerrainPatch_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(TerrainPatch* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // const Vector<SharedPtr<UIElement>>& UIElement::GetChildren() const | File: ../UI/UIElement.h
@@ -128,10 +128,10 @@ static Text* Text_Text_Context()
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Text_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Text* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void Text_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Text* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // const PODVector<Light*>& Drawable::GetLights() const | File: ../Graphics/Drawable.h
@@ -155,10 +155,10 @@ static Text3D* Text3D_Text3D_Context()
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Text3D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Text3D* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void Text3D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Text3D* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // explicit Texture::Texture(Context* context) | File: ../Graphics/Texture.h
@@ -168,10 +168,10 @@ static Texture* Texture_Texture_Context()
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Texture_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Texture* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void Texture_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Texture* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // SharedPtr<Image> Texture2D::GetImage() const | File: ../Graphics/Texture2D.h
@@ -188,10 +188,10 @@ static Texture2D* Texture2D_Texture2D_Context()
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Texture2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Texture2D* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void Texture2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Texture2D* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // explicit Texture2DArray::Texture2DArray(Context* context) | File: ../Graphics/Texture2DArray.h
@@ -201,10 +201,10 @@ static Texture2DArray* Texture2DArray_Texture2DArray_Context()
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Texture2DArray_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Texture2DArray* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void Texture2DArray_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Texture2DArray* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // explicit Texture3D::Texture3D(Context* context) | File: ../Graphics/Texture3D.h
@@ -214,10 +214,10 @@ static Texture3D* Texture3D_Texture3D_Context()
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Texture3D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Texture3D* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void Texture3D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Texture3D* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // SharedPtr<Image> TextureCube::GetImage(CubeMapFace face) const | File: ../Graphics/TextureCube.h
@@ -234,10 +234,10 @@ static TextureCube* TextureCube_TextureCube_Context()
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void TextureCube_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(TextureCube* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void TextureCube_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(TextureCube* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 #ifdef URHO3D_URHO2D
@@ -267,10 +267,10 @@ static TileMap2D* TileMap2D_TileMap2D_Context()
 
 #ifdef URHO3D_URHO2D
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void TileMap2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(TileMap2D* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void TileMap2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(TileMap2D* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 #endif
 
@@ -284,10 +284,10 @@ static TileMapLayer2D* TileMapLayer2D_TileMapLayer2D_Context()
 
 #ifdef URHO3D_URHO2D
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void TileMapLayer2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(TileMapLayer2D* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void TileMapLayer2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(TileMapLayer2D* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 #endif
 
@@ -306,10 +306,10 @@ static Time* Time_Time_Context()
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Time_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Time* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void Time_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Time* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 #ifdef URHO3D_URHO2D
@@ -331,10 +331,10 @@ static TmxFile2D* TmxFile2D_TmxFile2D_Context()
 
 #ifdef URHO3D_URHO2D
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void TmxFile2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(TmxFile2D* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void TmxFile2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(TmxFile2D* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 #endif
 

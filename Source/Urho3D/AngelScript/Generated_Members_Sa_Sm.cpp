@@ -75,10 +75,10 @@ static Scene* Scene_Scene_Context()
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Scene_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Scene* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void Scene_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Scene* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // const Vector<SharedPtr<UIElement>>& UIElement::GetChildren() const | File: ../UI/UIElement.h
@@ -116,10 +116,10 @@ static ScrollBar* ScrollBar_ScrollBar_Context()
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void ScrollBar_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ScrollBar* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void ScrollBar_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ScrollBar* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // const Vector<SharedPtr<UIElement>>& UIElement::GetChildren() const | File: ../UI/UIElement.h
@@ -157,10 +157,10 @@ static ScrollView* ScrollView_ScrollView_Context()
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void ScrollView_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ScrollView* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void ScrollView_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ScrollView* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // explicit Serializable::Serializable(Context* context) | File: ../Scene/Serializable.h
@@ -170,10 +170,10 @@ static Serializable* Serializable_Serializable_Context()
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Serializable_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Serializable* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void Serializable_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Serializable* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // explicit Shader::Shader(Context* context) | File: ../Graphics/Shader.h
@@ -183,10 +183,10 @@ static Shader* Shader_Shader_Context()
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Shader_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Shader* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void Shader_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Shader* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // ShaderParameterAnimationInfo::ShaderParameterAnimationInfo(Material* material, const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode, float speed) | File: ../Graphics/Material.h
@@ -208,10 +208,10 @@ static ShaderPrecache* ShaderPrecache_ShaderPrecache_Context_String(const String
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void ShaderPrecache_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ShaderPrecache* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void ShaderPrecache_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ShaderPrecache* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // ShaderVariation::ShaderVariation(Shader* owner, ShaderType type) | File: ../Graphics/ShaderVariation.h
@@ -247,10 +247,10 @@ static Skybox* Skybox_Skybox_Context()
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Skybox_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Skybox* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void Skybox_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Skybox* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // const Vector<SharedPtr<UIElement>>& UIElement::GetChildren() const | File: ../UI/UIElement.h
@@ -288,10 +288,10 @@ static Slider* Slider_Slider_Context()
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Slider_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Slider* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void Slider_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Slider* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // explicit SmoothedTransform::SmoothedTransform(Context* context) | File: ../Scene/SmoothedTransform.h
@@ -301,10 +301,10 @@ static SmoothedTransform* SmoothedTransform_SmoothedTransform_Context()
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void SmoothedTransform_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(SmoothedTransform* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void SmoothedTransform_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(SmoothedTransform* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // ShaderParameter::ShaderParameter(const String& name, unsigned glType, int location) | File: ../Graphics/ShaderVariation.h

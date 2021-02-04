@@ -22,17 +22,17 @@ static Component* Component_Component_Context_template()
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Component_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool_template(Component* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void Component_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool_template(Component* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Object_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool_template(Object* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void Object_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool_template(Object* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // explicit Resource::Resource(Context* context) | File: ../Resource/Resource.h
@@ -42,10 +42,10 @@ static Resource* Resource_Resource_Context_template()
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Resource_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool_template(Resource* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void Resource_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool_template(Resource* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 template <class T> void RegisterComponent(asIScriptEngine* engine, const char* className)

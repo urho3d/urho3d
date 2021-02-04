@@ -19,10 +19,10 @@ static JSONFile* JSONFile_JSONFile_Context()
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void JSONFile_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(JSONFile* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void JSONFile_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(JSONFile* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // JSONValue::JSONValue(bool value) | File: ../Resource/JSONValue.h

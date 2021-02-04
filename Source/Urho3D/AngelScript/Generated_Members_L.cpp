@@ -33,10 +33,10 @@ static Light* Light_Light_Context()
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Light_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Light* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void Light_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Light* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // const Vector<SharedPtr<UIElement>>& UIElement::GetChildren() const | File: ../UI/UIElement.h
@@ -74,10 +74,10 @@ static LineEdit* LineEdit_LineEdit_Context()
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void LineEdit_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(LineEdit* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void LineEdit_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(LineEdit* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // const Vector<SharedPtr<UIElement>>& UIElement::GetChildren() const | File: ../UI/UIElement.h
@@ -136,17 +136,17 @@ static ListView* ListView_ListView_Context()
 }
 
 // void ListView::SetSelections(const PODVector<unsigned>& indices) | File: ../UI/ListView.h
-static void ListView_SetSelections_PODVectorunsigned(ListView* ptr, CScriptArray* indices)
+static void ListView_SetSelections_PODVectorunsigned(ListView* ptr, CScriptArray* indices_conv)
 {
-    PODVector<unsigned> indices_conv = ArrayToPODVector<unsigned>(indices);
-    ptr->SetSelections(indices_conv);
+    PODVector<unsigned> indices = ArrayToPODVector<unsigned>(indices_conv);
+    ptr->SetSelections(indices);
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void ListView_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ListView* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void ListView_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ListView* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // explicit Localization::Localization(Context* context) | File: ../Resource/Localization.h
@@ -156,10 +156,10 @@ static Localization* Localization_Localization_Context()
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Localization_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Localization* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void Localization_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Localization* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // explicit Log::Log(Context* context) | File: ../IO/Log.h
@@ -169,17 +169,17 @@ static Log* Log_Log_Context()
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Log_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Log* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void Log_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Log* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void LogicComponent_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(LogicComponent* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void LogicComponent_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(LogicComponent* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 void ASRegisterGenerated_Members_L(asIScriptEngine* engine)

@@ -26,10 +26,10 @@ static void Ray_Ray_Ray(Ray* ptr, const Ray &ray)
 
 #ifdef URHO3D_PHYSICS
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void RaycastVehicle_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(RaycastVehicle* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void RaycastVehicle_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(RaycastVehicle* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 #endif
 
@@ -89,10 +89,10 @@ static Renderer* Renderer_Renderer_Context()
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Renderer_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Renderer* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void Renderer_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Renderer* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 #ifdef URHO3D_URHO2D
@@ -123,10 +123,10 @@ static Renderer2D* Renderer2D_Renderer2D_Context()
 
 #ifdef URHO3D_URHO2D
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Renderer2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Renderer2D* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void Renderer2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Renderer2D* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 #endif
 
@@ -137,10 +137,10 @@ static Resource* Resource_Resource_Context()
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Resource_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Resource* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void Resource_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Resource* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // SharedPtr<File> ResourceCache::GetFile(const String& name, bool sendEventOnFailure=true) | File: ../Resource/ResourceCache.h
@@ -178,10 +178,10 @@ static ResourceCache* ResourceCache_ResourceCache_Context()
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void ResourceCache_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ResourceCache* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void ResourceCache_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ResourceCache* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // explicit ResourceWithMetadata::ResourceWithMetadata(Context* context) | File: ../Resource/Resource.h
@@ -191,10 +191,10 @@ static ResourceWithMetadata* ResourceWithMetadata_ResourceWithMetadata_Context()
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void ResourceWithMetadata_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ResourceWithMetadata* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void ResourceWithMetadata_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ResourceWithMetadata* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // const PODVector<Light*>& Drawable::GetLights() const | File: ../Graphics/Drawable.h
@@ -218,10 +218,10 @@ static RibbonTrail* RibbonTrail_RibbonTrail_Context()
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void RibbonTrail_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(RibbonTrail* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void RibbonTrail_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(RibbonTrail* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 #ifdef URHO3D_PHYSICS
@@ -234,10 +234,10 @@ static RigidBody* RigidBody_RigidBody_Context()
 
 #ifdef URHO3D_PHYSICS
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void RigidBody_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(RigidBody* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void RigidBody_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(RigidBody* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 #endif
 
@@ -251,10 +251,10 @@ static RigidBody2D* RigidBody2D_RigidBody2D_Context()
 
 #ifdef URHO3D_URHO2D
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void RigidBody2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(RigidBody2D* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void RigidBody2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(RigidBody2D* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 #endif
 

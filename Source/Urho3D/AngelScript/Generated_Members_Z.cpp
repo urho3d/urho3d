@@ -27,10 +27,10 @@ static CScriptArray* Zone_GetVertexLights_void(Zone* ptr)
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-static void Zone_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Zone* ptr, CScriptArray* exceptions, bool onlyUserData)
+static void Zone_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Zone* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions_conv = ArrayToPODVector<StringHash>(exceptions);
-    ptr->UnsubscribeFromAllEventsExcept(exceptions_conv, onlyUserData);
+    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
 // explicit Zone::Zone(Context* context) | File: ../Graphics/Zone.h

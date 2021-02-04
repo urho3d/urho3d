@@ -197,43 +197,52 @@ static void RegisterStaticFunction(const ClassStaticFunctionAnalyzer& functionAn
     result->reg_ << "    // " << functionAnalyzer.GetLocation() << "\n";
 
     vector<ParamAnalyzer> params = functionAnalyzer.GetParams();
-    vector<shared_ptr<FuncParamConv> > convertedParams;
+    vector<ConvertedVariable> convertedParams;
     string outGlue;
     bool needWrapper = false;
 
     for (const ParamAnalyzer& param : params)
     {
-        shared_ptr<FuncParamConv> conv = CppFunctionParamToAS(param);
-        if (!conv->success_)
+        ConvertedVariable conv;
+        try
         {
-            result->reg_ << "    // " << conv->errorMessage_ << "\n";
+            conv = CppVariableToAS(param.GetType(), param.GetDeclname(), VariableUsage::FunctionParameter, param.GetDefval());
+        }
+        catch (const Exception& e)
+        {
+            result->reg_ << "    // " << e.what() << "\n";
             return;
         }
 
-        if (conv->NeedWrapper())
+        if (conv.NeedWrapper())
             needWrapper = true;
 
         convertedParams.push_back(conv);
     }
 
-    shared_ptr<FuncReturnTypeConv> convertedReturn = CppFunctionReturnTypeToAS(functionAnalyzer.GetReturnType());
-    if (!convertedReturn->success_)
+    ConvertedVariable convertedReturn;
+    
+    try
     {
-        result->reg_ << "    // " << convertedReturn->errorMessage_ << "\n";
+        convertedReturn = CppVariableToAS(functionAnalyzer.GetReturnType(), "", VariableUsage::FunctionReturn);
+    }
+    catch (const Exception& e)
+    {
+        result->reg_ << "    // " << e.what() << "\n";
         return;
     }
 
-    if (convertedReturn->needWrapper_)
+    if (convertedReturn.NeedWrapper())
         needWrapper = true;
 
     string declParams;
 
-    for (shared_ptr<FuncParamConv> conv : convertedParams)
+    for (const ConvertedVariable& conv : convertedParams)
     {
         if (declParams.length() > 0)
             declParams += ", ";
 
-        declParams += conv->asDecl_;
+        declParams += conv.asDeclaration_;
     }
 
     string asFunctionName = functionAnalyzer.GetName();
@@ -242,7 +251,7 @@ static void RegisterStaticFunction(const ClassStaticFunctionAnalyzer& functionAn
     if (needWrapper)
         result->glue_ << GenerateWrapper(functionAnalyzer, convertedParams, convertedReturn);
 
-    string decl = convertedReturn->asReturnType_ + " " + asFunctionName + "(" + declParams + ")";
+    string decl = convertedReturn.asDeclaration_ + " " + asFunctionName + "(" + declParams + ")";
 
     result->reg_ << "    engine->SetDefaultNamespace(\"" << className << "\");\n";
 
@@ -308,7 +317,7 @@ static void RegisterRefCountedConstructor(const ClassFunctionAnalyzer& functionA
 
         try
         {
-            decl += CppTypeToAS(param.GetType(), false);
+            decl += CppTypeToAS(param.GetType(), TypeUsage::FunctionParameter);
         }
         catch (const Exception& e)
         {
@@ -398,7 +407,7 @@ static void RegisterValueConstructor(const ClassFunctionAnalyzer& functionAnalyz
 
         try
         {
-            decl += CppTypeToAS(param.GetType(), false);
+            decl += CppTypeToAS(param.GetType(), TypeUsage::FunctionParameter);
         }
         catch (const Exception& e)
         {
@@ -771,45 +780,55 @@ static void RegisterMethod(const ClassFunctionAnalyzer& functionAnalyzer, bool t
     result->reg_ << "    // " << functionAnalyzer.GetLocation() << "\n";
 
     vector<ParamAnalyzer> params = functionAnalyzer.GetParams();
-    vector<shared_ptr<FuncParamConv> > convertedParams;
+    vector<ConvertedVariable> convertedParams;
     bool needWrapper = false;
 
     for (const ParamAnalyzer& param : params)
     {
-        shared_ptr<FuncParamConv> conv = CppFunctionParamToAS(param);
-        if (!conv->success_)
+        ConvertedVariable conv;
+        
+        try
         {
-            result->reg_ << "    // " << conv->errorMessage_ << "\n";
+            conv = CppVariableToAS(param.GetType(), param.GetDeclname(), VariableUsage::FunctionParameter, param.GetDefval());
+        }
+        catch (const Exception& e)
+        {
+            result->reg_ << "    // " << e.what() << "\n";
             return;
         }
 
-        if (conv->NeedWrapper())
+        if (conv.NeedWrapper())
             needWrapper = true;
 
         convertedParams.push_back(conv);
     }
 
-    shared_ptr<FuncReturnTypeConv> retConv = CppFunctionReturnTypeToAS(functionAnalyzer.GetReturnType());
-    if (!retConv->success_)
+    ConvertedVariable retConv;
+    
+    try
     {
-        result->reg_ << "    // " << retConv->errorMessage_ << "\n";
+        retConv = CppVariableToAS(functionAnalyzer.GetReturnType(), "", VariableUsage::FunctionReturn);
+    }
+    catch (const Exception& e)
+    {
+        result->reg_ << "    // " << e.what() << "\n";
         return;
     }
 
-    if (retConv->needWrapper_)
+    if (retConv.NeedWrapper())
         needWrapper = true;
 
     string declParams = "";
 
-    for (shared_ptr<FuncParamConv> conv : convertedParams)
+    for (const ConvertedVariable& conv : convertedParams)
     {
         if (declParams.length() > 0)
             declParams += ", ";
 
-        declParams += conv->asDecl_;
+        declParams += conv.asDeclaration_; // TODO функцию для джойна сделат ьвнутри конвертора
     }
 
-    string asReturnType = retConv->asReturnType_;
+    string asReturnType = retConv.asDeclaration_;
 
     string asFunctionName = functionAnalyzer.GetName();
     if (functionAnalyzer.IsConsversionOperator())
@@ -910,7 +929,7 @@ static void RegisterClassVarAsProperty(ClassVariableAnalyzer& variable)
 
         try
         {
-            asType = CppTypeToAS(variable.GetType(), false);
+            asType = CppTypeToAS(variable.GetType(), TypeUsage::ClassStaticVariable);
         }
         catch (const Exception& e)
         {
@@ -956,7 +975,7 @@ static void RegisterClassVarAsProperty(ClassVariableAnalyzer& variable)
         
         try
         {
-            propType = CppTypeToAS(variable.GetType(), false);
+            propType = CppTypeToAS(variable.GetType(), TypeUsage::ClassVariable);
         }
         catch (const Exception& e)
         {
