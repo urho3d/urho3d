@@ -282,7 +282,7 @@ void ASRegisterGenerated_Members_B(asIScriptEngine* engine)
     // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
     // Not registered because template
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
     // Error: type "PODVector<Node*>&" can not automatically bind
     // float Drawable::GetDistance() const | File: ../Graphics/Drawable.h
@@ -500,7 +500,7 @@ void ASRegisterGenerated_Members_B(asIScriptEngine* engine)
     engine->RegisterObjectMethod("BillboardSet", "int Refs() const", asMETHODPR(BillboardSet, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("BillboardSet", "int get_refs() const", asMETHODPR(BillboardSet, Refs, () const, int), asCALL_THISCALL);
     // static void BillboardSet::RegisterObject(Context* context) | File: ../Graphics/BillboardSet.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("BillboardSet", asBEHAVE_RELEASE, "void f()", asMETHODPR(BillboardSet, ReleaseRef, (), void), asCALL_THISCALL);
     // void Component::Remove() | File: ../Scene/Component.h
@@ -832,7 +832,7 @@ void ASRegisterGenerated_Members_B(asIScriptEngine* engine)
     engine->RegisterObjectMethod("BorderImage", "IntRect GetCombinedScreenRect()", asMETHODPR(BorderImage, GetCombinedScreenRect, (), IntRect), asCALL_THISCALL);
     engine->RegisterObjectMethod("BorderImage", "IntRect get_combinedScreenRect()", asMETHODPR(BorderImage, GetCombinedScreenRect, (), IntRect), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void UIElement::GetDebugDrawBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor) | File: ../UI/UIElement.h
     // Error: type "PODVector<UIBatch>&" can not automatically bind
     // XMLFile* UIElement::GetDefaultStyle(bool recursiveUp=true) const | File: ../UI/UIElement.h
@@ -1174,7 +1174,7 @@ void ASRegisterGenerated_Members_B(asIScriptEngine* engine)
     engine->RegisterObjectMethod("BorderImage", "int Refs() const", asMETHODPR(BorderImage, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("BorderImage", "int get_refs() const", asMETHODPR(BorderImage, Refs, () const, int), asCALL_THISCALL);
     // static void BorderImage::RegisterObject(Context* context) | File: ../UI/BorderImage.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("BorderImage", asBEHAVE_RELEASE, "void f()", asMETHODPR(BorderImage, ReleaseRef, (), void), asCALL_THISCALL);
     // void UIElement::Remove() | File: ../UI/UIElement.h
@@ -1825,7 +1825,7 @@ void ASRegisterGenerated_Members_B(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Button", "IntRect GetCombinedScreenRect()", asMETHODPR(Button, GetCombinedScreenRect, (), IntRect), asCALL_THISCALL);
     engine->RegisterObjectMethod("Button", "IntRect get_combinedScreenRect()", asMETHODPR(Button, GetCombinedScreenRect, (), IntRect), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void UIElement::GetDebugDrawBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor) | File: ../UI/UIElement.h
     // Error: type "PODVector<UIBatch>&" can not automatically bind
     // XMLFile* UIElement::GetDefaultStyle(bool recursiveUp=true) const | File: ../UI/UIElement.h
@@ -2182,7 +2182,7 @@ void ASRegisterGenerated_Members_B(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Button", "int Refs() const", asMETHODPR(Button, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("Button", "int get_refs() const", asMETHODPR(Button, Refs, () const, int), asCALL_THISCALL);
     // static void Button::RegisterObject(Context* context) | File: ../UI/Button.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("Button", asBEHAVE_RELEASE, "void f()", asMETHODPR(Button, ReleaseRef, (), void), asCALL_THISCALL);
     // void UIElement::Remove() | File: ../UI/UIElement.h

@@ -136,7 +136,7 @@ void ASRegisterGenerated_Members_G(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Geometry", "const String& GetCategory() const", asMETHODPR(Geometry, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Geometry", "const String& get_category() const", asMETHODPR(Geometry, GetCategory, () const, const String&), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
     engine->RegisterObjectMethod("Geometry", "VariantMap& GetEventDataMap() const", asMETHODPR(Geometry, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
     // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
@@ -359,7 +359,7 @@ void ASRegisterGenerated_Members_G(asIScriptEngine* engine)
     // bool Graphics::GetColorWrite() const | File: ../Graphics/Graphics.h
     engine->RegisterObjectMethod("Graphics", "bool GetColorWrite() const", asMETHODPR(Graphics, GetColorWrite, () const, bool), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // CullMode Graphics::GetCullMode() const | File: ../Graphics/Graphics.h
     engine->RegisterObjectMethod("Graphics", "CullMode GetCullMode() const", asMETHODPR(Graphics, GetCullMode, () const, CullMode), asCALL_THISCALL);
     // int Graphics::GetCurrentMonitor() const | File: ../Graphics/Graphics.h
@@ -680,7 +680,7 @@ void ASRegisterGenerated_Members_G(asIScriptEngine* engine)
     // void Graphics::Minimize() | File: ../Graphics/Graphics.h
     engine->RegisterObjectMethod("Graphics", "void Minimize()", asMETHODPR(Graphics, Minimize, (), void), asCALL_THISCALL);
     // bool Graphics::NeedParameterUpdate(ShaderParameterGroup group, const void* source) | File: ../Graphics/Graphics.h
-    // Error: type "void*" can not automatically bind
+    // Error: type "const void*" can not automatically bind
     // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
     engine->RegisterObjectMethod("Graphics", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(Graphics, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
     // void Graphics::OnWindowMoved() | File: ../Graphics/Graphics.h

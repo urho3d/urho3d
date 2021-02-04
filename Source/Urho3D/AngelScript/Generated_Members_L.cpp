@@ -263,7 +263,7 @@ void ASRegisterGenerated_Members_L(asIScriptEngine* engine)
     // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
     // Not registered because template
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
     // Error: type "PODVector<Node*>&" can not automatically bind
     // float Drawable::GetDistance() const | File: ../Graphics/Drawable.h
@@ -546,7 +546,7 @@ void ASRegisterGenerated_Members_L(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Light", "int Refs() const", asMETHODPR(Light, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "int get_refs() const", asMETHODPR(Light, Refs, () const, int), asCALL_THISCALL);
     // static void Light::RegisterObject(Context* context) | File: ../Graphics/Light.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("Light", asBEHAVE_RELEASE, "void f()", asMETHODPR(Light, ReleaseRef, (), void), asCALL_THISCALL);
     // void Component::Remove() | File: ../Scene/Component.h
@@ -922,7 +922,7 @@ void ASRegisterGenerated_Members_L(asIScriptEngine* engine)
     engine->RegisterObjectMethod("LineEdit", "IntRect GetCombinedScreenRect()", asMETHODPR(LineEdit, GetCombinedScreenRect, (), IntRect), asCALL_THISCALL);
     engine->RegisterObjectMethod("LineEdit", "IntRect get_combinedScreenRect()", asMETHODPR(LineEdit, GetCombinedScreenRect, (), IntRect), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // BorderImage* LineEdit::GetCursor() const | File: ../UI/LineEdit.h
     engine->RegisterObjectMethod("LineEdit", "BorderImage@+ GetCursor() const", asMETHODPR(LineEdit, GetCursor, () const, BorderImage*), asCALL_THISCALL);
     engine->RegisterObjectMethod("LineEdit", "BorderImage@+ get_cursor() const", asMETHODPR(LineEdit, GetCursor, () const, BorderImage*), asCALL_THISCALL);
@@ -1296,7 +1296,7 @@ void ASRegisterGenerated_Members_L(asIScriptEngine* engine)
     engine->RegisterObjectMethod("LineEdit", "int Refs() const", asMETHODPR(LineEdit, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("LineEdit", "int get_refs() const", asMETHODPR(LineEdit, Refs, () const, int), asCALL_THISCALL);
     // static void LineEdit::RegisterObject(Context* context) | File: ../UI/LineEdit.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("LineEdit", asBEHAVE_RELEASE, "void f()", asMETHODPR(LineEdit, ReleaseRef, (), void), asCALL_THISCALL);
     // void UIElement::Remove() | File: ../UI/UIElement.h
@@ -1851,7 +1851,7 @@ void ASRegisterGenerated_Members_L(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ListView", "UIElement@+ GetContentElement() const", asMETHODPR(ListView, GetContentElement, () const, UIElement*), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "UIElement@+ get_contentElement() const", asMETHODPR(ListView, GetContentElement, () const, UIElement*), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void UIElement::GetDebugDrawBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor) | File: ../UI/UIElement.h
     // Error: type "PODVector<UIBatch>&" can not automatically bind
     // XMLFile* UIElement::GetDefaultStyle(bool recursiveUp=true) const | File: ../UI/UIElement.h
@@ -2238,7 +2238,7 @@ void ASRegisterGenerated_Members_L(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ListView", "int Refs() const", asMETHODPR(ListView, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "int get_refs() const", asMETHODPR(ListView, Refs, () const, int), asCALL_THISCALL);
     // static void ListView::RegisterObject(Context* context) | File: ../UI/ListView.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("ListView", asBEHAVE_RELEASE, "void f()", asMETHODPR(ListView, ReleaseRef, (), void), asCALL_THISCALL);
     // void UIElement::Remove() | File: ../UI/UIElement.h
@@ -2653,7 +2653,7 @@ void ASRegisterGenerated_Members_L(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Localization", "const String& GetCategory() const", asMETHODPR(Localization, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Localization", "const String& get_category() const", asMETHODPR(Localization, GetCategory, () const, const String&), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
     engine->RegisterObjectMethod("Localization", "VariantMap& GetEventDataMap() const", asMETHODPR(Localization, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
     // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
@@ -2786,7 +2786,7 @@ void ASRegisterGenerated_Members_L(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Log", "const String& GetCategory() const", asMETHODPR(Log, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Log", "const String& get_category() const", asMETHODPR(Log, GetCategory, () const, const String&), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
     engine->RegisterObjectMethod("Log", "VariantMap& GetEventDataMap() const", asMETHODPR(Log, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
     // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
@@ -2964,7 +2964,7 @@ void ASRegisterGenerated_Members_L(asIScriptEngine* engine)
     // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
     // Not registered because template
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
     // Error: type "PODVector<Node*>&" can not automatically bind
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
@@ -3067,7 +3067,7 @@ void ASRegisterGenerated_Members_L(asIScriptEngine* engine)
     engine->RegisterObjectMethod("LogicComponent", "int Refs() const", asMETHODPR(LogicComponent, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("LogicComponent", "int get_refs() const", asMETHODPR(LogicComponent, Refs, () const, int), asCALL_THISCALL);
     // static void Animatable::RegisterObject(Context* context) | File: ../Scene/Animatable.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("LogicComponent", asBEHAVE_RELEASE, "void f()", asMETHODPR(LogicComponent, ReleaseRef, (), void), asCALL_THISCALL);
     // void Component::Remove() | File: ../Scene/Component.h

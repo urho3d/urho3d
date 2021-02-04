@@ -101,6 +101,7 @@ public:
     /// Destruct.
     ~Scene() override;
     /// Register object factory. Node must be registered first.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Load from binary data. Removes all existing child nodes and components first. Return true if successful.
@@ -361,6 +362,7 @@ private:
 };
 
 /// Register Scene library objects.
+/// @nobind
 void URHO3D_API RegisterSceneLibrary(Context* context);
 
 }

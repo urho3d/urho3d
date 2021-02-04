@@ -85,7 +85,7 @@ void ASRegisterGenerated_Members_E(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Engine", "const String& GetCategory() const", asMETHODPR(Engine, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "const String& get_category() const", asMETHODPR(Engine, GetCategory, () const, const String&), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
     engine->RegisterObjectMethod("Engine", "VariantMap& GetEventDataMap() const", asMETHODPR(Engine, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
     // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
@@ -269,7 +269,7 @@ void ASRegisterGenerated_Members_E(asIScriptEngine* engine)
     engine->RegisterObjectMethod("EventProfiler", "const String& GetCategory() const", asMETHODPR(EventProfiler, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod("EventProfiler", "const String& get_category() const", asMETHODPR(EventProfiler, GetCategory, () const, const String&), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // const ProfilerBlock* Profiler::GetCurrentBlock() | File: ../Core/Profiler.h
     // Error: type "ProfilerBlock" can not automatically bind bacause have @nobind mark
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h

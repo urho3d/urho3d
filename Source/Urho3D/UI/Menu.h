@@ -40,6 +40,7 @@ public:
     /// Destruct.
     ~Menu() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Load from XML data with style. Return true if successful.

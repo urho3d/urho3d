@@ -41,6 +41,7 @@ public:
     ~RaycastVehicle() override;
 
     /// Register object factory and attributes.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Handle enabled/disabled state change.

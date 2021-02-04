@@ -44,11 +44,10 @@ enum class TypeUsage
 struct ConvertedVariable
 {
     string asDeclaration_;
-
-    string newCppDeclaration_;
+    string cppDeclaration_;
     string glue_;
 
-    bool NeedWrapper() const { return !glue_.empty() || !newCppDeclaration_.empty(); }
+    bool NeedWrapper() const { return !glue_.empty(); }
 };
 
 enum class VariableUsage
@@ -59,7 +58,7 @@ enum class VariableUsage
     ClassVariable,
 };
 
-ConvertedVariable CppVariableToAS(const TypeAnalyzer& type, const string& name, VariableUsage usage, string defaultValue = "");
+ConvertedVariable CppVariableToAS(const TypeAnalyzer& type, VariableUsage usage, const string& name = "", const string& defaultValue = "");
 
 string CppTypeToAS(const TypeAnalyzer& type, TypeUsage typeUsage);
 

@@ -191,7 +191,7 @@ void ASRegisterGenerated_Members_F(asIScriptEngine* engine)
     engine->RegisterObjectMethod("File", "uint GetChecksum()", asMETHODPR(File, GetChecksum, (), unsigned), asCALL_THISCALL);
     engine->RegisterObjectMethod("File", "uint get_checksum()", asMETHODPR(File, GetChecksum, (), unsigned), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
     engine->RegisterObjectMethod("File", "VariantMap& GetEventDataMap() const", asMETHODPR(File, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
     // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
@@ -390,7 +390,7 @@ void ASRegisterGenerated_Members_F(asIScriptEngine* engine)
     engine->RegisterObjectMethod("File", "int WeakRefs() const", asMETHODPR(File, WeakRefs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("File", "int get_weakRefs() const", asMETHODPR(File, WeakRefs, () const, int), asCALL_THISCALL);
     // unsigned File::Write(const void* data, unsigned size) override | File: ../IO/File.h
-    // Error: type "void*" can not automatically bind
+    // Error: type "const void*" can not automatically bind
     // bool Serializer::WriteBool(bool value) | File: ../IO/Serializer.h
     engine->RegisterObjectMethod("File", "bool WriteBool(bool)", asMETHODPR(File, WriteBool, (bool), bool), asCALL_THISCALL);
     // bool Serializer::WriteBoundingBox(const BoundingBox& value) | File: ../IO/Serializer.h
@@ -514,7 +514,7 @@ void ASRegisterGenerated_Members_F(asIScriptEngine* engine)
     // Button* FileSelector::GetCloseButton() const | File: ../UI/FileSelector.h
     engine->RegisterObjectMethod("FileSelector", "Button@+ GetCloseButton() const", asMETHODPR(FileSelector, GetCloseButton, () const, Button*), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // XMLFile* FileSelector::GetDefaultStyle() const | File: ../UI/FileSelector.h
     engine->RegisterObjectMethod("FileSelector", "XMLFile@+ GetDefaultStyle() const", asMETHODPR(FileSelector, GetDefaultStyle, () const, XMLFile*), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSelector", "XMLFile@+ get_defaultStyle() const", asMETHODPR(FileSelector, GetDefaultStyle, () const, XMLFile*), asCALL_THISCALL);
@@ -603,7 +603,7 @@ void ASRegisterGenerated_Members_F(asIScriptEngine* engine)
     engine->RegisterObjectMethod("FileSelector", "int Refs() const", asMETHODPR(FileSelector, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSelector", "int get_refs() const", asMETHODPR(FileSelector, Refs, () const, int), asCALL_THISCALL);
     // static void FileSelector::RegisterObject(Context* context) | File: ../UI/FileSelector.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("FileSelector", asBEHAVE_RELEASE, "void f()", asMETHODPR(FileSelector, ReleaseRef, (), void), asCALL_THISCALL);
     // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
@@ -699,7 +699,7 @@ void ASRegisterGenerated_Members_F(asIScriptEngine* engine)
     engine->RegisterObjectMethod("FileSystem", "const String& GetCategory() const", asMETHODPR(FileSystem, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSystem", "const String& get_category() const", asMETHODPR(FileSystem, GetCategory, () const, const String&), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // String FileSystem::GetCurrentDir() const | File: ../IO/FileSystem.h
     engine->RegisterObjectMethod("FileSystem", "String GetCurrentDir() const", asMETHODPR(FileSystem, GetCurrentDir, () const, String), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSystem", "String get_currentDir() const", asMETHODPR(FileSystem, GetCurrentDir, () const, String), asCALL_THISCALL);
@@ -850,7 +850,7 @@ void ASRegisterGenerated_Members_F(asIScriptEngine* engine)
     engine->RegisterObjectMethod("FileWatcher", "const String& GetCategory() const", asMETHODPR(FileWatcher, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileWatcher", "const String& get_category() const", asMETHODPR(FileWatcher, GetCategory, () const, const String&), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // static ThreadID Thread::GetCurrentThreadID() | File: ../Core/Thread.h
     // Not registered because have @nobind mark
     // float FileWatcher::GetDelay() const | File: ../IO/FileWatcher.h
@@ -1000,7 +1000,7 @@ void ASRegisterGenerated_Members_F(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Font", "const String& GetCategory() const", asMETHODPR(Font, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Font", "const String& get_category() const", asMETHODPR(Font, GetCategory, () const, const String&), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
     engine->RegisterObjectMethod("Font", "VariantMap& GetEventDataMap() const", asMETHODPR(Font, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
     // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
@@ -1075,7 +1075,7 @@ void ASRegisterGenerated_Members_F(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Font", "int Refs() const", asMETHODPR(Font, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("Font", "int get_refs() const", asMETHODPR(Font, Refs, () const, int), asCALL_THISCALL);
     // static void Font::RegisterObject(Context* context) | File: ../UI/Font.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void Font::ReleaseFaces() | File: ../UI/Font.h
     engine->RegisterObjectMethod("Font", "void ReleaseFaces()", asMETHODPR(Font, ReleaseFaces, (), void), asCALL_THISCALL);
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h

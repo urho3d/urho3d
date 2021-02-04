@@ -99,19 +99,11 @@ CScriptArray* ResourceCacheGetResources(StringHash type, ResourceCache* ptr);
 
 // ========================================================================================
 
-// void JSONValue::SetVariant(const Variant &variant, Context *context=nullptr) | File: ../Resource/JSONValue.h
-void JSONValueSetVariant(const Variant& variant, JSONValue& jsonValue);
-// void JSONValue::SetVariantMap(const VariantMap &variantMap, Context *context=nullptr) | File: ../Resource/JSONValue.h
-void JSONValueSetVariantMap(const VariantMap& variantMap, JSONValue& jsonValue);
 CScriptArray* JSONValueGetKeys(const JSONValue& jsonValue);
 CScriptArray* JSONValueGetValues(const JSONValue& jsonValue);
 
 #define REGISTER_MANUAL_PART_JSONValue(T, className) \
     engine->RegisterObjectMethod(className, "Array<String>@ get_keys() const", asFUNCTION(JSONValueGetKeys), asCALL_CDECL_OBJLAST); \
-    engine->RegisterObjectMethod(className, "Array<JSONValue>@ get_values() const", asFUNCTION(JSONValueGetValues), asCALL_CDECL_OBJLAST); \
-    /* void JSONValue::SetVariant(const Variant &variant, Context *context=nullptr) | File: ../Resource/JSONValue.h */ \
-    engine->RegisterObjectMethod(className, "void SetVariant(const Variant&in)", asFUNCTION(JSONValueSetVariant), asCALL_CDECL_OBJLAST); \
-    /* void JSONValue::SetVariantMap(const VariantMap &variantMap, Context *context=nullptr) | File: ../Resource/JSONValue.h */ \
-    engine->RegisterObjectMethod(className, "void SetVariantMap(const VariantMap&in)", asFUNCTION(JSONValueSetVariantMap), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "Array<JSONValue>@ get_values() const", asFUNCTION(JSONValueGetValues), asCALL_CDECL_OBJLAST);
 
 }

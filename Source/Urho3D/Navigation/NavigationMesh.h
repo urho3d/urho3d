@@ -101,6 +101,7 @@ public:
     /// Destruct.
     ~NavigationMesh() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Visualize the component as debug geometry.
@@ -393,6 +394,7 @@ protected:
 };
 
 /// Register Navigation library objects.
+/// @nobind
 void URHO3D_API RegisterNavigationLibrary(Context* context);
 
 }

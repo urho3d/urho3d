@@ -40,6 +40,7 @@ public:
     /// Destruct.
     ~Zone() override;
     /// Register object factory. Drawable must be registered first.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Visualize the component as debug geometry.

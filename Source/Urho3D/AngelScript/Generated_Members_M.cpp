@@ -256,7 +256,7 @@ void ASRegisterGenerated_Members_M(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Material", "const String& GetCategory() const", asMETHODPR(Material, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "const String& get_category() const", asMETHODPR(Material, GetCategory, () const, const String&), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // CullMode Material::GetCullMode() const | File: ../Graphics/Material.h
     engine->RegisterObjectMethod("Material", "CullMode GetCullMode() const", asMETHODPR(Material, GetCullMode, () const, CullMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "CullMode get_cullMode() const", asMETHODPR(Material, GetCullMode, () const, CullMode), asCALL_THISCALL);
@@ -395,7 +395,7 @@ void ASRegisterGenerated_Members_M(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Material", "int Refs() const", asMETHODPR(Material, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "int get_refs() const", asMETHODPR(Material, Refs, () const, int), asCALL_THISCALL);
     // static void Material::RegisterObject(Context* context) | File: ../Graphics/Material.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("Material", asBEHAVE_RELEASE, "void f()", asMETHODPR(Material, ReleaseRef, (), void), asCALL_THISCALL);
     // void Material::ReleaseShaders() | File: ../Graphics/Material.h
@@ -1036,7 +1036,7 @@ void ASRegisterGenerated_Members_M(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Menu", "IntRect GetCombinedScreenRect()", asMETHODPR(Menu, GetCombinedScreenRect, (), IntRect), asCALL_THISCALL);
     engine->RegisterObjectMethod("Menu", "IntRect get_combinedScreenRect()", asMETHODPR(Menu, GetCombinedScreenRect, (), IntRect), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void UIElement::GetDebugDrawBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor) | File: ../UI/UIElement.h
     // Error: type "PODVector<UIBatch>&" can not automatically bind
     // XMLFile* UIElement::GetDefaultStyle(bool recursiveUp=true) const | File: ../UI/UIElement.h
@@ -1404,7 +1404,7 @@ void ASRegisterGenerated_Members_M(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Menu", "int Refs() const", asMETHODPR(Menu, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("Menu", "int get_refs() const", asMETHODPR(Menu, Refs, () const, int), asCALL_THISCALL);
     // static void Menu::RegisterObject(Context* context) | File: ../UI/Menu.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("Menu", asBEHAVE_RELEASE, "void f()", asMETHODPR(Menu, ReleaseRef, (), void), asCALL_THISCALL);
     // void UIElement::Remove() | File: ../UI/UIElement.h
@@ -1811,7 +1811,7 @@ void ASRegisterGenerated_Members_M(asIScriptEngine* engine)
     engine->RegisterObjectMethod("MessageBox", "const String& GetCategory() const", asMETHODPR(MessageBox, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod("MessageBox", "const String& get_category() const", asMETHODPR(MessageBox, GetCategory, () const, const String&), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
     engine->RegisterObjectMethod("MessageBox", "VariantMap& GetEventDataMap() const", asMETHODPR(MessageBox, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
     // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
@@ -1869,7 +1869,7 @@ void ASRegisterGenerated_Members_M(asIScriptEngine* engine)
     engine->RegisterObjectMethod("MessageBox", "int Refs() const", asMETHODPR(MessageBox, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("MessageBox", "int get_refs() const", asMETHODPR(MessageBox, Refs, () const, int), asCALL_THISCALL);
     // static void MessageBox::RegisterObject(Context* context) | File: ../UI/MessageBox.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("MessageBox", asBEHAVE_RELEASE, "void f()", asMETHODPR(MessageBox, ReleaseRef, (), void), asCALL_THISCALL);
     // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
@@ -1948,7 +1948,7 @@ void ASRegisterGenerated_Members_M(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Model", "const String& GetCategory() const", asMETHODPR(Model, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Model", "const String& get_category() const", asMETHODPR(Model, GetCategory, () const, const String&), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
     engine->RegisterObjectMethod("Model", "VariantMap& GetEventDataMap() const", asMETHODPR(Model, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
     // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
@@ -2058,7 +2058,7 @@ void ASRegisterGenerated_Members_M(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Model", "int Refs() const", asMETHODPR(Model, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("Model", "int get_refs() const", asMETHODPR(Model, Refs, () const, int), asCALL_THISCALL);
     // static void Model::RegisterObject(Context* context) | File: ../Graphics/Model.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("Model", asBEHAVE_RELEASE, "void f()", asMETHODPR(Model, ReleaseRef, (), void), asCALL_THISCALL);
     // void ResourceWithMetadata::RemoveAllMetadata() | File: ../Resource/Resource.h

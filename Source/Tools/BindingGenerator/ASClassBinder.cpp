@@ -206,7 +206,7 @@ static void RegisterStaticFunction(const ClassStaticFunctionAnalyzer& functionAn
         ConvertedVariable conv;
         try
         {
-            conv = CppVariableToAS(param.GetType(), param.GetDeclname(), VariableUsage::FunctionParameter, param.GetDefval());
+            conv = CppVariableToAS(param.GetType(), VariableUsage::FunctionParameter, param.GetDeclname(), param.GetDefval());
         }
         catch (const Exception& e)
         {
@@ -224,7 +224,7 @@ static void RegisterStaticFunction(const ClassStaticFunctionAnalyzer& functionAn
     
     try
     {
-        convertedReturn = CppVariableToAS(functionAnalyzer.GetReturnType(), "", VariableUsage::FunctionReturn);
+        convertedReturn = CppVariableToAS(functionAnalyzer.GetReturnType(), VariableUsage::FunctionReturn);
     }
     catch (const Exception& e)
     {
@@ -239,10 +239,13 @@ static void RegisterStaticFunction(const ClassStaticFunctionAnalyzer& functionAn
 
     for (const ConvertedVariable& conv : convertedParams)
     {
-        if (declParams.length() > 0)
-            declParams += ", ";
+        if (!conv.asDeclaration_.empty())
+        {
+            if (declParams.length() > 0)
+                declParams += ", ";
 
-        declParams += conv.asDeclaration_;
+            declParams += conv.asDeclaration_;
+        }
     }
 
     string asFunctionName = functionAnalyzer.GetName();
@@ -789,7 +792,7 @@ static void RegisterMethod(const ClassFunctionAnalyzer& functionAnalyzer, bool t
         
         try
         {
-            conv = CppVariableToAS(param.GetType(), param.GetDeclname(), VariableUsage::FunctionParameter, param.GetDefval());
+            conv = CppVariableToAS(param.GetType(), VariableUsage::FunctionParameter, param.GetDeclname(), param.GetDefval());
         }
         catch (const Exception& e)
         {
@@ -807,7 +810,7 @@ static void RegisterMethod(const ClassFunctionAnalyzer& functionAnalyzer, bool t
     
     try
     {
-        retConv = CppVariableToAS(functionAnalyzer.GetReturnType(), "", VariableUsage::FunctionReturn);
+        retConv = CppVariableToAS(functionAnalyzer.GetReturnType(), VariableUsage::FunctionReturn);
     }
     catch (const Exception& e)
     {
@@ -822,10 +825,13 @@ static void RegisterMethod(const ClassFunctionAnalyzer& functionAnalyzer, bool t
 
     for (const ConvertedVariable& conv : convertedParams)
     {
-        if (declParams.length() > 0)
-            declParams += ", ";
+        if (!conv.asDeclaration_.empty())
+        {
+            if (declParams.length() > 0)
+                declParams += ", ";
 
-        declParams += conv.asDeclaration_; // TODO функцию для джойна сделат ьвнутри конвертора
+            declParams += conv.asDeclaration_; // TODO функцию для джойна сделать внутри конвертора
+        }
     }
 
     string asReturnType = retConv.asDeclaration_;

@@ -51,6 +51,7 @@ public:
     /// Destruct.
     ~ParticleEffect2D() override;
     /// Register object factory. Drawable2D must be registered first.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.

@@ -52,6 +52,7 @@ public:
     /// Destruct.
     ~ListView() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// React to a key press.

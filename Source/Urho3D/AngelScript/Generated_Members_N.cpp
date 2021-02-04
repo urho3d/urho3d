@@ -223,7 +223,7 @@ void ASRegisterGenerated_Members_N(asIScriptEngine* engine)
     engine->RegisterObjectMethod("NamedPipe", "uint GetChecksum()", asMETHODPR(NamedPipe, GetChecksum, (), unsigned), asCALL_THISCALL);
     engine->RegisterObjectMethod("NamedPipe", "uint get_checksum()", asMETHODPR(NamedPipe, GetChecksum, (), unsigned), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
     engine->RegisterObjectMethod("NamedPipe", "VariantMap& GetEventDataMap() const", asMETHODPR(NamedPipe, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
     // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
@@ -419,7 +419,7 @@ void ASRegisterGenerated_Members_N(asIScriptEngine* engine)
     engine->RegisterObjectMethod("NamedPipe", "int WeakRefs() const", asMETHODPR(NamedPipe, WeakRefs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("NamedPipe", "int get_weakRefs() const", asMETHODPR(NamedPipe, WeakRefs, () const, int), asCALL_THISCALL);
     // unsigned NamedPipe::Write(const void* data, unsigned size) override | File: ../IO/NamedPipe.h
-    // Error: type "void*" can not automatically bind
+    // Error: type "const void*" can not automatically bind
     // bool Serializer::WriteBool(bool value) | File: ../IO/Serializer.h
     engine->RegisterObjectMethod("NamedPipe", "bool WriteBool(bool)", asMETHODPR(NamedPipe, WriteBool, (bool), bool), asCALL_THISCALL);
     // bool Serializer::WriteBoundingBox(const BoundingBox& value) | File: ../IO/Serializer.h
@@ -584,7 +584,7 @@ void ASRegisterGenerated_Members_N(asIScriptEngine* engine)
     // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
     // Not registered because template
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
     // Error: type "PODVector<Node*>&" can not automatically bind
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
@@ -694,7 +694,7 @@ void ASRegisterGenerated_Members_N(asIScriptEngine* engine)
     engine->RegisterObjectMethod("NavArea", "int Refs() const", asMETHODPR(NavArea, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("NavArea", "int get_refs() const", asMETHODPR(NavArea, Refs, () const, int), asCALL_THISCALL);
     // static void NavArea::RegisterObject(Context* context) | File: ../Navigation/NavArea.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("NavArea", asBEHAVE_RELEASE, "void f()", asMETHODPR(NavArea, ReleaseRef, (), void), asCALL_THISCALL);
     // void Component::Remove() | File: ../Scene/Component.h
@@ -871,7 +871,7 @@ void ASRegisterGenerated_Members_N(asIScriptEngine* engine)
     // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
     // Not registered because template
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
     // Error: type "PODVector<Node*>&" can not automatically bind
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
@@ -981,7 +981,7 @@ void ASRegisterGenerated_Members_N(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Navigable", "int Refs() const", asMETHODPR(Navigable, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("Navigable", "int get_refs() const", asMETHODPR(Navigable, Refs, () const, int), asCALL_THISCALL);
     // static void Navigable::RegisterObject(Context* context) | File: ../Navigation/Navigable.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("Navigable", asBEHAVE_RELEASE, "void f()", asMETHODPR(Navigable, ReleaseRef, (), void), asCALL_THISCALL);
     // void Component::Remove() | File: ../Scene/Component.h
@@ -1196,7 +1196,7 @@ void ASRegisterGenerated_Members_N(asIScriptEngine* engine)
     // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
     // Not registered because template
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
     // Error: type "PODVector<Node*>&" can not automatically bind
     // float NavigationMesh::GetDetailSampleDistance() const | File: ../Navigation/NavigationMesh.h
@@ -1367,7 +1367,7 @@ void ASRegisterGenerated_Members_N(asIScriptEngine* engine)
     engine->RegisterObjectMethod("NavigationMesh", "int Refs() const", asMETHODPR(NavigationMesh, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("NavigationMesh", "int get_refs() const", asMETHODPR(NavigationMesh, Refs, () const, int), asCALL_THISCALL);
     // static void NavigationMesh::RegisterObject(Context* context) | File: ../Navigation/NavigationMesh.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("NavigationMesh", asBEHAVE_RELEASE, "void f()", asMETHODPR(NavigationMesh, ReleaseRef, (), void), asCALL_THISCALL);
     // void Component::Remove() | File: ../Scene/Component.h
@@ -1587,7 +1587,7 @@ void ASRegisterGenerated_Members_N(asIScriptEngine* engine)
     // Connection* Network::GetConnection(const SLNet::AddressOrGUID& connection) const | File: ../Network/Network.h
     // Error: type "const SLNet::AddressOrGUID&" can not automatically bind
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
     engine->RegisterObjectMethod("Network", "VariantMap& GetEventDataMap() const", asMETHODPR(Network, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
     // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
@@ -1807,7 +1807,7 @@ void ASRegisterGenerated_Members_N(asIScriptEngine* engine)
     // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
     // Not registered because template
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
     // Error: type "PODVector<Node*>&" can not automatically bind
     // float NetworkPriority::GetDistanceFactor() const | File: ../Network/NetworkPriority.h
@@ -1920,7 +1920,7 @@ void ASRegisterGenerated_Members_N(asIScriptEngine* engine)
     engine->RegisterObjectMethod("NetworkPriority", "int Refs() const", asMETHODPR(NetworkPriority, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("NetworkPriority", "int get_refs() const", asMETHODPR(NetworkPriority, Refs, () const, int), asCALL_THISCALL);
     // static void NetworkPriority::RegisterObject(Context* context) | File: ../Network/NetworkPriority.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("NetworkPriority", asBEHAVE_RELEASE, "void f()", asMETHODPR(NetworkPriority, ReleaseRef, (), void), asCALL_THISCALL);
     // void Component::Remove() | File: ../Scene/Component.h
@@ -2154,7 +2154,7 @@ void ASRegisterGenerated_Members_N(asIScriptEngine* engine)
     // template<class T> void Node::GetComponents(PODVector<T*>& dest, bool recursive=false) const | File: ../Scene/Node.h
     // Not registered because template
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // const PODVector<Node*>& Node::GetDependencyNodes() const | File: ../Scene/Node.h
     engine->RegisterObjectMethod("Node", "Array<Node@>@ GetDependencyNodes() const", asFUNCTION(Node_GetDependencyNodes_void), asCALL_CDECL_OBJFIRST);
     // template<class T> T*  Node::GetDerivedComponent(bool recursive=false) const | File: ../Scene/Node.h
@@ -2400,7 +2400,7 @@ void ASRegisterGenerated_Members_N(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Node", "int Refs() const", asMETHODPR(Node, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("Node", "int get_refs() const", asMETHODPR(Node, Refs, () const, int), asCALL_THISCALL);
     // static void Node::RegisterObject(Context* context) | File: ../Scene/Node.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("Node", asBEHAVE_RELEASE, "void f()", asMETHODPR(Node, ReleaseRef, (), void), asCALL_THISCALL);
     // void Node::Remove() | File: ../Scene/Node.h

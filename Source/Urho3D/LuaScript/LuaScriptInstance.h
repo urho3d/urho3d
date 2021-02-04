@@ -67,6 +67,7 @@ public:
     /// Destruct.
     ~LuaScriptInstance() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Handle attribute write access.

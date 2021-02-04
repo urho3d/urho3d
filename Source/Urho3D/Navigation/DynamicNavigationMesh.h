@@ -52,6 +52,7 @@ public:
     ~DynamicNavigationMesh() override;
 
     /// Register with engine context.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Allocate the navigation mesh without building any tiles. Bounding box is not padded. Return true if successful.

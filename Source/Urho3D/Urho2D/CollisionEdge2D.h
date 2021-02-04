@@ -38,6 +38,7 @@ public:
     /// Destruct.
     ~CollisionEdge2D() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Set vertex 1.

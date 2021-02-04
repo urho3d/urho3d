@@ -203,7 +203,7 @@ void ASRegisterGenerated_Members_Tn_Tz(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ToolTip", "IntRect GetCombinedScreenRect()", asMETHODPR(ToolTip, GetCombinedScreenRect, (), IntRect), asCALL_THISCALL);
     engine->RegisterObjectMethod("ToolTip", "IntRect get_combinedScreenRect()", asMETHODPR(ToolTip, GetCombinedScreenRect, (), IntRect), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void UIElement::GetDebugDrawBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor) | File: ../UI/UIElement.h
     // Error: type "PODVector<UIBatch>&" can not automatically bind
     // XMLFile* UIElement::GetDefaultStyle(bool recursiveUp=true) const | File: ../UI/UIElement.h
@@ -523,7 +523,7 @@ void ASRegisterGenerated_Members_Tn_Tz(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ToolTip", "int Refs() const", asMETHODPR(ToolTip, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("ToolTip", "int get_refs() const", asMETHODPR(ToolTip, Refs, () const, int), asCALL_THISCALL);
     // static void ToolTip::RegisterObject(Context* context) | File: ../UI/ToolTip.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("ToolTip", asBEHAVE_RELEASE, "void f()", asMETHODPR(ToolTip, ReleaseRef, (), void), asCALL_THISCALL);
     // void UIElement::Remove() | File: ../UI/UIElement.h

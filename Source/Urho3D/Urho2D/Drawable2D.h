@@ -76,6 +76,7 @@ public:
     /// Destruct.
     ~Drawable2D() override;
     /// Register object factory. Drawable must be registered first.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Handle enabled/disabled state change.

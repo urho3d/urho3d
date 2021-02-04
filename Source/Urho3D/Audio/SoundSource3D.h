@@ -38,6 +38,7 @@ public:
     /// Construct.
     explicit SoundSource3D(Context* context);
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Visualize the component as debug geometry.

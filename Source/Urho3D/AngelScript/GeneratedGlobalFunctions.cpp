@@ -63,7 +63,7 @@ void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("float Atan2(float, float)", asFUNCTIONPR(Atan2, (float, float), float), asCALL_CDECL);
 
     // void BufferToString(String& dest, const void* data, unsigned size) | File: ../Core/StringUtils.h
-    // Error: type "void*" can not automatically bind
+    // Error: type "const void*" can not automatically bind
 
     // template<class T> T Ceil(T x) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("float Ceil(float)", asFUNCTIONPR(Ceil, (float), float), asCALL_CDECL);
@@ -352,19 +352,19 @@ void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("float RandomNormal(float, float)", asFUNCTIONPR(RandomNormal, (float, float), float), asCALL_CDECL);
 
     // void RegisterAudioLibrary(Context* context) | File: ../Audio/Audio.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
 
     // void RegisterGraphicsLibrary(Context* context) | File: ../Graphics/Graphics.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
 
     // void RegisterResourceLibrary(Context* context) | File: ../Resource/ResourceCache.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
 
     // void RegisterSceneLibrary(Context* context) | File: ../Scene/Scene.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
 
     // void RegisterUILibrary(Context* context) | File: ../UI/UI.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
 
     // String RemoveTrailingSlash(const String& pathName) | File: ../IO/FileSystem.h
     engine->RegisterGlobalFunction("String RemoveTrailingSlash(const String&in)", asFUNCTIONPR(RemoveTrailingSlash, (const String&), String), asCALL_CDECL);
@@ -659,27 +659,27 @@ void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
 
 #ifdef URHO3D_IK
     // void RegisterIKLibrary(Context* context) | File: ../IK/IK.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
 #endif
 
 #ifdef URHO3D_NAVIGATION
     // void RegisterNavigationLibrary(Context* context) | File: ../Navigation/NavigationMesh.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
 #endif
 
 #ifdef URHO3D_NETWORK
     // void RegisterNetworkLibrary(Context* context) | File: ../Network/Network.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
 #endif
 
 #ifdef URHO3D_PHYSICS
     // void RegisterPhysicsLibrary(Context* context) | File: ../Physics/PhysicsWorld.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
 #endif
 
 #ifdef URHO3D_URHO2D
     // void RegisterUrho2DLibrary(Context* context) | File: ../Urho2D/Urho2D.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
 #endif
 }
 

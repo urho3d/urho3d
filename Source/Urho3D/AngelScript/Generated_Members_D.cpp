@@ -251,7 +251,7 @@ void ASRegisterGenerated_Members_D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Database", "const String& GetCategory() const", asMETHODPR(Database, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Database", "const String& get_category() const", asMETHODPR(Database, GetCategory, () const, const String&), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
     engine->RegisterObjectMethod("Database", "VariantMap& GetEventDataMap() const", asMETHODPR(Database, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
     // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
@@ -369,7 +369,7 @@ void ASRegisterGenerated_Members_D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("DebugHud", "const String& GetCategory() const", asMETHODPR(DebugHud, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugHud", "const String& get_category() const", asMETHODPR(DebugHud, GetCategory, () const, const String&), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // XMLFile* DebugHud::GetDefaultStyle() const | File: ../Engine/DebugHud.h
     engine->RegisterObjectMethod("DebugHud", "XMLFile@+ GetDefaultStyle() const", asMETHODPR(DebugHud, GetDefaultStyle, () const, XMLFile*), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugHud", "XMLFile@+ get_defaultStyle() const", asMETHODPR(DebugHud, GetDefaultStyle, () const, XMLFile*), asCALL_THISCALL);
@@ -556,9 +556,9 @@ void ASRegisterGenerated_Members_D(asIScriptEngine* engine)
     // void DebugRenderer::AddTriangle(const Vector3& v1, const Vector3& v2, const Vector3& v3, unsigned color, bool depthTest=true) | File: ../Graphics/DebugRenderer.h
     engine->RegisterObjectMethod("DebugRenderer", "void AddTriangle(const Vector3&in, const Vector3&in, const Vector3&in, uint, bool = true)", asMETHODPR(DebugRenderer, AddTriangle, (const Vector3&, const Vector3&, const Vector3&, unsigned, bool), void), asCALL_THISCALL);
     // void DebugRenderer::AddTriangleMesh(const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount, const Matrix3x4& transform, const Color& color, bool depthTest=true) | File: ../Graphics/DebugRenderer.h
-    // Error: type "void*" can not automatically bind
+    // Error: type "const void*" can not automatically bind
     // void DebugRenderer::AddTriangleMesh(const void* vertexData, unsigned vertexSize, unsigned vertexStart, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount, const Matrix3x4& transform, const Color& color, bool depthTest=true) | File: ../Graphics/DebugRenderer.h
-    // Error: type "void*" can not automatically bind
+    // Error: type "const void*" can not automatically bind
     // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
     engine->RegisterObjectMethod("DebugRenderer", "void AllocateNetworkState()", asMETHODPR(DebugRenderer, AllocateNetworkState, (), void), asCALL_THISCALL);
     // virtual void Serializable::ApplyAttributes() | File: ../Scene/Serializable.h
@@ -610,7 +610,7 @@ void ASRegisterGenerated_Members_D(asIScriptEngine* engine)
     // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
     // Not registered because template
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
     // Error: type "PODVector<Node*>&" can not automatically bind
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
@@ -728,7 +728,7 @@ void ASRegisterGenerated_Members_D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("DebugRenderer", "int Refs() const", asMETHODPR(DebugRenderer, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugRenderer", "int get_refs() const", asMETHODPR(DebugRenderer, Refs, () const, int), asCALL_THISCALL);
     // static void DebugRenderer::RegisterObject(Context* context) | File: ../Graphics/DebugRenderer.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("DebugRenderer", asBEHAVE_RELEASE, "void f()", asMETHODPR(DebugRenderer, ReleaseRef, (), void), asCALL_THISCALL);
     // void Component::Remove() | File: ../Scene/Component.h
@@ -922,7 +922,7 @@ void ASRegisterGenerated_Members_D(asIScriptEngine* engine)
     // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
     // Not registered because template
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // PODVector<unsigned char> DecalSet::GetDecalsAttr() const | File: ../Graphics/DecalSet.h
     // Error: type "PODVector<unsigned char>" can not automatically bind
     // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
@@ -1137,7 +1137,7 @@ void ASRegisterGenerated_Members_D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("DecalSet", "int Refs() const", asMETHODPR(DecalSet, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("DecalSet", "int get_refs() const", asMETHODPR(DecalSet, Refs, () const, int), asCALL_THISCALL);
     // static void DecalSet::RegisterObject(Context* context) | File: ../Graphics/DecalSet.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("DecalSet", asBEHAVE_RELEASE, "void f()", asMETHODPR(DecalSet, ReleaseRef, (), void), asCALL_THISCALL);
     // void Component::Remove() | File: ../Scene/Component.h
@@ -1502,7 +1502,7 @@ void ASRegisterGenerated_Members_D(asIScriptEngine* engine)
     // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
     // Not registered because template
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
     // Error: type "PODVector<Node*>&" can not automatically bind
     // float Drawable::GetDistance() const | File: ../Graphics/Drawable.h
@@ -1692,7 +1692,7 @@ void ASRegisterGenerated_Members_D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Drawable", "int Refs() const", asMETHODPR(Drawable, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("Drawable", "int get_refs() const", asMETHODPR(Drawable, Refs, () const, int), asCALL_THISCALL);
     // static void Drawable::RegisterObject(Context* context) | File: ../Graphics/Drawable.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("Drawable", asBEHAVE_RELEASE, "void f()", asMETHODPR(Drawable, ReleaseRef, (), void), asCALL_THISCALL);
     // void Component::Remove() | File: ../Scene/Component.h
@@ -1923,7 +1923,7 @@ void ASRegisterGenerated_Members_D(asIScriptEngine* engine)
     // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
     // Not registered because template
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
     // Error: type "PODVector<Node*>&" can not automatically bind
     // float Drawable::GetDistance() const | File: ../Graphics/Drawable.h
@@ -2121,7 +2121,7 @@ void ASRegisterGenerated_Members_D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Drawable2D", "int Refs() const", asMETHODPR(Drawable2D, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("Drawable2D", "int get_refs() const", asMETHODPR(Drawable2D, Refs, () const, int), asCALL_THISCALL);
     // static void Drawable2D::RegisterObject(Context* context) | File: ../Urho2D/Drawable2D.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("Drawable2D", asBEHAVE_RELEASE, "void f()", asMETHODPR(Drawable2D, ReleaseRef, (), void), asCALL_THISCALL);
     // void Component::Remove() | File: ../Scene/Component.h
@@ -2435,7 +2435,7 @@ void ASRegisterGenerated_Members_D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("DropDownList", "IntRect GetCombinedScreenRect()", asMETHODPR(DropDownList, GetCombinedScreenRect, (), IntRect), asCALL_THISCALL);
     engine->RegisterObjectMethod("DropDownList", "IntRect get_combinedScreenRect()", asMETHODPR(DropDownList, GetCombinedScreenRect, (), IntRect), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void UIElement::GetDebugDrawBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor) | File: ../UI/UIElement.h
     // Error: type "PODVector<UIBatch>&" can not automatically bind
     // XMLFile* UIElement::GetDefaultStyle(bool recursiveUp=true) const | File: ../UI/UIElement.h
@@ -2829,7 +2829,7 @@ void ASRegisterGenerated_Members_D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("DropDownList", "int Refs() const", asMETHODPR(DropDownList, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("DropDownList", "int get_refs() const", asMETHODPR(DropDownList, Refs, () const, int), asCALL_THISCALL);
     // static void DropDownList::RegisterObject(Context* context) | File: ../UI/DropDownList.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("DropDownList", asBEHAVE_RELEASE, "void f()", asMETHODPR(DropDownList, ReleaseRef, (), void), asCALL_THISCALL);
     // void UIElement::Remove() | File: ../UI/UIElement.h
@@ -3342,7 +3342,7 @@ void ASRegisterGenerated_Members_D(asIScriptEngine* engine)
     // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
     // Not registered because template
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
     // Error: type "PODVector<Node*>&" can not automatically bind
     // float NavigationMesh::GetDetailSampleDistance() const | File: ../Navigation/NavigationMesh.h
@@ -3522,7 +3522,7 @@ void ASRegisterGenerated_Members_D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("DynamicNavigationMesh", "int Refs() const", asMETHODPR(DynamicNavigationMesh, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("DynamicNavigationMesh", "int get_refs() const", asMETHODPR(DynamicNavigationMesh, Refs, () const, int), asCALL_THISCALL);
     // static void DynamicNavigationMesh::RegisterObject(Context* context) | File: ../Navigation/DynamicNavigationMesh.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("DynamicNavigationMesh", asBEHAVE_RELEASE, "void f()", asMETHODPR(DynamicNavigationMesh, ReleaseRef, (), void), asCALL_THISCALL);
     // void Component::Remove() | File: ../Scene/Component.h

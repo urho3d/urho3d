@@ -84,6 +84,7 @@ public:
     /// Destruct. Any child nodes are detached.
     ~Node() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Load from binary data. Return true if successful.

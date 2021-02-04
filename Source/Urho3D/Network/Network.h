@@ -205,6 +205,7 @@ private:
 };
 
 /// Register Network library objects.
+/// @nobind
 void URHO3D_API RegisterNetworkLibrary(Context* context);
 
 }

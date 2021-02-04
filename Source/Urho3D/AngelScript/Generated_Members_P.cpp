@@ -344,7 +344,7 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     engine->RegisterObjectMethod("PackageFile", "uint GetChecksum() const", asMETHODPR(PackageFile, GetChecksum, () const, unsigned), asCALL_THISCALL);
     engine->RegisterObjectMethod("PackageFile", "uint get_checksum() const", asMETHODPR(PackageFile, GetChecksum, () const, unsigned), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // const HashMap<String, PackageEntry>& PackageFile::GetEntries() const | File: ../IO/PackageFile.h
     // Error: type "const HashMap<String, PackageEntry>&" can not automatically bind
     // const PackageEntry* PackageFile::GetEntry(const String& fileName) const | File: ../IO/PackageFile.h
@@ -506,7 +506,7 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ParticleEffect", "const Vector3& GetConstantForce() const", asMETHODPR(ParticleEffect, GetConstantForce, () const, const Vector3&), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect", "const Vector3& get_constantForce() const", asMETHODPR(ParticleEffect, GetConstantForce, () const, const Vector3&), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // float ParticleEffect::GetDampingForce() const | File: ../Graphics/ParticleEffect.h
     engine->RegisterObjectMethod("ParticleEffect", "float GetDampingForce() const", asMETHODPR(ParticleEffect, GetDampingForce, () const, float), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect", "float get_dampingForce() const", asMETHODPR(ParticleEffect, GetDampingForce, () const, float), asCALL_THISCALL);
@@ -677,7 +677,7 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ParticleEffect", "int Refs() const", asMETHODPR(ParticleEffect, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect", "int get_refs() const", asMETHODPR(ParticleEffect, Refs, () const, int), asCALL_THISCALL);
     // static void ParticleEffect::RegisterObject(Context* context) | File: ../Graphics/ParticleEffect.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("ParticleEffect", asBEHAVE_RELEASE, "void f()", asMETHODPR(ParticleEffect, ReleaseRef, (), void), asCALL_THISCALL);
     // void ParticleEffect::RemoveColorFrame(unsigned index) | File: ../Graphics/ParticleEffect.h
@@ -886,7 +886,7 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ParticleEffect2D", "const String& GetCategory() const", asMETHODPR(ParticleEffect2D, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect2D", "const String& get_category() const", asMETHODPR(ParticleEffect2D, GetCategory, () const, const String&), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // float ParticleEffect2D::GetDuration() const | File: ../Urho2D/ParticleEffect2D.h
     engine->RegisterObjectMethod("ParticleEffect2D", "float GetDuration() const", asMETHODPR(ParticleEffect2D, GetDuration, () const, float), asCALL_THISCALL);
     // EmitterType2D ParticleEffect2D::GetEmitterType() const | File: ../Urho2D/ParticleEffect2D.h
@@ -1015,7 +1015,7 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ParticleEffect2D", "int Refs() const", asMETHODPR(ParticleEffect2D, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect2D", "int get_refs() const", asMETHODPR(ParticleEffect2D, Refs, () const, int), asCALL_THISCALL);
     // static void ParticleEffect2D::RegisterObject(Context* context) | File: ../Urho2D/ParticleEffect2D.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("ParticleEffect2D", asBEHAVE_RELEASE, "void f()", asMETHODPR(ParticleEffect2D, ReleaseRef, (), void), asCALL_THISCALL);
     // void Resource::ResetUseTimer() | File: ../Resource/Resource.h
@@ -1235,7 +1235,7 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
     // Not registered because template
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
     // Error: type "PODVector<Node*>&" can not automatically bind
     // float Drawable::GetDistance() const | File: ../Graphics/Drawable.h
@@ -1473,7 +1473,7 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ParticleEmitter", "int Refs() const", asMETHODPR(ParticleEmitter, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "int get_refs() const", asMETHODPR(ParticleEmitter, Refs, () const, int), asCALL_THISCALL);
     // static void ParticleEmitter::RegisterObject(Context* context) | File: ../Graphics/ParticleEmitter.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("ParticleEmitter", asBEHAVE_RELEASE, "void f()", asMETHODPR(ParticleEmitter, ReleaseRef, (), void), asCALL_THISCALL);
     // void Component::Remove() | File: ../Scene/Component.h
@@ -1773,7 +1773,7 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
     // Not registered because template
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
     // Error: type "PODVector<Node*>&" can not automatically bind
     // float Drawable::GetDistance() const | File: ../Graphics/Drawable.h
@@ -1988,7 +1988,7 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ParticleEmitter2D", "int Refs() const", asMETHODPR(ParticleEmitter2D, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter2D", "int get_refs() const", asMETHODPR(ParticleEmitter2D, Refs, () const, int), asCALL_THISCALL);
     // static void ParticleEmitter2D::RegisterObject(Context* context) | File: ../Urho2D/ParticleEmitter2D.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("ParticleEmitter2D", asBEHAVE_RELEASE, "void f()", asMETHODPR(ParticleEmitter2D, ReleaseRef, (), void), asCALL_THISCALL);
     // void Component::Remove() | File: ../Scene/Component.h
@@ -2384,7 +2384,7 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
     // Not registered because template
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // CollisionGeometryDataCache& PhysicsWorld::GetConvexCache() | File: ../Physics/PhysicsWorld.h
     // Error: type "CollisionGeometryDataCache&" can not automatically bind
     // int PhysicsWorld::getDebugMode() const override | File: ../Physics/PhysicsWorld.h
@@ -2545,7 +2545,7 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     engine->RegisterObjectMethod("PhysicsWorld", "int Refs() const", asMETHODPR(PhysicsWorld, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "int get_refs() const", asMETHODPR(PhysicsWorld, Refs, () const, int), asCALL_THISCALL);
     // static void PhysicsWorld::RegisterObject(Context* context) | File: ../Physics/PhysicsWorld.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("PhysicsWorld", asBEHAVE_RELEASE, "void f()", asMETHODPR(PhysicsWorld, ReleaseRef, (), void), asCALL_THISCALL);
     // void Component::Remove() | File: ../Scene/Component.h
@@ -2796,7 +2796,7 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
     // Not registered because template
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // bool PhysicsWorld2D::GetContinuousPhysics() const | File: ../Urho2D/PhysicsWorld2D.h
     engine->RegisterObjectMethod("PhysicsWorld2D", "bool GetContinuousPhysics() const", asMETHODPR(PhysicsWorld2D, GetContinuousPhysics, () const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld2D", "bool get_continuousPhysics() const", asMETHODPR(PhysicsWorld2D, GetContinuousPhysics, () const, bool), asCALL_THISCALL);
@@ -2955,7 +2955,7 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     engine->RegisterObjectMethod("PhysicsWorld2D", "int Refs() const", asMETHODPR(PhysicsWorld2D, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld2D", "int get_refs() const", asMETHODPR(PhysicsWorld2D, Refs, () const, int), asCALL_THISCALL);
     // static void PhysicsWorld2D::RegisterObject(Context* context) | File: ../Urho2D/PhysicsWorld2D.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("PhysicsWorld2D", asBEHAVE_RELEASE, "void f()", asMETHODPR(PhysicsWorld2D, ReleaseRef, (), void), asCALL_THISCALL);
     // void Component::Remove() | File: ../Scene/Component.h
@@ -3239,7 +3239,7 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Profiler", "const String& GetCategory() const", asMETHODPR(Profiler, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Profiler", "const String& get_category() const", asMETHODPR(Profiler, GetCategory, () const, const String&), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // const ProfilerBlock* Profiler::GetCurrentBlock() | File: ../Core/Profiler.h
     // Error: type "ProfilerBlock" can not automatically bind bacause have @nobind mark
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
@@ -3471,7 +3471,7 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ProgressBar", "IntRect GetCombinedScreenRect()", asMETHODPR(ProgressBar, GetCombinedScreenRect, (), IntRect), asCALL_THISCALL);
     engine->RegisterObjectMethod("ProgressBar", "IntRect get_combinedScreenRect()", asMETHODPR(ProgressBar, GetCombinedScreenRect, (), IntRect), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void UIElement::GetDebugDrawBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor) | File: ../UI/UIElement.h
     // Error: type "PODVector<UIBatch>&" can not automatically bind
     // XMLFile* UIElement::GetDefaultStyle(bool recursiveUp=true) const | File: ../UI/UIElement.h
@@ -3832,7 +3832,7 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ProgressBar", "int Refs() const", asMETHODPR(ProgressBar, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("ProgressBar", "int get_refs() const", asMETHODPR(ProgressBar, Refs, () const, int), asCALL_THISCALL);
     // static void ProgressBar::RegisterObject(Context* context) | File: ../UI/ProgressBar.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("ProgressBar", asBEHAVE_RELEASE, "void f()", asMETHODPR(ProgressBar, ReleaseRef, (), void), asCALL_THISCALL);
     // void UIElement::Remove() | File: ../UI/UIElement.h

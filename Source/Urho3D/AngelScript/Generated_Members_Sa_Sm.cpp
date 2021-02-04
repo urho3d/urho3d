@@ -462,7 +462,7 @@ void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
     // template<class T> void Node::GetComponents(PODVector<T*>& dest, bool recursive=false) const | File: ../Scene/Node.h
     // Not registered because template
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // const PODVector<Node*>& Node::GetDependencyNodes() const | File: ../Scene/Node.h
     engine->RegisterObjectMethod("Scene", "Array<Node@>@ GetDependencyNodes() const", asFUNCTION(Scene_GetDependencyNodes_void), asCALL_CDECL_OBJFIRST);
     // template<class T> T*  Node::GetDerivedComponent(bool recursive=false) const | File: ../Scene/Node.h
@@ -774,7 +774,7 @@ void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Scene", "int Refs() const", asMETHODPR(Scene, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "int get_refs() const", asMETHODPR(Scene, Refs, () const, int), asCALL_THISCALL);
     // static void Scene::RegisterObject(Context* context) | File: ../Scene/Scene.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void Scene::RegisterVar(const String& name) | File: ../Scene/Scene.h
     engine->RegisterObjectMethod("Scene", "void RegisterVar(const String&in)", asMETHODPR(Scene, RegisterVar, (const String&), void), asCALL_THISCALL);
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
@@ -1256,7 +1256,7 @@ void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ScrollBar", "IntRect GetCombinedScreenRect()", asMETHODPR(ScrollBar, GetCombinedScreenRect, (), IntRect), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollBar", "IntRect get_combinedScreenRect()", asMETHODPR(ScrollBar, GetCombinedScreenRect, (), IntRect), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void UIElement::GetDebugDrawBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor) | File: ../UI/UIElement.h
     // Error: type "PODVector<UIBatch>&" can not automatically bind
     // XMLFile* UIElement::GetDefaultStyle(bool recursiveUp=true) const | File: ../UI/UIElement.h
@@ -1622,7 +1622,7 @@ void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ScrollBar", "int Refs() const", asMETHODPR(ScrollBar, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollBar", "int get_refs() const", asMETHODPR(ScrollBar, Refs, () const, int), asCALL_THISCALL);
     // static void ScrollBar::RegisterObject(Context* context) | File: ../UI/ScrollBar.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("ScrollBar", asBEHAVE_RELEASE, "void f()", asMETHODPR(ScrollBar, ReleaseRef, (), void), asCALL_THISCALL);
     // void UIElement::Remove() | File: ../UI/UIElement.h
@@ -2138,7 +2138,7 @@ void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ScrollView", "UIElement@+ GetContentElement() const", asMETHODPR(ScrollView, GetContentElement, () const, UIElement*), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "UIElement@+ get_contentElement() const", asMETHODPR(ScrollView, GetContentElement, () const, UIElement*), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void UIElement::GetDebugDrawBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor) | File: ../UI/UIElement.h
     // Error: type "PODVector<UIBatch>&" can not automatically bind
     // XMLFile* UIElement::GetDefaultStyle(bool recursiveUp=true) const | File: ../UI/UIElement.h
@@ -2488,7 +2488,7 @@ void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ScrollView", "int Refs() const", asMETHODPR(ScrollView, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "int get_refs() const", asMETHODPR(ScrollView, Refs, () const, int), asCALL_THISCALL);
     // static void ScrollView::RegisterObject(Context* context) | File: ../UI/ScrollView.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("ScrollView", asBEHAVE_RELEASE, "void f()", asMETHODPR(ScrollView, ReleaseRef, (), void), asCALL_THISCALL);
     // void UIElement::Remove() | File: ../UI/UIElement.h
@@ -2878,7 +2878,7 @@ void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Serializable", "const String& GetCategory() const", asMETHODPR(Serializable, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Serializable", "const String& get_category() const", asMETHODPR(Serializable, GetCategory, () const, const String&), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
     engine->RegisterObjectMethod("Serializable", "VariantMap& GetEventDataMap() const", asMETHODPR(Serializable, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
     // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
@@ -3033,7 +3033,7 @@ void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
     RegisterSubclass<RefCounted, Serializable>(engine, "RefCounted", "Serializable");
 
     // virtual unsigned Serializer::Write(const void* data, unsigned size)=0 | File: ../IO/Serializer.h
-    // Error: type "void*" can not automatically bind
+    // Error: type "const void*" can not automatically bind
     // bool Serializer::WriteBool(bool value) | File: ../IO/Serializer.h
     engine->RegisterObjectMethod("Serializer", "bool WriteBool(bool)", asMETHODPR(Serializer, WriteBool, (bool), bool), asCALL_THISCALL);
     // bool Serializer::WriteBoundingBox(const BoundingBox& value) | File: ../IO/Serializer.h
@@ -3140,7 +3140,7 @@ void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Shader", "const String& GetCategory() const", asMETHODPR(Shader, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Shader", "const String& get_category() const", asMETHODPR(Shader, GetCategory, () const, const String&), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
     engine->RegisterObjectMethod("Shader", "VariantMap& GetEventDataMap() const", asMETHODPR(Shader, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
     // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
@@ -3211,7 +3211,7 @@ void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Shader", "int Refs() const", asMETHODPR(Shader, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("Shader", "int get_refs() const", asMETHODPR(Shader, Refs, () const, int), asCALL_THISCALL);
     // static void Shader::RegisterObject(Context* context) | File: ../Graphics/Shader.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("Shader", asBEHAVE_RELEASE, "void f()", asMETHODPR(Shader, ReleaseRef, (), void), asCALL_THISCALL);
     // void Resource::ResetUseTimer() | File: ../Resource/Resource.h
@@ -3338,7 +3338,7 @@ void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ShaderPrecache", "const String& GetCategory() const", asMETHODPR(ShaderPrecache, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod("ShaderPrecache", "const String& get_category() const", asMETHODPR(ShaderPrecache, GetCategory, () const, const String&), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
     engine->RegisterObjectMethod("ShaderPrecache", "VariantMap& GetEventDataMap() const", asMETHODPR(ShaderPrecache, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
     // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
@@ -3636,7 +3636,7 @@ void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
     // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
     // Not registered because template
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
     // Error: type "PODVector<Node*>&" can not automatically bind
     // float Drawable::GetDistance() const | File: ../Graphics/Drawable.h
@@ -3849,7 +3849,7 @@ void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Skybox", "int Refs() const", asMETHODPR(Skybox, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("Skybox", "int get_refs() const", asMETHODPR(Skybox, Refs, () const, int), asCALL_THISCALL);
     // static void Skybox::RegisterObject(Context* context) | File: ../Graphics/Skybox.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("Skybox", asBEHAVE_RELEASE, "void f()", asMETHODPR(Skybox, ReleaseRef, (), void), asCALL_THISCALL);
     // void Component::Remove() | File: ../Scene/Component.h
@@ -4169,7 +4169,7 @@ void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Slider", "IntRect GetCombinedScreenRect()", asMETHODPR(Slider, GetCombinedScreenRect, (), IntRect), asCALL_THISCALL);
     engine->RegisterObjectMethod("Slider", "IntRect get_combinedScreenRect()", asMETHODPR(Slider, GetCombinedScreenRect, (), IntRect), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void UIElement::GetDebugDrawBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor) | File: ../UI/UIElement.h
     // Error: type "PODVector<UIBatch>&" can not automatically bind
     // XMLFile* UIElement::GetDefaultStyle(bool recursiveUp=true) const | File: ../UI/UIElement.h
@@ -4526,7 +4526,7 @@ void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Slider", "int Refs() const", asMETHODPR(Slider, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("Slider", "int get_refs() const", asMETHODPR(Slider, Refs, () const, int), asCALL_THISCALL);
     // static void Slider::RegisterObject(Context* context) | File: ../UI/Slider.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("Slider", asBEHAVE_RELEASE, "void f()", asMETHODPR(Slider, ReleaseRef, (), void), asCALL_THISCALL);
     // void UIElement::Remove() | File: ../UI/UIElement.h
@@ -4955,7 +4955,7 @@ void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
     // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
     // Not registered because template
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
     // Error: type "PODVector<Node*>&" can not automatically bind
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
@@ -5075,7 +5075,7 @@ void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
     engine->RegisterObjectMethod("SmoothedTransform", "int Refs() const", asMETHODPR(SmoothedTransform, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("SmoothedTransform", "int get_refs() const", asMETHODPR(SmoothedTransform, Refs, () const, int), asCALL_THISCALL);
     // static void SmoothedTransform::RegisterObject(Context* context) | File: ../Scene/SmoothedTransform.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("SmoothedTransform", asBEHAVE_RELEASE, "void f()", asMETHODPR(SmoothedTransform, ReleaseRef, (), void), asCALL_THISCALL);
     // void Component::Remove() | File: ../Scene/Component.h

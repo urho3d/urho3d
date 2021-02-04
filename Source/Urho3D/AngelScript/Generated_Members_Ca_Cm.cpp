@@ -140,7 +140,7 @@ void ASRegisterGenerated_Members_Ca_Cm(asIScriptEngine* engine)
     // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
     // Not registered because template
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
     // Error: type "PODVector<Node*>&" can not automatically bind
     // float Camera::GetDistance(const Vector3& worldPos) const | File: ../Graphics/Camera.h
@@ -332,7 +332,7 @@ void ASRegisterGenerated_Members_Ca_Cm(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Camera", "int Refs() const", asMETHODPR(Camera, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "int get_refs() const", asMETHODPR(Camera, Refs, () const, int), asCALL_THISCALL);
     // static void Camera::RegisterObject(Context* context) | File: ../Graphics/Camera.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("Camera", asBEHAVE_RELEASE, "void f()", asMETHODPR(Camera, ReleaseRef, (), void), asCALL_THISCALL);
     // void Component::Remove() | File: ../Scene/Component.h
@@ -653,7 +653,7 @@ void ASRegisterGenerated_Members_Ca_Cm(asIScriptEngine* engine)
     engine->RegisterObjectMethod("CheckBox", "IntRect GetCombinedScreenRect()", asMETHODPR(CheckBox, GetCombinedScreenRect, (), IntRect), asCALL_THISCALL);
     engine->RegisterObjectMethod("CheckBox", "IntRect get_combinedScreenRect()", asMETHODPR(CheckBox, GetCombinedScreenRect, (), IntRect), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void UIElement::GetDebugDrawBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor) | File: ../UI/UIElement.h
     // Error: type "PODVector<UIBatch>&" can not automatically bind
     // XMLFile* UIElement::GetDefaultStyle(bool recursiveUp=true) const | File: ../UI/UIElement.h
@@ -998,7 +998,7 @@ void ASRegisterGenerated_Members_Ca_Cm(asIScriptEngine* engine)
     engine->RegisterObjectMethod("CheckBox", "int Refs() const", asMETHODPR(CheckBox, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("CheckBox", "int get_refs() const", asMETHODPR(CheckBox, Refs, () const, int), asCALL_THISCALL);
     // static void CheckBox::RegisterObject(Context* context) | File: ../UI/CheckBox.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("CheckBox", asBEHAVE_RELEASE, "void f()", asMETHODPR(CheckBox, ReleaseRef, (), void), asCALL_THISCALL);
     // void UIElement::Remove() | File: ../UI/UIElement.h

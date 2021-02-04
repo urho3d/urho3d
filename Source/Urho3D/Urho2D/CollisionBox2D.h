@@ -38,6 +38,7 @@ public:
     /// Destruct.
     ~CollisionBox2D() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Set size.

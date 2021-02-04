@@ -167,7 +167,7 @@ void ASRegisterGenerated_Members_U(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UI", "const String& GetClipboardText() const", asMETHODPR(UI, GetClipboardText, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "const String& get_clipboardText() const", asMETHODPR(UI, GetClipboardText, () const, const String&), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // Cursor* UI::GetCursor() const | File: ../UI/UI.h
     engine->RegisterObjectMethod("UI", "Cursor@+ GetCursor() const", asMETHODPR(UI, GetCursor, () const, Cursor*), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "Cursor@+ get_cursor() const", asMETHODPR(UI, GetCursor, () const, Cursor*), asCALL_THISCALL);
@@ -528,7 +528,7 @@ void ASRegisterGenerated_Members_U(asIScriptEngine* engine)
     // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
     // Not registered because template
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
     // Error: type "PODVector<Node*>&" can not automatically bind
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
@@ -642,7 +642,7 @@ void ASRegisterGenerated_Members_U(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UIComponent", "int Refs() const", asMETHODPR(UIComponent, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("UIComponent", "int get_refs() const", asMETHODPR(UIComponent, Refs, () const, int), asCALL_THISCALL);
     // static void UIComponent::RegisterObject(Context* context) | File: ../UI/UIComponent.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("UIComponent", asBEHAVE_RELEASE, "void f()", asMETHODPR(UIComponent, ReleaseRef, (), void), asCALL_THISCALL);
     // void Component::Remove() | File: ../Scene/Component.h
@@ -886,7 +886,7 @@ void ASRegisterGenerated_Members_U(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UIElement", "IntRect GetCombinedScreenRect()", asMETHODPR(UIElement, GetCombinedScreenRect, (), IntRect), asCALL_THISCALL);
     engine->RegisterObjectMethod("UIElement", "IntRect get_combinedScreenRect()", asMETHODPR(UIElement, GetCombinedScreenRect, (), IntRect), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void UIElement::GetDebugDrawBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor) | File: ../UI/UIElement.h
     // Error: type "PODVector<UIBatch>&" can not automatically bind
     // XMLFile* UIElement::GetDefaultStyle(bool recursiveUp=true) const | File: ../UI/UIElement.h
@@ -1203,7 +1203,7 @@ void ASRegisterGenerated_Members_U(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UIElement", "int Refs() const", asMETHODPR(UIElement, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("UIElement", "int get_refs() const", asMETHODPR(UIElement, Refs, () const, int), asCALL_THISCALL);
     // static void UIElement::RegisterObject(Context* context) | File: ../UI/UIElement.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("UIElement", asBEHAVE_RELEASE, "void f()", asMETHODPR(UIElement, ReleaseRef, (), void), asCALL_THISCALL);
     // void UIElement::Remove() | File: ../UI/UIElement.h
@@ -1646,7 +1646,7 @@ void ASRegisterGenerated_Members_U(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UISelectable", "IntRect GetCombinedScreenRect()", asMETHODPR(UISelectable, GetCombinedScreenRect, (), IntRect), asCALL_THISCALL);
     engine->RegisterObjectMethod("UISelectable", "IntRect get_combinedScreenRect()", asMETHODPR(UISelectable, GetCombinedScreenRect, (), IntRect), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void UIElement::GetDebugDrawBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor) | File: ../UI/UIElement.h
     // Error: type "PODVector<UIBatch>&" can not automatically bind
     // XMLFile* UIElement::GetDefaultStyle(bool recursiveUp=true) const | File: ../UI/UIElement.h
@@ -1969,7 +1969,7 @@ void ASRegisterGenerated_Members_U(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UISelectable", "int Refs() const", asMETHODPR(UISelectable, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("UISelectable", "int get_refs() const", asMETHODPR(UISelectable, Refs, () const, int), asCALL_THISCALL);
     // static void UISelectable::RegisterObject(Context* context) | File: ../UI/UISelectable.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("UISelectable", asBEHAVE_RELEASE, "void f()", asMETHODPR(UISelectable, ReleaseRef, (), void), asCALL_THISCALL);
     // void UIElement::Remove() | File: ../UI/UIElement.h
@@ -2351,7 +2351,7 @@ void ASRegisterGenerated_Members_U(asIScriptEngine* engine)
     // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
     // Not registered because template
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
     // Error: type "PODVector<Node*>&" can not automatically bind
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
@@ -2464,7 +2464,7 @@ void ASRegisterGenerated_Members_U(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UnknownComponent", "int Refs() const", asMETHODPR(UnknownComponent, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("UnknownComponent", "int get_refs() const", asMETHODPR(UnknownComponent, Refs, () const, int), asCALL_THISCALL);
     // static void UnknownComponent::RegisterObject(Context* context) | File: ../Scene/UnknownComponent.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("UnknownComponent", asBEHAVE_RELEASE, "void f()", asMETHODPR(UnknownComponent, ReleaseRef, (), void), asCALL_THISCALL);
     // void Component::Remove() | File: ../Scene/Component.h

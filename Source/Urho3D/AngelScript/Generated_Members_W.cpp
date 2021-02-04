@@ -198,7 +198,7 @@ void ASRegisterGenerated_Members_W(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Window", "IntRect GetCombinedScreenRect()", asMETHODPR(Window, GetCombinedScreenRect, (), IntRect), asCALL_THISCALL);
     engine->RegisterObjectMethod("Window", "IntRect get_combinedScreenRect()", asMETHODPR(Window, GetCombinedScreenRect, (), IntRect), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void UIElement::GetDebugDrawBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor) | File: ../UI/UIElement.h
     // Error: type "PODVector<UIBatch>&" can not automatically bind
     // XMLFile* UIElement::GetDefaultStyle(bool recursiveUp=true) const | File: ../UI/UIElement.h
@@ -570,7 +570,7 @@ void ASRegisterGenerated_Members_W(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Window", "int Refs() const", asMETHODPR(Window, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("Window", "int get_refs() const", asMETHODPR(Window, Refs, () const, int), asCALL_THISCALL);
     // static void Window::RegisterObject(Context* context) | File: ../UI/Window.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("Window", asBEHAVE_RELEASE, "void f()", asMETHODPR(Window, ReleaseRef, (), void), asCALL_THISCALL);
     // void UIElement::Remove() | File: ../UI/UIElement.h
@@ -982,7 +982,7 @@ void ASRegisterGenerated_Members_W(asIScriptEngine* engine)
     engine->RegisterObjectMethod("WorkQueue", "const String& GetCategory() const", asMETHODPR(WorkQueue, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod("WorkQueue", "const String& get_category() const", asMETHODPR(WorkQueue, GetCategory, () const, const String&), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
     engine->RegisterObjectMethod("WorkQueue", "VariantMap& GetEventDataMap() const", asMETHODPR(WorkQueue, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
     // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h

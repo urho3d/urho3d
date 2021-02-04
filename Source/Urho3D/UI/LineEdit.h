@@ -41,6 +41,7 @@ public:
     /// Destruct.
     ~LineEdit() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Apply attribute changes that can not be applied immediately.

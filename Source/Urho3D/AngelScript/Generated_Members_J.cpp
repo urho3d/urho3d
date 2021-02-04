@@ -67,6 +67,27 @@ static void JSONValue_JSONValue_JSONValue(JSONValue* ptr, const JSONValue &value
     new(ptr) JSONValue(value);
 }
 
+// void JSONValue::SetVariant(const Variant& variant, Context* context=nullptr) | File: ../Resource/JSONValue.h
+static void JSONValue_SetVariant_Variant_Context(JSONValue* ptr, const Variant& variant)
+{
+    Context* context = GetScriptContext();
+    ptr->SetVariant(variant, context);
+}
+
+// void JSONValue::SetVariantMap(const VariantMap& variantMap, Context* context=nullptr) | File: ../Resource/JSONValue.h
+static void JSONValue_SetVariantMap_VariantMap_Context(JSONValue* ptr, const VariantMap& variantMap)
+{
+    Context* context = GetScriptContext();
+    ptr->SetVariantMap(variantMap, context);
+}
+
+// void JSONValue::SetVariantValue(const Variant& variant, Context* context=nullptr) | File: ../Resource/JSONValue.h
+static void JSONValue_SetVariantValue_Variant_Context(JSONValue* ptr, const Variant& variant)
+{
+    Context* context = GetScriptContext();
+    ptr->SetVariantValue(variant, context);
+}
+
 void ASRegisterGenerated_Members_J(asIScriptEngine* engine)
 {
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
@@ -89,7 +110,7 @@ void ASRegisterGenerated_Members_J(asIScriptEngine* engine)
     engine->RegisterObjectMethod("JSONFile", "const String& GetCategory() const", asMETHODPR(JSONFile, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONFile", "const String& get_category() const", asMETHODPR(JSONFile, GetCategory, () const, const String&), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
     engine->RegisterObjectMethod("JSONFile", "VariantMap& GetEventDataMap() const", asMETHODPR(JSONFile, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
     // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
@@ -159,7 +180,7 @@ void ASRegisterGenerated_Members_J(asIScriptEngine* engine)
     engine->RegisterObjectMethod("JSONFile", "int Refs() const", asMETHODPR(JSONFile, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONFile", "int get_refs() const", asMETHODPR(JSONFile, Refs, () const, int), asCALL_THISCALL);
     // static void JSONFile::RegisterObject(Context* context) | File: ../Resource/JSONFile.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("JSONFile", asBEHAVE_RELEASE, "void f()", asMETHODPR(JSONFile, ReleaseRef, (), void), asCALL_THISCALL);
     // void Resource::ResetUseTimer() | File: ../Resource/Resource.h
@@ -401,11 +422,11 @@ void ASRegisterGenerated_Members_J(asIScriptEngine* engine)
     // void JSONValue::SetType(JSONValueType valueType, JSONNumberType numberType=JSONNT_NAN) | File: ../Resource/JSONValue.h
     engine->RegisterObjectMethod("JSONValue", "void SetType(JSONValueType, JSONNumberType = JSONNT_NAN)", asMETHODPR(JSONValue, SetType, (JSONValueType, JSONNumberType), void), asCALL_THISCALL);
     // void JSONValue::SetVariant(const Variant& variant, Context* context=nullptr) | File: ../Resource/JSONValue.h
-    // Context can be used as firs parameter of constructors only
+    engine->RegisterObjectMethod("JSONValue", "void SetVariant(const Variant&in)", asFUNCTION(JSONValue_SetVariant_Variant_Context), asCALL_CDECL_OBJFIRST);
     // void JSONValue::SetVariantMap(const VariantMap& variantMap, Context* context=nullptr) | File: ../Resource/JSONValue.h
-    // Context can be used as firs parameter of constructors only
+    engine->RegisterObjectMethod("JSONValue", "void SetVariantMap(const VariantMap&in)", asFUNCTION(JSONValue_SetVariantMap_VariantMap_Context), asCALL_CDECL_OBJFIRST);
     // void JSONValue::SetVariantValue(const Variant& variant, Context* context=nullptr) | File: ../Resource/JSONValue.h
-    // Context can be used as firs parameter of constructors only
+    engine->RegisterObjectMethod("JSONValue", "void SetVariantValue(const Variant&in)", asFUNCTION(JSONValue_SetVariantValue_Variant_Context), asCALL_CDECL_OBJFIRST);
     // void JSONValue::SetVariantVector(const VariantVector& variantVector, Context* context=nullptr) | File: ../Resource/JSONValue.h
     // Error: type "const VariantVector&" can not automatically bind
     // unsigned JSONValue::Size() const | File: ../Resource/JSONValue.h

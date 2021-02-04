@@ -50,6 +50,7 @@ TypeAnalyzer::TypeAnalyzer(xml_node type, const TemplateSpecialization& speciali
 
     fullType_ = RemoveRefs(type);
     fullType_ = RemoveFirst(fullType_, "URHO3D_API ");
+    fullType_ = RemoveFirst(fullType_, " URHO3D_API");
     fullType_ = CutStart(fullType_, "constexpr ");
     fullType_ = ReplaceAll(fullType_, " *", "*");
     fullType_ = ReplaceAll(fullType_, " &", "&");
@@ -495,6 +496,7 @@ string GlobalVariableAnalyzer::GetLocation() const
     string result = ExtractDefinition(memberdef_);
 
     result = RemoveFirst(result, "URHO3D_API ");
+    result = RemoveFirst(result, " URHO3D_API");
 
     assert(Contains(result, " Urho3D::"));
     result = ReplaceFirst(result, " Urho3D::", " ");
@@ -906,6 +908,7 @@ string GetFunctionLocation(xml_node memberdef)
     }
     
     result = RemoveFirst(result, "URHO3D_API ");
+    result = RemoveFirst(result, " URHO3D_API");
 
     result = ReplaceAll(result, " **", "** ");
     result = ReplaceAll(result, " &&", "&& ");

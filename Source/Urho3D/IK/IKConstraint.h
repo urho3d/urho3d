@@ -45,6 +45,7 @@ public:
     ~IKConstraint() override;
 
     /// Registers this class as an object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     float GetStiffness() const;

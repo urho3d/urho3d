@@ -498,7 +498,7 @@ void ASRegisterGenerated_Members_Sn_Sz(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Sound", "const String& GetCategory() const", asMETHODPR(Sound, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Sound", "const String& get_category() const", asMETHODPR(Sound, GetCategory, () const, const String&), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // SharedArrayPtr<signed char> Sound::GetData() const | File: ../Audio/Sound.h
     // Error: type "SharedArrayPtr<signed char>" can not automatically bind
     // unsigned Sound::GetDataSize() const | File: ../Audio/Sound.h
@@ -608,7 +608,7 @@ void ASRegisterGenerated_Members_Sn_Sz(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Sound", "int Refs() const", asMETHODPR(Sound, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("Sound", "int get_refs() const", asMETHODPR(Sound, Refs, () const, int), asCALL_THISCALL);
     // static void Sound::RegisterObject(Context* context) | File: ../Audio/Sound.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("Sound", asBEHAVE_RELEASE, "void f()", asMETHODPR(Sound, ReleaseRef, (), void), asCALL_THISCALL);
     // void ResourceWithMetadata::RemoveAllMetadata() | File: ../Resource/Resource.h
@@ -633,7 +633,7 @@ void ASRegisterGenerated_Members_Sn_Sz(asIScriptEngine* engine)
     // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
     engine->RegisterObjectMethod("Sound", "void SetBlockEvents(bool)", asMETHODPR(Sound, SetBlockEvents, (bool), void), asCALL_THISCALL);
     // void Sound::SetData(const void* data, unsigned dataSize) | File: ../Audio/Sound.h
-    // Error: type "void*" can not automatically bind
+    // Error: type "const void*" can not automatically bind
     // void Sound::SetFormat(unsigned frequency, bool sixteenBit, bool stereo) | File: ../Audio/Sound.h
     engine->RegisterObjectMethod("Sound", "void SetFormat(uint, bool, bool)", asMETHODPR(Sound, SetFormat, (unsigned, bool, bool), void), asCALL_THISCALL);
     // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
@@ -747,7 +747,7 @@ void ASRegisterGenerated_Members_Sn_Sz(asIScriptEngine* engine)
     // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
     // Not registered because template
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
     // Error: type "PODVector<Node*>&" can not automatically bind
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
@@ -852,7 +852,7 @@ void ASRegisterGenerated_Members_Sn_Sz(asIScriptEngine* engine)
     engine->RegisterObjectMethod("SoundListener", "int Refs() const", asMETHODPR(SoundListener, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("SoundListener", "int get_refs() const", asMETHODPR(SoundListener, Refs, () const, int), asCALL_THISCALL);
     // static void SoundListener::RegisterObject(Context* context) | File: ../Audio/SoundListener.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("SoundListener", asBEHAVE_RELEASE, "void f()", asMETHODPR(SoundListener, ReleaseRef, (), void), asCALL_THISCALL);
     // void Component::Remove() | File: ../Scene/Component.h
@@ -1029,7 +1029,7 @@ void ASRegisterGenerated_Members_Sn_Sz(asIScriptEngine* engine)
     // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
     // Not registered because template
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
     // Error: type "PODVector<Node*>&" can not automatically bind
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
@@ -1173,7 +1173,7 @@ void ASRegisterGenerated_Members_Sn_Sz(asIScriptEngine* engine)
     engine->RegisterObjectMethod("SoundSource", "int Refs() const", asMETHODPR(SoundSource, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("SoundSource", "int get_refs() const", asMETHODPR(SoundSource, Refs, () const, int), asCALL_THISCALL);
     // static void SoundSource::RegisterObject(Context* context) | File: ../Audio/SoundSource.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("SoundSource", asBEHAVE_RELEASE, "void f()", asMETHODPR(SoundSource, ReleaseRef, (), void), asCALL_THISCALL);
     // void Component::Remove() | File: ../Scene/Component.h
@@ -1385,7 +1385,7 @@ void ASRegisterGenerated_Members_Sn_Sz(asIScriptEngine* engine)
     // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
     // Not registered because template
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
     // Error: type "PODVector<Node*>&" can not automatically bind
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
@@ -1541,7 +1541,7 @@ void ASRegisterGenerated_Members_Sn_Sz(asIScriptEngine* engine)
     engine->RegisterObjectMethod("SoundSource3D", "int Refs() const", asMETHODPR(SoundSource3D, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("SoundSource3D", "int get_refs() const", asMETHODPR(SoundSource3D, Refs, () const, int), asCALL_THISCALL);
     // static void SoundSource3D::RegisterObject(Context* context) | File: ../Audio/SoundSource3D.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("SoundSource3D", asBEHAVE_RELEASE, "void f()", asMETHODPR(SoundSource3D, ReleaseRef, (), void), asCALL_THISCALL);
     // void Component::Remove() | File: ../Scene/Component.h
@@ -1924,7 +1924,7 @@ void ASRegisterGenerated_Members_Sn_Sz(asIScriptEngine* engine)
     // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
     // Not registered because template
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // unsigned SplinePath::GetControlledIdAttr() const | File: ../Scene/SplinePath.h
     engine->RegisterObjectMethod("SplinePath", "uint GetControlledIdAttr() const", asMETHODPR(SplinePath, GetControlledIdAttr, () const, unsigned), asCALL_THISCALL);
     // Node* SplinePath::GetControlledNode() const | File: ../Scene/SplinePath.h
@@ -2054,7 +2054,7 @@ void ASRegisterGenerated_Members_Sn_Sz(asIScriptEngine* engine)
     engine->RegisterObjectMethod("SplinePath", "int Refs() const", asMETHODPR(SplinePath, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("SplinePath", "int get_refs() const", asMETHODPR(SplinePath, Refs, () const, int), asCALL_THISCALL);
     // static void SplinePath::RegisterObject(Context* context) | File: ../Scene/SplinePath.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("SplinePath", asBEHAVE_RELEASE, "void f()", asMETHODPR(SplinePath, ReleaseRef, (), void), asCALL_THISCALL);
     // void Component::Remove() | File: ../Scene/Component.h
@@ -2318,7 +2318,7 @@ void ASRegisterGenerated_Members_Sn_Sz(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Sprite", "IntRect GetCombinedScreenRect()", asMETHODPR(Sprite, GetCombinedScreenRect, (), IntRect), asCALL_THISCALL);
     engine->RegisterObjectMethod("Sprite", "IntRect get_combinedScreenRect()", asMETHODPR(Sprite, GetCombinedScreenRect, (), IntRect), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void UIElement::GetDebugDrawBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor) | File: ../UI/UIElement.h
     // Error: type "PODVector<UIBatch>&" can not automatically bind
     // XMLFile* UIElement::GetDefaultStyle(bool recursiveUp=true) const | File: ../UI/UIElement.h
@@ -2654,7 +2654,7 @@ void ASRegisterGenerated_Members_Sn_Sz(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Sprite", "int Refs() const", asMETHODPR(Sprite, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("Sprite", "int get_refs() const", asMETHODPR(Sprite, Refs, () const, int), asCALL_THISCALL);
     // static void Sprite::RegisterObject(Context* context) | File: ../UI/Sprite.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("Sprite", asBEHAVE_RELEASE, "void f()", asMETHODPR(Sprite, ReleaseRef, (), void), asCALL_THISCALL);
     // void UIElement::Remove() | File: ../UI/UIElement.h
@@ -3024,7 +3024,7 @@ void ASRegisterGenerated_Members_Sn_Sz(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Sprite2D", "const String& GetCategory() const", asMETHODPR(Sprite2D, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Sprite2D", "const String& get_category() const", asMETHODPR(Sprite2D, GetCategory, () const, const String&), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // bool Sprite2D::GetDrawRectangle(Rect& rect, bool flipX=false, bool flipY=false) const | File: ../Urho2D/Sprite2D.h
     engine->RegisterObjectMethod("Sprite2D", "bool GetDrawRectangle(Rect&, bool = false, bool = false) const", asMETHODPR(Sprite2D, GetDrawRectangle, (Rect&, bool, bool) const, bool), asCALL_THISCALL);
     // bool Sprite2D::GetDrawRectangle(Rect& rect, const Vector2& hotSpot, bool flipX=false, bool flipY=false) const | File: ../Urho2D/Sprite2D.h
@@ -3114,7 +3114,7 @@ void ASRegisterGenerated_Members_Sn_Sz(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Sprite2D", "int Refs() const", asMETHODPR(Sprite2D, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("Sprite2D", "int get_refs() const", asMETHODPR(Sprite2D, Refs, () const, int), asCALL_THISCALL);
     // static void Sprite2D::RegisterObject(Context* context) | File: ../Urho2D/Sprite2D.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("Sprite2D", asBEHAVE_RELEASE, "void f()", asMETHODPR(Sprite2D, ReleaseRef, (), void), asCALL_THISCALL);
     // void Resource::ResetUseTimer() | File: ../Resource/Resource.h
@@ -3224,7 +3224,7 @@ void ASRegisterGenerated_Members_Sn_Sz(asIScriptEngine* engine)
     engine->RegisterObjectMethod("SpriteSheet2D", "const String& GetCategory() const", asMETHODPR(SpriteSheet2D, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod("SpriteSheet2D", "const String& get_category() const", asMETHODPR(SpriteSheet2D, GetCategory, () const, const String&), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
     engine->RegisterObjectMethod("SpriteSheet2D", "VariantMap& GetEventDataMap() const", asMETHODPR(SpriteSheet2D, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
     // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
@@ -3294,7 +3294,7 @@ void ASRegisterGenerated_Members_Sn_Sz(asIScriptEngine* engine)
     engine->RegisterObjectMethod("SpriteSheet2D", "int Refs() const", asMETHODPR(SpriteSheet2D, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("SpriteSheet2D", "int get_refs() const", asMETHODPR(SpriteSheet2D, Refs, () const, int), asCALL_THISCALL);
     // static void SpriteSheet2D::RegisterObject(Context* context) | File: ../Urho2D/SpriteSheet2D.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("SpriteSheet2D", asBEHAVE_RELEASE, "void f()", asMETHODPR(SpriteSheet2D, ReleaseRef, (), void), asCALL_THISCALL);
     // void Resource::ResetUseTimer() | File: ../Resource/Resource.h
@@ -3434,7 +3434,7 @@ void ASRegisterGenerated_Members_Sn_Sz(asIScriptEngine* engine)
     // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
     // Not registered because template
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
     // Error: type "PODVector<Node*>&" can not automatically bind
     // float Drawable::GetDistance() const | File: ../Graphics/Drawable.h
@@ -3647,7 +3647,7 @@ void ASRegisterGenerated_Members_Sn_Sz(asIScriptEngine* engine)
     engine->RegisterObjectMethod("StaticModel", "int Refs() const", asMETHODPR(StaticModel, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("StaticModel", "int get_refs() const", asMETHODPR(StaticModel, Refs, () const, int), asCALL_THISCALL);
     // static void StaticModel::RegisterObject(Context* context) | File: ../Graphics/StaticModel.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("StaticModel", asBEHAVE_RELEASE, "void f()", asMETHODPR(StaticModel, ReleaseRef, (), void), asCALL_THISCALL);
     // void Component::Remove() | File: ../Scene/Component.h
@@ -3902,7 +3902,7 @@ void ASRegisterGenerated_Members_Sn_Sz(asIScriptEngine* engine)
     // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
     // Not registered because template
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
     // Error: type "PODVector<Node*>&" can not automatically bind
     // float Drawable::GetDistance() const | File: ../Graphics/Drawable.h
@@ -4123,7 +4123,7 @@ void ASRegisterGenerated_Members_Sn_Sz(asIScriptEngine* engine)
     engine->RegisterObjectMethod("StaticModelGroup", "int Refs() const", asMETHODPR(StaticModelGroup, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("StaticModelGroup", "int get_refs() const", asMETHODPR(StaticModelGroup, Refs, () const, int), asCALL_THISCALL);
     // static void StaticModelGroup::RegisterObject(Context* context) | File: ../Graphics/StaticModelGroup.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("StaticModelGroup", asBEHAVE_RELEASE, "void f()", asMETHODPR(StaticModelGroup, ReleaseRef, (), void), asCALL_THISCALL);
     // void Component::Remove() | File: ../Scene/Component.h
@@ -4394,7 +4394,7 @@ void ASRegisterGenerated_Members_Sn_Sz(asIScriptEngine* engine)
     // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
     // Not registered because template
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // Material* StaticSprite2D::GetCustomMaterial() const | File: ../Urho2D/StaticSprite2D.h
     engine->RegisterObjectMethod("StaticSprite2D", "Material@+ GetCustomMaterial() const", asMETHODPR(StaticSprite2D, GetCustomMaterial, () const, Material*), asCALL_THISCALL);
     engine->RegisterObjectMethod("StaticSprite2D", "Material@+ get_customMaterial() const", asMETHODPR(StaticSprite2D, GetCustomMaterial, () const, Material*), asCALL_THISCALL);
@@ -4629,7 +4629,7 @@ void ASRegisterGenerated_Members_Sn_Sz(asIScriptEngine* engine)
     engine->RegisterObjectMethod("StaticSprite2D", "int Refs() const", asMETHODPR(StaticSprite2D, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("StaticSprite2D", "int get_refs() const", asMETHODPR(StaticSprite2D, Refs, () const, int), asCALL_THISCALL);
     // static void StaticSprite2D::RegisterObject(Context* context) | File: ../Urho2D/StaticSprite2D.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("StaticSprite2D", asBEHAVE_RELEASE, "void f()", asMETHODPR(StaticSprite2D, ReleaseRef, (), void), asCALL_THISCALL);
     // void Component::Remove() | File: ../Scene/Component.h
@@ -4937,7 +4937,7 @@ void ASRegisterGenerated_Members_Sn_Sz(asIScriptEngine* engine)
     // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
     // Not registered because template
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // Material* StaticSprite2D::GetCustomMaterial() const | File: ../Urho2D/StaticSprite2D.h
     engine->RegisterObjectMethod("StretchableSprite2D", "Material@+ GetCustomMaterial() const", asMETHODPR(StretchableSprite2D, GetCustomMaterial, () const, Material*), asCALL_THISCALL);
     engine->RegisterObjectMethod("StretchableSprite2D", "Material@+ get_customMaterial() const", asMETHODPR(StretchableSprite2D, GetCustomMaterial, () const, Material*), asCALL_THISCALL);
@@ -5172,7 +5172,7 @@ void ASRegisterGenerated_Members_Sn_Sz(asIScriptEngine* engine)
     engine->RegisterObjectMethod("StretchableSprite2D", "int Refs() const", asMETHODPR(StretchableSprite2D, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("StretchableSprite2D", "int get_refs() const", asMETHODPR(StretchableSprite2D, Refs, () const, int), asCALL_THISCALL);
     // static void StretchableSprite2D::RegisterObject(Context* context) | File: ../Urho2D/StretchableSprite2D.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("StretchableSprite2D", asBEHAVE_RELEASE, "void f()", asMETHODPR(StretchableSprite2D, ReleaseRef, (), void), asCALL_THISCALL);
     // void Component::Remove() | File: ../Scene/Component.h

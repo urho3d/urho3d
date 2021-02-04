@@ -311,13 +311,13 @@ void ASRegisterGenerated_Members_R(asIScriptEngine* engine)
     // float Ray::HitDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2, Vector3* outNormal=nullptr, Vector3* outBary=nullptr) const | File: ../Math/Ray.h
     // Error: type "Vector3*" can not automatically bind
     // float Ray::HitDistance(const void* vertexData, unsigned vertexStride, unsigned vertexStart, unsigned vertexCount, Vector3* outNormal=nullptr, Vector2* outUV=nullptr, unsigned uvOffset=0) const | File: ../Math/Ray.h
-    // Error: type "void*" can not automatically bind
+    // Error: type "const void*" can not automatically bind
     // float Ray::HitDistance(const void* vertexData, unsigned vertexStride, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount, Vector3* outNormal=nullptr, Vector2* outUV=nullptr, unsigned uvOffset=0) const | File: ../Math/Ray.h
-    // Error: type "void*" can not automatically bind
+    // Error: type "const void*" can not automatically bind
     // bool Ray::InsideGeometry(const void* vertexData, unsigned vertexSize, unsigned vertexStart, unsigned vertexCount) const | File: ../Math/Ray.h
-    // Error: type "void*" can not automatically bind
+    // Error: type "const void*" can not automatically bind
     // bool Ray::InsideGeometry(const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount) const | File: ../Math/Ray.h
-    // Error: type "void*" can not automatically bind
+    // Error: type "const void*" can not automatically bind
     // Ray& Ray::operator=(const Ray& rhs) noexcept=default | File: ../Math/Ray.h
     engine->RegisterObjectMethod("Ray", "Ray& opAssign(const Ray&in)", asMETHODPR(Ray, operator=, (const Ray&), Ray&), asCALL_THISCALL);
     // bool Ray::operator==(const Ray& rhs) const | File: ../Math/Ray.h
@@ -424,7 +424,7 @@ void ASRegisterGenerated_Members_R(asIScriptEngine* engine)
     // Vector3 RaycastVehicle::GetContactPosition(int wheel) const | File: ../Physics/RaycastVehicle.h
     engine->RegisterObjectMethod("RaycastVehicle", "Vector3 GetContactPosition(int) const", asMETHODPR(RaycastVehicle, GetContactPosition, (int) const, Vector3), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // IntVector3 RaycastVehicle::GetCoordinateSystem() const | File: ../Physics/RaycastVehicle.h
     engine->RegisterObjectMethod("RaycastVehicle", "IntVector3 GetCoordinateSystem() const", asMETHODPR(RaycastVehicle, GetCoordinateSystem, () const, IntVector3), asCALL_THISCALL);
     engine->RegisterObjectMethod("RaycastVehicle", "IntVector3 get_coordinateSystem() const", asMETHODPR(RaycastVehicle, GetCoordinateSystem, () const, IntVector3), asCALL_THISCALL);
@@ -591,7 +591,7 @@ void ASRegisterGenerated_Members_R(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RaycastVehicle", "int Refs() const", asMETHODPR(RaycastVehicle, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("RaycastVehicle", "int get_refs() const", asMETHODPR(RaycastVehicle, Refs, () const, int), asCALL_THISCALL);
     // static void RaycastVehicle::RegisterObject(Context* context) | File: ../Physics/RaycastVehicle.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("RaycastVehicle", asBEHAVE_RELEASE, "void f()", asMETHODPR(RaycastVehicle, ReleaseRef, (), void), asCALL_THISCALL);
     // void Component::Remove() | File: ../Scene/Component.h
@@ -1087,7 +1087,7 @@ void ASRegisterGenerated_Members_R(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Renderer", "const String& GetCategory() const", asMETHODPR(Renderer, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "const String& get_category() const", asMETHODPR(Renderer, GetCategory, () const, const String&), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // Texture2D* Renderer::GetDefaultLightRamp() const | File: ../Graphics/Renderer.h
     engine->RegisterObjectMethod("Renderer", "Texture2D@+ GetDefaultLightRamp() const", asMETHODPR(Renderer, GetDefaultLightRamp, () const, Texture2D*), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "Texture2D@+ get_defaultLightRamp() const", asMETHODPR(Renderer, GetDefaultLightRamp, () const, Texture2D*), asCALL_THISCALL);
@@ -1515,7 +1515,7 @@ void ASRegisterGenerated_Members_R(asIScriptEngine* engine)
     // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
     // Not registered because template
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
     // Error: type "PODVector<Node*>&" can not automatically bind
     // float Drawable::GetDistance() const | File: ../Graphics/Drawable.h
@@ -1707,7 +1707,7 @@ void ASRegisterGenerated_Members_R(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Renderer2D", "int Refs() const", asMETHODPR(Renderer2D, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer2D", "int get_refs() const", asMETHODPR(Renderer2D, Refs, () const, int), asCALL_THISCALL);
     // static void Renderer2D::RegisterObject(Context* context) | File: ../Urho2D/Renderer2D.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("Renderer2D", asBEHAVE_RELEASE, "void f()", asMETHODPR(Renderer2D, ReleaseRef, (), void), asCALL_THISCALL);
     // void Component::Remove() | File: ../Scene/Component.h
@@ -1897,7 +1897,7 @@ void ASRegisterGenerated_Members_R(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Resource", "const String& GetCategory() const", asMETHODPR(Resource, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Resource", "const String& get_category() const", asMETHODPR(Resource, GetCategory, () const, const String&), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
     engine->RegisterObjectMethod("Resource", "VariantMap& GetEventDataMap() const", asMETHODPR(Resource, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
     // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
@@ -2054,7 +2054,7 @@ void ASRegisterGenerated_Members_R(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ResourceCache", "const String& GetCategory() const", asMETHODPR(ResourceCache, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "const String& get_category() const", asMETHODPR(ResourceCache, GetCategory, () const, const String&), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
     engine->RegisterObjectMethod("ResourceCache", "VariantMap& GetEventDataMap() const", asMETHODPR(ResourceCache, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
     // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
@@ -2269,7 +2269,7 @@ void ASRegisterGenerated_Members_R(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ResourceWithMetadata", "const String& GetCategory() const", asMETHODPR(ResourceWithMetadata, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceWithMetadata", "const String& get_category() const", asMETHODPR(ResourceWithMetadata, GetCategory, () const, const String&), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
     engine->RegisterObjectMethod("ResourceWithMetadata", "VariantMap& GetEventDataMap() const", asMETHODPR(ResourceWithMetadata, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
     // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
@@ -2482,7 +2482,7 @@ void ASRegisterGenerated_Members_R(asIScriptEngine* engine)
     // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
     // Not registered because template
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
     // Error: type "PODVector<Node*>&" can not automatically bind
     // float Drawable::GetDistance() const | File: ../Graphics/Drawable.h
@@ -2713,7 +2713,7 @@ void ASRegisterGenerated_Members_R(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RibbonTrail", "int Refs() const", asMETHODPR(RibbonTrail, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("RibbonTrail", "int get_refs() const", asMETHODPR(RibbonTrail, Refs, () const, int), asCALL_THISCALL);
     // static void RibbonTrail::RegisterObject(Context* context) | File: ../Graphics/RibbonTrail.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("RibbonTrail", asBEHAVE_RELEASE, "void f()", asMETHODPR(RibbonTrail, ReleaseRef, (), void), asCALL_THISCALL);
     // void Component::Remove() | File: ../Scene/Component.h
@@ -3047,7 +3047,7 @@ void ASRegisterGenerated_Members_R(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RigidBody", "float GetContactProcessingThreshold() const", asMETHODPR(RigidBody, GetContactProcessingThreshold, () const, float), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "float get_contactProcessingThreshold() const", asMETHODPR(RigidBody, GetContactProcessingThreshold, () const, float), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
     // Error: type "PODVector<Node*>&" can not automatically bind
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
@@ -3207,7 +3207,7 @@ void ASRegisterGenerated_Members_R(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RigidBody", "int Refs() const", asMETHODPR(RigidBody, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "int get_refs() const", asMETHODPR(RigidBody, Refs, () const, int), asCALL_THISCALL);
     // static void RigidBody::RegisterObject(Context* context) | File: ../Physics/RigidBody.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RigidBody::ReleaseBody() | File: ../Physics/RigidBody.h
     engine->RegisterObjectMethod("RigidBody", "void ReleaseBody()", asMETHODPR(RigidBody, ReleaseBody, (), void), asCALL_THISCALL);
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
@@ -3505,7 +3505,7 @@ void ASRegisterGenerated_Members_R(asIScriptEngine* engine)
     // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
     // Not registered because template
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
     // Error: type "PODVector<Node*>&" can not automatically bind
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
@@ -3643,7 +3643,7 @@ void ASRegisterGenerated_Members_R(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RigidBody2D", "int Refs() const", asMETHODPR(RigidBody2D, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody2D", "int get_refs() const", asMETHODPR(RigidBody2D, Refs, () const, int), asCALL_THISCALL);
     // static void RigidBody2D::RegisterObject(Context* context) | File: ../Urho2D/RigidBody2D.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RigidBody2D::ReleaseBody() | File: ../Urho2D/RigidBody2D.h
     engine->RegisterObjectMethod("RigidBody2D", "void ReleaseBody()", asMETHODPR(RigidBody2D, ReleaseBody, (), void), asCALL_THISCALL);
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h

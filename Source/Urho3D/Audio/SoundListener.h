@@ -38,6 +38,7 @@ public:
     /// Destruct.
     ~SoundListener() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 };
 

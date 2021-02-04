@@ -119,7 +119,7 @@ void ASRegisterGenerated_Members_O(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Object", "const String& GetCategory() const", asMETHODPR(Object, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Object", "const String& get_category() const", asMETHODPR(Object, GetCategory, () const, const String&), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
     engine->RegisterObjectMethod("Object", "VariantMap& GetEventDataMap() const", asMETHODPR(Object, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
     // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
@@ -240,7 +240,7 @@ void ASRegisterGenerated_Members_O(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ObjectAnimation", "const String& GetCategory() const", asMETHODPR(ObjectAnimation, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod("ObjectAnimation", "const String& get_category() const", asMETHODPR(ObjectAnimation, GetCategory, () const, const String&), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
     engine->RegisterObjectMethod("ObjectAnimation", "VariantMap& GetEventDataMap() const", asMETHODPR(ObjectAnimation, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
     // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
@@ -309,7 +309,7 @@ void ASRegisterGenerated_Members_O(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ObjectAnimation", "int Refs() const", asMETHODPR(ObjectAnimation, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("ObjectAnimation", "int get_refs() const", asMETHODPR(ObjectAnimation, Refs, () const, int), asCALL_THISCALL);
     // static void ObjectAnimation::RegisterObject(Context* context) | File: ../Scene/ObjectAnimation.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("ObjectAnimation", asBEHAVE_RELEASE, "void f()", asMETHODPR(ObjectAnimation, ReleaseRef, (), void), asCALL_THISCALL);
     // void ObjectAnimation::RemoveAttributeAnimation(const String& name) | File: ../Scene/ObjectAnimation.h
@@ -387,7 +387,7 @@ void ASRegisterGenerated_Members_O(asIScriptEngine* engine)
     // virtual SharedPtr<Object> ObjectFactory::CreateObject()=0 | File: ../Core/Object.h
     engine->RegisterObjectMethod("ObjectFactory", "Object@+ CreateObject()", asFUNCTION(ObjectFactory_CreateObject_void), asCALL_CDECL_OBJFIRST);
     // Context* ObjectFactory::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // StringHash ObjectFactory::GetType() const | File: ../Core/Object.h
     engine->RegisterObjectMethod("ObjectFactory", "StringHash GetType() const", asMETHODPR(ObjectFactory, GetType, () const, StringHash), asCALL_THISCALL);
     // const TypeInfo* ObjectFactory::GetTypeInfo() const | File: ../Core/Object.h
@@ -468,7 +468,7 @@ void ASRegisterGenerated_Members_O(asIScriptEngine* engine)
     // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
     // Not registered because template
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
     // Error: type "PODVector<Node*>&" can not automatically bind
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
@@ -584,7 +584,7 @@ void ASRegisterGenerated_Members_O(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Obstacle", "int Refs() const", asMETHODPR(Obstacle, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("Obstacle", "int get_refs() const", asMETHODPR(Obstacle, Refs, () const, int), asCALL_THISCALL);
     // static void Obstacle::RegisterObject(Context* context) | File: ../Navigation/Obstacle.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("Obstacle", asBEHAVE_RELEASE, "void f()", asMETHODPR(Obstacle, ReleaseRef, (), void), asCALL_THISCALL);
     // void Component::Remove() | File: ../Scene/Component.h
@@ -710,9 +710,9 @@ void ASRegisterGenerated_Members_O(asIScriptEngine* engine)
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("OcclusionBuffer", asBEHAVE_ADDREF, "void f()", asMETHODPR(OcclusionBuffer, AddRef, (), void), asCALL_THISCALL);
     // bool OcclusionBuffer::AddTriangles(const Matrix3x4& model, const void* vertexData, unsigned vertexSize, unsigned vertexStart, unsigned vertexCount) | File: ../Graphics/OcclusionBuffer.h
-    // Error: type "void*" can not automatically bind
+    // Error: type "const void*" can not automatically bind
     // bool OcclusionBuffer::AddTriangles(const Matrix3x4& model, const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount) | File: ../Graphics/OcclusionBuffer.h
-    // Error: type "void*" can not automatically bind
+    // Error: type "const void*" can not automatically bind
     // void OcclusionBuffer::BuildDepthHierarchy() | File: ../Graphics/OcclusionBuffer.h
     engine->RegisterObjectMethod("OcclusionBuffer", "void BuildDepthHierarchy()", asMETHODPR(OcclusionBuffer, BuildDepthHierarchy, (), void), asCALL_THISCALL);
     // template<typename T> T* Object::Cast() | File: ../Core/Object.h
@@ -733,7 +733,7 @@ void ASRegisterGenerated_Members_O(asIScriptEngine* engine)
     engine->RegisterObjectMethod("OcclusionBuffer", "const String& GetCategory() const", asMETHODPR(OcclusionBuffer, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod("OcclusionBuffer", "const String& get_category() const", asMETHODPR(OcclusionBuffer, GetCategory, () const, const String&), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // CullMode OcclusionBuffer::GetCullMode() const | File: ../Graphics/OcclusionBuffer.h
     engine->RegisterObjectMethod("OcclusionBuffer", "CullMode GetCullMode() const", asMETHODPR(OcclusionBuffer, GetCullMode, () const, CullMode), asCALL_THISCALL);
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
@@ -924,7 +924,7 @@ void ASRegisterGenerated_Members_O(asIScriptEngine* engine)
     // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
     // Not registered because template
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // const BoundingBox& Octant::GetCullingBox() const | File: ../Graphics/Octree.h
     engine->RegisterObjectMethod("Octree", "const BoundingBox& GetCullingBox() const", asMETHODPR(Octree, GetCullingBox, () const, const BoundingBox&), asCALL_THISCALL);
     // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
@@ -1061,7 +1061,7 @@ void ASRegisterGenerated_Members_O(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Octree", "int Refs() const", asMETHODPR(Octree, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("Octree", "int get_refs() const", asMETHODPR(Octree, Refs, () const, int), asCALL_THISCALL);
     // static void Octree::RegisterObject(Context* context) | File: ../Graphics/Octree.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("Octree", asBEHAVE_RELEASE, "void f()", asMETHODPR(Octree, ReleaseRef, (), void), asCALL_THISCALL);
     // void Component::Remove() | File: ../Scene/Component.h
@@ -1247,7 +1247,7 @@ void ASRegisterGenerated_Members_O(asIScriptEngine* engine)
     // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
     // Not registered because template
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
     // Error: type "PODVector<Node*>&" can not automatically bind
     // Node* OffMeshConnection::GetEndPoint() const | File: ../Navigation/OffMeshConnection.h
@@ -1366,7 +1366,7 @@ void ASRegisterGenerated_Members_O(asIScriptEngine* engine)
     engine->RegisterObjectMethod("OffMeshConnection", "int Refs() const", asMETHODPR(OffMeshConnection, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("OffMeshConnection", "int get_refs() const", asMETHODPR(OffMeshConnection, Refs, () const, int), asCALL_THISCALL);
     // static void OffMeshConnection::RegisterObject(Context* context) | File: ../Navigation/OffMeshConnection.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("OffMeshConnection", asBEHAVE_RELEASE, "void f()", asMETHODPR(OffMeshConnection, ReleaseRef, (), void), asCALL_THISCALL);
     // void Component::Remove() | File: ../Scene/Component.h

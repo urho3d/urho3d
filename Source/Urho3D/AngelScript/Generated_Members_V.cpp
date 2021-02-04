@@ -498,7 +498,7 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ValueAnimation", "const String& GetCategory() const", asMETHODPR(ValueAnimation, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod("ValueAnimation", "const String& get_category() const", asMETHODPR(ValueAnimation, GetCategory, () const, const String&), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // float ValueAnimation::GetEndTime() const | File: ../Scene/ValueAnimation.h
     engine->RegisterObjectMethod("ValueAnimation", "float GetEndTime() const", asMETHODPR(ValueAnimation, GetEndTime, () const, float), asCALL_THISCALL);
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
@@ -586,7 +586,7 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ValueAnimation", "int Refs() const", asMETHODPR(ValueAnimation, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("ValueAnimation", "int get_refs() const", asMETHODPR(ValueAnimation, Refs, () const, int), asCALL_THISCALL);
     // static void ValueAnimation::RegisterObject(Context* context) | File: ../Scene/ValueAnimation.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("ValueAnimation", asBEHAVE_RELEASE, "void f()", asMETHODPR(ValueAnimation, ReleaseRef, (), void), asCALL_THISCALL);
     // void Resource::ResetUseTimer() | File: ../Resource/Resource.h
@@ -1067,7 +1067,7 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
     // bool Variant::operator==(const Matrix4& rhs) const | File: ../Core/Variant.h
     engine->RegisterObjectMethod("Variant", "bool opEquals(const Matrix4&in) const", asMETHODPR(Variant, operator==, (const Matrix4&) const, bool), asCALL_THISCALL);
     // void Variant::SetBuffer(const void* data, unsigned size) | File: ../Core/Variant.h
-    // Error: type "void*" can not automatically bind
+    // Error: type "const void*" can not automatically bind
     // template<class T> void Variant::SetCustom(const T& value) | File: ../Core/Variant.h
     // Not registered because template
     // void Variant::SetCustomVariantValue(const CustomVariantValue& value) | File: ../Core/Variant.h
@@ -1604,7 +1604,7 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
     // void VectorBuffer::SetData(const PODVector<unsigned char>& data) | File: ../IO/VectorBuffer.h
     // Error: type "const PODVector<unsigned char>&" can not automatically bind
     // void VectorBuffer::SetData(const void* data, unsigned size) | File: ../IO/VectorBuffer.h
-    // Error: type "void*" can not automatically bind
+    // Error: type "const void*" can not automatically bind
     // void VectorBuffer::SetData(Deserializer& source, unsigned size) | File: ../IO/VectorBuffer.h
     engine->RegisterObjectMethod("VectorBuffer", "void SetData(Deserializer&, uint)", asMETHODPR(VectorBuffer, SetData, (Deserializer&, unsigned), void), asCALL_THISCALL);
     // virtual void AbstractFile::SetName(const String& name) | File: ../IO/AbstractFile.h
@@ -1619,7 +1619,7 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
     // VectorBuffer::VectorBuffer(Deserializer& source, unsigned size) | File: ../IO/VectorBuffer.h
     engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_CONSTRUCT, "void f(Deserializer&, uint)", asFUNCTION(VectorBuffer_VectorBuffer_Deserializer_unsigned), asCALL_CDECL_OBJFIRST);
     // unsigned VectorBuffer::Write(const void* data, unsigned size) override | File: ../IO/VectorBuffer.h
-    // Error: type "void*" can not automatically bind
+    // Error: type "const void*" can not automatically bind
     // bool Serializer::WriteBool(bool value) | File: ../IO/Serializer.h
     engine->RegisterObjectMethod("VectorBuffer", "bool WriteBool(bool)", asMETHODPR(VectorBuffer, WriteBool, (bool), bool), asCALL_THISCALL);
     // bool Serializer::WriteBoundingBox(const BoundingBox& value) | File: ../IO/Serializer.h
@@ -1731,7 +1731,7 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
     engine->RegisterObjectMethod("VertexBuffer", "const String& GetCategory() const", asMETHODPR(VertexBuffer, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod("VertexBuffer", "const String& get_category() const", asMETHODPR(VertexBuffer, GetCategory, () const, const String&), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // const VertexElement* VertexBuffer::GetElement(VertexElementSemantic semantic, unsigned char index=0) const | File: ../Graphics/VertexBuffer.h
     // Error: type "const VertexElement*" can not automatically bind
     // const VertexElement* VertexBuffer::GetElement(VertexElementType type, VertexElementSemantic semantic, unsigned char index=0) const | File: ../Graphics/VertexBuffer.h
@@ -1865,9 +1865,9 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
     // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
     engine->RegisterObjectMethod("VertexBuffer", "void SetBlockEvents(bool)", asMETHODPR(VertexBuffer, SetBlockEvents, (bool), void), asCALL_THISCALL);
     // bool VertexBuffer::SetData(const void* data) | File: ../Graphics/VertexBuffer.h
-    // Error: type "void*" can not automatically bind
+    // Error: type "const void*" can not automatically bind
     // bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count, bool discard=false) | File: ../Graphics/VertexBuffer.h
-    // Error: type "void*" can not automatically bind
+    // Error: type "const void*" can not automatically bind
     // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
     engine->RegisterObjectMethod("VertexBuffer", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(VertexBuffer, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("VertexBuffer", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(VertexBuffer, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
@@ -1940,7 +1940,7 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
     engine->RegisterObjectMethod("View", "const String& GetCategory() const", asMETHODPR(View, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod("View", "const String& get_category() const", asMETHODPR(View, GetCategory, () const, const String&), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // Camera* View::GetCullCamera() const | File: ../Graphics/View.h
     engine->RegisterObjectMethod("View", "Camera@+ GetCullCamera() const", asMETHODPR(View, GetCullCamera, () const, Camera*), asCALL_THISCALL);
     // bool View::GetDrawDebug() const | File: ../Graphics/View.h
@@ -2216,7 +2216,7 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
     engine->RegisterObjectMethod("View3D", "IntRect GetCombinedScreenRect()", asMETHODPR(View3D, GetCombinedScreenRect, (), IntRect), asCALL_THISCALL);
     engine->RegisterObjectMethod("View3D", "IntRect get_combinedScreenRect()", asMETHODPR(View3D, GetCombinedScreenRect, (), IntRect), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // virtual void UIElement::GetDebugDrawBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor) | File: ../UI/UIElement.h
     // Error: type "PODVector<UIBatch>&" can not automatically bind
     // XMLFile* UIElement::GetDefaultStyle(bool recursiveUp=true) const | File: ../UI/UIElement.h
@@ -2605,7 +2605,7 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
     engine->RegisterObjectMethod("View3D", "int Refs() const", asMETHODPR(View3D, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("View3D", "int get_refs() const", asMETHODPR(View3D, Refs, () const, int), asCALL_THISCALL);
     // static void View3D::RegisterObject(Context* context) | File: ../UI/View3D.h
-    // Context can be used as firs parameter of constructors only
+    // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("View3D", asBEHAVE_RELEASE, "void f()", asMETHODPR(View3D, ReleaseRef, (), void), asCALL_THISCALL);
     // void UIElement::Remove() | File: ../UI/UIElement.h
@@ -3028,7 +3028,7 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Viewport", "const String& GetCategory() const", asMETHODPR(Viewport, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Viewport", "const String& get_category() const", asMETHODPR(Viewport, GetCategory, () const, const String&), asCALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
-    // Error: type "Context*" can not be returned
+    // Error: type "Context*" can used only as function parameter
     // Camera* Viewport::GetCullCamera() const | File: ../Graphics/Viewport.h
     engine->RegisterObjectMethod("Viewport", "Camera@+ GetCullCamera() const", asMETHODPR(Viewport, GetCullCamera, () const, Camera*), asCALL_THISCALL);
     engine->RegisterObjectMethod("Viewport", "Camera@+ get_cullCamera() const", asMETHODPR(Viewport, GetCullCamera, () const, Camera*), asCALL_THISCALL);

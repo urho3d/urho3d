@@ -123,7 +123,7 @@ static void BindGlobalFunction(const GlobalFunctionAnalyzer& functionAnalyzer)
         
         try
         {
-            conv = CppVariableToAS(param.GetType(), param.GetDeclname(), VariableUsage::FunctionParameter, param.GetDefval());
+            conv = CppVariableToAS(param.GetType(), VariableUsage::FunctionParameter, param.GetDeclname(), param.GetDefval());
         }
         catch (const Exception& e)
         {
@@ -132,10 +132,13 @@ static void BindGlobalFunction(const GlobalFunctionAnalyzer& functionAnalyzer)
             return;
         }
 
-        if (declParams.length() > 0)
-            declParams += ", ";
+        if (!conv.asDeclaration_.empty())
+        {
+            if (declParams.length() > 0)
+                declParams += ", ";
 
-        declParams += conv.asDeclaration_;
+            declParams += conv.asDeclaration_;
+        }
 
         if (conv.NeedWrapper())
             needWrapper = true;
@@ -147,7 +150,7 @@ static void BindGlobalFunction(const GlobalFunctionAnalyzer& functionAnalyzer)
 
     try
     {
-        retConv = CppVariableToAS(functionAnalyzer.GetReturnType(), "", VariableUsage::FunctionReturn);
+        retConv = CppVariableToAS(functionAnalyzer.GetReturnType(), VariableUsage::FunctionReturn);
     }
     catch (const Exception& e)
     {
