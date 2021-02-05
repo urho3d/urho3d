@@ -25,6 +25,13 @@ static void Camera_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Camer
     ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
+// void UIElement::AddTags(const StringVector& tags) | File: ../UI/UIElement.h
+static void CheckBox_AddTags_StringVector(CheckBox* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->AddTags(tags);
+}
+
 // explicit CheckBox::CheckBox(Context* context) | File: ../UI/CheckBox.h
 static CheckBox* CheckBox_CheckBox_Context()
 {
@@ -57,6 +64,13 @@ static CScriptArray* CheckBox_GetTags_void(CheckBox* ptr)
 {
     const StringVector& result = ptr->GetTags();
     return VectorToArray<String>(result, "Array<String>");
+}
+
+// void UIElement::SetTags(const StringVector& tags) | File: ../UI/UIElement.h
+static void CheckBox_SetTags_StringVector(CheckBox* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->SetTags(tags);
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
@@ -527,7 +541,7 @@ void ASRegisterGenerated_Members_Ca_Cm(asIScriptEngine* engine)
     // void UIElement::AddTags(const String& tags, char separator=';') | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("CheckBox", "void AddTags(const String&in, int8 = ';')", asMETHODPR(CheckBox, AddTags, (const String&, char), void), asCALL_THISCALL);
     // void UIElement::AddTags(const StringVector& tags) | File: ../UI/UIElement.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("CheckBox", "void AddTags(Array<String>@+)", asFUNCTION(CheckBox_AddTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void UIElement::AdjustScissor(IntRect& currentScissor) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("CheckBox", "void AdjustScissor(IntRect&)", asMETHODPR(CheckBox, AdjustScissor, (IntRect&), void), asCALL_THISCALL);
     // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
@@ -1278,7 +1292,7 @@ void ASRegisterGenerated_Members_Ca_Cm(asIScriptEngine* engine)
     // bool UIElement::SetStyleAuto(XMLFile* file=nullptr) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("CheckBox", "bool SetStyleAuto(XMLFile@+ = null)", asMETHODPR(CheckBox, SetStyleAuto, (XMLFile*), bool), asCALL_THISCALL);
     // void UIElement::SetTags(const StringVector& tags) | File: ../UI/UIElement.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("CheckBox", "void SetTags(Array<String>@+)", asFUNCTION(CheckBox_SetTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
     engine->RegisterObjectMethod("CheckBox", "void SetTemporary(bool)", asMETHODPR(CheckBox, SetTemporary, (bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("CheckBox", "void set_temporary(bool)", asMETHODPR(CheckBox, SetTemporary, (bool), void), asCALL_THISCALL);

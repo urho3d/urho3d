@@ -12,6 +12,13 @@ namespace Urho3D
 void FakeAddRef(void* ptr);
 void FakeReleaseRef(void* ptr);
 
+// void Node::AddTags(const StringVector& tags) | File: ../Scene/Node.h
+static void Scene_AddTags_StringVector(Scene* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->AddTags(tags);
+}
+
 // const Vector<SharedPtr<Node>>& Node::GetChildren() const | File: ../Scene/Node.h
 static CScriptArray* Scene_GetChildren_void(Scene* ptr)
 {
@@ -74,11 +81,25 @@ static Scene* Scene_Scene_Context()
     return new Scene(GetScriptContext());
 }
 
+// void Node::SetTags(const StringVector& tags) | File: ../Scene/Node.h
+static void Scene_SetTags_StringVector(Scene* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->SetTags(tags);
+}
+
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void Scene_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Scene* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
     PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
     ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
+}
+
+// void UIElement::AddTags(const StringVector& tags) | File: ../UI/UIElement.h
+static void ScrollBar_AddTags_StringVector(ScrollBar* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->AddTags(tags);
 }
 
 // const Vector<SharedPtr<UIElement>>& UIElement::GetChildren() const | File: ../UI/UIElement.h
@@ -115,11 +136,25 @@ static ScrollBar* ScrollBar_ScrollBar_Context()
     return new ScrollBar(GetScriptContext());
 }
 
+// void UIElement::SetTags(const StringVector& tags) | File: ../UI/UIElement.h
+static void ScrollBar_SetTags_StringVector(ScrollBar* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->SetTags(tags);
+}
+
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void ScrollBar_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ScrollBar* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
     PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
     ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
+}
+
+// void UIElement::AddTags(const StringVector& tags) | File: ../UI/UIElement.h
+static void ScrollView_AddTags_StringVector(ScrollView* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->AddTags(tags);
 }
 
 // const Vector<SharedPtr<UIElement>>& UIElement::GetChildren() const | File: ../UI/UIElement.h
@@ -156,6 +191,13 @@ static ScrollView* ScrollView_ScrollView_Context()
     return new ScrollView(GetScriptContext());
 }
 
+// void UIElement::SetTags(const StringVector& tags) | File: ../UI/UIElement.h
+static void ScrollView_SetTags_StringVector(ScrollView* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->SetTags(tags);
+}
+
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void ScrollView_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(ScrollView* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
@@ -174,6 +216,14 @@ static void Serializable_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool
 {
     PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
     ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
+}
+
+// bool Serializer::WriteStringVector(const StringVector& value) | File: ../IO/Serializer.h
+static bool Serializer_WriteStringVector_StringVector(Serializer* ptr, CScriptArray* value_conv)
+{
+    StringVector value = ArrayToVector<String>(value_conv);
+    bool result = ptr->WriteStringVector(value);
+    return result;
 }
 
 // explicit Shader::Shader(Context* context) | File: ../Graphics/Shader.h
@@ -253,6 +303,13 @@ static void Skybox_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Skybo
     ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
+// void UIElement::AddTags(const StringVector& tags) | File: ../UI/UIElement.h
+static void Slider_AddTags_StringVector(Slider* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->AddTags(tags);
+}
+
 // const Vector<SharedPtr<UIElement>>& UIElement::GetChildren() const | File: ../UI/UIElement.h
 static CScriptArray* Slider_GetChildren_void(Slider* ptr)
 {
@@ -279,6 +336,13 @@ static CScriptArray* Slider_GetTags_void(Slider* ptr)
 {
     const StringVector& result = ptr->GetTags();
     return VectorToArray<String>(result, "Array<String>");
+}
+
+// void UIElement::SetTags(const StringVector& tags) | File: ../UI/UIElement.h
+static void Slider_SetTags_StringVector(Slider* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->SetTags(tags);
 }
 
 // explicit Slider::Slider(Context* context) | File: ../UI/Slider.h
@@ -344,7 +408,7 @@ void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
     // void Node::AddTags(const String& tags, char separator=';') | File: ../Scene/Node.h
     engine->RegisterObjectMethod("Scene", "void AddTags(const String&in, int8 = ';')", asMETHODPR(Scene, AddTags, (const String&, char), void), asCALL_THISCALL);
     // void Node::AddTags(const StringVector& tags) | File: ../Scene/Node.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("Scene", "void AddTags(Array<String>@+)", asFUNCTION(Scene_AddTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
     engine->RegisterObjectMethod("Scene", "void AllocateNetworkState()", asMETHODPR(Scene, AllocateNetworkState, (), void), asCALL_THISCALL);
     // void Node::ApplyAttributes() override | File: ../Scene/Node.h
@@ -965,7 +1029,7 @@ void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Scene", "void SetSnapThreshold(float)", asMETHODPR(Scene, SetSnapThreshold, (float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void set_snapThreshold(float)", asMETHODPR(Scene, SetSnapThreshold, (float), void), asCALL_THISCALL);
     // void Node::SetTags(const StringVector& tags) | File: ../Scene/Node.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("Scene", "void SetTags(Array<String>@+)", asFUNCTION(Scene_SetTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
     engine->RegisterObjectMethod("Scene", "void SetTemporary(bool)", asMETHODPR(Scene, SetTemporary, (bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void set_temporary(bool)", asMETHODPR(Scene, SetTemporary, (bool), void), asCALL_THISCALL);
@@ -1130,7 +1194,7 @@ void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
     // void UIElement::AddTags(const String& tags, char separator=';') | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("ScrollBar", "void AddTags(const String&in, int8 = ';')", asMETHODPR(ScrollBar, AddTags, (const String&, char), void), asCALL_THISCALL);
     // void UIElement::AddTags(const StringVector& tags) | File: ../UI/UIElement.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("ScrollBar", "void AddTags(Array<String>@+)", asFUNCTION(ScrollBar_AddTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void UIElement::AdjustScissor(IntRect& currentScissor) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("ScrollBar", "void AdjustScissor(IntRect&)", asMETHODPR(ScrollBar, AdjustScissor, (IntRect&), void), asCALL_THISCALL);
     // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
@@ -1908,7 +1972,7 @@ void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
     // bool UIElement::SetStyleAuto(XMLFile* file=nullptr) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("ScrollBar", "bool SetStyleAuto(XMLFile@+ = null)", asMETHODPR(ScrollBar, SetStyleAuto, (XMLFile*), bool), asCALL_THISCALL);
     // void UIElement::SetTags(const StringVector& tags) | File: ../UI/UIElement.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("ScrollBar", "void SetTags(Array<String>@+)", asFUNCTION(ScrollBar_SetTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
     engine->RegisterObjectMethod("ScrollBar", "void SetTemporary(bool)", asMETHODPR(ScrollBar, SetTemporary, (bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollBar", "void set_temporary(bool)", asMETHODPR(ScrollBar, SetTemporary, (bool), void), asCALL_THISCALL);
@@ -2014,7 +2078,7 @@ void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
     // void UIElement::AddTags(const String& tags, char separator=';') | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("ScrollView", "void AddTags(const String&in, int8 = ';')", asMETHODPR(ScrollView, AddTags, (const String&, char), void), asCALL_THISCALL);
     // void UIElement::AddTags(const StringVector& tags) | File: ../UI/UIElement.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("ScrollView", "void AddTags(Array<String>@+)", asFUNCTION(ScrollView_AddTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void UIElement::AdjustScissor(IntRect& currentScissor) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("ScrollView", "void AdjustScissor(IntRect&)", asMETHODPR(ScrollView, AdjustScissor, (IntRect&), void), asCALL_THISCALL);
     // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
@@ -2762,7 +2826,7 @@ void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
     // bool UIElement::SetStyleAuto(XMLFile* file=nullptr) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("ScrollView", "bool SetStyleAuto(XMLFile@+ = null)", asMETHODPR(ScrollView, SetStyleAuto, (XMLFile*), bool), asCALL_THISCALL);
     // void UIElement::SetTags(const StringVector& tags) | File: ../UI/UIElement.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("ScrollView", "void SetTags(Array<String>@+)", asFUNCTION(ScrollView_SetTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
     engine->RegisterObjectMethod("ScrollView", "void SetTemporary(bool)", asMETHODPR(ScrollView, SetTemporary, (bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "void set_temporary(bool)", asMETHODPR(ScrollView, SetTemporary, (bool), void), asCALL_THISCALL);
@@ -3089,7 +3153,7 @@ void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
     // bool Serializer::WriteStringHash(const StringHash& value) | File: ../IO/Serializer.h
     engine->RegisterObjectMethod("Serializer", "bool WriteStringHash(const StringHash&in)", asMETHODPR(Serializer, WriteStringHash, (const StringHash&), bool), asCALL_THISCALL);
     // bool Serializer::WriteStringVector(const StringVector& value) | File: ../IO/Serializer.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("Serializer", "bool WriteStringVector(Array<String>@+)", asFUNCTION(Serializer_WriteStringVector_StringVector), asCALL_CDECL_OBJFIRST);
     // bool Serializer::WriteUByte(unsigned char value) | File: ../IO/Serializer.h
     engine->RegisterObjectMethod("Serializer", "bool WriteUByte(uint8)", asMETHODPR(Serializer, WriteUByte, (unsigned char), bool), asCALL_THISCALL);
     // bool Serializer::WriteUInt(unsigned value) | File: ../IO/Serializer.h
@@ -4046,7 +4110,7 @@ void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
     // void UIElement::AddTags(const String& tags, char separator=';') | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("Slider", "void AddTags(const String&in, int8 = ';')", asMETHODPR(Slider, AddTags, (const String&, char), void), asCALL_THISCALL);
     // void UIElement::AddTags(const StringVector& tags) | File: ../UI/UIElement.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("Slider", "void AddTags(Array<String>@+)", asFUNCTION(Slider_AddTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void UIElement::AdjustScissor(IntRect& currentScissor) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("Slider", "void AdjustScissor(IntRect&)", asMETHODPR(Slider, AdjustScissor, (IntRect&), void), asCALL_THISCALL);
     // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
@@ -4807,7 +4871,7 @@ void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
     // bool UIElement::SetStyleAuto(XMLFile* file=nullptr) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("Slider", "bool SetStyleAuto(XMLFile@+ = null)", asMETHODPR(Slider, SetStyleAuto, (XMLFile*), bool), asCALL_THISCALL);
     // void UIElement::SetTags(const StringVector& tags) | File: ../UI/UIElement.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("Slider", "void SetTags(Array<String>@+)", asFUNCTION(Slider_SetTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
     engine->RegisterObjectMethod("Slider", "void SetTemporary(bool)", asMETHODPR(Slider, SetTemporary, (bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Slider", "void set_temporary(bool)", asMETHODPR(Slider, SetTemporary, (bool), void), asCALL_THISCALL);

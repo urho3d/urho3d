@@ -26,6 +26,14 @@ static CScriptArray* XMLElement_GetStringVector_void(XMLElement* ptr)
     return VectorToArray<String>(result, "Array<String>");
 }
 
+// bool XMLElement::SetStringVector(const StringVector& value) | File: ../Resource/XMLElement.h
+static bool XMLElement_SetStringVector_StringVector(XMLElement* ptr, CScriptArray* value_conv)
+{
+    StringVector value = ArrayToVector<String>(value_conv);
+    bool result = ptr->SetStringVector(value);
+    return result;
+}
+
 // XMLElement::XMLElement(const XMLElement& rhs) | File: ../Resource/XMLElement.h
 static void XMLElement_XMLElement_XMLElement(XMLElement* ptr, const XMLElement &rhs)
 {
@@ -276,7 +284,7 @@ void ASRegisterGenerated_Members_X(asIScriptEngine* engine)
     // bool XMLElement::SetString(const String& name, const String& value) | File: ../Resource/XMLElement.h
     engine->RegisterObjectMethod("XMLElement", "bool SetString(const String&in, const String&in)", asMETHODPR(XMLElement, SetString, (const String&, const String&), bool), asCALL_THISCALL);
     // bool XMLElement::SetStringVector(const StringVector& value) | File: ../Resource/XMLElement.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("XMLElement", "bool SetStringVector(Array<String>@+)", asFUNCTION(XMLElement_SetStringVector_StringVector), asCALL_CDECL_OBJFIRST);
     // bool XMLElement::SetUInt(const String& name, unsigned value) | File: ../Resource/XMLElement.h
     engine->RegisterObjectMethod("XMLElement", "bool SetUInt(const String&in, uint)", asMETHODPR(XMLElement, SetUInt, (const String&, unsigned), bool), asCALL_THISCALL);
     // bool XMLElement::SetUInt64(const String& name, unsigned long long value) | File: ../Resource/XMLElement.h

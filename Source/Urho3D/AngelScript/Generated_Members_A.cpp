@@ -19,6 +19,14 @@ static CScriptArray* AbstractFile_ReadStringVector_void(AbstractFile* ptr)
     return VectorToArray<String>(result, "Array<String>");
 }
 
+// bool Serializer::WriteStringVector(const StringVector& value) | File: ../IO/Serializer.h
+static bool AbstractFile_WriteStringVector_StringVector(AbstractFile* ptr, CScriptArray* value_conv)
+{
+    StringVector value = ArrayToVector<String>(value_conv);
+    bool result = ptr->WriteStringVector(value);
+    return result;
+}
+
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void Animatable_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Animatable* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
@@ -385,7 +393,7 @@ void ASRegisterGenerated_Members_A(asIScriptEngine* engine)
     // bool Serializer::WriteStringHash(const StringHash& value) | File: ../IO/Serializer.h
     engine->RegisterObjectMethod("AbstractFile", "bool WriteStringHash(const StringHash&in)", asMETHODPR(AbstractFile, WriteStringHash, (const StringHash&), bool), asCALL_THISCALL);
     // bool Serializer::WriteStringVector(const StringVector& value) | File: ../IO/Serializer.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("AbstractFile", "bool WriteStringVector(Array<String>@+)", asFUNCTION(AbstractFile_WriteStringVector_StringVector), asCALL_CDECL_OBJFIRST);
     // bool Serializer::WriteUByte(unsigned char value) | File: ../IO/Serializer.h
     engine->RegisterObjectMethod("AbstractFile", "bool WriteUByte(uint8)", asMETHODPR(AbstractFile, WriteUByte, (unsigned char), bool), asCALL_THISCALL);
     // bool Serializer::WriteUInt(unsigned value) | File: ../IO/Serializer.h

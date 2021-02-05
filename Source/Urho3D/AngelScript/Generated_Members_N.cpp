@@ -38,6 +38,14 @@ static void NamedPipe_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Na
     ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
+// bool Serializer::WriteStringVector(const StringVector& value) | File: ../IO/Serializer.h
+static bool NamedPipe_WriteStringVector_StringVector(NamedPipe* ptr, CScriptArray* value_conv)
+{
+    StringVector value = ArrayToVector<String>(value_conv);
+    bool result = ptr->WriteStringVector(value);
+    return result;
+}
+
 #ifdef URHO3D_NAVIGATION
 // explicit NavArea::NavArea(Context* context) | File: ../Navigation/NavArea.h
 static NavArea* NavArea_NavArea_Context()
@@ -142,6 +150,13 @@ static void NetworkPriority_UnsubscribeFromAllEventsExcept_PODVectorStringHash_b
 }
 #endif
 
+// void Node::AddTags(const StringVector& tags) | File: ../Scene/Node.h
+static void Node_AddTags_StringVector(Node* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->AddTags(tags);
+}
+
 // const Vector<SharedPtr<Node>>& Node::GetChildren() const | File: ../Scene/Node.h
 static CScriptArray* Node_GetChildren_void(Node* ptr)
 {
@@ -195,6 +210,13 @@ static CScriptArray* Node_GetTags_void(Node* ptr)
 static Node* Node_Node_Context()
 {
     return new Node(GetScriptContext());
+}
+
+// void Node::SetTags(const StringVector& tags) | File: ../Scene/Node.h
+static void Node_SetTags_StringVector(Node* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->SetTags(tags);
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
@@ -475,7 +497,7 @@ void ASRegisterGenerated_Members_N(asIScriptEngine* engine)
     // bool Serializer::WriteStringHash(const StringHash& value) | File: ../IO/Serializer.h
     engine->RegisterObjectMethod("NamedPipe", "bool WriteStringHash(const StringHash&in)", asMETHODPR(NamedPipe, WriteStringHash, (const StringHash&), bool), asCALL_THISCALL);
     // bool Serializer::WriteStringVector(const StringVector& value) | File: ../IO/Serializer.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("NamedPipe", "bool WriteStringVector(Array<String>@+)", asFUNCTION(NamedPipe_WriteStringVector_StringVector), asCALL_CDECL_OBJFIRST);
     // bool Serializer::WriteUByte(unsigned char value) | File: ../IO/Serializer.h
     engine->RegisterObjectMethod("NamedPipe", "bool WriteUByte(uint8)", asMETHODPR(NamedPipe, WriteUByte, (unsigned char), bool), asCALL_THISCALL);
     // bool Serializer::WriteUInt(unsigned value) | File: ../IO/Serializer.h
@@ -2064,7 +2086,7 @@ void ASRegisterGenerated_Members_N(asIScriptEngine* engine)
     // void Node::AddTags(const String& tags, char separator=';') | File: ../Scene/Node.h
     engine->RegisterObjectMethod("Node", "void AddTags(const String&in, int8 = ';')", asMETHODPR(Node, AddTags, (const String&, char), void), asCALL_THISCALL);
     // void Node::AddTags(const StringVector& tags) | File: ../Scene/Node.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("Node", "void AddTags(Array<String>@+)", asFUNCTION(Node_AddTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
     engine->RegisterObjectMethod("Node", "void AllocateNetworkState()", asMETHODPR(Node, AllocateNetworkState, (), void), asCALL_THISCALL);
     // void Node::ApplyAttributes() override | File: ../Scene/Node.h
@@ -2571,7 +2593,7 @@ void ASRegisterGenerated_Members_N(asIScriptEngine* engine)
     // void Node::SetScene(Scene* scene) | File: ../Scene/Node.h
     engine->RegisterObjectMethod("Node", "void SetScene(Scene@+)", asMETHODPR(Node, SetScene, (Scene*), void), asCALL_THISCALL);
     // void Node::SetTags(const StringVector& tags) | File: ../Scene/Node.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("Node", "void SetTags(Array<String>@+)", asFUNCTION(Node_SetTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
     engine->RegisterObjectMethod("Node", "void SetTemporary(bool)", asMETHODPR(Node, SetTemporary, (bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Node", "void set_temporary(bool)", asMETHODPR(Node, SetTemporary, (bool), void), asCALL_THISCALL);

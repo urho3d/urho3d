@@ -276,6 +276,13 @@ static void Profiler_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Pro
     ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
+// void UIElement::AddTags(const StringVector& tags) | File: ../UI/UIElement.h
+static void ProgressBar_AddTags_StringVector(ProgressBar* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->AddTags(tags);
+}
+
 // const Vector<SharedPtr<UIElement>>& UIElement::GetChildren() const | File: ../UI/UIElement.h
 static CScriptArray* ProgressBar_GetChildren_void(ProgressBar* ptr)
 {
@@ -308,6 +315,13 @@ static CScriptArray* ProgressBar_GetTags_void(ProgressBar* ptr)
 static ProgressBar* ProgressBar_ProgressBar_Context()
 {
     return new ProgressBar(GetScriptContext());
+}
+
+// void UIElement::SetTags(const StringVector& tags) | File: ../UI/UIElement.h
+static void ProgressBar_SetTags_StringVector(ProgressBar* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->SetTags(tags);
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
@@ -3348,7 +3362,7 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     // void UIElement::AddTags(const String& tags, char separator=';') | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("ProgressBar", "void AddTags(const String&in, int8 = ';')", asMETHODPR(ProgressBar, AddTags, (const String&, char), void), asCALL_THISCALL);
     // void UIElement::AddTags(const StringVector& tags) | File: ../UI/UIElement.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("ProgressBar", "void AddTags(Array<String>@+)", asFUNCTION(ProgressBar_AddTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void UIElement::AdjustScissor(IntRect& currentScissor) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("ProgressBar", "void AdjustScissor(IntRect&)", asMETHODPR(ProgressBar, AdjustScissor, (IntRect&), void), asCALL_THISCALL);
     // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
@@ -4115,7 +4129,7 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     // bool UIElement::SetStyleAuto(XMLFile* file=nullptr) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("ProgressBar", "bool SetStyleAuto(XMLFile@+ = null)", asMETHODPR(ProgressBar, SetStyleAuto, (XMLFile*), bool), asCALL_THISCALL);
     // void UIElement::SetTags(const StringVector& tags) | File: ../UI/UIElement.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("ProgressBar", "void SetTags(Array<String>@+)", asFUNCTION(ProgressBar_SetTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
     engine->RegisterObjectMethod("ProgressBar", "void SetTemporary(bool)", asMETHODPR(ProgressBar, SetTemporary, (bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ProgressBar", "void set_temporary(bool)", asMETHODPR(ProgressBar, SetTemporary, (bool), void), asCALL_THISCALL);

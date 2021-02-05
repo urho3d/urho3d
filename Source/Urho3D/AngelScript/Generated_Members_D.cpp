@@ -137,6 +137,13 @@ static void Drawable2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(D
 }
 #endif
 
+// void UIElement::AddTags(const StringVector& tags) | File: ../UI/UIElement.h
+static void DropDownList_AddTags_StringVector(DropDownList* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->AddTags(tags);
+}
+
 // explicit DropDownList::DropDownList(Context* context) | File: ../UI/DropDownList.h
 static DropDownList* DropDownList_DropDownList_Context()
 {
@@ -176,6 +183,13 @@ static CScriptArray* DropDownList_GetTags_void(DropDownList* ptr)
 {
     const StringVector& result = ptr->GetTags();
     return VectorToArray<String>(result, "Array<String>");
+}
+
+// void UIElement::SetTags(const StringVector& tags) | File: ../UI/UIElement.h
+static void DropDownList_SetTags_StringVector(DropDownList* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->SetTags(tags);
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
@@ -2306,7 +2320,7 @@ void ASRegisterGenerated_Members_D(asIScriptEngine* engine)
     // void UIElement::AddTags(const String& tags, char separator=';') | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("DropDownList", "void AddTags(const String&in, int8 = ';')", asMETHODPR(DropDownList, AddTags, (const String&, char), void), asCALL_THISCALL);
     // void UIElement::AddTags(const StringVector& tags) | File: ../UI/UIElement.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("DropDownList", "void AddTags(Array<String>@+)", asFUNCTION(DropDownList_AddTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void UIElement::AdjustScissor(IntRect& currentScissor) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("DropDownList", "void AdjustScissor(IntRect&)", asMETHODPR(DropDownList, AdjustScissor, (IntRect&), void), asCALL_THISCALL);
     // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
@@ -3144,7 +3158,7 @@ void ASRegisterGenerated_Members_D(asIScriptEngine* engine)
     // bool UIElement::SetStyleAuto(XMLFile* file=nullptr) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("DropDownList", "bool SetStyleAuto(XMLFile@+ = null)", asMETHODPR(DropDownList, SetStyleAuto, (XMLFile*), bool), asCALL_THISCALL);
     // void UIElement::SetTags(const StringVector& tags) | File: ../UI/UIElement.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("DropDownList", "void SetTags(Array<String>@+)", asFUNCTION(DropDownList_SetTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
     engine->RegisterObjectMethod("DropDownList", "void SetTemporary(bool)", asMETHODPR(DropDownList, SetTemporary, (bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("DropDownList", "void set_temporary(bool)", asMETHODPR(DropDownList, SetTemporary, (bool), void), asCALL_THISCALL);

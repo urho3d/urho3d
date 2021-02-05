@@ -52,6 +52,13 @@ static void UIComponent_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(
     ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
+// void UIElement::AddTags(const StringVector& tags) | File: ../UI/UIElement.h
+static void UIElement_AddTags_StringVector(UIElement* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->AddTags(tags);
+}
+
 // const Vector<SharedPtr<UIElement>>& UIElement::GetChildren() const | File: ../UI/UIElement.h
 static CScriptArray* UIElement_GetChildren_void(UIElement* ptr)
 {
@@ -80,6 +87,13 @@ static CScriptArray* UIElement_GetTags_void(UIElement* ptr)
     return VectorToArray<String>(result, "Array<String>");
 }
 
+// void UIElement::SetTags(const StringVector& tags) | File: ../UI/UIElement.h
+static void UIElement_SetTags_StringVector(UIElement* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->SetTags(tags);
+}
+
 // explicit UIElement::UIElement(Context* context) | File: ../UI/UIElement.h
 static UIElement* UIElement_UIElement_Context()
 {
@@ -91,6 +105,13 @@ static void UIElement_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(UI
 {
     PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
     ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
+}
+
+// void UIElement::AddTags(const StringVector& tags) | File: ../UI/UIElement.h
+static void UISelectable_AddTags_StringVector(UISelectable* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->AddTags(tags);
 }
 
 // const Vector<SharedPtr<UIElement>>& UIElement::GetChildren() const | File: ../UI/UIElement.h
@@ -119,6 +140,13 @@ static CScriptArray* UISelectable_GetTags_void(UISelectable* ptr)
 {
     const StringVector& result = ptr->GetTags();
     return VectorToArray<String>(result, "Array<String>");
+}
+
+// void UIElement::SetTags(const StringVector& tags) | File: ../UI/UIElement.h
+static void UISelectable_SetTags_StringVector(UISelectable* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->SetTags(tags);
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
@@ -771,7 +799,7 @@ void ASRegisterGenerated_Members_U(asIScriptEngine* engine)
     // void UIElement::AddTags(const String& tags, char separator=';') | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("UIElement", "void AddTags(const String&in, int8 = ';')", asMETHODPR(UIElement, AddTags, (const String&, char), void), asCALL_THISCALL);
     // void UIElement::AddTags(const StringVector& tags) | File: ../UI/UIElement.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("UIElement", "void AddTags(Array<String>@+)", asFUNCTION(UIElement_AddTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void UIElement::AdjustScissor(IntRect& currentScissor) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("UIElement", "void AdjustScissor(IntRect&)", asMETHODPR(UIElement, AdjustScissor, (IntRect&), void), asCALL_THISCALL);
     // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
@@ -1446,7 +1474,7 @@ void ASRegisterGenerated_Members_U(asIScriptEngine* engine)
     // bool UIElement::SetStyleAuto(XMLFile* file=nullptr) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("UIElement", "bool SetStyleAuto(XMLFile@+ = null)", asMETHODPR(UIElement, SetStyleAuto, (XMLFile*), bool), asCALL_THISCALL);
     // void UIElement::SetTags(const StringVector& tags) | File: ../UI/UIElement.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("UIElement", "void SetTags(Array<String>@+)", asFUNCTION(UIElement_SetTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
     engine->RegisterObjectMethod("UIElement", "void SetTemporary(bool)", asMETHODPR(UIElement, SetTemporary, (bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("UIElement", "void set_temporary(bool)", asMETHODPR(UIElement, SetTemporary, (bool), void), asCALL_THISCALL);
@@ -1531,7 +1559,7 @@ void ASRegisterGenerated_Members_U(asIScriptEngine* engine)
     // void UIElement::AddTags(const String& tags, char separator=';') | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("UISelectable", "void AddTags(const String&in, int8 = ';')", asMETHODPR(UISelectable, AddTags, (const String&, char), void), asCALL_THISCALL);
     // void UIElement::AddTags(const StringVector& tags) | File: ../UI/UIElement.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("UISelectable", "void AddTags(Array<String>@+)", asFUNCTION(UISelectable_AddTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void UIElement::AdjustScissor(IntRect& currentScissor) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("UISelectable", "void AdjustScissor(IntRect&)", asMETHODPR(UISelectable, AdjustScissor, (IntRect&), void), asCALL_THISCALL);
     // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
@@ -2218,7 +2246,7 @@ void ASRegisterGenerated_Members_U(asIScriptEngine* engine)
     // bool UIElement::SetStyleAuto(XMLFile* file=nullptr) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("UISelectable", "bool SetStyleAuto(XMLFile@+ = null)", asMETHODPR(UISelectable, SetStyleAuto, (XMLFile*), bool), asCALL_THISCALL);
     // void UIElement::SetTags(const StringVector& tags) | File: ../UI/UIElement.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("UISelectable", "void SetTags(Array<String>@+)", asFUNCTION(UISelectable_SetTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
     engine->RegisterObjectMethod("UISelectable", "void SetTemporary(bool)", asMETHODPR(UISelectable, SetTemporary, (bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("UISelectable", "void set_temporary(bool)", asMETHODPR(UISelectable, SetTemporary, (bool), void), asCALL_THISCALL);

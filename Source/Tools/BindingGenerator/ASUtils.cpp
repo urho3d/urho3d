@@ -216,12 +216,37 @@ ConvertedVariable CppVariableToAS(const TypeAnalyzer& type, VariableUsage usage,
     }
 
     // Works with both Vector<String> and Vector<String>&
-    if ((cppTypeName == "Vector<String>" || cppTypeName == "StringVector") && !type.IsPointer() && usage == VariableUsage::FunctionReturn)
+    if (cppTypeName == "Vector<String>" || cppTypeName == "StringVector")
     {
-        result.asDeclaration_ = "Array<String>@";
-        result.cppDeclaration_ = "CScriptArray*";
-        result.glue_ = "return VectorToArray<String>(result, \"Array<String>\");\n";
-        return result;
+        // Works with both Vector<String> and Vector<String>&
+        if (usage == VariableUsage::FunctionReturn && !type.IsPointer())
+        {
+            result.asDeclaration_ = "Array<String>@";
+            result.cppDeclaration_ = "CScriptArray*";
+            result.glue_ = "return VectorToArray<String>(result, \"Array<String>\");\n";
+            return result;
+        }
+
+        if (usage == VariableUsage::FunctionParameter && type.IsConst() && type.IsReference())
+        {
+            string newCppVarName = name + "_conv";
+
+            //result->asDecl_ = "String[]&";
+            result.asDeclaration_ = "Array<String>@+";
+            result.cppDeclaration_ = "CScriptArray* " + newCppVarName;
+            result.glue_ = "    " + cppTypeName + " " + name + " = ArrayToVector<String>(" + newCppVarName + ");\n";
+
+            if (!defaultValue.empty())
+            {
+                assert(defaultValue == "Vector< String >()");
+                //result->asDecl_ += " = Array<String>()";
+                result.asDeclaration_ += " = null";
+            }
+
+            return result;
+        }
+
+        throw Exception("Error: type \"" + type.ToString() + "\" can not automatically bind");
     }
 
     smatch match;
@@ -323,24 +348,6 @@ ConvertedVariable CppVariableToAS(const TypeAnalyzer& type, VariableUsage usage,
     }
 
     // =============================================================================
-
-    if (cppTypeName == "Vector<String>" && type.IsConst() && type.IsReference() && usage == VariableUsage::FunctionParameter)
-    {
-        string newCppVarName = name + "_conv";
-        //result->asDecl_ = "String[]&";
-        result.asDeclaration_ = "Array<String>@+";
-        result.cppDeclaration_ = "CScriptArray* " + newCppVarName;
-        result.glue_ = "    " + cppTypeName + " " + name + " = ArrayToVector<String>(" + newCppVarName + ");\n";
-
-        if (!defaultValue.empty())
-        {
-            assert(defaultValue == "Vector< String >()");
-            //result->asDecl_ += " = Array<String>()";
-            result.asDeclaration_ += " = null";
-        }
-
-        return result;
-    }
 
     regex_match(cppTypeName, match, regex("PODVector<(\\w+)>"));
     if (match.size() == 2 && type.IsConst() && type.IsReference() && usage == VariableUsage::FunctionParameter)
@@ -610,6 +617,8 @@ string CppValueToAS(const string& cppValue)
 static string GenerateFunctionWrapperName(xml_node memberdef)
 {
     string result = ExtractName(memberdef);
+
+    result = ReplaceAll(result, "=", "equals");
 
     vector<ParamAnalyzer> params = ExtractParams(memberdef);
 

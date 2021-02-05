@@ -126,6 +126,13 @@ static void SplinePath_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(S
     ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
+// void UIElement::AddTags(const StringVector& tags) | File: ../UI/UIElement.h
+static void Sprite_AddTags_StringVector(Sprite* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->AddTags(tags);
+}
+
 // const Vector<SharedPtr<UIElement>>& UIElement::GetChildren() const | File: ../UI/UIElement.h
 static CScriptArray* Sprite_GetChildren_void(Sprite* ptr)
 {
@@ -152,6 +159,13 @@ static CScriptArray* Sprite_GetTags_void(Sprite* ptr)
 {
     const StringVector& result = ptr->GetTags();
     return VectorToArray<String>(result, "Array<String>");
+}
+
+// void UIElement::SetTags(const StringVector& tags) | File: ../UI/UIElement.h
+static void Sprite_SetTags_StringVector(Sprite* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->SetTags(tags);
 }
 
 // explicit Sprite::Sprite(Context* context) | File: ../UI/Sprite.h
@@ -2200,7 +2214,7 @@ void ASRegisterGenerated_Members_Sn_Sz(asIScriptEngine* engine)
     // void UIElement::AddTags(const String& tags, char separator=';') | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("Sprite", "void AddTags(const String&in, int8 = ';')", asMETHODPR(Sprite, AddTags, (const String&, char), void), asCALL_THISCALL);
     // void UIElement::AddTags(const StringVector& tags) | File: ../UI/UIElement.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("Sprite", "void AddTags(Array<String>@+)", asFUNCTION(Sprite_AddTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void UIElement::AdjustScissor(IntRect& currentScissor) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("Sprite", "void AdjustScissor(IntRect&)", asMETHODPR(Sprite, AdjustScissor, (IntRect&), void), asCALL_THISCALL);
     // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
@@ -2920,7 +2934,7 @@ void ASRegisterGenerated_Members_Sn_Sz(asIScriptEngine* engine)
     // bool UIElement::SetStyleAuto(XMLFile* file=nullptr) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("Sprite", "bool SetStyleAuto(XMLFile@+ = null)", asMETHODPR(Sprite, SetStyleAuto, (XMLFile*), bool), asCALL_THISCALL);
     // void UIElement::SetTags(const StringVector& tags) | File: ../UI/UIElement.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("Sprite", "void SetTags(Array<String>@+)", asFUNCTION(Sprite_SetTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
     engine->RegisterObjectMethod("Sprite", "void SetTemporary(bool)", asMETHODPR(Sprite, SetTemporary, (bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Sprite", "void set_temporary(bool)", asMETHODPR(Sprite, SetTemporary, (bool), void), asCALL_THISCALL);

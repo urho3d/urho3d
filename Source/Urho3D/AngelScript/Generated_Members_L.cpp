@@ -39,6 +39,13 @@ static void Light_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Light*
     ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
+// void UIElement::AddTags(const StringVector& tags) | File: ../UI/UIElement.h
+static void LineEdit_AddTags_StringVector(LineEdit* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->AddTags(tags);
+}
+
 // const Vector<SharedPtr<UIElement>>& UIElement::GetChildren() const | File: ../UI/UIElement.h
 static CScriptArray* LineEdit_GetChildren_void(LineEdit* ptr)
 {
@@ -73,11 +80,25 @@ static LineEdit* LineEdit_LineEdit_Context()
     return new LineEdit(GetScriptContext());
 }
 
+// void UIElement::SetTags(const StringVector& tags) | File: ../UI/UIElement.h
+static void LineEdit_SetTags_StringVector(LineEdit* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->SetTags(tags);
+}
+
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
 static void LineEdit_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(LineEdit* ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
     PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
     ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
+}
+
+// void UIElement::AddTags(const StringVector& tags) | File: ../UI/UIElement.h
+static void ListView_AddTags_StringVector(ListView* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->AddTags(tags);
 }
 
 // const Vector<SharedPtr<UIElement>>& UIElement::GetChildren() const | File: ../UI/UIElement.h
@@ -140,6 +161,13 @@ static void ListView_SetSelections_PODVectorunsigned(ListView* ptr, CScriptArray
 {
     PODVector<unsigned> indices = ArrayToPODVector<unsigned>(indices_conv);
     ptr->SetSelections(indices);
+}
+
+// void UIElement::SetTags(const StringVector& tags) | File: ../UI/UIElement.h
+static void ListView_SetTags_StringVector(ListView* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->SetTags(tags);
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
@@ -801,7 +829,7 @@ void ASRegisterGenerated_Members_L(asIScriptEngine* engine)
     // void UIElement::AddTags(const String& tags, char separator=';') | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("LineEdit", "void AddTags(const String&in, int8 = ';')", asMETHODPR(LineEdit, AddTags, (const String&, char), void), asCALL_THISCALL);
     // void UIElement::AddTags(const StringVector& tags) | File: ../UI/UIElement.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("LineEdit", "void AddTags(Array<String>@+)", asFUNCTION(LineEdit_AddTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void UIElement::AdjustScissor(IntRect& currentScissor) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("LineEdit", "void AdjustScissor(IntRect&)", asMETHODPR(LineEdit, AdjustScissor, (IntRect&), void), asCALL_THISCALL);
     // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
@@ -1583,7 +1611,7 @@ void ASRegisterGenerated_Members_L(asIScriptEngine* engine)
     // bool UIElement::SetStyleAuto(XMLFile* file=nullptr) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("LineEdit", "bool SetStyleAuto(XMLFile@+ = null)", asMETHODPR(LineEdit, SetStyleAuto, (XMLFile*), bool), asCALL_THISCALL);
     // void UIElement::SetTags(const StringVector& tags) | File: ../UI/UIElement.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("LineEdit", "void SetTags(Array<String>@+)", asFUNCTION(LineEdit_SetTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
     engine->RegisterObjectMethod("LineEdit", "void SetTemporary(bool)", asMETHODPR(LineEdit, SetTemporary, (bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("LineEdit", "void set_temporary(bool)", asMETHODPR(LineEdit, SetTemporary, (bool), void), asCALL_THISCALL);
@@ -1703,7 +1731,7 @@ void ASRegisterGenerated_Members_L(asIScriptEngine* engine)
     // void UIElement::AddTags(const String& tags, char separator=';') | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("ListView", "void AddTags(const String&in, int8 = ';')", asMETHODPR(ListView, AddTags, (const String&, char), void), asCALL_THISCALL);
     // void UIElement::AddTags(const StringVector& tags) | File: ../UI/UIElement.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("ListView", "void AddTags(Array<String>@+)", asFUNCTION(ListView_AddTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void UIElement::AdjustScissor(IntRect& currentScissor) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("ListView", "void AdjustScissor(IntRect&)", asMETHODPR(ListView, AdjustScissor, (IntRect&), void), asCALL_THISCALL);
     // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
@@ -2541,7 +2569,7 @@ void ASRegisterGenerated_Members_L(asIScriptEngine* engine)
     // bool UIElement::SetStyleAuto(XMLFile* file=nullptr) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("ListView", "bool SetStyleAuto(XMLFile@+ = null)", asMETHODPR(ListView, SetStyleAuto, (XMLFile*), bool), asCALL_THISCALL);
     // void UIElement::SetTags(const StringVector& tags) | File: ../UI/UIElement.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("ListView", "void SetTags(Array<String>@+)", asFUNCTION(ListView_SetTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
     engine->RegisterObjectMethod("ListView", "void SetTemporary(bool)", asMETHODPR(ListView, SetTemporary, (bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void set_temporary(bool)", asMETHODPR(ListView, SetTemporary, (bool), void), asCALL_THISCALL);

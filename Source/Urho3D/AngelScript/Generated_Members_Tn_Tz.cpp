@@ -12,6 +12,13 @@ namespace Urho3D
 void FakeAddRef(void* ptr);
 void FakeReleaseRef(void* ptr);
 
+// void UIElement::AddTags(const StringVector& tags) | File: ../UI/UIElement.h
+static void ToolTip_AddTags_StringVector(ToolTip* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->AddTags(tags);
+}
+
 // const Vector<SharedPtr<UIElement>>& UIElement::GetChildren() const | File: ../UI/UIElement.h
 static CScriptArray* ToolTip_GetChildren_void(ToolTip* ptr)
 {
@@ -38,6 +45,13 @@ static CScriptArray* ToolTip_GetTags_void(ToolTip* ptr)
 {
     const StringVector& result = ptr->GetTags();
     return VectorToArray<String>(result, "Array<String>");
+}
+
+// void UIElement::SetTags(const StringVector& tags) | File: ../UI/UIElement.h
+static void ToolTip_SetTags_StringVector(ToolTip* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->SetTags(tags);
 }
 
 // explicit ToolTip::ToolTip(Context* context) | File: ../UI/ToolTip.h
@@ -88,7 +102,7 @@ void ASRegisterGenerated_Members_Tn_Tz(asIScriptEngine* engine)
     // void UIElement::AddTags(const String& tags, char separator=';') | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("ToolTip", "void AddTags(const String&in, int8 = ';')", asMETHODPR(ToolTip, AddTags, (const String&, char), void), asCALL_THISCALL);
     // void UIElement::AddTags(const StringVector& tags) | File: ../UI/UIElement.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("ToolTip", "void AddTags(Array<String>@+)", asFUNCTION(ToolTip_AddTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void UIElement::AdjustScissor(IntRect& currentScissor) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("ToolTip", "void AdjustScissor(IntRect&)", asMETHODPR(ToolTip, AdjustScissor, (IntRect&), void), asCALL_THISCALL);
     // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
@@ -771,7 +785,7 @@ void ASRegisterGenerated_Members_Tn_Tz(asIScriptEngine* engine)
     // bool UIElement::SetStyleAuto(XMLFile* file=nullptr) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("ToolTip", "bool SetStyleAuto(XMLFile@+ = null)", asMETHODPR(ToolTip, SetStyleAuto, (XMLFile*), bool), asCALL_THISCALL);
     // void UIElement::SetTags(const StringVector& tags) | File: ../UI/UIElement.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("ToolTip", "void SetTags(Array<String>@+)", asFUNCTION(ToolTip_SetTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
     engine->RegisterObjectMethod("ToolTip", "void SetTemporary(bool)", asMETHODPR(ToolTip, SetTemporary, (bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ToolTip", "void set_temporary(bool)", asMETHODPR(ToolTip, SetTemporary, (bool), void), asCALL_THISCALL);

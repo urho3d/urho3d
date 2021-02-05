@@ -44,6 +44,14 @@ static void File_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(File* p
     ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
+// bool Serializer::WriteStringVector(const StringVector& value) | File: ../IO/Serializer.h
+static bool File_WriteStringVector_StringVector(File* ptr, CScriptArray* value_conv)
+{
+    StringVector value = ArrayToVector<String>(value_conv);
+    bool result = ptr->WriteStringVector(value);
+    return result;
+}
+
 // explicit FileSelector::FileSelector(Context* context) | File: ../UI/FileSelector.h
 static FileSelector* FileSelector_FileSelector_Context()
 {
@@ -446,7 +454,7 @@ void ASRegisterGenerated_Members_F(asIScriptEngine* engine)
     // bool Serializer::WriteStringHash(const StringHash& value) | File: ../IO/Serializer.h
     engine->RegisterObjectMethod("File", "bool WriteStringHash(const StringHash&in)", asMETHODPR(File, WriteStringHash, (const StringHash&), bool), asCALL_THISCALL);
     // bool Serializer::WriteStringVector(const StringVector& value) | File: ../IO/Serializer.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("File", "bool WriteStringVector(Array<String>@+)", asFUNCTION(File_WriteStringVector_StringVector), asCALL_CDECL_OBJFIRST);
     // bool Serializer::WriteUByte(unsigned char value) | File: ../IO/Serializer.h
     engine->RegisterObjectMethod("File", "bool WriteUByte(uint8)", asMETHODPR(File, WriteUByte, (unsigned char), bool), asCALL_THISCALL);
     // bool Serializer::WriteUInt(unsigned value) | File: ../IO/Serializer.h

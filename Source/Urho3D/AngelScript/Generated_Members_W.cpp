@@ -12,6 +12,13 @@ namespace Urho3D
 void FakeAddRef(void* ptr);
 void FakeReleaseRef(void* ptr);
 
+// void UIElement::AddTags(const StringVector& tags) | File: ../UI/UIElement.h
+static void Window_AddTags_StringVector(Window* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->AddTags(tags);
+}
+
 // const Vector<SharedPtr<UIElement>>& UIElement::GetChildren() const | File: ../UI/UIElement.h
 static CScriptArray* Window_GetChildren_void(Window* ptr)
 {
@@ -38,6 +45,13 @@ static CScriptArray* Window_GetTags_void(Window* ptr)
 {
     const StringVector& result = ptr->GetTags();
     return VectorToArray<String>(result, "Array<String>");
+}
+
+// void UIElement::SetTags(const StringVector& tags) | File: ../UI/UIElement.h
+static void Window_SetTags_StringVector(Window* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->SetTags(tags);
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
@@ -77,7 +91,7 @@ void ASRegisterGenerated_Members_W(asIScriptEngine* engine)
     // void UIElement::AddTags(const String& tags, char separator=';') | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("Window", "void AddTags(const String&in, int8 = ';')", asMETHODPR(Window, AddTags, (const String&, char), void), asCALL_THISCALL);
     // void UIElement::AddTags(const StringVector& tags) | File: ../UI/UIElement.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("Window", "void AddTags(Array<String>@+)", asFUNCTION(Window_AddTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void UIElement::AdjustScissor(IntRect& currentScissor) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("Window", "void AdjustScissor(IntRect&)", asMETHODPR(Window, AdjustScissor, (IntRect&), void), asCALL_THISCALL);
     // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
@@ -872,7 +886,7 @@ void ASRegisterGenerated_Members_W(asIScriptEngine* engine)
     // bool UIElement::SetStyleAuto(XMLFile* file=nullptr) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("Window", "bool SetStyleAuto(XMLFile@+ = null)", asMETHODPR(Window, SetStyleAuto, (XMLFile*), bool), asCALL_THISCALL);
     // void UIElement::SetTags(const StringVector& tags) | File: ../UI/UIElement.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("Window", "void SetTags(Array<String>@+)", asFUNCTION(Window_SetTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
     engine->RegisterObjectMethod("Window", "void SetTemporary(bool)", asMETHODPR(Window, SetTemporary, (bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Window", "void set_temporary(bool)", asMETHODPR(Window, SetTemporary, (bool), void), asCALL_THISCALL);

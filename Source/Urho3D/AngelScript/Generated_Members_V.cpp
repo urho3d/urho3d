@@ -50,6 +50,22 @@ static CScriptArray* Variant_GetStringVector_void(Variant* ptr)
     return VectorToArray<String>(result, "Array<String>");
 }
 
+// Variant& Variant::operator=(const StringVector& rhs) | File: ../Core/Variant.h
+static Variant& Variant_operatorequals_StringVector(Variant* ptr, CScriptArray* rhs_conv)
+{
+    StringVector rhs = ArrayToVector<String>(rhs_conv);
+    Variant& result = ptr->operator=(rhs);
+    return result;
+}
+
+// bool Variant::operator==(const StringVector& rhs) const | File: ../Core/Variant.h
+static bool Variant_operatorequalsequals_StringVector(Variant* ptr, CScriptArray* rhs_conv)
+{
+    StringVector rhs = ArrayToVector<String>(rhs_conv);
+    bool result = ptr->operator==(rhs);
+    return result;
+}
+
 // Variant::Variant(int value) | File: ../Core/Variant.h
 static void Variant_Variant_int(Variant* ptr, int value)
 {
@@ -309,6 +325,14 @@ static void VectorBuffer_VectorBuffer_Deserializer_unsigned(VectorBuffer* ptr, D
     new(ptr) VectorBuffer(source, size);
 }
 
+// bool Serializer::WriteStringVector(const StringVector& value) | File: ../IO/Serializer.h
+static bool VectorBuffer_WriteStringVector_StringVector(VectorBuffer* ptr, CScriptArray* value_conv)
+{
+    StringVector value = ArrayToVector<String>(value_conv);
+    bool result = ptr->WriteStringVector(value);
+    return result;
+}
+
 // static unsigned VertexBuffer::GetElementOffset(const PODVector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index=0) | File: ../Graphics/VertexBuffer.h
 static unsigned VertexBuffer_GetElementOffset_PODVectorVertexElement_VertexElementType_VertexElementSemantic_unsignedchar(CScriptArray* elements_conv, VertexElementType type, VertexElementSemantic semantic, unsigned char index)
 {
@@ -402,6 +426,13 @@ static View* View_View_Context()
     return new View(GetScriptContext());
 }
 
+// void UIElement::AddTags(const StringVector& tags) | File: ../UI/UIElement.h
+static void View3D_AddTags_StringVector(View3D* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->AddTags(tags);
+}
+
 // const Vector<SharedPtr<UIElement>>& UIElement::GetChildren() const | File: ../UI/UIElement.h
 static CScriptArray* View3D_GetChildren_void(View3D* ptr)
 {
@@ -428,6 +459,13 @@ static CScriptArray* View3D_GetTags_void(View3D* ptr)
 {
     const StringVector& result = ptr->GetTags();
     return VectorToArray<String>(result, "Array<String>");
+}
+
+// void UIElement::SetTags(const StringVector& tags) | File: ../UI/UIElement.h
+static void View3D_SetTags_StringVector(View3D* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->SetTags(tags);
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
@@ -983,7 +1021,7 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
     // Variant& Variant::operator=(const VariantVector& rhs) | File: ../Core/Variant.h
     // Error: type "const VariantVector&" can not automatically bind
     // Variant& Variant::operator=(const StringVector& rhs) | File: ../Core/Variant.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("Variant", "Variant& opAssign(Array<String>@+)", asFUNCTION(Variant_operatorequals_StringVector), asCALL_CDECL_OBJFIRST);
     // Variant& Variant::operator=(const VariantMap& rhs) | File: ../Core/Variant.h
     engine->RegisterObjectMethod("Variant", "Variant& opAssign(const VariantMap&in)", asMETHODPR(Variant, operator=, (const VariantMap&), Variant&), asCALL_THISCALL);
     // Variant& Variant::operator=(const Rect& rhs) | File: ../Core/Variant.h
@@ -1045,7 +1083,7 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
     // bool Variant::operator==(const VariantVector& rhs) const | File: ../Core/Variant.h
     // Error: type "const VariantVector&" can not automatically bind
     // bool Variant::operator==(const StringVector& rhs) const | File: ../Core/Variant.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("Variant", "bool opEquals(Array<String>@+) const", asFUNCTION(Variant_operatorequalsequals_StringVector), asCALL_CDECL_OBJFIRST);
     // bool Variant::operator==(const VariantMap& rhs) const | File: ../Core/Variant.h
     engine->RegisterObjectMethod("Variant", "bool opEquals(const VariantMap&in) const", asMETHODPR(Variant, operator==, (const VariantMap&) const, bool), asCALL_THISCALL);
     // bool Variant::operator==(const Rect& rhs) const | File: ../Core/Variant.h
@@ -1675,7 +1713,7 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
     // bool Serializer::WriteStringHash(const StringHash& value) | File: ../IO/Serializer.h
     engine->RegisterObjectMethod("VectorBuffer", "bool WriteStringHash(const StringHash&in)", asMETHODPR(VectorBuffer, WriteStringHash, (const StringHash&), bool), asCALL_THISCALL);
     // bool Serializer::WriteStringVector(const StringVector& value) | File: ../IO/Serializer.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("VectorBuffer", "bool WriteStringVector(Array<String>@+)", asFUNCTION(VectorBuffer_WriteStringVector_StringVector), asCALL_CDECL_OBJFIRST);
     // bool Serializer::WriteUByte(unsigned char value) | File: ../IO/Serializer.h
     engine->RegisterObjectMethod("VectorBuffer", "bool WriteUByte(uint8)", asMETHODPR(VectorBuffer, WriteUByte, (unsigned char), bool), asCALL_THISCALL);
     // bool Serializer::WriteUInt(unsigned value) | File: ../IO/Serializer.h
@@ -2089,7 +2127,7 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
     // void UIElement::AddTags(const String& tags, char separator=';') | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("View3D", "void AddTags(const String&in, int8 = ';')", asMETHODPR(View3D, AddTags, (const String&, char), void), asCALL_THISCALL);
     // void UIElement::AddTags(const StringVector& tags) | File: ../UI/UIElement.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("View3D", "void AddTags(Array<String>@+)", asFUNCTION(View3D_AddTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void UIElement::AdjustScissor(IntRect& currentScissor) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("View3D", "void AdjustScissor(IntRect&)", asMETHODPR(View3D, AdjustScissor, (IntRect&), void), asCALL_THISCALL);
     // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
@@ -2913,7 +2951,7 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
     // bool UIElement::SetStyleAuto(XMLFile* file=nullptr) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("View3D", "bool SetStyleAuto(XMLFile@+ = null)", asMETHODPR(View3D, SetStyleAuto, (XMLFile*), bool), asCALL_THISCALL);
     // void UIElement::SetTags(const StringVector& tags) | File: ../UI/UIElement.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("View3D", "void SetTags(Array<String>@+)", asFUNCTION(View3D_SetTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
     engine->RegisterObjectMethod("View3D", "void SetTemporary(bool)", asMETHODPR(View3D, SetTemporary, (bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("View3D", "void set_temporary(bool)", asMETHODPR(View3D, SetTemporary, (bool), void), asCALL_THISCALL);

@@ -39,6 +39,13 @@ static void BillboardSet_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool
     ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
+// void UIElement::AddTags(const StringVector& tags) | File: ../UI/UIElement.h
+static void BorderImage_AddTags_StringVector(BorderImage* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->AddTags(tags);
+}
+
 // explicit BorderImage::BorderImage(Context* context) | File: ../UI/BorderImage.h
 static BorderImage* BorderImage_BorderImage_Context()
 {
@@ -71,6 +78,13 @@ static CScriptArray* BorderImage_GetTags_void(BorderImage* ptr)
 {
     const StringVector& result = ptr->GetTags();
     return VectorToArray<String>(result, "Array<String>");
+}
+
+// void UIElement::SetTags(const StringVector& tags) | File: ../UI/UIElement.h
+static void BorderImage_SetTags_StringVector(BorderImage* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->SetTags(tags);
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
@@ -128,6 +142,13 @@ static BufferedSoundStream* BufferedSoundStream_BufferedSoundStream_void()
     return new BufferedSoundStream();
 }
 
+// void UIElement::AddTags(const StringVector& tags) | File: ../UI/UIElement.h
+static void Button_AddTags_StringVector(Button* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->AddTags(tags);
+}
+
 // explicit Button::Button(Context* context) | File: ../UI/Button.h
 static Button* Button_Button_Context()
 {
@@ -160,6 +181,13 @@ static CScriptArray* Button_GetTags_void(Button* ptr)
 {
     const StringVector& result = ptr->GetTags();
     return VectorToArray<String>(result, "Array<String>");
+}
+
+// void UIElement::SetTags(const StringVector& tags) | File: ../UI/UIElement.h
+static void Button_SetTags_StringVector(Button* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->SetTags(tags);
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
@@ -709,7 +737,7 @@ void ASRegisterGenerated_Members_B(asIScriptEngine* engine)
     // void UIElement::AddTags(const String& tags, char separator=';') | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("BorderImage", "void AddTags(const String&in, int8 = ';')", asMETHODPR(BorderImage, AddTags, (const String&, char), void), asCALL_THISCALL);
     // void UIElement::AddTags(const StringVector& tags) | File: ../UI/UIElement.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("BorderImage", "void AddTags(Array<String>@+)", asFUNCTION(BorderImage_AddTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void UIElement::AdjustScissor(IntRect& currentScissor) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("BorderImage", "void AdjustScissor(IntRect&)", asMETHODPR(BorderImage, AdjustScissor, (IntRect&), void), asCALL_THISCALL);
     // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
@@ -1446,7 +1474,7 @@ void ASRegisterGenerated_Members_B(asIScriptEngine* engine)
     // bool UIElement::SetStyleAuto(XMLFile* file=nullptr) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("BorderImage", "bool SetStyleAuto(XMLFile@+ = null)", asMETHODPR(BorderImage, SetStyleAuto, (XMLFile*), bool), asCALL_THISCALL);
     // void UIElement::SetTags(const StringVector& tags) | File: ../UI/UIElement.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("BorderImage", "void SetTags(Array<String>@+)", asFUNCTION(BorderImage_SetTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
     engine->RegisterObjectMethod("BorderImage", "void SetTemporary(bool)", asMETHODPR(BorderImage, SetTemporary, (bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("BorderImage", "void set_temporary(bool)", asMETHODPR(BorderImage, SetTemporary, (bool), void), asCALL_THISCALL);
@@ -1702,7 +1730,7 @@ void ASRegisterGenerated_Members_B(asIScriptEngine* engine)
     // void UIElement::AddTags(const String& tags, char separator=';') | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("Button", "void AddTags(const String&in, int8 = ';')", asMETHODPR(Button, AddTags, (const String&, char), void), asCALL_THISCALL);
     // void UIElement::AddTags(const StringVector& tags) | File: ../UI/UIElement.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("Button", "void AddTags(Array<String>@+)", asFUNCTION(Button_AddTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void UIElement::AdjustScissor(IntRect& currentScissor) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("Button", "void AdjustScissor(IntRect&)", asMETHODPR(Button, AdjustScissor, (IntRect&), void), asCALL_THISCALL);
     // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
@@ -2472,7 +2500,7 @@ void ASRegisterGenerated_Members_B(asIScriptEngine* engine)
     // bool UIElement::SetStyleAuto(XMLFile* file=nullptr) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("Button", "bool SetStyleAuto(XMLFile@+ = null)", asMETHODPR(Button, SetStyleAuto, (XMLFile*), bool), asCALL_THISCALL);
     // void UIElement::SetTags(const StringVector& tags) | File: ../UI/UIElement.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("Button", "void SetTags(Array<String>@+)", asFUNCTION(Button_SetTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
     engine->RegisterObjectMethod("Button", "void SetTemporary(bool)", asMETHODPR(Button, SetTemporary, (bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Button", "void set_temporary(bool)", asMETHODPR(Button, SetTemporary, (bool), void), asCALL_THISCALL);

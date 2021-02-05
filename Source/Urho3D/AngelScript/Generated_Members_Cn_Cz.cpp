@@ -299,6 +299,13 @@ static void CrowdManager_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool
 }
 #endif
 
+// void UIElement::AddTags(const StringVector& tags) | File: ../UI/UIElement.h
+static void Cursor_AddTags_StringVector(Cursor* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->AddTags(tags);
+}
+
 // explicit Cursor::Cursor(Context* context) | File: ../UI/Cursor.h
 static Cursor* Cursor_Cursor_Context()
 {
@@ -331,6 +338,13 @@ static CScriptArray* Cursor_GetTags_void(Cursor* ptr)
 {
     const StringVector& result = ptr->GetTags();
     return VectorToArray<String>(result, "Array<String>");
+}
+
+// void UIElement::SetTags(const StringVector& tags) | File: ../UI/UIElement.h
+static void Cursor_SetTags_StringVector(Cursor* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->SetTags(tags);
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
@@ -4770,7 +4784,7 @@ void ASRegisterGenerated_Members_Cn_Cz(asIScriptEngine* engine)
     // void UIElement::AddTags(const String& tags, char separator=';') | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("Cursor", "void AddTags(const String&in, int8 = ';')", asMETHODPR(Cursor, AddTags, (const String&, char), void), asCALL_THISCALL);
     // void UIElement::AddTags(const StringVector& tags) | File: ../UI/UIElement.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("Cursor", "void AddTags(Array<String>@+)", asFUNCTION(Cursor_AddTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void UIElement::AdjustScissor(IntRect& currentScissor) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("Cursor", "void AdjustScissor(IntRect&)", asMETHODPR(Cursor, AdjustScissor, (IntRect&), void), asCALL_THISCALL);
     // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
@@ -5528,7 +5542,7 @@ void ASRegisterGenerated_Members_Cn_Cz(asIScriptEngine* engine)
     // bool UIElement::SetStyleAuto(XMLFile* file=nullptr) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("Cursor", "bool SetStyleAuto(XMLFile@+ = null)", asMETHODPR(Cursor, SetStyleAuto, (XMLFile*), bool), asCALL_THISCALL);
     // void UIElement::SetTags(const StringVector& tags) | File: ../UI/UIElement.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("Cursor", "void SetTags(Array<String>@+)", asFUNCTION(Cursor_SetTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
     engine->RegisterObjectMethod("Cursor", "void SetTemporary(bool)", asMETHODPR(Cursor, SetTemporary, (bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Cursor", "void set_temporary(bool)", asMETHODPR(Cursor, SetTemporary, (bool), void), asCALL_THISCALL);

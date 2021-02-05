@@ -93,6 +93,13 @@ static void TerrainPatch_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool
     ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
+// void UIElement::AddTags(const StringVector& tags) | File: ../UI/UIElement.h
+static void Text_AddTags_StringVector(Text* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->AddTags(tags);
+}
+
 // const Vector<SharedPtr<UIElement>>& UIElement::GetChildren() const | File: ../UI/UIElement.h
 static CScriptArray* Text_GetChildren_void(Text* ptr)
 {
@@ -119,6 +126,13 @@ static CScriptArray* Text_GetTags_void(Text* ptr)
 {
     const StringVector& result = ptr->GetTags();
     return VectorToArray<String>(result, "Array<String>");
+}
+
+// void UIElement::SetTags(const StringVector& tags) | File: ../UI/UIElement.h
+static void Text_SetTags_StringVector(Text* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->SetTags(tags);
 }
 
 // explicit Text::Text(Context* context) | File: ../UI/Text.h
@@ -1534,7 +1548,7 @@ void ASRegisterGenerated_Members_Ta_Tm(asIScriptEngine* engine)
     // void UIElement::AddTags(const String& tags, char separator=';') | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("Text", "void AddTags(const String&in, int8 = ';')", asMETHODPR(Text, AddTags, (const String&, char), void), asCALL_THISCALL);
     // void UIElement::AddTags(const StringVector& tags) | File: ../UI/UIElement.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("Text", "void AddTags(Array<String>@+)", asFUNCTION(Text_AddTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void UIElement::AdjustScissor(IntRect& currentScissor) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("Text", "void AdjustScissor(IntRect&)", asMETHODPR(Text, AdjustScissor, (IntRect&), void), asCALL_THISCALL);
     // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
@@ -2320,7 +2334,7 @@ void ASRegisterGenerated_Members_Ta_Tm(asIScriptEngine* engine)
     // bool UIElement::SetStyleAuto(XMLFile* file=nullptr) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("Text", "bool SetStyleAuto(XMLFile@+ = null)", asMETHODPR(Text, SetStyleAuto, (XMLFile*), bool), asCALL_THISCALL);
     // void UIElement::SetTags(const StringVector& tags) | File: ../UI/UIElement.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("Text", "void SetTags(Array<String>@+)", asFUNCTION(Text_SetTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
     engine->RegisterObjectMethod("Text", "void SetTemporary(bool)", asMETHODPR(Text, SetTemporary, (bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "void set_temporary(bool)", asMETHODPR(Text, SetTemporary, (bool), void), asCALL_THISCALL);

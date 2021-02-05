@@ -110,6 +110,13 @@ static void Matrix4_Matrix4_float_float_float_float_float_float_float_float_floa
     new(ptr) Matrix4(v00, v01, v02, v03, v10, v11, v12, v13, v20, v21, v22, v23, v30, v31, v32, v33);
 }
 
+// void UIElement::AddTags(const StringVector& tags) | File: ../UI/UIElement.h
+static void Menu_AddTags_StringVector(Menu* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->AddTags(tags);
+}
+
 // const Vector<SharedPtr<UIElement>>& UIElement::GetChildren() const | File: ../UI/UIElement.h
 static CScriptArray* Menu_GetChildren_void(Menu* ptr)
 {
@@ -142,6 +149,13 @@ static CScriptArray* Menu_GetTags_void(Menu* ptr)
 static Menu* Menu_Menu_Context()
 {
     return new Menu(GetScriptContext());
+}
+
+// void UIElement::SetTags(const StringVector& tags) | File: ../UI/UIElement.h
+static void Menu_SetTags_StringVector(Menu* ptr, CScriptArray* tags_conv)
+{
+    StringVector tags = ArrayToVector<String>(tags_conv);
+    ptr->SetTags(tags);
 }
 
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
@@ -909,7 +923,7 @@ void ASRegisterGenerated_Members_M(asIScriptEngine* engine)
     // void UIElement::AddTags(const String& tags, char separator=';') | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("Menu", "void AddTags(const String&in, int8 = ';')", asMETHODPR(Menu, AddTags, (const String&, char), void), asCALL_THISCALL);
     // void UIElement::AddTags(const StringVector& tags) | File: ../UI/UIElement.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("Menu", "void AddTags(Array<String>@+)", asFUNCTION(Menu_AddTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void UIElement::AdjustScissor(IntRect& currentScissor) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("Menu", "void AdjustScissor(IntRect&)", asMETHODPR(Menu, AdjustScissor, (IntRect&), void), asCALL_THISCALL);
     // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
@@ -1702,7 +1716,7 @@ void ASRegisterGenerated_Members_M(asIScriptEngine* engine)
     // bool UIElement::SetStyleAuto(XMLFile* file=nullptr) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("Menu", "bool SetStyleAuto(XMLFile@+ = null)", asMETHODPR(Menu, SetStyleAuto, (XMLFile*), bool), asCALL_THISCALL);
     // void UIElement::SetTags(const StringVector& tags) | File: ../UI/UIElement.h
-    // Error: type "const StringVector&" can not automatically bind
+    engine->RegisterObjectMethod("Menu", "void SetTags(Array<String>@+)", asFUNCTION(Menu_SetTags_StringVector), asCALL_CDECL_OBJFIRST);
     // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
     engine->RegisterObjectMethod("Menu", "void SetTemporary(bool)", asMETHODPR(Menu, SetTemporary, (bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Menu", "void set_temporary(bool)", asMETHODPR(Menu, SetTemporary, (bool), void), asCALL_THISCALL);
