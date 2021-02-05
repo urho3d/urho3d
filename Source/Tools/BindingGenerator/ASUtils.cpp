@@ -250,8 +250,9 @@ ConvertedVariable CppVariableToAS(const TypeAnalyzer& type, VariableUsage usage,
     }
 
     smatch match;
+
     regex_match(cppTypeName, match, regex("SharedPtr<(\\w+)>"));
-    if (match.size() == 2 && usage == VariableUsage::FunctionReturn)
+    if (!match.empty())
     {
         string cppSubtypeName = match[1].str();
 
@@ -269,14 +270,19 @@ ConvertedVariable CppVariableToAS(const TypeAnalyzer& type, VariableUsage usage,
         if (cppSubtypeName == "WorkItem") // TODO autodetect
             throw Exception("Error: type \"" + type.ToString() + "\" can not automatically bind");
 
-        result.asDeclaration_ = asSubtypeName + "@+";
-        result.cppDeclaration_ = cppSubtypeName + "*";
-        result.glue_ = "return result.Detach();\n";
-        return result;
+        if (usage == VariableUsage::FunctionReturn)
+        {
+            result.asDeclaration_ = asSubtypeName + "@+";
+            result.cppDeclaration_ = cppSubtypeName + "*";
+            result.glue_ = "return result.Detach();\n";
+            return result;
+        }
+
+        throw Exception("Error: type \"" + type.ToString() + "\" can not automatically bind");
     }
 
     regex_match(cppTypeName, match, regex("Vector<SharedPtr<(\\w+)>>"));
-    if (match.size() == 2 && usage == VariableUsage::FunctionReturn)
+    if (!match.empty())
     {
         string cppSubtypeName = match[1].str();
 
@@ -291,20 +297,40 @@ ConvertedVariable CppVariableToAS(const TypeAnalyzer& type, VariableUsage usage,
             asSubtypeName = cppSubtypeName;
         }
 
-        result.asDeclaration_ = "Array<" + asSubtypeName + "@>@";
-        result.cppDeclaration_ = "CScriptArray*";
+        if (cppSubtypeName == "WorkItem") // TODO autodetect
+            throw Exception("Error: type \"" + type.ToString() + "\" can not automatically bind");
 
-        // Which variant is correct/better?
+        if (usage == VariableUsage::FunctionReturn)
+        {
+            result.asDeclaration_ = "Array<" + asSubtypeName + "@>@";
+            result.cppDeclaration_ = "CScriptArray*";
+
+            // Which variant is correct/better?
 #if 0
-        result->glueResult_ = "return VectorToArray<SharedPtr<" + cppTypeName + "> >(result, \"Array<" + asTypeName + "@>@\");\n";
+            result->glueResult_ = "return VectorToArray<SharedPtr<" + cppTypeName + ">>(result, \"Array<" + asTypeName + "@>@\");\n";
 #else
-        result.glue_ = "return VectorToHandleArray(result, \"Array<" + asSubtypeName + "@>\");\n";
+            result.glue_ = "return VectorToHandleArray(result, \"Array<" + asSubtypeName + "@>\");\n";
 #endif
-        return result;
+            return result;
+        }
+
+        if (usage == VariableUsage::FunctionParameter && type.IsConst() && type.IsReference())
+        {
+            string newCppVarName = name + "_conv";
+            result.asDeclaration_ = "Array<" + asSubtypeName + "@>@+";
+            result.cppDeclaration_ = "CScriptArray* " + newCppVarName;
+            result.glue_ = "    " + cppTypeName + " " + name + " = HandleArrayToVector<" + cppSubtypeName + ">(" + newCppVarName + ");\n";
+
+            assert(defaultValue.empty()); // TODO: make
+
+            return result;
+        }
+
+        throw Exception("Error: type \"" + type.ToString() + "\" can not automatically bind");
     }
 
     regex_match(cppTypeName, match, regex("PODVector<(\\w+)\\*>"));
-    if (match.size() == 2 && usage == VariableUsage::FunctionReturn)
+    if (!match.empty())
     {
         string cppSubtypeName = match[1].str();
 
@@ -319,14 +345,31 @@ ConvertedVariable CppVariableToAS(const TypeAnalyzer& type, VariableUsage usage,
             asSubtypeName = cppSubtypeName;
         }
 
-        result.asDeclaration_ = "Array<" + asSubtypeName + "@>@";
-        result.cppDeclaration_ = "CScriptArray*";
-        result.glue_ = "return VectorToHandleArray(result, \"Array<" + asSubtypeName + "@>\");\n";
-        return result;
+        if (usage == VariableUsage::FunctionReturn)
+        {
+            result.asDeclaration_ = "Array<" + asSubtypeName + "@>@";
+            result.cppDeclaration_ = "CScriptArray*";
+            result.glue_ = "return VectorToHandleArray(result, \"Array<" + asSubtypeName + "@>\");\n";
+            return result;
+        }
+
+        if (usage == VariableUsage::FunctionParameter && type.IsConst() && type.IsReference())
+        {
+            string newCppVarName = name + "_conv";
+            result.asDeclaration_ = "Array<" + asSubtypeName + "@>@";
+            result.cppDeclaration_ = "CScriptArray* " + newCppVarName;
+            result.glue_ = "    " + cppTypeName + " " + name + " = ArrayToPODVector<" + cppSubtypeName + "*>(" + newCppVarName + ");\n";
+
+            assert(defaultValue.empty()); // TODO: make
+
+            return result;
+        }
+
+        throw Exception("Error: type \"" + type.ToString() + "\" can not automatically bind");
     }
 
     regex_match(cppTypeName, match, regex("PODVector<(\\w+)>"));
-    if (match.size() == 2 && type.IsConst() == type.IsReference() && usage == VariableUsage::FunctionReturn)
+    if (!match.empty())
     {
         string cppSubtypeName = match[1].str();
 
@@ -341,98 +384,28 @@ ConvertedVariable CppVariableToAS(const TypeAnalyzer& type, VariableUsage usage,
             asSubtypeName = cppSubtypeName;
         }
 
-        result.asDeclaration_ = "Array<" + asSubtypeName + ">@";
-        result.cppDeclaration_ = "CScriptArray*";
-        result.glue_ = "return VectorToArray(result, \"Array<" + asSubtypeName + ">\");\n";
-        return result;
+        if (usage == VariableUsage::FunctionReturn && type.IsConst() == type.IsReference())
+        {
+            result.asDeclaration_ = "Array<" + asSubtypeName + ">@";
+            result.cppDeclaration_ = "CScriptArray*";
+            result.glue_ = "return VectorToArray(result, \"Array<" + asSubtypeName + ">\");\n";
+            return result;
+        }
+
+        if (usage == VariableUsage::FunctionParameter && type.IsConst() && type.IsReference())
+        {
+            string newCppVarName = name + "_conv";
+            result.asDeclaration_ = "Array<" + asSubtypeName + ">@+";
+            result.cppDeclaration_ = "CScriptArray* " + newCppVarName;
+            result.glue_ = "    " + cppTypeName + " " + name + " = ArrayToPODVector<" + cppSubtypeName + ">(" + newCppVarName + ");\n";
+
+            assert(defaultValue.empty()); // TODO: make
+
+            return result;
+        }
+
+        throw Exception("Error: type \"" + type.ToString() + "\" can not automatically bind");
     }
-
-    // =============================================================================
-
-    regex_match(cppTypeName, match, regex("PODVector<(\\w+)>"));
-    if (match.size() == 2 && type.IsConst() && type.IsReference() && usage == VariableUsage::FunctionParameter)
-    {
-        string cppSubtypeName = match[1].str();
-
-        string asSubtypeName;
-
-        try
-        {
-            asSubtypeName = CppPrimitiveTypeToAS(cppSubtypeName);
-        }
-        catch (...)
-        {
-            asSubtypeName = cppSubtypeName;
-        }
-
-        string newCppVarName = name + "_conv";
-        result.asDeclaration_ = "Array<" + asSubtypeName + ">@+";
-        result.cppDeclaration_ = "CScriptArray* " + newCppVarName;
-        result.glue_ = "    " + cppTypeName + " " + name + " = ArrayToPODVector<" + cppSubtypeName + ">(" + newCppVarName + ");\n";
-
-        assert(defaultValue.empty()); // TODO: make
-
-        return result;
-    }
-
-    regex_match(cppTypeName, match, regex("PODVector<(\\w+)\\*>"));
-    // TODO check \\w is refcounted
-    if (match.size() == 2 && type.IsConst() && type.IsReference() && usage == VariableUsage::FunctionParameter)
-    {
-        string cppSubtypeName = match[1].str();
-
-        string asSubtypeName;
-
-        try
-        {
-            asSubtypeName = CppPrimitiveTypeToAS(cppSubtypeName);
-        }
-        catch (...)
-        {
-            asSubtypeName = cppSubtypeName;
-        }
-
-        string newCppVarName = name + "_conv";
-        result.asDeclaration_ = "Array<" + asSubtypeName + "@>@";
-        result.cppDeclaration_ = "CScriptArray* " + newCppVarName;
-        result.glue_ = "    " + cppTypeName + " " + name + " = ArrayToPODVector<" + cppSubtypeName + "*>(" + newCppVarName + ");\n";
-
-        assert(defaultValue.empty()); // TODO: make
-
-        return result;
-    }
-
-    regex_match(cppTypeName, match, regex("Vector<SharedPtr<(\\w+)>>"));
-    if (match.size() == 2 && type.IsConst() && type.IsReference() && usage == VariableUsage::FunctionParameter)
-    {
-        string cppSubtypeName = match[1].str();
-
-        string asSubtypeName;
-
-        try
-        {
-            asSubtypeName = CppPrimitiveTypeToAS(cppSubtypeName);
-        }
-        catch (...)
-        {
-            asSubtypeName = cppSubtypeName;
-        }
-
-        if (cppSubtypeName == "WorkItem") // TODO autodetect
-            throw Exception("Error: type \"" + type.ToString() + "\" can not automatically bind");
-
-        string newCppVarName = name + "_conv";
-        result.asDeclaration_ = "Array<" + asSubtypeName + "@>@+";
-        result.cppDeclaration_ = "CScriptArray* " + newCppVarName;
-        result.glue_ = "    " + cppTypeName + " " + name + " = HandleArrayToVector<" + cppSubtypeName + ">(" + newCppVarName + ");\n";
-        
-        assert(defaultValue.empty()); // TODO: make
-
-        return result;
-    }
-
-    // =============================================================================
-
 
     if (!IsKnownCppType(cppTypeName))
         throw Exception("Error: type \"" + type.ToString() + "\" can not automatically bind");
@@ -468,7 +441,7 @@ ConvertedVariable CppVariableToAS(const TypeAnalyzer& type, VariableUsage usage,
     if (Contains(type.ToString(), "::"))
         throw Exception("Error: type \"" + type.ToString() + "\" can not automatically bind bacause internal");
 
-    if (type.IsConst() && type.IsReference() && usage == VariableUsage::FunctionParameter)
+    if (usage == VariableUsage::FunctionParameter && type.IsConst() && type.IsReference())
     {
         result.asDeclaration_ = "const " + asTypeName + "&in";
         result.cppDeclaration_ = type.ToString();
@@ -483,9 +456,6 @@ ConvertedVariable CppVariableToAS(const TypeAnalyzer& type, VariableUsage usage,
             result.asDeclaration_ += " = " + asDefaultValue;
         }
 
-        //if (!name.empty())
-        //    result.asDeclaration_ += result.asDeclaration_ + " " + name;
-        
         return result;
     }
 
@@ -512,9 +482,6 @@ ConvertedVariable CppVariableToAS(const TypeAnalyzer& type, VariableUsage usage,
 
     if (usage == VariableUsage::FunctionReturn && type.IsConst() && !type.IsPointer())
         result.asDeclaration_ = "const " + result.asDeclaration_;
-
-    //if (!name.empty())
-    //    result.asDeclaration_ += result.asDeclaration_ + " " + name;
 
     if (!defaultValue.empty())
     {
@@ -618,6 +585,7 @@ static string GenerateFunctionWrapperName(xml_node memberdef)
 {
     string result = ExtractName(memberdef);
 
+    // Operators
     result = ReplaceAll(result, "=", "equals");
 
     vector<ParamAnalyzer> params = ExtractParams(memberdef);
