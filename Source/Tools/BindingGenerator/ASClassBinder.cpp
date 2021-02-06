@@ -235,26 +235,13 @@ static void RegisterStaticFunction(const ClassStaticFunctionAnalyzer& functionAn
     if (convertedReturn.NeedWrapper())
         needWrapper = true;
 
-    string declParams;
-
-    for (const ConvertedVariable& conv : convertedParams)
-    {
-        if (!conv.asDeclaration_.empty())
-        {
-            if (declParams.length() > 0)
-                declParams += ", ";
-
-            declParams += conv.asDeclaration_;
-        }
-    }
-
     string asFunctionName = functionAnalyzer.GetName();
     string className = functionAnalyzer.GetClassName();
 
     if (needWrapper)
         result->glue_ << GenerateWrapper(functionAnalyzer, convertedParams, convertedReturn);
 
-    string decl = convertedReturn.asDeclaration_ + " " + asFunctionName + "(" + declParams + ")";
+    string decl = convertedReturn.asDeclaration_ + " " + asFunctionName + "(" + JoinASDeclarations(convertedParams) + ")";
 
     result->reg_ << "    engine->SetDefaultNamespace(\"" << className << "\");\n";
 
@@ -286,7 +273,7 @@ static void RegisterRefCountedConstructor(const ClassFunctionAnalyzer& functionA
         args = CutStart(args, "Context *context");
         args = CutStart(args, ", ");
     }
-    else if (args.find("Context") != string::npos)
+    else if (Contains(args, "Context"))
     {
         result->reg_ <<
             "    // " << functionAnalyzer.GetLocation() << "\n"
@@ -821,19 +808,6 @@ static void RegisterMethod(const ClassFunctionAnalyzer& functionAnalyzer, bool t
     if (retConv.NeedWrapper())
         needWrapper = true;
 
-    string declParams = "";
-
-    for (const ConvertedVariable& conv : convertedParams)
-    {
-        if (!conv.asDeclaration_.empty())
-        {
-            if (declParams.length() > 0)
-                declParams += ", ";
-
-            declParams += conv.asDeclaration_; // TODO функцию для джойна сделать внутри конвертора
-        }
-    }
-
     string asReturnType = retConv.asDeclaration_;
 
     string asFunctionName = functionAnalyzer.GetName();
@@ -853,7 +827,7 @@ static void RegisterMethod(const ClassFunctionAnalyzer& functionAnalyzer, bool t
     if (needWrapper)
         result->glue_ << GenerateWrapper(functionAnalyzer, templateVersion, convertedParams, retConv);
 
-    string decl = asReturnType + " " + asFunctionName + "(" + declParams + ")";
+    string decl = asReturnType + " " + asFunctionName + "(" + JoinASDeclarations(convertedParams) + ")";
 
     if (functionAnalyzer.IsConst())
         decl += " const";
@@ -889,7 +863,7 @@ static void RegisterMethod(const ClassFunctionAnalyzer& functionAnalyzer, bool t
             }
         }
         
-        decl = asReturnType + " " + asFunctionName + "(" + declParams + ")";
+        decl = asReturnType + " " + asFunctionName + "(" + JoinASDeclarations(convertedParams) + ")";
 
         if (functionAnalyzer.IsConst())
             decl += " const";

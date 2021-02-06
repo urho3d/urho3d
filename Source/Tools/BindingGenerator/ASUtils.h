@@ -50,6 +50,8 @@ struct ConvertedVariable
     bool NeedWrapper() const { return !glue_.empty(); }
 };
 
+string JoinASDeclarations(const vector<ConvertedVariable>& vars);
+
 enum class VariableUsage
 {
     FunctionParameter = 0,
@@ -82,7 +84,7 @@ shared_ptr<ClassAnalyzer> FindClassByID(const string& name);
 
 string GenerateWrapperName(const GlobalFunctionAnalyzer& functionAnalyzer);
 string GenerateWrapperName(const ClassStaticFunctionAnalyzer& functionAnalyzer);
-string GenerateWrapperName(const ClassFunctionAnalyzer& functionAnalyzer, bool templateVersion);
+string GenerateWrapperName(const ClassFunctionAnalyzer& functionAnalyzer, bool templateVersion = false);
 
 string GenerateWrapper(const GlobalFunctionAnalyzer& functionAnalyzer, const vector<ConvertedVariable>& convertedParams, const ConvertedVariable& convertedReturn);
 string GenerateWrapper(const ClassStaticFunctionAnalyzer& functionAnalyzer, const vector<ConvertedVariable>& convertedParams, const ConvertedVariable& convertedReturn);

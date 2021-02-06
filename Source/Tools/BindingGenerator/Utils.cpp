@@ -195,6 +195,11 @@ bool Contains(const string& str, const string& substr)
     return str.find(substr) != string::npos;
 }
 
+bool Contains(const string& str, char c)
+{
+    return str.find(c) != string::npos;
+}
+
 string FirstCharToLower(const string& str)
 {
     if (str.empty())

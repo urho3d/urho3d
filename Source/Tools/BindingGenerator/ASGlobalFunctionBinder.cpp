@@ -104,7 +104,6 @@ static vector<map<string, string>> GetSpecializations(const GlobalFunctionAnalyz
 
 static void BindGlobalFunction(const GlobalFunctionAnalyzer& functionAnalyzer)
 {
-    string declParams = "";
     vector<ParamAnalyzer> params = functionAnalyzer.GetParams();
     string outGlue;
 
@@ -130,14 +129,6 @@ static void BindGlobalFunction(const GlobalFunctionAnalyzer& functionAnalyzer)
             processedGlobalFunction.registration_ = "// " + string(e.what());
             Result::globalFunctions_.push_back(processedGlobalFunction);
             return;
-        }
-
-        if (!conv.asDeclaration_.empty())
-        {
-            if (declParams.length() > 0)
-                declParams += ", ";
-
-            declParams += conv.asDeclaration_;
         }
 
         if (conv.NeedWrapper())
@@ -169,7 +160,7 @@ static void BindGlobalFunction(const GlobalFunctionAnalyzer& functionAnalyzer)
 
     string asFunctionName = functionAnalyzer.GetName();
 
-    string decl = asReturnType + " " + asFunctionName + "(" + declParams + ")";
+    string decl = asReturnType + " " + asFunctionName + "(" + JoinASDeclarations(convertedParams) + ")";
 
     processedGlobalFunction.registration_ = "engine->RegisterGlobalFunction(\"" + decl + "\", ";
 
@@ -187,7 +178,7 @@ static void BindGlobalFunction(const GlobalFunctionAnalyzer& functionAnalyzer)
     {
         asFunctionName = CutStart(aliasMark, "BIND_AS_ALIAS_");
 
-        decl = asReturnType + " " + asFunctionName + "(" + declParams + ")";
+        decl = asReturnType + " " + asFunctionName + "(" + JoinASDeclarations(convertedParams) + ")";
 
         processedGlobalFunction.registration_ = "engine->RegisterGlobalFunction(\"" + decl + "\", ";
 

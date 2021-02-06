@@ -320,7 +320,7 @@ public:
     vector<string> GetTemplateParams() const { return ExtractTemplateParams(memberdef_); }
     bool IsDefine() const { return CONTAINS(SourceData::defines_, GetName()); }
     bool IsTemplate() const { return ::IsTemplate(memberdef_); }
-    string JoinParamsNames(bool skipContext = false) const { return ::JoinParamsNames(memberdef_, skipContext); }
+    string JoinParamsNames(bool skipContext = false) const { return ::JoinParamsNames(memberdef_, skipContext); } // TODO убрать skipContext, он больше не нужен
     string JoinParamsTypes() const { return ::JoinParamsTypes(memberdef_, specialization_); }
 
     virtual string GetLocation() const { return GetFunctionLocation(memberdef_); }

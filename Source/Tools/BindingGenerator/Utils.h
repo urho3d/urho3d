@@ -44,7 +44,9 @@ string RemoveFirst(const string& src, const string& value);
 vector<string> Split(const string& str, char delim);
 vector<string> Split(const string& str, const string& delim);
 string Join(const vector<string>& values, const string& separator);
+
 bool Contains(const string& str, const string& substr);
+bool Contains(const string& str, char c);
 
 // Return all after last found substring
 string CutToLast(const string& src, const string& value, bool inclusive);

@@ -86,6 +86,47 @@ string CppPrimitiveTypeToAS(const string& cppType)
     throw Exception(cppType + " not a primitive type");
 }
 
+string JoinASDeclarations(const vector<ConvertedVariable>& vars)
+{
+    string result;
+
+    for (const ConvertedVariable& var : vars)
+    {
+        if (!var.asDeclaration_.empty())
+        {
+            if (!result.empty())
+                result += ", ";
+
+            result += var.asDeclaration_;
+        }
+    }
+
+    return result;
+}
+
+string JoinCppDeclarations(const string& firstCppDeclaration, const vector<ConvertedVariable>& vars)
+{
+    string result = firstCppDeclaration;
+
+    for (const ConvertedVariable& var : vars)
+    {
+        if (!var.cppDeclaration_.empty())
+        {
+            if (!result.empty())
+                result += ", ";
+
+            result += var.cppDeclaration_;
+        }
+    }
+
+    return result;
+}
+
+string JoinCppDeclarations(const vector<ConvertedVariable>& vars)
+{
+    return JoinCppDeclarations("", vars);
+}
+
 shared_ptr<EnumAnalyzer> FindEnum(const string& name)
 {
     NamespaceAnalyzer namespaceAnalyzer(SourceData::namespaceUrho3D_);
@@ -435,7 +476,7 @@ ConvertedVariable CppVariableToAS(const TypeAnalyzer& type, VariableUsage usage,
         asTypeName = cppTypeName;
     }
 
-    if (asTypeName.find('<') != string::npos)
+    if (Contains(asTypeName, '<'))
         throw Exception("Error: type \"" + type.ToString() + "\" can not automatically bind");
 
     if (Contains(type.ToString(), "::"))
@@ -534,7 +575,7 @@ string CppTypeToAS(const TypeAnalyzer& type, TypeUsage typeUsage)
     if (asTypeName == "void" && type.IsPointer())
         throw Exception("Error: type \"void*\" can not automatically bind");
 
-    if (asTypeName.find('<') != string::npos)
+    if (Contains(asTypeName, '<'))
         throw Exception("Error: type \"" + type.ToString() + "\" can not automatically bind");
 
     if (Contains(type.ToString(), "::"))
@@ -637,27 +678,8 @@ string GenerateWrapper(const GlobalFunctionAnalyzer& functionAnalyzer, const vec
 
     string glueReturnType = convertedReturn.cppDeclaration_;
 
-    vector<ParamAnalyzer> params = functionAnalyzer.GetParams();
-    
-    result = "static " + glueReturnType + " " + GenerateWrapperName(functionAnalyzer) + "(";
-
-    string cppDecl;
-
-    for (size_t i = 0; i < convertedParams.size(); i++)
-    {
-        if (!convertedParams[i].cppDeclaration_.empty())
-        {
-            if (!cppDecl.empty())
-                cppDecl += ", ";
-
-            cppDecl += convertedParams[i].cppDeclaration_;
-        }
-    }
-
-    result += cppDecl;
-
-    result +=
-        ")\n"
+    result =
+        "static " + glueReturnType + " " + GenerateWrapperName(functionAnalyzer) + "(" + JoinCppDeclarations(convertedParams) + ")\n"
         "{\n";
 
     for (size_t i = 0; i < convertedParams.size(); i++)
@@ -668,17 +690,7 @@ string GenerateWrapper(const GlobalFunctionAnalyzer& functionAnalyzer, const vec
     else
         result += "    ";
 
-    result += functionAnalyzer.GetName() + "(";
-
-    for (size_t i = 0; i < convertedParams.size(); i++)
-    {
-        if (i != 0)
-            result += ", ";
-
-        result += params[i].GetDeclname();
-    }
-
-    result += ");\n";
+    result += functionAnalyzer.GetName() + "(" + functionAnalyzer.JoinParamsNames() + ");\n";
 
     if (!convertedReturn.glue_.empty())
         result += "    " + convertedReturn.glue_;
@@ -703,27 +715,7 @@ string GenerateWrapper(const ClassStaticFunctionAnalyzer& functionAnalyzer, cons
 
     result +=
         "// " + functionAnalyzer.GetLocation() + "\n"
-        "static " + glueReturnType + " " + GenerateWrapperName(functionAnalyzer) + "(";
-
-    vector<ParamAnalyzer> params = functionAnalyzer.GetParams();
-
-    string cppDecl;
-
-    for (size_t i = 0; i < convertedParams.size(); i++)
-    {
-        if (!convertedParams[i].cppDeclaration_.empty())
-        {
-            if (!cppDecl.empty())
-                cppDecl += ", ";
-
-            cppDecl += convertedParams[i].cppDeclaration_;
-        }
-    }
-
-    result += cppDecl;
-
-    result +=
-        ")\n"
+        "static " + glueReturnType + " " + GenerateWrapperName(functionAnalyzer) + "(" + JoinCppDeclarations(convertedParams) + ")\n"
         "{\n";
 
     for (size_t i = 0; i < convertedParams.size(); i++)
@@ -734,17 +726,7 @@ string GenerateWrapper(const ClassStaticFunctionAnalyzer& functionAnalyzer, cons
     else
         result += "    ";
 
-    result += functionAnalyzer.GetClassName() + "::" + functionAnalyzer.GetName() + "(";
-
-    for (size_t i = 0; i < convertedParams.size(); i++)
-    {
-        if (i != 0)
-            result += ", ";
-
-        result += params[i].GetDeclname();
-    }
-
-    result += ");\n";
+    result += functionAnalyzer.GetClassName() + "::" + functionAnalyzer.GetName() + "(" + functionAnalyzer.JoinParamsNames() + ");\n";
 
     if (!convertedReturn.glue_.empty())
         result += "    " + convertedReturn.glue_;
@@ -774,27 +756,7 @@ string GenerateWrapper(const ClassFunctionAnalyzer& functionAnalyzer, bool templ
 
     result +=
         "// " + functionAnalyzer.GetLocation() + "\n"
-        "static " + glueReturnType + " " + GenerateWrapperName(functionAnalyzer, templateVersion) + "(";
-
-    vector<ParamAnalyzer> params = functionAnalyzer.GetParams();
-
-    string cppDecl = functionAnalyzer.GetClassName() + string("* ptr");
-
-    for (size_t i = 0; i < convertedParams.size(); i++)
-    {
-        if (!convertedParams[i].cppDeclaration_.empty())
-        {
-            if (!cppDecl.empty())
-                cppDecl += ", ";
-
-            cppDecl += convertedParams[i].cppDeclaration_;
-        }
-    }
-
-    result += cppDecl;
-
-    result +=
-        ")\n"
+        "static " + glueReturnType + " " + GenerateWrapperName(functionAnalyzer, templateVersion) + "(" + JoinCppDeclarations(functionAnalyzer.GetClassName() + "* ptr", convertedParams) + ")\n"
         "{\n";
 
     for (size_t i = 0; i < convertedParams.size(); i++)
@@ -805,17 +767,7 @@ string GenerateWrapper(const ClassFunctionAnalyzer& functionAnalyzer, bool templ
     else
         result += "    ";
 
-    result += "ptr->" + functionAnalyzer.GetName() + "(";
-
-    for (size_t i = 0; i < convertedParams.size(); i++)
-    {
-        if (i != 0)
-            result += ", ";
-
-        result += params[i].GetDeclname();
-    }
-
-    result += ");\n";
+    result += "ptr->" + functionAnalyzer.GetName() + "(" + functionAnalyzer.JoinParamsNames() + ");\n";
 
     if (!convertedReturn.glue_.empty())
         result += "    " + convertedReturn.glue_;
