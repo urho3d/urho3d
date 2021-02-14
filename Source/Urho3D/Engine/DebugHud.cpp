@@ -232,13 +232,11 @@ void DebugHud::SetMode(unsigned mode)
 
     memoryText_->SetPosition(0, modeText_->IsVisible() ? modeText_->GetHeight() * -2 : 0);
 
-#ifdef URHO3D_PROFILING
-#ifndef URHO3D_TRACY_PROFILING
+#if defined(URHO3D_PROFILING) && !defined(URHO3D_TRACY_PROFILING)
     // Event profiler is created on engine initialization if "EventProfiler" parameter is set
     auto* eventProfiler = GetSubsystem<EventProfiler>();
     if (eventProfiler)
         EventProfiler::SetActive((mode & DEBUGHUD_SHOW_EVENTPROFILER) != 0);
-#endif
 #endif
 
     mode_ = mode;

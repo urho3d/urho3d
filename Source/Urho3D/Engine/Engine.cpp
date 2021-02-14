@@ -121,10 +121,8 @@ Engine::Engine(Context* context) :
     // Create subsystems which do not depend on engine initialization or startup parameters
     context_->RegisterSubsystem(new Time(context_));
     context_->RegisterSubsystem(new WorkQueue(context_));
-#ifdef URHO3D_PROFILING
-#ifndef URHO3D_TRACY_PROFILING
+#if defined(URHO3D_PROFILING) && !defined(URHO3D_TRACY_PROFILING)
     context_->RegisterSubsystem(new Profiler(context_));
-#endif
 #endif
     context_->RegisterSubsystem(new FileSystem(context_));
 #ifdef URHO3D_LOGGING
@@ -306,14 +304,12 @@ bool Engine::Initialize(const VariantMap& parameters)
         timeOut_ = GetParameter(parameters, EP_TIME_OUT, 0).GetInt() * 1000000LL;
 #endif
 
-#ifdef URHO3D_PROFILING
-#ifndef URHO3D_TRACY_PROFILING
+#if defined(URHO3D_PROFILING) && !defined(URHO3D_TRACY_PROFILING)
     if (GetParameter(parameters, EP_EVENT_PROFILER, true).GetBool())
     {
         context_->RegisterSubsystem(new EventProfiler(context_));
         EventProfiler::SetActive(true);
     }
-#endif
 #endif
     frameTimer_.Reset();
 
@@ -489,15 +485,13 @@ void Engine::RunFrame()
     auto* input = GetSubsystem<Input>();
     auto* audio = GetSubsystem<Audio>();
 
-#ifdef URHO3D_PROFILING
-#ifndef URHO3D_TRACY_PROFILING
+#if defined(URHO3D_PROFILING) && !defined(URHO3D_TRACY_PROFILING)
     if (EventProfiler::IsActive())
     {
         auto* eventProfiler = GetSubsystem<EventProfiler>();
         if (eventProfiler)
             eventProfiler->BeginFrame();
     }
-#endif
 #endif
 
     time->BeginFrame(timeStep_);
