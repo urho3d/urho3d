@@ -254,7 +254,7 @@ endif ()
 cmake_dependent_option (URHO3D_PACKAGING "Enable resources packaging support" FALSE "NOT WEB" TRUE)
 # Enable profiling by default. If disabled, autoprofileblocks become no-ops and the Profiler subsystem is not instantiated.
 option (URHO3D_PROFILING "Enable profiling support" TRUE)
-# Enable Tracy profiling by default. Tracy profiling only works if URHO3D_PROFILING is set to be true.
+# Extended "Tracy Profiler" based profiling. Disabled by default. This feature only works if URHO3D_PROFILING is also set to be true.
 option (URHO3D_TRACY_PROFILING "Enable Tracy support for extended profiling. Tracy profiling only works if URHO3D_PROFILING is on" FALSE)
 # Enable logging by default. If disabled, LOGXXXX macros become no-ops and the Log subsystem is not instantiated.
 option (URHO3D_LOGGING "Enable logging support" TRUE)
