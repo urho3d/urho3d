@@ -391,6 +391,7 @@ if (EMSCRIPTEN)
 endif ()
 if (URHO3D_TRACY_PROFILING)
     set (URHO3D_PROFILING 0)
+    unset (URHO3D_PROFILING CACHE)
 endif ()
 
 # Union all the sysroot variables into one so it can be referred to generically later

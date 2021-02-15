@@ -69,6 +69,7 @@ Urho3D uses the following third-party libraries:
 - tolua++ 1.0.93 (defunct - http://www.codenix.com/~tolua)
 - WebP (https://chromium.googlesource.com/webm/libwebp)
 - ETCPACK (https://github.com/Ericsson/ETCPACK)
+- Tracy 0.7.6 (https://github.com/wolfpld/tracy)
 
 DXT / PVRTC decompression code based on the Squish library and the Oolong
 Engine.
