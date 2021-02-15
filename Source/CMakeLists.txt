@@ -124,7 +124,7 @@ if (URHO3D_PHYSICS)
     add_subdirectory (ThirdParty/Bullet)
 endif ()
 
-if (URHO3D_PROFILING AND URHO3D_TRACY_PROFILING)
+if (URHO3D_TRACY_PROFILING)
     add_subdirectory (ThirdParty/Tracy)
 endif ()
 

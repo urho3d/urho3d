@@ -258,7 +258,7 @@ private:
     Profiler* profiler_;
 };
 
-#ifdef URHO3D_PROFILING
+
 // Use Tracy profiler.
 #ifdef URHO3D_TRACY_PROFILING
 /// Macro for scoped profiling with a name.
@@ -280,7 +280,8 @@ private:
 #define URHO3D_PROFILE_RESOURCE_COLOR tracy::Color::MediumSeaGreen
 
 // Use default profiler.
-#else
+#elif defined(URHO3D_PROFILING)
+/// Macro for scoped profiling with a name.
 #define URHO3D_PROFILE(name) Urho3D::AutoProfileBlock profile_ ## name (GetSubsystem<Urho3D::Profiler>(), #name)
 #define URHO3D_PROFILE_COLOR(name, color)
 #define URHO3D_PROFILE_STR(nameStr, size)
@@ -290,8 +291,8 @@ private:
 
 #define URHO3D_PROFILE_EVENT_COLOR
 #define URHO3D_PROFILE_RESOURCE_COLOR
-#endif
 
+// Profiling off.
 #else
 #define URHO3D_PROFILE(name)
 #define URHO3D_PROFILE_COLOR(name, color)
@@ -303,5 +304,4 @@ private:
 #define URHO3D_PROFILE_EVENT_COLOR
 #define URHO3D_PROFILE_RESOURCE_COLOR
 #endif
-
 }

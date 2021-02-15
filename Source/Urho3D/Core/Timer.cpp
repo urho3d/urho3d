@@ -110,7 +110,7 @@ void Time::BeginFrame(float timeStep)
 
     timeStep_ = timeStep;
 
-#if defined(URHO3D_PROFILING) && !defined(URHO3D_TRACY_PROFILING)
+#ifdef URHO3D_PROFILING
     auto* profiler = GetSubsystem<Profiler>();
     if (profiler)
         profiler->BeginFrame();
@@ -138,7 +138,7 @@ void Time::EndFrame()
         SendEvent(E_ENDFRAME);
     }
 
-#if defined(URHO3D_PROFILING) && !defined(URHO3D_TRACY_PROFILING)
+#ifdef URHO3D_PROFILING
     auto* profiler = GetSubsystem<Profiler>();
     if (profiler)
         profiler->EndFrame();

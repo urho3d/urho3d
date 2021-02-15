@@ -121,7 +121,7 @@ Engine::Engine(Context* context) :
     // Create subsystems which do not depend on engine initialization or startup parameters
     context_->RegisterSubsystem(new Time(context_));
     context_->RegisterSubsystem(new WorkQueue(context_));
-#if defined(URHO3D_PROFILING) && !defined(URHO3D_TRACY_PROFILING)
+#ifdef URHO3D_PROFILING
     context_->RegisterSubsystem(new Profiler(context_));
 #endif
     context_->RegisterSubsystem(new FileSystem(context_));
@@ -304,7 +304,7 @@ bool Engine::Initialize(const VariantMap& parameters)
         timeOut_ = GetParameter(parameters, EP_TIME_OUT, 0).GetInt() * 1000000LL;
 #endif
 
-#if defined(URHO3D_PROFILING) && !defined(URHO3D_TRACY_PROFILING)
+#ifdef URHO3D_PROFILING
     if (GetParameter(parameters, EP_EVENT_PROFILER, true).GetBool())
     {
         context_->RegisterSubsystem(new EventProfiler(context_));
@@ -485,7 +485,7 @@ void Engine::RunFrame()
     auto* input = GetSubsystem<Input>();
     auto* audio = GetSubsystem<Audio>();
 
-#if defined(URHO3D_PROFILING) && !defined(URHO3D_TRACY_PROFILING)
+#ifdef URHO3D_PROFILING
     if (EventProfiler::IsActive())
     {
         auto* eventProfiler = GetSubsystem<EventProfiler>();
