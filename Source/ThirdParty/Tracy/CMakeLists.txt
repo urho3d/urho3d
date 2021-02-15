@@ -23,8 +23,8 @@
 # Define target name
 set (TARGET_NAME Tracy)
 
-# Definition
-ADD_DEFINITIONS (-DTRACY_ENABLE=1)
+# Required for MinGW
+ADD_DEFINITIONS (-D_WIN32_WINNT=0x600)
 
 # On Android, we define TRACY_TIMER_FALLBACK to make timer work on both physical and virtual devices
 if (ANDROID)
