@@ -521,6 +521,9 @@ void Engine::RunFrame()
     ApplyFrameLimit();
 
     time->EndFrame();
+
+    // Mark a frame for profiling
+    URHO3D_PROFILE_FRAME();
 }
 
 Console* Engine::CreateConsole()

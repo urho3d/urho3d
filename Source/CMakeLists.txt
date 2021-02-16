@@ -124,6 +124,10 @@ if (URHO3D_PHYSICS)
     add_subdirectory (ThirdParty/Bullet)
 endif ()
 
+if (URHO3D_TRACY_PROFILING)
+    add_subdirectory (ThirdParty/Tracy)
+endif ()
+
 if (NOT ANDROID AND NOT ARM AND NOT WEB)
     if (URHO3D_OPENGL)
         add_subdirectory (ThirdParty/GLEW)

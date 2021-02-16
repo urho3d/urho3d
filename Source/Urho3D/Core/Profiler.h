@@ -26,6 +26,11 @@
 #include "../Core/Thread.h"
 #include "../Core/Timer.h"
 
+#ifdef URHO3D_TRACY_PROFILING
+#define TRACY_ENABLE 1
+#include "Tracy/Tracy.hpp"
+#endif
+
 namespace Urho3D
 {
 
@@ -253,10 +258,41 @@ private:
     Profiler* profiler_;
 };
 
-#ifdef URHO3D_PROFILING
-#define URHO3D_PROFILE(name) Urho3D::AutoProfileBlock profile_ ## name (GetSubsystem<Urho3D::Profiler>(), #name)
-#else
-#define URHO3D_PROFILE(name)
+#ifdef URHO3D_TRACY_PROFILING // Use Tracy profiler
+    /// Macro for scoped profiling with a name.
+    #define URHO3D_PROFILE(name) ZoneScopedN(#name)
+#elif defined(URHO3D_PROFILING) // Use default profiler
+    /// Macro for scoped profiling with a name.
+    #define URHO3D_PROFILE(name) Urho3D::AutoProfileBlock profile_ ## name (GetSubsystem<Urho3D::Profiler>(), #name)
+#else // Profiling off
+    #define URHO3D_PROFILE(name)
+#endif
+
+#ifdef URHO3D_TRACY_PROFILING // Use Tracy profiler
+    /// Macro for scoped profiling with a name and color.
+    #define URHO3D_PROFILE_COLOR(name, color) ZoneScopedNC(#name, color)
+    /// Macro for scoped profiling with a dynamic string name.
+    #define URHO3D_PROFILE_STR(nameStr, size) ZoneName(nameStr, size)
+    /// Macro for marking a game frame.
+    #define URHO3D_PROFILE_FRAME() FrameMark
+    /// Macro for recording name of current thread.
+    #define URHO3D_PROFILE_THREAD(name) tracy::SetThreadName(name)
+    /// Macro for scoped profiling of a function.
+    #define URHO3D_PROFILE_FUNCTION() ZoneScopedN(__FUNCTION__)
+
+    /// Color used for highlighting event.
+    #define URHO3D_PROFILE_EVENT_COLOR tracy::Color::OrangeRed
+    /// Color used for highlighting resource.
+    #define URHO3D_PROFILE_RESOURCE_COLOR tracy::Color::MediumSeaGreen
+#else // Tracy profiler off
+    #define URHO3D_PROFILE_COLOR(name, color)
+    #define URHO3D_PROFILE_STR(nameStr, size)
+    #define URHO3D_PROFILE_FRAME()
+    #define URHO3D_PROFILE_THREAD(name)
+    #define URHO3D_PROFILE_FUNCTION()
+
+    #define URHO3D_PROFILE_EVENT_COLOR
+    #define URHO3D_PROFILE_RESOURCE_COLOR
 #endif
 
 }

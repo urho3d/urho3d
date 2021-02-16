@@ -139,7 +139,8 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_FILEWATCHER   |1|Enable filewatcher support|
 |URHO3D_HASH_DEBUG    |0|Enable %StringHash reversing and hash collision detection at the expense of memory and performance penalty|
 |URHO3D_PACKAGING     |0|Enable resources packaging support|
-|URHO3D_PROFILING     |1|Enable profiling support|
+|URHO3D_PROFILING     |1|Enable default profiling support|
+|URHO3D_TRACY_PROFILING|0|Enable extended profiling support using Tracy Profiler; overrides URHO3D_PROFILING option|
 |URHO3D_LOGGING       |1|Enable logging support|
 |URHO3D_THREADING     |*|Enable thread support, on Web platform default to 0, on other platforms default to 1|
 |URHO3D_TESTING       |0|Enable testing support|

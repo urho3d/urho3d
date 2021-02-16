@@ -50,6 +50,8 @@ BackgroundLoader::~BackgroundLoader()
 
 void BackgroundLoader::ThreadFunction()
 {
+    URHO3D_PROFILE_THREAD("BackgroundLoader Thread");
+
     while (shouldRun_)
     {
         backgroundLoadMutex_.Acquire();
@@ -264,13 +266,19 @@ void BackgroundLoader::FinishBackgroundLoading(BackgroundLoadItem& item)
     // If BeginLoad() phase was successful, call EndLoad() and get the final success/failure result
     if (success)
     {
-#ifdef URHO3D_PROFILING
+#ifdef URHO3D_TRACY_PROFILING
+        URHO3D_PROFILE_COLOR(FinishBackgroundLoading, URHO3D_PROFILE_RESOURCE_COLOR);
+
+        String profileBlockName("Finish" + resource->GetTypeName());
+        URHO3D_PROFILE_STR(profileBlockName.CString(), profileBlockName.Length());
+#elif defined(URHO3D_PROFILING)
         String profileBlockName("Finish" + resource->GetTypeName());
 
         auto* profiler = owner_->GetSubsystem<Profiler>();
         if (profiler)
             profiler->BeginBlock(profileBlockName.CString());
 #endif
+
         URHO3D_LOGDEBUG("Finishing background loaded resource " + resource->GetName());
         success = resource->EndLoad();
 
