@@ -68,13 +68,9 @@ shared_ptr<EnumAnalyzer> FindEnum(const string& name);
 string CppPrimitiveTypeToAS(const string& cppType);
 string CppValueToAS(const string& cppValue);
 
-class Exception : public exception
+class Exception : public runtime_error
 {
-public:
-    Exception(string message)
-        : exception(message.c_str())
-    {
-    }
+    using runtime_error::runtime_error;
 };
 
 bool IsKnownCppType(const string& name);
