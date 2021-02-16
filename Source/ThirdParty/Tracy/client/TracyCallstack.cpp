@@ -1,3 +1,5 @@
+// Modified for Urho3D
+
 #include <new>
 #include <stdio.h>
 #include <string.h>
@@ -81,6 +83,8 @@ extern "C"
     t_RtlWalkFrameChain RtlWalkFrameChain = 0;
 }
 
+// Urho3D: Commented out
+/*
 #if defined __MINGW32__ && API_VERSION_NUMBER < 12
 extern "C" {
 // Actual required API_VERSION_NUMBER is unknown because it is undocumented. These functions are not present in at least v11.
@@ -93,6 +97,7 @@ BOOL IMAGEAPI SymGetLineFromInlineContext(HANDLE hProcess, DWORD64 qwAddr, ULONG
     DWORD64 qwModuleBaseAddress, PDWORD pdwDisplacement, PIMAGEHLP_LINE64 Line64);
 };
 #endif
+*/
 
 #ifndef __CYGWIN__
 struct ModuleCache
@@ -292,7 +297,13 @@ CallstackSymbolData DecodeCodeAddress( uint64_t ptr )
 #ifdef TRACY_DBGHELP_LOCK
     DBGHELP_LOCK;
 #endif
-#ifndef __CYGWIN__
+
+// Urho3D: commented out original
+//#ifndef __CYGWIN__
+
+// Urho3D
+#if !defined (__CYGWIN__) && !defined (__MINGW32__)
+
     DWORD inlineNum = SymAddrIncludeInlineTrace( proc, ptr );
     DWORD ctx = 0;
     DWORD idx;
@@ -335,7 +346,13 @@ CallstackEntryData DecodeCallstackPtr( uint64_t ptr )
 #ifdef TRACY_DBGHELP_LOCK
     DBGHELP_LOCK;
 #endif
-#ifndef __CYGWIN__
+
+// Urho3D: commented out original
+//#ifndef __CYGWIN__
+
+// Urho3D
+#if !defined (__CYGWIN__) && !defined (__MINGW32__)
+
     DWORD inlineNum = SymAddrIncludeInlineTrace( proc, ptr );
     if( inlineNum > MaxCbTrace - 1 ) inlineNum = MaxCbTrace - 1;
     DWORD ctx = 0;
@@ -393,7 +410,12 @@ CallstackEntryData DecodeCallstackPtr( uint64_t ptr )
         }
     }
 
-#ifndef __CYGWIN__
+// Urho3D: commented out original
+//#ifndef __CYGWIN__
+
+// Urho3D
+#if !defined (__CYGWIN__) && !defined (__MINGW32__)
+
     if( doInline )
     {
         for( DWORD i=0; i<inlineNum; i++ )

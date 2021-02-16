@@ -913,6 +913,13 @@ macro (define_dependency_libs TARGET)
         endif ()
     endif ()
 
+    # ThirdParty/Tracy external dependency
+    if (${TARGET} MATCHES Tracy|Urho3D)
+        if (MINGW)
+            list (APPEND LIBS ws2_32 dbghelp advapi32 user32)
+        endif ()
+    endif ()
+
     # ThirdParty/Civetweb external dependency
     if (${TARGET} MATCHES Civetweb|Urho3D)
         if (URHO3D_SSL)
