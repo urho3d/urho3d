@@ -83,7 +83,7 @@ extern "C"
     t_RtlWalkFrameChain RtlWalkFrameChain = 0;
 }
 
-// Urho3D: Commented out
+// Urho3D: Commented out (fix building with i686-8.1.0-posix-dwarf-rt_v6-rev0)
 /*
 #if defined __MINGW32__ && API_VERSION_NUMBER < 12
 extern "C" {
