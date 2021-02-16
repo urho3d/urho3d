@@ -284,7 +284,7 @@ private:
     #define URHO3D_PROFILE_EVENT_COLOR tracy::Color::OrangeRed
     /// Color used for highlighting resource.
     #define URHO3D_PROFILE_RESOURCE_COLOR tracy::Color::MediumSeaGreen
-#else // Profiling off
+#else // Tracy profiler off
     #define URHO3D_PROFILE_COLOR(name, color)
     #define URHO3D_PROFILE_STR(nameStr, size)
     #define URHO3D_PROFILE_FRAME()

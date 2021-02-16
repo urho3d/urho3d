@@ -28,6 +28,9 @@ add_definitions (-DTRACY_ENABLE=1)
 
 if (MINGW)
     add_definitions (-D_WIN32_WINNT=0x601)
+    if (URHO3D_LIB_TYPE STREQUAL SHARED)
+        add_definitions (-DTRACY_EXPORTS)
+    endif ()
 endif ()
 
 # On Android, we define TRACY_TIMER_FALLBACK to make timer work on both physical and virtual devices
