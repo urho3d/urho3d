@@ -23,6 +23,9 @@
 # Define target name
 set (TARGET_NAME Tracy)
 
+# Definition
+ADD_DEFINITIONS (-DTRACY_ENABLE=1)
+
 # Required for MinGW
 ADD_DEFINITIONS (-D_WIN32_WINNT=0x600)
 
