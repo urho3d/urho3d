@@ -302,7 +302,7 @@ CallstackSymbolData DecodeCodeAddress( uint64_t ptr )
 //#ifndef __CYGWIN__
 
 // Urho3D
-#if !defined (__CYGWIN__) && !defined (__MINGW32__)
+#if !defined(__CYGWIN__) && !defined(__MINGW32__)
 
     DWORD inlineNum = SymAddrIncludeInlineTrace( proc, ptr );
     DWORD ctx = 0;
@@ -351,7 +351,7 @@ CallstackEntryData DecodeCallstackPtr( uint64_t ptr )
 //#ifndef __CYGWIN__
 
 // Urho3D
-#if !defined (__CYGWIN__) && !defined (__MINGW32__)
+#if !defined(__CYGWIN__) && !defined(__MINGW32__)
 
     DWORD inlineNum = SymAddrIncludeInlineTrace( proc, ptr );
     if( inlineNum > MaxCbTrace - 1 ) inlineNum = MaxCbTrace - 1;
@@ -414,7 +414,7 @@ CallstackEntryData DecodeCallstackPtr( uint64_t ptr )
 //#ifndef __CYGWIN__
 
 // Urho3D
-#if !defined (__CYGWIN__) && !defined (__MINGW32__)
+#if !defined(__CYGWIN__) && !defined(__MINGW32__)
 
     if( doInline )
     {
