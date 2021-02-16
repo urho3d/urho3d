@@ -24,18 +24,19 @@
 set (TARGET_NAME Tracy)
 
 # Definition
-ADD_DEFINITIONS (-DTRACY_ENABLE=1)
+add_definitions (-DTRACY_ENABLE=1)
 
-# Required for MinGW
-ADD_DEFINITIONS (-D_WIN32_WINNT=0x601)
+if (MINGW)
+    add_definitions (-D_WIN32_WINNT=0x601)
+endif ()
 
 # On Android, we define TRACY_TIMER_FALLBACK to make timer work on both physical and virtual devices
 if (ANDROID)
-    ADD_DEFINITIONS (-DTRACY_TIMER_FALLBACK=1)
-endif()
+    add_definitions (-DTRACY_TIMER_FALLBACK=1)
+endif ()
 
 # Define source files
-define_source_files(TracyClient.cpp)
+define_source_files (TracyClient.cpp)
 
 # Setup target
 setup_library ()
