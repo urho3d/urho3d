@@ -301,7 +301,7 @@ CallstackSymbolData DecodeCodeAddress( uint64_t ptr )
 // Urho3D: commented out original
 //#ifndef __CYGWIN__
 
-// Urho3D
+// Urho3D: Fix building with i686-8.1.0-posix-dwarf-rt_v6-rev0
 #if !defined(__CYGWIN__) && !defined(__MINGW32__)
 
     DWORD inlineNum = SymAddrIncludeInlineTrace( proc, ptr );
@@ -350,7 +350,7 @@ CallstackEntryData DecodeCallstackPtr( uint64_t ptr )
 // Urho3D: commented out original
 //#ifndef __CYGWIN__
 
-// Urho3D
+// Urho3D: Fix building with i686-8.1.0-posix-dwarf-rt_v6-rev0
 #if !defined(__CYGWIN__) && !defined(__MINGW32__)
 
     DWORD inlineNum = SymAddrIncludeInlineTrace( proc, ptr );
@@ -413,7 +413,7 @@ CallstackEntryData DecodeCallstackPtr( uint64_t ptr )
 // Urho3D: commented out original
 //#ifndef __CYGWIN__
 
-// Urho3D
+// Urho3D: Fix building with i686-8.1.0-posix-dwarf-rt_v6-rev0
 #if !defined(__CYGWIN__) && !defined(__MINGW32__)
 
     if( doInline )
