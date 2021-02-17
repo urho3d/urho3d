@@ -154,7 +154,7 @@ static void RegisterDestructor(const ClassAnalyzer& classAnalyzer, ProcessedClas
 
     if (thisDestructor)
     {
-        result->comment_ = thisDestructor->GetLocation();
+        result->comment_ = thisDestructor->GetDeclaration();
         processedClass.destructor_ = result;
     }
     else if (!classAnalyzer.HasThisDestructor() && IsDestructorRequired(classAnalyzer))

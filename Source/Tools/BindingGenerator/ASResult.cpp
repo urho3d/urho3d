@@ -574,7 +574,8 @@ namespace Result
             }
 
             ofs <<
-                "static void Register" << processedClass.name_ << "(asIScriptEngine* engine)\n"
+                "// " << processedClass.comment_ << "\n"
+                "static void Register_" << processedClass.name_ << "(asIScriptEngine* engine)\n"
                 "{\n";
 
             /*
@@ -623,7 +624,7 @@ namespace Result
                 openedDefine = processedClass.insideDefine_;
             }
 
-            ofs << "    Register" << processedClass.name_ << "(engine);\n";
+            ofs << "    Register_" << processedClass.name_ << "(engine);\n";
 
             isFirst = false;
         }

@@ -163,6 +163,10 @@ string JoinParamsNames(xml_node memberdef, bool skipContext = false);
 
 // <memberdef kind="function">
 //     ...
+string GetFunctionDeclaration(xml_node memberdef);
+
+// <memberdef kind="function">
+//     ...
 string GetFunctionLocation(xml_node memberdef);
 
 // <compounddef|memberdef id="...">
@@ -365,6 +369,7 @@ public:
     bool IsDeleted() const { return EndsWith(ExtractArgsstring(memberdef_), "=delete"); }
     bool IsConsversionOperator() const { return StartsWith(GetName(), "operator "); }
 
+    string GetDeclaration() const { return JoinNonEmpty({ classAnalyzer_.usingLocation_, GetFunctionDeclaration(memberdef_) }, " | "); }
     string GetLocation() const override { return JoinNonEmpty({ classAnalyzer_.usingLocation_, GetFunctionLocation(memberdef_) }, " | "); }
 };
 

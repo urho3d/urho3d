@@ -886,7 +886,7 @@ string ClassFunctionAnalyzer::GetContainsClassName() const
     return result;
 }
 
-string GetFunctionLocation(xml_node memberdef)
+string GetFunctionDeclaration(xml_node memberdef)
 {
     assert(IsMemberdef(memberdef));
     assert(ExtractKind(memberdef) == "function");
@@ -903,8 +903,6 @@ string GetFunctionLocation(xml_node memberdef)
 
     if (IsExplicit(memberdef))
         result = "explicit " + result;
-
-    result += " | File: " + ExtractHeaderFile(memberdef);
 
     if (IsTemplate(memberdef))
     {
@@ -933,6 +931,11 @@ string GetFunctionLocation(xml_node memberdef)
     result = BeautifyDefinition(result);
 
     return result;
+}
+
+string GetFunctionLocation(xml_node memberdef)
+{
+    return GetFunctionDeclaration(memberdef) + " | File: " + ExtractHeaderFile(memberdef);
 }
 
 bool ClassFunctionAnalyzer::IsConst() const
@@ -1028,7 +1031,6 @@ string ClassVariableAnalyzer::GetLocation() const
     string result =  match[1].str() + match[2].str();
 
     result = BeautifyDefinition(result);
-
     result += " | File: " + GetHeaderFile();
 
     if (!classAnalyzer_.usingLocation_.empty())

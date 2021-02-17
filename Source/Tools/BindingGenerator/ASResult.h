@@ -115,7 +115,7 @@ struct ProcessedGlobalVariable
 struct ClassMemberRegistration
 {
     string name_; // Used for sorting
-    string comment_; // Location
+    string comment_; // Cpp declaration or location
     string glue_; // Can be empty
     string registration_; // Or warning message
 };
