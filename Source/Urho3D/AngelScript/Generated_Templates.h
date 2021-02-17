@@ -103,7 +103,7 @@ template <class T> void RegisterComponent(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "const String& get_category() const", asMETHODPR(T, GetCategory, () const, const String&), asCALL_THISCALL);
     // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
     engine->RegisterObjectMethod(className, "Component@+ GetComponent(StringHash) const", asMETHODPR(T, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
-    // template<class T> T*  Component::GetComponent() const | File: ../Scene/Component.h
+    // template<class T> T* Component::GetComponent() const | File: ../Scene/Component.h
     // Not registered because template
     // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
     // Error: type "PODVector<Component*>&" can not automatically bind
@@ -151,7 +151,7 @@ template <class T> void RegisterComponent(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "Scene@+ GetScene() const", asMETHODPR(T, GetScene, () const, Scene*), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod(className, "Object@+ GetSubsystem(StringHash) const", asMETHODPR(T, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
     engine->RegisterObjectMethod(className, "StringHash GetType() const", asMETHODPR(T, GetType, () const, StringHash), asCALL_THISCALL);
@@ -360,7 +360,7 @@ template <class T> void RegisterObject(asIScriptEngine* engine, const char* clas
     engine->RegisterObjectMethod(className, "const VariantMap& get_globalVars() const", asMETHODPR(T, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod(className, "Object@+ GetSubsystem(StringHash) const", asMETHODPR(T, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
     engine->RegisterObjectMethod(className, "StringHash GetType() const", asMETHODPR(T, GetType, () const, StringHash), asCALL_THISCALL);
@@ -480,7 +480,7 @@ template <class T> void RegisterResource(asIScriptEngine* engine, const char* cl
     engine->RegisterObjectMethod(className, "StringHash GetNameHash() const", asMETHODPR(T, GetNameHash, () const, StringHash), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod(className, "Object@+ GetSubsystem(StringHash) const", asMETHODPR(T, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
     engine->RegisterObjectMethod(className, "StringHash GetType() const", asMETHODPR(T, GetType, () const, StringHash), asCALL_THISCALL);

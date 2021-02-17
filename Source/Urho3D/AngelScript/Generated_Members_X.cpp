@@ -371,7 +371,7 @@ void ASRegisterGenerated_Members_X(asIScriptEngine* engine)
     engine->RegisterObjectMethod("XMLFile", "XMLElement GetRoot(const String&in = String::EMPTY)", asMETHODPR(XMLFile, GetRoot, (const String&), XMLElement), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("XMLFile", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(XMLFile, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
     engine->RegisterObjectMethod("XMLFile", "StringHash GetType() const", asMETHODPR(XMLFile, GetType, () const, StringHash), asCALL_THISCALL);

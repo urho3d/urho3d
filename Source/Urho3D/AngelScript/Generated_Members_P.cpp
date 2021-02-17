@@ -387,7 +387,7 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     engine->RegisterObjectMethod("PackageFile", "uint get_numFiles() const", asMETHODPR(PackageFile, GetNumFiles, () const, unsigned), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("PackageFile", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(PackageFile, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // unsigned PackageFile::GetTotalDataSize() const | File: ../IO/PackageFile.h
     engine->RegisterObjectMethod("PackageFile", "uint GetTotalDataSize() const", asMETHODPR(PackageFile, GetTotalDataSize, () const, unsigned), asCALL_THISCALL);
@@ -630,7 +630,7 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ParticleEffect", "float get_sizeMul() const", asMETHODPR(ParticleEffect, GetSizeMul, () const, float), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("ParticleEffect", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(ParticleEffect, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // const TextureFrame* ParticleEffect::GetTextureFrame(unsigned index) const | File: ../Graphics/ParticleEffect.h
     engine->RegisterObjectMethod("ParticleEffect", "TextureFrame@+ GetTextureFrame(uint) const", asMETHODPR(ParticleEffect, GetTextureFrame, (unsigned) const, const TextureFrame*), asCALL_THISCALL);
@@ -983,7 +983,7 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ParticleEffect2D", "float GetStartParticleSizeVariance() const", asMETHODPR(ParticleEffect2D, GetStartParticleSizeVariance, () const, float), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("ParticleEffect2D", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(ParticleEffect2D, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // float ParticleEffect2D::GetTangentialAcceleration() const | File: ../Urho2D/ParticleEffect2D.h
     engine->RegisterObjectMethod("ParticleEffect2D", "float GetTangentialAcceleration() const", asMETHODPR(ParticleEffect2D, GetTangentialAcceleration, () const, float), asCALL_THISCALL);
@@ -1242,7 +1242,7 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ParticleEmitter", "const String& get_category() const", asMETHODPR(ParticleEmitter, GetCategory, () const, const String&), asCALL_THISCALL);
     // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
     engine->RegisterObjectMethod("ParticleEmitter", "Component@+ GetComponent(StringHash) const", asMETHODPR(ParticleEmitter, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
-    // template<class T> T*  Component::GetComponent() const | File: ../Scene/Component.h
+    // template<class T> T* Component::GetComponent() const | File: ../Scene/Component.h
     // Not registered because template
     // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
     // Error: type "PODVector<Component*>&" can not automatically bind
@@ -1361,7 +1361,7 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ParticleEmitter", "float GetSortValue() const", asMETHODPR(ParticleEmitter, GetSortValue, () const, float), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("ParticleEmitter", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(ParticleEmitter, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
     engine->RegisterObjectMethod("ParticleEmitter", "StringHash GetType() const", asMETHODPR(ParticleEmitter, GetType, () const, StringHash), asCALL_THISCALL);
@@ -1780,7 +1780,7 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ParticleEmitter2D", "const String& get_category() const", asMETHODPR(ParticleEmitter2D, GetCategory, () const, const String&), asCALL_THISCALL);
     // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
     engine->RegisterObjectMethod("ParticleEmitter2D", "Component@+ GetComponent(StringHash) const", asMETHODPR(ParticleEmitter2D, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
-    // template<class T> T*  Component::GetComponent() const | File: ../Scene/Component.h
+    // template<class T> T* Component::GetComponent() const | File: ../Scene/Component.h
     // Not registered because template
     // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
     // Error: type "PODVector<Component*>&" can not automatically bind
@@ -1888,7 +1888,7 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ParticleEmitter2D", "ResourceRef GetSpriteAttr() const", asMETHODPR(ParticleEmitter2D, GetSpriteAttr, () const, ResourceRef), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("ParticleEmitter2D", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(ParticleEmitter2D, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
     engine->RegisterObjectMethod("ParticleEmitter2D", "StringHash GetType() const", asMETHODPR(ParticleEmitter2D, GetType, () const, StringHash), asCALL_THISCALL);
@@ -2391,7 +2391,7 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     // Error: type "PODVector<RigidBody*>&" can not automatically bind
     // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
     engine->RegisterObjectMethod("PhysicsWorld", "Component@+ GetComponent(StringHash) const", asMETHODPR(PhysicsWorld, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
-    // template<class T> T*  Component::GetComponent() const | File: ../Scene/Component.h
+    // template<class T> T* Component::GetComponent() const | File: ../Scene/Component.h
     // Not registered because template
     // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
     // Error: type "PODVector<Component*>&" can not automatically bind
@@ -2474,7 +2474,7 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     engine->RegisterObjectMethod("PhysicsWorld", "bool get_splitImpulse() const", asMETHODPR(PhysicsWorld, GetSplitImpulse, () const, bool), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("PhysicsWorld", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(PhysicsWorld, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // CollisionGeometryDataCache& PhysicsWorld::GetTriMeshCache() | File: ../Physics/PhysicsWorld.h
     // Error: type "CollisionGeometryDataCache&" can not automatically bind
@@ -2803,7 +2803,7 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     engine->RegisterObjectMethod("PhysicsWorld2D", "const String& get_category() const", asMETHODPR(PhysicsWorld2D, GetCategory, () const, const String&), asCALL_THISCALL);
     // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
     engine->RegisterObjectMethod("PhysicsWorld2D", "Component@+ GetComponent(StringHash) const", asMETHODPR(PhysicsWorld2D, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
-    // template<class T> T*  Component::GetComponent() const | File: ../Scene/Component.h
+    // template<class T> T* Component::GetComponent() const | File: ../Scene/Component.h
     // Not registered because template
     // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
     // Error: type "PODVector<Component*>&" can not automatically bind
@@ -2884,7 +2884,7 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     engine->RegisterObjectMethod("PhysicsWorld2D", "bool get_subStepping() const", asMETHODPR(PhysicsWorld2D, GetSubStepping, () const, bool), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("PhysicsWorld2D", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(PhysicsWorld2D, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
     engine->RegisterObjectMethod("PhysicsWorld2D", "StringHash GetType() const", asMETHODPR(PhysicsWorld2D, GetType, () const, StringHash), asCALL_THISCALL);
@@ -3187,7 +3187,7 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     REGISTER_MANUAL_PART_Plane(Plane, "Plane")
 #endif
 
-    // Vector<PODVector<Vector3> > Polyhedron::faces_ | File: ../Math/Polyhedron.h
+    // Vector<PODVector<Vector3>> Polyhedron::faces_ | File: ../Math/Polyhedron.h
     // Error: type "Vector<PODVector<Vector3>>" can not automatically bind
     // void Polyhedron::AddFace(const Vector3& v0, const Vector3& v1, const Vector3& v2) | File: ../Math/Polyhedron.h
     engine->RegisterObjectMethod("Polyhedron", "void AddFace(const Vector3&in, const Vector3&in, const Vector3&in)", asMETHODPR(Polyhedron, AddFace, (const Vector3&, const Vector3&, const Vector3&), void), asCALL_THISCALL);
@@ -3272,7 +3272,7 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     // Error: type "ProfilerBlock" can not automatically bind bacause have @nobind mark
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("Profiler", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Profiler, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
     engine->RegisterObjectMethod("Profiler", "StringHash GetType() const", asMETHODPR(Profiler, GetType, () const, StringHash), asCALL_THISCALL);
@@ -3379,7 +3379,7 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ProgressBar", "void ChangeValue(float)", asMETHODPR(ProgressBar, ChangeValue, (float), void), asCALL_THISCALL);
     // UIElement* UIElement::CreateChild(StringHash type, const String& name=String::EMPTY, unsigned index=M_MAX_UNSIGNED) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("ProgressBar", "UIElement@+ CreateChild(StringHash, const String&in = String::EMPTY, uint = M_MAX_UNSIGNED)", asMETHODPR(ProgressBar, CreateChild, (StringHash, const String&, unsigned), UIElement*), asCALL_THISCALL);
-    // template<class T> T*  UIElement::CreateChild(const String& name=String::EMPTY, unsigned index=M_MAX_UNSIGNED) | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::CreateChild(const String& name=String::EMPTY, unsigned index=M_MAX_UNSIGNED) | File: ../UI/UIElement.h
     // Not registered because template
     // void UIElement::DisableLayoutUpdate() | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("ProgressBar", "void DisableLayoutUpdate()", asMETHODPR(ProgressBar, DisableLayoutUpdate, (), void), asCALL_THISCALL);
@@ -3445,11 +3445,11 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ProgressBar", "UIElement@+ GetChild(const String&in, bool = false) const", asMETHODPR(ProgressBar, GetChild, (const String&, bool) const, UIElement*), asCALL_THISCALL);
     // UIElement* UIElement::GetChild(const StringHash& key, const Variant& value=Variant::EMPTY, bool recursive=false) const | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("ProgressBar", "UIElement@+ GetChild(const StringHash&in, const Variant&in = Variant::EMPTY, bool = false) const", asMETHODPR(ProgressBar, GetChild, (const StringHash&, const Variant&, bool) const, UIElement*), asCALL_THISCALL);
-    // template<class T> T*  UIElement::GetChildDynamicCast(unsigned index) const | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::GetChildDynamicCast(unsigned index) const | File: ../UI/UIElement.h
     // Not registered because template
-    // template<class T> T*  UIElement::GetChildDynamicCast(const String& name, bool recursive=false) const | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::GetChildDynamicCast(const String& name, bool recursive=false) const | File: ../UI/UIElement.h
     // Not registered because template
-    // template<class T> T*  UIElement::GetChildDynamicCast(const StringHash& key, const Variant& value=Variant::EMPTY, bool recursive=false) const | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::GetChildDynamicCast(const StringHash& key, const Variant& value=Variant::EMPTY, bool recursive=false) const | File: ../UI/UIElement.h
     // Not registered because template
     // const IntVector2& UIElement::GetChildOffset() const | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("ProgressBar", "const IntVector2& GetChildOffset() const", asMETHODPR(ProgressBar, GetChildOffset, () const, const IntVector2&), asCALL_THISCALL);
@@ -3464,11 +3464,11 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     // Error: type "PODVector<UIElement*>&" can not automatically bind
     // PODVector<UIElement*> UIElement::GetChildrenWithTag(const String& tag, bool recursive=false) const | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("ProgressBar", "Array<UIElement@>@ GetChildrenWithTag(const String&in, bool = false) const", asFUNCTION(ProgressBar_GetChildrenWithTag_String_bool), asCALL_CDECL_OBJFIRST);
-    // template<class T> T*  UIElement::GetChildStaticCast(unsigned index) const | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::GetChildStaticCast(unsigned index) const | File: ../UI/UIElement.h
     // Not registered because template
-    // template<class T> T*  UIElement::GetChildStaticCast(const String& name, bool recursive=false) const | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::GetChildStaticCast(const String& name, bool recursive=false) const | File: ../UI/UIElement.h
     // Not registered because template
-    // template<class T> T*  UIElement::GetChildStaticCast(const StringHash& key, const Variant& value=Variant::EMPTY, bool recursive=false) const | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::GetChildStaticCast(const StringHash& key, const Variant& value=Variant::EMPTY, bool recursive=false) const | File: ../UI/UIElement.h
     // Not registered because template
     // const IntRect& UIElement::GetClipBorder() const | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("ProgressBar", "const IntRect& GetClipBorder() const", asMETHODPR(ProgressBar, GetClipBorder, () const, const IntRect&), asCALL_THISCALL);
@@ -3667,7 +3667,7 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ProgressBar", "bool get_sortChildren() const", asMETHODPR(ProgressBar, GetSortChildren, () const, bool), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("ProgressBar", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(ProgressBar, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // const StringVector& UIElement::GetTags() const | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("ProgressBar", "Array<String>@ GetTags() const", asFUNCTION(ProgressBar_GetTags_void), asCALL_CDECL_OBJFIRST);

@@ -134,7 +134,7 @@ void ASRegisterGenerated_Members_O(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Object", "const VariantMap& get_globalVars() const", asMETHODPR(Object, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("Object", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Object, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
     engine->RegisterObjectMethod("Object", "StringHash GetType() const", asMETHODPR(Object, GetType, () const, StringHash), asCALL_THISCALL);
@@ -263,7 +263,7 @@ void ASRegisterGenerated_Members_O(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ObjectAnimation", "StringHash GetNameHash() const", asMETHODPR(ObjectAnimation, GetNameHash, () const, StringHash), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("ObjectAnimation", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(ObjectAnimation, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
     engine->RegisterObjectMethod("ObjectAnimation", "StringHash GetType() const", asMETHODPR(ObjectAnimation, GetType, () const, StringHash), asCALL_THISCALL);
@@ -461,7 +461,7 @@ void ASRegisterGenerated_Members_O(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Obstacle", "const String& get_category() const", asMETHODPR(Obstacle, GetCategory, () const, const String&), asCALL_THISCALL);
     // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
     engine->RegisterObjectMethod("Obstacle", "Component@+ GetComponent(StringHash) const", asMETHODPR(Obstacle, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
-    // template<class T> T*  Component::GetComponent() const | File: ../Scene/Component.h
+    // template<class T> T* Component::GetComponent() const | File: ../Scene/Component.h
     // Not registered because template
     // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
     // Error: type "PODVector<Component*>&" can not automatically bind
@@ -518,7 +518,7 @@ void ASRegisterGenerated_Members_O(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Obstacle", "Scene@+ GetScene() const", asMETHODPR(Obstacle, GetScene, () const, Scene*), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("Obstacle", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Obstacle, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
     engine->RegisterObjectMethod("Obstacle", "StringHash GetType() const", asMETHODPR(Obstacle, GetType, () const, StringHash), asCALL_THISCALL);
@@ -758,7 +758,7 @@ void ASRegisterGenerated_Members_O(asIScriptEngine* engine)
     engine->RegisterObjectMethod("OcclusionBuffer", "const Matrix4& GetProjection() const", asMETHODPR(OcclusionBuffer, GetProjection, () const, const Matrix4&), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("OcclusionBuffer", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(OcclusionBuffer, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
     engine->RegisterObjectMethod("OcclusionBuffer", "StringHash GetType() const", asMETHODPR(OcclusionBuffer, GetType, () const, StringHash), asCALL_THISCALL);
@@ -917,7 +917,7 @@ void ASRegisterGenerated_Members_O(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Octree", "const String& get_category() const", asMETHODPR(Octree, GetCategory, () const, const String&), asCALL_THISCALL);
     // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
     engine->RegisterObjectMethod("Octree", "Component@+ GetComponent(StringHash) const", asMETHODPR(Octree, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
-    // template<class T> T*  Component::GetComponent() const | File: ../Scene/Component.h
+    // template<class T> T* Component::GetComponent() const | File: ../Scene/Component.h
     // Not registered because template
     // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
     // Error: type "PODVector<Component*>&" can not automatically bind
@@ -982,7 +982,7 @@ void ASRegisterGenerated_Members_O(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Octree", "Scene@+ GetScene() const", asMETHODPR(Octree, GetScene, () const, Scene*), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("Octree", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Octree, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
     engine->RegisterObjectMethod("Octree", "StringHash GetType() const", asMETHODPR(Octree, GetType, () const, StringHash), asCALL_THISCALL);
@@ -1240,7 +1240,7 @@ void ASRegisterGenerated_Members_O(asIScriptEngine* engine)
     engine->RegisterObjectMethod("OffMeshConnection", "const String& get_category() const", asMETHODPR(OffMeshConnection, GetCategory, () const, const String&), asCALL_THISCALL);
     // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
     engine->RegisterObjectMethod("OffMeshConnection", "Component@+ GetComponent(StringHash) const", asMETHODPR(OffMeshConnection, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
-    // template<class T> T*  Component::GetComponent() const | File: ../Scene/Component.h
+    // template<class T> T* Component::GetComponent() const | File: ../Scene/Component.h
     // Not registered because template
     // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
     // Error: type "PODVector<Component*>&" can not automatically bind
@@ -1297,7 +1297,7 @@ void ASRegisterGenerated_Members_O(asIScriptEngine* engine)
     engine->RegisterObjectMethod("OffMeshConnection", "Scene@+ GetScene() const", asMETHODPR(OffMeshConnection, GetScene, () const, Scene*), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("OffMeshConnection", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(OffMeshConnection, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
     engine->RegisterObjectMethod("OffMeshConnection", "StringHash GetType() const", asMETHODPR(OffMeshConnection, GetType, () const, StringHash), asCALL_THISCALL);

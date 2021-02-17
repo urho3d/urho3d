@@ -215,7 +215,7 @@ void ASRegisterGenerated_Members_I(asIScriptEngine* engine)
     engine->RegisterObjectMethod("IKConstraint", "const String& get_category() const", asMETHODPR(IKConstraint, GetCategory, () const, const String&), asCALL_THISCALL);
     // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
     engine->RegisterObjectMethod("IKConstraint", "Component@+ GetComponent(StringHash) const", asMETHODPR(IKConstraint, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
-    // template<class T> T*  Component::GetComponent() const | File: ../Scene/Component.h
+    // template<class T> T* Component::GetComponent() const | File: ../Scene/Component.h
     // Not registered because template
     // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
     // Error: type "PODVector<Component*>&" can not automatically bind
@@ -269,7 +269,7 @@ void ASRegisterGenerated_Members_I(asIScriptEngine* engine)
     engine->RegisterObjectMethod("IKConstraint", "float GetStretchiness() const", asMETHODPR(IKConstraint, GetStretchiness, () const, float), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("IKConstraint", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(IKConstraint, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
     engine->RegisterObjectMethod("IKConstraint", "StringHash GetType() const", asMETHODPR(IKConstraint, GetType, () const, StringHash), asCALL_THISCALL);
@@ -510,7 +510,7 @@ void ASRegisterGenerated_Members_I(asIScriptEngine* engine)
     engine->RegisterObjectMethod("IKEffector", "uint get_chainLength() const", asMETHODPR(IKEffector, GetChainLength, () const, unsigned), asCALL_THISCALL);
     // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
     engine->RegisterObjectMethod("IKEffector", "Component@+ GetComponent(StringHash) const", asMETHODPR(IKEffector, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
-    // template<class T> T*  Component::GetComponent() const | File: ../Scene/Component.h
+    // template<class T> T* Component::GetComponent() const | File: ../Scene/Component.h
     // Not registered because template
     // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
     // Error: type "PODVector<Component*>&" can not automatically bind
@@ -568,7 +568,7 @@ void ASRegisterGenerated_Members_I(asIScriptEngine* engine)
     engine->RegisterObjectMethod("IKEffector", "Scene@+ GetScene() const", asMETHODPR(IKEffector, GetScene, () const, Scene*), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("IKEffector", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(IKEffector, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // const String& IKEffector::GetTargetName() const | File: ../IK/IKEffector.h
     engine->RegisterObjectMethod("IKEffector", "const String& GetTargetName() const", asMETHODPR(IKEffector, GetTargetName, () const, const String&), asCALL_THISCALL);
@@ -868,7 +868,7 @@ void ASRegisterGenerated_Members_I(asIScriptEngine* engine)
     engine->RegisterObjectMethod("IKSolver", "const String& get_category() const", asMETHODPR(IKSolver, GetCategory, () const, const String&), asCALL_THISCALL);
     // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
     engine->RegisterObjectMethod("IKSolver", "Component@+ GetComponent(StringHash) const", asMETHODPR(IKSolver, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
-    // template<class T> T*  Component::GetComponent() const | File: ../Scene/Component.h
+    // template<class T> T* Component::GetComponent() const | File: ../Scene/Component.h
     // Not registered because template
     // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
     // Error: type "PODVector<Component*>&" can not automatically bind
@@ -927,7 +927,7 @@ void ASRegisterGenerated_Members_I(asIScriptEngine* engine)
     engine->RegisterObjectMethod("IKSolver", "Scene@+ GetScene() const", asMETHODPR(IKSolver, GetScene, () const, Scene*), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("IKSolver", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(IKSolver, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // bool IKSolver::GetTARGET_ROTATIONS() const | File: ../IK/IKSolver.h
     engine->RegisterObjectMethod("IKSolver", "bool GetTARGET_ROTATIONS() const", asMETHODPR(IKSolver, GetTARGET_ROTATIONS, () const, bool), asCALL_THISCALL);
@@ -1260,7 +1260,7 @@ void ASRegisterGenerated_Members_I(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Image", "Image@+ GetSubimage(const IntRect&in) const", asMETHODPR(Image, GetSubimage, (const IntRect&) const, Image*), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("Image", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Image, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
     engine->RegisterObjectMethod("Image", "StringHash GetType() const", asMETHODPR(Image, GetType, () const, StringHash), asCALL_THISCALL);
@@ -1464,7 +1464,7 @@ void ASRegisterGenerated_Members_I(asIScriptEngine* engine)
     // Error: type "SharedArrayPtr<unsigned char>" can not automatically bind
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("IndexBuffer", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(IndexBuffer, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
     engine->RegisterObjectMethod("IndexBuffer", "StringHash GetType() const", asMETHODPR(IndexBuffer, GetType, () const, StringHash), asCALL_THISCALL);
@@ -1689,7 +1689,7 @@ void ASRegisterGenerated_Members_I(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Input", "bool get_screenKeyboardSupport() const", asMETHODPR(Input, GetScreenKeyboardSupport, () const, bool), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("Input", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Input, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // bool Input::GetToggleFullscreen() const | File: ../Input/Input.h
     engine->RegisterObjectMethod("Input", "bool GetToggleFullscreen() const", asMETHODPR(Input, GetToggleFullscreen, () const, bool), asCALL_THISCALL);

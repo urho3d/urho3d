@@ -175,7 +175,7 @@ void ASRegisterGenerated_Members_G(asIScriptEngine* engine)
     // Error: type "SharedArrayPtr<unsigned char>&" can not automatically bind
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("Geometry", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Geometry, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
     engine->RegisterObjectMethod("Geometry", "StringHash GetType() const", asMETHODPR(Geometry, GetType, () const, StringHash), asCALL_THISCALL);
@@ -606,7 +606,7 @@ void ASRegisterGenerated_Members_G(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Graphics", "StencilOp GetStencilZFail() const", asMETHODPR(Graphics, GetStencilZFail, () const, StencilOp), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("Graphics", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Graphics, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // Texture* Graphics::GetTexture(unsigned index) const | File: ../Graphics/Graphics.h
     engine->RegisterObjectMethod("Graphics", "Texture@+ GetTexture(uint) const", asMETHODPR(Graphics, GetTexture, (unsigned) const, Texture*), asCALL_THISCALL);

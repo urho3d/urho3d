@@ -228,7 +228,7 @@ void ASRegisterGenerated_Members_F(asIScriptEngine* engine)
     engine->RegisterObjectMethod("File", "uint get_size() const", asMETHODPR(File, GetSize, () const, unsigned), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("File", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(File, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
     engine->RegisterObjectMethod("File", "StringHash GetType() const", asMETHODPR(File, GetType, () const, StringHash), asCALL_THISCALL);
@@ -570,7 +570,7 @@ void ASRegisterGenerated_Members_F(asIScriptEngine* engine)
     engine->RegisterObjectMethod("FileSelector", "LineEdit@+ get_pathEdit() const", asMETHODPR(FileSelector, GetPathEdit, () const, LineEdit*), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("FileSelector", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(FileSelector, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // const String& FileSelector::GetTitle() const | File: ../UI/FileSelector.h
     engine->RegisterObjectMethod("FileSelector", "const String& GetTitle() const", asMETHODPR(FileSelector, GetTitle, () const, const String&), asCALL_THISCALL);
@@ -733,7 +733,7 @@ void ASRegisterGenerated_Members_F(asIScriptEngine* engine)
     engine->RegisterObjectMethod("FileSystem", "String get_programDir() const", asMETHODPR(FileSystem, GetProgramDir, () const, String), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("FileSystem", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(FileSystem, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // String FileSystem::GetTemporaryDir() const | File: ../IO/FileSystem.h
     engine->RegisterObjectMethod("FileSystem", "String GetTemporaryDir() const", asMETHODPR(FileSystem, GetTemporaryDir, () const, String), asCALL_THISCALL);
@@ -881,7 +881,7 @@ void ASRegisterGenerated_Members_F(asIScriptEngine* engine)
     engine->RegisterObjectMethod("FileWatcher", "const String& GetPath() const", asMETHODPR(FileWatcher, GetPath, () const, const String&), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("FileWatcher", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(FileWatcher, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
     engine->RegisterObjectMethod("FileWatcher", "StringHash GetType() const", asMETHODPR(FileWatcher, GetType, () const, StringHash), asCALL_THISCALL);
@@ -1039,7 +1039,7 @@ void ASRegisterGenerated_Members_F(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Font", "const Vector2& get_scaledGlyphOffset() const", asMETHODPR(Font, GetScaledGlyphOffset, () const, const Vector2&), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("Font", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Font, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // IntVector2 Font::GetTotalGlyphOffset(float pointSize) const | File: ../UI/Font.h
     engine->RegisterObjectMethod("Font", "IntVector2 GetTotalGlyphOffset(float) const", asMETHODPR(Font, GetTotalGlyphOffset, (float) const, IntVector2), asCALL_THISCALL);

@@ -276,7 +276,7 @@ void ASRegisterGenerated_Members_U(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UI", "float get_scale() const", asMETHODPR(UI, GetScale, () const, float), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("UI", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(UI, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
     engine->RegisterObjectMethod("UI", "StringHash GetType() const", asMETHODPR(UI, GetType, () const, StringHash), asCALL_THISCALL);
@@ -549,7 +549,7 @@ void ASRegisterGenerated_Members_U(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UIComponent", "const String& get_category() const", asMETHODPR(UIComponent, GetCategory, () const, const String&), asCALL_THISCALL);
     // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
     engine->RegisterObjectMethod("UIComponent", "Component@+ GetComponent(StringHash) const", asMETHODPR(UIComponent, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
-    // template<class T> T*  Component::GetComponent() const | File: ../Scene/Component.h
+    // template<class T> T* Component::GetComponent() const | File: ../Scene/Component.h
     // Not registered because template
     // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
     // Error: type "PODVector<Component*>&" can not automatically bind
@@ -603,7 +603,7 @@ void ASRegisterGenerated_Members_U(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UIComponent", "Scene@+ GetScene() const", asMETHODPR(UIComponent, GetScene, () const, Scene*), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("UIComponent", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(UIComponent, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // Texture2D* UIComponent::GetTexture() const | File: ../UI/UIComponent.h
     engine->RegisterObjectMethod("UIComponent", "Texture2D@+ GetTexture() const", asMETHODPR(UIComponent, GetTexture, () const, Texture2D*), asCALL_THISCALL);
@@ -814,7 +814,7 @@ void ASRegisterGenerated_Members_U(asIScriptEngine* engine)
     // Not registered because template
     // UIElement* UIElement::CreateChild(StringHash type, const String& name=String::EMPTY, unsigned index=M_MAX_UNSIGNED) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("UIElement", "UIElement@+ CreateChild(StringHash, const String&in = String::EMPTY, uint = M_MAX_UNSIGNED)", asMETHODPR(UIElement, CreateChild, (StringHash, const String&, unsigned), UIElement*), asCALL_THISCALL);
-    // template<class T> T*  UIElement::CreateChild(const String& name=String::EMPTY, unsigned index=M_MAX_UNSIGNED) | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::CreateChild(const String& name=String::EMPTY, unsigned index=M_MAX_UNSIGNED) | File: ../UI/UIElement.h
     // Not registered because template
     // void UIElement::DisableLayoutUpdate() | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("UIElement", "void DisableLayoutUpdate()", asMETHODPR(UIElement, DisableLayoutUpdate, (), void), asCALL_THISCALL);
@@ -874,11 +874,11 @@ void ASRegisterGenerated_Members_U(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UIElement", "UIElement@+ GetChild(const String&in, bool = false) const", asMETHODPR(UIElement, GetChild, (const String&, bool) const, UIElement*), asCALL_THISCALL);
     // UIElement* UIElement::GetChild(const StringHash& key, const Variant& value=Variant::EMPTY, bool recursive=false) const | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("UIElement", "UIElement@+ GetChild(const StringHash&in, const Variant&in = Variant::EMPTY, bool = false) const", asMETHODPR(UIElement, GetChild, (const StringHash&, const Variant&, bool) const, UIElement*), asCALL_THISCALL);
-    // template<class T> T*  UIElement::GetChildDynamicCast(unsigned index) const | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::GetChildDynamicCast(unsigned index) const | File: ../UI/UIElement.h
     // Not registered because template
-    // template<class T> T*  UIElement::GetChildDynamicCast(const String& name, bool recursive=false) const | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::GetChildDynamicCast(const String& name, bool recursive=false) const | File: ../UI/UIElement.h
     // Not registered because template
-    // template<class T> T*  UIElement::GetChildDynamicCast(const StringHash& key, const Variant& value=Variant::EMPTY, bool recursive=false) const | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::GetChildDynamicCast(const StringHash& key, const Variant& value=Variant::EMPTY, bool recursive=false) const | File: ../UI/UIElement.h
     // Not registered because template
     // const IntVector2& UIElement::GetChildOffset() const | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("UIElement", "const IntVector2& GetChildOffset() const", asMETHODPR(UIElement, GetChildOffset, () const, const IntVector2&), asCALL_THISCALL);
@@ -893,11 +893,11 @@ void ASRegisterGenerated_Members_U(asIScriptEngine* engine)
     // Error: type "PODVector<UIElement*>&" can not automatically bind
     // PODVector<UIElement*> UIElement::GetChildrenWithTag(const String& tag, bool recursive=false) const | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("UIElement", "Array<UIElement@>@ GetChildrenWithTag(const String&in, bool = false) const", asFUNCTION(UIElement_GetChildrenWithTag_String_bool), asCALL_CDECL_OBJFIRST);
-    // template<class T> T*  UIElement::GetChildStaticCast(unsigned index) const | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::GetChildStaticCast(unsigned index) const | File: ../UI/UIElement.h
     // Not registered because template
-    // template<class T> T*  UIElement::GetChildStaticCast(const String& name, bool recursive=false) const | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::GetChildStaticCast(const String& name, bool recursive=false) const | File: ../UI/UIElement.h
     // Not registered because template
-    // template<class T> T*  UIElement::GetChildStaticCast(const StringHash& key, const Variant& value=Variant::EMPTY, bool recursive=false) const | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::GetChildStaticCast(const StringHash& key, const Variant& value=Variant::EMPTY, bool recursive=false) const | File: ../UI/UIElement.h
     // Not registered because template
     // const IntRect& UIElement::GetClipBorder() const | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("UIElement", "const IntRect& GetClipBorder() const", asMETHODPR(UIElement, GetClipBorder, () const, const IntRect&), asCALL_THISCALL);
@@ -1065,7 +1065,7 @@ void ASRegisterGenerated_Members_U(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UIElement", "bool get_sortChildren() const", asMETHODPR(UIElement, GetSortChildren, () const, bool), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("UIElement", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(UIElement, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // const StringVector& UIElement::GetTags() const | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("UIElement", "Array<String>@ GetTags() const", asFUNCTION(UIElement_GetTags_void), asCALL_CDECL_OBJFIRST);
@@ -1574,7 +1574,7 @@ void ASRegisterGenerated_Members_U(asIScriptEngine* engine)
     // Not registered because template
     // UIElement* UIElement::CreateChild(StringHash type, const String& name=String::EMPTY, unsigned index=M_MAX_UNSIGNED) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("UISelectable", "UIElement@+ CreateChild(StringHash, const String&in = String::EMPTY, uint = M_MAX_UNSIGNED)", asMETHODPR(UISelectable, CreateChild, (StringHash, const String&, unsigned), UIElement*), asCALL_THISCALL);
-    // template<class T> T*  UIElement::CreateChild(const String& name=String::EMPTY, unsigned index=M_MAX_UNSIGNED) | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::CreateChild(const String& name=String::EMPTY, unsigned index=M_MAX_UNSIGNED) | File: ../UI/UIElement.h
     // Not registered because template
     // void UIElement::DisableLayoutUpdate() | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("UISelectable", "void DisableLayoutUpdate()", asMETHODPR(UISelectable, DisableLayoutUpdate, (), void), asCALL_THISCALL);
@@ -1634,11 +1634,11 @@ void ASRegisterGenerated_Members_U(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UISelectable", "UIElement@+ GetChild(const String&in, bool = false) const", asMETHODPR(UISelectable, GetChild, (const String&, bool) const, UIElement*), asCALL_THISCALL);
     // UIElement* UIElement::GetChild(const StringHash& key, const Variant& value=Variant::EMPTY, bool recursive=false) const | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("UISelectable", "UIElement@+ GetChild(const StringHash&in, const Variant&in = Variant::EMPTY, bool = false) const", asMETHODPR(UISelectable, GetChild, (const StringHash&, const Variant&, bool) const, UIElement*), asCALL_THISCALL);
-    // template<class T> T*  UIElement::GetChildDynamicCast(unsigned index) const | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::GetChildDynamicCast(unsigned index) const | File: ../UI/UIElement.h
     // Not registered because template
-    // template<class T> T*  UIElement::GetChildDynamicCast(const String& name, bool recursive=false) const | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::GetChildDynamicCast(const String& name, bool recursive=false) const | File: ../UI/UIElement.h
     // Not registered because template
-    // template<class T> T*  UIElement::GetChildDynamicCast(const StringHash& key, const Variant& value=Variant::EMPTY, bool recursive=false) const | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::GetChildDynamicCast(const StringHash& key, const Variant& value=Variant::EMPTY, bool recursive=false) const | File: ../UI/UIElement.h
     // Not registered because template
     // const IntVector2& UIElement::GetChildOffset() const | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("UISelectable", "const IntVector2& GetChildOffset() const", asMETHODPR(UISelectable, GetChildOffset, () const, const IntVector2&), asCALL_THISCALL);
@@ -1653,11 +1653,11 @@ void ASRegisterGenerated_Members_U(asIScriptEngine* engine)
     // Error: type "PODVector<UIElement*>&" can not automatically bind
     // PODVector<UIElement*> UIElement::GetChildrenWithTag(const String& tag, bool recursive=false) const | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("UISelectable", "Array<UIElement@>@ GetChildrenWithTag(const String&in, bool = false) const", asFUNCTION(UISelectable_GetChildrenWithTag_String_bool), asCALL_CDECL_OBJFIRST);
-    // template<class T> T*  UIElement::GetChildStaticCast(unsigned index) const | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::GetChildStaticCast(unsigned index) const | File: ../UI/UIElement.h
     // Not registered because template
-    // template<class T> T*  UIElement::GetChildStaticCast(const String& name, bool recursive=false) const | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::GetChildStaticCast(const String& name, bool recursive=false) const | File: ../UI/UIElement.h
     // Not registered because template
-    // template<class T> T*  UIElement::GetChildStaticCast(const StringHash& key, const Variant& value=Variant::EMPTY, bool recursive=false) const | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::GetChildStaticCast(const StringHash& key, const Variant& value=Variant::EMPTY, bool recursive=false) const | File: ../UI/UIElement.h
     // Not registered because template
     // const IntRect& UIElement::GetClipBorder() const | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("UISelectable", "const IntRect& GetClipBorder() const", asMETHODPR(UISelectable, GetClipBorder, () const, const IntRect&), asCALL_THISCALL);
@@ -1831,7 +1831,7 @@ void ASRegisterGenerated_Members_U(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UISelectable", "bool get_sortChildren() const", asMETHODPR(UISelectable, GetSortChildren, () const, bool), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("UISelectable", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(UISelectable, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // const StringVector& UIElement::GetTags() const | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("UISelectable", "Array<String>@ GetTags() const", asFUNCTION(UISelectable_GetTags_void), asCALL_CDECL_OBJFIRST);
@@ -2372,7 +2372,7 @@ void ASRegisterGenerated_Members_U(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UnknownComponent", "const String& get_category() const", asMETHODPR(UnknownComponent, GetCategory, () const, const String&), asCALL_THISCALL);
     // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
     engine->RegisterObjectMethod("UnknownComponent", "Component@+ GetComponent(StringHash) const", asMETHODPR(UnknownComponent, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
-    // template<class T> T*  Component::GetComponent() const | File: ../Scene/Component.h
+    // template<class T> T* Component::GetComponent() const | File: ../Scene/Component.h
     // Not registered because template
     // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
     // Error: type "PODVector<Component*>&" can not automatically bind
@@ -2420,7 +2420,7 @@ void ASRegisterGenerated_Members_U(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UnknownComponent", "Scene@+ GetScene() const", asMETHODPR(UnknownComponent, GetScene, () const, Scene*), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("UnknownComponent", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(UnknownComponent, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // StringHash UnknownComponent::GetType() const override | File: ../Scene/UnknownComponent.h
     engine->RegisterObjectMethod("UnknownComponent", "StringHash GetType() const", asMETHODPR(UnknownComponent, GetType, () const, StringHash), asCALL_THISCALL);

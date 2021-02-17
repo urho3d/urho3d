@@ -340,7 +340,7 @@ void ASRegisterGenerated_Members_M(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Material", "bool GetSpecular() const", asMETHODPR(Material, GetSpecular, () const, bool), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("Material", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Material, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // Technique* Material::GetTechnique(unsigned index) const | File: ../Graphics/Material.h
     engine->RegisterObjectMethod("Material", "Technique@+ GetTechnique(uint) const", asMETHODPR(Material, GetTechnique, (unsigned) const, Technique*), asCALL_THISCALL);
@@ -938,7 +938,7 @@ void ASRegisterGenerated_Members_M(asIScriptEngine* engine)
     // Not registered because template
     // UIElement* UIElement::CreateChild(StringHash type, const String& name=String::EMPTY, unsigned index=M_MAX_UNSIGNED) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("Menu", "UIElement@+ CreateChild(StringHash, const String&in = String::EMPTY, uint = M_MAX_UNSIGNED)", asMETHODPR(Menu, CreateChild, (StringHash, const String&, unsigned), UIElement*), asCALL_THISCALL);
-    // template<class T> T*  UIElement::CreateChild(const String& name=String::EMPTY, unsigned index=M_MAX_UNSIGNED) | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::CreateChild(const String& name=String::EMPTY, unsigned index=M_MAX_UNSIGNED) | File: ../UI/UIElement.h
     // Not registered because template
     // void UIElement::DisableLayoutUpdate() | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("Menu", "void DisableLayoutUpdate()", asMETHODPR(Menu, DisableLayoutUpdate, (), void), asCALL_THISCALL);
@@ -1010,11 +1010,11 @@ void ASRegisterGenerated_Members_M(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Menu", "UIElement@+ GetChild(const String&in, bool = false) const", asMETHODPR(Menu, GetChild, (const String&, bool) const, UIElement*), asCALL_THISCALL);
     // UIElement* UIElement::GetChild(const StringHash& key, const Variant& value=Variant::EMPTY, bool recursive=false) const | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("Menu", "UIElement@+ GetChild(const StringHash&in, const Variant&in = Variant::EMPTY, bool = false) const", asMETHODPR(Menu, GetChild, (const StringHash&, const Variant&, bool) const, UIElement*), asCALL_THISCALL);
-    // template<class T> T*  UIElement::GetChildDynamicCast(unsigned index) const | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::GetChildDynamicCast(unsigned index) const | File: ../UI/UIElement.h
     // Not registered because template
-    // template<class T> T*  UIElement::GetChildDynamicCast(const String& name, bool recursive=false) const | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::GetChildDynamicCast(const String& name, bool recursive=false) const | File: ../UI/UIElement.h
     // Not registered because template
-    // template<class T> T*  UIElement::GetChildDynamicCast(const StringHash& key, const Variant& value=Variant::EMPTY, bool recursive=false) const | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::GetChildDynamicCast(const StringHash& key, const Variant& value=Variant::EMPTY, bool recursive=false) const | File: ../UI/UIElement.h
     // Not registered because template
     // const IntVector2& UIElement::GetChildOffset() const | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("Menu", "const IntVector2& GetChildOffset() const", asMETHODPR(Menu, GetChildOffset, () const, const IntVector2&), asCALL_THISCALL);
@@ -1029,11 +1029,11 @@ void ASRegisterGenerated_Members_M(asIScriptEngine* engine)
     // Error: type "PODVector<UIElement*>&" can not automatically bind
     // PODVector<UIElement*> UIElement::GetChildrenWithTag(const String& tag, bool recursive=false) const | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("Menu", "Array<UIElement@>@ GetChildrenWithTag(const String&in, bool = false) const", asFUNCTION(Menu_GetChildrenWithTag_String_bool), asCALL_CDECL_OBJFIRST);
-    // template<class T> T*  UIElement::GetChildStaticCast(unsigned index) const | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::GetChildStaticCast(unsigned index) const | File: ../UI/UIElement.h
     // Not registered because template
-    // template<class T> T*  UIElement::GetChildStaticCast(const String& name, bool recursive=false) const | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::GetChildStaticCast(const String& name, bool recursive=false) const | File: ../UI/UIElement.h
     // Not registered because template
-    // template<class T> T*  UIElement::GetChildStaticCast(const StringHash& key, const Variant& value=Variant::EMPTY, bool recursive=false) const | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::GetChildStaticCast(const StringHash& key, const Variant& value=Variant::EMPTY, bool recursive=false) const | File: ../UI/UIElement.h
     // Not registered because template
     // const IntRect& UIElement::GetClipBorder() const | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("Menu", "const IntRect& GetClipBorder() const", asMETHODPR(Menu, GetClipBorder, () const, const IntRect&), asCALL_THISCALL);
@@ -1239,7 +1239,7 @@ void ASRegisterGenerated_Members_M(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Menu", "bool get_sortChildren() const", asMETHODPR(Menu, GetSortChildren, () const, bool), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("Menu", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Menu, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // const StringVector& UIElement::GetTags() const | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("Menu", "Array<String>@ GetTags() const", asFUNCTION(Menu_GetTags_void), asCALL_CDECL_OBJFIRST);
@@ -1843,7 +1843,7 @@ void ASRegisterGenerated_Members_M(asIScriptEngine* engine)
     engine->RegisterObjectMethod("MessageBox", "const String& get_message() const", asMETHODPR(MessageBox, GetMessage, () const, const String&), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("MessageBox", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(MessageBox, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // const String& MessageBox::GetTitle() const | File: ../UI/MessageBox.h
     engine->RegisterObjectMethod("MessageBox", "const String& GetTitle() const", asMETHODPR(MessageBox, GetTitle, () const, const String&), asCALL_THISCALL);
@@ -2025,7 +2025,7 @@ void ASRegisterGenerated_Members_M(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Model", "Skeleton& get_skeleton()", asMETHODPR(Model, GetSkeleton, (), Skeleton&), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("Model", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Model, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
     engine->RegisterObjectMethod("Model", "StringHash GetType() const", asMETHODPR(Model, GetType, () const, StringHash), asCALL_THISCALL);

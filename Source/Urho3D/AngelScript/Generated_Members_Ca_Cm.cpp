@@ -147,7 +147,7 @@ void ASRegisterGenerated_Members_Ca_Cm(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Camera", "Vector4 GetClipPlaneAttr() const", asMETHODPR(Camera, GetClipPlaneAttr, () const, Vector4), asCALL_THISCALL);
     // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
     engine->RegisterObjectMethod("Camera", "Component@+ GetComponent(StringHash) const", asMETHODPR(Camera, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
-    // template<class T> T*  Component::GetComponent() const | File: ../Scene/Component.h
+    // template<class T> T* Component::GetComponent() const | File: ../Scene/Component.h
     // Not registered because template
     // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
     // Error: type "PODVector<Component*>&" can not automatically bind
@@ -254,7 +254,7 @@ void ASRegisterGenerated_Members_Ca_Cm(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Camera", "Frustum GetSplitFrustum(float, float) const", asMETHODPR(Camera, GetSplitFrustum, (float, float) const, Frustum), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("Camera", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Camera, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
     engine->RegisterObjectMethod("Camera", "StringHash GetType() const", asMETHODPR(Camera, GetType, () const, StringHash), asCALL_THISCALL);
@@ -558,7 +558,7 @@ void ASRegisterGenerated_Members_Ca_Cm(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("CheckBox", asBEHAVE_FACTORY, "CheckBox@+ f()", asFUNCTION(CheckBox_CheckBox_Context), asCALL_CDECL);
     // UIElement* UIElement::CreateChild(StringHash type, const String& name=String::EMPTY, unsigned index=M_MAX_UNSIGNED) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("CheckBox", "UIElement@+ CreateChild(StringHash, const String&in = String::EMPTY, uint = M_MAX_UNSIGNED)", asMETHODPR(CheckBox, CreateChild, (StringHash, const String&, unsigned), UIElement*), asCALL_THISCALL);
-    // template<class T> T*  UIElement::CreateChild(const String& name=String::EMPTY, unsigned index=M_MAX_UNSIGNED) | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::CreateChild(const String& name=String::EMPTY, unsigned index=M_MAX_UNSIGNED) | File: ../UI/UIElement.h
     // Not registered because template
     // void UIElement::DisableLayoutUpdate() | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("CheckBox", "void DisableLayoutUpdate()", asMETHODPR(CheckBox, DisableLayoutUpdate, (), void), asCALL_THISCALL);
@@ -627,11 +627,11 @@ void ASRegisterGenerated_Members_Ca_Cm(asIScriptEngine* engine)
     engine->RegisterObjectMethod("CheckBox", "UIElement@+ GetChild(const String&in, bool = false) const", asMETHODPR(CheckBox, GetChild, (const String&, bool) const, UIElement*), asCALL_THISCALL);
     // UIElement* UIElement::GetChild(const StringHash& key, const Variant& value=Variant::EMPTY, bool recursive=false) const | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("CheckBox", "UIElement@+ GetChild(const StringHash&in, const Variant&in = Variant::EMPTY, bool = false) const", asMETHODPR(CheckBox, GetChild, (const StringHash&, const Variant&, bool) const, UIElement*), asCALL_THISCALL);
-    // template<class T> T*  UIElement::GetChildDynamicCast(unsigned index) const | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::GetChildDynamicCast(unsigned index) const | File: ../UI/UIElement.h
     // Not registered because template
-    // template<class T> T*  UIElement::GetChildDynamicCast(const String& name, bool recursive=false) const | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::GetChildDynamicCast(const String& name, bool recursive=false) const | File: ../UI/UIElement.h
     // Not registered because template
-    // template<class T> T*  UIElement::GetChildDynamicCast(const StringHash& key, const Variant& value=Variant::EMPTY, bool recursive=false) const | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::GetChildDynamicCast(const StringHash& key, const Variant& value=Variant::EMPTY, bool recursive=false) const | File: ../UI/UIElement.h
     // Not registered because template
     // const IntVector2& UIElement::GetChildOffset() const | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("CheckBox", "const IntVector2& GetChildOffset() const", asMETHODPR(CheckBox, GetChildOffset, () const, const IntVector2&), asCALL_THISCALL);
@@ -646,11 +646,11 @@ void ASRegisterGenerated_Members_Ca_Cm(asIScriptEngine* engine)
     // Error: type "PODVector<UIElement*>&" can not automatically bind
     // PODVector<UIElement*> UIElement::GetChildrenWithTag(const String& tag, bool recursive=false) const | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("CheckBox", "Array<UIElement@>@ GetChildrenWithTag(const String&in, bool = false) const", asFUNCTION(CheckBox_GetChildrenWithTag_String_bool), asCALL_CDECL_OBJFIRST);
-    // template<class T> T*  UIElement::GetChildStaticCast(unsigned index) const | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::GetChildStaticCast(unsigned index) const | File: ../UI/UIElement.h
     // Not registered because template
-    // template<class T> T*  UIElement::GetChildStaticCast(const String& name, bool recursive=false) const | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::GetChildStaticCast(const String& name, bool recursive=false) const | File: ../UI/UIElement.h
     // Not registered because template
-    // template<class T> T*  UIElement::GetChildStaticCast(const StringHash& key, const Variant& value=Variant::EMPTY, bool recursive=false) const | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::GetChildStaticCast(const StringHash& key, const Variant& value=Variant::EMPTY, bool recursive=false) const | File: ../UI/UIElement.h
     // Not registered because template
     // const IntRect& UIElement::GetClipBorder() const | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("CheckBox", "const IntRect& GetClipBorder() const", asMETHODPR(CheckBox, GetClipBorder, () const, const IntRect&), asCALL_THISCALL);
@@ -835,7 +835,7 @@ void ASRegisterGenerated_Members_Ca_Cm(asIScriptEngine* engine)
     engine->RegisterObjectMethod("CheckBox", "bool get_sortChildren() const", asMETHODPR(CheckBox, GetSortChildren, () const, bool), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("CheckBox", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(CheckBox, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // const StringVector& UIElement::GetTags() const | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("CheckBox", "Array<String>@ GetTags() const", asFUNCTION(CheckBox_GetTags_void), asCALL_CDECL_OBJFIRST);

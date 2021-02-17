@@ -118,7 +118,7 @@ void ASRegisterGenerated_Members_E(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Engine", "bool get_pauseMinimized() const", asMETHODPR(Engine, GetPauseMinimized, () const, bool), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("Engine", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Engine, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // int Engine::GetTimeStepSmoothing() const | File: ../Engine/Engine.h
     engine->RegisterObjectMethod("Engine", "int GetTimeStepSmoothing() const", asMETHODPR(Engine, GetTimeStepSmoothing, () const, int), asCALL_THISCALL);
@@ -288,7 +288,7 @@ void ASRegisterGenerated_Members_E(asIScriptEngine* engine)
     // Error: type "ProfilerBlock" can not automatically bind bacause have @nobind mark
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("EventProfiler", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(EventProfiler, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
     engine->RegisterObjectMethod("EventProfiler", "StringHash GetType() const", asMETHODPR(EventProfiler, GetType, () const, StringHash), asCALL_THISCALL);

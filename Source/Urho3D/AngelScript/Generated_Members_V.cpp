@@ -573,7 +573,7 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ValueAnimation", "float get_splineTension() const", asMETHODPR(ValueAnimation, GetSplineTension, () const, float), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("ValueAnimation", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(ValueAnimation, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
     engine->RegisterObjectMethod("ValueAnimation", "StringHash GetType() const", asMETHODPR(ValueAnimation, GetType, () const, StringHash), asCALL_THISCALL);
@@ -1818,7 +1818,7 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
     // Error: type "SharedArrayPtr<unsigned char>" can not automatically bind
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("VertexBuffer", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(VertexBuffer, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
     engine->RegisterObjectMethod("VertexBuffer", "StringHash GetType() const", asMETHODPR(VertexBuffer, GetType, () const, StringHash), asCALL_THISCALL);
@@ -2023,7 +2023,7 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
     engine->RegisterObjectMethod("View", "View@+ GetSourceView() const", asMETHODPR(View, GetSourceView, () const, View*), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("View", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(View, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
     engine->RegisterObjectMethod("View", "StringHash GetType() const", asMETHODPR(View, GetType, () const, StringHash), asCALL_THISCALL);
@@ -2142,7 +2142,7 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
     // Not registered because template
     // UIElement* UIElement::CreateChild(StringHash type, const String& name=String::EMPTY, unsigned index=M_MAX_UNSIGNED) | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("View3D", "UIElement@+ CreateChild(StringHash, const String&in = String::EMPTY, uint = M_MAX_UNSIGNED)", asMETHODPR(View3D, CreateChild, (StringHash, const String&, unsigned), UIElement*), asCALL_THISCALL);
-    // template<class T> T*  UIElement::CreateChild(const String& name=String::EMPTY, unsigned index=M_MAX_UNSIGNED) | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::CreateChild(const String& name=String::EMPTY, unsigned index=M_MAX_UNSIGNED) | File: ../UI/UIElement.h
     // Not registered because template
     // void UIElement::DisableLayoutUpdate() | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("View3D", "void DisableLayoutUpdate()", asMETHODPR(View3D, DisableLayoutUpdate, (), void), asCALL_THISCALL);
@@ -2214,11 +2214,11 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
     engine->RegisterObjectMethod("View3D", "UIElement@+ GetChild(const String&in, bool = false) const", asMETHODPR(View3D, GetChild, (const String&, bool) const, UIElement*), asCALL_THISCALL);
     // UIElement* UIElement::GetChild(const StringHash& key, const Variant& value=Variant::EMPTY, bool recursive=false) const | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("View3D", "UIElement@+ GetChild(const StringHash&in, const Variant&in = Variant::EMPTY, bool = false) const", asMETHODPR(View3D, GetChild, (const StringHash&, const Variant&, bool) const, UIElement*), asCALL_THISCALL);
-    // template<class T> T*  UIElement::GetChildDynamicCast(unsigned index) const | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::GetChildDynamicCast(unsigned index) const | File: ../UI/UIElement.h
     // Not registered because template
-    // template<class T> T*  UIElement::GetChildDynamicCast(const String& name, bool recursive=false) const | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::GetChildDynamicCast(const String& name, bool recursive=false) const | File: ../UI/UIElement.h
     // Not registered because template
-    // template<class T> T*  UIElement::GetChildDynamicCast(const StringHash& key, const Variant& value=Variant::EMPTY, bool recursive=false) const | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::GetChildDynamicCast(const StringHash& key, const Variant& value=Variant::EMPTY, bool recursive=false) const | File: ../UI/UIElement.h
     // Not registered because template
     // const IntVector2& UIElement::GetChildOffset() const | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("View3D", "const IntVector2& GetChildOffset() const", asMETHODPR(View3D, GetChildOffset, () const, const IntVector2&), asCALL_THISCALL);
@@ -2233,11 +2233,11 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
     // Error: type "PODVector<UIElement*>&" can not automatically bind
     // PODVector<UIElement*> UIElement::GetChildrenWithTag(const String& tag, bool recursive=false) const | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("View3D", "Array<UIElement@>@ GetChildrenWithTag(const String&in, bool = false) const", asFUNCTION(View3D_GetChildrenWithTag_String_bool), asCALL_CDECL_OBJFIRST);
-    // template<class T> T*  UIElement::GetChildStaticCast(unsigned index) const | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::GetChildStaticCast(unsigned index) const | File: ../UI/UIElement.h
     // Not registered because template
-    // template<class T> T*  UIElement::GetChildStaticCast(const String& name, bool recursive=false) const | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::GetChildStaticCast(const String& name, bool recursive=false) const | File: ../UI/UIElement.h
     // Not registered because template
-    // template<class T> T*  UIElement::GetChildStaticCast(const StringHash& key, const Variant& value=Variant::EMPTY, bool recursive=false) const | File: ../UI/UIElement.h
+    // template<class T> T* UIElement::GetChildStaticCast(const StringHash& key, const Variant& value=Variant::EMPTY, bool recursive=false) const | File: ../UI/UIElement.h
     // Not registered because template
     // const IntRect& UIElement::GetClipBorder() const | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("View3D", "const IntRect& GetClipBorder() const", asMETHODPR(View3D, GetClipBorder, () const, const IntRect&), asCALL_THISCALL);
@@ -2455,7 +2455,7 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
     engine->RegisterObjectMethod("View3D", "bool get_sortChildren() const", asMETHODPR(View3D, GetSortChildren, () const, bool), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("View3D", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(View3D, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // const StringVector& UIElement::GetTags() const | File: ../UI/UIElement.h
     engine->RegisterObjectMethod("View3D", "Array<String>@ GetTags() const", asFUNCTION(View3D_GetTags_void), asCALL_CDECL_OBJFIRST);
@@ -3098,7 +3098,7 @@ void ASRegisterGenerated_Members_V(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Viewport", "Ray GetScreenRay(int, int) const", asMETHODPR(Viewport, GetScreenRay, (int, int) const, Ray), asCALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
     engine->RegisterObjectMethod("Viewport", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Viewport, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
-    // template<class T> T*  Object::GetSubsystem() const | File: ../Core/Object.h
+    // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
     engine->RegisterObjectMethod("Viewport", "StringHash GetType() const", asMETHODPR(Viewport, GetType, () const, StringHash), asCALL_THISCALL);
