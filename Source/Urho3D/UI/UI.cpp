@@ -330,6 +330,7 @@ void UI::Update(float timeStep)
     IntVector2 cursorPos;
     bool cursorVisible;
     GetCursorPositionAndVisible(cursorPos, cursorVisible);
+    cursorPos = ConvertSystemToUI(cursorPos);
 
     // Drag begin based on time
     if (dragElementsCount_ > 0 && !mouseGrabbed)
@@ -1308,6 +1309,7 @@ void UI::GetCursorPositionAndVisible(IntVector2& pos, bool& visible)
     if (cursor_ && cursor_->IsVisible())
     {
         pos = cursor_->GetPosition();
+        pos = ConvertUIToSystem(pos);
         visible = true;
     }
     else if (GetSubsystem<Input>()->GetMouseMode() == MM_RELATIVE)
@@ -1764,6 +1766,7 @@ void UI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
     IntVector2 cursorPos;
     bool cursorVisible;
     GetCursorPositionAndVisible(cursorPos, cursorVisible);
+    cursorPos = ConvertSystemToUI(cursorPos);
 
     // Handle drag cancelling
     ProcessDragCancel();
@@ -1784,6 +1787,7 @@ void UI::HandleMouseButtonUp(StringHash eventType, VariantMap& eventData)
     IntVector2 cursorPos;
     bool cursorVisible;
     GetCursorPositionAndVisible(cursorPos, cursorVisible);
+    cursorPos = ConvertSystemToUI(cursorPos);
 
     ProcessClickEnd(cursorPos, (MouseButton)eventData[P_BUTTON].GetUInt(), mouseButtons_, qualifiers_, cursor_, cursorVisible);
 }
@@ -1829,6 +1833,7 @@ void UI::HandleMouseMove(StringHash eventType, VariantMap& eventData)
     IntVector2 cursorPos;
     bool cursorVisible;
     GetCursorPositionAndVisible(cursorPos, cursorVisible);
+    cursorPos = ConvertSystemToUI(cursorPos);
 
     ProcessMove(cursorPos, mouseDeltaPos, mouseButtons_, qualifiers_, cursor_, cursorVisible);
 }
@@ -1849,6 +1854,7 @@ void UI::HandleMouseWheel(StringHash eventType, VariantMap& eventData)
     IntVector2 cursorPos;
     bool cursorVisible;
     GetCursorPositionAndVisible(cursorPos, cursorVisible);
+    cursorPos = ConvertSystemToUI(cursorPos);
 
     if (!nonFocusedMouseWheel_ && focusElement_)
         focusElement_->OnWheel(delta, mouseButtons_, qualifiers_);
@@ -2113,6 +2119,7 @@ void UI::ProcessDragCancel()
     IntVector2 cursorPos;
     bool cursorVisible;
     GetCursorPositionAndVisible(cursorPos, cursorVisible);
+    cursorPos = ConvertSystemToUI(cursorPos);
 
     for (HashMap<WeakPtr<UIElement>, UI::DragData*>::Iterator i = dragElements_.Begin(); i != dragElements_.End();)
     {

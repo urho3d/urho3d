@@ -2044,7 +2044,8 @@ void UpdateView(float timeStep)
     // If not dragging
     if (resizingBorder == 0)
     {
-        UIElement@ uiElement = ui.GetElementAt(ui.cursorPosition);
+        IntVector2 pos = ui.ConvertSystemToUI(ui.cursorPosition);
+        UIElement@ uiElement = ui.GetElementAt(pos);
         if (uiElement !is null && uiElement.vars.Contains("VIEWMODE"))
         {
             setViewportCursor = uiElement.vars["VIEWMODE"].GetUInt();
@@ -2285,7 +2286,7 @@ void ViewRaycast(bool mouseClick)
     if (input.mouseGrabbed)
         return;
 
-    IntVector2 pos = ui.cursorPosition;
+    IntVector2 pos = ui.ConvertSystemToUI(ui.cursorPosition);
     UIElement@ elementAtPos = ui.GetElementAt(pos, pickMode != PICK_UI_ELEMENTS);
     if (editMode == EDIT_SPAWN)
     {
