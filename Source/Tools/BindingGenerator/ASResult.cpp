@@ -605,8 +605,8 @@ namespace Result
                 "    Vector<RegisterObjectMethodArgs> methods;\n"
                 "    CollectMembers_" << processedClass.name_ << "(methods);\n"
                 "    const char* asClassName = \"" << processedClass.name_ << "\";\n"
-                "    for (const RegisterObjectMethodArgs& method : methods)\n"
-                "        engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);\n";
+                "    //for (const RegisterObjectMethodArgs& method : methods)\n"
+                "    //    engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);\n";
 
             ofs << "}\n";
 
