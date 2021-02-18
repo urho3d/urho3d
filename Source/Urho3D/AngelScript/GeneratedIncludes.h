@@ -31,6 +31,7 @@
 #include "../Core/Spline.h"
 #include "../Core/StringHashRegister.h"
 #include "../Core/StringUtils.h"
+#include "../Core/Thread.h"
 #include "../Core/Timer.h"
 #include "../Core/Variant.h"
 #include "../Core/WorkQueue.h"

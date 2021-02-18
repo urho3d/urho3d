@@ -57,6 +57,20 @@ namespace Urho3D
 
 class Camera;
 
+struct RegisterObjectMethodArgs
+{
+    String declaration_;
+    asSFuncPtr funcPointer_;
+    asDWORD callConv_;
+
+    RegisterObjectMethodArgs(String declaration, asSFuncPtr funcPointer, asDWORD callConv)
+        : declaration_(declaration)
+        , funcPointer_(funcPointer)
+        , callConv_(callConv)
+    {
+    }
+};
+
 /// Template function for Vector to array conversion.
 template <class T> CScriptArray* VectorToArray(const Vector<T>& vector, const char* arrayName)
 {

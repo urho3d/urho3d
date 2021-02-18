@@ -178,10 +178,6 @@ static void ProcessClass(const ClassAnalyzer& classAnalyzer)
     if (classAnalyzer.IsTemplate())
         return;
 
-    // TODO: Remove
-    if (classAnalyzer.IsAbstract() && !(classAnalyzer.IsRefCounted() || Contains(classAnalyzer.GetComment(), "FAKE_REF")))
-        return;
-
     string header = classAnalyzer.GetHeaderFile();
     Result::AddHeader(header);
 
@@ -193,11 +189,22 @@ static void ProcessClass(const ClassAnalyzer& classAnalyzer)
     processedClass.comment_ = classAnalyzer.GetLocation();
     processedClass.insideDefine_ = InsideDefine(header);
 
+    // CollectMembers()
+
+    if (classAnalyzer.IsAbstract() && !(classAnalyzer.IsRefCounted() || Contains(classAnalyzer.GetComment(), "FAKE_REF")))
+    {
+        processedClass.objectTypeRegistration_ = "// Not registered because value types can not be abstract";
+        processedClass.noBind_ = true;
+        Result::classes_.push_back(processedClass);
+        return;
+    }
+
     string classComment = classAnalyzer.GetComment();
 
     if (Contains(classComment, "NO_BIND"))
     {
         processedClass.objectTypeRegistration_ = "// Not registered because have @nobind mark";
+        processedClass.noBind_ = true;
         Result::classes_.push_back(processedClass);
         return;
     }
@@ -205,11 +212,25 @@ static void ProcessClass(const ClassAnalyzer& classAnalyzer)
     if (Contains(classComment, "MANUAL_BIND"))
     {
         processedClass.objectTypeRegistration_ = "// Not registered because have @manualbind mark";
+        processedClass.noBind_ = true;
         Result::classes_.push_back(processedClass);
         return;
     }
 
     RegisterObjectType(classAnalyzer, processedClass);
+
+    vector<ClassAnalyzer> baseClasses = classAnalyzer.GetBaseClasses();
+    for (const ClassAnalyzer& baseClass : baseClasses)
+        processedClass.baseClassNames_.push_back(baseClass.GetClassName());
+
+    if (classAnalyzer.IsAbstract()) // Abstract refcounted type
+    {
+        Result::classes_.push_back(processedClass);
+        return;
+    }
+
+    // RegisterSpecialMethods()
+
     RegisterDefaultConstructor(classAnalyzer, processedClass);
 
     vector<ClassFunctionAnalyzer> nonDefaultConstructors = classAnalyzer.GetThisNonDefaultConstructors();

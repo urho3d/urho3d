@@ -172,6 +172,8 @@ if (URHO3D_GENERATEBINDINGS)
                             "AngelScript/GeneratedObjectTypes.cpp"
                             "AngelScript/GeneratedDefaultConstructors.cpp"
                             "AngelScript/GeneratedClasses.cpp"
+                            "AngelScript/GeneratedClassMembers.cpp"
+                            "AngelScript/GeneratedClassMembers.h"
                             "AngelScript/Generated_Members_A.cpp"
                             "AngelScript/Generated_Members_B.cpp"
                             "AngelScript/Generated_Members_Constraint.cpp"

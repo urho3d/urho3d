@@ -133,6 +133,10 @@ struct ProcessedClass
     shared_ptr<ClassMemberRegistration> defaultConstructor_;
     shared_ptr<ClassMemberRegistration> destructor_;
 
+    bool noBind_ = false;
+
+    vector<string> baseClassNames_;
+
     // Tests
     vector<string> nonDefaultConstructors_;
     vector<string> commonMembers_;

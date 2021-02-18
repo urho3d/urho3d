@@ -219,6 +219,9 @@ void ASRegisterGeneratedObjectTypes(asIScriptEngine* engine)
     // class Engine | File: ../Engine/Engine.h
     engine->RegisterObjectType("Engine", 0, asOBJ_REF);
 
+    // class EventHandler | File: ../Core/Object.h
+    // Not registered because value types can not be abstract
+
     // class EventHandler11Impl | File: ../Core/Object.h
     // Not registered because have @nobind mark
 
@@ -446,6 +449,9 @@ void ASRegisterGeneratedObjectTypes(asIScriptEngine* engine)
 
     // class Octree | File: ../Graphics/Octree.h
     engine->RegisterObjectType("Octree", 0, asOBJ_REF);
+
+    // class OctreeQuery | File: ../Graphics/OctreeQuery.h
+    // Not registered because value types can not be abstract
 
     // struct OctreeQueryResult | File: ../Graphics/OctreeQuery.h
     engine->RegisterObjectType("OctreeQueryResult", sizeof(OctreeQueryResult), asOBJ_VALUE | asGetTypeTraits<OctreeQueryResult>());
@@ -704,6 +710,9 @@ void ASRegisterGeneratedObjectTypes(asIScriptEngine* engine)
 
     // struct TextureFrame | File: ../Graphics/ParticleEffect.h
     engine->RegisterObjectType("TextureFrame", 0, asOBJ_REF);
+
+    // class Thread | File: ../Core/Thread.h
+    // Not registered because value types can not be abstract
 
     // class Time | File: ../Core/Timer.h
     engine->RegisterObjectType("Time", 0, asOBJ_REF);
