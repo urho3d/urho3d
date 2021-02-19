@@ -330,7 +330,6 @@ void UI::Update(float timeStep)
     IntVector2 cursorPos;
     bool cursorVisible;
     GetCursorPositionAndVisible(cursorPos, cursorVisible);
-    cursorPos = ConvertSystemToUI(cursorPos);
 
     // Drag begin based on time
     if (dragElementsCount_ > 0 && !mouseGrabbed)
@@ -769,9 +768,9 @@ void UI::SetCustomSize(int width, int height)
 IntVector2 UI::GetCursorPosition() const
 {
     if (cursor_)
-        return ConvertUIToSystem(cursor_->GetPosition());
+        return cursor_->GetPosition();
 
-    return GetSubsystem<Input>()->GetMousePosition();
+    return ConvertSystemToUI(GetSubsystem<Input>()->GetMousePosition());
 }
 
 UIElement* UI::GetElementAt(const IntVector2& position, bool enabledOnly, IntVector2* elementScreenPosition)
@@ -1308,7 +1307,6 @@ void UI::GetCursorPositionAndVisible(IntVector2& pos, bool& visible)
     if (cursor_ && cursor_->IsVisible())
     {
         pos = cursor_->GetPosition();
-        pos = ConvertUIToSystem(pos);
         visible = true;
     }
     else if (GetSubsystem<Input>()->GetMouseMode() == MM_RELATIVE)
@@ -1316,13 +1314,16 @@ void UI::GetCursorPositionAndVisible(IntVector2& pos, bool& visible)
     else
     {
         auto* input = GetSubsystem<Input>();
-        pos = input->GetMousePosition();
         visible = input->IsMouseVisible();
 
         if (!visible && cursor_)
         {
             pos = cursor_->GetPosition();
-            pos = ConvertUIToSystem(pos);
+        }
+        else
+        {
+            pos = input->GetMousePosition();
+            pos = ConvertSystemToUI(pos);
         }
     }
 }
@@ -1768,7 +1769,6 @@ void UI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
     IntVector2 cursorPos;
     bool cursorVisible;
     GetCursorPositionAndVisible(cursorPos, cursorVisible);
-    cursorPos = ConvertSystemToUI(cursorPos);
 
     // Handle drag cancelling
     ProcessDragCancel();
@@ -1789,7 +1789,6 @@ void UI::HandleMouseButtonUp(StringHash eventType, VariantMap& eventData)
     IntVector2 cursorPos;
     bool cursorVisible;
     GetCursorPositionAndVisible(cursorPos, cursorVisible);
-    cursorPos = ConvertSystemToUI(cursorPos);
 
     ProcessClickEnd(cursorPos, (MouseButton)eventData[P_BUTTON].GetUInt(), mouseButtons_, qualifiers_, cursor_, cursorVisible);
 }
@@ -1835,7 +1834,6 @@ void UI::HandleMouseMove(StringHash eventType, VariantMap& eventData)
     IntVector2 cursorPos;
     bool cursorVisible;
     GetCursorPositionAndVisible(cursorPos, cursorVisible);
-    cursorPos = ConvertSystemToUI(cursorPos);
 
     ProcessMove(cursorPos, mouseDeltaPos, mouseButtons_, qualifiers_, cursor_, cursorVisible);
 }
@@ -1856,7 +1854,6 @@ void UI::HandleMouseWheel(StringHash eventType, VariantMap& eventData)
     IntVector2 cursorPos;
     bool cursorVisible;
     GetCursorPositionAndVisible(cursorPos, cursorVisible);
-    cursorPos = ConvertSystemToUI(cursorPos);
 
     if (!nonFocusedMouseWheel_ && focusElement_)
         focusElement_->OnWheel(delta, mouseButtons_, qualifiers_);
@@ -2116,7 +2113,6 @@ void UI::ProcessDragCancel()
     IntVector2 cursorPos;
     bool cursorVisible;
     GetCursorPositionAndVisible(cursorPos, cursorVisible);
-    cursorPos = ConvertSystemToUI(cursorPos);
 
     for (HashMap<WeakPtr<UIElement>, UI::DragData*>::Iterator i = dragElements_.Begin(); i != dragElements_.End();)
     {

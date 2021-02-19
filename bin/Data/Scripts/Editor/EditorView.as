@@ -2044,8 +2044,7 @@ void UpdateView(float timeStep)
     // If not dragging
     if (resizingBorder == 0)
     {
-        IntVector2 pos = ui.ConvertSystemToUI(ui.cursorPosition);
-        UIElement@ uiElement = ui.GetElementAt(pos);
+        UIElement@ uiElement = ui.GetElementAt(ui.cursorPosition);
         if (uiElement !is null && uiElement.vars.Contains("VIEWMODE"))
         {
             setViewportCursor = uiElement.vars["VIEWMODE"].GetUInt();
@@ -2247,10 +2246,11 @@ void ViewMouseClick()
 
 Ray GetActiveViewportCameraRay()
 {
+    IntVector2 pos = ui.ConvertUIToSystem(ui.cursorPosition);
     IntRect view = activeViewport.viewport.rect;
     return camera.GetScreenRay(
-        float(ui.cursorPosition.x - view.left) / view.width,
-        float(ui.cursorPosition.y - view.top) / view.height
+        float(pos.x - view.left) / view.width,
+        float(pos.y - view.top) / view.height
     );
 }
 
@@ -2286,7 +2286,7 @@ void ViewRaycast(bool mouseClick)
     if (input.mouseGrabbed)
         return;
 
-    IntVector2 pos = ui.ConvertSystemToUI(ui.cursorPosition);
+    IntVector2 pos = ui.cursorPosition;
     UIElement@ elementAtPos = ui.GetElementAt(pos, pickMode != PICK_UI_ELEMENTS);
     if (editMode == EDIT_SPAWN)
     {
@@ -2724,7 +2724,7 @@ Vector3 SelectedNodesCenterPoint()
 
 Drawable@ GetDrawableAtMousePostion()
 {
-    IntVector2 pos = ui.cursorPosition;
+    IntVector2 pos = ui.ConvertUIToSystem(ui.cursorPosition);
     Ray cameraRay = camera.GetScreenRay(float(pos.x) / activeViewport.viewport.rect.width, float(pos.y) / activeViewport.viewport.rect.height);
 
     if (editorScene.octree is null)
