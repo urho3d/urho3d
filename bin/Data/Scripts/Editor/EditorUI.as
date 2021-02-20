@@ -133,8 +133,8 @@ void ResizeUI()
     // Relayout root UI element
     editorUIElement.SetSize(graphics.width, graphics.height);
 
-    // Set new viewport area and reset the viewport layout
-    viewportArea = IntRect(0, 0, graphics.width, graphics.height);
+    // Set new viewport area and reset the viewport layout. Note: viewportArea is in scaled UI position.
+    viewportArea = IntRect(0, 0, graphics.width / ui.scale, graphics.height / ui.scale);
     SetViewportMode(viewportMode);
 }
 
