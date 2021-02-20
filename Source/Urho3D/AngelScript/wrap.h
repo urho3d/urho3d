@@ -24,7 +24,7 @@
 
 #include <type_traits>
 
-#include "angelscript.h"
+#include <AngelScript/angelscript.h>
 
 //only Boost.Preprocessor is needed, so it may be reasonable to include it in the Urho repository directly
 #include <boost/preprocessor.hpp>

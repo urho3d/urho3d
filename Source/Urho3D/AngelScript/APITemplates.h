@@ -45,6 +45,7 @@
 #endif
 
 #include <AngelScript/angelscript.h>
+#include "../AngelScript/wrapmacros.h"
 #include <cstring>
 
 #ifdef _MSC_VER

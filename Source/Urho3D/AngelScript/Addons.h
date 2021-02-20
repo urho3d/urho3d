@@ -33,6 +33,7 @@
 #include "../Math/StringHash.h"
 
 #include <AngelScript/angelscript.h>
+#include "../AngelScript/wrapmacros.h"
 
 // Adapted from Angelscript's scriptarray, scriptdictionary & scriptstdstring add-ons, but with garbage collection disabled
 

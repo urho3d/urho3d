@@ -109,7 +109,7 @@ Component* NodeGetComponent(unsigned index, Node* ptr);
         /* void Node::SetOwner(Connection* owner) | File: ../Scene/Node.h */ \
         engine->RegisterObjectMethod(className, "void SetOwner(Connection@+)", asMETHODPR(T, SetOwner, (Connection*), void), asCALL_THISCALL); \
         engine->RegisterObjectMethod(className, "void set_owner(Connection@+)", asMETHODPR(T, SetOwner, (Connection*), void), asCALL_THISCALL); \
-        /* Connection* Node::GetOwner() const | File: ../Scene/Node.h * \
+        /* Connection* Node::GetOwner() const | File: ../Scene/Node.h */ \
         engine->RegisterObjectMethod(className, "Connection@+ GetOwner() const", asMETHODPR(T, GetOwner, () const, Connection*), asCALL_THISCALL); \
         engine->RegisterObjectMethod(className, "Connection@+ get_owner() const", asMETHODPR(T, GetOwner, () const, Connection*), asCALL_THISCALL); \
         /* void Node::CleanupConnection(Connection* connection) | File: ../Scene/Node.h */ \
