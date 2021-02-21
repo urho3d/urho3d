@@ -47,7 +47,7 @@ static PhysicsWorld* GetPhysicsWorld()
 void ASRegisterManualLast_Physics(asIScriptEngine* engine)
 {
     // template<class T> T * Node::GetComponent(bool recursive=false) const | File: ../Scene/Node.h
-    engine->RegisterGlobalFunction("PhysicsWorld@+ get_physicsWorld()", asFUNCTION(GetPhysicsWorld), asCALL_CDECL);
+    engine->RegisterGlobalFunction("PhysicsWorld@+ get_physicsWorld()", AS_FUNCTION(GetPhysicsWorld), AS_CALL_CDECL);
 }
 
 // ========================================================================================

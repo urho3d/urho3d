@@ -52,23 +52,23 @@ CScriptArray* NavigationMeshFindPath(const Vector3& start, const Vector3& end, c
 
 #define REGISTER_MANUAL_PART_NavigationMesh(T, className) \
     /* virtual PODVector<unsigned char> NavigationMesh::GetTileData(const IntVector2 &tile) const | File: ../Navigation/NavigationMesh.h */ \
-    engine->RegisterObjectMethod(className, "VectorBuffer GetTileData(const IntVector2&) const", asFUNCTION(NavigationMeshGetTileData), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "VectorBuffer GetTileData(const IntVector2&) const", AS_FUNCTION_OBJLAST(NavigationMeshGetTileData), AS_CALL_CDECL_OBJLAST); \
     /* virtual bool NavigationMesh::AddTile(const PODVector< unsigned char > &tileData) | File: ../Navigation/NavigationMesh.h */ \
-    engine->RegisterObjectMethod(className, "bool AddTile(const VectorBuffer&in) const", asFUNCTION(NavigationMeshAddTile), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "bool AddTile(const VectorBuffer&in) const", AS_FUNCTION_OBJLAST(NavigationMeshAddTile), AS_CALL_CDECL_OBJLAST); \
     /* Vector3 NavigationMesh::FindNearestPoint(const Vector3 &point, const Vector3 &extents=Vector3::ONE, const dtQueryFilter *filter=nullptr, dtPolyRef *nearestRef=nullptr) | File: ../Navigation/NavigationMesh.h */ \
-    engine->RegisterObjectMethod(className, "Vector3 FindNearestPoint(const Vector3&in, const Vector3&in extents = Vector3(1.0, 1.0, 1.0))", asFUNCTION(NavigationMeshFindNearestPoint), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "Vector3 FindNearestPoint(const Vector3&in, const Vector3&in extents = Vector3(1.0, 1.0, 1.0))", AS_FUNCTION_OBJLAST(NavigationMeshFindNearestPoint), AS_CALL_CDECL_OBJLAST); \
     /* Vector3 NavigationMesh::GetRandomPoint(const dtQueryFilter *filter=nullptr, dtPolyRef *randomRef=nullptr) | File: ../Navigation/NavigationMesh.h */ \
-    engine->RegisterObjectMethod(className, "Vector3 GetRandomPoint()", asFUNCTION(NavigationMeshGetRandomPoint), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "Vector3 GetRandomPoint()", AS_FUNCTION_OBJLAST(NavigationMeshGetRandomPoint), AS_CALL_CDECL_OBJLAST); \
     /* Vector3 NavigationMesh::GetRandomPointInCircle(const Vector3 &center, float radius, const Vector3 &extents=Vector3::ONE, const dtQueryFilter *filter=nullptr, dtPolyRef *randomRef=nullptr) | File: ../Navigation/NavigationMesh.h */ \
-    engine->RegisterObjectMethod(className, "Vector3 GetRandomPointInCircle(const Vector3&in, float, const Vector3&in extents = Vector3(1.0, 1.0, 1.0))", asFUNCTION(NavigationMeshGetRandomPointInCircle), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "Vector3 GetRandomPointInCircle(const Vector3&in, float, const Vector3&in extents = Vector3(1.0, 1.0, 1.0))", AS_FUNCTION_OBJLAST(NavigationMeshGetRandomPointInCircle), AS_CALL_CDECL_OBJLAST); \
     /* float NavigationMesh::GetDistanceToWall(const Vector3 &point, float radius, const Vector3 &extents=Vector3::ONE, const dtQueryFilter *filter=nullptr, Vector3 *hitPos=nullptr, Vector3 *hitNormal=nullptr) | File: ../Navigation/NavigationMesh.h */ \
-    engine->RegisterObjectMethod(className, "float GetDistanceToWall(const Vector3&in, float, const Vector3&in extents = Vector3(1.0, 1.0, 1.0))", asFUNCTION(NavigationMeshGetDistanceToWall), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "float GetDistanceToWall(const Vector3&in, float, const Vector3&in extents = Vector3(1.0, 1.0, 1.0))", AS_FUNCTION_OBJLAST(NavigationMeshGetDistanceToWall), AS_CALL_CDECL_OBJLAST); \
     /* Vector3 NavigationMesh::Raycast(const Vector3 &start, const Vector3 &end, const Vector3 &extents=Vector3::ONE, const dtQueryFilter *filter=nullptr, Vector3 *hitNormal=nullptr) | File: ../Navigation/NavigationMesh.h */ \
-    engine->RegisterObjectMethod(className, "Vector3 Raycast(const Vector3&in, const Vector3&in, const Vector3&in extents = Vector3(1.0, 1.0, 1.0))", asFUNCTION(NavigationMeshRaycast), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "Vector3 Raycast(const Vector3&in, const Vector3&in, const Vector3&in extents = Vector3(1.0, 1.0, 1.0))", AS_FUNCTION_OBJLAST(NavigationMeshRaycast), AS_CALL_CDECL_OBJLAST); \
     /* Vector3 NavigationMesh::MoveAlongSurface(const Vector3 &start, const Vector3 &end, const Vector3 &extents=Vector3::ONE, int maxVisited=3, const dtQueryFilter *filter=nullptr) | File: ../Navigation/NavigationMesh.h */ \
-    engine->RegisterObjectMethod(className, "Vector3 MoveAlongSurface(const Vector3&in, const Vector3&in, const Vector3&in extents = Vector3(1.0, 1.0, 1.0), int maxVisited = 3)", asFUNCTION(NavigationMeshMoveAlongSurface), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "Vector3 MoveAlongSurface(const Vector3&in, const Vector3&in, const Vector3&in extents = Vector3(1.0, 1.0, 1.0), int maxVisited = 3)", AS_FUNCTION_OBJLAST(NavigationMeshMoveAlongSurface), AS_CALL_CDECL_OBJLAST); \
     /* void NavigationMesh::FindPath(PODVector< Vector3 > &dest, const Vector3 &start, const Vector3 &end, const Vector3 &extents=Vector3::ONE, const dtQueryFilter *filter=nullptr) | File: ../Navigation/NavigationMesh.h */ \
-    engine->RegisterObjectMethod(className, "Array<Vector3>@ FindPath(const Vector3&in, const Vector3&in, const Vector3&in extents = Vector3(1.0, 1.0, 1.0))", asFUNCTION(NavigationMeshFindPath), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "Array<Vector3>@ FindPath(const Vector3&in, const Vector3&in, const Vector3&in extents = Vector3(1.0, 1.0, 1.0))", AS_FUNCTION_OBJLAST(NavigationMeshFindPath), AS_CALL_CDECL_OBJLAST);
 
 // ========================================================================================
 
@@ -85,15 +85,15 @@ Vector3 CrowdManager_Raycast(const Vector3& start, const Vector3& end, int query
 
 #define REGISTER_MANUAL_PART_CrowdManager(T, className) \
     /* Vector3 CrowdManager::GetRandomPoint(int queryFilterType, dtPolyRef *randomRef=nullptr) | File: ../Navigation/CrowdManager.h */ \
-    engine->RegisterObjectMethod(className, "Vector3 GetRandomPoint(int)", asFUNCTION(CrowdManagerGetRandomPoint), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "Vector3 GetRandomPoint(int)", AS_FUNCTION_OBJLAST(CrowdManagerGetRandomPoint), AS_CALL_CDECL_OBJLAST); \
     /* Vector3 CrowdManager::GetRandomPointInCircle(const Vector3 &center, float radius, int queryFilterType, dtPolyRef *randomRef=nullptr) | File: ../Navigation/CrowdManager.h */ \
-    engine->RegisterObjectMethod(className, "Vector3 GetRandomPointInCircle(const Vector3&in, float, int)", asFUNCTION(CrowdManagerRandomPointInCircle), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "Vector3 GetRandomPointInCircle(const Vector3&in, float, int)", AS_FUNCTION_OBJLAST(CrowdManagerRandomPointInCircle), AS_CALL_CDECL_OBJLAST); \
     /* Vector3 CrowdManager::FindNearestPoint(const Vector3 &point, int queryFilterType, dtPolyRef *nearestRef=nullptr) | File: ../Navigation/CrowdManager.h */ \
-    engine->RegisterObjectMethod("CrowdManager", "Vector3 FindNearestPoint(const Vector3&in, int)", asFUNCTION(CrowdManager_FindNearestPoint), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod("CrowdManager", "Vector3 FindNearestPoint(const Vector3&in, int)", AS_FUNCTION_OBJLAST(CrowdManager_FindNearestPoint), AS_CALL_CDECL_OBJLAST); \
     /* float CrowdManager::GetDistanceToWall(const Vector3 &point, float radius, int queryFilterType, Vector3 *hitPos=nullptr, Vector3 *hitNormal=nullptr) | File: ../Navigation/CrowdManager.h */ \
-    engine->RegisterObjectMethod("CrowdManager", "float GetDistanceToWall(const Vector3&in, float, int)", asFUNCTION(CrowdManager_GetDistanceToWall), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod("CrowdManager", "float GetDistanceToWall(const Vector3&in, float, int)", AS_FUNCTION_OBJLAST(CrowdManager_GetDistanceToWall), AS_CALL_CDECL_OBJLAST); \
     /* Vector3 CrowdManager::Raycast(const Vector3 &start, const Vector3 &end, int queryFilterType, Vector3 *hitNormal=nullptr) | File: ../Navigation/CrowdManager.h */ \
-    engine->RegisterObjectMethod("CrowdManager", "Vector3 Raycast(const Vector3&in, const Vector3&in, int)", asFUNCTION(CrowdManager_Raycast), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("CrowdManager", "Vector3 Raycast(const Vector3&in, const Vector3&in, int)", AS_FUNCTION_OBJLAST(CrowdManager_Raycast), AS_CALL_CDECL_OBJLAST);
 
 }
 

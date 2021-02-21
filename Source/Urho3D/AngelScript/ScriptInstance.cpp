@@ -40,7 +40,6 @@
 #include "../Scene/SceneEvents.h"
 
 #include <AngelScript/angelscript.h>
-#include "../AngelScript/wrapmacros.h"
 
 #include "../DebugNew.h"
 

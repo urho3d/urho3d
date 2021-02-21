@@ -45,7 +45,7 @@ static UI* GetUI()
 void ASRegisterManualLast_UI(asIScriptEngine* engine)
 {
     // template<class T> T * Object::GetSubsystem() const | File: ../Core/Object.h
-    engine->RegisterGlobalFunction("UI@+ get_ui()", asFUNCTION(GetUI), asCALL_CDECL);
+    engine->RegisterGlobalFunction("UI@+ get_ui()", AS_FUNCTION(GetUI), AS_CALL_CDECL);
 }
 
 // ========================================================================================

@@ -165,9 +165,9 @@ static void BindGlobalFunction(const GlobalFunctionAnalyzer& functionAnalyzer)
     processedGlobalFunction.registration_ = "engine->RegisterGlobalFunction(\"" + decl + "\", ";
 
     if (needWrapper)
-        processedGlobalFunction.registration_ += "asFUNCTION(" + GenerateWrapperName(functionAnalyzer) + "), asCALL_CDECL);";
+        processedGlobalFunction.registration_ += "AS_FUNCTION(" + GenerateWrapperName(functionAnalyzer) + "), AS_CALL_CDECL);";
     else
-        processedGlobalFunction.registration_ += Generate_asFUNCTIONPR(functionAnalyzer) + ", asCALL_CDECL);";
+        processedGlobalFunction.registration_ += Generate_asFUNCTIONPR(functionAnalyzer) + ", AS_CALL_CDECL);";
 
     Result::globalFunctions_.push_back(processedGlobalFunction);
 
@@ -183,9 +183,9 @@ static void BindGlobalFunction(const GlobalFunctionAnalyzer& functionAnalyzer)
         processedGlobalFunction.registration_ = "engine->RegisterGlobalFunction(\"" + decl + "\", ";
 
         if (needWrapper)
-            processedGlobalFunction.registration_ += "asFUNCTION(" + GenerateWrapperName(functionAnalyzer) + "), asCALL_CDECL);";
+            processedGlobalFunction.registration_ += "AS_FUNCTION(" + GenerateWrapperName(functionAnalyzer) + "), AS_CALL_CDECL);";
         else
-            processedGlobalFunction.registration_ += Generate_asFUNCTIONPR(functionAnalyzer) + ", asCALL_CDECL);";
+            processedGlobalFunction.registration_ += Generate_asFUNCTIONPR(functionAnalyzer) + ", AS_CALL_CDECL);";
 
         Result::globalFunctions_.push_back(processedGlobalFunction);
     }

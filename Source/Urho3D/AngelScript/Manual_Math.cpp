@@ -39,7 +39,7 @@ void ASRegisterManualFirst_Math(asIScriptEngine* engine)
 void ASRegisterManualLast_Math(asIScriptEngine* engine)
 {
     // template <class T, typename std::enable_if...> T Mod(T x, T y) | File: ../Math/MathDefs.h
-    engine->RegisterGlobalFunction("float Mod(float, float)", asFUNCTION(Mod<float>), asCALL_CDECL);
+    engine->RegisterGlobalFunction("float Mod(float, float)", AS_FUNCTION(Mod<float>), AS_CALL_CDECL);
 }
 
 // ========================================================================================

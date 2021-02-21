@@ -54,11 +54,11 @@ static Localization* GetLocalization()
 void ASRegisterManualLast_Resource(asIScriptEngine* engine)
 {
     // template<class T> T * Object::GetSubsystem() const | File: ../Core/Object.h
-    engine->RegisterGlobalFunction("Localization@+ get_localization()", asFUNCTION(GetLocalization), asCALL_CDECL);
+    engine->RegisterGlobalFunction("Localization@+ get_localization()", AS_FUNCTION(GetLocalization), AS_CALL_CDECL);
     // template<class T> T * Object::GetSubsystem() const | File: ../Core/Object.h
-    engine->RegisterGlobalFunction("ResourceCache@+ get_resourceCache()", asFUNCTION(GetResourceCache), asCALL_CDECL);
+    engine->RegisterGlobalFunction("ResourceCache@+ get_resourceCache()", AS_FUNCTION(GetResourceCache), AS_CALL_CDECL);
     // template<class T> T * Object::GetSubsystem() const | File: ../Core/Object.h
-    engine->RegisterGlobalFunction("ResourceCache@+ get_cache()", asFUNCTION(GetResourceCache), asCALL_CDECL);
+    engine->RegisterGlobalFunction("ResourceCache@+ get_cache()", AS_FUNCTION(GetResourceCache), AS_CALL_CDECL);
 }
 
 // ========================================================================================

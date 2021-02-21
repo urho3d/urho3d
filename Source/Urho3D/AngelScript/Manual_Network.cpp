@@ -47,7 +47,7 @@ static Network* GetNetwork()
 void ASRegisterManualLast_Network(asIScriptEngine* engine)
 {
     // template<class T> T * Object::GetSubsystem() const | File: ../Core/Object.h
-    engine->RegisterGlobalFunction("Network@+ get_network()", asFUNCTION(GetNetwork), asCALL_CDECL);
+    engine->RegisterGlobalFunction("Network@+ get_network()", AS_FUNCTION(GetNetwork), AS_CALL_CDECL);
 }
 
 } // namespace Urho3D

@@ -45,7 +45,7 @@ static Audio* GetAudio()
 void ASRegisterManualLast_Audio(asIScriptEngine* engine)
 {
     // template<class T> T * Object::GetSubsystem() const | File: ../Core/Object.h
-    engine->RegisterGlobalFunction("Audio@+ get_audio()", asFUNCTION(GetAudio), asCALL_CDECL);
+    engine->RegisterGlobalFunction("Audio@+ get_audio()", AS_FUNCTION(GetAudio), AS_CALL_CDECL);
 }
 
 }

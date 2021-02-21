@@ -23,6 +23,7 @@
 #include "../Precompiled.h"
 
 #include "../AngelScript/Addons.h"
+#include "../AngelScript/RegistrationMacros.h"
 
 #include <cstring>
 #include <new>
@@ -1629,37 +1630,37 @@ static void ScriptArrayClear(CScriptArray* ptr)
 
 void RegisterArray(asIScriptEngine* engine)
 {
-    engine->RegisterObjectBehaviour("Array<T>", asBEHAVE_TEMPLATE_CALLBACK, "bool f(int&in, bool&out)", asFUNCTION(ScriptArrayTemplateCallback), asCALL_CDECL);
-    engine->RegisterObjectBehaviour("Array<T>", asBEHAVE_FACTORY, "Array<T>@ f(int&in)", asFUNCTIONPR(CScriptArray::Create, (asITypeInfo*), CScriptArray*), asCALL_CDECL);
-    engine->RegisterObjectBehaviour("Array<T>", asBEHAVE_FACTORY, "Array<T>@ f(int&in, uint)", asFUNCTIONPR(CScriptArray::Create, (asITypeInfo*, asUINT), CScriptArray*), asCALL_CDECL);
-    engine->RegisterObjectBehaviour("Array<T>", asBEHAVE_FACTORY, "Array<T>@ f(int&in, uint, const T &in)", asFUNCTIONPR(CScriptArray::Create, (asITypeInfo*, asUINT, void *), CScriptArray*), asCALL_CDECL);
-    engine->RegisterObjectBehaviour("Array<T>", asBEHAVE_LIST_FACTORY, "Array<T>@ f(int&in type, int&in list) {repeat T}", asFUNCTIONPR(CScriptArray::Create, (asITypeInfo*, void*), CScriptArray*), asCALL_CDECL);
-    engine->RegisterObjectBehaviour("Array<T>", asBEHAVE_ADDREF, "void f()", asMETHOD(CScriptArray, AddRef), asCALL_THISCALL);
-    engine->RegisterObjectBehaviour("Array<T>", asBEHAVE_RELEASE, "void f()", asMETHOD(CScriptArray, Release), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Array<T>", "T& opIndex(uint)", asMETHODPR(CScriptArray, At, (unsigned), void*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Array<T>", "const T& opIndex(uint) const", asMETHODPR(CScriptArray, At, (unsigned), void*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Array<T>", "Array<T>& opAssign(const Array<T>& in)", asMETHOD(CScriptArray, operator=), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Array<T>", "void Insert(uint, const T& in)", asMETHOD(CScriptArray, InsertAt), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Array<T>", "void Erase(uint)", asMETHOD(CScriptArray, RemoveAt), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Array<T>", "void Push(const T& in)", asMETHOD(CScriptArray, InsertLast), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Array<T>", "void Pop()", asMETHOD(CScriptArray, RemoveLast), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Array<T>", "void Reserve(uint)", asMETHOD(CScriptArray, Reserve), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Array<T>", "void Resize(uint)", asMETHODPR(CScriptArray, Resize, (asUINT), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Array<T>", "void Clear()", asFUNCTION(ScriptArrayClear), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Array<T>", "void Sort()", asMETHODPR(CScriptArray, SortAsc, (), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Array<T>", "void Sort(uint, uint)", asMETHODPR(CScriptArray, SortAsc, (asUINT, asUINT), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Array<T>", "void SortReverse()", asMETHODPR(CScriptArray, SortDesc, (), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Array<T>", "void SortReverse(uint, uint)", asMETHODPR(CScriptArray, SortDesc, (asUINT, asUINT), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Array<T>", "void Reverse()", asMETHOD(CScriptArray, Reverse), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Array<T>", "int Find(const T&in) const", asMETHODPR(CScriptArray, Find, (void*) const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Array<T>", "int Find(uint, const T&in) const", asMETHODPR(CScriptArray, Find, (asUINT, void*) const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Array<T>", "int FindByRef(const T&in) const", asMETHODPR(CScriptArray, FindByRef, (void*) const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Array<T>", "int FindByRef(uint, const T&in) const", asMETHODPR(CScriptArray, FindByRef, (asUINT, void*) const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Array<T>", "bool Swap(Array<T>&inout)", asMETHOD(CScriptArray, Swap), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Array<T>", "bool opEquals(const Array<T>&in) const", asMETHOD(CScriptArray, operator==), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Array<T>", "uint get_length() const", asMETHOD(CScriptArray, GetSize), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Array<T>", "void set_length(uint)", asMETHODPR(CScriptArray, Resize, (asUINT), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Array<T>", "bool get_empty() const", asMETHOD(CScriptArray, IsEmpty), asCALL_THISCALL);
+    engine->RegisterObjectBehaviour("Array<T>", asBEHAVE_TEMPLATE_CALLBACK, "bool f(int&in, bool&out)", AS_FUNCTION(ScriptArrayTemplateCallback), AS_CALL_CDECL);
+    engine->RegisterObjectBehaviour("Array<T>", asBEHAVE_FACTORY, "Array<T>@ f(int&in)", AS_FUNCTIONPR(CScriptArray::Create, (asITypeInfo*), CScriptArray*), AS_CALL_CDECL);
+    engine->RegisterObjectBehaviour("Array<T>", asBEHAVE_FACTORY, "Array<T>@ f(int&in, uint)", AS_FUNCTIONPR(CScriptArray::Create, (asITypeInfo*, asUINT), CScriptArray*), AS_CALL_CDECL);
+    engine->RegisterObjectBehaviour("Array<T>", asBEHAVE_FACTORY, "Array<T>@ f(int&in, uint, const T &in)", AS_FUNCTIONPR(CScriptArray::Create, (asITypeInfo*, asUINT, void *), CScriptArray*), AS_CALL_CDECL);
+    engine->RegisterObjectBehaviour("Array<T>", asBEHAVE_LIST_FACTORY, "Array<T>@ f(int&in type, int&in list) {repeat T}", AS_FUNCTIONPR(CScriptArray::Create, (asITypeInfo*, void*), CScriptArray*), AS_CALL_CDECL);
+    engine->RegisterObjectBehaviour("Array<T>", asBEHAVE_ADDREF, "void f()", AS_METHOD(CScriptArray, AddRef), AS_CALL_THISCALL);
+    engine->RegisterObjectBehaviour("Array<T>", asBEHAVE_RELEASE, "void f()", AS_METHOD(CScriptArray, Release), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Array<T>", "T& opIndex(uint)", AS_METHODPR(CScriptArray, At, (unsigned), void*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Array<T>", "const T& opIndex(uint) const", AS_METHODPR(CScriptArray, At, (unsigned), void*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Array<T>", "Array<T>& opAssign(const Array<T>& in)", AS_METHOD(CScriptArray, operator=), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Array<T>", "void Insert(uint, const T& in)", AS_METHOD(CScriptArray, InsertAt), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Array<T>", "void Erase(uint)", AS_METHOD(CScriptArray, RemoveAt), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Array<T>", "void Push(const T& in)", AS_METHOD(CScriptArray, InsertLast), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Array<T>", "void Pop()", AS_METHOD(CScriptArray, RemoveLast), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Array<T>", "void Reserve(uint)", AS_METHOD(CScriptArray, Reserve), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Array<T>", "void Resize(uint)", AS_METHODPR(CScriptArray, Resize, (asUINT), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Array<T>", "void Clear()", AS_FUNCTION_OBJLAST(ScriptArrayClear), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Array<T>", "void Sort()", AS_METHODPR(CScriptArray, SortAsc, (), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Array<T>", "void Sort(uint, uint)", AS_METHODPR(CScriptArray, SortAsc, (asUINT, asUINT), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Array<T>", "void SortReverse()", AS_METHODPR(CScriptArray, SortDesc, (), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Array<T>", "void SortReverse(uint, uint)", AS_METHODPR(CScriptArray, SortDesc, (asUINT, asUINT), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Array<T>", "void Reverse()", AS_METHOD(CScriptArray, Reverse), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Array<T>", "int Find(const T&in) const", AS_METHODPR(CScriptArray, Find, (void*) const, int), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Array<T>", "int Find(uint, const T&in) const", AS_METHODPR(CScriptArray, Find, (asUINT, void*) const, int), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Array<T>", "int FindByRef(const T&in) const", AS_METHODPR(CScriptArray, FindByRef, (void*) const, int), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Array<T>", "int FindByRef(uint, const T&in) const", AS_METHODPR(CScriptArray, FindByRef, (asUINT, void*) const, int), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Array<T>", "bool Swap(Array<T>&inout)", AS_METHOD(CScriptArray, Swap), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Array<T>", "bool opEquals(const Array<T>&in) const", AS_METHOD(CScriptArray, operator==), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Array<T>", "uint get_length() const", AS_METHOD(CScriptArray, GetSize), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Array<T>", "void set_length(uint)", AS_METHODPR(CScriptArray, Resize, (asUINT), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Array<T>", "bool get_empty() const", AS_METHOD(CScriptArray, IsEmpty), AS_CALL_THISCALL);
     engine->RegisterDefaultArrayType("Array<T>");
 }
 
@@ -2289,39 +2290,39 @@ static void ScriptDictionaryGet_Generic(asIScriptGeneric *gen)
 
 void RegisterDictionary(asIScriptEngine *engine)
 {
-    engine->RegisterObjectBehaviour("DictionaryValue", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(CScriptDictValue_Construct), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("DictionaryValue", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(CScriptDictValue_Destruct), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("DictionaryValue", "DictionaryValue &opAssign(double)", asFUNCTIONPR(CScriptDictValue_opAssign, (double, CScriptDictValue*), CScriptDictValue &), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("DictionaryValue", "DictionaryValue &opAssign(int64)", asFUNCTIONPR(CScriptDictValue_opAssign, (asINT64, CScriptDictValue*), CScriptDictValue &), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("DictionaryValue", "int64 opConv()", asFUNCTIONPR(CScriptDictValue_opConvInt, (CScriptDictValue*), asINT64), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("DictionaryValue", "double opConv()", asFUNCTIONPR(CScriptDictValue_opConvDouble, (CScriptDictValue*), double), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("DictionaryValue", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJLAST(CScriptDictValue_Construct), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("DictionaryValue", asBEHAVE_DESTRUCT, "void f()", AS_FUNCTION_OBJLAST(CScriptDictValue_Destruct), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("DictionaryValue", "DictionaryValue &opAssign(double)", AS_FUNCTIONPR_OBJLAST(CScriptDictValue_opAssign, (double, CScriptDictValue*), CScriptDictValue &), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("DictionaryValue", "DictionaryValue &opAssign(int64)", AS_FUNCTIONPR_OBJLAST(CScriptDictValue_opAssign, (asINT64, CScriptDictValue*), CScriptDictValue &), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("DictionaryValue", "int64 opConv()", AS_FUNCTIONPR_OBJLAST(CScriptDictValue_opConvInt, (CScriptDictValue*), asINT64), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("DictionaryValue", "double opConv()", AS_FUNCTIONPR_OBJLAST(CScriptDictValue_opConvDouble, (CScriptDictValue*), double), AS_CALL_CDECL_OBJLAST);
 
     engine->RegisterObjectType("Dictionary", sizeof(CScriptDictionary), asOBJ_REF);
     engine->RegisterObjectBehaviour("Dictionary", asBEHAVE_FACTORY, "Dictionary@ f()", asFUNCTION(ScriptDictionaryFactory_Generic), asCALL_GENERIC);
     engine->RegisterObjectBehaviour("Dictionary", asBEHAVE_LIST_FACTORY, "Dictionary @f(int &in) {repeat {String, ?}}", asFUNCTION(ScriptDictionaryListFactory_Generic), asCALL_GENERIC);
-    engine->RegisterObjectBehaviour("Dictionary", asBEHAVE_ADDREF, "void f()", asMETHOD(CScriptDictionary,AddRef), asCALL_THISCALL);
-    engine->RegisterObjectBehaviour("Dictionary", asBEHAVE_RELEASE, "void f()", asMETHOD(CScriptDictionary,Release), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Dictionary", "Dictionary &opAssign(const Dictionary &in)", asMETHODPR(CScriptDictionary, operator=, (const CScriptDictionary &), CScriptDictionary&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Dictionary", "void Set(const String &in, const int64&in)", asMETHODPR(CScriptDictionary,Set,(const String&,const asINT64&),void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Dictionary", "bool Get(const String &in, int64&out) const", asMETHODPR(CScriptDictionary,Get,(const String&,asINT64&) const,bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Dictionary", "void Set(const String &in, const double&in)", asMETHODPR(CScriptDictionary,Set,(const String&,const double&),void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Dictionary", "bool Get(const String &in, double&out) const", asMETHODPR(CScriptDictionary,Get,(const String&,double&) const,bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Dictionary", "bool Exists(const String &in) const", asMETHOD(CScriptDictionary,Exists), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Dictionary", "bool get_empty() const", asMETHOD(CScriptDictionary, IsEmpty), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Dictionary", "uint get_length() const", asMETHOD(CScriptDictionary, GetSize), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Dictionary", "void Erase(const String &in)", asMETHOD(CScriptDictionary,Delete), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Dictionary", "void Clear()", asMETHOD(CScriptDictionary,DeleteAll), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Dictionary", "Array<String> @get_keys() const", asMETHOD(CScriptDictionary,GetKeys), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Dictionary", "DictionaryValue &opIndex(const String &in)", asMETHODPR(CScriptDictionary, operator[], (const String &), CScriptDictValue*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Dictionary", "const DictionaryValue &opIndex(const String &in) const", asMETHODPR(CScriptDictionary, operator[], (const String &) const, const CScriptDictValue*), asCALL_THISCALL);
+    engine->RegisterObjectBehaviour("Dictionary", asBEHAVE_ADDREF, "void f()", AS_METHOD(CScriptDictionary,AddRef), AS_CALL_THISCALL);
+    engine->RegisterObjectBehaviour("Dictionary", asBEHAVE_RELEASE, "void f()", AS_METHOD(CScriptDictionary,Release), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Dictionary", "Dictionary &opAssign(const Dictionary &in)", AS_METHODPR(CScriptDictionary, operator=, (const CScriptDictionary &), CScriptDictionary&), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Dictionary", "void Set(const String &in, const int64&in)", AS_METHODPR(CScriptDictionary,Set,(const String&,const asINT64&),void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Dictionary", "bool Get(const String &in, int64&out) const", AS_METHODPR(CScriptDictionary,Get,(const String&,asINT64&) const,bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Dictionary", "void Set(const String &in, const double&in)", AS_METHODPR(CScriptDictionary,Set,(const String&,const double&),void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Dictionary", "bool Get(const String &in, double&out) const", AS_METHODPR(CScriptDictionary,Get,(const String&,double&) const,bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Dictionary", "bool Exists(const String &in) const", AS_METHOD(CScriptDictionary,Exists), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Dictionary", "bool get_empty() const", AS_METHOD(CScriptDictionary, IsEmpty), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Dictionary", "uint get_length() const", AS_METHOD(CScriptDictionary, GetSize), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Dictionary", "void Erase(const String &in)", AS_METHOD(CScriptDictionary,Delete), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Dictionary", "void Clear()", AS_METHOD(CScriptDictionary,DeleteAll), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Dictionary", "Array<String> @get_keys() const", AS_METHOD(CScriptDictionary,GetKeys), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Dictionary", "DictionaryValue &opIndex(const String &in)", AS_METHODPR(CScriptDictionary, operator[], (const String &), CScriptDictValue*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Dictionary", "const DictionaryValue &opIndex(const String &in) const", AS_METHODPR(CScriptDictionary, operator[], (const String &) const, const CScriptDictValue*), AS_CALL_THISCALL);
 
 #ifndef AS_MAX_PORTABILITY
-    engine->RegisterObjectMethod("DictionaryValue", "DictionaryValue &opHndlAssign(const ?&in)", asFUNCTIONPR(CScriptDictValue_opAssign, (void *, int, CScriptDictValue*), CScriptDictValue &), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("DictionaryValue", "DictionaryValue &opAssign(const ?&in)", asFUNCTIONPR(CScriptDictValue_opAssign, (void *, int, CScriptDictValue*), CScriptDictValue &), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("DictionaryValue", "void opCast(?&out)", asFUNCTIONPR(CScriptDictValue_opCast, (void *, int, CScriptDictValue*), void), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("DictionaryValue", "void opConv(?&out)", asFUNCTIONPR(CScriptDictValue_opCast, (void *, int, CScriptDictValue*), void), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Dictionary", "void Set(const String &in, const ?&in)", asMETHODPR(CScriptDictionary, Set, (const String&, void*, int), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Dictionary", "bool Get(const String &in, ?&out) const", asMETHODPR(CScriptDictionary, Get, (const String&, void*, int) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DictionaryValue", "DictionaryValue &opHndlAssign(const ?&in)", AS_FUNCTIONPR_OBJLAST(CScriptDictValue_opAssign, (void *, int, CScriptDictValue*), CScriptDictValue &), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("DictionaryValue", "DictionaryValue &opAssign(const ?&in)", AS_FUNCTIONPR_OBJLAST(CScriptDictValue_opAssign, (void *, int, CScriptDictValue*), CScriptDictValue &), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("DictionaryValue", "void opCast(?&out)", AS_FUNCTIONPR_OBJLAST(CScriptDictValue_opCast, (void *, int, CScriptDictValue*), void), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("DictionaryValue", "void opConv(?&out)", AS_FUNCTIONPR_OBJLAST(CScriptDictValue_opCast, (void *, int, CScriptDictValue*), void), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Dictionary", "void Set(const String &in, const ?&in)", AS_METHODPR(CScriptDictionary, Set, (const String&, void*, int), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Dictionary", "bool Get(const String &in, ?&out) const", AS_METHODPR(CScriptDictionary, Get, (const String&, void*, int) const, bool), AS_CALL_THISCALL);
 #else
     engine->RegisterObjectMethod("DictionaryValue", "DictionaryValue &opHndlAssign(const ?&in)", asFUNCTION(CScriptDictValue_opAssign_gen), asCALL_GENERIC);
     engine->RegisterObjectMethod("DictionaryValue", "DictionaryValue &opAssign(const ?&in)", asFUNCTION(CScriptDictValue_opAssign_gen), asCALL_GENERIC);

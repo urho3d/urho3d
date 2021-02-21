@@ -248,9 +248,9 @@ static void RegisterStaticFunction(const ClassStaticFunctionAnalyzer& functionAn
     result->reg_ << "    engine->RegisterGlobalFunction(\"" << decl << "\", ";
 
     if (needWrapper)
-        result->reg_ << "asFUNCTION(" << GenerateWrapperName(functionAnalyzer) << "), asCALL_CDECL);\n";
+        result->reg_ << "AS_FUNCTION(" << GenerateWrapperName(functionAnalyzer) << "), AS_CALL_CDECL);\n";
     else
-        result->reg_ << Generate_asFUNCTIONPR(functionAnalyzer) << ", asCALL_CDECL);\n";
+        result->reg_ << Generate_asFUNCTIONPR(functionAnalyzer) << ", AS_CALL_CDECL);\n";
 
     result->reg_ << "    engine->SetDefaultNamespace(\"\");\n";
 }
@@ -337,8 +337,8 @@ static void RegisterRefCountedConstructor(const ClassFunctionAnalyzer& functionA
             "        engine->RegisterObjectBehaviour(className, "
             "asBEHAVE_FACTORY, "
             "declFactory.CString(), "
-            "asFUNCTION(" << wrapperName << "), "
-            "asCALL_CDECL);\n"
+            "AS_FUNCTION(" << wrapperName << "), "
+            "AS_CALL_CDECL);\n"
             "    }\n";
     }
     else
@@ -349,8 +349,8 @@ static void RegisterRefCountedConstructor(const ClassFunctionAnalyzer& functionA
             "\"" << className << "\", "
             "asBEHAVE_FACTORY, "
             "\"" << decl << "\", "
-            "asFUNCTION(" << wrapperName << "), "
-            "asCALL_CDECL);\n";
+            "AS_FUNCTION(" << wrapperName << "), "
+            "AS_CALL_CDECL);\n";
     }
 
     if (!insideDefine.empty())
@@ -433,8 +433,8 @@ static void RegisterValueConstructor(const ClassFunctionAnalyzer& functionAnalyz
         "\"" << className << "\", "
         "asBEHAVE_CONSTRUCT, "
         "\"" << decl << "\", "
-        "asFUNCTION(" << wrapperName << "), "
-        "asCALL_CDECL_OBJFIRST);\n";
+        "AS_FUNCTION_OBJFIRST(" << wrapperName << "), "
+        "AS_CALL_CDECL_OBJFIRST);\n";
 
     if (isDefaultConstructor && !insideDefine.empty())
         reg << "#endif\n";
@@ -505,7 +505,7 @@ static void RegisterComparisonOperator(const ClassAnalyzer& classAnalyzer)
     result->reg_ <<
         "    // " << operatorLessLocation << "\n"
         "    // " << operatorGreaterLocation << "\n"
-        "    engine->RegisterObjectMethod(\"" << className << "\", \"int opCmp(const " << className << "&in) const\", asFUNCTION(" << wrapperName << "), asCALL_CDECL_OBJFIRST);\n";
+        "    engine->RegisterObjectMethod(\"" << className << "\", \"int opCmp(const " << className << "&in) const\", AS_FUNCTION_OBJFIRST(" << wrapperName << "), AS_CALL_CDECL_OBJFIRST);\n";
 }
 
 static void RegisterAddReleaseRef(const ClassFunctionAnalyzer& functionAnalyzer, bool templateVersion)
@@ -520,9 +520,9 @@ static void RegisterAddReleaseRef(const ClassFunctionAnalyzer& functionAnalyzer,
     result->reg_ << "    // " << functionAnalyzer.GetLocation() << "\n";
 
     if (templateVersion)
-        result->reg_ << "    engine->RegisterObjectBehaviour(className, " << behaviour << ", \"void f()\", "  << methodpr << ", asCALL_THISCALL);\n";
+        result->reg_ << "    engine->RegisterObjectBehaviour(className, " << behaviour << ", \"void f()\", "  << methodpr << ", AS_CALL_THISCALL);\n";
     else
-        result->reg_ << "    engine->RegisterObjectBehaviour(\"" << className << "\", " << behaviour << ", \"void f()\", " << methodpr << ", asCALL_THISCALL);\n";
+        result->reg_ << "    engine->RegisterObjectBehaviour(\"" << className << "\", " << behaviour << ", \"void f()\", " << methodpr << ", AS_CALL_THISCALL);\n";
 }
 
 static void RegisterFakeAddReleaseRef(const ClassAnalyzer& classAnalyzer)
@@ -531,8 +531,8 @@ static void RegisterFakeAddReleaseRef(const ClassAnalyzer& classAnalyzer)
     shared_ptr<ASGeneratedFile_Members> result = GetGeneratedFile(className);
 
     result->reg_ <<
-        "    engine->RegisterObjectBehaviour(\"" << className << "\", asBEHAVE_ADDREF, \"void f()\", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);\n"
-        "    engine->RegisterObjectBehaviour(\"" << className << "\", asBEHAVE_RELEASE, \"void f()\", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);\n";
+        "    engine->RegisterObjectBehaviour(\"" << className << "\", asBEHAVE_ADDREF, \"void f()\", AS_FUNCTION_OBJLAST(FakeAddRef), AS_CALL_CDECL_OBJLAST);\n"
+        "    engine->RegisterObjectBehaviour(\"" << className << "\", asBEHAVE_RELEASE, \"void f()\", AS_FUNCTION_OBJLAST(FakeReleaseRef), AS_CALL_CDECL_OBJLAST);\n";
 }
 
 // https://www.angelcode.com/angelscript/sdk/docs/manual/doc_script_class_ops.html
@@ -838,9 +838,9 @@ static void RegisterMethod(const ClassFunctionAnalyzer& functionAnalyzer, bool t
         result->reg_ << "    engine->RegisterObjectMethod(\"" << functionAnalyzer.GetClassName() << "\", \"" << decl << "\", ";
 
     if (needWrapper)
-        result->reg_ << "asFUNCTION(" << GenerateWrapperName(functionAnalyzer, templateVersion) << "), asCALL_CDECL_OBJFIRST);\n";
+        result->reg_ << "AS_FUNCTION_OBJFIRST(" << GenerateWrapperName(functionAnalyzer, templateVersion) << "), AS_CALL_CDECL_OBJFIRST);\n";
     else
-        result->reg_ << Generate_asMETHODPR(functionAnalyzer, templateVersion) << ", asCALL_THISCALL);\n";
+        result->reg_ << Generate_asMETHODPR(functionAnalyzer, templateVersion) << ", AS_CALL_THISCALL);\n";
 
     // Also register as property if needed
     string propertyMark = GetPropertyMark(functionAnalyzer);
@@ -874,9 +874,9 @@ static void RegisterMethod(const ClassFunctionAnalyzer& functionAnalyzer, bool t
             result->reg_ << "    engine->RegisterObjectMethod(\"" << functionAnalyzer.GetClassName() << "\", \"" << decl << "\", ";
 
         if (needWrapper)
-            result->reg_ << "asFUNCTION(" << GenerateWrapperName(functionAnalyzer, templateVersion) << "), asCALL_CDECL_OBJFIRST);\n";
+            result->reg_ << "AS_FUNCTION_OBJFIRST(" << GenerateWrapperName(functionAnalyzer, templateVersion) << "), AS_CALL_CDECL_OBJFIRST);\n";
         else
-            result->reg_ << Generate_asMETHODPR(functionAnalyzer, templateVersion) << ", asCALL_THISCALL);\n";
+            result->reg_ << Generate_asMETHODPR(functionAnalyzer, templateVersion) << ", AS_CALL_THISCALL);\n";
     }
 }
 

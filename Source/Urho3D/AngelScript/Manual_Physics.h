@@ -39,7 +39,7 @@ RigidBody* PhysicsRaycastResultGetRigidBody(PhysicsRaycastResult* ptr);
 
 #define REGISTER_MANUAL_PART_PhysicsRaycastResult(T, className) \
     /* RigidBody* PhysicsRaycastResult::body_ | File: ../Physics/PhysicsWorld.h */ \
-    engine->RegisterObjectMethod(className, "RigidBody@+ get_body() const", asFUNCTION(PhysicsRaycastResultGetRigidBody), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "RigidBody@+ get_body() const", AS_FUNCTION_OBJLAST(PhysicsRaycastResultGetRigidBody), AS_CALL_CDECL_OBJLAST);
 
 // ========================================================================================
 
@@ -48,7 +48,7 @@ CScriptArray* RigidBodyGetCollidingBodies(RigidBody* ptr);
 
 #define REGISTER_MANUAL_PART_RigidBody(T, className) \
     /* void RigidBody::GetCollidingBodies(PODVector< RigidBody * > &result) const | File: ../Physics/RigidBody.h */ \
-    engine->RegisterObjectMethod(className, "Array<RigidBody@>@ get_collidingBodies() const", asFUNCTION(RigidBodyGetCollidingBodies), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "Array<RigidBody@>@ get_collidingBodies() const", AS_FUNCTION_OBJLAST(RigidBodyGetCollidingBodies), AS_CALL_CDECL_OBJLAST);
 
 // ========================================================================================
 
@@ -73,25 +73,25 @@ CScriptArray* PhysicsWorldGetCollidingBodies(RigidBody* body, PhysicsWorld* ptr)
 
 #define REGISTER_MANUAL_PART_PhysicsWorld(T, className) \
     /* void PhysicsWorld::Raycast(PODVector< PhysicsRaycastResult > &result, const Ray &ray, float maxDistance, unsigned collisionMask=M_MAX_UNSIGNED) | File: ../Physics/PhysicsWorld.h */ \
-    engine->RegisterObjectMethod(className, "Array<PhysicsRaycastResult>@ Raycast(const Ray&in, float, uint collisionMask = 0xffff)", asFUNCTION(PhysicsWorldRaycast), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "Array<PhysicsRaycastResult>@ Raycast(const Ray&in, float, uint collisionMask = 0xffff)", AS_FUNCTION_OBJLAST(PhysicsWorldRaycast), AS_CALL_CDECL_OBJLAST); \
     /* void PhysicsWorld::RaycastSingle(PhysicsRaycastResult &result, const Ray &ray, float maxDistance, unsigned collisionMask=M_MAX_UNSIGNED) | File: ../Physics/PhysicsWorld.h */ \
-    engine->RegisterObjectMethod(className, "PhysicsRaycastResult RaycastSingle(const Ray&in, float, uint collisionMask = 0xffff)", asFUNCTION(PhysicsWorldRaycastSingle), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "PhysicsRaycastResult RaycastSingle(const Ray&in, float, uint collisionMask = 0xffff)", AS_FUNCTION_OBJLAST(PhysicsWorldRaycastSingle), AS_CALL_CDECL_OBJLAST); \
     /* void PhysicsWorld::RaycastSingleSegmented(PhysicsRaycastResult &result, const Ray &ray, float maxDistance, float segmentDistance, unsigned collisionMask=M_MAX_UNSIGNED, float overlapDistance=0.1f) | File: ../Physics/PhysicsWorld.h */ \
-    engine->RegisterObjectMethod(className, "PhysicsRaycastResult RaycastSingleSegmented(const Ray&in, float, float, uint collisionMask = 0xffff, float overlapDistance = 0.1f)", asFUNCTION(PhysicsWorldRaycastSingleSegmented), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "PhysicsRaycastResult RaycastSingleSegmented(const Ray&in, float, float, uint collisionMask = 0xffff, float overlapDistance = 0.1f)", AS_FUNCTION_OBJLAST(PhysicsWorldRaycastSingleSegmented), AS_CALL_CDECL_OBJLAST); \
     /* void PhysicsWorld::SphereCast(PhysicsRaycastResult &result, const Ray &ray, float radius, float maxDistance, unsigned collisionMask=M_MAX_UNSIGNED) | File: ../Physics/PhysicsWorld.h */ \
-    engine->RegisterObjectMethod(className, "PhysicsRaycastResult SphereCast(const Ray&in, float, float, uint collisionMask = 0xffff)", asFUNCTION(PhysicsWorldSphereCast), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "PhysicsRaycastResult SphereCast(const Ray&in, float, float, uint collisionMask = 0xffff)", AS_FUNCTION_OBJLAST(PhysicsWorldSphereCast), AS_CALL_CDECL_OBJLAST); \
     /* There seems to be a bug in AngelScript resulting in a crash if we use an auto handle with this function. */ \
     /* Work around by manually releasing the CollisionShape handle */ \
     /* void PhysicsWorld::ConvexCast(PhysicsRaycastResult &result, CollisionShape *shape, const Vector3 &startPos, const Quaternion &startRot, const Vector3 &endPos, const Quaternion &endRot, unsigned collisionMask=M_MAX_UNSIGNED) | File: ../Physics/PhysicsWorld.h */ \
-    engine->RegisterObjectMethod(className, "PhysicsRaycastResult ConvexCast(CollisionShape@, const Vector3&in, const Quaternion&in, const Vector3&in, const Quaternion&in, uint collisionMask = 0xffff)", asFUNCTION(PhysicsWorldConvexCast), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "PhysicsRaycastResult ConvexCast(CollisionShape@, const Vector3&in, const Quaternion&in, const Vector3&in, const Quaternion&in, uint collisionMask = 0xffff)", AS_FUNCTION_OBJLAST(PhysicsWorldConvexCast), AS_CALL_CDECL_OBJLAST); \
     /* void PhysicsWorld::GetRigidBodies(PODVector< RigidBody * > &result, const Sphere &sphere, unsigned collisionMask=M_MAX_UNSIGNED) | File: ../Physics/PhysicsWorld.h */ \
-    engine->RegisterObjectMethod(className, "Array<RigidBody@>@ GetRigidBodies(const Sphere&in, uint collisionMask = 0xffff)", asFUNCTION(PhysicsWorldGetRigidBodiesSphere), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "Array<RigidBody@>@ GetRigidBodies(const Sphere&in, uint collisionMask = 0xffff)", AS_FUNCTION_OBJLAST(PhysicsWorldGetRigidBodiesSphere), AS_CALL_CDECL_OBJLAST); \
     /* void PhysicsWorld::GetRigidBodies(PODVector< RigidBody * > &result, const BoundingBox &box, unsigned collisionMask=M_MAX_UNSIGNED) | File: ../Physics/PhysicsWorld.h */ \
-    engine->RegisterObjectMethod(className, "Array<RigidBody@>@ GetRigidBodies(const BoundingBox&in, uint collisionMask = 0xffff)", asFUNCTION(PhysicsWorldGetRigidBodiesBox), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "Array<RigidBody@>@ GetRigidBodies(const BoundingBox&in, uint collisionMask = 0xffff)", AS_FUNCTION_OBJLAST(PhysicsWorldGetRigidBodiesBox), AS_CALL_CDECL_OBJLAST); \
     /* void PhysicsWorld::GetRigidBodies(PODVector< RigidBody * > &result, const RigidBody *body) | File: ../Physics/PhysicsWorld.h */ \
-    engine->RegisterObjectMethod(className, "Array<RigidBody@>@ GetRigidBodies(RigidBody@+)", asFUNCTION(PhysicsWorldGetRigidBodiesBody), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "Array<RigidBody@>@ GetRigidBodies(RigidBody@+)", AS_FUNCTION_OBJLAST(PhysicsWorldGetRigidBodiesBody), AS_CALL_CDECL_OBJLAST); \
     /* void PhysicsWorld::GetCollidingBodies(PODVector< RigidBody * > &result, const RigidBody *body) | File: ../Physics/PhysicsWorld.h */ \
-    engine->RegisterObjectMethod(className, "Array<RigidBody@>@ GetCollidingBodies(RigidBody@+)", asFUNCTION(PhysicsWorldGetCollidingBodies), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "Array<RigidBody@>@ GetCollidingBodies(RigidBody@+)", AS_FUNCTION_OBJLAST(PhysicsWorldGetCollidingBodies), AS_CALL_CDECL_OBJLAST);
 
 }
 

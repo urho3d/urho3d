@@ -50,11 +50,6 @@ static void ConstructDbResultCopy(const DbResult& other, DbResult* ptr)
     new(ptr) DbResult(other);
 }
 
-static void DestructDbResult(DbResult* ptr)
-{
-    ptr->~DbResult();
-}
-
 static CScriptArray* DbResultGetColumns(DbResult* ptr)
 {
     return VectorToArray<String>(ptr->GetColumns(), "Array<String>");
@@ -74,15 +69,15 @@ static CScriptArray* DbResultGetRow(unsigned index, DbResult* ptr)
 
 static void RegisterDbResult(asIScriptEngine* engine)
 {
-    engine->RegisterObjectBehaviour("DbResult", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructDbResult), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("DbResult", asBEHAVE_CONSTRUCT, "void f(const DbResult&in)", asFUNCTION(ConstructDbResultCopy), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("DbResult", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructDbResult), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("DbResult", "DbResult& opAssign(const DbResult&in)", asMETHODPR(DbResult, operator =, (const DbResult&), DbResult&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("DbResult", "uint get_numColumns() const", asMETHOD(DbResult, GetNumColumns), asCALL_THISCALL);
-    engine->RegisterObjectMethod("DbResult", "uint get_numRows() const", asMETHOD(DbResult, GetNumRows), asCALL_THISCALL);
-    engine->RegisterObjectMethod("DbResult", "int64 get_numAffectedRows() const", asMETHOD(DbResult, GetNumAffectedRows), asCALL_THISCALL);
-    engine->RegisterObjectMethod("DbResult", "Array<String>@ get_columns() const", asFUNCTION(DbResultGetColumns), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("DbResult", "Array<Variant>@ get_row(uint) const", asFUNCTION(DbResultGetRow), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("DbResult", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJLAST(ConstructDbResult), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("DbResult", asBEHAVE_CONSTRUCT, "void f(const DbResult&in)", AS_FUNCTION_OBJLAST(ConstructDbResultCopy), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("DbResult", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(DbResult), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("DbResult", "DbResult& opAssign(const DbResult&in)", AS_METHODPR(DbResult, operator =, (const DbResult&), DbResult&), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("DbResult", "uint get_numColumns() const", AS_METHOD(DbResult, GetNumColumns), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("DbResult", "uint get_numRows() const", AS_METHOD(DbResult, GetNumRows), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("DbResult", "int64 get_numAffectedRows() const", AS_METHOD(DbResult, GetNumAffectedRows), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("DbResult", "Array<String>@ get_columns() const", AS_FUNCTION_OBJLAST(DbResultGetColumns), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("DbResult", "Array<Variant>@ get_row(uint) const", AS_FUNCTION_OBJLAST(DbResultGetRow), AS_CALL_CDECL_OBJLAST);
 }
 
 // ========================================================================================
@@ -90,9 +85,9 @@ static void RegisterDbResult(asIScriptEngine* engine)
 static void RegisterDbConnection(asIScriptEngine* engine)
 {
     RegisterObject<DbConnection>(engine, "DbConnection");
-    engine->RegisterObjectMethod("DbConnection", "DbResult Execute(const String&in, bool useCursorEvent = false)", asMETHOD(DbConnection, Execute), asCALL_THISCALL);
-    engine->RegisterObjectMethod("DbConnection", "const String& get_connectionString() const", asMETHOD(DbConnection, GetConnectionString), asCALL_THISCALL);
-    engine->RegisterObjectMethod("DbConnection", "bool get_connected() const", asMETHOD(DbConnection, IsConnected), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DbConnection", "DbResult Execute(const String&in, bool useCursorEvent = false)", AS_METHOD(DbConnection, Execute), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("DbConnection", "const String& get_connectionString() const", AS_METHOD(DbConnection, GetConnectionString), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("DbConnection", "bool get_connected() const", AS_METHOD(DbConnection, IsConnected), AS_CALL_THISCALL);
 }
 
 // ========================================================================================
@@ -113,8 +108,8 @@ void ASRegisterManualLast_Database(asIScriptEngine* engine)
     RegisterDbResult(engine);
     RegisterDbConnection(engine);
 
-    engine->RegisterGlobalFunction("Database@+ get_database()", asFUNCTION(GetDatabase), asCALL_CDECL);
-    engine->RegisterGlobalFunction("DBAPI get_DBAPI()", asFUNCTION(GetDBAPI), asCALL_CDECL);
+    engine->RegisterGlobalFunction("Database@+ get_database()", AS_FUNCTION(GetDatabase), AS_CALL_CDECL);
+    engine->RegisterGlobalFunction("DBAPI get_DBAPI()", AS_FUNCTION(GetDBAPI), AS_CALL_CDECL);
 }
 
 }

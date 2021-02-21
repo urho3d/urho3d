@@ -797,395 +797,395 @@ static void Vertex2D_Constructor(Vertex2D* ptr)
 void ASRegisterGeneratedDefaultConstructors(asIScriptEngine* engine)
 {
     // AllocatorBlock::AllocatorBlock() | Implicitly-declared
-    engine->RegisterObjectBehaviour("AllocatorBlock", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(AllocatorBlock_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("AllocatorBlock", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(AllocatorBlock_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // AllocatorNode::AllocatorNode() | Implicitly-declared
-    engine->RegisterObjectBehaviour("AllocatorNode", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(AllocatorNode_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("AllocatorNode", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(AllocatorNode_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // AnimationKeyFrame::AnimationKeyFrame() | File: ../Graphics/Animation.h
-    engine->RegisterObjectBehaviour("AnimationKeyFrame", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(AnimationKeyFrame_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("AnimationKeyFrame", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(AnimationKeyFrame_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // AnimationStateTrack::AnimationStateTrack() | File: ../Graphics/AnimationState.h
-    engine->RegisterObjectBehaviour("AnimationStateTrack", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(AnimationStateTrack_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("AnimationStateTrack", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(AnimationStateTrack_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // AnimationTriggerPoint::AnimationTriggerPoint() | File: ../Graphics/Animation.h
-    engine->RegisterObjectBehaviour("AnimationTriggerPoint", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(AnimationTriggerPoint_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("AnimationTriggerPoint", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(AnimationTriggerPoint_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // AreaAllocator::AreaAllocator() | File: ../Math/AreaAllocator.h
-    engine->RegisterObjectBehaviour("AreaAllocator", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(AreaAllocator_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("AreaAllocator", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(AreaAllocator_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // AsyncProgress::AsyncProgress() | Implicitly-declared
-    engine->RegisterObjectBehaviour("AsyncProgress", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(AsyncProgress_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("AsyncProgress", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(AsyncProgress_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // AttributeInfo::AttributeInfo()=default | File: ../Core/Attribute.h
-    engine->RegisterObjectBehaviour("AttributeInfo", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(AttributeInfo_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("AttributeInfo", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(AttributeInfo_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // BackgroundLoadItem::BackgroundLoadItem() | Implicitly-declared
-    engine->RegisterObjectBehaviour("BackgroundLoadItem", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(BackgroundLoadItem_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("BackgroundLoadItem", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(BackgroundLoadItem_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // Batch::Batch()=default | File: ../Graphics/Batch.h
-    engine->RegisterObjectBehaviour("Batch", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(Batch_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("Batch", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(Batch_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // BatchGroup::BatchGroup() | File: ../Graphics/Batch.h
-    engine->RegisterObjectBehaviour("BatchGroup", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(BatchGroup_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("BatchGroup", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(BatchGroup_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // BatchGroupKey::BatchGroupKey()=default | File: ../Graphics/Batch.h
-    engine->RegisterObjectBehaviour("BatchGroupKey", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(BatchGroupKey_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("BatchGroupKey", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(BatchGroupKey_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // BatchQueue::BatchQueue() | Implicitly-declared
-    engine->RegisterObjectBehaviour("BatchQueue", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(BatchQueue_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("BatchQueue", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(BatchQueue_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // BiasParameters::BiasParameters()=default | File: ../Graphics/Light.h
-    engine->RegisterObjectBehaviour("BiasParameters", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(BiasParameters_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("BiasParameters", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(BiasParameters_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // BoundingBox::BoundingBox() noexcept | File: ../Math/BoundingBox.h
-    engine->RegisterObjectBehaviour("BoundingBox", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(BoundingBox_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("BoundingBox", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(BoundingBox_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // CascadeParameters::CascadeParameters()=default | File: ../Graphics/Light.h
-    engine->RegisterObjectBehaviour("CascadeParameters", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(CascadeParameters_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("CascadeParameters", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(CascadeParameters_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // CharLocation::CharLocation() | Implicitly-declared
-    engine->RegisterObjectBehaviour("CharLocation", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(CharLocation_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("CharLocation", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(CharLocation_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // Color::Color() noexcept | File: ../Math/Color.h
-    engine->RegisterObjectBehaviour("Color", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(Color_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("Color", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(Color_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // ComponentReplicationState::ComponentReplicationState() | Implicitly-declared
-    engine->RegisterObjectBehaviour("ComponentReplicationState", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ComponentReplicationState_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("ComponentReplicationState", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(ComponentReplicationState_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // CompressedLevel::CompressedLevel() | Implicitly-declared
-    engine->RegisterObjectBehaviour("CompressedLevel", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(CompressedLevel_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("CompressedLevel", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(CompressedLevel_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // Condition::Condition() | File: ../Core/Condition.h
-    engine->RegisterObjectBehaviour("Condition", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(Condition_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("Condition", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(Condition_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // Controls::Controls() | File: ../Input/Controls.h
-    engine->RegisterObjectBehaviour("Controls", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(Controls_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("Controls", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(Controls_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // CursorShapeInfo::CursorShapeInfo() | File: ../UI/Cursor.h
-    engine->RegisterObjectBehaviour("CursorShapeInfo", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(CursorShapeInfo_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("CursorShapeInfo", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(CursorShapeInfo_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // DebugLine::DebugLine()=default | File: ../Graphics/DebugRenderer.h
-    engine->RegisterObjectBehaviour("DebugLine", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(DebugLine_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("DebugLine", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(DebugLine_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // DebugTriangle::DebugTriangle()=default | File: ../Graphics/DebugRenderer.h
-    engine->RegisterObjectBehaviour("DebugTriangle", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(DebugTriangle_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("DebugTriangle", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(DebugTriangle_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // Decal::Decal() | File: ../Graphics/DecalSet.h
-    engine->RegisterObjectBehaviour("Decal", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(Decal_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("Decal", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(Decal_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // DecalVertex::DecalVertex()=default | File: ../Graphics/DecalSet.h
-    engine->RegisterObjectBehaviour("DecalVertex", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(DecalVertex_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("DecalVertex", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(DecalVertex_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // DirtyBits::DirtyBits()=default | File: ../Scene/ReplicationState.h
-    engine->RegisterObjectBehaviour("DirtyBits", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(DirtyBits_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("DirtyBits", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(DirtyBits_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // FileSelectorEntry::FileSelectorEntry() | Implicitly-declared
-    engine->RegisterObjectBehaviour("FileSelectorEntry", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(FileSelectorEntry_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("FileSelectorEntry", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(FileSelectorEntry_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // FocusParameters::FocusParameters()=default | File: ../Graphics/Light.h
-    engine->RegisterObjectBehaviour("FocusParameters", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(FocusParameters_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("FocusParameters", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(FocusParameters_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // FontGlyph::FontGlyph() | Implicitly-declared
-    engine->RegisterObjectBehaviour("FontGlyph", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(FontGlyph_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("FontGlyph", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(FontGlyph_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // FrameInfo::FrameInfo() | Implicitly-declared
-    engine->RegisterObjectBehaviour("FrameInfo", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(FrameInfo_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("FrameInfo", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(FrameInfo_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // Frustum::Frustum() noexcept=default | File: ../Math/Frustum.h
-    engine->RegisterObjectBehaviour("Frustum", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(Frustum_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("Frustum", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(Frustum_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // GeometryDesc::GeometryDesc() | Implicitly-declared
-    engine->RegisterObjectBehaviour("GeometryDesc", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(GeometryDesc_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("GeometryDesc", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(GeometryDesc_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // HashBase::HashBase() | File: ../Container/HashBase.h
-    engine->RegisterObjectBehaviour("HashBase", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(HashBase_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("HashBase", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(HashBase_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // HashIteratorBase::HashIteratorBase() | File: ../Container/HashBase.h
-    engine->RegisterObjectBehaviour("HashIteratorBase", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(HashIteratorBase_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("HashIteratorBase", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(HashIteratorBase_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // HashNodeBase::HashNodeBase() | File: ../Container/HashBase.h
-    engine->RegisterObjectBehaviour("HashNodeBase", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(HashNodeBase_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("HashNodeBase", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(HashNodeBase_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // HiresTimer::HiresTimer() | File: ../Core/Timer.h
-    engine->RegisterObjectBehaviour("HiresTimer", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(HiresTimer_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("HiresTimer", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(HiresTimer_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // IndexBufferDesc::IndexBufferDesc() | Implicitly-declared
-    engine->RegisterObjectBehaviour("IndexBufferDesc", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(IndexBufferDesc_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("IndexBufferDesc", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(IndexBufferDesc_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // InstanceData::InstanceData()=default | File: ../Graphics/Batch.h
-    engine->RegisterObjectBehaviour("InstanceData", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(InstanceData_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("InstanceData", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(InstanceData_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // IntRect::IntRect() noexcept | File: ../Math/Rect.h
-    engine->RegisterObjectBehaviour("IntRect", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(IntRect_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("IntRect", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(IntRect_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // IntVector2::IntVector2() noexcept | File: ../Math/Vector2.h
-    engine->RegisterObjectBehaviour("IntVector2", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(IntVector2_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("IntVector2", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(IntVector2_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // IntVector3::IntVector3() noexcept | File: ../Math/Vector3.h
-    engine->RegisterObjectBehaviour("IntVector3", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(IntVector3_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("IntVector3", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(IntVector3_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // JSONValue::JSONValue() | File: ../Resource/JSONValue.h
-    engine->RegisterObjectBehaviour("JSONValue", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(JSONValue_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("JSONValue", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(JSONValue_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // LightBatchQueue::LightBatchQueue() | Implicitly-declared
-    engine->RegisterObjectBehaviour("LightBatchQueue", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(LightBatchQueue_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("LightBatchQueue", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(LightBatchQueue_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // LightQueryResult::LightQueryResult() | Implicitly-declared
-    engine->RegisterObjectBehaviour("LightQueryResult", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(LightQueryResult_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("LightQueryResult", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(LightQueryResult_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // LinkedListNode::LinkedListNode() | File: ../Container/LinkedList.h
-    engine->RegisterObjectBehaviour("LinkedListNode", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(LinkedListNode_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("LinkedListNode", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(LinkedListNode_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // ListBase::ListBase() | File: ../Container/ListBase.h
-    engine->RegisterObjectBehaviour("ListBase", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ListBase_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("ListBase", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(ListBase_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // ListIteratorBase::ListIteratorBase() | File: ../Container/ListBase.h
-    engine->RegisterObjectBehaviour("ListIteratorBase", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ListIteratorBase_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("ListIteratorBase", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(ListIteratorBase_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // ListNodeBase::ListNodeBase() | File: ../Container/ListBase.h
-    engine->RegisterObjectBehaviour("ListNodeBase", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ListNodeBase_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("ListNodeBase", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(ListNodeBase_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // MaterialShaderParameter::MaterialShaderParameter() | Implicitly-declared
-    engine->RegisterObjectBehaviour("MaterialShaderParameter", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(MaterialShaderParameter_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("MaterialShaderParameter", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(MaterialShaderParameter_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // Matrix2::Matrix2() noexcept | File: ../Math/Matrix2.h
-    engine->RegisterObjectBehaviour("Matrix2", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(Matrix2_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("Matrix2", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(Matrix2_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // Matrix3::Matrix3() noexcept | File: ../Math/Matrix3.h
-    engine->RegisterObjectBehaviour("Matrix3", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(Matrix3_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("Matrix3", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(Matrix3_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // Matrix3x4::Matrix3x4() noexcept | File: ../Math/Matrix3x4.h
-    engine->RegisterObjectBehaviour("Matrix3x4", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(Matrix3x4_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("Matrix3x4", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(Matrix3x4_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // Matrix4::Matrix4() noexcept | File: ../Math/Matrix4.h
-    engine->RegisterObjectBehaviour("Matrix4", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(Matrix4_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("Matrix4", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(Matrix4_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // ModelMorph::ModelMorph() | Implicitly-declared
-    engine->RegisterObjectBehaviour("ModelMorph", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ModelMorph_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("ModelMorph", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(ModelMorph_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // Mutex::Mutex() | File: ../Core/Mutex.h
-    engine->RegisterObjectBehaviour("Mutex", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(Mutex_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("Mutex", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(Mutex_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // NetworkState::NetworkState() | Implicitly-declared
-    engine->RegisterObjectBehaviour("NetworkState", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(NetworkState_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("NetworkState", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(NetworkState_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // NodeImpl::NodeImpl() | Implicitly-declared
-    engine->RegisterObjectBehaviour("NodeImpl", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(NodeImpl_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("NodeImpl", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(NodeImpl_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // NodeReplicationState::NodeReplicationState() | Implicitly-declared
-    engine->RegisterObjectBehaviour("NodeReplicationState", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(NodeReplicationState_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("NodeReplicationState", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(NodeReplicationState_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // OcclusionBatch::OcclusionBatch() | Implicitly-declared
-    engine->RegisterObjectBehaviour("OcclusionBatch", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(OcclusionBatch_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("OcclusionBatch", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(OcclusionBatch_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // OcclusionBufferData::OcclusionBufferData() | Implicitly-declared
-    engine->RegisterObjectBehaviour("OcclusionBufferData", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(OcclusionBufferData_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("OcclusionBufferData", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(OcclusionBufferData_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // OctreeQueryResult::OctreeQueryResult() | File: ../Graphics/OctreeQuery.h
-    engine->RegisterObjectBehaviour("OctreeQueryResult", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(OctreeQueryResult_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("OctreeQueryResult", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(OctreeQueryResult_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // Particle::Particle() | Implicitly-declared
-    engine->RegisterObjectBehaviour("Particle", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(Particle_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("Particle", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(Particle_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // PerThreadSceneResult::PerThreadSceneResult() | Implicitly-declared
-    engine->RegisterObjectBehaviour("PerThreadSceneResult", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(PerThreadSceneResult_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("PerThreadSceneResult", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(PerThreadSceneResult_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // Plane::Plane() noexcept | File: ../Math/Plane.h
-    engine->RegisterObjectBehaviour("Plane", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(Plane_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("Plane", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(Plane_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // Polyhedron::Polyhedron() noexcept=default | File: ../Math/Polyhedron.h
-    engine->RegisterObjectBehaviour("Polyhedron", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(Polyhedron_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("Polyhedron", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(Polyhedron_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // Quaternion::Quaternion() noexcept | File: ../Math/Quaternion.h
-    engine->RegisterObjectBehaviour("Quaternion", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(Quaternion_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("Quaternion", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(Quaternion_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // Ray::Ray() noexcept=default | File: ../Math/Ray.h
-    engine->RegisterObjectBehaviour("Ray", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(Ray_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("Ray", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(Ray_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // RayQueryResult::RayQueryResult() | File: ../Graphics/OctreeQuery.h
-    engine->RegisterObjectBehaviour("RayQueryResult", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(RayQueryResult_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("RayQueryResult", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(RayQueryResult_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // Rect::Rect() noexcept | File: ../Math/Rect.h
-    engine->RegisterObjectBehaviour("Rect", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(Rect_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("Rect", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(Rect_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // RefCount::RefCount() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("RefCount", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(RefCount_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("RefCount", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(RefCount_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // RenderPathCommand::RenderPathCommand() | Implicitly-declared
-    engine->RegisterObjectBehaviour("RenderPathCommand", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(RenderPathCommand_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("RenderPathCommand", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(RenderPathCommand_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // RenderTargetInfo::RenderTargetInfo() | Implicitly-declared
-    engine->RegisterObjectBehaviour("RenderTargetInfo", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(RenderTargetInfo_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("RenderTargetInfo", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(RenderTargetInfo_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // ReplicationState::ReplicationState() | Implicitly-declared
-    engine->RegisterObjectBehaviour("ReplicationState", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ReplicationState_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("ReplicationState", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(ReplicationState_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // ResourceGroup::ResourceGroup() | File: ../Resource/ResourceCache.h
-    engine->RegisterObjectBehaviour("ResourceGroup", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ResourceGroup_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("ResourceGroup", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(ResourceGroup_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // ResourceRef::ResourceRef()=default | File: ../Core/Variant.h
-    engine->RegisterObjectBehaviour("ResourceRef", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ResourceRef_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("ResourceRef", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(ResourceRef_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // ResourceRefList::ResourceRefList()=default | File: ../Core/Variant.h
-    engine->RegisterObjectBehaviour("ResourceRefList", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ResourceRefList_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("ResourceRefList", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(ResourceRefList_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // ScenePassInfo::ScenePassInfo() | Implicitly-declared
-    engine->RegisterObjectBehaviour("ScenePassInfo", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ScenePassInfo_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("ScenePassInfo", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(ScenePassInfo_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // SceneReplicationState::SceneReplicationState() | Implicitly-declared
-    engine->RegisterObjectBehaviour("SceneReplicationState", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(SceneReplicationState_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("SceneReplicationState", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(SceneReplicationState_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // SceneResolver::SceneResolver() | File: ../Scene/SceneResolver.h
-    engine->RegisterObjectBehaviour("SceneResolver", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(SceneResolver_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("SceneResolver", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(SceneResolver_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // ScratchBuffer::ScratchBuffer() | File: ../Graphics/Graphics.h
-    engine->RegisterObjectBehaviour("ScratchBuffer", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ScratchBuffer_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("ScratchBuffer", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(ScratchBuffer_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // ScreenModeParams::ScreenModeParams() | Implicitly-declared
-    engine->RegisterObjectBehaviour("ScreenModeParams", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ScreenModeParams_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("ScreenModeParams", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(ScreenModeParams_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // ShaderParameter::ShaderParameter()=default | File: ../Graphics/ShaderVariation.h
-    engine->RegisterObjectBehaviour("ShaderParameter", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ShaderParameter_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("ShaderParameter", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(ShaderParameter_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // ShadowBatchQueue::ShadowBatchQueue() | Implicitly-declared
-    engine->RegisterObjectBehaviour("ShadowBatchQueue", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ShadowBatchQueue_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("ShadowBatchQueue", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(ShadowBatchQueue_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // SourceBatch::SourceBatch() | File: ../Graphics/Drawable.h
-    engine->RegisterObjectBehaviour("SourceBatch", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(SourceBatch_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("SourceBatch", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(SourceBatch_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // Sphere::Sphere() noexcept | File: ../Math/Sphere.h
-    engine->RegisterObjectBehaviour("Sphere", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(Sphere_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("Sphere", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(Sphere_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // Spline::Spline() | File: ../Core/Spline.h
-    engine->RegisterObjectBehaviour("Spline", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(Spline_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("Spline", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(Spline_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // StaticModelGeometryData::StaticModelGeometryData() | Implicitly-declared
-    engine->RegisterObjectBehaviour("StaticModelGeometryData", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(StaticModelGeometryData_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("StaticModelGeometryData", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(StaticModelGeometryData_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // StoredLogMessage::StoredLogMessage()=default | File: ../IO/Log.h
-    engine->RegisterObjectBehaviour("StoredLogMessage", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(StoredLogMessage_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("StoredLogMessage", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(StoredLogMessage_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // String::String() noexcept | File: ../Container/Str.h
-    engine->RegisterObjectBehaviour("String", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(String_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("String", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(String_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // StringHash::StringHash() noexcept | File: ../Math/StringHash.h
-    engine->RegisterObjectBehaviour("StringHash", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(StringHash_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("StringHash", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(StringHash_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // TechniqueEntry::TechniqueEntry() noexcept | File: ../Graphics/Material.h
-    engine->RegisterObjectBehaviour("TechniqueEntry", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(TechniqueEntry_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("TechniqueEntry", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(TechniqueEntry_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // Timer::Timer() | File: ../Core/Timer.h
-    engine->RegisterObjectBehaviour("Timer", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(Timer_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("Timer", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(Timer_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // TrailPoint::TrailPoint()=default | File: ../Graphics/RibbonTrail.h
-    engine->RegisterObjectBehaviour("TrailPoint", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(TrailPoint_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("TrailPoint", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(TrailPoint_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // UIBatch::UIBatch() | File: ../UI/UIBatch.h
-    engine->RegisterObjectBehaviour("UIBatch", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(UIBatch_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("UIBatch", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(UIBatch_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // VAnimEventFrame::VAnimEventFrame() | Implicitly-declared
-    engine->RegisterObjectBehaviour("VAnimEventFrame", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(VAnimEventFrame_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("VAnimEventFrame", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(VAnimEventFrame_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // VAnimKeyFrame::VAnimKeyFrame() | Implicitly-declared
-    engine->RegisterObjectBehaviour("VAnimKeyFrame", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(VAnimKeyFrame_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("VAnimKeyFrame", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(VAnimKeyFrame_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // Variant::Variant()=default | File: ../Core/Variant.h
-    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(Variant_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(Variant_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // Vector2::Vector2() noexcept | File: ../Math/Vector2.h
-    engine->RegisterObjectBehaviour("Vector2", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(Vector2_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("Vector2", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(Vector2_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // Vector3::Vector3() noexcept | File: ../Math/Vector3.h
-    engine->RegisterObjectBehaviour("Vector3", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(Vector3_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("Vector3", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(Vector3_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // Vector4::Vector4() noexcept | File: ../Math/Vector4.h
-    engine->RegisterObjectBehaviour("Vector4", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(Vector4_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("Vector4", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(Vector4_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // VectorBase::VectorBase() noexcept | File: ../Container/VectorBase.h
-    engine->RegisterObjectBehaviour("VectorBase", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(VectorBase_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("VectorBase", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(VectorBase_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // VectorBuffer::VectorBuffer() | File: ../IO/VectorBuffer.h
-    engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(VectorBuffer_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(VectorBuffer_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // VertexBufferDesc::VertexBufferDesc() | Implicitly-declared
-    engine->RegisterObjectBehaviour("VertexBufferDesc", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(VertexBufferDesc_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("VertexBufferDesc", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(VertexBufferDesc_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // VertexBufferMorph::VertexBufferMorph() | Implicitly-declared
-    engine->RegisterObjectBehaviour("VertexBufferMorph", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(VertexBufferMorph_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("VertexBufferMorph", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(VertexBufferMorph_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // VertexElement::VertexElement() noexcept | File: ../Graphics/GraphicsDefs.h
-    engine->RegisterObjectBehaviour("VertexElement", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(VertexElement_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("VertexElement", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(VertexElement_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // WindowModeParams::WindowModeParams() | Implicitly-declared
-    engine->RegisterObjectBehaviour("WindowModeParams", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(WindowModeParams_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("WindowModeParams", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(WindowModeParams_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // XMLElement::XMLElement() | File: ../Resource/XMLElement.h
-    engine->RegisterObjectBehaviour("XMLElement", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(XMLElement_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("XMLElement", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(XMLElement_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // XPathQuery::XPathQuery() | File: ../Resource/XMLElement.h
-    engine->RegisterObjectBehaviour("XPathQuery", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(XPathQuery_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("XPathQuery", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(XPathQuery_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // XPathResultSet::XPathResultSet() | File: ../Resource/XMLElement.h
-    engine->RegisterObjectBehaviour("XPathResultSet", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(XPathResultSet_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("XPathResultSet", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(XPathResultSet_Constructor), AS_CALL_CDECL_OBJFIRST);
 
 #ifdef URHO3D_NAVIGATION
     // NavAreaStub::NavAreaStub() | Implicitly-declared
-    engine->RegisterObjectBehaviour("NavAreaStub", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(NavAreaStub_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("NavAreaStub", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(NavAreaStub_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // NavBuildData::NavBuildData() | File: ../Navigation/NavBuildData.h
-    engine->RegisterObjectBehaviour("NavBuildData", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(NavBuildData_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("NavBuildData", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(NavBuildData_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // NavigationGeometryInfo::NavigationGeometryInfo() | Implicitly-declared
-    engine->RegisterObjectBehaviour("NavigationGeometryInfo", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(NavigationGeometryInfo_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("NavigationGeometryInfo", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(NavigationGeometryInfo_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // NavigationPathPoint::NavigationPathPoint() | Implicitly-declared
-    engine->RegisterObjectBehaviour("NavigationPathPoint", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(NavigationPathPoint_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("NavigationPathPoint", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(NavigationPathPoint_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // SimpleNavBuildData::SimpleNavBuildData() | File: ../Navigation/NavBuildData.h
-    engine->RegisterObjectBehaviour("SimpleNavBuildData", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(SimpleNavBuildData_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("SimpleNavBuildData", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(SimpleNavBuildData_Constructor), AS_CALL_CDECL_OBJFIRST);
 #endif
 
 #ifdef URHO3D_NETWORK
     // PackageDownload::PackageDownload() | File: ../Network/Connection.h
-    engine->RegisterObjectBehaviour("PackageDownload", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(PackageDownload_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("PackageDownload", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(PackageDownload_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // PackageUpload::PackageUpload() | File: ../Network/Connection.h
-    engine->RegisterObjectBehaviour("PackageUpload", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(PackageUpload_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("PackageUpload", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(PackageUpload_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // RemoteEvent::RemoteEvent() | Implicitly-declared
-    engine->RegisterObjectBehaviour("RemoteEvent", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(RemoteEvent_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("RemoteEvent", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(RemoteEvent_Constructor), AS_CALL_CDECL_OBJFIRST);
 #endif
 
 #ifdef URHO3D_PHYSICS
     // DelayedWorldTransform::DelayedWorldTransform() | Implicitly-declared
-    engine->RegisterObjectBehaviour("DelayedWorldTransform", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(DelayedWorldTransform_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("DelayedWorldTransform", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(DelayedWorldTransform_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // ManifoldPair::ManifoldPair() | File: ../Physics/PhysicsWorld.h
-    engine->RegisterObjectBehaviour("ManifoldPair", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ManifoldPair_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("ManifoldPair", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(ManifoldPair_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // PhysicsRaycastResult::PhysicsRaycastResult() | Implicitly-declared
-    engine->RegisterObjectBehaviour("PhysicsRaycastResult", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(PhysicsRaycastResult_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("PhysicsRaycastResult", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(PhysicsRaycastResult_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // PhysicsWorldConfig::PhysicsWorldConfig() | File: ../Physics/PhysicsWorld.h
-    engine->RegisterObjectBehaviour("PhysicsWorldConfig", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(PhysicsWorldConfig_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("PhysicsWorldConfig", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(PhysicsWorldConfig_Constructor), AS_CALL_CDECL_OBJFIRST);
 #endif
 
 #ifdef URHO3D_URHO2D
     // DelayedWorldTransform2D::DelayedWorldTransform2D() | Implicitly-declared
-    engine->RegisterObjectBehaviour("DelayedWorldTransform2D", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(DelayedWorldTransform2D_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("DelayedWorldTransform2D", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(DelayedWorldTransform2D_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // Particle2D::Particle2D() | Implicitly-declared
-    engine->RegisterObjectBehaviour("Particle2D", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(Particle2D_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("Particle2D", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(Particle2D_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // PhysicsRaycastResult2D::PhysicsRaycastResult2D() | Implicitly-declared
-    engine->RegisterObjectBehaviour("PhysicsRaycastResult2D", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(PhysicsRaycastResult2D_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("PhysicsRaycastResult2D", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(PhysicsRaycastResult2D_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // SourceBatch2D::SourceBatch2D() | File: ../Urho2D/Drawable2D.h
-    engine->RegisterObjectBehaviour("SourceBatch2D", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(SourceBatch2D_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("SourceBatch2D", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(SourceBatch2D_Constructor), AS_CALL_CDECL_OBJFIRST);
 
     // Vertex2D::Vertex2D() | Implicitly-declared
-    engine->RegisterObjectBehaviour("Vertex2D", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(Vertex2D_Constructor), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("Vertex2D", asBEHAVE_CONSTRUCT, "void f()", AS_FUNCTION_OBJFIRST(Vertex2D_Constructor), AS_CALL_CDECL_OBJFIRST);
 #endif
 }
 

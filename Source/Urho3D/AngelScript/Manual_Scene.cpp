@@ -65,12 +65,12 @@ void ASRegisterManualLast_Scene(asIScriptEngine* engine)
 {
 #ifdef URHO3D_PHYSICS
     // template<class T> T * Node::GetComponent(bool recursive=false) const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "PhysicsWorld@+ get_physicsWorld() const", asFUNCTION(SceneGetPhysicsWorld), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Scene", "PhysicsWorld@+ get_physicsWorld() const", AS_FUNCTION_OBJLAST(SceneGetPhysicsWorld), AS_CALL_CDECL_OBJLAST);
 #endif
 
 #ifdef URHO3D_URHO2D
     // template<class T> T * Node::GetComponent(bool recursive=false) const | File: ../Scene/Node.h
-    engine->RegisterObjectMethod("Scene", "PhysicsWorld2D@+ get_physicsWorld2D() const", asFUNCTION(SceneGetPhysicsWorld2D), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Scene", "PhysicsWorld2D@+ get_physicsWorld2D() const", AS_FUNCTION_OBJLAST(SceneGetPhysicsWorld2D), AS_CALL_CDECL_OBJLAST);
 #endif
 }
 
