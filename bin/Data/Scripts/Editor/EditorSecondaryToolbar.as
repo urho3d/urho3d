@@ -10,9 +10,9 @@ void CreateSecondaryToolBar()
     secondaryToolBar.layoutSpacing = 4;
     secondaryToolBar.layoutBorder = IntRect(4, 4, 4, 4);
     secondaryToolBar.opacity = uiMaxOpacity;
-    secondaryToolBar.SetFixedSize(28, graphics.height);
+    secondaryToolBar.SetFixedSize(28, graphics.height / ui.scale);
     secondaryToolBar.SetPosition(0, uiMenuBar.height+40);
-    secondaryToolBar.SetFixedHeight(graphics.height);
+    secondaryToolBar.SetFixedHeight(graphics.height / ui.scale);
 
     Button@ b = CreateSmallToolBarButton("Node", "Replicated Node");
     secondaryToolBar.AddChild(b);

@@ -314,6 +314,8 @@ bool Raycast(float maxDistance, Vector3& hitPos, Drawable@& hitDrawable)
     if (!ui.cursor.visible || ui.GetElementAt(pos, true) !is null)
         return false;
 
+    pos = ui.ConvertUIToSystem(ui.cursorPosition);
+
     Camera@ camera = cameraNode.GetComponent("Camera");
     Ray cameraRay = camera.GetScreenRay(float(pos.x) / graphics.width, float(pos.y) / graphics.height);
     // Pick only geometry objects, not eg. zones or lights, only get the first (closest) hit

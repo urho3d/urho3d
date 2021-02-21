@@ -114,13 +114,13 @@ void CreateUI()
 void ResizeUI()
 {
     // Resize menu bar
-    uiMenuBar.SetFixedWidth(graphics.width);
+    uiMenuBar.SetFixedWidth(graphics.width / ui.scale);
 
     // Resize tool bar
-    toolBar.SetFixedWidth(graphics.width);
+    toolBar.SetFixedWidth(graphics.width / ui.scale);
 
     // Resize secondary tool bar
-    secondaryToolBar.SetFixedHeight(graphics.height);
+    secondaryToolBar.SetFixedHeight(graphics.height / ui.scale);
 
     // Relayout windows
     Array<UIElement@> children = ui.root.GetChildren();
@@ -133,8 +133,8 @@ void ResizeUI()
     // Relayout root UI element
     editorUIElement.SetSize(graphics.width, graphics.height);
 
-    // Set new viewport area and reset the viewport layout
-    viewportArea = IntRect(0, 0, graphics.width, graphics.height);
+    // Set new viewport area and reset the viewport layout. Note: viewportArea is in scaled UI position.
+    viewportArea = IntRect(0, 0, graphics.width / ui.scale, graphics.height / ui.scale);
     SetViewportMode(viewportMode);
 }
 
@@ -320,7 +320,7 @@ void CreateMenuBar()
     uiMenuBar.style = "EditorMenuBar";
     uiMenuBar.SetLayout(LM_HORIZONTAL);
     uiMenuBar.opacity = uiMaxOpacity;
-    uiMenuBar.SetFixedWidth(graphics.width);
+    uiMenuBar.SetFixedWidth(graphics.width / ui.scale);
 
     {
         Menu@ menu = CreateMenu("File");

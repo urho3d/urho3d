@@ -123,7 +123,11 @@ static void JSCanvasSize(int width, int height, bool fullscreen, float scale)
             if (cursor)
             {
                 cursor->SetVisible(uiCursorVisible);
-                cursor->SetPosition(input->GetMousePosition());
+
+                IntVector2 pos = input->GetMousePosition();
+                pos = ui->ConvertSystemToUI(pos);
+
+                cursor->SetPosition(pos);
             }
         }
     }

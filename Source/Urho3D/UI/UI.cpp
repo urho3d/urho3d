@@ -382,8 +382,7 @@ void UI::Update(float timeStep)
     {
         TouchState* touch = input->GetTouch(i);
         IntVector2 touchPos = touch->position_;
-        touchPos.x_ = (int)(touchPos.x_ / uiScale_);
-        touchPos.y_ = (int)(touchPos.y_ / uiScale_);
+        touchPos = ConvertSystemToUI(touchPos);
         ProcessHover(touchPos, MakeTouchIDMask(touch->touchID_), QUAL_NONE, nullptr);
     }
 
@@ -769,9 +768,9 @@ void UI::SetCustomSize(int width, int height)
 IntVector2 UI::GetCursorPosition() const
 {
     if (cursor_)
-        return ConvertUIToSystem(cursor_->GetPosition());
+        return cursor_->GetPosition();
 
-    return GetSubsystem<Input>()->GetMousePosition();
+    return ConvertSystemToUI(GetSubsystem<Input>()->GetMousePosition());
 }
 
 UIElement* UI::GetElementAt(const IntVector2& position, bool enabledOnly, IntVector2* elementScreenPosition)
@@ -1315,11 +1314,17 @@ void UI::GetCursorPositionAndVisible(IntVector2& pos, bool& visible)
     else
     {
         auto* input = GetSubsystem<Input>();
-        pos = input->GetMousePosition();
         visible = input->IsMouseVisible();
 
         if (!visible && cursor_)
+        {
             pos = cursor_->GetPosition();
+        }
+        else
+        {
+            pos = input->GetMousePosition();
+            pos = ConvertSystemToUI(pos);
+        }
     }
 }
 
@@ -1886,8 +1891,7 @@ void UI::HandleTouchBegin(StringHash eventType, VariantMap& eventData)
     using namespace TouchBegin;
 
     IntVector2 pos(eventData[P_X].GetInt(), eventData[P_Y].GetInt());
-    pos.x_ = int(pos.x_ / uiScale_);
-    pos.y_ = int(pos.y_ / uiScale_);
+    pos = ConvertSystemToUI(pos);
     usingTouchInput_ = true;
 
     const MouseButton touchId = MakeTouchIDMask(eventData[P_TOUCHID].GetInt());
@@ -1907,8 +1911,7 @@ void UI::HandleTouchEnd(StringHash eventType, VariantMap& eventData)
     using namespace TouchEnd;
 
     IntVector2 pos(eventData[P_X].GetInt(), eventData[P_Y].GetInt());
-    pos.x_ = int(pos.x_ / uiScale_);
-    pos.y_ = int(pos.y_ / uiScale_);
+    pos = ConvertSystemToUI(pos);
 
     // Get the touch index
     const MouseButton touchId = MakeTouchIDMask(eventData[P_TOUCHID].GetInt());
@@ -1938,10 +1941,8 @@ void UI::HandleTouchMove(StringHash eventType, VariantMap& eventData)
 
     IntVector2 pos(eventData[P_X].GetInt(), eventData[P_Y].GetInt());
     IntVector2 deltaPos(eventData[P_DX].GetInt(), eventData[P_DY].GetInt());
-    pos.x_ = int(pos.x_ / uiScale_);
-    pos.y_ = int(pos.y_ / uiScale_);
-    deltaPos.x_ = int(deltaPos.x_ / uiScale_);
-    deltaPos.y_ = int(deltaPos.y_ / uiScale_);
+    pos = ConvertSystemToUI(pos);
+    deltaPos = ConvertSystemToUI(deltaPos);
     usingTouchInput_ = true;
 
     const MouseButton touchId = MakeTouchIDMask(eventData[P_TOUCHID].GetInt());
@@ -2061,8 +2062,7 @@ void UI::HandleDropFile(StringHash eventType, VariantMap& eventData)
     if (input->IsMouseVisible())
     {
         IntVector2 screenPos = input->GetMousePosition();
-        screenPos.x_ = int(screenPos.x_ / uiScale_);
-        screenPos.y_ = int(screenPos.y_ / uiScale_);
+        screenPos = ConvertSystemToUI(screenPos);
 
         UIElement* element = GetElementAt(screenPos);
 
@@ -2148,8 +2148,8 @@ IntVector2 UI::SumTouchPositions(UI::DragData* dragData, const IntVector2& oldSe
                 if (!ts)
                     break;
                 IntVector2 pos = ts->position_;
-                dragData->sumPos.x_ += (int)(pos.x_ / uiScale_);
-                dragData->sumPos.y_ += (int)(pos.y_ / uiScale_);
+                pos = ConvertSystemToUI(pos);
+                dragData->sumPos += pos;
             }
         }
         sendPos.x_ = dragData->sumPos.x_ / dragData->numDragButtons;
