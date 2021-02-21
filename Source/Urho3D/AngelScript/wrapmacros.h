@@ -24,6 +24,12 @@
 
 #pragma once
 
+// This not works on old versions of VS. All other compilers replace define parameters first (asFUNCTION),
+// and then the define itself (RegisterGlobalFunction), but VS does the opposite.
+// Latest versions of VS requires enable option:
+// https://docs.microsoft.com/en-us/cpp/preprocessor/preprocessor-experimental-overview
+// https://docs.microsoft.com/en-us/cpp/build/reference/experimental-preprocessor
+
 // Only use this file if the portable (wrapped) code has been specifically requested
 #ifdef AS_MAX_PORTABILITY
 

@@ -147,6 +147,7 @@ cmake_dependent_option (IOS "Setup build for iOS platform" FALSE "XCODE" FALSE)
 cmake_dependent_option (TVOS "Setup build for tvOS platform" FALSE "XCODE" FALSE)
 cmake_dependent_option (URHO3D_64BIT "Enable 64-bit build, the default is set based on the native ABI of the chosen compiler toolchain" "${NATIVE_64BIT}" "NOT MSVC AND NOT ANDROID AND NOT (ARM AND NOT IOS) AND NOT WEB AND NOT POWERPC" "${NATIVE_64BIT}")     # Intentionally only enable the option for iOS but not for tvOS as the latter is 64-bit only
 option (URHO3D_ANGELSCRIPT "Enable AngelScript scripting support" TRUE)
+cmake_dependent_option (URHO3D_FORCE_AS_MAX_PORTABILITY "Use generic calling convention for AngelScript on any platform" FALSE "URHO3D_ANGELSCRIPT" FALSE)
 option (URHO3D_IK "Enable inverse kinematics support" TRUE)
 option (URHO3D_LUA "Enable additional Lua scripting support" TRUE)
 option (URHO3D_NAVIGATION "Enable navigation support" TRUE)
@@ -1574,6 +1575,14 @@ macro (setup_executable)
             endif ()
         endif ()
     endif ()
+    
+    # Enable cross platform macros for VS. It is necessary for AS generic wrappers
+    # https://docs.microsoft.com/en-us/cpp/build/reference/zc-preprocessor
+    if (MSVC_VERSION GREATER_EQUAL 1925)
+        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:preprocessor")
+    elseif (MSVC_VERSION GREATER_EQUAL 1915)
+        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /experimental:preprocessor")
+    endif ()
 endmacro ()
 
 # Macro for setting up a library target
@@ -1609,6 +1618,17 @@ macro (setup_library)
             if (XCODE AND DEFINED ENV{CI})
                 set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
                 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
+            endif ()
+        endif ()
+
+        # Enable cross platform macros for VS. It is necessary for AS generic wrappers
+        # https://docs.microsoft.com/en-us/cpp/build/reference/zc-preprocessor
+        # But this cause errors in some third party libs
+        if (MSVC AND ${TARGET_NAME} STREQUAL Urho3D)
+            if (MSVC_VERSION GREATER_EQUAL 1925)
+                set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:preprocessor")
+            elseif (MSVC_VERSION GREATER_EQUAL 1915)
+                set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /experimental:preprocessor")
             endif ()
         endif ()
     elseif (URHO3D_SCP_TO_TARGET)
