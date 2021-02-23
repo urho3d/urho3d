@@ -59,11 +59,11 @@ static Engine* GetEngine()
 void ASRegisterManualLast_Engine(asIScriptEngine* engine)
 {
     // template<class T> T * Object::GetSubsystem() const | File: ../Core/Object.h
-    engine->RegisterGlobalFunction("Console@+ get_console()", asFUNCTION(GetConsole), asCALL_CDECL);
+    engine->RegisterGlobalFunction("Console@+ get_console()", AS_FUNCTION(GetConsole), AS_CALL_CDECL);
     // template<class T> T * Object::GetSubsystem() const | File: ../Core/Object.h
-    engine->RegisterGlobalFunction("DebugHud@+ get_debugHud()", asFUNCTION(GetDebugHud), asCALL_CDECL);
+    engine->RegisterGlobalFunction("DebugHud@+ get_debugHud()", AS_FUNCTION(GetDebugHud), AS_CALL_CDECL);
     // template<class T> T * Object::GetSubsystem() const | File: ../Core/Object.h
-    engine->RegisterGlobalFunction("Engine@+ get_engine()", asFUNCTION(GetEngine), asCALL_CDECL);
+    engine->RegisterGlobalFunction("Engine@+ get_engine()", AS_FUNCTION(GetEngine), AS_CALL_CDECL);
 }
 
 }

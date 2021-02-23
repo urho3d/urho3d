@@ -103,21 +103,21 @@ static Octree* GetOctree()
 // This function is called after ASRegisterGenerated()
 void ASRegisterManualLast_Graphics(asIScriptEngine* engine)
 {
-    engine->RegisterObjectMethod("StaticModel", "void SetModel(Model@+)", asFUNCTION(StaticModelSetModel), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("StaticModel", "void set_model(Model@+)", asFUNCTION(StaticModelSetModel), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Skybox", "void SetModel(Model@+)", asFUNCTION(StaticModelSetModel), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Skybox", "void set_model(Model@+)", asFUNCTION(StaticModelSetModel), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("StaticModelGroup", "void SetModel(Model@+)", asFUNCTION(StaticModelSetModel), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("StaticModelGroup", "void set_model(Model@+)", asFUNCTION(StaticModelSetModel), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("StaticModel", "void SetModel(Model@+)", AS_FUNCTION_OBJLAST(StaticModelSetModel), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("StaticModel", "void set_model(Model@+)", AS_FUNCTION_OBJLAST(StaticModelSetModel), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Skybox", "void SetModel(Model@+)", AS_FUNCTION_OBJLAST(StaticModelSetModel), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Skybox", "void set_model(Model@+)", AS_FUNCTION_OBJLAST(StaticModelSetModel), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("StaticModelGroup", "void SetModel(Model@+)", AS_FUNCTION_OBJLAST(StaticModelSetModel), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("StaticModelGroup", "void set_model(Model@+)", AS_FUNCTION_OBJLAST(StaticModelSetModel), AS_CALL_CDECL_OBJLAST);
 
     // template<class T> T * Object::GetSubsystem() const | File: ../Core/Object.h
-    engine->RegisterGlobalFunction("Graphics@+ get_graphics()", asFUNCTION(GetGraphics), asCALL_CDECL);
+    engine->RegisterGlobalFunction("Graphics@+ get_graphics()", AS_FUNCTION(GetGraphics), AS_CALL_CDECL);
     // template<class T> T * Object::GetSubsystem() const | File: ../Core/Object.h
-    engine->RegisterGlobalFunction("Renderer@+ get_renderer()", asFUNCTION(GetRenderer), asCALL_CDECL);
+    engine->RegisterGlobalFunction("Renderer@+ get_renderer()", AS_FUNCTION(GetRenderer), AS_CALL_CDECL);
     // template<class T> T * Object::GetSubsystem() const | File: ../Core/Object.h
-    engine->RegisterGlobalFunction("DebugRenderer@+ get_debugRenderer()", asFUNCTION(GetDebugRenderer), asCALL_CDECL);
+    engine->RegisterGlobalFunction("DebugRenderer@+ get_debugRenderer()", AS_FUNCTION(GetDebugRenderer), AS_CALL_CDECL);
     // template<class T> T * Object::GetSubsystem() const | File: ../Core/Object.h
-    engine->RegisterGlobalFunction("Octree@+ get_octree()", asFUNCTION(GetOctree), asCALL_CDECL);
+    engine->RegisterGlobalFunction("Octree@+ get_octree()", AS_FUNCTION(GetOctree), AS_CALL_CDECL);
 }
 
 // ========================================================================================

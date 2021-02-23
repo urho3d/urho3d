@@ -36,9 +36,9 @@ VectorBuffer DeserializerReadVectorBuffer(unsigned size, Deserializer* ptr);
 
 #define REGISTER_MANUAL_PART_Deserializer(T, className) \
     /* virtual unsigned Deserializer::Read(void *dest, unsigned size)=0 | File: ../IO/Deserializer.h */ \
-    engine->RegisterObjectMethod(className, "Array<uint8>@ Read(uint)", asFUNCTION(DeserializerRead), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "Array<uint8>@ Read(uint)", AS_FUNCTION_OBJLAST(DeserializerRead), AS_CALL_CDECL_OBJLAST); \
     /* VectorBuffer(Deserializer& source, unsigned size) | File: ../IO/VectorBuffer.h */ \
-    engine->RegisterObjectMethod(className, "VectorBuffer ReadVectorBuffer(uint)", asFUNCTION(DeserializerReadVectorBuffer), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "VectorBuffer ReadVectorBuffer(uint)", AS_FUNCTION_OBJLAST(DeserializerReadVectorBuffer), AS_CALL_CDECL_OBJLAST);
 
 // ================================================================================
 
@@ -49,9 +49,9 @@ bool SerializerWriteVectorBuffer(VectorBuffer* src, Serializer* ptr);
 
 #define REGISTER_MANUAL_PART_Serializer(T, className) \
     /* virtual unsigned Serializer::Write(const void *data, unsigned size)=0 | File: ../IO/Serializer.h */ \
-    engine->RegisterObjectMethod(className, "uint Write(Array<uint8>@+)", asFUNCTION(SerializerWrite), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "uint Write(Array<uint8>@+)", AS_FUNCTION_OBJLAST(SerializerWrite), AS_CALL_CDECL_OBJLAST); \
     /* virtual unsigned Serializer::Write(const void *data, unsigned size)=0 | File: ../IO/Serializer.h */ \
-    engine->RegisterObjectMethod(className, "bool WriteVectorBuffer(const VectorBuffer&in)", asFUNCTION(SerializerWriteVectorBuffer), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "bool WriteVectorBuffer(const VectorBuffer&in)", AS_FUNCTION_OBJLAST(SerializerWriteVectorBuffer), AS_CALL_CDECL_OBJLAST);
 
 // ================================================================================
 
@@ -60,6 +60,6 @@ CScriptArray* FileSystemScanDir(const String& pathName, const String& filter, un
 
 #define REGISTER_MANUAL_PART_FileSystem(T, className) \
     /* void FileSystem::ScanDir(Vector< String > &result, const String &pathName, const String &filter, unsigned flags, bool recursive) const | File: ../IO/FileSystem.h */ \
-    engine->RegisterObjectMethod(className, "Array<String>@ ScanDir(const String&in, const String&in, uint, bool) const", asFUNCTION(FileSystemScanDir), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "Array<String>@ ScanDir(const String&in, const String&in, uint, bool) const", AS_FUNCTION_OBJLAST(FileSystemScanDir), AS_CALL_CDECL_OBJLAST);
 
 }

@@ -40,7 +40,7 @@ namespace Urho3D
 const AttributeInfo& SerializableGetAttributeInfo(unsigned index, Serializable* ptr);
 
 #define REGISTER_MANUAL_PART_Serializable(T, className) \
-    engine->RegisterObjectMethod(className, "const AttributeInfo& get_attributeInfos(uint) const", asFUNCTION(SerializableGetAttributeInfo), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "const AttributeInfo& get_attributeInfos(uint) const", AS_FUNCTION_OBJLAST(SerializableGetAttributeInfo), AS_CALL_CDECL_OBJLAST);
 
 // ========================================================================================
 
@@ -76,44 +76,44 @@ Component* NodeGetComponent(unsigned index, Node* ptr);
 #define REGISTER_MANUAL_PART_Node(T, className) \
     RegisterNamedObjectConstructor<T>(engine, className); \
     /* bool Node::SaveXML(Serializer &dest, const String &indentation="\t") const | File: ../Scene/Node.h */ \
-    engine->RegisterObjectMethod(className, "bool SaveXML(File@+, const String&in indentation = \"\t\")", asFUNCTION(NodeSaveXML), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "bool SaveXML(File@+, const String&in indentation = \"\t\")", AS_FUNCTION_OBJLAST(NodeSaveXML), AS_CALL_CDECL_OBJLAST); \
     /* bool Node::SaveXML(Serializer &dest, const String &indentation="\t") const | File: ../Scene/Node.h */ \
-    engine->RegisterObjectMethod(className, "bool SaveXML(VectorBuffer&, const String&in indentation = \"\t\")", asFUNCTION(NodeSaveXMLVectorBuffer), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "bool SaveXML(VectorBuffer&, const String&in indentation = \"\t\")", AS_FUNCTION_OBJLAST(NodeSaveXMLVectorBuffer), AS_CALL_CDECL_OBJLAST); \
     /* bool Node::SaveJSON(Serializer &dest, const String &indentation="\t") const | File: ../Scene/Node.h */ \
-    engine->RegisterObjectMethod(className, "bool SaveJSON(File@+)", asFUNCTION(NodeSaveJSON), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "bool SaveJSON(File@+)", AS_FUNCTION_OBJLAST(NodeSaveJSON), AS_CALL_CDECL_OBJLAST); \
     /* bool Node::SaveJSON(Serializer &dest, const String &indentation="\t") const | File: ../Scene/Node.h */ \
-    engine->RegisterObjectMethod(className, "bool SaveJSON(VectorBuffer&)", asFUNCTION(NodeSaveJSONVectorBuffer), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "bool SaveJSON(VectorBuffer&)", AS_FUNCTION_OBJLAST(NodeSaveJSONVectorBuffer), AS_CALL_CDECL_OBJLAST); \
     /* template<class T> void Node::GetChildrenWithComponent(PODVector< Node * > &dest, bool recursive=false) const | File: ../Scene/Node.h */ \
-    engine->RegisterObjectMethod(className, "Array<Node@>@ GetChildrenWithScript(bool recursive = false) const", asFUNCTION(NodeGetChildrenWithScript), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "Array<Node@>@ GetChildrenWithScript(bool recursive = false) const", AS_FUNCTION_OBJLAST(NodeGetChildrenWithScript), AS_CALL_CDECL_OBJLAST); \
     /* template<class T> void Node::GetChildrenWithComponent(PODVector< Node * > &dest, bool recursive=false) const | File: ../Scene/Node.h */ \
-    engine->RegisterObjectMethod(className, "Array<Node@>@ GetChildrenWithScript(const String&in, bool recursive = false) const", asFUNCTION(NodeGetChildrenWithClassName), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "Array<Node@>@ GetChildrenWithScript(const String&in, bool recursive = false) const", AS_FUNCTION_OBJLAST(NodeGetChildrenWithClassName), AS_CALL_CDECL_OBJLAST); \
     /* void Node::GetComponents(PODVector< Component * > &dest, StringHash type, bool recursive=false) const | File: ../Scene/Node.h */ \
-    engine->RegisterObjectMethod(className, "Array<Component@>@ GetComponents(const String&in, bool recursive = false) const", asFUNCTION(NodeGetComponentsWithType), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "Array<Component@>@ GetComponents(const String&in, bool recursive = false) const", AS_FUNCTION_OBJLAST(NodeGetComponentsWithType), AS_CALL_CDECL_OBJLAST); \
     /* unsigned Node::GetNumChildren(bool recursive=false) const | File: ../Scene/Node.h */ \
-    engine->RegisterObjectMethod(className, "uint get_numChildren() const", asFUNCTION(NodeGetNumChildrenNonRecursive), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "uint get_numChildren() const", AS_FUNCTION_OBJLAST(NodeGetNumChildrenNonRecursive), AS_CALL_CDECL_OBJLAST); \
     /* unsigned Node::GetNumChildren(bool recursive=false) const | File: ../Scene/Node.h */ \
-    engine->RegisterObjectMethod(className, "uint get_numAllChildren() const", asFUNCTION(NodeGetNumChildrenRecursive), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "uint get_numAllChildren() const", AS_FUNCTION_OBJLAST(NodeGetNumChildrenRecursive), AS_CALL_CDECL_OBJLAST); \
     /* Node* Node::GetChild(unsigned index) const | File: ../Scene/Node.h */ \
-    engine->RegisterObjectMethod(className, "Node@+ get_children(uint) const", asFUNCTION(NodeGetChild), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "Node@+ get_children(uint) const", AS_FUNCTION_OBJLAST(NodeGetChild), AS_CALL_CDECL_OBJLAST); \
     /* Node* Node::GetChild(const String &name, bool recursive=false) const | File: ../Scene/Node.h */ \
-    engine->RegisterObjectMethod(className, "Node@+ get_childrenByName(const String&in) const", asFUNCTION(NodeGetChildByName), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "Node@+ get_childrenByName(const String&in) const", AS_FUNCTION_OBJLAST(NodeGetChildByName), AS_CALL_CDECL_OBJLAST); \
     /* Node* Node::GetChild(const String &name, bool recursive=false) const | File: ../Scene/Node.h */ \
-    engine->RegisterObjectMethod(className, "Node@+ get_allChildrenByName(const String&in) const", asFUNCTION(NodeGetChildByNameRecursive), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "Node@+ get_allChildrenByName(const String&in) const", AS_FUNCTION_OBJLAST(NodeGetChildByNameRecursive), AS_CALL_CDECL_OBJLAST); \
     /* const Vector<SharedPtr<Component> >& Node::GetComponents() const | File: ../Scene/Node.h */ \
-    engine->RegisterObjectMethod(className, "Component@+ get_components(uint) const", asFUNCTION(NodeGetComponent), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "Component@+ get_components(uint) const", AS_FUNCTION_OBJLAST(NodeGetComponent), AS_CALL_CDECL_OBJLAST); \
     /* const VariantMap& Node::GetVars() const | File: ../Scene/Node.h */ \
-    engine->RegisterObjectMethod(className, "VariantMap& get_vars()", asFUNCTION(NodeGetVars), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "VariantMap& get_vars()", AS_FUNCTION_OBJLAST(NodeGetVars), AS_CALL_CDECL_OBJLAST); \
     /* Workarounds for Connection that used outside URHO3D_NETWORK define */ \
     if (URHO3D_NETWORK_DEFINED) \
     { \
         /* void Node::SetOwner(Connection* owner) | File: ../Scene/Node.h */ \
-        engine->RegisterObjectMethod(className, "void SetOwner(Connection@+)", asMETHODPR(T, SetOwner, (Connection*), void), asCALL_THISCALL); \
-        engine->RegisterObjectMethod(className, "void set_owner(Connection@+)", asMETHODPR(T, SetOwner, (Connection*), void), asCALL_THISCALL); \
+        engine->RegisterObjectMethod(className, "void SetOwner(Connection@+)", AS_METHOD(T, SetOwner), AS_CALL_THISCALL); \
+        engine->RegisterObjectMethod(className, "void set_owner(Connection@+)", AS_METHOD(T, SetOwner), AS_CALL_THISCALL); \
         /* Connection* Node::GetOwner() const | File: ../Scene/Node.h */ \
-        engine->RegisterObjectMethod(className, "Connection@+ GetOwner() const", asMETHODPR(T, GetOwner, () const, Connection*), asCALL_THISCALL); \
-        engine->RegisterObjectMethod(className, "Connection@+ get_owner() const", asMETHODPR(T, GetOwner, () const, Connection*), asCALL_THISCALL); \
+        engine->RegisterObjectMethod(className, "Connection@+ GetOwner() const", AS_METHOD(T, GetOwner), AS_CALL_THISCALL); \
+        engine->RegisterObjectMethod(className, "Connection@+ get_owner() const", AS_METHOD(T, GetOwner), AS_CALL_THISCALL); \
         /* void Node::CleanupConnection(Connection* connection) | File: ../Scene/Node.h */ \
-        engine->RegisterObjectMethod(className, "void CleanupConnection(Connection@+)", asMETHODPR(T, CleanupConnection, (Connection*), void), asCALL_THISCALL); \
+        engine->RegisterObjectMethod(className, "void CleanupConnection(Connection@+)", AS_METHOD(T, CleanupConnection), AS_CALL_THISCALL); \
     }
 
 // ========================================================================================
@@ -151,44 +151,44 @@ Octree* SceneGetOctree(Scene* ptr);
 
 #define REGISTER_MANUAL_PART_Scene(T, className) \
     /* bool Scene::LoadXML(Deserializer &source) | File: ../Scene/Scene.h */ \
-    engine->RegisterObjectMethod(className, "bool LoadXML(File@+)", asFUNCTION(SceneLoadXML), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "bool LoadXML(File@+)", AS_FUNCTION_OBJLAST(SceneLoadXML), AS_CALL_CDECL_OBJLAST); \
     /* bool Scene::LoadXML(Deserializer &source) | File: ../Scene/Scene.h */ \
-    engine->RegisterObjectMethod(className, "bool LoadXML(VectorBuffer&)", asFUNCTION(SceneLoadXMLVectorBuffer), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "bool LoadXML(VectorBuffer&)", AS_FUNCTION_OBJLAST(SceneLoadXMLVectorBuffer), AS_CALL_CDECL_OBJLAST); \
     /* bool Scene::LoadJSON(Deserializer &source) | File: ../Scene/Scene.h */ \
-    engine->RegisterObjectMethod(className, "bool LoadJSON(File@+)", asFUNCTION(SceneLoadJSON), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "bool LoadJSON(File@+)", AS_FUNCTION_OBJLAST(SceneLoadJSON), AS_CALL_CDECL_OBJLAST); \
     /* bool Scene::LoadJSON(Deserializer &source) | File: ../Scene/Scene.h */ \
-    engine->RegisterObjectMethod(className, "bool LoadJSON(VectorBuffer&)", asFUNCTION(SceneLoadJSONVectorBuffer), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "bool LoadJSON(VectorBuffer&)", AS_FUNCTION_OBJLAST(SceneLoadJSONVectorBuffer), AS_CALL_CDECL_OBJLAST); \
     /* Node* Scene::Instantiate(Deserializer &source, const Vector3 &position, const Quaternion &rotation, CreateMode mode=REPLICATED) | File: ../Scene/Scene.h */ \
-    engine->RegisterObjectMethod(className, "Node@+ Instantiate(File@+, const Vector3&in, const Quaternion&in, CreateMode mode = REPLICATED)", asFUNCTION(SceneInstantiate), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "Node@+ Instantiate(File@+, const Vector3&in, const Quaternion&in, CreateMode mode = REPLICATED)", AS_FUNCTION_OBJLAST(SceneInstantiate), AS_CALL_CDECL_OBJLAST); \
     /* Node* Scene::Instantiate(Deserializer &source, const Vector3 &position, const Quaternion &rotation, CreateMode mode=REPLICATED) | File: ../Scene/Scene.h */ \
     /* Node* Scene::InstantiateXML(Deserializer &source, const Vector3 &position, const Quaternion &rotation, CreateMode mode=REPLICATED) | File: ../Scene/Scene.h */ \
-    engine->RegisterObjectMethod(className, "Node@+ Instantiate(VectorBuffer&, const Vector3&in, const Quaternion&in, CreateMode mode = REPLICATED)", asFUNCTION(SceneInstantiateVectorBuffer), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "Node@+ Instantiate(VectorBuffer&, const Vector3&in, const Quaternion&in, CreateMode mode = REPLICATED)", AS_FUNCTION_OBJLAST(SceneInstantiateVectorBuffer), AS_CALL_CDECL_OBJLAST); \
     /* Node* Scene::InstantiateXML(Deserializer &source, const Vector3 &position, const Quaternion &rotation, CreateMode mode=REPLICATED) | File: ../Scene/Scene.h */ \
-    engine->RegisterObjectMethod(className, "Node@+ InstantiateXML(File@+, const Vector3&in, const Quaternion&in, CreateMode mode = REPLICATED)", asFUNCTION(SceneInstantiateXML), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "Node@+ InstantiateXML(File@+, const Vector3&in, const Quaternion&in, CreateMode mode = REPLICATED)", AS_FUNCTION_OBJLAST(SceneInstantiateXML), AS_CALL_CDECL_OBJLAST); \
     /* Node* Scene::InstantiateXML(Deserializer &source, const Vector3 &position, const Quaternion &rotation, CreateMode mode=REPLICATED) | File: ../Scene/Scene.h */ \
-    engine->RegisterObjectMethod(className, "Node@+ InstantiateXML(VectorBuffer&, const Vector3&in, const Quaternion&in, CreateMode mode = REPLICATED)", asFUNCTION(SceneInstantiateXMLVectorBuffer), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "Node@+ InstantiateXML(VectorBuffer&, const Vector3&in, const Quaternion&in, CreateMode mode = REPLICATED)", AS_FUNCTION_OBJLAST(SceneInstantiateXMLVectorBuffer), AS_CALL_CDECL_OBJLAST); \
     /* Node* Scene::InstantiateXML(Deserializer &source, const Vector3 &position, const Quaternion &rotation, CreateMode mode=REPLICATED) | File: ../Scene/Scene.h */ \
-    engine->RegisterObjectMethod(className, "Node@+ InstantiateXML(XMLFile@+, const Vector3&in, const Quaternion&in, CreateMode mode = REPLICATED)", asFUNCTION(SceneInstantiateXMLFile), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "Node@+ InstantiateXML(XMLFile@+, const Vector3&in, const Quaternion&in, CreateMode mode = REPLICATED)", AS_FUNCTION_OBJLAST(SceneInstantiateXMLFile), AS_CALL_CDECL_OBJLAST); \
     /* Node* Scene::InstantiateJSON(Deserializer &source, const Vector3 &position, const Quaternion &rotation, CreateMode mode=REPLICATED) | File: ../Scene/Scene.h */ \
-    engine->RegisterObjectMethod(className, "Node@+ InstantiateJSON(File@+, const Vector3&in, const Quaternion&in, CreateMode mode = REPLICATED)", asFUNCTION(SceneInstantiateJSON), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "Node@+ InstantiateJSON(File@+, const Vector3&in, const Quaternion&in, CreateMode mode = REPLICATED)", AS_FUNCTION_OBJLAST(SceneInstantiateJSON), AS_CALL_CDECL_OBJLAST); \
     /* Node* Scene::InstantiateJSON(Deserializer &source, const Vector3 &position, const Quaternion &rotation, CreateMode mode=REPLICATED) | File: ../Scene/Scene.h */ \
-    engine->RegisterObjectMethod(className, "Node@+ InstantiateJSON(VectorBuffer&, const Vector3&in, const Quaternion&in, CreateMode mode = REPLICATED)", asFUNCTION(SceneInstantiateJSONVectorBuffer), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "Node@+ InstantiateJSON(VectorBuffer&, const Vector3&in, const Quaternion&in, CreateMode mode = REPLICATED)", AS_FUNCTION_OBJLAST(SceneInstantiateJSONVectorBuffer), AS_CALL_CDECL_OBJLAST); \
     /* Node* Scene::InstantiateJSON(Deserializer &source, const Vector3 &position, const Quaternion &rotation, CreateMode mode=REPLICATED) | File: ../Scene/Scene.h */ \
-    engine->RegisterObjectMethod(className, "Node@+ InstantiateJSON(JSONFile@+, const Vector3&in, const Quaternion&in, CreateMode mode = REPLICATED)", asFUNCTION(SceneInstantiateJSONFile), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "Node@+ InstantiateJSON(JSONFile@+, const Vector3&in, const Quaternion&in, CreateMode mode = REPLICATED)", AS_FUNCTION_OBJLAST(SceneInstantiateJSONFile), AS_CALL_CDECL_OBJLAST); \
     /* bool Scene::GetNodesWithTag(PODVector< Node * > &dest, const String &tag) const | File: ../Scene/Scene.h */ \
-    engine->RegisterObjectMethod(className, "Array<Node@>@ GetNodesWithTag(const String&in) const", asFUNCTION(SceneGetNodesWithTag), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "Array<Node@>@ GetNodesWithTag(const String&in) const", AS_FUNCTION_OBJLAST(SceneGetNodesWithTag), AS_CALL_CDECL_OBJLAST); \
     /* Component* Node::GetComponent(StringHash type, bool recursive=false) const | File: ../Scene/Scene.h */ \
     /* Workaround Doxygen bug: have no const flag in xml */ \
-    engine->RegisterObjectMethod(className, "Component@+ GetComponent(StringHash, bool = false) const", asMETHODPR(T, GetComponent, (StringHash, bool) const, Component*), asCALL_THISCALL); \
+    engine->RegisterObjectMethod(className, "Component@+ GetComponent(StringHash, bool = false) const", AS_METHODPR(Scene, GetComponent, (StringHash, bool) const, Component*), AS_CALL_THISCALL); \
     /* bool Node::SaveXML(XMLElement &dest) const override | File: ../Scene/Scene.h */ \
     /* Workaround Doxygen bug: have no const flag in xml */ \
-    engine->RegisterObjectMethod(className, "bool SaveXML(XMLElement&) const", asMETHODPR(T, SaveXML, (XMLElement &) const, bool), asCALL_THISCALL); \
+    engine->RegisterObjectMethod(className, "bool SaveXML(XMLElement&) const", AS_METHODPR(Scene, SaveXML, (XMLElement &) const, bool), AS_CALL_THISCALL); \
     /* bool Node::SaveJSON(JSONValue &dest) const override | File: ../Scene/Scene.h */\
     /* Workaround Doxygen bug: have no const flag in xml */ \
-    engine->RegisterObjectMethod(className, "bool SaveJSON(JSONValue&) const", asMETHODPR(T, SaveJSON, (JSONValue &) const, bool), asCALL_THISCALL); \
+    engine->RegisterObjectMethod(className, "bool SaveJSON(JSONValue&) const", AS_METHODPR(Scene, SaveJSON, (JSONValue &) const, bool), AS_CALL_THISCALL); \
     /* template<class T> T * Node::GetComponent(bool recursive=false) const | File: ../Scene/Node.h */ \
-    engine->RegisterObjectMethod(className, "DebugRenderer@+ get_debugRenderer() const", asFUNCTION(SceneGetDebugRenderer), asCALL_CDECL_OBJLAST); \
-    engine->RegisterObjectMethod(className, "Octree@+ get_octree() const", asFUNCTION(SceneGetOctree), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "DebugRenderer@+ get_debugRenderer() const", AS_FUNCTION_OBJLAST(SceneGetDebugRenderer), AS_CALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "Octree@+ get_octree() const", AS_FUNCTION_OBJLAST(SceneGetOctree), AS_CALL_CDECL_OBJLAST);
 
 // ========================================================================================
 
@@ -199,9 +199,9 @@ void BoneSetNode(Node* node, Bone* ptr);
 
 #define REGISTER_MANUAL_PART_Bone(T, className) \
     /* WeakPtr<Node> Bone::node_ | File: ../Graphics/Skeleton.h */ \
-    engine->RegisterObjectMethod(className, "void set_node(Node@+)", asFUNCTION(BoneSetNode), asCALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "void set_node(Node@+)", AS_FUNCTION_OBJLAST(BoneSetNode), AS_CALL_CDECL_OBJLAST); \
     /* WeakPtr<Node> Bone::node_ | File: ../Graphics/Skeleton.h */ \
-    engine->RegisterObjectMethod(className, "Node@+ get_node() const", asFUNCTION(BoneGetNode), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "Node@+ get_node() const", AS_FUNCTION_OBJLAST(BoneGetNode), AS_CALL_CDECL_OBJLAST);
 
 // ========================================================================================
 
@@ -210,7 +210,7 @@ void BoneSetNode(Node* node, Bone* ptr);
     if (URHO3D_NETWORK_DEFINED) \
     { \
         /* void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h */ \
-        engine->RegisterObjectMethod(className, "void CleanupConnection(Connection@+)", asMETHODPR(T, CleanupConnection, (Connection*), void), asCALL_THISCALL); \
+        engine->RegisterObjectMethod(className, "void CleanupConnection(Connection@+)", AS_METHODPR(T, CleanupConnection, (Connection*), void), AS_CALL_THISCALL); \
     }
 
 }

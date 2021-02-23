@@ -170,13 +170,13 @@ void ASRegisterGenerated_Members_I(asIScriptEngine* engine)
 {
 #ifdef URHO3D_IK
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("IKConstraint", asBEHAVE_ADDREF, "void f()", asMETHODPR(IKConstraint, AddRef, (), void), asCALL_THISCALL);
+    engine->RegisterObjectBehaviour("IKConstraint", asBEHAVE_ADDREF, "void f()", AS_METHODPR(IKConstraint, AddRef, (), void), AS_CALL_THISCALL);
     // void Component::AddReplicationState(ComponentReplicationState* state) | File: ../Scene/Component.h
     // Error: type "ComponentReplicationState*" can not automatically bind
     // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKConstraint", "void AllocateNetworkState()", asMETHODPR(IKConstraint, AllocateNetworkState, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void AllocateNetworkState()", AS_METHODPR(IKConstraint, AllocateNetworkState, (), void), AS_CALL_THISCALL);
     // virtual void Serializable::ApplyAttributes() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKConstraint", "void ApplyAttributes()", asMETHODPR(IKConstraint, ApplyAttributes, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void ApplyAttributes()", AS_METHODPR(IKConstraint, ApplyAttributes, (), void), AS_CALL_THISCALL);
     // template<typename T> T* Object::Cast() | File: ../Core/Object.h
     // Not registered because template
     // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
@@ -184,37 +184,37 @@ void ASRegisterGenerated_Members_I(asIScriptEngine* engine)
     // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
     // Not registered because have @manualbind mark
     // virtual void Component::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKConstraint", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(IKConstraint, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void DrawDebugGeometry(DebugRenderer@+, bool)", AS_METHODPR(IKConstraint, DrawDebugGeometry, (DebugRenderer*, bool), void), AS_CALL_THISCALL);
     // bool Animatable::GetAnimationEnabled() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKConstraint", "bool GetAnimationEnabled() const", asMETHODPR(IKConstraint, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKConstraint", "bool get_animationEnabled() const", asMETHODPR(IKConstraint, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "bool GetAnimationEnabled() const", AS_METHODPR(IKConstraint, GetAnimationEnabled, () const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "bool get_animationEnabled() const", AS_METHODPR(IKConstraint, GetAnimationEnabled, () const, bool), AS_CALL_THISCALL);
     // Variant Serializable::GetAttribute(unsigned index) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKConstraint", "Variant GetAttribute(uint) const", asMETHODPR(IKConstraint, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKConstraint", "Variant get_attributes(uint) const", asMETHODPR(IKConstraint, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "Variant GetAttribute(uint) const", AS_METHODPR(IKConstraint, GetAttribute, (unsigned) const, Variant), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "Variant get_attributes(uint) const", AS_METHODPR(IKConstraint, GetAttribute, (unsigned) const, Variant), AS_CALL_THISCALL);
     // Variant Serializable::GetAttribute(const String& name) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKConstraint", "Variant GetAttribute(const String&in) const", asMETHODPR(IKConstraint, GetAttribute, (const String&) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "Variant GetAttribute(const String&in) const", AS_METHODPR(IKConstraint, GetAttribute, (const String&) const, Variant), AS_CALL_THISCALL);
     // ValueAnimation* Animatable::GetAttributeAnimation(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKConstraint", "ValueAnimation@+ GetAttributeAnimation(const String&in) const", asMETHODPR(IKConstraint, GetAttributeAnimation, (const String&) const, ValueAnimation*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "ValueAnimation@+ GetAttributeAnimation(const String&in) const", AS_METHODPR(IKConstraint, GetAttributeAnimation, (const String&) const, ValueAnimation*), AS_CALL_THISCALL);
     // float Animatable::GetAttributeAnimationSpeed(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKConstraint", "float GetAttributeAnimationSpeed(const String&in) const", asMETHODPR(IKConstraint, GetAttributeAnimationSpeed, (const String&) const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "float GetAttributeAnimationSpeed(const String&in) const", AS_METHODPR(IKConstraint, GetAttributeAnimationSpeed, (const String&) const, float), AS_CALL_THISCALL);
     // float Animatable::GetAttributeAnimationTime(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKConstraint", "float GetAttributeAnimationTime(const String&in) const", asMETHODPR(IKConstraint, GetAttributeAnimationTime, (const String&) const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "float GetAttributeAnimationTime(const String&in) const", AS_METHODPR(IKConstraint, GetAttributeAnimationTime, (const String&) const, float), AS_CALL_THISCALL);
     // WrapMode Animatable::GetAttributeAnimationWrapMode(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKConstraint", "WrapMode GetAttributeAnimationWrapMode(const String&in) const", asMETHODPR(IKConstraint, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "WrapMode GetAttributeAnimationWrapMode(const String&in) const", AS_METHODPR(IKConstraint, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), AS_CALL_THISCALL);
     // Variant Serializable::GetAttributeDefault(unsigned index) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKConstraint", "Variant GetAttributeDefault(uint) const", asMETHODPR(IKConstraint, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKConstraint", "Variant get_attributeDefaults(uint) const", asMETHODPR(IKConstraint, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "Variant GetAttributeDefault(uint) const", AS_METHODPR(IKConstraint, GetAttributeDefault, (unsigned) const, Variant), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "Variant get_attributeDefaults(uint) const", AS_METHODPR(IKConstraint, GetAttributeDefault, (unsigned) const, Variant), AS_CALL_THISCALL);
     // Variant Serializable::GetAttributeDefault(const String& name) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKConstraint", "Variant GetAttributeDefault(const String&in) const", asMETHODPR(IKConstraint, GetAttributeDefault, (const String&) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "Variant GetAttributeDefault(const String&in) const", AS_METHODPR(IKConstraint, GetAttributeDefault, (const String&) const, Variant), AS_CALL_THISCALL);
     // virtual const Vector<AttributeInfo>* Serializable::GetAttributes() const | File: ../Scene/Serializable.h
     // Error: type "const Vector<AttributeInfo>*" can not automatically bind
     // bool Object::GetBlockEvents() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKConstraint", "bool GetBlockEvents() const", asMETHODPR(IKConstraint, GetBlockEvents, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "bool GetBlockEvents() const", AS_METHODPR(IKConstraint, GetBlockEvents, () const, bool), AS_CALL_THISCALL);
     // const String& Object::GetCategory() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKConstraint", "const String& GetCategory() const", asMETHODPR(IKConstraint, GetCategory, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKConstraint", "const String& get_category() const", asMETHODPR(IKConstraint, GetCategory, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "const String& GetCategory() const", AS_METHODPR(IKConstraint, GetCategory, () const, const String&), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "const String& get_category() const", AS_METHODPR(IKConstraint, GetCategory, () const, const String&), AS_CALL_THISCALL);
     // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKConstraint", "Component@+ GetComponent(StringHash) const", asMETHODPR(IKConstraint, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "Component@+ GetComponent(StringHash) const", AS_METHODPR(IKConstraint, GetComponent, (StringHash) const, Component*), AS_CALL_THISCALL);
     // template<class T> T* Component::GetComponent() const | File: ../Scene/Component.h
     // Not registered because template
     // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
@@ -226,186 +226,186 @@ void ASRegisterGenerated_Members_I(asIScriptEngine* engine)
     // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
     // Error: type "PODVector<Node*>&" can not automatically bind
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKConstraint", "VariantMap& GetEventDataMap() const", asMETHODPR(IKConstraint, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "VariantMap& GetEventDataMap() const", AS_METHODPR(IKConstraint, GetEventDataMap, () const, VariantMap&), AS_CALL_THISCALL);
     // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
     // Error: type "EventHandler*" can not automatically bind
     // Object* Object::GetEventSender() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKConstraint", "Object@+ GetEventSender() const", asMETHODPR(IKConstraint, GetEventSender, () const, Object*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "Object@+ GetEventSender() const", AS_METHODPR(IKConstraint, GetEventSender, () const, Object*), AS_CALL_THISCALL);
     // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKConstraint", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(IKConstraint, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKConstraint", "const Variant& get_globalVar(StringHash) const", asMETHODPR(IKConstraint, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "const Variant& GetGlobalVar(StringHash) const", AS_METHODPR(IKConstraint, GetGlobalVar, (StringHash) const, const Variant&), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "const Variant& get_globalVar(StringHash) const", AS_METHODPR(IKConstraint, GetGlobalVar, (StringHash) const, const Variant&), AS_CALL_THISCALL);
     // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKConstraint", "const VariantMap& GetGlobalVars() const", asMETHODPR(IKConstraint, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKConstraint", "const VariantMap& get_globalVars() const", asMETHODPR(IKConstraint, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "const VariantMap& GetGlobalVars() const", AS_METHODPR(IKConstraint, GetGlobalVars, () const, const VariantMap&), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "const VariantMap& get_globalVars() const", AS_METHODPR(IKConstraint, GetGlobalVars, () const, const VariantMap&), AS_CALL_THISCALL);
     // unsigned Component::GetID() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKConstraint", "uint GetID() const", asMETHODPR(IKConstraint, GetID, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKConstraint", "uint get_id() const", asMETHODPR(IKConstraint, GetID, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "uint GetID() const", AS_METHODPR(IKConstraint, GetID, () const, unsigned), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "uint get_id() const", AS_METHODPR(IKConstraint, GetID, () const, unsigned), AS_CALL_THISCALL);
     // bool Serializable::GetInterceptNetworkUpdate(const String& attributeName) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKConstraint", "bool GetInterceptNetworkUpdate(const String&in) const", asMETHODPR(IKConstraint, GetInterceptNetworkUpdate, (const String&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "bool GetInterceptNetworkUpdate(const String&in) const", AS_METHODPR(IKConstraint, GetInterceptNetworkUpdate, (const String&) const, bool), AS_CALL_THISCALL);
     // const Vector2& IKConstraint::GetLengthConstraints() const | File: ../IK/IKConstraint.h
-    engine->RegisterObjectMethod("IKConstraint", "const Vector2& GetLengthConstraints() const", asMETHODPR(IKConstraint, GetLengthConstraints, () const, const Vector2&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "const Vector2& GetLengthConstraints() const", AS_METHODPR(IKConstraint, GetLengthConstraints, () const, const Vector2&), AS_CALL_THISCALL);
     // virtual const Vector<AttributeInfo>* Serializable::GetNetworkAttributes() const | File: ../Scene/Serializable.h
     // Error: type "const Vector<AttributeInfo>*" can not automatically bind
     // NetworkState* Serializable::GetNetworkState() const | File: ../Scene/Serializable.h
     // Error: type "NetworkState*" can not automatically bind
     // Node* Component::GetNode() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKConstraint", "Node@+ GetNode() const", asMETHODPR(IKConstraint, GetNode, () const, Node*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKConstraint", "Node@+ get_node() const", asMETHODPR(IKConstraint, GetNode, () const, Node*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "Node@+ GetNode() const", AS_METHODPR(IKConstraint, GetNode, () const, Node*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "Node@+ get_node() const", AS_METHODPR(IKConstraint, GetNode, () const, Node*), AS_CALL_THISCALL);
     // unsigned Serializable::GetNumAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKConstraint", "uint GetNumAttributes() const", asMETHODPR(IKConstraint, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKConstraint", "uint get_numAttributes() const", asMETHODPR(IKConstraint, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "uint GetNumAttributes() const", AS_METHODPR(IKConstraint, GetNumAttributes, () const, unsigned), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "uint get_numAttributes() const", AS_METHODPR(IKConstraint, GetNumAttributes, () const, unsigned), AS_CALL_THISCALL);
     // unsigned Serializable::GetNumNetworkAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKConstraint", "uint GetNumNetworkAttributes() const", asMETHODPR(IKConstraint, GetNumNetworkAttributes, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "uint GetNumNetworkAttributes() const", AS_METHODPR(IKConstraint, GetNumNetworkAttributes, () const, unsigned), AS_CALL_THISCALL);
     // ObjectAnimation* Animatable::GetObjectAnimation() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKConstraint", "ObjectAnimation@+ GetObjectAnimation() const", asMETHODPR(IKConstraint, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKConstraint", "ObjectAnimation@+ get_objectAnimation() const", asMETHODPR(IKConstraint, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "ObjectAnimation@+ GetObjectAnimation() const", AS_METHODPR(IKConstraint, GetObjectAnimation, () const, ObjectAnimation*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "ObjectAnimation@+ get_objectAnimation() const", AS_METHODPR(IKConstraint, GetObjectAnimation, () const, ObjectAnimation*), AS_CALL_THISCALL);
     // ResourceRef Animatable::GetObjectAnimationAttr() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKConstraint", "ResourceRef GetObjectAnimationAttr() const", asMETHODPR(IKConstraint, GetObjectAnimationAttr, () const, ResourceRef), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "ResourceRef GetObjectAnimationAttr() const", AS_METHODPR(IKConstraint, GetObjectAnimationAttr, () const, ResourceRef), AS_CALL_THISCALL);
     // Scene* Component::GetScene() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKConstraint", "Scene@+ GetScene() const", asMETHODPR(IKConstraint, GetScene, () const, Scene*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "Scene@+ GetScene() const", AS_METHODPR(IKConstraint, GetScene, () const, Scene*), AS_CALL_THISCALL);
     // float IKConstraint::GetStiffness() const | File: ../IK/IKConstraint.h
-    engine->RegisterObjectMethod("IKConstraint", "float GetStiffness() const", asMETHODPR(IKConstraint, GetStiffness, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "float GetStiffness() const", AS_METHODPR(IKConstraint, GetStiffness, () const, float), AS_CALL_THISCALL);
     // float IKConstraint::GetStretchiness() const | File: ../IK/IKConstraint.h
-    engine->RegisterObjectMethod("IKConstraint", "float GetStretchiness() const", asMETHODPR(IKConstraint, GetStretchiness, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "float GetStretchiness() const", AS_METHODPR(IKConstraint, GetStretchiness, () const, float), AS_CALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKConstraint", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(IKConstraint, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "Object@+ GetSubsystem(StringHash) const", AS_METHODPR(IKConstraint, GetSubsystem, (StringHash) const, Object*), AS_CALL_THISCALL);
     // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKConstraint", "StringHash GetType() const", asMETHODPR(IKConstraint, GetType, () const, StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKConstraint", "StringHash get_type() const", asMETHODPR(IKConstraint, GetType, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "StringHash GetType() const", AS_METHODPR(IKConstraint, GetType, () const, StringHash), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "StringHash get_type() const", AS_METHODPR(IKConstraint, GetType, () const, StringHash), AS_CALL_THISCALL);
     // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
     // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
     // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
     // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
     // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKConstraint", "const String& GetTypeName() const", asMETHODPR(IKConstraint, GetTypeName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKConstraint", "const String& get_typeName() const", asMETHODPR(IKConstraint, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "const String& GetTypeName() const", AS_METHODPR(IKConstraint, GetTypeName, () const, const String&), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "const String& get_typeName() const", AS_METHODPR(IKConstraint, GetTypeName, () const, const String&), AS_CALL_THISCALL);
     // bool Object::HasEventHandlers() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKConstraint", "bool HasEventHandlers() const", asMETHODPR(IKConstraint, HasEventHandlers, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "bool HasEventHandlers() const", AS_METHODPR(IKConstraint, HasEventHandlers, () const, bool), AS_CALL_THISCALL);
     // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKConstraint", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(IKConstraint, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "bool HasSubscribedToEvent(StringHash) const", AS_METHODPR(IKConstraint, HasSubscribedToEvent, (StringHash) const, bool), AS_CALL_THISCALL);
     // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKConstraint", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(IKConstraint, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "bool HasSubscribedToEvent(Object@+, StringHash) const", AS_METHODPR(IKConstraint, HasSubscribedToEvent, (Object*, StringHash) const, bool), AS_CALL_THISCALL);
     // explicit IKConstraint::IKConstraint(Context* context) | File: ../IK/IKConstraint.h
-    engine->RegisterObjectBehaviour("IKConstraint", asBEHAVE_FACTORY, "IKConstraint@+ f()", asFUNCTION(IKConstraint_IKConstraint_Context), asCALL_CDECL);
+    engine->RegisterObjectBehaviour("IKConstraint", asBEHAVE_FACTORY, "IKConstraint@+ f()", AS_FUNCTION(IKConstraint_IKConstraint_Context), AS_CALL_CDECL);
     // bool Component::IsEnabled() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKConstraint", "bool IsEnabled() const", asMETHODPR(IKConstraint, IsEnabled, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKConstraint", "bool get_enabled() const", asMETHODPR(IKConstraint, IsEnabled, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "bool IsEnabled() const", AS_METHODPR(IKConstraint, IsEnabled, () const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "bool get_enabled() const", AS_METHODPR(IKConstraint, IsEnabled, () const, bool), AS_CALL_THISCALL);
     // bool Component::IsEnabledEffective() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKConstraint", "bool IsEnabledEffective() const", asMETHODPR(IKConstraint, IsEnabledEffective, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKConstraint", "bool get_enabledEffective() const", asMETHODPR(IKConstraint, IsEnabledEffective, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "bool IsEnabledEffective() const", AS_METHODPR(IKConstraint, IsEnabledEffective, () const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "bool get_enabledEffective() const", AS_METHODPR(IKConstraint, IsEnabledEffective, () const, bool), AS_CALL_THISCALL);
     // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKConstraint", "bool IsInstanceOf(StringHash) const", asMETHODPR(IKConstraint, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "bool IsInstanceOf(StringHash) const", AS_METHODPR(IKConstraint, IsInstanceOf, (StringHash) const, bool), AS_CALL_THISCALL);
     // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
     // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
     // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
     // Not registered because template
     // bool Component::IsReplicated() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKConstraint", "bool IsReplicated() const", asMETHODPR(IKConstraint, IsReplicated, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKConstraint", "bool get_replicated() const", asMETHODPR(IKConstraint, IsReplicated, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "bool IsReplicated() const", AS_METHODPR(IKConstraint, IsReplicated, () const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "bool get_replicated() const", AS_METHODPR(IKConstraint, IsReplicated, () const, bool), AS_CALL_THISCALL);
     // bool Serializable::IsTemporary() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKConstraint", "bool IsTemporary() const", asMETHODPR(IKConstraint, IsTemporary, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKConstraint", "bool get_temporary() const", asMETHODPR(IKConstraint, IsTemporary, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "bool IsTemporary() const", AS_METHODPR(IKConstraint, IsTemporary, () const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "bool get_temporary() const", AS_METHODPR(IKConstraint, IsTemporary, () const, bool), AS_CALL_THISCALL);
     // virtual bool Serializable::Load(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKConstraint", "bool Load(Deserializer&)", asMETHODPR(IKConstraint, Load, (Deserializer&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "bool Load(Deserializer&)", AS_METHODPR(IKConstraint, Load, (Deserializer&), bool), AS_CALL_THISCALL);
     // bool Animatable::LoadJSON(const JSONValue& source) override | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKConstraint", "bool LoadJSON(const JSONValue&in)", asMETHODPR(IKConstraint, LoadJSON, (const JSONValue&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "bool LoadJSON(const JSONValue&in)", AS_METHODPR(IKConstraint, LoadJSON, (const JSONValue&), bool), AS_CALL_THISCALL);
     // bool Animatable::LoadXML(const XMLElement& source) override | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKConstraint", "bool LoadXML(const XMLElement&in)", asMETHODPR(IKConstraint, LoadXML, (const XMLElement&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "bool LoadXML(const XMLElement&in)", AS_METHODPR(IKConstraint, LoadXML, (const XMLElement&), bool), AS_CALL_THISCALL);
     // void Component::MarkNetworkUpdate() override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKConstraint", "void MarkNetworkUpdate()", asMETHODPR(IKConstraint, MarkNetworkUpdate, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void MarkNetworkUpdate()", AS_METHODPR(IKConstraint, MarkNetworkUpdate, (), void), AS_CALL_THISCALL);
     // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKConstraint", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(IKConstraint, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void OnEvent(Object@+, StringHash, VariantMap&)", AS_METHODPR(IKConstraint, OnEvent, (Object*, StringHash, VariantMap&), void), AS_CALL_THISCALL);
     // virtual void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKConstraint", "void OnGetAttribute(const AttributeInfo&in, Variant&) const", asMETHODPR(IKConstraint, OnGetAttribute, (const AttributeInfo&, Variant&) const, void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void OnGetAttribute(const AttributeInfo&in, Variant&) const", AS_METHODPR(IKConstraint, OnGetAttribute, (const AttributeInfo&, Variant&) const, void), AS_CALL_THISCALL);
     // virtual void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKConstraint", "void OnSetAttribute(const AttributeInfo&in, const Variant&in)", asMETHODPR(IKConstraint, OnSetAttribute, (const AttributeInfo&, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void OnSetAttribute(const AttributeInfo&in, const Variant&in)", AS_METHODPR(IKConstraint, OnSetAttribute, (const AttributeInfo&, const Variant&), void), AS_CALL_THISCALL);
     // virtual void Component::OnSetEnabled() | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKConstraint", "void OnSetEnabled()", asMETHODPR(IKConstraint, OnSetEnabled, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void OnSetEnabled()", AS_METHODPR(IKConstraint, OnSetEnabled, (), void), AS_CALL_THISCALL);
     // void Component::PrepareNetworkUpdate() | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKConstraint", "void PrepareNetworkUpdate()", asMETHODPR(IKConstraint, PrepareNetworkUpdate, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void PrepareNetworkUpdate()", AS_METHODPR(IKConstraint, PrepareNetworkUpdate, (), void), AS_CALL_THISCALL);
     // bool Serializable::ReadDeltaUpdate(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKConstraint", "bool ReadDeltaUpdate(Deserializer&)", asMETHODPR(IKConstraint, ReadDeltaUpdate, (Deserializer&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "bool ReadDeltaUpdate(Deserializer&)", AS_METHODPR(IKConstraint, ReadDeltaUpdate, (Deserializer&), bool), AS_CALL_THISCALL);
     // bool Serializable::ReadLatestDataUpdate(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKConstraint", "bool ReadLatestDataUpdate(Deserializer&)", asMETHODPR(IKConstraint, ReadLatestDataUpdate, (Deserializer&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "bool ReadLatestDataUpdate(Deserializer&)", AS_METHODPR(IKConstraint, ReadLatestDataUpdate, (Deserializer&), bool), AS_CALL_THISCALL);
     // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
     // Error: type "RefCount*" can not automatically bind
     // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("IKConstraint", "int Refs() const", asMETHODPR(IKConstraint, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKConstraint", "int get_refs() const", asMETHODPR(IKConstraint, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "int Refs() const", AS_METHODPR(IKConstraint, Refs, () const, int), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "int get_refs() const", AS_METHODPR(IKConstraint, Refs, () const, int), AS_CALL_THISCALL);
     // static void IKConstraint::RegisterObject(Context* context) | File: ../IK/IKConstraint.h
     // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("IKConstraint", asBEHAVE_RELEASE, "void f()", asMETHODPR(IKConstraint, ReleaseRef, (), void), asCALL_THISCALL);
+    engine->RegisterObjectBehaviour("IKConstraint", asBEHAVE_RELEASE, "void f()", AS_METHODPR(IKConstraint, ReleaseRef, (), void), AS_CALL_THISCALL);
     // void Component::Remove() | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKConstraint", "void Remove()", asMETHODPR(IKConstraint, Remove, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void Remove()", AS_METHODPR(IKConstraint, Remove, (), void), AS_CALL_THISCALL);
     // void Animatable::RemoveAttributeAnimation(const String& name) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKConstraint", "void RemoveAttributeAnimation(const String&in)", asMETHODPR(IKConstraint, RemoveAttributeAnimation, (const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void RemoveAttributeAnimation(const String&in)", AS_METHODPR(IKConstraint, RemoveAttributeAnimation, (const String&), void), AS_CALL_THISCALL);
     // void Serializable::RemoveInstanceDefault() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKConstraint", "void RemoveInstanceDefault()", asMETHODPR(IKConstraint, RemoveInstanceDefault, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void RemoveInstanceDefault()", AS_METHODPR(IKConstraint, RemoveInstanceDefault, (), void), AS_CALL_THISCALL);
     // void Animatable::RemoveObjectAnimation() | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKConstraint", "void RemoveObjectAnimation()", asMETHODPR(IKConstraint, RemoveObjectAnimation, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void RemoveObjectAnimation()", AS_METHODPR(IKConstraint, RemoveObjectAnimation, (), void), AS_CALL_THISCALL);
     // void Serializable::ResetToDefault() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKConstraint", "void ResetToDefault()", asMETHODPR(IKConstraint, ResetToDefault, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void ResetToDefault()", AS_METHODPR(IKConstraint, ResetToDefault, (), void), AS_CALL_THISCALL);
     // bool Component::Save(Serializer& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKConstraint", "bool Save(Serializer&) const", asMETHODPR(IKConstraint, Save, (Serializer&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "bool Save(Serializer&) const", AS_METHODPR(IKConstraint, Save, (Serializer&) const, bool), AS_CALL_THISCALL);
     // virtual bool Serializable::SaveDefaultAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKConstraint", "bool SaveDefaultAttributes() const", asMETHODPR(IKConstraint, SaveDefaultAttributes, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "bool SaveDefaultAttributes() const", AS_METHODPR(IKConstraint, SaveDefaultAttributes, () const, bool), AS_CALL_THISCALL);
     // bool Component::SaveJSON(JSONValue& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKConstraint", "bool SaveJSON(JSONValue&) const", asMETHODPR(IKConstraint, SaveJSON, (JSONValue&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "bool SaveJSON(JSONValue&) const", AS_METHODPR(IKConstraint, SaveJSON, (JSONValue&) const, bool), AS_CALL_THISCALL);
     // bool Component::SaveXML(XMLElement& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKConstraint", "bool SaveXML(XMLElement&) const", asMETHODPR(IKConstraint, SaveXML, (XMLElement&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "bool SaveXML(XMLElement&) const", AS_METHODPR(IKConstraint, SaveXML, (XMLElement&) const, bool), AS_CALL_THISCALL);
     // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKConstraint", "void SendEvent(StringHash)", asMETHODPR(IKConstraint, SendEvent, (StringHash), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void SendEvent(StringHash)", AS_METHODPR(IKConstraint, SendEvent, (StringHash), void), AS_CALL_THISCALL);
     // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKConstraint", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(IKConstraint, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void SendEvent(StringHash, VariantMap&)", AS_METHODPR(IKConstraint, SendEvent, (StringHash, VariantMap&), void), AS_CALL_THISCALL);
     // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
     // Not registered because template
     // void Animatable::SetAnimationEnabled(bool enable) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKConstraint", "void SetAnimationEnabled(bool)", asMETHODPR(IKConstraint, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKConstraint", "void set_animationEnabled(bool)", asMETHODPR(IKConstraint, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void SetAnimationEnabled(bool)", AS_METHODPR(IKConstraint, SetAnimationEnabled, (bool), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void set_animationEnabled(bool)", AS_METHODPR(IKConstraint, SetAnimationEnabled, (bool), void), AS_CALL_THISCALL);
     // void Animatable::SetAnimationTime(float time) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKConstraint", "void SetAnimationTime(float)", asMETHODPR(IKConstraint, SetAnimationTime, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void SetAnimationTime(float)", AS_METHODPR(IKConstraint, SetAnimationTime, (float), void), AS_CALL_THISCALL);
     // bool Serializable::SetAttribute(unsigned index, const Variant& value) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKConstraint", "bool SetAttribute(uint, const Variant&in)", asMETHODPR(IKConstraint, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKConstraint", "bool set_attributes(uint, const Variant&in)", asMETHODPR(IKConstraint, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "bool SetAttribute(uint, const Variant&in)", AS_METHODPR(IKConstraint, SetAttribute, (unsigned, const Variant&), bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "bool set_attributes(uint, const Variant&in)", AS_METHODPR(IKConstraint, SetAttribute, (unsigned, const Variant&), bool), AS_CALL_THISCALL);
     // bool Serializable::SetAttribute(const String& name, const Variant& value) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKConstraint", "bool SetAttribute(const String&in, const Variant&in)", asMETHODPR(IKConstraint, SetAttribute, (const String&, const Variant&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "bool SetAttribute(const String&in, const Variant&in)", AS_METHODPR(IKConstraint, SetAttribute, (const String&, const Variant&), bool), AS_CALL_THISCALL);
     // void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode=WM_LOOP, float speed=1.0f) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKConstraint", "void SetAttributeAnimation(const String&in, ValueAnimation@+, WrapMode = WM_LOOP, float = 1.0f)", asMETHODPR(IKConstraint, SetAttributeAnimation, (const String&, ValueAnimation*, WrapMode, float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void SetAttributeAnimation(const String&in, ValueAnimation@+, WrapMode = WM_LOOP, float = 1.0f)", AS_METHODPR(IKConstraint, SetAttributeAnimation, (const String&, ValueAnimation*, WrapMode, float), void), AS_CALL_THISCALL);
     // void Animatable::SetAttributeAnimationSpeed(const String& name, float speed) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKConstraint", "void SetAttributeAnimationSpeed(const String&in, float)", asMETHODPR(IKConstraint, SetAttributeAnimationSpeed, (const String&, float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void SetAttributeAnimationSpeed(const String&in, float)", AS_METHODPR(IKConstraint, SetAttributeAnimationSpeed, (const String&, float), void), AS_CALL_THISCALL);
     // void Animatable::SetAttributeAnimationTime(const String& name, float time) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKConstraint", "void SetAttributeAnimationTime(const String&in, float)", asMETHODPR(IKConstraint, SetAttributeAnimationTime, (const String&, float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void SetAttributeAnimationTime(const String&in, float)", AS_METHODPR(IKConstraint, SetAttributeAnimationTime, (const String&, float), void), AS_CALL_THISCALL);
     // void Animatable::SetAttributeAnimationWrapMode(const String& name, WrapMode wrapMode) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKConstraint", "void SetAttributeAnimationWrapMode(const String&in, WrapMode)", asMETHODPR(IKConstraint, SetAttributeAnimationWrapMode, (const String&, WrapMode), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void SetAttributeAnimationWrapMode(const String&in, WrapMode)", AS_METHODPR(IKConstraint, SetAttributeAnimationWrapMode, (const String&, WrapMode), void), AS_CALL_THISCALL);
     // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKConstraint", "void SetBlockEvents(bool)", asMETHODPR(IKConstraint, SetBlockEvents, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void SetBlockEvents(bool)", AS_METHODPR(IKConstraint, SetBlockEvents, (bool), void), AS_CALL_THISCALL);
     // void Component::SetEnabled(bool enable) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKConstraint", "void SetEnabled(bool)", asMETHODPR(IKConstraint, SetEnabled, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKConstraint", "void set_enabled(bool)", asMETHODPR(IKConstraint, SetEnabled, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void SetEnabled(bool)", AS_METHODPR(IKConstraint, SetEnabled, (bool), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void set_enabled(bool)", AS_METHODPR(IKConstraint, SetEnabled, (bool), void), AS_CALL_THISCALL);
     // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKConstraint", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(IKConstraint, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKConstraint", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(IKConstraint, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void SetGlobalVar(StringHash, const Variant&in)", AS_METHODPR(IKConstraint, SetGlobalVar, (StringHash, const Variant&), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void set_globalVar(StringHash, const Variant&in)", AS_METHODPR(IKConstraint, SetGlobalVar, (StringHash, const Variant&), void), AS_CALL_THISCALL);
     // void Serializable::SetInstanceDefault(bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKConstraint", "void SetInstanceDefault(bool)", asMETHODPR(IKConstraint, SetInstanceDefault, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void SetInstanceDefault(bool)", AS_METHODPR(IKConstraint, SetInstanceDefault, (bool), void), AS_CALL_THISCALL);
     // void Serializable::SetInterceptNetworkUpdate(const String& attributeName, bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKConstraint", "void SetInterceptNetworkUpdate(const String&in, bool)", asMETHODPR(IKConstraint, SetInterceptNetworkUpdate, (const String&, bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void SetInterceptNetworkUpdate(const String&in, bool)", AS_METHODPR(IKConstraint, SetInterceptNetworkUpdate, (const String&, bool), void), AS_CALL_THISCALL);
     // void IKConstraint::SetLengthConstraints(const Vector2& lengthConstraints) | File: ../IK/IKConstraint.h
-    engine->RegisterObjectMethod("IKConstraint", "void SetLengthConstraints(const Vector2&in)", asMETHODPR(IKConstraint, SetLengthConstraints, (const Vector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void SetLengthConstraints(const Vector2&in)", AS_METHODPR(IKConstraint, SetLengthConstraints, (const Vector2&), void), AS_CALL_THISCALL);
     // void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKConstraint", "void SetObjectAnimation(ObjectAnimation@+)", asMETHODPR(IKConstraint, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKConstraint", "void set_objectAnimation(ObjectAnimation@+)", asMETHODPR(IKConstraint, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void SetObjectAnimation(ObjectAnimation@+)", AS_METHODPR(IKConstraint, SetObjectAnimation, (ObjectAnimation*), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void set_objectAnimation(ObjectAnimation@+)", AS_METHODPR(IKConstraint, SetObjectAnimation, (ObjectAnimation*), void), AS_CALL_THISCALL);
     // void Animatable::SetObjectAnimationAttr(const ResourceRef& value) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKConstraint", "void SetObjectAnimationAttr(const ResourceRef&in)", asMETHODPR(IKConstraint, SetObjectAnimationAttr, (const ResourceRef&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void SetObjectAnimationAttr(const ResourceRef&in)", AS_METHODPR(IKConstraint, SetObjectAnimationAttr, (const ResourceRef&), void), AS_CALL_THISCALL);
     // void IKConstraint::SetStiffness(float stiffness) | File: ../IK/IKConstraint.h
-    engine->RegisterObjectMethod("IKConstraint", "void SetStiffness(float)", asMETHODPR(IKConstraint, SetStiffness, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void SetStiffness(float)", AS_METHODPR(IKConstraint, SetStiffness, (float), void), AS_CALL_THISCALL);
     // void IKConstraint::SetStretchiness(float stretchiness) | File: ../IK/IKConstraint.h
-    engine->RegisterObjectMethod("IKConstraint", "void SetStretchiness(float)", asMETHODPR(IKConstraint, SetStretchiness, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void SetStretchiness(float)", AS_METHODPR(IKConstraint, SetStretchiness, (float), void), AS_CALL_THISCALL);
     // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKConstraint", "void SetTemporary(bool)", asMETHODPR(IKConstraint, SetTemporary, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKConstraint", "void set_temporary(bool)", asMETHODPR(IKConstraint, SetTemporary, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void SetTemporary(bool)", AS_METHODPR(IKConstraint, SetTemporary, (bool), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void set_temporary(bool)", AS_METHODPR(IKConstraint, SetTemporary, (bool), void), AS_CALL_THISCALL);
     // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
     // Error: type "EventHandler*" can not automatically bind
     // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
@@ -415,24 +415,24 @@ void ASRegisterGenerated_Members_I(asIScriptEngine* engine)
     // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
     // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
     // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKConstraint", "void UnsubscribeFromAllEvents()", asMETHODPR(IKConstraint, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void UnsubscribeFromAllEvents()", AS_METHODPR(IKConstraint, UnsubscribeFromAllEvents, (), void), AS_CALL_THISCALL);
     // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKConstraint", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(IKConstraint_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("IKConstraint", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", AS_FUNCTION_OBJFIRST(IKConstraint_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), AS_CALL_CDECL_OBJFIRST);
     // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKConstraint", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(IKConstraint, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void UnsubscribeFromEvent(StringHash)", AS_METHODPR(IKConstraint, UnsubscribeFromEvent, (StringHash), void), AS_CALL_THISCALL);
     // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKConstraint", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(IKConstraint, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void UnsubscribeFromEvent(Object@+, StringHash)", AS_METHODPR(IKConstraint, UnsubscribeFromEvent, (Object*, StringHash), void), AS_CALL_THISCALL);
     // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKConstraint", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(IKConstraint, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void UnsubscribeFromEvents(Object@+)", AS_METHODPR(IKConstraint, UnsubscribeFromEvents, (Object*), void), AS_CALL_THISCALL);
     // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("IKConstraint", "int WeakRefs() const", asMETHODPR(IKConstraint, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKConstraint", "int get_weakRefs() const", asMETHODPR(IKConstraint, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "int WeakRefs() const", AS_METHODPR(IKConstraint, WeakRefs, () const, int), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "int get_weakRefs() const", AS_METHODPR(IKConstraint, WeakRefs, () const, int), AS_CALL_THISCALL);
     // void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attributeBits, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKConstraint", "void WriteDeltaUpdate(Serializer&, const DirtyBits&in, uint8)", asMETHODPR(IKConstraint, WriteDeltaUpdate, (Serializer&, const DirtyBits&, unsigned char), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void WriteDeltaUpdate(Serializer&, const DirtyBits&in, uint8)", AS_METHODPR(IKConstraint, WriteDeltaUpdate, (Serializer&, const DirtyBits&, unsigned char), void), AS_CALL_THISCALL);
     // void Serializable::WriteInitialDeltaUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKConstraint", "void WriteInitialDeltaUpdate(Serializer&, uint8)", asMETHODPR(IKConstraint, WriteInitialDeltaUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void WriteInitialDeltaUpdate(Serializer&, uint8)", AS_METHODPR(IKConstraint, WriteInitialDeltaUpdate, (Serializer&, unsigned char), void), AS_CALL_THISCALL);
     // void Serializable::WriteLatestDataUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKConstraint", "void WriteLatestDataUpdate(Serializer&, uint8)", asMETHODPR(IKConstraint, WriteLatestDataUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKConstraint", "void WriteLatestDataUpdate(Serializer&, uint8)", AS_METHODPR(IKConstraint, WriteLatestDataUpdate, (Serializer&, unsigned char), void), AS_CALL_THISCALL);
 #ifdef REGISTER_MANUAL_PART_Component
     REGISTER_MANUAL_PART_Component(IKConstraint, "IKConstraint")
 #endif
@@ -460,13 +460,13 @@ void ASRegisterGenerated_Members_I(asIScriptEngine* engine)
 
 #ifdef URHO3D_IK
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("IKEffector", asBEHAVE_ADDREF, "void f()", asMETHODPR(IKEffector, AddRef, (), void), asCALL_THISCALL);
+    engine->RegisterObjectBehaviour("IKEffector", asBEHAVE_ADDREF, "void f()", AS_METHODPR(IKEffector, AddRef, (), void), AS_CALL_THISCALL);
     // void Component::AddReplicationState(ComponentReplicationState* state) | File: ../Scene/Component.h
     // Error: type "ComponentReplicationState*" can not automatically bind
     // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKEffector", "void AllocateNetworkState()", asMETHODPR(IKEffector, AllocateNetworkState, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void AllocateNetworkState()", AS_METHODPR(IKEffector, AllocateNetworkState, (), void), AS_CALL_THISCALL);
     // virtual void Serializable::ApplyAttributes() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKEffector", "void ApplyAttributes()", asMETHODPR(IKEffector, ApplyAttributes, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void ApplyAttributes()", AS_METHODPR(IKEffector, ApplyAttributes, (), void), AS_CALL_THISCALL);
     // template<typename T> T* Object::Cast() | File: ../Core/Object.h
     // Not registered because template
     // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
@@ -474,42 +474,42 @@ void ASRegisterGenerated_Members_I(asIScriptEngine* engine)
     // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
     // Not registered because have @manualbind mark
     // void IKEffector::DrawDebugGeometry(bool depthTest) | File: ../IK/IKEffector.h
-    engine->RegisterObjectMethod("IKEffector", "void DrawDebugGeometry(bool)", asMETHODPR(IKEffector, DrawDebugGeometry, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void DrawDebugGeometry(bool)", AS_METHODPR(IKEffector, DrawDebugGeometry, (bool), void), AS_CALL_THISCALL);
     // void IKEffector::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override | File: ../IK/IKEffector.h
-    engine->RegisterObjectMethod("IKEffector", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(IKEffector, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void DrawDebugGeometry(DebugRenderer@+, bool)", AS_METHODPR(IKEffector, DrawDebugGeometry, (DebugRenderer*, bool), void), AS_CALL_THISCALL);
     // bool Animatable::GetAnimationEnabled() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKEffector", "bool GetAnimationEnabled() const", asMETHODPR(IKEffector, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "bool get_animationEnabled() const", asMETHODPR(IKEffector, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "bool GetAnimationEnabled() const", AS_METHODPR(IKEffector, GetAnimationEnabled, () const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "bool get_animationEnabled() const", AS_METHODPR(IKEffector, GetAnimationEnabled, () const, bool), AS_CALL_THISCALL);
     // Variant Serializable::GetAttribute(unsigned index) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKEffector", "Variant GetAttribute(uint) const", asMETHODPR(IKEffector, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "Variant get_attributes(uint) const", asMETHODPR(IKEffector, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "Variant GetAttribute(uint) const", AS_METHODPR(IKEffector, GetAttribute, (unsigned) const, Variant), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "Variant get_attributes(uint) const", AS_METHODPR(IKEffector, GetAttribute, (unsigned) const, Variant), AS_CALL_THISCALL);
     // Variant Serializable::GetAttribute(const String& name) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKEffector", "Variant GetAttribute(const String&in) const", asMETHODPR(IKEffector, GetAttribute, (const String&) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "Variant GetAttribute(const String&in) const", AS_METHODPR(IKEffector, GetAttribute, (const String&) const, Variant), AS_CALL_THISCALL);
     // ValueAnimation* Animatable::GetAttributeAnimation(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKEffector", "ValueAnimation@+ GetAttributeAnimation(const String&in) const", asMETHODPR(IKEffector, GetAttributeAnimation, (const String&) const, ValueAnimation*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "ValueAnimation@+ GetAttributeAnimation(const String&in) const", AS_METHODPR(IKEffector, GetAttributeAnimation, (const String&) const, ValueAnimation*), AS_CALL_THISCALL);
     // float Animatable::GetAttributeAnimationSpeed(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKEffector", "float GetAttributeAnimationSpeed(const String&in) const", asMETHODPR(IKEffector, GetAttributeAnimationSpeed, (const String&) const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "float GetAttributeAnimationSpeed(const String&in) const", AS_METHODPR(IKEffector, GetAttributeAnimationSpeed, (const String&) const, float), AS_CALL_THISCALL);
     // float Animatable::GetAttributeAnimationTime(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKEffector", "float GetAttributeAnimationTime(const String&in) const", asMETHODPR(IKEffector, GetAttributeAnimationTime, (const String&) const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "float GetAttributeAnimationTime(const String&in) const", AS_METHODPR(IKEffector, GetAttributeAnimationTime, (const String&) const, float), AS_CALL_THISCALL);
     // WrapMode Animatable::GetAttributeAnimationWrapMode(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKEffector", "WrapMode GetAttributeAnimationWrapMode(const String&in) const", asMETHODPR(IKEffector, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "WrapMode GetAttributeAnimationWrapMode(const String&in) const", AS_METHODPR(IKEffector, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), AS_CALL_THISCALL);
     // Variant Serializable::GetAttributeDefault(unsigned index) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKEffector", "Variant GetAttributeDefault(uint) const", asMETHODPR(IKEffector, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "Variant get_attributeDefaults(uint) const", asMETHODPR(IKEffector, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "Variant GetAttributeDefault(uint) const", AS_METHODPR(IKEffector, GetAttributeDefault, (unsigned) const, Variant), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "Variant get_attributeDefaults(uint) const", AS_METHODPR(IKEffector, GetAttributeDefault, (unsigned) const, Variant), AS_CALL_THISCALL);
     // Variant Serializable::GetAttributeDefault(const String& name) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKEffector", "Variant GetAttributeDefault(const String&in) const", asMETHODPR(IKEffector, GetAttributeDefault, (const String&) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "Variant GetAttributeDefault(const String&in) const", AS_METHODPR(IKEffector, GetAttributeDefault, (const String&) const, Variant), AS_CALL_THISCALL);
     // virtual const Vector<AttributeInfo>* Serializable::GetAttributes() const | File: ../Scene/Serializable.h
     // Error: type "const Vector<AttributeInfo>*" can not automatically bind
     // bool Object::GetBlockEvents() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKEffector", "bool GetBlockEvents() const", asMETHODPR(IKEffector, GetBlockEvents, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "bool GetBlockEvents() const", AS_METHODPR(IKEffector, GetBlockEvents, () const, bool), AS_CALL_THISCALL);
     // const String& Object::GetCategory() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKEffector", "const String& GetCategory() const", asMETHODPR(IKEffector, GetCategory, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "const String& get_category() const", asMETHODPR(IKEffector, GetCategory, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "const String& GetCategory() const", AS_METHODPR(IKEffector, GetCategory, () const, const String&), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "const String& get_category() const", AS_METHODPR(IKEffector, GetCategory, () const, const String&), AS_CALL_THISCALL);
     // unsigned IKEffector::GetChainLength() const | File: ../IK/IKEffector.h
-    engine->RegisterObjectMethod("IKEffector", "uint GetChainLength() const", asMETHODPR(IKEffector, GetChainLength, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "uint get_chainLength() const", asMETHODPR(IKEffector, GetChainLength, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "uint GetChainLength() const", AS_METHODPR(IKEffector, GetChainLength, () const, unsigned), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "uint get_chainLength() const", AS_METHODPR(IKEffector, GetChainLength, () const, unsigned), AS_CALL_THISCALL);
     // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKEffector", "Component@+ GetComponent(StringHash) const", asMETHODPR(IKEffector, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "Component@+ GetComponent(StringHash) const", AS_METHODPR(IKEffector, GetComponent, (StringHash) const, Component*), AS_CALL_THISCALL);
     // template<class T> T* Component::GetComponent() const | File: ../Scene/Component.h
     // Not registered because template
     // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
@@ -521,235 +521,235 @@ void ASRegisterGenerated_Members_I(asIScriptEngine* engine)
     // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
     // Error: type "PODVector<Node*>&" can not automatically bind
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKEffector", "VariantMap& GetEventDataMap() const", asMETHODPR(IKEffector, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "VariantMap& GetEventDataMap() const", AS_METHODPR(IKEffector, GetEventDataMap, () const, VariantMap&), AS_CALL_THISCALL);
     // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
     // Error: type "EventHandler*" can not automatically bind
     // Object* Object::GetEventSender() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKEffector", "Object@+ GetEventSender() const", asMETHODPR(IKEffector, GetEventSender, () const, Object*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "Object@+ GetEventSender() const", AS_METHODPR(IKEffector, GetEventSender, () const, Object*), AS_CALL_THISCALL);
     // bool IKEffector::GetFeature(Feature feature) const | File: ../IK/IKEffector.h
     // Not registered because have @nobind mark
     // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKEffector", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(IKEffector, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "const Variant& get_globalVar(StringHash) const", asMETHODPR(IKEffector, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "const Variant& GetGlobalVar(StringHash) const", AS_METHODPR(IKEffector, GetGlobalVar, (StringHash) const, const Variant&), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "const Variant& get_globalVar(StringHash) const", AS_METHODPR(IKEffector, GetGlobalVar, (StringHash) const, const Variant&), AS_CALL_THISCALL);
     // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKEffector", "const VariantMap& GetGlobalVars() const", asMETHODPR(IKEffector, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "const VariantMap& get_globalVars() const", asMETHODPR(IKEffector, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "const VariantMap& GetGlobalVars() const", AS_METHODPR(IKEffector, GetGlobalVars, () const, const VariantMap&), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "const VariantMap& get_globalVars() const", AS_METHODPR(IKEffector, GetGlobalVars, () const, const VariantMap&), AS_CALL_THISCALL);
     // unsigned Component::GetID() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKEffector", "uint GetID() const", asMETHODPR(IKEffector, GetID, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "uint get_id() const", asMETHODPR(IKEffector, GetID, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "uint GetID() const", AS_METHODPR(IKEffector, GetID, () const, unsigned), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "uint get_id() const", AS_METHODPR(IKEffector, GetID, () const, unsigned), AS_CALL_THISCALL);
     // bool IKEffector::GetINHERIT_PARENT_ROTATION() const | File: ../IK/IKEffector.h
-    engine->RegisterObjectMethod("IKEffector", "bool GetINHERIT_PARENT_ROTATION() const", asMETHODPR(IKEffector, GetINHERIT_PARENT_ROTATION, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "bool GetINHERIT_PARENT_ROTATION() const", AS_METHODPR(IKEffector, GetINHERIT_PARENT_ROTATION, () const, bool), AS_CALL_THISCALL);
     // bool Serializable::GetInterceptNetworkUpdate(const String& attributeName) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKEffector", "bool GetInterceptNetworkUpdate(const String&in) const", asMETHODPR(IKEffector, GetInterceptNetworkUpdate, (const String&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "bool GetInterceptNetworkUpdate(const String&in) const", AS_METHODPR(IKEffector, GetInterceptNetworkUpdate, (const String&) const, bool), AS_CALL_THISCALL);
     // virtual const Vector<AttributeInfo>* Serializable::GetNetworkAttributes() const | File: ../Scene/Serializable.h
     // Error: type "const Vector<AttributeInfo>*" can not automatically bind
     // NetworkState* Serializable::GetNetworkState() const | File: ../Scene/Serializable.h
     // Error: type "NetworkState*" can not automatically bind
     // Node* Component::GetNode() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKEffector", "Node@+ GetNode() const", asMETHODPR(IKEffector, GetNode, () const, Node*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "Node@+ get_node() const", asMETHODPR(IKEffector, GetNode, () const, Node*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "Node@+ GetNode() const", AS_METHODPR(IKEffector, GetNode, () const, Node*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "Node@+ get_node() const", AS_METHODPR(IKEffector, GetNode, () const, Node*), AS_CALL_THISCALL);
     // unsigned Serializable::GetNumAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKEffector", "uint GetNumAttributes() const", asMETHODPR(IKEffector, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "uint get_numAttributes() const", asMETHODPR(IKEffector, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "uint GetNumAttributes() const", AS_METHODPR(IKEffector, GetNumAttributes, () const, unsigned), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "uint get_numAttributes() const", AS_METHODPR(IKEffector, GetNumAttributes, () const, unsigned), AS_CALL_THISCALL);
     // unsigned Serializable::GetNumNetworkAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKEffector", "uint GetNumNetworkAttributes() const", asMETHODPR(IKEffector, GetNumNetworkAttributes, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "uint GetNumNetworkAttributes() const", AS_METHODPR(IKEffector, GetNumNetworkAttributes, () const, unsigned), AS_CALL_THISCALL);
     // ObjectAnimation* Animatable::GetObjectAnimation() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKEffector", "ObjectAnimation@+ GetObjectAnimation() const", asMETHODPR(IKEffector, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "ObjectAnimation@+ get_objectAnimation() const", asMETHODPR(IKEffector, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "ObjectAnimation@+ GetObjectAnimation() const", AS_METHODPR(IKEffector, GetObjectAnimation, () const, ObjectAnimation*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "ObjectAnimation@+ get_objectAnimation() const", AS_METHODPR(IKEffector, GetObjectAnimation, () const, ObjectAnimation*), AS_CALL_THISCALL);
     // ResourceRef Animatable::GetObjectAnimationAttr() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKEffector", "ResourceRef GetObjectAnimationAttr() const", asMETHODPR(IKEffector, GetObjectAnimationAttr, () const, ResourceRef), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "ResourceRef GetObjectAnimationAttr() const", AS_METHODPR(IKEffector, GetObjectAnimationAttr, () const, ResourceRef), AS_CALL_THISCALL);
     // float IKEffector::GetRotationDecay() const | File: ../IK/IKEffector.h
-    engine->RegisterObjectMethod("IKEffector", "float GetRotationDecay() const", asMETHODPR(IKEffector, GetRotationDecay, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "float get_rotationDecay() const", asMETHODPR(IKEffector, GetRotationDecay, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "float GetRotationDecay() const", AS_METHODPR(IKEffector, GetRotationDecay, () const, float), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "float get_rotationDecay() const", AS_METHODPR(IKEffector, GetRotationDecay, () const, float), AS_CALL_THISCALL);
     // float IKEffector::GetRotationWeight() const | File: ../IK/IKEffector.h
-    engine->RegisterObjectMethod("IKEffector", "float GetRotationWeight() const", asMETHODPR(IKEffector, GetRotationWeight, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "float get_rotationWeight() const", asMETHODPR(IKEffector, GetRotationWeight, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "float GetRotationWeight() const", AS_METHODPR(IKEffector, GetRotationWeight, () const, float), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "float get_rotationWeight() const", AS_METHODPR(IKEffector, GetRotationWeight, () const, float), AS_CALL_THISCALL);
     // Scene* Component::GetScene() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKEffector", "Scene@+ GetScene() const", asMETHODPR(IKEffector, GetScene, () const, Scene*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "Scene@+ GetScene() const", AS_METHODPR(IKEffector, GetScene, () const, Scene*), AS_CALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKEffector", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(IKEffector, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "Object@+ GetSubsystem(StringHash) const", AS_METHODPR(IKEffector, GetSubsystem, (StringHash) const, Object*), AS_CALL_THISCALL);
     // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // const String& IKEffector::GetTargetName() const | File: ../IK/IKEffector.h
-    engine->RegisterObjectMethod("IKEffector", "const String& GetTargetName() const", asMETHODPR(IKEffector, GetTargetName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "const String& get_targetName() const", asMETHODPR(IKEffector, GetTargetName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "const String& GetTargetName() const", AS_METHODPR(IKEffector, GetTargetName, () const, const String&), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "const String& get_targetName() const", AS_METHODPR(IKEffector, GetTargetName, () const, const String&), AS_CALL_THISCALL);
     // Node* IKEffector::GetTargetNode() const | File: ../IK/IKEffector.h
-    engine->RegisterObjectMethod("IKEffector", "Node@+ GetTargetNode() const", asMETHODPR(IKEffector, GetTargetNode, () const, Node*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "Node@+ get_targetNode() const", asMETHODPR(IKEffector, GetTargetNode, () const, Node*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "Node@+ GetTargetNode() const", AS_METHODPR(IKEffector, GetTargetNode, () const, Node*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "Node@+ get_targetNode() const", AS_METHODPR(IKEffector, GetTargetNode, () const, Node*), AS_CALL_THISCALL);
     // const Vector3& IKEffector::GetTargetPosition() const | File: ../IK/IKEffector.h
-    engine->RegisterObjectMethod("IKEffector", "const Vector3& GetTargetPosition() const", asMETHODPR(IKEffector, GetTargetPosition, () const, const Vector3&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "const Vector3& get_targetPosition() const", asMETHODPR(IKEffector, GetTargetPosition, () const, const Vector3&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "const Vector3& GetTargetPosition() const", AS_METHODPR(IKEffector, GetTargetPosition, () const, const Vector3&), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "const Vector3& get_targetPosition() const", AS_METHODPR(IKEffector, GetTargetPosition, () const, const Vector3&), AS_CALL_THISCALL);
     // const Quaternion& IKEffector::GetTargetRotation() const | File: ../IK/IKEffector.h
-    engine->RegisterObjectMethod("IKEffector", "const Quaternion& GetTargetRotation() const", asMETHODPR(IKEffector, GetTargetRotation, () const, const Quaternion&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "const Quaternion& get_targetRotation() const", asMETHODPR(IKEffector, GetTargetRotation, () const, const Quaternion&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "const Quaternion& GetTargetRotation() const", AS_METHODPR(IKEffector, GetTargetRotation, () const, const Quaternion&), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "const Quaternion& get_targetRotation() const", AS_METHODPR(IKEffector, GetTargetRotation, () const, const Quaternion&), AS_CALL_THISCALL);
     // Vector3 IKEffector::GetTargetRotationEuler() const | File: ../IK/IKEffector.h
-    engine->RegisterObjectMethod("IKEffector", "Vector3 GetTargetRotationEuler() const", asMETHODPR(IKEffector, GetTargetRotationEuler, () const, Vector3), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "Vector3 GetTargetRotationEuler() const", AS_METHODPR(IKEffector, GetTargetRotationEuler, () const, Vector3), AS_CALL_THISCALL);
     // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKEffector", "StringHash GetType() const", asMETHODPR(IKEffector, GetType, () const, StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "StringHash get_type() const", asMETHODPR(IKEffector, GetType, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "StringHash GetType() const", AS_METHODPR(IKEffector, GetType, () const, StringHash), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "StringHash get_type() const", AS_METHODPR(IKEffector, GetType, () const, StringHash), AS_CALL_THISCALL);
     // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
     // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
     // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
     // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
     // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKEffector", "const String& GetTypeName() const", asMETHODPR(IKEffector, GetTypeName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "const String& get_typeName() const", asMETHODPR(IKEffector, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "const String& GetTypeName() const", AS_METHODPR(IKEffector, GetTypeName, () const, const String&), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "const String& get_typeName() const", AS_METHODPR(IKEffector, GetTypeName, () const, const String&), AS_CALL_THISCALL);
     // float IKEffector::GetWeight() const | File: ../IK/IKEffector.h
-    engine->RegisterObjectMethod("IKEffector", "float GetWeight() const", asMETHODPR(IKEffector, GetWeight, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "float get_weight() const", asMETHODPR(IKEffector, GetWeight, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "float GetWeight() const", AS_METHODPR(IKEffector, GetWeight, () const, float), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "float get_weight() const", AS_METHODPR(IKEffector, GetWeight, () const, float), AS_CALL_THISCALL);
     // bool IKEffector::GetWEIGHT_NLERP() const | File: ../IK/IKEffector.h
-    engine->RegisterObjectMethod("IKEffector", "bool GetWEIGHT_NLERP() const", asMETHODPR(IKEffector, GetWEIGHT_NLERP, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "bool GetWEIGHT_NLERP() const", AS_METHODPR(IKEffector, GetWEIGHT_NLERP, () const, bool), AS_CALL_THISCALL);
     // bool Object::HasEventHandlers() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKEffector", "bool HasEventHandlers() const", asMETHODPR(IKEffector, HasEventHandlers, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "bool HasEventHandlers() const", AS_METHODPR(IKEffector, HasEventHandlers, () const, bool), AS_CALL_THISCALL);
     // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKEffector", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(IKEffector, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "bool HasSubscribedToEvent(StringHash) const", AS_METHODPR(IKEffector, HasSubscribedToEvent, (StringHash) const, bool), AS_CALL_THISCALL);
     // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKEffector", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(IKEffector, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "bool HasSubscribedToEvent(Object@+, StringHash) const", AS_METHODPR(IKEffector, HasSubscribedToEvent, (Object*, StringHash) const, bool), AS_CALL_THISCALL);
     // explicit IKEffector::IKEffector(Context* context) | File: ../IK/IKEffector.h
-    engine->RegisterObjectBehaviour("IKEffector", asBEHAVE_FACTORY, "IKEffector@+ f()", asFUNCTION(IKEffector_IKEffector_Context), asCALL_CDECL);
+    engine->RegisterObjectBehaviour("IKEffector", asBEHAVE_FACTORY, "IKEffector@+ f()", AS_FUNCTION(IKEffector_IKEffector_Context), AS_CALL_CDECL);
     // bool Component::IsEnabled() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKEffector", "bool IsEnabled() const", asMETHODPR(IKEffector, IsEnabled, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "bool get_enabled() const", asMETHODPR(IKEffector, IsEnabled, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "bool IsEnabled() const", AS_METHODPR(IKEffector, IsEnabled, () const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "bool get_enabled() const", AS_METHODPR(IKEffector, IsEnabled, () const, bool), AS_CALL_THISCALL);
     // bool Component::IsEnabledEffective() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKEffector", "bool IsEnabledEffective() const", asMETHODPR(IKEffector, IsEnabledEffective, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "bool get_enabledEffective() const", asMETHODPR(IKEffector, IsEnabledEffective, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "bool IsEnabledEffective() const", AS_METHODPR(IKEffector, IsEnabledEffective, () const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "bool get_enabledEffective() const", AS_METHODPR(IKEffector, IsEnabledEffective, () const, bool), AS_CALL_THISCALL);
     // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKEffector", "bool IsInstanceOf(StringHash) const", asMETHODPR(IKEffector, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "bool IsInstanceOf(StringHash) const", AS_METHODPR(IKEffector, IsInstanceOf, (StringHash) const, bool), AS_CALL_THISCALL);
     // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
     // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
     // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
     // Not registered because template
     // bool Component::IsReplicated() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKEffector", "bool IsReplicated() const", asMETHODPR(IKEffector, IsReplicated, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "bool get_replicated() const", asMETHODPR(IKEffector, IsReplicated, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "bool IsReplicated() const", AS_METHODPR(IKEffector, IsReplicated, () const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "bool get_replicated() const", AS_METHODPR(IKEffector, IsReplicated, () const, bool), AS_CALL_THISCALL);
     // bool Serializable::IsTemporary() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKEffector", "bool IsTemporary() const", asMETHODPR(IKEffector, IsTemporary, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "bool get_temporary() const", asMETHODPR(IKEffector, IsTemporary, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "bool IsTemporary() const", AS_METHODPR(IKEffector, IsTemporary, () const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "bool get_temporary() const", AS_METHODPR(IKEffector, IsTemporary, () const, bool), AS_CALL_THISCALL);
     // virtual bool Serializable::Load(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKEffector", "bool Load(Deserializer&)", asMETHODPR(IKEffector, Load, (Deserializer&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "bool Load(Deserializer&)", AS_METHODPR(IKEffector, Load, (Deserializer&), bool), AS_CALL_THISCALL);
     // bool Animatable::LoadJSON(const JSONValue& source) override | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKEffector", "bool LoadJSON(const JSONValue&in)", asMETHODPR(IKEffector, LoadJSON, (const JSONValue&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "bool LoadJSON(const JSONValue&in)", AS_METHODPR(IKEffector, LoadJSON, (const JSONValue&), bool), AS_CALL_THISCALL);
     // bool Animatable::LoadXML(const XMLElement& source) override | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKEffector", "bool LoadXML(const XMLElement&in)", asMETHODPR(IKEffector, LoadXML, (const XMLElement&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "bool LoadXML(const XMLElement&in)", AS_METHODPR(IKEffector, LoadXML, (const XMLElement&), bool), AS_CALL_THISCALL);
     // void Component::MarkNetworkUpdate() override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKEffector", "void MarkNetworkUpdate()", asMETHODPR(IKEffector, MarkNetworkUpdate, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void MarkNetworkUpdate()", AS_METHODPR(IKEffector, MarkNetworkUpdate, (), void), AS_CALL_THISCALL);
     // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKEffector", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(IKEffector, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void OnEvent(Object@+, StringHash, VariantMap&)", AS_METHODPR(IKEffector, OnEvent, (Object*, StringHash, VariantMap&), void), AS_CALL_THISCALL);
     // virtual void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKEffector", "void OnGetAttribute(const AttributeInfo&in, Variant&) const", asMETHODPR(IKEffector, OnGetAttribute, (const AttributeInfo&, Variant&) const, void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void OnGetAttribute(const AttributeInfo&in, Variant&) const", AS_METHODPR(IKEffector, OnGetAttribute, (const AttributeInfo&, Variant&) const, void), AS_CALL_THISCALL);
     // virtual void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKEffector", "void OnSetAttribute(const AttributeInfo&in, const Variant&in)", asMETHODPR(IKEffector, OnSetAttribute, (const AttributeInfo&, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void OnSetAttribute(const AttributeInfo&in, const Variant&in)", AS_METHODPR(IKEffector, OnSetAttribute, (const AttributeInfo&, const Variant&), void), AS_CALL_THISCALL);
     // virtual void Component::OnSetEnabled() | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKEffector", "void OnSetEnabled()", asMETHODPR(IKEffector, OnSetEnabled, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void OnSetEnabled()", AS_METHODPR(IKEffector, OnSetEnabled, (), void), AS_CALL_THISCALL);
     // void Component::PrepareNetworkUpdate() | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKEffector", "void PrepareNetworkUpdate()", asMETHODPR(IKEffector, PrepareNetworkUpdate, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void PrepareNetworkUpdate()", AS_METHODPR(IKEffector, PrepareNetworkUpdate, (), void), AS_CALL_THISCALL);
     // bool Serializable::ReadDeltaUpdate(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKEffector", "bool ReadDeltaUpdate(Deserializer&)", asMETHODPR(IKEffector, ReadDeltaUpdate, (Deserializer&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "bool ReadDeltaUpdate(Deserializer&)", AS_METHODPR(IKEffector, ReadDeltaUpdate, (Deserializer&), bool), AS_CALL_THISCALL);
     // bool Serializable::ReadLatestDataUpdate(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKEffector", "bool ReadLatestDataUpdate(Deserializer&)", asMETHODPR(IKEffector, ReadLatestDataUpdate, (Deserializer&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "bool ReadLatestDataUpdate(Deserializer&)", AS_METHODPR(IKEffector, ReadLatestDataUpdate, (Deserializer&), bool), AS_CALL_THISCALL);
     // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
     // Error: type "RefCount*" can not automatically bind
     // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("IKEffector", "int Refs() const", asMETHODPR(IKEffector, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "int get_refs() const", asMETHODPR(IKEffector, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "int Refs() const", AS_METHODPR(IKEffector, Refs, () const, int), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "int get_refs() const", AS_METHODPR(IKEffector, Refs, () const, int), AS_CALL_THISCALL);
     // static void IKEffector::RegisterObject(Context* context) | File: ../IK/IKEffector.h
     // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("IKEffector", asBEHAVE_RELEASE, "void f()", asMETHODPR(IKEffector, ReleaseRef, (), void), asCALL_THISCALL);
+    engine->RegisterObjectBehaviour("IKEffector", asBEHAVE_RELEASE, "void f()", AS_METHODPR(IKEffector, ReleaseRef, (), void), AS_CALL_THISCALL);
     // void Component::Remove() | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKEffector", "void Remove()", asMETHODPR(IKEffector, Remove, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void Remove()", AS_METHODPR(IKEffector, Remove, (), void), AS_CALL_THISCALL);
     // void Animatable::RemoveAttributeAnimation(const String& name) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKEffector", "void RemoveAttributeAnimation(const String&in)", asMETHODPR(IKEffector, RemoveAttributeAnimation, (const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void RemoveAttributeAnimation(const String&in)", AS_METHODPR(IKEffector, RemoveAttributeAnimation, (const String&), void), AS_CALL_THISCALL);
     // void Serializable::RemoveInstanceDefault() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKEffector", "void RemoveInstanceDefault()", asMETHODPR(IKEffector, RemoveInstanceDefault, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void RemoveInstanceDefault()", AS_METHODPR(IKEffector, RemoveInstanceDefault, (), void), AS_CALL_THISCALL);
     // void Animatable::RemoveObjectAnimation() | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKEffector", "void RemoveObjectAnimation()", asMETHODPR(IKEffector, RemoveObjectAnimation, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void RemoveObjectAnimation()", AS_METHODPR(IKEffector, RemoveObjectAnimation, (), void), AS_CALL_THISCALL);
     // void Serializable::ResetToDefault() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKEffector", "void ResetToDefault()", asMETHODPR(IKEffector, ResetToDefault, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void ResetToDefault()", AS_METHODPR(IKEffector, ResetToDefault, (), void), AS_CALL_THISCALL);
     // bool Component::Save(Serializer& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKEffector", "bool Save(Serializer&) const", asMETHODPR(IKEffector, Save, (Serializer&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "bool Save(Serializer&) const", AS_METHODPR(IKEffector, Save, (Serializer&) const, bool), AS_CALL_THISCALL);
     // virtual bool Serializable::SaveDefaultAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKEffector", "bool SaveDefaultAttributes() const", asMETHODPR(IKEffector, SaveDefaultAttributes, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "bool SaveDefaultAttributes() const", AS_METHODPR(IKEffector, SaveDefaultAttributes, () const, bool), AS_CALL_THISCALL);
     // bool Component::SaveJSON(JSONValue& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKEffector", "bool SaveJSON(JSONValue&) const", asMETHODPR(IKEffector, SaveJSON, (JSONValue&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "bool SaveJSON(JSONValue&) const", AS_METHODPR(IKEffector, SaveJSON, (JSONValue&) const, bool), AS_CALL_THISCALL);
     // bool Component::SaveXML(XMLElement& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKEffector", "bool SaveXML(XMLElement&) const", asMETHODPR(IKEffector, SaveXML, (XMLElement&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "bool SaveXML(XMLElement&) const", AS_METHODPR(IKEffector, SaveXML, (XMLElement&) const, bool), AS_CALL_THISCALL);
     // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKEffector", "void SendEvent(StringHash)", asMETHODPR(IKEffector, SendEvent, (StringHash), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void SendEvent(StringHash)", AS_METHODPR(IKEffector, SendEvent, (StringHash), void), AS_CALL_THISCALL);
     // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKEffector", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(IKEffector, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void SendEvent(StringHash, VariantMap&)", AS_METHODPR(IKEffector, SendEvent, (StringHash, VariantMap&), void), AS_CALL_THISCALL);
     // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
     // Not registered because template
     // void Animatable::SetAnimationEnabled(bool enable) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKEffector", "void SetAnimationEnabled(bool)", asMETHODPR(IKEffector, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "void set_animationEnabled(bool)", asMETHODPR(IKEffector, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void SetAnimationEnabled(bool)", AS_METHODPR(IKEffector, SetAnimationEnabled, (bool), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void set_animationEnabled(bool)", AS_METHODPR(IKEffector, SetAnimationEnabled, (bool), void), AS_CALL_THISCALL);
     // void Animatable::SetAnimationTime(float time) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKEffector", "void SetAnimationTime(float)", asMETHODPR(IKEffector, SetAnimationTime, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void SetAnimationTime(float)", AS_METHODPR(IKEffector, SetAnimationTime, (float), void), AS_CALL_THISCALL);
     // bool Serializable::SetAttribute(unsigned index, const Variant& value) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKEffector", "bool SetAttribute(uint, const Variant&in)", asMETHODPR(IKEffector, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "bool set_attributes(uint, const Variant&in)", asMETHODPR(IKEffector, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "bool SetAttribute(uint, const Variant&in)", AS_METHODPR(IKEffector, SetAttribute, (unsigned, const Variant&), bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "bool set_attributes(uint, const Variant&in)", AS_METHODPR(IKEffector, SetAttribute, (unsigned, const Variant&), bool), AS_CALL_THISCALL);
     // bool Serializable::SetAttribute(const String& name, const Variant& value) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKEffector", "bool SetAttribute(const String&in, const Variant&in)", asMETHODPR(IKEffector, SetAttribute, (const String&, const Variant&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "bool SetAttribute(const String&in, const Variant&in)", AS_METHODPR(IKEffector, SetAttribute, (const String&, const Variant&), bool), AS_CALL_THISCALL);
     // void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode=WM_LOOP, float speed=1.0f) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKEffector", "void SetAttributeAnimation(const String&in, ValueAnimation@+, WrapMode = WM_LOOP, float = 1.0f)", asMETHODPR(IKEffector, SetAttributeAnimation, (const String&, ValueAnimation*, WrapMode, float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void SetAttributeAnimation(const String&in, ValueAnimation@+, WrapMode = WM_LOOP, float = 1.0f)", AS_METHODPR(IKEffector, SetAttributeAnimation, (const String&, ValueAnimation*, WrapMode, float), void), AS_CALL_THISCALL);
     // void Animatable::SetAttributeAnimationSpeed(const String& name, float speed) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKEffector", "void SetAttributeAnimationSpeed(const String&in, float)", asMETHODPR(IKEffector, SetAttributeAnimationSpeed, (const String&, float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void SetAttributeAnimationSpeed(const String&in, float)", AS_METHODPR(IKEffector, SetAttributeAnimationSpeed, (const String&, float), void), AS_CALL_THISCALL);
     // void Animatable::SetAttributeAnimationTime(const String& name, float time) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKEffector", "void SetAttributeAnimationTime(const String&in, float)", asMETHODPR(IKEffector, SetAttributeAnimationTime, (const String&, float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void SetAttributeAnimationTime(const String&in, float)", AS_METHODPR(IKEffector, SetAttributeAnimationTime, (const String&, float), void), AS_CALL_THISCALL);
     // void Animatable::SetAttributeAnimationWrapMode(const String& name, WrapMode wrapMode) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKEffector", "void SetAttributeAnimationWrapMode(const String&in, WrapMode)", asMETHODPR(IKEffector, SetAttributeAnimationWrapMode, (const String&, WrapMode), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void SetAttributeAnimationWrapMode(const String&in, WrapMode)", AS_METHODPR(IKEffector, SetAttributeAnimationWrapMode, (const String&, WrapMode), void), AS_CALL_THISCALL);
     // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKEffector", "void SetBlockEvents(bool)", asMETHODPR(IKEffector, SetBlockEvents, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void SetBlockEvents(bool)", AS_METHODPR(IKEffector, SetBlockEvents, (bool), void), AS_CALL_THISCALL);
     // void IKEffector::SetChainLength(unsigned chainLength) | File: ../IK/IKEffector.h
-    engine->RegisterObjectMethod("IKEffector", "void SetChainLength(uint)", asMETHODPR(IKEffector, SetChainLength, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "void set_chainLength(uint)", asMETHODPR(IKEffector, SetChainLength, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void SetChainLength(uint)", AS_METHODPR(IKEffector, SetChainLength, (unsigned), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void set_chainLength(uint)", AS_METHODPR(IKEffector, SetChainLength, (unsigned), void), AS_CALL_THISCALL);
     // void Component::SetEnabled(bool enable) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKEffector", "void SetEnabled(bool)", asMETHODPR(IKEffector, SetEnabled, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "void set_enabled(bool)", asMETHODPR(IKEffector, SetEnabled, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void SetEnabled(bool)", AS_METHODPR(IKEffector, SetEnabled, (bool), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void set_enabled(bool)", AS_METHODPR(IKEffector, SetEnabled, (bool), void), AS_CALL_THISCALL);
     // void IKEffector::SetFeature(Feature feature, bool enable) | File: ../IK/IKEffector.h
     // Not registered because have @nobind mark
     // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKEffector", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(IKEffector, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(IKEffector, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void SetGlobalVar(StringHash, const Variant&in)", AS_METHODPR(IKEffector, SetGlobalVar, (StringHash, const Variant&), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void set_globalVar(StringHash, const Variant&in)", AS_METHODPR(IKEffector, SetGlobalVar, (StringHash, const Variant&), void), AS_CALL_THISCALL);
     // void IKEffector::SetINHERIT_PARENT_ROTATION(bool enable) | File: ../IK/IKEffector.h
-    engine->RegisterObjectMethod("IKEffector", "void SetINHERIT_PARENT_ROTATION(bool)", asMETHODPR(IKEffector, SetINHERIT_PARENT_ROTATION, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void SetINHERIT_PARENT_ROTATION(bool)", AS_METHODPR(IKEffector, SetINHERIT_PARENT_ROTATION, (bool), void), AS_CALL_THISCALL);
     // void Serializable::SetInstanceDefault(bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKEffector", "void SetInstanceDefault(bool)", asMETHODPR(IKEffector, SetInstanceDefault, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void SetInstanceDefault(bool)", AS_METHODPR(IKEffector, SetInstanceDefault, (bool), void), AS_CALL_THISCALL);
     // void Serializable::SetInterceptNetworkUpdate(const String& attributeName, bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKEffector", "void SetInterceptNetworkUpdate(const String&in, bool)", asMETHODPR(IKEffector, SetInterceptNetworkUpdate, (const String&, bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void SetInterceptNetworkUpdate(const String&in, bool)", AS_METHODPR(IKEffector, SetInterceptNetworkUpdate, (const String&, bool), void), AS_CALL_THISCALL);
     // void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKEffector", "void SetObjectAnimation(ObjectAnimation@+)", asMETHODPR(IKEffector, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "void set_objectAnimation(ObjectAnimation@+)", asMETHODPR(IKEffector, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void SetObjectAnimation(ObjectAnimation@+)", AS_METHODPR(IKEffector, SetObjectAnimation, (ObjectAnimation*), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void set_objectAnimation(ObjectAnimation@+)", AS_METHODPR(IKEffector, SetObjectAnimation, (ObjectAnimation*), void), AS_CALL_THISCALL);
     // void Animatable::SetObjectAnimationAttr(const ResourceRef& value) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKEffector", "void SetObjectAnimationAttr(const ResourceRef&in)", asMETHODPR(IKEffector, SetObjectAnimationAttr, (const ResourceRef&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void SetObjectAnimationAttr(const ResourceRef&in)", AS_METHODPR(IKEffector, SetObjectAnimationAttr, (const ResourceRef&), void), AS_CALL_THISCALL);
     // void IKEffector::SetRotationDecay(float decay) | File: ../IK/IKEffector.h
-    engine->RegisterObjectMethod("IKEffector", "void SetRotationDecay(float)", asMETHODPR(IKEffector, SetRotationDecay, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "void set_rotationDecay(float)", asMETHODPR(IKEffector, SetRotationDecay, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void SetRotationDecay(float)", AS_METHODPR(IKEffector, SetRotationDecay, (float), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void set_rotationDecay(float)", AS_METHODPR(IKEffector, SetRotationDecay, (float), void), AS_CALL_THISCALL);
     // void IKEffector::SetRotationWeight(float weight) | File: ../IK/IKEffector.h
-    engine->RegisterObjectMethod("IKEffector", "void SetRotationWeight(float)", asMETHODPR(IKEffector, SetRotationWeight, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "void set_rotationWeight(float)", asMETHODPR(IKEffector, SetRotationWeight, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void SetRotationWeight(float)", AS_METHODPR(IKEffector, SetRotationWeight, (float), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void set_rotationWeight(float)", AS_METHODPR(IKEffector, SetRotationWeight, (float), void), AS_CALL_THISCALL);
     // void IKEffector::SetTargetName(const String& nodeName) | File: ../IK/IKEffector.h
-    engine->RegisterObjectMethod("IKEffector", "void SetTargetName(const String&in)", asMETHODPR(IKEffector, SetTargetName, (const String&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "void set_targetName(const String&in)", asMETHODPR(IKEffector, SetTargetName, (const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void SetTargetName(const String&in)", AS_METHODPR(IKEffector, SetTargetName, (const String&), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void set_targetName(const String&in)", AS_METHODPR(IKEffector, SetTargetName, (const String&), void), AS_CALL_THISCALL);
     // void IKEffector::SetTargetNode(Node* targetNode) | File: ../IK/IKEffector.h
-    engine->RegisterObjectMethod("IKEffector", "void SetTargetNode(Node@+)", asMETHODPR(IKEffector, SetTargetNode, (Node*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "void set_targetNode(Node@+)", asMETHODPR(IKEffector, SetTargetNode, (Node*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void SetTargetNode(Node@+)", AS_METHODPR(IKEffector, SetTargetNode, (Node*), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void set_targetNode(Node@+)", AS_METHODPR(IKEffector, SetTargetNode, (Node*), void), AS_CALL_THISCALL);
     // void IKEffector::SetTargetPosition(const Vector3& targetPosition) | File: ../IK/IKEffector.h
-    engine->RegisterObjectMethod("IKEffector", "void SetTargetPosition(const Vector3&in)", asMETHODPR(IKEffector, SetTargetPosition, (const Vector3&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "void set_targetPosition(const Vector3&in)", asMETHODPR(IKEffector, SetTargetPosition, (const Vector3&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void SetTargetPosition(const Vector3&in)", AS_METHODPR(IKEffector, SetTargetPosition, (const Vector3&), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void set_targetPosition(const Vector3&in)", AS_METHODPR(IKEffector, SetTargetPosition, (const Vector3&), void), AS_CALL_THISCALL);
     // void IKEffector::SetTargetRotation(const Quaternion& targetRotation) | File: ../IK/IKEffector.h
-    engine->RegisterObjectMethod("IKEffector", "void SetTargetRotation(const Quaternion&in)", asMETHODPR(IKEffector, SetTargetRotation, (const Quaternion&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "void set_targetRotation(const Quaternion&in)", asMETHODPR(IKEffector, SetTargetRotation, (const Quaternion&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void SetTargetRotation(const Quaternion&in)", AS_METHODPR(IKEffector, SetTargetRotation, (const Quaternion&), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void set_targetRotation(const Quaternion&in)", AS_METHODPR(IKEffector, SetTargetRotation, (const Quaternion&), void), AS_CALL_THISCALL);
     // void IKEffector::SetTargetRotationEuler(const Vector3& targetRotation) | File: ../IK/IKEffector.h
-    engine->RegisterObjectMethod("IKEffector", "void SetTargetRotationEuler(const Vector3&in)", asMETHODPR(IKEffector, SetTargetRotationEuler, (const Vector3&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void SetTargetRotationEuler(const Vector3&in)", AS_METHODPR(IKEffector, SetTargetRotationEuler, (const Vector3&), void), AS_CALL_THISCALL);
     // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKEffector", "void SetTemporary(bool)", asMETHODPR(IKEffector, SetTemporary, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "void set_temporary(bool)", asMETHODPR(IKEffector, SetTemporary, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void SetTemporary(bool)", AS_METHODPR(IKEffector, SetTemporary, (bool), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void set_temporary(bool)", AS_METHODPR(IKEffector, SetTemporary, (bool), void), AS_CALL_THISCALL);
     // void IKEffector::SetWeight(float weight) | File: ../IK/IKEffector.h
-    engine->RegisterObjectMethod("IKEffector", "void SetWeight(float)", asMETHODPR(IKEffector, SetWeight, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "void set_weight(float)", asMETHODPR(IKEffector, SetWeight, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void SetWeight(float)", AS_METHODPR(IKEffector, SetWeight, (float), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void set_weight(float)", AS_METHODPR(IKEffector, SetWeight, (float), void), AS_CALL_THISCALL);
     // void IKEffector::SetWEIGHT_NLERP(bool enable) | File: ../IK/IKEffector.h
-    engine->RegisterObjectMethod("IKEffector", "void SetWEIGHT_NLERP(bool)", asMETHODPR(IKEffector, SetWEIGHT_NLERP, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void SetWEIGHT_NLERP(bool)", AS_METHODPR(IKEffector, SetWEIGHT_NLERP, (bool), void), AS_CALL_THISCALL);
     // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
     // Error: type "EventHandler*" can not automatically bind
     // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
@@ -759,24 +759,24 @@ void ASRegisterGenerated_Members_I(asIScriptEngine* engine)
     // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
     // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
     // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKEffector", "void UnsubscribeFromAllEvents()", asMETHODPR(IKEffector, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void UnsubscribeFromAllEvents()", AS_METHODPR(IKEffector, UnsubscribeFromAllEvents, (), void), AS_CALL_THISCALL);
     // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKEffector", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(IKEffector_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("IKEffector", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", AS_FUNCTION_OBJFIRST(IKEffector_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), AS_CALL_CDECL_OBJFIRST);
     // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKEffector", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(IKEffector, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void UnsubscribeFromEvent(StringHash)", AS_METHODPR(IKEffector, UnsubscribeFromEvent, (StringHash), void), AS_CALL_THISCALL);
     // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKEffector", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(IKEffector, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void UnsubscribeFromEvent(Object@+, StringHash)", AS_METHODPR(IKEffector, UnsubscribeFromEvent, (Object*, StringHash), void), AS_CALL_THISCALL);
     // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKEffector", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(IKEffector, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void UnsubscribeFromEvents(Object@+)", AS_METHODPR(IKEffector, UnsubscribeFromEvents, (Object*), void), AS_CALL_THISCALL);
     // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("IKEffector", "int WeakRefs() const", asMETHODPR(IKEffector, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "int get_weakRefs() const", asMETHODPR(IKEffector, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "int WeakRefs() const", AS_METHODPR(IKEffector, WeakRefs, () const, int), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "int get_weakRefs() const", AS_METHODPR(IKEffector, WeakRefs, () const, int), AS_CALL_THISCALL);
     // void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attributeBits, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKEffector", "void WriteDeltaUpdate(Serializer&, const DirtyBits&in, uint8)", asMETHODPR(IKEffector, WriteDeltaUpdate, (Serializer&, const DirtyBits&, unsigned char), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void WriteDeltaUpdate(Serializer&, const DirtyBits&in, uint8)", AS_METHODPR(IKEffector, WriteDeltaUpdate, (Serializer&, const DirtyBits&, unsigned char), void), AS_CALL_THISCALL);
     // void Serializable::WriteInitialDeltaUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKEffector", "void WriteInitialDeltaUpdate(Serializer&, uint8)", asMETHODPR(IKEffector, WriteInitialDeltaUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void WriteInitialDeltaUpdate(Serializer&, uint8)", AS_METHODPR(IKEffector, WriteInitialDeltaUpdate, (Serializer&, unsigned char), void), AS_CALL_THISCALL);
     // void Serializable::WriteLatestDataUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKEffector", "void WriteLatestDataUpdate(Serializer&, uint8)", asMETHODPR(IKEffector, WriteLatestDataUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKEffector", "void WriteLatestDataUpdate(Serializer&, uint8)", AS_METHODPR(IKEffector, WriteLatestDataUpdate, (Serializer&, unsigned char), void), AS_CALL_THISCALL);
 #ifdef REGISTER_MANUAL_PART_Component
     REGISTER_MANUAL_PART_Component(IKEffector, "IKEffector")
 #endif
@@ -804,25 +804,25 @@ void ASRegisterGenerated_Members_I(asIScriptEngine* engine)
 
 #ifdef URHO3D_IK
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("IKSolver", asBEHAVE_ADDREF, "void f()", asMETHODPR(IKSolver, AddRef, (), void), asCALL_THISCALL);
+    engine->RegisterObjectBehaviour("IKSolver", asBEHAVE_ADDREF, "void f()", AS_METHODPR(IKSolver, AddRef, (), void), AS_CALL_THISCALL);
     // void Component::AddReplicationState(ComponentReplicationState* state) | File: ../Scene/Component.h
     // Error: type "ComponentReplicationState*" can not automatically bind
     // void Serializable::AllocateNetworkState() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKSolver", "void AllocateNetworkState()", asMETHODPR(IKSolver, AllocateNetworkState, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void AllocateNetworkState()", AS_METHODPR(IKSolver, AllocateNetworkState, (), void), AS_CALL_THISCALL);
     // void IKSolver::ApplyActivePoseToScene() | File: ../IK/IKSolver.h
-    engine->RegisterObjectMethod("IKSolver", "void ApplyActivePoseToScene()", asMETHODPR(IKSolver, ApplyActivePoseToScene, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void ApplyActivePoseToScene()", AS_METHODPR(IKSolver, ApplyActivePoseToScene, (), void), AS_CALL_THISCALL);
     // virtual void Serializable::ApplyAttributes() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKSolver", "void ApplyAttributes()", asMETHODPR(IKSolver, ApplyAttributes, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void ApplyAttributes()", AS_METHODPR(IKSolver, ApplyAttributes, (), void), AS_CALL_THISCALL);
     // void IKSolver::ApplyOriginalPoseToActivePose() | File: ../IK/IKSolver.h
-    engine->RegisterObjectMethod("IKSolver", "void ApplyOriginalPoseToActivePose()", asMETHODPR(IKSolver, ApplyOriginalPoseToActivePose, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void ApplyOriginalPoseToActivePose()", AS_METHODPR(IKSolver, ApplyOriginalPoseToActivePose, (), void), AS_CALL_THISCALL);
     // void IKSolver::ApplyOriginalPoseToScene() | File: ../IK/IKSolver.h
-    engine->RegisterObjectMethod("IKSolver", "void ApplyOriginalPoseToScene()", asMETHODPR(IKSolver, ApplyOriginalPoseToScene, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void ApplyOriginalPoseToScene()", AS_METHODPR(IKSolver, ApplyOriginalPoseToScene, (), void), AS_CALL_THISCALL);
     // void IKSolver::ApplySceneToActivePose() | File: ../IK/IKSolver.h
-    engine->RegisterObjectMethod("IKSolver", "void ApplySceneToActivePose()", asMETHODPR(IKSolver, ApplySceneToActivePose, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void ApplySceneToActivePose()", AS_METHODPR(IKSolver, ApplySceneToActivePose, (), void), AS_CALL_THISCALL);
     // void IKSolver::ApplySceneToOriginalPose() | File: ../IK/IKSolver.h
-    engine->RegisterObjectMethod("IKSolver", "void ApplySceneToOriginalPose()", asMETHODPR(IKSolver, ApplySceneToOriginalPose, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void ApplySceneToOriginalPose()", AS_METHODPR(IKSolver, ApplySceneToOriginalPose, (), void), AS_CALL_THISCALL);
     // void IKSolver::CalculateJointRotations() | File: ../IK/IKSolver.h
-    engine->RegisterObjectMethod("IKSolver", "void CalculateJointRotations()", asMETHODPR(IKSolver, CalculateJointRotations, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void CalculateJointRotations()", AS_METHODPR(IKSolver, CalculateJointRotations, (), void), AS_CALL_THISCALL);
     // template<typename T> T* Object::Cast() | File: ../Core/Object.h
     // Not registered because template
     // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
@@ -830,44 +830,44 @@ void ASRegisterGenerated_Members_I(asIScriptEngine* engine)
     // void Component::CleanupConnection(Connection* connection) | File: ../Scene/Component.h
     // Not registered because have @manualbind mark
     // void IKSolver::DrawDebugGeometry(bool depthTest) | File: ../IK/IKSolver.h
-    engine->RegisterObjectMethod("IKSolver", "void DrawDebugGeometry(bool)", asMETHODPR(IKSolver, DrawDebugGeometry, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void DrawDebugGeometry(bool)", AS_METHODPR(IKSolver, DrawDebugGeometry, (bool), void), AS_CALL_THISCALL);
     // void IKSolver::DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override | File: ../IK/IKSolver.h
-    engine->RegisterObjectMethod("IKSolver", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(IKSolver, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void DrawDebugGeometry(DebugRenderer@+, bool)", AS_METHODPR(IKSolver, DrawDebugGeometry, (DebugRenderer*, bool), void), AS_CALL_THISCALL);
     // Algorithm IKSolver::GetAlgorithm() const | File: ../IK/IKSolver.h
     // Not registered because have @manualbind mark
     // bool Animatable::GetAnimationEnabled() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKSolver", "bool GetAnimationEnabled() const", asMETHODPR(IKSolver, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "bool get_animationEnabled() const", asMETHODPR(IKSolver, GetAnimationEnabled, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool GetAnimationEnabled() const", AS_METHODPR(IKSolver, GetAnimationEnabled, () const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool get_animationEnabled() const", AS_METHODPR(IKSolver, GetAnimationEnabled, () const, bool), AS_CALL_THISCALL);
     // Variant Serializable::GetAttribute(unsigned index) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKSolver", "Variant GetAttribute(uint) const", asMETHODPR(IKSolver, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "Variant get_attributes(uint) const", asMETHODPR(IKSolver, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "Variant GetAttribute(uint) const", AS_METHODPR(IKSolver, GetAttribute, (unsigned) const, Variant), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "Variant get_attributes(uint) const", AS_METHODPR(IKSolver, GetAttribute, (unsigned) const, Variant), AS_CALL_THISCALL);
     // Variant Serializable::GetAttribute(const String& name) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKSolver", "Variant GetAttribute(const String&in) const", asMETHODPR(IKSolver, GetAttribute, (const String&) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "Variant GetAttribute(const String&in) const", AS_METHODPR(IKSolver, GetAttribute, (const String&) const, Variant), AS_CALL_THISCALL);
     // ValueAnimation* Animatable::GetAttributeAnimation(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKSolver", "ValueAnimation@+ GetAttributeAnimation(const String&in) const", asMETHODPR(IKSolver, GetAttributeAnimation, (const String&) const, ValueAnimation*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "ValueAnimation@+ GetAttributeAnimation(const String&in) const", AS_METHODPR(IKSolver, GetAttributeAnimation, (const String&) const, ValueAnimation*), AS_CALL_THISCALL);
     // float Animatable::GetAttributeAnimationSpeed(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKSolver", "float GetAttributeAnimationSpeed(const String&in) const", asMETHODPR(IKSolver, GetAttributeAnimationSpeed, (const String&) const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "float GetAttributeAnimationSpeed(const String&in) const", AS_METHODPR(IKSolver, GetAttributeAnimationSpeed, (const String&) const, float), AS_CALL_THISCALL);
     // float Animatable::GetAttributeAnimationTime(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKSolver", "float GetAttributeAnimationTime(const String&in) const", asMETHODPR(IKSolver, GetAttributeAnimationTime, (const String&) const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "float GetAttributeAnimationTime(const String&in) const", AS_METHODPR(IKSolver, GetAttributeAnimationTime, (const String&) const, float), AS_CALL_THISCALL);
     // WrapMode Animatable::GetAttributeAnimationWrapMode(const String& name) const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKSolver", "WrapMode GetAttributeAnimationWrapMode(const String&in) const", asMETHODPR(IKSolver, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "WrapMode GetAttributeAnimationWrapMode(const String&in) const", AS_METHODPR(IKSolver, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), AS_CALL_THISCALL);
     // Variant Serializable::GetAttributeDefault(unsigned index) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKSolver", "Variant GetAttributeDefault(uint) const", asMETHODPR(IKSolver, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "Variant get_attributeDefaults(uint) const", asMETHODPR(IKSolver, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "Variant GetAttributeDefault(uint) const", AS_METHODPR(IKSolver, GetAttributeDefault, (unsigned) const, Variant), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "Variant get_attributeDefaults(uint) const", AS_METHODPR(IKSolver, GetAttributeDefault, (unsigned) const, Variant), AS_CALL_THISCALL);
     // Variant Serializable::GetAttributeDefault(const String& name) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKSolver", "Variant GetAttributeDefault(const String&in) const", asMETHODPR(IKSolver, GetAttributeDefault, (const String&) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "Variant GetAttributeDefault(const String&in) const", AS_METHODPR(IKSolver, GetAttributeDefault, (const String&) const, Variant), AS_CALL_THISCALL);
     // virtual const Vector<AttributeInfo>* Serializable::GetAttributes() const | File: ../Scene/Serializable.h
     // Error: type "const Vector<AttributeInfo>*" can not automatically bind
     // bool IKSolver::GetAUTO_SOLVE() const | File: ../IK/IKSolver.h
-    engine->RegisterObjectMethod("IKSolver", "bool GetAUTO_SOLVE() const", asMETHODPR(IKSolver, GetAUTO_SOLVE, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "bool get_AUTO_SOLVE() const", asMETHODPR(IKSolver, GetAUTO_SOLVE, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool GetAUTO_SOLVE() const", AS_METHODPR(IKSolver, GetAUTO_SOLVE, () const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool get_AUTO_SOLVE() const", AS_METHODPR(IKSolver, GetAUTO_SOLVE, () const, bool), AS_CALL_THISCALL);
     // bool Object::GetBlockEvents() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKSolver", "bool GetBlockEvents() const", asMETHODPR(IKSolver, GetBlockEvents, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool GetBlockEvents() const", AS_METHODPR(IKSolver, GetBlockEvents, () const, bool), AS_CALL_THISCALL);
     // const String& Object::GetCategory() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKSolver", "const String& GetCategory() const", asMETHODPR(IKSolver, GetCategory, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "const String& get_category() const", asMETHODPR(IKSolver, GetCategory, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "const String& GetCategory() const", AS_METHODPR(IKSolver, GetCategory, () const, const String&), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "const String& get_category() const", AS_METHODPR(IKSolver, GetCategory, () const, const String&), AS_CALL_THISCALL);
     // Component* Component::GetComponent(StringHash type) const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKSolver", "Component@+ GetComponent(StringHash) const", asMETHODPR(IKSolver, GetComponent, (StringHash) const, Component*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "Component@+ GetComponent(StringHash) const", AS_METHODPR(IKSolver, GetComponent, (StringHash) const, Component*), AS_CALL_THISCALL);
     // template<class T> T* Component::GetComponent() const | File: ../Scene/Component.h
     // Not registered because template
     // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const | File: ../Scene/Component.h
@@ -875,241 +875,241 @@ void ASRegisterGenerated_Members_I(asIScriptEngine* engine)
     // template<class T> void Component::GetComponents(PODVector<T*>& dest) const | File: ../Scene/Component.h
     // Not registered because template
     // bool IKSolver::GetCONSTRAINTS() const | File: ../IK/IKSolver.h
-    engine->RegisterObjectMethod("IKSolver", "bool GetCONSTRAINTS() const", asMETHODPR(IKSolver, GetCONSTRAINTS, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "bool get_CONSTRAINTS() const", asMETHODPR(IKSolver, GetCONSTRAINTS, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool GetCONSTRAINTS() const", AS_METHODPR(IKSolver, GetCONSTRAINTS, () const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool get_CONSTRAINTS() const", AS_METHODPR(IKSolver, GetCONSTRAINTS, () const, bool), AS_CALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
     // Error: type "Context*" can used only as function parameter
     // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest) | File: ../Scene/Component.h
     // Error: type "PODVector<Node*>&" can not automatically bind
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKSolver", "VariantMap& GetEventDataMap() const", asMETHODPR(IKSolver, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "VariantMap& GetEventDataMap() const", AS_METHODPR(IKSolver, GetEventDataMap, () const, VariantMap&), AS_CALL_THISCALL);
     // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
     // Error: type "EventHandler*" can not automatically bind
     // Object* Object::GetEventSender() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKSolver", "Object@+ GetEventSender() const", asMETHODPR(IKSolver, GetEventSender, () const, Object*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "Object@+ GetEventSender() const", AS_METHODPR(IKSolver, GetEventSender, () const, Object*), AS_CALL_THISCALL);
     // bool IKSolver::GetFeature(Feature feature) const | File: ../IK/IKSolver.h
     // Not registered because have @nobind mark
     // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKSolver", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(IKSolver, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "const Variant& get_globalVar(StringHash) const", asMETHODPR(IKSolver, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "const Variant& GetGlobalVar(StringHash) const", AS_METHODPR(IKSolver, GetGlobalVar, (StringHash) const, const Variant&), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "const Variant& get_globalVar(StringHash) const", AS_METHODPR(IKSolver, GetGlobalVar, (StringHash) const, const Variant&), AS_CALL_THISCALL);
     // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKSolver", "const VariantMap& GetGlobalVars() const", asMETHODPR(IKSolver, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "const VariantMap& get_globalVars() const", asMETHODPR(IKSolver, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "const VariantMap& GetGlobalVars() const", AS_METHODPR(IKSolver, GetGlobalVars, () const, const VariantMap&), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "const VariantMap& get_globalVars() const", AS_METHODPR(IKSolver, GetGlobalVars, () const, const VariantMap&), AS_CALL_THISCALL);
     // unsigned Component::GetID() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKSolver", "uint GetID() const", asMETHODPR(IKSolver, GetID, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "uint get_id() const", asMETHODPR(IKSolver, GetID, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "uint GetID() const", AS_METHODPR(IKSolver, GetID, () const, unsigned), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "uint get_id() const", AS_METHODPR(IKSolver, GetID, () const, unsigned), AS_CALL_THISCALL);
     // bool Serializable::GetInterceptNetworkUpdate(const String& attributeName) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKSolver", "bool GetInterceptNetworkUpdate(const String&in) const", asMETHODPR(IKSolver, GetInterceptNetworkUpdate, (const String&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool GetInterceptNetworkUpdate(const String&in) const", AS_METHODPR(IKSolver, GetInterceptNetworkUpdate, (const String&) const, bool), AS_CALL_THISCALL);
     // bool IKSolver::GetJOINT_ROTATIONS() const | File: ../IK/IKSolver.h
-    engine->RegisterObjectMethod("IKSolver", "bool GetJOINT_ROTATIONS() const", asMETHODPR(IKSolver, GetJOINT_ROTATIONS, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "bool get_JOINT_ROTATIONS() const", asMETHODPR(IKSolver, GetJOINT_ROTATIONS, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool GetJOINT_ROTATIONS() const", AS_METHODPR(IKSolver, GetJOINT_ROTATIONS, () const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool get_JOINT_ROTATIONS() const", AS_METHODPR(IKSolver, GetJOINT_ROTATIONS, () const, bool), AS_CALL_THISCALL);
     // unsigned IKSolver::GetMaximumIterations() const | File: ../IK/IKSolver.h
-    engine->RegisterObjectMethod("IKSolver", "uint GetMaximumIterations() const", asMETHODPR(IKSolver, GetMaximumIterations, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "uint get_maximumIterations() const", asMETHODPR(IKSolver, GetMaximumIterations, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "uint GetMaximumIterations() const", AS_METHODPR(IKSolver, GetMaximumIterations, () const, unsigned), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "uint get_maximumIterations() const", AS_METHODPR(IKSolver, GetMaximumIterations, () const, unsigned), AS_CALL_THISCALL);
     // virtual const Vector<AttributeInfo>* Serializable::GetNetworkAttributes() const | File: ../Scene/Serializable.h
     // Error: type "const Vector<AttributeInfo>*" can not automatically bind
     // NetworkState* Serializable::GetNetworkState() const | File: ../Scene/Serializable.h
     // Error: type "NetworkState*" can not automatically bind
     // Node* Component::GetNode() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKSolver", "Node@+ GetNode() const", asMETHODPR(IKSolver, GetNode, () const, Node*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "Node@+ get_node() const", asMETHODPR(IKSolver, GetNode, () const, Node*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "Node@+ GetNode() const", AS_METHODPR(IKSolver, GetNode, () const, Node*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "Node@+ get_node() const", AS_METHODPR(IKSolver, GetNode, () const, Node*), AS_CALL_THISCALL);
     // unsigned Serializable::GetNumAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKSolver", "uint GetNumAttributes() const", asMETHODPR(IKSolver, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "uint get_numAttributes() const", asMETHODPR(IKSolver, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "uint GetNumAttributes() const", AS_METHODPR(IKSolver, GetNumAttributes, () const, unsigned), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "uint get_numAttributes() const", AS_METHODPR(IKSolver, GetNumAttributes, () const, unsigned), AS_CALL_THISCALL);
     // unsigned Serializable::GetNumNetworkAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKSolver", "uint GetNumNetworkAttributes() const", asMETHODPR(IKSolver, GetNumNetworkAttributes, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "uint GetNumNetworkAttributes() const", AS_METHODPR(IKSolver, GetNumNetworkAttributes, () const, unsigned), AS_CALL_THISCALL);
     // ObjectAnimation* Animatable::GetObjectAnimation() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKSolver", "ObjectAnimation@+ GetObjectAnimation() const", asMETHODPR(IKSolver, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "ObjectAnimation@+ get_objectAnimation() const", asMETHODPR(IKSolver, GetObjectAnimation, () const, ObjectAnimation*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "ObjectAnimation@+ GetObjectAnimation() const", AS_METHODPR(IKSolver, GetObjectAnimation, () const, ObjectAnimation*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "ObjectAnimation@+ get_objectAnimation() const", AS_METHODPR(IKSolver, GetObjectAnimation, () const, ObjectAnimation*), AS_CALL_THISCALL);
     // ResourceRef Animatable::GetObjectAnimationAttr() const | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKSolver", "ResourceRef GetObjectAnimationAttr() const", asMETHODPR(IKSolver, GetObjectAnimationAttr, () const, ResourceRef), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "ResourceRef GetObjectAnimationAttr() const", AS_METHODPR(IKSolver, GetObjectAnimationAttr, () const, ResourceRef), AS_CALL_THISCALL);
     // Scene* Component::GetScene() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKSolver", "Scene@+ GetScene() const", asMETHODPR(IKSolver, GetScene, () const, Scene*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "Scene@+ GetScene() const", AS_METHODPR(IKSolver, GetScene, () const, Scene*), AS_CALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKSolver", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(IKSolver, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "Object@+ GetSubsystem(StringHash) const", AS_METHODPR(IKSolver, GetSubsystem, (StringHash) const, Object*), AS_CALL_THISCALL);
     // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // bool IKSolver::GetTARGET_ROTATIONS() const | File: ../IK/IKSolver.h
-    engine->RegisterObjectMethod("IKSolver", "bool GetTARGET_ROTATIONS() const", asMETHODPR(IKSolver, GetTARGET_ROTATIONS, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "bool get_TARGET_ROTATIONS() const", asMETHODPR(IKSolver, GetTARGET_ROTATIONS, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool GetTARGET_ROTATIONS() const", AS_METHODPR(IKSolver, GetTARGET_ROTATIONS, () const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool get_TARGET_ROTATIONS() const", AS_METHODPR(IKSolver, GetTARGET_ROTATIONS, () const, bool), AS_CALL_THISCALL);
     // float IKSolver::GetTolerance() const | File: ../IK/IKSolver.h
-    engine->RegisterObjectMethod("IKSolver", "float GetTolerance() const", asMETHODPR(IKSolver, GetTolerance, () const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "float get_tolerance() const", asMETHODPR(IKSolver, GetTolerance, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "float GetTolerance() const", AS_METHODPR(IKSolver, GetTolerance, () const, float), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "float get_tolerance() const", AS_METHODPR(IKSolver, GetTolerance, () const, float), AS_CALL_THISCALL);
     // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKSolver", "StringHash GetType() const", asMETHODPR(IKSolver, GetType, () const, StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "StringHash get_type() const", asMETHODPR(IKSolver, GetType, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "StringHash GetType() const", AS_METHODPR(IKSolver, GetType, () const, StringHash), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "StringHash get_type() const", AS_METHODPR(IKSolver, GetType, () const, StringHash), AS_CALL_THISCALL);
     // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
     // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
     // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
     // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
     // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKSolver", "const String& GetTypeName() const", asMETHODPR(IKSolver, GetTypeName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "const String& get_typeName() const", asMETHODPR(IKSolver, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "const String& GetTypeName() const", AS_METHODPR(IKSolver, GetTypeName, () const, const String&), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "const String& get_typeName() const", AS_METHODPR(IKSolver, GetTypeName, () const, const String&), AS_CALL_THISCALL);
     // bool IKSolver::GetUPDATE_ACTIVE_POSE() const | File: ../IK/IKSolver.h
-    engine->RegisterObjectMethod("IKSolver", "bool GetUPDATE_ACTIVE_POSE() const", asMETHODPR(IKSolver, GetUPDATE_ACTIVE_POSE, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "bool get_UPDATE_ACTIVE_POSE() const", asMETHODPR(IKSolver, GetUPDATE_ACTIVE_POSE, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool GetUPDATE_ACTIVE_POSE() const", AS_METHODPR(IKSolver, GetUPDATE_ACTIVE_POSE, () const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool get_UPDATE_ACTIVE_POSE() const", AS_METHODPR(IKSolver, GetUPDATE_ACTIVE_POSE, () const, bool), AS_CALL_THISCALL);
     // bool IKSolver::GetUPDATE_ORIGINAL_POSE() const | File: ../IK/IKSolver.h
-    engine->RegisterObjectMethod("IKSolver", "bool GetUPDATE_ORIGINAL_POSE() const", asMETHODPR(IKSolver, GetUPDATE_ORIGINAL_POSE, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "bool get_UPDATE_ORIGINAL_POSE() const", asMETHODPR(IKSolver, GetUPDATE_ORIGINAL_POSE, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool GetUPDATE_ORIGINAL_POSE() const", AS_METHODPR(IKSolver, GetUPDATE_ORIGINAL_POSE, () const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool get_UPDATE_ORIGINAL_POSE() const", AS_METHODPR(IKSolver, GetUPDATE_ORIGINAL_POSE, () const, bool), AS_CALL_THISCALL);
     // bool IKSolver::GetUSE_ORIGINAL_POSE() const | File: ../IK/IKSolver.h
-    engine->RegisterObjectMethod("IKSolver", "bool GetUSE_ORIGINAL_POSE() const", asMETHODPR(IKSolver, GetUSE_ORIGINAL_POSE, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "bool get_USE_ORIGINAL_POSE() const", asMETHODPR(IKSolver, GetUSE_ORIGINAL_POSE, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool GetUSE_ORIGINAL_POSE() const", AS_METHODPR(IKSolver, GetUSE_ORIGINAL_POSE, () const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool get_USE_ORIGINAL_POSE() const", AS_METHODPR(IKSolver, GetUSE_ORIGINAL_POSE, () const, bool), AS_CALL_THISCALL);
     // bool Object::HasEventHandlers() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKSolver", "bool HasEventHandlers() const", asMETHODPR(IKSolver, HasEventHandlers, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool HasEventHandlers() const", AS_METHODPR(IKSolver, HasEventHandlers, () const, bool), AS_CALL_THISCALL);
     // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKSolver", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(IKSolver, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool HasSubscribedToEvent(StringHash) const", AS_METHODPR(IKSolver, HasSubscribedToEvent, (StringHash) const, bool), AS_CALL_THISCALL);
     // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKSolver", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(IKSolver, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool HasSubscribedToEvent(Object@+, StringHash) const", AS_METHODPR(IKSolver, HasSubscribedToEvent, (Object*, StringHash) const, bool), AS_CALL_THISCALL);
     // explicit IKSolver::IKSolver(Context* context) | File: ../IK/IKSolver.h
-    engine->RegisterObjectBehaviour("IKSolver", asBEHAVE_FACTORY, "IKSolver@+ f()", asFUNCTION(IKSolver_IKSolver_Context), asCALL_CDECL);
+    engine->RegisterObjectBehaviour("IKSolver", asBEHAVE_FACTORY, "IKSolver@+ f()", AS_FUNCTION(IKSolver_IKSolver_Context), AS_CALL_CDECL);
     // bool Component::IsEnabled() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKSolver", "bool IsEnabled() const", asMETHODPR(IKSolver, IsEnabled, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "bool get_enabled() const", asMETHODPR(IKSolver, IsEnabled, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool IsEnabled() const", AS_METHODPR(IKSolver, IsEnabled, () const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool get_enabled() const", AS_METHODPR(IKSolver, IsEnabled, () const, bool), AS_CALL_THISCALL);
     // bool Component::IsEnabledEffective() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKSolver", "bool IsEnabledEffective() const", asMETHODPR(IKSolver, IsEnabledEffective, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "bool get_enabledEffective() const", asMETHODPR(IKSolver, IsEnabledEffective, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool IsEnabledEffective() const", AS_METHODPR(IKSolver, IsEnabledEffective, () const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool get_enabledEffective() const", AS_METHODPR(IKSolver, IsEnabledEffective, () const, bool), AS_CALL_THISCALL);
     // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKSolver", "bool IsInstanceOf(StringHash) const", asMETHODPR(IKSolver, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool IsInstanceOf(StringHash) const", AS_METHODPR(IKSolver, IsInstanceOf, (StringHash) const, bool), AS_CALL_THISCALL);
     // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
     // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
     // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
     // Not registered because template
     // bool Component::IsReplicated() const | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKSolver", "bool IsReplicated() const", asMETHODPR(IKSolver, IsReplicated, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "bool get_replicated() const", asMETHODPR(IKSolver, IsReplicated, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool IsReplicated() const", AS_METHODPR(IKSolver, IsReplicated, () const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool get_replicated() const", AS_METHODPR(IKSolver, IsReplicated, () const, bool), AS_CALL_THISCALL);
     // bool Serializable::IsTemporary() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKSolver", "bool IsTemporary() const", asMETHODPR(IKSolver, IsTemporary, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "bool get_temporary() const", asMETHODPR(IKSolver, IsTemporary, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool IsTemporary() const", AS_METHODPR(IKSolver, IsTemporary, () const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool get_temporary() const", AS_METHODPR(IKSolver, IsTemporary, () const, bool), AS_CALL_THISCALL);
     // virtual bool Serializable::Load(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKSolver", "bool Load(Deserializer&)", asMETHODPR(IKSolver, Load, (Deserializer&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool Load(Deserializer&)", AS_METHODPR(IKSolver, Load, (Deserializer&), bool), AS_CALL_THISCALL);
     // bool Animatable::LoadJSON(const JSONValue& source) override | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKSolver", "bool LoadJSON(const JSONValue&in)", asMETHODPR(IKSolver, LoadJSON, (const JSONValue&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool LoadJSON(const JSONValue&in)", AS_METHODPR(IKSolver, LoadJSON, (const JSONValue&), bool), AS_CALL_THISCALL);
     // bool Animatable::LoadXML(const XMLElement& source) override | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKSolver", "bool LoadXML(const XMLElement&in)", asMETHODPR(IKSolver, LoadXML, (const XMLElement&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool LoadXML(const XMLElement&in)", AS_METHODPR(IKSolver, LoadXML, (const XMLElement&), bool), AS_CALL_THISCALL);
     // void Component::MarkNetworkUpdate() override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKSolver", "void MarkNetworkUpdate()", asMETHODPR(IKSolver, MarkNetworkUpdate, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void MarkNetworkUpdate()", AS_METHODPR(IKSolver, MarkNetworkUpdate, (), void), AS_CALL_THISCALL);
     // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKSolver", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(IKSolver, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void OnEvent(Object@+, StringHash, VariantMap&)", AS_METHODPR(IKSolver, OnEvent, (Object*, StringHash, VariantMap&), void), AS_CALL_THISCALL);
     // virtual void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKSolver", "void OnGetAttribute(const AttributeInfo&in, Variant&) const", asMETHODPR(IKSolver, OnGetAttribute, (const AttributeInfo&, Variant&) const, void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void OnGetAttribute(const AttributeInfo&in, Variant&) const", AS_METHODPR(IKSolver, OnGetAttribute, (const AttributeInfo&, Variant&) const, void), AS_CALL_THISCALL);
     // virtual void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKSolver", "void OnSetAttribute(const AttributeInfo&in, const Variant&in)", asMETHODPR(IKSolver, OnSetAttribute, (const AttributeInfo&, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void OnSetAttribute(const AttributeInfo&in, const Variant&in)", AS_METHODPR(IKSolver, OnSetAttribute, (const AttributeInfo&, const Variant&), void), AS_CALL_THISCALL);
     // virtual void Component::OnSetEnabled() | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKSolver", "void OnSetEnabled()", asMETHODPR(IKSolver, OnSetEnabled, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void OnSetEnabled()", AS_METHODPR(IKSolver, OnSetEnabled, (), void), AS_CALL_THISCALL);
     // void Component::PrepareNetworkUpdate() | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKSolver", "void PrepareNetworkUpdate()", asMETHODPR(IKSolver, PrepareNetworkUpdate, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void PrepareNetworkUpdate()", AS_METHODPR(IKSolver, PrepareNetworkUpdate, (), void), AS_CALL_THISCALL);
     // bool Serializable::ReadDeltaUpdate(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKSolver", "bool ReadDeltaUpdate(Deserializer&)", asMETHODPR(IKSolver, ReadDeltaUpdate, (Deserializer&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool ReadDeltaUpdate(Deserializer&)", AS_METHODPR(IKSolver, ReadDeltaUpdate, (Deserializer&), bool), AS_CALL_THISCALL);
     // bool Serializable::ReadLatestDataUpdate(Deserializer& source) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKSolver", "bool ReadLatestDataUpdate(Deserializer&)", asMETHODPR(IKSolver, ReadLatestDataUpdate, (Deserializer&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool ReadLatestDataUpdate(Deserializer&)", AS_METHODPR(IKSolver, ReadLatestDataUpdate, (Deserializer&), bool), AS_CALL_THISCALL);
     // void IKSolver::RebuildChainTrees() | File: ../IK/IKSolver.h
-    engine->RegisterObjectMethod("IKSolver", "void RebuildChainTrees()", asMETHODPR(IKSolver, RebuildChainTrees, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void RebuildChainTrees()", AS_METHODPR(IKSolver, RebuildChainTrees, (), void), AS_CALL_THISCALL);
     // void IKSolver::RecalculateSegmentLengths() | File: ../IK/IKSolver.h
-    engine->RegisterObjectMethod("IKSolver", "void RecalculateSegmentLengths()", asMETHODPR(IKSolver, RecalculateSegmentLengths, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void RecalculateSegmentLengths()", AS_METHODPR(IKSolver, RecalculateSegmentLengths, (), void), AS_CALL_THISCALL);
     // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
     // Error: type "RefCount*" can not automatically bind
     // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("IKSolver", "int Refs() const", asMETHODPR(IKSolver, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "int get_refs() const", asMETHODPR(IKSolver, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "int Refs() const", AS_METHODPR(IKSolver, Refs, () const, int), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "int get_refs() const", AS_METHODPR(IKSolver, Refs, () const, int), AS_CALL_THISCALL);
     // static void IKSolver::RegisterObject(Context* context) | File: ../IK/IKSolver.h
     // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("IKSolver", asBEHAVE_RELEASE, "void f()", asMETHODPR(IKSolver, ReleaseRef, (), void), asCALL_THISCALL);
+    engine->RegisterObjectBehaviour("IKSolver", asBEHAVE_RELEASE, "void f()", AS_METHODPR(IKSolver, ReleaseRef, (), void), AS_CALL_THISCALL);
     // void Component::Remove() | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKSolver", "void Remove()", asMETHODPR(IKSolver, Remove, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void Remove()", AS_METHODPR(IKSolver, Remove, (), void), AS_CALL_THISCALL);
     // void Animatable::RemoveAttributeAnimation(const String& name) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKSolver", "void RemoveAttributeAnimation(const String&in)", asMETHODPR(IKSolver, RemoveAttributeAnimation, (const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void RemoveAttributeAnimation(const String&in)", AS_METHODPR(IKSolver, RemoveAttributeAnimation, (const String&), void), AS_CALL_THISCALL);
     // void Serializable::RemoveInstanceDefault() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKSolver", "void RemoveInstanceDefault()", asMETHODPR(IKSolver, RemoveInstanceDefault, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void RemoveInstanceDefault()", AS_METHODPR(IKSolver, RemoveInstanceDefault, (), void), AS_CALL_THISCALL);
     // void Animatable::RemoveObjectAnimation() | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKSolver", "void RemoveObjectAnimation()", asMETHODPR(IKSolver, RemoveObjectAnimation, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void RemoveObjectAnimation()", AS_METHODPR(IKSolver, RemoveObjectAnimation, (), void), AS_CALL_THISCALL);
     // void Serializable::ResetToDefault() | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKSolver", "void ResetToDefault()", asMETHODPR(IKSolver, ResetToDefault, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void ResetToDefault()", AS_METHODPR(IKSolver, ResetToDefault, (), void), AS_CALL_THISCALL);
     // bool Component::Save(Serializer& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKSolver", "bool Save(Serializer&) const", asMETHODPR(IKSolver, Save, (Serializer&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool Save(Serializer&) const", AS_METHODPR(IKSolver, Save, (Serializer&) const, bool), AS_CALL_THISCALL);
     // virtual bool Serializable::SaveDefaultAttributes() const | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKSolver", "bool SaveDefaultAttributes() const", asMETHODPR(IKSolver, SaveDefaultAttributes, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool SaveDefaultAttributes() const", AS_METHODPR(IKSolver, SaveDefaultAttributes, () const, bool), AS_CALL_THISCALL);
     // bool Component::SaveJSON(JSONValue& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKSolver", "bool SaveJSON(JSONValue&) const", asMETHODPR(IKSolver, SaveJSON, (JSONValue&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool SaveJSON(JSONValue&) const", AS_METHODPR(IKSolver, SaveJSON, (JSONValue&) const, bool), AS_CALL_THISCALL);
     // bool Component::SaveXML(XMLElement& dest) const override | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKSolver", "bool SaveXML(XMLElement&) const", asMETHODPR(IKSolver, SaveXML, (XMLElement&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool SaveXML(XMLElement&) const", AS_METHODPR(IKSolver, SaveXML, (XMLElement&) const, bool), AS_CALL_THISCALL);
     // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKSolver", "void SendEvent(StringHash)", asMETHODPR(IKSolver, SendEvent, (StringHash), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void SendEvent(StringHash)", AS_METHODPR(IKSolver, SendEvent, (StringHash), void), AS_CALL_THISCALL);
     // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKSolver", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(IKSolver, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void SendEvent(StringHash, VariantMap&)", AS_METHODPR(IKSolver, SendEvent, (StringHash, VariantMap&), void), AS_CALL_THISCALL);
     // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
     // Not registered because template
     // void IKSolver::SetAlgorithm(Algorithm algorithm) | File: ../IK/IKSolver.h
     // Not registered because have @manualbind mark
     // void Animatable::SetAnimationEnabled(bool enable) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKSolver", "void SetAnimationEnabled(bool)", asMETHODPR(IKSolver, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "void set_animationEnabled(bool)", asMETHODPR(IKSolver, SetAnimationEnabled, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void SetAnimationEnabled(bool)", AS_METHODPR(IKSolver, SetAnimationEnabled, (bool), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void set_animationEnabled(bool)", AS_METHODPR(IKSolver, SetAnimationEnabled, (bool), void), AS_CALL_THISCALL);
     // void Animatable::SetAnimationTime(float time) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKSolver", "void SetAnimationTime(float)", asMETHODPR(IKSolver, SetAnimationTime, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void SetAnimationTime(float)", AS_METHODPR(IKSolver, SetAnimationTime, (float), void), AS_CALL_THISCALL);
     // bool Serializable::SetAttribute(unsigned index, const Variant& value) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKSolver", "bool SetAttribute(uint, const Variant&in)", asMETHODPR(IKSolver, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "bool set_attributes(uint, const Variant&in)", asMETHODPR(IKSolver, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool SetAttribute(uint, const Variant&in)", AS_METHODPR(IKSolver, SetAttribute, (unsigned, const Variant&), bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool set_attributes(uint, const Variant&in)", AS_METHODPR(IKSolver, SetAttribute, (unsigned, const Variant&), bool), AS_CALL_THISCALL);
     // bool Serializable::SetAttribute(const String& name, const Variant& value) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKSolver", "bool SetAttribute(const String&in, const Variant&in)", asMETHODPR(IKSolver, SetAttribute, (const String&, const Variant&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool SetAttribute(const String&in, const Variant&in)", AS_METHODPR(IKSolver, SetAttribute, (const String&, const Variant&), bool), AS_CALL_THISCALL);
     // void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode=WM_LOOP, float speed=1.0f) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKSolver", "void SetAttributeAnimation(const String&in, ValueAnimation@+, WrapMode = WM_LOOP, float = 1.0f)", asMETHODPR(IKSolver, SetAttributeAnimation, (const String&, ValueAnimation*, WrapMode, float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void SetAttributeAnimation(const String&in, ValueAnimation@+, WrapMode = WM_LOOP, float = 1.0f)", AS_METHODPR(IKSolver, SetAttributeAnimation, (const String&, ValueAnimation*, WrapMode, float), void), AS_CALL_THISCALL);
     // void Animatable::SetAttributeAnimationSpeed(const String& name, float speed) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKSolver", "void SetAttributeAnimationSpeed(const String&in, float)", asMETHODPR(IKSolver, SetAttributeAnimationSpeed, (const String&, float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void SetAttributeAnimationSpeed(const String&in, float)", AS_METHODPR(IKSolver, SetAttributeAnimationSpeed, (const String&, float), void), AS_CALL_THISCALL);
     // void Animatable::SetAttributeAnimationTime(const String& name, float time) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKSolver", "void SetAttributeAnimationTime(const String&in, float)", asMETHODPR(IKSolver, SetAttributeAnimationTime, (const String&, float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void SetAttributeAnimationTime(const String&in, float)", AS_METHODPR(IKSolver, SetAttributeAnimationTime, (const String&, float), void), AS_CALL_THISCALL);
     // void Animatable::SetAttributeAnimationWrapMode(const String& name, WrapMode wrapMode) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKSolver", "void SetAttributeAnimationWrapMode(const String&in, WrapMode)", asMETHODPR(IKSolver, SetAttributeAnimationWrapMode, (const String&, WrapMode), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void SetAttributeAnimationWrapMode(const String&in, WrapMode)", AS_METHODPR(IKSolver, SetAttributeAnimationWrapMode, (const String&, WrapMode), void), AS_CALL_THISCALL);
     // void IKSolver::SetAUTO_SOLVE(bool enable) | File: ../IK/IKSolver.h
-    engine->RegisterObjectMethod("IKSolver", "void SetAUTO_SOLVE(bool)", asMETHODPR(IKSolver, SetAUTO_SOLVE, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "void set_AUTO_SOLVE(bool)", asMETHODPR(IKSolver, SetAUTO_SOLVE, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void SetAUTO_SOLVE(bool)", AS_METHODPR(IKSolver, SetAUTO_SOLVE, (bool), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void set_AUTO_SOLVE(bool)", AS_METHODPR(IKSolver, SetAUTO_SOLVE, (bool), void), AS_CALL_THISCALL);
     // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKSolver", "void SetBlockEvents(bool)", asMETHODPR(IKSolver, SetBlockEvents, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void SetBlockEvents(bool)", AS_METHODPR(IKSolver, SetBlockEvents, (bool), void), AS_CALL_THISCALL);
     // void IKSolver::SetCONSTRAINTS(bool enable) | File: ../IK/IKSolver.h
-    engine->RegisterObjectMethod("IKSolver", "void SetCONSTRAINTS(bool)", asMETHODPR(IKSolver, SetCONSTRAINTS, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "void set_CONSTRAINTS(bool)", asMETHODPR(IKSolver, SetCONSTRAINTS, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void SetCONSTRAINTS(bool)", AS_METHODPR(IKSolver, SetCONSTRAINTS, (bool), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void set_CONSTRAINTS(bool)", AS_METHODPR(IKSolver, SetCONSTRAINTS, (bool), void), AS_CALL_THISCALL);
     // void Component::SetEnabled(bool enable) | File: ../Scene/Component.h
-    engine->RegisterObjectMethod("IKSolver", "void SetEnabled(bool)", asMETHODPR(IKSolver, SetEnabled, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "void set_enabled(bool)", asMETHODPR(IKSolver, SetEnabled, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void SetEnabled(bool)", AS_METHODPR(IKSolver, SetEnabled, (bool), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void set_enabled(bool)", AS_METHODPR(IKSolver, SetEnabled, (bool), void), AS_CALL_THISCALL);
     // void IKSolver::SetFeature(Feature feature, bool enable) | File: ../IK/IKSolver.h
     // Not registered because have @nobind mark
     // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKSolver", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(IKSolver, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(IKSolver, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void SetGlobalVar(StringHash, const Variant&in)", AS_METHODPR(IKSolver, SetGlobalVar, (StringHash, const Variant&), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void set_globalVar(StringHash, const Variant&in)", AS_METHODPR(IKSolver, SetGlobalVar, (StringHash, const Variant&), void), AS_CALL_THISCALL);
     // void Serializable::SetInstanceDefault(bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKSolver", "void SetInstanceDefault(bool)", asMETHODPR(IKSolver, SetInstanceDefault, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void SetInstanceDefault(bool)", AS_METHODPR(IKSolver, SetInstanceDefault, (bool), void), AS_CALL_THISCALL);
     // void Serializable::SetInterceptNetworkUpdate(const String& attributeName, bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKSolver", "void SetInterceptNetworkUpdate(const String&in, bool)", asMETHODPR(IKSolver, SetInterceptNetworkUpdate, (const String&, bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void SetInterceptNetworkUpdate(const String&in, bool)", AS_METHODPR(IKSolver, SetInterceptNetworkUpdate, (const String&, bool), void), AS_CALL_THISCALL);
     // void IKSolver::SetJOINT_ROTATIONS(bool enable) | File: ../IK/IKSolver.h
-    engine->RegisterObjectMethod("IKSolver", "void SetJOINT_ROTATIONS(bool)", asMETHODPR(IKSolver, SetJOINT_ROTATIONS, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "void set_JOINT_ROTATIONS(bool)", asMETHODPR(IKSolver, SetJOINT_ROTATIONS, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void SetJOINT_ROTATIONS(bool)", AS_METHODPR(IKSolver, SetJOINT_ROTATIONS, (bool), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void set_JOINT_ROTATIONS(bool)", AS_METHODPR(IKSolver, SetJOINT_ROTATIONS, (bool), void), AS_CALL_THISCALL);
     // void IKSolver::SetMaximumIterations(unsigned iterations) | File: ../IK/IKSolver.h
-    engine->RegisterObjectMethod("IKSolver", "void SetMaximumIterations(uint)", asMETHODPR(IKSolver, SetMaximumIterations, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "void set_maximumIterations(uint)", asMETHODPR(IKSolver, SetMaximumIterations, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void SetMaximumIterations(uint)", AS_METHODPR(IKSolver, SetMaximumIterations, (unsigned), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void set_maximumIterations(uint)", AS_METHODPR(IKSolver, SetMaximumIterations, (unsigned), void), AS_CALL_THISCALL);
     // void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKSolver", "void SetObjectAnimation(ObjectAnimation@+)", asMETHODPR(IKSolver, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "void set_objectAnimation(ObjectAnimation@+)", asMETHODPR(IKSolver, SetObjectAnimation, (ObjectAnimation*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void SetObjectAnimation(ObjectAnimation@+)", AS_METHODPR(IKSolver, SetObjectAnimation, (ObjectAnimation*), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void set_objectAnimation(ObjectAnimation@+)", AS_METHODPR(IKSolver, SetObjectAnimation, (ObjectAnimation*), void), AS_CALL_THISCALL);
     // void Animatable::SetObjectAnimationAttr(const ResourceRef& value) | File: ../Scene/Animatable.h
-    engine->RegisterObjectMethod("IKSolver", "void SetObjectAnimationAttr(const ResourceRef&in)", asMETHODPR(IKSolver, SetObjectAnimationAttr, (const ResourceRef&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void SetObjectAnimationAttr(const ResourceRef&in)", AS_METHODPR(IKSolver, SetObjectAnimationAttr, (const ResourceRef&), void), AS_CALL_THISCALL);
     // void IKSolver::SetTARGET_ROTATIONS(bool enable) | File: ../IK/IKSolver.h
-    engine->RegisterObjectMethod("IKSolver", "void SetTARGET_ROTATIONS(bool)", asMETHODPR(IKSolver, SetTARGET_ROTATIONS, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "void set_TARGET_ROTATIONS(bool)", asMETHODPR(IKSolver, SetTARGET_ROTATIONS, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void SetTARGET_ROTATIONS(bool)", AS_METHODPR(IKSolver, SetTARGET_ROTATIONS, (bool), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void set_TARGET_ROTATIONS(bool)", AS_METHODPR(IKSolver, SetTARGET_ROTATIONS, (bool), void), AS_CALL_THISCALL);
     // void Serializable::SetTemporary(bool enable) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKSolver", "void SetTemporary(bool)", asMETHODPR(IKSolver, SetTemporary, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "void set_temporary(bool)", asMETHODPR(IKSolver, SetTemporary, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void SetTemporary(bool)", AS_METHODPR(IKSolver, SetTemporary, (bool), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void set_temporary(bool)", AS_METHODPR(IKSolver, SetTemporary, (bool), void), AS_CALL_THISCALL);
     // void IKSolver::SetTolerance(float tolerance) | File: ../IK/IKSolver.h
-    engine->RegisterObjectMethod("IKSolver", "void SetTolerance(float)", asMETHODPR(IKSolver, SetTolerance, (float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "void set_tolerance(float)", asMETHODPR(IKSolver, SetTolerance, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void SetTolerance(float)", AS_METHODPR(IKSolver, SetTolerance, (float), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void set_tolerance(float)", AS_METHODPR(IKSolver, SetTolerance, (float), void), AS_CALL_THISCALL);
     // void IKSolver::SetUPDATE_ACTIVE_POSE(bool enable) | File: ../IK/IKSolver.h
-    engine->RegisterObjectMethod("IKSolver", "void SetUPDATE_ACTIVE_POSE(bool)", asMETHODPR(IKSolver, SetUPDATE_ACTIVE_POSE, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "void set_UPDATE_ACTIVE_POSE(bool)", asMETHODPR(IKSolver, SetUPDATE_ACTIVE_POSE, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void SetUPDATE_ACTIVE_POSE(bool)", AS_METHODPR(IKSolver, SetUPDATE_ACTIVE_POSE, (bool), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void set_UPDATE_ACTIVE_POSE(bool)", AS_METHODPR(IKSolver, SetUPDATE_ACTIVE_POSE, (bool), void), AS_CALL_THISCALL);
     // void IKSolver::SetUPDATE_ORIGINAL_POSE(bool enable) | File: ../IK/IKSolver.h
-    engine->RegisterObjectMethod("IKSolver", "void SetUPDATE_ORIGINAL_POSE(bool)", asMETHODPR(IKSolver, SetUPDATE_ORIGINAL_POSE, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "void set_UPDATE_ORIGINAL_POSE(bool)", asMETHODPR(IKSolver, SetUPDATE_ORIGINAL_POSE, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void SetUPDATE_ORIGINAL_POSE(bool)", AS_METHODPR(IKSolver, SetUPDATE_ORIGINAL_POSE, (bool), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void set_UPDATE_ORIGINAL_POSE(bool)", AS_METHODPR(IKSolver, SetUPDATE_ORIGINAL_POSE, (bool), void), AS_CALL_THISCALL);
     // void IKSolver::SetUSE_ORIGINAL_POSE(bool enable) | File: ../IK/IKSolver.h
-    engine->RegisterObjectMethod("IKSolver", "void SetUSE_ORIGINAL_POSE(bool)", asMETHODPR(IKSolver, SetUSE_ORIGINAL_POSE, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "void set_USE_ORIGINAL_POSE(bool)", asMETHODPR(IKSolver, SetUSE_ORIGINAL_POSE, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void SetUSE_ORIGINAL_POSE(bool)", AS_METHODPR(IKSolver, SetUSE_ORIGINAL_POSE, (bool), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void set_USE_ORIGINAL_POSE(bool)", AS_METHODPR(IKSolver, SetUSE_ORIGINAL_POSE, (bool), void), AS_CALL_THISCALL);
     // void IKSolver::Solve() | File: ../IK/IKSolver.h
-    engine->RegisterObjectMethod("IKSolver", "void Solve()", asMETHODPR(IKSolver, Solve, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void Solve()", AS_METHODPR(IKSolver, Solve, (), void), AS_CALL_THISCALL);
     // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
     // Error: type "EventHandler*" can not automatically bind
     // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
@@ -1119,24 +1119,24 @@ void ASRegisterGenerated_Members_I(asIScriptEngine* engine)
     // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
     // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
     // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKSolver", "void UnsubscribeFromAllEvents()", asMETHODPR(IKSolver, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void UnsubscribeFromAllEvents()", AS_METHODPR(IKSolver, UnsubscribeFromAllEvents, (), void), AS_CALL_THISCALL);
     // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKSolver", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(IKSolver_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("IKSolver", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", AS_FUNCTION_OBJFIRST(IKSolver_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), AS_CALL_CDECL_OBJFIRST);
     // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKSolver", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(IKSolver, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void UnsubscribeFromEvent(StringHash)", AS_METHODPR(IKSolver, UnsubscribeFromEvent, (StringHash), void), AS_CALL_THISCALL);
     // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKSolver", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(IKSolver, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void UnsubscribeFromEvent(Object@+, StringHash)", AS_METHODPR(IKSolver, UnsubscribeFromEvent, (Object*, StringHash), void), AS_CALL_THISCALL);
     // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IKSolver", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(IKSolver, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void UnsubscribeFromEvents(Object@+)", AS_METHODPR(IKSolver, UnsubscribeFromEvents, (Object*), void), AS_CALL_THISCALL);
     // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("IKSolver", "int WeakRefs() const", asMETHODPR(IKSolver, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "int get_weakRefs() const", asMETHODPR(IKSolver, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "int WeakRefs() const", AS_METHODPR(IKSolver, WeakRefs, () const, int), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "int get_weakRefs() const", AS_METHODPR(IKSolver, WeakRefs, () const, int), AS_CALL_THISCALL);
     // void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attributeBits, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKSolver", "void WriteDeltaUpdate(Serializer&, const DirtyBits&in, uint8)", asMETHODPR(IKSolver, WriteDeltaUpdate, (Serializer&, const DirtyBits&, unsigned char), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void WriteDeltaUpdate(Serializer&, const DirtyBits&in, uint8)", AS_METHODPR(IKSolver, WriteDeltaUpdate, (Serializer&, const DirtyBits&, unsigned char), void), AS_CALL_THISCALL);
     // void Serializable::WriteInitialDeltaUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKSolver", "void WriteInitialDeltaUpdate(Serializer&, uint8)", asMETHODPR(IKSolver, WriteInitialDeltaUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void WriteInitialDeltaUpdate(Serializer&, uint8)", AS_METHODPR(IKSolver, WriteInitialDeltaUpdate, (Serializer&, unsigned char), void), AS_CALL_THISCALL);
     // void Serializable::WriteLatestDataUpdate(Serializer& dest, unsigned char timeStamp) | File: ../Scene/Serializable.h
-    engine->RegisterObjectMethod("IKSolver", "void WriteLatestDataUpdate(Serializer&, uint8)", asMETHODPR(IKSolver, WriteLatestDataUpdate, (Serializer&, unsigned char), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void WriteLatestDataUpdate(Serializer&, uint8)", AS_METHODPR(IKSolver, WriteLatestDataUpdate, (Serializer&, unsigned char), void), AS_CALL_THISCALL);
 #ifdef REGISTER_MANUAL_PART_Component
     REGISTER_MANUAL_PART_Component(IKSolver, "IKSolver")
 #endif
@@ -1163,225 +1163,225 @@ void ASRegisterGenerated_Members_I(asIScriptEngine* engine)
 #endif
 
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("Image", asBEHAVE_ADDREF, "void f()", asMETHODPR(Image, AddRef, (), void), asCALL_THISCALL);
+    engine->RegisterObjectBehaviour("Image", asBEHAVE_ADDREF, "void f()", AS_METHODPR(Image, AddRef, (), void), AS_CALL_THISCALL);
     // bool Image::BeginLoad(Deserializer& source) override | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "bool BeginLoad(Deserializer&)", asMETHODPR(Image, BeginLoad, (Deserializer&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool BeginLoad(Deserializer&)", AS_METHODPR(Image, BeginLoad, (Deserializer&), bool), AS_CALL_THISCALL);
     // template<typename T> T* Object::Cast() | File: ../Core/Object.h
     // Not registered because template
     // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
     // Not registered because template
     // void Image::CleanupLevels() | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "void CleanupLevels()", asMETHODPR(Image, CleanupLevels, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "void CleanupLevels()", AS_METHODPR(Image, CleanupLevels, (), void), AS_CALL_THISCALL);
     // void Image::Clear(const Color& color) | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "void Clear(const Color&in)", asMETHODPR(Image, Clear, (const Color&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "void Clear(const Color&in)", AS_METHODPR(Image, Clear, (const Color&), void), AS_CALL_THISCALL);
     // void Image::ClearInt(unsigned uintColor) | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "void ClearInt(uint)", asMETHODPR(Image, ClearInt, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "void ClearInt(uint)", AS_METHODPR(Image, ClearInt, (unsigned), void), AS_CALL_THISCALL);
     // SharedPtr<Image> Image::ConvertToRGBA() const | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "Image@+ ConvertToRGBA() const", asFUNCTION(Image_ConvertToRGBA_void), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("Image", "Image@+ ConvertToRGBA() const", AS_FUNCTION_OBJFIRST(Image_ConvertToRGBA_void), AS_CALL_CDECL_OBJFIRST);
     // virtual bool Resource::EndLoad() | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Image", "bool EndLoad()", asMETHODPR(Image, EndLoad, (), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool EndLoad()", AS_METHODPR(Image, EndLoad, (), bool), AS_CALL_THISCALL);
     // bool Image::FlipHorizontal() | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "bool FlipHorizontal()", asMETHODPR(Image, FlipHorizontal, (), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool FlipHorizontal()", AS_METHODPR(Image, FlipHorizontal, (), bool), AS_CALL_THISCALL);
     // bool Image::FlipVertical() | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "bool FlipVertical()", asMETHODPR(Image, FlipVertical, (), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool FlipVertical()", AS_METHODPR(Image, FlipVertical, (), bool), AS_CALL_THISCALL);
     // AsyncLoadState Resource::GetAsyncLoadState() const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Image", "AsyncLoadState GetAsyncLoadState() const", asMETHODPR(Image, GetAsyncLoadState, () const, AsyncLoadState), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "AsyncLoadState GetAsyncLoadState() const", AS_METHODPR(Image, GetAsyncLoadState, () const, AsyncLoadState), AS_CALL_THISCALL);
     // bool Object::GetBlockEvents() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Image", "bool GetBlockEvents() const", asMETHODPR(Image, GetBlockEvents, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool GetBlockEvents() const", AS_METHODPR(Image, GetBlockEvents, () const, bool), AS_CALL_THISCALL);
     // const String& Object::GetCategory() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Image", "const String& GetCategory() const", asMETHODPR(Image, GetCategory, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Image", "const String& get_category() const", asMETHODPR(Image, GetCategory, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "const String& GetCategory() const", AS_METHODPR(Image, GetCategory, () const, const String&), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "const String& get_category() const", AS_METHODPR(Image, GetCategory, () const, const String&), AS_CALL_THISCALL);
     // unsigned Image::GetComponents() const | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "uint GetComponents() const", asMETHODPR(Image, GetComponents, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Image", "uint get_components() const", asMETHODPR(Image, GetComponents, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "uint GetComponents() const", AS_METHODPR(Image, GetComponents, () const, unsigned), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "uint get_components() const", AS_METHODPR(Image, GetComponents, () const, unsigned), AS_CALL_THISCALL);
     // CompressedFormat Image::GetCompressedFormat() const | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "CompressedFormat GetCompressedFormat() const", asMETHODPR(Image, GetCompressedFormat, () const, CompressedFormat), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Image", "CompressedFormat get_compressedFormat() const", asMETHODPR(Image, GetCompressedFormat, () const, CompressedFormat), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "CompressedFormat GetCompressedFormat() const", AS_METHODPR(Image, GetCompressedFormat, () const, CompressedFormat), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "CompressedFormat get_compressedFormat() const", AS_METHODPR(Image, GetCompressedFormat, () const, CompressedFormat), AS_CALL_THISCALL);
     // CompressedLevel Image::GetCompressedLevel(unsigned index) const | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "CompressedLevel GetCompressedLevel(uint) const", asMETHODPR(Image, GetCompressedLevel, (unsigned) const, CompressedLevel), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "CompressedLevel GetCompressedLevel(uint) const", AS_METHODPR(Image, GetCompressedLevel, (unsigned) const, CompressedLevel), AS_CALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
     // Error: type "Context*" can used only as function parameter
     // unsigned char* Image::GetData() const | File: ../Resource/Image.h
     // Error: type "unsigned char*" can not automatically bind
     // SharedPtr<Image> Image::GetDecompressedImage() const | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "Image@+ GetDecompressedImage() const", asFUNCTION(Image_GetDecompressedImage_void), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("Image", "Image@+ GetDecompressedImage() const", AS_FUNCTION_OBJFIRST(Image_GetDecompressedImage_void), AS_CALL_CDECL_OBJFIRST);
     // int Image::GetDepth() const | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "int GetDepth() const", asMETHODPR(Image, GetDepth, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Image", "int get_depth() const", asMETHODPR(Image, GetDepth, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "int GetDepth() const", AS_METHODPR(Image, GetDepth, () const, int), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "int get_depth() const", AS_METHODPR(Image, GetDepth, () const, int), AS_CALL_THISCALL);
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Image", "VariantMap& GetEventDataMap() const", asMETHODPR(Image, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "VariantMap& GetEventDataMap() const", AS_METHODPR(Image, GetEventDataMap, () const, VariantMap&), AS_CALL_THISCALL);
     // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
     // Error: type "EventHandler*" can not automatically bind
     // Object* Object::GetEventSender() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Image", "Object@+ GetEventSender() const", asMETHODPR(Image, GetEventSender, () const, Object*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "Object@+ GetEventSender() const", AS_METHODPR(Image, GetEventSender, () const, Object*), AS_CALL_THISCALL);
     // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Image", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(Image, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Image", "const Variant& get_globalVar(StringHash) const", asMETHODPR(Image, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "const Variant& GetGlobalVar(StringHash) const", AS_METHODPR(Image, GetGlobalVar, (StringHash) const, const Variant&), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "const Variant& get_globalVar(StringHash) const", AS_METHODPR(Image, GetGlobalVar, (StringHash) const, const Variant&), AS_CALL_THISCALL);
     // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Image", "const VariantMap& GetGlobalVars() const", asMETHODPR(Image, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Image", "const VariantMap& get_globalVars() const", asMETHODPR(Image, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "const VariantMap& GetGlobalVars() const", AS_METHODPR(Image, GetGlobalVars, () const, const VariantMap&), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "const VariantMap& get_globalVars() const", AS_METHODPR(Image, GetGlobalVars, () const, const VariantMap&), AS_CALL_THISCALL);
     // int Image::GetHeight() const | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "int GetHeight() const", asMETHODPR(Image, GetHeight, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Image", "int get_height() const", asMETHODPR(Image, GetHeight, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "int GetHeight() const", AS_METHODPR(Image, GetHeight, () const, int), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "int get_height() const", AS_METHODPR(Image, GetHeight, () const, int), AS_CALL_THISCALL);
     // void Image::GetLevels(PODVector<Image*>& levels) | File: ../Resource/Image.h
     // Error: type "PODVector<Image*>&" can not automatically bind
     // void Image::GetLevels(PODVector<const Image*>& levels) const | File: ../Resource/Image.h
     // Error: type "PODVector<const Image*>&" can not automatically bind
     // unsigned Resource::GetMemoryUse() const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Image", "uint GetMemoryUse() const", asMETHODPR(Image, GetMemoryUse, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Image", "uint get_memoryUse() const", asMETHODPR(Image, GetMemoryUse, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "uint GetMemoryUse() const", AS_METHODPR(Image, GetMemoryUse, () const, unsigned), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "uint get_memoryUse() const", AS_METHODPR(Image, GetMemoryUse, () const, unsigned), AS_CALL_THISCALL);
     // const String& Resource::GetName() const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Image", "const String& GetName() const", asMETHODPR(Image, GetName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Image", "const String& get_name() const", asMETHODPR(Image, GetName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "const String& GetName() const", AS_METHODPR(Image, GetName, () const, const String&), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "const String& get_name() const", AS_METHODPR(Image, GetName, () const, const String&), AS_CALL_THISCALL);
     // StringHash Resource::GetNameHash() const | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Image", "StringHash GetNameHash() const", asMETHODPR(Image, GetNameHash, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "StringHash GetNameHash() const", AS_METHODPR(Image, GetNameHash, () const, StringHash), AS_CALL_THISCALL);
     // SharedPtr<Image> Image::GetNextLevel() const | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "Image@+ GetNextLevel() const", asFUNCTION(Image_GetNextLevel_void), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("Image", "Image@+ GetNextLevel() const", AS_FUNCTION_OBJFIRST(Image_GetNextLevel_void), AS_CALL_CDECL_OBJFIRST);
     // SharedPtr<Image> Image::GetNextSibling() const | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "Image@+ GetNextSibling() const", asFUNCTION(Image_GetNextSibling_void), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("Image", "Image@+ GetNextSibling() const", AS_FUNCTION_OBJFIRST(Image_GetNextSibling_void), AS_CALL_CDECL_OBJFIRST);
     // unsigned Image::GetNumCompressedLevels() const | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "uint GetNumCompressedLevels() const", asMETHODPR(Image, GetNumCompressedLevels, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Image", "uint get_numCompressedLevels() const", asMETHODPR(Image, GetNumCompressedLevels, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "uint GetNumCompressedLevels() const", AS_METHODPR(Image, GetNumCompressedLevels, () const, unsigned), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "uint get_numCompressedLevels() const", AS_METHODPR(Image, GetNumCompressedLevels, () const, unsigned), AS_CALL_THISCALL);
     // Color Image::GetPixel(int x, int y) const | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "Color GetPixel(int, int) const", asMETHODPR(Image, GetPixel, (int, int) const, Color), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "Color GetPixel(int, int) const", AS_METHODPR(Image, GetPixel, (int, int) const, Color), AS_CALL_THISCALL);
     // Color Image::GetPixel(int x, int y, int z) const | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "Color GetPixel(int, int, int) const", asMETHODPR(Image, GetPixel, (int, int, int) const, Color), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "Color GetPixel(int, int, int) const", AS_METHODPR(Image, GetPixel, (int, int, int) const, Color), AS_CALL_THISCALL);
     // Color Image::GetPixelBilinear(float x, float y) const | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "Color GetPixelBilinear(float, float) const", asMETHODPR(Image, GetPixelBilinear, (float, float) const, Color), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "Color GetPixelBilinear(float, float) const", AS_METHODPR(Image, GetPixelBilinear, (float, float) const, Color), AS_CALL_THISCALL);
     // unsigned Image::GetPixelInt(int x, int y) const | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "uint GetPixelInt(int, int) const", asMETHODPR(Image, GetPixelInt, (int, int) const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "uint GetPixelInt(int, int) const", AS_METHODPR(Image, GetPixelInt, (int, int) const, unsigned), AS_CALL_THISCALL);
     // unsigned Image::GetPixelInt(int x, int y, int z) const | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "uint GetPixelInt(int, int, int) const", asMETHODPR(Image, GetPixelInt, (int, int, int) const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "uint GetPixelInt(int, int, int) const", AS_METHODPR(Image, GetPixelInt, (int, int, int) const, unsigned), AS_CALL_THISCALL);
     // Color Image::GetPixelTrilinear(float x, float y, float z) const | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "Color GetPixelTrilinear(float, float, float) const", asMETHODPR(Image, GetPixelTrilinear, (float, float, float) const, Color), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "Color GetPixelTrilinear(float, float, float) const", AS_METHODPR(Image, GetPixelTrilinear, (float, float, float) const, Color), AS_CALL_THISCALL);
     // SDL_Surface* Image::GetSDLSurface(const IntRect& rect=IntRect::ZERO) const | File: ../Resource/Image.h
     // Error: type "SDL_Surface*" can not automatically bind
     // Image* Image::GetSubimage(const IntRect& rect) const | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "Image@+ GetSubimage(const IntRect&in) const", asMETHODPR(Image, GetSubimage, (const IntRect&) const, Image*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "Image@+ GetSubimage(const IntRect&in) const", AS_METHODPR(Image, GetSubimage, (const IntRect&) const, Image*), AS_CALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Image", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Image, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "Object@+ GetSubsystem(StringHash) const", AS_METHODPR(Image, GetSubsystem, (StringHash) const, Object*), AS_CALL_THISCALL);
     // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Image", "StringHash GetType() const", asMETHODPR(Image, GetType, () const, StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Image", "StringHash get_type() const", asMETHODPR(Image, GetType, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "StringHash GetType() const", AS_METHODPR(Image, GetType, () const, StringHash), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "StringHash get_type() const", AS_METHODPR(Image, GetType, () const, StringHash), AS_CALL_THISCALL);
     // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
     // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
     // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
     // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
     // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Image", "const String& GetTypeName() const", asMETHODPR(Image, GetTypeName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Image", "const String& get_typeName() const", asMETHODPR(Image, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "const String& GetTypeName() const", AS_METHODPR(Image, GetTypeName, () const, const String&), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "const String& get_typeName() const", AS_METHODPR(Image, GetTypeName, () const, const String&), AS_CALL_THISCALL);
     // unsigned Resource::GetUseTimer() | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Image", "uint GetUseTimer()", asMETHODPR(Image, GetUseTimer, (), unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Image", "uint get_useTimer()", asMETHODPR(Image, GetUseTimer, (), unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "uint GetUseTimer()", AS_METHODPR(Image, GetUseTimer, (), unsigned), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "uint get_useTimer()", AS_METHODPR(Image, GetUseTimer, (), unsigned), AS_CALL_THISCALL);
     // int Image::GetWidth() const | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "int GetWidth() const", asMETHODPR(Image, GetWidth, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Image", "int get_width() const", asMETHODPR(Image, GetWidth, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "int GetWidth() const", AS_METHODPR(Image, GetWidth, () const, int), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "int get_width() const", AS_METHODPR(Image, GetWidth, () const, int), AS_CALL_THISCALL);
     // bool Image::HasAlphaChannel() const | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "bool HasAlphaChannel() const", asMETHODPR(Image, HasAlphaChannel, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Image", "bool get_hasAlphaChannel() const", asMETHODPR(Image, HasAlphaChannel, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool HasAlphaChannel() const", AS_METHODPR(Image, HasAlphaChannel, () const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool get_hasAlphaChannel() const", AS_METHODPR(Image, HasAlphaChannel, () const, bool), AS_CALL_THISCALL);
     // bool Object::HasEventHandlers() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Image", "bool HasEventHandlers() const", asMETHODPR(Image, HasEventHandlers, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool HasEventHandlers() const", AS_METHODPR(Image, HasEventHandlers, () const, bool), AS_CALL_THISCALL);
     // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Image", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(Image, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool HasSubscribedToEvent(StringHash) const", AS_METHODPR(Image, HasSubscribedToEvent, (StringHash) const, bool), AS_CALL_THISCALL);
     // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Image", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(Image, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool HasSubscribedToEvent(Object@+, StringHash) const", AS_METHODPR(Image, HasSubscribedToEvent, (Object*, StringHash) const, bool), AS_CALL_THISCALL);
     // explicit Image::Image(Context* context) | File: ../Resource/Image.h
-    engine->RegisterObjectBehaviour("Image", asBEHAVE_FACTORY, "Image@+ f()", asFUNCTION(Image_Image_Context), asCALL_CDECL);
+    engine->RegisterObjectBehaviour("Image", asBEHAVE_FACTORY, "Image@+ f()", AS_FUNCTION(Image_Image_Context), AS_CALL_CDECL);
     // bool Image::IsArray() const | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "bool IsArray() const", asMETHODPR(Image, IsArray, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Image", "bool get_array() const", asMETHODPR(Image, IsArray, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool IsArray() const", AS_METHODPR(Image, IsArray, () const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool get_array() const", AS_METHODPR(Image, IsArray, () const, bool), AS_CALL_THISCALL);
     // bool Image::IsCompressed() const | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "bool IsCompressed() const", asMETHODPR(Image, IsCompressed, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Image", "bool get_compressed() const", asMETHODPR(Image, IsCompressed, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool IsCompressed() const", AS_METHODPR(Image, IsCompressed, () const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool get_compressed() const", AS_METHODPR(Image, IsCompressed, () const, bool), AS_CALL_THISCALL);
     // bool Image::IsCubemap() const | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "bool IsCubemap() const", asMETHODPR(Image, IsCubemap, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Image", "bool get_cubemap() const", asMETHODPR(Image, IsCubemap, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool IsCubemap() const", AS_METHODPR(Image, IsCubemap, () const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool get_cubemap() const", AS_METHODPR(Image, IsCubemap, () const, bool), AS_CALL_THISCALL);
     // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Image", "bool IsInstanceOf(StringHash) const", asMETHODPR(Image, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool IsInstanceOf(StringHash) const", AS_METHODPR(Image, IsInstanceOf, (StringHash) const, bool), AS_CALL_THISCALL);
     // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
     // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
     // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
     // Not registered because template
     // bool Image::IsSRGB() const | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "bool IsSRGB() const", asMETHODPR(Image, IsSRGB, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Image", "bool get_sRGB() const", asMETHODPR(Image, IsSRGB, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool IsSRGB() const", AS_METHODPR(Image, IsSRGB, () const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool get_sRGB() const", AS_METHODPR(Image, IsSRGB, () const, bool), AS_CALL_THISCALL);
     // bool Resource::Load(Deserializer& source) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Image", "bool Load(Deserializer&)", asMETHODPR(Image, Load, (Deserializer&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool Load(Deserializer&)", AS_METHODPR(Image, Load, (Deserializer&), bool), AS_CALL_THISCALL);
     // bool Image::LoadColorLUT(Deserializer& source) | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "bool LoadColorLUT(Deserializer&)", asMETHODPR(Image, LoadColorLUT, (Deserializer&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool LoadColorLUT(Deserializer&)", AS_METHODPR(Image, LoadColorLUT, (Deserializer&), bool), AS_CALL_THISCALL);
     // bool Resource::LoadFile(const String& fileName) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Image", "bool LoadFile(const String&in)", asMETHODPR(Image, LoadFile, (const String&), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Image", "bool Load(const String&in)", asMETHODPR(Image, LoadFile, (const String&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool LoadFile(const String&in)", AS_METHODPR(Image, LoadFile, (const String&), bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool Load(const String&in)", AS_METHODPR(Image, LoadFile, (const String&), bool), AS_CALL_THISCALL);
     // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Image", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(Image, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "void OnEvent(Object@+, StringHash, VariantMap&)", AS_METHODPR(Image, OnEvent, (Object*, StringHash, VariantMap&), void), AS_CALL_THISCALL);
     // void Image::PrecalculateLevels() | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "void PrecalculateLevels()", asMETHODPR(Image, PrecalculateLevels, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "void PrecalculateLevels()", AS_METHODPR(Image, PrecalculateLevels, (), void), AS_CALL_THISCALL);
     // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
     // Error: type "RefCount*" can not automatically bind
     // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("Image", "int Refs() const", asMETHODPR(Image, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Image", "int get_refs() const", asMETHODPR(Image, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "int Refs() const", AS_METHODPR(Image, Refs, () const, int), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "int get_refs() const", AS_METHODPR(Image, Refs, () const, int), AS_CALL_THISCALL);
     // static void Image::RegisterObject(Context* context) | File: ../Resource/Image.h
     // Not registered because have @nobind mark
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("Image", asBEHAVE_RELEASE, "void f()", asMETHODPR(Image, ReleaseRef, (), void), asCALL_THISCALL);
+    engine->RegisterObjectBehaviour("Image", asBEHAVE_RELEASE, "void f()", AS_METHODPR(Image, ReleaseRef, (), void), AS_CALL_THISCALL);
     // void Resource::ResetUseTimer() | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Image", "void ResetUseTimer()", asMETHODPR(Image, ResetUseTimer, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "void ResetUseTimer()", AS_METHODPR(Image, ResetUseTimer, (), void), AS_CALL_THISCALL);
     // bool Image::Resize(int width, int height) | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "bool Resize(int, int)", asMETHODPR(Image, Resize, (int, int), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool Resize(int, int)", AS_METHODPR(Image, Resize, (int, int), bool), AS_CALL_THISCALL);
     // bool Image::Save(Serializer& dest) const override | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "bool Save(Serializer&) const", asMETHODPR(Image, Save, (Serializer&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool Save(Serializer&) const", AS_METHODPR(Image, Save, (Serializer&) const, bool), AS_CALL_THISCALL);
     // bool Image::SaveBMP(const String& fileName) const | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "bool SaveBMP(const String&in) const", asMETHODPR(Image, SaveBMP, (const String&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool SaveBMP(const String&in) const", AS_METHODPR(Image, SaveBMP, (const String&) const, bool), AS_CALL_THISCALL);
     // bool Image::SaveDDS(const String& fileName) const | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "bool SaveDDS(const String&in) const", asMETHODPR(Image, SaveDDS, (const String&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool SaveDDS(const String&in) const", AS_METHODPR(Image, SaveDDS, (const String&) const, bool), AS_CALL_THISCALL);
     // bool Image::SaveFile(const String& fileName) const override | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "bool SaveFile(const String&in) const", asMETHODPR(Image, SaveFile, (const String&) const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Image", "bool Save(const String&in) const", asMETHODPR(Image, SaveFile, (const String&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool SaveFile(const String&in) const", AS_METHODPR(Image, SaveFile, (const String&) const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool Save(const String&in) const", AS_METHODPR(Image, SaveFile, (const String&) const, bool), AS_CALL_THISCALL);
     // bool Image::SaveJPG(const String& fileName, int quality) const | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "bool SaveJPG(const String&in, int) const", asMETHODPR(Image, SaveJPG, (const String&, int) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool SaveJPG(const String&in, int) const", AS_METHODPR(Image, SaveJPG, (const String&, int) const, bool), AS_CALL_THISCALL);
     // bool Image::SavePNG(const String& fileName) const | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "bool SavePNG(const String&in) const", asMETHODPR(Image, SavePNG, (const String&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool SavePNG(const String&in) const", AS_METHODPR(Image, SavePNG, (const String&) const, bool), AS_CALL_THISCALL);
     // bool Image::SaveTGA(const String& fileName) const | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "bool SaveTGA(const String&in) const", asMETHODPR(Image, SaveTGA, (const String&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool SaveTGA(const String&in) const", AS_METHODPR(Image, SaveTGA, (const String&) const, bool), AS_CALL_THISCALL);
     // bool Image::SaveWEBP(const String& fileName, float compression=0.0f) const | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "bool SaveWEBP(const String&in, float = 0.0f) const", asMETHODPR(Image, SaveWEBP, (const String&, float) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool SaveWEBP(const String&in, float = 0.0f) const", AS_METHODPR(Image, SaveWEBP, (const String&, float) const, bool), AS_CALL_THISCALL);
     // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Image", "void SendEvent(StringHash)", asMETHODPR(Image, SendEvent, (StringHash), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "void SendEvent(StringHash)", AS_METHODPR(Image, SendEvent, (StringHash), void), AS_CALL_THISCALL);
     // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Image", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(Image, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "void SendEvent(StringHash, VariantMap&)", AS_METHODPR(Image, SendEvent, (StringHash, VariantMap&), void), AS_CALL_THISCALL);
     // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
     // Not registered because template
     // void Resource::SetAsyncLoadState(AsyncLoadState newState) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Image", "void SetAsyncLoadState(AsyncLoadState)", asMETHODPR(Image, SetAsyncLoadState, (AsyncLoadState), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "void SetAsyncLoadState(AsyncLoadState)", AS_METHODPR(Image, SetAsyncLoadState, (AsyncLoadState), void), AS_CALL_THISCALL);
     // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Image", "void SetBlockEvents(bool)", asMETHODPR(Image, SetBlockEvents, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "void SetBlockEvents(bool)", AS_METHODPR(Image, SetBlockEvents, (bool), void), AS_CALL_THISCALL);
     // void Image::SetData(const unsigned char* pixelData) | File: ../Resource/Image.h
     // Error: type "const unsigned char*" can not automatically bind
     // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Image", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(Image, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Image", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(Image, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "void SetGlobalVar(StringHash, const Variant&in)", AS_METHODPR(Image, SetGlobalVar, (StringHash, const Variant&), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "void set_globalVar(StringHash, const Variant&in)", AS_METHODPR(Image, SetGlobalVar, (StringHash, const Variant&), void), AS_CALL_THISCALL);
     // void Resource::SetMemoryUse(unsigned size) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Image", "void SetMemoryUse(uint)", asMETHODPR(Image, SetMemoryUse, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "void SetMemoryUse(uint)", AS_METHODPR(Image, SetMemoryUse, (unsigned), void), AS_CALL_THISCALL);
     // void Resource::SetName(const String& name) | File: ../Resource/Resource.h
-    engine->RegisterObjectMethod("Image", "void SetName(const String&in)", asMETHODPR(Image, SetName, (const String&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Image", "void set_name(const String&in)", asMETHODPR(Image, SetName, (const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "void SetName(const String&in)", AS_METHODPR(Image, SetName, (const String&), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "void set_name(const String&in)", AS_METHODPR(Image, SetName, (const String&), void), AS_CALL_THISCALL);
     // void Image::SetPixel(int x, int y, const Color& color) | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "void SetPixel(int, int, const Color&in)", asMETHODPR(Image, SetPixel, (int, int, const Color&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "void SetPixel(int, int, const Color&in)", AS_METHODPR(Image, SetPixel, (int, int, const Color&), void), AS_CALL_THISCALL);
     // void Image::SetPixel(int x, int y, int z, const Color& color) | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "void SetPixel(int, int, int, const Color&in)", asMETHODPR(Image, SetPixel, (int, int, int, const Color&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "void SetPixel(int, int, int, const Color&in)", AS_METHODPR(Image, SetPixel, (int, int, int, const Color&), void), AS_CALL_THISCALL);
     // void Image::SetPixelInt(int x, int y, unsigned uintColor) | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "void SetPixelInt(int, int, uint)", asMETHODPR(Image, SetPixelInt, (int, int, unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "void SetPixelInt(int, int, uint)", AS_METHODPR(Image, SetPixelInt, (int, int, unsigned), void), AS_CALL_THISCALL);
     // void Image::SetPixelInt(int x, int y, int z, unsigned uintColor) | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "void SetPixelInt(int, int, int, uint)", asMETHODPR(Image, SetPixelInt, (int, int, int, unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "void SetPixelInt(int, int, int, uint)", AS_METHODPR(Image, SetPixelInt, (int, int, int, unsigned), void), AS_CALL_THISCALL);
     // bool Image::SetSize(int width, int height, unsigned components) | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "bool SetSize(int, int, uint)", asMETHODPR(Image, SetSize, (int, int, unsigned), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool SetSize(int, int, uint)", AS_METHODPR(Image, SetSize, (int, int, unsigned), bool), AS_CALL_THISCALL);
     // bool Image::SetSize(int width, int height, int depth, unsigned components) | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "bool SetSize(int, int, int, uint)", asMETHODPR(Image, SetSize, (int, int, int, unsigned), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool SetSize(int, int, int, uint)", AS_METHODPR(Image, SetSize, (int, int, int, unsigned), bool), AS_CALL_THISCALL);
     // bool Image::SetSubimage(const Image* image, const IntRect& rect) | File: ../Resource/Image.h
-    engine->RegisterObjectMethod("Image", "bool SetSubimage(Image@+, const IntRect&in)", asMETHODPR(Image, SetSubimage, (const Image*, const IntRect&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool SetSubimage(Image@+, const IntRect&in)", AS_METHODPR(Image, SetSubimage, (const Image*, const IntRect&), bool), AS_CALL_THISCALL);
     // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
     // Error: type "EventHandler*" can not automatically bind
     // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
@@ -1391,18 +1391,18 @@ void ASRegisterGenerated_Members_I(asIScriptEngine* engine)
     // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
     // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
     // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Image", "void UnsubscribeFromAllEvents()", asMETHODPR(Image, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "void UnsubscribeFromAllEvents()", AS_METHODPR(Image, UnsubscribeFromAllEvents, (), void), AS_CALL_THISCALL);
     // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Image", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(Image_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("Image", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", AS_FUNCTION_OBJFIRST(Image_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), AS_CALL_CDECL_OBJFIRST);
     // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Image", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(Image, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "void UnsubscribeFromEvent(StringHash)", AS_METHODPR(Image, UnsubscribeFromEvent, (StringHash), void), AS_CALL_THISCALL);
     // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Image", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(Image, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "void UnsubscribeFromEvent(Object@+, StringHash)", AS_METHODPR(Image, UnsubscribeFromEvent, (Object*, StringHash), void), AS_CALL_THISCALL);
     // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Image", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(Image, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "void UnsubscribeFromEvents(Object@+)", AS_METHODPR(Image, UnsubscribeFromEvents, (Object*), void), AS_CALL_THISCALL);
     // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("Image", "int WeakRefs() const", asMETHODPR(Image, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Image", "int get_weakRefs() const", asMETHODPR(Image, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "int WeakRefs() const", AS_METHODPR(Image, WeakRefs, () const, int), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "int get_weakRefs() const", AS_METHODPR(Image, WeakRefs, () const, int), AS_CALL_THISCALL);
 #ifdef REGISTER_MANUAL_PART_Resource
     REGISTER_MANUAL_PART_Resource(Image, "Image")
 #endif
@@ -1420,128 +1420,128 @@ void ASRegisterGenerated_Members_I(asIScriptEngine* engine)
     RegisterSubclass<RefCounted, Image>(engine, "RefCounted", "Image");
 
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("IndexBuffer", asBEHAVE_ADDREF, "void f()", asMETHODPR(IndexBuffer, AddRef, (), void), asCALL_THISCALL);
+    engine->RegisterObjectBehaviour("IndexBuffer", asBEHAVE_ADDREF, "void f()", AS_METHODPR(IndexBuffer, AddRef, (), void), AS_CALL_THISCALL);
     // template<typename T> T* Object::Cast() | File: ../Core/Object.h
     // Not registered because template
     // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
     // Not registered because template
     // void GPUObject::ClearDataLost() | File: ../Graphics/GPUObject.h
-    engine->RegisterObjectMethod("IndexBuffer", "void ClearDataLost()", asMETHODPR(IndexBuffer, ClearDataLost, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "void ClearDataLost()", AS_METHODPR(IndexBuffer, ClearDataLost, (), void), AS_CALL_THISCALL);
     // bool Object::GetBlockEvents() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IndexBuffer", "bool GetBlockEvents() const", asMETHODPR(IndexBuffer, GetBlockEvents, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "bool GetBlockEvents() const", AS_METHODPR(IndexBuffer, GetBlockEvents, () const, bool), AS_CALL_THISCALL);
     // const String& Object::GetCategory() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IndexBuffer", "const String& GetCategory() const", asMETHODPR(IndexBuffer, GetCategory, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IndexBuffer", "const String& get_category() const", asMETHODPR(IndexBuffer, GetCategory, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "const String& GetCategory() const", AS_METHODPR(IndexBuffer, GetCategory, () const, const String&), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "const String& get_category() const", AS_METHODPR(IndexBuffer, GetCategory, () const, const String&), AS_CALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
     // Error: type "Context*" can used only as function parameter
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IndexBuffer", "VariantMap& GetEventDataMap() const", asMETHODPR(IndexBuffer, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "VariantMap& GetEventDataMap() const", AS_METHODPR(IndexBuffer, GetEventDataMap, () const, VariantMap&), AS_CALL_THISCALL);
     // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
     // Error: type "EventHandler*" can not automatically bind
     // Object* Object::GetEventSender() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IndexBuffer", "Object@+ GetEventSender() const", asMETHODPR(IndexBuffer, GetEventSender, () const, Object*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "Object@+ GetEventSender() const", AS_METHODPR(IndexBuffer, GetEventSender, () const, Object*), AS_CALL_THISCALL);
     // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IndexBuffer", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(IndexBuffer, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IndexBuffer", "const Variant& get_globalVar(StringHash) const", asMETHODPR(IndexBuffer, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "const Variant& GetGlobalVar(StringHash) const", AS_METHODPR(IndexBuffer, GetGlobalVar, (StringHash) const, const Variant&), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "const Variant& get_globalVar(StringHash) const", AS_METHODPR(IndexBuffer, GetGlobalVar, (StringHash) const, const Variant&), AS_CALL_THISCALL);
     // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IndexBuffer", "const VariantMap& GetGlobalVars() const", asMETHODPR(IndexBuffer, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IndexBuffer", "const VariantMap& get_globalVars() const", asMETHODPR(IndexBuffer, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "const VariantMap& GetGlobalVars() const", AS_METHODPR(IndexBuffer, GetGlobalVars, () const, const VariantMap&), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "const VariantMap& get_globalVars() const", AS_METHODPR(IndexBuffer, GetGlobalVars, () const, const VariantMap&), AS_CALL_THISCALL);
     // void* GPUObject::GetGPUObject() const | File: ../Graphics/GPUObject.h
     // Error: type "void*" can not automatically bind
     // unsigned GPUObject::GetGPUObjectName() const | File: ../Graphics/GPUObject.h
-    engine->RegisterObjectMethod("IndexBuffer", "uint GetGPUObjectName() const", asMETHODPR(IndexBuffer, GetGPUObjectName, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "uint GetGPUObjectName() const", AS_METHODPR(IndexBuffer, GetGPUObjectName, () const, unsigned), AS_CALL_THISCALL);
     // Graphics* GPUObject::GetGraphics() const | File: ../Graphics/GPUObject.h
-    engine->RegisterObjectMethod("IndexBuffer", "Graphics@+ GetGraphics() const", asMETHODPR(IndexBuffer, GetGraphics, () const, Graphics*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "Graphics@+ GetGraphics() const", AS_METHODPR(IndexBuffer, GetGraphics, () const, Graphics*), AS_CALL_THISCALL);
     // unsigned IndexBuffer::GetIndexCount() const | File: ../Graphics/IndexBuffer.h
-    engine->RegisterObjectMethod("IndexBuffer", "uint GetIndexCount() const", asMETHODPR(IndexBuffer, GetIndexCount, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IndexBuffer", "uint get_indexCount() const", asMETHODPR(IndexBuffer, GetIndexCount, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "uint GetIndexCount() const", AS_METHODPR(IndexBuffer, GetIndexCount, () const, unsigned), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "uint get_indexCount() const", AS_METHODPR(IndexBuffer, GetIndexCount, () const, unsigned), AS_CALL_THISCALL);
     // unsigned IndexBuffer::GetIndexSize() const | File: ../Graphics/IndexBuffer.h
-    engine->RegisterObjectMethod("IndexBuffer", "uint GetIndexSize() const", asMETHODPR(IndexBuffer, GetIndexSize, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IndexBuffer", "uint get_indexSize() const", asMETHODPR(IndexBuffer, GetIndexSize, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "uint GetIndexSize() const", AS_METHODPR(IndexBuffer, GetIndexSize, () const, unsigned), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "uint get_indexSize() const", AS_METHODPR(IndexBuffer, GetIndexSize, () const, unsigned), AS_CALL_THISCALL);
     // unsigned char* IndexBuffer::GetShadowData() const | File: ../Graphics/IndexBuffer.h
     // Error: type "unsigned char*" can not automatically bind
     // SharedArrayPtr<unsigned char> IndexBuffer::GetShadowDataShared() const | File: ../Graphics/IndexBuffer.h
     // Error: type "SharedArrayPtr<unsigned char>" can not automatically bind
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IndexBuffer", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(IndexBuffer, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "Object@+ GetSubsystem(StringHash) const", AS_METHODPR(IndexBuffer, GetSubsystem, (StringHash) const, Object*), AS_CALL_THISCALL);
     // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IndexBuffer", "StringHash GetType() const", asMETHODPR(IndexBuffer, GetType, () const, StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IndexBuffer", "StringHash get_type() const", asMETHODPR(IndexBuffer, GetType, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "StringHash GetType() const", AS_METHODPR(IndexBuffer, GetType, () const, StringHash), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "StringHash get_type() const", AS_METHODPR(IndexBuffer, GetType, () const, StringHash), AS_CALL_THISCALL);
     // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
     // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
     // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
     // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
     // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IndexBuffer", "const String& GetTypeName() const", asMETHODPR(IndexBuffer, GetTypeName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IndexBuffer", "const String& get_typeName() const", asMETHODPR(IndexBuffer, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "const String& GetTypeName() const", AS_METHODPR(IndexBuffer, GetTypeName, () const, const String&), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "const String& get_typeName() const", AS_METHODPR(IndexBuffer, GetTypeName, () const, const String&), AS_CALL_THISCALL);
     // bool IndexBuffer::GetUsedVertexRange(unsigned start, unsigned count, unsigned& minVertex, unsigned& vertexCount) | File: ../Graphics/IndexBuffer.h
-    engine->RegisterObjectMethod("IndexBuffer", "bool GetUsedVertexRange(uint, uint, uint&, uint&)", asMETHODPR(IndexBuffer, GetUsedVertexRange, (unsigned, unsigned, unsigned&, unsigned&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "bool GetUsedVertexRange(uint, uint, uint&, uint&)", AS_METHODPR(IndexBuffer, GetUsedVertexRange, (unsigned, unsigned, unsigned&, unsigned&), bool), AS_CALL_THISCALL);
     // bool Object::HasEventHandlers() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IndexBuffer", "bool HasEventHandlers() const", asMETHODPR(IndexBuffer, HasEventHandlers, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "bool HasEventHandlers() const", AS_METHODPR(IndexBuffer, HasEventHandlers, () const, bool), AS_CALL_THISCALL);
     // bool GPUObject::HasPendingData() const | File: ../Graphics/GPUObject.h
-    engine->RegisterObjectMethod("IndexBuffer", "bool HasPendingData() const", asMETHODPR(IndexBuffer, HasPendingData, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "bool HasPendingData() const", AS_METHODPR(IndexBuffer, HasPendingData, () const, bool), AS_CALL_THISCALL);
     // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IndexBuffer", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(IndexBuffer, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "bool HasSubscribedToEvent(StringHash) const", AS_METHODPR(IndexBuffer, HasSubscribedToEvent, (StringHash) const, bool), AS_CALL_THISCALL);
     // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IndexBuffer", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(IndexBuffer, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "bool HasSubscribedToEvent(Object@+, StringHash) const", AS_METHODPR(IndexBuffer, HasSubscribedToEvent, (Object*, StringHash) const, bool), AS_CALL_THISCALL);
     // explicit IndexBuffer::IndexBuffer(Context* context, bool forceHeadless=false) | File: ../Graphics/IndexBuffer.h
-    engine->RegisterObjectBehaviour("IndexBuffer", asBEHAVE_FACTORY, "IndexBuffer@+ f(bool = false)", asFUNCTION(IndexBuffer_IndexBuffer_Context_bool), asCALL_CDECL);
+    engine->RegisterObjectBehaviour("IndexBuffer", asBEHAVE_FACTORY, "IndexBuffer@+ f(bool = false)", AS_FUNCTION(IndexBuffer_IndexBuffer_Context_bool), AS_CALL_CDECL);
     // bool GPUObject::IsDataLost() const | File: ../Graphics/GPUObject.h
-    engine->RegisterObjectMethod("IndexBuffer", "bool IsDataLost() const", asMETHODPR(IndexBuffer, IsDataLost, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IndexBuffer", "bool get_dataLost() const", asMETHODPR(IndexBuffer, IsDataLost, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "bool IsDataLost() const", AS_METHODPR(IndexBuffer, IsDataLost, () const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "bool get_dataLost() const", AS_METHODPR(IndexBuffer, IsDataLost, () const, bool), AS_CALL_THISCALL);
     // bool IndexBuffer::IsDynamic() const | File: ../Graphics/IndexBuffer.h
-    engine->RegisterObjectMethod("IndexBuffer", "bool IsDynamic() const", asMETHODPR(IndexBuffer, IsDynamic, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IndexBuffer", "bool get_dynamic() const", asMETHODPR(IndexBuffer, IsDynamic, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "bool IsDynamic() const", AS_METHODPR(IndexBuffer, IsDynamic, () const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "bool get_dynamic() const", AS_METHODPR(IndexBuffer, IsDynamic, () const, bool), AS_CALL_THISCALL);
     // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IndexBuffer", "bool IsInstanceOf(StringHash) const", asMETHODPR(IndexBuffer, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "bool IsInstanceOf(StringHash) const", AS_METHODPR(IndexBuffer, IsInstanceOf, (StringHash) const, bool), AS_CALL_THISCALL);
     // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
     // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
     // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
     // Not registered because template
     // bool IndexBuffer::IsLocked() const | File: ../Graphics/IndexBuffer.h
-    engine->RegisterObjectMethod("IndexBuffer", "bool IsLocked() const", asMETHODPR(IndexBuffer, IsLocked, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "bool IsLocked() const", AS_METHODPR(IndexBuffer, IsLocked, () const, bool), AS_CALL_THISCALL);
     // bool IndexBuffer::IsShadowed() const | File: ../Graphics/IndexBuffer.h
-    engine->RegisterObjectMethod("IndexBuffer", "bool IsShadowed() const", asMETHODPR(IndexBuffer, IsShadowed, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IndexBuffer", "bool get_shadowed() const", asMETHODPR(IndexBuffer, IsShadowed, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "bool IsShadowed() const", AS_METHODPR(IndexBuffer, IsShadowed, () const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "bool get_shadowed() const", AS_METHODPR(IndexBuffer, IsShadowed, () const, bool), AS_CALL_THISCALL);
     // void* IndexBuffer::Lock(unsigned start, unsigned count, bool discard=false) | File: ../Graphics/IndexBuffer.h
     // Error: type "void*" can not automatically bind
     // void IndexBuffer::OnDeviceLost() override | File: ../Graphics/IndexBuffer.h
-    engine->RegisterObjectMethod("IndexBuffer", "void OnDeviceLost()", asMETHODPR(IndexBuffer, OnDeviceLost, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "void OnDeviceLost()", AS_METHODPR(IndexBuffer, OnDeviceLost, (), void), AS_CALL_THISCALL);
     // void IndexBuffer::OnDeviceReset() override | File: ../Graphics/IndexBuffer.h
-    engine->RegisterObjectMethod("IndexBuffer", "void OnDeviceReset()", asMETHODPR(IndexBuffer, OnDeviceReset, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "void OnDeviceReset()", AS_METHODPR(IndexBuffer, OnDeviceReset, (), void), AS_CALL_THISCALL);
     // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IndexBuffer", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(IndexBuffer, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "void OnEvent(Object@+, StringHash, VariantMap&)", AS_METHODPR(IndexBuffer, OnEvent, (Object*, StringHash, VariantMap&), void), AS_CALL_THISCALL);
     // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
     // Error: type "RefCount*" can not automatically bind
     // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("IndexBuffer", "int Refs() const", asMETHODPR(IndexBuffer, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IndexBuffer", "int get_refs() const", asMETHODPR(IndexBuffer, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "int Refs() const", AS_METHODPR(IndexBuffer, Refs, () const, int), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "int get_refs() const", AS_METHODPR(IndexBuffer, Refs, () const, int), AS_CALL_THISCALL);
     // void IndexBuffer::Release() override | File: ../Graphics/IndexBuffer.h
-    engine->RegisterObjectMethod("IndexBuffer", "void Release()", asMETHODPR(IndexBuffer, Release, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "void Release()", AS_METHODPR(IndexBuffer, Release, (), void), AS_CALL_THISCALL);
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("IndexBuffer", asBEHAVE_RELEASE, "void f()", asMETHODPR(IndexBuffer, ReleaseRef, (), void), asCALL_THISCALL);
+    engine->RegisterObjectBehaviour("IndexBuffer", asBEHAVE_RELEASE, "void f()", AS_METHODPR(IndexBuffer, ReleaseRef, (), void), AS_CALL_THISCALL);
     // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IndexBuffer", "void SendEvent(StringHash)", asMETHODPR(IndexBuffer, SendEvent, (StringHash), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "void SendEvent(StringHash)", AS_METHODPR(IndexBuffer, SendEvent, (StringHash), void), AS_CALL_THISCALL);
     // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IndexBuffer", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(IndexBuffer, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "void SendEvent(StringHash, VariantMap&)", AS_METHODPR(IndexBuffer, SendEvent, (StringHash, VariantMap&), void), AS_CALL_THISCALL);
     // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
     // Not registered because template
     // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IndexBuffer", "void SetBlockEvents(bool)", asMETHODPR(IndexBuffer, SetBlockEvents, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "void SetBlockEvents(bool)", AS_METHODPR(IndexBuffer, SetBlockEvents, (bool), void), AS_CALL_THISCALL);
     // bool IndexBuffer::SetData(const void* data) | File: ../Graphics/IndexBuffer.h
     // Error: type "const void*" can not automatically bind
     // bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count, bool discard=false) | File: ../Graphics/IndexBuffer.h
     // Error: type "const void*" can not automatically bind
     // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IndexBuffer", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(IndexBuffer, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IndexBuffer", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(IndexBuffer, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "void SetGlobalVar(StringHash, const Variant&in)", AS_METHODPR(IndexBuffer, SetGlobalVar, (StringHash, const Variant&), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "void set_globalVar(StringHash, const Variant&in)", AS_METHODPR(IndexBuffer, SetGlobalVar, (StringHash, const Variant&), void), AS_CALL_THISCALL);
     // void IndexBuffer::SetShadowed(bool enable) | File: ../Graphics/IndexBuffer.h
-    engine->RegisterObjectMethod("IndexBuffer", "void SetShadowed(bool)", asMETHODPR(IndexBuffer, SetShadowed, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IndexBuffer", "void set_shadowed(bool)", asMETHODPR(IndexBuffer, SetShadowed, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "void SetShadowed(bool)", AS_METHODPR(IndexBuffer, SetShadowed, (bool), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "void set_shadowed(bool)", AS_METHODPR(IndexBuffer, SetShadowed, (bool), void), AS_CALL_THISCALL);
     // bool IndexBuffer::SetSize(unsigned indexCount, bool largeIndices, bool dynamic=false) | File: ../Graphics/IndexBuffer.h
-    engine->RegisterObjectMethod("IndexBuffer", "bool SetSize(uint, bool, bool = false)", asMETHODPR(IndexBuffer, SetSize, (unsigned, bool, bool), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "bool SetSize(uint, bool, bool = false)", AS_METHODPR(IndexBuffer, SetSize, (unsigned, bool, bool), bool), AS_CALL_THISCALL);
     // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
     // Error: type "EventHandler*" can not automatically bind
     // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
@@ -1551,20 +1551,20 @@ void ASRegisterGenerated_Members_I(asIScriptEngine* engine)
     // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
     // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
     // void IndexBuffer::Unlock() | File: ../Graphics/IndexBuffer.h
-    engine->RegisterObjectMethod("IndexBuffer", "void Unlock()", asMETHODPR(IndexBuffer, Unlock, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "void Unlock()", AS_METHODPR(IndexBuffer, Unlock, (), void), AS_CALL_THISCALL);
     // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IndexBuffer", "void UnsubscribeFromAllEvents()", asMETHODPR(IndexBuffer, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "void UnsubscribeFromAllEvents()", AS_METHODPR(IndexBuffer, UnsubscribeFromAllEvents, (), void), AS_CALL_THISCALL);
     // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IndexBuffer", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(IndexBuffer_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("IndexBuffer", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", AS_FUNCTION_OBJFIRST(IndexBuffer_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), AS_CALL_CDECL_OBJFIRST);
     // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IndexBuffer", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(IndexBuffer, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "void UnsubscribeFromEvent(StringHash)", AS_METHODPR(IndexBuffer, UnsubscribeFromEvent, (StringHash), void), AS_CALL_THISCALL);
     // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IndexBuffer", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(IndexBuffer, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "void UnsubscribeFromEvent(Object@+, StringHash)", AS_METHODPR(IndexBuffer, UnsubscribeFromEvent, (Object*, StringHash), void), AS_CALL_THISCALL);
     // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("IndexBuffer", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(IndexBuffer, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "void UnsubscribeFromEvents(Object@+)", AS_METHODPR(IndexBuffer, UnsubscribeFromEvents, (Object*), void), AS_CALL_THISCALL);
     // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("IndexBuffer", "int WeakRefs() const", asMETHODPR(IndexBuffer, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IndexBuffer", "int get_weakRefs() const", asMETHODPR(IndexBuffer, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "int WeakRefs() const", AS_METHODPR(IndexBuffer, WeakRefs, () const, int), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "int get_weakRefs() const", AS_METHODPR(IndexBuffer, WeakRefs, () const, int), AS_CALL_THISCALL);
 #ifdef REGISTER_MANUAL_PART_Object
     REGISTER_MANUAL_PART_Object(IndexBuffer, "IndexBuffer")
 #endif
@@ -1581,231 +1581,231 @@ void ASRegisterGenerated_Members_I(asIScriptEngine* engine)
     RegisterSubclass<RefCounted, IndexBuffer>(engine, "RefCounted", "IndexBuffer");
 
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("Input", asBEHAVE_ADDREF, "void f()", asMETHODPR(Input, AddRef, (), void), asCALL_THISCALL);
+    engine->RegisterObjectBehaviour("Input", asBEHAVE_ADDREF, "void f()", AS_METHODPR(Input, AddRef, (), void), AS_CALL_THISCALL);
     // SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile=nullptr, XMLFile* styleFile=nullptr) | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "SDL_JoystickID AddScreenJoystick(XMLFile@+ = null, XMLFile@+ = null)", asMETHODPR(Input, AddScreenJoystick, (XMLFile*, XMLFile*), SDL_JoystickID), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "SDL_JoystickID AddScreenJoystick(XMLFile@+ = null, XMLFile@+ = null)", AS_METHODPR(Input, AddScreenJoystick, (XMLFile*, XMLFile*), SDL_JoystickID), AS_CALL_THISCALL);
     // template<typename T> T* Object::Cast() | File: ../Core/Object.h
     // Not registered because template
     // template<typename T> const T* Object::Cast() const | File: ../Core/Object.h
     // Not registered because template
     // void Input::CenterMousePosition() | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "void CenterMousePosition()", asMETHODPR(Input, CenterMousePosition, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "void CenterMousePosition()", AS_METHODPR(Input, CenterMousePosition, (), void), AS_CALL_THISCALL);
     // bool Object::GetBlockEvents() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Input", "bool GetBlockEvents() const", asMETHODPR(Input, GetBlockEvents, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool GetBlockEvents() const", AS_METHODPR(Input, GetBlockEvents, () const, bool), AS_CALL_THISCALL);
     // const String& Object::GetCategory() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Input", "const String& GetCategory() const", asMETHODPR(Input, GetCategory, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "const String& get_category() const", asMETHODPR(Input, GetCategory, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "const String& GetCategory() const", AS_METHODPR(Input, GetCategory, () const, const String&), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "const String& get_category() const", AS_METHODPR(Input, GetCategory, () const, const String&), AS_CALL_THISCALL);
     // Context* Object::GetContext() const | File: ../Core/Object.h
     // Error: type "Context*" can used only as function parameter
     // VariantMap& Object::GetEventDataMap() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Input", "VariantMap& GetEventDataMap() const", asMETHODPR(Input, GetEventDataMap, () const, VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "VariantMap& GetEventDataMap() const", AS_METHODPR(Input, GetEventDataMap, () const, VariantMap&), AS_CALL_THISCALL);
     // EventHandler* Object::GetEventHandler() const | File: ../Core/Object.h
     // Error: type "EventHandler*" can not automatically bind
     // Object* Object::GetEventSender() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Input", "Object@+ GetEventSender() const", asMETHODPR(Input, GetEventSender, () const, Object*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "Object@+ GetEventSender() const", AS_METHODPR(Input, GetEventSender, () const, Object*), AS_CALL_THISCALL);
     // const Variant& Object::GetGlobalVar(StringHash key) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Input", "const Variant& GetGlobalVar(StringHash) const", asMETHODPR(Input, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "const Variant& get_globalVar(StringHash) const", asMETHODPR(Input, GetGlobalVar, (StringHash) const, const Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "const Variant& GetGlobalVar(StringHash) const", AS_METHODPR(Input, GetGlobalVar, (StringHash) const, const Variant&), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "const Variant& get_globalVar(StringHash) const", AS_METHODPR(Input, GetGlobalVar, (StringHash) const, const Variant&), AS_CALL_THISCALL);
     // const VariantMap& Object::GetGlobalVars() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Input", "const VariantMap& GetGlobalVars() const", asMETHODPR(Input, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "const VariantMap& get_globalVars() const", asMETHODPR(Input, GetGlobalVars, () const, const VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "const VariantMap& GetGlobalVars() const", AS_METHODPR(Input, GetGlobalVars, () const, const VariantMap&), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "const VariantMap& get_globalVars() const", AS_METHODPR(Input, GetGlobalVars, () const, const VariantMap&), AS_CALL_THISCALL);
     // Vector2 Input::GetInputScale() const | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "Vector2 GetInputScale() const", asMETHODPR(Input, GetInputScale, () const, Vector2), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "Vector2 get_inputScale() const", asMETHODPR(Input, GetInputScale, () const, Vector2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "Vector2 GetInputScale() const", AS_METHODPR(Input, GetInputScale, () const, Vector2), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "Vector2 get_inputScale() const", AS_METHODPR(Input, GetInputScale, () const, Vector2), AS_CALL_THISCALL);
     // JoystickState* Input::GetJoystick(SDL_JoystickID id) | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "JoystickState@+ GetJoystick(SDL_JoystickID)", asMETHODPR(Input, GetJoystick, (SDL_JoystickID), JoystickState*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "JoystickState@+ get_joysticks(SDL_JoystickID)", asMETHODPR(Input, GetJoystick, (SDL_JoystickID), JoystickState*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "JoystickState@+ GetJoystick(SDL_JoystickID)", AS_METHODPR(Input, GetJoystick, (SDL_JoystickID), JoystickState*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "JoystickState@+ get_joysticks(SDL_JoystickID)", AS_METHODPR(Input, GetJoystick, (SDL_JoystickID), JoystickState*), AS_CALL_THISCALL);
     // JoystickState* Input::GetJoystickByIndex(unsigned index) | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "JoystickState@+ GetJoystickByIndex(uint)", asMETHODPR(Input, GetJoystickByIndex, (unsigned), JoystickState*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "JoystickState@+ get_joysticksByIndex(uint)", asMETHODPR(Input, GetJoystickByIndex, (unsigned), JoystickState*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "JoystickState@+ GetJoystickByIndex(uint)", AS_METHODPR(Input, GetJoystickByIndex, (unsigned), JoystickState*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "JoystickState@+ get_joysticksByIndex(uint)", AS_METHODPR(Input, GetJoystickByIndex, (unsigned), JoystickState*), AS_CALL_THISCALL);
     // JoystickState* Input::GetJoystickByName(const String& name) | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "JoystickState@+ GetJoystickByName(const String&in)", asMETHODPR(Input, GetJoystickByName, (const String&), JoystickState*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "JoystickState@+ get_joysticksByName(const String&in)", asMETHODPR(Input, GetJoystickByName, (const String&), JoystickState*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "JoystickState@+ GetJoystickByName(const String&in)", AS_METHODPR(Input, GetJoystickByName, (const String&), JoystickState*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "JoystickState@+ get_joysticksByName(const String&in)", AS_METHODPR(Input, GetJoystickByName, (const String&), JoystickState*), AS_CALL_THISCALL);
     // bool Input::GetKeyDown(Key key) const | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "bool GetKeyDown(Key) const", asMETHODPR(Input, GetKeyDown, (Key) const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "bool get_keyDown(Key) const", asMETHODPR(Input, GetKeyDown, (Key) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool GetKeyDown(Key) const", AS_METHODPR(Input, GetKeyDown, (Key) const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool get_keyDown(Key) const", AS_METHODPR(Input, GetKeyDown, (Key) const, bool), AS_CALL_THISCALL);
     // Key Input::GetKeyFromName(const String& name) const | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "Key GetKeyFromName(const String&in) const", asMETHODPR(Input, GetKeyFromName, (const String&) const, Key), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "Key GetKeyFromName(const String&in) const", AS_METHODPR(Input, GetKeyFromName, (const String&) const, Key), AS_CALL_THISCALL);
     // Key Input::GetKeyFromScancode(Scancode scancode) const | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "Key GetKeyFromScancode(Scancode) const", asMETHODPR(Input, GetKeyFromScancode, (Scancode) const, Key), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "Key GetKeyFromScancode(Scancode) const", AS_METHODPR(Input, GetKeyFromScancode, (Scancode) const, Key), AS_CALL_THISCALL);
     // String Input::GetKeyName(Key key) const | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "String GetKeyName(Key) const", asMETHODPR(Input, GetKeyName, (Key) const, String), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "String GetKeyName(Key) const", AS_METHODPR(Input, GetKeyName, (Key) const, String), AS_CALL_THISCALL);
     // bool Input::GetKeyPress(Key key) const | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "bool GetKeyPress(Key) const", asMETHODPR(Input, GetKeyPress, (Key) const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "bool get_keyPress(Key) const", asMETHODPR(Input, GetKeyPress, (Key) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool GetKeyPress(Key) const", AS_METHODPR(Input, GetKeyPress, (Key) const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool get_keyPress(Key) const", AS_METHODPR(Input, GetKeyPress, (Key) const, bool), AS_CALL_THISCALL);
     // bool Input::GetMouseButtonDown(MouseButtonFlags button) const | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "bool GetMouseButtonDown(MouseButtonFlags) const", asMETHODPR(Input, GetMouseButtonDown, (MouseButtonFlags) const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "bool get_mouseButtonDown(MouseButtonFlags) const", asMETHODPR(Input, GetMouseButtonDown, (MouseButtonFlags) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool GetMouseButtonDown(MouseButtonFlags) const", AS_METHODPR(Input, GetMouseButtonDown, (MouseButtonFlags) const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool get_mouseButtonDown(MouseButtonFlags) const", AS_METHODPR(Input, GetMouseButtonDown, (MouseButtonFlags) const, bool), AS_CALL_THISCALL);
     // bool Input::GetMouseButtonPress(MouseButtonFlags button) const | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "bool GetMouseButtonPress(MouseButtonFlags) const", asMETHODPR(Input, GetMouseButtonPress, (MouseButtonFlags) const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "bool get_mouseButtonPress(MouseButtonFlags) const", asMETHODPR(Input, GetMouseButtonPress, (MouseButtonFlags) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool GetMouseButtonPress(MouseButtonFlags) const", AS_METHODPR(Input, GetMouseButtonPress, (MouseButtonFlags) const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool get_mouseButtonPress(MouseButtonFlags) const", AS_METHODPR(Input, GetMouseButtonPress, (MouseButtonFlags) const, bool), AS_CALL_THISCALL);
     // MouseMode Input::GetMouseMode() const | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "MouseMode GetMouseMode() const", asMETHODPR(Input, GetMouseMode, () const, MouseMode), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "MouseMode get_mouseMode() const", asMETHODPR(Input, GetMouseMode, () const, MouseMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "MouseMode GetMouseMode() const", AS_METHODPR(Input, GetMouseMode, () const, MouseMode), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "MouseMode get_mouseMode() const", AS_METHODPR(Input, GetMouseMode, () const, MouseMode), AS_CALL_THISCALL);
     // IntVector2 Input::GetMouseMove() const | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "IntVector2 GetMouseMove() const", asMETHODPR(Input, GetMouseMove, () const, IntVector2), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "IntVector2 get_mouseMove() const", asMETHODPR(Input, GetMouseMove, () const, IntVector2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "IntVector2 GetMouseMove() const", AS_METHODPR(Input, GetMouseMove, () const, IntVector2), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "IntVector2 get_mouseMove() const", AS_METHODPR(Input, GetMouseMove, () const, IntVector2), AS_CALL_THISCALL);
     // int Input::GetMouseMoveWheel() const | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "int GetMouseMoveWheel() const", asMETHODPR(Input, GetMouseMoveWheel, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "int get_mouseMoveWheel() const", asMETHODPR(Input, GetMouseMoveWheel, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "int GetMouseMoveWheel() const", AS_METHODPR(Input, GetMouseMoveWheel, () const, int), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "int get_mouseMoveWheel() const", AS_METHODPR(Input, GetMouseMoveWheel, () const, int), AS_CALL_THISCALL);
     // int Input::GetMouseMoveX() const | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "int GetMouseMoveX() const", asMETHODPR(Input, GetMouseMoveX, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "int get_mouseMoveX() const", asMETHODPR(Input, GetMouseMoveX, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "int GetMouseMoveX() const", AS_METHODPR(Input, GetMouseMoveX, () const, int), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "int get_mouseMoveX() const", AS_METHODPR(Input, GetMouseMoveX, () const, int), AS_CALL_THISCALL);
     // int Input::GetMouseMoveY() const | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "int GetMouseMoveY() const", asMETHODPR(Input, GetMouseMoveY, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "int get_mouseMoveY() const", asMETHODPR(Input, GetMouseMoveY, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "int GetMouseMoveY() const", AS_METHODPR(Input, GetMouseMoveY, () const, int), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "int get_mouseMoveY() const", AS_METHODPR(Input, GetMouseMoveY, () const, int), AS_CALL_THISCALL);
     // IntVector2 Input::GetMousePosition() const | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "IntVector2 GetMousePosition() const", asMETHODPR(Input, GetMousePosition, () const, IntVector2), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "IntVector2 get_mousePosition() const", asMETHODPR(Input, GetMousePosition, () const, IntVector2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "IntVector2 GetMousePosition() const", AS_METHODPR(Input, GetMousePosition, () const, IntVector2), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "IntVector2 get_mousePosition() const", AS_METHODPR(Input, GetMousePosition, () const, IntVector2), AS_CALL_THISCALL);
     // unsigned Input::GetNumJoysticks() const | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "uint GetNumJoysticks() const", asMETHODPR(Input, GetNumJoysticks, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "uint get_numJoysticks() const", asMETHODPR(Input, GetNumJoysticks, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "uint GetNumJoysticks() const", AS_METHODPR(Input, GetNumJoysticks, () const, unsigned), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "uint get_numJoysticks() const", AS_METHODPR(Input, GetNumJoysticks, () const, unsigned), AS_CALL_THISCALL);
     // unsigned Input::GetNumTouches() const | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "uint GetNumTouches() const", asMETHODPR(Input, GetNumTouches, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "uint get_numTouches() const", asMETHODPR(Input, GetNumTouches, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "uint GetNumTouches() const", AS_METHODPR(Input, GetNumTouches, () const, unsigned), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "uint get_numTouches() const", AS_METHODPR(Input, GetNumTouches, () const, unsigned), AS_CALL_THISCALL);
     // bool Input::GetQualifierDown(Qualifier qualifier) const | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "bool GetQualifierDown(Qualifier) const", asMETHODPR(Input, GetQualifierDown, (Qualifier) const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "bool get_qualifierDown(Qualifier) const", asMETHODPR(Input, GetQualifierDown, (Qualifier) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool GetQualifierDown(Qualifier) const", AS_METHODPR(Input, GetQualifierDown, (Qualifier) const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool get_qualifierDown(Qualifier) const", AS_METHODPR(Input, GetQualifierDown, (Qualifier) const, bool), AS_CALL_THISCALL);
     // bool Input::GetQualifierPress(Qualifier qualifier) const | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "bool GetQualifierPress(Qualifier) const", asMETHODPR(Input, GetQualifierPress, (Qualifier) const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "bool get_qualifierPress(Qualifier) const", asMETHODPR(Input, GetQualifierPress, (Qualifier) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool GetQualifierPress(Qualifier) const", AS_METHODPR(Input, GetQualifierPress, (Qualifier) const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool get_qualifierPress(Qualifier) const", AS_METHODPR(Input, GetQualifierPress, (Qualifier) const, bool), AS_CALL_THISCALL);
     // QualifierFlags Input::GetQualifiers() const | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "QualifierFlags GetQualifiers() const", asMETHODPR(Input, GetQualifiers, () const, QualifierFlags), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "QualifierFlags get_qualifiers() const", asMETHODPR(Input, GetQualifiers, () const, QualifierFlags), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "QualifierFlags GetQualifiers() const", AS_METHODPR(Input, GetQualifiers, () const, QualifierFlags), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "QualifierFlags get_qualifiers() const", AS_METHODPR(Input, GetQualifiers, () const, QualifierFlags), AS_CALL_THISCALL);
     // bool Input::GetScancodeDown(Scancode scancode) const | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "bool GetScancodeDown(Scancode) const", asMETHODPR(Input, GetScancodeDown, (Scancode) const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "bool get_scancodeDown(Scancode) const", asMETHODPR(Input, GetScancodeDown, (Scancode) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool GetScancodeDown(Scancode) const", AS_METHODPR(Input, GetScancodeDown, (Scancode) const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool get_scancodeDown(Scancode) const", AS_METHODPR(Input, GetScancodeDown, (Scancode) const, bool), AS_CALL_THISCALL);
     // Scancode Input::GetScancodeFromKey(Key key) const | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "Scancode GetScancodeFromKey(Key) const", asMETHODPR(Input, GetScancodeFromKey, (Key) const, Scancode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "Scancode GetScancodeFromKey(Key) const", AS_METHODPR(Input, GetScancodeFromKey, (Key) const, Scancode), AS_CALL_THISCALL);
     // Scancode Input::GetScancodeFromName(const String& name) const | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "Scancode GetScancodeFromName(const String&in) const", asMETHODPR(Input, GetScancodeFromName, (const String&) const, Scancode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "Scancode GetScancodeFromName(const String&in) const", AS_METHODPR(Input, GetScancodeFromName, (const String&) const, Scancode), AS_CALL_THISCALL);
     // String Input::GetScancodeName(Scancode scancode) const | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "String GetScancodeName(Scancode) const", asMETHODPR(Input, GetScancodeName, (Scancode) const, String), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "String GetScancodeName(Scancode) const", AS_METHODPR(Input, GetScancodeName, (Scancode) const, String), AS_CALL_THISCALL);
     // bool Input::GetScancodePress(Scancode scancode) const | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "bool GetScancodePress(Scancode) const", asMETHODPR(Input, GetScancodePress, (Scancode) const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "bool get_scancodePress(Scancode) const", asMETHODPR(Input, GetScancodePress, (Scancode) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool GetScancodePress(Scancode) const", AS_METHODPR(Input, GetScancodePress, (Scancode) const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool get_scancodePress(Scancode) const", AS_METHODPR(Input, GetScancodePress, (Scancode) const, bool), AS_CALL_THISCALL);
     // bool Input::GetScreenKeyboardSupport() const | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "bool GetScreenKeyboardSupport() const", asMETHODPR(Input, GetScreenKeyboardSupport, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "bool get_screenKeyboardSupport() const", asMETHODPR(Input, GetScreenKeyboardSupport, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool GetScreenKeyboardSupport() const", AS_METHODPR(Input, GetScreenKeyboardSupport, () const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool get_screenKeyboardSupport() const", AS_METHODPR(Input, GetScreenKeyboardSupport, () const, bool), AS_CALL_THISCALL);
     // Object* Object::GetSubsystem(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Input", "Object@+ GetSubsystem(StringHash) const", asMETHODPR(Input, GetSubsystem, (StringHash) const, Object*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "Object@+ GetSubsystem(StringHash) const", AS_METHODPR(Input, GetSubsystem, (StringHash) const, Object*), AS_CALL_THISCALL);
     // template<class T> T* Object::GetSubsystem() const | File: ../Core/Object.h
     // Not registered because template
     // bool Input::GetToggleFullscreen() const | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "bool GetToggleFullscreen() const", asMETHODPR(Input, GetToggleFullscreen, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "bool get_toggleFullscreen() const", asMETHODPR(Input, GetToggleFullscreen, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool GetToggleFullscreen() const", AS_METHODPR(Input, GetToggleFullscreen, () const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool get_toggleFullscreen() const", AS_METHODPR(Input, GetToggleFullscreen, () const, bool), AS_CALL_THISCALL);
     // TouchState* Input::GetTouch(unsigned index) const | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "TouchState@+ GetTouch(uint) const", asMETHODPR(Input, GetTouch, (unsigned) const, TouchState*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "TouchState@+ get_touches(uint) const", asMETHODPR(Input, GetTouch, (unsigned) const, TouchState*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "TouchState@+ GetTouch(uint) const", AS_METHODPR(Input, GetTouch, (unsigned) const, TouchState*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "TouchState@+ get_touches(uint) const", AS_METHODPR(Input, GetTouch, (unsigned) const, TouchState*), AS_CALL_THISCALL);
     // bool Input::GetTouchEmulation() const | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "bool GetTouchEmulation() const", asMETHODPR(Input, GetTouchEmulation, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "bool get_touchEmulation() const", asMETHODPR(Input, GetTouchEmulation, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool GetTouchEmulation() const", AS_METHODPR(Input, GetTouchEmulation, () const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool get_touchEmulation() const", AS_METHODPR(Input, GetTouchEmulation, () const, bool), AS_CALL_THISCALL);
     // virtual StringHash Object::GetType() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Input", "StringHash GetType() const", asMETHODPR(Input, GetType, () const, StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "StringHash get_type() const", asMETHODPR(Input, GetType, () const, StringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "StringHash GetType() const", AS_METHODPR(Input, GetType, () const, StringHash), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "StringHash get_type() const", AS_METHODPR(Input, GetType, () const, StringHash), AS_CALL_THISCALL);
     // virtual const TypeInfo* Object::GetTypeInfo() const =0 | File: ../Core/Object.h
     // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
     // static const TypeInfo* Object::GetTypeInfoStatic() | File: ../Core/Object.h
     // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
     // virtual const String& Object::GetTypeName() const =0 | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Input", "const String& GetTypeName() const", asMETHODPR(Input, GetTypeName, () const, const String&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "const String& get_typeName() const", asMETHODPR(Input, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "const String& GetTypeName() const", AS_METHODPR(Input, GetTypeName, () const, const String&), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "const String& get_typeName() const", AS_METHODPR(Input, GetTypeName, () const, const String&), AS_CALL_THISCALL);
     // bool Object::HasEventHandlers() const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Input", "bool HasEventHandlers() const", asMETHODPR(Input, HasEventHandlers, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool HasEventHandlers() const", AS_METHODPR(Input, HasEventHandlers, () const, bool), AS_CALL_THISCALL);
     // bool Input::HasFocus() | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "bool HasFocus()", asMETHODPR(Input, HasFocus, (), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "bool get_focus()", asMETHODPR(Input, HasFocus, (), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool HasFocus()", AS_METHODPR(Input, HasFocus, (), bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool get_focus()", AS_METHODPR(Input, HasFocus, (), bool), AS_CALL_THISCALL);
     // bool Object::HasSubscribedToEvent(StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Input", "bool HasSubscribedToEvent(StringHash) const", asMETHODPR(Input, HasSubscribedToEvent, (StringHash) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool HasSubscribedToEvent(StringHash) const", AS_METHODPR(Input, HasSubscribedToEvent, (StringHash) const, bool), AS_CALL_THISCALL);
     // bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Input", "bool HasSubscribedToEvent(Object@+, StringHash) const", asMETHODPR(Input, HasSubscribedToEvent, (Object*, StringHash) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool HasSubscribedToEvent(Object@+, StringHash) const", AS_METHODPR(Input, HasSubscribedToEvent, (Object*, StringHash) const, bool), AS_CALL_THISCALL);
     // explicit Input::Input(Context* context) | File: ../Input/Input.h
-    engine->RegisterObjectBehaviour("Input", asBEHAVE_FACTORY, "Input@+ f()", asFUNCTION(Input_Input_Context), asCALL_CDECL);
+    engine->RegisterObjectBehaviour("Input", asBEHAVE_FACTORY, "Input@+ f()", AS_FUNCTION(Input_Input_Context), AS_CALL_CDECL);
     // bool Object::IsInstanceOf(StringHash type) const | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Input", "bool IsInstanceOf(StringHash) const", asMETHODPR(Input, IsInstanceOf, (StringHash) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool IsInstanceOf(StringHash) const", AS_METHODPR(Input, IsInstanceOf, (StringHash) const, bool), AS_CALL_THISCALL);
     // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const | File: ../Core/Object.h
     // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
     // template<typename T> bool Object::IsInstanceOf() const | File: ../Core/Object.h
     // Not registered because template
     // bool Input::IsMinimized() const | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "bool IsMinimized() const", asMETHODPR(Input, IsMinimized, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "bool get_minimized() const", asMETHODPR(Input, IsMinimized, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool IsMinimized() const", AS_METHODPR(Input, IsMinimized, () const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool get_minimized() const", AS_METHODPR(Input, IsMinimized, () const, bool), AS_CALL_THISCALL);
     // bool Input::IsMouseGrabbed() const | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "bool IsMouseGrabbed() const", asMETHODPR(Input, IsMouseGrabbed, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "bool get_mouseGrabbed() const", asMETHODPR(Input, IsMouseGrabbed, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool IsMouseGrabbed() const", AS_METHODPR(Input, IsMouseGrabbed, () const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool get_mouseGrabbed() const", AS_METHODPR(Input, IsMouseGrabbed, () const, bool), AS_CALL_THISCALL);
     // bool Input::IsMouseLocked() const | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "bool IsMouseLocked() const", asMETHODPR(Input, IsMouseLocked, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "bool get_mouseLocked() const", asMETHODPR(Input, IsMouseLocked, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool IsMouseLocked() const", AS_METHODPR(Input, IsMouseLocked, () const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool get_mouseLocked() const", AS_METHODPR(Input, IsMouseLocked, () const, bool), AS_CALL_THISCALL);
     // bool Input::IsMouseVisible() const | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "bool IsMouseVisible() const", asMETHODPR(Input, IsMouseVisible, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "bool get_mouseVisible() const", asMETHODPR(Input, IsMouseVisible, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool IsMouseVisible() const", AS_METHODPR(Input, IsMouseVisible, () const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool get_mouseVisible() const", AS_METHODPR(Input, IsMouseVisible, () const, bool), AS_CALL_THISCALL);
     // bool Input::IsScreenJoystickVisible(SDL_JoystickID id) const | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "bool IsScreenJoystickVisible(SDL_JoystickID) const", asMETHODPR(Input, IsScreenJoystickVisible, (SDL_JoystickID) const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "bool get_screenJoystickVisible(SDL_JoystickID) const", asMETHODPR(Input, IsScreenJoystickVisible, (SDL_JoystickID) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool IsScreenJoystickVisible(SDL_JoystickID) const", AS_METHODPR(Input, IsScreenJoystickVisible, (SDL_JoystickID) const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool get_screenJoystickVisible(SDL_JoystickID) const", AS_METHODPR(Input, IsScreenJoystickVisible, (SDL_JoystickID) const, bool), AS_CALL_THISCALL);
     // bool Input::IsScreenKeyboardVisible() const | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "bool IsScreenKeyboardVisible() const", asMETHODPR(Input, IsScreenKeyboardVisible, () const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "bool get_screenKeyboardVisible() const", asMETHODPR(Input, IsScreenKeyboardVisible, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool IsScreenKeyboardVisible() const", AS_METHODPR(Input, IsScreenKeyboardVisible, () const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool get_screenKeyboardVisible() const", AS_METHODPR(Input, IsScreenKeyboardVisible, () const, bool), AS_CALL_THISCALL);
     // unsigned Input::LoadGestures(Deserializer& source) | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "uint LoadGestures(Deserializer&)", asMETHODPR(Input, LoadGestures, (Deserializer&), unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "uint LoadGestures(Deserializer&)", AS_METHODPR(Input, LoadGestures, (Deserializer&), unsigned), AS_CALL_THISCALL);
     // virtual void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Input", "void OnEvent(Object@+, StringHash, VariantMap&)", asMETHODPR(Input, OnEvent, (Object*, StringHash, VariantMap&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "void OnEvent(Object@+, StringHash, VariantMap&)", AS_METHODPR(Input, OnEvent, (Object*, StringHash, VariantMap&), void), AS_CALL_THISCALL);
     // bool Input::RecordGesture() | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "bool RecordGesture()", asMETHODPR(Input, RecordGesture, (), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool RecordGesture()", AS_METHODPR(Input, RecordGesture, (), bool), AS_CALL_THISCALL);
     // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
     // Error: type "RefCount*" can not automatically bind
     // int RefCounted::Refs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("Input", "int Refs() const", asMETHODPR(Input, Refs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "int get_refs() const", asMETHODPR(Input, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "int Refs() const", AS_METHODPR(Input, Refs, () const, int), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "int get_refs() const", AS_METHODPR(Input, Refs, () const, int), AS_CALL_THISCALL);
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("Input", asBEHAVE_RELEASE, "void f()", asMETHODPR(Input, ReleaseRef, (), void), asCALL_THISCALL);
+    engine->RegisterObjectBehaviour("Input", asBEHAVE_RELEASE, "void f()", AS_METHODPR(Input, ReleaseRef, (), void), AS_CALL_THISCALL);
     // void Input::RemoveAllGestures() | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "void RemoveAllGestures()", asMETHODPR(Input, RemoveAllGestures, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "void RemoveAllGestures()", AS_METHODPR(Input, RemoveAllGestures, (), void), AS_CALL_THISCALL);
     // bool Input::RemoveGesture(unsigned gestureID) | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "bool RemoveGesture(uint)", asMETHODPR(Input, RemoveGesture, (unsigned), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool RemoveGesture(uint)", AS_METHODPR(Input, RemoveGesture, (unsigned), bool), AS_CALL_THISCALL);
     // bool Input::RemoveScreenJoystick(SDL_JoystickID id) | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "bool RemoveScreenJoystick(SDL_JoystickID)", asMETHODPR(Input, RemoveScreenJoystick, (SDL_JoystickID), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool RemoveScreenJoystick(SDL_JoystickID)", AS_METHODPR(Input, RemoveScreenJoystick, (SDL_JoystickID), bool), AS_CALL_THISCALL);
     // void Input::ResetMouseGrabbed() | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "void ResetMouseGrabbed()", asMETHODPR(Input, ResetMouseGrabbed, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "void ResetMouseGrabbed()", AS_METHODPR(Input, ResetMouseGrabbed, (), void), AS_CALL_THISCALL);
     // void Input::ResetMouseMode() | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "void ResetMouseMode()", asMETHODPR(Input, ResetMouseMode, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "void ResetMouseMode()", AS_METHODPR(Input, ResetMouseMode, (), void), AS_CALL_THISCALL);
     // void Input::ResetMouseVisible() | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "void ResetMouseVisible()", asMETHODPR(Input, ResetMouseVisible, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "void ResetMouseVisible()", AS_METHODPR(Input, ResetMouseVisible, (), void), AS_CALL_THISCALL);
     // bool Input::SaveGesture(Serializer& dest, unsigned gestureID) | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "bool SaveGesture(Serializer&, uint)", asMETHODPR(Input, SaveGesture, (Serializer&, unsigned), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool SaveGesture(Serializer&, uint)", AS_METHODPR(Input, SaveGesture, (Serializer&, unsigned), bool), AS_CALL_THISCALL);
     // bool Input::SaveGestures(Serializer& dest) | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "bool SaveGestures(Serializer&)", asMETHODPR(Input, SaveGestures, (Serializer&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool SaveGestures(Serializer&)", AS_METHODPR(Input, SaveGestures, (Serializer&), bool), AS_CALL_THISCALL);
     // void Object::SendEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Input", "void SendEvent(StringHash)", asMETHODPR(Input, SendEvent, (StringHash), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "void SendEvent(StringHash)", AS_METHODPR(Input, SendEvent, (StringHash), void), AS_CALL_THISCALL);
     // void Object::SendEvent(StringHash eventType, VariantMap& eventData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Input", "void SendEvent(StringHash, VariantMap&)", asMETHODPR(Input, SendEvent, (StringHash, VariantMap&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "void SendEvent(StringHash, VariantMap&)", AS_METHODPR(Input, SendEvent, (StringHash, VariantMap&), void), AS_CALL_THISCALL);
     // template<typename... Args> void Object::SendEvent(StringHash eventType, Args... args) | File: ../Core/Object.h
     // Not registered because template
     // void Object::SetBlockEvents(bool block) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Input", "void SetBlockEvents(bool)", asMETHODPR(Input, SetBlockEvents, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "void SetBlockEvents(bool)", AS_METHODPR(Input, SetBlockEvents, (bool), void), AS_CALL_THISCALL);
     // void Object::SetGlobalVar(StringHash key, const Variant& value) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Input", "void SetGlobalVar(StringHash, const Variant&in)", asMETHODPR(Input, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "void set_globalVar(StringHash, const Variant&in)", asMETHODPR(Input, SetGlobalVar, (StringHash, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "void SetGlobalVar(StringHash, const Variant&in)", AS_METHODPR(Input, SetGlobalVar, (StringHash, const Variant&), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "void set_globalVar(StringHash, const Variant&in)", AS_METHODPR(Input, SetGlobalVar, (StringHash, const Variant&), void), AS_CALL_THISCALL);
     // void Input::SetMouseGrabbed(bool grab, bool suppressEvent=false) | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "void SetMouseGrabbed(bool, bool = false)", asMETHODPR(Input, SetMouseGrabbed, (bool, bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "void SetMouseGrabbed(bool, bool = false)", AS_METHODPR(Input, SetMouseGrabbed, (bool, bool), void), AS_CALL_THISCALL);
     // void Input::SetMouseMode(MouseMode mode, bool suppressEvent=false) | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "void SetMouseMode(MouseMode, bool = false)", asMETHODPR(Input, SetMouseMode, (MouseMode, bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "void SetMouseMode(MouseMode, bool = false)", AS_METHODPR(Input, SetMouseMode, (MouseMode, bool), void), AS_CALL_THISCALL);
     // void Input::SetMousePosition(const IntVector2& position) | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "void SetMousePosition(const IntVector2&in)", asMETHODPR(Input, SetMousePosition, (const IntVector2&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "void set_mousePosition(const IntVector2&in)", asMETHODPR(Input, SetMousePosition, (const IntVector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "void SetMousePosition(const IntVector2&in)", AS_METHODPR(Input, SetMousePosition, (const IntVector2&), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "void set_mousePosition(const IntVector2&in)", AS_METHODPR(Input, SetMousePosition, (const IntVector2&), void), AS_CALL_THISCALL);
     // void Input::SetMouseVisible(bool enable, bool suppressEvent=false) | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "void SetMouseVisible(bool, bool = false)", asMETHODPR(Input, SetMouseVisible, (bool, bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "void SetMouseVisible(bool, bool = false)", AS_METHODPR(Input, SetMouseVisible, (bool, bool), void), AS_CALL_THISCALL);
     // void Input::SetScreenJoystickVisible(SDL_JoystickID id, bool enable) | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "void SetScreenJoystickVisible(SDL_JoystickID, bool)", asMETHODPR(Input, SetScreenJoystickVisible, (SDL_JoystickID, bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "void set_screenJoystickVisible(SDL_JoystickID, bool)", asMETHODPR(Input, SetScreenJoystickVisible, (SDL_JoystickID, bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "void SetScreenJoystickVisible(SDL_JoystickID, bool)", AS_METHODPR(Input, SetScreenJoystickVisible, (SDL_JoystickID, bool), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "void set_screenJoystickVisible(SDL_JoystickID, bool)", AS_METHODPR(Input, SetScreenJoystickVisible, (SDL_JoystickID, bool), void), AS_CALL_THISCALL);
     // void Input::SetScreenKeyboardVisible(bool enable) | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "void SetScreenKeyboardVisible(bool)", asMETHODPR(Input, SetScreenKeyboardVisible, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "void set_screenKeyboardVisible(bool)", asMETHODPR(Input, SetScreenKeyboardVisible, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "void SetScreenKeyboardVisible(bool)", AS_METHODPR(Input, SetScreenKeyboardVisible, (bool), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "void set_screenKeyboardVisible(bool)", AS_METHODPR(Input, SetScreenKeyboardVisible, (bool), void), AS_CALL_THISCALL);
     // void Input::SetToggleFullscreen(bool enable) | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "void SetToggleFullscreen(bool)", asMETHODPR(Input, SetToggleFullscreen, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "void set_toggleFullscreen(bool)", asMETHODPR(Input, SetToggleFullscreen, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "void SetToggleFullscreen(bool)", AS_METHODPR(Input, SetToggleFullscreen, (bool), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "void set_toggleFullscreen(bool)", AS_METHODPR(Input, SetToggleFullscreen, (bool), void), AS_CALL_THISCALL);
     // void Input::SetTouchEmulation(bool enable) | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "void SetTouchEmulation(bool)", asMETHODPR(Input, SetTouchEmulation, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "void set_touchEmulation(bool)", asMETHODPR(Input, SetTouchEmulation, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "void SetTouchEmulation(bool)", AS_METHODPR(Input, SetTouchEmulation, (bool), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "void set_touchEmulation(bool)", AS_METHODPR(Input, SetTouchEmulation, (bool), void), AS_CALL_THISCALL);
     // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
     // Error: type "EventHandler*" can not automatically bind
     // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler) | File: ../Core/Object.h
@@ -1815,20 +1815,20 @@ void ASRegisterGenerated_Members_I(asIScriptEngine* engine)
     // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=nullptr) | File: ../Core/Object.h
     // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
     // void Object::UnsubscribeFromAllEvents() | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Input", "void UnsubscribeFromAllEvents()", asMETHODPR(Input, UnsubscribeFromAllEvents, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "void UnsubscribeFromAllEvents()", AS_METHODPR(Input, UnsubscribeFromAllEvents, (), void), AS_CALL_THISCALL);
     // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Input", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", asFUNCTION(Input_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("Input", "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", AS_FUNCTION_OBJFIRST(Input_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool), AS_CALL_CDECL_OBJFIRST);
     // void Object::UnsubscribeFromEvent(StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Input", "void UnsubscribeFromEvent(StringHash)", asMETHODPR(Input, UnsubscribeFromEvent, (StringHash), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "void UnsubscribeFromEvent(StringHash)", AS_METHODPR(Input, UnsubscribeFromEvent, (StringHash), void), AS_CALL_THISCALL);
     // void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Input", "void UnsubscribeFromEvent(Object@+, StringHash)", asMETHODPR(Input, UnsubscribeFromEvent, (Object*, StringHash), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "void UnsubscribeFromEvent(Object@+, StringHash)", AS_METHODPR(Input, UnsubscribeFromEvent, (Object*, StringHash), void), AS_CALL_THISCALL);
     // void Object::UnsubscribeFromEvents(Object* sender) | File: ../Core/Object.h
-    engine->RegisterObjectMethod("Input", "void UnsubscribeFromEvents(Object@+)", asMETHODPR(Input, UnsubscribeFromEvents, (Object*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "void UnsubscribeFromEvents(Object@+)", AS_METHODPR(Input, UnsubscribeFromEvents, (Object*), void), AS_CALL_THISCALL);
     // void Input::Update() | File: ../Input/Input.h
-    engine->RegisterObjectMethod("Input", "void Update()", asMETHODPR(Input, Update, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "void Update()", AS_METHODPR(Input, Update, (), void), AS_CALL_THISCALL);
     // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
-    engine->RegisterObjectMethod("Input", "int WeakRefs() const", asMETHODPR(Input, WeakRefs, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "int get_weakRefs() const", asMETHODPR(Input, WeakRefs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "int WeakRefs() const", AS_METHODPR(Input, WeakRefs, () const, int), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "int get_weakRefs() const", AS_METHODPR(Input, WeakRefs, () const, int), AS_CALL_THISCALL);
 #ifdef REGISTER_MANUAL_PART_Object
     REGISTER_MANUAL_PART_Object(Input, "Input")
 #endif
@@ -1854,62 +1854,62 @@ void ASRegisterGenerated_Members_I(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const IntRect ZERO", (void*)&IntRect::ZERO);
     engine->SetDefaultNamespace("");
     // int IntRect::Bottom() const | File: ../Math/Rect.h
-    engine->RegisterObjectMethod("IntRect", "int Bottom() const", asMETHODPR(IntRect, Bottom, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntRect", "int Bottom() const", AS_METHODPR(IntRect, Bottom, () const, int), AS_CALL_THISCALL);
     // void IntRect::Clip(const IntRect& rect) | File: ../Math/Rect.h
-    engine->RegisterObjectMethod("IntRect", "void Clip(const IntRect&in)", asMETHODPR(IntRect, Clip, (const IntRect&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntRect", "void Clip(const IntRect&in)", AS_METHODPR(IntRect, Clip, (const IntRect&), void), AS_CALL_THISCALL);
     // const int* IntRect::Data() const | File: ../Math/Rect.h
     // Error: type "const int*" can not automatically bind
     // int IntRect::Height() const | File: ../Math/Rect.h
-    engine->RegisterObjectMethod("IntRect", "int Height() const", asMETHODPR(IntRect, Height, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IntRect", "int get_height() const", asMETHODPR(IntRect, Height, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntRect", "int Height() const", AS_METHODPR(IntRect, Height, () const, int), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IntRect", "int get_height() const", AS_METHODPR(IntRect, Height, () const, int), AS_CALL_THISCALL);
     // IntRect::IntRect(const IntVector2& min, const IntVector2& max) noexcept | File: ../Math/Rect.h
-    engine->RegisterObjectBehaviour("IntRect", asBEHAVE_CONSTRUCT, "void f(const IntVector2&in, const IntVector2&in)", asFUNCTION(IntRect_IntRect_IntVector2_IntVector2), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("IntRect", asBEHAVE_CONSTRUCT, "void f(const IntVector2&in, const IntVector2&in)", AS_FUNCTION_OBJFIRST(IntRect_IntRect_IntVector2_IntVector2), AS_CALL_CDECL_OBJFIRST);
     // IntRect::IntRect(int left, int top, int right, int bottom) noexcept | File: ../Math/Rect.h
-    engine->RegisterObjectBehaviour("IntRect", asBEHAVE_CONSTRUCT, "void f(int, int, int, int)", asFUNCTION(IntRect_IntRect_int_int_int_int), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("IntRect", asBEHAVE_CONSTRUCT, "void f(int, int, int, int)", AS_FUNCTION_OBJFIRST(IntRect_IntRect_int_int_int_int), AS_CALL_CDECL_OBJFIRST);
     // explicit IntRect::IntRect(const int* data) noexcept | File: ../Math/Rect.h
     // Error: type "const int*" can not automatically bind
     // Intersection IntRect::IsInside(const IntVector2& point) const | File: ../Math/Rect.h
-    engine->RegisterObjectMethod("IntRect", "Intersection IsInside(const IntVector2&in) const", asMETHODPR(IntRect, IsInside, (const IntVector2&) const, Intersection), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntRect", "Intersection IsInside(const IntVector2&in) const", AS_METHODPR(IntRect, IsInside, (const IntVector2&) const, Intersection), AS_CALL_THISCALL);
     // Intersection IntRect::IsInside(const IntRect& rect) const | File: ../Math/Rect.h
-    engine->RegisterObjectMethod("IntRect", "Intersection IsInside(const IntRect&in) const", asMETHODPR(IntRect, IsInside, (const IntRect&) const, Intersection), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntRect", "Intersection IsInside(const IntRect&in) const", AS_METHODPR(IntRect, IsInside, (const IntRect&) const, Intersection), AS_CALL_THISCALL);
     // int IntRect::Left() const | File: ../Math/Rect.h
-    engine->RegisterObjectMethod("IntRect", "int Left() const", asMETHODPR(IntRect, Left, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntRect", "int Left() const", AS_METHODPR(IntRect, Left, () const, int), AS_CALL_THISCALL);
     // IntVector2 IntRect::Max() const | File: ../Math/Rect.h
-    engine->RegisterObjectMethod("IntRect", "IntVector2 Max() const", asMETHODPR(IntRect, Max, () const, IntVector2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntRect", "IntVector2 Max() const", AS_METHODPR(IntRect, Max, () const, IntVector2), AS_CALL_THISCALL);
     // void IntRect::Merge(const IntRect& rect) | File: ../Math/Rect.h
-    engine->RegisterObjectMethod("IntRect", "void Merge(const IntRect&in)", asMETHODPR(IntRect, Merge, (const IntRect&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntRect", "void Merge(const IntRect&in)", AS_METHODPR(IntRect, Merge, (const IntRect&), void), AS_CALL_THISCALL);
     // IntVector2 IntRect::Min() const | File: ../Math/Rect.h
-    engine->RegisterObjectMethod("IntRect", "IntVector2 Min() const", asMETHODPR(IntRect, Min, () const, IntVector2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntRect", "IntVector2 Min() const", AS_METHODPR(IntRect, Min, () const, IntVector2), AS_CALL_THISCALL);
     // IntRect IntRect::operator*(float value) const | File: ../Math/Rect.h
-    engine->RegisterObjectMethod("IntRect", "IntRect opMul(float) const", asMETHODPR(IntRect, operator*, (float) const, IntRect), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntRect", "IntRect opMul(float) const", AS_METHODPR(IntRect, operator*, (float) const, IntRect), AS_CALL_THISCALL);
     // IntRect& IntRect::operator*=(float value) | File: ../Math/Rect.h
-    engine->RegisterObjectMethod("IntRect", "IntRect& opMulAssign(float)", asMETHODPR(IntRect, operator*=, (float), IntRect&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntRect", "IntRect& opMulAssign(float)", AS_METHODPR(IntRect, operator*=, (float), IntRect&), AS_CALL_THISCALL);
     // IntRect IntRect::operator+(const IntRect& rhs) const | File: ../Math/Rect.h
-    engine->RegisterObjectMethod("IntRect", "IntRect opAdd(const IntRect&in) const", asMETHODPR(IntRect, operator+, (const IntRect&) const, IntRect), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntRect", "IntRect opAdd(const IntRect&in) const", AS_METHODPR(IntRect, operator+, (const IntRect&) const, IntRect), AS_CALL_THISCALL);
     // IntRect& IntRect::operator+=(const IntRect& rhs) | File: ../Math/Rect.h
-    engine->RegisterObjectMethod("IntRect", "IntRect& opAddAssign(const IntRect&in)", asMETHODPR(IntRect, operator+=, (const IntRect&), IntRect&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntRect", "IntRect& opAddAssign(const IntRect&in)", AS_METHODPR(IntRect, operator+=, (const IntRect&), IntRect&), AS_CALL_THISCALL);
     // IntRect IntRect::operator-(const IntRect& rhs) const | File: ../Math/Rect.h
-    engine->RegisterObjectMethod("IntRect", "IntRect opSub(const IntRect&in) const", asMETHODPR(IntRect, operator-, (const IntRect&) const, IntRect), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntRect", "IntRect opSub(const IntRect&in) const", AS_METHODPR(IntRect, operator-, (const IntRect&) const, IntRect), AS_CALL_THISCALL);
     // IntRect& IntRect::operator-=(const IntRect& rhs) | File: ../Math/Rect.h
-    engine->RegisterObjectMethod("IntRect", "IntRect& opSubAssign(const IntRect&in)", asMETHODPR(IntRect, operator-=, (const IntRect&), IntRect&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntRect", "IntRect& opSubAssign(const IntRect&in)", AS_METHODPR(IntRect, operator-=, (const IntRect&), IntRect&), AS_CALL_THISCALL);
     // IntRect IntRect::operator/(float value) const | File: ../Math/Rect.h
-    engine->RegisterObjectMethod("IntRect", "IntRect opDiv(float) const", asMETHODPR(IntRect, operator/, (float) const, IntRect), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntRect", "IntRect opDiv(float) const", AS_METHODPR(IntRect, operator/, (float) const, IntRect), AS_CALL_THISCALL);
     // IntRect& IntRect::operator/=(float value) | File: ../Math/Rect.h
-    engine->RegisterObjectMethod("IntRect", "IntRect& opDivAssign(float)", asMETHODPR(IntRect, operator/=, (float), IntRect&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntRect", "IntRect& opDivAssign(float)", AS_METHODPR(IntRect, operator/=, (float), IntRect&), AS_CALL_THISCALL);
     // bool IntRect::operator==(const IntRect& rhs) const | File: ../Math/Rect.h
-    engine->RegisterObjectMethod("IntRect", "bool opEquals(const IntRect&in) const", asMETHODPR(IntRect, operator==, (const IntRect&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntRect", "bool opEquals(const IntRect&in) const", AS_METHODPR(IntRect, operator==, (const IntRect&) const, bool), AS_CALL_THISCALL);
     // int IntRect::Right() const | File: ../Math/Rect.h
-    engine->RegisterObjectMethod("IntRect", "int Right() const", asMETHODPR(IntRect, Right, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntRect", "int Right() const", AS_METHODPR(IntRect, Right, () const, int), AS_CALL_THISCALL);
     // IntVector2 IntRect::Size() const | File: ../Math/Rect.h
-    engine->RegisterObjectMethod("IntRect", "IntVector2 Size() const", asMETHODPR(IntRect, Size, () const, IntVector2), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IntRect", "IntVector2 get_size() const", asMETHODPR(IntRect, Size, () const, IntVector2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntRect", "IntVector2 Size() const", AS_METHODPR(IntRect, Size, () const, IntVector2), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IntRect", "IntVector2 get_size() const", AS_METHODPR(IntRect, Size, () const, IntVector2), AS_CALL_THISCALL);
     // int IntRect::Top() const | File: ../Math/Rect.h
-    engine->RegisterObjectMethod("IntRect", "int Top() const", asMETHODPR(IntRect, Top, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntRect", "int Top() const", AS_METHODPR(IntRect, Top, () const, int), AS_CALL_THISCALL);
     // String IntRect::ToString() const | File: ../Math/Rect.h
-    engine->RegisterObjectMethod("IntRect", "String ToString() const", asMETHODPR(IntRect, ToString, () const, String), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntRect", "String ToString() const", AS_METHODPR(IntRect, ToString, () const, String), AS_CALL_THISCALL);
     // int IntRect::Width() const | File: ../Math/Rect.h
-    engine->RegisterObjectMethod("IntRect", "int Width() const", asMETHODPR(IntRect, Width, () const, int), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IntRect", "int get_width() const", asMETHODPR(IntRect, Width, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntRect", "int Width() const", AS_METHODPR(IntRect, Width, () const, int), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("IntRect", "int get_width() const", AS_METHODPR(IntRect, Width, () const, int), AS_CALL_THISCALL);
     // IntRect& IntRect::operator=(const IntRect&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<IntRect>(engine, "IntRect");
 #ifdef REGISTER_MANUAL_PART_IntRect
@@ -1947,49 +1947,49 @@ void ASRegisterGenerated_Members_I(asIScriptEngine* engine)
     // const int* IntVector2::Data() const | File: ../Math/Vector2.h
     // Error: type "const int*" can not automatically bind
     // IntVector2::IntVector2(int x, int y) noexcept | File: ../Math/Vector2.h
-    engine->RegisterObjectBehaviour("IntVector2", asBEHAVE_CONSTRUCT, "void f(int, int)", asFUNCTION(IntVector2_IntVector2_int_int), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("IntVector2", asBEHAVE_CONSTRUCT, "void f(int, int)", AS_FUNCTION_OBJFIRST(IntVector2_IntVector2_int_int), AS_CALL_CDECL_OBJFIRST);
     // explicit IntVector2::IntVector2(const int* data) noexcept | File: ../Math/Vector2.h
     // Error: type "const int*" can not automatically bind
     // explicit IntVector2::IntVector2(const float* data) | File: ../Math/Vector2.h
     // Error: type "const float*" can not automatically bind
     // IntVector2::IntVector2(const IntVector2& rhs) noexcept=default | File: ../Math/Vector2.h
-    engine->RegisterObjectBehaviour("IntVector2", asBEHAVE_CONSTRUCT, "void f(const IntVector2&in)", asFUNCTION(IntVector2_IntVector2_IntVector2), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("IntVector2", asBEHAVE_CONSTRUCT, "void f(const IntVector2&in)", AS_FUNCTION_OBJFIRST(IntVector2_IntVector2_IntVector2), AS_CALL_CDECL_OBJFIRST);
     // float IntVector2::Length() const | File: ../Math/Vector2.h
-    engine->RegisterObjectMethod("IntVector2", "float Length() const", asMETHODPR(IntVector2, Length, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntVector2", "float Length() const", AS_METHODPR(IntVector2, Length, () const, float), AS_CALL_THISCALL);
     // IntVector2 IntVector2::operator*(int rhs) const | File: ../Math/Vector2.h
-    engine->RegisterObjectMethod("IntVector2", "IntVector2 opMul(int) const", asMETHODPR(IntVector2, operator*, (int) const, IntVector2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntVector2", "IntVector2 opMul(int) const", AS_METHODPR(IntVector2, operator*, (int) const, IntVector2), AS_CALL_THISCALL);
     // IntVector2 IntVector2::operator*(const IntVector2& rhs) const | File: ../Math/Vector2.h
-    engine->RegisterObjectMethod("IntVector2", "IntVector2 opMul(const IntVector2&in) const", asMETHODPR(IntVector2, operator*, (const IntVector2&) const, IntVector2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntVector2", "IntVector2 opMul(const IntVector2&in) const", AS_METHODPR(IntVector2, operator*, (const IntVector2&) const, IntVector2), AS_CALL_THISCALL);
     // IntVector2& IntVector2::operator*=(int rhs) | File: ../Math/Vector2.h
-    engine->RegisterObjectMethod("IntVector2", "IntVector2& opMulAssign(int)", asMETHODPR(IntVector2, operator*=, (int), IntVector2&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntVector2", "IntVector2& opMulAssign(int)", AS_METHODPR(IntVector2, operator*=, (int), IntVector2&), AS_CALL_THISCALL);
     // IntVector2& IntVector2::operator*=(const IntVector2& rhs) | File: ../Math/Vector2.h
-    engine->RegisterObjectMethod("IntVector2", "IntVector2& opMulAssign(const IntVector2&in)", asMETHODPR(IntVector2, operator*=, (const IntVector2&), IntVector2&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntVector2", "IntVector2& opMulAssign(const IntVector2&in)", AS_METHODPR(IntVector2, operator*=, (const IntVector2&), IntVector2&), AS_CALL_THISCALL);
     // IntVector2 IntVector2::operator+(const IntVector2& rhs) const | File: ../Math/Vector2.h
-    engine->RegisterObjectMethod("IntVector2", "IntVector2 opAdd(const IntVector2&in) const", asMETHODPR(IntVector2, operator+, (const IntVector2&) const, IntVector2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntVector2", "IntVector2 opAdd(const IntVector2&in) const", AS_METHODPR(IntVector2, operator+, (const IntVector2&) const, IntVector2), AS_CALL_THISCALL);
     // IntVector2& IntVector2::operator+=(const IntVector2& rhs) | File: ../Math/Vector2.h
-    engine->RegisterObjectMethod("IntVector2", "IntVector2& opAddAssign(const IntVector2&in)", asMETHODPR(IntVector2, operator+=, (const IntVector2&), IntVector2&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntVector2", "IntVector2& opAddAssign(const IntVector2&in)", AS_METHODPR(IntVector2, operator+=, (const IntVector2&), IntVector2&), AS_CALL_THISCALL);
     // IntVector2 IntVector2::operator-() const | File: ../Math/Vector2.h
-    engine->RegisterObjectMethod("IntVector2", "IntVector2 opNeg() const", asMETHODPR(IntVector2, operator-, () const, IntVector2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntVector2", "IntVector2 opNeg() const", AS_METHODPR(IntVector2, operator-, () const, IntVector2), AS_CALL_THISCALL);
     // IntVector2 IntVector2::operator-(const IntVector2& rhs) const | File: ../Math/Vector2.h
-    engine->RegisterObjectMethod("IntVector2", "IntVector2 opSub(const IntVector2&in) const", asMETHODPR(IntVector2, operator-, (const IntVector2&) const, IntVector2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntVector2", "IntVector2 opSub(const IntVector2&in) const", AS_METHODPR(IntVector2, operator-, (const IntVector2&) const, IntVector2), AS_CALL_THISCALL);
     // IntVector2& IntVector2::operator-=(const IntVector2& rhs) | File: ../Math/Vector2.h
-    engine->RegisterObjectMethod("IntVector2", "IntVector2& opSubAssign(const IntVector2&in)", asMETHODPR(IntVector2, operator-=, (const IntVector2&), IntVector2&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntVector2", "IntVector2& opSubAssign(const IntVector2&in)", AS_METHODPR(IntVector2, operator-=, (const IntVector2&), IntVector2&), AS_CALL_THISCALL);
     // IntVector2 IntVector2::operator/(int rhs) const | File: ../Math/Vector2.h
-    engine->RegisterObjectMethod("IntVector2", "IntVector2 opDiv(int) const", asMETHODPR(IntVector2, operator/, (int) const, IntVector2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntVector2", "IntVector2 opDiv(int) const", AS_METHODPR(IntVector2, operator/, (int) const, IntVector2), AS_CALL_THISCALL);
     // IntVector2 IntVector2::operator/(const IntVector2& rhs) const | File: ../Math/Vector2.h
-    engine->RegisterObjectMethod("IntVector2", "IntVector2 opDiv(const IntVector2&in) const", asMETHODPR(IntVector2, operator/, (const IntVector2&) const, IntVector2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntVector2", "IntVector2 opDiv(const IntVector2&in) const", AS_METHODPR(IntVector2, operator/, (const IntVector2&) const, IntVector2), AS_CALL_THISCALL);
     // IntVector2& IntVector2::operator/=(int rhs) | File: ../Math/Vector2.h
-    engine->RegisterObjectMethod("IntVector2", "IntVector2& opDivAssign(int)", asMETHODPR(IntVector2, operator/=, (int), IntVector2&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntVector2", "IntVector2& opDivAssign(int)", AS_METHODPR(IntVector2, operator/=, (int), IntVector2&), AS_CALL_THISCALL);
     // IntVector2& IntVector2::operator/=(const IntVector2& rhs) | File: ../Math/Vector2.h
-    engine->RegisterObjectMethod("IntVector2", "IntVector2& opDivAssign(const IntVector2&in)", asMETHODPR(IntVector2, operator/=, (const IntVector2&), IntVector2&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntVector2", "IntVector2& opDivAssign(const IntVector2&in)", AS_METHODPR(IntVector2, operator/=, (const IntVector2&), IntVector2&), AS_CALL_THISCALL);
     // IntVector2& IntVector2::operator=(const IntVector2& rhs) noexcept=default | File: ../Math/Vector2.h
-    engine->RegisterObjectMethod("IntVector2", "IntVector2& opAssign(const IntVector2&in)", asMETHODPR(IntVector2, operator=, (const IntVector2&), IntVector2&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntVector2", "IntVector2& opAssign(const IntVector2&in)", AS_METHODPR(IntVector2, operator=, (const IntVector2&), IntVector2&), AS_CALL_THISCALL);
     // bool IntVector2::operator==(const IntVector2& rhs) const | File: ../Math/Vector2.h
-    engine->RegisterObjectMethod("IntVector2", "bool opEquals(const IntVector2&in) const", asMETHODPR(IntVector2, operator==, (const IntVector2&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntVector2", "bool opEquals(const IntVector2&in) const", AS_METHODPR(IntVector2, operator==, (const IntVector2&) const, bool), AS_CALL_THISCALL);
     // unsigned IntVector2::ToHash() const | File: ../Math/Vector2.h
-    engine->RegisterObjectMethod("IntVector2", "uint ToHash() const", asMETHODPR(IntVector2, ToHash, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntVector2", "uint ToHash() const", AS_METHODPR(IntVector2, ToHash, () const, unsigned), AS_CALL_THISCALL);
     // String IntVector2::ToString() const | File: ../Math/Vector2.h
-    engine->RegisterObjectMethod("IntVector2", "String ToString() const", asMETHODPR(IntVector2, ToString, () const, String), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntVector2", "String ToString() const", AS_METHODPR(IntVector2, ToString, () const, String), AS_CALL_THISCALL);
 #ifdef REGISTER_MANUAL_PART_IntVector2
     REGISTER_MANUAL_PART_IntVector2(IntVector2, "IntVector2")
 #endif
@@ -2035,47 +2035,47 @@ void ASRegisterGenerated_Members_I(asIScriptEngine* engine)
     // const int* IntVector3::Data() const | File: ../Math/Vector3.h
     // Error: type "const int*" can not automatically bind
     // IntVector3::IntVector3(int x, int y, int z) noexcept | File: ../Math/Vector3.h
-    engine->RegisterObjectBehaviour("IntVector3", asBEHAVE_CONSTRUCT, "void f(int, int, int)", asFUNCTION(IntVector3_IntVector3_int_int_int), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("IntVector3", asBEHAVE_CONSTRUCT, "void f(int, int, int)", AS_FUNCTION_OBJFIRST(IntVector3_IntVector3_int_int_int), AS_CALL_CDECL_OBJFIRST);
     // explicit IntVector3::IntVector3(const int* data) noexcept | File: ../Math/Vector3.h
     // Error: type "const int*" can not automatically bind
     // IntVector3::IntVector3(const IntVector3& rhs) noexcept=default | File: ../Math/Vector3.h
-    engine->RegisterObjectBehaviour("IntVector3", asBEHAVE_CONSTRUCT, "void f(const IntVector3&in)", asFUNCTION(IntVector3_IntVector3_IntVector3), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("IntVector3", asBEHAVE_CONSTRUCT, "void f(const IntVector3&in)", AS_FUNCTION_OBJFIRST(IntVector3_IntVector3_IntVector3), AS_CALL_CDECL_OBJFIRST);
     // float IntVector3::Length() const | File: ../Math/Vector3.h
-    engine->RegisterObjectMethod("IntVector3", "float Length() const", asMETHODPR(IntVector3, Length, () const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntVector3", "float Length() const", AS_METHODPR(IntVector3, Length, () const, float), AS_CALL_THISCALL);
     // IntVector3 IntVector3::operator*(int rhs) const | File: ../Math/Vector3.h
-    engine->RegisterObjectMethod("IntVector3", "IntVector3 opMul(int) const", asMETHODPR(IntVector3, operator*, (int) const, IntVector3), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntVector3", "IntVector3 opMul(int) const", AS_METHODPR(IntVector3, operator*, (int) const, IntVector3), AS_CALL_THISCALL);
     // IntVector3 IntVector3::operator*(const IntVector3& rhs) const | File: ../Math/Vector3.h
-    engine->RegisterObjectMethod("IntVector3", "IntVector3 opMul(const IntVector3&in) const", asMETHODPR(IntVector3, operator*, (const IntVector3&) const, IntVector3), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntVector3", "IntVector3 opMul(const IntVector3&in) const", AS_METHODPR(IntVector3, operator*, (const IntVector3&) const, IntVector3), AS_CALL_THISCALL);
     // IntVector3& IntVector3::operator*=(int rhs) | File: ../Math/Vector3.h
-    engine->RegisterObjectMethod("IntVector3", "IntVector3& opMulAssign(int)", asMETHODPR(IntVector3, operator*=, (int), IntVector3&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntVector3", "IntVector3& opMulAssign(int)", AS_METHODPR(IntVector3, operator*=, (int), IntVector3&), AS_CALL_THISCALL);
     // IntVector3& IntVector3::operator*=(const IntVector3& rhs) | File: ../Math/Vector3.h
-    engine->RegisterObjectMethod("IntVector3", "IntVector3& opMulAssign(const IntVector3&in)", asMETHODPR(IntVector3, operator*=, (const IntVector3&), IntVector3&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntVector3", "IntVector3& opMulAssign(const IntVector3&in)", AS_METHODPR(IntVector3, operator*=, (const IntVector3&), IntVector3&), AS_CALL_THISCALL);
     // IntVector3 IntVector3::operator+(const IntVector3& rhs) const | File: ../Math/Vector3.h
-    engine->RegisterObjectMethod("IntVector3", "IntVector3 opAdd(const IntVector3&in) const", asMETHODPR(IntVector3, operator+, (const IntVector3&) const, IntVector3), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntVector3", "IntVector3 opAdd(const IntVector3&in) const", AS_METHODPR(IntVector3, operator+, (const IntVector3&) const, IntVector3), AS_CALL_THISCALL);
     // IntVector3& IntVector3::operator+=(const IntVector3& rhs) | File: ../Math/Vector3.h
-    engine->RegisterObjectMethod("IntVector3", "IntVector3& opAddAssign(const IntVector3&in)", asMETHODPR(IntVector3, operator+=, (const IntVector3&), IntVector3&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntVector3", "IntVector3& opAddAssign(const IntVector3&in)", AS_METHODPR(IntVector3, operator+=, (const IntVector3&), IntVector3&), AS_CALL_THISCALL);
     // IntVector3 IntVector3::operator-() const | File: ../Math/Vector3.h
-    engine->RegisterObjectMethod("IntVector3", "IntVector3 opNeg() const", asMETHODPR(IntVector3, operator-, () const, IntVector3), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntVector3", "IntVector3 opNeg() const", AS_METHODPR(IntVector3, operator-, () const, IntVector3), AS_CALL_THISCALL);
     // IntVector3 IntVector3::operator-(const IntVector3& rhs) const | File: ../Math/Vector3.h
-    engine->RegisterObjectMethod("IntVector3", "IntVector3 opSub(const IntVector3&in) const", asMETHODPR(IntVector3, operator-, (const IntVector3&) const, IntVector3), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntVector3", "IntVector3 opSub(const IntVector3&in) const", AS_METHODPR(IntVector3, operator-, (const IntVector3&) const, IntVector3), AS_CALL_THISCALL);
     // IntVector3& IntVector3::operator-=(const IntVector3& rhs) | File: ../Math/Vector3.h
-    engine->RegisterObjectMethod("IntVector3", "IntVector3& opSubAssign(const IntVector3&in)", asMETHODPR(IntVector3, operator-=, (const IntVector3&), IntVector3&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntVector3", "IntVector3& opSubAssign(const IntVector3&in)", AS_METHODPR(IntVector3, operator-=, (const IntVector3&), IntVector3&), AS_CALL_THISCALL);
     // IntVector3 IntVector3::operator/(int rhs) const | File: ../Math/Vector3.h
-    engine->RegisterObjectMethod("IntVector3", "IntVector3 opDiv(int) const", asMETHODPR(IntVector3, operator/, (int) const, IntVector3), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntVector3", "IntVector3 opDiv(int) const", AS_METHODPR(IntVector3, operator/, (int) const, IntVector3), AS_CALL_THISCALL);
     // IntVector3 IntVector3::operator/(const IntVector3& rhs) const | File: ../Math/Vector3.h
-    engine->RegisterObjectMethod("IntVector3", "IntVector3 opDiv(const IntVector3&in) const", asMETHODPR(IntVector3, operator/, (const IntVector3&) const, IntVector3), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntVector3", "IntVector3 opDiv(const IntVector3&in) const", AS_METHODPR(IntVector3, operator/, (const IntVector3&) const, IntVector3), AS_CALL_THISCALL);
     // IntVector3& IntVector3::operator/=(int rhs) | File: ../Math/Vector3.h
-    engine->RegisterObjectMethod("IntVector3", "IntVector3& opDivAssign(int)", asMETHODPR(IntVector3, operator/=, (int), IntVector3&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntVector3", "IntVector3& opDivAssign(int)", AS_METHODPR(IntVector3, operator/=, (int), IntVector3&), AS_CALL_THISCALL);
     // IntVector3& IntVector3::operator/=(const IntVector3& rhs) | File: ../Math/Vector3.h
-    engine->RegisterObjectMethod("IntVector3", "IntVector3& opDivAssign(const IntVector3&in)", asMETHODPR(IntVector3, operator/=, (const IntVector3&), IntVector3&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntVector3", "IntVector3& opDivAssign(const IntVector3&in)", AS_METHODPR(IntVector3, operator/=, (const IntVector3&), IntVector3&), AS_CALL_THISCALL);
     // IntVector3& IntVector3::operator=(const IntVector3& rhs) noexcept=default | File: ../Math/Vector3.h
-    engine->RegisterObjectMethod("IntVector3", "IntVector3& opAssign(const IntVector3&in)", asMETHODPR(IntVector3, operator=, (const IntVector3&), IntVector3&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntVector3", "IntVector3& opAssign(const IntVector3&in)", AS_METHODPR(IntVector3, operator=, (const IntVector3&), IntVector3&), AS_CALL_THISCALL);
     // bool IntVector3::operator==(const IntVector3& rhs) const | File: ../Math/Vector3.h
-    engine->RegisterObjectMethod("IntVector3", "bool opEquals(const IntVector3&in) const", asMETHODPR(IntVector3, operator==, (const IntVector3&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntVector3", "bool opEquals(const IntVector3&in) const", AS_METHODPR(IntVector3, operator==, (const IntVector3&) const, bool), AS_CALL_THISCALL);
     // unsigned IntVector3::ToHash() const | File: ../Math/Vector3.h
-    engine->RegisterObjectMethod("IntVector3", "uint ToHash() const", asMETHODPR(IntVector3, ToHash, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntVector3", "uint ToHash() const", AS_METHODPR(IntVector3, ToHash, () const, unsigned), AS_CALL_THISCALL);
     // String IntVector3::ToString() const | File: ../Math/Vector3.h
-    engine->RegisterObjectMethod("IntVector3", "String ToString() const", asMETHODPR(IntVector3, ToString, () const, String), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntVector3", "String ToString() const", AS_METHODPR(IntVector3, ToString, () const, String), AS_CALL_THISCALL);
 #ifdef REGISTER_MANUAL_PART_IntVector3
     REGISTER_MANUAL_PART_IntVector3(IntVector3, "IntVector3")
 #endif

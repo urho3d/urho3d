@@ -110,6 +110,7 @@ A number of build options can be defined when invoking the build scripts or when
 |TVOS                 |0|Configure project for targeting tvOS platform (cmake_generic.sh and cmake-gui only)|
 |URHO3D_64BIT         |*|Enable 64-bit build, the default is set based on the native ABI of the chosen compiler toolchain|
 |URHO3D_ANGELSCRIPT   |1|Enable AngelScript scripting support|
+|URHO3D_FORCE_AS_MAX_PORTABILITY|0|Use generic calling convention for AngelScript on any platform|
 |URHO3D_LUA           |1|Enable Lua scripting support|
 |URHO3D_LUAJIT        |1|Enable Lua scripting support using LuaJIT (check LuaJIT's CMakeLists.txt for more options)|
 |URHO3D_LUAJIT_AMALG  |*|Enable LuaJIT amalgamated build (LuaJIT only); default to true when LuaJIT is enabled|

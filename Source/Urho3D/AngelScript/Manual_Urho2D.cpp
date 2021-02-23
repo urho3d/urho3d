@@ -50,7 +50,7 @@ static PhysicsWorld2D* GetPhysicsWorld2D()
 void ASRegisterManualLast_Urho2D(asIScriptEngine* engine)
 {
     // template<class T> T * Node::GetComponent(bool recursive=false) const | File: ../Scene/Node.h
-    engine->RegisterGlobalFunction("PhysicsWorld2D@+ get_physicsWorld2D()", asFUNCTION(GetPhysicsWorld2D), asCALL_CDECL);
+    engine->RegisterGlobalFunction("PhysicsWorld2D@+ get_physicsWorld2D()", AS_FUNCTION(GetPhysicsWorld2D), AS_CALL_CDECL);
 }
 
 // ========================================================================================

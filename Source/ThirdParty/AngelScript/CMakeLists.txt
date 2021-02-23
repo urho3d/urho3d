@@ -31,6 +31,10 @@ if (NOT EXCEPTIONS)
     add_definitions (-DAS_NO_EXCEPTIONS)
 endif ()
 
+if (URHO3D_FORCE_AS_MAX_PORTABILITY)
+    add_definitions (-DAS_MAX_PORTABILITY)
+endif ()
+
 # Define source files
 define_source_files (GLOB_CPP_PATTERNS source/*.cpp GLOB_H_PATTERNS include/*.h source/*.h)
 if (ARM)

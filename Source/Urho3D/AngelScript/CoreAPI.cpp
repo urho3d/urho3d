@@ -47,8 +47,8 @@ void ArrayToStringVector(CScriptArray* arr, StringVector& dest)
 
 static void RegisterVariant(asIScriptEngine* engine)
 {
-    engine->RegisterGlobalFunction("VariantType GetVariantTypeFromName(const String&in)", asFUNCTIONPR(Variant::GetTypeFromName, (const String&), VariantType), asCALL_CDECL);
-    engine->RegisterGlobalFunction("String GetVariantTypeName(VariantType)", asFUNCTIONPR(Variant::GetTypeName, (VariantType), String), asCALL_CDECL);
+    engine->RegisterGlobalFunction("VariantType GetVariantTypeFromName(const String&in)", AS_FUNCTIONPR(Variant::GetTypeFromName, (const String&), VariantType), AS_CALL_CDECL);
+    engine->RegisterGlobalFunction("String GetVariantTypeName(VariantType)", AS_FUNCTIONPR(Variant::GetTypeName, (VariantType), String), AS_CALL_CDECL);
 }
 
 static String StringJoined(CScriptArray* arr, const String& glue)
@@ -59,28 +59,28 @@ static String StringJoined(CScriptArray* arr, const String& glue)
 
 static void RegisterStringUtils(asIScriptEngine* engine)
 {
-    engine->RegisterObjectMethod("String", "bool ToBool() const", asFUNCTIONPR(ToBool, (const String&), bool), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("String", "float ToFloat() const", asFUNCTIONPR(ToFloat, (const String&), float), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("String", "double ToDouble() const", asFUNCTIONPR(ToDouble, (const String&), double), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("String", "int ToInt(int base = 10) const", asFUNCTIONPR(ToInt, (const String&, int), int), asCALL_CDECL_OBJFIRST);
-    engine->RegisterObjectMethod("String", "uint ToUInt(int base = 10) const", asFUNCTIONPR(ToUInt, (const String&, int), unsigned), asCALL_CDECL_OBJFIRST);
-    engine->RegisterObjectMethod("String", "int64 ToInt64(int base = 10) const", asFUNCTIONPR(ToInt64, (const String&, int), long long), asCALL_CDECL_OBJFIRST);
-    engine->RegisterObjectMethod("String", "uint64 ToUInt64(int base = 10) const", asFUNCTIONPR(ToUInt64, (const String&, int), unsigned long long), asCALL_CDECL_OBJFIRST);
-    engine->RegisterObjectMethod("String", "Color ToColor() const", asFUNCTIONPR(ToColor, (const String&), Color), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("String", "IntRect ToIntRect() const", asFUNCTIONPR(ToIntRect, (const String&), IntRect), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("String", "IntVector2 ToIntVector2() const", asFUNCTIONPR(ToIntVector2, (const String&), IntVector2), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("String", "IntVector3 ToIntVector3() const", asFUNCTIONPR(ToIntVector3, (const String&), IntVector3), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("String", "Quaternion ToQuaternion() const", asFUNCTIONPR(ToQuaternion, (const String&), Quaternion), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("String", "Vector2 ToVector2() const", asFUNCTIONPR(ToVector2, (const String&), Vector2), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("String", "Vector3 ToVector3() const", asFUNCTIONPR(ToVector3, (const String&), Vector3), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("String", "Vector4 ToVector4(bool allowMissingCoords = false) const", asFUNCTIONPR(ToVector4, (const String&, bool), Vector4), asCALL_CDECL_OBJFIRST);
-    engine->RegisterObjectMethod("String", "Variant ToVectorVariant() const", asFUNCTIONPR(ToVectorVariant, (const String&), Variant), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("String", "Matrix3 ToMatrix3() const", asFUNCTIONPR(ToMatrix3, (const String&), Matrix3), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("String", "Matrix3x4 ToMatrix3x4() const", asFUNCTIONPR(ToMatrix3x4, (const String&), Matrix3x4), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("String", "Matrix4 ToMatrix4() const", asFUNCTIONPR(ToMatrix4, (const String&), Matrix4), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("String", "bool ToBool() const", AS_FUNCTIONPR_OBJLAST(ToBool, (const String&), bool), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("String", "float ToFloat() const", AS_FUNCTIONPR_OBJLAST(ToFloat, (const String&), float), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("String", "double ToDouble() const", AS_FUNCTIONPR_OBJLAST(ToDouble, (const String&), double), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("String", "int ToInt(int base = 10) const", AS_FUNCTIONPR_OBJLAST(ToInt, (const String&, int), int), AS_CALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("String", "uint ToUInt(int base = 10) const", AS_FUNCTIONPR_OBJLAST(ToUInt, (const String&, int), unsigned), AS_CALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("String", "int64 ToInt64(int base = 10) const", AS_FUNCTIONPR_OBJLAST(ToInt64, (const String&, int), long long), AS_CALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("String", "uint64 ToUInt64(int base = 10) const", AS_FUNCTIONPR_OBJLAST(ToUInt64, (const String&, int), unsigned long long), AS_CALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("String", "Color ToColor() const", AS_FUNCTIONPR_OBJLAST(ToColor, (const String&), Color), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("String", "IntRect ToIntRect() const", AS_FUNCTIONPR_OBJLAST(ToIntRect, (const String&), IntRect), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("String", "IntVector2 ToIntVector2() const", AS_FUNCTIONPR_OBJLAST(ToIntVector2, (const String&), IntVector2), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("String", "IntVector3 ToIntVector3() const", AS_FUNCTIONPR_OBJLAST(ToIntVector3, (const String&), IntVector3), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("String", "Quaternion ToQuaternion() const", AS_FUNCTIONPR_OBJLAST(ToQuaternion, (const String&), Quaternion), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("String", "Vector2 ToVector2() const", AS_FUNCTIONPR_OBJLAST(ToVector2, (const String&), Vector2), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("String", "Vector3 ToVector3() const", AS_FUNCTIONPR_OBJLAST(ToVector3, (const String&), Vector3), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("String", "Vector4 ToVector4(bool allowMissingCoords = false) const", AS_FUNCTIONPR_OBJLAST(ToVector4, (const String&, bool), Vector4), AS_CALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("String", "Variant ToVectorVariant() const", AS_FUNCTIONPR_OBJLAST(ToVectorVariant, (const String&), Variant), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("String", "Matrix3 ToMatrix3() const", AS_FUNCTIONPR_OBJLAST(ToMatrix3, (const String&), Matrix3), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("String", "Matrix3x4 ToMatrix3x4() const", AS_FUNCTIONPR_OBJLAST(ToMatrix3x4, (const String&), Matrix3x4), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("String", "Matrix4 ToMatrix4() const", AS_FUNCTIONPR_OBJLAST(ToMatrix4, (const String&), Matrix4), AS_CALL_CDECL_OBJLAST);
 
     //engine->RegisterGlobalFunction("String ToStringHex(int)", asFUNCTION(ToStringHex), asCALL_CDECL);
-    engine->RegisterGlobalFunction("String Join(String[]&, const String&in glue)", asFUNCTION(StringJoined), asCALL_CDECL);
+    engine->RegisterGlobalFunction("String Join(String[]&, const String&in glue)", AS_FUNCTION(StringJoined), AS_CALL_CDECL);
 }
 
 static Object* CreateObject(const String& objectType)
@@ -203,23 +203,23 @@ static VariantMap& GetGlobalVars()
 
 void RegisterObject(asIScriptEngine* engine)
 {
-    engine->RegisterGlobalFunction("Object@ CreateObject(const String&in)", asFUNCTION(CreateObject), asCALL_CDECL);
-    engine->RegisterGlobalFunction("void SendEvent(const String&in, VariantMap& eventData = VariantMap())", asFUNCTION(SendEvent), asCALL_CDECL);
-    engine->RegisterGlobalFunction("void SubscribeToEvent(const String&in, const String&in)", asFUNCTION(SubscribeToEvent), asCALL_CDECL);
-    engine->RegisterGlobalFunction("void SubscribeToEvent(Object@+, const String&in, const String&in)", asFUNCTION(SubscribeToSenderEvent), asCALL_CDECL);
-    engine->RegisterGlobalFunction("void UnsubscribeFromEvent(const String&in)", asFUNCTION(UnsubscribeFromEvent), asCALL_CDECL);
-    engine->RegisterGlobalFunction("void UnsubscribeFromEvent(Object@+, const String&in)", asFUNCTION(UnsubscribeFromSenderEvent), asCALL_CDECL);
-    engine->RegisterGlobalFunction("void UnsubscribeFromEvents(Object@+)", asFUNCTION(UnsubscribeFromSenderEvents), asCALL_CDECL);
-    engine->RegisterGlobalFunction("void UnsubscribeFromAllEvents()", asFUNCTION(UnsubscribeFromAllEvents), asCALL_CDECL);
-    engine->RegisterGlobalFunction("void UnsubscribeFromAllEventsExcept(Array<String>@+)", asFUNCTION(UnsubscribeFromAllEventsExcept), asCALL_CDECL);
-    engine->RegisterGlobalFunction("bool HasSubscribedToEvent(const String&in)", asFUNCTION(HasSubscribedToEvent), asCALL_CDECL);
-    engine->RegisterGlobalFunction("bool HasSubscribedToEvent(Object@+, const String&in)", asFUNCTION(HasSubscribedToSenderEvent), asCALL_CDECL);
-    engine->RegisterGlobalFunction("void RegisterEventName(const String&in)", asFUNCTION(RegisterEventName), asCALL_CDECL);
-    engine->RegisterGlobalFunction("Object@+ GetEventSender()", asFUNCTION(GetEventSender), asCALL_CDECL);
-    engine->RegisterGlobalFunction("const String& GetTypeName(StringHash)", asFUNCTION(GetTypeName), asCALL_CDECL);
-    engine->RegisterGlobalFunction("void SetGlobalVar(const String&in, Variant&in)", asFUNCTION(SetGlobalVar), asCALL_CDECL);
-    engine->RegisterGlobalFunction("Variant GetGlobalVar(const String&in)", asFUNCTION(GetGlobalVar), asCALL_CDECL);
-    engine->RegisterGlobalFunction("VariantMap& get_globalVars()", asFUNCTION(GetGlobalVars), asCALL_CDECL);
+    engine->RegisterGlobalFunction("Object@ CreateObject(const String&in)", AS_FUNCTION(CreateObject), AS_CALL_CDECL);
+    engine->RegisterGlobalFunction("void SendEvent(const String&in, VariantMap& eventData = VariantMap())", AS_FUNCTION(SendEvent), AS_CALL_CDECL);
+    engine->RegisterGlobalFunction("void SubscribeToEvent(const String&in, const String&in)", AS_FUNCTION(SubscribeToEvent), AS_CALL_CDECL);
+    engine->RegisterGlobalFunction("void SubscribeToEvent(Object@+, const String&in, const String&in)", AS_FUNCTION(SubscribeToSenderEvent), AS_CALL_CDECL);
+    engine->RegisterGlobalFunction("void UnsubscribeFromEvent(const String&in)", AS_FUNCTION(UnsubscribeFromEvent), AS_CALL_CDECL);
+    engine->RegisterGlobalFunction("void UnsubscribeFromEvent(Object@+, const String&in)", AS_FUNCTION(UnsubscribeFromSenderEvent), AS_CALL_CDECL);
+    engine->RegisterGlobalFunction("void UnsubscribeFromEvents(Object@+)", AS_FUNCTION(UnsubscribeFromSenderEvents), AS_CALL_CDECL);
+    engine->RegisterGlobalFunction("void UnsubscribeFromAllEvents()", AS_FUNCTION(UnsubscribeFromAllEvents), AS_CALL_CDECL);
+    engine->RegisterGlobalFunction("void UnsubscribeFromAllEventsExcept(Array<String>@+)", AS_FUNCTION(UnsubscribeFromAllEventsExcept), AS_CALL_CDECL);
+    engine->RegisterGlobalFunction("bool HasSubscribedToEvent(const String&in)", AS_FUNCTION(HasSubscribedToEvent), AS_CALL_CDECL);
+    engine->RegisterGlobalFunction("bool HasSubscribedToEvent(Object@+, const String&in)", AS_FUNCTION(HasSubscribedToSenderEvent), AS_CALL_CDECL);
+    engine->RegisterGlobalFunction("void RegisterEventName(const String&in)", AS_FUNCTION(RegisterEventName), AS_CALL_CDECL);
+    engine->RegisterGlobalFunction("Object@+ GetEventSender()", AS_FUNCTION(GetEventSender), AS_CALL_CDECL);
+    engine->RegisterGlobalFunction("const String& GetTypeName(StringHash)", AS_FUNCTION(GetTypeName), AS_CALL_CDECL);
+    engine->RegisterGlobalFunction("void SetGlobalVar(const String&in, Variant&in)", AS_FUNCTION(SetGlobalVar), AS_CALL_CDECL);
+    engine->RegisterGlobalFunction("Variant GetGlobalVar(const String&in)", AS_FUNCTION(GetGlobalVar), AS_CALL_CDECL);
+    engine->RegisterGlobalFunction("VariantMap& get_globalVars()", AS_FUNCTION(GetGlobalVars), AS_CALL_CDECL);
 }
 
 void RegisterCoreAPI(asIScriptEngine* engine)

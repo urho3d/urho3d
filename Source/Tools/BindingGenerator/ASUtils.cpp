@@ -791,7 +791,7 @@ string Generate_asFUNCTIONPR(const GlobalFunctionAnalyzer& functionAnalyzer)
     string functionName = functionAnalyzer.GetName();
     string cppParams = "(" + JoinParamsTypes(functionAnalyzer.GetMemberdef(), functionAnalyzer.GetSpecialization()) + ")";
     string returnType = functionAnalyzer.GetReturnType().ToString();
-    return "asFUNCTIONPR(" + functionName + ", " + cppParams + ", " + returnType + ")";
+    return "AS_FUNCTIONPR(" + functionName + ", " + cppParams + ", " + returnType + ")";
 }
 
 string Generate_asFUNCTIONPR(const ClassStaticFunctionAnalyzer& functionAnalyzer)
@@ -800,7 +800,7 @@ string Generate_asFUNCTIONPR(const ClassStaticFunctionAnalyzer& functionAnalyzer
     string functionName = functionAnalyzer.GetName();
     string cppParams = "(" + JoinParamsTypes(functionAnalyzer.GetMemberdef(), functionAnalyzer.GetSpecialization()) + ")";
     string returnType = functionAnalyzer.GetReturnType().ToString();
-    return "asFUNCTIONPR(" + className + "::" + functionName + ", " + cppParams + ", " + returnType + ")";
+    return "AS_FUNCTIONPR(" + className + "::" + functionName + ", " + cppParams + ", " + returnType + ")";
 }
 
 string Generate_asMETHODPR(const ClassFunctionAnalyzer& functionAnalyzer, bool templateVersion)
@@ -816,9 +816,9 @@ string Generate_asMETHODPR(const ClassFunctionAnalyzer& functionAnalyzer, bool t
     string returnType = functionAnalyzer.GetReturnType().ToString();
     
     if (templateVersion)
-        return "asMETHODPR(T, " + functionName + ", " + cppParams + ", " + returnType + ")";
+        return "AS_METHODPR(T, " + functionName + ", " + cppParams + ", " + returnType + ")";
     else
-        return "asMETHODPR(" + className + ", " + functionName + ", " + cppParams + ", " + returnType + ")";
+        return "AS_METHODPR(" + className + ", " + functionName + ", " + cppParams + ", " + returnType + ")";
 }
 
 } // namespace ASBindingGenerator

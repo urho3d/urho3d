@@ -22,6 +22,48 @@
 
 #pragma once
 
+// WRAP_MFN_PR for GCC
+// GCC has problems with templates, VS with macros, so implementations is different
+
+/*
+struct A
+{
+    bool f(int i) { return true; }
+};
+
+struct B : public A
+{
+    // f() is inherited
+};
+
+template <bool (B::*fp)(int)>
+struct WrapF
+{
+};
+
+WrapF<&B::f> a;
+// Doesn't work for any compiler
+// Error: non-type template argument of type 'bool (Urho3D::A::*)(int)' cannot be converted to a value of type 'bool (Urho3D::B::*)(int)'
+
+WrapF<static_cast<bool (B::*)(int)>(&B::f)> b;
+// Works for VS but not works for GCC
+// Error: non-type template argument is not a pointer to member constant
+
+==================================
+
+MACROS1(a, b, MACROS2)
+GCC replaces the parameter MACROS2 first and after that MACROS1
+VS replaces MACROS1 first
+
+VS has parameters:
+https://docs.microsoft.com/en-us/cpp/preprocessor/preprocessor-experimental-overview
+https://docs.microsoft.com/en-us/cpp/build/reference/experimental-preprocessor
+but it cause banch of errors in Windows 10 SDK <= 10.0.17763.0
+and third party libs
+*/
+
+#ifndef _MSC_VER
+
 #include <type_traits>
 
 #include <AngelScript/angelscript.h>
@@ -133,4 +175,4 @@ void callconst(asIScriptGeneric*g, C*obj, R (C::*fn)(P...)const, P... args)
 
 } // namespace wrap
 
-
+#endif // ndef _MSC_VER

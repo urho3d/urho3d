@@ -45,7 +45,7 @@ static Input* GetInput()
 void ASRegisterManualLast_Input(asIScriptEngine* engine)
 {
     // template<class T> T * Object::GetSubsystem() const | File: ../Core/Object.h
-    engine->RegisterGlobalFunction("Input@+ get_input()", asFUNCTION(GetInput), asCALL_CDECL);
+    engine->RegisterGlobalFunction("Input@+ get_input()", AS_FUNCTION(GetInput), AS_CALL_CDECL);
 }
 
 // ========================================================================================

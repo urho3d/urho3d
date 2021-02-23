@@ -111,7 +111,7 @@ static void RegisterDefaultConstructor(const ClassAnalyzer& classAnalyzer, Proce
         "    new(ptr) " + className + "();\n"
         "}\n";
 
-    result->registration_ = "engine->RegisterObjectBehaviour(\"" + className + "\", asBEHAVE_CONSTRUCT, \"void f()\", asFUNCTION(" + wrapperName + "), asCALL_CDECL_OBJFIRST);";
+    result->registration_ = "engine->RegisterObjectBehaviour(\"" + className + "\", asBEHAVE_CONSTRUCT, \"void f()\", AS_FUNCTION_OBJFIRST(" + wrapperName + "), AS_CALL_CDECL_OBJFIRST);";
 
     shared_ptr<ClassFunctionAnalyzer> defaultConstructor = classAnalyzer.GetDefinedThisDefaultConstructor();
 
@@ -142,13 +142,14 @@ static void RegisterDestructor(const ClassAnalyzer& classAnalyzer, ProcessedClas
 
     result->name_ = "~" + className;
 
+    // TODO: remove glue
     result->glue_ =
         "static void " + wrapperName + "(" + className + "* ptr)\n"
         "{\n"
         "    ptr->~" + className + "();\n"
         "}\n";
 
-    result->registration_ = "engine->RegisterObjectBehaviour(\"" + className + "\", asBEHAVE_DESTRUCT, \"void f()\", asFUNCTION(" + wrapperName + "), asCALL_CDECL_OBJFIRST);";
+    result->registration_ = "engine->RegisterObjectBehaviour(\"" + className + "\", asBEHAVE_DESTRUCT, \"void f()\", AS_DESTRUCTOR(" + className + "), AS_CALL_CDECL_OBJFIRST);";
 
     shared_ptr<ClassFunctionAnalyzer> thisDestructor = classAnalyzer.GetDefinedThisDestructor();
 
