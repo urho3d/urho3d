@@ -569,7 +569,7 @@ namespace Result
                 openedDefine = processedClass.insideDefine_;
             }
 
-            if (processedClass.destructor_)
+            if (processedClass.destructor_ && !processedClass.destructor_->glue_.empty())
             {
                 ofs <<
                     "// " << processedClass.destructor_->comment_ << "\n"

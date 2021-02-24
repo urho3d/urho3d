@@ -2344,11 +2344,6 @@ static void ConstructStringCopy(const String& str, String* ptr)
     new(ptr) String(str);
 }
 
-static void DestructString(String* ptr)
-{
-    ptr->~String();
-}
-
 static char* StringCharAt(unsigned i, String& str)
 {
     if (i >= str.Length())
@@ -2403,8 +2398,6 @@ static void ConstructStringBool(bool value, String* ptr)
 {
     new(ptr) String(value);
 }
-
-
 
 static void StringSetUTF8FromLatin1(const String& src, String& str)
 {

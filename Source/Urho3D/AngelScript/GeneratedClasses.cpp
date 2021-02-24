@@ -23,12 +23,6 @@ static void Register_AbstractFile(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// AllocatorBlock::~AllocatorBlock() | Implicitly-declared
-static void AllocatorBlock_Destructor(AllocatorBlock* ptr)
-{
-    ptr->~AllocatorBlock();
-}
-
 // struct AllocatorBlock | File: ../Container/Allocator.h
 static void Register_AllocatorBlock(asIScriptEngine* engine)
 {
@@ -40,12 +34,6 @@ static void Register_AllocatorBlock(asIScriptEngine* engine)
     const char* asClassName = "AllocatorBlock";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// AllocatorNode::~AllocatorNode() | Implicitly-declared
-static void AllocatorNode_Destructor(AllocatorNode* ptr)
-{
-    ptr->~AllocatorNode();
 }
 
 // struct AllocatorNode | File: ../Container/Allocator.h
@@ -111,12 +99,6 @@ static void Register_AnimationController(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// AnimationKeyFrame::~AnimationKeyFrame() | Implicitly-declared
-static void AnimationKeyFrame_Destructor(AnimationKeyFrame* ptr)
-{
-    ptr->~AnimationKeyFrame();
-}
-
 // struct AnimationKeyFrame | File: ../Graphics/Animation.h
 static void Register_AnimationKeyFrame(asIScriptEngine* engine)
 {
@@ -138,12 +120,6 @@ static void Register_AnimationState(asIScriptEngine* engine)
     const char* asClassName = "AnimationState";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// AnimationStateTrack::~AnimationStateTrack()
-static void AnimationStateTrack_Destructor(AnimationStateTrack* ptr)
-{
-    ptr->~AnimationStateTrack();
 }
 
 // struct AnimationStateTrack | File: ../Graphics/AnimationState.h
@@ -169,12 +145,6 @@ static void Register_AnimationTrack(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// AnimationTriggerPoint::~AnimationTriggerPoint() | Implicitly-declared
-static void AnimationTriggerPoint_Destructor(AnimationTriggerPoint* ptr)
-{
-    ptr->~AnimationTriggerPoint();
-}
-
 // struct AnimationTriggerPoint | File: ../Graphics/Animation.h
 static void Register_AnimationTriggerPoint(asIScriptEngine* engine)
 {
@@ -188,12 +158,6 @@ static void Register_AnimationTriggerPoint(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// AreaAllocator::~AreaAllocator() | Implicitly-declared
-static void AreaAllocator_Destructor(AreaAllocator* ptr)
-{
-    ptr->~AreaAllocator();
-}
-
 // class AreaAllocator | File: ../Math/AreaAllocator.h
 static void Register_AreaAllocator(asIScriptEngine* engine)
 {
@@ -205,12 +169,6 @@ static void Register_AreaAllocator(asIScriptEngine* engine)
     const char* asClassName = "AreaAllocator";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// AsyncProgress::~AsyncProgress() | Implicitly-declared
-static void AsyncProgress_Destructor(AsyncProgress* ptr)
-{
-    ptr->~AsyncProgress();
 }
 
 // struct AsyncProgress | File: ../Scene/Scene.h
@@ -246,12 +204,6 @@ static void Register_AttributeAnimationInfo(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// AttributeInfo::~AttributeInfo() | Implicitly-declared
-static void AttributeInfo_Destructor(AttributeInfo* ptr)
-{
-    ptr->~AttributeInfo();
-}
-
 // struct AttributeInfo | File: ../Core/Attribute.h
 static void Register_AttributeInfo(asIScriptEngine* engine)
 {
@@ -275,12 +227,6 @@ static void Register_Audio(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// BackgroundLoadItem::~BackgroundLoadItem() | Implicitly-declared
-static void BackgroundLoadItem_Destructor(BackgroundLoadItem* ptr)
-{
-    ptr->~BackgroundLoadItem();
-}
-
 // struct BackgroundLoadItem | File: ../Resource/BackgroundLoader.h
 static void Register_BackgroundLoadItem(asIScriptEngine* engine)
 {
@@ -292,12 +238,6 @@ static void Register_BackgroundLoadItem(asIScriptEngine* engine)
     const char* asClassName = "BackgroundLoadItem";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// Batch::~Batch() | Implicitly-declared
-static void Batch_Destructor(Batch* ptr)
-{
-    ptr->~Batch();
 }
 
 // struct Batch | File: ../Graphics/Batch.h
@@ -313,12 +253,6 @@ static void Register_Batch(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// BatchGroup::~BatchGroup()=default
-static void BatchGroup_Destructor(BatchGroup* ptr)
-{
-    ptr->~BatchGroup();
-}
-
 // struct BatchGroup | File: ../Graphics/Batch.h
 static void Register_BatchGroup(asIScriptEngine* engine)
 {
@@ -332,12 +266,6 @@ static void Register_BatchGroup(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// BatchGroupKey::~BatchGroupKey() | Implicitly-declared
-static void BatchGroupKey_Destructor(BatchGroupKey* ptr)
-{
-    ptr->~BatchGroupKey();
-}
-
 // struct BatchGroupKey | File: ../Graphics/Batch.h
 static void Register_BatchGroupKey(asIScriptEngine* engine)
 {
@@ -349,12 +277,6 @@ static void Register_BatchGroupKey(asIScriptEngine* engine)
     const char* asClassName = "BatchGroupKey";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// BatchQueue::~BatchQueue() | Implicitly-declared
-static void BatchQueue_Destructor(BatchQueue* ptr)
-{
-    ptr->~BatchQueue();
 }
 
 // struct BatchQueue | File: ../Graphics/Batch.h
@@ -470,12 +392,6 @@ static void Register_CascadeParameters(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// CharLocation::~CharLocation() | Implicitly-declared
-static void CharLocation_Destructor(CharLocation* ptr)
-{
-    ptr->~CharLocation();
-}
-
 // struct CharLocation | File: ../UI/Text.h
 static void Register_CharLocation(asIScriptEngine* engine)
 {
@@ -529,12 +445,6 @@ static void Register_Component(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// ComponentReplicationState::~ComponentReplicationState() | Implicitly-declared
-static void ComponentReplicationState_Destructor(ComponentReplicationState* ptr)
-{
-    ptr->~ComponentReplicationState();
-}
-
 // struct ComponentReplicationState | File: ../Scene/ReplicationState.h
 static void Register_ComponentReplicationState(asIScriptEngine* engine)
 {
@@ -548,12 +458,6 @@ static void Register_ComponentReplicationState(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// CompressedLevel::~CompressedLevel() | Implicitly-declared
-static void CompressedLevel_Destructor(CompressedLevel* ptr)
-{
-    ptr->~CompressedLevel();
-}
-
 // struct CompressedLevel | File: ../Resource/Image.h
 static void Register_CompressedLevel(asIScriptEngine* engine)
 {
@@ -565,12 +469,6 @@ static void Register_CompressedLevel(asIScriptEngine* engine)
     const char* asClassName = "CompressedLevel";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// Condition::~Condition()
-static void Condition_Destructor(Condition* ptr)
-{
-    ptr->~Condition();
 }
 
 // class Condition | File: ../Core/Condition.h
@@ -616,12 +514,6 @@ static void Register_Context(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// Controls::~Controls()
-static void Controls_Destructor(Controls* ptr)
-{
-    ptr->~Controls();
-}
-
 // class Controls | File: ../Input/Controls.h
 static void Register_Controls(asIScriptEngine* engine)
 {
@@ -643,12 +535,6 @@ static void Register_Cursor(asIScriptEngine* engine)
     const char* asClassName = "Cursor";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// CursorShapeInfo::~CursorShapeInfo() | Implicitly-declared
-static void CursorShapeInfo_Destructor(CursorShapeInfo* ptr)
-{
-    ptr->~CursorShapeInfo();
 }
 
 // struct CursorShapeInfo | File: ../UI/Cursor.h
@@ -694,12 +580,6 @@ static void Register_DebugHud(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// DebugLine::~DebugLine() | Implicitly-declared
-static void DebugLine_Destructor(DebugLine* ptr)
-{
-    ptr->~DebugLine();
-}
-
 // struct DebugLine | File: ../Graphics/DebugRenderer.h
 static void Register_DebugLine(asIScriptEngine* engine)
 {
@@ -723,12 +603,6 @@ static void Register_DebugRenderer(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// DebugTriangle::~DebugTriangle() | Implicitly-declared
-static void DebugTriangle_Destructor(DebugTriangle* ptr)
-{
-    ptr->~DebugTriangle();
-}
-
 // struct DebugTriangle | File: ../Graphics/DebugRenderer.h
 static void Register_DebugTriangle(asIScriptEngine* engine)
 {
@@ -740,12 +614,6 @@ static void Register_DebugTriangle(asIScriptEngine* engine)
     const char* asClassName = "DebugTriangle";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// Decal::~Decal() | Implicitly-declared
-static void Decal_Destructor(Decal* ptr)
-{
-    ptr->~Decal();
 }
 
 // struct Decal | File: ../Graphics/DecalSet.h
@@ -769,12 +637,6 @@ static void Register_DecalSet(asIScriptEngine* engine)
     const char* asClassName = "DecalSet";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// DecalVertex::~DecalVertex() | Implicitly-declared
-static void DecalVertex_Destructor(DecalVertex* ptr)
-{
-    ptr->~DecalVertex();
 }
 
 // struct DecalVertex | File: ../Graphics/DecalSet.h
@@ -808,12 +670,6 @@ static void Register_Deserializer(asIScriptEngine* engine)
     const char* asClassName = "Deserializer";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// DirtyBits::~DirtyBits() | Implicitly-declared
-static void DirtyBits_Destructor(DirtyBits* ptr)
-{
-    ptr->~DirtyBits();
 }
 
 // struct DirtyBits | File: ../Scene/ReplicationState.h
@@ -899,12 +755,6 @@ static void Register_FileSelector(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// FileSelectorEntry::~FileSelectorEntry() | Implicitly-declared
-static void FileSelectorEntry_Destructor(FileSelectorEntry* ptr)
-{
-    ptr->~FileSelectorEntry();
-}
-
 // struct FileSelectorEntry | File: ../UI/FileSelector.h
 static void Register_FileSelectorEntry(asIScriptEngine* engine)
 {
@@ -988,12 +838,6 @@ static void Register_FontFaceFreeType(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// FontGlyph::~FontGlyph() | Implicitly-declared
-static void FontGlyph_Destructor(FontGlyph* ptr)
-{
-    ptr->~FontGlyph();
-}
-
 // struct FontGlyph | File: ../UI/FontFace.h
 static void Register_FontGlyph(asIScriptEngine* engine)
 {
@@ -1005,12 +849,6 @@ static void Register_FontGlyph(asIScriptEngine* engine)
     const char* asClassName = "FontGlyph";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// FrameInfo::~FrameInfo() | Implicitly-declared
-static void FrameInfo_Destructor(FrameInfo* ptr)
-{
-    ptr->~FrameInfo();
 }
 
 // struct FrameInfo | File: ../Graphics/Drawable.h
@@ -1026,12 +864,6 @@ static void Register_FrameInfo(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// Frustum::~Frustum() | Implicitly-declared
-static void Frustum_Destructor(Frustum* ptr)
-{
-    ptr->~Frustum();
-}
-
 // class Frustum | File: ../Math/Frustum.h
 static void Register_Frustum(asIScriptEngine* engine)
 {
@@ -1043,12 +875,6 @@ static void Register_Frustum(asIScriptEngine* engine)
     const char* asClassName = "Frustum";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// virtual GPUObject::~GPUObject()
-static void GPUObject_Destructor(GPUObject* ptr)
-{
-    ptr->~GPUObject();
 }
 
 // class GPUObject | File: ../Graphics/GPUObject.h
@@ -1074,12 +900,6 @@ static void Register_Geometry(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// GeometryDesc::~GeometryDesc() | Implicitly-declared
-static void GeometryDesc_Destructor(GeometryDesc* ptr)
-{
-    ptr->~GeometryDesc();
-}
-
 // struct GeometryDesc | File: ../Graphics/Model.h
 static void Register_GeometryDesc(asIScriptEngine* engine)
 {
@@ -1103,12 +923,6 @@ static void Register_Graphics(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// HashBase::~HashBase() | Implicitly-declared
-static void HashBase_Destructor(HashBase* ptr)
-{
-    ptr->~HashBase();
-}
-
 // class HashBase | File: ../Container/HashBase.h
 static void Register_HashBase(asIScriptEngine* engine)
 {
@@ -1120,12 +934,6 @@ static void Register_HashBase(asIScriptEngine* engine)
     const char* asClassName = "HashBase";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// HashIteratorBase::~HashIteratorBase() | Implicitly-declared
-static void HashIteratorBase_Destructor(HashIteratorBase* ptr)
-{
-    ptr->~HashIteratorBase();
 }
 
 // struct HashIteratorBase | File: ../Container/HashBase.h
@@ -1141,12 +949,6 @@ static void Register_HashIteratorBase(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// HashNodeBase::~HashNodeBase() | Implicitly-declared
-static void HashNodeBase_Destructor(HashNodeBase* ptr)
-{
-    ptr->~HashNodeBase();
-}
-
 // struct HashNodeBase | File: ../Container/HashBase.h
 static void Register_HashNodeBase(asIScriptEngine* engine)
 {
@@ -1158,12 +960,6 @@ static void Register_HashNodeBase(asIScriptEngine* engine)
     const char* asClassName = "HashNodeBase";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// HiresTimer::~HiresTimer() | Implicitly-declared
-static void HiresTimer_Destructor(HiresTimer* ptr)
-{
-    ptr->~HiresTimer();
 }
 
 // class HiresTimer | File: ../Core/Timer.h
@@ -1199,12 +995,6 @@ static void Register_IndexBuffer(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// IndexBufferDesc::~IndexBufferDesc() | Implicitly-declared
-static void IndexBufferDesc_Destructor(IndexBufferDesc* ptr)
-{
-    ptr->~IndexBufferDesc();
-}
-
 // struct IndexBufferDesc | File: ../Graphics/Model.h
 static void Register_IndexBufferDesc(asIScriptEngine* engine)
 {
@@ -1226,12 +1016,6 @@ static void Register_Input(asIScriptEngine* engine)
     const char* asClassName = "Input";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// InstanceData::~InstanceData() | Implicitly-declared
-static void InstanceData_Destructor(InstanceData* ptr)
-{
-    ptr->~InstanceData();
 }
 
 // struct InstanceData | File: ../Graphics/Batch.h
@@ -1287,12 +1071,6 @@ static void Register_JSONFile(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// JSONValue::~JSONValue()
-static void JSONValue_Destructor(JSONValue* ptr)
-{
-    ptr->~JSONValue();
-}
-
 // class JSONValue | File: ../Resource/JSONValue.h
 static void Register_JSONValue(asIScriptEngine* engine)
 {
@@ -1326,12 +1104,6 @@ static void Register_Light(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// LightBatchQueue::~LightBatchQueue() | Implicitly-declared
-static void LightBatchQueue_Destructor(LightBatchQueue* ptr)
-{
-    ptr->~LightBatchQueue();
-}
-
 // struct LightBatchQueue | File: ../Graphics/Batch.h
 static void Register_LightBatchQueue(asIScriptEngine* engine)
 {
@@ -1343,12 +1115,6 @@ static void Register_LightBatchQueue(asIScriptEngine* engine)
     const char* asClassName = "LightBatchQueue";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// LightQueryResult::~LightQueryResult() | Implicitly-declared
-static void LightQueryResult_Destructor(LightQueryResult* ptr)
-{
-    ptr->~LightQueryResult();
 }
 
 // struct LightQueryResult | File: ../Graphics/View.h
@@ -1374,12 +1140,6 @@ static void Register_LineEdit(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// LinkedListNode::~LinkedListNode() | Implicitly-declared
-static void LinkedListNode_Destructor(LinkedListNode* ptr)
-{
-    ptr->~LinkedListNode();
-}
-
 // struct LinkedListNode | File: ../Container/LinkedList.h
 static void Register_LinkedListNode(asIScriptEngine* engine)
 {
@@ -1391,12 +1151,6 @@ static void Register_LinkedListNode(asIScriptEngine* engine)
     const char* asClassName = "LinkedListNode";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// ListBase::~ListBase() | Implicitly-declared
-static void ListBase_Destructor(ListBase* ptr)
-{
-    ptr->~ListBase();
 }
 
 // class ListBase | File: ../Container/ListBase.h
@@ -1412,12 +1166,6 @@ static void Register_ListBase(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// ListIteratorBase::~ListIteratorBase() | Implicitly-declared
-static void ListIteratorBase_Destructor(ListIteratorBase* ptr)
-{
-    ptr->~ListIteratorBase();
-}
-
 // struct ListIteratorBase | File: ../Container/ListBase.h
 static void Register_ListIteratorBase(asIScriptEngine* engine)
 {
@@ -1429,12 +1177,6 @@ static void Register_ListIteratorBase(asIScriptEngine* engine)
     const char* asClassName = "ListIteratorBase";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// ListNodeBase::~ListNodeBase() | Implicitly-declared
-static void ListNodeBase_Destructor(ListNodeBase* ptr)
-{
-    ptr->~ListNodeBase();
 }
 
 // struct ListNodeBase | File: ../Container/ListBase.h
@@ -1498,12 +1240,6 @@ static void Register_Material(asIScriptEngine* engine)
     const char* asClassName = "Material";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// MaterialShaderParameter::~MaterialShaderParameter() | Implicitly-declared
-static void MaterialShaderParameter_Destructor(MaterialShaderParameter* ptr)
-{
-    ptr->~MaterialShaderParameter();
 }
 
 // struct MaterialShaderParameter | File: ../Graphics/Material.h
@@ -1589,12 +1325,6 @@ static void Register_Model(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// ModelMorph::~ModelMorph() | Implicitly-declared
-static void ModelMorph_Destructor(ModelMorph* ptr)
-{
-    ptr->~ModelMorph();
-}
-
 // struct ModelMorph | File: ../Graphics/Model.h
 static void Register_ModelMorph(asIScriptEngine* engine)
 {
@@ -1608,12 +1338,6 @@ static void Register_ModelMorph(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// Mutex::~Mutex()
-static void Mutex_Destructor(Mutex* ptr)
-{
-    ptr->~Mutex();
-}
-
 // class Mutex | File: ../Core/Mutex.h
 static void Register_Mutex(asIScriptEngine* engine)
 {
@@ -1625,12 +1349,6 @@ static void Register_Mutex(asIScriptEngine* engine)
     const char* asClassName = "Mutex";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// MutexLock::~MutexLock()
-static void MutexLock_Destructor(MutexLock* ptr)
-{
-    ptr->~MutexLock();
 }
 
 // class MutexLock | File: ../Core/Mutex.h
@@ -1656,12 +1374,6 @@ static void Register_NamedPipe(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// NetworkState::~NetworkState() | Implicitly-declared
-static void NetworkState_Destructor(NetworkState* ptr)
-{
-    ptr->~NetworkState();
-}
-
 // struct NetworkState | File: ../Scene/ReplicationState.h
 static void Register_NetworkState(asIScriptEngine* engine)
 {
@@ -1685,12 +1397,6 @@ static void Register_Node(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// NodeImpl::~NodeImpl() | Implicitly-declared
-static void NodeImpl_Destructor(NodeImpl* ptr)
-{
-    ptr->~NodeImpl();
-}
-
 // struct NodeImpl | File: ../Scene/Node.h
 static void Register_NodeImpl(asIScriptEngine* engine)
 {
@@ -1702,12 +1408,6 @@ static void Register_NodeImpl(asIScriptEngine* engine)
     const char* asClassName = "NodeImpl";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// NodeReplicationState::~NodeReplicationState() | Implicitly-declared
-static void NodeReplicationState_Destructor(NodeReplicationState* ptr)
-{
-    ptr->~NodeReplicationState();
 }
 
 // struct NodeReplicationState | File: ../Scene/ReplicationState.h
@@ -1753,12 +1453,6 @@ static void Register_ObjectFactory(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// OcclusionBatch::~OcclusionBatch() | Implicitly-declared
-static void OcclusionBatch_Destructor(OcclusionBatch* ptr)
-{
-    ptr->~OcclusionBatch();
-}
-
 // struct OcclusionBatch | File: ../Graphics/OcclusionBuffer.h
 static void Register_OcclusionBatch(asIScriptEngine* engine)
 {
@@ -1782,12 +1476,6 @@ static void Register_OcclusionBuffer(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// OcclusionBufferData::~OcclusionBufferData() | Implicitly-declared
-static void OcclusionBufferData_Destructor(OcclusionBufferData* ptr)
-{
-    ptr->~OcclusionBufferData();
-}
-
 // struct OcclusionBufferData | File: ../Graphics/OcclusionBuffer.h
 static void Register_OcclusionBufferData(asIScriptEngine* engine)
 {
@@ -1809,12 +1497,6 @@ static void Register_Octree(asIScriptEngine* engine)
     const char* asClassName = "Octree";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// OctreeQueryResult::~OctreeQueryResult() | Implicitly-declared
-static void OctreeQueryResult_Destructor(OctreeQueryResult* ptr)
-{
-    ptr->~OctreeQueryResult();
 }
 
 // struct OctreeQueryResult | File: ../Graphics/OctreeQuery.h
@@ -1860,12 +1542,6 @@ static void Register_PackageFile(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// Particle::~Particle() | Implicitly-declared
-static void Particle_Destructor(Particle* ptr)
-{
-    ptr->~Particle();
-}
-
 // struct Particle | File: ../Graphics/ParticleEmitter.h
 static void Register_Particle(asIScriptEngine* engine)
 {
@@ -1909,12 +1585,6 @@ static void Register_Pass(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// PerThreadSceneResult::~PerThreadSceneResult() | Implicitly-declared
-static void PerThreadSceneResult_Destructor(PerThreadSceneResult* ptr)
-{
-    ptr->~PerThreadSceneResult();
-}
-
 // struct PerThreadSceneResult | File: ../Graphics/View.h
 static void Register_PerThreadSceneResult(asIScriptEngine* engine)
 {
@@ -1936,12 +1606,6 @@ static void Register_Plane(asIScriptEngine* engine)
     const char* asClassName = "Plane";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// Polyhedron::~Polyhedron() noexcept=default
-static void Polyhedron_Destructor(Polyhedron* ptr)
-{
-    ptr->~Polyhedron();
 }
 
 // class Polyhedron | File: ../Math/Polyhedron.h
@@ -1997,12 +1661,6 @@ static void Register_Ray(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// RayQueryResult::~RayQueryResult() | Implicitly-declared
-static void RayQueryResult_Destructor(RayQueryResult* ptr)
-{
-    ptr->~RayQueryResult();
-}
-
 // struct RayQueryResult | File: ../Graphics/OctreeQuery.h
 static void Register_RayQueryResult(asIScriptEngine* engine)
 {
@@ -2024,12 +1682,6 @@ static void Register_Rect(asIScriptEngine* engine)
     const char* asClassName = "Rect";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// RefCount::~RefCount()
-static void RefCount_Destructor(RefCount* ptr)
-{
-    ptr->~RefCount();
 }
 
 // struct RefCount | File: ../Container/RefCounted.h
@@ -2065,12 +1717,6 @@ static void Register_RenderPath(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// RenderPathCommand::~RenderPathCommand() | Implicitly-declared
-static void RenderPathCommand_Destructor(RenderPathCommand* ptr)
-{
-    ptr->~RenderPathCommand();
-}
-
 // struct RenderPathCommand | File: ../Graphics/RenderPath.h
 static void Register_RenderPathCommand(asIScriptEngine* engine)
 {
@@ -2094,12 +1740,6 @@ static void Register_RenderSurface(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// RenderTargetInfo::~RenderTargetInfo() | Implicitly-declared
-static void RenderTargetInfo_Destructor(RenderTargetInfo* ptr)
-{
-    ptr->~RenderTargetInfo();
-}
-
 // struct RenderTargetInfo | File: ../Graphics/RenderPath.h
 static void Register_RenderTargetInfo(asIScriptEngine* engine)
 {
@@ -2121,12 +1761,6 @@ static void Register_Renderer(asIScriptEngine* engine)
     const char* asClassName = "Renderer";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// ReplicationState::~ReplicationState() | Implicitly-declared
-static void ReplicationState_Destructor(ReplicationState* ptr)
-{
-    ptr->~ReplicationState();
 }
 
 // struct ReplicationState | File: ../Scene/ReplicationState.h
@@ -2162,12 +1796,6 @@ static void Register_ResourceCache(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// ResourceGroup::~ResourceGroup() | Implicitly-declared
-static void ResourceGroup_Destructor(ResourceGroup* ptr)
-{
-    ptr->~ResourceGroup();
-}
-
 // struct ResourceGroup | File: ../Resource/ResourceCache.h
 static void Register_ResourceGroup(asIScriptEngine* engine)
 {
@@ -2181,12 +1809,6 @@ static void Register_ResourceGroup(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// ResourceRef::~ResourceRef() | Implicitly-declared
-static void ResourceRef_Destructor(ResourceRef* ptr)
-{
-    ptr->~ResourceRef();
-}
-
 // struct ResourceRef | File: ../Core/Variant.h
 static void Register_ResourceRef(asIScriptEngine* engine)
 {
@@ -2198,12 +1820,6 @@ static void Register_ResourceRef(asIScriptEngine* engine)
     const char* asClassName = "ResourceRef";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// ResourceRefList::~ResourceRefList() | Implicitly-declared
-static void ResourceRefList_Destructor(ResourceRefList* ptr)
-{
-    ptr->~ResourceRefList();
 }
 
 // struct ResourceRefList | File: ../Core/Variant.h
@@ -2249,12 +1865,6 @@ static void Register_Scene(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// ScenePassInfo::~ScenePassInfo() | Implicitly-declared
-static void ScenePassInfo_Destructor(ScenePassInfo* ptr)
-{
-    ptr->~ScenePassInfo();
-}
-
 // struct ScenePassInfo | File: ../Graphics/View.h
 static void Register_ScenePassInfo(asIScriptEngine* engine)
 {
@@ -2266,12 +1876,6 @@ static void Register_ScenePassInfo(asIScriptEngine* engine)
     const char* asClassName = "ScenePassInfo";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// SceneReplicationState::~SceneReplicationState() | Implicitly-declared
-static void SceneReplicationState_Destructor(SceneReplicationState* ptr)
-{
-    ptr->~SceneReplicationState();
 }
 
 // struct SceneReplicationState | File: ../Scene/ReplicationState.h
@@ -2287,12 +1891,6 @@ static void Register_SceneReplicationState(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// SceneResolver::~SceneResolver()
-static void SceneResolver_Destructor(SceneResolver* ptr)
-{
-    ptr->~SceneResolver();
-}
-
 // class SceneResolver | File: ../Scene/SceneResolver.h
 static void Register_SceneResolver(asIScriptEngine* engine)
 {
@@ -2306,12 +1904,6 @@ static void Register_SceneResolver(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// ScratchBuffer::~ScratchBuffer() | Implicitly-declared
-static void ScratchBuffer_Destructor(ScratchBuffer* ptr)
-{
-    ptr->~ScratchBuffer();
-}
-
 // struct ScratchBuffer | File: ../Graphics/Graphics.h
 static void Register_ScratchBuffer(asIScriptEngine* engine)
 {
@@ -2323,12 +1915,6 @@ static void Register_ScratchBuffer(asIScriptEngine* engine)
     const char* asClassName = "ScratchBuffer";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// ScreenModeParams::~ScreenModeParams() | Implicitly-declared
-static void ScreenModeParams_Destructor(ScreenModeParams* ptr)
-{
-    ptr->~ScreenModeParams();
 }
 
 // struct ScreenModeParams | File: ../Graphics/Graphics.h
@@ -2394,12 +1980,6 @@ static void Register_Shader(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// ShaderParameter::~ShaderParameter() | Implicitly-declared
-static void ShaderParameter_Destructor(ShaderParameter* ptr)
-{
-    ptr->~ShaderParameter();
-}
-
 // struct ShaderParameter | File: ../Graphics/ShaderVariation.h
 static void Register_ShaderParameter(asIScriptEngine* engine)
 {
@@ -2441,12 +2021,6 @@ static void Register_ShaderVariation(asIScriptEngine* engine)
     const char* asClassName = "ShaderVariation";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// ShadowBatchQueue::~ShadowBatchQueue() | Implicitly-declared
-static void ShadowBatchQueue_Destructor(ShadowBatchQueue* ptr)
-{
-    ptr->~ShadowBatchQueue();
 }
 
 // struct ShadowBatchQueue | File: ../Graphics/Batch.h
@@ -2552,12 +2126,6 @@ static void Register_SoundStream(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// SourceBatch::~SourceBatch()
-static void SourceBatch_Destructor(SourceBatch* ptr)
-{
-    ptr->~SourceBatch();
-}
-
 // struct SourceBatch | File: ../Graphics/Drawable.h
 static void Register_SourceBatch(asIScriptEngine* engine)
 {
@@ -2579,12 +2147,6 @@ static void Register_Sphere(asIScriptEngine* engine)
     const char* asClassName = "Sphere";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// Spline::~Spline() | Implicitly-declared
-static void Spline_Destructor(Spline* ptr)
-{
-    ptr->~Spline();
 }
 
 // class Spline | File: ../Core/Spline.h
@@ -2630,12 +2192,6 @@ static void Register_StaticModel(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// StaticModelGeometryData::~StaticModelGeometryData() | Implicitly-declared
-static void StaticModelGeometryData_Destructor(StaticModelGeometryData* ptr)
-{
-    ptr->~StaticModelGeometryData();
-}
-
 // struct StaticModelGeometryData | File: ../Graphics/StaticModel.h
 static void Register_StaticModelGeometryData(asIScriptEngine* engine)
 {
@@ -2659,12 +2215,6 @@ static void Register_StaticModelGroup(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// StoredLogMessage::~StoredLogMessage() | Implicitly-declared
-static void StoredLogMessage_Destructor(StoredLogMessage* ptr)
-{
-    ptr->~StoredLogMessage();
-}
-
 // struct StoredLogMessage | File: ../IO/Log.h
 static void Register_StoredLogMessage(asIScriptEngine* engine)
 {
@@ -2676,12 +2226,6 @@ static void Register_StoredLogMessage(asIScriptEngine* engine)
     const char* asClassName = "StoredLogMessage";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// String::~String()
-static void String_Destructor(String* ptr)
-{
-    ptr->~String();
 }
 
 // class String | File: ../Container/Str.h
@@ -2707,12 +2251,6 @@ static void Register_StringHash(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// StringHashRegister::~StringHashRegister()
-static void StringHashRegister_Destructor(StringHashRegister* ptr)
-{
-    ptr->~StringHashRegister();
-}
-
 // class StringHashRegister | File: ../Core/StringHashRegister.h
 static void Register_StringHashRegister(asIScriptEngine* engine)
 {
@@ -2734,12 +2272,6 @@ static void Register_Technique(asIScriptEngine* engine)
     const char* asClassName = "Technique";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// TechniqueEntry::~TechniqueEntry() noexcept=default
-static void TechniqueEntry_Destructor(TechniqueEntry* ptr)
-{
-    ptr->~TechniqueEntry();
 }
 
 // struct TechniqueEntry | File: ../Graphics/Material.h
@@ -2895,12 +2427,6 @@ static void Register_TouchState(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// TrailPoint::~TrailPoint() | Implicitly-declared
-static void TrailPoint_Destructor(TrailPoint* ptr)
-{
-    ptr->~TrailPoint();
-}
-
 // struct TrailPoint | File: ../Graphics/RibbonTrail.h
 static void Register_TrailPoint(asIScriptEngine* engine)
 {
@@ -2922,12 +2448,6 @@ static void Register_UI(asIScriptEngine* engine)
     const char* asClassName = "UI";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// UIBatch::~UIBatch() | Implicitly-declared
-static void UIBatch_Destructor(UIBatch* ptr)
-{
-    ptr->~UIBatch();
 }
 
 // class UIBatch | File: ../UI/UIBatch.h
@@ -2983,12 +2503,6 @@ static void Register_UnknownComponent(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// VAnimEventFrame::~VAnimEventFrame() | Implicitly-declared
-static void VAnimEventFrame_Destructor(VAnimEventFrame* ptr)
-{
-    ptr->~VAnimEventFrame();
-}
-
 // struct VAnimEventFrame | File: ../Scene/ValueAnimation.h
 static void Register_VAnimEventFrame(asIScriptEngine* engine)
 {
@@ -3000,12 +2514,6 @@ static void Register_VAnimEventFrame(asIScriptEngine* engine)
     const char* asClassName = "VAnimEventFrame";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// VAnimKeyFrame::~VAnimKeyFrame() | Implicitly-declared
-static void VAnimKeyFrame_Destructor(VAnimKeyFrame* ptr)
-{
-    ptr->~VAnimKeyFrame();
 }
 
 // struct VAnimKeyFrame | File: ../Scene/ValueAnimation.h
@@ -3039,12 +2547,6 @@ static void Register_ValueAnimationInfo(asIScriptEngine* engine)
     const char* asClassName = "ValueAnimationInfo";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// Variant::~Variant()
-static void Variant_Destructor(Variant* ptr)
-{
-    ptr->~Variant();
 }
 
 // class Variant | File: ../Core/Variant.h
@@ -3090,12 +2592,6 @@ static void Register_Vector4(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// VectorBase::~VectorBase() | Implicitly-declared
-static void VectorBase_Destructor(VectorBase* ptr)
-{
-    ptr->~VectorBase();
-}
-
 // class VectorBase | File: ../Container/VectorBase.h
 static void Register_VectorBase(asIScriptEngine* engine)
 {
@@ -3107,12 +2603,6 @@ static void Register_VectorBase(asIScriptEngine* engine)
     const char* asClassName = "VectorBase";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// VectorBuffer::~VectorBuffer() | Implicitly-declared
-static void VectorBuffer_Destructor(VectorBuffer* ptr)
-{
-    ptr->~VectorBuffer();
 }
 
 // class VectorBuffer | File: ../IO/VectorBuffer.h
@@ -3138,12 +2628,6 @@ static void Register_VertexBuffer(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// VertexBufferDesc::~VertexBufferDesc() | Implicitly-declared
-static void VertexBufferDesc_Destructor(VertexBufferDesc* ptr)
-{
-    ptr->~VertexBufferDesc();
-}
-
 // struct VertexBufferDesc | File: ../Graphics/Model.h
 static void Register_VertexBufferDesc(asIScriptEngine* engine)
 {
@@ -3157,12 +2641,6 @@ static void Register_VertexBufferDesc(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// VertexBufferMorph::~VertexBufferMorph() | Implicitly-declared
-static void VertexBufferMorph_Destructor(VertexBufferMorph* ptr)
-{
-    ptr->~VertexBufferMorph();
-}
-
 // struct VertexBufferMorph | File: ../Graphics/Model.h
 static void Register_VertexBufferMorph(asIScriptEngine* engine)
 {
@@ -3174,12 +2652,6 @@ static void Register_VertexBufferMorph(asIScriptEngine* engine)
     const char* asClassName = "VertexBufferMorph";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// VertexElement::~VertexElement() | Implicitly-declared
-static void VertexElement_Destructor(VertexElement* ptr)
-{
-    ptr->~VertexElement();
 }
 
 // struct VertexElement | File: ../Graphics/GraphicsDefs.h
@@ -3235,12 +2707,6 @@ static void Register_Window(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// WindowModeParams::~WindowModeParams() | Implicitly-declared
-static void WindowModeParams_Destructor(WindowModeParams* ptr)
-{
-    ptr->~WindowModeParams();
-}
-
 // struct WindowModeParams | File: ../Graphics/Graphics.h
 static void Register_WindowModeParams(asIScriptEngine* engine)
 {
@@ -3262,12 +2728,6 @@ static void Register_WorkQueue(asIScriptEngine* engine)
     const char* asClassName = "WorkQueue";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// XMLElement::~XMLElement()
-static void XMLElement_Destructor(XMLElement* ptr)
-{
-    ptr->~XMLElement();
 }
 
 // class XMLElement | File: ../Resource/XMLElement.h
@@ -3293,12 +2753,6 @@ static void Register_XMLFile(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// XPathQuery::~XPathQuery()
-static void XPathQuery_Destructor(XPathQuery* ptr)
-{
-    ptr->~XPathQuery();
-}
-
 // class XPathQuery | File: ../Resource/XMLElement.h
 static void Register_XPathQuery(asIScriptEngine* engine)
 {
@@ -3310,12 +2764,6 @@ static void Register_XPathQuery(asIScriptEngine* engine)
     const char* asClassName = "XPathQuery";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// XPathResultSet::~XPathResultSet()
-static void XPathResultSet_Destructor(XPathResultSet* ptr)
-{
-    ptr->~XPathResultSet();
 }
 
 // class XPathResultSet | File: ../Resource/XMLElement.h
@@ -3441,12 +2889,6 @@ static void Register_NavArea(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// NavAreaStub::~NavAreaStub() | Implicitly-declared
-static void NavAreaStub_Destructor(NavAreaStub* ptr)
-{
-    ptr->~NavAreaStub();
-}
-
 // struct NavAreaStub | File: ../Navigation/NavBuildData.h
 static void Register_NavAreaStub(asIScriptEngine* engine)
 {
@@ -3458,12 +2900,6 @@ static void Register_NavAreaStub(asIScriptEngine* engine)
     const char* asClassName = "NavAreaStub";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// virtual NavBuildData::~NavBuildData()
-static void NavBuildData_Destructor(NavBuildData* ptr)
-{
-    ptr->~NavBuildData();
 }
 
 // struct NavBuildData | File: ../Navigation/NavBuildData.h
@@ -3489,12 +2925,6 @@ static void Register_Navigable(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// NavigationGeometryInfo::~NavigationGeometryInfo() | Implicitly-declared
-static void NavigationGeometryInfo_Destructor(NavigationGeometryInfo* ptr)
-{
-    ptr->~NavigationGeometryInfo();
-}
-
 // struct NavigationGeometryInfo | File: ../Navigation/NavigationMesh.h
 static void Register_NavigationGeometryInfo(asIScriptEngine* engine)
 {
@@ -3516,12 +2946,6 @@ static void Register_NavigationMesh(asIScriptEngine* engine)
     const char* asClassName = "NavigationMesh";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// NavigationPathPoint::~NavigationPathPoint() | Implicitly-declared
-static void NavigationPathPoint_Destructor(NavigationPathPoint* ptr)
-{
-    ptr->~NavigationPathPoint();
 }
 
 // struct NavigationPathPoint | File: ../Navigation/NavigationMesh.h
@@ -3555,12 +2979,6 @@ static void Register_OffMeshConnection(asIScriptEngine* engine)
     const char* asClassName = "OffMeshConnection";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// SimpleNavBuildData::~SimpleNavBuildData() override
-static void SimpleNavBuildData_Destructor(SimpleNavBuildData* ptr)
-{
-    ptr->~SimpleNavBuildData();
 }
 
 // struct SimpleNavBuildData | File: ../Navigation/NavBuildData.h
@@ -3620,12 +3038,6 @@ static void Register_NetworkPriority(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// PackageDownload::~PackageDownload() | Implicitly-declared
-static void PackageDownload_Destructor(PackageDownload* ptr)
-{
-    ptr->~PackageDownload();
-}
-
 // struct PackageDownload | File: ../Network/Connection.h
 static void Register_PackageDownload(asIScriptEngine* engine)
 {
@@ -3639,12 +3051,6 @@ static void Register_PackageDownload(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// PackageUpload::~PackageUpload() | Implicitly-declared
-static void PackageUpload_Destructor(PackageUpload* ptr)
-{
-    ptr->~PackageUpload();
-}
-
 // struct PackageUpload | File: ../Network/Connection.h
 static void Register_PackageUpload(asIScriptEngine* engine)
 {
@@ -3656,12 +3062,6 @@ static void Register_PackageUpload(asIScriptEngine* engine)
     const char* asClassName = "PackageUpload";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// RemoteEvent::~RemoteEvent() | Implicitly-declared
-static void RemoteEvent_Destructor(RemoteEvent* ptr)
-{
-    ptr->~RemoteEvent();
 }
 
 // struct RemoteEvent | File: ../Network/Connection.h
@@ -3721,12 +3121,6 @@ static void Register_ConvexData(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// DelayedWorldTransform::~DelayedWorldTransform() | Implicitly-declared
-static void DelayedWorldTransform_Destructor(DelayedWorldTransform* ptr)
-{
-    ptr->~DelayedWorldTransform();
-}
-
 // struct DelayedWorldTransform | File: ../Physics/PhysicsWorld.h
 static void Register_DelayedWorldTransform(asIScriptEngine* engine)
 {
@@ -3760,12 +3154,6 @@ static void Register_HeightfieldData(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// ManifoldPair::~ManifoldPair() | Implicitly-declared
-static void ManifoldPair_Destructor(ManifoldPair* ptr)
-{
-    ptr->~ManifoldPair();
-}
-
 // struct ManifoldPair | File: ../Physics/PhysicsWorld.h
 static void Register_ManifoldPair(asIScriptEngine* engine)
 {
@@ -3777,12 +3165,6 @@ static void Register_ManifoldPair(asIScriptEngine* engine)
     const char* asClassName = "ManifoldPair";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// PhysicsRaycastResult::~PhysicsRaycastResult() | Implicitly-declared
-static void PhysicsRaycastResult_Destructor(PhysicsRaycastResult* ptr)
-{
-    ptr->~PhysicsRaycastResult();
 }
 
 // struct PhysicsRaycastResult | File: ../Physics/PhysicsWorld.h
@@ -3806,12 +3188,6 @@ static void Register_PhysicsWorld(asIScriptEngine* engine)
     const char* asClassName = "PhysicsWorld";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// PhysicsWorldConfig::~PhysicsWorldConfig() | Implicitly-declared
-static void PhysicsWorldConfig_Destructor(PhysicsWorldConfig* ptr)
-{
-    ptr->~PhysicsWorldConfig();
 }
 
 // struct PhysicsWorldConfig | File: ../Physics/PhysicsWorld.h
@@ -4061,12 +3437,6 @@ static void Register_ConstraintWheel2D(asIScriptEngine* engine)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
 }
 
-// DelayedWorldTransform2D::~DelayedWorldTransform2D() | Implicitly-declared
-static void DelayedWorldTransform2D_Destructor(DelayedWorldTransform2D* ptr)
-{
-    ptr->~DelayedWorldTransform2D();
-}
-
 // struct DelayedWorldTransform2D | File: ../Urho2D/PhysicsWorld2D.h
 static void Register_DelayedWorldTransform2D(asIScriptEngine* engine)
 {
@@ -4088,12 +3458,6 @@ static void Register_Drawable2D(asIScriptEngine* engine)
     const char* asClassName = "Drawable2D";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// Particle2D::~Particle2D() | Implicitly-declared
-static void Particle2D_Destructor(Particle2D* ptr)
-{
-    ptr->~Particle2D();
 }
 
 // struct Particle2D | File: ../Urho2D/ParticleEmitter2D.h
@@ -4127,12 +3491,6 @@ static void Register_ParticleEmitter2D(asIScriptEngine* engine)
     const char* asClassName = "ParticleEmitter2D";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// PhysicsRaycastResult2D::~PhysicsRaycastResult2D() | Implicitly-declared
-static void PhysicsRaycastResult2D_Destructor(PhysicsRaycastResult2D* ptr)
-{
-    ptr->~PhysicsRaycastResult2D();
 }
 
 // struct PhysicsRaycastResult2D | File: ../Urho2D/PhysicsWorld2D.h
@@ -4186,12 +3544,6 @@ static void Register_RigidBody2D(asIScriptEngine* engine)
     const char* asClassName = "RigidBody2D";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// SourceBatch2D::~SourceBatch2D() | Implicitly-declared
-static void SourceBatch2D_Destructor(SourceBatch2D* ptr)
-{
-    ptr->~SourceBatch2D();
 }
 
 // struct SourceBatch2D | File: ../Urho2D/Drawable2D.h
@@ -4345,12 +3697,6 @@ static void Register_TmxTileLayer2D(asIScriptEngine* engine)
     const char* asClassName = "TmxTileLayer2D";
     for (const RegisterObjectMethodArgs& method : methods)
         engine->RegisterObjectMethod(asClassName, method.declaration_.CString(), method.funcPointer_, method.callConv_);
-}
-
-// Vertex2D::~Vertex2D() | Implicitly-declared
-static void Vertex2D_Destructor(Vertex2D* ptr)
-{
-    ptr->~Vertex2D();
 }
 
 // struct Vertex2D | File: ../Urho2D/Drawable2D.h
