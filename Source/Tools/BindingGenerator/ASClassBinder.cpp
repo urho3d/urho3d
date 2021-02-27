@@ -264,6 +264,11 @@ static void RegisterRefCountedConstructor(const MethodAnalyzer& methodAnalyzer, 
 
     string args = ExtractCleanedFunctionArgsstring(methodAnalyzer.GetMemberdef());
 
+    bool isDefaultConstructor = args.empty();
+
+    if (isDefaultConstructor)
+        return;
+
     //shared_ptr<ASGeneratedFile_Members> result = GetGeneratedFile(functionAnalyzer.GetClass().GetClassName());
     ASGeneratedFile_Base* result = templateVersion ? (ASGeneratedFile_Base*)_result_Templates.get() : (ASGeneratedFile_Base*)GetGeneratedFile(methodAnalyzer.GetClass().GetClassName()).get();
 

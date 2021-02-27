@@ -18,11 +18,17 @@ void ASRegisterGeneratedDefaultConstructors(asIScriptEngine* engine)
     // AllocatorNode::AllocatorNode() | Implicitly-declared
     engine->RegisterObjectBehaviour("AllocatorNode", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<AllocatorNode>), AS_CALL_CDECL_OBJFIRST);
 
+    // AnimationControl::AnimationControl() | File: ../Graphics/AnimationController.h
+    engine->RegisterObjectBehaviour("AnimationControl", asBEHAVE_FACTORY, "AnimationControl@+ f()", asFUNCTION(ASCompatibleFactory<AnimationControl>), AS_CALL_CDECL);
+
     // AnimationKeyFrame::AnimationKeyFrame() | File: ../Graphics/Animation.h
     engine->RegisterObjectBehaviour("AnimationKeyFrame", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<AnimationKeyFrame>), AS_CALL_CDECL_OBJFIRST);
 
     // AnimationStateTrack::AnimationStateTrack() | File: ../Graphics/AnimationState.h
     engine->RegisterObjectBehaviour("AnimationStateTrack", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<AnimationStateTrack>), AS_CALL_CDECL_OBJFIRST);
+
+    // AnimationTrack::AnimationTrack() | File: ../Graphics/Animation.h
+    engine->RegisterObjectBehaviour("AnimationTrack", asBEHAVE_FACTORY, "AnimationTrack@+ f()", asFUNCTION(ASCompatibleFactory<AnimationTrack>), AS_CALL_CDECL);
 
     // AnimationTriggerPoint::AnimationTriggerPoint() | File: ../Graphics/Animation.h
     engine->RegisterObjectBehaviour("AnimationTriggerPoint", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<AnimationTriggerPoint>), AS_CALL_CDECL_OBJFIRST);
@@ -54,8 +60,14 @@ void ASRegisterGeneratedDefaultConstructors(asIScriptEngine* engine)
     // BiasParameters::BiasParameters()=default | File: ../Graphics/Light.h
     engine->RegisterObjectBehaviour("BiasParameters", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<BiasParameters>), AS_CALL_CDECL_OBJFIRST);
 
+    // Bone::Bone() | File: ../Graphics/Skeleton.h
+    engine->RegisterObjectBehaviour("Bone", asBEHAVE_FACTORY, "Bone@+ f()", asFUNCTION(ASCompatibleFactory<Bone>), AS_CALL_CDECL);
+
     // BoundingBox::BoundingBox() noexcept | File: ../Math/BoundingBox.h
     engine->RegisterObjectBehaviour("BoundingBox", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<BoundingBox>), AS_CALL_CDECL_OBJFIRST);
+
+    // BufferedSoundStream::BufferedSoundStream() | File: ../Audio/BufferedSoundStream.h
+    engine->RegisterObjectBehaviour("BufferedSoundStream", asBEHAVE_FACTORY, "BufferedSoundStream@+ f()", asFUNCTION(ASCompatibleFactory<BufferedSoundStream>), AS_CALL_CDECL);
 
     // CascadeParameters::CascadeParameters()=default | File: ../Graphics/Light.h
     engine->RegisterObjectBehaviour("CascadeParameters", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<CascadeParameters>), AS_CALL_CDECL_OBJFIRST);
@@ -66,6 +78,9 @@ void ASRegisterGeneratedDefaultConstructors(asIScriptEngine* engine)
     // Color::Color() noexcept | File: ../Math/Color.h
     engine->RegisterObjectBehaviour("Color", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<Color>), AS_CALL_CDECL_OBJFIRST);
 
+    // ColorFrame::ColorFrame() | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectBehaviour("ColorFrame", asBEHAVE_FACTORY, "ColorFrame@+ f()", asFUNCTION(ASCompatibleFactory<ColorFrame>), AS_CALL_CDECL);
+
     // ComponentReplicationState::ComponentReplicationState() | Implicitly-declared
     engine->RegisterObjectBehaviour("ComponentReplicationState", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<ComponentReplicationState>), AS_CALL_CDECL_OBJFIRST);
 
@@ -74,6 +89,9 @@ void ASRegisterGeneratedDefaultConstructors(asIScriptEngine* engine)
 
     // Condition::Condition() | File: ../Core/Condition.h
     engine->RegisterObjectBehaviour("Condition", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<Condition>), AS_CALL_CDECL_OBJFIRST);
+
+    // Context::Context() | File: ../Core/Context.h
+    engine->RegisterObjectBehaviour("Context", asBEHAVE_FACTORY, "Context@+ f()", asFUNCTION(ASCompatibleFactory<Context>), AS_CALL_CDECL);
 
     // Controls::Controls() | File: ../Input/Controls.h
     engine->RegisterObjectBehaviour("Controls", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<Controls>), AS_CALL_CDECL_OBJFIRST);
@@ -95,6 +113,9 @@ void ASRegisterGeneratedDefaultConstructors(asIScriptEngine* engine)
 
     // DirtyBits::DirtyBits()=default | File: ../Scene/ReplicationState.h
     engine->RegisterObjectBehaviour("DirtyBits", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<DirtyBits>), AS_CALL_CDECL_OBJFIRST);
+
+    // EventReceiverGroup::EventReceiverGroup() | File: ../Core/Context.h
+    engine->RegisterObjectBehaviour("EventReceiverGroup", asBEHAVE_FACTORY, "EventReceiverGroup@+ f()", asFUNCTION(ASCompatibleFactory<EventReceiverGroup>), AS_CALL_CDECL);
 
     // FileSelectorEntry::FileSelectorEntry() | Implicitly-declared
     engine->RegisterObjectBehaviour("FileSelectorEntry", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<FileSelectorEntry>), AS_CALL_CDECL_OBJFIRST);
@@ -228,6 +249,12 @@ void ASRegisterGeneratedDefaultConstructors(asIScriptEngine* engine)
     // RefCount::RefCount() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("RefCount", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<RefCount>), AS_CALL_CDECL_OBJFIRST);
 
+    // RefCounted::RefCounted() | File: ../Container/RefCounted.h
+    engine->RegisterObjectBehaviour("RefCounted", asBEHAVE_FACTORY, "RefCounted@+ f()", asFUNCTION(ASCompatibleFactory<RefCounted>), AS_CALL_CDECL);
+
+    // RenderPath::RenderPath() | File: ../Graphics/RenderPath.h
+    engine->RegisterObjectBehaviour("RenderPath", asBEHAVE_FACTORY, "RenderPath@+ f()", asFUNCTION(ASCompatibleFactory<RenderPath>), AS_CALL_CDECL);
+
     // RenderPathCommand::RenderPathCommand() | Implicitly-declared
     engine->RegisterObjectBehaviour("RenderPathCommand", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<RenderPathCommand>), AS_CALL_CDECL_OBJFIRST);
 
@@ -267,6 +294,9 @@ void ASRegisterGeneratedDefaultConstructors(asIScriptEngine* engine)
     // ShadowBatchQueue::ShadowBatchQueue() | Implicitly-declared
     engine->RegisterObjectBehaviour("ShadowBatchQueue", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<ShadowBatchQueue>), AS_CALL_CDECL_OBJFIRST);
 
+    // Skeleton::Skeleton() | File: ../Graphics/Skeleton.h
+    engine->RegisterObjectBehaviour("Skeleton", asBEHAVE_FACTORY, "Skeleton@+ f()", asFUNCTION(ASCompatibleFactory<Skeleton>), AS_CALL_CDECL);
+
     // SourceBatch::SourceBatch() | File: ../Graphics/Drawable.h
     engine->RegisterObjectBehaviour("SourceBatch", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<SourceBatch>), AS_CALL_CDECL_OBJFIRST);
 
@@ -290,6 +320,9 @@ void ASRegisterGeneratedDefaultConstructors(asIScriptEngine* engine)
 
     // TechniqueEntry::TechniqueEntry() noexcept | File: ../Graphics/Material.h
     engine->RegisterObjectBehaviour("TechniqueEntry", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<TechniqueEntry>), AS_CALL_CDECL_OBJFIRST);
+
+    // TextureFrame::TextureFrame() | File: ../Graphics/ParticleEffect.h
+    engine->RegisterObjectBehaviour("TextureFrame", asBEHAVE_FACTORY, "TextureFrame@+ f()", asFUNCTION(ASCompatibleFactory<TextureFrame>), AS_CALL_CDECL);
 
     // Timer::Timer() | File: ../Core/Timer.h
     engine->RegisterObjectBehaviour("Timer", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<Timer>), AS_CALL_CDECL_OBJFIRST);
@@ -397,8 +430,17 @@ void ASRegisterGeneratedDefaultConstructors(asIScriptEngine* engine)
     // PhysicsRaycastResult2D::PhysicsRaycastResult2D() | Implicitly-declared
     engine->RegisterObjectBehaviour("PhysicsRaycastResult2D", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<PhysicsRaycastResult2D>), AS_CALL_CDECL_OBJFIRST);
 
+    // PropertySet2D::PropertySet2D() | File: ../Urho2D/TileMapDefs2D.h
+    engine->RegisterObjectBehaviour("PropertySet2D", asBEHAVE_FACTORY, "PropertySet2D@+ f()", asFUNCTION(ASCompatibleFactory<PropertySet2D>), AS_CALL_CDECL);
+
     // SourceBatch2D::SourceBatch2D() | File: ../Urho2D/Drawable2D.h
     engine->RegisterObjectBehaviour("SourceBatch2D", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<SourceBatch2D>), AS_CALL_CDECL_OBJFIRST);
+
+    // Tile2D::Tile2D() | File: ../Urho2D/TileMapDefs2D.h
+    engine->RegisterObjectBehaviour("Tile2D", asBEHAVE_FACTORY, "Tile2D@+ f()", asFUNCTION(ASCompatibleFactory<Tile2D>), AS_CALL_CDECL);
+
+    // TileMapObject2D::TileMapObject2D() | File: ../Urho2D/TileMapDefs2D.h
+    engine->RegisterObjectBehaviour("TileMapObject2D", asBEHAVE_FACTORY, "TileMapObject2D@+ f()", asFUNCTION(ASCompatibleFactory<TileMapObject2D>), AS_CALL_CDECL);
 
     // Vertex2D::Vertex2D() | Implicitly-declared
     engine->RegisterObjectBehaviour("Vertex2D", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<Vertex2D>), AS_CALL_CDECL_OBJFIRST);

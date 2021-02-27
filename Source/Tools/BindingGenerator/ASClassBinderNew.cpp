@@ -140,15 +140,13 @@ static void RegisterConstructor(const MethodAnalyzer& methodAnalyzer, ProcessedC
     if (params.empty()) // Default constructor
     {
         if (classAnalyzer.IsRefCounted() || Contains(classAnalyzer.GetComment(), "FAKE_REF"))
-        {
-        }
+            result.registration_ = "engine->RegisterObjectBehaviour(\"" + asClassName + "\", asBEHAVE_FACTORY, \"" + asClassName + "@+ f()\", asFUNCTION(ASCompatibleFactory<" + cppClassName + ">), AS_CALL_CDECL);";
         else
-        {
-            result.comment_ = methodAnalyzer.GetLocation(); // Rewrite comment
             result.registration_ = "engine->RegisterObjectBehaviour(\"" + asClassName + "\", asBEHAVE_CONSTRUCT, \"void f()\", asFUNCTION(ASCompatibleConstructor<" + cppClassName + ">), AS_CALL_CDECL_OBJFIRST);";
-            processedClass.defaultConstructor_ = make_shared<MemberRegistration>(result);
-            return;
-        }
+
+        result.comment_ = methodAnalyzer.GetLocation(); // Rewrite comment
+        processedClass.defaultConstructor_ = make_shared<MemberRegistration>(result);
+        return;
     }
 }
 
@@ -252,18 +250,17 @@ static void ProcessClass(const ClassAnalyzer& classAnalyzer)
 
     if (!classAnalyzer.HasThisConstructor() && IsConstructorRequired(classAnalyzer))
     {
+        shared_ptr<MemberRegistration> result = make_shared<MemberRegistration>();
+        string cppClassName = classAnalyzer.GetClassName();
+        string asClassName = classAnalyzer.GetClassName();
+
         if (classAnalyzer.IsRefCounted() || Contains(classAnalyzer.GetComment(), "FAKE_REF"))
-        {
-        }
+            result->registration_ = "engine->RegisterObjectBehaviour(\"" + asClassName + "\", asBEHAVE_FACTORY, \"" + asClassName + "@+ f()\", asFUNCTION(ASCompatibleFactory<" + cppClassName + ">), AS_CALL_CDECL);";
         else
-        {
-            shared_ptr<MemberRegistration> result = make_shared<MemberRegistration>();
-            string cppClassName = classAnalyzer.GetClassName();
-            string asClassName = classAnalyzer.GetClassName();
-            result->comment_ = cppClassName + "::" + cppClassName + "() | Implicitly-declared";
             result->registration_ = "engine->RegisterObjectBehaviour(\"" + asClassName + "\", asBEHAVE_CONSTRUCT, \"void f()\", asFUNCTION(ASCompatibleConstructor<" + cppClassName + ">), AS_CALL_CDECL_OBJFIRST);";
-            processedClass.defaultConstructor_ = result;
-        }
+
+        result->comment_ = cppClassName + "::" + cppClassName + "() | Implicitly-declared";
+        processedClass.defaultConstructor_ = result;
     }
 
     RegisterDestructor(classAnalyzer, processedClass);

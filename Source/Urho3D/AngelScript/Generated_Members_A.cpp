@@ -216,18 +216,6 @@ static void Audio_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(Audio*
     ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
-// AnimationControl::AnimationControl() | File: ../Graphics/AnimationController.h
-static AnimationControl* AnimationControl_AnimationControl_void()
-{
-    return new AnimationControl();
-}
-
-// AnimationTrack::AnimationTrack() | File: ../Graphics/Animation.h
-static AnimationTrack* AnimationTrack_AnimationTrack_void()
-{
-    return new AnimationTrack();
-}
-
 void ASRegisterGenerated_Members_A(asIScriptEngine* engine)
 {
     // virtual unsigned Deserializer::GetChecksum() | File: ../IO/Deserializer.h
@@ -2951,8 +2939,6 @@ void ASRegisterGenerated_Members_A(asIScriptEngine* engine)
     engine->RegisterObjectProperty("AnimationControl", "float speed", offsetof(AnimationControl, speed_));
     // float AnimationControl::targetWeight_ | File: ../Graphics/AnimationController.h
     engine->RegisterObjectProperty("AnimationControl", "float targetWeight", offsetof(AnimationControl, targetWeight_));
-    // AnimationControl::AnimationControl() | File: ../Graphics/AnimationController.h
-    engine->RegisterObjectBehaviour("AnimationControl", asBEHAVE_FACTORY, "AnimationControl@+ f()", AS_FUNCTION(AnimationControl_AnimationControl_void), AS_CALL_CDECL);
     // AnimationControl& AnimationControl::operator=(const AnimationControl&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<AnimationControl>(engine, "AnimationControl");
     engine->RegisterObjectBehaviour("AnimationControl", asBEHAVE_ADDREF, "void f()", AS_FUNCTION_OBJLAST(FakeAddRef), AS_CALL_CDECL_OBJLAST);
@@ -3001,8 +2987,6 @@ void ASRegisterGenerated_Members_A(asIScriptEngine* engine)
     engine->RegisterObjectProperty("AnimationTrack", "StringHash nameHash", offsetof(AnimationTrack, nameHash_));
     // void AnimationTrack::AddKeyFrame(const AnimationKeyFrame& keyFrame) | File: ../Graphics/Animation.h
     engine->RegisterObjectMethod("AnimationTrack", "void AddKeyFrame(const AnimationKeyFrame&in)", AS_METHODPR(AnimationTrack, AddKeyFrame, (const AnimationKeyFrame&), void), AS_CALL_THISCALL);
-    // AnimationTrack::AnimationTrack() | File: ../Graphics/Animation.h
-    engine->RegisterObjectBehaviour("AnimationTrack", asBEHAVE_FACTORY, "AnimationTrack@+ f()", AS_FUNCTION(AnimationTrack_AnimationTrack_void), AS_CALL_CDECL);
     // AnimationKeyFrame* AnimationTrack::GetKeyFrame(unsigned index) | File: ../Graphics/Animation.h
     // Error: type "AnimationKeyFrame*" can not automatically bind
     // bool AnimationTrack::GetKeyFrameIndex(float time, unsigned& index) const | File: ../Graphics/Animation.h

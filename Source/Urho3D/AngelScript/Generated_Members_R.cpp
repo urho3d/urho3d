@@ -57,23 +57,11 @@ static void Rect_Rect_Rect(Rect* ptr, const Rect &rect)
     new(ptr) Rect(rect);
 }
 
-// RefCounted::RefCounted() | File: ../Container/RefCounted.h
-static RefCounted* RefCounted_RefCounted_void()
-{
-    return new RefCounted();
-}
-
 // SharedPtr<RenderPath> RenderPath::Clone() | File: ../Graphics/RenderPath.h
 static RenderPath* RenderPath_Clone_void(RenderPath* ptr)
 {
     SharedPtr<RenderPath> result = ptr->Clone();
     return result.Detach();
-}
-
-// RenderPath::RenderPath() | File: ../Graphics/RenderPath.h
-static RenderPath* RenderPath_RenderPath_void()
-{
-    return new RenderPath();
 }
 
 // explicit RenderSurface::RenderSurface(Texture* parentTexture) | File: ../Graphics/RenderSurface.h
@@ -868,8 +856,6 @@ void ASRegisterGenerated_Members_R(asIScriptEngine* engine)
 
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("RefCounted", asBEHAVE_ADDREF, "void f()", AS_METHODPR(RefCounted, AddRef, (), void), AS_CALL_THISCALL);
-    // RefCounted::RefCounted() | File: ../Container/RefCounted.h
-    engine->RegisterObjectBehaviour("RefCounted", asBEHAVE_FACTORY, "RefCounted@+ f()", AS_FUNCTION(RefCounted_RefCounted_void), AS_CALL_CDECL);
     // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
     // Error: type "RefCount*" can not automatically bind
     // int RefCounted::Refs() const | File: ../Container/RefCounted.h
@@ -936,8 +922,6 @@ void ASRegisterGenerated_Members_R(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RenderPath", "void RemoveRenderTarget(const String&in)", AS_METHODPR(RenderPath, RemoveRenderTarget, (const String&), void), AS_CALL_THISCALL);
     // void RenderPath::RemoveRenderTargets(const String& tag) | File: ../Graphics/RenderPath.h
     engine->RegisterObjectMethod("RenderPath", "void RemoveRenderTargets(const String&in)", AS_METHODPR(RenderPath, RemoveRenderTargets, (const String&), void), AS_CALL_THISCALL);
-    // RenderPath::RenderPath() | File: ../Graphics/RenderPath.h
-    engine->RegisterObjectBehaviour("RenderPath", asBEHAVE_FACTORY, "RenderPath@+ f()", AS_FUNCTION(RenderPath_RenderPath_void), AS_CALL_CDECL);
     // void RenderPath::SetCommand(unsigned index, const RenderPathCommand& command) | File: ../Graphics/RenderPath.h
     engine->RegisterObjectMethod("RenderPath", "void SetCommand(uint, const RenderPathCommand&in)", AS_METHODPR(RenderPath, SetCommand, (unsigned, const RenderPathCommand&), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod("RenderPath", "void set_commands(uint, const RenderPathCommand&in)", AS_METHODPR(RenderPath, SetCommand, (unsigned, const RenderPathCommand&), void), AS_CALL_THISCALL);
