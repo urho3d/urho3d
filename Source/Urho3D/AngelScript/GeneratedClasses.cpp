@@ -2231,6 +2231,12 @@ static void Register_StoredLogMessage(asIScriptEngine* engine)
 // class String | File: ../Container/Str.h
 static void Register_String(asIScriptEngine* engine)
 {
+    // explicit String::String(long value)
+    // Not registered because have @nobind mark
+
+    // explicit String::String(unsigned long value)
+    // Not registered because have @nobind mark
+
     // String::~String()
     engine->RegisterObjectBehaviour("String", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(String), AS_CALL_CDECL_OBJFIRST);
 

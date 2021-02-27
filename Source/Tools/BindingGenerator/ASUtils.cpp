@@ -662,12 +662,12 @@ string GenerateWrapperName(const ClassStaticFunctionAnalyzer& functionAnalyzer)
     return functionAnalyzer.GetClassName() + "_" + GenerateFunctionWrapperName(functionAnalyzer.GetMemberdef());
 }
 
-string GenerateWrapperName(const ClassFunctionAnalyzer& functionAnalyzer, bool templateVersion)
+string GenerateWrapperName(const MethodAnalyzer& methodAnalyzer, bool templateVersion)
 {
     if (templateVersion)
-        return functionAnalyzer.GetClassName() + "_" + GenerateFunctionWrapperName(functionAnalyzer.GetMemberdef()) + "_template";
+        return methodAnalyzer.GetClassName() + "_" + GenerateFunctionWrapperName(methodAnalyzer.GetMemberdef()) + "_template";
     else
-        return functionAnalyzer.GetClassName() + "_" + GenerateFunctionWrapperName(functionAnalyzer.GetMemberdef());
+        return methodAnalyzer.GetClassName() + "_" + GenerateFunctionWrapperName(methodAnalyzer.GetMemberdef());
 }
 
 // =================================================================================
@@ -743,11 +743,11 @@ string GenerateWrapper(const ClassStaticFunctionAnalyzer& functionAnalyzer, cons
     return result;
 }
 
-string GenerateWrapper(const ClassFunctionAnalyzer& functionAnalyzer, bool templateVersion, const vector<ConvertedVariable>& convertedParams, const ConvertedVariable& convertedReturn)
+string GenerateWrapper(const MethodAnalyzer& methodAnalyzer, bool templateVersion, const vector<ConvertedVariable>& convertedParams, const ConvertedVariable& convertedReturn)
 {
     string result;
 
-    string insideDefine = InsideDefine(functionAnalyzer.GetClass().GetHeaderFile());
+    string insideDefine = InsideDefine(methodAnalyzer.GetClass().GetHeaderFile());
 
     if (!insideDefine.empty())
         result += "#ifdef " + insideDefine + "\n";
@@ -755,19 +755,19 @@ string GenerateWrapper(const ClassFunctionAnalyzer& functionAnalyzer, bool templ
     string glueReturnType = convertedReturn.cppDeclaration_;
 
     result +=
-        "// " + functionAnalyzer.GetLocation() + "\n"
-        "static " + glueReturnType + " " + GenerateWrapperName(functionAnalyzer, templateVersion) + "(" + JoinCppDeclarations(functionAnalyzer.GetClassName() + "* ptr", convertedParams) + ")\n"
+        "// " + methodAnalyzer.GetLocation() + "\n"
+        "static " + glueReturnType + " " + GenerateWrapperName(methodAnalyzer, templateVersion) + "(" + JoinCppDeclarations(methodAnalyzer.GetClassName() + "* ptr", convertedParams) + ")\n"
         "{\n";
 
     for (size_t i = 0; i < convertedParams.size(); i++)
         result += convertedParams[i].glue_;
 
     if (glueReturnType != "void")
-        result += "    " + functionAnalyzer.GetReturnType().ToString() + " result = ";
+        result += "    " + methodAnalyzer.GetReturnType().ToString() + " result = ";
     else
         result += "    ";
 
-    result += "ptr->" + functionAnalyzer.GetName() + "(" + functionAnalyzer.JoinParamsNames() + ");\n";
+    result += "ptr->" + methodAnalyzer.GetName() + "(" + methodAnalyzer.JoinParamsNames() + ");\n";
 
     if (!convertedReturn.glue_.empty())
         result += "    " + convertedReturn.glue_;
@@ -803,17 +803,17 @@ string Generate_asFUNCTIONPR(const ClassStaticFunctionAnalyzer& functionAnalyzer
     return "AS_FUNCTIONPR(" + className + "::" + functionName + ", " + cppParams + ", " + returnType + ")";
 }
 
-string Generate_asMETHODPR(const ClassFunctionAnalyzer& functionAnalyzer, bool templateVersion)
+string Generate_asMETHODPR(const MethodAnalyzer& methodAnalyzer, bool templateVersion)
 {
-    string className = functionAnalyzer.GetClassName();
-    string functionName = functionAnalyzer.GetName();
+    string className = methodAnalyzer.GetClassName();
+    string functionName = methodAnalyzer.GetName();
 
-    string cppParams = "(" + JoinParamsTypes(functionAnalyzer.GetMemberdef(), functionAnalyzer.GetSpecialization()) + ")";
+    string cppParams = "(" + JoinParamsTypes(methodAnalyzer.GetMemberdef(), methodAnalyzer.GetSpecialization()) + ")";
 
-    if (functionAnalyzer.IsConst())
+    if (methodAnalyzer.IsConst())
         cppParams += " const";
 
-    string returnType = functionAnalyzer.GetReturnType().ToString();
+    string returnType = methodAnalyzer.GetReturnType().ToString();
     
     if (templateVersion)
         return "AS_METHODPR(T, " + functionName + ", " + cppParams + ", " + returnType + ")";

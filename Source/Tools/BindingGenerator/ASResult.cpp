@@ -459,6 +459,9 @@ namespace Result
             if (!processedClass.defaultConstructor_)
                 continue;
 
+            if (processedClass.defaultConstructor_->glue_.empty())
+                continue;
+
             if (processedClass.insideDefine_ != openedDefine && !openedDefine.empty())
             {
                 ofs << "\n#endif\n";
@@ -494,6 +497,9 @@ namespace Result
         for (const ProcessedClass& processedClass : classes_)
         {
             if (!processedClass.defaultConstructor_)
+                continue;
+
+            if (processedClass.noBind_)
                 continue;
 
             if (processedClass.insideDefine_ != openedDefine && !openedDefine.empty())
@@ -584,6 +590,18 @@ namespace Result
 
             bool needGap = false;
 
+            for (const RegistrationError& regError : processedClass.unregisteredSpecialMethods_)
+            {
+                if (needGap)
+                    ofs << '\n';
+
+                ofs <<
+                    "    // " << regError.comment_ << "\n"
+                    "    // " << regError.message_ << "\n";
+
+                needGap = true;
+            }
+
             /*
             for (string nonDefaultConstructor : processedClass.nonDefaultConstructors_)
                 ofs << "    // " << nonDefaultConstructor << "\n";
@@ -591,6 +609,9 @@ namespace Result
 
             if (processedClass.destructor_)
             {
+                if (needGap)
+                    ofs << '\n';
+
                 ofs <<
                     "    // " << processedClass.destructor_->comment_ << "\n"
                     "    " << processedClass.destructor_->registration_ << "\n";

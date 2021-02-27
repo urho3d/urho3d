@@ -26,13 +26,15 @@
 #include "../AngelScript/aswrappedcall.h"
 #endif
 
+#include "../AngelScript/Generated_Templates_New.h"
+
 namespace Urho3D
 {
 
 // f - function
 // c - class
 // m - method
-// p - parameters
+// p - parameters (in parentheses)
 // r - return type
 // PR - parameters, return type
 

@@ -112,12 +112,18 @@ struct ProcessedGlobalVariable
     bool operator <(const ProcessedGlobalVariable& rhs) const;
 };
 
-struct ClassMemberRegistration
+struct MemberRegistration
 {
     string name_; // Used for sorting
-    string comment_; // Cpp declaration or location
+    string comment_; // C++ declaration / location
     string glue_; // Can be empty
     string registration_; // Or warning message
+};
+
+struct RegistrationError
+{
+    string comment_; // C++ declaration / location
+    string message_;
 };
 
 struct ProcessedClass
@@ -130,15 +136,20 @@ struct ProcessedClass
     // Used for sorting
     bool operator <(const ProcessedClass& rhs) const;
 
-    shared_ptr<ClassMemberRegistration> defaultConstructor_;
-    shared_ptr<ClassMemberRegistration> destructor_;
+    shared_ptr<MemberRegistration> defaultConstructor_;
+    vector<MemberRegistration> nonDefaultConstructors_;
+
+
+
+    shared_ptr<MemberRegistration> destructor_;
+
+    vector<RegistrationError> unregisteredSpecialMethods_;
 
     bool noBind_ = false;
 
     vector<string> baseClassNames_;
 
     // Tests
-    vector<string> nonDefaultConstructors_;
     vector<string> commonMembers_;
     vector<string> personalMembers_;
 };

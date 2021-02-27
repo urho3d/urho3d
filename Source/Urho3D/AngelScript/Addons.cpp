@@ -33,6 +33,17 @@
 namespace Urho3D
 {
 
+bool operator ==(const asSFuncPtr& a, const asSFuncPtr& b)
+{
+    for (int i = 0; i < sizeof(a.ptr.dummy); i++)
+    {
+        if (a.ptr.dummy[i] != b.ptr.dummy[i])
+            return false;
+    }
+
+    return true;
+}
+
 using namespace std;
 
 // Set the default memory routines

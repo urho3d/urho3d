@@ -255,17 +255,17 @@ static void RegisterStaticFunction(const ClassStaticFunctionAnalyzer& functionAn
     result->reg_ << "    engine->SetDefaultNamespace(\"\");\n";
 }
 
-static void RegisterRefCountedConstructor(const ClassFunctionAnalyzer& functionAnalyzer, bool templateVersion)
+static void RegisterRefCountedConstructor(const MethodAnalyzer& methodAnalyzer, bool templateVersion)
 {
-    string className = functionAnalyzer.GetClassName();
-    string wrapperName = GenerateWrapperName(functionAnalyzer, templateVersion);
-    string header = functionAnalyzer.GetClass().GetHeaderFile();
+    string className = methodAnalyzer.GetClassName();
+    string wrapperName = GenerateWrapperName(methodAnalyzer, templateVersion);
+    string header = methodAnalyzer.GetClass().GetHeaderFile();
     string insideDefine = InsideDefine(header);
 
-    string args = ExtractCleanedFunctionArgsstring(functionAnalyzer.GetMemberdef());
+    string args = ExtractCleanedFunctionArgsstring(methodAnalyzer.GetMemberdef());
 
     //shared_ptr<ASGeneratedFile_Members> result = GetGeneratedFile(functionAnalyzer.GetClass().GetClassName());
-    ASGeneratedFile_Base* result = templateVersion ? (ASGeneratedFile_Base*)_result_Templates.get() : (ASGeneratedFile_Base*)GetGeneratedFile(functionAnalyzer.GetClass().GetClassName()).get();
+    ASGeneratedFile_Base* result = templateVersion ? (ASGeneratedFile_Base*)_result_Templates.get() : (ASGeneratedFile_Base*)GetGeneratedFile(methodAnalyzer.GetClass().GetClassName()).get();
 
     bool firstContext = StartsWith(args, "Context *context");
     if (firstContext)
@@ -276,12 +276,12 @@ static void RegisterRefCountedConstructor(const ClassFunctionAnalyzer& functionA
     else if (Contains(args, "Context"))
     {
         result->reg_ <<
-            "    // " << functionAnalyzer.GetLocation() << "\n"
+            "    // " << methodAnalyzer.GetLocation() << "\n"
             "    // Error: context can be only first\n";
         return;
     }
 
-    string cppParamsNames = functionAnalyzer.JoinParamsNames(firstContext);
+    string cppParamsNames = methodAnalyzer.JoinParamsNames(firstContext);
 
     if (firstContext)
     {
@@ -291,7 +291,7 @@ static void RegisterRefCountedConstructor(const ClassFunctionAnalyzer& functionA
     }
 
     string decl = "";
-    vector<ParamAnalyzer> params = functionAnalyzer.GetParams();
+    vector<ParamAnalyzer> params = methodAnalyzer.GetParams();
     for (unsigned i = 0; i < params.size(); i++)
     {
         ParamAnalyzer param = params[i];
@@ -312,7 +312,7 @@ static void RegisterRefCountedConstructor(const ClassFunctionAnalyzer& functionA
         catch (const Exception& e)
         {
             result->reg_ <<
-                "    // " << functionAnalyzer.GetLocation() << "\n"
+                "    // " << methodAnalyzer.GetLocation() << "\n"
                 "    // " << e.what() << "\n";
             return;
         }
@@ -331,7 +331,7 @@ static void RegisterRefCountedConstructor(const ClassFunctionAnalyzer& functionA
     if (templateVersion)
     {
         result->reg_ <<
-            "    // " << functionAnalyzer.GetLocation() << "\n"
+            "    // " << methodAnalyzer.GetLocation() << "\n"
             "    {\n"
             "        String declFactory(String(className) + \"@ f()\");\n"
             "        engine->RegisterObjectBehaviour(className, "
@@ -344,7 +344,7 @@ static void RegisterRefCountedConstructor(const ClassFunctionAnalyzer& functionA
     else
     {
         result->reg_ <<
-            "    // " << functionAnalyzer.GetLocation() << "\n"
+            "    // " << methodAnalyzer.GetLocation() << "\n"
             "    engine->RegisterObjectBehaviour("
             "\"" << className << "\", "
             "asBEHAVE_FACTORY, "
@@ -357,7 +357,7 @@ static void RegisterRefCountedConstructor(const ClassFunctionAnalyzer& functionA
         result->glue_ << "#ifdef " << insideDefine << "\n";
 
     result->glue_ <<
-        "// " << functionAnalyzer.GetLocation() << "\n"
+        "// " << methodAnalyzer.GetLocation() << "\n"
         "static " << className << "* " << wrapperName << "(" << args << ")\n"
         "{\n"
         "    return new " << className << "(" << cppParamsNames << ");\n"
@@ -369,14 +369,14 @@ static void RegisterRefCountedConstructor(const ClassFunctionAnalyzer& functionA
     result->glue_ << "\n";
 }
 
-static void RegisterValueConstructor(const ClassFunctionAnalyzer& functionAnalyzer, bool templateVersion)
+static void RegisterValueConstructor(const MethodAnalyzer& methodAnalyzer, bool templateVersion)
 {
-    string header = functionAnalyzer.GetClass().GetHeaderFile();
+    string header = methodAnalyzer.GetClass().GetHeaderFile();
     string insideDefine = InsideDefine(header);
-    string className = functionAnalyzer.GetClassName();
-    string wrapperName = GenerateWrapperName(functionAnalyzer, templateVersion);
+    string className = methodAnalyzer.GetClassName();
+    string wrapperName = GenerateWrapperName(methodAnalyzer, templateVersion);
     
-    string args = ExtractCleanedFunctionArgsstring(functionAnalyzer.GetMemberdef());
+    string args = ExtractCleanedFunctionArgsstring(methodAnalyzer.GetMemberdef());
 
     shared_ptr<ASGeneratedFile_Members> result = GetGeneratedFile(className);
 
@@ -389,7 +389,7 @@ static void RegisterValueConstructor(const ClassFunctionAnalyzer& functionAnalyz
     stringstream& glue = result->glue_;
 
     string decl = "";
-    vector<ParamAnalyzer> params = functionAnalyzer.GetParams();
+    vector<ParamAnalyzer> params = methodAnalyzer.GetParams();
     for (ParamAnalyzer param : params)
     {
         if (decl.length() > 0)
@@ -405,7 +405,7 @@ static void RegisterValueConstructor(const ClassFunctionAnalyzer& functionAnalyz
                 reg << "#ifdef " << insideDefine << "\n";
 
             reg <<
-                "    // " << functionAnalyzer.GetLocation() << "\n"
+                "    // " << methodAnalyzer.GetLocation() << "\n"
                 "    // " << e.what() << "\n";
 
             if (isDefaultConstructor && !insideDefine.empty())
@@ -428,7 +428,7 @@ static void RegisterValueConstructor(const ClassFunctionAnalyzer& functionAnalyz
         reg << "#ifdef " << insideDefine << "\n";
 
     reg <<
-        "    // " << functionAnalyzer.GetLocation() << "\n"
+        "    // " << methodAnalyzer.GetLocation() << "\n"
         "    engine->RegisterObjectBehaviour("
         "\"" << className << "\", "
         "asBEHAVE_CONSTRUCT, "
@@ -443,7 +443,7 @@ static void RegisterValueConstructor(const ClassFunctionAnalyzer& functionAnalyz
         glue << "#ifdef " << insideDefine << "\n";
 
     glue <<
-        "// " << functionAnalyzer.GetLocation() << "\n"
+        "// " << methodAnalyzer.GetLocation() << "\n"
         "static void " << wrapperName << "(" << className << "* ptr";
 
     if (args.length() > 0)
@@ -451,7 +451,7 @@ static void RegisterValueConstructor(const ClassFunctionAnalyzer& functionAnalyz
 
     glue << ")\n"
         "{\n"
-        "    new(ptr) " << className << "(" << functionAnalyzer.JoinParamsNames() << ");\n"
+        "    new(ptr) " << className << "(" << methodAnalyzer.JoinParamsNames() << ");\n"
         "}\n";
 
     if (isDefaultConstructor && !insideDefine.empty())
@@ -476,7 +476,7 @@ static void TryRegisterImplicitlyDeclaredAssignOperator(const ClassAnalyzer& cla
 // Some required methods can not be bound automatically when processing class because implicitly-declared
 static void RegisterImplicitlyDeclaredMethods(const ClassAnalyzer& classAnalyzer)
 {
-    if (!classAnalyzer.ContainsFunction("operator="))
+    if (!classAnalyzer.ContainsMethod("operator="))
         TryRegisterImplicitlyDeclaredAssignOperator(classAnalyzer);
 
     // No need register impicitly declared copy constructor when registered opAssign operator
@@ -486,8 +486,8 @@ static void RegisterComparisonOperator(const ClassAnalyzer& classAnalyzer)
 {
     string className = classAnalyzer.GetClassName();
     string wrapperName = className + "_Comparison";
-    string operatorLessLocation = classAnalyzer.GetFunction("operator<")->GetLocation();
-    string operatorGreaterLocation = classAnalyzer.GetFunction("operator>")->GetLocation();
+    string operatorLessLocation = classAnalyzer.GetMethod("operator<")->GetLocation();
+    string operatorGreaterLocation = classAnalyzer.GetMethod("operator>")->GetLocation();
     shared_ptr<ASGeneratedFile_Members> result = GetGeneratedFile(className);
 
     result->glue_ <<
@@ -508,16 +508,16 @@ static void RegisterComparisonOperator(const ClassAnalyzer& classAnalyzer)
         "    engine->RegisterObjectMethod(\"" << className << "\", \"int opCmp(const " << className << "&in) const\", AS_FUNCTION_OBJFIRST(" << wrapperName << "), AS_CALL_CDECL_OBJFIRST);\n";
 }
 
-static void RegisterAddReleaseRef(const ClassFunctionAnalyzer& functionAnalyzer, bool templateVersion)
+static void RegisterAddReleaseRef(const MethodAnalyzer& methodAnalyzer, bool templateVersion)
 {
-    string className = functionAnalyzer.GetClassName();
+    string className = methodAnalyzer.GetClassName();
     //shared_ptr<ASGeneratedFile_Members> result = GetGeneratedFile(className);
-    ASGeneratedFile_Base* result = templateVersion ? (ASGeneratedFile_Base*)_result_Templates.get() : (ASGeneratedFile_Base*)GetGeneratedFile(functionAnalyzer.GetClass().GetClassName()).get();
-    string functionName = functionAnalyzer.GetName();
+    ASGeneratedFile_Base* result = templateVersion ? (ASGeneratedFile_Base*)_result_Templates.get() : (ASGeneratedFile_Base*)GetGeneratedFile(methodAnalyzer.GetClass().GetClassName()).get();
+    string functionName = methodAnalyzer.GetName();
     string behaviour = (functionName == "AddRef") ? "asBEHAVE_ADDREF" : "asBEHAVE_RELEASE";
-    string methodpr = Generate_asMETHODPR(functionAnalyzer, templateVersion);
+    string methodpr = Generate_asMETHODPR(methodAnalyzer, templateVersion);
 
-    result->reg_ << "    // " << functionAnalyzer.GetLocation() << "\n";
+    result->reg_ << "    // " << methodAnalyzer.GetLocation() << "\n";
 
     if (templateVersion)
         result->reg_ << "    engine->RegisterObjectBehaviour(className, " << behaviour << ", \"void f()\", "  << methodpr << ", AS_CALL_THISCALL);\n";
@@ -536,9 +536,9 @@ static void RegisterFakeAddReleaseRef(const ClassAnalyzer& classAnalyzer)
 }
 
 // https://www.angelcode.com/angelscript/sdk/docs/manual/doc_script_class_ops.html
-static string CppMethodNameToAS(const ClassFunctionAnalyzer& functionAnalyzer)
+static string CppMethodNameToAS(const MethodAnalyzer& methodAnalyzer)
 {
-    string name = functionAnalyzer.GetName();
+    string name = methodAnalyzer.GetName();
 
     if (name == "operator=")
         return "opAssign";
@@ -548,7 +548,7 @@ static string CppMethodNameToAS(const ClassFunctionAnalyzer& functionAnalyzer)
 
     if (name == "operator-")
     {
-        if (!functionAnalyzer.GetParams().size()) // If no params
+        if (!methodAnalyzer.GetParams().size()) // If no params
             return "opNeg";               // then unary minus
         else
             return "opSub";
@@ -581,7 +581,7 @@ static string CppMethodNameToAS(const ClassFunctionAnalyzer& functionAnalyzer)
     // Conversion to another type operator
     if (StartsWith(name, "operator "))
     {
-        if (functionAnalyzer.IsExplicit())
+        if (methodAnalyzer.IsExplicit())
             return "opConv";
         else
             return "opImplConv";
@@ -600,12 +600,12 @@ static string CppMethodNameToAS(const ClassFunctionAnalyzer& functionAnalyzer)
 }
 
 // Iterate over overrided funcions
-static bool HaveMark(const ClassFunctionAnalyzer& functionAnalyzer, const string& mark)
+static bool HaveMark(const MethodAnalyzer& methodAnalyzer, const string& mark)
 {
-    if (Contains(functionAnalyzer.GetComment(), mark))
+    if (Contains(methodAnalyzer.GetComment(), mark))
         return true;
 
-    shared_ptr<ClassFunctionAnalyzer> reimplements = functionAnalyzer.Reimplements();
+    shared_ptr<MethodAnalyzer> reimplements = methodAnalyzer.Reimplements();
 
     if (!reimplements)
         return false;
@@ -615,9 +615,9 @@ static bool HaveMark(const ClassFunctionAnalyzer& functionAnalyzer, const string
 
 // Can return BIND_AS_ALIAS_xxxx or BIND_AS_PROPERTY
 // Return "" if no this marks
-static string GetPropertyMark(ClassFunctionAnalyzer function)
+static string GetPropertyMark(const MethodAnalyzer& methodAnalyzer)
 {
-    string comment = function.GetComment();
+    string comment = methodAnalyzer.GetComment();
 
     smatch match;
     regex_match(comment, match, regex(".*\\b(BIND_AS_ALIAS_.+?)\\b.*"));
@@ -628,7 +628,7 @@ static string GetPropertyMark(ClassFunctionAnalyzer function)
     if (match.size() == 1)
         return "BIND_AS_PROPERTY";
 
-    shared_ptr<ClassFunctionAnalyzer> reimplements = function.Reimplements();
+    shared_ptr<MethodAnalyzer> reimplements = methodAnalyzer.Reimplements();
 
     if (!reimplements)
         return "";
@@ -637,9 +637,9 @@ static string GetPropertyMark(ClassFunctionAnalyzer function)
 }
 
 // https://www.angelcode.com/angelscript/sdk/docs/manual/doc_reg_objprop.html
-static string CppMethodNameToASProperty(const ClassFunctionAnalyzer& functionAnalyzer)
+static string CppMethodNameToASProperty(const MethodAnalyzer& methodAnalyzer)
 {
-    string name = functionAnalyzer.GetName();
+    string name = methodAnalyzer.GetName();
 
     if (StartsWith(name, "Is") || StartsWith(name, "Get"))
     {
@@ -656,14 +656,14 @@ static string CppMethodNameToASProperty(const ClassFunctionAnalyzer& functionAna
         return result;
     }
 
-    if (functionAnalyzer.CanBeGetProperty())
+    if (methodAnalyzer.CanBeGetProperty())
     {
         string result = name;
         result = "get_" + FirstCharToLower(result);
         return result;
     }
 
-    if (functionAnalyzer.CanBeSetProperty())
+    if (methodAnalyzer.CanBeSetProperty())
     {
         string result = name;
         result = "set_" + FirstCharToLower(result);
@@ -673,65 +673,65 @@ static string CppMethodNameToASProperty(const ClassFunctionAnalyzer& functionAna
     throw Exception("Can not be property");
 }
 
-static void RegisterMethod(const ClassFunctionAnalyzer& functionAnalyzer, bool templateVersion)
+static void RegisterMethod(const MethodAnalyzer& methodAnalyzer, bool templateVersion)
 {
-    if (functionAnalyzer.IsDefine()) // URHO3D_OBJECT
+    if (methodAnalyzer.IsDefine()) // URHO3D_OBJECT
         return; 
     
-    if (!functionAnalyzer.IsPublic())
+    if (!methodAnalyzer.IsPublic())
         return;
 
-    if (functionAnalyzer.IsParentDestructor())
+    if (methodAnalyzer.IsParentDestructor())
         return;
 
-    if (functionAnalyzer.IsParentConstructor())
+    if (methodAnalyzer.IsParentConstructor())
         return;
 
     //shared_ptr<ASGeneratedFile_Members> result = GetGeneratedFile(functionAnalyzer.GetClass().GetClassName());
-    ASGeneratedFile_Base* result = templateVersion ? (ASGeneratedFile_Base*)_result_Templates.get() : (ASGeneratedFile_Base*)GetGeneratedFile(functionAnalyzer.GetClass().GetClassName()).get();
+    ASGeneratedFile_Base* result = templateVersion ? (ASGeneratedFile_Base*)_result_Templates.get() : (ASGeneratedFile_Base*)GetGeneratedFile(methodAnalyzer.GetClass().GetClassName()).get();
 
-    if (HaveMark(functionAnalyzer, "NO_BIND"))
+    if (HaveMark(methodAnalyzer, "NO_BIND"))
     {
-        result->reg_ << "    // " << functionAnalyzer.GetLocation() << "\n";
+        result->reg_ << "    // " << methodAnalyzer.GetLocation() << "\n";
         result->reg_ << "    // Not registered because have @nobind mark\n";
         return;
     }
 
-    if (HaveMark(functionAnalyzer, "MANUAL_BIND"))
+    if (HaveMark(methodAnalyzer, "MANUAL_BIND"))
     {
-        result->reg_ << "    // " << functionAnalyzer.GetLocation() << "\n";
+        result->reg_ << "    // " << methodAnalyzer.GetLocation() << "\n";
         result->reg_ << "    // Not registered because have @manualbind mark\n";
         return;
     }
 
-    if (functionAnalyzer.IsTemplate())
+    if (methodAnalyzer.IsTemplate())
     {
-        result->reg_ << "    // " << functionAnalyzer.GetLocation() << "\n";
+        result->reg_ << "    // " << methodAnalyzer.GetLocation() << "\n";
         result->reg_ << "    // Not registered because template\n";
         return;
     }
 
-    if (functionAnalyzer.IsStatic())
+    if (methodAnalyzer.IsStatic())
     {
-        ClassStaticFunctionAnalyzer classStaticFunctionAnalyzer(functionAnalyzer.GetClass(), functionAnalyzer.GetMemberdef());
+        ClassStaticFunctionAnalyzer classStaticFunctionAnalyzer(methodAnalyzer.GetClass(), methodAnalyzer.GetMemberdef());
         RegisterStaticFunction(classStaticFunctionAnalyzer, result);
         return;
     }
 
-    if (functionAnalyzer.IsDeleted())
+    if (methodAnalyzer.IsDeleted())
         return;
 
     /*if (function.IsPureVirtual()) // Register pure virtual function but not register constructor for this class
         return;*/
 
     // Do not register destructor for refcounted because object is deleted by himself
-    if (functionAnalyzer.IsThisDestructor()
-        && (functionAnalyzer.GetClass().IsRefCounted() || Contains(functionAnalyzer.GetClass().GetComment(), "FAKE_REF")))
+    if (methodAnalyzer.IsThisDestructor()
+        && (methodAnalyzer.GetClass().IsRefCounted() || Contains(methodAnalyzer.GetClass().GetComment(), "FAKE_REF")))
     {
         return;
     }
 
-    string functionName = functionAnalyzer.GetName();
+    string functionName = methodAnalyzer.GetName();
 
     if (functionName == "operator!=")
         return;
@@ -742,34 +742,34 @@ static void RegisterMethod(const ClassFunctionAnalyzer& functionAnalyzer, bool t
 
     if (functionName == "AddRef" || functionName == "ReleaseRef")
     {
-        RegisterAddReleaseRef(functionAnalyzer, templateVersion);
+        RegisterAddReleaseRef(methodAnalyzer, templateVersion);
         return;
     }
 
-    if (functionAnalyzer.IsThisConstructor())
+    if (methodAnalyzer.IsThisConstructor())
     {
-        if (functionAnalyzer.GetClass().IsRefCounted() || Contains(functionAnalyzer.GetClass().GetComment(), "FAKE_REF"))
+        if (methodAnalyzer.GetClass().IsRefCounted() || Contains(methodAnalyzer.GetClass().GetComment(), "FAKE_REF"))
         {
             // Do not register construnctor for abstract class
-            if (functionAnalyzer.GetClass().IsAbstract())
+            if (methodAnalyzer.GetClass().IsAbstract())
                 return;
 
-            RegisterRefCountedConstructor(functionAnalyzer, templateVersion);
+            RegisterRefCountedConstructor(methodAnalyzer, templateVersion);
         }
         else
         {
-            RegisterValueConstructor(functionAnalyzer, templateVersion);
+            RegisterValueConstructor(methodAnalyzer, templateVersion);
         }
         
         return;
     }
 
-    if (functionAnalyzer.IsThisDestructor())
+    if (methodAnalyzer.IsThisDestructor())
         return;
 
-    result->reg_ << "    // " << functionAnalyzer.GetLocation() << "\n";
+    result->reg_ << "    // " << methodAnalyzer.GetLocation() << "\n";
 
-    vector<ParamAnalyzer> params = functionAnalyzer.GetParams();
+    vector<ParamAnalyzer> params = methodAnalyzer.GetParams();
     vector<ConvertedVariable> convertedParams;
     bool needWrapper = false;
 
@@ -797,7 +797,7 @@ static void RegisterMethod(const ClassFunctionAnalyzer& functionAnalyzer, bool t
     
     try
     {
-        retConv = CppVariableToAS(functionAnalyzer.GetReturnType(), VariableUsage::FunctionReturn);
+        retConv = CppVariableToAS(methodAnalyzer.GetReturnType(), VariableUsage::FunctionReturn);
     }
     catch (const Exception& e)
     {
@@ -810,13 +810,13 @@ static void RegisterMethod(const ClassFunctionAnalyzer& functionAnalyzer, bool t
 
     string asReturnType = retConv.asDeclaration_;
 
-    string asFunctionName = functionAnalyzer.GetName();
-    if (functionAnalyzer.IsConsversionOperator())
+    string asFunctionName = methodAnalyzer.GetName();
+    if (methodAnalyzer.IsConsversionOperator())
         asReturnType = CutStart(asFunctionName, "operator ");
     
     try
     {
-        asFunctionName = CppMethodNameToAS(functionAnalyzer);
+        asFunctionName = CppMethodNameToAS(methodAnalyzer);
     }
     catch (const Exception& e)
     {
@@ -825,25 +825,25 @@ static void RegisterMethod(const ClassFunctionAnalyzer& functionAnalyzer, bool t
     }
 
     if (needWrapper)
-        result->glue_ << GenerateWrapper(functionAnalyzer, templateVersion, convertedParams, retConv);
+        result->glue_ << GenerateWrapper(methodAnalyzer, templateVersion, convertedParams, retConv);
 
     string decl = asReturnType + " " + asFunctionName + "(" + JoinASDeclarations(convertedParams) + ")";
 
-    if (functionAnalyzer.IsConst())
+    if (methodAnalyzer.IsConst())
         decl += " const";
 
     if (templateVersion)
         result->reg_ << "    engine->RegisterObjectMethod(className, \"" << decl << "\", ";
     else
-        result->reg_ << "    engine->RegisterObjectMethod(\"" << functionAnalyzer.GetClassName() << "\", \"" << decl << "\", ";
+        result->reg_ << "    engine->RegisterObjectMethod(\"" << methodAnalyzer.GetClassName() << "\", \"" << decl << "\", ";
 
     if (needWrapper)
-        result->reg_ << "AS_FUNCTION_OBJFIRST(" << GenerateWrapperName(functionAnalyzer, templateVersion) << "), AS_CALL_CDECL_OBJFIRST);\n";
+        result->reg_ << "AS_FUNCTION_OBJFIRST(" << GenerateWrapperName(methodAnalyzer, templateVersion) << "), AS_CALL_CDECL_OBJFIRST);\n";
     else
-        result->reg_ << Generate_asMETHODPR(functionAnalyzer, templateVersion) << ", AS_CALL_THISCALL);\n";
+        result->reg_ << Generate_asMETHODPR(methodAnalyzer, templateVersion) << ", AS_CALL_THISCALL);\n";
 
     // Also register as property if needed
-    string propertyMark = GetPropertyMark(functionAnalyzer);
+    string propertyMark = GetPropertyMark(methodAnalyzer);
     if (!propertyMark.empty())
     {
         if (StartsWith(propertyMark, "BIND_AS_ALIAS_"))
@@ -854,7 +854,7 @@ static void RegisterMethod(const ClassFunctionAnalyzer& functionAnalyzer, bool t
         {
             try
             {
-                asFunctionName = CppMethodNameToASProperty(functionAnalyzer);
+                asFunctionName = CppMethodNameToASProperty(methodAnalyzer);
             }
             catch (const Exception& e)
             {
@@ -865,18 +865,18 @@ static void RegisterMethod(const ClassFunctionAnalyzer& functionAnalyzer, bool t
         
         decl = asReturnType + " " + asFunctionName + "(" + JoinASDeclarations(convertedParams) + ")";
 
-        if (functionAnalyzer.IsConst())
+        if (methodAnalyzer.IsConst())
             decl += " const";
 
         if (templateVersion)
             result->reg_ << "    engine->RegisterObjectMethod(className, \"" << decl << "\", ";
         else
-            result->reg_ << "    engine->RegisterObjectMethod(\"" << functionAnalyzer.GetClassName() << "\", \"" << decl << "\", ";
+            result->reg_ << "    engine->RegisterObjectMethod(\"" << methodAnalyzer.GetClassName() << "\", \"" << decl << "\", ";
 
         if (needWrapper)
-            result->reg_ << "AS_FUNCTION_OBJFIRST(" << GenerateWrapperName(functionAnalyzer, templateVersion) << "), AS_CALL_CDECL_OBJFIRST);\n";
+            result->reg_ << "AS_FUNCTION_OBJFIRST(" << GenerateWrapperName(methodAnalyzer, templateVersion) << "), AS_CALL_CDECL_OBJFIRST);\n";
         else
-            result->reg_ << Generate_asMETHODPR(functionAnalyzer, templateVersion) << ", AS_CALL_THISCALL);\n";
+            result->reg_ << Generate_asMETHODPR(methodAnalyzer, templateVersion) << ", AS_CALL_THISCALL);\n";
     }
 }
 
@@ -993,14 +993,14 @@ static void RegisterObjectMembers(const ClassAnalyzer& classAnalyzer, bool templ
     for (ClassVariableAnalyzer variable : variables)
         RegisterClassVarAsProperty(variable);
 
-    vector<ClassFunctionAnalyzer> functions = classAnalyzer.GetFunctions();
-    for (ClassFunctionAnalyzer function : functions)
-        RegisterMethod(function, templateVersion);
+    vector<MethodAnalyzer> methods = classAnalyzer.GetAllMethods();
+    for (const MethodAnalyzer& method : methods)
+        RegisterMethod(method, templateVersion);
 
     RegisterImplicitlyDeclaredMethods(classAnalyzer);
 
     // 2 operators is replaced by single function opCmp
-    if (classAnalyzer.ContainsFunction("operator>") || classAnalyzer.ContainsFunction("operator>"))
+    if (classAnalyzer.ContainsMethod("operator>") || classAnalyzer.ContainsMethod("operator>"))
         RegisterComparisonOperator(classAnalyzer);
 
     if (Contains(classAnalyzer.GetComment(), "FAKE_REF"))
