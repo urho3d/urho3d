@@ -270,12 +270,6 @@ static ShaderVariation* ShaderVariation_ShaderVariation_Shader_ShaderType(Shader
     return new ShaderVariation(owner, type);
 }
 
-// Skeleton::Skeleton() | File: ../Graphics/Skeleton.h
-static Skeleton* Skeleton_Skeleton_void()
-{
-    return new Skeleton();
-}
-
 // const PODVector<Light*>& Drawable::GetLights() const | File: ../Graphics/Drawable.h
 static CScriptArray* Skybox_GetLights_void(Skybox* ptr)
 {
@@ -3621,8 +3615,6 @@ void ASRegisterGenerated_Members_Sa_Sm(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Skeleton", "bool Save(Serializer&) const", AS_METHODPR(Skeleton, Save, (Serializer&) const, bool), AS_CALL_THISCALL);
     // void Skeleton::SetRootBoneIndex(unsigned index) | File: ../Graphics/Skeleton.h
     engine->RegisterObjectMethod("Skeleton", "void SetRootBoneIndex(uint)", AS_METHODPR(Skeleton, SetRootBoneIndex, (unsigned), void), AS_CALL_THISCALL);
-    // Skeleton::Skeleton() | File: ../Graphics/Skeleton.h
-    engine->RegisterObjectBehaviour("Skeleton", asBEHAVE_FACTORY, "Skeleton@+ f()", AS_FUNCTION(Skeleton_Skeleton_void), AS_CALL_CDECL);
     // Skeleton& Skeleton::operator=(const Skeleton&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<Skeleton>(engine, "Skeleton");
     engine->RegisterObjectBehaviour("Skeleton", asBEHAVE_ADDREF, "void f()", AS_FUNCTION_OBJLAST(FakeAddRef), AS_CALL_CDECL_OBJLAST);

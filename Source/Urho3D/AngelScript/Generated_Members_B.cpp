@@ -136,12 +136,6 @@ static void BoundingBox_BoundingBox_Sphere(BoundingBox* ptr, const Sphere &spher
     new(ptr) BoundingBox(sphere);
 }
 
-// BufferedSoundStream::BufferedSoundStream() | File: ../Audio/BufferedSoundStream.h
-static BufferedSoundStream* BufferedSoundStream_BufferedSoundStream_void()
-{
-    return new BufferedSoundStream();
-}
-
 // void UIElement::AddTags(const StringVector& tags) | File: ../UI/UIElement.h
 static void Button_AddTags_StringVector(Button* ptr, CScriptArray* tags_conv)
 {
@@ -219,12 +213,6 @@ static void BatchGroupKey_BatchGroupKey_Batch(BatchGroupKey* ptr, const Batch &b
 static void BiasParameters_BiasParameters_float_float_float(BiasParameters* ptr, float constantBias, float slopeScaledBias, float normalOffset=0.0f)
 {
     new(ptr) BiasParameters(constantBias, slopeScaledBias, normalOffset);
-}
-
-// Bone::Bone() | File: ../Graphics/Skeleton.h
-static Bone* Bone_Bone_void()
-{
-    return new Bone();
 }
 
 void ASRegisterGenerated_Members_B(asIScriptEngine* engine)
@@ -1671,8 +1659,6 @@ void ASRegisterGenerated_Members_B(asIScriptEngine* engine)
     // Error: type "const SharedArrayPtr<signed short>&" can not automatically bind
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("BufferedSoundStream", asBEHAVE_ADDREF, "void f()", AS_METHODPR(BufferedSoundStream, AddRef, (), void), AS_CALL_THISCALL);
-    // BufferedSoundStream::BufferedSoundStream() | File: ../Audio/BufferedSoundStream.h
-    engine->RegisterObjectBehaviour("BufferedSoundStream", asBEHAVE_FACTORY, "BufferedSoundStream@+ f()", AS_FUNCTION(BufferedSoundStream_BufferedSoundStream_void), AS_CALL_CDECL);
     // void BufferedSoundStream::Clear() | File: ../Audio/BufferedSoundStream.h
     engine->RegisterObjectMethod("BufferedSoundStream", "void Clear()", AS_METHODPR(BufferedSoundStream, Clear, (), void), AS_CALL_THISCALL);
     // float BufferedSoundStream::GetBufferLength() const | File: ../Audio/BufferedSoundStream.h
@@ -2845,8 +2831,6 @@ void ASRegisterGenerated_Members_B(asIScriptEngine* engine)
     engine->RegisterObjectProperty("Bone", "uint parentIndex", offsetof(Bone, parentIndex_));
     // float Bone::radius_ | File: ../Graphics/Skeleton.h
     engine->RegisterObjectProperty("Bone", "float radius", offsetof(Bone, radius_));
-    // Bone::Bone() | File: ../Graphics/Skeleton.h
-    engine->RegisterObjectBehaviour("Bone", asBEHAVE_FACTORY, "Bone@+ f()", AS_FUNCTION(Bone_Bone_void), AS_CALL_CDECL);
     // Bone& Bone::operator=(const Bone&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<Bone>(engine, "Bone");
     engine->RegisterObjectBehaviour("Bone", asBEHAVE_ADDREF, "void f()", AS_FUNCTION_OBJLAST(FakeAddRef), AS_CALL_CDECL_OBJLAST);

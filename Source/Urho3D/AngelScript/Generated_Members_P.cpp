@@ -331,14 +331,6 @@ static void ProgressBar_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(
     ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
-#ifdef URHO3D_URHO2D
-// PropertySet2D::PropertySet2D() | File: ../Urho2D/TileMapDefs2D.h
-static PropertySet2D* PropertySet2D_PropertySet2D_void()
-{
-    return new PropertySet2D();
-}
-#endif
-
 void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
 {
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
@@ -4231,8 +4223,6 @@ void ASRegisterGenerated_Members_P(asIScriptEngine* engine)
     engine->RegisterObjectMethod("PropertySet2D", "bool HasProperty(const String&in) const", AS_METHODPR(PropertySet2D, HasProperty, (const String&) const, bool), AS_CALL_THISCALL);
     // void PropertySet2D::Load(const XMLElement& element) | File: ../Urho2D/TileMapDefs2D.h
     engine->RegisterObjectMethod("PropertySet2D", "void Load(const XMLElement&in)", AS_METHODPR(PropertySet2D, Load, (const XMLElement&), void), AS_CALL_THISCALL);
-    // PropertySet2D::PropertySet2D() | File: ../Urho2D/TileMapDefs2D.h
-    engine->RegisterObjectBehaviour("PropertySet2D", asBEHAVE_FACTORY, "PropertySet2D@+ f()", AS_FUNCTION(PropertySet2D_PropertySet2D_void), AS_CALL_CDECL);
     // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
     // Error: type "RefCount*" can not automatically bind
     // int RefCounted::Refs() const | File: ../Container/RefCounted.h

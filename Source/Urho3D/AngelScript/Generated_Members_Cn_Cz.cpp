@@ -243,12 +243,6 @@ static void ConstantBuffer_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bo
     ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
-// Context::Context() | File: ../Core/Context.h
-static Context* Context_Context_void()
-{
-    return new Context();
-}
-
 // SharedPtr<Object> Context::CreateObject(StringHash objectType) | File: ../Core/Context.h
 static Object* Context_CreateObject_StringHash(Context* ptr, StringHash objectType)
 {
@@ -379,12 +373,6 @@ static void CustomGeometry_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bo
 {
     PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
     ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
-}
-
-// ColorFrame::ColorFrame() | File: ../Graphics/ParticleEffect.h
-static ColorFrame* ColorFrame_ColorFrame_void()
-{
-    return new ColorFrame();
 }
 
 // explicit ColorFrame::ColorFrame(const Color& color) | File: ../Graphics/ParticleEffect.h
@@ -3921,8 +3909,6 @@ void ASRegisterGenerated_Members_Cn_Cz(asIScriptEngine* engine)
 
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("Context", asBEHAVE_ADDREF, "void f()", AS_METHODPR(Context, AddRef, (), void), AS_CALL_THISCALL);
-    // Context::Context() | File: ../Core/Context.h
-    engine->RegisterObjectBehaviour("Context", asBEHAVE_FACTORY, "Context@+ f()", AS_FUNCTION(Context_Context_void), AS_CALL_CDECL);
     // void Context::CopyBaseAttributes(StringHash baseType, StringHash derivedType) | File: ../Core/Context.h
     engine->RegisterObjectMethod("Context", "void CopyBaseAttributes(StringHash, StringHash)", AS_METHODPR(Context, CopyBaseAttributes, (StringHash, StringHash), void), AS_CALL_THISCALL);
     // template<class T, class U> void Context::CopyBaseAttributes() | File: ../Core/Context.h
@@ -6141,8 +6127,6 @@ void ASRegisterGenerated_Members_Cn_Cz(asIScriptEngine* engine)
     engine->RegisterObjectProperty("ColorFrame", "Color color", offsetof(ColorFrame, color_));
     // float ColorFrame::time_ | File: ../Graphics/ParticleEffect.h
     engine->RegisterObjectProperty("ColorFrame", "float time", offsetof(ColorFrame, time_));
-    // ColorFrame::ColorFrame() | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectBehaviour("ColorFrame", asBEHAVE_FACTORY, "ColorFrame@+ f()", AS_FUNCTION(ColorFrame_ColorFrame_void), AS_CALL_CDECL);
     // explicit ColorFrame::ColorFrame(const Color& color) | File: ../Graphics/ParticleEffect.h
     engine->RegisterObjectBehaviour("ColorFrame", asBEHAVE_FACTORY, "ColorFrame@+ f(const Color&in)", AS_FUNCTION(ColorFrame_ColorFrame_Color), AS_CALL_CDECL);
     // ColorFrame::ColorFrame(const Color& color, float time) | File: ../Graphics/ParticleEffect.h

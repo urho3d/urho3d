@@ -46,12 +46,6 @@ static void EventProfiler_UnsubscribeFromAllEventsExcept_PODVectorStringHash_boo
     ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
-// EventReceiverGroup::EventReceiverGroup() | File: ../Core/Context.h
-static EventReceiverGroup* EventReceiverGroup_EventReceiverGroup_void()
-{
-    return new EventReceiverGroup();
-}
-
 void ASRegisterGenerated_Members_E(asIScriptEngine* engine)
 {
     // void RefCounted::AddRef() | File: ../Container/RefCounted.h
@@ -389,8 +383,6 @@ void ASRegisterGenerated_Members_E(asIScriptEngine* engine)
     engine->RegisterObjectMethod("EventReceiverGroup", "void BeginSendEvent()", AS_METHODPR(EventReceiverGroup, BeginSendEvent, (), void), AS_CALL_THISCALL);
     // void EventReceiverGroup::EndSendEvent() | File: ../Core/Context.h
     engine->RegisterObjectMethod("EventReceiverGroup", "void EndSendEvent()", AS_METHODPR(EventReceiverGroup, EndSendEvent, (), void), AS_CALL_THISCALL);
-    // EventReceiverGroup::EventReceiverGroup() | File: ../Core/Context.h
-    engine->RegisterObjectBehaviour("EventReceiverGroup", asBEHAVE_FACTORY, "EventReceiverGroup@+ f()", AS_FUNCTION(EventReceiverGroup_EventReceiverGroup_void), AS_CALL_CDECL);
     // RefCount* RefCounted::RefCountPtr() | File: ../Container/RefCounted.h
     // Error: type "RefCount*" can not automatically bind
     // int RefCounted::Refs() const | File: ../Container/RefCounted.h

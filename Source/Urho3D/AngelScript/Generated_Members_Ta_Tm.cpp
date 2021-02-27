@@ -255,14 +255,6 @@ static void TextureCube_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bool(
 }
 
 #ifdef URHO3D_URHO2D
-// Tile2D::Tile2D() | File: ../Urho2D/TileMapDefs2D.h
-static Tile2D* Tile2D_Tile2D_void()
-{
-    return new Tile2D();
-}
-#endif
-
-#ifdef URHO3D_URHO2D
 // Vector<SharedPtr<TileMapObject2D>> TileMap2D::GetTileCollisionShapes(unsigned gid) const | File: ../Urho2D/TileMap2D.h
 static CScriptArray* TileMap2D_GetTileCollisionShapes_unsigned(TileMap2D* ptr, unsigned gid)
 {
@@ -302,14 +294,6 @@ static void TileMapLayer2D_UnsubscribeFromAllEventsExcept_PODVectorStringHash_bo
 {
     PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
     ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
-}
-#endif
-
-#ifdef URHO3D_URHO2D
-// TileMapObject2D::TileMapObject2D() | File: ../Urho2D/TileMapDefs2D.h
-static TileMapObject2D* TileMapObject2D_TileMapObject2D_void()
-{
-    return new TileMapObject2D();
 }
 #endif
 
@@ -388,12 +372,6 @@ static TmxTileLayer2D* TmxTileLayer2D_TmxTileLayer2D_TmxFile2D(TmxFile2D *tmxFil
 static void TechniqueEntry_TechniqueEntry_Technique_MaterialQuality_float(TechniqueEntry* ptr, Technique *tech, MaterialQuality qualityLevel, float lodDistance)
 {
     new(ptr) TechniqueEntry(tech, qualityLevel, lodDistance);
-}
-
-// TextureFrame::TextureFrame() | File: ../Graphics/ParticleEffect.h
-static TextureFrame* TextureFrame_TextureFrame_void()
-{
-    return new TextureFrame();
 }
 
 void ASRegisterGenerated_Members_Ta_Tm(asIScriptEngine* engine)
@@ -4749,8 +4727,6 @@ void ASRegisterGenerated_Members_Ta_Tm(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Tile2D", "int get_refs() const", AS_METHODPR(Tile2D, Refs, () const, int), AS_CALL_THISCALL);
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("Tile2D", asBEHAVE_RELEASE, "void f()", AS_METHODPR(Tile2D, ReleaseRef, (), void), AS_CALL_THISCALL);
-    // Tile2D::Tile2D() | File: ../Urho2D/TileMapDefs2D.h
-    engine->RegisterObjectBehaviour("Tile2D", asBEHAVE_FACTORY, "Tile2D@+ f()", AS_FUNCTION(Tile2D_Tile2D_void), AS_CALL_CDECL);
     // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
     engine->RegisterObjectMethod("Tile2D", "int WeakRefs() const", AS_METHODPR(Tile2D, WeakRefs, () const, int), AS_CALL_THISCALL);
     engine->RegisterObjectMethod("Tile2D", "int get_weakRefs() const", AS_METHODPR(Tile2D, WeakRefs, () const, int), AS_CALL_THISCALL);
@@ -5439,8 +5415,6 @@ void ASRegisterGenerated_Members_Ta_Tm(asIScriptEngine* engine)
     engine->RegisterObjectMethod("TileMapObject2D", "int get_refs() const", AS_METHODPR(TileMapObject2D, Refs, () const, int), AS_CALL_THISCALL);
     // void RefCounted::ReleaseRef() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("TileMapObject2D", asBEHAVE_RELEASE, "void f()", AS_METHODPR(TileMapObject2D, ReleaseRef, (), void), AS_CALL_THISCALL);
-    // TileMapObject2D::TileMapObject2D() | File: ../Urho2D/TileMapDefs2D.h
-    engine->RegisterObjectBehaviour("TileMapObject2D", asBEHAVE_FACTORY, "TileMapObject2D@+ f()", AS_FUNCTION(TileMapObject2D_TileMapObject2D_void), AS_CALL_CDECL);
     // int RefCounted::WeakRefs() const | File: ../Container/RefCounted.h
     engine->RegisterObjectMethod("TileMapObject2D", "int WeakRefs() const", AS_METHODPR(TileMapObject2D, WeakRefs, () const, int), AS_CALL_THISCALL);
     engine->RegisterObjectMethod("TileMapObject2D", "int get_weakRefs() const", AS_METHODPR(TileMapObject2D, WeakRefs, () const, int), AS_CALL_THISCALL);
@@ -5991,8 +5965,6 @@ void ASRegisterGenerated_Members_Ta_Tm(asIScriptEngine* engine)
     engine->RegisterObjectProperty("TextureFrame", "float time", offsetof(TextureFrame, time_));
     // Rect TextureFrame::uv_ | File: ../Graphics/ParticleEffect.h
     engine->RegisterObjectProperty("TextureFrame", "Rect uv", offsetof(TextureFrame, uv_));
-    // TextureFrame::TextureFrame() | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectBehaviour("TextureFrame", asBEHAVE_FACTORY, "TextureFrame@+ f()", AS_FUNCTION(TextureFrame_TextureFrame_void), AS_CALL_CDECL);
     // TextureFrame& TextureFrame::operator=(const TextureFrame&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<TextureFrame>(engine, "TextureFrame");
     engine->RegisterObjectBehaviour("TextureFrame", asBEHAVE_ADDREF, "void f()", AS_FUNCTION_OBJLAST(FakeAddRef), AS_CALL_CDECL_OBJLAST);
