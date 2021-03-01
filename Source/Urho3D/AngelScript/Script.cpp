@@ -72,6 +72,7 @@ void ASRegisterGeneratedObjectTypes(asIScriptEngine* engine);
 void ASRegisterGeneratedDefaultConstructors(asIScriptEngine* engine);
 void ASRegisterGeneratedClasses(asIScriptEngine* engine);
 
+/*
 void ASRegisterGenerated_Members_A(asIScriptEngine* engine);
 void ASRegisterGenerated_Members_B(asIScriptEngine* engine);
 void ASRegisterGenerated_Members_Ca_Cm(asIScriptEngine* engine);
@@ -104,6 +105,7 @@ void ASRegisterGenerated_Members_Y(asIScriptEngine* engine);
 void ASRegisterGenerated_Members_Z(asIScriptEngine* engine);
 
 void ASRegisterGenerated_Members_Other(asIScriptEngine* engine);
+*/
 
 void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine);
 void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine);
@@ -148,6 +150,7 @@ Script::Script(Context* context) :
     ASRegisterGeneratedDefaultConstructors(scriptEngine_);
     ASRegisterGeneratedClasses(scriptEngine_);
 
+    /*
     ASRegisterGenerated_Members_A(scriptEngine_);
     ASRegisterGenerated_Members_B(scriptEngine_);
     ASRegisterGenerated_Members_Ca_Cm(scriptEngine_);
@@ -180,6 +183,7 @@ Script::Script(Context* context) :
     ASRegisterGenerated_Members_Z(scriptEngine_);
 
     ASRegisterGenerated_Members_Other(scriptEngine_);
+    */
 
     ASRegisterGeneratedGlobalVariables(scriptEngine_);
     ASRegisterGeneratedGlobalFunctions(scriptEngine_);

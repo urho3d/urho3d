@@ -59,19 +59,148 @@ namespace Urho3D
 
 class Camera;
 
+bool operator ==(const asSFuncPtr& a, const asSFuncPtr& b);
+
 struct RegisterObjectMethodArgs
 {
-    String declaration_;
+    String cppDeclaration_; // Used as identifier when removed from list
+    String asDeclaration_;
     asSFuncPtr funcPointer_;
-    asDWORD callConv_;
+    asDWORD callConv_ = 0;
 
-    RegisterObjectMethodArgs(String declaration, asSFuncPtr funcPointer, asDWORD callConv)
-        : declaration_(declaration)
+    RegisterObjectMethodArgs() = default;
+
+    RegisterObjectMethodArgs(const String& cppDeclaration, const String& asDeclaration, const asSFuncPtr& funcPointer, asDWORD callConv)
+        : cppDeclaration_(cppDeclaration)
+        , asDeclaration_(asDeclaration)
         , funcPointer_(funcPointer)
         , callConv_(callConv)
     {
     }
 };
+
+struct RegisterGlobalFunctionArgs
+{
+    String cppDeclaration_;
+    String asDeclaration_;
+    asSFuncPtr funcPointer_;
+    asDWORD callConv_ = 0;
+
+    RegisterGlobalFunctionArgs() = default;
+
+    RegisterGlobalFunctionArgs(const String& cppDeclaration, const String& asDeclaration, const asSFuncPtr& funcPointer, asDWORD callConv)
+        : cppDeclaration_(cppDeclaration)
+        , asDeclaration_(asDeclaration)
+        , funcPointer_(funcPointer)
+        , callConv_(callConv)
+    {
+    }
+};
+
+struct RegisterObjectPropertyArgs
+{
+    String cppDeclaration_;
+    String asDeclaration_;
+    int byteOffset_ = 0;
+
+    RegisterObjectPropertyArgs() = default;
+
+    RegisterObjectPropertyArgs(const String& cppDeclaration, const String& asDeclaration, int byteOffset)
+        : cppDeclaration_(cppDeclaration)
+        , asDeclaration_(asDeclaration)
+        , byteOffset_(byteOffset)
+    {
+    }
+};
+
+struct RegisterGlobalPropertyArgs
+{
+    String cppDeclaration_;
+    String asDeclaration_;
+    void* pointer_ = nullptr;
+
+    RegisterGlobalPropertyArgs() = default;
+    
+    RegisterGlobalPropertyArgs(const String& cppDeclaration, const String& asDeclaration, void* pointer)
+        : cppDeclaration_(cppDeclaration)
+        , asDeclaration_(asDeclaration)
+        , pointer_(pointer)
+    {
+    }
+};
+
+struct RegisterObjectBehaviourArgs
+{
+    String cppDeclaration_;
+    asEBehaviours behaviour_;
+    String asDeclaration_;
+    asSFuncPtr funcPointer_;
+    asDWORD callConv_ = 0;
+
+    RegisterObjectBehaviourArgs() = default;
+
+    RegisterObjectBehaviourArgs(const String& cppDeclaration, asEBehaviours behaviour, const String& asDeclaration, const asSFuncPtr& funcPointer, asDWORD callConv)
+        : cppDeclaration_(cppDeclaration)
+        , behaviour_(behaviour)
+        , asDeclaration_(asDeclaration)
+        , funcPointer_(funcPointer)
+        , callConv_(callConv)
+    {
+    }
+};
+
+struct MemberCollection
+{
+    Vector<RegisterObjectMethodArgs> methods_;
+    Vector<RegisterGlobalFunctionArgs> staticMethods_;
+    Vector<RegisterObjectPropertyArgs> fields_;
+    Vector<RegisterObjectMethodArgs> wrappedFields_;
+    Vector<RegisterGlobalPropertyArgs> staticFields_;
+    Vector<RegisterObjectBehaviourArgs> behaviours_;
+};
+
+// Where T is RegisterObjectMethodArgs, RegisterObjectPropertyArgs, RegisterGlobalPropertyArgs
+template<typename T> void Remove(Vector<T>& list, const String& cppDeclaration)
+{
+    // The vector can contain several elements with the same cppDeclaration (aliases)
+    auto it = list.Begin();
+    while (it != list.End())
+    {
+        if (it->cppDeclaration_ == cppDeclaration)
+            it = list.Erase(it);
+        else
+            ++it;
+    }
+}
+
+inline void RegisterMembers(asIScriptEngine* engine, const char* asClassName, const MemberCollection& members)
+{
+    for (const RegisterObjectMethodArgs& method : members.methods_)
+        engine->RegisterObjectMethod(asClassName, method.asDeclaration_.CString(), method.funcPointer_, method.callConv_);
+
+    for (const RegisterGlobalFunctionArgs& staticMethod : members.staticMethods_)
+    {
+        engine->SetDefaultNamespace(asClassName);
+        engine->RegisterGlobalFunction(staticMethod.asDeclaration_.CString(), staticMethod.funcPointer_, staticMethod.callConv_);
+        engine->SetDefaultNamespace("");
+    }
+
+    for (const RegisterObjectPropertyArgs& field : members.fields_)
+        engine->RegisterObjectProperty(asClassName, field.asDeclaration_.CString(), field.byteOffset_);
+
+    for (const RegisterObjectMethodArgs& wrappedField : members.wrappedFields_)
+        engine->RegisterObjectMethod(asClassName, wrappedField.asDeclaration_.CString(), wrappedField.funcPointer_, wrappedField.callConv_);
+
+    for (const RegisterGlobalPropertyArgs& staticField : members.staticFields_)
+    {
+        engine->SetDefaultNamespace(asClassName);
+        engine->RegisterGlobalProperty(staticField.asDeclaration_.CString(), staticField.pointer_);
+        engine->SetDefaultNamespace("");
+    }
+
+    for (const RegisterObjectBehaviourArgs& behaviour : members.behaviours_)
+        engine->RegisterObjectBehaviour(asClassName, behaviour.behaviour_, behaviour.asDeclaration_.CString(), behaviour.funcPointer_, behaviour.callConv_);
+}
 
 /// Template function for Vector to array conversion.
 template <class T> CScriptArray* VectorToArray(const Vector<T>& vector, const char* arrayName)

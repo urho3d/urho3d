@@ -26,7 +26,9 @@
 #include "../AngelScript/ScriptAPI.h"
 #include "../AngelScript/ScriptFile.h"
 #include "../Resource/ResourceCache.h"
-#include "../AngelScript/Generated_Templates.h"
+//#include "../AngelScript/Generated_Templates.h"
+#include "../AngelScript/GeneratedClassMembers.h"
+#include "../AngelScript/Generated_Members.h"
 
 namespace Urho3D
 {
@@ -85,14 +87,39 @@ static asIScriptObject* NodeCreateScriptObjectWithFile(ScriptFile* file, const S
     return instance->GetScriptObject();
 }
 
+static ScriptFile* ScriptFile_ScriptFile_Context()
+{
+    Context* context = GetScriptContext();
+    return new ScriptFile(context);
+}
+
 static void RegisterScriptFile(asIScriptEngine* engine)
 {
+    /*
     RegisterResource<ScriptFile>(engine, "ScriptFile");
     engine->RegisterObjectMethod("ScriptFile", "bool Execute(const String&in, const Array<Variant>@+ params = null)", AS_FUNCTION_OBJLAST(ScriptFileExecute), AS_CALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ScriptFile", "void DelayedExecute(float, bool, const String&in, const Array<Variant>@+ params = null)", AS_FUNCTION_OBJLAST(ScriptFileDelayedExecute), AS_CALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ScriptFile", "void ClearDelayedExecute(const String&in declaration = String())", AS_METHOD(ScriptFile, ClearDelayedExecute), AS_CALL_THISCALL);
     engine->RegisterObjectMethod("ScriptFile", "bool get_compiled() const", AS_METHOD(ScriptFile, IsCompiled), AS_CALL_THISCALL);
     engine->RegisterGlobalFunction("ScriptFile@+ get_scriptFile()", AS_FUNCTION(GetScriptContextFile), AS_CALL_CDECL);
+    */
+
+    engine->RegisterObjectType("ScriptFile", 0, asOBJ_REF);
+
+    MemberCollection members;
+    CollectMembers_Resource(members);
+    RegisterMembers_Resource<ScriptFile>(engine, "ScriptFile");
+    RegisterMembers(engine, "ScriptFile", members);
+
+    engine->RegisterObjectBehaviour("ScriptFile", asBEHAVE_FACTORY, "ScriptFile@+ f()", AS_FUNCTION(ScriptFile_ScriptFile_Context), AS_CALL_CDECL);
+
+    engine->RegisterObjectMethod("ScriptFile", "bool Execute(const String&in, const Array<Variant>@+ params = null)", AS_FUNCTION_OBJLAST(ScriptFileExecute), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("ScriptFile", "void DelayedExecute(float, bool, const String&in, const Array<Variant>@+ params = null)", AS_FUNCTION_OBJLAST(ScriptFileDelayedExecute), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("ScriptFile", "void ClearDelayedExecute(const String&in declaration = String())", AS_METHOD(ScriptFile, ClearDelayedExecute), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("ScriptFile", "bool get_compiled() const", AS_METHOD(ScriptFile, IsCompiled), AS_CALL_THISCALL);
+    engine->RegisterGlobalFunction("ScriptFile@+ get_scriptFile()", AS_FUNCTION(GetScriptContextFile), AS_CALL_CDECL);
+
+    // TODO: named constructor, base classes?
 }
 
 static asIScriptObject* NodeCreateScriptObject(const String& scriptFileName, const String& className, CreateMode mode, Node* ptr)
@@ -221,6 +248,12 @@ static void SelfRemove()
         ptr->Remove();
 }
 
+static ScriptInstance* ScriptInstance_ScriptInstance_Context()
+{
+    Context* context = GetScriptContext();
+    return new ScriptInstance(context);
+}
+
 static void RegisterScriptInstance(asIScriptEngine* engine)
 {
     engine->RegisterObjectMethod("Node", "ScriptObject@+ CreateScriptObject(ScriptFile@+, const String&in, CreateMode mode = REPLICATED)", AS_FUNCTION_OBJLAST(NodeCreateScriptObjectWithFile), AS_CALL_CDECL_OBJLAST);
@@ -235,7 +268,20 @@ static void RegisterScriptInstance(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Scene", "ScriptObject@+ GetScriptObject(const String&in) const", AS_FUNCTION_OBJLAST(NodeGetNamedScriptObject), AS_CALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Scene", "ScriptObject@+ get_scriptObject() const", AS_FUNCTION_OBJLAST(NodeGetScriptObject), AS_CALL_CDECL_OBJLAST);
 
-    RegisterComponent<ScriptInstance>(engine, "ScriptInstance");
+    engine->RegisterObjectType("ScriptInstance", 0, asOBJ_REF);
+    engine->RegisterObjectBehaviour("ScriptInstance", asBEHAVE_FACTORY, "ScriptInstance@+ f()", AS_FUNCTION(ScriptInstance_ScriptInstance_Context), AS_CALL_CDECL);
+
+    MemberCollection members;
+    CollectMembers_Component(members);
+    RegisterMembers_Component<ScriptInstance>(engine, "ScriptInstance");
+    RegisterMembers(engine, "ScriptInstance", members);
+
+    RegisterSubclass<Component, ScriptInstance>(engine, "Component", "ScriptInstance");
+    RegisterSubclass<Animatable, ScriptInstance>(engine, "Animatable", "ScriptInstance");
+    RegisterSubclass<Serializable, ScriptInstance>(engine, "Serializable", "ScriptInstance");
+    RegisterSubclass<Object, ScriptInstance>(engine, "Object", "ScriptInstance");
+    RegisterSubclass<RefCounted, ScriptInstance>(engine, "RefCounted", "ScriptInstance");
+
     engine->RegisterObjectMethod("ScriptInstance", "bool CreateObject(ScriptFile@+, const String&in)", AS_METHODPR(ScriptInstance, CreateObject, (ScriptFile*, const String&), bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod("ScriptInstance", "bool Execute(const String&in, const Array<Variant>@+ params = null)", AS_FUNCTION_OBJLAST(ScriptInstanceExecute), AS_CALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ScriptInstance", "void DelayedExecute(float, bool, const String&in, const Array<Variant>@+ params = null)", AS_FUNCTION(ScriptInstanceDelayedExecute), AS_CALL_CDECL_OBJLAST);
@@ -249,6 +295,24 @@ static void RegisterScriptInstance(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ScriptInstance", "const String& get_className() const", AS_METHOD(ScriptInstance, GetClassName), AS_CALL_THISCALL);
     engine->RegisterGlobalFunction("ScriptInstance@+ get_self()", AS_FUNCTION(GetSelf), AS_CALL_CDECL);
 
+
+
+    /*
+    RegisterComponent<ScriptInstance>(engine, "ScriptInstance");
+    engine->RegisterObjectMethod("ScriptInstance", "bool CreateObject(ScriptFile@+, const String&in)", AS_METHODPR(ScriptInstance, CreateObject, (ScriptFile*, const String&), bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("ScriptInstance", "bool Execute(const String&in, const Array<Variant>@+ params = null)", AS_FUNCTION_OBJLAST(ScriptInstanceExecute), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("ScriptInstance", "void DelayedExecute(float, bool, const String&in, const Array<Variant>@+ params = null)", AS_FUNCTION(ScriptInstanceDelayedExecute), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("ScriptInstance", "void ClearDelayedExecute(const String&in declaration = String())", AS_METHOD(ScriptInstance, ClearDelayedExecute), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("ScriptInstance", "bool IsA(const String&in declaration) const", AS_METHOD(ScriptInstance, IsA), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("ScriptInstance", "bool HasMethod(const String&in declaration) const", AS_METHOD(ScriptInstance, HasMethod), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("ScriptInstance", "void set_scriptFile(ScriptFile@+)", AS_METHOD(ScriptInstance, SetScriptFile), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("ScriptInstance", "ScriptFile@+ get_scriptFile() const", AS_METHOD(ScriptInstance, GetScriptFile), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("ScriptInstance", "ScriptObject@+ get_scriptObject() const", AS_METHOD(ScriptInstance, GetScriptObject), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("ScriptInstance", "void set_className(const String&in)", AS_METHOD(ScriptInstance, SetClassName), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("ScriptInstance", "const String& get_className() const", AS_METHOD(ScriptInstance, GetClassName), AS_CALL_THISCALL);
+    engine->RegisterGlobalFunction("ScriptInstance@+ get_self()", AS_FUNCTION(GetSelf), AS_CALL_CDECL);
+    */
+
     // Register convenience functions for controlling self, similar to event sending
     engine->RegisterGlobalFunction("void MarkNetworkUpdate()", AS_FUNCTION(SelfMarkNetworkUpdate), AS_CALL_CDECL);
     engine->RegisterGlobalFunction("void DelayedExecute(float, bool, const String&in, const Array<Variant>@+ params = null)", AS_FUNCTION(SelfDelayedExecute), AS_CALL_CDECL);
@@ -261,12 +325,36 @@ static Script* GetScript()
     return GetScriptContext()->GetSubsystem<Script>();
 }
 
+static Script* Script_Script_Context()
+{
+    Context* context = GetScriptContext();
+    return new Script(context);
+}
+
 static void RegisterScript(asIScriptEngine* engine)
 {
     engine->RegisterEnum("DumpMode");
     engine->RegisterEnumValue("DumpMode", "DOXYGEN", DOXYGEN);
     engine->RegisterEnumValue("DumpMode", "C_HEADER", C_HEADER);
 
+    engine->RegisterObjectType("Script", 0, asOBJ_REF);
+    engine->RegisterObjectBehaviour("Script", asBEHAVE_FACTORY, "Script@+ f()", AS_FUNCTION(Script_Script_Context), AS_CALL_CDECL);
+    MemberCollection members;
+    CollectMembers_Object(members);
+    RegisterMembers_Object<Script>(engine, "Script");
+    RegisterMembers(engine, "Script", members);
+
+    engine->RegisterObjectMethod("Script", "bool Execute(const String&in)", AS_METHOD(Script, Execute), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Script", "void DumpAPI(DumpMode mode = DOXYGEN, const String&in sourceTree = String())", AS_METHOD(Script, DumpAPI), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Script", "void set_defaultScriptFile(ScriptFile@+)", AS_METHOD(Script, SetDefaultScriptFile), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Script", "ScriptFile@+ get_defaultScriptFile() const", AS_METHOD(Script, GetDefaultScriptFile), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Script", "void set_defaultScene(Scene@+)", AS_METHOD(Script, SetDefaultScene), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Script", "Scene@+ get_defaultScene() const", AS_METHOD(Script, GetDefaultScene), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Script", "void set_executeConsoleCommands(bool)", AS_METHOD(Script, SetExecuteConsoleCommands), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("Script", "bool get_executeConsoleCommands() const", AS_METHOD(Script, GetExecuteConsoleCommands), AS_CALL_THISCALL);
+    engine->RegisterGlobalFunction("Script@+ get_script()", AS_FUNCTION(GetScript), AS_CALL_CDECL);
+
+    /*
     RegisterObject<Script>(engine, "Script");
     engine->RegisterObjectMethod("Script", "bool Execute(const String&in)", AS_METHOD(Script, Execute), AS_CALL_THISCALL);
     engine->RegisterObjectMethod("Script", "void DumpAPI(DumpMode mode = DOXYGEN, const String&in sourceTree = String())", AS_METHOD(Script, DumpAPI), AS_CALL_THISCALL);
@@ -277,6 +365,7 @@ static void RegisterScript(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Script", "void set_executeConsoleCommands(bool)", AS_METHOD(Script, SetExecuteConsoleCommands), AS_CALL_THISCALL);
     engine->RegisterObjectMethod("Script", "bool get_executeConsoleCommands() const", AS_METHOD(Script, GetExecuteConsoleCommands), AS_CALL_THISCALL);
     engine->RegisterGlobalFunction("Script@+ get_script()", AS_FUNCTION(GetScript), AS_CALL_CDECL);
+    */
 }
 
 static void RegisterScriptObject(asIScriptEngine* engine)

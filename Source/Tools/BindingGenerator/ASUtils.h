@@ -37,8 +37,8 @@ enum class TypeUsage
 {
     FunctionParameter = 0,
     FunctionReturn,
-    ClassStaticVariable,
-    ClassVariable,
+    StaticField,
+    Field,
 };
 
 struct ConvertedVariable
@@ -56,8 +56,8 @@ enum class VariableUsage
 {
     FunctionParameter = 0,
     FunctionReturn,
-    ClassStaticVariable,
-    ClassVariable,
+    StaticField,
+    Field,
 };
 
 ConvertedVariable CppVariableToAS(const TypeAnalyzer& type, VariableUsage usage, const string& name = "", const string& defaultValue = "");
@@ -83,11 +83,15 @@ string GenerateWrapperName(const ClassStaticFunctionAnalyzer& functionAnalyzer);
 string GenerateWrapperName(const MethodAnalyzer& methodAnalyzer, bool templateVersion = false);
 
 string GenerateWrapper(const GlobalFunctionAnalyzer& functionAnalyzer, const vector<ConvertedVariable>& convertedParams, const ConvertedVariable& convertedReturn);
-string GenerateWrapper(const ClassStaticFunctionAnalyzer& functionAnalyzer, const vector<ConvertedVariable>& convertedParams, const ConvertedVariable& convertedReturn);
+string GenerateWrapper(const ClassStaticFunctionAnalyzer& functionAnalyzer, bool templateVersion, const vector<ConvertedVariable>& convertedParams, const ConvertedVariable& convertedReturn);
 string GenerateWrapper(const MethodAnalyzer& methodAnalyzer, bool templateVersion, const vector<ConvertedVariable>& convertedParams, const ConvertedVariable& convertedReturn);
 
+string GenerateConstructorWrapper(const MethodAnalyzer& methodAnalyzer, const vector<ConvertedVariable>& convertedParams);
+string GenerateFactoryWrapper(const MethodAnalyzer& methodAnalyzer, const vector<ConvertedVariable>& convertedParams);
+
+
 string Generate_asFUNCTIONPR(const GlobalFunctionAnalyzer& functionAnalyzer);
-string Generate_asFUNCTIONPR(const ClassStaticFunctionAnalyzer& functionAnalyzer);
+string Generate_asFUNCTIONPR(const ClassStaticFunctionAnalyzer& functionAnalyzer, bool templateVersion);
 string Generate_asMETHODPR(const MethodAnalyzer& methodAnalyzer, bool templateVersion);
 
 }

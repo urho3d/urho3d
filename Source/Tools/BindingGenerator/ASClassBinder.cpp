@@ -33,10 +33,10 @@
 #include <fstream>
 #include <vector>
 
+extern string _sourceDir;
+
 namespace ASBindingGenerator
 {
-
-static string _outputBasePath;
 
 static shared_ptr<ASGeneratedFile_Members> _result_Members_A;
 static shared_ptr<ASGeneratedFile_Members> _result_Members_B;
@@ -192,6 +192,7 @@ static shared_ptr<ASGeneratedFile_Members> GetGeneratedFile(const string& classN
 }
 
 //static void RegisterStaticFunction(const ClassStaticFunctionAnalyzer& functionAnalyzer, shared_ptr<ASGeneratedFile_Members> result)
+/*
 static void RegisterStaticFunction(const ClassStaticFunctionAnalyzer& functionAnalyzer, ASGeneratedFile_Base* result)
 {
     result->reg_ << "    // " << functionAnalyzer.GetLocation() << "\n";
@@ -254,6 +255,7 @@ static void RegisterStaticFunction(const ClassStaticFunctionAnalyzer& functionAn
 
     result->reg_ << "    engine->SetDefaultNamespace(\"\");\n";
 }
+*/
 
 static void RegisterRefCountedConstructor(const MethodAnalyzer& methodAnalyzer, bool templateVersion)
 {
@@ -692,6 +694,12 @@ static void RegisterMethod(const MethodAnalyzer& methodAnalyzer, bool templateVe
     if (methodAnalyzer.IsParentConstructor())
         return;
 
+    if (!templateVersion)
+    {
+        if (!methodAnalyzer.IsStatic())
+            return;
+    }
+
     //shared_ptr<ASGeneratedFile_Members> result = GetGeneratedFile(functionAnalyzer.GetClass().GetClassName());
     ASGeneratedFile_Base* result = templateVersion ? (ASGeneratedFile_Base*)_result_Templates.get() : (ASGeneratedFile_Base*)GetGeneratedFile(methodAnalyzer.GetClass().GetClassName()).get();
 
@@ -719,7 +727,7 @@ static void RegisterMethod(const MethodAnalyzer& methodAnalyzer, bool templateVe
     if (methodAnalyzer.IsStatic())
     {
         ClassStaticFunctionAnalyzer classStaticFunctionAnalyzer(methodAnalyzer.GetClass(), methodAnalyzer.GetMemberdef());
-        RegisterStaticFunction(classStaticFunctionAnalyzer, result);
+        //RegisterStaticFunction(classStaticFunctionAnalyzer, result);
         return;
     }
 
@@ -885,8 +893,10 @@ static void RegisterMethod(const MethodAnalyzer& methodAnalyzer, bool templateVe
     }
 }
 
-static void RegisterClassVarAsProperty(ClassVariableAnalyzer& variable)
+static void RegisterClassVarAsProperty(FieldAnalyzer& variable)
 {
+    return;
+
     if (!variable.IsPublic())
         return;
 
@@ -914,7 +924,7 @@ static void RegisterClassVarAsProperty(ClassVariableAnalyzer& variable)
 
         try
         {
-            asType = CppTypeToAS(variable.GetType(), TypeUsage::ClassStaticVariable);
+            asType = CppTypeToAS(variable.GetType(), TypeUsage::StaticField);
         }
         catch (const Exception& e)
         {
@@ -960,7 +970,7 @@ static void RegisterClassVarAsProperty(ClassVariableAnalyzer& variable)
         
         try
         {
-            propType = CppTypeToAS(variable.GetType(), TypeUsage::ClassVariable);
+            propType = CppTypeToAS(variable.GetType(), TypeUsage::Field);
         }
         catch (const Exception& e)
         {
@@ -994,8 +1004,8 @@ static void RegisterObjectMembers(const ClassAnalyzer& classAnalyzer, bool templ
     if (!insideDefine.empty())
         result->reg_ << "#ifdef " << insideDefine << "\n";
 
-    vector<ClassVariableAnalyzer> variables = classAnalyzer.GetVariables();
-    for (ClassVariableAnalyzer variable : variables)
+    vector<FieldAnalyzer> variables = classAnalyzer.GetAllFields();
+    for (FieldAnalyzer variable : variables)
         RegisterClassVarAsProperty(variable);
 
     vector<MethodAnalyzer> methods = classAnalyzer.GetAllMethods();
@@ -1166,42 +1176,44 @@ static void ProcessClass(const ClassAnalyzer& classAnalyzer, bool templateVersio
         _result_Templates->reg_ << "}\n\n";
 }
 
-void ProcessAllClasses(const string& outputBasePath)
-{
-    _outputBasePath = outputBasePath;
 
-    _result_Members_A = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_A.cpp", "ASRegisterGenerated_Members_A");
-    _result_Members_B = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_B.cpp", "ASRegisterGenerated_Members_B");
-    _result_Members_Constraint = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_Constraint.cpp", "ASRegisterGenerated_Members_Constraint");
-    _result_Members_Ca_Cm = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_Ca_Cm.cpp", "ASRegisterGenerated_Members_Ca_Cm");
-    _result_Members_Cn_Cz = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_Cn_Cz.cpp", "ASRegisterGenerated_Members_Cn_Cz");
-    _result_Members_D = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_D.cpp", "ASRegisterGenerated_Members_D");
-    _result_Members_E = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_E.cpp", "ASRegisterGenerated_Members_E");
-    _result_Members_F = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_F.cpp", "ASRegisterGenerated_Members_F");
-    _result_Members_G = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_G.cpp", "ASRegisterGenerated_Members_G");
-    _result_Members_H = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_H.cpp", "ASRegisterGenerated_Members_H");
-    _result_Members_I = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_I.cpp", "ASRegisterGenerated_Members_I");
-    _result_Members_J = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_J.cpp", "ASRegisterGenerated_Members_J");
-    _result_Members_K = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_K.cpp", "ASRegisterGenerated_Members_K");
-    _result_Members_L = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_L.cpp", "ASRegisterGenerated_Members_L");
-    _result_Members_M = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_M.cpp", "ASRegisterGenerated_Members_M");
-    _result_Members_N = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_N.cpp", "ASRegisterGenerated_Members_N");
-    _result_Members_O = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_O.cpp", "ASRegisterGenerated_Members_O");
-    _result_Members_P = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_P.cpp", "ASRegisterGenerated_Members_P");
-    _result_Members_Q = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_Q.cpp", "ASRegisterGenerated_Members_Q");
-    _result_Members_R = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_R.cpp", "ASRegisterGenerated_Members_R");
-    _result_Members_Sa_Sm = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_Sa_Sm.cpp", "ASRegisterGenerated_Members_Sa_Sm");
-    _result_Members_Sn_Sz = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_Sn_Sz.cpp", "ASRegisterGenerated_Members_Sn_Sz");
-    _result_Members_Ta_Tm = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_Ta_Tm.cpp", "ASRegisterGenerated_Members_Ta_Tm");
-    _result_Members_Tn_Tz = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_Tn_Tz.cpp", "ASRegisterGenerated_Members_Tn_Tz");
-    _result_Members_U = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_U.cpp", "ASRegisterGenerated_Members_U");
-    _result_Members_V = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_V.cpp", "ASRegisterGenerated_Members_V");
-    _result_Members_W = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_W.cpp", "ASRegisterGenerated_Members_W");
-    _result_Members_X = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_X.cpp", "ASRegisterGenerated_Members_X");
-    _result_Members_Y = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_Y.cpp", "ASRegisterGenerated_Members_Y");
-    _result_Members_Z = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_Z.cpp", "ASRegisterGenerated_Members_Z");
-    _result_Members_Other = make_shared<ASGeneratedFile_Members>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Members_Other.cpp", "ASRegisterGenerated_Members_Other");
-    _result_Templates = make_shared<ASGeneratedFile_Templates>(_outputBasePath + "/Source/Urho3D/AngelScript/Generated_Templates.h");
+
+void ProcessAllClasses()
+{
+    return;
+
+    _result_Members_A = make_shared<ASGeneratedFile_Members>(_sourceDir + "/Source/Urho3D/AngelScript/Generated_Members_A.cpp", "ASRegisterGenerated_Members_A");
+    _result_Members_B = make_shared<ASGeneratedFile_Members>(_sourceDir + "/Source/Urho3D/AngelScript/Generated_Members_B.cpp", "ASRegisterGenerated_Members_B");
+    _result_Members_Constraint = make_shared<ASGeneratedFile_Members>(_sourceDir + "/Source/Urho3D/AngelScript/Generated_Members_Constraint.cpp", "ASRegisterGenerated_Members_Constraint");
+    _result_Members_Ca_Cm = make_shared<ASGeneratedFile_Members>(_sourceDir + "/Source/Urho3D/AngelScript/Generated_Members_Ca_Cm.cpp", "ASRegisterGenerated_Members_Ca_Cm");
+    _result_Members_Cn_Cz = make_shared<ASGeneratedFile_Members>(_sourceDir + "/Source/Urho3D/AngelScript/Generated_Members_Cn_Cz.cpp", "ASRegisterGenerated_Members_Cn_Cz");
+    _result_Members_D = make_shared<ASGeneratedFile_Members>(_sourceDir + "/Source/Urho3D/AngelScript/Generated_Members_D.cpp", "ASRegisterGenerated_Members_D");
+    _result_Members_E = make_shared<ASGeneratedFile_Members>(_sourceDir + "/Source/Urho3D/AngelScript/Generated_Members_E.cpp", "ASRegisterGenerated_Members_E");
+    _result_Members_F = make_shared<ASGeneratedFile_Members>(_sourceDir + "/Source/Urho3D/AngelScript/Generated_Members_F.cpp", "ASRegisterGenerated_Members_F");
+    _result_Members_G = make_shared<ASGeneratedFile_Members>(_sourceDir + "/Source/Urho3D/AngelScript/Generated_Members_G.cpp", "ASRegisterGenerated_Members_G");
+    _result_Members_H = make_shared<ASGeneratedFile_Members>(_sourceDir + "/Source/Urho3D/AngelScript/Generated_Members_H.cpp", "ASRegisterGenerated_Members_H");
+    _result_Members_I = make_shared<ASGeneratedFile_Members>(_sourceDir + "/Source/Urho3D/AngelScript/Generated_Members_I.cpp", "ASRegisterGenerated_Members_I");
+    _result_Members_J = make_shared<ASGeneratedFile_Members>(_sourceDir + "/Source/Urho3D/AngelScript/Generated_Members_J.cpp", "ASRegisterGenerated_Members_J");
+    _result_Members_K = make_shared<ASGeneratedFile_Members>(_sourceDir + "/Source/Urho3D/AngelScript/Generated_Members_K.cpp", "ASRegisterGenerated_Members_K");
+    _result_Members_L = make_shared<ASGeneratedFile_Members>(_sourceDir + "/Source/Urho3D/AngelScript/Generated_Members_L.cpp", "ASRegisterGenerated_Members_L");
+    _result_Members_M = make_shared<ASGeneratedFile_Members>(_sourceDir + "/Source/Urho3D/AngelScript/Generated_Members_M.cpp", "ASRegisterGenerated_Members_M");
+    _result_Members_N = make_shared<ASGeneratedFile_Members>(_sourceDir + "/Source/Urho3D/AngelScript/Generated_Members_N.cpp", "ASRegisterGenerated_Members_N");
+    _result_Members_O = make_shared<ASGeneratedFile_Members>(_sourceDir + "/Source/Urho3D/AngelScript/Generated_Members_O.cpp", "ASRegisterGenerated_Members_O");
+    _result_Members_P = make_shared<ASGeneratedFile_Members>(_sourceDir + "/Source/Urho3D/AngelScript/Generated_Members_P.cpp", "ASRegisterGenerated_Members_P");
+    _result_Members_Q = make_shared<ASGeneratedFile_Members>(_sourceDir + "/Source/Urho3D/AngelScript/Generated_Members_Q.cpp", "ASRegisterGenerated_Members_Q");
+    _result_Members_R = make_shared<ASGeneratedFile_Members>(_sourceDir + "/Source/Urho3D/AngelScript/Generated_Members_R.cpp", "ASRegisterGenerated_Members_R");
+    _result_Members_Sa_Sm = make_shared<ASGeneratedFile_Members>(_sourceDir + "/Source/Urho3D/AngelScript/Generated_Members_Sa_Sm.cpp", "ASRegisterGenerated_Members_Sa_Sm");
+    _result_Members_Sn_Sz = make_shared<ASGeneratedFile_Members>(_sourceDir + "/Source/Urho3D/AngelScript/Generated_Members_Sn_Sz.cpp", "ASRegisterGenerated_Members_Sn_Sz");
+    _result_Members_Ta_Tm = make_shared<ASGeneratedFile_Members>(_sourceDir + "/Source/Urho3D/AngelScript/Generated_Members_Ta_Tm.cpp", "ASRegisterGenerated_Members_Ta_Tm");
+    _result_Members_Tn_Tz = make_shared<ASGeneratedFile_Members>(_sourceDir + "/Source/Urho3D/AngelScript/Generated_Members_Tn_Tz.cpp", "ASRegisterGenerated_Members_Tn_Tz");
+    _result_Members_U = make_shared<ASGeneratedFile_Members>(_sourceDir + "/Source/Urho3D/AngelScript/Generated_Members_U.cpp", "ASRegisterGenerated_Members_U");
+    _result_Members_V = make_shared<ASGeneratedFile_Members>(_sourceDir + "/Source/Urho3D/AngelScript/Generated_Members_V.cpp", "ASRegisterGenerated_Members_V");
+    _result_Members_W = make_shared<ASGeneratedFile_Members>(_sourceDir + "/Source/Urho3D/AngelScript/Generated_Members_W.cpp", "ASRegisterGenerated_Members_W");
+    _result_Members_X = make_shared<ASGeneratedFile_Members>(_sourceDir + "/Source/Urho3D/AngelScript/Generated_Members_X.cpp", "ASRegisterGenerated_Members_X");
+    _result_Members_Y = make_shared<ASGeneratedFile_Members>(_sourceDir + "/Source/Urho3D/AngelScript/Generated_Members_Y.cpp", "ASRegisterGenerated_Members_Y");
+    _result_Members_Z = make_shared<ASGeneratedFile_Members>(_sourceDir + "/Source/Urho3D/AngelScript/Generated_Members_Z.cpp", "ASRegisterGenerated_Members_Z");
+    _result_Members_Other = make_shared<ASGeneratedFile_Members>(_sourceDir + "/Source/Urho3D/AngelScript/Generated_Members_Other.cpp", "ASRegisterGenerated_Members_Other");
+    _result_Templates = make_shared<ASGeneratedFile_Templates>(_sourceDir + "/Source/Urho3D/AngelScript/Generated_Templates.h");
 
     // Sorting keys to make class order compiler independent
     vector<string> classIDs;

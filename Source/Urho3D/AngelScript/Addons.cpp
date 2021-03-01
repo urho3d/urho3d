@@ -35,13 +35,13 @@ namespace Urho3D
 
 bool operator ==(const asSFuncPtr& a, const asSFuncPtr& b)
 {
-    for (int i = 0; i < sizeof(a.ptr.dummy); i++)
+    for (size_t i = 0; i < sizeof(a.ptr.dummy); i++)
     {
         if (a.ptr.dummy[i] != b.ptr.dummy[i])
             return false;
     }
 
-    return true;
+    return a.flag == b.flag;
 }
 
 using namespace std;

@@ -656,7 +656,6 @@ public:
     const Vector2& GetLayoutFlexScale() const { return layoutFlexScale_; }
 
     /// Return number of child elements.
-    /// @property
     unsigned GetNumChildren(bool recursive = false) const;
     /// Return child element by index.
     /// @property{get_children}

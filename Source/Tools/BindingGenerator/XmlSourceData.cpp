@@ -40,7 +40,7 @@
 static void LoadXml(const string& fullPath)
 {
     // All loaded XMLs. Not used directly, just prevents destruction
-    static vector<shared_ptr<xml_document> > xmlStorage;
+    static vector<shared_ptr<xml_document>> xmlStorage;
 
     // Load and store XML file
     shared_ptr<xml_document> xmlDocument = make_shared<xml_document>();

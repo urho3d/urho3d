@@ -112,46 +112,163 @@ struct ProcessedGlobalVariable
     bool operator <(const ProcessedGlobalVariable& rhs) const;
 };
 
-struct MemberRegistration
+struct Registration
 {
-    string name_; // Used for sorting
-    string comment_; // C++ declaration / location
-    string glue_; // Can be empty
+    string comment_;
+    string glue_;
+    vector<string> registration_;
+};
+
+struct SpecialMethodRegistration
+{
+    string comment_; // C++ declaration / location for default constructor
+    string glue_;
     string registration_; // Or warning message
 };
 
-struct RegistrationError
+struct RegisterObjectMethodArgs
 {
+    vector<string> asDeclarations_; // String
+    string funcPointer_;            // asSFuncPtr
+    string callConv_;               // asDWORD
+};
+
+struct MethodRegistration
+{
+    string name_; // Used for sorting
+    string cppDeclaration_;
+    string glue_;
+    RegisterObjectMethodArgs registration_;
+};
+
+struct RegisterGlobalFunctionArgs
+{
+    vector<string> asDeclarations_; // String
+    string funcPointer_;            // asSFuncPtr
+    string callConv_;               // asDWORD
+};
+
+struct StaticMethodRegistration
+{
+    string name_; // Used for sorting
+    string cppDeclaration_;
+    string glue_;
+    RegisterGlobalFunctionArgs registration_;
+};
+
+struct RegisterObjectPropertyArgs
+{
+    vector<string> asDeclarations_; // String
+    string byteOffset_;             // int
+};
+
+struct FieldRegistration
+{
+    string name_; // Used for sorting
+    string cppDeclaration_;
+    RegisterObjectPropertyArgs registration_;
+};
+
+struct RegisterGlobalPropertyArgs
+{
+    vector<string> asDeclarations_; // String
+    string pointer_;                // void*
+};
+
+struct StaticFieldRegistration
+{
+    string name_; // Used for sorting
+    string cppDeclaration_;
+    RegisterGlobalPropertyArgs registration_;
+};
+
+/*
+struct RegisterObjectBehaviourArgs
+{
+    string behaviour_;              // asEBehaviours
+    vector<string> asDeclarations_; // String
+    string funcPointer_;            // asSFuncPtr
+    string callConv_;               // asDWORD
+};
+
+struct BehaviorRegistration
+{
+    string name_; // Used for sorting
+    string cppDeclaration_;
+    //string glue_;
+    RegisterObjectBehaviourArgs registration_;
+};
+*/
+
+struct MemberRegistrationError
+{
+    string name_; // Used for sorting
     string comment_; // C++ declaration / location
     string message_;
+
+    // Used for sorting
+    bool operator <(const MemberRegistrationError& rhs) const;
 };
 
 struct ProcessedClass
 {
     string name_;
+    string dirName_;
     string insideDefine_; // Can be empty
     string comment_; // Class location
     string objectTypeRegistration_; // engine->RegisterObjectType(...); or warning message
+    int inherianceDeep_ = 0; // Used for sorting
 
     // Used for sorting
     bool operator <(const ProcessedClass& rhs) const;
 
-    shared_ptr<MemberRegistration> defaultConstructor_;
-    vector<MemberRegistration> nonDefaultConstructors_;
+    shared_ptr<SpecialMethodRegistration> defaultConstructor_;
+    vector<SpecialMethodRegistration> nonDefaultConstructors_;
 
+    shared_ptr<SpecialMethodRegistration> destructor_;
 
+    vector<SpecialMethodRegistration> fakeRefBehaviors_;
 
-    shared_ptr<MemberRegistration> destructor_;
+    vector<MemberRegistrationError> unregisteredSpecialMethods_;
 
-    vector<RegistrationError> unregisteredSpecialMethods_;
+    vector<MethodRegistration> methods_;
+    vector<MemberRegistrationError> unregisteredMethods_;
+
+    vector<StaticMethodRegistration> staticMethods_;
+    vector<MemberRegistrationError> unregisteredStaticMethods_;
+
+    vector<FieldRegistration> fields_;
+    vector<MemberRegistrationError> unregisteredFields_;
+
+    vector<MethodRegistration> wrappedFields_;
+
+    vector<StaticFieldRegistration> staticFields_;
+    vector<MemberRegistrationError> unregisteredStaticFields_;
+
+    vector<string> additionalLines_;
 
     bool noBind_ = false;
 
     vector<string> baseClassNames_;
+    vector<string> subclassRegistrations_;
 
-    // Tests
-    vector<string> commonMembers_;
-    vector<string> personalMembers_;
+    // Base class members that were hidden in this class (c++ declarations)
+    vector<string> hiddenMethods_;
+    vector<string> hiddenStaticMethods_;
+    vector<string> hiddenFields_;
+    vector<string> hiddenStaticFields_;
+
+    vector<Registration> personalMethods_;
+    vector<Registration> templateMethods_;
+
+    vector<Registration> personalStaticMethods_;
+    vector<Registration> templateStaticMethods_;
+
+    vector<Registration> personalFields_;
+    vector<Registration> templateFields_;
+
+    vector<Registration> personalStaticFields_;
+    vector<Registration> templateStaticFields_;
 };
 
 namespace Result

@@ -36,7 +36,7 @@ namespace Urho3D
 // m - method
 // p - parameters (in parentheses)
 // r - return type
-// PR - parameters, return type
+// PR - parameters + return type
 
 // RegisterGlobalFunction(decl, AS_FUNCTION(f), AS_CALL_CDECL)
 // RegisterGlobalFunction(decl, AS_FUNCTIONPR(f, p, r), AS_CALL_CDECL)

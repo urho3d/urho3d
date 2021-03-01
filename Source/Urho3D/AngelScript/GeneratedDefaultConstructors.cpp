@@ -39,25 +39,22 @@ void ASRegisterGeneratedDefaultConstructors(asIScriptEngine* engine)
     // AsyncProgress::AsyncProgress() | Implicitly-declared
     engine->RegisterObjectBehaviour("AsyncProgress", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<AsyncProgress>), AS_CALL_CDECL_OBJFIRST);
 
-    // AttributeInfo::AttributeInfo()=default | File: ../Core/Attribute.h
+    // AttributeInfo::AttributeInfo() = default | File: ../Core/Attribute.h
     engine->RegisterObjectBehaviour("AttributeInfo", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<AttributeInfo>), AS_CALL_CDECL_OBJFIRST);
 
     // BackgroundLoadItem::BackgroundLoadItem() | Implicitly-declared
     engine->RegisterObjectBehaviour("BackgroundLoadItem", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<BackgroundLoadItem>), AS_CALL_CDECL_OBJFIRST);
 
-    // Batch::Batch()=default | File: ../Graphics/Batch.h
+    // Batch::Batch() = default | File: ../Graphics/Batch.h
     engine->RegisterObjectBehaviour("Batch", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<Batch>), AS_CALL_CDECL_OBJFIRST);
 
-    // BatchGroup::BatchGroup() | File: ../Graphics/Batch.h
-    engine->RegisterObjectBehaviour("BatchGroup", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<BatchGroup>), AS_CALL_CDECL_OBJFIRST);
-
-    // BatchGroupKey::BatchGroupKey()=default | File: ../Graphics/Batch.h
+    // BatchGroupKey::BatchGroupKey() = default | File: ../Graphics/Batch.h
     engine->RegisterObjectBehaviour("BatchGroupKey", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<BatchGroupKey>), AS_CALL_CDECL_OBJFIRST);
 
     // BatchQueue::BatchQueue() | Implicitly-declared
     engine->RegisterObjectBehaviour("BatchQueue", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<BatchQueue>), AS_CALL_CDECL_OBJFIRST);
 
-    // BiasParameters::BiasParameters()=default | File: ../Graphics/Light.h
+    // BiasParameters::BiasParameters() = default | File: ../Graphics/Light.h
     engine->RegisterObjectBehaviour("BiasParameters", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<BiasParameters>), AS_CALL_CDECL_OBJFIRST);
 
     // Bone::Bone() | File: ../Graphics/Skeleton.h
@@ -66,10 +63,7 @@ void ASRegisterGeneratedDefaultConstructors(asIScriptEngine* engine)
     // BoundingBox::BoundingBox() noexcept | File: ../Math/BoundingBox.h
     engine->RegisterObjectBehaviour("BoundingBox", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<BoundingBox>), AS_CALL_CDECL_OBJFIRST);
 
-    // BufferedSoundStream::BufferedSoundStream() | File: ../Audio/BufferedSoundStream.h
-    engine->RegisterObjectBehaviour("BufferedSoundStream", asBEHAVE_FACTORY, "BufferedSoundStream@+ f()", asFUNCTION(ASCompatibleFactory<BufferedSoundStream>), AS_CALL_CDECL);
-
-    // CascadeParameters::CascadeParameters()=default | File: ../Graphics/Light.h
+    // CascadeParameters::CascadeParameters() = default | File: ../Graphics/Light.h
     engine->RegisterObjectBehaviour("CascadeParameters", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<CascadeParameters>), AS_CALL_CDECL_OBJFIRST);
 
     // CharLocation::CharLocation() | Implicitly-declared
@@ -81,17 +75,11 @@ void ASRegisterGeneratedDefaultConstructors(asIScriptEngine* engine)
     // ColorFrame::ColorFrame() | File: ../Graphics/ParticleEffect.h
     engine->RegisterObjectBehaviour("ColorFrame", asBEHAVE_FACTORY, "ColorFrame@+ f()", asFUNCTION(ASCompatibleFactory<ColorFrame>), AS_CALL_CDECL);
 
-    // ComponentReplicationState::ComponentReplicationState() | Implicitly-declared
-    engine->RegisterObjectBehaviour("ComponentReplicationState", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<ComponentReplicationState>), AS_CALL_CDECL_OBJFIRST);
-
     // CompressedLevel::CompressedLevel() | Implicitly-declared
     engine->RegisterObjectBehaviour("CompressedLevel", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<CompressedLevel>), AS_CALL_CDECL_OBJFIRST);
 
     // Condition::Condition() | File: ../Core/Condition.h
     engine->RegisterObjectBehaviour("Condition", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<Condition>), AS_CALL_CDECL_OBJFIRST);
-
-    // Context::Context() | File: ../Core/Context.h
-    engine->RegisterObjectBehaviour("Context", asBEHAVE_FACTORY, "Context@+ f()", asFUNCTION(ASCompatibleFactory<Context>), AS_CALL_CDECL);
 
     // Controls::Controls() | File: ../Input/Controls.h
     engine->RegisterObjectBehaviour("Controls", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<Controls>), AS_CALL_CDECL_OBJFIRST);
@@ -99,28 +87,25 @@ void ASRegisterGeneratedDefaultConstructors(asIScriptEngine* engine)
     // CursorShapeInfo::CursorShapeInfo() | File: ../UI/Cursor.h
     engine->RegisterObjectBehaviour("CursorShapeInfo", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<CursorShapeInfo>), AS_CALL_CDECL_OBJFIRST);
 
-    // DebugLine::DebugLine()=default | File: ../Graphics/DebugRenderer.h
+    // DebugLine::DebugLine() = default | File: ../Graphics/DebugRenderer.h
     engine->RegisterObjectBehaviour("DebugLine", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<DebugLine>), AS_CALL_CDECL_OBJFIRST);
 
-    // DebugTriangle::DebugTriangle()=default | File: ../Graphics/DebugRenderer.h
+    // DebugTriangle::DebugTriangle() = default | File: ../Graphics/DebugRenderer.h
     engine->RegisterObjectBehaviour("DebugTriangle", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<DebugTriangle>), AS_CALL_CDECL_OBJFIRST);
 
     // Decal::Decal() | File: ../Graphics/DecalSet.h
     engine->RegisterObjectBehaviour("Decal", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<Decal>), AS_CALL_CDECL_OBJFIRST);
 
-    // DecalVertex::DecalVertex()=default | File: ../Graphics/DecalSet.h
+    // DecalVertex::DecalVertex() = default | File: ../Graphics/DecalSet.h
     engine->RegisterObjectBehaviour("DecalVertex", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<DecalVertex>), AS_CALL_CDECL_OBJFIRST);
 
-    // DirtyBits::DirtyBits()=default | File: ../Scene/ReplicationState.h
+    // DirtyBits::DirtyBits() = default | File: ../Scene/ReplicationState.h
     engine->RegisterObjectBehaviour("DirtyBits", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<DirtyBits>), AS_CALL_CDECL_OBJFIRST);
-
-    // EventReceiverGroup::EventReceiverGroup() | File: ../Core/Context.h
-    engine->RegisterObjectBehaviour("EventReceiverGroup", asBEHAVE_FACTORY, "EventReceiverGroup@+ f()", asFUNCTION(ASCompatibleFactory<EventReceiverGroup>), AS_CALL_CDECL);
 
     // FileSelectorEntry::FileSelectorEntry() | Implicitly-declared
     engine->RegisterObjectBehaviour("FileSelectorEntry", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<FileSelectorEntry>), AS_CALL_CDECL_OBJFIRST);
 
-    // FocusParameters::FocusParameters()=default | File: ../Graphics/Light.h
+    // FocusParameters::FocusParameters() = default | File: ../Graphics/Light.h
     engine->RegisterObjectBehaviour("FocusParameters", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<FocusParameters>), AS_CALL_CDECL_OBJFIRST);
 
     // FontGlyph::FontGlyph() | Implicitly-declared
@@ -129,7 +114,7 @@ void ASRegisterGeneratedDefaultConstructors(asIScriptEngine* engine)
     // FrameInfo::FrameInfo() | Implicitly-declared
     engine->RegisterObjectBehaviour("FrameInfo", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<FrameInfo>), AS_CALL_CDECL_OBJFIRST);
 
-    // Frustum::Frustum() noexcept=default | File: ../Math/Frustum.h
+    // Frustum::Frustum() noexcept = default | File: ../Math/Frustum.h
     engine->RegisterObjectBehaviour("Frustum", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<Frustum>), AS_CALL_CDECL_OBJFIRST);
 
     // GeometryDesc::GeometryDesc() | Implicitly-declared
@@ -150,7 +135,7 @@ void ASRegisterGeneratedDefaultConstructors(asIScriptEngine* engine)
     // IndexBufferDesc::IndexBufferDesc() | Implicitly-declared
     engine->RegisterObjectBehaviour("IndexBufferDesc", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<IndexBufferDesc>), AS_CALL_CDECL_OBJFIRST);
 
-    // InstanceData::InstanceData()=default | File: ../Graphics/Batch.h
+    // InstanceData::InstanceData() = default | File: ../Graphics/Batch.h
     engine->RegisterObjectBehaviour("InstanceData", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<InstanceData>), AS_CALL_CDECL_OBJFIRST);
 
     // IntRect::IntRect() noexcept | File: ../Math/Rect.h
@@ -210,9 +195,6 @@ void ASRegisterGeneratedDefaultConstructors(asIScriptEngine* engine)
     // NodeImpl::NodeImpl() | Implicitly-declared
     engine->RegisterObjectBehaviour("NodeImpl", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<NodeImpl>), AS_CALL_CDECL_OBJFIRST);
 
-    // NodeReplicationState::NodeReplicationState() | Implicitly-declared
-    engine->RegisterObjectBehaviour("NodeReplicationState", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<NodeReplicationState>), AS_CALL_CDECL_OBJFIRST);
-
     // OcclusionBatch::OcclusionBatch() | Implicitly-declared
     engine->RegisterObjectBehaviour("OcclusionBatch", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<OcclusionBatch>), AS_CALL_CDECL_OBJFIRST);
 
@@ -231,13 +213,13 @@ void ASRegisterGeneratedDefaultConstructors(asIScriptEngine* engine)
     // Plane::Plane() noexcept | File: ../Math/Plane.h
     engine->RegisterObjectBehaviour("Plane", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<Plane>), AS_CALL_CDECL_OBJFIRST);
 
-    // Polyhedron::Polyhedron() noexcept=default | File: ../Math/Polyhedron.h
+    // Polyhedron::Polyhedron() noexcept = default | File: ../Math/Polyhedron.h
     engine->RegisterObjectBehaviour("Polyhedron", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<Polyhedron>), AS_CALL_CDECL_OBJFIRST);
 
     // Quaternion::Quaternion() noexcept | File: ../Math/Quaternion.h
     engine->RegisterObjectBehaviour("Quaternion", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<Quaternion>), AS_CALL_CDECL_OBJFIRST);
 
-    // Ray::Ray() noexcept=default | File: ../Math/Ray.h
+    // Ray::Ray() noexcept = default | File: ../Math/Ray.h
     engine->RegisterObjectBehaviour("Ray", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<Ray>), AS_CALL_CDECL_OBJFIRST);
 
     // RayQueryResult::RayQueryResult() | File: ../Graphics/OctreeQuery.h
@@ -252,9 +234,6 @@ void ASRegisterGeneratedDefaultConstructors(asIScriptEngine* engine)
     // RefCounted::RefCounted() | File: ../Container/RefCounted.h
     engine->RegisterObjectBehaviour("RefCounted", asBEHAVE_FACTORY, "RefCounted@+ f()", asFUNCTION(ASCompatibleFactory<RefCounted>), AS_CALL_CDECL);
 
-    // RenderPath::RenderPath() | File: ../Graphics/RenderPath.h
-    engine->RegisterObjectBehaviour("RenderPath", asBEHAVE_FACTORY, "RenderPath@+ f()", asFUNCTION(ASCompatibleFactory<RenderPath>), AS_CALL_CDECL);
-
     // RenderPathCommand::RenderPathCommand() | Implicitly-declared
     engine->RegisterObjectBehaviour("RenderPathCommand", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<RenderPathCommand>), AS_CALL_CDECL_OBJFIRST);
 
@@ -267,17 +246,14 @@ void ASRegisterGeneratedDefaultConstructors(asIScriptEngine* engine)
     // ResourceGroup::ResourceGroup() | File: ../Resource/ResourceCache.h
     engine->RegisterObjectBehaviour("ResourceGroup", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<ResourceGroup>), AS_CALL_CDECL_OBJFIRST);
 
-    // ResourceRef::ResourceRef()=default | File: ../Core/Variant.h
+    // ResourceRef::ResourceRef() = default | File: ../Core/Variant.h
     engine->RegisterObjectBehaviour("ResourceRef", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<ResourceRef>), AS_CALL_CDECL_OBJFIRST);
 
-    // ResourceRefList::ResourceRefList()=default | File: ../Core/Variant.h
+    // ResourceRefList::ResourceRefList() = default | File: ../Core/Variant.h
     engine->RegisterObjectBehaviour("ResourceRefList", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<ResourceRefList>), AS_CALL_CDECL_OBJFIRST);
 
     // ScenePassInfo::ScenePassInfo() | Implicitly-declared
     engine->RegisterObjectBehaviour("ScenePassInfo", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<ScenePassInfo>), AS_CALL_CDECL_OBJFIRST);
-
-    // SceneReplicationState::SceneReplicationState() | Implicitly-declared
-    engine->RegisterObjectBehaviour("SceneReplicationState", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<SceneReplicationState>), AS_CALL_CDECL_OBJFIRST);
 
     // SceneResolver::SceneResolver() | File: ../Scene/SceneResolver.h
     engine->RegisterObjectBehaviour("SceneResolver", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<SceneResolver>), AS_CALL_CDECL_OBJFIRST);
@@ -288,7 +264,7 @@ void ASRegisterGeneratedDefaultConstructors(asIScriptEngine* engine)
     // ScreenModeParams::ScreenModeParams() | Implicitly-declared
     engine->RegisterObjectBehaviour("ScreenModeParams", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<ScreenModeParams>), AS_CALL_CDECL_OBJFIRST);
 
-    // ShaderParameter::ShaderParameter()=default | File: ../Graphics/ShaderVariation.h
+    // ShaderParameter::ShaderParameter() = default | File: ../Graphics/ShaderVariation.h
     engine->RegisterObjectBehaviour("ShaderParameter", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<ShaderParameter>), AS_CALL_CDECL_OBJFIRST);
 
     // ShadowBatchQueue::ShadowBatchQueue() | Implicitly-declared
@@ -309,7 +285,7 @@ void ASRegisterGeneratedDefaultConstructors(asIScriptEngine* engine)
     // StaticModelGeometryData::StaticModelGeometryData() | Implicitly-declared
     engine->RegisterObjectBehaviour("StaticModelGeometryData", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<StaticModelGeometryData>), AS_CALL_CDECL_OBJFIRST);
 
-    // StoredLogMessage::StoredLogMessage()=default | File: ../IO/Log.h
+    // StoredLogMessage::StoredLogMessage() = default | File: ../IO/Log.h
     engine->RegisterObjectBehaviour("StoredLogMessage", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<StoredLogMessage>), AS_CALL_CDECL_OBJFIRST);
 
     // String::String() noexcept | File: ../Container/Str.h
@@ -327,7 +303,7 @@ void ASRegisterGeneratedDefaultConstructors(asIScriptEngine* engine)
     // Timer::Timer() | File: ../Core/Timer.h
     engine->RegisterObjectBehaviour("Timer", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<Timer>), AS_CALL_CDECL_OBJFIRST);
 
-    // TrailPoint::TrailPoint()=default | File: ../Graphics/RibbonTrail.h
+    // TrailPoint::TrailPoint() = default | File: ../Graphics/RibbonTrail.h
     engine->RegisterObjectBehaviour("TrailPoint", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<TrailPoint>), AS_CALL_CDECL_OBJFIRST);
 
     // UIBatch::UIBatch() | File: ../UI/UIBatch.h
@@ -339,7 +315,7 @@ void ASRegisterGeneratedDefaultConstructors(asIScriptEngine* engine)
     // VAnimKeyFrame::VAnimKeyFrame() | Implicitly-declared
     engine->RegisterObjectBehaviour("VAnimKeyFrame", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<VAnimKeyFrame>), AS_CALL_CDECL_OBJFIRST);
 
-    // Variant::Variant()=default | File: ../Core/Variant.h
+    // Variant::Variant() = default | File: ../Core/Variant.h
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<Variant>), AS_CALL_CDECL_OBJFIRST);
 
     // Vector2::Vector2() noexcept | File: ../Math/Vector2.h
@@ -353,9 +329,6 @@ void ASRegisterGeneratedDefaultConstructors(asIScriptEngine* engine)
 
     // VectorBase::VectorBase() noexcept | File: ../Container/VectorBase.h
     engine->RegisterObjectBehaviour("VectorBase", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<VectorBase>), AS_CALL_CDECL_OBJFIRST);
-
-    // VectorBuffer::VectorBuffer() | File: ../IO/VectorBuffer.h
-    engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<VectorBuffer>), AS_CALL_CDECL_OBJFIRST);
 
     // VertexBufferDesc::VertexBufferDesc() | Implicitly-declared
     engine->RegisterObjectBehaviour("VertexBufferDesc", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<VertexBufferDesc>), AS_CALL_CDECL_OBJFIRST);
@@ -390,9 +363,6 @@ void ASRegisterGeneratedDefaultConstructors(asIScriptEngine* engine)
 
     // NavigationPathPoint::NavigationPathPoint() | Implicitly-declared
     engine->RegisterObjectBehaviour("NavigationPathPoint", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<NavigationPathPoint>), AS_CALL_CDECL_OBJFIRST);
-
-    // SimpleNavBuildData::SimpleNavBuildData() | File: ../Navigation/NavBuildData.h
-    engine->RegisterObjectBehaviour("SimpleNavBuildData", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<SimpleNavBuildData>), AS_CALL_CDECL_OBJFIRST);
 #endif
 
 #ifdef URHO3D_NETWORK
@@ -430,21 +400,55 @@ void ASRegisterGeneratedDefaultConstructors(asIScriptEngine* engine)
     // PhysicsRaycastResult2D::PhysicsRaycastResult2D() | Implicitly-declared
     engine->RegisterObjectBehaviour("PhysicsRaycastResult2D", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<PhysicsRaycastResult2D>), AS_CALL_CDECL_OBJFIRST);
 
-    // PropertySet2D::PropertySet2D() | File: ../Urho2D/TileMapDefs2D.h
-    engine->RegisterObjectBehaviour("PropertySet2D", asBEHAVE_FACTORY, "PropertySet2D@+ f()", asFUNCTION(ASCompatibleFactory<PropertySet2D>), AS_CALL_CDECL);
-
     // SourceBatch2D::SourceBatch2D() | File: ../Urho2D/Drawable2D.h
     engine->RegisterObjectBehaviour("SourceBatch2D", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<SourceBatch2D>), AS_CALL_CDECL_OBJFIRST);
+
+    // Vertex2D::Vertex2D() | Implicitly-declared
+    engine->RegisterObjectBehaviour("Vertex2D", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<Vertex2D>), AS_CALL_CDECL_OBJFIRST);
+#endif
+
+    // BatchGroup::BatchGroup() | File: ../Graphics/Batch.h
+    engine->RegisterObjectBehaviour("BatchGroup", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<BatchGroup>), AS_CALL_CDECL_OBJFIRST);
+
+    // ComponentReplicationState::ComponentReplicationState() | Implicitly-declared
+    engine->RegisterObjectBehaviour("ComponentReplicationState", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<ComponentReplicationState>), AS_CALL_CDECL_OBJFIRST);
+
+    // Context::Context() | File: ../Core/Context.h
+    engine->RegisterObjectBehaviour("Context", asBEHAVE_FACTORY, "Context@+ f()", asFUNCTION(ASCompatibleFactory<Context>), AS_CALL_CDECL);
+
+    // EventReceiverGroup::EventReceiverGroup() | File: ../Core/Context.h
+    engine->RegisterObjectBehaviour("EventReceiverGroup", asBEHAVE_FACTORY, "EventReceiverGroup@+ f()", asFUNCTION(ASCompatibleFactory<EventReceiverGroup>), AS_CALL_CDECL);
+
+    // NodeReplicationState::NodeReplicationState() | Implicitly-declared
+    engine->RegisterObjectBehaviour("NodeReplicationState", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<NodeReplicationState>), AS_CALL_CDECL_OBJFIRST);
+
+    // RenderPath::RenderPath() | File: ../Graphics/RenderPath.h
+    engine->RegisterObjectBehaviour("RenderPath", asBEHAVE_FACTORY, "RenderPath@+ f()", asFUNCTION(ASCompatibleFactory<RenderPath>), AS_CALL_CDECL);
+
+    // SceneReplicationState::SceneReplicationState() | Implicitly-declared
+    engine->RegisterObjectBehaviour("SceneReplicationState", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<SceneReplicationState>), AS_CALL_CDECL_OBJFIRST);
+
+#ifdef URHO3D_NAVIGATION
+    // SimpleNavBuildData::SimpleNavBuildData() | File: ../Navigation/NavBuildData.h
+    engine->RegisterObjectBehaviour("SimpleNavBuildData", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<SimpleNavBuildData>), AS_CALL_CDECL_OBJFIRST);
+#endif
+
+#ifdef URHO3D_URHO2D
+    // PropertySet2D::PropertySet2D() | File: ../Urho2D/TileMapDefs2D.h
+    engine->RegisterObjectBehaviour("PropertySet2D", asBEHAVE_FACTORY, "PropertySet2D@+ f()", asFUNCTION(ASCompatibleFactory<PropertySet2D>), AS_CALL_CDECL);
 
     // Tile2D::Tile2D() | File: ../Urho2D/TileMapDefs2D.h
     engine->RegisterObjectBehaviour("Tile2D", asBEHAVE_FACTORY, "Tile2D@+ f()", asFUNCTION(ASCompatibleFactory<Tile2D>), AS_CALL_CDECL);
 
     // TileMapObject2D::TileMapObject2D() | File: ../Urho2D/TileMapDefs2D.h
     engine->RegisterObjectBehaviour("TileMapObject2D", asBEHAVE_FACTORY, "TileMapObject2D@+ f()", asFUNCTION(ASCompatibleFactory<TileMapObject2D>), AS_CALL_CDECL);
-
-    // Vertex2D::Vertex2D() | Implicitly-declared
-    engine->RegisterObjectBehaviour("Vertex2D", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<Vertex2D>), AS_CALL_CDECL_OBJFIRST);
 #endif
+
+    // BufferedSoundStream::BufferedSoundStream() | File: ../Audio/BufferedSoundStream.h
+    engine->RegisterObjectBehaviour("BufferedSoundStream", asBEHAVE_FACTORY, "BufferedSoundStream@+ f()", asFUNCTION(ASCompatibleFactory<BufferedSoundStream>), AS_CALL_CDECL);
+
+    // VectorBuffer::VectorBuffer() | File: ../IO/VectorBuffer.h
+    engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<VectorBuffer>), AS_CALL_CDECL_OBJFIRST);
 }
 
 }
