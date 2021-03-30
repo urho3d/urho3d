@@ -1,0 +1,11 @@
+prefix=C:/Program Files/Urho3D
+exec_prefix=C:/Program Files/Urho3D/
+libdir=C:/Program Files/Urho3D/lib
+includedir=C:/Program Files/Urho3D/../include/include
+
+Name: Urho3D
+Description: Import various well-known 3D model formats in an uniform manner.
+Version: 5.0.0
+Libs: -L${libdir} -lassimp
+Libs.private:  
+Cflags: -I${includedir}
