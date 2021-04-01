@@ -43,6 +43,10 @@
 # 3) Add libassimp using the file lists (eliminates duplication of file names between
 #    source groups and library command)
 #
+
+# Urho3D: modified to force in house builds, removed anything not needed for
+# a static build.
+
 cmake_minimum_required( VERSION 3.0 )
 SET( HEADER_PATH ../include/assimp )
 
@@ -256,7 +260,7 @@ OPTION(ASSIMP_BUILD_ALL_EXPORTERS_BY_DEFAULT "default value of all ASSIMP_BUILD_
 # this way selective loaders can be compiled (reduces filesize + compile time)
 MACRO(ADD_ASSIMP_EXPORTER name)
   IF (ASSIMP_NO_EXPORT)
-	set(ASSIMP_EXPORTER_ENABLED FALSE)
+    set(ASSIMP_EXPORTER_ENABLED FALSE)
   ELSEIF (ASSIMP_BUILD_ALL_EXPORTERS_BY_DEFAULT)
     set(ASSIMP_EXPORTER_ENABLED TRUE)
     IF (DEFINED ASSIMP_BUILD_${name}_EXPORTER AND NOT ASSIMP_BUILD_${name}_EXPORTER)
@@ -268,7 +272,7 @@ MACRO(ADD_ASSIMP_EXPORTER name)
 
   IF (ASSIMP_EXPORTER_ENABLED)
     SET(ASSIMP_EXPORTERS_ENABLED "${ASSIMP_EXPORTERS_ENABLED} ${name}")
-	LIST(APPEND ASSIMP_EXPORTER_SRCS ${ARGN})
+    LIST(APPEND ASSIMP_EXPORTER_SRCS ${ARGN})
     SOURCE_GROUP(${name}_EXPORTER FILES ${ARGN})
   ELSE()
     SET(ASSIMP_EXPORTERS_DISABLED "${ASSIMP_EXPORTERS_DISABLED} ${name}")
@@ -854,12 +858,12 @@ ADD_ASSIMP_EXPORTER( STEP
 )
 
 if ((NOT ASSIMP_NO_EXPORT) OR (NOT ASSIMP_EXPORTERS_ENABLED STREQUAL ""))
-	SET( Exporter_SRCS
-	  Common/Exporter.cpp
-	  CApi/AssimpCExport.cpp
-	  ${HEADER_PATH}/BlobIOSystem.h
-	)
-	SOURCE_GROUP( Exporter FILES ${Exporter_SRCS})
+    SET( Exporter_SRCS
+      Common/Exporter.cpp
+      CApi/AssimpCExport.cpp
+      ${HEADER_PATH}/BlobIOSystem.h
+    )
+    SOURCE_GROUP( Exporter FILES ${Exporter_SRCS})
 endif()
 
 SET( Extra_SRCS
@@ -923,9 +927,9 @@ SOURCE_GROUP( ziplib FILES ${ziplib_SRCS} )
 
 # TODO if cmake required version has been updated to >3.12.0, collapse this to the second case only
 if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
-	add_definitions(-DMINIZ_USE_UNALIGNED_LOADS_AND_STORES=0)
+    add_definitions(-DMINIZ_USE_UNALIGNED_LOADS_AND_STORES=0)
 else()
-	add_compile_definitions(MINIZ_USE_UNALIGNED_LOADS_AND_STORES=0)
+    add_compile_definitions(MINIZ_USE_UNALIGNED_LOADS_AND_STORES=0)
 endif()
 
 SOURCE_GROUP( ziplib FILES ${ziplib_SRCS} )
@@ -1095,7 +1099,7 @@ ADD_DEFINITIONS( -DOPENDDLPARSER_BUILD )
 # Urho3D: We're bypassing the contrib CMakeLists.txt and so IRRXML_INCLUDE_DIR is never set.
 INCLUDE_DIRECTORIES(
     #${IRRXML_INCLUDE_DIR}
-	../contrib/irrXML
+    ../contrib/irrXML
     ../contrib/openddlparser/include
 )
 
@@ -1110,7 +1114,6 @@ ENDIF (ASSIMP_BUILD_NONFREE_C4D_IMPORTER)
 # Urho3D - commented out targets defined by the original CMakeLists.txt and use our own macro instead
 
 # Define target name
-# For some unholy reason this is capital case in Urho3D and small case in assimp
 set (TARGET_NAME Assimp)
 
 # Define source files

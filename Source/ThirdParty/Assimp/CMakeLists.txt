@@ -38,7 +38,9 @@ SET(CMAKE_POLICY_DEFAULT_CMP0074 NEW)
 
 CMAKE_MINIMUM_REQUIRED( VERSION 3.0 )
 
-# Modified for Urho3D
+# Modified for Urho3D: Removed Hunter, Android, tests, forced in-house builds,
+# ignored contrib folder and included their source manually, removed useless
+# cmake options related to shared libs and so.
 
 PROJECT( Assimp VERSION 5.0.0 )
 
@@ -210,7 +212,7 @@ ENDIF( ASSIMP_NO_EXPORT )
 SET ( ASSIMP_BUILD_ARCHITECTURE "" CACHE STRING
   "describe the current architecture."
 )
-IF    ( ASSIMP_BUILD_ARCHITECTURE STREQUAL "")
+IF( ASSIMP_BUILD_ARCHITECTURE STREQUAL "")
 ELSE  ( ASSIMP_BUILD_ARCHITECTURE STREQUAL "")
   ADD_DEFINITIONS ( -D'ASSIMP_BUILD_ARCHITECTURE="${ASSIMP_BUILD_ARCHITECTURE}"' )
 ENDIF ( ASSIMP_BUILD_ARCHITECTURE STREQUAL "")
