@@ -1163,3 +1163,9 @@ SET_TARGET_PROPERTIES( Assimp PROPERTIES
 IF (RT_FOUND AND ASSIMP_IMPORTER_GLTF_USE_OPEN3DGC)
   TARGET_LINK_LIBRARIES(assimp ${RT_LIBRARY})
 ENDIF (RT_FOUND AND ASSIMP_IMPORTER_GLTF_USE_OPEN3DGC)
+
+# When performing Xcode CI build suppress all the warnings for 3rd party libraries because there are just too many of them
+if (XCODE AND DEFINED ENV{CI})
+    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
+endif ()
