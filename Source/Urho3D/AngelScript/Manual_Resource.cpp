@@ -38,13 +38,13 @@ void ASRegisterManualFirst_Resource(asIScriptEngine* engine)
 
 // ========================================================================================
 
-// template<class T> T * Object::GetSubsystem() const | File: ../Core/Object.h
+// template <class T> T* Context::GetSubsystem() const | File: ../Core/Context.h
 static ResourceCache* GetResourceCache()
 {
     return GetScriptContext()->GetSubsystem<ResourceCache>();
 }
 
-// template<class T> T * Object::GetSubsystem() const | File: ../Core/Object.h
+// template <class T> T* Context::GetSubsystem() const | File: ../Core/Context.h
 static Localization* GetLocalization()
 {
     return GetScriptContext()->GetSubsystem<Localization>();
@@ -53,126 +53,12 @@ static Localization* GetLocalization()
 // This function is called after ASRegisterGenerated()
 void ASRegisterManualLast_Resource(asIScriptEngine* engine)
 {
-    // template<class T> T * Object::GetSubsystem() const | File: ../Core/Object.h
+    // template <class T> T* Context::GetSubsystem() const | File: ../Core/Context.h
     engine->RegisterGlobalFunction("Localization@+ get_localization()", AS_FUNCTION(GetLocalization), AS_CALL_CDECL);
-    // template<class T> T * Object::GetSubsystem() const | File: ../Core/Object.h
+    
+    // template <class T> T* Context::GetSubsystem() const | File: ../Core/Context.h
     engine->RegisterGlobalFunction("ResourceCache@+ get_resourceCache()", AS_FUNCTION(GetResourceCache), AS_CALL_CDECL);
-    // template<class T> T * Object::GetSubsystem() const | File: ../Core/Object.h
     engine->RegisterGlobalFunction("ResourceCache@+ get_cache()", AS_FUNCTION(GetResourceCache), AS_CALL_CDECL);
-}
-
-// ========================================================================================
-
-// bool Resource::Load(Deserializer &source) | File: ../Resource/Resource.h
-bool ResourceLoad(File* file, Resource* ptr)
-{
-    return file && ptr->Load(*file);
-}
-
-// bool Resource::Load(Deserializer &source) | File: ../Resource/Resource.h
-bool ResourceLoadVectorBuffer(VectorBuffer& buffer, Resource* ptr)
-{
-    return ptr->Load(buffer);
-}
-
-// virtual bool Resource::Save(Serializer &dest) const | File: ../Resource/Resource.h
-bool ResourceSave(File* file, Resource* ptr)
-{
-    return file && ptr->Save(*file);
-}
-
-// virtual bool Resource::Save(Serializer &dest) const | File: ../Resource/Resource.h
-bool ResourceSaveVectorBuffer(VectorBuffer& buffer, Resource* ptr)
-{
-    return ptr->Save(buffer);
-}
-
-// ========================================================================================
-
-// bool XPathQuery::SetQuery(const String &queryString, const String &variableString=String::EMPTY, bool bind=true) | File: ../Resource/XMLElement.h
-bool XPathQuery_SetQuery(const String& queryString, XPathQuery* ptr)
-{
-    return ptr->SetQuery(queryString);
-}
-
-// ========================================================================================
-
-// XMLElement XMLFile::GetRoot(const String &name=String::EMPTY) | File: ../Resource/XMLFile.h
-XMLElement XMLFileGetRootDefault(XMLFile* ptr)
-{
-    return ptr->GetRoot();
-}
-
-// ========================================================================================
-
-void ArrayToVariantVector(CScriptArray* arr, VariantVector& dest);
-
-// XMLElement XMLElement::SelectSingle(const String &query, pugi::xpath_variable_set *variables=nullptr) const | File: ../Resource/XMLElement.h
-XMLElement XMLElement_SelectSingle(const String& query, XMLElement* ptr)
-{
-    return ptr->SelectSingle(query);
-}
-
-// XPathResultSet XMLElement::Select(const String &query, pugi::xpath_variable_set *variables=nullptr) const | File: ../Resource/XMLElement.h
-XPathResultSet XMLElement_Select(const String& query, XMLElement* ptr)
-{
-    return ptr->Select(query);
-}
-
-// bool XMLElement::SetVariantVector(const VariantVector &value) | File: ../Resource/XMLElement.h
-bool XMLElementSetVariantVector(CScriptArray* value, XMLElement* ptr)
-{
-    VariantVector src;
-    ArrayToVariantVector(value, src);
-    return ptr->SetVariantVector(src);
-}
-
-// VariantVector XMLElement::GetVariantVector() const | File: ../Resource/XMLElement.h
-CScriptArray* XMLElementGetVariantVector(XMLElement* ptr)
-{
-    return VectorToArray<Variant>(ptr->GetVariantVector(), "Array<Variant>");
-}
-
-// ========================================================================================
-
-// void ResourceCache::GetResources(PODVector< Resource * > &result, StringHash type) const | File: ../Resource/ResourceCache.h
-CScriptArray* ResourceCacheGetResources(StringHash type, ResourceCache* ptr)
-{
-    PODVector<Resource*> resources;
-    ptr->GetResources(resources, type);
-    return VectorToHandleArray(resources, "Array<Resource@>");
-}
-
-// ========================================================================================
-
-CScriptArray* JSONValueGetKeys(const JSONValue& jsonValue)
-{
-    Vector<String> keys;
-    if (jsonValue.IsObject())
-    {
-        for (ConstJSONObjectIterator i = jsonValue.Begin(); i != jsonValue.End(); ++i)
-            keys.Push(i->first_);
-    }
-
-    return VectorToArray<String>(keys, "Array<String>");
-}
-
-CScriptArray* JSONValueGetValues(const JSONValue& jsonValue)
-{
-    if (jsonValue.IsArray())
-        return VectorToArray<JSONValue>(jsonValue.GetArray(), "Array<JSONValue>");
-    else
-    {
-        Vector<JSONValue> values;
-
-        if (jsonValue.IsObject())
-        {
-            for (ConstJSONObjectIterator i = jsonValue.Begin(); i != jsonValue.End(); ++i)
-                values.Push(i->second_);
-        }
-
-        return VectorToArray<JSONValue>(values, "Array<JSONValue>");
-    }
 }
 
 }

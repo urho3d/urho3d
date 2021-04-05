@@ -9,21 +9,21 @@ namespace Urho3D
 {
 
 // const Vector<String>& GetArguments() | File: ../Core/ProcessUtils.h
-static CScriptArray* GetArguments_void()
+static CScriptArray* constspVectorlesStringgreamp_GetArguments_void()
 {
     const Vector<String>& result = GetArguments();
     return VectorToArray<String>(result, "Array<String>");
 }
 
-// const Vector<String>& ParseArguments(const String& cmdLine, bool skipFirstArgument=true) | File: ../Core/ProcessUtils.h
-static CScriptArray* ParseArguments_String_bool(const String& cmdLine, bool skipFirstArgument)
+// const Vector<String>& ParseArguments(const String& cmdLine, bool skipFirstArgument = true) | File: ../Core/ProcessUtils.h
+static CScriptArray* constspVectorlesStringgreamp_ParseArguments_constspStringamp_bool(const String& cmdLine, bool skipFirstArgument)
 {
     const Vector<String>& result = ParseArguments(cmdLine, skipFirstArgument);
     return VectorToArray<String>(result, "Array<String>");
 }
 
-// bool WriteDrawablesToOBJ(const PODVector<Drawable*>& drawables, File* outputFile, bool asZUp, bool asRightHanded, bool writeLightmapUV=false) | File: ../Graphics/Drawable.h
-static bool WriteDrawablesToOBJ_PODVectorDrawable_File_bool_bool_bool(CScriptArray* drawables_conv, File* outputFile, bool asZUp, bool asRightHanded, bool writeLightmapUV)
+// bool WriteDrawablesToOBJ(const PODVector<Drawable*>& drawables, File* outputFile, bool asZUp, bool asRightHanded, bool writeLightmapUV = false) | File: ../Graphics/Drawable.h
+static bool bool_WriteDrawablesToOBJ_constspPODVectorlesDrawablestargreamp_Filestar_bool_bool_bool(CScriptArray* drawables_conv, File* outputFile, bool asZUp, bool asRightHanded, bool writeLightmapUV)
 {
     PODVector<Drawable*> drawables = ArrayToPODVector<Drawable*>(drawables_conv);
     bool result = WriteDrawablesToOBJ(drawables, outputFile, asZUp, asRightHanded, writeLightmapUV);
@@ -32,10 +32,10 @@ static bool WriteDrawablesToOBJ_PODVectorDrawable_File_bool_bool_bool(CScriptArr
 
 void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
 {
-    // template<class T> T Abs(T value) | File: ../Math/MathDefs.h
+    // template <class T> T Abs(T value) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("float Abs(float)", AS_FUNCTIONPR(Abs, (float), float), AS_CALL_CDECL);
 
-    // template<class T> T Acos(T x) | File: ../Math/MathDefs.h
+    // template <class T> T Acos(T x) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("float Acos(float)", AS_FUNCTIONPR(Acos, (float), float), AS_CALL_CDECL);
 
     // String AddTrailingSlash(const String& pathName) | File: ../IO/FileSystem.h
@@ -44,7 +44,7 @@ void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
     // void AllocatorFree(AllocatorBlock* allocator, void* ptr) | File: ../Container/Allocator.h
     // Error: type "AllocatorBlock*" can not automatically bind
 
-    // AllocatorBlock* AllocatorInitialize(unsigned nodeSize, unsigned initialCapacity=1) | File: ../Container/Allocator.h
+    // AllocatorBlock* AllocatorInitialize(unsigned nodeSize, unsigned initialCapacity = 1) | File: ../Container/Allocator.h
     // Error: type "AllocatorBlock*" can not automatically bind
 
     // void* AllocatorReserve(AllocatorBlock* allocator) | File: ../Container/Allocator.h
@@ -53,25 +53,25 @@ void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
     // void AllocatorUninitialize(AllocatorBlock* allocator) | File: ../Container/Allocator.h
     // Error: type "AllocatorBlock*" can not automatically bind
 
-    // template<class T> T Asin(T x) | File: ../Math/MathDefs.h
+    // template <class T> T Asin(T x) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("float Asin(float)", AS_FUNCTIONPR(Asin, (float), float), AS_CALL_CDECL);
 
-    // template<class T> T Atan(T x) | File: ../Math/MathDefs.h
+    // template <class T> T Atan(T x) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("float Atan(float)", AS_FUNCTIONPR(Atan, (float), float), AS_CALL_CDECL);
 
-    // template<class T> T Atan2(T y, T x) | File: ../Math/MathDefs.h
+    // template <class T> T Atan2(T y, T x) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("float Atan2(float, float)", AS_FUNCTIONPR(Atan2, (float, float), float), AS_CALL_CDECL);
 
     // void BufferToString(String& dest, const void* data, unsigned size) | File: ../Core/StringUtils.h
     // Error: type "const void*" can not automatically bind
 
-    // template<class T> T Ceil(T x) | File: ../Math/MathDefs.h
+    // template <class T> T Ceil(T x) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("float Ceil(float)", AS_FUNCTIONPR(Ceil, (float), float), AS_CALL_CDECL);
 
-    // template<class T> int CeilToInt(T x) | File: ../Math/MathDefs.h
+    // template <class T> int CeilToInt(T x) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("int CeilToInt(float)", AS_FUNCTIONPR(CeilToInt, (float), int), AS_CALL_CDECL);
 
-    // template<class T> T Clamp(T value, T min, T max) | File: ../Math/MathDefs.h
+    // template <class T> T Clamp(T value, T min, T max) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("float Clamp(float, float, float)", AS_FUNCTIONPR(Clamp, (float, float, float), float), AS_CALL_CDECL);
     engine->RegisterGlobalFunction("int Clamp(int, int, int)", AS_FUNCTIONPR(Clamp, (int, int, int), int), AS_CALL_CDECL);
 
@@ -96,7 +96,7 @@ void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
     // VectorBuffer CompressVectorBuffer(VectorBuffer& src) | File: ../IO/Compression.h
     engine->RegisterGlobalFunction("VectorBuffer CompressVectorBuffer(VectorBuffer&)", AS_FUNCTIONPR(CompressVectorBuffer, (VectorBuffer&), VectorBuffer), AS_CALL_CDECL);
 
-    // template<class T> T Cos(T angle) | File: ../Math/MathDefs.h
+    // template <class T> T Cos(T angle) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("float Cos(float)", AS_FUNCTIONPR(Cos, (float), float), AS_CALL_CDECL);
 
     // unsigned CountSetBits(unsigned value) | File: ../Math/MathDefs.h
@@ -123,13 +123,13 @@ void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
     // VectorBuffer DecompressVectorBuffer(VectorBuffer& src) | File: ../IO/Compression.h
     engine->RegisterGlobalFunction("VectorBuffer DecompressVectorBuffer(VectorBuffer&)", AS_FUNCTIONPR(DecompressVectorBuffer, (VectorBuffer&), VectorBuffer), AS_CALL_CDECL);
 
-    // template<class T> bool Equals(T lhs, T rhs) | File: ../Math/MathDefs.h
+    // template <class T> bool Equals(T lhs, T rhs) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("bool Equals(float, float)", AS_FUNCTIONPR(Equals, (float, float), bool), AS_CALL_CDECL);
 
     // void ErrorDialog(const String& title, const String& message) | File: ../Core/ProcessUtils.h
     engine->RegisterGlobalFunction("void ErrorDialog(const String&in, const String&in)", AS_FUNCTIONPR(ErrorDialog, (const String&, const String&), void), AS_CALL_CDECL);
 
-    // void ErrorExit(const String& message=String::EMPTY, int exitCode=EXIT_FAILURE) | File: ../Core/ProcessUtils.h
+    // void ErrorExit(const String& message = String::EMPTY, int exitCode = EXIT_FAILURE) | File: ../Core/ProcessUtils.h
     engine->RegisterGlobalFunction("void ErrorExit(const String&in = String::EMPTY, int = EXIT_FAILURE)", AS_FUNCTIONPR(ErrorExit, (const String&, int), void), AS_CALL_CDECL);
 
     // unsigned EstimateCompressBound(unsigned srcSize) | File: ../IO/Compression.h
@@ -147,20 +147,20 @@ void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
     // unsigned FloatToRawIntBits(float value) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("uint FloatToRawIntBits(float)", AS_FUNCTIONPR(FloatToRawIntBits, (float), unsigned), AS_CALL_CDECL);
 
-    // template<class T> T Floor(T x) | File: ../Math/MathDefs.h
+    // template <class T> T Floor(T x) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("float Floor(float)", AS_FUNCTIONPR(Floor, (float), float), AS_CALL_CDECL);
 
-    // template<class T> int FloorToInt(T x) | File: ../Math/MathDefs.h
+    // template <class T> int FloorToInt(T x) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("int FloorToInt(float)", AS_FUNCTIONPR(FloorToInt, (float), int), AS_CALL_CDECL);
 
-    // template<class T> T Fract(T value) | File: ../Math/MathDefs.h
+    // template <class T> T Fract(T value) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("float Fract(float)", AS_FUNCTIONPR(Fract, (float), float), AS_CALL_CDECL);
 
     // void GenerateTangents(void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount, unsigned normalOffset, unsigned texCoordOffset, unsigned tangentOffset) | File: ../Graphics/Tangent.h
     // Error: type "void*" can not automatically bind
 
     // const Vector<String>& GetArguments() | File: ../Core/ProcessUtils.h
-    engine->RegisterGlobalFunction("Array<String>@ GetArguments()", AS_FUNCTION(GetArguments_void), AS_CALL_CDECL);
+    engine->RegisterGlobalFunction("Array<String>@ GetArguments()", AS_FUNCTION(constspVectorlesStringgreamp_GetArguments_void), AS_CALL_CDECL);
 
     // const char* GetCompilerDefines() | File: ../LibraryInfo.h
     // Error: type "const char*" can not automatically bind
@@ -171,13 +171,13 @@ void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
     // StringHashRegister& GetEventNameRegister() | File: ../Core/Object.h
     engine->RegisterGlobalFunction("StringHashRegister& GetEventNameRegister()", AS_FUNCTIONPR(GetEventNameRegister, (), StringHashRegister&), AS_CALL_CDECL);
 
-    // String GetExtension(const String& fullPath, bool lowercaseExtension=true) | File: ../IO/FileSystem.h
+    // String GetExtension(const String& fullPath, bool lowercaseExtension = true) | File: ../IO/FileSystem.h
     engine->RegisterGlobalFunction("String GetExtension(const String&in, bool = true)", AS_FUNCTIONPR(GetExtension, (const String&, bool), String), AS_CALL_CDECL);
 
     // String GetFileName(const String& fullPath) | File: ../IO/FileSystem.h
     engine->RegisterGlobalFunction("String GetFileName(const String&in)", AS_FUNCTIONPR(GetFileName, (const String&), String), AS_CALL_CDECL);
 
-    // String GetFileNameAndExtension(const String& fileName, bool lowercaseExtension=false) | File: ../IO/FileSystem.h
+    // String GetFileNameAndExtension(const String& fileName, bool lowercaseExtension = false) | File: ../IO/FileSystem.h
     engine->RegisterGlobalFunction("String GetFileNameAndExtension(const String&in, bool = false)", AS_FUNCTIONPR(GetFileNameAndExtension, (const String&, bool), String), AS_CALL_CDECL);
 
     // String GetFileSizeString(unsigned long long memorySize) | File: ../Core/StringUtils.h
@@ -231,13 +231,13 @@ void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
     // const char* GetRevision() | File: ../LibraryInfo.h
     // Error: type "const char*" can not automatically bind
 
-    // unsigned GetStringListIndex(const String& value, const String* strings, unsigned defaultIndex, bool caseSensitive=false) | File: ../Core/StringUtils.h
+    // unsigned GetStringListIndex(const String& value, const String* strings, unsigned defaultIndex, bool caseSensitive = false) | File: ../Core/StringUtils.h
     // Error: type "const String*" can not automatically bind
 
-    // unsigned GetStringListIndex(const char* value, const String* strings, unsigned defaultIndex, bool caseSensitive=false) | File: ../Core/StringUtils.h
+    // unsigned GetStringListIndex(const char* value, const String* strings, unsigned defaultIndex, bool caseSensitive = false) | File: ../Core/StringUtils.h
     // Error: type "const char*" can not automatically bind
 
-    // unsigned GetStringListIndex(const char* value, const char** strings, unsigned defaultIndex, bool caseSensitive=false) | File: ../Core/StringUtils.h
+    // unsigned GetStringListIndex(const char* value, const char** strings, unsigned defaultIndex, bool caseSensitive = false) | File: ../Core/StringUtils.h
     // Error: type "const char*" can not automatically bind
 
     // unsigned long long GetTotalMemory() | File: ../Core/ProcessUtils.h
@@ -252,7 +252,7 @@ void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
     // void InitFPU() | File: ../Core/ProcessUtils.h
     engine->RegisterGlobalFunction("void InitFPU()", AS_FUNCTIONPR(InitFPU, (), void), AS_CALL_CDECL);
 
-    // template<class T> T InverseLerp(T lhs, T rhs, T x) | File: ../Math/MathDefs.h
+    // template <class T> T InverseLerp(T lhs, T rhs, T x) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("float InverseLerp(float, float, float)", AS_FUNCTIONPR(InverseLerp, (float, float, float), float), AS_CALL_CDECL);
 
     // bool IsAbsolutePath(const String& pathName) | File: ../IO/FileSystem.h
@@ -264,27 +264,27 @@ void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
     // bool IsDigit(unsigned ch) | File: ../Core/StringUtils.h
     engine->RegisterGlobalFunction("bool IsDigit(uint)", AS_FUNCTIONPR(IsDigit, (unsigned), bool), AS_CALL_CDECL);
 
-    // template<class T> bool IsNaN(T value) | File: ../Math/MathDefs.h
+    // template <class T> bool IsNaN(T value) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("bool IsNaN(double)", AS_FUNCTIONPR(IsNaN, (double), bool), AS_CALL_CDECL);
     engine->RegisterGlobalFunction("bool IsNaN(float)", AS_FUNCTIONPR(IsNaN, (float), bool), AS_CALL_CDECL);
 
     // bool IsPowerOfTwo(unsigned value) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("bool IsPowerOfTwo(uint)", AS_FUNCTIONPR(IsPowerOfTwo, (unsigned), bool), AS_CALL_CDECL);
 
-    // template<class T, class U> T Lerp(T lhs, T rhs, U t) | File: ../Math/MathDefs.h
+    // template <class T, class U> T Lerp(T lhs, T rhs, U t) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("float Lerp(float, float, float)", AS_FUNCTIONPR(Lerp, (float, float, float), float), AS_CALL_CDECL);
 
-    // template<class T> T Ln(T x) | File: ../Math/MathDefs.h
+    // template <class T> T Ln(T x) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("float Ln(float)", AS_FUNCTIONPR(Ln, (float), float), AS_CALL_CDECL);
 
     // unsigned LogBaseTwo(unsigned value) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("uint LogBaseTwo(uint)", AS_FUNCTIONPR(LogBaseTwo, (unsigned), unsigned), AS_CALL_CDECL);
 
-    // template<class T, class U> T Max(T lhs, U rhs) | File: ../Math/MathDefs.h
+    // template <class T, class U> T Max(T lhs, U rhs) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("float Max(float, float)", AS_FUNCTIONPR(Max, (float, float), float), AS_CALL_CDECL);
     engine->RegisterGlobalFunction("int Max(int, int)", AS_FUNCTIONPR(Max, (int, int), int), AS_CALL_CDECL);
 
-    // template<class T, class U> T Min(T lhs, U rhs) | File: ../Math/MathDefs.h
+    // template <class T, class U> T Min(T lhs, U rhs) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("float Min(float, float)", AS_FUNCTIONPR(Min, (float, float), float), AS_CALL_CDECL);
     engine->RegisterGlobalFunction("int Min(int, int)", AS_FUNCTIONPR(Min, (int, int), int), AS_CALL_CDECL);
 
@@ -294,8 +294,8 @@ void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
     // void OpenConsoleWindow() | File: ../Core/ProcessUtils.h
     engine->RegisterGlobalFunction("void OpenConsoleWindow()", AS_FUNCTIONPR(OpenConsoleWindow, (), void), AS_CALL_CDECL);
 
-    // const Vector<String>& ParseArguments(const String& cmdLine, bool skipFirstArgument=true) | File: ../Core/ProcessUtils.h
-    engine->RegisterGlobalFunction("Array<String>@ ParseArguments(const String&in, bool = true)", AS_FUNCTION(ParseArguments_String_bool), AS_CALL_CDECL);
+    // const Vector<String>& ParseArguments(const String& cmdLine, bool skipFirstArgument = true) | File: ../Core/ProcessUtils.h
+    engine->RegisterGlobalFunction("Array<String>@ ParseArguments(const String&in, bool = true)", AS_FUNCTION(constspVectorlesStringgreamp_ParseArguments_constspStringamp_bool), AS_CALL_CDECL);
 
     // const Vector<String>& ParseArguments(const WString& cmdLine) | File: ../Core/ProcessUtils.h
     // Error: type "WString" can not automatically bind bacause have @nobind mark
@@ -309,19 +309,19 @@ void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
     // const Vector<String>& ParseArguments(int argc, char** argv) | File: ../Core/ProcessUtils.h
     // Error: type "char**" can not automatically bind
 
-    // template<class T> T Pow(T x, T y) | File: ../Math/MathDefs.h
+    // template <class T> T Pow(T x, T y) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("float Pow(float, float)", AS_FUNCTIONPR(Pow, (float, float), float), AS_CALL_CDECL);
 
-    // void PrintLine(const String& str, bool error=false) | File: ../Core/ProcessUtils.h
+    // void PrintLine(const String& str, bool error = false) | File: ../Core/ProcessUtils.h
     engine->RegisterGlobalFunction("void PrintLine(const String&in, bool = false)", AS_FUNCTIONPR(PrintLine, (const String&, bool), void), AS_CALL_CDECL);
 
-    // void PrintLine(const char* str, bool error=false) | File: ../Core/ProcessUtils.h
+    // void PrintLine(const char* str, bool error = false) | File: ../Core/ProcessUtils.h
     // Error: type "const char*" can not automatically bind
 
-    // void PrintUnicode(const String& str, bool error=false) | File: ../Core/ProcessUtils.h
+    // void PrintUnicode(const String& str, bool error = false) | File: ../Core/ProcessUtils.h
     engine->RegisterGlobalFunction("void PrintUnicode(const String&in, bool = false)", AS_FUNCTIONPR(PrintUnicode, (const String&, bool), void), AS_CALL_CDECL);
 
-    // void PrintUnicodeLine(const String& str, bool error=false) | File: ../Core/ProcessUtils.h
+    // void PrintUnicodeLine(const String& str, bool error = false) | File: ../Core/ProcessUtils.h
     engine->RegisterGlobalFunction("void PrintUnicodeLine(const String&in, bool = false)", AS_FUNCTIONPR(PrintUnicodeLine, (const String&, bool), void), AS_CALL_CDECL);
 
     // int Rand() | File: ../Math/Random.h
@@ -372,10 +372,10 @@ void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
     // String ReplaceExtension(const String& fullPath, const String& newExtension) | File: ../IO/FileSystem.h
     engine->RegisterGlobalFunction("String ReplaceExtension(const String&in, const String&in)", AS_FUNCTIONPR(ReplaceExtension, (const String&, const String&), String), AS_CALL_CDECL);
 
-    // template<class T> T Round(T x) | File: ../Math/MathDefs.h
+    // template <class T> T Round(T x) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("float Round(float)", AS_FUNCTIONPR(Round, (float), float), AS_CALL_CDECL);
 
-    // template<class T> int RoundToInt(T x) | File: ../Math/MathDefs.h
+    // template <class T> int RoundToInt(T x) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("int RoundToInt(float)", AS_FUNCTIONPR(RoundToInt, (float), int), AS_CALL_CDECL);
 
     // constexpr unsigned SDBMHash(unsigned hash, unsigned char c) | File: ../Math/MathDefs.h
@@ -387,22 +387,22 @@ void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
     // void SetRandomSeed(unsigned seed) | File: ../Math/Random.h
     engine->RegisterGlobalFunction("void SetRandomSeed(uint)", AS_FUNCTIONPR(SetRandomSeed, (unsigned), void), AS_CALL_CDECL);
 
-    // template<class T> T Sign(T value) | File: ../Math/MathDefs.h
+    // template <class T> T Sign(T value) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("float Sign(float)", AS_FUNCTIONPR(Sign, (float), float), AS_CALL_CDECL);
 
-    // template<class T> T Sin(T angle) | File: ../Math/MathDefs.h
+    // template <class T> T Sin(T angle) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("float Sin(float)", AS_FUNCTIONPR(Sin, (float), float), AS_CALL_CDECL);
 
     // void SinCos(float angle, float& sin, float& cos) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("void SinCos(float, float&, float&)", AS_FUNCTIONPR(SinCos, (float, float&, float&), void), AS_CALL_CDECL);
 
-    // template<class T> T SmoothStep(T lhs, T rhs, T t) | File: ../Math/MathDefs.h
+    // template <class T> T SmoothStep(T lhs, T rhs, T t) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("float SmoothStep(float, float, float)", AS_FUNCTIONPR(SmoothStep, (float, float, float), float), AS_CALL_CDECL);
 
-    // void SplitPath(const String& fullPath, String& pathName, String& fileName, String& extension, bool lowercaseExtension=true) | File: ../IO/FileSystem.h
+    // void SplitPath(const String& fullPath, String& pathName, String& fileName, String& extension, bool lowercaseExtension = true) | File: ../IO/FileSystem.h
     engine->RegisterGlobalFunction("void SplitPath(const String&in, String&, String&, String&, bool = true)", AS_FUNCTIONPR(SplitPath, (const String&, String&, String&, String&, bool), void), AS_CALL_CDECL);
 
-    // template<class T> T Sqrt(T x) | File: ../Math/MathDefs.h
+    // template <class T> T Sqrt(T x) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("float Sqrt(float)", AS_FUNCTIONPR(Sqrt, (float), float), AS_CALL_CDECL);
 
     // float StableRandom(const Vector2& seed) | File: ../Math/Vector2.h
@@ -420,7 +420,7 @@ void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
     // void StringToBuffer(PODVector<unsigned char>& dest, const char* source) | File: ../Core/StringUtils.h
     // Error: type "PODVector<unsigned char>&" can not automatically bind
 
-    // template<class T> T Tan(T angle) | File: ../Math/MathDefs.h
+    // template <class T> T Tan(T angle) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("float Tan(float)", AS_FUNCTIONPR(Tan, (float), float), AS_CALL_CDECL);
 
     // bool ToBool(const String& source) | File: ../Core/StringUtils.h
@@ -447,16 +447,16 @@ void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
     // float ToFloat(const char* source) | File: ../Core/StringUtils.h
     // Error: type "const char*" can not automatically bind
 
-    // int ToInt(const String& source, int base=10) | File: ../Core/StringUtils.h
+    // int ToInt(const String& source, int base = 10) | File: ../Core/StringUtils.h
     engine->RegisterGlobalFunction("int ToInt(const String&in, int = 10)", AS_FUNCTIONPR(ToInt, (const String&, int), int), AS_CALL_CDECL);
 
-    // int ToInt(const char* source, int base=10) | File: ../Core/StringUtils.h
+    // int ToInt(const char* source, int base = 10) | File: ../Core/StringUtils.h
     // Error: type "const char*" can not automatically bind
 
-    // long long ToInt64(const String& source, int base=10) | File: ../Core/StringUtils.h
+    // long long ToInt64(const String& source, int base = 10) | File: ../Core/StringUtils.h
     engine->RegisterGlobalFunction("int64 ToInt64(const String&in, int = 10)", AS_FUNCTIONPR(ToInt64, (const String&, int), long long), AS_CALL_CDECL);
 
-    // long long ToInt64(const char* source, int base=10) | File: ../Core/StringUtils.h
+    // long long ToInt64(const char* source, int base = 10) | File: ../Core/StringUtils.h
     // Error: type "const char*" can not automatically bind
 
     // IntRect ToIntRect(const String& source) | File: ../Core/StringUtils.h
@@ -519,16 +519,16 @@ void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
     // String ToStringHex(unsigned value) | File: ../Core/StringUtils.h
     engine->RegisterGlobalFunction("String ToStringHex(uint)", AS_FUNCTIONPR(ToStringHex, (unsigned), String), AS_CALL_CDECL);
 
-    // unsigned ToUInt(const String& source, int base=10) | File: ../Core/StringUtils.h
+    // unsigned ToUInt(const String& source, int base = 10) | File: ../Core/StringUtils.h
     engine->RegisterGlobalFunction("uint ToUInt(const String&in, int = 10)", AS_FUNCTIONPR(ToUInt, (const String&, int), unsigned), AS_CALL_CDECL);
 
-    // unsigned ToUInt(const char* source, int base=10) | File: ../Core/StringUtils.h
+    // unsigned ToUInt(const char* source, int base = 10) | File: ../Core/StringUtils.h
     // Error: type "const char*" can not automatically bind
 
-    // unsigned long long ToUInt64(const String& source, int base=10) | File: ../Core/StringUtils.h
+    // unsigned long long ToUInt64(const String& source, int base = 10) | File: ../Core/StringUtils.h
     engine->RegisterGlobalFunction("uint64 ToUInt64(const String&in, int = 10)", AS_FUNCTIONPR(ToUInt64, (const String&, int), unsigned long long), AS_CALL_CDECL);
 
-    // unsigned long long ToUInt64(const char* source, int base=10) | File: ../Core/StringUtils.h
+    // unsigned long long ToUInt64(const char* source, int base = 10) | File: ../Core/StringUtils.h
     // Error: type "const char*" can not automatically bind
 
     // unsigned ToUpper(unsigned ch) | File: ../Core/StringUtils.h
@@ -546,10 +546,10 @@ void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
     // Vector3 ToVector3(const char* source) | File: ../Core/StringUtils.h
     // Error: type "const char*" can not automatically bind
 
-    // Vector4 ToVector4(const String& source, bool allowMissingCoords=false) | File: ../Core/StringUtils.h
+    // Vector4 ToVector4(const String& source, bool allowMissingCoords = false) | File: ../Core/StringUtils.h
     engine->RegisterGlobalFunction("Vector4 ToVector4(const String&in, bool = false)", AS_FUNCTIONPR(ToVector4, (const String&, bool), Vector4), AS_CALL_CDECL);
 
-    // Vector4 ToVector4(const char* source, bool allowMissingCoords=false) | File: ../Core/StringUtils.h
+    // Vector4 ToVector4(const char* source, bool allowMissingCoords = false) | File: ../Core/StringUtils.h
     // Error: type "const char*" can not automatically bind
 
     // Variant ToVectorVariant(const String& source) | File: ../Core/StringUtils.h
@@ -654,8 +654,8 @@ void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
     // IntVector3 VectorRoundToInt(const Vector3& vec) | File: ../Math/Vector3.h
     engine->RegisterGlobalFunction("IntVector3 VectorRoundToInt(const Vector3&in)", AS_FUNCTIONPR(VectorRoundToInt, (const Vector3&), IntVector3), AS_CALL_CDECL);
 
-    // bool WriteDrawablesToOBJ(const PODVector<Drawable*>& drawables, File* outputFile, bool asZUp, bool asRightHanded, bool writeLightmapUV=false) | File: ../Graphics/Drawable.h
-    engine->RegisterGlobalFunction("bool WriteDrawablesToOBJ(Array<Drawable@>@, File@+, bool, bool, bool = false)", AS_FUNCTION(WriteDrawablesToOBJ_PODVectorDrawable_File_bool_bool_bool), AS_CALL_CDECL);
+    // bool WriteDrawablesToOBJ(const PODVector<Drawable*>& drawables, File* outputFile, bool asZUp, bool asRightHanded, bool writeLightmapUV = false) | File: ../Graphics/Drawable.h
+    engine->RegisterGlobalFunction("bool WriteDrawablesToOBJ(Array<Drawable@>@, File@+, bool, bool, bool = false)", AS_FUNCTION(bool_WriteDrawablesToOBJ_constspPODVectorlesDrawablestargreamp_Filestar_bool_bool_bool), AS_CALL_CDECL);
 
 #ifdef URHO3D_IK
     // void RegisterIKLibrary(Context* context) | File: ../IK/IK.h

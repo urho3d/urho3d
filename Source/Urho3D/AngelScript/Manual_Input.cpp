@@ -35,7 +35,7 @@ void ASRegisterManualFirst_Input(asIScriptEngine* engine)
 
 // ========================================================================================
 
-// template<class T> T * Object::GetSubsystem() const | File: ../Core/Object.h
+// template <class T> T* Context::GetSubsystem() const | File: ../Core/Context.h
 static Input* GetInput()
 {
     return GetScriptContext()->GetSubsystem<Input>();
@@ -44,64 +44,8 @@ static Input* GetInput()
 // This function is called after ASRegisterGenerated()
 void ASRegisterManualLast_Input(asIScriptEngine* engine)
 {
-    // template<class T> T * Object::GetSubsystem() const | File: ../Core/Object.h
+    // template <class T> T* Context::GetSubsystem() const | File: ../Core/Context.h
     engine->RegisterGlobalFunction("Input@+ get_input()", AS_FUNCTION(GetInput), AS_CALL_CDECL);
-}
-
-// ========================================================================================
-
-// bool Input::SaveGestures(Serializer &dest) | File: ../Input/Input.h
-bool InputSaveGestures(File* file, Input* ptr)
-{
-    return file && ptr->SaveGestures(*file);
-}
-
-// bool Input::SaveGestures(Serializer &dest) | File: ../Input/Input.h
-bool InputSaveGesturesVectorBuffer(VectorBuffer& buffer, Input* ptr)
-{
-    return ptr->SaveGestures(buffer);
-}
-
-// bool Input::SaveGesture(Serializer &dest, unsigned gestureID) | File: ../Input/Input.h
-bool InputSaveGesture(File* file, unsigned gestureID, Input* ptr)
-{
-    return file && ptr->SaveGesture(*file, gestureID);
-}
-
-// bool Input::SaveGesture(Serializer &dest, unsigned gestureID) | File: ../Input/Input.h
-bool InputSaveGestureVectorBuffer(VectorBuffer& buffer, unsigned gestureID, Input* ptr)
-{
-    return ptr->SaveGesture(buffer, gestureID);
-}
-
-// unsigned Input::LoadGestures(Deserializer &source) | File: ../Input/Input.h
-unsigned InputLoadGestures(File* file, Input* ptr)
-{
-    return file ? ptr->LoadGestures(*file) : 0;
-}
-
-// unsigned Input::LoadGestures(Deserializer &source) | File: ../Input/Input.h
-unsigned InputLoadGesturesVectorBuffer(VectorBuffer& buffer, Input* ptr)
-{
-    return ptr->LoadGestures(buffer);
-}
-
-// void Input::SetMouseGrabbed(bool grab, bool suppressEvent=false) | File: ../Input/Input.h
-void InputSetMouseGrabbed(bool enable, Input* ptr)
-{
-    ptr->SetMouseGrabbed(enable, false);
-}
-
-// void Input::SetMouseMode(MouseMode mode, bool suppressEvent=false) | File: ../Input/Input.h
-void InputSetMouseMode(MouseMode mode, Input* ptr)
-{
-    ptr->SetMouseMode(mode, false);
-}
-
-// void Input::SetMouseVisible(bool enable, bool suppressEvent=false) | File: ../Input/Input.h
-void InputSetMouseVisible(bool enable, Input* ptr)
-{
-    ptr->SetMouseVisible(enable, false);
 }
 
 }

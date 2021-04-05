@@ -39,7 +39,7 @@
 namespace Urho3D
 {
 
-bool operator ==(const asSFuncPtr& a, const asSFuncPtr& b);
+//bool operator ==(const asSFuncPtr& a, const asSFuncPtr& b);
 
 struct SArrayBuffer;
 struct SArrayCache;

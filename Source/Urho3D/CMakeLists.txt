@@ -34,6 +34,21 @@ if (HAVE_STDINT_H)
   add_definitions (-DHAVE_STDINT_H)
 endif ()
 
+# For AngelScript big files
+if (MSVC)
+    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /bigobj")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
+elseif (MINGW)
+    if (URHO3D_64BIT)
+        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wa,-mbig-obj")
+        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-mbig-obj")
+    elseif (CMAKE_BUILD_TYPE MATCHES Debug)
+        SET_SOURCE_FILES_PROPERTIES(AngelScript/GeneratedClasses.cpp PROPERTIES COMPILE_FLAGS -Os)
+        SET_SOURCE_FILES_PROPERTIES(AngelScript/GeneratedClasses.cpp PROPERTIES LINK_FLAGS -Os)
+        SET_SOURCE_FILES_PROPERTIES(AngelScript/GeneratedClasses.cpp PROPERTIES STATIC_LIBRARY_FLAGS -Os)
+    endif ()
+endif ()
+
 # Generate JSON compilation database format specification
 if (URHO3D_CLANG_TOOLS OR URHO3D_BINDINGS)
     set (CMAKE_EXPORT_COMPILE_COMMANDS 1)
@@ -172,43 +187,28 @@ if (URHO3D_GENERATEBINDINGS)
                             "AngelScript/GeneratedObjectTypes.cpp"
                             "AngelScript/GeneratedDefaultConstructors.cpp"
                             "AngelScript/GeneratedClasses.cpp"
-                            "AngelScript/GeneratedClassMembers.cpp"
                             "AngelScript/GeneratedClassMembers.h"
-                            "AngelScript/Generated_Members_A.cpp"
-                            "AngelScript/Generated_Members_B.cpp"
-                            "AngelScript/Generated_Members_Constraint.cpp"
-                            "AngelScript/Generated_Members_Ca_Cm.cpp"
-                            "AngelScript/Generated_Members_Cn_Cz.cpp"
-                            "AngelScript/Generated_Members_D.cpp"
-                            "AngelScript/Generated_Members_E.cpp"
-                            "AngelScript/Generated_Members_F.cpp"
-                            "AngelScript/Generated_Members_G.cpp"
-                            "AngelScript/Generated_Members_H.cpp"
-                            "AngelScript/Generated_Members_I.cpp"
-                            "AngelScript/Generated_Members_J.cpp"
-                            "AngelScript/Generated_Members_K.cpp"
-                            "AngelScript/Generated_Members_L.cpp"
-                            "AngelScript/Generated_Members_M.cpp"
-                            "AngelScript/Generated_Members_N.cpp"
-                            "AngelScript/Generated_Members_O.cpp"
-                            "AngelScript/Generated_Members_P.cpp"
-                            "AngelScript/Generated_Members_Q.cpp"
-                            "AngelScript/Generated_Members_R.cpp"
-                            "AngelScript/Generated_Members_Sa_Sm.cpp"
-                            "AngelScript/Generated_Members_Sn_Sz.cpp"
-                            "AngelScript/Generated_Members_Ta_Tm.cpp"
-                            "AngelScript/Generated_Members_Tn_Tz.cpp"
-                            "AngelScript/Generated_Members_U.cpp"
-                            "AngelScript/Generated_Members_V.cpp"
-                            "AngelScript/Generated_Members_W.cpp"
-                            "AngelScript/Generated_Members_X.cpp"
-                            "AngelScript/Generated_Members_Y.cpp"
-                            "AngelScript/Generated_Members_Z.cpp"
-                            "AngelScript/Generated_Members_Other.cpp"
+                            "AngelScript/Generated_Members_Audio.cpp"
+                            "AngelScript/Generated_Members_Container.cpp"
+                            "AngelScript/Generated_Members_Core.cpp"
+                            "AngelScript/Generated_Members_Database.cpp"
+                            "AngelScript/Generated_Members_Engine.cpp"
+                            "AngelScript/Generated_Members_Graphics.cpp"
+                            "AngelScript/Generated_Members_IK.cpp"
+                            "AngelScript/Generated_Members_Input.cpp"
+                            "AngelScript/Generated_Members_IO.cpp"
+                            "AngelScript/Generated_Members_Math.cpp"
+                            "AngelScript/Generated_Members_Navigation.cpp"
+                            "AngelScript/Generated_Members_Network.cpp"
+                            "AngelScript/Generated_Members_Physics.cpp"
+                            "AngelScript/Generated_Members_Resource.cpp"
+                            "AngelScript/Generated_Members_Scene.cpp"
+                            "AngelScript/Generated_Members_UI.cpp"
+                            "AngelScript/Generated_Members_Urho2D.cpp"
                             "AngelScript/GeneratedGlobalVariables.cpp"
                             "AngelScript/GeneratedGlobalFunctions.cpp"
                             "AngelScript/GeneratedIncludes.h"
-                            "AngelScript/Generated_Templates.h"
+                            "AngelScript/Generated_Members.h"
                             "AngelScript/Generated_Templates_New.h")
 
     set (AS_GENERATED_FILES_FULL_PATHS "${AS_GENERATED_FILES}")

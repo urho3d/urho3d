@@ -26,7 +26,9 @@
 #include "../AngelScript/APITemplates.h"
 
 #include "../Database/Database.h"
-#include "../AngelScript/Generated_Templates.h"
+//#include "../AngelScript/Generated_Templates.h"
+#include "../AngelScript/GeneratedClassMembers.h"
+#include "../AngelScript/Generated_Members.h"
 
 namespace Urho3D
 {
@@ -82,12 +84,33 @@ static void RegisterDbResult(asIScriptEngine* engine)
 
 // ========================================================================================
 
+/*
+static DbConnection* DbConnection_DbConnection_Context()
+{
+    Context* context = GetScriptContext();
+    return new DbConnection(context);
+}
+*/
+
 static void RegisterDbConnection(asIScriptEngine* engine)
 {
+    MemberCollection members;
+    CollectMembers_Object(members);
+    RegisterMembers_Object<DbConnection>(engine, "DbConnection");
+    RegisterMembers(engine, "DbConnection", members);
+
+    //engine->RegisterObjectBehaviour("DbConnection", asBEHAVE_FACTORY, "DbConnection@+ f()", AS_FUNCTION(DbConnection_DbConnection_Context), AS_CALL_CDECL);
+
+    engine->RegisterObjectMethod("DbConnection", "DbResult Execute(const String&in, bool useCursorEvent = false)", AS_METHOD(DbConnection, Execute), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("DbConnection", "const String& get_connectionString() const", AS_METHOD(DbConnection, GetConnectionString), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod("DbConnection", "bool get_connected() const", AS_METHOD(DbConnection, IsConnected), AS_CALL_THISCALL);
+
+    /*
     RegisterObject<DbConnection>(engine, "DbConnection");
     engine->RegisterObjectMethod("DbConnection", "DbResult Execute(const String&in, bool useCursorEvent = false)", AS_METHOD(DbConnection, Execute), AS_CALL_THISCALL);
     engine->RegisterObjectMethod("DbConnection", "const String& get_connectionString() const", AS_METHOD(DbConnection, GetConnectionString), AS_CALL_THISCALL);
     engine->RegisterObjectMethod("DbConnection", "bool get_connected() const", AS_METHOD(DbConnection, IsConnected), AS_CALL_THISCALL);
+    */
 }
 
 // ========================================================================================
