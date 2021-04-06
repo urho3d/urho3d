@@ -379,7 +379,7 @@ public:
     shared_ptr<MethodAnalyzer> Reimplements() const;
 
     string GetClassName() const { return classAnalyzer_.GetClassName(); }
-    string GetContainsClassName() const; // May this function defined in parent class, so return name o class, real define this function
+    string GetContainsClassName() const; // May this function defined in parent class, so return name oа class, real define this function
     bool IsStatic() const { return ::IsStatic(memberdef_); }
     bool IsPublic() const { return ExtractProt(memberdef_) == "public"; }
 
@@ -398,6 +398,8 @@ public:
     bool IsExplicit() const { return ::IsExplicit(memberdef_); }
     bool IsDeleted() const { return EndsWith(ExtractArgsstring(memberdef_), "=delete"); }
     bool IsConsversionOperator() const { return StartsWith(GetName(), "operator "); }
+
+    bool IsThisMethod() const { return GetContainsClassName() == GetClassName(); } // Defined in this class
 
     string GetDeclaration() const { return JoinNonEmpty({ classAnalyzer_.usingLocation_, GetFunctionDeclaration(memberdef_) }, " | "); }
     string GetLocation() const override { return JoinNonEmpty({ classAnalyzer_.usingLocation_, GetFunctionLocation(memberdef_) }, " | "); }

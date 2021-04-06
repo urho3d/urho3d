@@ -561,7 +561,6 @@ namespace Result
             "#include \"../AngelScript/APITemplates.h\"\n"
             "\n"
             "#include \"../AngelScript/GeneratedIncludes.h\"\n"
-            "#include \"../AngelScript/GeneratedClassMembers.h\"\n"
             "#include \"../AngelScript/Generated_Members.h\"\n"
             "#include \"../AngelScript/Manual.h\"\n"
             "\n"
@@ -700,14 +699,21 @@ namespace Result
                 ofs << '\n';
 
             ofs <<
-                "    MemberCollection members;\n"
                 "    RegisterMembers_" << processedClass.name_ << "<" << processedClass.name_ << ">(engine, \"" << processedClass.name_ << "\");\n"
-                "    CollectMembers_" << processedClass.name_ << "(members);\n"
-                "    RegisterMembers(engine, \"" << processedClass.name_ << "\", members);\n"
                 "\n"
                 "    #ifdef REGISTER_CLASS_MANUAL_PART_" << processedClass.name_ << "\n"
                 "        REGISTER_CLASS_MANUAL_PART_" << processedClass.name_ << "();\n"
                 "    #endif\n";
+
+            for (const MemberRegistrationError& unregisteredPersonalMethod : processedClass.unregisteredPersonalMethods_)
+            {
+                ofs <<
+                    "\n"
+                    "    // " << unregisteredPersonalMethod.comment_ << "\n"
+                    "    // " << unregisteredPersonalMethod.message_ << "\n";
+
+                needGap = true;
+            }
 
             for (const Registration& perosnalMethod : processedClass.personalMethods_)
             {
@@ -717,6 +723,16 @@ namespace Result
 
                 for (const string& reg : perosnalMethod.registration_)
                     ofs << "    " << reg << '\n';
+            }
+
+            for (const MemberRegistrationError& unregisteredPersonalStaticMethod : processedClass.unregisteredPersonalStaticMethods_)
+            {
+                ofs <<
+                    "\n"
+                    "    // " << unregisteredPersonalStaticMethod.comment_ << "\n"
+                    "    // " << unregisteredPersonalStaticMethod.message_ << "\n";
+
+                needGap = true;
             }
 
             for (const Registration& perosnalStaticMethod : processedClass.personalStaticMethods_)
@@ -829,300 +845,7 @@ namespace Result
     // Write result to GeneratedClassMembers.cpp and GeneratedClassMembers.h // TODO change comment
     static void SaveClassMembers()
     {
-        for (ProcessedClass& processedClass : classes_)
-        {
-            shared_ptr<MemberCppFile> file = GetMemberCppFile(processedClass.dirName_);
-
-            if (processedClass.insideDefine_ != file->openedDefine_ && !file->openedDefine_.empty())
-            {
-                file->ofs_ <<
-                    "\n"
-                    "#endif // def " << file->openedDefine_ << "\n";
-
-                file->openedDefine_.clear();
-            }
-
-            if (processedClass.insideDefine_ != file->openedDefine_ && !processedClass.insideDefine_.empty())
-            {
-                file->ofs_ <<
-                    "\n"
-                    "#ifdef " << processedClass.insideDefine_ << "\n";
-
-                file->openedDefine_ = processedClass.insideDefine_;
-            }
-
-            for (const MethodRegistration& method : processedClass.methods_)
-            {
-                if (!method.glue_.empty())
-                {
-                    file->ofs_ <<
-                        "\n"
-                        "// " << method.cppDeclaration_ << "\n"
-                        << method.glue_;
-                }
-            }
-
-            for (const StaticMethodRegistration& staticMethod : processedClass.staticMethods_)
-            {
-                if (!staticMethod.glue_.empty())
-                {
-                    file->ofs_ <<
-                        "\n"
-                        "// " << staticMethod.cppDeclaration_ << "\n"
-                        << staticMethod.glue_;
-                }
-            }
-
-            file->ofs_ <<
-                "\n"
-                "// " << processedClass.comment_ << "\n"
-                "void CollectMembers_" << processedClass.name_ << "(MemberCollection& members)\n"
-                "{\n";
-
-            file->needGap_ = false;
-
-            if (processedClass.baseClassNames_.size())
-            {
-                for (const string& baseClassName : processedClass.baseClassNames_)
-                    file->ofs_ << "    CollectMembers_" << baseClassName << "(members);\n";
-
-                file->needGap_ = true;
-            }
-
-            if (file->needGap_ && processedClass.hiddenMethods_.size())
-                file->ofs_ << '\n';
-
-            for (const string& hiddenMethod : processedClass.hiddenMethods_)
-            {
-                string escaped = ReplaceAll(hiddenMethod, "\"", "\\\"");
-                file->ofs_ << "    Remove(members.methods_, \"" << escaped << "\");\n";
-                file->needGap_ = true;
-            }
-
-            if (file->needGap_ && processedClass.hiddenStaticMethods_.size())
-                file->ofs_ << '\n';
-
-            for (const string& hiddenStaticMethod : processedClass.hiddenStaticMethods_)
-            {
-                string escaped = ReplaceAll(hiddenStaticMethod, "\"", "\\\"");
-                file->ofs_ << "    Remove(members.staticMethods_, \"" << escaped << "\");\n";
-                file->needGap_ = true;
-            }
-
-            if (file->needGap_ && processedClass.hiddenFields_.size())
-                file->ofs_ << '\n';
-
-            for (const string& hiddenField : processedClass.hiddenFields_)
-            {
-                string escaped = ReplaceAll(hiddenField, "\"", "\\\"");
-                file->ofs_ << "    Remove(members.fields_, \"" << escaped << "\");\n";
-                file->ofs_ << "    Remove(members.wrappedFields_, \"" << escaped << "\");\n";
-                file->needGap_ = true;
-            }
-
-            if (file->needGap_ && processedClass.hiddenStaticFields_.size())
-                file->ofs_ << '\n';
-
-            for (const string& hiddenStaticField : processedClass.hiddenStaticFields_)
-            {
-                string escaped = ReplaceAll(hiddenStaticField, "\"", "\\\"");
-                file->ofs_ << "    Remove(members.staticFields_, \"" << escaped << "\");\n";
-                file->needGap_ = true;
-            }
-
-            sort(processedClass.unregisteredMethods_.begin(), processedClass.unregisteredMethods_.end());
-
-            if (file->needGap_ && processedClass.unregisteredMethods_.size())
-                file->ofs_ << '\n';
-
-            for (const MemberRegistrationError& unregisteredMethod : processedClass.unregisteredMethods_)
-            {
-                file->ofs_ <<
-                    "    // " << unregisteredMethod.comment_ << "\n"
-                    "    // " << unregisteredMethod.message_ << "\n";
-
-                file->needGap_ = true;
-            }
-
-            if (file->needGap_ && processedClass.methods_.size())
-                file->ofs_ << '\n';
-
-            // TODO сортировать
-
-            for (const MethodRegistration& method : processedClass.methods_)
-            {
-                const RegisterObjectMethodArgs& args = method.registration_;
-                assert(args.asDeclarations_.size());
-
-                for (const string& asDeclaration : args.asDeclarations_)
-                    file->ofs_ << "    members.methods_.Push(RegisterObjectMethodArgs(\"" << method.cppDeclaration_ << "\", \"" << asDeclaration << "\", " << args.funcPointer_ << ", " << args.callConv_ << "));\n";
-
-                file->needGap_ = true;
-            }
-
-            if (file->needGap_ && processedClass.unregisteredStaticMethods_.size())
-                file->ofs_ << '\n';
-
-            for (const MemberRegistrationError& unregisteredStaticMethod : processedClass.unregisteredStaticMethods_)
-            {
-                file->ofs_ <<
-                    "    // " << unregisteredStaticMethod.comment_ << "\n"
-                    "    // " << unregisteredStaticMethod.message_ << "\n";
-
-                file->needGap_ = true;
-            }
-
-            if (file->needGap_ && processedClass.staticMethods_.size())
-                file->ofs_ << '\n';
-
-            for (const StaticMethodRegistration& staticMethod : processedClass.staticMethods_)
-            {
-                const RegisterGlobalFunctionArgs& args = staticMethod.registration_;
-                assert(args.asDeclarations_.size());
-
-                for (const string& asDeclaration : args.asDeclarations_)
-                    file->ofs_ << "    members.staticMethods_.Push(RegisterGlobalFunctionArgs(\"" << staticMethod.cppDeclaration_ << "\", \"" << asDeclaration << "\", " << args.funcPointer_ << ", " << args.callConv_ << "));\n";
-
-                file->needGap_ = true;
-            }
-
-            if (file->needGap_ && processedClass.unregisteredFields_.size())
-                file->ofs_ << '\n';
-
-            for (const MemberRegistrationError& unregisteredField : processedClass.unregisteredFields_)
-            {
-                file->ofs_ <<
-                    "    // " << unregisteredField.comment_ << "\n"
-                    "    // " << unregisteredField.message_ << "\n";
-
-                file->needGap_ = true;
-            }
-
-            if (file->needGap_ && processedClass.fields_.size())
-                file->ofs_ << '\n';
-
-            for (const FieldRegistration& field : processedClass.fields_)
-            {
-                const RegisterObjectPropertyArgs& args = field.registration_;
-                assert(args.asDeclarations_.size());
-
-                for (const string& asDeclaration : args.asDeclarations_)
-                    file->ofs_ << "    members.fields_.Push(RegisterObjectPropertyArgs(\"" << field.cppDeclaration_ << "\", \"" << asDeclaration << "\", " << args.byteOffset_ << "));\n";
-
-                file->needGap_ = true;
-            }
-
-            if (file->needGap_ && processedClass.unregisteredStaticFields_.size())
-                file->ofs_ << '\n';
-
-            for (const MemberRegistrationError& unregisteredStaticField : processedClass.unregisteredStaticFields_)
-            {
-                file->ofs_ <<
-                    "    // " << unregisteredStaticField.comment_ << "\n"
-                    "    // " << unregisteredStaticField.message_ << "\n";
-
-                file->needGap_ = true;
-            }
-
-            if (file->needGap_ && processedClass.staticFields_.size())
-                file->ofs_ << '\n';
-
-            for (const StaticFieldRegistration& staticField : processedClass.staticFields_)
-            {
-                const RegisterGlobalPropertyArgs& args = staticField.registration_;
-                assert(args.asDeclarations_.size());
-
-                for (const string& asDeclaration : args.asDeclarations_)
-                    file->ofs_ << "    members.staticFields_.Push(RegisterGlobalPropertyArgs(\"" << staticField.cppDeclaration_ << "\", \"" << asDeclaration << "\", " << args.pointer_ << "));\n";
-
-                file->needGap_ = true;
-            }
-
-            if (file->needGap_)
-                file->ofs_ << '\n';
-
-            //file->ofs_ <<
-            //    "    #ifdef REGISTER_MEMBERS_MANUAL_PART_" << processedClass.name_ << "\n"
-            //    "        REGISTER_MEMBERS_MANUAL_PART_" << processedClass.name_ << "();\n"
-            //    "    #endif\n";
-
-            file->ofs_ << "}\n";
-        }
-
-        for (auto it : memberCppFiles_)
-        {
-            shared_ptr<MemberCppFile> file = it.second;
-            
-            if (!file->openedDefine_.empty())
-            {
-                file->ofs_ <<
-                    "\n"
-                    "#endif // def " << file->openedDefine_ << "\n";
-
-                file->openedDefine_.clear();
-            }
-
-            file->ofs_ <<
-                "\n"
-                "} // namespace Urho3D\n";
-        }
-
-        ofstream ofsH(_sourceDir + "/Source/Urho3D/AngelScript/GeneratedClassMembers.h");
-
-        ofsH <<
-            "// DO NOT EDIT. This file is generated\n"
-            "\n"
-            "#pragma once\n"
-            "\n"
-            "#include \"../AngelScript/APITemplates.h\"\n"
-            "\n"
-            "#include \"../AngelScript/GeneratedIncludes.h\"\n"
-            "\n"
-            "namespace Urho3D\n"
-            "{\n";
-
-        string openedDefine;
-
-        for (const ProcessedClass& processedClass : classes_)
-        {
-            if (processedClass.insideDefine_ != openedDefine && !openedDefine.empty())
-            {
-                ofsH <<
-                    "\n"
-                    "#endif // def " << openedDefine << "\n";
-
-                openedDefine.clear();
-            }
-
-            if (processedClass.insideDefine_ != openedDefine && !processedClass.insideDefine_.empty())
-            {
-                ofsH <<
-                    "\n"
-                    "#ifdef " << processedClass.insideDefine_ << "\n";
-
-                openedDefine = processedClass.insideDefine_;
-            }
-
-            ofsH <<
-                "\n"
-                "// " << processedClass.comment_ << "\n"
-                "void CollectMembers_" << processedClass.name_ << "(MemberCollection& members);\n";
-        }
-
-        if (!openedDefine.empty())
-        {
-            ofsH <<
-                "\n"
-                "#endif // def " << openedDefine << "\n";
-
-            openedDefine.clear();
-        }
-
-        ofsH <<
-            "\n"
-            "} // namespace Urho3D\n";
-
-        ofsH = ofstream(_sourceDir + "/Source/Urho3D/AngelScript/Generated_Members.h");
+        ofstream ofsH = ofstream(_sourceDir + "/Source/Urho3D/AngelScript/Generated_Members.h");
 
         ofsH <<
             "// DO NOT EDIT. This file is generated\n"
@@ -1137,7 +860,7 @@ namespace Result
             "namespace Urho3D\n"
             "{\n";
 
-        openedDefine.clear();
+        string openedDefine;
 
         for (const ProcessedClass& processedClass : classes_)
         {
@@ -1197,14 +920,14 @@ namespace Result
                 needGap = true;
             }
 
-            if (needGap && processedClass.unregisteredMethods_.size())
+            if (needGap && processedClass.unregisteredTemplateMethods_.size())
                 ofsH << '\n';
 
-            for (const MemberRegistrationError& unregisteredMethod : processedClass.unregisteredMethods_)
+            for (const MemberRegistrationError& unregisteredTemplateMethod : processedClass.unregisteredTemplateMethods_)
             {
                 ofsH <<
-                    "    // " << unregisteredMethod.comment_ << "\n"
-                    "    // " << unregisteredMethod.message_ << "\n";
+                    "    // " << unregisteredTemplateMethod.comment_ << "\n"
+                    "    // " << unregisteredTemplateMethod.message_ << "\n";
 
                 needGap = true;
             }
@@ -1222,6 +945,18 @@ namespace Result
                 needGap = true;
             }
 
+            if (needGap && processedClass.unregisteredTemplateStaticMethods_.size())
+                ofsH << '\n';
+
+            for (const MemberRegistrationError& unregisteredTemplateStaticMethod : processedClass.unregisteredTemplateStaticMethods_)
+            {
+                ofsH <<
+                    "    // " << unregisteredTemplateStaticMethod.comment_ << "\n"
+                    "    // " << unregisteredTemplateStaticMethod.message_ << "\n";
+
+                needGap = true;
+            }
+
             for (const Registration& staticMethod : processedClass.templateStaticMethods_)
             {
                 if (needGap)
@@ -1234,6 +969,59 @@ namespace Result
 
                 needGap = true;
             }
+
+            if (needGap && processedClass.unregisteredTemplateFields_.size())
+                ofsH << '\n';
+
+            for (const MemberRegistrationError& unregisteredTemplateField : processedClass.unregisteredTemplateFields_)
+            {
+                ofsH <<
+                    "    // " << unregisteredTemplateField.comment_ << "\n"
+                    "    // " << unregisteredTemplateField.message_ << "\n";
+
+                needGap = true;
+            }
+
+            for (const Registration& field : processedClass.templateFields_)
+            {
+                if (needGap)
+                    ofsH << '\n';
+
+                ofsH << "    // " << field.comment_ << '\n';
+
+                for (const string& registration : field.registration_)
+                    ofsH << "    " << registration << '\n';
+
+                needGap = true;
+            }
+
+            if (needGap && processedClass.unregisteredTemplateStaticFields_.size())
+                ofsH << '\n';
+
+            for (const MemberRegistrationError& unregisteredTemplateStaticField : processedClass.unregisteredTemplateStaticFields_)
+            {
+                ofsH <<
+                    "    // " << unregisteredTemplateStaticField.comment_ << "\n"
+                    "    // " << unregisteredTemplateStaticField.message_ << "\n";
+
+                needGap = true;
+            }
+
+            for (const Registration& field : processedClass.templateStaticFields_)
+            {
+                if (needGap)
+                    ofsH << '\n';
+
+                ofsH << "    // " << field.comment_ << '\n';
+
+                for (const string& registration : field.registration_)
+                    ofsH << "    " << registration << '\n';
+
+                needGap = true;
+            }
+
+            if (needGap)
+                ofsH << '\n';
 
             ofsH <<
                 "    #ifdef REGISTER_MEMBERS_MANUAL_PART_" << processedClass.name_ << "\n"

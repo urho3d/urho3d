@@ -4,7 +4,6 @@
 #include "../AngelScript/APITemplates.h"
 
 #include "../AngelScript/GeneratedIncludes.h"
-#include "../AngelScript/GeneratedClassMembers.h"
 #include "../AngelScript/Generated_Members.h"
 #include "../AngelScript/Manual.h"
 
@@ -20,10 +19,7 @@ static void Register_AllocatorBlock(asIScriptEngine* engine)
     // AllocatorBlock::~AllocatorBlock() | Implicitly-declared
     engine->RegisterObjectBehaviour("AllocatorBlock", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(AllocatorBlock), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_AllocatorBlock<AllocatorBlock>(engine, "AllocatorBlock");
-    CollectMembers_AllocatorBlock(members);
-    RegisterMembers(engine, "AllocatorBlock", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_AllocatorBlock
         REGISTER_CLASS_MANUAL_PART_AllocatorBlock();
@@ -39,10 +35,7 @@ static void Register_AllocatorNode(asIScriptEngine* engine)
     // AllocatorNode::~AllocatorNode() | Implicitly-declared
     engine->RegisterObjectBehaviour("AllocatorNode", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(AllocatorNode), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_AllocatorNode<AllocatorNode>(engine, "AllocatorNode");
-    CollectMembers_AllocatorNode(members);
-    RegisterMembers(engine, "AllocatorNode", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_AllocatorNode
         REGISTER_CLASS_MANUAL_PART_AllocatorNode();
@@ -58,10 +51,7 @@ static void Register_AnimationControl(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("AnimationControl", asBEHAVE_ADDREF, "void f()", AS_FUNCTION_OBJLAST(FakeAddRef), AS_CALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("AnimationControl", asBEHAVE_RELEASE, "void f()", AS_FUNCTION_OBJLAST(FakeReleaseRef), AS_CALL_CDECL_OBJLAST);
 
-    MemberCollection members;
     RegisterMembers_AnimationControl<AnimationControl>(engine, "AnimationControl");
-    CollectMembers_AnimationControl(members);
-    RegisterMembers(engine, "AnimationControl", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_AnimationControl
         REGISTER_CLASS_MANUAL_PART_AnimationControl();
@@ -77,10 +67,7 @@ static void Register_AnimationKeyFrame(asIScriptEngine* engine)
     // AnimationKeyFrame::~AnimationKeyFrame() | Implicitly-declared
     engine->RegisterObjectBehaviour("AnimationKeyFrame", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(AnimationKeyFrame), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_AnimationKeyFrame<AnimationKeyFrame>(engine, "AnimationKeyFrame");
-    CollectMembers_AnimationKeyFrame(members);
-    RegisterMembers(engine, "AnimationKeyFrame", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_AnimationKeyFrame
         REGISTER_CLASS_MANUAL_PART_AnimationKeyFrame();
@@ -96,10 +83,7 @@ static void Register_AnimationStateTrack(asIScriptEngine* engine)
     // AnimationStateTrack::~AnimationStateTrack()
     engine->RegisterObjectBehaviour("AnimationStateTrack", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(AnimationStateTrack), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_AnimationStateTrack<AnimationStateTrack>(engine, "AnimationStateTrack");
-    CollectMembers_AnimationStateTrack(members);
-    RegisterMembers(engine, "AnimationStateTrack", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_AnimationStateTrack
         REGISTER_CLASS_MANUAL_PART_AnimationStateTrack();
@@ -115,10 +99,7 @@ static void Register_AnimationTrack(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("AnimationTrack", asBEHAVE_ADDREF, "void f()", AS_FUNCTION_OBJLAST(FakeAddRef), AS_CALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("AnimationTrack", asBEHAVE_RELEASE, "void f()", AS_FUNCTION_OBJLAST(FakeReleaseRef), AS_CALL_CDECL_OBJLAST);
 
-    MemberCollection members;
     RegisterMembers_AnimationTrack<AnimationTrack>(engine, "AnimationTrack");
-    CollectMembers_AnimationTrack(members);
-    RegisterMembers(engine, "AnimationTrack", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_AnimationTrack
         REGISTER_CLASS_MANUAL_PART_AnimationTrack();
@@ -134,10 +115,7 @@ static void Register_AnimationTriggerPoint(asIScriptEngine* engine)
     // AnimationTriggerPoint::~AnimationTriggerPoint() | Implicitly-declared
     engine->RegisterObjectBehaviour("AnimationTriggerPoint", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(AnimationTriggerPoint), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_AnimationTriggerPoint<AnimationTriggerPoint>(engine, "AnimationTriggerPoint");
-    CollectMembers_AnimationTriggerPoint(members);
-    RegisterMembers(engine, "AnimationTriggerPoint", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_AnimationTriggerPoint
         REGISTER_CLASS_MANUAL_PART_AnimationTriggerPoint();
@@ -170,10 +148,7 @@ static void Register_AreaAllocator(asIScriptEngine* engine)
     // AreaAllocator::~AreaAllocator() | Implicitly-declared
     engine->RegisterObjectBehaviour("AreaAllocator", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(AreaAllocator), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_AreaAllocator<AreaAllocator>(engine, "AreaAllocator");
-    CollectMembers_AreaAllocator(members);
-    RegisterMembers(engine, "AreaAllocator", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_AreaAllocator
         REGISTER_CLASS_MANUAL_PART_AreaAllocator();
@@ -189,10 +164,7 @@ static void Register_AsyncProgress(asIScriptEngine* engine)
     // AsyncProgress::~AsyncProgress() | Implicitly-declared
     engine->RegisterObjectBehaviour("AsyncProgress", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(AsyncProgress), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_AsyncProgress<AsyncProgress>(engine, "AsyncProgress");
-    CollectMembers_AsyncProgress(members);
-    RegisterMembers(engine, "AsyncProgress", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_AsyncProgress
         REGISTER_CLASS_MANUAL_PART_AsyncProgress();
@@ -211,10 +183,7 @@ static void Register_AttributeInfo(asIScriptEngine* engine)
     // AttributeInfo::~AttributeInfo() | Implicitly-declared
     engine->RegisterObjectBehaviour("AttributeInfo", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(AttributeInfo), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_AttributeInfo<AttributeInfo>(engine, "AttributeInfo");
-    CollectMembers_AttributeInfo(members);
-    RegisterMembers(engine, "AttributeInfo", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_AttributeInfo
         REGISTER_CLASS_MANUAL_PART_AttributeInfo();
@@ -230,10 +199,7 @@ static void Register_BackgroundLoadItem(asIScriptEngine* engine)
     // BackgroundLoadItem::~BackgroundLoadItem() | Implicitly-declared
     engine->RegisterObjectBehaviour("BackgroundLoadItem", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(BackgroundLoadItem), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_BackgroundLoadItem<BackgroundLoadItem>(engine, "BackgroundLoadItem");
-    CollectMembers_BackgroundLoadItem(members);
-    RegisterMembers(engine, "BackgroundLoadItem", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_BackgroundLoadItem
         REGISTER_CLASS_MANUAL_PART_BackgroundLoadItem();
@@ -258,10 +224,7 @@ static void Register_Batch(asIScriptEngine* engine)
     // Batch::~Batch() | Implicitly-declared
     engine->RegisterObjectBehaviour("Batch", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(Batch), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_Batch<Batch>(engine, "Batch");
-    CollectMembers_Batch(members);
-    RegisterMembers(engine, "Batch", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Batch
         REGISTER_CLASS_MANUAL_PART_Batch();
@@ -286,10 +249,7 @@ static void Register_BatchGroupKey(asIScriptEngine* engine)
     // BatchGroupKey::~BatchGroupKey() | Implicitly-declared
     engine->RegisterObjectBehaviour("BatchGroupKey", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(BatchGroupKey), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_BatchGroupKey<BatchGroupKey>(engine, "BatchGroupKey");
-    CollectMembers_BatchGroupKey(members);
-    RegisterMembers(engine, "BatchGroupKey", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_BatchGroupKey
         REGISTER_CLASS_MANUAL_PART_BatchGroupKey();
@@ -305,10 +265,7 @@ static void Register_BatchQueue(asIScriptEngine* engine)
     // BatchQueue::~BatchQueue() | Implicitly-declared
     engine->RegisterObjectBehaviour("BatchQueue", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(BatchQueue), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_BatchQueue<BatchQueue>(engine, "BatchQueue");
-    CollectMembers_BatchQueue(members);
-    RegisterMembers(engine, "BatchQueue", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_BatchQueue
         REGISTER_CLASS_MANUAL_PART_BatchQueue();
@@ -330,10 +287,7 @@ static void Register_BiasParameters(asIScriptEngine* engine)
     // BiasParameters::BiasParameters(float constantBias, float slopeScaledBias, float normalOffset = 0.0f)
     engine->RegisterObjectBehaviour("BiasParameters", asBEHAVE_CONSTRUCT, "void f(float, float, float = 0.0f)", AS_FUNCTION_OBJFIRST(BiasParameters__BiasParameters_float_float_float), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_BiasParameters<BiasParameters>(engine, "BiasParameters");
-    CollectMembers_BiasParameters(members);
-    RegisterMembers(engine, "BiasParameters", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_BiasParameters
         REGISTER_CLASS_MANUAL_PART_BiasParameters();
@@ -349,10 +303,7 @@ static void Register_Billboard(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Billboard", asBEHAVE_ADDREF, "void f()", AS_FUNCTION_OBJLAST(FakeAddRef), AS_CALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Billboard", asBEHAVE_RELEASE, "void f()", AS_FUNCTION_OBJLAST(FakeReleaseRef), AS_CALL_CDECL_OBJLAST);
 
-    MemberCollection members;
     RegisterMembers_Billboard<Billboard>(engine, "Billboard");
-    CollectMembers_Billboard(members);
-    RegisterMembers(engine, "Billboard", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Billboard
         REGISTER_CLASS_MANUAL_PART_Billboard();
@@ -368,10 +319,7 @@ static void Register_Bone(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Bone", asBEHAVE_ADDREF, "void f()", AS_FUNCTION_OBJLAST(FakeAddRef), AS_CALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Bone", asBEHAVE_RELEASE, "void f()", AS_FUNCTION_OBJLAST(FakeReleaseRef), AS_CALL_CDECL_OBJLAST);
 
-    MemberCollection members;
     RegisterMembers_Bone<Bone>(engine, "Bone");
-    CollectMembers_Bone(members);
-    RegisterMembers(engine, "Bone", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Bone
         REGISTER_CLASS_MANUAL_PART_Bone();
@@ -444,10 +392,7 @@ static void Register_BoundingBox(asIScriptEngine* engine)
     // explicit BoundingBox::BoundingBox(const Sphere& sphere)
     engine->RegisterObjectBehaviour("BoundingBox", asBEHAVE_CONSTRUCT, "void f(const Sphere&in)", AS_FUNCTION_OBJFIRST(BoundingBox__BoundingBox_constspSphereamp), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_BoundingBox<BoundingBox>(engine, "BoundingBox");
-    CollectMembers_BoundingBox(members);
-    RegisterMembers(engine, "BoundingBox", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_BoundingBox
         REGISTER_CLASS_MANUAL_PART_BoundingBox();
@@ -466,10 +411,7 @@ static void Register_CascadeParameters(asIScriptEngine* engine)
     // CascadeParameters::CascadeParameters(float split1, float split2, float split3, float split4, float fadeStart, float biasAutoAdjust = 1.0f)
     engine->RegisterObjectBehaviour("CascadeParameters", asBEHAVE_CONSTRUCT, "void f(float, float, float, float, float, float = 1.0f)", AS_FUNCTION_OBJFIRST(CascadeParameters__CascadeParameters_float_float_float_float_float_float), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_CascadeParameters<CascadeParameters>(engine, "CascadeParameters");
-    CollectMembers_CascadeParameters(members);
-    RegisterMembers(engine, "CascadeParameters", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_CascadeParameters
         REGISTER_CLASS_MANUAL_PART_CascadeParameters();
@@ -485,10 +427,7 @@ static void Register_CharLocation(asIScriptEngine* engine)
     // CharLocation::~CharLocation() | Implicitly-declared
     engine->RegisterObjectBehaviour("CharLocation", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(CharLocation), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_CharLocation<CharLocation>(engine, "CharLocation");
-    CollectMembers_CharLocation(members);
-    RegisterMembers(engine, "CharLocation", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_CharLocation
         REGISTER_CLASS_MANUAL_PART_CharLocation();
@@ -555,10 +494,7 @@ static void Register_Color(asIScriptEngine* engine)
     // explicit Color::Color(const Vector4& color)
     engine->RegisterObjectBehaviour("Color", asBEHAVE_CONSTRUCT, "void f(const Vector4&in)", AS_FUNCTION_OBJFIRST(Color__Color_constspVector4amp), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_Color<Color>(engine, "Color");
-    CollectMembers_Color(members);
-    RegisterMembers(engine, "Color", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Color
         REGISTER_CLASS_MANUAL_PART_Color();
@@ -588,10 +524,7 @@ static void Register_ColorFrame(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("ColorFrame", asBEHAVE_ADDREF, "void f()", AS_FUNCTION_OBJLAST(FakeAddRef), AS_CALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("ColorFrame", asBEHAVE_RELEASE, "void f()", AS_FUNCTION_OBJLAST(FakeReleaseRef), AS_CALL_CDECL_OBJLAST);
 
-    MemberCollection members;
     RegisterMembers_ColorFrame<ColorFrame>(engine, "ColorFrame");
-    CollectMembers_ColorFrame(members);
-    RegisterMembers(engine, "ColorFrame", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ColorFrame
         REGISTER_CLASS_MANUAL_PART_ColorFrame();
@@ -607,10 +540,7 @@ static void Register_CompressedLevel(asIScriptEngine* engine)
     // CompressedLevel::~CompressedLevel() | Implicitly-declared
     engine->RegisterObjectBehaviour("CompressedLevel", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(CompressedLevel), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_CompressedLevel<CompressedLevel>(engine, "CompressedLevel");
-    CollectMembers_CompressedLevel(members);
-    RegisterMembers(engine, "CompressedLevel", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_CompressedLevel
         REGISTER_CLASS_MANUAL_PART_CompressedLevel();
@@ -626,10 +556,7 @@ static void Register_Condition(asIScriptEngine* engine)
     // Condition::~Condition()
     engine->RegisterObjectBehaviour("Condition", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(Condition), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_Condition<Condition>(engine, "Condition");
-    CollectMembers_Condition(members);
-    RegisterMembers(engine, "Condition", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Condition
         REGISTER_CLASS_MANUAL_PART_Condition();
@@ -645,10 +572,7 @@ static void Register_Controls(asIScriptEngine* engine)
     // Controls::~Controls()
     engine->RegisterObjectBehaviour("Controls", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(Controls), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_Controls<Controls>(engine, "Controls");
-    CollectMembers_Controls(members);
-    RegisterMembers(engine, "Controls", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Controls
         REGISTER_CLASS_MANUAL_PART_Controls();
@@ -673,10 +597,7 @@ static void Register_CursorShapeInfo(asIScriptEngine* engine)
     // CursorShapeInfo::~CursorShapeInfo() | Implicitly-declared
     engine->RegisterObjectBehaviour("CursorShapeInfo", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(CursorShapeInfo), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_CursorShapeInfo<CursorShapeInfo>(engine, "CursorShapeInfo");
-    CollectMembers_CursorShapeInfo(members);
-    RegisterMembers(engine, "CursorShapeInfo", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_CursorShapeInfo
         REGISTER_CLASS_MANUAL_PART_CursorShapeInfo();
@@ -692,10 +613,7 @@ static void Register_CustomGeometryVertex(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("CustomGeometryVertex", asBEHAVE_ADDREF, "void f()", AS_FUNCTION_OBJLAST(FakeAddRef), AS_CALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("CustomGeometryVertex", asBEHAVE_RELEASE, "void f()", AS_FUNCTION_OBJLAST(FakeReleaseRef), AS_CALL_CDECL_OBJLAST);
 
-    MemberCollection members;
     RegisterMembers_CustomGeometryVertex<CustomGeometryVertex>(engine, "CustomGeometryVertex");
-    CollectMembers_CustomGeometryVertex(members);
-    RegisterMembers(engine, "CustomGeometryVertex", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_CustomGeometryVertex
         REGISTER_CLASS_MANUAL_PART_CustomGeometryVertex();
@@ -720,10 +638,7 @@ static void Register_DebugLine(asIScriptEngine* engine)
     // DebugLine::~DebugLine() | Implicitly-declared
     engine->RegisterObjectBehaviour("DebugLine", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(DebugLine), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_DebugLine<DebugLine>(engine, "DebugLine");
-    CollectMembers_DebugLine(members);
-    RegisterMembers(engine, "DebugLine", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_DebugLine
         REGISTER_CLASS_MANUAL_PART_DebugLine();
@@ -748,10 +663,7 @@ static void Register_DebugTriangle(asIScriptEngine* engine)
     // DebugTriangle::~DebugTriangle() | Implicitly-declared
     engine->RegisterObjectBehaviour("DebugTriangle", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(DebugTriangle), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_DebugTriangle<DebugTriangle>(engine, "DebugTriangle");
-    CollectMembers_DebugTriangle(members);
-    RegisterMembers(engine, "DebugTriangle", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_DebugTriangle
         REGISTER_CLASS_MANUAL_PART_DebugTriangle();
@@ -767,10 +679,7 @@ static void Register_Decal(asIScriptEngine* engine)
     // Decal::~Decal() | Implicitly-declared
     engine->RegisterObjectBehaviour("Decal", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(Decal), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_Decal<Decal>(engine, "Decal");
-    CollectMembers_Decal(members);
-    RegisterMembers(engine, "Decal", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Decal
         REGISTER_CLASS_MANUAL_PART_Decal();
@@ -798,10 +707,7 @@ static void Register_DecalVertex(asIScriptEngine* engine)
     // DecalVertex::~DecalVertex() | Implicitly-declared
     engine->RegisterObjectBehaviour("DecalVertex", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(DecalVertex), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_DecalVertex<DecalVertex>(engine, "DecalVertex");
-    CollectMembers_DecalVertex(members);
-    RegisterMembers(engine, "DecalVertex", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_DecalVertex
         REGISTER_CLASS_MANUAL_PART_DecalVertex();
@@ -814,10 +720,7 @@ static void Register_DecalVertex(asIScriptEngine* engine)
 // struct DepthValue | File: ../Graphics/OcclusionBuffer.h
 static void Register_DepthValue(asIScriptEngine* engine)
 {
-    MemberCollection members;
     RegisterMembers_DepthValue<DepthValue>(engine, "DepthValue");
-    CollectMembers_DepthValue(members);
-    RegisterMembers(engine, "DepthValue", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_DepthValue
         REGISTER_CLASS_MANUAL_PART_DepthValue();
@@ -833,10 +736,7 @@ static void Register_Deserializer(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Deserializer", asBEHAVE_ADDREF, "void f()", AS_FUNCTION_OBJLAST(FakeAddRef), AS_CALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Deserializer", asBEHAVE_RELEASE, "void f()", AS_FUNCTION_OBJLAST(FakeReleaseRef), AS_CALL_CDECL_OBJLAST);
 
-    MemberCollection members;
     RegisterMembers_Deserializer<Deserializer>(engine, "Deserializer");
-    CollectMembers_Deserializer(members);
-    RegisterMembers(engine, "Deserializer", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Deserializer
         REGISTER_CLASS_MANUAL_PART_Deserializer();
@@ -861,10 +761,7 @@ static void Register_DirtyBits(asIScriptEngine* engine)
     // DirtyBits::~DirtyBits() | Implicitly-declared
     engine->RegisterObjectBehaviour("DirtyBits", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(DirtyBits), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_DirtyBits<DirtyBits>(engine, "DirtyBits");
-    CollectMembers_DirtyBits(members);
-    RegisterMembers(engine, "DirtyBits", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_DirtyBits
         REGISTER_CLASS_MANUAL_PART_DirtyBits();
@@ -880,10 +777,7 @@ static void Register_FileSelectorEntry(asIScriptEngine* engine)
     // FileSelectorEntry::~FileSelectorEntry() | Implicitly-declared
     engine->RegisterObjectBehaviour("FileSelectorEntry", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(FileSelectorEntry), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_FileSelectorEntry<FileSelectorEntry>(engine, "FileSelectorEntry");
-    CollectMembers_FileSelectorEntry(members);
-    RegisterMembers(engine, "FileSelectorEntry", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_FileSelectorEntry
         REGISTER_CLASS_MANUAL_PART_FileSelectorEntry();
@@ -905,10 +799,7 @@ static void Register_FocusParameters(asIScriptEngine* engine)
     // FocusParameters::FocusParameters(bool focus, bool nonUniform, bool autoSize, float quantize, float minView)
     engine->RegisterObjectBehaviour("FocusParameters", asBEHAVE_CONSTRUCT, "void f(bool, bool, bool, float, float)", AS_FUNCTION_OBJFIRST(FocusParameters__FocusParameters_bool_bool_bool_float_float), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_FocusParameters<FocusParameters>(engine, "FocusParameters");
-    CollectMembers_FocusParameters(members);
-    RegisterMembers(engine, "FocusParameters", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_FocusParameters
         REGISTER_CLASS_MANUAL_PART_FocusParameters();
@@ -924,10 +815,7 @@ static void Register_FontGlyph(asIScriptEngine* engine)
     // FontGlyph::~FontGlyph() | Implicitly-declared
     engine->RegisterObjectBehaviour("FontGlyph", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(FontGlyph), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_FontGlyph<FontGlyph>(engine, "FontGlyph");
-    CollectMembers_FontGlyph(members);
-    RegisterMembers(engine, "FontGlyph", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_FontGlyph
         REGISTER_CLASS_MANUAL_PART_FontGlyph();
@@ -943,10 +831,7 @@ static void Register_FrameInfo(asIScriptEngine* engine)
     // FrameInfo::~FrameInfo() | Implicitly-declared
     engine->RegisterObjectBehaviour("FrameInfo", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(FrameInfo), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_FrameInfo<FrameInfo>(engine, "FrameInfo");
-    CollectMembers_FrameInfo(members);
-    RegisterMembers(engine, "FrameInfo", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_FrameInfo
         REGISTER_CLASS_MANUAL_PART_FrameInfo();
@@ -971,10 +856,7 @@ static void Register_Frustum(asIScriptEngine* engine)
     // Frustum::~Frustum() | Implicitly-declared
     engine->RegisterObjectBehaviour("Frustum", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(Frustum), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_Frustum<Frustum>(engine, "Frustum");
-    CollectMembers_Frustum(members);
-    RegisterMembers(engine, "Frustum", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Frustum
         REGISTER_CLASS_MANUAL_PART_Frustum();
@@ -996,10 +878,7 @@ static void Register_GPUObject(asIScriptEngine* engine)
     // virtual GPUObject::~GPUObject()
     engine->RegisterObjectBehaviour("GPUObject", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(GPUObject), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_GPUObject<GPUObject>(engine, "GPUObject");
-    CollectMembers_GPUObject(members);
-    RegisterMembers(engine, "GPUObject", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_GPUObject
         REGISTER_CLASS_MANUAL_PART_GPUObject();
@@ -1015,10 +894,7 @@ static void Register_GeometryDesc(asIScriptEngine* engine)
     // GeometryDesc::~GeometryDesc() | Implicitly-declared
     engine->RegisterObjectBehaviour("GeometryDesc", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(GeometryDesc), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_GeometryDesc<GeometryDesc>(engine, "GeometryDesc");
-    CollectMembers_GeometryDesc(members);
-    RegisterMembers(engine, "GeometryDesc", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_GeometryDesc
         REGISTER_CLASS_MANUAL_PART_GeometryDesc();
@@ -1034,10 +910,7 @@ static void Register_HashBase(asIScriptEngine* engine)
     // HashBase::~HashBase() | Implicitly-declared
     engine->RegisterObjectBehaviour("HashBase", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(HashBase), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_HashBase<HashBase>(engine, "HashBase");
-    CollectMembers_HashBase(members);
-    RegisterMembers(engine, "HashBase", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_HashBase
         REGISTER_CLASS_MANUAL_PART_HashBase();
@@ -1056,10 +929,7 @@ static void Register_HashIteratorBase(asIScriptEngine* engine)
     // HashIteratorBase::~HashIteratorBase() | Implicitly-declared
     engine->RegisterObjectBehaviour("HashIteratorBase", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(HashIteratorBase), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_HashIteratorBase<HashIteratorBase>(engine, "HashIteratorBase");
-    CollectMembers_HashIteratorBase(members);
-    RegisterMembers(engine, "HashIteratorBase", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_HashIteratorBase
         REGISTER_CLASS_MANUAL_PART_HashIteratorBase();
@@ -1075,10 +945,7 @@ static void Register_HashNodeBase(asIScriptEngine* engine)
     // HashNodeBase::~HashNodeBase() | Implicitly-declared
     engine->RegisterObjectBehaviour("HashNodeBase", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(HashNodeBase), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_HashNodeBase<HashNodeBase>(engine, "HashNodeBase");
-    CollectMembers_HashNodeBase(members);
-    RegisterMembers(engine, "HashNodeBase", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_HashNodeBase
         REGISTER_CLASS_MANUAL_PART_HashNodeBase();
@@ -1094,10 +961,7 @@ static void Register_HiresTimer(asIScriptEngine* engine)
     // HiresTimer::~HiresTimer() | Implicitly-declared
     engine->RegisterObjectBehaviour("HiresTimer", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(HiresTimer), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_HiresTimer<HiresTimer>(engine, "HiresTimer");
-    CollectMembers_HiresTimer(members);
-    RegisterMembers(engine, "HiresTimer", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_HiresTimer
         REGISTER_CLASS_MANUAL_PART_HiresTimer();
@@ -1113,10 +977,7 @@ static void Register_IndexBufferDesc(asIScriptEngine* engine)
     // IndexBufferDesc::~IndexBufferDesc() | Implicitly-declared
     engine->RegisterObjectBehaviour("IndexBufferDesc", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(IndexBufferDesc), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_IndexBufferDesc<IndexBufferDesc>(engine, "IndexBufferDesc");
-    CollectMembers_IndexBufferDesc(members);
-    RegisterMembers(engine, "IndexBufferDesc", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_IndexBufferDesc
         REGISTER_CLASS_MANUAL_PART_IndexBufferDesc();
@@ -1135,10 +996,7 @@ static void Register_InstanceData(asIScriptEngine* engine)
     // InstanceData::~InstanceData() | Implicitly-declared
     engine->RegisterObjectBehaviour("InstanceData", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(InstanceData), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_InstanceData<InstanceData>(engine, "InstanceData");
-    CollectMembers_InstanceData(members);
-    RegisterMembers(engine, "InstanceData", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_InstanceData
         REGISTER_CLASS_MANUAL_PART_InstanceData();
@@ -1171,10 +1029,7 @@ static void Register_IntRect(asIScriptEngine* engine)
     // IntRect::IntRect(int left, int top, int right, int bottom) noexcept
     engine->RegisterObjectBehaviour("IntRect", asBEHAVE_CONSTRUCT, "void f(int, int, int, int)", AS_FUNCTION_OBJFIRST(IntRect__IntRect_int_int_int_int), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_IntRect<IntRect>(engine, "IntRect");
-    CollectMembers_IntRect(members);
-    RegisterMembers(engine, "IntRect", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_IntRect
         REGISTER_CLASS_MANUAL_PART_IntRect();
@@ -1209,10 +1064,7 @@ static void Register_IntVector2(asIScriptEngine* engine)
     // IntVector2::IntVector2(const IntVector2& rhs) noexcept = default
     engine->RegisterObjectBehaviour("IntVector2", asBEHAVE_CONSTRUCT, "void f(const IntVector2&in)", AS_FUNCTION_OBJFIRST(IntVector2__IntVector2_constspIntVector2amp), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_IntVector2<IntVector2>(engine, "IntVector2");
-    CollectMembers_IntVector2(members);
-    RegisterMembers(engine, "IntVector2", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_IntVector2
         REGISTER_CLASS_MANUAL_PART_IntVector2();
@@ -1242,10 +1094,7 @@ static void Register_IntVector3(asIScriptEngine* engine)
     // IntVector3::IntVector3(const IntVector3& rhs) noexcept = default
     engine->RegisterObjectBehaviour("IntVector3", asBEHAVE_CONSTRUCT, "void f(const IntVector3&in)", AS_FUNCTION_OBJFIRST(IntVector3__IntVector3_constspIntVector3amp), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_IntVector3<IntVector3>(engine, "IntVector3");
-    CollectMembers_IntVector3(members);
-    RegisterMembers(engine, "IntVector3", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_IntVector3
         REGISTER_CLASS_MANUAL_PART_IntVector3();
@@ -1322,10 +1171,7 @@ static void Register_JSONValue(asIScriptEngine* engine)
     // JSONValue::~JSONValue()
     engine->RegisterObjectBehaviour("JSONValue", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(JSONValue), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_JSONValue<JSONValue>(engine, "JSONValue");
-    CollectMembers_JSONValue(members);
-    RegisterMembers(engine, "JSONValue", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_JSONValue
         REGISTER_CLASS_MANUAL_PART_JSONValue();
@@ -1338,10 +1184,7 @@ static void Register_JoystickState(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("JoystickState", asBEHAVE_ADDREF, "void f()", AS_FUNCTION_OBJLAST(FakeAddRef), AS_CALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("JoystickState", asBEHAVE_RELEASE, "void f()", AS_FUNCTION_OBJLAST(FakeReleaseRef), AS_CALL_CDECL_OBJLAST);
 
-    MemberCollection members;
     RegisterMembers_JoystickState<JoystickState>(engine, "JoystickState");
-    CollectMembers_JoystickState(members);
-    RegisterMembers(engine, "JoystickState", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_JoystickState
         REGISTER_CLASS_MANUAL_PART_JoystickState();
@@ -1357,10 +1200,7 @@ static void Register_LightBatchQueue(asIScriptEngine* engine)
     // LightBatchQueue::~LightBatchQueue() | Implicitly-declared
     engine->RegisterObjectBehaviour("LightBatchQueue", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(LightBatchQueue), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_LightBatchQueue<LightBatchQueue>(engine, "LightBatchQueue");
-    CollectMembers_LightBatchQueue(members);
-    RegisterMembers(engine, "LightBatchQueue", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_LightBatchQueue
         REGISTER_CLASS_MANUAL_PART_LightBatchQueue();
@@ -1376,10 +1216,7 @@ static void Register_LightQueryResult(asIScriptEngine* engine)
     // LightQueryResult::~LightQueryResult() | Implicitly-declared
     engine->RegisterObjectBehaviour("LightQueryResult", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(LightQueryResult), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_LightQueryResult<LightQueryResult>(engine, "LightQueryResult");
-    CollectMembers_LightQueryResult(members);
-    RegisterMembers(engine, "LightQueryResult", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_LightQueryResult
         REGISTER_CLASS_MANUAL_PART_LightQueryResult();
@@ -1395,10 +1232,7 @@ static void Register_LinkedListNode(asIScriptEngine* engine)
     // LinkedListNode::~LinkedListNode() | Implicitly-declared
     engine->RegisterObjectBehaviour("LinkedListNode", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(LinkedListNode), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_LinkedListNode<LinkedListNode>(engine, "LinkedListNode");
-    CollectMembers_LinkedListNode(members);
-    RegisterMembers(engine, "LinkedListNode", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_LinkedListNode
         REGISTER_CLASS_MANUAL_PART_LinkedListNode();
@@ -1414,10 +1248,7 @@ static void Register_ListBase(asIScriptEngine* engine)
     // ListBase::~ListBase() | Implicitly-declared
     engine->RegisterObjectBehaviour("ListBase", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(ListBase), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_ListBase<ListBase>(engine, "ListBase");
-    CollectMembers_ListBase(members);
-    RegisterMembers(engine, "ListBase", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ListBase
         REGISTER_CLASS_MANUAL_PART_ListBase();
@@ -1436,10 +1267,7 @@ static void Register_ListIteratorBase(asIScriptEngine* engine)
     // ListIteratorBase::~ListIteratorBase() | Implicitly-declared
     engine->RegisterObjectBehaviour("ListIteratorBase", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(ListIteratorBase), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_ListIteratorBase<ListIteratorBase>(engine, "ListIteratorBase");
-    CollectMembers_ListIteratorBase(members);
-    RegisterMembers(engine, "ListIteratorBase", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ListIteratorBase
         REGISTER_CLASS_MANUAL_PART_ListIteratorBase();
@@ -1455,10 +1283,7 @@ static void Register_ListNodeBase(asIScriptEngine* engine)
     // ListNodeBase::~ListNodeBase() | Implicitly-declared
     engine->RegisterObjectBehaviour("ListNodeBase", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(ListNodeBase), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_ListNodeBase<ListNodeBase>(engine, "ListNodeBase");
-    CollectMembers_ListNodeBase(members);
-    RegisterMembers(engine, "ListNodeBase", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ListNodeBase
         REGISTER_CLASS_MANUAL_PART_ListNodeBase();
@@ -1474,10 +1299,7 @@ static void Register_MaterialShaderParameter(asIScriptEngine* engine)
     // MaterialShaderParameter::~MaterialShaderParameter() | Implicitly-declared
     engine->RegisterObjectBehaviour("MaterialShaderParameter", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(MaterialShaderParameter), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_MaterialShaderParameter<MaterialShaderParameter>(engine, "MaterialShaderParameter");
-    CollectMembers_MaterialShaderParameter(members);
-    RegisterMembers(engine, "MaterialShaderParameter", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_MaterialShaderParameter
         REGISTER_CLASS_MANUAL_PART_MaterialShaderParameter();
@@ -1510,10 +1332,7 @@ static void Register_Matrix2(asIScriptEngine* engine)
     // Matrix2::Matrix2(float v00, float v01, float v10, float v11) noexcept
     engine->RegisterObjectBehaviour("Matrix2", asBEHAVE_CONSTRUCT, "void f(float, float, float, float)", AS_FUNCTION_OBJFIRST(Matrix2__Matrix2_float_float_float_float), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_Matrix2<Matrix2>(engine, "Matrix2");
-    CollectMembers_Matrix2(members);
-    RegisterMembers(engine, "Matrix2", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Matrix2
         REGISTER_CLASS_MANUAL_PART_Matrix2();
@@ -1543,10 +1362,7 @@ static void Register_Matrix3(asIScriptEngine* engine)
     // Matrix3::Matrix3(float v00, float v01, float v02, float v10, float v11, float v12, float v20, float v21, float v22) noexcept
     engine->RegisterObjectBehaviour("Matrix3", asBEHAVE_CONSTRUCT, "void f(float, float, float, float, float, float, float, float, float)", AS_FUNCTION_OBJFIRST(Matrix3__Matrix3_float_float_float_float_float_float_float_float_float), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_Matrix3<Matrix3>(engine, "Matrix3");
-    CollectMembers_Matrix3(members);
-    RegisterMembers(engine, "Matrix3", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Matrix3
         REGISTER_CLASS_MANUAL_PART_Matrix3();
@@ -1608,10 +1424,7 @@ static void Register_Matrix3x4(asIScriptEngine* engine)
     // Matrix3x4::Matrix3x4(const Vector3& translation, const Quaternion& rotation, const Vector3& scale) noexcept
     engine->RegisterObjectBehaviour("Matrix3x4", asBEHAVE_CONSTRUCT, "void f(const Vector3&in, const Quaternion&in, const Vector3&in)", AS_FUNCTION_OBJFIRST(Matrix3x4__Matrix3x4_constspVector3amp_constspQuaternionamp_constspVector3amp), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_Matrix3x4<Matrix3x4>(engine, "Matrix3x4");
-    CollectMembers_Matrix3x4(members);
-    RegisterMembers(engine, "Matrix3x4", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Matrix3x4
         REGISTER_CLASS_MANUAL_PART_Matrix3x4();
@@ -1649,10 +1462,7 @@ static void Register_Matrix4(asIScriptEngine* engine)
     // Matrix4::Matrix4(float v00, float v01, float v02, float v03, float v10, float v11, float v12, float v13, float v20, float v21, float v22, float v23, float v30, float v31, float v32, float v33) noexcept
     engine->RegisterObjectBehaviour("Matrix4", asBEHAVE_CONSTRUCT, "void f(float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float)", AS_FUNCTION_OBJFIRST(Matrix4__Matrix4_float_float_float_float_float_float_float_float_float_float_float_float_float_float_float_float), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_Matrix4<Matrix4>(engine, "Matrix4");
-    CollectMembers_Matrix4(members);
-    RegisterMembers(engine, "Matrix4", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Matrix4
         REGISTER_CLASS_MANUAL_PART_Matrix4();
@@ -1665,10 +1475,7 @@ static void Register_ModelMorph(asIScriptEngine* engine)
     // ModelMorph::~ModelMorph() | Implicitly-declared
     engine->RegisterObjectBehaviour("ModelMorph", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(ModelMorph), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_ModelMorph<ModelMorph>(engine, "ModelMorph");
-    CollectMembers_ModelMorph(members);
-    RegisterMembers(engine, "ModelMorph", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ModelMorph
         REGISTER_CLASS_MANUAL_PART_ModelMorph();
@@ -1684,10 +1491,7 @@ static void Register_Mutex(asIScriptEngine* engine)
     // Mutex::~Mutex()
     engine->RegisterObjectBehaviour("Mutex", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(Mutex), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_Mutex<Mutex>(engine, "Mutex");
-    CollectMembers_Mutex(members);
-    RegisterMembers(engine, "Mutex", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Mutex
         REGISTER_CLASS_MANUAL_PART_Mutex();
@@ -1715,10 +1519,7 @@ static void Register_MutexLock(asIScriptEngine* engine)
     // MutexLock::~MutexLock()
     engine->RegisterObjectBehaviour("MutexLock", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(MutexLock), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_MutexLock<MutexLock>(engine, "MutexLock");
-    CollectMembers_MutexLock(members);
-    RegisterMembers(engine, "MutexLock", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_MutexLock
         REGISTER_CLASS_MANUAL_PART_MutexLock();
@@ -1731,10 +1532,7 @@ static void Register_NetworkState(asIScriptEngine* engine)
     // NetworkState::~NetworkState() | Implicitly-declared
     engine->RegisterObjectBehaviour("NetworkState", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(NetworkState), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_NetworkState<NetworkState>(engine, "NetworkState");
-    CollectMembers_NetworkState(members);
-    RegisterMembers(engine, "NetworkState", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_NetworkState
         REGISTER_CLASS_MANUAL_PART_NetworkState();
@@ -1750,10 +1548,7 @@ static void Register_NodeImpl(asIScriptEngine* engine)
     // NodeImpl::~NodeImpl() | Implicitly-declared
     engine->RegisterObjectBehaviour("NodeImpl", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(NodeImpl), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_NodeImpl<NodeImpl>(engine, "NodeImpl");
-    CollectMembers_NodeImpl(members);
-    RegisterMembers(engine, "NodeImpl", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_NodeImpl
         REGISTER_CLASS_MANUAL_PART_NodeImpl();
@@ -1769,10 +1564,7 @@ static void Register_OcclusionBatch(asIScriptEngine* engine)
     // OcclusionBatch::~OcclusionBatch() | Implicitly-declared
     engine->RegisterObjectBehaviour("OcclusionBatch", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(OcclusionBatch), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_OcclusionBatch<OcclusionBatch>(engine, "OcclusionBatch");
-    CollectMembers_OcclusionBatch(members);
-    RegisterMembers(engine, "OcclusionBatch", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_OcclusionBatch
         REGISTER_CLASS_MANUAL_PART_OcclusionBatch();
@@ -1788,10 +1580,7 @@ static void Register_OcclusionBufferData(asIScriptEngine* engine)
     // OcclusionBufferData::~OcclusionBufferData() | Implicitly-declared
     engine->RegisterObjectBehaviour("OcclusionBufferData", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(OcclusionBufferData), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_OcclusionBufferData<OcclusionBufferData>(engine, "OcclusionBufferData");
-    CollectMembers_OcclusionBufferData(members);
-    RegisterMembers(engine, "OcclusionBufferData", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_OcclusionBufferData
         REGISTER_CLASS_MANUAL_PART_OcclusionBufferData();
@@ -1807,10 +1596,7 @@ static void Register_OctreeQueryResult(asIScriptEngine* engine)
     // OctreeQueryResult::~OctreeQueryResult() | Implicitly-declared
     engine->RegisterObjectBehaviour("OctreeQueryResult", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(OctreeQueryResult), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_OctreeQueryResult<OctreeQueryResult>(engine, "OctreeQueryResult");
-    CollectMembers_OctreeQueryResult(members);
-    RegisterMembers(engine, "OctreeQueryResult", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_OctreeQueryResult
         REGISTER_CLASS_MANUAL_PART_OctreeQueryResult();
@@ -1823,10 +1609,7 @@ static void Register_OctreeQueryResult(asIScriptEngine* engine)
 // struct PackageEntry | File: ../IO/PackageFile.h
 static void Register_PackageEntry(asIScriptEngine* engine)
 {
-    MemberCollection members;
     RegisterMembers_PackageEntry<PackageEntry>(engine, "PackageEntry");
-    CollectMembers_PackageEntry(members);
-    RegisterMembers(engine, "PackageEntry", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_PackageEntry
         REGISTER_CLASS_MANUAL_PART_PackageEntry();
@@ -1842,10 +1625,7 @@ static void Register_Particle(asIScriptEngine* engine)
     // Particle::~Particle() | Implicitly-declared
     engine->RegisterObjectBehaviour("Particle", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(Particle), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_Particle<Particle>(engine, "Particle");
-    CollectMembers_Particle(members);
-    RegisterMembers(engine, "Particle", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Particle
         REGISTER_CLASS_MANUAL_PART_Particle();
@@ -1861,10 +1641,7 @@ static void Register_PerThreadSceneResult(asIScriptEngine* engine)
     // PerThreadSceneResult::~PerThreadSceneResult() | Implicitly-declared
     engine->RegisterObjectBehaviour("PerThreadSceneResult", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(PerThreadSceneResult), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_PerThreadSceneResult<PerThreadSceneResult>(engine, "PerThreadSceneResult");
-    CollectMembers_PerThreadSceneResult(members);
-    RegisterMembers(engine, "PerThreadSceneResult", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_PerThreadSceneResult
         REGISTER_CLASS_MANUAL_PART_PerThreadSceneResult();
@@ -1910,10 +1687,7 @@ static void Register_Plane(asIScriptEngine* engine)
     // explicit Plane::Plane(const Vector4& plane) noexcept
     engine->RegisterObjectBehaviour("Plane", asBEHAVE_CONSTRUCT, "void f(const Vector4&in)", AS_FUNCTION_OBJFIRST(Plane__Plane_constspVector4amp), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_Plane<Plane>(engine, "Plane");
-    CollectMembers_Plane(members);
-    RegisterMembers(engine, "Plane", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Plane
         REGISTER_CLASS_MANUAL_PART_Plane();
@@ -1954,10 +1728,7 @@ static void Register_Polyhedron(asIScriptEngine* engine)
     // Polyhedron::~Polyhedron() noexcept = default
     engine->RegisterObjectBehaviour("Polyhedron", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(Polyhedron), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_Polyhedron<Polyhedron>(engine, "Polyhedron");
-    CollectMembers_Polyhedron(members);
-    RegisterMembers(engine, "Polyhedron", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Polyhedron
         REGISTER_CLASS_MANUAL_PART_Polyhedron();
@@ -2043,10 +1814,7 @@ static void Register_Quaternion(asIScriptEngine* engine)
     // explicit Quaternion::Quaternion(const Matrix3& matrix) noexcept
     engine->RegisterObjectBehaviour("Quaternion", asBEHAVE_CONSTRUCT, "void f(const Matrix3&in)", AS_FUNCTION_OBJFIRST(Quaternion__Quaternion_constspMatrix3amp), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_Quaternion<Quaternion>(engine, "Quaternion");
-    CollectMembers_Quaternion(members);
-    RegisterMembers(engine, "Quaternion", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Quaternion
         REGISTER_CLASS_MANUAL_PART_Quaternion();
@@ -2073,10 +1841,7 @@ static void Register_Ray(asIScriptEngine* engine)
     // Ray::Ray(const Ray& ray) noexcept = default
     engine->RegisterObjectBehaviour("Ray", asBEHAVE_CONSTRUCT, "void f(const Ray&in)", AS_FUNCTION_OBJFIRST(Ray__Ray_constspRayamp), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_Ray<Ray>(engine, "Ray");
-    CollectMembers_Ray(members);
-    RegisterMembers(engine, "Ray", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Ray
         REGISTER_CLASS_MANUAL_PART_Ray();
@@ -2089,10 +1854,7 @@ static void Register_RayQueryResult(asIScriptEngine* engine)
     // RayQueryResult::~RayQueryResult() | Implicitly-declared
     engine->RegisterObjectBehaviour("RayQueryResult", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(RayQueryResult), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_RayQueryResult<RayQueryResult>(engine, "RayQueryResult");
-    CollectMembers_RayQueryResult(members);
-    RegisterMembers(engine, "RayQueryResult", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_RayQueryResult
         REGISTER_CLASS_MANUAL_PART_RayQueryResult();
@@ -2141,10 +1903,7 @@ static void Register_Rect(asIScriptEngine* engine)
     // Rect::Rect(const Rect& rect) noexcept = default
     engine->RegisterObjectBehaviour("Rect", asBEHAVE_CONSTRUCT, "void f(const Rect&in)", AS_FUNCTION_OBJFIRST(Rect__Rect_constspRectamp), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_Rect<Rect>(engine, "Rect");
-    CollectMembers_Rect(members);
-    RegisterMembers(engine, "Rect", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Rect
         REGISTER_CLASS_MANUAL_PART_Rect();
@@ -2157,10 +1916,7 @@ static void Register_RefCount(asIScriptEngine* engine)
     // RefCount::~RefCount()
     engine->RegisterObjectBehaviour("RefCount", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(RefCount), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_RefCount<RefCount>(engine, "RefCount");
-    CollectMembers_RefCount(members);
-    RegisterMembers(engine, "RefCount", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_RefCount
         REGISTER_CLASS_MANUAL_PART_RefCount();
@@ -2176,10 +1932,7 @@ static void Register_RefCounted(asIScriptEngine* engine)
     // RefCounted::RefCounted(const RefCounted& rhs) = delete
     // Not registered because deleted
 
-    MemberCollection members;
     RegisterMembers_RefCounted<RefCounted>(engine, "RefCounted");
-    CollectMembers_RefCounted(members);
-    RegisterMembers(engine, "RefCounted", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_RefCounted
         REGISTER_CLASS_MANUAL_PART_RefCounted();
@@ -2192,10 +1945,7 @@ static void Register_RenderPathCommand(asIScriptEngine* engine)
     // RenderPathCommand::~RenderPathCommand() | Implicitly-declared
     engine->RegisterObjectBehaviour("RenderPathCommand", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(RenderPathCommand), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_RenderPathCommand<RenderPathCommand>(engine, "RenderPathCommand");
-    CollectMembers_RenderPathCommand(members);
-    RegisterMembers(engine, "RenderPathCommand", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_RenderPathCommand
         REGISTER_CLASS_MANUAL_PART_RenderPathCommand();
@@ -2211,10 +1961,7 @@ static void Register_RenderTargetInfo(asIScriptEngine* engine)
     // RenderTargetInfo::~RenderTargetInfo() | Implicitly-declared
     engine->RegisterObjectBehaviour("RenderTargetInfo", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(RenderTargetInfo), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_RenderTargetInfo<RenderTargetInfo>(engine, "RenderTargetInfo");
-    CollectMembers_RenderTargetInfo(members);
-    RegisterMembers(engine, "RenderTargetInfo", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_RenderTargetInfo
         REGISTER_CLASS_MANUAL_PART_RenderTargetInfo();
@@ -2230,10 +1977,7 @@ static void Register_ReplicationState(asIScriptEngine* engine)
     // ReplicationState::~ReplicationState() | Implicitly-declared
     engine->RegisterObjectBehaviour("ReplicationState", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(ReplicationState), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_ReplicationState<ReplicationState>(engine, "ReplicationState");
-    CollectMembers_ReplicationState(members);
-    RegisterMembers(engine, "ReplicationState", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ReplicationState
         REGISTER_CLASS_MANUAL_PART_ReplicationState();
@@ -2249,10 +1993,7 @@ static void Register_ResourceGroup(asIScriptEngine* engine)
     // ResourceGroup::~ResourceGroup() | Implicitly-declared
     engine->RegisterObjectBehaviour("ResourceGroup", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(ResourceGroup), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_ResourceGroup<ResourceGroup>(engine, "ResourceGroup");
-    CollectMembers_ResourceGroup(members);
-    RegisterMembers(engine, "ResourceGroup", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ResourceGroup
         REGISTER_CLASS_MANUAL_PART_ResourceGroup();
@@ -2304,10 +2045,7 @@ static void Register_ResourceRef(asIScriptEngine* engine)
     // ResourceRef::~ResourceRef() | Implicitly-declared
     engine->RegisterObjectBehaviour("ResourceRef", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(ResourceRef), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_ResourceRef<ResourceRef>(engine, "ResourceRef");
-    CollectMembers_ResourceRef(members);
-    RegisterMembers(engine, "ResourceRef", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ResourceRef
         REGISTER_CLASS_MANUAL_PART_ResourceRef();
@@ -2341,10 +2079,7 @@ static void Register_ResourceRefList(asIScriptEngine* engine)
     // ResourceRefList::~ResourceRefList() | Implicitly-declared
     engine->RegisterObjectBehaviour("ResourceRefList", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(ResourceRefList), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_ResourceRefList<ResourceRefList>(engine, "ResourceRefList");
-    CollectMembers_ResourceRefList(members);
-    RegisterMembers(engine, "ResourceRefList", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ResourceRefList
         REGISTER_CLASS_MANUAL_PART_ResourceRefList();
@@ -2360,10 +2095,7 @@ static void Register_ScenePassInfo(asIScriptEngine* engine)
     // ScenePassInfo::~ScenePassInfo() | Implicitly-declared
     engine->RegisterObjectBehaviour("ScenePassInfo", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(ScenePassInfo), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_ScenePassInfo<ScenePassInfo>(engine, "ScenePassInfo");
-    CollectMembers_ScenePassInfo(members);
-    RegisterMembers(engine, "ScenePassInfo", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ScenePassInfo
         REGISTER_CLASS_MANUAL_PART_ScenePassInfo();
@@ -2379,10 +2111,7 @@ static void Register_SceneResolver(asIScriptEngine* engine)
     // SceneResolver::~SceneResolver()
     engine->RegisterObjectBehaviour("SceneResolver", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(SceneResolver), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_SceneResolver<SceneResolver>(engine, "SceneResolver");
-    CollectMembers_SceneResolver(members);
-    RegisterMembers(engine, "SceneResolver", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_SceneResolver
         REGISTER_CLASS_MANUAL_PART_SceneResolver();
@@ -2398,10 +2127,7 @@ static void Register_ScratchBuffer(asIScriptEngine* engine)
     // ScratchBuffer::~ScratchBuffer() | Implicitly-declared
     engine->RegisterObjectBehaviour("ScratchBuffer", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(ScratchBuffer), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_ScratchBuffer<ScratchBuffer>(engine, "ScratchBuffer");
-    CollectMembers_ScratchBuffer(members);
-    RegisterMembers(engine, "ScratchBuffer", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ScratchBuffer
         REGISTER_CLASS_MANUAL_PART_ScratchBuffer();
@@ -2417,10 +2143,7 @@ static void Register_ScreenModeParams(asIScriptEngine* engine)
     // ScreenModeParams::~ScreenModeParams() | Implicitly-declared
     engine->RegisterObjectBehaviour("ScreenModeParams", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(ScreenModeParams), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_ScreenModeParams<ScreenModeParams>(engine, "ScreenModeParams");
-    CollectMembers_ScreenModeParams(members);
-    RegisterMembers(engine, "ScreenModeParams", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ScreenModeParams
         REGISTER_CLASS_MANUAL_PART_ScreenModeParams();
@@ -2436,10 +2159,7 @@ static void Register_Serializer(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Serializer", asBEHAVE_ADDREF, "void f()", AS_FUNCTION_OBJLAST(FakeAddRef), AS_CALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Serializer", asBEHAVE_RELEASE, "void f()", AS_FUNCTION_OBJLAST(FakeReleaseRef), AS_CALL_CDECL_OBJLAST);
 
-    MemberCollection members;
     RegisterMembers_Serializer<Serializer>(engine, "Serializer");
-    CollectMembers_Serializer(members);
-    RegisterMembers(engine, "Serializer", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Serializer
         REGISTER_CLASS_MANUAL_PART_Serializer();
@@ -2480,10 +2200,7 @@ static void Register_ShaderParameter(asIScriptEngine* engine)
     // ShaderParameter::~ShaderParameter() | Implicitly-declared
     engine->RegisterObjectBehaviour("ShaderParameter", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(ShaderParameter), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_ShaderParameter<ShaderParameter>(engine, "ShaderParameter");
-    CollectMembers_ShaderParameter(members);
-    RegisterMembers(engine, "ShaderParameter", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ShaderParameter
         REGISTER_CLASS_MANUAL_PART_ShaderParameter();
@@ -2499,10 +2216,7 @@ static void Register_ShadowBatchQueue(asIScriptEngine* engine)
     // ShadowBatchQueue::~ShadowBatchQueue() | Implicitly-declared
     engine->RegisterObjectBehaviour("ShadowBatchQueue", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(ShadowBatchQueue), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_ShadowBatchQueue<ShadowBatchQueue>(engine, "ShadowBatchQueue");
-    CollectMembers_ShadowBatchQueue(members);
-    RegisterMembers(engine, "ShadowBatchQueue", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ShadowBatchQueue
         REGISTER_CLASS_MANUAL_PART_ShadowBatchQueue();
@@ -2518,10 +2232,7 @@ static void Register_Skeleton(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Skeleton", asBEHAVE_ADDREF, "void f()", AS_FUNCTION_OBJLAST(FakeAddRef), AS_CALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Skeleton", asBEHAVE_RELEASE, "void f()", AS_FUNCTION_OBJLAST(FakeReleaseRef), AS_CALL_CDECL_OBJLAST);
 
-    MemberCollection members;
     RegisterMembers_Skeleton<Skeleton>(engine, "Skeleton");
-    CollectMembers_Skeleton(members);
-    RegisterMembers(engine, "Skeleton", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Skeleton
         REGISTER_CLASS_MANUAL_PART_Skeleton();
@@ -2546,10 +2257,7 @@ static void Register_SourceBatch(asIScriptEngine* engine)
     // SourceBatch::~SourceBatch()
     engine->RegisterObjectBehaviour("SourceBatch", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(SourceBatch), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_SourceBatch<SourceBatch>(engine, "SourceBatch");
-    CollectMembers_SourceBatch(members);
-    RegisterMembers(engine, "SourceBatch", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_SourceBatch
         REGISTER_CLASS_MANUAL_PART_SourceBatch();
@@ -2603,10 +2311,7 @@ static void Register_Sphere(asIScriptEngine* engine)
     // explicit Sphere::Sphere(const Polyhedron& poly) noexcept
     engine->RegisterObjectBehaviour("Sphere", asBEHAVE_CONSTRUCT, "void f(const Polyhedron&in)", AS_FUNCTION_OBJFIRST(Sphere__Sphere_constspPolyhedronamp), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_Sphere<Sphere>(engine, "Sphere");
-    CollectMembers_Sphere(members);
-    RegisterMembers(engine, "Sphere", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Sphere
         REGISTER_CLASS_MANUAL_PART_Sphere();
@@ -2639,10 +2344,7 @@ static void Register_Spline(asIScriptEngine* engine)
     // Spline::~Spline() | Implicitly-declared
     engine->RegisterObjectBehaviour("Spline", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(Spline), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_Spline<Spline>(engine, "Spline");
-    CollectMembers_Spline(members);
-    RegisterMembers(engine, "Spline", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Spline
         REGISTER_CLASS_MANUAL_PART_Spline();
@@ -2655,10 +2357,7 @@ static void Register_StaticModelGeometryData(asIScriptEngine* engine)
     // StaticModelGeometryData::~StaticModelGeometryData() | Implicitly-declared
     engine->RegisterObjectBehaviour("StaticModelGeometryData", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(StaticModelGeometryData), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_StaticModelGeometryData<StaticModelGeometryData>(engine, "StaticModelGeometryData");
-    CollectMembers_StaticModelGeometryData(members);
-    RegisterMembers(engine, "StaticModelGeometryData", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_StaticModelGeometryData
         REGISTER_CLASS_MANUAL_PART_StaticModelGeometryData();
@@ -2683,10 +2382,7 @@ static void Register_StoredLogMessage(asIScriptEngine* engine)
     // StoredLogMessage::~StoredLogMessage() | Implicitly-declared
     engine->RegisterObjectBehaviour("StoredLogMessage", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(StoredLogMessage), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_StoredLogMessage<StoredLogMessage>(engine, "StoredLogMessage");
-    CollectMembers_StoredLogMessage(members);
-    RegisterMembers(engine, "StoredLogMessage", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_StoredLogMessage
         REGISTER_CLASS_MANUAL_PART_StoredLogMessage();
@@ -2820,10 +2516,7 @@ static void Register_String(asIScriptEngine* engine)
     // String::~String()
     engine->RegisterObjectBehaviour("String", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(String), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_String<String>(engine, "String");
-    CollectMembers_String(members);
-    RegisterMembers(engine, "String", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_String
         REGISTER_CLASS_MANUAL_PART_String();
@@ -2861,10 +2554,7 @@ static void Register_StringHash(asIScriptEngine* engine)
     // StringHash::StringHash(const String& str) noexcept
     engine->RegisterObjectBehaviour("StringHash", asBEHAVE_CONSTRUCT, "void f(const String&in)", AS_FUNCTION_OBJFIRST(StringHash__StringHash_constspStringamp), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_StringHash<StringHash>(engine, "StringHash");
-    CollectMembers_StringHash(members);
-    RegisterMembers(engine, "StringHash", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_StringHash
         REGISTER_CLASS_MANUAL_PART_StringHash();
@@ -2886,10 +2576,7 @@ static void Register_StringHashRegister(asIScriptEngine* engine)
     // StringHashRegister::~StringHashRegister()
     engine->RegisterObjectBehaviour("StringHashRegister", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(StringHashRegister), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_StringHashRegister<StringHashRegister>(engine, "StringHashRegister");
-    CollectMembers_StringHashRegister(members);
-    RegisterMembers(engine, "StringHashRegister", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_StringHashRegister
         REGISTER_CLASS_MANUAL_PART_StringHashRegister();
@@ -2914,10 +2601,7 @@ static void Register_TechniqueEntry(asIScriptEngine* engine)
     // TechniqueEntry::~TechniqueEntry() noexcept = default
     engine->RegisterObjectBehaviour("TechniqueEntry", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(TechniqueEntry), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_TechniqueEntry<TechniqueEntry>(engine, "TechniqueEntry");
-    CollectMembers_TechniqueEntry(members);
-    RegisterMembers(engine, "TechniqueEntry", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_TechniqueEntry
         REGISTER_CLASS_MANUAL_PART_TechniqueEntry();
@@ -2933,10 +2617,7 @@ static void Register_TextureFrame(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("TextureFrame", asBEHAVE_ADDREF, "void f()", AS_FUNCTION_OBJLAST(FakeAddRef), AS_CALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("TextureFrame", asBEHAVE_RELEASE, "void f()", AS_FUNCTION_OBJLAST(FakeReleaseRef), AS_CALL_CDECL_OBJLAST);
 
-    MemberCollection members;
     RegisterMembers_TextureFrame<TextureFrame>(engine, "TextureFrame");
-    CollectMembers_TextureFrame(members);
-    RegisterMembers(engine, "TextureFrame", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_TextureFrame
         REGISTER_CLASS_MANUAL_PART_TextureFrame();
@@ -2949,10 +2630,7 @@ static void Register_TextureFrame(asIScriptEngine* engine)
 // class Timer | File: ../Core/Timer.h
 static void Register_Timer(asIScriptEngine* engine)
 {
-    MemberCollection members;
     RegisterMembers_Timer<Timer>(engine, "Timer");
-    CollectMembers_Timer(members);
-    RegisterMembers(engine, "Timer", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Timer
         REGISTER_CLASS_MANUAL_PART_Timer();
@@ -2968,10 +2646,7 @@ static void Register_TouchState(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("TouchState", asBEHAVE_ADDREF, "void f()", AS_FUNCTION_OBJLAST(FakeAddRef), AS_CALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("TouchState", asBEHAVE_RELEASE, "void f()", AS_FUNCTION_OBJLAST(FakeReleaseRef), AS_CALL_CDECL_OBJLAST);
 
-    MemberCollection members;
     RegisterMembers_TouchState<TouchState>(engine, "TouchState");
-    CollectMembers_TouchState(members);
-    RegisterMembers(engine, "TouchState", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_TouchState
         REGISTER_CLASS_MANUAL_PART_TouchState();
@@ -2996,10 +2671,7 @@ static void Register_TrailPoint(asIScriptEngine* engine)
     // TrailPoint::~TrailPoint() | Implicitly-declared
     engine->RegisterObjectBehaviour("TrailPoint", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(TrailPoint), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_TrailPoint<TrailPoint>(engine, "TrailPoint");
-    CollectMembers_TrailPoint(members);
-    RegisterMembers(engine, "TrailPoint", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_TrailPoint
         REGISTER_CLASS_MANUAL_PART_TrailPoint();
@@ -3018,10 +2690,7 @@ static void Register_UIBatch(asIScriptEngine* engine)
     // UIBatch::~UIBatch() | Implicitly-declared
     engine->RegisterObjectBehaviour("UIBatch", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(UIBatch), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_UIBatch<UIBatch>(engine, "UIBatch");
-    CollectMembers_UIBatch(members);
-    RegisterMembers(engine, "UIBatch", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_UIBatch
         REGISTER_CLASS_MANUAL_PART_UIBatch();
@@ -3037,10 +2706,7 @@ static void Register_VAnimEventFrame(asIScriptEngine* engine)
     // VAnimEventFrame::~VAnimEventFrame() | Implicitly-declared
     engine->RegisterObjectBehaviour("VAnimEventFrame", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(VAnimEventFrame), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_VAnimEventFrame<VAnimEventFrame>(engine, "VAnimEventFrame");
-    CollectMembers_VAnimEventFrame(members);
-    RegisterMembers(engine, "VAnimEventFrame", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_VAnimEventFrame
         REGISTER_CLASS_MANUAL_PART_VAnimEventFrame();
@@ -3056,10 +2722,7 @@ static void Register_VAnimKeyFrame(asIScriptEngine* engine)
     // VAnimKeyFrame::~VAnimKeyFrame() | Implicitly-declared
     engine->RegisterObjectBehaviour("VAnimKeyFrame", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(VAnimKeyFrame), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_VAnimKeyFrame<VAnimKeyFrame>(engine, "VAnimKeyFrame");
-    CollectMembers_VAnimKeyFrame(members);
-    RegisterMembers(engine, "VAnimKeyFrame", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_VAnimKeyFrame
         REGISTER_CLASS_MANUAL_PART_VAnimKeyFrame();
@@ -3332,10 +2995,7 @@ static void Register_Variant(asIScriptEngine* engine)
     // Variant::~Variant()
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(Variant), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_Variant<Variant>(engine, "Variant");
-    CollectMembers_Variant(members);
-    RegisterMembers(engine, "Variant", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Variant
         REGISTER_CLASS_MANUAL_PART_Variant();
@@ -3373,10 +3033,7 @@ static void Register_Vector2(asIScriptEngine* engine)
     // Vector2::Vector2(float x, float y) noexcept
     engine->RegisterObjectBehaviour("Vector2", asBEHAVE_CONSTRUCT, "void f(float, float)", AS_FUNCTION_OBJFIRST(Vector2__Vector2_float_float), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_Vector2<Vector2>(engine, "Vector2");
-    CollectMembers_Vector2(members);
-    RegisterMembers(engine, "Vector2", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Vector2
         REGISTER_CLASS_MANUAL_PART_Vector2();
@@ -3438,10 +3095,7 @@ static void Register_Vector3(asIScriptEngine* engine)
     // Vector3::Vector3(float x, float y) noexcept
     engine->RegisterObjectBehaviour("Vector3", asBEHAVE_CONSTRUCT, "void f(float, float)", AS_FUNCTION_OBJFIRST(Vector3__Vector3_float_float), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_Vector3<Vector3>(engine, "Vector3");
-    CollectMembers_Vector3(members);
-    RegisterMembers(engine, "Vector3", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Vector3
         REGISTER_CLASS_MANUAL_PART_Vector3();
@@ -3479,10 +3133,7 @@ static void Register_Vector4(asIScriptEngine* engine)
     // Vector4::Vector4(float x, float y, float z, float w) noexcept
     engine->RegisterObjectBehaviour("Vector4", asBEHAVE_CONSTRUCT, "void f(float, float, float, float)", AS_FUNCTION_OBJFIRST(Vector4__Vector4_float_float_float_float), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_Vector4<Vector4>(engine, "Vector4");
-    CollectMembers_Vector4(members);
-    RegisterMembers(engine, "Vector4", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Vector4
         REGISTER_CLASS_MANUAL_PART_Vector4();
@@ -3495,10 +3146,7 @@ static void Register_VectorBase(asIScriptEngine* engine)
     // VectorBase::~VectorBase() | Implicitly-declared
     engine->RegisterObjectBehaviour("VectorBase", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(VectorBase), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_VectorBase<VectorBase>(engine, "VectorBase");
-    CollectMembers_VectorBase(members);
-    RegisterMembers(engine, "VectorBase", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_VectorBase
         REGISTER_CLASS_MANUAL_PART_VectorBase();
@@ -3514,10 +3162,7 @@ static void Register_VertexBufferDesc(asIScriptEngine* engine)
     // VertexBufferDesc::~VertexBufferDesc() | Implicitly-declared
     engine->RegisterObjectBehaviour("VertexBufferDesc", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(VertexBufferDesc), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_VertexBufferDesc<VertexBufferDesc>(engine, "VertexBufferDesc");
-    CollectMembers_VertexBufferDesc(members);
-    RegisterMembers(engine, "VertexBufferDesc", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_VertexBufferDesc
         REGISTER_CLASS_MANUAL_PART_VertexBufferDesc();
@@ -3533,10 +3178,7 @@ static void Register_VertexBufferMorph(asIScriptEngine* engine)
     // VertexBufferMorph::~VertexBufferMorph() | Implicitly-declared
     engine->RegisterObjectBehaviour("VertexBufferMorph", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(VertexBufferMorph), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_VertexBufferMorph<VertexBufferMorph>(engine, "VertexBufferMorph");
-    CollectMembers_VertexBufferMorph(members);
-    RegisterMembers(engine, "VertexBufferMorph", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_VertexBufferMorph
         REGISTER_CLASS_MANUAL_PART_VertexBufferMorph();
@@ -3561,10 +3203,7 @@ static void Register_VertexElement(asIScriptEngine* engine)
     // VertexElement::~VertexElement() | Implicitly-declared
     engine->RegisterObjectBehaviour("VertexElement", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(VertexElement), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_VertexElement<VertexElement>(engine, "VertexElement");
-    CollectMembers_VertexElement(members);
-    RegisterMembers(engine, "VertexElement", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_VertexElement
         REGISTER_CLASS_MANUAL_PART_VertexElement();
@@ -3580,10 +3219,7 @@ static void Register_WindowModeParams(asIScriptEngine* engine)
     // WindowModeParams::~WindowModeParams() | Implicitly-declared
     engine->RegisterObjectBehaviour("WindowModeParams", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(WindowModeParams), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_WindowModeParams<WindowModeParams>(engine, "WindowModeParams");
-    CollectMembers_WindowModeParams(members);
-    RegisterMembers(engine, "WindowModeParams", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_WindowModeParams
         REGISTER_CLASS_MANUAL_PART_WindowModeParams();
@@ -3613,10 +3249,7 @@ static void Register_XMLElement(asIScriptEngine* engine)
     // XMLElement::~XMLElement()
     engine->RegisterObjectBehaviour("XMLElement", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(XMLElement), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_XMLElement<XMLElement>(engine, "XMLElement");
-    CollectMembers_XMLElement(members);
-    RegisterMembers(engine, "XMLElement", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_XMLElement
         REGISTER_CLASS_MANUAL_PART_XMLElement();
@@ -3638,10 +3271,7 @@ static void Register_XPathQuery(asIScriptEngine* engine)
     // XPathQuery::~XPathQuery()
     engine->RegisterObjectBehaviour("XPathQuery", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(XPathQuery), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_XPathQuery<XPathQuery>(engine, "XPathQuery");
-    CollectMembers_XPathQuery(members);
-    RegisterMembers(engine, "XPathQuery", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_XPathQuery
         REGISTER_CLASS_MANUAL_PART_XPathQuery();
@@ -3669,10 +3299,7 @@ static void Register_XPathResultSet(asIScriptEngine* engine)
     // XPathResultSet::~XPathResultSet()
     engine->RegisterObjectBehaviour("XPathResultSet", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(XPathResultSet), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_XPathResultSet<XPathResultSet>(engine, "XPathResultSet");
-    CollectMembers_XPathResultSet(members);
-    RegisterMembers(engine, "XPathResultSet", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_XPathResultSet
         REGISTER_CLASS_MANUAL_PART_XPathResultSet();
@@ -3684,10 +3311,7 @@ static void Register_XPathResultSet(asIScriptEngine* engine)
 // struct CrowdObstacleAvoidanceParams | File: ../Navigation/CrowdManager.h
 static void Register_CrowdObstacleAvoidanceParams(asIScriptEngine* engine)
 {
-    MemberCollection members;
     RegisterMembers_CrowdObstacleAvoidanceParams<CrowdObstacleAvoidanceParams>(engine, "CrowdObstacleAvoidanceParams");
-    CollectMembers_CrowdObstacleAvoidanceParams(members);
-    RegisterMembers(engine, "CrowdObstacleAvoidanceParams", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_CrowdObstacleAvoidanceParams
         REGISTER_CLASS_MANUAL_PART_CrowdObstacleAvoidanceParams();
@@ -3703,10 +3327,7 @@ static void Register_NavAreaStub(asIScriptEngine* engine)
     // NavAreaStub::~NavAreaStub() | Implicitly-declared
     engine->RegisterObjectBehaviour("NavAreaStub", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(NavAreaStub), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_NavAreaStub<NavAreaStub>(engine, "NavAreaStub");
-    CollectMembers_NavAreaStub(members);
-    RegisterMembers(engine, "NavAreaStub", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_NavAreaStub
         REGISTER_CLASS_MANUAL_PART_NavAreaStub();
@@ -3722,10 +3343,7 @@ static void Register_NavBuildData(asIScriptEngine* engine)
     // virtual NavBuildData::~NavBuildData()
     engine->RegisterObjectBehaviour("NavBuildData", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(NavBuildData), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_NavBuildData<NavBuildData>(engine, "NavBuildData");
-    CollectMembers_NavBuildData(members);
-    RegisterMembers(engine, "NavBuildData", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_NavBuildData
         REGISTER_CLASS_MANUAL_PART_NavBuildData();
@@ -3741,10 +3359,7 @@ static void Register_NavigationGeometryInfo(asIScriptEngine* engine)
     // NavigationGeometryInfo::~NavigationGeometryInfo() | Implicitly-declared
     engine->RegisterObjectBehaviour("NavigationGeometryInfo", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(NavigationGeometryInfo), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_NavigationGeometryInfo<NavigationGeometryInfo>(engine, "NavigationGeometryInfo");
-    CollectMembers_NavigationGeometryInfo(members);
-    RegisterMembers(engine, "NavigationGeometryInfo", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_NavigationGeometryInfo
         REGISTER_CLASS_MANUAL_PART_NavigationGeometryInfo();
@@ -3760,10 +3375,7 @@ static void Register_NavigationPathPoint(asIScriptEngine* engine)
     // NavigationPathPoint::~NavigationPathPoint() | Implicitly-declared
     engine->RegisterObjectBehaviour("NavigationPathPoint", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(NavigationPathPoint), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_NavigationPathPoint<NavigationPathPoint>(engine, "NavigationPathPoint");
-    CollectMembers_NavigationPathPoint(members);
-    RegisterMembers(engine, "NavigationPathPoint", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_NavigationPathPoint
         REGISTER_CLASS_MANUAL_PART_NavigationPathPoint();
@@ -3783,10 +3395,7 @@ static void Register_PackageDownload(asIScriptEngine* engine)
     // PackageDownload::~PackageDownload() | Implicitly-declared
     engine->RegisterObjectBehaviour("PackageDownload", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(PackageDownload), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_PackageDownload<PackageDownload>(engine, "PackageDownload");
-    CollectMembers_PackageDownload(members);
-    RegisterMembers(engine, "PackageDownload", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_PackageDownload
         REGISTER_CLASS_MANUAL_PART_PackageDownload();
@@ -3802,10 +3411,7 @@ static void Register_PackageUpload(asIScriptEngine* engine)
     // PackageUpload::~PackageUpload() | Implicitly-declared
     engine->RegisterObjectBehaviour("PackageUpload", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(PackageUpload), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_PackageUpload<PackageUpload>(engine, "PackageUpload");
-    CollectMembers_PackageUpload(members);
-    RegisterMembers(engine, "PackageUpload", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_PackageUpload
         REGISTER_CLASS_MANUAL_PART_PackageUpload();
@@ -3821,10 +3427,7 @@ static void Register_RemoteEvent(asIScriptEngine* engine)
     // RemoteEvent::~RemoteEvent() | Implicitly-declared
     engine->RegisterObjectBehaviour("RemoteEvent", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(RemoteEvent), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_RemoteEvent<RemoteEvent>(engine, "RemoteEvent");
-    CollectMembers_RemoteEvent(members);
-    RegisterMembers(engine, "RemoteEvent", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_RemoteEvent
         REGISTER_CLASS_MANUAL_PART_RemoteEvent();
@@ -3844,10 +3447,7 @@ static void Register_DelayedWorldTransform(asIScriptEngine* engine)
     // DelayedWorldTransform::~DelayedWorldTransform() | Implicitly-declared
     engine->RegisterObjectBehaviour("DelayedWorldTransform", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(DelayedWorldTransform), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_DelayedWorldTransform<DelayedWorldTransform>(engine, "DelayedWorldTransform");
-    CollectMembers_DelayedWorldTransform(members);
-    RegisterMembers(engine, "DelayedWorldTransform", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_DelayedWorldTransform
         REGISTER_CLASS_MANUAL_PART_DelayedWorldTransform();
@@ -3863,10 +3463,7 @@ static void Register_ManifoldPair(asIScriptEngine* engine)
     // ManifoldPair::~ManifoldPair() | Implicitly-declared
     engine->RegisterObjectBehaviour("ManifoldPair", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(ManifoldPair), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_ManifoldPair<ManifoldPair>(engine, "ManifoldPair");
-    CollectMembers_ManifoldPair(members);
-    RegisterMembers(engine, "ManifoldPair", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ManifoldPair
         REGISTER_CLASS_MANUAL_PART_ManifoldPair();
@@ -3882,10 +3479,7 @@ static void Register_PhysicsRaycastResult(asIScriptEngine* engine)
     // PhysicsRaycastResult::~PhysicsRaycastResult() | Implicitly-declared
     engine->RegisterObjectBehaviour("PhysicsRaycastResult", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(PhysicsRaycastResult), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_PhysicsRaycastResult<PhysicsRaycastResult>(engine, "PhysicsRaycastResult");
-    CollectMembers_PhysicsRaycastResult(members);
-    RegisterMembers(engine, "PhysicsRaycastResult", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_PhysicsRaycastResult
         REGISTER_CLASS_MANUAL_PART_PhysicsRaycastResult();
@@ -3901,10 +3495,7 @@ static void Register_PhysicsWorldConfig(asIScriptEngine* engine)
     // PhysicsWorldConfig::~PhysicsWorldConfig() | Implicitly-declared
     engine->RegisterObjectBehaviour("PhysicsWorldConfig", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(PhysicsWorldConfig), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_PhysicsWorldConfig<PhysicsWorldConfig>(engine, "PhysicsWorldConfig");
-    CollectMembers_PhysicsWorldConfig(members);
-    RegisterMembers(engine, "PhysicsWorldConfig", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_PhysicsWorldConfig
         REGISTER_CLASS_MANUAL_PART_PhysicsWorldConfig();
@@ -3924,10 +3515,7 @@ static void Register_DelayedWorldTransform2D(asIScriptEngine* engine)
     // DelayedWorldTransform2D::~DelayedWorldTransform2D() | Implicitly-declared
     engine->RegisterObjectBehaviour("DelayedWorldTransform2D", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(DelayedWorldTransform2D), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_DelayedWorldTransform2D<DelayedWorldTransform2D>(engine, "DelayedWorldTransform2D");
-    CollectMembers_DelayedWorldTransform2D(members);
-    RegisterMembers(engine, "DelayedWorldTransform2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_DelayedWorldTransform2D
         REGISTER_CLASS_MANUAL_PART_DelayedWorldTransform2D();
@@ -3943,10 +3531,7 @@ static void Register_Particle2D(asIScriptEngine* engine)
     // Particle2D::~Particle2D() | Implicitly-declared
     engine->RegisterObjectBehaviour("Particle2D", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(Particle2D), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_Particle2D<Particle2D>(engine, "Particle2D");
-    CollectMembers_Particle2D(members);
-    RegisterMembers(engine, "Particle2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Particle2D
         REGISTER_CLASS_MANUAL_PART_Particle2D();
@@ -3962,10 +3547,7 @@ static void Register_PhysicsRaycastResult2D(asIScriptEngine* engine)
     // PhysicsRaycastResult2D::~PhysicsRaycastResult2D() | Implicitly-declared
     engine->RegisterObjectBehaviour("PhysicsRaycastResult2D", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(PhysicsRaycastResult2D), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_PhysicsRaycastResult2D<PhysicsRaycastResult2D>(engine, "PhysicsRaycastResult2D");
-    CollectMembers_PhysicsRaycastResult2D(members);
-    RegisterMembers(engine, "PhysicsRaycastResult2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_PhysicsRaycastResult2D
         REGISTER_CLASS_MANUAL_PART_PhysicsRaycastResult2D();
@@ -3981,10 +3563,7 @@ static void Register_SourceBatch2D(asIScriptEngine* engine)
     // SourceBatch2D::~SourceBatch2D() | Implicitly-declared
     engine->RegisterObjectBehaviour("SourceBatch2D", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(SourceBatch2D), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_SourceBatch2D<SourceBatch2D>(engine, "SourceBatch2D");
-    CollectMembers_SourceBatch2D(members);
-    RegisterMembers(engine, "SourceBatch2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_SourceBatch2D
         REGISTER_CLASS_MANUAL_PART_SourceBatch2D();
@@ -4000,10 +3579,7 @@ static void Register_TileMapInfo2D(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("TileMapInfo2D", asBEHAVE_ADDREF, "void f()", AS_FUNCTION_OBJLAST(FakeAddRef), AS_CALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("TileMapInfo2D", asBEHAVE_RELEASE, "void f()", AS_FUNCTION_OBJLAST(FakeReleaseRef), AS_CALL_CDECL_OBJLAST);
 
-    MemberCollection members;
     RegisterMembers_TileMapInfo2D<TileMapInfo2D>(engine, "TileMapInfo2D");
-    CollectMembers_TileMapInfo2D(members);
-    RegisterMembers(engine, "TileMapInfo2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_TileMapInfo2D
         REGISTER_CLASS_MANUAL_PART_TileMapInfo2D();
@@ -4019,10 +3595,7 @@ static void Register_Vertex2D(asIScriptEngine* engine)
     // Vertex2D::~Vertex2D() | Implicitly-declared
     engine->RegisterObjectBehaviour("Vertex2D", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(Vertex2D), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_Vertex2D<Vertex2D>(engine, "Vertex2D");
-    CollectMembers_Vertex2D(members);
-    RegisterMembers(engine, "Vertex2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Vertex2D
         REGISTER_CLASS_MANUAL_PART_Vertex2D();
@@ -4056,10 +3629,7 @@ static void Register_AnimationState(asIScriptEngine* engine)
 
     RegisterSubclass<RefCounted, AnimationState>(engine, "RefCounted", "AnimationState");
 
-    MemberCollection members;
     RegisterMembers_AnimationState<AnimationState>(engine, "AnimationState");
-    CollectMembers_AnimationState(members);
-    RegisterMembers(engine, "AnimationState", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_AnimationState
         REGISTER_CLASS_MANUAL_PART_AnimationState();
@@ -4071,10 +3641,7 @@ static void Register_AttributeAccessor(asIScriptEngine* engine)
 {
     RegisterSubclass<RefCounted, AttributeAccessor>(engine, "RefCounted", "AttributeAccessor");
 
-    MemberCollection members;
     RegisterMembers_AttributeAccessor<AttributeAccessor>(engine, "AttributeAccessor");
-    CollectMembers_AttributeAccessor(members);
-    RegisterMembers(engine, "AttributeAccessor", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_AttributeAccessor
         REGISTER_CLASS_MANUAL_PART_AttributeAccessor();
@@ -4096,10 +3663,7 @@ static void Register_BatchGroup(asIScriptEngine* engine)
     // BatchGroup::~BatchGroup() = default
     engine->RegisterObjectBehaviour("BatchGroup", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(BatchGroup), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_BatchGroup<BatchGroup>(engine, "BatchGroup");
-    CollectMembers_BatchGroup(members);
-    RegisterMembers(engine, "BatchGroup", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_BatchGroup
         REGISTER_CLASS_MANUAL_PART_BatchGroup();
@@ -4115,10 +3679,7 @@ static void Register_ComponentReplicationState(asIScriptEngine* engine)
     // ComponentReplicationState::~ComponentReplicationState() | Implicitly-declared
     engine->RegisterObjectBehaviour("ComponentReplicationState", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(ComponentReplicationState), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_ComponentReplicationState<ComponentReplicationState>(engine, "ComponentReplicationState");
-    CollectMembers_ComponentReplicationState(members);
-    RegisterMembers(engine, "ComponentReplicationState", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ComponentReplicationState
         REGISTER_CLASS_MANUAL_PART_ComponentReplicationState();
@@ -4133,10 +3694,7 @@ static void Register_Context(asIScriptEngine* engine)
 {
     RegisterSubclass<RefCounted, Context>(engine, "RefCounted", "Context");
 
-    MemberCollection members;
     RegisterMembers_Context<Context>(engine, "Context");
-    CollectMembers_Context(members);
-    RegisterMembers(engine, "Context", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Context
         REGISTER_CLASS_MANUAL_PART_Context();
@@ -4148,10 +3706,7 @@ static void Register_EventReceiverGroup(asIScriptEngine* engine)
 {
     RegisterSubclass<RefCounted, EventReceiverGroup>(engine, "RefCounted", "EventReceiverGroup");
 
-    MemberCollection members;
     RegisterMembers_EventReceiverGroup<EventReceiverGroup>(engine, "EventReceiverGroup");
-    CollectMembers_EventReceiverGroup(members);
-    RegisterMembers(engine, "EventReceiverGroup", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_EventReceiverGroup
         REGISTER_CLASS_MANUAL_PART_EventReceiverGroup();
@@ -4163,10 +3718,7 @@ static void Register_FontFace(asIScriptEngine* engine)
 {
     RegisterSubclass<RefCounted, FontFace>(engine, "RefCounted", "FontFace");
 
-    MemberCollection members;
     RegisterMembers_FontFace<FontFace>(engine, "FontFace");
-    CollectMembers_FontFace(members);
-    RegisterMembers(engine, "FontFace", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_FontFace
         REGISTER_CLASS_MANUAL_PART_FontFace();
@@ -4179,10 +3731,7 @@ static void Register_NodeReplicationState(asIScriptEngine* engine)
     // NodeReplicationState::~NodeReplicationState() | Implicitly-declared
     engine->RegisterObjectBehaviour("NodeReplicationState", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(NodeReplicationState), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_NodeReplicationState<NodeReplicationState>(engine, "NodeReplicationState");
-    CollectMembers_NodeReplicationState(members);
-    RegisterMembers(engine, "NodeReplicationState", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_NodeReplicationState
         REGISTER_CLASS_MANUAL_PART_NodeReplicationState();
@@ -4197,10 +3746,7 @@ static void Register_Object(asIScriptEngine* engine)
 {
     RegisterSubclass<RefCounted, Object>(engine, "RefCounted", "Object");
 
-    MemberCollection members;
     RegisterMembers_Object<Object>(engine, "Object");
-    CollectMembers_Object(members);
-    RegisterMembers(engine, "Object", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Object
         REGISTER_CLASS_MANUAL_PART_Object();
@@ -4212,10 +3758,7 @@ static void Register_ObjectFactory(asIScriptEngine* engine)
 {
     RegisterSubclass<RefCounted, ObjectFactory>(engine, "RefCounted", "ObjectFactory");
 
-    MemberCollection members;
     RegisterMembers_ObjectFactory<ObjectFactory>(engine, "ObjectFactory");
-    CollectMembers_ObjectFactory(members);
-    RegisterMembers(engine, "ObjectFactory", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ObjectFactory
         REGISTER_CLASS_MANUAL_PART_ObjectFactory();
@@ -4236,10 +3779,7 @@ static void Register_Pass(asIScriptEngine* engine)
 
     RegisterSubclass<RefCounted, Pass>(engine, "RefCounted", "Pass");
 
-    MemberCollection members;
     RegisterMembers_Pass<Pass>(engine, "Pass");
-    CollectMembers_Pass(members);
-    RegisterMembers(engine, "Pass", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Pass
         REGISTER_CLASS_MANUAL_PART_Pass();
@@ -4251,10 +3791,7 @@ static void Register_RenderPath(asIScriptEngine* engine)
 {
     RegisterSubclass<RefCounted, RenderPath>(engine, "RefCounted", "RenderPath");
 
-    MemberCollection members;
     RegisterMembers_RenderPath<RenderPath>(engine, "RenderPath");
-    CollectMembers_RenderPath(members);
-    RegisterMembers(engine, "RenderPath", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_RenderPath
         REGISTER_CLASS_MANUAL_PART_RenderPath();
@@ -4275,10 +3812,7 @@ static void Register_RenderSurface(asIScriptEngine* engine)
 
     RegisterSubclass<RefCounted, RenderSurface>(engine, "RefCounted", "RenderSurface");
 
-    MemberCollection members;
     RegisterMembers_RenderSurface<RenderSurface>(engine, "RenderSurface");
-    CollectMembers_RenderSurface(members);
-    RegisterMembers(engine, "RenderSurface", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_RenderSurface
         REGISTER_CLASS_MANUAL_PART_RenderSurface();
@@ -4291,10 +3825,7 @@ static void Register_SceneReplicationState(asIScriptEngine* engine)
     // SceneReplicationState::~SceneReplicationState() | Implicitly-declared
     engine->RegisterObjectBehaviour("SceneReplicationState", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(SceneReplicationState), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_SceneReplicationState<SceneReplicationState>(engine, "SceneReplicationState");
-    CollectMembers_SceneReplicationState(members);
-    RegisterMembers(engine, "SceneReplicationState", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_SceneReplicationState
         REGISTER_CLASS_MANUAL_PART_SceneReplicationState();
@@ -4318,10 +3849,7 @@ static void Register_ShaderVariation(asIScriptEngine* engine)
 
     RegisterSubclass<RefCounted, ShaderVariation>(engine, "RefCounted", "ShaderVariation");
 
-    MemberCollection members;
     RegisterMembers_ShaderVariation<ShaderVariation>(engine, "ShaderVariation");
-    CollectMembers_ShaderVariation(members);
-    RegisterMembers(engine, "ShaderVariation", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ShaderVariation
         REGISTER_CLASS_MANUAL_PART_ShaderVariation();
@@ -4333,10 +3861,7 @@ static void Register_SoundStream(asIScriptEngine* engine)
 {
     RegisterSubclass<RefCounted, SoundStream>(engine, "RefCounted", "SoundStream");
 
-    MemberCollection members;
     RegisterMembers_SoundStream<SoundStream>(engine, "SoundStream");
-    CollectMembers_SoundStream(members);
-    RegisterMembers(engine, "SoundStream", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_SoundStream
         REGISTER_CLASS_MANUAL_PART_SoundStream();
@@ -4373,10 +3898,7 @@ static void Register_ValueAnimationInfo(asIScriptEngine* engine)
 
     RegisterSubclass<RefCounted, ValueAnimationInfo>(engine, "RefCounted", "ValueAnimationInfo");
 
-    MemberCollection members;
     RegisterMembers_ValueAnimationInfo<ValueAnimationInfo>(engine, "ValueAnimationInfo");
-    CollectMembers_ValueAnimationInfo(members);
-    RegisterMembers(engine, "ValueAnimationInfo", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ValueAnimationInfo
         REGISTER_CLASS_MANUAL_PART_ValueAnimationInfo();
@@ -4391,10 +3913,7 @@ static void Register_SimpleNavBuildData(asIScriptEngine* engine)
     // SimpleNavBuildData::~SimpleNavBuildData() override
     engine->RegisterObjectBehaviour("SimpleNavBuildData", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(SimpleNavBuildData), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_SimpleNavBuildData<SimpleNavBuildData>(engine, "SimpleNavBuildData");
-    CollectMembers_SimpleNavBuildData(members);
-    RegisterMembers(engine, "SimpleNavBuildData", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_SimpleNavBuildData
         REGISTER_CLASS_MANUAL_PART_SimpleNavBuildData();
@@ -4424,10 +3943,7 @@ static void Register_HttpRequest(asIScriptEngine* engine)
     RegisterSubclass<RefCounted, HttpRequest>(engine, "RefCounted", "HttpRequest");
     RegisterSubclass<Deserializer, HttpRequest>(engine, "Deserializer", "HttpRequest");
 
-    MemberCollection members;
     RegisterMembers_HttpRequest<HttpRequest>(engine, "HttpRequest");
-    CollectMembers_HttpRequest(members);
-    RegisterMembers(engine, "HttpRequest", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_HttpRequest
         REGISTER_CLASS_MANUAL_PART_HttpRequest();
@@ -4443,10 +3959,7 @@ static void Register_CollisionGeometryData(asIScriptEngine* engine)
 {
     RegisterSubclass<RefCounted, CollisionGeometryData>(engine, "RefCounted", "CollisionGeometryData");
 
-    MemberCollection members;
     RegisterMembers_CollisionGeometryData<CollisionGeometryData>(engine, "CollisionGeometryData");
-    CollectMembers_CollisionGeometryData(members);
-    RegisterMembers(engine, "CollisionGeometryData", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_CollisionGeometryData
         REGISTER_CLASS_MANUAL_PART_CollisionGeometryData();
@@ -4462,10 +3975,7 @@ static void Register_PropertySet2D(asIScriptEngine* engine)
 {
     RegisterSubclass<RefCounted, PropertySet2D>(engine, "RefCounted", "PropertySet2D");
 
-    MemberCollection members;
     RegisterMembers_PropertySet2D<PropertySet2D>(engine, "PropertySet2D");
-    CollectMembers_PropertySet2D(members);
-    RegisterMembers(engine, "PropertySet2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_PropertySet2D
         REGISTER_CLASS_MANUAL_PART_PropertySet2D();
@@ -4477,10 +3987,7 @@ static void Register_Tile2D(asIScriptEngine* engine)
 {
     RegisterSubclass<RefCounted, Tile2D>(engine, "RefCounted", "Tile2D");
 
-    MemberCollection members;
     RegisterMembers_Tile2D<Tile2D>(engine, "Tile2D");
-    CollectMembers_Tile2D(members);
-    RegisterMembers(engine, "Tile2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Tile2D
         REGISTER_CLASS_MANUAL_PART_Tile2D();
@@ -4492,10 +3999,7 @@ static void Register_TileMapObject2D(asIScriptEngine* engine)
 {
     RegisterSubclass<RefCounted, TileMapObject2D>(engine, "RefCounted", "TileMapObject2D");
 
-    MemberCollection members;
     RegisterMembers_TileMapObject2D<TileMapObject2D>(engine, "TileMapObject2D");
-    CollectMembers_TileMapObject2D(members);
-    RegisterMembers(engine, "TileMapObject2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_TileMapObject2D
         REGISTER_CLASS_MANUAL_PART_TileMapObject2D();
@@ -4516,10 +4020,7 @@ static void Register_TmxLayer2D(asIScriptEngine* engine)
 
     RegisterSubclass<RefCounted, TmxLayer2D>(engine, "RefCounted", "TmxLayer2D");
 
-    MemberCollection members;
     RegisterMembers_TmxLayer2D<TmxLayer2D>(engine, "TmxLayer2D");
-    CollectMembers_TmxLayer2D(members);
-    RegisterMembers(engine, "TmxLayer2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_TmxLayer2D
         REGISTER_CLASS_MANUAL_PART_TmxLayer2D();
@@ -4551,10 +4052,7 @@ static void Register_AttributeAnimationInfo(asIScriptEngine* engine)
     RegisterSubclass<ValueAnimationInfo, AttributeAnimationInfo>(engine, "ValueAnimationInfo", "AttributeAnimationInfo");
     RegisterSubclass<RefCounted, AttributeAnimationInfo>(engine, "RefCounted", "AttributeAnimationInfo");
 
-    MemberCollection members;
     RegisterMembers_AttributeAnimationInfo<AttributeAnimationInfo>(engine, "AttributeAnimationInfo");
-    CollectMembers_AttributeAnimationInfo(members);
-    RegisterMembers(engine, "AttributeAnimationInfo", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_AttributeAnimationInfo
         REGISTER_CLASS_MANUAL_PART_AttributeAnimationInfo();
@@ -4577,10 +4075,7 @@ static void Register_Audio(asIScriptEngine* engine)
     RegisterSubclass<Object, Audio>(engine, "Object", "Audio");
     RegisterSubclass<RefCounted, Audio>(engine, "RefCounted", "Audio");
 
-    MemberCollection members;
     RegisterMembers_Audio<Audio>(engine, "Audio");
-    CollectMembers_Audio(members);
-    RegisterMembers(engine, "Audio", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Audio
         REGISTER_CLASS_MANUAL_PART_Audio();
@@ -4593,10 +4088,7 @@ static void Register_BufferedSoundStream(asIScriptEngine* engine)
     RegisterSubclass<SoundStream, BufferedSoundStream>(engine, "SoundStream", "BufferedSoundStream");
     RegisterSubclass<RefCounted, BufferedSoundStream>(engine, "RefCounted", "BufferedSoundStream");
 
-    MemberCollection members;
     RegisterMembers_BufferedSoundStream<BufferedSoundStream>(engine, "BufferedSoundStream");
-    CollectMembers_BufferedSoundStream(members);
-    RegisterMembers(engine, "BufferedSoundStream", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_BufferedSoundStream
         REGISTER_CLASS_MANUAL_PART_BufferedSoundStream();
@@ -4619,10 +4111,7 @@ static void Register_Console(asIScriptEngine* engine)
     RegisterSubclass<Object, Console>(engine, "Object", "Console");
     RegisterSubclass<RefCounted, Console>(engine, "RefCounted", "Console");
 
-    MemberCollection members;
     RegisterMembers_Console<Console>(engine, "Console");
-    CollectMembers_Console(members);
-    RegisterMembers(engine, "Console", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Console
         REGISTER_CLASS_MANUAL_PART_Console();
@@ -4645,10 +4134,7 @@ static void Register_ConstantBuffer(asIScriptEngine* engine)
     RegisterSubclass<Object, ConstantBuffer>(engine, "Object", "ConstantBuffer");
     RegisterSubclass<RefCounted, ConstantBuffer>(engine, "RefCounted", "ConstantBuffer");
 
-    MemberCollection members;
     RegisterMembers_ConstantBuffer<ConstantBuffer>(engine, "ConstantBuffer");
-    CollectMembers_ConstantBuffer(members);
-    RegisterMembers(engine, "ConstantBuffer", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ConstantBuffer
         REGISTER_CLASS_MANUAL_PART_ConstantBuffer();
@@ -4671,10 +4157,7 @@ static void Register_DebugHud(asIScriptEngine* engine)
     RegisterSubclass<Object, DebugHud>(engine, "Object", "DebugHud");
     RegisterSubclass<RefCounted, DebugHud>(engine, "RefCounted", "DebugHud");
 
-    MemberCollection members;
     RegisterMembers_DebugHud<DebugHud>(engine, "DebugHud");
-    CollectMembers_DebugHud(members);
-    RegisterMembers(engine, "DebugHud", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_DebugHud
         REGISTER_CLASS_MANUAL_PART_DebugHud();
@@ -4697,10 +4180,7 @@ static void Register_Engine(asIScriptEngine* engine)
     RegisterSubclass<Object, Engine>(engine, "Object", "Engine");
     RegisterSubclass<RefCounted, Engine>(engine, "RefCounted", "Engine");
 
-    MemberCollection members;
     RegisterMembers_Engine<Engine>(engine, "Engine");
-    CollectMembers_Engine(members);
-    RegisterMembers(engine, "Engine", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Engine
         REGISTER_CLASS_MANUAL_PART_Engine();
@@ -4743,10 +4223,7 @@ static void Register_File(asIScriptEngine* engine)
     RegisterSubclass<Deserializer, File>(engine, "Deserializer", "File");
     RegisterSubclass<Serializer, File>(engine, "Serializer", "File");
 
-    MemberCollection members;
     RegisterMembers_File<File>(engine, "File");
-    CollectMembers_File(members);
-    RegisterMembers(engine, "File", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_File
         REGISTER_CLASS_MANUAL_PART_File();
@@ -4769,10 +4246,7 @@ static void Register_FileSelector(asIScriptEngine* engine)
     RegisterSubclass<Object, FileSelector>(engine, "Object", "FileSelector");
     RegisterSubclass<RefCounted, FileSelector>(engine, "RefCounted", "FileSelector");
 
-    MemberCollection members;
     RegisterMembers_FileSelector<FileSelector>(engine, "FileSelector");
-    CollectMembers_FileSelector(members);
-    RegisterMembers(engine, "FileSelector", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_FileSelector
         REGISTER_CLASS_MANUAL_PART_FileSelector();
@@ -4795,10 +4269,7 @@ static void Register_FileSystem(asIScriptEngine* engine)
     RegisterSubclass<Object, FileSystem>(engine, "Object", "FileSystem");
     RegisterSubclass<RefCounted, FileSystem>(engine, "RefCounted", "FileSystem");
 
-    MemberCollection members;
     RegisterMembers_FileSystem<FileSystem>(engine, "FileSystem");
-    CollectMembers_FileSystem(members);
-    RegisterMembers(engine, "FileSystem", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_FileSystem
         REGISTER_CLASS_MANUAL_PART_FileSystem();
@@ -4821,10 +4292,7 @@ static void Register_FileWatcher(asIScriptEngine* engine)
     RegisterSubclass<Object, FileWatcher>(engine, "Object", "FileWatcher");
     RegisterSubclass<RefCounted, FileWatcher>(engine, "RefCounted", "FileWatcher");
 
-    MemberCollection members;
     RegisterMembers_FileWatcher<FileWatcher>(engine, "FileWatcher");
-    CollectMembers_FileWatcher(members);
-    RegisterMembers(engine, "FileWatcher", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_FileWatcher
         REGISTER_CLASS_MANUAL_PART_FileWatcher();
@@ -4846,10 +4314,7 @@ static void Register_FontFaceBitmap(asIScriptEngine* engine)
     RegisterSubclass<FontFace, FontFaceBitmap>(engine, "FontFace", "FontFaceBitmap");
     RegisterSubclass<RefCounted, FontFaceBitmap>(engine, "RefCounted", "FontFaceBitmap");
 
-    MemberCollection members;
     RegisterMembers_FontFaceBitmap<FontFaceBitmap>(engine, "FontFaceBitmap");
-    CollectMembers_FontFaceBitmap(members);
-    RegisterMembers(engine, "FontFaceBitmap", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_FontFaceBitmap
         REGISTER_CLASS_MANUAL_PART_FontFaceBitmap();
@@ -4871,10 +4336,7 @@ static void Register_FontFaceFreeType(asIScriptEngine* engine)
     RegisterSubclass<FontFace, FontFaceFreeType>(engine, "FontFace", "FontFaceFreeType");
     RegisterSubclass<RefCounted, FontFaceFreeType>(engine, "RefCounted", "FontFaceFreeType");
 
-    MemberCollection members;
     RegisterMembers_FontFaceFreeType<FontFaceFreeType>(engine, "FontFaceFreeType");
-    CollectMembers_FontFaceFreeType(members);
-    RegisterMembers(engine, "FontFaceFreeType", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_FontFaceFreeType
         REGISTER_CLASS_MANUAL_PART_FontFaceFreeType();
@@ -4897,10 +4359,7 @@ static void Register_Geometry(asIScriptEngine* engine)
     RegisterSubclass<Object, Geometry>(engine, "Object", "Geometry");
     RegisterSubclass<RefCounted, Geometry>(engine, "RefCounted", "Geometry");
 
-    MemberCollection members;
     RegisterMembers_Geometry<Geometry>(engine, "Geometry");
-    CollectMembers_Geometry(members);
-    RegisterMembers(engine, "Geometry", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Geometry
         REGISTER_CLASS_MANUAL_PART_Geometry();
@@ -4923,10 +4382,7 @@ static void Register_Graphics(asIScriptEngine* engine)
     RegisterSubclass<Object, Graphics>(engine, "Object", "Graphics");
     RegisterSubclass<RefCounted, Graphics>(engine, "RefCounted", "Graphics");
 
-    MemberCollection members;
     RegisterMembers_Graphics<Graphics>(engine, "Graphics");
-    CollectMembers_Graphics(members);
-    RegisterMembers(engine, "Graphics", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Graphics
         REGISTER_CLASS_MANUAL_PART_Graphics();
@@ -4949,10 +4405,7 @@ static void Register_IndexBuffer(asIScriptEngine* engine)
     RegisterSubclass<Object, IndexBuffer>(engine, "Object", "IndexBuffer");
     RegisterSubclass<RefCounted, IndexBuffer>(engine, "RefCounted", "IndexBuffer");
 
-    MemberCollection members;
     RegisterMembers_IndexBuffer<IndexBuffer>(engine, "IndexBuffer");
-    CollectMembers_IndexBuffer(members);
-    RegisterMembers(engine, "IndexBuffer", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_IndexBuffer
         REGISTER_CLASS_MANUAL_PART_IndexBuffer();
@@ -4975,10 +4428,7 @@ static void Register_Input(asIScriptEngine* engine)
     RegisterSubclass<Object, Input>(engine, "Object", "Input");
     RegisterSubclass<RefCounted, Input>(engine, "RefCounted", "Input");
 
-    MemberCollection members;
     RegisterMembers_Input<Input>(engine, "Input");
-    CollectMembers_Input(members);
-    RegisterMembers(engine, "Input", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Input
         REGISTER_CLASS_MANUAL_PART_Input();
@@ -5001,10 +4451,7 @@ static void Register_Localization(asIScriptEngine* engine)
     RegisterSubclass<Object, Localization>(engine, "Object", "Localization");
     RegisterSubclass<RefCounted, Localization>(engine, "RefCounted", "Localization");
 
-    MemberCollection members;
     RegisterMembers_Localization<Localization>(engine, "Localization");
-    CollectMembers_Localization(members);
-    RegisterMembers(engine, "Localization", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Localization
         REGISTER_CLASS_MANUAL_PART_Localization();
@@ -5027,10 +4474,7 @@ static void Register_Log(asIScriptEngine* engine)
     RegisterSubclass<Object, Log>(engine, "Object", "Log");
     RegisterSubclass<RefCounted, Log>(engine, "RefCounted", "Log");
 
-    MemberCollection members;
     RegisterMembers_Log<Log>(engine, "Log");
-    CollectMembers_Log(members);
-    RegisterMembers(engine, "Log", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Log
         REGISTER_CLASS_MANUAL_PART_Log();
@@ -5053,10 +4497,7 @@ static void Register_MessageBox(asIScriptEngine* engine)
     RegisterSubclass<Object, MessageBox>(engine, "Object", "MessageBox");
     RegisterSubclass<RefCounted, MessageBox>(engine, "RefCounted", "MessageBox");
 
-    MemberCollection members;
     RegisterMembers_MessageBox<MessageBox>(engine, "MessageBox");
-    CollectMembers_MessageBox(members);
-    RegisterMembers(engine, "MessageBox", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_MessageBox
         REGISTER_CLASS_MANUAL_PART_MessageBox();
@@ -5090,10 +4531,7 @@ static void Register_NamedPipe(asIScriptEngine* engine)
     RegisterSubclass<Deserializer, NamedPipe>(engine, "Deserializer", "NamedPipe");
     RegisterSubclass<Serializer, NamedPipe>(engine, "Serializer", "NamedPipe");
 
-    MemberCollection members;
     RegisterMembers_NamedPipe<NamedPipe>(engine, "NamedPipe");
-    CollectMembers_NamedPipe(members);
-    RegisterMembers(engine, "NamedPipe", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_NamedPipe
         REGISTER_CLASS_MANUAL_PART_NamedPipe();
@@ -5116,10 +4554,7 @@ static void Register_OcclusionBuffer(asIScriptEngine* engine)
     RegisterSubclass<Object, OcclusionBuffer>(engine, "Object", "OcclusionBuffer");
     RegisterSubclass<RefCounted, OcclusionBuffer>(engine, "RefCounted", "OcclusionBuffer");
 
-    MemberCollection members;
     RegisterMembers_OcclusionBuffer<OcclusionBuffer>(engine, "OcclusionBuffer");
-    CollectMembers_OcclusionBuffer(members);
-    RegisterMembers(engine, "OcclusionBuffer", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_OcclusionBuffer
         REGISTER_CLASS_MANUAL_PART_OcclusionBuffer();
@@ -5141,10 +4576,7 @@ static void Register_OggVorbisSoundStream(asIScriptEngine* engine)
     RegisterSubclass<SoundStream, OggVorbisSoundStream>(engine, "SoundStream", "OggVorbisSoundStream");
     RegisterSubclass<RefCounted, OggVorbisSoundStream>(engine, "RefCounted", "OggVorbisSoundStream");
 
-    MemberCollection members;
     RegisterMembers_OggVorbisSoundStream<OggVorbisSoundStream>(engine, "OggVorbisSoundStream");
-    CollectMembers_OggVorbisSoundStream(members);
-    RegisterMembers(engine, "OggVorbisSoundStream", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_OggVorbisSoundStream
         REGISTER_CLASS_MANUAL_PART_OggVorbisSoundStream();
@@ -5176,10 +4608,7 @@ static void Register_PackageFile(asIScriptEngine* engine)
     RegisterSubclass<Object, PackageFile>(engine, "Object", "PackageFile");
     RegisterSubclass<RefCounted, PackageFile>(engine, "RefCounted", "PackageFile");
 
-    MemberCollection members;
     RegisterMembers_PackageFile<PackageFile>(engine, "PackageFile");
-    CollectMembers_PackageFile(members);
-    RegisterMembers(engine, "PackageFile", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_PackageFile
         REGISTER_CLASS_MANUAL_PART_PackageFile();
@@ -5202,14 +4631,14 @@ static void Register_Profiler(asIScriptEngine* engine)
     RegisterSubclass<Object, Profiler>(engine, "Object", "Profiler");
     RegisterSubclass<RefCounted, Profiler>(engine, "RefCounted", "Profiler");
 
-    MemberCollection members;
     RegisterMembers_Profiler<Profiler>(engine, "Profiler");
-    CollectMembers_Profiler(members);
-    RegisterMembers(engine, "Profiler", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Profiler
         REGISTER_CLASS_MANUAL_PART_Profiler();
     #endif
+
+    // void Profiler::BeginBlock(const char* name)
+    // Error: type "const char*" can not automatically bind
 }
 
 // explicit Renderer::Renderer(Context* context)
@@ -5228,10 +4657,7 @@ static void Register_Renderer(asIScriptEngine* engine)
     RegisterSubclass<Object, Renderer>(engine, "Object", "Renderer");
     RegisterSubclass<RefCounted, Renderer>(engine, "RefCounted", "Renderer");
 
-    MemberCollection members;
     RegisterMembers_Renderer<Renderer>(engine, "Renderer");
-    CollectMembers_Renderer(members);
-    RegisterMembers(engine, "Renderer", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Renderer
         REGISTER_CLASS_MANUAL_PART_Renderer();
@@ -5254,10 +4680,7 @@ static void Register_Resource(asIScriptEngine* engine)
     RegisterSubclass<Object, Resource>(engine, "Object", "Resource");
     RegisterSubclass<RefCounted, Resource>(engine, "RefCounted", "Resource");
 
-    MemberCollection members;
     RegisterMembers_Resource<Resource>(engine, "Resource");
-    CollectMembers_Resource(members);
-    RegisterMembers(engine, "Resource", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Resource
         REGISTER_CLASS_MANUAL_PART_Resource();
@@ -5283,10 +4706,7 @@ static void Register_ResourceCache(asIScriptEngine* engine)
     RegisterSubclass<Object, ResourceCache>(engine, "Object", "ResourceCache");
     RegisterSubclass<RefCounted, ResourceCache>(engine, "RefCounted", "ResourceCache");
 
-    MemberCollection members;
     RegisterMembers_ResourceCache<ResourceCache>(engine, "ResourceCache");
-    CollectMembers_ResourceCache(members);
-    RegisterMembers(engine, "ResourceCache", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ResourceCache
         REGISTER_CLASS_MANUAL_PART_ResourceCache();
@@ -5309,10 +4729,7 @@ static void Register_Serializable(asIScriptEngine* engine)
     RegisterSubclass<Object, Serializable>(engine, "Object", "Serializable");
     RegisterSubclass<RefCounted, Serializable>(engine, "RefCounted", "Serializable");
 
-    MemberCollection members;
     RegisterMembers_Serializable<Serializable>(engine, "Serializable");
-    CollectMembers_Serializable(members);
-    RegisterMembers(engine, "Serializable", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Serializable
         REGISTER_CLASS_MANUAL_PART_Serializable();
@@ -5345,10 +4762,7 @@ static void Register_ShaderParameterAnimationInfo(asIScriptEngine* engine)
     RegisterSubclass<ValueAnimationInfo, ShaderParameterAnimationInfo>(engine, "ValueAnimationInfo", "ShaderParameterAnimationInfo");
     RegisterSubclass<RefCounted, ShaderParameterAnimationInfo>(engine, "RefCounted", "ShaderParameterAnimationInfo");
 
-    MemberCollection members;
     RegisterMembers_ShaderParameterAnimationInfo<ShaderParameterAnimationInfo>(engine, "ShaderParameterAnimationInfo");
-    CollectMembers_ShaderParameterAnimationInfo(members);
-    RegisterMembers(engine, "ShaderParameterAnimationInfo", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ShaderParameterAnimationInfo
         REGISTER_CLASS_MANUAL_PART_ShaderParameterAnimationInfo();
@@ -5371,10 +4785,7 @@ static void Register_ShaderPrecache(asIScriptEngine* engine)
     RegisterSubclass<Object, ShaderPrecache>(engine, "Object", "ShaderPrecache");
     RegisterSubclass<RefCounted, ShaderPrecache>(engine, "RefCounted", "ShaderPrecache");
 
-    MemberCollection members;
     RegisterMembers_ShaderPrecache<ShaderPrecache>(engine, "ShaderPrecache");
-    CollectMembers_ShaderPrecache(members);
-    RegisterMembers(engine, "ShaderPrecache", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ShaderPrecache
         REGISTER_CLASS_MANUAL_PART_ShaderPrecache();
@@ -5397,10 +4808,7 @@ static void Register_Time(asIScriptEngine* engine)
     RegisterSubclass<Object, Time>(engine, "Object", "Time");
     RegisterSubclass<RefCounted, Time>(engine, "RefCounted", "Time");
 
-    MemberCollection members;
     RegisterMembers_Time<Time>(engine, "Time");
-    CollectMembers_Time(members);
-    RegisterMembers(engine, "Time", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Time
         REGISTER_CLASS_MANUAL_PART_Time();
@@ -5423,10 +4831,7 @@ static void Register_UI(asIScriptEngine* engine)
     RegisterSubclass<Object, UI>(engine, "Object", "UI");
     RegisterSubclass<RefCounted, UI>(engine, "RefCounted", "UI");
 
-    MemberCollection members;
     RegisterMembers_UI<UI>(engine, "UI");
-    CollectMembers_UI(members);
-    RegisterMembers(engine, "UI", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_UI
         REGISTER_CLASS_MANUAL_PART_UI();
@@ -5453,10 +4858,7 @@ static void Register_VectorBuffer(asIScriptEngine* engine)
     // VectorBuffer::~VectorBuffer() | Implicitly-declared
     engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(VectorBuffer), AS_CALL_CDECL_OBJFIRST);
 
-    MemberCollection members;
     RegisterMembers_VectorBuffer<VectorBuffer>(engine, "VectorBuffer");
-    CollectMembers_VectorBuffer(members);
-    RegisterMembers(engine, "VectorBuffer", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_VectorBuffer
         REGISTER_CLASS_MANUAL_PART_VectorBuffer();
@@ -5482,10 +4884,7 @@ static void Register_VertexBuffer(asIScriptEngine* engine)
     RegisterSubclass<Object, VertexBuffer>(engine, "Object", "VertexBuffer");
     RegisterSubclass<RefCounted, VertexBuffer>(engine, "RefCounted", "VertexBuffer");
 
-    MemberCollection members;
     RegisterMembers_VertexBuffer<VertexBuffer>(engine, "VertexBuffer");
-    CollectMembers_VertexBuffer(members);
-    RegisterMembers(engine, "VertexBuffer", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_VertexBuffer
         REGISTER_CLASS_MANUAL_PART_VertexBuffer();
@@ -5508,10 +4907,7 @@ static void Register_View(asIScriptEngine* engine)
     RegisterSubclass<Object, View>(engine, "Object", "View");
     RegisterSubclass<RefCounted, View>(engine, "RefCounted", "View");
 
-    MemberCollection members;
     RegisterMembers_View<View>(engine, "View");
-    CollectMembers_View(members);
-    RegisterMembers(engine, "View", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_View
         REGISTER_CLASS_MANUAL_PART_View();
@@ -5552,10 +4948,7 @@ static void Register_Viewport(asIScriptEngine* engine)
     RegisterSubclass<Object, Viewport>(engine, "Object", "Viewport");
     RegisterSubclass<RefCounted, Viewport>(engine, "RefCounted", "Viewport");
 
-    MemberCollection members;
     RegisterMembers_Viewport<Viewport>(engine, "Viewport");
-    CollectMembers_Viewport(members);
-    RegisterMembers(engine, "Viewport", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Viewport
         REGISTER_CLASS_MANUAL_PART_Viewport();
@@ -5578,10 +4971,7 @@ static void Register_WorkQueue(asIScriptEngine* engine)
     RegisterSubclass<Object, WorkQueue>(engine, "Object", "WorkQueue");
     RegisterSubclass<RefCounted, WorkQueue>(engine, "RefCounted", "WorkQueue");
 
-    MemberCollection members;
     RegisterMembers_WorkQueue<WorkQueue>(engine, "WorkQueue");
-    CollectMembers_WorkQueue(members);
-    RegisterMembers(engine, "WorkQueue", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_WorkQueue
         REGISTER_CLASS_MANUAL_PART_WorkQueue();
@@ -5606,10 +4996,7 @@ static void Register_Database(asIScriptEngine* engine)
     RegisterSubclass<Object, Database>(engine, "Object", "Database");
     RegisterSubclass<RefCounted, Database>(engine, "RefCounted", "Database");
 
-    MemberCollection members;
     RegisterMembers_Database<Database>(engine, "Database");
-    CollectMembers_Database(members);
-    RegisterMembers(engine, "Database", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Database
         REGISTER_CLASS_MANUAL_PART_Database();
@@ -5629,10 +5016,7 @@ static void Register_Connection(asIScriptEngine* engine)
     RegisterSubclass<Object, Connection>(engine, "Object", "Connection");
     RegisterSubclass<RefCounted, Connection>(engine, "RefCounted", "Connection");
 
-    MemberCollection members;
     RegisterMembers_Connection<Connection>(engine, "Connection");
-    CollectMembers_Connection(members);
-    RegisterMembers(engine, "Connection", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Connection
         REGISTER_CLASS_MANUAL_PART_Connection();
@@ -5655,10 +5039,7 @@ static void Register_Network(asIScriptEngine* engine)
     RegisterSubclass<Object, Network>(engine, "Object", "Network");
     RegisterSubclass<RefCounted, Network>(engine, "RefCounted", "Network");
 
-    MemberCollection members;
     RegisterMembers_Network<Network>(engine, "Network");
-    CollectMembers_Network(members);
-    RegisterMembers(engine, "Network", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Network
         REGISTER_CLASS_MANUAL_PART_Network();
@@ -5692,10 +5073,7 @@ static void Register_ConvexData(asIScriptEngine* engine)
     RegisterSubclass<CollisionGeometryData, ConvexData>(engine, "CollisionGeometryData", "ConvexData");
     RegisterSubclass<RefCounted, ConvexData>(engine, "RefCounted", "ConvexData");
 
-    MemberCollection members;
     RegisterMembers_ConvexData<ConvexData>(engine, "ConvexData");
-    CollectMembers_ConvexData(members);
-    RegisterMembers(engine, "ConvexData", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ConvexData
         REGISTER_CLASS_MANUAL_PART_ConvexData();
@@ -5725,10 +5103,7 @@ static void Register_GImpactMeshData(asIScriptEngine* engine)
     RegisterSubclass<CollisionGeometryData, GImpactMeshData>(engine, "CollisionGeometryData", "GImpactMeshData");
     RegisterSubclass<RefCounted, GImpactMeshData>(engine, "RefCounted", "GImpactMeshData");
 
-    MemberCollection members;
     RegisterMembers_GImpactMeshData<GImpactMeshData>(engine, "GImpactMeshData");
-    CollectMembers_GImpactMeshData(members);
-    RegisterMembers(engine, "GImpactMeshData", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_GImpactMeshData
         REGISTER_CLASS_MANUAL_PART_GImpactMeshData();
@@ -5750,10 +5125,7 @@ static void Register_HeightfieldData(asIScriptEngine* engine)
     RegisterSubclass<CollisionGeometryData, HeightfieldData>(engine, "CollisionGeometryData", "HeightfieldData");
     RegisterSubclass<RefCounted, HeightfieldData>(engine, "RefCounted", "HeightfieldData");
 
-    MemberCollection members;
     RegisterMembers_HeightfieldData<HeightfieldData>(engine, "HeightfieldData");
-    CollectMembers_HeightfieldData(members);
-    RegisterMembers(engine, "HeightfieldData", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_HeightfieldData
         REGISTER_CLASS_MANUAL_PART_HeightfieldData();
@@ -5783,10 +5155,7 @@ static void Register_TriangleMeshData(asIScriptEngine* engine)
     RegisterSubclass<CollisionGeometryData, TriangleMeshData>(engine, "CollisionGeometryData", "TriangleMeshData");
     RegisterSubclass<RefCounted, TriangleMeshData>(engine, "RefCounted", "TriangleMeshData");
 
-    MemberCollection members;
     RegisterMembers_TriangleMeshData<TriangleMeshData>(engine, "TriangleMeshData");
-    CollectMembers_TriangleMeshData(members);
-    RegisterMembers(engine, "TriangleMeshData", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_TriangleMeshData
         REGISTER_CLASS_MANUAL_PART_TriangleMeshData();
@@ -5812,10 +5181,7 @@ static void Register_TmxImageLayer2D(asIScriptEngine* engine)
     RegisterSubclass<TmxLayer2D, TmxImageLayer2D>(engine, "TmxLayer2D", "TmxImageLayer2D");
     RegisterSubclass<RefCounted, TmxImageLayer2D>(engine, "RefCounted", "TmxImageLayer2D");
 
-    MemberCollection members;
     RegisterMembers_TmxImageLayer2D<TmxImageLayer2D>(engine, "TmxImageLayer2D");
-    CollectMembers_TmxImageLayer2D(members);
-    RegisterMembers(engine, "TmxImageLayer2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_TmxImageLayer2D
         REGISTER_CLASS_MANUAL_PART_TmxImageLayer2D();
@@ -5837,10 +5203,7 @@ static void Register_TmxObjectGroup2D(asIScriptEngine* engine)
     RegisterSubclass<TmxLayer2D, TmxObjectGroup2D>(engine, "TmxLayer2D", "TmxObjectGroup2D");
     RegisterSubclass<RefCounted, TmxObjectGroup2D>(engine, "RefCounted", "TmxObjectGroup2D");
 
-    MemberCollection members;
     RegisterMembers_TmxObjectGroup2D<TmxObjectGroup2D>(engine, "TmxObjectGroup2D");
-    CollectMembers_TmxObjectGroup2D(members);
-    RegisterMembers(engine, "TmxObjectGroup2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_TmxObjectGroup2D
         REGISTER_CLASS_MANUAL_PART_TmxObjectGroup2D();
@@ -5862,10 +5225,7 @@ static void Register_TmxTileLayer2D(asIScriptEngine* engine)
     RegisterSubclass<TmxLayer2D, TmxTileLayer2D>(engine, "TmxLayer2D", "TmxTileLayer2D");
     RegisterSubclass<RefCounted, TmxTileLayer2D>(engine, "RefCounted", "TmxTileLayer2D");
 
-    MemberCollection members;
     RegisterMembers_TmxTileLayer2D<TmxTileLayer2D>(engine, "TmxTileLayer2D");
-    CollectMembers_TmxTileLayer2D(members);
-    RegisterMembers(engine, "TmxTileLayer2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_TmxTileLayer2D
         REGISTER_CLASS_MANUAL_PART_TmxTileLayer2D();
@@ -5881,10 +5241,7 @@ static void Register_Animatable(asIScriptEngine* engine)
     RegisterSubclass<Object, Animatable>(engine, "Object", "Animatable");
     RegisterSubclass<RefCounted, Animatable>(engine, "RefCounted", "Animatable");
 
-    MemberCollection members;
     RegisterMembers_Animatable<Animatable>(engine, "Animatable");
-    CollectMembers_Animatable(members);
-    RegisterMembers(engine, "Animatable", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Animatable
         REGISTER_CLASS_MANUAL_PART_Animatable();
@@ -5911,10 +5268,7 @@ static void Register_EventProfiler(asIScriptEngine* engine)
     RegisterSubclass<Object, EventProfiler>(engine, "Object", "EventProfiler");
     RegisterSubclass<RefCounted, EventProfiler>(engine, "RefCounted", "EventProfiler");
 
-    MemberCollection members;
     RegisterMembers_EventProfiler<EventProfiler>(engine, "EventProfiler");
-    CollectMembers_EventProfiler(members);
-    RegisterMembers(engine, "EventProfiler", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_EventProfiler
         REGISTER_CLASS_MANUAL_PART_EventProfiler();
@@ -5938,10 +5292,7 @@ static void Register_Font(asIScriptEngine* engine)
     RegisterSubclass<Object, Font>(engine, "Object", "Font");
     RegisterSubclass<RefCounted, Font>(engine, "RefCounted", "Font");
 
-    MemberCollection members;
     RegisterMembers_Font<Font>(engine, "Font");
-    CollectMembers_Font(members);
-    RegisterMembers(engine, "Font", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Font
         REGISTER_CLASS_MANUAL_PART_Font();
@@ -5965,10 +5316,7 @@ static void Register_Image(asIScriptEngine* engine)
     RegisterSubclass<Object, Image>(engine, "Object", "Image");
     RegisterSubclass<RefCounted, Image>(engine, "RefCounted", "Image");
 
-    MemberCollection members;
     RegisterMembers_Image<Image>(engine, "Image");
-    CollectMembers_Image(members);
-    RegisterMembers(engine, "Image", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Image
         REGISTER_CLASS_MANUAL_PART_Image();
@@ -5992,10 +5340,7 @@ static void Register_JSONFile(asIScriptEngine* engine)
     RegisterSubclass<Object, JSONFile>(engine, "Object", "JSONFile");
     RegisterSubclass<RefCounted, JSONFile>(engine, "RefCounted", "JSONFile");
 
-    MemberCollection members;
     RegisterMembers_JSONFile<JSONFile>(engine, "JSONFile");
-    CollectMembers_JSONFile(members);
-    RegisterMembers(engine, "JSONFile", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_JSONFile
         REGISTER_CLASS_MANUAL_PART_JSONFile();
@@ -6019,10 +5364,7 @@ static void Register_Material(asIScriptEngine* engine)
     RegisterSubclass<Object, Material>(engine, "Object", "Material");
     RegisterSubclass<RefCounted, Material>(engine, "RefCounted", "Material");
 
-    MemberCollection members;
     RegisterMembers_Material<Material>(engine, "Material");
-    CollectMembers_Material(members);
-    RegisterMembers(engine, "Material", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Material
         REGISTER_CLASS_MANUAL_PART_Material();
@@ -6046,10 +5388,7 @@ static void Register_ObjectAnimation(asIScriptEngine* engine)
     RegisterSubclass<Object, ObjectAnimation>(engine, "Object", "ObjectAnimation");
     RegisterSubclass<RefCounted, ObjectAnimation>(engine, "RefCounted", "ObjectAnimation");
 
-    MemberCollection members;
     RegisterMembers_ObjectAnimation<ObjectAnimation>(engine, "ObjectAnimation");
-    CollectMembers_ObjectAnimation(members);
-    RegisterMembers(engine, "ObjectAnimation", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ObjectAnimation
         REGISTER_CLASS_MANUAL_PART_ObjectAnimation();
@@ -6073,10 +5412,7 @@ static void Register_ParticleEffect(asIScriptEngine* engine)
     RegisterSubclass<Object, ParticleEffect>(engine, "Object", "ParticleEffect");
     RegisterSubclass<RefCounted, ParticleEffect>(engine, "RefCounted", "ParticleEffect");
 
-    MemberCollection members;
     RegisterMembers_ParticleEffect<ParticleEffect>(engine, "ParticleEffect");
-    CollectMembers_ParticleEffect(members);
-    RegisterMembers(engine, "ParticleEffect", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ParticleEffect
         REGISTER_CLASS_MANUAL_PART_ParticleEffect();
@@ -6100,10 +5436,7 @@ static void Register_ResourceWithMetadata(asIScriptEngine* engine)
     RegisterSubclass<Object, ResourceWithMetadata>(engine, "Object", "ResourceWithMetadata");
     RegisterSubclass<RefCounted, ResourceWithMetadata>(engine, "RefCounted", "ResourceWithMetadata");
 
-    MemberCollection members;
     RegisterMembers_ResourceWithMetadata<ResourceWithMetadata>(engine, "ResourceWithMetadata");
-    CollectMembers_ResourceWithMetadata(members);
-    RegisterMembers(engine, "ResourceWithMetadata", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ResourceWithMetadata
         REGISTER_CLASS_MANUAL_PART_ResourceWithMetadata();
@@ -6127,10 +5460,7 @@ static void Register_Shader(asIScriptEngine* engine)
     RegisterSubclass<Object, Shader>(engine, "Object", "Shader");
     RegisterSubclass<RefCounted, Shader>(engine, "RefCounted", "Shader");
 
-    MemberCollection members;
     RegisterMembers_Shader<Shader>(engine, "Shader");
-    CollectMembers_Shader(members);
-    RegisterMembers(engine, "Shader", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Shader
         REGISTER_CLASS_MANUAL_PART_Shader();
@@ -6154,10 +5484,7 @@ static void Register_Technique(asIScriptEngine* engine)
     RegisterSubclass<Object, Technique>(engine, "Object", "Technique");
     RegisterSubclass<RefCounted, Technique>(engine, "RefCounted", "Technique");
 
-    MemberCollection members;
     RegisterMembers_Technique<Technique>(engine, "Technique");
-    CollectMembers_Technique(members);
-    RegisterMembers(engine, "Technique", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Technique
         REGISTER_CLASS_MANUAL_PART_Technique();
@@ -6181,10 +5508,7 @@ static void Register_ValueAnimation(asIScriptEngine* engine)
     RegisterSubclass<Object, ValueAnimation>(engine, "Object", "ValueAnimation");
     RegisterSubclass<RefCounted, ValueAnimation>(engine, "RefCounted", "ValueAnimation");
 
-    MemberCollection members;
     RegisterMembers_ValueAnimation<ValueAnimation>(engine, "ValueAnimation");
-    CollectMembers_ValueAnimation(members);
-    RegisterMembers(engine, "ValueAnimation", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ValueAnimation
         REGISTER_CLASS_MANUAL_PART_ValueAnimation();
@@ -6208,10 +5532,7 @@ static void Register_XMLFile(asIScriptEngine* engine)
     RegisterSubclass<Object, XMLFile>(engine, "Object", "XMLFile");
     RegisterSubclass<RefCounted, XMLFile>(engine, "RefCounted", "XMLFile");
 
-    MemberCollection members;
     RegisterMembers_XMLFile<XMLFile>(engine, "XMLFile");
-    CollectMembers_XMLFile(members);
-    RegisterMembers(engine, "XMLFile", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_XMLFile
         REGISTER_CLASS_MANUAL_PART_XMLFile();
@@ -6237,10 +5558,7 @@ static void Register_AnimationSet2D(asIScriptEngine* engine)
     RegisterSubclass<Object, AnimationSet2D>(engine, "Object", "AnimationSet2D");
     RegisterSubclass<RefCounted, AnimationSet2D>(engine, "RefCounted", "AnimationSet2D");
 
-    MemberCollection members;
     RegisterMembers_AnimationSet2D<AnimationSet2D>(engine, "AnimationSet2D");
-    CollectMembers_AnimationSet2D(members);
-    RegisterMembers(engine, "AnimationSet2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_AnimationSet2D
         REGISTER_CLASS_MANUAL_PART_AnimationSet2D();
@@ -6264,10 +5582,7 @@ static void Register_ParticleEffect2D(asIScriptEngine* engine)
     RegisterSubclass<Object, ParticleEffect2D>(engine, "Object", "ParticleEffect2D");
     RegisterSubclass<RefCounted, ParticleEffect2D>(engine, "RefCounted", "ParticleEffect2D");
 
-    MemberCollection members;
     RegisterMembers_ParticleEffect2D<ParticleEffect2D>(engine, "ParticleEffect2D");
-    CollectMembers_ParticleEffect2D(members);
-    RegisterMembers(engine, "ParticleEffect2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ParticleEffect2D
         REGISTER_CLASS_MANUAL_PART_ParticleEffect2D();
@@ -6291,10 +5606,7 @@ static void Register_Sprite2D(asIScriptEngine* engine)
     RegisterSubclass<Object, Sprite2D>(engine, "Object", "Sprite2D");
     RegisterSubclass<RefCounted, Sprite2D>(engine, "RefCounted", "Sprite2D");
 
-    MemberCollection members;
     RegisterMembers_Sprite2D<Sprite2D>(engine, "Sprite2D");
-    CollectMembers_Sprite2D(members);
-    RegisterMembers(engine, "Sprite2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Sprite2D
         REGISTER_CLASS_MANUAL_PART_Sprite2D();
@@ -6318,10 +5630,7 @@ static void Register_SpriteSheet2D(asIScriptEngine* engine)
     RegisterSubclass<Object, SpriteSheet2D>(engine, "Object", "SpriteSheet2D");
     RegisterSubclass<RefCounted, SpriteSheet2D>(engine, "RefCounted", "SpriteSheet2D");
 
-    MemberCollection members;
     RegisterMembers_SpriteSheet2D<SpriteSheet2D>(engine, "SpriteSheet2D");
-    CollectMembers_SpriteSheet2D(members);
-    RegisterMembers(engine, "SpriteSheet2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_SpriteSheet2D
         REGISTER_CLASS_MANUAL_PART_SpriteSheet2D();
@@ -6345,10 +5654,7 @@ static void Register_TmxFile2D(asIScriptEngine* engine)
     RegisterSubclass<Object, TmxFile2D>(engine, "Object", "TmxFile2D");
     RegisterSubclass<RefCounted, TmxFile2D>(engine, "RefCounted", "TmxFile2D");
 
-    MemberCollection members;
     RegisterMembers_TmxFile2D<TmxFile2D>(engine, "TmxFile2D");
-    CollectMembers_TmxFile2D(members);
-    RegisterMembers(engine, "TmxFile2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_TmxFile2D
         REGISTER_CLASS_MANUAL_PART_TmxFile2D();
@@ -6375,10 +5681,7 @@ static void Register_Animation(asIScriptEngine* engine)
     RegisterSubclass<Object, Animation>(engine, "Object", "Animation");
     RegisterSubclass<RefCounted, Animation>(engine, "RefCounted", "Animation");
 
-    MemberCollection members;
     RegisterMembers_Animation<Animation>(engine, "Animation");
-    CollectMembers_Animation(members);
-    RegisterMembers(engine, "Animation", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Animation
         REGISTER_CLASS_MANUAL_PART_Animation();
@@ -6403,10 +5706,7 @@ static void Register_Component(asIScriptEngine* engine)
     RegisterSubclass<Object, Component>(engine, "Object", "Component");
     RegisterSubclass<RefCounted, Component>(engine, "RefCounted", "Component");
 
-    MemberCollection members;
     RegisterMembers_Component<Component>(engine, "Component");
-    CollectMembers_Component(members);
-    RegisterMembers(engine, "Component", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Component
         REGISTER_CLASS_MANUAL_PART_Component();
@@ -6437,10 +5737,7 @@ static void Register_Model(asIScriptEngine* engine)
     RegisterSubclass<Object, Model>(engine, "Object", "Model");
     RegisterSubclass<RefCounted, Model>(engine, "RefCounted", "Model");
 
-    MemberCollection members;
     RegisterMembers_Model<Model>(engine, "Model");
-    CollectMembers_Model(members);
-    RegisterMembers(engine, "Model", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Model
         REGISTER_CLASS_MANUAL_PART_Model();
@@ -6465,10 +5762,7 @@ static void Register_Node(asIScriptEngine* engine)
     RegisterSubclass<Object, Node>(engine, "Object", "Node");
     RegisterSubclass<RefCounted, Node>(engine, "RefCounted", "Node");
 
-    MemberCollection members;
     RegisterMembers_Node<Node>(engine, "Node");
-    CollectMembers_Node(members);
-    RegisterMembers(engine, "Node", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Node
         REGISTER_CLASS_MANUAL_PART_Node();
@@ -6505,10 +5799,7 @@ static void Register_Sound(asIScriptEngine* engine)
     RegisterSubclass<Object, Sound>(engine, "Object", "Sound");
     RegisterSubclass<RefCounted, Sound>(engine, "RefCounted", "Sound");
 
-    MemberCollection members;
     RegisterMembers_Sound<Sound>(engine, "Sound");
-    CollectMembers_Sound(members);
-    RegisterMembers(engine, "Sound", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Sound
         REGISTER_CLASS_MANUAL_PART_Sound();
@@ -6533,10 +5824,7 @@ static void Register_Texture(asIScriptEngine* engine)
     RegisterSubclass<Object, Texture>(engine, "Object", "Texture");
     RegisterSubclass<RefCounted, Texture>(engine, "RefCounted", "Texture");
 
-    MemberCollection members;
     RegisterMembers_Texture<Texture>(engine, "Texture");
-    CollectMembers_Texture(members);
-    RegisterMembers(engine, "Texture", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Texture
         REGISTER_CLASS_MANUAL_PART_Texture();
@@ -6561,10 +5849,7 @@ static void Register_UIElement(asIScriptEngine* engine)
     RegisterSubclass<Object, UIElement>(engine, "Object", "UIElement");
     RegisterSubclass<RefCounted, UIElement>(engine, "RefCounted", "UIElement");
 
-    MemberCollection members;
     RegisterMembers_UIElement<UIElement>(engine, "UIElement");
-    CollectMembers_UIElement(members);
-    RegisterMembers(engine, "UIElement", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_UIElement
         REGISTER_CLASS_MANUAL_PART_UIElement();
@@ -6614,10 +5899,7 @@ static void Register_AnimationController(asIScriptEngine* engine)
     RegisterSubclass<Object, AnimationController>(engine, "Object", "AnimationController");
     RegisterSubclass<RefCounted, AnimationController>(engine, "RefCounted", "AnimationController");
 
-    MemberCollection members;
     RegisterMembers_AnimationController<AnimationController>(engine, "AnimationController");
-    CollectMembers_AnimationController(members);
-    RegisterMembers(engine, "AnimationController", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_AnimationController
         REGISTER_CLASS_MANUAL_PART_AnimationController();
@@ -6643,10 +5925,7 @@ static void Register_BorderImage(asIScriptEngine* engine)
     RegisterSubclass<Object, BorderImage>(engine, "Object", "BorderImage");
     RegisterSubclass<RefCounted, BorderImage>(engine, "RefCounted", "BorderImage");
 
-    MemberCollection members;
     RegisterMembers_BorderImage<BorderImage>(engine, "BorderImage");
-    CollectMembers_BorderImage(members);
-    RegisterMembers(engine, "BorderImage", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_BorderImage
         REGISTER_CLASS_MANUAL_PART_BorderImage();
@@ -6681,10 +5960,7 @@ static void Register_Camera(asIScriptEngine* engine)
     RegisterSubclass<Object, Camera>(engine, "Object", "Camera");
     RegisterSubclass<RefCounted, Camera>(engine, "RefCounted", "Camera");
 
-    MemberCollection members;
     RegisterMembers_Camera<Camera>(engine, "Camera");
-    CollectMembers_Camera(members);
-    RegisterMembers(engine, "Camera", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Camera
         REGISTER_CLASS_MANUAL_PART_Camera();
@@ -6710,10 +5986,7 @@ static void Register_DebugRenderer(asIScriptEngine* engine)
     RegisterSubclass<Object, DebugRenderer>(engine, "Object", "DebugRenderer");
     RegisterSubclass<RefCounted, DebugRenderer>(engine, "RefCounted", "DebugRenderer");
 
-    MemberCollection members;
     RegisterMembers_DebugRenderer<DebugRenderer>(engine, "DebugRenderer");
-    CollectMembers_DebugRenderer(members);
-    RegisterMembers(engine, "DebugRenderer", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_DebugRenderer
         REGISTER_CLASS_MANUAL_PART_DebugRenderer();
@@ -6729,10 +6002,7 @@ static void Register_Drawable(asIScriptEngine* engine)
     RegisterSubclass<Object, Drawable>(engine, "Object", "Drawable");
     RegisterSubclass<RefCounted, Drawable>(engine, "RefCounted", "Drawable");
 
-    MemberCollection members;
     RegisterMembers_Drawable<Drawable>(engine, "Drawable");
-    CollectMembers_Drawable(members);
-    RegisterMembers(engine, "Drawable", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Drawable
         REGISTER_CLASS_MANUAL_PART_Drawable();
@@ -6751,10 +6021,7 @@ static void Register_LogicComponent(asIScriptEngine* engine)
     RegisterSubclass<Object, LogicComponent>(engine, "Object", "LogicComponent");
     RegisterSubclass<RefCounted, LogicComponent>(engine, "RefCounted", "LogicComponent");
 
-    MemberCollection members;
     RegisterMembers_LogicComponent<LogicComponent>(engine, "LogicComponent");
-    CollectMembers_LogicComponent(members);
-    RegisterMembers(engine, "LogicComponent", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_LogicComponent
         REGISTER_CLASS_MANUAL_PART_LogicComponent();
@@ -6780,10 +6047,7 @@ static void Register_Octree(asIScriptEngine* engine)
     RegisterSubclass<Object, Octree>(engine, "Object", "Octree");
     RegisterSubclass<RefCounted, Octree>(engine, "RefCounted", "Octree");
 
-    MemberCollection members;
     RegisterMembers_Octree<Octree>(engine, "Octree");
-    CollectMembers_Octree(members);
-    RegisterMembers(engine, "Octree", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Octree
         REGISTER_CLASS_MANUAL_PART_Octree();
@@ -6809,10 +6073,7 @@ static void Register_Scene(asIScriptEngine* engine)
     RegisterSubclass<Object, Scene>(engine, "Object", "Scene");
     RegisterSubclass<RefCounted, Scene>(engine, "RefCounted", "Scene");
 
-    MemberCollection members;
     RegisterMembers_Scene<Scene>(engine, "Scene");
-    CollectMembers_Scene(members);
-    RegisterMembers(engine, "Scene", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Scene
         REGISTER_CLASS_MANUAL_PART_Scene();
@@ -6838,10 +6099,7 @@ static void Register_ScrollView(asIScriptEngine* engine)
     RegisterSubclass<Object, ScrollView>(engine, "Object", "ScrollView");
     RegisterSubclass<RefCounted, ScrollView>(engine, "RefCounted", "ScrollView");
 
-    MemberCollection members;
     RegisterMembers_ScrollView<ScrollView>(engine, "ScrollView");
-    CollectMembers_ScrollView(members);
-    RegisterMembers(engine, "ScrollView", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ScrollView
         REGISTER_CLASS_MANUAL_PART_ScrollView();
@@ -6871,10 +6129,7 @@ static void Register_SmoothedTransform(asIScriptEngine* engine)
     RegisterSubclass<Object, SmoothedTransform>(engine, "Object", "SmoothedTransform");
     RegisterSubclass<RefCounted, SmoothedTransform>(engine, "RefCounted", "SmoothedTransform");
 
-    MemberCollection members;
     RegisterMembers_SmoothedTransform<SmoothedTransform>(engine, "SmoothedTransform");
-    CollectMembers_SmoothedTransform(members);
-    RegisterMembers(engine, "SmoothedTransform", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_SmoothedTransform
         REGISTER_CLASS_MANUAL_PART_SmoothedTransform();
@@ -6900,10 +6155,7 @@ static void Register_SoundListener(asIScriptEngine* engine)
     RegisterSubclass<Object, SoundListener>(engine, "Object", "SoundListener");
     RegisterSubclass<RefCounted, SoundListener>(engine, "RefCounted", "SoundListener");
 
-    MemberCollection members;
     RegisterMembers_SoundListener<SoundListener>(engine, "SoundListener");
-    CollectMembers_SoundListener(members);
-    RegisterMembers(engine, "SoundListener", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_SoundListener
         REGISTER_CLASS_MANUAL_PART_SoundListener();
@@ -6929,10 +6181,7 @@ static void Register_SoundSource(asIScriptEngine* engine)
     RegisterSubclass<Object, SoundSource>(engine, "Object", "SoundSource");
     RegisterSubclass<RefCounted, SoundSource>(engine, "RefCounted", "SoundSource");
 
-    MemberCollection members;
     RegisterMembers_SoundSource<SoundSource>(engine, "SoundSource");
-    CollectMembers_SoundSource(members);
-    RegisterMembers(engine, "SoundSource", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_SoundSource
         REGISTER_CLASS_MANUAL_PART_SoundSource();
@@ -6958,10 +6207,7 @@ static void Register_SplinePath(asIScriptEngine* engine)
     RegisterSubclass<Object, SplinePath>(engine, "Object", "SplinePath");
     RegisterSubclass<RefCounted, SplinePath>(engine, "RefCounted", "SplinePath");
 
-    MemberCollection members;
     RegisterMembers_SplinePath<SplinePath>(engine, "SplinePath");
-    CollectMembers_SplinePath(members);
-    RegisterMembers(engine, "SplinePath", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_SplinePath
         REGISTER_CLASS_MANUAL_PART_SplinePath();
@@ -6987,10 +6233,7 @@ static void Register_Sprite(asIScriptEngine* engine)
     RegisterSubclass<Object, Sprite>(engine, "Object", "Sprite");
     RegisterSubclass<RefCounted, Sprite>(engine, "RefCounted", "Sprite");
 
-    MemberCollection members;
     RegisterMembers_Sprite<Sprite>(engine, "Sprite");
-    CollectMembers_Sprite(members);
-    RegisterMembers(engine, "Sprite", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Sprite
         REGISTER_CLASS_MANUAL_PART_Sprite();
@@ -7016,10 +6259,7 @@ static void Register_Terrain(asIScriptEngine* engine)
     RegisterSubclass<Object, Terrain>(engine, "Object", "Terrain");
     RegisterSubclass<RefCounted, Terrain>(engine, "RefCounted", "Terrain");
 
-    MemberCollection members;
     RegisterMembers_Terrain<Terrain>(engine, "Terrain");
-    CollectMembers_Terrain(members);
-    RegisterMembers(engine, "Terrain", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Terrain
         REGISTER_CLASS_MANUAL_PART_Terrain();
@@ -7045,10 +6285,7 @@ static void Register_Texture2D(asIScriptEngine* engine)
     RegisterSubclass<Object, Texture2D>(engine, "Object", "Texture2D");
     RegisterSubclass<RefCounted, Texture2D>(engine, "RefCounted", "Texture2D");
 
-    MemberCollection members;
     RegisterMembers_Texture2D<Texture2D>(engine, "Texture2D");
-    CollectMembers_Texture2D(members);
-    RegisterMembers(engine, "Texture2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Texture2D
         REGISTER_CLASS_MANUAL_PART_Texture2D();
@@ -7074,10 +6311,7 @@ static void Register_Texture2DArray(asIScriptEngine* engine)
     RegisterSubclass<Object, Texture2DArray>(engine, "Object", "Texture2DArray");
     RegisterSubclass<RefCounted, Texture2DArray>(engine, "RefCounted", "Texture2DArray");
 
-    MemberCollection members;
     RegisterMembers_Texture2DArray<Texture2DArray>(engine, "Texture2DArray");
-    CollectMembers_Texture2DArray(members);
-    RegisterMembers(engine, "Texture2DArray", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Texture2DArray
         REGISTER_CLASS_MANUAL_PART_Texture2DArray();
@@ -7103,10 +6337,7 @@ static void Register_Texture3D(asIScriptEngine* engine)
     RegisterSubclass<Object, Texture3D>(engine, "Object", "Texture3D");
     RegisterSubclass<RefCounted, Texture3D>(engine, "RefCounted", "Texture3D");
 
-    MemberCollection members;
     RegisterMembers_Texture3D<Texture3D>(engine, "Texture3D");
-    CollectMembers_Texture3D(members);
-    RegisterMembers(engine, "Texture3D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Texture3D
         REGISTER_CLASS_MANUAL_PART_Texture3D();
@@ -7132,10 +6363,7 @@ static void Register_TextureCube(asIScriptEngine* engine)
     RegisterSubclass<Object, TextureCube>(engine, "Object", "TextureCube");
     RegisterSubclass<RefCounted, TextureCube>(engine, "RefCounted", "TextureCube");
 
-    MemberCollection members;
     RegisterMembers_TextureCube<TextureCube>(engine, "TextureCube");
-    CollectMembers_TextureCube(members);
-    RegisterMembers(engine, "TextureCube", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_TextureCube
         REGISTER_CLASS_MANUAL_PART_TextureCube();
@@ -7161,10 +6389,7 @@ static void Register_ToolTip(asIScriptEngine* engine)
     RegisterSubclass<Object, ToolTip>(engine, "Object", "ToolTip");
     RegisterSubclass<RefCounted, ToolTip>(engine, "RefCounted", "ToolTip");
 
-    MemberCollection members;
     RegisterMembers_ToolTip<ToolTip>(engine, "ToolTip");
-    CollectMembers_ToolTip(members);
-    RegisterMembers(engine, "ToolTip", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ToolTip
         REGISTER_CLASS_MANUAL_PART_ToolTip();
@@ -7190,10 +6415,7 @@ static void Register_UIComponent(asIScriptEngine* engine)
     RegisterSubclass<Object, UIComponent>(engine, "Object", "UIComponent");
     RegisterSubclass<RefCounted, UIComponent>(engine, "RefCounted", "UIComponent");
 
-    MemberCollection members;
     RegisterMembers_UIComponent<UIComponent>(engine, "UIComponent");
-    CollectMembers_UIComponent(members);
-    RegisterMembers(engine, "UIComponent", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_UIComponent
         REGISTER_CLASS_MANUAL_PART_UIComponent();
@@ -7209,10 +6431,7 @@ static void Register_UISelectable(asIScriptEngine* engine)
     RegisterSubclass<Object, UISelectable>(engine, "Object", "UISelectable");
     RegisterSubclass<RefCounted, UISelectable>(engine, "RefCounted", "UISelectable");
 
-    MemberCollection members;
     RegisterMembers_UISelectable<UISelectable>(engine, "UISelectable");
-    CollectMembers_UISelectable(members);
-    RegisterMembers(engine, "UISelectable", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_UISelectable
         REGISTER_CLASS_MANUAL_PART_UISelectable();
@@ -7228,10 +6447,7 @@ static void Register_UnknownComponent(asIScriptEngine* engine)
     RegisterSubclass<Object, UnknownComponent>(engine, "Object", "UnknownComponent");
     RegisterSubclass<RefCounted, UnknownComponent>(engine, "RefCounted", "UnknownComponent");
 
-    MemberCollection members;
     RegisterMembers_UnknownComponent<UnknownComponent>(engine, "UnknownComponent");
-    CollectMembers_UnknownComponent(members);
-    RegisterMembers(engine, "UnknownComponent", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_UnknownComponent
         REGISTER_CLASS_MANUAL_PART_UnknownComponent();
@@ -7259,10 +6475,7 @@ static void Register_IKConstraint(asIScriptEngine* engine)
     RegisterSubclass<Object, IKConstraint>(engine, "Object", "IKConstraint");
     RegisterSubclass<RefCounted, IKConstraint>(engine, "RefCounted", "IKConstraint");
 
-    MemberCollection members;
     RegisterMembers_IKConstraint<IKConstraint>(engine, "IKConstraint");
-    CollectMembers_IKConstraint(members);
-    RegisterMembers(engine, "IKConstraint", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_IKConstraint
         REGISTER_CLASS_MANUAL_PART_IKConstraint();
@@ -7288,10 +6501,7 @@ static void Register_IKEffector(asIScriptEngine* engine)
     RegisterSubclass<Object, IKEffector>(engine, "Object", "IKEffector");
     RegisterSubclass<RefCounted, IKEffector>(engine, "RefCounted", "IKEffector");
 
-    MemberCollection members;
     RegisterMembers_IKEffector<IKEffector>(engine, "IKEffector");
-    CollectMembers_IKEffector(members);
-    RegisterMembers(engine, "IKEffector", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_IKEffector
         REGISTER_CLASS_MANUAL_PART_IKEffector();
@@ -7317,10 +6527,7 @@ static void Register_IKSolver(asIScriptEngine* engine)
     RegisterSubclass<Object, IKSolver>(engine, "Object", "IKSolver");
     RegisterSubclass<RefCounted, IKSolver>(engine, "RefCounted", "IKSolver");
 
-    MemberCollection members;
     RegisterMembers_IKSolver<IKSolver>(engine, "IKSolver");
-    CollectMembers_IKSolver(members);
-    RegisterMembers(engine, "IKSolver", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_IKSolver
         REGISTER_CLASS_MANUAL_PART_IKSolver();
@@ -7350,10 +6557,7 @@ static void Register_CrowdAgent(asIScriptEngine* engine)
     RegisterSubclass<Object, CrowdAgent>(engine, "Object", "CrowdAgent");
     RegisterSubclass<RefCounted, CrowdAgent>(engine, "RefCounted", "CrowdAgent");
 
-    MemberCollection members;
     RegisterMembers_CrowdAgent<CrowdAgent>(engine, "CrowdAgent");
-    CollectMembers_CrowdAgent(members);
-    RegisterMembers(engine, "CrowdAgent", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_CrowdAgent
         REGISTER_CLASS_MANUAL_PART_CrowdAgent();
@@ -7379,10 +6583,7 @@ static void Register_CrowdManager(asIScriptEngine* engine)
     RegisterSubclass<Object, CrowdManager>(engine, "Object", "CrowdManager");
     RegisterSubclass<RefCounted, CrowdManager>(engine, "RefCounted", "CrowdManager");
 
-    MemberCollection members;
     RegisterMembers_CrowdManager<CrowdManager>(engine, "CrowdManager");
-    CollectMembers_CrowdManager(members);
-    RegisterMembers(engine, "CrowdManager", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_CrowdManager
         REGISTER_CLASS_MANUAL_PART_CrowdManager();
@@ -7408,10 +6609,7 @@ static void Register_NavArea(asIScriptEngine* engine)
     RegisterSubclass<Object, NavArea>(engine, "Object", "NavArea");
     RegisterSubclass<RefCounted, NavArea>(engine, "RefCounted", "NavArea");
 
-    MemberCollection members;
     RegisterMembers_NavArea<NavArea>(engine, "NavArea");
-    CollectMembers_NavArea(members);
-    RegisterMembers(engine, "NavArea", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_NavArea
         REGISTER_CLASS_MANUAL_PART_NavArea();
@@ -7437,10 +6635,7 @@ static void Register_Navigable(asIScriptEngine* engine)
     RegisterSubclass<Object, Navigable>(engine, "Object", "Navigable");
     RegisterSubclass<RefCounted, Navigable>(engine, "RefCounted", "Navigable");
 
-    MemberCollection members;
     RegisterMembers_Navigable<Navigable>(engine, "Navigable");
-    CollectMembers_Navigable(members);
-    RegisterMembers(engine, "Navigable", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Navigable
         REGISTER_CLASS_MANUAL_PART_Navigable();
@@ -7466,10 +6661,7 @@ static void Register_NavigationMesh(asIScriptEngine* engine)
     RegisterSubclass<Object, NavigationMesh>(engine, "Object", "NavigationMesh");
     RegisterSubclass<RefCounted, NavigationMesh>(engine, "RefCounted", "NavigationMesh");
 
-    MemberCollection members;
     RegisterMembers_NavigationMesh<NavigationMesh>(engine, "NavigationMesh");
-    CollectMembers_NavigationMesh(members);
-    RegisterMembers(engine, "NavigationMesh", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_NavigationMesh
         REGISTER_CLASS_MANUAL_PART_NavigationMesh();
@@ -7495,10 +6687,7 @@ static void Register_Obstacle(asIScriptEngine* engine)
     RegisterSubclass<Object, Obstacle>(engine, "Object", "Obstacle");
     RegisterSubclass<RefCounted, Obstacle>(engine, "RefCounted", "Obstacle");
 
-    MemberCollection members;
     RegisterMembers_Obstacle<Obstacle>(engine, "Obstacle");
-    CollectMembers_Obstacle(members);
-    RegisterMembers(engine, "Obstacle", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Obstacle
         REGISTER_CLASS_MANUAL_PART_Obstacle();
@@ -7524,10 +6713,7 @@ static void Register_OffMeshConnection(asIScriptEngine* engine)
     RegisterSubclass<Object, OffMeshConnection>(engine, "Object", "OffMeshConnection");
     RegisterSubclass<RefCounted, OffMeshConnection>(engine, "RefCounted", "OffMeshConnection");
 
-    MemberCollection members;
     RegisterMembers_OffMeshConnection<OffMeshConnection>(engine, "OffMeshConnection");
-    CollectMembers_OffMeshConnection(members);
-    RegisterMembers(engine, "OffMeshConnection", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_OffMeshConnection
         REGISTER_CLASS_MANUAL_PART_OffMeshConnection();
@@ -7557,10 +6743,7 @@ static void Register_NetworkPriority(asIScriptEngine* engine)
     RegisterSubclass<Object, NetworkPriority>(engine, "Object", "NetworkPriority");
     RegisterSubclass<RefCounted, NetworkPriority>(engine, "RefCounted", "NetworkPriority");
 
-    MemberCollection members;
     RegisterMembers_NetworkPriority<NetworkPriority>(engine, "NetworkPriority");
-    CollectMembers_NetworkPriority(members);
-    RegisterMembers(engine, "NetworkPriority", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_NetworkPriority
         REGISTER_CLASS_MANUAL_PART_NetworkPriority();
@@ -7590,10 +6773,7 @@ static void Register_CollisionShape(asIScriptEngine* engine)
     RegisterSubclass<Object, CollisionShape>(engine, "Object", "CollisionShape");
     RegisterSubclass<RefCounted, CollisionShape>(engine, "RefCounted", "CollisionShape");
 
-    MemberCollection members;
     RegisterMembers_CollisionShape<CollisionShape>(engine, "CollisionShape");
-    CollectMembers_CollisionShape(members);
-    RegisterMembers(engine, "CollisionShape", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_CollisionShape
         REGISTER_CLASS_MANUAL_PART_CollisionShape();
@@ -7619,10 +6799,7 @@ static void Register_Constraint(asIScriptEngine* engine)
     RegisterSubclass<Object, Constraint>(engine, "Object", "Constraint");
     RegisterSubclass<RefCounted, Constraint>(engine, "RefCounted", "Constraint");
 
-    MemberCollection members;
     RegisterMembers_Constraint<Constraint>(engine, "Constraint");
-    CollectMembers_Constraint(members);
-    RegisterMembers(engine, "Constraint", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Constraint
         REGISTER_CLASS_MANUAL_PART_Constraint();
@@ -7648,10 +6825,7 @@ static void Register_PhysicsWorld(asIScriptEngine* engine)
     RegisterSubclass<Object, PhysicsWorld>(engine, "Object", "PhysicsWorld");
     RegisterSubclass<RefCounted, PhysicsWorld>(engine, "RefCounted", "PhysicsWorld");
 
-    MemberCollection members;
     RegisterMembers_PhysicsWorld<PhysicsWorld>(engine, "PhysicsWorld");
-    CollectMembers_PhysicsWorld(members);
-    RegisterMembers(engine, "PhysicsWorld", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_PhysicsWorld
         REGISTER_CLASS_MANUAL_PART_PhysicsWorld();
@@ -7677,10 +6851,7 @@ static void Register_RigidBody(asIScriptEngine* engine)
     RegisterSubclass<Object, RigidBody>(engine, "Object", "RigidBody");
     RegisterSubclass<RefCounted, RigidBody>(engine, "RefCounted", "RigidBody");
 
-    MemberCollection members;
     RegisterMembers_RigidBody<RigidBody>(engine, "RigidBody");
-    CollectMembers_RigidBody(members);
-    RegisterMembers(engine, "RigidBody", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_RigidBody
         REGISTER_CLASS_MANUAL_PART_RigidBody();
@@ -7700,10 +6871,7 @@ static void Register_CollisionShape2D(asIScriptEngine* engine)
     RegisterSubclass<Object, CollisionShape2D>(engine, "Object", "CollisionShape2D");
     RegisterSubclass<RefCounted, CollisionShape2D>(engine, "RefCounted", "CollisionShape2D");
 
-    MemberCollection members;
     RegisterMembers_CollisionShape2D<CollisionShape2D>(engine, "CollisionShape2D");
-    CollectMembers_CollisionShape2D(members);
-    RegisterMembers(engine, "CollisionShape2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_CollisionShape2D
         REGISTER_CLASS_MANUAL_PART_CollisionShape2D();
@@ -7729,10 +6897,7 @@ static void Register_Constraint2D(asIScriptEngine* engine)
     RegisterSubclass<Object, Constraint2D>(engine, "Object", "Constraint2D");
     RegisterSubclass<RefCounted, Constraint2D>(engine, "RefCounted", "Constraint2D");
 
-    MemberCollection members;
     RegisterMembers_Constraint2D<Constraint2D>(engine, "Constraint2D");
-    CollectMembers_Constraint2D(members);
-    RegisterMembers(engine, "Constraint2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Constraint2D
         REGISTER_CLASS_MANUAL_PART_Constraint2D();
@@ -7758,10 +6923,7 @@ static void Register_PhysicsWorld2D(asIScriptEngine* engine)
     RegisterSubclass<Object, PhysicsWorld2D>(engine, "Object", "PhysicsWorld2D");
     RegisterSubclass<RefCounted, PhysicsWorld2D>(engine, "RefCounted", "PhysicsWorld2D");
 
-    MemberCollection members;
     RegisterMembers_PhysicsWorld2D<PhysicsWorld2D>(engine, "PhysicsWorld2D");
-    CollectMembers_PhysicsWorld2D(members);
-    RegisterMembers(engine, "PhysicsWorld2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_PhysicsWorld2D
         REGISTER_CLASS_MANUAL_PART_PhysicsWorld2D();
@@ -7787,10 +6949,7 @@ static void Register_RigidBody2D(asIScriptEngine* engine)
     RegisterSubclass<Object, RigidBody2D>(engine, "Object", "RigidBody2D");
     RegisterSubclass<RefCounted, RigidBody2D>(engine, "RefCounted", "RigidBody2D");
 
-    MemberCollection members;
     RegisterMembers_RigidBody2D<RigidBody2D>(engine, "RigidBody2D");
-    CollectMembers_RigidBody2D(members);
-    RegisterMembers(engine, "RigidBody2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_RigidBody2D
         REGISTER_CLASS_MANUAL_PART_RigidBody2D();
@@ -7816,10 +6975,7 @@ static void Register_TileMap2D(asIScriptEngine* engine)
     RegisterSubclass<Object, TileMap2D>(engine, "Object", "TileMap2D");
     RegisterSubclass<RefCounted, TileMap2D>(engine, "RefCounted", "TileMap2D");
 
-    MemberCollection members;
     RegisterMembers_TileMap2D<TileMap2D>(engine, "TileMap2D");
-    CollectMembers_TileMap2D(members);
-    RegisterMembers(engine, "TileMap2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_TileMap2D
         REGISTER_CLASS_MANUAL_PART_TileMap2D();
@@ -7845,10 +7001,7 @@ static void Register_TileMapLayer2D(asIScriptEngine* engine)
     RegisterSubclass<Object, TileMapLayer2D>(engine, "Object", "TileMapLayer2D");
     RegisterSubclass<RefCounted, TileMapLayer2D>(engine, "RefCounted", "TileMapLayer2D");
 
-    MemberCollection members;
     RegisterMembers_TileMapLayer2D<TileMapLayer2D>(engine, "TileMapLayer2D");
-    CollectMembers_TileMapLayer2D(members);
-    RegisterMembers(engine, "TileMapLayer2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_TileMapLayer2D
         REGISTER_CLASS_MANUAL_PART_TileMapLayer2D();
@@ -7877,10 +7030,7 @@ static void Register_BillboardSet(asIScriptEngine* engine)
     RegisterSubclass<Object, BillboardSet>(engine, "Object", "BillboardSet");
     RegisterSubclass<RefCounted, BillboardSet>(engine, "RefCounted", "BillboardSet");
 
-    MemberCollection members;
     RegisterMembers_BillboardSet<BillboardSet>(engine, "BillboardSet");
-    CollectMembers_BillboardSet(members);
-    RegisterMembers(engine, "BillboardSet", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_BillboardSet
         REGISTER_CLASS_MANUAL_PART_BillboardSet();
@@ -7907,10 +7057,7 @@ static void Register_Button(asIScriptEngine* engine)
     RegisterSubclass<Object, Button>(engine, "Object", "Button");
     RegisterSubclass<RefCounted, Button>(engine, "RefCounted", "Button");
 
-    MemberCollection members;
     RegisterMembers_Button<Button>(engine, "Button");
-    CollectMembers_Button(members);
-    RegisterMembers(engine, "Button", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Button
         REGISTER_CLASS_MANUAL_PART_Button();
@@ -7946,10 +7093,7 @@ static void Register_CheckBox(asIScriptEngine* engine)
     RegisterSubclass<Object, CheckBox>(engine, "Object", "CheckBox");
     RegisterSubclass<RefCounted, CheckBox>(engine, "RefCounted", "CheckBox");
 
-    MemberCollection members;
     RegisterMembers_CheckBox<CheckBox>(engine, "CheckBox");
-    CollectMembers_CheckBox(members);
-    RegisterMembers(engine, "CheckBox", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_CheckBox
         REGISTER_CLASS_MANUAL_PART_CheckBox();
@@ -7976,10 +7120,7 @@ static void Register_Cursor(asIScriptEngine* engine)
     RegisterSubclass<Object, Cursor>(engine, "Object", "Cursor");
     RegisterSubclass<RefCounted, Cursor>(engine, "RefCounted", "Cursor");
 
-    MemberCollection members;
     RegisterMembers_Cursor<Cursor>(engine, "Cursor");
-    CollectMembers_Cursor(members);
-    RegisterMembers(engine, "Cursor", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Cursor
         REGISTER_CLASS_MANUAL_PART_Cursor();
@@ -8006,10 +7147,7 @@ static void Register_CustomGeometry(asIScriptEngine* engine)
     RegisterSubclass<Object, CustomGeometry>(engine, "Object", "CustomGeometry");
     RegisterSubclass<RefCounted, CustomGeometry>(engine, "RefCounted", "CustomGeometry");
 
-    MemberCollection members;
     RegisterMembers_CustomGeometry<CustomGeometry>(engine, "CustomGeometry");
-    CollectMembers_CustomGeometry(members);
-    RegisterMembers(engine, "CustomGeometry", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_CustomGeometry
         REGISTER_CLASS_MANUAL_PART_CustomGeometry();
@@ -8036,10 +7174,7 @@ static void Register_DecalSet(asIScriptEngine* engine)
     RegisterSubclass<Object, DecalSet>(engine, "Object", "DecalSet");
     RegisterSubclass<RefCounted, DecalSet>(engine, "RefCounted", "DecalSet");
 
-    MemberCollection members;
     RegisterMembers_DecalSet<DecalSet>(engine, "DecalSet");
-    CollectMembers_DecalSet(members);
-    RegisterMembers(engine, "DecalSet", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_DecalSet
         REGISTER_CLASS_MANUAL_PART_DecalSet();
@@ -8066,10 +7201,7 @@ static void Register_Light(asIScriptEngine* engine)
     RegisterSubclass<Object, Light>(engine, "Object", "Light");
     RegisterSubclass<RefCounted, Light>(engine, "RefCounted", "Light");
 
-    MemberCollection members;
     RegisterMembers_Light<Light>(engine, "Light");
-    CollectMembers_Light(members);
-    RegisterMembers(engine, "Light", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Light
         REGISTER_CLASS_MANUAL_PART_Light();
@@ -8096,10 +7228,7 @@ static void Register_LineEdit(asIScriptEngine* engine)
     RegisterSubclass<Object, LineEdit>(engine, "Object", "LineEdit");
     RegisterSubclass<RefCounted, LineEdit>(engine, "RefCounted", "LineEdit");
 
-    MemberCollection members;
     RegisterMembers_LineEdit<LineEdit>(engine, "LineEdit");
-    CollectMembers_LineEdit(members);
-    RegisterMembers(engine, "LineEdit", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_LineEdit
         REGISTER_CLASS_MANUAL_PART_LineEdit();
@@ -8126,10 +7255,7 @@ static void Register_ListView(asIScriptEngine* engine)
     RegisterSubclass<Object, ListView>(engine, "Object", "ListView");
     RegisterSubclass<RefCounted, ListView>(engine, "RefCounted", "ListView");
 
-    MemberCollection members;
     RegisterMembers_ListView<ListView>(engine, "ListView");
-    CollectMembers_ListView(members);
-    RegisterMembers(engine, "ListView", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ListView
         REGISTER_CLASS_MANUAL_PART_ListView();
@@ -8156,10 +7282,7 @@ static void Register_ProgressBar(asIScriptEngine* engine)
     RegisterSubclass<Object, ProgressBar>(engine, "Object", "ProgressBar");
     RegisterSubclass<RefCounted, ProgressBar>(engine, "RefCounted", "ProgressBar");
 
-    MemberCollection members;
     RegisterMembers_ProgressBar<ProgressBar>(engine, "ProgressBar");
-    CollectMembers_ProgressBar(members);
-    RegisterMembers(engine, "ProgressBar", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ProgressBar
         REGISTER_CLASS_MANUAL_PART_ProgressBar();
@@ -8186,10 +7309,7 @@ static void Register_RibbonTrail(asIScriptEngine* engine)
     RegisterSubclass<Object, RibbonTrail>(engine, "Object", "RibbonTrail");
     RegisterSubclass<RefCounted, RibbonTrail>(engine, "RefCounted", "RibbonTrail");
 
-    MemberCollection members;
     RegisterMembers_RibbonTrail<RibbonTrail>(engine, "RibbonTrail");
-    CollectMembers_RibbonTrail(members);
-    RegisterMembers(engine, "RibbonTrail", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_RibbonTrail
         REGISTER_CLASS_MANUAL_PART_RibbonTrail();
@@ -8216,10 +7336,7 @@ static void Register_ScrollBar(asIScriptEngine* engine)
     RegisterSubclass<Object, ScrollBar>(engine, "Object", "ScrollBar");
     RegisterSubclass<RefCounted, ScrollBar>(engine, "RefCounted", "ScrollBar");
 
-    MemberCollection members;
     RegisterMembers_ScrollBar<ScrollBar>(engine, "ScrollBar");
-    CollectMembers_ScrollBar(members);
-    RegisterMembers(engine, "ScrollBar", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ScrollBar
         REGISTER_CLASS_MANUAL_PART_ScrollBar();
@@ -8246,10 +7363,7 @@ static void Register_Slider(asIScriptEngine* engine)
     RegisterSubclass<Object, Slider>(engine, "Object", "Slider");
     RegisterSubclass<RefCounted, Slider>(engine, "RefCounted", "Slider");
 
-    MemberCollection members;
     RegisterMembers_Slider<Slider>(engine, "Slider");
-    CollectMembers_Slider(members);
-    RegisterMembers(engine, "Slider", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Slider
         REGISTER_CLASS_MANUAL_PART_Slider();
@@ -8276,10 +7390,7 @@ static void Register_SoundSource3D(asIScriptEngine* engine)
     RegisterSubclass<Object, SoundSource3D>(engine, "Object", "SoundSource3D");
     RegisterSubclass<RefCounted, SoundSource3D>(engine, "RefCounted", "SoundSource3D");
 
-    MemberCollection members;
     RegisterMembers_SoundSource3D<SoundSource3D>(engine, "SoundSource3D");
-    CollectMembers_SoundSource3D(members);
-    RegisterMembers(engine, "SoundSource3D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_SoundSource3D
         REGISTER_CLASS_MANUAL_PART_SoundSource3D();
@@ -8306,14 +7417,14 @@ static void Register_StaticModel(asIScriptEngine* engine)
     RegisterSubclass<Object, StaticModel>(engine, "Object", "StaticModel");
     RegisterSubclass<RefCounted, StaticModel>(engine, "RefCounted", "StaticModel");
 
-    MemberCollection members;
     RegisterMembers_StaticModel<StaticModel>(engine, "StaticModel");
-    CollectMembers_StaticModel(members);
-    RegisterMembers(engine, "StaticModel", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_StaticModel
         REGISTER_CLASS_MANUAL_PART_StaticModel();
     #endif
+
+    // virtual void StaticModel::SetModel(Model* model)
+    // Not registered because have @manualbind mark
 }
 
 // explicit TerrainPatch::TerrainPatch(Context* context)
@@ -8336,10 +7447,7 @@ static void Register_TerrainPatch(asIScriptEngine* engine)
     RegisterSubclass<Object, TerrainPatch>(engine, "Object", "TerrainPatch");
     RegisterSubclass<RefCounted, TerrainPatch>(engine, "RefCounted", "TerrainPatch");
 
-    MemberCollection members;
     RegisterMembers_TerrainPatch<TerrainPatch>(engine, "TerrainPatch");
-    CollectMembers_TerrainPatch(members);
-    RegisterMembers(engine, "TerrainPatch", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_TerrainPatch
         REGISTER_CLASS_MANUAL_PART_TerrainPatch();
@@ -8366,10 +7474,7 @@ static void Register_Text(asIScriptEngine* engine)
     RegisterSubclass<Object, Text>(engine, "Object", "Text");
     RegisterSubclass<RefCounted, Text>(engine, "RefCounted", "Text");
 
-    MemberCollection members;
     RegisterMembers_Text<Text>(engine, "Text");
-    CollectMembers_Text(members);
-    RegisterMembers(engine, "Text", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Text
         REGISTER_CLASS_MANUAL_PART_Text();
@@ -8396,10 +7501,7 @@ static void Register_Text3D(asIScriptEngine* engine)
     RegisterSubclass<Object, Text3D>(engine, "Object", "Text3D");
     RegisterSubclass<RefCounted, Text3D>(engine, "RefCounted", "Text3D");
 
-    MemberCollection members;
     RegisterMembers_Text3D<Text3D>(engine, "Text3D");
-    CollectMembers_Text3D(members);
-    RegisterMembers(engine, "Text3D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Text3D
         REGISTER_CLASS_MANUAL_PART_Text3D();
@@ -8426,10 +7528,7 @@ static void Register_Window(asIScriptEngine* engine)
     RegisterSubclass<Object, Window>(engine, "Object", "Window");
     RegisterSubclass<RefCounted, Window>(engine, "RefCounted", "Window");
 
-    MemberCollection members;
     RegisterMembers_Window<Window>(engine, "Window");
-    CollectMembers_Window(members);
-    RegisterMembers(engine, "Window", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Window
         REGISTER_CLASS_MANUAL_PART_Window();
@@ -8456,10 +7555,7 @@ static void Register_Zone(asIScriptEngine* engine)
     RegisterSubclass<Object, Zone>(engine, "Object", "Zone");
     RegisterSubclass<RefCounted, Zone>(engine, "RefCounted", "Zone");
 
-    MemberCollection members;
     RegisterMembers_Zone<Zone>(engine, "Zone");
-    CollectMembers_Zone(members);
-    RegisterMembers(engine, "Zone", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Zone
         REGISTER_CLASS_MANUAL_PART_Zone();
@@ -8488,10 +7584,7 @@ static void Register_DynamicNavigationMesh(asIScriptEngine* engine)
     RegisterSubclass<Object, DynamicNavigationMesh>(engine, "Object", "DynamicNavigationMesh");
     RegisterSubclass<RefCounted, DynamicNavigationMesh>(engine, "RefCounted", "DynamicNavigationMesh");
 
-    MemberCollection members;
     RegisterMembers_DynamicNavigationMesh<DynamicNavigationMesh>(engine, "DynamicNavigationMesh");
-    CollectMembers_DynamicNavigationMesh(members);
-    RegisterMembers(engine, "DynamicNavigationMesh", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_DynamicNavigationMesh
         REGISTER_CLASS_MANUAL_PART_DynamicNavigationMesh();
@@ -8515,10 +7608,7 @@ static void Register_RaycastVehicle(asIScriptEngine* engine)
     RegisterSubclass<Object, RaycastVehicle>(engine, "Object", "RaycastVehicle");
     RegisterSubclass<RefCounted, RaycastVehicle>(engine, "RefCounted", "RaycastVehicle");
 
-    MemberCollection members;
     RegisterMembers_RaycastVehicle<RaycastVehicle>(engine, "RaycastVehicle");
-    CollectMembers_RaycastVehicle(members);
-    RegisterMembers(engine, "RaycastVehicle", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_RaycastVehicle
         REGISTER_CLASS_MANUAL_PART_RaycastVehicle();
@@ -8549,10 +7639,7 @@ static void Register_CollisionBox2D(asIScriptEngine* engine)
     RegisterSubclass<Object, CollisionBox2D>(engine, "Object", "CollisionBox2D");
     RegisterSubclass<RefCounted, CollisionBox2D>(engine, "RefCounted", "CollisionBox2D");
 
-    MemberCollection members;
     RegisterMembers_CollisionBox2D<CollisionBox2D>(engine, "CollisionBox2D");
-    CollectMembers_CollisionBox2D(members);
-    RegisterMembers(engine, "CollisionBox2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_CollisionBox2D
         REGISTER_CLASS_MANUAL_PART_CollisionBox2D();
@@ -8579,10 +7666,7 @@ static void Register_CollisionChain2D(asIScriptEngine* engine)
     RegisterSubclass<Object, CollisionChain2D>(engine, "Object", "CollisionChain2D");
     RegisterSubclass<RefCounted, CollisionChain2D>(engine, "RefCounted", "CollisionChain2D");
 
-    MemberCollection members;
     RegisterMembers_CollisionChain2D<CollisionChain2D>(engine, "CollisionChain2D");
-    CollectMembers_CollisionChain2D(members);
-    RegisterMembers(engine, "CollisionChain2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_CollisionChain2D
         REGISTER_CLASS_MANUAL_PART_CollisionChain2D();
@@ -8609,10 +7693,7 @@ static void Register_CollisionCircle2D(asIScriptEngine* engine)
     RegisterSubclass<Object, CollisionCircle2D>(engine, "Object", "CollisionCircle2D");
     RegisterSubclass<RefCounted, CollisionCircle2D>(engine, "RefCounted", "CollisionCircle2D");
 
-    MemberCollection members;
     RegisterMembers_CollisionCircle2D<CollisionCircle2D>(engine, "CollisionCircle2D");
-    CollectMembers_CollisionCircle2D(members);
-    RegisterMembers(engine, "CollisionCircle2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_CollisionCircle2D
         REGISTER_CLASS_MANUAL_PART_CollisionCircle2D();
@@ -8639,10 +7720,7 @@ static void Register_CollisionEdge2D(asIScriptEngine* engine)
     RegisterSubclass<Object, CollisionEdge2D>(engine, "Object", "CollisionEdge2D");
     RegisterSubclass<RefCounted, CollisionEdge2D>(engine, "RefCounted", "CollisionEdge2D");
 
-    MemberCollection members;
     RegisterMembers_CollisionEdge2D<CollisionEdge2D>(engine, "CollisionEdge2D");
-    CollectMembers_CollisionEdge2D(members);
-    RegisterMembers(engine, "CollisionEdge2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_CollisionEdge2D
         REGISTER_CLASS_MANUAL_PART_CollisionEdge2D();
@@ -8669,10 +7747,7 @@ static void Register_CollisionPolygon2D(asIScriptEngine* engine)
     RegisterSubclass<Object, CollisionPolygon2D>(engine, "Object", "CollisionPolygon2D");
     RegisterSubclass<RefCounted, CollisionPolygon2D>(engine, "RefCounted", "CollisionPolygon2D");
 
-    MemberCollection members;
     RegisterMembers_CollisionPolygon2D<CollisionPolygon2D>(engine, "CollisionPolygon2D");
-    CollectMembers_CollisionPolygon2D(members);
-    RegisterMembers(engine, "CollisionPolygon2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_CollisionPolygon2D
         REGISTER_CLASS_MANUAL_PART_CollisionPolygon2D();
@@ -8699,10 +7774,7 @@ static void Register_ConstraintDistance2D(asIScriptEngine* engine)
     RegisterSubclass<Object, ConstraintDistance2D>(engine, "Object", "ConstraintDistance2D");
     RegisterSubclass<RefCounted, ConstraintDistance2D>(engine, "RefCounted", "ConstraintDistance2D");
 
-    MemberCollection members;
     RegisterMembers_ConstraintDistance2D<ConstraintDistance2D>(engine, "ConstraintDistance2D");
-    CollectMembers_ConstraintDistance2D(members);
-    RegisterMembers(engine, "ConstraintDistance2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ConstraintDistance2D
         REGISTER_CLASS_MANUAL_PART_ConstraintDistance2D();
@@ -8729,10 +7801,7 @@ static void Register_ConstraintFriction2D(asIScriptEngine* engine)
     RegisterSubclass<Object, ConstraintFriction2D>(engine, "Object", "ConstraintFriction2D");
     RegisterSubclass<RefCounted, ConstraintFriction2D>(engine, "RefCounted", "ConstraintFriction2D");
 
-    MemberCollection members;
     RegisterMembers_ConstraintFriction2D<ConstraintFriction2D>(engine, "ConstraintFriction2D");
-    CollectMembers_ConstraintFriction2D(members);
-    RegisterMembers(engine, "ConstraintFriction2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ConstraintFriction2D
         REGISTER_CLASS_MANUAL_PART_ConstraintFriction2D();
@@ -8759,10 +7828,7 @@ static void Register_ConstraintGear2D(asIScriptEngine* engine)
     RegisterSubclass<Object, ConstraintGear2D>(engine, "Object", "ConstraintGear2D");
     RegisterSubclass<RefCounted, ConstraintGear2D>(engine, "RefCounted", "ConstraintGear2D");
 
-    MemberCollection members;
     RegisterMembers_ConstraintGear2D<ConstraintGear2D>(engine, "ConstraintGear2D");
-    CollectMembers_ConstraintGear2D(members);
-    RegisterMembers(engine, "ConstraintGear2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ConstraintGear2D
         REGISTER_CLASS_MANUAL_PART_ConstraintGear2D();
@@ -8789,10 +7855,7 @@ static void Register_ConstraintMotor2D(asIScriptEngine* engine)
     RegisterSubclass<Object, ConstraintMotor2D>(engine, "Object", "ConstraintMotor2D");
     RegisterSubclass<RefCounted, ConstraintMotor2D>(engine, "RefCounted", "ConstraintMotor2D");
 
-    MemberCollection members;
     RegisterMembers_ConstraintMotor2D<ConstraintMotor2D>(engine, "ConstraintMotor2D");
-    CollectMembers_ConstraintMotor2D(members);
-    RegisterMembers(engine, "ConstraintMotor2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ConstraintMotor2D
         REGISTER_CLASS_MANUAL_PART_ConstraintMotor2D();
@@ -8819,10 +7882,7 @@ static void Register_ConstraintMouse2D(asIScriptEngine* engine)
     RegisterSubclass<Object, ConstraintMouse2D>(engine, "Object", "ConstraintMouse2D");
     RegisterSubclass<RefCounted, ConstraintMouse2D>(engine, "RefCounted", "ConstraintMouse2D");
 
-    MemberCollection members;
     RegisterMembers_ConstraintMouse2D<ConstraintMouse2D>(engine, "ConstraintMouse2D");
-    CollectMembers_ConstraintMouse2D(members);
-    RegisterMembers(engine, "ConstraintMouse2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ConstraintMouse2D
         REGISTER_CLASS_MANUAL_PART_ConstraintMouse2D();
@@ -8849,10 +7909,7 @@ static void Register_ConstraintPrismatic2D(asIScriptEngine* engine)
     RegisterSubclass<Object, ConstraintPrismatic2D>(engine, "Object", "ConstraintPrismatic2D");
     RegisterSubclass<RefCounted, ConstraintPrismatic2D>(engine, "RefCounted", "ConstraintPrismatic2D");
 
-    MemberCollection members;
     RegisterMembers_ConstraintPrismatic2D<ConstraintPrismatic2D>(engine, "ConstraintPrismatic2D");
-    CollectMembers_ConstraintPrismatic2D(members);
-    RegisterMembers(engine, "ConstraintPrismatic2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ConstraintPrismatic2D
         REGISTER_CLASS_MANUAL_PART_ConstraintPrismatic2D();
@@ -8879,10 +7936,7 @@ static void Register_ConstraintPulley2D(asIScriptEngine* engine)
     RegisterSubclass<Object, ConstraintPulley2D>(engine, "Object", "ConstraintPulley2D");
     RegisterSubclass<RefCounted, ConstraintPulley2D>(engine, "RefCounted", "ConstraintPulley2D");
 
-    MemberCollection members;
     RegisterMembers_ConstraintPulley2D<ConstraintPulley2D>(engine, "ConstraintPulley2D");
-    CollectMembers_ConstraintPulley2D(members);
-    RegisterMembers(engine, "ConstraintPulley2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ConstraintPulley2D
         REGISTER_CLASS_MANUAL_PART_ConstraintPulley2D();
@@ -8909,10 +7963,7 @@ static void Register_ConstraintRevolute2D(asIScriptEngine* engine)
     RegisterSubclass<Object, ConstraintRevolute2D>(engine, "Object", "ConstraintRevolute2D");
     RegisterSubclass<RefCounted, ConstraintRevolute2D>(engine, "RefCounted", "ConstraintRevolute2D");
 
-    MemberCollection members;
     RegisterMembers_ConstraintRevolute2D<ConstraintRevolute2D>(engine, "ConstraintRevolute2D");
-    CollectMembers_ConstraintRevolute2D(members);
-    RegisterMembers(engine, "ConstraintRevolute2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ConstraintRevolute2D
         REGISTER_CLASS_MANUAL_PART_ConstraintRevolute2D();
@@ -8939,10 +7990,7 @@ static void Register_ConstraintRope2D(asIScriptEngine* engine)
     RegisterSubclass<Object, ConstraintRope2D>(engine, "Object", "ConstraintRope2D");
     RegisterSubclass<RefCounted, ConstraintRope2D>(engine, "RefCounted", "ConstraintRope2D");
 
-    MemberCollection members;
     RegisterMembers_ConstraintRope2D<ConstraintRope2D>(engine, "ConstraintRope2D");
-    CollectMembers_ConstraintRope2D(members);
-    RegisterMembers(engine, "ConstraintRope2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ConstraintRope2D
         REGISTER_CLASS_MANUAL_PART_ConstraintRope2D();
@@ -8969,10 +8017,7 @@ static void Register_ConstraintWeld2D(asIScriptEngine* engine)
     RegisterSubclass<Object, ConstraintWeld2D>(engine, "Object", "ConstraintWeld2D");
     RegisterSubclass<RefCounted, ConstraintWeld2D>(engine, "RefCounted", "ConstraintWeld2D");
 
-    MemberCollection members;
     RegisterMembers_ConstraintWeld2D<ConstraintWeld2D>(engine, "ConstraintWeld2D");
-    CollectMembers_ConstraintWeld2D(members);
-    RegisterMembers(engine, "ConstraintWeld2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ConstraintWeld2D
         REGISTER_CLASS_MANUAL_PART_ConstraintWeld2D();
@@ -8999,10 +8044,7 @@ static void Register_ConstraintWheel2D(asIScriptEngine* engine)
     RegisterSubclass<Object, ConstraintWheel2D>(engine, "Object", "ConstraintWheel2D");
     RegisterSubclass<RefCounted, ConstraintWheel2D>(engine, "RefCounted", "ConstraintWheel2D");
 
-    MemberCollection members;
     RegisterMembers_ConstraintWheel2D<ConstraintWheel2D>(engine, "ConstraintWheel2D");
-    CollectMembers_ConstraintWheel2D(members);
-    RegisterMembers(engine, "ConstraintWheel2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ConstraintWheel2D
         REGISTER_CLASS_MANUAL_PART_ConstraintWheel2D();
@@ -9019,10 +8061,7 @@ static void Register_Drawable2D(asIScriptEngine* engine)
     RegisterSubclass<Object, Drawable2D>(engine, "Object", "Drawable2D");
     RegisterSubclass<RefCounted, Drawable2D>(engine, "RefCounted", "Drawable2D");
 
-    MemberCollection members;
     RegisterMembers_Drawable2D<Drawable2D>(engine, "Drawable2D");
-    CollectMembers_Drawable2D(members);
-    RegisterMembers(engine, "Drawable2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Drawable2D
         REGISTER_CLASS_MANUAL_PART_Drawable2D();
@@ -9052,10 +8091,7 @@ static void Register_Renderer2D(asIScriptEngine* engine)
     RegisterSubclass<Object, Renderer2D>(engine, "Object", "Renderer2D");
     RegisterSubclass<RefCounted, Renderer2D>(engine, "RefCounted", "Renderer2D");
 
-    MemberCollection members;
     RegisterMembers_Renderer2D<Renderer2D>(engine, "Renderer2D");
-    CollectMembers_Renderer2D(members);
-    RegisterMembers(engine, "Renderer2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Renderer2D
         REGISTER_CLASS_MANUAL_PART_Renderer2D();
@@ -9085,10 +8121,7 @@ static void Register_AnimatedModel(asIScriptEngine* engine)
     RegisterSubclass<Object, AnimatedModel>(engine, "Object", "AnimatedModel");
     RegisterSubclass<RefCounted, AnimatedModel>(engine, "RefCounted", "AnimatedModel");
 
-    MemberCollection members;
     RegisterMembers_AnimatedModel<AnimatedModel>(engine, "AnimatedModel");
-    CollectMembers_AnimatedModel(members);
-    RegisterMembers(engine, "AnimatedModel", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_AnimatedModel
         REGISTER_CLASS_MANUAL_PART_AnimatedModel();
@@ -9116,10 +8149,7 @@ static void Register_Menu(asIScriptEngine* engine)
     RegisterSubclass<Object, Menu>(engine, "Object", "Menu");
     RegisterSubclass<RefCounted, Menu>(engine, "RefCounted", "Menu");
 
-    MemberCollection members;
     RegisterMembers_Menu<Menu>(engine, "Menu");
-    CollectMembers_Menu(members);
-    RegisterMembers(engine, "Menu", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Menu
         REGISTER_CLASS_MANUAL_PART_Menu();
@@ -9147,10 +8177,7 @@ static void Register_ParticleEmitter(asIScriptEngine* engine)
     RegisterSubclass<Object, ParticleEmitter>(engine, "Object", "ParticleEmitter");
     RegisterSubclass<RefCounted, ParticleEmitter>(engine, "RefCounted", "ParticleEmitter");
 
-    MemberCollection members;
     RegisterMembers_ParticleEmitter<ParticleEmitter>(engine, "ParticleEmitter");
-    CollectMembers_ParticleEmitter(members);
-    RegisterMembers(engine, "ParticleEmitter", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ParticleEmitter
         REGISTER_CLASS_MANUAL_PART_ParticleEmitter();
@@ -9178,10 +8205,7 @@ static void Register_Skybox(asIScriptEngine* engine)
     RegisterSubclass<Object, Skybox>(engine, "Object", "Skybox");
     RegisterSubclass<RefCounted, Skybox>(engine, "RefCounted", "Skybox");
 
-    MemberCollection members;
     RegisterMembers_Skybox<Skybox>(engine, "Skybox");
-    CollectMembers_Skybox(members);
-    RegisterMembers(engine, "Skybox", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Skybox
         REGISTER_CLASS_MANUAL_PART_Skybox();
@@ -9209,10 +8233,7 @@ static void Register_StaticModelGroup(asIScriptEngine* engine)
     RegisterSubclass<Object, StaticModelGroup>(engine, "Object", "StaticModelGroup");
     RegisterSubclass<RefCounted, StaticModelGroup>(engine, "RefCounted", "StaticModelGroup");
 
-    MemberCollection members;
     RegisterMembers_StaticModelGroup<StaticModelGroup>(engine, "StaticModelGroup");
-    CollectMembers_StaticModelGroup(members);
-    RegisterMembers(engine, "StaticModelGroup", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_StaticModelGroup
         REGISTER_CLASS_MANUAL_PART_StaticModelGroup();
@@ -9240,10 +8261,7 @@ static void Register_View3D(asIScriptEngine* engine)
     RegisterSubclass<Object, View3D>(engine, "Object", "View3D");
     RegisterSubclass<RefCounted, View3D>(engine, "RefCounted", "View3D");
 
-    MemberCollection members;
     RegisterMembers_View3D<View3D>(engine, "View3D");
-    CollectMembers_View3D(members);
-    RegisterMembers(engine, "View3D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_View3D
         REGISTER_CLASS_MANUAL_PART_View3D();
@@ -9273,10 +8291,7 @@ static void Register_ParticleEmitter2D(asIScriptEngine* engine)
     RegisterSubclass<Object, ParticleEmitter2D>(engine, "Object", "ParticleEmitter2D");
     RegisterSubclass<RefCounted, ParticleEmitter2D>(engine, "RefCounted", "ParticleEmitter2D");
 
-    MemberCollection members;
     RegisterMembers_ParticleEmitter2D<ParticleEmitter2D>(engine, "ParticleEmitter2D");
-    CollectMembers_ParticleEmitter2D(members);
-    RegisterMembers(engine, "ParticleEmitter2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_ParticleEmitter2D
         REGISTER_CLASS_MANUAL_PART_ParticleEmitter2D();
@@ -9304,10 +8319,7 @@ static void Register_StaticSprite2D(asIScriptEngine* engine)
     RegisterSubclass<Object, StaticSprite2D>(engine, "Object", "StaticSprite2D");
     RegisterSubclass<RefCounted, StaticSprite2D>(engine, "RefCounted", "StaticSprite2D");
 
-    MemberCollection members;
     RegisterMembers_StaticSprite2D<StaticSprite2D>(engine, "StaticSprite2D");
-    CollectMembers_StaticSprite2D(members);
-    RegisterMembers(engine, "StaticSprite2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_StaticSprite2D
         REGISTER_CLASS_MANUAL_PART_StaticSprite2D();
@@ -9338,10 +8350,7 @@ static void Register_DropDownList(asIScriptEngine* engine)
     RegisterSubclass<Object, DropDownList>(engine, "Object", "DropDownList");
     RegisterSubclass<RefCounted, DropDownList>(engine, "RefCounted", "DropDownList");
 
-    MemberCollection members;
     RegisterMembers_DropDownList<DropDownList>(engine, "DropDownList");
-    CollectMembers_DropDownList(members);
-    RegisterMembers(engine, "DropDownList", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_DropDownList
         REGISTER_CLASS_MANUAL_PART_DropDownList();
@@ -9372,10 +8381,7 @@ static void Register_AnimatedSprite2D(asIScriptEngine* engine)
     RegisterSubclass<Object, AnimatedSprite2D>(engine, "Object", "AnimatedSprite2D");
     RegisterSubclass<RefCounted, AnimatedSprite2D>(engine, "RefCounted", "AnimatedSprite2D");
 
-    MemberCollection members;
     RegisterMembers_AnimatedSprite2D<AnimatedSprite2D>(engine, "AnimatedSprite2D");
-    CollectMembers_AnimatedSprite2D(members);
-    RegisterMembers(engine, "AnimatedSprite2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_AnimatedSprite2D
         REGISTER_CLASS_MANUAL_PART_AnimatedSprite2D();
@@ -9404,10 +8410,7 @@ static void Register_StretchableSprite2D(asIScriptEngine* engine)
     RegisterSubclass<Object, StretchableSprite2D>(engine, "Object", "StretchableSprite2D");
     RegisterSubclass<RefCounted, StretchableSprite2D>(engine, "RefCounted", "StretchableSprite2D");
 
-    MemberCollection members;
     RegisterMembers_StretchableSprite2D<StretchableSprite2D>(engine, "StretchableSprite2D");
-    CollectMembers_StretchableSprite2D(members);
-    RegisterMembers(engine, "StretchableSprite2D", members);
 
     #ifdef REGISTER_CLASS_MANUAL_PART_StretchableSprite2D
         REGISTER_CLASS_MANUAL_PART_StretchableSprite2D();

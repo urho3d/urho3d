@@ -231,19 +231,19 @@ struct ProcessedClass
 
     vector<MemberRegistrationError> unregisteredSpecialMethods_;
 
-    vector<MethodRegistration> methods_;
-    vector<MemberRegistrationError> unregisteredMethods_;
+    //vector<MethodRegistration> methods_;
 
-    vector<StaticMethodRegistration> staticMethods_;
-    vector<MemberRegistrationError> unregisteredStaticMethods_;
 
-    vector<FieldRegistration> fields_;
-    vector<MemberRegistrationError> unregisteredFields_;
+    //vector<StaticMethodRegistration> staticMethods_;
+    //vector<MemberRegistrationError> unregisteredStaticMethods_;
 
-    vector<MethodRegistration> wrappedFields_;
+    //vector<FieldRegistration> fields_;
+    //vector<MemberRegistrationError> unregisteredFields_;
 
-    vector<StaticFieldRegistration> staticFields_;
-    vector<MemberRegistrationError> unregisteredStaticFields_;
+    //vector<MethodRegistration> wrappedFields_;
+
+    //vector<StaticFieldRegistration> staticFields_;
+    //vector<MemberRegistrationError> unregisteredStaticFields_;
 
     vector<string> additionalLines_;
 
@@ -253,22 +253,30 @@ struct ProcessedClass
     vector<string> subclassRegistrations_;
 
     // Base class members that were hidden in this class (c++ declarations)
-    vector<string> hiddenMethods_;
+    /*vector<string> hiddenMethods_;
     vector<string> hiddenStaticMethods_;
     vector<string> hiddenFields_;
-    vector<string> hiddenStaticFields_;
+    vector<string> hiddenStaticFields_;*/
 
-    vector<Registration> personalMethods_;
     vector<Registration> templateMethods_;
+    vector<MemberRegistrationError> unregisteredTemplateMethods_;
+    vector<Registration> personalMethods_;
+    vector<MemberRegistrationError> unregisteredPersonalMethods_;
 
-    vector<Registration> personalStaticMethods_;
     vector<Registration> templateStaticMethods_;
-
+    vector<MemberRegistrationError> unregisteredTemplateStaticMethods_;
+    vector<Registration> personalStaticMethods_;
+    vector<MemberRegistrationError> unregisteredPersonalStaticMethods_;
+    
     vector<Registration> personalFields_;
+    vector<MemberRegistrationError> unregisteredPersonalFields_;
     vector<Registration> templateFields_;
+    vector<MemberRegistrationError> unregisteredTemplateFields_;
 
     vector<Registration> personalStaticFields_;
+    vector<MemberRegistrationError> unregisteredPersonalStaticFields_;
     vector<Registration> templateStaticFields_;
+    vector<MemberRegistrationError> unregisteredTemplateStaticFields_;
 };
 
 namespace Result

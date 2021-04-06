@@ -379,13 +379,17 @@ static string GetSignature(const MethodAnalyzer& method)
     for (xml_node param : memberdef.children("param"))
         result += RemoveRefs(param.child("type")) + '|';
 
+    if (method.IsStatic())
+        result += "static" + result;
+
     return result;
 }
 
 struct ClassMemeberSignatures
 {
-    unordered_set<string> methods_;
-    unordered_set<string> hiddenInAnyDerivedClassesMethods_;
+    unordered_set<string> methods_; // Signatures of all nonstatic public methods (including inherited)
+    unordered_map<string, vector<string>> hiddenInAnyDerivedClassesMethods_; // method signature -> derived class names
+    unordered_map<string, vector<string>> existsInBaseClassesMethods_; // method signature -> base class names
 };
 
 static unordered_map<string, shared_ptr<ClassMemeberSignatures>> _cachedMemberSignatures; // className -> signatures
@@ -418,20 +422,39 @@ static void InitCachedMemberSignatures()
         string className = classAnalyzer.GetClassName();
         shared_ptr<ClassMemeberSignatures> classData = _cachedMemberSignatures[classAnalyzer.GetClassName()];
         vector<MethodAnalyzer> methods = classAnalyzer.GetAllPublicMethods();
+        vector<ClassAnalyzer> allDerivedClasses = classAnalyzer.GetAllDerivedClasses();
+        vector<ClassAnalyzer> baseClasses = classAnalyzer.GetBaseClasses();
         for (const MethodAnalyzer& method : methods)
         {
             string methodSignature = GetSignature(method);
-            vector<ClassAnalyzer> derivedClasses = method.GetClass().GetAllDerivedClasses();
-            for (const ClassAnalyzer& derivedClass : derivedClasses)
+
+            vector<string> hiddenInderivedClasses;
+            
+            for (const ClassAnalyzer& derivedClass : allDerivedClasses)
             {
-                if (!ContainsSameSignature(derivedClass.GetClassName(), methodSignature))
-                {
-                    classData->hiddenInAnyDerivedClassesMethods_.insert(methodSignature);
-                    break;
-                }
+                string derivedClassName = derivedClass.GetClassName();
+                if (!ContainsSameSignature(derivedClassName, methodSignature))
+                    hiddenInderivedClasses.push_back(derivedClassName);
             }
+
+            if (hiddenInderivedClasses.size())
+                classData->hiddenInAnyDerivedClassesMethods_[methodSignature] = hiddenInderivedClasses;
+
+            vector<string> existInBaseClasses;
+
+            for (const ClassAnalyzer& baseClass : baseClasses)
+            {
+                string baseClassName = baseClass.GetClassName();
+                if (ContainsSameSignature(baseClassName, methodSignature))
+                    existInBaseClasses.push_back(baseClassName);
+            }
+
+            if (existInBaseClasses.size())
+                classData->existsInBaseClassesMethods_[methodSignature] = existInBaseClasses;
         }
     }
+
+
 }
 
 /*static bool ContainsSameSignature(const ClassAnalyzer& classAnalyzer, const MethodAnalyzer& method)
@@ -449,7 +472,7 @@ static void InitCachedMemberSignatures()
 
 
 
-static bool HiddenInAnyDerivedClasses(const MethodAnalyzer& method)
+static vector<string> HiddenInAnyDerivedClasses(const MethodAnalyzer& method)
 {
     /*vector<string> result;
 
@@ -465,12 +488,17 @@ static bool HiddenInAnyDerivedClasses(const MethodAnalyzer& method)
 
     return result;*/
     string classname = method.GetClassName();
-    shared_ptr<ClassMemeberSignatures> classData = _cachedMemberSignatures[classname];
     string methodSignature = GetSignature(method);
-    return classData->hiddenInAnyDerivedClassesMethods_.find(methodSignature) != classData->hiddenInAnyDerivedClassesMethods_.end();
+    shared_ptr<ClassMemeberSignatures> classData = _cachedMemberSignatures[classname];
+
+    auto it = classData->hiddenInAnyDerivedClassesMethods_.find(methodSignature);
+    if (it == classData->hiddenInAnyDerivedClassesMethods_.end())
+        return vector<string>();
+    else
+        return it->second;
 }
 
-static bool HiddenInAnyDerivedClasses(const MethodAnalyzer& method, const ClassAnalyzer& classAnalyzer)
+static vector<string> HiddenInAnyDerivedClasses(const MethodAnalyzer& method, const ClassAnalyzer& classAnalyzer)
 {
     /*vector<string> result;
 
@@ -484,42 +512,70 @@ static bool HiddenInAnyDerivedClasses(const MethodAnalyzer& method, const ClassA
     }
 
     return result;*/
+
     string classname = classAnalyzer.GetClassName();
-    shared_ptr<ClassMemeberSignatures> classData = _cachedMemberSignatures[classname];
     string methodSignature = GetSignature(method);
-    return classData->hiddenInAnyDerivedClassesMethods_.find(methodSignature) != classData->hiddenInAnyDerivedClassesMethods_.end();
+    shared_ptr<ClassMemeberSignatures> classData = _cachedMemberSignatures[classname];
+
+    auto it = classData->hiddenInAnyDerivedClassesMethods_.find(methodSignature);
+    if (it == classData->hiddenInAnyDerivedClassesMethods_.end())
+        return vector<string>();
+    else
+        return it->second;
 }
 
 static vector<string> ExistsInBaseClasses(const MethodAnalyzer& method)
 {
-    vector<string> result;
+    /*vector<string> result;
 
     vector<ClassAnalyzer> baseClasses = method.GetClass().GetBaseClasses();
+    string methodSignature = GetSignature(method);
     for (const ClassAnalyzer& baseClass : baseClasses)
     {
         //if (ContainsSameSignature(baseClass, method))
         //    result.push_back(baseClass.GetClassName());
-        if (ContainsSameSignature(baseClass.GetClassName(), GetSignature(method)))
+        if (ContainsSameSignature(baseClass.GetClassName(), methodSignature))
             result.push_back(baseClass.GetClassName());
     }
 
-    return result;
+    return result;*/
+
+    string classname = method.GetClassName();
+    string methodSignature = GetSignature(method);
+    shared_ptr<ClassMemeberSignatures> classData = _cachedMemberSignatures[classname];
+    
+    auto it = classData->existsInBaseClassesMethods_.find(methodSignature);
+    if (it == classData->existsInBaseClassesMethods_.end())
+        return vector<string>();
+    else
+        return it->second;
 }
 
 static vector<string> ExistsInBaseClasses(const MethodAnalyzer& method, const ClassAnalyzer& classAnalyzer)
 {
-    vector<string> result;
+    /*vector<string> result;
 
     vector<ClassAnalyzer> baseClasses = classAnalyzer.GetBaseClasses();
+    string methodSignature = GetSignature(method);
     for (const ClassAnalyzer& baseClass : baseClasses)
     {
         //if (ContainsSameSignature(baseClass, method))
         //    result.push_back(baseClass.GetClassName());
-        if (ContainsSameSignature(baseClass.GetClassName(), GetSignature(method)))
+        if (ContainsSameSignature(baseClass.GetClassName(), methodSignature))
             result.push_back(baseClass.GetClassName());
     }
 
-    return result;
+    return result;*/
+
+    string classname = classAnalyzer.GetClassName();
+    string methodSignature = GetSignature(method);
+    shared_ptr<ClassMemeberSignatures> classData = _cachedMemberSignatures[classname];
+
+    auto it = classData->existsInBaseClassesMethods_.find(methodSignature);
+    if (it == classData->existsInBaseClassesMethods_.end())
+        return vector<string>();
+    else
+        return it->second;
 }
 
 // Returns names of derived class that has base classes with the same method signature
@@ -570,24 +626,40 @@ static void RegisterMethod(const MethodAnalyzer& methodAnalyzer, ProcessedClass&
 
     vector<string> existsInBaseClasses = ExistsInBaseClasses(methodAnalyzer);
 
-    bool regInTemplate = true;
 
     if (existsInBaseClasses.size() == 1)
     {
         shared_ptr<ClassAnalyzer> baseClass = FindClassByName(existsInBaseClasses[0]);
-        if (!HiddenInAnyDerivedClasses(methodAnalyzer, *baseClass) && FindConflicts(methodAnalyzer, *baseClass).empty())
+        if (HiddenInAnyDerivedClasses(methodAnalyzer, *baseClass).empty() && FindConflicts(methodAnalyzer, *baseClass).empty())
             return; // Already registered in template of base class
     }
 
-    bool hiddenInDerivedClasses = HiddenInAnyDerivedClasses(methodAnalyzer);
+    bool regInTemplate = true;
 
-    if (hiddenInDerivedClasses)
+    vector<string> hiddenInDerivedClasses = HiddenInAnyDerivedClasses(methodAnalyzer);
+
+    if (!hiddenInDerivedClasses.empty())
+    {
+        if (methodAnalyzer.IsThisMethod())
+        {
+            MemberRegistrationError msg;
+            msg.name_ = methodAnalyzer.GetName();
+            msg.comment_ = methodAnalyzer.GetDeclaration();
+            msg.message_ = "Can not be registered here bacause hidden in derived classes: " + Join(hiddenInDerivedClasses, ", ");
+            processedClass.unregisteredTemplateMethods_.push_back(msg);
+        }
+
         regInTemplate = false; // Impossible register in template
+    }
 
-    string conflict = FindConflicts(methodAnalyzer);
+    if (regInTemplate) // Additional check
+    {
 
-    if (!conflict.empty())
-        regInTemplate = false; // Impossible register in tempalte
+        string conflict = FindConflicts(methodAnalyzer);
+
+        if (!conflict.empty())
+            regInTemplate = false; // Impossible register in tempalte
+    }
 
     // ====================================================
     // END
@@ -598,7 +670,11 @@ static void RegisterMethod(const MethodAnalyzer& methodAnalyzer, ProcessedClass&
         regError.name_ = methodAnalyzer.GetName();
         regError.comment_ = methodAnalyzer.GetDeclaration();
         regError.message_ = "Not registered because template";
-        processedClass.unregisteredStaticMethods_.push_back(regError);
+
+        if (regInTemplate)
+            processedClass.unregisteredTemplateStaticMethods_.push_back(regError);
+        else
+            processedClass.unregisteredPersonalStaticMethods_.push_back(regError);
         return;
     }
 
@@ -608,7 +684,11 @@ static void RegisterMethod(const MethodAnalyzer& methodAnalyzer, ProcessedClass&
         regError.name_ = methodAnalyzer.GetName();
         regError.comment_ = methodAnalyzer.GetDeclaration();
         regError.message_ = "Not registered because deleted";
-        processedClass.unregisteredStaticMethods_.push_back(regError);
+        if (regInTemplate)
+            processedClass.unregisteredTemplateStaticMethods_.push_back(regError);
+        else
+            processedClass.unregisteredPersonalStaticMethods_.push_back(regError);
+
         return;
     }
 
@@ -620,7 +700,11 @@ static void RegisterMethod(const MethodAnalyzer& methodAnalyzer, ProcessedClass&
             regError.name_ = methodAnalyzer.GetName();
             regError.comment_ = methodAnalyzer.GetDeclaration();
             regError.message_ = "Not registered because have @nobind mark";
-            processedClass.unregisteredStaticMethods_.push_back(regError);
+            if (regInTemplate)
+                processedClass.unregisteredTemplateStaticMethods_.push_back(regError);
+            else
+                processedClass.unregisteredPersonalStaticMethods_.push_back(regError);
+
             return;
         }
 
@@ -630,7 +714,11 @@ static void RegisterMethod(const MethodAnalyzer& methodAnalyzer, ProcessedClass&
             regError.name_ = methodAnalyzer.GetName();
             regError.comment_ = methodAnalyzer.GetDeclaration();
             regError.message_ = "Not registered because have @manualbind mark";
-            processedClass.unregisteredStaticMethods_.push_back(regError);
+            if (regInTemplate)
+                processedClass.unregisteredTemplateStaticMethods_.push_back(regError);
+            else
+                processedClass.unregisteredPersonalStaticMethods_.push_back(regError);
+
             return;
         }
 
@@ -654,7 +742,11 @@ static void RegisterMethod(const MethodAnalyzer& methodAnalyzer, ProcessedClass&
                 regError.name_ = staticMethodAnalyzer.GetName();
                 regError.comment_ = methodAnalyzer.GetDeclaration();
                 regError.message_ = e.what();
-                processedClass.unregisteredStaticMethods_.push_back(regError);
+                if (regInTemplate)
+                    processedClass.unregisteredTemplateStaticMethods_.push_back(regError);
+                else
+                    processedClass.unregisteredPersonalStaticMethods_.push_back(regError);
+
                 return;
             }
 
@@ -676,7 +768,11 @@ static void RegisterMethod(const MethodAnalyzer& methodAnalyzer, ProcessedClass&
             regError.name_ = staticMethodAnalyzer.GetName();
             regError.comment_ = methodAnalyzer.GetDeclaration();
             regError.message_ = e.what();
-            processedClass.unregisteredStaticMethods_.push_back(regError);
+            if (regInTemplate)
+                processedClass.unregisteredTemplateStaticMethods_.push_back(regError);
+            else
+                processedClass.unregisteredPersonalStaticMethods_.push_back(regError);
+
             return;
         }
 
@@ -769,7 +865,10 @@ static void RegisterMethod(const MethodAnalyzer& methodAnalyzer, ProcessedClass&
         regError.name_ = methodAnalyzer.GetName();
         regError.comment_ = methodAnalyzer.GetDeclaration();
         regError.message_ = "Not registered because have @nobind mark";
-        processedClass.unregisteredMethods_.push_back(regError);
+        if (regInTemplate)
+            processedClass.unregisteredTemplateMethods_.push_back(regError);
+        else
+            processedClass.unregisteredPersonalMethods_.push_back(regError);
         return;
     }
 
@@ -779,7 +878,10 @@ static void RegisterMethod(const MethodAnalyzer& methodAnalyzer, ProcessedClass&
         regError.name_ = methodAnalyzer.GetName();
         regError.comment_ = methodAnalyzer.GetDeclaration();
         regError.message_ = "Not registered because have @manualbind mark";
-        processedClass.unregisteredMethods_.push_back(regError);
+        if (regInTemplate)
+            processedClass.unregisteredTemplateMethods_.push_back(regError);
+        else
+            processedClass.unregisteredPersonalMethods_.push_back(regError);
         return;
     }
 
@@ -801,7 +903,11 @@ static void RegisterMethod(const MethodAnalyzer& methodAnalyzer, ProcessedClass&
             regError.name_ = methodAnalyzer.GetName();
             regError.comment_ = methodAnalyzer.GetDeclaration();
             regError.message_ = e.what();
-            processedClass.unregisteredMethods_.push_back(regError);
+            if (regInTemplate)
+                processedClass.unregisteredTemplateMethods_.push_back(regError);
+            else
+                processedClass.unregisteredPersonalMethods_.push_back(regError);
+
             return;
         }
 
@@ -823,7 +929,11 @@ static void RegisterMethod(const MethodAnalyzer& methodAnalyzer, ProcessedClass&
         regError.name_ = methodAnalyzer.GetName();
         regError.comment_ = methodAnalyzer.GetDeclaration();
         regError.message_ = e.what();
-        processedClass.unregisteredMethods_.push_back(regError);
+        if (regInTemplate)
+            processedClass.unregisteredTemplateMethods_.push_back(regError);
+        else
+            processedClass.unregisteredPersonalMethods_.push_back(regError);
+
         return;
     }
 
@@ -846,7 +956,11 @@ static void RegisterMethod(const MethodAnalyzer& methodAnalyzer, ProcessedClass&
         regError.name_ = methodAnalyzer.GetName();
         regError.comment_ = methodAnalyzer.GetDeclaration();
         regError.message_ = e.what();
-        processedClass.unregisteredMethods_.push_back(regError);
+        if (regInTemplate)
+            processedClass.unregisteredTemplateMethods_.push_back(regError);
+        else
+            processedClass.unregisteredPersonalMethods_.push_back(regError);
+
         return;
     }
 
@@ -921,7 +1035,11 @@ static void RegisterMethod(const MethodAnalyzer& methodAnalyzer, ProcessedClass&
                 regError.name_ = methodAnalyzer.GetName();
                 regError.comment_ = methodAnalyzer.GetDeclaration();
                 regError.message_ = e.what();
-                processedClass.unregisteredMethods_.push_back(regError);
+                if (regInTemplate)
+                    processedClass.unregisteredTemplateMethods_.push_back(regError);
+                else
+                    processedClass.unregisteredPersonalMethods_.push_back(regError);
+
                 return;
             }
         }
@@ -957,7 +1075,7 @@ static void RegisterField(const FieldAnalyzer& fieldAnalyzer, ProcessedClass& pr
         regError.name_ = fieldAnalyzer.GetName();
         regError.comment_ = fieldAnalyzer.GetDeclaration();
         regError.message_ = "Not registered because have @nobind mark";
-        processedClass.unregisteredFields_.push_back(regError);
+        processedClass.unregisteredTemplateFields_.push_back(regError);
         return;
     }
 
@@ -967,7 +1085,7 @@ static void RegisterField(const FieldAnalyzer& fieldAnalyzer, ProcessedClass& pr
         regError.name_ = fieldAnalyzer.GetName();
         regError.comment_ = fieldAnalyzer.GetDeclaration();
         regError.message_ = "Not registered because have @manualbind mark";
-        processedClass.unregisteredFields_.push_back(regError);
+        processedClass.unregisteredTemplateFields_.push_back(regError);
         return;
     }
 
@@ -985,7 +1103,7 @@ static void RegisterField(const FieldAnalyzer& fieldAnalyzer, ProcessedClass& pr
             regError.name_ = fieldAnalyzer.GetName();
             regError.comment_ = fieldAnalyzer.GetDeclaration();
             regError.message_ = e.what();
-            processedClass.unregisteredStaticFields_.push_back(regError);
+            processedClass.unregisteredTemplateStaticFields_.push_back(regError);
             return;
         }
 
@@ -997,13 +1115,23 @@ static void RegisterField(const FieldAnalyzer& fieldAnalyzer, ProcessedClass& pr
         string cppClassName = fieldAnalyzer.GetClassName();
         string asPropertyName = fieldAnalyzer.GetName();
 
-        StaticFieldRegistration result;
+        /*StaticFieldRegistration result;
         result.cppDeclaration_ = fieldAnalyzer.GetDeclaration();
         result.name_ = fieldAnalyzer.GetName();
         result.registration_.asDeclarations_.push_back(asType + " " + asPropertyName);
         result.registration_.pointer_ = "(void*)&" + cppClassName + "::" + fieldAnalyzer.GetName();
 
         processedClass.staticFields_.push_back(result);
+        */
+
+        Registration reg;
+        reg.comment_ = fieldAnalyzer.GetDeclaration();
+        reg.registration_.push_back(
+            "engine->SetDefaultNamespace(className);"
+            "engine->RegisterGlobalProperty(\"" + asType + " " + asPropertyName + "\", " + "(void*)&T::" + fieldAnalyzer.GetName() + ");"
+            "engine->SetDefaultNamespace(\"\");");
+
+        processedClass.templateStaticFields_.push_back(reg);
     }
     else
     {
@@ -1013,7 +1141,7 @@ static void RegisterField(const FieldAnalyzer& fieldAnalyzer, ProcessedClass& pr
             regError.name_ = fieldAnalyzer.GetName();
             regError.comment_ = fieldAnalyzer.GetDeclaration();
             regError.message_ = "Not registered because array";
-            processedClass.unregisteredFields_.push_back(regError);
+            processedClass.unregisteredTemplateFields_.push_back(regError);
             return;
         }
 
@@ -1023,7 +1151,7 @@ static void RegisterField(const FieldAnalyzer& fieldAnalyzer, ProcessedClass& pr
             regError.name_ = fieldAnalyzer.GetName();
             regError.comment_ = fieldAnalyzer.GetDeclaration();
             regError.message_ = "Not registered because pointer";
-            processedClass.unregisteredFields_.push_back(regError);
+            processedClass.unregisteredTemplateFields_.push_back(regError);
             return;
         }
 
@@ -1039,7 +1167,7 @@ static void RegisterField(const FieldAnalyzer& fieldAnalyzer, ProcessedClass& pr
             regError.name_ = fieldAnalyzer.GetName();
             regError.comment_ = fieldAnalyzer.GetDeclaration();
             regError.message_ = e.what();
-            processedClass.unregisteredFields_.push_back(regError);
+            processedClass.unregisteredTemplateFields_.push_back(regError);
             return;
         }
 
@@ -1049,13 +1177,20 @@ static void RegisterField(const FieldAnalyzer& fieldAnalyzer, ProcessedClass& pr
 
         string cppClassName = fieldAnalyzer.GetClassName();
 
-        FieldRegistration result;
+        /*FieldRegistration result;
         result.name_ = cppFieldName;
         result.cppDeclaration_ = fieldAnalyzer.GetDeclaration();
         result.registration_.asDeclarations_.push_back(asPropertyType + " " + asPropertyName);
-        result.registration_.byteOffset_ = "offsetof(" + cppClassName + ", " + cppFieldName + ")";
+        result.registration_.byteOffset_ = "offsetof(" + cppClassName + ", " + cppFieldName + ")";*/
 
-        processedClass.fields_.push_back(result);
+        Registration reg;
+        reg.comment_ = fieldAnalyzer.GetDeclaration();
+        reg.registration_.push_back("engine->RegisterObjectProperty(className, \"" + asPropertyType + " " + asPropertyName + "\", "
+            "offsetof(T, " + cppFieldName + "));");
+
+        processedClass.templateFields_.push_back(reg);
+
+        //processedClass.fields_.push_back(result);
     }
 }
 
@@ -1066,11 +1201,11 @@ static void RegisterComparisonOperator(const ClassAnalyzer& classAnalyzer, Proce
     assert(methodAnalyzer);
     string wrapperName = GenerateWrapperName(*methodAnalyzer);
 
-    MethodRegistration result;
-    result.cppDeclaration_ = methodAnalyzer->GetDeclaration();
+    Registration result;
+    result.comment_ = methodAnalyzer->GetDeclaration();
     
     result.glue_ =
-        "static int " + wrapperName + "(const " + className + "& lhs, const " + className + "& rhs)\n"
+        "template <class T> int " + wrapperName + "(const T& lhs, const T& rhs)\n"
         "{\n"
         "    if (lhs < rhs)\n"
         "        return -1;\n\n"
@@ -1079,12 +1214,12 @@ static void RegisterComparisonOperator(const ClassAnalyzer& classAnalyzer, Proce
         "    return 0;\n"
         "}\n";
 
-    result.name_ = methodAnalyzer->GetName();
-    result.registration_.asDeclarations_.push_back("int opCmp(const " + className + "&in) const");
-    result.registration_.funcPointer_ = "AS_FUNCTION_OBJFIRST(" + wrapperName + ")";
-    result.registration_.callConv_ = "AS_CALL_CDECL_OBJFIRST";
+    //result.name_ = methodAnalyzer->GetName();
+    result.registration_.push_back(
+        "engine->RegisterObjectMethod(className, \"int opCmp(const " + className + "& in) const\", "
+        "AS_FUNCTION_OBJFIRST(" + wrapperName + "<T>), AS_CALL_CDECL_OBJFIRST);");
 
-    processedClass.methods_.push_back(result);
+    processedClass.templateMethods_.push_back(result);
 }
 
 static void TryRegisterImplicitlyDeclaredAssignOperator(const ClassAnalyzer& classAnalyzer, ProcessedClass& processedClass)
@@ -1155,10 +1290,10 @@ static void ProcessClass(const ClassAnalyzer& classAnalyzer)
     for (const ClassAnalyzer& baseClass : baseClasses)
         processedClass.baseClassNames_.push_back(baseClass.GetClassName());
 
-    processedClass.hiddenMethods_ = classAnalyzer.GetHiddenMethods();
-    processedClass.hiddenStaticMethods_ = classAnalyzer.GetHiddenStaticMethods();
+    //processedClass.hiddenMethods_ = classAnalyzer.GetHiddenMethods();
+    /*processedClass.hiddenStaticMethods_ = classAnalyzer.GetHiddenStaticMethods();
     processedClass.hiddenFields_ = classAnalyzer.GetHiddenFields();
-    processedClass.hiddenStaticFields_ = classAnalyzer.GetHiddenStaticFields();
+    processedClass.hiddenStaticFields_ = classAnalyzer.GetHiddenStaticFields();*/
 
     if (classAnalyzer.IsAbstract() && !(classAnalyzer.IsRefCounted() || Contains(classAnalyzer.GetComment(), "FAKE_REF")))
     {

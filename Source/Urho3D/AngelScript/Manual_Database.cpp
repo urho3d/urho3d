@@ -27,7 +27,7 @@
 
 #include "../Database/Database.h"
 //#include "../AngelScript/Generated_Templates.h"
-#include "../AngelScript/GeneratedClassMembers.h"
+//#include "../AngelScript/GeneratedClassMembers.h"
 #include "../AngelScript/Generated_Members.h"
 
 namespace Urho3D
