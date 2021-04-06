@@ -33,6 +33,7 @@
 #include <regex>
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 
 namespace ASBindingGenerator
 {
@@ -368,80 +369,125 @@ static string GetPropertyMark(const MethodAnalyzer& methodAnalyzer)
     return GetPropertyMark(*reimplements);
 }
 
-// Comparsion without template specializations
-static bool CompareSignatures(const MethodAnalyzer& a, const MethodAnalyzer& b)
+static string GetSignature(const MethodAnalyzer& method)
 {
-    xml_node aMemberdef = a.GetMemberdef();
-    xml_node bMemberdef = b.GetMemberdef();
+    xml_node memberdef = method.GetMemberdef();
 
-    if (string(aMemberdef.child_value("name")) != string(bMemberdef.child_value("name")))
-        return false;
+    string result = string(memberdef.child_value("name")) + '|';
+    result += RemoveRefs(memberdef.child("type")) + '|';
 
-    if (RemoveRefs(aMemberdef.child("type")) != RemoveRefs(bMemberdef.child("type")))
-        return false;
+    for (xml_node param : memberdef.children("param"))
+        result += RemoveRefs(param.child("type")) + '|';
 
-    vector<xml_node> aParams;
-    for (xml_node p : aMemberdef.children("param"))
-        aParams.push_back(p);
-
-    vector<xml_node> bParams;
-    for (xml_node p : bMemberdef.children("param"))
-        bParams.push_back(p);
-
-    if (aParams.size() != bParams.size())
-        return false;
-
-    for (int i = 0; i < aParams.size(); i++)
-    {
-        string aParamType = RemoveRefs(aParams[i].child("type"));
-        string bParamType = RemoveRefs(bParams[i].child("type"));
-
-        if (aParamType != bParamType)
-            return false;
-    }
-
-    return true;
+    return result;
 }
 
-static bool ContainsSameSignature(const ClassAnalyzer& classAnalyzer, const MethodAnalyzer& method)
+struct ClassMemeberSignatures
+{
+    unordered_set<string> methods_;
+    unordered_set<string> hiddenInAnyDerivedClassesMethods_;
+};
+
+static unordered_map<string, shared_ptr<ClassMemeberSignatures>> _cachedMemberSignatures; // className -> signatures
+
+static bool ContainsSameSignature(const string& className, const string& methodSignature)
+{
+    shared_ptr<ClassMemeberSignatures> classData = _cachedMemberSignatures[className];
+    return classData->methods_.find(methodSignature) != classData->methods_.end();
+}
+
+static void InitCachedMemberSignatures()
+{ 
+    // Fill signatures
+    for (auto element : SourceData::classesByID_)
+    {
+        xml_node compounddef = element.second;
+        ClassAnalyzer classAnalyzer(compounddef);
+        shared_ptr<ClassMemeberSignatures> classData = make_shared<ClassMemeberSignatures>();
+        vector<MethodAnalyzer> methods = classAnalyzer.GetAllPublicMethods();
+        for (const MethodAnalyzer& method : methods)
+            classData->methods_.insert(GetSignature(method));
+        _cachedMemberSignatures[classAnalyzer.GetClassName()] = classData;
+    }
+
+    // Fill hidden in any derived classes members
+    for (auto element : SourceData::classesByID_)
+    {
+        xml_node compounddef = element.second;
+        ClassAnalyzer classAnalyzer(compounddef);
+        string className = classAnalyzer.GetClassName();
+        shared_ptr<ClassMemeberSignatures> classData = _cachedMemberSignatures[classAnalyzer.GetClassName()];
+        vector<MethodAnalyzer> methods = classAnalyzer.GetAllPublicMethods();
+        for (const MethodAnalyzer& method : methods)
+        {
+            string methodSignature = GetSignature(method);
+            vector<ClassAnalyzer> derivedClasses = method.GetClass().GetAllDerivedClasses();
+            for (const ClassAnalyzer& derivedClass : derivedClasses)
+            {
+                if (!ContainsSameSignature(derivedClass.GetClassName(), methodSignature))
+                {
+                    classData->hiddenInAnyDerivedClassesMethods_.insert(methodSignature);
+                    break;
+                }
+            }
+        }
+    }
+}
+
+/*static bool ContainsSameSignature(const ClassAnalyzer& classAnalyzer, const MethodAnalyzer& method)
 {
     vector<MethodAnalyzer> methods = classAnalyzer.GetAllPublicMethods();
     
     for (const MethodAnalyzer& m : methods)
     {
-        if (CompareSignatures(m, method))
+        if (GetSignature(m) == GetSignature(method))
             return true;
     }
 
     return false;
-}
+}*/
 
-static vector<string> HiddenInAnyDerivedClasses(const MethodAnalyzer& method)
+
+
+static bool HiddenInAnyDerivedClasses(const MethodAnalyzer& method)
 {
-    vector<string> result;
+    /*vector<string> result;
 
     vector<ClassAnalyzer> derivedClasses = method.GetClass().GetAllDerivedClasses();
     for (const ClassAnalyzer& derivedClass : derivedClasses)
     {
-        if (!ContainsSameSignature(derivedClass, method))
+        //if (!ContainsSameSignature(derivedClass, method))
+        //    result.push_back(derivedClass.GetClassName());
+
+        if (!ContainsSameSignature(derivedClass.GetClassName(), GetSignature(method)))
             result.push_back(derivedClass.GetClassName());
     }
 
-    return result;
+    return result;*/
+    string classname = method.GetClassName();
+    shared_ptr<ClassMemeberSignatures> classData = _cachedMemberSignatures[classname];
+    string methodSignature = GetSignature(method);
+    return classData->hiddenInAnyDerivedClassesMethods_.find(methodSignature) != classData->hiddenInAnyDerivedClassesMethods_.end();
 }
 
-static vector<string> HiddenInAnyDerivedClasses(const MethodAnalyzer& method, const ClassAnalyzer& classAnalyzer)
+static bool HiddenInAnyDerivedClasses(const MethodAnalyzer& method, const ClassAnalyzer& classAnalyzer)
 {
-    vector<string> result;
+    /*vector<string> result;
 
     vector<ClassAnalyzer> derivedClasses = classAnalyzer.GetAllDerivedClasses();
     for (const ClassAnalyzer& derivedClass : derivedClasses)
     {
-        if (!ContainsSameSignature(derivedClass, method))
+        //if (!ContainsSameSignature(derivedClass, method))
+        //    result.push_back(derivedClass.GetClassName());
+        if (!ContainsSameSignature(derivedClass.GetClassName(), GetSignature(method)))
             result.push_back(derivedClass.GetClassName());
     }
 
-    return result;
+    return result;*/
+    string classname = classAnalyzer.GetClassName();
+    shared_ptr<ClassMemeberSignatures> classData = _cachedMemberSignatures[classname];
+    string methodSignature = GetSignature(method);
+    return classData->hiddenInAnyDerivedClassesMethods_.find(methodSignature) != classData->hiddenInAnyDerivedClassesMethods_.end();
 }
 
 static vector<string> ExistsInBaseClasses(const MethodAnalyzer& method)
@@ -451,7 +497,9 @@ static vector<string> ExistsInBaseClasses(const MethodAnalyzer& method)
     vector<ClassAnalyzer> baseClasses = method.GetClass().GetBaseClasses();
     for (const ClassAnalyzer& baseClass : baseClasses)
     {
-        if (ContainsSameSignature(baseClass, method))
+        //if (ContainsSameSignature(baseClass, method))
+        //    result.push_back(baseClass.GetClassName());
+        if (ContainsSameSignature(baseClass.GetClassName(), GetSignature(method)))
             result.push_back(baseClass.GetClassName());
     }
 
@@ -465,7 +513,9 @@ static vector<string> ExistsInBaseClasses(const MethodAnalyzer& method, const Cl
     vector<ClassAnalyzer> baseClasses = classAnalyzer.GetBaseClasses();
     for (const ClassAnalyzer& baseClass : baseClasses)
     {
-        if (ContainsSameSignature(baseClass, method))
+        //if (ContainsSameSignature(baseClass, method))
+        //    result.push_back(baseClass.GetClassName());
+        if (ContainsSameSignature(baseClass.GetClassName(), GetSignature(method)))
             result.push_back(baseClass.GetClassName());
     }
 
@@ -525,13 +575,13 @@ static void RegisterMethod(const MethodAnalyzer& methodAnalyzer, ProcessedClass&
     if (existsInBaseClasses.size() == 1)
     {
         shared_ptr<ClassAnalyzer> baseClass = FindClassByName(existsInBaseClasses[0]);
-        if (HiddenInAnyDerivedClasses(methodAnalyzer, *baseClass).size() == 0 && FindConflicts(methodAnalyzer, *baseClass).empty())
+        if (!HiddenInAnyDerivedClasses(methodAnalyzer, *baseClass) && FindConflicts(methodAnalyzer, *baseClass).empty())
             return; // Already registered in template of base class
     }
 
-    vector<string> hiddenInDerivedClasses = HiddenInAnyDerivedClasses(methodAnalyzer);
+    bool hiddenInDerivedClasses = HiddenInAnyDerivedClasses(methodAnalyzer);
 
-    if (hiddenInDerivedClasses.size())
+    if (hiddenInDerivedClasses)
         regInTemplate = false; // Impossible register in template
 
     string conflict = FindConflicts(methodAnalyzer);
@@ -1219,6 +1269,8 @@ void ProcessAllClassesNew()
         ProcessClass(analyzer);
     }
 #else
+    InitCachedMemberSignatures();
+
     for (auto element : SourceData::classesByID_)
     {
         xml_node compounddef = element.second;
