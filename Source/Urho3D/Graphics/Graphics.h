@@ -520,7 +520,8 @@ public:
     /// Return shader program. This is an API-specific class and should not be used by applications.
     /// @nobind
     ShaderProgram* GetShaderProgram() const;
-
+    /// Return last used shader program.
+    ShaderProgram* GetLastShaderProgram() const { return lastShaderProgram_; }
     /// Return texture unit index by name.
     TextureUnit GetTextureUnit(const String& name);
     /// Return texture unit name by index.
@@ -908,6 +909,8 @@ private:
     mutable WeakPtr<Shader> lastShader_;
     /// Last used shader name in shader variation query.
     mutable String lastShaderName_;
+    /// Last used ShaderProgram
+    ShaderProgram* lastShaderProgram_{};
     /// Shader precache utility.
     SharedPtr<ShaderPrecache> shaderPrecache_;
     /// Allowed screen orientations.

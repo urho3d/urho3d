@@ -347,7 +347,7 @@ const ShaderParameter* ShaderProgram::GetParameter(StringHash param) const
 bool ShaderProgram::NeedParameterUpdate(ShaderParameterGroup group, const void* source)
 {
     // If global framenumber has changed, invalidate all per-program parameter sources now
-    if (globalFrameNumber != frameNumber_)
+    if (globalFrameNumber != frameNumber_ || graphics_->GetLastShaderProgram() != this)
     {
         for (auto& parameterSource : parameterSources_)
             parameterSource = (const void*)M_MAX_UNSIGNED;

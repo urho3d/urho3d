@@ -1083,6 +1083,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
             {
                 glUseProgram(i->second_->GetGPUObjectName());
                 impl_->shaderProgram_ = i->second_;
+                lastShaderProgram_ = impl_->shaderProgram_;
             }
             else
             {
@@ -1102,6 +1103,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
                 // Note: Link() calls glUseProgram() to set the texture sampler uniforms,
                 // so it is not necessary to call it again
                 impl_->shaderProgram_ = newProgram;
+                lastShaderProgram_ = impl_->shaderProgram_;
             }
             else
             {
