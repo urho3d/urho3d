@@ -34,19 +34,17 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #----------------------------------------------------------------------
+
+# Modified for Urho3D
+
 SET(CMAKE_POLICY_DEFAULT_CMP0074 NEW)
 
 CMAKE_MINIMUM_REQUIRED( VERSION 3.0 )
 
-# Modified for Urho3D: Removed Hunter, Android, tests, forced in-house builds,
-# ignored contrib folder and included their source manually, removed useless
-# cmake options related to shared libs and so.
-
 PROJECT( Assimp VERSION 5.0.0 )
 
 # All supported options ###############################################
-
-# Urho3D: only keep options that are relevant for static library builds
+# Urho3D: removed shared lib, android/ios, package detection flags
 
 OPTION( ASSIMP_DOUBLE_PRECISION
   "Set to ON to enable double precision processing"
@@ -114,7 +112,7 @@ IF(NOT IGNORE_GIT_HASH)
 ENDIF()
 
 IF(NOT GIT_COMMIT_HASH)
-  SET(GIT_COMMIT_HASH 0)
+    SET(GIT_COMMIT_HASH 0)
 ENDIF(NOT GIT_COMMIT_HASH)
 
 IF(ASSIMP_DOUBLE_PRECISION)
@@ -196,6 +194,8 @@ ELSEIF( CMAKE_COMPILER_IS_MINGW )
   ADD_DEFINITIONS( -U__STRICT_ANSI__ )
 ENDIF()
 
+# Urho3D: remove IOS settings
+
 get_cmake_property(is_multi_config GENERATOR_IS_MULTI_CONFIG)
 
 IF (INJECT_DEBUG_POSTFIX AND (is_multi_config OR CMAKE_BUILD_TYPE STREQUAL "Debug"))
@@ -212,7 +212,7 @@ ENDIF( ASSIMP_NO_EXPORT )
 SET ( ASSIMP_BUILD_ARCHITECTURE "" CACHE STRING
   "describe the current architecture."
 )
-IF( ASSIMP_BUILD_ARCHITECTURE STREQUAL "")
+IF    ( ASSIMP_BUILD_ARCHITECTURE STREQUAL "")
 ELSE  ( ASSIMP_BUILD_ARCHITECTURE STREQUAL "")
   ADD_DEFINITIONS ( -D'ASSIMP_BUILD_ARCHITECTURE="${ASSIMP_BUILD_ARCHITECTURE}"' )
 ENDIF ( ASSIMP_BUILD_ARCHITECTURE STREQUAL "")
@@ -275,5 +275,5 @@ ELSE (ASSIMP_BUILD_NONFREE_C4D_IMPORTER)
   ADD_DEFINITIONS( -DASSIMP_BUILD_NO_C4D_IMPORTER )
 ENDIF (ASSIMP_BUILD_NONFREE_C4D_IMPORTER)
 
-#ADD_SUBDIRECTORY(contrib/)
 ADD_SUBDIRECTORY( code/ )
+#ADD_SUBDIRECTORY(contrib/)

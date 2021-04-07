@@ -44,8 +44,7 @@
 #    source groups and library command)
 #
 
-# Urho3D: modified to force in house builds, removed anything not needed for
-# a static build.
+# Modified for Urho3D
 
 cmake_minimum_required( VERSION 3.0 )
 SET( HEADER_PATH ../include/assimp )
@@ -835,9 +834,12 @@ ADD_ASSIMP_EXPORTER( ASSJSON
 # optimizations that take up extra space. Given that the issue is a string table overflowing, -Os seemed appropriate
 # Also, I'm not positive if both link & compile flags are needed, but this hopefully ensures that the issue should not
 # recur for edge cases such as static builds.
-# Urho3D: setting them to -O2 instead fixes CI builds
 if ((CMAKE_COMPILER_IS_MINGW) AND (CMAKE_BUILD_TYPE MATCHES Debug))
   #message("-- Applying MinGW StepFileGen1.cpp Debug Workaround")
+  #SET_SOURCE_FILES_PROPERTIES(Importer/StepFile/StepFileGen1.cpp PROPERTIES COMPILE_FLAGS -Os )
+  #SET_SOURCE_FILES_PROPERTIES(Importer/StepFile/StepFileGen1.cpp PROPERTIES LINK_FLAGS -Os )
+  #SET_SOURCE_FILES_PROPERTIES(Importer/StepFile/StepFileGen1.cpp PROPERTIES STATIC_LIBRARY_FLAGS -Os )
+  # Urho3D: setting them to -O2 instead fixes CI builds
   SET_SOURCE_FILES_PROPERTIES(Importer/StepFile/StepFileGen1.cpp PROPERTIES COMPILE_FLAGS -O2 )
   SET_SOURCE_FILES_PROPERTIES(Importer/StepFile/StepFileGen1.cpp PROPERTIES LINK_FLAGS -O2 )
   SET_SOURCE_FILES_PROPERTIES(Importer/StepFile/StepFileGen1.cpp PROPERTIES STATIC_LIBRARY_FLAGS -O2 )
@@ -1048,7 +1050,8 @@ if(MSVC10)
   endif( VC10_STDINT_FIX )
 endif(MSVC10)
 
-ADD_DEFINITIONS( -DASSIMP_BUILD_DLL_EXPORT )
+# Urho3D: shared builds unnecessary
+# ADD_DEFINITIONS( -DASSIMP_BUILD_DLL_EXPORT )
 
 if ( MSVC )
   ADD_DEFINITIONS( -D_SCL_SECURE_NO_WARNINGS )
@@ -1059,6 +1062,7 @@ endif ( MSVC )
 SET (unzip_compile_SRCS ${unzip_SRCS})
 INCLUDE_DIRECTORIES( "../contrib/unzip/" )
 
+# Urho3D: disable messages
 #MESSAGE(STATUS "Enabled importer formats:${ASSIMP_IMPORTERS_ENABLED}")
 #MESSAGE(STATUS "Disabled importer formats:${ASSIMP_IMPORTERS_DISABLED}")
 
@@ -1089,7 +1093,7 @@ SET( assimp_src
   ${openddl_parser_SRCS}
   ${open3dgc_SRCS}
   ${ziplib_SRCS}
-  ${zlib_SRCS}
+  ${zlib_SRCS} # Urho3D: include zlib headers
   # Necessary to show the headers in the project when using the VC++ generator:
 
   ${PUBLIC_HEADERS}
@@ -1151,6 +1155,7 @@ SET_TARGET_PROPERTIES( Assimp PROPERTIES
   OUTPUT_NAME assimp${LIBRARY_SUFFIX}
 )
 
+# Urho3D: already forced to build in house
 # Build against external unzip, or add ../contrib/unzip so
 # assimp can #include "unzip.h"
 #if (UNZIP_FOUND)
@@ -1162,8 +1167,10 @@ SET_TARGET_PROPERTIES( Assimp PROPERTIES
 
 # Add RT-extension library for glTF importer with Open3DGC-compression.
 IF (RT_FOUND AND ASSIMP_IMPORTER_GLTF_USE_OPEN3DGC)
-  TARGET_LINK_LIBRARIES(assimp ${RT_LIBRARY})
+  TARGET_LINK_LIBRARIES(Assimp ${RT_LIBRARY})
 ENDIF (RT_FOUND AND ASSIMP_IMPORTER_GLTF_USE_OPEN3DGC)
+
+# Urho3D: remove install targets, android system, coveralls
 
 # When performing Xcode CI build suppress all the warnings for 3rd party libraries because there are just too many of them
 if (XCODE AND DEFINED ENV{CI})
