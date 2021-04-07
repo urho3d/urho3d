@@ -58,10 +58,6 @@ OPTION( INJECT_DEBUG_POSTFIX
   "Inject debug postfix in .a/.so/.dll lib names"
   ON
 )
-OPTION ( IGNORE_GIT_HASH
-   "Don't call git to get the hash."
-   ON
-)
 
 # Use subset of Windows.h
 if (WIN32)
@@ -91,25 +87,11 @@ SET( ASSIMP_PACKAGE_VERSION "0" CACHE STRING "the package-specific version used 
 # Enable C++11 support globally
 set_property( GLOBAL PROPERTY CXX_STANDARD 11 )
 
-IF(NOT IGNORE_GIT_HASH)
-  # Get the current working branch
-  EXECUTE_PROCESS(
-    COMMAND git rev-parse --abbrev-ref HEAD
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    OUTPUT_VARIABLE GIT_BRANCH
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-    ERROR_QUIET
-  )
+# Get the current working branch
+SET (GIT_BRANCH modified-for-urho3d)
 
-  # Get the latest abbreviated commit hash of the working branch
-  EXECUTE_PROCESS(
-    COMMAND git rev-parse --short=8 HEAD
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    OUTPUT_VARIABLE GIT_COMMIT_HASH
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-    ERROR_QUIET
-  )
-ENDIF()
+# Get the latest abbreviated commit hash of the working branch
+SET (GIT_COMMIT_HASH 8f0c6b0)
 
 IF(NOT GIT_COMMIT_HASH)
     SET(GIT_COMMIT_HASH 0)
