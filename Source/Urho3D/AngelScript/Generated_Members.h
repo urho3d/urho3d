@@ -13,6 +13,17 @@ namespace Urho3D
 // struct AllocatorBlock | File: ../Container/Allocator.h
 template <class T> void RegisterMembers_AllocatorBlock(asIScriptEngine* engine, const char* className)
 {
+    // AllocatorNode* AllocatorBlock::free_
+    // Not registered because pointer
+    // AllocatorBlock* AllocatorBlock::next_
+    // Not registered because pointer
+
+    // unsigned AllocatorBlock::nodeSize_
+    engine->RegisterObjectProperty(className, "uint nodeSize", offsetof(T, nodeSize_));
+
+    // unsigned AllocatorBlock::capacity_
+    engine->RegisterObjectProperty(className, "uint capacity", offsetof(T, capacity_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_AllocatorBlock
         REGISTER_MEMBERS_MANUAL_PART_AllocatorBlock();
     #endif
@@ -21,6 +32,9 @@ template <class T> void RegisterMembers_AllocatorBlock(asIScriptEngine* engine, 
 // struct AllocatorNode | File: ../Container/Allocator.h
 template <class T> void RegisterMembers_AllocatorNode(asIScriptEngine* engine, const char* className)
 {
+    // AllocatorNode* AllocatorNode::next_
+    // Not registered because pointer
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_AllocatorNode
         REGISTER_MEMBERS_MANUAL_PART_AllocatorNode();
     #endif
@@ -29,6 +43,45 @@ template <class T> void RegisterMembers_AllocatorNode(asIScriptEngine* engine, c
 // struct AnimationControl | File: ../Graphics/AnimationController.h
 template <class T> void RegisterMembers_AnimationControl(asIScriptEngine* engine, const char* className)
 {
+    // String AnimationControl::name_
+    engine->RegisterObjectProperty(className, "String name", offsetof(T, name_));
+
+    // StringHash AnimationControl::hash_
+    engine->RegisterObjectProperty(className, "StringHash hash", offsetof(T, hash_));
+
+    // float AnimationControl::speed_
+    engine->RegisterObjectProperty(className, "float speed", offsetof(T, speed_));
+
+    // float AnimationControl::targetWeight_
+    engine->RegisterObjectProperty(className, "float targetWeight", offsetof(T, targetWeight_));
+
+    // float AnimationControl::fadeTime_
+    engine->RegisterObjectProperty(className, "float fadeTime", offsetof(T, fadeTime_));
+
+    // float AnimationControl::autoFadeTime_
+    engine->RegisterObjectProperty(className, "float autoFadeTime", offsetof(T, autoFadeTime_));
+
+    // float AnimationControl::setTimeTtl_
+    engine->RegisterObjectProperty(className, "float setTimeTtl", offsetof(T, setTimeTtl_));
+
+    // float AnimationControl::setWeightTtl_
+    engine->RegisterObjectProperty(className, "float setWeightTtl", offsetof(T, setWeightTtl_));
+
+    // unsigned short AnimationControl::setTime_
+    engine->RegisterObjectProperty(className, "uint16 setTime", offsetof(T, setTime_));
+
+    // unsigned char AnimationControl::setWeight_
+    engine->RegisterObjectProperty(className, "uint8 setWeight", offsetof(T, setWeight_));
+
+    // unsigned char AnimationControl::setTimeRev_
+    engine->RegisterObjectProperty(className, "uint8 setTimeRev", offsetof(T, setTimeRev_));
+
+    // unsigned char AnimationControl::setWeightRev_
+    engine->RegisterObjectProperty(className, "uint8 setWeightRev", offsetof(T, setWeightRev_));
+
+    // bool AnimationControl::removeOnCompletion_
+    engine->RegisterObjectProperty(className, "bool removeOnCompletion", offsetof(T, removeOnCompletion_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_AnimationControl
         REGISTER_MEMBERS_MANUAL_PART_AnimationControl();
     #endif
@@ -37,6 +90,18 @@ template <class T> void RegisterMembers_AnimationControl(asIScriptEngine* engine
 // struct AnimationKeyFrame | File: ../Graphics/Animation.h
 template <class T> void RegisterMembers_AnimationKeyFrame(asIScriptEngine* engine, const char* className)
 {
+    // float AnimationKeyFrame::time_
+    engine->RegisterObjectProperty(className, "float time", offsetof(T, time_));
+
+    // Vector3 AnimationKeyFrame::position_
+    engine->RegisterObjectProperty(className, "Vector3 position", offsetof(T, position_));
+
+    // Quaternion AnimationKeyFrame::rotation_
+    engine->RegisterObjectProperty(className, "Quaternion rotation", offsetof(T, rotation_));
+
+    // Vector3 AnimationKeyFrame::scale_
+    engine->RegisterObjectProperty(className, "Vector3 scale", offsetof(T, scale_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_AnimationKeyFrame
         REGISTER_MEMBERS_MANUAL_PART_AnimationKeyFrame();
     #endif
@@ -45,6 +110,19 @@ template <class T> void RegisterMembers_AnimationKeyFrame(asIScriptEngine* engin
 // struct AnimationStateTrack | File: ../Graphics/AnimationState.h
 template <class T> void RegisterMembers_AnimationStateTrack(asIScriptEngine* engine, const char* className)
 {
+    // const AnimationTrack* AnimationStateTrack::track_
+    // Not registered because pointer
+    // Bone* AnimationStateTrack::bone_
+    // Not registered because pointer
+    // WeakPtr<Node> AnimationStateTrack::node_
+    // Error: type "WeakPtr<Node>" can not automatically bind
+
+    // float AnimationStateTrack::weight_
+    engine->RegisterObjectProperty(className, "float weight", offsetof(T, weight_));
+
+    // unsigned AnimationStateTrack::keyFrame_
+    engine->RegisterObjectProperty(className, "uint keyFrame", offsetof(T, keyFrame_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_AnimationStateTrack
         REGISTER_MEMBERS_MANUAL_PART_AnimationStateTrack();
     #endif
@@ -78,6 +156,19 @@ template <class T> void RegisterMembers_AnimationTrack(asIScriptEngine* engine, 
     // void AnimationTrack::SetKeyFrame(unsigned index, const AnimationKeyFrame& keyFrame)
     engine->RegisterObjectMethod(className, "void SetKeyFrame(uint, const AnimationKeyFrame&in)", AS_METHODPR(T, SetKeyFrame, (unsigned, const AnimationKeyFrame&), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_keyFrames(uint, const AnimationKeyFrame&in)", AS_METHODPR(T, SetKeyFrame, (unsigned, const AnimationKeyFrame&), void), AS_CALL_THISCALL);
+
+    // Vector<AnimationKeyFrame> AnimationTrack::keyFrames_
+    // Error: type "Vector<AnimationKeyFrame>" can not automatically bind
+
+    // String AnimationTrack::name_
+    engine->RegisterObjectProperty(className, "String name", offsetof(T, name_));
+
+    // StringHash AnimationTrack::nameHash_
+    engine->RegisterObjectProperty(className, "StringHash nameHash", offsetof(T, nameHash_));
+
+    // AnimationChannelFlags AnimationTrack::channelMask_
+    engine->RegisterObjectProperty(className, "AnimationChannelFlags channelMask", offsetof(T, channelMask_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_AnimationTrack
         REGISTER_MEMBERS_MANUAL_PART_AnimationTrack();
     #endif
@@ -86,6 +177,12 @@ template <class T> void RegisterMembers_AnimationTrack(asIScriptEngine* engine, 
 // struct AnimationTriggerPoint | File: ../Graphics/Animation.h
 template <class T> void RegisterMembers_AnimationTriggerPoint(asIScriptEngine* engine, const char* className)
 {
+    // float AnimationTriggerPoint::time_
+    engine->RegisterObjectProperty(className, "float time", offsetof(T, time_));
+
+    // Variant AnimationTriggerPoint::data_
+    engine->RegisterObjectProperty(className, "Variant data", offsetof(T, data_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_AnimationTriggerPoint
         REGISTER_MEMBERS_MANUAL_PART_AnimationTriggerPoint();
     #endif
@@ -108,6 +205,7 @@ template <class T> void RegisterMembers_AreaAllocator(asIScriptEngine* engine, c
 
     // void AreaAllocator::Reset(int width, int height, int maxWidth = 0, int maxHeight = 0, bool fastMode = true)
     engine->RegisterObjectMethod(className, "void Reset(int, int, int = 0, int = 0, bool = true)", AS_METHODPR(T, Reset, (int, int, int, int, bool), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_AreaAllocator
         REGISTER_MEMBERS_MANUAL_PART_AreaAllocator();
     #endif
@@ -116,6 +214,36 @@ template <class T> void RegisterMembers_AreaAllocator(asIScriptEngine* engine, c
 // struct AsyncProgress | File: ../Scene/Scene.h
 template <class T> void RegisterMembers_AsyncProgress(asIScriptEngine* engine, const char* className)
 {
+    // SharedPtr<File> AsyncProgress::file_
+    // Error: type "SharedPtr<File>" can not automatically bind
+    // SharedPtr<XMLFile> AsyncProgress::xmlFile_
+    // Error: type "SharedPtr<XMLFile>" can not automatically bind
+    // SharedPtr<JSONFile> AsyncProgress::jsonFile_
+    // Error: type "SharedPtr<JSONFile>" can not automatically bind
+    // HashSet<StringHash> AsyncProgress::resources_
+    // Error: type "HashSet<StringHash>" can not automatically bind
+
+    // XMLElement AsyncProgress::xmlElement_
+    engine->RegisterObjectProperty(className, "XMLElement xmlElement", offsetof(T, xmlElement_));
+
+    // unsigned AsyncProgress::jsonIndex_
+    engine->RegisterObjectProperty(className, "uint jsonIndex", offsetof(T, jsonIndex_));
+
+    // LoadMode AsyncProgress::mode_
+    engine->RegisterObjectProperty(className, "LoadMode mode", offsetof(T, mode_));
+
+    // unsigned AsyncProgress::loadedResources_
+    engine->RegisterObjectProperty(className, "uint loadedResources", offsetof(T, loadedResources_));
+
+    // unsigned AsyncProgress::totalResources_
+    engine->RegisterObjectProperty(className, "uint totalResources", offsetof(T, totalResources_));
+
+    // unsigned AsyncProgress::loadedNodes_
+    engine->RegisterObjectProperty(className, "uint loadedNodes", offsetof(T, loadedNodes_));
+
+    // unsigned AsyncProgress::totalNodes_
+    engine->RegisterObjectProperty(className, "uint totalNodes", offsetof(T, totalNodes_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_AsyncProgress
         REGISTER_MEMBERS_MANUAL_PART_AsyncProgress();
     #endif
@@ -126,6 +254,7 @@ template <class T> void RegisterMembers_AttributeHandle(asIScriptEngine* engine,
 {
     // AttributeHandle& AttributeHandle::SetMetadata(StringHash key, const Variant& value)
     // Error: type "AttributeHandle" can not automatically bind bacause have @nobind mark
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_AttributeHandle
         REGISTER_MEMBERS_MANUAL_PART_AttributeHandle();
     #endif
@@ -136,6 +265,32 @@ template <class T> void RegisterMembers_AttributeInfo(asIScriptEngine* engine, c
 {
     // const Variant& AttributeInfo::GetMetadata(const StringHash& key) const
     engine->RegisterObjectMethod(className, "const Variant& GetMetadata(const StringHash&in) const", AS_METHODPR(T, GetMetadata, (const StringHash&) const, const Variant&), AS_CALL_THISCALL);
+
+    // template <class T> T AttributeInfo::GetMetadata(const StringHash& key) const
+    // Not registered because template
+
+    // const char** AttributeInfo::enumNames_
+    // Error: type "const char**" can not automatically bind
+    // SharedPtr<AttributeAccessor> AttributeInfo::accessor_
+    // Error: type "SharedPtr<AttributeAccessor>" can not automatically bind
+    // void* AttributeInfo::ptr_
+    // Not registered because pointer
+
+    // VariantType AttributeInfo::type_
+    engine->RegisterObjectProperty(className, "VariantType type", offsetof(T, type_));
+
+    // String AttributeInfo::name_
+    engine->RegisterObjectProperty(className, "String name", offsetof(T, name_));
+
+    // Variant AttributeInfo::defaultValue_
+    engine->RegisterObjectProperty(className, "Variant defaultValue", offsetof(T, defaultValue_));
+
+    // AttributeModeFlags AttributeInfo::mode_
+    engine->RegisterObjectProperty(className, "AttributeModeFlags mode", offsetof(T, mode_));
+
+    // VariantMap AttributeInfo::metadata_
+    engine->RegisterObjectProperty(className, "VariantMap metadata", offsetof(T, metadata_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_AttributeInfo
         REGISTER_MEMBERS_MANUAL_PART_AttributeInfo();
     #endif
@@ -152,6 +307,16 @@ template <class T> void RegisterMembers_AutoProfileBlock(asIScriptEngine* engine
 // struct BackgroundLoadItem | File: ../Resource/BackgroundLoader.h
 template <class T> void RegisterMembers_BackgroundLoadItem(asIScriptEngine* engine, const char* className)
 {
+    // SharedPtr<Resource> BackgroundLoadItem::resource_
+    // Error: type "SharedPtr<Resource>" can not automatically bind
+    // HashSet<Pair<StringHash, StringHash>> BackgroundLoadItem::dependencies_
+    // Error: type "HashSet<Pair<StringHash, StringHash>>" can not automatically bind
+    // HashSet<Pair<StringHash, StringHash>> BackgroundLoadItem::dependents_
+    // Error: type "HashSet<Pair<StringHash, StringHash>>" can not automatically bind
+
+    // bool BackgroundLoadItem::sendEventOnFailure_
+    engine->RegisterObjectProperty(className, "bool sendEventOnFailure", offsetof(T, sendEventOnFailure_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_BackgroundLoadItem
         REGISTER_MEMBERS_MANUAL_PART_BackgroundLoadItem();
     #endif
@@ -168,6 +333,47 @@ template <class T> void RegisterMembers_Batch(asIScriptEngine* engine, const cha
 
     // void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool allowDepthWrite) const
     engine->RegisterObjectMethod(className, "void Prepare(View@+, Camera@+, bool, bool) const", AS_METHODPR(T, Prepare, (View*, Camera*, bool, bool) const, void), AS_CALL_THISCALL);
+
+    // Geometry* Batch::geometry_
+    // Not registered because pointer
+    // Material* Batch::material_
+    // Not registered because pointer
+    // const Matrix3x4* Batch::worldTransform_
+    // Not registered because pointer
+    // void* Batch::instancingData_
+    // Not registered because pointer
+    // Zone* Batch::zone_
+    // Not registered because pointer
+    // LightBatchQueue* Batch::lightQueue_
+    // Not registered because pointer
+    // Pass* Batch::pass_
+    // Not registered because pointer
+    // ShaderVariation* Batch::vertexShader_
+    // Not registered because pointer
+    // ShaderVariation* Batch::pixelShader_
+    // Not registered because pointer
+
+    // unsigned long long Batch::sortKey_
+    engine->RegisterObjectProperty(className, "uint64 sortKey", offsetof(T, sortKey_));
+
+    // float Batch::distance_
+    engine->RegisterObjectProperty(className, "float distance", offsetof(T, distance_));
+
+    // unsigned char Batch::renderOrder_
+    engine->RegisterObjectProperty(className, "uint8 renderOrder", offsetof(T, renderOrder_));
+
+    // unsigned char Batch::lightMask_
+    engine->RegisterObjectProperty(className, "uint8 lightMask", offsetof(T, lightMask_));
+
+    // bool Batch::isBase_
+    engine->RegisterObjectProperty(className, "bool isBase", offsetof(T, isBase_));
+
+    // unsigned Batch::numWorldTransforms_
+    engine->RegisterObjectProperty(className, "uint numWorldTransforms", offsetof(T, numWorldTransforms_));
+
+    // GeometryType Batch::geometryType_
+    engine->RegisterObjectProperty(className, "GeometryType geometryType", offsetof(T, geometryType_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Batch
         REGISTER_MEMBERS_MANUAL_PART_Batch();
     #endif
@@ -184,6 +390,21 @@ template <class T> void RegisterMembers_BatchGroupKey(asIScriptEngine* engine, c
 
     // unsigned BatchGroupKey::ToHash() const
     engine->RegisterObjectMethod(className, "uint ToHash() const", AS_METHODPR(T, ToHash, () const, unsigned), AS_CALL_THISCALL);
+
+    // Zone* BatchGroupKey::zone_
+    // Not registered because pointer
+    // LightBatchQueue* BatchGroupKey::lightQueue_
+    // Not registered because pointer
+    // Pass* BatchGroupKey::pass_
+    // Not registered because pointer
+    // Material* BatchGroupKey::material_
+    // Not registered because pointer
+    // Geometry* BatchGroupKey::geometry_
+    // Not registered because pointer
+
+    // unsigned char BatchGroupKey::renderOrder_
+    engine->RegisterObjectProperty(className, "uint8 renderOrder", offsetof(T, renderOrder_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_BatchGroupKey
         REGISTER_MEMBERS_MANUAL_PART_BatchGroupKey();
     #endif
@@ -214,6 +435,40 @@ template <class T> void RegisterMembers_BatchQueue(asIScriptEngine* engine, cons
 
     // void BatchQueue::SortFrontToBack()
     engine->RegisterObjectMethod(className, "void SortFrontToBack()", AS_METHODPR(T, SortFrontToBack, (), void), AS_CALL_THISCALL);
+
+    // HashMap<BatchGroupKey, BatchGroup> BatchQueue::batchGroups_
+    // Error: type "HashMap<BatchGroupKey, BatchGroup>" can not automatically bind
+    // HashMap<unsigned, unsigned> BatchQueue::shaderRemapping_
+    // Error: type "HashMap<unsigned, unsigned>" can not automatically bind
+    // HashMap<unsigned short, unsigned short> BatchQueue::materialRemapping_
+    // Error: type "HashMap<unsigned short, unsigned short>" can not automatically bind
+    // HashMap<unsigned short, unsigned short> BatchQueue::geometryRemapping_
+    // Error: type "HashMap<unsigned short, unsigned short>" can not automatically bind
+    // PODVector<Batch> BatchQueue::batches_
+    // Error: type "PODVector<Batch>" can not automatically bind
+    // PODVector<Batch*> BatchQueue::sortedBatches_
+    // Error: type "PODVector<Batch*>" can not automatically bind
+    // PODVector<BatchGroup*> BatchQueue::sortedBatchGroups_
+    // Error: type "PODVector<BatchGroup*>" can not automatically bind
+
+    // unsigned BatchQueue::maxSortedInstances_
+    engine->RegisterObjectProperty(className, "uint maxSortedInstances", offsetof(T, maxSortedInstances_));
+
+    // bool BatchQueue::hasExtraDefines_
+    engine->RegisterObjectProperty(className, "bool hasExtraDefines", offsetof(T, hasExtraDefines_));
+
+    // String BatchQueue::vsExtraDefines_
+    engine->RegisterObjectProperty(className, "String vsExtraDefines", offsetof(T, vsExtraDefines_));
+
+    // String BatchQueue::psExtraDefines_
+    engine->RegisterObjectProperty(className, "String psExtraDefines", offsetof(T, psExtraDefines_));
+
+    // StringHash BatchQueue::vsExtraDefinesHash_
+    engine->RegisterObjectProperty(className, "StringHash vsExtraDefinesHash", offsetof(T, vsExtraDefinesHash_));
+
+    // StringHash BatchQueue::psExtraDefinesHash_
+    engine->RegisterObjectProperty(className, "StringHash psExtraDefinesHash", offsetof(T, psExtraDefinesHash_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_BatchQueue
         REGISTER_MEMBERS_MANUAL_PART_BatchQueue();
     #endif
@@ -224,6 +479,16 @@ template <class T> void RegisterMembers_BiasParameters(asIScriptEngine* engine, 
 {
     // void BiasParameters::Validate()
     engine->RegisterObjectMethod(className, "void Validate()", AS_METHODPR(T, Validate, (), void), AS_CALL_THISCALL);
+
+    // float BiasParameters::constantBias_
+    engine->RegisterObjectProperty(className, "float constantBias", offsetof(T, constantBias_));
+
+    // float BiasParameters::slopeScaledBias_
+    engine->RegisterObjectProperty(className, "float slopeScaledBias", offsetof(T, slopeScaledBias_));
+
+    // float BiasParameters::normalOffset_
+    engine->RegisterObjectProperty(className, "float normalOffset", offsetof(T, normalOffset_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_BiasParameters
         REGISTER_MEMBERS_MANUAL_PART_BiasParameters();
     #endif
@@ -232,6 +497,33 @@ template <class T> void RegisterMembers_BiasParameters(asIScriptEngine* engine, 
 // struct Billboard | File: ../Graphics/BillboardSet.h
 template <class T> void RegisterMembers_Billboard(asIScriptEngine* engine, const char* className)
 {
+    // Vector3 Billboard::position_
+    engine->RegisterObjectProperty(className, "Vector3 position", offsetof(T, position_));
+
+    // Vector2 Billboard::size_
+    engine->RegisterObjectProperty(className, "Vector2 size", offsetof(T, size_));
+
+    // Rect Billboard::uv_
+    engine->RegisterObjectProperty(className, "Rect uv", offsetof(T, uv_));
+
+    // Color Billboard::color_
+    engine->RegisterObjectProperty(className, "Color color", offsetof(T, color_));
+
+    // float Billboard::rotation_
+    engine->RegisterObjectProperty(className, "float rotation", offsetof(T, rotation_));
+
+    // Vector3 Billboard::direction_
+    engine->RegisterObjectProperty(className, "Vector3 direction", offsetof(T, direction_));
+
+    // bool Billboard::enabled_
+    engine->RegisterObjectProperty(className, "bool enabled", offsetof(T, enabled_));
+
+    // float Billboard::sortDistance_
+    engine->RegisterObjectProperty(className, "float sortDistance", offsetof(T, sortDistance_));
+
+    // float Billboard::screenScaleFactor_
+    engine->RegisterObjectProperty(className, "float screenScaleFactor", offsetof(T, screenScaleFactor_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Billboard
         REGISTER_MEMBERS_MANUAL_PART_Billboard();
     #endif
@@ -240,6 +532,42 @@ template <class T> void RegisterMembers_Billboard(asIScriptEngine* engine, const
 // struct Bone | File: ../Graphics/Skeleton.h
 template <class T> void RegisterMembers_Bone(asIScriptEngine* engine, const char* className)
 {
+    // WeakPtr<Node> Bone::node_
+    // Error: type "WeakPtr<Node>" can not automatically bind
+
+    // String Bone::name_
+    engine->RegisterObjectProperty(className, "String name", offsetof(T, name_));
+
+    // StringHash Bone::nameHash_
+    engine->RegisterObjectProperty(className, "StringHash nameHash", offsetof(T, nameHash_));
+
+    // unsigned Bone::parentIndex_
+    engine->RegisterObjectProperty(className, "uint parentIndex", offsetof(T, parentIndex_));
+
+    // Vector3 Bone::initialPosition_
+    engine->RegisterObjectProperty(className, "Vector3 initialPosition", offsetof(T, initialPosition_));
+
+    // Quaternion Bone::initialRotation_
+    engine->RegisterObjectProperty(className, "Quaternion initialRotation", offsetof(T, initialRotation_));
+
+    // Vector3 Bone::initialScale_
+    engine->RegisterObjectProperty(className, "Vector3 initialScale", offsetof(T, initialScale_));
+
+    // Matrix3x4 Bone::offsetMatrix_
+    engine->RegisterObjectProperty(className, "Matrix3x4 offsetMatrix", offsetof(T, offsetMatrix_));
+
+    // bool Bone::animated_
+    engine->RegisterObjectProperty(className, "bool animated", offsetof(T, animated_));
+
+    // BoneCollisionShapeFlags Bone::collisionMask_
+    engine->RegisterObjectProperty(className, "BoneCollisionShapeFlags collisionMask", offsetof(T, collisionMask_));
+
+    // float Bone::radius_
+    engine->RegisterObjectProperty(className, "float radius", offsetof(T, radius_));
+
+    // BoundingBox Bone::boundingBox_
+    engine->RegisterObjectProperty(className, "BoundingBox boundingBox", offsetof(T, boundingBox_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Bone
         REGISTER_MEMBERS_MANUAL_PART_Bone();
     #endif
@@ -359,6 +687,19 @@ template <class T> void RegisterMembers_BoundingBox(asIScriptEngine* engine, con
 
     // BoundingBox BoundingBox::Transformed(const Matrix3x4& transform) const
     engine->RegisterObjectMethod(className, "BoundingBox Transformed(const Matrix3x4&in) const", AS_METHODPR(T, Transformed, (const Matrix3x4&) const, BoundingBox), AS_CALL_THISCALL);
+
+    // Vector3 BoundingBox::min_
+    engine->RegisterObjectProperty(className, "Vector3 min", offsetof(T, min_));
+
+    // float BoundingBox::dummyMin_
+    engine->RegisterObjectProperty(className, "float dummyMin", offsetof(T, dummyMin_));
+
+    // Vector3 BoundingBox::max_
+    engine->RegisterObjectProperty(className, "Vector3 max", offsetof(T, max_));
+
+    // float BoundingBox::dummyMax_
+    engine->RegisterObjectProperty(className, "float dummyMax", offsetof(T, dummyMax_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_BoundingBox
         REGISTER_MEMBERS_MANUAL_PART_BoundingBox();
     #endif
@@ -372,6 +713,16 @@ template <class T> void RegisterMembers_CascadeParameters(asIScriptEngine* engin
 
     // void CascadeParameters::Validate()
     engine->RegisterObjectMethod(className, "void Validate()", AS_METHODPR(T, Validate, (), void), AS_CALL_THISCALL);
+
+    // Vector4 CascadeParameters::splits_
+    engine->RegisterObjectProperty(className, "Vector4 splits", offsetof(T, splits_));
+
+    // float CascadeParameters::fadeStart_
+    engine->RegisterObjectProperty(className, "float fadeStart", offsetof(T, fadeStart_));
+
+    // float CascadeParameters::biasAutoAdjust_
+    engine->RegisterObjectProperty(className, "float biasAutoAdjust", offsetof(T, biasAutoAdjust_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_CascadeParameters
         REGISTER_MEMBERS_MANUAL_PART_CascadeParameters();
     #endif
@@ -380,6 +731,12 @@ template <class T> void RegisterMembers_CascadeParameters(asIScriptEngine* engin
 // struct CharLocation | File: ../UI/Text.h
 template <class T> void RegisterMembers_CharLocation(asIScriptEngine* engine, const char* className)
 {
+    // Vector2 CharLocation::position_
+    engine->RegisterObjectProperty(className, "Vector2 position", offsetof(T, position_));
+
+    // Vector2 CharLocation::size_
+    engine->RegisterObjectProperty(className, "Vector2 size", offsetof(T, size_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_CharLocation
         REGISTER_MEMBERS_MANUAL_PART_CharLocation();
     #endif
@@ -394,10 +751,10 @@ template <class T> void RegisterMembers_Color(asIScriptEngine* engine, const cha
     // Error: type "const float*" can not automatically bind
     // void Color::FromUIntMask(unsigned color, const ChannelMask& mask)
     // Error: type "const ChannelMask&" can not automatically bind
-    // unsigned Color::ToUIntMask(const ChannelMask& mask) const
-    // Error: type "const ChannelMask&" can not automatically bind
     // bool Color::operator !=(const Color& rhs) const
     // Only operator == is needed
+    // unsigned Color::ToUIntMask(const ChannelMask& mask) const
+    // Error: type "const ChannelMask&" can not automatically bind
 
     // Color Color::Abs() const
     engine->RegisterObjectMethod(className, "Color Abs() const", AS_METHODPR(T, Abs, () const, Color), AS_CALL_THISCALL);
@@ -517,6 +874,54 @@ template <class T> void RegisterMembers_Color(asIScriptEngine* engine, const cha
 
     // static float Color::ConvertLinearToGamma(float value)
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("float ConvertLinearToGamma(float)", AS_FUNCTIONPR(T::ConvertLinearToGamma, (float), float), AS_CALL_CDECL);engine->SetDefaultNamespace("");
+
+    // float Color::r_
+    engine->RegisterObjectProperty(className, "float r", offsetof(T, r_));
+
+    // float Color::g_
+    engine->RegisterObjectProperty(className, "float g", offsetof(T, g_));
+
+    // float Color::b_
+    engine->RegisterObjectProperty(className, "float b", offsetof(T, b_));
+
+    // float Color::a_
+    engine->RegisterObjectProperty(className, "float a", offsetof(T, a_));
+
+    // static const ChannelMask Color::ABGR
+    // Error: type "const ChannelMask" can not automatically bind
+    // static const ChannelMask Color::ARGB
+    // Error: type "const ChannelMask" can not automatically bind
+
+    // static const Color Color::WHITE
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const Color WHITE", (void*)&T::WHITE);engine->SetDefaultNamespace("");
+
+    // static const Color Color::GRAY
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const Color GRAY", (void*)&T::GRAY);engine->SetDefaultNamespace("");
+
+    // static const Color Color::BLACK
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const Color BLACK", (void*)&T::BLACK);engine->SetDefaultNamespace("");
+
+    // static const Color Color::RED
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const Color RED", (void*)&T::RED);engine->SetDefaultNamespace("");
+
+    // static const Color Color::GREEN
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const Color GREEN", (void*)&T::GREEN);engine->SetDefaultNamespace("");
+
+    // static const Color Color::BLUE
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const Color BLUE", (void*)&T::BLUE);engine->SetDefaultNamespace("");
+
+    // static const Color Color::CYAN
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const Color CYAN", (void*)&T::CYAN);engine->SetDefaultNamespace("");
+
+    // static const Color Color::MAGENTA
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const Color MAGENTA", (void*)&T::MAGENTA);engine->SetDefaultNamespace("");
+
+    // static const Color Color::YELLOW
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const Color YELLOW", (void*)&T::YELLOW);engine->SetDefaultNamespace("");
+
+    // static const Color Color::TRANSPARENT_BLACK
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const Color TRANSPARENT_BLACK", (void*)&T::TRANSPARENT_BLACK);engine->SetDefaultNamespace("");
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Color
         REGISTER_MEMBERS_MANUAL_PART_Color();
     #endif
@@ -527,6 +932,13 @@ template <class T> void RegisterMembers_ColorFrame(asIScriptEngine* engine, cons
 {
     // Color ColorFrame::Interpolate(const ColorFrame& next, float time) const
     engine->RegisterObjectMethod(className, "Color Interpolate(const ColorFrame&in, float) const", AS_METHODPR(T, Interpolate, (const ColorFrame&, float) const, Color), AS_CALL_THISCALL);
+
+    // Color ColorFrame::color_
+    engine->RegisterObjectProperty(className, "Color color", offsetof(T, color_));
+
+    // float ColorFrame::time_
+    engine->RegisterObjectProperty(className, "float time", offsetof(T, time_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ColorFrame
         REGISTER_MEMBERS_MANUAL_PART_ColorFrame();
     #endif
@@ -537,6 +949,34 @@ template <class T> void RegisterMembers_CompressedLevel(asIScriptEngine* engine,
 {
     // bool CompressedLevel::Decompress(unsigned char* dest) const
     // Error: type "unsigned char*" can not automatically bind
+
+    // unsigned char* CompressedLevel::data_
+    // Not registered because pointer
+
+    // CompressedFormat CompressedLevel::format_
+    engine->RegisterObjectProperty(className, "CompressedFormat format", offsetof(T, format_));
+
+    // int CompressedLevel::width_
+    engine->RegisterObjectProperty(className, "int width", offsetof(T, width_));
+
+    // int CompressedLevel::height_
+    engine->RegisterObjectProperty(className, "int height", offsetof(T, height_));
+
+    // int CompressedLevel::depth_
+    engine->RegisterObjectProperty(className, "int depth", offsetof(T, depth_));
+
+    // unsigned CompressedLevel::blockSize_
+    engine->RegisterObjectProperty(className, "uint blockSize", offsetof(T, blockSize_));
+
+    // unsigned CompressedLevel::dataSize_
+    engine->RegisterObjectProperty(className, "uint dataSize", offsetof(T, dataSize_));
+
+    // unsigned CompressedLevel::rowSize_
+    engine->RegisterObjectProperty(className, "uint rowSize", offsetof(T, rowSize_));
+
+    // unsigned CompressedLevel::rows_
+    engine->RegisterObjectProperty(className, "uint rows", offsetof(T, rows_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_CompressedLevel
         REGISTER_MEMBERS_MANUAL_PART_CompressedLevel();
     #endif
@@ -550,6 +990,7 @@ template <class T> void RegisterMembers_Condition(asIScriptEngine* engine, const
 
     // void Condition::Wait()
     engine->RegisterObjectMethod(className, "void Wait()", AS_METHODPR(T, Wait, (), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Condition
         REGISTER_MEMBERS_MANUAL_PART_Condition();
     #endif
@@ -569,6 +1010,19 @@ template <class T> void RegisterMembers_Controls(asIScriptEngine* engine, const 
 
     // void Controls::Set(unsigned buttons, bool down = true)
     engine->RegisterObjectMethod(className, "void Set(uint, bool = true)", AS_METHODPR(T, Set, (unsigned, bool), void), AS_CALL_THISCALL);
+
+    // unsigned Controls::buttons_
+    engine->RegisterObjectProperty(className, "uint buttons", offsetof(T, buttons_));
+
+    // float Controls::yaw_
+    engine->RegisterObjectProperty(className, "float yaw", offsetof(T, yaw_));
+
+    // float Controls::pitch_
+    engine->RegisterObjectProperty(className, "float pitch", offsetof(T, pitch_));
+
+    // VariantMap Controls::extraData_
+    engine->RegisterObjectProperty(className, "VariantMap extraData", offsetof(T, extraData_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Controls
         REGISTER_MEMBERS_MANUAL_PART_Controls();
     #endif
@@ -577,6 +1031,25 @@ template <class T> void RegisterMembers_Controls(asIScriptEngine* engine, const 
 // struct CursorShapeInfo | File: ../UI/Cursor.h
 template <class T> void RegisterMembers_CursorShapeInfo(asIScriptEngine* engine, const char* className)
 {
+    // SharedPtr<Image> CursorShapeInfo::image_
+    // Error: type "SharedPtr<Image>" can not automatically bind
+    // SharedPtr<Texture> CursorShapeInfo::texture_
+    // Error: type "SharedPtr<Texture>" can not automatically bind
+    // SDL_Cursor* CursorShapeInfo::osCursor_
+    // Not registered because pointer
+
+    // IntRect CursorShapeInfo::imageRect_
+    engine->RegisterObjectProperty(className, "IntRect imageRect", offsetof(T, imageRect_));
+
+    // IntVector2 CursorShapeInfo::hotSpot_
+    engine->RegisterObjectProperty(className, "IntVector2 hotSpot", offsetof(T, hotSpot_));
+
+    // bool CursorShapeInfo::systemDefined_
+    engine->RegisterObjectProperty(className, "bool systemDefined", offsetof(T, systemDefined_));
+
+    // int CursorShapeInfo::systemCursor_
+    engine->RegisterObjectProperty(className, "int systemCursor", offsetof(T, systemCursor_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_CursorShapeInfo
         REGISTER_MEMBERS_MANUAL_PART_CursorShapeInfo();
     #endif
@@ -585,6 +1058,21 @@ template <class T> void RegisterMembers_CursorShapeInfo(asIScriptEngine* engine,
 // struct CustomGeometryVertex | File: ../Graphics/CustomGeometry.h
 template <class T> void RegisterMembers_CustomGeometryVertex(asIScriptEngine* engine, const char* className)
 {
+    // Vector3 CustomGeometryVertex::position_
+    engine->RegisterObjectProperty(className, "Vector3 position", offsetof(T, position_));
+
+    // Vector3 CustomGeometryVertex::normal_
+    engine->RegisterObjectProperty(className, "Vector3 normal", offsetof(T, normal_));
+
+    // unsigned CustomGeometryVertex::color_
+    engine->RegisterObjectProperty(className, "uint color", offsetof(T, color_));
+
+    // Vector2 CustomGeometryVertex::texCoord_
+    engine->RegisterObjectProperty(className, "Vector2 texCoord", offsetof(T, texCoord_));
+
+    // Vector4 CustomGeometryVertex::tangent_
+    engine->RegisterObjectProperty(className, "Vector4 tangent", offsetof(T, tangent_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_CustomGeometryVertex
         REGISTER_MEMBERS_MANUAL_PART_CustomGeometryVertex();
     #endif
@@ -612,6 +1100,14 @@ template <class T> void RegisterMembers_CustomVariantValue(asIScriptEngine* engi
 
     // virtual String CustomVariantValue::ToString() const
     engine->RegisterObjectMethod(className, "String ToString() const", AS_METHODPR(T, ToString, () const, String), AS_CALL_THISCALL);
+
+    // template <class T> T* CustomVariantValue::GetValuePtr()
+    // Not registered because template
+    // template <class T> const T* CustomVariantValue::GetValuePtr() const
+    // Not registered because template
+    // template <class T> bool CustomVariantValue::IsType() const
+    // Not registered because template
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_CustomVariantValue
         REGISTER_MEMBERS_MANUAL_PART_CustomVariantValue();
     #endif
@@ -620,6 +1116,15 @@ template <class T> void RegisterMembers_CustomVariantValue(asIScriptEngine* engi
 // struct DebugLine | File: ../Graphics/DebugRenderer.h
 template <class T> void RegisterMembers_DebugLine(asIScriptEngine* engine, const char* className)
 {
+    // Vector3 DebugLine::start_
+    engine->RegisterObjectProperty(className, "Vector3 start", offsetof(T, start_));
+
+    // Vector3 DebugLine::end_
+    engine->RegisterObjectProperty(className, "Vector3 end", offsetof(T, end_));
+
+    // unsigned DebugLine::color_
+    engine->RegisterObjectProperty(className, "uint color", offsetof(T, color_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_DebugLine
         REGISTER_MEMBERS_MANUAL_PART_DebugLine();
     #endif
@@ -628,6 +1133,18 @@ template <class T> void RegisterMembers_DebugLine(asIScriptEngine* engine, const
 // struct DebugTriangle | File: ../Graphics/DebugRenderer.h
 template <class T> void RegisterMembers_DebugTriangle(asIScriptEngine* engine, const char* className)
 {
+    // Vector3 DebugTriangle::v1_
+    engine->RegisterObjectProperty(className, "Vector3 v1", offsetof(T, v1_));
+
+    // Vector3 DebugTriangle::v2_
+    engine->RegisterObjectProperty(className, "Vector3 v2", offsetof(T, v2_));
+
+    // Vector3 DebugTriangle::v3_
+    engine->RegisterObjectProperty(className, "Vector3 v3", offsetof(T, v3_));
+
+    // unsigned DebugTriangle::color_
+    engine->RegisterObjectProperty(className, "uint color", offsetof(T, color_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_DebugTriangle
         REGISTER_MEMBERS_MANUAL_PART_DebugTriangle();
     #endif
@@ -641,6 +1158,21 @@ template <class T> void RegisterMembers_Decal(asIScriptEngine* engine, const cha
 
     // void Decal::CalculateBoundingBox()
     engine->RegisterObjectMethod(className, "void CalculateBoundingBox()", AS_METHODPR(T, CalculateBoundingBox, (), void), AS_CALL_THISCALL);
+
+    // PODVector<DecalVertex> Decal::vertices_
+    // Error: type "PODVector<DecalVertex>" can not automatically bind
+    // PODVector<unsigned short> Decal::indices_
+    // Error: type "PODVector<unsigned short>" can not automatically bind
+
+    // float Decal::timer_
+    engine->RegisterObjectProperty(className, "float timer", offsetof(T, timer_));
+
+    // float Decal::timeToLive_
+    engine->RegisterObjectProperty(className, "float timeToLive", offsetof(T, timeToLive_));
+
+    // BoundingBox Decal::boundingBox_
+    engine->RegisterObjectProperty(className, "BoundingBox boundingBox", offsetof(T, boundingBox_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Decal
         REGISTER_MEMBERS_MANUAL_PART_Decal();
     #endif
@@ -649,6 +1181,23 @@ template <class T> void RegisterMembers_Decal(asIScriptEngine* engine, const cha
 // struct DecalVertex | File: ../Graphics/DecalSet.h
 template <class T> void RegisterMembers_DecalVertex(asIScriptEngine* engine, const char* className)
 {
+    // float DecalVertex::blendWeights_[4]
+    // Not registered because array
+    // unsigned char DecalVertex::blendIndices_[4]
+    // Not registered because array
+
+    // Vector3 DecalVertex::position_
+    engine->RegisterObjectProperty(className, "Vector3 position", offsetof(T, position_));
+
+    // Vector3 DecalVertex::normal_
+    engine->RegisterObjectProperty(className, "Vector3 normal", offsetof(T, normal_));
+
+    // Vector2 DecalVertex::texCoord_
+    engine->RegisterObjectProperty(className, "Vector2 texCoord", offsetof(T, texCoord_));
+
+    // Vector4 DecalVertex::tangent_
+    engine->RegisterObjectProperty(className, "Vector4 tangent", offsetof(T, tangent_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_DecalVertex
         REGISTER_MEMBERS_MANUAL_PART_DecalVertex();
     #endif
@@ -657,6 +1206,12 @@ template <class T> void RegisterMembers_DecalVertex(asIScriptEngine* engine, con
 // struct DepthValue | File: ../Graphics/OcclusionBuffer.h
 template <class T> void RegisterMembers_DepthValue(asIScriptEngine* engine, const char* className)
 {
+    // int DepthValue::min_
+    engine->RegisterObjectProperty(className, "int min", offsetof(T, min_));
+
+    // int DepthValue::max_
+    engine->RegisterObjectProperty(className, "int max", offsetof(T, max_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_DepthValue
         REGISTER_MEMBERS_MANUAL_PART_DepthValue();
     #endif
@@ -821,6 +1376,7 @@ template <class T> void RegisterMembers_Deserializer(asIScriptEngine* engine, co
 
     // unsigned Deserializer::Tell() const
     engine->RegisterObjectMethod(className, "uint Tell() const", AS_METHODPR(T, Tell, () const, unsigned), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Deserializer
         REGISTER_MEMBERS_MANUAL_PART_Deserializer();
     #endif
@@ -843,6 +1399,13 @@ template <class T> void RegisterMembers_DirtyBits(asIScriptEngine* engine, const
 
     // void DirtyBits::Set(unsigned index)
     engine->RegisterObjectMethod(className, "void Set(uint)", AS_METHODPR(T, Set, (unsigned), void), AS_CALL_THISCALL);
+
+    // unsigned char DirtyBits::data_[MAX_NETWORK_ATTRIBUTES/8]
+    // Not registered because array
+
+    // unsigned char DirtyBits::count_
+    engine->RegisterObjectProperty(className, "uint8 count", offsetof(T, count_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_DirtyBits
         REGISTER_MEMBERS_MANUAL_PART_DirtyBits();
     #endif
@@ -851,6 +1414,12 @@ template <class T> void RegisterMembers_DirtyBits(asIScriptEngine* engine, const
 // struct FileSelectorEntry | File: ../UI/FileSelector.h
 template <class T> void RegisterMembers_FileSelectorEntry(asIScriptEngine* engine, const char* className)
 {
+    // String FileSelectorEntry::name_
+    engine->RegisterObjectProperty(className, "String name", offsetof(T, name_));
+
+    // bool FileSelectorEntry::directory_
+    engine->RegisterObjectProperty(className, "bool directory", offsetof(T, directory_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_FileSelectorEntry
         REGISTER_MEMBERS_MANUAL_PART_FileSelectorEntry();
     #endif
@@ -861,6 +1430,22 @@ template <class T> void RegisterMembers_FocusParameters(asIScriptEngine* engine,
 {
     // void FocusParameters::Validate()
     engine->RegisterObjectMethod(className, "void Validate()", AS_METHODPR(T, Validate, (), void), AS_CALL_THISCALL);
+
+    // bool FocusParameters::focus_
+    engine->RegisterObjectProperty(className, "bool focus", offsetof(T, focus_));
+
+    // bool FocusParameters::nonUniform_
+    engine->RegisterObjectProperty(className, "bool nonUniform", offsetof(T, nonUniform_));
+
+    // bool FocusParameters::autoSize_
+    engine->RegisterObjectProperty(className, "bool autoSize", offsetof(T, autoSize_));
+
+    // float FocusParameters::quantize_
+    engine->RegisterObjectProperty(className, "float quantize", offsetof(T, quantize_));
+
+    // float FocusParameters::minView_
+    engine->RegisterObjectProperty(className, "float minView", offsetof(T, minView_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_FocusParameters
         REGISTER_MEMBERS_MANUAL_PART_FocusParameters();
     #endif
@@ -869,6 +1454,39 @@ template <class T> void RegisterMembers_FocusParameters(asIScriptEngine* engine,
 // struct FontGlyph | File: ../UI/FontFace.h
 template <class T> void RegisterMembers_FontGlyph(asIScriptEngine* engine, const char* className)
 {
+    // short FontGlyph::x_
+    engine->RegisterObjectProperty(className, "int16 x", offsetof(T, x_));
+
+    // short FontGlyph::y_
+    engine->RegisterObjectProperty(className, "int16 y", offsetof(T, y_));
+
+    // short FontGlyph::texWidth_
+    engine->RegisterObjectProperty(className, "int16 texWidth", offsetof(T, texWidth_));
+
+    // short FontGlyph::texHeight_
+    engine->RegisterObjectProperty(className, "int16 texHeight", offsetof(T, texHeight_));
+
+    // float FontGlyph::width_
+    engine->RegisterObjectProperty(className, "float width", offsetof(T, width_));
+
+    // float FontGlyph::height_
+    engine->RegisterObjectProperty(className, "float height", offsetof(T, height_));
+
+    // float FontGlyph::offsetX_
+    engine->RegisterObjectProperty(className, "float offsetX", offsetof(T, offsetX_));
+
+    // float FontGlyph::offsetY_
+    engine->RegisterObjectProperty(className, "float offsetY", offsetof(T, offsetY_));
+
+    // float FontGlyph::advanceX_
+    engine->RegisterObjectProperty(className, "float advanceX", offsetof(T, advanceX_));
+
+    // unsigned FontGlyph::page_
+    engine->RegisterObjectProperty(className, "uint page", offsetof(T, page_));
+
+    // bool FontGlyph::used_
+    engine->RegisterObjectProperty(className, "bool used", offsetof(T, used_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_FontGlyph
         REGISTER_MEMBERS_MANUAL_PART_FontGlyph();
     #endif
@@ -877,6 +1495,18 @@ template <class T> void RegisterMembers_FontGlyph(asIScriptEngine* engine, const
 // struct FrameInfo | File: ../Graphics/Drawable.h
 template <class T> void RegisterMembers_FrameInfo(asIScriptEngine* engine, const char* className)
 {
+    // Camera* FrameInfo::camera_
+    // Not registered because pointer
+
+    // unsigned FrameInfo::frameNumber_
+    engine->RegisterObjectProperty(className, "uint frameNumber", offsetof(T, frameNumber_));
+
+    // float FrameInfo::timeStep_
+    engine->RegisterObjectProperty(className, "float timeStep", offsetof(T, timeStep_));
+
+    // IntVector2 FrameInfo::viewSize_
+    engine->RegisterObjectProperty(className, "IntVector2 viewSize", offsetof(T, viewSize_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_FrameInfo
         REGISTER_MEMBERS_MANUAL_PART_FrameInfo();
     #endif
@@ -941,6 +1571,12 @@ template <class T> void RegisterMembers_Frustum(asIScriptEngine* engine, const c
 
     // void Frustum::UpdatePlanes()
     engine->RegisterObjectMethod(className, "void UpdatePlanes()", AS_METHODPR(T, UpdatePlanes, (), void), AS_CALL_THISCALL);
+
+    // Plane Frustum::planes_[NUM_FRUSTUM_PLANES]
+    // Not registered because array
+    // Vector3 Frustum::vertices_[NUM_FRUSTUM_VERTICES]
+    // Not registered because array
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Frustum
         REGISTER_MEMBERS_MANUAL_PART_Frustum();
     #endif
@@ -976,6 +1612,7 @@ template <class T> void RegisterMembers_GPUObject(asIScriptEngine* engine, const
 
     // virtual void GPUObject::Release()
     engine->RegisterObjectMethod(className, "void Release()", AS_METHODPR(T, Release, (), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_GPUObject
         REGISTER_MEMBERS_MANUAL_PART_GPUObject();
     #endif
@@ -984,6 +1621,21 @@ template <class T> void RegisterMembers_GPUObject(asIScriptEngine* engine, const
 // struct GeometryDesc | File: ../Graphics/Model.h
 template <class T> void RegisterMembers_GeometryDesc(asIScriptEngine* engine, const char* className)
 {
+    // PrimitiveType GeometryDesc::type_
+    engine->RegisterObjectProperty(className, "PrimitiveType type", offsetof(T, type_));
+
+    // unsigned GeometryDesc::vbRef_
+    engine->RegisterObjectProperty(className, "uint vbRef", offsetof(T, vbRef_));
+
+    // unsigned GeometryDesc::ibRef_
+    engine->RegisterObjectProperty(className, "uint ibRef", offsetof(T, ibRef_));
+
+    // unsigned GeometryDesc::indexStart_
+    engine->RegisterObjectProperty(className, "uint indexStart", offsetof(T, indexStart_));
+
+    // unsigned GeometryDesc::indexCount_
+    engine->RegisterObjectProperty(className, "uint indexCount", offsetof(T, indexCount_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_GeometryDesc
         REGISTER_MEMBERS_MANUAL_PART_GeometryDesc();
     #endif
@@ -992,6 +1644,15 @@ template <class T> void RegisterMembers_GeometryDesc(asIScriptEngine* engine, co
 // struct GlyphLocation | File: ../UI/Text.h
 template <class T> void RegisterMembers_GlyphLocation(asIScriptEngine* engine, const char* className)
 {
+    // const FontGlyph* GlyphLocation::glyph_
+    // Not registered because pointer
+
+    // float GlyphLocation::x_
+    engine->RegisterObjectProperty(className, "float x", offsetof(T, x_));
+
+    // float GlyphLocation::y_
+    engine->RegisterObjectProperty(className, "float y", offsetof(T, y_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_GlyphLocation
         REGISTER_MEMBERS_MANUAL_PART_GlyphLocation();
     #endif
@@ -1011,6 +1672,13 @@ template <class T> void RegisterMembers_HashBase(asIScriptEngine* engine, const 
 
     // void HashBase::Swap(HashBase& rhs)
     engine->RegisterObjectMethod(className, "void Swap(HashBase&)", AS_METHODPR(T, Swap, (HashBase&), void), AS_CALL_THISCALL);
+
+    // static const unsigned HashBase::MIN_BUCKETS
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const uint MIN_BUCKETS", (void*)&T::MIN_BUCKETS);engine->SetDefaultNamespace("");
+
+    // static const unsigned HashBase::MAX_LOAD_FACTOR
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const uint MAX_LOAD_FACTOR", (void*)&T::MAX_LOAD_FACTOR);engine->SetDefaultNamespace("");
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_HashBase
         REGISTER_MEMBERS_MANUAL_PART_HashBase();
     #endif
@@ -1030,6 +1698,10 @@ template <class T> void RegisterMembers_HashIteratorBase(asIScriptEngine* engine
 
     // bool HashIteratorBase::operator ==(const HashIteratorBase& rhs) const
     engine->RegisterObjectMethod(className, "bool opEquals(const HashIteratorBase&in) const", AS_METHODPR(T, operator==, (const HashIteratorBase&) const, bool), AS_CALL_THISCALL);
+
+    // HashNodeBase* HashIteratorBase::ptr_
+    // Not registered because pointer
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_HashIteratorBase
         REGISTER_MEMBERS_MANUAL_PART_HashIteratorBase();
     #endif
@@ -1038,6 +1710,13 @@ template <class T> void RegisterMembers_HashIteratorBase(asIScriptEngine* engine
 // struct HashNodeBase | File: ../Container/HashBase.h
 template <class T> void RegisterMembers_HashNodeBase(asIScriptEngine* engine, const char* className)
 {
+    // HashNodeBase* HashNodeBase::down_
+    // Not registered because pointer
+    // HashNodeBase* HashNodeBase::prev_
+    // Not registered because pointer
+    // HashNodeBase* HashNodeBase::next_
+    // Not registered because pointer
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_HashNodeBase
         REGISTER_MEMBERS_MANUAL_PART_HashNodeBase();
     #endif
@@ -1057,6 +1736,7 @@ template <class T> void RegisterMembers_HiresTimer(asIScriptEngine* engine, cons
 
     // static long long HiresTimer::GetFrequency()
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("int64 GetFrequency()", AS_FUNCTIONPR(T::GetFrequency, (), long long), AS_CALL_CDECL);engine->SetDefaultNamespace("");
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_HiresTimer
         REGISTER_MEMBERS_MANUAL_PART_HiresTimer();
     #endif
@@ -1065,6 +1745,18 @@ template <class T> void RegisterMembers_HiresTimer(asIScriptEngine* engine, cons
 // struct IndexBufferDesc | File: ../Graphics/Model.h
 template <class T> void RegisterMembers_IndexBufferDesc(asIScriptEngine* engine, const char* className)
 {
+    // SharedArrayPtr<unsigned char> IndexBufferDesc::data_
+    // Error: type "SharedArrayPtr<unsigned char>" can not automatically bind
+
+    // unsigned IndexBufferDesc::indexCount_
+    engine->RegisterObjectProperty(className, "uint indexCount", offsetof(T, indexCount_));
+
+    // unsigned IndexBufferDesc::indexSize_
+    engine->RegisterObjectProperty(className, "uint indexSize", offsetof(T, indexSize_));
+
+    // unsigned IndexBufferDesc::dataSize_
+    engine->RegisterObjectProperty(className, "uint dataSize", offsetof(T, dataSize_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_IndexBufferDesc
         REGISTER_MEMBERS_MANUAL_PART_IndexBufferDesc();
     #endif
@@ -1073,6 +1765,14 @@ template <class T> void RegisterMembers_IndexBufferDesc(asIScriptEngine* engine,
 // struct InstanceData | File: ../Graphics/Batch.h
 template <class T> void RegisterMembers_InstanceData(asIScriptEngine* engine, const char* className)
 {
+    // const Matrix3x4* InstanceData::worldTransform_
+    // Not registered because pointer
+    // const void* InstanceData::instancingData_
+    // Not registered because pointer
+
+    // float InstanceData::distance_
+    engine->RegisterObjectProperty(className, "float distance", offsetof(T, distance_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_InstanceData
         REGISTER_MEMBERS_MANUAL_PART_InstanceData();
     #endif
@@ -1157,6 +1857,22 @@ template <class T> void RegisterMembers_IntRect(asIScriptEngine* engine, const c
     // int IntRect::Width() const
     engine->RegisterObjectMethod(className, "int Width() const", AS_METHODPR(T, Width, () const, int), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "int get_width() const", AS_METHODPR(T, Width, () const, int), AS_CALL_THISCALL);
+
+    // int IntRect::left_
+    engine->RegisterObjectProperty(className, "int left", offsetof(T, left_));
+
+    // int IntRect::top_
+    engine->RegisterObjectProperty(className, "int top", offsetof(T, top_));
+
+    // int IntRect::right_
+    engine->RegisterObjectProperty(className, "int right", offsetof(T, right_));
+
+    // int IntRect::bottom_
+    engine->RegisterObjectProperty(className, "int bottom", offsetof(T, bottom_));
+
+    // static const IntRect IntRect::ZERO
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const IntRect ZERO", (void*)&T::ZERO);engine->SetDefaultNamespace("");
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_IntRect
         REGISTER_MEMBERS_MANUAL_PART_IntRect();
     #endif
@@ -1223,6 +1939,31 @@ template <class T> void RegisterMembers_IntVector2(asIScriptEngine* engine, cons
 
     // String IntVector2::ToString() const
     engine->RegisterObjectMethod(className, "String ToString() const", AS_METHODPR(T, ToString, () const, String), AS_CALL_THISCALL);
+
+    // int IntVector2::x_
+    engine->RegisterObjectProperty(className, "int x", offsetof(T, x_));
+
+    // int IntVector2::y_
+    engine->RegisterObjectProperty(className, "int y", offsetof(T, y_));
+
+    // static const IntVector2 IntVector2::ZERO
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const IntVector2 ZERO", (void*)&T::ZERO);engine->SetDefaultNamespace("");
+
+    // static const IntVector2 IntVector2::LEFT
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const IntVector2 LEFT", (void*)&T::LEFT);engine->SetDefaultNamespace("");
+
+    // static const IntVector2 IntVector2::RIGHT
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const IntVector2 RIGHT", (void*)&T::RIGHT);engine->SetDefaultNamespace("");
+
+    // static const IntVector2 IntVector2::UP
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const IntVector2 UP", (void*)&T::UP);engine->SetDefaultNamespace("");
+
+    // static const IntVector2 IntVector2::DOWN
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const IntVector2 DOWN", (void*)&T::DOWN);engine->SetDefaultNamespace("");
+
+    // static const IntVector2 IntVector2::ONE
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const IntVector2 ONE", (void*)&T::ONE);engine->SetDefaultNamespace("");
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_IntVector2
         REGISTER_MEMBERS_MANUAL_PART_IntVector2();
     #endif
@@ -1289,6 +2030,40 @@ template <class T> void RegisterMembers_IntVector3(asIScriptEngine* engine, cons
 
     // String IntVector3::ToString() const
     engine->RegisterObjectMethod(className, "String ToString() const", AS_METHODPR(T, ToString, () const, String), AS_CALL_THISCALL);
+
+    // int IntVector3::x_
+    engine->RegisterObjectProperty(className, "int x", offsetof(T, x_));
+
+    // int IntVector3::y_
+    engine->RegisterObjectProperty(className, "int y", offsetof(T, y_));
+
+    // int IntVector3::z_
+    engine->RegisterObjectProperty(className, "int z", offsetof(T, z_));
+
+    // static const IntVector3 IntVector3::ZERO
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const IntVector3 ZERO", (void*)&T::ZERO);engine->SetDefaultNamespace("");
+
+    // static const IntVector3 IntVector3::LEFT
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const IntVector3 LEFT", (void*)&T::LEFT);engine->SetDefaultNamespace("");
+
+    // static const IntVector3 IntVector3::RIGHT
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const IntVector3 RIGHT", (void*)&T::RIGHT);engine->SetDefaultNamespace("");
+
+    // static const IntVector3 IntVector3::UP
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const IntVector3 UP", (void*)&T::UP);engine->SetDefaultNamespace("");
+
+    // static const IntVector3 IntVector3::DOWN
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const IntVector3 DOWN", (void*)&T::DOWN);engine->SetDefaultNamespace("");
+
+    // static const IntVector3 IntVector3::FORWARD
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const IntVector3 FORWARD", (void*)&T::FORWARD);engine->SetDefaultNamespace("");
+
+    // static const IntVector3 IntVector3::BACK
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const IntVector3 BACK", (void*)&T::BACK);engine->SetDefaultNamespace("");
+
+    // static const IntVector3 IntVector3::ONE
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const IntVector3 ONE", (void*)&T::ONE);engine->SetDefaultNamespace("");
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_IntVector3
         REGISTER_MEMBERS_MANUAL_PART_IntVector3();
     #endif
@@ -1318,14 +2093,14 @@ template <class T> void JSONValue_void_SetVariantValue_constspVariantamp_Context
 // class JSONValue | File: ../Resource/JSONValue.h
 template <class T> void RegisterMembers_JSONValue(asIScriptEngine* engine, const char* className)
 {
-    // ConstJSONObjectIterator JSONValue::Begin() const
-    // Error: type "ConstJSONObjectIterator" can not automatically bind
     // JSONObjectIterator JSONValue::Begin()
     // Error: type "JSONObjectIterator" can not automatically bind
-    // ConstJSONObjectIterator JSONValue::End() const
+    // ConstJSONObjectIterator JSONValue::Begin() const
     // Error: type "ConstJSONObjectIterator" can not automatically bind
     // JSONObjectIterator JSONValue::End()
     // Error: type "JSONObjectIterator" can not automatically bind
+    // ConstJSONObjectIterator JSONValue::End() const
+    // Error: type "ConstJSONObjectIterator" can not automatically bind
     // const JSONArray& JSONValue::GetArray() const
     // Error: type "const JSONArray&" can not automatically bind
     // const char* JSONValue::GetCString(const char* defaultValue = "") const
@@ -1334,14 +2109,14 @@ template <class T> void RegisterMembers_JSONValue(asIScriptEngine* engine, const
     // Error: type "const JSONObject&" can not automatically bind
     // VariantVector JSONValue::GetVariantVector() const
     // Error: type "VariantVector" can not automatically bind
-    // void JSONValue::SetVariantVector(const VariantVector& variantVector, Context* context = nullptr)
-    // Error: type "const VariantVector&" can not automatically bind
+    // JSONValue& JSONValue::operator =(const char* rhs)
+    // Error: type "const char*" can not automatically bind
     // JSONValue& JSONValue::operator =(const JSONArray& rhs)
     // Error: type "const JSONArray&" can not automatically bind
     // JSONValue& JSONValue::operator =(const JSONObject& rhs)
     // Error: type "const JSONObject&" can not automatically bind
-    // JSONValue& JSONValue::operator =(const char* rhs)
-    // Error: type "const char*" can not automatically bind
+    // void JSONValue::SetVariantVector(const VariantVector& variantVector, Context* context = nullptr)
+    // Error: type "const VariantVector&" can not automatically bind
 
     // void JSONValue::Clear()
     engine->RegisterObjectMethod(className, "void Clear()", AS_METHODPR(T, Clear, (), void), AS_CALL_THISCALL);
@@ -1489,6 +2264,11 @@ template <class T> void RegisterMembers_JSONValue(asIScriptEngine* engine, const
     engine->RegisterObjectMethod(className, "uint Size() const", AS_METHODPR(T, Size, () const, unsigned), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_size() const", AS_METHODPR(T, Size, () const, unsigned), AS_CALL_THISCALL);
 
+    // static JSONValueType JSONValue::GetValueTypeFromName(const char* typeName)
+    // Error: type "const char*" can not automatically bind
+    // static JSONNumberType JSONValue::GetNumberTypeFromName(const char* typeName)
+    // Error: type "const char*" can not automatically bind
+
     // static String JSONValue::GetValueTypeName(JSONValueType type)
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("String GetValueTypeName(JSONValueType)", AS_FUNCTIONPR(T::GetValueTypeName, (JSONValueType), String), AS_CALL_CDECL);engine->SetDefaultNamespace("");
 
@@ -1500,6 +2280,26 @@ template <class T> void RegisterMembers_JSONValue(asIScriptEngine* engine, const
 
     // static JSONNumberType JSONValue::GetNumberTypeFromName(const String& typeName)
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("JSONNumberType GetNumberTypeFromName(const String&in)", AS_FUNCTIONPR(T::GetNumberTypeFromName, (const String&), JSONNumberType), AS_CALL_CDECL);engine->SetDefaultNamespace("");
+
+    // bool JSONValue::boolValue_
+    // Not registered because have @nobind mark
+    // double JSONValue::numberValue_
+    // Not registered because have @nobind mark
+    // String* JSONValue::stringValue_
+    // Not registered because have @nobind mark
+    // JSONArray* JSONValue::arrayValue_
+    // Not registered because have @nobind mark
+    // JSONObject* JSONValue::objectValue_
+    // Not registered because have @nobind mark
+
+    // static const JSONArray JSONValue::emptyArray
+    // Error: type "const JSONArray" can not automatically bind
+    // static const JSONObject JSONValue::emptyObject
+    // Error: type "const JSONObject" can not automatically bind
+
+    // static const JSONValue JSONValue::EMPTY
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const JSONValue EMPTY", (void*)&T::EMPTY);engine->SetDefaultNamespace("");
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_JSONValue
         REGISTER_MEMBERS_MANUAL_PART_JSONValue();
     #endif
@@ -1545,6 +2345,28 @@ template <class T> void RegisterMembers_JoystickState(asIScriptEngine* engine, c
 
     // void JoystickState::Reset()
     engine->RegisterObjectMethod(className, "void Reset()", AS_METHODPR(T, Reset, (), void), AS_CALL_THISCALL);
+
+    // SDL_Joystick* JoystickState::joystick_
+    // Not registered because pointer
+    // SDL_GameController* JoystickState::controller_
+    // Not registered because pointer
+    // UIElement* JoystickState::screenJoystick_
+    // Not registered because pointer
+    // PODVector<bool> JoystickState::buttons_
+    // Error: type "PODVector<bool>" can not automatically bind
+    // PODVector<bool> JoystickState::buttonPress_
+    // Error: type "PODVector<bool>" can not automatically bind
+    // PODVector<float> JoystickState::axes_
+    // Error: type "PODVector<float>" can not automatically bind
+    // PODVector<int> JoystickState::hats_
+    // Error: type "PODVector<int>" can not automatically bind
+
+    // SDL_JoystickID JoystickState::joystickID_
+    engine->RegisterObjectProperty(className, "SDL_JoystickID joystickID", offsetof(T, joystickID_));
+
+    // String JoystickState::name_
+    engine->RegisterObjectProperty(className, "String name", offsetof(T, name_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_JoystickState
         REGISTER_MEMBERS_MANUAL_PART_JoystickState();
     #endif
@@ -1553,6 +2375,26 @@ template <class T> void RegisterMembers_JoystickState(asIScriptEngine* engine, c
 // struct LightBatchQueue | File: ../Graphics/Batch.h
 template <class T> void RegisterMembers_LightBatchQueue(asIScriptEngine* engine, const char* className)
 {
+    // Light* LightBatchQueue::light_
+    // Not registered because pointer
+    // Texture2D* LightBatchQueue::shadowMap_
+    // Not registered because pointer
+    // Vector<ShadowBatchQueue> LightBatchQueue::shadowSplits_
+    // Error: type "Vector<ShadowBatchQueue>" can not automatically bind
+    // PODVector<Light*> LightBatchQueue::vertexLights_
+    // Error: type "PODVector<Light*>" can not automatically bind
+    // PODVector<Batch> LightBatchQueue::volumeBatches_
+    // Error: type "PODVector<Batch>" can not automatically bind
+
+    // bool LightBatchQueue::negative_
+    engine->RegisterObjectProperty(className, "bool negative", offsetof(T, negative_));
+
+    // BatchQueue LightBatchQueue::litBaseBatches_
+    engine->RegisterObjectProperty(className, "BatchQueue litBaseBatches", offsetof(T, litBaseBatches_));
+
+    // BatchQueue LightBatchQueue::litBatches_
+    engine->RegisterObjectProperty(className, "BatchQueue litBatches", offsetof(T, litBatches_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_LightBatchQueue
         REGISTER_MEMBERS_MANUAL_PART_LightBatchQueue();
     #endif
@@ -1561,6 +2403,28 @@ template <class T> void RegisterMembers_LightBatchQueue(asIScriptEngine* engine,
 // struct LightQueryResult | File: ../Graphics/View.h
 template <class T> void RegisterMembers_LightQueryResult(asIScriptEngine* engine, const char* className)
 {
+    // Light* LightQueryResult::light_
+    // Not registered because pointer
+    // PODVector<Drawable*> LightQueryResult::litGeometries_
+    // Error: type "PODVector<Drawable*>" can not automatically bind
+    // PODVector<Drawable*> LightQueryResult::shadowCasters_
+    // Error: type "PODVector<Drawable*>" can not automatically bind
+    // Camera* LightQueryResult::shadowCameras_[MAX_LIGHT_SPLITS]
+    // Not registered because array
+    // unsigned LightQueryResult::shadowCasterBegin_[MAX_LIGHT_SPLITS]
+    // Not registered because array
+    // unsigned LightQueryResult::shadowCasterEnd_[MAX_LIGHT_SPLITS]
+    // Not registered because array
+    // BoundingBox LightQueryResult::shadowCasterBox_[MAX_LIGHT_SPLITS]
+    // Not registered because array
+    // float LightQueryResult::shadowNearSplits_[MAX_LIGHT_SPLITS]
+    // Not registered because array
+    // float LightQueryResult::shadowFarSplits_[MAX_LIGHT_SPLITS]
+    // Not registered because array
+
+    // unsigned LightQueryResult::numSplits_
+    engine->RegisterObjectProperty(className, "uint numSplits", offsetof(T, numSplits_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_LightQueryResult
         REGISTER_MEMBERS_MANUAL_PART_LightQueryResult();
     #endif
@@ -1569,6 +2433,9 @@ template <class T> void RegisterMembers_LightQueryResult(asIScriptEngine* engine
 // struct LinkedListNode | File: ../Container/LinkedList.h
 template <class T> void RegisterMembers_LinkedListNode(asIScriptEngine* engine, const char* className)
 {
+    // LinkedListNode* LinkedListNode::next_
+    // Not registered because pointer
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_LinkedListNode
         REGISTER_MEMBERS_MANUAL_PART_LinkedListNode();
     #endif
@@ -1579,6 +2446,7 @@ template <class T> void RegisterMembers_ListBase(asIScriptEngine* engine, const 
 {
     // void ListBase::Swap(ListBase& rhs)
     engine->RegisterObjectMethod(className, "void Swap(ListBase&)", AS_METHODPR(T, Swap, (ListBase&), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ListBase
         REGISTER_MEMBERS_MANUAL_PART_ListBase();
     #endif
@@ -1598,6 +2466,10 @@ template <class T> void RegisterMembers_ListIteratorBase(asIScriptEngine* engine
 
     // bool ListIteratorBase::operator ==(const ListIteratorBase& rhs) const
     engine->RegisterObjectMethod(className, "bool opEquals(const ListIteratorBase&in) const", AS_METHODPR(T, operator==, (const ListIteratorBase&) const, bool), AS_CALL_THISCALL);
+
+    // ListNodeBase* ListIteratorBase::ptr_
+    // Not registered because pointer
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ListIteratorBase
         REGISTER_MEMBERS_MANUAL_PART_ListIteratorBase();
     #endif
@@ -1606,6 +2478,11 @@ template <class T> void RegisterMembers_ListIteratorBase(asIScriptEngine* engine
 // struct ListNodeBase | File: ../Container/ListBase.h
 template <class T> void RegisterMembers_ListNodeBase(asIScriptEngine* engine, const char* className)
 {
+    // ListNodeBase* ListNodeBase::prev_
+    // Not registered because pointer
+    // ListNodeBase* ListNodeBase::next_
+    // Not registered because pointer
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ListNodeBase
         REGISTER_MEMBERS_MANUAL_PART_ListNodeBase();
     #endif
@@ -1614,6 +2491,12 @@ template <class T> void RegisterMembers_ListNodeBase(asIScriptEngine* engine, co
 // struct MaterialShaderParameter | File: ../Graphics/Material.h
 template <class T> void RegisterMembers_MaterialShaderParameter(asIScriptEngine* engine, const char* className)
 {
+    // String MaterialShaderParameter::name_
+    engine->RegisterObjectProperty(className, "String name", offsetof(T, name_));
+
+    // Variant MaterialShaderParameter::value_
+    engine->RegisterObjectProperty(className, "Variant value", offsetof(T, value_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_MaterialShaderParameter
         REGISTER_MEMBERS_MANUAL_PART_MaterialShaderParameter();
     #endif
@@ -1677,6 +2560,28 @@ template <class T> void RegisterMembers_Matrix2(asIScriptEngine* engine, const c
 
     // Matrix2 Matrix2::Transpose() const
     engine->RegisterObjectMethod(className, "Matrix2 Transpose() const", AS_METHODPR(T, Transpose, () const, Matrix2), AS_CALL_THISCALL);
+
+    // static void Matrix2::BulkTranspose(float* dest, const float* src, unsigned count)
+    // Error: type "float*" can not automatically bind
+
+    // float Matrix2::m00_
+    engine->RegisterObjectProperty(className, "float m00", offsetof(T, m00_));
+
+    // float Matrix2::m01_
+    engine->RegisterObjectProperty(className, "float m01", offsetof(T, m01_));
+
+    // float Matrix2::m10_
+    engine->RegisterObjectProperty(className, "float m10", offsetof(T, m10_));
+
+    // float Matrix2::m11_
+    engine->RegisterObjectProperty(className, "float m11", offsetof(T, m11_));
+
+    // static const Matrix2 Matrix2::ZERO
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const Matrix2 ZERO", (void*)&T::ZERO);engine->SetDefaultNamespace("");
+
+    // static const Matrix2 Matrix2::IDENTITY
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const Matrix2 IDENTITY", (void*)&T::IDENTITY);engine->SetDefaultNamespace("");
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Matrix2
         REGISTER_MEMBERS_MANUAL_PART_Matrix2();
     #endif
@@ -1752,6 +2657,43 @@ template <class T> void RegisterMembers_Matrix3(asIScriptEngine* engine, const c
 
     // Matrix3 Matrix3::Transpose() const
     engine->RegisterObjectMethod(className, "Matrix3 Transpose() const", AS_METHODPR(T, Transpose, () const, Matrix3), AS_CALL_THISCALL);
+
+    // static void Matrix3::BulkTranspose(float* dest, const float* src, unsigned count)
+    // Error: type "float*" can not automatically bind
+
+    // float Matrix3::m00_
+    engine->RegisterObjectProperty(className, "float m00", offsetof(T, m00_));
+
+    // float Matrix3::m01_
+    engine->RegisterObjectProperty(className, "float m01", offsetof(T, m01_));
+
+    // float Matrix3::m02_
+    engine->RegisterObjectProperty(className, "float m02", offsetof(T, m02_));
+
+    // float Matrix3::m10_
+    engine->RegisterObjectProperty(className, "float m10", offsetof(T, m10_));
+
+    // float Matrix3::m11_
+    engine->RegisterObjectProperty(className, "float m11", offsetof(T, m11_));
+
+    // float Matrix3::m12_
+    engine->RegisterObjectProperty(className, "float m12", offsetof(T, m12_));
+
+    // float Matrix3::m20_
+    engine->RegisterObjectProperty(className, "float m20", offsetof(T, m20_));
+
+    // float Matrix3::m21_
+    engine->RegisterObjectProperty(className, "float m21", offsetof(T, m21_));
+
+    // float Matrix3::m22_
+    engine->RegisterObjectProperty(className, "float m22", offsetof(T, m22_));
+
+    // static const Matrix3 Matrix3::ZERO
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const Matrix3 ZERO", (void*)&T::ZERO);engine->SetDefaultNamespace("");
+
+    // static const Matrix3 Matrix3::IDENTITY
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const Matrix3 IDENTITY", (void*)&T::IDENTITY);engine->SetDefaultNamespace("");
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Matrix3
         REGISTER_MEMBERS_MANUAL_PART_Matrix3();
     #endif
@@ -1857,6 +2799,49 @@ template <class T> void RegisterMembers_Matrix3x4(asIScriptEngine* engine, const
 
     // Vector3 Matrix3x4::Translation() const
     engine->RegisterObjectMethod(className, "Vector3 Translation() const", AS_METHODPR(T, Translation, () const, Vector3), AS_CALL_THISCALL);
+
+    // float Matrix3x4::m00_
+    engine->RegisterObjectProperty(className, "float m00", offsetof(T, m00_));
+
+    // float Matrix3x4::m01_
+    engine->RegisterObjectProperty(className, "float m01", offsetof(T, m01_));
+
+    // float Matrix3x4::m02_
+    engine->RegisterObjectProperty(className, "float m02", offsetof(T, m02_));
+
+    // float Matrix3x4::m03_
+    engine->RegisterObjectProperty(className, "float m03", offsetof(T, m03_));
+
+    // float Matrix3x4::m10_
+    engine->RegisterObjectProperty(className, "float m10", offsetof(T, m10_));
+
+    // float Matrix3x4::m11_
+    engine->RegisterObjectProperty(className, "float m11", offsetof(T, m11_));
+
+    // float Matrix3x4::m12_
+    engine->RegisterObjectProperty(className, "float m12", offsetof(T, m12_));
+
+    // float Matrix3x4::m13_
+    engine->RegisterObjectProperty(className, "float m13", offsetof(T, m13_));
+
+    // float Matrix3x4::m20_
+    engine->RegisterObjectProperty(className, "float m20", offsetof(T, m20_));
+
+    // float Matrix3x4::m21_
+    engine->RegisterObjectProperty(className, "float m21", offsetof(T, m21_));
+
+    // float Matrix3x4::m22_
+    engine->RegisterObjectProperty(className, "float m22", offsetof(T, m22_));
+
+    // float Matrix3x4::m23_
+    engine->RegisterObjectProperty(className, "float m23", offsetof(T, m23_));
+
+    // static const Matrix3x4 Matrix3x4::ZERO
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const Matrix3x4 ZERO", (void*)&T::ZERO);engine->SetDefaultNamespace("");
+
+    // static const Matrix3x4 Matrix3x4::IDENTITY
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const Matrix3x4 IDENTITY", (void*)&T::IDENTITY);engine->SetDefaultNamespace("");
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Matrix3x4
         REGISTER_MEMBERS_MANUAL_PART_Matrix3x4();
     #endif
@@ -1959,6 +2944,64 @@ template <class T> void RegisterMembers_Matrix4(asIScriptEngine* engine, const c
 
     // Matrix4 Matrix4::Transpose() const
     engine->RegisterObjectMethod(className, "Matrix4 Transpose() const", AS_METHODPR(T, Transpose, () const, Matrix4), AS_CALL_THISCALL);
+
+    // static void Matrix4::BulkTranspose(float* dest, const float* src, unsigned count)
+    // Error: type "float*" can not automatically bind
+
+    // float Matrix4::m00_
+    engine->RegisterObjectProperty(className, "float m00", offsetof(T, m00_));
+
+    // float Matrix4::m01_
+    engine->RegisterObjectProperty(className, "float m01", offsetof(T, m01_));
+
+    // float Matrix4::m02_
+    engine->RegisterObjectProperty(className, "float m02", offsetof(T, m02_));
+
+    // float Matrix4::m03_
+    engine->RegisterObjectProperty(className, "float m03", offsetof(T, m03_));
+
+    // float Matrix4::m10_
+    engine->RegisterObjectProperty(className, "float m10", offsetof(T, m10_));
+
+    // float Matrix4::m11_
+    engine->RegisterObjectProperty(className, "float m11", offsetof(T, m11_));
+
+    // float Matrix4::m12_
+    engine->RegisterObjectProperty(className, "float m12", offsetof(T, m12_));
+
+    // float Matrix4::m13_
+    engine->RegisterObjectProperty(className, "float m13", offsetof(T, m13_));
+
+    // float Matrix4::m20_
+    engine->RegisterObjectProperty(className, "float m20", offsetof(T, m20_));
+
+    // float Matrix4::m21_
+    engine->RegisterObjectProperty(className, "float m21", offsetof(T, m21_));
+
+    // float Matrix4::m22_
+    engine->RegisterObjectProperty(className, "float m22", offsetof(T, m22_));
+
+    // float Matrix4::m23_
+    engine->RegisterObjectProperty(className, "float m23", offsetof(T, m23_));
+
+    // float Matrix4::m30_
+    engine->RegisterObjectProperty(className, "float m30", offsetof(T, m30_));
+
+    // float Matrix4::m31_
+    engine->RegisterObjectProperty(className, "float m31", offsetof(T, m31_));
+
+    // float Matrix4::m32_
+    engine->RegisterObjectProperty(className, "float m32", offsetof(T, m32_));
+
+    // float Matrix4::m33_
+    engine->RegisterObjectProperty(className, "float m33", offsetof(T, m33_));
+
+    // static const Matrix4 Matrix4::ZERO
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const Matrix4 ZERO", (void*)&T::ZERO);engine->SetDefaultNamespace("");
+
+    // static const Matrix4 Matrix4::IDENTITY
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const Matrix4 IDENTITY", (void*)&T::IDENTITY);engine->SetDefaultNamespace("");
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Matrix4
         REGISTER_MEMBERS_MANUAL_PART_Matrix4();
     #endif
@@ -1967,6 +3010,18 @@ template <class T> void RegisterMembers_Matrix4(asIScriptEngine* engine, const c
 // struct ModelMorph | File: ../Graphics/Model.h
 template <class T> void RegisterMembers_ModelMorph(asIScriptEngine* engine, const char* className)
 {
+    // HashMap<unsigned, VertexBufferMorph> ModelMorph::buffers_
+    // Error: type "HashMap<unsigned, VertexBufferMorph>" can not automatically bind
+
+    // String ModelMorph::name_
+    engine->RegisterObjectProperty(className, "String name", offsetof(T, name_));
+
+    // StringHash ModelMorph::nameHash_
+    engine->RegisterObjectProperty(className, "StringHash nameHash", offsetof(T, nameHash_));
+
+    // float ModelMorph::weight_
+    engine->RegisterObjectProperty(className, "float weight", offsetof(T, weight_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ModelMorph
         REGISTER_MEMBERS_MANUAL_PART_ModelMorph();
     #endif
@@ -1983,6 +3038,7 @@ template <class T> void RegisterMembers_Mutex(asIScriptEngine* engine, const cha
 
     // bool Mutex::TryAcquire()
     engine->RegisterObjectMethod(className, "bool TryAcquire()", AS_METHODPR(T, TryAcquire, (), bool), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Mutex
         REGISTER_MEMBERS_MANUAL_PART_Mutex();
     #endif
@@ -1991,6 +3047,9 @@ template <class T> void RegisterMembers_Mutex(asIScriptEngine* engine, const cha
 // class MutexLock | File: ../Core/Mutex.h
 template <class T> void RegisterMembers_MutexLock(asIScriptEngine* engine, const char* className)
 {
+    // MutexLock& MutexLock::operator =(const MutexLock& rhs) = delete
+    // Not registered because deleted
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_MutexLock
         REGISTER_MEMBERS_MANUAL_PART_MutexLock();
     #endif
@@ -1999,6 +3058,21 @@ template <class T> void RegisterMembers_MutexLock(asIScriptEngine* engine, const
 // struct NetworkState | File: ../Scene/ReplicationState.h
 template <class T> void RegisterMembers_NetworkState(asIScriptEngine* engine, const char* className)
 {
+    // const Vector<AttributeInfo>* NetworkState::attributes_
+    // Not registered because pointer
+    // Vector<Variant> NetworkState::currentValues_
+    // Error: type "Vector<Variant>" can not automatically bind
+    // Vector<Variant> NetworkState::previousValues_
+    // Error: type "Vector<Variant>" can not automatically bind
+    // PODVector<ReplicationState*> NetworkState::replicationStates_
+    // Error: type "PODVector<ReplicationState*>" can not automatically bind
+
+    // VariantMap NetworkState::previousVars_
+    engine->RegisterObjectProperty(className, "VariantMap previousVars", offsetof(T, previousVars_));
+
+    // unsigned long long NetworkState::interceptMask_
+    engine->RegisterObjectProperty(className, "uint64 interceptMask", offsetof(T, interceptMask_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_NetworkState
         REGISTER_MEMBERS_MANUAL_PART_NetworkState();
     #endif
@@ -2007,6 +3081,22 @@ template <class T> void RegisterMembers_NetworkState(asIScriptEngine* engine, co
 // struct NodeImpl | File: ../Scene/Node.h
 template <class T> void RegisterMembers_NodeImpl(asIScriptEngine* engine, const char* className)
 {
+    // PODVector<Node*> NodeImpl::dependencyNodes_
+    // Error: type "PODVector<Node*>" can not automatically bind
+    // Connection* NodeImpl::owner_
+    // Not registered because pointer
+    // StringVector NodeImpl::tags_
+    // Error: type "StringVector" can not automatically bind
+
+    // String NodeImpl::name_
+    engine->RegisterObjectProperty(className, "String name", offsetof(T, name_));
+
+    // StringHash NodeImpl::nameHash_
+    engine->RegisterObjectProperty(className, "StringHash nameHash", offsetof(T, nameHash_));
+
+    // VectorBuffer NodeImpl::attrBuffer_
+    engine->RegisterObjectProperty(className, "VectorBuffer attrBuffer", offsetof(T, attrBuffer_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_NodeImpl
         REGISTER_MEMBERS_MANUAL_PART_NodeImpl();
     #endif
@@ -2015,6 +3105,26 @@ template <class T> void RegisterMembers_NodeImpl(asIScriptEngine* engine, const 
 // struct OcclusionBatch | File: ../Graphics/OcclusionBuffer.h
 template <class T> void RegisterMembers_OcclusionBatch(asIScriptEngine* engine, const char* className)
 {
+    // const void* OcclusionBatch::vertexData_
+    // Not registered because pointer
+    // const void* OcclusionBatch::indexData_
+    // Not registered because pointer
+
+    // Matrix3x4 OcclusionBatch::model_
+    engine->RegisterObjectProperty(className, "Matrix3x4 model", offsetof(T, model_));
+
+    // unsigned OcclusionBatch::vertexSize_
+    engine->RegisterObjectProperty(className, "uint vertexSize", offsetof(T, vertexSize_));
+
+    // unsigned OcclusionBatch::indexSize_
+    engine->RegisterObjectProperty(className, "uint indexSize", offsetof(T, indexSize_));
+
+    // unsigned OcclusionBatch::drawStart_
+    engine->RegisterObjectProperty(className, "uint drawStart", offsetof(T, drawStart_));
+
+    // unsigned OcclusionBatch::drawCount_
+    engine->RegisterObjectProperty(className, "uint drawCount", offsetof(T, drawCount_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_OcclusionBatch
         REGISTER_MEMBERS_MANUAL_PART_OcclusionBatch();
     #endif
@@ -2023,6 +3133,14 @@ template <class T> void RegisterMembers_OcclusionBatch(asIScriptEngine* engine, 
 // struct OcclusionBufferData | File: ../Graphics/OcclusionBuffer.h
 template <class T> void RegisterMembers_OcclusionBufferData(asIScriptEngine* engine, const char* className)
 {
+    // SharedArrayPtr<int> OcclusionBufferData::dataWithSafety_
+    // Error: type "SharedArrayPtr<int>" can not automatically bind
+    // int* OcclusionBufferData::data_
+    // Not registered because pointer
+
+    // bool OcclusionBufferData::used_
+    engine->RegisterObjectProperty(className, "bool used", offsetof(T, used_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_OcclusionBufferData
         REGISTER_MEMBERS_MANUAL_PART_OcclusionBufferData();
     #endif
@@ -2031,8 +3149,6 @@ template <class T> void RegisterMembers_OcclusionBufferData(asIScriptEngine* eng
 // class Octant | File: ../Graphics/Octree.h
 template <class T> void RegisterMembers_Octant(asIScriptEngine* engine, const char* className)
 {
-    // void Octant::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
-    // Not registered because have @nobind mark
     // Octant* Octant::GetOrCreateChild(unsigned index)
     // Error: type "Octant" can not automatically bind bacause have @nobind mark
     // Octant* Octant::GetParent() const
@@ -2074,6 +3190,7 @@ template <class T> void RegisterMembers_Octant(asIScriptEngine* engine, const ch
 
     // void Octant::ResetRoot()
     engine->RegisterObjectMethod(className, "void ResetRoot()", AS_METHODPR(T, ResetRoot, (), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Octant
         REGISTER_MEMBERS_MANUAL_PART_Octant();
     #endif
@@ -2087,6 +3204,19 @@ template <class T> void RegisterMembers_OctreeQuery(asIScriptEngine* engine, con
 
     // virtual Intersection OctreeQuery::TestOctant(const BoundingBox& box, bool inside) = 0
     engine->RegisterObjectMethod(className, "Intersection TestOctant(const BoundingBox&in, bool)", AS_METHODPR(T, TestOctant, (const BoundingBox&, bool), Intersection), AS_CALL_THISCALL);
+
+    // OctreeQuery& OctreeQuery::operator =(const OctreeQuery& rhs) = delete
+    // Not registered because deleted
+
+    // PODVector<Drawable*>& OctreeQuery::result_
+    // Error: type "PODVector<Drawable*>&" can not automatically bind
+
+    // unsigned char OctreeQuery::drawableFlags_
+    engine->RegisterObjectProperty(className, "uint8 drawableFlags", offsetof(T, drawableFlags_));
+
+    // unsigned OctreeQuery::viewMask_
+    engine->RegisterObjectProperty(className, "uint viewMask", offsetof(T, viewMask_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_OctreeQuery
         REGISTER_MEMBERS_MANUAL_PART_OctreeQuery();
     #endif
@@ -2097,6 +3227,12 @@ template <class T> void RegisterMembers_OctreeQueryResult(asIScriptEngine* engin
 {
     // bool OctreeQueryResult::operator !=(const OctreeQueryResult& rhs) const
     // Only operator == is needed
+
+    // Drawable* OctreeQueryResult::drawable_
+    // Not registered because pointer
+    // Node* OctreeQueryResult::node_
+    // Not registered because pointer
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_OctreeQueryResult
         REGISTER_MEMBERS_MANUAL_PART_OctreeQueryResult();
     #endif
@@ -2105,6 +3241,15 @@ template <class T> void RegisterMembers_OctreeQueryResult(asIScriptEngine* engin
 // struct PackageEntry | File: ../IO/PackageFile.h
 template <class T> void RegisterMembers_PackageEntry(asIScriptEngine* engine, const char* className)
 {
+    // unsigned PackageEntry::offset_
+    engine->RegisterObjectProperty(className, "uint offset", offsetof(T, offset_));
+
+    // unsigned PackageEntry::size_
+    engine->RegisterObjectProperty(className, "uint size", offsetof(T, size_));
+
+    // unsigned PackageEntry::checksum_
+    engine->RegisterObjectProperty(className, "uint checksum", offsetof(T, checksum_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_PackageEntry
         REGISTER_MEMBERS_MANUAL_PART_PackageEntry();
     #endif
@@ -2113,6 +3258,30 @@ template <class T> void RegisterMembers_PackageEntry(asIScriptEngine* engine, co
 // struct Particle | File: ../Graphics/ParticleEmitter.h
 template <class T> void RegisterMembers_Particle(asIScriptEngine* engine, const char* className)
 {
+    // Vector3 Particle::velocity_
+    engine->RegisterObjectProperty(className, "Vector3 velocity", offsetof(T, velocity_));
+
+    // Vector2 Particle::size_
+    engine->RegisterObjectProperty(className, "Vector2 size", offsetof(T, size_));
+
+    // float Particle::timer_
+    engine->RegisterObjectProperty(className, "float timer", offsetof(T, timer_));
+
+    // float Particle::timeToLive_
+    engine->RegisterObjectProperty(className, "float timeToLive", offsetof(T, timeToLive_));
+
+    // float Particle::scale_
+    engine->RegisterObjectProperty(className, "float scale", offsetof(T, scale_));
+
+    // float Particle::rotationSpeed_
+    engine->RegisterObjectProperty(className, "float rotationSpeed", offsetof(T, rotationSpeed_));
+
+    // unsigned Particle::colorIndex_
+    engine->RegisterObjectProperty(className, "uint colorIndex", offsetof(T, colorIndex_));
+
+    // unsigned Particle::texIndex_
+    engine->RegisterObjectProperty(className, "uint texIndex", offsetof(T, texIndex_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Particle
         REGISTER_MEMBERS_MANUAL_PART_Particle();
     #endif
@@ -2121,6 +3290,17 @@ template <class T> void RegisterMembers_Particle(asIScriptEngine* engine, const 
 // struct PerThreadSceneResult | File: ../Graphics/View.h
 template <class T> void RegisterMembers_PerThreadSceneResult(asIScriptEngine* engine, const char* className)
 {
+    // PODVector<Drawable*> PerThreadSceneResult::geometries_
+    // Error: type "PODVector<Drawable*>" can not automatically bind
+    // PODVector<Light*> PerThreadSceneResult::lights_
+    // Error: type "PODVector<Light*>" can not automatically bind
+
+    // float PerThreadSceneResult::minZ_
+    engine->RegisterObjectProperty(className, "float minZ", offsetof(T, minZ_));
+
+    // float PerThreadSceneResult::maxZ_
+    engine->RegisterObjectProperty(className, "float maxZ", offsetof(T, maxZ_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_PerThreadSceneResult
         REGISTER_MEMBERS_MANUAL_PART_PerThreadSceneResult();
     #endif
@@ -2174,6 +3354,19 @@ template <class T> void RegisterMembers_Plane(asIScriptEngine* engine, const cha
 
     // Plane Plane::Transformed(const Matrix4& transform) const
     engine->RegisterObjectMethod(className, "Plane Transformed(const Matrix4&in) const", AS_METHODPR(T, Transformed, (const Matrix4&) const, Plane), AS_CALL_THISCALL);
+
+    // Vector3 Plane::normal_
+    engine->RegisterObjectProperty(className, "Vector3 normal", offsetof(T, normal_));
+
+    // Vector3 Plane::absNormal_
+    engine->RegisterObjectProperty(className, "Vector3 absNormal", offsetof(T, absNormal_));
+
+    // float Plane::d_
+    engine->RegisterObjectProperty(className, "float d", offsetof(T, d_));
+
+    // static const Plane Plane::UP
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const Plane UP", (void*)&T::UP);engine->SetDefaultNamespace("");
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Plane
         REGISTER_MEMBERS_MANUAL_PART_Plane();
     #endif
@@ -2233,6 +3426,10 @@ template <class T> void RegisterMembers_Polyhedron(asIScriptEngine* engine, cons
 
     // Polyhedron Polyhedron::Transformed(const Matrix3x4& transform) const
     engine->RegisterObjectMethod(className, "Polyhedron Transformed(const Matrix3x4&in) const", AS_METHODPR(T, Transformed, (const Matrix3x4&) const, Polyhedron), AS_CALL_THISCALL);
+
+    // Vector<PODVector<Vector3>> Polyhedron::faces_
+    // Error: type "Vector<PODVector<Vector3>>" can not automatically bind
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Polyhedron
         REGISTER_MEMBERS_MANUAL_PART_Polyhedron();
     #endif
@@ -2242,7 +3439,7 @@ template <class T> void RegisterMembers_Polyhedron(asIScriptEngine* engine, cons
 template <class T> void RegisterMembers_ProfilerBlock(asIScriptEngine* engine, const char* className)
 {
     // ProfilerBlock* ProfilerBlock::GetChild(const char* name)
-    // Error: type "const char*" can not automatically bind
+    // Can not be registered here bacause hidden in derived classes: EventProfilerBlock
 
     // void ProfilerBlock::Begin()
     engine->RegisterObjectMethod(className, "void Begin()", AS_METHODPR(T, Begin, (), void), AS_CALL_THISCALL);
@@ -2255,6 +3452,53 @@ template <class T> void RegisterMembers_ProfilerBlock(asIScriptEngine* engine, c
 
     // void ProfilerBlock::EndFrame()
     engine->RegisterObjectMethod(className, "void EndFrame()", AS_METHODPR(T, EndFrame, (), void), AS_CALL_THISCALL);
+
+    // char* ProfilerBlock::name_
+    // Not registered because pointer
+    // ProfilerBlock* ProfilerBlock::parent_
+    // Not registered because pointer
+    // PODVector<ProfilerBlock*> ProfilerBlock::children_
+    // Error: type "PODVector<ProfilerBlock*>" can not automatically bind
+
+    // HiresTimer ProfilerBlock::timer_
+    engine->RegisterObjectProperty(className, "HiresTimer timer", offsetof(T, timer_));
+
+    // long long ProfilerBlock::time_
+    engine->RegisterObjectProperty(className, "int64 time", offsetof(T, time_));
+
+    // long long ProfilerBlock::maxTime_
+    engine->RegisterObjectProperty(className, "int64 maxTime", offsetof(T, maxTime_));
+
+    // unsigned ProfilerBlock::count_
+    engine->RegisterObjectProperty(className, "uint count", offsetof(T, count_));
+
+    // long long ProfilerBlock::frameTime_
+    engine->RegisterObjectProperty(className, "int64 frameTime", offsetof(T, frameTime_));
+
+    // long long ProfilerBlock::frameMaxTime_
+    engine->RegisterObjectProperty(className, "int64 frameMaxTime", offsetof(T, frameMaxTime_));
+
+    // unsigned ProfilerBlock::frameCount_
+    engine->RegisterObjectProperty(className, "uint frameCount", offsetof(T, frameCount_));
+
+    // long long ProfilerBlock::intervalTime_
+    engine->RegisterObjectProperty(className, "int64 intervalTime", offsetof(T, intervalTime_));
+
+    // long long ProfilerBlock::intervalMaxTime_
+    engine->RegisterObjectProperty(className, "int64 intervalMaxTime", offsetof(T, intervalMaxTime_));
+
+    // unsigned ProfilerBlock::intervalCount_
+    engine->RegisterObjectProperty(className, "uint intervalCount", offsetof(T, intervalCount_));
+
+    // long long ProfilerBlock::totalTime_
+    engine->RegisterObjectProperty(className, "int64 totalTime", offsetof(T, totalTime_));
+
+    // long long ProfilerBlock::totalMaxTime_
+    engine->RegisterObjectProperty(className, "int64 totalMaxTime", offsetof(T, totalMaxTime_));
+
+    // unsigned ProfilerBlock::totalCount_
+    engine->RegisterObjectProperty(className, "uint totalCount", offsetof(T, totalCount_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ProfilerBlock
         REGISTER_MEMBERS_MANUAL_PART_ProfilerBlock();
     #endif
@@ -2379,6 +3623,22 @@ template <class T> void RegisterMembers_Quaternion(asIScriptEngine* engine, cons
     // float Quaternion::YawAngle() const
     engine->RegisterObjectMethod(className, "float YawAngle() const", AS_METHODPR(T, YawAngle, () const, float), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_yaw() const", AS_METHODPR(T, YawAngle, () const, float), AS_CALL_THISCALL);
+
+    // float Quaternion::w_
+    engine->RegisterObjectProperty(className, "float w", offsetof(T, w_));
+
+    // float Quaternion::x_
+    engine->RegisterObjectProperty(className, "float x", offsetof(T, x_));
+
+    // float Quaternion::y_
+    engine->RegisterObjectProperty(className, "float y", offsetof(T, y_));
+
+    // float Quaternion::z_
+    engine->RegisterObjectProperty(className, "float z", offsetof(T, z_));
+
+    // static const Quaternion Quaternion::IDENTITY
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const Quaternion IDENTITY", (void*)&T::IDENTITY);engine->SetDefaultNamespace("");
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Quaternion
         REGISTER_MEMBERS_MANUAL_PART_Quaternion();
     #endif
@@ -2389,13 +3649,13 @@ template <class T> void RegisterMembers_Ray(asIScriptEngine* engine, const char*
 {
     // float Ray::HitDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2, Vector3* outNormal = nullptr, Vector3* outBary = nullptr) const
     // Error: type "Vector3*" can not automatically bind
-    // float Ray::HitDistance(const void* vertexData, unsigned vertexStride, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount, Vector3* outNormal = nullptr, Vector2* outUV = nullptr, unsigned uvOffset = 0) const
-    // Error: type "const void*" can not automatically bind
     // float Ray::HitDistance(const void* vertexData, unsigned vertexStride, unsigned vertexStart, unsigned vertexCount, Vector3* outNormal = nullptr, Vector2* outUV = nullptr, unsigned uvOffset = 0) const
     // Error: type "const void*" can not automatically bind
-    // bool Ray::InsideGeometry(const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount) const
+    // float Ray::HitDistance(const void* vertexData, unsigned vertexStride, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount, Vector3* outNormal = nullptr, Vector2* outUV = nullptr, unsigned uvOffset = 0) const
     // Error: type "const void*" can not automatically bind
     // bool Ray::InsideGeometry(const void* vertexData, unsigned vertexSize, unsigned vertexStart, unsigned vertexCount) const
+    // Error: type "const void*" can not automatically bind
+    // bool Ray::InsideGeometry(const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount) const
     // Error: type "const void*" can not automatically bind
     // bool Ray::operator !=(const Ray& rhs) const
     // Only operator == is needed
@@ -2432,6 +3692,13 @@ template <class T> void RegisterMembers_Ray(asIScriptEngine* engine, const char*
 
     // Ray Ray::Transformed(const Matrix3x4& transform) const
     engine->RegisterObjectMethod(className, "Ray Transformed(const Matrix3x4&in) const", AS_METHODPR(T, Transformed, (const Matrix3x4&) const, Ray), AS_CALL_THISCALL);
+
+    // Vector3 Ray::origin_
+    engine->RegisterObjectProperty(className, "Vector3 origin", offsetof(T, origin_));
+
+    // Vector3 Ray::direction_
+    engine->RegisterObjectProperty(className, "Vector3 direction", offsetof(T, direction_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Ray
         REGISTER_MEMBERS_MANUAL_PART_Ray();
     #endif
@@ -2440,6 +3707,27 @@ template <class T> void RegisterMembers_Ray(asIScriptEngine* engine, const char*
 // class RayOctreeQuery | File: ../Graphics/OctreeQuery.h
 template <class T> void RegisterMembers_RayOctreeQuery(asIScriptEngine* engine, const char* className)
 {
+    // RayOctreeQuery& RayOctreeQuery::operator =(const RayOctreeQuery& rhs) = delete
+    // Not registered because deleted
+
+    // PODVector<RayQueryResult>& RayOctreeQuery::result_
+    // Error: type "PODVector<RayQueryResult>&" can not automatically bind
+
+    // Ray RayOctreeQuery::ray_
+    engine->RegisterObjectProperty(className, "Ray ray", offsetof(T, ray_));
+
+    // unsigned char RayOctreeQuery::drawableFlags_
+    engine->RegisterObjectProperty(className, "uint8 drawableFlags", offsetof(T, drawableFlags_));
+
+    // unsigned RayOctreeQuery::viewMask_
+    engine->RegisterObjectProperty(className, "uint viewMask", offsetof(T, viewMask_));
+
+    // float RayOctreeQuery::maxDistance_
+    engine->RegisterObjectProperty(className, "float maxDistance", offsetof(T, maxDistance_));
+
+    // RayQueryLevel RayOctreeQuery::level_
+    engine->RegisterObjectProperty(className, "RayQueryLevel level", offsetof(T, level_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_RayOctreeQuery
         REGISTER_MEMBERS_MANUAL_PART_RayOctreeQuery();
     #endif
@@ -2450,6 +3738,27 @@ template <class T> void RegisterMembers_RayQueryResult(asIScriptEngine* engine, 
 {
     // bool RayQueryResult::operator !=(const RayQueryResult& rhs) const
     // Only operator == is needed
+
+    // Drawable* RayQueryResult::drawable_
+    // Not registered because pointer
+    // Node* RayQueryResult::node_
+    // Not registered because pointer
+
+    // Vector3 RayQueryResult::position_
+    engine->RegisterObjectProperty(className, "Vector3 position", offsetof(T, position_));
+
+    // Vector3 RayQueryResult::normal_
+    engine->RegisterObjectProperty(className, "Vector3 normal", offsetof(T, normal_));
+
+    // Vector2 RayQueryResult::textureUV_
+    engine->RegisterObjectProperty(className, "Vector2 textureUV", offsetof(T, textureUV_));
+
+    // float RayQueryResult::distance_
+    engine->RegisterObjectProperty(className, "float distance", offsetof(T, distance_));
+
+    // unsigned RayQueryResult::subObject_
+    engine->RegisterObjectProperty(className, "uint subObject", offsetof(T, subObject_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_RayQueryResult
         REGISTER_MEMBERS_MANUAL_PART_RayQueryResult();
     #endif
@@ -2565,6 +3874,22 @@ template <class T> void RegisterMembers_Rect(asIScriptEngine* engine, const char
 
     // Vector4 Rect::ToVector4() const
     engine->RegisterObjectMethod(className, "Vector4 ToVector4() const", AS_METHODPR(T, ToVector4, () const, Vector4), AS_CALL_THISCALL);
+
+    // Vector2 Rect::min_
+    engine->RegisterObjectProperty(className, "Vector2 min", offsetof(T, min_));
+
+    // Vector2 Rect::max_
+    engine->RegisterObjectProperty(className, "Vector2 max", offsetof(T, max_));
+
+    // static const Rect Rect::FULL
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const Rect FULL", (void*)&T::FULL);engine->SetDefaultNamespace("");
+
+    // static const Rect Rect::POSITIVE
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const Rect POSITIVE", (void*)&T::POSITIVE);engine->SetDefaultNamespace("");
+
+    // static const Rect Rect::ZERO
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const Rect ZERO", (void*)&T::ZERO);engine->SetDefaultNamespace("");
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Rect
         REGISTER_MEMBERS_MANUAL_PART_Rect();
     #endif
@@ -2573,6 +3898,12 @@ template <class T> void RegisterMembers_Rect(asIScriptEngine* engine, const char
 // struct RefCount | File: ../Container/RefCounted.h
 template <class T> void RegisterMembers_RefCount(asIScriptEngine* engine, const char* className)
 {
+    // int RefCount::refs_
+    engine->RegisterObjectProperty(className, "int refs", offsetof(T, refs_));
+
+    // int RefCount::weakRefs_
+    engine->RegisterObjectProperty(className, "int weakRefs", offsetof(T, weakRefs_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_RefCount
         REGISTER_MEMBERS_MANUAL_PART_RefCount();
     #endif
@@ -2595,6 +3926,10 @@ template <class T> void RegisterMembers_RefCounted(asIScriptEngine* engine, cons
     // int RefCounted::WeakRefs() const
     engine->RegisterObjectMethod(className, "int WeakRefs() const", AS_METHODPR(T, WeakRefs, () const, int), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "int get_weakRefs() const", AS_METHODPR(T, WeakRefs, () const, int), AS_CALL_THISCALL);
+
+    // RefCounted& RefCounted::operator =(const RefCounted& rhs) = delete
+    // Not registered because deleted
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_RefCounted
         REGISTER_MEMBERS_MANUAL_PART_RefCounted();
     #endif
@@ -2659,6 +3994,80 @@ template <class T> void RegisterMembers_RenderPathCommand(asIScriptEngine* engin
     // void RenderPathCommand::SetTextureName(TextureUnit unit, const String& name)
     engine->RegisterObjectMethod(className, "void SetTextureName(TextureUnit, const String&in)", AS_METHODPR(T, SetTextureName, (TextureUnit, const String&), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_textureNames(TextureUnit, const String&in)", AS_METHODPR(T, SetTextureName, (TextureUnit, const String&), void), AS_CALL_THISCALL);
+
+    // String RenderPathCommand::textureNames_[MAX_TEXTURE_UNITS]
+    // Not registered because array
+    // HashMap<StringHash, Variant> RenderPathCommand::shaderParameters_
+    // Error: type "HashMap<StringHash, Variant>" can not automatically bind
+    // Vector<Pair<String, CubeMapFace>> RenderPathCommand::outputs_
+    // Error: type "Vector<Pair<String, CubeMapFace>>" can not automatically bind
+
+    // String RenderPathCommand::tag_
+    engine->RegisterObjectProperty(className, "String tag", offsetof(T, tag_));
+
+    // RenderCommandType RenderPathCommand::type_
+    engine->RegisterObjectProperty(className, "RenderCommandType type", offsetof(T, type_));
+
+    // RenderCommandSortMode RenderPathCommand::sortMode_
+    engine->RegisterObjectProperty(className, "RenderCommandSortMode sortMode", offsetof(T, sortMode_));
+
+    // String RenderPathCommand::pass_
+    engine->RegisterObjectProperty(className, "String pass", offsetof(T, pass_));
+
+    // unsigned RenderPathCommand::passIndex_
+    engine->RegisterObjectProperty(className, "uint passIndex", offsetof(T, passIndex_));
+
+    // String RenderPathCommand::metadata_
+    engine->RegisterObjectProperty(className, "String metadata", offsetof(T, metadata_));
+
+    // String RenderPathCommand::vertexShaderName_
+    engine->RegisterObjectProperty(className, "String vertexShaderName", offsetof(T, vertexShaderName_));
+
+    // String RenderPathCommand::pixelShaderName_
+    engine->RegisterObjectProperty(className, "String pixelShaderName", offsetof(T, pixelShaderName_));
+
+    // String RenderPathCommand::vertexShaderDefines_
+    engine->RegisterObjectProperty(className, "String vertexShaderDefines", offsetof(T, vertexShaderDefines_));
+
+    // String RenderPathCommand::pixelShaderDefines_
+    engine->RegisterObjectProperty(className, "String pixelShaderDefines", offsetof(T, pixelShaderDefines_));
+
+    // String RenderPathCommand::depthStencilName_
+    engine->RegisterObjectProperty(className, "String depthStencilName", offsetof(T, depthStencilName_));
+
+    // ClearTargetFlags RenderPathCommand::clearFlags_
+    engine->RegisterObjectProperty(className, "ClearTargetFlags clearFlags", offsetof(T, clearFlags_));
+
+    // Color RenderPathCommand::clearColor_
+    engine->RegisterObjectProperty(className, "Color clearColor", offsetof(T, clearColor_));
+
+    // float RenderPathCommand::clearDepth_
+    engine->RegisterObjectProperty(className, "float clearDepth", offsetof(T, clearDepth_));
+
+    // unsigned RenderPathCommand::clearStencil_
+    engine->RegisterObjectProperty(className, "uint clearStencil", offsetof(T, clearStencil_));
+
+    // BlendMode RenderPathCommand::blendMode_
+    engine->RegisterObjectProperty(className, "BlendMode blendMode", offsetof(T, blendMode_));
+
+    // bool RenderPathCommand::enabled_
+    engine->RegisterObjectProperty(className, "bool enabled", offsetof(T, enabled_));
+
+    // bool RenderPathCommand::useFogColor_
+    engine->RegisterObjectProperty(className, "bool useFogColor", offsetof(T, useFogColor_));
+
+    // bool RenderPathCommand::markToStencil_
+    engine->RegisterObjectProperty(className, "bool markToStencil", offsetof(T, markToStencil_));
+
+    // bool RenderPathCommand::useLitBase_
+    engine->RegisterObjectProperty(className, "bool useLitBase", offsetof(T, useLitBase_));
+
+    // bool RenderPathCommand::vertexLights_
+    engine->RegisterObjectProperty(className, "bool vertexLights", offsetof(T, vertexLights_));
+
+    // String RenderPathCommand::eventName_
+    engine->RegisterObjectProperty(className, "String eventName", offsetof(T, eventName_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_RenderPathCommand
         REGISTER_MEMBERS_MANUAL_PART_RenderPathCommand();
     #endif
@@ -2669,6 +4078,43 @@ template <class T> void RegisterMembers_RenderTargetInfo(asIScriptEngine* engine
 {
     // void RenderTargetInfo::Load(const XMLElement& element)
     engine->RegisterObjectMethod(className, "void Load(const XMLElement&in)", AS_METHODPR(T, Load, (const XMLElement&), void), AS_CALL_THISCALL);
+
+    // String RenderTargetInfo::name_
+    engine->RegisterObjectProperty(className, "String name", offsetof(T, name_));
+
+    // String RenderTargetInfo::tag_
+    engine->RegisterObjectProperty(className, "String tag", offsetof(T, tag_));
+
+    // unsigned RenderTargetInfo::format_
+    engine->RegisterObjectProperty(className, "uint format", offsetof(T, format_));
+
+    // Vector2 RenderTargetInfo::size_
+    engine->RegisterObjectProperty(className, "Vector2 size", offsetof(T, size_));
+
+    // RenderTargetSizeMode RenderTargetInfo::sizeMode_
+    engine->RegisterObjectProperty(className, "RenderTargetSizeMode sizeMode", offsetof(T, sizeMode_));
+
+    // int RenderTargetInfo::multiSample_
+    engine->RegisterObjectProperty(className, "int multiSample", offsetof(T, multiSample_));
+
+    // bool RenderTargetInfo::autoResolve_
+    engine->RegisterObjectProperty(className, "bool autoResolve", offsetof(T, autoResolve_));
+
+    // bool RenderTargetInfo::enabled_
+    engine->RegisterObjectProperty(className, "bool enabled", offsetof(T, enabled_));
+
+    // bool RenderTargetInfo::cubemap_
+    engine->RegisterObjectProperty(className, "bool cubemap", offsetof(T, cubemap_));
+
+    // bool RenderTargetInfo::filtered_
+    engine->RegisterObjectProperty(className, "bool filtered", offsetof(T, filtered_));
+
+    // bool RenderTargetInfo::sRGB_
+    engine->RegisterObjectProperty(className, "bool sRGB", offsetof(T, sRGB_));
+
+    // bool RenderTargetInfo::persistent_
+    engine->RegisterObjectProperty(className, "bool persistent", offsetof(T, persistent_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_RenderTargetInfo
         REGISTER_MEMBERS_MANUAL_PART_RenderTargetInfo();
     #endif
@@ -2677,6 +4123,9 @@ template <class T> void RegisterMembers_RenderTargetInfo(asIScriptEngine* engine
 // struct ReplicationState | File: ../Scene/ReplicationState.h
 template <class T> void RegisterMembers_ReplicationState(asIScriptEngine* engine, const char* className)
 {
+    // Connection* ReplicationState::connection_
+    // Not registered because pointer
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ReplicationState
         REGISTER_MEMBERS_MANUAL_PART_ReplicationState();
     #endif
@@ -2685,6 +4134,15 @@ template <class T> void RegisterMembers_ReplicationState(asIScriptEngine* engine
 // struct ResourceGroup | File: ../Resource/ResourceCache.h
 template <class T> void RegisterMembers_ResourceGroup(asIScriptEngine* engine, const char* className)
 {
+    // HashMap<StringHash, SharedPtr<Resource>> ResourceGroup::resources_
+    // Error: type "HashMap<StringHash, SharedPtr<Resource>>" can not automatically bind
+
+    // unsigned long long ResourceGroup::memoryBudget_
+    engine->RegisterObjectProperty(className, "uint64 memoryBudget", offsetof(T, memoryBudget_));
+
+    // unsigned long long ResourceGroup::memoryUse_
+    engine->RegisterObjectProperty(className, "uint64 memoryUse", offsetof(T, memoryUse_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ResourceGroup
         REGISTER_MEMBERS_MANUAL_PART_ResourceGroup();
     #endif
@@ -2698,6 +4156,13 @@ template <class T> void RegisterMembers_ResourceRef(asIScriptEngine* engine, con
 
     // bool ResourceRef::operator ==(const ResourceRef& rhs) const
     engine->RegisterObjectMethod(className, "bool opEquals(const ResourceRef&in) const", AS_METHODPR(T, operator==, (const ResourceRef&) const, bool), AS_CALL_THISCALL);
+
+    // StringHash ResourceRef::type_
+    engine->RegisterObjectProperty(className, "StringHash type", offsetof(T, type_));
+
+    // String ResourceRef::name_
+    engine->RegisterObjectProperty(className, "String name", offsetof(T, name_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ResourceRef
         REGISTER_MEMBERS_MANUAL_PART_ResourceRef();
     #endif
@@ -2711,6 +4176,13 @@ template <class T> void RegisterMembers_ResourceRefList(asIScriptEngine* engine,
 
     // bool ResourceRefList::operator ==(const ResourceRefList& rhs) const
     engine->RegisterObjectMethod(className, "bool opEquals(const ResourceRefList&in) const", AS_METHODPR(T, operator==, (const ResourceRefList&) const, bool), AS_CALL_THISCALL);
+
+    // StringVector ResourceRefList::names_
+    // Error: type "StringVector" can not automatically bind
+
+    // StringHash ResourceRefList::type_
+    engine->RegisterObjectProperty(className, "StringHash type", offsetof(T, type_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ResourceRefList
         REGISTER_MEMBERS_MANUAL_PART_ResourceRefList();
     #endif
@@ -2719,6 +4191,21 @@ template <class T> void RegisterMembers_ResourceRefList(asIScriptEngine* engine,
 // struct ScenePassInfo | File: ../Graphics/View.h
 template <class T> void RegisterMembers_ScenePassInfo(asIScriptEngine* engine, const char* className)
 {
+    // BatchQueue* ScenePassInfo::batchQueue_
+    // Not registered because pointer
+
+    // unsigned ScenePassInfo::passIndex_
+    engine->RegisterObjectProperty(className, "uint passIndex", offsetof(T, passIndex_));
+
+    // bool ScenePassInfo::allowInstancing_
+    engine->RegisterObjectProperty(className, "bool allowInstancing", offsetof(T, allowInstancing_));
+
+    // bool ScenePassInfo::markToStencil_
+    engine->RegisterObjectProperty(className, "bool markToStencil", offsetof(T, markToStencil_));
+
+    // bool ScenePassInfo::vertexLights_
+    engine->RegisterObjectProperty(className, "bool vertexLights", offsetof(T, vertexLights_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ScenePassInfo
         REGISTER_MEMBERS_MANUAL_PART_ScenePassInfo();
     #endif
@@ -2738,6 +4225,7 @@ template <class T> void RegisterMembers_SceneResolver(asIScriptEngine* engine, c
 
     // void SceneResolver::Resolve()
     engine->RegisterObjectMethod(className, "void Resolve()", AS_METHODPR(T, Resolve, (), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_SceneResolver
         REGISTER_MEMBERS_MANUAL_PART_SceneResolver();
     #endif
@@ -2746,6 +4234,15 @@ template <class T> void RegisterMembers_SceneResolver(asIScriptEngine* engine, c
 // struct ScratchBuffer | File: ../Graphics/Graphics.h
 template <class T> void RegisterMembers_ScratchBuffer(asIScriptEngine* engine, const char* className)
 {
+    // SharedArrayPtr<unsigned char> ScratchBuffer::data_
+    // Error: type "SharedArrayPtr<unsigned char>" can not automatically bind
+
+    // unsigned ScratchBuffer::size_
+    engine->RegisterObjectProperty(className, "uint size", offsetof(T, size_));
+
+    // bool ScratchBuffer::reserved_
+    engine->RegisterObjectProperty(className, "bool reserved", offsetof(T, reserved_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ScratchBuffer
         REGISTER_MEMBERS_MANUAL_PART_ScratchBuffer();
     #endif
@@ -2762,6 +4259,34 @@ template <class T> void RegisterMembers_ScreenModeParams(asIScriptEngine* engine
 
     // bool ScreenModeParams::operator ==(const ScreenModeParams& rhs) const
     engine->RegisterObjectMethod(className, "bool opEquals(const ScreenModeParams&in) const", AS_METHODPR(T, operator==, (const ScreenModeParams&) const, bool), AS_CALL_THISCALL);
+
+    // bool ScreenModeParams::fullscreen_
+    engine->RegisterObjectProperty(className, "bool fullscreen", offsetof(T, fullscreen_));
+
+    // bool ScreenModeParams::borderless_
+    engine->RegisterObjectProperty(className, "bool borderless", offsetof(T, borderless_));
+
+    // bool ScreenModeParams::resizable_
+    engine->RegisterObjectProperty(className, "bool resizable", offsetof(T, resizable_));
+
+    // bool ScreenModeParams::highDPI_
+    engine->RegisterObjectProperty(className, "bool highDPI", offsetof(T, highDPI_));
+
+    // bool ScreenModeParams::vsync_
+    engine->RegisterObjectProperty(className, "bool vsync", offsetof(T, vsync_));
+
+    // bool ScreenModeParams::tripleBuffer_
+    engine->RegisterObjectProperty(className, "bool tripleBuffer", offsetof(T, tripleBuffer_));
+
+    // int ScreenModeParams::multiSample_
+    engine->RegisterObjectProperty(className, "int multiSample", offsetof(T, multiSample_));
+
+    // int ScreenModeParams::monitor_
+    engine->RegisterObjectProperty(className, "int monitor", offsetof(T, monitor_));
+
+    // int ScreenModeParams::refreshRate_
+    engine->RegisterObjectProperty(className, "int refreshRate", offsetof(T, refreshRate_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ScreenModeParams
         REGISTER_MEMBERS_MANUAL_PART_ScreenModeParams();
     #endif
@@ -2898,6 +4423,7 @@ template <class T> void RegisterMembers_Serializer(asIScriptEngine* engine, cons
 
     // bool Serializer::WriteVLE(unsigned value)
     engine->RegisterObjectMethod(className, "bool WriteVLE(uint)", AS_METHODPR(T, WriteVLE, (unsigned), bool), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Serializer
         REGISTER_MEMBERS_MANUAL_PART_Serializer();
     #endif
@@ -2906,6 +4432,40 @@ template <class T> void RegisterMembers_Serializer(asIScriptEngine* engine, cons
 // struct ShaderParameter | File: ../Graphics/ShaderVariation.h
 template <class T> void RegisterMembers_ShaderParameter(asIScriptEngine* engine, const char* className)
 {
+    // union ShaderParameter::@4 Urho3D::ShaderParameter::@5
+    // Error: type "union Urho3D::ShaderParameter::@4" can not automatically bind
+    // union ShaderParameter::@6 Urho3D::ShaderParameter::@7
+    // Error: type "union Urho3D::ShaderParameter::@6" can not automatically bind
+    // ConstantBuffer* ShaderParameter::bufferPtr_
+    // Not registered because pointer
+
+    // ShaderType ShaderParameter::type_
+    engine->RegisterObjectProperty(className, "ShaderType type", offsetof(T, type_));
+
+    // String ShaderParameter::name_
+    engine->RegisterObjectProperty(className, "String name", offsetof(T, name_));
+
+    // unsigned ShaderParameter::offset_
+    engine->RegisterObjectProperty(className, "uint offset", offsetof(T, offset_));
+
+    // int ShaderParameter::location_
+    engine->RegisterObjectProperty(className, "int location", offsetof(T, location_));
+
+    // unsigned ShaderParameter::register_
+    engine->RegisterObjectProperty(className, "uint register", offsetof(T, register_));
+
+    // unsigned ShaderParameter::size_
+    engine->RegisterObjectProperty(className, "uint size", offsetof(T, size_));
+
+    // unsigned ShaderParameter::glType_
+    engine->RegisterObjectProperty(className, "uint glType", offsetof(T, glType_));
+
+    // unsigned ShaderParameter::regCount_
+    engine->RegisterObjectProperty(className, "uint regCount", offsetof(T, regCount_));
+
+    // unsigned ShaderParameter::buffer_
+    engine->RegisterObjectProperty(className, "uint buffer", offsetof(T, buffer_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ShaderParameter
         REGISTER_MEMBERS_MANUAL_PART_ShaderParameter();
     #endif
@@ -2914,6 +4474,21 @@ template <class T> void RegisterMembers_ShaderParameter(asIScriptEngine* engine,
 // struct ShadowBatchQueue | File: ../Graphics/Batch.h
 template <class T> void RegisterMembers_ShadowBatchQueue(asIScriptEngine* engine, const char* className)
 {
+    // Camera* ShadowBatchQueue::shadowCamera_
+    // Not registered because pointer
+
+    // IntRect ShadowBatchQueue::shadowViewport_
+    engine->RegisterObjectProperty(className, "IntRect shadowViewport", offsetof(T, shadowViewport_));
+
+    // BatchQueue ShadowBatchQueue::shadowBatches_
+    engine->RegisterObjectProperty(className, "BatchQueue shadowBatches", offsetof(T, shadowBatches_));
+
+    // float ShadowBatchQueue::nearSplit_
+    engine->RegisterObjectProperty(className, "float nearSplit", offsetof(T, nearSplit_));
+
+    // float ShadowBatchQueue::farSplit_
+    engine->RegisterObjectProperty(className, "float farSplit", offsetof(T, farSplit_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ShadowBatchQueue
         REGISTER_MEMBERS_MANUAL_PART_ShadowBatchQueue();
     #endif
@@ -2979,6 +4554,7 @@ template <class T> void RegisterMembers_Skeleton(asIScriptEngine* engine, const 
 
     // void Skeleton::SetRootBoneIndex(unsigned index)
     engine->RegisterObjectMethod(className, "void SetRootBoneIndex(uint)", AS_METHODPR(T, SetRootBoneIndex, (unsigned), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Skeleton
         REGISTER_MEMBERS_MANUAL_PART_Skeleton();
     #endif
@@ -2989,6 +4565,25 @@ template <class T> void RegisterMembers_SourceBatch(asIScriptEngine* engine, con
 {
     // SourceBatch& SourceBatch::operator =(const SourceBatch& rhs)
     engine->RegisterObjectMethod(className, "SourceBatch& opAssign(const SourceBatch&in)", AS_METHODPR(T, operator=, (const SourceBatch&), SourceBatch&), AS_CALL_THISCALL);
+
+    // Geometry* SourceBatch::geometry_
+    // Not registered because pointer
+    // SharedPtr<Material> SourceBatch::material_
+    // Error: type "SharedPtr<Material>" can not automatically bind
+    // const Matrix3x4* SourceBatch::worldTransform_
+    // Not registered because pointer
+    // void* SourceBatch::instancingData_
+    // Not registered because pointer
+
+    // float SourceBatch::distance_
+    engine->RegisterObjectProperty(className, "float distance", offsetof(T, distance_));
+
+    // unsigned SourceBatch::numWorldTransforms_
+    engine->RegisterObjectProperty(className, "uint numWorldTransforms", offsetof(T, numWorldTransforms_));
+
+    // GeometryType SourceBatch::geometryType_
+    engine->RegisterObjectProperty(className, "GeometryType geometryType", offsetof(T, geometryType_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_SourceBatch
         REGISTER_MEMBERS_MANUAL_PART_SourceBatch();
     #endif
@@ -3069,6 +4664,13 @@ template <class T> void RegisterMembers_Sphere(asIScriptEngine* engine, const ch
 
     // bool Sphere::operator ==(const Sphere& rhs) const
     engine->RegisterObjectMethod(className, "bool opEquals(const Sphere&in) const", AS_METHODPR(T, operator==, (const Sphere&) const, bool), AS_CALL_THISCALL);
+
+    // Vector3 Sphere::center_
+    engine->RegisterObjectProperty(className, "Vector3 center", offsetof(T, center_));
+
+    // float Sphere::radius_
+    engine->RegisterObjectProperty(className, "float radius", offsetof(T, radius_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Sphere
         REGISTER_MEMBERS_MANUAL_PART_Sphere();
     #endif
@@ -3079,10 +4681,10 @@ template <class T> void RegisterMembers_Spline(asIScriptEngine* engine, const ch
 {
     // const VariantVector& Spline::GetKnots() const
     // Error: type "const VariantVector&" can not automatically bind
-    // void Spline::SetKnots(const Vector<Variant>& knots)
-    // Error: type "const Vector<Variant>&" can not automatically bind
     // bool Spline::operator !=(const Spline& rhs) const
     // Only operator == is needed
+    // void Spline::SetKnots(const Vector<Variant>& knots)
+    // Error: type "const Vector<Variant>&" can not automatically bind
 
     // void Spline::AddKnot(const Variant& knot)
     engine->RegisterObjectMethod(className, "void AddKnot(const Variant&in)", AS_METHODPR(T, AddKnot, (const Variant&), void), AS_CALL_THISCALL);
@@ -3122,6 +4724,7 @@ template <class T> void RegisterMembers_Spline(asIScriptEngine* engine, const ch
 
     // void Spline::SetKnot(const Variant& knot, unsigned index)
     engine->RegisterObjectMethod(className, "void SetKnot(const Variant&in, uint)", AS_METHODPR(T, SetKnot, (const Variant&, unsigned), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Spline
         REGISTER_MEMBERS_MANUAL_PART_Spline();
     #endif
@@ -3130,6 +4733,12 @@ template <class T> void RegisterMembers_Spline(asIScriptEngine* engine, const ch
 // struct StaticModelGeometryData | File: ../Graphics/StaticModel.h
 template <class T> void RegisterMembers_StaticModelGeometryData(asIScriptEngine* engine, const char* className)
 {
+    // Vector3 StaticModelGeometryData::center_
+    engine->RegisterObjectProperty(className, "Vector3 center", offsetof(T, center_));
+
+    // unsigned StaticModelGeometryData::lodLevel_
+    engine->RegisterObjectProperty(className, "uint lodLevel", offsetof(T, lodLevel_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_StaticModelGeometryData
         REGISTER_MEMBERS_MANUAL_PART_StaticModelGeometryData();
     #endif
@@ -3138,6 +4747,15 @@ template <class T> void RegisterMembers_StaticModelGeometryData(asIScriptEngine*
 // struct StoredLogMessage | File: ../IO/Log.h
 template <class T> void RegisterMembers_StoredLogMessage(asIScriptEngine* engine, const char* className)
 {
+    // String StoredLogMessage::message_
+    engine->RegisterObjectProperty(className, "String message", offsetof(T, message_));
+
+    // int StoredLogMessage::level_
+    engine->RegisterObjectProperty(className, "int level", offsetof(T, level_));
+
+    // bool StoredLogMessage::error_
+    engine->RegisterObjectProperty(className, "bool error", offsetof(T, error_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_StoredLogMessage
         REGISTER_MEMBERS_MANUAL_PART_StoredLogMessage();
     #endif
@@ -3157,6 +4775,18 @@ template <class T> CScriptArray* String_VectorlesStringgre_Split_char_bool_templ
     return VectorToArray<String>(result, "Array<String>");
 }
 
+// bool String::operator <(const String& rhs) const
+template <class T> int String_bool_operatorles_constspStringamp(const T& lhs, const T& rhs)
+{
+    if (lhs < rhs)
+        return -1;
+
+    if (lhs > rhs)
+        return 1;
+
+    return 0;
+}
+
 // class String | File: ../Container/Str.h
 template <class T> void RegisterMembers_String(asIScriptEngine* engine, const char* className)
 {
@@ -3168,36 +4798,28 @@ template <class T> void RegisterMembers_String(asIScriptEngine* engine, const ch
     // Error: type "const char*" can not automatically bind
     // String& String::AppendWithFormatArgs(const char* formatString, va_list args)
     // Error: type "const char*" can not automatically bind
-    // ConstIterator String::Begin() const
-    // Error: type "ConstIterator" can not automatically bind
     // Iterator String::Begin()
     // Error: type "Iterator" can not automatically bind
-    // const char* String::CString() const
-    // Error: type "const char*" can not automatically bind
+    // ConstIterator String::Begin() const
+    // Error: type "ConstIterator" can not automatically bind
     // int String::Compare(const char* str, bool caseSensitive = true) const
     // Error: type "const char*" can not automatically bind
-    // ConstIterator String::End() const
-    // Error: type "ConstIterator" can not automatically bind
+    // const char* String::CString() const
+    // Error: type "const char*" can not automatically bind
     // Iterator String::End()
     // Error: type "Iterator" can not automatically bind
+    // ConstIterator String::End() const
+    // Error: type "ConstIterator" can not automatically bind
     // Iterator String::Erase(const Iterator& it)
     // Error: type "const Iterator&" can not automatically bind
     // Iterator String::Erase(const Iterator& start, const Iterator& end)
     // Error: type "const Iterator&" can not automatically bind
-    // Iterator String::Insert(const Iterator& dest, char c)
+    // Iterator String::Insert(const Iterator& dest, const String& str)
     // Error: type "const Iterator&" can not automatically bind
     // Iterator String::Insert(const Iterator& dest, const Iterator& start, const Iterator& end)
     // Error: type "const Iterator&" can not automatically bind
-    // Iterator String::Insert(const Iterator& dest, const String& str)
+    // Iterator String::Insert(const Iterator& dest, char c)
     // Error: type "const Iterator&" can not automatically bind
-    // Iterator String::Replace(const Iterator& start, const Iterator& end, const String& replaceWith)
-    // Error: type "const Iterator&" can not automatically bind
-    // void String::Replace(unsigned pos, unsigned length, const char* replaceWith)
-    // Error: type "const char*" can not automatically bind
-    // void String::SetUTF8FromLatin1(const char* str)
-    // Error: type "const char*" can not automatically bind
-    // void String::SetUTF8FromWChar(const wchar_t* str)
-    // Error: type "const wchar_t*" can not automatically bind
     // bool String::operator !=(const String& rhs) const
     // Only operator == is needed
     // bool String::operator !=(const char* rhs) const
@@ -3224,6 +4846,14 @@ template <class T> void RegisterMembers_String(asIScriptEngine* engine, const ch
     // Registerd as opCmp separately
     // bool String::operator>(const char* rhs) const
     // Error: type "const char*" can not automatically bind
+    // void String::Replace(unsigned pos, unsigned length, const char* replaceWith)
+    // Error: type "const char*" can not automatically bind
+    // Iterator String::Replace(const Iterator& start, const Iterator& end, const String& replaceWith)
+    // Error: type "const Iterator&" can not automatically bind
+    // void String::SetUTF8FromLatin1(const char* str)
+    // Error: type "const char*" can not automatically bind
+    // void String::SetUTF8FromWChar(const wchar_t* str)
+    // Error: type "const wchar_t*" can not automatically bind
 
     // String& String::Append(const String& str)
     engine->RegisterObjectMethod(className, "String& Append(const String&in)", AS_METHODPR(T, Append, (const String&), String&), AS_CALL_THISCALL);
@@ -3413,9 +5043,49 @@ template <class T> void RegisterMembers_String(asIScriptEngine* engine, const ch
 
     // String String::Trimmed() const
     engine->RegisterObjectMethod(className, "String Trimmed() const", AS_METHODPR(T, Trimmed, () const, String), AS_CALL_THISCALL);
+
+    // bool String::operator <(const String& rhs) const
+    engine->RegisterObjectMethod(className, "int opCmp(const String& in) const", AS_FUNCTION_OBJFIRST(String_bool_operatorles_constspStringamp<T>), AS_CALL_CDECL_OBJFIRST);
+
+    // template <class T> String& String::operator +=(const T& rhs)
+    // Not registered because template
+    // static Vector<String> String::Split(const char* str, char separator, bool keepEmptyStrings = false)
+    // Error: type "const char*" can not automatically bind
+    // static String String::Joined(const Vector<String>& subStrings, const String& glue)
+    // Not registered because have @manualbind mark
+    // static void String::EncodeUTF8(char*& dest, unsigned unicodeChar)
+    // Error: type "char*&" can not automatically bind
+    // static unsigned String::DecodeUTF8(const char*& src)
+    // Error: type "const char*&" can not automatically bind
+    // static unsigned String::CStringLength(const char* str)
+    // Error: type "const char*" can not automatically bind
+    // static int String::Compare(const char* lhs, const char* rhs, bool caseSensitive)
+    // Error: type "const char*" can not automatically bind
+
+    // static const unsigned String::NPOS
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const uint NPOS", (void*)&T::NPOS);engine->SetDefaultNamespace("");
+
+    // static const unsigned String::MIN_CAPACITY
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const uint MIN_CAPACITY", (void*)&T::MIN_CAPACITY);engine->SetDefaultNamespace("");
+
+    // static const String String::EMPTY
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const String EMPTY", (void*)&T::EMPTY);engine->SetDefaultNamespace("");
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_String
         REGISTER_MEMBERS_MANUAL_PART_String();
     #endif
+}
+
+// bool StringHash::operator <(const StringHash& rhs) const
+template <class T> int StringHash_bool_operatorles_constspStringHashamp(const T& lhs, const T& rhs)
+{
+    if (lhs < rhs)
+        return -1;
+
+    if (lhs > rhs)
+        return 1;
+
+    return 0;
 }
 
 // class StringHash | File: ../Math/StringHash.h
@@ -3455,6 +5125,18 @@ template <class T> void RegisterMembers_StringHash(asIScriptEngine* engine, cons
     // unsigned StringHash::Value() const
     engine->RegisterObjectMethod(className, "uint Value() const", AS_METHODPR(T, Value, () const, unsigned), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_value() const", AS_METHODPR(T, Value, () const, unsigned), AS_CALL_THISCALL);
+
+    // bool StringHash::operator <(const StringHash& rhs) const
+    engine->RegisterObjectMethod(className, "int opCmp(const StringHash& in) const", AS_FUNCTION_OBJFIRST(StringHash_bool_operatorles_constspStringHashamp<T>), AS_CALL_CDECL_OBJFIRST);
+
+    // static unsigned StringHash::Calculate(const char* str, unsigned hash = 0)
+    // Error: type "const char*" can not automatically bind
+    // static StringHashRegister* StringHash::GetGlobalStringHashRegister()
+    // Error: type "StringHashRegister*" can not automatically bind
+
+    // static const StringHash StringHash::ZERO
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const StringHash ZERO", (void*)&T::ZERO);engine->SetDefaultNamespace("");
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_StringHash
         REGISTER_MEMBERS_MANUAL_PART_StringHash();
     #endif
@@ -3478,6 +5160,7 @@ template <class T> void RegisterMembers_StringHashRegister(asIScriptEngine* engi
 
     // String StringHashRegister::GetStringCopy(const StringHash& hash) const
     engine->RegisterObjectMethod(className, "String GetStringCopy(const StringHash&in) const", AS_METHODPR(T, GetStringCopy, (const StringHash&) const, String), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_StringHashRegister
         REGISTER_MEMBERS_MANUAL_PART_StringHashRegister();
     #endif
@@ -3486,6 +5169,17 @@ template <class T> void RegisterMembers_StringHashRegister(asIScriptEngine* engi
 // struct TechniqueEntry | File: ../Graphics/Material.h
 template <class T> void RegisterMembers_TechniqueEntry(asIScriptEngine* engine, const char* className)
 {
+    // SharedPtr<Technique> TechniqueEntry::technique_
+    // Error: type "SharedPtr<Technique>" can not automatically bind
+    // SharedPtr<Technique> TechniqueEntry::original_
+    // Error: type "SharedPtr<Technique>" can not automatically bind
+
+    // MaterialQuality TechniqueEntry::qualityLevel_
+    engine->RegisterObjectProperty(className, "MaterialQuality qualityLevel", offsetof(T, qualityLevel_));
+
+    // float TechniqueEntry::lodDistance_
+    engine->RegisterObjectProperty(className, "float lodDistance", offsetof(T, lodDistance_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_TechniqueEntry
         REGISTER_MEMBERS_MANUAL_PART_TechniqueEntry();
     #endif
@@ -3494,6 +5188,12 @@ template <class T> void RegisterMembers_TechniqueEntry(asIScriptEngine* engine, 
 // struct TextureFrame | File: ../Graphics/ParticleEffect.h
 template <class T> void RegisterMembers_TextureFrame(asIScriptEngine* engine, const char* className)
 {
+    // Rect TextureFrame::uv_
+    engine->RegisterObjectProperty(className, "Rect uv", offsetof(T, uv_));
+
+    // float TextureFrame::time_
+    engine->RegisterObjectProperty(className, "float time", offsetof(T, time_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_TextureFrame
         REGISTER_MEMBERS_MANUAL_PART_TextureFrame();
     #endif
@@ -3517,11 +5217,15 @@ template <class T> void RegisterMembers_Thread(asIScriptEngine* engine, const ch
     // virtual void Thread::ThreadFunction() = 0
     engine->RegisterObjectMethod(className, "void ThreadFunction()", AS_METHODPR(T, ThreadFunction, (), void), AS_CALL_THISCALL);
 
+    // static ThreadID Thread::GetCurrentThreadID()
+    // Not registered because have @nobind mark
+
     // static void Thread::SetMainThread()
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("void SetMainThread()", AS_FUNCTIONPR(T::SetMainThread, (), void), AS_CALL_CDECL);engine->SetDefaultNamespace("");
 
     // static bool Thread::IsMainThread()
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("bool IsMainThread()", AS_FUNCTIONPR(T::IsMainThread, (), bool), AS_CALL_CDECL);engine->SetDefaultNamespace("");
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Thread
         REGISTER_MEMBERS_MANUAL_PART_Thread();
     #endif
@@ -3535,6 +5239,7 @@ template <class T> void RegisterMembers_Timer(asIScriptEngine* engine, const cha
 
     // void Timer::Reset()
     engine->RegisterObjectMethod(className, "void Reset()", AS_METHODPR(T, Reset, (), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Timer
         REGISTER_MEMBERS_MANUAL_PART_Timer();
     #endif
@@ -3546,6 +5251,25 @@ template <class T> void RegisterMembers_TouchState(asIScriptEngine* engine, cons
     // UIElement* TouchState::GetTouchedElement()
     engine->RegisterObjectMethod(className, "UIElement@+ GetTouchedElement()", AS_METHODPR(T, GetTouchedElement, (), UIElement*), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "UIElement@+ get_touchedElement()", AS_METHODPR(T, GetTouchedElement, (), UIElement*), AS_CALL_THISCALL);
+
+    // WeakPtr<UIElement> TouchState::touchedElement_
+    // Error: type "WeakPtr<UIElement>" can not automatically bind
+
+    // int TouchState::touchID_
+    engine->RegisterObjectProperty(className, "int touchID", offsetof(T, touchID_));
+
+    // IntVector2 TouchState::position_
+    engine->RegisterObjectProperty(className, "IntVector2 position", offsetof(T, position_));
+
+    // IntVector2 TouchState::lastPosition_
+    engine->RegisterObjectProperty(className, "IntVector2 lastPosition", offsetof(T, lastPosition_));
+
+    // IntVector2 TouchState::delta_
+    engine->RegisterObjectProperty(className, "IntVector2 delta", offsetof(T, delta_));
+
+    // float TouchState::pressure_
+    engine->RegisterObjectProperty(className, "float pressure", offsetof(T, pressure_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_TouchState
         REGISTER_MEMBERS_MANUAL_PART_TouchState();
     #endif
@@ -3554,6 +5278,27 @@ template <class T> void RegisterMembers_TouchState(asIScriptEngine* engine, cons
 // struct TrailPoint | File: ../Graphics/RibbonTrail.h
 template <class T> void RegisterMembers_TrailPoint(asIScriptEngine* engine, const char* className)
 {
+    // TrailPoint* TrailPoint::next_
+    // Not registered because pointer
+
+    // Vector3 TrailPoint::position_
+    engine->RegisterObjectProperty(className, "Vector3 position", offsetof(T, position_));
+
+    // Vector3 TrailPoint::forward_
+    engine->RegisterObjectProperty(className, "Vector3 forward", offsetof(T, forward_));
+
+    // Vector3 TrailPoint::parentPos_
+    engine->RegisterObjectProperty(className, "Vector3 parentPos", offsetof(T, parentPos_));
+
+    // float TrailPoint::elapsedLength_
+    engine->RegisterObjectProperty(className, "float elapsedLength", offsetof(T, elapsedLength_));
+
+    // float TrailPoint::lifetime_
+    engine->RegisterObjectProperty(className, "float lifetime", offsetof(T, lifetime_));
+
+    // float TrailPoint::sortDistance_
+    engine->RegisterObjectProperty(className, "float sortDistance", offsetof(T, sortDistance_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_TrailPoint
         REGISTER_MEMBERS_MANUAL_PART_TrailPoint();
     #endif
@@ -3575,6 +5320,10 @@ template <class T> void RegisterMembers_TypeInfo(asIScriptEngine* engine, const 
 
     // bool TypeInfo::IsTypeOf(StringHash type) const
     engine->RegisterObjectMethod(className, "bool IsTypeOf(StringHash) const", AS_METHODPR(T, IsTypeOf, (StringHash) const, bool), AS_CALL_THISCALL);
+
+    // template <typename T> bool TypeInfo::IsTypeOf() const
+    // Not registered because template
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_TypeInfo
         REGISTER_MEMBERS_MANUAL_PART_TypeInfo();
     #endif
@@ -3609,6 +5358,43 @@ template <class T> void RegisterMembers_UIBatch(asIScriptEngine* engine, const c
 
     // void UIBatch::SetDefaultColor()
     engine->RegisterObjectMethod(className, "void SetDefaultColor()", AS_METHODPR(T, SetDefaultColor, (), void), AS_CALL_THISCALL);
+
+    // static void UIBatch::AddOrMerge(const UIBatch& batch, PODVector<UIBatch>& batches)
+    // Error: type "PODVector<UIBatch>&" can not automatically bind
+
+    // UIElement* UIBatch::element_
+    // Not registered because pointer
+    // Texture* UIBatch::texture_
+    // Not registered because pointer
+    // PODVector<float>* UIBatch::vertexData_
+    // Not registered because pointer
+    // Material* UIBatch::customMaterial_
+    // Not registered because pointer
+
+    // BlendMode UIBatch::blendMode_
+    engine->RegisterObjectProperty(className, "BlendMode blendMode", offsetof(T, blendMode_));
+
+    // IntRect UIBatch::scissor_
+    engine->RegisterObjectProperty(className, "IntRect scissor", offsetof(T, scissor_));
+
+    // Vector2 UIBatch::invTextureSize_
+    engine->RegisterObjectProperty(className, "Vector2 invTextureSize", offsetof(T, invTextureSize_));
+
+    // unsigned UIBatch::vertexStart_
+    engine->RegisterObjectProperty(className, "uint vertexStart", offsetof(T, vertexStart_));
+
+    // unsigned UIBatch::vertexEnd_
+    engine->RegisterObjectProperty(className, "uint vertexEnd", offsetof(T, vertexEnd_));
+
+    // unsigned UIBatch::color_
+    engine->RegisterObjectProperty(className, "uint color", offsetof(T, color_));
+
+    // bool UIBatch::useGradient_
+    engine->RegisterObjectProperty(className, "bool useGradient", offsetof(T, useGradient_));
+
+    // static Vector3 UIBatch::posAdjust
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("Vector3 posAdjust", (void*)&T::posAdjust);engine->SetDefaultNamespace("");
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_UIBatch
         REGISTER_MEMBERS_MANUAL_PART_UIBatch();
     #endif
@@ -3617,6 +5403,15 @@ template <class T> void RegisterMembers_UIBatch(asIScriptEngine* engine, const c
 // struct VAnimEventFrame | File: ../Scene/ValueAnimation.h
 template <class T> void RegisterMembers_VAnimEventFrame(asIScriptEngine* engine, const char* className)
 {
+    // float VAnimEventFrame::time_
+    engine->RegisterObjectProperty(className, "float time", offsetof(T, time_));
+
+    // StringHash VAnimEventFrame::eventType_
+    engine->RegisterObjectProperty(className, "StringHash eventType", offsetof(T, eventType_));
+
+    // VariantMap VAnimEventFrame::eventData_
+    engine->RegisterObjectProperty(className, "VariantMap eventData", offsetof(T, eventData_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_VAnimEventFrame
         REGISTER_MEMBERS_MANUAL_PART_VAnimEventFrame();
     #endif
@@ -3625,6 +5420,12 @@ template <class T> void RegisterMembers_VAnimEventFrame(asIScriptEngine* engine,
 // struct VAnimKeyFrame | File: ../Scene/ValueAnimation.h
 template <class T> void RegisterMembers_VAnimKeyFrame(asIScriptEngine* engine, const char* className)
 {
+    // float VAnimKeyFrame::time_
+    engine->RegisterObjectProperty(className, "float time", offsetof(T, time_));
+
+    // Variant VAnimKeyFrame::value_
+    engine->RegisterObjectProperty(className, "Variant value", offsetof(T, value_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_VAnimKeyFrame
         REGISTER_MEMBERS_MANUAL_PART_VAnimKeyFrame();
     #endif
@@ -3656,9 +5457,9 @@ template <class T> bool Variant_bool_operatoreqeq_constspStringVectoramp_templat
 // class Variant | File: ../Core/Variant.h
 template <class T> void RegisterMembers_Variant(asIScriptEngine* engine, const char* className)
 {
-    // void Variant::FromString(VariantType type, const char* value)
-    // Error: type "const char*" can not automatically bind
     // void Variant::FromString(const char* type, const char* value)
+    // Error: type "const char*" can not automatically bind
+    // void Variant::FromString(VariantType type, const char* value)
     // Error: type "const char*" can not automatically bind
     // const PODVector<unsigned char>& Variant::GetBuffer() const
     // Error: type "const PODVector<unsigned char>&" can not automatically bind
@@ -3678,13 +5479,49 @@ template <class T> void RegisterMembers_Variant(asIScriptEngine* engine, const c
     // Error: type "VariantVector*" can not automatically bind
     // void* Variant::GetVoidPtr() const
     // Error: type "void*" can not automatically bind
-    // void Variant::SetBuffer(const void* data, unsigned size)
-    // Error: type "const void*" can not automatically bind
-    // void Variant::SetCustomVariantValue(const CustomVariantValue& value)
-    // Error: type "CustomVariantValue" can not automatically bind bacause have @nobind mark
-    // bool Variant::operator !=(RefCounted* rhs) const
+    // bool Variant::operator !=(const Variant& rhs) const
+    // Only operator == is needed
+    // bool Variant::operator !=(int rhs) const
+    // Only operator == is needed
+    // bool Variant::operator !=(unsigned rhs) const
+    // Only operator == is needed
+    // bool Variant::operator !=(long long rhs) const
+    // Only operator == is needed
+    // bool Variant::operator !=(unsigned long long rhs) const
     // Only operator == is needed
     // bool Variant::operator !=(bool rhs) const
+    // Only operator == is needed
+    // bool Variant::operator !=(float rhs) const
+    // Only operator == is needed
+    // bool Variant::operator !=(double rhs) const
+    // Only operator == is needed
+    // bool Variant::operator !=(const Vector2& rhs) const
+    // Only operator == is needed
+    // bool Variant::operator !=(const Vector3& rhs) const
+    // Only operator == is needed
+    // bool Variant::operator !=(const Vector4& rhs) const
+    // Only operator == is needed
+    // bool Variant::operator !=(const Quaternion& rhs) const
+    // Only operator == is needed
+    // bool Variant::operator !=(const String& rhs) const
+    // Only operator == is needed
+    // bool Variant::operator !=(const PODVector<unsigned char>& rhs) const
+    // Error: type "const PODVector<unsigned char>&" can not automatically bind
+    // bool Variant::operator !=(const VectorBuffer& rhs) const
+    // Only operator == is needed
+    // bool Variant::operator !=(void* rhs) const
+    // Error: type "void*" can not automatically bind
+    // bool Variant::operator !=(const ResourceRef& rhs) const
+    // Only operator == is needed
+    // bool Variant::operator !=(const ResourceRefList& rhs) const
+    // Only operator == is needed
+    // bool Variant::operator !=(const VariantVector& rhs) const
+    // Error: type "const VariantVector&" can not automatically bind
+    // bool Variant::operator !=(const StringVector& rhs) const
+    // Only operator == is needed
+    // bool Variant::operator !=(const VariantMap& rhs) const
+    // Only operator == is needed
+    // bool Variant::operator !=(const Rect& rhs) const
     // Only operator == is needed
     // bool Variant::operator !=(const IntRect& rhs) const
     // Only operator == is needed
@@ -3692,70 +5529,34 @@ template <class T> void RegisterMembers_Variant(asIScriptEngine* engine, const c
     // Only operator == is needed
     // bool Variant::operator !=(const IntVector3& rhs) const
     // Only operator == is needed
+    // bool Variant::operator !=(const StringHash& rhs) const
+    // Only operator == is needed
+    // bool Variant::operator !=(RefCounted* rhs) const
+    // Only operator == is needed
     // bool Variant::operator !=(const Matrix3& rhs) const
     // Only operator == is needed
     // bool Variant::operator !=(const Matrix3x4& rhs) const
     // Only operator == is needed
     // bool Variant::operator !=(const Matrix4& rhs) const
     // Only operator == is needed
-    // bool Variant::operator !=(const PODVector<unsigned char>& rhs) const
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
-    // bool Variant::operator !=(const Quaternion& rhs) const
-    // Only operator == is needed
-    // bool Variant::operator !=(const Rect& rhs) const
-    // Only operator == is needed
-    // bool Variant::operator !=(const ResourceRef& rhs) const
-    // Only operator == is needed
-    // bool Variant::operator !=(const ResourceRefList& rhs) const
-    // Only operator == is needed
-    // bool Variant::operator !=(const String& rhs) const
-    // Only operator == is needed
-    // bool Variant::operator !=(const StringHash& rhs) const
-    // Only operator == is needed
-    // bool Variant::operator !=(const StringVector& rhs) const
-    // Only operator == is needed
-    // bool Variant::operator !=(const Variant& rhs) const
-    // Only operator == is needed
-    // bool Variant::operator !=(const VariantMap& rhs) const
-    // Only operator == is needed
-    // bool Variant::operator !=(const VariantVector& rhs) const
-    // Error: type "const VariantVector&" can not automatically bind
-    // bool Variant::operator !=(const Vector2& rhs) const
-    // Only operator == is needed
-    // bool Variant::operator !=(const Vector3& rhs) const
-    // Only operator == is needed
-    // bool Variant::operator !=(const Vector4& rhs) const
-    // Only operator == is needed
-    // bool Variant::operator !=(const VectorBuffer& rhs) const
-    // Only operator == is needed
-    // bool Variant::operator !=(double rhs) const
-    // Only operator == is needed
-    // bool Variant::operator !=(float rhs) const
-    // Only operator == is needed
-    // bool Variant::operator !=(int rhs) const
-    // Only operator == is needed
-    // bool Variant::operator !=(long long rhs) const
-    // Only operator == is needed
-    // bool Variant::operator !=(unsigned long long rhs) const
-    // Only operator == is needed
-    // bool Variant::operator !=(unsigned rhs) const
-    // Only operator == is needed
-    // bool Variant::operator !=(void* rhs) const
-    // Error: type "void*" can not automatically bind
-    // Variant& Variant::operator =(const PODVector<unsigned char>& rhs)
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
-    // Variant& Variant::operator =(const VariantVector& rhs)
-    // Error: type "const VariantVector&" can not automatically bind
     // Variant& Variant::operator =(const char* rhs)
     // Error: type "const char*" can not automatically bind
+    // Variant& Variant::operator =(const PODVector<unsigned char>& rhs)
+    // Error: type "const PODVector<unsigned char>&" can not automatically bind
     // Variant& Variant::operator =(void* rhs)
     // Error: type "void*" can not automatically bind
+    // Variant& Variant::operator =(const VariantVector& rhs)
+    // Error: type "const VariantVector&" can not automatically bind
     // bool Variant::operator ==(const PODVector<unsigned char>& rhs) const
     // Error: type "const PODVector<unsigned char>&" can not automatically bind
-    // bool Variant::operator ==(const VariantVector& rhs) const
-    // Error: type "const VariantVector&" can not automatically bind
     // bool Variant::operator ==(void* rhs) const
     // Error: type "void*" can not automatically bind
+    // bool Variant::operator ==(const VariantVector& rhs) const
+    // Error: type "const VariantVector&" can not automatically bind
+    // void Variant::SetBuffer(const void* data, unsigned size)
+    // Error: type "const void*" can not automatically bind
+    // void Variant::SetCustomVariantValue(const CustomVariantValue& value)
+    // Error: type "CustomVariantValue" can not automatically bind bacause have @nobind mark
 
     // void Variant::Clear()
     engine->RegisterObjectMethod(className, "void Clear()", AS_METHODPR(T, Clear, (), void), AS_CALL_THISCALL);
@@ -4037,11 +5838,132 @@ template <class T> void RegisterMembers_Variant(asIScriptEngine* engine, const c
     // String Variant::ToString() const
     engine->RegisterObjectMethod(className, "String ToString() const", AS_METHODPR(T, ToString, () const, String), AS_CALL_THISCALL);
 
+    // template <class T> T Variant::Get() const
+    // Not registered because template
+    // template <> int Variant::Get() const
+    // Not registered because template
+    // template <> unsigned Variant::Get() const
+    // Not registered because template
+    // template <> long long Variant::Get() const
+    // Not registered because template
+    // template <> unsigned long long Variant::Get() const
+    // Not registered because template
+    // template <> StringHash Variant::Get() const
+    // Not registered because template
+    // template <> bool Variant::Get() const
+    // Not registered because template
+    // template <> float Variant::Get() const
+    // Not registered because template
+    // template <> double Variant::Get() const
+    // Not registered because template
+    // template <> const Vector2& Variant::Get() const
+    // Not registered because template
+    // template <> const Vector3& Variant::Get() const
+    // Not registered because template
+    // template <> const Vector4& Variant::Get() const
+    // Not registered because template
+    // template <> const Quaternion& Variant::Get() const
+    // Not registered because template
+    // template <> const Color& Variant::Get() const
+    // Not registered because template
+    // template <> const String& Variant::Get() const
+    // Not registered because template
+    // template <> const Rect& Variant::Get() const
+    // Not registered because template
+    // template <> const IntRect& Variant::Get() const
+    // Not registered because template
+    // template <> const IntVector2& Variant::Get() const
+    // Not registered because template
+    // template <> const IntVector3& Variant::Get() const
+    // Not registered because template
+    // template <> const PODVector<unsigned char>& Variant::Get() const
+    // Not registered because template
+    // template <> void* Variant::Get() const
+    // Not registered because template
+    // template <> RefCounted* Variant::Get() const
+    // Not registered because template
+    // template <> const Matrix3& Variant::Get() const
+    // Not registered because template
+    // template <> const Matrix3x4& Variant::Get() const
+    // Not registered because template
+    // template <> const Matrix4& Variant::Get() const
+    // Not registered because template
+    // template <> ResourceRef Variant::Get() const
+    // Not registered because template
+    // template <> ResourceRefList Variant::Get() const
+    // Not registered because template
+    // template <> VariantVector Variant::Get() const
+    // Not registered because template
+    // template <> StringVector Variant::Get() const
+    // Not registered because template
+    // template <> VariantMap Variant::Get() const
+    // Not registered because template
+    // template <> Vector2 Variant::Get() const
+    // Not registered because template
+    // template <> Vector3 Variant::Get() const
+    // Not registered because template
+    // template <> Vector4 Variant::Get() const
+    // Not registered because template
+    // template <> Quaternion Variant::Get() const
+    // Not registered because template
+    // template <> Color Variant::Get() const
+    // Not registered because template
+    // template <> String Variant::Get() const
+    // Not registered because template
+    // template <> Rect Variant::Get() const
+    // Not registered because template
+    // template <> IntRect Variant::Get() const
+    // Not registered because template
+    // template <> IntVector2 Variant::Get() const
+    // Not registered because template
+    // template <> IntVector3 Variant::Get() const
+    // Not registered because template
+    // template <> PODVector<unsigned char> Variant::Get() const
+    // Not registered because template
+    // template <> Matrix3 Variant::Get() const
+    // Not registered because template
+    // template <> Matrix3x4 Variant::Get() const
+    // Not registered because template
+    // template <> Matrix4 Variant::Get() const
+    // Not registered because template
+    // template <class T> T Variant::GetCustom() const
+    // Not registered because template
+    // template <class T> T* Variant::GetCustomPtr()
+    // Not registered because template
+    // template <class T> bool Variant::IsCustomType() const
+    // Not registered because template
+    // template <class T> Variant& Variant::operator =(const CustomVariantValueImpl<T>& value)
+    // Not registered because template
+    // template <class T> void Variant::SetCustom(const T& value)
+    // Not registered because template
+    // static VariantType Variant::GetTypeFromName(const char* typeName)
+    // Error: type "const char*" can not automatically bind
+
     // static String Variant::GetTypeName(VariantType type)
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("String GetTypeName(VariantType)", AS_FUNCTIONPR(T::GetTypeName, (VariantType), String), AS_CALL_CDECL);engine->SetDefaultNamespace("");
 
     // static VariantType Variant::GetTypeFromName(const String& typeName)
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("VariantType GetTypeFromName(const String&in)", AS_FUNCTIONPR(T::GetTypeFromName, (const String&), VariantType), AS_CALL_CDECL);engine->SetDefaultNamespace("");
+
+    // static const PODVector<unsigned char> Variant::emptyBuffer
+    // Error: type "const PODVector<unsigned char>" can not automatically bind
+    // static const VariantVector Variant::emptyVariantVector
+    // Error: type "const VariantVector" can not automatically bind
+    // static const StringVector Variant::emptyStringVector
+    // Error: type "const StringVector" can not automatically bind
+
+    // static const Variant Variant::EMPTY
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const Variant EMPTY", (void*)&T::EMPTY);engine->SetDefaultNamespace("");
+
+    // static const ResourceRef Variant::emptyResourceRef
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const ResourceRef emptyResourceRef", (void*)&T::emptyResourceRef);engine->SetDefaultNamespace("");
+
+    // static const ResourceRefList Variant::emptyResourceRefList
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const ResourceRefList emptyResourceRefList", (void*)&T::emptyResourceRefList);engine->SetDefaultNamespace("");
+
+    // static const VariantMap Variant::emptyVariantMap
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const VariantMap emptyVariantMap", (void*)&T::emptyVariantMap);engine->SetDefaultNamespace("");
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Variant
         REGISTER_MEMBERS_MANUAL_PART_Variant();
     #endif
@@ -4149,6 +6071,31 @@ template <class T> void RegisterMembers_Vector2(asIScriptEngine* engine, const c
 
     // String Vector2::ToString() const
     engine->RegisterObjectMethod(className, "String ToString() const", AS_METHODPR(T, ToString, () const, String), AS_CALL_THISCALL);
+
+    // float Vector2::x_
+    engine->RegisterObjectProperty(className, "float x", offsetof(T, x_));
+
+    // float Vector2::y_
+    engine->RegisterObjectProperty(className, "float y", offsetof(T, y_));
+
+    // static const Vector2 Vector2::ZERO
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const Vector2 ZERO", (void*)&T::ZERO);engine->SetDefaultNamespace("");
+
+    // static const Vector2 Vector2::LEFT
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const Vector2 LEFT", (void*)&T::LEFT);engine->SetDefaultNamespace("");
+
+    // static const Vector2 Vector2::RIGHT
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const Vector2 RIGHT", (void*)&T::RIGHT);engine->SetDefaultNamespace("");
+
+    // static const Vector2 Vector2::UP
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const Vector2 UP", (void*)&T::UP);engine->SetDefaultNamespace("");
+
+    // static const Vector2 Vector2::DOWN
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const Vector2 DOWN", (void*)&T::DOWN);engine->SetDefaultNamespace("");
+
+    // static const Vector2 Vector2::ONE
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const Vector2 ONE", (void*)&T::ONE);engine->SetDefaultNamespace("");
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Vector2
         REGISTER_MEMBERS_MANUAL_PART_Vector2();
     #endif
@@ -4277,6 +6224,40 @@ template <class T> void RegisterMembers_Vector3(asIScriptEngine* engine, const c
 
     // String Vector3::ToString() const
     engine->RegisterObjectMethod(className, "String ToString() const", AS_METHODPR(T, ToString, () const, String), AS_CALL_THISCALL);
+
+    // float Vector3::x_
+    engine->RegisterObjectProperty(className, "float x", offsetof(T, x_));
+
+    // float Vector3::y_
+    engine->RegisterObjectProperty(className, "float y", offsetof(T, y_));
+
+    // float Vector3::z_
+    engine->RegisterObjectProperty(className, "float z", offsetof(T, z_));
+
+    // static const Vector3 Vector3::ZERO
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const Vector3 ZERO", (void*)&T::ZERO);engine->SetDefaultNamespace("");
+
+    // static const Vector3 Vector3::LEFT
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const Vector3 LEFT", (void*)&T::LEFT);engine->SetDefaultNamespace("");
+
+    // static const Vector3 Vector3::RIGHT
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const Vector3 RIGHT", (void*)&T::RIGHT);engine->SetDefaultNamespace("");
+
+    // static const Vector3 Vector3::UP
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const Vector3 UP", (void*)&T::UP);engine->SetDefaultNamespace("");
+
+    // static const Vector3 Vector3::DOWN
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const Vector3 DOWN", (void*)&T::DOWN);engine->SetDefaultNamespace("");
+
+    // static const Vector3 Vector3::FORWARD
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const Vector3 FORWARD", (void*)&T::FORWARD);engine->SetDefaultNamespace("");
+
+    // static const Vector3 Vector3::BACK
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const Vector3 BACK", (void*)&T::BACK);engine->SetDefaultNamespace("");
+
+    // static const Vector3 Vector3::ONE
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const Vector3 ONE", (void*)&T::ONE);engine->SetDefaultNamespace("");
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Vector3
         REGISTER_MEMBERS_MANUAL_PART_Vector3();
     #endif
@@ -4376,6 +6357,25 @@ template <class T> void RegisterMembers_Vector4(asIScriptEngine* engine, const c
 
     // String Vector4::ToString() const
     engine->RegisterObjectMethod(className, "String ToString() const", AS_METHODPR(T, ToString, () const, String), AS_CALL_THISCALL);
+
+    // float Vector4::x_
+    engine->RegisterObjectProperty(className, "float x", offsetof(T, x_));
+
+    // float Vector4::y_
+    engine->RegisterObjectProperty(className, "float y", offsetof(T, y_));
+
+    // float Vector4::z_
+    engine->RegisterObjectProperty(className, "float z", offsetof(T, z_));
+
+    // float Vector4::w_
+    engine->RegisterObjectProperty(className, "float w", offsetof(T, w_));
+
+    // static const Vector4 Vector4::ZERO
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const Vector4 ZERO", (void*)&T::ZERO);engine->SetDefaultNamespace("");
+
+    // static const Vector4 Vector4::ONE
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const Vector4 ONE", (void*)&T::ONE);engine->SetDefaultNamespace("");
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Vector4
         REGISTER_MEMBERS_MANUAL_PART_Vector4();
     #endif
@@ -4386,6 +6386,7 @@ template <class T> void RegisterMembers_VectorBase(asIScriptEngine* engine, cons
 {
     // void VectorBase::Swap(VectorBase& rhs)
     engine->RegisterObjectMethod(className, "void Swap(VectorBase&)", AS_METHODPR(T, Swap, (VectorBase&), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_VectorBase
         REGISTER_MEMBERS_MANUAL_PART_VectorBase();
     #endif
@@ -4394,6 +6395,17 @@ template <class T> void RegisterMembers_VectorBase(asIScriptEngine* engine, cons
 // struct VertexBufferDesc | File: ../Graphics/Model.h
 template <class T> void RegisterMembers_VertexBufferDesc(asIScriptEngine* engine, const char* className)
 {
+    // PODVector<VertexElement> VertexBufferDesc::vertexElements_
+    // Error: type "PODVector<VertexElement>" can not automatically bind
+    // SharedArrayPtr<unsigned char> VertexBufferDesc::data_
+    // Error: type "SharedArrayPtr<unsigned char>" can not automatically bind
+
+    // unsigned VertexBufferDesc::vertexCount_
+    engine->RegisterObjectProperty(className, "uint vertexCount", offsetof(T, vertexCount_));
+
+    // unsigned VertexBufferDesc::dataSize_
+    engine->RegisterObjectProperty(className, "uint dataSize", offsetof(T, dataSize_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_VertexBufferDesc
         REGISTER_MEMBERS_MANUAL_PART_VertexBufferDesc();
     #endif
@@ -4402,6 +6414,18 @@ template <class T> void RegisterMembers_VertexBufferDesc(asIScriptEngine* engine
 // struct VertexBufferMorph | File: ../Graphics/Model.h
 template <class T> void RegisterMembers_VertexBufferMorph(asIScriptEngine* engine, const char* className)
 {
+    // SharedArrayPtr<unsigned char> VertexBufferMorph::morphData_
+    // Error: type "SharedArrayPtr<unsigned char>" can not automatically bind
+
+    // VertexMaskFlags VertexBufferMorph::elementMask_
+    engine->RegisterObjectProperty(className, "VertexMaskFlags elementMask", offsetof(T, elementMask_));
+
+    // unsigned VertexBufferMorph::vertexCount_
+    engine->RegisterObjectProperty(className, "uint vertexCount", offsetof(T, vertexCount_));
+
+    // unsigned VertexBufferMorph::dataSize_
+    engine->RegisterObjectProperty(className, "uint dataSize", offsetof(T, dataSize_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_VertexBufferMorph
         REGISTER_MEMBERS_MANUAL_PART_VertexBufferMorph();
     #endif
@@ -4415,6 +6439,22 @@ template <class T> void RegisterMembers_VertexElement(asIScriptEngine* engine, c
 
     // bool VertexElement::operator ==(const VertexElement& rhs) const
     engine->RegisterObjectMethod(className, "bool opEquals(const VertexElement&in) const", AS_METHODPR(T, operator==, (const VertexElement&) const, bool), AS_CALL_THISCALL);
+
+    // VertexElementType VertexElement::type_
+    engine->RegisterObjectProperty(className, "VertexElementType type", offsetof(T, type_));
+
+    // VertexElementSemantic VertexElement::semantic_
+    engine->RegisterObjectProperty(className, "VertexElementSemantic semantic", offsetof(T, semantic_));
+
+    // unsigned char VertexElement::index_
+    engine->RegisterObjectProperty(className, "uint8 index", offsetof(T, index_));
+
+    // bool VertexElement::perInstance_
+    engine->RegisterObjectProperty(className, "bool perInstance", offsetof(T, perInstance_));
+
+    // unsigned VertexElement::offset_
+    engine->RegisterObjectProperty(className, "uint offset", offsetof(T, offset_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_VertexElement
         REGISTER_MEMBERS_MANUAL_PART_VertexElement();
     #endif
@@ -4423,16 +6463,16 @@ template <class T> void RegisterMembers_VertexElement(asIScriptEngine* engine, c
 // class WString | File: ../Container/Str.h
 template <class T> void RegisterMembers_WString(asIScriptEngine* engine, const char* className)
 {
-    // const wchar_t& WString::At(unsigned index) const
-    // Error: type "const wchar_t&" can not automatically bind
     // wchar_t& WString::At(unsigned index)
     // Error: type "wchar_t&" can not automatically bind
+    // const wchar_t& WString::At(unsigned index) const
+    // Error: type "const wchar_t&" can not automatically bind
     // const wchar_t* WString::CString() const
     // Error: type "const wchar_t*" can not automatically bind
-    // const wchar_t& WString::operator [](unsigned index) const
-    // Error: type "const wchar_t&" can not automatically bind
     // wchar_t& WString::operator [](unsigned index)
     // Error: type "wchar_t&" can not automatically bind
+    // const wchar_t& WString::operator [](unsigned index) const
+    // Error: type "const wchar_t&" can not automatically bind
 
     // bool WString::Empty() const
     engine->RegisterObjectMethod(className, "bool Empty() const", AS_METHODPR(T, Empty, () const, bool), AS_CALL_THISCALL);
@@ -4442,6 +6482,7 @@ template <class T> void RegisterMembers_WString(asIScriptEngine* engine, const c
 
     // void WString::Resize(unsigned newLength)
     engine->RegisterObjectMethod(className, "void Resize(uint)", AS_METHODPR(T, Resize, (unsigned), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_WString
         REGISTER_MEMBERS_MANUAL_PART_WString();
     #endif
@@ -4450,6 +6491,15 @@ template <class T> void RegisterMembers_WString(asIScriptEngine* engine, const c
 // struct WindowModeParams | File: ../Graphics/Graphics.h
 template <class T> void RegisterMembers_WindowModeParams(asIScriptEngine* engine, const char* className)
 {
+    // int WindowModeParams::width_
+    engine->RegisterObjectProperty(className, "int width", offsetof(T, width_));
+
+    // int WindowModeParams::height_
+    engine->RegisterObjectProperty(className, "int height", offsetof(T, height_));
+
+    // ScreenModeParams WindowModeParams::screenParams_
+    engine->RegisterObjectProperty(className, "ScreenModeParams screenParams", offsetof(T, screenParams_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_WindowModeParams
         REGISTER_MEMBERS_MANUAL_PART_WindowModeParams();
     #endif
@@ -4526,10 +6576,10 @@ template <class T> void RegisterMembers_XMLElement(asIScriptEngine* engine, cons
     // Error: type "const char*" can not automatically bind
     // bool XMLElement::SetAttribute(const char* value)
     // Error: type "const char*" can not automatically bind
-    // bool XMLElement::SetBuffer(const String& name, const PODVector<unsigned char>& value)
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
     // bool XMLElement::SetBuffer(const String& name, const void* data, unsigned size)
     // Error: type "const void*" can not automatically bind
+    // bool XMLElement::SetBuffer(const String& name, const PODVector<unsigned char>& value)
+    // Error: type "const PODVector<unsigned char>&" can not automatically bind
     // bool XMLElement::SetValue(const char* value)
     // Error: type "const char*" can not automatically bind
     // bool XMLElement::SetVariantVector(const VariantVector& value)
@@ -4807,6 +6857,10 @@ template <class T> void RegisterMembers_XMLElement(asIScriptEngine* engine, cons
 
     // bool XMLElement::SetVectorVariant(const String& name, const Variant& value)
     engine->RegisterObjectMethod(className, "bool SetVectorVariant(const String&in, const Variant&in)", AS_METHODPR(T, SetVectorVariant, (const String&, const Variant&), bool), AS_CALL_THISCALL);
+
+    // static const XMLElement XMLElement::EMPTY
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const XMLElement EMPTY", (void*)&T::EMPTY);engine->SetDefaultNamespace("");
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_XMLElement
         REGISTER_MEMBERS_MANUAL_PART_XMLElement();
     #endif
@@ -4858,6 +6912,7 @@ template <class T> void RegisterMembers_XPathQuery(asIScriptEngine* engine, cons
 
     // bool XPathQuery::SetVariable(const String& name, const XPathResultSet& value)
     engine->RegisterObjectMethod(className, "bool SetVariable(const String&in, const XPathResultSet&in)", AS_METHODPR(T, SetVariable, (const String&, const XPathResultSet&), bool), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_XPathQuery
         REGISTER_MEMBERS_MANUAL_PART_XPathQuery();
     #endif
@@ -4886,6 +6941,7 @@ template <class T> void RegisterMembers_XPathResultSet(asIScriptEngine* engine, 
     // unsigned XPathResultSet::Size() const
     engine->RegisterObjectMethod(className, "uint Size() const", AS_METHODPR(T, Size, () const, unsigned), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_size() const", AS_METHODPR(T, Size, () const, unsigned), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_XPathResultSet
         REGISTER_MEMBERS_MANUAL_PART_XPathResultSet();
     #endif
@@ -4896,6 +6952,36 @@ template <class T> void RegisterMembers_XPathResultSet(asIScriptEngine* engine, 
 // struct CrowdObstacleAvoidanceParams | File: ../Navigation/CrowdManager.h
 template <class T> void RegisterMembers_CrowdObstacleAvoidanceParams(asIScriptEngine* engine, const char* className)
 {
+    // float CrowdObstacleAvoidanceParams::velBias
+    engine->RegisterObjectProperty(className, "float velBias", offsetof(T, velBias));
+
+    // float CrowdObstacleAvoidanceParams::weightDesVel
+    engine->RegisterObjectProperty(className, "float weightDesVel", offsetof(T, weightDesVel));
+
+    // float CrowdObstacleAvoidanceParams::weightCurVel
+    engine->RegisterObjectProperty(className, "float weightCurVel", offsetof(T, weightCurVel));
+
+    // float CrowdObstacleAvoidanceParams::weightSide
+    engine->RegisterObjectProperty(className, "float weightSide", offsetof(T, weightSide));
+
+    // float CrowdObstacleAvoidanceParams::weightToi
+    engine->RegisterObjectProperty(className, "float weightToi", offsetof(T, weightToi));
+
+    // float CrowdObstacleAvoidanceParams::horizTime
+    engine->RegisterObjectProperty(className, "float horizTime", offsetof(T, horizTime));
+
+    // unsigned char CrowdObstacleAvoidanceParams::gridSize
+    engine->RegisterObjectProperty(className, "uint8 gridSize", offsetof(T, gridSize));
+
+    // unsigned char CrowdObstacleAvoidanceParams::adaptiveDivs
+    engine->RegisterObjectProperty(className, "uint8 adaptiveDivs", offsetof(T, adaptiveDivs));
+
+    // unsigned char CrowdObstacleAvoidanceParams::adaptiveRings
+    engine->RegisterObjectProperty(className, "uint8 adaptiveRings", offsetof(T, adaptiveRings));
+
+    // unsigned char CrowdObstacleAvoidanceParams::adaptiveDepth
+    engine->RegisterObjectProperty(className, "uint8 adaptiveDepth", offsetof(T, adaptiveDepth));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_CrowdObstacleAvoidanceParams
         REGISTER_MEMBERS_MANUAL_PART_CrowdObstacleAvoidanceParams();
     #endif
@@ -4904,6 +6990,12 @@ template <class T> void RegisterMembers_CrowdObstacleAvoidanceParams(asIScriptEn
 // struct NavAreaStub | File: ../Navigation/NavBuildData.h
 template <class T> void RegisterMembers_NavAreaStub(asIScriptEngine* engine, const char* className)
 {
+    // BoundingBox NavAreaStub::bounds_
+    engine->RegisterObjectProperty(className, "BoundingBox bounds", offsetof(T, bounds_));
+
+    // unsigned char NavAreaStub::areaID_
+    engine->RegisterObjectProperty(className, "uint8 areaID", offsetof(T, areaID_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_NavAreaStub
         REGISTER_MEMBERS_MANUAL_PART_NavAreaStub();
     #endif
@@ -4912,6 +7004,32 @@ template <class T> void RegisterMembers_NavAreaStub(asIScriptEngine* engine, con
 // struct NavBuildData | File: ../Navigation/NavBuildData.h
 template <class T> void RegisterMembers_NavBuildData(asIScriptEngine* engine, const char* className)
 {
+    // PODVector<Vector3> NavBuildData::vertices_
+    // Error: type "PODVector<Vector3>" can not automatically bind
+    // PODVector<int> NavBuildData::indices_
+    // Error: type "PODVector<int>" can not automatically bind
+    // PODVector<Vector3> NavBuildData::offMeshVertices_
+    // Error: type "PODVector<Vector3>" can not automatically bind
+    // PODVector<float> NavBuildData::offMeshRadii_
+    // Error: type "PODVector<float>" can not automatically bind
+    // PODVector<unsigned short> NavBuildData::offMeshFlags_
+    // Error: type "PODVector<unsigned short>" can not automatically bind
+    // PODVector<unsigned char> NavBuildData::offMeshAreas_
+    // Error: type "PODVector<unsigned char>" can not automatically bind
+    // PODVector<unsigned char> NavBuildData::offMeshDir_
+    // Error: type "PODVector<unsigned char>" can not automatically bind
+    // rcContext* NavBuildData::ctx_
+    // Not registered because pointer
+    // rcHeightfield* NavBuildData::heightField_
+    // Not registered because pointer
+    // rcCompactHeightfield* NavBuildData::compactHeightField_
+    // Not registered because pointer
+    // PODVector<NavAreaStub> NavBuildData::navAreas_
+    // Error: type "PODVector<NavAreaStub>" can not automatically bind
+
+    // BoundingBox NavBuildData::worldBoundingBox_
+    engine->RegisterObjectProperty(className, "BoundingBox worldBoundingBox", offsetof(T, worldBoundingBox_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_NavBuildData
         REGISTER_MEMBERS_MANUAL_PART_NavBuildData();
     #endif
@@ -4920,6 +7038,18 @@ template <class T> void RegisterMembers_NavBuildData(asIScriptEngine* engine, co
 // struct NavigationGeometryInfo | File: ../Navigation/NavigationMesh.h
 template <class T> void RegisterMembers_NavigationGeometryInfo(asIScriptEngine* engine, const char* className)
 {
+    // Component* NavigationGeometryInfo::component_
+    // Not registered because pointer
+
+    // unsigned NavigationGeometryInfo::lodLevel_
+    engine->RegisterObjectProperty(className, "uint lodLevel", offsetof(T, lodLevel_));
+
+    // Matrix3x4 NavigationGeometryInfo::transform_
+    engine->RegisterObjectProperty(className, "Matrix3x4 transform", offsetof(T, transform_));
+
+    // BoundingBox NavigationGeometryInfo::boundingBox_
+    engine->RegisterObjectProperty(className, "BoundingBox boundingBox", offsetof(T, boundingBox_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_NavigationGeometryInfo
         REGISTER_MEMBERS_MANUAL_PART_NavigationGeometryInfo();
     #endif
@@ -4928,6 +7058,15 @@ template <class T> void RegisterMembers_NavigationGeometryInfo(asIScriptEngine* 
 // struct NavigationPathPoint | File: ../Navigation/NavigationMesh.h
 template <class T> void RegisterMembers_NavigationPathPoint(asIScriptEngine* engine, const char* className)
 {
+    // Vector3 NavigationPathPoint::position_
+    engine->RegisterObjectProperty(className, "Vector3 position", offsetof(T, position_));
+
+    // NavigationPathPointFlag NavigationPathPoint::flag_
+    engine->RegisterObjectProperty(className, "NavigationPathPointFlag flag", offsetof(T, flag_));
+
+    // unsigned char NavigationPathPoint::areaID_
+    engine->RegisterObjectProperty(className, "uint8 areaID", offsetof(T, areaID_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_NavigationPathPoint
         REGISTER_MEMBERS_MANUAL_PART_NavigationPathPoint();
     #endif
@@ -4940,6 +7079,23 @@ template <class T> void RegisterMembers_NavigationPathPoint(asIScriptEngine* eng
 // struct PackageDownload | File: ../Network/Connection.h
 template <class T> void RegisterMembers_PackageDownload(asIScriptEngine* engine, const char* className)
 {
+    // SharedPtr<File> PackageDownload::file_
+    // Error: type "SharedPtr<File>" can not automatically bind
+    // HashSet<unsigned> PackageDownload::receivedFragments_
+    // Error: type "HashSet<unsigned>" can not automatically bind
+
+    // String PackageDownload::name_
+    engine->RegisterObjectProperty(className, "String name", offsetof(T, name_));
+
+    // unsigned PackageDownload::totalFragments_
+    engine->RegisterObjectProperty(className, "uint totalFragments", offsetof(T, totalFragments_));
+
+    // unsigned PackageDownload::checksum_
+    engine->RegisterObjectProperty(className, "uint checksum", offsetof(T, checksum_));
+
+    // bool PackageDownload::initiated_
+    engine->RegisterObjectProperty(className, "bool initiated", offsetof(T, initiated_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_PackageDownload
         REGISTER_MEMBERS_MANUAL_PART_PackageDownload();
     #endif
@@ -4948,6 +7104,15 @@ template <class T> void RegisterMembers_PackageDownload(asIScriptEngine* engine,
 // struct PackageUpload | File: ../Network/Connection.h
 template <class T> void RegisterMembers_PackageUpload(asIScriptEngine* engine, const char* className)
 {
+    // SharedPtr<File> PackageUpload::file_
+    // Error: type "SharedPtr<File>" can not automatically bind
+
+    // unsigned PackageUpload::fragment_
+    engine->RegisterObjectProperty(className, "uint fragment", offsetof(T, fragment_));
+
+    // unsigned PackageUpload::totalFragments_
+    engine->RegisterObjectProperty(className, "uint totalFragments", offsetof(T, totalFragments_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_PackageUpload
         REGISTER_MEMBERS_MANUAL_PART_PackageUpload();
     #endif
@@ -4956,6 +7121,18 @@ template <class T> void RegisterMembers_PackageUpload(asIScriptEngine* engine, c
 // struct RemoteEvent | File: ../Network/Connection.h
 template <class T> void RegisterMembers_RemoteEvent(asIScriptEngine* engine, const char* className)
 {
+    // unsigned RemoteEvent::senderID_
+    engine->RegisterObjectProperty(className, "uint senderID", offsetof(T, senderID_));
+
+    // StringHash RemoteEvent::eventType_
+    engine->RegisterObjectProperty(className, "StringHash eventType", offsetof(T, eventType_));
+
+    // VariantMap RemoteEvent::eventData_
+    engine->RegisterObjectProperty(className, "VariantMap eventData", offsetof(T, eventData_));
+
+    // bool RemoteEvent::inOrder_
+    engine->RegisterObjectProperty(className, "bool inOrder", offsetof(T, inOrder_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_RemoteEvent
         REGISTER_MEMBERS_MANUAL_PART_RemoteEvent();
     #endif
@@ -4968,6 +7145,17 @@ template <class T> void RegisterMembers_RemoteEvent(asIScriptEngine* engine, con
 // struct DelayedWorldTransform | File: ../Physics/PhysicsWorld.h
 template <class T> void RegisterMembers_DelayedWorldTransform(asIScriptEngine* engine, const char* className)
 {
+    // RigidBody* DelayedWorldTransform::rigidBody_
+    // Not registered because pointer
+    // RigidBody* DelayedWorldTransform::parentRigidBody_
+    // Not registered because pointer
+
+    // Vector3 DelayedWorldTransform::worldPosition_
+    engine->RegisterObjectProperty(className, "Vector3 worldPosition", offsetof(T, worldPosition_));
+
+    // Quaternion DelayedWorldTransform::worldRotation_
+    engine->RegisterObjectProperty(className, "Quaternion worldRotation", offsetof(T, worldRotation_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_DelayedWorldTransform
         REGISTER_MEMBERS_MANUAL_PART_DelayedWorldTransform();
     #endif
@@ -4976,6 +7164,11 @@ template <class T> void RegisterMembers_DelayedWorldTransform(asIScriptEngine* e
 // struct ManifoldPair | File: ../Physics/PhysicsWorld.h
 template <class T> void RegisterMembers_ManifoldPair(asIScriptEngine* engine, const char* className)
 {
+    // btPersistentManifold* ManifoldPair::manifold_
+    // Not registered because pointer
+    // btPersistentManifold* ManifoldPair::flippedManifold_
+    // Not registered because pointer
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ManifoldPair
         REGISTER_MEMBERS_MANUAL_PART_ManifoldPair();
     #endif
@@ -4986,6 +7179,22 @@ template <class T> void RegisterMembers_PhysicsRaycastResult(asIScriptEngine* en
 {
     // bool PhysicsRaycastResult::operator !=(const PhysicsRaycastResult& rhs) const
     // Only operator == is needed
+
+    // RigidBody* PhysicsRaycastResult::body_
+    // Not registered because pointer
+
+    // Vector3 PhysicsRaycastResult::position_
+    engine->RegisterObjectProperty(className, "Vector3 position", offsetof(T, position_));
+
+    // Vector3 PhysicsRaycastResult::normal_
+    engine->RegisterObjectProperty(className, "Vector3 normal", offsetof(T, normal_));
+
+    // float PhysicsRaycastResult::distance_
+    engine->RegisterObjectProperty(className, "float distance", offsetof(T, distance_));
+
+    // float PhysicsRaycastResult::hitFraction_
+    engine->RegisterObjectProperty(className, "float hitFraction", offsetof(T, hitFraction_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_PhysicsRaycastResult
         REGISTER_MEMBERS_MANUAL_PART_PhysicsRaycastResult();
     #endif
@@ -4994,6 +7203,9 @@ template <class T> void RegisterMembers_PhysicsRaycastResult(asIScriptEngine* en
 // struct PhysicsWorldConfig | File: ../Physics/PhysicsWorld.h
 template <class T> void RegisterMembers_PhysicsWorldConfig(asIScriptEngine* engine, const char* className)
 {
+    // btCollisionConfiguration* PhysicsWorldConfig::collisionConfig_
+    // Not registered because pointer
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_PhysicsWorldConfig
         REGISTER_MEMBERS_MANUAL_PART_PhysicsWorldConfig();
     #endif
@@ -5006,6 +7218,17 @@ template <class T> void RegisterMembers_PhysicsWorldConfig(asIScriptEngine* engi
 // struct DelayedWorldTransform2D | File: ../Urho2D/PhysicsWorld2D.h
 template <class T> void RegisterMembers_DelayedWorldTransform2D(asIScriptEngine* engine, const char* className)
 {
+    // RigidBody2D* DelayedWorldTransform2D::rigidBody_
+    // Not registered because pointer
+    // RigidBody2D* DelayedWorldTransform2D::parentRigidBody_
+    // Not registered because pointer
+
+    // Vector3 DelayedWorldTransform2D::worldPosition_
+    engine->RegisterObjectProperty(className, "Vector3 worldPosition", offsetof(T, worldPosition_));
+
+    // Quaternion DelayedWorldTransform2D::worldRotation_
+    engine->RegisterObjectProperty(className, "Quaternion worldRotation", offsetof(T, worldRotation_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_DelayedWorldTransform2D
         REGISTER_MEMBERS_MANUAL_PART_DelayedWorldTransform2D();
     #endif
@@ -5014,6 +7237,54 @@ template <class T> void RegisterMembers_DelayedWorldTransform2D(asIScriptEngine*
 // struct Particle2D | File: ../Urho2D/ParticleEmitter2D.h
 template <class T> void RegisterMembers_Particle2D(asIScriptEngine* engine, const char* className)
 {
+    // float Particle2D::timeToLive_
+    engine->RegisterObjectProperty(className, "float timeToLive", offsetof(T, timeToLive_));
+
+    // Vector3 Particle2D::position_
+    engine->RegisterObjectProperty(className, "Vector3 position", offsetof(T, position_));
+
+    // float Particle2D::size_
+    engine->RegisterObjectProperty(className, "float size", offsetof(T, size_));
+
+    // float Particle2D::sizeDelta_
+    engine->RegisterObjectProperty(className, "float sizeDelta", offsetof(T, sizeDelta_));
+
+    // float Particle2D::rotation_
+    engine->RegisterObjectProperty(className, "float rotation", offsetof(T, rotation_));
+
+    // float Particle2D::rotationDelta_
+    engine->RegisterObjectProperty(className, "float rotationDelta", offsetof(T, rotationDelta_));
+
+    // Color Particle2D::color_
+    engine->RegisterObjectProperty(className, "Color color", offsetof(T, color_));
+
+    // Color Particle2D::colorDelta_
+    engine->RegisterObjectProperty(className, "Color colorDelta", offsetof(T, colorDelta_));
+
+    // Vector2 Particle2D::startPos_
+    engine->RegisterObjectProperty(className, "Vector2 startPos", offsetof(T, startPos_));
+
+    // Vector2 Particle2D::velocity_
+    engine->RegisterObjectProperty(className, "Vector2 velocity", offsetof(T, velocity_));
+
+    // float Particle2D::radialAcceleration_
+    engine->RegisterObjectProperty(className, "float radialAcceleration", offsetof(T, radialAcceleration_));
+
+    // float Particle2D::tangentialAcceleration_
+    engine->RegisterObjectProperty(className, "float tangentialAcceleration", offsetof(T, tangentialAcceleration_));
+
+    // float Particle2D::emitRadius_
+    engine->RegisterObjectProperty(className, "float emitRadius", offsetof(T, emitRadius_));
+
+    // float Particle2D::emitRadiusDelta_
+    engine->RegisterObjectProperty(className, "float emitRadiusDelta", offsetof(T, emitRadiusDelta_));
+
+    // float Particle2D::emitRotation_
+    engine->RegisterObjectProperty(className, "float emitRotation", offsetof(T, emitRotation_));
+
+    // float Particle2D::emitRotationDelta_
+    engine->RegisterObjectProperty(className, "float emitRotationDelta", offsetof(T, emitRotationDelta_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Particle2D
         REGISTER_MEMBERS_MANUAL_PART_Particle2D();
     #endif
@@ -5024,6 +7295,19 @@ template <class T> void RegisterMembers_PhysicsRaycastResult2D(asIScriptEngine* 
 {
     // bool PhysicsRaycastResult2D::operator !=(const PhysicsRaycastResult2D& rhs) const
     // Only operator == is needed
+
+    // RigidBody2D* PhysicsRaycastResult2D::body_
+    // Not registered because pointer
+
+    // Vector2 PhysicsRaycastResult2D::position_
+    engine->RegisterObjectProperty(className, "Vector2 position", offsetof(T, position_));
+
+    // Vector2 PhysicsRaycastResult2D::normal_
+    engine->RegisterObjectProperty(className, "Vector2 normal", offsetof(T, normal_));
+
+    // float PhysicsRaycastResult2D::distance_
+    engine->RegisterObjectProperty(className, "float distance", offsetof(T, distance_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_PhysicsRaycastResult2D
         REGISTER_MEMBERS_MANUAL_PART_PhysicsRaycastResult2D();
     #endif
@@ -5032,6 +7316,19 @@ template <class T> void RegisterMembers_PhysicsRaycastResult2D(asIScriptEngine* 
 // struct SourceBatch2D | File: ../Urho2D/Drawable2D.h
 template <class T> void RegisterMembers_SourceBatch2D(asIScriptEngine* engine, const char* className)
 {
+    // WeakPtr<Drawable2D> SourceBatch2D::owner_
+    // Error: type "WeakPtr<Drawable2D>" can not automatically bind
+    // SharedPtr<Material> SourceBatch2D::material_
+    // Error: type "SharedPtr<Material>" can not automatically bind
+    // Vector<Vertex2D> SourceBatch2D::vertices_
+    // Error: type "Vector<Vertex2D>" can not automatically bind
+
+    // float SourceBatch2D::distance_
+    engine->RegisterObjectProperty(className, "float distance", offsetof(T, distance_));
+
+    // int SourceBatch2D::drawOrder_
+    engine->RegisterObjectProperty(className, "int drawOrder", offsetof(T, drawOrder_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_SourceBatch2D
         REGISTER_MEMBERS_MANUAL_PART_SourceBatch2D();
     #endif
@@ -5056,6 +7353,22 @@ template <class T> void RegisterMembers_TileMapInfo2D(asIScriptEngine* engine, c
 
     // Vector2 TileMapInfo2D::TileIndexToPosition(int x, int y) const
     engine->RegisterObjectMethod(className, "Vector2 TileIndexToPosition(int, int) const", AS_METHODPR(T, TileIndexToPosition, (int, int) const, Vector2), AS_CALL_THISCALL);
+
+    // Orientation2D TileMapInfo2D::orientation_
+    engine->RegisterObjectProperty(className, "Orientation2D orientation", offsetof(T, orientation_));
+
+    // int TileMapInfo2D::width_
+    engine->RegisterObjectProperty(className, "int width", offsetof(T, width_));
+
+    // int TileMapInfo2D::height_
+    engine->RegisterObjectProperty(className, "int height", offsetof(T, height_));
+
+    // float TileMapInfo2D::tileWidth_
+    engine->RegisterObjectProperty(className, "float tileWidth", offsetof(T, tileWidth_));
+
+    // float TileMapInfo2D::tileHeight_
+    engine->RegisterObjectProperty(className, "float tileHeight", offsetof(T, tileHeight_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_TileMapInfo2D
         REGISTER_MEMBERS_MANUAL_PART_TileMapInfo2D();
     #endif
@@ -5064,6 +7377,15 @@ template <class T> void RegisterMembers_TileMapInfo2D(asIScriptEngine* engine, c
 // struct Vertex2D | File: ../Urho2D/Drawable2D.h
 template <class T> void RegisterMembers_Vertex2D(asIScriptEngine* engine, const char* className)
 {
+    // Vector3 Vertex2D::position_
+    engine->RegisterObjectProperty(className, "Vector3 position", offsetof(T, position_));
+
+    // unsigned Vertex2D::color_
+    engine->RegisterObjectProperty(className, "uint color", offsetof(T, color_));
+
+    // Vector2 Vertex2D::uv_
+    engine->RegisterObjectProperty(className, "Vector2 uv", offsetof(T, uv_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Vertex2D
         REGISTER_MEMBERS_MANUAL_PART_Vertex2D();
     #endif
@@ -5072,6 +7394,32 @@ template <class T> void RegisterMembers_Vertex2D(asIScriptEngine* engine, const 
 // struct ViewBatchInfo2D | File: ../Urho2D/Renderer2D.h
 template <class T> void RegisterMembers_ViewBatchInfo2D(asIScriptEngine* engine, const char* className)
 {
+    // SharedPtr<VertexBuffer> ViewBatchInfo2D::vertexBuffer_
+    // Error: type "SharedPtr<VertexBuffer>" can not automatically bind
+    // PODVector<const SourceBatch2D*> ViewBatchInfo2D::sourceBatches_
+    // Error: type "PODVector<const SourceBatch2D*>" can not automatically bind
+    // PODVector<float> ViewBatchInfo2D::distances_
+    // Error: type "PODVector<float>" can not automatically bind
+    // Vector<SharedPtr<Material>> ViewBatchInfo2D::materials_
+    // Error: type "Vector<SharedPtr<Material>>" can not automatically bind
+    // Vector<SharedPtr<Geometry>> ViewBatchInfo2D::geometries_
+    // Error: type "Vector<SharedPtr<Geometry>>" can not automatically bind
+
+    // unsigned ViewBatchInfo2D::vertexBufferUpdateFrameNumber_
+    engine->RegisterObjectProperty(className, "uint vertexBufferUpdateFrameNumber", offsetof(T, vertexBufferUpdateFrameNumber_));
+
+    // unsigned ViewBatchInfo2D::indexCount_
+    engine->RegisterObjectProperty(className, "uint indexCount", offsetof(T, indexCount_));
+
+    // unsigned ViewBatchInfo2D::vertexCount_
+    engine->RegisterObjectProperty(className, "uint vertexCount", offsetof(T, vertexCount_));
+
+    // unsigned ViewBatchInfo2D::batchUpdatedFrameNumber_
+    engine->RegisterObjectProperty(className, "uint batchUpdatedFrameNumber", offsetof(T, batchUpdatedFrameNumber_));
+
+    // unsigned ViewBatchInfo2D::batchCount_
+    engine->RegisterObjectProperty(className, "uint batchCount", offsetof(T, batchCount_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ViewBatchInfo2D
         REGISTER_MEMBERS_MANUAL_PART_ViewBatchInfo2D();
     #endif
@@ -5088,6 +7436,7 @@ template <class T> void RegisterMembers_AbstractFile(asIScriptEngine* engine, co
     // virtual void AbstractFile::SetName(const String& name)
     engine->RegisterObjectMethod(className, "void SetName(const String&in)", AS_METHODPR(T, SetName, (const String&), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_name(const String&in)", AS_METHODPR(T, SetName, (const String&), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_AbstractFile
         REGISTER_MEMBERS_MANUAL_PART_AbstractFile();
     #endif
@@ -5097,6 +7446,7 @@ template <class T> void RegisterMembers_AbstractFile(asIScriptEngine* engine, co
 template <class T> void RegisterMembers_AllContentOctreeQuery(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_OctreeQuery<T>(engine, className);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_AllContentOctreeQuery
         REGISTER_MEMBERS_MANUAL_PART_AllContentOctreeQuery();
     #endif
@@ -5211,6 +7561,7 @@ template <class T> void RegisterMembers_AnimationState(asIScriptEngine* engine, 
     // void AnimationState::SetWeight(float weight)
     engine->RegisterObjectMethod(className, "void SetWeight(float)", AS_METHODPR(T, SetWeight, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_weight(float)", AS_METHODPR(T, SetWeight, (float), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_AnimationState
         REGISTER_MEMBERS_MANUAL_PART_AnimationState();
     #endif
@@ -5226,6 +7577,7 @@ template <class T> void RegisterMembers_AttributeAccessor(asIScriptEngine* engin
 
     // virtual void AttributeAccessor::Set(Serializable* ptr, const Variant& src) = 0
     engine->RegisterObjectMethod(className, "void Set(Serializable@+, const Variant&in)", AS_METHODPR(T, Set, (Serializable*, const Variant&), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_AttributeAccessor
         REGISTER_MEMBERS_MANUAL_PART_AttributeAccessor();
     #endif
@@ -5248,6 +7600,7 @@ template <class T> void RegisterMembers_BackgroundLoader(asIScriptEngine* engine
 
     // void BackgroundLoader::WaitForResource(StringHash type, StringHash nameHash)
     engine->RegisterObjectMethod(className, "void WaitForResource(StringHash, StringHash)", AS_METHODPR(T, WaitForResource, (StringHash, StringHash), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_BackgroundLoader
         REGISTER_MEMBERS_MANUAL_PART_BackgroundLoader();
     #endif
@@ -5263,6 +7616,13 @@ template <class T> void RegisterMembers_BatchGroup(asIScriptEngine* engine, cons
 
     // void BatchGroup::AddTransforms(const Batch& batch)
     engine->RegisterObjectMethod(className, "void AddTransforms(const Batch&in)", AS_METHODPR(T, AddTransforms, (const Batch&), void), AS_CALL_THISCALL);
+
+    // PODVector<InstanceData> BatchGroup::instances_
+    // Error: type "PODVector<InstanceData>" can not automatically bind
+
+    // unsigned BatchGroup::startIndex_
+    engine->RegisterObjectProperty(className, "uint startIndex", offsetof(T, startIndex_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_BatchGroup
         REGISTER_MEMBERS_MANUAL_PART_BatchGroup();
     #endif
@@ -5272,6 +7632,10 @@ template <class T> void RegisterMembers_BatchGroup(asIScriptEngine* engine, cons
 template <class T> void RegisterMembers_BoxOctreeQuery(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_OctreeQuery<T>(engine, className);
+
+    // BoundingBox BoxOctreeQuery::box_
+    engine->RegisterObjectProperty(className, "BoundingBox box", offsetof(T, box_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_BoxOctreeQuery
         REGISTER_MEMBERS_MANUAL_PART_BoxOctreeQuery();
     #endif
@@ -5281,6 +7645,15 @@ template <class T> void RegisterMembers_BoxOctreeQuery(asIScriptEngine* engine, 
 template <class T> void RegisterMembers_ComponentReplicationState(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_ReplicationState<T>(engine, className);
+
+    // NodeReplicationState* ComponentReplicationState::nodeState_
+    // Not registered because pointer
+    // WeakPtr<Component> ComponentReplicationState::component_
+    // Error: type "WeakPtr<Component>" can not automatically bind
+
+    // DirtyBits ComponentReplicationState::dirtyAttributes_
+    engine->RegisterObjectProperty(className, "DirtyBits dirtyAttributes", offsetof(T, dirtyAttributes_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ComponentReplicationState
         REGISTER_MEMBERS_MANUAL_PART_ComponentReplicationState();
     #endif
@@ -5373,6 +7746,32 @@ template <class T> void RegisterMembers_Context(asIScriptEngine* engine, const c
 
     // void Context::SetGlobalVar(StringHash key, const Variant& value)
     engine->RegisterObjectMethod(className, "void SetGlobalVar(StringHash, const Variant&in)", AS_METHODPR(T, SetGlobalVar, (StringHash, const Variant&), void), AS_CALL_THISCALL);
+
+    // template <class T, class U> void Context::CopyBaseAttributes()
+    // Not registered because template
+    // template <class T> SharedPtr<T> Context::CreateObject()
+    // Not registered because template
+    // template <class T> AttributeInfo* Context::GetAttribute(const char* name)
+    // Not registered because template
+    // template <class T> T* Context::GetSubsystem() const
+    // Not registered because template
+    // template <class T> AttributeHandle Context::RegisterAttribute(const AttributeInfo& attr)
+    // Not registered because template
+    // template <class T> void Context::RegisterFactory()
+    // Not registered because template
+    // template <class T> void Context::RegisterFactory(const char* category)
+    // Not registered because template
+    // template <class T> T* Context::RegisterSubsystem()
+    // Not registered because template
+    // template <class T> void Context::RemoveAllAttributes()
+    // Not registered because template
+    // template <class T> void Context::RemoveAttribute(const char* name)
+    // Not registered because template
+    // template <class T> void Context::RemoveSubsystem()
+    // Not registered because template
+    // template <class T> void Context::UpdateAttributeDefaultValue(const char* name, const Variant& defaultValue)
+    // Not registered because template
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Context
         REGISTER_MEMBERS_MANUAL_PART_Context();
     #endif
@@ -5402,6 +7801,7 @@ template <class T> void RegisterMembers_EventHandler(asIScriptEngine* engine, co
 
     // void EventHandler::SetSenderAndEventType(Object* sender, StringHash eventType)
     engine->RegisterObjectMethod(className, "void SetSenderAndEventType(Object@+, StringHash)", AS_METHODPR(T, SetSenderAndEventType, (Object*, StringHash), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_EventHandler
         REGISTER_MEMBERS_MANUAL_PART_EventHandler();
     #endif
@@ -5414,6 +7814,10 @@ template <class T> void RegisterMembers_EventProfilerBlock(asIScriptEngine* engi
 
     // EventProfilerBlock* EventProfilerBlock::GetChild(StringHash eventID)
     // Error: type "EventProfilerBlock" can not automatically bind bacause have @nobind mark
+
+    // StringHash EventProfilerBlock::eventID_
+    engine->RegisterObjectProperty(className, "StringHash eventID", offsetof(T, eventID_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_EventProfilerBlock
         REGISTER_MEMBERS_MANUAL_PART_EventProfilerBlock();
     #endif
@@ -5435,6 +7839,10 @@ template <class T> void RegisterMembers_EventReceiverGroup(asIScriptEngine* engi
 
     // void EventReceiverGroup::Remove(Object* object)
     engine->RegisterObjectMethod(className, "void Remove(Object@+)", AS_METHODPR(T, Remove, (Object*), void), AS_CALL_THISCALL);
+
+    // PODVector<Object*> EventReceiverGroup::receivers_
+    // Error: type "PODVector<Object*>" can not automatically bind
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_EventReceiverGroup
         REGISTER_MEMBERS_MANUAL_PART_EventReceiverGroup();
     #endif
@@ -5474,6 +7882,7 @@ template <class T> void RegisterMembers_FontFace(asIScriptEngine* engine, const 
 
     // bool FontFace::IsDataLost() const
     engine->RegisterObjectMethod(className, "bool IsDataLost() const", AS_METHODPR(T, IsDataLost, () const, bool), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_FontFace
         REGISTER_MEMBERS_MANUAL_PART_FontFace();
     #endif
@@ -5483,6 +7892,10 @@ template <class T> void RegisterMembers_FontFace(asIScriptEngine* engine, const 
 template <class T> void RegisterMembers_FrustumOctreeQuery(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_OctreeQuery<T>(engine, className);
+
+    // Frustum FrustumOctreeQuery::frustum_
+    engine->RegisterObjectProperty(className, "Frustum frustum", offsetof(T, frustum_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_FrustumOctreeQuery
         REGISTER_MEMBERS_MANUAL_PART_FrustumOctreeQuery();
     #endif
@@ -5492,6 +7905,25 @@ template <class T> void RegisterMembers_FrustumOctreeQuery(asIScriptEngine* engi
 template <class T> void RegisterMembers_NodeReplicationState(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_ReplicationState<T>(engine, className);
+
+    // SceneReplicationState* NodeReplicationState::sceneState_
+    // Not registered because pointer
+    // WeakPtr<Node> NodeReplicationState::node_
+    // Error: type "WeakPtr<Node>" can not automatically bind
+    // HashSet<StringHash> NodeReplicationState::dirtyVars_
+    // Error: type "HashSet<StringHash>" can not automatically bind
+    // HashMap<unsigned, ComponentReplicationState> NodeReplicationState::componentStates_
+    // Error: type "HashMap<unsigned, ComponentReplicationState>" can not automatically bind
+
+    // DirtyBits NodeReplicationState::dirtyAttributes_
+    engine->RegisterObjectProperty(className, "DirtyBits dirtyAttributes", offsetof(T, dirtyAttributes_));
+
+    // float NodeReplicationState::priorityAcc_
+    engine->RegisterObjectProperty(className, "float priorityAcc", offsetof(T, priorityAcc_));
+
+    // bool NodeReplicationState::markedDirty_
+    engine->RegisterObjectProperty(className, "bool markedDirty", offsetof(T, markedDirty_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_NodeReplicationState
         REGISTER_MEMBERS_MANUAL_PART_NodeReplicationState();
     #endif
@@ -5517,13 +7949,13 @@ template <class T> void RegisterMembers_Object(asIScriptEngine* engine, const ch
     // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
     // bool Object::IsInstanceOf(const TypeInfo* typeInfo) const
     // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler)
-    // Error: type "EventHandler" can not bind bacause abstract value
-    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData = nullptr)
-    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
     // void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler)
     // Error: type "EventHandler" can not bind bacause abstract value
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler)
+    // Error: type "EventHandler" can not bind bacause abstract value
     // void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData = nullptr)
+    // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
+    // void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData = nullptr)
     // Error: type "const std::function<void(StringHash, VariantMap&)>&" can not automatically bind
 
     // bool Object::GetBlockEvents() const
@@ -5600,6 +8032,20 @@ template <class T> void RegisterMembers_Object(asIScriptEngine* engine, const ch
 
     // void Object::UnsubscribeFromEvents(Object* sender)
     engine->RegisterObjectMethod(className, "void UnsubscribeFromEvents(Object@+)", AS_METHODPR(T, UnsubscribeFromEvents, (Object*), void), AS_CALL_THISCALL);
+
+    // template <typename T> T* Object::Cast()
+    // Not registered because template
+    // template <typename T> const T* Object::Cast() const
+    // Not registered because template
+    // template <class T> T* Object::GetSubsystem() const
+    // Not registered because template
+    // template <typename T> bool Object::IsInstanceOf() const
+    // Not registered because template
+    // template <typename... Args> void Object::SendEvent(StringHash eventType, Args... args)
+    // Not registered because template
+    // static const TypeInfo* Object::GetTypeInfoStatic()
+    // Error: type "TypeInfo" can not automatically bind bacause have @nobind mark
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Object
         REGISTER_MEMBERS_MANUAL_PART_Object();
     #endif
@@ -5630,6 +8076,7 @@ template <class T> void RegisterMembers_ObjectFactory(asIScriptEngine* engine, c
 
     // const String& ObjectFactory::GetTypeName() const
     engine->RegisterObjectMethod(className, "const String& GetTypeName() const", AS_METHODPR(T, GetTypeName, () const, const String&), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ObjectFactory
         REGISTER_MEMBERS_MANUAL_PART_ObjectFactory();
     #endif
@@ -5804,6 +8251,7 @@ template <class T> void RegisterMembers_Pass(asIScriptEngine* engine, const char
     // void Pass::SetVertexShaderDefines(const String& defines)
     engine->RegisterObjectMethod(className, "void SetVertexShaderDefines(const String&in)", AS_METHODPR(T, SetVertexShaderDefines, (const String&), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_vertexShaderDefines(const String&in)", AS_METHODPR(T, SetVertexShaderDefines, (const String&), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Pass
         REGISTER_MEMBERS_MANUAL_PART_Pass();
     #endif
@@ -5813,6 +8261,10 @@ template <class T> void RegisterMembers_Pass(asIScriptEngine* engine, const char
 template <class T> void RegisterMembers_PointOctreeQuery(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_OctreeQuery<T>(engine, className);
+
+    // Vector3 PointOctreeQuery::point_
+    engine->RegisterObjectProperty(className, "Vector3 point", offsetof(T, point_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_PointOctreeQuery
         REGISTER_MEMBERS_MANUAL_PART_PointOctreeQuery();
     #endif
@@ -5903,6 +8355,12 @@ template <class T> void RegisterMembers_RenderPath(asIScriptEngine* engine, cons
 
     // void RenderPath::ToggleEnabled(const String& tag)
     engine->RegisterObjectMethod(className, "void ToggleEnabled(const String&in)", AS_METHODPR(T, ToggleEnabled, (const String&), void), AS_CALL_THISCALL);
+
+    // Vector<RenderTargetInfo> RenderPath::renderTargets_
+    // Error: type "Vector<RenderTargetInfo>" can not automatically bind
+    // Vector<RenderPathCommand> RenderPath::commands_
+    // Error: type "Vector<RenderPathCommand>" can not automatically bind
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_RenderPath
         REGISTER_MEMBERS_MANUAL_PART_RenderPath();
     #endif
@@ -6012,6 +8470,18 @@ template <class T> void RegisterMembers_RenderSurface(asIScriptEngine* engine, c
     // void RenderSurface::SetViewport(unsigned index, Viewport* viewport)
     engine->RegisterObjectMethod(className, "void SetViewport(uint, Viewport@+)", AS_METHODPR(T, SetViewport, (unsigned, Viewport*), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_viewports(uint, Viewport@+)", AS_METHODPR(T, SetViewport, (unsigned, Viewport*), void), AS_CALL_THISCALL);
+
+    // void* RenderSurface::surface_
+    // Not registered because have @nobind mark
+    // void* RenderSurface::renderTargetView_
+    // Not registered because have @nobind mark
+    // unsigned RenderSurface::renderBuffer_
+    // Not registered because have @nobind mark
+    // void* RenderSurface::readOnlyView_
+    // Not registered because have @nobind mark
+    // unsigned RenderSurface::target_
+    // Not registered because have @nobind mark
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_RenderSurface
         REGISTER_MEMBERS_MANUAL_PART_RenderSurface();
     #endif
@@ -6024,6 +8494,12 @@ template <class T> void RegisterMembers_SceneReplicationState(asIScriptEngine* e
 
     // void SceneReplicationState::Clear()
     engine->RegisterObjectMethod(className, "void Clear()", AS_METHODPR(T, Clear, (), void), AS_CALL_THISCALL);
+
+    // HashMap<unsigned, NodeReplicationState> SceneReplicationState::nodeStates_
+    // Error: type "HashMap<unsigned, NodeReplicationState>" can not automatically bind
+    // HashSet<unsigned> SceneReplicationState::dirtyNodes_
+    // Error: type "HashSet<unsigned>" can not automatically bind
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_SceneReplicationState
         REGISTER_MEMBERS_MANUAL_PART_SceneReplicationState();
     #endif
@@ -6080,6 +8556,10 @@ template <class T> void RegisterMembers_ShaderVariation(asIScriptEngine* engine,
 
     // void ShaderVariation::SetName(const String& name)
     engine->RegisterObjectMethod(className, "void SetName(const String&in)", AS_METHODPR(T, SetName, (const String&), void), AS_CALL_THISCALL);
+
+    // static const char* ShaderVariation::elementSemanticNames[]
+    // Error: type "const char*" can not automatically bind
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ShaderVariation
         REGISTER_MEMBERS_MANUAL_PART_ShaderVariation();
     #endif
@@ -6119,6 +8599,7 @@ template <class T> void RegisterMembers_SoundStream(asIScriptEngine* engine, con
 
     // void SoundStream::SetStopAtEnd(bool enable)
     engine->RegisterObjectMethod(className, "void SetStopAtEnd(bool)", AS_METHODPR(T, SetStopAtEnd, (bool), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_SoundStream
         REGISTER_MEMBERS_MANUAL_PART_SoundStream();
     #endif
@@ -6128,6 +8609,10 @@ template <class T> void RegisterMembers_SoundStream(asIScriptEngine* engine, con
 template <class T> void RegisterMembers_SphereOctreeQuery(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_OctreeQuery<T>(engine, className);
+
+    // Sphere SphereOctreeQuery::sphere_
+    engine->RegisterObjectProperty(className, "Sphere sphere", offsetof(T, sphere_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_SphereOctreeQuery
         REGISTER_MEMBERS_MANUAL_PART_SphereOctreeQuery();
     #endif
@@ -6164,6 +8649,7 @@ template <class T> void RegisterMembers_ValueAnimationInfo(asIScriptEngine* engi
 
     // bool ValueAnimationInfo::Update(float timeStep)
     engine->RegisterObjectMethod(className, "bool Update(float)", AS_METHODPR(T, Update, (float), bool), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ValueAnimationInfo
         REGISTER_MEMBERS_MANUAL_PART_ValueAnimationInfo();
     #endif
@@ -6173,6 +8659,24 @@ template <class T> void RegisterMembers_ValueAnimationInfo(asIScriptEngine* engi
 template <class T> void RegisterMembers_WorkItem(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_RefCounted<T>(engine, className);
+
+    // void(* WorkItem::workFunction_) (const WorkItem* , unsigned)
+    // Not registered because pointer
+    // void* WorkItem::start_
+    // Not registered because pointer
+    // void* WorkItem::end_
+    // Not registered because pointer
+    // void* WorkItem::aux_
+    // Not registered because pointer
+    // std::atomic<bool> WorkItem::completed_
+    // Error: type "std::atomic<bool>" can not automatically bind
+
+    // unsigned WorkItem::priority_
+    engine->RegisterObjectProperty(className, "uint priority", offsetof(T, priority_));
+
+    // bool WorkItem::sendEvent_
+    engine->RegisterObjectProperty(className, "bool sendEvent", offsetof(T, sendEvent_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_WorkItem
         REGISTER_MEMBERS_MANUAL_PART_WorkItem();
     #endif
@@ -6184,6 +8688,16 @@ template <class T> void RegisterMembers_WorkItem(asIScriptEngine* engine, const 
 template <class T> void RegisterMembers_DynamicNavBuildData(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_NavBuildData<T>(engine, className);
+
+    // dtTileCacheContourSet* DynamicNavBuildData::contourSet_
+    // Not registered because pointer
+    // dtTileCachePolyMesh* DynamicNavBuildData::polyMesh_
+    // Not registered because pointer
+    // rcHeightfieldLayerSet* DynamicNavBuildData::heightFieldLayers_
+    // Not registered because pointer
+    // dtTileCacheAlloc* DynamicNavBuildData::alloc_
+    // Not registered because pointer
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_DynamicNavBuildData
         REGISTER_MEMBERS_MANUAL_PART_DynamicNavBuildData();
     #endif
@@ -6193,6 +8707,14 @@ template <class T> void RegisterMembers_DynamicNavBuildData(asIScriptEngine* eng
 template <class T> void RegisterMembers_SimpleNavBuildData(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_NavBuildData<T>(engine, className);
+
+    // rcContourSet* SimpleNavBuildData::contourSet_
+    // Not registered because pointer
+    // rcPolyMesh* SimpleNavBuildData::polyMesh_
+    // Not registered because pointer
+    // rcPolyMeshDetail* SimpleNavBuildData::polyMeshDetail_
+    // Not registered because pointer
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_SimpleNavBuildData
         REGISTER_MEMBERS_MANUAL_PART_SimpleNavBuildData();
     #endif
@@ -6232,6 +8754,7 @@ template <class T> void RegisterMembers_HttpRequest(asIScriptEngine* engine, con
     // bool HttpRequest::IsOpen() const
     engine->RegisterObjectMethod(className, "bool IsOpen() const", AS_METHODPR(T, IsOpen, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_open() const", AS_METHODPR(T, IsOpen, () const, bool), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_HttpRequest
         REGISTER_MEMBERS_MANUAL_PART_HttpRequest();
     #endif
@@ -6245,6 +8768,7 @@ template <class T> void RegisterMembers_HttpRequest(asIScriptEngine* engine, con
 template <class T> void RegisterMembers_CollisionGeometryData(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_RefCounted<T>(engine, className);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_CollisionGeometryData
         REGISTER_MEMBERS_MANUAL_PART_CollisionGeometryData();
     #endif
@@ -6267,6 +8791,7 @@ template <class T> void RegisterMembers_PropertySet2D(asIScriptEngine* engine, c
 
     // void PropertySet2D::Load(const XMLElement& element)
     engine->RegisterObjectMethod(className, "void Load(const XMLElement&in)", AS_METHODPR(T, Load, (const XMLElement&), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_PropertySet2D
         REGISTER_MEMBERS_MANUAL_PART_PropertySet2D();
     #endif
@@ -6302,6 +8827,7 @@ template <class T> void RegisterMembers_Tile2D(asIScriptEngine* engine, const ch
 
     // bool Tile2D::HasProperty(const String& name) const
     engine->RegisterObjectMethod(className, "bool HasProperty(const String&in) const", AS_METHODPR(T, HasProperty, (const String&) const, bool), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Tile2D
         REGISTER_MEMBERS_MANUAL_PART_Tile2D();
     #endif
@@ -6364,6 +8890,7 @@ template <class T> void RegisterMembers_TileMapObject2D(asIScriptEngine* engine,
 
     // bool TileMapObject2D::HasProperty(const String& name) const
     engine->RegisterObjectMethod(className, "bool HasProperty(const String&in) const", AS_METHODPR(T, HasProperty, (const String&) const, bool), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_TileMapObject2D
         REGISTER_MEMBERS_MANUAL_PART_TileMapObject2D();
     #endif
@@ -6397,6 +8924,7 @@ template <class T> void RegisterMembers_TmxLayer2D(asIScriptEngine* engine, cons
 
     // bool TmxLayer2D::IsVisible() const
     engine->RegisterObjectMethod(className, "bool IsVisible() const", AS_METHODPR(T, IsVisible, () const, bool), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_TmxLayer2D
         REGISTER_MEMBERS_MANUAL_PART_TmxLayer2D();
     #endif
@@ -6411,6 +8939,7 @@ template <class T> void RegisterMembers_AttributeAnimationInfo(asIScriptEngine* 
 
     // const AttributeInfo& AttributeAnimationInfo::GetAttributeInfo() const
     engine->RegisterObjectMethod(className, "const AttributeInfo& GetAttributeInfo() const", AS_METHODPR(T, GetAttributeInfo, () const, const AttributeInfo&), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_AttributeAnimationInfo
         REGISTER_MEMBERS_MANUAL_PART_AttributeAnimationInfo();
     #endif
@@ -6515,6 +9044,7 @@ template <class T> void RegisterMembers_Audio(asIScriptEngine* engine, const cha
 
     // void Audio::Update(float timeStep)
     engine->RegisterObjectMethod(className, "void Update(float)", AS_METHODPR(T, Update, (float), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Audio
         REGISTER_MEMBERS_MANUAL_PART_Audio();
     #endif
@@ -6525,12 +9055,12 @@ template <class T> void RegisterMembers_BufferedSoundStream(asIScriptEngine* eng
 {
     RegisterMembers_SoundStream<T>(engine, className);
 
+    // void BufferedSoundStream::AddData(void* data, unsigned numBytes)
+    // Error: type "void*" can not automatically bind
     // void BufferedSoundStream::AddData(const SharedArrayPtr<signed char>& data, unsigned numBytes)
     // Error: type "const SharedArrayPtr<signed char>&" can not automatically bind
     // void BufferedSoundStream::AddData(const SharedArrayPtr<signed short>& data, unsigned numBytes)
     // Error: type "const SharedArrayPtr<signed short>&" can not automatically bind
-    // void BufferedSoundStream::AddData(void* data, unsigned numBytes)
-    // Error: type "void*" can not automatically bind
 
     // void BufferedSoundStream::Clear()
     engine->RegisterObjectMethod(className, "void Clear()", AS_METHODPR(T, Clear, (), void), AS_CALL_THISCALL);
@@ -6540,6 +9070,7 @@ template <class T> void RegisterMembers_BufferedSoundStream(asIScriptEngine* eng
 
     // unsigned BufferedSoundStream::GetBufferNumBytes() const
     engine->RegisterObjectMethod(className, "uint GetBufferNumBytes() const", AS_METHODPR(T, GetBufferNumBytes, () const, unsigned), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_BufferedSoundStream
         REGISTER_MEMBERS_MANUAL_PART_BufferedSoundStream();
     #endif
@@ -6648,6 +9179,7 @@ template <class T> void RegisterMembers_Console(asIScriptEngine* engine, const c
 
     // void Console::UpdateElements()
     engine->RegisterObjectMethod(className, "void UpdateElements()", AS_METHODPR(T, UpdateElements, (), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Console
         REGISTER_MEMBERS_MANUAL_PART_Console();
     #endif
@@ -6675,6 +9207,7 @@ template <class T> void RegisterMembers_ConstantBuffer(asIScriptEngine* engine, 
 
     // bool ConstantBuffer::SetSize(unsigned size)
     engine->RegisterObjectMethod(className, "bool SetSize(uint)", AS_METHODPR(T, SetSize, (unsigned), bool), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ConstantBuffer
         REGISTER_MEMBERS_MANUAL_PART_ConstantBuffer();
     #endif
@@ -6761,6 +9294,7 @@ template <class T> void RegisterMembers_DebugHud(asIScriptEngine* engine, const 
 
     // void DebugHud::Update()
     engine->RegisterObjectMethod(className, "void Update()", AS_METHODPR(T, Update, (), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_DebugHud
         REGISTER_MEMBERS_MANUAL_PART_DebugHud();
     #endif
@@ -6889,6 +9423,7 @@ template <class T> void RegisterMembers_Engine(asIScriptEngine* engine, const ch
 
     // static const Variant& Engine::GetParameter(const VariantMap& parameters, const String& parameter, const Variant& defaultValue = Variant::EMPTY)
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("const Variant& GetParameter(const VariantMap&in, const String&in, const Variant&in = Variant::EMPTY)", AS_FUNCTIONPR(T::GetParameter, (const VariantMap&, const String&, const Variant&), const Variant&), AS_CALL_CDECL);engine->SetDefaultNamespace("");
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Engine
         REGISTER_MEMBERS_MANUAL_PART_Engine();
     #endif
@@ -6898,6 +9433,7 @@ template <class T> void RegisterMembers_Engine(asIScriptEngine* engine, const ch
 template <class T> void RegisterMembers_EventHandler11Impl(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_EventHandler<T>(engine, className);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_EventHandler11Impl
         REGISTER_MEMBERS_MANUAL_PART_EventHandler11Impl();
     #endif
@@ -6935,6 +9471,7 @@ template <class T> void RegisterMembers_File(asIScriptEngine* engine, const char
 
     // bool File::Open(PackageFile* package, const String& fileName)
     engine->RegisterObjectMethod(className, "bool Open(PackageFile@+, const String&in)", AS_METHODPR(T, Open, (PackageFile*, const String&), bool), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_File
         REGISTER_MEMBERS_MANUAL_PART_File();
     #endif
@@ -7043,6 +9580,10 @@ template <class T> void RegisterMembers_FileSelector(asIScriptEngine* engine, co
 
     // void FileSelector::UpdateElements()
     engine->RegisterObjectMethod(className, "void UpdateElements()", AS_METHODPR(T, UpdateElements, (), void), AS_CALL_THISCALL);
+
+    // static void FileSelector::RegisterObject(Context* context)
+    // Not registered because have @nobind mark
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_FileSelector
         REGISTER_MEMBERS_MANUAL_PART_FileSelector();
     #endif
@@ -7150,6 +9691,7 @@ template <class T> void RegisterMembers_FileSystem(asIScriptEngine* engine, cons
 
     // unsigned FileSystem::SystemRunAsync(const String& fileName, const Vector<String>& arguments)
     engine->RegisterObjectMethod(className, "uint SystemRunAsync(const String&in, Array<String>@+)", AS_FUNCTION_OBJFIRST(FileSystem_unsigned_SystemRunAsync_constspStringamp_constspVectorlesStringgreamp_template<FileSystem>), AS_CALL_CDECL_OBJFIRST);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_FileSystem
         REGISTER_MEMBERS_MANUAL_PART_FileSystem();
     #endif
@@ -7181,6 +9723,7 @@ template <class T> void RegisterMembers_FileWatcher(asIScriptEngine* engine, con
 
     // void FileWatcher::StopWatching()
     engine->RegisterObjectMethod(className, "void StopWatching()", AS_METHODPR(T, StopWatching, (), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_FileWatcher
         REGISTER_MEMBERS_MANUAL_PART_FileWatcher();
     #endif
@@ -7196,6 +9739,7 @@ template <class T> void RegisterMembers_FontFaceBitmap(asIScriptEngine* engine, 
 
     // bool FontFaceBitmap::Save(Serializer& dest, int pointSize, const String& indentation = "\t")
     engine->RegisterObjectMethod(className, "bool Save(Serializer&, int, const String&in = \"\t\")", AS_METHODPR(T, Save, (Serializer&, int, const String&), bool), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_FontFaceBitmap
         REGISTER_MEMBERS_MANUAL_PART_FontFaceBitmap();
     #endif
@@ -7205,6 +9749,7 @@ template <class T> void RegisterMembers_FontFaceBitmap(asIScriptEngine* engine, 
 template <class T> void RegisterMembers_FontFaceFreeType(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_FontFace<T>(engine, className);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_FontFaceFreeType
         REGISTER_MEMBERS_MANUAL_PART_FontFaceFreeType();
     #endif
@@ -7307,6 +9852,7 @@ template <class T> void RegisterMembers_Geometry(asIScriptEngine* engine, const 
 
     // bool Geometry::SetVertexBuffer(unsigned index, VertexBuffer* buffer)
     engine->RegisterObjectMethod(className, "bool SetVertexBuffer(uint, VertexBuffer@+)", AS_METHODPR(T, SetVertexBuffer, (unsigned, VertexBuffer*), bool), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Geometry
         REGISTER_MEMBERS_MANUAL_PART_Geometry();
     #endif
@@ -7976,6 +10522,7 @@ template <class T> void RegisterMembers_Graphics(asIScriptEngine* engine, const 
 
     // static bool Graphics::GetGL3Support()
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("bool GetGL3Support()", AS_FUNCTIONPR(T::GetGL3Support, (), bool), AS_CALL_CDECL);engine->SetDefaultNamespace("");
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Graphics
         REGISTER_MEMBERS_MANUAL_PART_Graphics();
     #endif
@@ -8029,6 +10576,7 @@ template <class T> void RegisterMembers_IndexBuffer(asIScriptEngine* engine, con
 
     // void IndexBuffer::Unlock()
     engine->RegisterObjectMethod(className, "void Unlock()", AS_METHODPR(T, Unlock, (), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_IndexBuffer
         REGISTER_MEMBERS_MANUAL_PART_IndexBuffer();
     #endif
@@ -8252,6 +10800,7 @@ template <class T> void RegisterMembers_Input(asIScriptEngine* engine, const cha
 
     // void Input::Update()
     engine->RegisterObjectMethod(className, "void Update()", AS_METHODPR(T, Update, (), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Input
         REGISTER_MEMBERS_MANUAL_PART_Input();
     #endif
@@ -8300,6 +10849,7 @@ template <class T> void RegisterMembers_Localization(asIScriptEngine* engine, co
 
     // void Localization::SetLanguage(const String& language)
     engine->RegisterObjectMethod(className, "void SetLanguage(const String&in)", AS_METHODPR(T, SetLanguage, (const String&), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Localization
         REGISTER_MEMBERS_MANUAL_PART_Localization();
     #endif
@@ -8344,8 +10894,14 @@ template <class T> void RegisterMembers_Log(asIScriptEngine* engine, const char*
     engine->RegisterObjectMethod(className, "void SetTimeStamp(bool)", AS_METHODPR(T, SetTimeStamp, (bool), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_timeStamp(bool)", AS_METHODPR(T, SetTimeStamp, (bool), void), AS_CALL_THISCALL);
 
+    // static void Log::Write(int level, const String& message)
+    // Not registered because have @nobind mark
+    // static void Log::WriteFormat(int level, const char* format,...)
+    // Error: type "const char*" can not automatically bind
+
     // static void Log::WriteRaw(const String& message, bool error = false)
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("void WriteRaw(const String&in, bool = false)", AS_FUNCTIONPR(T::WriteRaw, (const String&, bool), void), AS_CALL_CDECL);engine->SetDefaultNamespace("");
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Log
         REGISTER_MEMBERS_MANUAL_PART_Log();
     #endif
@@ -8361,6 +10917,7 @@ template <class T> void RegisterMembers_MemoryBuffer(asIScriptEngine* engine, co
 
     // bool MemoryBuffer::IsReadOnly()
     engine->RegisterObjectMethod(className, "bool IsReadOnly()", AS_METHODPR(T, IsReadOnly, (), bool), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_MemoryBuffer
         REGISTER_MEMBERS_MANUAL_PART_MemoryBuffer();
     #endif
@@ -8390,6 +10947,10 @@ template <class T> void RegisterMembers_MessageBox(asIScriptEngine* engine, cons
     // void MessageBox::SetTitle(const String& text)
     engine->RegisterObjectMethod(className, "void SetTitle(const String&in)", AS_METHODPR(T, SetTitle, (const String&), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_title(const String&in)", AS_METHODPR(T, SetTitle, (const String&), void), AS_CALL_THISCALL);
+
+    // static void MessageBox::RegisterObject(Context* context)
+    // Not registered because have @nobind mark
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_MessageBox
         REGISTER_MEMBERS_MANUAL_PART_MessageBox();
     #endif
@@ -8414,6 +10975,7 @@ template <class T> void RegisterMembers_NamedPipe(asIScriptEngine* engine, const
 
     // bool NamedPipe::Open(const String& name, bool isServer)
     engine->RegisterObjectMethod(className, "bool Open(const String&in, bool)", AS_METHODPR(T, Open, (const String&, bool), bool), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_NamedPipe
         REGISTER_MEMBERS_MANUAL_PART_NamedPipe();
     #endif
@@ -8424,9 +10986,9 @@ template <class T> void RegisterMembers_OcclusionBuffer(asIScriptEngine* engine,
 {
     RegisterMembers_Object<T>(engine, className);
 
-    // bool OcclusionBuffer::AddTriangles(const Matrix3x4& model, const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount)
-    // Error: type "const void*" can not automatically bind
     // bool OcclusionBuffer::AddTriangles(const Matrix3x4& model, const void* vertexData, unsigned vertexSize, unsigned vertexStart, unsigned vertexCount)
+    // Error: type "const void*" can not automatically bind
+    // bool OcclusionBuffer::AddTriangles(const Matrix3x4& model, const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount)
     // Error: type "const void*" can not automatically bind
     // int* OcclusionBuffer::GetBuffer() const
     // Error: type "int*" can not automatically bind
@@ -8490,6 +11052,7 @@ template <class T> void RegisterMembers_OcclusionBuffer(asIScriptEngine* engine,
 
     // void OcclusionBuffer::SetView(Camera* camera)
     engine->RegisterObjectMethod(className, "void SetView(Camera@+)", AS_METHODPR(T, SetView, (Camera*), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_OcclusionBuffer
         REGISTER_MEMBERS_MANUAL_PART_OcclusionBuffer();
     #endif
@@ -8499,6 +11062,7 @@ template <class T> void RegisterMembers_OcclusionBuffer(asIScriptEngine* engine,
 template <class T> void RegisterMembers_OggVorbisSoundStream(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_SoundStream<T>(engine, className);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_OggVorbisSoundStream
         REGISTER_MEMBERS_MANUAL_PART_OggVorbisSoundStream();
     #endif
@@ -8556,6 +11120,7 @@ template <class T> void RegisterMembers_PackageFile(asIScriptEngine* engine, con
 
     // bool PackageFile::Open(const String& fileName, unsigned startOffset = 0)
     engine->RegisterObjectMethod(className, "bool Open(const String&in, uint = 0)", AS_METHODPR(T, Open, (const String&, unsigned), bool), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_PackageFile
         REGISTER_MEMBERS_MANUAL_PART_PackageFile();
     #endif
@@ -8567,7 +11132,7 @@ template <class T> void RegisterMembers_Profiler(asIScriptEngine* engine, const 
     RegisterMembers_Object<T>(engine, className);
 
     // void Profiler::BeginBlock(const char* name)
-    // Error: type "const char*" can not automatically bind
+    // Can not be registered here bacause hidden in derived classes: EventProfiler
     // const ProfilerBlock* Profiler::GetCurrentBlock()
     // Error: type "ProfilerBlock" can not automatically bind bacause have @nobind mark
     // const ProfilerBlock* Profiler::GetRootBlock()
@@ -8587,6 +11152,7 @@ template <class T> void RegisterMembers_Profiler(asIScriptEngine* engine, const 
 
     // const String& Profiler::PrintData(bool showUnused = false, bool showTotal = false, unsigned maxDepth = M_MAX_UNSIGNED) const
     engine->RegisterObjectMethod(className, "const String& PrintData(bool = false, bool = false, uint = M_MAX_UNSIGNED) const", AS_METHODPR(T, PrintData, (bool, bool, unsigned) const, const String&), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Profiler
         REGISTER_MEMBERS_MANUAL_PART_Profiler();
     #endif
@@ -8964,6 +11530,7 @@ template <class T> void RegisterMembers_Renderer(asIScriptEngine* engine, const 
 
     // static View* Renderer::GetActualView(View* view)
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("View@+ GetActualView(View@+)", AS_FUNCTIONPR(T::GetActualView, (View*), View*), AS_CALL_CDECL);engine->SetDefaultNamespace("");
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Renderer
         REGISTER_MEMBERS_MANUAL_PART_Renderer();
     #endif
@@ -8973,6 +11540,9 @@ template <class T> void RegisterMembers_Renderer(asIScriptEngine* engine, const 
 template <class T> void RegisterMembers_Resource(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_Object<T>(engine, className);
+
+    // bool Resource::Load(Deserializer& source)
+    // Can not be registered here bacause hidden in derived classes: Material, ParticleEffect
 
     // virtual bool Resource::BeginLoad(Deserializer& source)
     engine->RegisterObjectMethod(className, "bool BeginLoad(Deserializer&)", AS_METHODPR(T, BeginLoad, (Deserializer&), bool), AS_CALL_THISCALL);
@@ -9021,6 +11591,7 @@ template <class T> void RegisterMembers_Resource(asIScriptEngine* engine, const 
     // void Resource::SetName(const String& name)
     engine->RegisterObjectMethod(className, "void SetName(const String&in)", AS_METHODPR(T, SetName, (const String&), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_name(const String&in)", AS_METHODPR(T, SetName, (const String&), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Resource
         REGISTER_MEMBERS_MANUAL_PART_Resource();
     #endif
@@ -9210,6 +11781,20 @@ template <class T> void RegisterMembers_ResourceCache(asIScriptEngine* engine, c
 
     // void ResourceCache::StoreResourceDependency(Resource* resource, const String& dependency)
     engine->RegisterObjectMethod(className, "void StoreResourceDependency(Resource@+, const String&in)", AS_METHODPR(T, StoreResourceDependency, (Resource*, const String&), void), AS_CALL_THISCALL);
+
+    // template <class T> bool ResourceCache::BackgroundLoadResource(const String& name, bool sendEventOnFailure = true, Resource* caller = nullptr)
+    // Not registered because template
+    // template <class T> T* ResourceCache::GetExistingResource(const String& name)
+    // Not registered because template
+    // template <class T> T* ResourceCache::GetResource(const String& name, bool sendEventOnFailure = true)
+    // Not registered because template
+    // template <class T> void ResourceCache::GetResources(PODVector<T*>& result) const
+    // Not registered because template
+    // template <class T> SharedPtr<T> ResourceCache::GetTempResource(const String& name, bool sendEventOnFailure = true)
+    // Not registered because template
+    // template <class T> void ResourceCache::ReleaseResource(const String& name, bool force = false)
+    // Not registered because template
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ResourceCache
         REGISTER_MEMBERS_MANUAL_PART_ResourceCache();
     #endif
@@ -9222,6 +11807,7 @@ template <class T> void RegisterMembers_ResourceRouter(asIScriptEngine* engine, 
 
     // virtual void ResourceRouter::Route(String& name, ResourceRequest requestType) = 0
     engine->RegisterObjectMethod(className, "void Route(String&, ResourceRequest)", AS_METHODPR(T, Route, (String&, ResourceRequest), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ResourceRouter
         REGISTER_MEMBERS_MANUAL_PART_ResourceRouter();
     #endif
@@ -9238,6 +11824,8 @@ template <class T> void RegisterMembers_Serializable(asIScriptEngine* engine, co
     // Error: type "const Vector<AttributeInfo>*" can not automatically bind
     // NetworkState* Serializable::GetNetworkState() const
     // Error: type "NetworkState*" can not automatically bind
+    // virtual bool Serializable::LoadXML(const XMLElement& source)
+    // Can not be registered here bacause hidden in derived classes: Menu, DropDownList
 
     // void Serializable::AllocateNetworkState()
     engine->RegisterObjectMethod(className, "void AllocateNetworkState()", AS_METHODPR(T, AllocateNetworkState, (), void), AS_CALL_THISCALL);
@@ -9337,6 +11925,7 @@ template <class T> void RegisterMembers_Serializable(asIScriptEngine* engine, co
 
     // void Serializable::WriteLatestDataUpdate(Serializer& dest, unsigned char timeStamp)
     engine->RegisterObjectMethod(className, "void WriteLatestDataUpdate(Serializer&, uint8)", AS_METHODPR(T, WriteLatestDataUpdate, (Serializer&, unsigned char), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Serializable
         REGISTER_MEMBERS_MANUAL_PART_Serializable();
     #endif
@@ -9349,6 +11938,7 @@ template <class T> void RegisterMembers_ShaderParameterAnimationInfo(asIScriptEn
 
     // const String& ShaderParameterAnimationInfo::GetName() const
     engine->RegisterObjectMethod(className, "const String& GetName() const", AS_METHODPR(T, GetName, () const, const String&), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ShaderParameterAnimationInfo
         REGISTER_MEMBERS_MANUAL_PART_ShaderParameterAnimationInfo();
     #endif
@@ -9364,6 +11954,7 @@ template <class T> void RegisterMembers_ShaderPrecache(asIScriptEngine* engine, 
 
     // static void ShaderPrecache::LoadShaders(Graphics* graphics, Deserializer& source)
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("void LoadShaders(Graphics@+, Deserializer&)", AS_FUNCTIONPR(T::LoadShaders, (Graphics*, Deserializer&), void), AS_CALL_CDECL);engine->SetDefaultNamespace("");
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ShaderPrecache
         REGISTER_MEMBERS_MANUAL_PART_ShaderPrecache();
     #endif
@@ -9413,6 +12004,7 @@ template <class T> void RegisterMembers_Time(asIScriptEngine* engine, const char
 
     // static void Time::Sleep(unsigned mSec)
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("void Sleep(uint)", AS_FUNCTIONPR(T::Sleep, (unsigned), void), AS_CALL_CDECL);engine->SetDefaultNamespace("");
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Time
         REGISTER_MEMBERS_MANUAL_PART_Time();
     #endif
@@ -9672,6 +12264,7 @@ template <class T> void RegisterMembers_UI(asIScriptEngine* engine, const char* 
 
     // void UI::Update(float timeStep)
     engine->RegisterObjectMethod(className, "void Update(float)", AS_METHODPR(T, Update, (float), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_UI
         REGISTER_MEMBERS_MANUAL_PART_UI();
     #endif
@@ -9701,6 +12294,7 @@ template <class T> void RegisterMembers_VectorBuffer(asIScriptEngine* engine, co
 
     // void VectorBuffer::SetData(Deserializer& source, unsigned size)
     engine->RegisterObjectMethod(className, "void SetData(Deserializer&, uint)", AS_METHODPR(T, SetData, (Deserializer&, unsigned), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_VectorBuffer
         REGISTER_MEMBERS_MANUAL_PART_VectorBuffer();
     #endif
@@ -9828,6 +12422,11 @@ template <class T> void RegisterMembers_VertexBuffer(asIScriptEngine* engine, co
     // void VertexBuffer::Unlock()
     engine->RegisterObjectMethod(className, "void Unlock()", AS_METHODPR(T, Unlock, (), void), AS_CALL_THISCALL);
 
+    // static const VertexElement* VertexBuffer::GetElement(const PODVector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0)
+    // Error: type "const VertexElement*" can not automatically bind
+    // static void VertexBuffer::UpdateOffsets(PODVector<VertexElement>& elements)
+    // Error: type "PODVector<VertexElement>&" can not automatically bind
+
     // static bool VertexBuffer::HasElement(const PODVector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0)
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("bool HasElement(Array<VertexElement>@+, VertexElementType, VertexElementSemantic, uint8 = 0)", AS_FUNCTION(VertexBuffer_bool_HasElement_constspPODVectorlesVertexElementgreamp_VertexElementType_VertexElementSemantic_unsignedspchar<VertexBuffer>), AS_CALL_CDECL);engine->SetDefaultNamespace("");
 
@@ -9842,6 +12441,7 @@ template <class T> void RegisterMembers_VertexBuffer(asIScriptEngine* engine, co
 
     // static unsigned VertexBuffer::GetVertexSize(unsigned elementMask)
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("uint GetVertexSize(uint)", AS_FUNCTIONPR(T::GetVertexSize, (unsigned), unsigned), AS_CALL_CDECL);engine->SetDefaultNamespace("");
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_VertexBuffer
         REGISTER_MEMBERS_MANUAL_PART_VertexBuffer();
     #endif
@@ -9953,6 +12553,7 @@ template <class T> void RegisterMembers_View(asIScriptEngine* engine, const char
 
     // void View::Update(const FrameInfo& frame)
     engine->RegisterObjectMethod(className, "void Update(const FrameInfo&in)", AS_METHODPR(T, Update, (const FrameInfo&), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_View
         REGISTER_MEMBERS_MANUAL_PART_View();
     #endif
@@ -10028,6 +12629,7 @@ template <class T> void RegisterMembers_Viewport(asIScriptEngine* engine, const 
 
     // IntVector2 Viewport::WorldToScreenPoint(const Vector3& worldPos) const
     engine->RegisterObjectMethod(className, "IntVector2 WorldToScreenPoint(const Vector3&in) const", AS_METHODPR(T, WorldToScreenPoint, (const Vector3&) const, IntVector2), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Viewport
         REGISTER_MEMBERS_MANUAL_PART_Viewport();
     #endif
@@ -10079,6 +12681,7 @@ template <class T> void RegisterMembers_WorkQueue(asIScriptEngine* engine, const
 
     // void WorkQueue::SetTolerance(int tolerance)
     engine->RegisterObjectMethod(className, "void SetTolerance(int)", AS_METHODPR(T, SetTolerance, (int), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_WorkQueue
         REGISTER_MEMBERS_MANUAL_PART_WorkQueue();
     #endif
@@ -10111,6 +12714,7 @@ template <class T> void RegisterMembers_Database(asIScriptEngine* engine, const 
 
     // static DBAPI Database::GetAPI()
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("DBAPI GetAPI()", AS_FUNCTIONPR(T::GetAPI, (), DBAPI), AS_CALL_CDECL);engine->SetDefaultNamespace("");
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Database
         REGISTER_MEMBERS_MANUAL_PART_Database();
     #endif
@@ -10294,6 +12898,16 @@ template <class T> void RegisterMembers_Connection(asIScriptEngine* engine, cons
 
     // String Connection::ToString() const
     engine->RegisterObjectMethod(className, "String ToString() const", AS_METHODPR(T, ToString, () const, String), AS_CALL_THISCALL);
+
+    // Controls Connection::controls_
+    engine->RegisterObjectProperty(className, "Controls controls", offsetof(T, controls_));
+
+    // unsigned char Connection::timeStamp_
+    engine->RegisterObjectProperty(className, "uint8 timeStamp", offsetof(T, timeStamp_));
+
+    // VariantMap Connection::identity_
+    engine->RegisterObjectProperty(className, "VariantMap identity", offsetof(T, identity_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Connection
         REGISTER_MEMBERS_MANUAL_PART_Connection();
     #endif
@@ -10446,6 +13060,7 @@ template <class T> void RegisterMembers_Network(asIScriptEngine* engine, const c
 
     // void Network::Update(float timeStep)
     engine->RegisterObjectMethod(className, "void Update(float)", AS_METHODPR(T, Update, (float), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Network
         REGISTER_MEMBERS_MANUAL_PART_Network();
     #endif
@@ -10469,6 +13084,18 @@ template <class T> void RegisterMembers_ConvexData(asIScriptEngine* engine, cons
 
     // void ConvexData::BuildHull(const PODVector<Vector3>& vertices)
     engine->RegisterObjectMethod(className, "void BuildHull(Array<Vector3>@+)", AS_FUNCTION_OBJFIRST(ConvexData_void_BuildHull_constspPODVectorlesVector3greamp_template<ConvexData>), AS_CALL_CDECL_OBJFIRST);
+
+    // SharedArrayPtr<Vector3> ConvexData::vertexData_
+    // Error: type "SharedArrayPtr<Vector3>" can not automatically bind
+    // SharedArrayPtr<unsigned> ConvexData::indexData_
+    // Error: type "SharedArrayPtr<unsigned>" can not automatically bind
+
+    // unsigned ConvexData::vertexCount_
+    engine->RegisterObjectProperty(className, "uint vertexCount", offsetof(T, vertexCount_));
+
+    // unsigned ConvexData::indexCount_
+    engine->RegisterObjectProperty(className, "uint indexCount", offsetof(T, indexCount_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ConvexData
         REGISTER_MEMBERS_MANUAL_PART_ConvexData();
     #endif
@@ -10478,6 +13105,10 @@ template <class T> void RegisterMembers_ConvexData(asIScriptEngine* engine, cons
 template <class T> void RegisterMembers_GImpactMeshData(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_CollisionGeometryData<T>(engine, className);
+
+    // UniquePtr<TriangleMeshInterface> GImpactMeshData::meshInterface_
+    // Error: type "UniquePtr<TriangleMeshInterface>" can not automatically bind
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_GImpactMeshData
         REGISTER_MEMBERS_MANUAL_PART_GImpactMeshData();
     #endif
@@ -10487,6 +13118,22 @@ template <class T> void RegisterMembers_GImpactMeshData(asIScriptEngine* engine,
 template <class T> void RegisterMembers_HeightfieldData(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_CollisionGeometryData<T>(engine, className);
+
+    // SharedArrayPtr<float> HeightfieldData::heightData_
+    // Error: type "SharedArrayPtr<float>" can not automatically bind
+
+    // Vector3 HeightfieldData::spacing_
+    engine->RegisterObjectProperty(className, "Vector3 spacing", offsetof(T, spacing_));
+
+    // IntVector2 HeightfieldData::size_
+    engine->RegisterObjectProperty(className, "IntVector2 size", offsetof(T, size_));
+
+    // float HeightfieldData::minHeight_
+    engine->RegisterObjectProperty(className, "float minHeight", offsetof(T, minHeight_));
+
+    // float HeightfieldData::maxHeight_
+    engine->RegisterObjectProperty(className, "float maxHeight", offsetof(T, maxHeight_));
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_HeightfieldData
         REGISTER_MEMBERS_MANUAL_PART_HeightfieldData();
     #endif
@@ -10496,6 +13143,14 @@ template <class T> void RegisterMembers_HeightfieldData(asIScriptEngine* engine,
 template <class T> void RegisterMembers_TriangleMeshData(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_CollisionGeometryData<T>(engine, className);
+
+    // UniquePtr<TriangleMeshInterface> TriangleMeshData::meshInterface_
+    // Error: type "UniquePtr<TriangleMeshInterface>" can not automatically bind
+    // UniquePtr<btBvhTriangleMeshShape> TriangleMeshData::shape_
+    // Error: type "UniquePtr<btBvhTriangleMeshShape>" can not automatically bind
+    // UniquePtr<btTriangleInfoMap> TriangleMeshData::infoMap_
+    // Error: type "UniquePtr<btTriangleInfoMap>" can not automatically bind
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_TriangleMeshData
         REGISTER_MEMBERS_MANUAL_PART_TriangleMeshData();
     #endif
@@ -10521,6 +13176,7 @@ template <class T> void RegisterMembers_TmxImageLayer2D(asIScriptEngine* engine,
 
     // bool TmxImageLayer2D::Load(const XMLElement& element, const TileMapInfo2D& info)
     engine->RegisterObjectMethod(className, "bool Load(const XMLElement&in, const TileMapInfo2D&in)", AS_METHODPR(T, Load, (const XMLElement&, const TileMapInfo2D&), bool), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_TmxImageLayer2D
         REGISTER_MEMBERS_MANUAL_PART_TmxImageLayer2D();
     #endif
@@ -10542,6 +13198,7 @@ template <class T> void RegisterMembers_TmxObjectGroup2D(asIScriptEngine* engine
 
     // bool TmxObjectGroup2D::Load(const XMLElement& element, const TileMapInfo2D& info)
     engine->RegisterObjectMethod(className, "bool Load(const XMLElement&in, const TileMapInfo2D&in)", AS_METHODPR(T, Load, (const XMLElement&, const TileMapInfo2D&), bool), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_TmxObjectGroup2D
         REGISTER_MEMBERS_MANUAL_PART_TmxObjectGroup2D();
     #endif
@@ -10557,6 +13214,7 @@ template <class T> void RegisterMembers_TmxTileLayer2D(asIScriptEngine* engine, 
 
     // bool TmxTileLayer2D::Load(const XMLElement& element, const TileMapInfo2D& info)
     engine->RegisterObjectMethod(className, "bool Load(const XMLElement&in, const TileMapInfo2D&in)", AS_METHODPR(T, Load, (const XMLElement&, const TileMapInfo2D&), bool), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_TmxTileLayer2D
         REGISTER_MEMBERS_MANUAL_PART_TmxTileLayer2D();
     #endif
@@ -10568,6 +13226,9 @@ template <class T> void RegisterMembers_TmxTileLayer2D(asIScriptEngine* engine, 
 template <class T> void RegisterMembers_Animatable(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_Serializable<T>(engine, className);
+
+    // bool Animatable::LoadXML(const XMLElement& source) override
+    // Can not be registered here bacause hidden in derived classes: Menu, DropDownList
 
     // bool Animatable::GetAnimationEnabled() const
     engine->RegisterObjectMethod(className, "bool GetAnimationEnabled() const", AS_METHODPR(T, GetAnimationEnabled, () const, bool), AS_CALL_THISCALL);
@@ -10623,6 +13284,10 @@ template <class T> void RegisterMembers_Animatable(asIScriptEngine* engine, cons
 
     // void Animatable::SetObjectAnimationAttr(const ResourceRef& value)
     engine->RegisterObjectMethod(className, "void SetObjectAnimationAttr(const ResourceRef&in)", AS_METHODPR(T, SetObjectAnimationAttr, (const ResourceRef&), void), AS_CALL_THISCALL);
+
+    // static void Animatable::RegisterObject(Context* context)
+    // Not registered because have @nobind mark
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Animatable
         REGISTER_MEMBERS_MANUAL_PART_Animatable();
     #endif
@@ -10641,6 +13306,7 @@ template <class T> void RegisterMembers_EventProfiler(asIScriptEngine* engine, c
 
     // static bool EventProfiler::IsActive()
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("bool IsActive()", AS_FUNCTIONPR(T::IsActive, (), bool), AS_CALL_CDECL);engine->SetDefaultNamespace("");
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_EventProfiler
         REGISTER_MEMBERS_MANUAL_PART_EventProfiler();
     #endif
@@ -10688,6 +13354,10 @@ template <class T> void RegisterMembers_Font(asIScriptEngine* engine, const char
     // void Font::SetScaledGlyphOffset(const Vector2& offset)
     engine->RegisterObjectMethod(className, "void SetScaledGlyphOffset(const Vector2&in)", AS_METHODPR(T, SetScaledGlyphOffset, (const Vector2&), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_scaledGlyphOffset(const Vector2&in)", AS_METHODPR(T, SetScaledGlyphOffset, (const Vector2&), void), AS_CALL_THISCALL);
+
+    // static void Font::RegisterObject(Context* context)
+    // Not registered because have @nobind mark
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Font
         REGISTER_MEMBERS_MANUAL_PART_Font();
     #endif
@@ -10882,6 +13552,10 @@ template <class T> void RegisterMembers_Image(asIScriptEngine* engine, const cha
 
     // bool Image::SetSubimage(const Image* image, const IntRect& rect)
     engine->RegisterObjectMethod(className, "bool SetSubimage(Image@+, const IntRect&in)", AS_METHODPR(T, SetSubimage, (const Image*, const IntRect&), bool), AS_CALL_THISCALL);
+
+    // static void Image::RegisterObject(Context* context)
+    // Not registered because have @nobind mark
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Image
         REGISTER_MEMBERS_MANUAL_PART_Image();
     #endif
@@ -10910,6 +13584,10 @@ template <class T> void RegisterMembers_JSONFile(asIScriptEngine* engine, const 
 
     // String JSONFile::ToString(const String& indendation = "\t") const
     engine->RegisterObjectMethod(className, "String ToString(const String&in = \"\t\") const", AS_METHODPR(T, ToString, (const String&) const, String), AS_CALL_THISCALL);
+
+    // static void JSONFile::RegisterObject(Context* context)
+    // Not registered because have @nobind mark
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_JSONFile
         REGISTER_MEMBERS_MANUAL_PART_JSONFile();
     #endif
@@ -11119,11 +13797,15 @@ template <class T> void RegisterMembers_Material(asIScriptEngine* engine, const 
     // void Material::SortTechniques()
     engine->RegisterObjectMethod(className, "void SortTechniques()", AS_METHODPR(T, SortTechniques, (), void), AS_CALL_THISCALL);
 
+    // static void Material::RegisterObject(Context* context)
+    // Not registered because have @nobind mark
+
     // static String Material::GetTextureUnitName(TextureUnit unit)
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("String GetTextureUnitName(TextureUnit)", AS_FUNCTIONPR(T::GetTextureUnitName, (TextureUnit), String), AS_CALL_CDECL);engine->SetDefaultNamespace("");
 
     // static Variant Material::ParseShaderParameterValue(const String& value)
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("Variant ParseShaderParameterValue(const String&in)", AS_FUNCTIONPR(T::ParseShaderParameterValue, (const String&), Variant), AS_CALL_CDECL);engine->SetDefaultNamespace("");
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Material
         REGISTER_MEMBERS_MANUAL_PART_Material();
     #endif
@@ -11175,6 +13857,10 @@ template <class T> void RegisterMembers_ObjectAnimation(asIScriptEngine* engine,
 
     // bool ObjectAnimation::SaveXML(XMLElement& dest) const
     engine->RegisterObjectMethod(className, "bool SaveXML(XMLElement&) const", AS_METHODPR(T, SaveXML, (XMLElement&) const, bool), AS_CALL_THISCALL);
+
+    // static void ObjectAnimation::RegisterObject(Context* context)
+    // Not registered because have @nobind mark
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ObjectAnimation
         REGISTER_MEMBERS_MANUAL_PART_ObjectAnimation();
     #endif
@@ -11527,6 +14213,10 @@ template <class T> void RegisterMembers_ParticleEffect(asIScriptEngine* engine, 
 
     // void ParticleEffect::SortTextureFrames()
     engine->RegisterObjectMethod(className, "void SortTextureFrames()", AS_METHODPR(T, SortTextureFrames, (), void), AS_CALL_THISCALL);
+
+    // static void ParticleEffect::RegisterObject(Context* context)
+    // Not registered because have @nobind mark
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ParticleEffect
         REGISTER_MEMBERS_MANUAL_PART_ParticleEffect();
     #endif
@@ -11557,6 +14247,7 @@ template <class T> void RegisterMembers_ResourceWithMetadata(asIScriptEngine* en
 
     // void ResourceWithMetadata::RemoveMetadata(const String& name)
     engine->RegisterObjectMethod(className, "void RemoveMetadata(const String&in)", AS_METHODPR(T, RemoveMetadata, (const String&), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ResourceWithMetadata
         REGISTER_MEMBERS_MANUAL_PART_ResourceWithMetadata();
     #endif
@@ -11581,6 +14272,10 @@ template <class T> void RegisterMembers_Shader(asIScriptEngine* engine, const ch
 
     // bool Resource::Load(Deserializer& source)
     engine->RegisterObjectMethod(className, "bool Load(Deserializer&)", AS_METHODPR(T, Load, (Deserializer&), bool), AS_CALL_THISCALL);
+
+    // static void Shader::RegisterObject(Context* context)
+    // Not registered because have @nobind mark
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Shader
         REGISTER_MEMBERS_MANUAL_PART_Shader();
     #endif
@@ -11679,8 +14374,36 @@ template <class T> void RegisterMembers_Technique(asIScriptEngine* engine, const
     engine->RegisterObjectMethod(className, "void SetIsDesktop(bool)", AS_METHODPR(T, SetIsDesktop, (bool), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_desktop(bool)", AS_METHODPR(T, SetIsDesktop, (bool), void), AS_CALL_THISCALL);
 
+    // static void Technique::RegisterObject(Context* context)
+    // Not registered because have @nobind mark
+
     // static unsigned Technique::GetPassIndex(const String& passName)
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("uint GetPassIndex(const String&in)", AS_FUNCTIONPR(T::GetPassIndex, (const String&), unsigned), AS_CALL_CDECL);engine->SetDefaultNamespace("");
+
+    // static unsigned Technique::basePassIndex
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("uint basePassIndex", (void*)&T::basePassIndex);engine->SetDefaultNamespace("");
+
+    // static unsigned Technique::alphaPassIndex
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("uint alphaPassIndex", (void*)&T::alphaPassIndex);engine->SetDefaultNamespace("");
+
+    // static unsigned Technique::materialPassIndex
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("uint materialPassIndex", (void*)&T::materialPassIndex);engine->SetDefaultNamespace("");
+
+    // static unsigned Technique::deferredPassIndex
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("uint deferredPassIndex", (void*)&T::deferredPassIndex);engine->SetDefaultNamespace("");
+
+    // static unsigned Technique::lightPassIndex
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("uint lightPassIndex", (void*)&T::lightPassIndex);engine->SetDefaultNamespace("");
+
+    // static unsigned Technique::litBasePassIndex
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("uint litBasePassIndex", (void*)&T::litBasePassIndex);engine->SetDefaultNamespace("");
+
+    // static unsigned Technique::litAlphaPassIndex
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("uint litAlphaPassIndex", (void*)&T::litAlphaPassIndex);engine->SetDefaultNamespace("");
+
+    // static unsigned Technique::shadowPassIndex
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("uint shadowPassIndex", (void*)&T::shadowPassIndex);engine->SetDefaultNamespace("");
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Technique
         REGISTER_MEMBERS_MANUAL_PART_Technique();
     #endif
@@ -11759,6 +14482,10 @@ template <class T> void RegisterMembers_ValueAnimation(asIScriptEngine* engine, 
     // void ValueAnimation::SetValueType(VariantType valueType)
     engine->RegisterObjectMethod(className, "void SetValueType(VariantType)", AS_METHODPR(T, SetValueType, (VariantType), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_valueType(VariantType)", AS_METHODPR(T, SetValueType, (VariantType), void), AS_CALL_THISCALL);
+
+    // static void ValueAnimation::RegisterObject(Context* context)
+    // Not registered because have @nobind mark
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ValueAnimation
         REGISTER_MEMBERS_MANUAL_PART_ValueAnimation();
     #endif
@@ -11798,6 +14525,10 @@ template <class T> void RegisterMembers_XMLFile(asIScriptEngine* engine, const c
 
     // String XMLFile::ToString(const String& indentation = "\t") const
     engine->RegisterObjectMethod(className, "String ToString(const String&in = \"\t\") const", AS_METHODPR(T, ToString, (const String&) const, String), AS_CALL_THISCALL);
+
+    // static void XMLFile::RegisterObject(Context* context)
+    // Not registered because have @nobind mark
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_XMLFile
         REGISTER_MEMBERS_MANUAL_PART_XMLFile();
     #endif
@@ -11831,6 +14562,10 @@ template <class T> void RegisterMembers_AnimationSet2D(asIScriptEngine* engine, 
 
     // bool Resource::Load(Deserializer& source)
     engine->RegisterObjectMethod(className, "bool Load(Deserializer&)", AS_METHODPR(T, Load, (Deserializer&), bool), AS_CALL_THISCALL);
+
+    // static void AnimationSet2D::RegisterObject(Context* context)
+    // Not registered because have @nobind mark
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_AnimationSet2D
         REGISTER_MEMBERS_MANUAL_PART_AnimationSet2D();
     #endif
@@ -12063,6 +14798,10 @@ template <class T> void RegisterMembers_ParticleEffect2D(asIScriptEngine* engine
 
     // void ParticleEffect2D::SetTangentialAccelVariance(float tangentialAccelVariance)
     engine->RegisterObjectMethod(className, "void SetTangentialAccelVariance(float)", AS_METHODPR(T, SetTangentialAccelVariance, (float), void), AS_CALL_THISCALL);
+
+    // static void ParticleEffect2D::RegisterObject(Context* context)
+    // Not registered because have @nobind mark
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ParticleEffect2D
         REGISTER_MEMBERS_MANUAL_PART_ParticleEffect2D();
     #endif
@@ -12131,11 +14870,15 @@ template <class T> void RegisterMembers_Sprite2D(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "void SetTextureEdgeOffset(float)", AS_METHODPR(T, SetTextureEdgeOffset, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_textureEdgeOffset(float)", AS_METHODPR(T, SetTextureEdgeOffset, (float), void), AS_CALL_THISCALL);
 
+    // static void Sprite2D::RegisterObject(Context* context)
+    // Not registered because have @nobind mark
+
     // static ResourceRef Sprite2D::SaveToResourceRef(Sprite2D* sprite)
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("ResourceRef SaveToResourceRef(Sprite2D@+)", AS_FUNCTIONPR(T::SaveToResourceRef, (Sprite2D*), ResourceRef), AS_CALL_CDECL);engine->SetDefaultNamespace("");
 
     // static Sprite2D* Sprite2D::LoadFromResourceRef(Object* object, const ResourceRef& value)
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("Sprite2D@+ LoadFromResourceRef(Object@+, const ResourceRef&in)", AS_FUNCTIONPR(T::LoadFromResourceRef, (Object*, const ResourceRef&), Sprite2D*), AS_CALL_CDECL);engine->SetDefaultNamespace("");
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Sprite2D
         REGISTER_MEMBERS_MANUAL_PART_Sprite2D();
     #endif
@@ -12165,6 +14908,10 @@ template <class T> void RegisterMembers_SpriteSheet2D(asIScriptEngine* engine, c
     // void SpriteSheet2D::SetTexture(Texture2D* texture)
     engine->RegisterObjectMethod(className, "void SetTexture(Texture2D@+)", AS_METHODPR(T, SetTexture, (Texture2D*), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_texture(Texture2D@+)", AS_METHODPR(T, SetTexture, (Texture2D*), void), AS_CALL_THISCALL);
+
+    // static void SpriteSheet2D::RegisterObject(Context* context)
+    // Not registered because have @nobind mark
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_SpriteSheet2D
         REGISTER_MEMBERS_MANUAL_PART_SpriteSheet2D();
     #endif
@@ -12219,6 +14966,10 @@ template <class T> void RegisterMembers_TmxFile2D(asIScriptEngine* engine, const
     // void TmxFile2D::SetSpriteTextureEdgeOffset(float offset)
     engine->RegisterObjectMethod(className, "void SetSpriteTextureEdgeOffset(float)", AS_METHODPR(T, SetSpriteTextureEdgeOffset, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_edgeOffset(float)", AS_METHODPR(T, SetSpriteTextureEdgeOffset, (float), void), AS_CALL_THISCALL);
+
+    // static void TmxFile2D::RegisterObject(Context* context)
+    // Not registered because have @nobind mark
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_TmxFile2D
         REGISTER_MEMBERS_MANUAL_PART_TmxFile2D();
     #endif
@@ -12313,6 +15064,10 @@ template <class T> void RegisterMembers_Animation(asIScriptEngine* engine, const
     // void Animation::SetTrigger(unsigned index, const AnimationTriggerPoint& trigger)
     engine->RegisterObjectMethod(className, "void SetTrigger(uint, const AnimationTriggerPoint&in)", AS_METHODPR(T, SetTrigger, (unsigned, const AnimationTriggerPoint&), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_triggers(uint, const AnimationTriggerPoint&in)", AS_METHODPR(T, SetTrigger, (unsigned, const AnimationTriggerPoint&), void), AS_CALL_THISCALL);
+
+    // static void Animation::RegisterObject(Context* context)
+    // Not registered because have @nobind mark
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Animation
         REGISTER_MEMBERS_MANUAL_PART_Animation();
     #endif
@@ -12331,6 +15086,8 @@ template <class T> void RegisterMembers_Component(asIScriptEngine* engine, const
     // Error: type "PODVector<Component*>&" can not automatically bind
     // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest)
     // Error: type "PODVector<Node*>&" can not automatically bind
+    // virtual void Component::OnSetEnabled()
+    // Can not be registered here bacause hidden in derived classes: LogicComponent
 
     // Component* Component::GetComponent(StringHash type) const
     engine->RegisterObjectMethod(className, "Component@+ GetComponent(StringHash) const", AS_METHODPR(T, GetComponent, (StringHash) const, Component*), AS_CALL_THISCALL);
@@ -12370,6 +15127,12 @@ template <class T> void RegisterMembers_Component(asIScriptEngine* engine, const
     // void Component::SetEnabled(bool enable)
     engine->RegisterObjectMethod(className, "void SetEnabled(bool)", AS_METHODPR(T, SetEnabled, (bool), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_enabled(bool)", AS_METHODPR(T, SetEnabled, (bool), void), AS_CALL_THISCALL);
+
+    // template <class T> T* Component::GetComponent() const
+    // Not registered because template
+    // template <class T> void Component::GetComponents(PODVector<T*>& dest) const
+    // Not registered because template
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Component
         REGISTER_MEMBERS_MANUAL_PART_Component();
     #endif
@@ -12430,11 +15193,11 @@ template <class T> void RegisterMembers_Model(asIScriptEngine* engine, const cha
     // Error: type "const Vector<Vector<SharedPtr<Geometry>>>&" can not automatically bind
     // const Vector<PODVector<unsigned>>& Model::GetGeometryBoneMappings() const
     // Error: type "const Vector<PODVector<unsigned>>&" can not automatically bind
-    // const ModelMorph* Model::GetMorph(StringHash nameHash) const
+    // const ModelMorph* Model::GetMorph(unsigned index) const
     // Error: type "const ModelMorph*" can not automatically bind
     // const ModelMorph* Model::GetMorph(const String& name) const
     // Error: type "const ModelMorph*" can not automatically bind
-    // const ModelMorph* Model::GetMorph(unsigned index) const
+    // const ModelMorph* Model::GetMorph(StringHash nameHash) const
     // Error: type "const ModelMorph*" can not automatically bind
     // const Vector<ModelMorph>& Model::GetMorphs() const
     // Error: type "const Vector<ModelMorph>&" can not automatically bind
@@ -12515,6 +15278,10 @@ template <class T> void RegisterMembers_Model(asIScriptEngine* engine, const cha
 
     // bool Model::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer>>& buffers, const PODVector<unsigned>& morphRangeStarts, const PODVector<unsigned>& morphRangeCounts)
     engine->RegisterObjectMethod(className, "bool SetVertexBuffers(Array<VertexBuffer@>@+, Array<uint>@+, Array<uint>@+)", AS_FUNCTION_OBJFIRST(Model_bool_SetVertexBuffers_constspVectorlesSharedPtrlesVertexBuffergregreamp_constspPODVectorlesunsignedgreamp_constspPODVectorlesunsignedgreamp_template<Model>), AS_CALL_CDECL_OBJFIRST);
+
+    // static void Model::RegisterObject(Context* context)
+    // Not registered because have @nobind mark
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Model
         REGISTER_MEMBERS_MANUAL_PART_Model();
     #endif
@@ -12610,6 +15377,14 @@ template <class T> void RegisterMembers_Node(asIScriptEngine* engine, const char
     // Error: type "const PODVector<unsigned char>&" can not automatically bind
     // Connection* Node::GetOwner() const
     // Not registered because have @manualbind mark
+    // bool Node::Load(Deserializer& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false, CreateMode mode = REPLICATED)
+    // Can not be registered here bacause hidden in derived classes: Scene
+    // bool Node::LoadJSON(const JSONValue& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false, CreateMode mode = REPLICATED)
+    // Can not be registered here bacause hidden in derived classes: Scene
+    // bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false, CreateMode mode = REPLICATED)
+    // Can not be registered here bacause hidden in derived classes: Scene
+    // void Node::MarkReplicationDirty()
+    // Can not be registered here bacause hidden in derived classes: Scene
     // void Node::SetNetParentAttr(const PODVector<unsigned char>& value)
     // Error: type "const PODVector<unsigned char>&" can not automatically bind
     // void Node::SetNetRotationAttr(const PODVector<unsigned char>& value)
@@ -13126,6 +15901,32 @@ template <class T> void RegisterMembers_Node(asIScriptEngine* engine, const char
 
     // void Node::Yaw(float angle, TransformSpace space = TS_LOCAL)
     engine->RegisterObjectMethod(className, "void Yaw(float, TransformSpace = TS_LOCAL)", AS_METHODPR(T, Yaw, (float, TransformSpace), void), AS_CALL_THISCALL);
+
+    // template <class T> T* Node::CreateComponent(CreateMode mode = REPLICATED, unsigned id = 0)
+    // Not registered because template
+    // template <class T> void Node::GetChildrenWithComponent(PODVector<Node*>& dest, bool recursive = false) const
+    // Not registered because template
+    // template <class T> T* Node::GetComponent(bool recursive = false) const
+    // Not registered because template
+    // template <class T> void Node::GetComponents(PODVector<T*>& dest, bool recursive = false) const
+    // Not registered because template
+    // template <class T> T* Node::GetDerivedComponent(bool recursive = false) const
+    // Not registered because template
+    // template <class T> void Node::GetDerivedComponents(PODVector<T*>& dest, bool recursive = false, bool clearVector = true) const
+    // Not registered because template
+    // template <class T> T* Node::GetOrCreateComponent(CreateMode mode = REPLICATED, unsigned id = 0)
+    // Not registered because template
+    // template <class T> T* Node::GetParentComponent(bool fullTraversal = false) const
+    // Not registered because template
+    // template <class T> T* Node::GetParentDerivedComponent(bool fullTraversal = false) const
+    // Not registered because template
+    // template <class T> bool Node::HasComponent() const
+    // Not registered because template
+    // template <class T> void Node::RemoveComponent()
+    // Not registered because template
+    // template <class T> void Node::RemoveComponents()
+    // Not registered because template
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Node
         REGISTER_MEMBERS_MANUAL_PART_Node();
     #endif
@@ -13215,6 +16016,10 @@ template <class T> void RegisterMembers_Sound(asIScriptEngine* engine, const cha
 
     // void Sound::SetSize(unsigned dataSize)
     engine->RegisterObjectMethod(className, "void SetSize(uint)", AS_METHODPR(T, SetSize, (unsigned), void), AS_CALL_THISCALL);
+
+    // static void Sound::RegisterObject(Context* context)
+    // Not registered because have @nobind mark
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Sound
         REGISTER_MEMBERS_MANUAL_PART_Sound();
     #endif
@@ -13228,12 +16033,12 @@ template <class T> void RegisterMembers_Texture(asIScriptEngine* engine, const c
 
     // void* Texture::GetResolveTexture() const
     // Error: type "void*" can not automatically bind
-    // unsigned Texture::GetSRGBFormat(unsigned format)
-    // Not registered because have @nobind mark
     // void* Texture::GetSampler() const
     // Error: type "void*" can not automatically bind
     // void* Texture::GetShaderResourceView() const
     // Error: type "void*" can not automatically bind
+    // unsigned Texture::GetSRGBFormat(unsigned format)
+    // Not registered because have @nobind mark
 
     // TextureAddressMode Texture::GetAddressMode(TextureCoordinate coord) const
     engine->RegisterObjectMethod(className, "TextureAddressMode GetAddressMode(TextureCoordinate) const", AS_METHODPR(T, GetAddressMode, (TextureCoordinate) const, TextureAddressMode), AS_CALL_THISCALL);
@@ -13394,11 +16199,21 @@ template <class T> void RegisterMembers_Texture(asIScriptEngine* engine, const c
     // void Texture::UpdateParameters()
     engine->RegisterObjectMethod(className, "void UpdateParameters()", AS_METHODPR(T, UpdateParameters, (), void), AS_CALL_THISCALL);
 
+    // static unsigned Texture::GetSRVFormat(unsigned format)
+    // Not registered because have @nobind mark
+    // static unsigned Texture::GetDSVFormat(unsigned format)
+    // Not registered because have @nobind mark
+    // static unsigned Texture::GetExternalFormat(unsigned format)
+    // Not registered because have @nobind mark
+    // static unsigned Texture::GetDataType(unsigned format)
+    // Not registered because have @nobind mark
+
     // static unsigned Texture::CheckMaxLevels(int width, int height, unsigned requestedLevels)
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("uint CheckMaxLevels(int, int, uint)", AS_FUNCTIONPR(T::CheckMaxLevels, (int, int, unsigned), unsigned), AS_CALL_CDECL);engine->SetDefaultNamespace("");
 
     // static unsigned Texture::CheckMaxLevels(int width, int height, int depth, unsigned requestedLevels)
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("uint CheckMaxLevels(int, int, int, uint)", AS_FUNCTIONPR(T::CheckMaxLevels, (int, int, int, unsigned), unsigned), AS_CALL_CDECL);engine->SetDefaultNamespace("");
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Texture
         REGISTER_MEMBERS_MANUAL_PART_Texture();
     #endif
@@ -13461,6 +16276,20 @@ template <class T> void RegisterMembers_UIElement(asIScriptEngine* engine, const
     // Error: type "PODVector<UIElement*>&" can not automatically bind
     // virtual void UIElement::GetDebugDrawBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
     // Error: type "PODVector<UIBatch>&" can not automatically bind
+    // const IntVector2& UIElement::GetPosition() const
+    // Can not be registered here bacause hidden in derived classes: Sprite
+    // bool UIElement::IsSelected() const
+    // Can not be registered here bacause hidden in derived classes: ListView
+    // bool UIElement::LoadXML(const XMLElement& source) override
+    // Can not be registered here bacause hidden in derived classes: Menu, DropDownList
+    // bool UIElement::LoadXML(Deserializer& source)
+    // Can not be registered here bacause hidden in derived classes: Menu, DropDownList
+    // bool UIElement::SaveXML(Serializer& dest, const String& indentation = "\t") const
+    // Can not be registered here bacause hidden in derived classes: Menu, DropDownList
+    // void UIElement::SetPosition(const IntVector2& position)
+    // Can not be registered here bacause hidden in derived classes: Sprite
+    // void UIElement::SetPosition(int x, int y)
+    // Can not be registered here bacause hidden in derived classes: Sprite
 
     // void UIElement::AddChild(UIElement* element)
     engine->RegisterObjectMethod(className, "void AddChild(UIElement@+)", AS_METHODPR(T, AddChild, (UIElement*), void), AS_CALL_THISCALL);
@@ -14143,6 +16972,22 @@ template <class T> void RegisterMembers_UIElement(asIScriptEngine* engine, const
 
     // void UIElement::UpdateLayout()
     engine->RegisterObjectMethod(className, "void UpdateLayout()", AS_METHODPR(T, UpdateLayout, (), void), AS_CALL_THISCALL);
+
+    // template <class T> T* UIElement::CreateChild(const String& name = String::EMPTY, unsigned index = M_MAX_UNSIGNED)
+    // Not registered because template
+    // template <class T> T* UIElement::GetChildDynamicCast(unsigned index) const
+    // Not registered because template
+    // template <class T> T* UIElement::GetChildDynamicCast(const String& name, bool recursive = false) const
+    // Not registered because template
+    // template <class T> T* UIElement::GetChildDynamicCast(const StringHash& key, const Variant& value = Variant::EMPTY, bool recursive = false) const
+    // Not registered because template
+    // template <class T> T* UIElement::GetChildStaticCast(unsigned index) const
+    // Not registered because template
+    // template <class T> T* UIElement::GetChildStaticCast(const String& name, bool recursive = false) const
+    // Not registered because template
+    // template <class T> T* UIElement::GetChildStaticCast(const StringHash& key, const Variant& value = Variant::EMPTY, bool recursive = false) const
+    // Not registered because template
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_UIElement
         REGISTER_MEMBERS_MANUAL_PART_UIElement();
     #endif
@@ -14284,6 +17129,7 @@ template <class T> void RegisterMembers_AnimationController(asIScriptEngine* eng
 
     // virtual void AnimationController::Update(float timeStep)
     engine->RegisterObjectMethod(className, "void Update(float)", AS_METHODPR(T, Update, (float), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_AnimationController
         REGISTER_MEMBERS_MANUAL_PART_AnimationController();
     #endif
@@ -14401,6 +17247,7 @@ template <class T> void RegisterMembers_BorderImage(asIScriptEngine* engine, con
     // void BorderImage::SetTiled(bool enable)
     engine->RegisterObjectMethod(className, "void SetTiled(bool)", AS_METHODPR(T, SetTiled, (bool), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_tiled(bool)", AS_METHODPR(T, SetTiled, (bool), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_BorderImage
         REGISTER_MEMBERS_MANUAL_PART_BorderImage();
     #endif
@@ -14647,6 +17494,7 @@ template <class T> void RegisterMembers_Camera(asIScriptEngine* engine, const ch
 
     // Vector2 Camera::WorldToScreenPoint(const Vector3& worldPos) const
     engine->RegisterObjectMethod(className, "Vector2 WorldToScreenPoint(const Vector3&in) const", AS_METHODPR(T, WorldToScreenPoint, (const Vector3&) const, Vector2), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Camera
         REGISTER_MEMBERS_MANUAL_PART_Camera();
     #endif
@@ -14750,6 +17598,7 @@ template <class T> void RegisterMembers_DebugRenderer(asIScriptEngine* engine, c
 
     // void DebugRenderer::SetView(Camera* camera)
     engine->RegisterObjectMethod(className, "void SetView(Camera@+)", AS_METHODPR(T, SetView, (Camera*), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_DebugRenderer
         REGISTER_MEMBERS_MANUAL_PART_DebugRenderer();
     #endif
@@ -14780,6 +17629,8 @@ template <class T> void RegisterMembers_Drawable(asIScriptEngine* engine, const 
     // Error: type "Octant" can not automatically bind bacause have @nobind mark
     // virtual void Drawable::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
     // Error: type "RayOctreeQuery" can not automatically bind bacause have @nobind mark
+    // virtual void Drawable::Update(const FrameInfo& frame)
+    // Can not be registered here bacause hidden in derived classes: ParticleEmitter2D
 
     // void Drawable::AddLight(Light* light)
     engine->RegisterObjectMethod(className, "void AddLight(Light@+)", AS_METHODPR(T, AddLight, (Light*), void), AS_CALL_THISCALL);
@@ -14980,6 +17831,7 @@ template <class T> void RegisterMembers_Drawable(asIScriptEngine* engine, const 
 
     // virtual void Drawable::UpdateGeometry(const FrameInfo& frame)
     engine->RegisterObjectMethod(className, "void UpdateGeometry(const FrameInfo&in)", AS_METHODPR(T, UpdateGeometry, (const FrameInfo&), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Drawable
         REGISTER_MEMBERS_MANUAL_PART_Drawable();
     #endif
@@ -14992,6 +17844,7 @@ template <class T> void RegisterMembers_LogicComponent(asIScriptEngine* engine, 
 
     // virtual void Component::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     engine->RegisterObjectMethod(className, "void DrawDebugGeometry(DebugRenderer@+, bool)", AS_METHODPR(T, DrawDebugGeometry, (DebugRenderer*, bool), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_LogicComponent
         REGISTER_MEMBERS_MANUAL_PART_LogicComponent();
     #endif
@@ -15040,6 +17893,7 @@ template <class T> void RegisterMembers_Octree(asIScriptEngine* engine, const ch
 
     // void Octree::Update(const FrameInfo& frame)
     engine->RegisterObjectMethod(className, "void Update(const FrameInfo&in)", AS_METHODPR(T, Update, (const FrameInfo&), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Octree
         REGISTER_MEMBERS_MANUAL_PART_Octree();
     #endif
@@ -15248,6 +18102,7 @@ template <class T> void RegisterMembers_Scene(asIScriptEngine* engine, const cha
 
     // static bool Scene::IsReplicatedID(unsigned id)
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("bool IsReplicatedID(uint)", AS_FUNCTIONPR(T::IsReplicatedID, (unsigned), bool), AS_CALL_CDECL);engine->SetDefaultNamespace("");
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Scene
         REGISTER_MEMBERS_MANUAL_PART_Scene();
     #endif
@@ -15386,6 +18241,7 @@ template <class T> void RegisterMembers_ScrollView(asIScriptEngine* engine, cons
 
     // void ScrollView::SetViewPositionAttr(const IntVector2& value)
     engine->RegisterObjectMethod(className, "void SetViewPositionAttr(const IntVector2&in)", AS_METHODPR(T, SetViewPositionAttr, (const IntVector2&), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ScrollView
         REGISTER_MEMBERS_MANUAL_PART_ScrollView();
     #endif
@@ -15440,6 +18296,7 @@ template <class T> void RegisterMembers_SmoothedTransform(asIScriptEngine* engin
 
     // void SmoothedTransform::Update(float constant, float squaredSnapThreshold)
     engine->RegisterObjectMethod(className, "void Update(float, float)", AS_METHODPR(T, Update, (float, float), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_SmoothedTransform
         REGISTER_MEMBERS_MANUAL_PART_SmoothedTransform();
     #endif
@@ -15455,6 +18312,7 @@ template <class T> void RegisterMembers_SoundListener(asIScriptEngine* engine, c
 
     // virtual void Component::OnSetEnabled()
     engine->RegisterObjectMethod(className, "void OnSetEnabled()", AS_METHODPR(T, OnSetEnabled, (), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_SoundListener
         REGISTER_MEMBERS_MANUAL_PART_SoundListener();
     #endif
@@ -15578,6 +18436,7 @@ template <class T> void RegisterMembers_SoundSource(asIScriptEngine* engine, con
 
     // void SoundSource::UpdateMasterGain()
     engine->RegisterObjectMethod(className, "void UpdateMasterGain()", AS_METHODPR(T, UpdateMasterGain, (), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_SoundSource
         REGISTER_MEMBERS_MANUAL_PART_SoundSource();
     #endif
@@ -15660,6 +18519,7 @@ template <class T> void RegisterMembers_SplinePath(asIScriptEngine* engine, cons
     // void SplinePath::SetSpeed(float speed)
     engine->RegisterObjectMethod(className, "void SetSpeed(float)", AS_METHODPR(T, SetSpeed, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_speed(float)", AS_METHODPR(T, SetSpeed, (float), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_SplinePath
         REGISTER_MEMBERS_MANUAL_PART_SplinePath();
     #endif
@@ -15762,6 +18622,7 @@ template <class T> void RegisterMembers_Sprite(asIScriptEngine* engine, const ch
 
     // void Sprite::SetTextureAttr(const ResourceRef& value)
     engine->RegisterObjectMethod(className, "void SetTextureAttr(const ResourceRef&in)", AS_METHODPR(T, SetTextureAttr, (const ResourceRef&), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Sprite
         REGISTER_MEMBERS_MANUAL_PART_Sprite();
     #endif
@@ -16022,6 +18883,7 @@ template <class T> void RegisterMembers_Terrain(asIScriptEngine* engine, const c
 
     // IntVector2 Terrain::WorldToHeightMap(const Vector3& worldPosition) const
     engine->RegisterObjectMethod(className, "IntVector2 WorldToHeightMap(const Vector3&in) const", AS_METHODPR(T, WorldToHeightMap, (const Vector3&) const, IntVector2), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Terrain
         REGISTER_MEMBERS_MANUAL_PART_Terrain();
     #endif
@@ -16059,6 +18921,10 @@ template <class T> void RegisterMembers_Texture2D(asIScriptEngine* engine, const
 
     // bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usage = TEXTURE_STATIC, int multiSample = 1, bool autoResolve = true)
     engine->RegisterObjectMethod(className, "bool SetSize(int, int, uint, TextureUsage = TEXTURE_STATIC, int = 1, bool = true)", AS_METHODPR(T, SetSize, (int, int, unsigned, TextureUsage, int, bool), bool), AS_CALL_THISCALL);
+
+    // static void Texture2D::RegisterObject(Context* context)
+    // Not registered because have @nobind mark
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Texture2D
         REGISTER_MEMBERS_MANUAL_PART_Texture2D();
     #endif
@@ -16094,6 +18960,10 @@ template <class T> void RegisterMembers_Texture2DArray(asIScriptEngine* engine, 
 
     // bool Texture2DArray::SetSize(unsigned layers, int width, int height, unsigned format, TextureUsage usage = TEXTURE_STATIC)
     engine->RegisterObjectMethod(className, "bool SetSize(uint, int, int, uint, TextureUsage = TEXTURE_STATIC)", AS_METHODPR(T, SetSize, (unsigned, int, int, unsigned, TextureUsage), bool), AS_CALL_THISCALL);
+
+    // static void Texture2DArray::RegisterObject(Context* context)
+    // Not registered because have @nobind mark
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Texture2DArray
         REGISTER_MEMBERS_MANUAL_PART_Texture2DArray();
     #endif
@@ -16114,6 +18984,10 @@ template <class T> void RegisterMembers_Texture3D(asIScriptEngine* engine, const
 
     // bool Texture3D::SetSize(int width, int height, int depth, unsigned format, TextureUsage usage = TEXTURE_STATIC)
     engine->RegisterObjectMethod(className, "bool SetSize(int, int, int, uint, TextureUsage = TEXTURE_STATIC)", AS_METHODPR(T, SetSize, (int, int, int, unsigned, TextureUsage), bool), AS_CALL_THISCALL);
+
+    // static void Texture3D::RegisterObject(Context* context)
+    // Not registered because have @nobind mark
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Texture3D
         REGISTER_MEMBERS_MANUAL_PART_Texture3D();
     #endif
@@ -16151,6 +19025,10 @@ template <class T> void RegisterMembers_TextureCube(asIScriptEngine* engine, con
 
     // bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage = TEXTURE_STATIC, int multiSample = 1)
     engine->RegisterObjectMethod(className, "bool SetSize(int, uint, TextureUsage = TEXTURE_STATIC, int = 1)", AS_METHODPR(T, SetSize, (int, unsigned, TextureUsage, int), bool), AS_CALL_THISCALL);
+
+    // static void TextureCube::RegisterObject(Context* context)
+    // Not registered because have @nobind mark
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_TextureCube
         REGISTER_MEMBERS_MANUAL_PART_TextureCube();
     #endif
@@ -16198,6 +19076,7 @@ template <class T> void RegisterMembers_ToolTip(asIScriptEngine* engine, const c
 
     // void UIElement::SetPosition(int x, int y)
     engine->RegisterObjectMethod(className, "void SetPosition(int, int)", AS_METHODPR(T, SetPosition, (int, int), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ToolTip
         REGISTER_MEMBERS_MANUAL_PART_ToolTip();
     #endif
@@ -16228,6 +19107,7 @@ template <class T> void RegisterMembers_UIComponent(asIScriptEngine* engine, con
 
     // void UIComponent::SetViewportIndex(unsigned index)
     engine->RegisterObjectMethod(className, "void SetViewportIndex(uint)", AS_METHODPR(T, SetViewportIndex, (unsigned), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_UIComponent
         REGISTER_MEMBERS_MANUAL_PART_UIComponent();
     #endif
@@ -16277,6 +19157,7 @@ template <class T> void RegisterMembers_UISelectable(asIScriptEngine* engine, co
     // void UISelectable::SetSelectionColor(const Color& color)
     engine->RegisterObjectMethod(className, "void SetSelectionColor(const Color&in)", AS_METHODPR(T, SetSelectionColor, (const Color&), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_selectionColor(const Color&in)", AS_METHODPR(T, SetSelectionColor, (const Color&), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_UISelectable
         REGISTER_MEMBERS_MANUAL_PART_UISelectable();
     #endif
@@ -16314,6 +19195,12 @@ template <class T> void RegisterMembers_UnknownComponent(asIScriptEngine* engine
 
     // void UnknownComponent::SetTypeName(const String& typeName)
     engine->RegisterObjectMethod(className, "void SetTypeName(const String&in)", AS_METHODPR(T, SetTypeName, (const String&), void), AS_CALL_THISCALL);
+
+    // static Urho3D::StringHash UnknownComponent::GetTypeStatic()
+    // Error: type "Urho3D::StringHash" can not automatically bind
+    // static const Urho3D::String& UnknownComponent::GetTypeNameStatic()
+    // Error: type "const Urho3D::String&" can not automatically bind
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_UnknownComponent
         REGISTER_MEMBERS_MANUAL_PART_UnknownComponent();
     #endif
@@ -16349,6 +19236,7 @@ template <class T> void RegisterMembers_IKConstraint(asIScriptEngine* engine, co
 
     // void IKConstraint::SetStretchiness(float stretchiness)
     engine->RegisterObjectMethod(className, "void SetStretchiness(float)", AS_METHODPR(T, SetStretchiness, (float), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_IKConstraint
         REGISTER_MEMBERS_MANUAL_PART_IKConstraint();
     #endif
@@ -16454,6 +19342,7 @@ template <class T> void RegisterMembers_IKEffector(asIScriptEngine* engine, cons
 
     // void IKEffector::SetWEIGHT_NLERP(bool enable)
     engine->RegisterObjectMethod(className, "void SetWEIGHT_NLERP(bool)", AS_METHODPR(T, SetWEIGHT_NLERP, (bool), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_IKEffector
         REGISTER_MEMBERS_MANUAL_PART_IKEffector();
     #endif
@@ -16580,6 +19469,7 @@ template <class T> void RegisterMembers_IKSolver(asIScriptEngine* engine, const 
 
     // void IKSolver::Solve()
     engine->RegisterObjectMethod(className, "void Solve()", AS_METHODPR(T, Solve, (), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_IKSolver
         REGISTER_MEMBERS_MANUAL_PART_IKSolver();
     #endif
@@ -16732,6 +19622,7 @@ template <class T> void RegisterMembers_CrowdAgent(asIScriptEngine* engine, cons
     // void CrowdAgent::SetUpdateNodePosition(bool unodepos)
     engine->RegisterObjectMethod(className, "void SetUpdateNodePosition(bool)", AS_METHODPR(T, SetUpdateNodePosition, (bool), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_updateNodePosition(bool)", AS_METHODPR(T, SetUpdateNodePosition, (bool), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_CrowdAgent
         REGISTER_MEMBERS_MANUAL_PART_CrowdAgent();
     #endif
@@ -16853,6 +19744,7 @@ template <class T> void RegisterMembers_CrowdManager(asIScriptEngine* engine, co
 
     // void CrowdManager::SetObstacleAvoidanceParams(unsigned obstacleAvoidanceType, const CrowdObstacleAvoidanceParams& params)
     engine->RegisterObjectMethod(className, "void SetObstacleAvoidanceParams(uint, const CrowdObstacleAvoidanceParams&in)", AS_METHODPR(T, SetObstacleAvoidanceParams, (unsigned, const CrowdObstacleAvoidanceParams&), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_CrowdManager
         REGISTER_MEMBERS_MANUAL_PART_CrowdManager();
     #endif
@@ -16888,6 +19780,7 @@ template <class T> void RegisterMembers_NavArea(asIScriptEngine* engine, const c
     // void NavArea::SetBoundingBox(const BoundingBox& bnds)
     engine->RegisterObjectMethod(className, "void SetBoundingBox(const BoundingBox&in)", AS_METHODPR(T, SetBoundingBox, (const BoundingBox&), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_boundingBox(const BoundingBox&in)", AS_METHODPR(T, SetBoundingBox, (const BoundingBox&), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_NavArea
         REGISTER_MEMBERS_MANUAL_PART_NavArea();
     #endif
@@ -16911,6 +19804,7 @@ template <class T> void RegisterMembers_Navigable(asIScriptEngine* engine, const
     // void Navigable::SetRecursive(bool enable)
     engine->RegisterObjectMethod(className, "void SetRecursive(bool)", AS_METHODPR(T, SetRecursive, (bool), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_recursive(bool)", AS_METHODPR(T, SetRecursive, (bool), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Navigable
         REGISTER_MEMBERS_MANUAL_PART_Navigable();
     #endif
@@ -16925,10 +19819,10 @@ template <class T> void RegisterMembers_NavigationMesh(asIScriptEngine* engine, 
     // Error: type "const PODVector<unsigned char>&" can not automatically bind
     // Vector3 NavigationMesh::FindNearestPoint(const Vector3& point, const Vector3& extents = Vector3::ONE, const dtQueryFilter* filter = nullptr, dtPolyRef* nearestRef = nullptr)
     // Error: type "const dtQueryFilter*" can not automatically bind
-    // void NavigationMesh::FindPath(PODVector<NavigationPathPoint>& dest, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE, const dtQueryFilter* filter = nullptr)
-    // Error: type "PODVector<NavigationPathPoint>&" can not automatically bind
     // void NavigationMesh::FindPath(PODVector<Vector3>& dest, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE, const dtQueryFilter* filter = nullptr)
     // Error: type "PODVector<Vector3>&" can not automatically bind
+    // void NavigationMesh::FindPath(PODVector<NavigationPathPoint>& dest, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE, const dtQueryFilter* filter = nullptr)
+    // Error: type "PODVector<NavigationPathPoint>&" can not automatically bind
     // float NavigationMesh::GetDistanceToWall(const Vector3& point, float radius, const Vector3& extents = Vector3::ONE, const dtQueryFilter* filter = nullptr, Vector3* hitPos = nullptr, Vector3* hitNormal = nullptr)
     // Error: type "const dtQueryFilter*" can not automatically bind
     // virtual PODVector<unsigned char> NavigationMesh::GetNavigationDataAttr() const
@@ -17145,6 +20039,7 @@ template <class T> void RegisterMembers_NavigationMesh(asIScriptEngine* engine, 
     // void NavigationMesh::SetTileSize(int size)
     engine->RegisterObjectMethod(className, "void SetTileSize(int)", AS_METHODPR(T, SetTileSize, (int), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_tileSize(int)", AS_METHODPR(T, SetTileSize, (int), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_NavigationMesh
         REGISTER_MEMBERS_MANUAL_PART_NavigationMesh();
     #endif
@@ -17183,6 +20078,7 @@ template <class T> void RegisterMembers_Obstacle(asIScriptEngine* engine, const 
     // void Obstacle::SetRadius(float newRadius)
     engine->RegisterObjectMethod(className, "void SetRadius(float)", AS_METHODPR(T, SetRadius, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_radius(float)", AS_METHODPR(T, SetRadius, (float), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Obstacle
         REGISTER_MEMBERS_MANUAL_PART_Obstacle();
     #endif
@@ -17238,6 +20134,7 @@ template <class T> void RegisterMembers_OffMeshConnection(asIScriptEngine* engin
     // void OffMeshConnection::SetRadius(float radius)
     engine->RegisterObjectMethod(className, "void SetRadius(float)", AS_METHODPR(T, SetRadius, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_radius(float)", AS_METHODPR(T, SetRadius, (float), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_OffMeshConnection
         REGISTER_MEMBERS_MANUAL_PART_OffMeshConnection();
     #endif
@@ -17292,6 +20189,7 @@ template <class T> void RegisterMembers_NetworkPriority(asIScriptEngine* engine,
     // void NetworkPriority::SetMinPriority(float priority)
     engine->RegisterObjectMethod(className, "void SetMinPriority(float)", AS_METHODPR(T, SetMinPriority, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_minPriority(float)", AS_METHODPR(T, SetMinPriority, (float), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_NetworkPriority
         REGISTER_MEMBERS_MANUAL_PART_NetworkPriority();
     #endif
@@ -17434,6 +20332,7 @@ template <class T> void RegisterMembers_CollisionShape(asIScriptEngine* engine, 
 
     // void CollisionShape::SetTriangleMesh(Model* model, unsigned lodLevel = 0, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY)
     engine->RegisterObjectMethod(className, "void SetTriangleMesh(Model@+, uint = 0, const Vector3&in = Vector3::ONE, const Vector3&in = Vector3::ZERO, const Quaternion&in = Quaternion::IDENTITY)", AS_METHODPR(T, SetTriangleMesh, (Model*, unsigned, const Vector3&, const Vector3&, const Quaternion&), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_CollisionShape
         REGISTER_MEMBERS_MANUAL_PART_CollisionShape();
     #endif
@@ -17569,6 +20468,7 @@ template <class T> void RegisterMembers_Constraint(asIScriptEngine* engine, cons
     // void Constraint::SetWorldPosition(const Vector3& position)
     engine->RegisterObjectMethod(className, "void SetWorldPosition(const Vector3&in)", AS_METHODPR(T, SetWorldPosition, (const Vector3&), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_worldPosition(const Vector3&in)", AS_METHODPR(T, SetWorldPosition, (const Vector3&), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Constraint
         REGISTER_MEMBERS_MANUAL_PART_Constraint();
     #endif
@@ -17581,32 +20481,32 @@ template <class T> void RegisterMembers_PhysicsWorld(asIScriptEngine* engine, co
 
     // void PhysicsWorld::ConvexCast(PhysicsRaycastResult& result, btCollisionShape* shape, const Vector3& startPos, const Quaternion& startRot, const Vector3& endPos, const Quaternion& endRot, unsigned collisionMask = M_MAX_UNSIGNED)
     // Error: type "btCollisionShape*" can not automatically bind
-    // void PhysicsWorld::GetCollidingBodies(PODVector<RigidBody*>& result, const RigidBody* body)
-    // Error: type "PODVector<RigidBody*>&" can not automatically bind
-    // CollisionGeometryDataCache& PhysicsWorld::GetConvexCache()
-    // Error: type "CollisionGeometryDataCache&" can not automatically bind
-    // CollisionGeometryDataCache& PhysicsWorld::GetGImpactTrimeshCache()
-    // Error: type "CollisionGeometryDataCache&" can not automatically bind
-    // void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const BoundingBox& box, unsigned collisionMask = M_MAX_UNSIGNED)
-    // Error: type "PODVector<RigidBody*>&" can not automatically bind
-    // void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const RigidBody* body)
-    // Error: type "PODVector<RigidBody*>&" can not automatically bind
-    // void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const Sphere& sphere, unsigned collisionMask = M_MAX_UNSIGNED)
-    // Error: type "PODVector<RigidBody*>&" can not automatically bind
-    // CollisionGeometryDataCache& PhysicsWorld::GetTriMeshCache()
-    // Error: type "CollisionGeometryDataCache&" can not automatically bind
-    // btDiscreteDynamicsWorld* PhysicsWorld::GetWorld()
-    // Error: type "btDiscreteDynamicsWorld*" can not automatically bind
-    // void PhysicsWorld::Raycast(PODVector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
-    // Error: type "PODVector<PhysicsRaycastResult>&" can not automatically bind
     // void PhysicsWorld::draw3dText(const btVector3& location, const char* textString) override
     // Error: type "const btVector3&" can not automatically bind
     // void PhysicsWorld::drawContactPoint(const btVector3& pointOnB, const btVector3& normalOnB, btScalar distance, int lifeTime, const btVector3& color) override
     // Error: type "const btVector3&" can not automatically bind
     // void PhysicsWorld::drawLine(const btVector3& from, const btVector3& to, const btVector3& color) override
     // Error: type "const btVector3&" can not automatically bind
+    // void PhysicsWorld::GetCollidingBodies(PODVector<RigidBody*>& result, const RigidBody* body)
+    // Error: type "PODVector<RigidBody*>&" can not automatically bind
+    // CollisionGeometryDataCache& PhysicsWorld::GetConvexCache()
+    // Error: type "CollisionGeometryDataCache&" can not automatically bind
+    // CollisionGeometryDataCache& PhysicsWorld::GetGImpactTrimeshCache()
+    // Error: type "CollisionGeometryDataCache&" can not automatically bind
+    // void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const Sphere& sphere, unsigned collisionMask = M_MAX_UNSIGNED)
+    // Error: type "PODVector<RigidBody*>&" can not automatically bind
+    // void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const BoundingBox& box, unsigned collisionMask = M_MAX_UNSIGNED)
+    // Error: type "PODVector<RigidBody*>&" can not automatically bind
+    // void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const RigidBody* body)
+    // Error: type "PODVector<RigidBody*>&" can not automatically bind
+    // CollisionGeometryDataCache& PhysicsWorld::GetTriMeshCache()
+    // Error: type "CollisionGeometryDataCache&" can not automatically bind
+    // btDiscreteDynamicsWorld* PhysicsWorld::GetWorld()
+    // Error: type "btDiscreteDynamicsWorld*" can not automatically bind
     // bool PhysicsWorld::isVisible(const btVector3& aabbMin, const btVector3& aabbMax) override
     // Error: type "const btVector3&" can not automatically bind
+    // void PhysicsWorld::Raycast(PODVector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
+    // Error: type "PODVector<PhysicsRaycastResult>&" can not automatically bind
     // void PhysicsWorld::reportErrorWarning(const char* warningString) override
     // Error: type "const char*" can not automatically bind
 
@@ -17754,6 +20654,10 @@ template <class T> void RegisterMembers_PhysicsWorld(asIScriptEngine* engine, co
 
     // void PhysicsWorld::UpdateCollisions()
     engine->RegisterObjectMethod(className, "void UpdateCollisions()", AS_METHODPR(T, UpdateCollisions, (), void), AS_CALL_THISCALL);
+
+    // static struct PhysicsWorldConfig PhysicsWorld::config
+    // Error: type "struct PhysicsWorldConfig" can not automatically bind
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_PhysicsWorld
         REGISTER_MEMBERS_MANUAL_PART_PhysicsWorld();
     #endif
@@ -17772,10 +20676,10 @@ template <class T> void RegisterMembers_RigidBody(asIScriptEngine* engine, const
     // Error: type "btCompoundShape*" can not automatically bind
     // const PODVector<unsigned char>& RigidBody::GetNetAngularVelocityAttr() const
     // Error: type "const PODVector<unsigned char>&" can not automatically bind
-    // void RigidBody::SetNetAngularVelocityAttr(const PODVector<unsigned char>& value)
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
     // void RigidBody::getWorldTransform(btTransform& worldTrans) const override
     // Not registered because have @nobind mark
+    // void RigidBody::SetNetAngularVelocityAttr(const PODVector<unsigned char>& value)
+    // Error: type "const PODVector<unsigned char>&" can not automatically bind
     // void RigidBody::setWorldTransform(const btTransform& worldTrans) override
     // Not registered because have @nobind mark
 
@@ -18055,6 +20959,7 @@ template <class T> void RegisterMembers_RigidBody(asIScriptEngine* engine, const
 
     // void RigidBody::UpdateMass()
     engine->RegisterObjectMethod(className, "void UpdateMass()", AS_METHODPR(T, UpdateMass, (), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_RigidBody
         REGISTER_MEMBERS_MANUAL_PART_RigidBody();
     #endif
@@ -18151,6 +21056,7 @@ template <class T> void RegisterMembers_CollisionShape2D(asIScriptEngine* engine
     // void CollisionShape2D::SetTrigger(bool trigger)
     engine->RegisterObjectMethod(className, "void SetTrigger(bool)", AS_METHODPR(T, SetTrigger, (bool), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_trigger(bool)", AS_METHODPR(T, SetTrigger, (bool), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_CollisionShape2D
         REGISTER_MEMBERS_MANUAL_PART_CollisionShape2D();
     #endif
@@ -18201,6 +21107,7 @@ template <class T> void RegisterMembers_Constraint2D(asIScriptEngine* engine, co
     // void Constraint2D::SetOtherBody(RigidBody2D* body)
     engine->RegisterObjectMethod(className, "void SetOtherBody(RigidBody2D@+)", AS_METHODPR(T, SetOtherBody, (RigidBody2D*), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_otherBody(RigidBody2D@+)", AS_METHODPR(T, SetOtherBody, (RigidBody2D*), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Constraint2D
         REGISTER_MEMBERS_MANUAL_PART_Constraint2D();
     #endif
@@ -18385,6 +21292,7 @@ template <class T> void RegisterMembers_PhysicsWorld2D(asIScriptEngine* engine, 
 
     // void PhysicsWorld2D::Update(float timeStep)
     engine->RegisterObjectMethod(className, "void Update(float)", AS_METHODPR(T, Update, (float), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_PhysicsWorld2D
         REGISTER_MEMBERS_MANUAL_PART_PhysicsWorld2D();
     #endif
@@ -18555,6 +21463,7 @@ template <class T> void RegisterMembers_RigidBody2D(asIScriptEngine* engine, con
     // void RigidBody2D::SetUseFixtureMass(bool useFixtureMass)
     engine->RegisterObjectMethod(className, "void SetUseFixtureMass(bool)", AS_METHODPR(T, SetUseFixtureMass, (bool), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_useFixtureMass(bool)", AS_METHODPR(T, SetUseFixtureMass, (bool), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_RigidBody2D
         REGISTER_MEMBERS_MANUAL_PART_RigidBody2D();
     #endif
@@ -18614,6 +21523,7 @@ template <class T> void RegisterMembers_TileMap2D(asIScriptEngine* engine, const
 
     // Vector2 TileMap2D::TileIndexToPosition(int x, int y) const
     engine->RegisterObjectMethod(className, "Vector2 TileIndexToPosition(int, int) const", AS_METHODPR(T, TileIndexToPosition, (int, int) const, Vector2), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_TileMap2D
         REGISTER_MEMBERS_MANUAL_PART_TileMap2D();
     #endif
@@ -18692,6 +21602,7 @@ template <class T> void RegisterMembers_TileMapLayer2D(asIScriptEngine* engine, 
     // void TileMapLayer2D::SetVisible(bool visible)
     engine->RegisterObjectMethod(className, "void SetVisible(bool)", AS_METHODPR(T, SetVisible, (bool), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_visible(bool)", AS_METHODPR(T, SetVisible, (bool), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_TileMapLayer2D
         REGISTER_MEMBERS_MANUAL_PART_TileMapLayer2D();
     #endif
@@ -18802,6 +21713,7 @@ template <class T> void RegisterMembers_BillboardSet(asIScriptEngine* engine, co
 
     // virtual void Drawable::Update(const FrameInfo& frame)
     engine->RegisterObjectMethod(className, "void Update(const FrameInfo&in)", AS_METHODPR(T, Update, (const FrameInfo&), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_BillboardSet
         REGISTER_MEMBERS_MANUAL_PART_BillboardSet();
     #endif
@@ -18856,6 +21768,7 @@ template <class T> void RegisterMembers_Button(asIScriptEngine* engine, const ch
     // void Button::SetRepeatRate(float rate)
     engine->RegisterObjectMethod(className, "void SetRepeatRate(float)", AS_METHODPR(T, SetRepeatRate, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_repeatRate(float)", AS_METHODPR(T, SetRepeatRate, (float), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Button
         REGISTER_MEMBERS_MANUAL_PART_Button();
     #endif
@@ -18893,6 +21806,7 @@ template <class T> void RegisterMembers_CheckBox(asIScriptEngine* engine, const 
 
     // void CheckBox::SetCheckedOffset(int x, int y)
     engine->RegisterObjectMethod(className, "void SetCheckedOffset(int, int)", AS_METHODPR(T, SetCheckedOffset, (int, int), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_CheckBox
         REGISTER_MEMBERS_MANUAL_PART_CheckBox();
     #endif
@@ -18944,6 +21858,7 @@ template <class T> void RegisterMembers_Cursor(asIScriptEngine* engine, const ch
     // void Cursor::SetUseSystemShapes(bool enable)
     engine->RegisterObjectMethod(className, "void SetUseSystemShapes(bool)", AS_METHODPR(T, SetUseSystemShapes, (bool), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_useSystemShapes(bool)", AS_METHODPR(T, SetUseSystemShapes, (bool), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Cursor
         REGISTER_MEMBERS_MANUAL_PART_Cursor();
     #endif
@@ -19031,6 +21946,7 @@ template <class T> void RegisterMembers_CustomGeometry(asIScriptEngine* engine, 
 
     // virtual void Drawable::Update(const FrameInfo& frame)
     engine->RegisterObjectMethod(className, "void Update(const FrameInfo&in)", AS_METHODPR(T, Update, (const FrameInfo&), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_CustomGeometry
         REGISTER_MEMBERS_MANUAL_PART_CustomGeometry();
     #endif
@@ -19107,6 +22023,7 @@ template <class T> void RegisterMembers_DecalSet(asIScriptEngine* engine, const 
 
     // virtual void Drawable::Update(const FrameInfo& frame)
     engine->RegisterObjectMethod(className, "void Update(const FrameInfo&in)", AS_METHODPR(T, Update, (const FrameInfo&), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_DecalSet
         REGISTER_MEMBERS_MANUAL_PART_DecalSet();
     #endif
@@ -19362,6 +22279,7 @@ template <class T> void RegisterMembers_Light(asIScriptEngine* engine, const cha
 
     // static Matrix3x4 Light::GetFullscreenQuadTransform(Camera* camera)
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("Matrix3x4 GetFullscreenQuadTransform(Camera@+)", AS_FUNCTIONPR(T::GetFullscreenQuadTransform, (Camera*), Matrix3x4), AS_CALL_CDECL);engine->SetDefaultNamespace("");
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Light
         REGISTER_MEMBERS_MANUAL_PART_Light();
     #endif
@@ -19452,6 +22370,7 @@ template <class T> void RegisterMembers_LineEdit(asIScriptEngine* engine, const 
     // void LineEdit::SetTextSelectable(bool enable)
     engine->RegisterObjectMethod(className, "void SetTextSelectable(bool)", AS_METHODPR(T, SetTextSelectable, (bool), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_textSelectable(bool)", AS_METHODPR(T, SetTextSelectable, (bool), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_LineEdit
         REGISTER_MEMBERS_MANUAL_PART_LineEdit();
     #endif
@@ -19634,6 +22553,7 @@ template <class T> void RegisterMembers_ListView(asIScriptEngine* engine, const 
 
     // void ListView::UpdateInternalLayout()
     engine->RegisterObjectMethod(className, "void UpdateInternalLayout()", AS_METHODPR(T, UpdateInternalLayout, (), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ListView
         REGISTER_MEMBERS_MANUAL_PART_ListView();
     #endif
@@ -19697,6 +22617,7 @@ template <class T> void RegisterMembers_ProgressBar(asIScriptEngine* engine, con
     // void ProgressBar::SetValue(float value)
     engine->RegisterObjectMethod(className, "void SetValue(float)", AS_METHODPR(T, SetValue, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_value(float)", AS_METHODPR(T, SetValue, (float), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ProgressBar
         REGISTER_MEMBERS_MANUAL_PART_ProgressBar();
     #endif
@@ -19838,6 +22759,7 @@ template <class T> void RegisterMembers_RibbonTrail(asIScriptEngine* engine, con
 
     // void RibbonTrail::Update(const FrameInfo& frame) override
     engine->RegisterObjectMethod(className, "void Update(const FrameInfo&in)", AS_METHODPR(T, Update, (const FrameInfo&), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_RibbonTrail
         REGISTER_MEMBERS_MANUAL_PART_RibbonTrail();
     #endif
@@ -19921,6 +22843,7 @@ template <class T> void RegisterMembers_ScrollBar(asIScriptEngine* engine, const
 
     // void ScrollBar::StepForward()
     engine->RegisterObjectMethod(className, "void StepForward()", AS_METHODPR(T, StepForward, (), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ScrollBar
         REGISTER_MEMBERS_MANUAL_PART_ScrollBar();
     #endif
@@ -19978,6 +22901,7 @@ template <class T> void RegisterMembers_Slider(asIScriptEngine* engine, const ch
     // void Slider::SetValue(float value)
     engine->RegisterObjectMethod(className, "void SetValue(float)", AS_METHODPR(T, SetValue, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_value(float)", AS_METHODPR(T, SetValue, (float), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Slider
         REGISTER_MEMBERS_MANUAL_PART_Slider();
     #endif
@@ -20036,6 +22960,7 @@ template <class T> void RegisterMembers_SoundSource3D(asIScriptEngine* engine, c
     // void SoundSource3D::SetRolloffFactor(float factor)
     engine->RegisterObjectMethod(className, "void SetRolloffFactor(float)", AS_METHODPR(T, SetRolloffFactor, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_rolloffFactor(float)", AS_METHODPR(T, SetRolloffFactor, (float), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_SoundSource3D
         REGISTER_MEMBERS_MANUAL_PART_SoundSource3D();
     #endif
@@ -20047,7 +22972,7 @@ template <class T> void RegisterMembers_StaticModel(asIScriptEngine* engine, con
     RegisterMembers_Drawable<T>(engine, className);
 
     // virtual void StaticModel::SetModel(Model* model)
-    // Not registered because have @manualbind mark
+    // Can not be registered here bacause hidden in derived classes: AnimatedModel
 
     // void StaticModel::ApplyMaterialList(const String& fileName = String::EMPTY)
     engine->RegisterObjectMethod(className, "void ApplyMaterialList(const String&in = String::EMPTY)", AS_METHODPR(T, ApplyMaterialList, (const String&), void), AS_CALL_THISCALL);
@@ -20104,6 +23029,7 @@ template <class T> void RegisterMembers_StaticModel(asIScriptEngine* engine, con
 
     // virtual void Drawable::Update(const FrameInfo& frame)
     engine->RegisterObjectMethod(className, "void Update(const FrameInfo&in)", AS_METHODPR(T, Update, (const FrameInfo&), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_StaticModel
         REGISTER_MEMBERS_MANUAL_PART_StaticModel();
     #endif
@@ -20170,6 +23096,7 @@ template <class T> void RegisterMembers_TerrainPatch(asIScriptEngine* engine, co
 
     // virtual void Drawable::Update(const FrameInfo& frame)
     engine->RegisterObjectMethod(className, "void Update(const FrameInfo&in)", AS_METHODPR(T, Update, (const FrameInfo&), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_TerrainPatch
         REGISTER_MEMBERS_MANUAL_PART_TerrainPatch();
     #endif
@@ -20333,6 +23260,7 @@ template <class T> void RegisterMembers_Text(asIScriptEngine* engine, const char
     // void Text::SetWordwrap(bool enable)
     engine->RegisterObjectMethod(className, "void SetWordwrap(bool)", AS_METHODPR(T, SetWordwrap, (bool), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_wordwrap(bool)", AS_METHODPR(T, SetWordwrap, (bool), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Text
         REGISTER_MEMBERS_MANUAL_PART_Text();
     #endif
@@ -20563,6 +23491,7 @@ template <class T> void RegisterMembers_Text3D(asIScriptEngine* engine, const ch
 
     // virtual void Drawable::Update(const FrameInfo& frame)
     engine->RegisterObjectMethod(className, "void Update(const FrameInfo&in)", AS_METHODPR(T, Update, (const FrameInfo&), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Text3D
         REGISTER_MEMBERS_MANUAL_PART_Text3D();
     #endif
@@ -20661,6 +23590,7 @@ template <class T> void RegisterMembers_Window(asIScriptEngine* engine, const ch
     // void Window::SetResizeBorder(const IntRect& rect)
     engine->RegisterObjectMethod(className, "void SetResizeBorder(const IntRect&in)", AS_METHODPR(T, SetResizeBorder, (const IntRect&), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_resizeBorder(const IntRect&in)", AS_METHODPR(T, SetResizeBorder, (const IntRect&), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Window
         REGISTER_MEMBERS_MANUAL_PART_Window();
     #endif
@@ -20786,6 +23716,7 @@ template <class T> void RegisterMembers_Zone(asIScriptEngine* engine, const char
 
     // virtual void Drawable::Update(const FrameInfo& frame)
     engine->RegisterObjectMethod(className, "void Update(const FrameInfo&in)", AS_METHODPR(T, Update, (const FrameInfo&), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Zone
         REGISTER_MEMBERS_MANUAL_PART_Zone();
     #endif
@@ -20824,6 +23755,7 @@ template <class T> void RegisterMembers_DynamicNavigationMesh(asIScriptEngine* e
     // void DynamicNavigationMesh::SetMaxObstacles(unsigned maxObstacles)
     engine->RegisterObjectMethod(className, "void SetMaxObstacles(uint)", AS_METHODPR(T, SetMaxObstacles, (unsigned), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_maxObstacles(uint)", AS_METHODPR(T, SetMaxObstacles, (unsigned), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_DynamicNavigationMesh
         REGISTER_MEMBERS_MANUAL_PART_DynamicNavigationMesh();
     #endif
@@ -21020,6 +23952,25 @@ template <class T> void RegisterMembers_RaycastVehicle(asIScriptEngine* engine, 
 
     // bool RaycastVehicle::WheelIsGrounded(int wheel) const
     engine->RegisterObjectMethod(className, "bool WheelIsGrounded(int) const", AS_METHODPR(T, WheelIsGrounded, (int) const, bool), AS_CALL_THISCALL);
+
+    // static const IntVector3 RaycastVehicle::RIGHT_UP_FORWARD
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const IntVector3 RIGHT_UP_FORWARD", (void*)&T::RIGHT_UP_FORWARD);engine->SetDefaultNamespace("");
+
+    // static const IntVector3 RaycastVehicle::RIGHT_FORWARD_UP
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const IntVector3 RIGHT_FORWARD_UP", (void*)&T::RIGHT_FORWARD_UP);engine->SetDefaultNamespace("");
+
+    // static const IntVector3 RaycastVehicle::UP_FORWARD_RIGHT
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const IntVector3 UP_FORWARD_RIGHT", (void*)&T::UP_FORWARD_RIGHT);engine->SetDefaultNamespace("");
+
+    // static const IntVector3 RaycastVehicle::UP_RIGHT_FORWARD
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const IntVector3 UP_RIGHT_FORWARD", (void*)&T::UP_RIGHT_FORWARD);engine->SetDefaultNamespace("");
+
+    // static const IntVector3 RaycastVehicle::FORWARD_RIGHT_UP
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const IntVector3 FORWARD_RIGHT_UP", (void*)&T::FORWARD_RIGHT_UP);engine->SetDefaultNamespace("");
+
+    // static const IntVector3 RaycastVehicle::FORWARD_UP_RIGHT
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const IntVector3 FORWARD_UP_RIGHT", (void*)&T::FORWARD_UP_RIGHT);engine->SetDefaultNamespace("");
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_RaycastVehicle
         REGISTER_MEMBERS_MANUAL_PART_RaycastVehicle();
     #endif
@@ -21063,6 +24014,7 @@ template <class T> void RegisterMembers_CollisionBox2D(asIScriptEngine* engine, 
 
     // void CollisionBox2D::SetSize(float width, float height)
     engine->RegisterObjectMethod(className, "void SetSize(float, float)", AS_METHODPR(T, SetSize, (float, float), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_CollisionBox2D
         REGISTER_MEMBERS_MANUAL_PART_CollisionBox2D();
     #endif
@@ -21119,6 +24071,7 @@ template <class T> void RegisterMembers_CollisionChain2D(asIScriptEngine* engine
 
     // void CollisionChain2D::SetVertices(const PODVector<Vector2>& vertices)
     engine->RegisterObjectMethod(className, "void SetVertices(Array<Vector2>@+)", AS_FUNCTION_OBJFIRST(CollisionChain2D_void_SetVertices_constspPODVectorlesVector2greamp_template<CollisionChain2D>), AS_CALL_CDECL_OBJFIRST);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_CollisionChain2D
         REGISTER_MEMBERS_MANUAL_PART_CollisionChain2D();
     #endif
@@ -21147,6 +24100,7 @@ template <class T> void RegisterMembers_CollisionCircle2D(asIScriptEngine* engin
     // void CollisionCircle2D::SetRadius(float radius)
     engine->RegisterObjectMethod(className, "void SetRadius(float)", AS_METHODPR(T, SetRadius, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_radius(float)", AS_METHODPR(T, SetRadius, (float), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_CollisionCircle2D
         REGISTER_MEMBERS_MANUAL_PART_CollisionCircle2D();
     #endif
@@ -21175,6 +24129,7 @@ template <class T> void RegisterMembers_CollisionEdge2D(asIScriptEngine* engine,
 
     // void CollisionEdge2D::SetVertices(const Vector2& vertex1, const Vector2& vertex2)
     engine->RegisterObjectMethod(className, "void SetVertices(const Vector2&in, const Vector2&in)", AS_METHODPR(T, SetVertices, (const Vector2&, const Vector2&), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_CollisionEdge2D
         REGISTER_MEMBERS_MANUAL_PART_CollisionEdge2D();
     #endif
@@ -21223,6 +24178,7 @@ template <class T> void RegisterMembers_CollisionPolygon2D(asIScriptEngine* engi
 
     // void CollisionPolygon2D::SetVertices(const PODVector<Vector2>& vertices)
     engine->RegisterObjectMethod(className, "void SetVertices(Array<Vector2>@+)", AS_FUNCTION_OBJFIRST(CollisionPolygon2D_void_SetVertices_constspPODVectorlesVector2greamp_template<CollisionPolygon2D>), AS_CALL_CDECL_OBJFIRST);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_CollisionPolygon2D
         REGISTER_MEMBERS_MANUAL_PART_CollisionPolygon2D();
     #endif
@@ -21272,6 +24228,7 @@ template <class T> void RegisterMembers_ConstraintDistance2D(asIScriptEngine* en
     // void ConstraintDistance2D::SetOwnerBodyAnchor(const Vector2& anchor)
     engine->RegisterObjectMethod(className, "void SetOwnerBodyAnchor(const Vector2&in)", AS_METHODPR(T, SetOwnerBodyAnchor, (const Vector2&), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_ownerBodyAnchor(const Vector2&in)", AS_METHODPR(T, SetOwnerBodyAnchor, (const Vector2&), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ConstraintDistance2D
         REGISTER_MEMBERS_MANUAL_PART_ConstraintDistance2D();
     #endif
@@ -21305,6 +24262,7 @@ template <class T> void RegisterMembers_ConstraintFriction2D(asIScriptEngine* en
     // void ConstraintFriction2D::SetMaxTorque(float maxTorque)
     engine->RegisterObjectMethod(className, "void SetMaxTorque(float)", AS_METHODPR(T, SetMaxTorque, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_maxTorque(float)", AS_METHODPR(T, SetMaxTorque, (float), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ConstraintFriction2D
         REGISTER_MEMBERS_MANUAL_PART_ConstraintFriction2D();
     #endif
@@ -21338,6 +24296,7 @@ template <class T> void RegisterMembers_ConstraintGear2D(asIScriptEngine* engine
     // void ConstraintGear2D::SetRatio(float ratio)
     engine->RegisterObjectMethod(className, "void SetRatio(float)", AS_METHODPR(T, SetRatio, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_ratio(float)", AS_METHODPR(T, SetRatio, (float), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ConstraintGear2D
         REGISTER_MEMBERS_MANUAL_PART_ConstraintGear2D();
     #endif
@@ -21387,6 +24346,7 @@ template <class T> void RegisterMembers_ConstraintMotor2D(asIScriptEngine* engin
     // void ConstraintMotor2D::SetMaxTorque(float maxTorque)
     engine->RegisterObjectMethod(className, "void SetMaxTorque(float)", AS_METHODPR(T, SetMaxTorque, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_maxTorque(float)", AS_METHODPR(T, SetMaxTorque, (float), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ConstraintMotor2D
         REGISTER_MEMBERS_MANUAL_PART_ConstraintMotor2D();
     #endif
@@ -21428,6 +24388,7 @@ template <class T> void RegisterMembers_ConstraintMouse2D(asIScriptEngine* engin
     // void ConstraintMouse2D::SetTarget(const Vector2& target)
     engine->RegisterObjectMethod(className, "void SetTarget(const Vector2&in)", AS_METHODPR(T, SetTarget, (const Vector2&), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_target(const Vector2&in)", AS_METHODPR(T, SetTarget, (const Vector2&), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ConstraintMouse2D
         REGISTER_MEMBERS_MANUAL_PART_ConstraintMouse2D();
     #endif
@@ -21501,6 +24462,7 @@ template <class T> void RegisterMembers_ConstraintPrismatic2D(asIScriptEngine* e
     // void ConstraintPrismatic2D::SetUpperTranslation(float upperTranslation)
     engine->RegisterObjectMethod(className, "void SetUpperTranslation(float)", AS_METHODPR(T, SetUpperTranslation, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_upperTranslation(float)", AS_METHODPR(T, SetUpperTranslation, (float), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ConstraintPrismatic2D
         REGISTER_MEMBERS_MANUAL_PART_ConstraintPrismatic2D();
     #endif
@@ -21550,6 +24512,7 @@ template <class T> void RegisterMembers_ConstraintPulley2D(asIScriptEngine* engi
     // void ConstraintPulley2D::SetRatio(float ratio)
     engine->RegisterObjectMethod(className, "void SetRatio(float)", AS_METHODPR(T, SetRatio, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_ratio(float)", AS_METHODPR(T, SetRatio, (float), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ConstraintPulley2D
         REGISTER_MEMBERS_MANUAL_PART_ConstraintPulley2D();
     #endif
@@ -21615,6 +24578,7 @@ template <class T> void RegisterMembers_ConstraintRevolute2D(asIScriptEngine* en
     // void ConstraintRevolute2D::SetUpperAngle(float upperAngle)
     engine->RegisterObjectMethod(className, "void SetUpperAngle(float)", AS_METHODPR(T, SetUpperAngle, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_upperAngle(float)", AS_METHODPR(T, SetUpperAngle, (float), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ConstraintRevolute2D
         REGISTER_MEMBERS_MANUAL_PART_ConstraintRevolute2D();
     #endif
@@ -21648,6 +24612,7 @@ template <class T> void RegisterMembers_ConstraintRope2D(asIScriptEngine* engine
     // void ConstraintRope2D::SetOwnerBodyAnchor(const Vector2& anchor)
     engine->RegisterObjectMethod(className, "void SetOwnerBodyAnchor(const Vector2&in)", AS_METHODPR(T, SetOwnerBodyAnchor, (const Vector2&), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_ownerBodyAnchor(const Vector2&in)", AS_METHODPR(T, SetOwnerBodyAnchor, (const Vector2&), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ConstraintRope2D
         REGISTER_MEMBERS_MANUAL_PART_ConstraintRope2D();
     #endif
@@ -21681,6 +24646,7 @@ template <class T> void RegisterMembers_ConstraintWeld2D(asIScriptEngine* engine
     // void ConstraintWeld2D::SetFrequencyHz(float frequencyHz)
     engine->RegisterObjectMethod(className, "void SetFrequencyHz(float)", AS_METHODPR(T, SetFrequencyHz, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_frequencyHz(float)", AS_METHODPR(T, SetFrequencyHz, (float), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ConstraintWeld2D
         REGISTER_MEMBERS_MANUAL_PART_ConstraintWeld2D();
     #endif
@@ -21746,6 +24712,7 @@ template <class T> void RegisterMembers_ConstraintWheel2D(asIScriptEngine* engin
     // void ConstraintWheel2D::SetMotorSpeed(float motorSpeed)
     engine->RegisterObjectMethod(className, "void SetMotorSpeed(float)", AS_METHODPR(T, SetMotorSpeed, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_motorSpeed(float)", AS_METHODPR(T, SetMotorSpeed, (float), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ConstraintWheel2D
         REGISTER_MEMBERS_MANUAL_PART_ConstraintWheel2D();
     #endif
@@ -21774,6 +24741,7 @@ template <class T> void RegisterMembers_Drawable2D(asIScriptEngine* engine, cons
     // void Drawable2D::SetOrderInLayer(int orderInLayer)
     engine->RegisterObjectMethod(className, "void SetOrderInLayer(int)", AS_METHODPR(T, SetOrderInLayer, (int), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_orderInLayer(int)", AS_METHODPR(T, SetOrderInLayer, (int), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Drawable2D
         REGISTER_MEMBERS_MANUAL_PART_Drawable2D();
     #endif
@@ -21798,6 +24766,7 @@ template <class T> void RegisterMembers_Renderer2D(asIScriptEngine* engine, cons
 
     // virtual void Drawable::Update(const FrameInfo& frame)
     engine->RegisterObjectMethod(className, "void Update(const FrameInfo&in)", AS_METHODPR(T, Update, (const FrameInfo&), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Renderer2D
         REGISTER_MEMBERS_MANUAL_PART_Renderer2D();
     #endif
@@ -21945,6 +24914,7 @@ template <class T> void RegisterMembers_AnimatedModel(asIScriptEngine* engine, c
 
     // void AnimatedModel::UpdateBoneBoundingBox()
     engine->RegisterObjectMethod(className, "void UpdateBoneBoundingBox()", AS_METHODPR(T, UpdateBoneBoundingBox, (), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_AnimatedModel
         REGISTER_MEMBERS_MANUAL_PART_AnimatedModel();
     #endif
@@ -21998,6 +24968,7 @@ template <class T> void RegisterMembers_Menu(asIScriptEngine* engine, const char
     // void Menu::ShowPopup(bool enable)
     engine->RegisterObjectMethod(className, "void ShowPopup(bool)", AS_METHODPR(T, ShowPopup, (bool), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_showPopup(bool)", AS_METHODPR(T, ShowPopup, (bool), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Menu
         REGISTER_MEMBERS_MANUAL_PART_Menu();
     #endif
@@ -22072,6 +25043,7 @@ template <class T> void RegisterMembers_ParticleEmitter(asIScriptEngine* engine,
     // void ParticleEmitter::SetSerializeParticles(bool enable)
     engine->RegisterObjectMethod(className, "void SetSerializeParticles(bool)", AS_METHODPR(T, SetSerializeParticles, (bool), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_serializeParticles(bool)", AS_METHODPR(T, SetSerializeParticles, (bool), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ParticleEmitter
         REGISTER_MEMBERS_MANUAL_PART_ParticleEmitter();
     #endif
@@ -22084,6 +25056,7 @@ template <class T> void RegisterMembers_Skybox(asIScriptEngine* engine, const ch
 
     // virtual void StaticModel::SetModel(Model* model)
     // Not registered because have @manualbind mark
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Skybox
         REGISTER_MEMBERS_MANUAL_PART_Skybox();
     #endif
@@ -22117,6 +25090,7 @@ template <class T> void RegisterMembers_StaticModelGroup(asIScriptEngine* engine
 
     // void StaticModelGroup::RemoveInstanceNode(Node* node)
     engine->RegisterObjectMethod(className, "void RemoveInstanceNode(Node@+)", AS_METHODPR(T, RemoveInstanceNode, (Node*), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_StaticModelGroup
         REGISTER_MEMBERS_MANUAL_PART_StaticModelGroup();
     #endif
@@ -22168,6 +25142,7 @@ template <class T> void RegisterMembers_View3D(asIScriptEngine* engine, const ch
 
     // void View3D::SetView(Scene* scene, Camera* camera, bool ownScene = true)
     engine->RegisterObjectMethod(className, "void SetView(Scene@+, Camera@+, bool = true)", AS_METHODPR(T, SetView, (Scene*, Camera*, bool), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_View3D
         REGISTER_MEMBERS_MANUAL_PART_View3D();
     #endif
@@ -22229,6 +25204,7 @@ template <class T> void RegisterMembers_ParticleEmitter2D(asIScriptEngine* engin
 
     // void ParticleEmitter2D::SetSpriteAttr(const ResourceRef& value)
     engine->RegisterObjectMethod(className, "void SetSpriteAttr(const ResourceRef&in)", AS_METHODPR(T, SetSpriteAttr, (const ResourceRef&), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ParticleEmitter2D
         REGISTER_MEMBERS_MANUAL_PART_ParticleEmitter2D();
     #endif
@@ -22368,6 +25344,7 @@ template <class T> void RegisterMembers_StaticSprite2D(asIScriptEngine* engine, 
 
     // virtual void Drawable::Update(const FrameInfo& frame)
     engine->RegisterObjectMethod(className, "void Update(const FrameInfo&in)", AS_METHODPR(T, Update, (const FrameInfo&), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_StaticSprite2D
         REGISTER_MEMBERS_MANUAL_PART_StaticSprite2D();
     #endif
@@ -22451,6 +25428,7 @@ template <class T> void RegisterMembers_DropDownList(asIScriptEngine* engine, co
 
     // void DropDownList::SetSelectionAttr(unsigned index)
     engine->RegisterObjectMethod(className, "void SetSelectionAttr(uint)", AS_METHODPR(T, SetSelectionAttr, (unsigned), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_DropDownList
         REGISTER_MEMBERS_MANUAL_PART_DropDownList();
     #endif
@@ -22511,6 +25489,7 @@ template <class T> void RegisterMembers_AnimatedSprite2D(asIScriptEngine* engine
     // void AnimatedSprite2D::SetSpeed(float speed)
     engine->RegisterObjectMethod(className, "void SetSpeed(float)", AS_METHODPR(T, SetSpeed, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_speed(float)", AS_METHODPR(T, SetSpeed, (float), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_AnimatedSprite2D
         REGISTER_MEMBERS_MANUAL_PART_AnimatedSprite2D();
     #endif
@@ -22528,6 +25507,7 @@ template <class T> void RegisterMembers_StretchableSprite2D(asIScriptEngine* eng
     // void StretchableSprite2D::SetBorder(const IntRect& border)
     engine->RegisterObjectMethod(className, "void SetBorder(const IntRect&in)", AS_METHODPR(T, SetBorder, (const IntRect&), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_border(const IntRect&in)", AS_METHODPR(T, SetBorder, (const IntRect&), void), AS_CALL_THISCALL);
+
     #ifdef REGISTER_MEMBERS_MANUAL_PART_StretchableSprite2D
         REGISTER_MEMBERS_MANUAL_PART_StretchableSprite2D();
     #endif

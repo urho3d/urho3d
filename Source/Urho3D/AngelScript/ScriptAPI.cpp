@@ -27,7 +27,6 @@
 #include "../AngelScript/ScriptFile.h"
 #include "../Resource/ResourceCache.h"
 //#include "../AngelScript/Generated_Templates.h"
-#include "../AngelScript/GeneratedClassMembers.h"
 #include "../AngelScript/Generated_Members.h"
 
 namespace Urho3D
@@ -106,10 +105,7 @@ static void RegisterScriptFile(asIScriptEngine* engine)
 
     engine->RegisterObjectType("ScriptFile", 0, asOBJ_REF);
 
-    MemberCollection members;
-    CollectMembers_Resource(members);
     RegisterMembers_Resource<ScriptFile>(engine, "ScriptFile");
-    RegisterMembers(engine, "ScriptFile", members);
 
     engine->RegisterObjectBehaviour("ScriptFile", asBEHAVE_FACTORY, "ScriptFile@+ f()", AS_FUNCTION(ScriptFile_ScriptFile_Context), AS_CALL_CDECL);
 
@@ -271,10 +267,7 @@ static void RegisterScriptInstance(asIScriptEngine* engine)
     engine->RegisterObjectType("ScriptInstance", 0, asOBJ_REF);
     engine->RegisterObjectBehaviour("ScriptInstance", asBEHAVE_FACTORY, "ScriptInstance@+ f()", AS_FUNCTION(ScriptInstance_ScriptInstance_Context), AS_CALL_CDECL);
 
-    MemberCollection members;
-    CollectMembers_Component(members);
     RegisterMembers_Component<ScriptInstance>(engine, "ScriptInstance");
-    RegisterMembers(engine, "ScriptInstance", members);
 
     RegisterSubclass<Component, ScriptInstance>(engine, "Component", "ScriptInstance");
     RegisterSubclass<Animatable, ScriptInstance>(engine, "Animatable", "ScriptInstance");
@@ -339,10 +332,7 @@ static void RegisterScript(asIScriptEngine* engine)
 
     engine->RegisterObjectType("Script", 0, asOBJ_REF);
     engine->RegisterObjectBehaviour("Script", asBEHAVE_FACTORY, "Script@+ f()", AS_FUNCTION(Script_Script_Context), AS_CALL_CDECL);
-    MemberCollection members;
-    CollectMembers_Object(members);
     RegisterMembers_Object<Script>(engine, "Script");
-    RegisterMembers(engine, "Script", members);
 
     engine->RegisterObjectMethod("Script", "bool Execute(const String&in)", AS_METHOD(Script, Execute), AS_CALL_THISCALL);
     engine->RegisterObjectMethod("Script", "void DumpAPI(DumpMode mode = DOXYGEN, const String&in sourceTree = String())", AS_METHOD(Script, DumpAPI), AS_CALL_THISCALL);
