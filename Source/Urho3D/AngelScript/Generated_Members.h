@@ -11541,9 +11541,6 @@ template <class T> void RegisterMembers_Resource(asIScriptEngine* engine, const 
 {
     RegisterMembers_Object<T>(engine, className);
 
-    // bool Resource::Load(Deserializer& source)
-    // Can not be registered here bacause hidden in derived classes: Material, ParticleEffect
-
     // virtual bool Resource::BeginLoad(Deserializer& source)
     engine->RegisterObjectMethod(className, "bool BeginLoad(Deserializer&)", AS_METHODPR(T, BeginLoad, (Deserializer&), bool), AS_CALL_THISCALL);
 
@@ -11567,6 +11564,9 @@ template <class T> void RegisterMembers_Resource(asIScriptEngine* engine, const 
     // unsigned Resource::GetUseTimer()
     engine->RegisterObjectMethod(className, "uint GetUseTimer()", AS_METHODPR(T, GetUseTimer, (), unsigned), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_useTimer()", AS_METHODPR(T, GetUseTimer, (), unsigned), AS_CALL_THISCALL);
+
+    // bool Resource::Load(Deserializer& source)
+    engine->RegisterObjectMethod(className, "bool Load(Deserializer&)", AS_METHODPR(T, Load, (Deserializer&), bool), AS_CALL_THISCALL);
 
     // bool Resource::LoadFile(const String& fileName)
     engine->RegisterObjectMethod(className, "bool LoadFile(const String&in)", AS_METHODPR(T, LoadFile, (const String&), bool), AS_CALL_THISCALL);
@@ -11824,8 +11824,6 @@ template <class T> void RegisterMembers_Serializable(asIScriptEngine* engine, co
     // Error: type "const Vector<AttributeInfo>*" can not automatically bind
     // NetworkState* Serializable::GetNetworkState() const
     // Error: type "NetworkState*" can not automatically bind
-    // virtual bool Serializable::LoadXML(const XMLElement& source)
-    // Can not be registered here bacause hidden in derived classes: Menu, DropDownList
 
     // void Serializable::AllocateNetworkState()
     engine->RegisterObjectMethod(className, "void AllocateNetworkState()", AS_METHODPR(T, AllocateNetworkState, (), void), AS_CALL_THISCALL);
@@ -11866,6 +11864,9 @@ template <class T> void RegisterMembers_Serializable(asIScriptEngine* engine, co
 
     // virtual bool Serializable::LoadJSON(const JSONValue& source)
     engine->RegisterObjectMethod(className, "bool LoadJSON(const JSONValue&in)", AS_METHODPR(T, LoadJSON, (const JSONValue&), bool), AS_CALL_THISCALL);
+
+    // virtual bool Serializable::LoadXML(const XMLElement& source)
+    engine->RegisterObjectMethod(className, "bool LoadXML(const XMLElement&in)", AS_METHODPR(T, LoadXML, (const XMLElement&), bool), AS_CALL_THISCALL);
 
     // virtual void Serializable::MarkNetworkUpdate()
     engine->RegisterObjectMethod(className, "void MarkNetworkUpdate()", AS_METHODPR(T, MarkNetworkUpdate, (), void), AS_CALL_THISCALL);
@@ -13227,9 +13228,6 @@ template <class T> void RegisterMembers_Animatable(asIScriptEngine* engine, cons
 {
     RegisterMembers_Serializable<T>(engine, className);
 
-    // bool Animatable::LoadXML(const XMLElement& source) override
-    // Can not be registered here bacause hidden in derived classes: Menu, DropDownList
-
     // bool Animatable::GetAnimationEnabled() const
     engine->RegisterObjectMethod(className, "bool GetAnimationEnabled() const", AS_METHODPR(T, GetAnimationEnabled, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_animationEnabled() const", AS_METHODPR(T, GetAnimationEnabled, () const, bool), AS_CALL_THISCALL);
@@ -13337,9 +13335,6 @@ template <class T> void RegisterMembers_Font(asIScriptEngine* engine, const char
 
     // bool Font::IsSDFFont() const
     engine->RegisterObjectMethod(className, "bool IsSDFFont() const", AS_METHODPR(T, IsSDFFont, () const, bool), AS_CALL_THISCALL);
-
-    // bool Resource::Load(Deserializer& source)
-    engine->RegisterObjectMethod(className, "bool Load(Deserializer&)", AS_METHODPR(T, Load, (Deserializer&), bool), AS_CALL_THISCALL);
 
     // void Font::ReleaseFaces()
     engine->RegisterObjectMethod(className, "void ReleaseFaces()", AS_METHODPR(T, ReleaseFaces, (), void), AS_CALL_THISCALL);
@@ -13502,9 +13497,6 @@ template <class T> void RegisterMembers_Image(asIScriptEngine* engine, const cha
     engine->RegisterObjectMethod(className, "bool IsSRGB() const", AS_METHODPR(T, IsSRGB, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_sRGB() const", AS_METHODPR(T, IsSRGB, () const, bool), AS_CALL_THISCALL);
 
-    // bool Resource::Load(Deserializer& source)
-    engine->RegisterObjectMethod(className, "bool Load(Deserializer&)", AS_METHODPR(T, Load, (Deserializer&), bool), AS_CALL_THISCALL);
-
     // bool Image::LoadColorLUT(Deserializer& source)
     engine->RegisterObjectMethod(className, "bool LoadColorLUT(Deserializer&)", AS_METHODPR(T, LoadColorLUT, (Deserializer&), bool), AS_CALL_THISCALL);
 
@@ -13575,9 +13567,6 @@ template <class T> void RegisterMembers_JSONFile(asIScriptEngine* engine, const 
 
     // const JSONValue& JSONFile::GetRoot() const
     engine->RegisterObjectMethod(className, "const JSONValue& GetRoot() const", AS_METHODPR(T, GetRoot, () const, const JSONValue&), AS_CALL_THISCALL);
-
-    // bool Resource::Load(Deserializer& source)
-    engine->RegisterObjectMethod(className, "bool Load(Deserializer&)", AS_METHODPR(T, Load, (Deserializer&), bool), AS_CALL_THISCALL);
 
     // bool JSONFile::Save(Serializer& dest, const String& indendation) const
     engine->RegisterObjectMethod(className, "bool Save(Serializer&, const String&in) const", AS_METHODPR(T, Save, (Serializer&, const String&) const, bool), AS_CALL_THISCALL);
@@ -13836,9 +13825,6 @@ template <class T> void RegisterMembers_ObjectAnimation(asIScriptEngine* engine,
     // WrapMode ObjectAnimation::GetAttributeAnimationWrapMode(const String& name) const
     engine->RegisterObjectMethod(className, "WrapMode GetAttributeAnimationWrapMode(const String&in) const", AS_METHODPR(T, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "WrapMode get_wrapModes(const String&in) const", AS_METHODPR(T, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), AS_CALL_THISCALL);
-
-    // bool Resource::Load(Deserializer& source)
-    engine->RegisterObjectMethod(className, "bool Load(Deserializer&)", AS_METHODPR(T, Load, (Deserializer&), bool), AS_CALL_THISCALL);
 
     // bool ObjectAnimation::LoadJSON(const JSONValue& source)
     engine->RegisterObjectMethod(className, "bool LoadJSON(const JSONValue&in)", AS_METHODPR(T, LoadJSON, (const JSONValue&), bool), AS_CALL_THISCALL);
@@ -14239,9 +14225,6 @@ template <class T> void RegisterMembers_ResourceWithMetadata(asIScriptEngine* en
     engine->RegisterObjectMethod(className, "bool HasMetadata() const", AS_METHODPR(T, HasMetadata, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_hasMetadata() const", AS_METHODPR(T, HasMetadata, () const, bool), AS_CALL_THISCALL);
 
-    // bool Resource::Load(Deserializer& source)
-    engine->RegisterObjectMethod(className, "bool Load(Deserializer&)", AS_METHODPR(T, Load, (Deserializer&), bool), AS_CALL_THISCALL);
-
     // void ResourceWithMetadata::RemoveAllMetadata()
     engine->RegisterObjectMethod(className, "void RemoveAllMetadata()", AS_METHODPR(T, RemoveAllMetadata, (), void), AS_CALL_THISCALL);
 
@@ -14269,9 +14252,6 @@ template <class T> void RegisterMembers_Shader(asIScriptEngine* engine, const ch
 
     // ShaderVariation* Shader::GetVariation(ShaderType type, const String& defines)
     engine->RegisterObjectMethod(className, "ShaderVariation@+ GetVariation(ShaderType, const String&in)", AS_METHODPR(T, GetVariation, (ShaderType, const String&), ShaderVariation*), AS_CALL_THISCALL);
-
-    // bool Resource::Load(Deserializer& source)
-    engine->RegisterObjectMethod(className, "bool Load(Deserializer&)", AS_METHODPR(T, Load, (Deserializer&), bool), AS_CALL_THISCALL);
 
     // static void Shader::RegisterObject(Context* context)
     // Not registered because have @nobind mark
@@ -14361,9 +14341,6 @@ template <class T> void RegisterMembers_Technique(asIScriptEngine* engine, const
     engine->RegisterObjectMethod(className, "bool IsSupported() const", AS_METHODPR(T, IsSupported, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_supported() const", AS_METHODPR(T, IsSupported, () const, bool), AS_CALL_THISCALL);
 
-    // bool Resource::Load(Deserializer& source)
-    engine->RegisterObjectMethod(className, "bool Load(Deserializer&)", AS_METHODPR(T, Load, (Deserializer&), bool), AS_CALL_THISCALL);
-
     // void Technique::ReleaseShaders()
     engine->RegisterObjectMethod(className, "void ReleaseShaders()", AS_METHODPR(T, ReleaseShaders, (), void), AS_CALL_THISCALL);
 
@@ -14450,9 +14427,6 @@ template <class T> void RegisterMembers_ValueAnimation(asIScriptEngine* engine, 
     // bool ValueAnimation::IsValid() const
     engine->RegisterObjectMethod(className, "bool IsValid() const", AS_METHODPR(T, IsValid, () const, bool), AS_CALL_THISCALL);
 
-    // bool Resource::Load(Deserializer& source)
-    engine->RegisterObjectMethod(className, "bool Load(Deserializer&)", AS_METHODPR(T, Load, (Deserializer&), bool), AS_CALL_THISCALL);
-
     // bool ValueAnimation::LoadJSON(const JSONValue& source)
     engine->RegisterObjectMethod(className, "bool LoadJSON(const JSONValue&in)", AS_METHODPR(T, LoadJSON, (const JSONValue&), bool), AS_CALL_THISCALL);
 
@@ -14511,9 +14485,6 @@ template <class T> void RegisterMembers_XMLFile(asIScriptEngine* engine, const c
     // XMLElement XMLFile::GetRoot(const String& name = String::EMPTY)
     engine->RegisterObjectMethod(className, "XMLElement GetRoot(const String&in = String::EMPTY)", AS_METHODPR(T, GetRoot, (const String&), XMLElement), AS_CALL_THISCALL);
 
-    // bool Resource::Load(Deserializer& source)
-    engine->RegisterObjectMethod(className, "bool Load(Deserializer&)", AS_METHODPR(T, Load, (Deserializer&), bool), AS_CALL_THISCALL);
-
     // void XMLFile::Patch(XMLFile* patchFile)
     engine->RegisterObjectMethod(className, "void Patch(XMLFile@+)", AS_METHODPR(T, Patch, (XMLFile*), void), AS_CALL_THISCALL);
 
@@ -14559,9 +14530,6 @@ template <class T> void RegisterMembers_AnimationSet2D(asIScriptEngine* engine, 
 
     // bool AnimationSet2D::HasAnimation(const String& animationName) const
     engine->RegisterObjectMethod(className, "bool HasAnimation(const String&in) const", AS_METHODPR(T, HasAnimation, (const String&) const, bool), AS_CALL_THISCALL);
-
-    // bool Resource::Load(Deserializer& source)
-    engine->RegisterObjectMethod(className, "bool Load(Deserializer&)", AS_METHODPR(T, Load, (Deserializer&), bool), AS_CALL_THISCALL);
 
     // static void AnimationSet2D::RegisterObject(Context* context)
     // Not registered because have @nobind mark
@@ -14690,9 +14658,6 @@ template <class T> void RegisterMembers_ParticleEffect2D(asIScriptEngine* engine
 
     // float ParticleEffect2D::GetTangentialAccelVariance() const
     engine->RegisterObjectMethod(className, "float GetTangentialAccelVariance() const", AS_METHODPR(T, GetTangentialAccelVariance, () const, float), AS_CALL_THISCALL);
-
-    // bool Resource::Load(Deserializer& source)
-    engine->RegisterObjectMethod(className, "bool Load(Deserializer&)", AS_METHODPR(T, Load, (Deserializer&), bool), AS_CALL_THISCALL);
 
     // void ParticleEffect2D::SetAngle(float angle)
     engine->RegisterObjectMethod(className, "void SetAngle(float)", AS_METHODPR(T, SetAngle, (float), void), AS_CALL_THISCALL);
@@ -14844,9 +14809,6 @@ template <class T> void RegisterMembers_Sprite2D(asIScriptEngine* engine, const 
     // bool Sprite2D::GetTextureRectangle(Rect& rect, bool flipX = false, bool flipY = false) const
     engine->RegisterObjectMethod(className, "bool GetTextureRectangle(Rect&, bool = false, bool = false) const", AS_METHODPR(T, GetTextureRectangle, (Rect&, bool, bool) const, bool), AS_CALL_THISCALL);
 
-    // bool Resource::Load(Deserializer& source)
-    engine->RegisterObjectMethod(className, "bool Load(Deserializer&)", AS_METHODPR(T, Load, (Deserializer&), bool), AS_CALL_THISCALL);
-
     // void Sprite2D::SetHotSpot(const Vector2& hotSpot)
     engine->RegisterObjectMethod(className, "void SetHotSpot(const Vector2&in)", AS_METHODPR(T, SetHotSpot, (const Vector2&), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_hotSpot(const Vector2&in)", AS_METHODPR(T, SetHotSpot, (const Vector2&), void), AS_CALL_THISCALL);
@@ -14902,9 +14864,6 @@ template <class T> void RegisterMembers_SpriteSheet2D(asIScriptEngine* engine, c
     engine->RegisterObjectMethod(className, "Texture2D@+ GetTexture() const", AS_METHODPR(T, GetTexture, () const, Texture2D*), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "Texture2D@+ get_texture() const", AS_METHODPR(T, GetTexture, () const, Texture2D*), AS_CALL_THISCALL);
 
-    // bool Resource::Load(Deserializer& source)
-    engine->RegisterObjectMethod(className, "bool Load(Deserializer&)", AS_METHODPR(T, Load, (Deserializer&), bool), AS_CALL_THISCALL);
-
     // void SpriteSheet2D::SetTexture(Texture2D* texture)
     engine->RegisterObjectMethod(className, "void SetTexture(Texture2D@+)", AS_METHODPR(T, SetTexture, (Texture2D*), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_texture(Texture2D@+)", AS_METHODPR(T, SetTexture, (Texture2D*), void), AS_CALL_THISCALL);
@@ -14956,9 +14915,6 @@ template <class T> void RegisterMembers_TmxFile2D(asIScriptEngine* engine, const
 
     // Sprite2D* TmxFile2D::GetTileSprite(unsigned gid) const
     engine->RegisterObjectMethod(className, "Sprite2D@+ GetTileSprite(uint) const", AS_METHODPR(T, GetTileSprite, (unsigned) const, Sprite2D*), AS_CALL_THISCALL);
-
-    // bool Resource::Load(Deserializer& source)
-    engine->RegisterObjectMethod(className, "bool Load(Deserializer&)", AS_METHODPR(T, Load, (Deserializer&), bool), AS_CALL_THISCALL);
 
     // bool TmxFile2D::SetInfo(Orientation2D orientation, int width, int height, float tileWidth, float tileHeight)
     engine->RegisterObjectMethod(className, "bool SetInfo(Orientation2D, int, int, float, float)", AS_METHODPR(T, SetInfo, (Orientation2D, int, int, float, float), bool), AS_CALL_THISCALL);
@@ -15114,9 +15070,6 @@ template <class T> void RegisterMembers_Component(asIScriptEngine* engine, const
     // bool Component::IsReplicated() const
     engine->RegisterObjectMethod(className, "bool IsReplicated() const", AS_METHODPR(T, IsReplicated, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_replicated() const", AS_METHODPR(T, IsReplicated, () const, bool), AS_CALL_THISCALL);
-
-    // bool Animatable::LoadXML(const XMLElement& source) override
-    engine->RegisterObjectMethod(className, "bool LoadXML(const XMLElement&in)", AS_METHODPR(T, LoadXML, (const XMLElement&), bool), AS_CALL_THISCALL);
 
     // void Component::PrepareNetworkUpdate()
     engine->RegisterObjectMethod(className, "void PrepareNetworkUpdate()", AS_METHODPR(T, PrepareNetworkUpdate, (), void), AS_CALL_THISCALL);
@@ -15622,9 +15575,6 @@ template <class T> void RegisterMembers_Node(asIScriptEngine* engine, const char
     // bool Node::IsReplicated() const
     engine->RegisterObjectMethod(className, "bool IsReplicated() const", AS_METHODPR(T, IsReplicated, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_replicated() const", AS_METHODPR(T, IsReplicated, () const, bool), AS_CALL_THISCALL);
-
-    // bool Node::LoadXML(const XMLElement& source) override
-    engine->RegisterObjectMethod(className, "bool LoadXML(const XMLElement&in)", AS_METHODPR(T, LoadXML, (const XMLElement&), bool), AS_CALL_THISCALL);
 
     // Vector3 Node::LocalToWorld(const Vector3& position) const
     engine->RegisterObjectMethod(className, "Vector3 LocalToWorld(const Vector3&in) const", AS_METHODPR(T, LocalToWorld, (const Vector3&) const, Vector3), AS_CALL_THISCALL);
@@ -16280,12 +16230,6 @@ template <class T> void RegisterMembers_UIElement(asIScriptEngine* engine, const
     // Can not be registered here bacause hidden in derived classes: Sprite
     // bool UIElement::IsSelected() const
     // Can not be registered here bacause hidden in derived classes: ListView
-    // bool UIElement::LoadXML(const XMLElement& source) override
-    // Can not be registered here bacause hidden in derived classes: Menu, DropDownList
-    // bool UIElement::LoadXML(Deserializer& source)
-    // Can not be registered here bacause hidden in derived classes: Menu, DropDownList
-    // bool UIElement::SaveXML(Serializer& dest, const String& indentation = "\t") const
-    // Can not be registered here bacause hidden in derived classes: Menu, DropDownList
     // void UIElement::SetPosition(const IntVector2& position)
     // Can not be registered here bacause hidden in derived classes: Sprite
     // void UIElement::SetPosition(int x, int y)
@@ -16640,6 +16584,9 @@ template <class T> void RegisterMembers_UIElement(asIScriptEngine* engine, const
     // virtual bool UIElement::LoadXML(const XMLElement& source, XMLFile* styleFile)
     engine->RegisterObjectMethod(className, "bool LoadXML(const XMLElement&in, XMLFile@+)", AS_METHODPR(T, LoadXML, (const XMLElement&, XMLFile*), bool), AS_CALL_THISCALL);
 
+    // bool UIElement::LoadXML(Deserializer& source)
+    engine->RegisterObjectMethod(className, "bool LoadXML(Deserializer&)", AS_METHODPR(T, LoadXML, (Deserializer&), bool), AS_CALL_THISCALL);
+
     // virtual void UIElement::OnClickBegin(const IntVector2& position, const IntVector2& screenPosition, MouseButton button, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor)
     engine->RegisterObjectMethod(className, "void OnClickBegin(const IntVector2&in, const IntVector2&in, MouseButton, MouseButtonFlags, QualifierFlags, Cursor@+)", AS_METHODPR(T, OnClickBegin, (const IntVector2&, const IntVector2&, MouseButton, MouseButtonFlags, QualifierFlags, Cursor*), void), AS_CALL_THISCALL);
 
@@ -16711,6 +16658,9 @@ template <class T> void RegisterMembers_UIElement(asIScriptEngine* engine, const
 
     // void UIElement::ResetDeepEnabled()
     engine->RegisterObjectMethod(className, "void ResetDeepEnabled()", AS_METHODPR(T, ResetDeepEnabled, (), void), AS_CALL_THISCALL);
+
+    // bool UIElement::SaveXML(Serializer& dest, const String& indentation = "\t") const
+    engine->RegisterObjectMethod(className, "bool SaveXML(Serializer&, const String&in = \"\t\") const", AS_METHODPR(T, SaveXML, (Serializer&, const String&) const, bool), AS_CALL_THISCALL);
 
     // virtual IntVector2 UIElement::ScreenToElement(const IntVector2& screenPosition)
     engine->RegisterObjectMethod(className, "IntVector2 ScreenToElement(const IntVector2&in)", AS_METHODPR(T, ScreenToElement, (const IntVector2&), IntVector2), AS_CALL_THISCALL);
@@ -18173,15 +18123,6 @@ template <class T> void RegisterMembers_ScrollView(asIScriptEngine* engine, cons
     engine->RegisterObjectMethod(className, "const IntVector2& GetViewPosition() const", AS_METHODPR(T, GetViewPosition, () const, const IntVector2&), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "const IntVector2& get_viewPosition() const", AS_METHODPR(T, GetViewPosition, () const, const IntVector2&), AS_CALL_THISCALL);
 
-    // bool UIElement::LoadXML(const XMLElement& source) override
-    engine->RegisterObjectMethod(className, "bool LoadXML(const XMLElement&in)", AS_METHODPR(T, LoadXML, (const XMLElement&), bool), AS_CALL_THISCALL);
-
-    // bool UIElement::LoadXML(Deserializer& source)
-    engine->RegisterObjectMethod(className, "bool LoadXML(Deserializer&)", AS_METHODPR(T, LoadXML, (Deserializer&), bool), AS_CALL_THISCALL);
-
-    // bool UIElement::SaveXML(Serializer& dest, const String& indentation = "\t") const
-    engine->RegisterObjectMethod(className, "bool SaveXML(Serializer&, const String&in = \"\t\") const", AS_METHODPR(T, SaveXML, (Serializer&, const String&) const, bool), AS_CALL_THISCALL);
-
     // void ScrollView::SetAutoDisableChildren(bool disable)
     engine->RegisterObjectMethod(className, "void SetAutoDisableChildren(bool)", AS_METHODPR(T, SetAutoDisableChildren, (bool), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_autoDisableChildren(bool)", AS_METHODPR(T, SetAutoDisableChildren, (bool), void), AS_CALL_THISCALL);
@@ -18567,15 +18508,6 @@ template <class T> void RegisterMembers_Sprite(asIScriptEngine* engine, const ch
     // bool UIElement::IsSelected() const
     engine->RegisterObjectMethod(className, "bool IsSelected() const", AS_METHODPR(T, IsSelected, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_selected() const", AS_METHODPR(T, IsSelected, () const, bool), AS_CALL_THISCALL);
-
-    // bool UIElement::LoadXML(const XMLElement& source) override
-    engine->RegisterObjectMethod(className, "bool LoadXML(const XMLElement&in)", AS_METHODPR(T, LoadXML, (const XMLElement&), bool), AS_CALL_THISCALL);
-
-    // bool UIElement::LoadXML(Deserializer& source)
-    engine->RegisterObjectMethod(className, "bool LoadXML(Deserializer&)", AS_METHODPR(T, LoadXML, (Deserializer&), bool), AS_CALL_THISCALL);
-
-    // bool UIElement::SaveXML(Serializer& dest, const String& indentation = "\t") const
-    engine->RegisterObjectMethod(className, "bool SaveXML(Serializer&, const String&in = \"\t\") const", AS_METHODPR(T, SaveXML, (Serializer&, const String&) const, bool), AS_CALL_THISCALL);
 
     // void Sprite::SetBlendMode(BlendMode mode)
     engine->RegisterObjectMethod(className, "void SetBlendMode(BlendMode)", AS_METHODPR(T, SetBlendMode, (BlendMode), void), AS_CALL_THISCALL);
@@ -19054,17 +18986,8 @@ template <class T> void RegisterMembers_ToolTip(asIScriptEngine* engine, const c
     engine->RegisterObjectMethod(className, "bool IsSelected() const", AS_METHODPR(T, IsSelected, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_selected() const", AS_METHODPR(T, IsSelected, () const, bool), AS_CALL_THISCALL);
 
-    // bool UIElement::LoadXML(const XMLElement& source) override
-    engine->RegisterObjectMethod(className, "bool LoadXML(const XMLElement&in)", AS_METHODPR(T, LoadXML, (const XMLElement&), bool), AS_CALL_THISCALL);
-
-    // bool UIElement::LoadXML(Deserializer& source)
-    engine->RegisterObjectMethod(className, "bool LoadXML(Deserializer&)", AS_METHODPR(T, LoadXML, (Deserializer&), bool), AS_CALL_THISCALL);
-
     // void ToolTip::Reset()
     engine->RegisterObjectMethod(className, "void Reset()", AS_METHODPR(T, Reset, (), void), AS_CALL_THISCALL);
-
-    // bool UIElement::SaveXML(Serializer& dest, const String& indentation = "\t") const
-    engine->RegisterObjectMethod(className, "bool SaveXML(Serializer&, const String&in = \"\t\") const", AS_METHODPR(T, SaveXML, (Serializer&, const String&) const, bool), AS_CALL_THISCALL);
 
     // void ToolTip::SetDelay(float delay)
     engine->RegisterObjectMethod(className, "void SetDelay(float)", AS_METHODPR(T, SetDelay, (float), void), AS_CALL_THISCALL);
@@ -19133,15 +19056,6 @@ template <class T> void RegisterMembers_UISelectable(asIScriptEngine* engine, co
     // bool UIElement::IsSelected() const
     engine->RegisterObjectMethod(className, "bool IsSelected() const", AS_METHODPR(T, IsSelected, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_selected() const", AS_METHODPR(T, IsSelected, () const, bool), AS_CALL_THISCALL);
-
-    // bool UIElement::LoadXML(const XMLElement& source) override
-    engine->RegisterObjectMethod(className, "bool LoadXML(const XMLElement&in)", AS_METHODPR(T, LoadXML, (const XMLElement&), bool), AS_CALL_THISCALL);
-
-    // bool UIElement::LoadXML(Deserializer& source)
-    engine->RegisterObjectMethod(className, "bool LoadXML(Deserializer&)", AS_METHODPR(T, LoadXML, (Deserializer&), bool), AS_CALL_THISCALL);
-
-    // bool UIElement::SaveXML(Serializer& dest, const String& indentation = "\t") const
-    engine->RegisterObjectMethod(className, "bool SaveXML(Serializer&, const String&in = \"\t\") const", AS_METHODPR(T, SaveXML, (Serializer&, const String&) const, bool), AS_CALL_THISCALL);
 
     // void UISelectable::SetHoverColor(const Color& color)
     engine->RegisterObjectMethod(className, "void SetHoverColor(const Color&in)", AS_METHODPR(T, SetHoverColor, (const Color&), void), AS_CALL_THISCALL);
@@ -21787,15 +21701,6 @@ template <class T> void RegisterMembers_CheckBox(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "bool IsChecked() const", AS_METHODPR(T, IsChecked, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_checked() const", AS_METHODPR(T, IsChecked, () const, bool), AS_CALL_THISCALL);
 
-    // bool UIElement::LoadXML(const XMLElement& source) override
-    engine->RegisterObjectMethod(className, "bool LoadXML(const XMLElement&in)", AS_METHODPR(T, LoadXML, (const XMLElement&), bool), AS_CALL_THISCALL);
-
-    // bool UIElement::LoadXML(Deserializer& source)
-    engine->RegisterObjectMethod(className, "bool LoadXML(Deserializer&)", AS_METHODPR(T, LoadXML, (Deserializer&), bool), AS_CALL_THISCALL);
-
-    // bool UIElement::SaveXML(Serializer& dest, const String& indentation = "\t") const
-    engine->RegisterObjectMethod(className, "bool SaveXML(Serializer&, const String&in = \"\t\") const", AS_METHODPR(T, SaveXML, (Serializer&, const String&) const, bool), AS_CALL_THISCALL);
-
     // void CheckBox::SetChecked(bool enable)
     engine->RegisterObjectMethod(className, "void SetChecked(bool)", AS_METHODPR(T, SetChecked, (bool), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_checked(bool)", AS_METHODPR(T, SetChecked, (bool), void), AS_CALL_THISCALL);
@@ -21838,15 +21743,6 @@ template <class T> void RegisterMembers_Cursor(asIScriptEngine* engine, const ch
     // bool Cursor::GetUseSystemShapes() const
     engine->RegisterObjectMethod(className, "bool GetUseSystemShapes() const", AS_METHODPR(T, GetUseSystemShapes, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_useSystemShapes() const", AS_METHODPR(T, GetUseSystemShapes, () const, bool), AS_CALL_THISCALL);
-
-    // bool UIElement::LoadXML(const XMLElement& source) override
-    engine->RegisterObjectMethod(className, "bool LoadXML(const XMLElement&in)", AS_METHODPR(T, LoadXML, (const XMLElement&), bool), AS_CALL_THISCALL);
-
-    // bool UIElement::LoadXML(Deserializer& source)
-    engine->RegisterObjectMethod(className, "bool LoadXML(Deserializer&)", AS_METHODPR(T, LoadXML, (Deserializer&), bool), AS_CALL_THISCALL);
-
-    // bool UIElement::SaveXML(Serializer& dest, const String& indentation = "\t") const
-    engine->RegisterObjectMethod(className, "bool SaveXML(Serializer&, const String&in = \"\t\") const", AS_METHODPR(T, SaveXML, (Serializer&, const String&) const, bool), AS_CALL_THISCALL);
 
     // void Cursor::SetShape(const String& shape)
     engine->RegisterObjectMethod(className, "void SetShape(const String&in)", AS_METHODPR(T, SetShape, (const String&), void), AS_CALL_THISCALL);
@@ -22330,15 +22226,6 @@ template <class T> void RegisterMembers_LineEdit(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "bool IsTextSelectable() const", AS_METHODPR(T, IsTextSelectable, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_textSelectable() const", AS_METHODPR(T, IsTextSelectable, () const, bool), AS_CALL_THISCALL);
 
-    // bool UIElement::LoadXML(const XMLElement& source) override
-    engine->RegisterObjectMethod(className, "bool LoadXML(const XMLElement&in)", AS_METHODPR(T, LoadXML, (const XMLElement&), bool), AS_CALL_THISCALL);
-
-    // bool UIElement::LoadXML(Deserializer& source)
-    engine->RegisterObjectMethod(className, "bool LoadXML(Deserializer&)", AS_METHODPR(T, LoadXML, (Deserializer&), bool), AS_CALL_THISCALL);
-
-    // bool UIElement::SaveXML(Serializer& dest, const String& indentation = "\t") const
-    engine->RegisterObjectMethod(className, "bool SaveXML(Serializer&, const String&in = \"\t\") const", AS_METHODPR(T, SaveXML, (Serializer&, const String&) const, bool), AS_CALL_THISCALL);
-
     // void LineEdit::SetCursorBlinkRate(float rate)
     engine->RegisterObjectMethod(className, "void SetCursorBlinkRate(float)", AS_METHODPR(T, SetCursorBlinkRate, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_cursorBlinkRate(float)", AS_METHODPR(T, SetCursorBlinkRate, (float), void), AS_CALL_THISCALL);
@@ -22590,15 +22477,6 @@ template <class T> void RegisterMembers_ProgressBar(asIScriptEngine* engine, con
     engine->RegisterObjectMethod(className, "float GetValue() const", AS_METHODPR(T, GetValue, () const, float), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_value() const", AS_METHODPR(T, GetValue, () const, float), AS_CALL_THISCALL);
 
-    // bool UIElement::LoadXML(const XMLElement& source) override
-    engine->RegisterObjectMethod(className, "bool LoadXML(const XMLElement&in)", AS_METHODPR(T, LoadXML, (const XMLElement&), bool), AS_CALL_THISCALL);
-
-    // bool UIElement::LoadXML(Deserializer& source)
-    engine->RegisterObjectMethod(className, "bool LoadXML(Deserializer&)", AS_METHODPR(T, LoadXML, (Deserializer&), bool), AS_CALL_THISCALL);
-
-    // bool UIElement::SaveXML(Serializer& dest, const String& indentation = "\t") const
-    engine->RegisterObjectMethod(className, "bool SaveXML(Serializer&, const String&in = \"\t\") const", AS_METHODPR(T, SaveXML, (Serializer&, const String&) const, bool), AS_CALL_THISCALL);
-
     // void ProgressBar::SetLoadingPercentStyle(const String& style)
     engine->RegisterObjectMethod(className, "void SetLoadingPercentStyle(const String&in)", AS_METHODPR(T, SetLoadingPercentStyle, (const String&), void), AS_CALL_THISCALL);
 
@@ -22809,15 +22687,6 @@ template <class T> void RegisterMembers_ScrollBar(asIScriptEngine* engine, const
     engine->RegisterObjectMethod(className, "float GetValue() const", AS_METHODPR(T, GetValue, () const, float), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_value() const", AS_METHODPR(T, GetValue, () const, float), AS_CALL_THISCALL);
 
-    // bool UIElement::LoadXML(const XMLElement& source) override
-    engine->RegisterObjectMethod(className, "bool LoadXML(const XMLElement&in)", AS_METHODPR(T, LoadXML, (const XMLElement&), bool), AS_CALL_THISCALL);
-
-    // bool UIElement::LoadXML(Deserializer& source)
-    engine->RegisterObjectMethod(className, "bool LoadXML(Deserializer&)", AS_METHODPR(T, LoadXML, (Deserializer&), bool), AS_CALL_THISCALL);
-
-    // bool UIElement::SaveXML(Serializer& dest, const String& indentation = "\t") const
-    engine->RegisterObjectMethod(className, "bool SaveXML(Serializer&, const String&in = \"\t\") const", AS_METHODPR(T, SaveXML, (Serializer&, const String&) const, bool), AS_CALL_THISCALL);
-
     // void ScrollBar::SetOrientation(Orientation orientation)
     engine->RegisterObjectMethod(className, "void SetOrientation(Orientation)", AS_METHODPR(T, SetOrientation, (Orientation), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_orientation(Orientation)", AS_METHODPR(T, SetOrientation, (Orientation), void), AS_CALL_THISCALL);
@@ -22876,15 +22745,6 @@ template <class T> void RegisterMembers_Slider(asIScriptEngine* engine, const ch
     // float Slider::GetValue() const
     engine->RegisterObjectMethod(className, "float GetValue() const", AS_METHODPR(T, GetValue, () const, float), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_value() const", AS_METHODPR(T, GetValue, () const, float), AS_CALL_THISCALL);
-
-    // bool UIElement::LoadXML(const XMLElement& source) override
-    engine->RegisterObjectMethod(className, "bool LoadXML(const XMLElement&in)", AS_METHODPR(T, LoadXML, (const XMLElement&), bool), AS_CALL_THISCALL);
-
-    // bool UIElement::LoadXML(Deserializer& source)
-    engine->RegisterObjectMethod(className, "bool LoadXML(Deserializer&)", AS_METHODPR(T, LoadXML, (Deserializer&), bool), AS_CALL_THISCALL);
-
-    // bool UIElement::SaveXML(Serializer& dest, const String& indentation = "\t") const
-    engine->RegisterObjectMethod(className, "bool SaveXML(Serializer&, const String&in = \"\t\") const", AS_METHODPR(T, SaveXML, (Serializer&, const String&) const, bool), AS_CALL_THISCALL);
 
     // void Slider::SetOrientation(Orientation orientation)
     engine->RegisterObjectMethod(className, "void SetOrientation(Orientation)", AS_METHODPR(T, SetOrientation, (Orientation), void), AS_CALL_THISCALL);
@@ -23541,15 +23401,6 @@ template <class T> void RegisterMembers_Window(asIScriptEngine* engine, const ch
     // bool Window::IsResizable() const
     engine->RegisterObjectMethod(className, "bool IsResizable() const", AS_METHODPR(T, IsResizable, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_resizable() const", AS_METHODPR(T, IsResizable, () const, bool), AS_CALL_THISCALL);
-
-    // bool UIElement::LoadXML(const XMLElement& source) override
-    engine->RegisterObjectMethod(className, "bool LoadXML(const XMLElement&in)", AS_METHODPR(T, LoadXML, (const XMLElement&), bool), AS_CALL_THISCALL);
-
-    // bool UIElement::LoadXML(Deserializer& source)
-    engine->RegisterObjectMethod(className, "bool LoadXML(Deserializer&)", AS_METHODPR(T, LoadXML, (Deserializer&), bool), AS_CALL_THISCALL);
-
-    // bool UIElement::SaveXML(Serializer& dest, const String& indentation = "\t") const
-    engine->RegisterObjectMethod(className, "bool SaveXML(Serializer&, const String&in = \"\t\") const", AS_METHODPR(T, SaveXML, (Serializer&, const String&) const, bool), AS_CALL_THISCALL);
 
     // void Window::SetFixedHeightResizing(bool enable)
     engine->RegisterObjectMethod(className, "void SetFixedHeightResizing(bool)", AS_METHODPR(T, SetFixedHeightResizing, (bool), void), AS_CALL_THISCALL);

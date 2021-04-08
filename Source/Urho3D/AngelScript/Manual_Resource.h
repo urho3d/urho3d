@@ -33,15 +33,13 @@ namespace Urho3D
 // bool Resource::Load(Deserializer& source) | File: ../Resource/Resource.h
 template <class T> bool Resource_Load_File(File* file, T* ptr)
 {
-    // TODO: Remove conversion
-    return file && ((Resource*)ptr)->Load(*file);
+    return file && ptr->Load(*file);
 }
 
 // bool Resource::Load(Deserializer& source) | File: ../Resource/Resource.h
 template <class T> bool Resource_Load_VectorBuffer(VectorBuffer& buffer, T* ptr)
 {
-    // TODO: Remove conversion
-    return ((Resource*)ptr)->Load(buffer);
+    return ptr->Load(buffer);
 }
 
 // virtual bool Resource::Save(Serializer& dest) const | File: ../Resource/Resource.h
@@ -56,26 +54,14 @@ template <class T> bool Resource_Save_VectorBuffer(VectorBuffer& buffer, T* ptr)
     return ptr->Save(buffer);
 }
 
-#define REGISTER_MEMBERS_MANUAL_PART_Resource()                                                 \
-    /* bool Resource::Load(Deserializer& source) | File: ../Resource/Resource.h */              \
+#define REGISTER_MEMBERS_MANUAL_PART_Resource() \
+    /* bool Resource::Load(Deserializer& source) | File: ../Resource/Resource.h */ \
     engine->RegisterObjectMethod(className, "bool Load(File@+)", AS_FUNCTION_OBJLAST(Resource_Load_File<T>), AS_CALL_CDECL_OBJLAST); \
     engine->RegisterObjectMethod(className, "bool Load(VectorBuffer&)", AS_FUNCTION_OBJLAST(Resource_Load_VectorBuffer<T>), AS_CALL_CDECL_OBJLAST); \
-                                                                                                \
-    /* virtual bool Resource::Save(Serializer& dest) const | File: ../Resource/Resource.h */    \
+    \
+    /* virtual bool Resource::Save(Serializer& dest) const | File: ../Resource/Resource.h */ \
     engine->RegisterObjectMethod(className, "bool Save(File@+) const", AS_FUNCTION_OBJLAST(Resource_Save_File<T>), AS_CALL_CDECL_OBJLAST); \
     engine->RegisterObjectMethod(className, "bool Save(VectorBuffer&) const", AS_FUNCTION_OBJLAST(Resource_Save_VectorBuffer<T>), AS_CALL_CDECL_OBJLAST);
-
-// ========================================================================================
-
-// bool Image::Save(Serializer& dest) const override | File: ../Resource/Image.h
-template <class T> bool Image_Save_VectorBuffer(VectorBuffer& buffer, T* ptr)
-{
-    return ptr->Save(buffer);
-}
-
-//#define REGISTER_MEMBERS_MANUAL_PART_Image() \
-//    /* bool Image::Save(Serializer& dest) const override | File: ../Resource/Image.h */ \
-//    engine->RegisterObjectMethod(className, "bool Save(VectorBuffer&) const", AS_FUNCTION_OBJLAST(Image_Save_VectorBuffer<T>), AS_CALL_CDECL_OBJLAST);
 
 // ========================================================================================
 
@@ -97,8 +83,8 @@ template <class T> XMLElement XMLFile_GetRoot_Default(T* ptr)
     return ptr->GetRoot();
 }
 
-#define REGISTER_MEMBERS_MANUAL_PART_XMLFile()                                                             \
-    /* XMLElement XMLFile::GetRoot(const String& name = String::EMPTY) | File: ../Resource/XMLFile.h */    \
+#define REGISTER_MEMBERS_MANUAL_PART_XMLFile() \
+    /* XMLElement XMLFile::GetRoot(const String& name = String::EMPTY) | File: ../Resource/XMLFile.h */ \
     engine->RegisterObjectMethod(className, "XMLElement get_root()", AS_FUNCTION_OBJLAST(XMLFile_GetRoot_Default<T>), AS_CALL_CDECL_OBJLAST);
 
 // ========================================================================================
@@ -134,10 +120,13 @@ template <class T> CScriptArray* XMLElement_GetVariantVector(T* ptr)
 #define REGISTER_MEMBERS_MANUAL_PART_XMLElement() \
     /* XMLElement XMLElement::SelectSingle(const String& query, pugi::xpath_variable_set* variables = nullptr) const | File: ../Resource/XMLElement.h */ \
     engine->RegisterObjectMethod(className, "XMLElement SelectSingle(const String&in)", AS_FUNCTION_OBJLAST(XMLElement_SelectSingle<T>), AS_CALL_CDECL_OBJLAST); \
+    \
     /* XPathResultSet XMLElement::Select(const String& query, pugi::xpath_variable_set* variables = nullptr) const | File: ../Resource/XMLElement.h */ \
     engine->RegisterObjectMethod(className, "XPathResultSet Select(const String&in)", AS_FUNCTION_OBJLAST(XMLElement_Select<T>), AS_CALL_CDECL_OBJLAST); \
+    \
     /* bool XMLElement::SetVariantVector(const VariantVector& value) | File: ../Resource/XMLElement.h */ \
     engine->RegisterObjectMethod(className, "bool SetVariantVector(Array<Variant>@+)", AS_FUNCTION_OBJLAST(XMLElement_SetVariantVector<T>), AS_CALL_CDECL_OBJLAST); \
+    \
     /* VariantVector XMLElement::GetVariantVector() const | File: ../Resource/XMLElement.h */ \
     engine->RegisterObjectMethod(className, "Array<Variant>@ GetVariantVector() const", AS_FUNCTION_OBJLAST(XMLElement_GetVariantVector<T>), AS_CALL_CDECL_OBJLAST);
 

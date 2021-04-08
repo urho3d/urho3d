@@ -292,66 +292,11 @@ void RegisterImplicitlyDeclaredAssignOperatorIfPossible(asIScriptEngine* engine,
 }
 
 // ================================================================================
-
-static const AttributeInfo noAttributeInfoOLD{};
-
 // To keep Xcode LLVM/Clang happy - it erroneously warns on unused functions defined below which are actually being referenced in the code
 #if __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-function"
 #endif
-
-static const AttributeInfo& SerializableGetAttributeInfoOLD(unsigned index, Serializable* ptr)
-{
-    const Vector<AttributeInfo>* attributes = ptr->GetAttributes();
-    if (!attributes || index >= attributes->Size())
-    {
-        GetActiveASContext()->SetException("Index out of bounds");
-        return noAttributeInfoOLD;
-    }
-    else
-        return attributes->At(index);
-}
-
-// ================================================================================
-
-// bool Resource::Load(Deserializer &source) | File: ../Resource/Resource.h
-static bool ResourceLoadOLD(File* file, Resource* ptr)
-{
-    return file && ptr->Load(*file);
-}
-
-// bool Resource::Load(Deserializer &source) | File: ../Resource/Resource.h
-static bool ResourceLoadVectorBufferOLD(VectorBuffer& buffer, Resource* ptr)
-{
-    return ptr->Load(buffer);
-}
-
-// bool Resource::LoadFile(const String &fileName) | File: ../Resource/Resource.h
-static bool ResourceLoadByNameOLD(const String& fileName, Resource* ptr)
-{
-    return ptr->LoadFile(fileName);
-}
-
-// virtual bool Resource::Save(Serializer &dest) const | File: ../Resource/Resource.h
-static bool ResourceSaveOLD(File* file, Resource* ptr)
-{
-    return file && ptr->Save(*file);
-}
-
-// virtual bool Resource::Save(Serializer &dest) const | File: ../Resource/Resource.h
-static bool ResourceSaveVectorBufferOLD(VectorBuffer& buffer, Resource* ptr)
-{
-    return ptr->Save(buffer);
-}
-
-// virtual bool Resource::SaveFile(const String &fileName) const | File: ../Resource/Resource.h
-static bool ResourceSaveByNameOLD(const String& fileName, Resource* ptr)
-{
-    return ptr->SaveFile(fileName);
-}
-
-// ================================================================================
 
 template <class T> T* ConstructObject()
 {
@@ -380,26 +325,6 @@ template <class T> void RegisterNamedObjectConstructor(asIScriptEngine* engine, 
 {
     String declFactoryWithName(String(className) + "@ f(const String&in)");
     engine->RegisterObjectBehaviour(className, asBEHAVE_FACTORY, declFactoryWithName.CString(), AS_FUNCTION(ConstructNamedObject<T>), AS_CALL_CDECL);
-}
-
-static bool SerializableLoad(File* file, Serializable* ptr)
-{
-    return file && ptr->Load(*file);
-}
-
-static bool SerializableLoadVectorBuffer(VectorBuffer& buffer, Serializable* ptr)
-{
-    return ptr->Load(buffer);
-}
-
-static bool SerializableSave(File* file, Serializable* ptr)
-{
-    return file && ptr->Save(*file);
-}
-
-static bool SerializableSaveVectorBuffer(VectorBuffer& buffer, Serializable* ptr)
-{
-    return ptr->Save(buffer);
 }
 
 #if __clang__

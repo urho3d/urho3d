@@ -38,8 +38,8 @@ template <class T> CScriptArray* AttributeInfo_GetEnumNames(T* ptr)
     return VectorToArray<String>(enumNames, "Array<String>");
 }
 
-#define REGISTER_MEMBERS_MANUAL_PART_AttributeInfo()                                       \
-    /* const char** AttributeInfo::enumNames_ | File: ../Core/Attribute.h */               \
+#define REGISTER_MEMBERS_MANUAL_PART_AttributeInfo() \
+    /* const char** AttributeInfo::enumNames_ | File: ../Core/Attribute.h */ \
     engine->RegisterObjectMethod(className, "Array<String>@ get_enumNames() const", AS_FUNCTION_OBJLAST(AttributeInfo_GetEnumNames<T>), AS_CALL_CDECL_OBJLAST);
 
 // ========================================================================================
@@ -86,11 +86,11 @@ template <class T> const String& ResourceRefList_GetName(unsigned index, Resourc
     return ptr->names_[index];
 }
 
-#define REGISTER_MEMBERS_MANUAL_PART_ResourceRefList()                                                                                                              \
-    /* StringVector ResourceRefList::names_ | File: ../Core/Variant.h */                                                                                            \
-    engine->RegisterObjectMethod(className, "void Resize(uint)", AS_FUNCTION_OBJLAST(ResourceRefList_Resize<T>), AS_CALL_CDECL_OBJLAST);                            \
-    engine->RegisterObjectMethod(className, "uint get_length() const", AS_FUNCTION_OBJLAST(ResourceRefList_GetSize<T>), AS_CALL_CDECL_OBJLAST);                     \
-    engine->RegisterObjectMethod(className, "bool get_empty() const", AS_FUNCTION_OBJLAST(ResourceRefList_IsEmpty<T>), AS_CALL_CDECL_OBJLAST);                      \
+#define REGISTER_MEMBERS_MANUAL_PART_ResourceRefList() \
+    /* StringVector ResourceRefList::names_ | File: ../Core/Variant.h */ \
+    engine->RegisterObjectMethod(className, "void Resize(uint)", AS_FUNCTION_OBJLAST(ResourceRefList_Resize<T>), AS_CALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "uint get_length() const", AS_FUNCTION_OBJLAST(ResourceRefList_GetSize<T>), AS_CALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "bool get_empty() const", AS_FUNCTION_OBJLAST(ResourceRefList_IsEmpty<T>), AS_CALL_CDECL_OBJLAST); \
     engine->RegisterObjectMethod(className, "void set_names(uint, const String&in) const", AS_FUNCTION_OBJLAST(ResourceRefList_SetName<T>), AS_CALL_CDECL_OBJLAST); \
     engine->RegisterObjectMethod(className, "const String& get_names(uint) const", AS_FUNCTION_OBJLAST(ResourceRefList_GetName<T>), AS_CALL_CDECL_OBJLAST);
 
@@ -124,14 +124,14 @@ template <class T> void Spline_SetKnot(unsigned index, const Variant& in, T* ptr
     ptr->SetKnot(in, index);
 }
 
-#define REGISTER_MEMBERS_MANUAL_PART_Spline()                                                                                                      \
-    /* const VariantVector& Spline::GetKnots() const | File: ../Core/Spline.h */                                                                   \
-    engine->RegisterObjectMethod(className, "Array<Variant>@ get_knots() const", AS_FUNCTION_OBJLAST(Spline_GetKnots<T>), AS_CALL_CDECL_OBJLAST);  \
-                                                                                                                                                   \
-    /* void Spline::SetKnots(const Vector<Variant>& knots) | File: ../Core/Spline.h */                                                             \
-    engine->RegisterObjectMethod(className, "void set_knots(Array<Variant>@+)", AS_FUNCTION_OBJLAST(Spline_SetKnots<T>), AS_CALL_CDECL_OBJLAST);   \
-                                                                                                                                                   \
-    /* void Spline::SetKnot(const Variant& knot, unsigned index) | File: ../Core/Spline.h */                                                       \
+#define REGISTER_MEMBERS_MANUAL_PART_Spline() \
+    /* const VariantVector& Spline::GetKnots() const | File: ../Core/Spline.h */ \
+    engine->RegisterObjectMethod(className, "Array<Variant>@ get_knots() const", AS_FUNCTION_OBJLAST(Spline_GetKnots<T>), AS_CALL_CDECL_OBJLAST); \
+    \
+    /* void Spline::SetKnots(const Vector<Variant>& knots) | File: ../Core/Spline.h */ \
+    engine->RegisterObjectMethod(className, "void set_knots(Array<Variant>@+)", AS_FUNCTION_OBJLAST(Spline_SetKnots<T>), AS_CALL_CDECL_OBJLAST); \
+    \
+    /* void Spline::SetKnot(const Variant& knot, unsigned index) | File: ../Core/Spline.h */ \
     engine->RegisterObjectMethod(className, "void set_knot(uint, const Variant&in)", AS_FUNCTION_OBJLAST(Spline_SetKnot<T>), AS_CALL_CDECL_OBJLAST);
 
 }
