@@ -33,19 +33,6 @@
 namespace Urho3D
 {
 
-bool operator ==(const asSFuncPtr& a, const asSFuncPtr& b)
-{
-    for (size_t i = 0; i < sizeof(a.ptr.dummy); i++)
-    {
-        if (a.ptr.dummy[i] != b.ptr.dummy[i])
-            return false;
-    }
-
-    return a.flag == b.flag;
-}
-
-using namespace std;
-
 // Set the default memory routines
 // Use the angelscript engine's memory routines by default
 static asALLOCFUNC_t userAlloc = asAllocMem;

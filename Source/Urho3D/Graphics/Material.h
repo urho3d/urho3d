@@ -123,6 +123,8 @@ public:
     /// Save resource. Return true if successful.
     bool Save(Serializer& dest) const override;
 
+    using Resource::Load;
+
     /// Load from an XML element. Return true if successful.
     bool Load(const XMLElement& source);
     /// Save to an XML element. Return true if successful.

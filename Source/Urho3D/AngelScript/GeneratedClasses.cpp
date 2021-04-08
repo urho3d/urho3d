@@ -4685,9 +4685,6 @@ static void Register_Resource(asIScriptEngine* engine)
     #ifdef REGISTER_CLASS_MANUAL_PART_Resource
         REGISTER_CLASS_MANUAL_PART_Resource();
     #endif
-
-    // bool Resource::Load(Deserializer& source)
-    engine->RegisterObjectMethod("Resource", "bool Load(Deserializer&)", AS_METHODPR(Resource, Load, (Deserializer&), bool), AS_CALL_THISCALL);
 }
 
 // explicit ResourceCache::ResourceCache(Context* context)
@@ -4734,9 +4731,6 @@ static void Register_Serializable(asIScriptEngine* engine)
     #ifdef REGISTER_CLASS_MANUAL_PART_Serializable
         REGISTER_CLASS_MANUAL_PART_Serializable();
     #endif
-
-    // virtual bool Serializable::LoadXML(const XMLElement& source)
-    engine->RegisterObjectMethod("Serializable", "bool LoadXML(const XMLElement&in)", AS_METHODPR(Serializable, LoadXML, (const XMLElement&), bool), AS_CALL_THISCALL);
 }
 
 // ShaderParameterAnimationInfo::ShaderParameterAnimationInfo(Material* material, const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode, float speed)
@@ -5246,9 +5240,6 @@ static void Register_Animatable(asIScriptEngine* engine)
     #ifdef REGISTER_CLASS_MANUAL_PART_Animatable
         REGISTER_CLASS_MANUAL_PART_Animatable();
     #endif
-
-    // bool Animatable::LoadXML(const XMLElement& source) override
-    engine->RegisterObjectMethod("Animatable", "bool LoadXML(const XMLElement&in)", AS_METHODPR(Animatable, LoadXML, (const XMLElement&), bool), AS_CALL_THISCALL);
 }
 
 // explicit EventProfiler::EventProfiler(Context* context)
@@ -5863,15 +5854,6 @@ static void Register_UIElement(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UIElement", "bool IsSelected() const", AS_METHODPR(UIElement, IsSelected, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod("UIElement", "bool get_selected() const", AS_METHODPR(UIElement, IsSelected, () const, bool), AS_CALL_THISCALL);
 
-    // bool UIElement::LoadXML(const XMLElement& source) override
-    engine->RegisterObjectMethod("UIElement", "bool LoadXML(const XMLElement&in)", AS_METHODPR(UIElement, LoadXML, (const XMLElement&), bool), AS_CALL_THISCALL);
-
-    // bool UIElement::LoadXML(Deserializer& source)
-    engine->RegisterObjectMethod("UIElement", "bool LoadXML(Deserializer&)", AS_METHODPR(UIElement, LoadXML, (Deserializer&), bool), AS_CALL_THISCALL);
-
-    // bool UIElement::SaveXML(Serializer& dest, const String& indentation = "\t") const
-    engine->RegisterObjectMethod("UIElement", "bool SaveXML(Serializer&, const String&in = \"\t\") const", AS_METHODPR(UIElement, SaveXML, (Serializer&, const String&) const, bool), AS_CALL_THISCALL);
-
     // void UIElement::SetPosition(const IntVector2& position)
     engine->RegisterObjectMethod("UIElement", "void SetPosition(const IntVector2&in)", AS_METHODPR(UIElement, SetPosition, (const IntVector2&), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod("UIElement", "void set_position(const IntVector2&in)", AS_METHODPR(UIElement, SetPosition, (const IntVector2&), void), AS_CALL_THISCALL);
@@ -5930,15 +5912,6 @@ static void Register_BorderImage(asIScriptEngine* engine)
     #ifdef REGISTER_CLASS_MANUAL_PART_BorderImage
         REGISTER_CLASS_MANUAL_PART_BorderImage();
     #endif
-
-    // bool UIElement::LoadXML(const XMLElement& source) override
-    engine->RegisterObjectMethod("BorderImage", "bool LoadXML(const XMLElement&in)", AS_METHODPR(BorderImage, LoadXML, (const XMLElement&), bool), AS_CALL_THISCALL);
-
-    // bool UIElement::LoadXML(Deserializer& source)
-    engine->RegisterObjectMethod("BorderImage", "bool LoadXML(Deserializer&)", AS_METHODPR(BorderImage, LoadXML, (Deserializer&), bool), AS_CALL_THISCALL);
-
-    // bool UIElement::SaveXML(Serializer& dest, const String& indentation = "\t") const
-    engine->RegisterObjectMethod("BorderImage", "bool SaveXML(Serializer&, const String&in = \"\t\") const", AS_METHODPR(BorderImage, SaveXML, (Serializer&, const String&) const, bool), AS_CALL_THISCALL);
 }
 
 // explicit Camera::Camera(Context* context)
@@ -7062,15 +7035,6 @@ static void Register_Button(asIScriptEngine* engine)
     #ifdef REGISTER_CLASS_MANUAL_PART_Button
         REGISTER_CLASS_MANUAL_PART_Button();
     #endif
-
-    // bool UIElement::LoadXML(const XMLElement& source) override
-    engine->RegisterObjectMethod("Button", "bool LoadXML(const XMLElement&in)", AS_METHODPR(Button, LoadXML, (const XMLElement&), bool), AS_CALL_THISCALL);
-
-    // bool UIElement::LoadXML(Deserializer& source)
-    engine->RegisterObjectMethod("Button", "bool LoadXML(Deserializer&)", AS_METHODPR(Button, LoadXML, (Deserializer&), bool), AS_CALL_THISCALL);
-
-    // bool UIElement::SaveXML(Serializer& dest, const String& indentation = "\t") const
-    engine->RegisterObjectMethod("Button", "bool SaveXML(Serializer&, const String&in = \"\t\") const", AS_METHODPR(Button, SaveXML, (Serializer&, const String&) const, bool), AS_CALL_THISCALL);
 }
 
 // explicit CheckBox::CheckBox(Context* context)

@@ -53,8 +53,8 @@ template <class T> bool Font_SaveXML_FileName(const String& fileName, int pointS
     return ptr->SaveXML(file, pointSize, usedGlyphs, indentation);
 }
 
-#define REGISTER_MEMBERS_MANUAL_PART_Font()                                                                                                          \
-    /* bool Font::SaveXML(Serializer& dest, int pointSize, bool usedGlyphs = false, const String& indentation = "\t") | File: ../UI/Font.h */        \
+#define REGISTER_MEMBERS_MANUAL_PART_Font() \
+    /* bool Font::SaveXML(Serializer& dest, int pointSize, bool usedGlyphs = false, const String& indentation = "\t") | File: ../UI/Font.h */ \
     engine->RegisterObjectMethod(className, "bool SaveXML(File@+, int, bool usedGlyphs = false, const String&in indentation = \"\t\")", AS_FUNCTION_OBJLAST(Font_SaveXML_File<T>), AS_CALL_CDECL_OBJLAST); \
     engine->RegisterObjectMethod(className, "bool SaveXML(VectorBuffer&, int, bool usedGlyphs = false, const String&in indentation = \"\t\")", AS_FUNCTION_OBJLAST(Font_SaveXML_VectorBuffer<T>), AS_CALL_CDECL_OBJLAST); \
     engine->RegisterObjectMethod(className, "bool SaveXML(const String&in, int, bool usedGlyphs = false, const String&in indentation = \"\t\")", AS_FUNCTION_OBJLAST(Font_SaveXML_FileName<T>), AS_CALL_CDECL_OBJLAST);
@@ -104,15 +104,13 @@ template <class T> UIElement* UIElement_LoadChildXML(XMLFile* file, XMLFile* sty
 // bool UIElement::SaveXML(Serializer& dest, const String& indentation = "\t") const | File: ../UI/UIElement.h
 template <class T> bool UIElement_SaveXML_File(File* file, const String& indentation, T* ptr)
 {
-    // TODO: remove converison
-    return file && ((UIElement*)ptr)->SaveXML(*file, indentation);
+    return file && ptr->SaveXML(*file, indentation);
 }
 
 // bool UIElement::SaveXML(Serializer& dest, const String& indentation = "\t") const | File: ../UI/UIElement.h
 template <class T> bool UIElement_SaveXML_VectorBuffer(VectorBuffer& buffer, const String& indentation, T* ptr)
 {
-    // TODO: remove converison
-    return ((UIElement*)ptr)->SaveXML(buffer, indentation);
+    return ptr->SaveXML(buffer, indentation);
 }
 
 // void UIElement::RemoveChildAtIndex(unsigned index) | File: ../UI/UIElement.h
@@ -266,21 +264,21 @@ template <class T> void UI_SetFocusElement(UIElement* element, UI* ptr)
     ptr->SetFocusElement(element);
 }
 
-#define REGISTER_MEMBERS_MANUAL_PART_UI()                                                                                      \
-    /* SharedPtr<UIElement> UI::LoadLayout(Deserializer& source, XMLFile* styleFile = nullptr) | File: ../UI/UI.h */           \
+#define REGISTER_MEMBERS_MANUAL_PART_UI() \
+    /* SharedPtr<UIElement> UI::LoadLayout(Deserializer& source, XMLFile* styleFile = nullptr) | File: ../UI/UI.h */ \
     engine->RegisterObjectMethod(className, "UIElement@ LoadLayout(File@+)", AS_FUNCTION_OBJLAST(UI_LoadLayout_File<T>), AS_CALL_CDECL_OBJLAST); \
     engine->RegisterObjectMethod(className, "UIElement@ LoadLayout(File@+, XMLFile@+)", AS_FUNCTION_OBJLAST(UI_LoadLayout_File_Style<T>), AS_CALL_CDECL_OBJLAST); \
     engine->RegisterObjectMethod(className, "UIElement@ LoadLayout(VectorBuffer&)", AS_FUNCTION_OBJLAST(UI_LoadLayout_VectorBuffer<T>), AS_CALL_CDECL_OBJLAST); \
     engine->RegisterObjectMethod(className, "UIElement@ LoadLayout(VectorBuffer&, XMLFile@+)", AS_FUNCTION_OBJLAST(UI_LoadLayout_VectorBuffer_Style<T>), AS_CALL_CDECL_OBJLAST); \
-                                                                                                                               \
-    /* bool UI::SaveLayout(Serializer& dest, UIElement* element) | File: ../UI/UI.h */                                         \
+    \
+    /* bool UI::SaveLayout(Serializer& dest, UIElement* element) | File: ../UI/UI.h */ \
     engine->RegisterObjectMethod(className, "bool SaveLayout(File@+, UIElement@+)", AS_FUNCTION_OBJLAST(UI_SaveLayout_File<T>), AS_CALL_CDECL_OBJLAST); \
     engine->RegisterObjectMethod(className, "bool SaveLayout(VectorBuffer&, UIElement@+)", AS_FUNCTION_OBJLAST(UI_SaveLayout_VectorBuffer<T>), AS_CALL_CDECL_OBJLAST); \
-                                                                                                                               \
-    /* const Vector<UIElement*> UI::GetDragElements() | File: ../UI/UI.h */                                                    \
+    \
+    /* const Vector<UIElement*> UI::GetDragElements() | File: ../UI/UI.h */ \
     engine->RegisterObjectMethod(className, "const Array<UIElement@>@ GetDragElements()", AS_FUNCTION_OBJLAST(UI_GetDragElements<T>), AS_CALL_CDECL_OBJLAST); \
-                                                                                                                               \
-    /* void UI::SetFocusElement(UIElement* element, bool byKey = false) | File: ../UI/UI.h */                                  \
+    \
+    /* void UI::SetFocusElement(UIElement* element, bool byKey = false) | File: ../UI/UI.h */ \
     engine->RegisterObjectMethod(className, "void set_focusElement(UIElement@+)", AS_FUNCTION_OBJLAST(UI_SetFocusElement<T>), AS_CALL_CDECL_OBJLAST);
 
 // ========================================================================================

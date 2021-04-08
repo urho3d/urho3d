@@ -30,11 +30,6 @@
 namespace Urho3D
 {
 
-// Workaround crash in 43_HttpRequestDemo.as ( may be thread related)
-//#define REGISTER_MEMBERS_MANUAL_PART_HttpRequest() \
-//    Remove(members.methods_, "String Deserializer::ReadLine()"); \
-//    members.methods_.Push(RegisterObjectMethodArgs("String Deserializer::ReadLine()", "String ReadLine()", AS_METHODPR(HttpRequest, ReadLine, (), String), AS_CALL_THISCALL));
-
 }
 
 #endif // def URHO3D_NETWORK

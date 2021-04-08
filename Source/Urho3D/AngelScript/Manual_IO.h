@@ -44,11 +44,11 @@ template <class T> VectorBuffer Deserializer_ReadVectorBuffer(unsigned size, Des
     return VectorBuffer(*ptr, size);
 }
 
-#define REGISTER_MEMBERS_MANUAL_PART_Deserializer()                                                                                        \
-    /* virtual unsigned Deserializer::Read(void* dest, unsigned size) = 0 | File: ../IO/Deserializer.h */                                  \
+#define REGISTER_MEMBERS_MANUAL_PART_Deserializer() \
+    /* virtual unsigned Deserializer::Read(void* dest, unsigned size) = 0 | File: ../IO/Deserializer.h */ \
     engine->RegisterObjectMethod(className, "Array<uint8>@ Read(uint)", AS_FUNCTION_OBJLAST(Deserializer_Read<T>), AS_CALL_CDECL_OBJLAST); \
-                                                                                                                                           \
-    /* VectorBuffer::VectorBuffer(Deserializer& source, unsigned size) | File: .. / IO / VectorBuffer.h */                                 \
+    \
+    /* VectorBuffer::VectorBuffer(Deserializer& source, unsigned size) | File: .. / IO / VectorBuffer.h */ \
     engine->RegisterObjectMethod(className, "VectorBuffer ReadVectorBuffer(uint)", AS_FUNCTION_OBJLAST(Deserializer_ReadVectorBuffer<T>), AS_CALL_CDECL_OBJLAST);
 
 // ================================================================================
@@ -66,8 +66,8 @@ template <class T> bool Serializer_Write_VectorBuffer(VectorBuffer* src, Seriali
     return ptr->Write(src->GetData(), src->GetSize()) == src->GetSize();
 }
 
-#define REGISTER_MEMBERS_MANUAL_PART_Serializer()                                                                                           \
-    /* virtual unsigned Serializer::Write(const void* data, unsigned size) = 0 | File: ../IO/Serializer.h */                                \
+#define REGISTER_MEMBERS_MANUAL_PART_Serializer() \
+    /* virtual unsigned Serializer::Write(const void* data, unsigned size) = 0 | File: ../IO/Serializer.h */ \
     engine->RegisterObjectMethod(className, "uint Write(Array<uint8>@+)", AS_FUNCTION_OBJLAST(Serializer_Write<T>), AS_CALL_CDECL_OBJLAST); \
     engine->RegisterObjectMethod(className, "bool WriteVectorBuffer(const VectorBuffer&in)", AS_FUNCTION_OBJLAST(Serializer_Write_VectorBuffer<T>), AS_CALL_CDECL_OBJLAST);
 

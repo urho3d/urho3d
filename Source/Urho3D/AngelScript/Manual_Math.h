@@ -56,8 +56,8 @@ static void Vector2_Vector2_Data(CScriptArray* data, Vector2* ptr)
     new(ptr) Vector2(static_cast<float*>(data->At(0)));
 }
 
-#define REGISTER_CLASS_MANUAL_PART_Vector2()                                                  \
-    /* explicit Vector2::Vector2(const float* data) noexcept | File: ../Math/Vector2.h */     \
+#define REGISTER_CLASS_MANUAL_PART_Vector2() \
+    /* explicit Vector2::Vector2(const float* data) noexcept | File: ../Math/Vector2.h */ \
     engine->RegisterObjectBehaviour("Vector2", asBEHAVE_CONSTRUCT, "void f(float[]&)", AS_FUNCTION_OBJLAST(Vector2_Vector2_Data), AS_CALL_CDECL_OBJLAST);
 
 // const float* Vector2::Data() const | File: ../Math/Vector2.h
@@ -66,8 +66,8 @@ template <class T> CScriptArray* Vector2_Data(T* ptr)
     return BufferToArray<float>(ptr->Data(), 2, "float[]");
 }
 
-#define REGISTER_MEMBERS_MANUAL_PART_Vector2()                                            \
-    /* const float* Vector2::Data() const | File: ../Math/Vector2.h */                    \
+#define REGISTER_MEMBERS_MANUAL_PART_Vector2() \
+    /* const float* Vector2::Data() const | File: ../Math/Vector2.h */ \
     engine->RegisterObjectMethod(className, "float[]& get_data() const", AS_FUNCTION_OBJLAST(Vector2_Data<T>), AS_CALL_CDECL_OBJLAST);
 
 // ========================================================================================
@@ -100,8 +100,8 @@ static void Vector3_Vector3_Data(CScriptArray* data, Vector3* ptr)
     new(ptr) Vector3(static_cast<float*>(data->At(0)));
 }
 
-#define REGISTER_CLASS_MANUAL_PART_Vector3()                                                         \
-    /* explicit Vector3::Vector3(const float* data) noexcept | File: ../Math/Vector3.h */            \
+#define REGISTER_CLASS_MANUAL_PART_Vector3() \
+    /* explicit Vector3::Vector3(const float* data) noexcept | File: ../Math/Vector3.h */ \
     engine->RegisterObjectBehaviour("Vector3", asBEHAVE_CONSTRUCT, "void f(float[]&)", AS_FUNCTION_OBJLAST(Vector3_Vector3_Data), AS_CALL_CDECL_OBJLAST);
 
 // const float* Vector3::Data() const | File: ../Math/Vector3.h
@@ -110,8 +110,8 @@ template <class T> CScriptArray* Vector3_Data(T* ptr)
     return BufferToArray<float>(ptr->Data(), 3, "float[]");
 }
 
-#define REGISTER_MEMBERS_MANUAL_PART_Vector3()                                                       \
-    /* const float* Vector3::Data() const | File: ../Math/Vector3.h */                               \
+#define REGISTER_MEMBERS_MANUAL_PART_Vector3() \
+    /* const float* Vector3::Data() const | File: ../Math/Vector3.h */ \
     engine->RegisterObjectMethod(className, "float[]& get_data() const", AS_FUNCTION_OBJLAST(Vector3_Data<T>), AS_CALL_CDECL_OBJLAST);
 
 // ========================================================================================
@@ -122,8 +122,8 @@ static void Vector4_Vector4_Data(CScriptArray* data, Vector4* ptr)
     new(ptr) Vector4(static_cast<float*>(data->At(0)));
 }
 
-#define REGISTER_CLASS_MANUAL_PART_Vector4()                                                     \
-    /* explicit Vector4::Vector4(const float* data) noexcept | File: ../Math/Vector4.h */        \
+#define REGISTER_CLASS_MANUAL_PART_Vector4() \
+    /* explicit Vector4::Vector4(const float* data) noexcept | File: ../Math/Vector4.h */ \
     engine->RegisterObjectBehaviour("Vector4", asBEHAVE_CONSTRUCT, "void f(float[]&)", AS_FUNCTION_OBJLAST(Vector4_Vector4_Data), AS_CALL_CDECL_OBJLAST);
 
 // const float* Vector4::Data() const | File: ../Math/Vector4.h
@@ -132,8 +132,8 @@ template <class T> CScriptArray* Vector4_Data(T* ptr)
     return BufferToArray<float>(ptr->Data(), 4, "float[]");
 }
 
-#define REGISTER_MEMBERS_MANUAL_PART_Vector4()                                            \
-    /* const float* Vector4::Data() const | File: ../Math/Vector4.h */                    \
+#define REGISTER_MEMBERS_MANUAL_PART_Vector4() \
+    /* const float* Vector4::Data() const | File: ../Math/Vector4.h */ \
     engine->RegisterObjectMethod(className, "float[]& get_data() const", AS_FUNCTION_OBJLAST(Vector4_Data<T>), AS_CALL_CDECL_OBJLAST);
 
 // ========================================================================================
@@ -226,7 +226,6 @@ template <class T> CScriptArray* Polyhedron_GetFace(unsigned index, T* ptr)
 #define REGISTER_MEMBERS_MANUAL_PART_Polyhedron() \
     /* Vector<PODVector<Vector3>> Polyhedron::faces_ | File: ../Math/Polyhedron.h */ \
     engine->RegisterObjectMethod(className, "uint get_numFaces() const", AS_FUNCTION_OBJLAST(Polyhedron_GetNumFaces<T>), AS_CALL_CDECL_OBJLAST); \
-    /* Vector<PODVector<Vector3>> Polyhedron::faces_ | File: ../Math/Polyhedron.h */ \
     engine->RegisterObjectMethod(className, "Array<Vector3>@ get_face(uint) const", AS_FUNCTION_OBJLAST(Polyhedron_GetFace<T>), AS_CALL_CDECL_OBJLAST);
 
 }

@@ -75,8 +75,8 @@ template <class T> RenderPathCommand* RenderPath_GetCommand(unsigned index, T* p
 #define REGISTER_MEMBERS_MANUAL_PART_RenderPath() \
     /* Vector<RenderTargetInfo> RenderPath::renderTargets_ | File: ../Graphics/RenderPath.h */ \
     engine->RegisterObjectMethod(className, "const RenderTargetInfo& get_renderTargets(uint) const", AS_FUNCTION_OBJLAST(RenderPath_GetRenderTarget<T>), AS_CALL_CDECL_OBJLAST); \
-                                                                                               \
-    /* Vector<RenderPathCommand> RenderPath::commands_ | File: ../Graphics/RenderPath.h */     \
+    \
+    /* Vector<RenderPathCommand> RenderPath::commands_ | File: ../Graphics/RenderPath.h */ \
     engine->RegisterObjectMethod(className, "const RenderPathCommand& get_commands(uint) const", AS_FUNCTION_OBJLAST(RenderPath_GetCommand<T>), AS_CALL_CDECL_OBJLAST);
 
 // ========================================================================================
@@ -132,24 +132,12 @@ template <class T> const TechniqueEntry& Material_GetTechniqueEntry(unsigned ind
     return ptr->GetTechniqueEntry(index);
 }
 
-#define REGISTER_MEMBERS_MANUAL_PART_Material()                                                                                            \
-    /*engine->RegisterObjectMethod(className, "bool Load(File@+)", AS_FUNCTION_OBJLAST(Material_Load_File<T>), AS_CALL_CDECL_OBJLAST);*/       \
-                                                                                                                                           \
-    /* const HashMap<StringHash, MaterialShaderParameter>& Material::GetShaderParameters() const | File: ../Graphics/Material.h */         \
+#define REGISTER_MEMBERS_MANUAL_PART_Material() \
+    /* const HashMap<StringHash, MaterialShaderParameter>& Material::GetShaderParameters() const | File: ../Graphics/Material.h */ \
     engine->RegisterObjectMethod(className, "Array<String>@ get_shaderParameterNames() const", AS_FUNCTION_OBJLAST(Material_GetShaderParameterNames<T>), AS_CALL_CDECL_OBJLAST); \
-                                                                                                                                           \
-    /* const TechniqueEntry& Material::GetTechniqueEntry(unsigned index) const | File: ../Graphics/Material.h */                           \
+    \
+    /* const TechniqueEntry& Material::GetTechniqueEntry(unsigned index) const | File: ../Graphics/Material.h */ \
     engine->RegisterObjectMethod(className, "const TechniqueEntry& get_techniqueEntries(uint) const", AS_FUNCTION_OBJLAST(Material_GetTechniqueEntry<T>), AS_CALL_CDECL_OBJLAST);
-
-// ========================================================================================
-
-template <class T> bool ParticleEffect_Load_File(File* file, T* ptr)
-{
-    return file && ptr->Resource::Load(*file);
-}
-
-//#define REGISTER_MEMBERS_MANUAL_PART_ParticleEffect() \
-//    engine->RegisterObjectMethod(className, "bool Load(File@+)", AS_FUNCTION_OBJLAST(ParticleEffect_Load_File<T>), AS_CALL_CDECL_OBJLAST);
 
 // ========================================================================================
 
@@ -188,12 +176,12 @@ template <class T> bool VertexBuffer_SetDataRange(VectorBuffer& src, unsigned st
         return false;
 }
 
-#define REGISTER_MEMBERS_MANUAL_PART_VertexBuffer()                                                                                                  \
-    engine->RegisterObjectMethod(className, "VectorBuffer GetData() const", AS_FUNCTION_OBJLAST(VertexBuffer_GetData<T>), AS_CALL_CDECL_OBJLAST);    \
-                                                                                                                                                     \
-    /* bool VertexBuffer::SetData(const void* data) | File: ../Graphics/VertexBuffer.h */                                                            \
-    engine->RegisterObjectMethod(className, "bool SetData(VectorBuffer&)", AS_FUNCTION_OBJLAST(VertexBuffer_SetData<T>), AS_CALL_CDECL_OBJLAST);     \
-                                                                                                                                                     \
+#define REGISTER_MEMBERS_MANUAL_PART_VertexBuffer() \
+    engine->RegisterObjectMethod(className, "VectorBuffer GetData() const", AS_FUNCTION_OBJLAST(VertexBuffer_GetData<T>), AS_CALL_CDECL_OBJLAST); \
+    \
+    /* bool VertexBuffer::SetData(const void* data) | File: ../Graphics/VertexBuffer.h */ \
+    engine->RegisterObjectMethod(className, "bool SetData(VectorBuffer&)", AS_FUNCTION_OBJLAST(VertexBuffer_SetData<T>), AS_CALL_CDECL_OBJLAST); \
+    \
     /* bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count, bool discard = false) | File: ../Graphics/VertexBuffer.h */ \
     engine->RegisterObjectMethod(className, "bool SetDataRange(VectorBuffer&, uint, uint, bool = false)", AS_FUNCTION_OBJLAST(VertexBuffer_SetDataRange<T>), AS_CALL_CDECL_OBJLAST);
 
@@ -234,18 +222,18 @@ template <class T> bool IndexBuffer_SetDataRange(VectorBuffer& src, unsigned sta
         return false;
 }
 
-#define REGISTER_MEMBERS_MANUAL_PART_IndexBuffer()                                                                                                 \
-    engine->RegisterObjectMethod(className, "VectorBuffer GetData()", AS_FUNCTION_OBJLAST(IndexBuffer_GetData<T>), AS_CALL_CDECL_OBJLAST);         \
-                                                                                                                                                   \
-    /* bool IndexBuffer::SetData(const void* data) | File: ../Graphics/IndexBuffer.h */                                                            \
-    engine->RegisterObjectMethod(className, "bool SetData(VectorBuffer&)", AS_FUNCTION_OBJLAST(IndexBuffer_SetData<T>), AS_CALL_CDECL_OBJLAST);    \
-                                                                                                                                                   \
+#define REGISTER_MEMBERS_MANUAL_PART_IndexBuffer() \
+    engine->RegisterObjectMethod(className, "VectorBuffer GetData()", AS_FUNCTION_OBJLAST(IndexBuffer_GetData<T>), AS_CALL_CDECL_OBJLAST); \
+    \
+    /* bool IndexBuffer::SetData(const void* data) | File: ../Graphics/IndexBuffer.h */ \
+    engine->RegisterObjectMethod(className, "bool SetData(VectorBuffer&)", AS_FUNCTION_OBJLAST(IndexBuffer_SetData<T>), AS_CALL_CDECL_OBJLAST); \
+    \
     /* bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count, bool discard = false) | File: ../Graphics/IndexBuffer.h */ \
     engine->RegisterObjectMethod(className, "bool SetDataRange(VectorBuffer&, uint, uint, bool discard = false)", AS_FUNCTION_OBJLAST(IndexBuffer_SetDataRange<T>), AS_CALL_CDECL_OBJLAST);
 
 // ========================================================================================
 
-#define REGISTER_MEMBERS_MANUAL_PART_AnimationTrack()                                                    \
+#define REGISTER_MEMBERS_MANUAL_PART_AnimationTrack() \
     /* AnimationKeyFrame* AnimationTrack::GetKeyFrame(unsigned index) | File: ../Graphics/Animation.h */ \
     engine->RegisterObjectMethod(className, "const AnimationKeyFrame& get_keyFrames(uint) const", AS_METHOD(T, GetKeyFrame), AS_CALL_THISCALL);
 
@@ -272,7 +260,7 @@ template <class T> AnimationTriggerPoint* Animation_GetTrigger(unsigned index, T
 // ========================================================================================
 
 #define REGISTER_MEMBERS_MANUAL_PART_CascadeParameters() \
-    /* Vector4 CascadeParameters::splits_ | File: ../Graphics/Light.h */                \
+    /* Vector4 CascadeParameters::splits_ | File: ../Graphics/Light.h */ \
     engine->RegisterObjectProperty(className, "float split1", offsetof(T, splits_.x_)); \
     engine->RegisterObjectProperty(className, "float split2", offsetof(T, splits_.y_)); \
     engine->RegisterObjectProperty(className, "float split3", offsetof(T, splits_.z_)); \
@@ -304,7 +292,7 @@ template <class T> void StaticModel_SetModel(Model* model, T* ptr)
 }
 
 #define REGISTER_MEMBERS_MANUAL_PART_StaticModel() \
-    /* virtual void StaticModel::SetModel(Model* model) | File: ../Graphics/StaticModel.h */                                                    \
+    /* virtual void StaticModel::SetModel(Model* model) | File: ../Graphics/StaticModel.h */ \
     engine->RegisterObjectMethod(className, "void SetModel(Model@+)", AS_FUNCTION_OBJLAST(StaticModel_SetModel<T>), AS_CALL_CDECL_OBJLAST); \
     engine->RegisterObjectMethod(className, "void set_model(Model@+)", AS_FUNCTION_OBJLAST(StaticModel_SetModel<T>), AS_CALL_CDECL_OBJLAST);
 
@@ -324,11 +312,8 @@ template <class T> void AnimatedModel_SetModel(Model* model, T* ptr)
 }
 
 #define REGISTER_MEMBERS_MANUAL_PART_AnimatedModel() \
-    /* const Vector<ModelMorph>& AnimatedModel::GetMorphs() const | File: ../Graphics/AnimatedModel.h */                                                            \
-    engine->RegisterObjectMethod(className, "const String& get_morphNames(uint) const", AS_FUNCTION_OBJLAST(AnimatedModel_GetMorphName<T>), AS_CALL_CDECL_OBJLAST); \
-                                                                                                                                                                    \
-    /* void AnimatedModel::SetModel(Model* model, bool createBones = true) | File: ../Graphics/AnimatedModel.h */                                                   \
-    /*engine->RegisterObjectMethod(className, "void set_model(Model@+)", AS_FUNCTION_OBJLAST(AnimatedModel_SetModel<T>), AS_CALL_CDECL_OBJLAST);*/
+    /* const Vector<ModelMorph>& AnimatedModel::GetMorphs() const | File: ../Graphics/AnimatedModel.h */ \
+    engine->RegisterObjectMethod(className, "const String& get_morphNames(uint) const", AS_FUNCTION_OBJLAST(AnimatedModel_GetMorphName<T>), AS_CALL_CDECL_OBJLAST);
 
 // ========================================================================================
 
@@ -346,10 +331,10 @@ template <class T> const AnimationControl* AnimationController_GetAnimation(unsi
 }
 
 #define REGISTER_MEMBERS_MANUAL_PART_AnimationController() \
-    /* const Vector<AnimationControl>& AnimationController::GetAnimations() const | File: ../Graphics/AnimationController.h */                                      \
+    /* const Vector<AnimationControl>& AnimationController::GetAnimations() const | File: ../Graphics/AnimationController.h */ \
     engine->RegisterObjectMethod(className, "uint get_numAnimations() const", AS_FUNCTION_OBJLAST(AnimationController_GetNumAnimations<T>), AS_CALL_CDECL_OBJLAST); \
-                                                                                                                                                                    \
-    /* const Vector<AnimationControl>& AnimationController::GetAnimations() const | File: ../Graphics/AnimationController.h */                                      \
+    \
+    /* const Vector<AnimationControl>& AnimationController::GetAnimations() const | File: ../Graphics/AnimationController.h */ \
     engine->RegisterObjectMethod(className, "const AnimationControl@+ get_animations(uint) const", AS_FUNCTION_OBJLAST(AnimationController_GetAnimation<T>), AS_CALL_CDECL_OBJLAST);
 
 // ========================================================================================
@@ -368,10 +353,10 @@ template <class T> void Graphics_PrecacheShaders_VectorBuffer(VectorBuffer& buff
 }
 
 #define REGISTER_MEMBERS_MANUAL_PART_Graphics() \
-    /* void Graphics::PrecacheShaders(Deserializer& source) | File: ../Graphics/Graphics.h */                                                              \
+    /* void Graphics::PrecacheShaders(Deserializer& source) | File: ../Graphics/Graphics.h */ \
     engine->RegisterObjectMethod(className, "void PrecacheShaders(File@+)", AS_FUNCTION_OBJLAST(Graphics_PrecacheShaders_File<T>), AS_CALL_CDECL_OBJLAST); \
-                                                                                                                                                           \
-    /* void Graphics::PrecacheShaders(Deserializer& source) | File: ../Graphics/Graphics.h */                                                              \
+    \
+    /* void Graphics::PrecacheShaders(Deserializer& source) | File: ../Graphics/Graphics.h */ \
     engine->RegisterObjectMethod(className, "void PrecacheShaders(VectorBuffer&)", AS_FUNCTION_OBJLAST(Graphics_PrecacheShaders_VectorBuffer<T>), AS_CALL_CDECL_OBJLAST);
 
 // ========================================================================================
@@ -389,10 +374,10 @@ template <class T> Node* RayQueryResult_GetNode(T* ptr)
 }
 
 #define REGISTER_MEMBERS_MANUAL_PART_RayQueryResult() \
-    /* Drawable* RayQueryResult::drawable_ | File: ../Graphics/OctreeQuery.h */                                                                            \
+    /* Drawable* RayQueryResult::drawable_ | File: ../Graphics/OctreeQuery.h */ \
     engine->RegisterObjectMethod(className, "Drawable@+ get_drawable() const", AS_FUNCTION_OBJLAST(RayQueryResult_GetDrawable<T>), AS_CALL_CDECL_OBJLAST); \
-                                                                                                                                                           \
-    /* Node* RayQueryResult::node_ | File: ../Graphics/OctreeQuery.h */                                                                                    \
+    \
+    /* Node* RayQueryResult::node_ | File: ../Graphics/OctreeQuery.h */ \
     engine->RegisterObjectMethod(className, "Node@+ get_node() const", AS_FUNCTION_OBJLAST(RayQueryResult_GetNode<T>), AS_CALL_CDECL_OBJLAST);
 
 // ========================================================================================
@@ -474,17 +459,17 @@ template <class T> CScriptArray* Octree_GetDrawables_All(unsigned char drawableF
 }
 
 #define REGISTER_MEMBERS_MANUAL_PART_Octree() \
-    /* void Octree::Raycast(RayOctreeQuery& query) const | File: ../Graphics/Octree.h */              \
+    /* void Octree::Raycast(RayOctreeQuery& query) const | File: ../Graphics/Octree.h */ \
     engine->RegisterObjectMethod(className, "Array<RayQueryResult>@ Raycast(const Ray&in, RayQueryLevel = RAY_TRIANGLE, float = M_INFINITY, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK) const", AS_FUNCTION_OBJLAST(Octree_Raycast<T>), AS_CALL_CDECL_OBJLAST); \
-                                                                                                      \
-    /* void Octree::RaycastSingle(RayOctreeQuery& query) const | File: ../Graphics/Octree.h */        \
+    \
+    /* void Octree::RaycastSingle(RayOctreeQuery& query) const | File: ../Graphics/Octree.h */ \
     engine->RegisterObjectMethod(className, "RayQueryResult RaycastSingle(const Ray&in, RayQueryLevel = RAY_TRIANGLE, float = M_INFINITY, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK) const", AS_FUNCTION_OBJLAST(Octree_RaycastSingle<T>), AS_CALL_CDECL_OBJLAST); \
-                                                                                                      \
-    /* void Octree::GetDrawables(OctreeQuery& query) const | File: ../Graphics/Octree.h */            \
-    engine->RegisterObjectMethod(className, "Array<Drawable@>@ GetDrawables(const Vector3&in, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK)", AS_FUNCTION_OBJLAST(Octree_GetDrawables_Point<T>), AS_CALL_CDECL_OBJLAST);   \
+    \
+    /* void Octree::GetDrawables(OctreeQuery& query) const | File: ../Graphics/Octree.h */ \
+    engine->RegisterObjectMethod(className, "Array<Drawable@>@ GetDrawables(const Vector3&in, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK)", AS_FUNCTION_OBJLAST(Octree_GetDrawables_Point<T>), AS_CALL_CDECL_OBJLAST); \
     engine->RegisterObjectMethod(className, "Array<Drawable@>@ GetDrawables(const BoundingBox&in, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK)", AS_FUNCTION_OBJLAST(Octree_GetDrawables_Box<T>), AS_CALL_CDECL_OBJLAST); \
     engine->RegisterObjectMethod(className, "Array<Drawable@>@ GetDrawables(const Frustum&in, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK)", AS_FUNCTION_OBJLAST(Octree_GetDrawables_Frustum<T>), AS_CALL_CDECL_OBJLAST); \
-    engine->RegisterObjectMethod(className, "Array<Drawable@>@ GetDrawables(const Sphere&in, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK)", AS_FUNCTION_OBJLAST(Octree_GetDrawables_Sphere<T>), AS_CALL_CDECL_OBJLAST);   \
+    engine->RegisterObjectMethod(className, "Array<Drawable@>@ GetDrawables(const Sphere&in, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK)", AS_FUNCTION_OBJLAST(Octree_GetDrawables_Sphere<T>), AS_CALL_CDECL_OBJLAST); \
     engine->RegisterObjectMethod(className, "Array<Drawable@>@ GetAllDrawables(uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK)", AS_FUNCTION_OBJLAST(Octree_GetDrawables_All<T>), AS_CALL_CDECL_OBJLAST);
 
 // ========================================================================================
