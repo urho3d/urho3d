@@ -33,7 +33,7 @@ namespace Urho3D
 {
 
 // virtual PODVector<unsigned char> NavigationMesh::GetTileData(const IntVector2& tile) const | File: ../Navigation/NavigationMesh.h
-template <class T> VectorBuffer NavigationMesh_GetTileData(const IntVector2& tile, const NavigationMesh* ptr)
+template <class T> VectorBuffer NavigationMesh_GetTileData(const IntVector2& tile, const T* ptr)
 {
     VectorBuffer buffer;
     buffer.SetData(ptr->GetTileData(tile));
@@ -41,49 +41,49 @@ template <class T> VectorBuffer NavigationMesh_GetTileData(const IntVector2& til
 }
 
 // virtual bool NavigationMesh::AddTile(const PODVector<unsigned char>& tileData) | File: ../Navigation/NavigationMesh.h
-template <class T> bool NavigationMesh_AddTile(const VectorBuffer& tileData, NavigationMesh* ptr)
+template <class T> bool NavigationMesh_AddTile(const VectorBuffer& tileData, T* ptr)
 {
     return ptr->AddTile(tileData.GetBuffer());
 }
 
 // Vector3 NavigationMesh::FindNearestPoint(const Vector3& point, const Vector3& extents = Vector3::ONE, const dtQueryFilter* filter = nullptr, dtPolyRef* nearestRef = nullptr) | File: ../Navigation/NavigationMesh.h
-template <class T> Vector3 NavigationMesh_FindNearestPoint(const Vector3& point, const Vector3& extents, NavigationMesh* ptr)
+template <class T> Vector3 NavigationMesh_FindNearestPoint(const Vector3& point, const Vector3& extents, T* ptr)
 {
     return ptr->FindNearestPoint(point, extents);
 }
 
 // Vector3 NavigationMesh::GetRandomPoint(const dtQueryFilter* filter = nullptr, dtPolyRef* randomRef = nullptr) | File: ../Navigation/NavigationMesh.h
-template <class T> Vector3 NavigationMesh_GetRandomPoint(NavigationMesh* ptr)
+template <class T> Vector3 NavigationMesh_GetRandomPoint(T* ptr)
 {
     return ptr->GetRandomPoint();
 }
 
 // Vector3 NavigationMesh::GetRandomPointInCircle(const Vector3& center, float radius, const Vector3& extents = Vector3::ONE, const dtQueryFilter* filter = nullptr, dtPolyRef* randomRef = nullptr) | File: ../Navigation/NavigationMesh.h
-template <class T> Vector3 NavigationMesh_GetRandomPointInCircle(const Vector3& center, float radius, const Vector3& extents, NavigationMesh* ptr)
+template <class T> Vector3 NavigationMesh_GetRandomPointInCircle(const Vector3& center, float radius, const Vector3& extents, T* ptr)
 {
     return ptr->GetRandomPointInCircle(center, radius, extents);
 }
 
 // float NavigationMesh::GetDistanceToWall(const Vector3& point, float radius, const Vector3& extents = Vector3::ONE, const dtQueryFilter* filter = nullptr, Vector3* hitPos = nullptr, Vector3* hitNormal = nullptr) | File: ../Navigation/NavigationMesh.h
-template <class T> float NavigationMesh_GetDistanceToWall(const Vector3& point, float radius, const Vector3& extents, NavigationMesh* ptr)
+template <class T> float NavigationMesh_GetDistanceToWall(const Vector3& point, float radius, const Vector3& extents, T* ptr)
 {
     return ptr->GetDistanceToWall(point, radius, extents);
 }
 
 // Vector3 NavigationMesh::Raycast(const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE, const dtQueryFilter* filter = nullptr, Vector3* hitNormal = nullptr) | File: ../Navigation/NavigationMesh.h
-template <class T> Vector3 NavigationMesh_Raycast(const Vector3& start, const Vector3& end, const Vector3& extents, NavigationMesh* ptr)
+template <class T> Vector3 NavigationMesh_Raycast(const Vector3& start, const Vector3& end, const Vector3& extents, T* ptr)
 {
     return ptr->Raycast(start, end, extents);
 }
 
 // Vector3 NavigationMesh::MoveAlongSurface(const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE, int maxVisited = 3, const dtQueryFilter* filter = nullptr)  | File: ../Navigation/NavigationMesh.h
-template <class T> Vector3 NavigationMesh_MoveAlongSurface(const Vector3& start, const Vector3& end, const Vector3& extents, int maxVisited, NavigationMesh* ptr)
+template <class T> Vector3 NavigationMesh_MoveAlongSurface(const Vector3& start, const Vector3& end, const Vector3& extents, int maxVisited, T* ptr)
 {
     return ptr->MoveAlongSurface(start, end, extents, maxVisited);
 }
 
 // void NavigationMesh::FindPath(PODVector<Vector3>& dest, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE, const dtQueryFilter* filter = nullptr) | File: ../Navigation/NavigationMesh.h
-template <class T> CScriptArray* NavigationMesh_FindPath(const Vector3& start, const Vector3& end, const Vector3& extents, NavigationMesh* ptr)
+template <class T> CScriptArray* NavigationMesh_FindPath(const Vector3& start, const Vector3& end, const Vector3& extents, T* ptr)
 {
     PODVector<Vector3> dest;
     ptr->FindPath(dest, start, end, extents);
@@ -120,55 +120,32 @@ template <class T> CScriptArray* NavigationMesh_FindPath(const Vector3& start, c
 
 // ========================================================================================
 
-// PODVector<unsigned char> DynamicNavigationMesh::GetTileData(const IntVector2& tile) const override | File: ../Navigation/DynamicNavigationMesh.h
-template <class T> VectorBuffer DynamicNavigationMesh_GetTileData(const IntVector2& tile, const DynamicNavigationMesh* ptr)
-{
-    VectorBuffer buffer;
-    buffer.SetData(ptr->GetTileData(tile));
-    return buffer;
-}
-
-// bool DynamicNavigationMesh::AddTile(const PODVector<unsigned char>& tileData) override | File: ../Navigation/DynamicNavigationMesh.h
-template <class T> bool DynamicNavigationMesh_AddTile(const VectorBuffer& tileData, DynamicNavigationMesh* ptr)
-{
-    return ptr->AddTile(tileData.GetBuffer());
-}
-
-//#define REGISTER_MEMBERS_MANUAL_PART_DynamicNavigationMesh()                                                                                   \
-//    /* PODVector<unsigned char> DynamicNavigationMesh::GetTileData(const IntVector2& tile) const override | File: ../Navigation/DynamicNavigationMesh.h */ \
-//    engine->RegisterObjectMethod(className, "VectorBuffer GetTileData(const IntVector2&) const", AS_FUNCTION_OBJLAST(DynamicNavigationMesh_GetTileData<T>), AS_CALL_CDECL_OBJLAST); \
-//                                                                                                                                               \
-//    /* bool DynamicNavigationMesh::AddTile(const PODVector<unsigned char>& tileData) override | File: ../Navigation/DynamicNavigationMesh.h */ \
-//    engine->RegisterObjectMethod(className, "bool AddTile(const VectorBuffer&in) const", AS_FUNCTION_OBJLAST(DynamicNavigationMesh_AddTile<T>), AS_CALL_CDECL_OBJLAST);
-
-// ========================================================================================
-
 // Vector3 CrowdManager::GetRandomPoint(int queryFilterType, dtPolyRef* randomRef = nullptr) | File: ../Navigation/CrowdManager.h
-template <class T> Vector3 CrowdManager_GetRandomPoint(int queryFilterType, CrowdManager* crowdManager)
+template <class T> Vector3 CrowdManager_GetRandomPoint(int queryFilterType, T* crowdManager)
 {
     return crowdManager->GetRandomPoint(queryFilterType);
 }
 
 // Vector3 CrowdManager::GetRandomPointInCircle(const Vector3& center, float radius, int queryFilterType, dtPolyRef* randomRef = nullptr) | File: ../Navigation/CrowdManager.h
-template <class T> Vector3 CrowdManager_RandomPointInCircle(const Vector3& center, float radius, int queryFilterType, CrowdManager* manager)
+template <class T> Vector3 CrowdManager_RandomPointInCircle(const Vector3& center, float radius, int queryFilterType, T* manager)
 {
     return manager->GetRandomPointInCircle(center, radius, queryFilterType);
 }
 
 // Vector3 CrowdManager::FindNearestPoint(const Vector3& point, int queryFilterType, dtPolyRef* nearestRef = nullptr) | File: ../Navigation/CrowdManager.h
-template <class T> Vector3 CrowdManager_FindNearestPoint(const Vector3& point, int queryFilterType, CrowdManager* ptr)
+template <class T> Vector3 CrowdManager_FindNearestPoint(const Vector3& point, int queryFilterType, T* ptr)
 {
     return ptr->FindNearestPoint(point, queryFilterType);
 }
 
 // float CrowdManager::GetDistanceToWall(const Vector3& point, float radius, int queryFilterType, Vector3* hitPos = nullptr, Vector3* hitNormal = nullptr) | File: ../Navigation/CrowdManager.h
-template <class T> float CrowdManager_GetDistanceToWall(const Vector3& point, float radius, int queryFilterType, CrowdManager* ptr)
+template <class T> float CrowdManager_GetDistanceToWall(const Vector3& point, float radius, int queryFilterType, T* ptr)
 {
     return ptr->GetDistanceToWall(point, radius, queryFilterType);
 }
 
 // Vector3 CrowdManager::Raycast(const Vector3& start, const Vector3& end, int queryFilterType, Vector3* hitNormal = nullptr) | File: ../Navigation/CrowdManager.h
-template <class T> Vector3 CrowdManager_Raycast(const Vector3& start, const Vector3& end, int queryFilterType, CrowdManager* ptr)
+template <class T> Vector3 CrowdManager_Raycast(const Vector3& start, const Vector3& end, int queryFilterType, T* ptr)
 {
     return ptr->Raycast(start, end, queryFilterType);
 }
