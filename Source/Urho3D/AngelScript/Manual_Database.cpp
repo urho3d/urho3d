@@ -94,10 +94,7 @@ static DbConnection* DbConnection_DbConnection_Context()
 
 static void RegisterDbConnection(asIScriptEngine* engine)
 {
-    MemberCollection members;
-    CollectMembers_Object(members);
     RegisterMembers_Object<DbConnection>(engine, "DbConnection");
-    RegisterMembers(engine, "DbConnection", members);
 
     //engine->RegisterObjectBehaviour("DbConnection", asBEHAVE_FACTORY, "DbConnection@+ f()", AS_FUNCTION(DbConnection_DbConnection_Context), AS_CALL_CDECL);
 
