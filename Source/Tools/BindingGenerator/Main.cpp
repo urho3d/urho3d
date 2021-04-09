@@ -40,7 +40,6 @@ namespace ASBindingGenerator
 {
     void ProcessAllEnums();
     void ProcessAllClasses();
-    void ProcessAllClassesNew();
     void ProcessAllGlobalVariables();
     void ProcessAllGlobalFunctions();
     void SaveResult();
@@ -51,7 +50,6 @@ namespace ASBindingGenerator
     {
         ProcessAllEnums();
         ProcessAllClasses();
-        ProcessAllClassesNew();
         ProcessAllGlobalVariables();
         ProcessAllGlobalFunctions();
         SaveResult();

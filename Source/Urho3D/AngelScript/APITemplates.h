@@ -218,17 +218,15 @@ template <class T> Vector<SharedPtr<T> > HandleArrayToVector(CScriptArray* arr)
 }
 
 /// Template function for dynamic cast between two script classes.
-template <class A, class B> B* RefCast(A* a)
+template <class From, class To> To* RefCast(From* from)
 {
-    if (!a)
+    if (!from)
         return nullptr;
 
-    B* b = dynamic_cast<B*>(a);
-
-    return b;
+    return dynamic_cast<To*>(from);
 }
 
-/// Template function for registering implicit casts between base and subclass.
+/// Template function for registering casts between base and subclass.
 // https://www.angelcode.com/angelscript/sdk/docs/manual/doc_adv_class_hierarchy.html
 template <class BaseType, class DerivedType> void RegisterSubclass(asIScriptEngine* engine, const char* baseClassName, const char* derivedClassName)
 {
@@ -240,8 +238,6 @@ template <class BaseType, class DerivedType> void RegisterSubclass(asIScriptEngi
 
     String declReturnBaseConst("const " + String(baseClassName) + "@+ opImplCast() const");
     engine->RegisterObjectMethod(derivedClassName, declReturnBaseConst.CString(), AS_FUNCTION_OBJLAST((RefCast<DerivedType, BaseType>)), AS_CALL_CDECL_OBJLAST);
-
-    // TODO fix all scripts to "cast(derivedClass)"
 
     //String declReturnDerived(String(derivedClassName) + "@+ opCast()");
     String declReturnDerived(String(derivedClassName) + "@+ opImplCast()");

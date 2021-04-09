@@ -71,9 +71,9 @@ namespace Urho3D
 // RegisterObjectBehaviour(obj, behaviour, decl, AS_FUNCTION_OBJLAST(f), AS_CALL_CDECL_OBJLAST)
 //     where behaviour is asBEHAVE_CONSTRUCT, asBEHAVE_ADDREF or asBEHAVE_RELEASE
 // RegisterObjectMethod(obj, decl, AS_FUNCTION_OBJFIRST(f), AS_CALL_CDECL_OBJFIRST)
-// RegisterObjectMethod(obj, decl, AS_FUNCTIONPT_OBJFIRST(f, p, r), AS_CALL_CDECL_OBJFIRST)
+// RegisterObjectMethod(obj, decl, AS_FUNCTIONPR_OBJFIRST(f, p, r), AS_CALL_CDECL_OBJFIRST)
 // RegisterObjectMethod(obj, decl, AS_FUNCTION_OBJLAST(f), AS_CALL_CDECL_OBJLAST)
-// RegisterObjectMethod(obj, decl, AS_FUNCTIONPT_OBJLAST(f, p, r), AS_CALL_CDECL_OBJLAST)
+// RegisterObjectMethod(obj, decl, AS_FUNCTIONPR_OBJLAST(f, p, r), AS_CALL_CDECL_OBJLAST)
 #ifdef AS_MAX_PORTABILITY
 	#define AS_FUNCTION_OBJFIRST(f) WRAP_OBJ_FIRST(f)
 	#define AS_FUNCTION_OBJLAST(f) WRAP_OBJ_LAST(f)
