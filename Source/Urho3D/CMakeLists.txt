@@ -43,9 +43,9 @@ elseif (MINGW)
         set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wa,-mbig-obj")
         set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-mbig-obj")
     elseif (CMAKE_BUILD_TYPE MATCHES Debug)
-        SET_SOURCE_FILES_PROPERTIES(AngelScript/GeneratedClasses.cpp PROPERTIES COMPILE_FLAGS -Os)
-        SET_SOURCE_FILES_PROPERTIES(AngelScript/GeneratedClasses.cpp PROPERTIES LINK_FLAGS -Os)
-        SET_SOURCE_FILES_PROPERTIES(AngelScript/GeneratedClasses.cpp PROPERTIES STATIC_LIBRARY_FLAGS -Os)
+        SET_SOURCE_FILES_PROPERTIES(AngelScript/Generated_Classes.cpp PROPERTIES COMPILE_FLAGS -Os)
+        SET_SOURCE_FILES_PROPERTIES(AngelScript/Generated_Classes.cpp PROPERTIES LINK_FLAGS -Os)
+        SET_SOURCE_FILES_PROPERTIES(AngelScript/Generated_Classes.cpp PROPERTIES STATIC_LIBRARY_FLAGS -Os)
     endif ()
 endif ()
 
@@ -183,15 +183,15 @@ if (URHO3D_GENERATEBINDINGS)
     set (XML_AST_DIR "${CMAKE_BINARY_DIR}/Source/Tools/BindingGenerator/generated/xml")
     set (BINDING_GENERATOR_PATH "${CMAKE_BINARY_DIR}/bin/tool/BindingGenerator")
 
-    set (AS_GENERATED_FILES "AngelScript/GeneratedEnums.cpp"
-                            "AngelScript/GeneratedObjectTypes.cpp"
-                            "AngelScript/GeneratedDefaultConstructors.cpp"
-                            "AngelScript/GeneratedClasses.cpp"
-                            "AngelScript/GeneratedGlobalVariables.cpp"
-                            "AngelScript/GeneratedGlobalFunctions.cpp"
-                            "AngelScript/GeneratedIncludes.h"
+    set (AS_GENERATED_FILES "AngelScript/Generated_Enums.cpp"
+                            "AngelScript/Generated_ObjectTypes.cpp"
+                            "AngelScript/Generated_DefaultConstructors.cpp"
+                            "AngelScript/Generated_Classes.cpp"
+                            "AngelScript/Generated_GlobalVariables.cpp"
+                            "AngelScript/Generated_GlobalFunctions.cpp"
+                            "AngelScript/Generated_Includes.h"
                             "AngelScript/Generated_Members.h"
-                            "AngelScript/Generated_Templates_New.h")
+                            "AngelScript/Generated_Templates.h")
 
     set (AS_GENERATED_FILES_FULL_PATHS "${AS_GENERATED_FILES}")
     # Add "${CMAKE_SOURCE_DIR}/Source/Urho3D/" to every item in list

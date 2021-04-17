@@ -4,7 +4,7 @@
 
 #include "../AngelScript/APITemplates.h"
 
-#include "../AngelScript/GeneratedIncludes.h"
+#include "../AngelScript/Generated_Includes.h"
 #include "../AngelScript/Manual.h"
 
 namespace Urho3D
@@ -4432,10 +4432,10 @@ template <class T> void RegisterMembers_Serializer(asIScriptEngine* engine, cons
 // struct ShaderParameter | File: ../Graphics/ShaderVariation.h
 template <class T> void RegisterMembers_ShaderParameter(asIScriptEngine* engine, const char* className)
 {
-    // union ShaderParameter::@0 Urho3D::ShaderParameter::@1
-    // Error: type "union Urho3D::ShaderParameter::@0" can not automatically bind
-    // union ShaderParameter::@2 Urho3D::ShaderParameter::@3
-    // Error: type "union Urho3D::ShaderParameter::@2" can not automatically bind
+    // union ShaderParameter::@4 Urho3D::ShaderParameter::@5
+    // Error: type "union Urho3D::ShaderParameter::@4" can not automatically bind
+    // union ShaderParameter::@6 Urho3D::ShaderParameter::@7
+    // Error: type "union Urho3D::ShaderParameter::@6" can not automatically bind
     // ConstantBuffer* ShaderParameter::bufferPtr_
     // Not registered because pointer
 

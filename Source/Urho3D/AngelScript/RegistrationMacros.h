@@ -26,7 +26,7 @@
 #include "../AngelScript/aswrappedcall.h"
 #endif
 
-#include "../AngelScript/Generated_Templates_New.h"
+#include "../AngelScript/Generated_Templates.h"
 
 namespace Urho3D
 {
