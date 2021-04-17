@@ -52,7 +52,7 @@ void ASGeneratedFile_Members::Save()
         "#include \"../Precompiled.h\"\n"
         "#include \"../AngelScript/APITemplates.h\"\n"
         "\n"
-        "#include \"../AngelScript/GeneratedIncludes.h\"\n"
+        "#include \"../AngelScript/Generated_Includes.h\"\n"
         "#include \"../AngelScript/Manual.h\"\n"
         "\n"
         "namespace Urho3D\n"
@@ -89,7 +89,7 @@ void ASGeneratedFile_Templates::Save()
         "#include \"../Precompiled.h\"\n"
         "#include \"../AngelScript/APITemplates.h\"\n"
         "\n"
-        "#include \"../AngelScript/GeneratedIncludes.h\"\n"
+        "#include \"../AngelScript/Generated_Includes.h\"\n"
         "\n"
         "#include \"../AngelScript/Manual.h\"\n"
         "\n"
@@ -159,12 +159,12 @@ namespace Result
 {
     vector<ProcessedEnum> enums_;
 
-    // Write result to GeneratedEnums.cpp
+    // Write result to Generated_Enums.cpp
     static void SaveEnums()
     {
         sort(enums_.begin(), enums_.end());
 
-        ofstream ofs(_sourceDir + "/Source/Urho3D/AngelScript/GeneratedEnums.cpp");
+        ofstream ofs(_sourceDir + "/Source/Urho3D/AngelScript/Generated_Enums.cpp");
 
         ofs <<
             "// DO NOT EDIT. This file is generated\n"
@@ -174,7 +174,7 @@ namespace Result
             "#include \"../Precompiled.h\"\n"
             "#include \"../AngelScript/APITemplates.h\"\n"
             "\n"
-            "#include \"../AngelScript/GeneratedIncludes.h\"\n"
+            "#include \"../AngelScript/Generated_Includes.h\"\n"
             "\n"
             "namespace Urho3D\n"
             "{\n"
@@ -244,12 +244,12 @@ namespace Result
 
     vector<ProcessedGlobalFunction> globalFunctions_;
 
-    // Write result to GlobalFunctions.cpp
+    // Write result to Generated_GlobalFunctions.cpp
     static void SaveGlobalFunctions()
     {
         sort(globalFunctions_.begin(), globalFunctions_.end());
 
-        ofstream ofs(_sourceDir + "/Source/Urho3D/AngelScript/GeneratedGlobalFunctions.cpp");
+        ofstream ofs(_sourceDir + "/Source/Urho3D/AngelScript/Generated_GlobalFunctions.cpp");
 
         ofs <<
             "// DO NOT EDIT. This file is generated\n"
@@ -257,7 +257,7 @@ namespace Result
             "#include \"../Precompiled.h\"\n"
             "#include \"../AngelScript/APITemplates.h\"\n"
             "\n"
-            "#include \"../AngelScript/GeneratedIncludes.h\"\n"
+            "#include \"../AngelScript/Generated_Includes.h\"\n"
             "\n"
             "namespace Urho3D\n"
             "{\n"
@@ -327,12 +327,12 @@ namespace Result
 
     vector<ProcessedGlobalVariable> globalVariables_;
 
-    // Write result to GlobalVariables.cpp
+    // Write result to Generated_GlobalVariables.cpp
     static void SaveGlobalVariables()
     {
         sort(globalVariables_.begin(), globalVariables_.end());
 
-        ofstream ofs(_sourceDir + "/Source/Urho3D/AngelScript/GeneratedGlobalVariables.cpp");
+        ofstream ofs(_sourceDir + "/Source/Urho3D/AngelScript/Generated_GlobalVariables.cpp");
 
         ofs <<
             "// DO NOT EDIT. This file is generated\n"
@@ -340,7 +340,7 @@ namespace Result
             "#include \"../Precompiled.h\"\n"
             "#include \"../AngelScript/APITemplates.h\"\n"
             "\n"
-            "#include \"../AngelScript/GeneratedIncludes.h\"\n"
+            "#include \"../AngelScript/Generated_Includes.h\"\n"
             "\n"
             "// Some headers could re-define M_PI, ensure that it's undefined\n"
             "#undef M_PI\n"
@@ -393,10 +393,10 @@ namespace Result
 
     vector<ProcessedClass> classes_;
 
-    // Write result to GeneratedObjectTypes.cpp
+    // Write result to Generated_ObjectTypes.cpp
     static void SaveObjectTypes()
     {
-        ofstream ofs(_sourceDir + "/Source/Urho3D/AngelScript/GeneratedObjectTypes.cpp");
+        ofstream ofs(_sourceDir + "/Source/Urho3D/AngelScript/Generated_ObjectTypes.cpp");
 
         ofs <<
             "// DO NOT EDIT. This file is generated\n"
@@ -406,7 +406,7 @@ namespace Result
             "#include \"../Precompiled.h\"\n"
             "#include \"../AngelScript/APITemplates.h\"\n"
             "\n"
-            "#include \"../AngelScript/GeneratedIncludes.h\"\n"
+            "#include \"../AngelScript/Generated_Includes.h\"\n"
             "\n"
             "namespace Urho3D\n"
             "{\n"
@@ -450,10 +450,10 @@ namespace Result
             "}\n";
     }
 
-    // Write result to GeneratedDefaultConstructors.cpp
+    // Write result to Generated_DefaultConstructors.cpp
     static void SaveDefaultConstructors()
     {
-        ofstream ofs(_sourceDir + "/Source/Urho3D/AngelScript/GeneratedDefaultConstructors.cpp");
+        ofstream ofs(_sourceDir + "/Source/Urho3D/AngelScript/Generated_DefaultConstructors.cpp");
 
         ofs <<
             "// DO NOT EDIT. This file is generated\n"
@@ -463,7 +463,7 @@ namespace Result
             "#include \"../Precompiled.h\"\n"
             "#include \"../AngelScript/APITemplates.h\"\n"
             "\n"
-            "#include \"../AngelScript/GeneratedIncludes.h\"\n"
+            "#include \"../AngelScript/Generated_Includes.h\"\n"
             "\n"
             "namespace Urho3D\n"
             "{\n";
@@ -549,10 +549,10 @@ namespace Result
             "}\n";
     }
 
-    // Write result to GeneratedClasses.cpp
+    // Write result to Generated_Classes.cpp
     static void SaveGeneratedClasses()
     {
-        ofstream ofs(_sourceDir + "/Source/Urho3D/AngelScript/GeneratedClasses.cpp");
+        ofstream ofs(_sourceDir + "/Source/Urho3D/AngelScript/Generated_Classes.cpp");
 
         ofs <<
             "// DO NOT EDIT. This file is generated\n"
@@ -560,7 +560,7 @@ namespace Result
             "#include \"../Precompiled.h\"\n"
             "#include \"../AngelScript/APITemplates.h\"\n"
             "\n"
-            "#include \"../AngelScript/GeneratedIncludes.h\"\n"
+            "#include \"../AngelScript/Generated_Includes.h\"\n"
             "#include \"../AngelScript/Generated_Members.h\"\n"
             "#include \"../AngelScript/Manual.h\"\n"
             "\n"
@@ -818,8 +818,8 @@ namespace Result
                 "#include \"../Precompiled.h\"\n"
                 "#include \"../AngelScript/APITemplates.h\"\n"
                 "\n"
-                "#include \"../AngelScript/GeneratedIncludes.h\"\n"
-                "#include \"../AngelScript/GeneratedClassMembers.h\"\n"
+                "#include \"../AngelScript/Generated_Includes.h\"\n"
+                "#include \"../AngelScript/Generated_ClassMembers.h\"\n"
                 "#include \"../AngelScript/Manual.h\"\n"
                 "\n"
                 "namespace Urho3D\n"
@@ -854,7 +854,7 @@ namespace Result
             "\n"
             "#include \"../AngelScript/APITemplates.h\"\n"
             "\n"
-            "#include \"../AngelScript/GeneratedIncludes.h\"\n"
+            "#include \"../AngelScript/Generated_Includes.h\"\n"
             "#include \"../AngelScript/Manual.h\"\n"
             "\n"
             "namespace Urho3D\n"
@@ -1077,13 +1077,13 @@ namespace Result
         }
     }
 
-    // Write result to GeneratedIncludes.h
+    // Write result to Generated_Includes.h
     static void SaveIncludes()
     {
         sort(headers_.begin(), headers_.end());
         sort(ignoredHeaders_.begin(), ignoredHeaders_.end());
 
-        ofstream ofs(_sourceDir + "/Source/Urho3D/AngelScript/GeneratedIncludes.h");
+        ofstream ofs(_sourceDir + "/Source/Urho3D/AngelScript/Generated_Includes.h");
 
         ofs <<
             "// DO NOT EDIT. This file is generated\n"

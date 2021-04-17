@@ -3,7 +3,7 @@
 #include "../Precompiled.h"
 #include "../AngelScript/APITemplates.h"
 
-#include "../AngelScript/GeneratedIncludes.h"
+#include "../AngelScript/Generated_Includes.h"
 #include "../AngelScript/Generated_Members.h"
 #include "../AngelScript/Manual.h"
 

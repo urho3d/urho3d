@@ -195,7 +195,7 @@ void WriteFactories(ofstream& ofs)
 
 void GenerateTemplates()
 {
-    ofstream ofs(_sourceDir + "/Source/Urho3D/AngelScript/Generated_Templates_New.h");
+    ofstream ofs(_sourceDir + "/Source/Urho3D/AngelScript/Generated_Templates.h");
 
     ofs <<
         "// DO NOT EDIT. This file is generated\n"

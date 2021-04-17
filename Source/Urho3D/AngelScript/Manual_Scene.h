@@ -22,13 +22,11 @@
 
 #pragma once
 
-//#include "../AngelScript/APITemplates.h"
 #include "../Graphics/Skeleton.h"
 #include "../Scene/Scene.h"
 #include "../Graphics/Octree.h"
 #include "../Graphics/DebugRenderer.h"
 #include "../IO/PackageFile.h"
-//#include "../AngelScript/GeneratedIncludes.h"
 
 namespace Urho3D
 {

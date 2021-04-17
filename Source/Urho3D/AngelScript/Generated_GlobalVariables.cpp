@@ -3,7 +3,7 @@
 #include "../Precompiled.h"
 #include "../AngelScript/APITemplates.h"
 
-#include "../AngelScript/GeneratedIncludes.h"
+#include "../AngelScript/Generated_Includes.h"
 
 // Some headers could re-define M_PI, ensure that it's undefined
 #undef M_PI
