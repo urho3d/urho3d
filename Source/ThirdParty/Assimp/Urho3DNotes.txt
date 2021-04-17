@@ -1,3 +1,8 @@
-URL: https://github.com/assimp/assimp
+URL: https://github.com/assimp/assimp/releases/tag/v5.0.1
 Date: 19.03.2021
 Latest commit: https://github.com/assimp/assimp/commit/8f0c6b04b2257a520aaab38421b2e090204b69df
+
+Deleted ./cmake ./doc ./include/assimp/port ./packaging ./port ./samples ./scripts ./test ./tools, ./*.cmake.in, ./BUILDBINARIES_EXAMPLE.bat
+Kept only ./cmake-modules/Findrt.cmake and ./cmake-modules/MinGW_x86_64.cmake and deleted the rest inside because they're redundant
+Kept revision.h.in
+Modified ./CMakeLists.txt and ./code/CMakeLists.txt
