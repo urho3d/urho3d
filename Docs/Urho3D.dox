@@ -4,7 +4,7 @@ namespace Urho3D
 /**
 \mainpage Documentation
 
-Urho3D (https://urho3d.github.io/) is a free lightweight, cross-platform 2D and 3D game engine implemented in C++ and released under the MIT license. It utilizes either Direct3D9 or OpenGL for rendering (%Shader %Model 2 or OpenGL 2.0 required as minimum.)
+Urho3D (https://urho3d.io/) is a free lightweight, cross-platform 2D and 3D game engine implemented in C++ and released under the MIT license. It utilizes either Direct3D9 or OpenGL for rendering (%Shader %Model 2 or OpenGL 2.0 required as minimum.)
 
 For getting started, see:
 
