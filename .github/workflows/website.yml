@@ -25,7 +25,7 @@
 name: Website event dispatcher
 on:
   push:
-    branches: [master]
+    branches: [ master ]
 jobs:
   dispatch:
     name: Dispatch build event
@@ -33,7 +33,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        with: { fetch-depth: 0 }
       - name: What changed
         id: whatchanged
         run: echo ::set-output name=skip::$(git whatchanged -1 |grep -cq 'website/'; echo $?)

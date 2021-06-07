@@ -23,7 +23,7 @@
 ---
 
 name: CI/CD
-on: [push, pull_request]
+on: [ push, pull_request ]
 jobs:
   init:
     name: Init
@@ -31,7 +31,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        with: { fetch-depth: 0 }
       - name: What changed
         id: whatchanged
         run: echo ::set-output name=skip::$(git whatchanged -1 |grep '^:' |grep -cqv 'website/'; echo $?)
