@@ -26,7 +26,7 @@ name: CI/CD
 on: [push, pull_request]
 jobs:
   init:
-    name: init
+    name: Init
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
