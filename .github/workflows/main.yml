@@ -33,7 +33,9 @@ jobs:
         uses: actions/checkout@v2
       - name: What changed
         id: whatchanged
-        run: echo ::set-output name=skip::$(git whatchanged -1 |grep '^:' |grep -cqv 'website/'; echo $?)
+        run: |
+          git whatchanged -1 |grep '^:' >/tmp/whatchanged
+          echo ::set-output name=skip::$(grep -cqv 'website/' /tmp/whatchanged; echo $?)
       - name: Proceed
         run: true
         if: steps.whatchanged.outputs.skip == '0'
