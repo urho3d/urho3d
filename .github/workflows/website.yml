@@ -33,9 +33,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        with: { fetch-depth: 2 }
       - name: What changed
         id: whatchanged
-        run: echo ::set-output name=skip::$(git whatchanged -1 |grep -cq 'website/'; echo $?)
+        run: echo ::set-output name=skip::$(git log --raw --no-merges -1 |grep -cq 'website/'; echo $?)
       - name: Dispatch
         uses: peter-evans/repository-dispatch@v1.1.3
         with:

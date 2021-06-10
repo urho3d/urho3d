@@ -28,21 +28,22 @@ jobs:
   init:
     name: Init
     runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.whatchanged.outputs.skip }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        with: { fetch-depth: 2 }
       - name: What changed
         id: whatchanged
         run: |
-          git whatchanged -1 |grep '^:' >/tmp/whatchanged
+          git log --raw --no-merges -1 |grep '^:' >/tmp/whatchanged
           echo ::set-output name=skip::$(grep -cqv 'website/' /tmp/whatchanged; echo $?)
-      - name: Proceed
-        run: true
-        if: steps.whatchanged.outputs.skip == '0'
   linux:
     name: 🐧
     runs-on: ubuntu-latest
     needs: init
+    if: needs.init.outputs.skip == '0'
     strategy:
       fail-fast: false
       matrix:
@@ -174,6 +175,7 @@ jobs:
     name: 🍏
     runs-on: macos-latest
     needs: init
+    if: needs.init.outputs.skip == '0'
     strategy:
       fail-fast: false
       matrix:
@@ -234,6 +236,7 @@ jobs:
     name: 🔲
     runs-on: windows-latest
     needs: init
+    if: needs.init.outputs.skip == '0'
     strategy:
       fail-fast: false
       matrix:
