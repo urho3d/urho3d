@@ -33,10 +33,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        with: { fetch-depth: 2 }
       - name: What changed
         id: whatchanged
         run: |
+          git fetch --deepen=1
           git log --raw --no-merges -1 |grep '^:' >/tmp/whatchanged
           echo ::set-output name=skip::$(grep -cqv 'website/' /tmp/whatchanged; echo $?)
   linux:
