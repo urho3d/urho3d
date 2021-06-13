@@ -1,0 +1,212 @@
+---
+sidebar_position: 10
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Quick Start
+
+Using Dockerized Build Environment to start quickly
+
+There are more than one way to start using the Urho3D library. This section shows you how to start quickly by using docker containers that have the build environment already prepared for you. All you need is a working docker engine on your host system.
+
+:::tip
+
+Skip to the Requirements section, if you cannot use docker engine on your host system.
+
+:::
+
+:::info
+
+Both `docker` and `podman` are supported.
+
+:::
+
+:::caution
+
+Windows host system requires WSL2.
+
+:::
+
+## Build and Install Urho3D Library
+
+Clone the Urho3D project from the main branch, change directory to its project root, and execute the following commands to build and install the library for your desired target platform.
+
+<Tabs
+  groupId={'target-platform'}
+  defaultValue={'android'}
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'Arm', value: 'arm'},
+    {label: 'Linux', value: 'linux'},
+    {label: 'RPI', value: 'rpi'},
+    {label: 'Web', value: 'web'},
+    {label: 'Windows', value: 'win'},
+  ]
+  }>
+  <TabItem value="android">
+
+```bash
+git clone https://github.com/urho3d/Urho3D.git
+cd Urho3D
+# Build Urho3D library
+script/dockerized.sh android
+# Install Urho3D library to Maven local repository mounted from a docker volume
+script/dockerized.sh android rake install
+```
+
+  </TabItem>
+  <TabItem value="arm">
+
+```bash {3}
+git clone https://github.com/urho3d/Urho3D.git
+cd Urho3D
+# Build Urho3D library, usually you need to specify extra build options to target a specific ARM board
+script/dockerized.sh arm
+# Install Urho3D library to a stage directory mounted from a docker volume
+script/dockerized.sh arm rake install[~/stage-arm]
+```
+
+  </TabItem>
+  <TabItem value="linux">
+
+```bash
+git clone https://github.com/urho3d/Urho3D.git
+cd Urho3D
+# Build Urho3D library
+script/dockerized.sh linux
+# Install Urho3D library to a stage directory mounted from a docker volume
+script/dockerized.sh linux rake install[~/stage-linux]
+```
+
+  </TabItem>
+  <TabItem value="rpi">
+
+```bash {3}
+git clone https://github.com/urho3d/Urho3D.git
+cd Urho3D
+# Build Urho3D library, modify the "RPI_ABI" build option accordingly
+RPI_ABI=RPI4 script/dockerized.sh rpi
+# Install Urho3D library to a stage directory mounted from a docker volume
+script/dockerized.sh rpi rake install[~/stage-rpi]
+```
+
+  </TabItem>
+  <TabItem value="web">
+
+```bash
+git clone https://github.com/urho3d/Urho3D.git
+cd Urho3D
+# Build Urho3D library
+script/dockerized.sh web
+# Install Urho3D library to a stage directory mounted from a docker volume
+script/dockerized.sh web rake install[~/stage-web]
+```
+
+  </TabItem>
+  <TabItem value="win">
+
+```bash
+git clone https://github.com/urho3d/Urho3D.git
+cd Urho3D
+# Build Urho3D library
+script/dockerized.sh mingw
+# Install Urho3D library to a stage directory mounted from a docker volume
+script/dockerized.sh mingw rake install[~/stage-mingw]
+```
+
+  </TabItem>
+</Tabs>
+
+## Create a New UrhoApp
+
+You need an installed Urho3D library for the desired target platform to proceed. Although the Urho3D build system also supports linking the Urho3D library directly from its build tree, this quick start guide will not be discussing it here. Assuming you have been following along from the previous section, execute the following commands to create a new skeleton project structure for your new app, and then build it.
+
+<Tabs
+  groupId={'target-platform'}
+  defaultValue={'android'}
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'Arm', value: 'arm'},
+    {label: 'Linux', value: 'linux'},
+    {label: 'RPI', value: 'rpi'},
+    {label: 'Web', value: 'web'},
+    {label: 'Windows', value: 'win'},
+  ]
+  }>
+  <TabItem value="android">
+
+```bash
+# Scaffolding a new UrhoApp
+script/dockerized.sh android rake new[AndroidUrhoApp,demo]
+cd demo/AndroidUrhoApp
+# Build the newly generated UrhoApp
+script/dockerized.sh android
+```
+
+  </TabItem>
+  <TabItem value="arm">
+
+```bash {4}
+# Scaffolding a new UrhoApp
+script/dockerized.sh arm rake new[ArmUrhoApp,demo]
+cd demo/ArmUrhoApp
+# Build the newly generated UrhoApp, specify other extra build options to target a specific ARM board
+URHO3D_HOME=/home/urho3d/stage-arm/usr/local script/dockerized.sh arm
+```
+
+  </TabItem>
+  <TabItem value="linux">
+
+```bash
+# Scaffolding a new UrhoApp
+script/dockerized.sh linux rake new[LinuxUrhoApp,demo]
+cd demo/LinuxUrhoApp
+# Build the newly generated UrhoApp
+URHO3D_HOME=/home/urho3d/stage-linux/usr/local script/dockerized.sh linux
+```
+
+  </TabItem>
+  <TabItem value="rpi">
+
+```bash {4}
+# Scaffolding a new UrhoApp
+script/dockerized.sh rpi rake new[PiUrhoApp,demo]
+cd demo/PiUrhoApp
+# Build the newly generated UrhoApp, modify the "RPI_ABI" build option accordingly
+RPI_ABI=RPI4 URHO3D_HOME=/home/urho3d/stage-rpi/usr/local script/dockerized.sh rpi
+```
+
+  </TabItem>
+  <TabItem value="web">
+
+```bash
+# Scaffolding a new UrhoApp
+script/dockerized.sh web rake new[WebUrhoApp,demo]
+cd demo/WebUrhoApp
+# Build the newly generated UrhoApp
+URHO3D_HOME=/home/urho3d/stage-web/usr/local script/dockerized.sh web
+```
+
+  </TabItem>
+  <TabItem value="win">
+
+```bash
+# Scaffolding a new UrhoApp
+script/dockerized.sh mingw rake new[WindowsUrhoApp,demo]
+cd demo/WindowsUrhoApp
+# Build the newly generated UrhoApp
+URHO3D_HOME=/home/urho3d/stage-mingw/usr/local script/dockerized.sh mingw
+```
+
+  </TabItem>
+</Tabs>
+
+:::note
+
+This is not a copy/paste error. You can build your new UrhoApp exactly the same way as the Urho3D project itself!
+
+:::
+
+The `URHO3D_HOME` build option tells the build system where to find the installed Urho3D library, if the installed location is not a system wide standard location. See the Build Options section for more information.
