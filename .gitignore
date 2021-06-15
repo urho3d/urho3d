@@ -15,6 +15,7 @@ generated/
 build/
 /captures/
 .cxx/
+/demo/
 
 # Output files
 /Source/**/*.a
