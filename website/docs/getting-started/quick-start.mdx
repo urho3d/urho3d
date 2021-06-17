@@ -119,9 +119,11 @@ script/dockerized.sh mingw rake install[~/stage-mingw]
   </TabItem>
 </Tabs>
 
+The `script/dockerized.sh` spawns one of the docker container based on the specified platform name in the first argument. The rest of the arguments specify the command to be executed inside the container. The default command is `rake build`. You can invoke other rake tasks by passing the command explicitly as arguments. It is also possible to invoke multiple rake tasks in one go. Read Rake Tasks section for more details.
+
 ## Create a New UrhoApp
 
-You need an installed Urho3D library for the desired target platform to proceed. Although the Urho3D build system also supports linking the Urho3D library directly from its build tree, this quick start guide will not be discussing it here. Assuming you have been following along from the previous section, execute the following commands to create a new skeleton project structure for your new app, and then build it.
+You need an installed Urho3D library for the desired target platform to proceed. Although the Urho3D build system also supports linking the Urho3D library directly from its build tree, this quick start guide will not be discussing it here. Assuming you have been following along from the previous section, execute the following commands to create a new UrhoApp project, and then build it.
 
 <Tabs
   groupId={'target-platform'}
@@ -138,7 +140,7 @@ You need an installed Urho3D library for the desired target platform to proceed.
   <TabItem value="android">
 
 ```bash
-# Scaffolding a new UrhoApp
+# Create a new UrhoApp
 script/dockerized.sh android rake new[AndroidUrhoApp,demo]
 cd demo/AndroidUrhoApp
 # Build the newly generated UrhoApp
@@ -149,7 +151,7 @@ script/dockerized.sh android
   <TabItem value="arm">
 
 ```bash {4}
-# Scaffolding a new UrhoApp
+# Create a new UrhoApp
 script/dockerized.sh arm rake new[ArmUrhoApp,demo]
 cd demo/ArmUrhoApp
 # Build the newly generated UrhoApp, specify other extra build options to target a specific ARM board
@@ -160,7 +162,7 @@ URHO3D_HOME=/home/urho3d/stage-arm/usr/local script/dockerized.sh arm
   <TabItem value="linux">
 
 ```bash
-# Scaffolding a new UrhoApp
+# Create a new UrhoApp
 script/dockerized.sh linux rake new[LinuxUrhoApp,demo]
 cd demo/LinuxUrhoApp
 # Build the newly generated UrhoApp
@@ -171,7 +173,7 @@ URHO3D_HOME=/home/urho3d/stage-linux/usr/local script/dockerized.sh linux
   <TabItem value="rpi">
 
 ```bash {4}
-# Scaffolding a new UrhoApp
+# Create a new UrhoApp
 script/dockerized.sh rpi rake new[PiUrhoApp,demo]
 cd demo/PiUrhoApp
 # Build the newly generated UrhoApp, modify the "RPI_ABI" build option accordingly
@@ -182,7 +184,7 @@ RPI_ABI=RPI4 URHO3D_HOME=/home/urho3d/stage-rpi/usr/local script/dockerized.sh r
   <TabItem value="web">
 
 ```bash
-# Scaffolding a new UrhoApp
+# Create a new UrhoApp
 script/dockerized.sh web rake new[WebUrhoApp,demo]
 cd demo/WebUrhoApp
 # Build the newly generated UrhoApp
@@ -193,7 +195,7 @@ URHO3D_HOME=/home/urho3d/stage-web/usr/local script/dockerized.sh web
   <TabItem value="win">
 
 ```bash
-# Scaffolding a new UrhoApp
+# Create a new UrhoApp
 script/dockerized.sh mingw rake new[WindowsUrhoApp,demo]
 cd demo/WindowsUrhoApp
 # Build the newly generated UrhoApp
@@ -209,4 +211,8 @@ This is not a copy/paste error. You can build your new UrhoApp exactly the same 
 
 :::
 
-The `URHO3D_HOME` build option tells the build system where to find the installed Urho3D library, if the installed location is not a system wide standard location. See the Build Options section for more information.
+The `URHO3D_HOME` build option tells the build system where to find the installed Urho3D library, if the installed location is not a system wide standard location. See the Build Options section for more information. The Maven local repository for Android platform is one of such standard location and hence the command for building UrhoApp on Android platform can be simplified.
+
+<div className={'text--center'}>
+  <img src={'/img/docs/quick-start-screencast.svg'} alt={'Screencast'}/>
+</div>
