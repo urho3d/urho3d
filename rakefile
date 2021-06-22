@@ -30,7 +30,10 @@ task :cmake => [:init] do
       system 'bash', '-c', 'rm -rf ~/.{ccache,gradle}' or abort 'Failed to clear the build cache'
     end
   end
-  next if ENV['PLATFORM'] == 'android' || (Dir.exist?("#{build_tree}") and not ARGV.include?('cmake'))
+  next if ENV['PLATFORM'] == 'android' || (Dir.exists?("#{build_tree}") and not ARGV.include?('cmake'))
+  if dockerized? && !ENV['URHO3D_HOME']
+    ENV['URHO3D_HOME'] = "~/stage-#{ENV['PLATFORM']}/usr/local"
+  end
   script = "script/cmake_#{ENV['GENERATOR']}#{ENV['OS'] ? '.bat' : '.sh'}"
   build_options = /linux|macOS|win/ =~ ENV['PLATFORM'] ? '' : "-D #{ENV['PLATFORM'].upcase}=1"
   File.readlines('script/.build-options').each { |var|
@@ -103,6 +106,8 @@ task :install, [:prefix] => [:init] do |_, args|
   if ENV['PLATFORM'] == 'android'
     Rake::Task[:gradle].invoke('publishToMavenLocal')
     next
+  elsif dockerized?
+    args.with_defaults(:prefix => "~/stage-#{ENV['PLATFORM']}")
   end
   wrapper = args[:prefix] && !ENV['OS'] ? "DESTDIR=#{verify_path(args[:prefix])}" : ''
   system build_target('install', wrapper) or abort

@@ -4,16 +4,17 @@ sidebar_position: 10
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import Styles from './getting-started.module.scss'
 
 # Quick Start
 
-Using Dockerized Build Environment to start quickly
+Using Dockerized Build Environment (DBE) to start quickly
 
 There are more than one way to start using the Urho3D library. This section shows you how to start quickly by using docker containers that have the build environment already prepared for you. All you need is a working docker engine on your host system.
 
 :::tip
 
-Skip to the Requirements section, if you cannot use docker engine on your host system.
+Skip to the [Requirements](building-urho3d-library#Requirements) section, if you cannot use docker engine on your host system.
 
 :::
 
@@ -34,10 +35,12 @@ Windows host system requires WSL2.
 Clone the Urho3D project from the main branch, change directory to its project root, and execute the following commands to build and install the library for your desired target platform.
 
 <Tabs
+  className={Styles.buildUrho3D}
   groupId={'target-platform'}
   defaultValue={'android'}
   values={[
     {label: 'Android', value: 'android'},
+    {label: 'Apple', value: 'apple'},
     {label: 'Arm', value: 'arm'},
     {label: 'Linux', value: 'linux'},
     {label: 'RPI', value: 'rpi'},
@@ -45,75 +48,83 @@ Clone the Urho3D project from the main branch, change directory to its project r
     {label: 'Windows', value: 'win'},
   ]
   }>
-  <TabItem value="android">
+  <TabItem value={'android'}>
 
 ```bash
 git clone https://github.com/urho3d/Urho3D.git
 cd Urho3D
 # Build Urho3D library
 script/dockerized.sh android
-# Install Urho3D library to Maven local repository mounted from a docker volume
+# Install Urho3D library to Maven local repository
 script/dockerized.sh android rake install
 ```
 
   </TabItem>
-  <TabItem value="arm">
+  <TabItem value={'apple'}>
 
-```bash {3}
+```
+Currently DBE does not support Apple platforms
+However, Urho3D supports Apple platforms using native build environment
+```
+
+  </TabItem>
+  <TabItem value={'arm'}>
+
+```bash
 git clone https://github.com/urho3d/Urho3D.git
 cd Urho3D
 # Build Urho3D library, usually you need to specify extra build options to target a specific ARM board
 script/dockerized.sh arm
-# Install Urho3D library to a stage directory mounted from a docker volume
-script/dockerized.sh arm rake install[~/stage-arm]
+# Install Urho3D library to a local stage directory
+script/dockerized.sh arm rake install
 ```
 
   </TabItem>
-  <TabItem value="linux">
+  <TabItem value={'linux'}>
 
 ```bash
 git clone https://github.com/urho3d/Urho3D.git
 cd Urho3D
 # Build Urho3D library
 script/dockerized.sh linux
-# Install Urho3D library to a stage directory mounted from a docker volume
-script/dockerized.sh linux rake install[~/stage-linux]
+# Install Urho3D library to a local stage directory
+script/dockerized.sh linux rake install
 ```
 
   </TabItem>
-  <TabItem value="rpi">
+  <TabItem value={'rpi'}>
 
-```bash {3}
+```bash
 git clone https://github.com/urho3d/Urho3D.git
 cd Urho3D
 # Build Urho3D library, modify the "RPI_ABI" build option accordingly
 RPI_ABI=RPI4 script/dockerized.sh rpi
-# Install Urho3D library to a stage directory mounted from a docker volume
-script/dockerized.sh rpi rake install[~/stage-rpi]
+# Install Urho3D library to a local stage directory
+script/dockerized.sh rpi rake install
 ```
 
   </TabItem>
-  <TabItem value="web">
+  <TabItem value={'web'}>
 
 ```bash
 git clone https://github.com/urho3d/Urho3D.git
 cd Urho3D
 # Build Urho3D library
 script/dockerized.sh web
-# Install Urho3D library to a stage directory mounted from a docker volume
-script/dockerized.sh web rake install[~/stage-web]
+# Install Urho3D library to a local stage directory
+script/dockerized.sh web rake install
 ```
 
   </TabItem>
-  <TabItem value="win">
+  <TabItem value={'win'}>
 
 ```bash
 git clone https://github.com/urho3d/Urho3D.git
 cd Urho3D
 # Build Urho3D library
 script/dockerized.sh mingw
-# Install Urho3D library to a stage directory mounted from a docker volume
-script/dockerized.sh mingw rake install[~/stage-mingw]
+# Install Urho3D library to a local stage directory
+script/dockerized.sh mingw rake install
 ```
 
   </TabItem>
@@ -126,10 +137,12 @@ The `script/dockerized.sh` spawns one of the docker container based on the speci
 You need an installed Urho3D library for the desired target platform to proceed. Although the Urho3D build system also supports linking the Urho3D library directly from its build tree, this quick start guide will not be discussing it here. Assuming you have been following along from the previous section, execute the following commands to create a new UrhoApp project, and then build it.
 
 <Tabs
+  className={Styles.buildUrhoApp}
   groupId={'target-platform'}
   defaultValue={'android'}
   values={[
     {label: 'Android', value: 'android'},
+    {label: 'Apple', value: 'apple'},
     {label: 'Arm', value: 'arm'},
     {label: 'Linux', value: 'linux'},
     {label: 'RPI', value: 'rpi'},
@@ -137,7 +150,7 @@ You need an installed Urho3D library for the desired target platform to proceed.
     {label: 'Windows', value: 'win'},
   ]
   }>
-  <TabItem value="android">
+  <TabItem value={'android'}>
 
 ```bash
 # Create a new UrhoApp
@@ -148,58 +161,66 @@ script/dockerized.sh android
 ```
 
   </TabItem>
-  <TabItem value="arm">
+  <TabItem value={'apple'}>
 
-```bash {4}
+```
+Currently DBE does not support Apple platforms
+However, Urho3D supports Apple platforms using native build environment
+```
+
+  </TabItem>
+  <TabItem value={'arm'}>
+
+```bash
 # Create a new UrhoApp
 script/dockerized.sh arm rake new[ArmUrhoApp,demo]
 cd demo/ArmUrhoApp
 # Build the newly generated UrhoApp, specify other extra build options to target a specific ARM board
-URHO3D_HOME=/home/urho3d/stage-arm/usr/local script/dockerized.sh arm
+script/dockerized.sh arm
 ```
 
   </TabItem>
-  <TabItem value="linux">
+  <TabItem value={'linux'}>
 
 ```bash
 # Create a new UrhoApp
 script/dockerized.sh linux rake new[LinuxUrhoApp,demo]
 cd demo/LinuxUrhoApp
 # Build the newly generated UrhoApp
-URHO3D_HOME=/home/urho3d/stage-linux/usr/local script/dockerized.sh linux
+script/dockerized.sh linux
 ```
 
   </TabItem>
-  <TabItem value="rpi">
+  <TabItem value={'rpi'}>
 
-```bash {4}
+```bash
 # Create a new UrhoApp
 script/dockerized.sh rpi rake new[PiUrhoApp,demo]
 cd demo/PiUrhoApp
 # Build the newly generated UrhoApp, modify the "RPI_ABI" build option accordingly
-RPI_ABI=RPI4 URHO3D_HOME=/home/urho3d/stage-rpi/usr/local script/dockerized.sh rpi
+RPI_ABI=RPI4 script/dockerized.sh rpi
 ```
 
   </TabItem>
-  <TabItem value="web">
+  <TabItem value={'web'}>
 
 ```bash
 # Create a new UrhoApp
 script/dockerized.sh web rake new[WebUrhoApp,demo]
 cd demo/WebUrhoApp
 # Build the newly generated UrhoApp
-URHO3D_HOME=/home/urho3d/stage-web/usr/local script/dockerized.sh web
+script/dockerized.sh web
 ```
 
   </TabItem>
-  <TabItem value="win">
+  <TabItem value={'win'}>
 
 ```bash
 # Create a new UrhoApp
 script/dockerized.sh mingw rake new[WindowsUrhoApp,demo]
 cd demo/WindowsUrhoApp
 # Build the newly generated UrhoApp
-URHO3D_HOME=/home/urho3d/stage-mingw/usr/local script/dockerized.sh mingw
+script/dockerized.sh mingw
 ```
 
   </TabItem>
@@ -211,7 +232,7 @@ This is not a copy/paste error. You can build your new UrhoApp exactly the same 
 
 :::
 
-The `URHO3D_HOME` build option tells the build system where to find the installed Urho3D library, if the installed location is not a system wide standard location. See the Build Options section for more information. The Maven local repository for Android platform is one of such standard location and hence the command for building UrhoApp on Android platform can be simplified.
+You can pass optional build options to the build system by using environment variables. One easy way to do that is to set them just in time on the same line before the actual command to be invoked. For example, `RPI_ABI=RPI4 script/dockerized.sh rpi`. See the Build Options section for more information.
 
 <div className={'text--center'}>
   <img src={'/img/docs/quick-start-screencast.svg'} alt={'Screencast'}/>
@@ -219,55 +240,56 @@ The `URHO3D_HOME` build option tells the build system where to find the installe
 
 ## UrhoApp Project Structure
 
-In order to reuse the same build system for Urho3D project to successfully build your own UrhoApp project, the UrhoApp project must be structured similarly to Urho3D project. Assuming you chose to use the `rake new` to create the UrhoApp project, you will have the following project structure under a new app directory in the specified parent directory:
+In order to reuse the same build system for Urho3D project to successfully build your own UrhoApp project, the UrhoApp project must be structured similarly to Urho3D project. Assuming you chose to use the `rake new` to create the UrhoApp project, you will have the following project structure under a new app directory:
 
 ```
 UrhoApp
-├── app
-│   ├── build.gradle.kts
-│   ├── CMakeLists.txt
-│   ├── proguard-rules.pro
-│   └── src
-│       ├─ cpp
-│       │  ├─ UrhoApp.cpp
-│       │  └─ UrhoApp.h
-│       ├─ java/io/urho3d/urhoapp
-│       │  └─ MainActivity.kt
-│       ├─ res
-│       |  └─ (truncated)
-│       └─ AndroidManifest.xml
-├── bin
-│   ├── CoreData
-│   │   └─ (as in Urho3D)
-│   └── Data
-│       ├─ Materials
-│       │  └─ Mushroom.xml
-│       ├─ Models
-│       │  └─ Mushroom.mdl
-│       ├─ Music
-│       │  └─ Ninja Gods.ogg
-│       └─ Textures
-│          ├─ Mushroom.dds
-│          ├─ UrhoIcon.icns
-│          └─ UrhoIcon.png
-├── build.gradle.kts
-├── cmake
-│   └── (as in Urho3D)
-├── CMakeLists.txt
-├── gradle/wrapper
-│   ├── gradle-wrapper.jar
-│   └── gradle-wrapper.properties
-├── gradle.properties
-├── gradlew
-├── gradlew.bat
-├── rakefile
-├── scripts
-│   └── (as in Urho3D)
-├── settings.gradle.kts
-├── .clang-format
-├── .clang-tidy
-├── .gitattributes
-└── .gitignore
+├─ app
+│  ├─ build.gradle.kts
+│  ├─ CMakeLists.txt
+│  ├─ proguard-rules.pro
+│  └─ src
+│     ├─ cpp
+│     │  ├─ UrhoApp.cpp
+│     │  └─ UrhoApp.h
+│     ├─ java
+│     │  └─ io/urho3d/urhoapp
+│     │     └─ MainActivity.kt
+│     ├─ res
+│     |  └─ (truncated)
+│     └─ AndroidManifest.xml
+├─ bin
+│  ├─ CoreData
+│  │  └─ (as in Urho3D)
+│  └─ Data
+│     ├─ Materials
+│     │  └─ Mushroom.xml
+│     ├─ Models
+│     │  └─ Mushroom.mdl
+│     ├─ Music
+│     │  └─ Ninja Gods.ogg
+│     └─ Textures
+│        ├─ Mushroom.dds
+│        ├─ UrhoIcon.icns
+│        └─ UrhoIcon.png
+├─ build.gradle.kts
+├─ cmake
+│  └─ (as in Urho3D)
+├─ CMakeLists.txt
+├─ gradle/wrapper
+│  ├─ gradle-wrapper.jar
+│  └─ gradle-wrapper.properties
+├─ gradle.properties
+├─ gradlew
+├─ gradlew.bat
+├─ rakefile
+├─ scripts
+│  └─ (as in Urho3D)
+├─ settings.gradle.kts
+├─ .clang-format
+├─ .clang-tidy
+├─ .gitattributes
+└─ .gitignore
 ```
 
 At the root of the project there are a few build scripts which can be grouped as follows:
@@ -281,12 +303,6 @@ If you are very familiar with CMake then you can directly invoke `cmake`, `ccmak
 All the above are for the build system, the actual meat of the UrhoApp project are only residing in the following two directories:
 - `app/` - mainly contains the C++ source code in `src/cpp/` and Kotlin/Java source code in `src/java/`.
 - `bin/` - contains the assets used by the Urho3D game engine, at the very least it should have `CoreData/` and `Data/`.
-
-:::tip
-
-The UrhoApp project can be opened directly in the IDE that supports CMake or Gradle build system, like **Android Studio**, **Clion**, **IntelliJ IDEA**, and **Visual Studio**. For other IDEs, like Xcode, use CMake to generate the initial build tree first.
-
-:::
 
 :::info
 

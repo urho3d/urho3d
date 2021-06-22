@@ -115,7 +115,7 @@ jobs:
         if: matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format'
       - name: Scaffolding - install
         run: |
-          script/dockerized.sh ${PLATFORM/-*} rake install[~/stage]
+          script/dockerized.sh ${PLATFORM/-*} rake install
           if [[ $PLATFORM == android ]]; then touch build/cache/.gradle/mark; fi
         if: matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format'
       - name: Scaffolding - new
@@ -124,7 +124,7 @@ jobs:
       - name: Scaffolding - build
         run: |
           cd build/cache/projects/UrhoApp
-          URHO3D_HOME=/home/urho3d/stage/usr/local script/dockerized.sh ${PLATFORM/-*}
+          script/dockerized.sh ${PLATFORM/-*}
         if: matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format'
       - name: Scaffolding - test
         run: |

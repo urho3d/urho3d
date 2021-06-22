@@ -1,0 +1,14 @@
+// A quick and dirty hack to keep the tab panel with less content to have the same height as others
+div > div > div > div > div > div {
+  .buildUrho3D + & {
+    min-height: 164px;
+  }
+
+  .buildUrhoApp + & {
+    min-height: 142px;
+  }
+
+  .requirements + & {
+    min-height: 340px;
+  }
+}

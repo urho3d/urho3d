@@ -1,0 +1,146 @@
+---
+sidebar_position: 20
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import Styles from './getting-started.module.scss';
+
+# Installation
+
+Using native and cross-compiler toolchains to build and install Urho3D library
+
+## Requirements
+
+First prepares the build environment by installing a compiler toolchain for your target platform, and the required build tools. The compiler can be GCC, Clang, MSVC, MinGW-w64, or the one bundled in the SDK like Android SDK, Emscripten SDK, etc. On Ubuntu you can easily prepare the build environment by installing the `build-essential` package, on Windows by installing Visual Studio IDE, and on macOS by installing Xcode IDE. However, for cross-compiling usually you have to download and install the corresponding SDK manually. Make sure at the minimum the build environment has these build tools installed:
+- CMake
+- Git
+- Rake
+
+Optionally these as well:
+- ccache - for speeding up the build
+- Doxygen and Graphviz - for building documentation
+- Make or Ninja - for building with terminal/console
+
+:::caution
+
+Cross-compiling on Windows host requires MinGW-w64 to be installed too as it is required to build the host-tools on the fly while cross-compiling the library for the target platform.
+
+:::
+
+Although Urho3D project has included all required third-party libraries as source code, there may be system-level dependency packages that must be satisfied before Urho3D can be built from source successfully. The list below is by no mean comprehensive nor canonical, but it should be the minimal to get started.
+
+:::note
+
+This may change in the future when the project uses better package manager and Modern CMake. Ideally, the project should bootstrap itself with more ease than currently is.
+
+:::
+
+<Tabs
+  className={Styles.requirements}
+  groupId={'target-platform'}
+  defaultValue={'android'}
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'Apple', value: 'apple'},
+    {label: 'Arm', value: 'arm'},
+    {label: 'Linux', value: 'linux'},
+    {label: 'RPI', value: 'rpi'},
+    {label: 'Web', value: 'web'},
+    {label: 'Windows', value: 'win'},
+  ]
+  }>
+  <TabItem value={'android'}>
+
+```
+Android Studio (and IntelliJ IDEA) should already provide everything required
+Remember to complete the Android SDK installation as per instructed by IDE
+Tested tool version: 29.0.2
+Tested NDK version: 21.3.6528147
+```
+
+  </TabItem>
+  <TabItem value={'apple'}>
+
+```
+# Xcode should already provide everything required
+# You may use "homebrew" to install other missing development packages, like "openssl"
+```
+
+  </TabItem>
+  <TabItem value={'arm'}>
+
+```bash
+# Urho3D only supports ARM platform on Linux OS, so it has the same deps as building Linux platform
+apt install \
+    # !!! MESA is not needed on system with proprietary kernel module/driver !!!
+    libgl1-mesa-dev \
+    # Display server, still default to X11 at the moment
+    libx11-dev \
+    # Sound server, still default to PulseAudio at the moment
+    libpulse-dev \
+    # D-BUS and udev, for game controller hot-plugging
+    libdbus-1-dev libudev-dev \
+    # IME, optional for Chinese/Japanese/Korean text inputting
+    libibus-1.0-dev \
+    # SSL, optional for secure networking
+    libssl-dev
+```
+
+  </TabItem>
+  <TabItem value={'linux'}>
+
+```bash
+# Building as 32-bit on a 64-bit host requires installation of 32-bit development packages too
+apt install \
+    # !!! MESA is not needed on system with proprietary kernel module/driver !!!
+    libgl1-mesa-dev \
+    # Display server, still default to X11 at the moment
+    libx11-dev \
+    # Sound server, still default to PulseAudio at the moment
+    libpulse-dev \
+    # D-BUS and udev, for game controller hot-plugging
+    libdbus-1-dev libudev-dev \
+    # IME, optional for Chinese/Japanese/Korean text inputting
+    libibus-1.0-dev \
+    # SSL, optional for secure networking
+    libssl-dev
+```
+
+  </TabItem>
+  <TabItem value={'rpi'}>
+
+```bash
+# This list was compiled for RPI3 in mind, with proprietary Broadcom Video Core proprietary driver
+# However, you can still use it for RPI4 by also installing MESA and X11 on top of it
+apt install \
+    # Sound server, still default to PulseAudio at the moment
+    libpulse-dev \
+    # D-BUS and udev, for game controller hot-plugging
+    libdbus-1-dev libudev-dev \
+    # Generic Linux input driver
+    libevdev2 \
+    # IME, optional for Chinese/Japanese/Korean text inputting
+    libibus-1.0-dev \
+    # SSL, optional for secure networking
+    libssl-dev
+```
+
+  </TabItem>
+  <TabItem value={'web'}>
+
+```
+# Emscripten SDK should already provide everything required
+# Tested SDK version: 2.0.8
+```
+
+  </TabItem>
+  <TabItem value={'win'}>
+
+```
+# Visual Studio should already provide everything required
+# Similarly for MinGW-w64
+```
+
+  </TabItem>
+</Tabs>
