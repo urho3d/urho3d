@@ -1,14 +1,30 @@
 // A quick and dirty hack to keep the tab panel with less content to have the same height as others
-div > div > div > div > div > div {
-  .buildUrho3D + & {
-    min-height: 164px;
-  }
+div > div {
+  > div > div > div > div, .textBlock {
+    .buildUrho3D + & {
+      min-height: 164px;
+    }
 
-  .buildUrhoApp + & {
-    min-height: 142px;
-  }
+    .buildUrhoApp + & {
+      min-height: 142px;
+    }
 
-  .requirements + & {
-    min-height: 340px;
+    .requirements + & {
+      min-height: 340px;
+    }
+  }
+}
+
+.textBlock {
+  overflow: auto;
+  border-radius: var(--ifm-global-radius);
+  color: rgb(191, 199, 213);
+  background-color: rgb(41, 45, 62);
+  margin-bottom: var(--ifm-leading);
+  padding: var(--ifm-pre-padding);
+  min-width: 100%;
+
+  p {
+    margin: 0;
   }
 }

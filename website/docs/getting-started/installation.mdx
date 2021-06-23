@@ -51,22 +51,19 @@ This may change in the future when the project uses better package manager and M
   ]
   }>
   <TabItem value={'android'}>
-
-```
-Android Studio (and IntelliJ IDEA) should already provide everything required
-Remember to complete the Android SDK installation as per instructed by IDE
-Tested tool version: 29.0.2
-Tested NDK version: 21.3.6528147
-```
-
+    <div className={Styles.textBlock}>
+      <p>Install <strong>Android Studio</strong> or <strong>IntelliJ IDEA</strong> and it should already provide everything required.</p>
+      <p>Remember to complete the Android SDK installation as per instructed by IDE.</p>
+      <br/>
+      <p>Tested tool version: <strong>29.0.2</strong></p>
+      <p>Tested NDK version: <strong>21.3.6528147</strong></p>
+    </div>
   </TabItem>
   <TabItem value={'apple'}>
-
-```
-# Xcode should already provide everything required
-# You may use "homebrew" to install other missing development packages, like "openssl"
-```
-
+    <div className={Styles.textBlock}>
+      <p>Install <strong>Xcode</strong> and it should provide almost everything required.</p>
+      <p>You may use <strong>homebrew</strong> to install other missing development packages, like <strong>openssl</strong>.</p>
+    </div>
   </TabItem>
   <TabItem value={'arm'}>
 
@@ -128,19 +125,19 @@ apt install \
 
   </TabItem>
   <TabItem value={'web'}>
-
-```
-# Emscripten SDK should already provide everything required
-# Tested SDK version: 2.0.8
-```
-
+    <div className={Styles.textBlock}>
+      <p>Install <strong>Emscripten SDK</strong> and it should already provide everything required.</p>
+      <br/>
+      <p>Tested SDK version: <strong>2.0.8</strong></p>
+    </div>
   </TabItem>
   <TabItem value={'win'}>
-
-```
-# Visual Studio should already provide everything required
-# Similarly for MinGW-w64
-```
-
+    <div className={Styles.textBlock}>
+      <p>
+        Install <strong>Visual Studio</strong> together with <strong>Windows SDK</strong>.
+        Alternatively, install <strong>MinGW-w64</strong>.
+      </p>
+      <p>Both should already provide everything required.</p>
+    </div>
   </TabItem>
 </Tabs>
