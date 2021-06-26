@@ -2,9 +2,10 @@
 sidebar_position: 10
 ---
 
+import clsx from "clsx";
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
-import Styles from './getting-started.module.scss'
+import styles from './getting-started.module.scss';
 
 # Quick Start
 
@@ -35,7 +36,7 @@ Windows host system requires WSL2.
 Clone the Urho3D project from the main branch, change directory to its project root, and execute the following commands to build and install the library for your desired target platform.
 
 <Tabs
-  className={Styles.buildUrho3D}
+  className={styles.buildUrho3D}
   groupId={'target-platform'}
   defaultValue={'android'}
   values={[
@@ -61,7 +62,7 @@ script/dockerized.sh android rake install
 
   </TabItem>
   <TabItem value={'apple'}>
-    <div className={Styles.textBlock}>
+    <div className={clsx('textBlock', styles.fixedHeight)}>
       <p>Currently DBE does not support Apple platforms.</p>
       <p>However, Urho3D supports Apple platforms using native build environment.</p>
     </div>
@@ -135,7 +136,7 @@ The `script/dockerized.sh` spawns one of the docker container based on the speci
 You need an installed Urho3D library for the desired target platform to proceed. Although the Urho3D build system also supports linking the Urho3D library directly from its build tree, this quick start guide will not be discussing it here. Assuming you have been following along from the previous section, execute the following commands to create a new UrhoApp project, and then build it.
 
 <Tabs
-  className={Styles.buildUrhoApp}
+  className={styles.buildUrhoApp}
   groupId={'target-platform'}
   defaultValue={'android'}
   values={[
@@ -160,7 +161,7 @@ script/dockerized.sh android
 
   </TabItem>
   <TabItem value={'apple'}>
-    <div className={Styles.textBlock}>
+    <div className={clsx('textBlock', styles.fixedHeight)}>
       <p>Currently DBE does not support Apple platforms.</p>
       <p>However, Urho3D supports Apple platforms using native build environment.</p>
     </div>
