@@ -140,15 +140,15 @@ apt install \
 
 In general when cross-compiling the build system requires both the cross-compiler and native compiler toolchains to be installed on the host machine. This is because Urho3D build system builds the host-tool using the native compiler on the fly while cross-compiling the library for the target platform in one go. Check the table below on the supported cross-compiling scenario using Linux, Mac, and Windows host machine, respectively.
 
-<CompilerMatrix>
+<CompilerMatrix infoClassName={styles.infoFixedHeight}>
 
   |               |       |Linux|Mac|Windows|
   |---------------|-------|:---:|:-:|:-----:|
   |Target Platform|Android|Cross-compiler: Android NDK<br/>native-compiler: Clang or GCC|Cross-compiler: Android NDK<br/>native-compiler: Apple Clang|Cross-compiler: Android NDK<br/>native-compiler: MinGW-w64|
-  |               |Apple  ||Apple Clang can target macOS, iOS, and tvOS||
-  |               |Arm    |Cross-compiler: ? (not required when building natively)<br/>native-compiler: Clang or GCC||
+  |               |Apple  ||native-compiler: Apple Clang, can actually target macOS, iOS, and tvOS||
+  |               |Arm    |Cross-compiler: ?, no need for native build<br/>native-compiler: Clang or GCC||
   |               |Linux  |native-compiler: Clang or GCC||
-  |               |RPI    |Cross-compiler: ? (not required when building natively)<br/>native-compiler: Clang or GCC||
+  |               |RPI    |Cross-compiler: ?, no need for native build<br/>native-compiler: Clang or GCC||
   |               |Web    |Cross-compiler: Emscripten EMCC<br/>native-compiler: Clang or GCC|Cross-compiler: Emscripten EMCC<br/>native-compiler: Apple Clang|Cross-compiler: Emscripten EMCC<br/>native-compiler: MinGW-w64|
   |               |Windows|Cross-compiler: MinGW-w64<br/>native-compiler: Clang or GCC||native-compiler: MinGW-w64 or MSVC
 

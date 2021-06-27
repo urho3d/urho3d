@@ -14,3 +14,8 @@ div {
     }
   }
 }
+
+// As the info content may be changed in the future, adjust the minimum height here to prevent jumping elements
+.infoFixedHeight {
+  min-height: 86px;
+}
