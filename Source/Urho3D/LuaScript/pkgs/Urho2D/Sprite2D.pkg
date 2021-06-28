@@ -1,7 +1,7 @@
 $#include "Urho2D/Sprite2D.h"
 
 class Sprite2D : public Resource
-{    
+{
 public:
     void SetTexture(Texture2D* texture);
     void SetRectangle(const IntRect& rectangle);

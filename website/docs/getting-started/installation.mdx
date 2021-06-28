@@ -1,0 +1,155 @@
+---
+sidebar_position: 20
+---
+
+import clsx from "clsx";
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import CompilerMatrix from '../../src/components/CompilerMatrix';
+import styles from './getting-started.module.scss';
+
+# Installation
+
+Using native and cross-compiler toolchains to build and install Urho3D library
+
+## Requirements
+
+First prepares the build environment by installing a compiler toolchain for your target platform, and the required build tools. The compiler can be GCC, Clang, MSVC, MinGW-w64, or the one bundled in the SDK like Android SDK, Emscripten SDK, etc. On Ubuntu you can easily prepare the build environment by installing the `build-essential` package, on Windows by installing Visual Studio IDE, and on macOS by installing Xcode IDE. However, for cross-compiling usually you have to download and install the corresponding SDK manually. Make sure at the minimum the build environment has these build tools installed:
+- CMake
+- Git
+- Rake
+
+Optionally these as well:
+- ccache - for speeding up the build
+- Doxygen and Graphviz - for building documentation
+- Make or Ninja - for building with terminal/console
+
+Although Urho3D project has included all required third-party libraries as source code, there may be system-level dependency packages that must be satisfied before Urho3D can be built from source successfully. The list below is by no mean comprehensive nor canonical, but it should be the minimal to get started.
+
+:::note
+
+This may change in the future when the project uses better package manager and Modern CMake. Ideally, the project should bootstrap itself with more ease than currently is.
+
+:::
+
+<Tabs
+  className={styles.requirements}
+  groupId={'target-platform'}
+  defaultValue={'android'}
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'Apple', value: 'apple'},
+    {label: 'Arm', value: 'arm'},
+    {label: 'Linux', value: 'linux'},
+    {label: 'RPI', value: 'rpi'},
+    {label: 'Web', value: 'web'},
+    {label: 'Windows', value: 'win'},
+  ]
+  }>
+  <TabItem value={'android'}>
+    <div className={clsx('textBlock', styles.fixedHeight)}>
+      <p>Install <strong>Android Studio</strong> or <strong>IntelliJ IDEA</strong> and it should already provide everything required.</p>
+      <p>Remember to complete the <strong>Android SDK</strong> installation as per instructed by IDE.</p>
+      <br/>
+      <p>Tested tool version: <strong>29.0.2</strong></p>
+      <p>Tested NDK version: <strong>21.3.6528147</strong></p>
+    </div>
+  </TabItem>
+  <TabItem value={'apple'}>
+    <div className={clsx('textBlock', styles.fixedHeight)}>
+      <p>Install <strong>Xcode</strong> and it should provide almost everything required.</p>
+      <p>You may use <strong>homebrew</strong> to install other missing development packages, like <strong>openssl</strong>.</p>
+    </div>
+  </TabItem>
+  <TabItem value={'arm'}>
+
+```bash
+# Urho3D only supports ARM platform on Linux OS, so it has the same deps as building Linux platform
+apt install \
+    # !!! MESA is not needed on system with proprietary kernel module/driver !!!
+    libgl1-mesa-dev \
+    # Display server, still default to X11 at the moment
+    libx11-dev \
+    # Sound server, still default to PulseAudio at the moment
+    libpulse-dev \
+    # D-BUS and udev, for game controller hot-plugging
+    libdbus-1-dev libudev-dev \
+    # IME, optional for Chinese/Japanese/Korean text inputting
+    libibus-1.0-dev \
+    # SSL, optional for secure networking
+    libssl-dev
+```
+
+  </TabItem>
+  <TabItem value={'linux'}>
+
+```bash
+# Building as 32-bit on a 64-bit host requires installation of 32-bit development packages too
+apt install \
+    # !!! MESA is not needed on system with proprietary kernel module/driver !!!
+    libgl1-mesa-dev \
+    # Display server, still default to X11 at the moment
+    libx11-dev \
+    # Sound server, still default to PulseAudio at the moment
+    libpulse-dev \
+    # D-BUS and udev, for game controller hot-plugging
+    libdbus-1-dev libudev-dev \
+    # IME, optional for Chinese/Japanese/Korean text inputting
+    libibus-1.0-dev \
+    # SSL, optional for secure networking
+    libssl-dev
+```
+
+  </TabItem>
+  <TabItem value={'rpi'}>
+
+```bash
+# This list was compiled for RPI3 in mind, with proprietary Broadcom Video Core proprietary driver
+# However, you can still use it for RPI4 by also installing MESA and X11 on top of it
+apt install \
+    # Sound server, still default to PulseAudio at the moment
+    libpulse-dev \
+    # D-BUS and udev, for game controller hot-plugging
+    libdbus-1-dev libudev-dev \
+    # Generic Linux input driver
+    libevdev2 \
+    # IME, optional for Chinese/Japanese/Korean text inputting
+    libibus-1.0-dev \
+    # SSL, optional for secure networking
+    libssl-dev
+```
+
+  </TabItem>
+  <TabItem value={'web'}>
+    <div className={clsx('textBlock', styles.fixedHeight)}>
+      <p>Install <strong>Emscripten SDK</strong> and it should already provide everything required.</p>
+      <br/>
+      <p>Tested SDK version: <strong>2.0.8</strong></p>
+    </div>
+  </TabItem>
+  <TabItem value={'win'}>
+    <div className={clsx('textBlock', styles.fixedHeight)}>
+      <p>
+        Install <strong>Visual Studio</strong> together with <strong>Windows SDK</strong>.
+        Alternatively, install <strong>MinGW-w64</strong>.
+      </p>
+      <p>Both should already provide everything required.</p>
+    </div>
+  </TabItem>
+</Tabs>
+
+In general when cross-compiling the build system requires both the cross-compiler and native compiler toolchains to be installed on the host machine. This is because Urho3D build system builds the host-tool using the native compiler on the fly while cross-compiling the library for the target platform in one go. Check the table below on the supported cross-compiling scenario using Linux, Mac, and Windows host machine, respectively.
+
+<CompilerMatrix infoClassName={styles.infoFixedHeight}>
+
+  |               |       |Linux|Mac|Windows|
+  |---------------|-------|:---:|:-:|:-----:|
+  |Target Platform|Android|Cross-compiler: Android NDK<br/>native-compiler: Clang or GCC|Cross-compiler: Android NDK<br/>native-compiler: Apple Clang|Cross-compiler: Android NDK<br/>native-compiler: MinGW-w64|
+  |               |Apple  ||native-compiler: Apple Clang, can actually target macOS, iOS, and tvOS||
+  |               |Arm    |Cross-compiler: ?, no need for native build<br/>native-compiler: Clang or GCC||
+  |               |Linux  |native-compiler: Clang or GCC||
+  |               |RPI    |Cross-compiler: ?, no need for native build<br/>native-compiler: Clang or GCC||
+  |               |Web    |Cross-compiler: Emscripten EMCC<br/>native-compiler: Clang or GCC|Cross-compiler: Emscripten EMCC<br/>native-compiler: Apple Clang|Cross-compiler: Emscripten EMCC<br/>native-compiler: MinGW-w64|
+  |               |Windows|Cross-compiler: MinGW-w64<br/>native-compiler: Clang or GCC||native-compiler: MinGW-w64 or MSVC
+
+</CompilerMatrix>

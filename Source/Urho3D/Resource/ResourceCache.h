@@ -126,7 +126,7 @@ public:
     /// @property
     void SetAutoReloadResources(bool enable);
     /// Enable or disable returning resources that failed to load. Default false. This may be useful in editing to not lose resource ref attributes.
-    /// @property   
+    /// @property
     void SetReturnFailedResources(bool enable) { returnFailedResources_ = enable; }
 
     /// Define whether when getting resources should check package files or directories first. True for packages, false for directories.
@@ -317,6 +317,7 @@ template <class T> void ResourceCache::GetResources(PODVector<T*>& result) const
 }
 
 /// Register Resource library subsystems and objects.
+/// @nobind
 void URHO3D_API RegisterResourceLibrary(Context* context);
 
 }

@@ -218,6 +218,7 @@ void UseGizmo()
     IntVector2 pos = ui.cursorPosition;
     if (ui.GetElementAt(pos) !is null)
         return;
+
     Ray cameraRay = GetActiveViewportCameraRay();
     float scale = gizmoNode.scale.x;
 

@@ -35,7 +35,7 @@ void ASRegisterManualFirst_Audio(asIScriptEngine* engine)
 
 // ========================================================================================
 
-// template<class T> T * Object::GetSubsystem() const | File: ../Core/Object.h
+// template <class T> T* Context::GetSubsystem() const | File: ../Core/Context.h
 static Audio* GetAudio()
 {
     return GetScriptContext()->GetSubsystem<Audio>();
@@ -44,8 +44,8 @@ static Audio* GetAudio()
 // This function is called after ASRegisterGenerated()
 void ASRegisterManualLast_Audio(asIScriptEngine* engine)
 {
-    // template<class T> T * Object::GetSubsystem() const | File: ../Core/Object.h
-    engine->RegisterGlobalFunction("Audio@+ get_audio()", asFUNCTION(GetAudio), asCALL_CDECL);
+    // template <class T> T* Context::GetSubsystem() const | File: ../Core/Context.h
+    engine->RegisterGlobalFunction("Audio@+ get_audio()", AS_FUNCTION(GetAudio), AS_CALL_CDECL);
 }
 
 }

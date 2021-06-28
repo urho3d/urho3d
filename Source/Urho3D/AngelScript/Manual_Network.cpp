@@ -37,7 +37,7 @@ void ASRegisterManualFirst_Network(asIScriptEngine* engine)
 
 // ========================================================================================
 
-// template<class T> T * Object::GetSubsystem() const | File: ../Core/Object.h
+// template <class T> T* Context::GetSubsystem() const | File: ../Core/Context.h
 static Network* GetNetwork()
 {
     return GetScriptContext()->GetSubsystem<Network>();
@@ -46,8 +46,8 @@ static Network* GetNetwork()
 // This function is called after ASRegisterGenerated()
 void ASRegisterManualLast_Network(asIScriptEngine* engine)
 {
-    // template<class T> T * Object::GetSubsystem() const | File: ../Core/Object.h
-    engine->RegisterGlobalFunction("Network@+ get_network()", asFUNCTION(GetNetwork), asCALL_CDECL);
+    // template <class T> T* Context::GetSubsystem() const | File: ../Core/Context.h
+    engine->RegisterGlobalFunction("Network@+ get_network()", AS_FUNCTION(GetNetwork), AS_CALL_CDECL);
 }
 
 } // namespace Urho3D

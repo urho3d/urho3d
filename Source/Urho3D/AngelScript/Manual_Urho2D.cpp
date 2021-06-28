@@ -39,7 +39,7 @@ void ASRegisterManualFirst_Urho2D(asIScriptEngine* engine)
 
 // ========================================================================================
 
-// template<class T> T * Node::GetComponent(bool recursive=false) const | File: ../Scene/Node.h
+// template <class T> T* Node::GetComponent(bool recursive = false) const | File: ../Scene/Node.h
 static PhysicsWorld2D* GetPhysicsWorld2D()
 {
     Scene* scene = GetScriptContextScene();
@@ -49,42 +49,8 @@ static PhysicsWorld2D* GetPhysicsWorld2D()
 // This function is called after ASRegisterGenerated()
 void ASRegisterManualLast_Urho2D(asIScriptEngine* engine)
 {
-    // template<class T> T * Node::GetComponent(bool recursive=false) const | File: ../Scene/Node.h
-    engine->RegisterGlobalFunction("PhysicsWorld2D@+ get_physicsWorld2D()", asFUNCTION(GetPhysicsWorld2D), asCALL_CDECL);
-}
-
-// ========================================================================================
-
-// RigidBody2D* PhysicsRaycastResult2D::body_ | File: ../Urho2D/PhysicsWorld2D.h
-RigidBody2D* PhysicsRaycastResultGetRigidBody2D(PhysicsRaycastResult2D* ptr)
-{
-    return ptr->body_;
-}
-
-// ========================================================================================
-
-// void PhysicsWorld2D::Raycast(PODVector< PhysicsRaycastResult2D > &results, const Vector2 &startPoint, const Vector2 &endPoint, unsigned collisionMask=M_MAX_UNSIGNED) | File: ../Urho2D/PhysicsWorld2D.h
-CScriptArray* PhysicsWorld2DRaycast(const Vector2& startPoint, const Vector2& endPoint, unsigned collisionMask, PhysicsWorld2D* ptr)
-{
-    PODVector<PhysicsRaycastResult2D> result;
-    ptr->Raycast(result, startPoint, endPoint, collisionMask);
-    return VectorToArray<PhysicsRaycastResult2D>(result, "Array<PhysicsRaycastResult2D>");
-}
-
-// void PhysicsWorld2D::RaycastSingle(PhysicsRaycastResult2D &result, const Vector2 &startPoint, const Vector2 &endPoint, unsigned collisionMask=M_MAX_UNSIGNED) | File: ../Urho2D/PhysicsWorld2D.h
-PhysicsRaycastResult2D PhysicsWorld2DRaycastSingle(const Vector2& startPoint, const Vector2& endPoint, unsigned collisionMask, PhysicsWorld2D* ptr)
-{
-    PhysicsRaycastResult2D result;
-    ptr->RaycastSingle(result, startPoint, endPoint, collisionMask);
-    return result;
-}
-
-// void PhysicsWorld2D::GetRigidBodies(PODVector< RigidBody2D * > &results, const Rect &aabb, unsigned collisionMask=M_MAX_UNSIGNED) | File: ../Urho2D/PhysicsWorld2D.h
-CScriptArray* PhysicsWorld2DGetRigidBodies(const Rect& aabb, unsigned collisionMask, PhysicsWorld2D* ptr)
-{
-    PODVector<RigidBody2D*> results;
-    ptr->GetRigidBodies(results, aabb, collisionMask);
-    return VectorToHandleArray<RigidBody2D>(results, "Array<RigidBody2D@>");
+    // template <class T> T* Node::GetComponent(bool recursive = false) const | File: ../Scene/Node.h
+    engine->RegisterGlobalFunction("PhysicsWorld2D@+ get_physicsWorld2D()", AS_FUNCTION(GetPhysicsWorld2D), AS_CALL_CDECL);
 }
 
 }

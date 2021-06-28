@@ -6,7 +6,7 @@ class Viewport
     Viewport(Scene* scene, Camera* camera, RenderPath* renderPath = 0);
     Viewport(Scene* scene, Camera* camera, const IntRect& rect, RenderPath* renderPath = 0);
     ~Viewport();
-    
+
     void SetScene(Scene* scene);
     void SetCamera(Camera* camera);
     void SetCullCamera(Camera* camera);
@@ -14,7 +14,7 @@ class Viewport
     void SetRenderPath(RenderPath* path);
     bool SetRenderPath(XMLFile* file);
     void SetDrawDebug(bool enable);
-    
+
     Scene* GetScene() const;
     Camera* GetCamera() const;
     Camera* GetCullCamera() const;

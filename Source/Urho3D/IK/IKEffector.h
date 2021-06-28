@@ -68,6 +68,7 @@ public:
     ~IKEffector() override;
 
     /// Registers this class as an object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Test if a certain feature is enabled (see IKEffector::Feature).

@@ -38,6 +38,7 @@ public:
     /// Destruct.
     ~CheckBox() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Return UI rendering batches.

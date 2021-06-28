@@ -4,7 +4,7 @@ namespace Urho3D
 /**
 \mainpage Documentation
 
-Urho3D (https://urho3d.github.io/) is a free lightweight, cross-platform 2D and 3D game engine implemented in C++ and released under the MIT license. It utilizes either Direct3D9 or OpenGL for rendering (%Shader %Model 2 or OpenGL 2.0 required as minimum.)
+Urho3D (https://urho3d.io/) is a free lightweight, cross-platform 2D and 3D game engine implemented in C++ and released under the MIT license. It utilizes either Direct3D9 or OpenGL for rendering (%Shader %Model 2 or OpenGL 2.0 required as minimum.)
 
 For getting started, see:
 
@@ -62,170 +62,6 @@ Also see \ref PortingNotes for necessary changes when moving to a newer Urho3D v
 
 \page Credits Credits
 
-Urho3D development, contributions and bugfixes by:
-- Lasse &Ouml;&ouml;rni
-- Wei Tjong Yao
-- Aster Jian
-- Ricardo Abreu
-- Eli Aloni
-- Vivienne Anthony
-- Christopher Augustus
-- Colin Barrett
-- Erik Beran
-- Gauthier Billot
-- Loic Blot
-- Danny Boisvert
-- Sergey Bosko
-- Lisandro Bruzzo
-- Steven Burns
-- Thomas Böhm
-- Carlo Carollo
-- Pete Chown
-- Christian Clavet
-- Sebastian Delatorre (primitivewaste)
-- Stanislav Demyanovich
-- Rainer Deyke
-- Josh Engebretson
-- Nicholas Farshidmehr
-- Simon Flores
-- Manuel Freiberger
-- Chris Friesen
-- Alex Fuller
-- Konstantin Guschin
-- Henrik Heino
-- Mika Heinonen
-- Victor Holt
-- Johnathan Jenkins
-- Jukka Jylänki
-- Graham King
-- Jason Kinzer
-- Cameron Kline
-- Jan Korous
-- Eugene Kozlov
-- Gunnar Kriik
-- Aliaksandr Kryvashein
-- Artem Kulyk
-- Rokas Kupstys
-- Ali K&auml;m&auml;r&auml;inen
-- Sergey Lapin
-- Pete Leigh
-- Pengfei Li
-- Arnis Lielturks
-- Frode 'Modanung' Lindeijer
-- Thorbjørn Lindeijer
-- Nathanial Lydick
-- Pavel Matcula
-- Xavier Maupeu
-- Iain Merrick
-- Justin Miller
-- Jonne Nauha
-- Huy Nguyen
-- Neal Nicdao
-- Paul Noome
-- David Palacios
-- Alex Parlett
-- Jordan Patterson
-- Georgii Pelageikin
-- Anton Petrov
-- Vladimir Pobedinsky
-- Franck Poulain
-- Pranjal Raihan
-- Alexey Rassikhin
-- Svyatoslav Razmyslov
-- Mariusz Richtscheid
-- Nick Royer
-- Jonathan Sandusky
-- Miika Santala
-- Anatoly Sennov
-- Matan Shukry
-- Bengt Soderstrom
-- Hualin Song
-- James Thomas
-- Joshua Tippetts
-- Konstantin Tomashevich
-- Yusuf Umar
-- Mateus Vendramini
-- Daniel Wiberg
-- Kaikai Zhang
-- Steven Zhang
-- AGreatFish
-- BlueMagnificent
-- CG-SS
-- Enhex
-- Fastran
-- Firegorilla
-- Gordon-F
-- Igor Segalla
-- LordGolias
-- Lumak
-- Magic.Lixin
-- Mike3D
-- MonkeyFirst
-- Ner'zhul
-- Newb I the Newbd
-- OvermindDL1
-- Polynominal
-- PredatorMF
-- PsychoCircuitry
-- Scellow
-- Skrylar
-- SuperWangKai
-- TheComet93
-- Y-way
-- 1vanK
-- ab4daa
-- andmar1x
-- amadeus_osa
-- atship
-- att
-- att-kin9
-- celeron55
-- chenjie199234
-- codexhound
-- cosmy1
-- damu
-- dragonCASTjosh
-- error408
-- feltech
-- fredakilla
-- gleblebedev
-- hdunderscore
-- holyfight6
-- lhinuz
-- lvshiling
-- marynate
-- meshonline
-- mightyCelu
-- MystMagus
-- neat3d
-- nemerle
-- ninjastone
-- orefkov
-- pat2nav
-- pflat
-- proller
-- r-a-sattarov
-- raould
-- rasteron
-- reattiva
-- rifai
-- rikorin
-- skaiware
-- smortex
-- ssinai1
-- sssooonnnggg
-- stievie
-- svifylabs
-- szamq
-- thebluefish
-- tommy3
-- yushli
-- zlum
-- ChrisDenham
-- Katekov Anton
-- SirNate0
-- tederis
-
 Urho3D is greatly inspired by OGRE (http://www.ogre3d.org/) and Horde3D (http://www.horde3d.org/). Additional inspiration & research used:
 
 - Rectangle packing by Jukka Jyl&auml;nki (clb) (http://clb.demon.fi/projects/rectangle-bin-packing/)
@@ -240,8 +76,8 @@ Urho3D is greatly inspired by OGRE (http://www.ogre3d.org/) and Horde3D (http://
 
 Urho3D uses the following third-party libraries:
 
-- AngelScript 2.33.0+ (http://www.angelcode.com/angelscript)
-- Boost 1.64.0 (http://www.boost.org) - only used for AngelScript generic bindings
+- AngelScript 2.35.1 WIP (http://www.angelcode.com/angelscript)
+- Boost 1.75.0 (http://www.boost.org) - only used for AngelScript generic bindings
 - Box2D 2.3.2 WIP (http://box2d.org)
 - Bullet 3.06+ (http://www.bulletphysics.org)
 - Civetweb 1.7 (https://github.com/civetweb/civetweb)
@@ -268,6 +104,8 @@ Urho3D uses the following third-party libraries:
 - stb_vorbis 1.13b (https://nothings.org)
 - tolua++ 1.0.93 (defunct - http://www.codenix.com/~tolua)
 - WebP (https://chromium.googlesource.com/webm/libwebp)
+- ETCPACK (https://github.com/Ericsson/ETCPACK)
+- Tracy 0.7.6 (https://github.com/wolfpld/tracy)
 
 DXT / ETC1 / PVRTC decompression code based on the Squish library and the Oolong %Engine.<br>
 Jack and mushroom models from the realXtend project. (https://www.realxtend.org)<br>

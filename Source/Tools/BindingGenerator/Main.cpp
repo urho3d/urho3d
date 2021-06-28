@@ -20,11 +20,16 @@
 // THE SOFTWARE.
 //
 
+#include <chrono>
+#include <iostream>
 #include <string>
 
 using namespace std;
 
 //#define DEVELOP
+
+// Path to Urho3D's root folder (CMAKE_SOURCE_DIR). There must be no slash at the end
+string _sourceDir;
 
 namespace SourceData
 {
@@ -33,37 +38,43 @@ namespace SourceData
 
 namespace ASBindingGenerator
 {
-    void ProcessAllEnums(const string& outputBasePath);
-    void ProcessAllClasses(const string& outputBasePath);
-    void ProcessAllGlobalVariables(const string& outputBasePath);
-    void ProcessAllGlobalFunctions(const string& outputBasePath);
+    void ProcessAllEnums();
+    void ProcessAllClasses();
+    void ProcessAllGlobalVariables();
+    void ProcessAllGlobalFunctions();
+    void SaveResult();
 
-    void GenerateBindings(const string& outputBasePath)
+    void GenerateTemplates();
+
+    void GenerateBindings()
     {
-        ProcessAllEnums(outputBasePath);
-        ProcessAllClasses(outputBasePath);
-        ProcessAllGlobalVariables(outputBasePath);
-        ProcessAllGlobalFunctions(outputBasePath);
+        ProcessAllEnums();
+        ProcessAllClasses();
+        ProcessAllGlobalVariables();
+        ProcessAllGlobalFunctions();
+        SaveResult();
+
+        GenerateTemplates();
     }
 }
 
 namespace LuaBindingGenerator
 {
-    void GenerateBindings(const string& outputBasePath)
+    void GenerateBindings()
     {
     }
 }
 
 namespace JSBindingGenerator
 {
-    void GenerateBindings(const string& outputBasePath)
+    void GenerateBindings()
     {
     }
 }
 
 namespace CSBindingGenerator
 {
-    void GenerateBindings(const string& outputBasePath)
+    void GenerateBindings()
     {
     }
 }
@@ -72,21 +83,28 @@ int main(int argc, char* argv[])
 {
 #ifdef DEVELOP
     string inputDir = R"(G:/MyGames/Urho3DFork/Build/Source/Tools/BindingGenerator/generated/xml)";
-    string outputBasePath = R"(G:/MyGames/Urho3DFork/Urho3D)";
+    _sourceDir = R"(G:/MyGames/Urho3DFork/Urho3D)";
 #else
     if (argc != 3)
         return -1;
 
     string inputDir = argv[1];
-    string outputBasePath = argv[2];
+    _sourceDir = argv[2];
 #endif
 
+    auto start = chrono::high_resolution_clock::now();
     SourceData::LoadAllXmls(inputDir);
+    auto end = chrono::high_resolution_clock::now();
+    cout << "Loaded in " << chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms\n";
 
-    ASBindingGenerator::GenerateBindings(outputBasePath);
-    LuaBindingGenerator::GenerateBindings(outputBasePath);
-    JSBindingGenerator::GenerateBindings(outputBasePath);
-    CSBindingGenerator::GenerateBindings(outputBasePath);
+    start = chrono::high_resolution_clock::now();
+    ASBindingGenerator::GenerateBindings();
+    end = chrono::high_resolution_clock::now();
+    cout << "Generated in " << chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms\n";
+
+    LuaBindingGenerator::GenerateBindings();
+    JSBindingGenerator::GenerateBindings();
+    CSBindingGenerator::GenerateBindings();
     
     return 0;
 }

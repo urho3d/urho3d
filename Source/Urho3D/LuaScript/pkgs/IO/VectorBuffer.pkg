@@ -6,18 +6,18 @@ class VectorBuffer
     // VectorBuffer(const PODVector<unsigned char>& data);
     VectorBuffer(Deserializer& source, unsigned size);
     ~VectorBuffer();
-    
+
     // void SetData(const PODVector<unsigned char>& data);
     void SetData(Deserializer& source, unsigned size);
     void Clear();
     void Resize(unsigned size);
-    
+
     // const unsigned char* GetData() const;
     const void* GetData() const;
     // unsigned char* GetModifiableData();
     void* GetModifiableData();
     // const PODVector<unsigned char>& GetBuffer() const;
-    
+
     // From Deserializer
     // unsigned Read(void* dest, unsigned size);
     tolua_outside VectorBuffer DeserializerRead @ Read(unsigned size);
@@ -29,7 +29,7 @@ class VectorBuffer
     unsigned Tell() const;
     unsigned GetSize() const;
     bool IsEof() const;
-    
+
     int ReadInt();
     long long ReadInt64();
     short ReadShort();
@@ -59,10 +59,10 @@ class VectorBuffer
     String ReadString();
     String ReadFileID();
     StringHash ReadStringHash();
-    
+
     // PODVector<unsigned char> ReadBuffer();
     VectorBuffer ReadBuffer();
-    
+
     ResourceRef ReadResourceRef();
     ResourceRefList ReadResourceRefList();
     Variant ReadVariant();
@@ -72,11 +72,11 @@ class VectorBuffer
     unsigned ReadVLE();
     unsigned ReadNetID();
     String ReadLine();
-    
+
     // From Serializer
     // unsigned Write(const void* data, unsigned size);
     tolua_outside unsigned SerializerWrite @ Write(const VectorBuffer& buffer);
-    
+
     bool WriteInt(int value);
     bool WriteInt64(long long value);
     bool WriteShort(short value);
@@ -106,10 +106,10 @@ class VectorBuffer
     bool WriteString(const String value);
     bool WriteFileID(const String value);
     bool WriteStringHash(const StringHash& value);
-    
+
     // bool WriteBuffer(const PODVector<unsigned char>& buffer);
     tolua_outside bool SerializerWriteBuffer @ WriteBuffer(const VectorBuffer& buffer);
-    
+
     bool WriteResourceRef(const ResourceRef& value);
     bool WriteResourceRefList(const ResourceRefList& value);
     bool WriteVariant(const Variant& value);
@@ -119,7 +119,7 @@ class VectorBuffer
     bool WriteVLE(unsigned value);
     bool WriteNetID(unsigned value);
     bool WriteLine(const String value);
-    
+
     // From Deserializer
     tolua_readonly tolua_property__get_set String name;
     tolua_readonly tolua_property__get_set unsigned checksum;

@@ -14,7 +14,7 @@ class Console : public Object
     void AddAutoComplete(const String option);
     void RemoveAutoComplete(const String option);
     void UpdateElements();
-    
+
     XMLFile* GetDefaultStyle() const;
     BorderImage* GetBackground() const;
     LineEdit* GetLineEdit() const;
@@ -29,7 +29,7 @@ class Console : public Object
     unsigned GetHistoryPosition() const;
     const String GetHistoryRow(unsigned index) const;
     bool GetFocusOnShow() const;
-    
+
     tolua_property__get_set XMLFile* defaultStyle;
     tolua_readonly tolua_property__get_set BorderImage* background;
     tolua_readonly tolua_property__get_set LineEdit* lineEdit;

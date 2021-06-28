@@ -25,18 +25,6 @@
 #include <cassert>
 #include <sstream>
 
-static string _lastErrorMessage;
-
-string GetLastErrorMessage()
-{
-    return _lastErrorMessage;
-}
-
-void SetLastErrorMessage(const string& message)
-{
-    _lastErrorMessage = message;
-}
-
 string Trim(const string& str)
 {
     size_t trimStart = 0;
@@ -168,6 +156,24 @@ vector<string> Split(const string& str, char delim)
     return result;
 }
 
+vector<string> Split(const string& str, const string& delim)
+{
+    vector<string> result;
+    size_t lastPos = 0;
+    size_t findPos = str.find(delim, lastPos);
+
+    while (findPos != string::npos)
+    {
+        result.push_back(str.substr(lastPos, findPos - lastPos));
+        lastPos = findPos + delim.length();
+        findPos = str.find(delim, lastPos);
+    }
+
+    result.push_back(str.substr(lastPos));
+
+    return result;
+}
+
 string CutStart(const string& str, const string& value)
 {
     if (!StartsWith(str, value))
@@ -189,6 +195,11 @@ bool Contains(const string& str, const string& substr)
     return str.find(substr) != string::npos;
 }
 
+bool Contains(const string& str, char c)
+{
+    return str.find(c) != string::npos;
+}
+
 string FirstCharToLower(const string& str)
 {
     if (str.empty())
@@ -197,5 +208,46 @@ string FirstCharToLower(const string& str)
     string result = str;
     result[0] = tolower(str[0]);
 
+    return result;
+}
+
+string Join(const vector<string>& values, const string& separator)
+{
+    string result;
+
+    for (const string& value : values)
+    {
+        if (!result.empty())
+            result += separator;
+
+        result += value;
+    }
+
+    return result;
+}
+
+string JoinNonEmpty(const vector<string>& strings, const string& separator)
+{
+    string result;
+
+    for (const string& str : strings)
+    {
+        if (str.empty())
+            continue;
+
+        if (!result.empty())
+            result += separator;
+
+        result += str;
+    }
+
+    return result;
+}
+
+string ToIdentifier(const string& str)
+{
+    string result = ReplaceAll(str, ", ", "_comma_");
+    result = ReplaceAll(result, "<", "_leftAngleBracket_");
+    result = ReplaceAll(result, ">", "_rightAngleBracket_");
     return result;
 }

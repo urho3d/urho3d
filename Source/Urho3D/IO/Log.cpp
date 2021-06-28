@@ -22,6 +22,7 @@
 
 #include "../Precompiled.h"
 
+#include "../Container/Str.h"
 #include "../Core/Context.h"
 #include "../Core/CoreEvents.h"
 #include "../Core/ProcessUtils.h"
@@ -133,6 +134,21 @@ void Log::SetTimeStamp(bool enable)
 void Log::SetQuiet(bool quiet)
 {
     quiet_ = quiet;
+}
+
+void Log::WriteFormat(int level, const char* format, ...)
+{
+    if (!logInstance || logInstance->level_ > level)
+        return;
+
+    // Forward to normal Write() after formatting the input
+    String message;
+    va_list args;
+    va_start(args, format);
+    message.AppendWithFormatArgs(format, args);
+    va_end(args);
+
+    Write(level, message);
 }
 
 void Log::Write(int level, const String& message)

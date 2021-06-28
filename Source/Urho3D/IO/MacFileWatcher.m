@@ -86,7 +86,7 @@ static void CallbackFunction(ConstFSEventStreamRef streamRef, void* clientCallBa
     FSEventStreamInvalidate(streamRef_);
     FSEventStreamRelease(streamRef_);
     streamRef_ = NULL;
-    
+
     self.changes = nil;
     self.pathName = nil;
     [super dealloc];
@@ -127,7 +127,7 @@ static void CallbackFunction(ConstFSEventStreamRef streamRef, void* clientCallBa
             continue;
         if ([fileName hasPrefix:watcher.pathName])
             fileName = [fileName substringFromIndex:[watcher.pathName length]];
-        
+
         // Skip if event path is a sub dir and watch sub dirs is not requested
         if (!watcher.watchSubDirs && [fileName rangeOfString:@"/"].location != NSNotFound)
             continue;
@@ -157,7 +157,7 @@ bool CheckMinimalVersion(int major, int minor)
 
 bool IsFileWatcherSupported()
 {
-    // The FS Event API only supports individual file watching in 10.7 (Lion) or later 
+    // The FS Event API only supports individual file watching in 10.7 (Lion) or later
     return CheckMinimalVersion(10, 7);
 }
 

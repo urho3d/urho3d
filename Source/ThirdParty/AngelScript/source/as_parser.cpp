@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2018 Andreas Jonsson
+   Copyright (c) 2003-2019 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -388,7 +388,7 @@ asCScriptNode *asCParser::ParseFunctionDefinition()
 	if( t1.type == ttConst )
 		node->AddChildLast(ParseToken(ttConst));
 
-	// Parse an optional 'explicit'
+	// Parse optional attributes
 	ParseMethodAttributes(node);
 
 	return node;
@@ -444,7 +444,7 @@ asCScriptNode *asCParser::ParseTypeMod(bool isParam)
 	return node;
 }
 
-// BNF:4: TYPE          ::= ['const'] SCOPE DATATYPE ['<' TYPE {',' TYPE} '>'] { ('[' ']') | '@' }
+// BNF:4: TYPE          ::= ['const'] SCOPE DATATYPE ['<' TYPE {',' TYPE} '>'] { ('[' ']') | ('@' ['const']) }
 asCScriptNode *asCParser::ParseType(bool allowConst, bool allowVariableType, bool allowAuto)
 {
 	asCScriptNode *node = CreateNode(snDataType);
@@ -503,6 +503,14 @@ asCScriptNode *asCParser::ParseType(bool allowConst, bool allowVariableType, boo
 		{
 			node->AddChildLast(ParseToken(ttHandle));
 			if( isSyntaxError ) return node;
+
+			GetToken(&t);
+			RewindTo(&t);
+			if( t.type == ttConst )
+			{
+				node->AddChildLast(ParseToken(ttConst));
+				if( isSyntaxError ) return node;
+			}
 		}
 
 		GetToken(&t);
@@ -1210,6 +1218,7 @@ bool asCParser::IdentifierIs(const sToken &t, const char *str)
 	return script->TokenEquals(t.pos, t.length, str);
 }
 
+// BNF:6: FUNCATTR      ::= {'override' | 'final' | 'explicit' | 'property'}
 void asCParser::ParseMethodAttributes(asCScriptNode *funcNode)
 {
 	sToken t1;
@@ -1221,7 +1230,8 @@ void asCParser::ParseMethodAttributes(asCScriptNode *funcNode)
 
 		if( IdentifierIs(t1, FINAL_TOKEN) || 
 			IdentifierIs(t1, OVERRIDE_TOKEN) || 
-			IdentifierIs(t1, EXPLICIT_TOKEN) )
+			IdentifierIs(t1, EXPLICIT_TOKEN) ||
+			IdentifierIs(t1, PROPERTY_TOKEN) )
 			funcNode->AddChildLast(ParseIdentifier());
 		else
 			break;
@@ -1250,7 +1260,7 @@ bool asCParser::IsType(sToken &nextToken)
 		if (t1.type == ttScope)
 			GetToken(&t1);
 
-		// The type may be preceeded with a multilevel scope
+		// The type may be preceded with a multilevel scope
 		GetToken(&t2);
 		while (t1.type == ttIdentifier)
 		{
@@ -1304,7 +1314,15 @@ bool asCParser::IsType(sToken &nextToken)
 	GetToken(&t2);
 	while (t2.type == ttHandle || t2.type == ttAmp || t2.type == ttOpenBracket)
 	{
-		if (t2.type == ttOpenBracket)
+		if( t2.type == ttHandle )
+		{
+			// A handle can optionally be read-only
+			sToken t3;
+			GetToken(&t3);
+			if(t3.type != ttConst )
+				RewindTo(&t3);
+		}
+		else if (t2.type == ttOpenBracket)
 		{
 			GetToken(&t2);
 			if (t2.type != ttCloseBracket)
@@ -2305,7 +2323,7 @@ int asCParser::ParseExpression(asCScriptCode *in_script)
 	return 0;
 }
 
-// BNF:1: IMPORT        ::= 'import' TYPE ['&'] IDENTIFIER PARAMLIST 'from' STRING ';'
+// BNF:1: IMPORT        ::= 'import' TYPE ['&'] IDENTIFIER PARAMLIST FUNCATTR 'from' STRING ';'
 asCScriptNode *asCParser::ParseImport()
 {
 	asCScriptNode *node = CreateNode(snImport);
@@ -2721,10 +2739,10 @@ bool asCParser::IsVarDecl()
 	}
 	if( t1.type == ttOpenParanthesis )
 	{
-		// If the closing paranthesis is followed by a statement
-		// block or end-of-file, then treat it as a function. A
-		// function decl may have nested paranthesis so we need to
-		// check for this too.
+		// If the closing parenthesis is followed by a statement block, 
+		// function decorator, or end-of-file, then treat it as a function. 
+		// A function decl may have nested parenthesis so we need to check 
+		// for this too.
 		int nest = 0;
 		while( t1.type != ttEnd )
 		{
@@ -2748,7 +2766,9 @@ bool asCParser::IsVarDecl()
 		{
 			GetToken(&t1);
 			RewindTo(&t);
-			if( t1.type == ttStartStatementBlock || t1.type == ttEnd )
+			if( t1.type == ttStartStatementBlock || 
+				t1.type == ttIdentifier || // function decorator
+				t1.type == ttEnd )
 				return false;
 		}
 
@@ -2884,21 +2904,22 @@ bool asCParser::IsFuncDecl(bool isMethod)
 				GetToken(&t1);
 				if( t1.type != ttConst )
 					RewindTo(&t1);
-
-				// A class method may also have any number of additional inheritance behavior specifiers
-				for( ; ; )
-				{
-					GetToken(&t1);
-					if( !IdentifierIs(t1, FINAL_TOKEN) && 
-						!IdentifierIs(t1, OVERRIDE_TOKEN) &&
-						!IdentifierIs(t1, EXPLICIT_TOKEN) )
-					{
-						RewindTo(&t1);
-						break;
-					}
-				}
 			}
 
+			// A function may also have any number of additional attributes
+			for( ; ; )
+			{
+				GetToken(&t1);
+				if( !IdentifierIs(t1, FINAL_TOKEN) && 
+					!IdentifierIs(t1, OVERRIDE_TOKEN) &&
+					!IdentifierIs(t1, EXPLICIT_TOKEN) &&
+					!IdentifierIs(t1, PROPERTY_TOKEN) )
+				{
+					RewindTo(&t1);
+					break;
+				}
+			}
+			
 			GetToken(&t1);
 			RewindTo(&t);
 			if( t1.type == ttStartStatementBlock )
@@ -2965,7 +2986,7 @@ asCScriptNode *asCParser::ParseFuncDef()
 	return node;
 }
 
-// BNF:1: FUNC          ::= {'shared' | 'external'} ['private' | 'protected'] [((TYPE ['&']) | '~')] IDENTIFIER PARAMLIST ['const'] {'override' | 'final' | 'explicit'} (';' | STATBLOCK)
+// BNF:1: FUNC          ::= {'shared' | 'external'} ['private' | 'protected'] [((TYPE ['&']) | '~')] IDENTIFIER PARAMLIST ['const'] FUNCATTR (';' | STATBLOCK)
 asCScriptNode *asCParser::ParseFunction(bool isMethod)
 {
 	asCScriptNode *node = CreateNode(snFunction);
@@ -3041,11 +3062,11 @@ asCScriptNode *asCParser::ParseFunction(bool isMethod)
 		// Is the method a const?
 		if( t1.type == ttConst )
 			node->AddChildLast(ParseToken(ttConst));
-
-		// TODO: Should support abstract methods, in which case no statement block should be provided
-		ParseMethodAttributes(node);
-		if( isSyntaxError ) return node;
 	}
+
+	// TODO: Should support abstract methods, in which case no statement block should be provided
+	ParseMethodAttributes(node);
+	if( isSyntaxError ) return node;
 
 	// External shared functions must be ended with ';'
 	GetToken(&t1);
@@ -3101,7 +3122,7 @@ asCScriptNode *asCParser::ParseInterfaceMethod()
 	return node;
 }
 
-// BNF:1: VIRTPROP      ::= ['private' | 'protected'] TYPE ['&'] IDENTIFIER '{' {('get' | 'set') ['const'] [('override' | 'final')] (STATBLOCK | ';')} '}'
+// BNF:1: VIRTPROP      ::= ['private' | 'protected'] TYPE ['&'] IDENTIFIER '{' {('get' | 'set') ['const'] FUNCATTR (STATBLOCK | ';')} '}'
 asCScriptNode *asCParser::ParseVirtualPropertyDecl(bool isMethod, bool isInterface)
 {
 	asCScriptNode *node = CreateNode(snVirtualProperty);

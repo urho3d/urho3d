@@ -13,7 +13,7 @@ class Texture2D : public Texture
     tolua_outside Image* Texture2DGetImage @ GetImage() const;
 
     RenderSurface* GetRenderSurface() const;
-    
+
     tolua_readonly tolua_property__get_set RenderSurface* renderSurface;
 };
 

@@ -10,13 +10,13 @@ class SoundSource3D : public SoundSource
     void SetOuterAngle(float angle);
     void SetRolloffFactor(float factor);
     void CalculateAttenuation();
-    
+
     float GetNearDistance() const;
     float GetFarDistance() const;
     float GetInnerAngle() const;
     float GetOuterAngle() const;
     float RollAngleoffFactor() const;
-    
+
     tolua_property__get_set float nearDistance;
     tolua_property__get_set float farDistance;
     tolua_property__get_set float innerAngle;

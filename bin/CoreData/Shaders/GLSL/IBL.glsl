@@ -9,22 +9,23 @@
 
     vec3 EnvBRDFApprox (vec3 SpecularColor, float Roughness, float NoV)
     {
-        vec4 c0 = vec4(-1, -0.0275, -0.572, 0.022 );
-        vec4 c1 = vec4(1, 0.0425, 1.0, -0.04 );
+        vec4 c0 = vec4(-1.0, -0.0275, -0.572, 0.022);
+        vec4 c1 = vec4(1.0, 0.0425, 1.0, -0.04);
         vec4 r = Roughness * c0 + c1;
         float a004 = min( r.x * r.x, exp2( -9.28 * NoV ) ) * r.x + r.y;
         vec2 AB = vec2( -1.04, 1.04 ) * a004 + r.zw;
         return SpecularColor * AB.x + AB.y;
     }
 
-    vec3 FixCubeLookup(vec3 v) 
+    // https://web.archive.org/web/20200228213025/http://the-witness.net/news/2012/02/seamless-cube-map-filtering/
+    vec3 FixCubeLookup(vec3 v, float cubeMapSize) 
     {
         float M = max(max(abs(v.x), abs(v.y)), abs(v.z));
-        float scale = (1024 - 1) / 1024;
+        float scale = (cubeMapSize - 1.0) / cubeMapSize;
 
-        if (abs(v.x) != M) v.x += scale;
-        if (abs(v.y) != M) v.y += scale;
-        if (abs(v.z) != M) v.z += scale; 
+        if (abs(v.x) != M) v.x *= scale;
+        if (abs(v.y) != M) v.y *= scale;
+        if (abs(v.z) != M) v.z *= scale; 
 
         return v;
     }
@@ -49,12 +50,13 @@
         // OpenGL ES does not support textureLod without extensions and does not have the sZoneCubeMap sampler,
         // so for now, sample without explicit LOD, and from the environment sampler, where the zone texture will be put
         // on mobile hardware
+        const float cubeMapSize = 1024.0; // TODO This only works with textures of a given size
         #ifndef GL_ES
-            vec3 cube = textureLod(sZoneCubeMap, FixCubeLookup(reflectVec), mipSelect).rgb;
-            vec3 cubeD = textureLod(sZoneCubeMap, FixCubeLookup(wsNormal), 9.0).rgb;
+            vec3 cube = textureLod(sZoneCubeMap, FixCubeLookup(reflectVec, cubeMapSize), mipSelect).rgb;
+            vec3 cubeD = textureLod(sZoneCubeMap, FixCubeLookup(wsNormal, cubeMapSize), 9.0).rgb;
         #else
-            vec3 cube = textureCube(sEnvCubeMap, FixCubeLookup(reflectVec)).rgb;
-            vec3 cubeD = textureCube(sEnvCubeMap, FixCubeLookup(wsNormal)).rgb;
+            vec3 cube = textureCube(sEnvCubeMap, FixCubeLookup(reflectVec, cubeMapSize)).rgb;
+            vec3 cubeD = textureCube(sEnvCubeMap, FixCubeLookup(wsNormal, cubeMapSize)).rgb;
         #endif
 
         // Fake the HDR texture

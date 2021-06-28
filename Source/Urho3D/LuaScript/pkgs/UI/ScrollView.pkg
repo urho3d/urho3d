@@ -4,7 +4,7 @@ class ScrollView : public UIElement
 {
     ScrollView();
     virtual ~ScrollView();
-    
+
     void SetContentElement(UIElement* element);
     void SetViewPosition(const IntVector2& position);
     void SetViewPosition(int x, int y);

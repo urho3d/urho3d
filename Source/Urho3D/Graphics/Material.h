@@ -113,6 +113,7 @@ public:
     /// Destruct.
     ~Material() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
@@ -121,6 +122,8 @@ public:
     bool EndLoad() override;
     /// Save resource. Return true if successful.
     bool Save(Serializer& dest) const override;
+
+    using Resource::Load;
 
     /// Load from an XML element. Return true if successful.
     bool Load(const XMLElement& source);

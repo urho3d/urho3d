@@ -304,7 +304,7 @@ public:
 private:
     /// type.
     unsigned type_;
-    
+
     // https://github.com/doxygen/doxygen/issues/7623
     union
     {

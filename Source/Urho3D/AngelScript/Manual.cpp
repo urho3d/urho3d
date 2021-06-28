@@ -25,7 +25,7 @@
 
 namespace Urho3D
 {
-    
+
 void ASRegisterManualFirst_Addons(asIScriptEngine* engine);
 void ASRegisterManualLast_Addons(asIScriptEngine* engine);
 
@@ -91,10 +91,23 @@ void ASRegisterManualLast_Urho2D(asIScriptEngine* engine);
 // This function is called before ASRegisterGenerated()
 void ASRegisterManualFirst(asIScriptEngine* engine)
 {
+    if (sizeof(long) == 4)
+    {
+        engine->RegisterTypedef("long", "int");
+        engine->RegisterTypedef("ulong", "uint");
+    }
+    else
+    {
+        engine->RegisterTypedef("long", "int64");
+        engine->RegisterTypedef("ulong", "uint64");
+    }
+
     if (sizeof(size_t) == 4)
         engine->RegisterTypedef("size_t", "uint");
     else
         engine->RegisterTypedef("size_t", "uint64");
+
+    engine->RegisterTypedef("SDL_JoystickID", "int");
 
     ASRegisterManualFirst_Addons(engine);
     ASRegisterManualFirst_Graphics(engine);

@@ -44,6 +44,7 @@ public:
     ~Obstacle() override;
 
     /// Register Obstacle with engine context.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Update the owning mesh when enabled status has changed.

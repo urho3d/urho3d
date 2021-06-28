@@ -67,7 +67,7 @@ function LuaScriptObject:UnsubscribeFromEvents(sender)
     local instance = self.instance
     if instance == nil then
         return
-    end 
+    end
     instance:UnsubscribeFromEvents(sender)
 end
 
@@ -75,7 +75,7 @@ function LuaScriptObject:UnsubscribeFromAllEvents()
     local instance = self.instance
     if instance == nil then
         return
-    end 
+    end
     instance:UnsubscribeFromAllEvents()
 end
 
@@ -111,7 +111,7 @@ function CreateScriptObjectInstance(object, instance)
     local o = {}
     setmetatable(o, object)
     object.__index = object
-    
+
     instance.object = o
     o.instance = instance
     o.node = instance:GetNode()
@@ -139,10 +139,10 @@ function DestroyScriptObjectInstance(instance)
     if object == nil then
         return
     end
-    
+
     -- Call stop function
     object:Stop()
-    
+
     object.node = nil
     object.instance = nil
     instance.object = nil
@@ -158,17 +158,17 @@ static int tolua_LuaScriptLuaAPI_LuaScriptInstance_SubscribeToEvent(lua_State* t
 
 #ifndef TOLUA_RELEASE
     if (args == 3)
-    {   
+    {
         // LuaScriptInstance::AddEventHandler(const String eventName, void* functionOrFunctionName);
         if (!tolua_isusertype(tolua_S,1,"LuaScriptInstance",0,&tolua_err) ||
-            !tolua_isurho3dstring(tolua_S,2,0,&tolua_err) || 
+            !tolua_isurho3dstring(tolua_S,2,0,&tolua_err) ||
             !tolua_isfunctionorurho3dstring(tolua_S,3,0,&tolua_err))
             goto tolua_lerror;
     }
     else if (args == 4)
     {
         // LuaScriptInstance::AddEventHandler(Object* sender, const String eventName, void* functionOrFunctionName);
-        if (!tolua_isusertype(tolua_S,1,"LuaScriptInstance",0,&tolua_err) || 
+        if (!tolua_isusertype(tolua_S,1,"LuaScriptInstance",0,&tolua_err) ||
             !tolua_isuserdata(tolua_S,2,0,&tolua_err) ||
             !tolua_isurho3dstring(tolua_S,3,0,&tolua_err) ||
             !tolua_isfunctionorurho3dstring(tolua_S,4,0,&tolua_err))
@@ -190,7 +190,7 @@ static int tolua_LuaScriptLuaAPI_LuaScriptInstance_SubscribeToEvent(lua_State* t
         {
             const String functionName = (const String)tolua_tourho3dstring(tolua_S,3,0);
             self->AddEventHandler(eventName,functionName);
-        }        
+        }
     }
     else if (args == 4)
     {

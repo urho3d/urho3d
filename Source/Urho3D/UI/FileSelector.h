@@ -58,6 +58,7 @@ public:
     /// Destruct.
     ~FileSelector() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Set fileselector UI style.

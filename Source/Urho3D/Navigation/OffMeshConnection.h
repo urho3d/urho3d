@@ -38,6 +38,7 @@ public:
     /// Destruct.
     ~OffMeshConnection() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.

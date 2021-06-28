@@ -159,6 +159,7 @@ public:
     /// Destruct.
     ~Light() override;
     /// Register object factory. Drawable must be registered first.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Process octree raycast. May be called from a worker thread.

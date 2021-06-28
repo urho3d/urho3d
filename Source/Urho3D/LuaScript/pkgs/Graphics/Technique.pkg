@@ -96,11 +96,11 @@ static Technique* TechniqueClone(const Technique* technique, const String& clone
 {
     if (!technique)
         return 0;
-        
+
     SharedPtr<Technique> clonedTechniquePtr = technique->Clone(cloneName);
     Technique* clonedTechnique = clonedTechniquePtr.Get();
     clonedTechniquePtr.Detach();
-    
+
     return clonedTechnique;
 }
 $}

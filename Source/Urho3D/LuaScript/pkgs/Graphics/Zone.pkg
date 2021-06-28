@@ -14,7 +14,7 @@ class Zone : public Drawable
     void SetOverride(bool enable);
     void SetAmbientGradient(bool enable);
     void SetZoneTexture(Texture* texture);
-    
+
     const Matrix3x4& GetInverseWorldTransform() const;
     const Color& GetAmbientColor() const;
     const Color& GetAmbientStartColor();
@@ -29,9 +29,9 @@ class Zone : public Drawable
     bool GetOverride() const;
     bool GetAmbientGradient() const;
     Texture* GetZoneTexture() const;
-    
+
     bool IsInside(const Vector3& point) const;
-    
+
     tolua_property__get_set BoundingBox& boundingBox;
     tolua_readonly tolua_property__get_set Matrix3x4& inverseWorldTransform;
     tolua_property__get_set Color& ambientColor;

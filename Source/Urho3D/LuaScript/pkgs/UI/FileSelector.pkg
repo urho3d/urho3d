@@ -12,7 +12,7 @@ class FileSelector : public Object
     virtual ~FileSelector();
 
     void SetDefaultStyle(XMLFile* style);
-    
+
     void SetTitle(const String text);
     void SetButtonTexts(const String okText, const String cancelText);
     void SetPath(const String path);
@@ -37,7 +37,7 @@ class FileSelector : public Object
     const String GetFilter() const;
     unsigned GetFilterIndex() const;
     bool GetDirectoryMode() const;
-    
+
     tolua_property__get_set XMLFile* defaultStyle;
     tolua_readonly tolua_property__get_set Window* window;
     tolua_readonly tolua_property__get_set Text* titleText;

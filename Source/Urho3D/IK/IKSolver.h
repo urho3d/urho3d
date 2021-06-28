@@ -170,6 +170,7 @@ public:
     /// Default destructor.
     ~IKSolver() override;
     /// Registers this class to the context.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Returns the active algorithm.

@@ -7,7 +7,7 @@ class Material : public Resource
 {
     Material();
     ~Material();
-    
+
     void SetNumTechniques(unsigned num);
     void SetTechnique(unsigned index, Technique* tech, MaterialQuality qualityLevel = 0, float lodDistance = 0.0f);
     void SetVertexShaderDefines(const String defines);
@@ -30,28 +30,28 @@ class Material : public Resource
     void SetScene(Scene* scene);
     void RemoveShaderParameter(const String name);
     void ReleaseShaders();
-    
+
     // SharedPtr<Material> Clone(const String cloneName = String::EMPTY) const;
     tolua_outside Material* MaterialClone @ Clone(const String cloneName = String::EMPTY) const;
-    
+
     void SortTechniques();
     void MarkForAuxView(unsigned frameNumber);
-    
+
     unsigned GetNumTechniques() const;
-    
+
     Technique* GetTechnique(unsigned index) const;
 
     Pass* GetPass(unsigned index, const String passName) const;
 
     Texture* GetTexture(TextureUnit unit) const;
-    
+
     const String GetVertexShaderDefines() const;
     const String GetPixelShaderDefines() const;
 
     ValueAnimation* GetShaderParameterAnimation(const String name) const;
     WrapMode GetShaderParameterAnimationWrapMode(const String name) const;
     float GetShaderParameterAnimationSpeed(const String name) const;
-    
+
     CullMode GetCullMode() const;
     CullMode GetShadowCullMode() const;
     FillMode GetFillMode() const;

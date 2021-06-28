@@ -9,10 +9,10 @@ class Drawable2D : public Drawable
 public:
     void SetLayer(int layer);
     void SetOrderInLayer(int orderInLayer);
-    
+
     int GetLayer() const;
     int GetOrderInLayer() const;
-    
+
     tolua_property__get_set int layer;
     tolua_property__get_set int orderInLayer;
 };

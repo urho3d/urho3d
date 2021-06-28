@@ -27,7 +27,7 @@ class SoundSource : public Component
     float GetPanning() const;
     AutoRemoveMode GetAutoRemoveMode() const;
     bool IsPlaying() const;
-    
+
     tolua_readonly tolua_property__get_set Sound* sound;
     tolua_property__get_set String soundType;
     tolua_readonly tolua_property__get_set float timePosition;

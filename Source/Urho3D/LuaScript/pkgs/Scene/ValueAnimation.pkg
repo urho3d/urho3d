@@ -11,13 +11,13 @@ class ValueAnimation : public Resource
 {
     ValueAnimation();
     ~ValueAnimation();
-    
+
     void SetInterpolationMethod(InterpMethod method);
     void SetSplineTension(float tension);
     void SetValueType(VariantType valueType);
     bool SetKeyFrame(float time, const Variant& value);
     void SetEventFrame(float time, const StringHash& eventType, const VariantMap& eventData = VariantMap());
-    
+
     InterpMethod GetInterpolationMethod() const;
     float GetSplineTension() const;
     VariantType GetValueType() const;

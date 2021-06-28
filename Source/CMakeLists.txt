@@ -74,7 +74,7 @@ endforeach ()
 
 if (URHO3D_ANGELSCRIPT)
     add_subdirectory (ThirdParty/AngelScript)
-    if (WEB OR (ARM AND URHO3D_64BIT))
+    if (WEB OR (ARM AND URHO3D_64BIT) OR URHO3D_FORCE_AS_MAX_PORTABILITY)
         add_subdirectory (ThirdParty/boost)
     endif ()
 endif ()
@@ -122,6 +122,10 @@ endif ()
 
 if (URHO3D_PHYSICS)
     add_subdirectory (ThirdParty/Bullet)
+endif ()
+
+if (URHO3D_TRACY_PROFILING)
+    add_subdirectory (ThirdParty/Tracy)
 endif ()
 
 if (NOT ANDROID AND NOT ARM AND NOT WEB)

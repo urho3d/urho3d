@@ -24,7 +24,7 @@ class Cursor : public BorderImage
 
     void DefineShape(const String shape, Image* image, const IntRect& imageRect, const IntVector2& hotSpot);
     void DefineShape(CursorShape shape, Image* image, const IntRect& imageRect, const IntVector2& hotSpot);
-    
+
     void SetShape(CursorShape shape);
     void SetShape(const String shape);
     void SetUseSystemShapes(bool enable);

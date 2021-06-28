@@ -12,7 +12,7 @@ class Deserializer
     unsigned Tell() const;
     unsigned GetSize() const;
     bool IsEof() const;
-    
+
     int ReadInt();
     long long ReadInt64();
     short ReadShort();
@@ -42,10 +42,10 @@ class Deserializer
     String ReadString();
     String ReadFileID();
     StringHash ReadStringHash();
-    
+
     // PODVector<unsigned char> ReadBuffer();
     VectorBuffer ReadBuffer();
-    
+
     ResourceRef ReadResourceRef();
     ResourceRefList ReadResourceRefList();
     Variant ReadVariant();
@@ -55,7 +55,7 @@ class Deserializer
     unsigned ReadVLE();
     unsigned ReadNetID();
     String ReadLine();
-    
+
     tolua_readonly tolua_property__get_set String name;
     tolua_readonly tolua_property__get_set unsigned checksum;
     tolua_readonly tolua_property__get_set unsigned position;

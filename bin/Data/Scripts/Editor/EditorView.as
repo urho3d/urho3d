@@ -17,7 +17,7 @@ uint resizingBorder = 0; // current border that is dragging
 uint viewportMode = VIEWPORT_SINGLE;
 int  viewportBorderOffset = 2; // used to center borders over viewport seams,  should be half of width
 int  viewportBorderWidth = 4; // width of a viewport resize border
-IntRect viewportArea; // the area where the editor viewport is. if we ever want to have the viewport not take up the whole screen this abstracts that
+IntRect viewportArea; // the area where the editor viewport is. if we ever want to have the viewport not take up the whole screen this abstracts that. NOTE: viewportArea is in scaled UI position.
 IntRect viewportUIClipBorder = IntRect(27, 60, 0, 0); // used to clip viewport borders, the borders are ugly when going behind the transparent toolbars
 RenderPath@ renderPath; // Renderpath to use on all views
 String renderPathName;
@@ -108,6 +108,30 @@ void ResizeString(String& str, uint newSize)
         str[i] = ' ';
 }
 
+/// Convert rect from scaled UI position to system position
+IntRect IntRectUIToSystem(const IntRect& rect)
+{
+    IntRect ret = rect;
+    ret.left = FloorToInt(ret.left * ui.scale);
+    ret.top = FloorToInt(ret.top * ui.scale);
+    ret.right = FloorToInt(ret.right * ui.scale);
+    ret.bottom = FloorToInt(ret.bottom * ui.scale);
+
+    return ret;
+}
+
+/// Convert rect from system position to scaled UI position
+IntRect IntRectSystemToUI(const IntRect& rect)
+{
+    IntRect ret = rect;
+    ret.left = FloorToInt(ret.left / ui.scale);
+    ret.top = FloorToInt(ret.top / ui.scale);
+    ret.right = FloorToInt(ret.right / ui.scale);
+    ret.bottom = FloorToInt(ret.bottom / ui.scale);
+
+    return ret;
+}
+
 // Holds info about a viewport such as camera settings and splits up shared resources
 class ViewportContext
 {
@@ -145,7 +169,11 @@ class ViewportContext
         orthoCameraZoom = camera.zoom;
         camera.fillMode = fillMode;
         soundListener = cameraNode.CreateComponent("SoundListener");
-        viewport = Viewport(editorScene, camera, viewRect, renderPath);
+        
+        // Here we convert viewRect from scaled UI position to system position 
+        IntRect sysRect = IntRectUIToSystem(viewRect);
+
+        viewport = Viewport(editorScene, camera, sysRect, renderPath);
         index = index_;
         viewportId = viewportId_;
         camera.viewMask = 0xffffffff; // It's easier to only have 1 gizmo active this viewport is shared with the gizmo
@@ -178,7 +206,7 @@ class ViewportContext
         viewportContextUI = UIElement();
         viewportUI.AddChild(viewportContextUI);
         viewportContextUI.SetPosition(viewport.rect.left, viewport.rect.top);
-        viewportContextUI.SetFixedSize(viewport.rect.width, viewport.rect.height);
+        viewportContextUI.SetFixedSize(viewport.rect.width / ui.scale, viewport.rect.height / ui.scale); // viewport.rect is in system position
         viewportContextUI.clipChildren = true;
 
         statusBar = BorderImage("ToolBar");
@@ -236,8 +264,8 @@ class ViewportContext
 
     void HandleResize()
     {
-        viewportContextUI.SetPosition(viewport.rect.left, viewport.rect.top);
-        viewportContextUI.SetFixedSize(viewport.rect.width, viewport.rect.height);
+        viewportContextUI.SetPosition(viewport.rect.left / ui.scale, viewport.rect.top / ui.scale);
+        viewportContextUI.SetFixedSize(viewport.rect.width / ui.scale, viewport.rect.height / ui.scale);  // viewport.rect is in system position
         if (viewport.rect.left < 34)
         {
             statusBar.layoutBorder = IntRect(34 - viewport.rect.left, 4, 4, 8);
@@ -253,7 +281,7 @@ class ViewportContext
             settingsWindow.position = pos;
         }
 
-        statusBar.SetFixedSize(viewport.rect.width, 22);
+        statusBar.SetFixedSize(viewport.rect.width / ui.scale, 22);
     }
 
     void ToggleOrthographic()
@@ -699,7 +727,7 @@ void SetHDR(bool enable)
 void CreateCamera()
 {
     // Set the initial viewport rect
-    viewportArea = IntRect(0, 0, graphics.width, graphics.height);
+    viewportArea = IntRect(0, 0, graphics.width / ui.scale, graphics.height / ui.scale);
 
     // Set viewport single to store default hierarchy/inspector height/positions
     if(viewportMode == VIEWPORT_COMPACT)
@@ -730,7 +758,7 @@ void CreateViewportUI()
         ui.root.AddChild(viewportUI);
     }
 
-    viewportUI.SetFixedSize(viewportArea.width, viewportArea.height);
+    viewportUI.SetFixedSize(viewportArea.width, viewportArea.height); // viewportArea is alreay in scaled UI position
     viewportUI.position = IntVector2(viewportArea.top, viewportArea.left);
     viewportUI.clipChildren = true;
     viewportUI.clipBorder = viewportUIClipBorder;
@@ -753,22 +781,25 @@ void CreateViewportUI()
         ViewportContext@ vc = viewports[i];
         vc.CreateViewportContextUI();
 
+        // Here we convert system position to scaled UI position
+        IntRect rect = IntRectSystemToUI(vc.viewport.rect);
+
         if (vc.viewportId & VIEWPORT_TOP > 0)
-            top = vc.viewport.rect;
+            top = rect;
         else if (vc.viewportId & VIEWPORT_BOTTOM > 0)
-            bottom = vc.viewport.rect;
+            bottom = rect;
         else if (vc.viewportId & VIEWPORT_LEFT > 0)
-            left = vc.viewport.rect;
+            left = rect;
         else if (vc.viewportId & VIEWPORT_RIGHT > 0)
-            right = vc.viewport.rect;
+            right = rect;
         else if (vc.viewportId & VIEWPORT_TOP_LEFT > 0)
-            topLeft = vc.viewport.rect;
+            topLeft = rect;
         else if (vc.viewportId & VIEWPORT_TOP_RIGHT > 0)
-            topRight = vc.viewport.rect;
+            topRight = rect;
         else if (vc.viewportId & VIEWPORT_BOTTOM_LEFT > 0)
-            bottomLeft = vc.viewport.rect;
+            bottomLeft = rect;
         else if (vc.viewportId & VIEWPORT_BOTTOM_RIGHT > 0)
-            bottomRight = vc.viewport.rect;
+            bottomRight = rect;
     }
 
     // Creates resize borders based on the mode set
@@ -2231,6 +2262,7 @@ void ViewMouseMove()
         return;
 
     IntVector2 pos = ui.cursor.position;
+    pos = ui.ConvertUIToSystem(pos);
     for (uint i = 0; i < viewports.length; ++i)
     {
         ViewportContext@ vc = viewports[i];
@@ -2246,10 +2278,11 @@ void ViewMouseClick()
 
 Ray GetActiveViewportCameraRay()
 {
+    IntVector2 pos = ui.ConvertUIToSystem(ui.cursorPosition);
     IntRect view = activeViewport.viewport.rect;
     return camera.GetScreenRay(
-        float(ui.cursorPosition.x - view.left) / view.width,
-        float(ui.cursorPosition.y - view.top) / view.height
+        float(pos.x - view.left) / view.width,
+        float(pos.y - view.top) / view.height
     );
 }
 
@@ -2723,7 +2756,7 @@ Vector3 SelectedNodesCenterPoint()
 
 Drawable@ GetDrawableAtMousePostion()
 {
-    IntVector2 pos = ui.cursorPosition;
+    IntVector2 pos = ui.ConvertUIToSystem(ui.cursorPosition);
     Ray cameraRay = camera.GetScreenRay(float(pos.x) / activeViewport.viewport.rect.width, float(pos.y) / activeViewport.viewport.rect.height);
 
     if (editorScene.octree is null)

@@ -35,7 +35,7 @@ void ASRegisterManualFirst_UI(asIScriptEngine* engine)
 
 // ========================================================================================
 
-// template<class T> T * Object::GetSubsystem() const | File: ../Core/Object.h
+// template <class T> T* Context::GetSubsystem() const | File: ../Core/Context.h
 static UI* GetUI()
 {
     return GetScriptContext()->GetSubsystem<UI>();
@@ -44,38 +44,14 @@ static UI* GetUI()
 // This function is called after ASRegisterGenerated()
 void ASRegisterManualLast_UI(asIScriptEngine* engine)
 {
-    // template<class T> T * Object::GetSubsystem() const | File: ../Core/Object.h
-    engine->RegisterGlobalFunction("UI@+ get_ui()", asFUNCTION(GetUI), asCALL_CDECL);
+    // template <class T> T* Context::GetSubsystem() const | File: ../Core/Context.h
+    engine->RegisterGlobalFunction("UI@+ get_ui()", AS_FUNCTION(GetUI), AS_CALL_CDECL);
 }
 
 // ========================================================================================
 
-// bool Font::SaveXML(Serializer &dest, int pointSize, bool usedGlyphs=false, const String &indentation="\t") | File: ../UI/Font.h
-bool FontSaveXMLVectorBuffer(VectorBuffer& buffer, int pointSize, bool usedGlyphs, const String& indentation, Font* ptr)
-{
-    return ptr->SaveXML(buffer, pointSize, usedGlyphs, indentation);
-}
-
-// bool Font::SaveXML(Serializer &dest, int pointSize, bool usedGlyphs=false, const String &indentation="\t") | File: ../UI/Font.h
-bool FontSaveXML(const String& fileName, int pointSize, bool usedGlyphs, const String& indentation, Font* ptr)
-{
-    if (fileName.Empty())
-        return false;
-
-    File file(ptr->GetContext(), fileName, FILE_WRITE);
-    return ptr->SaveXML(file, pointSize, usedGlyphs, indentation);
-}
-
-// bool Font::SaveXML(Serializer &dest, int pointSize, bool usedGlyphs=false, const String &indentation="\t") | File: ../UI/Font.h
-bool FontSaveXMLFile(File* file, int pointSize, bool usedGlyphs, const String& indentation, Font* ptr)
-{
-    return ptr->SaveXML(*file, pointSize, usedGlyphs, indentation);
-}
-
-// ========================================================================================
-
-// SharedPtr<UIElement> UI::LoadLayout(Deserializer &source, XMLFile *styleFile=nullptr) | File: ../UI/UI.h
-UIElement* UILoadLayoutFromFile(File* file, UI* ptr)
+// SharedPtr<UIElement> UI::LoadLayout(Deserializer& source, XMLFile* styleFile = nullptr) | File: ../UI/UI.h
+UIElement* UI_LoadLayout_File(File* file, UI* ptr)
 {
     if (file)
     {
@@ -88,8 +64,8 @@ UIElement* UILoadLayoutFromFile(File* file, UI* ptr)
         return nullptr;
 }
 
-// SharedPtr<UIElement> UI::LoadLayout(Deserializer &source, XMLFile *styleFile=nullptr) | File: ../UI/UI.h
-UIElement* UILoadLayoutFromVectorBuffer(VectorBuffer& buffer, UI* ptr)
+// SharedPtr<UIElement> UI::LoadLayout(Deserializer& source, XMLFile* styleFile = nullptr) | File: ../UI/UI.h
+UIElement* UI_LoadLayout_VectorBuffer(VectorBuffer& buffer, UI* ptr)
 {
     SharedPtr<UIElement> root = ptr->LoadLayout(buffer);
     if (root)
@@ -97,8 +73,8 @@ UIElement* UILoadLayoutFromVectorBuffer(VectorBuffer& buffer, UI* ptr)
     return root.Get();
 }
 
-// SharedPtr<UIElement> UI::LoadLayout(Deserializer &source, XMLFile *styleFile=nullptr) | File: ../UI/UI.h
-UIElement* UILoadLayoutFromFileWithStyle(File* file, XMLFile* styleFile, UI* ptr)
+// SharedPtr<UIElement> UI::LoadLayout(Deserializer& source, XMLFile* styleFile = nullptr) | File: ../UI/UI.h
+UIElement* UI_LoadLayout_File_Style(File* file, XMLFile* styleFile, UI* ptr)
 {
     if (file)
     {
@@ -111,8 +87,8 @@ UIElement* UILoadLayoutFromFileWithStyle(File* file, XMLFile* styleFile, UI* ptr
         return nullptr;
 }
 
-// SharedPtr<UIElement> UI::LoadLayout(Deserializer &source, XMLFile *styleFile=nullptr) | File: ../UI/UI.h
-UIElement* UILoadLayoutFromVectorBufferWithStyle(VectorBuffer& buffer, XMLFile* styleFile, UI* ptr)
+// SharedPtr<UIElement> UI::LoadLayout(Deserializer& source, XMLFile* styleFile = nullptr) | File: ../UI/UI.h
+UIElement* UI_LoadLayout_VectorBuffer_Style(VectorBuffer& buffer, XMLFile* styleFile, UI* ptr)
 {
     SharedPtr<UIElement> root = ptr->LoadLayout(buffer, styleFile);
     if (root)
@@ -120,124 +96,28 @@ UIElement* UILoadLayoutFromVectorBufferWithStyle(VectorBuffer& buffer, XMLFile* 
     return root.Get();
 }
 
-// bool UI::SaveLayout(Serializer &dest, UIElement *element) | File: ../UI/UI.h
-bool UISaveLayout(File* file, UIElement* element, UI* ptr)
+// bool UI::SaveLayout(Serializer& dest, UIElement* element) | File: ../UI/UI.h
+bool UI_SaveLayout_File(File* file, UIElement* element, UI* ptr)
 {
     return file && ptr->SaveLayout(*file, element);
 }
 
-// bool UI::SaveLayout(Serializer &dest, UIElement *element) | File: ../UI/UI.h
-bool UISaveLayoutVectorBuffer(VectorBuffer& buffer, UIElement* element, UI* ptr)
+// bool UI::SaveLayout(Serializer& dest, UIElement* element) | File: ../UI/UI.h
+bool UI_SaveLayout_VectorBuffer(VectorBuffer& buffer, UIElement* element, UI* ptr)
 {
     return ptr->SaveLayout(buffer, element);
 }
 
 // const Vector<UIElement*> UI::GetDragElements() | File: ../UI/UI.h
-CScriptArray* UIGetDragElements(UI* ptr)
+CScriptArray* UI_GetDragElements(UI* ptr)
 {
     return VectorToHandleArray(ptr->GetDragElements(), "const Array<UIElement@>@");
 }
 
-// void UI::SetFocusElement(UIElement *element, bool byKey=false) | File: ../UI/UI.h
-void UISetFocusElement(UIElement* element, UI* ptr)
+// void UI::SetFocusElement(UIElement* element, bool byKey = false) | File: ../UI/UI.h
+void UI_SetFocusElement(UIElement* element, UI* ptr)
 {
     ptr->SetFocusElement(element);
-}
-
-// ========================================================================================
-
-// bool UIElement::LoadXML(Deserializer &source) | File: ../UI/UIElement.h
-bool UIElementLoadXML(File* file, UIElement* ptr)
-{
-    return file && ptr->LoadXML(*file);
-}
-
-// bool UIElement::LoadXML(Deserializer &source) | File: ../UI/UIElement.h
-bool UIElementLoadXMLVectorBuffer(VectorBuffer& buffer, UIElement* ptr)
-{
-    return ptr->LoadXML(buffer);
-}
-
-// bool UIElement::LoadXML(Deserializer &source) | File: ../UI/UIElement.h
-bool UIElementLoadXML(XMLFile* file, XMLFile* styleFile, UIElement* ptr)
-{
-    if (file)
-    {
-        XMLElement rootElem = file->GetRoot("element");
-        return rootElem && ptr->LoadXML(rootElem, styleFile);
-    }
-    else
-        return false;
-}
-
-// virtual UIElement* UIElement::LoadChildXML(const XMLElement &childElem, XMLFile *styleFile) | File: ../UI/UIElement.h
-UIElement* UIElementLoadChildXML(XMLFile* file, XMLFile* styleFile, UIElement* ptr)
-{
-    if (!file)
-        return nullptr;
-
-    XMLElement rootElem = file->GetRoot("element");
-    if (rootElem)
-        return ptr->LoadChildXML(rootElem, styleFile);
-    else
-        return nullptr;
-}
-
-// bool UIElement::SaveXML(Serializer &dest, const String &indentation="\t") const | File: ../UI/UIElement.h
-bool UIElementSaveXML(File* file, const String& indentation, UIElement* ptr)
-{
-    return file && ptr->SaveXML(*file);
-}
-
-// bool UIElement::SaveXML(Serializer &dest, const String &indentation="\t") const | File: ../UI/UIElement.h
-bool UIElementSaveXMLVectorBuffer(VectorBuffer& buffer, const String& indentation, UIElement* ptr)
-{
-    return ptr->SaveXML(buffer);
-}
-
-// void UIElement::RemoveChildAtIndex(unsigned index) | File: ../UI/UIElement.h
-void UIElementRemoveChild(unsigned index, UIElement* ptr)
-{
-    ptr->RemoveChildAtIndex(index);
-}
-
-// bool UIElement::SetStyle(const String &styleName, XMLFile *file=nullptr) | File: ../UI/UIElement.h
-void UIElementSetStyle(const String& styleName, UIElement* ptr)
-{
-    if (styleName.Empty())
-        ptr->SetStyleAuto();
-    else
-        ptr->SetStyle(styleName);
-}
-
-// unsigned UIElement::GetNumChildren(bool recursive=false) const | File: ../UI/UIElement.h
-unsigned UIElementGetNumChildrenNonRecursive(UIElement* ptr)
-{
-    return ptr->GetNumChildren(false);
-}
-
-// unsigned UIElement::GetNumChildren(bool recursive=false) const | File: ../UI/UIElement.h
-unsigned UIElementGetNumChildrenRecursive(UIElement* ptr)
-{
-    return ptr->GetNumChildren(true);
-}
-
-// void UIElement::SetParent(UIElement *parent, unsigned index=M_MAX_UNSIGNED) | File: ../UI/UIElement.h
-void UIElementSetParent(UIElement* parent, UIElement* ptr)
-{
-    ptr->SetParent(parent);
-}
-
-// XMLFile* UIElement::GetDefaultStyle(bool recursiveUp=true) const | File: ../UI/UIElement.h
-XMLFile* UIElementGetDefaultStyle(UIElement* ptr)
-{
-    return ptr->GetDefaultStyle();
-}
-
-// const VariantMap& UIElement::GetVars() const | File: ../UI/UIElement.h
-VariantMap& UIElementGetVars(UIElement* ptr)
-{
-    return const_cast<VariantMap&>(ptr->GetVars());
 }
 
 }

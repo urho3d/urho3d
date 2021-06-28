@@ -117,6 +117,7 @@ public:
     /// Destruct.
     ~ParticleEffect() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
@@ -125,6 +126,8 @@ public:
     bool EndLoad() override;
     /// Save resource. Return true if successful.
     bool Save(Serializer& dest) const override;
+
+    using Resource::Load;
 
     /// Save resource to XMLElement. Return true if successful.
     bool Save(XMLElement& dest) const;

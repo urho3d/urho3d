@@ -4,12 +4,12 @@ class Controls
 {
     Controls();
     ~Controls();
-        
+
     void Reset();
     void Set(unsigned buttons, bool down = true);
     bool IsDown(unsigned button) const;
     bool IsPressed(unsigned button, const Controls& previousControls) const;
-    
+
     unsigned buttons_ @ buttons;
     float yaw_ @ yaw;
     float pitch_ @ pitch;

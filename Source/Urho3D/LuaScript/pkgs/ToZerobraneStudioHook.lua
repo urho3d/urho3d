@@ -23,8 +23,8 @@
 -- Highly based on "ToDoxHook.lua", adjusted for Zerobrane Studio API format.
 -- Compatible with Zerobrane Studio 0.41+ (Zerobrane Studio 0.40 and below may have issues)
 
---[[ Copy result in your Zerobrane Studio's folder "api/lua" and set it in your 
-     "interpreters" file with the filename (excluding it's lua extension) into the 
+--[[ Copy result in your Zerobrane Studio's folder "api/lua" and set it in your
+     "interpreters" file with the filename (excluding it's lua extension) into the
      "api" table variable. ]]--
 
 require "ToDoxHook"
@@ -39,11 +39,11 @@ function printFunction(self,ident,close,isfunc)
   func.const = self.const
   func.cname = self.cname
   func.lname = self.lname
- 
+
   if isfunc then
     func.name = func.lname
   end
- 
+
   currentFunction = func
   local i = 1
   while self.args[i] do
@@ -51,14 +51,14 @@ function printFunction(self,ident,close,isfunc)
     i = i + 1
   end
   currentFunction = nil
- 
+
   if currentClass == nil then
     table.insert(globalFunctions, func)
   else
     if func.name == "delete" then
       func.type = "void"
     end
-    
+
     if currentClass.functions == nil then
       currentClass.functions = { func }
     else
@@ -66,8 +66,8 @@ function printFunction(self,ident,close,isfunc)
     end
   end
 end
- 
- 
+
+
 -- Workaround for Zerobrane Studio's tool-tip with overloaded functions
 function adjustClassesOverloadFuncs()
   for i, class in ipairs(classes) do
@@ -150,49 +150,49 @@ function writeInheritances(file, classname)
     end
   end
 end
- 
+
 function writeClasses(file)
   sortByName(classes)
   adjustClassesOverloadFuncs()
- 
+
   file:write("\n\n  -- Classes")
   for i, class in ipairs(classes) do
     file:write("\n  " .. class.name .. " = {")
-               
+
     if class.functions ~= nil or class.properties ~= nil then
       file:write("\n    childs = {")
     end
-               
+
     if class.functions ~= nil then
       for i, func in ipairs(class.functions) do
           writeFunction(file, func, class.name)
       end
     end
-               
+
     if class.properties ~= nil then
       for i, property in ipairs(class.properties) do
         writeProperty(file, property)
       end
     end
-               
+
     -- append inheritance functions & properties
     if class.base ~= "" then
       writeInheritances(file, class.base)
     end
-                               
+
     if class.functions ~= nil or class.properties ~= nil then
       file:write("\n    },")
     end
- 
+
     file:write("\n    type = \"class\"")
     file:write("\n  },")
   end
 end
- 
+
 function writeEnumerates(file)
   sortByName(enumerates)
   file:write("\n\n  -- Enumerations\n")
- 
+
   for i, enumerate in ipairs(enumerates) do
     for i, value in ipairs(enumerate.values) do
       file:write("\n      " .. value .. " = {")
@@ -202,24 +202,24 @@ function writeEnumerates(file)
     end
   end
 end
- 
+
 function writeFunction(file, func, classname, isInheritance, asFunc)
   -- ignore operators
   if func.name:find("^operator[=%+%-%*%(%)\\</]") == nil then
- 
+
     -- ignore new/delete object if from inheritance
     if not ((func.name == classname or func.name == "new" or func.name == "delete") and isInheritance == true) then
-   
+
       -- write function begin
       file:write("\n      " .. func.name .. " = {")
- 
+
       -- write parameters
       file:write("\n        args = \"(")
       if func.declarations ~= nil then
         writeFunctionArgs(file, func.declarations)
       end
       file:write(")\",")
-     
+
       -- write description preparation
       local isFirstDescription = true
       if func.overloads ~= nil or func.descriptions ~= nil then
@@ -256,14 +256,14 @@ function writeFunction(file, func, classname, isInheritance, asFunc)
       if func.overloads ~= nil or func.descriptions ~= nil then
         file:write("\",")
       end
-      
+
       -- write returns
       if func.type ~= "" or func.ptr ~= "" then
         file:write("\n        returns = \"(")
         writeFunctionReturn(file, func)
         file:write(")\",")
       end
- 
+
       -- write valuetype
       if func.ptr ~= "" then
         if func.type ~= "" then
@@ -272,7 +272,7 @@ function writeFunction(file, func, classname, isInheritance, asFunc)
           file:write("\n        valuetype = \"" .. classname .. "\",")
         end
       end
-         
+
       -- write function end
       if asFunc == true then
         file:write("\n        type = \"function\"") -- accepts auto-completion with ".", ":" and global
@@ -283,79 +283,79 @@ function writeFunction(file, func, classname, isInheritance, asFunc)
     end
   end
 end
- 
+
 function writeGlobalConstants(file)
   sortByName(globalConstants)
- 
+
   file:write("\n\n  -- Global Constants\n")
   for i, constant in ipairs(globalConstants) do
     file:write("\n      " .. constant.name .. " = {")
-   
+
     -- write valuetype
     if constant.ptr ~= "" then
       if constant.type ~= "" then
         file:write("\n        valuetype = \"" .. constant.type:gsub("(const%s+)","") .. "\",")
       end
     end
-   
+
     -- write description (type)
     file:write("\n        description = \"" .. constant.type .. constant.ptr .. "\",")
-   
+
     -- write constant end
     file:write("\n        type = \"value\"")
     file:write("\n      },")
   end
 end
- 
+
 function writeGlobalConstants(file)
   sortByName(globalConstants)
- 
+
   file:write("\n\n  -- Global Constants\n")
   for i, constant in ipairs(globalConstants) do
     file:write("\n      " .. constant.name .. " = {")
-   
+
     -- write valuetype
     if constant.ptr ~= "" then
       if constant.type ~= "" then
         file:write("\n        valuetype = \"" .. constant.type:gsub("(const%s+)","") .. "\",")
       end
     end
-   
+
     -- write description (type)
     file:write("\n        description = \"" .. constant.type .. constant.ptr .. "\",")
-   
+
     -- write constant end
     file:write("\n        type = \"value\"")
     file:write("\n      },")
   end
 end
- 
-function writeGlobalFunctions(file) 
+
+function writeGlobalFunctions(file)
   sortByName(globalFunctions)
- 
+
   file:write("\n\n  -- Global Functions\n")
   for i, func in ipairs(globalFunctions) do
     writeFunction(file, func, nil, nil, true)
   end
 end
- 
+
 function writeGlobalProperties(file)
   file:write("\n")
   for i, property in ipairs(globalProperties) do
     writeProperty(file, property)
   end
 end
- 
+
 function writeProperty(file, property)
   file:write("\n      " .. property.name .. " = {")
- 
+
   -- write valuetype
   if property.ptr ~= "" then
     if property.type ~= "" then
       file:write("\n        valuetype = \"" .. property.type:gsub("(const%s+)","") .. "\",")
     end
   end
- 
+
   -- write description (type)
   if property.mod:find("tolua_readonly") == nil then
     file:write("\n        description = \"" .. property.type  .. property.ptr .. "")
@@ -370,40 +370,40 @@ function writeProperty(file, property)
     end
   end
   file:write("\",")
-  
+
   -- write property end
   file:write("\n        type = \"value\"")
   file:write("\n      },")
 end
- 
+
 function classPackage:print()
   curDir = getCurrentDirectory()
-  
+
   if flags.o == nil then
     print("Invalid output filename");
     return
   end
- 
+
   local filename = flags.o
   local file = io.open(filename, "wt")
- 
+
   file:write("-- Urho3D API generated on "..os.date('%Y-%m-%d'))
   file:write("\n\nlocal api = {")
- 
+
   local i = 1
   while self[i] do
     self[i]:print("","")
     i = i + 1
   end
   printDescriptionsFromPackageFile(flags.f)
- 
+
   writeClasses(file)
   writeEnumerates(file)
   writeGlobalFunctions(file)
   writeGlobalProperties(file)
   writeGlobalConstants(file)
- 
+
   file:write("\n}\nreturn api\n")
- 
+
   file:close()
 end

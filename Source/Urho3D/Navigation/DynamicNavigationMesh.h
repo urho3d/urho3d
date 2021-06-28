@@ -47,12 +47,13 @@ class URHO3D_API DynamicNavigationMesh : public NavigationMesh
 
 public:
     /// Constructor.
-    explicit DynamicNavigationMesh(Context*);
+    explicit DynamicNavigationMesh(Context* context);
     /// Destructor.
     ~DynamicNavigationMesh() override;
 
     /// Register with engine context.
-    static void RegisterObject(Context*);
+    /// @nobind
+    static void RegisterObject(Context* context);
 
     /// Allocate the navigation mesh without building any tiles. Bounding box is not padded. Return true if successful.
     bool Allocate(const BoundingBox& boundingBox, unsigned maxTiles) override;

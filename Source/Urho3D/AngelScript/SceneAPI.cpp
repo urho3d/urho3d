@@ -36,7 +36,7 @@ namespace Urho3D
 
 static void RegisterNode(asIScriptEngine* engine)
 {
-    engine->RegisterGlobalFunction("Node@+ get_node()", asFUNCTION(GetScriptContextNode), asCALL_CDECL);
+    engine->RegisterGlobalFunction("Node@+ get_node()", AS_FUNCTION(GetScriptContextNode), AS_CALL_CDECL);
 }
 
 static CScriptArray* GetObjectCategories()
@@ -79,11 +79,11 @@ static CScriptArray* GetObjectAttributeInfos(const String& objectType)
 
 static void RegisterScene(asIScriptEngine* engine)
 {
-    engine->RegisterGlobalFunction("Scene@+ get_scene()", asFUNCTION(GetScriptContextScene), asCALL_CDECL);
+    engine->RegisterGlobalFunction("Scene@+ get_scene()", AS_FUNCTION(GetScriptContextScene), AS_CALL_CDECL);
 
-    engine->RegisterGlobalFunction("Array<String>@ GetObjectCategories()", asFUNCTION(GetObjectCategories), asCALL_CDECL);
-    engine->RegisterGlobalFunction("Array<String>@ GetObjectsByCategory(const String&in)", asFUNCTION(GetObjectsByCategory), asCALL_CDECL);
-    engine->RegisterGlobalFunction("Array<AttributeInfo>@ GetObjectAttributeInfos(const String&in)", asFUNCTION(GetObjectAttributeInfos), asCALL_CDECL);
+    engine->RegisterGlobalFunction("Array<String>@ GetObjectCategories()", AS_FUNCTION(GetObjectCategories), AS_CALL_CDECL);
+    engine->RegisterGlobalFunction("Array<String>@ GetObjectsByCategory(const String&in)", AS_FUNCTION(GetObjectsByCategory), AS_CALL_CDECL);
+    engine->RegisterGlobalFunction("Array<AttributeInfo>@ GetObjectAttributeInfos(const String&in)", AS_FUNCTION(GetObjectAttributeInfos), AS_CALL_CDECL);
 }
 
 void RegisterSceneAPI(asIScriptEngine* engine)

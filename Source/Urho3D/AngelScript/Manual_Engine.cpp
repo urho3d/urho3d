@@ -37,19 +37,19 @@ void ASRegisterManualFirst_Engine(asIScriptEngine* engine)
 
 // ========================================================================================
 
-// template<class T> T * Object::GetSubsystem() const | File: ../Core/Object.h
+// template <class T> T* Context::GetSubsystem() const | File: ../Core/Context.h
 static Console* GetConsole()
 {
     return GetScriptContext()->GetSubsystem<Console>();
 }
 
-// template<class T> T * Object::GetSubsystem() const | File: ../Core/Object.h
+// template <class T> T* Context::GetSubsystem() const | File: ../Core/Context.h
 static DebugHud* GetDebugHud()
 {
     return GetScriptContext()->GetSubsystem<DebugHud>();
 }
 
-// template<class T> T * Object::GetSubsystem() const | File: ../Core/Object.h
+// template <class T> T* Context::GetSubsystem() const | File: ../Core/Context.h
 static Engine* GetEngine()
 {
     return GetScriptContext()->GetSubsystem<Engine>();
@@ -58,12 +58,14 @@ static Engine* GetEngine()
 // This function is called after ASRegisterGenerated()
 void ASRegisterManualLast_Engine(asIScriptEngine* engine)
 {
-    // template<class T> T * Object::GetSubsystem() const | File: ../Core/Object.h
-    engine->RegisterGlobalFunction("Console@+ get_console()", asFUNCTION(GetConsole), asCALL_CDECL);
-    // template<class T> T * Object::GetSubsystem() const | File: ../Core/Object.h
-    engine->RegisterGlobalFunction("DebugHud@+ get_debugHud()", asFUNCTION(GetDebugHud), asCALL_CDECL);
-    // template<class T> T * Object::GetSubsystem() const | File: ../Core/Object.h
-    engine->RegisterGlobalFunction("Engine@+ get_engine()", asFUNCTION(GetEngine), asCALL_CDECL);
+    // template <class T> T* Context::GetSubsystem() const | File: ../Core/Context.h
+    engine->RegisterGlobalFunction("Console@+ get_console()", AS_FUNCTION(GetConsole), AS_CALL_CDECL);
+    
+    // template <class T> T* Context::GetSubsystem() const | File: ../Core/Context.h
+    engine->RegisterGlobalFunction("DebugHud@+ get_debugHud()", AS_FUNCTION(GetDebugHud), AS_CALL_CDECL);
+    
+    // template <class T> T* Context::GetSubsystem() const | File: ../Core/Context.h
+    engine->RegisterGlobalFunction("Engine@+ get_engine()", AS_FUNCTION(GetEngine), AS_CALL_CDECL);
 }
 
 }

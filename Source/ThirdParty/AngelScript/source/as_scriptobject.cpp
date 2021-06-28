@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2018 Andreas Jonsson
+   Copyright (c) 2003-2019 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -888,30 +888,43 @@ asCScriptObject &ScriptObject_Assignment(asCScriptObject *other, asCScriptObject
 
 asCScriptObject &asCScriptObject::operator=(const asCScriptObject &other)
 {
-	if( &other != this )
+	CopyFromAs(&other, objType);
+	return *this;
+}
+
+// internal
+int asCScriptObject::CopyFromAs(const asCScriptObject *other, asCObjectType *in_objType)
+{
+	if( other != this )
 	{
-		if( !other.objType->DerivesFrom(objType) )
+		if( !other->objType->DerivesFrom(in_objType) )
 		{
 			// We cannot allow a value assignment from a type that isn't the same or 
 			// derives from this type as the member properties may not have the same layout
 			asIScriptContext *ctx = asGetActiveContext();
 			ctx->SetException(TXT_MISMATCH_IN_VALUE_ASSIGN);
-			return *this;
+			return asERROR;
 		}
 
 		// If the script class implements the opAssign method, it should be called
-		asCScriptEngine *engine = objType->engine;
-		asCScriptFunction *func = engine->scriptFunctions[objType->beh.copy];
+		asCScriptEngine *engine = in_objType->engine;
+		asCScriptFunction *func = engine->scriptFunctions[in_objType->beh.copy];
 		if( func->funcType == asFUNC_SYSTEM )
 		{
-			// Copy all properties
-			for( asUINT n = 0; n < objType->properties.GetLength(); n++ )
+			// If derived, use the base class' assignment operator to copy the inherited
+			// properties. Then only copy new properties for the derived class
+			if( in_objType->derivedFrom )
+				CopyFromAs(other, in_objType->derivedFrom);
+			
+			for( asUINT n = in_objType->derivedFrom ? in_objType->derivedFrom->properties.GetLength() : 0; 
+			     n < in_objType->properties.GetLength(); 
+				 n++ )
 			{
-				asCObjectProperty *prop = objType->properties[n];
+				asCObjectProperty *prop = in_objType->properties[n];
 				if( prop->type.IsObject() )
 				{
 					void **dst = (void**)(((char*)this) + prop->byteOffset);
-					void **src = (void**)(((char*)&other) + prop->byteOffset);
+					void **src = (void**)(((char*)other) + prop->byteOffset);
 					if( !prop->type.IsObjectHandle() )
 					{
 						if( prop->type.IsReference() || (prop->type.GetTypeInfo()->flags & asOBJ_REF) )
@@ -925,7 +938,7 @@ asCScriptObject &asCScriptObject::operator=(const asCScriptObject &other)
 				else if (prop->type.IsFuncdef())
 				{
 					asCScriptFunction **dst = (asCScriptFunction**)(((char*)this) + prop->byteOffset);
-					asCScriptFunction **src = (asCScriptFunction**)(((char*)&other) + prop->byteOffset);
+					asCScriptFunction **src = (asCScriptFunction**)(((char*)other) + prop->byteOffset);
 					if (*dst)
 						(*dst)->Release();
 					*dst = *src;
@@ -935,7 +948,7 @@ asCScriptObject &asCScriptObject::operator=(const asCScriptObject &other)
 				else
 				{
 					void *dst = ((char*)this) + prop->byteOffset;
-					void *src = ((char*)&other) + prop->byteOffset;
+					void *src = ((char*)other) + prop->byteOffset;
 					memcpy(dst, src, prop->type.GetSizeInMemoryBytes());
 				}
 			}
@@ -961,24 +974,20 @@ asCScriptObject &asCScriptObject::operator=(const asCScriptObject &other)
 				// Request a context from the engine
 				ctx = engine->RequestContext();
 				if( ctx == 0 )
-				{
-					// TODO: How to best report this failure?
-					return *this;
-				}
+					return asERROR;
 			}
 
-			r = ctx->Prepare(engine->scriptFunctions[objType->beh.copy]);
+			r = ctx->Prepare(engine->scriptFunctions[in_objType->beh.copy]);
 			if( r < 0 )
 			{
 				if( isNested )
 					ctx->PopState();
 				else
 					engine->ReturnContext(ctx);
-				// TODO: How to best report this failure?
-				return *this;
+				return r;
 			}
 
-			r = ctx->SetArgAddress(0, const_cast<asCScriptObject*>(&other));
+			r = ctx->SetArgAddress(0, const_cast<asCScriptObject*>(other));
 			asASSERT( r >= 0 );
 			r = ctx->SetObject(this);
 			asASSERT( r >= 0 );
@@ -1014,7 +1023,7 @@ asCScriptObject &asCScriptObject::operator=(const asCScriptObject &other)
 					// Return the context to the engine
 					engine->ReturnContext(ctx);
 				}
-				return *this;
+				return asERROR;
 			}
 
 			if( isNested )
@@ -1027,10 +1036,10 @@ asCScriptObject &asCScriptObject::operator=(const asCScriptObject &other)
 		}
 	}
 
-	return *this;
+	return asSUCCESS;
 }
 
-int asCScriptObject::CopyFrom(asIScriptObject *other)
+int asCScriptObject::CopyFrom(const asIScriptObject *other)
 {
 	if( other == 0 ) return asINVALID_ARG;
 
@@ -1039,7 +1048,7 @@ int asCScriptObject::CopyFrom(asIScriptObject *other)
 
 	*this = *(asCScriptObject*)other;
 
-	return 0;
+	return asSUCCESS;
 }
 
 void *asCScriptObject::AllocateUninitializedObject(asCObjectType *in_objType, asCScriptEngine *engine)
@@ -1089,19 +1098,19 @@ void asCScriptObject::FreeObject(void *ptr, asCObjectType *in_objType, asCScript
 	}
 }
 
-void asCScriptObject::CopyObject(void *src, void *dst, asCObjectType *in_objType, asCScriptEngine *engine)
+void asCScriptObject::CopyObject(const void *src, void *dst, asCObjectType *in_objType, asCScriptEngine *engine)
 {
 	int funcIndex = in_objType->beh.copy;
 	if( funcIndex )
 	{
 		asCScriptFunction *func = engine->scriptFunctions[in_objType->beh.copy];
 		if( func->funcType == asFUNC_SYSTEM )
-			engine->CallObjectMethod(dst, src, funcIndex);
+			engine->CallObjectMethod(dst, const_cast<void*>(src), funcIndex);
 		else
 		{
 			// Call the script class' opAssign method
 			asASSERT(in_objType->flags & asOBJ_SCRIPT_OBJECT );
-			reinterpret_cast<asCScriptObject*>(dst)->CopyFrom(reinterpret_cast<asCScriptObject*>(src));
+			reinterpret_cast<asCScriptObject*>(dst)->CopyFrom(reinterpret_cast<const asCScriptObject*>(src));
 		}
 	}
 	else if( in_objType->size && (in_objType->flags & asOBJ_POD) )

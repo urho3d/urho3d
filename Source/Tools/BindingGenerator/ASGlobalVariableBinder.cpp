@@ -30,69 +30,56 @@
 namespace ASBindingGenerator
 {
 
-static shared_ptr<ASGeneratedFile_GlobalVariables> _result;
-
 static void ProcessGlobalVariable(GlobalVariableAnalyzer varAnalyzer)
 {
     string header = varAnalyzer.GetHeaderFile();
+
+    Result::AddHeader(header);
    
     if (IsIgnoredHeader(header))
-    {
-        _result->AddIgnoredHeader(header);
         return;
-    }
 
-    string insideDefine = InsideDefine(header);
+    ProcessedGlobalVariable processedGlobalVariable;
+    processedGlobalVariable.name_ = varAnalyzer.GetName();
+    processedGlobalVariable.insideDefine_ = InsideDefine(header);
+    processedGlobalVariable.comment_ = varAnalyzer.GetLocation();
 
     if (varAnalyzer.IsArray())
     {
-        if (!insideDefine.empty())
-            _result->reg_ << "#ifdef " << insideDefine << "\n";
-
-        _result->reg_ <<
-            "    // " << varAnalyzer.GetLocation() << "\n"
-            "    // Not registered because array\n";
-
-        if (!insideDefine.empty())
-            _result->reg_ << "#endif\n";
-
+        processedGlobalVariable.registration_ = "// Not registered because array";
+        Result::globalVariables_.push_back(processedGlobalVariable);
         return;
     }
 
-    _result->AddHeader(header);
-
-    if (!insideDefine.empty())
-        _result->reg_ << "#ifdef " << insideDefine << "\n";
-
     TypeAnalyzer typeAnalyzer = varAnalyzer.GetType();
 
-    string asType = CppFundamentalTypeToAS(typeAnalyzer.GetName());
+    string asType;
+
+    try
+    {
+        asType = CppPrimitiveTypeToAS(typeAnalyzer.GetName());
+    }
+    catch (...)
+    {
+        asType = typeAnalyzer.GetName();
+    }
 
     if (typeAnalyzer.IsConst())
         asType = "const " + asType;
 
     string varName = varAnalyzer.GetName();
 
-    _result->reg_ <<
-        "    // " << varAnalyzer.GetLocation() << "\n"
-        "    engine->RegisterGlobalProperty(\"" << asType << " " << varName << "\", (void*)&" << varName << ");\n";
-
-    if (!insideDefine.empty())
-        _result->reg_ << "#endif\n";
+    processedGlobalVariable.registration_ = "engine->RegisterGlobalProperty(\"" + asType + " " + varName + "\", (void*)&" + varName + ");";
+    Result::globalVariables_.push_back(processedGlobalVariable);
 }
 
-void ProcessAllGlobalVariables(const string& outputBasePath)
+void ProcessAllGlobalVariables()
 {
-    string outputPath = outputBasePath + "/Source/Urho3D/AngelScript/Generated_GlobalVariables.cpp";
-    _result = make_shared<ASGeneratedFile_GlobalVariables>(outputPath, "ASRegisterGenerated_GlobalVariables");
-
     NamespaceAnalyzer namespaceAnalyzer(SourceData::namespaceUrho3D_);
     vector<GlobalVariableAnalyzer> globalVariableAnalyzers = namespaceAnalyzer.GetVariables();
 
     for (GlobalVariableAnalyzer globalVariableAnalyzer : globalVariableAnalyzers)
         ProcessGlobalVariable(globalVariableAnalyzer);
-
-    _result->Save();
 }
 
 } // namespace ASBindingGenerator

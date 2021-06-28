@@ -38,6 +38,7 @@ public:
     /// Destruct.
     ~Navigable() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Set whether geometry is automatically collected from child nodes. Default true.

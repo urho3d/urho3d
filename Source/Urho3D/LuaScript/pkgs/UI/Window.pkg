@@ -18,7 +18,7 @@ class Window : public BorderImage
 {
     Window();
     virtual ~Window();
-    
+
     void SetMovable(bool enable);
     void SetResizable(bool enable);
     void SetFixedWidthResizing(bool enable);

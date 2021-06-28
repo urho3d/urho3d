@@ -36,7 +36,7 @@ void ASRegisterManualFirst_Physics(asIScriptEngine* engine)
 
 // ========================================================================================
 
-// template<class T> T * Node::GetComponent(bool recursive=false) const | File: ../Scene/Node.h
+// template <class T> T* Node::GetComponent(bool recursive = false) const | File: ../Scene/Node.h
 static PhysicsWorld* GetPhysicsWorld()
 {
     Scene* scene = GetScriptContextScene();
@@ -46,103 +46,8 @@ static PhysicsWorld* GetPhysicsWorld()
 // This function is called after ASRegisterGenerated()
 void ASRegisterManualLast_Physics(asIScriptEngine* engine)
 {
-    // template<class T> T * Node::GetComponent(bool recursive=false) const | File: ../Scene/Node.h
-    engine->RegisterGlobalFunction("PhysicsWorld@+ get_physicsWorld()", asFUNCTION(GetPhysicsWorld), asCALL_CDECL);
-}
-
-// ========================================================================================
-
-// RigidBody* PhysicsRaycastResult::body_ | File: ../Physics/PhysicsWorld.h
-RigidBody* PhysicsRaycastResultGetRigidBody(PhysicsRaycastResult* ptr)
-{
-    return ptr->body_;
-}
-
-// ========================================================================================
-
-// void RigidBody::GetCollidingBodies(PODVector< RigidBody * > &result) const | File: ../Physics/RigidBody.h
-CScriptArray* RigidBodyGetCollidingBodies(RigidBody* ptr)
-{
-    PODVector<RigidBody*> result;
-    ptr->GetCollidingBodies(result);
-    return VectorToHandleArray<RigidBody>(result, "Array<RigidBody@>");
-}
-
-// ========================================================================================
-
-// void PhysicsWorld::Raycast(PODVector< PhysicsRaycastResult > &result, const Ray &ray, float maxDistance, unsigned collisionMask=M_MAX_UNSIGNED) | File: ../Physics/PhysicsWorld.h
-CScriptArray* PhysicsWorldRaycast(const Ray& ray, float maxDistance, unsigned collisionMask, PhysicsWorld* ptr)
-{
-    PODVector<PhysicsRaycastResult> result;
-    ptr->Raycast(result, ray, maxDistance, collisionMask);
-    return VectorToArray<PhysicsRaycastResult>(result, "Array<PhysicsRaycastResult>");
-}
-
-// void PhysicsWorld::RaycastSingle(PhysicsRaycastResult &result, const Ray &ray, float maxDistance, unsigned collisionMask=M_MAX_UNSIGNED) | File: ../Physics/PhysicsWorld.h
-PhysicsRaycastResult PhysicsWorldRaycastSingle(const Ray& ray, float maxDistance, unsigned collisionMask, PhysicsWorld* ptr)
-{
-    PhysicsRaycastResult result;
-    ptr->RaycastSingle(result, ray, maxDistance, collisionMask);
-    return result;
-}
-
-// void PhysicsWorld::RaycastSingleSegmented(PhysicsRaycastResult &result, const Ray &ray, float maxDistance, float segmentDistance, unsigned collisionMask=M_MAX_UNSIGNED, float overlapDistance=0.1f) | File: ../Physics/PhysicsWorld.h
-PhysicsRaycastResult PhysicsWorldRaycastSingleSegmented(const Ray& ray, float maxDistance, float segmentDistance, unsigned collisionMask, float overlapDistance, PhysicsWorld* ptr)
-{
-    PhysicsRaycastResult result;
-    ptr->RaycastSingleSegmented(result, ray, maxDistance, segmentDistance, collisionMask, overlapDistance);
-    return result;
-}
-
-// void PhysicsWorld::SphereCast(PhysicsRaycastResult &result, const Ray &ray, float radius, float maxDistance, unsigned collisionMask=M_MAX_UNSIGNED) | File: ../Physics/PhysicsWorld.h
-PhysicsRaycastResult PhysicsWorldSphereCast(const Ray& ray, float radius, float maxDistance, unsigned collisionMask, PhysicsWorld* ptr)
-{
-    PhysicsRaycastResult result;
-    ptr->SphereCast(result, ray, radius, maxDistance, collisionMask);
-    return result;
-}
-
-// void PhysicsWorld::ConvexCast(PhysicsRaycastResult &result, CollisionShape *shape, const Vector3 &startPos, const Quaternion &startRot, const Vector3 &endPos, const Quaternion &endRot, unsigned collisionMask=M_MAX_UNSIGNED) | File: ../Physics/PhysicsWorld.h
-PhysicsRaycastResult PhysicsWorldConvexCast(CollisionShape* shape, const Vector3& startPos, const Quaternion& startRot, const Vector3& endPos, const Quaternion& endRot, unsigned collisionMask, PhysicsWorld* ptr)
-{
-    PhysicsRaycastResult result;
-    ptr->ConvexCast(result, shape, startPos, startRot, endPos, endRot, collisionMask);
-    // Release extra ref manually due to not using an auto handle (see below)
-    if (shape)
-        shape->ReleaseRef();
-    return result;
-}
-
-// void PhysicsWorld::GetRigidBodies(PODVector< RigidBody * > &result, const Sphere &sphere, unsigned collisionMask=M_MAX_UNSIGNED) | File: ../Physics/PhysicsWorld.h
-CScriptArray* PhysicsWorldGetRigidBodiesSphere(const Sphere& sphere, unsigned collisionMask, PhysicsWorld* ptr)
-{
-    PODVector<RigidBody*> result;
-    ptr->GetRigidBodies(result, sphere, collisionMask);
-    return VectorToHandleArray<RigidBody>(result, "Array<RigidBody@>");
-}
-
-// void PhysicsWorld::GetRigidBodies(PODVector< RigidBody * > &result, const BoundingBox &box, unsigned collisionMask=M_MAX_UNSIGNED) | File: ../Physics/PhysicsWorld.h
-CScriptArray* PhysicsWorldGetRigidBodiesBox(const BoundingBox& box, unsigned collisionMask, PhysicsWorld* ptr)
-{
-    PODVector<RigidBody*> result;
-    ptr->GetRigidBodies(result, box, collisionMask);
-    return VectorToHandleArray<RigidBody>(result, "Array<RigidBody@>");
-}
-
-// void PhysicsWorld::GetRigidBodies(PODVector< RigidBody * > &result, const RigidBody *body) | File: ../Physics/PhysicsWorld.h
-CScriptArray* PhysicsWorldGetRigidBodiesBody(RigidBody* body, PhysicsWorld* ptr)
-{
-    PODVector<RigidBody*> result;
-    ptr->GetRigidBodies(result, body);
-    return VectorToHandleArray<RigidBody>(result, "Array<RigidBody@>");
-}
-
-// void PhysicsWorld::GetCollidingBodies(PODVector< RigidBody * > &result, const RigidBody *body) | File: ../Physics/PhysicsWorld.h
-CScriptArray* PhysicsWorldGetCollidingBodies(RigidBody* body, PhysicsWorld* ptr)
-{
-    PODVector<RigidBody*> result;
-    ptr->GetCollidingBodies(result, body);
-    return VectorToHandleArray<RigidBody>(result, "Array<RigidBody@>");
+    // template <class T> T* Node::GetComponent(bool recursive = false) const | File: ../Scene/Node.h
+    engine->RegisterGlobalFunction("PhysicsWorld@+ get_physicsWorld()", AS_FUNCTION(GetPhysicsWorld), AS_CALL_CDECL);
 }
 
 }

@@ -98,6 +98,7 @@ public:
     /// Reset root pointer recursively. Called when the whole octree is being destroyed.
     void ResetRoot();
     /// Draw bounds to the debug graphics recursively.
+    /// @nobind
     void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
 
 protected:
@@ -169,6 +170,7 @@ public:
     /// Destruct.
     ~Octree() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Visualize the component as debug geometry.

@@ -1,0 +1,21 @@
+// A quick and dirty hack to keep the tab panel with less content to have the same height as others
+div {
+  > div > div > div > div > div, .fixedHeight {
+    .buildUrho3D + & {
+      min-height: 164px;
+    }
+
+    .buildUrhoApp + & {
+      min-height: 142px;
+    }
+
+    .requirements + & {
+      min-height: 340px;
+    }
+  }
+}
+
+// As the info content may be changed in the future, adjust the minimum height here to prevent jumping elements
+.infoFixedHeight {
+  min-height: 86px;
+}

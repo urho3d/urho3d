@@ -239,7 +239,21 @@
 						<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
 						<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
 						<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
-						<attribute name="Text" value="Spawn on selected node" />
+						<attribute name="Text" value="Spawn on selected node's surface" />
+					</element>
+				</element>
+				<element style="ListRow">
+					<attribute name="Min Size" value="200 17" />
+					<attribute name="Layout Spacing" value="8" />
+					<element type="CheckBox">
+						<attribute name="Name" value="ParentToSelected" />
+					</element>
+					<element type="Text">
+						<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
+						<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
+						<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
+						<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
+						<attribute name="Text" value="Parent to selected node" />
 					</element>
 				</element>
 				<element style="ListRow">

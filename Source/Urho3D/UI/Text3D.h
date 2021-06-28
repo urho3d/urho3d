@@ -43,6 +43,7 @@ public:
     /// Destruct.
     ~Text3D() override;
     /// Register object factory. Drawable must be registered first.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Apply attribute changes that can not be applied immediately.

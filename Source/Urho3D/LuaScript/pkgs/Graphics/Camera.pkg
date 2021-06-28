@@ -64,7 +64,7 @@ class Camera : public Component
     float GetLodDistance(float distance, float scale, float bias) const;
     bool IsProjectionValid() const;
     Matrix3x4 GetEffectiveWorldTransform() const;
-    
+
     tolua_property__get_set float farClip;
     tolua_property__get_set float nearClip;
     tolua_property__get_set float fov;

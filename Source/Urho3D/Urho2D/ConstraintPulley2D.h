@@ -38,6 +38,7 @@ public:
     /// Destruct.
     ~ConstraintPulley2D() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Set other body ground anchor point.

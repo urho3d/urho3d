@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include "../AngelScript/Manual_Container.h"
 #include "../AngelScript/Manual_Core.h"
 #include "../AngelScript/Manual_IO.h"
 #include "../AngelScript/Manual_Math.h"

@@ -21,7 +21,7 @@ class HttpRequest
     // unsigned Read(void* dest, unsigned size);
     tolua_outside VectorBuffer HttpRequestRead @ Read(unsigned size);
     bool IsEof() const;
-    
+
     int ReadInt();
     short ReadShort();
     signed char ReadByte();
@@ -49,10 +49,10 @@ class HttpRequest
     String ReadString();
     String ReadFileID();
     StringHash ReadStringHash();
-    
+
     // PODVector<unsigned char> ReadBuffer();
     VectorBuffer ReadBuffer();
-    
+
     ResourceRef ReadResourceRef();
     ResourceRefList ReadResourceRefList();
     Variant ReadVariant();

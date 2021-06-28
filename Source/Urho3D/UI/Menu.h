@@ -32,15 +32,17 @@ class URHO3D_API Menu : public Button
 {
     URHO3D_OBJECT(Menu, Button);
 
-    using UIElement::LoadXML;
-
 public:
     /// Construct.
     explicit Menu(Context* context);
     /// Destruct.
     ~Menu() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
+
+    using UIElement::LoadXML;
+    using UIElement::SaveXML;
 
     /// Load from XML data with style. Return true if successful.
     bool LoadXML(const XMLElement& source, XMLFile* styleFile) override;

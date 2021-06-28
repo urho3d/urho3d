@@ -53,7 +53,7 @@ class Animation : public ResourceWithMetadata
     void AddTrigger(float time, bool timeIsNormalized, const Variant& data);
     void RemoveTrigger(unsigned index);
     void RemoveAllTriggers();
-    
+
     // SharedPtr<Animation> Clone(const String cloneName = String::EMPTY) const;
     tolua_outside Animation* AnimationClone @ Clone(const String cloneName = String::EMPTY) const;
 
@@ -61,8 +61,8 @@ class Animation : public ResourceWithMetadata
     float GetLength() const;
     unsigned GetNumTracks() const;
     AnimationTrack* GetTrack(const String name);
-    AnimationTrack* GetTrack(StringHash nameHash); 
-    AnimationTrack* GetTrack(unsigned index); 
+    AnimationTrack* GetTrack(StringHash nameHash);
+    AnimationTrack* GetTrack(unsigned index);
     unsigned GetNumTriggers() const;
     AnimationTriggerPoint* GetTrigger(unsigned index);
 
@@ -89,7 +89,7 @@ static Animation* AnimationClone(const Animation* animation, const String& clone
 {
     if (!animation)
         return 0;
-        
+
     return animation->Clone(cloneName).Detach();
 }
 

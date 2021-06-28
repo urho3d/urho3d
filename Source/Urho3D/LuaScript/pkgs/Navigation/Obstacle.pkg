@@ -3,14 +3,13 @@ $#include "Navigation/Obstacle.h"
 class Obstacle : public Component
 {
     void DrawDebugGeometry(bool depthTest);
-    
+
     void SetRadius(float radius);
     void SetHeight(float height);
-    
+
     float GetRadius() const;
     float GetHeight() const;
-    
-    
+
     tolua_property__get_set float radius;
     tolua_property__get_set float height;
 };

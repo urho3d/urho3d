@@ -54,9 +54,10 @@ void ASRegisterManualFirst_IK(asIScriptEngine* engine)
 void ASRegisterManualLast_IK(asIScriptEngine* engine)
 {
     // Algorithm IKSolver::GetAlgorithm() const | File: ../IK/IKSolver.h
-    engine->RegisterObjectMethod("IKSolver", "IKAlgorithm get_algorithm() const", asMETHOD(IKSolver, GetAlgorithm), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "IKAlgorithm get_algorithm() const", AS_METHOD(IKSolver, GetAlgorithm), AS_CALL_THISCALL);
+    
     // void IKSolver::SetAlgorithm(Algorithm algorithm) | File: ../IK/IKSolver.h
-    engine->RegisterObjectMethod("IKSolver", "void set_algorithm(IKAlgorithm)", asMETHOD(IKSolver, SetAlgorithm), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void set_algorithm(IKAlgorithm)", AS_METHOD(IKSolver, SetAlgorithm), AS_CALL_THISCALL);
 }
 
 }

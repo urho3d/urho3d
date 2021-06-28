@@ -4,7 +4,7 @@ class Geometry : public Object
 {
     Geometry();
     ~Geometry();
-    
+
     bool SetNumVertexBuffers(unsigned num);
     bool SetVertexBuffer(unsigned index, VertexBuffer* buffer);
     void SetIndexBuffer(IndexBuffer* buffer);
@@ -22,7 +22,7 @@ class Geometry : public Object
     unsigned GetVertexCount() const;
     float GetLodDistance();
     bool IsEmpty() const;
-    
+
     tolua_property__get_set unsigned numVertexBuffers;
     tolua_property__get_set IndexBuffer* indexBuffer;
     tolua_readonly tolua_property__get_set PrimitiveType primitiveType;

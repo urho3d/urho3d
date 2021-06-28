@@ -13,7 +13,7 @@ void CreateToolBar()
     toolBar.layoutSpacing = 4;
     toolBar.layoutBorder = IntRect(8, 4, 4, 8);
     toolBar.opacity = uiMaxOpacity;
-    toolBar.SetFixedSize(graphics.width, 42);
+    toolBar.SetFixedSize(graphics.width / ui.scale, 42);
     toolBar.SetPosition(0, uiMenuBar.height);
     ui.root.AddChild(toolBar);
 

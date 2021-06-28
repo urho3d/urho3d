@@ -24,61 +24,74 @@
 
 #include "XmlAnalyzer.h"
 
-#include <string>
 #include <map>
+#include <stdexcept>
+#include <string>
 
 using namespace std;
 
 namespace ASBindingGenerator
 {
 
-shared_ptr<EnumAnalyzer> FindEnum(const string& name);
-string CppFundamentalTypeToAS(const string& cppType);
-string CppTypeToAS(const TypeAnalyzer& type, bool returnType, bool& outSuccess);
-string CppValueToAS(const string& cppValue);
-
-struct FuncParamConv
+enum class TypeUsage
 {
-    bool success_ = false;
-    string errorMessage_ = "TODO";
-    string asDecl_ = "TODO";
-    string cppType_ = "TODO";
-    string inputVarName_ = "TODO";
-    string convertedVarName_ = "TODO";
-    string glue_ = "";
+    FunctionParameter = 0,
+    FunctionReturn,
+    StaticField,
+    Field,
+};
+
+struct ConvertedVariable
+{
+    string asDeclaration_;
+    string cppDeclaration_;
+    string glue_;
 
     bool NeedWrapper() const { return !glue_.empty(); }
 };
 
-shared_ptr<FuncParamConv> CppFunctionParamToAS(int paramIndex, ParamAnalyzer& paramAnalyzer);
+string JoinASDeclarations(const vector<ConvertedVariable>& vars);
 
-struct FuncReturnTypeConv
+enum class VariableUsage
 {
-    bool success_ = false;
-    bool needWrapper_ = false;
-    string errorMessage_ = "TODO";
-    string asReturnType_ = "TODO";
-    string glueReturnType_ = "TODO";
-    string glueReturn_ = "TODO";
+    FunctionParameter = 0,
+    FunctionReturn,
+    StaticField,
+    Field,
 };
 
-bool IsKnownType(const string& name);
+ConvertedVariable CppVariableToAS(const TypeAnalyzer& type, VariableUsage usage, const string& name = "", const string& defaultValue = "");
+
+string CppTypeToAS(const TypeAnalyzer& type, TypeUsage typeUsage);
+
+shared_ptr<EnumAnalyzer> FindEnum(const string& name);
+string CppPrimitiveTypeToAS(const string& cppType);
+string CppValueToAS(const string& cppValue);
+
+class Exception : public runtime_error
+{
+    using runtime_error::runtime_error;
+};
+
+bool IsKnownCppType(const string& name);
 
 shared_ptr<ClassAnalyzer> FindClassByName(const string& name);
 shared_ptr<ClassAnalyzer> FindClassByID(const string& name);
 
-shared_ptr<FuncReturnTypeConv> CppFunctionReturnTypeToAS(const TypeAnalyzer& typeAnalyzer);
-
 string GenerateWrapperName(const GlobalFunctionAnalyzer& functionAnalyzer);
 string GenerateWrapperName(const ClassStaticFunctionAnalyzer& functionAnalyzer);
-string GenerateWrapperName(const ClassFunctionAnalyzer& functionAnalyzer, bool templateVersion);
+string GenerateWrapperName(const MethodAnalyzer& methodAnalyzer, bool templateVersion = false);
 
-string GenerateWrapper(const GlobalFunctionAnalyzer& functionAnalyzer, vector<shared_ptr<FuncParamConv> >& convertedParams, shared_ptr<FuncReturnTypeConv> convertedReturn);
-string GenerateWrapper(const ClassStaticFunctionAnalyzer& functionAnalyzer, vector<shared_ptr<FuncParamConv> >& convertedParams, shared_ptr<FuncReturnTypeConv> convertedReturn);
-string GenerateWrapper(const ClassFunctionAnalyzer& functionAnalyzer, bool templateVersion, vector<shared_ptr<FuncParamConv> >& convertedParams, shared_ptr<FuncReturnTypeConv> convertedReturn);
+string GenerateWrapper(const GlobalFunctionAnalyzer& functionAnalyzer, const vector<ConvertedVariable>& convertedParams, const ConvertedVariable& convertedReturn);
+string GenerateWrapper(const ClassStaticFunctionAnalyzer& functionAnalyzer, bool templateVersion, const vector<ConvertedVariable>& convertedParams, const ConvertedVariable& convertedReturn);
+string GenerateWrapper(const MethodAnalyzer& methodAnalyzer, bool templateVersion, const vector<ConvertedVariable>& convertedParams, const ConvertedVariable& convertedReturn);
 
-string Generate_asFUNCTIONPR(const GlobalFunctionAnalyzer& functionAnalyzer, const map<string, string>& templateSpecialization = map<string, string>());
-string Generate_asFUNCTIONPR(const ClassStaticFunctionAnalyzer& functionAnalyzer, const map<string, string>& templateSpecialization = map<string, string>());
-string Generate_asMETHODPR(const ClassFunctionAnalyzer& functionAnalyzer, bool templateVersion, const map<string, string>& templateSpecialization = map<string, string>());
+string GenerateConstructorWrapper(const MethodAnalyzer& methodAnalyzer, const vector<ConvertedVariable>& convertedParams);
+string GenerateFactoryWrapper(const MethodAnalyzer& methodAnalyzer, const vector<ConvertedVariable>& convertedParams);
+
+
+string Generate_asFUNCTIONPR(const GlobalFunctionAnalyzer& functionAnalyzer);
+string Generate_asFUNCTIONPR(const ClassStaticFunctionAnalyzer& functionAnalyzer, bool templateVersion);
+string Generate_asMETHODPR(const MethodAnalyzer& methodAnalyzer, bool templateVersion);
 
 }

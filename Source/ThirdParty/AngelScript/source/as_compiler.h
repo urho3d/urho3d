@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2018 Andreas Jonsson
+   Copyright (c) 2003-2020 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -149,6 +149,7 @@ struct asCExprContext
 	void SetVoidExpression();
 	bool IsVoidExpression() const;
 	void Merge(asCExprContext *after);
+	void Copy(asCExprContext *other);
 	void SetAnonymousInitList(asCScriptNode *initList, asCScriptCode *script);
 	bool IsAnonymousInitList() const;
 
@@ -169,7 +170,7 @@ struct asCExprContext
 	// TODO: cleanup: use ambiguousName and an enum to say if it is a method, global func, or enum value
 	asCString methodName;
 	asCString enumValue;
-	asSNameSpace *symbolNamespace; // The namespace in which the ambigious symbol was found
+	asSNameSpace *symbolNamespace; // The namespace in which the ambiguous symbol was found
 	bool isAnonymousInitList; // Set to true if the expression is an init list for which the type has not yet been determined
 };
 
@@ -281,7 +282,7 @@ protected:
 
 	// Helper functions
 	void ConvertToPostFix(asCScriptNode *expr, asCArray<asCScriptNode *> &postfix);
-	void ProcessPropertyGetAccessor(asCExprContext *ctx, asCScriptNode *node);
+	int  ProcessPropertyGetAccessor(asCExprContext *ctx, asCScriptNode *node);
 	int  ProcessPropertySetAccessor(asCExprContext *ctx, asCExprContext *arg, asCScriptNode *node);
 	int  ProcessPropertyGetSetAccessor(asCExprContext *ctx, asCExprContext *lctx, asCExprContext *rctx, eTokenType op, asCScriptNode *errNode);
 	int  FindPropertyAccessor(const asCString &name, asCExprContext *ctx, asCScriptNode *node, asSNameSpace *ns, bool isThisAccess = false);
@@ -297,7 +298,7 @@ protected:
 	int  MatchArgument(asCScriptFunction *desc, const asCExprContext *argExpr, int paramNum, bool allowObjectConstruct = true);
 	void PerformFunctionCall(int funcId, asCExprContext *out, bool isConstructor = false, asCArray<asCExprContext*> *args = 0, asCObjectType *objTypeForConstruct = 0, bool useVariable = false, int varOffset = 0, int funcPtrVar = 0);
 	void MoveArgsToStack(int funcId, asCByteCode *bc, asCArray<asCExprContext *> &args, bool addOneToOffset);
-	void MakeFunctionCall(asCExprContext *ctx, int funcId, asCObjectType *objectType, asCArray<asCExprContext*> &args, asCScriptNode *node, bool useVariable = false, int stackOffset = 0, int funcPtrVar = 0);
+	int  MakeFunctionCall(asCExprContext *ctx, int funcId, asCObjectType *objectType, asCArray<asCExprContext*> &args, asCScriptNode *node, bool useVariable = false, int stackOffset = 0, int funcPtrVar = 0);
 	int  PrepareFunctionCall(int funcId, asCByteCode *bc, asCArray<asCExprContext *> &args);
 	void AfterFunctionCall(int funcId, asCArray<asCExprContext*> &args, asCExprContext *ctx, bool deferAll);
 	void ProcessDeferredParams(asCExprContext *ctx);
@@ -422,6 +423,9 @@ protected:
 	// This array holds the string constants that were allocated during the compilation, 
 	// so they can be released upon completion, whether the compilation was successful or not.
 	asCArray<void*>       usedStringConstants;
+
+	// This array holds the nodes that have been allocated temporarily
+	asCArray<asCScriptNode*> nodesToFreeUponComplete;
 
 	bool isCompilingDefaultArg;
 	bool isProcessingDeferredParams;

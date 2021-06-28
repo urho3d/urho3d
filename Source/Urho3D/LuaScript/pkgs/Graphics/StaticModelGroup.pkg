@@ -8,6 +8,6 @@ class StaticModelGroup : public StaticModel
 
     unsigned GetNumInstanceNodes() const;
     Node* GetInstanceNode(unsigned index) const;
-    
+
     tolua_readonly tolua_property__get_set unsigned numInstanceNodes;
 };

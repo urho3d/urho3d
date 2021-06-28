@@ -51,6 +51,7 @@ public:
     /// Destruct.
     ~TileMapLayer2D() override;
     /// Register object factory.
+    /// @nobind
     static void RegisterObject(Context* context);
 
     /// Add debug geometry to the debug renderer.

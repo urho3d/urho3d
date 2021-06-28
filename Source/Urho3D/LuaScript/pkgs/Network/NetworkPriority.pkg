@@ -11,9 +11,9 @@ class NetworkPriority : public Component
     float GetDistanceFactor() const;
     float GetMinPriority() const;
     bool GetAlwaysUpdateOwner() const;
-    
+
     bool CheckUpdate(float distance, float& accumulator);
-    
+
     tolua_property__get_set float basePriority;
     tolua_property__get_set float distanceFactor;
     tolua_property__get_set float minPriority;

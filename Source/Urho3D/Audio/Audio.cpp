@@ -85,7 +85,6 @@ bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpo
     desired.freq = mixRate;
 
     desired.format = AUDIO_S16;
-    desired.channels = (Uint8)(stereo ? 2 : 1);
     desired.callback = SDLAudioCallback;
     desired.userdata = this;
 
@@ -96,12 +95,27 @@ bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpo
         desired.samples /= 2;
 
     // Intentionally disallow format change so that the obtained format will always be the desired format, even though that format
-    // is not matching the device format, however in doing it will enable the SDL's internal audio stream with audio conversion
-    deviceID_ = SDL_OpenAudioDevice(nullptr, SDL_FALSE, &desired, &obtained, SDL_AUDIO_ALLOW_ANY_CHANGE&~SDL_AUDIO_ALLOW_FORMAT_CHANGE);
-    if (!deviceID_)
+    // is not matching the device format, however in doing it will enable the SDL's internal audio stream with audio conversion.
+    // Also disallow channels change to avoid issues on multichannel audio device (5.1, 7.1, etc)
+    int allowedChanges = SDL_AUDIO_ALLOW_ANY_CHANGE & ~SDL_AUDIO_ALLOW_FORMAT_CHANGE & ~SDL_AUDIO_ALLOW_CHANNELS_CHANGE;
+
+    if (stereo)
     {
-        URHO3D_LOGERROR("Could not initialize audio output");
-        return false;
+        desired.channels = 2;
+        deviceID_ = SDL_OpenAudioDevice(nullptr, SDL_FALSE, &desired, &obtained, allowedChanges);
+    }
+
+    // If stereo requested but not available then fall back into mono
+    if (!stereo || !deviceID_)
+    {
+        desired.channels = 1;
+        deviceID_ = SDL_OpenAudioDevice(nullptr, SDL_FALSE, &desired, &obtained, allowedChanges);
+
+        if (!deviceID_)
+        {
+            URHO3D_LOGERROR("Could not initialize audio output");
+            return false;
+        }
     }
 
     if (obtained.format != AUDIO_S16)
@@ -120,8 +134,7 @@ bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpo
     interpolation_ = interpolation;
     clipBuffer_ = new int[stereo ? fragmentSize_ << 1u : fragmentSize_];
 
-    URHO3D_LOGINFO("Set audio mode " + String(mixRate_) + " Hz " + (stereo_ ? "stereo" : "mono") + " " +
-            (interpolation_ ? "interpolated" : ""));
+    URHO3D_LOGINFO("Set audio mode " + String(mixRate_) + " Hz " + (stereo_ ? "stereo" : "mono") + (interpolation_ ? " interpolated" : ""));
 
     return Play();
 }
