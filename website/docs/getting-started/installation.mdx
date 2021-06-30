@@ -159,7 +159,13 @@ Lorem ipsum
 
 ## Build and Install Urho3D Library
 
-Clone the Urho3D project from the main branch, change directory to its project root, and execute **only one of the following commands** to build and install the library for your desired target platform. For simplicity's sake, this guide provides instruction to install the Urho3D library into a directory under user's home directory that does not require superuser privilege.
+Clone the Urho3D project from the main branch, change directory to its project root, and execute **only one of the following commands** to build and install the library for your desired target platform. For simplicity's sake, this guide provides instruction to install the Urho3D library into a directory under user's home directory that does not require superuser privilege, except for Windows native build.
+
+:::caution
+
+On Windows host there is no concept of **DESTDIR** for staged installation, so the library can only be installed to the system-wide installation location which requires Administrator privilege. It also means you cannot have both VS version and MinGW version installed at the same time. Additionally, notice that on Windows host the build options have to set on separate command before invoking Rake task.
+
+:::
 
 <Tabs
   className={styles.buildUrho3D}
@@ -239,7 +245,7 @@ RPI_ABI=RPI3 RPI_PREFIX=? RPI_SYSROOT=? PLATFORM=rpi rake build install[~/stage-
   <TabItem value={'web'}>
 
 ```bash
-# When using Rake task on *nix
+# When using Rake task on Linux or Mac
 PLATFORM=web rake build install[~/stage-web]
 
 # When using Rake task on Windows
@@ -251,10 +257,10 @@ set "PLATFORM=web" && rake build install[~/stage-web]
 
 ```bash
 # When compiling natively using VS
-rake build install[~/stage-win]
+rake build install
 
 # When compiling natively using MinGW-w64
-set "GENERATOR=mingw" && rake build install[~/stage-mingw]
+set "GENERATOR=mingw" && rake build install
 
 # When cross-compiling on Linux host machine
 PLATFORM=mingw rake build install[~/stage-mingw]
@@ -262,9 +268,3 @@ PLATFORM=mingw rake build install[~/stage-mingw]
 
   </TabItem>
 </Tabs>
-
-:::caution
-
-On Windows host the build options have to set on separate line before invoking Rake task.
-
-:::
