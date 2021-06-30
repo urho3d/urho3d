@@ -22,9 +22,8 @@ First prepares the build environment by installing a compiler toolchain for your
 Optionally these as well:
 - ccache - for speeding up the build
 - Doxygen and Graphviz - for building documentation
-- Make or Ninja - for building with terminal/console
 
-Although Urho3D project has included all required third-party libraries as source code, there may be system-level dependency packages that must be satisfied before Urho3D can be built from source successfully. The list below is by no mean comprehensive nor canonical, but it should be the minimal to get started.
+Although Urho3D project has included all required third-party libraries as source code, there may be system-level dependency packages that must be satisfied before Urho3D can be built from source successfully. The list below is by no mean comprehensive nor canonical, this is especially true on platforms with Linux operating system, but it should get you started.
 
 :::note
 
@@ -144,12 +143,128 @@ In general when cross-compiling the build system requires both the cross-compile
 
   |               |       |Linux|Mac|Windows|
   |---------------|-------|:---:|:-:|:-----:|
-  |Target Platform|Android|Cross-compiler: Android NDK<br/>native-compiler: Clang or GCC|Cross-compiler: Android NDK<br/>native-compiler: Apple Clang|Cross-compiler: Android NDK<br/>native-compiler: MinGW-w64|
-  |               |Apple  ||native-compiler: Apple Clang, can actually target macOS, iOS, and tvOS||
-  |               |Arm    |Cross-compiler: ?, no need for native build<br/>native-compiler: Clang or GCC||
-  |               |Linux  |native-compiler: Clang or GCC||
-  |               |RPI    |Cross-compiler: ?, no need for native build<br/>native-compiler: Clang or GCC||
-  |               |Web    |Cross-compiler: Emscripten EMCC<br/>native-compiler: Clang or GCC|Cross-compiler: Emscripten EMCC<br/>native-compiler: Apple Clang|Cross-compiler: Emscripten EMCC<br/>native-compiler: MinGW-w64|
-  |               |Windows|Cross-compiler: MinGW-w64<br/>native-compiler: Clang or GCC||native-compiler: MinGW-w64 or MSVC
+  |Target Platform|Android|Cross-compiler: Android NDK<br/>Native compiler: Clang or GCC|Cross-compiler: Android NDK<br/>Native compiler: Apple Clang|Cross-compiler: Android NDK<br/>Native compiler: MinGW-w64|
+  |               |Apple  ||Native compiler: Apple Clang, can actually target macOS, iOS, and tvOS||
+  |               |Arm    |Cross-compiler: ?, no need for native build<br/>Native compiler: Clang or GCC||
+  |               |Linux  |Native compiler: Clang or GCC||
+  |               |RPI    |Cross-compiler: ?, no need for native build<br/>Native compiler: Clang or GCC||
+  |               |Web    |Cross-compiler: Emscripten EMCC<br/>Native compiler: Clang or GCC|Cross-compiler: Emscripten EMCC<br/>Native compiler: Apple Clang|Cross-compiler: Emscripten EMCC<br/>Native compiler: MinGW-w64|
+  |               |Windows|Cross-compiler: MinGW-w64<br/>Native compiler: Clang or GCC||Native compiler: MinGW-w64 or MSVC
 
 </CompilerMatrix>
+
+### CCache
+
+Lorem ipsum
+
+## Build and Install Urho3D Library
+
+Clone the Urho3D project from the main branch, change directory to its project root, and execute **only one of the following commands** to build and install the library for your desired target platform. For simplicity's sake, this guide provides instruction to install the Urho3D library into a directory under user's home directory that does not require superuser privilege.
+
+<Tabs
+  className={styles.buildUrho3D}
+  groupId={'target-platform'}
+  defaultValue={'android'}
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'Apple', value: 'apple'},
+    {label: 'Arm', value: 'arm'},
+    {label: 'Linux', value: 'linux'},
+    {label: 'RPI', value: 'rpi'},
+    {label: 'Web', value: 'web'},
+    {label: 'Windows', value: 'win'},
+  ]
+  }>
+  <TabItem value={'android'}>
+
+```bash
+# When using Rake task, always install to Maven local repository
+PLATFORM=android rake build install
+
+# When using Gradle wrapper on Linux or Mac
+./gradlew build publishToMavenLocal
+
+# When using Gradle wrapper on Windows
+gradlew.bat build publishToMavenLocal
+```
+
+  </TabItem>
+  <TabItem value={'apple'}>
+
+```bash
+# When targeting macOS
+rake build install[~/stage-macOS]
+
+# When targeting iOS
+PLATFORM=iOS rake build install[~/stage-iOS]
+
+# When targeting tvOS
+PLATFORM=tvOS rake build install[~/stage-tvOS]
+```
+
+  </TabItem>
+  <TabItem value={'arm'}>
+
+```bash
+# When compiling natively on the ARM board
+PLATFORM=arm rake build install[~/stage-arm]
+
+# When cross-compiling on Linux host machine, substitute '?' accordingly
+ARM_ABI_FLAGS=? ARM_PREFIX=? ARM_SYSROOT=? PLATFORM=arm rake build install[~/stage-arm]
+```
+
+  </TabItem>
+  <TabItem value={'linux'}>
+
+```bash
+# When using Clang
+CC=clang CXX=clang++ rake build install[~/stage-linux-clang]
+
+# When using GCC
+rake build install[~/stage-linux-gcc]
+```
+
+  </TabItem>
+  <TabItem value={'rpi'}>
+
+```bash
+# When compiling natively on the RPI board
+RPI_ABI=RPI3 PLATFORM=rpi rake build install[~/stage-rpi]
+
+# When cross-compiling on Linux host machine, substitute '?' accordingly
+RPI_ABI=RPI3 RPI_PREFIX=? RPI_SYSROOT=? PLATFORM=rpi rake build install[~/stage-rpi]
+```
+
+  </TabItem>
+  <TabItem value={'web'}>
+
+```bash
+# When using Rake task on *nix
+PLATFORM=web rake build install[~/stage-web]
+
+# When using Rake task on Windows
+set "PLATFORM=web" && rake build install[~/stage-web]
+```
+
+  </TabItem>
+  <TabItem value={'win'}>
+
+```bash
+# When compiling natively using VS
+rake build install[~/stage-win]
+
+# When compiling natively using MinGW-w64
+set "GENERATOR=mingw" && rake build install[~/stage-mingw]
+
+# When cross-compiling on Linux host machine
+PLATFORM=mingw rake build install[~/stage-mingw]
+```
+
+  </TabItem>
+</Tabs>
+
+:::caution
+
+On Windows host the build options have to set on separate line before invoking Rake task.
+
+:::

@@ -1,16 +1,20 @@
 // A quick and dirty hack to keep the tab panel with less content to have the same height as others
 div {
   > div > div > div > div > div, .fixedHeight {
-    .buildUrho3D + & {
+    .quickBuildUrho3D + & {
       min-height: 164px;
     }
 
-    .buildUrhoApp + & {
+    .quickBuildUrhoApp + & {
       min-height: 142px;
     }
 
     .requirements + & {
       min-height: 340px;
+    }
+
+    .buildUrho3D + & {
+      min-height: 208px;
     }
   }
 }

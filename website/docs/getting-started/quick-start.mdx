@@ -31,12 +31,12 @@ Windows host system requires WSL2.
 
 :::
 
-## Build and Install Urho3D Library
+## Build and Install Urho3D Library with DBE
 
 Clone the Urho3D project from the main branch, change directory to its project root, and execute the following commands to build and install the library for your desired target platform.
 
 <Tabs
-  className={styles.buildUrho3D}
+  className={styles.quickBuildUrho3D}
   groupId={'target-platform'}
   defaultValue={'android'}
   values={[
@@ -72,8 +72,8 @@ script/dockerized.sh android rake install
 ```bash
 git clone https://github.com/urho3d/Urho3D.git
 cd Urho3D
-# Build Urho3D library, usually you need to specify extra build options to target a specific ARM board
-script/dockerized.sh arm
+# Build Urho3D library, substitute '?' accordingly
+ARM_ABI_FLAGS=? script/dockerized.sh arm
 # Install Urho3D library to a local stage directory
 script/dockerized.sh arm rake install
 ```
@@ -131,12 +131,12 @@ script/dockerized.sh mingw rake install
 
 The `script/dockerized.sh` spawns one of the docker container based on the specified platform name in the first argument. The rest of the arguments specify the command to be executed inside the container. The default command is `rake build`. You can invoke other rake tasks by passing the command explicitly as arguments. It is also possible to invoke multiple rake tasks in one go. Read Rake Tasks section for more details.
 
-## Create a New UrhoApp
+## Create a New UrhoApp with DBE
 
 You need an installed Urho3D library for the desired target platform to proceed. Although the Urho3D build system also supports linking the Urho3D library directly from its build tree, this quick start guide will not be discussing it here. Assuming you have been following along from the previous section, execute the following commands to create a new UrhoApp project, and then build it.
 
 <Tabs
-  className={styles.buildUrhoApp}
+  className={styles.quickBuildUrhoApp}
   groupId={'target-platform'}
   defaultValue={'android'}
   values={[
@@ -172,8 +172,8 @@ script/dockerized.sh android
 # Create a new UrhoApp
 script/dockerized.sh arm rake new[ArmUrhoApp,demo]
 cd demo/ArmUrhoApp
-# Build the newly generated UrhoApp, specify other extra build options to target a specific ARM board
-script/dockerized.sh arm
+# Build the newly generated UrhoApp, substitute '?' accordingly
+ARM_ABI_FLAGS=? script/dockerized.sh arm
 ```
 
   </TabItem>
