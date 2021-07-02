@@ -153,13 +153,33 @@ In general when cross-compiling the build system requires both the cross-compile
 
 </CompilerMatrix>
 
-### CCache
+### Setup ccache
 
-Lorem ipsum
+It is highly recommended having `ccache` installed on Linux build environment. It reduces the recompilation time drastically. To activate it, simply export these environment variables in the build environment:
+
+```bash title=~/.bash_profile
+export USE_CCACHE=1 CCACHE_SLOPPINESS=pch_defines,time_macros CCACHE_COMPRESS=1
+
+# When also targeting Android platform
+export ANDROID_CCACHE=$(which ccache)
+```
+
+Ensure to adjust the `PATH` environment variable so that the ccache symlinks directory is in front of the `/usr/bin` entry. Basically, whenever a compiler command is about to be invoked, it would be "intercepted" and invoking one of the ccache symlinks instead. Below is an easy way to verify the setup.
+
+```bash
+which gcc
+# The output should look similar to this: /usr/lib64/ccache/gcc
+```
+
+:::note
+
+This is the reason Dockerized Build Environment is fast. It builds using `ccache`.
+
+:::
 
 ## Build and Install Urho3D Library
 
-Clone the Urho3D project from the main branch, change directory to its project root, and execute **only one of the following commands** to build and install the library for your desired target platform. For simplicity's sake, this guide provides instruction to install the Urho3D library into a directory under user's home directory that does not require superuser privilege, except for Windows native build.
+Clone the Urho3D project from the main branch, change directory to its project root, and execute **only one of the following commands** to build and install the library for your desired target platform. For simplicity's sake, this guide provides instruction to install the Urho3D library into a directory under user's home directory that does not require superuser privilege.
 
 :::caution
 
