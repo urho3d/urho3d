@@ -30,9 +30,12 @@ task :cmake => [:init] do
       system 'bash', '-c', 'rm -rf ~/.{ccache,gradle}' or abort 'Failed to clear the build cache'
     end
   end
-  next if ENV['PLATFORM'] == 'android' || (Dir.exists?("#{build_tree}") and not ARGV.include?('cmake'))
-  if dockerized? && !ENV['URHO3D_HOME']
-    ENV['URHO3D_HOME'] = "~/stage-#{ENV['PLATFORM']}/usr/local"
+  next if ENV['PLATFORM'] == 'android' || (Dir.exists?(build_tree) and not ARGV.include?('cmake'))
+  if ENV['URHO3D_HOME'] == 'system'
+    delete('URHO3D_HOME')
+  elsif !ENV['URHO3D_HOME'] && (dockerized? || !ENV['OS'])
+    candidate = "#{staged_install_dir}/usr/local"
+    ENV['URHO3D_HOME'] = candidate if (dockerized? || Dir.exists?(candidate))
   end
   script = "script/cmake_#{ENV['GENERATOR']}#{ENV['OS'] ? '.bat' : '.sh'}"
   build_options = /linux|macOS|win/ =~ ENV['PLATFORM'] ? '' : "-D #{ENV['PLATFORM'].upcase}=1"
@@ -106,10 +109,10 @@ task :install, [:prefix] => [:init] do |_, args|
   if ENV['PLATFORM'] == 'android'
     Rake::Task[:gradle].invoke('publishToMavenLocal')
     next
-  elsif dockerized?
-    args.with_defaults(:prefix => "~/stage-#{ENV['PLATFORM']}")
+  elsif dockerized? || !root?
+    args.with_defaults(:prefix => staged_install_dir)
   end
-  wrapper = args[:prefix] && !ENV['OS'] ? "DESTDIR=#{verify_path(args[:prefix])}" : ''
+  wrapper = args[:prefix] && !ENV['OS'] ? "DESTDIR=#{verify_path(args[:prefix], true)}" : ''
   system build_target('install', wrapper) or abort
 end
 
@@ -336,21 +339,31 @@ def build_target(tgt, wrapper = '')
   %Q{#{wrapper} cmake --build "#{build_tree}" #{build_config} #{tgt ? "--target #{tgt}" : ''}}
 end
 
+def dockerized?
+  File.exists?('/entrypoint.sh')
+end
+
 def lint_err_file
   'build/clang-tidy.out'
 end
 
-def verify_path(path)
+def root?
+  !ENV['OS'] && Process.uid == 0
+end
+
+def staged_install_dir
+  File.expand_path("~/stage/#{ENV['PLATFORM'].downcase}#{ENV['CC'] ? "-#{ENV['CC']}" : ''}")
+end
+
+def verify_path(path, auto_create = false)
   require 'pathname'
   begin
-    Pathname.new(File.expand_path(path)).realdirpath.to_s
+    expanded_path = File.expand_path(path)
+    FileUtils.mkdir_p(expanded_path) if (auto_create && !Dir.exists?(expanded_path))
+    Pathname.new(expanded_path).realdirpath.to_s
   rescue
     abort "The specified path '#{path}' is invalid!"
   end
-end
-
-def dockerized?
-  File.exists?('/entrypoint.sh')
 end
 
 def first_match(regex, from)

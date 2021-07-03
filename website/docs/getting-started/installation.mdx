@@ -10,7 +10,7 @@ import styles from './getting-started.module.scss';
 
 # Installation
 
-Using native and cross-compiler toolchains to build and install Urho3D library
+Using native and cross-compiler toolchains to install Urho3D library
 
 ## Requirements
 
@@ -47,17 +47,17 @@ This may change in the future when the project uses better package manager and M
   }>
   <TabItem value={'android'}>
     <div className={clsx('textBlock', styles.fixedHeight)}>
-      <p>Install <strong>Android Studio</strong> or <strong>IntelliJ IDEA</strong> and it should already provide everything required.</p>
-      <p>Remember to complete the <strong>Android SDK</strong> installation as per instructed by IDE.</p>
+      Install <strong>Android Studio</strong> or <strong>IntelliJ IDEA</strong> and it should already provide everything required.<br/>
+      Remember to complete the <strong>Android SDK</strong> installation as per instructed by IDE.<br/>
       <br/>
-      <p>Tested tool version: <strong>29.0.2</strong></p>
-      <p>Tested NDK version: <strong>21.3.6528147</strong></p>
+      Tested tool version: <strong>29.0.2</strong><br/>
+      Tested NDK version: <strong>21.3.6528147</strong>
     </div>
   </TabItem>
   <TabItem value={'apple'}>
     <div className={clsx('textBlock', styles.fixedHeight)}>
-      <p>Install <strong>Xcode</strong> and it should provide almost everything required.</p>
-      <p>You may use <strong>homebrew</strong> to install other missing development packages, like <strong>openssl</strong>.</p>
+      Install <strong>Xcode</strong> and it should provide almost everything required.<br/>
+      You may use <strong>homebrew</strong> to install other missing development packages, like <strong>openssl</strong>.
     </div>
   </TabItem>
   <TabItem value={'arm'}>
@@ -121,18 +121,16 @@ apt install \
   </TabItem>
   <TabItem value={'web'}>
     <div className={clsx('textBlock', styles.fixedHeight)}>
-      <p>Install <strong>Emscripten SDK</strong> and it should already provide everything required.</p>
+      Install <strong>Emscripten SDK</strong> and it should already provide everything required.<br/>
       <br/>
-      <p>Tested SDK version: <strong>2.0.8</strong></p>
+      Tested SDK version: <strong>2.0.8</strong>
     </div>
   </TabItem>
   <TabItem value={'win'}>
     <div className={clsx('textBlock', styles.fixedHeight)}>
-      <p>
-        Install <strong>Visual Studio</strong> together with <strong>Windows SDK</strong>.
-        Alternatively, install <strong>MinGW-w64</strong>.
-      </p>
-      <p>Both should already provide everything required.</p>
+      Install <strong>Visual Studio</strong> together with <strong>Windows SDK</strong>.
+      Alternatively, install <strong>MinGW-w64</strong>.<br/>
+      Both should already provide everything required.
     </div>
   </TabItem>
 </Tabs>
@@ -155,7 +153,7 @@ In general when cross-compiling the build system requires both the cross-compile
 
 ### Setup ccache
 
-It is highly recommended having `ccache` installed on Linux build environment. It reduces the recompilation time drastically. To activate it, simply export these environment variables in the build environment:
+It is highly recommended having `ccache` installed on Linux build environment. It reduces the recompilation time drastically. To activate it, simply export these environment variables:
 
 ```bash title=~/.bash_profile
 export USE_CCACHE=1 CCACHE_SLOPPINESS=pch_defines,time_macros CCACHE_COMPRESS=1
@@ -164,31 +162,40 @@ export USE_CCACHE=1 CCACHE_SLOPPINESS=pch_defines,time_macros CCACHE_COMPRESS=1
 export ANDROID_CCACHE=$(which ccache)
 ```
 
-Ensure to adjust the `PATH` environment variable so that the ccache symlinks directory is in front of the `/usr/bin` entry. Basically, whenever a compiler command is about to be invoked, it would be "intercepted" and invoking one of the ccache symlinks instead. Below is an easy way to verify the setup.
+Adjust the `PATH` environment variable so that the ccache symlinks directory is in front of the `/usr/bin` entry, if it has not been automatically system-wide adjusted after installing the package. Basically by doing so, whenever a compiler command is about to be invoked, it would be "intercepted" and invoking one of the ccache symlinks instead.
 
-```bash
-which gcc
-# The output should look similar to this: /usr/lib64/ccache/gcc
+```bash title=~/.bashrc
+
+PATH=$(whereis -b ccache |grep -o '[^ ]*$'):$PATH
+
 ```
 
-:::note
+Finally, below is an easy way to verify the setup.
 
-This is the reason Dockerized Build Environment is fast. It builds using `ccache`.
+```bash
+
+[[ -L $(which gcc) ]] && echo "Good!" || echo "Oh no!"
+
+```
+
+:::info
+
+This is the reason Dockerized Build Environment is fast.
 
 :::
 
-## Build and Install Urho3D Library
+## Install Urho3D Library with CLI
 
-Clone the Urho3D project from the main branch, change directory to its project root, and execute **only one of the following commands** to build and install the library for your desired target platform. For simplicity's sake, this guide provides instruction to install the Urho3D library into a directory under user's home directory that does not require superuser privilege.
+Clone the Urho3D project from the main branch, change directory to its project root, and execute **only one of the following commands** to install the library for your desired target platform. For simplicity's sake, this section provides instruction to install the Urho3D library into a **staged install** location under user's home directory that does not require superuser privilege. However, on Windows host there is no concept of staged install, so the library can only be installed to the system-wide installation location which requires superuser privilege. No worry as most Windows users have such privilege by default. Unfortunately, it would prevent both VS version and MinGW version of the library installed at the same time though. Unless specified otherwise, the default staged install location is <code>~/stage/<em>&lt;platform&gt;</em></code>. For example, on Linux platform with GCC it is `~/stage/linux`. For Clang on Linux platform it is `~/stage/linux-clang` to prevent clash with GCC. For Android platform, it is installed in `~/.m2/repository` as AAR in Maven format.
 
 :::caution
 
-On Windows host there is no concept of **DESTDIR** for staged installation, so the library can only be installed to the system-wide installation location which requires Administrator privilege. It also means you cannot have both VS version and MinGW version installed at the same time. Additionally, notice that on Windows host the build options have to set on separate command before invoking Rake task.
+On Windows host the environment variables have to be set on separate command before invoking Rake task.
 
 :::
 
 <Tabs
-  className={styles.buildUrho3D}
+  className={styles.cliInstall}
   groupId={'target-platform'}
   defaultValue={'android'}
   values={[
@@ -218,14 +225,14 @@ gradlew.bat build publishToMavenLocal
   <TabItem value={'apple'}>
 
 ```bash
-# When targeting macOS
-rake build install[~/stage-macOS]
+# When targeting macOS, "PLATFORM=macOS" is the default on Mac
+rake build install
 
 # When targeting iOS
-PLATFORM=iOS rake build install[~/stage-iOS]
+PLATFORM=iOS rake build install
 
 # When targeting tvOS
-PLATFORM=tvOS rake build install[~/stage-tvOS]
+PLATFORM=tvOS rake build install
 ```
 
   </TabItem>
@@ -233,21 +240,21 @@ PLATFORM=tvOS rake build install[~/stage-tvOS]
 
 ```bash
 # When compiling natively on the ARM board
-PLATFORM=arm rake build install[~/stage-arm]
+PLATFORM=arm rake build install
 
 # When cross-compiling on Linux host machine, substitute '?' accordingly
-ARM_ABI_FLAGS=? ARM_PREFIX=? ARM_SYSROOT=? PLATFORM=arm rake build install[~/stage-arm]
+ARM_ABI_FLAGS=? ARM_PREFIX=? ARM_SYSROOT=? PLATFORM=arm rake build install
 ```
 
   </TabItem>
   <TabItem value={'linux'}>
 
 ```bash
-# When using Clang
-CC=clang CXX=clang++ rake build install[~/stage-linux-clang]
+# When using GCC, "PLATFORM=linux" is the default on Linux
+rake build install
 
-# When using GCC
-rake build install[~/stage-linux-gcc]
+# When using Clang, override the "CC" and "CXX" environment variables
+CC=clang CXX=clang++ rake build install
 ```
 
   </TabItem>
@@ -255,10 +262,10 @@ rake build install[~/stage-linux-gcc]
 
 ```bash
 # When compiling natively on the RPI board
-RPI_ABI=RPI3 PLATFORM=rpi rake build install[~/stage-rpi]
+RPI_ABI=RPI3 PLATFORM=rpi rake build install
 
 # When cross-compiling on Linux host machine, substitute '?' accordingly
-RPI_ABI=RPI3 RPI_PREFIX=? RPI_SYSROOT=? PLATFORM=rpi rake build install[~/stage-rpi]
+RPI_ABI=RPI3 RPI_PREFIX=? RPI_SYSROOT=? PLATFORM=rpi rake build install
 ```
 
   </TabItem>
@@ -266,25 +273,130 @@ RPI_ABI=RPI3 RPI_PREFIX=? RPI_SYSROOT=? PLATFORM=rpi rake build install[~/stage-
 
 ```bash
 # When using Rake task on Linux or Mac
-PLATFORM=web rake build install[~/stage-web]
+PLATFORM=web rake build install
 
 # When using Rake task on Windows
-set "PLATFORM=web" && rake build install[~/stage-web]
+set "PLATFORM=web" && rake build install
 ```
 
   </TabItem>
   <TabItem value={'win'}>
 
 ```bash
-# When compiling natively using VS
+# When compiling natively using VS, "PLATFORM=win" is the default on Windows
 rake build install
 
-# When compiling natively using MinGW-w64
+# When compiling natively using MinGW-w64, always install to system-wide location with potential clash
 set "GENERATOR=mingw" && rake build install
 
 # When cross-compiling on Linux host machine
-PLATFORM=mingw rake build install[~/stage-mingw]
+PLATFORM=mingw rake build install
 ```
+
+  </TabItem>
+</Tabs>
+
+## Install Urho3D Library with IDE
+
+The Urho3D project can be opened directly in the IDE that supports CMake or Gradle build system, like **Android Studio**, **CLion**, **IntelliJ IDEA**, and **Visual Studio**. For other IDEs, like Xcode, use CMake to generate the initial build tree first. This section tries to cover a few of the IDEs available in the market. The steps outlined here should be easily adaptable for other IDEs.
+
+<Tabs
+    className={styles.ideInstall}
+    groupId={'ide'}
+    defaultValue={'android-studio'}
+    values={[
+      {label: 'Android Studio', value: 'android-studio'},
+      {label: 'Code::Blocks', value: 'code-blocks'},
+      {label: 'CLion', value: 'clion'},
+      {label: 'IntelliJ IDEA', value: 'intellij'},
+      {label: 'Visual Studio', value: 'visual-studio'},
+      {label: 'Xcode', value: 'xcode'},
+    ]
+    }>
+  <TabItem value={'android-studio'}>
+
+<div className={clsx('textBlock', styles.fixedHeight)}>
+
+:::caution
+
+Do not update the Android Gradle Plugin when being prompted, unless you know what you are doing.
+
+:::
+
+- Choose "Open an Existing Project" or "Get from Version Control" if you haven't cloned the Urho3D project yet.
+- After Gradle sync is completed, select "launcher-app" from the "Edit Run/Debug Configurations" drop down list, and press "Ctrl+F9" to build the sample launcher app. This should build the Urho3D library as well.
+- To run the sample app, press "Shift+F10".
+- To install the Urho3D library for later use, locate the Gradle task called `publishToMavenLocal` and execute it.
+
+</div>
+
+  </TabItem>
+  <TabItem value={'code-blocks'}>
+
+<div className={clsx('textBlock', styles.fixedHeight)}>
+
+- Generate a build tree using CMake's Code::Blocks generator. One way to do it is by using rake task, like so:
+  `BUILD_TREE=build/linux-codeblocks GENERATOR=codeblocks rake cmake`
+- Open the "Urho3D.cbp" Code::Blocks project file in the build tree. In the above case, the project file can be found in "build/linux-codeblocks".
+- **// FIXME: Please submit PR to complete the install steps.**
+
+</div>
+
+  </TabItem>
+  <TabItem value={'clion'}>
+
+<div className={clsx('textBlock', styles.fixedHeight)}>
+
+- Choose "Open" or "Get from VCS" if you haven't cloned the Urho3D project yet.
+- In the "Open Project Wizard" window, enter the Urho3D build options in the "CMake options" field or just leave it empty for now to use the default options as provided by Urho3D build scripts. If you are using Linux host machine then remember to enter `DESTDIR=~/stage/linux` or `DESTDIR=~/stage/linux-clang CC=clang CXX=clang++` in the "Environment" field for staged install.
+- Select "01_HelloWorld" or any other samples from the "Select Run/Debug Configuration" drop down list and press "Ctrl+F9" to build the sample app. This should build the Urho3D library as well.
+- To run the sample app, press "Shift+F10".
+- To install the Urho3D library for later use, run "Install" under the "Build" menu.
+
+</div>
+
+  </TabItem>
+  <TabItem value={'intellij'}>
+
+<div className={clsx('textBlock', styles.fixedHeight)}>
+
+:::caution
+
+Do not update the Android Gradle Plugin when being prompted, unless you know what you are doing.
+
+:::
+
+- Choose "Open" or "Get from VCS" if you haven't cloned the Urho3D project yet.
+- After Gradle sync is completed, select "launcher-app" from the "Select Run/Debug Configuration" drop down list, and press "Ctrl+F9" to build the sample launcher app. This should build the Urho3D library as well.
+- To run the sample app, press "Shift+F10".
+- To install the Urho3D library for later use, locate the Gradle task called `publishToMavenLocal` and execute it.
+
+</div>
+
+  </TabItem>
+  <TabItem value={'visual-studio'}>
+
+<div className={clsx('textBlock', styles.fixedHeight)}>
+
+- **// FIXME: Please submit PR to complete the install steps.**
+
+</div>
+
+  </TabItem>
+  <TabItem value={'xcode'}>
+
+<div className={clsx('textBlock', styles.fixedHeight)}>
+
+- Generate a build tree using CMake's Xcode generator. One way to do it is by using rake task, like so:
+  - `rake cmake` for targeting macOS
+  - `PLATFORM=iOS rake cmake` for targeting iOS
+  - `PLATFORM=tvOS rake cmake` for targeting tvOS
+- Open the "Urho3D.xcodeproj" Xcode project file in the build tree. In the above case, the project file can be found in "build/macos", "build/ios", and "build/tvos", respectively.
+- Select "01_HelloWorld" or any other samples from the list of targets and press "⌘+B" to build the sample app. This should build the Urho3D library as well.
+- To run the sample app, press "⌘+R".
+- **// FIXME: Please submit PR to complete the install steps using staged install.**
+
+</div>
 
   </TabItem>
 </Tabs>

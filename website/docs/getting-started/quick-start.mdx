@@ -31,12 +31,12 @@ Windows host system requires WSL2.
 
 :::
 
-## Build and Install Urho3D Library with DBE
+## Install Urho3D Library with DBE
 
-Clone the Urho3D project from the main branch, change directory to its project root, and execute the following commands to build and install the library for your desired target platform.
+Clone the Urho3D project from the main branch, change directory to its project root, and execute the following commands to install the library for your desired target platform. Except for Android platform, which uses `~/.m2/repository`, the default install location is: <code>~/stage/<em>&lt;platform&gt;</em></code>. The "~" here refers to home directory mounted from a docker volume and as such it is persistent in between docker runs.
 
 <Tabs
-  className={styles.quickBuildUrho3D}
+  className={styles.dbeInstall}
   groupId={'target-platform'}
   defaultValue={'android'}
   values={[
@@ -63,8 +63,8 @@ script/dockerized.sh android rake install
   </TabItem>
   <TabItem value={'apple'}>
     <div className={clsx('textBlock', styles.fixedHeight)}>
-      <p>Currently DBE does not support Apple platforms.</p>
-      <p>However, Urho3D supports Apple platforms using native build environment.</p>
+      Currently DBE does not support Apple platforms.<br/>
+      However, Urho3D supports Apple platforms using native build environment.
     </div>
   </TabItem>
   <TabItem value={'arm'}>
@@ -133,10 +133,10 @@ The `script/dockerized.sh` spawns one of the docker container based on the speci
 
 ## Create a New UrhoApp with DBE
 
-You need an installed Urho3D library for the desired target platform to proceed. Although the Urho3D build system also supports linking the Urho3D library directly from its build tree, this quick start guide will not be discussing it here. Assuming you have been following along from the previous section, execute the following commands to create a new UrhoApp project, and then build it.
+You need an installed Urho3D library for the desired target platform to proceed. Although the Urho3D build system also supports linking the Urho3D library directly from its build tree, this quick start section will not be discussing it here. Assuming you have been following along from the previous section, execute the following commands to create a new UrhoApp project, and then build it.
 
 <Tabs
-  className={styles.quickBuildUrhoApp}
+  className={styles.dbeBuildUrhoApp}
   groupId={'target-platform'}
   defaultValue={'android'}
   values={[
@@ -162,8 +162,8 @@ script/dockerized.sh android
   </TabItem>
   <TabItem value={'apple'}>
     <div className={clsx('textBlock', styles.fixedHeight)}>
-      <p>Currently DBE does not support Apple platforms.</p>
-      <p>However, Urho3D supports Apple platforms using native build environment.</p>
+      Currently DBE does not support Apple platforms.<br/>
+      However, Urho3D supports Apple platforms using native build environment.
     </div>
   </TabItem>
   <TabItem value={'arm'}>
@@ -293,7 +293,7 @@ At the root of the project there are a few build scripts which can be grouped as
 - **CMake** - consist of `CMakeLists.txt` and all the CMake modules and toolchains in the `cmake/` directory.
 - **Gradle** - consist of `build.gradle.kts`, `settings.gradle.kts`, `gradle.properties`, and the Gradle wrapper scripts.
 - **Shell** - consist of convenience *nix bash shell script and Windows batch files in the `script/` directory.
-- **Rake** - only one `rakefile` but it defines all the common tasks.
+- **Rake** - one `rakefile` that defines all the common tasks with opinionated default options.
 
 If you are very familiar with CMake then you can directly invoke `cmake`, `ccmake`, or `cmake-gui` to generate a build tree for all the supported platforms, except for Android platform. For the latter case you need to use `gradle`, or via its wrapper script if you don't have Gradle installed globally. For the most cases though, you will probably find it useful to use the convenience shell scripts or to use them as reference for your own convenience scripts. Finally, the `rake` command can be used to execute rake tasks for building the project and more.
 
