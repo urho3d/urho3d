@@ -328,7 +328,7 @@ def build_host
 end
 
 def build_tree
-  ENV['BUILD_TREE'] || "build/#{dockerized? ? 'dockerized-' : ''}#{ENV['PLATFORM'].downcase}"
+  ENV['BUILD_TREE'] || "build/#{dockerized? ? 'dockerized-' : ''}#{ENV['PLATFORM'].downcase}#{ENV['CC'] ? "-#{ENV['CC']}" : ''}"
 end
 
 def build_config

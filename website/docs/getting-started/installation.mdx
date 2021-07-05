@@ -184,9 +184,11 @@ This is the reason Dockerized Build Environment is fast.
 
 :::
 
-## Install Urho3D Library with CLI
+## Install Urho3D Library
 
-Clone the Urho3D project from the main branch, change directory to its project root, and execute **only one of the following commands** to install the library for your desired target platform. For simplicity's sake, this section provides instruction to install the Urho3D library into a **staged install** location under user's home directory that does not require superuser privilege. However, on Windows host there is no concept of staged install, so the library can only be installed to the system-wide installation location which requires superuser privilege. No worry as most Windows users have such privilege by default. Unfortunately, it would prevent both VS version and MinGW version of the library installed at the same time though. Unless specified otherwise, the default staged install location is <code>~/stage/<em>&lt;platform&gt;</em></code>. For example, on Linux platform with GCC it is `~/stage/linux`. For Clang on Linux platform it is `~/stage/linux-clang` to prevent clash with GCC. For Android platform, it is installed in `~/.m2/repository` as AAR in Maven format.
+### Using CLI {#install-urho3d-library-using-cli}
+
+Clone the Urho3D project from the main branch, change directory to its project root, and execute **only one of the following commands** to install the library for your desired target platform. For simplicity's sake, this section provides instruction to install the Urho3D library into a **staged install** location under user's home directory that does not require superuser privilege. However, on Windows host there is no concept of staged install, so the library can only be installed to the system-wide installation location which requires superuser privilege. No worry as most Windows users have such privilege by default. Unfortunately, it would prevent both VS version and MinGW version of the library installed at the same time though. Unless specified otherwise, the default staged install location is <code>~/stage/<em>&lt;platform&gt;</em>/</code>. For example, on Linux platform with GCC it is `~/stage/linux/`. For Clang on Linux platform it is `~/stage/linux-clang/` to prevent clash with GCC. For Android platform, it is installed in `~/.m2/repository/` as AAR in Maven format.
 
 :::caution
 
@@ -289,14 +291,14 @@ rake build install
 # When compiling natively using MinGW-w64, always install to system-wide location with potential clash
 set "GENERATOR=mingw" && rake build install
 
-# When cross-compiling on Linux host machine
-PLATFORM=mingw rake build install
+# When cross-compiling on Linux host machine, substitute '?' accordingly
+MINGW_PREFIX=? PLATFORM=mingw rake build install
 ```
 
   </TabItem>
 </Tabs>
 
-## Install Urho3D Library with IDE
+### Using IDE {#install-urho3d-library-using-ide}
 
 The Urho3D project can be opened directly in the IDE that supports CMake or Gradle build system, like **Android Studio**, **CLion**, **IntelliJ IDEA**, and **Visual Studio**. For other IDEs, like Xcode, use CMake to generate the initial build tree first. This section tries to cover a few of the IDEs available in the market. The steps outlined here should be easily adaptable for other IDEs.
 
@@ -400,3 +402,133 @@ Do not update the Android Gradle Plugin when being prompted, unless you know wha
 
   </TabItem>
 </Tabs>
+
+## Create a new UrhoApp
+
+You need an installed Urho3D library for the desired target platform to proceed. If you have been following along the previous section to install the library then you should be able to create a new project using the library in no time. The most commonly encountered issue by newbie in the past is figuring out how to tell the build script where to find the **correct** Urho3D library to use. The new rake tasks have been designed to address this issue by providing opinionated sane default for most of the use cases, but without sacrificing the possibility to override the default when necessary. All you need is to execute the following command to create a new UrhoApp project.
+
+```bash
+rake new[UrhoApp,demo]
+```
+
+By default, this task creates a new project named **UrhoApp** in the `~/projects/` directory. You can override that by specifying explicitly the name of the new project as well as the parent directory where it should be created, as shown in the example above. Next, change directory to the project root of the newly created project and build it. You can build using CLI or IDE too.
+
+:::info
+
+The UrhoApp project is cross-platform out of the box!
+
+:::
+
+### Using CLI {#build-urhoapp-using-cli}
+
+Simply invoke `rake build` or just `rake` (as build is the default task). In order to target a specific platform, set the `PLATFORM` environment variable just before invoking the task. By default, the build task assumes to target native platform of the host machine.
+
+<Tabs
+  className={styles.cliInstall}
+  groupId={'target-platform'}
+  defaultValue={'android'}
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'Apple', value: 'apple'},
+    {label: 'Arm', value: 'arm'},
+    {label: 'Linux', value: 'linux'},
+    {label: 'RPI', value: 'rpi'},
+    {label: 'Web', value: 'web'},
+    {label: 'Windows', value: 'win'},
+  ]
+  }>
+  <TabItem value={'android'}>
+
+```bash
+# When using Rake task
+PLATFORM=android rake
+
+# When using Gradle wrapper on Linux or Mac
+./gradlew build
+
+# When using Gradle wrapper on Windows
+gradlew.bat build
+```
+
+  </TabItem>
+  <TabItem value={'apple'}>
+
+```bash
+# When targeting macOS, "PLATFORM=macOS" is the default on Mac
+rake
+
+# When targeting iOS
+PLATFORM=iOS rake
+
+# When targeting tvOS
+PLATFORM=tvOS rake
+```
+
+  </TabItem>
+  <TabItem value={'arm'}>
+
+```bash
+# When compiling natively on the ARM board
+PLATFORM=arm rake
+
+# When cross-compiling on Linux host machine, substitute '?' accordingly
+ARM_ABI_FLAGS=? ARM_PREFIX=? ARM_SYSROOT=? PLATFORM=arm rake
+```
+
+  </TabItem>
+  <TabItem value={'linux'}>
+
+```bash
+# When using GCC, "PLATFORM=linux" is the default on Linux
+rake
+
+# When using Clang, override the "CC" and "CXX" environment variables
+CC=clang CXX=clang++ rake
+```
+
+  </TabItem>
+  <TabItem value={'rpi'}>
+
+```bash
+# When compiling natively on the RPI board
+RPI_ABI=RPI3 PLATFORM=rpi rake
+
+# When cross-compiling on Linux host machine, substitute '?' accordingly
+RPI_ABI=RPI3 RPI_PREFIX=? RPI_SYSROOT=? PLATFORM=rpi rake
+```
+
+  </TabItem>
+  <TabItem value={'web'}>
+
+```bash
+# When using Rake task on Linux or Mac
+PLATFORM=web rake
+
+# When using Rake task on Windows
+set "PLATFORM=web" && rake
+```
+
+  </TabItem>
+  <TabItem value={'win'}>
+
+```bash
+# When compiling natively using VS, "PLATFORM=win" is the default on Windows
+rake
+
+# When compiling natively using MinGW-w64
+set "GENERATOR=mingw" && rake
+
+# When cross-compiling on Linux host machine, substitute '?' accordingly
+MINGW_PREFIX=? PLATFORM=mingw rake
+```
+
+  </TabItem>
+</Tabs>
+
+Except for Android platform, the task generates the initial build tree under <code>build/<em>&lt;platform&gt;</em>/</code> relative to the project root. Assuming it was built successfully for Linux platform, you could then run the UrhoApp executable like so:
+
+```bash
+build/linux/bin/UrhoApp
+```
+
+For Android platform, you would have to use other gradle task (e.g., `./gradlew installDebug`) to deploy the UrhoApp to an Android Emulator or actual device.
