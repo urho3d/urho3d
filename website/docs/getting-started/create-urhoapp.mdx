@@ -11,7 +11,7 @@ import styles from './getting-started.module.scss';
 
 Create your first UrhoApp project
 
-You need an installed Urho3D library for the desired target platform to proceed. If you have been following along the previous section to install the library then you should be able to create a new project using the library in no time. The most commonly encountered issue by newbie in the past was figuring out how to tell the build script where to find the **correct** Urho3D library to use. The new rake tasks have been designed to address this issue by providing opinionated sane default for most of the use cases, but without sacrificing the possibility to override the default when necessary.
+You need an installed Urho3D library for the desired target platform to proceed. If you have been following along the previous section to install the library then you should be able to create a new project using the library in no time. The most commonly encountered issue by newbie in the past was figuring out how to tell the build script where to find the correct Urho3D library to use. The new rake tasks have been designed to address this issue by providing opinionated sane default for most of the use cases, but without sacrificing the possibility to override the default when necessary.
 
 ## Project Scaffolding
 
@@ -185,7 +185,7 @@ Do not update the Android Gradle Plugin when being prompted, unless you know wha
 <div className={clsx('textBlock', styles.fixedHeight)}>
 
 - Choose "Open" to open the new project.
-- In the "Open Project Wizard" window, enter the optional build options in the "CMake options" field or just leave it empty for now to use the default options as provided by Urho3D build scripts. If you are using Clang compiler on Linux host machine then remember to enter `CC=clang CXX=clang++` in the "Environment" field also.
+- In the "Open Project Wizard" window, enter the optional build options in the "CMake options" field or just leave it empty for now to use the default options as provided by Urho3D build scripts. If you are using Linux host machine, enter `URHO3D_HOME=~/stage/linux/usr/local` or `URHO3D_HOME=~/stage/linux-clang/usr/local CC=clang CXX=clang++` in the "Environment" field; or leave it empty when you are using Windows host machine.
 - Select "UrhoApp" from the "Select Run/Debug Configuration" drop down list and press "Ctrl+F9" to build the UrhoApp.
 - To run the UrhoApp, press "Shift+F10".
 
@@ -251,6 +251,7 @@ Do not update the Android Gradle Plugin when being prompted, unless you know wha
   - `PLATFORM=iOS rake cmake` for targeting iOS
   - `PLATFORM=tvOS rake cmake` for targeting tvOS
 - Open the "UrhoApp.xcodeproj" Xcode project file in the build tree. In the above case, the project file can be found in "build/macos", "build/ios", and "build/tvos", respectively.
+- **// FIXME: Please submit PR to configure the <code>URHO3D_HOME=~/stage/<em>&lt;platform&gt;</em>/usr/local</code> environment variable before building the UrhoApp.**
 - Select "UrhoApp" from the list of targets and press "⌘+B" to build the UrhoApp.
 - To run the UrhoApp, press "⌘+R".
 
