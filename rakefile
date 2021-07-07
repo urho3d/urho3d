@@ -275,7 +275,15 @@ task :init do
   when /linux/
     $max_jobs = `grep -c processor /proc/cpuinfo`.chomp unless $max_jobs
     ENV['GENERATOR'] = 'generic' unless ENV['GENERATOR']
-    ENV['PLATFORM'] = 'linux' unless ENV['PLATFORM']
+    unless ENV['PLATFORM']
+      if /x86/ =~ `uname -m`
+        ENV['PLATFORM'] = 'linux'
+      elsif Dir.exists?('/opt/vc')
+        ENV['PLATFORM'] = 'rpi'
+      else
+        ENV['PLATFORM'] = 'arm'
+      end
+    end
   when /darwin|macOS/
     $max_jobs = `sysctl -n hw.logicalcpu`.chomp unless $max_jobs
     ENV['GENERATOR'] = 'xcode' unless ENV['GENERATOR']

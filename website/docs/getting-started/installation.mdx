@@ -51,7 +51,8 @@ This may change in the future when the project uses better package manager and M
       Remember to complete the <strong>Android SDK</strong> installation as per instructed by IDE.<br/>
       <br/>
       Tested tool version: <strong>29.0.2</strong><br/>
-      Tested NDK version: <strong>21.3.6528147</strong>
+      Tested NDK version: <strong>21.3.6528147</strong><br/>
+      Tested Android gradle plugin version: <strong>4.0.2</strong>
     </div>
   </TabItem>
   <TabItem value={'apple'}>
@@ -241,8 +242,8 @@ PLATFORM=tvOS rake build install
   <TabItem value={'arm'}>
 
 ```bash
-# When compiling natively on the ARM board
-PLATFORM=arm rake build install
+# When compiling natively on the ARM board, "PLATFORM=arm" should be already set
+rake build install
 
 # When cross-compiling on Linux host machine, substitute '?' accordingly
 ARM_ABI_FLAGS=? ARM_PREFIX=? ARM_SYSROOT=? PLATFORM=arm rake build install
@@ -263,8 +264,8 @@ CC=clang CXX=clang++ rake build install
   <TabItem value={'rpi'}>
 
 ```bash
-# When compiling natively on the RPI board
-RPI_ABI=RPI3 PLATFORM=rpi rake build install
+# When compiling natively on the RPI board, "PLATFORM=rpi" should be already set
+RPI_ABI=RPI3 rake build install
 
 # When cross-compiling on Linux host machine, substitute '?' accordingly
 RPI_ABI=RPI3 RPI_PREFIX=? RPI_SYSROOT=? PLATFORM=rpi rake build install
@@ -308,8 +309,9 @@ The Urho3D project can be opened directly in the IDE that supports CMake or Grad
     defaultValue={'android-studio'}
     values={[
       {label: 'Android Studio', value: 'android-studio'},
-      {label: 'Code::Blocks', value: 'code-blocks'},
       {label: 'CLion', value: 'clion'},
+      {label: 'Code::Blocks', value: 'code-blocks'},
+      {label: 'CodeLite', value: 'codelite'},
       {label: 'IntelliJ IDEA', value: 'intellij'},
       {label: 'Visual Studio', value: 'visual-studio'},
       {label: 'Xcode', value: 'xcode'},
@@ -333,18 +335,6 @@ Do not update the Android Gradle Plugin when being prompted, unless you know wha
 </div>
 
   </TabItem>
-  <TabItem value={'code-blocks'}>
-
-<div className={clsx('textBlock', styles.fixedHeight)}>
-
-- Generate a build tree using CMake's Code::Blocks generator. One way to do it is by using rake task, like so:
-  `BUILD_TREE=build/linux-codeblocks GENERATOR=codeblocks rake cmake`
-- Open the "Urho3D.cbp" Code::Blocks project file in the build tree. In the above case, the project file can be found in "build/linux-codeblocks".
-- **// FIXME: Please submit PR to complete the install steps.**
-
-</div>
-
-  </TabItem>
   <TabItem value={'clion'}>
 
 <div className={clsx('textBlock', styles.fixedHeight)}>
@@ -354,6 +344,30 @@ Do not update the Android Gradle Plugin when being prompted, unless you know wha
 - Select "01_HelloWorld" or any other samples from the "Select Run/Debug Configuration" drop down list and press "Ctrl+F9" to build the sample app. This should build the Urho3D library as well.
 - To run the sample app, press "Shift+F10".
 - To install the Urho3D library for later use, run "Install" under the "Build" menu.
+
+</div>
+
+  </TabItem>
+  <TabItem value={'code-blocks'}>
+
+<div className={clsx('textBlock', styles.fixedHeight)}>
+
+- Generate a build tree using CMake's Code::Blocks generator. One way to do it is by using rake task, like so:
+`BUILD_TREE=build/linux-codeblocks GENERATOR=codeblocks rake cmake`
+- Open the "Urho3D.cbp" Code::Blocks project file in the build tree. In the above case, the project file can be found in `build/linux-codeblocks/` directory.
+- **// FIXME: Please submit PR to complete the install steps.**
+
+</div>
+
+  </TabItem>
+  <TabItem value={'codelite'}>
+
+<div className={clsx('textBlock', styles.fixedHeight)}>
+
+- Generate a build tree using CMake's CodeLite generator. One way to do it is by using rake task, like so:
+`BUILD_TREE=build/linux-codelite GENERATOR=codelite rake cmake`
+- Open the "Urho3D.workspace" CodeLite workspace file in the build tree. In the above case, the workspace file can be found in `build/linux-codelite/` directory.
+- **// FIXME: Please submit PR to complete the install steps.**
 
 </div>
 
@@ -402,133 +416,3 @@ Do not update the Android Gradle Plugin when being prompted, unless you know wha
 
   </TabItem>
 </Tabs>
-
-## Create a new UrhoApp
-
-You need an installed Urho3D library for the desired target platform to proceed. If you have been following along the previous section to install the library then you should be able to create a new project using the library in no time. The most commonly encountered issue by newbie in the past is figuring out how to tell the build script where to find the **correct** Urho3D library to use. The new rake tasks have been designed to address this issue by providing opinionated sane default for most of the use cases, but without sacrificing the possibility to override the default when necessary. All you need is to execute the following command to create a new UrhoApp project.
-
-```bash
-rake new[UrhoApp,demo]
-```
-
-By default, this task creates a new project named **UrhoApp** in the `~/projects/` directory. You can override that by specifying explicitly the name of the new project as well as the parent directory where it should be created, as shown in the example above. Next, change directory to the project root of the newly created project and build it. You can build using CLI or IDE too.
-
-:::info
-
-The UrhoApp project is cross-platform out of the box!
-
-:::
-
-### Using CLI {#build-urhoapp-using-cli}
-
-Simply invoke `rake build` or just `rake` (as build is the default task). In order to target a specific platform, set the `PLATFORM` environment variable just before invoking the task. By default, the build task assumes to target native platform of the host machine.
-
-<Tabs
-  className={styles.cliInstall}
-  groupId={'target-platform'}
-  defaultValue={'android'}
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'Apple', value: 'apple'},
-    {label: 'Arm', value: 'arm'},
-    {label: 'Linux', value: 'linux'},
-    {label: 'RPI', value: 'rpi'},
-    {label: 'Web', value: 'web'},
-    {label: 'Windows', value: 'win'},
-  ]
-  }>
-  <TabItem value={'android'}>
-
-```bash
-# When using Rake task
-PLATFORM=android rake
-
-# When using Gradle wrapper on Linux or Mac
-./gradlew build
-
-# When using Gradle wrapper on Windows
-gradlew.bat build
-```
-
-  </TabItem>
-  <TabItem value={'apple'}>
-
-```bash
-# When targeting macOS, "PLATFORM=macOS" is the default on Mac
-rake
-
-# When targeting iOS
-PLATFORM=iOS rake
-
-# When targeting tvOS
-PLATFORM=tvOS rake
-```
-
-  </TabItem>
-  <TabItem value={'arm'}>
-
-```bash
-# When compiling natively on the ARM board
-PLATFORM=arm rake
-
-# When cross-compiling on Linux host machine, substitute '?' accordingly
-ARM_ABI_FLAGS=? ARM_PREFIX=? ARM_SYSROOT=? PLATFORM=arm rake
-```
-
-  </TabItem>
-  <TabItem value={'linux'}>
-
-```bash
-# When using GCC, "PLATFORM=linux" is the default on Linux
-rake
-
-# When using Clang, override the "CC" and "CXX" environment variables
-CC=clang CXX=clang++ rake
-```
-
-  </TabItem>
-  <TabItem value={'rpi'}>
-
-```bash
-# When compiling natively on the RPI board
-RPI_ABI=RPI3 PLATFORM=rpi rake
-
-# When cross-compiling on Linux host machine, substitute '?' accordingly
-RPI_ABI=RPI3 RPI_PREFIX=? RPI_SYSROOT=? PLATFORM=rpi rake
-```
-
-  </TabItem>
-  <TabItem value={'web'}>
-
-```bash
-# When using Rake task on Linux or Mac
-PLATFORM=web rake
-
-# When using Rake task on Windows
-set "PLATFORM=web" && rake
-```
-
-  </TabItem>
-  <TabItem value={'win'}>
-
-```bash
-# When compiling natively using VS, "PLATFORM=win" is the default on Windows
-rake
-
-# When compiling natively using MinGW-w64
-set "GENERATOR=mingw" && rake
-
-# When cross-compiling on Linux host machine, substitute '?' accordingly
-MINGW_PREFIX=? PLATFORM=mingw rake
-```
-
-  </TabItem>
-</Tabs>
-
-Except for Android platform, the task generates the initial build tree under <code>build/<em>&lt;platform&gt;</em>/</code> relative to the project root. Assuming it was built successfully for Linux platform, you could then run the UrhoApp executable like so:
-
-```bash
-build/linux/bin/UrhoApp
-```
-
-For Android platform, you would have to use other gradle task (e.g., `./gradlew installDebug`) to deploy the UrhoApp to an Android Emulator or actual device.

@@ -13,12 +13,16 @@ div {
       min-height: 340px;
     }
 
-    .cliInstall + & {
+    .cliInstall + &, .cliUrhoApp + & {
       min-height: 208px;
     }
 
     .ideInstall + & {
       min-height: 332px;
+    }
+
+    .ideUrhoApp + & {
+      min-height: 276px;
     }
   }
 }
