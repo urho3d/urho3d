@@ -33,7 +33,7 @@ Windows host system requires WSL2.
 
 ## Install Urho3D Library with DBE
 
-Clone the Urho3D project from the main branch, change directory to its project root, and execute the following commands to install the library for your desired target platform. Except for Android platform, which uses `~/.m2/repository/`, the default install location is: <code>~/stage/<em>&lt;platform&gt;</em>/</code>. The "~" here refers to home directory mounted from a docker volume and as such it is persistent in between docker runs.
+Clone the Urho3D project from the main branch, change directory to its project root, and execute the following commands to install the library for your desired target platform. Except for Android platform, which uses `~/.m2/repository/`, the default install location is: <code>~/.urho3d/install/<em>&lt;platform&gt;</em>/</code>. The "~" here refers to home directory mounted from a docker volume and as such it is persistent in between docker runs.
 
 <Tabs
   className={styles.dbeInstall}
@@ -54,10 +54,8 @@ Clone the Urho3D project from the main branch, change directory to its project r
 ```bash
 git clone https://github.com/urho3d/Urho3D.git
 cd Urho3D
-# Build Urho3D library
-script/dockerized.sh android
 # Install Urho3D library to Maven local repository
-script/dockerized.sh android rake install
+script/dockerized.sh android rake build install
 ```
 
   </TabItem>
@@ -72,10 +70,8 @@ script/dockerized.sh android rake install
 ```bash
 git clone https://github.com/urho3d/Urho3D.git
 cd Urho3D
-# Build Urho3D library, substitute '?' accordingly
-ARM_ABI_FLAGS=? script/dockerized.sh arm
-# Install Urho3D library to a local stage directory
-script/dockerized.sh arm rake install
+# Install Urho3D library to a default install location, substitute '?' accordingly
+ARM_ABI_FLAGS=? script/dockerized.sh arm rake build install
 ```
 
   </TabItem>
@@ -84,10 +80,8 @@ script/dockerized.sh arm rake install
 ```bash
 git clone https://github.com/urho3d/Urho3D.git
 cd Urho3D
-# Build Urho3D library
-script/dockerized.sh linux
-# Install Urho3D library to a local stage directory
-script/dockerized.sh linux rake install
+# Install Urho3D library to a default install location
+script/dockerized.sh linux rake build install
 ```
 
   </TabItem>
@@ -96,10 +90,8 @@ script/dockerized.sh linux rake install
 ```bash
 git clone https://github.com/urho3d/Urho3D.git
 cd Urho3D
-# Build Urho3D library, modify the "RPI_ABI" build option accordingly
-RPI_ABI=RPI4 script/dockerized.sh rpi
-# Install Urho3D library to a local stage directory
-script/dockerized.sh rpi rake install
+# Install Urho3D library to a default install location, modify the "RPI_ABI" build option accordingly
+RPI_ABI=RPI4 script/dockerized.sh rpi rake build install
 ```
 
   </TabItem>
@@ -108,10 +100,8 @@ script/dockerized.sh rpi rake install
 ```bash
 git clone https://github.com/urho3d/Urho3D.git
 cd Urho3D
-# Build Urho3D library
-script/dockerized.sh web
-# Install Urho3D library to a local stage directory
-script/dockerized.sh web rake install
+# Install Urho3D library to a default install location
+script/dockerized.sh web rake build install
 ```
 
   </TabItem>
@@ -120,10 +110,8 @@ script/dockerized.sh web rake install
 ```bash
 git clone https://github.com/urho3d/Urho3D.git
 cd Urho3D
-# Build Urho3D library
-script/dockerized.sh mingw
-# Install Urho3D library to a local stage directory
-script/dockerized.sh mingw rake install
+# Install Urho3D library to a default install location
+script/dockerized.sh mingw rake build install
 ```
 
   </TabItem>
@@ -225,7 +213,7 @@ script/dockerized.sh mingw
 
 :::note
 
-This is not a copy/paste error. You can build your new UrhoApp exactly the same way as the Urho3D project itself!
+This is not a copy/paste error. You can build your new UrhoApp exactly the same way as the Urho3D project itself! By default, DBE runs `rake build` command.
 
 :::
 

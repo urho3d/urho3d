@@ -185,7 +185,9 @@ Do not update the Android Gradle Plugin when being prompted, unless you know wha
 <div className={clsx('textBlock', styles.fixedHeight)}>
 
 - Choose "Open" to open the new project.
-- In the "Open Project Wizard" window, enter the optional build options in the "CMake options" field or just leave it empty for now to use the default options as provided by Urho3D build scripts. If you are using Linux host machine, enter `URHO3D_HOME=~/stage/linux/usr/local` or `URHO3D_HOME=~/stage/linux-clang/usr/local CC=clang CXX=clang++` in the "Environment" field; or leave it empty when you are using Windows host machine.
+- In the "Open Project Wizard" or in the "CMake Settings", set the `URHO3D_HOME` accordingly in the "CMake options" field, e.g.:
+  - `~/.urho3d/install/linux` when targeting Linux platform with GCC
+  - `%USERPROFILE%\.urho3d\install\win` when targeting Windows platform with MSVC
 - Select "UrhoApp" from the "Select Run/Debug Configuration" drop down list and press "Ctrl+F9" to build the UrhoApp.
 - To run the UrhoApp, press "Shift+F10".
 
@@ -196,8 +198,7 @@ Do not update the Android Gradle Plugin when being prompted, unless you know wha
 
 <div className={clsx('textBlock', styles.fixedHeight)}>
 
-- Generate a build tree using CMake's Code::Blocks generator. One way to do it is by using rake task, like so:
-`BUILD_TREE=build/linux-codeblocks GENERATOR=codeblocks rake cmake`
+- Generate a build tree using CMake's Code::Blocks generator. One way to do it is by using rake task, like so: `GENERATOR=codeblocks rake cmake`
 - Open the "UrhoApp.cbp" Code::Blocks project file in the build tree. In the above case, the project file can be found in `build/linux-codeblocks/` directory.
 - **// FIXME: Please submit PR to complete the steps.**
 
@@ -208,8 +209,7 @@ Do not update the Android Gradle Plugin when being prompted, unless you know wha
 
 <div className={clsx('textBlock', styles.fixedHeight)}>
 
-- Generate a build tree using CMake's CodeLite generator. One way to do it is by using rake task, like so:
-`BUILD_TREE=build/linux-codelite GENERATOR=codelite rake cmake`
+- Generate a build tree using CMake's CodeLite generator. One way to do it is by using rake task, like so: `GENERATOR=codelite rake cmake`
 - Open the "UrhoApp.workspace" CodeLite workspace file in the build tree. In the above case, the workspace file can be found in `build/linux-codelite/` directory.
 - **// FIXME: Please submit PR to complete the steps.**
 
@@ -237,7 +237,13 @@ Do not update the Android Gradle Plugin when being prompted, unless you know wha
 
 <div className={clsx('textBlock', styles.fixedHeight)}>
 
-- **// FIXME: Please submit PR to complete the install steps.**
+- Choose "Open a project or solution" to open the new project.
+- After CMake initial build tree is generated, open the "CMake Settings for UrhoApp" under the "Project" menu, then in the "CMake variables and cache" section:
+  - Disable the `URHO3D_PCH` build option
+  - Set the `URHO3D_HOME` to `%USERPROFILE%\.urho3d\install\win`
+- Save the above changes to allow CMake to reconfigure the build tree.
+- Double click the "Folder View" in the "Solution Explorer", then select the "UrhoApp_d.exe" from the "Select Startup Item" drop down list and press "Ctrl+B" to build the UrhoApp.
+- To run the UrhoApp, press "Ctrl+F5".
 
 </div>
 
@@ -251,7 +257,6 @@ Do not update the Android Gradle Plugin when being prompted, unless you know wha
   - `PLATFORM=iOS rake cmake` for targeting iOS
   - `PLATFORM=tvOS rake cmake` for targeting tvOS
 - Open the "UrhoApp.xcodeproj" Xcode project file in the build tree. In the above case, the project file can be found in "build/macos", "build/ios", and "build/tvos", respectively.
-- **// FIXME: Please submit PR to configure the <code>URHO3D_HOME=~/stage/<em>&lt;platform&gt;</em>/usr/local</code> environment variable before building the UrhoApp.**
 - Select "UrhoApp" from the list of targets and press "⌘+B" to build the UrhoApp.
 - To run the UrhoApp, press "⌘+R".
 

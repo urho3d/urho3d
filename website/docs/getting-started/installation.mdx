@@ -189,7 +189,7 @@ This is the reason Dockerized Build Environment is fast.
 
 ### Using CLI {#install-urho3d-library-using-cli}
 
-Clone the Urho3D project from the main branch, change directory to its project root, and execute **only one of the following commands** to install the library for your desired target platform. For simplicity's sake, this section provides instruction to install the Urho3D library into a **staged install** location under user's home directory that does not require superuser privilege. However, on Windows host there is no concept of staged install, so the library can only be installed to the system-wide installation location which requires superuser privilege. No worry as most Windows users have such privilege by default. Unfortunately, it would prevent both VS version and MinGW version of the library installed at the same time though. Unless specified otherwise, the default staged install location is <code>~/stage/<em>&lt;platform&gt;</em>/</code>. For example, on Linux platform with GCC it is `~/stage/linux/`. For Clang on Linux platform it is `~/stage/linux-clang/` to prevent clash with GCC. For Android platform, it is installed in `~/.m2/repository/` as AAR in Maven format.
+Clone the Urho3D project from the main branch, change directory to its project root, and execute **only one of the following commands** to install the library for your desired target platform. For simplicity's sake, this section provides instruction that install the Urho3D library into a default install location under user's home directory that does not require superuser privilege. Unless specified otherwise, the default install location is <code>~/.urho3d/install/<em>&lt;platform&gt;</em>/</code>. For example, on Linux platform with GCC it is `~/.urho3d/install/linux/`. For Clang on Linux platform it is `~/.urho3d/install/linux-clang/` to prevent clash with GCC. For Android platform, it is installed in `~/.m2/repository/` as AAR in Maven format.
 
 :::caution
 
@@ -301,7 +301,7 @@ MINGW_PREFIX=? PLATFORM=mingw rake build install
 
 ### Using IDE {#install-urho3d-library-using-ide}
 
-The Urho3D project can be opened directly in the IDE that supports CMake or Gradle build system, like **Android Studio**, **CLion**, **IntelliJ IDEA**, and **Visual Studio**. For other IDEs, like Xcode, use CMake to generate the initial build tree first. This section tries to cover a few of the IDEs available in the market. The steps outlined here should be easily adaptable for other IDEs.
+The Urho3D project can be opened directly in the IDE that supports CMake or Gradle build system, like **Android Studio**, **CLion**, **IntelliJ IDEA**, and **Visual Studio**. For other IDEs, like **Xcode**, use CMake to generate the initial build tree first. This section tries to cover a few of the IDEs available in the market. The steps outlined here should be easily adaptable for other IDEs.
 
 <Tabs
     className={styles.ideInstall}
@@ -340,7 +340,9 @@ Do not update the Android Gradle Plugin when being prompted, unless you know wha
 <div className={clsx('textBlock', styles.fixedHeight)}>
 
 - Choose "Open" or "Get from VCS" if you haven't cloned the Urho3D project yet.
-- In the "Open Project Wizard" window, enter the Urho3D build options in the "CMake options" field or just leave it empty for now to use the default options as provided by Urho3D build scripts. If you are using Linux host machine then remember to enter `DESTDIR=~/stage/linux` or `DESTDIR=~/stage/linux-clang CC=clang CXX=clang++` in the "Environment" field for staged install.
+- In the "Open Project Wizard" or in the "CMake Settings", set the `CMAKE_INSTALL_PREFIX` accordingly in the "CMake options" field, e.g.:
+  - `~/.urho3d/install/linux` when targeting Linux platform with GCC
+  - `%USERPROFILE%\.urho3d\install\win` when targeting Windows platform with MSVC
 - Select "01_HelloWorld" or any other samples from the "Select Run/Debug Configuration" drop down list and press "Ctrl+F9" to build the sample app. This should build the Urho3D library as well.
 - To run the sample app, press "Shift+F10".
 - To install the Urho3D library for later use, run "Install" under the "Build" menu.
@@ -352,8 +354,7 @@ Do not update the Android Gradle Plugin when being prompted, unless you know wha
 
 <div className={clsx('textBlock', styles.fixedHeight)}>
 
-- Generate a build tree using CMake's Code::Blocks generator. One way to do it is by using rake task, like so:
-`BUILD_TREE=build/linux-codeblocks GENERATOR=codeblocks rake cmake`
+- Generate a build tree using CMake's Code::Blocks generator. One way to do it is by using rake task, like so: `GENERATOR=codeblocks rake cmake`.
 - Open the "Urho3D.cbp" Code::Blocks project file in the build tree. In the above case, the project file can be found in `build/linux-codeblocks/` directory.
 - **// FIXME: Please submit PR to complete the install steps.**
 
@@ -364,8 +365,7 @@ Do not update the Android Gradle Plugin when being prompted, unless you know wha
 
 <div className={clsx('textBlock', styles.fixedHeight)}>
 
-- Generate a build tree using CMake's CodeLite generator. One way to do it is by using rake task, like so:
-`BUILD_TREE=build/linux-codelite GENERATOR=codelite rake cmake`
+- Generate a build tree using CMake's CodeLite generator. One way to do it is by using rake task, like so: `GENERATOR=codelite rake cmake`
 - Open the "Urho3D.workspace" CodeLite workspace file in the build tree. In the above case, the workspace file can be found in `build/linux-codelite/` directory.
 - **// FIXME: Please submit PR to complete the install steps.**
 
@@ -394,7 +394,14 @@ Do not update the Android Gradle Plugin when being prompted, unless you know wha
 
 <div className={clsx('textBlock', styles.fixedHeight)}>
 
-- **// FIXME: Please submit PR to complete the install steps.**
+- Choose "Open a project or solution" or "Clone a repository" if you haven't clone the Urho3D project yet.
+- After CMake initial build tree is generated, open the "CMake Settings for Urho3D" under the "Project" menu, then in the "CMake variables and cache" section:
+  - Disable the `URHO3D_PCH` build option
+  - Set the `CMAKE_INSTALL_PREFIX` to `%USERPROFILE%\.urho3d\install\win`
+- Save the above changes to allow CMake to reconfigure the build tree.
+- Double click the "Folder View" in the "Solution Explorer", then select the "01_HelloWorld_d.exe" from the "Select Startup Item" drop down list and press "Ctrl+B" to build the sample app. This should build the Urho3D library as well.
+- To run the sample app, press "Ctrl+F5".
+- To install the Urho3D library for later use, run "Install Urho3D" under the "Build" menu.
 
 </div>
 
@@ -410,7 +417,7 @@ Do not update the Android Gradle Plugin when being prompted, unless you know wha
 - Open the "Urho3D.xcodeproj" Xcode project file in the build tree. In the above case, the project file can be found in "build/macos", "build/ios", and "build/tvos", respectively.
 - Select "01_HelloWorld" or any other samples from the list of targets and press "⌘+B" to build the sample app. This should build the Urho3D library as well.
 - To run the sample app, press "⌘+R".
-- **// FIXME: Please submit PR to complete the install steps using staged install.**
+- Select "Install" from the list of targets and press "⌘+B" to actually install the Urho3D library for later use.
 
 </div>
 

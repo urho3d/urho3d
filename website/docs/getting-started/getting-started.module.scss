@@ -2,7 +2,7 @@
 div {
   > div > div > div > div > div, .fixedHeight {
     .dbeInstall + & {
-      min-height: 164px;
+      min-height: 120px;
     }
 
     .dbeBuildUrhoApp + & {
@@ -22,7 +22,7 @@ div {
     }
 
     .ideUrhoApp + & {
-      min-height: 276px;
+      min-height: 302px;
     }
   }
 }
