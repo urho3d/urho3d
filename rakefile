@@ -22,15 +22,15 @@
 
 task default: :build
 
-desc 'Show info for the specified build config and target platform'
+desc 'Show info for the specified target platform'
 task :info, [:kind] => [:init] do |_, args|
   case args[:kind]
   when 'build_tree'
-    puts build_tree
-  when 'urho3d_install_dir'
-    puts urho3d_install_dir
+    print build_tree
+  when 'install_dir'
+    print install_dir
   else
-    abort %q{Please specify the type of info requested: 'build_tree', 'urho3d_install_dir'}
+    abort %q{Please specify the type of info requested: 'build_tree', 'install_dir'}
   end
 end
 
@@ -47,7 +47,7 @@ task :cmake => [:init] do
     if ENV[var] == 'system'
       ENV.delete(var)
     elsif !ENV[var]
-      ENV[var] = urho3d_install_dir if var == 'CMAKE_INSTALL_PREFIX' || Dir.exists?(urho3d_install_dir)
+      ENV[var] = install_dir if var == 'CMAKE_INSTALL_PREFIX' || Dir.exists?(install_dir)
     end
   }
   script = "script/cmake_#{ENV['GENERATOR']}#{ENV['OS'] ? '.bat' : '.sh'}"
@@ -368,12 +368,12 @@ def dockerized?
   File.exists?('/entrypoint.sh')
 end
 
-def lint_err_file
-  'build/clang-tidy.out'
+def install_dir
+  "#{Dir.home}/.urho3d/install/#{default_path}"
 end
 
-def urho3d_install_dir
-  "#{Dir.home}/.urho3d/install/#{default_path}"
+def lint_err_file
+  'build/clang-tidy.out'
 end
 
 def verify_path(path, auto_create = false)

@@ -222,3 +222,33 @@ You can pass optional build options to the build system by using environment var
 <div className={'text--center'}>
   <img src={'/img/docs/quick-start-screencast.svg'} alt={'Screencast'}/>
 </div>
+
+## Dockerized Build Environment
+
+Inside the DBE docker container, you can run a single command. By default, the command to run is `rake`. Since the `rakefile` has defined `build` as the default task, effectively making the DBE defaults to perform the build task for the selected target platform. The DBE docker container automatically exits after the single command finished running. The docker container is ephemeral. To make the build artifacts persistent, they must be stored in a bind mount or a docker volume. With bind mount, DBE makes changes to the project root on the host machine after each run, typically in the `build/` directory. While DBE stores the build caches (from ccache and Gradle) and installed libraries (including Urho3D library), in the docker volume.
+
+Following are a few other examples how the DBE docker container can be run. First, set up `dbe` alias for spawning a DBE docker container for, say, Web platform. You can replace it with other target platform.
+
+```bash
+alias dbe='script/dockerized.sh web'
+```
+
+### `dbe env`
+
+Output the preconfigured environment variables for the target platform and exit.
+
+### `dbe ccache -s`
+
+Output the cache statistics from ccache and exit.
+
+### `dbe rake info['install_dir']`
+
+Output the Urho3D default install location for the target platform and exit.
+
+### `dbe ls $(dbe rake info['install_dir'])`
+
+List the current content of the Urho3D default install location for the target platform and exit.
+
+### `dbe bash`
+
+Run an interactive `bash` shell where you can poke around inside the running docker container, execute any commands, including installing more software packages with `sudo` command for quick testing. Changes that are not in bind mount and docker volume will be lost after you type `exit`.
