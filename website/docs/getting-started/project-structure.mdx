@@ -1,0 +1,71 @@
+---
+sidebar_position: 40
+---
+
+# Project Structure
+
+The UrhoApp project is cross-platform out of the box!
+
+In order to reuse the same build system for Urho3D project to successfully build your own UrhoApp project, the UrhoApp project must be structured similarly to Urho3D project. Assuming you chose to use the `rake new` to create the UrhoApp project, you will have the following project structure under a new app directory:
+
+```
+UrhoApp
+├─ app
+│  ├─ build.gradle.kts
+│  ├─ CMakeLists.txt
+│  ├─ proguard-rules.pro
+│  └─ src
+│     ├─ cpp
+│     │  ├─ UrhoApp.cpp
+│     │  └─ UrhoApp.h
+│     ├─ java
+│     │  └─ io/urho3d/urhoapp
+│     │     └─ MainActivity.kt
+│     ├─ res
+│     |  └─ (truncated)
+│     └─ AndroidManifest.xml
+├─ bin
+│  ├─ CoreData
+│  │  └─ (as in Urho3D)
+│  └─ Data
+│     ├─ Materials
+│     │  └─ Mushroom.xml
+│     ├─ Models
+│     │  └─ Mushroom.mdl
+│     ├─ Music
+│     │  └─ Ninja Gods.ogg
+│     └─ Textures
+│        ├─ Mushroom.dds
+│        ├─ UrhoIcon.icns
+│        └─ UrhoIcon.png
+├─ build.gradle.kts
+├─ cmake
+│  └─ (as in Urho3D)
+├─ CMakeLists.txt
+├─ gradle/wrapper
+│  ├─ gradle-wrapper.jar
+│  └─ gradle-wrapper.properties
+├─ gradle.properties
+├─ gradlew
+├─ gradlew.bat
+├─ rakefile
+├─ scripts
+│  └─ (as in Urho3D)
+├─ settings.gradle.kts
+├─ .clang-format
+├─ .clang-tidy
+├─ .gitattributes
+└─ .gitignore
+```
+
+At the root of the project there are a few build scripts which can be grouped as follows:
+- **CMake** - consist of `CMakeLists.txt` and all the CMake modules and toolchains in the `cmake/` directory.
+- **Gradle** - consist of `build.gradle.kts`, `settings.gradle.kts`, `gradle.properties`, and the Gradle wrapper scripts.
+- **Shell** - consist of convenience *nix bash shell script and Windows batch files in the `script/` directory.
+- **Rake** - one `rakefile` that defines all the common tasks with opinionated default options.
+
+If you are very familiar with CMake then you can directly invoke `cmake`, `ccmake`, or `cmake-gui` to generate a build tree for all the supported platforms, except for Android platform. For the latter case you need to use `gradle`, or via its wrapper script if you don't have Gradle installed globally. For the most cases though, you will probably find it useful to use the convenience shell scripts or to use them as reference for your own convenience scripts. Finally, the `rake` command can be used to execute rake tasks for building the project and more.
+
+All the above are for the build system, the actual meat of the UrhoApp project are only residing in the following two directories:
+- `app/` - mainly contains the C++ source code in `src/cpp/` and Kotlin/Java source code in `src/java/`.
+- `bin/` - contains the assets used by the Urho3D game engine, at the very least it should have `CoreData/` and `Data/`.

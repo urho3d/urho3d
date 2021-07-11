@@ -22,6 +22,18 @@
 
 task default: :build
 
+desc 'Show info for the specified build config and target platform'
+task :info, [:kind] => [:init] do |_, args|
+  case args[:kind]
+  when 'build_tree'
+    puts build_tree
+  when 'urho3d_install_dir'
+    puts urho3d_install_dir
+  else
+    abort %q{Please specify the type of info requested: 'build_tree', 'urho3d_install_dir'}
+  end
+end
+
 desc 'Invoke CMake to configure and generate a build tree'
 task :cmake => [:init] do
   if ENV['CI']
@@ -31,16 +43,13 @@ task :cmake => [:init] do
     end
   end
   next if ENV['PLATFORM'] == 'android' || (Dir.exists?(build_tree) and not ARGV.include?('cmake'))
-  if ENV['CMAKE_INSTALL_PREFIX'] == 'system'
-    ENV.delete('CMAKE_INSTALL_PREFIX')
-  elsif !ENV['CMAKE_INSTALL_PREFIX']
-    ENV['CMAKE_INSTALL_PREFIX'] = urho3d_install_dir
-  end
-  if ENV['URHO3D_HOME'] == 'system'
-    ENV.delete('URHO3D_HOME')
-  elsif !ENV['URHO3D_HOME']
-    ENV['URHO3D_HOME'] = urho3d_install_dir if Dir.exists?(urho3d_install_dir)
-  end
+  ['CMAKE_INSTALL_PREFIX', 'URHO3D_HOME'].each { |var|
+    if ENV[var] == 'system'
+      ENV.delete(var)
+    elsif !ENV[var]
+      ENV[var] = urho3d_install_dir if var == 'CMAKE_INSTALL_PREFIX' || Dir.exists?(urho3d_install_dir)
+    end
+  }
   script = "script/cmake_#{ENV['GENERATOR']}#{ENV['OS'] ? '.bat' : '.sh'}"
   build_options = /linux|macOS|win/ =~ ENV['PLATFORM'] ? '' : "-D #{ENV['PLATFORM'].upcase}=1"
   File.readlines('script/.build-options').each { |var|
@@ -350,7 +359,9 @@ def build_target(tgt, wrapper = '')
 end
 
 def default_path
-  "#{ENV['PLATFORM'].downcase}#{ENV['CC'] ? "-#{ENV['CC']}" : ''}#{ENV['GENERATOR'] ? "-#{ENV['GENERATOR']}" : ''}"
+  "#{ENV['PLATFORM'].downcase}" \
+  "#{ENV['CC'] ? "-#{ENV['CC']}" : ''}" \
+  "#{ENV['GENERATOR'] && ENV['GENERATOR'] != 'generic' ? "-#{ENV['GENERATOR']}" : ''}"
 end
 
 def dockerized?
