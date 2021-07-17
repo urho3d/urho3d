@@ -23,7 +23,10 @@
 ---
 
 name: CI/CD
-on: [ push, pull_request ]
+on:
+  push:
+  pull_request:
+  repository_dispatch: { types: [ build ] }
 jobs:
   init:
     name: Init
@@ -103,36 +106,29 @@ jobs:
         run: rake update_dot_files && script/dockerized.sh ${PLATFORM/-*} env
       - name: CMake
         run: script/dockerized.sh ${PLATFORM/-*} rake cmake
-        if: matrix.platform != 'android' && matrix.platform != 'linux-clang-format'
+        if: matrix.platform != 'android'
       - name: Build
         run: script/dockerized.sh ${PLATFORM/-*} rake build
-        if: matrix.platform != 'linux-clang-format'
       - name: Test
         run: script/dockerized.sh ${PLATFORM/-*} rake test
         if: startsWith(matrix.platform, 'linux') || matrix.platform == 'android'
       - name: Documentation
         run: script/dockerized.sh ${PLATFORM/-*} rake doc
-        if: matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format'
       - name: Scaffolding - install
         run: |
           script/dockerized.sh ${PLATFORM/-*} rake install
           if [[ $PLATFORM == android ]]; then touch build/cache/.gradle/mark; fi
-        if: matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format'
       - name: Scaffolding - new
         run: script/dockerized.sh ${PLATFORM/-*} rake new
-        if: matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format'
       - name: Scaffolding - build
         run: |
           cd build/cache/projects/UrhoApp
           script/dockerized.sh ${PLATFORM/-*}
-        if: matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format'
       - name: Scaffolding - test
         run: |
           cd build/cache/projects/UrhoApp
           script/dockerized.sh ${PLATFORM/-*} rake test
-        if: |
-          matrix.platform == 'android' ||
-          (startsWith(matrix.platform, 'linux') && matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format')
+        if: matrix.platform == 'android' || startsWith(matrix.platform, 'linux')
       - name: Scaffolding - cleanup
         run: |
           if [[ $PLATFORM == android ]]; then
@@ -141,10 +137,9 @@ jobs:
           else
             rm -rf build/cache/{.urho3d,projects}
           fi
-        if: matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format'
       - name: Package
         run: script/dockerized.sh ${PLATFORM/-*} rake package
-        if: github.event_name == 'push' && matrix.platform != 'android' && matrix.platform != 'linux-clang-tidy' && matrix.platform != 'linux-clang-format'
+        if: github.event_name == 'push' && matrix.platform != 'android'
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
@@ -155,7 +150,7 @@ jobs:
             android/urho3d-lib/build/distributions/*.zip
             android/urho3d-lib/build/libs/*.jar
             build/*.out
-        if: (success() && github.event_name == 'push') || (failure() && (matrix.platform == 'linux-clang-tidy' || matrix.platform == 'linux-clang-format'))
+        if: github.event_name == 'push'
         continue-on-error: ${{ !startsWith(github.ref, 'refs/tags/') }}
       - name: Publish
         env:

@@ -171,6 +171,18 @@ end
 
 ### Internal tasks ###
 
+task :check_license do
+  # Automatically bump copyright when crossing a new year
+  if /2008-([0-9]{4}) the Urho3D project/.match(File.read('rakefile'))[1].to_i != Time.now.year
+    system %Q{
+      git config user.name #{ENV['PUBLISHER_NAME']} && \\
+      git config user.email #{ENV['PUBLISHER_EMAIL']} && \\
+      git add #{bump_copyright_year.join ' '} && \\
+      if git commit -qm 'GH Actions: Bump copyright to #{Time.now.year}.'; then git push; fi
+    } or abort "Failed to push copyright update"
+  end
+end
+
 task :ci do
   ENV['URHO3D_PCH'] = '0' if ENV['PLATFORM'] == 'linux-gcc' # TODO - PCH causes cache miss on initial build for Linux/GCC, why?
   platform_modifier = /(.+?)-(.+)/.match(ENV['PLATFORM'])
@@ -259,24 +271,8 @@ task :ci_publish_web do
   } or abort 'Failed to update Web samples'
 end
 
-task :source_checksum do
-  require 'digest'
-  sha256_final = Digest::SHA256.new
-  sha256_iter = Digest::SHA256
-  Dir['Source/**/*.{c,h}*'].each { |it| sha256_final << sha256_iter.file(it).hexdigest }
-  puts "::set-output name=hexdigest::#{sha256_final.hexdigest}"
-end
-
-task :update_dot_files do
-  system 'bash', '-c', %q{
-    perl -ne 'undef $/; print $1 if /(Build Option.*?(?=\n\n))/s' Docs/GettingStarted.dox \
-      |tail -n +3 |cut -d'|' -f2 |tr -d [:blank:] >script/.build-options && \
-    echo URHO3D_LINT >>script/.build-options && \
-    cat script/.build-options <(perl -ne 'while (/([A-Z_]+):.+?/g) {print "$1\n"}' .github/workflows/main.yml) \
-      <(perl -ne 'while (/ENV\[\x27(\w+)\x27\]/g) {print "$1\n"}' rakefile) \
-      <(perl -ne 'while (/System.getenv\\("(\w+)"\\)/g) {print "$1\n"}' android/urho3d-lib/build.gradle.kts) \
-      |sort |uniq |grep -Ev '^(HOME|PATH)$' >script/.env-file
-  } or abort 'Failed to update dot files'
+task :gradle, [:task] do |_, args|
+  system "#{ENV['OS'] ? 'gradlew.bat' : './gradlew'} #{args[:task]} #{ENV['CI'] ? '--console plain' : ''}" or abort
 end
 
 task :init do
@@ -315,10 +311,6 @@ task :init do
   ENV['URHO3D_64BIT'] = ENV['ARCH'] == '32' ? '0' : '1' if /32|64/ =~ ENV['ARCH']
 end
 
-task :gradle, [:task] do |_, args|
-  system "#{ENV['OS'] ? 'gradlew.bat' : './gradlew'} #{args[:task]} #{ENV['CI'] ? '--console plain' : ''}" or abort
-end
-
 task :lint do
   lint_err = File.read(lint_err_file)
   puts lint_err
@@ -337,6 +329,26 @@ task :style do
       && exit ${PIPESTATUS[3]}
   } or abort 'Failed to pass style checks'
   puts 'Passed the style checks'
+end
+
+task :source_checksum do
+  require 'digest'
+  sha256_final = Digest::SHA256.new
+  sha256_iter = Digest::SHA256
+  Dir['Source/**/*.{c,h}*'].each { |it| sha256_final << sha256_iter.file(it).hexdigest }
+  puts "::set-output name=hexdigest::#{sha256_final.hexdigest}"
+end
+
+task :update_dot_files do
+  system 'bash', '-c', %q{
+    perl -ne 'undef $/; print $1 if /(Build Option.*?(?=\n\n))/s' Docs/GettingStarted.dox \
+      |tail -n +3 |cut -d'|' -f2 |tr -d [:blank:] >script/.build-options && \
+    echo URHO3D_LINT >>script/.build-options && \
+    cat script/.build-options <(perl -ne 'while (/([A-Z_]+):.+?/g) {print "$1\n"}' .github/workflows/main.yml) \
+      <(perl -ne 'while (/ENV\[\x27(\w+)\x27\]/g) {print "$1\n"}' rakefile) \
+      <(perl -ne 'while (/System.getenv\\("(\w+)"\\)/g) {print "$1\n"}' android/urho3d-lib/build.gradle.kts) \
+      |sort |uniq |grep -Ev '^(HOME|PATH)$' >script/.env-file
+  } or abort 'Failed to update dot files'
 end
 
 
@@ -816,6 +828,18 @@ Thumbs.db
   EOF
 end
 
+def bump_copyright_year(regex = '2008-[0-9]{4} the Urho3D project')
+  begin
+    copyrighted = `git grep -El '#{regex}'`.split
+    copyrighted.each { |filename|
+      replaced_content = File.read(filename).gsub(/#{regex}/, regex.gsub('[0-9]{4}', Time.now.year.to_s))
+      File.open(filename, 'w') { |file| file.puts replaced_content }
+    }
+    return copyrighted
+  rescue
+    abort 'Failed to bump copyright year'
+  end
+end
 
 # Load custom rake scripts
 Dir['.rake/*.rake'].each { |r| load r }
