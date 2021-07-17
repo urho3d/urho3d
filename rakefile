@@ -180,7 +180,11 @@ task :check_license do
       git add #{bump_copyright_year.join ' '} && \\
       if git commit -qm 'GH Actions: Bump copyright to #{Time.now.year}.'; then git push; fi
     } or abort "Failed to push copyright update"
+    dispatch = 0
+  else
+    dispatch = 1
   end
+  puts "::set-output name=dispatch::#{dispatch}"
 end
 
 task :ci do

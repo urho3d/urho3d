@@ -35,6 +35,9 @@ jobs:
         uses: actions/checkout@v2
       - name: Check license
         id: check_license
+        env:
+          PUBLISHER_NAME: ${{ secrets.PUBLISHER_NAME }}
+          PUBLISHER_EMAIL: ${{ secrets.PUBLISHER_EMAIL }}
         run: rake check_license
       - name: Dispatch
         uses: peter-evans/repository-dispatch@v1.1.3
