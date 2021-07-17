@@ -724,12 +724,9 @@ def urho_app_cpp(name)
   <<-EOF
 #include "#{name}.h"
 
-URHO3D_DEFINE_APPLICATION_MAIN(#{name});
+URHO3D_DEFINE_APPLICATION_MAIN(#{name})
 
-#{name}::#{name}(Context* context)
-    : Application(context)
-{
-}
+#{name}::#{name}(Context* context) : Application(context) {}
 
 void #{name}::Start()
 {

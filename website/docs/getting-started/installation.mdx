@@ -289,7 +289,7 @@ set "PLATFORM=web" && rake build install
 # When compiling natively using VS, "PLATFORM=win" is the default on Windows
 rake build install
 
-# When compiling natively using MinGW-w64, always install to system-wide location with potential clash
+# When compiling natively using MinGW-w64
 set "GENERATOR=mingw" && rake build install
 
 # When cross-compiling on Linux host machine, substitute '?' accordingly
@@ -338,6 +338,12 @@ Do not update the Android Gradle Plugin when being prompted, unless you know wha
   <TabItem value={'clion'}>
 
 <div className={clsx('textBlock', styles.fixedHeight)}>
+
+:::caution
+
+Disable the Gradle plugin and Gradle Native plugin as they may interfere and prevent proper project setup.
+
+:::
 
 - Choose "Open" or "Get from VCS" if you haven't cloned the Urho3D project yet.
 - In the "Open Project Wizard" or in the "CMake Settings", set the `CMAKE_INSTALL_PREFIX` accordingly in the "CMake options" field, e.g.:

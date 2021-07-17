@@ -235,20 +235,34 @@ alias dbe='script/dockerized.sh web'
 
 ### `dbe env`
 
-Output the preconfigured environment variables for the target platform and exit.
+Output the preconfigured environment variables for the target platform.
 
 ### `dbe ccache -s`
 
-Output the cache statistics from ccache and exit.
+Output the configuration and statistics from ccache.
 
 ### `dbe rake info['install_dir']`
 
-Output the Urho3D default install location for the target platform and exit.
+Output the Urho3D default install location for the target platform.
 
 ### `dbe ls $(dbe rake info['install_dir'])`
 
-List the current content of the Urho3D default install location for the target platform and exit.
+List the current content of the Urho3D default install location for the target platform.
 
 ### `dbe bash`
 
 Run an interactive `bash` shell where you can poke around inside the running docker container, execute any commands, including installing more software packages with `sudo` command for quick testing. Changes that are not in bind mount and docker volume will be lost after you type `exit`.
+
+## Build Artifacts
+
+The build artifacts from DBE can be found in the usual location as the conventional (non-dockerized) build environment. In fact the build artifacts from DBE should function and work as if they are built using the conventional way too. With the exception for Android platform, the build artifacts can be found in the build tree under the `bin/` directory.
+
+```bash
+ls $(dbe rake info['build_tree'])/bin
+```
+
+The build artifacts for Android platform in the AAR or in the APK format can be found in the `build/outputs/aar/` or `build/outputs/apk/` directory, respectively, relative to the Android library or Android app module.
+
+## Don't have docker engine?
+
+Fret not. The next section describes how to prepare the build environment the conventional way for each target platform.
