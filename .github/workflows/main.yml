@@ -114,7 +114,7 @@ jobs:
         if: startsWith(matrix.platform, 'linux') || matrix.platform == 'android'
       - name: Documentation
         run: script/dockerized.sh ${PLATFORM/-*} rake doc
-      - name: Scaffolding - install
+      - name: Install
         run: |
           script/dockerized.sh ${PLATFORM/-*} rake install
           if [[ $PLATFORM == android ]]; then touch build/cache/.gradle/mark; fi
@@ -203,7 +203,7 @@ jobs:
         if: matrix.platform == 'macOS'
       - name: Documentation
         run: rake doc
-      - name: Scaffolding - install
+      - name: Install
         run: rake install
       - name: Scaffolding - new
         run: rake new
@@ -271,7 +271,7 @@ jobs:
       - name: Documentation
         run: rake doc
         if: steps.install_dependencies.outcome == 'success'
-      - name: Scaffolding - install
+      - name: Install
         run: rake install
       - name: Scaffolding - new
         run: rake new

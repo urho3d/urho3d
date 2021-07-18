@@ -384,10 +384,23 @@ def build_target(tgt, wrapper = '')
   %Q{#{wrapper} cmake --build "#{build_tree}" #{build_config} #{tgt ? "--target #{tgt}" : ''}}
 end
 
+def bump_copyright_year(regex = '2008-[0-9]{4} the Urho3D project')
+  begin
+    copyrighted = `git grep -El '#{regex}'`.split
+    copyrighted.each { |filename|
+      replaced_content = File.read(filename).gsub(/#{regex}/, regex.gsub('[0-9]{4}', Time.now.year.to_s))
+      File.open(filename, 'w') { |file| file.puts replaced_content }
+    }
+    return copyrighted
+  rescue
+    abort 'Failed to bump copyright year'
+  end
+end
+
 def default_path
   "#{ENV['PLATFORM'].downcase}" \
   "#{ENV['CC'] ? "-#{ENV['CC']}" : ''}" \
-  "#{ENV['GENERATOR'] && ENV['GENERATOR'] != 'generic' ? "-#{ENV['GENERATOR']}" : ''}"
+  "#{ENV['GENERATOR'] && /generic|xcode|vs/ =~ ENV['GENERATOR'] ? '' : "-#{ENV['GENERATOR']}"}"
 end
 
 def dockerized?
@@ -842,18 +855,6 @@ Thumbs.db
   EOF
 end
 
-def bump_copyright_year(regex = '2008-[0-9]{4} the Urho3D project')
-  begin
-    copyrighted = `git grep -El '#{regex}'`.split
-    copyrighted.each { |filename|
-      replaced_content = File.read(filename).gsub(/#{regex}/, regex.gsub('[0-9]{4}', Time.now.year.to_s))
-      File.open(filename, 'w') { |file| file.puts replaced_content }
-    }
-    return copyrighted
-  rescue
-    abort 'Failed to bump copyright year'
-  end
-end
 
 # Load custom rake scripts
 Dir['.rake/*.rake'].each { |r| load r }
