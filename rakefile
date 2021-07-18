@@ -38,7 +38,7 @@ desc 'Invoke CMake to configure and generate a build tree'
 task :cmake => [:init] do
   if ENV['CI']
     system 'cmake --version' or abort 'Failed to find CMake'
-    if ENV['USE_CCACHE'] && /\[cache clear\]/ =~ `git log --format=%B -n1 2>/dev/null`
+    if ENV['USE_CCACHE'] && ENV['GITHUB_EVENT_NAME'] != 'repository_dispatch' && /\[cache clear\]/ =~ `git log --format=%B -n1 2>/dev/null`
       system 'bash', '-c', 'rm -rf ~/.{ccache,gradle}' or abort 'Failed to clear the build cache'
     end
   end
@@ -172,19 +172,19 @@ end
 ### Internal tasks ###
 
 task :check_license do
+  commit = 0
   # Automatically bump copyright when crossing a new year
   if /2008-([0-9]{4}) the Urho3D project/.match(File.read('rakefile'))[1].to_i != Time.now.year
     system %Q{
       git config user.name #{ENV['PUBLISHER_NAME']} && \\
       git config user.email #{ENV['PUBLISHER_EMAIL']} && \\
       git add #{bump_copyright_year.join ' '} && \\
-      if git commit -qm 'GH Actions: Bump copyright to #{Time.now.year}.\n[cache clear]'; then git push; fi
-    } or abort "Failed to push copyright update"
-    dispatch = 0
-  else
-    dispatch = 1
+      git commit -qm 'GH Actions: Bump copyright year to #{Time.now.year}.\n[cache clear]'
+    } or abort "Failed to commit copyright year update"
+    commit = 1
   end
-  puts "::set-output name=dispatch::#{dispatch}"
+  # TODO: Check and merge any new 3rd-party license into 'Source/ThirdParty/LICENSES'
+  puts "::set-output name=commit::#{commit}"
 end
 
 task :ci do
@@ -353,6 +353,16 @@ task :update_dot_files do
       <(perl -ne 'while (/System.getenv\\("(\w+)"\\)/g) {print "$1\n"}' android/urho3d-lib/build.gradle.kts) \
       |sort |uniq |grep -Ev '^(HOME|PATH)$' >script/.env-file
   } or abort 'Failed to update dot files'
+  if /schedule|workflow_dispatch/ =~ ENV['GITHUB_EVENT_NAME']
+    system %Q{
+      git config user.name #{ENV['PUBLISHER_NAME']} && \\
+      git config user.email #{ENV['PUBLISHER_EMAIL']} && \\
+      git add script/.build-options script/.env-file && \\
+      commit=0 && \\
+      if git commit -qm 'GH Actions: Update dot files for DBE'; then commit=1; fi && \\
+      echo ::set-output name=commit::$commit
+    } or abort "Failed to commit dot files update"
+  end
 end
 
 

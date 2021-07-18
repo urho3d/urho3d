@@ -30,24 +30,35 @@ jobs:
   nightly:
     name: Nightly build
     runs-on: ubuntu-latest
+    env:
+      PUBLISHER_NAME: ${{ secrets.PUBLISHER_NAME }}
+      PUBLISHER_EMAIL: ${{ secrets.PUBLISHER_EMAIL }}
+      PUBLISHER_TOKEN: ${{ secrets.PUBLISHER_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          token: ${{ secrets.PUBLISHER_TOKEN }}
+          token: ${{ env.PUBLISHER_TOKEN }}
       - name: Check license
         id: check_license
-        env:
-          PUBLISHER_NAME: ${{ secrets.PUBLISHER_NAME }}
-          PUBLISHER_EMAIL: ${{ secrets.PUBLISHER_EMAIL }}
         run: rake check_license
+      - name: Update dot files for DBE
+        id: update_dot_files
+        run: rake update_dot_files
+      - name: Push
+        run: git push
+        if: |
+          steps.check_license.outputs.commit == '1' ||
+          steps.update_dot_files.outputs.commit == '1'
       - name: Dispatch
         uses: peter-evans/repository-dispatch@v1.1.3
         with:
-          token: ${{ secrets.PUBLISHER_TOKEN }}
+          token: ${{ env.PUBLISHER_TOKEN }}
           repository: urho3d/Urho3D
           event-type: build
-        if: steps.check_license.outputs.dispatch == '1'
+        if: |
+          steps.check_license.outputs.commit == '0' &&
+          steps.update_dot_files.outputs.commit == '0'
 
 ...
 
