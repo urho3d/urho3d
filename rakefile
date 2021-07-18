@@ -359,7 +359,7 @@ task :update_dot_files do
       git config user.email #{ENV['PUBLISHER_EMAIL']} && \\
       git add script/.build-options script/.env-file && \\
       commit=0 && \\
-      if git commit -qm 'GH Actions: Update dot files for DBE'; then commit=1; fi && \\
+      if git commit -qm 'GH Actions: Update dot files for DBE.'; then commit=1; fi && \\
       echo ::set-output name=commit::$commit
     } or abort "Failed to commit dot files update"
   end
