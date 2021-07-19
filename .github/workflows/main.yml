@@ -26,7 +26,7 @@ name: CI/CD
 on:
   push:
   pull_request:
-  repository_dispatch: { types: [ build ] }
+  repository_dispatch: { types: [ 'Warm DBE build cache' ] }
 jobs:
   init:
     name: Init
@@ -170,7 +170,7 @@ jobs:
     name: 🍏
     runs-on: macos-latest
     needs: init
-    if: needs.init.outputs.skip == '0'
+    if: needs.init.outputs.skip == '0' && github.event_name != 'repository_dispatch'
     strategy:
       fail-fast: false
       matrix:
@@ -231,7 +231,7 @@ jobs:
     name: 🔲
     runs-on: windows-latest
     needs: init
-    if: needs.init.outputs.skip == '0'
+    if: needs.init.outputs.skip == '0' && github.event_name != 'repository_dispatch'
     strategy:
       fail-fast: false
       matrix:

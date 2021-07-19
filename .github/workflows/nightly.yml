@@ -55,7 +55,7 @@ jobs:
         with:
           token: ${{ env.PUBLISHER_TOKEN }}
           repository: urho3d/Urho3D
-          event-type: build
+          event-type: 'Warm DBE build cache'
         if: |
           steps.update_dot_files.outputs.commit == '0' &&
           steps.check_license.outputs.commit == '0'
