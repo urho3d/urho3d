@@ -45,6 +45,16 @@ jobs:
       - name: Check license
         id: check_license
         run: rake check_license
+      - name: Check cache
+        id: check_cache
+        run: |
+          last_run=$(date -d $(curl -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/urho3d/Urho3D/actions/workflows/2398550/runs 2>/dev/null |jq -r '.workflow_runs[0].created_at') '+%s')
+          now=$(date '+%s')
+          skip=$(( (now - last_run)/(60*60*24) < 7 ))
+          echo ::set-output name=skip::$skip
+        if: |
+          steps.update_dot_files.outputs.commit == '0' &&
+          steps.check_license.outputs.commit == '0'
       - name: Push
         run: git push
         if: |
@@ -56,9 +66,7 @@ jobs:
           token: ${{ env.PUBLISHER_TOKEN }}
           repository: urho3d/Urho3D
           event-type: 'Warm DBE build cache'
-        if: |
-          steps.update_dot_files.outputs.commit == '0' &&
-          steps.check_license.outputs.commit == '0'
+        if: steps.check_cache.outputs.skip == '0'
 
 ...
 
