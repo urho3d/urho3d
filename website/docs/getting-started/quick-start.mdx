@@ -27,13 +27,8 @@ Both `docker` and `podman` are supported.
 
 :::caution
 
-Windows host system requires WSL2.
-
-:::
-
-:::caution
-
-Android platform requires 16GB of RAM on the host system.
+- Windows host system requires WSL2.
+- Android platform requires 16 GB of RAM on the host system.
 
 :::
 
@@ -233,31 +228,57 @@ You can pass optional build options to the build system by using environment var
 
 Inside the DBE docker container, you can run a single command. By default, the command to run is `rake`. Since the `rakefile` has defined `build` as the default task, effectively making the DBE defaults to perform the build task for the selected target platform. The DBE docker container automatically exits after the single command finished running. The docker container is ephemeral. To make the build artifacts persistent, they must be stored in a bind mount or a docker volume. With bind mount, DBE makes changes to the project root on the host machine after each run, typically in the `build/` directory. While DBE stores the build caches (from ccache and Gradle) and installed libraries (including Urho3D library), in the docker volume.
 
+### Command Examples
+
 Following are a few other examples how the DBE docker container can be run. First, set up `dbe` alias for spawning a DBE docker container for, say, Web platform. You can replace it with other target platform.
 
 ```bash
 alias dbe='script/dockerized.sh web'
 ```
 
-### `dbe env`
+#### `dbe env`
 
 Output the preconfigured environment variables for the target platform.
 
-### `dbe ccache -s`
-
-Output the configuration and statistics from ccache.
-
-### `dbe rake info['install_dir']`
+#### `dbe rake info['install_dir']`
 
 Output the Urho3D default install location for the target platform.
 
-### `dbe ls $(dbe rake info['install_dir'])`
+#### `dbe ls $(dbe rake info['install_dir'])`
 
 List the current content of the Urho3D default install location for the target platform.
 
-### `dbe bash`
+#### `dbe ccache -Cz`
+
+Clear the build cache and zero out the accumulated statistics from ccache.
+
+#### `dbe clean build`
+
+Perform a clean build.
+
+#### `dbe bash`
 
 Run an interactive `bash` shell where you can poke around inside the running docker container, execute any commands, including installing more software packages with `sudo` command for quick testing. Changes that are not in bind mount and docker volume will be lost after you type `exit`.
+
+### Image Tags
+
+When the requested platform docker image has not been downloaded yet, the `script/dockerized.sh` automatically downloads the docker image from one of the Urho3D official Docker Hub repositories. It also attempts to download a matching docker image tag based on the current Git branch or tag of the local source code repository, defaulted to `master` tag if the detection mechanism failed. This behaviour can be overridden by setting the `DBE_TAG` environment variable to specify a docker image tag that you want to use explicitly. At the moment there are only `1.8-ALPHA`, `master` or `latest` tag to choose from though. The `master` tag should always work with the current main branch of the Urho3D project on GitHub, while the `latest` tag should only be used with future experimental or development branch of Urho3D project. The latter would contain build environment with updated OS version, or compiler toolchain version, etc, that may break the current main branch.
+
+```bash
+DBE_TAG=latest dbe
+```
+
+Note that both the `master` and `latest` tags are actually *rolling tag*. The tag can be updated to point to a newer docker image that meets the stipulated condition above. Depending on your own use case, this may or may not be desirable. If you don't track the Urho3D main branch frequently then all is good. The downloaded docker image can still be used even when it has been superseded globally. However, when you track the Urho3D main branch frequently then you may also need to refresh the local DBE image from time to time or whenever you encountered build failure after a `git pull` command. To refresh the docker image, simply set `DBE_REFRESH=1` when running the DBE command.
+
+```bash
+DBE_REFRESH=1 dbe
+```
+
+:::tip
+
+Before refreshing, you can actually use `podman` or `docker` to retag the already downloaded docker image to be another custom tag. This way you have an option to revert to it when something goes wrong with the newly downloaded DBE image.
+
+:::
 
 ## Build Artifacts
 
