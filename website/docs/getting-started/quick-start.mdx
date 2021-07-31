@@ -31,6 +31,12 @@ Windows host system requires WSL2.
 
 :::
 
+:::caution
+
+Android platform requires 16GB of RAM on the host system.
+
+:::
+
 ## Install Urho3D Library with DBE
 
 Clone the Urho3D project from the main branch, change directory to its project root, and execute the following commands to install the library for your desired target platform. Except for Android platform, which uses `~/.m2/repository/`, the default install location is: <code>~/.urho3d/install/<em>&lt;platform&gt;</em>/</code>. The "~" here refers to home directory mounted from a docker volume and as such it is persistent in between docker runs.

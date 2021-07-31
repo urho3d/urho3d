@@ -22,6 +22,7 @@
 #
 
 if [[ $# -eq 0 ]]; then echo "Usage: dockerized.sh linux|mingw|android|rpi|arm|web [command]"; exit 1; fi
+if [[ $(id -u) -eq 0 ]]; then echo "Should not run using sudo or root user"; exit 1; fi
 
 PROJECT_DIR=$(cd "${0%/*}/.." || exit 1; pwd)
 
