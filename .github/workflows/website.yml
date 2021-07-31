@@ -44,7 +44,7 @@ jobs:
           token: ${{ secrets.DISPATCHER_TOKEN }}
           repository: weitjong/urho3d-website
           event-type: build
-          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "message": "${{ github.event.head_commit.message }}"}'
+          client-payload: '{"sha": "${{ github.sha }}"}'
         if: steps.whatchanged.outputs.skip == '0'
 
 ...
