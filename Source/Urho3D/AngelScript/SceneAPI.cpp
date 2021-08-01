@@ -74,7 +74,7 @@ static CScriptArray* GetObjectAttributeInfos(const String& objectType)
 {
     const Vector<AttributeInfo>* attributes = GetScriptContext()->GetAttributes(Urho3D::StringHash(objectType));
     static Vector<AttributeInfo> emptyAttributes;
-    return VectorToArray<AttributeInfo>(attributes ? *attributes : emptyAttributes, "Array<AttributeInfo>");
+    return NotPODVectorToArray<AttributeInfo>(attributes ? *attributes : emptyAttributes, "Array<AttributeInfo>");
 }
 
 static void RegisterScene(asIScriptEngine* engine)

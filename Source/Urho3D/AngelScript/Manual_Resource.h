@@ -114,7 +114,7 @@ template <class T> bool XMLElement_SetVariantVector(CScriptArray* value, T* ptr)
 // VariantVector XMLElement::GetVariantVector() const | File: ../Resource/XMLElement.h
 template <class T> CScriptArray* XMLElement_GetVariantVector(T* ptr)
 {
-    return VectorToArray<Variant>(ptr->GetVariantVector(), "Array<Variant>");
+    return NotPODVectorToArray<Variant>(ptr->GetVariantVector(), "Array<Variant>");
 }
 
 #define REGISTER_MEMBERS_MANUAL_PART_XMLElement() \

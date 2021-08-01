@@ -66,7 +66,7 @@ static CScriptArray* DbResultGetRow(unsigned index, DbResult* ptr)
         return nullptr;
     }
     else
-        return VectorToArray<Variant>(rows[index], "Array<Variant>");
+        return NotPODVectorToArray<Variant>(rows[index], "Array<Variant>");
 }
 
 static void RegisterDbResult(asIScriptEngine* engine)

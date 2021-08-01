@@ -24,11 +24,12 @@
 
 #include "../Container/VectorBase.h"
 
+#include <algorithm>
 #include <cassert>
 #include <cstring>
-#include <algorithm>
 #include <initializer_list>
 #include <new>
+#include <type_traits>
 #include <utility>
 
 #ifdef _MSC_VER
@@ -684,6 +685,8 @@ private:
 /// %Vector template class for POD types. Does not call constructors or destructors and uses block move. Is intentionally (for performance reasons) unsafe for self-insertion.
 template <class T> class PODVector : public VectorBase
 {
+    static_assert(std::is_standard_layout<T>::value, "T must be standard layout type");
+
 public:
     using ValueType = T;
     using Iterator = RandomAccessIterator<T>;

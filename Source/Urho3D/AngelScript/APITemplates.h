@@ -95,6 +95,24 @@ template <class T> CScriptArray* VectorToArray(const PODVector<T>& vector, const
         return nullptr;
 }
 
+/// I don't know why in some cases compilers confuses Vector and PODVector and use incorrect overloading
+template <class T> CScriptArray* NotPODVectorToArray(const Vector<T>& vector, const char* arrayName)
+{
+    Context* context = GetScriptContext();
+    if (context)
+    {
+        asITypeInfo* type = context->GetSubsystem<Script>()->GetObjectType(arrayName);
+        CScriptArray* arr = CScriptArray::Create(type, vector.Size());
+
+        for (unsigned i = 0; i < arr->GetSize(); ++i)
+            *(static_cast<T*>(arr->At(i))) = vector[i];
+
+        return arr;
+    }
+    else
+        return nullptr;
+}
+
 /// Template function for data buffer to array conversion.
 template <class T> CScriptArray* BufferToArray(const T* buffer, unsigned size, const char* arrayName)
 {

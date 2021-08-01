@@ -86,7 +86,7 @@ static CScriptArray* VariantMap_GetKeys(const VariantMap& map)
 // Vector<U> HashMap::Values() const | File: ../Container/HashMap.h
 static CScriptArray* VariantMap_GetValues(const VariantMap& map)
 {
-    return VectorToArray<Variant>(map.Values(), "Array<Variant>");
+    return NotPODVectorToArray<Variant>(map.Values(), "Array<Variant>");
 }
 
 static void RegisterVariantMap(asIScriptEngine* engine)
@@ -293,7 +293,7 @@ static bool Variant_OperatorEquals_StringVector(CScriptArray* value, Variant* pt
 // const VariantVector& Variant::GetVariantVector() const | File: ../Core/Variant.h
 static CScriptArray* Variant_GetVariantVector(Variant* ptr)
 {
-    return VectorToArray<Variant>(ptr->GetVariantVector(), "Array<Variant>");
+    return NotPODVectorToArray<Variant>(ptr->GetVariantVector(), "Array<Variant>");
 }
 
 static void RegisterVariant(asIScriptEngine* engine)
