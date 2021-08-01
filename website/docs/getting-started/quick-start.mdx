@@ -27,8 +27,8 @@ Both `docker` and `podman` are supported.
 
 :::caution
 
-- Windows host system requires WSL2.
 - Android platform requires 16 GB of RAM on the host system.
+- Windows host system requires WSL2.
 
 :::
 
@@ -252,7 +252,7 @@ List the current content of the Urho3D default install location for the target p
 
 Clear the build cache and zero out the accumulated statistics from ccache.
 
-#### `dbe clean build`
+#### `dbe rake clean build`
 
 Perform a clean build.
 
@@ -262,13 +262,13 @@ Run an interactive `bash` shell where you can poke around inside the running doc
 
 ### Image Tags
 
-When the requested platform docker image has not been downloaded yet, the `script/dockerized.sh` automatically downloads the docker image from one of the Urho3D official Docker Hub repositories. It also attempts to download a matching docker image tag based on the current Git branch or tag of the local source code repository, defaulted to `master` tag if the detection mechanism failed. This behaviour can be overridden by setting the `DBE_TAG` environment variable to specify a docker image tag that you want to use explicitly. At the moment there are only `1.8-ALPHA`, `master` or `latest` tag to choose from though. The `master` tag should always work with the current main branch of the Urho3D project on GitHub, while the `latest` tag should only be used with future experimental or development branch of Urho3D project. The latter would contain build environment with updated OS version, or compiler toolchain version, etc, that may break the current main branch.
+When the requested platform docker image has not been downloaded yet, the `script/dockerized.sh` automatically downloads the docker image from one of the **Urho3D official Docker Hub repositories**. It also attempts to download a matching docker image tag based on the current Git tag of the local source code repository, defaulted to use `master` tag if the detection mechanism failed. This behaviour can be overridden by setting the `DBE_TAG` environment variable to specify a docker image tag that you want to use explicitly. There are `master` and `latest` tag to choose from. More tags will be added as Urho3D project releases new version. The `master` tag should always work with the current main branch of the Urho3D project on GitHub, while the `latest` tag should only be used with future experimental or development branch of Urho3D project. The latter would contain build environment with updated OS version, or compiler toolchain version, etc, that may break the current main branch. To use the `latest` docker image tag, simply set it like so:
 
 ```bash
 DBE_TAG=latest dbe
 ```
 
-Note that both the `master` and `latest` tags are actually *rolling tag*. The tag can be updated to point to a newer docker image that meets the stipulated condition above. Depending on your own use case, this may or may not be desirable. If you don't track the Urho3D main branch frequently then all is good. The downloaded docker image can still be used even when it has been superseded globally. However, when you track the Urho3D main branch frequently then you may also need to refresh the local DBE image from time to time or whenever you encountered build failure after a `git pull` command. To refresh the docker image, simply set `DBE_REFRESH=1` when running the DBE command.
+Note that both the `master` and `latest` tags are actually *rolling tag*. The tag can be updated to point to a newer docker image that meets the stipulated condition above. Depending on your own use case, this may or may not be desirable. If you don't track the Urho3D main branch frequently then all is good. The downloaded docker image can still be used locally even when it has been superseded globally. However, when you track the Urho3D main branch frequently then you may also need to refresh the local DBE image from time to time or whenever you encountered build failure after a `git pull` command. To refresh the docker image, simply set `DBE_REFRESH=1` as below:
 
 ```bash
 DBE_REFRESH=1 dbe
@@ -276,7 +276,7 @@ DBE_REFRESH=1 dbe
 
 :::tip
 
-Before refreshing, you can actually use `podman` or `docker` to retag the already downloaded docker image to be another custom tag. This way you have an option to revert to it when something goes wrong with the newly downloaded DBE image.
+Before refreshing, you can actually use `docker` or `podman` to retag the already downloaded docker image to be another custom tag. This way you have an option to revert to it when something goes wrong with the newly downloaded DBE image. The `DBE_TAG` environment variable works with custom tag too.
 
 :::
 
@@ -292,4 +292,4 @@ The build artifacts for Android platform in the AAR or in the APK format can be 
 
 ## Don't have docker engine?
 
-Fret not. The next section describes how to prepare the build environment the conventional way for each target platform.
+Fret not! The next section describes how to prepare the build environment the conventional way for each target platform.
