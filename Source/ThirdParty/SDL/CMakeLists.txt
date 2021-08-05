@@ -482,6 +482,9 @@ if(USE_GCC OR USE_CLANG)
   if(HAVE_NO_UNDEFINED)
     list(APPEND EXTRA_LDFLAGS "-Wl,--no-undefined")
   endif()
+
+  # Urho3D - Wayland quick fix
+  list(APPEND EXTRA_CFLAGS "-fcommon")
 endif()
 
 if(ASSEMBLY)
