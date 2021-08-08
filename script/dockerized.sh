@@ -24,6 +24,7 @@
 if [[ $# -eq 0 ]]; then echo "Usage: dockerized.sh linux|mingw|android|rpi|arm|web [command]"; exit 1; fi
 if [[ $(id -u) -eq 0 ]]; then echo "Should not run using sudo or root user"; exit 1; fi
 
+SCRIPT_DIR=$(cd "${0%/*}" || exit 1; pwd)
 PROJECT_DIR=$(cd "${0%/*}/.." || exit 1; pwd)
 
 # Determine which tool is available to use
@@ -81,7 +82,7 @@ if [[ $use_podman ]] || ( [[ $(d version -f '{{.Client.Version}}') =~ ^([0-9]+)\
     # podman or newer Docker client
     d run $interactive -t --rm -h fishtank $run_option \
         -e HOST_UID="$(id -u)" -e HOST_GID="$(id -g)" -e PROJECT_DIR="$PROJECT_DIR" \
-        --env-file "$PROJECT_DIR/script/.env-file" \
+        --env-file "$SCRIPT_DIR/.env-file" \
         --mount type=bind,source="$PROJECT_DIR",target="$PROJECT_DIR" \
         $mount_home_dir \
         $dbe_image "$@"
@@ -89,7 +90,7 @@ else
     # Fallback workaround on older Docker CLI version
     d run $interactive -t --rm -h fishtank \
         -e HOST_UID="$(id -u)" -e HOST_GID="$(id -g)" -e PROJECT_DIR="$PROJECT_DIR" \
-        --env-file <(perl -ne 'chomp; print "$_\n" if defined $ENV{$_}' "$PROJECT_DIR/script/.env-file") \
+        --env-file <(perl -ne 'chomp; print "$_\n" if defined $ENV{$_}' "$SCRIPT_DIR/.env-file") \
         --mount type=bind,source="$PROJECT_DIR",target="$PROJECT_DIR" \
         $mount_home_dir \
         $dbe_image "$@"
