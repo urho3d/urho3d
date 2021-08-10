@@ -91,8 +91,8 @@ script/dockerized.sh linux rake build install
 ```bash
 git clone https://github.com/urho3d/Urho3D.git
 cd Urho3D
-# Install Urho3D library to a default install location, modify the "RPI_ABI" build option accordingly
-RPI_ABI=RPI4 script/dockerized.sh rpi rake build install
+# Install Urho3D library to a default install location, use the 32-bit compiler toolchain
+ARCH=32 script/dockerized.sh rpi rake build install
 ```
 
   </TabItem>
@@ -183,8 +183,8 @@ script/dockerized.sh linux
 # Create a new UrhoApp
 script/dockerized.sh rpi rake new[PiUrhoApp,demo]
 cd demo/PiUrhoApp
-# Build the newly generated UrhoApp, modify the "RPI_ABI" build option accordingly
-RPI_ABI=RPI4 script/dockerized.sh rpi
+# Build the newly generated UrhoApp, use the 32-bit compiler toolchain
+ARCH=32 script/dockerized.sh rpi
 ```
 
   </TabItem>
@@ -218,7 +218,7 @@ This is not a copy/paste error. You can build your new UrhoApp exactly the same 
 
 :::
 
-You can pass optional build options to the build system by using environment variables. One easy way to do that is to set them just in time on the same line before the actual command to be invoked. For example, `RPI_ABI=RPI4 script/dockerized.sh rpi`. See the Build Options section for more information.
+Below is a sample screencast using DBE for Android platform.
 
 <div className={'text--center'}>
   <img src={'/img/docs/quick-start-screencast.svg'} alt={'Screencast'}/>
@@ -289,6 +289,12 @@ ls $(dbe rake info['build_tree'])/bin
 ```
 
 The build artifacts for Android platform in the AAR or in the APK format can be found in the `build/outputs/aar/` or `build/outputs/apk/` directory, respectively, relative to the Android library or Android app module.
+
+## Build Environment Variables
+
+You can pass Urho3D build options to the build system by using environment variables. One easy way to do that is to set them just in time on the same line before the actual command to be invoked. For example, `ARM_ABI_FLAGS='-mcpu=cortex-a53' script/dockerized.sh arm`. See the Urho3D Build Options section for all available build options.
+
+On top of that, DBE also recognizes `ARCH` environment variable to select between 32-bit and 64-bit (default) compiler toolchain. This is applicable to Arm, Linux, RPI, and Windows platforms. For example, use `ARCH=32 script/dockerized.sh rpi` to target 32-bit RPI platform.
 
 ## Don't have docker engine?
 
