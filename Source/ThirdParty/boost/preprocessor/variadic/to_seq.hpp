@@ -18,6 +18,8 @@
 #
 # /* BOOST_PP_VARIADIC_TO_SEQ */
 #
-# define BOOST_PP_VARIADIC_TO_SEQ(...) BOOST_PP_TUPLE_TO_SEQ((__VA_ARGS__))
+# if BOOST_PP_VARIADICS
+#    define BOOST_PP_VARIADIC_TO_SEQ(...) BOOST_PP_TUPLE_TO_SEQ((__VA_ARGS__))
+# endif
 #
 # endif
