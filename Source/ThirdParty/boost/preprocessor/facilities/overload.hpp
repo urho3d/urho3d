@@ -18,6 +18,8 @@
 #
 # /* BOOST_PP_OVERLOAD */
 #
-# define BOOST_PP_OVERLOAD(prefix, ...) BOOST_PP_CAT(prefix, BOOST_PP_VARIADIC_SIZE(__VA_ARGS__))
+# if BOOST_PP_VARIADICS
+#    define BOOST_PP_OVERLOAD(prefix, ...) BOOST_PP_CAT(prefix, BOOST_PP_VARIADIC_SIZE(__VA_ARGS__))
+# endif
 #
 # endif
