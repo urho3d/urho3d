@@ -1619,6 +1619,8 @@ void Connection::OnPackagesReady()
 
         if (extension == ".xml")
             success = scene_->LoadAsyncXML(file);
+        else if (extension == ".json")
+            success = scene_->LoadAsyncJSON(file);
         else
             success = scene_->LoadAsync(file);
 
