@@ -30,7 +30,7 @@ namespace Urho3D
 {
 
 // virtual unsigned Deserializer::Read(void* dest, unsigned size) = 0 | File: ../IO/Deserializer.h
-template <class T> CScriptArray* Deserializer_Read(unsigned size, Deserializer* ptr)
+template <class T> CScriptArray* Deserializer_Read(unsigned size, T* ptr)
 {
     PODVector<unsigned char> vector(size);
     unsigned bytesRead = size ? ptr->Read(&vector[0], size) : 0;
@@ -39,7 +39,7 @@ template <class T> CScriptArray* Deserializer_Read(unsigned size, Deserializer* 
 }
 
 // VectorBuffer::VectorBuffer(Deserializer& source, unsigned size) | File: .. / IO / VectorBuffer.h
-template <class T> VectorBuffer Deserializer_ReadVectorBuffer(unsigned size, Deserializer* ptr)
+template <class T> VectorBuffer Deserializer_ReadVectorBuffer(unsigned size, T* ptr)
 {
     return VectorBuffer(*ptr, size);
 }
@@ -54,14 +54,14 @@ template <class T> VectorBuffer Deserializer_ReadVectorBuffer(unsigned size, Des
 // ================================================================================
 
 // virtual unsigned Serializer::Write(const void* data, unsigned size) = 0 | File: ../IO/Serializer.h
-template <class T> unsigned Serializer_Write(CScriptArray* arr, Serializer* ptr)
+template <class T> unsigned Serializer_Write(CScriptArray* arr, T* ptr)
 {
     unsigned bytesToWrite = arr->GetSize();
     return bytesToWrite ? ptr->Write(arr->At(0), bytesToWrite) : 0;
 }
 
 // virtual unsigned Serializer::Write(const void* data, unsigned size) = 0 | File: ../IO/Serializer.h
-template <class T> bool Serializer_Write_VectorBuffer(VectorBuffer* src, Serializer* ptr)
+template <class T> bool Serializer_Write_VectorBuffer(VectorBuffer* src, T* ptr)
 {
     return ptr->Write(src->GetData(), src->GetSize()) == src->GetSize();
 }
@@ -74,7 +74,7 @@ template <class T> bool Serializer_Write_VectorBuffer(VectorBuffer* src, Seriali
 // ================================================================================
 
 // void FileSystem::ScanDir(Vector<String>& result, const String& pathName, const String& filter, unsigned flags, bool recursive) const | File: ../IO/FileSystem.h
-template <class T> CScriptArray* FileSystem_ScanDir(const String& pathName, const String& filter, unsigned flags, bool recursive, FileSystem* ptr)
+template <class T> CScriptArray* FileSystem_ScanDir(const String& pathName, const String& filter, unsigned flags, bool recursive, T* ptr)
 {
     Vector<String> result;
     ptr->ScanDir(result, pathName, filter, flags, recursive);
