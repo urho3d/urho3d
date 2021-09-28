@@ -232,19 +232,22 @@ template <class BaseType, class DerivedType> void RegisterSubclass(asIScriptEngi
 {
     if (!strcmp(baseClassName, derivedClassName))
         return;
-
-    String declReturnBase(String(baseClassName) + "@+ opImplCast()");
+    String declReturnBase = String(baseClassName) +
+                            ((engine->GetTypeInfoByName(baseClassName)->GetFlags() & asOBJ_NOCOUNT) ? "@" : "@+") +
+                            " opImplCast()";
     engine->RegisterObjectMethod(derivedClassName, declReturnBase.CString(), AS_FUNCTION_OBJLAST((RefCast<DerivedType, BaseType>)), AS_CALL_CDECL_OBJLAST);
 
-    String declReturnBaseConst("const " + String(baseClassName) + "@+ opImplCast() const");
+    String declReturnBaseConst("const " + declReturnBase + " const");
     engine->RegisterObjectMethod(derivedClassName, declReturnBaseConst.CString(), AS_FUNCTION_OBJLAST((RefCast<DerivedType, BaseType>)), AS_CALL_CDECL_OBJLAST);
 
     //String declReturnDerived(String(derivedClassName) + "@+ opCast()");
-    String declReturnDerived(String(derivedClassName) + "@+ opImplCast()");
+    String declReturnDerived(String(derivedClassName) +
+              ((engine->GetTypeInfoByName(derivedClassName)->GetFlags() & asOBJ_NOCOUNT) ? "@" : "@+") +
+              " opImplCast()");
     engine->RegisterObjectMethod(baseClassName, declReturnDerived.CString(), AS_FUNCTION_OBJLAST((RefCast<BaseType, DerivedType>)), AS_CALL_CDECL_OBJLAST);
 
     //String declReturnDerivedConst("const " + String(derivedClassName) + "@+ opCast() const");
-    String declReturnDerivedConst("const " + String(derivedClassName) + "@+ opImplCast() const");
+    String declReturnDerivedConst("const " + declReturnDerived + " const");
     engine->RegisterObjectMethod(baseClassName, declReturnDerivedConst.CString(), AS_FUNCTION_OBJLAST((RefCast<BaseType, DerivedType>)), AS_CALL_CDECL_OBJLAST);
 }
 

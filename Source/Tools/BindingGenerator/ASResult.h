@@ -227,8 +227,6 @@ struct ProcessedClass
 
     shared_ptr<SpecialMethodRegistration> destructor_;
 
-    vector<SpecialMethodRegistration> fakeRefBehaviors_;
-
     vector<MemberRegistrationError> unregisteredSpecialMethods_;
 
     //vector<MethodRegistration> methods_;

@@ -48,9 +48,6 @@ static void Register_AllocatorNode(asIScriptEngine* engine)
 // struct AnimationControl | File: ../Graphics/AnimationController.h
 static void Register_AnimationControl(asIScriptEngine* engine)
 {
-    engine->RegisterObjectBehaviour("AnimationControl", asBEHAVE_ADDREF, "void f()", AS_FUNCTION_OBJLAST(FakeAddRef), AS_CALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("AnimationControl", asBEHAVE_RELEASE, "void f()", AS_FUNCTION_OBJLAST(FakeReleaseRef), AS_CALL_CDECL_OBJLAST);
-
     RegisterMembers_AnimationControl<AnimationControl>(engine, "AnimationControl");
 
     #ifdef REGISTER_CLASS_MANUAL_PART_AnimationControl
@@ -96,9 +93,6 @@ static void Register_AnimationStateTrack(asIScriptEngine* engine)
 // struct AnimationTrack | File: ../Graphics/Animation.h
 static void Register_AnimationTrack(asIScriptEngine* engine)
 {
-    engine->RegisterObjectBehaviour("AnimationTrack", asBEHAVE_ADDREF, "void f()", AS_FUNCTION_OBJLAST(FakeAddRef), AS_CALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("AnimationTrack", asBEHAVE_RELEASE, "void f()", AS_FUNCTION_OBJLAST(FakeReleaseRef), AS_CALL_CDECL_OBJLAST);
-
     RegisterMembers_AnimationTrack<AnimationTrack>(engine, "AnimationTrack");
 
     #ifdef REGISTER_CLASS_MANUAL_PART_AnimationTrack
@@ -300,9 +294,6 @@ static void Register_BiasParameters(asIScriptEngine* engine)
 // struct Billboard | File: ../Graphics/BillboardSet.h
 static void Register_Billboard(asIScriptEngine* engine)
 {
-    engine->RegisterObjectBehaviour("Billboard", asBEHAVE_ADDREF, "void f()", AS_FUNCTION_OBJLAST(FakeAddRef), AS_CALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("Billboard", asBEHAVE_RELEASE, "void f()", AS_FUNCTION_OBJLAST(FakeReleaseRef), AS_CALL_CDECL_OBJLAST);
-
     RegisterMembers_Billboard<Billboard>(engine, "Billboard");
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Billboard
@@ -316,9 +307,6 @@ static void Register_Billboard(asIScriptEngine* engine)
 // struct Bone | File: ../Graphics/Skeleton.h
 static void Register_Bone(asIScriptEngine* engine)
 {
-    engine->RegisterObjectBehaviour("Bone", asBEHAVE_ADDREF, "void f()", AS_FUNCTION_OBJLAST(FakeAddRef), AS_CALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("Bone", asBEHAVE_RELEASE, "void f()", AS_FUNCTION_OBJLAST(FakeReleaseRef), AS_CALL_CDECL_OBJLAST);
-
     RegisterMembers_Bone<Bone>(engine, "Bone");
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Bone
@@ -517,12 +505,9 @@ static ColorFrame* ColorFrame__ColorFrame_constspColoramp_float(const Color& col
 static void Register_ColorFrame(asIScriptEngine* engine)
 {
     // explicit ColorFrame::ColorFrame(const Color& color)
-    engine->RegisterObjectBehaviour("ColorFrame", asBEHAVE_FACTORY, "ColorFrame@+ f(const Color&in)", AS_FUNCTION(ColorFrame__ColorFrame_constspColoramp) , AS_CALL_CDECL);
+    engine->RegisterObjectBehaviour("ColorFrame", asBEHAVE_FACTORY, "ColorFrame@ f(const Color&in)", AS_FUNCTION(ColorFrame__ColorFrame_constspColoramp) , AS_CALL_CDECL);
     // ColorFrame::ColorFrame(const Color& color, float time)
-    engine->RegisterObjectBehaviour("ColorFrame", asBEHAVE_FACTORY, "ColorFrame@+ f(const Color&in, float)", AS_FUNCTION(ColorFrame__ColorFrame_constspColoramp_float) , AS_CALL_CDECL);
-
-    engine->RegisterObjectBehaviour("ColorFrame", asBEHAVE_ADDREF, "void f()", AS_FUNCTION_OBJLAST(FakeAddRef), AS_CALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("ColorFrame", asBEHAVE_RELEASE, "void f()", AS_FUNCTION_OBJLAST(FakeReleaseRef), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("ColorFrame", asBEHAVE_FACTORY, "ColorFrame@ f(const Color&in, float)", AS_FUNCTION(ColorFrame__ColorFrame_constspColoramp_float) , AS_CALL_CDECL);
 
     RegisterMembers_ColorFrame<ColorFrame>(engine, "ColorFrame");
 
@@ -610,9 +595,6 @@ static void Register_CursorShapeInfo(asIScriptEngine* engine)
 // struct CustomGeometryVertex | File: ../Graphics/CustomGeometry.h
 static void Register_CustomGeometryVertex(asIScriptEngine* engine)
 {
-    engine->RegisterObjectBehaviour("CustomGeometryVertex", asBEHAVE_ADDREF, "void f()", AS_FUNCTION_OBJLAST(FakeAddRef), AS_CALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("CustomGeometryVertex", asBEHAVE_RELEASE, "void f()", AS_FUNCTION_OBJLAST(FakeReleaseRef), AS_CALL_CDECL_OBJLAST);
-
     RegisterMembers_CustomGeometryVertex<CustomGeometryVertex>(engine, "CustomGeometryVertex");
 
     #ifdef REGISTER_CLASS_MANUAL_PART_CustomGeometryVertex
@@ -733,9 +715,6 @@ static void Register_DepthValue(asIScriptEngine* engine)
 // class Deserializer | File: ../IO/Deserializer.h
 static void Register_Deserializer(asIScriptEngine* engine)
 {
-    engine->RegisterObjectBehaviour("Deserializer", asBEHAVE_ADDREF, "void f()", AS_FUNCTION_OBJLAST(FakeAddRef), AS_CALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("Deserializer", asBEHAVE_RELEASE, "void f()", AS_FUNCTION_OBJLAST(FakeReleaseRef), AS_CALL_CDECL_OBJLAST);
-
     RegisterMembers_Deserializer<Deserializer>(engine, "Deserializer");
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Deserializer
@@ -1181,9 +1160,6 @@ static void Register_JSONValue(asIScriptEngine* engine)
 // struct JoystickState | File: ../Input/Input.h
 static void Register_JoystickState(asIScriptEngine* engine)
 {
-    engine->RegisterObjectBehaviour("JoystickState", asBEHAVE_ADDREF, "void f()", AS_FUNCTION_OBJLAST(FakeAddRef), AS_CALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("JoystickState", asBEHAVE_RELEASE, "void f()", AS_FUNCTION_OBJLAST(FakeReleaseRef), AS_CALL_CDECL_OBJLAST);
-
     RegisterMembers_JoystickState<JoystickState>(engine, "JoystickState");
 
     #ifdef REGISTER_CLASS_MANUAL_PART_JoystickState
@@ -2156,9 +2132,6 @@ static void Register_ScreenModeParams(asIScriptEngine* engine)
 // class Serializer | File: ../IO/Serializer.h
 static void Register_Serializer(asIScriptEngine* engine)
 {
-    engine->RegisterObjectBehaviour("Serializer", asBEHAVE_ADDREF, "void f()", AS_FUNCTION_OBJLAST(FakeAddRef), AS_CALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("Serializer", asBEHAVE_RELEASE, "void f()", AS_FUNCTION_OBJLAST(FakeReleaseRef), AS_CALL_CDECL_OBJLAST);
-
     RegisterMembers_Serializer<Serializer>(engine, "Serializer");
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Serializer
@@ -2229,9 +2202,6 @@ static void Register_ShadowBatchQueue(asIScriptEngine* engine)
 // class Skeleton | File: ../Graphics/Skeleton.h
 static void Register_Skeleton(asIScriptEngine* engine)
 {
-    engine->RegisterObjectBehaviour("Skeleton", asBEHAVE_ADDREF, "void f()", AS_FUNCTION_OBJLAST(FakeAddRef), AS_CALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("Skeleton", asBEHAVE_RELEASE, "void f()", AS_FUNCTION_OBJLAST(FakeReleaseRef), AS_CALL_CDECL_OBJLAST);
-
     RegisterMembers_Skeleton<Skeleton>(engine, "Skeleton");
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Skeleton
@@ -2614,9 +2584,6 @@ static void Register_TechniqueEntry(asIScriptEngine* engine)
 // struct TextureFrame | File: ../Graphics/ParticleEffect.h
 static void Register_TextureFrame(asIScriptEngine* engine)
 {
-    engine->RegisterObjectBehaviour("TextureFrame", asBEHAVE_ADDREF, "void f()", AS_FUNCTION_OBJLAST(FakeAddRef), AS_CALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("TextureFrame", asBEHAVE_RELEASE, "void f()", AS_FUNCTION_OBJLAST(FakeReleaseRef), AS_CALL_CDECL_OBJLAST);
-
     RegisterMembers_TextureFrame<TextureFrame>(engine, "TextureFrame");
 
     #ifdef REGISTER_CLASS_MANUAL_PART_TextureFrame
@@ -2643,9 +2610,6 @@ static void Register_Timer(asIScriptEngine* engine)
 // struct TouchState | File: ../Input/Input.h
 static void Register_TouchState(asIScriptEngine* engine)
 {
-    engine->RegisterObjectBehaviour("TouchState", asBEHAVE_ADDREF, "void f()", AS_FUNCTION_OBJLAST(FakeAddRef), AS_CALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("TouchState", asBEHAVE_RELEASE, "void f()", AS_FUNCTION_OBJLAST(FakeReleaseRef), AS_CALL_CDECL_OBJLAST);
-
     RegisterMembers_TouchState<TouchState>(engine, "TouchState");
 
     #ifdef REGISTER_CLASS_MANUAL_PART_TouchState
@@ -3576,9 +3540,6 @@ static void Register_SourceBatch2D(asIScriptEngine* engine)
 // struct TileMapInfo2D | File: ../Urho2D/TileMapDefs2D.h
 static void Register_TileMapInfo2D(asIScriptEngine* engine)
 {
-    engine->RegisterObjectBehaviour("TileMapInfo2D", asBEHAVE_ADDREF, "void f()", AS_FUNCTION_OBJLAST(FakeAddRef), AS_CALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("TileMapInfo2D", asBEHAVE_RELEASE, "void f()", AS_FUNCTION_OBJLAST(FakeReleaseRef), AS_CALL_CDECL_OBJLAST);
-
     RegisterMembers_TileMapInfo2D<TileMapInfo2D>(engine, "TileMapInfo2D");
 
     #ifdef REGISTER_CLASS_MANUAL_PART_TileMapInfo2D

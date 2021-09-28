@@ -513,8 +513,8 @@ ConvertedVariable CppVariableToAS(const TypeAnalyzer& type, VariableUsage usage,
     {
         shared_ptr<ClassAnalyzer> analyzer = FindClassByName(cppTypeName);
 
-        if (analyzer && (analyzer->IsRefCounted() || Contains(analyzer->GetComment(), "FAKE_REF")))
-            result.asDeclaration_ += "@+";
+        if (analyzer && (analyzer->IsRefCounted() || analyzer->IsFakeRef()))
+            result.asDeclaration_ = result.asDeclaration_  + "@" + (analyzer->IsFakeRef() ? "" : "+");
         else
             throw Exception("Error: type \"" + type.ToString() + "\" can not automatically bind");
     }
@@ -597,8 +597,8 @@ string CppTypeToAS(const TypeAnalyzer& type, TypeUsage typeUsage)
     {
         shared_ptr<ClassAnalyzer> analyzer = FindClassByName(type.GetNameWithTemplateParams());
 
-        if (analyzer && (analyzer->IsRefCounted() || Contains(analyzer->GetComment(), "FAKE_REF")))
-            result += "@+";
+        if (analyzer && (analyzer->IsRefCounted() || analyzer->IsFakeRef()))
+            result = result + "@" + (analyzer->IsFakeRef() ? "" : "+");
         else
             throw Exception("Error: type \"" + type.ToString() + "\" can not automatically bind");
     }
