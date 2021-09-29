@@ -961,6 +961,11 @@ shared_ptr<ClassAnalyzer> ClassAnalyzer::GetBaseClass() const
 
 vector<ClassAnalyzer> ClassAnalyzer::GetBaseClasses() const
 {
+    // Workaround for bug in doxygen 1.9+
+    // https://github.com/doxygen/doxygen/issues/8805
+    // This can be removed in future
+    vector<string> pushed_refids;
+
     vector<ClassAnalyzer> result;
 
     for (xml_node basecompoundref : compounddef_.children("basecompoundref"))
@@ -972,6 +977,11 @@ vector<ClassAnalyzer> ClassAnalyzer::GetBaseClasses() const
         auto it = SourceData::classesByID_.find(refid);
         if (it == SourceData::classesByID_.end())
             continue;
+
+        // This can be removed in future
+        if (CONTAINS(pushed_refids, refid))
+            continue;
+        pushed_refids.push_back(refid);
 
         xml_node compounddef = it->second;
         result.push_back(ClassAnalyzer(compounddef));
