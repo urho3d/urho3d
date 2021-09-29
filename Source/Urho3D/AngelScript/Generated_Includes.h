@@ -264,11 +264,8 @@
 //#include "../Database/ODBC/ODBCConnection.h"
 //#include "../Database/ODBC/ODBCResult.h"
 //#include "../Engine/Application.h"
-//#include "../Graphics/Direct3D11/D3D11GraphicsImpl.h"
-//#include "../Graphics/Direct3D11/D3D11ShaderProgram.h"
-//#include "../Graphics/Direct3D11/D3D11VertexDeclaration.h"
-//#include "../Graphics/Direct3D9/D3D9VertexDeclaration.h"
 //#include "../Graphics/OpenGL/OGLGraphicsImpl.h"
+//#include "../Graphics/OpenGL/OGLShaderProgram.h"
 
 //#ifdef URHO3D_IK
 //#include "../IK/IKConverters.h"

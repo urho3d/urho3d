@@ -856,7 +856,8 @@ EXCLUDE_PATTERNS       = */*API*.cpp \
                          */*API*.h \
                          "@CMAKE_CURRENT_SOURCE_DIR@/*API.dox" \
                          */@EXCLUDE_GRAPHICS_API@/* \
-                         */@EXCLUDE_GRAPHICS_API2@/*
+                         */@EXCLUDE_GRAPHICS_API2@/* \
+                         "@CMAKE_SOURCE_DIR@/Source/Urho3D/Database/ODBC/*" # https://github.com/doxygen/doxygen/issues/8805
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
 # (namespaces, classes, functions, etc.) that should be excluded from the
