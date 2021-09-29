@@ -385,18 +385,18 @@ static string GetSignature(const MethodAnalyzer& method)
     return result;
 }
 
-struct ClassMemeberSignatures
+struct ClassMemberSignatures
 {
     unordered_set<string> methods_; // Signatures of all nonstatic public methods (including inherited)
     unordered_map<string, vector<string>> hiddenInAnyDerivedClassesMethods_; // method signature -> derived class names
     unordered_map<string, vector<string>> existsInBaseClassesMethods_; // method signature -> base class names
 };
 
-static unordered_map<string, shared_ptr<ClassMemeberSignatures>> _cachedMemberSignatures; // className -> signatures
+static unordered_map<string, shared_ptr<ClassMemberSignatures>> _cachedMemberSignatures; // className -> signatures
 
 static bool ContainsSameSignature(const string& className, const string& methodSignature)
 {
-    shared_ptr<ClassMemeberSignatures> classData = _cachedMemberSignatures[className];
+    shared_ptr<ClassMemberSignatures> classData = _cachedMemberSignatures[className];
     return classData->methods_.find(methodSignature) != classData->methods_.end();
 }
 
@@ -407,7 +407,7 @@ static void InitCachedMemberSignatures()
     {
         xml_node compounddef = element.second;
         ClassAnalyzer classAnalyzer(compounddef);
-        shared_ptr<ClassMemeberSignatures> classData = make_shared<ClassMemeberSignatures>();
+        shared_ptr<ClassMemberSignatures> classData = make_shared<ClassMemberSignatures>();
         vector<MethodAnalyzer> methods = classAnalyzer.GetAllPublicMethods();
         for (const MethodAnalyzer& method : methods)
             classData->methods_.insert(GetSignature(method));
@@ -420,7 +420,7 @@ static void InitCachedMemberSignatures()
         xml_node compounddef = element.second;
         ClassAnalyzer classAnalyzer(compounddef);
         string className = classAnalyzer.GetClassName();
-        shared_ptr<ClassMemeberSignatures> classData = _cachedMemberSignatures[classAnalyzer.GetClassName()];
+        shared_ptr<ClassMemberSignatures> classData = _cachedMemberSignatures[classAnalyzer.GetClassName()];
         vector<MethodAnalyzer> methods = classAnalyzer.GetAllPublicMethods();
         vector<ClassAnalyzer> allDerivedClasses = classAnalyzer.GetAllDerivedClasses();
         vector<ClassAnalyzer> baseClasses = classAnalyzer.GetBaseClasses();
@@ -489,7 +489,7 @@ static vector<string> HiddenInAnyDerivedClasses(const MethodAnalyzer& method)
     return result;*/
     string classname = method.GetClassName();
     string methodSignature = GetSignature(method);
-    shared_ptr<ClassMemeberSignatures> classData = _cachedMemberSignatures[classname];
+    shared_ptr<ClassMemberSignatures> classData = _cachedMemberSignatures[classname];
 
     auto it = classData->hiddenInAnyDerivedClassesMethods_.find(methodSignature);
     if (it == classData->hiddenInAnyDerivedClassesMethods_.end())
@@ -515,7 +515,7 @@ static vector<string> HiddenInAnyDerivedClasses(const MethodAnalyzer& method, co
 
     string classname = classAnalyzer.GetClassName();
     string methodSignature = GetSignature(method);
-    shared_ptr<ClassMemeberSignatures> classData = _cachedMemberSignatures[classname];
+    shared_ptr<ClassMemberSignatures> classData = _cachedMemberSignatures[classname];
 
     auto it = classData->hiddenInAnyDerivedClassesMethods_.find(methodSignature);
     if (it == classData->hiddenInAnyDerivedClassesMethods_.end())
@@ -542,7 +542,7 @@ static vector<string> ExistsInBaseClasses(const MethodAnalyzer& method)
 
     string classname = method.GetClassName();
     string methodSignature = GetSignature(method);
-    shared_ptr<ClassMemeberSignatures> classData = _cachedMemberSignatures[classname];
+    shared_ptr<ClassMemberSignatures> classData = _cachedMemberSignatures[classname];
     
     auto it = classData->existsInBaseClassesMethods_.find(methodSignature);
     if (it == classData->existsInBaseClassesMethods_.end())
@@ -567,9 +567,9 @@ static vector<string> ExistsInBaseClasses(const MethodAnalyzer& method, const Cl
 
     return result;*/
 
-    string classname = classAnalyzer.GetClassName();
+    string className = classAnalyzer.GetClassName();
     string methodSignature = GetSignature(method);
-    shared_ptr<ClassMemeberSignatures> classData = _cachedMemberSignatures[classname];
+    shared_ptr<ClassMemberSignatures> classData = _cachedMemberSignatures[className];
 
     auto it = classData->existsInBaseClassesMethods_.find(methodSignature);
     if (it == classData->existsInBaseClassesMethods_.end())
@@ -616,8 +616,8 @@ static void RegisterMethod(const MethodAnalyzer& methodAnalyzer, ProcessedClass&
 
     // TEST
 
-    if (methodAnalyzer.GetClassName() == "Component" && methodAnalyzer.GetName() == "DrawDebugGeometry")
-        int ddd = 1;
+    //if (/*methodAnalyzer.GetClassName() == "OcclusionBuffer" && */methodAnalyzer.GetName() == "AddRef")
+    //    string className = methodAnalyzer.GetClassName(); // Breakpoint here
 
     // TEST END
 
