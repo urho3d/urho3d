@@ -4511,14 +4511,14 @@ template <class T> void RegisterMembers_Skeleton(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "void Define(const Skeleton&in)", AS_METHODPR(T, Define, (const Skeleton&), void), AS_CALL_THISCALL);
 
     // Bone* Skeleton::GetBone(unsigned index)
-    engine->RegisterObjectMethod(className, "Bone@+ GetBone(uint)", AS_METHODPR(T, GetBone, (unsigned), Bone*), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "Bone@+ get_bones(uint)", AS_METHODPR(T, GetBone, (unsigned), Bone*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Bone@ GetBone(uint)", AS_METHODPR(T, GetBone, (unsigned), Bone*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Bone@ get_bones(uint)", AS_METHODPR(T, GetBone, (unsigned), Bone*), AS_CALL_THISCALL);
 
     // Bone* Skeleton::GetBone(const String& name)
-    engine->RegisterObjectMethod(className, "Bone@+ GetBone(const String&in)", AS_METHODPR(T, GetBone, (const String&), Bone*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Bone@ GetBone(const String&in)", AS_METHODPR(T, GetBone, (const String&), Bone*), AS_CALL_THISCALL);
 
     // Bone* Skeleton::GetBone(const StringHash& boneNameHash)
-    engine->RegisterObjectMethod(className, "Bone@+ GetBone(const StringHash&in)", AS_METHODPR(T, GetBone, (const StringHash&), Bone*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Bone@ GetBone(const StringHash&in)", AS_METHODPR(T, GetBone, (const StringHash&), Bone*), AS_CALL_THISCALL);
 
     // unsigned Skeleton::GetBoneIndex(const String& boneName) const
     engine->RegisterObjectMethod(className, "uint GetBoneIndex(const String&in) const", AS_METHODPR(T, GetBoneIndex, (const String&) const, unsigned), AS_CALL_THISCALL);
@@ -4527,18 +4527,18 @@ template <class T> void RegisterMembers_Skeleton(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "uint GetBoneIndex(const StringHash&in) const", AS_METHODPR(T, GetBoneIndex, (const StringHash&) const, unsigned), AS_CALL_THISCALL);
 
     // unsigned Skeleton::GetBoneIndex(const Bone* bone) const
-    engine->RegisterObjectMethod(className, "uint GetBoneIndex(Bone@+) const", AS_METHODPR(T, GetBoneIndex, (const Bone*) const, unsigned), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "uint GetBoneIndex(Bone@) const", AS_METHODPR(T, GetBoneIndex, (const Bone*) const, unsigned), AS_CALL_THISCALL);
 
     // Bone* Skeleton::GetBoneParent(const Bone* bone)
-    engine->RegisterObjectMethod(className, "Bone@+ GetBoneParent(Bone@+)", AS_METHODPR(T, GetBoneParent, (const Bone*), Bone*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Bone@ GetBoneParent(Bone@)", AS_METHODPR(T, GetBoneParent, (const Bone*), Bone*), AS_CALL_THISCALL);
 
     // unsigned Skeleton::GetNumBones() const
     engine->RegisterObjectMethod(className, "uint GetNumBones() const", AS_METHODPR(T, GetNumBones, () const, unsigned), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_numBones() const", AS_METHODPR(T, GetNumBones, () const, unsigned), AS_CALL_THISCALL);
 
     // Bone* Skeleton::GetRootBone()
-    engine->RegisterObjectMethod(className, "Bone@+ GetRootBone()", AS_METHODPR(T, GetRootBone, (), Bone*), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "Bone@+ get_rootBone()", AS_METHODPR(T, GetRootBone, (), Bone*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Bone@ GetRootBone()", AS_METHODPR(T, GetRootBone, (), Bone*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Bone@ get_rootBone()", AS_METHODPR(T, GetRootBone, (), Bone*), AS_CALL_THISCALL);
 
     // bool Skeleton::Load(Deserializer& source)
     engine->RegisterObjectMethod(className, "bool Load(Deserializer&)", AS_METHODPR(T, Load, (Deserializer&), bool), AS_CALL_THISCALL);
@@ -7501,8 +7501,8 @@ template <class T> void RegisterMembers_AnimationState(asIScriptEngine* engine, 
     engine->RegisterObjectMethod(className, "Node@+ get_node() const", AS_METHODPR(T, GetNode, () const, Node*), AS_CALL_THISCALL);
 
     // Bone* AnimationState::GetStartBone() const
-    engine->RegisterObjectMethod(className, "Bone@+ GetStartBone() const", AS_METHODPR(T, GetStartBone, () const, Bone*), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "Bone@+ get_startBone() const", AS_METHODPR(T, GetStartBone, () const, Bone*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Bone@ GetStartBone() const", AS_METHODPR(T, GetStartBone, () const, Bone*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Bone@ get_startBone() const", AS_METHODPR(T, GetStartBone, () const, Bone*), AS_CALL_THISCALL);
 
     // float AnimationState::GetTime() const
     engine->RegisterObjectMethod(className, "float GetTime() const", AS_METHODPR(T, GetTime, () const, float), AS_CALL_THISCALL);
@@ -7551,8 +7551,8 @@ template <class T> void RegisterMembers_AnimationState(asIScriptEngine* engine, 
     engine->RegisterObjectMethod(className, "void set_looped(bool)", AS_METHODPR(T, SetLooped, (bool), void), AS_CALL_THISCALL);
 
     // void AnimationState::SetStartBone(Bone* startBone)
-    engine->RegisterObjectMethod(className, "void SetStartBone(Bone@+)", AS_METHODPR(T, SetStartBone, (Bone*), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_startBone(Bone@+)", AS_METHODPR(T, SetStartBone, (Bone*), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void SetStartBone(Bone@)", AS_METHODPR(T, SetStartBone, (Bone*), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_startBone(Bone@)", AS_METHODPR(T, SetStartBone, (Bone*), void), AS_CALL_THISCALL);
 
     // void AnimationState::SetTime(float time)
     engine->RegisterObjectMethod(className, "void SetTime(float)", AS_METHODPR(T, SetTime, (float), void), AS_CALL_THISCALL);
@@ -10598,16 +10598,16 @@ template <class T> void RegisterMembers_Input(asIScriptEngine* engine, const cha
     engine->RegisterObjectMethod(className, "Vector2 get_inputScale() const", AS_METHODPR(T, GetInputScale, () const, Vector2), AS_CALL_THISCALL);
 
     // JoystickState* Input::GetJoystick(SDL_JoystickID id)
-    engine->RegisterObjectMethod(className, "JoystickState@+ GetJoystick(SDL_JoystickID)", AS_METHODPR(T, GetJoystick, (SDL_JoystickID), JoystickState*), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "JoystickState@+ get_joysticks(SDL_JoystickID)", AS_METHODPR(T, GetJoystick, (SDL_JoystickID), JoystickState*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "JoystickState@ GetJoystick(SDL_JoystickID)", AS_METHODPR(T, GetJoystick, (SDL_JoystickID), JoystickState*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "JoystickState@ get_joysticks(SDL_JoystickID)", AS_METHODPR(T, GetJoystick, (SDL_JoystickID), JoystickState*), AS_CALL_THISCALL);
 
     // JoystickState* Input::GetJoystickByIndex(unsigned index)
-    engine->RegisterObjectMethod(className, "JoystickState@+ GetJoystickByIndex(uint)", AS_METHODPR(T, GetJoystickByIndex, (unsigned), JoystickState*), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "JoystickState@+ get_joysticksByIndex(uint)", AS_METHODPR(T, GetJoystickByIndex, (unsigned), JoystickState*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "JoystickState@ GetJoystickByIndex(uint)", AS_METHODPR(T, GetJoystickByIndex, (unsigned), JoystickState*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "JoystickState@ get_joysticksByIndex(uint)", AS_METHODPR(T, GetJoystickByIndex, (unsigned), JoystickState*), AS_CALL_THISCALL);
 
     // JoystickState* Input::GetJoystickByName(const String& name)
-    engine->RegisterObjectMethod(className, "JoystickState@+ GetJoystickByName(const String&in)", AS_METHODPR(T, GetJoystickByName, (const String&), JoystickState*), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "JoystickState@+ get_joysticksByName(const String&in)", AS_METHODPR(T, GetJoystickByName, (const String&), JoystickState*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "JoystickState@ GetJoystickByName(const String&in)", AS_METHODPR(T, GetJoystickByName, (const String&), JoystickState*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "JoystickState@ get_joysticksByName(const String&in)", AS_METHODPR(T, GetJoystickByName, (const String&), JoystickState*), AS_CALL_THISCALL);
 
     // bool Input::GetKeyDown(Key key) const
     engine->RegisterObjectMethod(className, "bool GetKeyDown(Key) const", AS_METHODPR(T, GetKeyDown, (Key) const, bool), AS_CALL_THISCALL);
@@ -10704,8 +10704,8 @@ template <class T> void RegisterMembers_Input(asIScriptEngine* engine, const cha
     engine->RegisterObjectMethod(className, "bool get_toggleFullscreen() const", AS_METHODPR(T, GetToggleFullscreen, () const, bool), AS_CALL_THISCALL);
 
     // TouchState* Input::GetTouch(unsigned index) const
-    engine->RegisterObjectMethod(className, "TouchState@+ GetTouch(uint) const", AS_METHODPR(T, GetTouch, (unsigned) const, TouchState*), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "TouchState@+ get_touches(uint) const", AS_METHODPR(T, GetTouch, (unsigned) const, TouchState*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "TouchState@ GetTouch(uint) const", AS_METHODPR(T, GetTouch, (unsigned) const, TouchState*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "TouchState@ get_touches(uint) const", AS_METHODPR(T, GetTouch, (unsigned) const, TouchState*), AS_CALL_THISCALL);
 
     // bool Input::GetTouchEmulation() const
     engine->RegisterObjectMethod(className, "bool GetTouchEmulation() const", AS_METHODPR(T, GetTouchEmulation, () const, bool), AS_CALL_THISCALL);
@@ -13897,7 +13897,7 @@ template <class T> void RegisterMembers_ParticleEffect(asIScriptEngine* engine, 
     engine->RegisterObjectMethod(className, "float get_animationLodBias() const", AS_METHODPR(T, GetAnimationLodBias, () const, float), AS_CALL_THISCALL);
 
     // const ColorFrame* ParticleEffect::GetColorFrame(unsigned index) const
-    engine->RegisterObjectMethod(className, "ColorFrame@+ GetColorFrame(uint) const", AS_METHODPR(T, GetColorFrame, (unsigned) const, const ColorFrame*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "ColorFrame@ GetColorFrame(uint) const", AS_METHODPR(T, GetColorFrame, (unsigned) const, const ColorFrame*), AS_CALL_THISCALL);
 
     // const Vector3& ParticleEffect::GetConstantForce() const
     engine->RegisterObjectMethod(className, "const Vector3& GetConstantForce() const", AS_METHODPR(T, GetConstantForce, () const, const Vector3&), AS_CALL_THISCALL);
@@ -14022,7 +14022,7 @@ template <class T> void RegisterMembers_ParticleEffect(asIScriptEngine* engine, 
     engine->RegisterObjectMethod(className, "float get_sizeMul() const", AS_METHODPR(T, GetSizeMul, () const, float), AS_CALL_THISCALL);
 
     // const TextureFrame* ParticleEffect::GetTextureFrame(unsigned index) const
-    engine->RegisterObjectMethod(className, "TextureFrame@+ GetTextureFrame(uint) const", AS_METHODPR(T, GetTextureFrame, (unsigned) const, const TextureFrame*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "TextureFrame@ GetTextureFrame(uint) const", AS_METHODPR(T, GetTextureFrame, (unsigned) const, const TextureFrame*), AS_CALL_THISCALL);
 
     // bool ParticleEffect::GetUpdateInvisible() const
     engine->RegisterObjectMethod(className, "bool GetUpdateInvisible() const", AS_METHODPR(T, GetUpdateInvisible, () const, bool), AS_CALL_THISCALL);
@@ -14962,7 +14962,7 @@ template <class T> void RegisterMembers_Animation(asIScriptEngine* engine, const
     engine->RegisterObjectMethod(className, "Animation@+ Clone(const String&in = String::EMPTY) const", AS_FUNCTION_OBJFIRST(Animation_SharedPtrlesAnimationgre_Clone_constspStringamp_template<Animation>), AS_CALL_CDECL_OBJFIRST);
 
     // AnimationTrack* Animation::CreateTrack(const String& name)
-    engine->RegisterObjectMethod(className, "AnimationTrack@+ CreateTrack(const String&in)", AS_METHODPR(T, CreateTrack, (const String&), AnimationTrack*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "AnimationTrack@ CreateTrack(const String&in)", AS_METHODPR(T, CreateTrack, (const String&), AnimationTrack*), AS_CALL_THISCALL);
 
     // const String& Animation::GetAnimationName() const
     engine->RegisterObjectMethod(className, "const String& GetAnimationName() const", AS_METHODPR(T, GetAnimationName, () const, const String&), AS_CALL_THISCALL);
@@ -14984,14 +14984,14 @@ template <class T> void RegisterMembers_Animation(asIScriptEngine* engine, const
     engine->RegisterObjectMethod(className, "uint get_numTriggers() const", AS_METHODPR(T, GetNumTriggers, () const, unsigned), AS_CALL_THISCALL);
 
     // AnimationTrack* Animation::GetTrack(unsigned index)
-    engine->RegisterObjectMethod(className, "AnimationTrack@+ GetTrack(uint)", AS_METHODPR(T, GetTrack, (unsigned), AnimationTrack*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "AnimationTrack@ GetTrack(uint)", AS_METHODPR(T, GetTrack, (unsigned), AnimationTrack*), AS_CALL_THISCALL);
 
     // AnimationTrack* Animation::GetTrack(const String& name)
-    engine->RegisterObjectMethod(className, "AnimationTrack@+ GetTrack(const String&in)", AS_METHODPR(T, GetTrack, (const String&), AnimationTrack*), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "AnimationTrack@+ get_tracks(const String&in)", AS_METHODPR(T, GetTrack, (const String&), AnimationTrack*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "AnimationTrack@ GetTrack(const String&in)", AS_METHODPR(T, GetTrack, (const String&), AnimationTrack*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "AnimationTrack@ get_tracks(const String&in)", AS_METHODPR(T, GetTrack, (const String&), AnimationTrack*), AS_CALL_THISCALL);
 
     // AnimationTrack* Animation::GetTrack(StringHash nameHash)
-    engine->RegisterObjectMethod(className, "AnimationTrack@+ GetTrack(StringHash)", AS_METHODPR(T, GetTrack, (StringHash), AnimationTrack*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "AnimationTrack@ GetTrack(StringHash)", AS_METHODPR(T, GetTrack, (StringHash), AnimationTrack*), AS_CALL_THISCALL);
 
     // void Animation::RemoveAllTracks()
     engine->RegisterObjectMethod(className, "void RemoveAllTracks()", AS_METHODPR(T, RemoveAllTracks, (), void), AS_CALL_THISCALL);
@@ -17003,7 +17003,7 @@ template <class T> void RegisterMembers_AnimationController(asIScriptEngine* eng
     engine->RegisterObjectMethod(className, "float GetSpeed(const String&in) const", AS_METHODPR(T, GetSpeed, (const String&) const, float), AS_CALL_THISCALL);
 
     // Bone* AnimationController::GetStartBone(const String& name) const
-    engine->RegisterObjectMethod(className, "Bone@+ GetStartBone(const String&in) const", AS_METHODPR(T, GetStartBone, (const String&) const, Bone*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Bone@ GetStartBone(const String&in) const", AS_METHODPR(T, GetStartBone, (const String&) const, Bone*), AS_CALL_THISCALL);
 
     // const String& AnimationController::GetStartBoneName(const String& name) const
     engine->RegisterObjectMethod(className, "const String& GetStartBoneName(const String&in) const", AS_METHODPR(T, GetStartBoneName, (const String&) const, const String&), AS_CALL_THISCALL);
@@ -21548,8 +21548,8 @@ template <class T> void RegisterMembers_BillboardSet(asIScriptEngine* engine, co
     engine->RegisterObjectMethod(className, "float get_animationLodBias() const", AS_METHODPR(T, GetAnimationLodBias, () const, float), AS_CALL_THISCALL);
 
     // Billboard* BillboardSet::GetBillboard(unsigned index)
-    engine->RegisterObjectMethod(className, "Billboard@+ GetBillboard(uint)", AS_METHODPR(T, GetBillboard, (unsigned), Billboard*), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "Billboard@+ get_billboards(uint)", AS_METHODPR(T, GetBillboard, (unsigned), Billboard*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Billboard@ GetBillboard(uint)", AS_METHODPR(T, GetBillboard, (unsigned), Billboard*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Billboard@ get_billboards(uint)", AS_METHODPR(T, GetBillboard, (unsigned), Billboard*), AS_CALL_THISCALL);
 
     // FaceCameraMode BillboardSet::GetFaceCameraMode() const
     engine->RegisterObjectMethod(className, "FaceCameraMode GetFaceCameraMode() const", AS_METHODPR(T, GetFaceCameraMode, () const, FaceCameraMode), AS_CALL_THISCALL);
@@ -21815,7 +21815,7 @@ template <class T> void RegisterMembers_CustomGeometry(asIScriptEngine* engine, 
     engine->RegisterObjectMethod(className, "uint get_numVertices(uint) const", AS_METHODPR(T, GetNumVertices, (unsigned) const, unsigned), AS_CALL_THISCALL);
 
     // CustomGeometryVertex* CustomGeometry::GetVertex(unsigned geometryIndex, unsigned vertexNum)
-    engine->RegisterObjectMethod(className, "CustomGeometryVertex@+ GetVertex(uint, uint)", AS_METHODPR(T, GetVertex, (unsigned, unsigned), CustomGeometryVertex*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "CustomGeometryVertex@ GetVertex(uint, uint)", AS_METHODPR(T, GetVertex, (unsigned, unsigned), CustomGeometryVertex*), AS_CALL_THISCALL);
 
     // bool CustomGeometry::IsDynamic() const
     engine->RegisterObjectMethod(className, "bool IsDynamic() const", AS_METHODPR(T, IsDynamic, () const, bool), AS_CALL_THISCALL);

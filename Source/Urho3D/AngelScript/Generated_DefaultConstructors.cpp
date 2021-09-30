@@ -19,7 +19,7 @@ void ASRegisterGeneratedDefaultConstructors(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("AllocatorNode", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<AllocatorNode>), AS_CALL_CDECL_OBJFIRST);
 
     // AnimationControl::AnimationControl() | File: ../Graphics/AnimationController.h
-    engine->RegisterObjectBehaviour("AnimationControl", asBEHAVE_FACTORY, "AnimationControl@+ f()", asFUNCTION(ASCompatibleFactory<AnimationControl>), AS_CALL_CDECL);
+    engine->RegisterObjectBehaviour("AnimationControl", asBEHAVE_FACTORY, "AnimationControl@ f()", asFUNCTION(ASCompatibleFactory<AnimationControl>), AS_CALL_CDECL);
 
     // AnimationKeyFrame::AnimationKeyFrame() | File: ../Graphics/Animation.h
     engine->RegisterObjectBehaviour("AnimationKeyFrame", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<AnimationKeyFrame>), AS_CALL_CDECL_OBJFIRST);
@@ -28,7 +28,7 @@ void ASRegisterGeneratedDefaultConstructors(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("AnimationStateTrack", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<AnimationStateTrack>), AS_CALL_CDECL_OBJFIRST);
 
     // AnimationTrack::AnimationTrack() | File: ../Graphics/Animation.h
-    engine->RegisterObjectBehaviour("AnimationTrack", asBEHAVE_FACTORY, "AnimationTrack@+ f()", asFUNCTION(ASCompatibleFactory<AnimationTrack>), AS_CALL_CDECL);
+    engine->RegisterObjectBehaviour("AnimationTrack", asBEHAVE_FACTORY, "AnimationTrack@ f()", asFUNCTION(ASCompatibleFactory<AnimationTrack>), AS_CALL_CDECL);
 
     // AnimationTriggerPoint::AnimationTriggerPoint() | File: ../Graphics/Animation.h
     engine->RegisterObjectBehaviour("AnimationTriggerPoint", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<AnimationTriggerPoint>), AS_CALL_CDECL_OBJFIRST);
@@ -58,7 +58,7 @@ void ASRegisterGeneratedDefaultConstructors(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("BiasParameters", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<BiasParameters>), AS_CALL_CDECL_OBJFIRST);
 
     // Bone::Bone() | File: ../Graphics/Skeleton.h
-    engine->RegisterObjectBehaviour("Bone", asBEHAVE_FACTORY, "Bone@+ f()", asFUNCTION(ASCompatibleFactory<Bone>), AS_CALL_CDECL);
+    engine->RegisterObjectBehaviour("Bone", asBEHAVE_FACTORY, "Bone@ f()", asFUNCTION(ASCompatibleFactory<Bone>), AS_CALL_CDECL);
 
     // BoundingBox::BoundingBox() noexcept | File: ../Math/BoundingBox.h
     engine->RegisterObjectBehaviour("BoundingBox", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<BoundingBox>), AS_CALL_CDECL_OBJFIRST);
@@ -73,7 +73,7 @@ void ASRegisterGeneratedDefaultConstructors(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Color", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<Color>), AS_CALL_CDECL_OBJFIRST);
 
     // ColorFrame::ColorFrame() | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectBehaviour("ColorFrame", asBEHAVE_FACTORY, "ColorFrame@+ f()", asFUNCTION(ASCompatibleFactory<ColorFrame>), AS_CALL_CDECL);
+    engine->RegisterObjectBehaviour("ColorFrame", asBEHAVE_FACTORY, "ColorFrame@ f()", asFUNCTION(ASCompatibleFactory<ColorFrame>), AS_CALL_CDECL);
 
     // CompressedLevel::CompressedLevel() | Implicitly-declared
     engine->RegisterObjectBehaviour("CompressedLevel", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<CompressedLevel>), AS_CALL_CDECL_OBJFIRST);
@@ -271,7 +271,7 @@ void ASRegisterGeneratedDefaultConstructors(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("ShadowBatchQueue", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<ShadowBatchQueue>), AS_CALL_CDECL_OBJFIRST);
 
     // Skeleton::Skeleton() | File: ../Graphics/Skeleton.h
-    engine->RegisterObjectBehaviour("Skeleton", asBEHAVE_FACTORY, "Skeleton@+ f()", asFUNCTION(ASCompatibleFactory<Skeleton>), AS_CALL_CDECL);
+    engine->RegisterObjectBehaviour("Skeleton", asBEHAVE_FACTORY, "Skeleton@ f()", asFUNCTION(ASCompatibleFactory<Skeleton>), AS_CALL_CDECL);
 
     // SourceBatch::SourceBatch() | File: ../Graphics/Drawable.h
     engine->RegisterObjectBehaviour("SourceBatch", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<SourceBatch>), AS_CALL_CDECL_OBJFIRST);
@@ -298,7 +298,7 @@ void ASRegisterGeneratedDefaultConstructors(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("TechniqueEntry", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<TechniqueEntry>), AS_CALL_CDECL_OBJFIRST);
 
     // TextureFrame::TextureFrame() | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectBehaviour("TextureFrame", asBEHAVE_FACTORY, "TextureFrame@+ f()", asFUNCTION(ASCompatibleFactory<TextureFrame>), AS_CALL_CDECL);
+    engine->RegisterObjectBehaviour("TextureFrame", asBEHAVE_FACTORY, "TextureFrame@ f()", asFUNCTION(ASCompatibleFactory<TextureFrame>), AS_CALL_CDECL);
 
     // Timer::Timer() | File: ../Core/Timer.h
     engine->RegisterObjectBehaviour("Timer", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<Timer>), AS_CALL_CDECL_OBJFIRST);

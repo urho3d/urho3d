@@ -671,20 +671,6 @@ namespace Result
                 needGap = true;
             }
 
-            if (needGap && processedClass.fakeRefBehaviors_.size())
-                ofs << '\n';
-
-            for (const SpecialMethodRegistration& fakeRefBehavior : processedClass.fakeRefBehaviors_)
-            {
-                if (fakeRefBehavior.comment_.size())
-                    ofs << "    // " << fakeRefBehavior.comment_ << '\n';
-
-                ofs << "    " + fakeRefBehavior.registration_ << '\n';
-
-                needGap = true;
-            }
-
-
             if (needGap && processedClass.subclassRegistrations_.size())
                 ofs << '\n';
 

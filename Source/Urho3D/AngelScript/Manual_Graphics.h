@@ -335,7 +335,7 @@ template <class T> const AnimationControl* AnimationController_GetAnimation(unsi
     engine->RegisterObjectMethod(className, "uint get_numAnimations() const", AS_FUNCTION_OBJLAST(AnimationController_GetNumAnimations<T>), AS_CALL_CDECL_OBJLAST); \
     \
     /* const Vector<AnimationControl>& AnimationController::GetAnimations() const | File: ../Graphics/AnimationController.h */ \
-    engine->RegisterObjectMethod(className, "const AnimationControl@+ get_animations(uint) const", AS_FUNCTION_OBJLAST(AnimationController_GetAnimation<T>), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "const AnimationControl@ get_animations(uint) const", AS_FUNCTION_OBJLAST(AnimationController_GetAnimation<T>), AS_CALL_CDECL_OBJLAST);
 
 // ========================================================================================
 

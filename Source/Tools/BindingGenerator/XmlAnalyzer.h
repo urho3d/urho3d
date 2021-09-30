@@ -304,6 +304,7 @@ public:
     bool AllFloats() const;
     bool AllInts() const;
     bool IsPod() const;
+    bool IsFakeRef() const { return Contains(GetComment(), "FAKE_REF"); }
     shared_ptr<ClassAnalyzer> GetBaseClass() const;
     vector<ClassAnalyzer> GetBaseClasses() const;
     vector<ClassAnalyzer> GetAllBaseClasses() const;

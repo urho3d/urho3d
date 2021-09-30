@@ -19,7 +19,7 @@ void ASRegisterGeneratedObjectTypes(asIScriptEngine* engine)
     engine->RegisterObjectType("AllocatorNode", sizeof(AllocatorNode), asOBJ_VALUE | asGetTypeTraits<AllocatorNode>());
 
     // struct AnimationControl | File: ../Graphics/AnimationController.h
-    engine->RegisterObjectType("AnimationControl", 0, asOBJ_REF);
+    engine->RegisterObjectType("AnimationControl", 0, asOBJ_REF | asOBJ_NOCOUNT);
 
     // struct AnimationKeyFrame | File: ../Graphics/Animation.h
     engine->RegisterObjectType("AnimationKeyFrame", sizeof(AnimationKeyFrame), asOBJ_VALUE | asGetTypeTraits<AnimationKeyFrame>());
@@ -28,7 +28,7 @@ void ASRegisterGeneratedObjectTypes(asIScriptEngine* engine)
     engine->RegisterObjectType("AnimationStateTrack", sizeof(AnimationStateTrack), asOBJ_VALUE | asGetTypeTraits<AnimationStateTrack>());
 
     // struct AnimationTrack | File: ../Graphics/Animation.h
-    engine->RegisterObjectType("AnimationTrack", 0, asOBJ_REF);
+    engine->RegisterObjectType("AnimationTrack", 0, asOBJ_REF | asOBJ_NOCOUNT);
 
     // struct AnimationTriggerPoint | File: ../Graphics/Animation.h
     engine->RegisterObjectType("AnimationTriggerPoint", sizeof(AnimationTriggerPoint), asOBJ_VALUE | asGetTypeTraits<AnimationTriggerPoint>());
@@ -64,10 +64,10 @@ void ASRegisterGeneratedObjectTypes(asIScriptEngine* engine)
     engine->RegisterObjectType("BiasParameters", sizeof(BiasParameters), asOBJ_VALUE | asGetTypeTraits<BiasParameters>() | asOBJ_POD | asOBJ_APP_CLASS_ALLFLOATS);
 
     // struct Billboard | File: ../Graphics/BillboardSet.h
-    engine->RegisterObjectType("Billboard", 0, asOBJ_REF);
+    engine->RegisterObjectType("Billboard", 0, asOBJ_REF | asOBJ_NOCOUNT);
 
     // struct Bone | File: ../Graphics/Skeleton.h
-    engine->RegisterObjectType("Bone", 0, asOBJ_REF);
+    engine->RegisterObjectType("Bone", 0, asOBJ_REF | asOBJ_NOCOUNT);
 
     // class BoundingBox | File: ../Math/BoundingBox.h
     engine->RegisterObjectType("BoundingBox", sizeof(BoundingBox), asOBJ_VALUE | asGetTypeTraits<BoundingBox>() | asOBJ_POD | asOBJ_APP_CLASS_ALLFLOATS);
@@ -82,7 +82,7 @@ void ASRegisterGeneratedObjectTypes(asIScriptEngine* engine)
     engine->RegisterObjectType("Color", sizeof(Color), asOBJ_VALUE | asGetTypeTraits<Color>() | asOBJ_POD | asOBJ_APP_CLASS_ALLFLOATS);
 
     // struct ColorFrame | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectType("ColorFrame", 0, asOBJ_REF);
+    engine->RegisterObjectType("ColorFrame", 0, asOBJ_REF | asOBJ_NOCOUNT);
 
     // struct CompressedLevel | File: ../Resource/Image.h
     engine->RegisterObjectType("CompressedLevel", sizeof(CompressedLevel), asOBJ_VALUE | asGetTypeTraits<CompressedLevel>());
@@ -97,7 +97,7 @@ void ASRegisterGeneratedObjectTypes(asIScriptEngine* engine)
     engine->RegisterObjectType("CursorShapeInfo", sizeof(CursorShapeInfo), asOBJ_VALUE | asGetTypeTraits<CursorShapeInfo>());
 
     // struct CustomGeometryVertex | File: ../Graphics/CustomGeometry.h
-    engine->RegisterObjectType("CustomGeometryVertex", 0, asOBJ_REF);
+    engine->RegisterObjectType("CustomGeometryVertex", 0, asOBJ_REF | asOBJ_NOCOUNT);
 
     // class CustomVariantValue | File: ../Core/Variant.h
     // Not registered because have @nobind mark
@@ -118,7 +118,7 @@ void ASRegisterGeneratedObjectTypes(asIScriptEngine* engine)
     engine->RegisterObjectType("DepthValue", sizeof(DepthValue), asOBJ_VALUE | asGetTypeTraits<DepthValue>() | asOBJ_POD | asOBJ_APP_CLASS_ALLINTS);
 
     // class Deserializer | File: ../IO/Deserializer.h
-    engine->RegisterObjectType("Deserializer", 0, asOBJ_REF);
+    engine->RegisterObjectType("Deserializer", 0, asOBJ_REF | asOBJ_NOCOUNT);
 
     // struct DirtyBits | File: ../Scene/ReplicationState.h
     engine->RegisterObjectType("DirtyBits", sizeof(DirtyBits), asOBJ_VALUE | asGetTypeTraits<DirtyBits>());
@@ -178,7 +178,7 @@ void ASRegisterGeneratedObjectTypes(asIScriptEngine* engine)
     engine->RegisterObjectType("JSONValue", sizeof(JSONValue), asOBJ_VALUE | asGetTypeTraits<JSONValue>());
 
     // struct JoystickState | File: ../Input/Input.h
-    engine->RegisterObjectType("JoystickState", 0, asOBJ_REF);
+    engine->RegisterObjectType("JoystickState", 0, asOBJ_REF | asOBJ_NOCOUNT);
 
     // struct LightBatchQueue | File: ../Graphics/Batch.h
     engine->RegisterObjectType("LightBatchQueue", sizeof(LightBatchQueue), asOBJ_VALUE | asGetTypeTraits<LightBatchQueue>());
@@ -313,7 +313,7 @@ void ASRegisterGeneratedObjectTypes(asIScriptEngine* engine)
     engine->RegisterObjectType("ScreenModeParams", sizeof(ScreenModeParams), asOBJ_VALUE | asGetTypeTraits<ScreenModeParams>());
 
     // class Serializer | File: ../IO/Serializer.h
-    engine->RegisterObjectType("Serializer", 0, asOBJ_REF);
+    engine->RegisterObjectType("Serializer", 0, asOBJ_REF | asOBJ_NOCOUNT);
 
     // struct ShaderParameter | File: ../Graphics/ShaderVariation.h
     engine->RegisterObjectType("ShaderParameter", sizeof(ShaderParameter), asOBJ_VALUE | asGetTypeTraits<ShaderParameter>());
@@ -322,7 +322,7 @@ void ASRegisterGeneratedObjectTypes(asIScriptEngine* engine)
     engine->RegisterObjectType("ShadowBatchQueue", sizeof(ShadowBatchQueue), asOBJ_VALUE | asGetTypeTraits<ShadowBatchQueue>());
 
     // class Skeleton | File: ../Graphics/Skeleton.h
-    engine->RegisterObjectType("Skeleton", 0, asOBJ_REF);
+    engine->RegisterObjectType("Skeleton", 0, asOBJ_REF | asOBJ_NOCOUNT);
 
     // struct SourceBatch | File: ../Graphics/Drawable.h
     engine->RegisterObjectType("SourceBatch", sizeof(SourceBatch), asOBJ_VALUE | asGetTypeTraits<SourceBatch>());
@@ -352,7 +352,7 @@ void ASRegisterGeneratedObjectTypes(asIScriptEngine* engine)
     engine->RegisterObjectType("TechniqueEntry", sizeof(TechniqueEntry), asOBJ_VALUE | asGetTypeTraits<TechniqueEntry>());
 
     // struct TextureFrame | File: ../Graphics/ParticleEffect.h
-    engine->RegisterObjectType("TextureFrame", 0, asOBJ_REF);
+    engine->RegisterObjectType("TextureFrame", 0, asOBJ_REF | asOBJ_NOCOUNT);
 
     // class Thread | File: ../Core/Thread.h
     // Not registered because value types can not be abstract
@@ -361,7 +361,7 @@ void ASRegisterGeneratedObjectTypes(asIScriptEngine* engine)
     engine->RegisterObjectType("Timer", sizeof(Timer), asOBJ_VALUE | asGetTypeTraits<Timer>() | asOBJ_POD | asOBJ_APP_CLASS_ALLINTS);
 
     // struct TouchState | File: ../Input/Input.h
-    engine->RegisterObjectType("TouchState", 0, asOBJ_REF);
+    engine->RegisterObjectType("TouchState", 0, asOBJ_REF | asOBJ_NOCOUNT);
 
     // struct TrailPoint | File: ../Graphics/RibbonTrail.h
     engine->RegisterObjectType("TrailPoint", sizeof(TrailPoint), asOBJ_VALUE | asGetTypeTraits<TrailPoint>());
@@ -473,7 +473,7 @@ void ASRegisterGeneratedObjectTypes(asIScriptEngine* engine)
     engine->RegisterObjectType("SourceBatch2D", sizeof(SourceBatch2D), asOBJ_VALUE | asGetTypeTraits<SourceBatch2D>());
 
     // struct TileMapInfo2D | File: ../Urho2D/TileMapDefs2D.h
-    engine->RegisterObjectType("TileMapInfo2D", 0, asOBJ_REF);
+    engine->RegisterObjectType("TileMapInfo2D", 0, asOBJ_REF | asOBJ_NOCOUNT);
 
     // struct Vertex2D | File: ../Urho2D/Drawable2D.h
     engine->RegisterObjectType("Vertex2D", sizeof(Vertex2D), asOBJ_VALUE | asGetTypeTraits<Vertex2D>());
