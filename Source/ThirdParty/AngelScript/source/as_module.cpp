@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2020 Andreas Jonsson
+   Copyright (c) 2003-2021 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -1470,7 +1470,8 @@ const char *asCModule::GetImportedFunctionDeclaration(asUINT index) const
 	if( func == 0 ) return 0;
 
 	asCString *tempString = &asCThreadManager::GetLocalData()->string;
-	*tempString = func->GetDeclarationStr();
+	// TODO: Allow the application to decide if the parameter name should be included or not (requires change in the interface)
+	*tempString = func->GetDeclarationStr(true, true, false);
 
 	return tempString->AddressOf();
 }
@@ -1759,11 +1760,11 @@ int asCModule::CompileGlobalVar(const char *sectionName, const char *code, int l
 }
 
 // interface
-int asCModule::CompileFunction(const char *sectionName, const char *code, int lineOffset, asDWORD compileFlags, asIScriptFunction **outFunc)
+int asCModule::CompileFunction(const char* sectionName, const char* code, int lineOffset, asDWORD compileFlags, asIScriptFunction** outFunc)
 {
 	// Make sure the outFunc is null if the function fails, so the
 	// application doesn't attempt to release a non-existent function
-	if( outFunc )
+	if (outFunc)
 		*outFunc = 0;
 
 #ifdef AS_NO_COMPILER
@@ -1774,19 +1775,19 @@ int asCModule::CompileFunction(const char *sectionName, const char *code, int li
 	return asNOT_SUPPORTED;
 #else
 	// Validate arguments
-	if( code == 0 ||
-		(compileFlags != 0 && compileFlags != asCOMP_ADD_TO_MODULE) )
+	if (code == 0 ||
+		(compileFlags != 0 && compileFlags != asCOMP_ADD_TO_MODULE))
 		return asINVALID_ARG;
 
 	// Only one thread may build at one time
 	// TODO: It should be possible to have multiple threads perform compilations
 	int r = m_engine->RequestBuild();
-	if( r < 0 )
+	if (r < 0)
 		return r;
 
 	// Prepare the engine
 	m_engine->PrepareEngine();
-	if( m_engine->configFailed )
+	if (m_engine->configFailed)
 	{
 		m_engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, TXT_INVALID_CONFIGURATION);
 		m_engine->BuildCompleted();
@@ -1796,8 +1797,18 @@ int asCModule::CompileFunction(const char *sectionName, const char *code, int li
 	// Compile the single function
 	asCBuilder funcBuilder(m_engine, this);
 	asCString str = code;
-	asCScriptFunction *func = 0;
+	asCScriptFunction* func = 0;
 	r = funcBuilder.CompileFunction(sectionName, str.AddressOf(), lineOffset, compileFlags, &func);
+
+	if (r >= 0)
+	{
+		// Invoke the JIT compiler if it has been set
+		asIJITCompiler* jit = m_engine->GetJITCompiler();
+		if (jit)
+		{
+			func->JITCompile();
+		}
+	}
 
 	m_engine->BuildCompleted();
 

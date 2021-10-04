@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2020 Andreas Jonsson
+   Copyright (c) 2003-2021 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -1603,8 +1603,29 @@ int asCBuilder::CheckNameConflict(const char *name, asCScriptNode *node, asCScri
 	}
 
 #ifndef AS_NO_COMPILER
-	// Check against class types
+	// Check against interface types
 	asUINT n;
+	for (n = 0; n < interfaceDeclarations.GetLength(); n++)
+	{
+		if (interfaceDeclarations[n]->name == name &&
+			interfaceDeclarations[n]->typeInfo->nameSpace == ns)
+		{
+			if (code)
+			{
+				asCString str;
+				if (ns->name != "")
+					str = ns->name + "::" + name;
+				else
+					str = name;
+				str.Format(TXT_NAME_CONFLICT_s_INTF, str.AddressOf());
+				WriteError(str, code, node);
+			}
+
+			return -1;
+		}
+	}
+
+	// Check against class types
 	for( n = 0; n < classDeclarations.GetLength(); n++ )
 	{
 		if( classDeclarations[n]->name == name &&
@@ -2081,10 +2102,12 @@ int asCBuilder::RegisterMixinClass(asCScriptNode *node, asCScriptCode *file, asS
 
 	asCScriptNode *n = cl->firstChild;
 
-	// Skip potential 'final' and 'shared' tokens
+	// Skip potential decorator tokens
 	while( n->tokenType == ttIdentifier &&
 		   (file->TokenEquals(n->tokenPos, n->tokenLength, FINAL_TOKEN) ||
-		    file->TokenEquals(n->tokenPos, n->tokenLength, SHARED_TOKEN)) )
+		    file->TokenEquals(n->tokenPos, n->tokenLength, SHARED_TOKEN) ||
+			file->TokenEquals(n->tokenPos, n->tokenLength, ABSTRACT_TOKEN) ||
+			file->TokenEquals(n->tokenPos, n->tokenLength, EXTERNAL_TOKEN)) )
 	{
 		// Report error, because mixin class cannot be final or shared
 		asCString msg;
@@ -2922,7 +2945,8 @@ void asCBuilder::CompileInterfaces()
 		// If any of the derived interfaces are found after this interface, then move this to the end of the list
 		for( asUINT m = n+1; m < interfaceDeclarations.GetLength(); m++ )
 		{
-			if( intfType->Implements(interfaceDeclarations[m]->typeInfo) )
+			if( intfType != interfaceDeclarations[m]->typeInfo &&
+				intfType->Implements(interfaceDeclarations[m]->typeInfo) )
 			{
 				interfaceDeclarations.RemoveIndex(n);
 				interfaceDeclarations.PushLast(intfDecl);
@@ -4769,7 +4793,7 @@ int asCBuilder::RegisterScriptFunctionFromNode(asCScriptNode *node, asCScriptCod
 	return RegisterScriptFunction(node, file, objType, isInterface, isGlobalFunction, ns, isExistingShared, isMixin, name, returnType, parameterNames, parameterTypes, inOutFlags, defaultArgs, funcTraits);
 }
 
-asCScriptFunction *asCBuilder::RegisterLambda(asCScriptNode *node, asCScriptCode *file, asCScriptFunction *funcDef, const asCString &name, asSNameSpace *ns)
+asCScriptFunction *asCBuilder::RegisterLambda(asCScriptNode *node, asCScriptCode *file, asCScriptFunction *funcDef, const asCString &name, asSNameSpace *ns, bool isShared)
 {
 	// Get the parameter names from the node
 	asCArray<asCString> parameterNames;
@@ -4792,7 +4816,9 @@ asCScriptFunction *asCBuilder::RegisterLambda(asCScriptNode *node, asCScriptCode
 
 	// Get the return and parameter types from the funcDef
 	asCString funcName = name;
-	int r = RegisterScriptFunction(args, file, 0, 0, true, ns, false, false, funcName, funcDef->returnType, parameterNames, funcDef->parameterTypes, funcDef->inOutFlags, defaultArgs, asSFunctionTraits());
+	asSFunctionTraits traits;
+	traits.SetTrait(asTRAIT_SHARED, isShared);
+	int r = RegisterScriptFunction(args, file, 0, 0, true, ns, false, false, funcName, funcDef->returnType, parameterNames, funcDef->parameterTypes, funcDef->inOutFlags, defaultArgs, traits);
 	if( r < 0 )
 		return 0;
 
@@ -5477,7 +5503,7 @@ void asCBuilder::GetObjectMethodDescriptions(const char *name, asCObjectType *ob
 		// TODO: child funcdef: A scope can include a template type, e.g. array<ns::type>
 		int n = scope.FindLast("::");
 		asCString className = n >= 0 ? scope.SubString(n+2) : scope;
-		asCString nsName = n >= 0 ? scope.SubString(0, n) : "";
+		asCString nsName = n >= 0 ? scope.SubString(0, n) : asCString("");
 
 		// If a namespace was specifically defined, then this must be used
 		asSNameSpace *ns = 0;
@@ -5961,6 +5987,19 @@ asCDataType asCBuilder::CreateDataTypeFromNode(asCScriptNode *node, asCScriptCod
 	{
 		if( n->tokenType == ttOpenBracket )
 		{
+			if (isImplicitHandle)
+			{
+				// Make the type a handle
+				if (dt.MakeHandle(true, acceptHandleForScope) < 0)
+				{
+					if (reportError)
+						WriteError(TXT_OBJECT_HANDLE_NOT_SUPPORTED, file, n);
+					if (isValid)
+						*isValid = false;
+				}
+				isImplicitHandle = false;
+			}
+
 			// Make sure the sub type can be instantiated
 			if( !dt.CanBeInstantiated() )
 			{

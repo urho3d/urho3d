@@ -1,6 +1,6 @@
 //
 //  AngelCode Scripting Library
-//  Copyright (c) 2020-2020 Andreas Jonsson
+//  Copyright (c) 2020-2021 Andreas Jonsson
 //
 //  This software is provided 'as-is', without any express or implied
 //  warranty. In no event will the authors be held liable for any
@@ -34,6 +34,10 @@
 // with assistance & guidance provided by Sir Kane
 
 // Compile with GCC/GAS
+
+#if !defined(AS_MAX_PORTABILITY)
+
+#if defined(__aarch64__)
 
 .arch armv8-a
 .text
@@ -217,3 +221,7 @@ CallARM64RetInMemory:
 	.cfi_def_cfa_offset 0
     ret
     .cfi_endproc
+
+#endif /* __aarch64__ */
+
+#endif /* !AS_MAX_PORTABILITY */

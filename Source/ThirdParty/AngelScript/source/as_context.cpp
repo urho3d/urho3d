@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2020 Andreas Jonsson
+   Copyright (c) 2003-2021 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -2882,7 +2882,8 @@ void asCContext::ExecuteNext()
 			m_regs.stackPointer      = l_sp;
 			m_regs.stackFramePointer = l_fp;
 
-			if( !(objType->flags & asOBJ_NOCOUNT) )
+			// Update ref counter for object types that require it
+			if( !(objType->flags & (asOBJ_NOCOUNT | asOBJ_VALUE)) )
 			{
 				// Release previous object held by destination pointer
 				if( *d != 0 && beh->release )
@@ -3912,21 +3913,21 @@ void asCContext::ExecuteNext()
 			}
 			else
 			{
-				if( func->funcType == asFUNC_SCRIPT )
+				if (func->funcType == asFUNC_SCRIPT)
 				{
 					m_regs.programPointer++;
 					CallScriptFunction(func);
 				}
-				else if( func->funcType == asFUNC_DELEGATE )
+				else if (func->funcType == asFUNC_DELEGATE)
 				{
 					// Push the object pointer on the stack. There is always a reserved space for this so
 					// we don't don't need to worry about overflowing the allocated memory buffer
-					asASSERT( m_regs.stackPointer - AS_PTR_SIZE >= m_stackBlocks[m_stackIndex] );
+					asASSERT(m_regs.stackPointer - AS_PTR_SIZE >= m_stackBlocks[m_stackIndex]);
 					m_regs.stackPointer -= AS_PTR_SIZE;
 					*(asPWORD*)m_regs.stackPointer = asPWORD(func->objForDelegate);
 
 					// Call the delegated method
-					if( func->funcForDelegate->funcType == asFUNC_SYSTEM )
+					if (func->funcForDelegate->funcType == asFUNC_SYSTEM)
 					{
 						m_regs.stackPointer += CallSystemFunction(func->funcForDelegate->id, this);
 
@@ -3942,15 +3943,32 @@ void asCContext::ExecuteNext()
 						CallInterfaceMethod(func->funcForDelegate);
 					}
 				}
-				else
+				else if (func->funcType == asFUNC_SYSTEM)
 				{
-					asASSERT( func->funcType == asFUNC_SYSTEM );
-
 					m_regs.stackPointer += CallSystemFunction(func->id, this);
 
 					// Update program position after the call so the line number
 					// is correct in case the system function queries it
 					m_regs.programPointer++;
+				}
+				else if (func->funcType == asFUNC_IMPORTED)
+				{
+					m_regs.programPointer++;
+					int funcId = m_engine->importedFunctions[func->id & ~FUNC_IMPORTED]->boundFunctionId;
+					if (funcId > 0)
+						CallScriptFunction(m_engine->scriptFunctions[funcId]);
+					else
+					{
+						// Tell the exception handler to clean up the arguments to this method
+						m_needToCleanupArgs = true;
+
+						SetInternalException(TXT_UNBOUND_FUNCTION);
+					}
+				}
+				else
+				{
+					// Should not get here
+					asASSERT(false);
 				}
 			}
 
@@ -4141,7 +4159,8 @@ void asCContext::ExecuteNext()
 			m_regs.stackPointer      = l_sp;
 			m_regs.stackFramePointer = l_fp;
 
-			if( !(objType->flags & asOBJ_NOCOUNT) )
+			// Update ref counter for object types that require it
+			if( !(objType->flags & (asOBJ_NOCOUNT | asOBJ_VALUE)) )
 			{
 				// Release previous object held by destination pointer
 				if( *d != 0 && beh->release )

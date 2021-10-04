@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2020 Andreas Jonsson
+   Copyright (c) 2003-2021 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -55,8 +55,7 @@ BEGIN_AS_NAMESPACE
 
 int DetectCallingConvention(bool isMethod, const asSFuncPtr &ptr, int callConv, void *auxiliary, asSSystemFunctionInterface *internal)
 {
-	memset(internal, 0, sizeof(asSSystemFunctionInterface));
-
+	internal->Clear();
 	internal->func      = ptr.ptr.f.func;
 	internal->auxiliary = 0;
 

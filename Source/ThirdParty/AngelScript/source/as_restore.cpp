@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2020 Andreas Jonsson
+   Copyright (c) 2003-2021 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -155,7 +155,7 @@ int asCReader::ReadInner()
 	noDebugInfo = ReadEncodedUInt() ? VALUE_OF_BOOLEAN_TRUE : 0;
 
 	// Read enums
-	count = ReadEncodedUInt();
+	count = SanityCheck(ReadEncodedUInt(), 1000000);
 	module->m_enumTypes.Allocate(count, false);
 	for( i = 0; i < count && !error; i++ )
 	{
@@ -228,7 +228,7 @@ int asCReader::ReadInner()
 
 	// classTypes[]
 	// First restore the structure names, then the properties
-	count = ReadEncodedUInt();
+	count = SanityCheck(ReadEncodedUInt(), 1000000);
 	module->m_classTypes.Allocate(count, false);
 	for( i = 0; i < count && !error; ++i )
 	{
@@ -299,7 +299,7 @@ int asCReader::ReadInner()
 	if( error ) return asERROR;
 
 	// Read func defs
-	count = ReadEncodedUInt();
+	count = SanityCheck(ReadEncodedUInt(), 1000000);
 	module->m_funcDefs.Allocate(count, false);
 	for( i = 0; i < count && !error; i++ )
 	{
@@ -401,7 +401,7 @@ int asCReader::ReadInner()
 	if( error ) return asERROR;
 
 	// Read typedefs
-	count = ReadEncodedUInt();
+	count = SanityCheck(ReadEncodedUInt(), 1000000);
 	module->m_typeDefs.Allocate(count, false);
 	for( i = 0; i < count && !error; i++ )
 	{
@@ -422,7 +422,7 @@ int asCReader::ReadInner()
 	if( error ) return asERROR;
 
 	// scriptGlobals[]
-	count = ReadEncodedUInt();
+	count = SanityCheck(ReadEncodedUInt(), 1000000);
 	if( count && engine->ep.disallowGlobalVars )
 	{
 		engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, TXT_GLOBAL_VARS_NOT_ALLOWED);
@@ -435,7 +435,7 @@ int asCReader::ReadInner()
 	}
 
 	// scriptFunctions[]
-	count = ReadEncodedUInt();
+	count = SanityCheck(ReadEncodedUInt(), 1000000);
 	for( i = 0; i < count && !error; ++i )
 	{
 		size_t len = module->m_scriptFunctions.GetLength();
@@ -496,7 +496,7 @@ int asCReader::ReadInner()
 	}
 
 	// globalFunctions[]
-	count = ReadEncodedUInt();
+	count = SanityCheck(ReadEncodedUInt(), 1000000);
 	for( i = 0; i < count && !error; ++i )
 	{
 		bool isNew;
@@ -516,7 +516,7 @@ int asCReader::ReadInner()
 	if( error ) return asERROR;
 
 	// bindInformations[]
-	count = ReadEncodedUInt();
+	count = SanityCheck(ReadEncodedUInt(), 1000000);
 	module->m_bindInformations.Allocate(count, false);
 	for( i = 0; i < count && !error; ++i )
 	{
@@ -554,7 +554,7 @@ int asCReader::ReadInner()
 	if( error ) return asERROR;
 
 	// usedTypes[]
-	count = ReadEncodedUInt();
+	count = SanityCheck(ReadEncodedUInt(), 1000000);
 	usedTypes.Allocate(count, false);
 	for( i = 0; i < count && !error; ++i )
 	{
@@ -660,7 +660,7 @@ void asCReader::ReadUsedStringConstants()
 	asCString str;
 
 	asUINT count;
-	count = ReadEncodedUInt();
+	count = SanityCheck(ReadEncodedUInt(), 1000000);
 
 	if (count > 0 && engine->stringFactory == 0)
 	{
@@ -681,7 +681,7 @@ void asCReader::ReadUsedFunctions()
 	TimeIt("asCReader::ReadUsedFunctions");
 
 	asUINT count;
-	count = ReadEncodedUInt();
+	count = SanityCheck(ReadEncodedUInt(), 1000000);
 	usedFunctions.SetLength(count);
 	if( usedFunctions.GetLength() != count )
 	{
@@ -1026,13 +1026,7 @@ void asCReader::ReadFunctionSignature(asCScriptFunction *func, asCObjectType **p
 
 	ReadDataType(&func->returnType);
 
-	count = ReadEncodedUInt();
-	if( count > 256 )
-	{
-		// Too many arguments, must be something wrong in the file
-		Error(TXT_INVALID_BYTECODE_d);
-		return;
-	}
+	count = SanityCheck(ReadEncodedUInt(), 256);
 	func->parameterTypes.Allocate(count, false);
 	for( i = 0; i < count; ++i )
 	{
@@ -1253,12 +1247,12 @@ asCScriptFunction *asCReader::ReadFunction(bool &isNew, bool addToModule, bool a
 
 				ReadByteCode(func);
 
-				func->scriptData->variableSpace = ReadEncodedUInt();
+				func->scriptData->variableSpace = SanityCheck(ReadEncodedUInt(), 1000000);
 
 				func->scriptData->objVariablesOnHeap = 0;
 				if (bits & 8)
 				{
-					count = ReadEncodedUInt();
+					count = SanityCheck(ReadEncodedUInt(), 1000000);
 					func->scriptData->objVariablePos.Allocate(count, false);
 					func->scriptData->objVariableTypes.Allocate(count, false);
 					for (i = 0; i < count; ++i)
@@ -1275,14 +1269,14 @@ asCScriptFunction *asCReader::ReadFunction(bool &isNew, bool addToModule, bool a
 						}
 					}
 					if (count > 0)
-						func->scriptData->objVariablesOnHeap = ReadEncodedUInt();
+						func->scriptData->objVariablesOnHeap = SanityCheck(ReadEncodedUInt(), 10000);
 
-					int length = ReadEncodedUInt();
+					int length = SanityCheck(ReadEncodedUInt(), 1000000);
 					func->scriptData->objVariableInfo.SetLength(length);
 					for (i = 0; i < length; ++i)
 					{
-						func->scriptData->objVariableInfo[i].programPos = ReadEncodedUInt();
-						func->scriptData->objVariableInfo[i].variableOffset = ReadEncodedUInt();
+						func->scriptData->objVariableInfo[i].programPos = SanityCheck(ReadEncodedUInt(), 1000000);
+						func->scriptData->objVariableInfo[i].variableOffset = SanityCheck(ReadEncodedInt(), 10000);
 						asEObjVarInfoOption option = (asEObjVarInfoOption)ReadEncodedUInt();
 						func->scriptData->objVariableInfo[i].option = option;
 						if (option != asOBJ_INIT && 
@@ -1301,19 +1295,19 @@ asCScriptFunction *asCReader::ReadFunction(bool &isNew, bool addToModule, bool a
 				if (bits & 16)
 				{
 					// Read info on try/catch blocks
-					int length = ReadEncodedUInt();
+					int length = SanityCheck(ReadEncodedUInt(), 1000000);
 					func->scriptData->tryCatchInfo.SetLength(length);
 					for (i = 0; i < length; ++i)
 					{
 						// The program position must be adjusted to be in number of instructions
-						func->scriptData->tryCatchInfo[i].tryPos = ReadEncodedUInt();
-						func->scriptData->tryCatchInfo[i].catchPos = ReadEncodedUInt();
+						func->scriptData->tryCatchInfo[i].tryPos = SanityCheck(ReadEncodedUInt(), 1000000);
+						func->scriptData->tryCatchInfo[i].catchPos = SanityCheck(ReadEncodedUInt(), 1000000);
 					}
 				}
 
 				if (!noDebugInfo)
 				{
-					int length = ReadEncodedUInt();
+					int length = SanityCheck(ReadEncodedUInt(), 1000000);
 					func->scriptData->lineNumbers.SetLength(length);
 					if (int(func->scriptData->lineNumbers.GetLength()) != length)
 					{
@@ -1326,7 +1320,7 @@ asCScriptFunction *asCReader::ReadFunction(bool &isNew, bool addToModule, bool a
 						func->scriptData->lineNumbers[i] = ReadEncodedUInt();
 
 					// Read the array of script sections
-					length = ReadEncodedUInt();
+					length = SanityCheck(ReadEncodedUInt(), 1000000);
 					func->scriptData->sectionIdxs.SetLength(length);
 					if (int(func->scriptData->sectionIdxs.GetLength()) != length)
 					{
@@ -1351,7 +1345,7 @@ asCScriptFunction *asCReader::ReadFunction(bool &isNew, bool addToModule, bool a
 				// Read the variable information
 				if (!noDebugInfo)
 				{
-					int length = ReadEncodedUInt();
+					int length = SanityCheck(ReadEncodedUInt(), 1000000);
 					func->scriptData->variables.Allocate(length, false);
 					for (i = 0; i < length; i++)
 					{
@@ -1366,7 +1360,7 @@ asCScriptFunction *asCReader::ReadFunction(bool &isNew, bool addToModule, bool a
 						func->scriptData->variables.PushLast(var);
 
 						var->declaredAtProgramPos = ReadEncodedUInt();
-						var->stackOffset = ReadEncodedUInt();
+						var->stackOffset = SanityCheck(ReadEncodedInt(),10000);
 						ReadString(&var->name);
 						ReadDataType(&var->type);
 
@@ -1551,7 +1545,7 @@ void asCReader::ReadTypeDeclaration(asCTypeInfo *type, int phase, bool *isExtern
 		// Read the initial attributes
 		ReadString(&type->name);
 		ReadData(&type->flags, 4);
-		type->size = ReadEncodedUInt();
+		type->size = SanityCheck(ReadEncodedUInt(), 1000000);
 		asCString ns;
 		ReadString(&ns);
 		type->nameSpace = engine->AddNameSpace(ns.AddressOf());
@@ -1613,7 +1607,7 @@ void asCReader::ReadTypeDeclaration(asCTypeInfo *type, int phase, bool *isExtern
 		if( type->flags & asOBJ_ENUM )
 		{
 			asCEnumType *t = CastToEnumType(type);
-			int count = ReadEncodedUInt();
+			int count = SanityCheck(ReadEncodedUInt(), 1000000);
 			bool sharedExists = existingShared.MoveTo(0, type);
 			if( !sharedExists )
 			{
@@ -1695,7 +1689,7 @@ void asCReader::ReadTypeDeclaration(asCTypeInfo *type, int phase, bool *isExtern
 			}
 
 			// interfaces[] / interfaceVFTOffsets[]
-			int size = ReadEncodedUInt();
+			int size = SanityCheck(ReadEncodedUInt(), 1000000);
 			if( sharedExists )
 			{
 				for( int n = 0; n < size; n++ )
@@ -1725,7 +1719,7 @@ void asCReader::ReadTypeDeclaration(asCTypeInfo *type, int phase, bool *isExtern
 
 					if (!ot->IsInterface())
 					{
-						asUINT offset = ReadEncodedUInt();
+						asUINT offset = SanityCheck(ReadEncodedUInt(), 1000000);
 						ot->interfaceVFTOffsets.PushLast(offset);
 					}
 				}
@@ -1776,7 +1770,7 @@ void asCReader::ReadTypeDeclaration(asCTypeInfo *type, int phase, bool *isExtern
 						ot->beh.destruct = 0;
 				}
 
-				size = ReadEncodedUInt();
+				size = SanityCheck(ReadEncodedUInt(), 1000000);
 				for( int n = 0; n < size; n++ )
 				{
 					func = ReadFunction(isNew, !sharedExists, !sharedExists, !sharedExists);
@@ -1880,7 +1874,7 @@ void asCReader::ReadTypeDeclaration(asCTypeInfo *type, int phase, bool *isExtern
 			}
 
 			// methods[]
-			size = ReadEncodedUInt();
+			size = SanityCheck(ReadEncodedUInt(), 1000000);
 			int n;
 			for( n = 0; n < size; n++ )
 			{
@@ -1946,7 +1940,7 @@ void asCReader::ReadTypeDeclaration(asCTypeInfo *type, int phase, bool *isExtern
 			}
 
 			// virtualFunctionTable[]
-			size = ReadEncodedUInt();
+			size = SanityCheck(ReadEncodedUInt(), 1000000);
 			for( n = 0; n < size; n++ )
 			{
 				bool isNew;
@@ -2011,7 +2005,7 @@ void asCReader::ReadTypeDeclaration(asCTypeInfo *type, int phase, bool *isExtern
 		asASSERT(ot);
 
 		// properties[]
-		asUINT size = ReadEncodedUInt();
+		asUINT size = SanityCheck(ReadEncodedUInt(), 1000000);
 		for( asUINT n = 0; n < size; n++ )
 			ReadObjectProperty(ot);
 	}
@@ -2039,10 +2033,15 @@ asUINT asCReader::ReadEncodedUInt()
 	return asUINT(qw & 0xFFFFFFFFu);
 }
 
+int asCReader::ReadEncodedInt()
+{
+	return int(ReadEncodedUInt());
+}
+
 asQWORD asCReader::ReadEncodedUInt64()
 {
 	asQWORD i = 0;
-	asBYTE b;
+	asBYTE b = 0xFF; // set to 0xFF to better catch if the stream doesn't update the value
 	ReadData(&b, 1);
 	bool isNegative = ( b & 0x80 ) ? true : false;
 	b &= 0x7F;
@@ -2113,9 +2112,35 @@ asQWORD asCReader::ReadEncodedUInt64()
 	return i;
 }
 
+asUINT asCReader::SanityCheck(asUINT val, asUINT max)
+{
+	if (val > max)
+	{
+		Error(TXT_INVALID_BYTECODE_d);
+
+		// Return 0 as default value
+		return 0;
+	}
+
+	return val;
+}
+
+int asCReader::SanityCheck(int val, asUINT max)
+{
+	if (val > int(max) || val < -int(max))
+	{
+		Error(TXT_INVALID_BYTECODE_d);
+
+		// Return 0 as default value
+		return 0;
+	}
+
+	return val;
+}
+
 void asCReader::ReadString(asCString* str)
 {
-	asUINT len = ReadEncodedUInt();
+	asUINT len = SanityCheck(ReadEncodedUInt(), 1000000);
 	if( len & 1 )
 	{
 		asUINT idx = len/2;
@@ -2261,7 +2286,7 @@ asCTypeInfo* asCReader::ReadTypeInfo()
 			return 0;
 		}
 
-		asUINT numSubTypes = ReadEncodedUInt();
+		asUINT numSubTypes = SanityCheck(ReadEncodedUInt(), 100);
 		asCArray<asCDataType> subTypes;
 		for( asUINT n = 0; n < numSubTypes; n++ )
 		{
@@ -2422,7 +2447,7 @@ void asCReader::ReadByteCode(asCScriptFunction *func)
 
 	// Read number of instructions
 	asUINT total, numInstructions;
-	total = numInstructions = ReadEncodedUInt();
+	total = numInstructions = SanityCheck(ReadEncodedUInt(), 1000000);
 
 	// Reserve some space for the instructions
 	func->scriptData->byteCode.AllocateNoConstruct(numInstructions, false);
@@ -2664,7 +2689,7 @@ void asCReader::ReadUsedTypeIds()
 {
 	TimeIt("asCReader::ReadUsedTypeIds");
 
-	asUINT count = ReadEncodedUInt();
+	asUINT count = SanityCheck(ReadEncodedUInt(), 1000000);
 	usedTypeIds.Allocate(count, false);
 	for( asUINT n = 0; n < count; n++ )
 	{
@@ -2678,7 +2703,7 @@ void asCReader::ReadUsedGlobalProps()
 {
 	TimeIt("asCReader::ReadUsedGlobalProps");
 
-	int c = ReadEncodedUInt();
+	int c = SanityCheck(ReadEncodedUInt(), 1000000);
 
 	usedGlobalProperties.Allocate(c, false);
 
@@ -2719,7 +2744,7 @@ void asCReader::ReadUsedObjectProps()
 {
 	TimeIt("asCReader::ReadUsedObjectProps");
 
-	asUINT c = ReadEncodedUInt();
+	asUINT c = SanityCheck(ReadEncodedUInt(), 1000000);
 
 	usedObjectProperties.SetLength(c);
 	for( asUINT n = 0; n < c; n++ )

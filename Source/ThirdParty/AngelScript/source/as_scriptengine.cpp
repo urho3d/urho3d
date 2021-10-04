@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2020 Andreas Jonsson
+   Copyright (c) 2003-2021 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -951,12 +951,16 @@ asCModule *asCScriptEngine::FindNewOwnerForSharedFunc(asCScriptFunction *in_func
 	if( in_func->module != in_mod)
 		return in_func->module;
 
-	if (in_func->objectType && in_func->objectType->module && 
-		in_func->objectType->module != in_func->module)
+	// Check if this is a class method or class factory for a type that has already been moved to a different module
+	if ((in_func->objectType && in_func->objectType->module && in_func->objectType->module != in_func->module) ||
+		(in_func->IsFactory() && in_func->returnType.GetTypeInfo()->module && in_func->returnType.GetTypeInfo()->module != in_func->module))
 	{
 		// The object type for the method has already been transferred to 
 		// another module, so transfer the method to the same module
-		in_func->module = in_func->objectType->module;
+		if (in_func->objectType)
+			in_func->module = in_func->objectType->module;
+		else
+			in_func->module = in_func->returnType.GetTypeInfo()->module;
 
 		// Make sure the function is listed in the module
 		// The compiler may not have done this earlier, since the object
@@ -1370,7 +1374,9 @@ int asCScriptEngine::GetFactoryIdByDecl(const asCObjectType *ot, const char *dec
 	for( asUINT n = 0; n < ot->beh.factories.GetLength(); n++ )
 	{
 		asCScriptFunction *f = scriptFunctions[ot->beh.factories[n]];
-		if( f->IsSignatureEqual(&func) )
+
+		// We don't really care if the name of the function is correct
+		if( f->IsSignatureExceptNameEqual(&func) )
 		{
 			id = ot->beh.factories[n];
 			break;
@@ -2156,7 +2162,9 @@ int asCScriptEngine::RegisterBehaviourToObjectType(asCObjectType *objectType, as
 		}
 
 		// Verify the parameters
-		if( func.parameterTypes.GetLength() != 1 || !func.parameterTypes[0].IsReference() )
+		// The templates take a hidden parameter with the object type
+		if( (!(objectType->flags & asOBJ_TEMPLATE) && (func.parameterTypes.GetLength() != 1 || !func.parameterTypes[0].IsReference())) || 
+			((objectType->flags & asOBJ_TEMPLATE) && (func.parameterTypes.GetLength() != 2 || !func.parameterTypes[0].IsReference() || !func.parameterTypes[1].IsReference())) )
 		{
 			if( listPattern )
 				listPattern->Destroy(this);
@@ -4960,7 +4968,8 @@ int asCScriptEngine::RefCastObject(void *obj, asITypeInfo *fromType, asITypeInfo
 
 	// Look for ref cast behaviours
 	asCScriptFunction *universalCastFunc = 0;
-	asCObjectType *from = reinterpret_cast<asCObjectType*>(fromType);
+	asCObjectType *from = CastToObjectType(reinterpret_cast< asCTypeInfo*>(fromType));
+	if( from == 0 ) return asINVALID_ARG;
 	for( asUINT n = 0; n < from->methods.GetLength(); n++ )
 	{
 		asCScriptFunction *func = scriptFunctions[from->methods[n]];
@@ -5044,7 +5053,8 @@ void *asCScriptEngine::CreateScriptObject(const asITypeInfo *type)
 {
 	if( type == 0 ) return 0;
 
-	asCObjectType *objType = const_cast<asCObjectType*>(reinterpret_cast<const asCObjectType *>(type));
+	asCObjectType *objType = CastToObjectType(const_cast<asCTypeInfo*>(reinterpret_cast<const asCTypeInfo*>(type)));
+	if (objType == 0) return 0;
 	void *ptr = 0;
 
 	// Check that there is a default factory for ref types
@@ -5243,7 +5253,9 @@ void *asCScriptEngine::CreateUninitializedScriptObject(const asITypeInfo *type)
 	if( type == 0 || !(type->GetFlags() & asOBJ_SCRIPT_OBJECT) )
 		return 0;
 
-	asCObjectType *objType = const_cast<asCObjectType*>(reinterpret_cast<const asCObjectType*>(type));
+	asCObjectType *objType = CastToObjectType(const_cast<asCTypeInfo*>(reinterpret_cast<const asCTypeInfo*>(type)));
+	if (objType == 0)
+		return 0;
 
 	// Construct the object, but do not call the actual constructor that initializes the members
 	// The initialization will be done by the application afterwards, e.g. through serialization.
@@ -5260,9 +5272,11 @@ void *asCScriptEngine::CreateScriptObjectCopy(void *origObj, const asITypeInfo *
 {
 	if( origObj == 0 || type == 0 ) return 0;
 
+	const asCObjectType* ot = CastToObjectType(const_cast<asCTypeInfo*>(reinterpret_cast<const asCTypeInfo*>(type)));
+	if (ot == 0) return 0;
+
 	void *newObj = 0;
 
-	const asCObjectType *ot = reinterpret_cast<const asCObjectType*>(type);
 	if ((ot->flags & asOBJ_SCRIPT_OBJECT) && ot->beh.copyfactory)
 	{
 		// Call the script class' default factory with a context
@@ -5286,7 +5300,7 @@ void *asCScriptEngine::CreateScriptObjectCopy(void *origObj, const asITypeInfo *
 		}
 #endif
 	}
-	else if( ot->beh.copyconstruct )
+	else if(ot->beh.copyconstruct )
 	{
 		// Manually allocate the memory, then call the copy constructor
 		newObj = CallAlloc(ot);
@@ -5351,7 +5365,8 @@ int asCScriptEngine::AssignScriptObject(void *dstObj, void *srcObj, const asITyp
 	// TODO: Warn about invalid call in message stream (make it optional)
 	if( type == 0 || dstObj == 0 || srcObj == 0 ) return asINVALID_ARG;
 
-	const asCObjectType *objType = reinterpret_cast<const asCObjectType*>(type);
+	const asCObjectType *objType = CastToObjectType(const_cast<asCTypeInfo*>(reinterpret_cast<const asCTypeInfo*>(type)));
+	if (objType == 0) return asINVALID_ARG;
 
 	// If value assign for ref types has been disabled, then don't do anything if the type is a ref type
 	if (ep.disallowValueAssignForRefType && (objType->flags & asOBJ_REF) && !(objType->flags & asOBJ_SCOPED))
@@ -5389,7 +5404,7 @@ void asCScriptEngine::AddRefScriptObject(void *obj, const asITypeInfo *type)
 	// Make sure it is not a null pointer
 	if( obj == 0 || type == 0 ) return;
 
-	const asCTypeInfo *ti = static_cast<const asCTypeInfo*>(type);
+	const asCTypeInfo *ti = reinterpret_cast<const asCTypeInfo*>(type);
 	if (ti->flags & asOBJ_FUNCDEF)
 	{
 		CallObjectMethod(obj, functionBehaviours.beh.addref);
@@ -5411,7 +5426,7 @@ void asCScriptEngine::ReleaseScriptObject(void *obj, const asITypeInfo *type)
 	// Make sure it is not a null pointer
 	if( obj == 0 || type == 0 ) return;
 
-	const asCTypeInfo *ti = static_cast<const asCTypeInfo*>(type);
+	const asCTypeInfo *ti = reinterpret_cast<const asCTypeInfo*>(type);
 	if (ti->flags & asOBJ_FUNCDEF)
 	{
 		CallObjectMethod(obj, functionBehaviours.beh.release);

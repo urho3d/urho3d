@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2020 Andreas Jonsson
+   Copyright (c) 2003-2021 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -119,11 +119,33 @@ struct asSSystemFunctionInterface
 	};
 	asCArray<SClean>     cleanArgs;
 
-	asSSystemFunctionInterface() : func(0), baseOffset(0), callConv(ICC_GENERIC_FUNC), hostReturnInMemory(false), hostReturnFloat(false), hostReturnSize(0), paramSize(0), takesObjByVal(false), returnAutoHandle(false), compositeOffset(0), isCompositeIndirect(false), auxiliary(0) {}
+	asSSystemFunctionInterface()
+	{ 
+		Clear(); 
+	}
 
 	asSSystemFunctionInterface(const asSSystemFunctionInterface &in)
 	{
 		*this = in;
+	}
+
+	void Clear()
+	{
+		func                = 0;
+		baseOffset          = 0;
+		callConv            = ICC_GENERIC_FUNC;
+		hostReturnInMemory  = false;
+		hostReturnFloat     = false;
+		hostReturnSize      = 0;
+		paramSize           = 0;
+		takesObjByVal       = false;
+		returnAutoHandle    = false;
+		compositeOffset     = 0;
+		isCompositeIndirect = false;
+		auxiliary           = 0;
+
+		paramAutoHandles.SetLength(0);
+		cleanArgs.SetLength(0);
 	}
 
 	asSSystemFunctionInterface &operator=(const asSSystemFunctionInterface &in)
@@ -136,12 +158,14 @@ struct asSSystemFunctionInterface
 		hostReturnSize      = in.hostReturnSize;
 		paramSize           = in.paramSize;
 		takesObjByVal       = in.takesObjByVal;
-		paramAutoHandles    = in.paramAutoHandles;
 		returnAutoHandle    = in.returnAutoHandle;
 		compositeOffset     = in.compositeOffset;
 		isCompositeIndirect = in.isCompositeIndirect;
 		auxiliary           = in.auxiliary;
+
 		cleanArgs           = in.cleanArgs;
+		paramAutoHandles    = in.paramAutoHandles;
+
 		return *this;
 	}
 };
