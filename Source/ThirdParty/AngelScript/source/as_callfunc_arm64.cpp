@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2020-2020 Andreas Jonsson
+   Copyright (c) 2020-2021 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -110,7 +110,7 @@ static inline bool IsRegisterHFA(const asCDataType &type)
 
 	if( typeInfo == nullptr ||
 		(typeInfo->flags & asOBJ_APP_CLASS_ALLFLOATS) == 0 ||
-		type.IsObjectHandle() && type.IsReference() )
+		type.IsObjectHandle() || type.IsReference() )
 		return false;
 
 	const bool doubles = (typeInfo->flags & asOBJ_APP_CLASS_ALIGN8) != 0;

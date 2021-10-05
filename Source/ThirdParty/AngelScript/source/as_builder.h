@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2019 Andreas Jonsson
+   Copyright (c) 2003-2021 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -217,7 +217,7 @@ protected:
 	int                RegisterEnum(asCScriptNode *node, asCScriptCode *file, asSNameSpace *ns);
 	int                RegisterTypedef(asCScriptNode *node, asCScriptCode *file, asSNameSpace *ns);
 	int                RegisterFuncDef(asCScriptNode *node, asCScriptCode *file, asSNameSpace *ns, asCObjectType *parent);
-	asCScriptFunction *RegisterLambda(asCScriptNode *node, asCScriptCode *file, asCScriptFunction *funcDef, const asCString &name, asSNameSpace *ns);
+	asCScriptFunction *RegisterLambda(asCScriptNode *node, asCScriptCode *file, asCScriptFunction *funcDef, const asCString &name, asSNameSpace *ns, bool isShared);
 	void               CompleteFuncDef(sFuncDef *funcDef);
 	void               CompileInterfaces();
 	void               CompileClasses(asUINT originalNumTempl);

@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2019 Andreas Jonsson
+   Copyright (c) 2003-2021 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -2488,7 +2488,7 @@ asCScriptNode *asCParser::ParseScript(bool inBlock)
 	UNREACHABLE_RETURN;
 }
 
-// BNF:1: NAMESPACE     ::= 'namespace' IDENTIFIER '{' SCRIPT '}'
+// BNF:1: NAMESPACE     ::= 'namespace' IDENTIFIER {'::' IDENTIFIER} '{' SCRIPT '}'
 asCScriptNode *asCParser::ParseNamespace()
 {
 	asCScriptNode *node = CreateNode(snNamespace);
@@ -2505,11 +2505,32 @@ asCScriptNode *asCParser::ParseNamespace()
 		Error(InsteadFound(t1), &t1);
 	}
 
-	// TODO: namespace: Allow declaration of multiple nested namespace with namespace A::B::C { }
 	node->AddChildLast(ParseIdentifier());
 	if( isSyntaxError ) return node;
 
+	asCScriptNode *lowestNode = node;
 	GetToken(&t1);
+	while (t1.type == ttScope)
+	{
+		lowestNode->UpdateSourcePos(t1.pos, t1.length);
+
+		asCScriptNode *scopeNode = CreateNode(snScript);
+		if (scopeNode == 0) 
+			return 0;
+		lowestNode->AddChildLast(scopeNode);
+
+		lowestNode = CreateNode(snNamespace);
+		if (lowestNode == 0) 
+			return 0;
+
+		scopeNode->AddChildLast(lowestNode);
+		lowestNode->AddChildLast(ParseIdentifier());
+		if (isSyntaxError)
+			return node;
+
+		GetToken(&t1);
+	}
+	
 	if( t1.type == ttStartStatementBlock )
 		node->UpdateSourcePos(t1.pos, t1.length);
 	else
@@ -2521,7 +2542,7 @@ asCScriptNode *asCParser::ParseNamespace()
 
 	sToken start = t1;
 
-	node->AddChildLast(ParseScript(true));
+	lowestNode->AddChildLast(ParseScript(true));
 
 	if( !isSyntaxError )
 	{

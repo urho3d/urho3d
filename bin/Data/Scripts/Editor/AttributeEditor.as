@@ -68,7 +68,7 @@ UIElement@ SetValue(CheckBox@ element, bool value, bool sameValue)
 
 UIElement@ SetValue(DropDownList@ element, int value, bool sameValue)
 {
-    element.selection = sameValue ? value : M_MAX_UNSIGNED;
+    element.selection = sameValue ? uint(value) : M_MAX_UNSIGNED;
     return element;
 }
 

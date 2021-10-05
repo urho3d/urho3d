@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2019 Andreas Jonsson
+   Copyright (c) 2003-2021 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -215,6 +215,7 @@ public:
 	void SetProtected(bool set) { traits.SetTrait(asTRAIT_PROTECTED, set); }
 	void SetPrivate(bool set) { traits.SetTrait(asTRAIT_PRIVATE, set); }
 	void SetProperty(bool set) { traits.SetTrait(asTRAIT_PROPERTY, set); }
+	bool IsFactory() const;
 
 	asCScriptFunction(asCScriptEngine *engine, asCModule *mod, asEFuncType funcType);
 	~asCScriptFunction();

@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2020 Andreas Jonsson
+   Copyright (c) 2003-2021 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -252,26 +252,27 @@
 // compiler is the same for both, when this is so these flags are used to produce the
 // right code.
 
-// AS_WIN       - Microsoft Windows
-// AS_LINUX     - Linux
-// AS_MAC       - Apple Macintosh
-// AS_BSD       - BSD based OS (FreeBSD, DragonFly, OpenBSD, etc)
-// AS_XBOX      - Microsoft XBox
-// AS_XBOX360   - Microsoft XBox 360
-// AS_PSP       - Sony Playstation Portable
-// AS_PSVITA    - Sony Playstation Vita
-// AS_PS2       - Sony Playstation 2
-// AS_PS3       - Sony Playstation 3
-// AS_DC        - Sega Dreamcast
-// AS_GC        - Nintendo GameCube
-// AS_WII       - Nintendo Wii
-// AS_WIIU      - Nintendo Wii U
-// AS_IPHONE    - Apple IPhone
-// AS_ANDROID   - Android
-// AS_HAIKU     - Haiku
-// AS_ILLUMOS   - Illumos like (OpenSolaris, OpenIndiana, NCP, etc)
-// AS_MARMALADE - Marmalade cross platform SDK (a layer on top of the OS)
-// AS_SUN       - Sun UNIX
+// AS_WIN            - Microsoft Windows
+// AS_LINUX          - Linux
+// AS_MAC            - Apple Macintosh
+// AS_BSD            - BSD based OS (FreeBSD, DragonFly, OpenBSD, etc)
+// AS_XBOX           - Microsoft XBox
+// AS_XBOX360        - Microsoft XBox 360
+// AS_PSP            - Sony Playstation Portable
+// AS_PSVITA         - Sony Playstation Vita
+// AS_PS2            - Sony Playstation 2
+// AS_PS3            - Sony Playstation 3
+// AS_DC             - Sega Dreamcast
+// AS_GC             - Nintendo GameCube
+// AS_WII            - Nintendo Wii
+// AS_WIIU           - Nintendo Wii U
+// AS_NINTENDOSWITCH - Nintendo Switch
+// AS_IPHONE         - Apple IPhone
+// AS_ANDROID        - Android
+// AS_HAIKU          - Haiku
+// AS_ILLUMOS        - Illumos like (OpenSolaris, OpenIndiana, NCP, etc)
+// AS_MARMALADE      - Marmalade cross platform SDK (a layer on top of the OS)
+// AS_SUN            - Sun UNIX
 
 
 
@@ -656,6 +657,37 @@
 		// Native calling conventions are not yet supported
 		#define AS_MAX_PORTABILITY
 
+	// Nintendo Switch
+	// Note, __SWITCH__ is not an official define in the Nintendo dev kit. 
+	// You need to manually add this to the project when compiling for Switch.
+	#elif defined(__SWITCH__)
+		#define AS_NINTENDOSWITCH
+
+		#if (!defined(__LP64__))
+			#error write me
+		#else
+			#define AS_ARM64
+			#undef STDCALL
+			#define STDCALL
+
+			#undef GNU_STYLE_VIRTUAL_METHOD
+			#undef AS_NO_THISCALL_FUNCTOR_METHOD
+
+			#define HAS_128_BIT_PRIMITIVES
+
+			#define CDECL_RETURN_SIMPLE_IN_MEMORY
+			#define STDCALL_RETURN_SIMPLE_IN_MEMORY
+			#define THISCALL_RETURN_SIMPLE_IN_MEMORY
+
+			#undef THISCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE
+			#undef CDECL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE
+			#undef STDCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE
+
+			#define THISCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 5
+			#define CDECL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE    5
+			#define STDCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE  5
+		#endif
+
 	// Marmalade is a cross platform SDK. It uses g++ to compile for iOS and Android
 	#elif defined(__S3E__)
 		#ifndef AS_MARMALADE
@@ -757,7 +789,7 @@
 			#undef STDCALL
 			#define STDCALL
 
-		#elif (defined(__arm64__))
+		#elif (defined(__aarch64__))
 			// The IPhone 5S+ uses an ARM64 processor
 
 			// AngelScript currently doesn't support native calling
@@ -779,7 +811,7 @@
 			#undef COMPLEX_RETURN_MASK
 			#define COMPLEX_RETURN_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR | asOBJ_APP_ARRAY)
 
-		#elif defined(__LP64__) && !defined(__ppc__) && !defined(__PPC__) && !defined(__arm64__)
+		#elif defined(__LP64__) && !defined(__ppc__) && !defined(__PPC__) && !defined(__aarch64__)
 			// http://developer.apple.com/library/mac/#documentation/DeveloperTools/Conceptual/LowLevelABI/140-x86-64_Function_Calling_Conventions/x86_64.html#//apple_ref/doc/uid/TP40005035-SW1
 			#define AS_X64_GCC
 			#undef AS_NO_THISCALL_FUNCTOR_METHOD
@@ -1091,30 +1123,40 @@
 		#undef COMPLEX_RETURN_MASK
 		#define COMPLEX_RETURN_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR | asOBJ_APP_ARRAY)
 
-		#if (defined(_ARM_) || defined(__arm__))
+		#if (defined(_ARM_) || defined(__arm__) || defined(__aarch64__) || defined(__AARCH64EL__))
 			// Android ARM
-
-			// TODO: The stack unwind on exceptions currently fails due to the assembler code in as_callfunc_arm_gcc.S
-			#define AS_NO_EXCEPTIONS
 
 			#undef THISCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE
 			#undef CDECL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE
 			#undef STDCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE
-
-			#define THISCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 2
-			#define CDECL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 2
-			#define STDCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 2
 
 			// The stdcall calling convention is not used on the arm cpu
 			#undef STDCALL
 			#define STDCALL
 
 			#undef GNU_STYLE_VIRTUAL_METHOD
-
-			#define AS_ARM
 			#undef AS_NO_THISCALL_FUNCTOR_METHOD
-			#define AS_SOFTFP
-			#define AS_CALLEE_DESTROY_OBJ_BY_VAL
+
+			#if (!defined(__LP64__))
+				// TODO: The stack unwind on exceptions currently fails due to the assembler code in as_callfunc_arm_gcc.S
+				#define AS_NO_EXCEPTIONS
+
+				#define THISCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 2
+				#define CDECL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 2
+				#define STDCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 2
+
+				#define AS_ARM
+				#define AS_SOFTFP
+				#define AS_CALLEE_DESTROY_OBJ_BY_VAL
+			#elif (defined(__LP64__) || defined(__aarch64__))
+				#define AS_ARM64
+
+				#define HAS_128_BIT_PRIMITIVES
+
+				#define THISCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 5
+				#define CDECL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE    5
+				#define STDCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE  5
+			#endif
 		#elif (defined(i386) || defined(__i386) || defined(__i386__)) && !defined(__LP64__)
 			// Android Intel x86 (same config as Linux x86). Tested with Intel x86 Atom System Image.
 
@@ -1123,7 +1165,7 @@
 			#define AS_X86
 			#undef AS_NO_THISCALL_FUNCTOR_METHOD
 
-		// Urho3D: Add support for Android Intel x86_64 and Android ARM 64bit
+		// Urho3D: Add support for Android Intel x86_64
 		#elif defined(__LP64__) && !defined(__aarch64__)
 			// Android Intel x86_64 (same config as Linux x86_64). Tested with Intel x86_64 Atom System Image.
 			#define AS_X64_GCC
@@ -1133,12 +1175,6 @@
 			#define AS_LARGE_OBJS_PASSED_BY_REF
 			#define AS_LARGE_OBJ_MIN_SIZE 5
 			// STDCALL is not available on 64bit Linux
-			#undef STDCALL
-			#define STDCALL
-		#elif defined(__aarch64__)
-			// Doesn't support native calling for Android ARM 64bit yet
-			#define AS_MAX_PORTABILITY
-			// STDCALL is not available on ARM
 			#undef STDCALL
 			#define STDCALL
 		// Urho3D: end

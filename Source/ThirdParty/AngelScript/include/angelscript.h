@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2020 Andreas Jonsson
+   Copyright (c) 2003-2021 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -40,8 +40,8 @@
 #ifndef ANGELSCRIPT_H
 #define ANGELSCRIPT_H
 
-// Urho3D: Define AS_MAX_PORTABILITY for Web and 64-bit ARM / MCST Elbrus 2000 platforms
-#if defined(__EMSCRIPTEN__) || defined(__aarch64__) || defined(__e2k__)
+// Urho3D: Define AS_MAX_PORTABILITY for Web and MCST Elbrus 2000 platforms
+#if defined(__EMSCRIPTEN__) || defined(__e2k__)
 #define AS_MAX_PORTABILITY
 #endif
 
@@ -64,8 +64,8 @@ BEGIN_AS_NAMESPACE
 
 // AngelScript version
 
-#define ANGELSCRIPT_VERSION        23500
-#define ANGELSCRIPT_VERSION_STRING "2.35.0"
+#define ANGELSCRIPT_VERSION        23501
+#define ANGELSCRIPT_VERSION_STRING "2.35.1"
 
 // Data types
 
