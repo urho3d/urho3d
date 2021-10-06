@@ -45,6 +45,9 @@ static void Register_AllocatorNode(asIScriptEngine* engine)
 // struct AnimationControl | File: ../Graphics/AnimationController.h
 static void Register_AnimationControl(asIScriptEngine* engine)
 {
+    // AnimationControl::AnimationControl() | File: ../Graphics/AnimationController.h
+    // Factory not registered since the @nocount object created in a script through the factory will never be deleted
+
     RegisterMembers_AnimationControl<AnimationControl>(engine, "AnimationControl");
 
     #ifdef REGISTER_CLASS_MANUAL_PART_AnimationControl
@@ -90,6 +93,9 @@ static void Register_AnimationStateTrack(asIScriptEngine* engine)
 // struct AnimationTrack | File: ../Graphics/Animation.h
 static void Register_AnimationTrack(asIScriptEngine* engine)
 {
+    // AnimationTrack::AnimationTrack() | File: ../Graphics/Animation.h
+    // Factory not registered since the @nocount object created in a script through the factory will never be deleted
+
     RegisterMembers_AnimationTrack<AnimationTrack>(engine, "AnimationTrack");
 
     #ifdef REGISTER_CLASS_MANUAL_PART_AnimationTrack
@@ -304,6 +310,9 @@ static void Register_Billboard(asIScriptEngine* engine)
 // struct Bone | File: ../Graphics/Skeleton.h
 static void Register_Bone(asIScriptEngine* engine)
 {
+    // Bone::Bone() | File: ../Graphics/Skeleton.h
+    // Factory not registered since the @nocount object created in a script through the factory will never be deleted
+
     RegisterMembers_Bone<Bone>(engine, "Bone");
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Bone
@@ -486,25 +495,15 @@ static void Register_Color(asIScriptEngine* engine)
     #endif
 }
 
-// explicit ColorFrame::ColorFrame(const Color& color)
-static ColorFrame* ColorFrame__ColorFrame_constspColoramp(const Color& color)
-{
-    return new ColorFrame(color);
-}
-
-// ColorFrame::ColorFrame(const Color& color, float time)
-static ColorFrame* ColorFrame__ColorFrame_constspColoramp_float(const Color& color, float time)
-{
-    return new ColorFrame(color, time);
-}
-
 // struct ColorFrame | File: ../Graphics/ParticleEffect.h
 static void Register_ColorFrame(asIScriptEngine* engine)
 {
-    // explicit ColorFrame::ColorFrame(const Color& color)
-    engine->RegisterObjectBehaviour("ColorFrame", asBEHAVE_FACTORY, "ColorFrame@ f(const Color&in)", AS_FUNCTION(ColorFrame__ColorFrame_constspColoramp) , AS_CALL_CDECL);
-    // ColorFrame::ColorFrame(const Color& color, float time)
-    engine->RegisterObjectBehaviour("ColorFrame", asBEHAVE_FACTORY, "ColorFrame@ f(const Color&in, float)", AS_FUNCTION(ColorFrame__ColorFrame_constspColoramp_float) , AS_CALL_CDECL);
+    // ColorFrame::ColorFrame() | File: ../Graphics/ParticleEffect.h
+    // Factory not registered since the @nocount object created in a script through the factory will never be deleted
+    // ColorFrame::ColorFrame(const Color& color, float time) | File: ../Graphics/ParticleEffect.h
+    // Factory not registered since the @nocount object created in a script through the factory will never be deleted
+    // explicit ColorFrame::ColorFrame(const Color& color) | File: ../Graphics/ParticleEffect.h
+    // Factory not registered since the @nocount object created in a script through the factory will never be deleted
 
     RegisterMembers_ColorFrame<ColorFrame>(engine, "ColorFrame");
 
@@ -2199,6 +2198,9 @@ static void Register_ShadowBatchQueue(asIScriptEngine* engine)
 // class Skeleton | File: ../Graphics/Skeleton.h
 static void Register_Skeleton(asIScriptEngine* engine)
 {
+    // Skeleton::Skeleton() | File: ../Graphics/Skeleton.h
+    // Factory not registered since the @nocount object created in a script through the factory will never be deleted
+
     RegisterMembers_Skeleton<Skeleton>(engine, "Skeleton");
 
     #ifdef REGISTER_CLASS_MANUAL_PART_Skeleton
@@ -2581,6 +2583,9 @@ static void Register_TechniqueEntry(asIScriptEngine* engine)
 // struct TextureFrame | File: ../Graphics/ParticleEffect.h
 static void Register_TextureFrame(asIScriptEngine* engine)
 {
+    // TextureFrame::TextureFrame() | File: ../Graphics/ParticleEffect.h
+    // Factory not registered since the @nocount object created in a script through the factory will never be deleted
+
     RegisterMembers_TextureFrame<TextureFrame>(engine, "TextureFrame");
 
     #ifdef REGISTER_CLASS_MANUAL_PART_TextureFrame
