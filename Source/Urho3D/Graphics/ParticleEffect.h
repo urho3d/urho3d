@@ -41,7 +41,7 @@ enum EmitterType
 };
 
 /// %Color animation frame definition.
-/// @fakeref
+/// @nocount
 struct ColorFrame
 {
     /// Construct with default values.
@@ -84,7 +84,7 @@ struct ColorFrame
 };
 
 /// %Texture animation frame definition.
-/// @fakeref
+/// @nocount
 struct TextureFrame
 {
     /// Construct with default values.
