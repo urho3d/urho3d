@@ -304,7 +304,7 @@ public:
     bool AllFloats() const;
     bool AllInts() const;
     bool IsPod() const;
-    bool IsFakeRef() const { return Contains(GetComment(), "FAKE_REF"); }
+    bool IsNoCount() const { return Contains(GetComment(), "NO_COUNT"); } // Have @nocount in comment -> asOBJ_NOCOUNT
     shared_ptr<ClassAnalyzer> GetBaseClass() const;
     vector<ClassAnalyzer> GetBaseClasses() const;
     vector<ClassAnalyzer> GetAllBaseClasses() const;

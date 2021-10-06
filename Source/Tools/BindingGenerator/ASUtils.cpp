@@ -458,7 +458,7 @@ ConvertedVariable CppVariableToAS(const TypeAnalyzer& type, VariableUsage usage,
     if (analyzer && Contains(analyzer->GetComment(), "NO_BIND"))
         throw Exception("Error: type \"" + cppTypeName + "\" can not automatically bind bacause have @nobind mark");
 
-    if (analyzer && analyzer->IsAbstract() && !(analyzer->IsRefCounted() || Contains(analyzer->GetComment(), "FAKE_REF")))
+    if (analyzer && analyzer->IsAbstract() && !(analyzer->IsRefCounted() || analyzer->IsNoCount()))
         throw Exception("Error: type \"" + cppTypeName + "\" can not bind bacause abstract value");
 
     // analyzer can be null for simple types (int, float) or if type "using VariantVector = Vector<Variant>"
@@ -513,8 +513,8 @@ ConvertedVariable CppVariableToAS(const TypeAnalyzer& type, VariableUsage usage,
     {
         shared_ptr<ClassAnalyzer> analyzer = FindClassByName(cppTypeName);
 
-        if (analyzer && (analyzer->IsRefCounted() || analyzer->IsFakeRef()))
-            result.asDeclaration_ = result.asDeclaration_  + "@" + (analyzer->IsFakeRef() ? "" : "+");
+        if (analyzer && (analyzer->IsRefCounted() || analyzer->IsNoCount()))
+            result.asDeclaration_ = result.asDeclaration_  + "@" + (analyzer->IsNoCount() ? "" : "+");
         else
             throw Exception("Error: type \"" + type.ToString() + "\" can not automatically bind");
     }
@@ -597,8 +597,8 @@ string CppTypeToAS(const TypeAnalyzer& type, TypeUsage typeUsage)
     {
         shared_ptr<ClassAnalyzer> analyzer = FindClassByName(type.GetNameWithTemplateParams());
 
-        if (analyzer && (analyzer->IsRefCounted() || analyzer->IsFakeRef()))
-            result = result + "@" + (analyzer->IsFakeRef() ? "" : "+");
+        if (analyzer && (analyzer->IsRefCounted() || analyzer->IsNoCount()))
+            result = result + "@" + (analyzer->IsNoCount() ? "" : "+");
         else
             throw Exception("Error: type \"" + type.ToString() + "\" can not automatically bind");
     }

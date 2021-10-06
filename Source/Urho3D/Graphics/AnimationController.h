@@ -34,7 +34,7 @@ class Animation;
 struct Bone;
 
 /// Control data for an animation.
-/// @fakeref
+/// @nocount
 struct URHO3D_API AnimationControl
 {
     /// Construct with defaults.

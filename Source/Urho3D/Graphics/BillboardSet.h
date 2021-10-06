@@ -35,7 +35,7 @@ class IndexBuffer;
 class VertexBuffer;
 
 /// One billboard in the billboard set.
-/// @fakeref
+/// @nocount
 struct URHO3D_API Billboard
 {
     /// Position.

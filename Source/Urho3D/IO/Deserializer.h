@@ -30,7 +30,7 @@ namespace Urho3D
 {
 
 /// Abstract stream for reading.
-/// @fakeref
+/// @nocount
 class URHO3D_API Deserializer
 {
 public:
