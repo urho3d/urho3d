@@ -41,17 +41,6 @@ const unsigned HashBase::MAX_LOAD_FACTOR;
 
 // ========================================================================================
 
-
-void FakeAddRef(void* ptr)
-{
-}
-
-void FakeReleaseRef(void* ptr)
-{
-}
-
-// ========================================================================================
-
 static String& StringAssignInt(int value, String& str)
 {
     str = String(value);

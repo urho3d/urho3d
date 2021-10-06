@@ -58,9 +58,6 @@ void ASGeneratedFile_Members::Save()
         "namespace Urho3D\n"
         "{\n"
         "\n"
-        "void FakeAddRef(void* ptr);\n"
-        "void FakeReleaseRef(void* ptr);\n"
-        "\n"
         << glue_.str() <<
         "void " << functionName_ << "(asIScriptEngine* engine)\n"
         "{\n"
@@ -95,9 +92,6 @@ void ASGeneratedFile_Templates::Save()
         "\n"
         "namespace Urho3D\n"
         "{\n"
-        "\n"
-        "void FakeAddRef(void* ptr);\n"
-        "void FakeReleaseRef(void* ptr);\n"
         "\n"
         << glue_.str()
         << reg_.str() <<
@@ -565,10 +559,7 @@ namespace Result
             "#include \"../AngelScript/Manual.h\"\n"
             "\n"
             "namespace Urho3D\n"
-            "{\n"
-            "\n"
-            "void FakeAddRef(void* ptr);\n"
-            "void FakeReleaseRef(void* ptr);\n";
+            "{\n";
 
         string openedDefine;
         
