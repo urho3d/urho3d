@@ -10,9 +10,6 @@
 namespace Urho3D
 {
 
-void FakeAddRef(void* ptr);
-void FakeReleaseRef(void* ptr);
-
 // struct AllocatorBlock | File: ../Container/Allocator.h
 static void Register_AllocatorBlock(asIScriptEngine* engine)
 {
