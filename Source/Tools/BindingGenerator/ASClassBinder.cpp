@@ -144,6 +144,16 @@ static void RegisterConstructor(const MethodAnalyzer& methodAnalyzer, ProcessedC
         return;
     }
 
+    if (classAnalyzer.IsNoCount())
+    {
+        MemberRegistrationError regError;
+        regError.name_ = methodAnalyzer.GetName();
+        regError.comment_ = methodAnalyzer.GetLocation();
+        regError.message_ = "Factory not registered since the @nocount object created in a script through the factory will never be deleted";
+        processedClass.unregisteredSpecialMethods_.push_back(regError);
+        return;
+    }
+
     SpecialMethodRegistration result;
     //result.name_ = methodAnalyzer.GetName();
     result.comment_ = methodAnalyzer.GetDeclaration();
@@ -152,14 +162,11 @@ static void RegisterConstructor(const MethodAnalyzer& methodAnalyzer, ProcessedC
     string cppClassName = classAnalyzer.GetClassName();
     vector<ParamAnalyzer> params = methodAnalyzer.GetParams();
 
-    bool isNoCount = classAnalyzer.IsNoCount();
-
     if (params.empty()) // Default constructor
     {
-        if (classAnalyzer.IsRefCounted() || isNoCount)
+        if (classAnalyzer.IsRefCounted())
             result.registration_ = "engine->RegisterObjectBehaviour(\"" + asClassName + "\", asBEHAVE_FACTORY, \"" +
-                                   asClassName + "@" + (isNoCount ? "" : "+") +
-                                   " f()\", asFUNCTION(ASCompatibleFactory<" + cppClassName + ">), AS_CALL_CDECL);";
+                                   asClassName + "@+ f()\", asFUNCTION(ASCompatibleFactory<" + cppClassName + ">), AS_CALL_CDECL);";
         else
             result.registration_ = "engine->RegisterObjectBehaviour(\"" + asClassName + "\", asBEHAVE_CONSTRUCT, \"void f()\", asFUNCTION(ASCompatibleConstructor<" + cppClassName + ">), AS_CALL_CDECL_OBJFIRST);";
 
@@ -167,7 +174,6 @@ static void RegisterConstructor(const MethodAnalyzer& methodAnalyzer, ProcessedC
         processedClass.defaultConstructor_ = make_shared<SpecialMethodRegistration>(result);
         return;
     }
-
 
     vector<ConvertedVariable> convertedParams;
     for (const ParamAnalyzer& param : params)
@@ -198,9 +204,9 @@ static void RegisterConstructor(const MethodAnalyzer& methodAnalyzer, ProcessedC
             needWrapper = true;
     }
 
-    if (classAnalyzer.IsRefCounted() || isNoCount)
+    if (classAnalyzer.IsRefCounted())
     {
-        string asDeclaration = asClassName + "@" + (isNoCount ? "" : "+") + " f(" + JoinASDeclarations(convertedParams) + ")";
+        string asDeclaration = asClassName + "@+ f(" + JoinASDeclarations(convertedParams) + ")";
         result.registration_ = result.registration_ =
             "engine->RegisterObjectBehaviour(\"" + asClassName + "\", asBEHAVE_FACTORY, \"" + asDeclaration + "\", AS_FUNCTION("
             + GenerateWrapperName(methodAnalyzer) + ") , AS_CALL_CDECL);";
