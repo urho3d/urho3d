@@ -151,7 +151,8 @@ bool ScriptFile::BeginLoad(Deserializer& source)
 bool ScriptFile::EndLoad()
 {
     bool success = false;
-
+    // Map script module to script resource with userdata
+    scriptModule_->SetUserData(this);
     // Load from bytecode if available, else compile
     if (loadByteCode_)
     {
@@ -166,6 +167,8 @@ bool ScriptFile::EndLoad()
     }
     else
     {
+        if (onlyCompile_)
+            scriptModule_->GetEngine()->SetEngineProperty(asEP_INIT_GLOBAL_VARS_AFTER_BUILD, 0);
         int result = scriptModule_->Build();
         if (result >= 0)
         {
@@ -177,11 +180,7 @@ bool ScriptFile::EndLoad()
     }
 
     if (success)
-    {
         compiled_ = true;
-        // Map script module to script resource with userdata
-        scriptModule_->SetUserData(this);
-    }
 
     loadByteCode_.Reset();
     return success;
@@ -577,7 +576,13 @@ asIScriptObject* ScriptFile::CreateObject(const String& className, bool useInter
     // Get the factory function id from the object type
     String factoryName = String(type->GetName()) + "@ " + type->GetName() + "()";
     asIScriptFunction* factory = type->GetFactoryByDecl(factoryName.CString());
-    if (!factory || context->Prepare(factory) < 0 || context->Execute() < 0)
+    if (!factory || context->Prepare(factory) < 0)
+        return nullptr;
+    Script* scriptSystem = script_;
+    scriptSystem->IncScriptNestingLevel();
+    bool success = context->Execute() == asEXECUTION_FINISHED;
+    scriptSystem->DecScriptNestingLevel();
+    if (!success)
         return nullptr;
 
     void* objAddress = context->GetAddressOfReturnValue();

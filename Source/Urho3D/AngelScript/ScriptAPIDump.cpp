@@ -158,7 +158,7 @@ bool ComparePropertyInfos(const PropertyInfo& lhs, const PropertyInfo& rhs)
 
 void Script::OutputAPIRow(DumpMode mode, const String& row, bool removeReference, const String& separator)
 {
-    String out(row);
+    String out(row.Trimmed());
     out.Replace("&in", "&");
     out.Replace("&out", "&");
     if (removeReference)
@@ -185,6 +185,8 @@ void Script::OutputAPIRow(DumpMode mode, const String& row, bool removeReference
             ++posBegin;
             out.Replace(posBegin, posEnd - posBegin + 2, "Array<" + out.Substring(posBegin, posEnd - posBegin) + ">");
         }
+        // "opIndex" early was replaced to "operator[ ]", so not replaced here to Array<operator>
+        out.Replace("[ ]", "[]");
 
         Log::WriteRaw(out + separator + "\n");
     }
@@ -325,6 +327,7 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
                 "#define int8 signed char\n"
                 "#define int16 signed short\n"
                 "#define int64 long\n"
+                "#define uint unsigned\n"
                 "#define uint8 unsigned char\n"
                 "#define uint16 unsigned short\n"
                 "#define uint64 unsigned long\n"
@@ -338,7 +341,9 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
                 "#define cast reinterpret_cast\n"
                 "#define mixin\n"
                 "#define funcdef\n"
-            );
+                "#define protected\n"
+                "#define private\n"
+        );
 
     unsigned types = scriptEngine_->GetObjectTypeCount();
     Vector<Pair<String, unsigned> > sortedTypes;
@@ -418,7 +423,7 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
                     String str = "\ntemplate <";
                     for (asUINT tt = 0, ttm = type->GetSubTypeCount(); tt < ttm; tt++) {
                         asITypeInfo* pSubType = type->GetSubType(tt);
-                        str += String("class ") + pSubType->GetName() + (tt < ttm - 1 ? ", " : ">");
+                        str += String("typename ") + pSubType->GetName() + (tt < ttm - 1 ? ", " : ">");
                     }
                     Log::WriteRaw(str);
                 }
@@ -445,7 +450,7 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
             {
                 asIScriptFunction* method = type->GetMethodByIndex(j);
                 String methodName(method->GetName());
-                String declaration(method->GetDeclaration());
+                String declaration(method->GetDeclaration(true, false, true));
 
                 // Recreate tab escape sequences
                 declaration.Replace("\t", "\\t");
@@ -456,13 +461,24 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
                 {
                     // Sanitate the method name. For some operators fix name
                     if (declaration.Contains("::op")) {
-                        declaration.Replace("::opEquals(", "::operator==(");
-                        declaration.Replace("::opAssign(", "::operator=(");
-                        declaration.Replace("::opAddAssign(", "::operator+=(");
-                        declaration.Replace("::opAdd(", "::operator+(");
-                        declaration.Replace("::opCmp(", "::operator<(");
-                        declaration.Replace("::opPreInc(", "::operator++(");
-                        declaration.Replace("::opPostInc()", "::operator++(int)");
+                        declaration.Replace("::opEquals(", ":: operator==(");
+                        declaration.Replace("::opAssign(", ":: operator=(");
+                        declaration.Replace("::opAddAssign(", ":: operator+=(");
+                        declaration.Replace("::opAdd(", ":: operator+(");
+                        declaration.Replace("::opCmp(", ":: operator<(");
+                        declaration.Replace("::opPreInc(", ":: operator++(");
+                        declaration.Replace("::opPostInc()", ":: operator++(int)");
+                        declaration.Replace("::opIndex(", ":: operator[ ](");
+                        if (declaration.Contains("::opImplCast()") || declaration.Contains("::opImplConv()")) {
+                            int sp = declaration.Find(' ');
+                            String retType = declaration.Substring(0, sp);
+                            if (retType == "const")
+                            {
+                                sp = declaration.Find(' ', sp + 1);
+                                retType = declaration.Substring(0, sp);
+                            }
+                            declaration = "operator " + retType + "() const";
+                        }
                     }
                     if (!declaration.Contains("::op"))
                     {
@@ -589,7 +605,7 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
     {
         asIScriptFunction* function = scriptEngine_->GetGlobalFunctionByIndex(i);
         String functionName(function->GetName());
-        String declaration(function->GetDeclaration());
+        String declaration(function->GetDeclaration(true, false, true));
 
         // Recreate tab escape sequences
         declaration.Replace("\t", "\\t");
