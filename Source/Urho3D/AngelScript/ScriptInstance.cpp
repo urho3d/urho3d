@@ -62,6 +62,26 @@ static const char* methodDeclarations[] = {
     "void TransformChanged()"
 };
 
+void CleanupTypeInfoScriptInstance(asITypeInfo *type)
+{
+    delete static_cast<Vector<AttributeInfo>*>(type->GetUserData(eAttrMapUserIdx));
+}
+
+template<typename Op>
+inline void ScriptInstance::executeScript(asIScriptFunction* method, Op func) const {
+    Script* scriptSystem = GetSubsystem<Script>();
+    asIScriptContext* context = scriptSystem->GetScriptFileContext();
+    if (context->Prepare(method) < 0)
+        return;
+    context->SetObject(scriptObject_);
+    func(context);
+    scriptSystem->IncScriptNestingLevel();
+    context->Execute();
+    context->Unprepare();
+    scriptSystem->DecScriptNestingLevel();
+}
+
+
 ScriptInstance::ScriptInstance(Context* context) :
     Component(context)
 {
@@ -221,7 +241,7 @@ void ScriptInstance::ApplyAttributes()
     idAttributes_.Clear();
 
     if (scriptObject_ && methods_[METHOD_APPLYATTRIBUTES])
-        scriptFile_->Execute(scriptObject_, methods_[METHOD_APPLYATTRIBUTES]);
+        executeScript(methods_[METHOD_APPLYATTRIBUTES], [](asIScriptContext*) {});
 }
 
 void ScriptInstance::OnSetEnabled()
@@ -464,9 +484,9 @@ void ScriptInstance::SetScriptDataAttr(const PODVector<unsigned char>& data)
     if (scriptObject_ && methods_[METHOD_LOAD])
     {
         MemoryBuffer buf(data);
-        VariantVector parameters;
-        parameters.Push(Variant((void*)static_cast<Deserializer*>(&buf)));
-        scriptFile_->Execute(scriptObject_, methods_[METHOD_LOAD], parameters);
+        executeScript(methods_[METHOD_LOAD], [&](asIScriptContext* context) {
+            context->SetArgObject(0, &buf);
+        });
     }
 }
 
@@ -475,9 +495,9 @@ void ScriptInstance::SetScriptNetworkDataAttr(const PODVector<unsigned char>& da
     if (scriptObject_ && methods_[METHOD_READNETWORKUPDATE])
     {
         MemoryBuffer buf(data);
-        VariantVector parameters;
-        parameters.Push(Variant((void*)static_cast<Deserializer*>(&buf)));
-        scriptFile_->Execute(scriptObject_, methods_[METHOD_READNETWORKUPDATE], parameters);
+        executeScript(methods_[METHOD_READNETWORKUPDATE], [&](asIScriptContext* context) {
+            context->SetArgObject(0, &buf);
+        });
     }
 }
 
@@ -508,9 +528,9 @@ PODVector<unsigned char> ScriptInstance::GetScriptDataAttr() const
     else
     {
         VectorBuffer buf;
-        VariantVector parameters;
-        parameters.Push(Variant((void*)static_cast<Serializer*>(&buf)));
-        scriptFile_->Execute(scriptObject_, methods_[METHOD_SAVE], parameters);
+        executeScript(methods_[METHOD_SAVE], [&](asIScriptContext* context) {
+            context->SetArgObject(0, &buf);
+        });
         return buf.GetBuffer();
     }
 }
@@ -522,9 +542,9 @@ PODVector<unsigned char> ScriptInstance::GetScriptNetworkDataAttr() const
     else
     {
         VectorBuffer buf;
-        VariantVector parameters;
-        parameters.Push(Variant((void*)static_cast<Serializer*>(&buf)));
-        scriptFile_->Execute(scriptObject_, methods_[METHOD_WRITENETWORKUPDATE], parameters);
+        executeScript(methods_[METHOD_WRITENETWORKUPDATE], [&](asIScriptContext* context) {
+            context->SetArgObject(0, &buf);
+        });
         return buf.GetBuffer();
     }
 }
@@ -557,7 +577,7 @@ void ScriptInstance::OnMarkedDirty(Node* node)
     }
 
     if (scriptObject_ && methods_[METHOD_TRANSFORMCHANGED])
-        scriptFile_->Execute(scriptObject_, methods_[METHOD_TRANSFORMCHANGED]);
+        executeScript(methods_[METHOD_TRANSFORMCHANGED], [](asIScriptContext*) {});
 }
 
 void ScriptInstance::CreateObject()
@@ -578,7 +598,7 @@ void ScriptInstance::CreateObject()
         UpdateEventSubscription();
 
         if (methods_[METHOD_START])
-            scriptFile_->Execute(scriptObject_, methods_[METHOD_START]);
+            executeScript(methods_[METHOD_START], [](asIScriptContext*) {});
     }
     else
         URHO3D_LOGERROR("Failed to create object of class " + className_ + " from " + scriptFile_->GetName());
@@ -589,7 +609,7 @@ void ScriptInstance::ReleaseObject()
     if (scriptObject_)
     {
         if (methods_[METHOD_STOP])
-            scriptFile_->Execute(scriptObject_, methods_[METHOD_STOP]);
+            executeScript(methods_[METHOD_STOP], [](asIScriptContext*) {});
 
         PODVector<StringHash> exceptions;
         exceptions.Push(E_RELOADSTARTED);
@@ -631,97 +651,120 @@ void ScriptInstance::GetScriptMethods()
 
 void ScriptInstance::GetScriptAttributes()
 {
-    asIScriptEngine* engine = GetSubsystem<Script>()->GetScriptEngine();
     attributeInfos_ = *context_->GetAttributes(GetTypeStatic());
+    asITypeInfo* pTypeInfo = scriptObject_->GetObjectType();
+    Vector<AttributeInfo>* attrTemplate = reinterpret_cast<Vector<AttributeInfo>*>(pTypeInfo->GetUserData(eAttrMapUserIdx));
 
-    unsigned numProperties = scriptObject_->GetPropertyCount();
-    for (unsigned i = 0; i < numProperties; ++i)
+    if (!attrTemplate)
     {
-        const char* name = nullptr;
-        int typeId = 0; // AngelScript void typeid
-        bool isPrivate=false, isProtected=false, isHandle=false, isEnum=false;
+        attrTemplate = new Vector<AttributeInfo>;
+        pTypeInfo->SetUserData(attrTemplate, eAttrMapUserIdx);
 
-        scriptObject_->GetObjectType()->GetProperty(i, &name, &typeId, &isPrivate, &isProtected);
-
-        // Hide private variables or ones that begin with an underscore
-        if (isPrivate || isProtected || name[0] == '_')
-            continue;
-
-        String typeName = engine->GetTypeDeclaration(typeId);
-        isHandle = typeName.EndsWith("@");
-        if (isHandle)
-            typeName = typeName.Substring(0, typeName.Length() - 1);
-
-        if (engine->GetTypeInfoById(typeId))
-            isEnum = engine->GetTypeInfoById(typeId)->GetFlags() & asOBJ_ENUM;
-
-        AttributeInfo info;
-        info.mode_ = AM_FILE;
-        info.name_ = name;
-        info.ptr_ = scriptObject_->GetAddressOfProperty(i);
-
-        if (isEnum)
+        asIScriptEngine* engine = pTypeInfo->GetEngine();
+        unsigned numProperties = pTypeInfo->GetPropertyCount();
+        for (unsigned i = 0; i < numProperties; ++i)
         {
-            info.type_ = VAR_INT;
-            info.enumNames_ = GetSubsystem<Script>()->GetEnumValues(typeId);
-        }
-        else if (!isHandle)
-        {
-            switch (typeId)
+            const char* name = nullptr;
+            int typeId = 0, offset; // AngelScript void typeid
+            bool isPrivate = false, isProtected = false, isHandle = false, isEnum = false;
+
+            pTypeInfo->GetProperty(i, &name, &typeId, &isPrivate, &isProtected, &offset);
+
+            // Hide private variables or ones that begin with an underscore
+            if (isPrivate || isProtected || name[0] == '_')
+                continue;
+
+            isHandle = typeId & asTYPEID_OBJHANDLE;
+            String typeName = engine->GetTypeDeclaration(typeId & ~asTYPEID_OBJHANDLE);
+            isEnum = (typeId & asTYPEID_MASK_OBJECT) == 0 && typeId > asTYPEID_DOUBLE;
+
+            AttributeInfo info;
+
+            if (isEnum)
             {
-            case asTYPEID_BOOL:
-                info.type_ = VAR_BOOL;
-                break;
-
-            case asTYPEID_INT32:
-            case asTYPEID_UINT32:
                 info.type_ = VAR_INT;
-                break;
-
-            case asTYPEID_FLOAT:
-                info.type_ = VAR_FLOAT;
-                break;
-
-            default:
-                if (typeName == "Variant[]")
-                    info.type_ = VAR_VARIANTVECTOR;
-                else if (typeName == "String[]")
-                    info.type_ = VAR_STRINGVECTOR;
-                else
-                    info.type_ = Variant::GetTypeFromName(typeName);
-                break;
+                info.enumNames_ = GetSubsystem<Script>()->GetEnumValues(typeId);
             }
-        }
-        else
-        {
-            // For a handle type, check if it's an Object subclass with a registered factory
-            StringHash typeHash(typeName);
-            const HashMap<StringHash, SharedPtr<ObjectFactory> >& factories = context_->GetObjectFactories();
-            HashMap<StringHash, SharedPtr<ObjectFactory> >::ConstIterator j = factories.Find(typeHash);
-            if (j != factories.End())
+            else if (!isHandle)
             {
-                // Check base class type. Node & Component are supported as ID attributes, Resource as a resource reference
-                const TypeInfo* typeInfo = j->second_->GetTypeInfo();
-                if (typeInfo->IsTypeOf<Node>())
+                switch (typeId)
                 {
-                    info.mode_ |= AM_NODEID;
+                case asTYPEID_BOOL:
+                    info.type_ = VAR_BOOL;
+                    break;
+
+                case asTYPEID_INT32:
+                case asTYPEID_UINT32:
                     info.type_ = VAR_INT;
+                    break;
+
+                case asTYPEID_FLOAT:
+                    info.type_ = VAR_FLOAT;
+                    break;
+                case asTYPEID_DOUBLE:
+                    info.type_ = VAR_DOUBLE;
+                    break;
+                
+                case asTYPEID_INT64:
+                case asTYPEID_UINT64:
+                    info.type_ = VAR_INT64;
+                    break;
+
+                default:
+                    if (typeName == "Variant[]")
+                        info.type_ = VAR_VARIANTVECTOR;
+                    else if (typeName == "String[]")
+                        info.type_ = VAR_STRINGVECTOR;
+                    else
+                        info.type_ = Variant::GetTypeFromName(typeName);
+                    break;
                 }
-                else if (typeInfo->IsTypeOf<Component>())
+            }
+            else
+            {
+                // For a handle type, check if it's an Object subclass with a registered factory
+                StringHash typeHash(typeName);
+                const HashMap<StringHash, SharedPtr<ObjectFactory> >& factories = context_->GetObjectFactories();
+                HashMap<StringHash, SharedPtr<ObjectFactory> >::ConstIterator j = factories.Find(typeHash);
+                if (j != factories.End())
                 {
-                    info.mode_ |= AM_COMPONENTID;
-                    info.type_ = VAR_INT;
+                    // Check base class type. Node & Component are supported as ID attributes, Resource as a resource reference
+                    const TypeInfo* typeInfo = j->second_->GetTypeInfo();
+                    if (typeInfo->IsTypeOf<Node>())
+                    {
+                        info.mode_ = AM_NODEID;
+                        info.type_ = VAR_INT;
+                    }
+                    else if (typeInfo->IsTypeOf<Component>())
+                    {
+                        info.mode_ = AM_COMPONENTID;
+                        info.type_ = VAR_INT;
+                    }
+                    else if (typeInfo->IsTypeOf<Resource>())
+                    {
+                        info.type_ = VAR_RESOURCEREF;
+                        info.defaultValue_ = ResourceRef(typeHash);
+                    }
                 }
-                else if (typeInfo->IsTypeOf<Resource>())
-                {
-                    info.type_ = VAR_RESOURCEREF;
-                    info.defaultValue_ = ResourceRef(typeHash);
-                }
+            }
+
+            if (info.type_ != VAR_NONE)
+            {
+                info.mode_ |= AM_FILE;
+                info.name_ = name;
+                info.ptr_ = (void*)i;
+                attrTemplate->Push(info);
             }
         }
 
-        if (info.type_ != VAR_NONE)
-            attributeInfos_.Push(info);
+    }
+    attributeInfos_.Reserve(attributeInfos_.Size() + attrTemplate->Size());
+    for (unsigned i = 0; i < attrTemplate->Size(); ++i)
+    {
+        attributeInfos_.Push(attrTemplate->At(i));
+        AttributeInfo& back = attributeInfos_.Back();
+        back.ptr_ = scriptObject_->GetAddressOfProperty((size_t)back.ptr_);
+        int t = 1;
     }
 }
 
@@ -870,28 +913,25 @@ void ScriptInstance::HandleSceneUpdate(StringHash eventType, VariantMap& eventDa
     // Execute delayed start before first update
     if (methods_[METHOD_DELAYEDSTART])
     {
-        scriptFile_->Execute(scriptObject_, methods_[METHOD_DELAYEDSTART]);
+        executeScript(methods_[METHOD_DELAYEDSTART], [](asIScriptContext*) {});
         methods_[METHOD_DELAYEDSTART] = nullptr;  // Only execute once
     }
 
     if (methods_[METHOD_UPDATE])
-    {
-        VariantVector parameters;
-        parameters.Push(timeStep);
-        scriptFile_->Execute(scriptObject_, methods_[METHOD_UPDATE], parameters);
-    }
+        executeScript(methods_[METHOD_UPDATE], [&](asIScriptContext* context) {
+            context->SetArgFloat(0, timeStep);
+        });
 }
 
 void ScriptInstance::HandleScenePostUpdate(StringHash eventType, VariantMap& eventData)
 {
-    if (!scriptObject_)
+    if (!scriptObject_ || !methods_[METHOD_POSTUPDATE])
         return;
 
     using namespace ScenePostUpdate;
-
-    VariantVector parameters;
-    parameters.Push(eventData[P_TIMESTEP]);
-    scriptFile_->Execute(scriptObject_, methods_[METHOD_POSTUPDATE], parameters);
+    executeScript(methods_[METHOD_POSTUPDATE], [&](asIScriptContext* context) {
+        context->SetArgFloat(0, eventData[P_TIMESTEP].GetFloat());
+    });
 }
 
 #if defined(URHO3D_PHYSICS) || defined(URHO3D_URHO2D)
@@ -904,27 +944,26 @@ void ScriptInstance::HandlePhysicsPreStep(StringHash eventType, VariantMap& even
     // Execute delayed start before first fixed update if not called yet
     if (methods_[METHOD_DELAYEDSTART])
     {
-        scriptFile_->Execute(scriptObject_, methods_[METHOD_DELAYEDSTART]);
+        executeScript(methods_[METHOD_DELAYEDSTART], [](asIScriptContext*) {});
         methods_[METHOD_DELAYEDSTART] = nullptr;  // Only execute once
     }
-
-    using namespace PhysicsPreStep;
-
-    VariantVector parameters;
-    parameters.Push(eventData[P_TIMESTEP]);
-    scriptFile_->Execute(scriptObject_, methods_[METHOD_FIXEDUPDATE], parameters);
+    if (methods_[METHOD_FIXEDUPDATE]) {
+        using namespace PhysicsPreStep;
+        executeScript(methods_[METHOD_FIXEDUPDATE], [&](asIScriptContext* context) {
+            context->SetArgFloat(0, eventData[P_TIMESTEP].GetFloat());
+            });
+    }
 }
 
 void ScriptInstance::HandlePhysicsPostStep(StringHash eventType, VariantMap& eventData)
 {
-    if (!scriptObject_)
+    if (!scriptObject_ || !methods_[METHOD_FIXEDPOSTUPDATE])
         return;
 
     using namespace PhysicsPostStep;
-
-    VariantVector parameters;
-    parameters.Push(eventData[P_TIMESTEP]);
-    scriptFile_->Execute(scriptObject_, methods_[METHOD_FIXEDPOSTUPDATE], parameters);
+    executeScript(methods_[METHOD_FIXEDPOSTUPDATE], [&](asIScriptContext* context) {
+        context->SetArgFloat(0, eventData[P_TIMESTEP].GetFloat());
+    });
 }
 
 #endif
@@ -933,17 +972,15 @@ void ScriptInstance::HandleScriptEvent(StringHash eventType, VariantMap& eventDa
 {
     if (!IsEnabledEffective() || !scriptFile_ || !scriptObject_)
         return;
-
-    auto* method = static_cast<asIScriptFunction*>(GetEventHandler()->GetUserData());
-
-    VariantVector parameters;
-    if (method->GetParamCount() > 0)
-    {
-        parameters.Push(Variant((void*)&eventType));
-        parameters.Push(Variant((void*)&eventData));
+    asIScriptFunction* method = static_cast<asIScriptFunction*>(GetEventHandler()->GetUserData());
+    if (method->GetParamCount()) {
+        executeScript(method, [&](asIScriptContext* context) {
+            context->SetArgObject(0, &eventType);
+            context->SetArgObject(1, &eventData);
+        });
+    } else {
+        executeScript(method, [](asIScriptContext* context) {});
     }
-
-    scriptFile_->Execute(scriptObject_, method, parameters);
 }
 
 void ScriptInstance::HandleScriptFileReload(StringHash eventType, VariantMap& eventData)
