@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2021 the Urho3D project.
+// Copyright (c) 2008-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -162,6 +162,7 @@ void CompileScript(Context* context, const String& fileName)
         ErrorExit("Failed to open script file " + fileName);
 
     ScriptFile script(context);
+	script.SetOnlyCompile();
     if (!script.Load(inFile))
         ErrorExit();
 
