@@ -361,6 +361,7 @@ static void RegisterScript(asIScriptEngine* engine)
 static void RegisterScriptObject(asIScriptEngine* engine)
 {
     engine->RegisterInterface("ScriptObject");
+    engine->SetTypeInfoUserDataCleanupCallback(CleanupTypeInfoScriptInstance, eAttrMapUserIdx);
 }
 
 void RegisterScriptInterfaceAPI(asIScriptEngine* engine)
