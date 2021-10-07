@@ -162,7 +162,7 @@ void CompileScript(Context* context, const String& fileName)
         ErrorExit("Failed to open script file " + fileName);
 
     ScriptFile script(context);
-	script.SetOnlyCompile();
+    script.SetOnlyCompile();
     if (!script.Load(inFile))
         ErrorExit();
 
