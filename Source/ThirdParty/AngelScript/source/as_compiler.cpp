@@ -280,15 +280,21 @@ void asCCompiler::FinalizeFunction()
 
 	byteCode.ExtractObjectVariableInfo(outFunc);
 
-	// Compile the list of object variables for the exception handler
+	// Compile the list of object variables for the exception handler and the bytecode serialization
 	// Start with the variables allocated on the heap, and then the ones allocated on the stack
 	for( n = 0; n < variableAllocations.GetLength(); n++ )
 	{
-		if( (variableAllocations[n].IsObject() || variableAllocations[n].IsFuncdef()) && !variableAllocations[n].IsReference() )
+		// The exception handler doesn't need to know about references, but the bytecode serialization must adjust the size of the pointer
+		if( (variableAllocations[n].IsObject() || variableAllocations[n].IsFuncdef()) )
 		{
 			if( variableIsOnHeap[n] )
 			{
-				outFunc->scriptData->objVariableTypes.PushLast(variableAllocations[n].GetTypeInfo());
+				// For references, we just store a null pointer so the exception handler can identify that it shouldn't do anything, 
+				// but the bytecode serializer can still understand that it needs to adjust the size of the pointer
+				if (variableAllocations[n].IsReference())
+					outFunc->scriptData->objVariableTypes.PushLast(0);
+				else
+					outFunc->scriptData->objVariableTypes.PushLast(variableAllocations[n].GetTypeInfo());
 				outFunc->scriptData->objVariablePos.PushLast(GetVariableOffset(n));
 			}
 		}
@@ -296,11 +302,17 @@ void asCCompiler::FinalizeFunction()
 	outFunc->scriptData->objVariablesOnHeap = asUINT(outFunc->scriptData->objVariablePos.GetLength());
 	for( n = 0; n < variableAllocations.GetLength(); n++ )
 	{
-		if( (variableAllocations[n].IsObject() || variableAllocations[n].IsFuncdef()) && !variableAllocations[n].IsReference() )
+		// The exception handler doesn't need to know about references, but the bytecode serialization must adjust the size of the pointer
+		if( (variableAllocations[n].IsObject() || variableAllocations[n].IsFuncdef()) )
 		{
 			if( !variableIsOnHeap[n] )
 			{
-				outFunc->scriptData->objVariableTypes.PushLast(variableAllocations[n].GetTypeInfo());
+				// For references, we just store a null pointer so the exception handler can identify that it shouldn't do anything, 
+				// but the bytecode serializer can still understand that it needs to adjust the size of the pointer
+				if (variableAllocations[n].IsReference())
+					outFunc->scriptData->objVariableTypes.PushLast(0);
+				else
+					outFunc->scriptData->objVariableTypes.PushLast(variableAllocations[n].GetTypeInfo());
 				outFunc->scriptData->objVariablePos.PushLast(GetVariableOffset(n));
 			}
 		}
