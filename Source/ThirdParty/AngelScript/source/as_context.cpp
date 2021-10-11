@@ -4901,6 +4901,7 @@ void asCContext::CleanArgsOnStack()
 		for( v = 0; v < m_currentFunction->scriptData->objVariablePos.GetLength(); v++ )
 			if( m_currentFunction->scriptData->objVariablePos[v] == var )
 			{
+				asASSERT(m_currentFunction->scriptData->objVariableTypes[v]);
 				func = CastToFuncdefType(m_currentFunction->scriptData->objVariableTypes[v])->funcdef;
 				break;
 			}
@@ -5096,35 +5097,39 @@ bool asCContext::CleanStackFrame(bool catchException)
 				// Check if the pointer is initialized
 				if( *(asPWORD*)&m_regs.stackFramePointer[-pos] )
 				{
-					// Call the object's destructor
-					if (m_currentFunction->scriptData->objVariableTypes[n]->flags & asOBJ_FUNCDEF)
+					// Skip pointers with unknown types, as this is either a null pointer or just a reference that is not owned by function
+					if (m_currentFunction->scriptData->objVariableTypes[n])
 					{
-						(*(asCScriptFunction**)&m_regs.stackFramePointer[-pos])->Release();
-					}
-					else if( m_currentFunction->scriptData->objVariableTypes[n]->flags & asOBJ_REF )
-					{
-						asSTypeBehaviour *beh = &CastToObjectType(m_currentFunction->scriptData->objVariableTypes[n])->beh;
-						asASSERT( (m_currentFunction->scriptData->objVariableTypes[n]->flags & asOBJ_NOCOUNT) || beh->release );
-						if( beh->release )
-							m_engine->CallObjectMethod((void*)*(asPWORD*)&m_regs.stackFramePointer[-pos], beh->release);
-					}
-					else
-					{
-						asSTypeBehaviour *beh = &CastToObjectType(m_currentFunction->scriptData->objVariableTypes[n])->beh;
-						if( beh->destruct )
-							m_engine->CallObjectMethod((void*)*(asPWORD*)&m_regs.stackFramePointer[-pos], beh->destruct);
-						else if( m_currentFunction->scriptData->objVariableTypes[n]->flags & asOBJ_LIST_PATTERN )
-							m_engine->DestroyList((asBYTE*)*(asPWORD*)&m_regs.stackFramePointer[-pos], CastToObjectType(m_currentFunction->scriptData->objVariableTypes[n]));
+						// Call the object's destructor
+						if (m_currentFunction->scriptData->objVariableTypes[n]->flags & asOBJ_FUNCDEF)
+						{
+							(*(asCScriptFunction**)&m_regs.stackFramePointer[-pos])->Release();
+						}
+						else if( m_currentFunction->scriptData->objVariableTypes[n]->flags & asOBJ_REF )
+						{
+							asSTypeBehaviour *beh = &CastToObjectType(m_currentFunction->scriptData->objVariableTypes[n])->beh;
+							asASSERT( (m_currentFunction->scriptData->objVariableTypes[n]->flags & asOBJ_NOCOUNT) || beh->release );
+							if( beh->release )
+								m_engine->CallObjectMethod((void*)*(asPWORD*)&m_regs.stackFramePointer[-pos], beh->release);
+						}
+						else
+						{
+							asSTypeBehaviour *beh = &CastToObjectType(m_currentFunction->scriptData->objVariableTypes[n])->beh;
+							if( beh->destruct )
+								m_engine->CallObjectMethod((void*)*(asPWORD*)&m_regs.stackFramePointer[-pos], beh->destruct);
+							else if( m_currentFunction->scriptData->objVariableTypes[n]->flags & asOBJ_LIST_PATTERN )
+								m_engine->DestroyList((asBYTE*)*(asPWORD*)&m_regs.stackFramePointer[-pos], CastToObjectType(m_currentFunction->scriptData->objVariableTypes[n]));
 
-						// Free the memory
-						m_engine->CallFree((void*)*(asPWORD*)&m_regs.stackFramePointer[-pos]);
+							// Free the memory
+							m_engine->CallFree((void*)*(asPWORD*)&m_regs.stackFramePointer[-pos]);
+						}
 					}
 					*(asPWORD*)&m_regs.stackFramePointer[-pos] = 0;
 				}
 			}
 			else
 			{
-				asASSERT( m_currentFunction->scriptData->objVariableTypes[n]->GetFlags() & asOBJ_VALUE );
+				asASSERT( m_currentFunction->scriptData->objVariableTypes[n] && m_currentFunction->scriptData->objVariableTypes[n]->GetFlags() & asOBJ_VALUE );
 
 				// Only destroy the object if it is truly alive
 				if( liveObjects[n] > 0 )

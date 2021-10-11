@@ -3620,7 +3620,7 @@ void asCReader::CalculateAdjustmentByPos(asCScriptFunction *func)
 		// Determine the size the variable currently occupies on the stack
 		int size = AS_PTR_SIZE;
 
-		// objVariableTypes is null if the type is a null pointer
+		// objVariableTypes is null if the type is a null pointer, or just a reference to an object that is not owned by the function
 		if( func->scriptData->objVariableTypes[n] &&
 			(func->scriptData->objVariableTypes[n]->GetFlags() & asOBJ_VALUE) &&
 			n >= func->scriptData->objVariablesOnHeap )
@@ -3708,8 +3708,11 @@ asCScriptFunction *asCReader::GetCalledFunction(asCScriptFunction *func, asDWORD
 
 		// Find the funcdef from the local variable
 		for( v = 0; v < func->scriptData->objVariablePos.GetLength(); v++ )
-			if( func->scriptData->objVariablePos[v] == var )
+			if (func->scriptData->objVariablePos[v] == var)
+			{
+				asASSERT(func->scriptData->objVariableTypes[v]);
 				return CastToFuncdefType(func->scriptData->objVariableTypes[v])->funcdef;
+			}
 
 		// Look in parameters
 		int paramPos = 0;
@@ -4835,7 +4838,7 @@ void asCWriter::CalculateAdjustmentByPos(asCScriptFunction *func)
 		// Determine the size the variable currently occupies on the stack
 		int size = AS_PTR_SIZE;
 
-		// objVariableTypes is null if the variable type is a null pointer
+		// objVariableTypes is null if the variable type is a null pointer, or a reference to an object that is not owned by the function
 		if( func->scriptData->objVariableTypes[n] &&
 			(func->scriptData->objVariableTypes[n]->GetFlags() & asOBJ_VALUE) &&
 			n >= func->scriptData->objVariablesOnHeap )
@@ -4960,6 +4963,7 @@ int asCWriter::AdjustGetOffset(int offset, asCScriptFunction *func, asDWORD prog
 			{
 				if( func->scriptData->objVariablePos[v] == var )
 				{
+					asASSERT(func->scriptData->objVariableTypes[v]);
 					calledFunc = CastToFuncdefType(func->scriptData->objVariableTypes[v])->funcdef;
 					break;
 				}
