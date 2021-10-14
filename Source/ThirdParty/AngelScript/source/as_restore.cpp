@@ -4860,7 +4860,7 @@ void asCWriter::CalculateAdjustmentByPos(asCScriptFunction *func)
 	}
 
 	// Build look-up table with the adjustments for each stack position
-	adjustStackByPos.SetLength(func->scriptData->stackNeeded);
+	adjustStackByPos.SetLength(func->scriptData->stackNeeded+AS_PTR_SIZE); // Add space for a pointer stored in a temporary variable
 	memset(adjustStackByPos.AddressOf(), 0, adjustStackByPos.GetLength()*sizeof(int));
 	for( n = 0; n < adjustments.GetLength(); n+=2 )
 	{
