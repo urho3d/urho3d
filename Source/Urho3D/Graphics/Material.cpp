@@ -1261,6 +1261,7 @@ void Material::ResetToDefaults()
 
     batchedParameterUpdate_ = true;
     shaderParameters_.Clear();
+    shaderParameterAnimationInfos_.Clear();
     SetShaderParameter("UOffset", Vector4(1.0f, 0.0f, 0.0f, 0.0f));
     SetShaderParameter("VOffset", Vector4(0.0f, 1.0f, 0.0f, 0.0f));
     SetShaderParameter("MatDiffColor", Vector4::ONE);
