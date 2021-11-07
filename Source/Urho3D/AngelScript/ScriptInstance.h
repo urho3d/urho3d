@@ -30,6 +30,7 @@
 class asIScriptFunction;
 class asIScriptObject;
 class asIScriptContext;
+class asITypeInfo;
 
 namespace Urho3D
 {
