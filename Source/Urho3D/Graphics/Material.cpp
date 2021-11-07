@@ -1279,6 +1279,7 @@ void Material::ResetToDefaults()
     renderOrder_ = DEFAULT_RENDER_ORDER;
     occlusion_ = true;
 
+    UpdateEventSubscription();
     RefreshShaderParameterHash();
     RefreshMemoryUse();
 }
