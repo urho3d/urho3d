@@ -2,6 +2,14 @@ $#include "Graphics/Camera.h"
 
 enum FillMode {};
 
+enum ViewOverride
+{
+    VO_NONE,
+    VO_LOW_MATERIAL_QUALITY,
+    VO_DISABLE_SHADOWS,
+    VO_DISABLE_OCCLUSION,
+};
+
 static const unsigned VO_NONE;
 static const unsigned VO_LOW_MATERIAL_QUALITY;
 static const unsigned VO_DISABLE_SHADOWS;
