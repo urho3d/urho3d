@@ -18265,7 +18265,7 @@ template <class T> void RegisterMembers_SoundSource(asIScriptEngine* engine, con
     RegisterMembers_Component<T>(engine, className);
 
     // volatile signed char* SoundSource::GetPlayPosition() const
-    // Error: type "volatile signed char*" can not automatically bind
+    // Error: type "signed char*" can not automatically bind
     // void SoundSource::Mix(int* dest, unsigned samples, int mixRate, bool stereo, bool interpolation)
     // Error: type "int*" can not automatically bind
     // void SoundSource::SetPlayPosition(signed char* pos)
