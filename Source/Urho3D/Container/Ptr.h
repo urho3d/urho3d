@@ -568,7 +568,7 @@ template <class T> class UniquePtr
 {
 public:
     /// Construct empty.
-    UniquePtr() : ptr_(nullptr) { }
+    UniquePtr() { }
 
     /// Construct from pointer.
     explicit UniquePtr(T* ptr) : ptr_(ptr) { }
@@ -665,7 +665,7 @@ public:
     }
 
 private:
-    T* ptr_;
+    T* ptr_{};
 
 };
 
