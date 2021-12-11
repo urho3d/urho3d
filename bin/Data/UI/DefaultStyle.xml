@@ -117,6 +117,19 @@
             <attribute name="Vert Alignment" value="Center" />
         </element>
     </element>
+    <element type="MultiLineEdit" style="ScrollView">
+        <attribute name="Paddings" value="5 5 5 5" />
+        <element type="Text" internal="true">
+            <attribute name="Color" value="0.9 1 0.9 1" />
+            <attribute name="Selection Color" value="0.3 0.4 0.32 1" />
+            <element type="BorderImage" internal="true">
+                <attribute name="Size" value="4 16" />
+                <attribute name="Priority" value="1" />
+                <attribute name="Image Rect" value="12 0 16 16" />
+                <attribute name="Vert Alignment" value="Center" />
+            </element>
+        </element>
+    </element>
     <element type="ListView" style="ScrollView">  <!-- Shortcut to copy all the styles from ScrollView -->
         <element type="BorderImage" internal="true">
             <element internal="true">

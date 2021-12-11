@@ -48,6 +48,7 @@
 #include "../UI/FileSelector.h"
 #include "../UI/Font.h"
 #include "../UI/LineEdit.h"
+#include "../UI/MultiLineEdit.h"
 #include "../UI/ListView.h"
 #include "../UI/MessageBox.h"
 #include "../UI/ProgressBar.h"
@@ -2224,6 +2225,7 @@ void RegisterUILibrary(Context* context)
     Window::RegisterObject(context);
     View3D::RegisterObject(context);
     LineEdit::RegisterObject(context);
+    MultiLineEdit::RegisterObject(context);
     Slider::RegisterObject(context);
     ScrollBar::RegisterObject(context);
     ScrollView::RegisterObject(context);
