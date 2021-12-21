@@ -101,7 +101,7 @@ public:
     /// Set vertex blended color for start of trail.
     /// @property
     void SetStartColor(const Color& color);
-    /// Set vertex blended scale for end of trail.
+    /// Set vertex blended color for end of trail.
     /// @property
     void SetEndColor(const Color& color);
     /// Set vertex blended color for start of trail.
