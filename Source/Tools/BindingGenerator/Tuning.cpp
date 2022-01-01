@@ -26,6 +26,8 @@
 #include "Tuning.h"
 #include "Utils.h"
 
+using namespace std;
+
 // Some parts of the engine are compiled only if there are defines
 string InsideDefine(const string& headerFile)
 {

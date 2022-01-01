@@ -27,6 +27,8 @@
 #include "XmlAnalyzer.h"
 #include "XmlSourceData.h"
 
+using namespace std;
+
 namespace ASBindingGenerator
 {
 

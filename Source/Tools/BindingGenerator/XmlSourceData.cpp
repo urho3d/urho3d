@@ -37,6 +37,9 @@
 #include <sys/stat.h>
 #endif
 
+using namespace std;
+using namespace pugi;
+
 static void LoadXml(const string& fullPath)
 {
     // All loaded XMLs. Not used directly, just prevents destruction

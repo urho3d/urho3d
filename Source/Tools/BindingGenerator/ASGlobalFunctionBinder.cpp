@@ -31,6 +31,8 @@
 #include <map>
 #include <regex>
 
+using namespace std;
+
 namespace ASBindingGenerator
 {
 

@@ -25,6 +25,8 @@
 #include <cassert>
 #include <sstream>
 
+using namespace std;
+
 string Trim(const string& str)
 {
     size_t trimStart = 0;

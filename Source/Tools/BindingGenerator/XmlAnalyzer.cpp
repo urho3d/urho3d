@@ -27,6 +27,9 @@
 #include <cassert>
 #include <regex>
 
+using namespace std;
+using namespace pugi;
+
 extern string _sourceDir;
 
 string RemoveRefs(xml_node node)

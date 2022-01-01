@@ -26,40 +26,38 @@
 #include <vector>
 #include <algorithm>
 
-using namespace std;
+#define CONTAINS(vec, val) (std::find(vec.begin(), vec.end(), val) != vec.end())
 
-#define CONTAINS(vec, val) (find(vec.begin(), vec.end(), val) != vec.end())
+std::string Trim(const std::string& str);
+bool StartsWith(const std::string& str, const std::string& value);
+bool EndsWith(const std::string& str, const std::string& value);
+std::string CutStart(const std::string& str, const std::string& value);
+std::string CutEnd(const std::string& str, const std::string& value);
+std::string GetFirstWord(const std::string& str);
 
-string Trim(const string& str);
-bool StartsWith(const string& str, const string& value);
-bool EndsWith(const string& str, const string& value);
-string CutStart(const string& str, const string& value);
-string CutEnd(const string& str, const string& value);
-string GetFirstWord(const string& str);
+std::string ReplaceAll(const std::string& src, const std::string& from, const std::string& to);
+std::string RemoveAll(const std::string& src, const std::string& value);
+std::string ReplaceFirst(const std::string& src, const std::string& from, const std::string& to);
+std::string RemoveFirst(const std::string& src, const std::string& value);
+std::vector<std::string> Split(const std::string& str, char delim);
+std::vector<std::string> Split(const std::string& str, const std::string& delim);
+std::string Join(const std::vector<std::string>& values, const std::string& separator);
 
-string ReplaceAll(const string& src, const string& from, const string& to);
-string RemoveAll(const string& src, const string& value);
-string ReplaceFirst(const string& src, const string& from, const string& to);
-string RemoveFirst(const string& src, const string& value);
-vector<string> Split(const string& str, char delim);
-vector<string> Split(const string& str, const string& delim);
-string Join(const vector<string>& values, const string& separator);
-
-bool Contains(const string& str, const string& substr);
-bool Contains(const string& str, char c);
+bool Contains(const std::string& str, const std::string& substr);
+bool Contains(const std::string& str, char c);
 
 // Return all after last found substring
-string CutToLast(const string& src, const string& value, bool inclusive);
+std::string CutToLast(const std::string& src, const std::string& value, bool inclusive);
 
 // Return all after last /
-string GetFileName(const string& path);
+std::string GetFileName(const std::string& path);
 
 // Return all before last /
-string WithoutFileName(const string& path);
+std::string WithoutFileName(const std::string& path);
 
 // First letter to lower case. Works only for ASCII
-string FirstCharToLower(const string& str);
+std::string FirstCharToLower(const std::string& str);
 
-string JoinNonEmpty(const vector<string>& strings, const string& separator);
+std::string JoinNonEmpty(const std::vector<std::string>& strings, const std::string& separator);
 
-string ToIdentifier(const string& str);
+std::string ToIdentifier(const std::string& str);

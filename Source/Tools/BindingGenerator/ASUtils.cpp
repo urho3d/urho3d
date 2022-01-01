@@ -29,6 +29,9 @@
 #include <cassert>
 #include <regex>
 
+using namespace std;
+using namespace pugi;
+
 namespace ASBindingGenerator
 {
 

@@ -27,8 +27,6 @@
 #include <string>
 #include <vector>
 
-using namespace std;
-
 namespace ASBindingGenerator
 {
 
@@ -36,14 +34,14 @@ class ASGeneratedFile_Base
 {
 protected:
     // Result file path
-    string outputFilePath_;
+    std::string outputFilePath_;
 
 public:
     // Wrappers
-    stringstream glue_;
+    std::stringstream glue_;
 
     // Registration function body
-    stringstream reg_;
+    std::stringstream reg_;
 
     // Write result to file
     virtual void Save() {};
@@ -53,10 +51,10 @@ class ASGeneratedFile_WithRegistrationFunction : public ASGeneratedFile_Base
 {
 protected:
     // Registration function name
-    string functionName_;
+    std::string functionName_;
 
 public:
-    ASGeneratedFile_WithRegistrationFunction(const string& outputFilePath, const string& functionName);
+    ASGeneratedFile_WithRegistrationFunction(const std::string& outputFilePath, const std::string& functionName);
 };
 
 class ASGeneratedFile_Members : public ASGeneratedFile_WithRegistrationFunction
@@ -71,7 +69,7 @@ class ASGeneratedFile_Templates : public ASGeneratedFile_Base
 {
 
 public:
-    ASGeneratedFile_Templates(const string& outputFilePath);
+    ASGeneratedFile_Templates(const std::string& outputFilePath);
 
     // Write result to file
     void Save() override;
@@ -79,11 +77,11 @@ public:
 
 struct ProcessedEnum
 {
-    string name_; // Used for sorting
-    string comment_; // Location
-    vector<string> glue_; // Can be empty
-    string insideDefine_; // Can be empty
-    vector<string> registration_; // Or warning message
+    std::string name_; // Used for sorting
+    std::string comment_; // Location
+    std::vector<std::string> glue_; // Can be empty
+    std::string insideDefine_; // Can be empty
+    std::vector<std::string> registration_; // Or warning message
 
     // Used for sorting
     bool operator <(const ProcessedEnum& rhs) const;
@@ -91,11 +89,11 @@ struct ProcessedEnum
 
 struct ProcessedGlobalFunction
 {
-    string name_; // Used for sorting
-    string comment_; // Location
-    string glue_; // Can be empty
-    string insideDefine_; // Can be empty
-    string registration_; // Or warning message
+    std::string name_; // Used for sorting
+    std::string comment_; // Location
+    std::string glue_; // Can be empty
+    std::string insideDefine_; // Can be empty
+    std::string registration_; // Or warning message
 
     // Used for sorting
     bool operator <(const ProcessedGlobalFunction& rhs) const;
@@ -103,10 +101,10 @@ struct ProcessedGlobalFunction
 
 struct ProcessedGlobalVariable
 {
-    string name_; // Used for sorting
-    string comment_; // Location
-    string insideDefine_; // Can be empty
-    string registration_; // Or warning message
+    std::string name_; // Used for sorting
+    std::string comment_; // Location
+    std::string insideDefine_; // Can be empty
+    std::string registration_; // Or warning message
 
     // Used for sorting
     bool operator <(const ProcessedGlobalVariable& rhs) const;
@@ -114,97 +112,97 @@ struct ProcessedGlobalVariable
 
 struct Registration
 {
-    string comment_;
-    string glue_;
-    vector<string> registration_;
+    std::string comment_;
+    std::string glue_;
+    std::vector<std::string> registration_;
 };
 
 struct SpecialMethodRegistration
 {
-    string comment_; // C++ declaration / location for default constructor
-    string glue_;
-    string registration_; // Or warning message
+    std::string comment_; // C++ declaration / location for default constructor
+    std::string glue_;
+    std::string registration_; // Or warning message
 };
 
 struct RegisterObjectMethodArgs
 {
-    vector<string> asDeclarations_; // String
-    string funcPointer_;            // asSFuncPtr
-    string callConv_;               // asDWORD
+    std::vector<std::string> asDeclarations_; // String
+    std::string funcPointer_;            // asSFuncPtr
+    std::string callConv_;               // asDWORD
 };
 
 struct MethodRegistration
 {
-    string name_; // Used for sorting
-    string cppDeclaration_;
-    string glue_;
+    std::string name_; // Used for sorting
+    std::string cppDeclaration_;
+    std::string glue_;
     RegisterObjectMethodArgs registration_;
 };
 
 struct RegisterGlobalFunctionArgs
 {
-    vector<string> asDeclarations_; // String
-    string funcPointer_;            // asSFuncPtr
-    string callConv_;               // asDWORD
+    std::vector<std::string> asDeclarations_; // String
+    std::string funcPointer_;            // asSFuncPtr
+    std::string callConv_;               // asDWORD
 };
 
 struct StaticMethodRegistration
 {
-    string name_; // Used for sorting
-    string cppDeclaration_;
-    string glue_;
+    std::string name_; // Used for sorting
+    std::string cppDeclaration_;
+    std::string glue_;
     RegisterGlobalFunctionArgs registration_;
 };
 
 struct RegisterObjectPropertyArgs
 {
-    vector<string> asDeclarations_; // String
-    string byteOffset_;             // int
+    std::vector<std::string> asDeclarations_; // String
+    std::string byteOffset_;             // int
 };
 
 struct FieldRegistration
 {
-    string name_; // Used for sorting
-    string cppDeclaration_;
+    std::string name_; // Used for sorting
+    std::string cppDeclaration_;
     RegisterObjectPropertyArgs registration_;
 };
 
 struct RegisterGlobalPropertyArgs
 {
-    vector<string> asDeclarations_; // String
-    string pointer_;                // void*
+    std::vector<std::string> asDeclarations_; // String
+    std::string pointer_;                // void*
 };
 
 struct StaticFieldRegistration
 {
-    string name_; // Used for sorting
-    string cppDeclaration_;
+    std::string name_; // Used for sorting
+    std::string cppDeclaration_;
     RegisterGlobalPropertyArgs registration_;
 };
 
 /*
 struct RegisterObjectBehaviourArgs
 {
-    string behaviour_;              // asEBehaviours
-    vector<string> asDeclarations_; // String
-    string funcPointer_;            // asSFuncPtr
-    string callConv_;               // asDWORD
+    std::string behaviour_;              // asEBehaviours
+    std::vector<std::string> asDeclarations_; // String
+    std::string funcPointer_;            // asSFuncPtr
+    std::string callConv_;               // asDWORD
 };
 
 struct BehaviorRegistration
 {
-    string name_; // Used for sorting
-    string cppDeclaration_;
-    //string glue_;
+    std::string name_; // Used for sorting
+    std::string cppDeclaration_;
+    //std::string glue_;
     RegisterObjectBehaviourArgs registration_;
 };
 */
 
 struct MemberRegistrationError
 {
-    string name_; // Used for sorting
-    string comment_; // C++ declaration / location
-    string message_;
+    std::string name_; // Used for sorting
+    std::string comment_; // C++ declaration / location
+    std::string message_;
 
     // Used for sorting
     bool operator <(const MemberRegistrationError& rhs) const;
@@ -212,80 +210,80 @@ struct MemberRegistrationError
 
 struct ProcessedClass
 {
-    string name_;
-    string dirName_;
-    string insideDefine_; // Can be empty
-    string comment_; // Class location
-    string objectTypeRegistration_; // engine->RegisterObjectType(...); or warning message
+    std::string name_;
+    std::string dirName_;
+    std::string insideDefine_; // Can be empty
+    std::string comment_; // Class location
+    std::string objectTypeRegistration_; // engine->RegisterObjectType(...); or warning message
     int inherianceDeep_ = 0; // Used for sorting
 
     // Used for sorting
     bool operator <(const ProcessedClass& rhs) const;
 
-    shared_ptr<SpecialMethodRegistration> defaultConstructor_;
-    vector<SpecialMethodRegistration> nonDefaultConstructors_;
+    std::shared_ptr<SpecialMethodRegistration> defaultConstructor_;
+    std::vector<SpecialMethodRegistration> nonDefaultConstructors_;
 
-    shared_ptr<SpecialMethodRegistration> destructor_;
+    std::shared_ptr<SpecialMethodRegistration> destructor_;
 
-    vector<MemberRegistrationError> unregisteredSpecialMethods_;
+    std::vector<MemberRegistrationError> unregisteredSpecialMethods_;
 
-    //vector<MethodRegistration> methods_;
+    //std::vector<MethodRegistration> methods_;
 
 
-    //vector<StaticMethodRegistration> staticMethods_;
-    //vector<MemberRegistrationError> unregisteredStaticMethods_;
+    //std::vector<StaticMethodRegistration> staticMethods_;
+    //std::vector<MemberRegistrationError> unregisteredStaticMethods_;
 
-    //vector<FieldRegistration> fields_;
-    //vector<MemberRegistrationError> unregisteredFields_;
+    //std::vector<FieldRegistration> fields_;
+    //std::vector<MemberRegistrationError> unregisteredFields_;
 
-    //vector<MethodRegistration> wrappedFields_;
+    //std::vector<MethodRegistration> wrappedFields_;
 
-    //vector<StaticFieldRegistration> staticFields_;
-    //vector<MemberRegistrationError> unregisteredStaticFields_;
+    //std::vector<StaticFieldRegistration> staticFields_;
+    //std::vector<MemberRegistrationError> unregisteredStaticFields_;
 
-    vector<string> additionalLines_;
+    std::vector<std::string> additionalLines_;
 
     bool noBind_ = false;
 
-    vector<string> baseClassNames_;
-    vector<string> subclassRegistrations_;
+    std::vector<std::string> baseClassNames_;
+    std::vector<std::string> subclassRegistrations_;
 
     // Base class members that were hidden in this class (c++ declarations)
-    /*vector<string> hiddenMethods_;
-    vector<string> hiddenStaticMethods_;
-    vector<string> hiddenFields_;
-    vector<string> hiddenStaticFields_;*/
+    /*std::vector<std::string> hiddenMethods_;
+    std::vector<std::string> hiddenStaticMethods_;
+    std::vector<std::string> hiddenFields_;
+    std::vector<std::string> hiddenStaticFields_;*/
 
-    vector<Registration> templateMethods_;
-    vector<MemberRegistrationError> unregisteredTemplateMethods_;
-    vector<Registration> personalMethods_;
-    vector<MemberRegistrationError> unregisteredPersonalMethods_;
+    std::vector<Registration> templateMethods_;
+    std::vector<MemberRegistrationError> unregisteredTemplateMethods_;
+    std::vector<Registration> personalMethods_;
+    std::vector<MemberRegistrationError> unregisteredPersonalMethods_;
 
-    vector<Registration> templateStaticMethods_;
-    vector<MemberRegistrationError> unregisteredTemplateStaticMethods_;
-    vector<Registration> personalStaticMethods_;
-    vector<MemberRegistrationError> unregisteredPersonalStaticMethods_;
+    std::vector<Registration> templateStaticMethods_;
+    std::vector<MemberRegistrationError> unregisteredTemplateStaticMethods_;
+    std::vector<Registration> personalStaticMethods_;
+    std::vector<MemberRegistrationError> unregisteredPersonalStaticMethods_;
     
-    vector<Registration> personalFields_;
-    vector<MemberRegistrationError> unregisteredPersonalFields_;
-    vector<Registration> templateFields_;
-    vector<MemberRegistrationError> unregisteredTemplateFields_;
+    std::vector<Registration> personalFields_;
+    std::vector<MemberRegistrationError> unregisteredPersonalFields_;
+    std::vector<Registration> templateFields_;
+    std::vector<MemberRegistrationError> unregisteredTemplateFields_;
 
-    vector<Registration> personalStaticFields_;
-    vector<MemberRegistrationError> unregisteredPersonalStaticFields_;
-    vector<Registration> templateStaticFields_;
-    vector<MemberRegistrationError> unregisteredTemplateStaticFields_;
+    std::vector<Registration> personalStaticFields_;
+    std::vector<MemberRegistrationError> unregisteredPersonalStaticFields_;
+    std::vector<Registration> templateStaticFields_;
+    std::vector<MemberRegistrationError> unregisteredTemplateStaticFields_;
 };
 
 namespace Result
 {
-    extern vector<ProcessedEnum> enums_;
-    extern vector<ProcessedGlobalFunction> globalFunctions_;
-    extern vector<ProcessedGlobalVariable> globalVariables_;
-    extern vector<ProcessedClass> classes_;
+    extern std::vector<ProcessedEnum> enums_;
+    extern std::vector<ProcessedGlobalFunction> globalFunctions_;
+    extern std::vector<ProcessedGlobalVariable> globalVariables_;
+    extern std::vector<ProcessedClass> classes_;
 
     // Add header to lists if not added yet
-    void AddHeader(const string& headerFile);
+    void AddHeader(const std::string& headerFile);
 }
 
 } // namespace ASBindingGenerator

@@ -28,8 +28,6 @@
 #include <stdexcept>
 #include <string>
 
-using namespace std;
-
 namespace ASBindingGenerator
 {
 
@@ -43,14 +41,14 @@ enum class TypeUsage
 
 struct ConvertedVariable
 {
-    string asDeclaration_;
-    string cppDeclaration_;
-    string glue_;
+    std::string asDeclaration_;
+    std::string cppDeclaration_;
+    std::string glue_;
 
     bool NeedWrapper() const { return !glue_.empty(); }
 };
 
-string JoinASDeclarations(const vector<ConvertedVariable>& vars);
+std::string JoinASDeclarations(const std::vector<ConvertedVariable>& vars);
 
 enum class VariableUsage
 {
@@ -60,38 +58,38 @@ enum class VariableUsage
     Field,
 };
 
-ConvertedVariable CppVariableToAS(const TypeAnalyzer& type, VariableUsage usage, const string& name = "", const string& defaultValue = "");
+ConvertedVariable CppVariableToAS(const TypeAnalyzer& type, VariableUsage usage, const std::string& name = "", const std::string& defaultValue = "");
 
-string CppTypeToAS(const TypeAnalyzer& type, TypeUsage typeUsage);
+std::string CppTypeToAS(const TypeAnalyzer& type, TypeUsage typeUsage);
 
-shared_ptr<EnumAnalyzer> FindEnum(const string& name);
-string CppPrimitiveTypeToAS(const string& cppType);
-string CppValueToAS(const string& cppValue);
+std::shared_ptr<EnumAnalyzer> FindEnum(const std::string& name);
+std::string CppPrimitiveTypeToAS(const std::string& cppType);
+std::string CppValueToAS(const std::string& cppValue);
 
-class Exception : public runtime_error
+class Exception : public std::runtime_error
 {
     using runtime_error::runtime_error;
 };
 
-bool IsKnownCppType(const string& name);
+bool IsKnownCppType(const std::string& name);
 
-shared_ptr<ClassAnalyzer> FindClassByName(const string& name);
-shared_ptr<ClassAnalyzer> FindClassByID(const string& name);
+std::shared_ptr<ClassAnalyzer> FindClassByName(const std::string& name);
+std::shared_ptr<ClassAnalyzer> FindClassByID(const std::string& name);
 
-string GenerateWrapperName(const GlobalFunctionAnalyzer& functionAnalyzer);
-string GenerateWrapperName(const ClassStaticFunctionAnalyzer& functionAnalyzer);
-string GenerateWrapperName(const MethodAnalyzer& methodAnalyzer, bool templateVersion = false);
+std::string GenerateWrapperName(const GlobalFunctionAnalyzer& functionAnalyzer);
+std::string GenerateWrapperName(const ClassStaticFunctionAnalyzer& functionAnalyzer);
+std::string GenerateWrapperName(const MethodAnalyzer& methodAnalyzer, bool templateVersion = false);
 
-string GenerateWrapper(const GlobalFunctionAnalyzer& functionAnalyzer, const vector<ConvertedVariable>& convertedParams, const ConvertedVariable& convertedReturn);
-string GenerateWrapper(const ClassStaticFunctionAnalyzer& functionAnalyzer, bool templateVersion, const vector<ConvertedVariable>& convertedParams, const ConvertedVariable& convertedReturn);
-string GenerateWrapper(const MethodAnalyzer& methodAnalyzer, bool templateVersion, const vector<ConvertedVariable>& convertedParams, const ConvertedVariable& convertedReturn);
+std::string GenerateWrapper(const GlobalFunctionAnalyzer& functionAnalyzer, const std::vector<ConvertedVariable>& convertedParams, const ConvertedVariable& convertedReturn);
+std::string GenerateWrapper(const ClassStaticFunctionAnalyzer& functionAnalyzer, bool templateVersion, const std::vector<ConvertedVariable>& convertedParams, const ConvertedVariable& convertedReturn);
+std::string GenerateWrapper(const MethodAnalyzer& methodAnalyzer, bool templateVersion, const std::vector<ConvertedVariable>& convertedParams, const ConvertedVariable& convertedReturn);
 
-string GenerateConstructorWrapper(const MethodAnalyzer& methodAnalyzer, const vector<ConvertedVariable>& convertedParams);
-string GenerateFactoryWrapper(const MethodAnalyzer& methodAnalyzer, const vector<ConvertedVariable>& convertedParams);
+std::string GenerateConstructorWrapper(const MethodAnalyzer& methodAnalyzer, const std::vector<ConvertedVariable>& convertedParams);
+std::string GenerateFactoryWrapper(const MethodAnalyzer& methodAnalyzer, const std::vector<ConvertedVariable>& convertedParams);
 
 
-string Generate_asFUNCTIONPR(const GlobalFunctionAnalyzer& functionAnalyzer);
-string Generate_asFUNCTIONPR(const ClassStaticFunctionAnalyzer& functionAnalyzer, bool templateVersion);
-string Generate_asMETHODPR(const MethodAnalyzer& methodAnalyzer, bool templateVersion);
+std::string Generate_asFUNCTIONPR(const GlobalFunctionAnalyzer& functionAnalyzer);
+std::string Generate_asFUNCTIONPR(const ClassStaticFunctionAnalyzer& functionAnalyzer, bool templateVersion);
+std::string Generate_asMETHODPR(const MethodAnalyzer& methodAnalyzer, bool templateVersion);
 
 }

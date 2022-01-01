@@ -29,6 +29,8 @@
 #include <unordered_map>
 #include <memory>
 
+using namespace std;
+
 extern string _sourceDir;
 
 namespace ASBindingGenerator

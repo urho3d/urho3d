@@ -24,7 +24,5 @@
 
 #include <string>
 
-using namespace std;
-
-string InsideDefine(const string& headerFile);
-bool IsIgnoredHeader(const string& headerFile);
+std::string InsideDefine(const std::string& headerFile);
+bool IsIgnoredHeader(const std::string& headerFile);

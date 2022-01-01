@@ -31,36 +31,33 @@
 #include "XmlSourceData.h"
 #include "Utils.h"
 
-using namespace pugi;
-using namespace std;
-
-using TemplateSpecialization = map<string, string>;
+using TemplateSpecialization = std::map<std::string, std::string>;
 
 // <type>...</type> | <defval>...</defval> | <para>...</para>
-string RemoveRefs(xml_node node);
+std::string RemoveRefs(pugi::xml_node node);
 
 // <type>...</type>
 class TypeAnalyzer
 {
 private:
-    string fullType_;
-    string name_;
+    std::string fullType_;
+    std::string name_;
     bool isConst_;
     bool isPointer_; // *
     bool isReference_; // &
     bool isRvalueReference_; // &&
     bool isDoublePointer_; // **
     bool isRefToPoiner_; // *&
-    string templateParams_;
+    std::string templateParams_;
 
 public:
-    TypeAnalyzer(xml_node type, const TemplateSpecialization& specialization = {});
+    TypeAnalyzer(pugi::xml_node type, const TemplateSpecialization& specialization = {});
 
     // Used for doxygen bug workaround https://github.com/doxygen/doxygen/issues/7732
-    TypeAnalyzer(const string& typeName);
+    TypeAnalyzer(const std::string& typeName);
 
-    string ToString() const { return fullType_; }
-    string GetName() const { return name_; }
+    std::string ToString() const { return fullType_; }
+    std::string GetName() const { return name_; }
     bool IsConst() const { return isConst_; }
     bool IsPointer() const { return isPointer_; }
     bool IsReference() const { return isReference_; }
@@ -68,8 +65,8 @@ public:
     bool IsDoublePointer() const { return isDoublePointer_; }
     bool IsRefToPointer() const { return isRefToPoiner_; }
     bool IsTemplate() const { return templateParams_.length() > 0; }
-    string GetTemplateParams() { return templateParams_; }
-    string GetNameWithTemplateParams() const { return IsTemplate() ? name_ + "<" + templateParams_ + ">" : name_; }
+    std::string GetTemplateParams() { return templateParams_; }
+    std::string GetNameWithTemplateParams() const { return IsTemplate() ? name_ + "<" + templateParams_ + ">" : name_; }
 };
 
 // <memberdef kind="function">
@@ -77,15 +74,15 @@ public:
 class ParamAnalyzer
 {
 private:
-    xml_node node_;
+    pugi::xml_node node_;
     TemplateSpecialization specialization_; 
 
 public:
-    ParamAnalyzer(xml_node param, const TemplateSpecialization& specialization = {});
+    ParamAnalyzer(pugi::xml_node param, const TemplateSpecialization& specialization = {});
 
-    xml_node GetNode() const { return node_; }
+    pugi::xml_node GetNode() const { return node_; }
 
-    string ToString() const;
+    std::string ToString() const;
 
     // <param>
     //     <type>....</type>
@@ -93,146 +90,146 @@ public:
 
     // <param>
     //     <declname>....</declname>
-    string GetDeclname() const;
+    std::string GetDeclname() const;
 
     // <param>
     //     <defval>....</defval>
-    string GetDefval() const; // Default value
+    std::string GetDefval() const; // Default value
 };
 
 // <memberdef>
-inline bool IsMemberdef(xml_node node) { return node.name() == string("memberdef"); }
+inline bool IsMemberdef(pugi::xml_node node) { return node.name() == std::string("memberdef"); }
 
 // <compounddef>
-inline bool IsCompounddef(xml_node node) { return node.name() == string("compounddef"); }
+inline bool IsCompounddef(pugi::xml_node node) { return node.name() == std::string("compounddef"); }
 
 // <member>
-inline bool IsMember(xml_node node) { return node.name() == string("member"); }
+inline bool IsMember(pugi::xml_node node) { return node.name() == std::string("member"); }
 
 // <sectiondef>
-inline bool IsSectiondef(xml_node node) { return node.name() == string("sectiondef"); }
+inline bool IsSectiondef(pugi::xml_node node) { return node.name() == std::string("sectiondef"); }
 
 // <enumvalue>
-inline bool IsEnumvalue(xml_node node) { return node.name() == string("enumvalue"); }
+inline bool IsEnumvalue(pugi::xml_node node) { return node.name() == std::string("enumvalue"); }
 
 // <compounddef>
 //     <compoundname>...</compoundname>
-string ExtractCompoundname(xml_node compounddef);
+std::string ExtractCompoundname(pugi::xml_node compounddef);
 
 // <compounddef>
 //     <sectiondef kind="xxx">...</sectiondef>
-xml_node FindSectiondef(xml_node compounddef, const string& kind);
+pugi::xml_node FindSectiondef(pugi::xml_node compounddef, const std::string& kind);
 
 // <memberdef static="yes">
-bool IsStatic(xml_node memberdef);
+bool IsStatic(pugi::xml_node memberdef);
 
 // <memberdef kind="function" explicit="yes">
-bool IsExplicit(xml_node memberdef);
+bool IsExplicit(pugi::xml_node memberdef);
 
 // <memberdef>
 //     <definition>...</definition>
-string ExtractDefinition(xml_node memberdef);
+std::string ExtractDefinition(pugi::xml_node memberdef);
 
 // <memberdef>
 //     <argsstring>...</argsstring>
-string ExtractArgsstring(xml_node memberdef);
+std::string ExtractArgsstring(pugi::xml_node memberdef);
 
 // <memberdef kind="function">
 //     <argsstring>(...)</argsstring>
 //     <argsstring>(...) xxx</argsstring>
 //         where xxx can be of const, override, =default, =delete, =0 or their combination
-string ExtractCleanedFunctionArgsstring(xml_node memberdef);
+std::string ExtractCleanedFunctionArgsstring(pugi::xml_node memberdef);
 
 // <memberdef prot="...">
-string ExtractProt(xml_node memberdef);
+std::string ExtractProt(pugi::xml_node memberdef);
 
 // <memberdef>
 //     <type>...</type>
-TypeAnalyzer ExtractType(xml_node memberdef, const TemplateSpecialization& specialization = {});
+TypeAnalyzer ExtractType(pugi::xml_node memberdef, const TemplateSpecialization& specialization = {});
 
 // <memberdef kind="function">
 //     <param>...</param>
 //     <param>...</param>
-vector<ParamAnalyzer> ExtractParams(xml_node memberdef, const TemplateSpecialization& specialization = {});
+std::vector<ParamAnalyzer> ExtractParams(pugi::xml_node memberdef, const TemplateSpecialization& specialization = {});
 
 // <memberdef kind="function">
 //     <param>...</param>
 //     <param>...</param>
-string JoinParamsTypes(xml_node memberdef, const TemplateSpecialization& specialization = {});
-string JoinParamsNames(xml_node memberdef, bool skipContext = false);
+std::string JoinParamsTypes(pugi::xml_node memberdef, const TemplateSpecialization& specialization = {});
+std::string JoinParamsNames(pugi::xml_node memberdef, bool skipContext = false);
 
 // <memberdef kind="function">
 //     ...
-string GetFunctionDeclaration(xml_node memberdef);
+std::string GetFunctionDeclaration(pugi::xml_node memberdef);
 
 // <memberdef kind="variable">
 //     ...
-string GetVariableDeclaration(xml_node memberdef);
+std::string GetVariableDeclaration(pugi::xml_node memberdef);
 
 // <memberdef kind="function">
 //     ...
-string GetFunctionLocation(xml_node memberdef);
+std::string GetFunctionLocation(pugi::xml_node memberdef);
 
 // <compounddef|memberdef id="...">
-string ExtractID(xml_node node);
+std::string ExtractID(pugi::xml_node node);
 
 // <compounddef|memberdef|member|sectiondef kind="...">
-string ExtractKind(xml_node node);
+std::string ExtractKind(pugi::xml_node node);
 
 // <memberdef|enumvalue>
 //     <name>...</name>
-string ExtractName(xml_node node);
+std::string ExtractName(pugi::xml_node node);
 
 // <compounddef|memberdef>
 //     <location line="...">
-string ExtractLine(xml_node node);
+std::string ExtractLine(pugi::xml_node node);
 
 // <compounddef|memberdef>
 //     <location column="...">
-string ExtractColumn(xml_node node);
+std::string ExtractColumn(pugi::xml_node node);
 
 // <compounddef|memberdef>
 //     <briefdescription>...</briefdescription>
 //     <detaileddescription>...</detaileddescription>
-string ExtractComment(xml_node node);
+std::string ExtractComment(pugi::xml_node node);
 
 // <compounddef|memberdef>
 //     <location ...>
 // Extract header file path and convert to relative.
-// Return empty string when declared in *.cpp
-string ExtractHeaderFile(xml_node node);
+// Return empty std::string when declared in *.cpp
+std::string ExtractHeaderFile(pugi::xml_node node);
 
 // <compounddef|memberdef>
 //     <templateparamlist>
-bool IsTemplate(xml_node node);
+bool IsTemplate(pugi::xml_node node);
 
 // <compounddef|memberdef>
 //     <templateparamlist>
 //         <param>...</param>
 //         <param>...</param>
-vector<string> ExtractTemplateParams(xml_node node);
+std::vector<std::string> ExtractTemplateParams(pugi::xml_node node);
 
 // <compounddef kind="namespace">
 //     <sectiondef kind="enum">
 //         <memberdef kind="enum">...</memberdef>
 class EnumAnalyzer
 {
-    xml_node memberdef_;
+    pugi::xml_node memberdef_;
 
 public:
-    EnumAnalyzer(xml_node memberdef);
+    EnumAnalyzer(pugi::xml_node memberdef);
 
-    string GetTypeName() const { return ExtractName(memberdef_); }
-    string GetHeaderFile() const { return ExtractHeaderFile(memberdef_); }
-    string GetComment() const { return ExtractComment(memberdef_); }
+    std::string GetTypeName() const { return ExtractName(memberdef_); }
+    std::string GetHeaderFile() const { return ExtractHeaderFile(memberdef_); }
+    std::string GetComment() const { return ExtractComment(memberdef_); }
     bool IsInternal() const { return GetHeaderFile().empty(); } // true if declared in .cpp file
-    string GetBaseType() const;
-    string GetLocation() const;
+    std::string GetBaseType() const;
+    std::string GetLocation() const;
 
     // <memberdef kind="enum">
     //     <enumvalue><name>...</name></enumvalue>
     //     <enumvalue><name>...</name></enumvalue>
-    vector<string> GetEnumerators() const;
+    std::vector<std::string> GetEnumerators() const;
 
 };
 
@@ -241,17 +238,17 @@ public:
 //         <memberdef kind="variable">...</memberdef>
 class GlobalVariableAnalyzer
 {
-    xml_node memberdef_;
+    pugi::xml_node memberdef_;
 
 public:
-    GlobalVariableAnalyzer(xml_node memberdef);
+    GlobalVariableAnalyzer(pugi::xml_node memberdef);
 
-    string GetName() const { return ExtractName(memberdef_); }
-    string GetHeaderFile() const { return ExtractHeaderFile(memberdef_); }
+    std::string GetName() const { return ExtractName(memberdef_); }
+    std::string GetHeaderFile() const { return ExtractHeaderFile(memberdef_); }
     bool IsStatic() const { return ::IsStatic(memberdef_); }
     TypeAnalyzer GetType() const { return ExtractType(memberdef_); }
     bool IsArray() const { return StartsWith(ExtractArgsstring(memberdef_), "["); }
-    string GetLocation() const { return GetVariableDeclaration(memberdef_) + " | File: " + GetHeaderFile(); }
+    std::string GetLocation() const { return GetVariableDeclaration(memberdef_) + " | File: " + GetHeaderFile(); }
 };
 
 class MethodAnalyzer;
@@ -261,99 +258,99 @@ class FieldAnalyzer;
 class ClassAnalyzer
 {
 private:
-    xml_node compounddef_;
+    pugi::xml_node compounddef_;
     TemplateSpecialization specialization_;
     
-    vector<xml_node> GetMemberdefs() const;
+    std::vector<pugi::xml_node> GetMemberdefs() const;
 
 public:
-    string usingLocation_;
+    std::string usingLocation_;
 
-    xml_node GetCompounddef() const { return compounddef_; }
+    pugi::xml_node GetCompounddef() const { return compounddef_; }
 
-    ClassAnalyzer(xml_node compounddef, const TemplateSpecialization& specialization = {});
+    ClassAnalyzer(pugi::xml_node compounddef, const TemplateSpecialization& specialization = {});
 
     const TemplateSpecialization& GetSpecialization() const { return specialization_; }
 
-    string GetClassName() const;
-    string GetComment() const { return ExtractComment(compounddef_); }
-    string GetHeaderFile() const { return ExtractHeaderFile(compounddef_); }
-    string GetDirName() const;
-    string GetKind() const { return ExtractKind(compounddef_); }
+    std::string GetClassName() const;
+    std::string GetComment() const { return ExtractComment(compounddef_); }
+    std::string GetHeaderFile() const { return ExtractHeaderFile(compounddef_); }
+    std::string GetDirName() const;
+    std::string GetKind() const { return ExtractKind(compounddef_); }
     bool IsInternal() const;
     bool IsTemplate() const { return ::IsTemplate(compounddef_); }
-    vector<MethodAnalyzer> GetAllMethods() const;
-    vector<MethodAnalyzer> GetAllPublicMethods() const;
-    vector<MethodAnalyzer> GetThisPublicMethods() const;
-    vector<MethodAnalyzer> GetThisPublicStaticMethods() const;
-    vector<FieldAnalyzer> GetAllFields() const;
-    vector<FieldAnalyzer> GetThisPublicFields() const;
-    vector<FieldAnalyzer> GetThisPublicStaticFields() const;
-    bool ContainsMethod(const string& name) const;
-    shared_ptr<MethodAnalyzer> GetMethod(const string& name) const;
-    int NumMethods(const string& name) const;
+    std::vector<MethodAnalyzer> GetAllMethods() const;
+    std::vector<MethodAnalyzer> GetAllPublicMethods() const;
+    std::vector<MethodAnalyzer> GetThisPublicMethods() const;
+    std::vector<MethodAnalyzer> GetThisPublicStaticMethods() const;
+    std::vector<FieldAnalyzer> GetAllFields() const;
+    std::vector<FieldAnalyzer> GetThisPublicFields() const;
+    std::vector<FieldAnalyzer> GetThisPublicStaticFields() const;
+    bool ContainsMethod(const std::string& name) const;
+    std::shared_ptr<MethodAnalyzer> GetMethod(const std::string& name) const;
+    int NumMethods(const std::string& name) const;
     bool IsRefCounted() const;
     bool HasThisDestructor() const { return ContainsMethod("~" + GetClassName()); }
     bool HasThisConstructor() const;
     bool IsAbstract() const;
-    string GetLocation() const { return GetKind() + " " + GetClassName() + " | File: " + GetHeaderFile(); }
+    std::string GetLocation() const { return GetKind() + " " + GetClassName() + " | File: " + GetHeaderFile(); }
     bool AllFloats() const;
     bool AllInts() const;
     bool IsPod() const;
     bool IsNoCount() const { return Contains(GetComment(), "NO_COUNT"); } // Have @nocount in comment -> asOBJ_NOCOUNT
-    shared_ptr<ClassAnalyzer> GetBaseClass() const;
-    vector<ClassAnalyzer> GetBaseClasses() const;
-    vector<ClassAnalyzer> GetAllBaseClasses() const;
+    std::shared_ptr<ClassAnalyzer> GetBaseClass() const;
+    std::vector<ClassAnalyzer> GetBaseClasses() const;
+    std::vector<ClassAnalyzer> GetAllBaseClasses() const;
 
-    vector<ClassAnalyzer> GetDerivedClasses() const;
-    vector<ClassAnalyzer> GetAllDerivedClasses() const;
+    std::vector<ClassAnalyzer> GetDerivedClasses() const;
+    std::vector<ClassAnalyzer> GetAllDerivedClasses() const;
     
     // Return null if default constructor is implicitly-declared.
     // Return pointer if default constructor is deleted
-    shared_ptr<MethodAnalyzer> GetDefinedThisDefaultConstructor() const;
+    std::shared_ptr<MethodAnalyzer> GetDefinedThisDefaultConstructor() const;
 
-    vector<MethodAnalyzer> GetThisNonDefaultConstructors() const;
+    std::vector<MethodAnalyzer> GetThisNonDefaultConstructors() const;
 
     // Return null if destructor is implicitly-declared.
     // Return pointer if destructor is deleted
-    shared_ptr<MethodAnalyzer> GetDefinedThisDestructor() const { return GetMethod("~" + GetClassName()); }
+    std::shared_ptr<MethodAnalyzer> GetDefinedThisDestructor() const { return GetMethod("~" + GetClassName()); }
 
     int GetInherianceDeep(int counter = 0) const;
     
-    vector<string> GetAllPublicMembersRefids() const;
+    std::vector<std::string> GetAllPublicMembersRefids() const;
 
     // Base class members that were hidden in this class (c++ declarations)
-    vector<string> GetHiddenMethods() const;
-    vector<string> GetHiddenStaticMethods() const;
-    vector<string> GetHiddenFields() const;
-    vector<string> GetHiddenStaticFields() const;
+    std::vector<std::string> GetHiddenMethods() const;
+    std::vector<std::string> GetHiddenStaticMethods() const;
+    std::vector<std::string> GetHiddenFields() const;
+    std::vector<std::string> GetHiddenStaticFields() const;
 };
 
 // <memberdef kind="function">...</memberdef>
 class FunctionAnalyzer
 {
 protected:
-    xml_node memberdef_;
+    pugi::xml_node memberdef_;
     TemplateSpecialization specialization_;
 
 public:
-    FunctionAnalyzer(xml_node memberdef, const TemplateSpecialization& specialization = {});
+    FunctionAnalyzer(pugi::xml_node memberdef, const TemplateSpecialization& specialization = {});
     
-    xml_node GetMemberdef() const { return memberdef_; }
+    pugi::xml_node GetMemberdef() const { return memberdef_; }
     const TemplateSpecialization& GetSpecialization() const { return specialization_; }
 
-    string GetComment() const { return ExtractComment(memberdef_); }
-    string GetHeaderFile() const { return ExtractHeaderFile(memberdef_); }
-    string GetName() const { return ExtractName(memberdef_); }
-    vector<ParamAnalyzer> GetParams() const { return ExtractParams(memberdef_, specialization_); }
+    std::string GetComment() const { return ExtractComment(memberdef_); }
+    std::string GetHeaderFile() const { return ExtractHeaderFile(memberdef_); }
+    std::string GetName() const { return ExtractName(memberdef_); }
+    std::vector<ParamAnalyzer> GetParams() const { return ExtractParams(memberdef_, specialization_); }
     TypeAnalyzer GetReturnType() const { return ExtractType(memberdef_, specialization_); }
-    vector<string> GetTemplateParams() const { return ExtractTemplateParams(memberdef_); }
+    std::vector<std::string> GetTemplateParams() const { return ExtractTemplateParams(memberdef_); }
     bool IsDefine() const { return CONTAINS(SourceData::defines_, GetName()); }
     bool IsTemplate() const { return ::IsTemplate(memberdef_); }
-    string JoinParamsNames(bool skipContext = false) const { return ::JoinParamsNames(memberdef_, skipContext); } // TODO убрать skipContext, он больше не нужен
-    string JoinParamsTypes() const { return ::JoinParamsTypes(memberdef_, specialization_); }
+    std::string JoinParamsNames(bool skipContext = false) const { return ::JoinParamsNames(memberdef_, skipContext); } // TODO убрать skipContext, он больше не нужен
+    std::string JoinParamsTypes() const { return ::JoinParamsTypes(memberdef_, specialization_); }
 
-    virtual string GetLocation() const { return GetFunctionLocation(memberdef_); }
+    virtual std::string GetLocation() const { return GetFunctionLocation(memberdef_); }
 };
 
 // <compounddef kind="class|struct">
@@ -364,12 +361,12 @@ class MethodAnalyzer : public FunctionAnalyzer
     ClassAnalyzer classAnalyzer_;
 
 public:
-    MethodAnalyzer(const ClassAnalyzer& classAnalyzer, xml_node memberdef, const TemplateSpecialization& specialization = {});
+    MethodAnalyzer(const ClassAnalyzer& classAnalyzer, pugi::xml_node memberdef, const TemplateSpecialization& specialization = {});
 
     ClassAnalyzer GetClass() const { return classAnalyzer_; }
 
     // <memberdef kind="function" virt="...">
-    string GetVirt() const;
+    std::string GetVirt() const;
     bool IsPureVirtual() const { return GetVirt() == "pure-virtual"; }
 
     // <memberdef kind="function" const="yes">
@@ -377,10 +374,10 @@ public:
 
     // <memberdef>
     // <reimplements refid="..."></reimplements>
-    shared_ptr<MethodAnalyzer> Reimplements() const;
+    std::shared_ptr<MethodAnalyzer> Reimplements() const;
 
-    string GetClassName() const { return classAnalyzer_.GetClassName(); }
-    string GetContainsClassName() const; // May this function defined in parent class, so return name oа class, real define this function
+    std::string GetClassName() const { return classAnalyzer_.GetClassName(); }
+    std::string GetContainsClassName() const; // May this function defined in parent class, so return name oа class, real define this function
     bool IsStatic() const { return ::IsStatic(memberdef_); }
     bool IsPublic() const { return ExtractProt(memberdef_) == "public"; }
 
@@ -402,8 +399,8 @@ public:
 
     bool IsThisMethod() const { return GetContainsClassName() == GetClassName(); } // Defined in this class
 
-    string GetDeclaration() const { return JoinNonEmpty({ classAnalyzer_.usingLocation_, GetFunctionDeclaration(memberdef_) }, " | "); }
-    string GetLocation() const override { return JoinNonEmpty({ classAnalyzer_.usingLocation_, GetFunctionLocation(memberdef_) }, " | "); }
+    std::string GetDeclaration() const { return JoinNonEmpty({ classAnalyzer_.usingLocation_, GetFunctionDeclaration(memberdef_) }, " | "); }
+    std::string GetLocation() const override { return JoinNonEmpty({ classAnalyzer_.usingLocation_, GetFunctionLocation(memberdef_) }, " | "); }
 };
 
 // <compounddef kind="class|struct">
@@ -412,20 +409,20 @@ public:
 class FieldAnalyzer
 {
     ClassAnalyzer classAnalyzer_;
-    xml_node memberdef_;
+    pugi::xml_node memberdef_;
 
 public:
-    FieldAnalyzer(ClassAnalyzer classAnalyzer, xml_node memberdef);
+    FieldAnalyzer(ClassAnalyzer classAnalyzer, pugi::xml_node memberdef);
 
     bool IsStatic() const { return ::IsStatic(memberdef_); }
     TypeAnalyzer GetType() const { return ExtractType(memberdef_); }
-    string GetName() const { return ExtractName(memberdef_); }
-    string GetComment() const { return ExtractComment(memberdef_); }
+    std::string GetName() const { return ExtractName(memberdef_); }
+    std::string GetComment() const { return ExtractComment(memberdef_); }
     bool IsPublic() const { return ExtractProt(memberdef_) == "public"; }
-    string GetHeaderFile() const { return ExtractHeaderFile(memberdef_); }
-    string GetDeclaration() const { return GetVariableDeclaration(memberdef_); }
-    string GetLocation() const;
-    string GetClassName() const { return classAnalyzer_.GetClassName(); }
+    std::string GetHeaderFile() const { return ExtractHeaderFile(memberdef_); }
+    std::string GetDeclaration() const { return GetVariableDeclaration(memberdef_); }
+    std::string GetLocation() const;
+    std::string GetClassName() const { return classAnalyzer_.GetClassName(); }
     bool IsArray() const { return StartsWith(ExtractArgsstring(memberdef_), "["); };
 };
 
@@ -435,7 +432,7 @@ public:
 class GlobalFunctionAnalyzer : public FunctionAnalyzer
 {
 public:
-    GlobalFunctionAnalyzer(xml_node memberdef, const TemplateSpecialization& specialization = {});
+    GlobalFunctionAnalyzer(pugi::xml_node memberdef, const TemplateSpecialization& specialization = {});
 };
 
 // <compounddef kind="class|struct">
@@ -446,9 +443,9 @@ class ClassStaticFunctionAnalyzer : public FunctionAnalyzer
     ClassAnalyzer classAnalyzer_;
 
 public:
-    ClassStaticFunctionAnalyzer(const ClassAnalyzer& classAnalyzer, xml_node memberdef, const TemplateSpecialization& specialization = {});
+    ClassStaticFunctionAnalyzer(const ClassAnalyzer& classAnalyzer, pugi::xml_node memberdef, const TemplateSpecialization& specialization = {});
 
-    string GetClassName() const { return classAnalyzer_.GetClassName(); }
+    std::string GetClassName() const { return classAnalyzer_.GetClassName(); }
 };
 
 // <memberdef kind="typedef">
@@ -456,15 +453,15 @@ public:
 class UsingAnalyzer
 {
 private:
-    xml_node memberdef_;
+    pugi::xml_node memberdef_;
 
 public:
-    UsingAnalyzer(xml_node memberdef);
+    UsingAnalyzer(pugi::xml_node memberdef);
 
-    string GetComment() const { return ExtractComment(memberdef_); }
-    string GetHeaderFile() const { return ExtractHeaderFile(memberdef_); }
-    string GetLocation() const { return "using " + GetName() + " = " + GetType().ToString() + " | File: " + GetHeaderFile(); }
-    string GetName() const { return ExtractName(memberdef_); }
+    std::string GetComment() const { return ExtractComment(memberdef_); }
+    std::string GetHeaderFile() const { return ExtractHeaderFile(memberdef_); }
+    std::string GetLocation() const { return "using " + GetName() + " = " + GetType().ToString() + " | File: " + GetHeaderFile(); }
+    std::string GetName() const { return ExtractName(memberdef_); }
     TypeAnalyzer GetType() const { return ExtractType(memberdef_); }
 };
 
@@ -472,27 +469,27 @@ public:
 class NamespaceAnalyzer
 {
 private:
-    xml_node compounddef_;
+    pugi::xml_node compounddef_;
 
 public:
-    NamespaceAnalyzer(xml_node compounddef);
+    NamespaceAnalyzer(pugi::xml_node compounddef);
 
     // <compounddef kind="namespace">
     //     <sectiondef kind="enum">
     //         <memberdef kind="enum">...</memberdef>
     //         <memberdef kind="enum">...</memberdef>
-    vector<EnumAnalyzer> GetEnums();
+    std::vector<EnumAnalyzer> GetEnums();
 
     // <compounddef kind="namespace">
     //     <sectiondef kind="var">
     //         <memberdef kind="variable">...</memberdef>
     //         <memberdef kind="variable">...</memberdef>
-    vector<GlobalVariableAnalyzer> GetVariables();
+    std::vector<GlobalVariableAnalyzer> GetVariables();
 
     // <compounddef kind="namespace">
     //     <sectiondef kind="func">
     //         <memberdef kind="function">...</memberdef>
     //         <memberdef kind="function">...</memberdef>
-    vector<GlobalFunctionAnalyzer> GetFunctions();
+    std::vector<GlobalFunctionAnalyzer> GetFunctions();
 };
 
