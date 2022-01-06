@@ -53,7 +53,7 @@ static void LoadXml(const string& fullPath)
 
     xml_node doxygenindex = xmlDocument->child("doxygenindex");
     
-    if (doxygenindex) // index.xml
+    if (doxygenindex) // Only index.xml has doxygenindex child
     {
         // Fill defines_
         for (xml_node compound : doxygenindex.children("compound"))
@@ -82,9 +82,8 @@ static void LoadXml(const string& fullPath)
 
     if (compounddef_kind == "struct" || compounddef_kind == "class")
     {
-        // Fill classes_
-        string id = compounddef.attribute("id").value();
-        assert(!id.empty());
+        // Fill classesByID_
+        string id = ExtractID(compounddef);
         SourceData::classesByID_.insert({ id, compounddef });
 
         // Fill classesByName_

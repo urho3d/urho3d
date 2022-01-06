@@ -41,7 +41,7 @@ namespace SourceData
     // All enums from Urho3D namepace
     extern std::unordered_map<std::string, pugi::xml_node> enums_; // name -> memberdef
 
-    // List of all defines. Used to detect that some function is a define actually
+    // List of all defines. Used to detect that some function is a #define actually
     extern std::vector<std::string> defines_;
 
     // Namespace Urho3D contains enums, global functions and global variables
