@@ -1790,9 +1790,8 @@ void UIElement::SortChildren()
     if (sortChildren_ && sortOrderDirty_)
     {
         // Only sort when there is no layout
-        /// \todo Order is not stable when children have same priorities
         if (layoutMode_ == LM_FREE)
-            Sort(children_.Begin(), children_.End(), CompareUIElements);
+            std::stable_sort(children_.Begin().ptr_, children_.End().ptr_, CompareUIElements);
         sortOrderDirty_ = false;
     }
 }
