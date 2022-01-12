@@ -251,9 +251,9 @@ float Ray::HitDistance(const void* vertexData, unsigned vertexStride, unsigned v
     unsigned index = 0, nearestIdx = M_MAX_UNSIGNED;
     Vector3 barycentric;
 
-    Vector3 tempNormal_, tempBary_; 
-    Vector3* tempNormal = outNormal ? &tempNormal_ : nullptr;
-    Vector3* tempBary = outUV ? &tempBary_ : nullptr;
+    Vector3 tempNormalValue, tempBaryValue; 
+    Vector3* tempNormal = outNormal ? &tempNormalValue : nullptr;
+    Vector3* tempBary = outUV ? &tempBaryValue : nullptr;
 
     while (index + 2 < vertexCount)
     {
@@ -302,9 +302,9 @@ float Ray::HitDistance(const void* vertexData, unsigned vertexStride, const void
     const auto* vertices = (const unsigned char*)vertexData;
     Vector3 barycentric;
 
-    Vector3 tempNormal_, tempBary_; 
-    Vector3* tempNormal = outNormal ? &tempNormal_ : nullptr;
-    Vector3* tempBary = outUV ? &tempBary_ : nullptr;
+    Vector3 tempNormalValue, tempBaryValue; 
+    Vector3* tempNormal = outNormal ? &tempNormalValue : nullptr;
+    Vector3* tempBary = outUV ? &tempBaryValue : nullptr;
 
     // 16-bit indices
     if (indexSize == sizeof(unsigned short))
