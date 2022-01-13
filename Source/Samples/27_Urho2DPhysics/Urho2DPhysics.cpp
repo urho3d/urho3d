@@ -28,16 +28,16 @@
 #include <Urho3D/Graphics/Octree.h>
 #include <Urho3D/Graphics/Renderer.h>
 #include <Urho3D/Input/Input.h>
+#include <Urho3D/Physics2D/CollisionBox2D.h>
+#include <Urho3D/Physics2D/CollisionCircle2D.h>
+#include <Urho3D/Physics2D/PhysicsWorld2D.h>
+#include <Urho3D/Physics2D/RigidBody2D.h>
 #include <Urho3D/Resource/ResourceCache.h>
 #include <Urho3D/Scene/Scene.h>
 #include <Urho3D/Scene/SceneEvents.h>
 #include <Urho3D/UI/Font.h>
 #include <Urho3D/UI/Text.h>
-#include <Urho3D/Urho2D/CollisionBox2D.h>
-#include <Urho3D/Urho2D/CollisionCircle2D.h>
 #include <Urho3D/Urho2D/Drawable2D.h>
-#include <Urho3D/Urho2D/PhysicsWorld2D.h>
-#include <Urho3D/Urho2D/RigidBody2D.h>
 #include <Urho3D/Urho2D/Sprite2D.h>
 #include <Urho3D/Urho2D/StaticSprite2D.h>
 

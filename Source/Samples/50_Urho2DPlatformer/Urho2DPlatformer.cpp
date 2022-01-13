@@ -21,37 +21,37 @@
 //
 
 #include <Urho3D/Audio/Audio.h>
-#include <Urho3D/Urho2D/AnimatedSprite2D.h>
-#include <Urho3D/Urho2D/AnimationSet2D.h>
-#include <Urho3D/UI/Button.h>
-#include <Urho3D/Graphics/Camera.h>
-#include <Urho3D/Urho2D/CollisionBox2D.h>
-#include <Urho3D/Urho2D/CollisionChain2D.h>
-#include <Urho3D/Urho2D/CollisionCircle2D.h>
-#include <Urho3D/Urho2D/CollisionPolygon2D.h>
 #include <Urho3D/Core/CoreEvents.h>
-#include <Urho3D/Graphics/DebugRenderer.h>
+#include <Urho3D/Core/StringUtils.h>
 #include <Urho3D/Engine/Engine.h>
-#include <Urho3D/UI/Font.h>
+#include <Urho3D/Graphics/Camera.h>
+#include <Urho3D/Graphics/DebugRenderer.h>
 #include <Urho3D/Graphics/Graphics.h>
 #include <Urho3D/Graphics/GraphicsEvents.h>
-#include <Urho3D/Input/Input.h>
 #include <Urho3D/Graphics/Octree.h>
-#include <Urho3D/Urho2D/PhysicsEvents2D.h>
-#include <Urho3D/Urho2D/PhysicsWorld2D.h>
 #include <Urho3D/Graphics/Renderer.h>
+#include <Urho3D/Graphics/Zone.h>
+#include <Urho3D/Input/Input.h>
+#include <Urho3D/Physics2D/CollisionBox2D.h>
+#include <Urho3D/Physics2D/CollisionChain2D.h>
+#include <Urho3D/Physics2D/CollisionCircle2D.h>
+#include <Urho3D/Physics2D/CollisionPolygon2D.h>
+#include <Urho3D/Physics2D/PhysicsEvents2D.h>
+#include <Urho3D/Physics2D/PhysicsWorld2D.h>
+#include <Urho3D/Physics2D/RigidBody2D.h>
 #include <Urho3D/Resource/ResourceCache.h>
-#include <Urho3D/Urho2D/RigidBody2D.h>
 #include <Urho3D/Scene/Scene.h>
 #include <Urho3D/Scene/SceneEvents.h>
-#include <Urho3D/Core/StringUtils.h>
+#include <Urho3D/UI/Button.h>
+#include <Urho3D/UI/Font.h>
 #include <Urho3D/UI/Text.h>
+#include <Urho3D/UI/UI.h>
+#include <Urho3D/UI/UIEvents.h>
+#include <Urho3D/Urho2D/AnimatedSprite2D.h>
+#include <Urho3D/Urho2D/AnimationSet2D.h>
 #include <Urho3D/Urho2D/TileMap2D.h>
 #include <Urho3D/Urho2D/TileMapLayer2D.h>
 #include <Urho3D/Urho2D/TmxFile2D.h>
-#include <Urho3D/UI/UI.h>
-#include <Urho3D/UI/UIEvents.h>
-#include <Urho3D/Graphics/Zone.h>
 
 #include <Urho3D/DebugNew.h>
 

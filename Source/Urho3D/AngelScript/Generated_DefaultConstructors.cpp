@@ -372,15 +372,17 @@ void ASRegisterGeneratedDefaultConstructors(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("PhysicsWorldConfig", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<PhysicsWorldConfig>), AS_CALL_CDECL_OBJFIRST);
 #endif
 
-#ifdef URHO3D_URHO2D
+#ifdef URHO3D_PHYSICS2D
     // DelayedWorldTransform2D::DelayedWorldTransform2D() | Implicitly-declared
     engine->RegisterObjectBehaviour("DelayedWorldTransform2D", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<DelayedWorldTransform2D>), AS_CALL_CDECL_OBJFIRST);
 
-    // Particle2D::Particle2D() | Implicitly-declared
-    engine->RegisterObjectBehaviour("Particle2D", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<Particle2D>), AS_CALL_CDECL_OBJFIRST);
-
     // PhysicsRaycastResult2D::PhysicsRaycastResult2D() | Implicitly-declared
     engine->RegisterObjectBehaviour("PhysicsRaycastResult2D", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<PhysicsRaycastResult2D>), AS_CALL_CDECL_OBJFIRST);
+#endif
+
+#ifdef URHO3D_URHO2D
+    // Particle2D::Particle2D() | Implicitly-declared
+    engine->RegisterObjectBehaviour("Particle2D", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<Particle2D>), AS_CALL_CDECL_OBJFIRST);
 
     // SourceBatch2D::SourceBatch2D() | File: ../Urho2D/Drawable2D.h
     engine->RegisterObjectBehaviour("SourceBatch2D", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<SourceBatch2D>), AS_CALL_CDECL_OBJFIRST);

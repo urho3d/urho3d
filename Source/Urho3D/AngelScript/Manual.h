@@ -34,4 +34,4 @@
 #include "../AngelScript/Manual_Network.h"
 #include "../AngelScript/Manual_Navigation.h"
 #include "../AngelScript/Manual_Physics.h"
-#include "../AngelScript/Manual_Urho2D.h"
+#include "../AngelScript/Manual_Physics2D.h"

@@ -67,6 +67,12 @@ void ASRegisterManualFirst_Physics(asIScriptEngine* engine);
 void ASRegisterManualLast_Physics(asIScriptEngine* engine);
 #endif
 
+#ifdef URHO3D_PHYSICS2D
+void ASRegisterManualFirst_Physics2D(asIScriptEngine* engine);
+void ASRegisterManualLast_Physics2D(asIScriptEngine* engine);
+#endif
+
+
 #ifdef URHO3D_NETWORK
 void ASRegisterManualFirst_Network(asIScriptEngine* engine);
 void ASRegisterManualLast_Network(asIScriptEngine* engine);
@@ -81,12 +87,6 @@ void ASRegisterManualLast_IK(asIScriptEngine* engine);
 void ASRegisterManualFirst_Database(asIScriptEngine* engine);
 void ASRegisterManualLast_Database(asIScriptEngine* engine);
 #endif
-
-#ifdef URHO3D_URHO2D
-void ASRegisterManualFirst_Urho2D(asIScriptEngine* engine);
-void ASRegisterManualLast_Urho2D(asIScriptEngine* engine);
-#endif
-
 
 // This function is called before ASRegisterGenerated()
 void ASRegisterManualFirst(asIScriptEngine* engine)
@@ -126,6 +126,10 @@ void ASRegisterManualFirst(asIScriptEngine* engine)
     ASRegisterManualFirst_Physics(engine);
 #endif
 
+#ifdef URHO3D_PHYSICS2D
+    ASRegisterManualFirst_Physics2D(engine);
+#endif
+
 #ifdef URHO3D_NETWORK
     ASRegisterManualFirst_Network(engine);
 #endif
@@ -136,10 +140,6 @@ void ASRegisterManualFirst(asIScriptEngine* engine)
 
 #ifdef URHO3D_DATABASE
     ASRegisterManualFirst_Database(engine);
-#endif
-
-#ifdef URHO3D_URHO2D
-    ASRegisterManualFirst_Urho2D(engine);
 #endif
 }
 
@@ -163,6 +163,10 @@ void ASRegisterManualLast(asIScriptEngine* engine)
     ASRegisterManualLast_Physics(engine);
 #endif
 
+#ifdef URHO3D_PHYSICS2D
+    ASRegisterManualLast_Physics2D(engine);
+#endif
+
 #ifdef URHO3D_NETWORK
     ASRegisterManualLast_Network(engine);
 #endif
@@ -173,10 +177,6 @@ void ASRegisterManualLast(asIScriptEngine* engine)
 
 #ifdef URHO3D_DATABASE
     ASRegisterManualLast_Database(engine);
-#endif
-
-#ifdef URHO3D_URHO2D
-    ASRegisterManualLast_Urho2D(engine);
 #endif
 }
 

@@ -166,6 +166,30 @@
 #include "../Physics/RigidBody.h"
 #endif
 
+#ifdef URHO3D_PHYSICS2D
+#include "../Physics2D/CollisionBox2D.h"
+#include "../Physics2D/CollisionChain2D.h"
+#include "../Physics2D/CollisionCircle2D.h"
+#include "../Physics2D/CollisionEdge2D.h"
+#include "../Physics2D/CollisionPolygon2D.h"
+#include "../Physics2D/CollisionShape2D.h"
+#include "../Physics2D/Constraint2D.h"
+#include "../Physics2D/ConstraintDistance2D.h"
+#include "../Physics2D/ConstraintFriction2D.h"
+#include "../Physics2D/ConstraintGear2D.h"
+#include "../Physics2D/ConstraintMotor2D.h"
+#include "../Physics2D/ConstraintMouse2D.h"
+#include "../Physics2D/ConstraintPrismatic2D.h"
+#include "../Physics2D/ConstraintPulley2D.h"
+#include "../Physics2D/ConstraintRevolute2D.h"
+#include "../Physics2D/ConstraintRope2D.h"
+#include "../Physics2D/ConstraintWeld2D.h"
+#include "../Physics2D/ConstraintWheel2D.h"
+#include "../Physics2D/Physics2D.h"
+#include "../Physics2D/PhysicsWorld2D.h"
+#include "../Physics2D/RigidBody2D.h"
+#endif
+
 #include "../Resource/BackgroundLoader.h"
 #include "../Resource/Decompress.h"
 #include "../Resource/Image.h"
@@ -224,30 +248,10 @@
 #ifdef URHO3D_URHO2D
 #include "../Urho2D/AnimatedSprite2D.h"
 #include "../Urho2D/AnimationSet2D.h"
-#include "../Urho2D/CollisionBox2D.h"
-#include "../Urho2D/CollisionChain2D.h"
-#include "../Urho2D/CollisionCircle2D.h"
-#include "../Urho2D/CollisionEdge2D.h"
-#include "../Urho2D/CollisionPolygon2D.h"
-#include "../Urho2D/CollisionShape2D.h"
-#include "../Urho2D/Constraint2D.h"
-#include "../Urho2D/ConstraintDistance2D.h"
-#include "../Urho2D/ConstraintFriction2D.h"
-#include "../Urho2D/ConstraintGear2D.h"
-#include "../Urho2D/ConstraintMotor2D.h"
-#include "../Urho2D/ConstraintMouse2D.h"
-#include "../Urho2D/ConstraintPrismatic2D.h"
-#include "../Urho2D/ConstraintPulley2D.h"
-#include "../Urho2D/ConstraintRevolute2D.h"
-#include "../Urho2D/ConstraintRope2D.h"
-#include "../Urho2D/ConstraintWeld2D.h"
-#include "../Urho2D/ConstraintWheel2D.h"
 #include "../Urho2D/Drawable2D.h"
 #include "../Urho2D/ParticleEffect2D.h"
 #include "../Urho2D/ParticleEmitter2D.h"
-#include "../Urho2D/PhysicsWorld2D.h"
 #include "../Urho2D/Renderer2D.h"
-#include "../Urho2D/RigidBody2D.h"
 #include "../Urho2D/Sprite2D.h"
 #include "../Urho2D/SpriteSheet2D.h"
 #include "../Urho2D/StaticSprite2D.h"
@@ -275,8 +279,8 @@
 //#include "../Physics/PhysicsUtils.h"
 //#endif
 
-//#include "../Resource/PListFile.h"
-
-//#ifdef URHO3D_URHO2D
-//#include "../Urho2D/PhysicsUtils2D.h"
+//#ifdef URHO3D_PHYSICS2D
+//#include "../Physics2D/PhysicsUtils2D.h"
 //#endif
+
+//#include "../Resource/PListFile.h"

@@ -30,7 +30,7 @@
 #endif
 
 #ifdef URHO3D_URHO2D
-#include "../Urho2D/PhysicsWorld2D.h"
+#include "../Physics2D/PhysicsWorld2D.h"
 #endif
 
 namespace Urho3D

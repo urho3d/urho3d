@@ -54,6 +54,9 @@
 #include "../Physics/PhysicsWorld.h"
 #include "../Physics/RaycastVehicle.h"
 #endif
+#ifdef URHO3D_PHYSICS2D
+#include "../Physics2D/Physics2D.h"
+#endif
 #include "../Resource/ResourceCache.h"
 #include "../Resource/Localization.h"
 #include "../Scene/Scene.h"
@@ -149,6 +152,10 @@ Engine::Engine(Context* context) :
 
 #ifdef URHO3D_PHYSICS
     RegisterPhysicsLibrary(context_);
+#endif
+
+#ifdef URHO3D_PHYSICS2D
+    RegisterPhysics2DLibrary(context_);
 #endif
 
 #ifdef URHO3D_NAVIGATION

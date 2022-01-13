@@ -1,4 +1,4 @@
-// Urho2D physics Constraints sample.
+// Physics2D Constraints sample.
 // This sample is designed to help understanding and chosing the right constraint.
 // This sample demonstrates:
 //      - Creating physics constraints

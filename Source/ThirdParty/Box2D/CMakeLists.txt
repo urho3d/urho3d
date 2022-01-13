@@ -185,5 +185,5 @@ set (INCLUDE_DIRS .)
 # Setup target
 setup_library ()
 
-# Install headers for building and using the Urho3D library (install dependency for Urho3D/Urho2D/PhysicsWorld2D.h and Urho3D/Urho2D/RigidBody2D.h)
+# Install headers for building and using the Urho3D library (install dependency for Urho3D/Physics2D/PhysicsWorld2D.h and Urho3D/Physics2D/RigidBody2D.h)
 install_header_files (DIRECTORY Box2D DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty FILES_MATCHING PATTERN *.h)
