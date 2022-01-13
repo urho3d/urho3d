@@ -31,7 +31,7 @@
 #include "../Core/Profiler.h"
 #include "../IO/Log.h"
 #include "../IO/MemoryBuffer.h"
-#if defined(URHO3D_PHYSICS) || defined(URHO3D_URHO2D)
+#if defined(URHO3D_PHYSICS) || defined(URHO3D_PHYSICS2D)
 #include "../Physics/PhysicsEvents.h"
 #endif
 #include "../Resource/ResourceCache.h"

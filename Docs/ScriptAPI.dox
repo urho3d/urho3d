@@ -3,6 +3,974 @@ namespace Urho3D
 
 /**
 
+\page EventList Event list
+
+## %Audio events
+
+### SoundFinished
+- %Node : Node pointer
+- %SoundSource : SoundSource pointer
+- %Sound : Sound pointer
+
+## %Core events
+
+### BeginFrame
+- %FrameNumber : unsigned
+- %TimeStep : float
+
+### Update
+- %TimeStep : float
+
+### PostUpdate
+- %TimeStep : float
+
+### RenderUpdate
+- %TimeStep : float
+
+### PostRenderUpdate
+- %TimeStep : float
+
+### EndFrame
+
+## %Database events
+
+### DbCursor
+- %DbConnection : DbConnection pointer
+- %ResultImpl : Underlying result object pointer (cannot be used in scripting)
+- %SQL : String
+- %NumCols : unsigned
+- %ColValues : VariantVector
+- %ColHeaders : StringVector
+- %Filter : bool [in]
+- %Abort : bool [in]
+
+## %Drawable events
+
+### BoneHierarchyCreated
+- %Node : Node pointer
+
+### AnimationTrigger
+- %Node : Node pointer
+- %Animation : Animation pointer
+- %Name : String
+- %Time : Float
+- %Data : User-defined data type
+
+### AnimationFinished
+- %Node : Node pointer
+- %Animation : Animation pointer
+- %Name : String
+- %Looped : Bool
+
+### ParticleEffectFinished
+- %Node : Node pointer
+- %Effect : ParticleEffect pointer
+
+### TerrainCreated
+- %Node : Node pointer
+
+## %Engine events
+
+### ConsoleCommand
+- %Command : String
+- %Id : String
+
+## %Graphics events
+
+### ScreenMode
+- %Width : int
+- %Height : int
+- %Fullscreen : bool
+- %Borderless : bool
+- %Resizable : bool
+- %HighDPI : bool
+- %Monitor : int
+- %RefreshRate : int
+
+### WindowPos
+- %X : int
+- %Y : int
+
+### RenderSurfaceUpdate
+
+### BeginRendering
+
+### EndRendering
+
+### BeginViewUpdate
+- %View : View pointer
+- %Texture : Texture pointer
+- %Surface : RenderSurface pointer
+- %Scene : Scene pointer
+- %Camera : Camera pointer
+
+### EndViewUpdate
+- %View : View pointer
+- %Texture : Texture pointer
+- %Surface : RenderSurface pointer
+- %Scene : Scene pointer
+- %Camera : Camera pointer
+
+### BeginViewRender
+- %View : View pointer
+- %Texture : Texture pointer
+- %Surface : RenderSurface pointer
+- %Scene : Scene pointer
+- %Camera : Camera pointer
+
+### ViewBuffersReady
+- %View : View pointer
+- %Texture : Texture pointer
+- %Surface : RenderSurface pointer
+- %Scene : Scene pointer
+- %Camera : Camera pointer
+
+### ViewGlobalShaderParameters
+- %View : View pointer
+- %Texture : Texture pointer
+- %Surface : RenderSurface pointer
+- %Scene : Scene pointer
+- %Camera : Camera pointer
+
+### EndViewRender
+- %View : View pointer
+- %Texture : Texture pointer
+- %Surface : RenderSurface pointer
+- %Scene : Scene pointer
+- %Camera : Camera pointer
+
+### EndAllViewsRender
+
+### RenderPathEvent
+- %Name : String
+
+### DeviceLost
+
+### DeviceReset
+
+## %IK events
+
+### IKEffectorTargetChanged
+- %EffectorNode : (Node*) The effector node that has changed targets
+- %TargetNode : (Node*) The new target node. NOTE: Can be NULL (means no target)
+
+## %IO events
+
+### LogMessage
+- %Message : String
+- %Level : int
+
+### AsyncExecFinished
+- %RequestID : unsigned
+- %ExitCode : int
+
+## %Input events
+
+### MouseButtonDown
+- %Button : int
+- %Buttons : int
+- %Qualifiers : int
+- %Clicks : int
+
+### MouseButtonUp
+- %Button : int
+- %Buttons : int
+- %Qualifiers : int
+
+### MouseMove
+- %X : int (only when mouse visible)
+- %Y : int (only when mouse visible)
+- %DX : int
+- %DY : int
+- %Buttons : int
+- %Qualifiers : int
+
+### MouseWheel
+- %Wheel : int
+- %Buttons : int
+- %Qualifiers : int
+
+### KeyDown
+- %Key : int
+- %Scancode : int
+- %Buttons : int
+- %Qualifiers : int
+- %Repeat : bool
+
+### KeyUp
+- %Key : int
+- %Scancode : int
+- %Buttons : int
+- %Qualifiers : int
+
+### TextInput
+- %Text : String
+
+### TextEditing
+- %Composition : String
+- %Cursor : int
+- %SelectionLength : int
+
+### JoystickConnected
+- %JoystickID : int
+
+### JoystickDisconnected
+- %JoystickID : int
+
+### JoystickButtonDown
+- %JoystickID : int
+- %Button : int
+
+### JoystickButtonUp
+- %JoystickID : int
+- %Button : int
+
+### JoystickAxisMove
+- %JoystickID : int
+- %Button : int
+- %Position : float
+
+### JoystickHatMove
+- %JoystickID : int
+- %Button : int
+- %Position : int
+
+### TouchBegin
+- %TouchID : int
+- %X : int
+- %Y : int
+- %Pressure : float
+
+### TouchEnd
+- %TouchID : int
+- %X : int
+- %Y : int
+
+### TouchMove
+- %TouchID : int
+- %X : int
+- %Y : int
+- %DX : int
+- %DY : int
+- %Pressure : float
+
+### GestureRecorded
+- %GestureID : unsigned
+
+### GestureInput
+- %GestureID : unsigned
+- %CenterX : int
+- %CenterY : int
+- %NumFingers : int
+- %Error : float
+
+### MultiGesture
+- %CenterX : int
+- %CenterY : int
+- %NumFingers : int
+- %DTheta : float (degrees)
+- %DDist : float
+
+### DropFile
+- %FileName : String
+
+### InputFocus
+- %Focus : bool
+- %Minimized : bool
+
+### MouseVisibleChanged
+- %Visible : bool
+
+### MouseModeChanged
+- %Mode : MouseMode
+- %MouseLocked : bool
+
+### ExitRequested
+
+### SDLRawInput
+- %SDLEvent : SDL_Event*
+- %Consumed : bool
+
+### InputBegin
+
+### InputEnd
+
+## %Navigation events
+
+### NavigationMeshRebuilt
+- %Node : Node pointer
+- %Mesh : NavigationMesh pointer
+
+### NavigationAreaRebuilt
+- %Node : Node pointer
+- %Mesh : NavigationMesh pointer
+- %BoundsMin : Vector3
+- %BoundsMax : Vector3
+
+### NavigationTileAdded
+- %Node : Node pointer
+- %Mesh : NavigationMesh pointer
+- %Tile : IntVector2
+
+### NavigationTileRemoved
+- %Node : Node pointer
+- %Mesh : NavigationMesh pointer
+- %Tile : IntVector2
+
+### NavigationAllTilesRemoved
+- %Node : Node pointer
+- %Mesh : NavigationMesh pointer
+
+### CrowdAgentFormation
+- %Node : Node pointer
+- %CrowdAgent : CrowdAgent pointer
+- %Index : unsigned
+- %Size : unsigned
+- %Position : Vector3 [in/out]
+
+### CrowdAgentNodeFormation
+- %Node : Node pointer
+- %CrowdAgent : CrowdAgent pointer
+- %Index : unsigned
+- %Size : unsigned
+- %Position : Vector3 [in/out]
+
+### CrowdAgentReposition
+- %Node : Node pointer
+- %CrowdAgent : CrowdAgent pointer
+- %Position : Vector3
+- %Velocity : Vector3
+- %Arrived : bool
+- %TimeStep : float
+
+### CrowdAgentNodeReposition
+- %Node : Node pointer
+- %CrowdAgent : CrowdAgent pointer
+- %Position : Vector3
+- %Velocity : Vector3
+- %Arrived : bool
+- %TimeStep : float
+
+### CrowdAgentFailure
+- %Node : Node pointer
+- %CrowdAgent : CrowdAgent pointer
+- %Position : Vector3
+- %Velocity : Vector3
+- %CrowdAgentState : int
+- %CrowdTargetState : int
+
+### CrowdAgentNodeFailure
+- %Node : Node pointer
+- %CrowdAgent : CrowdAgent pointer
+- %Position : Vector3
+- %Velocity : Vector3
+- %CrowdAgentState : int
+- %CrowdTargetState : int
+
+### CrowdAgentStateChanged
+- %Node : Node pointer
+- %CrowdAgent : CrowdAgent pointer
+- %Position : Vector3
+- %Velocity : Vector3
+- %CrowdAgentState : int
+- %CrowdTargetState : int
+
+### CrowdAgentNodeStateChanged
+- %Node : Node pointer
+- %CrowdAgent : CrowdAgent pointer
+- %Position : Vector3
+- %Velocity : Vector3
+- %CrowdAgentState : int
+- %CrowdTargetState : int
+
+### NavigationObstacleAdded
+- %Node : Node pointer
+- %Obstacle : Obstacle pointer
+- %Position : Vector3
+- %Radius : float
+- %Height : float
+
+### NavigationObstacleRemoved
+- %Node : Node pointer
+- %Obstacle : Obstacle pointer
+- %Position : Vector3
+- %Radius : float
+- %Height : float
+
+## %Network events
+
+### ServerConnected
+
+### ServerDisconnected
+
+### ConnectFailed
+
+### ConnectionInProgress
+
+### ClientConnected
+- %Connection : Connection pointer
+
+### ClientDisconnected
+- %Connection : Connection pointer
+
+### ClientIdentity
+- %Connection : Connection pointer
+- %Allow : bool
+
+### ClientSceneLoaded
+- %Connection : Connection pointer
+
+### NetworkMessage
+- %Connection : Connection pointer
+- %MessageID : int
+- %Data : Buffer
+
+### NetworkUpdate
+
+### NetworkUpdateSent
+
+### NetworkSceneLoadFailed
+- %Connection : Connection pointer
+
+### RemoteEventData
+- %Connection : Connection pointer
+
+### NetworkBanned
+
+### NetworkInvalidPassword
+
+### NetworkHostDiscovered
+- %Address : String
+- %Port : int
+- %Beacon : VariantMap
+
+### NetworkNatPunchtroughSucceeded
+- %Address : String
+- %Port : int
+
+### NetworkNatPunchtroughFailed
+- %Address : String
+- %Port : int
+
+### NetworkNatMasterConnectionFailed
+
+### NetworkNatMasterConnectionSucceeded
+
+### NetworkNatMasterDisconnected
+
+## %Physics2D events
+
+### PhysicsUpdateContact2D
+- %World : PhysicsWorld2D pointer
+- %BodyA : RigidBody2D pointer
+- %BodyB : RigidBody2D pointer
+- %NodeA : Node pointer
+- %NodeB : Node pointer
+- %ShapeA : CollisionShape2D pointer
+- %ShapeB : CollisionShape2D pointer
+- %Enabled : bool [in/out]
+
+### PhysicsBeginContact2D
+- %World : PhysicsWorld2D pointer
+- %BodyA : RigidBody2D pointer
+- %BodyB : RigidBody2D pointer
+- %NodeA : Node pointer
+- %NodeB : Node pointer
+- %ShapeA : CollisionShape2D pointer
+- %ShapeB : CollisionShape2D pointer
+
+### PhysicsEndContact2D
+- %World : PhysicsWorld2D pointer
+- %BodyA : RigidBody2D pointer
+- %BodyB : RigidBody2D pointer
+- %NodeA : Node pointer
+- %NodeB : Node pointer
+- %ShapeA : CollisionShape2D pointer
+- %ShapeB : CollisionShape2D pointer
+
+### NodeUpdateContact2D
+- %Body : RigidBody2D pointer
+- %OtherNode : Node pointer
+- %OtherBody : RigidBody2D pointer
+- %Shape : CollisionShape2D pointer
+- %OtherShape : CollisionShape2D pointer
+- %Enabled : bool [in/out]
+
+### NodeBeginContact2D
+- %Body : RigidBody2D pointer
+- %OtherNode : Node pointer
+- %OtherBody : RigidBody2D pointer
+- %Shape : CollisionShape2D pointer
+- %OtherShape : CollisionShape2D pointer
+
+### NodeEndContact2D
+- %Body : RigidBody2D pointer
+- %OtherNode : Node pointer
+- %OtherBody : RigidBody2D pointer
+- %Shape : CollisionShape2D pointer
+- %OtherShape : CollisionShape2D pointer
+
+## %Physics events
+
+### PhysicsPreStep
+- %World : PhysicsWorld pointer
+- %TimeStep : float
+
+### PhysicsPostStep
+- %World : PhysicsWorld pointer
+- %TimeStep : float
+
+### PhysicsCollisionStart
+- %World : PhysicsWorld pointer
+- %NodeA : Node pointer
+- %NodeB : Node pointer
+- %BodyA : RigidBody pointer
+- %BodyB : RigidBody pointer
+- %Trigger : bool
+
+### PhysicsCollision
+- %World : PhysicsWorld pointer
+- %NodeA : Node pointer
+- %NodeB : Node pointer
+- %BodyA : RigidBody pointer
+- %BodyB : RigidBody pointer
+- %Trigger : bool
+
+### PhysicsCollisionEnd
+- %World : PhysicsWorld pointer
+- %NodeA : Node pointer
+- %NodeB : Node pointer
+- %BodyA : RigidBody pointer
+- %BodyB : RigidBody pointer
+- %Trigger : bool
+
+### NodeCollisionStart
+- %Body : RigidBody pointer
+- %OtherNode : Node pointer
+- %OtherBody : RigidBody pointer
+- %Trigger : bool
+
+### NodeCollision
+- %Body : RigidBody pointer
+- %OtherNode : Node pointer
+- %OtherBody : RigidBody pointer
+- %Trigger : bool
+
+### NodeCollisionEnd
+- %Body : RigidBody pointer
+- %OtherNode : Node pointer
+- %OtherBody : RigidBody pointer
+- %Trigger : bool
+
+## %Resource events
+
+### ReloadStarted
+
+### ReloadFinished
+
+### ReloadFailed
+
+### FileChanged
+- %FileName : String
+- %ResourceName : String
+
+### LoadFailed
+- %ResourceName : String
+
+### ResourceNotFound
+- %ResourceName : String
+
+### UnknownResourceType
+- %ResourceType : StringHash
+
+### ResourceBackgroundLoaded
+- %ResourceName : String
+- %Success : bool
+- %Resource : Resource pointer
+
+### ChangeLanguage
+
+## %Scene events
+
+### SceneUpdate
+- %Scene : Scene pointer
+- %TimeStep : float
+
+### SceneSubsystemUpdate
+- %Scene : Scene pointer
+- %TimeStep : float
+
+### UpdateSmoothing
+- %Constant : float
+- %SquaredSnapThreshold : float
+
+### SceneDrawableUpdateFinished
+- %Scene : Scene pointer
+- %TimeStep : float
+
+### TargetPositionChanged
+
+### TargetRotationChanged
+
+### AttributeAnimationUpdate
+- %Scene : Scene pointer
+- %TimeStep : float
+
+### AttributeAnimationAdded
+- %ObjectAnimation : Object animation pointer
+- %AttributeAnimationName : String
+
+### AttributeAnimationRemoved
+- %ObjectAnimation : Object animation pointer
+- %AttributeAnimationName : String
+
+### ScenePostUpdate
+- %Scene : Scene pointer
+- %TimeStep : float
+
+### AsyncLoadProgress
+- %Scene : Scene pointer
+- %Progress : float
+- %LoadedNodes : int
+- %TotalNodes : int
+- %LoadedResources : int
+- %TotalResources : int
+
+### AsyncLoadFinished
+- %Scene : Scene pointer
+
+### NodeAdded
+- %Scene : Scene pointer
+- %Parent : Node pointer
+- %Node : Node pointer
+
+### NodeRemoved
+- %Scene : Scene pointer
+- %Parent : Node pointer
+- %Node : Node pointer
+
+### ComponentAdded
+- %Scene : Scene pointer
+- %Node : Node pointer
+- %Component : Component pointer
+
+### ComponentRemoved
+- %Scene : Scene pointer
+- %Node : Node pointer
+- %Component : Component pointer
+
+### NodeNameChanged
+- %Scene : Scene pointer
+- %Node : Node pointer
+
+### NodeEnabledChanged
+- %Scene : Scene pointer
+- %Node : Node pointer
+
+### NodeTagAdded
+- %Scene : Scene pointer
+- %Node : Node pointer
+- %Tag : String tag
+
+### NodeTagRemoved
+- %Scene : Scene pointer
+- %Node : Node pointer
+- %Tag : String tag
+
+### ComponentEnabledChanged
+- %Scene : Scene pointer
+- %Node : Node pointer
+- %Component : Component pointer
+
+### TemporaryChanged
+- %Serializable : Serializable pointer
+
+### NodeCloned
+- %Scene : Scene pointer
+- %Node : Node pointer
+- %CloneNode : Node pointer
+
+### ComponentCloned
+- %Scene : Scene pointer
+- %Component : Component pointer
+- %CloneComponent : Component pointer
+
+### InterceptNetworkUpdate
+- %Serializable : Serializable pointer
+- %TimeStamp : unsigned (0-255)
+- %Index : unsigned
+- %Name : String
+- %Value : Variant
+
+## %UI events
+
+### UIMouseClick
+- %Element : UIElement pointer
+- %X : int
+- %Y : int
+- %Button : int
+- %Buttons : int
+- %Qualifiers : int
+
+### UIMouseClickEnd
+- %Element : UIElement pointer
+- %BeginElement : UIElement pointer
+- %X : int
+- %Y : int
+- %Button : int
+- %Buttons : int
+- %Qualifiers : int
+
+### UIMouseDoubleClick
+- %Element : UIElement pointer
+- %X : int
+- %Y : int
+- %XBegin : int
+- %YBegin : int
+- %Button : int
+- %Buttons : int
+- %Qualifiers : int
+
+### Click
+- %Element : UIElement pointer
+- %X : int
+- %Y : int
+- %Button : int
+- %Buttons : int
+- %Qualifiers : int
+
+### ClickEnd
+- %Element : UIElement pointer
+- %BeginElement : UIElement pointer
+- %X : int
+- %Y : int
+- %Button : int
+- %Buttons : int
+- %Qualifiers : int
+
+### DoubleClick
+- %Element : UIElement pointer
+- %X : int
+- %Y : int
+- %XBegin : int
+- %YBegin : int
+- %Button : int
+- %Buttons : int
+- %Qualifiers : int
+
+### DragDropTest
+- %Source : UIElement pointer
+- %Target : UIElement pointer
+- %Accept : bool
+
+### DragDropFinish
+- %Source : UIElement pointer
+- %Target : UIElement pointer
+- %Accept : bool
+
+### FocusChanged
+- %Element : UIElement pointer
+- %ClickedElement : UIElement pointer
+
+### NameChanged
+- %Element : UIElement pointer
+
+### Resized
+- %Element : UIElement pointer
+- %Width : int
+- %Height : int
+- %DX : int
+- %DY : int
+
+### Positioned
+- %Element : UIElement pointer
+- %X : int
+- %Y : int
+
+### VisibleChanged
+- %Element : UIElement pointer
+- %Visible : bool
+
+### Focused
+- %Element : UIElement pointer
+- %ByKey : bool
+
+### Defocused
+- %Element : UIElement pointer
+
+### LayoutUpdated
+- %Element : UIElement pointer
+
+### Pressed
+- %Element : UIElement pointer
+
+### Released
+- %Element : UIElement pointer
+
+### Toggled
+- %Element : UIElement pointer
+- %State : bool
+
+### SliderChanged
+- %Element : UIElement pointer
+- %Value : float
+
+### SliderPaged
+- %Element : UIElement pointer
+- %Offset : int
+- %Pressed : bool
+
+### ProgressBarChanged
+- %Element : UIElement pointer
+- %Value : float
+
+### ScrollBarChanged
+- %Element : UIElement pointer
+- %Value : float
+
+### ViewChanged
+- %Element : UIElement pointer
+- %X : int
+- %Y : int
+
+### ModalChanged
+- %Element : UIElement pointer
+- %Modal : bool
+
+### TextEntry
+- %Element : UIElement pointer
+- %Text : String [in/out]
+
+### TextChanged
+- %Element : UIElement pointer
+- %Text : String
+
+### TextFinished
+- %Element : UIElement pointer
+- %Text : String
+- %Value : Float
+
+### MenuSelected
+- %Element : UIElement pointer
+
+### ItemSelected
+- %Element : UIElement pointer
+- %Selection : int
+
+### ItemDeselected
+- %Element : UIElement pointer
+- %Selection : int
+
+### SelectionChanged
+- %Element : UIElement pointer
+
+### ItemClicked
+- %Element : UIElement pointer
+- %Item : UIElement pointer
+- %Selection : int
+- %Button : int
+- %Buttons : int
+- %Qualifiers : int
+
+### ItemDoubleClicked
+- %Element : UIElement pointer
+- %Item : UIElement pointer
+- %Selection : int
+- %Button : int
+- %Buttons : int
+- %Qualifiers : int
+
+### UnhandledKey
+- %Element : UIElement pointer
+- %Key : int
+- %Buttons : int
+- %Qualifiers : int
+
+### FileSelected
+- %FileName : String
+- %Filter : String
+- %OK : bool
+
+### MessageACK
+- %OK : bool
+
+### ElementAdded
+- %Root : UIElement pointer
+- %Parent : UIElement pointer
+- %Element : UIElement pointer
+
+### ElementRemoved
+- %Root : UIElement pointer
+- %Parent : UIElement pointer
+- %Element : UIElement pointer
+
+### HoverBegin
+- %Element : UIElement pointer
+- %X : int
+- %Y : int
+- %ElementX : int
+- %ElementY : int
+
+### HoverEnd
+- %Element : UIElement pointer
+
+### DragBegin
+- %Element : UIElement pointer
+- %X : int
+- %Y : int
+- %ElementX : int
+- %ElementY : int
+- %Buttons : int
+- %NumButtons : int
+
+### DragMove
+- %Element : UIElement pointer
+- %X : int
+- %Y : int
+- %DX : int
+- %DY : int
+- %ElementX : int
+- %ElementY : int
+- %Buttons : int
+- %NumButtons : int
+
+### DragEnd
+- %Element : UIElement pointer
+- %X : int
+- %Y : int
+- %ElementX : int
+- %ElementY : int
+- %Buttons : int
+- %NumButtons : int
+
+### DragCancel
+- %Element : UIElement pointer
+- %X : int
+- %Y : int
+- %ElementX : int
+- %ElementY : int
+- %Buttons : int
+- %NumButtons : int
+
+### UIDropFile
+- %FileName : String
+- %Element : UIElement pointer
+- %X : int
+- %Y : int
+- %ElementX : int (only if element is non-null)
+- %ElementY : int (only if element is non-null)
+
+## %Urho2D events
+
+### ParticlesEnd
+- %Node : Node pointer
+- %Effect : ParticleEffect2D pointer
+
+### ParticlesDuration
+- %Node : Node pointer
+- %Effect : ParticleEffect2D pointer
+
+
 \page AttributeList Attribute list
 
 ### AnimatedModel

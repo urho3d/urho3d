@@ -55,4 +55,4 @@ void ASRegisterManualLast_Physics2D(asIScriptEngine* engine)
 
 }
 
-#endif // def URHO3D_URHO2D
+#endif // def URHO3D_PHYSICS2D
