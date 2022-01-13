@@ -25,7 +25,7 @@ if (NOT URHO3D_URHO2D OR NOT URHO3D_PHYSICS2D)
 endif ()
 
 # Define target name
-set (TARGET_NAME 28_Urho2DPhysicsRope)
+set (TARGET_NAME 28_Physics2DRope)
 
 # Define source files
 define_source_files (EXTRA_H_FILES ${COMMON_SAMPLE_H_FILES})
