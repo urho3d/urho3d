@@ -20,7 +20,7 @@
 // THE SOFTWARE.
 //
 
-#ifdef URHO3D_URHO2D
+#ifdef URHO3D_PHYSICS2D
 
 #include "../Precompiled.h"
 #include "../AngelScript/APITemplates.h"
