@@ -40,7 +40,7 @@ using namespace Urho3D;
 const float CAMERA_MIN_DIST = 0.1f;
 const float CAMERA_MAX_DIST = 6.0f;
 
-/// Convenient functions for Urho2D samples:
+/// Convenient functions for Urho2D and Physics2D samples:
 ///    - Generate collision shapes from a tmx file objects
 ///    - Create Spriter Imp character
 ///    - Create enemies, coins and platforms to tile map placeholders

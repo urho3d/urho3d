@@ -28,7 +28,7 @@
 class Character2D;
 class Sample2D;
 
-/// Urho2D tile map example.
+/// Tile map example.
 /// This sample demonstrates:
 ///    - Creating an isometric 2D scene with tile map
 ///    - Displaying the scene using the Renderer subsystem

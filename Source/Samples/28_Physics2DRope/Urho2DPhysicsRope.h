@@ -31,7 +31,7 @@ namespace Urho3D
     class ConstraintRope2D;
 }
 
-/// Urho2D physics rope sample.
+/// Physics2D rope sample.
 /// This sample demonstrates:
 ///     - Create revolute constraint
 ///     - Create roop constraint

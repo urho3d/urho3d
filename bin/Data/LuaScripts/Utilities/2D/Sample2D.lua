@@ -1,4 +1,4 @@
--- Convenient functions for Urho2D samples:
+-- Convenient functions for Urho2D and Physics2D samples:
 --    - Generate collision shapes from a tmx file objects
 --    - Create Spriter Imp character
 --    - Load Mover script object class from file
