@@ -8395,6 +8395,11 @@ Properties:
 
 ### Feature
 
+- int WEIGHT_NLERP
+- int INHERIT_PARENT_ROTATION
+
+### Feature
+
 - int JOINT_ROTATIONS
 - int TARGET_ROTATIONS
 - int UPDATE_ORIGINAL_POSE
@@ -8402,11 +8407,6 @@ Properties:
 - int USE_ORIGINAL_POSE
 - int CONSTRAINTS
 - int AUTO_SOLVE
-
-### Feature
-
-- int WEIGHT_NLERP
-- int INHERIT_PARENT_ROTATION
 
 ### FileMode
 
@@ -9361,6 +9361,13 @@ Properties:
 - int VA_BOTTOM
 - int VA_CUSTOM
 
+### ViewOverride
+
+- int VO_NONE
+- int VO_LOW_MATERIAL_QUALITY
+- int VO_DISABLE_SHADOWS
+- int VO_DISABLE_OCCLUSION
+
 ### WindowDragMode
 
 - int DRAG_NONE
@@ -9622,6 +9629,7 @@ Properties:
 - int LOG_TRACE
 - int LOG_WARNING
 - int MAX_VERTEX_LIGHTS
+- int MSG_USER
 - float M_DEGTORAD
 - float M_DEGTORAD_2
 - float M_EPSILON
@@ -9648,10 +9656,6 @@ Properties:
 - String SOUND_MASTER
 - String SOUND_MUSIC
 - String SOUND_VOICE
-- unsigned VO_DISABLE_OCCLUSION
-- unsigned VO_DISABLE_SHADOWS
-- unsigned VO_LOW_MATERIAL_QUALITY
-- unsigned VO_NONE
 
 */
 

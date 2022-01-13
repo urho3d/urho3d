@@ -121,8 +121,9 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_SSL           |0|Enable HTTPS support for HttpRequest. Requires URHO3D_NETWORK build option to be enabled|
 |URHO3D_SSL_DYNAMIC   |0|Enables dynamic SSL library loading, requires URHO3D_SSL build option to be enabled|
 |URHO3D_PHYSICS       |1|Enable Physics support|
+|URHO3D_PHYSICS2D     |1|Enable Physics2D support|
 |URHO3D_NAVIGATION    |1|Enable Navigation support|
-|URHO3D_URHO2D        |1|Enable 2D rendering & physics support|
+|URHO3D_URHO2D        |1|Enable 2D rendering support|
 |URHO3D_PLAYER        |1|Build Urho3D script player|
 |URHO3D_SAMPLES       |1|Build sample applications|
 |URHO3D_TOOLS         |1|Build tools (native, RPI, and ARM on Linux only)|
@@ -744,6 +745,7 @@ under the Source/Urho3D directory:
 - %Audio. Provides the audio subsystem and playback of .wav & .ogg sounds in either 2D or 3D.
 - %UI. Provides graphical user interface elements.
 - Physics. Provides physics simulation.
+- Physics2D. Provides 2D physics simulation.
 - Navigation. Provides navigation mesh generation and pathfinding.
 - Urho2D. Provides 2D rendering components that integrate into the 3D scene.
 - %Script. Provides scripting support using the AngelScript language.

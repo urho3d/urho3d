@@ -31,8 +31,8 @@
 #ifdef URHO3D_PHYSICS
 #include "../Physics/PhysicsWorld.h"
 #endif
-#ifdef URHO3D_URHO2D
-#include "../Urho2D/PhysicsWorld2D.h"
+#ifdef URHO3D_PHYSICS2D
+#include "../Physics2D/PhysicsWorld2D.h"
 #endif
 
 #include "../DebugNew.h"
@@ -297,7 +297,7 @@ Component* Component::GetFixedUpdateSource()
 #ifdef URHO3D_PHYSICS
         ret = scene->GetComponent<PhysicsWorld>();
 #endif
-#ifdef URHO3D_URHO2D
+#ifdef URHO3D_PHYSICS2D
         if (!ret)
             ret = scene->GetComponent<PhysicsWorld2D>();
 #endif

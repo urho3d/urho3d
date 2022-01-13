@@ -677,6 +677,11 @@ void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
     // Not registered because have @nobind mark
 #endif
 
+#ifdef URHO3D_PHYSICS2D
+    // void RegisterPhysics2DLibrary(Context* context) | File: ../Physics2D/Physics2D.h
+    // Not registered because have @nobind mark
+#endif
+
 #ifdef URHO3D_URHO2D
     // void RegisterUrho2DLibrary(Context* context) | File: ../Urho2D/Urho2D.h
     // Not registered because have @nobind mark

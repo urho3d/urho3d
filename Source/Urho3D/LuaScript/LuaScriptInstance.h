@@ -159,7 +159,7 @@ private:
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
     /// Handle the logic post update event.
     void HandlePostUpdate(StringHash eventType, VariantMap& eventData);
-#if defined(URHO3D_PHYSICS) || defined(URHO3D_URHO2D)
+#if defined(URHO3D_PHYSICS) || defined(URHO3D_PHYSICS2D)
     /// Handle the physics update event.
     void HandleFixedUpdate(StringHash eventType, VariantMap& eventData);
     /// Handle the physics post update event.

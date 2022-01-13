@@ -459,15 +459,17 @@ void ASRegisterGeneratedObjectTypes(asIScriptEngine* engine)
     engine->RegisterObjectType("PhysicsWorldConfig", sizeof(PhysicsWorldConfig), asOBJ_VALUE | asGetTypeTraits<PhysicsWorldConfig>());
 #endif
 
-#ifdef URHO3D_URHO2D
-    // struct DelayedWorldTransform2D | File: ../Urho2D/PhysicsWorld2D.h
+#ifdef URHO3D_PHYSICS2D
+    // struct DelayedWorldTransform2D | File: ../Physics2D/PhysicsWorld2D.h
     engine->RegisterObjectType("DelayedWorldTransform2D", sizeof(DelayedWorldTransform2D), asOBJ_VALUE | asGetTypeTraits<DelayedWorldTransform2D>());
 
+    // struct PhysicsRaycastResult2D | File: ../Physics2D/PhysicsWorld2D.h
+    engine->RegisterObjectType("PhysicsRaycastResult2D", sizeof(PhysicsRaycastResult2D), asOBJ_VALUE | asGetTypeTraits<PhysicsRaycastResult2D>());
+#endif
+
+#ifdef URHO3D_URHO2D
     // struct Particle2D | File: ../Urho2D/ParticleEmitter2D.h
     engine->RegisterObjectType("Particle2D", sizeof(Particle2D), asOBJ_VALUE | asGetTypeTraits<Particle2D>());
-
-    // struct PhysicsRaycastResult2D | File: ../Urho2D/PhysicsWorld2D.h
-    engine->RegisterObjectType("PhysicsRaycastResult2D", sizeof(PhysicsRaycastResult2D), asOBJ_VALUE | asGetTypeTraits<PhysicsRaycastResult2D>());
 
     // struct SourceBatch2D | File: ../Urho2D/Drawable2D.h
     engine->RegisterObjectType("SourceBatch2D", sizeof(SourceBatch2D), asOBJ_VALUE | asGetTypeTraits<SourceBatch2D>());
@@ -955,19 +957,21 @@ void ASRegisterGeneratedObjectTypes(asIScriptEngine* engine)
     engine->RegisterObjectType("RigidBody", 0, asOBJ_REF);
 #endif
 
-#ifdef URHO3D_URHO2D
-    // class CollisionShape2D | File: ../Urho2D/CollisionShape2D.h
+#ifdef URHO3D_PHYSICS2D
+    // class CollisionShape2D | File: ../Physics2D/CollisionShape2D.h
     engine->RegisterObjectType("CollisionShape2D", 0, asOBJ_REF);
 
-    // class Constraint2D | File: ../Urho2D/Constraint2D.h
+    // class Constraint2D | File: ../Physics2D/Constraint2D.h
     engine->RegisterObjectType("Constraint2D", 0, asOBJ_REF);
 
-    // class PhysicsWorld2D | File: ../Urho2D/PhysicsWorld2D.h
+    // class PhysicsWorld2D | File: ../Physics2D/PhysicsWorld2D.h
     engine->RegisterObjectType("PhysicsWorld2D", 0, asOBJ_REF);
 
-    // class RigidBody2D | File: ../Urho2D/RigidBody2D.h
+    // class RigidBody2D | File: ../Physics2D/RigidBody2D.h
     engine->RegisterObjectType("RigidBody2D", 0, asOBJ_REF);
+#endif
 
+#ifdef URHO3D_URHO2D
     // class TileMap2D | File: ../Urho2D/TileMap2D.h
     engine->RegisterObjectType("TileMap2D", 0, asOBJ_REF);
 
@@ -1045,55 +1049,57 @@ void ASRegisterGeneratedObjectTypes(asIScriptEngine* engine)
     engine->RegisterObjectType("RaycastVehicle", 0, asOBJ_REF);
 #endif
 
-#ifdef URHO3D_URHO2D
-    // class CollisionBox2D | File: ../Urho2D/CollisionBox2D.h
+#ifdef URHO3D_PHYSICS2D
+    // class CollisionBox2D | File: ../Physics2D/CollisionBox2D.h
     engine->RegisterObjectType("CollisionBox2D", 0, asOBJ_REF);
 
-    // class CollisionChain2D | File: ../Urho2D/CollisionChain2D.h
+    // class CollisionChain2D | File: ../Physics2D/CollisionChain2D.h
     engine->RegisterObjectType("CollisionChain2D", 0, asOBJ_REF);
 
-    // class CollisionCircle2D | File: ../Urho2D/CollisionCircle2D.h
+    // class CollisionCircle2D | File: ../Physics2D/CollisionCircle2D.h
     engine->RegisterObjectType("CollisionCircle2D", 0, asOBJ_REF);
 
-    // class CollisionEdge2D | File: ../Urho2D/CollisionEdge2D.h
+    // class CollisionEdge2D | File: ../Physics2D/CollisionEdge2D.h
     engine->RegisterObjectType("CollisionEdge2D", 0, asOBJ_REF);
 
-    // class CollisionPolygon2D | File: ../Urho2D/CollisionPolygon2D.h
+    // class CollisionPolygon2D | File: ../Physics2D/CollisionPolygon2D.h
     engine->RegisterObjectType("CollisionPolygon2D", 0, asOBJ_REF);
 
-    // class ConstraintDistance2D | File: ../Urho2D/ConstraintDistance2D.h
+    // class ConstraintDistance2D | File: ../Physics2D/ConstraintDistance2D.h
     engine->RegisterObjectType("ConstraintDistance2D", 0, asOBJ_REF);
 
-    // class ConstraintFriction2D | File: ../Urho2D/ConstraintFriction2D.h
+    // class ConstraintFriction2D | File: ../Physics2D/ConstraintFriction2D.h
     engine->RegisterObjectType("ConstraintFriction2D", 0, asOBJ_REF);
 
-    // class ConstraintGear2D | File: ../Urho2D/ConstraintGear2D.h
+    // class ConstraintGear2D | File: ../Physics2D/ConstraintGear2D.h
     engine->RegisterObjectType("ConstraintGear2D", 0, asOBJ_REF);
 
-    // class ConstraintMotor2D | File: ../Urho2D/ConstraintMotor2D.h
+    // class ConstraintMotor2D | File: ../Physics2D/ConstraintMotor2D.h
     engine->RegisterObjectType("ConstraintMotor2D", 0, asOBJ_REF);
 
-    // class ConstraintMouse2D | File: ../Urho2D/ConstraintMouse2D.h
+    // class ConstraintMouse2D | File: ../Physics2D/ConstraintMouse2D.h
     engine->RegisterObjectType("ConstraintMouse2D", 0, asOBJ_REF);
 
-    // class ConstraintPrismatic2D | File: ../Urho2D/ConstraintPrismatic2D.h
+    // class ConstraintPrismatic2D | File: ../Physics2D/ConstraintPrismatic2D.h
     engine->RegisterObjectType("ConstraintPrismatic2D", 0, asOBJ_REF);
 
-    // class ConstraintPulley2D | File: ../Urho2D/ConstraintPulley2D.h
+    // class ConstraintPulley2D | File: ../Physics2D/ConstraintPulley2D.h
     engine->RegisterObjectType("ConstraintPulley2D", 0, asOBJ_REF);
 
-    // class ConstraintRevolute2D | File: ../Urho2D/ConstraintRevolute2D.h
+    // class ConstraintRevolute2D | File: ../Physics2D/ConstraintRevolute2D.h
     engine->RegisterObjectType("ConstraintRevolute2D", 0, asOBJ_REF);
 
-    // class ConstraintRope2D | File: ../Urho2D/ConstraintRope2D.h
+    // class ConstraintRope2D | File: ../Physics2D/ConstraintRope2D.h
     engine->RegisterObjectType("ConstraintRope2D", 0, asOBJ_REF);
 
-    // class ConstraintWeld2D | File: ../Urho2D/ConstraintWeld2D.h
+    // class ConstraintWeld2D | File: ../Physics2D/ConstraintWeld2D.h
     engine->RegisterObjectType("ConstraintWeld2D", 0, asOBJ_REF);
 
-    // class ConstraintWheel2D | File: ../Urho2D/ConstraintWheel2D.h
+    // class ConstraintWheel2D | File: ../Physics2D/ConstraintWheel2D.h
     engine->RegisterObjectType("ConstraintWheel2D", 0, asOBJ_REF);
+#endif
 
+#ifdef URHO3D_URHO2D
     // class Drawable2D | File: ../Urho2D/Drawable2D.h
     engine->RegisterObjectType("Drawable2D", 0, asOBJ_REF);
 

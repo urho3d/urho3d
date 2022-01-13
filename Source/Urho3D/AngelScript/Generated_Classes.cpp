@@ -3473,9 +3473,9 @@ static void Register_PhysicsWorldConfig(asIScriptEngine* engine)
 
 #endif // def URHO3D_PHYSICS
 
-#ifdef URHO3D_URHO2D
+#ifdef URHO3D_PHYSICS2D
 
-// struct DelayedWorldTransform2D | File: ../Urho2D/PhysicsWorld2D.h
+// struct DelayedWorldTransform2D | File: ../Physics2D/PhysicsWorld2D.h
 static void Register_DelayedWorldTransform2D(asIScriptEngine* engine)
 {
     // DelayedWorldTransform2D::~DelayedWorldTransform2D() | Implicitly-declared
@@ -3491,6 +3491,26 @@ static void Register_DelayedWorldTransform2D(asIScriptEngine* engine)
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<DelayedWorldTransform2D>(engine, "DelayedWorldTransform2D");
 }
 
+// struct PhysicsRaycastResult2D | File: ../Physics2D/PhysicsWorld2D.h
+static void Register_PhysicsRaycastResult2D(asIScriptEngine* engine)
+{
+    // PhysicsRaycastResult2D::~PhysicsRaycastResult2D() | Implicitly-declared
+    engine->RegisterObjectBehaviour("PhysicsRaycastResult2D", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(PhysicsRaycastResult2D), AS_CALL_CDECL_OBJFIRST);
+
+    RegisterMembers_PhysicsRaycastResult2D<PhysicsRaycastResult2D>(engine, "PhysicsRaycastResult2D");
+
+    #ifdef REGISTER_CLASS_MANUAL_PART_PhysicsRaycastResult2D
+        REGISTER_CLASS_MANUAL_PART_PhysicsRaycastResult2D();
+    #endif
+
+    // PhysicsRaycastResult2D& PhysicsRaycastResult2D::operator =(const PhysicsRaycastResult2D&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<PhysicsRaycastResult2D>(engine, "PhysicsRaycastResult2D");
+}
+
+#endif // def URHO3D_PHYSICS2D
+
+#ifdef URHO3D_URHO2D
+
 // struct Particle2D | File: ../Urho2D/ParticleEmitter2D.h
 static void Register_Particle2D(asIScriptEngine* engine)
 {
@@ -3505,22 +3525,6 @@ static void Register_Particle2D(asIScriptEngine* engine)
 
     // Particle2D& Particle2D::operator =(const Particle2D&) | Possible implicitly-declared
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<Particle2D>(engine, "Particle2D");
-}
-
-// struct PhysicsRaycastResult2D | File: ../Urho2D/PhysicsWorld2D.h
-static void Register_PhysicsRaycastResult2D(asIScriptEngine* engine)
-{
-    // PhysicsRaycastResult2D::~PhysicsRaycastResult2D() | Implicitly-declared
-    engine->RegisterObjectBehaviour("PhysicsRaycastResult2D", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(PhysicsRaycastResult2D), AS_CALL_CDECL_OBJFIRST);
-
-    RegisterMembers_PhysicsRaycastResult2D<PhysicsRaycastResult2D>(engine, "PhysicsRaycastResult2D");
-
-    #ifdef REGISTER_CLASS_MANUAL_PART_PhysicsRaycastResult2D
-        REGISTER_CLASS_MANUAL_PART_PhysicsRaycastResult2D();
-    #endif
-
-    // PhysicsRaycastResult2D& PhysicsRaycastResult2D::operator =(const PhysicsRaycastResult2D&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<PhysicsRaycastResult2D>(engine, "PhysicsRaycastResult2D");
 }
 
 // struct SourceBatch2D | File: ../Urho2D/Drawable2D.h
@@ -6796,9 +6800,9 @@ static void Register_RigidBody(asIScriptEngine* engine)
 
 #endif // def URHO3D_PHYSICS
 
-#ifdef URHO3D_URHO2D
+#ifdef URHO3D_PHYSICS2D
 
-// class CollisionShape2D | File: ../Urho2D/CollisionShape2D.h
+// class CollisionShape2D | File: ../Physics2D/CollisionShape2D.h
 static void Register_CollisionShape2D(asIScriptEngine* engine)
 {
     RegisterSubclass<Component, CollisionShape2D>(engine, "Component", "CollisionShape2D");
@@ -6821,7 +6825,7 @@ static Constraint2D* Constraint2D__Constraint2D_Contextstar()
     return new Constraint2D(context);
 }
 
-// class Constraint2D | File: ../Urho2D/Constraint2D.h
+// class Constraint2D | File: ../Physics2D/Constraint2D.h
 static void Register_Constraint2D(asIScriptEngine* engine)
 {
     // explicit Constraint2D::Constraint2D(Context* context)
@@ -6847,7 +6851,7 @@ static PhysicsWorld2D* PhysicsWorld2D__PhysicsWorld2D_Contextstar()
     return new PhysicsWorld2D(context);
 }
 
-// class PhysicsWorld2D | File: ../Urho2D/PhysicsWorld2D.h
+// class PhysicsWorld2D | File: ../Physics2D/PhysicsWorld2D.h
 static void Register_PhysicsWorld2D(asIScriptEngine* engine)
 {
     // explicit PhysicsWorld2D::PhysicsWorld2D(Context* context)
@@ -6873,7 +6877,7 @@ static RigidBody2D* RigidBody2D__RigidBody2D_Contextstar()
     return new RigidBody2D(context);
 }
 
-// class RigidBody2D | File: ../Urho2D/RigidBody2D.h
+// class RigidBody2D | File: ../Physics2D/RigidBody2D.h
 static void Register_RigidBody2D(asIScriptEngine* engine)
 {
     // explicit RigidBody2D::RigidBody2D(Context* context)
@@ -6891,6 +6895,10 @@ static void Register_RigidBody2D(asIScriptEngine* engine)
         REGISTER_CLASS_MANUAL_PART_RigidBody2D();
     #endif
 }
+
+#endif // def URHO3D_PHYSICS2D
+
+#ifdef URHO3D_URHO2D
 
 // explicit TileMap2D::TileMap2D(Context* context)
 static TileMap2D* TileMap2D__TileMap2D_Contextstar()
@@ -7544,7 +7552,7 @@ static void Register_RaycastVehicle(asIScriptEngine* engine)
 
 #endif // def URHO3D_PHYSICS
 
-#ifdef URHO3D_URHO2D
+#ifdef URHO3D_PHYSICS2D
 
 // explicit CollisionBox2D::CollisionBox2D(Context* context)
 static CollisionBox2D* CollisionBox2D__CollisionBox2D_Contextstar()
@@ -7553,7 +7561,7 @@ static CollisionBox2D* CollisionBox2D__CollisionBox2D_Contextstar()
     return new CollisionBox2D(context);
 }
 
-// class CollisionBox2D | File: ../Urho2D/CollisionBox2D.h
+// class CollisionBox2D | File: ../Physics2D/CollisionBox2D.h
 static void Register_CollisionBox2D(asIScriptEngine* engine)
 {
     // explicit CollisionBox2D::CollisionBox2D(Context* context)
@@ -7580,7 +7588,7 @@ static CollisionChain2D* CollisionChain2D__CollisionChain2D_Contextstar()
     return new CollisionChain2D(context);
 }
 
-// class CollisionChain2D | File: ../Urho2D/CollisionChain2D.h
+// class CollisionChain2D | File: ../Physics2D/CollisionChain2D.h
 static void Register_CollisionChain2D(asIScriptEngine* engine)
 {
     // explicit CollisionChain2D::CollisionChain2D(Context* context)
@@ -7607,7 +7615,7 @@ static CollisionCircle2D* CollisionCircle2D__CollisionCircle2D_Contextstar()
     return new CollisionCircle2D(context);
 }
 
-// class CollisionCircle2D | File: ../Urho2D/CollisionCircle2D.h
+// class CollisionCircle2D | File: ../Physics2D/CollisionCircle2D.h
 static void Register_CollisionCircle2D(asIScriptEngine* engine)
 {
     // explicit CollisionCircle2D::CollisionCircle2D(Context* context)
@@ -7634,7 +7642,7 @@ static CollisionEdge2D* CollisionEdge2D__CollisionEdge2D_Contextstar()
     return new CollisionEdge2D(context);
 }
 
-// class CollisionEdge2D | File: ../Urho2D/CollisionEdge2D.h
+// class CollisionEdge2D | File: ../Physics2D/CollisionEdge2D.h
 static void Register_CollisionEdge2D(asIScriptEngine* engine)
 {
     // explicit CollisionEdge2D::CollisionEdge2D(Context* context)
@@ -7661,7 +7669,7 @@ static CollisionPolygon2D* CollisionPolygon2D__CollisionPolygon2D_Contextstar()
     return new CollisionPolygon2D(context);
 }
 
-// class CollisionPolygon2D | File: ../Urho2D/CollisionPolygon2D.h
+// class CollisionPolygon2D | File: ../Physics2D/CollisionPolygon2D.h
 static void Register_CollisionPolygon2D(asIScriptEngine* engine)
 {
     // explicit CollisionPolygon2D::CollisionPolygon2D(Context* context)
@@ -7688,7 +7696,7 @@ static ConstraintDistance2D* ConstraintDistance2D__ConstraintDistance2D_Contexts
     return new ConstraintDistance2D(context);
 }
 
-// class ConstraintDistance2D | File: ../Urho2D/ConstraintDistance2D.h
+// class ConstraintDistance2D | File: ../Physics2D/ConstraintDistance2D.h
 static void Register_ConstraintDistance2D(asIScriptEngine* engine)
 {
     // explicit ConstraintDistance2D::ConstraintDistance2D(Context* context)
@@ -7715,7 +7723,7 @@ static ConstraintFriction2D* ConstraintFriction2D__ConstraintFriction2D_Contexts
     return new ConstraintFriction2D(context);
 }
 
-// class ConstraintFriction2D | File: ../Urho2D/ConstraintFriction2D.h
+// class ConstraintFriction2D | File: ../Physics2D/ConstraintFriction2D.h
 static void Register_ConstraintFriction2D(asIScriptEngine* engine)
 {
     // explicit ConstraintFriction2D::ConstraintFriction2D(Context* context)
@@ -7742,7 +7750,7 @@ static ConstraintGear2D* ConstraintGear2D__ConstraintGear2D_Contextstar()
     return new ConstraintGear2D(context);
 }
 
-// class ConstraintGear2D | File: ../Urho2D/ConstraintGear2D.h
+// class ConstraintGear2D | File: ../Physics2D/ConstraintGear2D.h
 static void Register_ConstraintGear2D(asIScriptEngine* engine)
 {
     // explicit ConstraintGear2D::ConstraintGear2D(Context* context)
@@ -7769,7 +7777,7 @@ static ConstraintMotor2D* ConstraintMotor2D__ConstraintMotor2D_Contextstar()
     return new ConstraintMotor2D(context);
 }
 
-// class ConstraintMotor2D | File: ../Urho2D/ConstraintMotor2D.h
+// class ConstraintMotor2D | File: ../Physics2D/ConstraintMotor2D.h
 static void Register_ConstraintMotor2D(asIScriptEngine* engine)
 {
     // explicit ConstraintMotor2D::ConstraintMotor2D(Context* context)
@@ -7796,7 +7804,7 @@ static ConstraintMouse2D* ConstraintMouse2D__ConstraintMouse2D_Contextstar()
     return new ConstraintMouse2D(context);
 }
 
-// class ConstraintMouse2D | File: ../Urho2D/ConstraintMouse2D.h
+// class ConstraintMouse2D | File: ../Physics2D/ConstraintMouse2D.h
 static void Register_ConstraintMouse2D(asIScriptEngine* engine)
 {
     // explicit ConstraintMouse2D::ConstraintMouse2D(Context* context)
@@ -7823,7 +7831,7 @@ static ConstraintPrismatic2D* ConstraintPrismatic2D__ConstraintPrismatic2D_Conte
     return new ConstraintPrismatic2D(context);
 }
 
-// class ConstraintPrismatic2D | File: ../Urho2D/ConstraintPrismatic2D.h
+// class ConstraintPrismatic2D | File: ../Physics2D/ConstraintPrismatic2D.h
 static void Register_ConstraintPrismatic2D(asIScriptEngine* engine)
 {
     // explicit ConstraintPrismatic2D::ConstraintPrismatic2D(Context* context)
@@ -7850,7 +7858,7 @@ static ConstraintPulley2D* ConstraintPulley2D__ConstraintPulley2D_Contextstar()
     return new ConstraintPulley2D(context);
 }
 
-// class ConstraintPulley2D | File: ../Urho2D/ConstraintPulley2D.h
+// class ConstraintPulley2D | File: ../Physics2D/ConstraintPulley2D.h
 static void Register_ConstraintPulley2D(asIScriptEngine* engine)
 {
     // explicit ConstraintPulley2D::ConstraintPulley2D(Context* context)
@@ -7877,7 +7885,7 @@ static ConstraintRevolute2D* ConstraintRevolute2D__ConstraintRevolute2D_Contexts
     return new ConstraintRevolute2D(context);
 }
 
-// class ConstraintRevolute2D | File: ../Urho2D/ConstraintRevolute2D.h
+// class ConstraintRevolute2D | File: ../Physics2D/ConstraintRevolute2D.h
 static void Register_ConstraintRevolute2D(asIScriptEngine* engine)
 {
     // explicit ConstraintRevolute2D::ConstraintRevolute2D(Context* context)
@@ -7904,7 +7912,7 @@ static ConstraintRope2D* ConstraintRope2D__ConstraintRope2D_Contextstar()
     return new ConstraintRope2D(context);
 }
 
-// class ConstraintRope2D | File: ../Urho2D/ConstraintRope2D.h
+// class ConstraintRope2D | File: ../Physics2D/ConstraintRope2D.h
 static void Register_ConstraintRope2D(asIScriptEngine* engine)
 {
     // explicit ConstraintRope2D::ConstraintRope2D(Context* context)
@@ -7931,7 +7939,7 @@ static ConstraintWeld2D* ConstraintWeld2D__ConstraintWeld2D_Contextstar()
     return new ConstraintWeld2D(context);
 }
 
-// class ConstraintWeld2D | File: ../Urho2D/ConstraintWeld2D.h
+// class ConstraintWeld2D | File: ../Physics2D/ConstraintWeld2D.h
 static void Register_ConstraintWeld2D(asIScriptEngine* engine)
 {
     // explicit ConstraintWeld2D::ConstraintWeld2D(Context* context)
@@ -7958,7 +7966,7 @@ static ConstraintWheel2D* ConstraintWheel2D__ConstraintWheel2D_Contextstar()
     return new ConstraintWheel2D(context);
 }
 
-// class ConstraintWheel2D | File: ../Urho2D/ConstraintWheel2D.h
+// class ConstraintWheel2D | File: ../Physics2D/ConstraintWheel2D.h
 static void Register_ConstraintWheel2D(asIScriptEngine* engine)
 {
     // explicit ConstraintWheel2D::ConstraintWheel2D(Context* context)
@@ -7977,6 +7985,10 @@ static void Register_ConstraintWheel2D(asIScriptEngine* engine)
         REGISTER_CLASS_MANUAL_PART_ConstraintWheel2D();
     #endif
 }
+
+#endif // def URHO3D_PHYSICS2D
+
+#ifdef URHO3D_URHO2D
 
 // class Drawable2D | File: ../Urho2D/Drawable2D.h
 static void Register_Drawable2D(asIScriptEngine* engine)
@@ -8494,10 +8506,13 @@ void ASRegisterGeneratedClasses(asIScriptEngine* engine)
     Register_PhysicsWorldConfig(engine);
 #endif
 
-#ifdef URHO3D_URHO2D
+#ifdef URHO3D_PHYSICS2D
     Register_DelayedWorldTransform2D(engine);
-    Register_Particle2D(engine);
     Register_PhysicsRaycastResult2D(engine);
+#endif
+
+#ifdef URHO3D_URHO2D
+    Register_Particle2D(engine);
     Register_SourceBatch2D(engine);
     Register_TileMapInfo2D(engine);
     Register_Vertex2D(engine);
@@ -8677,11 +8692,14 @@ void ASRegisterGeneratedClasses(asIScriptEngine* engine)
     Register_RigidBody(engine);
 #endif
 
-#ifdef URHO3D_URHO2D
+#ifdef URHO3D_PHYSICS2D
     Register_CollisionShape2D(engine);
     Register_Constraint2D(engine);
     Register_PhysicsWorld2D(engine);
     Register_RigidBody2D(engine);
+#endif
+
+#ifdef URHO3D_URHO2D
     Register_TileMap2D(engine);
     Register_TileMapLayer2D(engine);
 #endif
@@ -8714,7 +8732,7 @@ void ASRegisterGeneratedClasses(asIScriptEngine* engine)
     Register_RaycastVehicle(engine);
 #endif
 
-#ifdef URHO3D_URHO2D
+#ifdef URHO3D_PHYSICS2D
     Register_CollisionBox2D(engine);
     Register_CollisionChain2D(engine);
     Register_CollisionCircle2D(engine);
@@ -8731,6 +8749,9 @@ void ASRegisterGeneratedClasses(asIScriptEngine* engine)
     Register_ConstraintRope2D(engine);
     Register_ConstraintWeld2D(engine);
     Register_ConstraintWheel2D(engine);
+#endif
+
+#ifdef URHO3D_URHO2D
     Register_Drawable2D(engine);
     Register_Renderer2D(engine);
 #endif

@@ -45,6 +45,9 @@ string InsideDefine(const string& headerFile)
     if (dir == "../Physics")
         return "URHO3D_PHYSICS";
 
+    if (dir == "../Physics2D")
+        return "URHO3D_PHYSICS2D";
+
     if (dir == "../Navigation")
         return "URHO3D_NAVIGATION";
 

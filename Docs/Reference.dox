@@ -997,7 +997,7 @@ The rendering-related components defined by the %Graphics and %UI libraries are:
 - Zone: defines ambient light and fog settings for objects inside the zone volume.
 - Text3D: text that is rendered into the 3D view.
 
-Additionally there are 2D drawable components defined by the \ref Urho2D "Urho2D" sublibrary.
+Additionally there are 2D drawable components defined by the \ref Urho2D_and_Physics2D "Urho2D" sublibrary.
 
 \section Rendering_Optimizations Optimizations
 
@@ -2628,8 +2628,8 @@ By default the %UI is pixel perfect: the root element is sized equal to the appl
 
 The pixel scaling can be changed with the functions \ref UI::SetScale "SetScale()", \ref UI::SetWidth "SetWidth()" and \ref UI::SetHeight "SetHeight()".
 
-\page Urho2D Urho2D
-In order to make 2D games in Urho3D, the Urho2D sublibrary is provided. Urho2D includes 2D graphics and 2D physics.
+\page Urho2D_and_Physics2D Urho2D and Physics2D
+In order to make 2D games in Urho3D, the Urho2D and Physics2D sublibraries is provided.
 
 A typical 2D game setup would consist of the following:
     - Create an orthographic camera
@@ -2732,11 +2732,11 @@ You can use different layers in order to simulate perspective. In this case you 
 
 Finally, note that you can easily mix both 2D and 3D resources. 3D assets' position need to be slightly offset on the Z axis (z=1 is enough), Camera's position needs to be slightly offset (on the Z axis) from 3D assets' max girth and a Light is required.
 
-\section Urho2D_Physics Physics
-Urho2D implements rigid body physics simulation using the Box2D library. You can refer to Box2D manual at http://box2d.org/manual.pdf for full reference.
+\section Physics2D Physics2D
+Physics2D implements rigid body physics simulation using the Box2D library. You can refer to Box2D manual at http://box2d.org/manual.pdf for full reference.
 PhysicsWorld2D class implements 2D physics simulation in Urho3D and is mandatory for 2D physics components such as RigidBody2D, CollisionShape2D or Constraint2D.
 
-\section Urho2D_Rigidbodies_Components Rigid bodies components
+\section Physics2D_Rigidbodies_Components Rigid bodies components
 RigidBody2D is the base class for 2D physics object instance.
 
 Available rigid bodies (BodyType2D) are:
@@ -2762,10 +2762,10 @@ You can also directly set the linear or angular velocity of the body using \ref 
 
 To 'manually' move or rotate a body, simply translate or rotate the node to which it belongs to.
 
-\section Urho2D_Collision_Shapes_Components Collision shapes components
+\section Physics2D_Collision_Shapes_Components Collision shapes components
 Check Box2D manual - Chapter 4 Collision Module and Chapter 7 Fixtures for full reference.
 
-\subsection Urho2D_Collision_Shapes_Shapes Shapes
+\subsection Physics2D_Collision_Shapes_Shapes Shapes
 - CollisionBox2D: defines 2D physics collision box. Box shapes have an optional position offset (\ref CollisionBox2D::SetCenter "SetCenter()"), width and height size (\ref CollisionBox2D::SetSize "SetSize()") and a rotation angle expressed in degrees (\ref CollisionBox2D::SetAngle "SetAngle()".). Boxes are solid, so if you need a hollow box shape then create one from a CollisionChain2D shape.
 - Circle shapes <=> CollisionCircle2D: defines 2D physics collision circle. Circle shapes have an optional position offset (\ref CollisionCircle2D::SetCenter "SetCenter()") and a radius (\ref CollisionCircle2D::SetRadius "SetRadius()"). Circles are solid, you cannot make a hollow circle using the circle shape.
 - Polygon shapes <=> CollisionPolygon2D: defines 2D physics collision polygon. Polygon shapes are solid convex polygons. A polygon is convex when all line segments connecting two points in the interior do not cross any edge of the polygon. A polygon must have 3 or more vertices (\ref CollisionPolygon2D::SetVertices "SetVertices()"). Polygons vertices winding doesn't matter.
@@ -2778,7 +2778,7 @@ Important: collision shapes must match your textures in order to be accurate. Yo
 
 Use \ref PhysicsWorld2D::SetDrawShape "SetDrawShape()" in combination with \ref PhysicsWorld2D::DrawDebugGeometry "DrawDebugGeometry()" to toggle shapes visibility.
 
-\subsection Urho2D_Collision_Shapes_Fixtures Fixtures
+\subsection Physics2D_Collision_Shapes_Fixtures Fixtures
 Box2D fixtures are implemented through the CollisionShape2D base class for 2D physics collision shapes. Common parameters shared by every collision shape include:
 - Density: \ref CollisionShape2D::SetDensity "SetDensity()" and \ref CollisionShape2D::GetDensity "GetDensity()"
 - Friction: \ref CollisionShape2D::SetFriction "SetFriction()" and \ref CollisionShape2D::GetFriction "GetFriction()"
@@ -2789,7 +2789,7 @@ CollisionShape2D class also provides readonly access to these properties:
 - Inertia: \ref CollisionShape2D::GetInertia "GetInertia()"
 - Center of mass: \ref CollisionShape2D::GetMassCenter "GetMassCenter()"
 
-\subsection Urho2D_Collision_Shapes_Filtering Collision filtering
+\subsection Physics2D_Collision_Shapes_Filtering Collision filtering
 Box2D supports collision filtering (restricting which other objects to collide with) using categories and groups:
 - Collision categories:
     - First assign the collision shape to a category, using \ref CollisionShape2D::SetCategoryBits "SetCategoryBits()". Sixteen categories are available.
@@ -2802,15 +2802,15 @@ Note that:
 - a collision shape on a kinematic body can only collide with a dynamic body
 - collision shapes on the same body never collide with each other
 
-\subsection Urho2D_Collision_Shapes_Sensors Sensors
+\subsection Physics2D_Collision_Shapes_Sensors Sensors
 A collision shape can be set to \ref CollisionShape2D::SetTrigger "trigger mode" to only report collisions without actually applying collision forces. This can be used to implement trigger areas. Note that:
 - a sensor can be triggered only by dynamic bodies (BT_DYNAMIC)
-- \ref Urho2D_Physics_Queries "physics queries" don't report triggers. To get notified when a sensor is triggered or cease to be triggered, subscribe to E_PHYSICSBEGINCONTACT2D and E_PHYSICSENDCONTACT2D \ref Urho2D_Physics_Events "physics events".
+- \ref Physics2D_Queries "physics queries" don't report triggers. To get notified when a sensor is triggered or cease to be triggered, subscribe to E_PHYSICSBEGINCONTACT2D and E_PHYSICSENDCONTACT2D \ref Physics2D_Events "physics events".
 
-\section Urho2D_Constraints_Components Constraints components
+\section Physics2D_Constraints_Components Constraints components
 Constraints ('joints' in Box2D terminology) are used to constrain bodies to an anchor point or between themselves. Apply a constraint to a node (called 'ownerBody') and use \ref Constraint::SetOtherBody "SetOtherBody()" to set the other node's body to be constrained to the ownerBody.
 
-See 32_Urho2DConstraints sample for detailed examples and to help selecting the appropriate constraint. Following are the available constraints classes, with the indication of the corresponding 'joint' in Box2D manual (see Chapter 8 Joints):
+See 32_Physics2DConstraints sample for detailed examples and to help selecting the appropriate constraint. Following are the available constraints classes, with the indication of the corresponding 'joint' in Box2D manual (see Chapter 8 Joints):
 - Constraint2D: base class for 2D physics constraints.
 - Distance joint <=> ConstraintDistance2D: defines 2D physics distance constraint. The distance between two anchor points (\ref ConstraintDistance2D::SetOwnerBodyAnchor "SetOwnerBodyAnchor()" and \ref ConstraintDistance2D::SetOtherBodyAnchor "SetOtherBodyAnchor()") on two bodies is kept constant. The constraint can also be made soft, like a spring-damper connection. Softness is achieved by tuning frequency (\ref ConstraintDistance2D::SetFrequencyHz "SetFrequencyHz()" is below half of the timestep) and damping ratio (\ref ConstraintDistance2D::SetDampingRatio "SetDampingRatio()").
 - Revolute joint <=> ConstraintRevolute2D: defines 2D physics revolute constraint. This constraint forces two bodies to share a common hinge anchor point (\ref ConstraintRevolute2D::SetAnchor "SetAnchor()"). You can control the relative rotation of the two bodies (the constraint angle) using a limit and/or a motor. A limit (\ref ConstraintRevolute2D::SetEnableLimit "SetEnableLimit()") forces the joint angle to remain between a lower (\ref ConstraintRevolute2D::SetLowerAngle "SetLowerAngle()") and upper (\ref ConstraintRevolute2D::SetUpperAngle "SetUpperAngle()") bound. The limit will apply as much torque as needed to make this happen. The limit range should include zero, otherwise the constraint will lurch when the simulation begins. A motor (\ref ConstraintRevolute2D::SetEnableMotor "SetEnableMotor()") allows you to specify the constraint speed (the time derivative of the angle). The speed (\ref ConstraintRevolute2D::SetMotorSpeed "SetMotorSpeed()") can be negative or positive. When the maximum torque (\ref ConstraintRevolute2D::SetMaxMotorTorque "SetMaxMotorTorque()") is exceeded, the joint will slow down and can even reverse. You can use a motor to simulate friction. Just set the joint speed to zero, and set the maximum torque to some small, but significant value. The motor will try to prevent the constraint from rotating, but will yield to a significant load.
@@ -2828,24 +2828,24 @@ Collision between bodies connected by a constraint can be enabled/disabled using
 
 Use \ref PhysicsWorld2D::SetDrawJoint "SetDrawJoint()" in combination with \ref PhysicsWorld2D::DrawDebugGeometry "DrawDebugGeometry()" to toggle joints visibility.
 
-\section Urho2D_Physics_Queries Physics queries
+\section Physics2D_Queries Physics queries
 The following queries into the physics world are provided:
 
-\subsection Urho2D_Physics_Queries_Unary Unary geometric queries (queries on a single shape)
+\subsection Physics2D_Queries_Unary Unary geometric queries (queries on a single shape)
 - Shape point test: test if a point is inside a given plain shape and returns the body if true. Use \ref PhysicsWorld2D::GetRigidBody() "GetRigidBody()". Point can be a Vector2 world position, or more conveniently you can pass screen coordinates when performing the test from an input (mouse, joystick, touch). Note that only plain shapes are supported, this test is not applicable to \ref CollisionChain2D and \ref CollisionEdge2D shapes.
 - Shape ray cast: returns the body, distance, point of intersection (position) and normal vector for the first shape hit by the ray. Use \ref PhysicsWorld2D::RaycastSingle "RaycastSingle()".
 
-\subsection Urho2D_Physics_Queries_Binary Binary functions
+\subsection Physics2D_Queries_Binary Binary functions
 - Overlap between 2 shapes: not implemented
 - Contact manifolds (contact points for overlaping shapes): not implemented
 - Distance between 2 shapes: not implemented
 - %Time of impact (time when 2 moving shapes collide): not implemented
 
-\subsection Urho2D_Physics_Queries_World World queries (see Box2D manual - Chapter 10 World Class)
+\subsection Physics2D_Queries_World World queries (see Box2D manual - Chapter 10 World Class)
 - AABB queries: return the bodies overlaping with the given rectangle. See \ref PhysicsWorld2D::GetRigidBodies "GetRigidBodies()".
 - %Ray casts: return the body, distance, point of intersection (position) and normal vector for every shape hit by the ray. See \ref PhysicsWorld2D::Raycast "Raycast()".
 
-\section Urho2D_Physics_Events Physics events
+\section Physics2D_Events Physics events
 
 Contact listener (see Box2D manual, Chapter 9 Contacts) enables a given node to report contacts through events. Available events are:
 - E_PHYSICSBEGINCONTACT2D ("PhysicsBeginContact2D" in script): called when 2 collision shapes begin to overlap
