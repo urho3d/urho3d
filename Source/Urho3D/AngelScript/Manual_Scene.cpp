@@ -29,7 +29,7 @@
 #include "../Physics/PhysicsWorld.h"
 #endif
 
-#ifdef URHO3D_URHO2D
+#ifdef URHO3D_PHYSICS2D
 #include "../Physics2D/PhysicsWorld2D.h"
 #endif
 
@@ -51,7 +51,7 @@ static PhysicsWorld* SceneGetPhysicsWorld(Scene* ptr)
 }
 #endif
 
-#ifdef URHO3D_URHO2D
+#ifdef URHO3D_PHYSICS2D
 // template<class T> T * Node::GetComponent(bool recursive=false) const | File: ../Scene/Node.h
 static PhysicsWorld2D* SceneGetPhysicsWorld2D(Scene* ptr)
 {
@@ -67,7 +67,7 @@ void ASRegisterManualLast_Scene(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Scene", "PhysicsWorld@+ get_physicsWorld() const", AS_FUNCTION_OBJLAST(SceneGetPhysicsWorld), AS_CALL_CDECL_OBJLAST);
 #endif
 
-#ifdef URHO3D_URHO2D
+#ifdef URHO3D_PHYSICS2D
     // template<class T> T * Node::GetComponent(bool recursive=false) const | File: ../Scene/Node.h
     engine->RegisterObjectMethod("Scene", "PhysicsWorld2D@+ get_physicsWorld2D() const", AS_FUNCTION_OBJLAST(SceneGetPhysicsWorld2D), AS_CALL_CDECL_OBJLAST);
 #endif
