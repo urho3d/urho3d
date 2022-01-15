@@ -665,6 +665,9 @@ public:
     }
 
 private:
+    template <typename> friend class UniquePtr;
+
+    /// Pointer to the object.
     T* ptr_{};
 
 };
