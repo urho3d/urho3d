@@ -64,3 +64,6 @@ set (LIBS PugiXml)
 
 # Setup target
 setup_executable (TOOL NODEPS)
+
+# Preventing VS from placing cpp and h files to different groups 
+source_group (TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCE_FILES})
