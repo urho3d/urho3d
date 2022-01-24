@@ -28,6 +28,8 @@
 #include "../Core/Mutex.h"
 #include "../Core/Object.h"
 
+#include <vector>
+
 namespace Urho3D
 {
 
@@ -106,7 +108,7 @@ public:
     SoundListener* GetListener() const;
 
     /// Return all sound sources.
-    const PODVector<SoundSource*>& GetSoundSources() const { return soundSources_; }
+    const std::vector<SoundSource*>& GetSoundSources() const { return soundSources_; }
 
     /// Return whether the specified master gain has been defined.
     bool HasMasterGain(const String& type) const { return masterGain_.Contains(type); }
@@ -156,7 +158,7 @@ private:
     /// Paused sound types.
     HashSet<StringHash> pausedSoundTypes_;
     /// Sound sources.
-    PODVector<SoundSource*> soundSources_;
+    std::vector<SoundSource*> soundSources_;
     /// Sound listener.
     WeakPtr<SoundListener> listener_;
 };

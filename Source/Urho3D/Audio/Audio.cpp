@@ -40,6 +40,10 @@
 #pragma warning(disable:6293)
 #endif
 
+#include <algorithm>
+
+using namespace std;
+
 namespace Urho3D
 {
 
@@ -176,8 +180,8 @@ void Audio::SetMasterGain(const String& type, float gain)
 {
     masterGain_[type] = Clamp(gain, 0.0f, 1.0f);
 
-    for (PODVector<SoundSource*>::Iterator i = soundSources_.Begin(); i != soundSources_.End(); ++i)
-        (*i)->UpdateMasterGain();
+    for (SoundSource* soundSource : soundSources_)
+        soundSource->UpdateMasterGain();
 }
 
 void Audio::PauseSoundType(const String& type)
@@ -209,10 +213,10 @@ void Audio::SetListener(SoundListener* listener)
 
 void Audio::StopSound(Sound* sound)
 {
-    for (PODVector<SoundSource*>::Iterator i = soundSources_.Begin(); i != soundSources_.End(); ++i)
+    for (SoundSource* soundSource : soundSources_)
     {
-        if ((*i)->GetSound() == sound)
-            (*i)->Stop();
+        if (soundSource->GetSound() == sound)
+            soundSource->Stop();
     }
 }
 
@@ -239,16 +243,17 @@ SoundListener* Audio::GetListener() const
 void Audio::AddSoundSource(SoundSource* soundSource)
 {
     MutexLock lock(audioMutex_);
-    soundSources_.Push(soundSource);
+    soundSources_.push_back(soundSource);
 }
 
 void Audio::RemoveSoundSource(SoundSource* soundSource)
 {
-    PODVector<SoundSource*>::Iterator i = soundSources_.Find(soundSource);
-    if (i != soundSources_.End())
+    auto it = find(soundSources_.cbegin(), soundSources_.cend(), soundSource);
+
+    if (it != soundSources_.cend())
     {
         MutexLock lock(audioMutex_);
-        soundSources_.Erase(i);
+        soundSources_.erase(it);
     }
 }
 
@@ -297,18 +302,16 @@ void Audio::MixOutput(void* dest, unsigned samples)
         memset(clipPtr, 0, clipSamples * sizeof(int));
 
         // Mix samples to clip buffer
-        for (PODVector<SoundSource*>::Iterator i = soundSources_.Begin(); i != soundSources_.End(); ++i)
+        for (SoundSource* soundSource : soundSources_)
         {
-            SoundSource* source = *i;
-
             // Check for pause if necessary
             if (!pausedSoundTypes_.Empty())
             {
-                if (pausedSoundTypes_.Contains(source->GetSoundType()))
+                if (pausedSoundTypes_.Contains(soundSource->GetSoundType()))
                     continue;
             }
 
-            source->Mix(clipPtr, workSamples, mixRate_, stereo_, interpolation_);
+            soundSource->Mix(clipPtr, workSamples, mixRate_, stereo_, interpolation_);
         }
         // Copy output from clip buffer to destination
         auto* destPtr = (short*)dest;
@@ -343,18 +346,18 @@ void Audio::UpdateInternal(float timeStep)
     URHO3D_PROFILE(UpdateAudio);
 
     // Update in reverse order, because sound sources might remove themselves
-    for (unsigned i = soundSources_.Size() - 1; i < soundSources_.Size(); --i)
+    for (auto it = soundSources_.crbegin(); it != soundSources_.crend(); ++it)
     {
-        SoundSource* source = soundSources_[i];
+        SoundSource* soundSource = *it;
 
         // Check for pause if necessary; do not update paused sound sources
         if (!pausedSoundTypes_.Empty())
         {
-            if (pausedSoundTypes_.Contains(source->GetSoundType()))
+            if (pausedSoundTypes_.Contains(soundSource->GetSoundType()))
                 continue;
         }
 
-        source->Update(timeStep);
+        soundSource->Update(timeStep);
     }
 }
 

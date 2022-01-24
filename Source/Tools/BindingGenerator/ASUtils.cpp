@@ -412,6 +412,45 @@ ConvertedVariable CppVariableToAS(const TypeAnalyzer& type, VariableUsage usage,
         throw Exception("Error: type \"" + type.ToString() + "\" can not automatically bind");
     }
 
+    regex_match(cppTypeName, match, regex("std::vector<(\\w+)\\*>"));
+    if (!match.empty())
+    {
+        string cppSubtypeName = match[1].str();
+
+        string asSubtypeName;
+
+        try
+        {
+            asSubtypeName = CppPrimitiveTypeToAS(cppSubtypeName);
+        }
+        catch (...)
+        {
+            asSubtypeName = cppSubtypeName;
+        }
+
+        if (usage == VariableUsage::FunctionReturn)
+        {
+            result.asDeclaration_ = "Array<" + asSubtypeName + "@>@";
+            result.cppDeclaration_ = "CScriptArray*";
+            result.glue_ = "return VectorToHandleArray(result, \"Array<" + asSubtypeName + "@>\");\n";
+            return result;
+        }
+
+        if (usage == VariableUsage::FunctionParameter && type.IsConst() && type.IsReference())
+        {
+            string newCppVarName = name + "_conv";
+            result.asDeclaration_ = "Array<" + asSubtypeName + "@>@";
+            result.cppDeclaration_ = "CScriptArray* " + newCppVarName;
+            result.glue_ = "    " + cppTypeName + " " + name + " = ArrayToStdVector<" + cppSubtypeName + "*>(" + newCppVarName + ");\n";
+
+            assert(defaultValue.empty()); // TODO: make
+
+            return result;
+        }
+
+        throw Exception("Error: type \"" + type.ToString() + "\" can not automatically bind");
+    }
+
     regex_match(cppTypeName, match, regex("PODVector<(\\w+)>"));
     if (!match.empty())
     {

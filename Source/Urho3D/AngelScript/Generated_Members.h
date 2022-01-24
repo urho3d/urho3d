@@ -8949,10 +8949,10 @@ template <class T> void RegisterMembers_AttributeAnimationInfo(asIScriptEngine* 
     #endif
 }
 
-// const PODVector<SoundSource*>& Audio::GetSoundSources() const
-template <class T> CScriptArray* Audio_constspPODVectorlesSoundSourcestargreamp_GetSoundSources_void_template(T* _ptr)
+// const std::vector<SoundSource*>& Audio::GetSoundSources() const
+template <class T> CScriptArray* Audio_constspstdcolcolvectorlesSoundSourcestargreamp_GetSoundSources_void_template(T* _ptr)
 {
-    const PODVector<SoundSource*>& result = _ptr->GetSoundSources();
+    const std::vector<SoundSource*>& result = _ptr->GetSoundSources();
     return VectorToHandleArray(result, "Array<SoundSource@>");
 }
 
@@ -8993,8 +8993,8 @@ template <class T> void RegisterMembers_Audio(asIScriptEngine* engine, const cha
     // float Audio::GetSoundSourceMasterGain(StringHash typeHash) const
     engine->RegisterObjectMethod(className, "float GetSoundSourceMasterGain(StringHash) const", AS_METHODPR(T, GetSoundSourceMasterGain, (StringHash) const, float), AS_CALL_THISCALL);
 
-    // const PODVector<SoundSource*>& Audio::GetSoundSources() const
-    engine->RegisterObjectMethod(className, "Array<SoundSource@>@ GetSoundSources() const", AS_FUNCTION_OBJFIRST(Audio_constspPODVectorlesSoundSourcestargreamp_GetSoundSources_void_template<Audio>), AS_CALL_CDECL_OBJFIRST);
+    // const std::vector<SoundSource*>& Audio::GetSoundSources() const
+    engine->RegisterObjectMethod(className, "Array<SoundSource@>@ GetSoundSources() const", AS_FUNCTION_OBJFIRST(Audio_constspstdcolcolvectorlesSoundSourcestargreamp_GetSoundSources_void_template<Audio>), AS_CALL_CDECL_OBJFIRST);
 
     // bool Audio::HasMasterGain(const String& type) const
     engine->RegisterObjectMethod(className, "bool HasMasterGain(const String&in) const", AS_METHODPR(T, HasMasterGain, (const String&) const, bool), AS_CALL_THISCALL);

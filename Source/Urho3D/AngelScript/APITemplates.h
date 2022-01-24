@@ -54,6 +54,8 @@
 #pragma warning(disable:4505)
 #endif
 
+#include <vector>
+
 namespace Urho3D
 {
 
@@ -161,6 +163,30 @@ template <class T> CScriptArray* VectorToHandleArray(const PODVector<T*>& vector
         return nullptr;
 }
 
+/// Template function for std::vector to handle array conversion.
+template <class T> CScriptArray* VectorToHandleArray(const std::vector<T*>& vector, const char* arrayName)
+{
+    Context* context = GetScriptContext();
+    if (context)
+    {
+        asITypeInfo* type = context->GetSubsystem<Script>()->GetObjectType(arrayName);
+        CScriptArray* arr = CScriptArray::Create(type, vector.size());
+
+        for (unsigned i = 0; i < arr->GetSize(); ++i)
+        {
+            // Increment reference count for storing in the array
+            T* ptr = vector[i];
+            if (ptr)
+                ptr->AddRef();
+            *(static_cast<T**>(arr->At(i))) = ptr;
+        }
+
+        return arr;
+    }
+    else
+        return nullptr;
+}
+
 /// Template function for shared pointer Vector to handle array conversion.
 template <class T> CScriptArray* VectorToHandleArray(const Vector<SharedPtr<T> >& vector, const char* arrayName)
 {
@@ -200,6 +226,18 @@ template <class T> Vector<T> ArrayToVector(CScriptArray* arr)
 template <class T> PODVector<T> ArrayToPODVector(CScriptArray* arr)
 {
     PODVector<T> dest(arr ? arr->GetSize() : 0);
+    if (arr)
+    {
+        for (unsigned i = 0; i < arr->GetSize(); ++i)
+            dest[i] = *static_cast<T*>(arr->At(i));
+    }
+    return dest;
+}
+
+/// Template function for array to std::vector conversion.
+template <class T> std::vector<T> ArrayToStdVector(CScriptArray* arr)
+{
+    std::vector<T> dest(arr ? arr->GetSize() : 0);
     if (arr)
     {
         for (unsigned i = 0; i < arr->GetSize(); ++i)
