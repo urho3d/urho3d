@@ -56,6 +56,7 @@
 
 #include <Urho3D/DebugNew.h>
 
+using namespace std;
 using namespace Urho3D;
 
 struct OutModel
@@ -1173,7 +1174,7 @@ void BuildAndSaveModel(OutModel& model)
             FromAIString(model.rootBone_->mName));
 
         Skeleton skeleton;
-        Vector<Bone>& bones = skeleton.GetModifiableBones();
+        vector<Bone>& bones = skeleton.GetModifiableBones();
 
         for (unsigned i = 0; i < model.bones_.Size(); ++i)
         {
@@ -1197,13 +1198,13 @@ void BuildAndSaveModel(OutModel& model)
             newBone.boundingBox_ = model.boneHitboxes_[i];
             newBone.collisionMask_ = BONECOLLISION_SPHERE | BONECOLLISION_BOX;
             newBone.parentIndex_ = i;
-            bones.Push(newBone);
+            bones.push_back(newBone);
         }
         // Set the bone hierarchy
         for (unsigned i = 1; i < model.bones_.Size(); ++i)
         {
             String parentName = FromAIString(model.bones_[i]->mParent->mName);
-            for (unsigned j = 0; j < bones.Size(); ++j)
+            for (unsigned j = 0; j < bones.size(); ++j)
             {
                 if (bones[j].name_ == parentName)
                 {

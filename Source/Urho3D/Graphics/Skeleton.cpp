@@ -45,7 +45,7 @@ bool Skeleton::Load(Deserializer& source)
         return false;
 
     unsigned bones = source.ReadUInt();
-    bones_.Reserve(bones);
+    bones_.reserve(bones);
 
     for (unsigned i = 0; i < bones; ++i)
     {
@@ -68,7 +68,7 @@ bool Skeleton::Load(Deserializer& source)
         if (newBone.parentIndex_ == i)
             rootBoneIndex_ = i;
 
-        bones_.Push(newBone);
+        bones_.push_back(newBone);
     }
 
     return true;
@@ -76,12 +76,11 @@ bool Skeleton::Load(Deserializer& source)
 
 bool Skeleton::Save(Serializer& dest) const
 {
-    if (!dest.WriteUInt(bones_.Size()))
+    if (!dest.WriteUInt(bones_.size()))
         return false;
 
-    for (unsigned i = 0; i < bones_.Size(); ++i)
+    for (const Bone& bone : bones_)
     {
-        const Bone& bone = bones_[i];
         dest.WriteString(bone.name_);
         dest.WriteUInt(bone.parentIndex_);
         dest.WriteVector3(bone.initialPosition_);
@@ -107,14 +106,14 @@ void Skeleton::Define(const Skeleton& src)
     bones_ = src.bones_;
     // Make sure we clear node references, if they exist
     // (AnimatedModel will create new nodes on its own)
-    for (Vector<Bone>::Iterator i = bones_.Begin(); i != bones_.End(); ++i)
-        i->node_.Reset();
+    for (Bone& bone : bones_)
+        bone.node_.Reset();
     rootBoneIndex_ = src.rootBoneIndex_;
 }
 
 void Skeleton::SetRootBoneIndex(unsigned index)
 {
-    if (index < bones_.Size())
+    if (index < bones_.size())
         rootBoneIndex_ = index;
     else
         URHO3D_LOGERROR("Root bone index out of bounds");
@@ -122,25 +121,25 @@ void Skeleton::SetRootBoneIndex(unsigned index)
 
 void Skeleton::ClearBones()
 {
-    bones_.Clear();
+    bones_.clear();
     rootBoneIndex_ = M_MAX_UNSIGNED;
 }
 
 void Skeleton::Reset()
 {
-    for (Vector<Bone>::Iterator i = bones_.Begin(); i != bones_.End(); ++i)
+    for (Bone& bone : bones_)
     {
-        if (i->animated_ && i->node_)
-            i->node_->SetTransform(i->initialPosition_, i->initialRotation_, i->initialScale_);
+        if (bone.animated_ && bone.node_)
+            bone.node_->SetTransform(bone.initialPosition_, bone.initialRotation_, bone.initialScale_);
     }
 }
 
 void Skeleton::ResetSilent()
 {
-    for (Vector<Bone>::Iterator i = bones_.Begin(); i != bones_.End(); ++i)
+    for (Bone& bone : bones_)
     {
-        if (i->animated_ && i->node_)
-            i->node_->SetTransformSilent(i->initialPosition_, i->initialRotation_, i->initialScale_);
+        if (bone.animated_ && bone.node_)
+            bone.node_->SetTransformSilent(bone.initialPosition_, bone.initialRotation_, bone.initialScale_);
     }
 }
 
@@ -152,11 +151,10 @@ Bone* Skeleton::GetRootBone()
 
 unsigned Skeleton::GetBoneIndex(const StringHash& boneNameHash) const
 {
-    const unsigned numBones = bones_.Size();
-    for (unsigned i = 0; i < numBones; ++i)
+    for (size_t i = 0; i < bones_.size(); ++i)
     {
         if (bones_[i].nameHash_ == boneNameHash)
-            return i;
+            return (unsigned)i;
     }
 
     return M_MAX_UNSIGNED;
@@ -164,10 +162,10 @@ unsigned Skeleton::GetBoneIndex(const StringHash& boneNameHash) const
 
 unsigned Skeleton::GetBoneIndex(const Bone* bone) const
 {
-    if (bones_.Empty() || bone < &bones_.Front() || bone > &bones_.Back())
+    if (bones_.empty() || bone < &bones_.front() || bone > &bones_.back())
         return M_MAX_UNSIGNED;
 
-    return static_cast<unsigned>(bone - &bones_.Front());
+    return static_cast<unsigned>(bone - &bones_.front());
 }
 
 unsigned Skeleton::GetBoneIndex(const String& boneName) const
@@ -185,7 +183,7 @@ Bone* Skeleton::GetBoneParent(const Bone* bone)
 
 Bone* Skeleton::GetBone(unsigned index)
 {
-    return index < bones_.Size() ? &bones_[index] : nullptr;
+    return index < bones_.size() ? &bones_[index] : nullptr;
 }
 
 Bone* Skeleton::GetBone(const String& name)
@@ -201,7 +199,7 @@ Bone* Skeleton::GetBone(const char* name)
 Bone* Skeleton::GetBone(const StringHash& boneNameHash)
 {
     const unsigned index = GetBoneIndex(boneNameHash);
-    return index < bones_.Size() ? &bones_[index] : nullptr;
+    return index < bones_.size() ? &bones_[index] : nullptr;
 }
 
 }

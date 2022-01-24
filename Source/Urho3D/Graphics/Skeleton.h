@@ -107,14 +107,14 @@ public:
     void Reset();
 
     /// Return all bones.
-    const Vector<Bone>& GetBones() const { return bones_; }
+    const std::vector<Bone>& GetBones() const { return bones_; }
 
     /// Return modifiable bones.
-    Vector<Bone>& GetModifiableBones() { return bones_; }
+    std::vector<Bone>& GetModifiableBones() { return bones_; }
 
     /// Return number of bones.
     /// @property
-    unsigned GetNumBones() const { return bones_.Size(); }
+    unsigned GetNumBones() const { return (unsigned)bones_.size(); }
 
     /// Return root bone.
     /// @property
@@ -142,7 +142,7 @@ public:
 
 private:
     /// Bones.
-    Vector<Bone> bones_;
+    std::vector<Bone> bones_;
     /// Root bone index.
     unsigned rootBoneIndex_;
 };

@@ -44,6 +44,8 @@
 
 #include "../DebugNew.h"
 
+using namespace std;
+
 namespace Urho3D
 {
 
@@ -172,10 +174,10 @@ void AnimatedModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQu
     if (query.ray_.HitDistance(GetWorldBoundingBox()) >= query.maxDistance_)
         return;
 
-    const Vector<Bone>& bones = skeleton_.GetBones();
+    const vector<Bone>& bones = skeleton_.GetBones();
     Sphere boneSphere;
 
-    for (unsigned i = 0; i < bones.Size(); ++i)
+    for (size_t i = 0; i < bones.size(); ++i)
     {
         const Bone& bone = bones[i];
         if (!bone.node_)
@@ -220,7 +222,7 @@ void AnimatedModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQu
         result.distance_ = distance;
         result.drawable_ = this;
         result.node_ = node_;
-        result.subObject_ = i;
+        result.subObject_ = (unsigned)i;
         results.Push(result);
     }
 }
@@ -704,11 +706,11 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
         // Check if bone structure has stayed compatible (reloading the model). In that case retain the old bones and animations
         if (skeleton_.GetNumBones() == skeleton.GetNumBones())
         {
-            Vector<Bone>& destBones = skeleton_.GetModifiableBones();
-            const Vector<Bone>& srcBones = skeleton.GetBones();
+            vector<Bone>& destBones = skeleton_.GetModifiableBones();
+            const vector<Bone>& srcBones = skeleton.GetBones();
             bool compatible = true;
 
-            for (unsigned i = 0; i < destBones.Size(); ++i)
+            for (unsigned i = 0; i < destBones.size(); ++i)
             {
                 if (destBones[i].node_ && destBones[i].name_ == srcBones[i].name_ && destBones[i].parentIndex_ ==
                                                                                      srcBones[i].parentIndex_)
@@ -741,25 +743,25 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
         // Merge bounding boxes from non-master models
         FinalizeBoneBoundingBoxes();
 
-        Vector<Bone>& bones = skeleton_.GetModifiableBones();
+        vector<Bone>& bones = skeleton_.GetModifiableBones();
         // Create scene nodes for the bones
         if (createBones)
         {
-            for (Vector<Bone>::Iterator i = bones.Begin(); i != bones.End(); ++i)
+            for (Bone& bone : bones)
             {
                 // Create bones as local, as they are never to be directly synchronized over the network
-                Node* boneNode = node_->CreateChild(i->name_, LOCAL);
+                Node* boneNode = node_->CreateChild(bone.name_, LOCAL);
                 boneNode->AddListener(this);
-                boneNode->SetTransform(i->initialPosition_, i->initialRotation_, i->initialScale_);
+                boneNode->SetTransform(bone.initialPosition_, bone.initialRotation_, bone.initialScale_);
                 // Copy the model component's temporary status
                 boneNode->SetTemporary(IsTemporary());
-                i->node_ = boneNode;
+                bone.node_ = boneNode;
             }
 
-            for (unsigned i = 0; i < bones.Size(); ++i)
+            for (unsigned i = 0; i < (unsigned)bones.size(); ++i)
             {
                 unsigned parentIndex = bones[i].parentIndex_;
-                if (parentIndex != i && parentIndex < bones.Size())
+                if (parentIndex != i && parentIndex < bones.size())
                     bones[parentIndex].node_->AddChild(bones[i].node_);
             }
         }
@@ -782,13 +784,13 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
 
         if (createBones)
         {
-            Vector<Bone>& bones = skeleton_.GetModifiableBones();
-            for (Vector<Bone>::Iterator i = bones.Begin(); i != bones.End(); ++i)
+            vector<Bone>& bones = skeleton_.GetModifiableBones();
+            for (Bone& bone : bones)
             {
-                Node* boneNode = node_->GetChild(i->name_, true);
+                Node* boneNode = node_->GetChild(bone.name_, true);
                 if (boneNode)
                     boneNode->AddListener(this);
-                i->node_ = boneNode;
+                bone.node_ = boneNode;
             }
         }
     }
@@ -805,8 +807,8 @@ void AnimatedModel::SetModelAttr(const ResourceRef& value)
 
 void AnimatedModel::SetBonesEnabledAttr(const VariantVector& value)
 {
-    Vector<Bone>& bones = skeleton_.GetModifiableBones();
-    for (unsigned i = 0; i < bones.Size() && i < value.Size(); ++i)
+    vector<Bone>& bones = skeleton_.GetModifiableBones();
+    for (size_t i = 0; i < bones.size() && i < value.Size(); ++i)
         bones[i].animated_ = value[i].GetBool();
 }
 
@@ -867,10 +869,10 @@ ResourceRef AnimatedModel::GetModelAttr() const
 VariantVector AnimatedModel::GetBonesEnabledAttr() const
 {
     VariantVector ret;
-    const Vector<Bone>& bones = skeleton_.GetBones();
-    ret.Reserve(bones.Size());
-    for (Vector<Bone>::ConstIterator i = bones.Begin(); i != bones.End(); ++i)
-        ret.Push(i->animated_);
+    const vector<Bone>& bones = skeleton_.GetBones();
+    ret.Reserve(bones.size());
+    for (const Bone& bone : bones)
+        ret.Push(bone.animated_);
     return ret;
 }
 
@@ -911,19 +913,19 @@ void AnimatedModel::UpdateBoneBoundingBox()
         boneBoundingBox_.Clear();
         Matrix3x4 inverseNodeTransform = node_->GetWorldTransform().Inverse();
 
-        const Vector<Bone>& bones = skeleton_.GetBones();
-        for (Vector<Bone>::ConstIterator i = bones.Begin(); i != bones.End(); ++i)
+        const vector<Bone>& bones = skeleton_.GetBones();
+        for (const Bone& bone : bones)
         {
-            Node* boneNode = i->node_;
+            Node* boneNode = bone.node_;
             if (!boneNode)
                 continue;
 
             // Use hitbox if available. If not, use only half of the sphere radius
             /// \todo The sphere radius should be multiplied with bone scale
-            if (i->collisionMask_ & BONECOLLISION_BOX)
-                boneBoundingBox_.Merge(i->boundingBox_.Transformed(inverseNodeTransform * boneNode->GetWorldTransform()));
-            else if (i->collisionMask_ & BONECOLLISION_SPHERE)
-                boneBoundingBox_.Merge(Sphere(inverseNodeTransform * boneNode->GetWorldPosition(), i->radius_ * 0.5f));
+            if (bone.collisionMask_ & BONECOLLISION_BOX)
+                boneBoundingBox_.Merge(bone.boundingBox_.Transformed(inverseNodeTransform * boneNode->GetWorldTransform()));
+            else if (bone.collisionMask_ & BONECOLLISION_SPHERE)
+                boneBoundingBox_.Merge(Sphere(inverseNodeTransform * boneNode->GetWorldPosition(), bone.radius_ * 0.5f));
         }
     }
 
@@ -984,17 +986,17 @@ void AnimatedModel::AssignBoneNodes()
         return;
 
     // Find the bone nodes from the node hierarchy and add listeners
-    Vector<Bone>& bones = skeleton_.GetModifiableBones();
+    vector<Bone>& bones = skeleton_.GetModifiableBones();
     bool boneFound = false;
-    for (Vector<Bone>::Iterator i = bones.Begin(); i != bones.End(); ++i)
+    for (Bone& bone : bones)
     {
-        Node* boneNode = node_->GetChild(i->name_, true);
+        Node* boneNode = node_->GetChild(bone.name_, true);
         if (boneNode)
         {
             boneFound = true;
             boneNode->AddListener(this);
         }
-        i->node_ = boneNode;
+        bone.node_ = boneNode;
     }
 
     // If no bones found, this may be a prefab where the bone information was left out.
@@ -1012,7 +1014,7 @@ void AnimatedModel::AssignBoneNodes()
 
 void AnimatedModel::FinalizeBoneBoundingBoxes()
 {
-    Vector<Bone>& bones = skeleton_.GetModifiableBones();
+    vector<Bone>& bones = skeleton_.GetModifiableBones();
     PODVector<AnimatedModel*> models;
     GetComponents<AnimatedModel>(models);
 
@@ -1021,8 +1023,8 @@ void AnimatedModel::FinalizeBoneBoundingBoxes()
         // Reset first to the model resource's original bone bounding information if available (should be)
         if (model_)
         {
-            const Vector<Bone>& modelBones = model_->GetSkeleton().GetBones();
-            for (unsigned i = 0; i < bones.Size() && i < modelBones.Size(); ++i)
+            const vector<Bone>& modelBones = model_->GetSkeleton().GetBones();
+            for (size_t i = 0; i < bones.size() && i < modelBones.size(); ++i)
             {
                 bones[i].collisionMask_ = modelBones[i].collisionMask_;
                 bones[i].radius_ = modelBones[i].radius_;
@@ -1038,23 +1040,23 @@ void AnimatedModel::FinalizeBoneBoundingBoxes()
                 continue;
 
             Skeleton& otherSkeleton = (*i)->GetSkeleton();
-            for (Vector<Bone>::Iterator j = bones.Begin(); j != bones.End(); ++j)
+            for (Bone& bone : bones)
             {
-                Bone* otherBone = otherSkeleton.GetBone(j->nameHash_);
+                Bone* otherBone = otherSkeleton.GetBone(bone.nameHash_);
                 if (otherBone)
                 {
                     if (otherBone->collisionMask_ & BONECOLLISION_SPHERE)
                     {
-                        j->collisionMask_ |= BONECOLLISION_SPHERE;
-                        j->radius_ = Max(j->radius_, otherBone->radius_);
+                        bone.collisionMask_ |= BONECOLLISION_SPHERE;
+                        bone.radius_ = Max(bone.radius_, otherBone->radius_);
                     }
                     if (otherBone->collisionMask_ & BONECOLLISION_BOX)
                     {
-                        j->collisionMask_ |= BONECOLLISION_BOX;
-                        if (j->boundingBox_.Defined())
-                            j->boundingBox_.Merge(otherBone->boundingBox_);
+                        bone.collisionMask_ |= BONECOLLISION_BOX;
+                        if (bone.boundingBox_.Defined())
+                            bone.boundingBox_.Merge(otherBone->boundingBox_);
                         else
-                            j->boundingBox_.Define(otherBone->boundingBox_);
+                            bone.boundingBox_.Define(otherBone->boundingBox_);
                     }
                 }
             }
@@ -1063,12 +1065,12 @@ void AnimatedModel::FinalizeBoneBoundingBoxes()
 
     // Remove collision information from dummy bones that do not affect skinning, to prevent them from being merged
     // to the bounding box and making it artificially large
-    for (Vector<Bone>::Iterator i = bones.Begin(); i != bones.End(); ++i)
+    for (Bone& bone : bones)
     {
-        if (i->collisionMask_ & BONECOLLISION_BOX && i->boundingBox_.Size().Length() < M_EPSILON)
-            i->collisionMask_ &= ~BONECOLLISION_BOX;
-        if (i->collisionMask_ & BONECOLLISION_SPHERE && i->radius_ < M_EPSILON)
-            i->collisionMask_ &= ~BONECOLLISION_SPHERE;
+        if (bone.collisionMask_ & BONECOLLISION_BOX && bone.boundingBox_.Size().Length() < M_EPSILON)
+            bone.collisionMask_ &= ~BONECOLLISION_BOX;
+        if (bone.collisionMask_ & BONECOLLISION_SPHERE && bone.radius_ < M_EPSILON)
+            bone.collisionMask_ &= ~BONECOLLISION_SPHERE;
     }
 }
 
@@ -1303,14 +1305,14 @@ void AnimatedModel::ApplyAnimation()
 void AnimatedModel::UpdateSkinning()
 {
     // Note: the model's world transform will be baked in the skin matrices
-    const Vector<Bone>& bones = skeleton_.GetBones();
+    const vector<Bone>& bones = skeleton_.GetBones();
     // Use model's world transform in case a bone is missing
     const Matrix3x4& worldTransform = node_->GetWorldTransform();
 
     // Skinning with global matrices only
     if (!geometrySkinMatrices_.Size())
     {
-        for (unsigned i = 0; i < bones.Size(); ++i)
+        for (size_t i = 0; i < bones.size(); ++i)
         {
             const Bone& bone = bones[i];
             if (bone.node_)
@@ -1322,7 +1324,7 @@ void AnimatedModel::UpdateSkinning()
     // Skinning with per-geometry matrices
     else
     {
-        for (unsigned i = 0; i < bones.Size(); ++i)
+        for (size_t i = 0; i < bones.size(); ++i)
         {
             const Bone& bone = bones[i];
             if (bone.node_)

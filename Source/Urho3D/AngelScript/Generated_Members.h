@@ -4499,10 +4499,10 @@ template <class T> void RegisterMembers_Skeleton(asIScriptEngine* engine, const 
 {
     // Bone* Skeleton::GetBone(const char* name)
     // Error: type "const char*" can not automatically bind
-    // const Vector<Bone>& Skeleton::GetBones() const
-    // Error: type "const Vector<Bone>&" can not automatically bind
-    // Vector<Bone>& Skeleton::GetModifiableBones()
-    // Error: type "Vector<Bone>&" can not automatically bind
+    // const std::vector<Bone>& Skeleton::GetBones() const
+    // Error: type "const std::vector<Bone>&" can not automatically bind
+    // std::vector<Bone>& Skeleton::GetModifiableBones()
+    // Error: type "std::vector<Bone>&" can not automatically bind
 
     // void Skeleton::ClearBones()
     engine->RegisterObjectMethod(className, "void ClearBones()", AS_METHODPR(T, ClearBones, (), void), AS_CALL_THISCALL);
