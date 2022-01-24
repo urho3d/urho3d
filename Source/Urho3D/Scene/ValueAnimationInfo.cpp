@@ -28,6 +28,8 @@
 
 #include "../DebugNew.h"
 
+using namespace std;
+
 namespace Urho3D
 {
 
@@ -93,17 +95,17 @@ bool ValueAnimationInfo::SetTime(float time)
     // Send keyframe event if necessary
     if (animation_->HasEventFrames())
     {
-        PODVector<const VAnimEventFrame*> eventFrames;
+        vector<const VAnimEventFrame*> eventFrames;
         GetEventFrames(lastScaledTime_, scaledTime, eventFrames);
 
-        if (eventFrames.Size())
+        if (eventFrames.size())
         {
             // Make a copy of the target weakptr, since if it expires, the AnimationInfo is deleted as well, in which case the
             // member variable cannot be accessed
             WeakPtr<Object> targetWeak(target_);
 
-            for (unsigned i = 0; i < eventFrames.Size(); ++i)
-                target_->SendEvent(eventFrames[i]->eventType_, const_cast<VariantMap&>(eventFrames[i]->eventData_));
+            for (const VAnimEventFrame* eventFrame : eventFrames)
+                target_->SendEvent(eventFrame->eventType_, const_cast<VariantMap&>(eventFrame->eventData_));
 
             // Break immediately if target expired due to event
             if (targetWeak.Expired())
@@ -154,14 +156,16 @@ float ValueAnimationInfo::CalculateScaledTime(float currentTime, bool& finished)
     }
 }
 
-void ValueAnimationInfo::GetEventFrames(float beginTime, float endTime, PODVector<const VAnimEventFrame*>& eventFrames)
+void ValueAnimationInfo::GetEventFrames(float beginTime, float endTime, vector<const VAnimEventFrame*>& eventFrames)
 {
     switch (wrapMode_)
     {
     case WM_LOOP:
         /// \todo This can miss an event if the deltatime is exactly the animation's length
         if (beginTime <= endTime)
+        {
             animation_->GetEventFrames(beginTime, endTime, eventFrames);
+        }
         else
         {
             animation_->GetEventFrames(beginTime, animation_->GetEndTime(), eventFrames);

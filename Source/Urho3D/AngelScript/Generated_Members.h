@@ -14395,10 +14395,10 @@ template <class T> void RegisterMembers_ValueAnimation(asIScriptEngine* engine, 
 {
     RegisterMembers_Resource<T>(engine, className);
 
-    // void ValueAnimation::GetEventFrames(float beginTime, float endTime, PODVector<const VAnimEventFrame*>& eventFrames) const
-    // Error: type "PODVector<const VAnimEventFrame*>&" can not automatically bind
-    // const Vector<VAnimKeyFrame>& ValueAnimation::GetKeyFrames() const
-    // Error: type "const Vector<VAnimKeyFrame>&" can not automatically bind
+    // void ValueAnimation::GetEventFrames(float beginTime, float endTime, std::vector<const VAnimEventFrame*>& eventFrames) const
+    // Error: type "std::vector<const VAnimEventFrame*>&" can not automatically bind
+    // const std::vector<VAnimKeyFrame>& ValueAnimation::GetKeyFrames() const
+    // Error: type "const std::vector<VAnimKeyFrame>&" can not automatically bind
     // void* ValueAnimation::GetOwner() const
     // Error: type "void*" can not automatically bind
     // void ValueAnimation::SetOwner(void* owner)

@@ -24,8 +24,9 @@
 
 #include "../Container/Ptr.h"
 #include "../Container/RefCounted.h"
-#include "../Container/Vector.h"
 #include "../Scene/AnimationDefs.h"
+
+#include <vector>
 
 namespace Urho3D
 {
@@ -80,7 +81,7 @@ protected:
     /// Calculate scaled time.
     float CalculateScaledTime(float currentTime, bool& finished) const;
     /// Return event frames.
-    void GetEventFrames(float beginTime, float endTime, PODVector<const VAnimEventFrame*>& eventFrames);
+    void GetEventFrames(float beginTime, float endTime, std::vector<const VAnimEventFrame*>& eventFrames);
 
     /// Target object.
     WeakPtr<Object> target_;

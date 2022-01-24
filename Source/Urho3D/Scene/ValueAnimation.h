@@ -27,6 +27,8 @@
 #include "../Core/Variant.h"
 #include "../Resource/Resource.h"
 
+#include <vector>
+
 namespace Urho3D
 {
 
@@ -136,13 +138,13 @@ public:
     Variant GetAnimationValue(float scaledTime) const;
 
     /// Return all key frames.
-    const Vector<VAnimKeyFrame>& GetKeyFrames() const { return keyFrames_; }
+    const std::vector<VAnimKeyFrame>& GetKeyFrames() const { return keyFrames_; }
 
     /// Has event frames.
-    bool HasEventFrames() const { return !eventFrames_.Empty(); }
+    bool HasEventFrames() const { return !eventFrames_.empty(); }
 
     /// Return all event frames between time.
-    void GetEventFrames(float beginTime, float endTime, PODVector<const VAnimEventFrame*>& eventFrames) const;
+    void GetEventFrames(float beginTime, float endTime, std::vector<const VAnimEventFrame*>& eventFrames) const;
 
 protected:
     /// Linear interpolation.
@@ -169,13 +171,13 @@ protected:
     /// End time.
     float endTime_;
     /// Key frames.
-    Vector<VAnimKeyFrame> keyFrames_;
+    std::vector<VAnimKeyFrame> keyFrames_;
     /// Spline tangents.
     mutable VariantVector splineTangents_;
     /// Spline tangents dirty.
     mutable bool splineTangentsDirty_;
     /// Event frames.
-    Vector<VAnimEventFrame> eventFrames_;
+    std::vector<VAnimEventFrame> eventFrames_;
 };
 
 }
