@@ -178,9 +178,9 @@ private:
     String commandInterpreter_;
 
     /// Command history.
-    Vector<String> history_;
+    std::vector<String> history_;
     /// Pending log message rows.
-    Vector<Pair<int, String> > pendingRows_;
+    std::vector<Pair<int, String> > pendingRows_;
     /// Current row being edited.
     String currentRow_;
     /// Maximum displayed rows.
@@ -200,7 +200,7 @@ private:
     Unless currently going through history options, will go through previous auto complete options.
     When no previous options are left will start going through history options.
     */
-    Vector<String> autoComplete_;
+    std::vector<String> autoComplete_;
     /// Command auto complete current position.
     unsigned autoCompletePosition_;
     /// Store the original line which is being auto-completed.

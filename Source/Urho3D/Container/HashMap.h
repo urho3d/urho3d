@@ -29,6 +29,7 @@
 
 #include <cassert>
 #include <initializer_list>
+#include <vector>
 
 namespace Urho3D
 {

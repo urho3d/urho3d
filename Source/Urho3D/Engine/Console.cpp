@@ -23,7 +23,6 @@
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
-#include "../Base/Algorithm.h"
 #include "../Core/CoreEvents.h"
 #include "../Engine/Console.h"
 #include "../Engine/EngineEvents.h"
@@ -42,6 +41,10 @@
 #include "../UI/UIEvents.h"
 
 #include "../DebugNew.h"
+
+#include <algorithm>
+
+using namespace std;
 
 namespace Urho3D
 {
@@ -239,8 +242,8 @@ void Console::SetNumRows(unsigned rows)
 void Console::SetNumHistoryRows(unsigned rows)
 {
     historyRows_ = rows;
-    if (history_.Size() > rows)
-        history_.Resize(rows);
+    if (history_.size() > rows)
+        history_.resize(rows);
     if (historyPosition_ > rows)
         historyPosition_ = rows;
 }
@@ -253,20 +256,25 @@ void Console::SetFocusOnShow(bool enable)
 void Console::AddAutoComplete(const String& option)
 {
     // Sorted insertion
-    Vector<String>::Iterator iter = UpperBound(autoComplete_.Begin(), autoComplete_.End(), option);
-    if (!iter.ptr_)
-        autoComplete_.Push(option);
-    // Make sure it isn't a duplicate
-    else if (iter == autoComplete_.Begin() || *(iter - 1) != option)
-        autoComplete_.Insert(iter, option);
+    vector<String>::iterator it = upper_bound(autoComplete_.begin(), autoComplete_.end(), option);
+    if (it == autoComplete_.end())
+    {
+        autoComplete_.push_back(option);
+    }
+    else
+    {
+        // Make sure it isn't a duplicate
+        if (it == autoComplete_.begin() || *(it - 1) != option)
+            autoComplete_.insert(it, option);
+    }
 }
 
 void Console::RemoveAutoComplete(const String& option)
 {
     // Erase and keep ordered
-    autoComplete_.Erase(LowerBound(autoComplete_.Begin(), autoComplete_.End(), option));
-    if (autoCompletePosition_ > autoComplete_.Size())
-        autoCompletePosition_ = autoComplete_.Size();
+    autoComplete_.erase(lower_bound(autoComplete_.begin(), autoComplete_.end(), option));
+    if (autoCompletePosition_ > autoComplete_.size())
+        autoCompletePosition_ = (unsigned)autoComplete_.size();
 }
 
 void Console::UpdateElements()
@@ -304,7 +312,7 @@ void Console::CopySelectedRows() const
 
 const String& Console::GetHistoryRow(unsigned index) const
 {
-    return index < history_.Size() ? history_[index] : String::EMPTY;
+    return index < history_.size() ? history_[index] : String::EMPTY;
 }
 
 bool Console::PopulateInterpreter()
@@ -383,16 +391,16 @@ void Console::HandleTextFinished(StringHash eventType, VariantMap& eventData)
             P_ID, static_cast<Text*>(interpreters_->GetSelectedItem())->GetText());
 
         // Make sure the line isn't the same as the last one
-        if (history_.Empty() || line != history_.Back())
+        if (history_.empty() || line != history_.back())
         {
             // Store to history, then clear the lineedit
-            history_.Push(line);
-            if (history_.Size() > historyRows_)
-                history_.Erase(history_.Begin());
+            history_.push_back(line);
+            if (history_.size() > historyRows_)
+                history_.erase(history_.begin());
         }
 
-        historyPosition_ = history_.Size(); // Reset
-        autoCompletePosition_ = autoComplete_.Size(); // Reset
+        historyPosition_ = (unsigned)history_.size(); // Reset
+        autoCompletePosition_ = (unsigned)autoComplete_.size(); // Reset
 
         currentRow_.Clear();
         lineEdit_->SetText(currentRow_);
@@ -412,9 +420,9 @@ void Console::HandleLineEditKey(StringHash eventType, VariantMap& eventData)
     {
     case KEY_UP:
         if (autoCompletePosition_ == 0)
-            autoCompletePosition_ = autoComplete_.Size();
+            autoCompletePosition_ = (unsigned)autoComplete_.size();
 
-        if (autoCompletePosition_ < autoComplete_.Size())
+        if (autoCompletePosition_ < autoComplete_.size())
         {
             // Search for auto completion that contains the contents of the line
             for (--autoCompletePosition_; autoCompletePosition_ != M_MAX_UNSIGNED; --autoCompletePosition_)
@@ -432,17 +440,17 @@ void Console::HandleLineEditKey(StringHash eventType, VariantMap& eventData)
             if (autoCompletePosition_ == M_MAX_UNSIGNED)
             {
                 // Reset the position
-                autoCompletePosition_ = autoComplete_.Size();
+                autoCompletePosition_ = (unsigned)autoComplete_.size();
                 // Reset history position
-                historyPosition_ = history_.Size();
+                historyPosition_ = (unsigned)history_.size();
             }
         }
 
         // If no more auto complete options and history options left
-        if (autoCompletePosition_ == autoComplete_.Size() && historyPosition_ > 0)
+        if (autoCompletePosition_ == autoComplete_.size() && historyPosition_ > 0)
         {
             // If line text is not a history, save the current text value to be restored later
-            if (historyPosition_ == history_.Size())
+            if (historyPosition_ == history_.size())
                 currentRow_ = lineEdit_->GetText();
             // Use the previous option
             --historyPosition_;
@@ -452,7 +460,7 @@ void Console::HandleLineEditKey(StringHash eventType, VariantMap& eventData)
 
     case KEY_DOWN:
         // If history options left
-        if (historyPosition_ < history_.Size())
+        if (historyPosition_ < history_.size())
         {
             // Use the next option
             ++historyPosition_;
@@ -461,7 +469,7 @@ void Console::HandleLineEditKey(StringHash eventType, VariantMap& eventData)
         else
         {
             // Loop over
-            if (autoCompletePosition_ >= autoComplete_.Size())
+            if (autoCompletePosition_ >= autoComplete_.size())
                 autoCompletePosition_ = 0;
             else
                 ++autoCompletePosition_; // If not starting over, skip checking the currently found completion
@@ -469,7 +477,7 @@ void Console::HandleLineEditKey(StringHash eventType, VariantMap& eventData)
             unsigned startPosition = autoCompletePosition_;
 
             // Search for auto completion that contains the contents of the line
-            for (; autoCompletePosition_ < autoComplete_.Size(); ++autoCompletePosition_)
+            for (; autoCompletePosition_ < autoComplete_.size(); ++autoCompletePosition_)
             {
                 const String& current = autoComplete_[autoCompletePosition_];
                 if (current.StartsWith(autoCompleteLine_))
@@ -481,7 +489,7 @@ void Console::HandleLineEditKey(StringHash eventType, VariantMap& eventData)
             }
 
             // Continue to search the complete range
-            if (autoCompletePosition_ == autoComplete_.Size())
+            if (autoCompletePosition_ == autoComplete_.size())
             {
                 for (autoCompletePosition_ = 0; autoCompletePosition_ != startPosition; ++autoCompletePosition_)
                 {
@@ -504,13 +512,13 @@ void Console::HandleLineEditKey(StringHash eventType, VariantMap& eventData)
     {
         historyOrAutoCompleteChange_ = true;
         // Set text to history option
-        if (historyPosition_ < history_.Size())
+        if (historyPosition_ < history_.size())
             lineEdit_->SetText(history_[historyPosition_]);
         else // restore the original line value before it was set to history values
         {
             lineEdit_->SetText(currentRow_);
             // Set the auto complete position according to the currentRow
-            for (autoCompletePosition_ = 0; autoCompletePosition_ < autoComplete_.Size(); ++autoCompletePosition_)
+            for (autoCompletePosition_ = 0; autoCompletePosition_ < autoComplete_.size(); ++autoCompletePosition_)
                 if (autoComplete_[autoCompletePosition_].StartsWith(currentRow_))
                     break;
         }
@@ -540,7 +548,7 @@ void Console::HandleLogMessage(StringHash eventType, VariantMap& eventData)
     Vector<String> rows = eventData[P_MESSAGE].GetString().Split('\n');
 
     for (unsigned i = 0; i < rows.Size(); ++i)
-        pendingRows_.Push(MakePair(level, rows[i]));
+        pendingRows_.push_back(MakePair(level, rows[i]));
 
     if (autoVisibleOnError_ && level == LOG_ERROR && !IsVisible())
         SetVisible(true);
@@ -557,16 +565,16 @@ void Console::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
         uiRoot->AddChild(closeButton_);
     }
 
-    if (!rowContainer_->GetNumItems() || pendingRows_.Empty())
+    if (!rowContainer_->GetNumItems() || pendingRows_.empty())
         return;
 
     printing_ = true;
     rowContainer_->DisableLayoutUpdate();
 
     Text* text = nullptr;
-    for (unsigned i = 0; i < pendingRows_.Size(); ++i)
+    for (size_t i = 0; i < pendingRows_.size(); ++i)
     {
-        rowContainer_->RemoveItem((unsigned)0);
+        rowContainer_->RemoveItem(0u);
         text = new Text(context_);
         text->SetText(pendingRows_[i].second_);
 
@@ -576,7 +584,7 @@ void Console::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
         rowContainer_->AddItem(text);
     }
 
-    pendingRows_.Clear();
+    pendingRows_.clear();
 
     rowContainer_->EnsureItemVisibility(text);
     rowContainer_->EnableLayoutUpdate();

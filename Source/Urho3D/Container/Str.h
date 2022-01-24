@@ -24,9 +24,10 @@
 
 #include "../Container/Vector.h"
 
+#include <cctype>
 #include <cstdarg>
 #include <cstring>
-#include <cctype>
+#include <vector>
 
 namespace Urho3D
 {
