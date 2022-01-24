@@ -346,9 +346,9 @@ void Audio::UpdateInternal(float timeStep)
     URHO3D_PROFILE(UpdateAudio);
 
     // Update in reverse order, because sound sources might remove themselves
-    for (auto it = soundSources_.crbegin(); it != soundSources_.crend(); ++it)
+    for (size_t i = soundSources_.size() - 1; i < soundSources_.size(); --i)
     {
-        SoundSource* soundSource = *it;
+        SoundSource* soundSource = soundSources_[i];
 
         // Check for pause if necessary; do not update paused sound sources
         if (!pausedSoundTypes_.Empty())
