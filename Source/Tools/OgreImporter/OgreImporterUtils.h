@@ -33,6 +33,9 @@ using namespace Urho3D;
 
 struct Triangle
 {
+    // Fields are not initialized.
+    Triangle() = default;
+
     Triangle(unsigned v0, unsigned v1, unsigned v2) :
         v0_{v0},
         v1_{v1},
