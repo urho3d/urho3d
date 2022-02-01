@@ -56,6 +56,9 @@ struct CharLocation
 /// @nobind
 struct GlyphLocation
 {
+    /// Fields are not initialized.
+    GlyphLocation() = default;
+
     /// Construct.
     GlyphLocation(float x, float y, const FontGlyph* glyph) :
         x_(x),

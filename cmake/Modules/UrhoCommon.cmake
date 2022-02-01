@@ -509,11 +509,11 @@ if (WIN32 AND NOT CMAKE_PROJECT_NAME MATCHES ^Urho3D-ExternalProject-)
 endif ()
 
 # Platform and compiler specific options
-set (CMAKE_CXX_STANDARD 11)
+set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
 set (CMAKE_CXX_EXTENSIONS OFF)
 if (EMSCRIPTEN)     # It appears CMake does not detect C++standard for EMCC correctly, so do it the old way still
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 endif ()
 if (APPLE)
     if (IOS)

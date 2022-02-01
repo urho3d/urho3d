@@ -3375,7 +3375,7 @@ template <class T> void RegisterMembers_Plane(asIScriptEngine* engine, const cha
 // void Polyhedron::AddFace(const PODVector<Vector3>& face)
 template <class T> void Polyhedron_void_AddFace_constspPODVectorlesVector3greamp_template(T* _ptr, CScriptArray* face_conv)
 {
-    PODVector<Vector3> face = ArrayToPODVector<Vector3>(face_conv);
+    PODVector<Vector3> face = ArrayToVector<Vector3>(face_conv);
     _ptr->AddFace(face);
 }
 
@@ -7936,7 +7936,7 @@ template <class T> void RegisterMembers_NodeReplicationState(asIScriptEngine* en
 // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData)
 template <class T> void Object_void_UnsubscribeFromAllEventsExcept_constspPODVectorlesStringHashgreamp_bool_template(T* _ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions = ArrayToPODVector<StringHash>(exceptions_conv);
+    PODVector<StringHash> exceptions = ArrayToVector<StringHash>(exceptions_conv);
     _ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
@@ -12315,7 +12315,7 @@ template <class T> CScriptArray* VertexBuffer_constspPODVectorlesVertexElementgr
 // bool VertexBuffer::SetSize(unsigned vertexCount, const PODVector<VertexElement>& elements, bool dynamic = false)
 template <class T> bool VertexBuffer_bool_SetSize_unsigned_constspPODVectorlesVertexElementgreamp_bool_template(T* _ptr, unsigned vertexCount, CScriptArray* elements_conv, bool dynamic)
 {
-    PODVector<VertexElement> elements = ArrayToPODVector<VertexElement>(elements_conv);
+    PODVector<VertexElement> elements = ArrayToVector<VertexElement>(elements_conv);
     bool result = _ptr->SetSize(vertexCount, elements, dynamic);
     return result;
 }
@@ -12323,7 +12323,7 @@ template <class T> bool VertexBuffer_bool_SetSize_unsigned_constspPODVectorlesVe
 // static bool VertexBuffer::HasElement(const PODVector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0)
 template <class T> bool VertexBuffer_bool_HasElement_constspPODVectorlesVertexElementgreamp_VertexElementType_VertexElementSemantic_unsignedspchar(CScriptArray* elements_conv, VertexElementType type, VertexElementSemantic semantic, unsigned char index)
 {
-    PODVector<VertexElement> elements = ArrayToPODVector<VertexElement>(elements_conv);
+    PODVector<VertexElement> elements = ArrayToVector<VertexElement>(elements_conv);
     bool result = T::HasElement(elements, type, semantic, index);
     return result;
 }
@@ -12331,7 +12331,7 @@ template <class T> bool VertexBuffer_bool_HasElement_constspPODVectorlesVertexEl
 // static unsigned VertexBuffer::GetElementOffset(const PODVector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0)
 template <class T> unsigned VertexBuffer_unsigned_GetElementOffset_constspPODVectorlesVertexElementgreamp_VertexElementType_VertexElementSemantic_unsignedspchar(CScriptArray* elements_conv, VertexElementType type, VertexElementSemantic semantic, unsigned char index)
 {
-    PODVector<VertexElement> elements = ArrayToPODVector<VertexElement>(elements_conv);
+    PODVector<VertexElement> elements = ArrayToVector<VertexElement>(elements_conv);
     unsigned result = T::GetElementOffset(elements, type, semantic, index);
     return result;
 }
@@ -12346,7 +12346,7 @@ template <class T> CScriptArray* VertexBuffer_PODVectorlesVertexElementgre_GetEl
 // static unsigned VertexBuffer::GetVertexSize(const PODVector<VertexElement>& elements)
 template <class T> unsigned VertexBuffer_unsigned_GetVertexSize_constspPODVectorlesVertexElementgreamp(CScriptArray* elements_conv)
 {
-    PODVector<VertexElement> elements = ArrayToPODVector<VertexElement>(elements_conv);
+    PODVector<VertexElement> elements = ArrayToVector<VertexElement>(elements_conv);
     unsigned result = T::GetVertexSize(elements);
     return result;
 }
@@ -13078,7 +13078,7 @@ template <class T> void RegisterMembers_Network(asIScriptEngine* engine, const c
 // void ConvexData::BuildHull(const PODVector<Vector3>& vertices)
 template <class T> void ConvexData_void_BuildHull_constspPODVectorlesVector3greamp_template(T* _ptr, CScriptArray* vertices_conv)
 {
-    PODVector<Vector3> vertices = ArrayToPODVector<Vector3>(vertices_conv);
+    PODVector<Vector3> vertices = ArrayToVector<Vector3>(vertices_conv);
     _ptr->BuildHull(vertices);
 }
 
@@ -15135,8 +15135,8 @@ template <class T> bool Model_bool_SetIndexBuffers_constspVectorlesSharedPtrlesI
 template <class T> bool Model_bool_SetVertexBuffers_constspVectorlesSharedPtrlesVertexBuffergregreamp_constspPODVectorlesunsignedgreamp_constspPODVectorlesunsignedgreamp_template(T* _ptr, CScriptArray* buffers_conv, CScriptArray* morphRangeStarts_conv, CScriptArray* morphRangeCounts_conv)
 {
     Vector<SharedPtr<VertexBuffer>> buffers = HandleArrayToVector<VertexBuffer>(buffers_conv);
-    PODVector<unsigned> morphRangeStarts = ArrayToPODVector<unsigned>(morphRangeStarts_conv);
-    PODVector<unsigned> morphRangeCounts = ArrayToPODVector<unsigned>(morphRangeCounts_conv);
+    PODVector<unsigned> morphRangeStarts = ArrayToVector<unsigned>(morphRangeStarts_conv);
+    PODVector<unsigned> morphRangeCounts = ArrayToVector<unsigned>(morphRangeCounts_conv);
     bool result = _ptr->SetVertexBuffers(buffers, morphRangeStarts, morphRangeCounts);
     return result;
 }
@@ -22295,7 +22295,7 @@ template <class T> CScriptArray* ListView_constspPODVectorlesunsignedgreamp_GetS
 // void ListView::SetSelections(const PODVector<unsigned>& indices)
 template <class T> void ListView_void_SetSelections_constspPODVectorlesunsignedgreamp_template(T* _ptr, CScriptArray* indices_conv)
 {
-    PODVector<unsigned> indices = ArrayToPODVector<unsigned>(indices_conv);
+    PODVector<unsigned> indices = ArrayToVector<unsigned>(indices_conv);
     _ptr->SetSelections(indices);
 }
 
@@ -23889,7 +23889,7 @@ template <class T> CScriptArray* CollisionChain2D_constspPODVectorlesVector2grea
 // void CollisionChain2D::SetVertices(const PODVector<Vector2>& vertices)
 template <class T> void CollisionChain2D_void_SetVertices_constspPODVectorlesVector2greamp_template(T* _ptr, CScriptArray* vertices_conv)
 {
-    PODVector<Vector2> vertices = ArrayToPODVector<Vector2>(vertices_conv);
+    PODVector<Vector2> vertices = ArrayToVector<Vector2>(vertices_conv);
     _ptr->SetVertices(vertices);
 }
 
@@ -24004,7 +24004,7 @@ template <class T> CScriptArray* CollisionPolygon2D_constspPODVectorlesVector2gr
 // void CollisionPolygon2D::SetVertices(const PODVector<Vector2>& vertices)
 template <class T> void CollisionPolygon2D_void_SetVertices_constspPODVectorlesVector2greamp_template(T* _ptr, CScriptArray* vertices_conv)
 {
-    PODVector<Vector2> vertices = ArrayToPODVector<Vector2>(vertices_conv);
+    PODVector<Vector2> vertices = ArrayToVector<Vector2>(vertices_conv);
     _ptr->SetVertices(vertices);
 }
 

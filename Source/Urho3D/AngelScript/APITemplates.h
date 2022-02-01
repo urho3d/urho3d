@@ -77,24 +77,6 @@ template <class T> CScriptArray* VectorToArray(const Vector<T>& vector, const ch
         return nullptr;
 }
 
-/// Template function for PODVector to array conversion.
-template <class T> CScriptArray* VectorToArray(const PODVector<T>& vector, const char* arrayName)
-{
-    Context* context = GetScriptContext();
-    if (context)
-    {
-        asITypeInfo* type = context->GetSubsystem<Script>()->GetObjectType(arrayName);
-        CScriptArray* arr = CScriptArray::Create(type, vector.Size());
-
-        for (unsigned i = 0; i < arr->GetSize(); ++i)
-            *(static_cast<T*>(arr->At(i))) = vector[i];
-
-        return arr;
-    }
-    else
-        return nullptr;
-}
-
 /// Template function for data buffer to array conversion.
 template <class T> CScriptArray* BufferToArray(const T* buffer, unsigned size, const char* arrayName)
 {
@@ -115,30 +97,6 @@ template <class T> CScriptArray* BufferToArray(const T* buffer, unsigned size, c
 
 /// Template function for Vector to handle array conversion.
 template <class T> CScriptArray* VectorToHandleArray(const Vector<T*>& vector, const char* arrayName)
-{
-    Context* context = GetScriptContext();
-    if (context)
-    {
-        asITypeInfo* type = context->GetSubsystem<Script>()->GetObjectType(arrayName);
-        CScriptArray* arr = CScriptArray::Create(type, vector.Size());
-
-        for (unsigned i = 0; i < arr->GetSize(); ++i)
-        {
-            // Increment reference count for storing in the array
-            T* ptr = vector[i];
-            if (ptr)
-                ptr->AddRef();
-            *(static_cast<T**>(arr->At(i))) = ptr;
-        }
-
-        return arr;
-    }
-    else
-        return nullptr;
-}
-
-/// Template function for PODVector to handle array conversion.
-template <class T> CScriptArray* VectorToHandleArray(const PODVector<T*>& vector, const char* arrayName)
 {
     Context* context = GetScriptContext();
     if (context)
@@ -188,18 +146,6 @@ template <class T> CScriptArray* VectorToHandleArray(const Vector<SharedPtr<T> >
 template <class T> Vector<T> ArrayToVector(CScriptArray* arr)
 {
     Vector<T> dest(arr ? arr->GetSize() : 0);
-    if (arr)
-    {
-        for (unsigned i = 0; i < arr->GetSize(); ++i)
-            dest[i] = *static_cast<T*>(arr->At(i));
-    }
-    return dest;
-}
-
-/// Template function for array to PODVector conversion.
-template <class T> PODVector<T> ArrayToPODVector(CScriptArray* arr)
-{
-    PODVector<T> dest(arr ? arr->GetSize() : 0);
     if (arr)
     {
         for (unsigned i = 0; i < arr->GetSize(); ++i)
