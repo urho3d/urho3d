@@ -402,7 +402,7 @@ ConvertedVariable CppVariableToAS(const TypeAnalyzer& type, VariableUsage usage,
             string newCppVarName = name + "_conv";
             result.asDeclaration_ = "Array<" + asSubtypeName + "@>@";
             result.cppDeclaration_ = "CScriptArray* " + newCppVarName;
-            result.glue_ = "    " + cppTypeName + " " + name + " = ArrayToPODVector<" + cppSubtypeName + "*>(" + newCppVarName + ");\n";
+            result.glue_ = "    " + cppTypeName + " " + name + " = ArrayToVector<" + cppSubtypeName + "*>(" + newCppVarName + ");\n";
 
             assert(defaultValue.empty()); // TODO: make
 
@@ -441,7 +441,7 @@ ConvertedVariable CppVariableToAS(const TypeAnalyzer& type, VariableUsage usage,
             string newCppVarName = name + "_conv";
             result.asDeclaration_ = "Array<" + asSubtypeName + ">@+";
             result.cppDeclaration_ = "CScriptArray* " + newCppVarName;
-            result.glue_ = "    " + cppTypeName + " " + name + " = ArrayToPODVector<" + cppSubtypeName + ">(" + newCppVarName + ");\n";
+            result.glue_ = "    " + cppTypeName + " " + name + " = ArrayToVector<" + cppSubtypeName + ">(" + newCppVarName + ");\n";
 
             assert(defaultValue.empty()); // TODO: make
 

@@ -25,7 +25,7 @@ static CScriptArray* constspVectorlesStringgreamp_ParseArguments_constspStringam
 // bool WriteDrawablesToOBJ(const PODVector<Drawable*>& drawables, File* outputFile, bool asZUp, bool asRightHanded, bool writeLightmapUV = false) | File: ../Graphics/Drawable.h
 static bool bool_WriteDrawablesToOBJ_constspPODVectorlesDrawablestargreamp_Filestar_bool_bool_bool(CScriptArray* drawables_conv, File* outputFile, bool asZUp, bool asRightHanded, bool writeLightmapUV)
 {
-    PODVector<Drawable*> drawables = ArrayToPODVector<Drawable*>(drawables_conv);
+    PODVector<Drawable*> drawables = ArrayToVector<Drawable*>(drawables_conv);
     bool result = WriteDrawablesToOBJ(drawables, outputFile, asZUp, asRightHanded, writeLightmapUV);
     return result;
 }
