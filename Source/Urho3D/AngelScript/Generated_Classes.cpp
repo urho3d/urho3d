@@ -5672,9 +5672,6 @@ static void Register_Component(asIScriptEngine* engine)
 
     // virtual void Component::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     engine->RegisterObjectMethod("Component", "void DrawDebugGeometry(DebugRenderer@+, bool)", AS_METHODPR(Component, DrawDebugGeometry, (DebugRenderer*, bool), void), AS_CALL_THISCALL);
-
-    // virtual void Component::OnSetEnabled()
-    engine->RegisterObjectMethod("Component", "void OnSetEnabled()", AS_METHODPR(Component, OnSetEnabled, (), void), AS_CALL_THISCALL);
 }
 
 // explicit Model::Model(Context* context)
@@ -5952,9 +5949,19 @@ static void Register_Drawable(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Drawable", "void Update(const FrameInfo&in)", AS_METHODPR(Drawable, Update, (const FrameInfo&), void), AS_CALL_THISCALL);
 }
 
+// explicit LogicComponent::LogicComponent(Context* context)
+static LogicComponent* LogicComponent__LogicComponent_Contextstar()
+{
+    Context* context = GetScriptContext();
+    return new LogicComponent(context);
+}
+
 // class LogicComponent | File: ../Scene/LogicComponent.h
 static void Register_LogicComponent(asIScriptEngine* engine)
 {
+    // explicit LogicComponent::LogicComponent(Context* context)
+    engine->RegisterObjectBehaviour("LogicComponent", asBEHAVE_FACTORY, "LogicComponent@+ f()", AS_FUNCTION(LogicComponent__LogicComponent_Contextstar) , AS_CALL_CDECL);
+
     RegisterSubclass<Component, LogicComponent>(engine, "Component", "LogicComponent");
     RegisterSubclass<Animatable, LogicComponent>(engine, "Animatable", "LogicComponent");
     RegisterSubclass<Serializable, LogicComponent>(engine, "Serializable", "LogicComponent");

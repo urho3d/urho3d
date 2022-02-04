@@ -50,6 +50,7 @@ class URHO3D_API LogicComponent : public Component
 {
     URHO3D_OBJECT(LogicComponent, Component);
 
+public:
     /// Construct.
     explicit LogicComponent(Context* context);
     /// Destruct.

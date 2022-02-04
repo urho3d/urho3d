@@ -15046,8 +15046,6 @@ template <class T> void RegisterMembers_Component(asIScriptEngine* engine, const
     // Error: type "PODVector<Component*>&" can not automatically bind
     // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest)
     // Error: type "PODVector<Node*>&" can not automatically bind
-    // virtual void Component::OnSetEnabled()
-    // Can not be registered here bacause hidden in derived classes: LogicComponent
 
     // Component* Component::GetComponent(StringHash type) const
     engine->RegisterObjectMethod(className, "Component@+ GetComponent(StringHash) const", AS_METHODPR(T, GetComponent, (StringHash) const, Component*), AS_CALL_THISCALL);
@@ -15074,6 +15072,9 @@ template <class T> void RegisterMembers_Component(asIScriptEngine* engine, const
     // bool Component::IsReplicated() const
     engine->RegisterObjectMethod(className, "bool IsReplicated() const", AS_METHODPR(T, IsReplicated, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_replicated() const", AS_METHODPR(T, IsReplicated, () const, bool), AS_CALL_THISCALL);
+
+    // virtual void Component::OnSetEnabled()
+    engine->RegisterObjectMethod(className, "void OnSetEnabled()", AS_METHODPR(T, OnSetEnabled, (), void), AS_CALL_THISCALL);
 
     // void Component::PrepareNetworkUpdate()
     engine->RegisterObjectMethod(className, "void PrepareNetworkUpdate()", AS_METHODPR(T, PrepareNetworkUpdate, (), void), AS_CALL_THISCALL);
@@ -17036,9 +17037,6 @@ template <class T> void RegisterMembers_AnimationController(asIScriptEngine* eng
     // bool AnimationController::IsPlaying(unsigned char layer) const
     engine->RegisterObjectMethod(className, "bool IsPlaying(uint8) const", AS_METHODPR(T, IsPlaying, (unsigned char) const, bool), AS_CALL_THISCALL);
 
-    // void AnimationController::OnSetEnabled() override
-    engine->RegisterObjectMethod(className, "void OnSetEnabled()", AS_METHODPR(T, OnSetEnabled, (), void), AS_CALL_THISCALL);
-
     // bool AnimationController::Play(const String& name, unsigned char layer, bool looped, float fadeInTime = 0.0f)
     engine->RegisterObjectMethod(className, "bool Play(const String&in, uint8, bool, float = 0.0f)", AS_METHODPR(T, Play, (const String&, unsigned char, bool, float), bool), AS_CALL_THISCALL);
 
@@ -17350,9 +17348,6 @@ template <class T> void RegisterMembers_Camera(asIScriptEngine* engine, const ch
     // bool Camera::IsProjectionValid() const
     engine->RegisterObjectMethod(className, "bool IsProjectionValid() const", AS_METHODPR(T, IsProjectionValid, () const, bool), AS_CALL_THISCALL);
 
-    // virtual void Component::OnSetEnabled()
-    engine->RegisterObjectMethod(className, "void OnSetEnabled()", AS_METHODPR(T, OnSetEnabled, (), void), AS_CALL_THISCALL);
-
     // Vector3 Camera::ScreenToWorldPoint(const Vector3& screenPos) const
     engine->RegisterObjectMethod(className, "Vector3 ScreenToWorldPoint(const Vector3&in) const", AS_METHODPR(T, ScreenToWorldPoint, (const Vector3&) const, Vector3), AS_CALL_THISCALL);
 
@@ -17540,9 +17535,6 @@ template <class T> void RegisterMembers_DebugRenderer(asIScriptEngine* engine, c
     // bool DebugRenderer::IsInside(const BoundingBox& box) const
     engine->RegisterObjectMethod(className, "bool IsInside(const BoundingBox&in) const", AS_METHODPR(T, IsInside, (const BoundingBox&) const, bool), AS_CALL_THISCALL);
 
-    // virtual void Component::OnSetEnabled()
-    engine->RegisterObjectMethod(className, "void OnSetEnabled()", AS_METHODPR(T, OnSetEnabled, (), void), AS_CALL_THISCALL);
-
     // void DebugRenderer::Render()
     engine->RegisterObjectMethod(className, "void Render()", AS_METHODPR(T, Render, (), void), AS_CALL_THISCALL);
 
@@ -17721,9 +17713,6 @@ template <class T> void RegisterMembers_Drawable(asIScriptEngine* engine, const 
     // void Drawable::MarkInView(unsigned frameNumber)
     engine->RegisterObjectMethod(className, "void MarkInView(uint)", AS_METHODPR(T, MarkInView, (unsigned), void), AS_CALL_THISCALL);
 
-    // void Drawable::OnSetEnabled() override
-    engine->RegisterObjectMethod(className, "void OnSetEnabled()", AS_METHODPR(T, OnSetEnabled, (), void), AS_CALL_THISCALL);
-
     // void Drawable::SetBasePass(unsigned batchIndex)
     engine->RegisterObjectMethod(className, "void SetBasePass(uint)", AS_METHODPR(T, SetBasePass, (unsigned), void), AS_CALL_THISCALL);
 
@@ -17796,8 +17785,38 @@ template <class T> void RegisterMembers_LogicComponent(asIScriptEngine* engine, 
 {
     RegisterMembers_Component<T>(engine, className);
 
+    // virtual void LogicComponent::DelayedStart()
+    engine->RegisterObjectMethod(className, "void DelayedStart()", AS_METHODPR(T, DelayedStart, (), void), AS_CALL_THISCALL);
+
     // virtual void Component::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     engine->RegisterObjectMethod(className, "void DrawDebugGeometry(DebugRenderer@+, bool)", AS_METHODPR(T, DrawDebugGeometry, (DebugRenderer*, bool), void), AS_CALL_THISCALL);
+
+    // virtual void LogicComponent::FixedPostUpdate(float timeStep)
+    engine->RegisterObjectMethod(className, "void FixedPostUpdate(float)", AS_METHODPR(T, FixedPostUpdate, (float), void), AS_CALL_THISCALL);
+
+    // virtual void LogicComponent::FixedUpdate(float timeStep)
+    engine->RegisterObjectMethod(className, "void FixedUpdate(float)", AS_METHODPR(T, FixedUpdate, (float), void), AS_CALL_THISCALL);
+
+    // UpdateEventFlags LogicComponent::GetUpdateEventMask() const
+    engine->RegisterObjectMethod(className, "UpdateEventFlags GetUpdateEventMask() const", AS_METHODPR(T, GetUpdateEventMask, () const, UpdateEventFlags), AS_CALL_THISCALL);
+
+    // bool LogicComponent::IsDelayedStartCalled() const
+    engine->RegisterObjectMethod(className, "bool IsDelayedStartCalled() const", AS_METHODPR(T, IsDelayedStartCalled, () const, bool), AS_CALL_THISCALL);
+
+    // virtual void LogicComponent::PostUpdate(float timeStep)
+    engine->RegisterObjectMethod(className, "void PostUpdate(float)", AS_METHODPR(T, PostUpdate, (float), void), AS_CALL_THISCALL);
+
+    // void LogicComponent::SetUpdateEventMask(UpdateEventFlags mask)
+    engine->RegisterObjectMethod(className, "void SetUpdateEventMask(UpdateEventFlags)", AS_METHODPR(T, SetUpdateEventMask, (UpdateEventFlags), void), AS_CALL_THISCALL);
+
+    // virtual void LogicComponent::Start()
+    engine->RegisterObjectMethod(className, "void Start()", AS_METHODPR(T, Start, (), void), AS_CALL_THISCALL);
+
+    // virtual void LogicComponent::Stop()
+    engine->RegisterObjectMethod(className, "void Stop()", AS_METHODPR(T, Stop, (), void), AS_CALL_THISCALL);
+
+    // virtual void LogicComponent::Update(float timeStep)
+    engine->RegisterObjectMethod(className, "void Update(float)", AS_METHODPR(T, Update, (float), void), AS_CALL_THISCALL);
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_LogicComponent
         REGISTER_MEMBERS_MANUAL_PART_LogicComponent();
@@ -17832,9 +17851,6 @@ template <class T> void RegisterMembers_Octree(asIScriptEngine* engine, const ch
     // unsigned Octree::GetNumLevels() const
     engine->RegisterObjectMethod(className, "uint GetNumLevels() const", AS_METHODPR(T, GetNumLevels, () const, unsigned), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_numLevels() const", AS_METHODPR(T, GetNumLevels, () const, unsigned), AS_CALL_THISCALL);
-
-    // virtual void Component::OnSetEnabled()
-    engine->RegisterObjectMethod(className, "void OnSetEnabled()", AS_METHODPR(T, OnSetEnabled, (), void), AS_CALL_THISCALL);
 
     // void Octree::QueueUpdate(Drawable* drawable)
     engine->RegisterObjectMethod(className, "void QueueUpdate(Drawable@+)", AS_METHODPR(T, QueueUpdate, (Drawable*), void), AS_CALL_THISCALL);
@@ -18220,9 +18236,6 @@ template <class T> void RegisterMembers_SmoothedTransform(asIScriptEngine* engin
     engine->RegisterObjectMethod(className, "bool IsInProgress() const", AS_METHODPR(T, IsInProgress, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_inProgress() const", AS_METHODPR(T, IsInProgress, () const, bool), AS_CALL_THISCALL);
 
-    // virtual void Component::OnSetEnabled()
-    engine->RegisterObjectMethod(className, "void OnSetEnabled()", AS_METHODPR(T, OnSetEnabled, (), void), AS_CALL_THISCALL);
-
     // void SmoothedTransform::SetTargetPosition(const Vector3& position)
     engine->RegisterObjectMethod(className, "void SetTargetPosition(const Vector3&in)", AS_METHODPR(T, SetTargetPosition, (const Vector3&), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_targetPosition(const Vector3&in)", AS_METHODPR(T, SetTargetPosition, (const Vector3&), void), AS_CALL_THISCALL);
@@ -18254,9 +18267,6 @@ template <class T> void RegisterMembers_SoundListener(asIScriptEngine* engine, c
 
     // virtual void Component::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     engine->RegisterObjectMethod(className, "void DrawDebugGeometry(DebugRenderer@+, bool)", AS_METHODPR(T, DrawDebugGeometry, (DebugRenderer*, bool), void), AS_CALL_THISCALL);
-
-    // virtual void Component::OnSetEnabled()
-    engine->RegisterObjectMethod(className, "void OnSetEnabled()", AS_METHODPR(T, OnSetEnabled, (), void), AS_CALL_THISCALL);
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_SoundListener
         REGISTER_MEMBERS_MANUAL_PART_SoundListener();
@@ -18319,9 +18329,6 @@ template <class T> void RegisterMembers_SoundSource(asIScriptEngine* engine, con
     // bool SoundSource::IsPlaying() const
     engine->RegisterObjectMethod(className, "bool IsPlaying() const", AS_METHODPR(T, IsPlaying, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_playing() const", AS_METHODPR(T, IsPlaying, () const, bool), AS_CALL_THISCALL);
-
-    // virtual void Component::OnSetEnabled()
-    engine->RegisterObjectMethod(className, "void OnSetEnabled()", AS_METHODPR(T, OnSetEnabled, (), void), AS_CALL_THISCALL);
 
     // void SoundSource::Play(Sound* sound)
     engine->RegisterObjectMethod(className, "void Play(Sound@+)", AS_METHODPR(T, Play, (Sound*), void), AS_CALL_THISCALL);
@@ -18437,9 +18444,6 @@ template <class T> void RegisterMembers_SplinePath(asIScriptEngine* engine, cons
 
     // void SplinePath::Move(float timeStep)
     engine->RegisterObjectMethod(className, "void Move(float)", AS_METHODPR(T, Move, (float), void), AS_CALL_THISCALL);
-
-    // virtual void Component::OnSetEnabled()
-    engine->RegisterObjectMethod(className, "void OnSetEnabled()", AS_METHODPR(T, OnSetEnabled, (), void), AS_CALL_THISCALL);
 
     // void SplinePath::RemoveControlPoint(Node* point)
     engine->RegisterObjectMethod(className, "void RemoveControlPoint(Node@+)", AS_METHODPR(T, RemoveControlPoint, (Node*), void), AS_CALL_THISCALL);
@@ -18704,9 +18708,6 @@ template <class T> void RegisterMembers_Terrain(asIScriptEngine* engine, const c
 
     // bool Terrain::IsVisible() const
     engine->RegisterObjectMethod(className, "bool IsVisible() const", AS_METHODPR(T, IsVisible, () const, bool), AS_CALL_THISCALL);
-
-    // void Terrain::OnSetEnabled() override
-    engine->RegisterObjectMethod(className, "void OnSetEnabled()", AS_METHODPR(T, OnSetEnabled, (), void), AS_CALL_THISCALL);
 
     // void Terrain::SetCastShadows(bool enable)
     engine->RegisterObjectMethod(className, "void SetCastShadows(bool)", AS_METHODPR(T, SetCastShadows, (bool), void), AS_CALL_THISCALL);
@@ -19029,9 +19030,6 @@ template <class T> void RegisterMembers_UIComponent(asIScriptEngine* engine, con
     engine->RegisterObjectMethod(className, "Texture2D@+ GetTexture() const", AS_METHODPR(T, GetTexture, () const, Texture2D*), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "Texture2D@+ get_texture() const", AS_METHODPR(T, GetTexture, () const, Texture2D*), AS_CALL_THISCALL);
 
-    // virtual void Component::OnSetEnabled()
-    engine->RegisterObjectMethod(className, "void OnSetEnabled()", AS_METHODPR(T, OnSetEnabled, (), void), AS_CALL_THISCALL);
-
     // void UIComponent::SetViewportIndex(unsigned index)
     engine->RegisterObjectMethod(className, "void SetViewportIndex(uint)", AS_METHODPR(T, SetViewportIndex, (unsigned), void), AS_CALL_THISCALL);
 
@@ -19105,9 +19103,6 @@ template <class T> void RegisterMembers_UnknownComponent(asIScriptEngine* engine
     // const Vector<String>& UnknownComponent::GetXMLAttributes() const
     engine->RegisterObjectMethod(className, "Array<String>@ GetXMLAttributes() const", AS_FUNCTION_OBJFIRST(UnknownComponent_constspVectorlesStringgreamp_GetXMLAttributes_void_template<UnknownComponent>), AS_CALL_CDECL_OBJFIRST);
 
-    // virtual void Component::OnSetEnabled()
-    engine->RegisterObjectMethod(className, "void OnSetEnabled()", AS_METHODPR(T, OnSetEnabled, (), void), AS_CALL_THISCALL);
-
     // void UnknownComponent::SetType(StringHash typeHash)
     engine->RegisterObjectMethod(className, "void SetType(StringHash)", AS_METHODPR(T, SetType, (StringHash), void), AS_CALL_THISCALL);
 
@@ -19142,9 +19137,6 @@ template <class T> void RegisterMembers_IKConstraint(asIScriptEngine* engine, co
 
     // float IKConstraint::GetStretchiness() const
     engine->RegisterObjectMethod(className, "float GetStretchiness() const", AS_METHODPR(T, GetStretchiness, () const, float), AS_CALL_THISCALL);
-
-    // virtual void Component::OnSetEnabled()
-    engine->RegisterObjectMethod(className, "void OnSetEnabled()", AS_METHODPR(T, OnSetEnabled, (), void), AS_CALL_THISCALL);
 
     // void IKConstraint::SetLengthConstraints(const Vector2& lengthConstraints)
     engine->RegisterObjectMethod(className, "void SetLengthConstraints(const Vector2&in)", AS_METHODPR(T, SetLengthConstraints, (const Vector2&), void), AS_CALL_THISCALL);
@@ -19216,9 +19208,6 @@ template <class T> void RegisterMembers_IKEffector(asIScriptEngine* engine, cons
 
     // bool IKEffector::GetWEIGHT_NLERP() const
     engine->RegisterObjectMethod(className, "bool GetWEIGHT_NLERP() const", AS_METHODPR(T, GetWEIGHT_NLERP, () const, bool), AS_CALL_THISCALL);
-
-    // virtual void Component::OnSetEnabled()
-    engine->RegisterObjectMethod(className, "void OnSetEnabled()", AS_METHODPR(T, OnSetEnabled, (), void), AS_CALL_THISCALL);
 
     // void IKEffector::SetChainLength(unsigned chainLength)
     engine->RegisterObjectMethod(className, "void SetChainLength(uint)", AS_METHODPR(T, SetChainLength, (unsigned), void), AS_CALL_THISCALL);
@@ -19339,9 +19328,6 @@ template <class T> void RegisterMembers_IKSolver(asIScriptEngine* engine, const 
     // bool IKSolver::GetUSE_ORIGINAL_POSE() const
     engine->RegisterObjectMethod(className, "bool GetUSE_ORIGINAL_POSE() const", AS_METHODPR(T, GetUSE_ORIGINAL_POSE, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_USE_ORIGINAL_POSE() const", AS_METHODPR(T, GetUSE_ORIGINAL_POSE, () const, bool), AS_CALL_THISCALL);
-
-    // virtual void Component::OnSetEnabled()
-    engine->RegisterObjectMethod(className, "void OnSetEnabled()", AS_METHODPR(T, OnSetEnabled, (), void), AS_CALL_THISCALL);
 
     // void IKSolver::RebuildChainTrees()
     engine->RegisterObjectMethod(className, "void RebuildChainTrees()", AS_METHODPR(T, RebuildChainTrees, (), void), AS_CALL_THISCALL);
@@ -19491,9 +19477,6 @@ template <class T> void RegisterMembers_CrowdAgent(asIScriptEngine* engine, cons
     engine->RegisterObjectMethod(className, "bool IsInCrowd() const", AS_METHODPR(T, IsInCrowd, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_inCrowd() const", AS_METHODPR(T, IsInCrowd, () const, bool), AS_CALL_THISCALL);
 
-    // void CrowdAgent::OnSetEnabled() override
-    engine->RegisterObjectMethod(className, "void OnSetEnabled()", AS_METHODPR(T, OnSetEnabled, (), void), AS_CALL_THISCALL);
-
     // void CrowdAgent::ResetTarget()
     engine->RegisterObjectMethod(className, "void ResetTarget()", AS_METHODPR(T, ResetTarget, (), void), AS_CALL_THISCALL);
 
@@ -19627,9 +19610,6 @@ template <class T> void RegisterMembers_CrowdManager(asIScriptEngine* engine, co
     // Vector3 CrowdManager::MoveAlongSurface(const Vector3& start, const Vector3& end, int queryFilterType, int maxVisited = 3)
     engine->RegisterObjectMethod(className, "Vector3 MoveAlongSurface(const Vector3&in, const Vector3&in, int, int = 3)", AS_METHODPR(T, MoveAlongSurface, (const Vector3&, const Vector3&, int, int), Vector3), AS_CALL_THISCALL);
 
-    // virtual void Component::OnSetEnabled()
-    engine->RegisterObjectMethod(className, "void OnSetEnabled()", AS_METHODPR(T, OnSetEnabled, (), void), AS_CALL_THISCALL);
-
     // void CrowdManager::ResetCrowdTarget(Node* node = nullptr)
     engine->RegisterObjectMethod(className, "void ResetCrowdTarget(Node@+ = null)", AS_METHODPR(T, ResetCrowdTarget, (Node*), void), AS_CALL_THISCALL);
 
@@ -19688,9 +19668,6 @@ template <class T> void RegisterMembers_NavArea(asIScriptEngine* engine, const c
     engine->RegisterObjectMethod(className, "BoundingBox GetWorldBoundingBox() const", AS_METHODPR(T, GetWorldBoundingBox, () const, BoundingBox), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "BoundingBox get_worldBoundingBox() const", AS_METHODPR(T, GetWorldBoundingBox, () const, BoundingBox), AS_CALL_THISCALL);
 
-    // virtual void Component::OnSetEnabled()
-    engine->RegisterObjectMethod(className, "void OnSetEnabled()", AS_METHODPR(T, OnSetEnabled, (), void), AS_CALL_THISCALL);
-
     // void NavArea::SetAreaID(unsigned newID)
     engine->RegisterObjectMethod(className, "void SetAreaID(uint)", AS_METHODPR(T, SetAreaID, (unsigned), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_areaID(uint)", AS_METHODPR(T, SetAreaID, (unsigned), void), AS_CALL_THISCALL);
@@ -19715,9 +19692,6 @@ template <class T> void RegisterMembers_Navigable(asIScriptEngine* engine, const
     // bool Navigable::IsRecursive() const
     engine->RegisterObjectMethod(className, "bool IsRecursive() const", AS_METHODPR(T, IsRecursive, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_recursive() const", AS_METHODPR(T, IsRecursive, () const, bool), AS_CALL_THISCALL);
-
-    // virtual void Component::OnSetEnabled()
-    engine->RegisterObjectMethod(className, "void OnSetEnabled()", AS_METHODPR(T, OnSetEnabled, (), void), AS_CALL_THISCALL);
 
     // void Navigable::SetRecursive(bool enable)
     engine->RegisterObjectMethod(className, "void SetRecursive(bool)", AS_METHODPR(T, SetRecursive, (bool), void), AS_CALL_THISCALL);
@@ -19875,9 +19849,6 @@ template <class T> void RegisterMembers_NavigationMesh(asIScriptEngine* engine, 
     engine->RegisterObjectMethod(className, "bool IsInitialized() const", AS_METHODPR(T, IsInitialized, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_initialized() const", AS_METHODPR(T, IsInitialized, () const, bool), AS_CALL_THISCALL);
 
-    // virtual void Component::OnSetEnabled()
-    engine->RegisterObjectMethod(className, "void OnSetEnabled()", AS_METHODPR(T, OnSetEnabled, (), void), AS_CALL_THISCALL);
-
     // virtual void NavigationMesh::RemoveAllTiles()
     engine->RegisterObjectMethod(className, "void RemoveAllTiles()", AS_METHODPR(T, RemoveAllTiles, (), void), AS_CALL_THISCALL);
 
@@ -19986,9 +19957,6 @@ template <class T> void RegisterMembers_Obstacle(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "float GetRadius() const", AS_METHODPR(T, GetRadius, () const, float), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_radius() const", AS_METHODPR(T, GetRadius, () const, float), AS_CALL_THISCALL);
 
-    // void Obstacle::OnSetEnabled() override
-    engine->RegisterObjectMethod(className, "void OnSetEnabled()", AS_METHODPR(T, OnSetEnabled, (), void), AS_CALL_THISCALL);
-
     // void Obstacle::SetHeight(float newHeight)
     engine->RegisterObjectMethod(className, "void SetHeight(float)", AS_METHODPR(T, SetHeight, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_height(float)", AS_METHODPR(T, SetHeight, (float), void), AS_CALL_THISCALL);
@@ -20029,9 +19997,6 @@ template <class T> void RegisterMembers_OffMeshConnection(asIScriptEngine* engin
     // bool OffMeshConnection::IsBidirectional() const
     engine->RegisterObjectMethod(className, "bool IsBidirectional() const", AS_METHODPR(T, IsBidirectional, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_bidirectional() const", AS_METHODPR(T, IsBidirectional, () const, bool), AS_CALL_THISCALL);
-
-    // virtual void Component::OnSetEnabled()
-    engine->RegisterObjectMethod(className, "void OnSetEnabled()", AS_METHODPR(T, OnSetEnabled, (), void), AS_CALL_THISCALL);
 
     // void OffMeshConnection::SetAreaID(unsigned newAreaID)
     engine->RegisterObjectMethod(className, "void SetAreaID(uint)", AS_METHODPR(T, SetAreaID, (unsigned), void), AS_CALL_THISCALL);
@@ -20088,9 +20053,6 @@ template <class T> void RegisterMembers_NetworkPriority(asIScriptEngine* engine,
     // float NetworkPriority::GetMinPriority() const
     engine->RegisterObjectMethod(className, "float GetMinPriority() const", AS_METHODPR(T, GetMinPriority, () const, float), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_minPriority() const", AS_METHODPR(T, GetMinPriority, () const, float), AS_CALL_THISCALL);
-
-    // virtual void Component::OnSetEnabled()
-    engine->RegisterObjectMethod(className, "void OnSetEnabled()", AS_METHODPR(T, OnSetEnabled, (), void), AS_CALL_THISCALL);
 
     // void NetworkPriority::SetAlwaysUpdateOwner(bool enable)
     engine->RegisterObjectMethod(className, "void SetAlwaysUpdateOwner(bool)", AS_METHODPR(T, SetAlwaysUpdateOwner, (bool), void), AS_CALL_THISCALL);
@@ -20171,9 +20133,6 @@ template <class T> void RegisterMembers_CollisionShape(asIScriptEngine* engine, 
 
     // void CollisionShape::NotifyRigidBody(bool updateMass = true)
     engine->RegisterObjectMethod(className, "void NotifyRigidBody(bool = true)", AS_METHODPR(T, NotifyRigidBody, (bool), void), AS_CALL_THISCALL);
-
-    // void CollisionShape::OnSetEnabled() override
-    engine->RegisterObjectMethod(className, "void OnSetEnabled()", AS_METHODPR(T, OnSetEnabled, (), void), AS_CALL_THISCALL);
 
     // void CollisionShape::ReleaseShape()
     engine->RegisterObjectMethod(className, "void ReleaseShape()", AS_METHODPR(T, ReleaseShape, (), void), AS_CALL_THISCALL);
@@ -20324,9 +20283,6 @@ template <class T> void RegisterMembers_Constraint(asIScriptEngine* engine, cons
     // Vector3 Constraint::GetWorldPosition() const
     engine->RegisterObjectMethod(className, "Vector3 GetWorldPosition() const", AS_METHODPR(T, GetWorldPosition, () const, Vector3), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "Vector3 get_worldPosition() const", AS_METHODPR(T, GetWorldPosition, () const, Vector3), AS_CALL_THISCALL);
-
-    // void Constraint::OnSetEnabled() override
-    engine->RegisterObjectMethod(className, "void OnSetEnabled()", AS_METHODPR(T, OnSetEnabled, (), void), AS_CALL_THISCALL);
 
     // void Constraint::ReleaseConstraint()
     engine->RegisterObjectMethod(className, "void ReleaseConstraint()", AS_METHODPR(T, ReleaseConstraint, (), void), AS_CALL_THISCALL);
@@ -20495,9 +20451,6 @@ template <class T> void RegisterMembers_PhysicsWorld(asIScriptEngine* engine, co
     // bool PhysicsWorld::IsUpdateEnabled() const
     engine->RegisterObjectMethod(className, "bool IsUpdateEnabled() const", AS_METHODPR(T, IsUpdateEnabled, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_updateEnabled() const", AS_METHODPR(T, IsUpdateEnabled, () const, bool), AS_CALL_THISCALL);
-
-    // virtual void Component::OnSetEnabled()
-    engine->RegisterObjectMethod(className, "void OnSetEnabled()", AS_METHODPR(T, OnSetEnabled, (), void), AS_CALL_THISCALL);
 
     // void PhysicsWorld::RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
     engine->RegisterObjectMethod(className, "void RaycastSingle(PhysicsRaycastResult&, const Ray&in, float, uint = M_MAX_UNSIGNED)", AS_METHODPR(T, RaycastSingle, (PhysicsRaycastResult&, const Ray&, float, unsigned), void), AS_CALL_THISCALL);
@@ -20751,9 +20704,6 @@ template <class T> void RegisterMembers_RigidBody(asIScriptEngine* engine, const
     engine->RegisterObjectMethod(className, "bool IsTrigger() const", AS_METHODPR(T, IsTrigger, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_trigger() const", AS_METHODPR(T, IsTrigger, () const, bool), AS_CALL_THISCALL);
 
-    // void RigidBody::OnSetEnabled() override
-    engine->RegisterObjectMethod(className, "void OnSetEnabled()", AS_METHODPR(T, OnSetEnabled, (), void), AS_CALL_THISCALL);
-
     // void RigidBody::ReAddBodyToWorld()
     engine->RegisterObjectMethod(className, "void ReAddBodyToWorld()", AS_METHODPR(T, ReAddBodyToWorld, (), void), AS_CALL_THISCALL);
 
@@ -20941,9 +20891,6 @@ template <class T> void RegisterMembers_CollisionShape2D(asIScriptEngine* engine
     engine->RegisterObjectMethod(className, "bool IsTrigger() const", AS_METHODPR(T, IsTrigger, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_trigger() const", AS_METHODPR(T, IsTrigger, () const, bool), AS_CALL_THISCALL);
 
-    // void CollisionShape2D::OnSetEnabled() override
-    engine->RegisterObjectMethod(className, "void OnSetEnabled()", AS_METHODPR(T, OnSetEnabled, (), void), AS_CALL_THISCALL);
-
     // void CollisionShape2D::ReleaseFixture()
     engine->RegisterObjectMethod(className, "void ReleaseFixture()", AS_METHODPR(T, ReleaseFixture, (), void), AS_CALL_THISCALL);
 
@@ -21008,9 +20955,6 @@ template <class T> void RegisterMembers_Constraint2D(asIScriptEngine* engine, co
     // RigidBody2D* Constraint2D::GetOwnerBody() const
     engine->RegisterObjectMethod(className, "RigidBody2D@+ GetOwnerBody() const", AS_METHODPR(T, GetOwnerBody, () const, RigidBody2D*), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "RigidBody2D@+ get_ownerBody() const", AS_METHODPR(T, GetOwnerBody, () const, RigidBody2D*), AS_CALL_THISCALL);
-
-    // void Constraint2D::OnSetEnabled() override
-    engine->RegisterObjectMethod(className, "void OnSetEnabled()", AS_METHODPR(T, OnSetEnabled, (), void), AS_CALL_THISCALL);
 
     // void Constraint2D::ReleaseJoint()
     engine->RegisterObjectMethod(className, "void ReleaseJoint()", AS_METHODPR(T, ReleaseJoint, (), void), AS_CALL_THISCALL);
@@ -21139,9 +21083,6 @@ template <class T> void RegisterMembers_PhysicsWorld2D(asIScriptEngine* engine, 
     // bool PhysicsWorld2D::IsUpdateEnabled() const
     engine->RegisterObjectMethod(className, "bool IsUpdateEnabled() const", AS_METHODPR(T, IsUpdateEnabled, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_updateEnabled() const", AS_METHODPR(T, IsUpdateEnabled, () const, bool), AS_CALL_THISCALL);
-
-    // virtual void Component::OnSetEnabled()
-    engine->RegisterObjectMethod(className, "void OnSetEnabled()", AS_METHODPR(T, OnSetEnabled, (), void), AS_CALL_THISCALL);
 
     // void PhysicsWorld2D::RaycastSingle(PhysicsRaycastResult2D& result, const Vector2& startPoint, const Vector2& endPoint, unsigned collisionMask = M_MAX_UNSIGNED)
     engine->RegisterObjectMethod(className, "void RaycastSingle(PhysicsRaycastResult2D&, const Vector2&in, const Vector2&in, uint = M_MAX_UNSIGNED)", AS_METHODPR(T, RaycastSingle, (PhysicsRaycastResult2D&, const Vector2&, const Vector2&, unsigned), void), AS_CALL_THISCALL);
@@ -21315,9 +21256,6 @@ template <class T> void RegisterMembers_RigidBody2D(asIScriptEngine* engine, con
     engine->RegisterObjectMethod(className, "bool IsFixedRotation() const", AS_METHODPR(T, IsFixedRotation, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_fixedRotation() const", AS_METHODPR(T, IsFixedRotation, () const, bool), AS_CALL_THISCALL);
 
-    // void RigidBody2D::OnSetEnabled() override
-    engine->RegisterObjectMethod(className, "void OnSetEnabled()", AS_METHODPR(T, OnSetEnabled, (), void), AS_CALL_THISCALL);
-
     // void RigidBody2D::ReleaseBody()
     engine->RegisterObjectMethod(className, "void ReleaseBody()", AS_METHODPR(T, ReleaseBody, (), void), AS_CALL_THISCALL);
 
@@ -21430,9 +21368,6 @@ template <class T> void RegisterMembers_TileMap2D(asIScriptEngine* engine, const
     // ResourceRef TileMap2D::GetTmxFileAttr() const
     engine->RegisterObjectMethod(className, "ResourceRef GetTmxFileAttr() const", AS_METHODPR(T, GetTmxFileAttr, () const, ResourceRef), AS_CALL_THISCALL);
 
-    // virtual void Component::OnSetEnabled()
-    engine->RegisterObjectMethod(className, "void OnSetEnabled()", AS_METHODPR(T, OnSetEnabled, (), void), AS_CALL_THISCALL);
-
     // bool TileMap2D::PositionToTileIndex(int& x, int& y, const Vector2& position) const
     engine->RegisterObjectMethod(className, "bool PositionToTileIndex(int&, int&, const Vector2&in) const", AS_METHODPR(T, PositionToTileIndex, (int&, int&, const Vector2&) const, bool), AS_CALL_THISCALL);
 
@@ -21513,9 +21448,6 @@ template <class T> void RegisterMembers_TileMapLayer2D(asIScriptEngine* engine, 
     // bool TileMapLayer2D::IsVisible() const
     engine->RegisterObjectMethod(className, "bool IsVisible() const", AS_METHODPR(T, IsVisible, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_visible() const", AS_METHODPR(T, IsVisible, () const, bool), AS_CALL_THISCALL);
-
-    // virtual void Component::OnSetEnabled()
-    engine->RegisterObjectMethod(className, "void OnSetEnabled()", AS_METHODPR(T, OnSetEnabled, (), void), AS_CALL_THISCALL);
 
     // void TileMapLayer2D::SetDrawOrder(int drawOrder)
     engine->RegisterObjectMethod(className, "void SetDrawOrder(int)", AS_METHODPR(T, SetDrawOrder, (int), void), AS_CALL_THISCALL);
@@ -23637,12 +23569,6 @@ template <class T> void RegisterMembers_RaycastVehicle(asIScriptEngine* engine, 
     // void RaycastVehicle::AddWheel(Node* wheelNode, Vector3 wheelDirection, Vector3 wheelAxle, float restLength, float wheelRadius, bool frontWheel)
     engine->RegisterObjectMethod(className, "void AddWheel(Node@+, Vector3, Vector3, float, float, bool)", AS_METHODPR(T, AddWheel, (Node*, Vector3, Vector3, float, float, bool), void), AS_CALL_THISCALL);
 
-    // void RaycastVehicle::FixedPostUpdate(float timeStep) override
-    engine->RegisterObjectMethod(className, "void FixedPostUpdate(float)", AS_METHODPR(T, FixedPostUpdate, (float), void), AS_CALL_THISCALL);
-
-    // void RaycastVehicle::FixedUpdate(float timeStep) override
-    engine->RegisterObjectMethod(className, "void FixedUpdate(float)", AS_METHODPR(T, FixedUpdate, (float), void), AS_CALL_THISCALL);
-
     // float RaycastVehicle::GetBrake(int wheel) const
     engine->RegisterObjectMethod(className, "float GetBrake(int) const", AS_METHODPR(T, GetBrake, (int) const, float), AS_CALL_THISCALL);
 
@@ -23733,12 +23659,6 @@ template <class T> void RegisterMembers_RaycastVehicle(asIScriptEngine* engine, 
 
     // bool RaycastVehicle::IsFrontWheel(int wheel) const
     engine->RegisterObjectMethod(className, "bool IsFrontWheel(int) const", AS_METHODPR(T, IsFrontWheel, (int) const, bool), AS_CALL_THISCALL);
-
-    // void RaycastVehicle::OnSetEnabled() override
-    engine->RegisterObjectMethod(className, "void OnSetEnabled()", AS_METHODPR(T, OnSetEnabled, (), void), AS_CALL_THISCALL);
-
-    // void RaycastVehicle::PostUpdate(float timeStep) override
-    engine->RegisterObjectMethod(className, "void PostUpdate(float)", AS_METHODPR(T, PostUpdate, (float), void), AS_CALL_THISCALL);
 
     // void RaycastVehicle::ResetSuspension()
     engine->RegisterObjectMethod(className, "void ResetSuspension()", AS_METHODPR(T, ResetSuspension, (), void), AS_CALL_THISCALL);
