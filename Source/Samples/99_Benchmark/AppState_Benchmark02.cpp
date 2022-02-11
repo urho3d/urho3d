@@ -130,9 +130,6 @@ void AppState_Benchmark02::HandleSceneUpdate(StringHash eventType, VariantMap& e
     if (GetSubsystem<Input>()->GetKeyDown(KEY_ESCAPE))
         GetSubsystem<AppStateManager>()->SetRequiredAppStateId(APPSTATEID_MAINSCREEN);
 
-    if (fpsCounter_.GetTotalTime() >= 40.f)
-        GetSubsystem<AppStateManager>()->SetRequiredAppStateId(APPSTATEID_RESULTSCREEN);
-
     Node* cameraPath = scene_->GetChild("CameraPath");
     SplinePath* cameraSplinePath = cameraPath->GetComponent<SplinePath>();
     cameraSplinePath->Move(timeStep);
@@ -144,4 +141,7 @@ void AppState_Benchmark02::HandleSceneUpdate(StringHash eventType, VariantMap& e
     Node* cameraTargetNode = scene_->GetChild("CameraTarget");
     Node* cameraNode = scene_->GetChild("Camera");
     cameraNode->LookAt(cameraTargetNode->GetPosition());
+
+    if (cameraSplinePath->IsFinished())
+        GetSubsystem<AppStateManager>()->SetRequiredAppStateId(APPSTATEID_RESULTSCREEN);
 }
