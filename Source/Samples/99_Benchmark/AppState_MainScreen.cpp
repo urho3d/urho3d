@@ -100,6 +100,7 @@ void AppState_MainScreen::OnEnter()
     SetupViewport();
     GetSubsystem<Input>()->SetMouseVisible(true);
     SubscribeToEvent(scene_, E_SCENEUPDATE, URHO3D_HANDLER(AppState_MainScreen, HandleSceneUpdate));
+    fpsCounter_.Clear();
 }
 
 void AppState_MainScreen::OnLeave()
