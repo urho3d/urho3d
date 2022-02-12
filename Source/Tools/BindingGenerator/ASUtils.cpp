@@ -42,28 +42,28 @@ string CppPrimitiveTypeToAS(const string& cppType)
     if (cppType == "bool")
         return "bool";
 
-    if (cppType == "char" || cppType == "signed char")
+    if (cppType == "char" || cppType == "signed char" || cppType == "i8")
         return "int8";
 
-    if (cppType == "unsigned char")
+    if (cppType == "unsigned char" || cppType == "u8")
         return "uint8";
 
-    if (cppType == "short")
+    if (cppType == "short" || cppType == "i16")
         return "int16";
 
-    if (cppType == "unsigned short")
+    if (cppType == "unsigned short" || cppType == "u16")
         return "uint16";
 
-    if (cppType == "int")
+    if (cppType == "int" || cppType == "i32")
         return "int";
 
-    if (cppType == "unsigned" || cppType == "unsigned int")
+    if (cppType == "unsigned" || cppType == "unsigned int" || cppType == "u32")
         return "uint";
 
-    if (cppType == "long long")
+    if (cppType == "long long" || cppType == "i64")
         return "int64";
 
-    if (cppType == "unsigned long long")
+    if (cppType == "unsigned long long" || cppType == "u64")
         return "uint64";
 
     if (cppType == "float")
@@ -165,16 +165,24 @@ bool IsKnownCppType(const string& name)
         "size_t",
         "char",
         "signed char",
+        "i8",
         "unsigned char",
+        "u8",
         "short",
+        "i16",
         "unsigned short",
+        "u16",
         "int",
-        "long",
+        "i32",
+        "long", // Size is compiler-dependent
         "unsigned",
         "unsigned int",
-        "unsigned long",
+        "u32",
+        "unsigned long", // Size is compiler-dependent
         "long long",
+        "i64",
         "unsigned long long",
+        "u64",
         "float",
         "double",
         "SDL_JoystickID",

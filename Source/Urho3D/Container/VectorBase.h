@@ -29,6 +29,7 @@
 #endif
 
 #include "../Base/Iter.h"
+#include "../Base/PrimitiveTypes.h"
 #include "../Container/Swap.h"
 
 namespace Urho3D
@@ -61,11 +62,11 @@ protected:
     static unsigned char* AllocateBuffer(unsigned size);
 
     /// Size of vector.
-    unsigned size_;
+    u32 size_;
     /// Buffer capacity.
-    unsigned capacity_;
+    u32 capacity_;
     /// Buffer.
-    unsigned char* buffer_;
+    u8* buffer_;
 };
 
 }

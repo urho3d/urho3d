@@ -8961,7 +8961,7 @@ template <class T> void RegisterMembers_Audio(asIScriptEngine* engine, const cha
 {
     RegisterMembers_Object<T>(engine, className);
 
-    // void Audio::MixOutput(void* dest, unsigned samples)
+    // void Audio::MixOutput(void* dest, u32 samples)
     // Error: type "void*" can not automatically bind
 
     // void Audio::AddSoundSource(SoundSource* soundSource)
@@ -8979,16 +8979,16 @@ template <class T> void RegisterMembers_Audio(asIScriptEngine* engine, const cha
     engine->RegisterObjectMethod(className, "float GetMasterGain(const String&in) const", AS_METHODPR(T, GetMasterGain, (const String&) const, float), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_masterGain(const String&in) const", AS_METHODPR(T, GetMasterGain, (const String&) const, float), AS_CALL_THISCALL);
 
-    // int Audio::GetMixRate() const
-    engine->RegisterObjectMethod(className, "int GetMixRate() const", AS_METHODPR(T, GetMixRate, () const, int), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "int get_mixRate() const", AS_METHODPR(T, GetMixRate, () const, int), AS_CALL_THISCALL);
+    // i32 Audio::GetMixRate() const
+    engine->RegisterObjectMethod(className, "int GetMixRate() const", AS_METHODPR(T, GetMixRate, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_mixRate() const", AS_METHODPR(T, GetMixRate, () const, i32), AS_CALL_THISCALL);
 
     // Mutex& Audio::GetMutex()
     engine->RegisterObjectMethod(className, "Mutex& GetMutex()", AS_METHODPR(T, GetMutex, (), Mutex&), AS_CALL_THISCALL);
 
-    // unsigned Audio::GetSampleSize() const
-    engine->RegisterObjectMethod(className, "uint GetSampleSize() const", AS_METHODPR(T, GetSampleSize, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_sampleSize() const", AS_METHODPR(T, GetSampleSize, () const, unsigned), AS_CALL_THISCALL);
+    // u32 Audio::GetSampleSize() const
+    engine->RegisterObjectMethod(className, "uint GetSampleSize() const", AS_METHODPR(T, GetSampleSize, () const, u32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "uint get_sampleSize() const", AS_METHODPR(T, GetSampleSize, () const, u32), AS_CALL_THISCALL);
 
     // float Audio::GetSoundSourceMasterGain(StringHash typeHash) const
     engine->RegisterObjectMethod(className, "float GetSoundSourceMasterGain(StringHash) const", AS_METHODPR(T, GetSoundSourceMasterGain, (StringHash) const, float), AS_CALL_THISCALL);
@@ -9037,8 +9037,8 @@ template <class T> void RegisterMembers_Audio(asIScriptEngine* engine, const cha
     engine->RegisterObjectMethod(className, "void SetMasterGain(const String&in, float)", AS_METHODPR(T, SetMasterGain, (const String&, float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_masterGain(const String&in, float)", AS_METHODPR(T, SetMasterGain, (const String&, float), void), AS_CALL_THISCALL);
 
-    // bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpolation = true)
-    engine->RegisterObjectMethod(className, "bool SetMode(int, int, bool, bool = true)", AS_METHODPR(T, SetMode, (int, int, bool, bool), bool), AS_CALL_THISCALL);
+    // bool Audio::SetMode(i32 bufferLengthMSec, i32 mixRate, bool stereo, bool interpolation = true)
+    engine->RegisterObjectMethod(className, "bool SetMode(int, int, bool, bool = true)", AS_METHODPR(T, SetMode, (i32, i32, bool, bool), bool), AS_CALL_THISCALL);
 
     // void Audio::Stop()
     engine->RegisterObjectMethod(className, "void Stop()", AS_METHODPR(T, Stop, (), void), AS_CALL_THISCALL);

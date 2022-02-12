@@ -48,7 +48,7 @@ public:
     ~Audio() override;
 
     /// Initialize sound output with specified buffer length and output mode.
-    bool SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpolation = true);
+    bool SetMode(i32 bufferLengthMSec, i32 mixRate, bool stereo, bool interpolation = true);
     /// Run update on sound sources. Not required for continued playback, but frees unused sound sources & sounds and updates 3D positions.
     void Update(float timeStep);
     /// Restart sound output.
@@ -72,11 +72,11 @@ public:
 
     /// Return byte size of one sample.
     /// @property
-    unsigned GetSampleSize() const { return sampleSize_; }
+    u32 GetSampleSize() const { return sampleSize_; }
 
     /// Return mixing rate.
     /// @property
-    int GetMixRate() const { return mixRate_; }
+    i32 GetMixRate() const { return mixRate_; }
 
     /// Return whether output is interpolated.
     /// @property
@@ -123,7 +123,7 @@ public:
     float GetSoundSourceMasterGain(StringHash typeHash) const;
 
     /// Mix sound sources into the buffer.
-    void MixOutput(void* dest, unsigned samples);
+    void MixOutput(void* dest, u32 samples);
 
 private:
     /// Handle render update event.
@@ -134,17 +134,17 @@ private:
     void UpdateInternal(float timeStep);
 
     /// Clipping buffer for mixing.
-    SharedArrayPtr<int> clipBuffer_;
+    SharedArrayPtr<i32> clipBuffer_;
     /// Audio thread mutex.
     Mutex audioMutex_;
     /// SDL audio device ID.
-    unsigned deviceID_{};
+    u32 deviceID_{};
     /// Sample size.
-    unsigned sampleSize_{};
+    u32 sampleSize_{};
     /// Clip buffer size in samples.
-    unsigned fragmentSize_{};
+    u32 fragmentSize_{};
     /// Mixing rate.
-    int mixRate_{};
+    i32 mixRate_{};
     /// Mixing interpolation flag.
     bool interpolation_{};
     /// Stereo flag.
