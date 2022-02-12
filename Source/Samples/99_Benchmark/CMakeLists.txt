@@ -24,7 +24,7 @@
 set (TARGET_NAME 99_Benchmark)
 
 # Define source files
-define_source_files ()
+define_source_files (GROUP)
 
 # Setup target with resource copying
 setup_main_executable ()
@@ -32,5 +32,3 @@ setup_main_executable ()
 # Setup test cases
 setup_test ()
 
-# Preventing VS from placing cpp and h files to different groups 
-source_group (TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCE_FILES})
