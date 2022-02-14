@@ -22,11 +22,10 @@
 
 #include "../Precompiled.h"
 
-#include "../Math/MathDefs.h"
-#include "../Math/StringHash.h"
 #include "../Container/HashMap.h"
 #include "../Core/StringHashRegister.h"
 #include "../IO/Log.h"
+#include "../Math/StringHash.h"
 
 #include <cstdio>
 
@@ -52,13 +51,13 @@ static StringHashRegister& GetGlobalStringHashRegister()
 
 const StringHash StringHash::ZERO;
 
+#ifdef URHO3D_HASH_DEBUG
 StringHash::StringHash(const char* str) noexcept :
     value_(Calculate(str))
 {
-#ifdef URHO3D_HASH_DEBUG
     Urho3D::GetGlobalStringHashRegister().RegisterString(*this, str);
-#endif
 }
+#endif
 
 StringHash::StringHash(const String& str) noexcept :
     value_(Calculate(str.CString()))
@@ -66,19 +65,6 @@ StringHash::StringHash(const String& str) noexcept :
 #ifdef URHO3D_HASH_DEBUG
     Urho3D::GetGlobalStringHashRegister().RegisterString(*this, str.CString());
 #endif
-}
-
-unsigned StringHash::Calculate(const char* str, unsigned hash)
-{
-    if (!str)
-        return hash;
-
-    while (*str)
-    {
-        hash = SDBMHash(hash, (unsigned char)*str++);
-    }
-
-    return hash;
 }
 
 StringHashRegister* StringHash::GetGlobalStringHashRegister()

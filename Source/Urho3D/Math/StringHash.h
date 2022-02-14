@@ -23,6 +23,7 @@
 #pragma once
 
 #include "../Container/Str.h"
+#include "../Math/MathDefs.h"
 
 namespace Urho3D
 {
@@ -34,8 +35,8 @@ class URHO3D_API StringHash
 {
 public:
     /// Construct with zero value.
-    StringHash() noexcept :
-        value_(0)
+    StringHash() noexcept
+        : value_(0)
     {
     }
 
@@ -43,13 +44,21 @@ public:
     StringHash(const StringHash& rhs) noexcept = default;
 
     /// Construct with an initial value.
-    explicit StringHash(unsigned value) noexcept :
-        value_(value)
+    constexpr explicit StringHash(unsigned value) noexcept
+        : value_(value)
     {
     }
 
+#ifdef URHO3D_HASH_DEBUG
     /// Construct from a C string.
     StringHash(const char* str) noexcept;        // NOLINT(google-explicit-constructor)
+#else
+    constexpr StringHash(const char* str) noexcept
+        : value_(Calculate(str))
+    {
+    }
+#endif
+                                                 
     /// Construct from a string.
     StringHash(const String& str) noexcept;      // NOLINT(google-explicit-constructor)
 
@@ -100,7 +109,18 @@ public:
     unsigned ToHash() const { return value_; }
 
     /// Calculate hash value from a C string.
-    static unsigned Calculate(const char* str, unsigned hash = 0);
+    static constexpr u32 Calculate(const char* str, unsigned hash = 0)
+    {
+        if (!str)
+            return hash;
+
+        while (*str)
+        {
+            hash = SDBMHash(hash, (unsigned char)*str++);
+        }
+
+        return hash;
+    }
 
     /// Get global StringHashRegister. Use for debug purposes only. Return nullptr if URHO3D_HASH_DEBUG is off.
     static StringHashRegister* GetGlobalStringHashRegister();
@@ -112,5 +132,10 @@ private:
     /// Hash value.
     unsigned value_;
 };
+
+constexpr StringHash operator ""_hash(const char* str, size_t)
+{
+    return StringHash(StringHash::Calculate(str));
+}
 
 }
