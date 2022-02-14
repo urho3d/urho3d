@@ -5129,7 +5129,7 @@ template <class T> void RegisterMembers_StringHash(asIScriptEngine* engine, cons
     // bool StringHash::operator <(const StringHash& rhs) const
     engine->RegisterObjectMethod(className, "int opCmp(const StringHash& in) const", AS_FUNCTION_OBJFIRST(StringHash_bool_operatorles_constspStringHashamp<T>), AS_CALL_CDECL_OBJFIRST);
 
-    // static unsigned StringHash::Calculate(const char* str, unsigned hash = 0)
+    // static constexpr u32 StringHash::Calculate(const char* str, unsigned hash = 0)
     // Error: type "const char*" can not automatically bind
     // static StringHashRegister* StringHash::GetGlobalStringHashRegister()
     // Error: type "StringHashRegister*" can not automatically bind
