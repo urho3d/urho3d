@@ -168,7 +168,7 @@ jobs:
         continue-on-error: ${{ !startsWith(github.ref, 'refs/tags/') }}
   macOS:
     name: 🍏
-    runs-on: macos-latest
+    runs-on: macos-10.15
     needs: init
     if: needs.init.outputs.skip == '0' && github.event_name != 'repository_dispatch'
     strategy:
