@@ -229,7 +229,7 @@ jobs:
         if: github.event_name == 'push'
   windows:
     name: 🔲
-    runs-on: windows-latest
+    runs-on: windows-2019
     needs: init
     if: needs.init.outputs.skip == '0' && github.event_name != 'repository_dispatch'
     strategy:
