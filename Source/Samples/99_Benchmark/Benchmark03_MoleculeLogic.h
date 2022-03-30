@@ -22,26 +22,30 @@
 
 #pragma once
 
-#include "AppState_Base.h"
+#include <Urho3D/Scene/LogicComponent.h>
 
-class AppState_ResultScreen : public AppState_Base
+namespace U3D = Urho3D;
+
+class Benchmark03_MoleculeLogic : public U3D::LogicComponent
 {
 public:
-    URHO3D_OBJECT(AppState_ResultScreen, AppState_Base);
+    URHO3D_OBJECT(Benchmark03_MoleculeLogic, LogicComponent);
+
+private:
+    i32 moleculeType_;
+    U3D::Vector2 velocity_;
+    U3D::Vector2 force_;
 
 public:
-    AppState_ResultScreen(U3D::Context* context)
-        : AppState_Base(context)
-    {
-        name_ = "Result Screen";
-    }
+    explicit Benchmark03_MoleculeLogic(U3D::Context* context);
 
-    void OnEnter() override;
-    void OnLeave() override;
+    void SetParameters(i32 moleculeType);
 
-    void HandleSceneUpdate(U3D::StringHash eventType, U3D::VariantMap& eventData);
+    i32 GetMoleculeType() const { return moleculeType_; }
 
-    void ShowResultWindow();
-    void DestroyResultWindow();
-    void HandleResultOkButtonPressed(U3D::StringHash eventType, U3D::VariantMap& eventData);
+    // Update the velocity of this molecule
+    void Update(float timeStep) override;
+
+    // Move this molecule only after updating the velocities of all molecules 
+    void PostUpdate(float timeStep) override;
 };

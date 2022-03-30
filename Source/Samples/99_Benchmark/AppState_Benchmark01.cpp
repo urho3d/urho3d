@@ -55,7 +55,10 @@ void AppState_Benchmark01::HandleSceneUpdate(StringHash eventType, VariantMap& e
     UpdateCurrentFpsElement();
 
     if (GetSubsystem<Input>()->GetKeyDown(KEY_ESCAPE))
+    {
         GetSubsystem<AppStateManager>()->SetRequiredAppStateId(APPSTATEID_MAINSCREEN);
+        return;
+    }
 
     if (fpsCounter_.GetTotalTime() >= 25.f)
         GetSubsystem<AppStateManager>()->SetRequiredAppStateId(APPSTATEID_RESULTSCREEN);

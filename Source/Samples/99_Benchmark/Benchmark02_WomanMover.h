@@ -30,6 +30,7 @@ namespace U3D = Urho3D;
 // Custom logic component for moving the animated model and rotating at area edges
 class Benchmark02_WomanMover : public U3D::LogicComponent
 {
+public:
     URHO3D_OBJECT(Benchmark02_WomanMover, LogicComponent);
 
 private:

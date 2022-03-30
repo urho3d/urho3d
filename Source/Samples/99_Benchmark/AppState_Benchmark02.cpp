@@ -128,7 +128,10 @@ void AppState_Benchmark02::HandleSceneUpdate(StringHash eventType, VariantMap& e
     UpdateCurrentFpsElement();
 
     if (GetSubsystem<Input>()->GetKeyDown(KEY_ESCAPE))
+    {
         GetSubsystem<AppStateManager>()->SetRequiredAppStateId(APPSTATEID_MAINSCREEN);
+        return;
+    }
 
     Node* cameraPath = scene_->GetChild("CameraPath");
     SplinePath* cameraSplinePath = cameraPath->GetComponent<SplinePath>();

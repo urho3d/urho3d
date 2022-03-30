@@ -26,6 +26,7 @@
 
 class AppState_Benchmark02 : public AppState_Base
 {
+public:
     URHO3D_OBJECT(AppState_Benchmark02, AppState_Base);
 
 public:

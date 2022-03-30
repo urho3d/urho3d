@@ -83,8 +83,7 @@ void AppState_ResultScreen::ShowResultWindow()
     windowTitle->SetText("Result");
 
     AppStateManager* appStateManager = GetSubsystem<AppStateManager>();
-    // Iside OnEnter() currentAppStateId_ has not yet been changed
-    AppStateId prevAppStateId = appStateManager->GetCurrentAppStateId();
+    AppStateId prevAppStateId = appStateManager->GetPreviousAppStateId();
     const String& benchmarkName = appStateManager->GetName(prevAppStateId);
     const FpsCounter& benchmarkResult = appStateManager->GetResult(prevAppStateId);
 

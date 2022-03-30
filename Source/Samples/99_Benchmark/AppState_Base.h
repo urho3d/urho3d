@@ -32,6 +32,7 @@ inline const U3D::String CURRENT_FPS_STR = "Current FPS";
 
 class AppState_Base : public U3D::Object
 {
+public:
     URHO3D_OBJECT(AppState_Base, Object);
 
 protected:
