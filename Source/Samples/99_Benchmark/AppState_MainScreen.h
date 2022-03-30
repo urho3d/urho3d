@@ -31,6 +31,7 @@ namespace Urho3D
 
 class AppState_MainScreen : public AppState_Base
 {
+public:
     URHO3D_OBJECT(AppState_MainScreen, AppState_Base);
 
 private:
