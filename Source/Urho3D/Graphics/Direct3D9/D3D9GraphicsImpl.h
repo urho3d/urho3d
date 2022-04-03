@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include "../../Graphics/ShaderProgram.h"
-#include "../../Graphics/VertexDeclaration.h"
 #include "../../Math/Color.h"
+#include "D3D9ShaderProgram.h"
+#include "D3D9VertexDeclaration.h"
 
 #include <d3d9.h>
 
@@ -35,17 +35,17 @@ namespace Urho3D
 
 #define URHO3D_LOGD3DERROR(msg, hr) URHO3D_LOGERRORF("%s (HRESULT %x)", msg, (unsigned)hr)
 
-using ShaderProgramMap = HashMap<Pair<ShaderVariation*, ShaderVariation*>, SharedPtr<ShaderProgram> >;
-using VertexDeclarationMap = HashMap<unsigned long long, SharedPtr<VertexDeclaration> >;
+using ShaderProgramMap_D3D9 = HashMap<Pair<ShaderVariation*, ShaderVariation*>, SharedPtr<ShaderProgram_D3D9> >;
+using VertexDeclarationMap_D3D9 = HashMap<unsigned long long, SharedPtr<VertexDeclaration_D3D9> >;
 
 /// %Graphics implementation. Holds API-specific objects.
-class URHO3D_API GraphicsImpl
+class URHO3D_API GraphicsImpl_D3D9
 {
     friend class Graphics;
 
 public:
     /// Construct.
-    GraphicsImpl();
+    GraphicsImpl_D3D9();
 
     /// Return Direct3D device.
     IDirect3DDevice9* GetDevice() const { return device_; }
@@ -120,17 +120,17 @@ private:
     /// Blend operation.
     D3DBLENDOP blendOp_;
     /// Vertex declarations.
-    VertexDeclarationMap vertexDeclarations_;
+    VertexDeclarationMap_D3D9 vertexDeclarations_;
     /// Stream frequencies by vertex buffer.
     unsigned streamFrequencies_[MAX_VERTEX_STREAMS];
     /// Stream offsets by vertex buffer.
     unsigned streamOffsets_[MAX_VERTEX_STREAMS];
     /// Vertex declaration in use.
-    VertexDeclaration* vertexDeclaration_;
+    VertexDeclaration_D3D9* vertexDeclaration_;
     /// Shader programs.
-    ShaderProgramMap shaderPrograms_;
+    ShaderProgramMap_D3D9 shaderPrograms_;
     /// Shader program in use.
-    ShaderProgram* shaderProgram_;
+    ShaderProgram_D3D9* shaderProgram_;
 
 };
 

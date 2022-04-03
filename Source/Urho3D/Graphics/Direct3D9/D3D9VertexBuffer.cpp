@@ -23,39 +23,39 @@
 #include "../../Precompiled.h"
 
 #include "../../Graphics/Graphics.h"
-#include "../../Graphics/GraphicsImpl.h"
 #include "../../Graphics/VertexBuffer.h"
 #include "../../IO/Log.h"
+#include "D3D9GraphicsImpl.h"
 
 #include "../../DebugNew.h"
 
 namespace Urho3D
 {
 
-void VertexBuffer::OnDeviceLost()
+void VertexBuffer::OnDeviceLost_D3D9()
 {
     // Dynamic buffers are in the default pool and need to be released on device loss
     if (dynamic_)
-        Release();
+        Release_D3D9();
 }
 
-void VertexBuffer::OnDeviceReset()
+void VertexBuffer::OnDeviceReset_D3D9()
 {
     // Dynamic buffers are in the default pool and need to be recreated after device reset
     if (dynamic_ || !object_.ptr_)
     {
-        Create();
-        dataLost_ = !UpdateToGPU();
+        Create_D3D9();
+        dataLost_ = !UpdateToGPU_D3D9();
     }
     else if (dataPending_)
-        dataLost_ = !UpdateToGPU();
+        dataLost_ = !UpdateToGPU_D3D9();
 
     dataPending_ = false;
 }
 
-void VertexBuffer::Release()
+void VertexBuffer::Release_D3D9()
 {
-    Unlock();
+    Unlock_D3D9();
 
     if (graphics_)
     {
@@ -69,7 +69,7 @@ void VertexBuffer::Release()
     URHO3D_SAFE_RELEASE(object_.ptr_);
 }
 
-bool VertexBuffer::SetData(const void* data)
+bool VertexBuffer::SetData_D3D9(const void* data)
 {
     if (!data)
     {
@@ -95,11 +95,11 @@ bool VertexBuffer::SetData(const void* data)
             return true;
         }
 
-        void* hwData = MapBuffer(0, vertexCount_, true);
+        void* hwData = MapBuffer_D3D9(0, vertexCount_, true);
         if (hwData)
         {
             memcpy(hwData, data, vertexCount_ * vertexSize_);
-            UnmapBuffer();
+            UnmapBuffer_D3D9();
         }
         else
             return false;
@@ -109,10 +109,10 @@ bool VertexBuffer::SetData(const void* data)
     return true;
 }
 
-bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count, bool discard)
+bool VertexBuffer::SetDataRange_D3D9(const void* data, unsigned start, unsigned count, bool discard)
 {
     if (start == 0 && count == vertexCount_)
-        return SetData(data);
+        return SetData_D3D9(data);
 
     if (!data)
     {
@@ -147,11 +147,11 @@ bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count
             return true;
         }
 
-        void* hwData = MapBuffer(start, count, discard);
+        void* hwData = MapBuffer_D3D9(start, count, discard);
         if (hwData)
         {
             memcpy(hwData, data, count * vertexSize_);
-            UnmapBuffer();
+            UnmapBuffer_D3D9();
         }
         else
             return false;
@@ -160,7 +160,7 @@ bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count
     return true;
 }
 
-void* VertexBuffer::Lock(unsigned start, unsigned count, bool discard)
+void* VertexBuffer::Lock_D3D9(unsigned start, unsigned count, bool discard)
 {
     if (lockState_ != LOCK_NONE)
     {
@@ -188,7 +188,7 @@ void* VertexBuffer::Lock(unsigned start, unsigned count, bool discard)
 
     // Because shadow data must be kept in sync, can only lock hardware buffer if not shadowed
     if (object_.ptr_ && !shadowData_ && !graphics_->IsDeviceLost())
-        return MapBuffer(start, count, discard);
+        return MapBuffer_D3D9(start, count, discard);
     else if (shadowData_)
     {
         lockState_ = LOCK_SHADOW;
@@ -204,21 +204,21 @@ void* VertexBuffer::Lock(unsigned start, unsigned count, bool discard)
         return nullptr;
 }
 
-void VertexBuffer::Unlock()
+void VertexBuffer::Unlock_D3D9()
 {
     switch (lockState_)
     {
     case LOCK_HARDWARE:
-        UnmapBuffer();
+        UnmapBuffer_D3D9();
         break;
 
     case LOCK_SHADOW:
-        SetDataRange(shadowData_.Get() + lockStart_ * vertexSize_, lockStart_, lockCount_);
+        SetDataRange_D3D9(shadowData_.Get() + lockStart_ * vertexSize_, lockStart_, lockCount_);
         lockState_ = LOCK_NONE;
         break;
 
     case LOCK_SCRATCH:
-        SetDataRange(lockScratchData_, lockStart_, lockCount_);
+        SetDataRange_D3D9(lockScratchData_, lockStart_, lockCount_);
         if (graphics_)
             graphics_->FreeScratchBuffer(lockScratchData_);
         lockScratchData_ = nullptr;
@@ -229,9 +229,9 @@ void VertexBuffer::Unlock()
     }
 }
 
-bool VertexBuffer::Create()
+bool VertexBuffer::Create_D3D9()
 {
-    Release();
+    Release_D3D9();
 
     if (!vertexCount_ || elements_.Empty())
         return true;
@@ -247,7 +247,7 @@ bool VertexBuffer::Create()
         unsigned pool = dynamic_ ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
         unsigned d3dUsage = dynamic_ ? D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY : 0;
 
-        IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
+        IDirect3DDevice9* device = graphics_->GetImpl_D3D9()->GetDevice();
         HRESULT hr = device->CreateVertexBuffer(
             vertexCount_ * vertexSize_,
             d3dUsage,
@@ -266,15 +266,15 @@ bool VertexBuffer::Create()
     return true;
 }
 
-bool VertexBuffer::UpdateToGPU()
+bool VertexBuffer::UpdateToGPU_D3D9()
 {
     if (object_.ptr_ && shadowData_)
-        return SetData(shadowData_.Get());
+        return SetData_D3D9(shadowData_.Get());
     else
         return false;
 }
 
-void* VertexBuffer::MapBuffer(unsigned start, unsigned count, bool discard)
+void* VertexBuffer::MapBuffer_D3D9(unsigned start, unsigned count, bool discard)
 {
     void* hwData = nullptr;
 
@@ -295,7 +295,7 @@ void* VertexBuffer::MapBuffer(unsigned start, unsigned count, bool discard)
     return hwData;
 }
 
-void VertexBuffer::UnmapBuffer()
+void VertexBuffer::UnmapBuffer_D3D9()
 {
     if (object_.ptr_ && lockState_ == LOCK_HARDWARE)
     {

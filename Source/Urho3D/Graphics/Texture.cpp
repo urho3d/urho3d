@@ -284,4 +284,124 @@ void Texture::CheckTextureBudget(StringHash type)
         cache->ReleaseResources(Material::GetTypeStatic());
 }
 
+void Texture::SetSRGB(bool enable)
+{
+    GAPI gapi = Graphics::GetGAPI();
+
+#ifdef URHO3D_OPENGL
+    if (gapi == GAPI_OPENGL)
+        return SetSRGB_OGL(enable);
+#endif
+
+#ifdef URHO3D_D3D9
+    if (gapi == GAPI_D3D9)
+        return SetSRGB_D3D9(enable);
+#endif
+
+#ifdef URHO3D_D3D11
+    if (gapi == GAPI_D3D11)
+        return SetSRGB_D3D11(enable);
+#endif
+}
+
+void Texture::UpdateParameters()
+{
+    GAPI gapi = Graphics::GetGAPI();
+
+#ifdef URHO3D_OPENGL
+    if (gapi == GAPI_OPENGL)
+        return UpdateParameters_OGL();
+#endif
+
+#ifdef URHO3D_D3D9
+    if (gapi == GAPI_D3D9)
+        return UpdateParameters_D3D9();
+#endif
+
+#ifdef URHO3D_D3D11
+    if (gapi == GAPI_D3D11)
+        return UpdateParameters_D3D11();
+#endif
+}
+
+bool Texture::GetParametersDirty() const
+{
+    GAPI gapi = Graphics::GetGAPI();
+
+#ifdef URHO3D_OPENGL
+    if (gapi == GAPI_OPENGL)
+        return GetParametersDirty_OGL();
+#endif
+
+#ifdef URHO3D_D3D9
+    if (gapi == GAPI_D3D9)
+        return GetParametersDirty_D3D9();
+#endif
+
+#ifdef URHO3D_D3D11
+    if (gapi == GAPI_D3D11)
+        return GetParametersDirty_D3D11();
+#endif
+}
+
+bool Texture::IsCompressed() const
+{
+    GAPI gapi = Graphics::GetGAPI();
+
+#ifdef URHO3D_OPENGL
+    if (gapi == GAPI_OPENGL)
+        return IsCompressed_OGL();
+#endif
+
+#ifdef URHO3D_D3D9
+    if (gapi == GAPI_D3D9)
+        return IsCompressed_D3D9();
+#endif
+
+#ifdef URHO3D_D3D11
+    if (gapi == GAPI_D3D11)
+        return IsCompressed_D3D11();
+#endif
+}
+
+unsigned Texture::GetRowDataSize(int width) const
+{
+    GAPI gapi = Graphics::GetGAPI();
+
+#ifdef URHO3D_OPENGL
+    if (gapi == GAPI_OPENGL)
+        return GetRowDataSize_OGL(width);
+#endif
+
+#ifdef URHO3D_D3D9
+    if (gapi == GAPI_D3D9)
+        return GetRowDataSize_D3D9(width);
+#endif
+
+#ifdef URHO3D_D3D11
+    if (gapi == GAPI_D3D11)
+        return GetRowDataSize_D3D11(width);
+#endif
+}
+
+void Texture::RegenerateLevels()
+{
+    GAPI gapi = Graphics::GetGAPI();
+
+#ifdef URHO3D_OPENGL
+    if (gapi == GAPI_OPENGL)
+        return RegenerateLevels_OGL();
+#endif
+
+#ifdef URHO3D_D3D9
+    if (gapi == GAPI_D3D9)
+        return RegenerateLevels_D3D9();
+#endif
+
+#ifdef URHO3D_D3D11
+    if (gapi == GAPI_D3D11)
+        return RegenerateLevels_D3D11();
+#endif
+}
+
 }

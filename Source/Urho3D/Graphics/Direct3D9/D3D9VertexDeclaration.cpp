@@ -23,10 +23,10 @@
 #include "../../Precompiled.h"
 
 #include "../../Graphics/Graphics.h"
-#include "../../Graphics/GraphicsImpl.h"
 #include "../../Graphics/VertexBuffer.h"
-#include "../../Graphics/VertexDeclaration.h"
 #include "../../IO/Log.h"
+#include "D3D9GraphicsImpl.h"
+#include "D3D9VertexDeclaration.h"
 
 #include "../../DebugNew.h"
 
@@ -57,10 +57,10 @@ const BYTE d3dElementUsage[] =
     D3DDECLUSAGE_TEXCOORD // Object index (not supported by D3D9)
 };
 
-VertexDeclaration::VertexDeclaration(Graphics* graphics, const PODVector<VertexElement>& srcElements) :
+VertexDeclaration_D3D9::VertexDeclaration_D3D9(Graphics* graphics, const PODVector<VertexElement>& srcElements) :
     declaration_(nullptr)
 {
-    PODVector<VertexDeclarationElement> elements;
+    PODVector<VertexDeclarationElement_D3D9> elements;
 
     for (unsigned i = 0; i < srcElements.Size(); ++i)
     {
@@ -72,7 +72,7 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, const PODVector<VertexE
             continue;
         }
 
-        VertexDeclarationElement element;
+        VertexDeclarationElement_D3D9 element;
         element.semantic_ = srcElement.semantic_;
         element.type_ = srcElement.type_;
         element.index_ = srcElement.index_;
@@ -84,10 +84,10 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, const PODVector<VertexE
     Create(graphics, elements);
 }
 
-VertexDeclaration::VertexDeclaration(Graphics* graphics, const PODVector<VertexBuffer*>& buffers) :
+VertexDeclaration_D3D9::VertexDeclaration_D3D9(Graphics* graphics, const PODVector<VertexBuffer*>& buffers) :
     declaration_(nullptr)
 {
-    PODVector<VertexDeclarationElement> elements;
+    PODVector<VertexDeclarationElement_D3D9> elements;
     unsigned prevBufferElements = 0;
 
     for (unsigned i = 0; i < buffers.Size(); ++i)
@@ -123,7 +123,7 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, const PODVector<VertexB
             if (isExisting)
                 continue;
 
-            VertexDeclarationElement element;
+            VertexDeclarationElement_D3D9 element;
             element.semantic_ = srcElement.semantic_;
             element.type_ = srcElement.type_;
             element.index_ = srcElement.index_;
@@ -138,10 +138,10 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, const PODVector<VertexB
     Create(graphics, elements);
 }
 
-VertexDeclaration::VertexDeclaration(Graphics* graphics, const Vector<SharedPtr<VertexBuffer> >& buffers) :
+VertexDeclaration_D3D9::VertexDeclaration_D3D9(Graphics* graphics, const Vector<SharedPtr<VertexBuffer> >& buffers) :
     declaration_(nullptr)
 {
-    PODVector<VertexDeclarationElement> elements;
+    PODVector<VertexDeclarationElement_D3D9> elements;
     unsigned prevBufferElements = 0;
 
     for (unsigned i = 0; i < buffers.Size(); ++i)
@@ -177,7 +177,7 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, const Vector<SharedPtr<
             if (isExisting)
                 continue;
 
-            VertexDeclarationElement element;
+            VertexDeclarationElement_D3D9 element;
             element.semantic_ = srcElement.semantic_;
             element.type_ = srcElement.type_;
             element.index_ = srcElement.index_;
@@ -192,17 +192,17 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, const Vector<SharedPtr<
     Create(graphics, elements);
 }
 
-VertexDeclaration::~VertexDeclaration()
+VertexDeclaration_D3D9::~VertexDeclaration_D3D9()
 {
     Release();
 }
 
-void VertexDeclaration::Create(Graphics* graphics, const PODVector<VertexDeclarationElement>& elements)
+void VertexDeclaration_D3D9::Create(Graphics* graphics, const PODVector<VertexDeclarationElement_D3D9>& elements)
 {
     SharedArrayPtr<D3DVERTEXELEMENT9> elementArray(new D3DVERTEXELEMENT9[elements.Size() + 1]);
 
     D3DVERTEXELEMENT9* dest = elementArray;
-    for (Vector<VertexDeclarationElement>::ConstIterator i = elements.Begin(); i != elements.End(); ++i)
+    for (Vector<VertexDeclarationElement_D3D9>::ConstIterator i = elements.Begin(); i != elements.End(); ++i)
     {
         dest->Stream = (WORD)i->streamIndex_;
         dest->Offset = (WORD)i->offset_;
@@ -220,7 +220,7 @@ void VertexDeclaration::Create(Graphics* graphics, const PODVector<VertexDeclara
     dest->Usage = 0;
     dest->UsageIndex = 0;
 
-    IDirect3DDevice9* device = graphics->GetImpl()->GetDevice();
+    IDirect3DDevice9* device = graphics->GetImpl_D3D9()->GetDevice();
     HRESULT hr = device->CreateVertexDeclaration(elementArray, &declaration_);
     if (FAILED(hr))
     {
@@ -229,7 +229,7 @@ void VertexDeclaration::Create(Graphics* graphics, const PODVector<VertexDeclara
     }
 }
 
-void VertexDeclaration::Release()
+void VertexDeclaration_D3D9::Release()
 {
     URHO3D_SAFE_RELEASE(declaration_);
 }

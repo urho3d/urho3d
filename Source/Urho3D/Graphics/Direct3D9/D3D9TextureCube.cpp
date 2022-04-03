@@ -26,13 +26,13 @@
 #include "../../Core/Profiler.h"
 #include "../../Graphics/Graphics.h"
 #include "../../Graphics/GraphicsEvents.h"
-#include "../../Graphics/GraphicsImpl.h"
 #include "../../Graphics/Renderer.h"
 #include "../../Graphics/TextureCube.h"
 #include "../../IO/FileSystem.h"
 #include "../../IO/Log.h"
 #include "../../Resource/ResourceCache.h"
 #include "../../Resource/XMLFile.h"
+#include "D3D9GraphicsImpl.h"
 
 #include "../../DebugNew.h"
 
@@ -43,13 +43,13 @@
 namespace Urho3D
 {
 
-void TextureCube::OnDeviceLost()
+void TextureCube::OnDeviceLost_D3D9()
 {
     if (usage_ > TEXTURE_STATIC)
-        Release();
+        Release_D3D9();
 }
 
-void TextureCube::OnDeviceReset()
+void TextureCube::OnDeviceReset_D3D9()
 {
     if (usage_ > TEXTURE_STATIC || !object_.ptr_ || dataPending_)
     {
@@ -60,7 +60,7 @@ void TextureCube::OnDeviceReset()
 
         if (!object_.ptr_)
         {
-            Create();
+            Create_D3D9();
             dataLost_ = true;
         }
     }
@@ -68,7 +68,7 @@ void TextureCube::OnDeviceReset()
     dataPending_ = false;
 }
 
-void TextureCube::Release()
+void TextureCube::Release_D3D9()
 {
     if (graphics_)
     {
@@ -91,7 +91,7 @@ void TextureCube::Release()
     levelsDirty_ = false;
 }
 
-bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int width, int height, const void* data)
+bool TextureCube::SetData_D3D9(CubeMapFace face, unsigned level, int x, int y, int width, int height, const void* data)
 {
     URHO3D_PROFILE(SetTextureData);
 
@@ -120,7 +120,7 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
         return true;
     }
 
-    if (IsCompressed())
+    if (IsCompressed_D3D9())
     {
         x &= ~3;
         y &= ~3;
@@ -153,16 +153,16 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
         return false;
     }
 
-    if (IsCompressed())
+    if (IsCompressed_D3D9())
     {
         height = (height + 3) >> 2;
         y >>= 2;
     }
 
     unsigned char* src = (unsigned char*)data;
-    unsigned rowSize = GetRowDataSize(width);
+    unsigned rowSize = GetRowDataSize_D3D9(width);
 
-    // GetRowDataSize() returns CPU-side (source) data size, so need to convert for X8R8G8B8
+    // GetRowDataSize_D3D9() returns CPU-side (source) data size, so need to convert for X8R8G8B8
     if (format_ == D3DFMT_X8R8G8B8)
         rowSize = rowSize / 3 * 4;
 
@@ -213,16 +213,16 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
     return true;
 }
 
-bool TextureCube::SetData(CubeMapFace face, Deserializer& source)
+bool TextureCube::SetData_D3D9(CubeMapFace face, Deserializer& source)
 {
     SharedPtr<Image> image(new Image(context_));
     if (!image->Load(source))
         return false;
 
-    return SetData(face, image);
+    return SetData_D3D9(face, image);
 }
 
-bool TextureCube::SetData(CubeMapFace face, Image* image, bool useAlpha)
+bool TextureCube::SetData_D3D9(CubeMapFace face, Image* image, bool useAlpha)
 {
     if (!image)
     {
@@ -288,7 +288,7 @@ bool TextureCube::SetData(CubeMapFace face, Image* image, bool useAlpha)
         if (!face)
         {
             // If image was previously compressed, reset number of requested levels to avoid error if level count is too high for new size
-            if (IsCompressed() && requestedLevels_ > 1)
+            if (IsCompressed_D3D9() && requestedLevels_ > 1)
                 requestedLevels_ = 0;
             SetSize(levelWidth, format);
         }
@@ -308,7 +308,7 @@ bool TextureCube::SetData(CubeMapFace face, Image* image, bool useAlpha)
 
         for (unsigned i = 0; i < levels_; ++i)
         {
-            SetData(face, i, 0, 0, levelWidth, levelHeight, levelData);
+            SetData_D3D9(face, i, 0, 0, levelWidth, levelHeight, levelData);
             memoryUse += levelWidth * levelHeight * components;
 
             if (i < levels_ - 1)
@@ -373,14 +373,14 @@ bool TextureCube::SetData(CubeMapFace face, Image* image, bool useAlpha)
             CompressedLevel level = image->GetCompressedLevel(i + mipsToSkip);
             if (!needDecompress)
             {
-                SetData(face, i, 0, 0, level.width_, level.height_, level.data_);
+                SetData_D3D9(face, i, 0, 0, level.width_, level.height_, level.data_);
                 memoryUse += level.rows_ * level.rowSize_;
             }
             else
             {
                 unsigned char* rgbaData = new unsigned char[level.width_ * level.height_ * 4];
                 level.Decompress(rgbaData);
-                SetData(face, i, 0, 0, level.width_, level.height_, rgbaData);
+                SetData_D3D9(face, i, 0, 0, level.width_, level.height_, rgbaData);
                 memoryUse += level.width_ * level.height_ * 4;
                 delete[] rgbaData;
             }
@@ -396,7 +396,7 @@ bool TextureCube::SetData(CubeMapFace face, Image* image, bool useAlpha)
     return true;
 }
 
-bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
+bool TextureCube::GetData_D3D9(CubeMapFace face, unsigned level, void* dest) const
 {
     if (!object_.ptr_)
     {
@@ -459,7 +459,7 @@ bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
             }
         }
 
-        IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
+        IDirect3DDevice9* device = graphics_->GetImpl_D3D9()->GetDevice();
         HRESULT hr = device->CreateOffscreenPlainSurface((UINT)width_, (UINT)height_, (D3DFORMAT)format_, D3DPOOL_SYSTEMMEM, &offscreenSurface, nullptr);
         if (FAILED(hr))
         {
@@ -499,12 +499,12 @@ bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
     }
 
     int height = levelHeight;
-    if (IsCompressed())
+    if (IsCompressed_D3D9())
         height = (height + 3) >> 2;
 
     unsigned char* destPtr = (unsigned char*)dest;
-    unsigned rowSize = GetRowDataSize(levelWidth);
-    // GetRowDataSize() returns CPU-side (destination) data size, so need to convert for X8R8G8B8
+    unsigned rowSize = GetRowDataSize_D3D9(levelWidth);
+    // GetRowDataSize_D3D9() returns CPU-side (destination) data size, so need to convert for X8R8G8B8
     if (format_ == D3DFMT_X8R8G8B8)
         rowSize = rowSize / 3 * 4;
 
@@ -560,9 +560,9 @@ bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
     return true;
 }
 
-bool TextureCube::Create()
+bool TextureCube::Create_D3D9()
 {
-    Release();
+    Release_D3D9();
 
     if (!graphics_ || !width_ || !height_)
         return false;
@@ -573,7 +573,7 @@ bool TextureCube::Create()
         return true;
     }
 
-    GraphicsImpl* impl = graphics_->GetImpl();
+    GraphicsImpl_D3D9* impl = graphics_->GetImpl_D3D9();
 
     unsigned pool = usage_ > TEXTURE_STATIC ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
     unsigned d3dUsage = 0;
@@ -604,7 +604,7 @@ bool TextureCube::Create()
     if (multiSample_ > 1)
     {
         // Fall back to non-multisampled if unsupported multisampling mode
-        GraphicsImpl* impl = graphics_->GetImpl();
+        GraphicsImpl_D3D9* impl = graphics_->GetImpl_D3D9();
         if (!impl->CheckMultiSampleSupport((D3DFORMAT)format_, multiSample_))
         {
             multiSample_ = 1;
@@ -612,7 +612,7 @@ bool TextureCube::Create()
         }
     }
 
-    IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
+    IDirect3DDevice9* device = graphics_->GetImpl_D3D9()->GetDevice();
     HRESULT hr = device->CreateCubeTexture(
         (UINT)width_,
         requestedLevels_,

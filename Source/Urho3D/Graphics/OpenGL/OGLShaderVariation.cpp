@@ -25,16 +25,16 @@
 #include "../../Graphics/Graphics.h"
 #include "../../Graphics/GraphicsImpl.h"
 #include "../../Graphics/Shader.h"
-#include "../../Graphics/ShaderProgram.h"
 #include "../../Graphics/ShaderVariation.h"
 #include "../../IO/Log.h"
+#include "OGLShaderProgram.h"
 
 #include "../../DebugNew.h"
 
 namespace Urho3D
 {
 
-const char* ShaderVariation::elementSemanticNames[] =
+const char* ShaderVariation::elementSemanticNames_OGL[] =
 {
     "POS",
     "NORMAL",
@@ -47,7 +47,7 @@ const char* ShaderVariation::elementSemanticNames[] =
     "OBJECTINDEX"
 };
 
-void ShaderVariation::OnDeviceLost()
+void ShaderVariation::OnDeviceLost_OGL()
 {
     if (object_.name_ && !graphics_->IsDeviceLost())
         glDeleteShader(object_.name_);
@@ -57,7 +57,7 @@ void ShaderVariation::OnDeviceLost()
     compilerOutput_.Clear();
 }
 
-void ShaderVariation::Release()
+void ShaderVariation::Release_OGL()
 {
     if (object_.name_)
     {
@@ -81,15 +81,15 @@ void ShaderVariation::Release()
         }
 
         object_.name_ = 0;
-        graphics_->CleanupShaderPrograms(this);
+        graphics_->CleanupShaderPrograms_OGL(this);
     }
 
     compilerOutput_.Clear();
 }
 
-bool ShaderVariation::Create()
+bool ShaderVariation::Create_OGL()
 {
-    Release();
+    Release_OGL();
 
     if (!owner_)
     {
@@ -190,16 +190,9 @@ bool ShaderVariation::Create()
     return object_.name_ != 0;
 }
 
-void ShaderVariation::SetDefines(const String& defines)
+void ShaderVariation::SetDefines_OGL(const String& defines)
 {
     defines_ = defines;
 }
-
-// These methods are no-ops for OpenGL
-bool ShaderVariation::LoadByteCode(const String& binaryShaderName) { return false; }
-bool ShaderVariation::Compile() { return false; }
-void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize) {}
-void ShaderVariation::SaveByteCode(const String& binaryShaderName) {}
-void ShaderVariation::CalculateConstantBufferSizes() {}
 
 }

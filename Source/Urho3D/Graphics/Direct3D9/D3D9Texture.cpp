@@ -35,7 +35,7 @@
 namespace Urho3D
 {
 
-void Texture::SetSRGB(bool enable)
+void Texture::SetSRGB_D3D9(bool enable)
 {
     if (graphics_)
         enable &= graphics_->GetSRGBSupport();
@@ -43,22 +43,22 @@ void Texture::SetSRGB(bool enable)
     sRGB_ = enable;
 }
 
-void Texture::UpdateParameters()
+void Texture::UpdateParameters_D3D9()
 {
     // No-op on Direct3D9, handled by Graphics instead by modifying the sampler settings as necessary
 }
 
-bool Texture::GetParametersDirty() const
+bool Texture::GetParametersDirty_D3D9() const
 {
     return false;
 }
 
-bool Texture::IsCompressed() const
+bool Texture::IsCompressed_D3D9() const
 {
     return format_ == D3DFMT_DXT1 || format_ == D3DFMT_DXT3 || format_ == D3DFMT_DXT5;
 }
 
-unsigned Texture::GetRowDataSize(int width) const
+unsigned Texture::GetRowDataSize_D3D9(int width) const
 {
     switch (format_)
     {
@@ -104,7 +104,7 @@ unsigned Texture::GetRowDataSize(int width) const
     }
 }
 
-void Texture::RegenerateLevels()
+void Texture::RegenerateLevels_D3D9()
 {
     // No-op on Direct3D9
     levelsDirty_ = false;

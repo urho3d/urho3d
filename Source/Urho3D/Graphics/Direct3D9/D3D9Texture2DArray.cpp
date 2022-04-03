@@ -43,13 +43,13 @@
 namespace Urho3D
 {
 
-void Texture2DArray::OnDeviceLost()
+void Texture2DArray::OnDeviceLost_D3D9()
 {
     if (usage_ > TEXTURE_STATIC)
-        Release();
+        Release_D3D9();
 }
 
-void Texture2DArray::OnDeviceReset()
+void Texture2DArray::OnDeviceReset_D3D9()
 {
     if (usage_ > TEXTURE_STATIC || !object_.ptr_ || dataPending_)
     {
@@ -60,7 +60,7 @@ void Texture2DArray::OnDeviceReset()
 
         if (!object_.ptr_)
         {
-            Create();
+            Create_D3D9();
             dataLost_ = true;
         }
     }
@@ -68,7 +68,7 @@ void Texture2DArray::OnDeviceReset()
     dataPending_ = false;
 }
 
-void Texture2DArray::Release()
+void Texture2DArray::Release_D3D9()
 {
     if (graphics_)
     {
@@ -85,22 +85,22 @@ void Texture2DArray::Release()
     URHO3D_SAFE_RELEASE(object_.ptr_);
 }
 
-bool Texture2DArray::SetData(unsigned layer, unsigned level, int x, int y, int width, int height, const void* data)
+bool Texture2DArray::SetData_D3D9(unsigned layer, unsigned level, int x, int y, int width, int height, const void* data)
 {
     URHO3D_LOGERROR("Texture2DArray not supported on Direct3D9, can not set data");
     return false;
 }
 
-bool Texture2DArray::SetData(unsigned layer, Deserializer& source)
+bool Texture2DArray::SetData_D3D9(unsigned layer, Deserializer& source)
 {
     SharedPtr<Image> image(new Image(context_));
     if (!image->Load(source))
         return false;
 
-    return SetData(layer, image);
+    return SetData_D3D9(layer, image);
 }
 
-bool Texture2DArray::SetData(unsigned layer, Image* image, bool useAlpha)
+bool Texture2DArray::SetData_D3D9(unsigned layer, Image* image, bool useAlpha)
 {
     if (!image)
     {
@@ -160,7 +160,7 @@ bool Texture2DArray::SetData(unsigned layer, Image* image, bool useAlpha)
         if (!layer)
         {
             // If image was previously compressed, reset number of requested levels to avoid error if level count is too high for new size
-            if (IsCompressed() && requestedLevels_ > 1)
+            if (IsCompressed_D3D9() && requestedLevels_ > 1)
                 requestedLevels_ = 0;
             // Create the texture array (the number of layers must have been already set)
             SetSize(0, levelWidth, levelHeight, format);
@@ -182,7 +182,7 @@ bool Texture2DArray::SetData(unsigned layer, Image* image, bool useAlpha)
 
         for (unsigned i = 0; i < levels_; ++i)
         {
-            SetData(layer, i, 0, 0, levelWidth, levelHeight, levelData);
+            SetData_D3D9(layer, i, 0, 0, levelWidth, levelHeight, levelData);
             memoryUse += levelWidth * levelHeight * components;
 
             if (i < levels_ - 1)
@@ -241,14 +241,14 @@ bool Texture2DArray::SetData(unsigned layer, Image* image, bool useAlpha)
             CompressedLevel level = image->GetCompressedLevel(i + mipsToSkip);
             if (!needDecompress)
             {
-                SetData(layer, i, 0, 0, level.width_, level.height_, level.data_);
+                SetData_D3D9(layer, i, 0, 0, level.width_, level.height_, level.data_);
                 memoryUse += level.rows_ * level.rowSize_;
             }
             else
             {
                 unsigned char* rgbaData = new unsigned char[level.width_ * level.height_ * 4];
                 level.Decompress(rgbaData);
-                SetData(layer, i, 0, 0, level.width_, level.height_, rgbaData);
+                SetData_D3D9(layer, i, 0, 0, level.width_, level.height_, rgbaData);
                 memoryUse += level.width_ * level.height_ * 4;
                 delete[] rgbaData;
             }
@@ -264,15 +264,15 @@ bool Texture2DArray::SetData(unsigned layer, Image* image, bool useAlpha)
     return true;
 }
 
-bool Texture2DArray::GetData(unsigned layer, unsigned level, void* dest) const
+bool Texture2DArray::GetData_D3D9(unsigned layer, unsigned level, void* dest) const
 {
     URHO3D_LOGERROR("Texture2DArray not supported on Direct3D9, can not get data");
     return false;
 }
 
-bool Texture2DArray::Create()
+bool Texture2DArray::Create_D3D9()
 {
-    Release();
+    Release_D3D9();
 
     if (!graphics_ || !width_ || !height_ || !layers_)
         return false;

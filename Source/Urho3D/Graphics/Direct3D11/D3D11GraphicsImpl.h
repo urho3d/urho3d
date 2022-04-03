@@ -24,9 +24,9 @@
 
 #include "../../Graphics/ConstantBuffer.h"
 #include "../../Graphics/GraphicsDefs.h"
-#include "../../Graphics/ShaderProgram.h"
-#include "../../Graphics/VertexDeclaration.h"
 #include "../../Math/Color.h"
+#include "D3D11ShaderProgram.h"
+#include "D3D11VertexDeclaration.h"
 
 #include <d3d11.h>
 #include <dxgi.h>
@@ -38,18 +38,18 @@ namespace Urho3D
 
 #define URHO3D_LOGD3DERROR(msg, hr) URHO3D_LOGERRORF("%s (HRESULT %x)", msg, (unsigned)hr)
 
-using ShaderProgramMap = HashMap<Pair<ShaderVariation*, ShaderVariation*>, SharedPtr<ShaderProgram> >;
-using VertexDeclarationMap = HashMap<unsigned long long, SharedPtr<VertexDeclaration> >;
+using ShaderProgramMap_D3D11 = HashMap<Pair<ShaderVariation*, ShaderVariation*>, SharedPtr<ShaderProgram_D3D11> >;
+using VertexDeclarationMap_D3D11 = HashMap<unsigned long long, SharedPtr<VertexDeclaration_D3D11> >;
 using ConstantBufferMap = HashMap<unsigned, SharedPtr<ConstantBuffer> >;
 
 /// %Graphics implementation. Holds API-specific objects.
-class URHO3D_API GraphicsImpl
+class URHO3D_API GraphicsImpl_D3D11
 {
     friend class Graphics;
 
 public:
     /// Construct.
-    GraphicsImpl();
+    GraphicsImpl_D3D11();
 
     /// Return Direct3D device.
     ID3D11Device* GetDevice() const { return device_; }
@@ -134,15 +134,15 @@ private:
     /// Last dirtied vertex buffer.
     unsigned lastDirtyVB_;
     /// Vertex declarations.
-    VertexDeclarationMap vertexDeclarations_;
+    VertexDeclarationMap_D3D11 vertexDeclarations_;
     /// Constant buffer search map.
     ConstantBufferMap allConstantBuffers_;
     /// Currently dirty constant buffers.
     PODVector<ConstantBuffer*> dirtyConstantBuffers_;
     /// Shader programs.
-    ShaderProgramMap shaderPrograms_;
+    ShaderProgramMap_D3D11 shaderPrograms_;
     /// Shader program in use.
-    ShaderProgram* shaderProgram_;
+    ShaderProgram_D3D11* shaderProgram_;
 };
 
 }

@@ -80,6 +80,39 @@ protected:
     bool Create() override;
 
 private:
+#ifdef URHO3D_OPENGL
+    void OnDeviceLost_OGL();
+    void OnDeviceReset_OGL();
+    void Release_OGL();
+    bool SetData_OGL(CubeMapFace face, unsigned level, int x, int y, int width, int height, const void* data);
+    bool SetData_OGL(CubeMapFace face, Deserializer& source);
+    bool SetData_OGL(CubeMapFace face, Image* image, bool useAlpha = false);
+    bool GetData_OGL(CubeMapFace face, unsigned level, void* dest) const;
+    bool Create_OGL();
+#endif // def URHO3D_OPENGL
+
+#ifdef URHO3D_D3D9
+    void OnDeviceLost_D3D9();
+    void OnDeviceReset_D3D9();
+    void Release_D3D9();
+    bool SetData_D3D9(CubeMapFace face, unsigned level, int x, int y, int width, int height, const void* data);
+    bool SetData_D3D9(CubeMapFace face, Deserializer& source);
+    bool SetData_D3D9(CubeMapFace face, Image* image, bool useAlpha = false);
+    bool GetData_D3D9(CubeMapFace face, unsigned level, void* dest) const;
+    bool Create_D3D9();
+#endif // def URHO3D_D3D9
+
+#ifdef URHO3D_D3D11
+    void OnDeviceLost_D3D11();
+    void OnDeviceReset_D3D11();
+    void Release_D3D11();
+    bool SetData_D3D11(CubeMapFace face, unsigned level, int x, int y, int width, int height, const void* data);
+    bool SetData_D3D11(CubeMapFace face, Deserializer& source);
+    bool SetData_D3D11(CubeMapFace face, Image* image, bool useAlpha = false);
+    bool GetData_D3D11(CubeMapFace face, unsigned level, void* dest) const;
+    bool Create_D3D11();
+#endif // def URHO3D_D3D11
+
     /// Handle render surface update event.
     void HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& eventData);
 

@@ -8561,7 +8561,9 @@ template <class T> void RegisterMembers_ShaderVariation(asIScriptEngine* engine,
     // void ShaderVariation::SetName(const String& name)
     engine->RegisterObjectMethod(className, "void SetName(const String&in)", AS_METHODPR(T, SetName, (const String&), void), AS_CALL_THISCALL);
 
-    // static const char* ShaderVariation::elementSemanticNames[]
+    // static const char* ShaderVariation::elementSemanticNames_OGL[]
+    // Error: type "const char*" can not automatically bind
+    // static const char* ShaderVariation::elementSemanticNames_D3D11[]
     // Error: type "const char*" can not automatically bind
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ShaderVariation
@@ -9891,44 +9893,26 @@ template <class T> void RegisterMembers_Graphics(asIScriptEngine* engine, const 
 
     // void Graphics::AddGPUObject(GPUObject* object)
     // Error: type "GPUObject*" can not automatically bind
-    // void Graphics::CleanupRenderSurface(RenderSurface* surface)
-    // Not registered because have @nobind mark
     // void Graphics::FreeScratchBuffer(void* buffer)
     // Error: type "void*" can not automatically bind
     // void* Graphics::GetExternalWindow() const
     // Error: type "void*" can not automatically bind
-    // GraphicsImpl* Graphics::GetImpl() const
-    // Error: type "GraphicsImpl*" can not automatically bind
     // ConstantBuffer* Graphics::GetOrCreateConstantBuffer(ShaderType type, unsigned index, unsigned size)
     // Not registered because have @nobind mark
     // ShaderVariation* Graphics::GetShader(ShaderType type, const char* name, const char* defines) const
     // Error: type "const char*" can not automatically bind
-    // ShaderProgram* Graphics::GetShaderProgram() const
-    // Not registered because have @nobind mark
     // SDL_Window* Graphics::GetWindow() const
     // Error: type "SDL_Window*" can not automatically bind
-    // void Graphics::MarkFBODirty()
-    // Not registered because have @nobind mark
     // bool Graphics::NeedParameterUpdate(ShaderParameterGroup group, const void* source)
     // Error: type "const void*" can not automatically bind
     // void Graphics::RemoveGPUObject(GPUObject* object)
     // Error: type "GPUObject*" can not automatically bind
     // void* Graphics::ReserveScratchBuffer(unsigned size)
     // Error: type "void*" can not automatically bind
-    // void Graphics::Restore()
-    // Not registered because have @nobind mark
     // void Graphics::SetExternalWindow(void* window)
     // Error: type "void*" can not automatically bind
     // void Graphics::SetShaderParameter(StringHash param, const float* data, unsigned count)
     // Error: type "const float*" can not automatically bind
-    // void Graphics::SetTextureForUpdate(Texture* texture)
-    // Not registered because have @nobind mark
-    // void Graphics::SetTextureParametersDirty()
-    // Not registered because have @nobind mark
-    // void Graphics::SetUBO(unsigned object)
-    // Not registered because have @nobind mark
-    // void Graphics::SetVBO(unsigned object)
-    // Not registered because have @nobind mark
     // bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, unsigned instanceOffset = 0)
     // Not registered because have @nobind mark
 
@@ -9940,9 +9924,6 @@ template <class T> void RegisterMembers_Graphics(asIScriptEngine* engine, const 
 
     // void Graphics::CleanupScratchBuffers()
     engine->RegisterObjectMethod(className, "void CleanupScratchBuffers()", AS_METHODPR(T, CleanupScratchBuffers, (), void), AS_CALL_THISCALL);
-
-    // void Graphics::CleanupShaderPrograms(ShaderVariation* variation)
-    engine->RegisterObjectMethod(className, "void CleanupShaderPrograms(ShaderVariation@+)", AS_METHODPR(T, CleanupShaderPrograms, (ShaderVariation*), void), AS_CALL_THISCALL);
 
     // void Graphics::Clear(ClearTargetFlags flags, const Color& color = Color(0.0f, 0.0f, 0.0f, 0.0f), float depth = 1.0f, unsigned stencil = 0)
     engine->RegisterObjectMethod(className, "void Clear(ClearTargetFlags, const Color&in = Color(0.0f, 0.0f, 0.0f, 0.0f), float = 1.0f, uint = 0)", AS_METHODPR(T, Clear, (ClearTargetFlags, const Color&, float, unsigned), void), AS_CALL_THISCALL);
@@ -10466,6 +10447,9 @@ template <class T> void RegisterMembers_Graphics(asIScriptEngine* engine, const 
 
     // bool Graphics::ToggleFullscreen()
     engine->RegisterObjectMethod(className, "bool ToggleFullscreen()", AS_METHODPR(T, ToggleFullscreen, (), bool), AS_CALL_THISCALL);
+
+    // static GAPI Graphics::GetGAPI()
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("GAPI GetGAPI()", AS_FUNCTIONPR(T::GetGAPI, (), GAPI), AS_CALL_CDECL);engine->SetDefaultNamespace("");
 
     // static unsigned Graphics::GetAlphaFormat()
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("uint GetAlphaFormat()", AS_FUNCTIONPR(T::GetAlphaFormat, (), unsigned), AS_CALL_CDECL);engine->SetDefaultNamespace("");
@@ -15992,8 +15976,6 @@ template <class T> void RegisterMembers_Texture(asIScriptEngine* engine, const c
     // Error: type "void*" can not automatically bind
     // void* Texture::GetShaderResourceView() const
     // Error: type "void*" can not automatically bind
-    // unsigned Texture::GetSRGBFormat(unsigned format)
-    // Not registered because have @nobind mark
 
     // TextureAddressMode Texture::GetAddressMode(TextureCoordinate coord) const
     engine->RegisterObjectMethod(className, "TextureAddressMode GetAddressMode(TextureCoordinate) const", AS_METHODPR(T, GetAddressMode, (TextureCoordinate) const, TextureAddressMode), AS_CALL_THISCALL);
@@ -16153,15 +16135,6 @@ template <class T> void RegisterMembers_Texture(asIScriptEngine* engine, const c
 
     // void Texture::UpdateParameters()
     engine->RegisterObjectMethod(className, "void UpdateParameters()", AS_METHODPR(T, UpdateParameters, (), void), AS_CALL_THISCALL);
-
-    // static unsigned Texture::GetSRVFormat(unsigned format)
-    // Not registered because have @nobind mark
-    // static unsigned Texture::GetDSVFormat(unsigned format)
-    // Not registered because have @nobind mark
-    // static unsigned Texture::GetExternalFormat(unsigned format)
-    // Not registered because have @nobind mark
-    // static unsigned Texture::GetDataType(unsigned format)
-    // Not registered because have @nobind mark
 
     // static unsigned Texture::CheckMaxLevels(int width, int height, unsigned requestedLevels)
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("uint CheckMaxLevels(int, int, uint)", AS_FUNCTIONPR(T::CheckMaxLevels, (int, int, unsigned), unsigned), AS_CALL_CDECL);engine->SetDefaultNamespace("");

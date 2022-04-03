@@ -29,11 +29,11 @@ namespace Urho3D
 {
 
 /// Combined information for specific vertex and pixel shaders.
-class ShaderProgram : public RefCounted
+class ShaderProgram_D3D9 : public RefCounted
 {
 public:
     /// Construct.
-    ShaderProgram(ShaderVariation* vertexShader, ShaderVariation* pixelShader)
+    ShaderProgram_D3D9(ShaderVariation* vertexShader, ShaderVariation* pixelShader)
     {
         const HashMap<StringHash, ShaderParameter>& vsParams = vertexShader->GetParameters();
         for (HashMap<StringHash, ShaderParameter>::ConstIterator i = vsParams.Begin(); i != vsParams.End(); ++i)

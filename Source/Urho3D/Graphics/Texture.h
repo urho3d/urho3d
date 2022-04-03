@@ -192,10 +192,6 @@ public:
     /// Return texture's target. Only used on OpenGL.
     unsigned GetTarget() const { return target_; }
 
-    /// Convert format to sRGB. Not used on Direct3D9.
-    /// @nobind
-    unsigned GetSRGBFormat(unsigned format);
-
     /// Set or clear the need resolve flag. Called internally by Graphics.
     void SetResolveDirty(bool enable) { resolveDirty_ = enable; }
 
@@ -208,20 +204,61 @@ public:
     static unsigned CheckMaxLevels(int width, int height, unsigned requestedLevels);
     /// Check maximum allowed mip levels for a specific 3D texture size.
     static unsigned CheckMaxLevels(int width, int height, int depth, unsigned requestedLevels);
-    /// Return the shader resource view format corresponding to a texture format. Handles conversion of typeless depth texture formats. Only used on Direct3D11.
-    /// @nobind
-    static unsigned GetSRVFormat(unsigned format);
-    /// Return the depth-stencil view format corresponding to a texture format. Handles conversion of typeless depth texture formats. Only used on Direct3D11.
-    /// @nobind
-    static unsigned GetDSVFormat(unsigned format);
-    /// Return the non-internal texture format corresponding to an OpenGL internal format.
-    /// @nobind
-    static unsigned GetExternalFormat(unsigned format);
+
+#ifdef URHO3D_OPENGL
     /// Return the data type corresponding to an OpenGL internal format.
-    /// @nobind
-    static unsigned GetDataType(unsigned format);
+    static unsigned GetDataType_OGL(unsigned format);
+#endif
 
 protected:
+#ifdef URHO3D_OPENGL
+    /// Convert format to sRGB. Not used on Direct3D9.
+    unsigned GetSRGBFormat_OGL(unsigned format);
+
+    /// Return the non-internal texture format corresponding to an OpenGL internal format.
+    static unsigned GetExternalFormat_OGL(unsigned format);
+#endif // def URHO3D_OPENGL
+
+#ifdef URHO3D_D3D11
+    /// Convert format to sRGB. Not used on Direct3D9.
+    unsigned GetSRGBFormat_D3D11(unsigned format);
+
+    /// Return the shader resource view format corresponding to a texture format. Handles conversion of typeless depth texture formats. Only used on Direct3D11.
+    static unsigned GetSRVFormat_D3D11(unsigned format);
+
+    /// Return the depth-stencil view format corresponding to a texture format. Handles conversion of typeless depth texture formats. Only used on Direct3D11.
+    static unsigned GetDSVFormat_D3D11(unsigned format);
+#endif // def URHO3D_D3D11
+
+    // For proxy functions
+
+#ifdef URHO3D_OPENGL
+    void SetSRGB_OGL(bool enable);
+    void UpdateParameters_OGL();
+    bool GetParametersDirty_OGL() const;
+    bool IsCompressed_OGL() const;
+    unsigned GetRowDataSize_OGL(int width) const;
+    void RegenerateLevels_OGL();
+#endif // def URHO3D_OPENGL
+
+#ifdef URHO3D_D3D9
+    void SetSRGB_D3D9(bool enable);
+    void UpdateParameters_D3D9();
+    bool GetParametersDirty_D3D9() const;
+    bool IsCompressed_D3D9() const;
+    unsigned GetRowDataSize_D3D9(int width) const;
+    void RegenerateLevels_D3D9();
+#endif // def URHO3D_D3D9
+
+#ifdef URHO3D_D3D11
+    void SetSRGB_D3D11(bool enable);
+    void UpdateParameters_D3D11();
+    bool GetParametersDirty_D3D11() const;
+    bool IsCompressed_D3D11() const;
+    unsigned GetRowDataSize_D3D11(int width) const;
+    void RegenerateLevels_D3D11();
+#endif // def URHO3D_D3D11
+
     /// Check whether texture memory budget has been exceeded. Free unused materials in that case to release the texture references.
     void CheckTextureBudget(StringHash type);
     /// Create the GPU texture. Implemented in subclasses.

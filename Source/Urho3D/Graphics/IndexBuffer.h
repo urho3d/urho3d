@@ -100,6 +100,48 @@ private:
     /// Unmap the GPU buffer. Not used on OpenGL.
     void UnmapBuffer();
 
+#ifdef URHO3D_OPENGL
+    void OnDeviceLost_OGL();
+    void OnDeviceReset_OGL();
+    void Release_OGL();
+    bool SetData_OGL(const void* data);
+    bool SetDataRange_OGL(const void* data, unsigned start, unsigned count, bool discard = false);
+    void* Lock_OGL(unsigned start, unsigned count, bool discard);
+    void Unlock_OGL();
+    bool Create_OGL();
+    bool UpdateToGPU_OGL();
+    void* MapBuffer_OGL(unsigned start, unsigned count, bool discard);
+    void UnmapBuffer_OGL();
+#endif // def URHO3D_OPENGL
+
+#ifdef URHO3D_D3D9
+    void OnDeviceLost_D3D9();
+    void OnDeviceReset_D3D9();
+    void Release_D3D9();
+    bool SetData_D3D9(const void* data);
+    bool SetDataRange_D3D9(const void* data, unsigned start, unsigned count, bool discard = false);
+    void* Lock_D3D9(unsigned start, unsigned count, bool discard);
+    void Unlock_D3D9();
+    bool Create_D3D9();
+    bool UpdateToGPU_D3D9();
+    void* MapBuffer_D3D9(unsigned start, unsigned count, bool discard);
+    void UnmapBuffer_D3D9();
+#endif // def URHO3D_D3D9
+
+#ifdef URHO3D_D3D11
+    void OnDeviceLost_D3D11();
+    void OnDeviceReset_D3D11();
+    void Release_D3D11();
+    bool SetData_D3D11(const void* data);
+    bool SetDataRange_D3D11(const void* data, unsigned start, unsigned count, bool discard = false);
+    void* Lock_D3D11(unsigned start, unsigned count, bool discard);
+    void Unlock_D3D11();
+    bool Create_D3D11();
+    bool UpdateToGPU_D3D11();
+    void* MapBuffer_D3D11(unsigned start, unsigned count, bool discard);
+    void UnmapBuffer_D3D11();
+#endif // def URHO3D_D3D11
+
     /// Shadow data.
     SharedArrayPtr<unsigned char> shadowData_;
     /// Number of indices.

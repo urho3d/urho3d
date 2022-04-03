@@ -109,4 +109,93 @@ Viewport* RenderSurface::GetViewport(unsigned index) const
     return index < viewports_.Size() ? viewports_[index] : nullptr;
 }
 
+RenderSurface::RenderSurface(Texture* parentTexture)
+{
+    GAPI gapi = Graphics::GetGAPI();
+
+#ifdef URHO3D_OPENGL
+    if (gapi == GAPI_OPENGL)
+    {
+        Constructor_OGL(parentTexture);
+        return;
+    }
+#endif
+
+#ifdef URHO3D_D3D9
+    if (gapi == GAPI_D3D9)
+    {
+        Constructor_D3D9(parentTexture);
+        return;
+    }
+#endif
+
+#ifdef URHO3D_D3D11
+    if (gapi == GAPI_D3D11)
+    {
+        Constructor_D3D11(parentTexture);
+        return;
+    }
+#endif
+}
+
+bool RenderSurface::CreateRenderBuffer(unsigned width, unsigned height, unsigned format, int multiSample)
+{
+    GAPI gapi = Graphics::GetGAPI();
+
+#ifdef URHO3D_OPENGL
+    if (gapi == GAPI_OPENGL)
+        return CreateRenderBuffer_OGL(width, height, format, multiSample);
+#endif
+
+#ifdef URHO3D_D3D9
+    if (gapi == GAPI_D3D9)
+        return CreateRenderBuffer_D3D9(width, height, format, multiSample);
+#endif
+
+#ifdef URHO3D_D3D11
+    if (gapi == GAPI_D3D11)
+        return CreateRenderBuffer_D3D11(width, height, format, multiSample);
+#endif
+}
+
+void RenderSurface::OnDeviceLost()
+{
+    GAPI gapi = Graphics::GetGAPI();
+
+#ifdef URHO3D_OPENGL
+    if (gapi == GAPI_OPENGL)
+        return OnDeviceLost_OGL();
+#endif
+
+#ifdef URHO3D_D3D9
+    if (gapi == GAPI_D3D9)
+        return OnDeviceLost_D3D9();
+#endif
+
+#ifdef URHO3D_D3D11
+    if (gapi == GAPI_D3D11)
+        return OnDeviceLost_D3D11();
+#endif
+}
+
+void RenderSurface::Release()
+{
+    GAPI gapi = Graphics::GetGAPI();
+
+#ifdef URHO3D_OPENGL
+    if (gapi == GAPI_OPENGL)
+        return Release_OGL();
+#endif
+
+#ifdef URHO3D_D3D9
+    if (gapi == GAPI_D3D9)
+        return Release_D3D9();
+#endif
+
+#ifdef URHO3D_D3D11
+    if (gapi == GAPI_D3D11)
+        return Release_D3D11();
+#endif
+}
+
 }

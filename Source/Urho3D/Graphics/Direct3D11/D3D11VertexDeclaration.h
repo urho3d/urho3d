@@ -34,13 +34,13 @@ class ShaderVariation;
 class VertexBuffer;
 
 /// Vertex declaration.
-class URHO3D_API VertexDeclaration : public RefCounted
+class URHO3D_API VertexDeclaration_D3D11 : public RefCounted
 {
 public:
     /// Construct with vertex buffers and element masks to base declaration on.
-    VertexDeclaration(Graphics* graphics, ShaderVariation* vertexShader, VertexBuffer** buffers);
+    VertexDeclaration_D3D11(Graphics* graphics, ShaderVariation* vertexShader, VertexBuffer** buffers);
     /// Destruct.
-    virtual ~VertexDeclaration() override;
+    virtual ~VertexDeclaration_D3D11() override;
 
     /// Return input layout object corresponding to the declaration.
     void* GetInputLayout() const { return inputLayout_; }

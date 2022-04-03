@@ -137,20 +137,69 @@ public:
     /// Return defines with the CLIPPLANE define appended. Used internally on Direct3D11 only, will be empty on other APIs.
     const String& GetDefinesClipPlane() { return definesClipPlane_; }
 
+    /// OpenGL vertex semantic names. Used internally.
+    static const char* elementSemanticNames_OGL[];
+
     /// D3D11 vertex semantic names. Used internally.
-    static const char* elementSemanticNames[];
+    static const char* elementSemanticNames_D3D11[];
 
 private:
+
+    // Internal functions
+
+#ifdef URHO3D_D3D9
     /// Load bytecode from a file. Return true if successful.
-    bool LoadByteCode(const String& binaryShaderName);
+    bool LoadByteCode_D3D9(const String& binaryShaderName);
+
     /// Compile from source. Return true if successful.
-    bool Compile();
+    bool Compile_D3D9();
+
     /// Inspect the constant parameters and input layout (if applicable) from the shader bytecode.
-    void ParseParameters(unsigned char* bufData, unsigned bufSize);
+    void ParseParameters_D3D9(unsigned char* bufData, unsigned bufSize);
+
     /// Save bytecode to a file.
-    void SaveByteCode(const String& binaryShaderName);
+    void SaveByteCode_D3D9(const String& binaryShaderName);
+#endif // def URHO3D_D3D9
+
+#ifdef URHO3D_D3D11
+    /// Load bytecode from a file. Return true if successful.
+    bool LoadByteCode_D3D11(const String& binaryShaderName);
+
+    /// Compile from source. Return true if successful.
+    bool Compile_D3D11();
+
+    /// Inspect the constant parameters and input layout (if applicable) from the shader bytecode.
+    void ParseParameters_D3D11(unsigned char* bufData, unsigned bufSize);
+
+    /// Save bytecode to a file.
+    void SaveByteCode_D3D11(const String& binaryShaderName);
+    
     /// Calculate constant buffer sizes from parameters.
-    void CalculateConstantBufferSizes();
+    void CalculateConstantBufferSizes_D3D11();
+#endif // def URHO3D_D3D11
+
+    // For proxy functions
+
+#ifdef URHO3D_OPENGL
+    void OnDeviceLost_OGL();
+    void Release_OGL();
+    bool Create_OGL();
+    void SetDefines_OGL(const String& defines);
+#endif // def URHO3D_OPENGL
+
+#ifdef URHO3D_D3D9
+    void OnDeviceLost_D3D9();
+    void Release_D3D9();
+    bool Create_D3D9();
+    void SetDefines_D3D9(const String& defines);
+#endif // def URHO3D_D3D9
+
+#ifdef URHO3D_D3D11
+    void OnDeviceLost_D3D11();
+    void Release_D3D11();
+    bool Create_D3D11();
+    void SetDefines_D3D11(const String& defines);
+#endif // def URHO3D_D3D11
 
     /// Shader this variation belongs to.
     WeakPtr<Shader> owner_;

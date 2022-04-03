@@ -43,7 +43,8 @@ Texture2D::Texture2D(Context* context) :
     Texture(context)
 {
 #ifdef URHO3D_OPENGL
-    target_ = GL_TEXTURE_2D;
+    if (Graphics::GetGAPI() == GAPI_OPENGL)
+        target_ = GL_TEXTURE_2D;
 #endif
 }
 
@@ -190,6 +191,146 @@ void Texture2D::HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& even
             renderer->QueueRenderSurface(renderSurface_);
         renderSurface_->ResetUpdateQueued();
     }
+}
+
+void Texture2D::OnDeviceLost()
+{
+    GAPI gapi = Graphics::GetGAPI();
+
+#ifdef URHO3D_OPENGL
+    if (gapi == GAPI_OPENGL)
+        return OnDeviceLost_OGL();
+#endif
+
+#ifdef URHO3D_D3D9
+    if (gapi == GAPI_D3D9)
+        return OnDeviceLost_D3D9();
+#endif
+
+#ifdef URHO3D_D3D11
+    if (gapi == GAPI_D3D11)
+        return OnDeviceLost_D3D11();
+#endif
+}
+
+void Texture2D::OnDeviceReset()
+{
+    GAPI gapi = Graphics::GetGAPI();
+
+#ifdef URHO3D_OPENGL
+    if (gapi == GAPI_OPENGL)
+        return OnDeviceReset_OGL();
+#endif
+
+#ifdef URHO3D_D3D9
+    if (gapi == GAPI_D3D9)
+        return OnDeviceReset_D3D9();
+#endif
+
+#ifdef URHO3D_D3D11
+    if (gapi == GAPI_D3D11)
+        return OnDeviceReset_D3D11();
+#endif
+}
+
+void Texture2D::Release()
+{
+    GAPI gapi = Graphics::GetGAPI();
+
+#ifdef URHO3D_OPENGL
+    if (gapi == GAPI_OPENGL)
+        return Release_OGL();
+#endif
+
+#ifdef URHO3D_D3D9
+    if (gapi == GAPI_D3D9)
+        return Release_D3D9();
+#endif
+
+#ifdef URHO3D_D3D11
+    if (gapi == GAPI_D3D11)
+        return Release_D3D11();
+#endif
+}
+
+bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, const void* data)
+{
+    GAPI gapi = Graphics::GetGAPI();
+
+#ifdef URHO3D_OPENGL
+    if (gapi == GAPI_OPENGL)
+        return SetData_OGL(level, x, y, width, height, data);
+#endif
+
+#ifdef URHO3D_D3D9
+    if (gapi == GAPI_D3D9)
+        return SetData_D3D9(level, x, y, width, height, data);
+#endif
+
+#ifdef URHO3D_D3D11
+    if (gapi == GAPI_D3D11)
+        return SetData_D3D11(level, x, y, width, height, data);
+#endif
+}
+
+bool Texture2D::SetData(Image* image, bool useAlpha)
+{
+    GAPI gapi = Graphics::GetGAPI();
+
+#ifdef URHO3D_OPENGL
+    if (gapi == GAPI_OPENGL)
+        return SetData_OGL(image, useAlpha);
+#endif
+
+#ifdef URHO3D_D3D9
+    if (gapi == GAPI_D3D9)
+        return SetData_D3D9(image, useAlpha);
+#endif
+
+#ifdef URHO3D_D3D11
+    if (gapi == GAPI_D3D11)
+        return SetData_D3D11(image, useAlpha);
+#endif
+}
+
+bool Texture2D::GetData(unsigned level, void* dest) const
+{
+    GAPI gapi = Graphics::GetGAPI();
+
+#ifdef URHO3D_OPENGL
+    if (gapi == GAPI_OPENGL)
+        return GetData_OGL(level, dest);
+#endif
+
+#ifdef URHO3D_D3D9
+    if (gapi == GAPI_D3D9)
+        return GetData_D3D9(level, dest);
+#endif
+
+#ifdef URHO3D_D3D11
+    if (gapi == GAPI_D3D11)
+        return GetData_D3D11(level, dest);
+#endif
+}
+
+bool Texture2D::Create()
+{
+    GAPI gapi = Graphics::GetGAPI();
+
+#ifdef URHO3D_OPENGL
+    if (gapi == GAPI_OPENGL)
+        return Create_OGL();
+#endif
+
+#ifdef URHO3D_D3D9
+    if (gapi == GAPI_D3D9)
+        return Create_D3D9();
+#endif
+
+#ifdef URHO3D_D3D11
+    if (gapi == GAPI_D3D11)
+        return Create_D3D11();
+#endif
 }
 
 }

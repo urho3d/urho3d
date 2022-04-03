@@ -25,9 +25,9 @@
 #include "../../Graphics/ConstantBuffer.h"
 #include "../../Graphics/Graphics.h"
 #include "../../Graphics/GraphicsImpl.h"
-#include "../../Graphics/ShaderProgram.h"
 #include "../../Graphics/ShaderVariation.h"
 #include "../../IO/Log.h"
+#include "OGLShaderProgram.h"
 
 #include "../../DebugNew.h"
 
@@ -55,10 +55,10 @@ static unsigned NumberPostfix(const String& str)
     return M_MAX_UNSIGNED;
 }
 
-unsigned ShaderProgram::globalFrameNumber = 0;
-const void* ShaderProgram::globalParameterSources[MAX_SHADER_PARAMETER_GROUPS];
+unsigned ShaderProgram_OGL::globalFrameNumber = 0;
+const void* ShaderProgram_OGL::globalParameterSources[MAX_SHADER_PARAMETER_GROUPS];
 
-ShaderProgram::ShaderProgram(Graphics* graphics, ShaderVariation* vertexShader, ShaderVariation* pixelShader) :
+ShaderProgram_OGL::ShaderProgram_OGL(Graphics* graphics, ShaderVariation* vertexShader, ShaderVariation* pixelShader) :
     GPUObject(graphics),
     vertexShader_(vertexShader),
     pixelShader_(pixelShader)
@@ -67,25 +67,25 @@ ShaderProgram::ShaderProgram(Graphics* graphics, ShaderVariation* vertexShader, 
         parameterSource = (const void*)M_MAX_UNSIGNED;
 }
 
-ShaderProgram::~ShaderProgram()
+ShaderProgram_OGL::~ShaderProgram_OGL()
 {
     Release();
 }
 
-void ShaderProgram::OnDeviceLost()
+void ShaderProgram_OGL::OnDeviceLost()
 {
     if (object_.name_ && !graphics_->IsDeviceLost())
         glDeleteProgram(object_.name_);
 
     GPUObject::OnDeviceLost();
 
-    if (graphics_ && graphics_->GetShaderProgram() == this)
+    if (graphics_ && graphics_->GetShaderProgram_OGL() == this)
         graphics_->SetShaders(nullptr, nullptr);
 
     linkerOutput_.Clear();
 }
 
-void ShaderProgram::Release()
+void ShaderProgram_OGL::Release()
 {
     if (object_.name_)
     {
@@ -94,7 +94,7 @@ void ShaderProgram::Release()
 
         if (!graphics_->IsDeviceLost())
         {
-            if (graphics_->GetShaderProgram() == this)
+            if (graphics_->GetShaderProgram_OGL() == this)
                 graphics_->SetShaders(nullptr, nullptr);
 
             glDeleteProgram(object_.name_);
@@ -113,7 +113,7 @@ void ShaderProgram::Release()
     }
 }
 
-bool ShaderProgram::Link()
+bool ShaderProgram_OGL::Link()
 {
     Release();
 
@@ -168,7 +168,7 @@ bool ShaderProgram::Link()
         // Go in reverse order so that "binormal" is detected before "normal"
         for (unsigned j = MAX_VERTEX_ELEMENT_SEMANTICS - 1; j < MAX_VERTEX_ELEMENT_SEMANTICS; --j)
         {
-            if (name.Contains(ShaderVariation::elementSemanticNames[j], false))
+            if (name.Contains(ShaderVariation::elementSemanticNames_OGL[j], false))
             {
                 semantic = (VertexElementSemantic)j;
                 unsigned index = NumberPostfix(name);
@@ -320,22 +320,22 @@ bool ShaderProgram::Link()
     return true;
 }
 
-ShaderVariation* ShaderProgram::GetVertexShader() const
+ShaderVariation* ShaderProgram_OGL::GetVertexShader() const
 {
     return vertexShader_;
 }
 
-ShaderVariation* ShaderProgram::GetPixelShader() const
+ShaderVariation* ShaderProgram_OGL::GetPixelShader() const
 {
     return pixelShader_;
 }
 
-bool ShaderProgram::HasParameter(StringHash param) const
+bool ShaderProgram_OGL::HasParameter(StringHash param) const
 {
     return shaderParameters_.Find(param) != shaderParameters_.End();
 }
 
-const ShaderParameter* ShaderProgram::GetParameter(StringHash param) const
+const ShaderParameter* ShaderProgram_OGL::GetParameter(StringHash param) const
 {
     HashMap<StringHash, ShaderParameter>::ConstIterator i = shaderParameters_.Find(param);
     if (i != shaderParameters_.End())
@@ -344,7 +344,7 @@ const ShaderParameter* ShaderProgram::GetParameter(StringHash param) const
         return nullptr;
 }
 
-bool ShaderProgram::NeedParameterUpdate(ShaderParameterGroup group, const void* source)
+bool ShaderProgram_OGL::NeedParameterUpdate(ShaderParameterGroup group, const void* source)
 {
     // If global framenumber has changed, invalidate all per-program parameter sources now
     if (globalFrameNumber != frameNumber_)
@@ -384,7 +384,7 @@ bool ShaderProgram::NeedParameterUpdate(ShaderParameterGroup group, const void* 
 #endif
 }
 
-void ShaderProgram::ClearParameterSource(ShaderParameterGroup group)
+void ShaderProgram_OGL::ClearParameterSource(ShaderParameterGroup group)
 {
     // The shader program may use a mixture of constant buffers and individual uniforms even in the same group
 #ifndef GL_ES_VERSION_2_0
@@ -400,7 +400,7 @@ void ShaderProgram::ClearParameterSource(ShaderParameterGroup group)
 #endif
 }
 
-void ShaderProgram::ClearParameterSources()
+void ShaderProgram_OGL::ClearParameterSources()
 {
     ++globalFrameNumber;
     if (!globalFrameNumber)
@@ -412,7 +412,7 @@ void ShaderProgram::ClearParameterSources()
 #endif
 }
 
-void ShaderProgram::ClearGlobalParameterSource(ShaderParameterGroup group)
+void ShaderProgram_OGL::ClearGlobalParameterSource(ShaderParameterGroup group)
 {
     globalParameterSources[group] = (const void*)M_MAX_UNSIGNED;
 }

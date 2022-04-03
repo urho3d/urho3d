@@ -26,30 +26,30 @@
 #include "../../Core/Profiler.h"
 #include "../../Graphics/Graphics.h"
 #include "../../Graphics/GraphicsEvents.h"
-#include "../../Graphics/GraphicsImpl.h"
 #include "../../Graphics/Renderer.h"
 #include "../../Graphics/Texture3D.h"
 #include "../../IO/FileSystem.h"
 #include "../../IO/Log.h"
 #include "../../Resource/ResourceCache.h"
 #include "../../Resource/XMLFile.h"
+#include "D3D11GraphicsImpl.h"
 
 #include "../../DebugNew.h"
 
 namespace Urho3D
 {
 
-void Texture3D::OnDeviceLost()
+void Texture3D::OnDeviceLost_D3D11()
 {
     // No-op on Direct3D11
 }
 
-void Texture3D::OnDeviceReset()
+void Texture3D::OnDeviceReset_D3D11()
 {
     // No-op on Direct3D11
 }
 
-void Texture3D::Release()
+void Texture3D::Release_D3D11()
 {
     if (graphics_ && object_.ptr_)
     {
@@ -65,7 +65,7 @@ void Texture3D::Release()
     URHO3D_SAFE_RELEASE(sampler_);
 }
 
-bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int height, int depth, const void* data)
+bool Texture3D::SetData_D3D11(unsigned level, int x, int y, int z, int width, int height, int depth, const void* data)
 {
     URHO3D_PROFILE(SetTextureData);
 
@@ -98,7 +98,7 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
     }
 
     // If compressed, align the update region on a block
-    if (IsCompressed())
+    if (IsCompressed_D3D11())
     {
         x &= ~3;
         y &= ~3;
@@ -109,13 +109,13 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
     }
 
     unsigned char* src = (unsigned char*)data;
-    unsigned rowSize = GetRowDataSize(width);
-    unsigned rowStart = GetRowDataSize(x);
+    unsigned rowSize = GetRowDataSize_D3D11(width);
+    unsigned rowStart = GetRowDataSize_D3D11(x);
     unsigned subResource = D3D11CalcSubresource(level, 0, levels_);
 
     if (usage_ == TEXTURE_DYNAMIC)
     {
-        if (IsCompressed())
+        if (IsCompressed_D3D11())
         {
             height = (height + 3) >> 2;
             y >>= 2;
@@ -124,7 +124,7 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
         D3D11_MAPPED_SUBRESOURCE mappedData;
         mappedData.pData = nullptr;
 
-        HRESULT hr = graphics_->GetImpl()->GetDeviceContext()->Map((ID3D11Resource*)object_.ptr_, subResource, D3D11_MAP_WRITE_DISCARD, 0,
+        HRESULT hr = graphics_->GetImpl_D3D11()->GetDeviceContext()->Map((ID3D11Resource*)object_.ptr_, subResource, D3D11_MAP_WRITE_DISCARD, 0,
             &mappedData);
         if (FAILED(hr) || !mappedData.pData)
         {
@@ -142,12 +142,12 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
                 }
             }
 
-            graphics_->GetImpl()->GetDeviceContext()->Unmap((ID3D11Resource*)object_.ptr_, subResource);
+            graphics_->GetImpl_D3D11()->GetDeviceContext()->Unmap((ID3D11Resource*)object_.ptr_, subResource);
         }
     }
     else
     {
-        if (IsCompressed())
+        if (IsCompressed_D3D11())
             levelHeight = (levelHeight + 3) >> 2;
 
         D3D11_BOX destBox;
@@ -158,14 +158,14 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
         destBox.front = (UINT)z;
         destBox.back = (UINT)(z + depth);
 
-        graphics_->GetImpl()->GetDeviceContext()->UpdateSubresource((ID3D11Resource*)object_.ptr_, subResource, &destBox, data,
+        graphics_->GetImpl_D3D11()->GetDeviceContext()->UpdateSubresource((ID3D11Resource*)object_.ptr_, subResource, &destBox, data,
             rowSize, levelHeight * rowSize);
     }
 
     return true;
 }
 
-bool Texture3D::SetData(Image* image, bool useAlpha)
+bool Texture3D::SetData_D3D11(Image* image, bool useAlpha)
 {
     if (!image)
     {
@@ -223,13 +223,13 @@ bool Texture3D::SetData(Image* image, bool useAlpha)
         }
 
         // If image was previously compressed, reset number of requested levels to avoid error if level count is too high for new size
-        if (IsCompressed() && requestedLevels_ > 1)
+        if (IsCompressed_D3D11() && requestedLevels_ > 1)
             requestedLevels_ = 0;
         SetSize(levelWidth, levelHeight, levelDepth, format);
 
         for (unsigned i = 0; i < levels_; ++i)
         {
-            SetData(i, 0, 0, 0, levelWidth, levelHeight, levelDepth, levelData);
+            SetData_D3D11(i, 0, 0, 0, levelWidth, levelHeight, levelDepth, levelData);
             memoryUse += levelWidth * levelHeight * levelDepth * components;
 
             if (i < levels_ - 1)
@@ -274,14 +274,14 @@ bool Texture3D::SetData(Image* image, bool useAlpha)
             CompressedLevel level = image->GetCompressedLevel(i + mipsToSkip);
             if (!needDecompress)
             {
-                SetData(i, 0, 0, 0, level.width_, level.height_, level.depth_, level.data_);
+                SetData_D3D11(i, 0, 0, 0, level.width_, level.height_, level.depth_, level.data_);
                 memoryUse += level.depth_ * level.rows_ * level.rowSize_;
             }
             else
             {
                 unsigned char* rgbaData = new unsigned char[level.width_ * level.height_ * level.depth_ * 4];
                 level.Decompress(rgbaData);
-                SetData(i, 0, 0, 0, level.width_, level.height_, level.depth_, rgbaData);
+                SetData_D3D11(i, 0, 0, 0, level.width_, level.height_, level.depth_, rgbaData);
                 memoryUse += level.width_ * level.height_ * level.depth_ * 4;
                 delete[] rgbaData;
             }
@@ -292,7 +292,7 @@ bool Texture3D::SetData(Image* image, bool useAlpha)
     return true;
 }
 
-bool Texture3D::GetData(unsigned level, void* dest) const
+bool Texture3D::GetData_D3D11(unsigned level, void* dest) const
 {
     if (!object_.ptr_)
     {
@@ -327,7 +327,7 @@ bool Texture3D::GetData(unsigned level, void* dest) const
     textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
 
     ID3D11Texture3D* stagingTexture = nullptr;
-    HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateTexture3D(&textureDesc, nullptr, &stagingTexture);
+    HRESULT hr = graphics_->GetImpl_D3D11()->GetDevice()->CreateTexture3D(&textureDesc, nullptr, &stagingTexture);
     if (FAILED(hr))
     {
         URHO3D_LOGD3DERROR("Failed to create staging texture for GetData", hr);
@@ -343,15 +343,15 @@ bool Texture3D::GetData(unsigned level, void* dest) const
     srcBox.bottom = (UINT)levelHeight;
     srcBox.front = 0;
     srcBox.back = (UINT)levelDepth;
-    graphics_->GetImpl()->GetDeviceContext()->CopySubresourceRegion(stagingTexture, 0, 0, 0, 0, (ID3D11Resource*)object_.ptr_,
+    graphics_->GetImpl_D3D11()->GetDeviceContext()->CopySubresourceRegion(stagingTexture, 0, 0, 0, 0, (ID3D11Resource*)object_.ptr_,
         srcSubResource, &srcBox);
 
     D3D11_MAPPED_SUBRESOURCE mappedData;
     mappedData.pData = nullptr;
-    unsigned rowSize = GetRowDataSize(levelWidth);
-    unsigned numRows = (unsigned)(IsCompressed() ? (levelHeight + 3) >> 2 : levelHeight);
+    unsigned rowSize = GetRowDataSize_D3D11(levelWidth);
+    unsigned numRows = (unsigned)(IsCompressed_D3D11() ? (levelHeight + 3) >> 2 : levelHeight);
 
-    hr = graphics_->GetImpl()->GetDeviceContext()->Map((ID3D11Resource*)stagingTexture, 0, D3D11_MAP_READ, 0, &mappedData);
+    hr = graphics_->GetImpl_D3D11()->GetDeviceContext()->Map((ID3D11Resource*)stagingTexture, 0, D3D11_MAP_READ, 0, &mappedData);
     if (FAILED(hr) || !mappedData.pData)
     {
         URHO3D_LOGD3DERROR("Failed to map staging texture for GetData", hr);
@@ -368,15 +368,15 @@ bool Texture3D::GetData(unsigned level, void* dest) const
                     (unsigned char*)mappedData.pData + page * mappedData.DepthPitch + row * mappedData.RowPitch, rowSize);
             }
         }
-        graphics_->GetImpl()->GetDeviceContext()->Unmap((ID3D11Resource*)stagingTexture, 0);
+        graphics_->GetImpl_D3D11()->GetDeviceContext()->Unmap((ID3D11Resource*)stagingTexture, 0);
         URHO3D_SAFE_RELEASE(stagingTexture);
         return true;
     }
 }
 
-bool Texture3D::Create()
+bool Texture3D::Create_D3D11()
 {
-    Release();
+    Release_D3D11();
 
     if (!graphics_ || !width_ || !height_ || !depth_)
         return false;
@@ -389,12 +389,12 @@ bool Texture3D::Create()
     textureDesc.Height = (UINT)height_;
     textureDesc.Depth = (UINT)depth_;
     textureDesc.MipLevels = usage_ != TEXTURE_DYNAMIC ? levels_ : 1;
-    textureDesc.Format = (DXGI_FORMAT)(sRGB_ ? GetSRGBFormat(format_) : format_);
+    textureDesc.Format = (DXGI_FORMAT)(sRGB_ ? GetSRGBFormat_D3D11(format_) : format_);
     textureDesc.Usage = usage_ == TEXTURE_DYNAMIC ? D3D11_USAGE_DYNAMIC : D3D11_USAGE_DEFAULT;
     textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
     textureDesc.CPUAccessFlags = usage_ == TEXTURE_DYNAMIC ? D3D11_CPU_ACCESS_WRITE : 0;
 
-    HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateTexture3D(&textureDesc, nullptr, (ID3D11Texture3D**)&object_.ptr_);
+    HRESULT hr = graphics_->GetImpl_D3D11()->GetDevice()->CreateTexture3D(&textureDesc, nullptr, (ID3D11Texture3D**)&object_.ptr_);
     if (FAILED(hr))
     {
         URHO3D_LOGD3DERROR("Failed to create texture", hr);
@@ -404,11 +404,11 @@ bool Texture3D::Create()
 
     D3D11_SHADER_RESOURCE_VIEW_DESC resourceViewDesc;
     memset(&resourceViewDesc, 0, sizeof resourceViewDesc);
-    resourceViewDesc.Format = (DXGI_FORMAT)GetSRVFormat(textureDesc.Format);
+    resourceViewDesc.Format = (DXGI_FORMAT)GetSRVFormat_D3D11(textureDesc.Format);
     resourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE3D;
     resourceViewDesc.Texture3D.MipLevels = usage_ != TEXTURE_DYNAMIC ? (UINT)levels_ : 1;
 
-    hr = graphics_->GetImpl()->GetDevice()->CreateShaderResourceView((ID3D11Resource*)object_.ptr_, &resourceViewDesc,
+    hr = graphics_->GetImpl_D3D11()->GetDevice()->CreateShaderResourceView((ID3D11Resource*)object_.ptr_, &resourceViewDesc,
         (ID3D11ShaderResourceView**)&shaderResourceView_);
     if (FAILED(hr))
     {

@@ -39,7 +39,7 @@
 namespace Urho3D
 {
 
-void Texture3D::OnDeviceLost()
+void Texture3D::OnDeviceLost_OGL()
 {
     if (object_.name_ && !graphics_->IsDeviceLost())
         glDeleteTextures(1, &object_.name_);
@@ -47,7 +47,7 @@ void Texture3D::OnDeviceLost()
     GPUObject::OnDeviceLost();
 }
 
-void Texture3D::OnDeviceReset()
+void Texture3D::OnDeviceReset_OGL()
 {
     if (!object_.name_ || dataPending_)
     {
@@ -58,7 +58,7 @@ void Texture3D::OnDeviceReset()
 
         if (!object_.name_)
         {
-            Create();
+            Create_OGL();
             dataLost_ = true;
         }
     }
@@ -66,7 +66,7 @@ void Texture3D::OnDeviceReset()
     dataPending_ = false;
 }
 
-void Texture3D::Release()
+void Texture3D::Release_OGL()
 {
     if (object_.name_)
     {
@@ -84,7 +84,7 @@ void Texture3D::Release()
     }
 }
 
-bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int height, int depth, const void* data)
+bool Texture3D::SetData_OGL(unsigned level, int x, int y, int z, int width, int height, int depth, const void* data)
 {
     URHO3D_PROFILE(SetTextureData);
 
@@ -113,7 +113,7 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
         return true;
     }
 
-    if (IsCompressed())
+    if (IsCompressed_OGL())
     {
         x &= ~3u;
         y &= ~3u;
@@ -129,18 +129,18 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
         return false;
     }
 
-    graphics_->SetTextureForUpdate(this);
+    graphics_->SetTextureForUpdate_OGL(this);
 
 #ifndef GL_ES_VERSION_2_0
     bool wholeLevel = x == 0 && y == 0 && z == 0 && width == levelWidth && height == levelHeight && depth == levelDepth;
-    unsigned format = GetSRGB() ? GetSRGBFormat(format_) : format_;
+    unsigned format = GetSRGB() ? GetSRGBFormat_OGL(format_) : format_;
 
-    if (!IsCompressed())
+    if (!IsCompressed_OGL())
     {
         if (wholeLevel)
-            glTexImage3D(target_, level, format, width, height, depth, 0, GetExternalFormat(format_), GetDataType(format_), data);
+            glTexImage3D(target_, level, format, width, height, depth, 0, GetExternalFormat_OGL(format_), GetDataType_OGL(format_), data);
         else
-            glTexSubImage3D(target_, level, x, y, z, width, height, depth, GetExternalFormat(format_), GetDataType(format_), data);
+            glTexSubImage3D(target_, level, x, y, z, width, height, depth, GetExternalFormat_OGL(format_), GetDataType_OGL(format_), data);
     }
     else
     {
@@ -156,7 +156,7 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
     return true;
 }
 
-bool Texture3D::SetData(Image* image, bool useAlpha)
+bool Texture3D::SetData_OGL(Image* image, bool useAlpha)
 {
     if (!image)
     {
@@ -224,7 +224,7 @@ bool Texture3D::SetData(Image* image, bool useAlpha)
         }
 
         // If image was previously compressed, reset number of requested levels to avoid error if level count is too high for new size
-        if (IsCompressed() && requestedLevels_ > 1)
+        if (IsCompressed_OGL() && requestedLevels_ > 1)
             requestedLevels_ = 0;
         SetSize(levelWidth, levelHeight, levelDepth, format);
         if (!object_.name_)
@@ -232,7 +232,7 @@ bool Texture3D::SetData(Image* image, bool useAlpha)
 
         for (unsigned i = 0; i < levels_; ++i)
         {
-            SetData(i, 0, 0, 0, levelWidth, levelHeight, levelDepth, levelData);
+            SetData_OGL(i, 0, 0, 0, levelWidth, levelHeight, levelDepth, levelData);
             memoryUse += levelWidth * levelHeight * levelDepth * components;
 
             if (i < levels_ - 1)
@@ -277,14 +277,14 @@ bool Texture3D::SetData(Image* image, bool useAlpha)
             CompressedLevel level = image->GetCompressedLevel(i + mipsToSkip);
             if (!needDecompress)
             {
-                SetData(i, 0, 0, 0, level.width_, level.height_, level.depth_, level.data_);
+                SetData_OGL(i, 0, 0, 0, level.width_, level.height_, level.depth_, level.data_);
                 memoryUse += level.depth_ * level.rows_ * level.rowSize_;
             }
             else
             {
                 auto* rgbaData = new unsigned char[level.width_ * level.height_ * level.depth_ * 4];
                 level.Decompress(rgbaData);
-                SetData(i, 0, 0, 0, level.width_, level.height_, level.depth_, rgbaData);
+                SetData_OGL(i, 0, 0, 0, level.width_, level.height_, level.depth_, rgbaData);
                 memoryUse += level.width_ * level.height_ * level.depth_ * 4;
                 delete[] rgbaData;
             }
@@ -295,7 +295,7 @@ bool Texture3D::SetData(Image* image, bool useAlpha)
     return true;
 }
 
-bool Texture3D::GetData(unsigned level, void* dest) const
+bool Texture3D::GetData_OGL(unsigned level, void* dest) const
 {
 #ifndef GL_ES_VERSION_2_0
     if (!object_.name_ || !graphics_)
@@ -322,10 +322,10 @@ bool Texture3D::GetData(unsigned level, void* dest) const
         return false;
     }
 
-    graphics_->SetTextureForUpdate(const_cast<Texture3D*>(this));
+    graphics_->SetTextureForUpdate_OGL(const_cast<Texture3D*>(this));
 
-    if (!IsCompressed())
-        glGetTexImage(target_, level, GetExternalFormat(format_), GetDataType(format_), dest);
+    if (!IsCompressed_OGL())
+        glGetTexImage(target_, level, GetExternalFormat_OGL(format_), GetDataType_OGL(format_), dest);
     else
         glGetCompressedTexImage(target_, level, dest);
 
@@ -337,9 +337,9 @@ bool Texture3D::GetData(unsigned level, void* dest) const
 #endif
 }
 
-bool Texture3D::Create()
+bool Texture3D::Create_OGL()
 {
-    Release();
+    Release_OGL();
 
 #ifdef GL_ES_VERSION_2_0
     URHO3D_LOGERROR("Failed to create 3D texture, currently unsupported on OpenGL ES 2");
@@ -354,19 +354,19 @@ bool Texture3D::Create()
         return true;
     }
 
-    unsigned format = GetSRGB() ? GetSRGBFormat(format_) : format_;
-    unsigned externalFormat = GetExternalFormat(format_);
-    unsigned dataType = GetDataType(format_);
+    unsigned format = GetSRGB() ? GetSRGBFormat_OGL(format_) : format_;
+    unsigned externalFormat = GetExternalFormat_OGL(format_);
+    unsigned dataType = GetDataType_OGL(format_);
 
     glGenTextures(1, &object_.name_);
 
     // Ensure that our texture is bound to OpenGL texture unit 0
-    graphics_->SetTextureForUpdate(this);
+    graphics_->SetTextureForUpdate_OGL(this);
 
     // If not compressed, create the initial level 0 texture with null data
     bool success = true;
 
-    if (!IsCompressed())
+    if (!IsCompressed_OGL())
     {
         glGetError();
         glTexImage3D(target_, 0, format, width_, height_, depth_, 0, externalFormat, dataType, nullptr);

@@ -43,7 +43,7 @@
 namespace Urho3D
 {
 
-void TextureCube::OnDeviceLost()
+void TextureCube::OnDeviceLost_OGL()
 {
     if (object_.name_ && !graphics_->IsDeviceLost())
         glDeleteTextures(1, &object_.name_);
@@ -57,7 +57,7 @@ void TextureCube::OnDeviceLost()
     }
 }
 
-void TextureCube::OnDeviceReset()
+void TextureCube::OnDeviceReset_OGL()
 {
     if (!object_.name_ || dataPending_)
     {
@@ -68,7 +68,7 @@ void TextureCube::OnDeviceReset()
 
         if (!object_.name_)
         {
-            Create();
+            Create_OGL();
             dataLost_ = true;
         }
     }
@@ -76,7 +76,7 @@ void TextureCube::OnDeviceReset()
     dataPending_ = false;
 }
 
-void TextureCube::Release()
+void TextureCube::Release_OGL()
 {
     if (object_.name_)
     {
@@ -107,7 +107,7 @@ void TextureCube::Release()
     levelsDirty_ = false;
 }
 
-bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int width, int height, const void* data)
+bool TextureCube::SetData_OGL(CubeMapFace face, unsigned level, int x, int y, int width, int height, const void* data)
 {
     URHO3D_PROFILE(SetTextureData);
 
@@ -136,7 +136,7 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
         return true;
     }
 
-    if (IsCompressed())
+    if (IsCompressed_OGL())
     {
         x &= ~3u;
         y &= ~3u;
@@ -150,19 +150,19 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
         return false;
     }
 
-    graphics_->SetTextureForUpdate(this);
+    graphics_->SetTextureForUpdate_OGL(this);
 
     bool wholeLevel = x == 0 && y == 0 && width == levelWidth && height == levelHeight;
-    unsigned format = GetSRGB() ? GetSRGBFormat(format_) : format_;
+    unsigned format = GetSRGB() ? GetSRGBFormat_OGL(format_) : format_;
 
-    if (!IsCompressed())
+    if (!IsCompressed_OGL())
     {
         if (wholeLevel)
-            glTexImage2D((GLenum)(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face), level, format, width, height, 0, GetExternalFormat(format_),
-                GetDataType(format_), data);
+            glTexImage2D((GLenum)(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face), level, format, width, height, 0, GetExternalFormat_OGL(format_),
+                GetDataType_OGL(format_), data);
         else
-            glTexSubImage2D((GLenum)(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face), level, x, y, width, height, GetExternalFormat(format_),
-                GetDataType(format_), data);
+            glTexSubImage2D((GLenum)(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face), level, x, y, width, height, GetExternalFormat_OGL(format_),
+                GetDataType_OGL(format_), data);
     }
     else
     {
@@ -178,16 +178,16 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
     return true;
 }
 
-bool TextureCube::SetData(CubeMapFace face, Deserializer& source)
+bool TextureCube::SetData_OGL(CubeMapFace face, Deserializer& source)
 {
     SharedPtr<Image> image(new Image(context_));
     if (!image->Load(source))
         return false;
 
-    return SetData(face, image);
+    return SetData_OGL(face, image);
 }
 
-bool TextureCube::SetData(CubeMapFace face, Image* image, bool useAlpha)
+bool TextureCube::SetData_OGL(CubeMapFace face, Image* image, bool useAlpha)
 {
     if (!image)
     {
@@ -262,7 +262,7 @@ bool TextureCube::SetData(CubeMapFace face, Image* image, bool useAlpha)
         if (!face)
         {
             // If image was previously compressed, reset number of requested levels to avoid error if level count is too high for new size
-            if (IsCompressed() && requestedLevels_ > 1)
+            if (IsCompressed_OGL() && requestedLevels_ > 1)
                 requestedLevels_ = 0;
             SetSize(levelWidth, format);
         }
@@ -282,7 +282,7 @@ bool TextureCube::SetData(CubeMapFace face, Image* image, bool useAlpha)
 
         for (unsigned i = 0; i < levels_; ++i)
         {
-            SetData(face, i, 0, 0, levelWidth, levelHeight, levelData);
+            SetData_OGL(face, i, 0, 0, levelWidth, levelHeight, levelData);
             memoryUse += levelWidth * levelHeight * components;
 
             if (i < levels_ - 1)
@@ -347,14 +347,14 @@ bool TextureCube::SetData(CubeMapFace face, Image* image, bool useAlpha)
             CompressedLevel level = image->GetCompressedLevel(i + mipsToSkip);
             if (!needDecompress)
             {
-                SetData(face, i, 0, 0, level.width_, level.height_, level.data_);
+                SetData_OGL(face, i, 0, 0, level.width_, level.height_, level.data_);
                 memoryUse += level.rows_ * level.rowSize_;
             }
             else
             {
                 auto* rgbaData = new unsigned char[level.width_ * level.height_ * 4];
                 level.Decompress(rgbaData);
-                SetData(face, i, 0, 0, level.width_, level.height_, rgbaData);
+                SetData_OGL(face, i, 0, 0, level.width_, level.height_, rgbaData);
                 memoryUse += level.width_ * level.height_ * 4;
                 delete[] rgbaData;
             }
@@ -369,7 +369,7 @@ bool TextureCube::SetData(CubeMapFace face, Image* image, bool useAlpha)
     return true;
 }
 
-bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
+bool TextureCube::GetData_OGL(CubeMapFace face, unsigned level, void* dest) const
 {
     if (!object_.name_ || !graphics_)
     {
@@ -405,10 +405,10 @@ bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
     if (resolveDirty_)
         graphics_->ResolveToTexture(const_cast<TextureCube*>(this));
 
-    graphics_->SetTextureForUpdate(const_cast<TextureCube*>(this));
+    graphics_->SetTextureForUpdate_OGL(const_cast<TextureCube*>(this));
 
-    if (!IsCompressed())
-        glGetTexImage((GLenum)(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face), level, GetExternalFormat(format_), GetDataType(format_), dest);
+    if (!IsCompressed_OGL())
+        glGetTexImage((GLenum)(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face), level, GetExternalFormat_OGL(format_), GetDataType_OGL(format_), dest);
     else
         glGetCompressedTexImage((GLenum)(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face), level, dest);
 
@@ -421,7 +421,7 @@ bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
         graphics_->SetRenderTarget(0, renderSurfaces_[face]);
         // Ensure the FBO is current; this viewport is actually never rendered to
         graphics_->SetViewport(IntRect(0, 0, width_, height_));
-        glReadPixels(0, 0, width_, height_, GetExternalFormat(format_), GetDataType(format_), dest);
+        glReadPixels(0, 0, width_, height_, GetExternalFormat_OGL(format_), GetDataType_OGL(format_), dest);
         return true;
     }
 
@@ -430,9 +430,9 @@ bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
 #endif
 }
 
-bool TextureCube::Create()
+bool TextureCube::Create_OGL()
 {
-    Release();
+    Release_OGL();
 
     if (!graphics_ || !width_ || !height_)
         return false;
@@ -455,12 +455,12 @@ bool TextureCube::Create()
     glGenTextures(1, &object_.name_);
 
     // Ensure that our texture is bound to OpenGL texture unit 0
-    graphics_->SetTextureForUpdate(this);
+    graphics_->SetTextureForUpdate_OGL(this);
 
     // If not compressed, create the initial level 0 texture with null data
-    unsigned format = GetSRGB() ? GetSRGBFormat(format_) : format_;
-    unsigned externalFormat = GetExternalFormat(format_);
-    unsigned dataType = GetDataType(format_);
+    unsigned format = GetSRGB() ? GetSRGBFormat_OGL(format_) : format_;
+    unsigned externalFormat = GetExternalFormat_OGL(format_);
+    unsigned dataType = GetDataType_OGL(format_);
 
     // If multisample, create renderbuffers for each face
     if (multiSample_ > 1)
@@ -470,7 +470,7 @@ bool TextureCube::Create()
     }
 
     bool success = true;
-    if (!IsCompressed())
+    if (!IsCompressed_OGL())
     {
         glGetError();
         for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
@@ -495,7 +495,7 @@ bool TextureCube::Create()
         if (requestedLevels_ != 1)
         {
             // Generate levels for the first time now
-            RegenerateLevels();
+            RegenerateLevels_OGL();
             // Determine max. levels automatically
             requestedLevels_ = 0;
         }

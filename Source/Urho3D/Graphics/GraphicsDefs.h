@@ -40,6 +40,14 @@ class Vector3;
 #define DESKTOP_GRAPHICS
 #endif
 
+enum GAPI
+{
+    GAPI_NONE = 0,
+    GAPI_OPENGL,
+    GAPI_D3D9,
+    GAPI_D3D11
+};
+
 /// Primitive type.
 enum PrimitiveType
 {

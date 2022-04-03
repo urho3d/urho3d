@@ -23,13 +23,13 @@
 #include "../../Precompiled.h"
 
 #include "../../Graphics/Graphics.h"
-#include "../../Graphics/GraphicsImpl.h"
 #include "../../Graphics/Shader.h"
 #include "../../Graphics/VertexBuffer.h"
 #include "../../IO/File.h"
 #include "../../IO/FileSystem.h"
 #include "../../IO/Log.h"
 #include "../../Resource/ResourceCache.h"
+#include "D3D11GraphicsImpl.h"
 
 #include <d3dcompiler.h>
 
@@ -38,7 +38,7 @@
 namespace Urho3D
 {
 
-const char* ShaderVariation::elementSemanticNames[] =
+const char* ShaderVariation::elementSemanticNames_D3D11[] =
 {
     "POSITION",
     "NORMAL",
@@ -51,14 +51,14 @@ const char* ShaderVariation::elementSemanticNames[] =
     "OBJECTINDEX"
 };
 
-void ShaderVariation::OnDeviceLost()
+void ShaderVariation::OnDeviceLost_D3D11()
 {
     // No-op on Direct3D11
 }
 
-bool ShaderVariation::Create()
+bool ShaderVariation::Create_D3D11()
 {
-    Release();
+    Release_D3D11();
 
     if (!graphics_)
         return false;
@@ -76,18 +76,18 @@ bool ShaderVariation::Create()
 
     String binaryShaderName = graphics_->GetShaderCacheDir() + name + "_" + StringHash(defines_).ToString() + extension;
 
-    if (!LoadByteCode(binaryShaderName))
+    if (!LoadByteCode_D3D11(binaryShaderName))
     {
         // Compile shader if don't have valid bytecode
-        if (!Compile())
+        if (!Compile_D3D11())
             return false;
         // Save the bytecode after successful compile, but not if the source is from a package
         if (owner_->GetTimeStamp())
-            SaveByteCode(binaryShaderName);
+            SaveByteCode_D3D11(binaryShaderName);
     }
 
     // Then create shader from the bytecode
-    ID3D11Device* device = graphics_->GetImpl()->GetDevice();
+    ID3D11Device* device = graphics_->GetImpl_D3D11()->GetDevice();
     if (type_ == VS)
     {
         if (device && byteCode_.Size())
@@ -120,14 +120,14 @@ bool ShaderVariation::Create()
     return object_.ptr_ != nullptr;
 }
 
-void ShaderVariation::Release()
+void ShaderVariation::Release_D3D11()
 {
     if (object_.ptr_)
     {
         if (!graphics_)
             return;
 
-        graphics_->CleanupShaderPrograms(this);
+        graphics_->CleanupShaderPrograms_D3D11(this);
 
         if (type_ == VS)
         {
@@ -154,7 +154,7 @@ void ShaderVariation::Release()
     elementHash_ = 0;
 }
 
-void ShaderVariation::SetDefines(const String& defines)
+void ShaderVariation::SetDefines_D3D11(const String& defines)
 {
     defines_ = defines;
 
@@ -164,7 +164,7 @@ void ShaderVariation::SetDefines(const String& defines)
         definesClipPlane_ += " CLIPPLANE";
 }
 
-bool ShaderVariation::LoadByteCode(const String& binaryShaderName)
+bool ShaderVariation::LoadByteCode_D3D11(const String& binaryShaderName)
 {
     ResourceCache* cache = owner_->GetSubsystem<ResourceCache>();
     if (!cache->Exists(binaryShaderName))
@@ -222,7 +222,7 @@ bool ShaderVariation::LoadByteCode(const String& binaryShaderName)
         else
             URHO3D_LOGDEBUG("Loaded cached pixel shader " + GetFullName());
 
-        CalculateConstantBufferSizes();
+        CalculateConstantBufferSizes_D3D11();
         return true;
     }
     else
@@ -232,7 +232,7 @@ bool ShaderVariation::LoadByteCode(const String& binaryShaderName)
     }
 }
 
-bool ShaderVariation::Compile()
+bool ShaderVariation::Compile_D3D11()
 {
     const String& sourceCode = owner_->GetSourceCode(type_);
     Vector<String> defines = defines_.Split(' ');
@@ -315,8 +315,8 @@ bool ShaderVariation::Compile()
         unsigned char* bufData = (unsigned char*)shaderCode->GetBufferPointer();
         unsigned bufSize = (unsigned)shaderCode->GetBufferSize();
         // Use the original bytecode to reflect the parameters
-        ParseParameters(bufData, bufSize);
-        CalculateConstantBufferSizes();
+        ParseParameters_D3D11(bufData, bufSize);
+        CalculateConstantBufferSizes_D3D11();
 
         // Then strip everything not necessary to use the shader
         ID3DBlob* strippedCode = nullptr;
@@ -333,7 +333,7 @@ bool ShaderVariation::Compile()
     return !byteCode_.Empty();
 }
 
-void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
+void ShaderVariation::ParseParameters_D3D11(unsigned char* bufData, unsigned bufSize)
 {
     ID3D11ShaderReflection* reflection = nullptr;
     D3D11_SHADER_DESC shaderDesc;
@@ -355,7 +355,7 @@ void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
         {
             D3D11_SIGNATURE_PARAMETER_DESC paramDesc;
             reflection->GetInputParameterDesc((UINT)i, &paramDesc);
-            VertexElementSemantic semantic = (VertexElementSemantic)GetStringListIndex(paramDesc.SemanticName, elementSemanticNames, MAX_VERTEX_ELEMENT_SEMANTICS, true);
+            VertexElementSemantic semantic = (VertexElementSemantic)GetStringListIndex(paramDesc.SemanticName, elementSemanticNames_D3D11, MAX_VERTEX_ELEMENT_SEMANTICS, true);
             if (semantic != MAX_VERTEX_ELEMENT_SEMANTICS)
             {
                 CombineHash(elementHash, semantic);
@@ -403,7 +403,7 @@ void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
     reflection->Release();
 }
 
-void ShaderVariation::SaveByteCode(const String& binaryShaderName)
+void ShaderVariation::SaveByteCode_D3D11(const String& binaryShaderName)
 {
     ResourceCache* cache = owner_->GetSubsystem<ResourceCache>();
     FileSystem* fileSystem = owner_->GetSubsystem<FileSystem>();
@@ -461,7 +461,7 @@ void ShaderVariation::SaveByteCode(const String& binaryShaderName)
         file->Write(&byteCode_[0], byteCode_.Size());
 }
 
-void ShaderVariation::CalculateConstantBufferSizes()
+void ShaderVariation::CalculateConstantBufferSizes_D3D11()
 {
     for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS; ++i)
         constantBufferSizes_[i] = 0;

@@ -31,11 +31,11 @@ namespace Urho3D
 {
 
 /// Combined information for specific vertex and pixel shaders.
-class URHO3D_API ShaderProgram : public RefCounted
+class URHO3D_API ShaderProgram_D3D11 : public RefCounted
 {
 public:
     /// Construct.
-    ShaderProgram(Graphics* graphics, ShaderVariation* vertexShader, ShaderVariation* pixelShader)
+    ShaderProgram_D3D11(Graphics* graphics, ShaderVariation* vertexShader, ShaderVariation* pixelShader)
     {
         // Create needed constant buffers
         const unsigned* vsBufferSizes = vertexShader->GetConstantBufferSizes();
@@ -73,7 +73,7 @@ public:
     }
 
     /// Destruct.
-    virtual ~ShaderProgram() override
+    virtual ~ShaderProgram_D3D11() override
     {
     }
 

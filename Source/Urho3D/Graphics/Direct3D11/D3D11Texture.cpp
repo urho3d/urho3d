@@ -24,12 +24,12 @@
 
 #include "../../Core/Profiler.h"
 #include "../../Graphics/Graphics.h"
-#include "../../Graphics/GraphicsImpl.h"
 #include "../../Graphics/Material.h"
 #include "../../IO/FileSystem.h"
 #include "../../IO/Log.h"
 #include "../../Resource/ResourceCache.h"
 #include "../../Resource/XMLFile.h"
+#include "D3D11GraphicsImpl.h"
 
 #include "../../DebugNew.h"
 
@@ -58,7 +58,7 @@ static const D3D11_TEXTURE_ADDRESS_MODE d3dAddressMode[] =
     D3D11_TEXTURE_ADDRESS_BORDER
 };
 
-void Texture::SetSRGB(bool enable)
+void Texture::SetSRGB_D3D11(bool enable)
 {
     if (graphics_)
         enable &= graphics_->GetSRGBSupport();
@@ -72,17 +72,17 @@ void Texture::SetSRGB(bool enable)
     }
 }
 
-bool Texture::GetParametersDirty() const
+bool Texture::GetParametersDirty_D3D11() const
 {
     return parametersDirty_ || !sampler_;
 }
 
-bool Texture::IsCompressed() const
+bool Texture::IsCompressed_D3D11() const
 {
     return format_ == DXGI_FORMAT_BC1_UNORM || format_ == DXGI_FORMAT_BC2_UNORM || format_ == DXGI_FORMAT_BC3_UNORM;
 }
 
-unsigned Texture::GetRowDataSize(int width) const
+unsigned Texture::GetRowDataSize_D3D11(int width) const
 {
     switch (format_)
     {
@@ -123,7 +123,7 @@ unsigned Texture::GetRowDataSize(int width) const
     }
 }
 
-void Texture::UpdateParameters()
+void Texture::UpdateParameters_D3D11()
 {
     if ((!parametersDirty_ && sampler_) || !object_.ptr_)
         return;
@@ -146,7 +146,7 @@ void Texture::UpdateParameters()
     samplerDesc.MaxLOD = M_INFINITY;
     memcpy(&samplerDesc.BorderColor, borderColor_.Data(), 4 * sizeof(float));
 
-    HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateSamplerState(&samplerDesc, (ID3D11SamplerState**)&sampler_);
+    HRESULT hr = graphics_->GetImpl_D3D11()->GetDevice()->CreateSamplerState(&samplerDesc, (ID3D11SamplerState**)&sampler_);
     if (FAILED(hr))
     {
         URHO3D_SAFE_RELEASE(sampler_);
@@ -156,7 +156,7 @@ void Texture::UpdateParameters()
     parametersDirty_ = false;
 }
 
-unsigned Texture::GetSRVFormat(unsigned format)
+unsigned Texture::GetSRVFormat_D3D11(unsigned format)
 {
     if (format == DXGI_FORMAT_R24G8_TYPELESS)
         return DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
@@ -168,7 +168,7 @@ unsigned Texture::GetSRVFormat(unsigned format)
         return format;
 }
 
-unsigned Texture::GetDSVFormat(unsigned format)
+unsigned Texture::GetDSVFormat_D3D11(unsigned format)
 {
     if (format == DXGI_FORMAT_R24G8_TYPELESS)
         return DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -180,7 +180,7 @@ unsigned Texture::GetDSVFormat(unsigned format)
         return format;
 }
 
-unsigned Texture::GetSRGBFormat(unsigned format)
+unsigned Texture::GetSRGBFormat_D3D11(unsigned format)
 {
     if (format == DXGI_FORMAT_R8G8B8A8_UNORM)
         return DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
@@ -194,12 +194,12 @@ unsigned Texture::GetSRGBFormat(unsigned format)
         return format;
 }
 
-void Texture::RegenerateLevels()
+void Texture::RegenerateLevels_D3D11()
 {
     if (!shaderResourceView_)
         return;
 
-    graphics_->GetImpl()->GetDeviceContext()->GenerateMips((ID3D11ShaderResourceView*)shaderResourceView_);
+    graphics_->GetImpl_D3D11()->GetDeviceContext()->GenerateMips((ID3D11ShaderResourceView*)shaderResourceView_);
     levelsDirty_ = false;
 }
 
