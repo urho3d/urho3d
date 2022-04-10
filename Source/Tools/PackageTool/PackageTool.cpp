@@ -18,7 +18,8 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-//
+// how to decompress 
+// packagetool   ./pack2  ./pack2.pak     -d
 
 #include <Urho3D/Core/Context.h>
 #include <Urho3D/Container/ArrayPtr.h>
@@ -55,6 +56,7 @@ Vector<FileEntry> entries_;
 unsigned checksum_ = 0;
 bool compress_ = false;
 bool quiet_ = false;
+bool decompress_ = false;
 unsigned blockSize_ = COMPRESSED_BLOCK_SIZE;
 
 String ignoreExtensions_[] = {
@@ -92,9 +94,10 @@ void Run(const Vector<String>& arguments)
             "Options:\n"
             "-c      Enable package file LZ4 compression\n"
             "-q      Enable quiet mode\n"
+            "-d      Enable decompression\n"
             "\n"
             "Basepath is an optional prefix that will be added to the file entries.\n\n"
-            "Alternative output usage: PackageTool <output option> <package name>\n"
+            "Alternative output usage: PackageTool <output option> <package name> <directory>\n"
             "Output option:\n"
             "-i      Output package file information\n"
             "-l      Output file names (including their paths) contained in the package\n"
@@ -122,6 +125,9 @@ void Run(const Vector<String>& arguments)
                     case 'q':
                         quiet_ = true;
                         break;
+                    case 'd':
+                        decompress_ = true;
+                        break;
                     default:
                         ErrorExit("Unrecognized option");
                     }
@@ -132,33 +138,88 @@ void Run(const Vector<String>& arguments)
 
     if (!isOutputMode)
     {
-        if (!quiet_)
-            PrintLine("Scanning directory " + dirName + " for files");
-
-        // Get the file list recursively
-        Vector<String> fileNames;
-        fileSystem_->ScanDir(fileNames, dirName, "*.*", SCAN_FILES, true);
-        if (!fileNames.Size())
-            ErrorExit("No files found");
-
-        // Check for extensions to ignore
-        for (unsigned i = fileNames.Size() - 1; i < fileNames.Size(); --i)
+        if (compress_)
         {
-            String extension = GetExtension(fileNames[i]);
-            for (unsigned j = 0; ignoreExtensions_[j].Length(); ++j)
+            if (!quiet_)
+                PrintLine("Scanning directory " + dirName + " for files");
+
+            // Get the file list recursively
+            Vector<String> fileNames;
+            fileSystem_->ScanDir(fileNames, dirName, "*.*", SCAN_FILES, true);
+            if (!fileNames.Size())
+                ErrorExit("No files found");
+
+            // Check for extensions to ignore
+            for (unsigned i = fileNames.Size() - 1; i < fileNames.Size(); --i)
             {
-                if (extension == ignoreExtensions_[j])
+                String extension = GetExtension(fileNames[i]);
+                for (unsigned j = 0; ignoreExtensions_[j].Length(); ++j)
                 {
-                    fileNames.Erase(fileNames.Begin() + i);
-                    break;
+                    if (extension == ignoreExtensions_[j])
+                    {
+                        fileNames.Erase(fileNames.Begin() + i);
+                        break;
+                    }
                 }
             }
+
+            for (unsigned i = 0; i < fileNames.Size(); ++i)
+                ProcessFile(fileNames[i], dirName);
+
+            WritePackageFile(packageName, dirName);
         }
+        else if (decompress_){
+            FileSystem fs(context_);
+            SharedPtr<PackageFile> packageFile(new PackageFile(context_, packageName));
+#define MAX_ONCE 512
+            char buffer[MAX_ONCE] = "";
 
-        for (unsigned i = 0; i < fileNames.Size(); ++i)
-            ProcessFile(fileNames[i], dirName);
+            const HashMap<String, PackageEntry>& entries = packageFile->GetEntries();
+            for (HashMap<String, PackageEntry>::ConstIterator i = entries.Begin(); i != entries.End();)
+            {
+                HashMap<String, PackageEntry>::ConstIterator current = i++;
+                String fileEntry(dirName + "/" + current->first_);
+                unsigned pos = fileEntry.FindLast('/');
+                if (pos<0)
+                    ErrorExit(fileEntry);
 
-        WritePackageFile(packageName, dirName);
+                fs.CreateDir(fileEntry.Substring(0, pos));
+   
+                File readfile(context_, packageFile, current->first_);
+                if (!readfile.IsOpen())
+                    ErrorExit("readfile open failed " + fileEntry);
+
+                File savefile(context_,fileEntry, FILE_WRITE);
+                if (!savefile.IsOpen())
+                    ErrorExit("savefile open failed "+fileEntry);
+
+
+                PrintLine("write file: " + fileEntry);
+
+                unsigned size_ = 0;
+                unsigned size2_ = 0;
+                while (1)
+                {
+                    size_ = readfile.Read(buffer, MAX_ONCE);
+                    if (size_ == 0)
+                    {
+                        readfile.Close();
+                        savefile.Close();
+                        break;
+                    }
+
+                    size2_ = 0;
+                    while (1)
+                    {
+                        size2_ += savefile.Write(buffer + size2_, size_ - size2_);
+                        if (size2_ == size_)
+                            break;
+                    }
+                }
+
+                PrintLine("done...");
+            }
+        }
     }
     else
     {
@@ -274,7 +335,7 @@ void WritePackageFile(const String& fileName, const String& rootDir)
                 PrintLine(entries_[i].name_ + " size " + String(dataSize));
             dest.Write(&buffer[0], entries_[i].size_);
         }
-        else
+        else//compress
         {
             SharedArrayPtr<unsigned char> compressBuffer(new unsigned char[LZ4_compressBound(blockSize_)]);
 
