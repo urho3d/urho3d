@@ -25,9 +25,9 @@
 #include "../../Container/HashMap.h"
 #include "../../Core/Timer.h"
 #include "../../Graphics/ConstantBuffer.h"
-#include "../../Graphics/ShaderProgram.h"
 #include "../../Graphics/Texture2D.h"
 #include "../../Math/Color.h"
+#include "OGLShaderProgram.h"
 
 #if defined(IOS) || defined(TVOS)
 #include <OpenGLES/ES2/gl.h>
@@ -78,7 +78,7 @@ namespace Urho3D
 class Context;
 
 using ConstantBufferMap = HashMap<unsigned, SharedPtr<ConstantBuffer> >;
-using ShaderProgramMap = HashMap<Pair<ShaderVariation*, ShaderVariation*>, SharedPtr<ShaderProgram> >;
+using ShaderProgramMap_OGL = HashMap<Pair<ShaderVariation*, ShaderVariation*>, SharedPtr<ShaderProgram_OGL> >;
 
 /// Cached state of a frame buffer object.
 struct FrameBufferObject
@@ -96,13 +96,13 @@ struct FrameBufferObject
 };
 
 /// %Graphics subsystem implementation. Holds API-specific objects.
-class URHO3D_API GraphicsImpl
+class URHO3D_API GraphicsImpl_OGL
 {
     friend class Graphics;
 
 public:
     /// Construct.
-    GraphicsImpl() = default;
+    GraphicsImpl_OGL() = default;
 
     /// Return the GL Context.
     const SDL_GLContext& GetGLContext() { return context_; }
@@ -149,9 +149,9 @@ private:
     /// Map for additional depth textures, to emulate Direct3D9 ability to mix render texture and backbuffer rendering.
     HashMap<unsigned, SharedPtr<Texture2D> > depthTextures_;
     /// Shader program in use.
-    ShaderProgram* shaderProgram_{};
+    ShaderProgram_OGL* shaderProgram_{};
     /// Linked shader programs.
-    ShaderProgramMap shaderPrograms_;
+    ShaderProgramMap_OGL shaderPrograms_;
     /// Need FBO commit flag.
     bool fboDirty_{};
     /// Need vertex attribute pointer update flag.

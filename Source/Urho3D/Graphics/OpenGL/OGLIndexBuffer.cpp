@@ -33,7 +33,7 @@
 namespace Urho3D
 {
 
-void IndexBuffer::OnDeviceLost()
+void IndexBuffer::OnDeviceLost_OGL()
 {
     if (object_.name_ && !graphics_->IsDeviceLost())
         glDeleteBuffers(1, &object_.name_);
@@ -41,22 +41,22 @@ void IndexBuffer::OnDeviceLost()
     GPUObject::OnDeviceLost();
 }
 
-void IndexBuffer::OnDeviceReset()
+void IndexBuffer::OnDeviceReset_OGL()
 {
     if (!object_.name_)
     {
-        Create();
-        dataLost_ = !UpdateToGPU();
+        Create_OGL();
+        dataLost_ = !UpdateToGPU_OGL();
     }
     else if (dataPending_)
-        dataLost_ = !UpdateToGPU();
+        dataLost_ = !UpdateToGPU_OGL();
 
     dataPending_ = false;
 }
 
-void IndexBuffer::Release()
+void IndexBuffer::Release_OGL()
 {
-    Unlock();
+    Unlock_OGL();
 
     if (object_.name_)
     {
@@ -75,7 +75,7 @@ void IndexBuffer::Release()
     }
 }
 
-bool IndexBuffer::SetData(const void* data)
+bool IndexBuffer::SetData_OGL(const void* data)
 {
     if (!data)
     {
@@ -110,10 +110,10 @@ bool IndexBuffer::SetData(const void* data)
     return true;
 }
 
-bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count, bool discard)
+bool IndexBuffer::SetDataRange_OGL(const void* data, unsigned start, unsigned count, bool discard)
 {
     if (start == 0 && count == indexCount_)
-        return SetData(data);
+        return SetData_OGL(data);
 
     if (!data)
     {
@@ -159,7 +159,7 @@ bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count,
     return true;
 }
 
-void* IndexBuffer::Lock(unsigned start, unsigned count, bool discard)
+void* IndexBuffer::Lock_OGL(unsigned start, unsigned count, bool discard)
 {
     if (lockState_ != LOCK_NONE)
     {
@@ -201,17 +201,17 @@ void* IndexBuffer::Lock(unsigned start, unsigned count, bool discard)
         return nullptr;
 }
 
-void IndexBuffer::Unlock()
+void IndexBuffer::Unlock_OGL()
 {
     switch (lockState_)
     {
     case LOCK_SHADOW:
-        SetDataRange(shadowData_.Get() + lockStart_ * indexSize_, lockStart_, lockCount_, discardLock_);
+        SetDataRange_OGL(shadowData_.Get() + lockStart_ * indexSize_, lockStart_, lockCount_, discardLock_);
         lockState_ = LOCK_NONE;
         break;
 
     case LOCK_SCRATCH:
-        SetDataRange(lockScratchData_, lockStart_, lockCount_, discardLock_);
+        SetDataRange_OGL(lockScratchData_, lockStart_, lockCount_, discardLock_);
         if (graphics_)
             graphics_->FreeScratchBuffer(lockScratchData_);
         lockScratchData_ = nullptr;
@@ -223,11 +223,11 @@ void IndexBuffer::Unlock()
     }
 }
 
-bool IndexBuffer::Create()
+bool IndexBuffer::Create_OGL()
 {
     if (!indexCount_)
     {
-        Release();
+        Release_OGL();
         return true;
     }
 
@@ -254,21 +254,21 @@ bool IndexBuffer::Create()
     return true;
 }
 
-bool IndexBuffer::UpdateToGPU()
+bool IndexBuffer::UpdateToGPU_OGL()
 {
     if (object_.name_ && shadowData_)
-        return SetData(shadowData_.Get());
+        return SetData_OGL(shadowData_.Get());
     else
         return false;
 }
 
-void* IndexBuffer::MapBuffer(unsigned start, unsigned count, bool discard)
+void* IndexBuffer::MapBuffer_OGL(unsigned start, unsigned count, bool discard)
 {
     // Never called on OpenGL
     return nullptr;
 }
 
-void IndexBuffer::UnmapBuffer()
+void IndexBuffer::UnmapBuffer_OGL()
 {
     // Never called on OpenGL
 }

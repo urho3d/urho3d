@@ -23,11 +23,11 @@
 #include "../../Precompiled.h"
 
 #include "../../Graphics/Graphics.h"
-#include "../../Graphics/GraphicsImpl.h"
 #include "../../Graphics/ShaderVariation.h"
 #include "../../Graphics/VertexBuffer.h"
-#include "../../Graphics/VertexDeclaration.h"
 #include "../../IO/Log.h"
+#include "D3D11GraphicsImpl.h"
+#include "D3D11VertexDeclaration.h"
 
 #include "../../DebugNew.h"
 
@@ -45,7 +45,7 @@ static const DXGI_FORMAT d3dElementFormats[] =
     DXGI_FORMAT_R8G8B8A8_UNORM
 };
 
-VertexDeclaration::VertexDeclaration(Graphics* graphics, ShaderVariation* vertexShader, VertexBuffer** vertexBuffers) :
+VertexDeclaration_D3D11::VertexDeclaration_D3D11(Graphics* graphics, ShaderVariation* vertexShader, VertexBuffer** vertexBuffers) :
     inputLayout_(nullptr)
 {
     PODVector<D3D11_INPUT_ELEMENT_DESC> elementDescs;
@@ -62,7 +62,7 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, ShaderVariation* vertex
         for (unsigned j = 0; j < srcElements.Size(); ++j)
         {
             const VertexElement& srcElement = srcElements[j];
-            const char* semanticName = ShaderVariation::elementSemanticNames[srcElement.semantic_];
+            const char* semanticName = ShaderVariation::elementSemanticNames_D3D11[srcElement.semantic_];
 
             // Override existing element if necessary
             for (unsigned k = 0; k < prevBufferDescs; ++k)
@@ -100,7 +100,7 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, ShaderVariation* vertex
 
     const PODVector<unsigned char>& byteCode = vertexShader->GetByteCode();
 
-    HRESULT hr = graphics->GetImpl()->GetDevice()->CreateInputLayout(&elementDescs[0], (UINT)elementDescs.Size(), &byteCode[0],
+    HRESULT hr = graphics->GetImpl_D3D11()->GetDevice()->CreateInputLayout(&elementDescs[0], (UINT)elementDescs.Size(), &byteCode[0],
         byteCode.Size(), (ID3D11InputLayout**)&inputLayout_);
     if (FAILED(hr))
     {
@@ -110,7 +110,7 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, ShaderVariation* vertex
     }
 }
 
-VertexDeclaration::~VertexDeclaration()
+VertexDeclaration_D3D11::~VertexDeclaration_D3D11()
 {
     URHO3D_SAFE_RELEASE(inputLayout_);
 }

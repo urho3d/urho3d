@@ -180,7 +180,49 @@ bool Engine::Initialize(const VariantMap& parameters)
     // Register the rest of the subsystems
     if (!headless_)
     {
-        context_->RegisterSubsystem(new Graphics(context_));
+        GAPI gapi = GAPI_NONE;
+
+        // Try to set any possible graphics API as default
+
+#ifdef URHO3D_OPENGL
+        gapi = GAPI_OPENGL;
+#endif
+
+#ifdef URHO3D_D3D9
+        gapi = GAPI_D3D9;
+#endif
+
+#ifdef URHO3D_D3D11
+        gapi = GAPI_D3D11;
+#endif
+
+        // Use command line parameters
+
+#ifdef URHO3D_OPENGL
+        bool gapi_gl = GetParameter(parameters, EP_OPENGL, false).GetBool();
+        if (gapi_gl)
+            gapi = GAPI_OPENGL;
+#endif
+
+#ifdef URHO3D_D3D9
+        bool gapi_d3d9 = GetParameter(parameters, EP_DIRECT3D9, false).GetBool();
+        if (gapi_d3d9)
+            gapi = GAPI_D3D9;
+#endif
+
+#ifdef URHO3D_D3D11
+        bool gapi_d3d11 = GetParameter(parameters, EP_DIRECT3D11, false).GetBool();
+        if (gapi_d3d11)
+            gapi = GAPI_D3D11;
+#endif
+
+        if (gapi == GAPI_NONE)
+        {
+            URHO3D_LOGERROR("Graphics API not selected");
+            return false;
+        }
+
+        context_->RegisterSubsystem(new Graphics(context_, gapi));
         context_->RegisterSubsystem(new Renderer(context_));
     }
     else
@@ -247,10 +289,11 @@ bool Engine::Initialize(const VariantMap& parameters)
             graphics->SetWindowPosition(GetParameter(parameters, EP_WINDOW_POSITION_X).GetInt(),
                 GetParameter(parameters, EP_WINDOW_POSITION_Y).GetInt());
 
-#ifdef URHO3D_OPENGL
-        if (HasParameter(parameters, EP_FORCE_GL2))
-            graphics->SetForceGL2(GetParameter(parameters, EP_FORCE_GL2).GetBool());
-#endif
+        if (Graphics::GetGAPI() == GAPI_OPENGL)
+        {
+            if (HasParameter(parameters, EP_FORCE_GL2))
+                graphics->SetForceGL2(GetParameter(parameters, EP_FORCE_GL2).GetBool());
+        }
 
         if (!graphics->SetMode(
             GetParameter(parameters, EP_WINDOW_WIDTH, 0).GetInt(),
@@ -825,6 +868,12 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
                 ret[EP_FRAME_LIMITER] = false;
             else if (argument == "flushgpu")
                 ret[EP_FLUSH_GPU] = true;
+            else if (argument == "opengl")
+                ret[EP_OPENGL] = true;
+            else if (argument == "d3d9")
+                ret[EP_DIRECT3D9] = true;
+            else if (argument == "d3d11")
+                ret[EP_DIRECT3D11] = true;
             else if (argument == "gl2")
                 ret[EP_FORCE_GL2] = true;
             else if (argument == "landscape")

@@ -32,7 +32,7 @@
 namespace Urho3D
 {
 
-void ConstantBuffer::Release()
+void ConstantBuffer::Release_OGL()
 {
     if (object_.name_)
     {
@@ -40,7 +40,7 @@ void ConstantBuffer::Release()
             return;
 
 #ifndef GL_ES_VERSION_2_0
-        graphics_->SetUBO(0);
+        graphics_->SetUBO_OGL(0);
         glDeleteBuffers(1, &object_.name_);
 #endif
         object_.name_ = 0;
@@ -50,13 +50,13 @@ void ConstantBuffer::Release()
     size_ = 0;
 }
 
-void ConstantBuffer::OnDeviceReset()
+void ConstantBuffer::OnDeviceReset_OGL()
 {
     if (size_)
-        SetSize(size_); // Recreate
+        SetSize_OGL(size_); // Recreate
 }
 
-bool ConstantBuffer::SetSize(unsigned size)
+bool ConstantBuffer::SetSize_OGL(unsigned size)
 {
     if (!size)
     {
@@ -78,7 +78,7 @@ bool ConstantBuffer::SetSize(unsigned size)
 #ifndef GL_ES_VERSION_2_0
         if (!object_.name_)
             glGenBuffers(1, &object_.name_);
-        graphics_->SetUBO(object_.name_);
+        graphics_->SetUBO_OGL(object_.name_);
         glBufferData(GL_UNIFORM_BUFFER, size_, shadowData_.Get(), GL_DYNAMIC_DRAW);
 #endif
     }
@@ -86,12 +86,12 @@ bool ConstantBuffer::SetSize(unsigned size)
     return true;
 }
 
-void ConstantBuffer::Apply()
+void ConstantBuffer::Apply_OGL()
 {
     if (dirty_ && object_.name_)
     {
 #ifndef GL_ES_VERSION_2_0
-        graphics_->SetUBO(object_.name_);
+        graphics_->SetUBO_OGL(object_.name_);
         glBufferData(GL_UNIFORM_BUFFER, size_, shadowData_.Get(), GL_DYNAMIC_DRAW);
 #endif
         dirty_ = false;

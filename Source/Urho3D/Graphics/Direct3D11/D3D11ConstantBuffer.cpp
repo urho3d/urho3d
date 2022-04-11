@@ -23,21 +23,21 @@
 #include "../../Precompiled.h"
 
 #include "../../Graphics/Graphics.h"
-#include "../../Graphics/GraphicsImpl.h"
 #include "../../Graphics/ConstantBuffer.h"
 #include "../../IO/Log.h"
+#include "D3D11GraphicsImpl.h"
 
 #include "../../DebugNew.h"
 
 namespace Urho3D
 {
 
-void ConstantBuffer::OnDeviceReset()
+void ConstantBuffer::OnDeviceReset_D3D11()
 {
     // No-op on Direct3D11
 }
 
-void ConstantBuffer::Release()
+void ConstantBuffer::Release_D3D11()
 {
     URHO3D_SAFE_RELEASE(object_.ptr_);
 
@@ -45,9 +45,9 @@ void ConstantBuffer::Release()
     size_ = 0;
 }
 
-bool ConstantBuffer::SetSize(unsigned size)
+bool ConstantBuffer::SetSize_D3D11(unsigned size)
 {
-    Release();
+    Release_D3D11();
 
     if (!size)
     {
@@ -74,7 +74,7 @@ bool ConstantBuffer::SetSize(unsigned size)
         bufferDesc.CPUAccessFlags = 0;
         bufferDesc.Usage = D3D11_USAGE_DEFAULT;
 
-        HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateBuffer(&bufferDesc, 0, (ID3D11Buffer**)&object_.ptr_);
+        HRESULT hr = graphics_->GetImpl_D3D11()->GetDevice()->CreateBuffer(&bufferDesc, 0, (ID3D11Buffer**)&object_.ptr_);
         if (FAILED(hr))
         {
             URHO3D_SAFE_RELEASE(object_.ptr_);
@@ -86,11 +86,11 @@ bool ConstantBuffer::SetSize(unsigned size)
     return true;
 }
 
-void ConstantBuffer::Apply()
+void ConstantBuffer::Apply_D3D11()
 {
     if (dirty_ && object_.ptr_)
     {
-        graphics_->GetImpl()->GetDeviceContext()->UpdateSubresource((ID3D11Buffer*)object_.ptr_, 0, 0, shadowData_.Get(), 0, 0);
+        graphics_->GetImpl_D3D11()->GetDeviceContext()->UpdateSubresource((ID3D11Buffer*)object_.ptr_, 0, 0, shadowData_.Get(), 0, 0);
         dirty_ = false;
     }
 }

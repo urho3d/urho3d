@@ -43,11 +43,9 @@ class File;
 class Image;
 class IndexBuffer;
 class GPUObject;
-class GraphicsImpl;
 class RenderSurface;
 class Shader;
 class ShaderPrecache;
-class ShaderProgram;
 class ShaderVariation;
 class Texture;
 class Texture2D;
@@ -56,9 +54,36 @@ class TextureCube;
 class Vector3;
 class Vector4;
 class VertexBuffer;
-class VertexDeclaration;
+
+#ifdef URHO3D_OPENGL
+class GraphicsImpl_OGL;
+#endif
+
+#ifdef URHO3D_D3D9
+class GraphicsImpl_D3D9;
+#endif
+
+#ifdef URHO3D_D3D11
+class GraphicsImpl_D3D11;
+#endif
 
 struct ShaderParameter;
+
+#ifdef URHO3D_OPENGL
+// Note: ShaderProgram_OGL class is purposefully API-specific. It should not be used by Urho3D client applications.
+class ShaderProgram_OGL;
+#endif
+
+#ifdef URHO3D_D3D9
+// Note: ShaderProgram_D3D9 class is purposefully API-specific. It should not be used by Urho3D client applications.
+class ShaderProgram_D3D9;
+#endif
+
+#ifdef URHO3D_D3D11
+// Note: ShaderProgram_D3D11 class is purposefully API-specific. It should not be used by Urho3D client applications.
+class ShaderProgram_D3D11;
+#endif
+
 
 /// CPU-side scratch buffer for vertex data updates.
 struct ScratchBuffer
@@ -142,7 +167,7 @@ class URHO3D_API Graphics : public Object
 
 public:
     /// Construct.
-    explicit Graphics(Context* context);
+    explicit Graphics(Context* context, GAPI gapi);
     /// Destruct. Release the Direct3D11 device and close the window.
     ~Graphics() override;
 
@@ -268,12 +293,6 @@ public:
     void ClearTransformSources();
     /// Set texture.
     void SetTexture(unsigned index, Texture* texture);
-    /// Bind texture unit 0 for update. Called by Texture. Used only on OpenGL.
-    /// @nobind
-    void SetTextureForUpdate(Texture* texture);
-    /// Dirty texture parameters of all textures (when global settings change.)
-    /// @nobind
-    void SetTextureParametersDirty();
     /// Set default texture filtering mode. Called by Renderer before rendering.
     void SetDefaultTextureFilterMode(TextureFilterMode mode);
     /// Set default texture anisotropy level. Called by Renderer before rendering.
@@ -335,8 +354,32 @@ public:
     /// @property
     bool IsInitialized() const;
 
+#ifdef URHO3D_OPENGL
     /// Return graphics implementation, which holds the actual API-specific resources.
-    GraphicsImpl* GetImpl() const { return impl_; }
+    GraphicsImpl_OGL* GetImpl_OGL() const
+    {
+        assert(Graphics::GetGAPI() == GAPI_OPENGL);
+        return (GraphicsImpl_OGL*)impl_;
+    }
+#endif
+
+#ifdef URHO3D_D3D9
+    /// Return graphics implementation, which holds the actual API-specific resources.
+    GraphicsImpl_D3D9* GetImpl_D3D9() const
+    {
+        assert(Graphics::GetGAPI() == GAPI_D3D9);
+        return (GraphicsImpl_D3D9*)impl_;
+    }
+#endif
+
+#ifdef URHO3D_D3D11
+    /// Return graphics implementation, which holds the actual API-specific resources.
+    GraphicsImpl_D3D11* GetImpl_D3D11() const
+    {
+        assert(Graphics::GetGAPI() == GAPI_D3D11);
+        return (GraphicsImpl_D3D11*)impl_;
+    }
+#endif
 
     /// Return OS-specific external window handle. Null if not in use.
     void* GetExternalWindow() const { return externalWindow_; }
@@ -408,7 +451,7 @@ public:
     /// @property
     bool GetSRGB() const { return sRGB_; }
 
-    /// Return whether rendering output is dithered.
+    /// Return whether rendering output is dithered. Always false on Direct3D.
     /// @property
     bool GetDither() const;
 
@@ -517,9 +560,32 @@ public:
     /// Return current pixel shader.
     ShaderVariation* GetPixelShader() const { return pixelShader_; }
 
+#ifdef URHO3D_OPENGL
+    // Note: ShaderProgram_OGL class is purposefully API-specific. It should not be used by Urho3D client applications.
+
     /// Return shader program. This is an API-specific class and should not be used by applications.
-    /// @nobind
-    ShaderProgram* GetShaderProgram() const;
+    ShaderProgram_OGL* GetShaderProgram_OGL() const;
+
+    /// Clean up shader parameters when a shader variation is released or destroyed.
+    void CleanupShaderPrograms_OGL(ShaderVariation* variation);
+#endif
+
+#ifdef URHO3D_D3D9
+    // Note: ShaderProgram_D3D9 class is purposefully API-specific. It should not be used by Urho3D client applications.
+
+    /// Clean up shader parameters when a shader variation is released or destroyed.
+    void CleanupShaderPrograms_D3D9(ShaderVariation* variation);
+#endif
+
+#ifdef URHO3D_D3D11
+    // Note: ShaderProgram_D3D11 class is purposefully API-specific. It should not be used by Urho3D client applications.
+
+    /// Return shader program. This is an API-specific class and should not be used by applications.
+    ShaderProgram_D3D11* GetShaderProgram_D3D11() const;
+
+    /// Clean up shader parameters when a shader variation is released or destroyed.
+    void CleanupShaderPrograms_D3D11(ShaderVariation* variation);
+#endif
 
     /// Return texture unit index by name.
     TextureUnit GetTextureUnit(const String& name);
@@ -617,9 +683,27 @@ public:
     void OnWindowResized();
     /// Window was moved through user interaction. Called by Input subsystem.
     void OnWindowMoved();
+
+#ifdef URHO3D_OPENGL
     /// Restore GPU objects and reinitialize state. Requires an open window. Used only on OpenGL.
-    /// @nobind
-    void Restore();
+    void Restore_OGL();
+    
+    /// Mark the FBO needing an update. Used only on OpenGL.
+    void MarkFBODirty_OGL();
+    
+    /// Bind a VBO, avoiding redundant operation. Used only on OpenGL.
+    void SetVBO_OGL(unsigned object);
+    
+    /// Bind a UBO, avoiding redundant operation. Used only on OpenGL.
+    void SetUBO_OGL(unsigned object);
+
+    /// Clean up a render surface from all FBOs. Used only on OpenGL.
+    void CleanupRenderSurface_OGL(RenderSurface* surface);
+
+    /// Bind texture unit 0 for update. Called by Texture. Used only on OpenGL.
+    void SetTextureForUpdate_OGL(Texture* texture);
+#endif // def URHO3D_OPENGL
+
     /// Maximize the window.
     void Maximize();
     /// Minimize the window.
@@ -636,23 +720,13 @@ public:
     void FreeScratchBuffer(void* buffer);
     /// Clean up too large scratch buffers.
     void CleanupScratchBuffers();
-    /// Clean up shader parameters when a shader variation is released or destroyed.
-    void CleanupShaderPrograms(ShaderVariation* variation);
-    /// Clean up a render surface from all FBOs. Used only on OpenGL.
-    /// @nobind
-    void CleanupRenderSurface(RenderSurface* surface);
-    /// Get or create a constant buffer. Will be shared between shaders if possible.
+
+    /// Get or create a constant buffer. Will be shared between shaders if possible. Used only on OpenGL and DirectX 11.
     /// @nobind
     ConstantBuffer* GetOrCreateConstantBuffer(ShaderType type, unsigned index, unsigned size);
-    /// Mark the FBO needing an update. Used only on OpenGL.
-    /// @nobind
-    void MarkFBODirty();
-    /// Bind a VBO, avoiding redundant operation. Used only on OpenGL.
-    /// @nobind
-    void SetVBO(unsigned object);
-    /// Bind a UBO, avoiding redundant operation. Used only on OpenGL.
-    /// @nobind
-    void SetUBO(unsigned object);
+
+    /// Get used graphics API.
+    static GAPI GetGAPI() { return gapi; }
 
     /// Return the API-specific alpha texture format.
     static unsigned GetAlphaFormat();
@@ -698,69 +772,450 @@ public:
     static bool GetGL3Support();
 
 private:
-    /// Create the application window.
-    bool OpenWindow(int width, int height, bool resizable, bool borderless);
     /// Create the application window icon.
     void CreateWindowIcon();
+
     /// Adjust parameters according to the platform. Fill in missing paramters and resolve possible conflicts.
     void AdjustScreenMode(int& newWidth, int& newHeight, ScreenModeParams& params, bool& maximize) const;
+
     /// Called when screen mode is successfully changed by the backend.
     void OnScreenModeChanged();
+
+#ifdef URHO3D_D3D11
+    /// Create the application window.
+    bool OpenWindow_D3D11(int width, int height, bool resizable, bool borderless);
+
     /// Adjust the window for new resolution and fullscreen mode.
-    void AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen, bool& newBorderless, int& monitor);
+    void AdjustWindow_D3D11(int& newWidth, int& newHeight, bool& newFullscreen, bool& newBorderless, int& monitor);
+
     /// Create the Direct3D11 device and swap chain. Requires an open window. Can also be called again to recreate swap chain. Return true on success.
-    bool CreateDevice(int width, int height);
+    bool CreateDevice_D3D11(int width, int height);
+
     /// Update Direct3D11 swap chain state for a new mode and create views for the backbuffer & default depth buffer. Return true on success.
-    bool UpdateSwapChain(int width, int height);
-    /// Create the Direct3D9 interface.
-    bool CreateInterface();
-    /// Create the Direct3D9 device.
-    bool CreateDevice(unsigned adapter, unsigned deviceType);
-    /// Reset the Direct3D9 device.
-    void ResetDevice();
-    /// Notify all GPU resources so they can release themselves as needed. Used only on Direct3D9.
-    void OnDeviceLost();
-    /// Notify all GPU resources so they can recreate themselves as needed. Used only on Direct3D9.
-    void OnDeviceReset();
-    /// Set vertex buffer stream frequency. Used only on Direct3D9.
-    void SetStreamFrequency(unsigned index, unsigned frequency);
-    /// Reset stream frequencies. Used only on Direct3D9.
-    void ResetStreamFrequencies();
-    /// Check supported rendering features.
-    void CheckFeatureSupport();
-    /// Reset cached rendering state.
-    void ResetCachedState();
-    /// Initialize texture unit mappings.
-    void SetTextureUnitMappings();
-    /// Process dirtied state before draw.
-    void PrepareDraw();
+    bool UpdateSwapChain_D3D11(int width, int height);
+
     /// Create intermediate texture for multisampled backbuffer resolve. No-op if already exists.
-    void CreateResolveTexture();
+    void CreateResolveTexture_D3D11();
+
+    /// Process dirtied state before draw.
+    void PrepareDraw_D3D11();
+
+    /// Check supported rendering features.
+    void CheckFeatureSupport_D3D11();
+    
+    /// Reset cached rendering state.
+    void ResetCachedState_D3D11();
+
+    /// Initialize texture unit mappings.
+    void SetTextureUnitMappings_D3D11();
+
+    /// Dirty texture parameters of all textures (when global settings change). Used on OpenGL and DirectX 11.
+    void SetTextureParametersDirty_D3D11();
+#endif // def URHO3D_D3D11
+
+#ifdef URHO3D_D3D9
+    /// Create the application window.
+    bool OpenWindow_D3D9(int width, int height, bool resizable, bool borderless);
+
+    /// Adjust the window for new resolution and fullscreen mode.
+    void AdjustWindow_D3D9(int& newWidth, int& newHeight, bool& newFullscreen, bool& newBorderless, int& monitor);
+
+    /// Create the Direct3D9 interface.
+    bool CreateInterface_D3D9();
+
+    /// Create the Direct3D9 device.
+    bool CreateDevice_D3D9(unsigned adapter, unsigned deviceType);
+
+    /// Reset the Direct3D9 device.
+    void ResetDevice_D3D9();
+
+    /// Notify all GPU resources so they can release themselves as needed. Used only on Direct3D9.
+    void OnDeviceLost_D3D9();
+
+    /// Notify all GPU resources so they can recreate themselves as needed. Used only on Direct3D9.
+    void OnDeviceReset_D3D9();
+
+    /// Set vertex buffer stream frequency. Used only on Direct3D9.
+    void SetStreamFrequency_D3D9(unsigned index, unsigned frequency);
+
+    /// Reset stream frequencies. Used only on Direct3D9.
+    void ResetStreamFrequencies_D3D9();
+
+    /// Check supported rendering features.
+    void CheckFeatureSupport_D3D9();
+    
+    /// Reset cached rendering state.
+    void ResetCachedState_D3D9();
+    
+    /// Initialize texture unit mappings.
+    void SetTextureUnitMappings_D3D9();
+#endif // def URHO3D_D3D9
+
+#ifdef URHO3D_OPENGL
     /// Clean up all framebuffers. Called when destroying the context. Used only on OpenGL.
-    void CleanupFramebuffers();
+    void CleanupFramebuffers_OGL();
+    
     /// Create a framebuffer using either extension or core functionality. Used only on OpenGL.
-    unsigned CreateFramebuffer();
+    unsigned CreateFramebuffer_OGL();
+    
     /// Delete a framebuffer using either extension or core functionality. Used only on OpenGL.
-    void DeleteFramebuffer(unsigned fbo);
+    void DeleteFramebuffer_OGL(unsigned fbo);
+    
     /// Bind a framebuffer using either extension or core functionality. Used only on OpenGL.
-    void BindFramebuffer(unsigned fbo);
+    void BindFramebuffer_OGL(unsigned fbo);
+    
     /// Bind a framebuffer color attachment using either extension or core functionality. Used only on OpenGL.
-    void BindColorAttachment(unsigned index, unsigned target, unsigned object, bool isRenderBuffer);
+    void BindColorAttachment_OGL(unsigned index, unsigned target, unsigned object, bool isRenderBuffer);
+    
     /// Bind a framebuffer depth attachment using either extension or core functionality. Used only on OpenGL.
-    void BindDepthAttachment(unsigned object, bool isRenderBuffer);
+    void BindDepthAttachment_OGL(unsigned object, bool isRenderBuffer);
+    
     /// Bind a framebuffer stencil attachment using either extension or core functionality. Used only on OpenGL.
-    void BindStencilAttachment(unsigned object, bool isRenderBuffer);
+    void BindStencilAttachment_OGL(unsigned object, bool isRenderBuffer);
+    
     /// Check FBO completeness using either extension or core functionality. Used only on OpenGL.
-    bool CheckFramebuffer();
+    bool CheckFramebuffer_OGL();
+    
     /// Set vertex attrib divisor. No-op if unsupported. Used only on OpenGL.
-    void SetVertexAttribDivisor(unsigned location, unsigned divisor);
+    void SetVertexAttribDivisor_OGL(unsigned location, unsigned divisor);
+    
     /// Release/clear GPU objects and optionally close the window. Used only on OpenGL.
-    void Release(bool clearGPUObjects, bool closeWindow);
+    void Release_OGL(bool clearGPUObjects, bool closeWindow);
+
+    /// Process dirtied state before draw.
+    void PrepareDraw_OGL();
+
+    /// Check supported rendering features.
+    void CheckFeatureSupport_OGL();
+    
+    /// Reset cached rendering state.
+    void ResetCachedState_OGL();
+    
+    /// Initialize texture unit mappings.
+    void SetTextureUnitMappings_OGL();
+
+    /// Dirty texture parameters of all textures (when global settings change). Used on OpenGL and DirectX 11.
+    void SetTextureParametersDirty_OGL();
+#endif // def URHO3D_OPENGL
+
+    // For proxy functions
+
+#ifdef URHO3D_OPENGL
+    void Constructor_OGL();
+    void Destructor_OGL();
+    bool SetScreenMode_OGL(int width, int height, const ScreenModeParams& params, bool maximize);
+    void SetSRGB_OGL(bool enable);
+    void SetDither_OGL(bool enable);
+    void SetFlushGPU_OGL(bool enable);
+    void SetForceGL2_OGL(bool enable);
+    void Close_OGL();
+    bool TakeScreenShot_OGL(Image& destImage);
+    bool BeginFrame_OGL();
+    void EndFrame_OGL();
+    void Clear_OGL(ClearTargetFlags flags, const Color& color = Color(0.0f, 0.0f, 0.0f, 0.0f), float depth = 1.0f, unsigned stencil = 0);
+    bool ResolveToTexture_OGL(Texture2D* destination, const IntRect& viewport);
+    bool ResolveToTexture_OGL(Texture2D* texture);
+    bool ResolveToTexture_OGL(TextureCube* texture);
+    void Draw_OGL(PrimitiveType type, unsigned vertexStart, unsigned vertexCount);
+    void Draw_OGL(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount);
+    void Draw_OGL(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex, unsigned vertexCount);
+    void DrawInstanced_OGL(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount, unsigned instanceCount);
+    void DrawInstanced_OGL(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex, unsigned vertexCount, unsigned instanceCount);
+    void SetVertexBuffer_OGL(VertexBuffer* buffer);
+    bool SetVertexBuffers_OGL(const PODVector<VertexBuffer*>& buffers, unsigned instanceOffset = 0);
+    bool SetVertexBuffers_OGL(const Vector<SharedPtr<VertexBuffer> >& buffers, unsigned instanceOffset = 0);
+    void SetIndexBuffer_OGL(IndexBuffer* buffer);
+    void SetShaders_OGL(ShaderVariation* vs, ShaderVariation* ps);
+    void SetShaderParameter_OGL(StringHash param, const float* data, unsigned count);
+    void SetShaderParameter_OGL(StringHash param, float value);
+    void SetShaderParameter_OGL(StringHash param, int value);
+    void SetShaderParameter_OGL(StringHash param, bool value);
+    void SetShaderParameter_OGL(StringHash param, const Color& color);
+    void SetShaderParameter_OGL(StringHash param, const Vector2& vector);
+    void SetShaderParameter_OGL(StringHash param, const Matrix3& matrix);
+    void SetShaderParameter_OGL(StringHash param, const Vector3& vector);
+    void SetShaderParameter_OGL(StringHash param, const Matrix4& matrix);
+    void SetShaderParameter_OGL(StringHash param, const Vector4& vector);
+    void SetShaderParameter_OGL(StringHash param, const Matrix3x4& matrix);
+    bool NeedParameterUpdate_OGL(ShaderParameterGroup group, const void* source);
+    bool HasShaderParameter_OGL(StringHash param);
+    bool HasTextureUnit_OGL(TextureUnit unit);
+    void ClearParameterSource_OGL(ShaderParameterGroup group);
+    void ClearParameterSources_OGL();
+    void ClearTransformSources_OGL();
+    void SetTexture_OGL(unsigned index, Texture* texture);
+    void SetDefaultTextureFilterMode_OGL(TextureFilterMode mode);
+    void SetDefaultTextureAnisotropy_OGL(unsigned level);
+    void ResetRenderTargets_OGL();
+    void ResetRenderTarget_OGL(unsigned index);
+    void ResetDepthStencil_OGL();
+    void SetRenderTarget_OGL(unsigned index, RenderSurface* renderTarget);
+    void SetRenderTarget_OGL(unsigned index, Texture2D* texture);
+    void SetDepthStencil_OGL(RenderSurface* depthStencil);
+    void SetDepthStencil_OGL(Texture2D* texture);
+    void SetViewport_OGL(const IntRect& rect);
+    void SetBlendMode_OGL(BlendMode mode, bool alphaToCoverage = false);
+    void SetColorWrite_OGL(bool enable);
+    void SetCullMode_OGL(CullMode mode);
+    void SetDepthBias_OGL(float constantBias, float slopeScaledBias);
+    void SetDepthTest_OGL(CompareMode mode);
+    void SetDepthWrite_OGL(bool enable);
+    void SetFillMode_OGL(FillMode mode);
+    void SetLineAntiAlias_OGL(bool enable);
+    void SetScissorTest_OGL(bool enable, const Rect& rect = Rect::FULL, bool borderInclusive = true);
+    void SetScissorTest_OGL(bool enable, const IntRect& rect);
+    void SetClipPlane_OGL(bool enable, const Plane& clipPlane, const Matrix3x4& view, const Matrix4& projection);
+    void SetStencilTest_OGL(bool enable, CompareMode mode, StencilOp pass, StencilOp fail, StencilOp zFail, unsigned stencilRef, unsigned compareMask, unsigned writeMask);
+    bool IsInitialized_OGL() const;
+    bool GetDither_OGL() const;
+    bool IsDeviceLost_OGL() const;
+    PODVector<int> GetMultiSampleLevels_OGL() const;
+    unsigned GetFormat_OGL(CompressedFormat format) const;
+    ShaderVariation* GetShader_OGL(ShaderType type, const String& name, const String& defines = String::EMPTY) const;
+    ShaderVariation* GetShader_OGL(ShaderType type, const char* name, const char* defines) const;
+    VertexBuffer* GetVertexBuffer_OGL(unsigned index) const;
+    TextureUnit GetTextureUnit_OGL(const String& name);
+    const String& GetTextureUnitName_OGL(TextureUnit unit);
+    Texture* GetTexture_OGL(unsigned index) const;
+    RenderSurface* GetRenderTarget_OGL(unsigned index) const;
+    IntVector2 GetRenderTargetDimensions_OGL() const;
+    void OnWindowResized_OGL();
+    void OnWindowMoved_OGL();
+    ConstantBuffer* GetOrCreateConstantBuffer_OGL(ShaderType type, unsigned index, unsigned size);
+
+    static unsigned GetMaxBones_OGL();
+    static bool GetGL3Support_OGL();
+    static unsigned GetAlphaFormat_OGL();
+    static unsigned GetLuminanceFormat_OGL();
+    static unsigned GetLuminanceAlphaFormat_OGL();
+    static unsigned GetRGBFormat_OGL();
+    static unsigned GetRGBAFormat_OGL();
+    static unsigned GetRGBA16Format_OGL();
+    static unsigned GetRGBAFloat16Format_OGL();
+    static unsigned GetRGBAFloat32Format_OGL();
+    static unsigned GetRG16Format_OGL();
+    static unsigned GetRGFloat16Format_OGL();
+    static unsigned GetRGFloat32Format_OGL();
+    static unsigned GetFloat16Format_OGL();
+    static unsigned GetFloat32Format_OGL();
+    static unsigned GetLinearDepthFormat_OGL();
+    static unsigned GetDepthStencilFormat_OGL();
+    static unsigned GetReadableDepthFormat_OGL();
+    static unsigned GetFormat_OGL(const String& formatName);
+#endif // def URHO3D_OPENGL
+
+#ifdef URHO3D_D3D9
+    void Constructor_D3D9();
+    void Destructor_D3D9();
+    bool SetScreenMode_D3D9(int width, int height, const ScreenModeParams& params, bool maximize);
+    void SetSRGB_D3D9(bool enable);
+    void SetDither_D3D9(bool enable);
+    void SetFlushGPU_D3D9(bool enable);
+    void SetForceGL2_D3D9(bool enable);
+    void Close_D3D9();
+    bool TakeScreenShot_D3D9(Image& destImage);
+    bool BeginFrame_D3D9();
+    void EndFrame_D3D9();
+    void Clear_D3D9(ClearTargetFlags flags, const Color& color = Color(0.0f, 0.0f, 0.0f, 0.0f), float depth = 1.0f, unsigned stencil = 0);
+    bool ResolveToTexture_D3D9(Texture2D* destination, const IntRect& viewport);
+    bool ResolveToTexture_D3D9(Texture2D* texture);
+    bool ResolveToTexture_D3D9(TextureCube* texture);
+    void Draw_D3D9(PrimitiveType type, unsigned vertexStart, unsigned vertexCount);
+    void Draw_D3D9(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount);
+    void Draw_D3D9(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex, unsigned vertexCount);
+    void DrawInstanced_D3D9(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount, unsigned instanceCount);
+    void DrawInstanced_D3D9(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex, unsigned vertexCount, unsigned instanceCount);
+    void SetVertexBuffer_D3D9(VertexBuffer* buffer);
+    bool SetVertexBuffers_D3D9(const PODVector<VertexBuffer*>& buffers, unsigned instanceOffset = 0);
+    bool SetVertexBuffers_D3D9(const Vector<SharedPtr<VertexBuffer> >& buffers, unsigned instanceOffset = 0);
+    void SetIndexBuffer_D3D9(IndexBuffer* buffer);
+    void SetShaders_D3D9(ShaderVariation* vs, ShaderVariation* ps);
+    void SetShaderParameter_D3D9(StringHash param, const float* data, unsigned count);
+    void SetShaderParameter_D3D9(StringHash param, float value);
+    void SetShaderParameter_D3D9(StringHash param, int value);
+    void SetShaderParameter_D3D9(StringHash param, bool value);
+    void SetShaderParameter_D3D9(StringHash param, const Color& color);
+    void SetShaderParameter_D3D9(StringHash param, const Vector2& vector);
+    void SetShaderParameter_D3D9(StringHash param, const Matrix3& matrix);
+    void SetShaderParameter_D3D9(StringHash param, const Vector3& vector);
+    void SetShaderParameter_D3D9(StringHash param, const Matrix4& matrix);
+    void SetShaderParameter_D3D9(StringHash param, const Vector4& vector);
+    void SetShaderParameter_D3D9(StringHash param, const Matrix3x4& matrix);
+    bool NeedParameterUpdate_D3D9(ShaderParameterGroup group, const void* source);
+    bool HasShaderParameter_D3D9(StringHash param);
+    bool HasTextureUnit_D3D9(TextureUnit unit);
+    void ClearParameterSource_D3D9(ShaderParameterGroup group);
+    void ClearParameterSources_D3D9();
+    void ClearTransformSources_D3D9();
+    void SetTexture_D3D9(unsigned index, Texture* texture);
+    void SetDefaultTextureFilterMode_D3D9(TextureFilterMode mode);
+    void SetDefaultTextureAnisotropy_D3D9(unsigned level);
+    void ResetRenderTargets_D3D9();
+    void ResetRenderTarget_D3D9(unsigned index);
+    void ResetDepthStencil_D3D9();
+    void SetRenderTarget_D3D9(unsigned index, RenderSurface* renderTarget);
+    void SetRenderTarget_D3D9(unsigned index, Texture2D* texture);
+    void SetDepthStencil_D3D9(RenderSurface* depthStencil);
+    void SetDepthStencil_D3D9(Texture2D* texture);
+    void SetViewport_D3D9(const IntRect& rect);
+    void SetBlendMode_D3D9(BlendMode mode, bool alphaToCoverage = false);
+    void SetColorWrite_D3D9(bool enable);
+    void SetCullMode_D3D9(CullMode mode);
+    void SetDepthBias_D3D9(float constantBias, float slopeScaledBias);
+    void SetDepthTest_D3D9(CompareMode mode);
+    void SetDepthWrite_D3D9(bool enable);
+    void SetFillMode_D3D9(FillMode mode);
+    void SetLineAntiAlias_D3D9(bool enable);
+    void SetScissorTest_D3D9(bool enable, const Rect& rect = Rect::FULL, bool borderInclusive = true);
+    void SetScissorTest_D3D9(bool enable, const IntRect& rect);
+    void SetClipPlane_D3D9(bool enable, const Plane& clipPlane, const Matrix3x4& view, const Matrix4& projection);
+    void SetStencilTest_D3D9(bool enable, CompareMode mode = CMP_ALWAYS, StencilOp pass = OP_KEEP, StencilOp fail = OP_KEEP, StencilOp zFail = OP_KEEP, unsigned stencilRef = 0, unsigned compareMask = M_MAX_UNSIGNED, unsigned writeMask = M_MAX_UNSIGNED);
+    bool IsInitialized_D3D9() const;
+    bool GetDither_D3D9() const;
+    bool IsDeviceLost_D3D9() const;
+    PODVector<int> GetMultiSampleLevels_D3D9() const;
+    unsigned GetFormat_D3D9(CompressedFormat format) const;
+    ShaderVariation* GetShader_D3D9(ShaderType type, const String& name, const String& defines = String::EMPTY) const;
+    ShaderVariation* GetShader_D3D9(ShaderType type, const char* name, const char* defines) const;
+    VertexBuffer* GetVertexBuffer_D3D9(unsigned index) const;
+    TextureUnit GetTextureUnit_D3D9(const String& name);
+    const String& GetTextureUnitName_D3D9(TextureUnit unit);
+    Texture* GetTexture_D3D9(unsigned index) const;
+    RenderSurface* GetRenderTarget_D3D9(unsigned index) const;
+    IntVector2 GetRenderTargetDimensions_D3D9() const;
+    void OnWindowResized_D3D9();
+    void OnWindowMoved_D3D9();
+    ConstantBuffer* GetOrCreateConstantBuffer_D3D9(ShaderType type, unsigned index, unsigned size);
+
+    static unsigned GetMaxBones_D3D9();
+    static bool GetGL3Support_D3D9();
+    static unsigned GetAlphaFormat_D3D9();
+    static unsigned GetLuminanceFormat_D3D9();
+    static unsigned GetLuminanceAlphaFormat_D3D9();
+    static unsigned GetRGBFormat_D3D9();
+    static unsigned GetRGBAFormat_D3D9();
+    static unsigned GetRGBA16Format_D3D9();
+    static unsigned GetRGBAFloat16Format_D3D9();
+    static unsigned GetRGBAFloat32Format_D3D9();
+    static unsigned GetRG16Format_D3D9();
+    static unsigned GetRGFloat16Format_D3D9();
+    static unsigned GetRGFloat32Format_D3D9();
+    static unsigned GetFloat16Format_D3D9();
+    static unsigned GetFloat32Format_D3D9();
+    static unsigned GetLinearDepthFormat_D3D9();
+    static unsigned GetDepthStencilFormat_D3D9();
+    static unsigned GetReadableDepthFormat_D3D9();
+    static unsigned GetFormat_D3D9(const String& formatName);
+#endif // def URHO3D_D3D9
+
+#ifdef URHO3D_D3D11
+    void Constructor_D3D11();
+    void Destructor_D3D11();
+    bool SetScreenMode_D3D11(int width, int height, const ScreenModeParams& params, bool maximize);
+    void SetSRGB_D3D11(bool enable);
+    void SetDither_D3D11(bool enable);
+    void SetFlushGPU_D3D11(bool enable);
+    void SetForceGL2_D3D11(bool enable);
+    void Close_D3D11();
+    bool TakeScreenShot_D3D11(Image& destImage);
+    bool BeginFrame_D3D11();
+    void EndFrame_D3D11();
+    void Clear_D3D11(ClearTargetFlags flags, const Color& color = Color(0.0f, 0.0f, 0.0f, 0.0f), float depth = 1.0f, unsigned stencil = 0);
+    bool ResolveToTexture_D3D11(Texture2D* destination, const IntRect& viewport);
+    bool ResolveToTexture_D3D11(Texture2D* texture);
+    bool ResolveToTexture_D3D11(TextureCube* texture);
+    void Draw_D3D11(PrimitiveType type, unsigned vertexStart, unsigned vertexCount);
+    void Draw_D3D11(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount);
+    void Draw_D3D11(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex, unsigned vertexCount);
+    void DrawInstanced_D3D11(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount, unsigned instanceCount);
+    void DrawInstanced_D3D11(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex, unsigned vertexCount, unsigned instanceCount);
+    void SetVertexBuffer_D3D11(VertexBuffer* buffer);
+    bool SetVertexBuffers_D3D11(const PODVector<VertexBuffer*>& buffers, unsigned instanceOffset = 0);
+    bool SetVertexBuffers_D3D11(const Vector<SharedPtr<VertexBuffer> >& buffers, unsigned instanceOffset = 0);
+    void SetIndexBuffer_D3D11(IndexBuffer* buffer);
+    void SetShaders_D3D11(ShaderVariation* vs, ShaderVariation* ps);
+    void SetShaderParameter_D3D11(StringHash param, const float* data, unsigned count);
+    void SetShaderParameter_D3D11(StringHash param, float value);
+    void SetShaderParameter_D3D11(StringHash param, int value);
+    void SetShaderParameter_D3D11(StringHash param, bool value);
+    void SetShaderParameter_D3D11(StringHash param, const Color& color);
+    void SetShaderParameter_D3D11(StringHash param, const Vector2& vector);
+    void SetShaderParameter_D3D11(StringHash param, const Matrix3& matrix);
+    void SetShaderParameter_D3D11(StringHash param, const Vector3& vector);
+    void SetShaderParameter_D3D11(StringHash param, const Matrix4& matrix);
+    void SetShaderParameter_D3D11(StringHash param, const Vector4& vector);
+    void SetShaderParameter_D3D11(StringHash param, const Matrix3x4& matrix);
+    bool NeedParameterUpdate_D3D11(ShaderParameterGroup group, const void* source);
+    bool HasShaderParameter_D3D11(StringHash param);
+    bool HasTextureUnit_D3D11(TextureUnit unit);
+    void ClearParameterSource_D3D11(ShaderParameterGroup group);
+    void ClearParameterSources_D3D11();
+    void ClearTransformSources_D3D11();
+    void SetTexture_D3D11(unsigned index, Texture* texture);
+    void SetDefaultTextureFilterMode_D3D11(TextureFilterMode mode);
+    void SetDefaultTextureAnisotropy_D3D11(unsigned level);
+    void ResetRenderTargets_D3D11();
+    void ResetRenderTarget_D3D11(unsigned index);
+    void ResetDepthStencil_D3D11();
+    void SetRenderTarget_D3D11(unsigned index, RenderSurface* renderTarget);
+    void SetRenderTarget_D3D11(unsigned index, Texture2D* texture);
+    void SetDepthStencil_D3D11(RenderSurface* depthStencil);
+    void SetDepthStencil_D3D11(Texture2D* texture);
+    void SetViewport_D3D11(const IntRect& rect);
+    void SetBlendMode_D3D11(BlendMode mode, bool alphaToCoverage = false);
+    void SetColorWrite_D3D11(bool enable);
+    void SetCullMode_D3D11(CullMode mode);
+    void SetDepthBias_D3D11(float constantBias, float slopeScaledBias);
+    void SetDepthTest_D3D11(CompareMode mode);
+    void SetDepthWrite_D3D11(bool enable);
+    void SetFillMode_D3D11(FillMode mode);
+    void SetLineAntiAlias_D3D11(bool enable);
+    void SetScissorTest_D3D11(bool enable, const Rect& rect = Rect::FULL, bool borderInclusive = true);
+    void SetScissorTest_D3D11(bool enable, const IntRect& rect);
+    void SetClipPlane_D3D11(bool enable, const Plane& clipPlane, const Matrix3x4& view, const Matrix4& projection);
+    void SetStencilTest_D3D11(bool enable, CompareMode mode = CMP_ALWAYS, StencilOp pass = OP_KEEP, StencilOp fail = OP_KEEP, StencilOp zFail = OP_KEEP, unsigned stencilRef = 0, unsigned compareMask = M_MAX_UNSIGNED, unsigned writeMask = M_MAX_UNSIGNED);
+    bool IsInitialized_D3D11() const;
+    bool GetDither_D3D11() const;
+    bool IsDeviceLost_D3D11() const;
+    PODVector<int> GetMultiSampleLevels_D3D11() const;
+    unsigned GetFormat_D3D11(CompressedFormat format) const;
+    ShaderVariation* GetShader_D3D11(ShaderType type, const String& name, const String& defines = String::EMPTY) const;
+    ShaderVariation* GetShader_D3D11(ShaderType type, const char* name, const char* defines) const;
+    VertexBuffer* GetVertexBuffer_D3D11(unsigned index) const;
+    TextureUnit GetTextureUnit_D3D11(const String& name);
+    const String& GetTextureUnitName_D3D11(TextureUnit unit);
+    Texture* GetTexture_D3D11(unsigned index) const;
+    RenderSurface* GetRenderTarget_D3D11(unsigned index) const;
+    IntVector2 GetRenderTargetDimensions_D3D11() const;
+    void OnWindowResized_D3D11();
+    void OnWindowMoved_D3D11();
+    ConstantBuffer* GetOrCreateConstantBuffer_D3D11(ShaderType type, unsigned index, unsigned size);
+
+    static unsigned GetMaxBones_D3D11();
+    static bool GetGL3Support_D3D11();
+    static unsigned GetAlphaFormat_D3D11();
+    static unsigned GetLuminanceFormat_D3D11();
+    static unsigned GetLuminanceAlphaFormat_D3D11();
+    static unsigned GetRGBFormat_D3D11();
+    static unsigned GetRGBAFormat_D3D11();
+    static unsigned GetRGBA16Format_D3D11();
+    static unsigned GetRGBAFloat16Format_D3D11();
+    static unsigned GetRGBAFloat32Format_D3D11();
+    static unsigned GetRG16Format_D3D11();
+    static unsigned GetRGFloat16Format_D3D11();
+    static unsigned GetRGFloat32Format_D3D11();
+    static unsigned GetFloat16Format_D3D11();
+    static unsigned GetFloat32Format_D3D11();
+    static unsigned GetLinearDepthFormat_D3D11();
+    static unsigned GetDepthStencilFormat_D3D11();
+    static unsigned GetReadableDepthFormat_D3D11();
+    static unsigned GetFormat_D3D11(const String& formatName);
+#endif // def URHO3D_D3D11
 
     /// Mutex for accessing the GPU objects vector from several threads.
     Mutex gpuObjectMutex_;
     /// Implementation.
-    GraphicsImpl* impl_;
+    void* impl_;
     /// SDL window.
     SDL_Window* window_{};
     /// Window title.
@@ -916,13 +1371,16 @@ private:
     String apiName_;
 
     /// Pixel perfect UV offset.
-    static const Vector2 pixelUVOffset;
+    inline static Vector2 pixelUVOffset;
     /// OpenGL3 support flag.
-    static bool gl3Support;
+    inline static bool gl3Support;
+    /// Used graphics API.
+    inline static GAPI gapi;
 };
 
 /// Register Graphics library objects.
 /// @nobind
 void URHO3D_API RegisterGraphicsLibrary(Context* context);
 
-}
+} // namespace Urho3D
+

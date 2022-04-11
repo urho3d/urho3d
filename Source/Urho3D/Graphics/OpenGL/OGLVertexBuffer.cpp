@@ -32,7 +32,7 @@
 namespace Urho3D
 {
 
-void VertexBuffer::OnDeviceLost()
+void VertexBuffer::OnDeviceLost_OGL()
 {
     if (object_.name_ && !graphics_->IsDeviceLost())
         glDeleteBuffers(1, &object_.name_);
@@ -40,22 +40,22 @@ void VertexBuffer::OnDeviceLost()
     GPUObject::OnDeviceLost();
 }
 
-void VertexBuffer::OnDeviceReset()
+void VertexBuffer::OnDeviceReset_OGL()
 {
     if (!object_.name_)
     {
-        Create();
-        dataLost_ = !UpdateToGPU();
+        Create_OGL();
+        dataLost_ = !UpdateToGPU_OGL();
     }
     else if (dataPending_)
-        dataLost_ = !UpdateToGPU();
+        dataLost_ = !UpdateToGPU_OGL();
 
     dataPending_ = false;
 }
 
-void VertexBuffer::Release()
+void VertexBuffer::Release_OGL()
 {
-    Unlock();
+    Unlock_OGL();
 
     if (object_.name_)
     {
@@ -70,7 +70,7 @@ void VertexBuffer::Release()
                     graphics_->SetVertexBuffer(nullptr);
             }
 
-            graphics_->SetVBO(0);
+            graphics_->SetVBO_OGL(0);
             glDeleteBuffers(1, &object_.name_);
         }
 
@@ -78,7 +78,7 @@ void VertexBuffer::Release()
     }
 }
 
-bool VertexBuffer::SetData(const void* data)
+bool VertexBuffer::SetData_OGL(const void* data)
 {
     if (!data)
     {
@@ -99,7 +99,7 @@ bool VertexBuffer::SetData(const void* data)
     {
         if (!graphics_->IsDeviceLost())
         {
-            graphics_->SetVBO(object_.name_);
+            graphics_->SetVBO_OGL(object_.name_);
             glBufferData(GL_ARRAY_BUFFER, vertexCount_ * (size_t)vertexSize_, data, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
         }
         else
@@ -113,10 +113,10 @@ bool VertexBuffer::SetData(const void* data)
     return true;
 }
 
-bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count, bool discard)
+bool VertexBuffer::SetDataRange_OGL(const void* data, unsigned start, unsigned count, bool discard)
 {
     if (start == 0 && count == vertexCount_)
-        return SetData(data);
+        return SetData_OGL(data);
 
     if (!data)
     {
@@ -146,7 +146,7 @@ bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count
     {
         if (!graphics_->IsDeviceLost())
         {
-            graphics_->SetVBO(object_.name_);
+            graphics_->SetVBO_OGL(object_.name_);
             if (!discard || start != 0)
                 glBufferSubData(GL_ARRAY_BUFFER, start * (size_t)vertexSize_, count * vertexSize_, data);
             else
@@ -162,7 +162,7 @@ bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count
     return true;
 }
 
-void* VertexBuffer::Lock(unsigned start, unsigned count, bool discard)
+void* VertexBuffer::Lock_OGL(unsigned start, unsigned count, bool discard)
 {
     if (lockState_ != LOCK_NONE)
     {
@@ -204,17 +204,17 @@ void* VertexBuffer::Lock(unsigned start, unsigned count, bool discard)
         return nullptr;
 }
 
-void VertexBuffer::Unlock()
+void VertexBuffer::Unlock_OGL()
 {
     switch (lockState_)
     {
     case LOCK_SHADOW:
-        SetDataRange(shadowData_.Get() + lockStart_ * vertexSize_, lockStart_, lockCount_, discardLock_);
+        SetDataRange_OGL(shadowData_.Get() + lockStart_ * vertexSize_, lockStart_, lockCount_, discardLock_);
         lockState_ = LOCK_NONE;
         break;
 
     case LOCK_SCRATCH:
-        SetDataRange(lockScratchData_, lockStart_, lockCount_, discardLock_);
+        SetDataRange_OGL(lockScratchData_, lockStart_, lockCount_, discardLock_);
         if (graphics_)
             graphics_->FreeScratchBuffer(lockScratchData_);
         lockScratchData_ = nullptr;
@@ -226,11 +226,11 @@ void VertexBuffer::Unlock()
     }
 }
 
-bool VertexBuffer::Create()
+bool VertexBuffer::Create_OGL()
 {
     if (!vertexCount_ || !elementMask_)
     {
-        Release();
+        Release_OGL();
         return true;
     }
 
@@ -250,28 +250,28 @@ bool VertexBuffer::Create()
             return false;
         }
 
-        graphics_->SetVBO(object_.name_);
+        graphics_->SetVBO_OGL(object_.name_);
         glBufferData(GL_ARRAY_BUFFER, vertexCount_ * (size_t)vertexSize_, nullptr, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
     }
 
     return true;
 }
 
-bool VertexBuffer::UpdateToGPU()
+bool VertexBuffer::UpdateToGPU_OGL()
 {
     if (object_.name_ && shadowData_)
-        return SetData(shadowData_.Get());
+        return SetData_OGL(shadowData_.Get());
     else
         return false;
 }
 
-void* VertexBuffer::MapBuffer(unsigned start, unsigned count, bool discard)
+void* VertexBuffer::MapBuffer_OGL(unsigned start, unsigned count, bool discard)
 {
     // Never called on OpenGL
     return nullptr;
 }
 
-void VertexBuffer::UnmapBuffer()
+void VertexBuffer::UnmapBuffer_OGL()
 {
     // Never called on OpenGL
 }

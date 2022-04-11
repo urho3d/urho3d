@@ -31,14 +31,15 @@
 #include "../../Graphics/IndexBuffer.h"
 #include "../../Graphics/Shader.h"
 #include "../../Graphics/ShaderPrecache.h"
-#include "../../Graphics/ShaderProgram.h"
 #include "../../Graphics/Texture2D.h"
 #include "../../Graphics/TextureCube.h"
 #include "../../Graphics/VertexBuffer.h"
-#include "../../Graphics/VertexDeclaration.h"
 #include "../../IO/File.h"
 #include "../../IO/Log.h"
 #include "../../Resource/ResourceCache.h"
+#include "D3D9GraphicsImpl.h"
+#include "D3D9ShaderProgram.h"
+#include "D3D9VertexDeclaration.h"
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_syswm.h>
@@ -48,13 +49,6 @@
 #ifdef _MSC_VER
 #pragma warning(disable:4355)
 #endif
-
-// Prefer the high-performance GPU on switchable GPU systems
-extern "C"
-{
-__declspec(dllexport) DWORD NvOptimusEnablement = 1;
-__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
-}
 
 // Fix missing define in MinGW headers
 #ifndef D3DPRESENT_LINEAR_CONTENT
@@ -248,19 +242,19 @@ static HWND GetWindowHandle(SDL_Window* window)
 
 static unsigned readableDepthFormat = 0;
 
-const Vector2 Graphics::pixelUVOffset(0.5f, 0.5f);
-bool Graphics::gl3Support = false;
-
-Graphics::Graphics(Context* context) :
-    Object(context),
-    impl_(new GraphicsImpl()),
-    position_(SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED),
-    shaderPath_("Shaders/HLSL/"),
-    shaderExtension_(".hlsl"),
-    orientations_("LandscapeLeft LandscapeRight"),
-    apiName_("D3D9")
+void Graphics::Constructor_D3D9()
 {
-    SetTextureUnitMappings();
+    impl_ = new GraphicsImpl_D3D9();
+    position_ = IntVector2(SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED);
+    shaderPath_ = "Shaders/HLSL/";
+    shaderExtension_ = ".hlsl";
+    orientations_ = "LandscapeLeft LandscapeRight";
+    apiName_ = "D3D9";
+
+    Graphics::pixelUVOffset = Vector2(0.5f, 0.5f);
+    Graphics::gl3Support = false;
+
+    SetTextureUnitMappings_D3D9();
 
     context_->RequireSDL(SDL_INIT_VIDEO);
 
@@ -268,7 +262,7 @@ Graphics::Graphics(Context* context) :
     RegisterGraphicsLibrary(context_);
 }
 
-Graphics::~Graphics()
+void Graphics::Destructor_D3D9()
 {
     {
         MutexLock lock(gpuObjectMutex_);
@@ -279,13 +273,15 @@ Graphics::~Graphics()
         gpuObjects_.Clear();
     }
 
-    impl_->vertexDeclarations_.Clear();
+    GraphicsImpl_D3D9* impl = GetImpl_D3D9();
 
-    URHO3D_SAFE_RELEASE(impl_->defaultColorSurface_);
-    URHO3D_SAFE_RELEASE(impl_->defaultDepthStencilSurface_);
-    URHO3D_SAFE_RELEASE(impl_->frameQuery_);
-    URHO3D_SAFE_RELEASE(impl_->device_);
-    URHO3D_SAFE_RELEASE(impl_->interface_);
+    impl->vertexDeclarations_.Clear();
+
+    URHO3D_SAFE_RELEASE(impl->defaultColorSurface_);
+    URHO3D_SAFE_RELEASE(impl->defaultDepthStencilSurface_);
+    URHO3D_SAFE_RELEASE(impl->frameQuery_);
+    URHO3D_SAFE_RELEASE(impl->device_);
+    URHO3D_SAFE_RELEASE(impl->interface_);
 
     if (window_)
     {
@@ -300,9 +296,9 @@ Graphics::~Graphics()
     context_->ReleaseSDL();
 }
 
-bool Graphics::SetScreenMode(int width, int height, const ScreenModeParams& params, bool maximize)
+bool Graphics::SetScreenMode_D3D9(int width, int height, const ScreenModeParams& params, bool maximize)
 {
-    URHO3D_PROFILE(SetScreenMode);
+    URHO3D_PROFILE(SetScreenMode_D3D9);
 
     // Ensure that parameters are properly filled
     ScreenModeParams newParams = params;
@@ -323,26 +319,28 @@ bool Graphics::SetScreenMode(int width, int height, const ScreenModeParams& para
 
     if (!window_)
     {
-        if (!OpenWindow(width, height, newParams.resizable_, newParams.borderless_))
+        if (!OpenWindow_D3D9(width, height, newParams.resizable_, newParams.borderless_))
             return false;
     }
 
-    if (!impl_->interface_)
+    GraphicsImpl_D3D9* impl = GetImpl_D3D9();
+
+    if (!impl->interface_)
     {
-        if (!CreateInterface())
+        if (!CreateInterface_D3D9())
             return false;
 
-        CheckFeatureSupport();
+        CheckFeatureSupport_D3D9();
     }
 
     // Fall back to non-multisampled if unsupported multisampling mode
     if (newParams.multiSample_ > 1)
     {
-        if (!impl_->CheckMultiSampleSupport(fullscreenFormat, newParams.multiSample_))
+        if (!impl->CheckMultiSampleSupport(fullscreenFormat, newParams.multiSample_))
             newParams.multiSample_ = 1;
     }
 
-    AdjustWindow(width, height, newParams.fullscreen_, newParams.borderless_, newParams.monitor_);
+    AdjustWindow_D3D9(width, height, newParams.fullscreen_, newParams.borderless_, newParams.monitor_);
 
     if (maximize)
     {
@@ -352,46 +350,46 @@ bool Graphics::SetScreenMode(int width, int height, const ScreenModeParams& para
 
     if (newParams.fullscreen_)
     {
-        impl_->presentParams_.BackBufferFormat = fullscreenFormat;
-        impl_->presentParams_.Windowed = false;
+        impl->presentParams_.BackBufferFormat = fullscreenFormat;
+        impl->presentParams_.Windowed = false;
     }
     else
     {
-        impl_->presentParams_.BackBufferFormat = D3DFMT_UNKNOWN;
-        impl_->presentParams_.Windowed = true;
+        impl->presentParams_.BackBufferFormat = D3DFMT_UNKNOWN;
+        impl->presentParams_.Windowed = true;
     }
 
-    impl_->presentParams_.BackBufferWidth = (UINT)width;
-    impl_->presentParams_.BackBufferHeight = (UINT)height;
-    impl_->presentParams_.BackBufferCount = newParams.tripleBuffer_ ? 2 : 1;
-    impl_->presentParams_.MultiSampleType = newParams.multiSample_ > 1 ? static_cast<D3DMULTISAMPLE_TYPE>(newParams.multiSample_) : D3DMULTISAMPLE_NONE;
-    impl_->presentParams_.MultiSampleQuality = 0;
-    impl_->presentParams_.SwapEffect = D3DSWAPEFFECT_DISCARD;
-    impl_->presentParams_.hDeviceWindow = GetWindowHandle(window_);
-    impl_->presentParams_.EnableAutoDepthStencil = TRUE;
-    impl_->presentParams_.AutoDepthStencilFormat = D3DFMT_D24S8;
-    impl_->presentParams_.Flags = D3DPRESENT_LINEAR_CONTENT;
-    impl_->presentParams_.FullScreen_RefreshRateInHz = newParams.fullscreen_ ? newParams.refreshRate_ : D3DPRESENT_RATE_DEFAULT;
+    impl->presentParams_.BackBufferWidth = (UINT)width;
+    impl->presentParams_.BackBufferHeight = (UINT)height;
+    impl->presentParams_.BackBufferCount = newParams.tripleBuffer_ ? 2 : 1;
+    impl->presentParams_.MultiSampleType = newParams.multiSample_ > 1 ? static_cast<D3DMULTISAMPLE_TYPE>(newParams.multiSample_) : D3DMULTISAMPLE_NONE;
+    impl->presentParams_.MultiSampleQuality = 0;
+    impl->presentParams_.SwapEffect = D3DSWAPEFFECT_DISCARD;
+    impl->presentParams_.hDeviceWindow = GetWindowHandle(window_);
+    impl->presentParams_.EnableAutoDepthStencil = TRUE;
+    impl->presentParams_.AutoDepthStencilFormat = D3DFMT_D24S8;
+    impl->presentParams_.Flags = D3DPRESENT_LINEAR_CONTENT;
+    impl->presentParams_.FullScreen_RefreshRateInHz = newParams.fullscreen_ ? newParams.refreshRate_ : D3DPRESENT_RATE_DEFAULT;
 
     if (newParams.vsync_)
-        impl_->presentParams_.PresentationInterval = D3DPRESENT_INTERVAL_ONE;
+        impl->presentParams_.PresentationInterval = D3DPRESENT_INTERVAL_ONE;
     else
-        impl_->presentParams_.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
+        impl->presentParams_.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
 
     width_ = width;
     height_ = height;
     screenParams_ = newParams;
 
-    if (!impl_->device_)
+    if (!impl->device_)
     {
         unsigned adapter = SDL_Direct3D9GetAdapterIndex(screenParams_.monitor_);
         unsigned deviceType = D3DDEVTYPE_HAL;
 
         // Check for PerfHUD adapter
-        for (unsigned i = 0; i < impl_->interface_->GetAdapterCount(); ++i)
+        for (unsigned i = 0; i < impl->interface_->GetAdapterCount(); ++i)
         {
             D3DADAPTER_IDENTIFIER9 identifier;
-            impl_->interface_->GetAdapterIdentifier(i, 0, &identifier);
+            impl->interface_->GetAdapterIdentifier(i, 0, &identifier);
             if (strstr(identifier.Description, "PerfHUD") != nullptr)
             {
                 adapter = i;
@@ -400,20 +398,21 @@ bool Graphics::SetScreenMode(int width, int height, const ScreenModeParams& para
             }
         }
 
-        impl_->interface_->GetAdapterIdentifier(adapter, 0, &impl_->adapterIdentifier_);
-        if (!CreateDevice(adapter, deviceType))
+        impl->interface_->GetAdapterIdentifier(adapter, 0, &impl->adapterIdentifier_);
+        if (!CreateDevice_D3D9(adapter, deviceType))
             return false;
     }
     else
     {
         if (!monitorChanged)
-            ResetDevice();
+            ResetDevice_D3D9();
         else
         {
             URHO3D_LOGINFO("Destroying D3D9 device");
             // Monitor changed, re-create the D3D9 device on the new monitor
-            impl_->vertexDeclarations_.Clear();
-            OnDeviceLost();
+            impl->vertexDeclarations_.Clear();
+            OnDeviceLost_D3D9();
+            
             {
                 MutexLock lock(gpuObjectMutex_);
                 // Release all GPU objects that still exist
@@ -422,26 +421,26 @@ bool Graphics::SetScreenMode(int width, int height, const ScreenModeParams& para
             }
 
             // destroy previous device
-            URHO3D_SAFE_RELEASE(impl_->device_);
+            URHO3D_SAFE_RELEASE(impl->device_);
 
             // create new device on the specified monitor
             unsigned adapter = SDL_Direct3D9GetAdapterIndex(screenParams_.monitor_);
             unsigned deviceType = D3DDEVTYPE_HAL;
-            if (!CreateDevice(adapter, deviceType))
+            if (!CreateDevice_D3D9(adapter, deviceType))
                 return false;
-            ResetDevice();
+            ResetDevice_D3D9();
         }
     }
 
     // Clear the initial window contents to black
-    impl_->device_->BeginScene();
-    Clear(CLEAR_COLOR);
-    impl_->device_->EndScene();
-    impl_->device_->Present(nullptr, nullptr, nullptr, nullptr);
+    impl->device_->BeginScene();
+    Clear_D3D9(CLEAR_COLOR);
+    impl->device_->EndScene();
+    impl->device_->Present(nullptr, nullptr, nullptr, nullptr);
 
 #ifdef URHO3D_LOGGING
     D3DADAPTER_IDENTIFIER9 id = {0};
-    HRESULT hr = impl_->interface_->GetAdapterIdentifier(SDL_Direct3D9GetAdapterIndex(screenParams_.monitor_), 0, &id);
+    HRESULT hr = impl->interface_->GetAdapterIdentifier(SDL_Direct3D9GetAdapterIndex(screenParams_.monitor_), 0, &id);
     if (S_OK == hr)
         URHO3D_LOGINFOF("Adapter used %s", id.Description);
 #endif
@@ -450,27 +449,27 @@ bool Graphics::SetScreenMode(int width, int height, const ScreenModeParams& para
     return true;
 }
 
-void Graphics::SetSRGB(bool enable)
+void Graphics::SetSRGB_D3D9(bool enable)
 {
     sRGB_ = enable && sRGBWriteSupport_;
 }
 
-void Graphics::SetDither(bool enable)
+void Graphics::SetDither_D3D9(bool enable)
 {
     // No effect on Direct3D9
 }
 
-void Graphics::SetFlushGPU(bool enable)
+void Graphics::SetFlushGPU_D3D9(bool enable)
 {
     flushGPU_ = enable;
 }
 
-void Graphics::SetForceGL2(bool enable)
+void Graphics::SetForceGL2_D3D9(bool enable)
 {
     // No effect on Direct3D9
 }
 
-void Graphics::Close()
+void Graphics::Close_D3D9()
 {
     if (window_)
     {
@@ -480,21 +479,23 @@ void Graphics::Close()
     }
 }
 
-bool Graphics::TakeScreenShot(Image& destImage)
+bool Graphics::TakeScreenShot_D3D9(Image& destImage)
 {
-    URHO3D_PROFILE(TakeScreenShot);
+    URHO3D_PROFILE(TakeScreenShot_D3D9);
 
-    if (!impl_->device_)
+    GraphicsImpl_D3D9* impl = GetImpl_D3D9();
+
+    if (!impl->device_)
         return false;
 
-    if (IsDeviceLost())
+    if (IsDeviceLost_D3D9())
     {
         URHO3D_LOGERROR("Can not take screenshot while device is lost");
         return false;
     }
 
     D3DSURFACE_DESC surfaceDesc;
-    impl_->defaultColorSurface_->GetDesc(&surfaceDesc);
+    impl->defaultColorSurface_->GetDesc(&surfaceDesc);
 
     // If possible, get the backbuffer data, because it is a lot faster.
     // However, if we are multisampled, need to use the front buffer
@@ -502,7 +503,7 @@ bool Graphics::TakeScreenShot(Image& destImage)
     unsigned surfaceWidth = (unsigned)width_;
     unsigned surfaceHeight = (unsigned)height_;
 
-    if (impl_->presentParams_.MultiSampleType)
+    if (impl->presentParams_.MultiSampleType)
     {
         // If windowed and multisampled, must still capture the whole screen
         if (!screenParams_.fullscreen_)
@@ -516,7 +517,7 @@ bool Graphics::TakeScreenShot(Image& destImage)
     }
 
     IDirect3DSurface9* surface = nullptr;
-    HRESULT hr = impl_->device_->CreateOffscreenPlainSurface(surfaceWidth, surfaceHeight, surfaceDesc.Format, D3DPOOL_SYSTEMMEM, &surface, nullptr);
+    HRESULT hr = impl->device_->CreateOffscreenPlainSurface(surfaceWidth, surfaceHeight, surfaceDesc.Format, D3DPOOL_SYSTEMMEM, &surface, nullptr);
     if (FAILED(hr))
     {
         URHO3D_SAFE_RELEASE(surface);
@@ -525,9 +526,9 @@ bool Graphics::TakeScreenShot(Image& destImage)
     }
 
     if (useBackBuffer)
-        hr = impl_->device_->GetRenderTargetData(impl_->defaultColorSurface_, surface);
+        hr = impl->device_->GetRenderTargetData(impl->defaultColorSurface_, surface);
     else
-        hr = impl_->device_->GetFrontBufferData(0, surface);
+        hr = impl->device_->GetFrontBufferData(0, surface);
     if (FAILED(hr))
     {
         URHO3D_SAFE_RELEASE(surface);
@@ -609,9 +610,9 @@ bool Graphics::TakeScreenShot(Image& destImage)
     return true;
 }
 
-bool Graphics::BeginFrame()
+bool Graphics::BeginFrame_D3D9()
 {
-    if (!IsInitialized())
+    if (!IsInitialized_D3D9())
         return false;
 
     // If using an external window, check it for size changes, and reset screen mode if necessary
@@ -631,13 +632,15 @@ bool Graphics::BeginFrame()
             return false;
     }
 
+    GraphicsImpl_D3D9* impl = GetImpl_D3D9();
+
     // Check for lost device before rendering
-    HRESULT hr = impl_->device_->TestCooperativeLevel();
+    HRESULT hr = impl->device_->TestCooperativeLevel();
     if (hr != D3D_OK)
     {
         URHO3D_PROFILE(DeviceLost);
 
-        impl_->deviceLost_ = true;
+        impl->deviceLost_ = true;
 
         // The device can not be reset yet, sleep and try again eventually
         if (hr == D3DERR_DEVICELOST)
@@ -648,19 +651,19 @@ bool Graphics::BeginFrame()
         // The device is lost, but ready to be reset. Reset device but do not render on this frame yet
         if (hr == D3DERR_DEVICENOTRESET)
         {
-            ResetDevice();
+            ResetDevice_D3D9();
             return false;
         }
     }
 
-    impl_->device_->BeginScene();
+    impl->device_->BeginScene();
 
     // Set default rendertarget and depth buffer
-    ResetRenderTargets();
+    ResetRenderTargets_D3D9();
 
     // Cleanup textures from previous frame
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
-        SetTexture(i, nullptr);
+        SetTexture_D3D9(i, nullptr);
 
     numPrimitives_ = 0;
     numBatches_ = 0;
@@ -670,39 +673,41 @@ bool Graphics::BeginFrame()
     return true;
 }
 
-void Graphics::EndFrame()
+void Graphics::EndFrame_D3D9()
 {
-    if (!IsInitialized())
+    if (!IsInitialized_D3D9())
         return;
+
+    GraphicsImpl_D3D9* impl = GetImpl_D3D9();
 
     {
         URHO3D_PROFILE(Present);
 
         SendEvent(E_ENDRENDERING);
 
-        impl_->device_->EndScene();
-        impl_->device_->Present(nullptr, nullptr, nullptr, nullptr);
+        impl->device_->EndScene();
+        impl->device_->Present(nullptr, nullptr, nullptr, nullptr);
     }
 
     // Optionally flush GPU buffer to avoid control lag or framerate fluctuations due to multiple frame buffering
     // If a query was issued on the previous frame, first wait for it to finish
-    if (impl_->frameQuery_)
+    if (impl->frameQuery_)
     {
-        if (impl_->queryIssued_)
+        if (impl->queryIssued_)
         {
             URHO3D_PROFILE(FlushGPU);
 
-            while (impl_->frameQuery_->GetData(nullptr, 0, D3DGETDATA_FLUSH) == S_FALSE)
+            while (impl->frameQuery_->GetData(nullptr, 0, D3DGETDATA_FLUSH) == S_FALSE)
             {
             }
 
-            impl_->queryIssued_ = false;
+            impl->queryIssued_ = false;
         }
 
         if (flushGPU_)
         {
-            impl_->frameQuery_->Issue(D3DISSUE_END);
-            impl_->queryIssued_ = true;
+            impl->frameQuery_->Issue(D3DISSUE_END);
+            impl->queryIssued_ = true;
         }
     }
 
@@ -710,7 +715,7 @@ void Graphics::EndFrame()
     CleanupScratchBuffers();
 }
 
-void Graphics::Clear(ClearTargetFlags flags, const Color& color, float depth, unsigned stencil)
+void Graphics::Clear_D3D9(ClearTargetFlags flags, const Color& color, float depth, unsigned stencil)
 {
     DWORD d3dFlags = 0;
     if (flags & CLEAR_COLOR)
@@ -720,15 +725,15 @@ void Graphics::Clear(ClearTargetFlags flags, const Color& color, float depth, un
     if (flags & CLEAR_STENCIL)
         d3dFlags |= D3DCLEAR_STENCIL;
 
-    impl_->device_->Clear(0, nullptr, d3dFlags, GetD3DColor(color), depth, stencil);
+    GetImpl_D3D9()->device_->Clear(0, nullptr, d3dFlags, GetD3DColor(color), depth, stencil);
 }
 
-bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
+bool Graphics::ResolveToTexture_D3D9(Texture2D* destination, const IntRect& viewport)
 {
     if (!destination || !destination->GetRenderSurface())
         return false;
 
-    URHO3D_PROFILE(ResolveToTexture);
+    URHO3D_PROFILE(ResolveToTexture_D3D9);
 
     IntRect vpCopy = viewport;
     if (vpCopy.right_ <= vpCopy.left_)
@@ -748,7 +753,9 @@ bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
     destRect.right = destination->GetWidth();
     destRect.bottom = destination->GetHeight();
 
-    HRESULT hr = impl_->device_->StretchRect(impl_->defaultColorSurface_, &rect,
+    GraphicsImpl_D3D9* impl = GetImpl_D3D9();
+
+    HRESULT hr = impl->device_->StretchRect(impl->defaultColorSurface_, &rect,
         (IDirect3DSurface9*)destination->GetRenderSurface()->GetSurface(), &destRect, D3DTEXF_NONE);
     if (FAILED(hr))
     {
@@ -759,12 +766,12 @@ bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
         return true;
 }
 
-bool Graphics::ResolveToTexture(Texture2D* texture)
+bool Graphics::ResolveToTexture_D3D9(Texture2D* texture)
 {
     if (!texture || !texture->GetRenderSurface() || !texture->GetGPUObject() || texture->GetMultiSample() < 2)
         return false;
 
-    URHO3D_PROFILE(ResolveToTexture);
+    URHO3D_PROFILE(ResolveToTexture_D3D9);
 
     // Clear dirty flag already, because if resolve fails it's no use to retry (e.g. on the same frame)
     RenderSurface* surface = texture->GetRenderSurface();
@@ -788,7 +795,7 @@ bool Graphics::ResolveToTexture(Texture2D* texture)
         return false;
     }
 
-    hr = impl_->device_->StretchRect(srcSurface, &rect, destSurface, &rect, D3DTEXF_NONE);
+    hr = GetImpl_D3D9()->device_->StretchRect(srcSurface, &rect, destSurface, &rect, D3DTEXF_NONE);
     URHO3D_SAFE_RELEASE(destSurface);
     if (FAILED(hr))
     {
@@ -799,12 +806,12 @@ bool Graphics::ResolveToTexture(Texture2D* texture)
         return true;
 }
 
-bool Graphics::ResolveToTexture(TextureCube* texture)
+bool Graphics::ResolveToTexture_D3D9(TextureCube* texture)
 {
     if (!texture || !texture->GetRenderSurface(FACE_POSITIVE_X) || !texture->GetGPUObject() || texture->GetMultiSample() < 2)
         return false;
 
-    URHO3D_PROFILE(ResolveToTexture);
+    URHO3D_PROFILE(ResolveToTexture_D3D9);
 
     texture->SetResolveDirty(false);
 
@@ -833,7 +840,7 @@ bool Graphics::ResolveToTexture(TextureCube* texture)
             return false;
         }
 
-        hr = impl_->device_->StretchRect(srcSurface, &rect, destSurface, &rect, D3DTEXF_NONE);
+        hr = GetImpl_D3D9()->device_->StretchRect(srcSurface, &rect, destSurface, &rect, D3DTEXF_NONE);
         URHO3D_SAFE_RELEASE(destSurface);
         if (FAILED(hr))
         {
@@ -845,58 +852,58 @@ bool Graphics::ResolveToTexture(TextureCube* texture)
     return true;
 }
 
-void Graphics::Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCount)
+void Graphics::Draw_D3D9(PrimitiveType type, unsigned vertexStart, unsigned vertexCount)
 {
     if (!vertexCount)
         return;
 
-    ResetStreamFrequencies();
+    ResetStreamFrequencies_D3D9();
 
     unsigned primitiveCount;
     D3DPRIMITIVETYPE d3dPrimitiveType;
 
     GetD3DPrimitiveType(vertexCount, type, primitiveCount, d3dPrimitiveType);
-    impl_->device_->DrawPrimitive(d3dPrimitiveType, vertexStart, primitiveCount);
+    GetImpl_D3D9()->device_->DrawPrimitive(d3dPrimitiveType, vertexStart, primitiveCount);
 
     numPrimitives_ += primitiveCount;
     ++numBatches_;
 }
 
-void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount)
+void Graphics::Draw_D3D9(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount)
 {
     if (!indexCount)
         return;
 
-    ResetStreamFrequencies();
+    ResetStreamFrequencies_D3D9();
 
     unsigned primitiveCount;
     D3DPRIMITIVETYPE d3dPrimitiveType;
 
     GetD3DPrimitiveType(indexCount, type, primitiveCount, d3dPrimitiveType);
-    impl_->device_->DrawIndexedPrimitive(d3dPrimitiveType, 0, minVertex, vertexCount, indexStart, primitiveCount);
+    GetImpl_D3D9()->device_->DrawIndexedPrimitive(d3dPrimitiveType, 0, minVertex, vertexCount, indexStart, primitiveCount);
 
     numPrimitives_ += primitiveCount;
     ++numBatches_;
 }
 
-void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex, unsigned vertexCount)
+void Graphics::Draw_D3D9(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex, unsigned vertexCount)
 {
     if (!indexCount)
         return;
 
-    ResetStreamFrequencies();
+    ResetStreamFrequencies_D3D9();
 
     unsigned primitiveCount;
     D3DPRIMITIVETYPE d3dPrimitiveType;
 
     GetD3DPrimitiveType(indexCount, type, primitiveCount, d3dPrimitiveType);
-    impl_->device_->DrawIndexedPrimitive(d3dPrimitiveType, baseVertexIndex, minVertex, vertexCount, indexStart, primitiveCount);
+    GetImpl_D3D9()->device_->DrawIndexedPrimitive(d3dPrimitiveType, baseVertexIndex, minVertex, vertexCount, indexStart, primitiveCount);
 
     numPrimitives_ += primitiveCount;
     ++numBatches_;
 }
 
-void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount,
+void Graphics::DrawInstanced_D3D9(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount,
     unsigned instanceCount)
 {
     if (!indexCount || !instanceCount)
@@ -910,9 +917,9 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
             const PODVector<VertexElement>& elements = buffer->GetElements();
             // Check if buffer has per-instance data
             if (elements.Size() && elements[0].perInstance_)
-                SetStreamFrequency(i, D3DSTREAMSOURCE_INSTANCEDATA | 1u);
+                SetStreamFrequency_D3D9(i, D3DSTREAMSOURCE_INSTANCEDATA | 1u);
             else
-                SetStreamFrequency(i, D3DSTREAMSOURCE_INDEXEDDATA | instanceCount);
+                SetStreamFrequency_D3D9(i, D3DSTREAMSOURCE_INDEXEDDATA | instanceCount);
         }
     }
 
@@ -920,13 +927,13 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
     D3DPRIMITIVETYPE d3dPrimitiveType;
 
     GetD3DPrimitiveType(indexCount, type, primitiveCount, d3dPrimitiveType);
-    impl_->device_->DrawIndexedPrimitive(d3dPrimitiveType, 0, minVertex, vertexCount, indexStart, primitiveCount);
+    GetImpl_D3D9()->device_->DrawIndexedPrimitive(d3dPrimitiveType, 0, minVertex, vertexCount, indexStart, primitiveCount);
 
     numPrimitives_ += instanceCount * primitiveCount;
     ++numBatches_;
 }
 
-void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex,
+void Graphics::DrawInstanced_D3D9(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex,
     unsigned vertexCount, unsigned instanceCount)
 {
     if (!indexCount || !instanceCount)
@@ -940,9 +947,9 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
             const PODVector<VertexElement>& elements = buffer->GetElements();
             // Check if buffer has per-instance data
             if (elements.Size() && elements[0].perInstance_)
-                SetStreamFrequency(i, D3DSTREAMSOURCE_INSTANCEDATA | 1u);
+                SetStreamFrequency_D3D9(i, D3DSTREAMSOURCE_INSTANCEDATA | 1u);
             else
-                SetStreamFrequency(i, D3DSTREAMSOURCE_INDEXEDDATA | instanceCount);
+                SetStreamFrequency_D3D9(i, D3DSTREAMSOURCE_INDEXEDDATA | instanceCount);
         }
     }
 
@@ -950,21 +957,21 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
     D3DPRIMITIVETYPE d3dPrimitiveType;
 
     GetD3DPrimitiveType(indexCount, type, primitiveCount, d3dPrimitiveType);
-    impl_->device_->DrawIndexedPrimitive(d3dPrimitiveType, baseVertexIndex, minVertex, vertexCount, indexStart, primitiveCount);
+    GetImpl_D3D9()->device_->DrawIndexedPrimitive(d3dPrimitiveType, baseVertexIndex, minVertex, vertexCount, indexStart, primitiveCount);
 
     numPrimitives_ += instanceCount * primitiveCount;
     ++numBatches_;
 }
 
-void Graphics::SetVertexBuffer(VertexBuffer* buffer)
+void Graphics::SetVertexBuffer_D3D9(VertexBuffer* buffer)
 {
     // Note: this is not multi-instance safe
     static PODVector<VertexBuffer*> vertexBuffers(1);
     vertexBuffers[0] = buffer;
-    SetVertexBuffers(vertexBuffers);
+    SetVertexBuffers_D3D9(vertexBuffers);
 }
 
-bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, unsigned instanceOffset)
+bool Graphics::SetVertexBuffers_D3D9(const PODVector<VertexBuffer*>& buffers, unsigned instanceOffset)
 {
     if (buffers.Size() > MAX_VERTEX_STREAMS)
     {
@@ -982,24 +989,26 @@ bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, unsigne
         hash |= buffers[i]->GetBufferHash(i);
     }
 
+    GraphicsImpl_D3D9* impl = GetImpl_D3D9();
+
     if (hash)
     {
         // If no previous vertex declaration for that hash, create new
-        VertexDeclarationMap::Iterator i = impl_->vertexDeclarations_.Find(hash);
-        if (i == impl_->vertexDeclarations_.End())
+        VertexDeclarationMap_D3D9::Iterator i = impl->vertexDeclarations_.Find(hash);
+        if (i == impl->vertexDeclarations_.End())
         {
-            SharedPtr<VertexDeclaration> newDeclaration(new VertexDeclaration(this, buffers));
+            SharedPtr<VertexDeclaration_D3D9> newDeclaration(new VertexDeclaration_D3D9(this, buffers));
             if (!newDeclaration->GetDeclaration())
                 return false;
 
-            i = impl_->vertexDeclarations_.Insert(MakePair(hash, newDeclaration));
+            i = impl->vertexDeclarations_.Insert(MakePair(hash, newDeclaration));
         }
 
-        VertexDeclaration* declaration = i->second_;
-        if (declaration != impl_->vertexDeclaration_)
+        VertexDeclaration_D3D9* declaration = i->second_;
+        if (declaration != impl->vertexDeclaration_)
         {
-            impl_->device_->SetVertexDeclaration(declaration->GetDeclaration());
-            impl_->vertexDeclaration_ = declaration;
+            impl->device_->SetVertexDeclaration(declaration->GetDeclaration());
+            impl->vertexDeclaration_ = declaration;
         }
     }
 
@@ -1017,46 +1026,50 @@ bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, unsigne
                 offset = instanceOffset * buffer->GetVertexSize();
         }
 
-        if (buffer != vertexBuffers_[i] || offset != impl_->streamOffsets_[i])
+        if (buffer != vertexBuffers_[i] || offset != impl->streamOffsets_[i])
         {
             if (buffer)
-                impl_->device_->SetStreamSource(i, (IDirect3DVertexBuffer9*)buffer->GetGPUObject(), offset,
+                impl->device_->SetStreamSource(i, (IDirect3DVertexBuffer9*)buffer->GetGPUObject(), offset,
                     buffer->GetVertexSize());
             else
-                impl_->device_->SetStreamSource(i, nullptr, 0, 0);
+                impl->device_->SetStreamSource(i, nullptr, 0, 0);
 
             vertexBuffers_[i] = buffer;
-            impl_->streamOffsets_[i] = offset;
+            impl->streamOffsets_[i] = offset;
         }
     }
 
     return true;
 }
 
-bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers, unsigned instanceOffset)
+bool Graphics::SetVertexBuffers_D3D9(const Vector<SharedPtr<VertexBuffer> >& buffers, unsigned instanceOffset)
 {
-    return SetVertexBuffers(reinterpret_cast<const PODVector<VertexBuffer*>&>(buffers), instanceOffset);
+    return SetVertexBuffers_D3D9(reinterpret_cast<const PODVector<VertexBuffer*>&>(buffers), instanceOffset);
 }
 
-void Graphics::SetIndexBuffer(IndexBuffer* buffer)
+void Graphics::SetIndexBuffer_D3D9(IndexBuffer* buffer)
 {
     if (buffer != indexBuffer_)
     {
+        GraphicsImpl_D3D9* impl = GetImpl_D3D9();
+
         if (buffer)
-            impl_->device_->SetIndices((IDirect3DIndexBuffer9*)buffer->GetGPUObject());
+            impl->device_->SetIndices((IDirect3DIndexBuffer9*)buffer->GetGPUObject());
         else
-            impl_->device_->SetIndices(nullptr);
+            impl->device_->SetIndices(nullptr);
 
         indexBuffer_ = buffer;
     }
 }
 
-void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
+void Graphics::SetShaders_D3D9(ShaderVariation* vs, ShaderVariation* ps)
 {
     if (vs == vertexShader_ && ps == pixelShader_)
         return;
 
-    ClearParameterSources();
+    ClearParameterSources_D3D9();
+
+    GraphicsImpl_D3D9* impl = GetImpl_D3D9();
 
     if (vs != vertexShader_)
     {
@@ -1079,10 +1092,10 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
         }
 
         if (vs && vs->GetShaderType() == VS)
-            impl_->device_->SetVertexShader((IDirect3DVertexShader9*)vs->GetGPUObject());
+            impl->device_->SetVertexShader((IDirect3DVertexShader9*)vs->GetGPUObject());
         else
         {
-            impl_->device_->SetVertexShader(nullptr);
+            impl->device_->SetVertexShader(nullptr);
             vs = nullptr;
         }
 
@@ -1109,10 +1122,10 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
         }
 
         if (ps && ps->GetShaderType() == PS)
-            impl_->device_->SetPixelShader((IDirect3DPixelShader9*)ps->GetGPUObject());
+            impl->device_->SetPixelShader((IDirect3DPixelShader9*)ps->GetGPUObject());
         else
         {
-            impl_->device_->SetPixelShader(nullptr);
+            impl->device_->SetPixelShader(nullptr);
             ps = nullptr;
         }
 
@@ -1123,94 +1136,106 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
     if (vertexShader_ && pixelShader_)
     {
         Pair<ShaderVariation*, ShaderVariation*> key = MakePair(vertexShader_, pixelShader_);
-        ShaderProgramMap::Iterator i = impl_->shaderPrograms_.Find(key);
-        if (i != impl_->shaderPrograms_.End())
-            impl_->shaderProgram_ = i->second_.Get();
+        ShaderProgramMap_D3D9::Iterator i = impl->shaderPrograms_.Find(key);
+        if (i != impl->shaderPrograms_.End())
+            impl->shaderProgram_ = i->second_.Get();
         else
         {
-            ShaderProgram* newProgram = impl_->shaderPrograms_[key] = new ShaderProgram(vertexShader_, pixelShader_);
-            impl_->shaderProgram_ = newProgram;
+            ShaderProgram_D3D9* newProgram = impl->shaderPrograms_[key] = new ShaderProgram_D3D9(vertexShader_, pixelShader_);
+            impl->shaderProgram_ = newProgram;
         }
     }
     else
-        impl_->shaderProgram_ = nullptr;
+        impl->shaderProgram_ = nullptr;
 
     // Store shader combination if shader dumping in progress
     if (shaderPrecache_)
         shaderPrecache_->StoreShaders(vertexShader_, pixelShader_);
 }
 
-void Graphics::SetShaderParameter(StringHash param, const float* data, unsigned count)
+void Graphics::SetShaderParameter_D3D9(StringHash param, const float* data, unsigned count)
 {
+    GraphicsImpl_D3D9* impl = GetImpl_D3D9();
+
     HashMap<StringHash, ShaderParameter>::Iterator i;
-    if (!impl_->shaderProgram_ || (i = impl_->shaderProgram_->parameters_.Find(param)) == impl_->shaderProgram_->parameters_.End())
+    if (!impl->shaderProgram_ || (i = impl->shaderProgram_->parameters_.Find(param)) == impl->shaderProgram_->parameters_.End())
         return;
 
     if (i->second_.type_ == VS)
-        impl_->device_->SetVertexShaderConstantF(i->second_.register_, data, count / 4);
+        impl->device_->SetVertexShaderConstantF(i->second_.register_, data, count / 4);
     else
-        impl_->device_->SetPixelShaderConstantF(i->second_.register_, data, count / 4);
+        impl->device_->SetPixelShaderConstantF(i->second_.register_, data, count / 4);
 }
 
-void Graphics::SetShaderParameter(StringHash param, float value)
+void Graphics::SetShaderParameter_D3D9(StringHash param, float value)
 {
+    GraphicsImpl_D3D9* impl = GetImpl_D3D9();
+
     HashMap<StringHash, ShaderParameter>::Iterator i;
-    if (!impl_->shaderProgram_ || (i = impl_->shaderProgram_->parameters_.Find(param)) == impl_->shaderProgram_->parameters_.End())
+    if (!impl->shaderProgram_ || (i = impl->shaderProgram_->parameters_.Find(param)) == impl->shaderProgram_->parameters_.End())
         return;
 
     static Vector4 data(Vector4::ZERO);
     data.x_ = value;
 
     if (i->second_.type_ == VS)
-        impl_->device_->SetVertexShaderConstantF(i->second_.register_, &data.x_, 1);
+        impl->device_->SetVertexShaderConstantF(i->second_.register_, &data.x_, 1);
     else
-        impl_->device_->SetPixelShaderConstantF(i->second_.register_, &data.x_, 1);
+        impl->device_->SetPixelShaderConstantF(i->second_.register_, &data.x_, 1);
 }
 
-void Graphics::SetShaderParameter(StringHash param, int value)
+void Graphics::SetShaderParameter_D3D9(StringHash param, int value)
 {
+    GraphicsImpl_D3D9* impl = GetImpl_D3D9();
+
     /// \todo Int constants seem to have no effect on Direct3D9
     HashMap<StringHash, ShaderParameter>::Iterator i;
-    if (!impl_->shaderProgram_ || (i = impl_->shaderProgram_->parameters_.Find(param)) == impl_->shaderProgram_->parameters_.End())
+    if (!impl->shaderProgram_ || (i = impl->shaderProgram_->parameters_.Find(param)) == impl->shaderProgram_->parameters_.End())
         return;
 
     if (i->second_.type_ == VS)
-        impl_->device_->SetVertexShaderConstantI(i->second_.register_, &value, 1);
+        impl->device_->SetVertexShaderConstantI(i->second_.register_, &value, 1);
     else
-        impl_->device_->SetPixelShaderConstantI(i->second_.register_, &value, 1);
+        impl->device_->SetPixelShaderConstantI(i->second_.register_, &value, 1);
 }
 
-void Graphics::SetShaderParameter(StringHash param, bool value)
+void Graphics::SetShaderParameter_D3D9(StringHash param, bool value)
 {
+    GraphicsImpl_D3D9* impl = GetImpl_D3D9();
+
     /// \todo Bool constants seem to have no effect on Direct3D9
     HashMap<StringHash, ShaderParameter>::Iterator i;
-    if (!impl_->shaderProgram_ || (i = impl_->shaderProgram_->parameters_.Find(param)) == impl_->shaderProgram_->parameters_.End())
+    if (!impl->shaderProgram_ || (i = impl->shaderProgram_->parameters_.Find(param)) == impl->shaderProgram_->parameters_.End())
         return;
 
     BOOL data = value;
 
     if (i->second_.type_ == VS)
-        impl_->device_->SetVertexShaderConstantB(i->second_.register_, &data, 1);
+        impl->device_->SetVertexShaderConstantB(i->second_.register_, &data, 1);
     else
-        impl_->device_->SetPixelShaderConstantB(i->second_.register_, &data, 1);
+        impl->device_->SetPixelShaderConstantB(i->second_.register_, &data, 1);
 }
 
-void Graphics::SetShaderParameter(StringHash param, const Color& color)
+void Graphics::SetShaderParameter_D3D9(StringHash param, const Color& color)
 {
+    GraphicsImpl_D3D9* impl = GetImpl_D3D9();
+
     HashMap<StringHash, ShaderParameter>::Iterator i;
-    if (!impl_->shaderProgram_ || (i = impl_->shaderProgram_->parameters_.Find(param)) == impl_->shaderProgram_->parameters_.End())
+    if (!impl->shaderProgram_ || (i = impl->shaderProgram_->parameters_.Find(param)) == impl->shaderProgram_->parameters_.End())
         return;
 
     if (i->second_.type_ == VS)
-        impl_->device_->SetVertexShaderConstantF(i->second_.register_, color.Data(), 1);
+        impl->device_->SetVertexShaderConstantF(i->second_.register_, color.Data(), 1);
     else
-        impl_->device_->SetPixelShaderConstantF(i->second_.register_, color.Data(), 1);
+        impl->device_->SetPixelShaderConstantF(i->second_.register_, color.Data(), 1);
 }
 
-void Graphics::SetShaderParameter(StringHash param, const Vector2& vector)
+void Graphics::SetShaderParameter_D3D9(StringHash param, const Vector2& vector)
 {
+    GraphicsImpl_D3D9* impl = GetImpl_D3D9();
+
     HashMap<StringHash, ShaderParameter>::Iterator i;
-    if (!impl_->shaderProgram_ || (i = impl_->shaderProgram_->parameters_.Find(param)) == impl_->shaderProgram_->parameters_.End())
+    if (!impl->shaderProgram_ || (i = impl->shaderProgram_->parameters_.Find(param)) == impl->shaderProgram_->parameters_.End())
         return;
 
     static Vector4 data(Vector4::ZERO);
@@ -1218,15 +1243,17 @@ void Graphics::SetShaderParameter(StringHash param, const Vector2& vector)
     data.y_ = vector.y_;
 
     if (i->second_.type_ == VS)
-        impl_->device_->SetVertexShaderConstantF(i->second_.register_, &data.x_, 1);
+        impl->device_->SetVertexShaderConstantF(i->second_.register_, &data.x_, 1);
     else
-        impl_->device_->SetPixelShaderConstantF(i->second_.register_, &data.x_, 1);
+        impl->device_->SetPixelShaderConstantF(i->second_.register_, &data.x_, 1);
 }
 
-void Graphics::SetShaderParameter(StringHash param, const Matrix3& matrix)
+void Graphics::SetShaderParameter_D3D9(StringHash param, const Matrix3& matrix)
 {
+    GraphicsImpl_D3D9* impl = GetImpl_D3D9();
+
     HashMap<StringHash, ShaderParameter>::Iterator i;
-    if (!impl_->shaderProgram_ || (i = impl_->shaderProgram_->parameters_.Find(param)) == impl_->shaderProgram_->parameters_.End())
+    if (!impl->shaderProgram_ || (i = impl->shaderProgram_->parameters_.Find(param)) == impl->shaderProgram_->parameters_.End())
         return;
 
     static Matrix3x4 data(Matrix3x4::ZERO);
@@ -1241,15 +1268,17 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix3& matrix)
     data.m22_ = matrix.m22_;
 
     if (i->second_.type_ == VS)
-        impl_->device_->SetVertexShaderConstantF(i->second_.register_, &data.m00_, 3);
+        impl->device_->SetVertexShaderConstantF(i->second_.register_, &data.m00_, 3);
     else
-        impl_->device_->SetPixelShaderConstantF(i->second_.register_, &data.m00_, 3);
+        impl->device_->SetPixelShaderConstantF(i->second_.register_, &data.m00_, 3);
 }
 
-void Graphics::SetShaderParameter(StringHash param, const Vector3& vector)
+void Graphics::SetShaderParameter_D3D9(StringHash param, const Vector3& vector)
 {
+    GraphicsImpl_D3D9* impl = GetImpl_D3D9();
+
     HashMap<StringHash, ShaderParameter>::Iterator i;
-    if (!impl_->shaderProgram_ || (i = impl_->shaderProgram_->parameters_.Find(param)) == impl_->shaderProgram_->parameters_.End())
+    if (!impl->shaderProgram_ || (i = impl->shaderProgram_->parameters_.Find(param)) == impl->shaderProgram_->parameters_.End())
         return;
 
     static Vector4 data(Vector4::ZERO);
@@ -1258,48 +1287,54 @@ void Graphics::SetShaderParameter(StringHash param, const Vector3& vector)
     data.z_ = vector.z_;
 
     if (i->second_.type_ == VS)
-        impl_->device_->SetVertexShaderConstantF(i->second_.register_, &data.x_, 1);
+        impl->device_->SetVertexShaderConstantF(i->second_.register_, &data.x_, 1);
     else
-        impl_->device_->SetPixelShaderConstantF(i->second_.register_, &data.x_, 1);
+        impl->device_->SetPixelShaderConstantF(i->second_.register_, &data.x_, 1);
 }
 
-void Graphics::SetShaderParameter(StringHash param, const Matrix4& matrix)
+void Graphics::SetShaderParameter_D3D9(StringHash param, const Matrix4& matrix)
 {
+    GraphicsImpl_D3D9* impl = GetImpl_D3D9();
+
     HashMap<StringHash, ShaderParameter>::Iterator i;
-    if (!impl_->shaderProgram_ || (i = impl_->shaderProgram_->parameters_.Find(param)) == impl_->shaderProgram_->parameters_.End())
+    if (!impl->shaderProgram_ || (i = impl->shaderProgram_->parameters_.Find(param)) == impl->shaderProgram_->parameters_.End())
         return;
 
     if (i->second_.type_ == VS)
-        impl_->device_->SetVertexShaderConstantF(i->second_.register_, matrix.Data(), 4);
+        impl->device_->SetVertexShaderConstantF(i->second_.register_, matrix.Data(), 4);
     else
-        impl_->device_->SetPixelShaderConstantF(i->second_.register_, matrix.Data(), 4);
+        impl->device_->SetPixelShaderConstantF(i->second_.register_, matrix.Data(), 4);
 }
 
-void Graphics::SetShaderParameter(StringHash param, const Vector4& vector)
+void Graphics::SetShaderParameter_D3D9(StringHash param, const Vector4& vector)
 {
+    GraphicsImpl_D3D9* impl = GetImpl_D3D9();
+
     HashMap<StringHash, ShaderParameter>::Iterator i;
-    if (!impl_->shaderProgram_ || (i = impl_->shaderProgram_->parameters_.Find(param)) == impl_->shaderProgram_->parameters_.End())
+    if (!impl->shaderProgram_ || (i = impl->shaderProgram_->parameters_.Find(param)) == impl->shaderProgram_->parameters_.End())
         return;
 
     if (i->second_.type_ == VS)
-        impl_->device_->SetVertexShaderConstantF(i->second_.register_, vector.Data(), 1);
+        impl->device_->SetVertexShaderConstantF(i->second_.register_, vector.Data(), 1);
     else
-        impl_->device_->SetPixelShaderConstantF(i->second_.register_, vector.Data(), 1);
+        impl->device_->SetPixelShaderConstantF(i->second_.register_, vector.Data(), 1);
 }
 
-void Graphics::SetShaderParameter(StringHash param, const Matrix3x4& matrix)
+void Graphics::SetShaderParameter_D3D9(StringHash param, const Matrix3x4& matrix)
 {
+    GraphicsImpl_D3D9* impl = GetImpl_D3D9();
+
     HashMap<StringHash, ShaderParameter>::Iterator i;
-    if (!impl_->shaderProgram_ || (i = impl_->shaderProgram_->parameters_.Find(param)) == impl_->shaderProgram_->parameters_.End())
+    if (!impl->shaderProgram_ || (i = impl->shaderProgram_->parameters_.Find(param)) == impl->shaderProgram_->parameters_.End())
         return;
 
     if (i->second_.type_ == VS)
-        impl_->device_->SetVertexShaderConstantF(i->second_.register_, matrix.Data(), 3);
+        impl->device_->SetVertexShaderConstantF(i->second_.register_, matrix.Data(), 3);
     else
-        impl_->device_->SetPixelShaderConstantF(i->second_.register_, matrix.Data(), 3);
+        impl->device_->SetPixelShaderConstantF(i->second_.register_, matrix.Data(), 3);
 }
 
-bool Graphics::NeedParameterUpdate(ShaderParameterGroup group, const void* source)
+bool Graphics::NeedParameterUpdate_D3D9(ShaderParameterGroup group, const void* source)
 {
     if ((unsigned)(size_t)shaderParameterSources_[group] == M_MAX_UNSIGNED || shaderParameterSources_[group] != source)
     {
@@ -1310,34 +1345,36 @@ bool Graphics::NeedParameterUpdate(ShaderParameterGroup group, const void* sourc
         return false;
 }
 
-bool Graphics::HasShaderParameter(StringHash param)
+bool Graphics::HasShaderParameter_D3D9(StringHash param)
 {
-    return impl_->shaderProgram_ && impl_->shaderProgram_->parameters_.Find(param) != impl_->shaderProgram_->parameters_.End();
+    GraphicsImpl_D3D9* impl = GetImpl_D3D9();
+
+    return impl->shaderProgram_ && impl->shaderProgram_->parameters_.Find(param) != impl->shaderProgram_->parameters_.End();
 }
 
-bool Graphics::HasTextureUnit(TextureUnit unit)
+bool Graphics::HasTextureUnit_D3D9(TextureUnit unit)
 {
     return pixelShader_ && pixelShader_->HasTextureUnit(unit);
 }
 
-void Graphics::ClearParameterSource(ShaderParameterGroup group)
+void Graphics::ClearParameterSource_D3D9(ShaderParameterGroup group)
 {
     shaderParameterSources_[group] = (const void*)M_MAX_UNSIGNED;
 }
 
-void Graphics::ClearParameterSources()
+void Graphics::ClearParameterSources_D3D9()
 {
     for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS; ++i)
         shaderParameterSources_[i] = (const void*)M_MAX_UNSIGNED;
 }
 
-void Graphics::ClearTransformSources()
+void Graphics::ClearTransformSources_D3D9()
 {
     shaderParameterSources_[SP_CAMERA] = (const void*)M_MAX_UNSIGNED;
     shaderParameterSources_[SP_OBJECT] = (const void*)M_MAX_UNSIGNED;
 }
 
-void Graphics::SetTexture(unsigned index, Texture* texture)
+void Graphics::SetTexture_D3D9(unsigned index, Texture* texture)
 {
     if (index >= MAX_TEXTURE_UNITS)
         return;
@@ -1353,19 +1390,21 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
             if (texture->GetMultiSample() > 1 && texture->GetAutoResolve() && texture->IsResolveDirty())
             {
                 if (texture->GetType() == Texture2D::GetTypeStatic())
-                    ResolveToTexture(static_cast<Texture2D*>(texture));
+                    ResolveToTexture_D3D9(static_cast<Texture2D*>(texture));
                 else if (texture->GetType() == TextureCube::GetTypeStatic())
-                    ResolveToTexture(static_cast<TextureCube*>(texture));
+                    ResolveToTexture_D3D9(static_cast<TextureCube*>(texture));
             }
         }
     }
 
+    GraphicsImpl_D3D9* impl = GetImpl_D3D9();
+
     if (texture != textures_[index])
     {
         if (texture)
-            impl_->device_->SetTexture(index, (IDirect3DBaseTexture9*)texture->GetGPUObject());
+            impl->device_->SetTexture(index, (IDirect3DBaseTexture9*)texture->GetGPUObject());
         else
-            impl_->device_->SetTexture(index, nullptr);
+            impl->device_->SetTexture(index, nullptr);
 
         textures_[index] = texture;
     }
@@ -1378,108 +1417,110 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
 
         D3DTEXTUREFILTERTYPE min, mag, mip;
         min = d3dMinFilter[filterMode];
-        if (min != impl_->minFilters_[index])
+        if (min != impl->minFilters_[index])
         {
-            impl_->device_->SetSamplerState(index, D3DSAMP_MINFILTER, min);
-            impl_->minFilters_[index] = min;
+            impl->device_->SetSamplerState(index, D3DSAMP_MINFILTER, min);
+            impl->minFilters_[index] = min;
         }
         mag = d3dMagFilter[filterMode];
-        if (mag != impl_->magFilters_[index])
+        if (mag != impl->magFilters_[index])
         {
-            impl_->device_->SetSamplerState(index, D3DSAMP_MAGFILTER, mag);
-            impl_->magFilters_[index] = mag;
+            impl->device_->SetSamplerState(index, D3DSAMP_MAGFILTER, mag);
+            impl->magFilters_[index] = mag;
         }
         mip = d3dMipFilter[filterMode];
-        if (mip != impl_->mipFilters_[index])
+        if (mip != impl->mipFilters_[index])
         {
-            impl_->device_->SetSamplerState(index, D3DSAMP_MIPFILTER, mip);
-            impl_->mipFilters_[index] = mip;
+            impl->device_->SetSamplerState(index, D3DSAMP_MIPFILTER, mip);
+            impl->mipFilters_[index] = mip;
         }
         D3DTEXTUREADDRESS u, v;
         u = d3dAddressMode[texture->GetAddressMode(COORD_U)];
-        if (u != impl_->uAddressModes_[index])
+        if (u != impl->uAddressModes_[index])
         {
-            impl_->device_->SetSamplerState(index, D3DSAMP_ADDRESSU, u);
-            impl_->uAddressModes_[index] = u;
+            impl->device_->SetSamplerState(index, D3DSAMP_ADDRESSU, u);
+            impl->uAddressModes_[index] = u;
         }
         v = d3dAddressMode[texture->GetAddressMode(COORD_V)];
-        if (v != impl_->vAddressModes_[index])
+        if (v != impl->vAddressModes_[index])
         {
-            impl_->device_->SetSamplerState(index, D3DSAMP_ADDRESSV, v);
-            impl_->vAddressModes_[index] = v;
+            impl->device_->SetSamplerState(index, D3DSAMP_ADDRESSV, v);
+            impl->vAddressModes_[index] = v;
         }
         if (texture->GetType() == TextureCube::GetTypeStatic())
         {
             D3DTEXTUREADDRESS w = d3dAddressMode[texture->GetAddressMode(COORD_W)];
-            if (w != impl_->wAddressModes_[index])
+            if (w != impl->wAddressModes_[index])
             {
-                impl_->device_->SetSamplerState(index, D3DSAMP_ADDRESSW, w);
-                impl_->wAddressModes_[index] = w;
+                impl->device_->SetSamplerState(index, D3DSAMP_ADDRESSW, w);
+                impl->wAddressModes_[index] = w;
             }
         }
         unsigned maxAnisotropy = texture->GetAnisotropy();
         if (!maxAnisotropy)
             maxAnisotropy = defaultTextureAnisotropy_;
-        if (maxAnisotropy != impl_->maxAnisotropy_[index])
+        if (maxAnisotropy != impl->maxAnisotropy_[index])
         {
-            impl_->device_->SetSamplerState(index, D3DSAMP_MAXANISOTROPY, maxAnisotropy);
-            impl_->maxAnisotropy_[index] = maxAnisotropy;
+            impl->device_->SetSamplerState(index, D3DSAMP_MAXANISOTROPY, maxAnisotropy);
+            impl->maxAnisotropy_[index] = maxAnisotropy;
         }
         if (u == D3DTADDRESS_BORDER || v == D3DTADDRESS_BORDER)
         {
             const Color& borderColor = texture->GetBorderColor();
-            if (borderColor != impl_->borderColors_[index])
+            if (borderColor != impl->borderColors_[index])
             {
-                impl_->device_->SetSamplerState(index, D3DSAMP_BORDERCOLOR, GetD3DColor(borderColor));
-                impl_->borderColors_[index] = borderColor;
+                impl->device_->SetSamplerState(index, D3DSAMP_BORDERCOLOR, GetD3DColor(borderColor));
+                impl->borderColors_[index] = borderColor;
             }
         }
         if (sRGBSupport_)
         {
             bool sRGB = texture->GetSRGB();
-            if (sRGB != impl_->sRGBModes_[index])
+            if (sRGB != impl->sRGBModes_[index])
             {
-                impl_->device_->SetSamplerState(index, D3DSAMP_SRGBTEXTURE, sRGB ? TRUE : FALSE);
-                impl_->sRGBModes_[index] = sRGB;
+                impl->device_->SetSamplerState(index, D3DSAMP_SRGBTEXTURE, sRGB ? TRUE : FALSE);
+                impl->sRGBModes_[index] = sRGB;
             }
         }
     }
 }
 
-void Graphics::SetDefaultTextureFilterMode(TextureFilterMode mode)
+void Graphics::SetDefaultTextureFilterMode_D3D9(TextureFilterMode mode)
 {
     defaultTextureFilterMode_ = mode;
 }
 
-void Graphics::SetDefaultTextureAnisotropy(unsigned level)
+void Graphics::SetDefaultTextureAnisotropy_D3D9(unsigned level)
 {
     defaultTextureAnisotropy_ = Max(level, 1U);
 }
 
-void Graphics::ResetRenderTargets()
+void Graphics::ResetRenderTargets_D3D9()
 {
     for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
-        SetRenderTarget(i, (RenderSurface*)nullptr);
-    SetDepthStencil((RenderSurface*)nullptr);
-    SetViewport(IntRect(0, 0, width_, height_));
+        SetRenderTarget_D3D9(i, (RenderSurface*)nullptr);
+    SetDepthStencil_D3D9((RenderSurface*)nullptr);
+    SetViewport_D3D9(IntRect(0, 0, width_, height_));
 }
 
-void Graphics::ResetRenderTarget(unsigned index)
+void Graphics::ResetRenderTarget_D3D9(unsigned index)
 {
-    SetRenderTarget(index, (RenderSurface*)nullptr);
+    SetRenderTarget_D3D9(index, (RenderSurface*)nullptr);
 }
 
-void Graphics::ResetDepthStencil()
+void Graphics::ResetDepthStencil_D3D9()
 {
-    SetDepthStencil((RenderSurface*)nullptr);
+    SetDepthStencil_D3D9((RenderSurface*)nullptr);
 }
 
-void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
+void Graphics::SetRenderTarget_D3D9(unsigned index, RenderSurface* renderTarget)
 {
     if (index >= MAX_RENDERTARGETS)
         return;
 
     IDirect3DSurface9* newColorSurface = nullptr;
+
+    GraphicsImpl_D3D9* impl = GetImpl_D3D9();
 
     if (renderTarget)
     {
@@ -1490,19 +1531,19 @@ void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
     else
     {
         if (!index)
-            newColorSurface = impl_->defaultColorSurface_;
+            newColorSurface = impl->defaultColorSurface_;
     }
 
     renderTargets_[index] = renderTarget;
 
-    if (newColorSurface != impl_->colorSurfaces_[index])
+    if (newColorSurface != impl->colorSurfaces_[index])
     {
-        impl_->device_->SetRenderTarget(index, newColorSurface);
-        impl_->colorSurfaces_[index] = newColorSurface;
+        impl->device_->SetRenderTarget(index, newColorSurface);
+        impl->colorSurfaces_[index] = newColorSurface;
         // Setting the first rendertarget causes viewport to be reset
         if (!index)
         {
-            IntVector2 rtSize = GetRenderTargetDimensions();
+            IntVector2 rtSize = GetRenderTargetDimensions_D3D9();
             viewport_ = IntRect(0, 0, rtSize.x_, rtSize.y_);
         }
     }
@@ -1515,7 +1556,7 @@ void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
         for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
         {
             if (textures_[i] == parentTexture)
-                SetTexture(i, textures_[i]->GetBackupTexture());
+                SetTexture_D3D9(i, textures_[i]->GetBackupTexture());
         }
 
         // If multisampled, mark the texture & surface needing resolve
@@ -1530,25 +1571,26 @@ void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
     if (!index && sRGBWriteSupport_)
     {
         bool sRGBWrite = renderTarget ? renderTarget->GetParentTexture()->GetSRGB() : sRGB_;
-        if (sRGBWrite != impl_->sRGBWrite_)
+        if (sRGBWrite != impl->sRGBWrite_)
         {
-            impl_->device_->SetRenderState(D3DRS_SRGBWRITEENABLE, sRGBWrite ? TRUE : FALSE);
-            impl_->sRGBWrite_ = sRGBWrite;
+            impl->device_->SetRenderState(D3DRS_SRGBWRITEENABLE, sRGBWrite ? TRUE : FALSE);
+            impl->sRGBWrite_ = sRGBWrite;
         }
     }
 }
 
-void Graphics::SetRenderTarget(unsigned index, Texture2D* texture)
+void Graphics::SetRenderTarget_D3D9(unsigned index, Texture2D* texture)
 {
     RenderSurface* renderTarget = nullptr;
     if (texture)
         renderTarget = texture->GetRenderSurface();
 
-    SetRenderTarget(index, renderTarget);
+    SetRenderTarget_D3D9(index, renderTarget);
 }
 
-void Graphics::SetDepthStencil(RenderSurface* depthStencil)
+void Graphics::SetDepthStencil_D3D9(RenderSurface* depthStencil)
 {
+    GraphicsImpl_D3D9* impl = GetImpl_D3D9();
     IDirect3DSurface9* newDepthStencilSurface = nullptr;
     if (depthStencil && depthStencil->GetUsage() == TEXTURE_DEPTHSTENCIL)
     {
@@ -1557,28 +1599,28 @@ void Graphics::SetDepthStencil(RenderSurface* depthStencil)
     }
     if (!newDepthStencilSurface)
     {
-        newDepthStencilSurface = impl_->defaultDepthStencilSurface_;
+        newDepthStencilSurface = impl->defaultDepthStencilSurface_;
         depthStencil_ = nullptr;
     }
-    if (newDepthStencilSurface != impl_->depthStencilSurface_)
+    if (newDepthStencilSurface != impl->depthStencilSurface_)
     {
-        impl_->device_->SetDepthStencilSurface(newDepthStencilSurface);
-        impl_->depthStencilSurface_ = newDepthStencilSurface;
+        impl->device_->SetDepthStencilSurface(newDepthStencilSurface);
+        impl->depthStencilSurface_ = newDepthStencilSurface;
     }
 }
 
-void Graphics::SetDepthStencil(Texture2D* texture)
+void Graphics::SetDepthStencil_D3D9(Texture2D* texture)
 {
     RenderSurface* depthStencil = nullptr;
     if (texture)
         depthStencil = texture->GetRenderSurface();
 
-    SetDepthStencil(depthStencil);
+    SetDepthStencil_D3D9(depthStencil);
 }
 
-void Graphics::SetViewport(const IntRect& rect)
+void Graphics::SetViewport_D3D9(const IntRect& rect)
 {
-    IntVector2 size = GetRenderTargetDimensions();
+    IntVector2 size = GetRenderTargetDimensions_D3D9();
 
     IntRect rectCopy = rect;
 
@@ -1599,39 +1641,41 @@ void Graphics::SetViewport(const IntRect& rect)
     vp.Width = (DWORD)rectCopy.Width();
     vp.Height = (DWORD)rectCopy.Height();
 
-    impl_->device_->SetViewport(&vp);
+    GetImpl_D3D9()->device_->SetViewport(&vp);
     viewport_ = rectCopy;
 
     // Disable scissor test, needs to be re-enabled by the user
-    SetScissorTest(false);
+    SetScissorTest_D3D9(false);
 }
 
-void Graphics::SetBlendMode(BlendMode mode, bool /* alphaToCoverage */)
+void Graphics::SetBlendMode_D3D9(BlendMode mode, bool /* alphaToCoverage */)
 {
+    GraphicsImpl_D3D9* impl = GetImpl_D3D9();
+
     if (mode != blendMode_)
     {
-        if (d3dBlendEnable[mode] != impl_->blendEnable_)
+        if (d3dBlendEnable[mode] != impl->blendEnable_)
         {
-            impl_->device_->SetRenderState(D3DRS_ALPHABLENDENABLE, d3dBlendEnable[mode]);
-            impl_->blendEnable_ = d3dBlendEnable[mode];
+            impl->device_->SetRenderState(D3DRS_ALPHABLENDENABLE, d3dBlendEnable[mode]);
+            impl->blendEnable_ = d3dBlendEnable[mode];
         }
 
-        if (impl_->blendEnable_)
+        if (impl->blendEnable_)
         {
-            if (d3dSrcBlend[mode] != impl_->srcBlend_)
+            if (d3dSrcBlend[mode] != impl->srcBlend_)
             {
-                impl_->device_->SetRenderState(D3DRS_SRCBLEND, d3dSrcBlend[mode]);
-                impl_->srcBlend_ = d3dSrcBlend[mode];
+                impl->device_->SetRenderState(D3DRS_SRCBLEND, d3dSrcBlend[mode]);
+                impl->srcBlend_ = d3dSrcBlend[mode];
             }
-            if (d3dDestBlend[mode] != impl_->destBlend_)
+            if (d3dDestBlend[mode] != impl->destBlend_)
             {
-                impl_->device_->SetRenderState(D3DRS_DESTBLEND, d3dDestBlend[mode]);
-                impl_->destBlend_ = d3dDestBlend[mode];
+                impl->device_->SetRenderState(D3DRS_DESTBLEND, d3dDestBlend[mode]);
+                impl->destBlend_ = d3dDestBlend[mode];
             }
-            if (d3dBlendOp[mode] != impl_->blendOp_)
+            if (d3dBlendOp[mode] != impl->blendOp_)
             {
-                impl_->device_->SetRenderState(D3DRS_BLENDOP, d3dBlendOp[mode]);
-                impl_->blendOp_ = d3dBlendOp[mode];
+                impl->device_->SetRenderState(D3DRS_BLENDOP, d3dBlendOp[mode]);
+                impl->blendOp_ = d3dBlendOp[mode];
             }
         }
 
@@ -1639,87 +1683,90 @@ void Graphics::SetBlendMode(BlendMode mode, bool /* alphaToCoverage */)
     }
 }
 
-void Graphics::SetColorWrite(bool enable)
+void Graphics::SetColorWrite_D3D9(bool enable)
 {
     if (enable != colorWrite_)
     {
-        impl_->device_->SetRenderState(D3DRS_COLORWRITEENABLE,
+        GetImpl_D3D9()->device_->SetRenderState(D3DRS_COLORWRITEENABLE,
             enable ? D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE | D3DCOLORWRITEENABLE_ALPHA :
                 0);
         colorWrite_ = enable;
     }
 }
 
-void Graphics::SetCullMode(CullMode mode)
+void Graphics::SetCullMode_D3D9(CullMode mode)
 {
     if (mode != cullMode_)
     {
-        impl_->device_->SetRenderState(D3DRS_CULLMODE, d3dCullMode[mode]);
+        GetImpl_D3D9()->device_->SetRenderState(D3DRS_CULLMODE, d3dCullMode[mode]);
         cullMode_ = mode;
     }
 }
 
-void Graphics::SetDepthBias(float constantBias, float slopeScaledBias)
+void Graphics::SetDepthBias_D3D9(float constantBias, float slopeScaledBias)
 {
+    GraphicsImpl_D3D9* impl = GetImpl_D3D9();
+
     if (constantBias != constantDepthBias_)
     {
-        impl_->device_->SetRenderState(D3DRS_DEPTHBIAS, *((DWORD*)&constantBias));
+        impl->device_->SetRenderState(D3DRS_DEPTHBIAS, *((DWORD*)&constantBias));
         constantDepthBias_ = constantBias;
     }
     if (slopeScaledBias != slopeScaledDepthBias_)
     {
-        impl_->device_->SetRenderState(D3DRS_SLOPESCALEDEPTHBIAS, *((DWORD*)&slopeScaledBias));
+        impl->device_->SetRenderState(D3DRS_SLOPESCALEDEPTHBIAS, *((DWORD*)&slopeScaledBias));
         slopeScaledDepthBias_ = slopeScaledBias;
     }
 }
 
-void Graphics::SetDepthTest(CompareMode mode)
+void Graphics::SetDepthTest_D3D9(CompareMode mode)
 {
     if (mode != depthTestMode_)
     {
-        impl_->device_->SetRenderState(D3DRS_ZFUNC, d3dCmpFunc[mode]);
+        GetImpl_D3D9()->device_->SetRenderState(D3DRS_ZFUNC, d3dCmpFunc[mode]);
         depthTestMode_ = mode;
     }
 }
 
-void Graphics::SetDepthWrite(bool enable)
+void Graphics::SetDepthWrite_D3D9(bool enable)
 {
     if (enable != depthWrite_)
     {
-        impl_->device_->SetRenderState(D3DRS_ZWRITEENABLE, enable ? TRUE : FALSE);
+        GetImpl_D3D9()->device_->SetRenderState(D3DRS_ZWRITEENABLE, enable ? TRUE : FALSE);
         depthWrite_ = enable;
     }
 }
 
-void Graphics::SetFillMode(FillMode mode)
+void Graphics::SetFillMode_D3D9(FillMode mode)
 {
     if (mode != fillMode_)
     {
-        impl_->device_->SetRenderState(D3DRS_FILLMODE, d3dFillMode[mode]);
+        GetImpl_D3D9()->device_->SetRenderState(D3DRS_FILLMODE, d3dFillMode[mode]);
         fillMode_ = mode;
     }
 }
 
-void Graphics::SetLineAntiAlias(bool enable)
+void Graphics::SetLineAntiAlias_D3D9(bool enable)
 {
     if (enable != lineAntiAlias_)
     {
-        impl_->device_->SetRenderState(D3DRS_ANTIALIASEDLINEENABLE, enable ? TRUE : FALSE);
+        GetImpl_D3D9()->device_->SetRenderState(D3DRS_ANTIALIASEDLINEENABLE, enable ? TRUE : FALSE);
         lineAntiAlias_ = enable;
     }
 }
 
-
-void Graphics::SetScissorTest(bool enable, const Rect& rect, bool borderInclusive)
+void Graphics::SetScissorTest_D3D9(bool enable, const Rect& rect, bool borderInclusive)
 {
     // During some light rendering loops, a full rect is toggled on/off repeatedly.
     // Disable scissor in that case to reduce state changes
     if (rect.min_.x_ <= 0.0f && rect.min_.y_ <= 0.0f && rect.max_.x_ >= 1.0f && rect.max_.y_ >= 1.0f)
         enable = false;
 
+    GraphicsImpl_D3D9* impl = GetImpl_D3D9();
+
     if (enable)
     {
-        IntVector2 rtSize(GetRenderTargetDimensions());
+        IntVector2 rtSize(GetRenderTargetDimensions_D3D9());
         IntVector2 viewSize(viewport_.Size());
         IntVector2 viewPos(viewport_.left_, viewport_.top_);
         IntRect intRect;
@@ -1746,7 +1793,7 @@ void Graphics::SetScissorTest(bool enable, const Rect& rect, bool borderInclusiv
             d3dRect.right = intRect.right_;
             d3dRect.bottom = intRect.bottom_;
 
-            impl_->device_->SetScissorRect(&d3dRect);
+            impl->device_->SetScissorRect(&d3dRect);
             scissorRect_ = intRect;
         }
     }
@@ -1755,15 +1802,17 @@ void Graphics::SetScissorTest(bool enable, const Rect& rect, bool borderInclusiv
 
     if (enable != scissorTest_)
     {
-        impl_->device_->SetRenderState(D3DRS_SCISSORTESTENABLE, enable ? TRUE : FALSE);
+        impl->device_->SetRenderState(D3DRS_SCISSORTESTENABLE, enable ? TRUE : FALSE);
         scissorTest_ = enable;
     }
 }
 
-void Graphics::SetScissorTest(bool enable, const IntRect& rect)
+void Graphics::SetScissorTest_D3D9(bool enable, const IntRect& rect)
 {
-    IntVector2 rtSize(GetRenderTargetDimensions());
+    IntVector2 rtSize(GetRenderTargetDimensions_D3D9());
     IntVector2 viewPos(viewport_.left_, viewport_.top_);
+
+    GraphicsImpl_D3D9* impl = GetImpl_D3D9();
 
     if (enable)
     {
@@ -1789,7 +1838,7 @@ void Graphics::SetScissorTest(bool enable, const IntRect& rect)
             d3dRect.right = intRect.right_;
             d3dRect.bottom = intRect.bottom_;
 
-            impl_->device_->SetScissorRect(&d3dRect);
+            impl->device_->SetScissorRect(&d3dRect);
             scissorRect_ = intRect;
         }
     }
@@ -1798,17 +1847,19 @@ void Graphics::SetScissorTest(bool enable, const IntRect& rect)
 
     if (enable != scissorTest_)
     {
-        impl_->device_->SetRenderState(D3DRS_SCISSORTESTENABLE, enable ? TRUE : FALSE);
+        impl->device_->SetRenderState(D3DRS_SCISSORTESTENABLE, enable ? TRUE : FALSE);
         scissorTest_ = enable;
     }
 }
 
-void Graphics::SetStencilTest(bool enable, CompareMode mode, StencilOp pass, StencilOp fail, StencilOp zFail, unsigned stencilRef,
+void Graphics::SetStencilTest_D3D9(bool enable, CompareMode mode, StencilOp pass, StencilOp fail, StencilOp zFail, unsigned stencilRef,
     unsigned compareMask, unsigned writeMask)
 {
+    GraphicsImpl_D3D9* impl = GetImpl_D3D9();
+
     if (enable != stencilTest_)
     {
-        impl_->device_->SetRenderState(D3DRS_STENCILENABLE, enable ? TRUE : FALSE);
+        impl->device_->SetRenderState(D3DRS_STENCILENABLE, enable ? TRUE : FALSE);
         stencilTest_ = enable;
     }
 
@@ -1816,69 +1867,73 @@ void Graphics::SetStencilTest(bool enable, CompareMode mode, StencilOp pass, Ste
     {
         if (mode != stencilTestMode_)
         {
-            impl_->device_->SetRenderState(D3DRS_STENCILFUNC, d3dCmpFunc[mode]);
+            impl->device_->SetRenderState(D3DRS_STENCILFUNC, d3dCmpFunc[mode]);
             stencilTestMode_ = mode;
         }
         if (pass != stencilPass_)
         {
-            impl_->device_->SetRenderState(D3DRS_STENCILPASS, d3dStencilOp[pass]);
+            impl->device_->SetRenderState(D3DRS_STENCILPASS, d3dStencilOp[pass]);
             stencilPass_ = pass;
         }
         if (fail != stencilFail_)
         {
-            impl_->device_->SetRenderState(D3DRS_STENCILFAIL, d3dStencilOp[fail]);
+            impl->device_->SetRenderState(D3DRS_STENCILFAIL, d3dStencilOp[fail]);
             stencilFail_ = fail;
         }
         if (zFail != stencilZFail_)
         {
-            impl_->device_->SetRenderState(D3DRS_STENCILZFAIL, d3dStencilOp[zFail]);
+            impl->device_->SetRenderState(D3DRS_STENCILZFAIL, d3dStencilOp[zFail]);
             stencilZFail_ = zFail;
         }
         if (stencilRef != stencilRef_)
         {
-            impl_->device_->SetRenderState(D3DRS_STENCILREF, stencilRef);
+            impl->device_->SetRenderState(D3DRS_STENCILREF, stencilRef);
             stencilRef_ = stencilRef;
         }
         if (compareMask != stencilCompareMask_)
         {
-            impl_->device_->SetRenderState(D3DRS_STENCILMASK, compareMask);
+            impl->device_->SetRenderState(D3DRS_STENCILMASK, compareMask);
             stencilCompareMask_ = compareMask;
         }
         if (writeMask != stencilWriteMask_)
         {
-            impl_->device_->SetRenderState(D3DRS_STENCILWRITEMASK, writeMask);
+            impl->device_->SetRenderState(D3DRS_STENCILWRITEMASK, writeMask);
             stencilWriteMask_ = writeMask;
         }
     }
 }
 
-void Graphics::SetClipPlane(bool enable, const Plane& clipPlane, const Matrix3x4& view, const Matrix4& projection)
+void Graphics::SetClipPlane_D3D9(bool enable, const Plane& clipPlane, const Matrix3x4& view, const Matrix4& projection)
 {
+    GraphicsImpl_D3D9* impl = GetImpl_D3D9();
+
     if (enable != useClipPlane_)
     {
-        impl_->device_->SetRenderState(D3DRS_CLIPPLANEENABLE, enable ? 1 : 0);
+        impl->device_->SetRenderState(D3DRS_CLIPPLANEENABLE, enable ? 1 : 0);
         useClipPlane_ = enable;
     }
 
     if (enable)
     {
         Matrix4 viewProj = projection * view;
-        impl_->device_->SetClipPlane(0, clipPlane.Transformed(viewProj).ToVector4().Data());
+        impl->device_->SetClipPlane(0, clipPlane.Transformed(viewProj).ToVector4().Data());
     }
 }
 
-bool Graphics::IsInitialized() const
+bool Graphics::IsInitialized_D3D9() const
 {
-    return window_ != nullptr && impl_->GetDevice() != nullptr;
+    return window_ != nullptr && GetImpl_D3D9()->GetDevice() != nullptr;
 }
 
-PODVector<int> Graphics::GetMultiSampleLevels() const
+PODVector<int> Graphics::GetMultiSampleLevels_D3D9() const
 {
     PODVector<int> ret;
     // No multisampling always supported
     ret.Push(1);
 
-    if (!impl_->interface_)
+    GraphicsImpl_D3D9* impl = GetImpl_D3D9();
+
+    if (!impl->interface_)
         return ret;
 
     SDL_DisplayMode mode;
@@ -1887,14 +1942,14 @@ PODVector<int> Graphics::GetMultiSampleLevels() const
 
     for (int i = (int)D3DMULTISAMPLE_2_SAMPLES; i < (int)D3DMULTISAMPLE_16_SAMPLES; ++i)
     {
-        if (impl_->CheckMultiSampleSupport(fullscreenFormat, i))
+        if (impl->CheckMultiSampleSupport(fullscreenFormat, i))
             ret.Push(i);
     }
 
     return ret;
 }
 
-unsigned Graphics::GetFormat(CompressedFormat format) const
+unsigned Graphics::GetFormat_D3D9(CompressedFormat format) const
 {
     switch (format)
     {
@@ -1915,12 +1970,12 @@ unsigned Graphics::GetFormat(CompressedFormat format) const
     }
 }
 
-ShaderVariation* Graphics::GetShader(ShaderType type, const String& name, const String& defines) const
+ShaderVariation* Graphics::GetShader_D3D9(ShaderType type, const String& name, const String& defines) const
 {
-    return GetShader(type, name.CString(), defines.CString());
+    return GetShader_D3D9(type, name.CString(), defines.CString());
 }
 
-ShaderVariation* Graphics::GetShader(ShaderType type, const char* name, const char* defines) const
+ShaderVariation* Graphics::GetShader_D3D9(ShaderType type, const char* name, const char* defines) const
 {
     if (lastShaderName_ != name || !lastShader_)
     {
@@ -1938,12 +1993,12 @@ ShaderVariation* Graphics::GetShader(ShaderType type, const char* name, const ch
     return lastShader_ ? lastShader_->GetVariation(type, defines) : nullptr;
 }
 
-VertexBuffer* Graphics::GetVertexBuffer(unsigned index) const
+VertexBuffer* Graphics::GetVertexBuffer_D3D9(unsigned index) const
 {
     return index < MAX_VERTEX_STREAMS ? vertexBuffers_[index] : nullptr;
 }
 
-TextureUnit Graphics::GetTextureUnit(const String& name)
+TextureUnit Graphics::GetTextureUnit_D3D9(const String& name)
 {
     HashMap<String, TextureUnit>::Iterator i = textureUnits_.Find(name);
     if (i != textureUnits_.End())
@@ -1952,7 +2007,7 @@ TextureUnit Graphics::GetTextureUnit(const String& name)
         return MAX_TEXTURE_UNITS;
 }
 
-const String& Graphics::GetTextureUnitName(TextureUnit unit)
+const String& Graphics::GetTextureUnitName_D3D9(TextureUnit unit)
 {
     for (HashMap<String, TextureUnit>::Iterator i = textureUnits_.Begin(); i != textureUnits_.End(); ++i)
     {
@@ -1962,17 +2017,17 @@ const String& Graphics::GetTextureUnitName(TextureUnit unit)
     return String::EMPTY;
 }
 
-Texture* Graphics::GetTexture(unsigned index) const
+Texture* Graphics::GetTexture_D3D9(unsigned index) const
 {
     return index < MAX_TEXTURE_UNITS ? textures_[index] : nullptr;
 }
 
-RenderSurface* Graphics::GetRenderTarget(unsigned index) const
+RenderSurface* Graphics::GetRenderTarget_D3D9(unsigned index) const
 {
     return index < MAX_RENDERTARGETS ? renderTargets_[index] : nullptr;
 }
 
-IntVector2 Graphics::GetRenderTargetDimensions() const
+IntVector2 Graphics::GetRenderTargetDimensions_D3D9() const
 {
     int width, height;
 
@@ -1990,19 +2045,21 @@ IntVector2 Graphics::GetRenderTargetDimensions() const
     return IntVector2(width, height);
 }
 
-bool Graphics::GetDither() const
+bool Graphics::GetDither_D3D9() const
 {
     return false;
 }
 
-bool Graphics::IsDeviceLost() const
+bool Graphics::IsDeviceLost_D3D9() const
 {
-    return impl_->deviceLost_;
+    return GetImpl_D3D9()->deviceLost_;
 }
 
-void Graphics::OnWindowResized()
+void Graphics::OnWindowResized_D3D9()
 {
-    if (!impl_->device_ || !window_)
+    GraphicsImpl_D3D9* impl = GetImpl_D3D9();
+
+    if (!impl->device_ || !window_)
         return;
 
     int newWidth, newHeight;
@@ -2014,12 +2071,12 @@ void Graphics::OnWindowResized()
     width_ = newWidth;
     height_ = newHeight;
 
-    impl_->presentParams_.BackBufferWidth = (UINT)width_;
-    impl_->presentParams_.BackBufferHeight = (UINT)height_;
-    ResetDevice();
+    impl->presentParams_.BackBufferWidth = (UINT)width_;
+    impl->presentParams_.BackBufferHeight = (UINT)height_;
+    ResetDevice_D3D9();
 
     // Reset rendertargets and viewport for the new screen size
-    ResetRenderTargets();
+    ResetRenderTargets_D3D9();
 
     URHO3D_LOGDEBUGF("Window was resized to %dx%d", width_, height_);
 
@@ -2035,9 +2092,9 @@ void Graphics::OnWindowResized()
     SendEvent(E_SCREENMODE, eventData);
 }
 
-void Graphics::OnWindowMoved()
+void Graphics::OnWindowMoved_D3D9()
 {
-    if (!impl_->device_ || !window_ || screenParams_.fullscreen_)
+    if (!GetImpl_D3D9()->device_ || !window_ || screenParams_.fullscreen_)
         return;
 
     int newX, newY;
@@ -2059,172 +2116,184 @@ void Graphics::OnWindowMoved()
     SendEvent(E_WINDOWPOS, eventData);
 }
 
-void Graphics::CleanupShaderPrograms(ShaderVariation* variation)
+void Graphics::CleanupShaderPrograms_D3D9(ShaderVariation* variation)
 {
-    for (ShaderProgramMap::Iterator i = impl_->shaderPrograms_.Begin(); i != impl_->shaderPrograms_.End();)
+    GraphicsImpl_D3D9* impl = GetImpl_D3D9();
+
+    for (ShaderProgramMap_D3D9::Iterator i = impl->shaderPrograms_.Begin(); i != impl->shaderPrograms_.End();)
     {
         if (i->first_.first_ == variation || i->first_.second_ == variation)
-            i = impl_->shaderPrograms_.Erase(i);
+            i = impl->shaderPrograms_.Erase(i);
         else
             ++i;
     }
 
     if (vertexShader_ == variation || pixelShader_ == variation)
-        impl_->shaderProgram_ = nullptr;
+        impl->shaderProgram_ = nullptr;
 }
 
-unsigned Graphics::GetAlphaFormat()
+ConstantBuffer* Graphics::GetOrCreateConstantBuffer_D3D9(ShaderType /*type*/, unsigned index, unsigned size)
+{
+    // No-op on Direct3D 9
+    return nullptr;
+}
+
+unsigned Graphics::GetAlphaFormat_D3D9()
 {
     return D3DFMT_A8;
 }
 
-unsigned Graphics::GetLuminanceFormat()
+unsigned Graphics::GetLuminanceFormat_D3D9()
 {
     return D3DFMT_L8;
 }
 
-unsigned Graphics::GetLuminanceAlphaFormat()
+unsigned Graphics::GetLuminanceAlphaFormat_D3D9()
 {
     return D3DFMT_A8L8;
 }
 
-unsigned Graphics::GetRGBFormat()
+unsigned Graphics::GetRGBFormat_D3D9()
 {
     return D3DFMT_X8R8G8B8;
 }
 
-unsigned Graphics::GetRGBAFormat()
+unsigned Graphics::GetRGBAFormat_D3D9()
 {
     return D3DFMT_A8R8G8B8;
 }
 
-unsigned Graphics::GetRGBA16Format()
+unsigned Graphics::GetRGBA16Format_D3D9()
 {
     return D3DFMT_A16B16G16R16;
 }
 
-unsigned Graphics::GetRGBAFloat16Format()
+unsigned Graphics::GetRGBAFloat16Format_D3D9()
 {
     return D3DFMT_A16B16G16R16F;
 }
 
-unsigned Graphics::GetRGBAFloat32Format()
+unsigned Graphics::GetRGBAFloat32Format_D3D9()
 {
     return D3DFMT_A32B32G32R32F;
 }
 
-unsigned Graphics::GetRG16Format()
+unsigned Graphics::GetRG16Format_D3D9()
 {
     return D3DFMT_G16R16;
 }
 
-unsigned Graphics::GetRGFloat16Format()
+unsigned Graphics::GetRGFloat16Format_D3D9()
 {
     return D3DFMT_G16R16F;
 }
 
-unsigned Graphics::GetRGFloat32Format()
+unsigned Graphics::GetRGFloat32Format_D3D9()
 {
     return D3DFMT_G32R32F;
 }
 
-unsigned Graphics::GetFloat16Format()
+unsigned Graphics::GetFloat16Format_D3D9()
 {
     return D3DFMT_R16F;
 }
 
-unsigned Graphics::GetFloat32Format()
+unsigned Graphics::GetFloat32Format_D3D9()
 {
     return D3DFMT_R32F;
 }
 
-unsigned Graphics::GetLinearDepthFormat()
+unsigned Graphics::GetLinearDepthFormat_D3D9()
 {
     return D3DFMT_R32F;
 }
 
-unsigned Graphics::GetDepthStencilFormat()
+unsigned Graphics::GetDepthStencilFormat_D3D9()
 {
     return D3DFMT_D24S8;
 }
 
-unsigned Graphics::GetReadableDepthFormat()
+unsigned Graphics::GetReadableDepthFormat_D3D9()
 {
     return readableDepthFormat;
 }
 
-unsigned Graphics::GetFormat(const String& formatName)
+unsigned Graphics::GetFormat_D3D9(const String& formatName)
 {
     String nameLower = formatName.ToLower().Trimmed();
 
     if (nameLower == "a")
-        return GetAlphaFormat();
+        return GetAlphaFormat_D3D9();
     if (nameLower == "l")
-        return GetLuminanceFormat();
+        return GetLuminanceFormat_D3D9();
     if (nameLower == "la")
-        return GetLuminanceAlphaFormat();
+        return GetLuminanceAlphaFormat_D3D9();
     if (nameLower == "rgb")
-        return GetRGBFormat();
+        return GetRGBFormat_D3D9();
     if (nameLower == "rgba")
-        return GetRGBAFormat();
+        return GetRGBAFormat_D3D9();
     if (nameLower == "rgba16")
-        return GetRGBA16Format();
+        return GetRGBA16Format_D3D9();
     if (nameLower == "rgba16f")
-        return GetRGBAFloat16Format();
+        return GetRGBAFloat16Format_D3D9();
     if (nameLower == "rgba32f")
-        return GetRGBAFloat32Format();
+        return GetRGBAFloat32Format_D3D9();
     if (nameLower == "rg16")
-        return GetRG16Format();
+        return GetRG16Format_D3D9();
     if (nameLower == "rg16f")
-        return GetRGFloat16Format();
+        return GetRGFloat16Format_D3D9();
     if (nameLower == "rg32f")
-        return GetRGFloat32Format();
+        return GetRGFloat32Format_D3D9();
     if (nameLower == "r16f")
-        return GetFloat16Format();
+        return GetFloat16Format_D3D9();
     if (nameLower == "r32f" || nameLower == "float")
-        return GetFloat32Format();
+        return GetFloat32Format_D3D9();
     if (nameLower == "lineardepth" || nameLower == "depth")
-        return GetLinearDepthFormat();
+        return GetLinearDepthFormat_D3D9();
     if (nameLower == "d24s8")
-        return GetDepthStencilFormat();
+        return GetDepthStencilFormat_D3D9();
     if (nameLower == "readabledepth" || nameLower == "hwdepth")
-        return GetReadableDepthFormat();
+        return GetReadableDepthFormat_D3D9();
 
-    return GetRGBFormat();
+    return GetRGBFormat_D3D9();
 }
 
-unsigned Graphics::GetMaxBones()
+unsigned Graphics::GetMaxBones_D3D9()
 {
     return 64;
 }
 
-bool Graphics::GetGL3Support()
+bool Graphics::GetGL3Support_D3D9()
 {
-    return gl3Support;
+    return false;
 }
 
-void Graphics::SetStreamFrequency(unsigned index, unsigned frequency)
+void Graphics::SetStreamFrequency_D3D9(unsigned index, unsigned frequency)
 {
-    if (index < MAX_VERTEX_STREAMS && impl_->streamFrequencies_[index] != frequency)
+    GraphicsImpl_D3D9* impl = GetImpl_D3D9();
+
+    if (index < MAX_VERTEX_STREAMS && impl->streamFrequencies_[index] != frequency)
     {
-        impl_->device_->SetStreamSourceFreq(index, frequency);
-        impl_->streamFrequencies_[index] = frequency;
+        impl->device_->SetStreamSourceFreq(index, frequency);
+        impl->streamFrequencies_[index] = frequency;
     }
 }
 
-void Graphics::ResetStreamFrequencies()
+void Graphics::ResetStreamFrequencies_D3D9()
 {
+    GraphicsImpl_D3D9* impl = GetImpl_D3D9();
+
     for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
     {
-        if (impl_->streamFrequencies_[i] != 1)
+        if (impl->streamFrequencies_[i] != 1)
         {
-            impl_->device_->SetStreamSourceFreq(i, 1);
-            impl_->streamFrequencies_[i] = 1;
+            impl->device_->SetStreamSourceFreq(i, 1);
+            impl->streamFrequencies_[i] = 1;
         }
     }
 }
 
-bool Graphics::OpenWindow(int width, int height, bool resizable, bool borderless)
+bool Graphics::OpenWindow_D3D9(int width, int height, bool resizable, bool borderless)
 {
     if (!externalWindow_)
     {
@@ -2252,7 +2321,7 @@ bool Graphics::OpenWindow(int width, int height, bool resizable, bool borderless
     return true;
 }
 
-void Graphics::AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen, bool& newBorderless, int& monitor)
+void Graphics::AdjustWindow_D3D9(int& newWidth, int& newHeight, bool& newFullscreen, bool& newBorderless, int& monitor)
 {
     if (!externalWindow_)
     {
@@ -2307,30 +2376,32 @@ void Graphics::AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen, 
     }
 }
 
-bool Graphics::CreateInterface()
+bool Graphics::CreateInterface_D3D9()
 {
-    impl_->interface_ = Direct3DCreate9(D3D_SDK_VERSION);
-    if (!impl_->interface_)
+    GraphicsImpl_D3D9* impl = GetImpl_D3D9();
+
+    impl->interface_ = Direct3DCreate9(D3D_SDK_VERSION);
+    if (!impl->interface_)
     {
         URHO3D_LOGERROR("Could not create Direct3D9 interface");
         return false;
     }
 
-    HRESULT hr = impl_->interface_->GetDeviceCaps(impl_->adapter_, impl_->deviceType_, &impl_->deviceCaps_);
+    HRESULT hr = impl->interface_->GetDeviceCaps(impl->adapter_, impl->deviceType_, &impl->deviceCaps_);
     if (FAILED(hr))
     {
         URHO3D_LOGD3DERROR("Could not get Direct3D capabilities", hr);
         return false;
     }
 
-    hr = impl_->interface_->GetAdapterIdentifier(impl_->adapter_, 0, &impl_->adapterIdentifier_);
+    hr = impl->interface_->GetAdapterIdentifier(impl->adapter_, 0, &impl->adapterIdentifier_);
     if (FAILED(hr))
     {
         URHO3D_LOGD3DERROR("Could not get Direct3D adapter identifier", hr);
         return false;
     }
 
-    if (impl_->deviceCaps_.PixelShaderVersion < D3DPS_VERSION(3, 0))
+    if (impl->deviceCaps_.PixelShaderVersion < D3DPS_VERSION(3, 0))
     {
         URHO3D_LOGERROR("Shader model 3.0 display adapter is required");
         return false;
@@ -2339,45 +2410,47 @@ bool Graphics::CreateInterface()
     return true;
 }
 
-bool Graphics::CreateDevice(unsigned adapter, unsigned deviceType)
+bool Graphics::CreateDevice_D3D9(unsigned adapter, unsigned deviceType)
 {
+    GraphicsImpl_D3D9* impl = GetImpl_D3D9();
+
 #ifdef URHO3D_LUAJIT
     DWORD behaviorFlags = D3DCREATE_FPU_PRESERVE;
 #else
     DWORD behaviorFlags = 0;
 #endif
-    if (impl_->deviceCaps_.DevCaps & D3DDEVCAPS_HWTRANSFORMANDLIGHT)
+    if (impl->deviceCaps_.DevCaps & D3DDEVCAPS_HWTRANSFORMANDLIGHT)
     {
         behaviorFlags |= D3DCREATE_HARDWARE_VERTEXPROCESSING;
-        if (impl_->deviceCaps_.DevCaps & D3DDEVCAPS_PUREDEVICE)
+        if (impl->deviceCaps_.DevCaps & D3DDEVCAPS_PUREDEVICE)
             behaviorFlags |= D3DCREATE_PUREDEVICE;
     }
     else
         behaviorFlags |= D3DCREATE_SOFTWARE_VERTEXPROCESSING;
 
-    HRESULT hr = impl_->interface_->CreateDevice(
+    HRESULT hr = impl->interface_->CreateDevice(
         adapter,
         (D3DDEVTYPE)deviceType,
         GetWindowHandle(window_),
         behaviorFlags,
-        &impl_->presentParams_,
-        &impl_->device_);
+        &impl->presentParams_,
+        &impl->device_);
     if (FAILED(hr))
     {
         URHO3D_LOGD3DERROR("Could not create Direct3D9 device", hr);
         return false;
     }
 
-    impl_->adapter_ = adapter;
-    impl_->deviceType_ = (D3DDEVTYPE)deviceType;
+    impl->adapter_ = adapter;
+    impl->deviceType_ = (D3DDEVTYPE)deviceType;
 
-    OnDeviceReset();
+    OnDeviceReset_D3D9();
 
     URHO3D_LOGINFO("Created Direct3D9 device");
     return true;
 }
 
-void Graphics::CheckFeatureSupport()
+void Graphics::CheckFeatureSupport_D3D9()
 {
     anisotropySupport_ = true;
     dxtTextureSupport_ = true;
@@ -2389,26 +2462,28 @@ void Graphics::CheckFeatureSupport()
     instancingSupport_ = false;
     readableDepthFormat = 0;
 
+    GraphicsImpl_D3D9* impl = GetImpl_D3D9();
+
     // Check hardware shadow map support: prefer NVIDIA style hardware depth compared shadow maps if available
     shadowMapFormat_ = D3DFMT_D16;
-    if (impl_->CheckFormatSupport((D3DFORMAT)shadowMapFormat_, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE))
+    if (impl->CheckFormatSupport((D3DFORMAT)shadowMapFormat_, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE))
     {
         hardwareShadowSupport_ = true;
 
         // Check for hires depth support
         hiresShadowMapFormat_ = D3DFMT_D24X8;
-        if (!impl_->CheckFormatSupport((D3DFORMAT)hiresShadowMapFormat_, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE))
+        if (!impl->CheckFormatSupport((D3DFORMAT)hiresShadowMapFormat_, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE))
             hiresShadowMapFormat_ = 0;
     }
     else
     {
         // ATI DF16 format needs manual depth compare in the shader
         shadowMapFormat_ = MAKEFOURCC('D', 'F', '1', '6');
-        if (impl_->CheckFormatSupport((D3DFORMAT)shadowMapFormat_, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE))
+        if (impl->CheckFormatSupport((D3DFORMAT)shadowMapFormat_, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE))
         {
             // Check for hires depth support
             hiresShadowMapFormat_ = MAKEFOURCC('D', 'F', '2', '4');
-            if (!impl_->CheckFormatSupport((D3DFORMAT)hiresShadowMapFormat_, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE))
+            if (!impl->CheckFormatSupport((D3DFORMAT)hiresShadowMapFormat_, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE))
                 hiresShadowMapFormat_ = 0;
         }
         else
@@ -2422,76 +2497,80 @@ void Graphics::CheckFeatureSupport()
     // Check for Intel 4 Series with an old driver, enable manual shadow map compare in that case
     if (shadowMapFormat_ == D3DFMT_D16)
     {
-        if (impl_->adapterIdentifier_.VendorId == 0x8086 && impl_->adapterIdentifier_.DeviceId == 0x2a42 &&
-            impl_->adapterIdentifier_.DriverVersion.QuadPart <= 0x0007000f000a05d0ULL)
+        if (impl->adapterIdentifier_.VendorId == 0x8086 && impl->adapterIdentifier_.DeviceId == 0x2a42 &&
+            impl->adapterIdentifier_.DriverVersion.QuadPart <= 0x0007000f000a05d0ULL)
             hardwareShadowSupport_ = false;
     }
 
     // Check for readable depth (INTZ hack)
     D3DFORMAT intZFormat = (D3DFORMAT)MAKEFOURCC('I', 'N', 'T', 'Z');
-    if (impl_->CheckFormatSupport(intZFormat, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE))
+    if (impl->CheckFormatSupport(intZFormat, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE))
         readableDepthFormat = intZFormat;
 
     // Check for dummy color rendertarget format used with hardware shadow maps
     dummyColorFormat_ = D3DFMT_A8R8G8B8;
     D3DFORMAT nullFormat = (D3DFORMAT)MAKEFOURCC('N', 'U', 'L', 'L');
-    if (impl_->CheckFormatSupport(nullFormat, D3DUSAGE_RENDERTARGET, D3DRTYPE_TEXTURE))
+    if (impl->CheckFormatSupport(nullFormat, D3DUSAGE_RENDERTARGET, D3DRTYPE_TEXTURE))
         dummyColorFormat_ = nullFormat;
-    else if (impl_->CheckFormatSupport(D3DFMT_R16F, D3DUSAGE_RENDERTARGET, D3DRTYPE_TEXTURE))
+    else if (impl->CheckFormatSupport(D3DFMT_R16F, D3DUSAGE_RENDERTARGET, D3DRTYPE_TEXTURE))
         dummyColorFormat_ = D3DFMT_R16F;
-    else if (impl_->CheckFormatSupport(D3DFMT_R5G6B5, D3DUSAGE_RENDERTARGET, D3DRTYPE_TEXTURE))
+    else if (impl->CheckFormatSupport(D3DFMT_R5G6B5, D3DUSAGE_RENDERTARGET, D3DRTYPE_TEXTURE))
         dummyColorFormat_ = D3DFMT_R5G6B5;
-    else if (impl_->CheckFormatSupport(D3DFMT_A4R4G4B4, D3DUSAGE_RENDERTARGET, D3DRTYPE_TEXTURE))
+    else if (impl->CheckFormatSupport(D3DFMT_A4R4G4B4, D3DUSAGE_RENDERTARGET, D3DRTYPE_TEXTURE))
         dummyColorFormat_ = D3DFMT_A4R4G4B4;
 
     // Check for light prepass and deferred rendering support
-    if (impl_->deviceCaps_.NumSimultaneousRTs >= 2 && impl_->CheckFormatSupport(D3DFMT_R32F, D3DUSAGE_RENDERTARGET,
+    if (impl->deviceCaps_.NumSimultaneousRTs >= 2 && impl->CheckFormatSupport(D3DFMT_R32F, D3DUSAGE_RENDERTARGET,
         D3DRTYPE_TEXTURE))
     {
         lightPrepassSupport_ = true;
-        if (impl_->deviceCaps_.NumSimultaneousRTs >= 4)
+        if (impl->deviceCaps_.NumSimultaneousRTs >= 4)
             deferredSupport_ = true;
     }
 
     // Check for stream offset (needed for instancing)
-    if (impl_->deviceCaps_.DevCaps2 & D3DDEVCAPS2_STREAMOFFSET)
+    if (impl->deviceCaps_.DevCaps2 & D3DDEVCAPS2_STREAMOFFSET)
         instancingSupport_ = true;
 
     // Check for sRGB read & write
     /// \todo Should be checked for each texture format separately
-    sRGBSupport_ = impl_->CheckFormatSupport(D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_SRGBREAD, D3DRTYPE_TEXTURE);
-    sRGBWriteSupport_ = impl_->CheckFormatSupport(D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_SRGBWRITE, D3DRTYPE_TEXTURE);
+    sRGBSupport_ = impl->CheckFormatSupport(D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_SRGBREAD, D3DRTYPE_TEXTURE);
+    sRGBWriteSupport_ = impl->CheckFormatSupport(D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_SRGBWRITE, D3DRTYPE_TEXTURE);
 }
 
-void Graphics::ResetDevice()
+void Graphics::ResetDevice_D3D9()
 {
-    OnDeviceLost();
+    OnDeviceLost_D3D9();
 
-    if (SUCCEEDED(impl_->device_->Reset(&impl_->presentParams_)))
+    GraphicsImpl_D3D9* impl = GetImpl_D3D9();
+
+    if (SUCCEEDED(impl->device_->Reset(&impl->presentParams_)))
     {
-        impl_->deviceLost_ = false;
-        OnDeviceReset();
+        impl->deviceLost_ = false;
+        OnDeviceReset_D3D9();
     }
 }
 
-void Graphics::OnDeviceLost()
+void Graphics::OnDeviceLost_D3D9()
 {
     URHO3D_LOGINFO("Device lost");
 
-    if (impl_->defaultColorSurface_)
+    GraphicsImpl_D3D9* impl = GetImpl_D3D9();
+
+    if (impl->defaultColorSurface_)
     {
-        impl_->defaultColorSurface_->Release();
-        impl_->defaultColorSurface_ = nullptr;
+        impl->defaultColorSurface_->Release();
+        impl->defaultColorSurface_ = nullptr;
     }
-    if (impl_->defaultDepthStencilSurface_)
+    if (impl->defaultDepthStencilSurface_)
     {
-        impl_->defaultDepthStencilSurface_->Release();
-        impl_->defaultDepthStencilSurface_ = nullptr;
+        impl->defaultDepthStencilSurface_->Release();
+        impl->defaultDepthStencilSurface_ = nullptr;
     }
-    if (impl_->frameQuery_)
+    if (impl->frameQuery_)
     {
-        impl_->frameQuery_->Release();
-        impl_->frameQuery_ = nullptr;
+        impl->frameQuery_->Release();
+        impl->frameQuery_ = nullptr;
     }
 
     {
@@ -2504,7 +2583,7 @@ void Graphics::OnDeviceLost()
     SendEvent(E_DEVICELOST);
 }
 
-void Graphics::OnDeviceReset()
+void Graphics::OnDeviceReset_D3D9()
 {
     {
         MutexLock lock(gpuObjectMutex_);
@@ -2513,53 +2592,57 @@ void Graphics::OnDeviceReset()
             (*i)->OnDeviceReset();
     }
 
+    GraphicsImpl_D3D9* impl = GetImpl_D3D9();
+
     // Get default surfaces
-    impl_->device_->GetRenderTarget(0, &impl_->defaultColorSurface_);
-    impl_->device_->GetDepthStencilSurface(&impl_->defaultDepthStencilSurface_);
+    impl->device_->GetRenderTarget(0, &impl->defaultColorSurface_);
+    impl->device_->GetDepthStencilSurface(&impl->defaultDepthStencilSurface_);
 
     // Create frame query for flushing the GPU command buffer
-    impl_->device_->CreateQuery(D3DQUERYTYPE_EVENT, &impl_->frameQuery_);
+    impl->device_->CreateQuery(D3DQUERYTYPE_EVENT, &impl->frameQuery_);
 
-    ResetCachedState();
+    ResetCachedState_D3D9();
 
     SendEvent(E_DEVICERESET);
 }
 
-void Graphics::ResetCachedState()
+void Graphics::ResetCachedState_D3D9()
 {
+    GraphicsImpl_D3D9* impl = GetImpl_D3D9();
+
     for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
     {
         vertexBuffers_[i] = nullptr;
-        impl_->streamOffsets_[i] = 0;
+        impl->streamOffsets_[i] = 0;
     }
 
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
     {
         textures_[i] = nullptr;
-        impl_->minFilters_[i] = D3DTEXF_POINT;
-        impl_->magFilters_[i] = D3DTEXF_POINT;
-        impl_->mipFilters_[i] = D3DTEXF_NONE;
-        impl_->uAddressModes_[i] = D3DTADDRESS_WRAP;
-        impl_->vAddressModes_[i] = D3DTADDRESS_WRAP;
-        impl_->wAddressModes_[i] = D3DTADDRESS_WRAP;
-        impl_->maxAnisotropy_[i] = M_MAX_UNSIGNED;
-        impl_->borderColors_[i] = Color(0.0f, 0.0f, 0.0f, 0.0f);
-        impl_->sRGBModes_[i] = false;
+        impl->minFilters_[i] = D3DTEXF_POINT;
+        impl->magFilters_[i] = D3DTEXF_POINT;
+        impl->mipFilters_[i] = D3DTEXF_NONE;
+        impl->uAddressModes_[i] = D3DTADDRESS_WRAP;
+        impl->vAddressModes_[i] = D3DTADDRESS_WRAP;
+        impl->wAddressModes_[i] = D3DTADDRESS_WRAP;
+        impl->maxAnisotropy_[i] = M_MAX_UNSIGNED;
+        impl->borderColors_[i] = Color(0.0f, 0.0f, 0.0f, 0.0f);
+        impl->sRGBModes_[i] = false;
     }
 
     for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
     {
         renderTargets_[i] = nullptr;
-        impl_->colorSurfaces_[i] = nullptr;
+        impl->colorSurfaces_[i] = nullptr;
     }
 
     depthStencil_ = nullptr;
-    impl_->depthStencilSurface_ = nullptr;
+    impl->depthStencilSurface_ = nullptr;
     viewport_ = IntRect(0, 0, width_, height_);
-    impl_->sRGBWrite_ = false;
+    impl->sRGBWrite_ = false;
 
     for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
-        impl_->streamFrequencies_[i] = 1;
+        impl->streamFrequencies_[i] = 1;
 
     indexBuffer_ = nullptr;
     vertexShader_ = nullptr;
@@ -2585,15 +2668,15 @@ void Graphics::ResetCachedState()
     stencilCompareMask_ = M_MAX_UNSIGNED;
     stencilWriteMask_ = M_MAX_UNSIGNED;
     useClipPlane_ = false;
-    impl_->blendEnable_ = FALSE;
-    impl_->srcBlend_ = D3DBLEND_ONE;
-    impl_->destBlend_ = D3DBLEND_ZERO;
-    impl_->blendOp_ = D3DBLENDOP_ADD;
-    impl_->vertexDeclaration_ = nullptr;
-    impl_->queryIssued_ = false;
+    impl->blendEnable_ = FALSE;
+    impl->srcBlend_ = D3DBLEND_ONE;
+    impl->destBlend_ = D3DBLEND_ZERO;
+    impl->blendOp_ = D3DBLENDOP_ADD;
+    impl->vertexDeclaration_ = nullptr;
+    impl->queryIssued_ = false;
 }
 
-void Graphics::SetTextureUnitMappings()
+void Graphics::SetTextureUnitMappings_D3D9()
 {
     textureUnits_["DiffMap"] = TU_DIFFUSE;
     textureUnits_["DiffCubeMap"] = TU_DIFFUSE;

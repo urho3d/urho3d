@@ -26,26 +26,26 @@
 #include "../../Core/Profiler.h"
 #include "../../Graphics/Graphics.h"
 #include "../../Graphics/GraphicsEvents.h"
-#include "../../Graphics/GraphicsImpl.h"
 #include "../../Graphics/Renderer.h"
 #include "../../Graphics/Texture3D.h"
 #include "../../IO/FileSystem.h"
 #include "../../IO/Log.h"
 #include "../../Resource/ResourceCache.h"
 #include "../../Resource/XMLFile.h"
+#include "D3D9GraphicsImpl.h"
 
 #include "../../DebugNew.h"
 
 namespace Urho3D
 {
 
-void Texture3D::OnDeviceLost()
+void Texture3D::OnDeviceLost_D3D9()
 {
     if (usage_ > TEXTURE_STATIC)
-        Release();
+        Release_D3D9();
 }
 
-void Texture3D::OnDeviceReset()
+void Texture3D::OnDeviceReset_D3D9()
 {
     if (usage_ > TEXTURE_STATIC || !object_.ptr_ || dataPending_)
     {
@@ -56,7 +56,7 @@ void Texture3D::OnDeviceReset()
 
         if (!object_.ptr_)
         {
-            Create();
+            Create_D3D9();
             dataLost_ = true;
         }
     }
@@ -64,7 +64,7 @@ void Texture3D::OnDeviceReset()
     dataPending_ = false;
 }
 
-void Texture3D::Release()
+void Texture3D::Release_D3D9()
 {
     if (graphics_)
     {
@@ -78,7 +78,7 @@ void Texture3D::Release()
     URHO3D_SAFE_RELEASE(object_.ptr_);
 }
 
-bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int height, int depth, const void* data)
+bool Texture3D::SetData_D3D9(unsigned level, int x, int y, int z, int width, int height, int depth, const void* data)
 {
     URHO3D_PROFILE(SetTextureData);
 
@@ -107,7 +107,7 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
         return true;
     }
 
-    if (IsCompressed())
+    if (IsCompressed_D3D9())
     {
         x &= ~3;
         y &= ~3;
@@ -144,16 +144,16 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
         return false;
     }
 
-    if (IsCompressed())
+    if (IsCompressed_D3D9())
     {
         height = (height + 3) >> 2;
         y >>= 2;
     }
 
     unsigned char* src = (unsigned char*)data;
-    unsigned rowSize = GetRowDataSize(width);
+    unsigned rowSize = GetRowDataSize_D3D9(width);
 
-    // GetRowDataSize() returns CPU-side (source) data size, so need to convert for X8R8G8B8
+    // GetRowDataSize_D3D9() returns CPU-side (source) data size, so need to convert for X8R8G8B8
     if (format_ == D3DFMT_X8R8G8B8)
         rowSize = rowSize / 3 * 4;
 
@@ -216,7 +216,7 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
     return true;
 }
 
-bool Texture3D::SetData(Image* image, bool useAlpha)
+bool Texture3D::SetData_D3D9(Image* image, bool useAlpha)
 {
     if (!image)
     {
@@ -275,13 +275,13 @@ bool Texture3D::SetData(Image* image, bool useAlpha)
         }
 
         // If image was previously compressed, reset number of requested levels to avoid error if level count is too high for new size
-        if (IsCompressed() && requestedLevels_ > 1)
+        if (IsCompressed_D3D9() && requestedLevels_ > 1)
             requestedLevels_ = 0;
         SetSize(levelWidth, levelHeight, levelDepth, format);
 
         for (unsigned i = 0; i < levels_; ++i)
         {
-            SetData(i, 0, 0, 0, levelWidth, levelHeight, levelDepth, levelData);
+            SetData_D3D9(i, 0, 0, 0, levelWidth, levelHeight, levelDepth, levelData);
             memoryUse += levelWidth * levelHeight * levelDepth * components;
 
             if (i < levels_ - 1)
@@ -326,14 +326,14 @@ bool Texture3D::SetData(Image* image, bool useAlpha)
             CompressedLevel level = image->GetCompressedLevel(i + mipsToSkip);
             if (!needDecompress)
             {
-                SetData(i, 0, 0, 0, level.width_, level.height_, level.depth_, level.data_);
+                SetData_D3D9(i, 0, 0, 0, level.width_, level.height_, level.depth_, level.data_);
                 memoryUse += level.depth_ * level.rows_ * level.rowSize_;
             }
             else
             {
                 unsigned char* rgbaData = new unsigned char[level.width_ * level.height_ * level.depth_ * 4];
                 level.Decompress(rgbaData);
-                SetData(i, 0, 0, 0, level.width_, level.height_, level.depth_, rgbaData);
+                SetData_D3D9(i, 0, 0, 0, level.width_, level.height_, level.depth_, rgbaData);
                 memoryUse += level.width_ * level.height_ * level.depth_ * 4;
                 delete[] rgbaData;
             }
@@ -344,7 +344,7 @@ bool Texture3D::SetData(Image* image, bool useAlpha)
     return true;
 }
 
-bool Texture3D::GetData(unsigned level, void* dest) const
+bool Texture3D::GetData_D3D9(unsigned level, void* dest) const
 {
     if (!object_.ptr_)
     {
@@ -391,12 +391,12 @@ bool Texture3D::GetData(unsigned level, void* dest) const
     }
 
     int height = levelHeight;
-    if (IsCompressed())
+    if (IsCompressed_D3D9())
         height = (height + 3) >> 2;
 
     unsigned char* destPtr = (unsigned char*)dest;
-    unsigned rowSize = GetRowDataSize(levelWidth);
-    // GetRowDataSize() returns CPU-side (destination) data size, so need to convert for X8R8G8B8
+    unsigned rowSize = GetRowDataSize_D3D9(levelWidth);
+    // GetRowDataSize_D3D9() returns CPU-side (destination) data size, so need to convert for X8R8G8B8
     if (format_ == D3DFMT_X8R8G8B8)
         rowSize = rowSize / 3 * 4;
 
@@ -456,9 +456,9 @@ bool Texture3D::GetData(unsigned level, void* dest) const
     return true;
 }
 
-bool Texture3D::Create()
+bool Texture3D::Create_D3D9()
 {
-    Release();
+    Release_D3D9();
 
     if (!graphics_ || !width_ || !height_)
         return false;
@@ -472,7 +472,7 @@ bool Texture3D::Create()
     unsigned pool = usage_ > TEXTURE_STATIC ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
     unsigned d3dUsage = usage_ == TEXTURE_DYNAMIC ? D3DUSAGE_DYNAMIC : 0;
 
-    IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
+    IDirect3DDevice9* device = graphics_->GetImpl_D3D9()->GetDevice();
     HRESULT hr = device->CreateVolumeTexture(
         (UINT)width_,
         (UINT)height_,

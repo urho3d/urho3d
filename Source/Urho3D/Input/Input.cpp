@@ -2356,7 +2356,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
 #if defined(IOS) || defined(TVOS) || defined (__ANDROID__)
                 // On iOS/tvOS we never lose the GL context, but may have done GPU object changes that could not be applied yet. Apply them now
                 // On Android the old GL context may be lost already, restore GPU objects to the new GL context
-                graphics_->Restore();
+                graphics_->Restore_OGL();
 #endif
                 minimized_ = false;
                 SendInputFocusEvent();

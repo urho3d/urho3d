@@ -4333,18 +4333,18 @@ static void Register_Geometry(asIScriptEngine* engine)
     #endif
 }
 
-// explicit Graphics::Graphics(Context* context)
-static Graphics* Graphics__Graphics_Contextstar()
+// explicit Graphics::Graphics(Context* context, GAPI gapi)
+static Graphics* Graphics__Graphics_Contextstar_GAPI(GAPI gapi)
 {
     Context* context = GetScriptContext();
-    return new Graphics(context);
+    return new Graphics(context, gapi);
 }
 
 // class Graphics | File: ../Graphics/Graphics.h
 static void Register_Graphics(asIScriptEngine* engine)
 {
-    // explicit Graphics::Graphics(Context* context)
-    engine->RegisterObjectBehaviour("Graphics", asBEHAVE_FACTORY, "Graphics@+ f()", AS_FUNCTION(Graphics__Graphics_Contextstar) , AS_CALL_CDECL);
+    // explicit Graphics::Graphics(Context* context, GAPI gapi)
+    engine->RegisterObjectBehaviour("Graphics", asBEHAVE_FACTORY, "Graphics@+ f(GAPI)", AS_FUNCTION(Graphics__Graphics_Contextstar_GAPI) , AS_CALL_CDECL);
 
     RegisterSubclass<Object, Graphics>(engine, "Object", "Graphics");
     RegisterSubclass<RefCounted, Graphics>(engine, "RefCounted", "Graphics");

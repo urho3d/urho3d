@@ -42,20 +42,20 @@
 namespace Urho3D
 {
 
-RenderSurface::RenderSurface(Texture* parentTexture) :      // NOLINT(hicpp-member-init)
-    parentTexture_(parentTexture),
-    target_(GL_TEXTURE_2D),
-    renderBuffer_(0)
+void RenderSurface::Constructor_OGL(Texture* parentTexture)
 {
+    parentTexture_ = parentTexture;
+    target_ = GL_TEXTURE_2D;
+    renderBuffer_ = 0;
 }
 
-bool RenderSurface::CreateRenderBuffer(unsigned width, unsigned height, unsigned format, int multiSample)
+bool RenderSurface::CreateRenderBuffer_OGL(unsigned width, unsigned height, unsigned format, int multiSample)
 {
     Graphics* graphics = parentTexture_->GetGraphics();
     if (!graphics)
         return false;
 
-    Release();
+    Release_OGL();
 
 #ifndef GL_ES_VERSION_2_0
     if (Graphics::GetGL3Support())
@@ -85,7 +85,7 @@ bool RenderSurface::CreateRenderBuffer(unsigned width, unsigned height, unsigned
     return true;
 }
 
-void RenderSurface::OnDeviceLost()
+void RenderSurface::OnDeviceLost_OGL()
 {
     Graphics* graphics = parentTexture_->GetGraphics();
     if (!graphics)
@@ -101,7 +101,7 @@ void RenderSurface::OnDeviceLost()
         graphics->ResetDepthStencil();
 
     // Clean up also from non-active FBOs
-    graphics->CleanupRenderSurface(this);
+    graphics->CleanupRenderSurface_OGL(this);
 
     if (renderBuffer_ && !graphics->IsDeviceLost())
         glDeleteRenderbuffersEXT(1, &renderBuffer_);
@@ -109,7 +109,7 @@ void RenderSurface::OnDeviceLost()
     renderBuffer_ = 0;
 }
 
-void RenderSurface::Release()
+void RenderSurface::Release_OGL()
 {
     Graphics* graphics = parentTexture_->GetGraphics();
     if (!graphics)
@@ -127,7 +127,7 @@ void RenderSurface::Release()
             graphics->ResetDepthStencil();
 
         // Clean up also from non-active FBOs
-        graphics->CleanupRenderSurface(this);
+        graphics->CleanupRenderSurface_OGL(this);
 
         if (renderBuffer_)
             glDeleteRenderbuffersEXT(1, &renderBuffer_);

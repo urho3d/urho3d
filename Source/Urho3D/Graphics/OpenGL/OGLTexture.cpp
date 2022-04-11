@@ -66,7 +66,7 @@ static GLenum GetWrapMode(TextureAddressMode mode)
 #endif
 }
 
-void Texture::SetSRGB(bool enable)
+void Texture::SetSRGB_OGL(bool enable)
 {
     if (graphics_)
         enable &= graphics_->GetSRGBSupport();
@@ -80,11 +80,11 @@ void Texture::SetSRGB(bool enable)
 
         // If texture in use in the framebuffer, mark it dirty
         if (graphics_ && graphics_->GetRenderTarget(0) && graphics_->GetRenderTarget(0)->GetParentTexture() == this)
-            graphics_->MarkFBODirty();
+            graphics_->MarkFBODirty_OGL();
     }
 }
 
-void Texture::UpdateParameters()
+void Texture::UpdateParameters_OGL()
 {
     if (!object_.name_ || !graphics_)
         return;
@@ -173,12 +173,12 @@ void Texture::UpdateParameters()
     parametersDirty_ = false;
 }
 
-bool Texture::GetParametersDirty() const
+bool Texture::GetParametersDirty_OGL() const
 {
     return parametersDirty_;
 }
 
-bool Texture::IsCompressed() const
+bool Texture::IsCompressed_OGL() const
 {
     return format_ == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT || format_ == GL_COMPRESSED_RGBA_S3TC_DXT3_EXT ||
            format_ == GL_COMPRESSED_RGBA_S3TC_DXT5_EXT || format_ == GL_ETC1_RGB8_OES ||
@@ -187,7 +187,7 @@ bool Texture::IsCompressed() const
            format_ == COMPRESSED_RGB_PVRTC_2BPPV1_IMG || format_ == COMPRESSED_RGBA_PVRTC_2BPPV1_IMG;
 }
 
-unsigned Texture::GetRowDataSize(int width) const
+unsigned Texture::GetRowDataSize_OGL(int width) const
 {
     switch (format_)
     {
@@ -253,7 +253,7 @@ unsigned Texture::GetRowDataSize(int width) const
     }
 }
 
-unsigned Texture::GetExternalFormat(unsigned format)
+unsigned Texture::GetExternalFormat_OGL(unsigned format)
 {
 #ifndef GL_ES_VERSION_2_0
     if (format == GL_DEPTH_COMPONENT16 || format == GL_DEPTH_COMPONENT24 || format == GL_DEPTH_COMPONENT32)
@@ -279,7 +279,7 @@ unsigned Texture::GetExternalFormat(unsigned format)
 #endif
 }
 
-unsigned Texture::GetDataType(unsigned format)
+unsigned Texture::GetDataType_OGL(unsigned format)
 {
 #ifndef GL_ES_VERSION_2_0
     if (format == GL_DEPTH24_STENCIL8_EXT)
@@ -302,7 +302,7 @@ unsigned Texture::GetDataType(unsigned format)
 #endif
 }
 
-unsigned Texture::GetSRGBFormat(unsigned format)
+unsigned Texture::GetSRGBFormat_OGL(unsigned format)
 {
 #ifndef GL_ES_VERSION_2_0
     if (!graphics_ || !graphics_->GetSRGBSupport())
@@ -332,7 +332,7 @@ unsigned Texture::GetSRGBFormat(unsigned format)
 #endif
 }
 
-void Texture::RegenerateLevels()
+void Texture::RegenerateLevels_OGL()
 {
     if (!object_.name_)
         return;

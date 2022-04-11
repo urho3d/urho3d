@@ -109,6 +109,12 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // static const String EP_BORDERLESS | File: ../Engine/EngineDefs.h
     engine->RegisterGlobalProperty("const String EP_BORDERLESS", (void*)&EP_BORDERLESS);
 
+    // static const String EP_DIRECT3D11 | File: ../Engine/EngineDefs.h
+    engine->RegisterGlobalProperty("const String EP_DIRECT3D11", (void*)&EP_DIRECT3D11);
+
+    // static const String EP_DIRECT3D9 | File: ../Engine/EngineDefs.h
+    engine->RegisterGlobalProperty("const String EP_DIRECT3D9", (void*)&EP_DIRECT3D9);
+
     // static const String EP_DUMP_SHADERS | File: ../Engine/EngineDefs.h
     engine->RegisterGlobalProperty("const String EP_DUMP_SHADERS", (void*)&EP_DUMP_SHADERS);
 
@@ -156,6 +162,9 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
 
     // static const String EP_MULTI_SAMPLE | File: ../Engine/EngineDefs.h
     engine->RegisterGlobalProperty("const String EP_MULTI_SAMPLE", (void*)&EP_MULTI_SAMPLE);
+
+    // static const String EP_OPENGL | File: ../Engine/EngineDefs.h
+    engine->RegisterGlobalProperty("const String EP_OPENGL", (void*)&EP_OPENGL);
 
     // static const String EP_ORIENTATIONS | File: ../Engine/EngineDefs.h
     engine->RegisterGlobalProperty("const String EP_ORIENTATIONS", (void*)&EP_ORIENTATIONS);

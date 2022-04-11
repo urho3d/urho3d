@@ -138,6 +138,27 @@ public:
     void SetResolveDirty(bool enable) { resolveDirty_ = enable; }
 
 private:
+#ifdef URHO3D_OPENGL
+    void Constructor_OGL(Texture* parentTexture);
+    bool CreateRenderBuffer_OGL(unsigned width, unsigned height, unsigned format, int multiSample);
+    void OnDeviceLost_OGL();
+    void Release_OGL();
+#endif // def URHO3D_OPENGL
+
+#ifdef URHO3D_D3D9
+    void Constructor_D3D9(Texture* parentTexture);
+    bool CreateRenderBuffer_D3D9(unsigned width, unsigned height, unsigned format, int multiSample);
+    void OnDeviceLost_D3D9();
+    void Release_D3D9();
+#endif // def URHO3D_D3D9
+
+#ifdef URHO3D_D3D11
+    void Constructor_D3D11(Texture* parentTexture);
+    bool CreateRenderBuffer_D3D11(unsigned width, unsigned height, unsigned format, int multiSample);
+    void OnDeviceLost_D3D11();
+    void Release_D3D11();
+#endif // def URHO3D_D3D11
+
     /// Parent texture.
     Texture* parentTexture_;
 

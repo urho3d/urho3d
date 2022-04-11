@@ -40,6 +40,7 @@ task :cmake => [:init] do
     system 'cmake --version' or abort 'Failed to find CMake'
     if ENV['USE_CCACHE'] && ENV['GITHUB_EVENT_NAME'] != 'repository_dispatch' && /\[cache clear\]/ =~ `git log --format=%B -n1 2>/dev/null`
       system 'bash', '-c', 'rm -rf ~/.{ccache,gradle}' or abort 'Failed to clear the build cache'
+      puts "CMake cache has been cleared"
     end
   end
   next if ENV['PLATFORM'] == 'android' || (Dir.exists?(build_tree) and not ARGV.include?('cmake'))

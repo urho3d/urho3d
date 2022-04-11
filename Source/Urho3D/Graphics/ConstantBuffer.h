@@ -62,6 +62,27 @@ public:
     bool IsDirty() const { return dirty_; }
 
 private:
+#ifdef URHO3D_OPENGL
+    void Release_OGL();
+    void OnDeviceReset_OGL();
+    bool SetSize_OGL(unsigned size);
+    void Apply_OGL();
+#endif // def URHO3D_OPENGL
+
+#ifdef URHO3D_D3D9
+    void Release_D3D9();
+    void OnDeviceReset_D3D9();
+    bool SetSize_D3D9(unsigned size);
+    void Apply_D3D9();
+#endif // def URHO3D_D3D9
+
+#ifdef URHO3D_D3D11
+    void Release_D3D11();
+    void OnDeviceReset_D3D11();
+    bool SetSize_D3D11(unsigned size);
+    void Apply_D3D11();
+#endif // def URHO3D_D3D11
+
     /// Shadow data.
     SharedArrayPtr<unsigned char> shadowData_;
     /// Buffer byte size.

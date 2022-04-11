@@ -34,14 +34,14 @@
 namespace Urho3D
 {
 
-RenderSurface::RenderSurface(Texture* parentTexture) :      // NOLINT(hicpp-member-init)
-    parentTexture_(parentTexture),
-    renderTargetView_(nullptr),
-    readOnlyView_(nullptr)
+void RenderSurface::Constructor_D3D11(Texture* parentTexture)
 {
+    parentTexture_ = parentTexture;
+    renderTargetView_ = nullptr;
+    readOnlyView_ = nullptr;
 }
 
-void RenderSurface::Release()
+void RenderSurface::Release_D3D11()
 {
     Graphics* graphics = parentTexture_->GetGraphics();
     if (graphics && renderTargetView_)
@@ -60,13 +60,13 @@ void RenderSurface::Release()
     URHO3D_SAFE_RELEASE(readOnlyView_);
 }
 
-bool RenderSurface::CreateRenderBuffer(unsigned width, unsigned height, unsigned format, int multiSample)
+bool RenderSurface::CreateRenderBuffer_D3D11(unsigned width, unsigned height, unsigned format, int multiSample)
 {
     // Not used on Direct3D
     return false;
 }
 
-void RenderSurface::OnDeviceLost()
+void RenderSurface::OnDeviceLost_D3D11()
 {
     // No-op on Direct3D
 }

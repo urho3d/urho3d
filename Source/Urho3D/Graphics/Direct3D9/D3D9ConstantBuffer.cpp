@@ -31,21 +31,21 @@
 namespace Urho3D
 {
 
-void ConstantBuffer::OnDeviceReset()
+void ConstantBuffer::OnDeviceReset_D3D9()
 {
 }
 
-void ConstantBuffer::Release()
+void ConstantBuffer::Release_D3D9()
 {
 }
 
-bool ConstantBuffer::SetSize(unsigned size)
+bool ConstantBuffer::SetSize_D3D9(unsigned size)
 {
     URHO3D_LOGERROR("Constant buffers are not supported on Direct3D9");
     return false;
 }
 
-void ConstantBuffer::Apply()
+void ConstantBuffer::Apply_D3D9()
 {
 }
 

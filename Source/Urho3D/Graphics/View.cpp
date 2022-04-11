@@ -319,13 +319,11 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
     rtSize_ = IntVector2(rtWidth, rtHeight);
 
     // On OpenGL flip the viewport if rendering to a texture for consistent UV addressing with Direct3D9
-#ifdef URHO3D_OPENGL
-    if (renderTarget_)
+    if (Graphics::GetGAPI() == GAPI_OPENGL && renderTarget_)
     {
         viewRect_.bottom_ = rtHeight - viewRect_.top_;
         viewRect_.top_ = viewRect_.bottom_ - viewSize_.y_;
     }
-#endif
 
     scene_ = viewport->GetScene();
     cullCamera_ = viewport->GetCullCamera();
@@ -375,27 +373,28 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
     scenePasses_.Clear();
     geometriesUpdated_ = false;
 
-#ifdef URHO3D_OPENGL
-#ifdef GL_ES_VERSION_2_0
-    // On OpenGL ES we assume a stencil is not available or would not give a good performance, and disable light stencil
-    // optimizations in any case
-    noStencil_ = true;
-#else
-    for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
+    if (Graphics::GetGAPI() == GAPI_OPENGL)
     {
-        const RenderPathCommand& command = renderPath_->commands_[i];
-        if (!command.enabled_)
-            continue;
-        if (command.depthStencilName_.Length())
+#ifdef GL_ES_VERSION_2_0
+        // On OpenGL ES we assume a stencil is not available or would not give a good performance, and disable light stencil
+        // optimizations in any case
+        noStencil_ = true;
+#else
+        for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
         {
-            // Using a readable depth texture will disable light stencil optimizations on OpenGL, as for compatibility reasons
-            // we are using a depth format without stencil channel
-            noStencil_ = true;
-            break;
+            const RenderPathCommand& command = renderPath_->commands_[i];
+            if (!command.enabled_)
+                continue;
+            if (command.depthStencilName_.Length())
+            {
+                // Using a readable depth texture will disable light stencil optimizations on OpenGL, as for compatibility reasons
+                // we are using a depth format without stencil channel
+                noStencil_ = true;
+                break;
+            }
         }
+#endif
     }
-#endif
-#endif
 
     // Make sure that all necessary batch queues exist
     for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
@@ -596,8 +595,7 @@ void View::Render()
     }
 #endif
 
-#ifdef URHO3D_OPENGL
-    if (renderTarget_)
+    if (Graphics::GetGAPI() == GAPI_OPENGL && renderTarget_)
     {
         // On OpenGL, flip the projection if rendering to a texture so that the texture can be addressed in the same way
         // as a render texture produced on Direct3D9
@@ -608,7 +606,6 @@ void View::Render()
         if (camera_)
             camera_->SetFlipVertical(!camera_->GetFlipVertical());
     }
-#endif
 
     // Render
     ExecuteRenderPathCommands();
@@ -654,14 +651,12 @@ void View::Render()
         }
     }
 
-#ifdef URHO3D_OPENGL
-    if (renderTarget_)
+    if (Graphics::GetGAPI() == GAPI_OPENGL && renderTarget_)
     {
         // Restores original setting of FlipVertical when flipped by code above.
         if (camera_)
             camera_->SetFlipVertical(!camera_->GetFlipVertical());
     }
-#endif
 
     // Run framebuffer blitting if necessary. If scene was resolved from backbuffer, do not touch depth
     // (backbuffer should contain proper depth already)
@@ -724,15 +719,20 @@ void View::SetCameraShaderParameters(Camera* camera)
     if (camera->IsOrthographic())
     {
         depthMode.x_ = 1.0f;
-#ifdef URHO3D_OPENGL
-        depthMode.z_ = 0.5f;
-        depthMode.w_ = 0.5f;
-#else
-        depthMode.z_ = 1.0f;
-#endif
+        if (Graphics::GetGAPI() == GAPI_OPENGL)
+        {
+            depthMode.z_ = 0.5f;
+            depthMode.w_ = 0.5f;
+        }
+        else
+        {
+            depthMode.z_ = 1.0f;
+        }
     }
     else
+    {
         depthMode.w_ = 1.0f / camera->GetFarClip();
+    }
 
     graphics_->SetShaderParameter(VSP_DEPTHMODE, depthMode);
 
@@ -746,12 +746,14 @@ void View::SetCameraShaderParameters(Camera* camera)
     graphics_->SetShaderParameter(VSP_FRUSTUMSIZE, farVector);
 
     Matrix4 projection = camera->GetGPUProjection();
-#ifdef URHO3D_OPENGL
-    // Add constant depth bias manually to the projection matrix due to glPolygonOffset() inconsistency
-    float constantBias = 2.0f * graphics_->GetDepthConstantBias();
-    projection.m22_ += projection.m32_ * constantBias;
-    projection.m23_ += projection.m33_ * constantBias;
-#endif
+
+    if (Graphics::GetGAPI() == GAPI_OPENGL)
+    {
+        // Add constant depth bias manually to the projection matrix due to glPolygonOffset() inconsistency
+        float constantBias = 2.0f * graphics_->GetDepthConstantBias();
+        projection.m22_ += projection.m32_ * constantBias;
+        projection.m23_ += projection.m33_ * constantBias;
+    }
 
     graphics_->SetShaderParameter(VSP_VIEWPROJ, projection * camera->GetView());
 
@@ -774,14 +776,20 @@ void View::SetGBufferShaderParameters(const IntVector2& texSize, const IntRect& 
     float widthRange = 0.5f * viewRect.Width() / texWidth;
     float heightRange = 0.5f * viewRect.Height() / texHeight;
 
-#ifdef URHO3D_OPENGL
-    Vector4 bufferUVOffset(((float)viewRect.left_) / texWidth + widthRange,
-        1.0f - (((float)viewRect.top_) / texHeight + heightRange), widthRange, heightRange);
-#else
-    const Vector2& pixelUVOffset = Graphics::GetPixelUVOffset();
-    Vector4 bufferUVOffset((pixelUVOffset.x_ + (float)viewRect.left_) / texWidth + widthRange,
-        (pixelUVOffset.y_ + (float)viewRect.top_) / texHeight + heightRange, widthRange, heightRange);
-#endif
+    Vector4 bufferUVOffset;
+
+    if (Graphics::GetGAPI() == GAPI_OPENGL)
+    {
+        bufferUVOffset = Vector4(((float)viewRect.left_) / texWidth + widthRange,
+            1.0f - (((float)viewRect.top_) / texHeight + heightRange), widthRange, heightRange);
+    }
+    else
+    {
+        const Vector2& pixelUVOffset = Graphics::GetPixelUVOffset();
+        bufferUVOffset = Vector4((pixelUVOffset.x_ + (float)viewRect.left_) / texWidth + widthRange,
+            (pixelUVOffset.y_ + (float)viewRect.top_) / texHeight + heightRange, widthRange, heightRange);
+    }
+
     graphics_->SetShaderParameter(VSP_GBUFFEROFFSETS, bufferUVOffset);
 
     float invSizeX = 1.0f / texWidth;
@@ -1550,12 +1558,16 @@ void View::ExecuteRenderPathCommands()
                     // If the render path ends into a quad, it can be redirected to the final render target
                     // However, on OpenGL we can not reliably do this in case the final target is the backbuffer, and we want to
                     // render depth buffer sensitive debug geometry afterward (backbuffer and textures can not share depth)
-#ifndef URHO3D_OPENGL
-                    if (i == lastCommandIndex && command.type_ == CMD_QUAD)
-#else
-                    if (i == lastCommandIndex && command.type_ == CMD_QUAD && renderTarget_)
-#endif
-                        currentRenderTarget_ = renderTarget_;
+                    if (Graphics::GetGAPI() != GAPI_OPENGL)
+                    {
+                        if (i == lastCommandIndex && command.type_ == CMD_QUAD)
+                            currentRenderTarget_ = renderTarget_;
+                    }
+                    else
+                    {
+                        if (i == lastCommandIndex && command.type_ == CMD_QUAD && renderTarget_)
+                            currentRenderTarget_ = renderTarget_;
+                    }
                 }
                 else
                     currentRenderTarget_ = substituteRenderTarget_ ? substituteRenderTarget_ : renderTarget_;
@@ -1750,14 +1762,14 @@ void View::SetRenderTargets(RenderPathCommand& command)
             {
                 useColorWrite = false;
                 useCustomDepth = true;
-#if !defined(URHO3D_OPENGL) && !defined(URHO3D_D3D11)
+
                 // On D3D9 actual depth-only rendering is illegal, we need a color rendertarget
-                if (!depthOnlyDummyTexture_)
+                if (Graphics::GetGAPI() == GAPI_D3D9 && !depthOnlyDummyTexture_)
                 {
                     depthOnlyDummyTexture_ = renderer_->GetScreenBuffer(texture->GetWidth(), texture->GetHeight(),
                         graphics_->GetDummyColorFormat(), texture->GetMultiSample(), texture->GetAutoResolve(), false, false, false);
                 }
-#endif
+
                 graphics_->SetRenderTarget(0, GetRenderSurfaceFromTexture(depthOnlyDummyTexture_));
                 graphics_->SetDepthStencil(GetRenderSurfaceFromTexture(texture));
             }
@@ -1988,17 +2000,19 @@ void View::AllocateScreenBuffers()
         }
     }
 
-#ifdef URHO3D_OPENGL
-    // Due to FBO limitations, in OpenGL deferred modes need to render to texture first and then blit to the backbuffer
-    // Also, if rendering to a texture with full deferred rendering, it must be RGBA to comply with the rest of the buffers,
-    // unless using OpenGL 3
-    if (((deferred_ || hasScenePassToRTs) && !renderTarget_) || (!Graphics::GetGL3Support() && deferredAmbient_ && renderTarget_
-        && renderTarget_->GetParentTexture()->GetFormat() != Graphics::GetRGBAFormat()))
+    if (Graphics::GetGAPI() == GAPI_OPENGL)
+    {
+        // Due to FBO limitations, in OpenGL deferred modes need to render to texture first and then blit to the backbuffer
+        // Also, if rendering to a texture with full deferred rendering, it must be RGBA to comply with the rest of the buffers,
+        // unless using OpenGL 3
+        if (((deferred_ || hasScenePassToRTs) && !renderTarget_) || (!Graphics::GetGL3Support() && deferredAmbient_ && renderTarget_
+            && renderTarget_->GetParentTexture()->GetFormat() != Graphics::GetRGBAFormat()))
             needSubstitute = true;
-    // Also need substitute if rendering to backbuffer using a custom (readable) depth buffer
-    if (!renderTarget_ && hasCustomDepth)
-        needSubstitute = true;
-#endif
+        // Also need substitute if rendering to backbuffer using a custom (readable) depth buffer
+        if (!renderTarget_ && hasCustomDepth)
+            needSubstitute = true;
+    }
+
     // If backbuffer is antialiased when using deferred rendering, need to reserve a buffer
     if (deferred_ && !renderTarget_ && graphics_->GetMultiSample() > 1)
         needSubstitute = true;
@@ -2020,11 +2034,9 @@ void View::AllocateScreenBuffers()
         needSubstitute = true;
     }
 
-#ifdef URHO3D_OPENGL
     // On OpenGL 2 ensure that all MRT buffers are RGBA in deferred rendering
-    if (deferred_ && !renderer_->GetHDRRendering() && !Graphics::GetGL3Support())
+    if (deferred_ && !renderer_->GetHDRRendering() && Graphics::GetGAPI() == GAPI_OPENGL && !Graphics::GetGL3Support())
         format = Graphics::GetRGBAFormat();
-#endif
 
     if (hasViewportRead)
     {
@@ -2148,13 +2160,17 @@ void View::DrawFullscreenQuad(bool setIdentityProjection)
     {
         Matrix3x4 model = Matrix3x4::IDENTITY;
         Matrix4 projection = Matrix4::IDENTITY;
-#ifdef URHO3D_OPENGL
-        if (camera_ && camera_->GetFlipVertical())
-            projection.m11_ = -1.0f;
-        model.m23_ = 0.0f;
-#else
-        model.m23_ = 0.5f;
-#endif
+
+        if (Graphics::GetGAPI() == GAPI_OPENGL)
+        {
+            if (camera_ && camera_->GetFlipVertical())
+                projection.m11_ = -1.0f;
+            model.m23_ = 0.0f;
+        }
+        else
+        {
+            model.m23_ = 0.5f;
+        }
 
         graphics_->SetShaderParameter(VSP_MODEL, model);
         graphics_->SetShaderParameter(VSP_VIEWPROJ, projection);
@@ -2717,11 +2733,10 @@ void View::FinalizeShadowCamera(Camera* shadowCamera, Light* light, const IntRec
             shadowCamera->SetZoom(shadowCamera->GetZoom() * ((shadowMapWidth - 2.0f) / shadowMapWidth));
         else
         {
-#ifdef URHO3D_OPENGL
-            shadowCamera->SetZoom(shadowCamera->GetZoom() * ((shadowMapWidth - 3.0f) / shadowMapWidth));
-#else
-            shadowCamera->SetZoom(shadowCamera->GetZoom() * ((shadowMapWidth - 4.0f) / shadowMapWidth));
-#endif
+            if (Graphics::GetGAPI() == GAPI_OPENGL)
+                shadowCamera->SetZoom(shadowCamera->GetZoom() * ((shadowMapWidth - 3.0f) / shadowMapWidth));
+            else
+                shadowCamera->SetZoom(shadowCamera->GetZoom() * ((shadowMapWidth - 4.0f) / shadowMapWidth));
         }
     }
 }

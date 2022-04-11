@@ -23,13 +23,13 @@
 #include "../../Precompiled.h"
 
 #include "../../Graphics/Graphics.h"
-#include "../../Graphics/GraphicsImpl.h"
 #include "../../Graphics/Shader.h"
 #include "../../Graphics/ShaderVariation.h"
 #include "../../IO/File.h"
 #include "../../IO/FileSystem.h"
 #include "../../IO/Log.h"
 #include "../../Resource/ResourceCache.h"
+#include "D3D9GraphicsImpl.h"
 
 #include <d3dcompiler.h>
 #include <MojoShader/mojoshader.h>
@@ -39,7 +39,7 @@
 namespace Urho3D
 {
 
-void CopyStrippedCode(PODVector<unsigned char>& byteCode, unsigned char* bufData, unsigned bufSize)
+static void CopyStrippedCode(PODVector<unsigned char>& byteCode, unsigned char* bufData, unsigned bufSize)
 {
     unsigned const D3DSIO_COMMENT = 0xFFFE;
     unsigned* srcWords = (unsigned*)bufData;
@@ -69,14 +69,14 @@ void CopyStrippedCode(PODVector<unsigned char>& byteCode, unsigned char* bufData
     }
 }
 
-void ShaderVariation::OnDeviceLost()
+void ShaderVariation::OnDeviceLost_D3D9()
 {
     // No-op on Direct3D9, shaders are preserved through a device loss & reset
 }
 
-bool ShaderVariation::Create()
+bool ShaderVariation::Create_D3D9()
 {
-    Release();
+    Release_D3D9();
 
     if (!graphics_)
         return false;
@@ -94,18 +94,18 @@ bool ShaderVariation::Create()
 
     String binaryShaderName = graphics_->GetShaderCacheDir() + name + "_" + StringHash(defines_).ToString() + extension;
 
-    if (!LoadByteCode(binaryShaderName))
+    if (!LoadByteCode_D3D9(binaryShaderName))
     {
         // Compile shader if don't have valid bytecode
-        if (!Compile())
+        if (!Compile_D3D9())
             return false;
         // Save the bytecode after successful compile, but not if the source is from a package
         if (owner_->GetTimeStamp())
-            SaveByteCode(binaryShaderName);
+            SaveByteCode_D3D9(binaryShaderName);
     }
 
     // Then create shader from the bytecode
-    IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
+    IDirect3DDevice9* device = graphics_->GetImpl_D3D9()->GetDevice();
     if (type_ == VS)
     {
         HRESULT hr = device->CreateVertexShader(
@@ -136,11 +136,11 @@ bool ShaderVariation::Create()
     return object_.ptr_ != nullptr;
 }
 
-void ShaderVariation::Release()
+void ShaderVariation::Release_D3D9()
 {
     if (object_.ptr_ && graphics_)
     {
-        graphics_->CleanupShaderPrograms(this);
+        graphics_->CleanupShaderPrograms_D3D9(this);
 
         if (type_ == VS)
         {
@@ -163,12 +163,12 @@ void ShaderVariation::Release()
     parameters_.Clear();
 }
 
-void ShaderVariation::SetDefines(const String& defines)
+void ShaderVariation::SetDefines_D3D9(const String& defines)
 {
     defines_ = defines;
 }
 
-bool ShaderVariation::LoadByteCode(const String& binaryShaderName)
+bool ShaderVariation::LoadByteCode_D3D9(const String& binaryShaderName)
 {
     ResourceCache* cache = owner_->GetSubsystem<ResourceCache>();
     if (!cache->Exists(binaryShaderName))
@@ -232,7 +232,7 @@ bool ShaderVariation::LoadByteCode(const String& binaryShaderName)
     }
 }
 
-bool ShaderVariation::Compile()
+bool ShaderVariation::Compile_D3D9()
 {
     const String& sourceCode = owner_->GetSourceCode(type_);
     Vector<String> defines = defines_.Split(' ');
@@ -313,7 +313,7 @@ bool ShaderVariation::Compile()
         // Inspect the produced bytecode using MojoShader, then strip and store it
         unsigned char* bufData = (unsigned char*)shaderCode->GetBufferPointer();
         unsigned bufSize = (unsigned)shaderCode->GetBufferSize();
-        ParseParameters(bufData, bufSize);
+        ParseParameters_D3D9(bufData, bufSize);
         CopyStrippedCode(byteCode_, bufData, bufSize);
     }
 
@@ -323,7 +323,7 @@ bool ShaderVariation::Compile()
     return !byteCode_.Empty();
 }
 
-void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
+void ShaderVariation::ParseParameters_D3D9(unsigned char* bufData, unsigned bufSize)
 {
     MOJOSHADER_parseData const* parseData = MOJOSHADER_parse("bytecode", bufData, bufSize, nullptr, 0, nullptr, 0, nullptr, nullptr, nullptr);
 
@@ -357,7 +357,7 @@ void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
     MOJOSHADER_freeParseData(parseData);
 }
 
-void ShaderVariation::SaveByteCode(const String& binaryShaderName)
+void ShaderVariation::SaveByteCode_D3D9(const String& binaryShaderName)
 {
     ResourceCache* cache = owner_->GetSubsystem<ResourceCache>();
     FileSystem* fileSystem = owner_->GetSubsystem<FileSystem>();

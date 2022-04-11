@@ -43,7 +43,7 @@
 namespace Urho3D
 {
 
-void Texture2DArray::OnDeviceLost()
+void Texture2DArray::OnDeviceLost_OGL()
 {
     if (object_.name_ && !graphics_->IsDeviceLost())
         glDeleteTextures(1, &object_.name_);
@@ -54,7 +54,7 @@ void Texture2DArray::OnDeviceLost()
         renderSurface_->OnDeviceLost();
 }
 
-void Texture2DArray::OnDeviceReset()
+void Texture2DArray::OnDeviceReset_OGL()
 {
     if (!object_.name_ || dataPending_)
     {
@@ -65,7 +65,7 @@ void Texture2DArray::OnDeviceReset()
 
         if (!object_.name_)
         {
-            Create();
+            Create_OGL();
             dataLost_ = true;
         }
     }
@@ -73,7 +73,7 @@ void Texture2DArray::OnDeviceReset()
     dataPending_ = false;
 }
 
-void Texture2DArray::Release()
+void Texture2DArray::Release_OGL()
 {
     if (object_.name_)
     {
@@ -100,7 +100,7 @@ void Texture2DArray::Release()
     levelsDirty_ = false;
 }
 
-bool Texture2DArray::SetData(unsigned layer, unsigned level, int x, int y, int width, int height, const void* data)
+bool Texture2DArray::SetData_OGL(unsigned layer, unsigned level, int x, int y, int width, int height, const void* data)
 {
     URHO3D_PROFILE(SetTextureData);
 
@@ -135,7 +135,7 @@ bool Texture2DArray::SetData(unsigned layer, unsigned level, int x, int y, int w
         return true;
     }
 
-    if (IsCompressed())
+    if (IsCompressed_OGL())
     {
         x &= ~3u;
         y &= ~3u;
@@ -149,19 +149,19 @@ bool Texture2DArray::SetData(unsigned layer, unsigned level, int x, int y, int w
         return false;
     }
 
-    graphics_->SetTextureForUpdate(this);
+    graphics_->SetTextureForUpdate_OGL(this);
 
 #ifndef GL_ES_VERSION_2_0
     bool wholeLevel = x == 0 && y == 0 && width == levelWidth && height == levelHeight && layer == 0;
-    unsigned format = GetSRGB() ? GetSRGBFormat(format_) : format_;
+    unsigned format = GetSRGB() ? GetSRGBFormat_OGL(format_) : format_;
 
-    if (!IsCompressed())
+    if (!IsCompressed_OGL())
     {
         if (wholeLevel)
-            glTexImage3D(target_, level, format, width, height, layers_, 0, GetExternalFormat(format_),
-                GetDataType(format_), nullptr);
-        glTexSubImage3D(target_, level, x, y, layer, width, height, 1, GetExternalFormat(format_),
-            GetDataType(format_), data);
+            glTexImage3D(target_, level, format, width, height, layers_, 0, GetExternalFormat_OGL(format_),
+                GetDataType_OGL(format_), nullptr);
+        glTexSubImage3D(target_, level, x, y, layer, width, height, 1, GetExternalFormat_OGL(format_),
+            GetDataType_OGL(format_), data);
     }
     else
     {
@@ -177,16 +177,16 @@ bool Texture2DArray::SetData(unsigned layer, unsigned level, int x, int y, int w
     return true;
 }
 
-bool Texture2DArray::SetData(unsigned layer, Deserializer& source)
+bool Texture2DArray::SetData_OGL(unsigned layer, Deserializer& source)
 {
     SharedPtr<Image> image(new Image(context_));
     if (!image->Load(source))
         return false;
 
-    return SetData(layer, image);
+    return SetData_OGL(layer, image);
 }
 
-bool Texture2DArray::SetData(unsigned layer, Image* image, bool useAlpha)
+bool Texture2DArray::SetData_OGL(unsigned layer, Image* image, bool useAlpha)
 {
     if (!image)
     {
@@ -265,7 +265,7 @@ bool Texture2DArray::SetData(unsigned layer, Image* image, bool useAlpha)
         if (!layer)
         {
             // If image was previously compressed, reset number of requested levels to avoid error if level count is too high for new size
-            if (IsCompressed() && requestedLevels_ > 1)
+            if (IsCompressed_OGL() && requestedLevels_ > 1)
                 requestedLevels_ = 0;
             // Create the texture array (the number of layers must have been already set)
             SetSize(0, levelWidth, levelHeight, format);
@@ -286,7 +286,7 @@ bool Texture2DArray::SetData(unsigned layer, Image* image, bool useAlpha)
 
         for (unsigned i = 0; i < levels_; ++i)
         {
-            SetData(layer, i, 0, 0, levelWidth, levelHeight, levelData);
+            SetData_OGL(layer, i, 0, 0, levelWidth, levelHeight, levelData);
             memoryUse += levelWidth * levelHeight * components;
 
             if (i < levels_ - 1)
@@ -345,14 +345,14 @@ bool Texture2DArray::SetData(unsigned layer, Image* image, bool useAlpha)
             CompressedLevel level = image->GetCompressedLevel(i + mipsToSkip);
             if (!needDecompress)
             {
-                SetData(layer, i, 0, 0, level.width_, level.height_, level.data_);
+                SetData_OGL(layer, i, 0, 0, level.width_, level.height_, level.data_);
                 memoryUse += level.rows_ * level.rowSize_;
             }
             else
             {
                 auto* rgbaData = new unsigned char[level.width_ * level.height_ * 4];
                 level.Decompress(rgbaData);
-                SetData(layer, i, 0, 0, level.width_, level.height_, rgbaData);
+                SetData_OGL(layer, i, 0, 0, level.width_, level.height_, rgbaData);
                 memoryUse += level.width_ * level.height_ * 4;
                 delete[] rgbaData;
             }
@@ -368,7 +368,7 @@ bool Texture2DArray::SetData(unsigned layer, Image* image, bool useAlpha)
     return true;
 }
 
-bool Texture2DArray::GetData(unsigned layer, unsigned level, void* dest) const
+bool Texture2DArray::GetData_OGL(unsigned layer, unsigned level, void* dest) const
 {
 #ifndef GL_ES_VERSION_2_0
     if (!object_.name_ || !graphics_)
@@ -401,10 +401,10 @@ bool Texture2DArray::GetData(unsigned layer, unsigned level, void* dest) const
         return false;
     }
 
-    graphics_->SetTextureForUpdate(const_cast<Texture2DArray*>(this));
+    graphics_->SetTextureForUpdate_OGL(const_cast<Texture2DArray*>(this));
 
-    if (!IsCompressed())
-        glGetTexImage(target_, level, GetExternalFormat(format_), GetDataType(format_), dest);
+    if (!IsCompressed_OGL())
+        glGetTexImage(target_, level, GetExternalFormat_OGL(format_), GetDataType_OGL(format_), dest);
     else
         glGetCompressedTexImage(target_, level, dest);
 
@@ -416,9 +416,9 @@ bool Texture2DArray::GetData(unsigned layer, unsigned level, void* dest) const
 #endif
 }
 
-bool Texture2DArray::Create()
+bool Texture2DArray::Create_OGL()
 {
-    Release();
+    Release_OGL();
 
 #ifdef GL_ES_VERSION_2_0
     URHO3D_LOGERROR("Failed to create 2D array texture, currently unsupported on OpenGL ES 2");
@@ -437,15 +437,15 @@ bool Texture2DArray::Create()
     glGenTextures(1, &object_.name_);
 
     // Ensure that our texture is bound to OpenGL texture unit 0
-    graphics_->SetTextureForUpdate(this);
+    graphics_->SetTextureForUpdate_OGL(this);
 
-    unsigned format = GetSRGB() ? GetSRGBFormat(format_) : format_;
-    unsigned externalFormat = GetExternalFormat(format_);
-    unsigned dataType = GetDataType(format_);
+    unsigned format = GetSRGB() ? GetSRGBFormat_OGL(format_) : format_;
+    unsigned externalFormat = GetExternalFormat_OGL(format_);
+    unsigned dataType = GetDataType_OGL(format_);
 
     // If not compressed, create the initial level 0 texture with null data
     bool success = true;
-    if (!IsCompressed())
+    if (!IsCompressed_OGL())
     {
         glGetError();
         glTexImage3D(target_, 0, format, width_, height_, layers_, 0, externalFormat, dataType, nullptr);
@@ -467,7 +467,7 @@ bool Texture2DArray::Create()
         if (requestedLevels_ != 1)
         {
             // Generate levels for the first time now
-            RegenerateLevels();
+            RegenerateLevels_OGL();
             // Determine max. levels automatically
             requestedLevels_ = 0;
         }

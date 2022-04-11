@@ -204,4 +204,224 @@ void VertexBuffer::UpdateOffsets(PODVector<VertexElement>& elements)
     }
 }
 
+void VertexBuffer::OnDeviceLost()
+{
+    GAPI gapi = Graphics::GetGAPI();
+
+#ifdef URHO3D_OPENGL
+    if (gapi == GAPI_OPENGL)
+        return OnDeviceLost_OGL();
+#endif
+
+#ifdef URHO3D_D3D9
+    if (gapi == GAPI_D3D9)
+        return OnDeviceLost_D3D9();
+#endif
+
+#ifdef URHO3D_D3D11
+    if (gapi == GAPI_D3D11)
+        return OnDeviceLost_D3D11();
+#endif
+}
+
+void VertexBuffer::OnDeviceReset()
+{
+    GAPI gapi = Graphics::GetGAPI();
+
+#ifdef URHO3D_OPENGL
+    if (gapi == GAPI_OPENGL)
+        return OnDeviceReset_OGL();
+#endif
+
+#ifdef URHO3D_D3D9
+    if (gapi == GAPI_D3D9)
+        return OnDeviceReset_D3D9();
+#endif
+
+#ifdef URHO3D_D3D11
+    if (gapi == GAPI_D3D11)
+        return OnDeviceReset_D3D11();
+#endif
+}
+
+void VertexBuffer::Release()
+{
+    GAPI gapi = Graphics::GetGAPI();
+
+#ifdef URHO3D_OPENGL
+    if (gapi == GAPI_OPENGL)
+        return Release_OGL();
+#endif
+
+#ifdef URHO3D_D3D9
+    if (gapi == GAPI_D3D9)
+        return Release_D3D9();
+#endif
+
+#ifdef URHO3D_D3D11
+    if (gapi == GAPI_D3D11)
+        return Release_D3D11();
+#endif
+}
+
+bool VertexBuffer::SetData(const void* data)
+{
+    GAPI gapi = Graphics::GetGAPI();
+
+#ifdef URHO3D_OPENGL
+    if (gapi == GAPI_OPENGL)
+        return SetData_OGL(data);
+#endif
+
+#ifdef URHO3D_D3D9
+    if (gapi == GAPI_D3D9)
+        return SetData_D3D9(data);
+#endif
+
+#ifdef URHO3D_D3D11
+    if (gapi == GAPI_D3D11)
+        return SetData_D3D11(data);
+#endif
+}
+
+bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count, bool discard)
+{
+    GAPI gapi = Graphics::GetGAPI();
+
+#ifdef URHO3D_OPENGL
+    if (gapi == GAPI_OPENGL)
+        return SetDataRange_OGL(data, start, count, discard);
+#endif
+
+#ifdef URHO3D_D3D9
+    if (gapi == GAPI_D3D9)
+        return SetDataRange_D3D9(data, start, count, discard);
+#endif
+
+#ifdef URHO3D_D3D11
+    if (gapi == GAPI_D3D11)
+        return SetDataRange_D3D11(data, start, count, discard);
+#endif
+}
+
+void* VertexBuffer::Lock(unsigned start, unsigned count, bool discard)
+{
+    GAPI gapi = Graphics::GetGAPI();
+
+#ifdef URHO3D_OPENGL
+    if (gapi == GAPI_OPENGL)
+        return Lock_OGL(start, count, discard);
+#endif
+
+#ifdef URHO3D_D3D9
+    if (gapi == GAPI_D3D9)
+        return Lock_D3D9(start, count, discard);
+#endif
+
+#ifdef URHO3D_D3D11
+    if (gapi == GAPI_D3D11)
+        return Lock_D3D11(start, count, discard);
+#endif
+}
+
+void VertexBuffer::Unlock()
+{
+    GAPI gapi = Graphics::GetGAPI();
+
+#ifdef URHO3D_OPENGL
+    if (gapi == GAPI_OPENGL)
+        return Unlock_OGL();
+#endif
+
+#ifdef URHO3D_D3D9
+    if (gapi == GAPI_D3D9)
+        return Unlock_D3D9();
+#endif
+
+#ifdef URHO3D_D3D11
+    if (gapi == GAPI_D3D11)
+        return Unlock_D3D11();
+#endif
+}
+
+bool VertexBuffer::Create()
+{
+    GAPI gapi = Graphics::GetGAPI();
+
+#ifdef URHO3D_OPENGL
+    if (gapi == GAPI_OPENGL)
+        return Create_OGL();
+#endif
+
+#ifdef URHO3D_D3D9
+    if (gapi == GAPI_D3D9)
+        return Create_D3D9();
+#endif
+
+#ifdef URHO3D_D3D11
+    if (gapi == GAPI_D3D11)
+        return Create_D3D11();
+#endif
+}
+
+bool VertexBuffer::UpdateToGPU()
+{
+    GAPI gapi = Graphics::GetGAPI();
+
+#ifdef URHO3D_OPENGL
+    if (gapi == GAPI_OPENGL)
+        return UpdateToGPU_OGL();
+#endif
+
+#ifdef URHO3D_D3D9
+    if (gapi == GAPI_D3D9)
+        return UpdateToGPU_D3D9();
+#endif
+
+#ifdef URHO3D_D3D11
+    if (gapi == GAPI_D3D11)
+        return UpdateToGPU_D3D11();
+#endif
+}
+
+void* VertexBuffer::MapBuffer(unsigned start, unsigned count, bool discard)
+{
+    GAPI gapi = Graphics::GetGAPI();
+
+#ifdef URHO3D_OPENGL
+    if (gapi == GAPI_OPENGL)
+        return MapBuffer_OGL(start, count, discard);
+#endif
+
+#ifdef URHO3D_D3D9
+    if (gapi == GAPI_D3D9)
+        return MapBuffer_D3D9(start, count, discard);
+#endif
+
+#ifdef URHO3D_D3D11
+    if (gapi == GAPI_D3D11)
+        return MapBuffer_D3D11(start, count, discard);
+#endif
+}
+
+void VertexBuffer::UnmapBuffer()
+{
+    GAPI gapi = Graphics::GetGAPI();
+
+#ifdef URHO3D_OPENGL
+    if (gapi == GAPI_OPENGL)
+        return UnmapBuffer_OGL();
+#endif
+
+#ifdef URHO3D_D3D9
+    if (gapi == GAPI_D3D9)
+        return UnmapBuffer_D3D9();
+#endif
+
+#ifdef URHO3D_D3D11
+    if (gapi == GAPI_D3D11)
+        return UnmapBuffer_D3D11();
+#endif
+}
+
 }

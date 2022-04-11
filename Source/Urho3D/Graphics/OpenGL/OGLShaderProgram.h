@@ -35,13 +35,13 @@ class ConstantBuffer;
 class Graphics;
 
 /// Linked shader program on the GPU.
-class URHO3D_API ShaderProgram : public RefCounted, public GPUObject
+class URHO3D_API ShaderProgram_OGL : public RefCounted, public GPUObject
 {
 public:
     /// Construct.
-    ShaderProgram(Graphics* graphics, ShaderVariation* vertexShader, ShaderVariation* pixelShader);
+    ShaderProgram_OGL(Graphics* graphics, ShaderVariation* vertexShader, ShaderVariation* pixelShader);
     /// Destruct.
-    ~ShaderProgram() override;
+    ~ShaderProgram_OGL() override;
 
     /// Mark the GPU resource destroyed on context destruction.
     void OnDeviceLost() override;

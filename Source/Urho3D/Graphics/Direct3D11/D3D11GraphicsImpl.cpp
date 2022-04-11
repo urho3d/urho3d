@@ -23,14 +23,14 @@
 #include "../../Precompiled.h"
 
 #include "../../Graphics/Graphics.h"
-#include "../../Graphics/GraphicsImpl.h"
+#include "D3D11GraphicsImpl.h"
 
 #include "../../DebugNew.h"
 
 namespace Urho3D
 {
 
-GraphicsImpl::GraphicsImpl() :
+GraphicsImpl_D3D11::GraphicsImpl_D3D11() :
     device_(nullptr),
     deviceContext_(nullptr),
     swapChain_(nullptr),
@@ -64,7 +64,7 @@ GraphicsImpl::GraphicsImpl() :
     }
 }
 
-bool GraphicsImpl::CheckMultiSampleSupport(DXGI_FORMAT format, unsigned sampleCount) const
+bool GraphicsImpl_D3D11::CheckMultiSampleSupport(DXGI_FORMAT format, unsigned sampleCount) const
 {
     if (sampleCount < 2)
         return true; // Not multisampled
@@ -76,7 +76,7 @@ bool GraphicsImpl::CheckMultiSampleSupport(DXGI_FORMAT format, unsigned sampleCo
         return numLevels > 0;
 }
 
-unsigned GraphicsImpl::GetMultiSampleQuality(DXGI_FORMAT format, unsigned sampleCount) const
+unsigned GraphicsImpl_D3D11::GetMultiSampleQuality(DXGI_FORMAT format, unsigned sampleCount) const
 {
     if (sampleCount < 2)
         return 0; // Not multisampled, should use quality 0

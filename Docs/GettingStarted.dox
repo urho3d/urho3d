@@ -147,8 +147,9 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_THREADING     |*|Enable thread support, on Web platform default to 0, on other platforms default to 1|
 |URHO3D_TESTING       |0|Enable testing support|
 |URHO3D_TEST_TIMEOUT  |*|Number of seconds to test run the executables (when testing support is enabled only), default to 10 on Web platform and 5 on other platforms|
-|URHO3D_OPENGL        |0|Use OpenGL instead of Direct3D (Windows platform only)|
-|URHO3D_D3D11         |0|Use Direct3D11 instead of Direct3D9 (Windows platform only); overrides URHO3D_OPENGL option|
+|URHO3D_OPENGL        |1|Enable OpenGL support (Windows platform only)|
+|URHO3D_D3D9          |1|Enable Direct3D 9 support (Windows platform only)|
+|URHO3D_D3D11         |1|Enable Direct3D 11 support (Windows platform only)|
 |URHO3D_STATIC_RUNTIME|0|Use static C/C++ runtime libraries and eliminate the need for runtime DLLs installation (VS only)|
 |URHO3D_WIN32_CONSOLE |0|Use console main() instead of WinMain() as entry point when setting up Windows executable targets (Windows platform only)|
 |URHO3D_MACOSX_BUNDLE |0|Use MACOSX_BUNDLE when setting up macOS executable targets (macOS platform only)|
@@ -419,7 +420,10 @@ The engine can be configured using the following command line options.
 -tq <level>  Texture quality level, default 2 (high)
 -tf <level>  Texture filter mode, default 2 (trilinear)
 -af <level>  Texture anisotropy level, default 4. Also sets anisotropic filter mode
+-opengl      Use OpenGL API
 -gl2         Force OpenGL 2 use even if OpenGL 3 is available
+-d3d9        Use Direct3D 9 API
+-d3d11       Use Direct3D 11 API
 -flushgpu    Flush GPU command queue each frame. Effective only on Direct3D
 -borderless  Borderless window mode
 -lowdpi      Force low DPI mode on Retina display

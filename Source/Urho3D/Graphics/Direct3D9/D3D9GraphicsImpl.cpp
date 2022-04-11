@@ -23,14 +23,14 @@
 #include "../../Precompiled.h"
 
 #include "../../Graphics/Graphics.h"
-#include "../../Graphics/GraphicsImpl.h"
+#include "D3D9GraphicsImpl.h"
 
 #include "../../DebugNew.h"
 
 namespace Urho3D
 {
 
-GraphicsImpl::GraphicsImpl() :
+GraphicsImpl_D3D9::GraphicsImpl_D3D9() :
     interface_(nullptr),
     device_(nullptr),
     defaultColorSurface_(nullptr),
@@ -45,13 +45,13 @@ GraphicsImpl::GraphicsImpl() :
     memset(&presentParams_, 0, sizeof presentParams_);
 }
 
-bool GraphicsImpl::CheckFormatSupport(D3DFORMAT format, DWORD usage, D3DRESOURCETYPE type)
+bool GraphicsImpl_D3D9::CheckFormatSupport(D3DFORMAT format, DWORD usage, D3DRESOURCETYPE type)
 {
     return interface_ ? SUCCEEDED(interface_->CheckDeviceFormat(adapter_, deviceType_, D3DFMT_X8R8G8B8, usage, type, format)) :
         false;
 }
 
-bool GraphicsImpl::CheckMultiSampleSupport(D3DFORMAT format, int level)
+bool GraphicsImpl_D3D9::CheckMultiSampleSupport(D3DFORMAT format, int level)
 {
     return interface_ ? SUCCEEDED(interface_->CheckDeviceMultiSampleType(adapter_, deviceType_, format, FALSE,
         (D3DMULTISAMPLE_TYPE)level, nullptr)) : false;

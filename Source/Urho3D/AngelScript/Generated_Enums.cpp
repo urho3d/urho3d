@@ -923,6 +923,13 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     engine->RegisterEnumValue("FrustumPlane", "PLANE_DOWN", PLANE_DOWN);
     engine->RegisterEnumValue("FrustumPlane", "PLANE_FAR", PLANE_FAR);
 
+    // enum GAPI | File: ../Graphics/GraphicsDefs.h
+    engine->RegisterEnum("GAPI");
+    engine->RegisterEnumValue("GAPI", "GAPI_NONE", GAPI_NONE);
+    engine->RegisterEnumValue("GAPI", "GAPI_OPENGL", GAPI_OPENGL);
+    engine->RegisterEnumValue("GAPI", "GAPI_D3D9", GAPI_D3D9);
+    engine->RegisterEnumValue("GAPI", "GAPI_D3D11", GAPI_D3D11);
+
     // enum GeometryType | File: ../Graphics/GraphicsDefs.h
     engine->RegisterEnum("GeometryType");
     engine->RegisterEnumValue("GeometryType", "GEOM_STATIC", GEOM_STATIC);

@@ -339,13 +339,12 @@ else ()
   set (DIRECTX OFF)  # Make it off explicitly when not targeting Windows platform, just in case user passes it in accidentally via CLI
 endif ()
 dep_option(WASAPI              "Use the Windows WASAPI audio driver" ON WINDOWS OFF)
-# Urho3D - commented out RENDER_D3D as an option to avoid potential conflict with our URHO3D_OPENGL and URHO3D_D3D11 build options on Windows platform
-#          Instead just initialize the variable according to our build options; Urho3D also by default disables the SDL renderer subsystem
+# Urho3D
 if (WINDOWS)
-  if (URHO3D_OPENGL)
-    set (RENDER_D3D FALSE)
-  else ()
+  if (URHO3D_D3D9 OR URHO3D_D3D11)
     set (RENDER_D3D TRUE)
+  else ()
+    set (RENDER_D3D FALSE)
   endif ()
 endif ()
 dep_option(VIDEO_VIVANTE       "Use Vivante EGL video driver" ON UNIX_SYS OFF)
