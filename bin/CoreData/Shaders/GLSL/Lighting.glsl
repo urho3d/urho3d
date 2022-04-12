@@ -163,6 +163,7 @@ float GetDiffuseVolumetric(vec3 worldPos)
     #endif
 }
 
+// https://en.wikipedia.org/wiki/Blinn%E2%80%93Phong_reflection_model
 float GetSpecular(vec3 normal, vec3 eyeVec, vec3 lightDir, float specularPower)
 {
     vec3 halfVec = normalize(normalize(eyeVec) + lightDir);  
