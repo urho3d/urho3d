@@ -359,7 +359,7 @@ public:
     GraphicsImpl_OGL* GetImpl_OGL() const
     {
         assert(Graphics::GetGAPI() == GAPI_OPENGL);
-        return (GraphicsImpl_OGL*)impl_;
+        return static_cast<GraphicsImpl_OGL*>(impl_);
     }
 #endif
 
@@ -368,7 +368,7 @@ public:
     GraphicsImpl_D3D9* GetImpl_D3D9() const
     {
         assert(Graphics::GetGAPI() == GAPI_D3D9);
-        return (GraphicsImpl_D3D9*)impl_;
+        return static_cast<GraphicsImpl_D3D9*>(impl_);
     }
 #endif
 
@@ -377,7 +377,7 @@ public:
     GraphicsImpl_D3D11* GetImpl_D3D11() const
     {
         assert(Graphics::GetGAPI() == GAPI_D3D11);
-        return (GraphicsImpl_D3D11*)impl_;
+        return static_cast<GraphicsImpl_D3D11*>(impl_);
     }
 #endif
 
