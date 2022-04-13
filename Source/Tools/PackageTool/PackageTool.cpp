@@ -58,7 +58,6 @@ Vector<FileEntry> entries_;
 unsigned checksum_ = 0;
 bool compress_ = false;
 bool quiet_ = false;
-bool decompress_ = false;
 unsigned blockSize_ = COMPRESSED_BLOCK_SIZE;
 
 String ignoreExtensions_[] = {
@@ -69,6 +68,8 @@ String ignoreExtensions_[] = {
 
 int main(int argc, char** argv);
 void Run(const Vector<String>& arguments);
+void Pack(const Vector<String>& arguments);
+void Unpack(const Vector<String>& arguments);
 void ProcessFile(const String& fileName, const String& rootDir);
 void WritePackageFile(const String& fileName, const String& rootDir);
 void WriteHeader(File& dest);
@@ -87,183 +88,213 @@ int main(int argc, char** argv)
     return 0;
 }
 
-void Run(const Vector<String>& arguments)
-{
-    if (arguments.Size() < 2)
-        ErrorExit(
-            "Usage: PackageTool <directory to process> <package name> [basepath] [options]\n"
-            "\n"
-            "Options:\n"
-            "-c      Enable package file LZ4 compression\n"
-            "-q      Enable quiet mode\n"
-            "-d      Enable decompression\n"
-            "\n"
-            "Basepath is an optional prefix that will be added to the file entries.\n\n"
-            "Alternative output usage: PackageTool <output option> <package name> <directory>\n"
-            "Output option:\n"
-            "-i      Output package file information\n"
-            "-l      Output file names (including their paths) contained in the package\n"
-            "-L      Similar to -l but also output compression ratio (compressed package file only)\n"
-        );
+static const String USAGE_STR = 
+    "Usage:\n"
+    "1) Packing: PackageTool -p<options> <input directory name> <output package name> [base path]\n"
+    "   Options:\n"
+    "   * q - enable quiet mode\n"
+    "   * c - enable LZ4 compression\n"
+    "   Base path is an optional prefix that will be added to the file entries.\n"
+    "   Example: PackageTool -pqc CoreData CoreData.pak\n"
+    "2) Unpacking: PackageTool -u<options> <input package name> <output directory name>\n"
+    "   Options:\n"
+    "   * q - enable quiet mode\n"
+    "   Example: PackageTool -uq CoreData.pak CoreData\n"
+    "3) Print info: PackageTool -<mode> <package name>\n"
+    "   Modes:\n"
+    "   i - print package file information\n"
+    "   l - print file names (including their paths) contained in the package\n"
+    "   L - similar to l but also output compression ratio (compressed package file only)\n"
+    "   Example: PackageTool -i CoreData.pak";
 
-    const String& dirName = arguments[0];
-    const String& packageName = arguments[1];
-    bool isOutputMode = arguments[0].Length() == 2 && arguments[0][0] == '-';
-    if (arguments.Size() > 2)
+void Pack(const Vector<String>& arguments)
+{
+    if (arguments.Size() != 3 && arguments.Size() != 4)
+        ErrorExit(USAGE_STR);
+
+    const String& mode = arguments[0]; // Starts with -p
+
+    for (unsigned i = 2; i < mode.Length(); ++i)
     {
-        for (unsigned i = 2; i < arguments.Size(); ++i)
+        if (mode[i] == 'q')
+            quiet_ = true;
+        else if (mode[i] == 'c')
+            compress_ = true;
+        else
+            ErrorExit("Unrecognized option");
+    }
+
+    const String& dirName = arguments[1];
+    const String& packageName = arguments[2];
+    
+    if (arguments.Size() == 4)
+        basePath_ = arguments[3];
+
+    if (!quiet_)
+        PrintLine("Scanning directory " + dirName + " for files");
+
+    // Get the file list recursively
+    Vector<String> fileNames;
+    fileSystem_->ScanDir(fileNames, dirName, "*.*", SCAN_FILES, true);
+    if (!fileNames.Size())
+        ErrorExit("No files found");
+
+    // Check for extensions to ignore
+    for (unsigned i = fileNames.Size() - 1; i < fileNames.Size(); --i)
+    {
+        String extension = GetExtension(fileNames[i]);
+        for (unsigned j = 0; ignoreExtensions_[j].Length(); ++j)
         {
-            if (arguments[i][0] != '-')
-                basePath_ = AddTrailingSlash(arguments[i]);
-            else
+            if (extension == ignoreExtensions_[j])
             {
-                if (arguments[i].Length() > 1)
-                {
-                    switch (arguments[i][1])
-                    {
-                    case 'c':
-                        compress_ = true;
-                        break;
-                    case 'q':
-                        quiet_ = true;
-                        break;
-                    case 'd':
-                        decompress_ = true;
-                        break;
-                    default:
-                        ErrorExit("Unrecognized option");
-                    }
-                }
+                fileNames.Erase(fileNames.Begin() + i);
+                break;
             }
         }
     }
 
-    if (!isOutputMode)
+    for (unsigned i = 0; i < fileNames.Size(); ++i)
+        ProcessFile(fileNames[i], dirName);
+
+    WritePackageFile(packageName, dirName);
+}
+
+void Unpack(const Vector<String>& arguments)
+{
+    if (arguments.Size() != 3)
+        ErrorExit(USAGE_STR);
+
+    const String& mode = arguments[0]; // Starts with -u
+
+    for (unsigned i = 2; i < mode.Length(); ++i)
     {
-        if (compress_)
+        if (mode[i] == 'q')
+            quiet_ = true;
+        else
+            ErrorExit("Unrecognized option");
+    }
+
+    const String& packageName = arguments[1];
+    const String& dirName = arguments[2];
+
+    FileSystem fs(context_);
+    SharedPtr<PackageFile> packageFile(new PackageFile(context_, packageName));
+
+#define MAX_ONCE 512
+    char buffer[MAX_ONCE] = "";
+
+    const HashMap<String, PackageEntry>& entries = packageFile->GetEntries();
+    for (HashMap<String, PackageEntry>::ConstIterator i = entries.Begin(); i != entries.End();)
+    {
+        HashMap<String, PackageEntry>::ConstIterator current = i++;
+        String fileEntry(dirName + "/" + current->first_);
+        unsigned pos = fileEntry.FindLast('/');
+        if (pos < 0)
+            ErrorExit(fileEntry);
+
+        fs.CreateDir(fileEntry.Substring(0, pos));
+
+        File readfile(context_, packageFile, current->first_);
+        if (!readfile.IsOpen())
+            ErrorExit("readfile open failed " + fileEntry);
+
+        File savefile(context_, fileEntry, FILE_WRITE);
+        if (!savefile.IsOpen())
+            ErrorExit("savefile open failed " + fileEntry);
+
+        if (!quiet_)
+            PrintLine("write file: " + fileEntry);
+
+        unsigned size_ = 0;
+        unsigned size2_ = 0;
+        while (1)
         {
-            if (!quiet_)
-                PrintLine("Scanning directory " + dirName + " for files");
-
-            // Get the file list recursively
-            Vector<String> fileNames;
-            fileSystem_->ScanDir(fileNames, dirName, "*.*", SCAN_FILES, true);
-            if (!fileNames.Size())
-                ErrorExit("No files found");
-
-            // Check for extensions to ignore
-            for (unsigned i = fileNames.Size() - 1; i < fileNames.Size(); --i)
+            size_ = readfile.Read(buffer, MAX_ONCE);
+            if (size_ == 0)
             {
-                String extension = GetExtension(fileNames[i]);
-                for (unsigned j = 0; ignoreExtensions_[j].Length(); ++j)
-                {
-                    if (extension == ignoreExtensions_[j])
-                    {
-                        fileNames.Erase(fileNames.Begin() + i);
-                        break;
-                    }
-                }
+                readfile.Close();
+                savefile.Close();
+                break;
             }
 
-            for (unsigned i = 0; i < fileNames.Size(); ++i)
-                ProcessFile(fileNames[i], dirName);
-
-            WritePackageFile(packageName, dirName);
+            size2_ = 0;
+            while (1)
+            {
+                size2_ += savefile.Write(buffer + size2_, size_ - size2_);
+                if (size2_ == size_)
+                    break;
+            }
         }
-        else if (decompress_){
-            FileSystem fs(context_);
-            SharedPtr<PackageFile> packageFile(new PackageFile(context_, packageName));
-#define MAX_ONCE 512
-            char buffer[MAX_ONCE] = "";
+    }
 
+    if (!quiet_)
+        PrintLine("Done.");
+}
+
+void PrintInfo(const Vector<String>& arguments)
+{
+    if (arguments.Size() != 2)
+        ErrorExit(USAGE_STR);
+
+    const String& packageName = arguments[1];
+    SharedPtr<PackageFile> packageFile(new PackageFile(context_, packageName));
+    bool outputCompressionRatio = false;
+
+    switch (arguments[0][1])
+    {
+    case 'i':
+        PrintLine("Number of files: " + String(packageFile->GetNumFiles()));
+        PrintLine("File data size: " + String(packageFile->GetTotalDataSize()));
+        PrintLine("Package size: " + String(packageFile->GetTotalSize()));
+        PrintLine("Checksum: " + String(packageFile->GetChecksum()));
+        PrintLine("Compressed: " + String(packageFile->IsCompressed() ? "yes" : "no"));
+        break;
+    case 'L':
+        if (!packageFile->IsCompressed())
+            ErrorExit("Invalid output option: -L is applicable for compressed package file only");
+        outputCompressionRatio = true;
+        [[fallthrough]];
+    case 'l':
+        {
             const HashMap<String, PackageEntry>& entries = packageFile->GetEntries();
             for (HashMap<String, PackageEntry>::ConstIterator i = entries.Begin(); i != entries.End();)
             {
                 HashMap<String, PackageEntry>::ConstIterator current = i++;
-                String fileEntry(dirName + "/" + current->first_);
-                unsigned pos = fileEntry.FindLast('/');
-                if (pos<0)
-                    ErrorExit(fileEntry);
-
-                fs.CreateDir(fileEntry.Substring(0, pos));
-   
-                File readfile(context_, packageFile, current->first_);
-                if (!readfile.IsOpen())
-                    ErrorExit("readfile open failed " + fileEntry);
-
-                File savefile(context_,fileEntry, FILE_WRITE);
-                if (!savefile.IsOpen())
-                    ErrorExit("savefile open failed "+fileEntry);
-
-
-                PrintLine("write file: " + fileEntry);
-
-                unsigned size_ = 0;
-                unsigned size2_ = 0;
-                while (1)
+                String fileEntry(current->first_);
+                if (outputCompressionRatio)
                 {
-                    size_ = readfile.Read(buffer, MAX_ONCE);
-                    if (size_ == 0)
-                    {
-                        readfile.Close();
-                        savefile.Close();
-                        break;
-                    }
-
-                    size2_ = 0;
-                    while (1)
-                    {
-                        size2_ += savefile.Write(buffer + size2_, size_ - size2_);
-                        if (size2_ == size_)
-                            break;
-                    }
+                    unsigned compressedSize =
+                        (i == entries.End() ? packageFile->GetTotalSize() - sizeof(unsigned) : i->second_.offset_) -
+                        current->second_.offset_;
+                    fileEntry.AppendWithFormat("\tin: %u\tout: %u\tratio: %f", current->second_.size_, compressedSize,
+                        compressedSize ? 1.f * current->second_.size_ / compressedSize : 0.f);
                 }
-
-                PrintLine("done...");
+                PrintLine(fileEntry);
             }
         }
+        break;
+    default:
+        ErrorExit("Unrecognized output option");
     }
+}
+
+void Run(const Vector<String>& arguments)
+{
+    if (arguments.Size() < 2)
+        ErrorExit(USAGE_STR);
+
+    const String& mode = arguments[0];
+    if (mode.Length() < 2 || mode[0] != '-')
+        ErrorExit(USAGE_STR);
+
+    if (mode[1] == 'p')
+        Pack(arguments);
+    else if (mode[1] == 'u')
+        Unpack(arguments);
+    else if (mode[1] == 'i' || mode[1] == 'l' || mode[1] == 'L')
+        PrintInfo(arguments);
     else
-    {
-        SharedPtr<PackageFile> packageFile(new PackageFile(context_, packageName));
-        bool outputCompressionRatio = false;
-        switch (arguments[0][1])
-        {
-        case 'i':
-            PrintLine("Number of files: " + String(packageFile->GetNumFiles()));
-            PrintLine("File data size: " + String(packageFile->GetTotalDataSize()));
-            PrintLine("Package size: " + String(packageFile->GetTotalSize()));
-            PrintLine("Checksum: " + String(packageFile->GetChecksum()));
-            PrintLine("Compressed: " + String(packageFile->IsCompressed() ? "yes" : "no"));
-            break;
-        case 'L':
-            if (!packageFile->IsCompressed())
-                ErrorExit("Invalid output option: -L is applicable for compressed package file only");
-            outputCompressionRatio = true;
-            // Fallthrough
-        case 'l':
-            {
-                const HashMap<String, PackageEntry>& entries = packageFile->GetEntries();
-                for (HashMap<String, PackageEntry>::ConstIterator i = entries.Begin(); i != entries.End();)
-                {
-                    HashMap<String, PackageEntry>::ConstIterator current = i++;
-                    String fileEntry(current->first_);
-                    if (outputCompressionRatio)
-                    {
-                        unsigned compressedSize =
-                            (i == entries.End() ? packageFile->GetTotalSize() - sizeof(unsigned) : i->second_.offset_) -
-                            current->second_.offset_;
-                        fileEntry.AppendWithFormat("\tin: %u\tout: %u\tratio: %f", current->second_.size_, compressedSize,
-                            compressedSize ? 1.f * current->second_.size_ / compressedSize : 0.f);
-                    }
-                    PrintLine(fileEntry);
-                }
-            }
-            break;
-        default:
-            ErrorExit("Unrecognized output option");
-        }
-    }
+        ErrorExit(USAGE_STR);
 }
 
 void ProcessFile(const String& fileName, const String& rootDir)
