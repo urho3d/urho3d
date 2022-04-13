@@ -20,9 +20,6 @@
 // THE SOFTWARE.
 //
 
-// how to decompress 
-// packagetool   ./pack2  ./pack2.pak     -d
-
 #include <Urho3D/Core/Context.h>
 #include <Urho3D/Container/ArrayPtr.h>
 #include <Urho3D/Core/ProcessUtils.h>
