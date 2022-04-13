@@ -174,58 +174,52 @@ void Unpack(const Vector<String>& arguments)
     const String& packageName = arguments[1];
     const String& dirName = arguments[2];
 
-    FileSystem fs(context_);
     SharedPtr<PackageFile> packageFile(new PackageFile(context_, packageName));
 
-#define MAX_ONCE 512
-    char buffer[MAX_ONCE] = "";
+    char buffer[1024];
 
     const HashMap<String, PackageEntry>& entries = packageFile->GetEntries();
     for (HashMap<String, PackageEntry>::ConstIterator i = entries.Begin(); i != entries.End();)
     {
         HashMap<String, PackageEntry>::ConstIterator current = i++;
-        String fileEntry(dirName + "/" + current->first_);
-        unsigned pos = fileEntry.FindLast('/');
-        if (pos < 0)
-            ErrorExit(fileEntry);
+        String outFilePath(dirName + "/" + current->first_);
+        unsigned pos = outFilePath.FindLast('/');
+        if (pos == String::NPOS)
+            ErrorExit("pos == String::NPOS");
 
-        fs.CreateDir(fileEntry.Substring(0, pos));
+        fileSystem_->CreateDir(outFilePath.Substring(0, pos));
 
-        File readfile(context_, packageFile, current->first_);
-        if (!readfile.IsOpen())
-            ErrorExit("readfile open failed " + fileEntry);
+        File packedFile(context_, packageFile, current->first_);
+        if (!packedFile.IsOpen())
+            ErrorExit("packedFile open failed " + current->first_);
 
-        File savefile(context_, fileEntry, FILE_WRITE);
-        if (!savefile.IsOpen())
-            ErrorExit("savefile open failed " + fileEntry);
+        File outFile(context_, outFilePath, FILE_WRITE);
+        if (!outFile.IsOpen())
+            ErrorExit("outFile open failed " + current->first_);
 
         if (!quiet_)
-            PrintLine("write file: " + fileEntry);
+            PrintLine("Write file: " + outFilePath);
 
-        unsigned size_ = 0;
-        unsigned size2_ = 0;
-        while (1)
+        unsigned numRead, numWrite;
+        
+        while (true)
         {
-            size_ = readfile.Read(buffer, MAX_ONCE);
-            if (size_ == 0)
+            numRead = packedFile.Read(buffer, sizeof(buffer));
+            if (!numRead)
             {
-                readfile.Close();
-                savefile.Close();
+                packedFile.Close();
+                outFile.Close();
                 break;
             }
 
-            size2_ = 0;
-            while (1)
-            {
-                size2_ += savefile.Write(buffer + size2_, size_ - size2_);
-                if (size2_ == size_)
-                    break;
-            }
+            numWrite = outFile.Write(buffer, numRead);
+            if (numWrite != numRead)
+                ErrorExit("numWrite != numRead");
         }
     }
 
     if (!quiet_)
-        PrintLine("Done.");
+        PrintLine("Done");
 }
 
 void PrintInfo(const Vector<String>& arguments)
@@ -365,7 +359,7 @@ void WritePackageFile(const String& fileName, const String& rootDir)
                 PrintLine(entries_[i].name_ + " size " + String(dataSize));
             dest.Write(&buffer[0], entries_[i].size_);
         }
-        else//compress
+        else // Compress 
         {
             SharedArrayPtr<unsigned char> compressBuffer(new unsigned char[LZ4_compressBound(blockSize_)]);
 
