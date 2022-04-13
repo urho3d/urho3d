@@ -3545,7 +3545,7 @@ When PackageTool runs, it will go inside the source directory, then look for sub
 For example, this would convert all the resource files inside the Urho3D Data directory into a package called Data.pak (execute the command from the bin directory)
 
 \verbatim
-PackageTool -pqc Data Data.pak\n"
+PackageTool -pqc Data Data.pak"
 \endverbatim
 
 The -c option enables LZ4 compression on the files. The -q option enables the operation to be performed without sending output to the standard output stream.
