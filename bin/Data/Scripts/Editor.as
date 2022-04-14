@@ -104,24 +104,24 @@ void ParseArguments()
     Array<String> arguments = GetArguments();
     bool loaded = false;
 
-    // Scan for a scene to load
     for (uint i = 1; i < arguments.length; ++i)
     {
         if (arguments[i].ToLower() == "-scene")
         {
-            if (++i < arguments.length)
-            {
-                loaded = LoadScene(arguments[i]);
+            if (++i == arguments.length)
                 break;
-            }
+
+            loaded = LoadScene(arguments[i]);
+            continue;
         }
+
         if (arguments[i].ToLower() == "-language")
         {
-            if (++i < arguments.length)
-            {
-                localization.SetLanguage(arguments[i]);
+            if (++i == arguments.length)
                 break;
-            }
+
+            localization.SetLanguage(arguments[i]);
+            continue;
         }
     }
 
