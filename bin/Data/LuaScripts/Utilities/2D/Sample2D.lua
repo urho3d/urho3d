@@ -445,6 +445,7 @@ function SpawnEffect(node)
     particleNode:SetScale(0.5 / node.scale.x)
     local particleEmitter = particleNode:CreateComponent("ParticleEmitter2D")
     particleEmitter.effect = cache:GetResource("ParticleEffect2D", "Urho2D/sun.pex")
+    particleEmitter.layer = 2
 end
 
 function PlaySound(soundName)
