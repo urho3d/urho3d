@@ -89,6 +89,9 @@ function SubscribeToEvents()
     -- Subscribe to PostRenderUpdate to draw physics shapes
     SubscribeToEvent("PostRenderUpdate", "HandlePostRenderUpdate")
 
+    -- Subscribe to Box2D contact listeners
+    SubscribeToEvent("PhysicsBeginContact2D", "HandleCollisionBegin")
+
     -- Unsubscribe the SceneUpdate event from base class to prevent camera pitch and yaw in 2D sample
     UnsubscribeFromEvent("SceneUpdate")
 end
@@ -119,8 +122,61 @@ end
 function HandlePostRenderUpdate(eventType, eventData)
     if drawDebug then
         scene_:GetComponent("PhysicsWorld2D"):DrawDebugGeometry(true)
+        local tileMapNode = scene_:GetChild("TileMap", true)
+        local map = tileMapNode:GetComponent("TileMap2D")
+        map:DrawDebugGeometry(scene_:GetComponent("DebugRenderer"), false)
     end
 end
+
+function HandleCollisionBegin(eventType, eventData)
+    -- Get colliding node
+    local hitNode = eventData["NodeA"]:GetPtr("Node")
+    if hitNode.name == "Imp" then
+        hitNode = eventData["NodeB"]:GetPtr("Node")
+    end
+    local nodeName = hitNode.name
+    local character = character2DNode:GetScriptObject("Character2D")
+
+    -- Handle coins picking
+    if nodeName == "Coin" then
+        hitNode:Remove()
+        character.remainingCoins = character.remainingCoins - 1
+        if character.remainingCoins == 0 then
+            local instructions = ui.root:GetChild("Instructions", true)
+            instructions.text = "!!! You got all the coins !!!"
+        end
+        local coinsText = ui.root:GetChild("CoinsText", true)
+        coinsText.text = character.remainingCoins -- Update coins UI counter
+        PlaySound("Powerup.wav")
+    end
+
+    -- Handle interactions with enemies
+    if nodeName == "Orc" then
+        local animatedSprite = character2DNode:GetComponent("AnimatedSprite2D")
+        local deltaX = character2DNode.position.x - hitNode.position.x
+
+        -- Orc killed if character is fighting in its direction when the contact occurs
+        if animatedSprite.animation == "attack" and deltaX < 0 == animatedSprite.flipX then
+            hitNode:GetScriptObject("Mover").emitTime = 1
+            if hitNode:GetChild("Emitter", true) == nil then
+                hitNode:GetComponent("RigidBody2D"):Remove() -- Remove Orc's body
+                SpawnEffect(hitNode)
+                PlaySound("BigExplosion.wav")
+            end
+        -- Player killed if not fighting in the direction of the Orc when the contact occurs
+        else
+            if character2DNode:GetChild("Emitter", true) == nil then
+                character.wounded = true
+                if nodeName == "Orc" then
+                    hitNode:GetScriptObject("Mover").fightTimer = 1
+                end
+                SpawnEffect(character2DNode)
+                PlaySound("BigExplosion.wav")
+            end
+        end
+    end
+end
+
 
 -- Character2D script object class
 Character2D = ScriptObject()
@@ -135,6 +191,21 @@ function Character2D:Start()
 end
 
 function Character2D:Update(timeStep)
+
+    if character2DNode == nil then
+        return
+    end
+
+    -- Handle wounded/killed states
+    if self.killed then
+        return
+    end
+
+    if self.wounded then
+        self:HandleWoundedState(timeStep)
+        return
+    end
+
     local node = self.node
     local animatedSprite = node:GetComponent("AnimatedSprite2D")
 
@@ -179,5 +250,81 @@ function Character2D:Update(timeStep)
         end
     elseif animatedSprite.animation ~= "idle" then
         animatedSprite:SetAnimation("idle")
+    end
+end
+
+function Character2D:HandleWoundedState(timeStep)
+
+    local node = self.node
+    local body = node:GetComponent("RigidBody2D")
+    local animatedSprite = node:GetComponent("AnimatedSprite2D")
+
+    -- Play "hit" animation in loop
+    if animatedSprite.animation ~= "hit" then
+        animatedSprite:SetAnimation("hit", LM_FORCE_LOOPED)
+    end
+
+    -- Update timer
+    self.timer = self.timer + timeStep
+
+    if self.timer > 2.0 then
+        -- Reset timer
+        self.timer = 0.0
+
+        -- Clear forces (should be performed by setting linear velocity to zero, but currently doesn't work)
+        body.linearVelocity = Vector2(0.0, 0.0)
+        body.awake = false
+        body.awake = true
+
+        -- Remove particle emitter
+        node:GetChild("Emitter", true):Remove()
+
+        -- Update lifes UI and counter
+        self.remainingLifes = self.remainingLifes - 1
+        local lifeText = ui.root:GetChild("LifeText", true)
+        lifeText.text = self.remainingLifes -- Update lifes UI counter
+
+        -- Reset wounded state
+        self.wounded = false
+
+        -- Handle death
+        if self.remainingLifes == 0 then
+            self:HandleDeath()
+            return
+        end
+
+        -- Re-position the character to the nearest point
+        if node.position.x < 15.0 then
+            node.position = Vector3(1.0, 8.0, 0.0)
+        else
+            node.position = Vector3(18.8, 9.2, 0.0)
+        end
+    end
+end
+
+function Character2D:HandleDeath()
+
+    local node = self.node
+    local animatedSprite = node:GetComponent("AnimatedSprite2D")
+
+    -- Set state to 'killed'
+    self.killed = true
+
+    -- Update UI elements
+    local instructions = ui.root:GetChild("Instructions", true)
+    instructions.text = "!!! GAME OVER !!!"
+    ui.root:GetChild("ExitButton", true).visible = true
+    ui.root:GetChild("PlayButton", true).visible = true
+
+    -- Show mouse cursor so that we can click
+    input.mouseVisible = true
+
+    -- Put character outside of the scene and magnify him
+    node.position = Vector3(-20.0, 0.0, 0.0)
+    node:SetScale(1.2)
+
+    -- Play death animation once
+    if animatedSprite.animation ~= "dead2" then
+        animatedSprite:SetAnimation("dead2")
     end
 end
