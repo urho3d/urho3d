@@ -66,5 +66,6 @@ void Test_Container_Str()
     {
         String str = "bool Swap(T[]&)";
         str.Replace(10, 3, "Array<T>");
+        assert(str == "bool Swap(Array<T>&)");
     }
 }
