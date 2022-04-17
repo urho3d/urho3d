@@ -34,24 +34,14 @@ using namespace Urho3D;
 
 void Test_Container_Str();
 
-void Run(const Vector<String>& arguments)
+void Run()
 {
-    // arguments are not used yet
-
     Test_Container_Str();
 }
 
 int main(int argc, char* argv[])
 {
-    Vector<String> arguments;
-
-#ifdef WIN32
-    arguments = ParseArguments(GetCommandLineW());
-#else
-    arguments = ParseArguments(argc, argv);
-#endif
-
-    Run(arguments);
+    Run();
 
     std::cout << "All tests success" << std::endl;
 
