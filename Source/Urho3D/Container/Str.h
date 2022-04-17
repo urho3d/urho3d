@@ -537,7 +537,7 @@ private:
         /// Number of bytes without null terminator.
         u32 length_;
         
-        // Size of buffer_.
+        /// Size of buffer_.
         u32 capacity_;
     };
 
@@ -568,7 +568,7 @@ private:
     /// MSB of the last byte is used as a flag.
     inline static constexpr u8 SSO_MASK = 0b10000000u;
     
-    inline static constexpr u32 INVERTED_SSO_MASK = ~SSO_MASK;
+    inline static constexpr u8 INVERTED_SSO_MASK = ~SSO_MASK;
 
     unsigned GetShortStringLength() const
     {
