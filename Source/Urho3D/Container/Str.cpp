@@ -413,24 +413,24 @@ void String::Resize(unsigned newLength)
         while (capacity < newLength + 1)
             capacity += (capacity + 1) >> 1u;
 
-        if (capacity > SHORT_STRING_CAPACITY) // New buffer in heap
-        {
-            char* newBuffer = new char[capacity];
+        // SHORT_STRING_CAPACITY is minimal possible capacity
+        assert(capacity > SHORT_STRING_CAPACITY);
 
-            // Move the existing data to the new buffer
-            unsigned oldLength = Length();
-            if (oldLength)
-                CopyChars(newBuffer, GetBuffer(), oldLength);
+        char* newBuffer = new char[capacity];
 
-            // Delete the old buffer if in heap
-            if (!IsShort())
-                delete[] data_.longString_.buffer_;
+        // Move the existing data to the new buffer
+        unsigned oldLength = Length();
+        if (oldLength)
+            CopyChars(newBuffer, GetBuffer(), oldLength);
 
-            newBuffer[newLength] = '\0';
-            data_.longString_.buffer_ = newBuffer;
-            data_.longString_.capacity_ = capacity;
-            data_.longString_.length_ = newLength;
-        }
+        // Delete the old buffer if in heap
+        if (!IsShort())
+            delete[] data_.longString_.buffer_;
+
+        newBuffer[newLength] = '\0';
+        data_.longString_.buffer_ = newBuffer;
+        data_.longString_.capacity_ = capacity;
+        data_.longString_.length_ = newLength;
     }
     else // Old buffer is used
     {
