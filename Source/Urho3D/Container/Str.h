@@ -555,9 +555,13 @@ private:
 
     static_assert(sizeof(LongString) == sizeof(ShortString));
 
+    // https://github.com/doxygen/doxygen/issues/7623
     union
     {
+        // @nobind
         LongString longString_;
+        
+        // @nobind
         ShortString shortString_;
     } data_;
 
