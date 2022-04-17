@@ -62,4 +62,9 @@ void Test_Container_Str()
         assert(str == "aa!bb!CC");
         assert(str.IsShort());
     }
+
+    {
+        String str = "bool Swap(T[]&)";
+        str.Replace(10, 3, "Array<T>");
+    }
 }

@@ -1282,11 +1282,14 @@ void String::Replace(unsigned pos, unsigned length, const char* srcStart, unsign
         if (delta > 0)
         {
             Resize(thisLength + delta);
+            thisLength = Length();
             MoveRange(pos + srcLength, pos + length, thisLength - pos - length - delta);
         }
     }
     else
+    {
         Resize(thisLength + delta);
+    }
 
     CopyChars(GetBuffer() + pos, srcStart, srcLength);
 }
