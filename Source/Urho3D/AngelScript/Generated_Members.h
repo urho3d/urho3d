@@ -5070,9 +5070,9 @@ template <class T> void RegisterMembers_String(asIScriptEngine* engine, const ch
     // Error: type "const char*" can not automatically bind
 
     // LongString String::longString_
-    // Error: type "LongString" can not automatically bind
+    // Not registered because have @nobind mark
     // ShortString String::shortString_
-    // Error: type "ShortString" can not automatically bind
+    // Not registered because have @nobind mark
 
     // static const unsigned String::NPOS
     engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const uint NPOS", (void*)&T::NPOS);engine->SetDefaultNamespace("");

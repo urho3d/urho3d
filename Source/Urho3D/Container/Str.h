@@ -558,10 +558,10 @@ private:
     // https://github.com/doxygen/doxygen/issues/7623
     union
     {
-        // @nobind
+        /// @nobind
         LongString longString_;
         
-        // @nobind
+        /// @nobind
         ShortString shortString_;
     } data_;
 
