@@ -531,7 +531,7 @@ public:
 private:
     struct LongString
     {
-        // Data.
+        /// Data.
         char* buffer_;
 
         /// Number of bytes without null terminator.
