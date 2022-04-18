@@ -35,122 +35,96 @@
 namespace Urho3D
 {
 
-char String::endZero = 0;
-
 const String String::EMPTY;
 
-String::String(const WString& str) :
-    length_(0),
-    capacity_(0),
-    buffer_(&endZero)
+String::String(const WString& str)
+    : String()
 {
     SetUTF8FromWChar(str.CString());
 }
 
-String::String(int value) :
-    length_(0),
-    capacity_(0),
-    buffer_(&endZero)
+String::String(int value)
+    : String()
 {
     char tempBuffer[CONVERSION_BUFFER_LENGTH];
     sprintf(tempBuffer, "%d", value);
     *this = tempBuffer;
 }
 
-String::String(short value) :
-    length_(0),
-    capacity_(0),
-    buffer_(&endZero)
+String::String(short value)
+    : String()
 {
     char tempBuffer[CONVERSION_BUFFER_LENGTH];
     sprintf(tempBuffer, "%d", value);
     *this = tempBuffer;
 }
 
-String::String(long value) :
-    length_(0),
-    capacity_(0),
-    buffer_(&endZero)
+String::String(long value)
+    : String()
 {
     char tempBuffer[CONVERSION_BUFFER_LENGTH];
     sprintf(tempBuffer, "%ld", value);
     *this = tempBuffer;
 }
 
-String::String(long long value) :
-    length_(0),
-    capacity_(0),
-    buffer_(&endZero)
+String::String(long long value)
+    : String()
 {
     char tempBuffer[CONVERSION_BUFFER_LENGTH];
     sprintf(tempBuffer, "%lld", value);
     *this = tempBuffer;
 }
 
-String::String(unsigned value) :
-    length_(0),
-    capacity_(0),
-    buffer_(&endZero)
+String::String(unsigned value)
+    : String()
 {
     char tempBuffer[CONVERSION_BUFFER_LENGTH];
     sprintf(tempBuffer, "%u", value);
     *this = tempBuffer;
 }
 
-String::String(unsigned short value) :
-    length_(0),
-    capacity_(0),
-    buffer_(&endZero)
+String::String(unsigned short value)
+    : String()
 {
     char tempBuffer[CONVERSION_BUFFER_LENGTH];
     sprintf(tempBuffer, "%u", value);
     *this = tempBuffer;
 }
 
-String::String(unsigned long value) :
-    length_(0),
-    capacity_(0),
-    buffer_(&endZero)
+String::String(unsigned long value)
+    : String()
 {
     char tempBuffer[CONVERSION_BUFFER_LENGTH];
     sprintf(tempBuffer, "%lu", value);
     *this = tempBuffer;
 }
 
-String::String(unsigned long long value) :
-    length_(0),
-    capacity_(0),
-    buffer_(&endZero)
+String::String(unsigned long long value)
+    : String()
 {
     char tempBuffer[CONVERSION_BUFFER_LENGTH];
     sprintf(tempBuffer, "%llu", value);
     *this = tempBuffer;
 }
 
-String::String(float value) :
-    length_(0),
-    capacity_(0),
-    buffer_(&endZero)
+String::String(float value)
+    : String()
 {
     char tempBuffer[CONVERSION_BUFFER_LENGTH];
     sprintf(tempBuffer, "%g", value);
     *this = tempBuffer;
 }
 
-String::String(double value) :
-    length_(0),
-    capacity_(0),
-    buffer_(&endZero)
+String::String(double value)
+    : String()
 {
     char tempBuffer[CONVERSION_BUFFER_LENGTH];
     sprintf(tempBuffer, "%.15g", value);
     *this = tempBuffer;
 }
 
-String::String(bool value) :
-    length_(0),
-    capacity_(0),
-    buffer_(&endZero)
+String::String(bool value)
+    : String()
 {
     if (value)
         *this = "true";
@@ -158,23 +132,20 @@ String::String(bool value) :
         *this = "false";
 }
 
-String::String(char value) :
-    length_(0),
-    capacity_(0),
-    buffer_(&endZero)
+String::String(char value)
+    : String()
 {
     Resize(1);
-    buffer_[0] = value;
+    GetBuffer()[0] = value;
 }
 
-String::String(char value, unsigned length) :
-    length_(0),
-    capacity_(0),
-    buffer_(&endZero)
+String::String(char value, unsigned length)
+    : String()
 {
     Resize(length);
+    char* buffer = GetBuffer();
     for (unsigned i = 0; i < length; ++i)
-        buffer_[i] = value;
+        buffer[i] = value;
 }
 
 String& String::operator +=(int rhs)
@@ -229,21 +200,24 @@ String& String::operator +=(bool rhs)
 
 void String::Replace(char replaceThis, char replaceWith, bool caseSensitive)
 {
+    unsigned length = Length();
+    char* buffer = GetBuffer();
+
     if (caseSensitive)
     {
-        for (unsigned i = 0; i < length_; ++i)
+        for (unsigned i = 0; i < length; ++i)
         {
-            if (buffer_[i] == replaceThis)
-                buffer_[i] = replaceWith;
+            if (buffer[i] == replaceThis)
+                buffer[i] = replaceWith;
         }
     }
     else
     {
         replaceThis = (char)tolower(replaceThis);
-        for (unsigned i = 0; i < length_; ++i)
+        for (unsigned i = 0; i < length; ++i)
         {
-            if (tolower(buffer_[i]) == replaceThis)
-                buffer_[i] = replaceWith;
+            if (tolower(buffer[i]) == replaceThis)
+                buffer[i] = replaceWith;
         }
     }
 }
@@ -252,29 +226,33 @@ void String::Replace(const String& replaceThis, const String& replaceWith, bool 
 {
     unsigned nextPos = 0;
 
-    while (nextPos < length_)
+    unsigned length = Length();
+    unsigned replaceThisLength = replaceThis.Length();
+    unsigned replaceWithLength = replaceWith.Length();
+
+    while (nextPos < length)
     {
         unsigned pos = Find(replaceThis, nextPos, caseSensitive);
         if (pos == NPOS)
             break;
-        Replace(pos, replaceThis.length_, replaceWith);
-        nextPos = pos + replaceWith.length_;
+        Replace(pos, replaceThisLength, replaceWith);
+        nextPos = pos + replaceWithLength;
     }
 }
 
 void String::Replace(unsigned pos, unsigned length, const String& replaceWith)
 {
     // If substring is illegal, do nothing
-    if (pos + length > length_)
+    if (pos + length > Length())
         return;
 
-    Replace(pos, length, replaceWith.buffer_, replaceWith.length_);
+    Replace(pos, length, replaceWith.GetBuffer(), replaceWith.Length());
 }
 
 void String::Replace(unsigned pos, unsigned length, const char* replaceWith)
 {
     // If substring is illegal, do nothing
-    if (pos + length > length_)
+    if (pos + length > Length())
         return;
 
     Replace(pos, length, replaceWith, CStringLength(replaceWith));
@@ -283,7 +261,7 @@ void String::Replace(unsigned pos, unsigned length, const char* replaceWith)
 String::Iterator String::Replace(const String::Iterator& start, const String::Iterator& end, const String& replaceWith)
 {
     unsigned pos = (unsigned)(start - Begin());
-    if (pos >= length_)
+    if (pos >= Length())
         return End();
     auto length = (unsigned)(end - start);
     Replace(pos, length, replaceWith);
@@ -324,19 +302,21 @@ String& String::Append(const char* str, unsigned length)
 {
     if (str)
     {
-        unsigned oldLength = length_;
+        unsigned oldLength = Length();
         Resize(oldLength + length);
-        CopyChars(&buffer_[oldLength], str, length);
+        CopyChars(&GetBuffer()[oldLength], str, length);
     }
     return *this;
 }
 
 void String::Insert(unsigned pos, const String& str)
 {
-    if (pos > length_)
-        pos = length_;
+    unsigned length = Length();
 
-    if (pos == length_)
+    if (pos > length)
+        pos = length;
+
+    if (pos == length)
         (*this) += str;
     else
         Replace(pos, 0, str);
@@ -344,25 +324,31 @@ void String::Insert(unsigned pos, const String& str)
 
 void String::Insert(unsigned pos, char c)
 {
-    if (pos > length_)
-        pos = length_;
+    unsigned length = Length();
 
-    if (pos == length_)
+    if (pos > length)
+        pos = length;
+
+    if (pos == length)
+    {
         (*this) += c;
+    }
     else
     {
-        unsigned oldLength = length_;
-        Resize(length_ + 1);
+        unsigned oldLength = length;
+        Resize(length + 1);
         MoveRange(pos + 1, pos, oldLength - pos);
-        buffer_[pos] = c;
+        GetBuffer()[pos] = c;
     }
 }
 
 String::Iterator String::Insert(const String::Iterator& dest, const String& str)
 {
+    unsigned length = Length();
+
     unsigned pos = (unsigned)(dest - Begin());
-    if (pos > length_)
-        pos = length_;
+    if (pos > length)
+        pos = length;
     Insert(pos, str);
 
     return Begin() + pos;
@@ -371,9 +357,9 @@ String::Iterator String::Insert(const String::Iterator& dest, const String& str)
 String::Iterator String::Insert(const String::Iterator& dest, const String::Iterator& start, const String::Iterator& end)
 {
     unsigned pos = (unsigned)(dest - Begin());
-    if (pos > length_)
-        pos = length_;
-    auto length = (unsigned)(end - start);
+    if (pos > Length())
+        pos = Length();
+    unsigned length = (unsigned)(end - start);
     Replace(pos, 0, &(*start), length);
 
     return Begin() + pos;
@@ -381,9 +367,11 @@ String::Iterator String::Insert(const String::Iterator& dest, const String::Iter
 
 String::Iterator String::Insert(const String::Iterator& dest, char c)
 {
+    unsigned length = Length();
+
     unsigned pos = (unsigned)(dest - Begin());
-    if (pos > length_)
-        pos = length_;
+    if (pos > length)
+        pos = length;
     Insert(pos, c);
 
     return Begin() + pos;
@@ -397,7 +385,7 @@ void String::Erase(unsigned pos, unsigned length)
 String::Iterator String::Erase(const String::Iterator& it)
 {
     unsigned pos = (unsigned)(it - Begin());
-    if (pos >= length_)
+    if (pos >= Length())
         return End();
     Erase(pos);
 
@@ -407,9 +395,9 @@ String::Iterator String::Erase(const String::Iterator& it)
 String::Iterator String::Erase(const String::Iterator& start, const String::Iterator& end)
 {
     unsigned pos = (unsigned)(start - Begin());
-    if (pos >= length_)
+    if (pos >= Length())
         return End();
-    auto length = (unsigned)(end - start);
+    unsigned length = (unsigned)(end - start);
     Erase(pos, length);
 
     return Begin() + pos;
@@ -417,62 +405,97 @@ String::Iterator String::Erase(const String::Iterator& start, const String::Iter
 
 void String::Resize(unsigned newLength)
 {
-    if (!capacity_)
+    unsigned capacity = Capacity();
+
+    if (newLength && capacity < newLength + 1) // Need to increase capacity
     {
-        // If zero length requested, do not allocate buffer yet
-        if (!newLength)
-            return;
+        // Increase the capacity with half each time it is exceeded
+        while (capacity < newLength + 1)
+            capacity += (capacity + 1) >> 1u;
 
-        // Calculate initial capacity
-        capacity_ = newLength + 1;
-        if (capacity_ < MIN_CAPACITY)
-            capacity_ = MIN_CAPACITY;
+        // SHORT_STRING_CAPACITY is minimal possible capacity
+        assert(capacity > SHORT_STRING_CAPACITY);
 
-        buffer_ = new char[capacity_];
+        char* newBuffer = new char[capacity];
+
+        // Move the existing data to the new buffer
+        unsigned oldLength = Length();
+        if (oldLength)
+            CopyChars(newBuffer, GetBuffer(), oldLength);
+
+        // Delete the old buffer if in heap
+        if (!IsShort())
+            delete[] data_.longString_.buffer_;
+
+        newBuffer[newLength] = '\0';
+        data_.longString_.buffer_ = newBuffer;
+        data_.longString_.capacity_ = capacity;
+        data_.longString_.length_ = newLength;
     }
-    else
+    else // Old buffer is used
     {
-        if (newLength && capacity_ < newLength + 1)
+        if (IsShort())
         {
-            // Increase the capacity with half each time it is exceeded
-            while (capacity_ < newLength + 1)
-                capacity_ += (capacity_ + 1) >> 1u;
-
-            auto* newBuffer = new char[capacity_];
-            // Move the existing data to the new buffer, then delete the old buffer
-            if (length_)
-                CopyChars(newBuffer, buffer_, length_);
-            delete[] buffer_;
-
-            buffer_ = newBuffer;
+            data_.shortString_.buffer_[newLength] = '\0';
+            SetShortStringLength((u8)newLength);
+        }
+        else
+        {
+            data_.longString_.buffer_[newLength] = '\0';
+            data_.longString_.length_ = newLength;
         }
     }
-
-    buffer_[newLength] = 0;
-    length_ = newLength;
 }
 
 void String::Reserve(unsigned newCapacity)
 {
-    if (newCapacity < length_ + 1)
-        newCapacity = length_ + 1;
-    if (newCapacity == capacity_)
+    unsigned length = Length();
+
+    if (newCapacity < length + 1)
+        newCapacity = length + 1;
+
+    if (newCapacity < SHORT_STRING_CAPACITY)
+        newCapacity = SHORT_STRING_CAPACITY;
+
+    if (newCapacity == Capacity())
         return;
 
-    auto* newBuffer = new char[newCapacity];
-    // Move the existing data to the new buffer, then delete the old buffer
-    CopyChars(newBuffer, buffer_, length_ + 1);
-    if (capacity_)
-        delete[] buffer_;
+    if (newCapacity > SHORT_STRING_CAPACITY) // New buffer in heap
+    {
+        char* newBuffer = new char[newCapacity];
 
-    capacity_ = newCapacity;
-    buffer_ = newBuffer;
+        // Move the existing data to the new buffer
+        CopyChars(newBuffer, GetBuffer(), length + 1);
+
+        // Delete the old buffer if in heap
+        if (!IsShort())
+            delete[] data_.longString_.buffer_;
+
+        data_.longString_.buffer_ = newBuffer;
+        data_.longString_.capacity_ = newCapacity;
+        data_.longString_.length_ = length;
+    }
+    else // New buffer in stack
+    {
+        if (!IsShort()) // Old buffer in heap
+        {
+            // Pointer will be will be overwritten in CopyChars()
+            char* oldBuffer = data_.longString_.buffer_;
+
+            // Move the existing data from heap to stack
+            CopyChars(data_.shortString_.buffer_, oldBuffer, length + 1);
+
+            // Delete the old buffer if in heap
+            delete[] oldBuffer;
+        }
+
+        SetShortStringLength((u8)length);
+    }
 }
 
 void String::Compact()
 {
-    if (capacity_)
-        Reserve(length_ + 1);
+    Reserve(Length() + 1);
 }
 
 void String::Clear()
@@ -482,18 +505,18 @@ void String::Clear()
 
 void String::Swap(String& str)
 {
-    Urho3D::Swap(length_, str.length_);
-    Urho3D::Swap(capacity_, str.capacity_);
-    Urho3D::Swap(buffer_, str.buffer_);
+    std::swap(data_, str.data_);
 }
 
 String String::Substring(unsigned pos) const
 {
-    if (pos < length_)
+    unsigned length = Length();
+
+    if (pos < length)
     {
         String ret;
-        ret.Resize(length_ - pos);
-        CopyChars(ret.buffer_, buffer_ + pos, ret.length_);
+        ret.Resize(length - pos);
+        CopyChars(ret.GetBuffer(), GetBuffer() + pos, ret.Length());
 
         return ret;
     }
@@ -503,13 +526,15 @@ String String::Substring(unsigned pos) const
 
 String String::Substring(unsigned pos, unsigned length) const
 {
-    if (pos < length_)
+    unsigned thisLength = Length();
+
+    if (pos < thisLength)
     {
         String ret;
-        if (pos + length > length_)
-            length = length_ - pos;
+        if (pos + length > thisLength)
+            length = thisLength - pos;
         ret.Resize(length);
-        CopyChars(ret.buffer_, buffer_ + pos, ret.length_);
+        CopyChars(ret.GetBuffer(), GetBuffer() + pos, ret.Length());
 
         return ret;
     }
@@ -520,18 +545,20 @@ String String::Substring(unsigned pos, unsigned length) const
 String String::Trimmed() const
 {
     unsigned trimStart = 0;
-    unsigned trimEnd = length_;
+    unsigned trimEnd = Length();
+
+    const char* buffer = GetBuffer();
 
     while (trimStart < trimEnd)
     {
-        char c = buffer_[trimStart];
+        char c = buffer[trimStart];
         if (c != ' ' && c != 9)
             break;
         ++trimStart;
     }
     while (trimEnd > trimStart)
     {
-        char c = buffer_[trimEnd - 1];
+        char c = buffer[trimEnd - 1];
         if (c != ' ' && c != 9)
             break;
         --trimEnd;
@@ -543,8 +570,11 @@ String String::Trimmed() const
 String String::ToLower() const
 {
     String ret(*this);
-    for (unsigned i = 0; i < ret.length_; ++i)
-        ret[i] = (char)tolower(buffer_[i]);
+    const char* buffer = GetBuffer();
+    unsigned retLength = ret.Length();
+    char* retBuffer = ret.GetBuffer();
+    for (unsigned i = 0; i < retLength; ++i)
+        retBuffer[i] = (char)tolower(buffer[i]);
 
     return ret;
 }
@@ -552,8 +582,11 @@ String String::ToLower() const
 String String::ToUpper() const
 {
     String ret(*this);
-    for (unsigned i = 0; i < ret.length_; ++i)
-        ret[i] = (char)toupper(buffer_[i]);
+    const char* buffer = GetBuffer();
+    unsigned retLength = ret.Length();
+    char* retBuffer = ret.GetBuffer();
+    for (unsigned i = 0; i < retLength; ++i)
+        retBuffer[i] = (char)toupper(buffer[i]);
 
     return ret;
 }
@@ -570,20 +603,23 @@ void String::Join(const Vector<String>& subStrings, const String& glue)
 
 unsigned String::Find(char c, unsigned startPos, bool caseSensitive) const
 {
+    const char* buffer = GetBuffer();
+    unsigned length = Length();
+
     if (caseSensitive)
     {
-        for (unsigned i = startPos; i < length_; ++i)
+        for (unsigned i = startPos; i < length; ++i)
         {
-            if (buffer_[i] == c)
+            if (buffer[i] == c)
                 return i;
         }
     }
     else
     {
         c = (char)tolower(c);
-        for (unsigned i = startPos; i < length_; ++i)
+        for (unsigned i = startPos; i < length; ++i)
         {
-            if (tolower(buffer_[i]) == c)
+            if (tolower(buffer[i]) == c)
                 return i;
         }
     }
@@ -593,16 +629,22 @@ unsigned String::Find(char c, unsigned startPos, bool caseSensitive) const
 
 unsigned String::Find(const String& str, unsigned startPos, bool caseSensitive) const
 {
-    if (!str.length_ || str.length_ > length_)
+    unsigned length = Length();
+    unsigned strLength = str.Length();
+
+    if (!strLength || strLength > length)
         return NPOS;
 
-    char first = str.buffer_[0];
+    const char* buffer = GetBuffer();
+    const char* strBuffer = str.GetBuffer();
+
+    char first = strBuffer[0];
     if (!caseSensitive)
         first = (char)tolower(first);
 
-    for (unsigned i = startPos; i <= length_ - str.length_; ++i)
+    for (unsigned i = startPos; i <= length - strLength; ++i)
     {
-        char c = buffer_[i];
+        char c = buffer[i];
         if (!caseSensitive)
             c = (char)tolower(c);
 
@@ -610,10 +652,10 @@ unsigned String::Find(const String& str, unsigned startPos, bool caseSensitive) 
         {
             unsigned skip = NPOS;
             bool found = true;
-            for (unsigned j = 1; j < str.length_; ++j)
+            for (unsigned j = 1; j < strLength; ++j)
             {
-                c = buffer_[i + j];
-                char d = str.buffer_[j];
+                c = buffer[i + j];
+                char d = strBuffer[j];
                 if (!caseSensitive)
                 {
                     c = (char)tolower(c);
@@ -641,23 +683,26 @@ unsigned String::Find(const String& str, unsigned startPos, bool caseSensitive) 
 
 unsigned String::FindLast(char c, unsigned startPos, bool caseSensitive) const
 {
-    if (startPos >= length_)
-        startPos = length_ - 1;
+    unsigned length = Length();
+    const char* buffer = GetBuffer();
+
+    if (startPos >= length)
+        startPos = length - 1;
 
     if (caseSensitive)
     {
-        for (unsigned i = startPos; i < length_; --i)
+        for (unsigned i = startPos; i < length; --i)
         {
-            if (buffer_[i] == c)
+            if (buffer[i] == c)
                 return i;
         }
     }
     else
     {
         c = (char)tolower(c);
-        for (unsigned i = startPos; i < length_; --i)
+        for (unsigned i = startPos; i < length; --i)
         {
-            if (tolower(buffer_[i]) == c)
+            if (tolower(buffer[i]) == c)
                 return i;
         }
     }
@@ -667,28 +712,35 @@ unsigned String::FindLast(char c, unsigned startPos, bool caseSensitive) const
 
 unsigned String::FindLast(const String& str, unsigned startPos, bool caseSensitive) const
 {
-    if (!str.length_ || str.length_ > length_)
-        return NPOS;
-    if (startPos > length_ - str.length_)
-        startPos = length_ - str.length_;
+    unsigned length = Length();
+    unsigned strLength = str.Length();
 
-    char first = str.buffer_[0];
+    if (!strLength || strLength > length)
+        return NPOS;
+
+    if (startPos > length - strLength)
+        startPos = length - strLength;
+
+    const char* buffer = GetBuffer();
+    const char* strBuffer = str.GetBuffer();
+
+    char first = strBuffer[0];
     if (!caseSensitive)
         first = (char)tolower(first);
 
-    for (unsigned i = startPos; i < length_; --i)
+    for (unsigned i = startPos; i < length; --i)
     {
-        char c = buffer_[i];
+        char c = buffer[i];
         if (!caseSensitive)
             c = (char)tolower(c);
 
         if (c == first)
         {
             bool found = true;
-            for (unsigned j = 1; j < str.length_; ++j)
+            for (unsigned j = 1; j < strLength; ++j)
             {
-                c = buffer_[i + j];
-                char d = str.buffer_[j];
+                c = buffer[i + j];
+                char d = strBuffer[j];
                 if (!caseSensitive)
                 {
                     c = (char)tolower(c);
@@ -781,10 +833,12 @@ unsigned String::LengthUTF8() const
 {
     unsigned ret = 0;
 
-    const char* src = buffer_;
+    const char* buffer = GetBuffer();
+
+    const char* src = buffer;
     if (!src)
         return ret;
-    const char* end = buffer_ + length_;
+    const char* end = buffer + Length();
 
     while (src < end)
     {
@@ -800,7 +854,9 @@ unsigned String::ByteOffsetUTF8(unsigned index) const
     unsigned byteOffset = 0;
     unsigned utfPos = 0;
 
-    while (utfPos < index && byteOffset < length_)
+    unsigned length = Length();
+
+    while (utfPos < index && byteOffset < length)
     {
         NextUTF8Char(byteOffset);
         ++utfPos;
@@ -811,12 +867,11 @@ unsigned String::ByteOffsetUTF8(unsigned index) const
 
 unsigned String::NextUTF8Char(unsigned& byteOffset) const
 {
-    if (!buffer_)
-        return 0;
+    const char* buffer = GetBuffer();
 
-    const char* src = buffer_ + byteOffset;
+    const char* src = buffer + byteOffset;
     unsigned ret = DecodeUTF8(src);
-    byteOffset = (unsigned)(src - buffer_);
+    byteOffset = (unsigned)(src - buffer);
 
     return ret;
 }
@@ -831,8 +886,9 @@ void String::ReplaceUTF8(unsigned index, unsigned unicodeChar)
 {
     unsigned utfPos = 0;
     unsigned byteOffset = 0;
+    unsigned length = Length();
 
-    while (utfPos < index && byteOffset < length_)
+    while (utfPos < index && byteOffset < length)
     {
         NextUTF8Char(byteOffset);
         ++utfPos;
@@ -1214,24 +1270,28 @@ int String::Compare(const char* lhs, const char* rhs, bool caseSensitive)
 void String::Replace(unsigned pos, unsigned length, const char* srcStart, unsigned srcLength)
 {
     int delta = (int)srcLength - (int)length;
+    unsigned thisLength = Length();
 
-    if (pos + length < length_)
+    if (pos + length < thisLength)
     {
         if (delta < 0)
         {
-            MoveRange(pos + srcLength, pos + length, length_ - pos - length);
-            Resize(length_ + delta);
+            MoveRange(pos + srcLength, pos + length, thisLength - pos - length);
+            Resize(thisLength + delta);
         }
         if (delta > 0)
         {
-            Resize(length_ + delta);
-            MoveRange(pos + srcLength, pos + length, length_ - pos - length - delta);
+            Resize(thisLength + delta);
+            thisLength = Length();
+            MoveRange(pos + srcLength, pos + length, thisLength - pos - length - delta);
         }
     }
     else
-        Resize(length_ + delta);
+    {
+        Resize(thisLength + delta);
+    }
 
-    CopyChars(buffer_ + pos, srcStart, srcLength);
+    CopyChars(GetBuffer() + pos, srcStart, srcLength);
 }
 
 WString::WString() :

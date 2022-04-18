@@ -4432,10 +4432,10 @@ template <class T> void RegisterMembers_Serializer(asIScriptEngine* engine, cons
 // struct ShaderParameter | File: ../Graphics/ShaderVariation.h
 template <class T> void RegisterMembers_ShaderParameter(asIScriptEngine* engine, const char* className)
 {
-    // union ShaderParameter::@4 Urho3D::ShaderParameter::@5
-    // Error: type "union Urho3D::ShaderParameter::@4" can not automatically bind
-    // union ShaderParameter::@6 Urho3D::ShaderParameter::@7
-    // Error: type "union Urho3D::ShaderParameter::@6" can not automatically bind
+    // union ShaderParameter::@5 Urho3D::ShaderParameter::@6
+    // Error: type "union Urho3D::ShaderParameter::@5" can not automatically bind
+    // union ShaderParameter::@7 Urho3D::ShaderParameter::@8
+    // Error: type "union Urho3D::ShaderParameter::@7" can not automatically bind
     // ConstantBuffer* ShaderParameter::bufferPtr_
     // Not registered because pointer
 
@@ -4814,6 +4814,10 @@ template <class T> void RegisterMembers_String(asIScriptEngine* engine, const ch
     // Error: type "const Iterator&" can not automatically bind
     // Iterator String::Erase(const Iterator& start, const Iterator& end)
     // Error: type "const Iterator&" can not automatically bind
+    // char* String::GetBuffer()
+    // Error: type "char*" can not automatically bind
+    // const char* String::GetBuffer() const
+    // Error: type "const char*" can not automatically bind
     // Iterator String::Insert(const Iterator& dest, const String& str)
     // Error: type "const Iterator&" can not automatically bind
     // Iterator String::Insert(const Iterator& dest, const Iterator& start, const Iterator& end)
@@ -4927,6 +4931,9 @@ template <class T> void RegisterMembers_String(asIScriptEngine* engine, const ch
 
     // void String::Insert(unsigned pos, char c)
     engine->RegisterObjectMethod(className, "void Insert(uint, int8)", AS_METHODPR(T, Insert, (unsigned, char), void), AS_CALL_THISCALL);
+
+    // bool String::IsShort() const
+    engine->RegisterObjectMethod(className, "bool IsShort() const", AS_METHODPR(T, IsShort, () const, bool), AS_CALL_THISCALL);
 
     // void String::Join(const Vector<String>& subStrings, const String& glue)
     engine->RegisterObjectMethod(className, "void Join(Array<String>@+, const String&in)", AS_FUNCTION_OBJFIRST(String_void_Join_constspVectorlesStringgreamp_constspStringamp_template<String>), AS_CALL_CDECL_OBJFIRST);
@@ -5061,6 +5068,11 @@ template <class T> void RegisterMembers_String(asIScriptEngine* engine, const ch
     // Error: type "const char*" can not automatically bind
     // static int String::Compare(const char* lhs, const char* rhs, bool caseSensitive)
     // Error: type "const char*" can not automatically bind
+
+    // LongString String::longString_
+    // Not registered because have @nobind mark
+    // ShortString String::shortString_
+    // Not registered because have @nobind mark
 
     // static const unsigned String::NPOS
     engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const uint NPOS", (void*)&T::NPOS);engine->SetDefaultNamespace("");
