@@ -20,8 +20,6 @@
 // THE SOFTWARE.
 //
 
-#pragma once
-
 #include "AppStateManager.h"
 
 #include "AppState_Benchmark01.h"
