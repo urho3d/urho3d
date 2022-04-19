@@ -36,6 +36,10 @@
 
 #include "../DebugNew.h"
 
+#include <memory>
+
+using namespace std;
+
 namespace Urho3D
 {
 
@@ -112,8 +116,8 @@ bool XMLFile::BeginLoad(Deserializer& source)
         }
 
         // Patch this XMLFile and leave the original inherited XMLFile as it is
-        UniquePtr<pugi::xml_document> patchDocument(document_.Detach());
-        document_ = new pugi::xml_document();
+        std::unique_ptr<pugi::xml_document> patchDocument = move(document_);
+        document_ = make_unique<pugi::xml_document>();
         document_->reset(*inheritedXMLFile->document_);
         Patch(rootElem);
 

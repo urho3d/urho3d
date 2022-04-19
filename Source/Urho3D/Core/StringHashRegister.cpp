@@ -30,13 +30,15 @@
 
 #include "../DebugNew.h"
 
+using namespace std;
+
 namespace Urho3D
 {
 
 StringHashRegister::StringHashRegister(bool threadSafe)
 {
     if (threadSafe)
-        mutex_ = MakeUnique<Mutex>();
+        mutex_ = make_unique<Mutex>();
 }
 
 

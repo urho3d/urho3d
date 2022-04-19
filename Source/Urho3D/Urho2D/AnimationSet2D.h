@@ -25,6 +25,8 @@
 #include "../Container/ArrayPtr.h"
 #include "../Resource/Resource.h"
 
+#include <memory>
+
 #ifdef URHO3D_SPINE
 struct spAtlas;
 struct spSkeletonData;
@@ -78,7 +80,8 @@ public:
 #endif
 
     /// Return spriter data.
-    Spriter::SpriterData* GetSpriterData() const { return spriterData_.Get(); }
+    Spriter::SpriterData* GetSpriterData() const { return spriterData_.get(); }
+    
     /// Return spriter file sprite.
     Sprite2D* GetSpriterFileSprite(int folderId, int fileId) const;
 
@@ -111,13 +114,17 @@ private:
 #endif
 
     /// Spriter data.
-    UniquePtr<Spriter::SpriterData> spriterData_;
+    std::unique_ptr<Spriter::SpriterData> spriterData_;
+    
     /// Has sprite sheet.
     bool hasSpriteSheet_;
+    
     /// Sprite sheet file path.
     String spriteSheetFilePath_;
+    
     /// Sprite sheet.
     SharedPtr<SpriteSheet2D> spriteSheet_;
+    
     /// Spriter sprites.
     HashMap<unsigned, SharedPtr<Sprite2D> > spriterFileSprites_;
 };

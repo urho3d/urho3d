@@ -34,6 +34,8 @@
 
 #include "../DebugNew.h"
 
+using namespace std;
+
 namespace Urho3D
 {
 
@@ -669,7 +671,7 @@ void Serializable::ResetToDefault()
 
 void Serializable::RemoveInstanceDefault()
 {
-    instanceDefaultValues_.Reset();
+    instanceDefaultValues_.reset();
 }
 
 void Serializable::SetTemporary(bool enable)
@@ -715,7 +717,7 @@ void Serializable::AllocateNetworkState()
         return;
 
     const Vector<AttributeInfo>* networkAttributes = GetNetworkAttributes();
-    networkState_ = new NetworkState();
+    networkState_ = make_unique<NetworkState>();
     networkState_->attributes_ = networkAttributes;
 
     if (!networkAttributes)
@@ -1020,7 +1022,7 @@ void Serializable::SetInstanceDefault(const String& name, const Variant& default
 {
     // Allocate the instance level default value
     if (!instanceDefaultValues_)
-        instanceDefaultValues_ = new VariantMap();
+        instanceDefaultValues_ = make_unique<VariantMap>();
     instanceDefaultValues_->operator [](name) = defaultValue;
 }
 

@@ -27,6 +27,8 @@
 
 #include <Box2D/Box2D.h>
 
+#include <memory>
+
 namespace Urho3D
 {
 
@@ -226,7 +228,7 @@ public:
     int GetPositionIterations() const { return positionIterations_; }
 
     /// Return the Box2D physics world.
-    b2World* GetWorld() { return world_.Get(); }
+    b2World* GetWorld() { return world_.get(); }
 
     /// Set node dirtying to be disregarded.
     void SetApplyingTransforms(bool enable) { applyingTransforms_ = enable; }
@@ -246,7 +248,8 @@ protected:
     void SendEndContactEvents();
 
     /// Box2D physics world.
-    UniquePtr<b2World> world_;
+    std::unique_ptr<b2World> world_;
+    
     /// Gravity.
     Vector2 gravity_;
     /// Velocity iterations.

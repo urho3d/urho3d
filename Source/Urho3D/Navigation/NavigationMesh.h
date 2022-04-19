@@ -30,6 +30,8 @@
 #include "../Math/Matrix3x4.h"
 #include "../Scene/Component.h"
 
+#include <memory>
+
 #ifdef DT_POLYREF64
 using dtPolyRef = uint64_t;
 #else
@@ -339,14 +341,19 @@ protected:
 
     /// Identifying name for this navigation mesh.
     String meshName_;
+    
     /// Detour navigation mesh.
     dtNavMesh* navMesh_;
+    
     /// Detour navigation mesh query.
     dtNavMeshQuery* navMeshQuery_;
+    
     /// Detour navigation mesh query filter.
-    UniquePtr<dtQueryFilter> queryFilter_;
+    std::unique_ptr<dtQueryFilter> queryFilter_;
+    
     /// Temporary data for finding a path.
-    UniquePtr<FindPathData> pathData_;
+    std::unique_ptr<FindPathData> pathData_;
+    
     /// Tile size.
     int tileSize_;
     /// Cell size.

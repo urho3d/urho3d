@@ -27,6 +27,8 @@
 #include "../Math/Vector3.h"
 #include "../Scene/Component.h"
 
+#include <memory>
+
 class btTypedConstraint;
 
 namespace Urho3D
@@ -116,7 +118,7 @@ public:
     PhysicsWorld* GetPhysicsWorld() const { return physicsWorld_; }
 
     /// Return Bullet constraint.
-    btTypedConstraint* GetConstraint() const { return constraint_.Get(); }
+    btTypedConstraint* GetConstraint() const { return constraint_.get(); }
 
     /// Return constraint type.
     /// @property
@@ -201,8 +203,10 @@ private:
     WeakPtr<RigidBody> ownBody_;
     /// Other rigid body.
     WeakPtr<RigidBody> otherBody_;
+    
     /// Bullet constraint.
-    UniquePtr<btTypedConstraint> constraint_;
+    std::unique_ptr<btTypedConstraint> constraint_;
+    
     /// Constraint type.
     ConstraintType constraintType_;
     /// Constraint position.

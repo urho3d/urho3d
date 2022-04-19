@@ -29,6 +29,8 @@
 
 #include <Bullet/LinearMath/btMotionState.h>
 
+#include <memory>
+
 class btCompoundShape;
 class btRigidBody;
 
@@ -181,10 +183,10 @@ public:
     PhysicsWorld* GetPhysicsWorld() const { return physicsWorld_; }
 
     /// Return Bullet rigid body.
-    btRigidBody* GetBody() const { return body_.Get(); }
+    btRigidBody* GetBody() const { return body_.get(); }
 
     /// Return Bullet compound collision shape.
-    btCompoundShape* GetCompoundShape() const { return compoundShape_.Get(); }
+    btCompoundShape* GetCompoundShape() const { return compoundShape_.get(); }
 
     /// Return mass.
     /// @property
@@ -321,11 +323,14 @@ private:
     void MarkBodyDirty() { readdBody_ = true; }
 
     /// Bullet rigid body.
-    UniquePtr<btRigidBody> body_;
+    std::unique_ptr<btRigidBody> body_;
+    
     /// Bullet compound collision shape.
-    UniquePtr<btCompoundShape> compoundShape_;
+    std::unique_ptr<btCompoundShape> compoundShape_;
+    
     /// Compound collision shape with center of mass offset applied.
-    UniquePtr<btCompoundShape> shiftedCompoundShape_;
+    std::unique_ptr<btCompoundShape> shiftedCompoundShape_;
+    
     /// Physics world.
     WeakPtr<PhysicsWorld> physicsWorld_;
     /// Smoothed transform, if has one.
