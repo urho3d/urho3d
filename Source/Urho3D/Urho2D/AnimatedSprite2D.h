@@ -26,6 +26,8 @@
 
 #include "../Urho2D/StaticSprite2D.h"
 
+#include <memory>
+
 #ifdef URHO3D_SPINE
 struct spAnimationState;
 struct spAnimationStateData;
@@ -156,7 +158,7 @@ protected:
 #endif
 
     /// Spriter instance.
-    UniquePtr<Spriter::SpriterInstance> spriterInstance_;
+    std::unique_ptr<Spriter::SpriterInstance> spriterInstance_;
 };
 
 }

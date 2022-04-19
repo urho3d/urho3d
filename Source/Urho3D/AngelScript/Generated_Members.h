@@ -13107,8 +13107,8 @@ template <class T> void RegisterMembers_GImpactMeshData(asIScriptEngine* engine,
 {
     RegisterMembers_CollisionGeometryData<T>(engine, className);
 
-    // UniquePtr<TriangleMeshInterface> GImpactMeshData::meshInterface_
-    // Error: type "UniquePtr<TriangleMeshInterface>" can not automatically bind
+    // std::unique_ptr<TriangleMeshInterface> GImpactMeshData::meshInterface_
+    // Error: type "std::unique_ptr<TriangleMeshInterface>" can not automatically bind
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_GImpactMeshData
         REGISTER_MEMBERS_MANUAL_PART_GImpactMeshData();
@@ -13145,12 +13145,12 @@ template <class T> void RegisterMembers_TriangleMeshData(asIScriptEngine* engine
 {
     RegisterMembers_CollisionGeometryData<T>(engine, className);
 
-    // UniquePtr<TriangleMeshInterface> TriangleMeshData::meshInterface_
-    // Error: type "UniquePtr<TriangleMeshInterface>" can not automatically bind
-    // UniquePtr<btBvhTriangleMeshShape> TriangleMeshData::shape_
-    // Error: type "UniquePtr<btBvhTriangleMeshShape>" can not automatically bind
-    // UniquePtr<btTriangleInfoMap> TriangleMeshData::infoMap_
-    // Error: type "UniquePtr<btTriangleInfoMap>" can not automatically bind
+    // std::unique_ptr<TriangleMeshInterface> TriangleMeshData::meshInterface_
+    // Error: type "std::unique_ptr<TriangleMeshInterface>" can not automatically bind
+    // std::unique_ptr<btBvhTriangleMeshShape> TriangleMeshData::shape_
+    // Error: type "std::unique_ptr<btBvhTriangleMeshShape>" can not automatically bind
+    // std::unique_ptr<btTriangleInfoMap> TriangleMeshData::infoMap_
+    // Error: type "std::unique_ptr<btTriangleInfoMap>" can not automatically bind
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_TriangleMeshData
         REGISTER_MEMBERS_MANUAL_PART_TriangleMeshData();

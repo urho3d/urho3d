@@ -38,6 +38,8 @@
 
 #include "../DebugNew.h"
 
+using namespace std;
+
 #ifdef URHO3D_SPINE
 #include <spine/spine.h>
 #include <spine/extension.h>
@@ -293,7 +295,7 @@ bool AnimationSet2D::BeginLoadSpriter(Deserializer& source)
     if (source.Read(buffer.Get(), dataSize) != dataSize)
         return false;
 
-    spriterData_ = new Spriter::SpriterData();
+    spriterData_ = make_unique<Spriter::SpriterData>();
     if (!spriterData_->Load(buffer.Get(), dataSize))
     {
         URHO3D_LOGERROR("Could not spriter data from " + source.GetName());
@@ -521,7 +523,7 @@ void AnimationSet2D::Dispose()
     }
 #endif
 
-    spriterData_.Reset();
+    spriterData_.reset();
 
     sprite_.Reset();
     spriteSheet_.Reset();

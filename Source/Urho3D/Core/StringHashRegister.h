@@ -26,6 +26,8 @@
 #include "../Container/Ptr.h"
 #include "../Math/StringHash.h"
 
+#include <memory>
+
 namespace Urho3D
 {
 
@@ -57,8 +59,9 @@ public:
 private:
     /// Hash to string map.
     StringMap map_;
+    
     /// Mutex.
-    UniquePtr<Mutex> mutex_;
+    std::unique_ptr<Mutex> mutex_;
 };
 
 }

@@ -28,6 +28,8 @@
 #include "../Math/Matrix3x4.h"
 #include "../Scene/Animatable.h"
 
+#include <memory>
+
 namespace Urho3D
 {
 
@@ -751,8 +753,9 @@ private:
     Vector<SharedPtr<Node> > children_;
     /// Node listeners.
     Vector<WeakPtr<Component> > listeners_;
+    
     /// Pointer to implementation.
-    UniquePtr<NodeImpl> impl_;
+    std::unique_ptr<NodeImpl> impl_;
 
 protected:
     /// User variables.

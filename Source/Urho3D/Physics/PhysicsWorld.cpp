@@ -50,6 +50,8 @@
 
 extern ContactAddedCallback gContactAddedCallback;
 
+using namespace std;
+
 namespace Urho3D
 {
 
@@ -156,12 +158,12 @@ PhysicsWorld::PhysicsWorld(Context* context) :
     else
         collisionConfiguration_ = new btDefaultCollisionConfiguration();
 
-    collisionDispatcher_ = new btCollisionDispatcher(collisionConfiguration_);
-    btGImpactCollisionAlgorithm::registerAlgorithm(static_cast<btCollisionDispatcher*>(collisionDispatcher_.Get()));
+    collisionDispatcher_ = make_unique<btCollisionDispatcher>(collisionConfiguration_);
+    btGImpactCollisionAlgorithm::registerAlgorithm(static_cast<btCollisionDispatcher*>(collisionDispatcher_.get()));
 
-    broadphase_ = new btDbvtBroadphase();
-    solver_ = new btSequentialImpulseConstraintSolver();
-    world_ = new btDiscreteDynamicsWorld(collisionDispatcher_.Get(), broadphase_.Get(), solver_.Get(), collisionConfiguration_);
+    broadphase_ = make_unique<btDbvtBroadphase>();
+    solver_ = make_unique<btSequentialImpulseConstraintSolver>();
+    world_ = make_unique<btDiscreteDynamicsWorld>(collisionDispatcher_.get(), broadphase_.get(), solver_.get(), collisionConfiguration_);
 
     world_->setGravity(ToBtVector3(DEFAULT_GRAVITY));
     world_->getDispatchInfo().m_useContinuous = true;
@@ -187,10 +189,10 @@ PhysicsWorld::~PhysicsWorld()
             (*i)->ReleaseShape();
     }
 
-    world_.Reset();
-    solver_.Reset();
-    broadphase_.Reset();
-    collisionDispatcher_.Reset();
+    world_.reset();
+    solver_.reset();
+    broadphase_.reset();
+    collisionDispatcher_.reset();
 
     // Delete configuration only if it was the default created by PhysicsWorld
     if (!PhysicsWorld::config.collisionConfig_)
@@ -625,16 +627,16 @@ void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const Sphere& s
     result.Clear();
 
     btSphereShape sphereShape(sphere.radius_);
-    UniquePtr<btRigidBody> tempRigidBody(new btRigidBody(1.0f, nullptr, &sphereShape));
+    unique_ptr<btRigidBody> tempRigidBody(new btRigidBody(1.0f, nullptr, &sphereShape));
     tempRigidBody->setWorldTransform(btTransform(btQuaternion::getIdentity(), ToBtVector3(sphere.center_)));
     // Need to activate the temporary rigid body to get reliable results from static, sleeping objects
     tempRigidBody->activate();
-    world_->addRigidBody(tempRigidBody.Get());
+    world_->addRigidBody(tempRigidBody.get());
 
     PhysicsQueryCallback callback(result, collisionMask);
-    world_->contactTest(tempRigidBody.Get(), callback);
+    world_->contactTest(tempRigidBody.get(), callback);
 
-    world_->removeRigidBody(tempRigidBody.Get());
+    world_->removeRigidBody(tempRigidBody.get());
 }
 
 void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const BoundingBox& box, unsigned collisionMask)
@@ -644,15 +646,15 @@ void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const BoundingB
     result.Clear();
 
     btBoxShape boxShape(ToBtVector3(box.HalfSize()));
-    UniquePtr<btRigidBody> tempRigidBody(new btRigidBody(1.0f, nullptr, &boxShape));
+    unique_ptr<btRigidBody> tempRigidBody(new btRigidBody(1.0f, nullptr, &boxShape));
     tempRigidBody->setWorldTransform(btTransform(btQuaternion::getIdentity(), ToBtVector3(box.Center())));
     tempRigidBody->activate();
-    world_->addRigidBody(tempRigidBody.Get());
+    world_->addRigidBody(tempRigidBody.get());
 
     PhysicsQueryCallback callback(result, collisionMask);
-    world_->contactTest(tempRigidBody.Get(), callback);
+    world_->contactTest(tempRigidBody.get(), callback);
 
-    world_->removeRigidBody(tempRigidBody.Get());
+    world_->removeRigidBody(tempRigidBody.get());
 }
 
 void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const RigidBody* body)

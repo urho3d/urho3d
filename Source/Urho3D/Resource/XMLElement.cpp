@@ -30,6 +30,8 @@
 
 #include "../DebugNew.h"
 
+using namespace std;
+
 namespace Urho3D
 {
 
@@ -1070,20 +1072,22 @@ XPathQuery::~XPathQuery() = default;
 void XPathQuery::Bind()
 {
     // Delete previous query object and create a new one binding it with variable set
-    query_ = new pugi::xpath_query(queryString_.CString(), variables_.Get());
+    query_ = make_unique<pugi::xpath_query>(queryString_.CString(), variables_.get());
 }
 
 bool XPathQuery::SetVariable(const String& name, bool value)
 {
     if (!variables_)
-        variables_ = new pugi::xpath_variable_set();
+        variables_ = make_unique<pugi::xpath_variable_set>();
+
     return variables_->set(name.CString(), value);
 }
 
 bool XPathQuery::SetVariable(const String& name, float value)
 {
     if (!variables_)
-        variables_ = new pugi::xpath_variable_set();
+        variables_ = make_unique<pugi::xpath_variable_set>();
+
     return variables_->set(name.CString(), value);
 }
 
@@ -1095,14 +1099,15 @@ bool XPathQuery::SetVariable(const String& name, const String& value)
 bool XPathQuery::SetVariable(const char* name, const char* value)
 {
     if (!variables_)
-        variables_ = new pugi::xpath_variable_set();
+        variables_ = make_unique<pugi::xpath_variable_set>();
+
     return variables_->set(name, value);
 }
 
 bool XPathQuery::SetVariable(const String& name, const XPathResultSet& value)
 {
     if (!variables_)
-        variables_ = new pugi::xpath_variable_set();
+        variables_ = make_unique<pugi::xpath_variable_set>();
 
     pugi::xpath_node_set* nodeSet = value.GetXPathNodeSet();
     if (!nodeSet)
@@ -1116,7 +1121,7 @@ bool XPathQuery::SetQuery(const String& queryString, const String& variableStrin
     if (!variableString.Empty())
     {
         Clear();
-        variables_ = new pugi::xpath_variable_set();
+        variables_ = make_unique<pugi::xpath_variable_set>();
 
         // Parse the variable string having format "name1:type1,name2:type2,..." where type is one of "Bool", "Float", "String", "ResultSet"
         Vector<String> vars = variableString.Split(',');
@@ -1155,8 +1160,8 @@ void XPathQuery::Clear()
 {
     queryString_.Clear();
 
-    variables_.Reset();
-    query_.Reset();
+    variables_.reset();
+    query_.reset();
 }
 
 bool XPathQuery::EvaluateToBool(const XMLElement& element) const

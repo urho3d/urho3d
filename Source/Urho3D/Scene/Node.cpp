@@ -38,6 +38,8 @@
 
 #include "../DebugNew.h"
 
+using namespace std;
+
 #ifdef _MSC_VER
 #pragma warning(disable:6293)
 #endif
@@ -60,7 +62,7 @@ Node::Node(Context* context) :
     scale_(Vector3::ONE),
     worldRotation_(Quaternion::IDENTITY)
 {
-    impl_ = new NodeImpl();
+    impl_ = make_unique<NodeImpl>();
     impl_->owner_ = nullptr;
 }
 

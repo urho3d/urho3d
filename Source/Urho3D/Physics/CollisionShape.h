@@ -29,6 +29,8 @@
 #include "../Math/Quaternion.h"
 #include "../Scene/Component.h"
 
+#include <memory>
+
 class btBvhTriangleMeshShape;
 class btCollisionShape;
 class btCompoundShape;
@@ -81,11 +83,13 @@ struct TriangleMeshData : public CollisionGeometryData
     explicit TriangleMeshData(CustomGeometry* custom);
 
     /// Bullet triangle mesh interface.
-    UniquePtr<TriangleMeshInterface> meshInterface_;
+    std::unique_ptr<TriangleMeshInterface> meshInterface_;
+    
     /// Bullet triangle mesh collision shape.
-    UniquePtr<btBvhTriangleMeshShape> shape_;
+    std::unique_ptr<btBvhTriangleMeshShape> shape_;
+    
     /// Bullet triangle info map.
-    UniquePtr<btTriangleInfoMap> infoMap_;
+    std::unique_ptr<btTriangleInfoMap> infoMap_;
 };
 
 /// Triangle mesh geometry data.
@@ -97,7 +101,7 @@ struct GImpactMeshData : public CollisionGeometryData
     explicit GImpactMeshData(CustomGeometry* custom);
 
     /// Bullet triangle mesh interface.
-    UniquePtr<TriangleMeshInterface> meshInterface_;
+    std::unique_ptr<TriangleMeshInterface> meshInterface_;
 };
 
 /// Convex hull geometry data.
@@ -217,7 +221,7 @@ public:
     void SetLodLevel(unsigned lodLevel);
 
     /// Return Bullet collision shape.
-    btCollisionShape* GetCollisionShape() const { return shape_.Get(); }
+    btCollisionShape* GetCollisionShape() const { return shape_.get(); }
 
     /// Return the shared geometry data.
     CollisionGeometryData* GetGeometryData() const { return geometry_; }
@@ -304,16 +308,22 @@ private:
 
     /// Physics world.
     WeakPtr<PhysicsWorld> physicsWorld_;
+    
     /// Rigid body.
     WeakPtr<RigidBody> rigidBody_;
+    
     /// Model.
     SharedPtr<Model> model_;
+    
     /// Shared geometry data.
     SharedPtr<CollisionGeometryData> geometry_;
+    
     /// Bullet collision shape.
-    UniquePtr<btCollisionShape> shape_;
+    std::unique_ptr<btCollisionShape> shape_;
+    
     /// Collision shape type.
     ShapeType shapeType_;
+    
     /// Offset position.
     Vector3 position_;
     /// Offset rotation.

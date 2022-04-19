@@ -51,6 +51,8 @@
 
 #include "../DebugNew.h"
 
+using namespace std;
+
 extern "C" int SDL_AddTouch(SDL_TouchID touchID, SDL_TouchDeviceType type, const char* name);
 
 // Use a "click inside window to focus" mechanism on desktop platforms when the mouse cursor is hidden
@@ -391,7 +393,7 @@ Input::Input(Context* context) :
     SDL_SetHint(SDL_HINT_MOUSE_TOUCH_EVENTS, "0");
     SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0");
 #elif defined(__EMSCRIPTEN__)
-    emscriptenInput_ = new EmscriptenInput(this);
+    emscriptenInput_ = make_unique<EmscriptenInput>(this);
 #endif
 
     // Try to initialize right now, but skip if screen mode is not yet set

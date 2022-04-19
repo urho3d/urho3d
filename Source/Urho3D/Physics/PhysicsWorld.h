@@ -31,6 +31,8 @@
 
 #include <Bullet/LinearMath/btIDebugDraw.h>
 
+#include <memory>
+
 class btCollisionConfiguration;
 class btCollisionShape;
 class btBroadphaseInterface;
@@ -277,7 +279,7 @@ public:
     void SetDebugDepthTest(bool enable);
 
     /// Return the Bullet physics world.
-    btDiscreteDynamicsWorld* GetWorld() { return world_.Get(); }
+    btDiscreteDynamicsWorld* GetWorld() { return world_.get(); }
 
     /// Clean up the geometry cache.
     void CleanupGeometryCache();
@@ -319,14 +321,19 @@ private:
 
     /// Bullet collision configuration.
     btCollisionConfiguration* collisionConfiguration_{};
+    
     /// Bullet collision dispatcher.
-    UniquePtr<btDispatcher> collisionDispatcher_;
+    std::unique_ptr<btDispatcher> collisionDispatcher_;
+    
     /// Bullet collision broadphase.
-    UniquePtr<btBroadphaseInterface> broadphase_;
+    std::unique_ptr<btBroadphaseInterface> broadphase_;
+    
     /// Bullet constraint solver.
-    UniquePtr<btConstraintSolver> solver_;
+    std::unique_ptr<btConstraintSolver> solver_;
+    
     /// Bullet physics world.
-    UniquePtr<btDiscreteDynamicsWorld> world_;
+    std::unique_ptr<btDiscreteDynamicsWorld> world_;
+    
     /// Extra weak pointer to scene to allow for cleanup in case the world is destroyed before other components.
     WeakPtr<Scene> scene_;
     /// Rigid bodies in the world.
