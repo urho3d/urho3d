@@ -28,6 +28,8 @@
 #include <Urho3D/Urho3D.h>
 #endif
 
+#include <cassert>
+
 namespace Urho3D
 {
 
@@ -58,36 +60,97 @@ struct RefCount
 /// Base class for intrusively reference-counted objects. These are noncopyable and non-assignable.
 class URHO3D_API RefCounted
 {
+private:
+    /// Reference count. If below zero, the object has been destroyed.
+    int refs_;
+
+    /// Pointer to weak reference counter. Only created the first time WeakPtr is used.
+    /// If negative, the object has been destroyed.
+    int* weakRefsPtr_;
+
 public:
-    /// Construct. Allocate the reference count structure and set an initial self weak reference.
-    RefCounted();
-    /// Destruct. Mark as expired and also delete the reference count structure if no outside weak references exist.
-    virtual ~RefCounted();
+    /// Construct.
+    RefCounted()
+       : refs_(0)
+       , weakRefsPtr_(nullptr)
+    {
+    }
+    
+    /// Destruct.
+    virtual ~RefCounted()
+    {
+        assert(refs_ == 0);
+
+        // Mark object as destroyed to fire asserts if this object is still accessed
+        refs_ = -1;
+
+        if (weakRefsPtr_)
+        {
+            if (*weakRefsPtr_ == 0) // If no WeakPtr
+                delete weakRefsPtr_;
+            else
+                *weakRefsPtr_ = -(*weakRefsPtr_); // Mark object as destroyed. Will be deleted by the last WeakPtr
+        }
+    }
 
     /// Prevent copy construction.
     RefCounted(const RefCounted& rhs) = delete;
+    
     /// Prevent assignment.
     RefCounted& operator =(const RefCounted& rhs) = delete;
 
-    /// Increment reference count. Can also be called outside of a SharedPtr for traditional reference counting.
+    /// Increment reference count.
     /// @manualbind
-    void AddRef();
-    /// Decrement reference count and delete self if no more references. Can also be called outside of a SharedPtr for traditional reference counting.
+    void AddRef()
+    {
+        assert(refs_ >= 0);
+        refs_++;
+    }
+
+    /// Decrement reference count and delete self if no more references.
     /// @manualbind
-    void ReleaseRef();
+    void ReleaseRef()
+    {
+        assert(refs_ > 0);
+        refs_--;
+        
+        if (!refs_)
+            delete this;
+    }
+    
     /// Return reference count.
     /// @property
-    int Refs() const;
+    int Refs() const
+    {
+        assert(refs_ >= 0);
+        return refs_;
+    }
+
+    /// Set reference count manually.
+    void SetRefs(int value)
+    {
+        assert(value >= 0);
+        refs_ = value;
+    }
+    
     /// Return weak reference count.
     /// @property
-    int WeakRefs() const;
+    int WeakRefs() const
+    {
+        assert(refs_ >= 0);
+        return weakRefsPtr_ ? *weakRefsPtr_ : 0;
+    }
 
-    /// Return pointer to the reference count structure.
-    RefCount* RefCountPtr() { return refCount_; }
+    /// Return pointer to weak reference counter. Allocate if it doesn't already exist.
+    int* GetOrCreateWeakRefs()
+    {
+        assert(refs_ >= 0);
+        
+        if (!weakRefsPtr_)
+            weakRefsPtr_ = new int(0);
 
-private:
-    /// Pointer to the reference count structure.
-    RefCount* refCount_;
+        return weakRefsPtr_;
+    }
 };
 
 }

@@ -159,12 +159,7 @@ void View3D::ResetScene()
         return;
 
     if (!ownScene_)
-    {
-        RefCount* refCount = scene_->RefCountPtr();
-        ++refCount->refs_;
-        scene_ = nullptr;
-        --refCount->refs_;
-    }
+        scene_.Detach();
     else
         scene_ = nullptr;
 }

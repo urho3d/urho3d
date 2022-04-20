@@ -3914,14 +3914,17 @@ template <class T> void RegisterMembers_RefCounted(asIScriptEngine* engine, cons
 {
     // void RefCounted::AddRef()
     // Not registered because have @manualbind mark
-    // RefCount* RefCounted::RefCountPtr()
-    // Error: type "RefCount*" can not automatically bind
+    // int* RefCounted::GetOrCreateWeakRefs()
+    // Error: type "int*" can not automatically bind
     // void RefCounted::ReleaseRef()
     // Not registered because have @manualbind mark
 
     // int RefCounted::Refs() const
     engine->RegisterObjectMethod(className, "int Refs() const", AS_METHODPR(T, Refs, () const, int), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "int get_refs() const", AS_METHODPR(T, Refs, () const, int), AS_CALL_THISCALL);
+
+    // void RefCounted::SetRefs(int value)
+    engine->RegisterObjectMethod(className, "void SetRefs(int)", AS_METHODPR(T, SetRefs, (int), void), AS_CALL_THISCALL);
 
     // int RefCounted::WeakRefs() const
     engine->RegisterObjectMethod(className, "int WeakRefs() const", AS_METHODPR(T, WeakRefs, () const, int), AS_CALL_THISCALL);

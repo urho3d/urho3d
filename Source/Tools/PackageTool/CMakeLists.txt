@@ -37,7 +37,6 @@ if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
     set (MINI_URHO_CPP_FILES
         ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Container/Allocator.cpp
         ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Container/HashBase.cpp
-        ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Container/RefCounted.cpp
         ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Container/Str.cpp
         ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Container/VectorBase.cpp
         ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Core/Context.cpp
