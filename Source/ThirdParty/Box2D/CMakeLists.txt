@@ -24,7 +24,7 @@
 set (TARGET_NAME Box2D)
 
 # Define source files
-define_source_files (RECURSE GLOB_CPP_PATTERNS src/*.cpp /src/*.h GLOB_H_PATTERNS include/*.h GROUP)
+define_source_files (RECURSE GLOB_CPP_PATTERNS src/*.cpp src/*.h GLOB_H_PATTERNS include/*.h GROUP)
 
 set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
