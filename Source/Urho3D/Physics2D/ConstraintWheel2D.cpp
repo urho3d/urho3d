@@ -211,7 +211,7 @@ void ConstraintWheel2D::SetLowerTranslation(float lowerTranslation)
     jointDef_.lowerTranslation = lowerTranslation;
 
     if (joint_)
-        static_cast<b2WheelJoint*>(joint_)->SetMaxMotorTorque(lowerTranslation);
+        static_cast<b2WheelJoint*>(joint_)->SetLimits(lowerTranslation, jointDef_.upperTranslation);
     else
         RecreateJoint();
 
@@ -226,7 +226,7 @@ void ConstraintWheel2D::SetUpperTranslation(float upperTranslation)
     jointDef_.upperTranslation = upperTranslation;
 
     if (joint_)
-        static_cast<b2WheelJoint*>(joint_)->SetMaxMotorTorque(upperTranslation);
+        static_cast<b2WheelJoint*>(joint_)->SetLimits(jointDef_.lowerTranslation, upperTranslation);
     else
         RecreateJoint();
 
