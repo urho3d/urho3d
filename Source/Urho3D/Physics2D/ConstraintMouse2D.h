@@ -35,8 +35,10 @@ class URHO3D_API ConstraintMouse2D : public Constraint2D
 public:
     /// Construct.
     explicit ConstraintMouse2D(Context* context);
+    
     /// Destruct.
     ~ConstraintMouse2D() override;
+    
     /// Register object factory.
     /// @nobind
     static void RegisterObject(Context* context);
@@ -44,31 +46,37 @@ public:
     /// Set target.
     /// @property
     void SetTarget(const Vector2& target);
-    /// Set max force.
-    /// @property
-    void SetMaxForce(float maxForce);
-    /// Set frequency Hz.
-    /// @property
-    void SetFrequencyHz(float frequencyHz);
-    /// Set damping ratio.
-    /// @property
-    void SetDampingRatio(float dampingRatio);
-
+    
     /// Return target.
     /// @property
     const Vector2& GetTarget() const { return target_; }
 
+    /// Set max force.
+    /// @property
+    void SetMaxForce(float maxForce);
+    
     /// Return max force.
     /// @property
     float GetMaxForce() const { return jointDef_.maxForce; }
 
-    /// Return frequency Hz.
+    /// Set linear stiffness in N/m.
     /// @property
-    float GetFrequencyHz() const { return jointDef_.frequencyHz; }
+    void SetStiffness(float stiffness);
 
-    /// Return damping ratio.
+    /// Return linear stiffness in N/m.
     /// @property
-    float GetDampingRatio() const { return jointDef_.dampingRatio; }
+    float GetStiffness() const { return jointDef_.stiffness; }
+
+    /// Set linear damping in N*s/m.
+    /// @property
+    void SetDamping(float damping);
+
+    /// Return linear damping in N*s/m.
+    /// @property
+    float GetDamping() const { return jointDef_.damping; }
+
+    /// Calc and set stiffness and damping. Must be used after set owner and other bodies.
+    bool SetLinearStiffness(float frequencyHertz, float dampingRatio);
 
 private:
     /// Return joint def.
@@ -76,6 +84,7 @@ private:
 
     /// Box2D joint def.
     b2MouseJointDef jointDef_;
+    
     /// Target.
     Vector2 target_;
 };

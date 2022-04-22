@@ -36,7 +36,6 @@
 #include "../Physics2D/ConstraintPrismatic2D.h"
 #include "../Physics2D/ConstraintPulley2D.h"
 #include "../Physics2D/ConstraintRevolute2D.h"
-#include "../Physics2D/ConstraintRope2D.h"
 #include "../Physics2D/ConstraintWeld2D.h"
 #include "../Physics2D/ConstraintWheel2D.h"
 #include "../Physics2D/Physics2D.h"
@@ -71,7 +70,6 @@ void RegisterPhysics2DLibrary(Context* context)
     ConstraintPrismatic2D::RegisterObject(context);
     ConstraintPulley2D::RegisterObject(context);
     ConstraintRevolute2D::RegisterObject(context);
-    ConstraintRope2D::RegisterObject(context);
     ConstraintWeld2D::RegisterObject(context);
     ConstraintWheel2D::RegisterObject(context);
 }

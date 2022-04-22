@@ -94,10 +94,10 @@ void RigidBody2D::OnSetEnabled()
 {
     bool enabled = IsEnabledEffective();
 
-    bodyDef_.active = enabled;
+    bodyDef_.enabled = enabled;
 
     if (body_)
-        body_->SetActive(enabled);
+        body_->SetEnabled(enabled);
 
     MarkNetworkUpdate();
 }
@@ -374,7 +374,7 @@ void RigidBody2D::CreateBody()
     bodyDef_.angle = node_->GetWorldRotation().RollAngle() * M_DEGTORAD;
 
     body_ = physicsWorld_->GetWorld()->CreateBody(&bodyDef_);
-    body_->SetUserData(this);
+    body_->GetUserData().pointer = (uintptr_t)this;
 
     for (unsigned i = 0; i < collisionShapes_.Size(); ++i)
     {
@@ -431,7 +431,7 @@ void RigidBody2D::ApplyWorldTransform()
         parentRigidBody = parent->GetComponent<RigidBody2D>();
 
     // If body is not parented and is static or sleeping, no need to update
-    if (!parentRigidBody && (!body_->IsActive() || body_->GetType() == b2_staticBody || !body_->IsAwake()))
+    if (!parentRigidBody && (!body_->IsEnabled() || body_->GetType() == b2_staticBody || !body_->IsAwake()))
         return;
 
     const b2Transform& transform = body_->GetTransform();

@@ -102,11 +102,6 @@ void CreateScene()
 
         prevBody = body;
     }
-
-    ConstraintRope2D@ constraintRope = groundNode.CreateComponent("ConstraintRope2D");
-    constraintRope.otherBody = prevBody;
-    constraintRope.ownerBodyAnchor = Vector2(0.0f, y);
-    constraintRope.maxLength = NUM_OBJECTS - 1.0f + 0.01f;
 }
 
 void CreateInstructions()

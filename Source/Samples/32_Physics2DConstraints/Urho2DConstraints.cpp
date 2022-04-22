@@ -43,7 +43,6 @@
 #include <Urho3D/Physics2D/ConstraintPrismatic2D.h>
 #include <Urho3D/Physics2D/ConstraintPulley2D.h>
 #include <Urho3D/Physics2D/ConstraintRevolute2D.h>
-#include <Urho3D/Physics2D/ConstraintRope2D.h>
 #include <Urho3D/Physics2D/ConstraintWeld2D.h>
 #include <Urho3D/Physics2D/ConstraintWheel2D.h>
 #include <Urho3D/Physics2D/PhysicsWorld2D.h>
@@ -208,9 +207,11 @@ void Urho2DConstraints::CreateScene()
     constraintDistance->SetOtherBody(ballDistanceBody); // Constrain ball to box
     constraintDistance->SetOwnerBodyAnchor(boxDistanceNode->GetPosition2D());
     constraintDistance->SetOtherBodyAnchor(ballDistanceNode->GetPosition2D());
+    
     // Make the constraint soft (comment to make it rigid, which is its basic behavior)
-    constraintDistance->SetFrequencyHz(4.0f);
-    constraintDistance->SetDampingRatio(0.5f);
+    constraintDistance->SetMinLength(constraintDistance->GetLength() - 1.f);
+    constraintDistance->SetMaxLength(constraintDistance->GetLength() + 1.f);
+    constraintDistance->SetLinearStiffness(4.0f, 0.5f);
 
     // Create a ConstraintFriction2D ********** Not functional. From Box2d samples it seems that 2 anchors are required, Urho2D only provides 1, needs investigation ***********
     CreateFlag("ConstraintFriction2D", 0.03f, 1.0f); // Display Text3D flag
@@ -271,16 +272,14 @@ void Urho2DConstraints::CreateScene()
     wheel1->SetAnchor(ball1WheelNode->GetPosition2D());
     wheel1->SetAxis(Vector2(0.0f, 1.0f));
     wheel1->SetMaxMotorTorque(20.0f);
-    wheel1->SetFrequencyHz(4.0f);
-    wheel1->SetDampingRatio(0.4f);
+    wheel1->SetLinearStiffness(4.0f, 0.4f);
 
     auto* wheel2 = car->CreateComponent<ConstraintWheel2D>();
     wheel2->SetOtherBody(ball2WheelNode->GetComponent<RigidBody2D>());
     wheel2->SetAnchor(ball2WheelNode->GetPosition2D());
     wheel2->SetAxis(Vector2(0.0f, 1.0f));
     wheel2->SetMaxMotorTorque(10.0f);
-    wheel2->SetFrequencyHz(4.0f);
-    wheel2->SetDampingRatio(0.4f);
+    wheel2->SetLinearStiffness(4.0f, 0.4f);
 
     // ConstraintMotor2D
     CreateFlag("ConstraintMotor2D", 2.53f, -1.0f); // Display Text3D flag
@@ -356,21 +355,6 @@ void Urho2DConstraints::CreateScene()
     constraintRevolute->SetMotorSpeed(0.0f);
     constraintRevolute->SetEnableMotor(true);
 
-    // Create a ConstraintRope2D
-    CreateFlag("ConstraintRope2D", -4.97f, 1.0f); // Display Text3D flag
-    Node* boxRopeNode = box->Clone();
-    tempBody = boxRopeNode->GetComponent<RigidBody2D>();
-    tempBody->SetBodyType(BT_STATIC);
-    Node* ballRopeNode = ball->Clone();
-    boxRopeNode->SetPosition(Vector3(-3.7f, 0.7f, 0.0f));
-    ballRopeNode->SetPosition(Vector3(-4.5f, 0.0f, 0.0f));
-
-    auto* constraintRope = boxRopeNode->CreateComponent<ConstraintRope2D>();
-    constraintRope->SetOtherBody(ballRopeNode->GetComponent<RigidBody2D>()); // Constrain ball to box
-    constraintRope->SetOwnerBodyAnchor(Vector2(0.0f, -0.5f)); // Offset from box (OwnerBody) : the rope is rigid from OwnerBody center to this ownerBodyAnchor
-    constraintRope->SetMaxLength(0.9f); // Rope length
-    constraintRope->SetCollideConnected(true);
-
     // Create a ConstraintWeld2D
     CreateFlag("ConstraintWeld2D", -2.45f, 1.0f); // Display Text3D flag
     Node* boxWeldNode = box->Clone();
@@ -381,8 +365,7 @@ void Urho2DConstraints::CreateScene()
     auto* constraintWeld = boxWeldNode->CreateComponent<ConstraintWeld2D>();
     constraintWeld->SetOtherBody(ballWeldNode->GetComponent<RigidBody2D>()); // Constrain ball to box
     constraintWeld->SetAnchor(boxWeldNode->GetPosition2D());
-    constraintWeld->SetFrequencyHz(4.0f);
-    constraintWeld->SetDampingRatio(0.5f);
+    constraintWeld->SetAngularStiffness(4.0f, 0.5f);
 
     // Create a ConstraintWheel2D
     CreateFlag("ConstraintWheel2D",  2.53f, 1.0f); // Display Text3D flag
@@ -398,9 +381,8 @@ void Urho2DConstraints::CreateScene()
     constraintWheel->SetEnableMotor(true);
     constraintWheel->SetMaxMotorTorque(1.0f);
     constraintWheel->SetMotorSpeed(0.0f);
-    constraintWheel->SetFrequencyHz(4.0f);
-    constraintWheel->SetDampingRatio(0.5f);
-    constraintWheel->SetCollideConnected(true); // doesn't work
+    constraintWheel->SetLinearStiffness(4.0f, 0.5f);
+    //constraintWheel->SetCollideConnected(true); // doesn't work
 }
 
 void Urho2DConstraints::CreateFlag(const String& text, float x, float y) // Used to create Tex3D flags
@@ -524,6 +506,7 @@ void Urho2DConstraints::HandleMouseButtonDown(StringHash eventType, VariantMap& 
         constraintMouse->SetMaxForce(1000 * rigidBody->GetMass());
         constraintMouse->SetCollideConnected(true);
         constraintMouse->SetOtherBody(dummyBody);  // Use dummy body instead of rigidBody. It's better to create a dummy body automatically in ConstraintMouse2D
+        constraintMouse->SetLinearStiffness(5.0f, 0.7f);
     }
     SubscribeToEvent(E_MOUSEMOVE, URHO3D_HANDLER(Urho2DConstraints, HandleMouseMove));
     SubscribeToEvent(E_MOUSEBUTTONUP, URHO3D_HANDLER(Urho2DConstraints, HandleMouseButtonUp));
@@ -581,7 +564,7 @@ void Urho2DConstraints::HandleTouchBegin3(StringHash eventType, VariantMap& even
         constraintMouse->SetMaxForce(1000 * rigidBody->GetMass());
         constraintMouse->SetCollideConnected(true);
         constraintMouse->SetOtherBody(dummyBody);  // Use dummy body instead of rigidBody. It's better to create a dummy body automatically in ConstraintMouse2D
-        constraintMouse->SetDampingRatio(0);
+        constraintMouse->SetLinearStiffness(5.0f, 0.7f);
     }
     SubscribeToEvent(E_TOUCHMOVE, URHO3D_HANDLER(Urho2DConstraints, HandleTouchMove3));
     SubscribeToEvent(E_TOUCHEND, URHO3D_HANDLER(Urho2DConstraints, HandleTouchEnd3));

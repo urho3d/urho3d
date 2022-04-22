@@ -86,7 +86,7 @@ void Constraint2D::CreateJoint()
     if (jointDef)
     {
         joint_ = physicsWorld_->GetWorld()->CreateJoint(jointDef);
-        joint_->SetUserData(this);
+        joint_->GetUserData().pointer = (uintptr_t)this;
 
         if (ownerBody_)
             ownerBody_->AddConstraint2D(this);

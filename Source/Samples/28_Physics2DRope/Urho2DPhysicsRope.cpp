@@ -31,7 +31,6 @@
 #include <Urho3D/Physics2D/CollisionBox2D.h>
 #include <Urho3D/Physics2D/CollisionEdge2D.h>
 #include <Urho3D/Physics2D/ConstraintRevolute2D.h>
-#include <Urho3D/Physics2D/ConstraintRope2D.h>
 #include <Urho3D/Physics2D/PhysicsWorld2D.h>
 #include <Urho3D/Physics2D/RigidBody2D.h>
 #include <Urho3D/Scene/Scene.h>
@@ -143,11 +142,6 @@ void Urho2DPhysicsRope::CreateScene()
 
         prevBody = body;
     }
-
-    auto* constraintRope = groundNode->CreateComponent<ConstraintRope2D>();
-    constraintRope->SetOtherBody(prevBody);
-    constraintRope->SetOwnerBodyAnchor(Vector2(0.0f, y));
-    constraintRope->SetMaxLength(NUM_OBJECTS - 1.0f + 0.01f);
 }
 
 void Urho2DPhysicsRope::CreateInstructions()

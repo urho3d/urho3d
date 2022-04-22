@@ -137,7 +137,7 @@ void CollisionChain2D::RecreateFixture()
     if (loop_)
         chainShape_.CreateLoop(&b2Vertices[0], count);
     else
-        chainShape_.CreateChain(&b2Vertices[0], count);
+        chainShape_.CreateChain(&b2Vertices[0], count, b2Vertices[0], b2Vertices[b2Vertices.Size() - 1]);
 
     CreateFixture();
 }

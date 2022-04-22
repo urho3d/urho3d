@@ -20967,15 +20967,15 @@ template <class T> void RegisterMembers_PhysicsWorld2D(asIScriptEngine* engine, 
 
     // void PhysicsWorld2D::BeginContact(b2Contact* contact) override
     // Error: type "b2Contact*" can not automatically bind
-    // void PhysicsWorld2D::DrawCircle(const b2Vec2& center, float32 radius, const b2Color& color) override
+    // void PhysicsWorld2D::DrawCircle(const b2Vec2& center, float radius, const b2Color& color) override
     // Error: type "const b2Vec2&" can not automatically bind
-    // void PhysicsWorld2D::DrawPoint(const b2Vec2& p, float32 size, const b2Color& color) override
+    // void PhysicsWorld2D::DrawPoint(const b2Vec2& p, float size, const b2Color& color) override
     // Error: type "const b2Vec2&" can not automatically bind
     // void PhysicsWorld2D::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color) override
     // Error: type "const b2Vec2*" can not automatically bind
     // void PhysicsWorld2D::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color) override
     // Error: type "const b2Vec2&" can not automatically bind
-    // void PhysicsWorld2D::DrawSolidCircle(const b2Vec2& center, float32 radius, const b2Vec2& axis, const b2Color& color) override
+    // void PhysicsWorld2D::DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2& axis, const b2Color& color) override
     // Error: type "const b2Vec2&" can not automatically bind
     // void PhysicsWorld2D::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color) override
     // Error: type "const b2Vec2*" can not automatically bind
@@ -23953,17 +23953,21 @@ template <class T> void RegisterMembers_ConstraintDistance2D(asIScriptEngine* en
 {
     RegisterMembers_Constraint2D<T>(engine, className);
 
-    // float ConstraintDistance2D::GetDampingRatio() const
-    engine->RegisterObjectMethod(className, "float GetDampingRatio() const", AS_METHODPR(T, GetDampingRatio, () const, float), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "float get_dampingRatio() const", AS_METHODPR(T, GetDampingRatio, () const, float), AS_CALL_THISCALL);
-
-    // float ConstraintDistance2D::GetFrequencyHz() const
-    engine->RegisterObjectMethod(className, "float GetFrequencyHz() const", AS_METHODPR(T, GetFrequencyHz, () const, float), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "float get_frequencyHz() const", AS_METHODPR(T, GetFrequencyHz, () const, float), AS_CALL_THISCALL);
+    // float ConstraintDistance2D::GetDamping() const
+    engine->RegisterObjectMethod(className, "float GetDamping() const", AS_METHODPR(T, GetDamping, () const, float), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "float get_damping() const", AS_METHODPR(T, GetDamping, () const, float), AS_CALL_THISCALL);
 
     // float ConstraintDistance2D::GetLength() const
     engine->RegisterObjectMethod(className, "float GetLength() const", AS_METHODPR(T, GetLength, () const, float), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_length() const", AS_METHODPR(T, GetLength, () const, float), AS_CALL_THISCALL);
+
+    // float ConstraintDistance2D::GetMaxLength() const
+    engine->RegisterObjectMethod(className, "float GetMaxLength() const", AS_METHODPR(T, GetMaxLength, () const, float), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "float get_maxLength() const", AS_METHODPR(T, GetMaxLength, () const, float), AS_CALL_THISCALL);
+
+    // float ConstraintDistance2D::GetMinLength() const
+    engine->RegisterObjectMethod(className, "float GetMinLength() const", AS_METHODPR(T, GetMinLength, () const, float), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "float get_minLength() const", AS_METHODPR(T, GetMinLength, () const, float), AS_CALL_THISCALL);
 
     // const Vector2& ConstraintDistance2D::GetOtherBodyAnchor() const
     engine->RegisterObjectMethod(className, "const Vector2& GetOtherBodyAnchor() const", AS_METHODPR(T, GetOtherBodyAnchor, () const, const Vector2&), AS_CALL_THISCALL);
@@ -23973,17 +23977,28 @@ template <class T> void RegisterMembers_ConstraintDistance2D(asIScriptEngine* en
     engine->RegisterObjectMethod(className, "const Vector2& GetOwnerBodyAnchor() const", AS_METHODPR(T, GetOwnerBodyAnchor, () const, const Vector2&), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "const Vector2& get_ownerBodyAnchor() const", AS_METHODPR(T, GetOwnerBodyAnchor, () const, const Vector2&), AS_CALL_THISCALL);
 
-    // void ConstraintDistance2D::SetDampingRatio(float dampingRatio)
-    engine->RegisterObjectMethod(className, "void SetDampingRatio(float)", AS_METHODPR(T, SetDampingRatio, (float), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_dampingRatio(float)", AS_METHODPR(T, SetDampingRatio, (float), void), AS_CALL_THISCALL);
+    // float ConstraintDistance2D::GetStiffness() const
+    engine->RegisterObjectMethod(className, "float GetStiffness() const", AS_METHODPR(T, GetStiffness, () const, float), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "float get_stiffness() const", AS_METHODPR(T, GetStiffness, () const, float), AS_CALL_THISCALL);
 
-    // void ConstraintDistance2D::SetFrequencyHz(float frequencyHz)
-    engine->RegisterObjectMethod(className, "void SetFrequencyHz(float)", AS_METHODPR(T, SetFrequencyHz, (float), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_frequencyHz(float)", AS_METHODPR(T, SetFrequencyHz, (float), void), AS_CALL_THISCALL);
+    // void ConstraintDistance2D::SetDamping(float damping)
+    engine->RegisterObjectMethod(className, "void SetDamping(float)", AS_METHODPR(T, SetDamping, (float), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_damping(float)", AS_METHODPR(T, SetDamping, (float), void), AS_CALL_THISCALL);
 
     // void ConstraintDistance2D::SetLength(float length)
     engine->RegisterObjectMethod(className, "void SetLength(float)", AS_METHODPR(T, SetLength, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_length(float)", AS_METHODPR(T, SetLength, (float), void), AS_CALL_THISCALL);
+
+    // bool ConstraintDistance2D::SetLinearStiffness(float frequencyHertz, float dampingRatio)
+    engine->RegisterObjectMethod(className, "bool SetLinearStiffness(float, float)", AS_METHODPR(T, SetLinearStiffness, (float, float), bool), AS_CALL_THISCALL);
+
+    // void ConstraintDistance2D::SetMaxLength(float maxLength)
+    engine->RegisterObjectMethod(className, "void SetMaxLength(float)", AS_METHODPR(T, SetMaxLength, (float), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_maxLength(float)", AS_METHODPR(T, SetMaxLength, (float), void), AS_CALL_THISCALL);
+
+    // void ConstraintDistance2D::SetMinLength(float minLength)
+    engine->RegisterObjectMethod(className, "void SetMinLength(float)", AS_METHODPR(T, SetMinLength, (float), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_minLength(float)", AS_METHODPR(T, SetMinLength, (float), void), AS_CALL_THISCALL);
 
     // void ConstraintDistance2D::SetOtherBodyAnchor(const Vector2& anchor)
     engine->RegisterObjectMethod(className, "void SetOtherBodyAnchor(const Vector2&in)", AS_METHODPR(T, SetOtherBodyAnchor, (const Vector2&), void), AS_CALL_THISCALL);
@@ -23992,6 +24007,10 @@ template <class T> void RegisterMembers_ConstraintDistance2D(asIScriptEngine* en
     // void ConstraintDistance2D::SetOwnerBodyAnchor(const Vector2& anchor)
     engine->RegisterObjectMethod(className, "void SetOwnerBodyAnchor(const Vector2&in)", AS_METHODPR(T, SetOwnerBodyAnchor, (const Vector2&), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_ownerBodyAnchor(const Vector2&in)", AS_METHODPR(T, SetOwnerBodyAnchor, (const Vector2&), void), AS_CALL_THISCALL);
+
+    // void ConstraintDistance2D::SetStiffness(float stiffness)
+    engine->RegisterObjectMethod(className, "void SetStiffness(float)", AS_METHODPR(T, SetStiffness, (float), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_stiffness(float)", AS_METHODPR(T, SetStiffness, (float), void), AS_CALL_THISCALL);
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ConstraintDistance2D
         REGISTER_MEMBERS_MANUAL_PART_ConstraintDistance2D();
@@ -24121,33 +24140,36 @@ template <class T> void RegisterMembers_ConstraintMouse2D(asIScriptEngine* engin
 {
     RegisterMembers_Constraint2D<T>(engine, className);
 
-    // float ConstraintMouse2D::GetDampingRatio() const
-    engine->RegisterObjectMethod(className, "float GetDampingRatio() const", AS_METHODPR(T, GetDampingRatio, () const, float), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "float get_dampingRatio() const", AS_METHODPR(T, GetDampingRatio, () const, float), AS_CALL_THISCALL);
-
-    // float ConstraintMouse2D::GetFrequencyHz() const
-    engine->RegisterObjectMethod(className, "float GetFrequencyHz() const", AS_METHODPR(T, GetFrequencyHz, () const, float), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "float get_frequencyHz() const", AS_METHODPR(T, GetFrequencyHz, () const, float), AS_CALL_THISCALL);
+    // float ConstraintMouse2D::GetDamping() const
+    engine->RegisterObjectMethod(className, "float GetDamping() const", AS_METHODPR(T, GetDamping, () const, float), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "float get_damping() const", AS_METHODPR(T, GetDamping, () const, float), AS_CALL_THISCALL);
 
     // float ConstraintMouse2D::GetMaxForce() const
     engine->RegisterObjectMethod(className, "float GetMaxForce() const", AS_METHODPR(T, GetMaxForce, () const, float), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_maxForce() const", AS_METHODPR(T, GetMaxForce, () const, float), AS_CALL_THISCALL);
 
+    // float ConstraintMouse2D::GetStiffness() const
+    engine->RegisterObjectMethod(className, "float GetStiffness() const", AS_METHODPR(T, GetStiffness, () const, float), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "float get_stiffness() const", AS_METHODPR(T, GetStiffness, () const, float), AS_CALL_THISCALL);
+
     // const Vector2& ConstraintMouse2D::GetTarget() const
     engine->RegisterObjectMethod(className, "const Vector2& GetTarget() const", AS_METHODPR(T, GetTarget, () const, const Vector2&), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "const Vector2& get_target() const", AS_METHODPR(T, GetTarget, () const, const Vector2&), AS_CALL_THISCALL);
 
-    // void ConstraintMouse2D::SetDampingRatio(float dampingRatio)
-    engine->RegisterObjectMethod(className, "void SetDampingRatio(float)", AS_METHODPR(T, SetDampingRatio, (float), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_dampingRatio(float)", AS_METHODPR(T, SetDampingRatio, (float), void), AS_CALL_THISCALL);
+    // void ConstraintMouse2D::SetDamping(float damping)
+    engine->RegisterObjectMethod(className, "void SetDamping(float)", AS_METHODPR(T, SetDamping, (float), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_damping(float)", AS_METHODPR(T, SetDamping, (float), void), AS_CALL_THISCALL);
 
-    // void ConstraintMouse2D::SetFrequencyHz(float frequencyHz)
-    engine->RegisterObjectMethod(className, "void SetFrequencyHz(float)", AS_METHODPR(T, SetFrequencyHz, (float), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_frequencyHz(float)", AS_METHODPR(T, SetFrequencyHz, (float), void), AS_CALL_THISCALL);
+    // bool ConstraintMouse2D::SetLinearStiffness(float frequencyHertz, float dampingRatio)
+    engine->RegisterObjectMethod(className, "bool SetLinearStiffness(float, float)", AS_METHODPR(T, SetLinearStiffness, (float, float), bool), AS_CALL_THISCALL);
 
     // void ConstraintMouse2D::SetMaxForce(float maxForce)
     engine->RegisterObjectMethod(className, "void SetMaxForce(float)", AS_METHODPR(T, SetMaxForce, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_maxForce(float)", AS_METHODPR(T, SetMaxForce, (float), void), AS_CALL_THISCALL);
+
+    // void ConstraintMouse2D::SetStiffness(float stiffness)
+    engine->RegisterObjectMethod(className, "void SetStiffness(float)", AS_METHODPR(T, SetStiffness, (float), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_stiffness(float)", AS_METHODPR(T, SetStiffness, (float), void), AS_CALL_THISCALL);
 
     // void ConstraintMouse2D::SetTarget(const Vector2& target)
     engine->RegisterObjectMethod(className, "void SetTarget(const Vector2&in)", AS_METHODPR(T, SetTarget, (const Vector2&), void), AS_CALL_THISCALL);
@@ -24348,40 +24370,6 @@ template <class T> void RegisterMembers_ConstraintRevolute2D(asIScriptEngine* en
     #endif
 }
 
-// class ConstraintRope2D | File: ../Physics2D/ConstraintRope2D.h
-template <class T> void RegisterMembers_ConstraintRope2D(asIScriptEngine* engine, const char* className)
-{
-    RegisterMembers_Constraint2D<T>(engine, className);
-
-    // float ConstraintRope2D::GetMaxLength() const
-    engine->RegisterObjectMethod(className, "float GetMaxLength() const", AS_METHODPR(T, GetMaxLength, () const, float), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "float get_maxLength() const", AS_METHODPR(T, GetMaxLength, () const, float), AS_CALL_THISCALL);
-
-    // const Vector2& ConstraintRope2D::GetOtherBodyAnchor() const
-    engine->RegisterObjectMethod(className, "const Vector2& GetOtherBodyAnchor() const", AS_METHODPR(T, GetOtherBodyAnchor, () const, const Vector2&), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "const Vector2& get_otherBodyAnchor() const", AS_METHODPR(T, GetOtherBodyAnchor, () const, const Vector2&), AS_CALL_THISCALL);
-
-    // const Vector2& ConstraintRope2D::GetOwnerBodyAnchor() const
-    engine->RegisterObjectMethod(className, "const Vector2& GetOwnerBodyAnchor() const", AS_METHODPR(T, GetOwnerBodyAnchor, () const, const Vector2&), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "const Vector2& get_ownerBodyAnchor() const", AS_METHODPR(T, GetOwnerBodyAnchor, () const, const Vector2&), AS_CALL_THISCALL);
-
-    // void ConstraintRope2D::SetMaxLength(float maxLength)
-    engine->RegisterObjectMethod(className, "void SetMaxLength(float)", AS_METHODPR(T, SetMaxLength, (float), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_maxLength(float)", AS_METHODPR(T, SetMaxLength, (float), void), AS_CALL_THISCALL);
-
-    // void ConstraintRope2D::SetOtherBodyAnchor(const Vector2& anchor)
-    engine->RegisterObjectMethod(className, "void SetOtherBodyAnchor(const Vector2&in)", AS_METHODPR(T, SetOtherBodyAnchor, (const Vector2&), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_otherBodyAnchor(const Vector2&in)", AS_METHODPR(T, SetOtherBodyAnchor, (const Vector2&), void), AS_CALL_THISCALL);
-
-    // void ConstraintRope2D::SetOwnerBodyAnchor(const Vector2& anchor)
-    engine->RegisterObjectMethod(className, "void SetOwnerBodyAnchor(const Vector2&in)", AS_METHODPR(T, SetOwnerBodyAnchor, (const Vector2&), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_ownerBodyAnchor(const Vector2&in)", AS_METHODPR(T, SetOwnerBodyAnchor, (const Vector2&), void), AS_CALL_THISCALL);
-
-    #ifdef REGISTER_MEMBERS_MANUAL_PART_ConstraintRope2D
-        REGISTER_MEMBERS_MANUAL_PART_ConstraintRope2D();
-    #endif
-}
-
 // class ConstraintWeld2D | File: ../Physics2D/ConstraintWeld2D.h
 template <class T> void RegisterMembers_ConstraintWeld2D(asIScriptEngine* engine, const char* className)
 {
@@ -24391,25 +24379,28 @@ template <class T> void RegisterMembers_ConstraintWeld2D(asIScriptEngine* engine
     engine->RegisterObjectMethod(className, "const Vector2& GetAnchor() const", AS_METHODPR(T, GetAnchor, () const, const Vector2&), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "const Vector2& get_anchor() const", AS_METHODPR(T, GetAnchor, () const, const Vector2&), AS_CALL_THISCALL);
 
-    // float ConstraintWeld2D::GetDampingRatio() const
-    engine->RegisterObjectMethod(className, "float GetDampingRatio() const", AS_METHODPR(T, GetDampingRatio, () const, float), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "float get_dampingRatio() const", AS_METHODPR(T, GetDampingRatio, () const, float), AS_CALL_THISCALL);
+    // float ConstraintWeld2D::GetDamping() const
+    engine->RegisterObjectMethod(className, "float GetDamping() const", AS_METHODPR(T, GetDamping, () const, float), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "float get_damping() const", AS_METHODPR(T, GetDamping, () const, float), AS_CALL_THISCALL);
 
-    // float ConstraintWeld2D::GetFrequencyHz() const
-    engine->RegisterObjectMethod(className, "float GetFrequencyHz() const", AS_METHODPR(T, GetFrequencyHz, () const, float), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "float get_frequencyHz() const", AS_METHODPR(T, GetFrequencyHz, () const, float), AS_CALL_THISCALL);
+    // float ConstraintWeld2D::GetStiffness() const
+    engine->RegisterObjectMethod(className, "float GetStiffness() const", AS_METHODPR(T, GetStiffness, () const, float), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "float get_stiffness() const", AS_METHODPR(T, GetStiffness, () const, float), AS_CALL_THISCALL);
 
     // void ConstraintWeld2D::SetAnchor(const Vector2& anchor)
     engine->RegisterObjectMethod(className, "void SetAnchor(const Vector2&in)", AS_METHODPR(T, SetAnchor, (const Vector2&), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_anchor(const Vector2&in)", AS_METHODPR(T, SetAnchor, (const Vector2&), void), AS_CALL_THISCALL);
 
-    // void ConstraintWeld2D::SetDampingRatio(float dampingRatio)
-    engine->RegisterObjectMethod(className, "void SetDampingRatio(float)", AS_METHODPR(T, SetDampingRatio, (float), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_dampingRatio(float)", AS_METHODPR(T, SetDampingRatio, (float), void), AS_CALL_THISCALL);
+    // bool ConstraintWeld2D::SetAngularStiffness(float frequencyHertz, float dampingRatio)
+    engine->RegisterObjectMethod(className, "bool SetAngularStiffness(float, float)", AS_METHODPR(T, SetAngularStiffness, (float, float), bool), AS_CALL_THISCALL);
 
-    // void ConstraintWeld2D::SetFrequencyHz(float frequencyHz)
-    engine->RegisterObjectMethod(className, "void SetFrequencyHz(float)", AS_METHODPR(T, SetFrequencyHz, (float), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_frequencyHz(float)", AS_METHODPR(T, SetFrequencyHz, (float), void), AS_CALL_THISCALL);
+    // void ConstraintWeld2D::SetDamping(float damping)
+    engine->RegisterObjectMethod(className, "void SetDamping(float)", AS_METHODPR(T, SetDamping, (float), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_damping(float)", AS_METHODPR(T, SetDamping, (float), void), AS_CALL_THISCALL);
+
+    // void ConstraintWeld2D::SetStiffness(float stiffness)
+    engine->RegisterObjectMethod(className, "void SetStiffness(float)", AS_METHODPR(T, SetStiffness, (float), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_stiffness(float)", AS_METHODPR(T, SetStiffness, (float), void), AS_CALL_THISCALL);
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ConstraintWeld2D
         REGISTER_MEMBERS_MANUAL_PART_ConstraintWeld2D();
@@ -24429,17 +24420,21 @@ template <class T> void RegisterMembers_ConstraintWheel2D(asIScriptEngine* engin
     engine->RegisterObjectMethod(className, "const Vector2& GetAxis() const", AS_METHODPR(T, GetAxis, () const, const Vector2&), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "const Vector2& get_axis() const", AS_METHODPR(T, GetAxis, () const, const Vector2&), AS_CALL_THISCALL);
 
-    // float ConstraintWheel2D::GetDampingRatio() const
-    engine->RegisterObjectMethod(className, "float GetDampingRatio() const", AS_METHODPR(T, GetDampingRatio, () const, float), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "float get_dampingRatio() const", AS_METHODPR(T, GetDampingRatio, () const, float), AS_CALL_THISCALL);
+    // float ConstraintWheel2D::GetDamping() const
+    engine->RegisterObjectMethod(className, "float GetDamping() const", AS_METHODPR(T, GetDamping, () const, float), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "float get_damping() const", AS_METHODPR(T, GetDamping, () const, float), AS_CALL_THISCALL);
+
+    // bool ConstraintWheel2D::GetEnableLimit() const
+    engine->RegisterObjectMethod(className, "bool GetEnableLimit() const", AS_METHODPR(T, GetEnableLimit, () const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_enableLimit() const", AS_METHODPR(T, GetEnableLimit, () const, bool), AS_CALL_THISCALL);
 
     // bool ConstraintWheel2D::GetEnableMotor() const
     engine->RegisterObjectMethod(className, "bool GetEnableMotor() const", AS_METHODPR(T, GetEnableMotor, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_enableMotor() const", AS_METHODPR(T, GetEnableMotor, () const, bool), AS_CALL_THISCALL);
 
-    // float ConstraintWheel2D::GetFrequencyHz() const
-    engine->RegisterObjectMethod(className, "float GetFrequencyHz() const", AS_METHODPR(T, GetFrequencyHz, () const, float), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "float get_frequencyHz() const", AS_METHODPR(T, GetFrequencyHz, () const, float), AS_CALL_THISCALL);
+    // float ConstraintWheel2D::GetLowerTranslation() const
+    engine->RegisterObjectMethod(className, "float GetLowerTranslation() const", AS_METHODPR(T, GetLowerTranslation, () const, float), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "float get_lowerTranslation() const", AS_METHODPR(T, GetLowerTranslation, () const, float), AS_CALL_THISCALL);
 
     // float ConstraintWheel2D::GetMaxMotorTorque() const
     engine->RegisterObjectMethod(className, "float GetMaxMotorTorque() const", AS_METHODPR(T, GetMaxMotorTorque, () const, float), AS_CALL_THISCALL);
@@ -24449,6 +24444,14 @@ template <class T> void RegisterMembers_ConstraintWheel2D(asIScriptEngine* engin
     engine->RegisterObjectMethod(className, "float GetMotorSpeed() const", AS_METHODPR(T, GetMotorSpeed, () const, float), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_motorSpeed() const", AS_METHODPR(T, GetMotorSpeed, () const, float), AS_CALL_THISCALL);
 
+    // float ConstraintWheel2D::GetStiffness() const
+    engine->RegisterObjectMethod(className, "float GetStiffness() const", AS_METHODPR(T, GetStiffness, () const, float), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "float get_stiffness() const", AS_METHODPR(T, GetStiffness, () const, float), AS_CALL_THISCALL);
+
+    // float ConstraintWheel2D::GetUpperTranslation() const
+    engine->RegisterObjectMethod(className, "float GetUpperTranslation() const", AS_METHODPR(T, GetUpperTranslation, () const, float), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "float get_upperTranslation() const", AS_METHODPR(T, GetUpperTranslation, () const, float), AS_CALL_THISCALL);
+
     // void ConstraintWheel2D::SetAnchor(const Vector2& anchor)
     engine->RegisterObjectMethod(className, "void SetAnchor(const Vector2&in)", AS_METHODPR(T, SetAnchor, (const Vector2&), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_anchor(const Vector2&in)", AS_METHODPR(T, SetAnchor, (const Vector2&), void), AS_CALL_THISCALL);
@@ -24457,17 +24460,24 @@ template <class T> void RegisterMembers_ConstraintWheel2D(asIScriptEngine* engin
     engine->RegisterObjectMethod(className, "void SetAxis(const Vector2&in)", AS_METHODPR(T, SetAxis, (const Vector2&), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_axis(const Vector2&in)", AS_METHODPR(T, SetAxis, (const Vector2&), void), AS_CALL_THISCALL);
 
-    // void ConstraintWheel2D::SetDampingRatio(float dampingRatio)
-    engine->RegisterObjectMethod(className, "void SetDampingRatio(float)", AS_METHODPR(T, SetDampingRatio, (float), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_dampingRatio(float)", AS_METHODPR(T, SetDampingRatio, (float), void), AS_CALL_THISCALL);
+    // void ConstraintWheel2D::SetDamping(float damping)
+    engine->RegisterObjectMethod(className, "void SetDamping(float)", AS_METHODPR(T, SetDamping, (float), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_damping(float)", AS_METHODPR(T, SetDamping, (float), void), AS_CALL_THISCALL);
+
+    // void ConstraintWheel2D::SetEnableLimit(bool enableLimit)
+    engine->RegisterObjectMethod(className, "void SetEnableLimit(bool)", AS_METHODPR(T, SetEnableLimit, (bool), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_enableLimit(bool)", AS_METHODPR(T, SetEnableLimit, (bool), void), AS_CALL_THISCALL);
 
     // void ConstraintWheel2D::SetEnableMotor(bool enableMotor)
     engine->RegisterObjectMethod(className, "void SetEnableMotor(bool)", AS_METHODPR(T, SetEnableMotor, (bool), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_enableMotor(bool)", AS_METHODPR(T, SetEnableMotor, (bool), void), AS_CALL_THISCALL);
 
-    // void ConstraintWheel2D::SetFrequencyHz(float frequencyHz)
-    engine->RegisterObjectMethod(className, "void SetFrequencyHz(float)", AS_METHODPR(T, SetFrequencyHz, (float), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_frequencyHz(float)", AS_METHODPR(T, SetFrequencyHz, (float), void), AS_CALL_THISCALL);
+    // bool ConstraintWheel2D::SetLinearStiffness(float frequencyHertz, float dampingRatio)
+    engine->RegisterObjectMethod(className, "bool SetLinearStiffness(float, float)", AS_METHODPR(T, SetLinearStiffness, (float, float), bool), AS_CALL_THISCALL);
+
+    // void ConstraintWheel2D::SetLowerTranslation(float lowerTranslation)
+    engine->RegisterObjectMethod(className, "void SetLowerTranslation(float)", AS_METHODPR(T, SetLowerTranslation, (float), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_lowerTranslation(float)", AS_METHODPR(T, SetLowerTranslation, (float), void), AS_CALL_THISCALL);
 
     // void ConstraintWheel2D::SetMaxMotorTorque(float maxMotorTorque)
     engine->RegisterObjectMethod(className, "void SetMaxMotorTorque(float)", AS_METHODPR(T, SetMaxMotorTorque, (float), void), AS_CALL_THISCALL);
@@ -24476,6 +24486,14 @@ template <class T> void RegisterMembers_ConstraintWheel2D(asIScriptEngine* engin
     // void ConstraintWheel2D::SetMotorSpeed(float motorSpeed)
     engine->RegisterObjectMethod(className, "void SetMotorSpeed(float)", AS_METHODPR(T, SetMotorSpeed, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_motorSpeed(float)", AS_METHODPR(T, SetMotorSpeed, (float), void), AS_CALL_THISCALL);
+
+    // void ConstraintWheel2D::SetStiffness(float stiffness)
+    engine->RegisterObjectMethod(className, "void SetStiffness(float)", AS_METHODPR(T, SetStiffness, (float), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_stiffness(float)", AS_METHODPR(T, SetStiffness, (float), void), AS_CALL_THISCALL);
+
+    // void ConstraintWheel2D::SetUpperTranslation(float upperTranslation)
+    engine->RegisterObjectMethod(className, "void SetUpperTranslation(float)", AS_METHODPR(T, SetUpperTranslation, (float), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_upperTranslation(float)", AS_METHODPR(T, SetUpperTranslation, (float), void), AS_CALL_THISCALL);
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_ConstraintWheel2D
         REGISTER_MEMBERS_MANUAL_PART_ConstraintWheel2D();
