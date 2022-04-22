@@ -180,10 +180,12 @@ Node* Sample2D::CreateCharacter(const TileMapInfo2D& info, float friction, const
     auto* impBody = spriteNode->CreateComponent<RigidBody2D>();
     impBody->SetBodyType(BT_DYNAMIC);
     impBody->SetAllowSleep(false);
+    impBody->SetFixedRotation(true);
     auto* shape = spriteNode->CreateComponent<CollisionCircle2D>();
     shape->SetRadius(1.1f); // Set shape size
     shape->SetFriction(friction); // Set friction
     shape->SetRestitution(0.1f); // Bounce
+    shape->SetDensity(6.6f);
 
     return spriteNode;
 }

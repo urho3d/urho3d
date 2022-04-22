@@ -135,10 +135,13 @@ void CreateCharacter(const TileMapInfo2D@ info, bool createObject, float frictio
     RigidBody2D@ characterBody = character2DNode.CreateComponent("RigidBody2D");
     characterBody.bodyType = BT_DYNAMIC;
     characterBody.allowSleep = false;
+    characterBody.fixedRotation = true;
     CollisionCircle2D@ shape = character2DNode.CreateComponent("CollisionCircle2D");
     shape.radius = 1.1f; // Set shape size
     shape.friction = friction; // Set friction
     shape.restitution = 0.1f; // Bounce
+    shape.density = 6.6f;
+
     if (createObject)
         character2DNode.CreateScriptObject(scriptFile, "Character2D"); // Create a ScriptObject to handle character behavior
 
