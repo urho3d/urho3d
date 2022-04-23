@@ -123,8 +123,9 @@ void CreateScene()
     constraintDistance.ownerBodyAnchor = boxDistanceNode.position2D;
     constraintDistance.otherBodyAnchor = ballDistanceNode.position2D;
     // Make the constraint soft (comment to make it rigid, which is its basic behavior)
-    constraintDistance.frequencyHz = 4.0f;
-    constraintDistance.dampingRatio = 0.5f;
+    constraintDistance.minLength  = constraintDistance.length - 1.0f;
+    constraintDistance.maxLength  = constraintDistance.length + 1.0f;
+    constraintDistance.SetLinearStiffness(4.0f, 0.5f);
 
     // Create a ConstraintFriction2D ********** Not functional. From Box2d samples it seems that 2 anchors are required, Urho2D only provides 1, needs investigation ***********
     CreateFlag("ConstraintFriction2D", 0.03f, 1.0f); // Display Text3D flag
@@ -185,16 +186,14 @@ void CreateScene()
     wheel1.anchor = ball1WheelNode.position2D;
     wheel1.axis = Vector2(0.0f, 1.0f);
     wheel1.maxMotorTorque = 20.0f;
-    wheel1.frequencyHz = 4.0f;
-    wheel1.dampingRatio = 0.4f;
+    wheel1.SetLinearStiffness(4.0f, 0.4f);
 
     ConstraintWheel2D@ wheel2 = car.CreateComponent("ConstraintWheel2D");
     wheel2.otherBody = ball2WheelNode.GetComponent("RigidBody2D");
     wheel2.anchor = ball2WheelNode.position2D;
     wheel2.axis = Vector2(0.0f, 1.0f);
     wheel2.maxMotorTorque = 10.0f;
-    wheel2.frequencyHz = 4.0f;
-    wheel2.dampingRatio = 0.4f;
+    wheel2.SetLinearStiffness(4.0f, 0.4f);
 
     // ConstraintMotor2D
     CreateFlag("ConstraintMotor2D", 2.53f, -1.0f); // Display Text3D flag
@@ -270,21 +269,6 @@ void CreateScene()
     constraintRevolute.motorSpeed = 0.0f;
     constraintRevolute.enableMotor = true;
 
-    // Create a ConstraintRope2D
-    CreateFlag("ConstraintRope2D", -4.97f, 1.0f); // Display Text3D flag
-    Node@ boxRopeNode = box.Clone();
-    tempBody = boxRopeNode.GetComponent("RigidBody2D");
-    tempBody.bodyType = BT_STATIC;
-    Node@ ballRopeNode = ball.Clone();
-    boxRopeNode.position = Vector3(-3.7f, 0.7f, 0.0f);
-    ballRopeNode.position = Vector3(-4.5f, 0.0f, 0.0f);
-
-    ConstraintRope2D@ constraintRope = boxRopeNode.CreateComponent("ConstraintRope2D");
-    constraintRope.otherBody = ballRopeNode.GetComponent("RigidBody2D"); // Constrain ball to box
-    constraintRope.ownerBodyAnchor = Vector2(0.0f, -0.5f); // Offset from box (OwnerBody) : the rope is rigid from OwnerBody center to this ownerBodyAnchor
-    constraintRope.maxLength = 0.9f; // Rope length
-    constraintRope.collideConnected = true;
-
     // Create a ConstraintWeld2D
     CreateFlag("ConstraintWeld2D", -2.45f, 1.0f); // Display Text3D flag
     Node@ boxWeldNode = box.Clone();
@@ -295,8 +279,7 @@ void CreateScene()
     ConstraintWeld2D@ constraintWeld = boxWeldNode.CreateComponent("ConstraintWeld2D");
     constraintWeld.otherBody = ballWeldNode.GetComponent("RigidBody2D"); // Constrain ball to box
     constraintWeld.anchor = boxWeldNode.position2D;
-    constraintWeld.frequencyHz = 4.0f;
-    constraintWeld.dampingRatio = 0.5f;
+    constraintWeld.SetAngularStiffness(4.0f, 0.5f);
 
     // Create a ConstraintWheel2D
     CreateFlag("ConstraintWheel2D",  2.53f, 1.0f); // Display Text3D flag
@@ -312,9 +295,8 @@ void CreateScene()
     constraintWheel.enableMotor = true;
     constraintWheel.maxMotorTorque = 1.0f;
     constraintWheel.motorSpeed = 0.0f;
-    constraintWheel.frequencyHz = 4.0f;
-    constraintWheel.dampingRatio = 0.5f;
-    constraintWheel.collideConnected = true; // doesn't work
+    constraintWheel.SetLinearStiffness(4.0f, 0.5f);
+    //constraintWheel.collideConnected = true; // doesn't work
 }
 
 void CreateFlag(const String&in text, float x, float y) // Used to create Tex3D flags
@@ -405,6 +387,7 @@ void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
         constraintMouse.maxForce = 1000 * rigidBody.mass;
         constraintMouse.collideConnected = true;
         constraintMouse.otherBody = dummyBody;  // Use dummy body instead of rigidBody. It's better to create a dummy body automatically in ConstraintMouse2D
+        constraintMouse.SetLinearStiffness(5.0f, 0.7f);
     }
     SubscribeToEvent("MouseMove", "HandleMouseMove");
     SubscribeToEvent("MouseButtonUp", "HandleMouseButtonUp");
@@ -458,7 +441,7 @@ void HandleTouchBegin3(StringHash eventType, VariantMap& eventData)
         constraintMouse.maxForce = 1000 * rigidBody.mass;
         constraintMouse.collideConnected = true;
         constraintMouse.otherBody = dummyBody;  // Use dummy body instead of rigidBody. It's better to create a dummy body automatically in ConstraintMouse2D
-        constraintMouse.dampingRatio = 0;
+        constraintMouse.SetLinearStiffness(5.0f, 0.7f);
     }
     SubscribeToEvent("TouchMove", "HandleTouchMove3");
     SubscribeToEvent("TouchEnd", "HandleTouchEnd3");

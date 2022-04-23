@@ -105,8 +105,9 @@ CollisionPolygon2D@ CreatePolygonShape(Node@ node, const TileMapObject2D@ object
     return shape;
 }
 
-CollisionChain2D@ CreatePolyLineShape(Node@ node, TileMapObject2D@ object)
+void CreatePolyLineShape(Node@ node, TileMapObject2D@ object)
 {
+/*
     CollisionChain2D@ shape = node.CreateComponent("CollisionChain2D");
     uint numVertices = object.numPoints;
     shape.vertexCount = numVertices;
@@ -116,6 +117,21 @@ CollisionChain2D@ CreatePolyLineShape(Node@ node, TileMapObject2D@ object)
     if (object.HasProperty("Friction"))
         shape.friction = object.GetProperty("Friction").ToFloat();
     return shape;
+*/
+
+    // Latest Box2D supports only one sided chains with ghost vertices, use two sided edges instead.
+    // But this can cause stuck at the edges ends https://box2d.org/posts/2020/06/ghost-collisions/
+
+    int numVertices = object.numPoints;
+
+    for (int i = 1; i < numVertices; ++i)
+    {
+        CollisionEdge2D@ shape = node.CreateComponent("CollisionEdge2D");
+        shape.SetVertices(object.GetPoint(i - 1), object.GetPoint(i));
+        shape.friction = 0.8f;
+        if (object.HasProperty("Friction"))
+            shape.friction = object.GetProperty("Friction").ToFloat();
+    }
 }
 
 void CreateCharacter(const TileMapInfo2D@ info, bool createObject, float friction, Vector3 position, float scale)
@@ -135,10 +151,13 @@ void CreateCharacter(const TileMapInfo2D@ info, bool createObject, float frictio
     RigidBody2D@ characterBody = character2DNode.CreateComponent("RigidBody2D");
     characterBody.bodyType = BT_DYNAMIC;
     characterBody.allowSleep = false;
+    characterBody.fixedRotation = true;
     CollisionCircle2D@ shape = character2DNode.CreateComponent("CollisionCircle2D");
     shape.radius = 1.1f; // Set shape size
     shape.friction = friction; // Set friction
     shape.restitution = 0.1f; // Bounce
+    shape.density = 6.6f;
+
     if (createObject)
         character2DNode.CreateScriptObject(scriptFile, "Character2D"); // Create a ScriptObject to handle character behavior
 

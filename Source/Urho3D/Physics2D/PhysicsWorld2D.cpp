@@ -101,7 +101,7 @@ void PhysicsWorld2D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 
         debugRenderer_ = debug;
         debugDepthTest_ = depthTest;
-        world_->DrawDebugData();
+        world_->DebugDraw();
         debugRenderer_ = nullptr;
     }
 }
@@ -211,7 +211,7 @@ void PhysicsWorld2D::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount,
         debugRenderer_->AddTriangle(v, ToVector3(vertices[i]), ToVector3(vertices[i + 1]), c, debugDepthTest_);
 }
 
-void PhysicsWorld2D::DrawCircle(const b2Vec2& center, float32 radius, const b2Color& color)
+void PhysicsWorld2D::DrawCircle(const b2Vec2& center, float radius, const b2Color& color)
 {
     if (!debugRenderer_)
         return;
@@ -232,12 +232,12 @@ void PhysicsWorld2D::DrawCircle(const b2Vec2& center, float32 radius, const b2Co
 
 extern URHO3D_API const float PIXEL_SIZE;
 
-void PhysicsWorld2D::DrawPoint(const b2Vec2& p, float32 size, const b2Color& color)
+void PhysicsWorld2D::DrawPoint(const b2Vec2& p, float size, const b2Color& color)
 {
     DrawSolidCircle(p, size * 0.5f * PIXEL_SIZE, b2Vec2(), color);
 }
 
-void PhysicsWorld2D::DrawSolidCircle(const b2Vec2& center, float32 radius, const b2Vec2& axis, const b2Color& color)
+void PhysicsWorld2D::DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2& axis, const b2Color& color)
 {
     if (!debugRenderer_)
         return;
@@ -268,7 +268,7 @@ void PhysicsWorld2D::DrawTransform(const b2Transform& xf)
     if (!debugRenderer_)
         return;
 
-    const float32 axisScale = 0.4f;
+    const float axisScale = 0.4f;
 
     b2Vec2 p1 = xf.p, p2;
     p2 = p1 + axisScale * xf.q.GetXAxis();
@@ -468,7 +468,7 @@ public:
     }
 
     // Called for each fixture found in the query.
-    float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction) override
+    float ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float fraction) override
     {
         // Ignore sensor
         if (fixture->IsSensor())
@@ -481,7 +481,7 @@ public:
         result.position_ = ToVector2(point);
         result.normal_ = ToVector2(normal);
         result.distance_ = (result.position_ - startPoint_).Length();
-        result.body_ = (RigidBody2D*)(fixture->GetBody()->GetUserData());
+        result.body_ = (RigidBody2D*)(fixture->GetBody()->GetUserData().pointer);
 
         results_.Push(result);
         return true;
@@ -519,7 +519,7 @@ public:
     }
 
     // Called for each fixture found in the query.
-    float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction) override
+    float ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float fraction) override
     {
         // Ignore sensor
         if (fixture->IsSensor())
@@ -536,7 +536,7 @@ public:
             result_.position_ = ToVector2(point);
             result_.normal_ = ToVector2(normal);
             result_.distance_ = distance;
-            result_.body_ = (RigidBody2D*)(fixture->GetBody()->GetUserData());
+            result_.body_ = (RigidBody2D*)(fixture->GetBody()->GetUserData().pointer);
         }
 
         return true;
@@ -586,7 +586,7 @@ public:
 
         if (fixture->TestPoint(point_))
         {
-            rigidBody_ = (RigidBody2D*)(fixture->GetBody()->GetUserData());
+            rigidBody_ = (RigidBody2D*)(fixture->GetBody()->GetUserData().pointer);
             return false;
         }
 
@@ -656,7 +656,7 @@ public:
         if ((fixture->GetFilterData().maskBits & collisionMask_) == 0)
             return true;
 
-        results_.Push((RigidBody2D*)(fixture->GetBody()->GetUserData()));
+        results_.Push((RigidBody2D*)(fixture->GetBody()->GetUserData().pointer));
         return true;
     }
 
@@ -830,12 +830,12 @@ PhysicsWorld2D::ContactInfo::ContactInfo(b2Contact* contact)
 {
     b2Fixture* fixtureA = contact->GetFixtureA();
     b2Fixture* fixtureB = contact->GetFixtureB();
-    bodyA_ = (RigidBody2D*)(fixtureA->GetBody()->GetUserData());
-    bodyB_ = (RigidBody2D*)(fixtureB->GetBody()->GetUserData());
+    bodyA_ = (RigidBody2D*)(fixtureA->GetBody()->GetUserData().pointer);
+    bodyB_ = (RigidBody2D*)(fixtureB->GetBody()->GetUserData().pointer);
     nodeA_ = bodyA_->GetNode();
     nodeB_ = bodyB_->GetNode();
-    shapeA_ = (CollisionShape2D*)fixtureA->GetUserData();
-    shapeB_ = (CollisionShape2D*)fixtureB->GetUserData();
+    shapeA_ = (CollisionShape2D*)(fixtureA->GetUserData().pointer);
+    shapeB_ = (CollisionShape2D*)(fixtureB->GetUserData().pointer);
 
     b2WorldManifold worldManifold;
     contact->GetWorldManifold(&worldManifold);

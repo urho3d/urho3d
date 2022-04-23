@@ -7912,33 +7912,6 @@ static void Register_ConstraintRevolute2D(asIScriptEngine* engine)
     #endif
 }
 
-// explicit ConstraintRope2D::ConstraintRope2D(Context* context)
-static ConstraintRope2D* ConstraintRope2D__ConstraintRope2D_Contextstar()
-{
-    Context* context = GetScriptContext();
-    return new ConstraintRope2D(context);
-}
-
-// class ConstraintRope2D | File: ../Physics2D/ConstraintRope2D.h
-static void Register_ConstraintRope2D(asIScriptEngine* engine)
-{
-    // explicit ConstraintRope2D::ConstraintRope2D(Context* context)
-    engine->RegisterObjectBehaviour("ConstraintRope2D", asBEHAVE_FACTORY, "ConstraintRope2D@+ f()", AS_FUNCTION(ConstraintRope2D__ConstraintRope2D_Contextstar) , AS_CALL_CDECL);
-
-    RegisterSubclass<Constraint2D, ConstraintRope2D>(engine, "Constraint2D", "ConstraintRope2D");
-    RegisterSubclass<Component, ConstraintRope2D>(engine, "Component", "ConstraintRope2D");
-    RegisterSubclass<Animatable, ConstraintRope2D>(engine, "Animatable", "ConstraintRope2D");
-    RegisterSubclass<Serializable, ConstraintRope2D>(engine, "Serializable", "ConstraintRope2D");
-    RegisterSubclass<Object, ConstraintRope2D>(engine, "Object", "ConstraintRope2D");
-    RegisterSubclass<RefCounted, ConstraintRope2D>(engine, "RefCounted", "ConstraintRope2D");
-
-    RegisterMembers_ConstraintRope2D<ConstraintRope2D>(engine, "ConstraintRope2D");
-
-    #ifdef REGISTER_CLASS_MANUAL_PART_ConstraintRope2D
-        REGISTER_CLASS_MANUAL_PART_ConstraintRope2D();
-    #endif
-}
-
 // explicit ConstraintWeld2D::ConstraintWeld2D(Context* context)
 static ConstraintWeld2D* ConstraintWeld2D__ConstraintWeld2D_Contextstar()
 {
@@ -8753,7 +8726,6 @@ void ASRegisterGeneratedClasses(asIScriptEngine* engine)
     Register_ConstraintPrismatic2D(engine);
     Register_ConstraintPulley2D(engine);
     Register_ConstraintRevolute2D(engine);
-    Register_ConstraintRope2D(engine);
     Register_ConstraintWeld2D(engine);
     Register_ConstraintWheel2D(engine);
 #endif

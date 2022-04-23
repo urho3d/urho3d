@@ -51,9 +51,11 @@ void ConstraintDistance2D::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Owner Body Anchor", GetOwnerBodyAnchor, SetOwnerBodyAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Other Body Anchor", GetOtherBodyAnchor, SetOtherBodyAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Frequency Hz", GetFrequencyHz, SetFrequencyHz, float, 0.0f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Damping Ratio", GetDampingRatio, SetDampingRatio, float, 0.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Stiffness", GetStiffness, SetStiffness, float, 0.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Damping", GetDamping, SetDamping, float, 0.0f, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Length", GetLength, SetLength, float, 1.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Min Length", GetMinLength, SetMinLength, float, 0.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Max Length", GetMaxLength, SetMaxLength, float, FLT_MAX, AM_DEFAULT);
     URHO3D_COPY_BASE_ATTRIBUTES(Constraint2D);
 }
 
@@ -79,30 +81,30 @@ void ConstraintDistance2D::SetOtherBodyAnchor(const Vector2& anchor)
     MarkNetworkUpdate();
 }
 
-void ConstraintDistance2D::SetFrequencyHz(float frequencyHz)
+void ConstraintDistance2D::SetStiffness(float stiffness)
 {
-    if (frequencyHz == jointDef_.frequencyHz)
+    if (stiffness == jointDef_.stiffness)
         return;
 
-    jointDef_.frequencyHz = frequencyHz;
+    jointDef_.stiffness = stiffness;
 
     if (joint_)
-        static_cast<b2DistanceJoint*>(joint_)->SetFrequency(frequencyHz);
+        static_cast<b2DistanceJoint*>(joint_)->SetStiffness(stiffness);
     else
         RecreateJoint();
 
     MarkNetworkUpdate();
 }
 
-void ConstraintDistance2D::SetDampingRatio(float dampingRatio)
+void ConstraintDistance2D::SetDamping(float damping)
 {
-    if (dampingRatio == jointDef_.dampingRatio)
+    if (damping == jointDef_.damping)
         return;
 
-    jointDef_.dampingRatio = dampingRatio;
+    jointDef_.damping = damping;
 
     if (joint_)
-        static_cast<b2DistanceJoint*>(joint_)->SetDampingRatio(dampingRatio);
+        static_cast<b2DistanceJoint*>(joint_)->SetDamping(damping);
     else
         RecreateJoint();
 
@@ -137,6 +139,64 @@ b2JointDef* ConstraintDistance2D::GetJointDef()
     jointDef_.Initialize(bodyA, bodyB, ToB2Vec2(ownerBodyAnchor_), ToB2Vec2(otherBodyAnchor_));
 
     return &jointDef_;
+}
+
+bool ConstraintDistance2D::SetLinearStiffness(float frequencyHertz, float dampingRatio)
+{
+    if (!ownerBody_ || !otherBody_)
+        return false;
+
+    b2Body* bodyA = ownerBody_->GetBody();
+    b2Body* bodyB = otherBody_->GetBody();
+    if (!bodyA || !bodyB)
+        return false;
+
+    float stiffness, damping;
+    b2LinearStiffness(stiffness, damping, frequencyHertz, dampingRatio, bodyA, bodyB);
+
+    if (joint_)
+    {
+        static_cast<b2DistanceJoint*>(joint_)->SetDamping(damping);
+        static_cast<b2DistanceJoint*>(joint_)->SetStiffness(stiffness);
+    }
+    else
+    {
+        RecreateJoint();
+    }
+
+    MarkNetworkUpdate();
+
+    return true;
+}
+
+void ConstraintDistance2D::SetMinLength(float minLength)
+{
+    if (minLength == jointDef_.minLength)
+        return;
+
+    jointDef_.minLength = minLength;
+
+    if (joint_)
+        static_cast<b2DistanceJoint*>(joint_)->SetMinLength(minLength);
+    else
+        RecreateJoint();
+
+    MarkNetworkUpdate();
+}
+
+void ConstraintDistance2D::SetMaxLength(float maxLength)
+{
+    if (maxLength == jointDef_.maxLength)
+        return;
+
+    jointDef_.maxLength = maxLength;
+
+    if (joint_)
+        static_cast<b2DistanceJoint*>(joint_)->SetMaxLength(maxLength);
+    else
+        RecreateJoint();
+
+    MarkNetworkUpdate();
 }
 
 }

@@ -182,7 +182,6 @@
 #include "../Physics2D/ConstraintPrismatic2D.h"
 #include "../Physics2D/ConstraintPulley2D.h"
 #include "../Physics2D/ConstraintRevolute2D.h"
-#include "../Physics2D/ConstraintRope2D.h"
 #include "../Physics2D/ConstraintWeld2D.h"
 #include "../Physics2D/ConstraintWheel2D.h"
 #include "../Physics2D/Physics2D.h"

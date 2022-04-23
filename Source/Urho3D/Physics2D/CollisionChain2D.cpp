@@ -134,10 +134,21 @@ void CollisionChain2D::RecreateFixture()
         b2Vertices[i] = ToB2Vec2(vertices_[i] * worldScale);
 
     chainShape_.Clear();
+    
     if (loop_)
+    {
+        if (count < 2)
+            return;
+
         chainShape_.CreateLoop(&b2Vertices[0], count);
+    }
     else
-        chainShape_.CreateChain(&b2Vertices[0], count);
+    {
+        if (count < 4)
+            return;
+
+        chainShape_.CreateChain(&b2Vertices[1], count - 2, b2Vertices[0], b2Vertices[count - 1]);
+    }
 
     CreateFixture();
 }

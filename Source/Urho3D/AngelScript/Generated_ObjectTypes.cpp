@@ -1089,9 +1089,6 @@ void ASRegisterGeneratedObjectTypes(asIScriptEngine* engine)
     // class ConstraintRevolute2D | File: ../Physics2D/ConstraintRevolute2D.h
     engine->RegisterObjectType("ConstraintRevolute2D", 0, asOBJ_REF);
 
-    // class ConstraintRope2D | File: ../Physics2D/ConstraintRope2D.h
-    engine->RegisterObjectType("ConstraintRope2D", 0, asOBJ_REF);
-
     // class ConstraintWeld2D | File: ../Physics2D/ConstraintWeld2D.h
     engine->RegisterObjectType("ConstraintWeld2D", 0, asOBJ_REF);
 
