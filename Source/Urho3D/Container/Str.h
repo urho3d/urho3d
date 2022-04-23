@@ -568,7 +568,7 @@ private:
     /// MSB of the last byte is used as a flag.
     inline static constexpr u8 SSO_MASK = 0b10000000u;
     
-    inline static constexpr u8 INVERTED_SSO_MASK = ~SSO_MASK;
+    inline static constexpr u8 INVERTED_SSO_MASK = static_cast<u8>(~SSO_MASK);
 
     unsigned GetShortStringLength() const
     {
