@@ -34,6 +34,7 @@
 #include <Urho3D/Physics2D/CollisionBox2D.h>
 #include <Urho3D/Physics2D/CollisionChain2D.h>
 #include <Urho3D/Physics2D/CollisionCircle2D.h>
+#include <Urho3D/Physics2D/CollisionEdge2D.h>
 #include <Urho3D/Physics2D/CollisionPolygon2D.h>
 #include <Urho3D/Physics2D/RigidBody2D.h>
 #include <Urho3D/Resource/ResourceCache.h>
@@ -152,8 +153,9 @@ CollisionPolygon2D* Sample2D::CreatePolygonShape(Node* node, TileMapObject2D* ob
     return shape;
 }
 
-CollisionChain2D* Sample2D::CreatePolyLineShape(Node* node, TileMapObject2D* object)
+void Sample2D::CreatePolyLineShape(Node* node, TileMapObject2D* object)
 {
+    /*
     auto* shape = node->CreateComponent<CollisionChain2D>();
     int numVertices = object->GetNumPoints();
     shape->SetVertexCount(numVertices);
@@ -163,6 +165,21 @@ CollisionChain2D* Sample2D::CreatePolyLineShape(Node* node, TileMapObject2D* obj
     if (object->HasProperty("Friction"))
         shape->SetFriction(ToFloat(object->GetProperty("Friction")));
     return shape;
+    */
+
+    // Latest Box2D supports only one sided chains with ghost vertices, use two sided edges instead.
+    // But this can cause stuck at the edges ends https://box2d.org/posts/2020/06/ghost-collisions/
+
+    u32 numVertices = object->GetNumPoints();
+
+    for (u32 i = 1; i < numVertices; ++i)
+    {
+        CollisionEdge2D* shape = node->CreateComponent<CollisionEdge2D>();
+        shape->SetVertices(object->GetPoint(i - 1), object->GetPoint(i));
+        shape->SetFriction(0.8f);
+        if (object->HasProperty("Friction"))
+            shape->SetFriction(ToFloat(object->GetProperty("Friction")));
+    }
 }
 
 Node* Sample2D::CreateCharacter(const TileMapInfo2D& info, float friction, const Vector3& position, float scale)
