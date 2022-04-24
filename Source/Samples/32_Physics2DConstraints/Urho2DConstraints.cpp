@@ -454,8 +454,8 @@ void Urho2DConstraints::SubscribeToEvents()
     // Unsubscribe the SceneUpdate event from base class to prevent camera pitch and yaw in 2D sample
     UnsubscribeFromEvent(E_SCENEUPDATE);
 
-    if (touchEnabled_)
-        SubscribeToEvent(E_TOUCHBEGIN, URHO3D_HANDLER(Urho2DConstraints, HandleTouchBegin3));
+    // Overwrite the subscription from the base class
+    SubscribeToEvent(E_TOUCHBEGIN, URHO3D_HANDLER(Urho2DConstraints, HandleTouchBegin3));
 }
 
 void Urho2DConstraints::HandleUpdate(StringHash eventType, VariantMap& eventData)
@@ -546,6 +546,10 @@ void Urho2DConstraints::HandleMouseMove(StringHash eventType, VariantMap& eventD
 
 void Urho2DConstraints::HandleTouchBegin3(StringHash eventType, VariantMap& eventData)
 {
+    // On some platforms like Windows the presence of touch input can only be detected dynamically
+    if (!touchEnabled_)
+        InitTouchInput();
+
     auto* graphics = GetSubsystem<Graphics>();
     auto* physicsWorld = scene_->GetComponent<PhysicsWorld2D>();
     using namespace TouchBegin;
