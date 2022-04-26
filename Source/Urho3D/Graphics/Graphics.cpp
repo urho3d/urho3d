@@ -2166,7 +2166,7 @@ const String& Graphics::GetTextureUnitName(TextureUnit unit)
         return GetTextureUnitName_D3D11(unit);
 #endif
 
-    return {}; // Prevent warning
+    return String::EMPTY; // Prevent warning
 }
 
 Texture* Graphics::GetTexture(unsigned index) const
