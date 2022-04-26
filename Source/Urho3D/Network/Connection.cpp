@@ -38,9 +38,9 @@
 #include "../Scene/SceneEvents.h"
 #include "../Scene/SmoothedTransform.h"
 
-#include <SLikeNet/MessageIdentifiers.h>
-#include <SLikeNet/peerinterface.h>
-#include <SLikeNet/statistics.h>
+#include <slikenet/MessageIdentifiers.h>
+#include <slikenet/peerinterface.h>
+#include <slikenet/statistics.h>
 
 #ifdef SendMessage
 #undef SendMessage

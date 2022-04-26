@@ -38,10 +38,10 @@
 #include "../Network/Protocol.h"
 #include "../Scene/Scene.h"
 
-#include <SLikeNet/MessageIdentifiers.h>
-#include <SLikeNet/NatPunchthroughClient.h>
-#include <SLikeNet/peerinterface.h>
-#include <SLikeNet/statistics.h>
+#include <slikenet/MessageIdentifiers.h>
+#include <slikenet/NatPunchthroughClient.h>
+#include <slikenet/peerinterface.h>
+#include <slikenet/statistics.h>
 
 #ifdef SendMessage
 #undef SendMessage
