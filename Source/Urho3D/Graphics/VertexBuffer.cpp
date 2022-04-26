@@ -282,6 +282,8 @@ bool VertexBuffer::SetData(const void* data)
     if (gapi == GAPI_D3D11)
         return SetData_D3D11(data);
 #endif
+
+    return {}; // Prevent warning
 }
 
 bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count, bool discard)
@@ -302,6 +304,8 @@ bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count
     if (gapi == GAPI_D3D11)
         return SetDataRange_D3D11(data, start, count, discard);
 #endif
+
+    return {}; // Prevent warning
 }
 
 void* VertexBuffer::Lock(unsigned start, unsigned count, bool discard)
@@ -322,6 +326,8 @@ void* VertexBuffer::Lock(unsigned start, unsigned count, bool discard)
     if (gapi == GAPI_D3D11)
         return Lock_D3D11(start, count, discard);
 #endif
+
+    return {}; // Prevent warning
 }
 
 void VertexBuffer::Unlock()
@@ -362,6 +368,8 @@ bool VertexBuffer::Create()
     if (gapi == GAPI_D3D11)
         return Create_D3D11();
 #endif
+
+    return {}; // Prevent warning
 }
 
 bool VertexBuffer::UpdateToGPU()
@@ -382,6 +390,8 @@ bool VertexBuffer::UpdateToGPU()
     if (gapi == GAPI_D3D11)
         return UpdateToGPU_D3D11();
 #endif
+
+    return {}; // Prevent warning
 }
 
 void* VertexBuffer::MapBuffer(unsigned start, unsigned count, bool discard)
@@ -402,6 +412,8 @@ void* VertexBuffer::MapBuffer(unsigned start, unsigned count, bool discard)
     if (gapi == GAPI_D3D11)
         return MapBuffer_D3D11(start, count, discard);
 #endif
+
+    return {}; // Prevent warning
 }
 
 void VertexBuffer::UnmapBuffer()

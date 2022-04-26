@@ -213,6 +213,8 @@ bool IndexBuffer::SetData(const void* data)
     if (gapi == GAPI_D3D11)
         return SetData_D3D11(data);;
 #endif
+
+    return {}; // Prevent warning
 }
 
 bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count, bool discard)
@@ -233,6 +235,8 @@ bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count,
     if (gapi == GAPI_D3D11)
         return SetDataRange_D3D11(data, start, count, discard);
 #endif
+
+    return {}; // Prevent warning
 }
 
 void* IndexBuffer::Lock(unsigned start, unsigned count, bool discard)
@@ -253,6 +257,8 @@ void* IndexBuffer::Lock(unsigned start, unsigned count, bool discard)
     if (gapi == GAPI_D3D11)
         return Lock_D3D11(start, count, discard);
 #endif
+
+    return {}; // Prevent warning
 }
 
 void IndexBuffer::Unlock()
@@ -293,6 +299,8 @@ bool IndexBuffer::Create()
     if (gapi == GAPI_D3D11)
         return Create_D3D11();
 #endif
+
+    return {}; // Prevent warning
 }
 
 bool IndexBuffer::UpdateToGPU()
@@ -313,6 +321,8 @@ bool IndexBuffer::UpdateToGPU()
     if (gapi == GAPI_D3D11)
         return UpdateToGPU_D3D11();
 #endif
+
+    return {}; // Prevent warning
 }
 
 void* IndexBuffer::MapBuffer(unsigned start, unsigned count, bool discard)
@@ -333,6 +343,8 @@ void* IndexBuffer::MapBuffer(unsigned start, unsigned count, bool discard)
     if (gapi == GAPI_D3D11)
         return MapBuffer_D3D11(start, count, discard);
 #endif
+
+    return {}; // Prevent warning
 }
 
 void IndexBuffer::UnmapBuffer()

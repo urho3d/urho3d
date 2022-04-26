@@ -285,6 +285,8 @@ bool Texture2DArray::SetData(unsigned layer, unsigned level, int x, int y, int w
     if (gapi == GAPI_D3D11)
         return SetData_D3D11(layer, level, x, y, width, height, data);
 #endif
+
+    return {}; // Prevent warning
 }
 
 bool Texture2DArray::SetData(unsigned layer, Deserializer& source)
@@ -305,6 +307,8 @@ bool Texture2DArray::SetData(unsigned layer, Deserializer& source)
     if (gapi == GAPI_D3D11)
         return SetData_D3D11(layer, source);
 #endif
+
+    return {}; // Prevent warning
 }
 
 bool Texture2DArray::SetData(unsigned layer, Image* image, bool useAlpha)
@@ -325,6 +329,8 @@ bool Texture2DArray::SetData(unsigned layer, Image* image, bool useAlpha)
     if (gapi == GAPI_D3D11)
         return SetData_D3D11(layer, image, useAlpha);
 #endif
+
+    return {}; // Prevent warning
 }
 
 bool Texture2DArray::GetData(unsigned layer, unsigned level, void* dest) const
@@ -345,6 +351,8 @@ bool Texture2DArray::GetData(unsigned layer, unsigned level, void* dest) const
     if (gapi == GAPI_D3D11)
         return GetData_D3D11(layer, level, dest);
 #endif
+
+    return {}; // Prevent warning
 }
 
 bool Texture2DArray::Create()
@@ -365,6 +373,8 @@ bool Texture2DArray::Create()
     if (gapi == GAPI_D3D11)
         return Create_D3D11();
 #endif
+
+    return {}; // Prevent warning
 }
 
 }

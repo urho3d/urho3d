@@ -128,6 +128,8 @@ bool ConstantBuffer::SetSize(unsigned size)
     if (gapi == GAPI_D3D11)
         return SetSize_D3D11(size);
 #endif
+
+    return {}; // Prevent warning
 }
 
 void ConstantBuffer::Apply()

@@ -342,6 +342,8 @@ bool Texture::GetParametersDirty() const
     if (gapi == GAPI_D3D11)
         return GetParametersDirty_D3D11();
 #endif
+
+    return {}; // Prevent warning
 }
 
 bool Texture::IsCompressed() const
@@ -362,6 +364,8 @@ bool Texture::IsCompressed() const
     if (gapi == GAPI_D3D11)
         return IsCompressed_D3D11();
 #endif
+
+    return {}; // Prevent warning
 }
 
 unsigned Texture::GetRowDataSize(int width) const
@@ -382,6 +386,8 @@ unsigned Texture::GetRowDataSize(int width) const
     if (gapi == GAPI_D3D11)
         return GetRowDataSize_D3D11(width);
 #endif
+
+    return {}; // Prevent warning
 }
 
 void Texture::RegenerateLevels()

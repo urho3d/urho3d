@@ -428,6 +428,8 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
     if (gapi == GAPI_D3D11)
         return SetData_D3D11(face, level, x, y, width, height, data);
 #endif
+
+    return {}; // Prevent warning
 }
 
 bool TextureCube::SetData(CubeMapFace face, Deserializer& source)
@@ -448,6 +450,8 @@ bool TextureCube::SetData(CubeMapFace face, Deserializer& source)
     if (gapi == GAPI_D3D11)
         return SetData_D3D11(face, source);
 #endif
+
+    return {}; // Prevent warning
 }
 
 bool TextureCube::SetData(CubeMapFace face, Image* image, bool useAlpha)
@@ -468,6 +472,8 @@ bool TextureCube::SetData(CubeMapFace face, Image* image, bool useAlpha)
     if (gapi == GAPI_D3D11)
         return SetData_D3D11(face, image, useAlpha);
 #endif
+
+    return {}; // Prevent warning
 }
 
 bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
@@ -488,6 +494,8 @@ bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
     if (gapi == GAPI_D3D11)
         return GetData_D3D11(face, level, dest);
 #endif
+
+    return {}; // Prevent warning
 }
 
 bool TextureCube::Create()
@@ -508,6 +516,8 @@ bool TextureCube::Create()
     if (gapi == GAPI_D3D11)
         return Create_D3D11();
 #endif
+
+    return {}; // Prevent warning
 }
 
 }
