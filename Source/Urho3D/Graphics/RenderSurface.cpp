@@ -156,6 +156,8 @@ bool RenderSurface::CreateRenderBuffer(unsigned width, unsigned height, unsigned
     if (gapi == GAPI_D3D11)
         return CreateRenderBuffer_D3D11(width, height, format, multiSample);
 #endif
+
+    return {}; // Prevent warning
 }
 
 void RenderSurface::OnDeviceLost()

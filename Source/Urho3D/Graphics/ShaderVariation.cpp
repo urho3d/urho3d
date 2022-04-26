@@ -135,6 +135,8 @@ bool ShaderVariation::Create()
     if (gapi == GAPI_D3D11)
         return Create_D3D11();
 #endif
+
+    return {}; // Prevent warning
 }
 
 void ShaderVariation::SetDefines(const String& defines)

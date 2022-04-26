@@ -258,6 +258,8 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
     if (gapi == GAPI_D3D11)
         return SetData_D3D11(level, x, y, z, width, height, depth, data);
 #endif
+
+    return {}; // Prevent warning
 }
 
 bool Texture3D::SetData(Image* image, bool useAlpha)
@@ -278,6 +280,8 @@ bool Texture3D::SetData(Image* image, bool useAlpha)
     if (gapi == GAPI_D3D11)
         return SetData_D3D11(image, useAlpha);
 #endif
+
+    return {}; // Prevent warning
 }
 
 bool Texture3D::GetData(unsigned level, void* dest) const
@@ -298,6 +302,8 @@ bool Texture3D::GetData(unsigned level, void* dest) const
     if (gapi == GAPI_D3D11)
         return GetData_D3D11(level, dest);
 #endif
+
+    return {}; // Prevent warning
 }
 
 bool Texture3D::Create()
@@ -318,6 +324,8 @@ bool Texture3D::Create()
     if (gapi == GAPI_D3D11)
         return Create_D3D11();
 #endif
+
+    return {}; // Prevent warning
 }
 
 }

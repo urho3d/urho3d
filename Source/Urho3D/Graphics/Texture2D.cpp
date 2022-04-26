@@ -271,6 +271,8 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
     if (gapi == GAPI_D3D11)
         return SetData_D3D11(level, x, y, width, height, data);
 #endif
+
+    return {}; // Prevent warning
 }
 
 bool Texture2D::SetData(Image* image, bool useAlpha)
@@ -291,6 +293,8 @@ bool Texture2D::SetData(Image* image, bool useAlpha)
     if (gapi == GAPI_D3D11)
         return SetData_D3D11(image, useAlpha);
 #endif
+
+    return {}; // Prevent warning
 }
 
 bool Texture2D::GetData(unsigned level, void* dest) const
@@ -311,6 +315,8 @@ bool Texture2D::GetData(unsigned level, void* dest) const
     if (gapi == GAPI_D3D11)
         return GetData_D3D11(level, dest);
 #endif
+
+    return {}; // Prevent warning
 }
 
 bool Texture2D::Create()
@@ -331,6 +337,8 @@ bool Texture2D::Create()
     if (gapi == GAPI_D3D11)
         return Create_D3D11();
 #endif
+
+    return {}; // Prevent warning
 }
 
 }
