@@ -417,7 +417,7 @@ static bool ContainsSameSignature(const string& className, const string& methodS
 static void InitCachedMemberSignatures()
 { 
     // Fill signatures
-    for (auto element : SourceData::classesByID_)
+    for (pair<const string, xml_node>& element : SourceData::classesByID_)
     {
         xml_node compounddef = element.second;
         ClassAnalyzer classAnalyzer(compounddef);
@@ -429,7 +429,7 @@ static void InitCachedMemberSignatures()
     }
 
     // Fill hidden in any derived classes members
-    for (auto element : SourceData::classesByID_)
+    for (pair<const string, xml_node>& element : SourceData::classesByID_)
     {
         xml_node compounddef = element.second;
         ClassAnalyzer classAnalyzer(compounddef);
@@ -1178,8 +1178,8 @@ static void RegisterField(const FieldAnalyzer& fieldAnalyzer, ProcessedClass& pr
         catch (const Exception& e)
         {
             MemberRegistrationError regError;
-            regError.name_ = fieldAnalyzer.GetName();
-            regError.comment_ = fieldAnalyzer.GetDeclaration();
+            regError.name_ = HideUnnamedType(fieldAnalyzer.GetName());
+            regError.comment_ = HideUnnamedType(fieldAnalyzer.GetDeclaration());
             regError.message_ = e.what();
             processedClass.unregisteredTemplateFields_.push_back(regError);
             return;
@@ -1396,7 +1396,7 @@ void ProcessAllClasses()
 {
     InitCachedMemberSignatures();
 
-    for (auto element : SourceData::classesByID_)
+    for (pair<const string, xml_node>& element : SourceData::classesByID_)
     {
         xml_node compounddef = element.second;
         ClassAnalyzer analyzer(compounddef);
