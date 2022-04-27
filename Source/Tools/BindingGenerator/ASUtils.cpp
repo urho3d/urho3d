@@ -548,8 +548,17 @@ ConvertedVariable CppVariableToAS(const TypeAnalyzer& type, VariableUsage usage,
     return result;
 }
 
+string HideUnnamedType(const string& name)
+{
+    regex rgx("@\\d+");
+    return regex_replace(name, rgx, "@?");
+}
+
 string CppTypeToAS(const TypeAnalyzer& type, TypeUsage typeUsage)
 {
+    if (Contains(type.GetName(), "@")) // Unnamed union inside class
+        throw Exception("Error: type \"" + HideUnnamedType(type.ToString()) + "\" can not automatically bind");
+
     if (type.IsRvalueReference() || type.IsDoublePointer() || type.IsRefToPointer())
         throw Exception("Error: type \"" + type.ToString() + "\" can not automatically bind");
 

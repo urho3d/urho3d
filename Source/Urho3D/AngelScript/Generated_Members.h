@@ -4432,10 +4432,10 @@ template <class T> void RegisterMembers_Serializer(asIScriptEngine* engine, cons
 // struct ShaderParameter | File: ../Graphics/ShaderVariation.h
 template <class T> void RegisterMembers_ShaderParameter(asIScriptEngine* engine, const char* className)
 {
-    // union ShaderParameter::@5 Urho3D::ShaderParameter::@6
-    // Error: type "union Urho3D::ShaderParameter::@5" can not automatically bind
-    // union ShaderParameter::@7 Urho3D::ShaderParameter::@8
-    // Error: type "union Urho3D::ShaderParameter::@7" can not automatically bind
+    // union ShaderParameter::@? Urho3D::ShaderParameter::@?
+    // Error: type "union Urho3D::ShaderParameter::@?" can not automatically bind
+    // union ShaderParameter::@? Urho3D::ShaderParameter::@?
+    // Error: type "union Urho3D::ShaderParameter::@?" can not automatically bind
     // ConstantBuffer* ShaderParameter::bufferPtr_
     // Not registered because pointer
 

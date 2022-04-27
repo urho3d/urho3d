@@ -73,6 +73,10 @@ class Exception : public std::runtime_error
 
 bool IsKnownCppType(const std::string& name);
 
+// A union within a class may not have a type name. For such types, Doxygen generates identifiers like @123.
+// These identifiers can change and produce redundant changes in commits.
+std::string HideUnnamedType(const std::string& name);
+
 std::shared_ptr<ClassAnalyzer> FindClassByName(const std::string& name);
 std::shared_ptr<ClassAnalyzer> FindClassByID(const std::string& name);
 
