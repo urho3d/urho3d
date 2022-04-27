@@ -230,10 +230,10 @@ void PhysicsWorld2D::DrawCircle(const b2Vec2& center, float radius, const b2Colo
     }
 }
 
-extern URHO3D_API const float PIXEL_SIZE;
-
 void PhysicsWorld2D::DrawPoint(const b2Vec2& p, float size, const b2Color& color)
 {
+    const float PIXEL_SIZE = 0.01f; // Urho2D can be disabled, so duplicate constant here
+
     DrawSolidCircle(p, size * 0.5f * PIXEL_SIZE, b2Vec2(), color);
 }
 
