@@ -43,6 +43,7 @@ private:
     std::string fullType_;
     std::string name_;
     bool isConst_;
+    bool isConstexpr_;
     bool isPointer_; // *
     bool isReference_; // &
     bool isRvalueReference_; // &&
@@ -59,6 +60,7 @@ public:
     std::string ToString() const { return fullType_; }
     std::string GetName() const { return name_; }
     bool IsConst() const { return isConst_; }
+    bool IsConstexpr() const { return isConstexpr_; }
     bool IsPointer() const { return isPointer_; }
     bool IsReference() const { return isReference_; }
     bool IsRvalueReference() const { return isRvalueReference_; }
