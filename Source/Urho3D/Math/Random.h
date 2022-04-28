@@ -28,6 +28,8 @@
 #include <Urho3D/Urho3D.h>
 #endif
 
+#include "../Base/PrimitiveTypes.h"
+
 namespace Urho3D
 {
 

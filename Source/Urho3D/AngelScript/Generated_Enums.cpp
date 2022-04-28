@@ -21,10 +21,10 @@ static const unsigned char BoneCollisionShape_BONECOLLISION_NONE = BONECOLLISION
 static const unsigned char BoneCollisionShape_BONECOLLISION_SPHERE = BONECOLLISION_SPHERE;
 static const unsigned char BoneCollisionShape_BONECOLLISION_BOX = BONECOLLISION_BOX;
 
-// enum ClearTarget : unsigned | File: ../Graphics/GraphicsDefs.h
-static const unsigned ClearTarget_CLEAR_COLOR = CLEAR_COLOR;
-static const unsigned ClearTarget_CLEAR_DEPTH = CLEAR_DEPTH;
-static const unsigned ClearTarget_CLEAR_STENCIL = CLEAR_STENCIL;
+// enum ClearTarget : u32 | File: ../Graphics/GraphicsDefs.h
+static const u32 ClearTarget_CLEAR_COLOR = CLEAR_COLOR;
+static const u32 ClearTarget_CLEAR_DEPTH = CLEAR_DEPTH;
+static const u32 ClearTarget_CLEAR_STENCIL = CLEAR_STENCIL;
 
 // enum ControllerAxis : unsigned | File: ../Input/InputConstants.h
 static const unsigned ControllerAxis_CONTROLLER_AXIS_LEFTX = CONTROLLER_AXIS_LEFTX;
@@ -305,11 +305,11 @@ static const unsigned Key_KEY_VOLUMEDOWN = KEY_VOLUMEDOWN;
 static const unsigned Key_KEY_VOLUMEUP = KEY_VOLUMEUP;
 static const unsigned Key_KEY_WWW = KEY_WWW;
 
-// enum MaterialQuality : unsigned | File: ../Graphics/GraphicsDefs.h
-static const unsigned MaterialQuality_QUALITY_LOW = QUALITY_LOW;
-static const unsigned MaterialQuality_QUALITY_MEDIUM = QUALITY_MEDIUM;
-static const unsigned MaterialQuality_QUALITY_HIGH = QUALITY_HIGH;
-static const unsigned MaterialQuality_QUALITY_MAX = QUALITY_MAX;
+// enum MaterialQuality : u32 | File: ../Graphics/GraphicsDefs.h
+static const u32 MaterialQuality_QUALITY_LOW = QUALITY_LOW;
+static const u32 MaterialQuality_QUALITY_MEDIUM = QUALITY_MEDIUM;
+static const u32 MaterialQuality_QUALITY_HIGH = QUALITY_HIGH;
+static const u32 MaterialQuality_QUALITY_MAX = QUALITY_MAX;
 
 // enum MouseButton : unsigned | File: ../Input/InputConstants.h
 static const unsigned MouseButton_MOUSEB_NONE = MOUSEB_NONE;
@@ -586,22 +586,22 @@ static const unsigned UpdateEvent_USE_POSTUPDATE = USE_POSTUPDATE;
 static const unsigned UpdateEvent_USE_FIXEDUPDATE = USE_FIXEDUPDATE;
 static const unsigned UpdateEvent_USE_FIXEDPOSTUPDATE = USE_FIXEDPOSTUPDATE;
 
-// enum VertexMask : unsigned | File: ../Graphics/GraphicsDefs.h
-static const unsigned VertexMask_MASK_NONE = MASK_NONE;
-static const unsigned VertexMask_MASK_POSITION = MASK_POSITION;
-static const unsigned VertexMask_MASK_NORMAL = MASK_NORMAL;
-static const unsigned VertexMask_MASK_COLOR = MASK_COLOR;
-static const unsigned VertexMask_MASK_TEXCOORD1 = MASK_TEXCOORD1;
-static const unsigned VertexMask_MASK_TEXCOORD2 = MASK_TEXCOORD2;
-static const unsigned VertexMask_MASK_CUBETEXCOORD1 = MASK_CUBETEXCOORD1;
-static const unsigned VertexMask_MASK_CUBETEXCOORD2 = MASK_CUBETEXCOORD2;
-static const unsigned VertexMask_MASK_TANGENT = MASK_TANGENT;
-static const unsigned VertexMask_MASK_BLENDWEIGHTS = MASK_BLENDWEIGHTS;
-static const unsigned VertexMask_MASK_BLENDINDICES = MASK_BLENDINDICES;
-static const unsigned VertexMask_MASK_INSTANCEMATRIX1 = MASK_INSTANCEMATRIX1;
-static const unsigned VertexMask_MASK_INSTANCEMATRIX2 = MASK_INSTANCEMATRIX2;
-static const unsigned VertexMask_MASK_INSTANCEMATRIX3 = MASK_INSTANCEMATRIX3;
-static const unsigned VertexMask_MASK_OBJECTINDEX = MASK_OBJECTINDEX;
+// enum VertexMask : u32 | File: ../Graphics/GraphicsDefs.h
+static const u32 VertexMask_MASK_NONE = MASK_NONE;
+static const u32 VertexMask_MASK_POSITION = MASK_POSITION;
+static const u32 VertexMask_MASK_NORMAL = MASK_NORMAL;
+static const u32 VertexMask_MASK_COLOR = MASK_COLOR;
+static const u32 VertexMask_MASK_TEXCOORD1 = MASK_TEXCOORD1;
+static const u32 VertexMask_MASK_TEXCOORD2 = MASK_TEXCOORD2;
+static const u32 VertexMask_MASK_CUBETEXCOORD1 = MASK_CUBETEXCOORD1;
+static const u32 VertexMask_MASK_CUBETEXCOORD2 = MASK_CUBETEXCOORD2;
+static const u32 VertexMask_MASK_TANGENT = MASK_TANGENT;
+static const u32 VertexMask_MASK_BLENDWEIGHTS = MASK_BLENDWEIGHTS;
+static const u32 VertexMask_MASK_BLENDINDICES = MASK_BLENDINDICES;
+static const u32 VertexMask_MASK_INSTANCEMATRIX1 = MASK_INSTANCEMATRIX1;
+static const u32 VertexMask_MASK_INSTANCEMATRIX2 = MASK_INSTANCEMATRIX2;
+static const u32 VertexMask_MASK_INSTANCEMATRIX3 = MASK_INSTANCEMATRIX3;
+static const u32 VertexMask_MASK_OBJECTINDEX = MASK_OBJECTINDEX;
 
 // enum ViewOverride : unsigned | File: ../Graphics/Camera.h
 static const unsigned ViewOverride_VO_NONE = VO_NONE;
@@ -678,7 +678,7 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     // URHO3D_FLAGSET(BoneCollisionShape, BoneCollisionShapeFlags) | File: ../Graphics/Skeleton.h
     engine->RegisterTypedef("BoneCollisionShapeFlags", "uint8");
 
-    // enum ClearTarget : unsigned | File: ../Graphics/GraphicsDefs.h
+    // enum ClearTarget : u32 | File: ../Graphics/GraphicsDefs.h
     engine->RegisterTypedef("ClearTarget", "uint");
     engine->RegisterGlobalProperty("const uint CLEAR_COLOR", (void*)&ClearTarget_CLEAR_COLOR);
     engine->RegisterGlobalProperty("const uint CLEAR_DEPTH", (void*)&ClearTarget_CLEAR_DEPTH);
@@ -1316,7 +1316,7 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     engine->RegisterEnumValue("LockState", "LOCK_SHADOW", LOCK_SHADOW);
     engine->RegisterEnumValue("LockState", "LOCK_SCRATCH", LOCK_SCRATCH);
 
-    // enum MaterialQuality : unsigned | File: ../Graphics/GraphicsDefs.h
+    // enum MaterialQuality : u32 | File: ../Graphics/GraphicsDefs.h
     engine->RegisterTypedef("MaterialQuality", "uint");
     engine->RegisterGlobalProperty("const uint QUALITY_LOW", (void*)&MaterialQuality_QUALITY_LOW);
     engine->RegisterGlobalProperty("const uint QUALITY_MEDIUM", (void*)&MaterialQuality_QUALITY_MEDIUM);
@@ -1845,7 +1845,7 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     engine->RegisterEnumValue("VertexLightVSVariation", "VLVS_4LIGHTS", VLVS_4LIGHTS);
     engine->RegisterEnumValue("VertexLightVSVariation", "MAX_VERTEXLIGHT_VS_VARIATIONS", MAX_VERTEXLIGHT_VS_VARIATIONS);
 
-    // enum VertexMask : unsigned | File: ../Graphics/GraphicsDefs.h
+    // enum VertexMask : u32 | File: ../Graphics/GraphicsDefs.h
     engine->RegisterTypedef("VertexMask", "uint");
     engine->RegisterGlobalProperty("const uint MASK_NONE", (void*)&VertexMask_MASK_NONE);
     engine->RegisterGlobalProperty("const uint MASK_POSITION", (void*)&VertexMask_MASK_POSITION);
