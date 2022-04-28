@@ -1121,7 +1121,7 @@ static void RegisterField(const FieldAnalyzer& fieldAnalyzer, ProcessedClass& pr
             return;
         }
 
-        if (fieldAnalyzer.GetType().IsConst())
+        if (fieldAnalyzer.GetType().IsConst() || fieldAnalyzer.GetType().IsConstexpr())
             asType = "const " + asType;
 
         asType = ReplaceAll(asType, "struct ", "");

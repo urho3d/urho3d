@@ -515,7 +515,7 @@ public:
     static int Compare(const char* lhs, const char* rhs, bool caseSensitive);
 
     /// Position for "not found".
-    static const unsigned NPOS = 0xffffffff;
+    static inline constexpr unsigned NPOS = 0xffffffff;
 
     /// Empty string.
     static const String EMPTY;

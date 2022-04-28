@@ -1673,10 +1673,10 @@ template <class T> void RegisterMembers_HashBase(asIScriptEngine* engine, const 
     // void HashBase::Swap(HashBase& rhs)
     engine->RegisterObjectMethod(className, "void Swap(HashBase&)", AS_METHODPR(T, Swap, (HashBase&), void), AS_CALL_THISCALL);
 
-    // static const unsigned HashBase::MIN_BUCKETS
+    // static constexpr unsigned HashBase::MIN_BUCKETS
     engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const uint MIN_BUCKETS", (void*)&T::MIN_BUCKETS);engine->SetDefaultNamespace("");
 
-    // static const unsigned HashBase::MAX_LOAD_FACTOR
+    // static constexpr unsigned HashBase::MAX_LOAD_FACTOR
     engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const uint MAX_LOAD_FACTOR", (void*)&T::MAX_LOAD_FACTOR);engine->SetDefaultNamespace("");
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_HashBase
@@ -5074,7 +5074,7 @@ template <class T> void RegisterMembers_String(asIScriptEngine* engine, const ch
     // ShortString String::shortString_
     // Not registered because have @nobind mark
 
-    // static const unsigned String::NPOS
+    // static constexpr unsigned String::NPOS
     engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const uint NPOS", (void*)&T::NPOS);engine->SetDefaultNamespace("");
 
     // static const String String::EMPTY

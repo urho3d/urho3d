@@ -57,7 +57,6 @@ TypeAnalyzer::TypeAnalyzer(xml_node type, const TemplateSpecialization& speciali
     fullType_ = RemoveFirst(fullType_, "URHO3D_API ");
     fullType_ = RemoveFirst(fullType_, " URHO3D_API");
     fullType_ = CutStart(fullType_, "volatile ");
-    fullType_ = CutStart(fullType_, "constexpr ");
     fullType_ = ReplaceAll(fullType_, " *", "*");
     fullType_ = ReplaceAll(fullType_, " &", "&");
     fullType_ = ReplaceAll(fullType_, "< ", "<");
@@ -69,8 +68,25 @@ TypeAnalyzer::TypeAnalyzer(xml_node type, const TemplateSpecialization& speciali
         fullType_ = regex_replace(fullType_, rgx, it.second);
     }
 
-    isConst_ = StartsWith(fullType_, "const ");
-    name_ = CutStart(fullType_, "const ");
+    if (StartsWith(fullType_, "constexpr "))
+    {
+        isConstexpr_ = true;
+        isConst_ = false;
+        fullType_ = CutStart(fullType_, "constexpr ");
+        name_ = fullType_;
+    }
+    else if (StartsWith(fullType_, "const "))
+    {
+        isConst_ = true;
+        isConstexpr_ = false;
+        name_ = CutStart(fullType_, "const ");
+    }
+    else
+    {
+        isConst_ = false;
+        isConstexpr_ = false;
+        name_ = fullType_;
+    }
 
     isRvalueReference_ = EndsWith(name_, "&&");
     name_ = CutEnd(name_, "&&");
@@ -100,6 +116,7 @@ TypeAnalyzer::TypeAnalyzer(const string& typeName)
     fullType_ = typeName;
     name_ = typeName;
     isConst_ = false;
+    isConstexpr_ = false;
     isPointer_ = false;
     isReference_ = false;
     isRvalueReference_ = false;

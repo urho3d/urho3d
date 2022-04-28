@@ -33,13 +33,6 @@ void ASRegisterManualFirst_Container(asIScriptEngine* engine)
 
 // ========================================================================================
 
-// Workaround for GCC to allow get addresses
-const unsigned String::NPOS;
-const unsigned HashBase::MIN_BUCKETS;
-const unsigned HashBase::MAX_LOAD_FACTOR;
-
-// ========================================================================================
-
 static String& StringAssignInt(int value, String& str)
 {
     str = String(value);

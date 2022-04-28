@@ -66,7 +66,7 @@ static void ProcessGlobalVariable(GlobalVariableAnalyzer varAnalyzer)
         asType = typeAnalyzer.GetName();
     }
 
-    if (typeAnalyzer.IsConst())
+    if (typeAnalyzer.IsConst() || typeAnalyzer.IsConstexpr())
         asType = "const " + asType;
 
     string varName = varAnalyzer.GetName();
