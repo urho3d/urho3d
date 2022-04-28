@@ -5077,9 +5077,6 @@ template <class T> void RegisterMembers_String(asIScriptEngine* engine, const ch
     // static const unsigned String::NPOS
     engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const uint NPOS", (void*)&T::NPOS);engine->SetDefaultNamespace("");
 
-    // static const unsigned String::MIN_CAPACITY
-    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const uint MIN_CAPACITY", (void*)&T::MIN_CAPACITY);engine->SetDefaultNamespace("");
-
     // static const String String::EMPTY
     engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const String EMPTY", (void*)&T::EMPTY);engine->SetDefaultNamespace("");
 
