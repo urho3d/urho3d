@@ -1303,9 +1303,11 @@ namespace Urho3D
 - %Is %Enabled : bool
 - %Owner %Body %Anchor : Vector2
 - %Other %Body %Anchor : Vector2
-- %Frequency %Hz : float
-- %Damping %Ratio : float
+- %Stiffness : float
+- %Damping : float
 - %Length : float
+- %Min %Length : float
+- %Max %Length : float
 - %Collide %Connected : bool
 - %Other %Body %NodeID : int
 
@@ -1337,8 +1339,8 @@ namespace Urho3D
 - %Is %Enabled : bool
 - %Target : Vector2
 - %Max %Force : float
-- %Frequency %Hz : float
-- %Damping %Ratio : float
+- %Stiffness : float
+- %Damping : float
 - %Collide %Connected : bool
 - %Other %Body %NodeID : int
 
@@ -1377,19 +1379,11 @@ namespace Urho3D
 - %Collide %Connected : bool
 - %Other %Body %NodeID : int
 
-### ConstraintRope2D
-- %Is %Enabled : bool
-- %Owner %Body %Anchor : Vector2
-- %Other %Body %Anchor : Vector2
-- %Max %Length : float
-- %Collide %Connected : bool
-- %Other %Body %NodeID : int
-
 ### ConstraintWeld2D
 - %Is %Enabled : bool
 - %Anchor : Vector2
-- %Frequency %Hz : float
-- %Damping %Ratio : float
+- %Stiffness : float
+- %Damping : float
 - %Collide %Connected : bool
 - %Other %Body %NodeID : int
 
@@ -1400,8 +1394,11 @@ namespace Urho3D
 - %Enable %Motor : bool
 - %Max %Motor %Torque : float
 - %Motor %Speed : float
-- %Frequency %Hz : float
-- %Damping %Ratio : float
+- %Stiffness : float
+- %Damping : float
+- %Enable %Limit : bool
+- %Lower %Translation : float
+- %Upper %Translation : float
 - %Collide %Connected : bool
 - %Other %Body %NodeID : int
 
@@ -1763,11 +1760,6 @@ namespace Urho3D
 - %Base %Indent : int
 - %Clear %Sel. %On %Defocus : bool
 - %Select %On %Click %End : bool
-
-### LuaScriptInstance
-- %Is %Enabled : bool
-- %Script %File : ResourceRef
-- %Script %Object %Type : String
 
 ### Menu
 - %Name : String
@@ -2839,7 +2831,6 @@ namespace Urho3D
 <a href="#Class_ConstraintPrismatic2D"><b>ConstraintPrismatic2D</b></a>
 <a href="#Class_ConstraintPulley2D"><b>ConstraintPulley2D</b></a>
 <a href="#Class_ConstraintRevolute2D"><b>ConstraintRevolute2D</b></a>
-<a href="#Class_ConstraintRope2D"><b>ConstraintRope2D</b></a>
 <a href="#Class_ConstraintWeld2D"><b>ConstraintWeld2D</b></a>
 <a href="#Class_ConstraintWheel2D"><b>ConstraintWheel2D</b></a>
 <a href="#Class_Context"><b>Context</b></a>
@@ -3176,7 +3167,6 @@ Methods:
 - operator ConstraintPrismatic2D@() const
 - operator ConstraintPulley2D@() const
 - operator ConstraintRevolute2D@() const
-- operator ConstraintRope2D@() const
 - operator ConstraintWeld2D@() const
 - operator ConstraintWheel2D@() const
 - operator CrowdAgent@() const
@@ -3346,7 +3336,6 @@ Methods:
 - operator const ConstraintPrismatic2D@() const
 - operator const ConstraintPulley2D@() const
 - operator const ConstraintRevolute2D@() const
-- operator const ConstraintRope2D@() const
 - operator const ConstraintWeld2D@() const
 - operator const ConstraintWheel2D@() const
 - operator const CrowdAgent@() const
@@ -7981,7 +7970,6 @@ Methods:
 - operator ConstraintPrismatic2D@() const
 - operator ConstraintPulley2D@() const
 - operator ConstraintRevolute2D@() const
-- operator ConstraintRope2D@() const
 - operator ConstraintWeld2D@() const
 - operator ConstraintWheel2D@() const
 - operator CrowdAgent@() const
@@ -8142,7 +8130,6 @@ Methods:
 - operator const ConstraintPrismatic2D@() const
 - operator const ConstraintPulley2D@() const
 - operator const ConstraintRevolute2D@() const
-- operator const ConstraintRope2D@() const
 - operator const ConstraintWeld2D@() const
 - operator const ConstraintWheel2D@() const
 - operator const CrowdAgent@() const
@@ -8708,7 +8695,6 @@ Methods:
 - operator ConstraintPrismatic2D@() const
 - operator ConstraintPulley2D@() const
 - operator ConstraintRevolute2D@() const
-- operator ConstraintRope2D@() const
 - operator ConstraintWeld2D@() const
 - operator ConstraintWheel2D@() const
 - void CreateJoint()
@@ -8817,7 +8803,6 @@ Methods:
 - operator const ConstraintPrismatic2D@() const
 - operator const ConstraintPulley2D@() const
 - operator const ConstraintRevolute2D@() const
-- operator const ConstraintRope2D@() const
 - operator const ConstraintWeld2D@() const
 - operator const ConstraintWheel2D@() const
 - operator const Object@() const
@@ -8876,13 +8861,14 @@ Methods:
 - bool GetBlockEvents() const
 - bool GetCollideConnected() const
 - Component@ GetComponent(StringHash) const
-- float GetDampingRatio() const
+- float GetDamping() const
 - VariantMap& GetEventDataMap() const
 - Object@ GetEventSender() const
-- float GetFrequencyHz() const
 - uint GetID() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - float GetLength() const
+- float GetMaxLength() const
+- float GetMinLength() const
 - Node@ GetNode() const
 - uint GetNumAttributes() const
 - uint GetNumNetworkAttributes() const
@@ -8891,6 +8877,7 @@ Methods:
 - RigidBody2D@ GetOtherBody() const
 - RigidBody2D@ GetOwnerBody() const
 - Scene@ GetScene() const
+- float GetStiffness() const
 - Object@ GetSubsystem(StringHash) const
 - StringHash GetType() const
 - bool HasEventHandlers() const
@@ -8939,18 +8926,21 @@ Methods:
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetBlockEvents(bool)
 - void SetCollideConnected(bool)
-- void SetDampingRatio(float)
+- void SetDamping(float)
 - void SetEnabled(bool)
-- void SetFrequencyHz(float)
 - void SetGlobalVar(StringHash, const Variant&)
 - void SetInstanceDefault(bool)
 - void SetInterceptNetworkUpdate(const String&, bool)
 - void SetLength(float)
+- bool SetLinearStiffness(float, float)
+- void SetMaxLength(float)
+- void SetMinLength(float)
 - void SetObjectAnimation(ObjectAnimation@)
 - void SetObjectAnimationAttr(const ResourceRef&)
 - void SetOtherBody(RigidBody2D@)
 - void SetOtherBodyAnchor(const Vector2&)
 - void SetOwnerBodyAnchor(const Vector2&)
+- void SetStiffness(float)
 - void SetTemporary(bool)
 - const String& GetCategory() const
 - const String& GetTypeName() const
@@ -8982,14 +8972,15 @@ Properties:
 - Variant[] attributes
 - String category // readonly
 - bool collideConnected
-- float dampingRatio
+- float damping
 - bool enabled
 - bool enabledEffective // readonly
-- float frequencyHz
 - Variant[] globalVar
 - VariantMap globalVars // readonly
 - uint id // readonly
 - float length
+- float maxLength
+- float minLength
 - Node@ node // readonly
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
@@ -8999,6 +8990,7 @@ Properties:
 - Vector2 ownerBodyAnchor
 - int refs // readonly
 - bool replicated // readonly
+- float stiffness
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -9484,10 +9476,9 @@ Methods:
 - bool GetBlockEvents() const
 - bool GetCollideConnected() const
 - Component@ GetComponent(StringHash) const
-- float GetDampingRatio() const
+- float GetDamping() const
 - VariantMap& GetEventDataMap() const
 - Object@ GetEventSender() const
-- float GetFrequencyHz() const
 - uint GetID() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - float GetMaxForce() const
@@ -9499,6 +9490,7 @@ Methods:
 - RigidBody2D@ GetOtherBody() const
 - RigidBody2D@ GetOwnerBody() const
 - Scene@ GetScene() const
+- float GetStiffness() const
 - Object@ GetSubsystem(StringHash) const
 - StringHash GetType() const
 - bool HasEventHandlers() const
@@ -9547,16 +9539,17 @@ Methods:
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetBlockEvents(bool)
 - void SetCollideConnected(bool)
-- void SetDampingRatio(float)
+- void SetDamping(float)
 - void SetEnabled(bool)
-- void SetFrequencyHz(float)
 - void SetGlobalVar(StringHash, const Variant&)
 - void SetInstanceDefault(bool)
 - void SetInterceptNetworkUpdate(const String&, bool)
+- bool SetLinearStiffness(float, float)
 - void SetMaxForce(float)
 - void SetObjectAnimation(ObjectAnimation@)
 - void SetObjectAnimationAttr(const ResourceRef&)
 - void SetOtherBody(RigidBody2D@)
+- void SetStiffness(float)
 - void SetTarget(const Vector2&)
 - void SetTemporary(bool)
 - const String& GetCategory() const
@@ -9588,10 +9581,9 @@ Properties:
 - Variant[] attributes
 - String category // readonly
 - bool collideConnected
-- float dampingRatio
+- float damping
 - bool enabled
 - bool enabledEffective // readonly
-- float frequencyHz
 - Variant[] globalVar
 - VariantMap globalVars // readonly
 - uint id // readonly
@@ -9603,6 +9595,7 @@ Properties:
 - RigidBody2D@ ownerBody // readonly
 - int refs // readonly
 - bool replicated // readonly
+- float stiffness
 - Vector2 target
 - bool temporary
 - StringHash type // readonly
@@ -10089,155 +10082,6 @@ Properties:
 - float upperAngle
 - int weakRefs // readonly
 
-<a name="Class_ConstraintRope2D"></a>
-
-### ConstraintRope2D
-
-Methods:
-
-- void AllocateNetworkState()
-- operator Animatable@() const
-- void ApplyAttributes()
-- void CleanupConnection(Connection@)
-- operator Component@() const
-- operator Constraint2D@() const
-- void CreateJoint()
-- void DrawDebugGeometry(DebugRenderer@, bool)
-- bool GetAnimationEnabled() const
-- Constraint2D@ GetAttachedConstraint() const
-- Variant GetAttribute(const String&) const
-- Variant GetAttribute(uint) const
-- ValueAnimation@ GetAttributeAnimation(const String&) const
-- float GetAttributeAnimationSpeed(const String&) const
-- float GetAttributeAnimationTime(const String&) const
-- WrapMode GetAttributeAnimationWrapMode(const String&) const
-- Variant GetAttributeDefault(const String&) const
-- Variant GetAttributeDefault(uint) const
-- bool GetBlockEvents() const
-- bool GetCollideConnected() const
-- Component@ GetComponent(StringHash) const
-- VariantMap& GetEventDataMap() const
-- Object@ GetEventSender() const
-- uint GetID() const
-- bool GetInterceptNetworkUpdate(const String&) const
-- float GetMaxLength() const
-- Node@ GetNode() const
-- uint GetNumAttributes() const
-- uint GetNumNetworkAttributes() const
-- ObjectAnimation@ GetObjectAnimation() const
-- ResourceRef GetObjectAnimationAttr() const
-- RigidBody2D@ GetOtherBody() const
-- RigidBody2D@ GetOwnerBody() const
-- Scene@ GetScene() const
-- Object@ GetSubsystem(StringHash) const
-- StringHash GetType() const
-- bool HasEventHandlers() const
-- bool HasSubscribedToEvent(Object@, StringHash) const
-- bool HasSubscribedToEvent(StringHash) const
-- bool IsEnabled() const
-- bool IsEnabledEffective() const
-- bool IsInstanceOf(StringHash) const
-- bool IsReplicated() const
-- bool IsTemporary() const
-- bool Load(Deserializer&)
-- bool LoadJSON(const JSONValue&)
-- bool LoadXML(const XMLElement&)
-- void MarkNetworkUpdate()
-- operator Object@() const
-- void OnEvent(Object@, StringHash, VariantMap&)
-- void OnGetAttribute(const AttributeInfo&, Variant&) const
-- void OnSetAttribute(const AttributeInfo&, const Variant&)
-- void OnSetEnabled()
-- void PrepareNetworkUpdate()
-- bool ReadDeltaUpdate(Deserializer&)
-- bool ReadLatestDataUpdate(Deserializer&)
-- operator RefCounted@() const
-- int Refs() const
-- void ReleaseJoint()
-- void Remove()
-- void RemoveAttributeAnimation(const String&)
-- void RemoveInstanceDefault()
-- void RemoveObjectAnimation()
-- void ResetToDefault()
-- bool Save(Serializer&) const
-- bool SaveDefaultAttributes() const
-- bool SaveJSON(JSONValue&) const
-- bool SaveXML(XMLElement&) const
-- void SendEvent(StringHash)
-- void SendEvent(StringHash, VariantMap&)
-- operator Serializable@() const
-- void SetAnimationEnabled(bool)
-- void SetAnimationTime(float)
-- void SetAttachedConstraint(Constraint2D@)
-- bool SetAttribute(const String&, const Variant&)
-- bool SetAttribute(uint, const Variant&)
-- void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
-- void SetAttributeAnimationSpeed(const String&, float)
-- void SetAttributeAnimationTime(const String&, float)
-- void SetAttributeAnimationWrapMode(const String&, WrapMode)
-- void SetBlockEvents(bool)
-- void SetCollideConnected(bool)
-- void SetEnabled(bool)
-- void SetGlobalVar(StringHash, const Variant&)
-- void SetInstanceDefault(bool)
-- void SetInterceptNetworkUpdate(const String&, bool)
-- void SetMaxLength(float)
-- void SetObjectAnimation(ObjectAnimation@)
-- void SetObjectAnimationAttr(const ResourceRef&)
-- void SetOtherBody(RigidBody2D@)
-- void SetOtherBodyAnchor(const Vector2&)
-- void SetOwnerBodyAnchor(const Vector2&)
-- void SetTemporary(bool)
-- const String& GetCategory() const
-- const String& GetTypeName() const
-- void UnsubscribeFromAllEvents()
-- void UnsubscribeFromAllEventsExcept(StringHash[]@, bool)
-- void UnsubscribeFromEvent(Object@, StringHash)
-- void UnsubscribeFromEvent(StringHash)
-- void UnsubscribeFromEvents(Object@)
-- const Variant& GetGlobalVar(StringHash) const
-- const VariantMap& GetGlobalVars() const
-- const Vector2& GetOtherBodyAnchor() const
-- const Vector2& GetOwnerBodyAnchor() const
-- int WeakRefs() const
-- void WriteDeltaUpdate(Serializer&, const DirtyBits&, uint8)
-- void WriteInitialDeltaUpdate(Serializer&, uint8)
-- void WriteLatestDataUpdate(Serializer&, uint8)
-- operator const Animatable@() const
-- operator const Component@() const
-- operator const Constraint2D@() const
-- operator const Object@() const
-- operator const RefCounted@() const
-- operator const Serializable@() const
-
-Properties:
-
-- bool animationEnabled
-- Variant[] attributeDefaults // readonly
-- AttributeInfo[] attributeInfos // readonly
-- Variant[] attributes
-- String category // readonly
-- bool collideConnected
-- bool enabled
-- bool enabledEffective // readonly
-- Variant[] globalVar
-- VariantMap globalVars // readonly
-- uint id // readonly
-- float maxLength
-- Node@ node // readonly
-- uint numAttributes // readonly
-- ObjectAnimation@ objectAnimation
-- RigidBody2D@ otherBody
-- Vector2 otherBodyAnchor
-- RigidBody2D@ ownerBody // readonly
-- Vector2 ownerBodyAnchor
-- int refs // readonly
-- bool replicated // readonly
-- bool temporary
-- StringHash type // readonly
-- String typeName // readonly
-- int weakRefs // readonly
-
 <a name="Class_ConstraintWeld2D"></a>
 
 ### ConstraintWeld2D
@@ -10265,10 +10109,9 @@ Methods:
 - bool GetBlockEvents() const
 - bool GetCollideConnected() const
 - Component@ GetComponent(StringHash) const
-- float GetDampingRatio() const
+- float GetDamping() const
 - VariantMap& GetEventDataMap() const
 - Object@ GetEventSender() const
-- float GetFrequencyHz() const
 - uint GetID() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - Node@ GetNode() const
@@ -10279,6 +10122,7 @@ Methods:
 - RigidBody2D@ GetOtherBody() const
 - RigidBody2D@ GetOwnerBody() const
 - Scene@ GetScene() const
+- float GetStiffness() const
 - Object@ GetSubsystem(StringHash) const
 - StringHash GetType() const
 - bool HasEventHandlers() const
@@ -10317,6 +10161,7 @@ Methods:
 - void SendEvent(StringHash, VariantMap&)
 - operator Serializable@() const
 - void SetAnchor(const Vector2&)
+- bool SetAngularStiffness(float, float)
 - void SetAnimationEnabled(bool)
 - void SetAnimationTime(float)
 - void SetAttachedConstraint(Constraint2D@)
@@ -10328,15 +10173,15 @@ Methods:
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetBlockEvents(bool)
 - void SetCollideConnected(bool)
-- void SetDampingRatio(float)
+- void SetDamping(float)
 - void SetEnabled(bool)
-- void SetFrequencyHz(float)
 - void SetGlobalVar(StringHash, const Variant&)
 - void SetInstanceDefault(bool)
 - void SetInterceptNetworkUpdate(const String&, bool)
 - void SetObjectAnimation(ObjectAnimation@)
 - void SetObjectAnimationAttr(const ResourceRef&)
 - void SetOtherBody(RigidBody2D@)
+- void SetStiffness(float)
 - void SetTemporary(bool)
 - const String& GetCategory() const
 - const String& GetTypeName() const
@@ -10368,10 +10213,9 @@ Properties:
 - Variant[] attributes
 - String category // readonly
 - bool collideConnected
-- float dampingRatio
+- float damping
 - bool enabled
 - bool enabledEffective // readonly
-- float frequencyHz
 - Variant[] globalVar
 - VariantMap globalVars // readonly
 - uint id // readonly
@@ -10382,6 +10226,7 @@ Properties:
 - RigidBody2D@ ownerBody // readonly
 - int refs // readonly
 - bool replicated // readonly
+- float stiffness
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
@@ -10414,13 +10259,14 @@ Methods:
 - bool GetBlockEvents() const
 - bool GetCollideConnected() const
 - Component@ GetComponent(StringHash) const
-- float GetDampingRatio() const
+- float GetDamping() const
+- bool GetEnableLimit() const
 - bool GetEnableMotor() const
 - VariantMap& GetEventDataMap() const
 - Object@ GetEventSender() const
-- float GetFrequencyHz() const
 - uint GetID() const
 - bool GetInterceptNetworkUpdate(const String&) const
+- float GetLowerTranslation() const
 - float GetMaxMotorTorque() const
 - float GetMotorSpeed() const
 - Node@ GetNode() const
@@ -10431,8 +10277,10 @@ Methods:
 - RigidBody2D@ GetOtherBody() const
 - RigidBody2D@ GetOwnerBody() const
 - Scene@ GetScene() const
+- float GetStiffness() const
 - Object@ GetSubsystem(StringHash) const
 - StringHash GetType() const
+- float GetUpperTranslation() const
 - bool HasEventHandlers() const
 - bool HasSubscribedToEvent(Object@, StringHash) const
 - bool HasSubscribedToEvent(StringHash) const
@@ -10481,19 +10329,23 @@ Methods:
 - void SetAxis(const Vector2&)
 - void SetBlockEvents(bool)
 - void SetCollideConnected(bool)
-- void SetDampingRatio(float)
+- void SetDamping(float)
+- void SetEnableLimit(bool)
 - void SetEnableMotor(bool)
 - void SetEnabled(bool)
-- void SetFrequencyHz(float)
 - void SetGlobalVar(StringHash, const Variant&)
 - void SetInstanceDefault(bool)
 - void SetInterceptNetworkUpdate(const String&, bool)
+- bool SetLinearStiffness(float, float)
+- void SetLowerTranslation(float)
 - void SetMaxMotorTorque(float)
 - void SetMotorSpeed(float)
 - void SetObjectAnimation(ObjectAnimation@)
 - void SetObjectAnimationAttr(const ResourceRef&)
 - void SetOtherBody(RigidBody2D@)
+- void SetStiffness(float)
 - void SetTemporary(bool)
+- void SetUpperTranslation(float)
 - const String& GetCategory() const
 - const String& GetTypeName() const
 - void UnsubscribeFromAllEvents()
@@ -10526,14 +10378,15 @@ Properties:
 - Vector2 axis
 - String category // readonly
 - bool collideConnected
-- float dampingRatio
+- float damping
+- bool enableLimit
 - bool enableMotor
 - bool enabled
 - bool enabledEffective // readonly
-- float frequencyHz
 - Variant[] globalVar
 - VariantMap globalVars // readonly
 - uint id // readonly
+- float lowerTranslation
 - float maxMotorTorque
 - float motorSpeed
 - Node@ node // readonly
@@ -10543,9 +10396,11 @@ Properties:
 - RigidBody2D@ ownerBody // readonly
 - int refs // readonly
 - bool replicated // readonly
+- float stiffness
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
+- float upperTranslation
 - int weakRefs // readonly
 
 <a name="Class_Context"></a>
@@ -14534,7 +14389,6 @@ Methods:
 - void BeginDumpShaders(const String&)
 - bool BeginFrame()
 - void CleanupScratchBuffers()
-- void CleanupShaderPrograms(ShaderVariation@)
 - void Clear(uint, const Color& = Color ( 0.0f , 0.0f , 0.0f , 0.0f ), float = 1.0f, uint = 0)
 - void ClearParameterSource(ShaderParameterGroup)
 - void ClearParameterSources()
@@ -17443,7 +17297,10 @@ Methods:
 - void ApplyAttributes()
 - void CleanupConnection(Connection@)
 - operator Component@() const
+- void DelayedStart()
 - void DrawDebugGeometry(DebugRenderer@, bool)
+- void FixedPostUpdate(float)
+- void FixedUpdate(float)
 - bool GetAnimationEnabled() const
 - Variant GetAttribute(const String&) const
 - Variant GetAttribute(uint) const
@@ -17467,9 +17324,11 @@ Methods:
 - Scene@ GetScene() const
 - Object@ GetSubsystem(StringHash) const
 - StringHash GetType() const
+- uint GetUpdateEventMask() const
 - bool HasEventHandlers() const
 - bool HasSubscribedToEvent(Object@, StringHash) const
 - bool HasSubscribedToEvent(StringHash) const
+- bool IsDelayedStartCalled() const
 - bool IsEnabled() const
 - bool IsEnabledEffective() const
 - bool IsInstanceOf(StringHash) const
@@ -17483,6 +17342,8 @@ Methods:
 - void OnEvent(Object@, StringHash, VariantMap&)
 - void OnGetAttribute(const AttributeInfo&, Variant&) const
 - void OnSetAttribute(const AttributeInfo&, const Variant&)
+- void OnSetEnabled()
+- void PostUpdate(float)
 - void PrepareNetworkUpdate()
 - operator RaycastVehicle@() const
 - bool ReadDeltaUpdate(Deserializer&)
@@ -17517,6 +17378,9 @@ Methods:
 - void SetObjectAnimation(ObjectAnimation@)
 - void SetObjectAnimationAttr(const ResourceRef&)
 - void SetTemporary(bool)
+- void SetUpdateEventMask(uint)
+- void Start()
+- void Stop()
 - const String& GetCategory() const
 - const String& GetTypeName() const
 - void UnsubscribeFromAllEvents()
@@ -17524,6 +17388,7 @@ Methods:
 - void UnsubscribeFromEvent(Object@, StringHash)
 - void UnsubscribeFromEvent(StringHash)
 - void UnsubscribeFromEvents(Object@)
+- void Update(float)
 - const Variant& GetGlobalVar(StringHash) const
 - const VariantMap& GetGlobalVars() const
 - int WeakRefs() const
@@ -19849,7 +19714,6 @@ Methods:
 - operator ConstraintPrismatic2D@() const
 - operator ConstraintPulley2D@() const
 - operator ConstraintRevolute2D@() const
-- operator ConstraintRope2D@() const
 - operator ConstraintWeld2D@() const
 - operator ConstraintWheel2D@() const
 - operator CrowdAgent@() const
@@ -20030,7 +19894,6 @@ Methods:
 - operator const ConstraintPrismatic2D@() const
 - operator const ConstraintPulley2D@() const
 - operator const ConstraintRevolute2D@() const
-- operator const ConstraintRope2D@() const
 - operator const ConstraintWeld2D@() const
 - operator const ConstraintWheel2D@() const
 - operator const CrowdAgent@() const
@@ -22951,6 +22814,7 @@ Methods:
 - void ApplyAttributes()
 - void CleanupConnection(Connection@)
 - operator Component@() const
+- void DelayedStart()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - void FixedPostUpdate(float)
 - void FixedUpdate(float)
@@ -22987,6 +22851,7 @@ Methods:
 - float GetSteeringValue(int) const
 - Object@ GetSubsystem(StringHash) const
 - StringHash GetType() const
+- uint GetUpdateEventMask() const
 - Vector3 GetWheelAxle(int) const
 - Vector3 GetWheelConnectionPoint(int) const
 - float GetWheelDampingCompression(int) const
@@ -23008,6 +22873,7 @@ Methods:
 - bool HasSubscribedToEvent(Object@, StringHash) const
 - bool HasSubscribedToEvent(StringHash) const
 - void Init()
+- bool IsDelayedStartCalled() const
 - bool IsEnabled() const
 - bool IsEnabledEffective() const
 - bool IsFrontWheel(int) const
@@ -23067,6 +22933,7 @@ Methods:
 - void SetObjectAnimationAttr(const ResourceRef&)
 - void SetSteeringValue(int, float)
 - void SetTemporary(bool)
+- void SetUpdateEventMask(uint)
 - void SetWheelAxle(int, Vector3)
 - void SetWheelDampingCompression(int, float)
 - void SetWheelDampingRelaxation(int, float)
@@ -23079,6 +22946,8 @@ Methods:
 - void SetWheelSkidInfo(int, float)
 - void SetWheelSkidInfoCumulative(int, float)
 - void SetWheelSuspensionStiffness(int, float)
+- void Start()
+- void Stop()
 - const String& GetCategory() const
 - const String& GetTypeName() const
 - void UnsubscribeFromAllEvents()
@@ -23086,6 +22955,7 @@ Methods:
 - void UnsubscribeFromEvent(Object@, StringHash)
 - void UnsubscribeFromEvent(StringHash)
 - void UnsubscribeFromEvents(Object@)
+- void Update(float)
 - void UpdateWheelTransform(int, bool)
 - const Variant& GetGlobalVar(StringHash) const
 - const VariantMap& GetGlobalVars() const
@@ -23244,7 +23114,6 @@ Methods:
 - operator ConstraintPrismatic2D@() const
 - operator ConstraintPulley2D@() const
 - operator ConstraintRevolute2D@() const
-- operator ConstraintRope2D@() const
 - operator ConstraintWeld2D@() const
 - operator ConstraintWheel2D@() const
 - operator Context@() const
@@ -23433,7 +23302,6 @@ Methods:
 - operator const ConstraintPrismatic2D@() const
 - operator const ConstraintPulley2D@() const
 - operator const ConstraintRevolute2D@() const
-- operator const ConstraintRope2D@() const
 - operator const ConstraintWeld2D@() const
 - operator const ConstraintWheel2D@() const
 - operator const Context@() const
@@ -25828,6 +25696,7 @@ Methods:
 - void OnEvent(Object@, StringHash, VariantMap&)
 - void OnGetAttribute(const AttributeInfo&, Variant&) const
 - void OnSetAttribute(const AttributeInfo&, const Variant&)
+- void OnSetEnabled()
 - void PrepareNetworkUpdate()
 - bool ReadDeltaUpdate(Deserializer&)
 - bool ReadLatestDataUpdate(Deserializer&)
@@ -26812,7 +26681,6 @@ Methods:
 - operator ConstraintPrismatic2D@() const
 - operator ConstraintPulley2D@() const
 - operator ConstraintRevolute2D@() const
-- operator ConstraintRope2D@() const
 - operator ConstraintWeld2D@() const
 - operator ConstraintWheel2D@() const
 - operator CrowdAgent@() const
@@ -26965,7 +26833,6 @@ Methods:
 - operator const ConstraintPrismatic2D@() const
 - operator const ConstraintPulley2D@() const
 - operator const ConstraintRevolute2D@() const
-- operator const ConstraintRope2D@() const
 - operator const ConstraintWeld2D@() const
 - operator const ConstraintWheel2D@() const
 - operator const CrowdAgent@() const
@@ -30644,6 +30511,7 @@ Methods:
 - int8 Front() const
 - void Insert(uint, const String&)
 - void Insert(uint, int8)
+- bool IsShort() const
 - void Join(String[]@, const String&)
 - uint Length() const
 - uint LengthUTF8() const
@@ -30698,7 +30566,6 @@ Properties:
 Constants:
 
 - String EMPTY
-- uint MIN_CAPACITY
 - uint NPOS
 
 <a name="Class_StringHash"></a>
@@ -37808,6 +37675,14 @@ Properties:
 - PLANE_FAR
 
 
+### GAPI
+
+- GAPI_NONE
+- GAPI_OPENGL
+- GAPI_D3D9
+- GAPI_D3D11
+
+
 ### GeometryType
 
 - GEOM_STATIC
@@ -38446,6 +38321,7 @@ Properties:
 - uint GetFormat(const String&)
 - int64 GetFrequency()
 - Matrix3x4 GetFullscreenQuadTransform(Camera@)
+- GAPI GetGAPI()
 - bool GetGL3Support()
 - Variant GetGlobalVar(const String&)
 - String GetHostName()
@@ -38745,6 +38621,8 @@ Properties:
 - uint DRAWABLE_ZONE
 - String EP_AUTOLOAD_PATHS
 - String EP_BORDERLESS
+- String EP_DIRECT3D11
+- String EP_DIRECT3D9
 - String EP_DUMP_SHADERS
 - String EP_EVENT_PROFILER
 - String EP_EXTERNAL_WINDOW
@@ -38761,6 +38639,7 @@ Properties:
 - String EP_MATERIAL_QUALITY
 - String EP_MONITOR
 - String EP_MULTI_SAMPLE
+- String EP_OPENGL
 - String EP_ORIENTATIONS
 - String EP_PACKAGE_CACHE_DIR
 - String EP_REFRESH_RATE

@@ -35,7 +35,6 @@ void ASRegisterManualFirst_Container(asIScriptEngine* engine)
 
 // Workaround for GCC to allow get addresses
 const unsigned String::NPOS;
-const unsigned String::MIN_CAPACITY;
 const unsigned HashBase::MIN_BUCKETS;
 const unsigned HashBase::MAX_LOAD_FACTOR;
 
