@@ -23,6 +23,7 @@
 #pragma once
 
 #include "../Resource/Resource.h"
+#include "../Urho2D/Urho2D.h"
 
 namespace Urho3D
 {

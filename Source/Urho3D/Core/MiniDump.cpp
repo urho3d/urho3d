@@ -36,7 +36,7 @@
 namespace Urho3D
 {
 
-URHO3D_API int WriteMiniDump(const char* applicationName, void* exceptionPointers)
+int WriteMiniDump(const char* applicationName, void* exceptionPointers)
 {
     static bool miniDumpWritten = false;
 
