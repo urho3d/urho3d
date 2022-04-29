@@ -27,6 +27,7 @@
 #include "../Container/FlagSet.h"
 #include "../Container/HashBase.h"
 #include "../Math/StringHash.h"
+#include "../Math/Vector3.h"
 
 namespace Urho3D
 {
@@ -229,7 +230,7 @@ struct URHO3D_API VertexElement
 };
 
 /// Sizes of vertex element types.
-extern URHO3D_API const unsigned ELEMENT_TYPESIZES[];
+extern URHO3D_API const u32 ELEMENT_TYPESIZES[];
 
 /// Vertex element definitions for the legacy elements.
 extern URHO3D_API const VertexElement LEGACY_VERTEXELEMENTS[];
@@ -382,67 +383,76 @@ enum ShadowQuality
 };
 
 // Inbuilt shader parameters.
-extern URHO3D_API const StringHash VSP_AMBIENTSTARTCOLOR;
-extern URHO3D_API const StringHash VSP_AMBIENTENDCOLOR;
-extern URHO3D_API const StringHash VSP_BILLBOARDROT;
-extern URHO3D_API const StringHash VSP_CAMERAPOS;
-extern URHO3D_API const StringHash VSP_CLIPPLANE;
-extern URHO3D_API const StringHash VSP_NEARCLIP;
-extern URHO3D_API const StringHash VSP_FARCLIP;
-extern URHO3D_API const StringHash VSP_DEPTHMODE;
-extern URHO3D_API const StringHash VSP_DELTATIME;
-extern URHO3D_API const StringHash VSP_ELAPSEDTIME;
-extern URHO3D_API const StringHash VSP_FRUSTUMSIZE;
-extern URHO3D_API const StringHash VSP_GBUFFEROFFSETS;
-extern URHO3D_API const StringHash VSP_LIGHTDIR;
-extern URHO3D_API const StringHash VSP_LIGHTPOS;
-extern URHO3D_API const StringHash VSP_NORMALOFFSETSCALE;
-extern URHO3D_API const StringHash VSP_MODEL;
-extern URHO3D_API const StringHash VSP_VIEW;
-extern URHO3D_API const StringHash VSP_VIEWINV;
-extern URHO3D_API const StringHash VSP_VIEWPROJ;
-extern URHO3D_API const StringHash VSP_UOFFSET;
-extern URHO3D_API const StringHash VSP_VOFFSET;
-extern URHO3D_API const StringHash VSP_ZONE;
-extern URHO3D_API const StringHash VSP_LIGHTMATRICES;
-extern URHO3D_API const StringHash VSP_SKINMATRICES;
-extern URHO3D_API const StringHash VSP_VERTEXLIGHTS;
-extern URHO3D_API const StringHash PSP_AMBIENTCOLOR;
-extern URHO3D_API const StringHash PSP_CAMERAPOS;
-extern URHO3D_API const StringHash PSP_DELTATIME;
-extern URHO3D_API const StringHash PSP_DEPTHRECONSTRUCT;
-extern URHO3D_API const StringHash PSP_ELAPSEDTIME;
-extern URHO3D_API const StringHash PSP_FOGCOLOR;
-extern URHO3D_API const StringHash PSP_FOGPARAMS;
-extern URHO3D_API const StringHash PSP_GBUFFERINVSIZE;
-extern URHO3D_API const StringHash PSP_LIGHTCOLOR;
-extern URHO3D_API const StringHash PSP_LIGHTDIR;
-extern URHO3D_API const StringHash PSP_LIGHTPOS;
-extern URHO3D_API const StringHash PSP_NORMALOFFSETSCALE;
-extern URHO3D_API const StringHash PSP_MATDIFFCOLOR;
-extern URHO3D_API const StringHash PSP_MATEMISSIVECOLOR;
-extern URHO3D_API const StringHash PSP_MATENVMAPCOLOR;
-extern URHO3D_API const StringHash PSP_MATSPECCOLOR;
-extern URHO3D_API const StringHash PSP_NEARCLIP;
-extern URHO3D_API const StringHash PSP_FARCLIP;
-extern URHO3D_API const StringHash PSP_SHADOWCUBEADJUST;
-extern URHO3D_API const StringHash PSP_SHADOWDEPTHFADE;
-extern URHO3D_API const StringHash PSP_SHADOWINTENSITY;
-extern URHO3D_API const StringHash PSP_SHADOWMAPINVSIZE;
-extern URHO3D_API const StringHash PSP_SHADOWSPLITS;
-extern URHO3D_API const StringHash PSP_LIGHTMATRICES;
-extern URHO3D_API const StringHash PSP_VSMSHADOWPARAMS;
-extern URHO3D_API const StringHash PSP_ROUGHNESS;
-extern URHO3D_API const StringHash PSP_METALLIC;
-extern URHO3D_API const StringHash PSP_LIGHTRAD;
-extern URHO3D_API const StringHash PSP_LIGHTLENGTH;
-extern URHO3D_API const StringHash PSP_ZONEMIN;
-extern URHO3D_API const StringHash PSP_ZONEMAX;
+inline const StringHash VSP_AMBIENTENDCOLOR{"AmbientEndColor"};
+inline const StringHash VSP_AMBIENTSTARTCOLOR{"AmbientStartColor"};
+inline const StringHash VSP_BILLBOARDROT{"BillboardRot"};
+inline const StringHash VSP_CLIPPLANE{"ClipPlane"};
+inline const StringHash VSP_DEPTHMODE{"DepthMode"};
+inline const StringHash VSP_FRUSTUMSIZE{"FrustumSize"};
+inline const StringHash VSP_GBUFFEROFFSETS{"GBufferOffsets"};
+inline const StringHash VSP_MODEL{"Model"};
+inline const StringHash VSP_SKINMATRICES{"SkinMatrices"};
+inline const StringHash VSP_UOFFSET{"UOffset"};
+inline const StringHash VSP_VERTEXLIGHTS{"VertexLights"};
+inline const StringHash VSP_VIEW{"View"};
+inline const StringHash VSP_VIEWINV{"ViewInv"};
+inline const StringHash VSP_VIEWPROJ{"ViewProj"};
+inline const StringHash VSP_VOFFSET{"VOffset"};
+inline const StringHash VSP_ZONE{"Zone"};
+inline const StringHash PSP_AMBIENTCOLOR{"AmbientColor"};
+inline const StringHash PSP_DEPTHRECONSTRUCT{"DepthReconstruct"};
+inline const StringHash PSP_FOGCOLOR{"FogColor"};
+inline const StringHash PSP_FOGPARAMS{"FogParams"};
+inline const StringHash PSP_GBUFFERINVSIZE{"GBufferInvSize"};
+inline const StringHash PSP_LIGHTCOLOR{"LightColor"};
+inline const StringHash PSP_LIGHTLENGTH{"LightLength"};
+inline const StringHash PSP_LIGHTRAD{"LightRad"};
+inline const StringHash PSP_MATDIFFCOLOR{"MatDiffColor"};
+inline const StringHash PSP_MATEMISSIVECOLOR{"MatEmissiveColor"};
+inline const StringHash PSP_MATENVMAPCOLOR{"MatEnvMapColor"};
+inline const StringHash PSP_MATSPECCOLOR{"MatSpecColor"};
+inline const StringHash PSP_METALLIC{"Metallic"};
+inline const StringHash PSP_ROUGHNESS{"Roughness"};
+inline const StringHash PSP_SHADOWCUBEADJUST{"ShadowCubeAdjust"};
+inline const StringHash PSP_SHADOWDEPTHFADE{"ShadowDepthFade"};
+inline const StringHash PSP_SHADOWINTENSITY{"ShadowIntensity"};
+inline const StringHash PSP_SHADOWMAPINVSIZE{"ShadowMapInvSize"};
+inline const StringHash PSP_SHADOWSPLITS{"ShadowSplits"};
+inline const StringHash PSP_VSMSHADOWPARAMS{"VSMShadowParams"};
+inline const StringHash PSP_ZONEMAX{"ZoneMax"};
+inline const StringHash PSP_ZONEMIN{"ZoneMin"};
+
+inline const StringHash VSP_CAMERAPOS{"CameraPos"};
+inline const StringHash PSP_CAMERAPOS{"CameraPosPS"};
+
+inline const StringHash VSP_DELTATIME{"DeltaTime"};
+inline const StringHash PSP_DELTATIME{"DeltaTimePS"};
+
+inline const StringHash VSP_ELAPSEDTIME{"ElapsedTime"};
+inline const StringHash PSP_ELAPSEDTIME{"ElapsedTimePS"};
+
+inline const StringHash VSP_FARCLIP{"FarClip"};
+inline const StringHash PSP_FARCLIP{"FarClipPS"};
+
+inline const StringHash VSP_LIGHTDIR{"LightDir"};
+inline const StringHash PSP_LIGHTDIR{"LightDirPS"};
+
+inline const StringHash VSP_LIGHTMATRICES{"LightMatrices"};
+inline const StringHash PSP_LIGHTMATRICES{"LightMatricesPS"};
+
+inline const StringHash VSP_LIGHTPOS{"LightPos"};
+inline const StringHash PSP_LIGHTPOS{"LightPosPS"};
+
+inline const StringHash VSP_NEARCLIP{"NearClip"};
+inline const StringHash PSP_NEARCLIP{"NearClipPS"};
+
+inline const StringHash VSP_NORMALOFFSETSCALE{"NormalOffsetScale"};
+inline const StringHash PSP_NORMALOFFSETSCALE{"NormalOffsetScalePS"};
 
 // Scale calculation from bounding box diagonal.
-extern URHO3D_API const Vector3 DOT_SCALE;
+inline const Vector3 DOT_SCALE{1 / 3.0f, 1 / 3.0f, 1 / 3.0f};
 
-enum MaterialQuality : unsigned
+enum MaterialQuality : u32
 {
     QUALITY_LOW = 0,
     QUALITY_MEDIUM = 1,
@@ -450,7 +460,7 @@ enum MaterialQuality : unsigned
     QUALITY_MAX = 15,
 };
 
-enum ClearTarget : unsigned
+enum ClearTarget : u32
 {
     CLEAR_COLOR = 0x1,
     CLEAR_DEPTH = 0x2,
@@ -459,7 +469,7 @@ enum ClearTarget : unsigned
 URHO3D_FLAGSET(ClearTarget, ClearTargetFlags);
 
 // Legacy vertex element bitmasks.
-enum VertexMask : unsigned
+enum VertexMask : u32
 {
     MASK_NONE = 0x0,
     MASK_POSITION = 0x1,
@@ -479,9 +489,10 @@ enum VertexMask : unsigned
 };
 URHO3D_FLAGSET(VertexMask, VertexMaskFlags);
 
-static const int MAX_RENDERTARGETS = 4;
-static const int MAX_VERTEX_STREAMS = 4;
-static const int MAX_CONSTANT_REGISTERS = 256;
+inline constexpr i32 MAX_RENDERTARGETS = 4;
+inline constexpr i32 MAX_VERTEX_STREAMS = 4;
+inline constexpr i32 MAX_CONSTANT_REGISTERS = 256;
 
-static const int BITS_PER_COMPONENT = 8;
-}
+inline constexpr i32 BITS_PER_COMPONENT = 8;
+
+} // namespace Urho3D

@@ -16,7 +16,7 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // static const float ANIMATION_LOD_BASESCALE | File: ../Graphics/Drawable.h
     engine->RegisterGlobalProperty("const float ANIMATION_LOD_BASESCALE", (void*)&ANIMATION_LOD_BASESCALE);
 
-    // static const int BITS_PER_COMPONENT | File: ../Graphics/GraphicsDefs.h
+    // constexpr i32 BITS_PER_COMPONENT | File: ../Graphics/GraphicsDefs.h
     engine->RegisterGlobalProperty("const int BITS_PER_COMPONENT", (void*)&BITS_PER_COMPONENT);
 
     // static const int COLOR_LUT_SIZE | File: ../Resource/Image.h
@@ -100,7 +100,7 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // static const unsigned DRAWABLE_ZONE | File: ../Graphics/Drawable.h
     engine->RegisterGlobalProperty("const uint DRAWABLE_ZONE", (void*)&DRAWABLE_ZONE);
 
-    // const unsigned ELEMENT_TYPESIZES[] | File: ../Graphics/GraphicsDefs.h
+    // const u32 ELEMENT_TYPESIZES[] | File: ../Graphics/GraphicsDefs.h
     // Not registered because array
 
     // static const String EP_AUTOLOAD_PATHS | File: ../Engine/EngineDefs.h
@@ -304,7 +304,7 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // static const unsigned MAX_CASCADE_SPLITS | File: ../Graphics/Light.h
     engine->RegisterGlobalProperty("const uint MAX_CASCADE_SPLITS", (void*)&MAX_CASCADE_SPLITS);
 
-    // static const int MAX_CONSTANT_REGISTERS | File: ../Graphics/GraphicsDefs.h
+    // constexpr i32 MAX_CONSTANT_REGISTERS | File: ../Graphics/GraphicsDefs.h
     engine->RegisterGlobalProperty("const int MAX_CONSTANT_REGISTERS", (void*)&MAX_CONSTANT_REGISTERS);
 
     // static const int MAX_LIGHT_SPLITS | File: ../Graphics/Light.h
@@ -313,7 +313,7 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // static const unsigned MAX_NETWORK_ATTRIBUTES | File: ../Scene/ReplicationState.h
     engine->RegisterGlobalProperty("const uint MAX_NETWORK_ATTRIBUTES", (void*)&MAX_NETWORK_ATTRIBUTES);
 
-    // static const int MAX_RENDERTARGETS | File: ../Graphics/GraphicsDefs.h
+    // constexpr i32 MAX_RENDERTARGETS | File: ../Graphics/GraphicsDefs.h
     engine->RegisterGlobalProperty("const int MAX_RENDERTARGETS", (void*)&MAX_RENDERTARGETS);
 
     // static const int MAX_TEXTURE_QUALITY_LEVELS | File: ../Graphics/Texture.h
@@ -322,7 +322,7 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // static const int MAX_VERTEX_LIGHTS | File: ../Graphics/Drawable.h
     engine->RegisterGlobalProperty("const int MAX_VERTEX_LIGHTS", (void*)&MAX_VERTEX_LIGHTS);
 
-    // static const int MAX_VERTEX_STREAMS | File: ../Graphics/GraphicsDefs.h
+    // constexpr i32 MAX_VERTEX_STREAMS | File: ../Graphics/GraphicsDefs.h
     engine->RegisterGlobalProperty("const int MAX_VERTEX_STREAMS", (void*)&MAX_VERTEX_STREAMS);
 
     // static const unsigned MAX_VIEWPORT_TEXTURES | File: ../Graphics/View.h
@@ -331,49 +331,49 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // const IntVector2 MOUSE_POSITION_OFFSCREEN | File: ../Input/Input.h
     engine->RegisterGlobalProperty("const IntVector2 MOUSE_POSITION_OFFSCREEN", (void*)&MOUSE_POSITION_OFFSCREEN);
 
-    // static const float M_DEGTORAD | File: ../Math/MathDefs.h
+    // constexpr float M_DEGTORAD | File: ../Math/MathDefs.h
     engine->RegisterGlobalProperty("const float M_DEGTORAD", (void*)&M_DEGTORAD);
 
-    // static const float M_DEGTORAD_2 | File: ../Math/MathDefs.h
+    // constexpr float M_DEGTORAD_2 | File: ../Math/MathDefs.h
     engine->RegisterGlobalProperty("const float M_DEGTORAD_2", (void*)&M_DEGTORAD_2);
 
-    // static const float M_EPSILON | File: ../Math/MathDefs.h
+    // constexpr float M_EPSILON | File: ../Math/MathDefs.h
     engine->RegisterGlobalProperty("const float M_EPSILON", (void*)&M_EPSILON);
 
-    // static const float M_HALF_PI | File: ../Math/MathDefs.h
+    // constexpr float M_HALF_PI | File: ../Math/MathDefs.h
     engine->RegisterGlobalProperty("const float M_HALF_PI", (void*)&M_HALF_PI);
 
-    // static const float M_INFINITY | File: ../Math/MathDefs.h
+    // constexpr float M_INFINITY | File: ../Math/MathDefs.h
     engine->RegisterGlobalProperty("const float M_INFINITY", (void*)&M_INFINITY);
 
-    // static const float M_LARGE_EPSILON | File: ../Math/MathDefs.h
+    // constexpr float M_LARGE_EPSILON | File: ../Math/MathDefs.h
     engine->RegisterGlobalProperty("const float M_LARGE_EPSILON", (void*)&M_LARGE_EPSILON);
 
-    // static const float M_LARGE_VALUE | File: ../Math/MathDefs.h
+    // constexpr float M_LARGE_VALUE | File: ../Math/MathDefs.h
     engine->RegisterGlobalProperty("const float M_LARGE_VALUE", (void*)&M_LARGE_VALUE);
 
-    // static const float M_MAX_FOV | File: ../Math/MathDefs.h
+    // constexpr float M_MAX_FOV | File: ../Math/MathDefs.h
     engine->RegisterGlobalProperty("const float M_MAX_FOV", (void*)&M_MAX_FOV);
 
-    // static const int M_MAX_INT | File: ../Math/MathDefs.h
+    // constexpr i32 M_MAX_INT | File: ../Math/MathDefs.h
     engine->RegisterGlobalProperty("const int M_MAX_INT", (void*)&M_MAX_INT);
 
-    // static const unsigned M_MAX_UNSIGNED | File: ../Math/MathDefs.h
+    // constexpr u32 M_MAX_UNSIGNED | File: ../Math/MathDefs.h
     engine->RegisterGlobalProperty("const uint M_MAX_UNSIGNED", (void*)&M_MAX_UNSIGNED);
 
-    // static const int M_MIN_INT | File: ../Math/MathDefs.h
+    // constexpr i32 M_MIN_INT | File: ../Math/MathDefs.h
     engine->RegisterGlobalProperty("const int M_MIN_INT", (void*)&M_MIN_INT);
 
-    // static const float M_MIN_NEARCLIP | File: ../Math/MathDefs.h
+    // constexpr float M_MIN_NEARCLIP | File: ../Math/MathDefs.h
     engine->RegisterGlobalProperty("const float M_MIN_NEARCLIP", (void*)&M_MIN_NEARCLIP);
 
-    // static const unsigned M_MIN_UNSIGNED | File: ../Math/MathDefs.h
+    // constexpr u32 M_MIN_UNSIGNED | File: ../Math/MathDefs.h
     engine->RegisterGlobalProperty("const uint M_MIN_UNSIGNED", (void*)&M_MIN_UNSIGNED);
 
-    // static const float M_PI | File: ../Math/MathDefs.h
+    // constexpr float M_PI | File: ../Math/MathDefs.h
     engine->RegisterGlobalProperty("const float M_PI", (void*)&M_PI);
 
-    // static const float M_RADTODEG | File: ../Math/MathDefs.h
+    // constexpr float M_RADTODEG | File: ../Math/MathDefs.h
     engine->RegisterGlobalProperty("const float M_RADTODEG", (void*)&M_RADTODEG);
 
     // static const unsigned NUM_FRUSTUM_PLANES | File: ../Math/Frustum.h
