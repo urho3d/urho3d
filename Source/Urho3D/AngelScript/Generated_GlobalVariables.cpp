@@ -714,7 +714,7 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // static const unsigned FLIP_VERTICAL | File: ../Urho2D/TileMapDefs2D.h
     engine->RegisterGlobalProperty("const uint FLIP_VERTICAL", (void*)&FLIP_VERTICAL);
 
-    // const float PIXEL_SIZE | File: ../Urho2D/Drawable2D.h
+    // constexpr float PIXEL_SIZE | File: ../Urho2D/Urho2D.h
     engine->RegisterGlobalProperty("const float PIXEL_SIZE", (void*)&PIXEL_SIZE);
 #endif
 }

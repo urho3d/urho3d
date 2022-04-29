@@ -35,8 +35,6 @@
 namespace Urho3D
 {
 
-const float PIXEL_SIZE = 0.01f;
-
 SourceBatch2D::SourceBatch2D() :
     distance_(0.0f),
     drawOrder_(0)

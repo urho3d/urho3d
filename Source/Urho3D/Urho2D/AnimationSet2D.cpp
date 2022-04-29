@@ -270,7 +270,7 @@ bool AnimationSet2D::EndLoadSpine()
         return false;
     }
 
-    skeletonJson->scale = 0.01f; // PIXEL_SIZE;
+    skeletonJson->scale = PIXEL_SIZE;
     skeletonData_ = spSkeletonJson_readSkeletonData(skeletonJson, &jsonData_[0]);
 
     spSkeletonJson_dispose(skeletonJson);

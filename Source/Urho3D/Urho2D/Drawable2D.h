@@ -24,6 +24,7 @@
 
 #include "../Graphics/Drawable.h"
 #include "../Graphics/GraphicsDefs.h"
+#include "../Urho2D/Urho2D.h"
 
 namespace Urho3D
 {
@@ -61,9 +62,6 @@ struct SourceBatch2D
     /// Vertices.
     Vector<Vertex2D> vertices_;
 };
-
-/// Pixel size (equal 0.01f).
-extern URHO3D_API const float PIXEL_SIZE;
 
 /// Base class for 2D visible components.
 class URHO3D_API Drawable2D : public Drawable
