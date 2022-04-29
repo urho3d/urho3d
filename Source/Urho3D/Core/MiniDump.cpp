@@ -24,6 +24,7 @@
 
 #include "../Precompiled.h"
 
+#include "../Core/MiniDump.h"
 #include "../Core/ProcessUtils.h"
 
 #include <cstdio>
