@@ -33,7 +33,7 @@ namespace Urho3D
 // This function is called before ASRegisterGenerated()
 void ASRegisterManualFirst_Graphics(asIScriptEngine* engine)
 {
-    // enum TextureUnit | File: ../Graphics/GraphicsDefs.h
+    // enum TextureUnit | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterEnum("TextureUnit");
     engine->RegisterEnumValue("TextureUnit", "TU_DIFFUSE", TU_DIFFUSE);
     engine->RegisterEnumValue("TextureUnit", "TU_ALBEDOBUFFER", TU_ALBEDOBUFFER);

@@ -23,7 +23,7 @@
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
-#include "../Graphics/Texture2D.h"
+#include "../GraphicsAPI/Texture2D.h"
 #include "../IO/Deserializer.h"
 #include "../Resource/ResourceCache.h"
 #include "../Urho2D/Drawable2D.h"

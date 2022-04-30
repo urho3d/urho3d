@@ -23,24 +23,24 @@
 #include <Urho3D/Core/CoreEvents.h>
 #include <Urho3D/Engine/Engine.h>
 #include <Urho3D/Graphics/Graphics.h>
-#include <Urho3D/Graphics/Texture2D.h>
-#include <Urho3D/Graphics/Zone.h>
-#include <Urho3D/Graphics/StaticModel.h>
 #include <Urho3D/Graphics/Model.h>
-#include <Urho3D/Graphics/Technique.h>
 #include <Urho3D/Graphics/Octree.h>
+#include <Urho3D/Graphics/StaticModel.h>
+#include <Urho3D/Graphics/Technique.h>
+#include <Urho3D/Graphics/Zone.h>
+#include <Urho3D/GraphicsAPI/Texture2D.h>
 #include <Urho3D/Input/Input.h>
 #include <Urho3D/Resource/ResourceCache.h>
 #include <Urho3D/UI/Button.h>
 #include <Urho3D/UI/CheckBox.h>
 #include <Urho3D/UI/LineEdit.h>
+#include <Urho3D/UI/ListView.h>
 #include <Urho3D/UI/Text.h>
 #include <Urho3D/UI/ToolTip.h>
 #include <Urho3D/UI/UI.h>
+#include <Urho3D/UI/UIComponent.h>
 #include <Urho3D/UI/UIEvents.h>
 #include <Urho3D/UI/Window.h>
-#include <Urho3D/UI/ListView.h>
-#include <Urho3D/UI/UIComponent.h>
 
 #include "Hello3DUI.h"
 

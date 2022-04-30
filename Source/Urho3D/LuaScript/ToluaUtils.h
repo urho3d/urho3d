@@ -24,8 +24,8 @@
 
 #include "../Core/Context.h"
 #ifdef _WIN32
-#include "../Graphics/IndexBuffer.h"
-#include "../Graphics/VertexBuffer.h"
+#include "../GraphicsAPI/IndexBuffer.h"
+#include "../GraphicsAPI/VertexBuffer.h"
 #endif
 
 struct lua_State;

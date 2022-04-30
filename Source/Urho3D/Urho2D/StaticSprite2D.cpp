@@ -24,7 +24,7 @@
 
 #include "../Core/Context.h"
 #include "../Graphics/Material.h"
-#include "../Graphics/Texture2D.h"
+#include "../GraphicsAPI/Texture2D.h"
 #include "../Resource/ResourceCache.h"
 #include "../Scene/Scene.h"
 #include "../Urho2D/Renderer2D.h"

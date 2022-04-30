@@ -24,8 +24,8 @@
 
 #include "../Graphics/Geometry.h"
 #include "../Graphics/Graphics.h"
-#include "../Graphics/IndexBuffer.h"
-#include "../Graphics/VertexBuffer.h"
+#include "../GraphicsAPI/IndexBuffer.h"
+#include "../GraphicsAPI/VertexBuffer.h"
 #include "../IO/Log.h"
 #include "../Math/Ray.h"
 

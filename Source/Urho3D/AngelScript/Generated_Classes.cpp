@@ -844,7 +844,7 @@ static void GPUObject__GPUObject_Graphicsstar(GPUObject* _ptr, Graphics* graphic
     new(_ptr) GPUObject(graphics);
 }
 
-// class GPUObject | File: ../Graphics/GPUObject.h
+// class GPUObject | File: ../GraphicsAPI/GPUObject.h
 static void Register_GPUObject(asIScriptEngine* engine)
 {
     // explicit GPUObject::GPUObject(Graphics* graphics)
@@ -2156,7 +2156,7 @@ static void ShaderParameter__ShaderParameter_ShaderType_constspStringamp_unsigne
     new(_ptr) ShaderParameter(type, name, reg, regCount);
 }
 
-// struct ShaderParameter | File: ../Graphics/ShaderVariation.h
+// struct ShaderParameter | File: ../GraphicsAPI/ShaderVariation.h
 static void Register_ShaderParameter(asIScriptEngine* engine)
 {
     // ShaderParameter::ShaderParameter(const String& name, unsigned glType, int location)
@@ -3160,7 +3160,7 @@ static void VertexElement__VertexElement_VertexElementType_VertexElementSemantic
     new(_ptr) VertexElement(type, semantic, index, perInstance);
 }
 
-// struct VertexElement | File: ../Graphics/GraphicsDefs.h
+// struct VertexElement | File: ../GraphicsAPI/GraphicsDefs.h
 static void Register_VertexElement(asIScriptEngine* engine)
 {
     // VertexElement::VertexElement(VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0, bool perInstance = false) noexcept
@@ -3771,7 +3771,7 @@ static RenderSurface* RenderSurface__RenderSurface_Texturestar(Texture* parentTe
     return new RenderSurface(parentTexture);
 }
 
-// class RenderSurface | File: ../Graphics/RenderSurface.h
+// class RenderSurface | File: ../GraphicsAPI/RenderSurface.h
 static void Register_RenderSurface(asIScriptEngine* engine)
 {
     // explicit RenderSurface::RenderSurface(Texture* parentTexture)
@@ -3808,7 +3808,7 @@ static ShaderVariation* ShaderVariation__ShaderVariation_Shaderstar_ShaderType(S
     return new ShaderVariation(owner, type);
 }
 
-// class ShaderVariation | File: ../Graphics/ShaderVariation.h
+// class ShaderVariation | File: ../GraphicsAPI/ShaderVariation.h
 static void Register_ShaderVariation(asIScriptEngine* engine)
 {
     // ShaderVariation::ShaderVariation(Shader* owner, ShaderType type)
@@ -4092,7 +4092,7 @@ static ConstantBuffer* ConstantBuffer__ConstantBuffer_Contextstar()
     return new ConstantBuffer(context);
 }
 
-// class ConstantBuffer | File: ../Graphics/ConstantBuffer.h
+// class ConstantBuffer | File: ../GraphicsAPI/ConstantBuffer.h
 static void Register_ConstantBuffer(asIScriptEngine* engine)
 {
     // explicit ConstantBuffer::ConstantBuffer(Context* context)
@@ -4363,7 +4363,7 @@ static IndexBuffer* IndexBuffer__IndexBuffer_Contextstar_bool(bool forceHeadless
     return new IndexBuffer(context, forceHeadless);
 }
 
-// class IndexBuffer | File: ../Graphics/IndexBuffer.h
+// class IndexBuffer | File: ../GraphicsAPI/IndexBuffer.h
 static void Register_IndexBuffer(asIScriptEngine* engine)
 {
     // explicit IndexBuffer::IndexBuffer(Context* context, bool forceHeadless = false)
@@ -4737,7 +4737,7 @@ static ShaderPrecache* ShaderPrecache__ShaderPrecache_Contextstar_constspStringa
     return new ShaderPrecache(context, fileName);
 }
 
-// class ShaderPrecache | File: ../Graphics/ShaderPrecache.h
+// class ShaderPrecache | File: ../GraphicsAPI/ShaderPrecache.h
 static void Register_ShaderPrecache(asIScriptEngine* engine)
 {
     // ShaderPrecache::ShaderPrecache(Context* context, const String& fileName)
@@ -4836,7 +4836,7 @@ static VertexBuffer* VertexBuffer__VertexBuffer_Contextstar_bool(bool forceHeadl
     return new VertexBuffer(context, forceHeadless);
 }
 
-// class VertexBuffer | File: ../Graphics/VertexBuffer.h
+// class VertexBuffer | File: ../GraphicsAPI/VertexBuffer.h
 static void Register_VertexBuffer(asIScriptEngine* engine)
 {
     // explicit VertexBuffer::VertexBuffer(Context* context, bool forceHeadless = false)
@@ -5408,7 +5408,7 @@ static Shader* Shader__Shader_Contextstar()
     return new Shader(context);
 }
 
-// class Shader | File: ../Graphics/Shader.h
+// class Shader | File: ../GraphicsAPI/Shader.h
 static void Register_Shader(asIScriptEngine* engine)
 {
     // explicit Shader::Shader(Context* context)
@@ -5768,7 +5768,7 @@ static Texture* Texture__Texture_Contextstar()
     return new Texture(context);
 }
 
-// class Texture | File: ../Graphics/Texture.h
+// class Texture | File: ../GraphicsAPI/Texture.h
 static void Register_Texture(asIScriptEngine* engine)
 {
     // explicit Texture::Texture(Context* context)
@@ -6220,7 +6220,7 @@ static Texture2D* Texture2D__Texture2D_Contextstar()
     return new Texture2D(context);
 }
 
-// class Texture2D | File: ../Graphics/Texture2D.h
+// class Texture2D | File: ../GraphicsAPI/Texture2D.h
 static void Register_Texture2D(asIScriptEngine* engine)
 {
     // explicit Texture2D::Texture2D(Context* context)
@@ -6246,7 +6246,7 @@ static Texture2DArray* Texture2DArray__Texture2DArray_Contextstar()
     return new Texture2DArray(context);
 }
 
-// class Texture2DArray | File: ../Graphics/Texture2DArray.h
+// class Texture2DArray | File: ../GraphicsAPI/Texture2DArray.h
 static void Register_Texture2DArray(asIScriptEngine* engine)
 {
     // explicit Texture2DArray::Texture2DArray(Context* context)
@@ -6272,7 +6272,7 @@ static Texture3D* Texture3D__Texture3D_Contextstar()
     return new Texture3D(context);
 }
 
-// class Texture3D | File: ../Graphics/Texture3D.h
+// class Texture3D | File: ../GraphicsAPI/Texture3D.h
 static void Register_Texture3D(asIScriptEngine* engine)
 {
     // explicit Texture3D::Texture3D(Context* context)
@@ -6298,7 +6298,7 @@ static TextureCube* TextureCube__TextureCube_Contextstar()
     return new TextureCube(context);
 }
 
-// class TextureCube | File: ../Graphics/TextureCube.h
+// class TextureCube | File: ../GraphicsAPI/TextureCube.h
 static void Register_TextureCube(asIScriptEngine* engine)
 {
     // explicit TextureCube::TextureCube(Context* context)

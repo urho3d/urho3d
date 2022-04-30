@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include "../Graphics/GraphicsDefs.h"
+#include "../GraphicsAPI/GraphicsDefs.h"
 #include "../Math/BoundingBox.h"
 #include "../Scene/Component.h"
 

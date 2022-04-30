@@ -23,7 +23,7 @@
 #include "../Precompiled.h"
 
 #include "../Graphics/Graphics.h"
-#include "../Graphics/Texture.h"
+#include "../GraphicsAPI/Texture.h"
 #include "../UI/UIElement.h"
 
 #include "../DebugNew.h"

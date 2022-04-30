@@ -29,11 +29,11 @@
 #include <Urho3D/Graphics/Model.h>
 #include <Urho3D/Graphics/Octree.h>
 #include <Urho3D/Graphics/Renderer.h>
-#include <Urho3D/Graphics/RenderSurface.h>
 #include <Urho3D/Graphics/Skybox.h>
 #include <Urho3D/Graphics/Terrain.h>
-#include <Urho3D/Graphics/Texture2D.h>
 #include <Urho3D/Graphics/Zone.h>
+#include <Urho3D/GraphicsAPI/RenderSurface.h>
+#include <Urho3D/GraphicsAPI/Texture2D.h>
 #include <Urho3D/Input/Input.h>
 #include <Urho3D/IO/File.h>
 #include <Urho3D/IO/FileSystem.h>

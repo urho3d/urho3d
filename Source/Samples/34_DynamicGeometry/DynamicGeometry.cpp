@@ -26,14 +26,14 @@
 #include <Urho3D/Graphics/Camera.h>
 #include <Urho3D/Graphics/Geometry.h>
 #include <Urho3D/Graphics/Graphics.h>
-#include <Urho3D/Graphics/IndexBuffer.h>
 #include <Urho3D/Graphics/Light.h>
 #include <Urho3D/Graphics/Model.h>
 #include <Urho3D/Graphics/Octree.h>
 #include <Urho3D/Graphics/Renderer.h>
 #include <Urho3D/Graphics/StaticModel.h>
-#include <Urho3D/Graphics/VertexBuffer.h>
 #include <Urho3D/Graphics/Zone.h>
+#include <Urho3D/GraphicsAPI/IndexBuffer.h>
+#include <Urho3D/GraphicsAPI/VertexBuffer.h>
 #include <Urho3D/Input/Input.h>
 #include <Urho3D/IO/Log.h>
 #include <Urho3D/Resource/ResourceCache.h>

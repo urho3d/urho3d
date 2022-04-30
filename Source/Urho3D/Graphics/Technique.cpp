@@ -27,7 +27,7 @@
 #include "../Core/Profiler.h"
 #include "../Graphics/Graphics.h"
 #include "../Graphics/Technique.h"
-#include "../Graphics/ShaderVariation.h"
+#include "../GraphicsAPI/ShaderVariation.h"
 #include "../IO/Log.h"
 #include "../Resource/ResourceCache.h"
 #include "../Resource/XMLFile.h"

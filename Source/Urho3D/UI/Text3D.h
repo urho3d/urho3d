@@ -23,7 +23,7 @@
 #pragma once
 
 #include "../Graphics/Drawable.h"
-#include "../Graphics/VertexBuffer.h"
+#include "../GraphicsAPI/VertexBuffer.h"
 #include "../Math/Matrix3x4.h"
 #include "../UI/Text.h"
 

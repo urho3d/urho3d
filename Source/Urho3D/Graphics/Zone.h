@@ -23,7 +23,7 @@
 #pragma once
 
 #include "../Graphics/Drawable.h"
-#include "../Graphics/Texture.h"
+#include "../GraphicsAPI/Texture.h"
 #include "../Math/Color.h"
 
 namespace Urho3D

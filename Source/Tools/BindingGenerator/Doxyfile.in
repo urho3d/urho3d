@@ -95,8 +95,8 @@ QUIET                  = YES
 
 EXCLUDE_PATTERNS       = "@CMAKE_SOURCE_DIR@/Source/Urho3D/AngelScript/*" \
                          "@CMAKE_SOURCE_DIR@/Source/Urho3D/LuaScript/*" \
-                         "@CMAKE_SOURCE_DIR@/Source/Urho3D/Graphics/Direct3D11/*" \
-                         "@CMAKE_SOURCE_DIR@/Source/Urho3D/Graphics/Direct3D9/*" \
+                         "@CMAKE_SOURCE_DIR@/Source/Urho3D/GraphicsAPI/Direct3D11/*" \
+                         "@CMAKE_SOURCE_DIR@/Source/Urho3D/GraphicsAPI/Direct3D9/*" \
                          "@CMAKE_SOURCE_DIR@/Source/Urho3D/Database/SQLite/*" # https://github.com/doxygen/doxygen/issues/8805
 
 # The WARNINGS tag can be used to turn on/off the warning messages that are

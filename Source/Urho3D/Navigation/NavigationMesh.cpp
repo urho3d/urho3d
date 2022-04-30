@@ -30,7 +30,7 @@
 #include "../Graphics/Model.h"
 #include "../Graphics/StaticModel.h"
 #include "../Graphics/TerrainPatch.h"
-#include "../Graphics/VertexBuffer.h"
+#include "../GraphicsAPI/VertexBuffer.h"
 #include "../IO/Log.h"
 #include "../IO/MemoryBuffer.h"
 #include "../Navigation/CrowdAgent.h"

@@ -23,8 +23,8 @@
 #include "../Precompiled.h"
 
 #ifndef _WIN32
-#include "../Graphics/IndexBuffer.h"
-#include "../Graphics/VertexBuffer.h"
+#include "../GraphicsAPI/IndexBuffer.h"
+#include "../GraphicsAPI/VertexBuffer.h"
 #endif
 #include "../IO/VectorBuffer.h"
 

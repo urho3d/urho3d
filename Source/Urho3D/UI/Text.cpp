@@ -24,14 +24,14 @@
 
 #include "../Core/Context.h"
 #include "../Core/Profiler.h"
-#include "../Graphics/Texture2D.h"
+#include "../GraphicsAPI/Texture2D.h"
 #include "../IO/Log.h"
+#include "../Resource/Localization.h"
 #include "../Resource/ResourceCache.h"
+#include "../Resource/ResourceEvents.h"
 #include "../UI/Font.h"
 #include "../UI/FontFace.h"
 #include "../UI/Text.h"
-#include "../Resource/Localization.h"
-#include "../Resource/ResourceEvents.h"
 
 #include "../DebugNew.h"
 

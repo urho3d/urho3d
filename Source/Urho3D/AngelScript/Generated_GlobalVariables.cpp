@@ -16,7 +16,7 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // static const float ANIMATION_LOD_BASESCALE | File: ../Graphics/Drawable.h
     engine->RegisterGlobalProperty("const float ANIMATION_LOD_BASESCALE", (void*)&ANIMATION_LOD_BASESCALE);
 
-    // constexpr i32 BITS_PER_COMPONENT | File: ../Graphics/GraphicsDefs.h
+    // constexpr i32 BITS_PER_COMPONENT | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const int BITS_PER_COMPONENT", (void*)&BITS_PER_COMPONENT);
 
     // static const int COLOR_LUT_SIZE | File: ../Resource/Image.h
@@ -79,7 +79,7 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // static const unsigned DEFAULT_ZONEMASK | File: ../Graphics/Drawable.h
     engine->RegisterGlobalProperty("const uint DEFAULT_ZONEMASK", (void*)&DEFAULT_ZONEMASK);
 
-    // const Vector3 DOT_SCALE | File: ../Graphics/GraphicsDefs.h
+    // const Vector3 DOT_SCALE | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const Vector3 DOT_SCALE", (void*)&DOT_SCALE);
 
     // static const unsigned DRAWABLE_ANY | File: ../Graphics/Drawable.h
@@ -100,7 +100,7 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // static const unsigned DRAWABLE_ZONE | File: ../Graphics/Drawable.h
     engine->RegisterGlobalProperty("const uint DRAWABLE_ZONE", (void*)&DRAWABLE_ZONE);
 
-    // const u32 ELEMENT_TYPESIZES[] | File: ../Graphics/GraphicsDefs.h
+    // const u32 ELEMENT_TYPESIZES[] | File: ../GraphicsAPI/GraphicsDefs.h
     // Not registered because array
 
     // static const String EP_AUTOLOAD_PATHS | File: ../Engine/EngineDefs.h
@@ -274,7 +274,7 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // static const unsigned LAST_REPLICATED_ID | File: ../Scene/Scene.h
     engine->RegisterGlobalProperty("const uint LAST_REPLICATED_ID", (void*)&LAST_REPLICATED_ID);
 
-    // const VertexElement LEGACY_VERTEXELEMENTS[] | File: ../Graphics/GraphicsDefs.h
+    // const VertexElement LEGACY_VERTEXELEMENTS[] | File: ../GraphicsAPI/GraphicsDefs.h
     // Not registered because array
 
     // static const int LOG_DEBUG | File: ../IO/Log.h
@@ -304,7 +304,7 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // static const unsigned MAX_CASCADE_SPLITS | File: ../Graphics/Light.h
     engine->RegisterGlobalProperty("const uint MAX_CASCADE_SPLITS", (void*)&MAX_CASCADE_SPLITS);
 
-    // constexpr i32 MAX_CONSTANT_REGISTERS | File: ../Graphics/GraphicsDefs.h
+    // constexpr i32 MAX_CONSTANT_REGISTERS | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const int MAX_CONSTANT_REGISTERS", (void*)&MAX_CONSTANT_REGISTERS);
 
     // static const int MAX_LIGHT_SPLITS | File: ../Graphics/Light.h
@@ -313,16 +313,16 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // static const unsigned MAX_NETWORK_ATTRIBUTES | File: ../Scene/ReplicationState.h
     engine->RegisterGlobalProperty("const uint MAX_NETWORK_ATTRIBUTES", (void*)&MAX_NETWORK_ATTRIBUTES);
 
-    // constexpr i32 MAX_RENDERTARGETS | File: ../Graphics/GraphicsDefs.h
+    // constexpr i32 MAX_RENDERTARGETS | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const int MAX_RENDERTARGETS", (void*)&MAX_RENDERTARGETS);
 
-    // static const int MAX_TEXTURE_QUALITY_LEVELS | File: ../Graphics/Texture.h
+    // static const int MAX_TEXTURE_QUALITY_LEVELS | File: ../GraphicsAPI/Texture.h
     engine->RegisterGlobalProperty("const int MAX_TEXTURE_QUALITY_LEVELS", (void*)&MAX_TEXTURE_QUALITY_LEVELS);
 
     // static const int MAX_VERTEX_LIGHTS | File: ../Graphics/Drawable.h
     engine->RegisterGlobalProperty("const int MAX_VERTEX_LIGHTS", (void*)&MAX_VERTEX_LIGHTS);
 
-    // constexpr i32 MAX_VERTEX_STREAMS | File: ../Graphics/GraphicsDefs.h
+    // constexpr i32 MAX_VERTEX_STREAMS | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const int MAX_VERTEX_STREAMS", (void*)&MAX_VERTEX_STREAMS);
 
     // static const unsigned MAX_VIEWPORT_TEXTURES | File: ../Graphics/View.h
@@ -406,97 +406,97 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // static const unsigned PRIORITY_LAST | File: ../Resource/ResourceCache.h
     engine->RegisterGlobalProperty("const uint PRIORITY_LAST", (void*)&PRIORITY_LAST);
 
-    // const StringHash PSP_AMBIENTCOLOR | File: ../Graphics/GraphicsDefs.h
+    // const StringHash PSP_AMBIENTCOLOR | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash PSP_AMBIENTCOLOR", (void*)&PSP_AMBIENTCOLOR);
 
-    // const StringHash PSP_CAMERAPOS | File: ../Graphics/GraphicsDefs.h
+    // const StringHash PSP_CAMERAPOS | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash PSP_CAMERAPOS", (void*)&PSP_CAMERAPOS);
 
-    // const StringHash PSP_DELTATIME | File: ../Graphics/GraphicsDefs.h
+    // const StringHash PSP_DELTATIME | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash PSP_DELTATIME", (void*)&PSP_DELTATIME);
 
-    // const StringHash PSP_DEPTHRECONSTRUCT | File: ../Graphics/GraphicsDefs.h
+    // const StringHash PSP_DEPTHRECONSTRUCT | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash PSP_DEPTHRECONSTRUCT", (void*)&PSP_DEPTHRECONSTRUCT);
 
-    // const StringHash PSP_ELAPSEDTIME | File: ../Graphics/GraphicsDefs.h
+    // const StringHash PSP_ELAPSEDTIME | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash PSP_ELAPSEDTIME", (void*)&PSP_ELAPSEDTIME);
 
-    // const StringHash PSP_FARCLIP | File: ../Graphics/GraphicsDefs.h
+    // const StringHash PSP_FARCLIP | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash PSP_FARCLIP", (void*)&PSP_FARCLIP);
 
-    // const StringHash PSP_FOGCOLOR | File: ../Graphics/GraphicsDefs.h
+    // const StringHash PSP_FOGCOLOR | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash PSP_FOGCOLOR", (void*)&PSP_FOGCOLOR);
 
-    // const StringHash PSP_FOGPARAMS | File: ../Graphics/GraphicsDefs.h
+    // const StringHash PSP_FOGPARAMS | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash PSP_FOGPARAMS", (void*)&PSP_FOGPARAMS);
 
-    // const StringHash PSP_GBUFFERINVSIZE | File: ../Graphics/GraphicsDefs.h
+    // const StringHash PSP_GBUFFERINVSIZE | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash PSP_GBUFFERINVSIZE", (void*)&PSP_GBUFFERINVSIZE);
 
-    // const StringHash PSP_LIGHTCOLOR | File: ../Graphics/GraphicsDefs.h
+    // const StringHash PSP_LIGHTCOLOR | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash PSP_LIGHTCOLOR", (void*)&PSP_LIGHTCOLOR);
 
-    // const StringHash PSP_LIGHTDIR | File: ../Graphics/GraphicsDefs.h
+    // const StringHash PSP_LIGHTDIR | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash PSP_LIGHTDIR", (void*)&PSP_LIGHTDIR);
 
-    // const StringHash PSP_LIGHTLENGTH | File: ../Graphics/GraphicsDefs.h
+    // const StringHash PSP_LIGHTLENGTH | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash PSP_LIGHTLENGTH", (void*)&PSP_LIGHTLENGTH);
 
-    // const StringHash PSP_LIGHTMATRICES | File: ../Graphics/GraphicsDefs.h
+    // const StringHash PSP_LIGHTMATRICES | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash PSP_LIGHTMATRICES", (void*)&PSP_LIGHTMATRICES);
 
-    // const StringHash PSP_LIGHTPOS | File: ../Graphics/GraphicsDefs.h
+    // const StringHash PSP_LIGHTPOS | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash PSP_LIGHTPOS", (void*)&PSP_LIGHTPOS);
 
-    // const StringHash PSP_LIGHTRAD | File: ../Graphics/GraphicsDefs.h
+    // const StringHash PSP_LIGHTRAD | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash PSP_LIGHTRAD", (void*)&PSP_LIGHTRAD);
 
-    // const StringHash PSP_MATDIFFCOLOR | File: ../Graphics/GraphicsDefs.h
+    // const StringHash PSP_MATDIFFCOLOR | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash PSP_MATDIFFCOLOR", (void*)&PSP_MATDIFFCOLOR);
 
-    // const StringHash PSP_MATEMISSIVECOLOR | File: ../Graphics/GraphicsDefs.h
+    // const StringHash PSP_MATEMISSIVECOLOR | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash PSP_MATEMISSIVECOLOR", (void*)&PSP_MATEMISSIVECOLOR);
 
-    // const StringHash PSP_MATENVMAPCOLOR | File: ../Graphics/GraphicsDefs.h
+    // const StringHash PSP_MATENVMAPCOLOR | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash PSP_MATENVMAPCOLOR", (void*)&PSP_MATENVMAPCOLOR);
 
-    // const StringHash PSP_MATSPECCOLOR | File: ../Graphics/GraphicsDefs.h
+    // const StringHash PSP_MATSPECCOLOR | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash PSP_MATSPECCOLOR", (void*)&PSP_MATSPECCOLOR);
 
-    // const StringHash PSP_METALLIC | File: ../Graphics/GraphicsDefs.h
+    // const StringHash PSP_METALLIC | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash PSP_METALLIC", (void*)&PSP_METALLIC);
 
-    // const StringHash PSP_NEARCLIP | File: ../Graphics/GraphicsDefs.h
+    // const StringHash PSP_NEARCLIP | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash PSP_NEARCLIP", (void*)&PSP_NEARCLIP);
 
-    // const StringHash PSP_NORMALOFFSETSCALE | File: ../Graphics/GraphicsDefs.h
+    // const StringHash PSP_NORMALOFFSETSCALE | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash PSP_NORMALOFFSETSCALE", (void*)&PSP_NORMALOFFSETSCALE);
 
-    // const StringHash PSP_ROUGHNESS | File: ../Graphics/GraphicsDefs.h
+    // const StringHash PSP_ROUGHNESS | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash PSP_ROUGHNESS", (void*)&PSP_ROUGHNESS);
 
-    // const StringHash PSP_SHADOWCUBEADJUST | File: ../Graphics/GraphicsDefs.h
+    // const StringHash PSP_SHADOWCUBEADJUST | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash PSP_SHADOWCUBEADJUST", (void*)&PSP_SHADOWCUBEADJUST);
 
-    // const StringHash PSP_SHADOWDEPTHFADE | File: ../Graphics/GraphicsDefs.h
+    // const StringHash PSP_SHADOWDEPTHFADE | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash PSP_SHADOWDEPTHFADE", (void*)&PSP_SHADOWDEPTHFADE);
 
-    // const StringHash PSP_SHADOWINTENSITY | File: ../Graphics/GraphicsDefs.h
+    // const StringHash PSP_SHADOWINTENSITY | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash PSP_SHADOWINTENSITY", (void*)&PSP_SHADOWINTENSITY);
 
-    // const StringHash PSP_SHADOWMAPINVSIZE | File: ../Graphics/GraphicsDefs.h
+    // const StringHash PSP_SHADOWMAPINVSIZE | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash PSP_SHADOWMAPINVSIZE", (void*)&PSP_SHADOWMAPINVSIZE);
 
-    // const StringHash PSP_SHADOWSPLITS | File: ../Graphics/GraphicsDefs.h
+    // const StringHash PSP_SHADOWSPLITS | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash PSP_SHADOWSPLITS", (void*)&PSP_SHADOWSPLITS);
 
-    // const StringHash PSP_VSMSHADOWPARAMS | File: ../Graphics/GraphicsDefs.h
+    // const StringHash PSP_VSMSHADOWPARAMS | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash PSP_VSMSHADOWPARAMS", (void*)&PSP_VSMSHADOWPARAMS);
 
-    // const StringHash PSP_ZONEMAX | File: ../Graphics/GraphicsDefs.h
+    // const StringHash PSP_ZONEMAX | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash PSP_ZONEMAX", (void*)&PSP_ZONEMAX);
 
-    // const StringHash PSP_ZONEMIN | File: ../Graphics/GraphicsDefs.h
+    // const StringHash PSP_ZONEMIN | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash PSP_ZONEMIN", (void*)&PSP_ZONEMIN);
 
     // static const int QUICKSORT_THRESHOLD | File: ../Container/Sort.h
@@ -547,79 +547,79 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // static const unsigned VARIANT_VALUE_SIZE | File: ../Core/Variant.h
     engine->RegisterGlobalProperty("const uint VARIANT_VALUE_SIZE", (void*)&VARIANT_VALUE_SIZE);
 
-    // const StringHash VSP_AMBIENTENDCOLOR | File: ../Graphics/GraphicsDefs.h
+    // const StringHash VSP_AMBIENTENDCOLOR | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash VSP_AMBIENTENDCOLOR", (void*)&VSP_AMBIENTENDCOLOR);
 
-    // const StringHash VSP_AMBIENTSTARTCOLOR | File: ../Graphics/GraphicsDefs.h
+    // const StringHash VSP_AMBIENTSTARTCOLOR | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash VSP_AMBIENTSTARTCOLOR", (void*)&VSP_AMBIENTSTARTCOLOR);
 
-    // const StringHash VSP_BILLBOARDROT | File: ../Graphics/GraphicsDefs.h
+    // const StringHash VSP_BILLBOARDROT | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash VSP_BILLBOARDROT", (void*)&VSP_BILLBOARDROT);
 
-    // const StringHash VSP_CAMERAPOS | File: ../Graphics/GraphicsDefs.h
+    // const StringHash VSP_CAMERAPOS | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash VSP_CAMERAPOS", (void*)&VSP_CAMERAPOS);
 
-    // const StringHash VSP_CLIPPLANE | File: ../Graphics/GraphicsDefs.h
+    // const StringHash VSP_CLIPPLANE | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash VSP_CLIPPLANE", (void*)&VSP_CLIPPLANE);
 
-    // const StringHash VSP_DELTATIME | File: ../Graphics/GraphicsDefs.h
+    // const StringHash VSP_DELTATIME | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash VSP_DELTATIME", (void*)&VSP_DELTATIME);
 
-    // const StringHash VSP_DEPTHMODE | File: ../Graphics/GraphicsDefs.h
+    // const StringHash VSP_DEPTHMODE | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash VSP_DEPTHMODE", (void*)&VSP_DEPTHMODE);
 
-    // const StringHash VSP_ELAPSEDTIME | File: ../Graphics/GraphicsDefs.h
+    // const StringHash VSP_ELAPSEDTIME | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash VSP_ELAPSEDTIME", (void*)&VSP_ELAPSEDTIME);
 
-    // const StringHash VSP_FARCLIP | File: ../Graphics/GraphicsDefs.h
+    // const StringHash VSP_FARCLIP | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash VSP_FARCLIP", (void*)&VSP_FARCLIP);
 
-    // const StringHash VSP_FRUSTUMSIZE | File: ../Graphics/GraphicsDefs.h
+    // const StringHash VSP_FRUSTUMSIZE | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash VSP_FRUSTUMSIZE", (void*)&VSP_FRUSTUMSIZE);
 
-    // const StringHash VSP_GBUFFEROFFSETS | File: ../Graphics/GraphicsDefs.h
+    // const StringHash VSP_GBUFFEROFFSETS | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash VSP_GBUFFEROFFSETS", (void*)&VSP_GBUFFEROFFSETS);
 
-    // const StringHash VSP_LIGHTDIR | File: ../Graphics/GraphicsDefs.h
+    // const StringHash VSP_LIGHTDIR | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash VSP_LIGHTDIR", (void*)&VSP_LIGHTDIR);
 
-    // const StringHash VSP_LIGHTMATRICES | File: ../Graphics/GraphicsDefs.h
+    // const StringHash VSP_LIGHTMATRICES | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash VSP_LIGHTMATRICES", (void*)&VSP_LIGHTMATRICES);
 
-    // const StringHash VSP_LIGHTPOS | File: ../Graphics/GraphicsDefs.h
+    // const StringHash VSP_LIGHTPOS | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash VSP_LIGHTPOS", (void*)&VSP_LIGHTPOS);
 
-    // const StringHash VSP_MODEL | File: ../Graphics/GraphicsDefs.h
+    // const StringHash VSP_MODEL | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash VSP_MODEL", (void*)&VSP_MODEL);
 
-    // const StringHash VSP_NEARCLIP | File: ../Graphics/GraphicsDefs.h
+    // const StringHash VSP_NEARCLIP | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash VSP_NEARCLIP", (void*)&VSP_NEARCLIP);
 
-    // const StringHash VSP_NORMALOFFSETSCALE | File: ../Graphics/GraphicsDefs.h
+    // const StringHash VSP_NORMALOFFSETSCALE | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash VSP_NORMALOFFSETSCALE", (void*)&VSP_NORMALOFFSETSCALE);
 
-    // const StringHash VSP_SKINMATRICES | File: ../Graphics/GraphicsDefs.h
+    // const StringHash VSP_SKINMATRICES | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash VSP_SKINMATRICES", (void*)&VSP_SKINMATRICES);
 
-    // const StringHash VSP_UOFFSET | File: ../Graphics/GraphicsDefs.h
+    // const StringHash VSP_UOFFSET | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash VSP_UOFFSET", (void*)&VSP_UOFFSET);
 
-    // const StringHash VSP_VERTEXLIGHTS | File: ../Graphics/GraphicsDefs.h
+    // const StringHash VSP_VERTEXLIGHTS | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash VSP_VERTEXLIGHTS", (void*)&VSP_VERTEXLIGHTS);
 
-    // const StringHash VSP_VIEW | File: ../Graphics/GraphicsDefs.h
+    // const StringHash VSP_VIEW | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash VSP_VIEW", (void*)&VSP_VIEW);
 
-    // const StringHash VSP_VIEWINV | File: ../Graphics/GraphicsDefs.h
+    // const StringHash VSP_VIEWINV | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash VSP_VIEWINV", (void*)&VSP_VIEWINV);
 
-    // const StringHash VSP_VIEWPROJ | File: ../Graphics/GraphicsDefs.h
+    // const StringHash VSP_VIEWPROJ | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash VSP_VIEWPROJ", (void*)&VSP_VIEWPROJ);
 
-    // const StringHash VSP_VOFFSET | File: ../Graphics/GraphicsDefs.h
+    // const StringHash VSP_VOFFSET | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash VSP_VOFFSET", (void*)&VSP_VOFFSET);
 
-    // const StringHash VSP_ZONE | File: ../Graphics/GraphicsDefs.h
+    // const StringHash VSP_ZONE | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash VSP_ZONE", (void*)&VSP_ZONE);
 
 #ifdef URHO3D_NETWORK

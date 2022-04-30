@@ -26,7 +26,7 @@
 
 #include "../Container/Ptr.h"
 #include "../Container/RefCounted.h"
-#include "../Graphics/GraphicsDefs.h"
+#include "../GraphicsAPI/GraphicsDefs.h"
 #include "../Math/Color.h"
 #include "../Math/Vector4.h"
 

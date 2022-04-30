@@ -64,9 +64,9 @@ bool IsIgnoredHeader(const string& headerFile)
         "../AngelScript",
         //"../Container",
         "../LuaScript",
-        "../Graphics/Direct3D11",
-        "../Graphics/Direct3D9",
-        "../Graphics/OpenGL",
+        "../GraphicsAPI/Direct3D11",
+        "../GraphicsAPI/Direct3D9",
+        "../GraphicsAPI/OpenGL",
         "../Database/ODBC",
         "../Database/SQLite",
     };

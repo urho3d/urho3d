@@ -29,12 +29,12 @@
 #include <Urho3D/Graphics/DebugRenderer.h>
 #include <Urho3D/Graphics/Geometry.h>
 #include <Urho3D/Graphics/Graphics.h>
-#include <Urho3D/Graphics/IndexBuffer.h>
 #include <Urho3D/Graphics/Light.h>
 #include <Urho3D/Graphics/Material.h>
 #include <Urho3D/Graphics/Octree.h>
-#include <Urho3D/Graphics/VertexBuffer.h>
 #include <Urho3D/Graphics/Zone.h>
+#include <Urho3D/GraphicsAPI/IndexBuffer.h>
+#include <Urho3D/GraphicsAPI/VertexBuffer.h>
 #include <Urho3D/IO/File.h>
 #include <Urho3D/IO/FileSystem.h>
 #ifdef URHO3D_PHYSICS

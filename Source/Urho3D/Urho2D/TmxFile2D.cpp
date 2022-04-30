@@ -23,15 +23,15 @@
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
-#include "../Graphics/Texture2D.h"
 #include "../Graphics/Graphics.h"
+#include "../GraphicsAPI/Texture2D.h"
 #include "../IO/FileSystem.h"
 #include "../IO/Log.h"
+#include "../Math/AreaAllocator.h"
 #include "../Resource/ResourceCache.h"
 #include "../Resource/XMLFile.h"
 #include "../Urho2D/Sprite2D.h"
 #include "../Urho2D/TmxFile2D.h"
-#include "../Math/AreaAllocator.h"
 
 #include "../DebugNew.h"
 

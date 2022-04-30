@@ -154,15 +154,15 @@ else ()
 endif ()
 
 if (NOT URHO3D_OPENGL)
-    list (APPEND EXCLUDED_SOURCE_DIRS Graphics/OpenGL)
+    list (APPEND EXCLUDED_SOURCE_DIRS GraphicsAPI/OpenGL)
 endif ()
 
 if (NOT URHO3D_D3D9)
-    list (APPEND EXCLUDED_SOURCE_DIRS Graphics/Direct3D9)
+    list (APPEND EXCLUDED_SOURCE_DIRS GraphicsAPI/Direct3D9)
 endif ()
 
 if (NOT URHO3D_D3D11)
-    list (APPEND EXCLUDED_SOURCE_DIRS Graphics/Direct3D11)
+    list (APPEND EXCLUDED_SOURCE_DIRS GraphicsAPI/Direct3D11)
 endif ()
 
 if (APPLE AND NOT ARM)
