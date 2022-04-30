@@ -23,17 +23,17 @@
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
-#include "../Graphics/RibbonTrail.h"
-#include "../Graphics/VertexBuffer.h"
-#include "../Graphics/IndexBuffer.h"
 #include "../Graphics/Camera.h"
+#include "../Graphics/Geometry.h"
 #include "../Graphics/Material.h"
 #include "../Graphics/OctreeQuery.h"
-#include "../Graphics/Geometry.h"
+#include "../Graphics/RibbonTrail.h"
+#include "../GraphicsAPI/IndexBuffer.h"
+#include "../GraphicsAPI/VertexBuffer.h"
+#include "../IO/Log.h"
+#include "../Resource/ResourceCache.h"
 #include "../Scene/Scene.h"
 #include "../Scene/SceneEvents.h"
-#include "../Resource/ResourceCache.h"
-#include "../IO/Log.h"
 
 namespace Urho3D
 {

@@ -24,7 +24,7 @@
 
 #include "../Core/Context.h"
 #include "../IO/Log.h"
-#include "../Graphics/Texture2D.h"
+#include "../GraphicsAPI/Texture2D.h"
 #include "../Resource/Image.h"
 #include "../UI/Font.h"
 #include "../UI/FontFace.h"

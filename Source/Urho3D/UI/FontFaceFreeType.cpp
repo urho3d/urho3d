@@ -24,7 +24,7 @@
 
 #include "../Core/Context.h"
 #include "../Graphics/Graphics.h"
-#include "../Graphics/Texture2D.h"
+#include "../GraphicsAPI/Texture2D.h"
 #include "../IO/FileSystem.h"
 #include "../IO/Log.h"
 #include "../IO/MemoryBuffer.h"

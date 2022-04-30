@@ -252,7 +252,7 @@ void ASRegisterGeneratedDefaultConstructors(asIScriptEngine* engine)
     // ScreenModeParams::ScreenModeParams() | Implicitly-declared
     engine->RegisterObjectBehaviour("ScreenModeParams", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<ScreenModeParams>), AS_CALL_CDECL_OBJFIRST);
 
-    // ShaderParameter::ShaderParameter() = default | File: ../Graphics/ShaderVariation.h
+    // ShaderParameter::ShaderParameter() = default | File: ../GraphicsAPI/ShaderVariation.h
     engine->RegisterObjectBehaviour("ShaderParameter", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<ShaderParameter>), AS_CALL_CDECL_OBJFIRST);
 
     // ShadowBatchQueue::ShadowBatchQueue() | Implicitly-declared
@@ -318,7 +318,7 @@ void ASRegisterGeneratedDefaultConstructors(asIScriptEngine* engine)
     // VertexBufferMorph::VertexBufferMorph() | Implicitly-declared
     engine->RegisterObjectBehaviour("VertexBufferMorph", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<VertexBufferMorph>), AS_CALL_CDECL_OBJFIRST);
 
-    // VertexElement::VertexElement() noexcept | File: ../Graphics/GraphicsDefs.h
+    // VertexElement::VertexElement() noexcept | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterObjectBehaviour("VertexElement", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<VertexElement>), AS_CALL_CDECL_OBJFIRST);
 
     // WindowModeParams::WindowModeParams() | Implicitly-declared

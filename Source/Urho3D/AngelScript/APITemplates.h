@@ -31,7 +31,7 @@
 #include "../Container/Sort.h"
 #include "../Graphics/Drawable.h"
 #include "../Graphics/StaticModel.h"
-#include "../Graphics/Texture.h"
+#include "../GraphicsAPI/Texture.h"
 #include "../IO/File.h"
 #include "../IO/Log.h"
 #include "../IO/VectorBuffer.h"

@@ -21,7 +21,7 @@ static const unsigned char BoneCollisionShape_BONECOLLISION_NONE = BONECOLLISION
 static const unsigned char BoneCollisionShape_BONECOLLISION_SPHERE = BONECOLLISION_SPHERE;
 static const unsigned char BoneCollisionShape_BONECOLLISION_BOX = BONECOLLISION_BOX;
 
-// enum ClearTarget : u32 | File: ../Graphics/GraphicsDefs.h
+// enum ClearTarget : u32 | File: ../GraphicsAPI/GraphicsDefs.h
 static const u32 ClearTarget_CLEAR_COLOR = CLEAR_COLOR;
 static const u32 ClearTarget_CLEAR_DEPTH = CLEAR_DEPTH;
 static const u32 ClearTarget_CLEAR_STENCIL = CLEAR_STENCIL;
@@ -305,7 +305,7 @@ static const unsigned Key_KEY_VOLUMEDOWN = KEY_VOLUMEDOWN;
 static const unsigned Key_KEY_VOLUMEUP = KEY_VOLUMEUP;
 static const unsigned Key_KEY_WWW = KEY_WWW;
 
-// enum MaterialQuality : u32 | File: ../Graphics/GraphicsDefs.h
+// enum MaterialQuality : u32 | File: ../GraphicsAPI/GraphicsDefs.h
 static const u32 MaterialQuality_QUALITY_LOW = QUALITY_LOW;
 static const u32 MaterialQuality_QUALITY_MEDIUM = QUALITY_MEDIUM;
 static const u32 MaterialQuality_QUALITY_HIGH = QUALITY_HIGH;
@@ -586,7 +586,7 @@ static const unsigned UpdateEvent_USE_POSTUPDATE = USE_POSTUPDATE;
 static const unsigned UpdateEvent_USE_FIXEDUPDATE = USE_FIXEDUPDATE;
 static const unsigned UpdateEvent_USE_FIXEDPOSTUPDATE = USE_FIXEDPOSTUPDATE;
 
-// enum VertexMask : u32 | File: ../Graphics/GraphicsDefs.h
+// enum VertexMask : u32 | File: ../GraphicsAPI/GraphicsDefs.h
 static const u32 VertexMask_MASK_NONE = MASK_NONE;
 static const u32 VertexMask_MASK_POSITION = MASK_POSITION;
 static const u32 VertexMask_MASK_NORMAL = MASK_NORMAL;
@@ -656,7 +656,7 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     engine->RegisterEnumValue("AutoRemoveMode", "REMOVE_COMPONENT", REMOVE_COMPONENT);
     engine->RegisterEnumValue("AutoRemoveMode", "REMOVE_NODE", REMOVE_NODE);
 
-    // enum BlendMode | File: ../Graphics/GraphicsDefs.h
+    // enum BlendMode | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterEnum("BlendMode");
     engine->RegisterEnumValue("BlendMode", "BLEND_REPLACE", BLEND_REPLACE);
     engine->RegisterEnumValue("BlendMode", "BLEND_ADD", BLEND_ADD);
@@ -678,16 +678,16 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     // URHO3D_FLAGSET(BoneCollisionShape, BoneCollisionShapeFlags) | File: ../Graphics/Skeleton.h
     engine->RegisterTypedef("BoneCollisionShapeFlags", "uint8");
 
-    // enum ClearTarget : u32 | File: ../Graphics/GraphicsDefs.h
+    // enum ClearTarget : u32 | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterTypedef("ClearTarget", "uint");
     engine->RegisterGlobalProperty("const uint CLEAR_COLOR", (void*)&ClearTarget_CLEAR_COLOR);
     engine->RegisterGlobalProperty("const uint CLEAR_DEPTH", (void*)&ClearTarget_CLEAR_DEPTH);
     engine->RegisterGlobalProperty("const uint CLEAR_STENCIL", (void*)&ClearTarget_CLEAR_STENCIL);
 
-    // URHO3D_FLAGSET(ClearTarget, ClearTargetFlags) | File: ../Graphics/GraphicsDefs.h
+    // URHO3D_FLAGSET(ClearTarget, ClearTargetFlags) | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterTypedef("ClearTargetFlags", "uint");
 
-    // enum CompareMode | File: ../Graphics/GraphicsDefs.h
+    // enum CompareMode | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterEnum("CompareMode");
     engine->RegisterEnumValue("CompareMode", "CMP_ALWAYS", CMP_ALWAYS);
     engine->RegisterEnumValue("CompareMode", "CMP_EQUAL", CMP_EQUAL);
@@ -753,7 +753,7 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     engine->RegisterEnumValue("CreateMode", "REPLICATED", REPLICATED);
     engine->RegisterEnumValue("CreateMode", "LOCAL", LOCAL);
 
-    // enum CubeMapFace | File: ../Graphics/GraphicsDefs.h
+    // enum CubeMapFace | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterEnum("CubeMapFace");
     engine->RegisterEnumValue("CubeMapFace", "FACE_POSITIVE_X", FACE_POSITIVE_X);
     engine->RegisterEnumValue("CubeMapFace", "FACE_NEGATIVE_X", FACE_NEGATIVE_X);
@@ -763,7 +763,7 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     engine->RegisterEnumValue("CubeMapFace", "FACE_NEGATIVE_Z", FACE_NEGATIVE_Z);
     engine->RegisterEnumValue("CubeMapFace", "MAX_CUBEMAP_FACES", MAX_CUBEMAP_FACES);
 
-    // enum CubeMapLayout | File: ../Graphics/GraphicsDefs.h
+    // enum CubeMapLayout | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterEnum("CubeMapLayout");
     engine->RegisterEnumValue("CubeMapLayout", "CML_HORIZONTAL", CML_HORIZONTAL);
     engine->RegisterEnumValue("CubeMapLayout", "CML_HORIZONTALNVIDIA", CML_HORIZONTALNVIDIA);
@@ -771,7 +771,7 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     engine->RegisterEnumValue("CubeMapLayout", "CML_VERTICALCROSS", CML_VERTICALCROSS);
     engine->RegisterEnumValue("CubeMapLayout", "CML_BLENDER", CML_BLENDER);
 
-    // enum CullMode | File: ../Graphics/GraphicsDefs.h
+    // enum CullMode | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterEnum("CullMode");
     engine->RegisterEnumValue("CullMode", "CULL_NONE", CULL_NONE);
     engine->RegisterEnumValue("CullMode", "CULL_CCW", CULL_CCW);
@@ -872,7 +872,7 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     engine->RegisterEnumValue("EmitterType", "EMITTER_CYLINDER", EMITTER_CYLINDER);
     engine->RegisterEnumValue("EmitterType", "EMITTER_RING", EMITTER_RING);
 
-    // enum FaceCameraMode | File: ../Graphics/GraphicsDefs.h
+    // enum FaceCameraMode | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterEnum("FaceCameraMode");
     engine->RegisterEnumValue("FaceCameraMode", "FC_NONE", FC_NONE);
     engine->RegisterEnumValue("FaceCameraMode", "FC_ROTATE_XYZ", FC_ROTATE_XYZ);
@@ -888,7 +888,7 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     engine->RegisterEnumValue("FileMode", "FILE_WRITE", FILE_WRITE);
     engine->RegisterEnumValue("FileMode", "FILE_READWRITE", FILE_READWRITE);
 
-    // enum FillMode | File: ../Graphics/GraphicsDefs.h
+    // enum FillMode | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterEnum("FillMode");
     engine->RegisterEnumValue("FillMode", "FILL_SOLID", FILL_SOLID);
     engine->RegisterEnumValue("FillMode", "FILL_WIREFRAME", FILL_WIREFRAME);
@@ -923,14 +923,14 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     engine->RegisterEnumValue("FrustumPlane", "PLANE_DOWN", PLANE_DOWN);
     engine->RegisterEnumValue("FrustumPlane", "PLANE_FAR", PLANE_FAR);
 
-    // enum GAPI | File: ../Graphics/GraphicsDefs.h
+    // enum GAPI | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterEnum("GAPI");
     engine->RegisterEnumValue("GAPI", "GAPI_NONE", GAPI_NONE);
     engine->RegisterEnumValue("GAPI", "GAPI_OPENGL", GAPI_OPENGL);
     engine->RegisterEnumValue("GAPI", "GAPI_D3D9", GAPI_D3D9);
     engine->RegisterEnumValue("GAPI", "GAPI_D3D11", GAPI_D3D11);
 
-    // enum GeometryType | File: ../Graphics/GraphicsDefs.h
+    // enum GeometryType | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterEnum("GeometryType");
     engine->RegisterEnumValue("GeometryType", "GEOM_STATIC", GEOM_STATIC);
     engine->RegisterEnumValue("GeometryType", "GEOM_SKINNED", GEOM_SKINNED);
@@ -1246,7 +1246,7 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     engine->RegisterEnumValue("LayoutMode", "LM_HORIZONTAL", LM_HORIZONTAL);
     engine->RegisterEnumValue("LayoutMode", "LM_VERTICAL", LM_VERTICAL);
 
-    // enum LegacyVertexElement | File: ../Graphics/GraphicsDefs.h
+    // enum LegacyVertexElement | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterEnum("LegacyVertexElement");
     engine->RegisterEnumValue("LegacyVertexElement", "ELEMENT_POSITION", ELEMENT_POSITION);
     engine->RegisterEnumValue("LegacyVertexElement", "ELEMENT_NORMAL", ELEMENT_NORMAL);
@@ -1309,14 +1309,14 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     engine->RegisterEnumValue("LoadMode", "LOAD_SCENE", LOAD_SCENE);
     engine->RegisterEnumValue("LoadMode", "LOAD_SCENE_AND_RESOURCES", LOAD_SCENE_AND_RESOURCES);
 
-    // enum LockState | File: ../Graphics/GraphicsDefs.h
+    // enum LockState | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterEnum("LockState");
     engine->RegisterEnumValue("LockState", "LOCK_NONE", LOCK_NONE);
     engine->RegisterEnumValue("LockState", "LOCK_HARDWARE", LOCK_HARDWARE);
     engine->RegisterEnumValue("LockState", "LOCK_SHADOW", LOCK_SHADOW);
     engine->RegisterEnumValue("LockState", "LOCK_SCRATCH", LOCK_SCRATCH);
 
-    // enum MaterialQuality : u32 | File: ../Graphics/GraphicsDefs.h
+    // enum MaterialQuality : u32 | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterTypedef("MaterialQuality", "uint");
     engine->RegisterGlobalProperty("const uint QUALITY_LOW", (void*)&MaterialQuality_QUALITY_LOW);
     engine->RegisterGlobalProperty("const uint QUALITY_MEDIUM", (void*)&MaterialQuality_QUALITY_MEDIUM);
@@ -1355,7 +1355,7 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     engine->RegisterEnumValue("PassLightingMode", "LIGHTING_PERVERTEX", LIGHTING_PERVERTEX);
     engine->RegisterEnumValue("PassLightingMode", "LIGHTING_PERPIXEL", LIGHTING_PERPIXEL);
 
-    // enum PrimitiveType | File: ../Graphics/GraphicsDefs.h
+    // enum PrimitiveType | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterEnum("PrimitiveType");
     engine->RegisterEnumValue("PrimitiveType", "TRIANGLE_LIST", TRIANGLE_LIST);
     engine->RegisterEnumValue("PrimitiveType", "LINE_LIST", LINE_LIST);
@@ -1398,7 +1398,7 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     engine->RegisterEnumValue("RenderCommandType", "CMD_RENDERUI", CMD_RENDERUI);
     engine->RegisterEnumValue("RenderCommandType", "CMD_SENDEVENT", CMD_SENDEVENT);
 
-    // enum RenderSurfaceUpdateMode | File: ../Graphics/GraphicsDefs.h
+    // enum RenderSurfaceUpdateMode | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterEnum("RenderSurfaceUpdateMode");
     engine->RegisterEnumValue("RenderSurfaceUpdateMode", "SURFACE_MANUALUPDATE", SURFACE_MANUALUPDATE);
     engine->RegisterEnumValue("RenderSurfaceUpdateMode", "SURFACE_UPDATEVISIBLE", SURFACE_UPDATEVISIBLE);
@@ -1663,7 +1663,7 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const uint SCANCODE_APP1", (void*)&Scancode_SCANCODE_APP1);
     engine->RegisterGlobalProperty("const uint SCANCODE_APP2", (void*)&Scancode_SCANCODE_APP2);
 
-    // enum ShaderParameterGroup | File: ../Graphics/GraphicsDefs.h
+    // enum ShaderParameterGroup | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterEnum("ShaderParameterGroup");
     engine->RegisterEnumValue("ShaderParameterGroup", "SP_FRAME", SP_FRAME);
     engine->RegisterEnumValue("ShaderParameterGroup", "SP_CAMERA", SP_CAMERA);
@@ -1674,12 +1674,12 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     engine->RegisterEnumValue("ShaderParameterGroup", "SP_CUSTOM", SP_CUSTOM);
     engine->RegisterEnumValue("ShaderParameterGroup", "MAX_SHADER_PARAMETER_GROUPS", MAX_SHADER_PARAMETER_GROUPS);
 
-    // enum ShaderType | File: ../Graphics/GraphicsDefs.h
+    // enum ShaderType | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterEnum("ShaderType");
     engine->RegisterEnumValue("ShaderType", "VS", VS);
     engine->RegisterEnumValue("ShaderType", "PS", PS);
 
-    // enum ShadowQuality | File: ../Graphics/GraphicsDefs.h
+    // enum ShadowQuality | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterEnum("ShadowQuality");
     engine->RegisterEnumValue("ShadowQuality", "SHADOWQUALITY_SIMPLE_16BIT", SHADOWQUALITY_SIMPLE_16BIT);
     engine->RegisterEnumValue("ShadowQuality", "SHADOWQUALITY_SIMPLE_24BIT", SHADOWQUALITY_SIMPLE_24BIT);
@@ -1697,7 +1697,7 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     // URHO3D_FLAGSET(SmoothingType, SmoothingTypeFlags) | File: ../Scene/SmoothedTransform.h
     engine->RegisterTypedef("SmoothingTypeFlags", "uint");
 
-    // enum StencilOp | File: ../Graphics/GraphicsDefs.h
+    // enum StencilOp | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterEnum("StencilOp");
     engine->RegisterEnumValue("StencilOp", "OP_KEEP", OP_KEEP);
     engine->RegisterEnumValue("StencilOp", "OP_ZERO", OP_ZERO);
@@ -1711,7 +1711,7 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     engine->RegisterEnumValue("TextEffect", "TE_SHADOW", TE_SHADOW);
     engine->RegisterEnumValue("TextEffect", "TE_STROKE", TE_STROKE);
 
-    // enum TextureAddressMode | File: ../Graphics/GraphicsDefs.h
+    // enum TextureAddressMode | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterEnum("TextureAddressMode");
     engine->RegisterEnumValue("TextureAddressMode", "ADDRESS_WRAP", ADDRESS_WRAP);
     engine->RegisterEnumValue("TextureAddressMode", "ADDRESS_MIRROR", ADDRESS_MIRROR);
@@ -1719,14 +1719,14 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     engine->RegisterEnumValue("TextureAddressMode", "ADDRESS_BORDER", ADDRESS_BORDER);
     engine->RegisterEnumValue("TextureAddressMode", "MAX_ADDRESSMODES", MAX_ADDRESSMODES);
 
-    // enum TextureCoordinate | File: ../Graphics/GraphicsDefs.h
+    // enum TextureCoordinate | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterEnum("TextureCoordinate");
     engine->RegisterEnumValue("TextureCoordinate", "COORD_U", COORD_U);
     engine->RegisterEnumValue("TextureCoordinate", "COORD_V", COORD_V);
     engine->RegisterEnumValue("TextureCoordinate", "COORD_W", COORD_W);
     engine->RegisterEnumValue("TextureCoordinate", "MAX_COORDS", MAX_COORDS);
 
-    // enum TextureFilterMode | File: ../Graphics/GraphicsDefs.h
+    // enum TextureFilterMode | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterEnum("TextureFilterMode");
     engine->RegisterEnumValue("TextureFilterMode", "FILTER_NEAREST", FILTER_NEAREST);
     engine->RegisterEnumValue("TextureFilterMode", "FILTER_BILINEAR", FILTER_BILINEAR);
@@ -1736,10 +1736,10 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     engine->RegisterEnumValue("TextureFilterMode", "FILTER_DEFAULT", FILTER_DEFAULT);
     engine->RegisterEnumValue("TextureFilterMode", "MAX_FILTERMODES", MAX_FILTERMODES);
 
-    // enum TextureUnit | File: ../Graphics/GraphicsDefs.h
+    // enum TextureUnit | File: ../GraphicsAPI/GraphicsDefs.h
     // Not registered because have @manualbind mark
 
-    // enum TextureUsage | File: ../Graphics/GraphicsDefs.h
+    // enum TextureUsage | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterEnum("TextureUsage");
     engine->RegisterEnumValue("TextureUsage", "TEXTURE_STATIC", TEXTURE_STATIC);
     engine->RegisterEnumValue("TextureUsage", "TEXTURE_DYNAMIC", TEXTURE_DYNAMIC);
@@ -1812,7 +1812,7 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     engine->RegisterEnumValue("VariantType", "VAR_CUSTOM_STACK", VAR_CUSTOM_STACK);
     engine->RegisterEnumValue("VariantType", "MAX_VAR_TYPES", MAX_VAR_TYPES);
 
-    // enum VertexElementSemantic | File: ../Graphics/GraphicsDefs.h
+    // enum VertexElementSemantic | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterEnum("VertexElementSemantic");
     engine->RegisterEnumValue("VertexElementSemantic", "SEM_POSITION", SEM_POSITION);
     engine->RegisterEnumValue("VertexElementSemantic", "SEM_NORMAL", SEM_NORMAL);
@@ -1825,7 +1825,7 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     engine->RegisterEnumValue("VertexElementSemantic", "SEM_OBJECTINDEX", SEM_OBJECTINDEX);
     engine->RegisterEnumValue("VertexElementSemantic", "MAX_VERTEX_ELEMENT_SEMANTICS", MAX_VERTEX_ELEMENT_SEMANTICS);
 
-    // enum VertexElementType | File: ../Graphics/GraphicsDefs.h
+    // enum VertexElementType | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterEnum("VertexElementType");
     engine->RegisterEnumValue("VertexElementType", "TYPE_INT", TYPE_INT);
     engine->RegisterEnumValue("VertexElementType", "TYPE_FLOAT", TYPE_FLOAT);
@@ -1845,7 +1845,7 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     engine->RegisterEnumValue("VertexLightVSVariation", "VLVS_4LIGHTS", VLVS_4LIGHTS);
     engine->RegisterEnumValue("VertexLightVSVariation", "MAX_VERTEXLIGHT_VS_VARIATIONS", MAX_VERTEXLIGHT_VS_VARIATIONS);
 
-    // enum VertexMask : u32 | File: ../Graphics/GraphicsDefs.h
+    // enum VertexMask : u32 | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterTypedef("VertexMask", "uint");
     engine->RegisterGlobalProperty("const uint MASK_NONE", (void*)&VertexMask_MASK_NONE);
     engine->RegisterGlobalProperty("const uint MASK_POSITION", (void*)&VertexMask_MASK_POSITION);
@@ -1863,7 +1863,7 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const uint MASK_INSTANCEMATRIX3", (void*)&VertexMask_MASK_INSTANCEMATRIX3);
     engine->RegisterGlobalProperty("const uint MASK_OBJECTINDEX", (void*)&VertexMask_MASK_OBJECTINDEX);
 
-    // URHO3D_FLAGSET(VertexMask, VertexMaskFlags) | File: ../Graphics/GraphicsDefs.h
+    // URHO3D_FLAGSET(VertexMask, VertexMaskFlags) | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterTypedef("VertexMaskFlags", "uint");
 
     // enum VerticalAlignment | File: ../UI/UIElement.h

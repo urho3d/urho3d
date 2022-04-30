@@ -30,8 +30,8 @@
 #include "../Graphics/DebugRenderer.h"
 #include "../Graphics/Graphics.h"
 #include "../Graphics/Light.h"
-#include "../Graphics/ShaderVariation.h"
-#include "../Graphics/VertexBuffer.h"
+#include "../GraphicsAPI/ShaderVariation.h"
+#include "../GraphicsAPI/VertexBuffer.h"
 #include "../Math/Polyhedron.h"
 #include "../Resource/ResourceCache.h"
 

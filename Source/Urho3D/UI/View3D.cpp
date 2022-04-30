@@ -27,12 +27,12 @@
 #include "../Graphics/Graphics.h"
 #include "../Graphics/GraphicsEvents.h"
 #include "../Graphics/Octree.h"
-#include "../Graphics/Texture2D.h"
 #include "../Graphics/Zone.h"
+#include "../GraphicsAPI/Texture2D.h"
 #include "../Scene/Scene.h"
-#include "../UI/View3D.h"
 #include "../UI/UI.h"
 #include "../UI/UIEvents.h"
+#include "../UI/View3D.h"
 
 namespace Urho3D
 {

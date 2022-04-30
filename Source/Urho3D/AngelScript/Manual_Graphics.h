@@ -22,24 +22,24 @@
 
 #pragma once
 
-#include "../Graphics/AnimationController.h"
-#include "../Graphics/IndexBuffer.h"
-#include "../Graphics/RenderPath.h"
-#include "../Graphics/Texture2D.h"
-#include "../Graphics/Animation.h"
-#include "../Graphics/AnimationState.h"
-#include "../Graphics/AnimationController.h"
-#include "../Graphics/GraphicsDefs.h"
-#include "../Graphics/Model.h"
 #include "../Graphics/AnimatedModel.h"
-#include "../Graphics/ParticleEffect.h"
-#include "../Graphics/VertexBuffer.h"
+#include "../Graphics/Animation.h"
+#include "../Graphics/AnimationController.h"
+#include "../Graphics/AnimationController.h"
+#include "../Graphics/AnimationState.h"
 #include "../Graphics/Graphics.h"
-#include "../Graphics/Octree.h"
-#include "../Graphics/TextureCube.h"
-#include "../Graphics/Renderer.h"
-#include "../Graphics/Technique.h"
 #include "../Graphics/Material.h"
+#include "../Graphics/Model.h"
+#include "../Graphics/Octree.h"
+#include "../Graphics/ParticleEffect.h"
+#include "../Graphics/Renderer.h"
+#include "../Graphics/RenderPath.h"
+#include "../Graphics/Technique.h"
+#include "../GraphicsAPI/GraphicsDefs.h"
+#include "../GraphicsAPI/IndexBuffer.h"
+#include "../GraphicsAPI/Texture2D.h"
+#include "../GraphicsAPI/TextureCube.h"
+#include "../GraphicsAPI/VertexBuffer.h"
 
 namespace Urho3D
 {
@@ -156,7 +156,7 @@ template <class T> VectorBuffer VertexBuffer_GetData(T* ptr)
     return ret;
 }
 
-// bool VertexBuffer::SetData(const void* data) | File: ../Graphics/VertexBuffer.h
+// bool VertexBuffer::SetData(const void* data) | File: ../GraphicsAPI/VertexBuffer.h
 template <class T> bool VertexBuffer_SetData(VectorBuffer& src, T* ptr)
 {
     // Make sure there is enough data
@@ -166,7 +166,7 @@ template <class T> bool VertexBuffer_SetData(VectorBuffer& src, T* ptr)
         return false;
 }
 
-// bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count, bool discard = false) | File: ../Graphics/VertexBuffer.h
+// bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count, bool discard = false) | File: ../GraphicsAPI/VertexBuffer.h
 template <class T> bool VertexBuffer_SetDataRange(VectorBuffer& src, unsigned start, unsigned count, bool discard, T* ptr)
 {
     // Make sure there is enough data
@@ -179,10 +179,10 @@ template <class T> bool VertexBuffer_SetDataRange(VectorBuffer& src, unsigned st
 #define REGISTER_MEMBERS_MANUAL_PART_VertexBuffer() \
     engine->RegisterObjectMethod(className, "VectorBuffer GetData() const", AS_FUNCTION_OBJLAST(VertexBuffer_GetData<T>), AS_CALL_CDECL_OBJLAST); \
     \
-    /* bool VertexBuffer::SetData(const void* data) | File: ../Graphics/VertexBuffer.h */ \
+    /* bool VertexBuffer::SetData(const void* data) | File: ../GraphicsAPI/VertexBuffer.h */ \
     engine->RegisterObjectMethod(className, "bool SetData(VectorBuffer&)", AS_FUNCTION_OBJLAST(VertexBuffer_SetData<T>), AS_CALL_CDECL_OBJLAST); \
     \
-    /* bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count, bool discard = false) | File: ../Graphics/VertexBuffer.h */ \
+    /* bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count, bool discard = false) | File: ../GraphicsAPI/VertexBuffer.h */ \
     engine->RegisterObjectMethod(className, "bool SetDataRange(VectorBuffer&, uint, uint, bool = false)", AS_FUNCTION_OBJLAST(VertexBuffer_SetDataRange<T>), AS_CALL_CDECL_OBJLAST);
 
 // ========================================================================================
@@ -202,7 +202,7 @@ template <class T> VectorBuffer IndexBuffer_GetData(T* ptr)
     return ret;
 }
 
-// bool IndexBuffer::SetData(const void* data) | File: ../Graphics/IndexBuffer.h
+// bool IndexBuffer::SetData(const void* data) | File: ../GraphicsAPI/IndexBuffer.h
 template <class T> bool IndexBuffer_SetData(VectorBuffer& src, T* ptr)
 {
     // Make sure there is enough data
@@ -212,7 +212,7 @@ template <class T> bool IndexBuffer_SetData(VectorBuffer& src, T* ptr)
         return false;
 }
 
-// bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count, bool discard = false) | File: ../Graphics/IndexBuffer.h
+// bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count, bool discard = false) | File: ../GraphicsAPI/IndexBuffer.h
 template <class T> bool IndexBuffer_SetDataRange(VectorBuffer& src, unsigned start, unsigned count, bool discard, T* ptr)
 {
     // Make sure there is enough data
@@ -225,10 +225,10 @@ template <class T> bool IndexBuffer_SetDataRange(VectorBuffer& src, unsigned sta
 #define REGISTER_MEMBERS_MANUAL_PART_IndexBuffer() \
     engine->RegisterObjectMethod(className, "VectorBuffer GetData()", AS_FUNCTION_OBJLAST(IndexBuffer_GetData<T>), AS_CALL_CDECL_OBJLAST); \
     \
-    /* bool IndexBuffer::SetData(const void* data) | File: ../Graphics/IndexBuffer.h */ \
+    /* bool IndexBuffer::SetData(const void* data) | File: ../GraphicsAPI/IndexBuffer.h */ \
     engine->RegisterObjectMethod(className, "bool SetData(VectorBuffer&)", AS_FUNCTION_OBJLAST(IndexBuffer_SetData<T>), AS_CALL_CDECL_OBJLAST); \
     \
-    /* bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count, bool discard = false) | File: ../Graphics/IndexBuffer.h */ \
+    /* bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count, bool discard = false) | File: ../GraphicsAPI/IndexBuffer.h */ \
     engine->RegisterObjectMethod(className, "bool SetDataRange(VectorBuffer&, uint, uint, bool discard = false)", AS_FUNCTION_OBJLAST(IndexBuffer_SetDataRange<T>), AS_CALL_CDECL_OBJLAST);
 
 // ========================================================================================

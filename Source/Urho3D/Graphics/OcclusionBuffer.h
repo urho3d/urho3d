@@ -27,7 +27,7 @@
 #include "../Core/Object.h"
 #include "../Core/Timer.h"
 #include "../Container/ArrayPtr.h"
-#include "../Graphics/GraphicsDefs.h"
+#include "../GraphicsAPI/GraphicsDefs.h"
 #include "../Math/Frustum.h"
 
 namespace Urho3D

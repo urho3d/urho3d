@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "../Graphics/GraphicsDefs.h"
 #include "../Graphics/Light.h"
+#include "../GraphicsAPI/GraphicsDefs.h"
 #include "../Math/Vector4.h"
 #include "../Resource/Resource.h"
 #include "../Scene/ValueAnimationInfo.h"

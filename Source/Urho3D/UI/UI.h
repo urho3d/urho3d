@@ -25,7 +25,7 @@
 #pragma once
 
 #include "../Core/Object.h"
-#include "../Graphics/VertexBuffer.h"
+#include "../GraphicsAPI/VertexBuffer.h"
 #include "../UI/Cursor.h"
 #include "../UI/UIBatch.h"
 

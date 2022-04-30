@@ -24,10 +24,10 @@
 
 #pragma once
 
-#include "../Math/Color.h"
 #include "../Graphics/Drawable.h"
+#include "../GraphicsAPI/Texture.h"
+#include "../Math/Color.h"
 #include "../Math/Frustum.h"
-#include "../Graphics/Texture.h"
 
 namespace Urho3D
 {

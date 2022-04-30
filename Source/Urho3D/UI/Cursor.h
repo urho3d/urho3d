@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include "../Graphics/Texture.h"
+#include "../GraphicsAPI/Texture.h"
 #include "../Resource/Image.h"
 #include "../UI/BorderImage.h"
 

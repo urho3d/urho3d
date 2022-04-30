@@ -1582,7 +1582,7 @@ template <class T> void RegisterMembers_Frustum(asIScriptEngine* engine, const c
     #endif
 }
 
-// class GPUObject | File: ../Graphics/GPUObject.h
+// class GPUObject | File: ../GraphicsAPI/GPUObject.h
 template <class T> void RegisterMembers_GPUObject(asIScriptEngine* engine, const char* className)
 {
     // void* GPUObject::GetGPUObject() const
@@ -4429,7 +4429,7 @@ template <class T> void RegisterMembers_Serializer(asIScriptEngine* engine, cons
     #endif
 }
 
-// struct ShaderParameter | File: ../Graphics/ShaderVariation.h
+// struct ShaderParameter | File: ../GraphicsAPI/ShaderVariation.h
 template <class T> void RegisterMembers_ShaderParameter(asIScriptEngine* engine, const char* className)
 {
     // union ShaderParameter::@? Urho3D::ShaderParameter::@?
@@ -6440,7 +6440,7 @@ template <class T> void RegisterMembers_VertexBufferMorph(asIScriptEngine* engin
     #endif
 }
 
-// struct VertexElement | File: ../Graphics/GraphicsDefs.h
+// struct VertexElement | File: ../GraphicsAPI/GraphicsDefs.h
 template <class T> void RegisterMembers_VertexElement(asIScriptEngine* engine, const char* className)
 {
     // bool VertexElement::operator !=(const VertexElement& rhs) const
@@ -8379,7 +8379,7 @@ template <class T> void RegisterMembers_RenderPath(asIScriptEngine* engine, cons
     #endif
 }
 
-// class RenderSurface | File: ../Graphics/RenderSurface.h
+// class RenderSurface | File: ../GraphicsAPI/RenderSurface.h
 template <class T> void RegisterMembers_RenderSurface(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_RefCounted<T>(engine, className);
@@ -8518,7 +8518,7 @@ template <class T> void RegisterMembers_SceneReplicationState(asIScriptEngine* e
     #endif
 }
 
-// class ShaderVariation | File: ../Graphics/ShaderVariation.h
+// class ShaderVariation | File: ../GraphicsAPI/ShaderVariation.h
 template <class T> void RegisterMembers_ShaderVariation(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_RefCounted<T>(engine, className);
@@ -9200,7 +9200,7 @@ template <class T> void RegisterMembers_Console(asIScriptEngine* engine, const c
     #endif
 }
 
-// class ConstantBuffer | File: ../Graphics/ConstantBuffer.h
+// class ConstantBuffer | File: ../GraphicsAPI/ConstantBuffer.h
 template <class T> void RegisterMembers_ConstantBuffer(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_Object<T>(engine, className);
@@ -10525,7 +10525,7 @@ template <class T> void RegisterMembers_Graphics(asIScriptEngine* engine, const 
     #endif
 }
 
-// class IndexBuffer | File: ../Graphics/IndexBuffer.h
+// class IndexBuffer | File: ../GraphicsAPI/IndexBuffer.h
 template <class T> void RegisterMembers_IndexBuffer(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_Object<T>(engine, className);
@@ -11942,7 +11942,7 @@ template <class T> void RegisterMembers_ShaderParameterAnimationInfo(asIScriptEn
     #endif
 }
 
-// class ShaderPrecache | File: ../Graphics/ShaderPrecache.h
+// class ShaderPrecache | File: ../GraphicsAPI/ShaderPrecache.h
 template <class T> void RegisterMembers_ShaderPrecache(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_Object<T>(engine, className);
@@ -12344,7 +12344,7 @@ template <class T> unsigned VertexBuffer_unsigned_GetVertexSize_constspPODVector
     return result;
 }
 
-// class VertexBuffer | File: ../Graphics/VertexBuffer.h
+// class VertexBuffer | File: ../GraphicsAPI/VertexBuffer.h
 template <class T> void RegisterMembers_VertexBuffer(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_Object<T>(engine, className);
@@ -14233,7 +14233,7 @@ template <class T> void RegisterMembers_ResourceWithMetadata(asIScriptEngine* en
     #endif
 }
 
-// class Shader | File: ../Graphics/Shader.h
+// class Shader | File: ../GraphicsAPI/Shader.h
 template <class T> void RegisterMembers_Shader(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_Resource<T>(engine, className);
@@ -15973,7 +15973,7 @@ template <class T> void RegisterMembers_Sound(asIScriptEngine* engine, const cha
     #endif
 }
 
-// class Texture | File: ../Graphics/Texture.h
+// class Texture | File: ../GraphicsAPI/Texture.h
 template <class T> void RegisterMembers_Texture(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_ResourceWithMetadata<T>(engine, className);
@@ -18815,7 +18815,7 @@ template <class T> Image* Texture2D_SharedPtrlesImagegre_GetImage_void_template(
     return result.Detach();
 }
 
-// class Texture2D | File: ../Graphics/Texture2D.h
+// class Texture2D | File: ../GraphicsAPI/Texture2D.h
 template <class T> void RegisterMembers_Texture2D(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_Texture<T>(engine, className);
@@ -18849,7 +18849,7 @@ template <class T> void RegisterMembers_Texture2D(asIScriptEngine* engine, const
     #endif
 }
 
-// class Texture2DArray | File: ../Graphics/Texture2DArray.h
+// class Texture2DArray | File: ../GraphicsAPI/Texture2DArray.h
 template <class T> void RegisterMembers_Texture2DArray(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_Texture<T>(engine, className);
@@ -18888,7 +18888,7 @@ template <class T> void RegisterMembers_Texture2DArray(asIScriptEngine* engine, 
     #endif
 }
 
-// class Texture3D | File: ../Graphics/Texture3D.h
+// class Texture3D | File: ../GraphicsAPI/Texture3D.h
 template <class T> void RegisterMembers_Texture3D(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_Texture<T>(engine, className);
@@ -18919,7 +18919,7 @@ template <class T> Image* TextureCube_SharedPtrlesImagegre_GetImage_CubeMapFace_
     return result.Detach();
 }
 
-// class TextureCube | File: ../Graphics/TextureCube.h
+// class TextureCube | File: ../GraphicsAPI/TextureCube.h
 template <class T> void RegisterMembers_TextureCube(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_Texture<T>(engine, className);

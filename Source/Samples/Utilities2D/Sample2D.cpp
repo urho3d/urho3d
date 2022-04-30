@@ -27,7 +27,7 @@
 #include <Urho3D/Core/StringUtils.h>
 #include <Urho3D/Engine/Engine.h>
 #include <Urho3D/Graphics/Camera.h>
-#include <Urho3D/Graphics/Texture2D.h>
+#include <Urho3D/GraphicsAPI/Texture2D.h>
 #include <Urho3D/Input/Input.h>
 #include <Urho3D/IO/File.h>
 #include <Urho3D/IO/FileSystem.h>
