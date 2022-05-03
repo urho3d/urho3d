@@ -258,7 +258,7 @@ void Graphics::Destructor_D3D11()
         window_ = nullptr;
     }
 
-    delete impl_;
+    delete static_cast<GraphicsImpl_D3D11*>(impl_);
     impl_ = nullptr;
 
     context_->ReleaseSDL();
