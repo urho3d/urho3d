@@ -317,7 +317,7 @@ void Graphics::Destructor_OGL()
 {
     Close_OGL();
 
-    delete impl_;
+    delete static_cast<GraphicsImpl_OGL*>(impl_);
     impl_ = nullptr;
 
     context_->ReleaseSDL();
