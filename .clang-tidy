@@ -1,24 +1,5 @@
-#
-# Copyright (c) 2008-2022 the Urho3D project.
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-#
+# Copyright (c) 2008-2022 the Urho3D project
+# License: MIT
 
 ---
 Checks: 'clang-diagnostic-*,clang-analyzer-*,*,-android-*,-bugprone-bool-pointer-implicit-conversion,-bugprone-exception-escape,-bugprone-infinite-loop,-bugprone-signed-char-misuse,-cert-dcl50-cpp,-cert-env33-c,-cert-mem57-cpp,-cert-oop57-cpp,-cert-oop58-cpp,-clang-analyzer-*,-clang-diagnostic-*,-cppcoreguidelines-avoid-goto,-cppcoreguidelines-avoid-non-const-global-variables,-cppcoreguidelines-init-variables,-cppcoreguidelines-macro-usage,-cppcoreguidelines-no-malloc,-cppcoreguidelines-owning-memory,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-cppcoreguidelines-pro-bounds-constant-array-index,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-type-const-cast,-cppcoreguidelines-pro-type-cstyle-cast,-cppcoreguidelines-pro-type-reinterpret-cast,-cppcoreguidelines-pro-type-union-access,-cppcoreguidelines-pro-type-vararg,-cppcoreguidelines-special-member-functions,-darwin-*,-fuchsia-*,-google-*,-hicpp-avoid-goto,-hicpp-no-assembler,-linuxkernel-*,-llvm-*,-llvmlibc-*,-misc-bool-pointer-implicit-conversion,-misc-definitions-in-headers,-misc-non-private-member-variables-in-classes,-misc-redundant-expression,-misc-static-assert,-misc-unused-alias-decls,-misc-unused-parameters,-misc-unused-using-decls,-modernize-avoid-c-arrays,-modernize-use-default-member-init,-modernize-use-trailing-return-type,-modernize-use-using,-objc-*,-openmp-exception-escape,-portability-restrict-system-includes,-readability-braces-around-statements,-readability-else-after-return,-readability-function-size,-readability-identifier-naming,-readability-implicit-bool-conversion,-readability-isolate-declaration,-readability-magic-numbers,-readability-named-parameter,-readability-qualified-auto,-readability-redundant-access-specifiers,-readability-redundant-member-init,-readability-redundant-preprocessor,-readability-simplify-boolean-expr,-readability-uppercase-literal-suffix,-zircon-*,-bugprone-narrowing-conversions,-cert-con36-c,-cert-con54-cpp,-cert-dcl03-c,-cert-dcl16-c,-cert-dcl37-c,-cert-dcl51-cpp,-cert-dcl54-cpp,-cert-dcl59-cpp,-cert-err09-cpp,-cert-err61-cpp,-cert-fio38-c,-cert-msc30-c,-cert-msc32-c,-cert-oop11-cpp,-cert-oop54-cpp,-cert-pos44-c,-cppcoreguidelines-avoid-c-arrays,-cppcoreguidelines-avoid-magic-numbers,-cppcoreguidelines-c-copy-assignment-signature,-cppcoreguidelines-explicit-virtual-functions,-cppcoreguidelines-non-private-member-variables-in-classes,-fuchsia-header-anon-namespaces,-google-readability-braces-around-statements,-google-readability-function-size,-google-readability-namespace-comments,-hicpp-avoid-c-arrays,-hicpp-braces-around-statements,-hicpp-deprecated-headers,-hicpp-explicit-conversions,-hicpp-function-size,-hicpp-invalid-access-moved,-hicpp-member-init,-hicpp-move-const-arg,-hicpp-named-parameter,-hicpp-new-delete-operators,-hicpp-no-array-decay,-hicpp-no-malloc,-hicpp-noexcept-move,-hicpp-special-member-functions,-hicpp-static-assert,-hicpp-undelegated-constructor,-hicpp-uppercase-literal-suffix,-hicpp-use-auto,-hicpp-use-emplace,-hicpp-use-equals-default,-hicpp-use-equals-delete,-hicpp-use-noexcept,-hicpp-use-nullptr,-hicpp-use-override,-hicpp-vararg,google-default-arguments,google-explicit-constructor,google-runtime-operator'
