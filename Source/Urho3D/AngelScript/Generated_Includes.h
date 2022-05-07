@@ -118,6 +118,7 @@
 #include "../Input/InputConstants.h"
 #include "../LibraryInfo.h"
 #include "../Math/AreaAllocator.h"
+#include "../Math/BigInt.h"
 #include "../Math/BoundingBox.h"
 #include "../Math/Color.h"
 #include "../Math/Frustum.h"

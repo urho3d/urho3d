@@ -63,6 +63,9 @@ void ASRegisterGeneratedObjectTypes(asIScriptEngine* engine)
     // struct BiasParameters | File: ../Graphics/Light.h
     engine->RegisterObjectType("BiasParameters", sizeof(BiasParameters), asOBJ_VALUE | asGetTypeTraits<BiasParameters>() | asOBJ_POD | asOBJ_APP_CLASS_ALLFLOATS);
 
+    // class BigInt | File: ../Math/BigInt.h
+    // Not registered because have @nobind mark
+
     // struct Billboard | File: ../Graphics/BillboardSet.h
     engine->RegisterObjectType("Billboard", 0, asOBJ_REF | asOBJ_NOCOUNT);
 

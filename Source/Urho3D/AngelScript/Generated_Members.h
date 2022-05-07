@@ -494,6 +494,17 @@ template <class T> void RegisterMembers_BiasParameters(asIScriptEngine* engine, 
     #endif
 }
 
+// class BigInt | File: ../Math/BigInt.h
+template <class T> void RegisterMembers_BigInt(asIScriptEngine* engine, const char* className)
+{
+    // String BigInt::ToString() const
+    engine->RegisterObjectMethod(className, "String ToString() const", AS_METHODPR(T, ToString, () const, String), AS_CALL_THISCALL);
+
+    #ifdef REGISTER_MEMBERS_MANUAL_PART_BigInt
+        REGISTER_MEMBERS_MANUAL_PART_BigInt();
+    #endif
+}
+
 // struct Billboard | File: ../Graphics/BillboardSet.h
 template <class T> void RegisterMembers_Billboard(asIScriptEngine* engine, const char* className)
 {
