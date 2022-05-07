@@ -60,4 +60,6 @@ URHO3D_API String GetLoginName();
 URHO3D_API String GetHostName();
 /// Return the version of the currently running OS, or (?) if not identified.
 URHO3D_API String GetOSVersion();
-}
+
+} // namespace Urho3D
+
