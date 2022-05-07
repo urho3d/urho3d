@@ -1,7 +1,7 @@
 // Copyright (c) 2008-2022 the Urho3D project
 // License: MIT
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && defined(URHO3D_MINIDUMPS)
 
 #include "../Precompiled.h"
 
