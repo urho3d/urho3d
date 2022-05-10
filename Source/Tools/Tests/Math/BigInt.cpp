@@ -35,6 +35,7 @@ void Test_Math_BigInt()
     assert(BigInt("0") == BigInt("-0"));
     assert(BigInt("10") < BigInt("100"));
     assert(BigInt("10") > BigInt("-100"));
+    assert(BigInt("-10") > BigInt("-100"));
 
     // Sum of values with same sign
     assert((BigInt("1") + BigInt("2")).ToString() == "3");

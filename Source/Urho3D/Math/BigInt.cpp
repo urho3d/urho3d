@@ -228,7 +228,10 @@ bool BigInt::operator <(const BigInt& rhs) const
     if (positive_ != rhs.positive_)
         return !positive_;
 
-    return FirstIsLess(magnitude_, rhs.magnitude_);
+    if (positive_)
+        return FirstIsLess(magnitude_, rhs.magnitude_);
+    else
+        return FirstIsLess(rhs.magnitude_, magnitude_);
 }
 
 String BigInt::ToString() const
