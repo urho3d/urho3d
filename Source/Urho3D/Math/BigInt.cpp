@@ -173,6 +173,56 @@ BigInt::BigInt(const String& str)
     magnitude_.Push(ToInt(lastChunk));
 }
 
+BigInt::BigInt(i32 value)
+{
+    positive_ = (value >= 0);
+    value = Urho3D::Abs(value);
+
+    while (value != 0)
+    {
+        i32 mod = value % BASE;
+        magnitude_.Push(mod);
+        value /= BASE;
+    }
+}
+
+BigInt::BigInt(i64 value)
+{
+    positive_ = (value >= 0);
+    value = Urho3D::Abs(value);
+
+    while (value != 0)
+    {
+        i32 mod = (i32)(value % BASE);
+        magnitude_.Push(mod);
+        value /= BASE;
+    }
+}
+
+BigInt::BigInt(u32 value)
+{
+    positive_ = true;
+
+    while (value != 0)
+    {
+        i32 mod = (i32)(value % BASE);
+        magnitude_.Push(mod);
+        value /= BASE;
+    }
+}
+
+BigInt::BigInt(u64 value)
+{
+    positive_ = true;
+
+    while (value != 0)
+    {
+        i32 mod = (i32)(value % BASE);
+        magnitude_.Push(mod);
+        value /= BASE;
+    }
+}
+
 bool BigInt::operator <(const BigInt& rhs) const
 {
     if (positive_ != rhs.positive_)

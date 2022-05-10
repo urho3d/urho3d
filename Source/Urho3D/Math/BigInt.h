@@ -24,6 +24,10 @@ private:
 public:
     BigInt();
     BigInt(const String& str);
+    BigInt(i32 value);
+    BigInt(i64 value);
+    BigInt(u32 value);
+    BigInt(u64 value);
 
     bool operator ==(const BigInt& rhs) const { return positive_ == rhs.positive_ && magnitude_ == rhs.magnitude_; }
     bool operator !=(const BigInt& rhs) const { return positive_ != rhs.positive_ || magnitude_ != rhs.magnitude_; }

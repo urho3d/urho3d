@@ -12,8 +12,14 @@ using namespace Urho3D;
 
 void Test_Math_BigInt()
 {
-    // ToString()
+    // Constructors
     assert(BigInt().ToString() == "0");
+    assert(BigInt(0x7FFFFFFF).ToString() == "2147483647"); // BigInt(i32)
+    assert(BigInt(0x80000000).ToString() == "2147483648"); // BigInt(u32)
+    assert(BigInt(0xFFFFFFFF).ToString() == "4294967295"); // BigInt(u32)
+    assert(BigInt(0x7FFFFFFFFFFFFFFF).ToString() == "9223372036854775807"); // BigInt(i64)
+    assert(BigInt(0x8000000000000000).ToString() == "9223372036854775808"); // BigInt(u64)
+    assert(BigInt(0xFFFFFFFFFFFFFFFF).ToString() == "18446744073709551615"); // BigInt(u64)
     assert(BigInt("0").ToString() == "0");
     assert(BigInt("-0").ToString() == "0");
     assert(BigInt("3").ToString() == "3");
