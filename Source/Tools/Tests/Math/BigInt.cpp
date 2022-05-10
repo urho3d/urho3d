@@ -14,12 +14,12 @@ void Test_Math_BigInt()
 {
     // Constructors
     assert(BigInt().ToString() == "0");
-    assert(BigInt(0x7FFFFFFFi32).ToString() == "2147483647"); // BigInt(i32)
-    assert(BigInt(0x80000000ui32).ToString() == "2147483648"); // BigInt(u32)
-    assert(BigInt(0xFFFFFFFFui32).ToString() == "4294967295"); // BigInt(u32)
-    assert(BigInt(0x7FFFFFFFFFFFFFFFi64).ToString() == "9223372036854775807"); // BigInt(i64)
-    assert(BigInt(0x8000000000000000ui64).ToString() == "9223372036854775808"); // BigInt(u64)
-    assert(BigInt(0xFFFFFFFFFFFFFFFFui64).ToString() == "18446744073709551615"); // BigInt(u64)
+    assert(BigInt((i32)0x7FFFFFFF).ToString() == "2147483647"); // BigInt(i32)
+    assert(BigInt((u32)0x80000000).ToString() == "2147483648"); // BigInt(u32)
+    assert(BigInt((u32)0xFFFFFFFF).ToString() == "4294967295"); // BigInt(u32)
+    assert(BigInt((i64)0x7FFFFFFFFFFFFFFF).ToString() == "9223372036854775807"); // BigInt(i64)
+    assert(BigInt((u64)0x8000000000000000).ToString() == "9223372036854775808"); // BigInt(u64)
+    assert(BigInt((u64)0xFFFFFFFFFFFFFFFF).ToString() == "18446744073709551615"); // BigInt(u64)
     assert(BigInt("0").ToString() == "0");
     assert(BigInt("-0").ToString() == "0");
     assert(BigInt("3").ToString() == "3");
