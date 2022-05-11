@@ -14,12 +14,16 @@ namespace Urho3D
 /// @nobind
 class URHO3D_API BigInt
 {
+public:
+    /// i64 can conatins 10^9 * 10^9.
+    using Digit = i64;
+
 private:
     /// Sign.
     bool positive_;
 
     /// Array of digits with base 10^9 and reverse order (each element contains value in range [0 .. BASE-1]).
-    Vector<i32> magnitude_;
+    Vector<Digit> magnitude_;
 
 public:
     BigInt();
@@ -37,6 +41,7 @@ public:
 
     BigInt operator +(const BigInt& rhs) const;
     BigInt operator -(const BigInt& rhs) const;
+    BigInt operator *(const BigInt& rhs) const;
 
     String ToString() const;
 };

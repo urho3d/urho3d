@@ -11,17 +11,17 @@ namespace Urho3D
 {
 
 #if true
-    static constexpr i32 BASE = 1000'000'000; // 10^9
+    static constexpr BigInt::Digit BASE = 1000'000'000; // 10^9
 
     // Number of decimal digits in each magnitude_ element
     static constexpr i32 BASE_DIGITS = 9;
 #else // For tests
-    static constexpr i32 BASE = 10;
+    static constexpr BigInt::Digit BASE = 10;
     static constexpr i32 BASE_DIGITS = 1;
 #endif
 
 // Compare magnitudes
-static bool FirstIsLess(const Vector<i32>& first, const Vector<i32>& second)
+static bool FirstIsLess(const Vector<BigInt::Digit>& first, const Vector<BigInt::Digit>& second)
 {
     if (first.Size() != second.Size())
         return first.Size() < second.Size();
@@ -36,18 +36,18 @@ static bool FirstIsLess(const Vector<i32>& first, const Vector<i32>& second)
 }
 
 // a + b
-static Vector<i32> SumMagnitudes(const Vector<i32>& a, const Vector<i32>& b)
+static Vector<BigInt::Digit> SumMagnitudes(const Vector<BigInt::Digit>& a, const Vector<BigInt::Digit>& b)
 {
-    Vector<i32> ret;
+    Vector<BigInt::Digit> ret;
 
     u32 maxSize = Max(a.Size(), b.Size());
     ret.Resize(maxSize, 0);
 
     for (u32 i = 0; i < maxSize; ++i)
     {
-        i32 a_element = i < a.Size() ? a[i] : 0;
-        i32 b_element = i < b.Size() ? b[i] : 0;
-        i32 sum = a_element + b_element;
+        BigInt::Digit a_element = i < a.Size() ? a[i] : 0;
+        BigInt::Digit b_element = i < b.Size() ? b[i] : 0;
+        BigInt::Digit sum = a_element + b_element;
 
         ret[i] += sum; // ret[i] can be not zero
 
@@ -66,16 +66,16 @@ static Vector<i32> SumMagnitudes(const Vector<i32>& a, const Vector<i32>& b)
 }
 
 // a - b (a must be >= b)
-static Vector<i32> DiffMagnitudes(const Vector<i32>& a, const Vector<i32>& b)
+static Vector<BigInt::Digit> DiffMagnitudes(const Vector<BigInt::Digit>& a, const Vector<BigInt::Digit>& b)
 {
-    Vector<i32> ret;
+    Vector<BigInt::Digit> ret;
     ret.Resize(a.Size(), 0);
 
     for (u32 i = 0; i < a.Size(); ++i)
     {
-        i32 a_element = a[i];
-        i32 b_element = i < b.Size() ? b[i] : 0;
-        i32 diff = a_element - b_element;
+        BigInt::Digit a_element = a[i];
+        BigInt::Digit b_element = i < b.Size() ? b[i] : 0;
+        BigInt::Digit diff = a_element - b_element;
 
         ret[i] += diff; // ret[i] can be not zero
 
@@ -164,11 +164,11 @@ BigInt::BigInt(const String& str)
     for (; i > firstDigitPos; i -= BASE_DIGITS)
     {
         String chunk = str.Substring(i, BASE_DIGITS);
-        magnitude_.Push(ToInt(chunk));
+        magnitude_.Push(ToInt64(chunk)); // To Digit
     }
 
     String lastChunk = str.Substring(firstDigitPos, BASE_DIGITS + i - firstDigitPos);
-    magnitude_.Push(ToInt(lastChunk));
+    magnitude_.Push(ToInt64(lastChunk)); // To Digit
 }
 
 BigInt::BigInt(i32 value)
@@ -178,7 +178,7 @@ BigInt::BigInt(i32 value)
 
     while (value != 0)
     {
-        i32 mod = value % BASE;
+        Digit mod = value % BASE;
         magnitude_.Push(mod);
         value /= BASE;
     }
@@ -191,7 +191,7 @@ BigInt::BigInt(i64 value)
 
     while (value != 0)
     {
-        i32 mod = (i32)(value % BASE);
+        Digit mod = value % BASE;
         magnitude_.Push(mod);
         value /= BASE;
     }
@@ -203,7 +203,7 @@ BigInt::BigInt(u32 value)
 
     while (value != 0)
     {
-        i32 mod = (i32)(value % BASE);
+        Digit mod = value % BASE;
         magnitude_.Push(mod);
         value /= BASE;
     }
@@ -215,7 +215,7 @@ BigInt::BigInt(u64 value)
 
     while (value != 0)
     {
-        i32 mod = (i32)(value % BASE);
+        Digit mod = (Digit)(value % BASE);
         magnitude_.Push(mod);
         value /= BASE;
     }
@@ -311,6 +311,35 @@ BigInt BigInt::operator -(const BigInt& rhs) const
             ret.magnitude_ = DiffMagnitudes(magnitude_, rhs.magnitude_);
         }
     }
+
+    return ret;
+}
+
+BigInt BigInt::operator *(const BigInt& rhs) const
+{
+    BigInt ret;
+    ret.magnitude_.Resize(magnitude_.Size() + rhs.magnitude_.Size(), 0);
+
+    if (positive_ == rhs.positive_)
+        ret.positive_ = true;
+    else
+        ret.positive_ = false;
+
+    for (u32 this_index = 0; this_index < magnitude_.Size(); ++this_index)
+    {
+        for (u32 rhs_index = 0; rhs_index < rhs.magnitude_.Size(); ++rhs_index)
+            ret.magnitude_[this_index + rhs_index] += magnitude_[this_index] * rhs.magnitude_[rhs_index];
+    }
+
+    for (u32 i = 0; i < ret.magnitude_.Size() - 1; ++i)
+    {
+        ret.magnitude_[i + 1] += ret.magnitude_[i] / BASE;
+        ret.magnitude_[i] %= BASE;
+    }
+
+    // Remove leading zeros
+    while (ret.magnitude_.Size() >= 2 && ret.magnitude_.Back() == 0)
+        ret.magnitude_.Pop();
 
     return ret;
 }

@@ -30,6 +30,17 @@ void Test_Math_BigInt()
     assert(BigInt("-1230000").ToString() == "-1230000");
     assert(BigInt("0001230000").ToString() == "1230000");
     assert(BigInt("-0001230000").ToString() == "-1230000");
+    
+    {
+        BigInt bi{"-99999999999999999999999999999999999999999999999999999999999999999999"
+                  "999999999999999999999999999999999999999999999999999999999999999999999"
+                  "999999999999999999999999999999999999999999999999999999999999999999999"};
+        
+        assert(bi.ToString() ==
+               "-99999999999999999999999999999999999999999999999999999999999999999999"
+               "999999999999999999999999999999999999999999999999999999999999999999999"
+               "999999999999999999999999999999999999999999999999999999999999999999999");
+    }
 
     // Comparison
     assert(BigInt("0") == BigInt("-0"));
@@ -38,20 +49,39 @@ void Test_Math_BigInt()
     assert(BigInt("-10") > BigInt("-100"));
 
     // Sum of values with same sign
+    assert((BigInt("0") + BigInt("0")).ToString() == "0");
+    assert((BigInt("000") + BigInt("000")).ToString() == "0");
     assert((BigInt("1") + BigInt("2")).ToString() == "3");
     assert((BigInt("1000") + BigInt("200")).ToString() == "1200");
     assert((BigInt("-1000") + BigInt("-234")).ToString() == "-1234");
     assert((BigInt("-1000") - BigInt("234")).ToString() == "-1234");
     assert((BigInt("-1000") - BigInt("0")).ToString() == "-1000");
     assert((BigInt("9999999999999999999999") + BigInt("9999999999999999999999")).ToString() == "19999999999999999999998");
-
-    assert((BigInt("1000") - BigInt("1000")).ToString() == "0");
-    assert((BigInt("000") - BigInt("000")).ToString() == "0");
-    assert((BigInt("000") + BigInt("000")).ToString() == "0");
+    assert((BigInt("9999999999999999999999") + BigInt("1")).ToString() == "10000000000000000000000");
 
     // Sum of values with opposite sign
+    assert((BigInt("000") - BigInt("000")).ToString() == "0");
+    assert((BigInt("1000") - BigInt("1000")).ToString() == "0");
     assert((BigInt("1000") - BigInt("234")).ToString() == "766");
     assert((BigInt("234") - BigInt("1000")).ToString() == "-766");
     assert((BigInt("1000") - BigInt("0")).ToString() == "1000");
     assert((BigInt("0") - BigInt("034005")).ToString() == "-34005");
+    assert((BigInt("10000000000000000000000") - BigInt("1")).ToString() == "9999999999999999999999");
+    assert((BigInt("-10000000000000000000000") + BigInt("1")).ToString() == "-9999999999999999999999");
+
+    // Multiply
+    assert((BigInt("0") * BigInt("0")).ToString() == "0");
+    assert((BigInt("1") * BigInt("1")).ToString() == "1");
+    assert((BigInt("1") * BigInt("9999999999999999999999")).ToString() == "9999999999999999999999");
+    assert((BigInt("0") * BigInt("9999999999999999999999")).ToString() == "0");
+    assert((BigInt("10") * BigInt("2")).ToString() == "20");
+    assert((BigInt("-99999") * BigInt("99999")).ToString() == "-9999800001");
+    
+    {
+        BigInt bi1{"-99999999999999999999999999999999999999999999999999999999999999999999"};
+        BigInt bi2{"99999999999999999999999999999999999999999999999999999999999999999999"};
+        String str = (bi1 * bi2).ToString();
+        assert(str == "-99999999999999999999999999999999999999999999999999999999999999999998"
+                      "00000000000000000000000000000000000000000000000000000000000000000001");
+    }
 }
