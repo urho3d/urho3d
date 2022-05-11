@@ -1,23 +1,15 @@
 // Copyright (c) 2008-2022 the Urho3D project
 // License: MIT
 
-#include <Urho3D/Core/ProcessUtils.h>
-
-#ifdef WIN32
-#include <windows.h>
-#endif
-
-#include <Urho3D/DebugNew.h>
-
 #include <iostream>
 
-using namespace Urho3D;
-
 void Test_Container_Str();
+void Test_Math_BigInt();
 
 void Run()
 {
     Test_Container_Str();
+    Test_Math_BigInt();
 }
 
 int main(int argc, char* argv[])

@@ -9,3 +9,6 @@ define_source_files (RECURSE GROUP)
 
 # Setup target
 setup_executable (TOOL)
+
+# Setup test cases
+setup_test ()
