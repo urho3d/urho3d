@@ -14,12 +14,12 @@ void Test_Math_BigInt()
 {
     // Constructors
     assert(BigInt().ToString() == "0");
-    assert(BigInt((i32)0x7FFFFFFF).ToString() == "2147483647"); // BigInt(i32)
-    assert(BigInt((u32)0x80000000).ToString() == "2147483648"); // BigInt(u32)
-    assert(BigInt((u32)0xFFFFFFFF).ToString() == "4294967295"); // BigInt(u32)
-    assert(BigInt((i64)0x7FFFFFFFFFFFFFFF).ToString() == "9223372036854775807"); // BigInt(i64)
-    assert(BigInt((u64)0x8000000000000000).ToString() == "9223372036854775808"); // BigInt(u64)
-    assert(BigInt((u64)0xFFFFFFFFFFFFFFFF).ToString() == "18446744073709551615"); // BigInt(u64)
+    assert(BigInt((i32)0x7FFFFFFF).ToString() == "2147483647");
+    assert(BigInt((u32)0x80000000).ToString() == "2147483648");
+    assert(BigInt((u32)0xFFFFFFFF).ToString() == "4294967295");
+    assert(BigInt((i64)0x7FFFFFFFFFFFFFFF).ToString() == "9223372036854775807"); // (i64) need for macOS
+    assert(BigInt((u64)0x8000000000000000).ToString() == "9223372036854775808"); // (u64) need for macOS
+    assert(BigInt((u64)0xFFFFFFFFFFFFFFFF).ToString() == "18446744073709551615"); // (u64) need for macOS
     assert(BigInt("0").ToString() == "0");
     assert(BigInt("-0").ToString() == "0");
     assert(BigInt("3").ToString() == "3");
@@ -43,6 +43,7 @@ void Test_Math_BigInt()
     assert((BigInt("-1000") + BigInt("-234")).ToString() == "-1234");
     assert((BigInt("-1000") - BigInt("234")).ToString() == "-1234");
     assert((BigInt("-1000") - BigInt("0")).ToString() == "-1000");
+    assert((BigInt("9999999999999999999999") + BigInt("9999999999999999999999")).ToString() == "19999999999999999999998");
 
     assert((BigInt("1000") - BigInt("1000")).ToString() == "0");
     assert((BigInt("000") - BigInt("000")).ToString() == "0");

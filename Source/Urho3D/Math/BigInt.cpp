@@ -49,16 +49,14 @@ static Vector<i32> SumMagnitudes(const Vector<i32>& a, const Vector<i32>& b)
         i32 b_element = i < b.Size() ? b[i] : 0;
         i32 sum = a_element + b_element;
 
-        if (sum < BASE)
+        ret[i] += sum; // ret[i] can be not zero
+
+        while (ret[i] >= BASE)
         {
-            ret[i] = sum;
-        }
-        else // sum >= BASE
-        {
-            ret[i] = sum - BASE;
+            ret[i] -= BASE; // Use div & mod instead loop?
 
             if (i + 1 < ret.Size())
-                ret[i + 1] += 1;
+                ++ret[i + 1];
             else
                 ret.Push(1);
         }
@@ -79,14 +77,14 @@ static Vector<i32> DiffMagnitudes(const Vector<i32>& a, const Vector<i32>& b)
         i32 b_element = i < b.Size() ? b[i] : 0;
         i32 diff = a_element - b_element;
 
-        ret[i] += diff;
+        ret[i] += diff; // ret[i] can be not zero
 
         while (ret[i] < 0)
         {
             ret[i] += BASE;
 
             assert(i + 1 < ret.Size());
-            ret[i + 1]--;
+            --ret[i + 1];
         }
     }
 

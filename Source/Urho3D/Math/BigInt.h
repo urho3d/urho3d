@@ -18,7 +18,7 @@ private:
     /// Sign.
     bool positive_;
 
-    /// Array of digits with base 10^9 and reverse order.
+    /// Array of digits with base 10^9 and reverse order (each element contains value in range [0 .. BASE-1]).
     Vector<i32> magnitude_;
 
 public:
