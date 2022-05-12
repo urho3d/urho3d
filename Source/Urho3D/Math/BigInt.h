@@ -43,6 +43,22 @@ public:
     BigInt operator -(const BigInt& rhs) const;
     BigInt operator *(const BigInt& rhs) const;
 
+    BigInt& operator +=(const BigInt& rhs);
+    BigInt& operator -=(const BigInt& rhs);
+    BigInt& operator *=(const BigInt& rhs);
+
+    /// Prefix increment operator.
+    BigInt& operator++() { this->operator +=(1); return *this; }
+
+    /// Postfix increment operator.
+    BigInt operator++(int) { BigInt ret = *this; ++*this; return ret; }
+
+    /// Prefix decrement operator.
+    BigInt& operator--() { this->operator -=(1); return *this; }
+
+    /// Postfix decrement operator.
+    BigInt operator--(int) { BigInt ret = *this; --*this; return ret; }
+
     String ToString() const;
 };
 

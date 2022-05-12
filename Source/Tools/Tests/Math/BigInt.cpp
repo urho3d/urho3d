@@ -84,4 +84,20 @@ void Test_Math_BigInt()
         assert(str == "-99999999999999999999999999999999999999999999999999999999999999999998"
                       "00000000000000000000000000000000000000000000000000000000000000000001");
     }
+
+    // Additional operators
+    {
+        BigInt bi{(i32)1};
+        assert((bi++).ToString() == "1");
+        assert(bi.ToString() == "2");
+        assert((++bi).ToString() == "3");
+        assert(bi.ToString() == "3");
+        assert((bi--).ToString() == "3");
+        assert(bi.ToString() == "2");
+        assert((--bi).ToString() == "1");
+        assert(bi.ToString() == "1");
+        assert((bi += 10).ToString() == "11");
+        assert((bi -= 2).ToString() == "9");
+        assert((bi *= 2).ToString() == "18");
+    }
 }
