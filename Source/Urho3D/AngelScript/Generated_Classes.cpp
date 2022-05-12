@@ -294,6 +294,63 @@ static void Register_BiasParameters(asIScriptEngine* engine)
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<BiasParameters>(engine, "BiasParameters");
 }
 
+// BigInt::BigInt(const String& str)
+static void BigInt__BigInt_constspStringamp(BigInt* _ptr, const String& str)
+{
+    new(_ptr) BigInt(str);
+}
+
+// BigInt::BigInt(i32 value)
+static void BigInt__BigInt_i32(BigInt* _ptr, i32 value)
+{
+    new(_ptr) BigInt(value);
+}
+
+// BigInt::BigInt(i64 value)
+static void BigInt__BigInt_i64(BigInt* _ptr, i64 value)
+{
+    new(_ptr) BigInt(value);
+}
+
+// BigInt::BigInt(u32 value)
+static void BigInt__BigInt_u32(BigInt* _ptr, u32 value)
+{
+    new(_ptr) BigInt(value);
+}
+
+// BigInt::BigInt(u64 value)
+static void BigInt__BigInt_u64(BigInt* _ptr, u64 value)
+{
+    new(_ptr) BigInt(value);
+}
+
+// class BigInt | File: ../Math/BigInt.h
+static void Register_BigInt(asIScriptEngine* engine)
+{
+    // BigInt::BigInt(const String& str)
+    engine->RegisterObjectBehaviour("BigInt", asBEHAVE_CONSTRUCT, "void f(const String&in)", AS_FUNCTION_OBJFIRST(BigInt__BigInt_constspStringamp), AS_CALL_CDECL_OBJFIRST);
+    // BigInt::BigInt(i32 value)
+    engine->RegisterObjectBehaviour("BigInt", asBEHAVE_CONSTRUCT, "void f(int)", AS_FUNCTION_OBJFIRST(BigInt__BigInt_i32), AS_CALL_CDECL_OBJFIRST);
+    // BigInt::BigInt(i64 value)
+    engine->RegisterObjectBehaviour("BigInt", asBEHAVE_CONSTRUCT, "void f(int64)", AS_FUNCTION_OBJFIRST(BigInt__BigInt_i64), AS_CALL_CDECL_OBJFIRST);
+    // BigInt::BigInt(u32 value)
+    engine->RegisterObjectBehaviour("BigInt", asBEHAVE_CONSTRUCT, "void f(uint)", AS_FUNCTION_OBJFIRST(BigInt__BigInt_u32), AS_CALL_CDECL_OBJFIRST);
+    // BigInt::BigInt(u64 value)
+    engine->RegisterObjectBehaviour("BigInt", asBEHAVE_CONSTRUCT, "void f(uint64)", AS_FUNCTION_OBJFIRST(BigInt__BigInt_u64), AS_CALL_CDECL_OBJFIRST);
+
+    // BigInt::~BigInt() | Implicitly-declared
+    engine->RegisterObjectBehaviour("BigInt", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(BigInt), AS_CALL_CDECL_OBJFIRST);
+
+    RegisterMembers_BigInt<BigInt>(engine, "BigInt");
+
+    #ifdef REGISTER_CLASS_MANUAL_PART_BigInt
+        REGISTER_CLASS_MANUAL_PART_BigInt();
+    #endif
+
+    // BigInt& BigInt::operator =(const BigInt&) | Possible implicitly-declared
+    RegisterImplicitlyDeclaredAssignOperatorIfPossible<BigInt>(engine, "BigInt");
+}
+
 // struct Billboard | File: ../Graphics/BillboardSet.h
 static void Register_Billboard(asIScriptEngine* engine)
 {
@@ -8355,6 +8412,7 @@ void ASRegisterGeneratedClasses(asIScriptEngine* engine)
     Register_BatchGroupKey(engine);
     Register_BatchQueue(engine);
     Register_BiasParameters(engine);
+    Register_BigInt(engine);
     Register_Billboard(engine);
     Register_Bone(engine);
     Register_BoundingBox(engine);

@@ -11,7 +11,6 @@
 namespace Urho3D
 {
 
-/// @nobind
 class URHO3D_API BigInt
 {
 public:
