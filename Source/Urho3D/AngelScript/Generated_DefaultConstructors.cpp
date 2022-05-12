@@ -51,6 +51,9 @@ void ASRegisterGeneratedDefaultConstructors(asIScriptEngine* engine)
     // BiasParameters::BiasParameters() = default | File: ../Graphics/Light.h
     engine->RegisterObjectBehaviour("BiasParameters", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<BiasParameters>), AS_CALL_CDECL_OBJFIRST);
 
+    // BigInt::BigInt() | File: ../Math/BigInt.h
+    engine->RegisterObjectBehaviour("BigInt", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<BigInt>), AS_CALL_CDECL_OBJFIRST);
+
     // BoundingBox::BoundingBox() noexcept | File: ../Math/BoundingBox.h
     engine->RegisterObjectBehaviour("BoundingBox", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<BoundingBox>), AS_CALL_CDECL_OBJFIRST);
 

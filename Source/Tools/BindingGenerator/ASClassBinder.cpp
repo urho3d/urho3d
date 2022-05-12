@@ -301,6 +301,12 @@ static string CppMethodNameToAS(const MethodAnalyzer& methodAnalyzer)
     if (name == "operator>")
         throw Exception("Registerd as opCmp separately");
 
+    if (name == "operator++")
+        throw Exception("TODO");
+
+    if (name == "operator--")
+        throw Exception("TODO");
+
     return name;
 }
 

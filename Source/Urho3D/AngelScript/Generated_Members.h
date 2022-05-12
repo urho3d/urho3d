@@ -494,11 +494,62 @@ template <class T> void RegisterMembers_BiasParameters(asIScriptEngine* engine, 
     #endif
 }
 
+// bool BigInt::operator <(const BigInt& rhs) const
+template <class T> int BigInt_bool_operatorles_constspBigIntamp(const T& lhs, const T& rhs)
+{
+    if (lhs < rhs)
+        return -1;
+
+    if (lhs > rhs)
+        return 1;
+
+    return 0;
+}
+
 // class BigInt | File: ../Math/BigInt.h
 template <class T> void RegisterMembers_BigInt(asIScriptEngine* engine, const char* className)
 {
+    // bool BigInt::operator !=(const BigInt& rhs) const
+    // Only operator == is needed
+    // BigInt& BigInt::operator ++()
+    // TODO
+    // BigInt BigInt::operator ++(int)
+    // TODO
+    // BigInt& BigInt::operator --()
+    // TODO
+    // BigInt BigInt::operator --(int)
+    // TODO
+    // bool BigInt::operator <(const BigInt& rhs) const
+    // Registerd as opCmp separately
+    // bool BigInt::operator>(const BigInt& rhs) const
+    // Registerd as opCmp separately
+
+    // BigInt BigInt::operator *(const BigInt& rhs) const
+    engine->RegisterObjectMethod(className, "BigInt opMul(const BigInt&in) const", AS_METHODPR(T, operator*, (const BigInt&) const, BigInt), AS_CALL_THISCALL);
+
+    // BigInt& BigInt::operator *=(const BigInt& rhs)
+    engine->RegisterObjectMethod(className, "BigInt& opMulAssign(const BigInt&in)", AS_METHODPR(T, operator*=, (const BigInt&), BigInt&), AS_CALL_THISCALL);
+
+    // BigInt BigInt::operator +(const BigInt& rhs) const
+    engine->RegisterObjectMethod(className, "BigInt opAdd(const BigInt&in) const", AS_METHODPR(T, operator+, (const BigInt&) const, BigInt), AS_CALL_THISCALL);
+
+    // BigInt& BigInt::operator +=(const BigInt& rhs)
+    engine->RegisterObjectMethod(className, "BigInt& opAddAssign(const BigInt&in)", AS_METHODPR(T, operator+=, (const BigInt&), BigInt&), AS_CALL_THISCALL);
+
+    // BigInt BigInt::operator -(const BigInt& rhs) const
+    engine->RegisterObjectMethod(className, "BigInt opSub(const BigInt&in) const", AS_METHODPR(T, operator-, (const BigInt&) const, BigInt), AS_CALL_THISCALL);
+
+    // BigInt& BigInt::operator -=(const BigInt& rhs)
+    engine->RegisterObjectMethod(className, "BigInt& opSubAssign(const BigInt&in)", AS_METHODPR(T, operator-=, (const BigInt&), BigInt&), AS_CALL_THISCALL);
+
+    // bool BigInt::operator ==(const BigInt& rhs) const
+    engine->RegisterObjectMethod(className, "bool opEquals(const BigInt&in) const", AS_METHODPR(T, operator==, (const BigInt&) const, bool), AS_CALL_THISCALL);
+
     // String BigInt::ToString() const
     engine->RegisterObjectMethod(className, "String ToString() const", AS_METHODPR(T, ToString, () const, String), AS_CALL_THISCALL);
+
+    // bool BigInt::operator <(const BigInt& rhs) const
+    engine->RegisterObjectMethod(className, "int opCmp(const BigInt& in) const", AS_FUNCTION_OBJFIRST(BigInt_bool_operatorles_constspBigIntamp<T>), AS_CALL_CDECL_OBJFIRST);
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_BigInt
         REGISTER_MEMBERS_MANUAL_PART_BigInt();
