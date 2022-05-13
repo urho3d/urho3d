@@ -37,7 +37,7 @@ private:
     BigInt power_{1};
 
     /// Delay after click.
-    float clickDelay = 0.f;
+    float clickDelay_ = 0.f;
 
     /// Construct UI elements.
     void CreateUI();

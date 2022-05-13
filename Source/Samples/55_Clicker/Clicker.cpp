@@ -116,12 +116,12 @@ void Clicker::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
     float timeStep = eventData[P_TIMESTEP].GetFloat();
 
-    if (clickDelay > 0.f)
-        clickDelay -= timeStep;
+    if (clickDelay_ > 0.f)
+        clickDelay_ -= timeStep;
 
     Input* input = GetSubsystem<Input>();
 
-    if (input->GetMouseButtonDown(MOUSEB_LEFT) && clickDelay <= 0.f)
+    if (input->GetMouseButtonDown(MOUSEB_LEFT) && clickDelay_ <= 0.f)
     {
         score_ += power_;
 
@@ -129,7 +129,7 @@ void Clicker::HandleUpdate(StringHash eventType, VariantMap& eventData)
         Text* scoreText = static_cast<Text*>(uiRoot->GetChild("Score", false));
         scoreText->SetText(ShortNumberRepresentation(score_));
 
-        clickDelay = 0.2f;
+        clickDelay_ = 0.2f;
     }
 }
 
