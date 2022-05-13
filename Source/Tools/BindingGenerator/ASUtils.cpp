@@ -220,6 +220,12 @@ ConvertedVariable CppVariableToAS(const TypeAnalyzer& type, VariableUsage usage,
 {
     ConvertedVariable result;
 
+    if (usage == VariableUsage::PostfixIncDecParameter)
+    {
+        result.glue_ = "    " + type.ToString() + " " + name + "{};\n";
+        return result;
+    }
+
     if (type.IsRvalueReference() || type.IsDoublePointer() || type.IsRefToPointer())
         throw Exception("Error: type \"" + type.ToString() + "\" can not automatically bind");
 

@@ -301,11 +301,17 @@ static string CppMethodNameToAS(const MethodAnalyzer& methodAnalyzer)
     if (name == "operator>")
         throw Exception("Registerd as opCmp separately");
 
-    if (name == "operator++")
-        throw Exception("TODO");
+    if (methodAnalyzer.IsPrefixIncrementOperator())
+        return "opPreInc";
 
-    if (name == "operator--")
-        throw Exception("TODO");
+    if (methodAnalyzer.IsPostfixIncrementOperator())
+        return "opPostInc";
+
+    if (methodAnalyzer.IsPrefixDecrementOperator())
+        return "opPreDec";
+
+    if (methodAnalyzer.IsPostfixDecrementOperator())
+        return "opPostDec";
 
     return name;
 }
@@ -896,7 +902,11 @@ static void RegisterMethod(const MethodAnalyzer& methodAnalyzer, ProcessedClass&
 
         try
         {
-            conv = CppVariableToAS(param.GetType(), VariableUsage::FunctionParameter, param.GetDeclname(), param.GetDefval());
+            VariableUsage varUsage = VariableUsage::FunctionParameter;
+            if (methodAnalyzer.IsPostfixIncrementOperator() || methodAnalyzer.IsPostfixDecrementOperator())
+                varUsage = VariableUsage::PostfixIncDecParameter;
+
+            conv = CppVariableToAS(param.GetType(), varUsage, param.GetDeclname(), param.GetDefval());
         }
         catch (const Exception& e)
         {
