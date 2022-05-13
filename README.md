@@ -95,6 +95,8 @@ generation as part of the build process.
 The documentation is also available online at
   https://urho3d.io/documentation/HEAD/index.html
 
+Latest documentation: <https://rurho3d.github.io>
+
 Documentation on how to build Urho3D:
   https://urho3d.io/documentation/HEAD/_building.html
 Documentation on how to use Urho3D as external library
