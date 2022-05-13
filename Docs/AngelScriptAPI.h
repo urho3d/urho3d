@@ -1787,6 +1787,27 @@ float normalOffset;
 float slopeScaledBias;
 };
 
+class BigInt
+{
+public:
+~BigInt();
+BigInt();
+BigInt(const String&in);
+BigInt(int);
+BigInt(int64);
+BigInt(uint);
+BigInt(uint64);
+// Methods:
+BigInt  operator+(const BigInt&) const;
+BigInt&  operator++();
+BigInt  operator++(int);
+BigInt&  operator+=(const BigInt&);
+int  operator<(const BigInt&) const;
+BigInt&  operator=(const BigInt&);
+bool  operator==(const BigInt&) const;
+String ToString() const;
+};
+
 class Billboard
 {
 public:

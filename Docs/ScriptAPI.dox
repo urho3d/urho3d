@@ -2793,6 +2793,7 @@ namespace Urho3D
 <a href="#Class_BatchGroupKey"><b>BatchGroupKey</b></a>
 <a href="#Class_BatchQueue"><b>BatchQueue</b></a>
 <a href="#Class_BiasParameters"><b>BiasParameters</b></a>
+<a href="#Class_BigInt"><b>BigInt</b></a>
 <a href="#Class_Billboard"><b>Billboard</b></a>
 <a href="#Class_BillboardSet"><b>BillboardSet</b></a>
 <a href="#Class_Bone"><b>Bone</b></a>
@@ -4771,6 +4772,21 @@ Properties:
 - float constantBias
 - float normalOffset
 - float slopeScaledBias
+
+<a name="Class_BigInt"></a>
+
+### BigInt
+
+Methods:
+
+- BigInt  operator+(const BigInt&) const
+- BigInt&  operator++()
+- BigInt  operator++(int)
+- BigInt&  operator+=(const BigInt&)
+- int  operator<(const BigInt&) const
+- BigInt&  operator=(const BigInt&)
+- bool  operator==(const BigInt&) const
+- String ToString() const
 
 <a name="Class_Billboard"></a>
 
