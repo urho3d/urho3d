@@ -15,4 +15,20 @@ void Test_Math_BigInt()
         BigInt bi("9999999999999");
         Assert((bi += 1).ToString() == "10000000000000");
     }
+
+    // Additional operators
+    {
+        BigInt bi(int(1));
+        Assert((bi++).ToString() == "1");
+        Assert(bi.ToString() == "2");
+        Assert((++bi).ToString() == "3");
+        Assert(bi.ToString() == "3");
+        Assert((bi--).ToString() == "3");
+        Assert(bi.ToString() == "2");
+        Assert((--bi).ToString() == "1");
+        Assert(bi.ToString() == "1");
+        Assert((bi += 10).ToString() == "11");
+        Assert((bi -= 2).ToString() == "9");
+        Assert((bi *= 2).ToString() == "18");
+    }
 }

@@ -382,6 +382,11 @@ public:
 
     bool IsThisMethod() const { return GetContainsClassName() == GetClassName(); } // Defined in this class
 
+    bool IsPrefixIncrementOperator() const { return GetName() == "operator++" && GetParams().size() == 0; }
+    bool IsPostfixIncrementOperator() const { return GetName() == "operator++" && GetParams().size() != 0; }
+    bool IsPrefixDecrementOperator() const { return GetName() == "operator--" && GetParams().size() == 0; }
+    bool IsPostfixDecrementOperator() const { return GetName() == "operator--" && GetParams().size() != 0; }
+
     std::string GetDeclaration() const { return JoinNonEmpty({ classAnalyzer_.usingLocation_, GetFunctionDeclaration(memberdef_) }, " | "); }
     std::string GetLocation() const override { return JoinNonEmpty({ classAnalyzer_.usingLocation_, GetFunctionLocation(memberdef_) }, " | "); }
 };

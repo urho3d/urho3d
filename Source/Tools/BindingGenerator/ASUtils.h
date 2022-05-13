@@ -37,6 +37,7 @@ enum class VariableUsage
     FunctionReturn,
     StaticField,
     Field,
+    PostfixIncDecParameter
 };
 
 ConvertedVariable CppVariableToAS(const TypeAnalyzer& type, VariableUsage usage, const std::string& name = "", const std::string& defaultValue = "");
