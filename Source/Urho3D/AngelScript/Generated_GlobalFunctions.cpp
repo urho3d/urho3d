@@ -32,6 +32,9 @@ static bool bool_WriteDrawablesToOBJ_constspPODVectorlesDrawablestargreamp_Files
 
 void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
 {
+    // BigInt Abs(const BigInt& value) | File: ../Math/BigInt.h
+    engine->RegisterGlobalFunction("BigInt Abs(const BigInt&in)", AS_FUNCTIONPR(Abs, (const BigInt&), BigInt), AS_CALL_CDECL);
+
     // template <class T> T Abs(T value) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("float Abs(float)", AS_FUNCTIONPR(Abs, (float), float), AS_CALL_CDECL);
 

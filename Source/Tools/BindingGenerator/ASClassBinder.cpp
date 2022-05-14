@@ -265,6 +265,9 @@ static string CppMethodNameToAS(const MethodAnalyzer& methodAnalyzer)
     if (name == "operator/")
         return "opDiv";
 
+    if (name == "operator%")
+        return "opMod";
+
     if (name == "operator+=")
         return "opAddAssign";
 
@@ -276,6 +279,9 @@ static string CppMethodNameToAS(const MethodAnalyzer& methodAnalyzer)
 
     if (name == "operator/=")
         return "opDivAssign";
+
+    if (name == "operator%=")
+        return "opModAssign";
 
     if (name == "operator==")
         return "opEquals";
@@ -299,6 +305,12 @@ static string CppMethodNameToAS(const MethodAnalyzer& methodAnalyzer)
         throw Exception("Registerd as opCmp separately");
 
     if (name == "operator>")
+        throw Exception("Registerd as opCmp separately");
+
+    if (name == "operator<=")
+        throw Exception("Registerd as opCmp separately");
+
+    if (name == "operator>=")
         throw Exception("Registerd as opCmp separately");
 
     if (methodAnalyzer.IsPrefixIncrementOperator())

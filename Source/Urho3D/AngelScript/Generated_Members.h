@@ -529,8 +529,27 @@ template <class T> void RegisterMembers_BigInt(asIScriptEngine* engine, const ch
     // Only operator == is needed
     // bool BigInt::operator <(const BigInt& rhs) const
     // Registerd as opCmp separately
-    // bool BigInt::operator>(const BigInt& rhs) const
+    // bool BigInt::operator <=(const BigInt& rhs) const
     // Registerd as opCmp separately
+    // bool BigInt::operator >(const BigInt& rhs) const
+    // Registerd as opCmp separately
+    // bool BigInt::operator <=(const BigInt& rhs) const
+    // Registerd as opCmp separately
+
+    // bool BigInt::IsNegative() const
+    engine->RegisterObjectMethod(className, "bool IsNegative() const", AS_METHODPR(T, IsNegative, () const, bool), AS_CALL_THISCALL);
+
+    // bool BigInt::IsPositive() const
+    engine->RegisterObjectMethod(className, "bool IsPositive() const", AS_METHODPR(T, IsPositive, () const, bool), AS_CALL_THISCALL);
+
+    // bool BigInt::IsZero() const
+    engine->RegisterObjectMethod(className, "bool IsZero() const", AS_METHODPR(T, IsZero, () const, bool), AS_CALL_THISCALL);
+
+    // BigInt BigInt::operator %(const BigInt& rhs) const
+    engine->RegisterObjectMethod(className, "BigInt opMod(const BigInt&in) const", AS_METHODPR(T, operator%, (const BigInt&) const, BigInt), AS_CALL_THISCALL);
+
+    // BigInt& BigInt::operator %=(const BigInt& rhs)
+    engine->RegisterObjectMethod(className, "BigInt& opModAssign(const BigInt&in)", AS_METHODPR(T, operator%=, (const BigInt&), BigInt&), AS_CALL_THISCALL);
 
     // BigInt BigInt::operator *(const BigInt& rhs) const
     engine->RegisterObjectMethod(className, "BigInt opMul(const BigInt&in) const", AS_METHODPR(T, operator*, (const BigInt&) const, BigInt), AS_CALL_THISCALL);
@@ -553,6 +572,9 @@ template <class T> void RegisterMembers_BigInt(asIScriptEngine* engine, const ch
     // BigInt BigInt::operator -(const BigInt& rhs) const
     engine->RegisterObjectMethod(className, "BigInt opSub(const BigInt&in) const", AS_METHODPR(T, operator-, (const BigInt&) const, BigInt), AS_CALL_THISCALL);
 
+    // BigInt BigInt::operator -() const
+    engine->RegisterObjectMethod(className, "BigInt opNeg() const", AS_METHODPR(T, operator-, () const, BigInt), AS_CALL_THISCALL);
+
     // BigInt& BigInt::operator --()
     engine->RegisterObjectMethod(className, "BigInt& opPreDec()", AS_METHODPR(T, operator--, (), BigInt&), AS_CALL_THISCALL);
 
@@ -561,6 +583,12 @@ template <class T> void RegisterMembers_BigInt(asIScriptEngine* engine, const ch
 
     // BigInt& BigInt::operator -=(const BigInt& rhs)
     engine->RegisterObjectMethod(className, "BigInt& opSubAssign(const BigInt&in)", AS_METHODPR(T, operator-=, (const BigInt&), BigInt&), AS_CALL_THISCALL);
+
+    // BigInt BigInt::operator /(const BigInt& rhs) const
+    engine->RegisterObjectMethod(className, "BigInt opDiv(const BigInt&in) const", AS_METHODPR(T, operator/, (const BigInt&) const, BigInt), AS_CALL_THISCALL);
+
+    // BigInt& BigInt::operator /=(const BigInt& rhs)
+    engine->RegisterObjectMethod(className, "BigInt& opDivAssign(const BigInt&in)", AS_METHODPR(T, operator/=, (const BigInt&), BigInt&), AS_CALL_THISCALL);
 
     // bool BigInt::operator ==(const BigInt& rhs) const
     engine->RegisterObjectMethod(className, "bool opEquals(const BigInt&in) const", AS_METHODPR(T, operator==, (const BigInt&) const, bool), AS_CALL_THISCALL);
@@ -4928,9 +4956,9 @@ template <class T> void RegisterMembers_String(asIScriptEngine* engine, const ch
     // Error: type "const char*" can not automatically bind
     // bool String::operator ==(const char* rhs) const
     // Error: type "const char*" can not automatically bind
-    // bool String::operator>(const String& rhs) const
+    // bool String::operator >(const String& rhs) const
     // Registerd as opCmp separately
-    // bool String::operator>(const char* rhs) const
+    // bool String::operator >(const char* rhs) const
     // Error: type "const char*" can not automatically bind
     // void String::Replace(unsigned pos, unsigned length, const char* replaceWith)
     // Error: type "const char*" can not automatically bind
@@ -5186,7 +5214,7 @@ template <class T> void RegisterMembers_StringHash(asIScriptEngine* engine, cons
     // Only operator == is needed
     // bool StringHash::operator <(const StringHash& rhs) const
     // Registerd as opCmp separately
-    // bool StringHash::operator>(const StringHash& rhs) const
+    // bool StringHash::operator >(const StringHash& rhs) const
     // Registerd as opCmp separately
 
     // explicit StringHash::operator bool() const

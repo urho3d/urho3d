@@ -3,6 +3,7 @@
 
 #include "BigInt.h"
 
+#include "../Container/Pair.h"
 #include "../Core/StringUtils.h"
 
 #include "../DebugNew.h"
@@ -95,6 +96,46 @@ static Vector<BigInt::Digit> DiffMagnitudes(const Vector<BigInt::Digit>& a, cons
     return ret;
 }
 
+// Return quotient and remainder.
+// If denominator == 0, then return {0, 0}
+Pair<BigInt, BigInt> DivMod(BigInt numerator, BigInt denominator)
+{
+    if (denominator == 0)
+        return {0, 0};
+
+    BigInt absNum = Abs(numerator);
+    BigInt absDenom = Abs(denominator);
+
+    BigInt quotient = 0;
+    BigInt remainder = absNum;
+
+    // The Simplest and slowest way
+    while (remainder >= absDenom)
+    {
+        ++quotient;
+        remainder -= absDenom;
+
+        String strQ = quotient.ToString();
+        String strRem = remainder.ToString();
+        int a = 0;
+    }
+
+    // https://en.cppreference.com/w/cpp/language/operator_arithmetic
+    // (a/b)*b + a%b == a
+    // 7/3 = {2, 1}    | 2*3 + 1 == 7
+    // -7/3 = {-2, -1} | -2*3 + -1 == -7
+    // 7/-3 = {-2, 1}  | -2*-3 + 1 == 7
+    // -7/-3 = {2, -1} | 2*-3 + -1 == -7
+
+    if (numerator.IsPositive() != denominator.IsPositive())
+        quotient = -quotient;
+
+    if (numerator.IsNegative())
+        remainder = -remainder;
+
+    return {quotient, remainder};
+}
+
 BigInt::BigInt()
 {
     // Init as zero
@@ -182,6 +223,9 @@ BigInt::BigInt(i32 value)
         magnitude_.Push(mod);
         value /= BASE;
     }
+
+    if (!magnitude_.Size()) // value == 0
+        magnitude_.Push(0);
 }
 
 BigInt::BigInt(i64 value)
@@ -195,6 +239,9 @@ BigInt::BigInt(i64 value)
         magnitude_.Push(mod);
         value /= BASE;
     }
+    
+    if (!magnitude_.Size()) // value == 0
+        magnitude_.Push(0);
 }
 
 BigInt::BigInt(u32 value)
@@ -207,6 +254,9 @@ BigInt::BigInt(u32 value)
         magnitude_.Push(mod);
         value /= BASE;
     }
+
+    if (!magnitude_.Size()) // value == 0
+        magnitude_.Push(0);
 }
 
 BigInt::BigInt(u64 value)
@@ -219,6 +269,22 @@ BigInt::BigInt(u64 value)
         magnitude_.Push(mod);
         value /= BASE;
     }
+
+    if (!magnitude_.Size()) // value == 0
+        magnitude_.Push(0);
+}
+
+bool BigInt::IsZero() const
+{
+    assert(magnitude_.Size() > 0);
+
+    if (magnitude_.Size() == 1 && magnitude_[0] == 0)
+    {
+        assert(positive_);
+        return true;
+    }
+
+    return false;
 }
 
 bool BigInt::operator <(const BigInt& rhs) const
@@ -344,6 +410,26 @@ BigInt BigInt::operator *(const BigInt& rhs) const
     return ret;
 }
 
+BigInt BigInt::operator /(const BigInt& rhs) const
+{
+    Pair<BigInt, BigInt> divMod = DivMod(*this, rhs);
+    return divMod.first_;
+}
+
+BigInt BigInt::operator %(const BigInt& rhs) const
+{
+    Pair<BigInt, BigInt> divMod = DivMod(*this, rhs);
+    return divMod.second_;
+}
+
+BigInt BigInt::operator -() const
+{
+    BigInt ret = *this;
+    if (!ret.IsZero())
+        ret.positive_ = !ret.positive_;
+    return ret;
+}
+
 BigInt& BigInt::operator +=(const BigInt& rhs)
 {
     BigInt result = *this + rhs;
@@ -363,6 +449,22 @@ BigInt& BigInt::operator -=(const BigInt& rhs)
 BigInt& BigInt::operator *=(const BigInt& rhs)
 {
     BigInt result = *this * rhs;
+    Swap(this->positive_, result.positive_);
+    Swap(this->magnitude_, result.magnitude_);
+    return *this;
+}
+
+BigInt& BigInt::operator /=(const BigInt& rhs)
+{
+    BigInt result = *this / rhs;
+    Swap(this->positive_, result.positive_);
+    Swap(this->magnitude_, result.magnitude_);
+    return *this;
+}
+
+BigInt& BigInt::operator %=(const BigInt& rhs)
+{
+    BigInt result = *this % rhs;
     Swap(this->positive_, result.positive_);
     Swap(this->magnitude_, result.magnitude_);
     return *this;
