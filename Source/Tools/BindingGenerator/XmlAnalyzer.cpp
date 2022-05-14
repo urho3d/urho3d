@@ -225,6 +225,9 @@ static string BeautifyDefinition(const string& definition)
     result = ReplaceAll(result, "- = ", "-=");
     result = ReplaceAll(result, "* = ", "*=");
     result = ReplaceAll(result, "/ = ", "/=");
+    result = ReplaceAll(result, "% = ", "%=");
+    result = ReplaceAll(result, "< = ", "<=");
+    result = ReplaceAll(result, "> = ", "<=");
     result = ReplaceAll(result, "operator = ", "operator=");
 
     result = ReplaceAll(result, "operator", "operator ");
@@ -237,6 +240,7 @@ static string BeautifyDefinition(const string& definition)
     result = ReplaceAll(result, " >", ">");
 
     result = ReplaceAll(result, "template<", "template <");
+    result = ReplaceAll(result, "operator>", "operator >");
 
     return result;
 }

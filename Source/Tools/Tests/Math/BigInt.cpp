@@ -14,6 +14,7 @@ void Test_Math_BigInt()
 {
     // Constructors
     assert(BigInt().ToString() == "0");
+    assert(BigInt(0).ToString() == "0");
     assert(BigInt((i32)0x7FFFFFFF).ToString() == "2147483647");
     assert(BigInt((u32)0x80000000).ToString() == "2147483648");
     assert(BigInt((u32)0xFFFFFFFF).ToString() == "4294967295");
@@ -81,9 +82,62 @@ void Test_Math_BigInt()
         BigInt bi1{"-99999999999999999999999999999999999999999999999999999999999999999999"};
         BigInt bi2{"99999999999999999999999999999999999999999999999999999999999999999999"};
         String str = (bi1 * bi2).ToString();
+        
         assert(str == "-99999999999999999999999999999999999999999999999999999999999999999998"
                       "00000000000000000000000000000000000000000000000000000000000000000001");
     }
+
+    // Divison
+    assert((BigInt("0") / BigInt("-0")).ToString() == "0");
+    assert((BigInt("0") % BigInt("0")).ToString() == "0");
+    assert((BigInt("999999") / 1234).ToString() == "810");
+    assert((BigInt("999999") % 1234).ToString() == "459");
+    assert(1234 / BigInt("999999") == 0);
+    assert(1234 % BigInt("999999") == 1234);
+
+    {
+        // https://en.cppreference.com/w/cpp/language/operator_arithmetic
+        // (a/b)*b + a%b == a
+        BigInt a("9999999843");
+        BigInt b("99999998");
+        assert(a/b*b + a%b == a);
+
+        a = {"-9999999843"};
+        b = {"99999998"};
+        assert(a/b*b + a%b == a);
+
+        a = {"9999999843"};
+        b = {"-99999998"};
+        assert(a/b*b + a%b == a);
+
+        a = {"-9999999843"};
+        b = {"-99999998"};
+        assert(a/b*b + a%b == a);
+    }
+
+#if false // Current division implementation too slow
+    {
+        BigInt num{"-99999999999999999999999999999999999999999999999999999999999999999998"
+                   "00000000000000000000000000000000000000000000000000000000000000000001"};
+            
+        BigInt denom{"-99999999999999999999999999999999999999999999999999999999999999999999"};
+        String str = (num / denom).ToString();
+        assert(str == "99999999999999999999999999999999999999999999999999999999999999999999");
+        str = (num % denom).ToString();
+        assert(str == "0");
+    }
+#else
+    {
+        BigInt num{"-999998"
+                   "000001"};
+            
+        BigInt denom{"-999999"};
+        String str = (num / denom).ToString();
+        assert(str == "999999");
+        str = (num % denom).ToString();
+        assert(str == "0");
+    }
+#endif
 
     // Additional operators
     {

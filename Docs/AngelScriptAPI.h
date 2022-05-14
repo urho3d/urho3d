@@ -1805,6 +1805,9 @@ BigInt&  operator+=(const BigInt&);
 int  operator<(const BigInt&) const;
 BigInt&  operator=(const BigInt&);
 bool  operator==(const BigInt&) const;
+bool IsNegative() const;
+bool IsPositive() const;
+bool IsZero() const;
 String ToString() const;
 };
 
@@ -37928,6 +37931,7 @@ WM_CLAMP,
 };
 
 // Global functions
+BigInt Abs(const BigInt&);
 float Abs(float);
 float Acos(float);
 String AddTrailingSlash(const String&);
