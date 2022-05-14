@@ -77,11 +77,38 @@ public:
     String ToString() const;
 };
 
+#if false // Without constraints this can cause conflicts
 template <typename T> BigInt operator +(T lhs, const BigInt& rhs) { return BigInt(lhs) + rhs; }
 template <typename T> BigInt operator -(T lhs, const BigInt& rhs) { return BigInt(lhs) - rhs; }
 template <typename T> BigInt operator *(T lhs, const BigInt& rhs) { return BigInt(lhs) * rhs; }
 template <typename T> BigInt operator /(T lhs, const BigInt& rhs) { return BigInt(lhs) / rhs; }
 template <typename T> BigInt operator %(T lhs, const BigInt& rhs) { return BigInt(lhs) % rhs; }
+#else
+inline BigInt operator +(i32 lhs, const BigInt& rhs) { return BigInt(lhs) + rhs; }
+inline BigInt operator +(u32 lhs, const BigInt& rhs) { return BigInt(lhs) + rhs; }
+inline BigInt operator +(i64 lhs, const BigInt& rhs) { return BigInt(lhs) + rhs; }
+inline BigInt operator +(u64 lhs, const BigInt& rhs) { return BigInt(lhs) + rhs; }
+
+inline BigInt operator -(i32 lhs, const BigInt& rhs) { return BigInt(lhs) - rhs; }
+inline BigInt operator -(u32 lhs, const BigInt& rhs) { return BigInt(lhs) - rhs; }
+inline BigInt operator -(i64 lhs, const BigInt& rhs) { return BigInt(lhs) - rhs; }
+inline BigInt operator -(u64 lhs, const BigInt& rhs) { return BigInt(lhs) - rhs; }
+
+inline BigInt operator *(i32 lhs, const BigInt& rhs) { return BigInt(lhs) * rhs; }
+inline BigInt operator *(u32 lhs, const BigInt& rhs) { return BigInt(lhs) * rhs; }
+inline BigInt operator *(i64 lhs, const BigInt& rhs) { return BigInt(lhs) * rhs; }
+inline BigInt operator *(u64 lhs, const BigInt& rhs) { return BigInt(lhs) * rhs; }
+
+inline BigInt operator /(i32 lhs, const BigInt& rhs) { return BigInt(lhs) / rhs; }
+inline BigInt operator /(u32 lhs, const BigInt& rhs) { return BigInt(lhs) / rhs; }
+inline BigInt operator /(i64 lhs, const BigInt& rhs) { return BigInt(lhs) / rhs; }
+inline BigInt operator /(u64 lhs, const BigInt& rhs) { return BigInt(lhs) / rhs; }
+
+inline BigInt operator %(i32 lhs, const BigInt& rhs) { return BigInt(lhs) % rhs; }
+inline BigInt operator %(u32 lhs, const BigInt& rhs) { return BigInt(lhs) % rhs; }
+inline BigInt operator %(i64 lhs, const BigInt& rhs) { return BigInt(lhs) % rhs; }
+inline BigInt operator %(u64 lhs, const BigInt& rhs) { return BigInt(lhs) % rhs; }
+#endif
 
 inline BigInt Abs(const BigInt& value) { return value.IsNegative() ? -value : value; }
 
