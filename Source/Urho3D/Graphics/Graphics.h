@@ -668,13 +668,13 @@ public:
 #ifdef URHO3D_OPENGL
     /// Restore GPU objects and reinitialize state. Requires an open window. Used only on OpenGL.
     void Restore_OGL();
-    
+
     /// Mark the FBO needing an update. Used only on OpenGL.
     void MarkFBODirty_OGL();
-    
+
     /// Bind a VBO, avoiding redundant operation. Used only on OpenGL.
     void SetVBO_OGL(unsigned object);
-    
+
     /// Bind a UBO, avoiding redundant operation. Used only on OpenGL.
     void SetUBO_OGL(unsigned object);
 
@@ -783,7 +783,7 @@ private:
 
     /// Check supported rendering features.
     void CheckFeatureSupport_D3D11();
-    
+
     /// Reset cached rendering state.
     void ResetCachedState_D3D11();
 
@@ -824,10 +824,10 @@ private:
 
     /// Check supported rendering features.
     void CheckFeatureSupport_D3D9();
-    
+
     /// Reset cached rendering state.
     void ResetCachedState_D3D9();
-    
+
     /// Initialize texture unit mappings.
     void SetTextureUnitMappings_D3D9();
 #endif // def URHO3D_D3D9
@@ -835,31 +835,31 @@ private:
 #ifdef URHO3D_OPENGL
     /// Clean up all framebuffers. Called when destroying the context. Used only on OpenGL.
     void CleanupFramebuffers_OGL();
-    
+
     /// Create a framebuffer using either extension or core functionality. Used only on OpenGL.
     unsigned CreateFramebuffer_OGL();
-    
+
     /// Delete a framebuffer using either extension or core functionality. Used only on OpenGL.
     void DeleteFramebuffer_OGL(unsigned fbo);
-    
+
     /// Bind a framebuffer using either extension or core functionality. Used only on OpenGL.
     void BindFramebuffer_OGL(unsigned fbo);
-    
+
     /// Bind a framebuffer color attachment using either extension or core functionality. Used only on OpenGL.
     void BindColorAttachment_OGL(unsigned index, unsigned target, unsigned object, bool isRenderBuffer);
-    
+
     /// Bind a framebuffer depth attachment using either extension or core functionality. Used only on OpenGL.
     void BindDepthAttachment_OGL(unsigned object, bool isRenderBuffer);
-    
+
     /// Bind a framebuffer stencil attachment using either extension or core functionality. Used only on OpenGL.
     void BindStencilAttachment_OGL(unsigned object, bool isRenderBuffer);
-    
+
     /// Check FBO completeness using either extension or core functionality. Used only on OpenGL.
     bool CheckFramebuffer_OGL();
-    
+
     /// Set vertex attrib divisor. No-op if unsupported. Used only on OpenGL.
     void SetVertexAttribDivisor_OGL(unsigned location, unsigned divisor);
-    
+
     /// Release/clear GPU objects and optionally close the window. Used only on OpenGL.
     void Release_OGL(bool clearGPUObjects, bool closeWindow);
 
@@ -868,10 +868,10 @@ private:
 
     /// Check supported rendering features.
     void CheckFeatureSupport_OGL();
-    
+
     /// Reset cached rendering state.
     void ResetCachedState_OGL();
-    
+
     /// Initialize texture unit mappings.
     void SetTextureUnitMappings_OGL();
 

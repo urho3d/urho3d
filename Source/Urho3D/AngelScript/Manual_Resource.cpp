@@ -36,7 +36,7 @@ void ASRegisterManualLast_Resource(asIScriptEngine* engine)
 {
     // template <class T> T* Context::GetSubsystem() const | File: ../Core/Context.h
     engine->RegisterGlobalFunction("Localization@+ get_localization()", AS_FUNCTION(GetLocalization), AS_CALL_CDECL);
-    
+
     // template <class T> T* Context::GetSubsystem() const | File: ../Core/Context.h
     engine->RegisterGlobalFunction("ResourceCache@+ get_resourceCache()", AS_FUNCTION(GetResourceCache), AS_CALL_CDECL);
     engine->RegisterGlobalFunction("ResourceCache@+ get_cache()", AS_FUNCTION(GetResourceCache), AS_CALL_CDECL);

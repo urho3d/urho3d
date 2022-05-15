@@ -144,7 +144,7 @@ static void RegisterLog(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Log", "void Info(const String&in)", AS_FUNCTION_OBJLAST(LogInfo), AS_CALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Log", "void Warning(const String&in)", AS_FUNCTION_OBJLAST(LogWarning), AS_CALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Log", "void Error(const String&in)", AS_FUNCTION_OBJLAST(LogError), AS_CALL_CDECL_OBJLAST);
-	
+
 	// Register also Print() functions for convenience
     engine->RegisterGlobalFunction("void Print(const String&in, bool error = false)", AS_FUNCTIONPR(Print, (const String&, bool), void), AS_CALL_CDECL);
     engine->RegisterGlobalFunction("void Print(int, bool error = false)", AS_FUNCTIONPR(Print, (int, bool), void), AS_CALL_CDECL);
@@ -179,7 +179,7 @@ void ASRegisterManualLast_IO(asIScriptEngine* engine)
 
     // template <class T> T* Context::GetSubsystem() const | File: ../Core/Context.h
     engine->RegisterGlobalFunction("FileSystem@+ get_fileSystem()", AS_FUNCTION(GetFileSystem), AS_CALL_CDECL);
-    
+
     // template <class T> T* Context::GetSubsystem() const | File: ../Core/Context.h
     engine->RegisterGlobalFunction("Log@+ get_log()", AS_FUNCTION(GetLog), AS_CALL_CDECL);
 }

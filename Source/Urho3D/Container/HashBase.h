@@ -83,7 +83,7 @@ class URHO3D_API HashBase
 public:
     /// Initial amount of buckets.
     static inline constexpr unsigned MIN_BUCKETS = 8;
-    
+
     /// Maximum load factor.
     static inline constexpr unsigned MAX_LOAD_FACTOR = 4;
 

@@ -50,7 +50,7 @@ public:
 
     /// Return 0 if rhs zero.
     BigInt operator /(const BigInt& rhs) const;
-    
+
     /// Return 0 if rhs zero.
     BigInt operator %(const BigInt& rhs) const;
 

@@ -1052,7 +1052,7 @@ void CollisionShape::UpdateShape()
                     shape_ = make_unique<btHeightfieldTerrainShape>(
                         heightfield->size_.x_, heightfield->size_.y_, heightfield->heightData_.Get(),
                         1.0f, heightfield->minHeight_, heightfield->maxHeight_, 1, PHY_FLOAT, false);
-                    
+
                     shape_->setLocalScaling(
                         ToBtVector3(Vector3(heightfield->spacing_.x_, 1.0f, heightfield->spacing_.z_) * cachedWorldScale_ * size_));
                 }
@@ -1089,7 +1089,7 @@ void CollisionShape::UpdateCachedGeometryShape(CollisionGeometryDataCache& cache
         {
             geometry_ = CreateCollisionGeometryData(shapeType_, custom);
             assert(geometry_);
-            
+
             shape_.reset(CreateCollisionGeometryDataShape(shapeType_, geometry_.Get(), cachedWorldScale_ * size_));
             assert(shape_);
         }

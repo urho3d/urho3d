@@ -3,7 +3,7 @@
 	<attribute name="Name" value="EditorLayers" />
 	<attribute name="Position" value="952 533" />
 	<attribute name="Size" value="220 45" />
-	
+
   <element style="ListRow">
         <attribute name="Layout Spacing" value="2" />
         <attribute name="Position" value="5 4" />
@@ -17,7 +17,7 @@
             <attribute name="Min Size" value="180 0" />
             <attribute name="Max Size" value="180 2147483647" />
             <attribute name="Resize Popup" value="true" />
-            
+
             <element type="Window" internal="true" popup="true" style="none">
                 <element type="ListView" internal="true" style="none">
                 <attribute name="Name" value="ListView" />
@@ -41,7 +41,7 @@
             </element>
         </element>
     </element>
-	
+
 	<element type="CheckBox">
 		<attribute name="Name" value="Bit0" />
 		<attribute name="Position" value="55 24" />

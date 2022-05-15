@@ -65,10 +65,10 @@ struct TriangleMeshData : public CollisionGeometryData
 
     /// Bullet triangle mesh interface.
     std::unique_ptr<TriangleMeshInterface> meshInterface_;
-    
+
     /// Bullet triangle mesh collision shape.
     std::unique_ptr<btBvhTriangleMeshShape> shape_;
-    
+
     /// Bullet triangle info map.
     std::unique_ptr<btTriangleInfoMap> infoMap_;
 };
@@ -289,22 +289,22 @@ private:
 
     /// Physics world.
     WeakPtr<PhysicsWorld> physicsWorld_;
-    
+
     /// Rigid body.
     WeakPtr<RigidBody> rigidBody_;
-    
+
     /// Model.
     SharedPtr<Model> model_;
-    
+
     /// Shared geometry data.
     SharedPtr<CollisionGeometryData> geometry_;
-    
+
     /// Bullet collision shape.
     std::unique_ptr<btCollisionShape> shape_;
-    
+
     /// Collision shape type.
     ShapeType shapeType_;
-    
+
     /// Offset position.
     Vector3 position_;
     /// Offset rotation.

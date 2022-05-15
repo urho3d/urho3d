@@ -130,10 +130,10 @@ private:
 
     /// Attribute default value at each instance level.
     std::unique_ptr<VariantMap> instanceDefaultValues_;
-    
+
     /// When true, store the attribute value as instance's default value (internal use only).
     bool setInstanceDefault_;
-    
+
     /// Temporary flag.
     bool temporary_;
 };

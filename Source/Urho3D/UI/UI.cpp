@@ -1011,7 +1011,7 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
         graphics_->SetCullMode(CULL_CW);
     else
         graphics_->SetCullMode(CULL_CCW);
-    
+
     graphics_->SetDepthTest(CMP_ALWAYS);
     graphics_->SetDepthWrite(false);
     graphics_->SetFillMode(FILL_SOLID);

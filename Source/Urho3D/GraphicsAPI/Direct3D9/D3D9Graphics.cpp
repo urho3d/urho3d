@@ -393,7 +393,7 @@ bool Graphics::SetScreenMode_D3D9(int width, int height, const ScreenModeParams&
             // Monitor changed, re-create the D3D9 device on the new monitor
             impl->vertexDeclarations_.Clear();
             OnDeviceLost_D3D9();
-            
+
             {
                 MutexLock lock(gpuObjectMutex_);
                 // Release all GPU objects that still exist

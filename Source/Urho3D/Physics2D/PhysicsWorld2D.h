@@ -230,7 +230,7 @@ protected:
 
     /// Box2D physics world.
     std::unique_ptr<b2World> world_;
-    
+
     /// Gravity.
     Vector2 gravity_;
     /// Velocity iterations.

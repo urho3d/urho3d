@@ -734,7 +734,7 @@ private:
     Vector<SharedPtr<Node> > children_;
     /// Node listeners.
     Vector<WeakPtr<Component> > listeners_;
-    
+
     /// Pointer to implementation.
     std::unique_ptr<NodeImpl> impl_;
 

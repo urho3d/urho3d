@@ -184,10 +184,10 @@ private:
     WeakPtr<RigidBody> ownBody_;
     /// Other rigid body.
     WeakPtr<RigidBody> otherBody_;
-    
+
     /// Bullet constraint.
     std::unique_ptr<btTypedConstraint> constraint_;
-    
+
     /// Constraint type.
     ConstraintType constraintType_;
     /// Constraint position.

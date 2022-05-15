@@ -322,19 +322,19 @@ protected:
 
     /// Identifying name for this navigation mesh.
     String meshName_;
-    
+
     /// Detour navigation mesh.
     dtNavMesh* navMesh_;
-    
+
     /// Detour navigation mesh query.
     dtNavMeshQuery* navMeshQuery_;
-    
+
     /// Detour navigation mesh query filter.
     std::unique_ptr<dtQueryFilter> queryFilter_;
-    
+
     /// Temporary data for finding a path.
     std::unique_ptr<FindPathData> pathData_;
-    
+
     /// Tile size.
     int tileSize_;
     /// Cell size.

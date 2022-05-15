@@ -154,7 +154,7 @@ private:
 
     /// Save bytecode to a file.
     void SaveByteCode_D3D11(const String& binaryShaderName);
-    
+
     /// Calculate constant buffer sizes from parameters.
     void CalculateConstantBufferSizes_D3D11();
 #endif // def URHO3D_D3D11

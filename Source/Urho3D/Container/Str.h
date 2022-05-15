@@ -338,10 +338,10 @@ public:
     Iterator Erase(const Iterator& it);
     /// Erase a substring by iterators.
     Iterator Erase(const Iterator& start, const Iterator& end);
-    
+
     /// Resize the string. Can increase capacity, but never decrease.
     void Resize(unsigned newLength);
-    
+
     /// Set new capacity. New capacity may differ from requested.
     void Reserve(unsigned newCapacity);
 
@@ -516,7 +516,7 @@ private:
 
         /// Number of bytes without null terminator.
         u32 length_;
-        
+
         /// Size of buffer_.
         u32 capacity_;
     };
@@ -540,14 +540,14 @@ private:
     {
         /// @nobind
         LongString longString_;
-        
+
         /// @nobind
         ShortString shortString_;
     } data_;
 
     /// MSB of the last byte is used as a flag.
     inline static constexpr u8 SSO_MASK = 0b10000000u;
-    
+
     inline static constexpr u8 INVERTED_SSO_MASK = static_cast<u8>(~SSO_MASK);
 
     unsigned GetShortStringLength() const

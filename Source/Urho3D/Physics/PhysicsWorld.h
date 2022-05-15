@@ -302,19 +302,19 @@ private:
 
     /// Bullet collision configuration.
     btCollisionConfiguration* collisionConfiguration_{};
-    
+
     /// Bullet collision dispatcher.
     std::unique_ptr<btDispatcher> collisionDispatcher_;
-    
+
     /// Bullet collision broadphase.
     std::unique_ptr<btBroadphaseInterface> broadphase_;
-    
+
     /// Bullet constraint solver.
     std::unique_ptr<btConstraintSolver> solver_;
-    
+
     /// Bullet physics world.
     std::unique_ptr<btDiscreteDynamicsWorld> world_;
-    
+
     /// Extra weak pointer to scene to allow for cleanup in case the world is destroyed before other components.
     WeakPtr<Scene> scene_;
     /// Rigid bodies in the world.

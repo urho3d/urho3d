@@ -16,10 +16,10 @@ class URHO3D_API ConstraintDistance2D : public Constraint2D
 public:
     /// Construct.
     explicit ConstraintDistance2D(Context* context);
-    
+
     /// Destruct.
     ~ConstraintDistance2D() override;
-    
+
     /// Register object factory.
     /// @nobind
     static void RegisterObject(Context* context);
@@ -51,7 +51,7 @@ public:
     /// Set linear damping in N*s/m.
     /// @property
     void SetDamping(float damping);
-    
+
     /// Return linear damping in N*s/m.
     /// @property
     float GetDamping() const { return jointDef_.damping; }
@@ -89,10 +89,10 @@ private:
 
     /// Box2D joint def.
     b2DistanceJointDef jointDef_;
-    
+
     /// Owner body anchor.
     Vector2 ownerBodyAnchor_;
-    
+
     /// Other body anchor.
     Vector2 otherBodyAnchor_;
 };

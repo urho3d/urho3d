@@ -685,7 +685,7 @@ void ScriptInstance::GetScriptAttributes()
                 case asTYPEID_DOUBLE:
                     info.type_ = VAR_DOUBLE;
                     break;
-                
+
                 case asTYPEID_INT64:
                 case asTYPEID_UINT64:
                     info.type_ = VAR_INT64;

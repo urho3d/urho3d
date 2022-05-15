@@ -305,13 +305,13 @@ private:
 
     /// Bullet rigid body.
     std::unique_ptr<btRigidBody> body_;
-    
+
     /// Bullet compound collision shape.
     std::unique_ptr<btCompoundShape> compoundShape_;
-    
+
     /// Compound collision shape with center of mass offset applied.
     std::unique_ptr<btCompoundShape> shiftedCompoundShape_;
-    
+
     /// Physics world.
     WeakPtr<PhysicsWorld> physicsWorld_;
     /// Smoothed transform, if has one.

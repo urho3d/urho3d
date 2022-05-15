@@ -122,25 +122,25 @@ private:
 
     /// Detour tile cache instance that works with the nav mesh.
     dtTileCache* tileCache_{};
-    
+
     /// Used by dtTileCache to allocate blocks of memory.
     std::unique_ptr<dtTileCacheAlloc> allocator_;
-    
+
     /// Used by dtTileCache to compress the original tiles to use when reconstructing for changes.
     std::unique_ptr<dtTileCacheCompressor> compressor_;
-    
+
     /// Mesh processor used by Detour, in this case a 'pass-through' processor.
     std::unique_ptr<dtTileCacheMeshProcess> meshProcessor_;
-    
+
     /// Maximum number of obstacle objects allowed.
     unsigned maxObstacles_{1024};
-    
+
     /// Maximum number of layers that are allowed to be constructed.
     unsigned maxLayers_{};
-    
+
     /// Debug draw Obstacles.
     bool drawObstacles_{};
-    
+
     /// Queue of tiles to be built.
     PODVector<IntVector2> tileQueue_;
 };

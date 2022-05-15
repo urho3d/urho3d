@@ -16,10 +16,10 @@ class URHO3D_API ConstraintWheel2D : public Constraint2D
 public:
     /// Construct.
     explicit ConstraintWheel2D(Context* context);
-    
+
     /// Destruct.
     ~ConstraintWheel2D() override;
-    
+
     /// Register object factory.
     /// @nobind
     static void RegisterObject(Context* context);
@@ -31,7 +31,7 @@ public:
     /// Return anchor.
     /// @property
     const Vector2& GetAnchor() const { return anchor_; }
-    
+
     /// Set axis.
     /// @property
     void SetAxis(const Vector2& axis);
@@ -113,10 +113,10 @@ private:
 
     /// Box2D joint def.
     b2WheelJointDef jointDef_;
-    
+
     /// Anchor.
     Vector2 anchor_;
-    
+
     /// Axis.
     Vector2 axis_;
 };

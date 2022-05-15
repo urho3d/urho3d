@@ -41,10 +41,10 @@ void ASRegisterManualLast_Engine(asIScriptEngine* engine)
 {
     // template <class T> T* Context::GetSubsystem() const | File: ../Core/Context.h
     engine->RegisterGlobalFunction("Console@+ get_console()", AS_FUNCTION(GetConsole), AS_CALL_CDECL);
-    
+
     // template <class T> T* Context::GetSubsystem() const | File: ../Core/Context.h
     engine->RegisterGlobalFunction("DebugHud@+ get_debugHud()", AS_FUNCTION(GetDebugHud), AS_CALL_CDECL);
-    
+
     // template <class T> T* Context::GetSubsystem() const | File: ../Core/Context.h
     engine->RegisterGlobalFunction("Engine@+ get_engine()", AS_FUNCTION(GetEngine), AS_CALL_CDECL);
 }

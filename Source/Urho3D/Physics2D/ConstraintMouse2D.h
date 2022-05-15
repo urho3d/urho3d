@@ -16,10 +16,10 @@ class URHO3D_API ConstraintMouse2D : public Constraint2D
 public:
     /// Construct.
     explicit ConstraintMouse2D(Context* context);
-    
+
     /// Destruct.
     ~ConstraintMouse2D() override;
-    
+
     /// Register object factory.
     /// @nobind
     static void RegisterObject(Context* context);
@@ -27,7 +27,7 @@ public:
     /// Set target.
     /// @property
     void SetTarget(const Vector2& target);
-    
+
     /// Return target.
     /// @property
     const Vector2& GetTarget() const { return target_; }
@@ -35,7 +35,7 @@ public:
     /// Set max force.
     /// @property
     void SetMaxForce(float maxForce);
-    
+
     /// Return max force.
     /// @property
     float GetMaxForce() const { return jointDef_.maxForce; }
@@ -65,7 +65,7 @@ private:
 
     /// Box2D joint def.
     b2MouseJointDef jointDef_;
-    
+
     /// Target.
     Vector2 target_;
 };

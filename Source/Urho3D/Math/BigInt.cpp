@@ -185,7 +185,7 @@ BigInt::BigInt(const String& str)
     {
         if (!IsDigit(str[i]))
             break;
-        
+
         lastDigitPos = i;
     }
 
@@ -239,7 +239,7 @@ BigInt::BigInt(i64 value)
         magnitude_.Push(mod);
         value /= BASE;
     }
-    
+
     if (!magnitude_.Size()) // value == 0
         magnitude_.Push(0);
 }
@@ -316,7 +316,7 @@ String BigInt::ToString() const
     for (; i >= 0; --i)
     {
         String str(magnitude_[i]);
-        
+
         if (str.Length() < BASE_DIGITS)
         {
             String zeros('0', BASE_DIGITS - str.Length());
@@ -351,7 +351,7 @@ BigInt BigInt::operator +(const BigInt& rhs) const
             ret.magnitude_ = DiffMagnitudes(magnitude_, rhs.magnitude_);
         }
     }
-    
+
     return ret;
 }
 

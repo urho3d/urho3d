@@ -281,10 +281,10 @@ float Ray::HitDistance(const void* vertexData, unsigned vertexStride, const void
 {
     float nearest = M_INFINITY;
     const auto* vertices = (const unsigned char*)vertexData;
-    
+
     Vector3 tempNormal;
     Vector3* tempNormalPtr = outNormal ? &tempNormal : nullptr;
-    
+
     Vector3 barycentric;
     Vector3 tempBarycentric;
     Vector3* tempBarycentricPtr = outUV ? &tempBarycentric : nullptr;

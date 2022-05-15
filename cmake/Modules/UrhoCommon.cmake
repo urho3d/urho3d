@@ -487,11 +487,11 @@ if (WIN32 AND NOT CMAKE_PROJECT_NAME MATCHES ^Urho3D-ExternalProject-)
     if (URHO3D_D3D11)
         list (APPEND DIRECTX_REQUIRED_COMPONENTS D3D11)
     endif ()
-    
+
     if (URHO3D_D3D9)
         list (APPEND DIRECTX_REQUIRED_COMPONENTS D3D)
     endif ()
-    
+
     find_package (DirectX REQUIRED ${DIRECTX_REQUIRED_COMPONENTS} OPTIONAL_COMPONENTS ${DIRECTX_OPTIONAL_COMPONENTS})
     if (DIRECTX_FOUND)
         include_directories (SYSTEM ${DIRECTX_INCLUDE_DIRS})   # These variables may be empty when WinSDK or MinGW is being used

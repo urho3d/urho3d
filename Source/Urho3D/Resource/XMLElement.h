@@ -394,10 +394,10 @@ public:
 private:
     /// XPath query string.
     String queryString_;
-    
+
     /// Pugixml xpath_query.
     std::unique_ptr<pugi::xpath_query> query_;
-    
+
     /// Pugixml xpath_variable_set.
     std::unique_ptr<pugi::xpath_variable_set> variables_;
 };

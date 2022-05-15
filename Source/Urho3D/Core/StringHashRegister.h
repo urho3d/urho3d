@@ -40,7 +40,7 @@ public:
 private:
     /// Hash to string map.
     StringMap map_;
-    
+
     /// Mutex.
     std::unique_ptr<Mutex> mutex_;
 };

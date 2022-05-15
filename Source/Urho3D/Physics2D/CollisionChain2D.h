@@ -15,10 +15,10 @@ class URHO3D_API CollisionChain2D : public CollisionShape2D
 public:
     /// Construct.
     explicit CollisionChain2D(Context* context);
-    
+
     /// Destruct.
     ~CollisionChain2D() override;
-    
+
     /// Register object factory.
     /// @nobind
     static void RegisterObject(Context* context);
@@ -60,16 +60,16 @@ public:
 private:
     /// Apply node world scale.
     void ApplyNodeWorldScale() override;
-    
+
     /// Recreate fixture.
     void RecreateFixture();
 
     /// Chain shape.
     b2ChainShape chainShape_;
-    
+
     /// Loop.
     bool loop_;
-    
+
     /// Vertices.
     PODVector<Vector2> vertices_;
 };

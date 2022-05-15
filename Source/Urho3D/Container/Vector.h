@@ -249,7 +249,7 @@ public:
                 ++size_;
             else
                 Resize(size_ + 1);
-            
+
             Back() = value;
         }
         else

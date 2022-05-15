@@ -39,7 +39,7 @@ public:
     {
     }
 #endif
-                                                 
+
     /// Construct from a string.
     StringHash(const String& str) noexcept;      // NOLINT(google-explicit-constructor)
 

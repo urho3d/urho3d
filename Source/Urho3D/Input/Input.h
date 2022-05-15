@@ -461,13 +461,13 @@ private:
 #ifdef __EMSCRIPTEN__
     /// Emscripten Input glue instance.
     std::unique_ptr<EmscriptenInput> emscriptenInput_;
-    
+
     /// Flag used to detect mouse jump when exiting pointer-lock.
     bool emscriptenExitingPointerLock_;
-    
+
     /// Flag used to detect mouse jump on initial mouse click when entering pointer-lock.
     bool emscriptenEnteredPointerLock_;
-    
+
     /// Flag indicating current pointer-lock status.
     bool emscriptenPointerLock_;
 #endif
