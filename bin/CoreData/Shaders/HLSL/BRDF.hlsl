@@ -3,18 +3,18 @@
 
     // Following BRDF methods are based upon research Frostbite EA
     //[Lagrade et al. 2014, "Moving Frostbite to Physically Based Rendering"]
-    
+
     //Schlick Fresnel
     //specular  = the rgb specular color value of the pixel
-    //VdotH     = the dot product of the camera view direction and the half vector 
+    //VdotH     = the dot product of the camera view direction and the half vector
     float3 SchlickFresnel(float3 specular, float VdotH)
     {
         return specular + (float3(1.0, 1.0, 1.0) - specular) * pow(1.0 - VdotH, 5.0);
     }
 
-    //Schlick Gaussian Fresnel 
+    //Schlick Gaussian Fresnel
     //specular  = the rgb specular color value of the pixel
-    //VdotH     = the dot product of the camera view direction and the half vector 
+    //VdotH     = the dot product of the camera view direction and the half vector
     float3 SchlickGaussianFresnel(in float3 specular, in float VdotH)
     {
         float sphericalGaussian = pow(2.0, (-5.55473 * VdotH - 6.98316) * VdotH);
@@ -33,7 +33,7 @@
 
     //Get Fresnel
     //specular  = the rgb specular color value of the pixel
-    //VdotH     = the dot product of the camera view direction and the half vector 
+    //VdotH     = the dot product of the camera view direction and the half vector
     float3 Fresnel(float3 specular, float VdotH, float LdotH)
     {
         return SchlickFresnelCustom(specular, LdotH);
@@ -47,13 +47,13 @@
     float SmithGGXSchlickVisibility(float NdotL, float NdotV, float roughness)
     {
         float rough2 = roughness * roughness;
-        float lambdaV = NdotL  * sqrt((-NdotV * rough2 + NdotV) * NdotV + rough2);   
+        float lambdaV = NdotL  * sqrt((-NdotV * rough2 + NdotV) * NdotV + rough2);
         float lambdaL = NdotV  * sqrt((-NdotL * rough2 + NdotL) * NdotL + rough2);
-    
+
         return 0.5 / (lambdaV + lambdaL);
     }
 
-    float NeumannVisibility(float NdotV, float NdotL) 
+    float NeumannVisibility(float NdotV, float NdotL)
     {
         return NdotL * NdotV / max(1e-7, max(NdotL, NdotV));
     }

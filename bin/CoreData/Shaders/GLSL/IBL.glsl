@@ -18,14 +18,14 @@
     }
 
     // https://web.archive.org/web/20200228213025/http://the-witness.net/news/2012/02/seamless-cube-map-filtering/
-    vec3 FixCubeLookup(vec3 v, float cubeMapSize) 
+    vec3 FixCubeLookup(vec3 v, float cubeMapSize)
     {
         float M = max(max(abs(v.x), abs(v.y)), abs(v.z));
         float scale = (cubeMapSize - 1.0) / cubeMapSize;
 
         if (abs(v.x) != M) v.x *= scale;
         if (abs(v.y) != M) v.y *= scale;
-        if (abs(v.z) != M) v.z *= scale; 
+        if (abs(v.z) != M) v.z *= scale;
 
         return v;
     }

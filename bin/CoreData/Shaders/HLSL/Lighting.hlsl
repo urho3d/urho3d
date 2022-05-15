@@ -140,7 +140,7 @@ float GetAtten(float3 normal, float3 worldPos, out float3 lightDir)
 {
     lightDir = cLightDirPS;
     return saturate(dot(normal, lightDir));
-    
+
 }
 
 float GetAttenPoint(float3 normal, float3 worldPos, out float3 lightDir)
@@ -197,23 +197,23 @@ float GetIntensity(float3 color)
 #endif
 
 #ifdef VSM_SHADOW
-float ReduceLightBleeding(float min, float p_max)  
-{  
-    return clamp((p_max - min) / (1.0 - min), 0.0, 1.0);  
+float ReduceLightBleeding(float min, float p_max)
+{
+    return clamp((p_max - min) / (1.0 - min), 0.0, 1.0);
 }
 
-float Chebyshev(float2 Moments, float depth)  
-{  
-    //One-tailed inequality valid if depth > Moments.x  
-    float p = float(depth <= Moments.x);  
+float Chebyshev(float2 Moments, float depth)
+{
+    //One-tailed inequality valid if depth > Moments.x
+    float p = float(depth <= Moments.x);
     //Compute variance.
-    float Variance = Moments.y - (Moments.x * Moments.x); 
+    float Variance = Moments.y - (Moments.x * Moments.x);
 
     float minVariance = cVSMShadowParams.x;
-    Variance = max(Variance, minVariance);  
-    //Compute probabilistic upper bound.  
-    float d = depth - Moments.x;  
-    float p_max = Variance / (Variance + d*d); 
+    Variance = max(Variance, minVariance);
+    //Compute probabilistic upper bound.
+    float d = depth - Moments.x;
+    float p_max = Variance / (Variance + d*d);
     // Prevent light bleeding
     p_max = ReduceLightBleeding(cVSMShadowParams.y, p_max);
 
@@ -238,7 +238,7 @@ float GetShadow(float4 shadowPos)
                 return cShadowIntensity.y + cShadowIntensity.x * (inLight > shadowPos.z);
             #endif
         #endif
-    
+
     #elif defined(PCF_SHADOW)
         // Take four samples and average them
         // Note: in case of sampling a point light cube shadow, we optimize out the w divide as it has already been performed
@@ -269,7 +269,7 @@ float GetShadow(float4 shadowPos)
                 return cShadowIntensity.y + dot(inLight > shadowPos.z, cShadowIntensity.x);
             #endif
         #endif
-    
+
     #elif defined(VSM_SHADOW)
         float2 samples = Sample2D(ShadowMap, shadowPos.xy / shadowPos.w).rg;
         return cShadowIntensity.y + cShadowIntensity.x * Chebyshev(samples, shadowPos.z/shadowPos.w);
@@ -344,7 +344,7 @@ float GetDirShadowDeferred(float4 projWorldPos, float3 normal, float depth)
         else
             shadowPos = mul(projWorldPos, cLightMatricesPS[3]);
     #endif
-    
+
     return GetDirShadowFade(GetShadow(shadowPos), depth);
 }
 #endif

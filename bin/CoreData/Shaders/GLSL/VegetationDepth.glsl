@@ -15,7 +15,7 @@ void VS()
 {
     mat4 modelMatrix = iModelMatrix;
     vec3 worldPos = GetWorldPos(modelMatrix);
-    
+
     #ifdef WINDSTEMAXIS
         float stemDistance = dot(iPos.xyz, cWindStemAxis);
     #else

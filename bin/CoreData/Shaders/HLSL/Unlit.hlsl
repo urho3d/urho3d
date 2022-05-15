@@ -50,7 +50,7 @@ void VS(float4 iPos : POSITION,
     #if defined(D3D11) && defined(CLIPPLANE)
         oClip = dot(oPos, cClipPlane);
     #endif
-    
+
     #ifdef VERTEXCOLOR
         oColor = iColor;
     #endif

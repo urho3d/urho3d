@@ -24,11 +24,11 @@
 
         if (abs(v.x) != M) v.x *= scale;
         if (abs(v.y) != M) v.y *= scale;
-        if (abs(v.z) != M) v.z *= scale; 
+        if (abs(v.z) != M) v.z *= scale;
 
         return v;
     }
-    
+
     /// Calculate IBL contributation
     ///     reflectVec: reflection vector for cube sampling
     ///     wsNormal: surface normal in word space
@@ -36,7 +36,7 @@
     ///     roughness: surface roughness
     ///     ambientOcclusion: ambient occlusion
     float3 ImageBasedLighting(in float3 reflectVec, in float3 wsNormal, in float3 toCamera, in float3 diffColor, in float3 specColor, in float roughness, inout float3 reflectionCubeColor)
-    { 
+    {
         roughness = max(roughness, 0.08);
         reflectVec = GetSpecularDominantDir(wsNormal, reflectVec, roughness);
         const float ndv = saturate(dot(-toCamera, wsNormal));
@@ -45,9 +45,9 @@
 
         // float3 intersectMax = (cZoneMax - toCamera) / reflectVec;
         // float3 intersectMin = (cZoneMin - toCamera) / reflectVec;
-        
+
         // float3 furthestPlane = max(intersectMax, intersectMin);
-        
+
         // float planeDistance = min(min(furthestPlane.x, furthestPlane.y), furthestPlane.z);
 
         // // Get the intersection position
@@ -59,7 +59,7 @@
         const float cubeMapSize = 1024.0; // TODO This only works with textures of a given size
         float3 cube = SampleCubeLOD(ZoneCubeMap, float4(FixCubeLookup(reflectVec, cubeMapSize), mipSelect)).rgb;
         float3 cubeD = SampleCubeLOD(ZoneCubeMap, float4(FixCubeLookup(wsNormal, cubeMapSize), 9.0)).rgb;
-        
+
         // Fake the HDR texture
         float brightness = clamp(cAmbientColor.a, 0.0, 1.0);
         float darknessCutoff = clamp((cAmbientColor.a - 1.0) * 0.1, 0.0, 0.25);

@@ -69,7 +69,7 @@ void PS(float2 iScreenPos : TEXCOORD0,
         float2 dir;
         dir.x = -((lumaNW + lumaNE) - (lumaSW + lumaSE));
         dir.y =  ((lumaNW + lumaSW) - (lumaNE + lumaSE));
-    
+
         float dirReduce = max(
             (lumaNW + lumaNE + lumaSW + lumaSE) * (0.25 * FXAA_REDUCE_MUL),
             FXAA_REDUCE_MIN);
@@ -77,9 +77,9 @@ void PS(float2 iScreenPos : TEXCOORD0,
         dir = min(float2( FXAA_SPAN_MAX,  FXAA_SPAN_MAX),
               max(float2(-FXAA_SPAN_MAX, -FXAA_SPAN_MAX),
               dir * rcpDirMin)) * cGBufferInvSize.xy;
-    
+
         dir *= cFXAAParams.z;
-    
+
         float3 rgbA = (1.0/2.0) * (
             Sample2DLod0(DiffMap, iScreenPos + dir * (1.0/3.0 - 0.5)).xyz +
             Sample2DLod0(DiffMap, iScreenPos + dir * (2.0/3.0 - 0.5)).xyz);
@@ -87,7 +87,7 @@ void PS(float2 iScreenPos : TEXCOORD0,
             Sample2DLod0(DiffMap, iScreenPos + dir * (0.0/3.0 - 0.5)).xyz +
             Sample2DLod0(DiffMap, iScreenPos + dir * (3.0/3.0 - 0.5)).xyz);
         float lumaB = dot(rgbB, luma);
-        
+
         float3 rgbOut;
         if((lumaB < lumaMin) || (lumaB > lumaMax))
             rgbOut = rgbA;

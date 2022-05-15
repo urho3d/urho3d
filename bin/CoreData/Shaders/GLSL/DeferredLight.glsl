@@ -69,12 +69,12 @@ void PS()
     // Position acquired via near/far ray is relative to camera. Bring position to world space
     vec3 eyeVec = -worldPos;
     worldPos += cCameraPosPS;
-    
+
     vec3 normal = normalize(normalInput.rgb * 2.0 - 1.0);
     vec4 projWorldPos = vec4(worldPos, 1.0);
     vec3 lightColor;
     vec3 lightDir;
-    
+
     float diff = GetDiffuse(normal, worldPos, lightDir);
 
     #ifdef SHADOW

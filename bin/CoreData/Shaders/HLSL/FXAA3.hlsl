@@ -59,14 +59,14 @@ NOTE the other tuning knobs are now in the shader function inputs!
     //
     // Choose the quality preset.
     // This needs to be compiled into the shader as it effects code.
-    // Best option to include multiple presets is to 
+    // Best option to include multiple presets is to
     // in each shader define the preset, then include this file.
-    // 
+    //
     // OPTIONS
     // -----------------------------------------------------------------------
     // 10 to 15 - default medium dither (10=fastest, 15=highest quality)
     // 20 to 29 - less dither, more expensive (20=fastest, 29=highest quality)
-    // 39       - no dither, very expensive 
+    // 39       - no dither, very expensive
     //
     // NOTES
     // -----------------------------------------------------------------------
@@ -75,7 +75,7 @@ NOTE the other tuning knobs are now in the shader function inputs!
     // 23 = closest to FXAA 3.9 visually and performance wise
     //  _ = the lowest digit is directly related to performance
     // _  = the highest digit is directly related to style
-    // 
+    //
     #define FXAA_QUALITY_PRESET 12
 #endif
 
@@ -349,7 +349,7 @@ float4 FxaaPixelShader(
     //   0.333 - too little (faster)
     //   0.250 - low quality
     //   0.166 - default
-    //   0.125 - high quality 
+    //   0.125 - high quality
     //   0.063 - overkill (slower)
     float fxaaQualityEdgeThreshold,
     //
@@ -372,7 +372,7 @@ float4 FxaaPixelShader(
     float2 posM;
     posM.x = pos.x;
     posM.y = pos.y;
-    
+
     float4 rgbyM = FxaaTexTop(DiffMap, posM);
     rgbyM.y = CalcLuma(rgbyM.rgb);
     #define lumaM rgbyM.y
@@ -692,7 +692,7 @@ float4 FxaaPixelShader(
 /*============================================================================
 
                       Urho3D Vertex- and Pixelshader
-                      
+
 ============================================================================*/
 
 void VS(float4 iPos : POSITION,

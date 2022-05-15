@@ -32,7 +32,7 @@ void PS()
     #endif
 
     #ifdef UNCHARTED2
-    vec3 color = Uncharted2Tonemap(max(texture2D(sDiffMap, vScreenPos).rgb * cTonemapExposureBias, 0.0)) / 
+    vec3 color = Uncharted2Tonemap(max(texture2D(sDiffMap, vScreenPos).rgb * cTonemapExposureBias, 0.0)) /
         Uncharted2Tonemap(vec3(cTonemapMaxWhite, cTonemapMaxWhite, cTonemapMaxWhite));
     gl_FragColor = vec4(color, 1.0);
     #endif

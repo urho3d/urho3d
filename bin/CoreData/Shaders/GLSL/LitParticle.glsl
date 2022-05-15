@@ -62,7 +62,7 @@ void VS()
             // Spotlight projection: transform from world space to projector texture coordinates
             vSpotPos = projWorldPos * cLightMatrices[0];
         #endif
-    
+
         #ifdef POINTLIGHT
             vCubeMaskVec = (worldPos - cLightPos.xyz) * mat3(cLightMatrices[0][0].xyz, cLightMatrices[0][1].xyz, cLightMatrices[0][2].xyz);
         #endif
@@ -139,7 +139,7 @@ void PS()
         #ifdef SHADOW
             diff *= GetShadow(vShadowPos, vWorldPos.w);
         #endif
-    
+
         #if defined(SPOTLIGHT)
             lightColor = vSpotPos.w > 0.0 ? texture2DProj(sLightSpotMap, vSpotPos).rgb * cLightColor.rgb : vec3(0.0, 0.0, 0.0);
         #elif defined(CUBEMASK)

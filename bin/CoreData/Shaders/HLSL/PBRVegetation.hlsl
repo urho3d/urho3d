@@ -104,7 +104,7 @@ void VS(float4 iPos : POSITION,
 
     const float4x3 modelMatrix = iModelMatrix;
     float3 worldPos = GetWorldPos(modelMatrix);
-    
+
     #ifdef WINDSTEMAXIS
         float stemDistance = dot(iPos, cWindStemAxis);
     #else

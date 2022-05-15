@@ -114,7 +114,7 @@ void VS(float4 iPos : POSITION,
             for (int i = 0; i < NUMVERTEXLIGHTS; ++i)
                 oVertexLight += GetVertexLight(i, worldPos, oNormal) * cVertexLights[i * 3].rgb;
         #endif
-        
+
         oScreenPos = GetScreenPos(oPos);
     #endif
 }
@@ -178,13 +178,13 @@ void PS(float2 iTexCoord : TEXCOORD0,
         float3 lightDir;
         float3 lightColor;
         float3 finalColor;
-        
+
         float diff = GetDiffuse(normal, iWorldPos.xyz, lightDir);
 
         #ifdef SHADOW
             diff *= GetShadow(iShadowPos, iWorldPos.w);
         #endif
-    
+
         #if defined(SPOTLIGHT)
             lightColor = iSpotPos.w > 0.0 ? Sample2DProj(LightSpotMap, iSpotPos).rgb * cLightColor.rgb : 0.0;
         #elif defined(CUBEMASK)
@@ -192,7 +192,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
         #else
             lightColor = cLightColor.rgb;
         #endif
-    
+
         #ifdef SPECULAR
             float spec = GetSpecular(normal, cCameraPosPS - iWorldPos.xyz, lightDir, cMatSpecColor.a);
             finalColor = diff * lightColor * (diffColor.rgb + spec * specColor * cLightColor.a);

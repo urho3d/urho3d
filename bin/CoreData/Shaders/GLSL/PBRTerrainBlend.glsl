@@ -115,7 +115,7 @@ void PS()
     weights /= sumWeights;
     vec4 diffColor = cMatDiffColor * (
         weights.r * texture2D(sDetailMap1, vDetailTexCoord) +
-        weights.g * texture2D(sDetailMap2, vDetailTexCoord) + 
+        weights.g * texture2D(sDetailMap2, vDetailTexCoord) +
         weights.b * texture2D(sDetailMap3, vDetailTexCoord)
     );
 

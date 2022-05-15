@@ -27,7 +27,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
     out float4 oColor : OUTCOLOR0)
 {
     #ifdef BLUR3
-        #ifndef D3D11 
+        #ifndef D3D11
             oColor = GaussianBlur(3, cBlurDir, cBlurHInvSize * cBlurRadius, cBlurSigma, sDiffMap, iTexCoord);
         #else
             oColor = GaussianBlur(3, cBlurDir, cBlurHInvSize * cBlurRadius, cBlurSigma, tDiffMap, sDiffMap, iTexCoord);

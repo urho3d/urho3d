@@ -20,7 +20,7 @@ void VS(float4 iPos : POSITION,
     #ifdef NOUV
     float2 iTexCoord = float2(0.0, 0.0);
     #endif
-    
+
     float4x3 modelMatrix = iModelMatrix;
     float3 worldPos = GetWorldPos(modelMatrix);
     oPos = GetClipPos(worldPos);

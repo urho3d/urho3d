@@ -78,7 +78,7 @@ void PS()
     #ifdef SHADOW
         diff *= GetShadowDeferred(projWorldPos, normal, depth);
     #endif
-    
+
     #if defined(SPOTLIGHT)
         vec4 spotPos = projWorldPos * cLightMatricesPS[0];
         lightColor = spotPos.w > 0.0 ? texture2DProj(sLightSpotMap, spotPos).rgb * cLightColor.rgb : vec3(0.0);
