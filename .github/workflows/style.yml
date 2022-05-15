@@ -30,7 +30,7 @@ jobs:
         do
           git clone https://github.com/${{ github.repository }} engine_repo
           cd engine_repo
-          find ./bin -name '*.glsl' -or -name '*.hlsl' -or -name '*.xml' -exec perl -i -pe 's/[ \t]+(\r?\n)/$1/g' {} +
+          find ./bin -type f \( -name '*.glsl' -or -name '*.hlsl' -or -name '*.xml' \) -exec perl -i -pe 's/[ \t]+(\r?\n)/$1/g' {} +
           find ./cmake -type f -exec perl -i -pe 's/[ \t]+(\r?\n)/$1/g' {} +
           find ./Source/Urho3D -type f -exec perl -i -pe 's/[ \t]+(\r?\n)/$1/g' {} +
           git add -A
