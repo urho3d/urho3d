@@ -241,6 +241,9 @@ jobs:
           # Temporary use old version of Doxygen https://github.com/urho3d/Urho3D/issues/2757
           choco install --no-progress doxygen.install --version 1.8.20
           choco install --no-progress graphviz.portable
+          # Use MSYS2 instead obsolete MinGW
+          # https://github.com/urho3d/Urho3D/issues/2887
+          echo "c:\msys64\mingw32\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8
         continue-on-error: ${{ !startsWith(github.ref, 'refs/tags/') }}
       - name: CMake
         run: rake cmake
