@@ -3,7 +3,9 @@
 
 #pragma once
 
-#include "../Urho3DConfig.h"
+#include "../Base/PrimitiveTypes.h"
+
+#include <iterator>
 
 namespace Urho3D
 {
@@ -11,6 +13,12 @@ namespace Urho3D
 /// Random access iterator.
 template <class T> struct RandomAccessIterator
 {
+    using iterator_category = std::random_access_iterator_tag;
+    using difference_type = i32;
+    using value_type = T;
+    using pointer = T*;
+    using reference = T&;
+
     /// Construct.
     constexpr RandomAccessIterator() :
         ptr_(nullptr)
@@ -107,6 +115,12 @@ template <class T> struct RandomAccessIterator
 /// Random access const iterator.
 template <class T> struct RandomAccessConstIterator
 {
+    using iterator_category = std::random_access_iterator_tag;
+    using difference_type = i32;
+    using value_type = T;
+    using pointer = T*;
+    using reference = T&;
+
     /// Construct.
     constexpr RandomAccessConstIterator() :
         ptr_(0)
