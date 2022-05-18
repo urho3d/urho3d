@@ -42,7 +42,7 @@
 
     // Exact match
     #define URHO_CPP17_ONLY(x) x
-    #define URHO_CPP17_ONLY(x)
+    #define URHO_CPP20_ONLY(x)
 #else
     #error Compiler does not support required c++ standard. How did you get here?
 #endif
