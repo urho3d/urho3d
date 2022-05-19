@@ -9,9 +9,8 @@
 #include <Urho3D/Urho3D.h>
 #endif
 
-#include "../Base/Iter.h"
-#include "../Base/PrimitiveTypes.h"
 #include "../Container/Swap.h"
+#include "Iter.h"
 
 namespace Urho3D
 {
