@@ -164,7 +164,7 @@ void Unpack(const Vector<String>& arguments)
     {
         HashMap<String, PackageEntry>::ConstIterator current = i++;
         String outFilePath(dirName + "/" + current->first_);
-        unsigned pos = outFilePath.FindLast('/');
+        i32 pos = outFilePath.FindLast('/');
         if (pos == String::NPOS)
             ErrorExit("pos == String::NPOS");
 

@@ -75,7 +75,7 @@ bool LuaFile::LoadChunk(lua_State* luaState)
 
     // Get file base name
     String name = GetName();
-    unsigned extPos = name.FindLast('.');
+    i32 extPos = name.FindLast('.');
     if (extPos != String::NPOS)
         name = name.Substring(0, extPos);
 

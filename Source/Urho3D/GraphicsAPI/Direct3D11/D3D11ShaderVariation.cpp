@@ -247,7 +247,7 @@ bool ShaderVariation::Compile_D3D11()
 
     for (unsigned i = 0; i < defines.Size(); ++i)
     {
-        unsigned equalsPos = defines[i].Find('=');
+        i32 equalsPos = defines[i].Find('=');
         if (equalsPos != String::NPOS)
         {
             defineValues.Push(defines[i].Substring(equalsPos + 1));

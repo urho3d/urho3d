@@ -267,7 +267,7 @@ bool Text::SetFontSize(float size)
 void Text::DecodeToUnicode()
 {
     unicodeText_.Clear();
-    for (unsigned i = 0; i < text_.Length();)
+    for (i32 i = 0; i < text_.Length();)
         unicodeText_.Push(text_.NextUTF8Char(i));
 }
 

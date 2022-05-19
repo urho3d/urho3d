@@ -1286,7 +1286,7 @@ void BuildAndSaveAnimations(OutModel* model)
             if (model)
             {
                 unsigned boneIndex;
-                unsigned pos = channelName.Find("_$AssimpFbx$");
+                i32 pos = channelName.Find("_$AssimpFbx$");
 
                 if (!suppressFbxPivotNodes_ || pos == String::NPOS)
                 {
@@ -2783,7 +2783,7 @@ void ExtrapolatePivotlessAnimation(OutModel* model)
             {
                 aiNodeAnim* channel = anim->mChannels[j];
                 String channelName = FromAIString(channel->mNodeName);
-                unsigned pos = channelName.Find("_$AssimpFbx$");
+                i32 pos = channelName.Find("_$AssimpFbx$");
 
                 if (pos != String::NPOS)
                 {

@@ -99,7 +99,7 @@ void ExtractPropertyInfo(const String& functionName, const String& declaration, 
         if (info->type_.Empty())
         {
             // Extract type from parameters
-            unsigned begin = declaration.Find(',');
+            i32 begin = declaration.Find(',');
             if (begin == String::NPOS)
                 begin = declaration.Find('(');
             else
@@ -108,7 +108,7 @@ void ExtractPropertyInfo(const String& functionName, const String& declaration, 
             if (begin != String::NPOS)
             {
                 ++begin;
-                unsigned end = declaration.Find(')');
+                i32 end = declaration.Find(')');
                 if (end != String::NPOS)
                 {
                     info->type_ = declaration.Substring(begin, end - begin);
@@ -124,8 +124,8 @@ void ExtractPropertyInfo(const String& functionName, const String& declaration, 
 
 bool ComparePropertyStrings(const String& lhs, const String& rhs)
 {
-    int spaceLhs = lhs.Find(' ');
-    int spaceRhs = rhs.Find(' ');
+    i32 spaceLhs = lhs.Find(' ');
+    i32 spaceRhs = rhs.Find(' ');
     if (spaceLhs != String::NPOS && spaceRhs != String::NPOS)
         return String::Compare(lhs.CString() + spaceLhs, rhs.CString() + spaceRhs, true) < 0;
     else
@@ -153,15 +153,15 @@ void Script::OutputAPIRow(DumpMode mode, const String& row, bool removeReference
         out.Replace("?&", "void*");
 
         // s/(\w+)\[\]/Array<\1>/g
-        unsigned posBegin = String::NPOS;
+        i32 posBegin = String::NPOS;
         while (true)   // Loop to cater for array of array of T
         {
-            unsigned posEnd = out.Find("[]");
+            i32 posEnd = out.Find("[]");
             if (posEnd == String::NPOS)
                 break;
-            if (posBegin > posEnd)
+            if (posBegin == String::NPOS)
                 posBegin = posEnd - 1;
-            while (posBegin < posEnd && isalnum(out[posBegin]))
+            while (posBegin >= 0 && isalnum(out[posBegin]))
                 --posBegin;
             ++posBegin;
             out.Replace(posBegin, posEnd - posBegin + 2, "Array<" + out.Substring(posBegin, posEnd - posBegin) + ">");
@@ -217,8 +217,8 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
                     continue;
 
                 const String& sectionName = headerFiles[i].sectionName;
-                unsigned start = sectionName.Find('/') + 1;
-                unsigned end = sectionName.Find("Events.h");
+                i32 start = sectionName.Find('/') + 1;
+                i32 end = sectionName.Find("Events.h");
                 Log::WriteRaw("\n## %" + sectionName.Substring(start, end - start) + " events\n");
 
                 while (!file->IsEof())
@@ -466,11 +466,11 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
                         String prefix(typeName + "::");
                         declaration.Replace(prefix, "");
                         ///\todo Is there a better way to mark deprecated API bindings for AngelScript?
-                        unsigned posBegin = declaration.FindLast("const String&in = \"deprecated:");
+                        i32 posBegin = declaration.FindLast("const String&in = \"deprecated:");
                         if (posBegin != String::NPOS)
                         {
                             // Assume this 'mark' is added as the last parameter
-                            unsigned posEnd = declaration.Find(')', posBegin);
+                            i32 posEnd = declaration.Find(')', posBegin);
                             if (posEnd != String::NPOS)
                             {
                                 declaration.Replace(posBegin, posEnd - posBegin, "");

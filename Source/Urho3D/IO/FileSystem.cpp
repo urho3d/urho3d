@@ -629,7 +629,7 @@ bool FileSystem::DirExists(const String& pathName) const
         // Split the pathname into two components: the longest parent directory path and the last name component
         String assetPath(URHO3D_ASSET((fixedName + "/")));
         String parentPath;
-        unsigned pos = assetPath.FindLast('/', assetPath.Length() - 2);
+        i32 pos = assetPath.FindLast('/', assetPath.Length() - 2);
         if (pos != String::NPOS)
         {
             parentPath = assetPath.Substring(0, pos);
@@ -921,8 +921,8 @@ void SplitPath(const String& fullPath, String& pathName, String& fileName, Strin
 {
     String fullPathCopy = GetInternalPath(fullPath);
 
-    unsigned extPos = fullPathCopy.FindLast('.');
-    unsigned pathPos = fullPathCopy.FindLast('/');
+    i32 extPos = fullPathCopy.FindLast('.');
+    i32 pathPos = fullPathCopy.FindLast('/');
 
     if (extPos != String::NPOS && (pathPos == String::NPOS || extPos > pathPos))
     {
@@ -1002,7 +1002,7 @@ String RemoveTrailingSlash(const String& pathName)
 
 String GetParentPath(const String& path)
 {
-    unsigned pos = RemoveTrailingSlash(path).FindLast('/');
+    i32 pos = RemoveTrailingSlash(path).FindLast('/');
     if (pos != String::NPOS)
         return path.Substring(0, pos + 1);
     else

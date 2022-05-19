@@ -4902,7 +4902,7 @@ template <class T> void RegisterMembers_String(asIScriptEngine* engine, const ch
 {
     // String& String::Append(const char* str)
     // Error: type "const char*" can not automatically bind
-    // String& String::Append(const char* str, unsigned length)
+    // String& String::Append(const char* str, i32 length)
     // Error: type "const char*" can not automatically bind
     // String& String::AppendWithFormat(const char* formatString,...)
     // Error: type "const char*" can not automatically bind
@@ -4960,7 +4960,7 @@ template <class T> void RegisterMembers_String(asIScriptEngine* engine, const ch
     // Registerd as opCmp separately
     // bool String::operator >(const char* rhs) const
     // Error: type "const char*" can not automatically bind
-    // void String::Replace(unsigned pos, unsigned length, const char* replaceWith)
+    // void String::Replace(i32 pos, i32 length, const char* replaceWith)
     // Error: type "const char*" can not automatically bind
     // Iterator String::Replace(const Iterator& start, const Iterator& end, const String& replaceWith)
     // Error: type "const Iterator&" can not automatically bind
@@ -4978,23 +4978,23 @@ template <class T> void RegisterMembers_String(asIScriptEngine* engine, const ch
     // String& String::AppendUTF8(unsigned unicodeChar)
     engine->RegisterObjectMethod(className, "String& AppendUTF8(uint)", AS_METHODPR(T, AppendUTF8, (unsigned), String&), AS_CALL_THISCALL);
 
-    // char& String::At(unsigned index)
-    engine->RegisterObjectMethod(className, "int8& At(uint)", AS_METHODPR(T, At, (unsigned), char&), AS_CALL_THISCALL);
+    // char& String::At(i32 index)
+    engine->RegisterObjectMethod(className, "int8& At(int)", AS_METHODPR(T, At, (i32), char&), AS_CALL_THISCALL);
 
-    // const char& String::At(unsigned index) const
-    engine->RegisterObjectMethod(className, "const int8& At(uint) const", AS_METHODPR(T, At, (unsigned) const, const char&), AS_CALL_THISCALL);
+    // const char& String::At(i32 index) const
+    engine->RegisterObjectMethod(className, "const int8& At(int) const", AS_METHODPR(T, At, (i32) const, const char&), AS_CALL_THISCALL);
 
-    // unsigned String::AtUTF8(unsigned index) const
-    engine->RegisterObjectMethod(className, "uint AtUTF8(uint) const", AS_METHODPR(T, AtUTF8, (unsigned) const, unsigned), AS_CALL_THISCALL);
+    // unsigned String::AtUTF8(i32 index) const
+    engine->RegisterObjectMethod(className, "uint AtUTF8(int) const", AS_METHODPR(T, AtUTF8, (i32) const, unsigned), AS_CALL_THISCALL);
 
     // char String::Back() const
     engine->RegisterObjectMethod(className, "int8 Back() const", AS_METHODPR(T, Back, () const, char), AS_CALL_THISCALL);
 
-    // unsigned String::ByteOffsetUTF8(unsigned index) const
-    engine->RegisterObjectMethod(className, "uint ByteOffsetUTF8(uint) const", AS_METHODPR(T, ByteOffsetUTF8, (unsigned) const, unsigned), AS_CALL_THISCALL);
+    // i32 String::ByteOffsetUTF8(i32 index) const
+    engine->RegisterObjectMethod(className, "int ByteOffsetUTF8(int) const", AS_METHODPR(T, ByteOffsetUTF8, (i32) const, i32), AS_CALL_THISCALL);
 
-    // unsigned String::Capacity() const
-    engine->RegisterObjectMethod(className, "uint Capacity() const", AS_METHODPR(T, Capacity, () const, unsigned), AS_CALL_THISCALL);
+    // i32 String::Capacity() const
+    engine->RegisterObjectMethod(className, "int Capacity() const", AS_METHODPR(T, Capacity, () const, i32), AS_CALL_THISCALL);
 
     // void String::Clear()
     engine->RegisterObjectMethod(className, "void Clear()", AS_METHODPR(T, Clear, (), void), AS_CALL_THISCALL);
@@ -5018,29 +5018,29 @@ template <class T> void RegisterMembers_String(asIScriptEngine* engine, const ch
     // bool String::EndsWith(const String& str, bool caseSensitive = true) const
     engine->RegisterObjectMethod(className, "bool EndsWith(const String&in, bool = true) const", AS_METHODPR(T, EndsWith, (const String&, bool) const, bool), AS_CALL_THISCALL);
 
-    // void String::Erase(unsigned pos, unsigned length = 1)
-    engine->RegisterObjectMethod(className, "void Erase(uint, uint = 1)", AS_METHODPR(T, Erase, (unsigned, unsigned), void), AS_CALL_THISCALL);
+    // void String::Erase(i32 pos, i32 length = 1)
+    engine->RegisterObjectMethod(className, "void Erase(int, int = 1)", AS_METHODPR(T, Erase, (i32, i32), void), AS_CALL_THISCALL);
 
-    // unsigned String::Find(const String& str, unsigned startPos = 0, bool caseSensitive = true) const
-    engine->RegisterObjectMethod(className, "uint Find(const String&in, uint = 0, bool = true) const", AS_METHODPR(T, Find, (const String&, unsigned, bool) const, unsigned), AS_CALL_THISCALL);
+    // i32 String::Find(const String& str, i32 startPos = 0, bool caseSensitive = true) const
+    engine->RegisterObjectMethod(className, "int Find(const String&in, int = 0, bool = true) const", AS_METHODPR(T, Find, (const String&, i32, bool) const, i32), AS_CALL_THISCALL);
 
-    // unsigned String::Find(char c, unsigned startPos = 0, bool caseSensitive = true) const
-    engine->RegisterObjectMethod(className, "uint Find(int8, uint = 0, bool = true) const", AS_METHODPR(T, Find, (char, unsigned, bool) const, unsigned), AS_CALL_THISCALL);
+    // i32 String::Find(char c, i32 startPos = 0, bool caseSensitive = true) const
+    engine->RegisterObjectMethod(className, "int Find(int8, int = 0, bool = true) const", AS_METHODPR(T, Find, (char, i32, bool) const, i32), AS_CALL_THISCALL);
 
-    // unsigned String::FindLast(const String& str, unsigned startPos = NPOS, bool caseSensitive = true) const
-    engine->RegisterObjectMethod(className, "uint FindLast(const String&in, uint = String::NPOS, bool = true) const", AS_METHODPR(T, FindLast, (const String&, unsigned, bool) const, unsigned), AS_CALL_THISCALL);
+    // i32 String::FindLast(const String& str, i32 startPos = NPOS, bool caseSensitive = true) const
+    engine->RegisterObjectMethod(className, "int FindLast(const String&in, int = String::NPOS, bool = true) const", AS_METHODPR(T, FindLast, (const String&, i32, bool) const, i32), AS_CALL_THISCALL);
 
-    // unsigned String::FindLast(char c, unsigned startPos = NPOS, bool caseSensitive = true) const
-    engine->RegisterObjectMethod(className, "uint FindLast(int8, uint = String::NPOS, bool = true) const", AS_METHODPR(T, FindLast, (char, unsigned, bool) const, unsigned), AS_CALL_THISCALL);
+    // i32 String::FindLast(char c, i32 startPos = NPOS, bool caseSensitive = true) const
+    engine->RegisterObjectMethod(className, "int FindLast(int8, int = String::NPOS, bool = true) const", AS_METHODPR(T, FindLast, (char, i32, bool) const, i32), AS_CALL_THISCALL);
 
     // char String::Front() const
     engine->RegisterObjectMethod(className, "int8 Front() const", AS_METHODPR(T, Front, () const, char), AS_CALL_THISCALL);
 
-    // void String::Insert(unsigned pos, const String& str)
-    engine->RegisterObjectMethod(className, "void Insert(uint, const String&in)", AS_METHODPR(T, Insert, (unsigned, const String&), void), AS_CALL_THISCALL);
+    // void String::Insert(i32 pos, const String& str)
+    engine->RegisterObjectMethod(className, "void Insert(int, const String&in)", AS_METHODPR(T, Insert, (i32, const String&), void), AS_CALL_THISCALL);
 
-    // void String::Insert(unsigned pos, char c)
-    engine->RegisterObjectMethod(className, "void Insert(uint, int8)", AS_METHODPR(T, Insert, (unsigned, char), void), AS_CALL_THISCALL);
+    // void String::Insert(i32 pos, char c)
+    engine->RegisterObjectMethod(className, "void Insert(int, int8)", AS_METHODPR(T, Insert, (i32, char), void), AS_CALL_THISCALL);
 
     // bool String::IsShort() const
     engine->RegisterObjectMethod(className, "bool IsShort() const", AS_METHODPR(T, IsShort, () const, bool), AS_CALL_THISCALL);
@@ -5048,16 +5048,16 @@ template <class T> void RegisterMembers_String(asIScriptEngine* engine, const ch
     // void String::Join(const Vector<String>& subStrings, const String& glue)
     engine->RegisterObjectMethod(className, "void Join(Array<String>@+, const String&in)", AS_FUNCTION_OBJFIRST(String_void_Join_constspVectorlesStringgreamp_constspStringamp_template<String>), AS_CALL_CDECL_OBJFIRST);
 
-    // unsigned String::Length() const
-    engine->RegisterObjectMethod(className, "uint Length() const", AS_METHODPR(T, Length, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_length() const", AS_METHODPR(T, Length, () const, unsigned), AS_CALL_THISCALL);
+    // i32 String::Length() const
+    engine->RegisterObjectMethod(className, "int Length() const", AS_METHODPR(T, Length, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_length() const", AS_METHODPR(T, Length, () const, i32), AS_CALL_THISCALL);
 
-    // unsigned String::LengthUTF8() const
-    engine->RegisterObjectMethod(className, "uint LengthUTF8() const", AS_METHODPR(T, LengthUTF8, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_utf8Length() const", AS_METHODPR(T, LengthUTF8, () const, unsigned), AS_CALL_THISCALL);
+    // i32 String::LengthUTF8() const
+    engine->RegisterObjectMethod(className, "int LengthUTF8() const", AS_METHODPR(T, LengthUTF8, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_utf8Length() const", AS_METHODPR(T, LengthUTF8, () const, i32), AS_CALL_THISCALL);
 
-    // unsigned String::NextUTF8Char(unsigned& byteOffset) const
-    engine->RegisterObjectMethod(className, "uint NextUTF8Char(uint&) const", AS_METHODPR(T, NextUTF8Char, (unsigned&) const, unsigned), AS_CALL_THISCALL);
+    // unsigned String::NextUTF8Char(i32& byteOffset) const
+    engine->RegisterObjectMethod(className, "uint NextUTF8Char(int&) const", AS_METHODPR(T, NextUTF8Char, (i32&) const, unsigned), AS_CALL_THISCALL);
 
     // String String::operator +(const String& rhs) const
     engine->RegisterObjectMethod(className, "String opAdd(const String&in) const", AS_METHODPR(T, operator+, (const String&) const, String), AS_CALL_THISCALL);
@@ -5098,11 +5098,11 @@ template <class T> void RegisterMembers_String(asIScriptEngine* engine, const ch
     // bool String::operator ==(const String& rhs) const
     engine->RegisterObjectMethod(className, "bool opEquals(const String&in) const", AS_METHODPR(T, operator==, (const String&) const, bool), AS_CALL_THISCALL);
 
-    // char& String::operator [](unsigned index)
-    engine->RegisterObjectMethod(className, "int8& opIndex(uint)", AS_METHODPR(T, operator[], (unsigned), char&), AS_CALL_THISCALL);
+    // char& String::operator [](i32 index)
+    engine->RegisterObjectMethod(className, "int8& opIndex(int)", AS_METHODPR(T, operator[], (i32), char&), AS_CALL_THISCALL);
 
-    // const char& String::operator [](unsigned index) const
-    engine->RegisterObjectMethod(className, "const int8& opIndex(uint) const", AS_METHODPR(T, operator[], (unsigned) const, const char&), AS_CALL_THISCALL);
+    // const char& String::operator [](i32 index) const
+    engine->RegisterObjectMethod(className, "const int8& opIndex(int) const", AS_METHODPR(T, operator[], (i32) const, const char&), AS_CALL_THISCALL);
 
     // void String::Replace(char replaceThis, char replaceWith, bool caseSensitive = true)
     engine->RegisterObjectMethod(className, "void Replace(int8, int8, bool = true)", AS_METHODPR(T, Replace, (char, char, bool), void), AS_CALL_THISCALL);
@@ -5110,8 +5110,8 @@ template <class T> void RegisterMembers_String(asIScriptEngine* engine, const ch
     // void String::Replace(const String& replaceThis, const String& replaceWith, bool caseSensitive = true)
     engine->RegisterObjectMethod(className, "void Replace(const String&in, const String&in, bool = true)", AS_METHODPR(T, Replace, (const String&, const String&, bool), void), AS_CALL_THISCALL);
 
-    // void String::Replace(unsigned pos, unsigned length, const String& replaceWith)
-    engine->RegisterObjectMethod(className, "void Replace(uint, uint, const String&in)", AS_METHODPR(T, Replace, (unsigned, unsigned, const String&), void), AS_CALL_THISCALL);
+    // void String::Replace(i32 pos, i32 length, const String& replaceWith)
+    engine->RegisterObjectMethod(className, "void Replace(int, int, const String&in)", AS_METHODPR(T, Replace, (i32, i32, const String&), void), AS_CALL_THISCALL);
 
     // String String::Replaced(char replaceThis, char replaceWith, bool caseSensitive = true) const
     engine->RegisterObjectMethod(className, "String Replaced(int8, int8, bool = true) const", AS_METHODPR(T, Replaced, (char, char, bool) const, String), AS_CALL_THISCALL);
@@ -5119,14 +5119,14 @@ template <class T> void RegisterMembers_String(asIScriptEngine* engine, const ch
     // String String::Replaced(const String& replaceThis, const String& replaceWith, bool caseSensitive = true) const
     engine->RegisterObjectMethod(className, "String Replaced(const String&in, const String&in, bool = true) const", AS_METHODPR(T, Replaced, (const String&, const String&, bool) const, String), AS_CALL_THISCALL);
 
-    // void String::ReplaceUTF8(unsigned index, unsigned unicodeChar)
-    engine->RegisterObjectMethod(className, "void ReplaceUTF8(uint, uint)", AS_METHODPR(T, ReplaceUTF8, (unsigned, unsigned), void), AS_CALL_THISCALL);
+    // void String::ReplaceUTF8(i32 index, unsigned unicodeChar)
+    engine->RegisterObjectMethod(className, "void ReplaceUTF8(int, uint)", AS_METHODPR(T, ReplaceUTF8, (i32, unsigned), void), AS_CALL_THISCALL);
 
-    // void String::Reserve(unsigned newCapacity)
-    engine->RegisterObjectMethod(className, "void Reserve(uint)", AS_METHODPR(T, Reserve, (unsigned), void), AS_CALL_THISCALL);
+    // void String::Reserve(i32 newCapacity)
+    engine->RegisterObjectMethod(className, "void Reserve(int)", AS_METHODPR(T, Reserve, (i32), void), AS_CALL_THISCALL);
 
-    // void String::Resize(unsigned newLength)
-    engine->RegisterObjectMethod(className, "void Resize(uint)", AS_METHODPR(T, Resize, (unsigned), void), AS_CALL_THISCALL);
+    // void String::Resize(i32 newLength)
+    engine->RegisterObjectMethod(className, "void Resize(int)", AS_METHODPR(T, Resize, (i32), void), AS_CALL_THISCALL);
 
     // Vector<String> String::Split(char separator, bool keepEmptyStrings = false) const
     engine->RegisterObjectMethod(className, "Array<String>@ Split(int8, bool = false) const", AS_FUNCTION_OBJFIRST(String_VectorlesStringgre_Split_char_bool_template<String>), AS_CALL_CDECL_OBJFIRST);
@@ -5134,17 +5134,17 @@ template <class T> void RegisterMembers_String(asIScriptEngine* engine, const ch
     // bool String::StartsWith(const String& str, bool caseSensitive = true) const
     engine->RegisterObjectMethod(className, "bool StartsWith(const String&in, bool = true) const", AS_METHODPR(T, StartsWith, (const String&, bool) const, bool), AS_CALL_THISCALL);
 
-    // String String::Substring(unsigned pos) const
-    engine->RegisterObjectMethod(className, "String Substring(uint) const", AS_METHODPR(T, Substring, (unsigned) const, String), AS_CALL_THISCALL);
+    // String String::Substring(i32 pos) const
+    engine->RegisterObjectMethod(className, "String Substring(int) const", AS_METHODPR(T, Substring, (i32) const, String), AS_CALL_THISCALL);
 
-    // String String::Substring(unsigned pos, unsigned length) const
-    engine->RegisterObjectMethod(className, "String Substring(uint, uint) const", AS_METHODPR(T, Substring, (unsigned, unsigned) const, String), AS_CALL_THISCALL);
+    // String String::Substring(i32 pos, i32 length) const
+    engine->RegisterObjectMethod(className, "String Substring(int, int) const", AS_METHODPR(T, Substring, (i32, i32) const, String), AS_CALL_THISCALL);
 
-    // String String::SubstringUTF8(unsigned pos) const
-    engine->RegisterObjectMethod(className, "String SubstringUTF8(uint) const", AS_METHODPR(T, SubstringUTF8, (unsigned) const, String), AS_CALL_THISCALL);
+    // String String::SubstringUTF8(i32 pos) const
+    engine->RegisterObjectMethod(className, "String SubstringUTF8(int) const", AS_METHODPR(T, SubstringUTF8, (i32) const, String), AS_CALL_THISCALL);
 
-    // String String::SubstringUTF8(unsigned pos, unsigned length) const
-    engine->RegisterObjectMethod(className, "String SubstringUTF8(uint, uint) const", AS_METHODPR(T, SubstringUTF8, (unsigned, unsigned) const, String), AS_CALL_THISCALL);
+    // String String::SubstringUTF8(i32 pos, i32 length) const
+    engine->RegisterObjectMethod(className, "String SubstringUTF8(int, int) const", AS_METHODPR(T, SubstringUTF8, (i32, i32) const, String), AS_CALL_THISCALL);
 
     // void String::Swap(String& str)
     engine->RegisterObjectMethod(className, "void Swap(String&)", AS_METHODPR(T, Swap, (String&), void), AS_CALL_THISCALL);
@@ -5174,7 +5174,7 @@ template <class T> void RegisterMembers_String(asIScriptEngine* engine, const ch
     // Error: type "char*&" can not automatically bind
     // static unsigned String::DecodeUTF8(const char*& src)
     // Error: type "const char*&" can not automatically bind
-    // static unsigned String::CStringLength(const char* str)
+    // static i32 String::CStringLength(const char* str)
     // Error: type "const char*" can not automatically bind
     // static int String::Compare(const char* lhs, const char* rhs, bool caseSensitive)
     // Error: type "const char*" can not automatically bind
@@ -5184,8 +5184,8 @@ template <class T> void RegisterMembers_String(asIScriptEngine* engine, const ch
     // ShortString String::shortString_
     // Not registered because have @nobind mark
 
-    // static constexpr unsigned String::NPOS
-    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const uint NPOS", (void*)&T::NPOS);engine->SetDefaultNamespace("");
+    // static constexpr i32 String::NPOS
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const int NPOS", (void*)&T::NPOS);engine->SetDefaultNamespace("");
 
     // static const String String::EMPTY
     engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const String EMPTY", (void*)&T::EMPTY);engine->SetDefaultNamespace("");
@@ -6582,25 +6582,25 @@ template <class T> void RegisterMembers_VertexElement(asIScriptEngine* engine, c
 // class WString | File: ../Container/Str.h
 template <class T> void RegisterMembers_WString(asIScriptEngine* engine, const char* className)
 {
-    // wchar_t& WString::At(unsigned index)
+    // wchar_t& WString::At(i32 index)
     // Error: type "wchar_t&" can not automatically bind
-    // const wchar_t& WString::At(unsigned index) const
+    // const wchar_t& WString::At(i32 index) const
     // Error: type "const wchar_t&" can not automatically bind
     // const wchar_t* WString::CString() const
     // Error: type "const wchar_t*" can not automatically bind
-    // wchar_t& WString::operator [](unsigned index)
+    // wchar_t& WString::operator [](i32 index)
     // Error: type "wchar_t&" can not automatically bind
-    // const wchar_t& WString::operator [](unsigned index) const
+    // const wchar_t& WString::operator [](i32 index) const
     // Error: type "const wchar_t&" can not automatically bind
 
     // bool WString::Empty() const
     engine->RegisterObjectMethod(className, "bool Empty() const", AS_METHODPR(T, Empty, () const, bool), AS_CALL_THISCALL);
 
-    // unsigned WString::Length() const
-    engine->RegisterObjectMethod(className, "uint Length() const", AS_METHODPR(T, Length, () const, unsigned), AS_CALL_THISCALL);
+    // i32 WString::Length() const
+    engine->RegisterObjectMethod(className, "int Length() const", AS_METHODPR(T, Length, () const, i32), AS_CALL_THISCALL);
 
-    // void WString::Resize(unsigned newLength)
-    engine->RegisterObjectMethod(className, "void Resize(uint)", AS_METHODPR(T, Resize, (unsigned), void), AS_CALL_THISCALL);
+    // void WString::Resize(i32 newLength)
+    engine->RegisterObjectMethod(className, "void Resize(int)", AS_METHODPR(T, Resize, (i32), void), AS_CALL_THISCALL);
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_WString
         REGISTER_MEMBERS_MANUAL_PART_WString();
