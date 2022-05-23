@@ -19,14 +19,14 @@ namespace Urho3D
 
 void CommentOutFunction(String& code, const String& signature)
 {
-    unsigned startPos = code.Find(signature);
+    i32 startPos = code.Find(signature);
     unsigned braceLevel = 0;
     if (startPos == String::NPOS)
         return;
 
     code.Insert(startPos, "/*");
 
-    for (unsigned i = startPos + 2 + signature.Length(); i < code.Length(); ++i)
+    for (i32 i = startPos + 2 + signature.Length(); i < code.Length(); ++i)
     {
         if (code[i] == '{')
             ++braceLevel;

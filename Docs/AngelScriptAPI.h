@@ -29509,7 +29509,7 @@ String(float);
 String(double);
 String(bool);
 String(int8);
-String(int8, uint);
+String(int8, int);
 String(const char*);
 // Methods:
 String  operator+(bool) const;
@@ -29537,15 +29537,15 @@ String&  operator=(float);
 String&  operator=(int);
 String&  operator=(uint);
 bool  operator==(const String&) const;
-int8&  operator[](uint);
+int8&  operator[](int);
 String& Append(const String&);
 String& Append(int8);
 String& AppendUTF8(uint);
-int8& At(uint);
-uint AtUTF8(uint) const;
+int8& At(int);
+uint AtUTF8(int) const;
 int8 Back() const;
-uint ByteOffsetUTF8(uint) const;
-uint Capacity() const;
+int ByteOffsetUTF8(int) const;
+int Capacity() const;
 void Clear();
 void Compact();
 int Compare(const String&, bool = true) const;
@@ -29553,33 +29553,33 @@ bool Contains(const String&, bool = true) const;
 bool Contains(int8, bool = true) const;
 bool Empty() const;
 bool EndsWith(const String&, bool = true) const;
-void Erase(uint, uint = 1);
-uint Find(const String&, uint = 0, bool = true) const;
-uint Find(int8, uint = 0, bool = true) const;
-uint FindLast(const String&, uint = String :: NPOS, bool = true) const;
-uint FindLast(int8, uint = String :: NPOS, bool = true) const;
+void Erase(int, int = 1);
+int Find(const String&, int = 0, bool = true) const;
+int Find(int8, int = 0, bool = true) const;
+int FindLast(const String&, int = String :: NPOS, bool = true) const;
+int FindLast(int8, int = String :: NPOS, bool = true) const;
 int8 Front() const;
-void Insert(uint, const String&);
-void Insert(uint, int8);
+void Insert(int, const String&);
+void Insert(int, int8);
 bool IsShort() const;
 void Join(Array<String>, const String&);
-uint Length() const;
-uint LengthUTF8() const;
-uint NextUTF8Char(uint&) const;
+int Length() const;
+int LengthUTF8() const;
+uint NextUTF8Char(int&) const;
 void Replace(const String&, const String&, bool = true);
+void Replace(int, int, const String&);
 void Replace(int8, int8, bool = true);
-void Replace(uint, uint, const String&);
-void ReplaceUTF8(uint, uint);
+void ReplaceUTF8(int, uint);
 String Replaced(const String&, const String&, bool = true) const;
 String Replaced(int8, int8, bool = true) const;
-void Reserve(uint);
-void Resize(uint);
+void Reserve(int);
+void Resize(int);
 Array<String> Split(int8, bool = false) const;
 bool StartsWith(const String&, bool = true) const;
-String Substring(uint) const;
-String Substring(uint, uint) const;
-String SubstringUTF8(uint) const;
-String SubstringUTF8(uint, uint) const;
+String Substring(int) const;
+String Substring(int, int) const;
+String SubstringUTF8(int) const;
+String SubstringUTF8(int, int) const;
 void Swap(String&);
 bool ToBool() const;
 Color ToColor() const;
@@ -29604,20 +29604,20 @@ Vector3 ToVector3() const;
 Vector4 ToVector4(bool allowMissingCoords = false) const;
 Variant ToVectorVariant() const;
 String Trimmed() const;
-const int8&  operator[](uint) const;
-const int8& At(uint) const;
+const int8&  operator[](int) const;
+const int8& At(int) const;
 
 // Properties:
 /* readonly */
 bool empty;
 /* readonly */
-uint length;
+int length;
 /* readonly */
-uint utf8Length;
+int utf8Length;
 
 // Constants:
 static const String EMPTY;
-static const uint NPOS;
+static const int NPOS;
 };
 
 class StringHash

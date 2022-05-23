@@ -2323,9 +2323,9 @@ static void ConstructStringCopy(const String& str, String* ptr)
     new(ptr) String(str);
 }
 
-static char* StringCharAt(unsigned i, String& str)
+static char* StringCharAt(i32 i, String& str)
 {
-    if (i >= str.Length())
+    if (i < 0 || i >= str.Length())
     {
         asIScriptContext* context = asGetActiveContext();
         if (context)

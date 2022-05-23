@@ -65,7 +65,7 @@ void HttpRequest::ThreadFunction()
     String path = "/";
     int port = 80;
 
-    unsigned protocolEnd = url_.Find("://");
+    i32 protocolEnd = url_.Find("://");
     if (protocolEnd != String::NPOS)
     {
         protocol = url_.Substring(0, protocolEnd);
@@ -74,14 +74,14 @@ void HttpRequest::ThreadFunction()
     else
         host = url_;
 
-    unsigned pathStart = host.Find('/');
+    i32 pathStart = host.Find('/');
     if (pathStart != String::NPOS)
     {
         path = host.Substring(pathStart);
         host = host.Substring(0, pathStart);
     }
 
-    unsigned portStart = host.Find(':');
+    i32 portStart = host.Find(':');
     if (portStart != String::NPOS)
     {
         port = ToInt(host.Substring(portStart + 1));

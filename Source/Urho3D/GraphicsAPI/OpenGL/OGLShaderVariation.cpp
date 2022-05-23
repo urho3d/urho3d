@@ -89,8 +89,8 @@ bool ShaderVariation::Create_OGL()
     String shaderCode;
 
     // Check if the shader code contains a version define
-    unsigned verStart = originalShaderCode.Find('#');
-    unsigned verEnd = 0;
+    i32 verStart = originalShaderCode.Find('#');
+    i32 verEnd = 0;
     if (verStart != String::NPOS)
     {
         if (originalShaderCode.Substring(verStart + 1, 7) == "version")

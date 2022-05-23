@@ -2484,8 +2484,8 @@ static void String__String_char(String* _ptr, char value)
     new(_ptr) String(value);
 }
 
-// explicit String::String(char value, unsigned length)
-static void String__String_char_unsigned(String* _ptr, char value, unsigned length)
+// explicit String::String(char value, i32 length)
+static void String__String_char_i32(String* _ptr, char value, i32 length)
 {
     new(_ptr) String(value, length);
 }
@@ -2499,7 +2499,7 @@ static void Register_String(asIScriptEngine* engine)
     // Error: type "char*" can not automatically bind
     // String::String(const char* str)
     // Error: type "const char*" can not automatically bind
-    // String::String(const char* str, unsigned length)
+    // String::String(const char* str, i32 length)
     // Error: type "const char*" can not automatically bind
     // explicit String::String(const WString& str)
     // Error: type "WString" can not automatically bind bacause have @nobind mark
@@ -2536,8 +2536,8 @@ static void Register_String(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("String", asBEHAVE_CONSTRUCT, "void f(bool)", AS_FUNCTION_OBJFIRST(String__String_bool), AS_CALL_CDECL_OBJFIRST);
     // explicit String::String(char value)
     engine->RegisterObjectBehaviour("String", asBEHAVE_CONSTRUCT, "void f(int8)", AS_FUNCTION_OBJFIRST(String__String_char), AS_CALL_CDECL_OBJFIRST);
-    // explicit String::String(char value, unsigned length)
-    engine->RegisterObjectBehaviour("String", asBEHAVE_CONSTRUCT, "void f(int8, uint)", AS_FUNCTION_OBJFIRST(String__String_char_unsigned), AS_CALL_CDECL_OBJFIRST);
+    // explicit String::String(char value, i32 length)
+    engine->RegisterObjectBehaviour("String", asBEHAVE_CONSTRUCT, "void f(int8, int)", AS_FUNCTION_OBJFIRST(String__String_char_i32), AS_CALL_CDECL_OBJFIRST);
 
     // String::~String()
     engine->RegisterObjectBehaviour("String", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(String), AS_CALL_CDECL_OBJFIRST);

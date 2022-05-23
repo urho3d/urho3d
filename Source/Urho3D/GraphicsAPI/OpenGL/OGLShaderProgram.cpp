@@ -243,7 +243,7 @@ bool ShaderProgram_OGL::Link()
 
         // Check for array index included in the name and strip it
         String name(nameBuffer);
-        unsigned index = name.Find('[');
+        i32 index = name.Find('[');
         if (index != String::NPOS)
         {
             // If not the first index, skip
