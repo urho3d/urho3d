@@ -340,7 +340,7 @@ public:
     }
 
     /// Resize the list by removing or adding items at the end.
-    void Resize(unsigned newSize)
+    void Resize(i32 newSize)
     {
         while (size_ > newSize)
             Pop();
@@ -395,7 +395,7 @@ public:
     const T& Back() const { return *(--End()); }
 
     /// Return number of elements.
-    unsigned Size() const { return size_; }
+    i32 Size() const { return size_; }
 
     /// Return whether list is empty.
     bool Empty() const { return size_ == 0; }

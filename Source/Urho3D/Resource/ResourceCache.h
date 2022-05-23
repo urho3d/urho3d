@@ -6,7 +6,6 @@
 #pragma once
 
 #include "../Container/HashSet.h"
-#include "../Container/List.h"
 #include "../Core/Mutex.h"
 #include "../IO/File.h"
 #include "../Resource/Resource.h"

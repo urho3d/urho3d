@@ -4,7 +4,6 @@
 #pragma once
 
 #include "../Container/HashSet.h"
-#include "../Container/List.h"
 #include "../Core/Object.h"
 #include "../Graphics/Batch.h"
 #include "../Graphics/Light.h"
