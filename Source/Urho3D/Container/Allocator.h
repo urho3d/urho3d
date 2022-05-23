@@ -9,6 +9,8 @@
 #include <Urho3D/Urho3D.h>
 #endif
 
+#include "../Base/PrimitiveTypes.h"
+
 #include <cstddef>
 
 namespace Urho3D

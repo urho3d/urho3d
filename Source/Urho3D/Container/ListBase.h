@@ -100,7 +100,7 @@ protected:
     /// Node allocator.
     AllocatorBlock* allocator_;
     /// Number of nodes.
-    unsigned size_;
+    i32 size_;
 };
 
 }

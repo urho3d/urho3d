@@ -4,7 +4,6 @@
 #pragma once
 
 #include "../Container/ArrayPtr.h"
-#include "../Container/List.h"
 #include "../Math/AreaAllocator.h"
 
 namespace Urho3D
