@@ -5,6 +5,7 @@
 
 #include "../Container/HashBase.h"
 #include "../Container/Sort.h"
+#include "../Math/MathDefs.h"
 
 #include <cassert>
 #include <initializer_list>
@@ -427,11 +428,7 @@ public:
         if (!numBuckets || numBuckets < Size() / MAX_LOAD_FACTOR)
             return false;
 
-        // Check for being power of two
-        unsigned check = numBuckets;
-        while (!(check & 1u))
-            check >>= 1;
-        if (check != 1)
+        if (!IsPowerOfTwo(numBuckets))
             return false;
 
         AllocateBuckets(Size(), numBuckets);
