@@ -82,10 +82,10 @@ class URHO3D_API HashBase
 {
 public:
     /// Initial amount of buckets.
-    static inline constexpr unsigned MIN_BUCKETS = 8;
+    static inline constexpr i32 MIN_BUCKETS = 8;
 
     /// Maximum load factor.
-    static inline constexpr unsigned MAX_LOAD_FACTOR = 4;
+    static inline constexpr i32 MAX_LOAD_FACTOR = 4;
 
     /// Construct.
     HashBase() :
@@ -106,23 +106,23 @@ public:
     }
 
     /// Return number of elements.
-    unsigned Size() const { return ptrs_ ? (reinterpret_cast<unsigned*>(ptrs_))[0] : 0; }
+    i32 Size() const { return ptrs_ ? (reinterpret_cast<i32*>(ptrs_))[0] : 0; }
 
     /// Return number of buckets.
-    unsigned NumBuckets() const { return ptrs_ ? (reinterpret_cast<unsigned*>(ptrs_))[1] : 0; }
+    i32 NumBuckets() const { return ptrs_ ? (reinterpret_cast<i32*>(ptrs_))[1] : 0; }
 
     /// Return whether has no elements.
     bool Empty() const { return Size() == 0; }
 
 protected:
     /// Allocate bucket head pointers + room for size and bucket count variables.
-    void AllocateBuckets(unsigned size, unsigned numBuckets);
+    void AllocateBuckets(i32 size, i32 numBuckets);
 
     /// Reset bucket head pointers.
     void ResetPtrs();
 
     /// Set new size.
-    void SetSize(unsigned size) { if (ptrs_) (reinterpret_cast<unsigned*>(ptrs_))[0] = size; }
+    void SetSize(i32 size);
 
     /// Return bucket head pointers.
     HashNodeBase** Ptrs() const { return ptrs_ ? ptrs_ + 2 : nullptr; }

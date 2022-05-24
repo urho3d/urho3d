@@ -1744,20 +1744,20 @@ template <class T> void RegisterMembers_HashBase(asIScriptEngine* engine, const 
     // bool HashBase::Empty() const
     engine->RegisterObjectMethod(className, "bool Empty() const", AS_METHODPR(T, Empty, () const, bool), AS_CALL_THISCALL);
 
-    // unsigned HashBase::NumBuckets() const
-    engine->RegisterObjectMethod(className, "uint NumBuckets() const", AS_METHODPR(T, NumBuckets, () const, unsigned), AS_CALL_THISCALL);
+    // i32 HashBase::NumBuckets() const
+    engine->RegisterObjectMethod(className, "int NumBuckets() const", AS_METHODPR(T, NumBuckets, () const, i32), AS_CALL_THISCALL);
 
-    // unsigned HashBase::Size() const
-    engine->RegisterObjectMethod(className, "uint Size() const", AS_METHODPR(T, Size, () const, unsigned), AS_CALL_THISCALL);
+    // i32 HashBase::Size() const
+    engine->RegisterObjectMethod(className, "int Size() const", AS_METHODPR(T, Size, () const, i32), AS_CALL_THISCALL);
 
     // void HashBase::Swap(HashBase& rhs)
     engine->RegisterObjectMethod(className, "void Swap(HashBase&)", AS_METHODPR(T, Swap, (HashBase&), void), AS_CALL_THISCALL);
 
-    // static constexpr unsigned HashBase::MIN_BUCKETS
-    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const uint MIN_BUCKETS", (void*)&T::MIN_BUCKETS);engine->SetDefaultNamespace("");
+    // static constexpr i32 HashBase::MIN_BUCKETS
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const int MIN_BUCKETS", (void*)&T::MIN_BUCKETS);engine->SetDefaultNamespace("");
 
-    // static constexpr unsigned HashBase::MAX_LOAD_FACTOR
-    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const uint MAX_LOAD_FACTOR", (void*)&T::MAX_LOAD_FACTOR);engine->SetDefaultNamespace("");
+    // static constexpr i32 HashBase::MAX_LOAD_FACTOR
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("const int MAX_LOAD_FACTOR", (void*)&T::MAX_LOAD_FACTOR);engine->SetDefaultNamespace("");
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_HashBase
         REGISTER_MEMBERS_MANUAL_PART_HashBase();

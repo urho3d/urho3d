@@ -14631,14 +14631,14 @@ Methods:
 
 - HashBase&  operator=(const HashBase&)
 - bool Empty() const
-- uint NumBuckets() const
-- uint Size() const
+- int NumBuckets() const
+- int Size() const
 - void Swap(HashBase&)
 
 Constants:
 
-- uint MAX_LOAD_FACTOR
-- uint MIN_BUCKETS
+- int MAX_LOAD_FACTOR
+- int MIN_BUCKETS
 
 <a name="Class_HashIteratorBase"></a>
 
