@@ -10,38 +10,6 @@
 namespace Urho3D
 {
 
-// struct AllocatorBlock | File: ../Container/Allocator.h
-static void Register_AllocatorBlock(asIScriptEngine* engine)
-{
-    // AllocatorBlock::~AllocatorBlock() | Implicitly-declared
-    engine->RegisterObjectBehaviour("AllocatorBlock", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(AllocatorBlock), AS_CALL_CDECL_OBJFIRST);
-
-    RegisterMembers_AllocatorBlock<AllocatorBlock>(engine, "AllocatorBlock");
-
-    #ifdef REGISTER_CLASS_MANUAL_PART_AllocatorBlock
-        REGISTER_CLASS_MANUAL_PART_AllocatorBlock();
-    #endif
-
-    // AllocatorBlock& AllocatorBlock::operator =(const AllocatorBlock&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<AllocatorBlock>(engine, "AllocatorBlock");
-}
-
-// struct AllocatorNode | File: ../Container/Allocator.h
-static void Register_AllocatorNode(asIScriptEngine* engine)
-{
-    // AllocatorNode::~AllocatorNode() | Implicitly-declared
-    engine->RegisterObjectBehaviour("AllocatorNode", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(AllocatorNode), AS_CALL_CDECL_OBJFIRST);
-
-    RegisterMembers_AllocatorNode<AllocatorNode>(engine, "AllocatorNode");
-
-    #ifdef REGISTER_CLASS_MANUAL_PART_AllocatorNode
-        REGISTER_CLASS_MANUAL_PART_AllocatorNode();
-    #endif
-
-    // AllocatorNode& AllocatorNode::operator =(const AllocatorNode&) | Possible implicitly-declared
-    RegisterImplicitlyDeclaredAssignOperatorIfPossible<AllocatorNode>(engine, "AllocatorNode");
-}
-
 // struct AnimationControl | File: ../Graphics/AnimationController.h
 static void Register_AnimationControl(asIScriptEngine* engine)
 {
@@ -8397,8 +8365,6 @@ static void Register_StretchableSprite2D(asIScriptEngine* engine)
 
 void ASRegisterGeneratedClasses(asIScriptEngine* engine)
 {
-    Register_AllocatorBlock(engine);
-    Register_AllocatorNode(engine);
     Register_AnimationControl(engine);
     Register_AnimationKeyFrame(engine);
     Register_AnimationStateTrack(engine);

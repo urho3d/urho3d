@@ -157,7 +157,7 @@ public:
     HashSet()
     {
         // Reserve the tail node
-        allocator_ = AllocatorInitialize((unsigned)sizeof(Node));
+        allocator_ = AllocatorInitialize((i32)sizeof(Node));
         head_ = tail_ = ReserveNode();
     }
 
@@ -165,7 +165,7 @@ public:
     HashSet(const HashSet<T>& set)
     {
         // Reserve the tail node + initial capacity according to the set's size
-        allocator_ = AllocatorInitialize((unsigned)sizeof(Node), set.Size() + 1);
+        allocator_ = AllocatorInitialize((i32)sizeof(Node), set.Size() + 1);
         head_ = tail_ = ReserveNode();
         *this = set;
     }

@@ -44,18 +44,6 @@ void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
     // String AddTrailingSlash(const String& pathName) | File: ../IO/FileSystem.h
     engine->RegisterGlobalFunction("String AddTrailingSlash(const String&in)", AS_FUNCTIONPR(AddTrailingSlash, (const String&), String), AS_CALL_CDECL);
 
-    // void AllocatorFree(AllocatorBlock* allocator, void* ptr) | File: ../Container/Allocator.h
-    // Error: type "AllocatorBlock*" can not automatically bind
-
-    // AllocatorBlock* AllocatorInitialize(unsigned nodeSize, unsigned initialCapacity = 1) | File: ../Container/Allocator.h
-    // Error: type "AllocatorBlock*" can not automatically bind
-
-    // void* AllocatorReserve(AllocatorBlock* allocator) | File: ../Container/Allocator.h
-    // Error: type "AllocatorBlock*" can not automatically bind
-
-    // void AllocatorUninitialize(AllocatorBlock* allocator) | File: ../Container/Allocator.h
-    // Error: type "AllocatorBlock*" can not automatically bind
-
     // template <class T> T Asin(T x) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("float Asin(float)", AS_FUNCTIONPR(Asin, (float), float), AS_CALL_CDECL);
 

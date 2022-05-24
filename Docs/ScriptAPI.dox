@@ -2766,8 +2766,6 @@ namespace Urho3D
 
 \section ScriptAPI_ClassList Class list
 
-<a href="#Class_AllocatorBlock"><b>AllocatorBlock</b></a>
-<a href="#Class_AllocatorNode"><b>AllocatorNode</b></a>
 <a href="#Class_Animatable"><b>Animatable</b></a>
 <a href="#Class_AnimatedModel"><b>AnimatedModel</b></a>
 <a href="#Class_AnimatedSprite2D"><b>AnimatedSprite2D</b></a>
@@ -3113,27 +3111,6 @@ namespace Urho3D
 <a href="#Class_Zone"><b>Zone</b></a>
 
 \section ScriptAPI_Classes Classes
-<a name="Class_AllocatorBlock"></a>
-
-### AllocatorBlock
-
-Methods:
-
-- AllocatorBlock&  operator=(const AllocatorBlock&)
-
-Properties:
-
-- uint capacity
-- uint nodeSize
-
-<a name="Class_AllocatorNode"></a>
-
-### AllocatorNode
-
-Methods:
-
-- AllocatorNode&  operator=(const AllocatorNode&)
-
 <a name="Class_Animatable"></a>
 
 ### Animatable
