@@ -356,7 +356,7 @@ public:
     /// Insert a pair. Return iterator and set exists flag according to whether the key already existed.
     Iterator Insert(const Pair<T, U>& pair, bool& exists)
     {
-        unsigned oldSize = Size();
+        i32 oldSize = Size();
         Iterator ret(InsertNode(pair.first_, pair.second_));
         exists = (Size() == oldSize);
         return ret;
@@ -459,14 +459,14 @@ public:
     /// Sort pairs. After sorting the map can be iterated in order until new elements are inserted.
     void Sort()
     {
-        unsigned numKeys = Size();
+        i32 numKeys = Size();
         if (!numKeys)
             return;
 
         auto** ptrs = new Node* [numKeys];
         Node* ptr = Head();
 
-        for (unsigned i = 0; i < numKeys; ++i)
+        for (i32 i = 0; i < numKeys; ++i)
         {
             ptrs[i] = ptr;
             ptr = ptr->Next();
@@ -476,7 +476,7 @@ public:
 
         head_ = ptrs[0];
         ptrs[0]->prev_ = 0;
-        for (unsigned i = 1; i < numKeys; ++i)
+        for (i32 i = 1; i < numKeys; ++i)
         {
             ptrs[i - 1]->next_ = ptrs[i];
             ptrs[i]->prev_ = ptrs[i - 1];
@@ -488,8 +488,10 @@ public:
     }
 
     /// Rehash to a specific bucket count, which must be a power of two. Return true if successful.
-    bool Rehash(unsigned numBuckets)
+    bool Rehash(i32 numBuckets)
     {
+        assert(numBuckets > 0);
+
         if (numBuckets == NumBuckets())
             return true;
 

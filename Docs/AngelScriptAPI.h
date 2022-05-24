@@ -12448,13 +12448,13 @@ HashBase();
 // Methods:
 HashBase&  operator=(const HashBase&);
 bool Empty() const;
-uint NumBuckets() const;
-uint Size() const;
+int NumBuckets() const;
+int Size() const;
 void Swap(HashBase&);
 
 // Constants:
-static const uint MAX_LOAD_FACTOR;
-static const uint MIN_BUCKETS;
+static const int MAX_LOAD_FACTOR;
+static const int MIN_BUCKETS;
 };
 
 class HashIteratorBase

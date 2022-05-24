@@ -8,12 +8,14 @@
 namespace Urho3D
 {
 
-void HashBase::AllocateBuckets(unsigned size, unsigned numBuckets)
+void HashBase::AllocateBuckets(i32 size, i32 numBuckets)
 {
+    assert(size >= 0 && numBuckets > 0);
+
     delete[] ptrs_;
 
-    auto ptrs = new HashNodeBase* [numBuckets + 2];
-    auto* data = reinterpret_cast<unsigned*>(ptrs);
+    HashNodeBase** ptrs = new HashNodeBase* [numBuckets + 2];
+    i32* data = reinterpret_cast<i32*>(ptrs);
     data[0] = size;
     data[1] = numBuckets;
     ptrs_ = ptrs;
@@ -27,10 +29,18 @@ void HashBase::ResetPtrs()
     if (!ptrs_)
         return;
 
-    unsigned numBuckets = NumBuckets();
+    i32 numBuckets = NumBuckets();
     HashNodeBase** ptrs = Ptrs();
-    for (unsigned i = 0; i < numBuckets; ++i)
+    for (i32 i = 0; i < numBuckets; ++i)
         ptrs[i] = nullptr;
+}
+
+void HashBase::SetSize(i32 size)
+{
+    assert(size >= 0);
+
+    if (ptrs_)
+        (reinterpret_cast<unsigned*>(ptrs_))[0] = size;
 }
 
 }
