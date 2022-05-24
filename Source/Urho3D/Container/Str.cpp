@@ -293,7 +293,7 @@ String& String::Append(const char* str, i32 length)
 void String::Insert(i32 pos, const String& str)
 {
     assert(pos >= 0);
-    
+
     i32 length = Length();
 
     if (pos > length)
