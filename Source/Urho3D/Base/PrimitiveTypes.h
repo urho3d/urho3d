@@ -3,10 +3,11 @@
 
 #pragma once
 
+#include <climits>
 #include <cstdint>
 
 // https://en.cppreference.com/w/cpp/language/types
-static_assert(sizeof(char) == 1);
+static_assert(CHAR_BIT == 8);
 static_assert(sizeof(int) == 4);
 static_assert(sizeof(long) == 4 || sizeof(long) == 8); // (Win32, Win64, Unix32) || Unix64
 static_assert(sizeof(long long) == 8);
