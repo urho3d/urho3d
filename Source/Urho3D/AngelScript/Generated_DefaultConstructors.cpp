@@ -12,12 +12,6 @@ namespace Urho3D
 
 void ASRegisterGeneratedDefaultConstructors(asIScriptEngine* engine)
 {
-    // AllocatorBlock::AllocatorBlock() | Implicitly-declared
-    engine->RegisterObjectBehaviour("AllocatorBlock", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<AllocatorBlock>), AS_CALL_CDECL_OBJFIRST);
-
-    // AllocatorNode::AllocatorNode() | Implicitly-declared
-    engine->RegisterObjectBehaviour("AllocatorNode", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<AllocatorNode>), AS_CALL_CDECL_OBJFIRST);
-
     // AnimationKeyFrame::AnimationKeyFrame() | File: ../Graphics/Animation.h
     engine->RegisterObjectBehaviour("AnimationKeyFrame", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ASCompatibleConstructor<AnimationKeyFrame>), AS_CALL_CDECL_OBJFIRST);
 

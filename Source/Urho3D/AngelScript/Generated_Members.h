@@ -10,36 +10,6 @@
 namespace Urho3D
 {
 
-// struct AllocatorBlock | File: ../Container/Allocator.h
-template <class T> void RegisterMembers_AllocatorBlock(asIScriptEngine* engine, const char* className)
-{
-    // AllocatorNode* AllocatorBlock::free_
-    // Not registered because pointer
-    // AllocatorBlock* AllocatorBlock::next_
-    // Not registered because pointer
-
-    // unsigned AllocatorBlock::nodeSize_
-    engine->RegisterObjectProperty(className, "uint nodeSize", offsetof(T, nodeSize_));
-
-    // unsigned AllocatorBlock::capacity_
-    engine->RegisterObjectProperty(className, "uint capacity", offsetof(T, capacity_));
-
-    #ifdef REGISTER_MEMBERS_MANUAL_PART_AllocatorBlock
-        REGISTER_MEMBERS_MANUAL_PART_AllocatorBlock();
-    #endif
-}
-
-// struct AllocatorNode | File: ../Container/Allocator.h
-template <class T> void RegisterMembers_AllocatorNode(asIScriptEngine* engine, const char* className)
-{
-    // AllocatorNode* AllocatorNode::next_
-    // Not registered because pointer
-
-    #ifdef REGISTER_MEMBERS_MANUAL_PART_AllocatorNode
-        REGISTER_MEMBERS_MANUAL_PART_AllocatorNode();
-    #endif
-}
-
 // struct AnimationControl | File: ../Graphics/AnimationController.h
 template <class T> void RegisterMembers_AnimationControl(asIScriptEngine* engine, const char* className)
 {

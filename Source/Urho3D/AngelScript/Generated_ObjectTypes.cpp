@@ -12,12 +12,6 @@ namespace Urho3D
 
 void ASRegisterGeneratedObjectTypes(asIScriptEngine* engine)
 {
-    // struct AllocatorBlock | File: ../Container/Allocator.h
-    engine->RegisterObjectType("AllocatorBlock", sizeof(AllocatorBlock), asOBJ_VALUE | asGetTypeTraits<AllocatorBlock>());
-
-    // struct AllocatorNode | File: ../Container/Allocator.h
-    engine->RegisterObjectType("AllocatorNode", sizeof(AllocatorNode), asOBJ_VALUE | asGetTypeTraits<AllocatorNode>());
-
     // struct AnimationControl | File: ../Graphics/AnimationController.h
     engine->RegisterObjectType("AnimationControl", 0, asOBJ_REF | asOBJ_NOCOUNT);
 

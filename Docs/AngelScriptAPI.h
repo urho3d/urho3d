@@ -22,28 +22,6 @@
 
 // Classes
 
-class AllocatorBlock
-{
-public:
-~AllocatorBlock();
-AllocatorBlock();
-// Methods:
-AllocatorBlock&  operator=(const AllocatorBlock&);
-
-// Properties:
-uint capacity;
-uint nodeSize;
-};
-
-class AllocatorNode
-{
-public:
-~AllocatorNode();
-AllocatorNode();
-// Methods:
-AllocatorNode&  operator=(const AllocatorNode&);
-};
-
 class Animatable
 {
 public:
