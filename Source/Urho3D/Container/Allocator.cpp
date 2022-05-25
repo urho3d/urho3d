@@ -39,7 +39,7 @@ static AllocatorBlock* AllocatorReserveBlock(AllocatorBlock* allocator, i32 node
         newNode->next_ = reinterpret_cast<AllocatorNode*>(nodePtr + sizeof(AllocatorNode) + nodeSize);
         nodePtr += sizeof(AllocatorNode) + nodeSize;
     }
-    
+
     // i == capacity - 1
     {
         AllocatorNode* newNode = reinterpret_cast<AllocatorNode*>(nodePtr);

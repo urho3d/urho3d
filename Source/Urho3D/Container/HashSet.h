@@ -427,7 +427,7 @@ public:
 
         if (numBuckets == NumBuckets())
             return true;
-        
+
         if (!numBuckets || numBuckets < Size() / MAX_LOAD_FACTOR)
             return false;
 
