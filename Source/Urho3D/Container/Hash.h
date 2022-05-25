@@ -86,6 +86,12 @@ template <> inline unsigned MakeHash(const char& value)
     return (unsigned)value;
 }
 
+/// Unicode code point hash function.
+template <> inline unsigned MakeHash(const c32& value)
+{
+    return (unsigned)value;
+}
+
 /// Unsigned char hash function.
 template <> inline unsigned MakeHash(const unsigned char& value)
 {

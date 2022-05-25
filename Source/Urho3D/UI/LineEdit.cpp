@@ -65,7 +65,7 @@ void LineEdit::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Is Text Selectable", IsTextSelectable, SetTextSelectable, bool, true, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Is Text Copyable", IsTextCopyable, SetTextCopyable, bool, true, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Cursor Blink Rate", GetCursorBlinkRate, SetCursorBlinkRate, float, 1.0f, AM_FILE);
-    URHO3D_ATTRIBUTE("Echo Character", int, echoCharacter_, 0, AM_FILE);
+    URHO3D_ATTRIBUTE("Echo Character", unsigned, echoCharacter_, 0, AM_FILE);
 }
 
 void LineEdit::ApplyAttributes()
@@ -494,7 +494,7 @@ void LineEdit::SetMaxLength(unsigned length)
     maxLength_ = length;
 }
 
-void LineEdit::SetEchoCharacter(unsigned c)
+void LineEdit::SetEchoCharacter(c32 c)
 {
     echoCharacter_ = c;
     UpdateText();
@@ -545,7 +545,7 @@ bool LineEdit::FilterImplicitAttributes(XMLElement& dest) const
 
 void LineEdit::UpdateText()
 {
-    unsigned utf8Length = line_.LengthUTF8();
+    i32 utf8Length = line_.LengthUTF8();
 
     // If maxLength_ nonzero, truncate line to enforce length
     if (maxLength_ && utf8Length > maxLength_)
@@ -561,7 +561,7 @@ void LineEdit::UpdateText()
     else
     {
         String echoText;
-        for (unsigned i = 0; i < utf8Length; ++i)
+        for (i32 i = 0; i < utf8Length; ++i)
             echoText.AppendUTF8(echoCharacter_);
         text_->SetText(echoText);
     }

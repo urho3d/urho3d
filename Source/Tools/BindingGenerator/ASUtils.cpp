@@ -55,10 +55,10 @@ string CppPrimitiveTypeToAS(const string& cppType)
 
     // Types below are registered in Manual.cpp
     
-    if (cppType == "long")
+    if (cppType == "long") // Size is compiler-dependent
         return "long";
 
-    if (cppType == "unsigned long")
+    if (cppType == "unsigned long") // Size is compiler-dependent
         return "ulong";
 
     if (cppType == "size_t")
@@ -67,7 +67,24 @@ string CppPrimitiveTypeToAS(const string& cppType)
     if (cppType == "SDL_JoystickID")
         return "SDL_JoystickID";
 
+    if (cppType == "c32")
+        return "c32";
+
     throw Exception(cppType + " not a primitive type");
+}
+
+static bool IsKnownPrimitiveCppType(const string& cppType)
+{
+    try
+    {
+        CppPrimitiveTypeToAS(cppType);
+    }
+    catch (...)
+    {
+        return false;
+    }
+
+    return true;
 }
 
 string JoinASDeclarations(const vector<ConvertedVariable>& vars)
@@ -142,37 +159,15 @@ bool IsKnownCppType(const string& name)
 {
     static vector<string> _knownTypes = {
         "void",
-        "bool",
-        "size_t",
-        "char",
-        "signed char",
-        "i8",
-        "unsigned char",
-        "u8",
-        "short",
-        "i16",
-        "unsigned short",
-        "u16",
-        "int",
-        "i32",
-        "long", // Size is compiler-dependent
-        "unsigned",
-        "unsigned int",
-        "u32",
-        "unsigned long", // Size is compiler-dependent
-        "long long",
-        "i64",
-        "unsigned long long",
-        "u64",
-        "float",
-        "double",
-        "SDL_JoystickID",
 
         // TODO: Remove
         "VariantMap",
     };
 
     if (CONTAINS(_knownTypes, name))
+        return true;
+
+    if (IsKnownPrimitiveCppType(name))
         return true;
 
     if (SourceData::classesByName_.find(name) != SourceData::classesByName_.end())

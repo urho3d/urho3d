@@ -267,9 +267,9 @@ protected:
     /// Row height.
     float rowHeight_;
     /// Text as Unicode characters.
-    PODVector<unsigned> unicodeText_;
+    PODVector<c32> unicodeText_;
     /// Text modified into printed form.
-    PODVector<unsigned> printText_;
+    PODVector<c32> printText_;
     /// Mapping of printed form back to original char indices.
     PODVector<unsigned> printToText_;
     /// Row widths.

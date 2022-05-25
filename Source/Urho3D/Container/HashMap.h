@@ -253,7 +253,7 @@ public:
     }
 
     /// Move-assign a hash map.
-    HashMap& operator =(HashMap<T, U> && rhs) noexcept
+    HashMap& operator =(HashMap<T, U>&& rhs) noexcept
     {
         Swap(rhs);
         return *this;

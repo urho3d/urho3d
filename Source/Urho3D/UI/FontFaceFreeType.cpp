@@ -271,9 +271,9 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
     return true;
 }
 
-const FontGlyph* FontFaceFreeType::GetGlyph(unsigned c)
+const FontGlyph* FontFaceFreeType::GetGlyph(c32 c)
 {
-    HashMap<unsigned, FontGlyph>::Iterator i = glyphMapping_.Find(c);
+    HashMap<c32, FontGlyph>::Iterator i = glyphMapping_.Find(c);
     if (i != glyphMapping_.End())
     {
         FontGlyph& glyph = i->second_;
@@ -283,7 +283,7 @@ const FontGlyph* FontFaceFreeType::GetGlyph(unsigned c)
 
     if (LoadCharGlyph(c))
     {
-        HashMap<unsigned, FontGlyph>::Iterator i = glyphMapping_.Find(c);
+        HashMap<c32, FontGlyph>::Iterator i = glyphMapping_.Find(c);
         if (i != glyphMapping_.End())
         {
             FontGlyph& glyph = i->second_;
@@ -373,7 +373,7 @@ void FontFaceFreeType::BoxFilter(unsigned char* dest, size_t destSize, const uns
     }
 }
 
-bool FontFaceFreeType::LoadCharGlyph(unsigned charCode, Image* image)
+bool FontFaceFreeType::LoadCharGlyph(c32 charCode, Image* image)
 {
     if (!face_)
         return false;

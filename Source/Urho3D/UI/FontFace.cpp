@@ -32,9 +32,9 @@ FontFace::~FontFace()
     }
 }
 
-const FontGlyph* FontFace::GetGlyph(unsigned c)
+const FontGlyph* FontFace::GetGlyph(c32 c)
 {
-    HashMap<unsigned, FontGlyph>::Iterator i = glyphMapping_.Find(c);
+    HashMap<c32, FontGlyph>::Iterator i = glyphMapping_.Find(c);
     if (i != glyphMapping_.End())
     {
         FontGlyph& glyph = i->second_;
@@ -45,7 +45,7 @@ const FontGlyph* FontFace::GetGlyph(unsigned c)
         return nullptr;
 }
 
-float FontFace::GetKerning(unsigned c, unsigned d) const
+float FontFace::GetKerning(c32 c, c32 d) const
 {
     if (kerningMapping_.Empty())
         return 0;
@@ -56,9 +56,9 @@ float FontFace::GetKerning(unsigned c, unsigned d) const
     if (c > 0xffff || d > 0xffff)
         return 0;
 
-    unsigned value = (c << 16u) + d;
+    u32 value = (c << 16u) + d;
 
-    HashMap<unsigned, float>::ConstIterator i = kerningMapping_.Find(value);
+    HashMap<u32, float>::ConstIterator i = kerningMapping_.Find(value);
     if (i != kerningMapping_.End())
         return i->second_;
 

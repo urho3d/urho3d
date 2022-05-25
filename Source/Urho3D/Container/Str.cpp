@@ -787,7 +787,7 @@ void String::SetUTF8FromLatin1(const char* str)
     while (*str)
     {
         char* dest = temp;
-        EncodeUTF8(dest, (unsigned)*str++);
+        EncodeUTF8(dest, (c32)*str++);
         *dest = 0;
         Append(temp);
     }
@@ -805,7 +805,7 @@ void String::SetUTF8FromWChar(const wchar_t* str)
 #ifdef _WIN32
     while (*str)
     {
-        unsigned unicodeChar = DecodeUTF16(str);
+        c32 unicodeChar = DecodeUTF16(str);
         char* dest = temp;
         EncodeUTF8(dest, unicodeChar);
         *dest = 0;
@@ -815,7 +815,7 @@ void String::SetUTF8FromWChar(const wchar_t* str)
     while (*str)
     {
         char* dest = temp;
-        EncodeUTF8(dest, (unsigned)*str++);
+        EncodeUTF8(dest, (c32)*str++);
         *dest = 0;
         Append(temp);
     }
@@ -858,24 +858,24 @@ i32 String::ByteOffsetUTF8(i32 index) const
     return byteOffset;
 }
 
-unsigned String::NextUTF8Char(i32& byteOffset) const
+c32 String::NextUTF8Char(i32& byteOffset) const
 {
     const char* buffer = GetBuffer();
 
     const char* src = buffer + byteOffset;
-    unsigned ret = DecodeUTF8(src);
+    c32 ret = DecodeUTF8(src);
     byteOffset = (i32)(src - buffer);
 
     return ret;
 }
 
-unsigned String::AtUTF8(i32 index) const
+c32 String::AtUTF8(i32 index) const
 {
     i32 byteOffset = ByteOffsetUTF8(index);
     return NextUTF8Char(byteOffset);
 }
 
-void String::ReplaceUTF8(i32 index, unsigned unicodeChar)
+void String::ReplaceUTF8(i32 index, c32 unicodeChar)
 {
     i32 utfPos = 0;
     i32 byteOffset = 0;
@@ -901,7 +901,7 @@ void String::ReplaceUTF8(i32 index, unsigned unicodeChar)
     Replace(beginCharPos, byteOffset - beginCharPos, temp, (i32)(dest - temp));
 }
 
-String& String::AppendUTF8(unsigned unicodeChar)
+String& String::AppendUTF8(c32 unicodeChar)
 {
     char temp[7];
     char* dest = temp;
@@ -941,7 +941,7 @@ String String::SubstringUTF8(i32 pos, i32 length) const
     return ret;
 }
 
-void String::EncodeUTF8(char*& dest, unsigned unicodeChar)
+void String::EncodeUTF8(char*& dest, c32 unicodeChar)
 {
     if (unicodeChar < 0x80)
         *dest++ = unicodeChar;
@@ -987,19 +987,19 @@ void String::EncodeUTF8(char*& dest, unsigned unicodeChar)
     }
 }
 
-#define GET_NEXT_CONTINUATION_BYTE(ptr) *(ptr); if ((unsigned char)*(ptr) < 0x80 || (unsigned char)*(ptr) >= 0xc0) return '?'; else ++(ptr);
+#define GET_NEXT_CONTINUATION_BYTE(ptr) *(ptr); if ((u8)*(ptr) < 0x80 || (u8)*(ptr) >= 0xc0) return '?'; else ++(ptr);
 
-unsigned String::DecodeUTF8(const char*& src)
+c32 String::DecodeUTF8(const char*& src)
 {
     if (src == nullptr)
         return 0;
 
-    unsigned char char1 = *src++;
+    u8 char1 = *src++;
 
     // Check if we are in the middle of a UTF8 character
     if (char1 >= 0x80 && char1 < 0xc0)
     {
-        while ((unsigned char)*src >= 0x80 && (unsigned char)*src < 0xc0)
+        while ((u8)*src >= 0x80 && (u8)*src < 0xc0)
             ++src;
         return '?';
     }
@@ -1008,45 +1008,45 @@ unsigned String::DecodeUTF8(const char*& src)
         return char1;
     else if (char1 < 0xe0)
     {
-        unsigned char char2 = GET_NEXT_CONTINUATION_BYTE(src);
-        return (unsigned)((char2 & 0x3fu) | ((char1 & 0x1fu) << 6u));
+        u8 char2 = GET_NEXT_CONTINUATION_BYTE(src);
+        return (c32)((char2 & 0x3fu) | ((char1 & 0x1fu) << 6u));
     }
     else if (char1 < 0xf0)
     {
-        unsigned char char2 = GET_NEXT_CONTINUATION_BYTE(src);
-        unsigned char char3 = GET_NEXT_CONTINUATION_BYTE(src);
-        return (unsigned)((char3 & 0x3fu) | ((char2 & 0x3fu) << 6u) | ((char1 & 0xfu) << 12u));
+        u8 char2 = GET_NEXT_CONTINUATION_BYTE(src);
+        u8 char3 = GET_NEXT_CONTINUATION_BYTE(src);
+        return (c32)((char3 & 0x3fu) | ((char2 & 0x3fu) << 6u) | ((char1 & 0xfu) << 12u));
     }
     else if (char1 < 0xf8)
     {
-        unsigned char char2 = GET_NEXT_CONTINUATION_BYTE(src);
-        unsigned char char3 = GET_NEXT_CONTINUATION_BYTE(src);
-        unsigned char char4 = GET_NEXT_CONTINUATION_BYTE(src);
-        return (unsigned)((char4 & 0x3fu) | ((char3 & 0x3fu) << 6u) | ((char2 & 0x3fu) << 12u) | ((char1 & 0x7u) << 18u));
+        u8 char2 = GET_NEXT_CONTINUATION_BYTE(src);
+        u8 char3 = GET_NEXT_CONTINUATION_BYTE(src);
+        u8 char4 = GET_NEXT_CONTINUATION_BYTE(src);
+        return (c32)((char4 & 0x3fu) | ((char3 & 0x3fu) << 6u) | ((char2 & 0x3fu) << 12u) | ((char1 & 0x7u) << 18u));
     }
     else if (char1 < 0xfc)
     {
-        unsigned char char2 = GET_NEXT_CONTINUATION_BYTE(src);
-        unsigned char char3 = GET_NEXT_CONTINUATION_BYTE(src);
-        unsigned char char4 = GET_NEXT_CONTINUATION_BYTE(src);
-        unsigned char char5 = GET_NEXT_CONTINUATION_BYTE(src);
-        return (unsigned)((char5 & 0x3fu) | ((char4 & 0x3fu) << 6u) | ((char3 & 0x3fu) << 12u) | ((char2 & 0x3fu) << 18u) |
+        u8 char2 = GET_NEXT_CONTINUATION_BYTE(src);
+        u8 char3 = GET_NEXT_CONTINUATION_BYTE(src);
+        u8 char4 = GET_NEXT_CONTINUATION_BYTE(src);
+        u8 char5 = GET_NEXT_CONTINUATION_BYTE(src);
+        return (c32)((char5 & 0x3fu) | ((char4 & 0x3fu) << 6u) | ((char3 & 0x3fu) << 12u) | ((char2 & 0x3fu) << 18u) |
                           ((char1 & 0x3u) << 24u));
     }
     else
     {
-        unsigned char char2 = GET_NEXT_CONTINUATION_BYTE(src);
-        unsigned char char3 = GET_NEXT_CONTINUATION_BYTE(src);
-        unsigned char char4 = GET_NEXT_CONTINUATION_BYTE(src);
-        unsigned char char5 = GET_NEXT_CONTINUATION_BYTE(src);
-        unsigned char char6 = GET_NEXT_CONTINUATION_BYTE(src);
-        return (unsigned)((char6 & 0x3fu) | ((char5 & 0x3fu) << 6u) | ((char4 & 0x3fu) << 12u) | ((char3 & 0x3fu) << 18u) |
+        u8 char2 = GET_NEXT_CONTINUATION_BYTE(src);
+        u8 char3 = GET_NEXT_CONTINUATION_BYTE(src);
+        u8 char4 = GET_NEXT_CONTINUATION_BYTE(src);
+        u8 char5 = GET_NEXT_CONTINUATION_BYTE(src);
+        u8 char6 = GET_NEXT_CONTINUATION_BYTE(src);
+        return (c32)((char6 & 0x3fu) | ((char5 & 0x3fu) << 6u) | ((char4 & 0x3fu) << 12u) | ((char3 & 0x3fu) << 18u) |
                           ((char2 & 0x3fu) << 24u) | ((char1 & 0x1u) << 30u));
     }
 }
 
 #ifdef _WIN32
-void String::EncodeUTF16(wchar_t*& dest, unsigned unicodeChar)
+void String::EncodeUTF16(wchar_t*& dest, c32 unicodeChar)
 {
     if (unicodeChar < 0x10000)
         *dest++ = unicodeChar;
@@ -1058,12 +1058,12 @@ void String::EncodeUTF16(wchar_t*& dest, unsigned unicodeChar)
     }
 }
 
-unsigned String::DecodeUTF16(const wchar_t*& src)
+c32 String::DecodeUTF16(const wchar_t*& src)
 {
     if (src == nullptr)
         return 0;
 
-    unsigned short word1 = *src++;
+    u16 word1 = *src++;
 
     // Check if we are at a low surrogate
     if (word1 >= 0xdc00 && word1 < 0xe000)
@@ -1077,7 +1077,7 @@ unsigned String::DecodeUTF16(const wchar_t*& src)
         return word1;
     else
     {
-        unsigned short word2 = *src++;
+        u16 word2 = *src++;
         if (word2 < 0xdc00 || word2 >= 0xe000)
         {
             --src;

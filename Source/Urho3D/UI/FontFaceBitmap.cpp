@@ -170,7 +170,7 @@ bool FontFaceBitmap::Load(FontFace* fontFace, bool usedGlyphs)
     int maxTextureSize = font_->GetSubsystem<UI>()->GetMaxFontTextureSize();
     AreaAllocator allocator(FONT_TEXTURE_MIN_SIZE, FONT_TEXTURE_MIN_SIZE, maxTextureSize, maxTextureSize);
 
-    for (HashMap<unsigned, FontGlyph>::ConstIterator i = fontFace->glyphMapping_.Begin(); i != fontFace->glyphMapping_.End(); ++i)
+    for (HashMap<c32, FontGlyph>::ConstIterator i = fontFace->glyphMapping_.Begin(); i != fontFace->glyphMapping_.End(); ++i)
     {
         FontGlyph fontGlyph = i->second_;
         if (!fontGlyph.used_)
@@ -220,7 +220,7 @@ bool FontFaceBitmap::Load(FontFace* fontFace, bool usedGlyphs)
         newImages[i] = image;
     }
 
-    for (HashMap<unsigned, FontGlyph>::Iterator i = glyphMapping_.Begin(); i != glyphMapping_.End(); ++i)
+    for (HashMap<c32, FontGlyph>::Iterator i = glyphMapping_.Begin(); i != glyphMapping_.End(); ++i)
     {
         FontGlyph& newGlyph = i->second_;
         const FontGlyph& oldGlyph = fontFace->glyphMapping_[i->first_];
@@ -232,7 +232,7 @@ bool FontFaceBitmap::Load(FontFace* fontFace, bool usedGlyphs)
     for (unsigned i = 0; i < newImages.Size(); ++i)
         textures_[i] = LoadFaceTexture(newImages[i]);
 
-    for (HashMap<unsigned, float>::ConstIterator i = fontFace->kerningMapping_.Begin(); i != fontFace->kerningMapping_.End(); ++i)
+    for (HashMap<u32, float>::ConstIterator i = fontFace->kerningMapping_.Begin(); i != fontFace->kerningMapping_.End(); ++i)
     {
         unsigned first = (i->first_) >> 16u;
         unsigned second = (i->first_) & 0xffffu;
@@ -290,7 +290,7 @@ bool FontFaceBitmap::Save(Serializer& dest, int pointSize, const String& indenta
     unsigned numGlyphs = glyphMapping_.Size();
     charsElem.SetInt("count", numGlyphs);
 
-    for (HashMap<unsigned, FontGlyph>::ConstIterator i = glyphMapping_.Begin(); i != glyphMapping_.End(); ++i)
+    for (HashMap<c32, FontGlyph>::ConstIterator i = glyphMapping_.Begin(); i != glyphMapping_.End(); ++i)
     {
         // Char
         XMLElement charElem = charsElem.CreateChild("char");
@@ -310,7 +310,7 @@ bool FontFaceBitmap::Save(Serializer& dest, int pointSize, const String& indenta
     if (!kerningMapping_.Empty())
     {
         XMLElement kerningsElem = rootElem.CreateChild("kernings");
-        for (HashMap<unsigned, float>::ConstIterator i = kerningMapping_.Begin(); i != kerningMapping_.End(); ++i)
+        for (HashMap<u32, float>::ConstIterator i = kerningMapping_.Begin(); i != kerningMapping_.End(); ++i)
         {
             XMLElement kerningElem = kerningsElem.CreateChild("kerning");
             kerningElem.SetInt("first", i->first_ >> 16u);
