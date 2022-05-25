@@ -40,7 +40,7 @@ void HashBase::SetSize(i32 size)
     assert(size >= 0);
 
     if (ptrs_)
-        (reinterpret_cast<unsigned*>(ptrs_))[0] = size;
+        (reinterpret_cast<i32*>(ptrs_))[0] = size;
 }
 
 }
