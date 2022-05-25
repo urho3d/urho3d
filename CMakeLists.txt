@@ -2,7 +2,7 @@
 # License: MIT
 
 # Set CMake minimum version
-cmake_minimum_required (VERSION 3.10.2)
+cmake_minimum_required (VERSION 3.15)
 
 # Set project name
 project (Urho3D)
