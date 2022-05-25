@@ -8,6 +8,7 @@
 
 // https://en.cppreference.com/w/cpp/language/types
 static_assert(CHAR_BIT == 8);
+static_assert(sizeof(short) == 2);
 static_assert(sizeof(int) == 4);
 static_assert(sizeof(long) == 4 || sizeof(long) == 8); // (Win32, Win64, Unix32) || Unix64
 static_assert(sizeof(long long) == 8);
@@ -21,3 +22,7 @@ typedef int32_t  i32;
 typedef uint32_t u32;
 typedef int64_t  i64;
 typedef uint64_t u64;
+
+// Unicode code point (UTF-32 code unit)
+static_assert(sizeof(char32_t) == 4);
+typedef char32_t c32;

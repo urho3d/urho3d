@@ -341,7 +341,7 @@ String GetConsoleInput()
         ReadConsoleInputW(input, &record, 1, &readEvents);
         if (record.EventType == KEY_EVENT && record.Event.KeyEvent.bKeyDown)
         {
-            unsigned c = record.Event.KeyEvent.uChar.UnicodeChar;
+            c32 c = record.Event.KeyEvent.uChar.UnicodeChar;
             if (c)
             {
                 if (c == '\b')

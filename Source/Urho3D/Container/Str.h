@@ -442,13 +442,13 @@ public:
     /// Return byte offset to char in UTF8 content.
     i32 ByteOffsetUTF8(i32 index) const;
     /// Return next Unicode character from UTF8 content and increase byte offset.
-    unsigned NextUTF8Char(i32& byteOffset) const;
+    c32 NextUTF8Char(i32& byteOffset) const;
     /// Return Unicode character at index from UTF8 content.
-    unsigned AtUTF8(i32 index) const;
+    c32 AtUTF8(i32 index) const;
     /// Replace Unicode character at index from UTF8 content.
-    void ReplaceUTF8(i32 index, unsigned unicodeChar);
+    void ReplaceUTF8(i32 index, c32 unicodeChar);
     /// Append Unicode character at the end as UTF8.
-    String& AppendUTF8(unsigned unicodeChar);
+    String& AppendUTF8(c32 unicodeChar);
     /// Return a UTF8 substring from position to end.
     String SubstringUTF8(i32 pos) const;
     /// Return a UTF8 substring with length from position.
@@ -474,14 +474,14 @@ public:
     /// @manualbind
     static String Joined(const Vector<String>& subStrings, const String& glue);
     /// Encode Unicode character to UTF8. Pointer will be incremented.
-    static void EncodeUTF8(char*& dest, unsigned unicodeChar);
+    static void EncodeUTF8(char*& dest, c32 unicodeChar);
     /// Decode Unicode character from UTF8. Pointer will be incremented.
-    static unsigned DecodeUTF8(const char*& src);
+    static c32 DecodeUTF8(const char*& src);
 #ifdef _WIN32
     /// Encode Unicode character to UTF16. Pointer will be incremented.
-    static void EncodeUTF16(wchar_t*& dest, unsigned unicodeChar);
+    static void EncodeUTF16(wchar_t*& dest, c32 unicodeChar);
     /// Decode Unicode character from UTF16. Pointer will be incremented.
-    static unsigned DecodeUTF16(const wchar_t*& src);
+    static c32 DecodeUTF16(const wchar_t*& src);
 #endif
 
     /// Return length of a C string.

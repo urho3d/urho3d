@@ -4945,8 +4945,8 @@ template <class T> void RegisterMembers_String(asIScriptEngine* engine, const ch
     // String& String::Append(char c)
     engine->RegisterObjectMethod(className, "String& Append(int8)", AS_METHODPR(T, Append, (char), String&), AS_CALL_THISCALL);
 
-    // String& String::AppendUTF8(unsigned unicodeChar)
-    engine->RegisterObjectMethod(className, "String& AppendUTF8(uint)", AS_METHODPR(T, AppendUTF8, (unsigned), String&), AS_CALL_THISCALL);
+    // String& String::AppendUTF8(c32 unicodeChar)
+    engine->RegisterObjectMethod(className, "String& AppendUTF8(c32)", AS_METHODPR(T, AppendUTF8, (c32), String&), AS_CALL_THISCALL);
 
     // char& String::At(i32 index)
     engine->RegisterObjectMethod(className, "int8& At(int)", AS_METHODPR(T, At, (i32), char&), AS_CALL_THISCALL);
@@ -4954,8 +4954,8 @@ template <class T> void RegisterMembers_String(asIScriptEngine* engine, const ch
     // const char& String::At(i32 index) const
     engine->RegisterObjectMethod(className, "const int8& At(int) const", AS_METHODPR(T, At, (i32) const, const char&), AS_CALL_THISCALL);
 
-    // unsigned String::AtUTF8(i32 index) const
-    engine->RegisterObjectMethod(className, "uint AtUTF8(int) const", AS_METHODPR(T, AtUTF8, (i32) const, unsigned), AS_CALL_THISCALL);
+    // c32 String::AtUTF8(i32 index) const
+    engine->RegisterObjectMethod(className, "c32 AtUTF8(int) const", AS_METHODPR(T, AtUTF8, (i32) const, c32), AS_CALL_THISCALL);
 
     // char String::Back() const
     engine->RegisterObjectMethod(className, "int8 Back() const", AS_METHODPR(T, Back, () const, char), AS_CALL_THISCALL);
@@ -5026,8 +5026,8 @@ template <class T> void RegisterMembers_String(asIScriptEngine* engine, const ch
     engine->RegisterObjectMethod(className, "int LengthUTF8() const", AS_METHODPR(T, LengthUTF8, () const, i32), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "int get_utf8Length() const", AS_METHODPR(T, LengthUTF8, () const, i32), AS_CALL_THISCALL);
 
-    // unsigned String::NextUTF8Char(i32& byteOffset) const
-    engine->RegisterObjectMethod(className, "uint NextUTF8Char(int&) const", AS_METHODPR(T, NextUTF8Char, (i32&) const, unsigned), AS_CALL_THISCALL);
+    // c32 String::NextUTF8Char(i32& byteOffset) const
+    engine->RegisterObjectMethod(className, "c32 NextUTF8Char(int&) const", AS_METHODPR(T, NextUTF8Char, (i32&) const, c32), AS_CALL_THISCALL);
 
     // String String::operator +(const String& rhs) const
     engine->RegisterObjectMethod(className, "String opAdd(const String&in) const", AS_METHODPR(T, operator+, (const String&) const, String), AS_CALL_THISCALL);
@@ -5089,8 +5089,8 @@ template <class T> void RegisterMembers_String(asIScriptEngine* engine, const ch
     // String String::Replaced(const String& replaceThis, const String& replaceWith, bool caseSensitive = true) const
     engine->RegisterObjectMethod(className, "String Replaced(const String&in, const String&in, bool = true) const", AS_METHODPR(T, Replaced, (const String&, const String&, bool) const, String), AS_CALL_THISCALL);
 
-    // void String::ReplaceUTF8(i32 index, unsigned unicodeChar)
-    engine->RegisterObjectMethod(className, "void ReplaceUTF8(int, uint)", AS_METHODPR(T, ReplaceUTF8, (i32, unsigned), void), AS_CALL_THISCALL);
+    // void String::ReplaceUTF8(i32 index, c32 unicodeChar)
+    engine->RegisterObjectMethod(className, "void ReplaceUTF8(int, c32)", AS_METHODPR(T, ReplaceUTF8, (i32, c32), void), AS_CALL_THISCALL);
 
     // void String::Reserve(i32 newCapacity)
     engine->RegisterObjectMethod(className, "void Reserve(int)", AS_METHODPR(T, Reserve, (i32), void), AS_CALL_THISCALL);
@@ -5140,9 +5140,9 @@ template <class T> void RegisterMembers_String(asIScriptEngine* engine, const ch
     // Error: type "const char*" can not automatically bind
     // static String String::Joined(const Vector<String>& subStrings, const String& glue)
     // Not registered because have @manualbind mark
-    // static void String::EncodeUTF8(char*& dest, unsigned unicodeChar)
+    // static void String::EncodeUTF8(char*& dest, c32 unicodeChar)
     // Error: type "char*&" can not automatically bind
-    // static unsigned String::DecodeUTF8(const char*& src)
+    // static c32 String::DecodeUTF8(const char*& src)
     // Error: type "const char*&" can not automatically bind
     // static i32 String::CStringLength(const char* str)
     // Error: type "const char*" can not automatically bind
@@ -7953,13 +7953,13 @@ template <class T> void RegisterMembers_FontFace(asIScriptEngine* engine, const 
 {
     RegisterMembers_RefCounted<T>(engine, className);
 
-    // virtual const FontGlyph* FontFace::GetGlyph(unsigned c)
+    // virtual const FontGlyph* FontFace::GetGlyph(c32 c)
     // Error: type "const FontGlyph*" can not automatically bind
     // virtual bool FontFace::Load(const unsigned char* fontData, unsigned fontDataSize, float pointSize) = 0
     // Error: type "const unsigned char*" can not automatically bind
 
-    // float FontFace::GetKerning(unsigned c, unsigned d) const
-    engine->RegisterObjectMethod(className, "float GetKerning(uint, uint) const", AS_METHODPR(T, GetKerning, (unsigned, unsigned) const, float), AS_CALL_THISCALL);
+    // float FontFace::GetKerning(c32 c, c32 d) const
+    engine->RegisterObjectMethod(className, "float GetKerning(c32, c32) const", AS_METHODPR(T, GetKerning, (c32, c32) const, float), AS_CALL_THISCALL);
 
     // float FontFace::GetPointSize() const
     engine->RegisterObjectMethod(className, "float GetPointSize() const", AS_METHODPR(T, GetPointSize, () const, float), AS_CALL_THISCALL);
@@ -22200,9 +22200,9 @@ template <class T> void RegisterMembers_LineEdit(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "uint GetCursorPosition() const", AS_METHODPR(T, GetCursorPosition, () const, unsigned), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_cursorPosition() const", AS_METHODPR(T, GetCursorPosition, () const, unsigned), AS_CALL_THISCALL);
 
-    // unsigned LineEdit::GetEchoCharacter() const
-    engine->RegisterObjectMethod(className, "uint GetEchoCharacter() const", AS_METHODPR(T, GetEchoCharacter, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_echoCharacter() const", AS_METHODPR(T, GetEchoCharacter, () const, unsigned), AS_CALL_THISCALL);
+    // c32 LineEdit::GetEchoCharacter() const
+    engine->RegisterObjectMethod(className, "c32 GetEchoCharacter() const", AS_METHODPR(T, GetEchoCharacter, () const, c32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "c32 get_echoCharacter() const", AS_METHODPR(T, GetEchoCharacter, () const, c32), AS_CALL_THISCALL);
 
     // unsigned LineEdit::GetMaxLength() const
     engine->RegisterObjectMethod(className, "uint GetMaxLength() const", AS_METHODPR(T, GetMaxLength, () const, unsigned), AS_CALL_THISCALL);
@@ -22240,9 +22240,9 @@ template <class T> void RegisterMembers_LineEdit(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "void SetCursorPosition(uint)", AS_METHODPR(T, SetCursorPosition, (unsigned), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_cursorPosition(uint)", AS_METHODPR(T, SetCursorPosition, (unsigned), void), AS_CALL_THISCALL);
 
-    // void LineEdit::SetEchoCharacter(unsigned c)
-    engine->RegisterObjectMethod(className, "void SetEchoCharacter(uint)", AS_METHODPR(T, SetEchoCharacter, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_echoCharacter(uint)", AS_METHODPR(T, SetEchoCharacter, (unsigned), void), AS_CALL_THISCALL);
+    // void LineEdit::SetEchoCharacter(c32 c)
+    engine->RegisterObjectMethod(className, "void SetEchoCharacter(c32)", AS_METHODPR(T, SetEchoCharacter, (c32), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_echoCharacter(c32)", AS_METHODPR(T, SetEchoCharacter, (c32), void), AS_CALL_THISCALL);
 
     // void LineEdit::SetMaxLength(unsigned length)
     engine->RegisterObjectMethod(className, "void SetMaxLength(uint)", AS_METHODPR(T, SetMaxLength, (unsigned), void), AS_CALL_THISCALL);

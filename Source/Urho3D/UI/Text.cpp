@@ -501,7 +501,7 @@ void Text::UpdateText(bool onResize)
             for (unsigned i = 0; i < unicodeText_.Size(); ++i)
             {
                 unsigned j;
-                unsigned c = unicodeText_[i];
+                u32 c = unicodeText_[i];
 
                 if (c != '\n')
                 {
@@ -594,7 +594,7 @@ void Text::UpdateText(bool onResize)
 
         for (unsigned i = 0; i < printText_.Size(); ++i)
         {
-            unsigned c = printText_[i];
+            c32 c = printText_[i];
 
             if (c != '\n')
             {
@@ -686,7 +686,7 @@ void Text::UpdateCharLocations()
         CharLocation loc;
         loc.position_ = Vector2(x, y);
 
-        unsigned c = printText_[i];
+        c32 c = printText_[i];
         if (c != '\n')
         {
             const FontGlyph* glyph = face->GetGlyph(c);

@@ -65,7 +65,7 @@ public:
     void SetMaxLength(unsigned length);
     /// Set echo character for password entry and such. 0 (default) shows the actual text.
     /// @property
-    void SetEchoCharacter(unsigned c);
+    void SetEchoCharacter(c32 c);
     /// Set whether can move cursor with arrows or mouse, default true.
     /// @property
     void SetCursorMovable(bool enable);
@@ -94,7 +94,7 @@ public:
 
     /// Return echo character.
     /// @property
-    unsigned GetEchoCharacter() const { return echoCharacter_; }
+    c32 GetEchoCharacter() const { return echoCharacter_; }
 
     /// Return whether can move cursor with arrows or mouse.
     /// @property
@@ -147,7 +147,7 @@ protected:
     /// Maximum text length.
     unsigned maxLength_;
     /// Echo character.
-    unsigned echoCharacter_;
+    c32 echoCharacter_;
     /// Cursor movable flag.
     bool cursorMovable_;
     /// Text selectable flag.

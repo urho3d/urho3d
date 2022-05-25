@@ -23,7 +23,7 @@ public:
     /// Load font face.
     bool Load(const unsigned char* fontData, unsigned fontDataSize, float pointSize) override;
     /// Return pointer to the glyph structure corresponding to a character. Return null if glyph not found.
-    const FontGlyph* GetGlyph(unsigned c) override;
+    const FontGlyph* GetGlyph(c32 c) override;
 
     /// Return if font face uses mutable glyphs.
     bool HasMutableGlyphs() const override { return hasMutableGlyph_; }
@@ -32,7 +32,7 @@ private:
     /// Setup next texture.
     bool SetupNextTexture(int textureWidth, int textureHeight);
     /// Load char glyph.
-    bool LoadCharGlyph(unsigned charCode, Image* image = nullptr);
+    bool LoadCharGlyph(c32 charCode, Image* image = nullptr);
     /// Smooth one row of a horizontally oversampled glyph image.
     void BoxFilter(unsigned char* dest, size_t destSize, const unsigned char* src, size_t srcSize);
 

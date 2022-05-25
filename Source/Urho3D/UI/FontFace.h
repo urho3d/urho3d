@@ -54,13 +54,13 @@ public:
     /// Load font face.
     virtual bool Load(const unsigned char* fontData, unsigned fontDataSize, float pointSize) = 0;
     /// Return pointer to the glyph structure corresponding to a character. Return null if glyph not found.
-    virtual const FontGlyph* GetGlyph(unsigned c);
+    virtual const FontGlyph* GetGlyph(c32 c);
 
     /// Return if font face uses mutable glyphs.
     virtual bool HasMutableGlyphs() const { return false; }
 
     /// Return the kerning for a character and the next character.
-    float GetKerning(unsigned c, unsigned d) const;
+    float GetKerning(c32 c, c32 d) const;
     /// Return true when one of the texture has a data loss.
     bool IsDataLost() const;
 
@@ -83,9 +83,9 @@ protected:
     /// Parent font.
     Font* font_{};
     /// Glyph mapping.
-    HashMap<unsigned, FontGlyph> glyphMapping_;
+    HashMap<c32, FontGlyph> glyphMapping_;
     /// Kerning mapping.
-    HashMap<unsigned, float> kerningMapping_;
+    HashMap<u32, float> kerningMapping_;
     /// Glyph texture pages.
     Vector<SharedPtr<Texture2D> > textures_;
     /// Point size.
