@@ -292,8 +292,18 @@ union VariantValue
     CustomVariantValue* customValueHeap_;
     CustomVariantValue customValueStack_;
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:26495)
+#endif
+
     /// Construct uninitialized.
     VariantValue() { }      // NOLINT(modernize-use-equals-default)
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+
     /// Non-copyable.
     VariantValue(const VariantValue& value) = delete;
     /// Destruct.
