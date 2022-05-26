@@ -49,9 +49,9 @@
 
 // Case insensitive string comparison.
 #ifdef _WIN32
-   #define URHO_STRICMP(a,b) stricmp(a,b)
-   #define URHO_STRNICMP(a,b,n) strnicmp(a,b,n)
+    #define URHO_STRICMP(a,b) stricmp(a,b)
+    #define URHO_STRNICMP(a,b,n) strnicmp(a,b,n)
 #else
-   #define URHO_STRICMP(a,b) strcasecmp(a,b)
-   #define URHO_STRNICMP(a,b,n) strncasecmp(a,b,n)
+    #define URHO_STRICMP(a,b) strcasecmp(a,b)
+    #define URHO_STRNICMP(a,b,n) strncasecmp(a,b,n)
 #endif
