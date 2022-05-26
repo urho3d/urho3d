@@ -4,6 +4,11 @@
 # Define target name
 set (TARGET_NAME Urho3D)
 
+if (MSVC)
+    # Set warning level for Urho3D project
+    add_compile_options(/W3)
+endif ()
+
 # Prevent ICE from old MinGW versions, workaround from the GCC bugzilla https://gcc.gnu.org/bugzilla/show_bug.cgi?id=61189
 if (MINGW AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.9.1 AND NOT URHO3D_64BIT)
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mpreferred-stack-boundary=2")
