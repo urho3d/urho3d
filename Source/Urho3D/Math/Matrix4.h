@@ -19,6 +19,12 @@ class Matrix3x4;
 class URHO3D_API Matrix4
 {
 public:
+
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:26495)
+#endif
+
     /// Construct an identity matrix.
     Matrix4() noexcept
 #ifndef URHO3D_SSE
@@ -150,6 +156,10 @@ public:
         _mm_storeu_ps(&m30_, _mm_loadu_ps(data + 12));
 #endif
     }
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
     /// Assign from another matrix.
     Matrix4& operator =(const Matrix4& rhs) noexcept

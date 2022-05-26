@@ -16,6 +16,12 @@ namespace Urho3D
 class URHO3D_API Quaternion
 {
 public:
+
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:26495)
+#endif
+
     /// Construct an identity quaternion.
     Quaternion() noexcept
 #ifndef URHO3D_SSE
@@ -73,6 +79,17 @@ public:
 #endif
     }
 
+#ifdef URHO3D_SSE
+    explicit Quaternion(__m128 wxyz) noexcept
+    {
+        _mm_storeu_ps(&w_, wxyz);
+    }
+#endif
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+
     /// Construct from an angle (in degrees) and axis.
     Quaternion(float angle, const Vector3& axis) noexcept
     {
@@ -114,13 +131,6 @@ public:
     {
         FromRotationMatrix(matrix);
     }
-
-#ifdef URHO3D_SSE
-    explicit Quaternion(__m128 wxyz) noexcept
-    {
-        _mm_storeu_ps(&w_, wxyz);
-    }
-#endif
 
     /// Assign from another quaternion.
     Quaternion& operator =(const Quaternion& rhs) noexcept

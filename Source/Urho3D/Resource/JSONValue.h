@@ -55,11 +55,22 @@ using ConstJSONObjectIterator = JSONObject::ConstIterator;
 class URHO3D_API JSONValue
 {
 public:
+
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:26495)
+#endif
+
     /// Construct null value.
     JSONValue() :
         type_(0)
     {
     }
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+
     /// Construct with a boolean.
     JSONValue(bool value) :         // NOLINT(google-explicit-constructor)
         type_(0)
