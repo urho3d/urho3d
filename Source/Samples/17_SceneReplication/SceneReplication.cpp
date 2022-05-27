@@ -395,7 +395,7 @@ void SceneReplication::HandlePhysicsPreStep(StringHash eventType, VariantMap& ev
     // Server: apply controls to client objects
     else if (network->IsServerRunning())
     {
-        const Vector<SharedPtr<Connection> >& connections = network->GetClientConnections();
+        const Vector<SharedPtr<Connection>>& connections = network->GetClientConnections();
 
         for (unsigned i = 0; i < connections.Size(); ++i)
         {

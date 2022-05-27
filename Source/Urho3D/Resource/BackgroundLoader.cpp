@@ -75,7 +75,7 @@ void BackgroundLoader::ThreadFunction()
             backgroundLoadMutex_.Acquire();
             if (item.dependents_.Size())
             {
-                for (HashSet<Pair<StringHash, StringHash> >::Iterator i = item.dependents_.Begin();
+                for (HashSet<Pair<StringHash, StringHash>>::Iterator i = item.dependents_.Begin();
                      i != item.dependents_.End(); ++i)
                 {
                     HashMap<Pair<StringHash, StringHash>, BackgroundLoadItem>::Iterator j = backgroundLoadQueue_.Find(*i);

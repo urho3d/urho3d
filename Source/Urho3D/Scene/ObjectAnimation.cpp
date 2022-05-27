@@ -92,7 +92,7 @@ bool ObjectAnimation::LoadXML(const XMLElement& source)
 
 bool ObjectAnimation::SaveXML(XMLElement& dest) const
 {
-    for (HashMap<String, SharedPtr<ValueAnimationInfo> >::ConstIterator i = attributeAnimationInfos_.Begin();
+    for (HashMap<String, SharedPtr<ValueAnimationInfo>>::ConstIterator i = attributeAnimationInfos_.Begin();
          i != attributeAnimationInfos_.End(); ++i)
     {
         XMLElement animElem = dest.CreateChild("attributeanimation");
@@ -151,7 +151,7 @@ bool ObjectAnimation::SaveJSON(JSONValue& dest) const
 {
     JSONValue attributeAnimationsValue;
 
-    for (HashMap<String, SharedPtr<ValueAnimationInfo> >::ConstIterator i = attributeAnimationInfos_.Begin();
+    for (HashMap<String, SharedPtr<ValueAnimationInfo>>::ConstIterator i = attributeAnimationInfos_.Begin();
          i != attributeAnimationInfos_.End(); ++i)
     {
         JSONValue animValue;
@@ -184,7 +184,7 @@ void ObjectAnimation::AddAttributeAnimation(const String& name, ValueAnimation* 
 
 void ObjectAnimation::RemoveAttributeAnimation(const String& name)
 {
-    HashMap<String, SharedPtr<ValueAnimationInfo> >::Iterator i = attributeAnimationInfos_.Find(name);
+    HashMap<String, SharedPtr<ValueAnimationInfo>>::Iterator i = attributeAnimationInfos_.Find(name);
     if (i != attributeAnimationInfos_.End())
     {
         SendAttributeAnimationRemovedEvent(name);
@@ -199,7 +199,7 @@ void ObjectAnimation::RemoveAttributeAnimation(ValueAnimation* attributeAnimatio
     if (!attributeAnimation)
         return;
 
-    for (HashMap<String, SharedPtr<ValueAnimationInfo> >::Iterator i = attributeAnimationInfos_.Begin();
+    for (HashMap<String, SharedPtr<ValueAnimationInfo>>::Iterator i = attributeAnimationInfos_.Begin();
          i != attributeAnimationInfos_.End(); ++i)
     {
         if (i->second_->GetAnimation() == attributeAnimation)
@@ -233,7 +233,7 @@ float ObjectAnimation::GetAttributeAnimationSpeed(const String& name) const
 
 ValueAnimationInfo* ObjectAnimation::GetAttributeAnimationInfo(const String& name) const
 {
-    HashMap<String, SharedPtr<ValueAnimationInfo> >::ConstIterator i = attributeAnimationInfos_.Find(name);
+    HashMap<String, SharedPtr<ValueAnimationInfo>>::ConstIterator i = attributeAnimationInfos_.Find(name);
     if (i != attributeAnimationInfos_.End())
         return i->second_;
     return nullptr;

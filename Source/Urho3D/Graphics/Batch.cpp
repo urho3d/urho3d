@@ -594,8 +594,8 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                 graphics->SetShaderParameter(i->first_, i->second_.value_);
         }
 
-        const HashMap<TextureUnit, SharedPtr<Texture> >& textures = material_->GetTextures();
-        for (HashMap<TextureUnit, SharedPtr<Texture> >::ConstIterator i = textures.Begin(); i != textures.End(); ++i)
+        const HashMap<TextureUnit, SharedPtr<Texture>>& textures = material_->GetTextures();
+        for (HashMap<TextureUnit, SharedPtr<Texture>>::ConstIterator i = textures.Begin(); i != textures.End(); ++i)
         {
             if (graphics->HasTextureUnit(i->first_))
                 graphics->SetTexture(i->first_, i->second_.Get());
@@ -687,7 +687,7 @@ void BatchGroup::Draw(View* view, Camera* camera, bool allowDepthWrite) const
 
             // Get the geometry vertex buffers, then add the instancing stream buffer
             // Hack: use a const_cast to avoid dynamic allocation of new temp vectors
-            auto& vertexBuffers = const_cast<Vector<SharedPtr<VertexBuffer> >&>(
+            auto& vertexBuffers = const_cast<Vector<SharedPtr<VertexBuffer>>&>(
                 geometry_->GetVertexBuffers());
             vertexBuffers.Push(SharedPtr<VertexBuffer>(instanceBuffer));
 

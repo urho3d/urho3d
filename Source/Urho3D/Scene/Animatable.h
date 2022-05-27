@@ -138,7 +138,7 @@ protected:
     /// Animated network attribute set.
     HashSet<const AttributeInfo*> animatedNetworkAttributes_;
     /// Attribute animation infos.
-    HashMap<String, SharedPtr<AttributeAnimationInfo> > attributeAnimationInfos_;
+    HashMap<String, SharedPtr<AttributeAnimationInfo>> attributeAnimationInfos_;
 };
 
 }

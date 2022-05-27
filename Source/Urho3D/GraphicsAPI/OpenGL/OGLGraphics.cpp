@@ -982,7 +982,7 @@ bool Graphics::SetVertexBuffers_OGL(const PODVector<VertexBuffer*>& buffers, uns
     return true;
 }
 
-bool Graphics::SetVertexBuffers_OGL(const Vector<SharedPtr<VertexBuffer> >& buffers, unsigned instanceOffset)
+bool Graphics::SetVertexBuffers_OGL(const Vector<SharedPtr<VertexBuffer>>& buffers, unsigned instanceOffset)
 {
     return SetVertexBuffers_OGL(reinterpret_cast<const PODVector<VertexBuffer*>&>(buffers), instanceOffset);
 }
@@ -1709,7 +1709,7 @@ void Graphics::SetDepthStencil_OGL(RenderSurface* depthStencil)
         if (width <= width_ && height <= height_)
         {
             unsigned searchKey = (width << 16u) | height;
-            HashMap<unsigned, SharedPtr<Texture2D> >::Iterator i = impl->depthTextures_.Find(searchKey);
+            HashMap<unsigned, SharedPtr<Texture2D>>::Iterator i = impl->depthTextures_.Find(searchKey);
             if (i != impl->depthTextures_.End())
                 depthStencil = i->second_->GetRenderSurface();
             else
@@ -2365,7 +2365,7 @@ ConstantBuffer* Graphics::GetOrCreateConstantBuffer_OGL(ShaderType type,  unsign
     GraphicsImpl_OGL* impl = GetImpl_OGL();
 
     unsigned key = (index << 16u) | size;
-    HashMap<unsigned, SharedPtr<ConstantBuffer> >::Iterator i = impl->allConstantBuffers_.Find(key);
+    HashMap<unsigned, SharedPtr<ConstantBuffer>>::Iterator i = impl->allConstantBuffers_.Find(key);
     if (i == impl->allConstantBuffers_.End())
     {
         i = impl->allConstantBuffers_.Insert(MakePair(key, SharedPtr<ConstantBuffer>(new ConstantBuffer(context_))));

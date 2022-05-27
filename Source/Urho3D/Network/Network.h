@@ -109,7 +109,7 @@ public:
     Connection* GetServerConnection() const;
     /// Return all client connections.
     /// @property
-    Vector<SharedPtr<Connection> > GetClientConnections() const;
+    Vector<SharedPtr<Connection>> GetClientConnections() const;
     /// Return whether the server is running.
     /// @property
     bool IsServerRunning() const;
@@ -146,7 +146,7 @@ private:
     /// Client's server connection.
     SharedPtr<Connection> serverConnection_;
     /// Server's client connections.
-    HashMap<SLNet::AddressOrGUID, SharedPtr<Connection> > clientConnections_;
+    HashMap<SLNet::AddressOrGUID, SharedPtr<Connection>> clientConnections_;
     /// Allowed remote events.
     HashSet<StringHash> allowedRemoteEvents_;
     /// Remote event fixed blacklist.

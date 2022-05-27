@@ -132,7 +132,7 @@ FontFace* Font::GetFace(float pointSize)
 
     // For outline fonts, we return the nearest size in 1/64th increments, as that's what FreeType supports.
     int key = FloatToFixed(pointSize);
-    HashMap<int, SharedPtr<FontFace> >::Iterator i = faces_.Find(key);
+    HashMap<int, SharedPtr<FontFace>>::Iterator i = faces_.Find(key);
     if (i != faces_.End())
     {
         if (!i->second_->IsDataLost())

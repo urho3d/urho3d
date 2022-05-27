@@ -171,7 +171,7 @@ public:
     }
 
     /// Move-construct from another hash set.
-    HashSet(HashSet<T> && set) noexcept
+    HashSet(HashSet<T>&& set) noexcept
     {
         Swap(set);
     }
@@ -210,7 +210,7 @@ public:
     }
 
     /// Move-assign a hash set.
-    HashSet& operator =(HashSet<T> && rhs) noexcept
+    HashSet& operator =(HashSet<T>&& rhs) noexcept
     {
         Swap(rhs);
         return *this;

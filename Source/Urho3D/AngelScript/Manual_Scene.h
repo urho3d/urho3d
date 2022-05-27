@@ -80,8 +80,8 @@ template <class T> CScriptArray* Node_GetChildren_Script_ClassName(const String&
     for (PODVector<Node*>::Iterator i = nodes.Begin(); i != nodes.End(); ++i)
     {
         Node* node = *i;
-        const Vector<SharedPtr<Component> >& components = node->GetComponents();
-        for (Vector<SharedPtr<Component> >::ConstIterator j = components.Begin(); j != components.End(); ++j)
+        const Vector<SharedPtr<Component>>& components = node->GetComponents();
+        for (Vector<SharedPtr<Component>>::ConstIterator j = components.Begin(); j != components.End(); ++j)
         {
             if (auto* instance = (*j)->Cast<ScriptInstance>())
             {
@@ -117,7 +117,7 @@ template <class T> unsigned Node_GetNumChildren_Recursive(T* ptr)
 // Node* Node::GetChild(unsigned index) const | File: ../Scene/Node.h
 template <class T> Node* Node_GetChild(unsigned index, T* ptr)
 {
-    const Vector<SharedPtr<Node> >& children = ptr->GetChildren();
+    const Vector<SharedPtr<Node>>& children = ptr->GetChildren();
     if (index >= children.Size())
     {
         GetActiveASContext()->SetException("Index out of bounds");
@@ -142,7 +142,7 @@ template <class T> Node* Node_GetChild_Name_Recursive(const String& name, T* ptr
 // const Vector<SharedPtr<Component>>& Node::GetComponents() const | File: ../Scene/Node.h
 template <class T> Component* Node_GetComponent(unsigned index, T* ptr)
 {
-    const Vector<SharedPtr<Component> >& components = ptr->GetComponents();
+    const Vector<SharedPtr<Component>>& components = ptr->GetComponents();
     if (index >= components.Size())
     {
         GetActiveASContext()->SetException("Index out of bounds");

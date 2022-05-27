@@ -35,7 +35,7 @@ struct ResourceGroup
     /// Current memory use.
     unsigned long long memoryUse_;
     /// Resources.
-    HashMap<StringHash, SharedPtr<Resource> > resources_;
+    HashMap<StringHash, SharedPtr<Resource>> resources_;
 };
 
 /// Resource request types.
@@ -147,7 +147,7 @@ public:
 
     /// Return added package files.
     /// @property
-    const Vector<SharedPtr<PackageFile> >& GetPackageFiles() const { return packages_; }
+    const Vector<SharedPtr<PackageFile>>& GetPackageFiles() const { return packages_; }
 
     /// Template version of returning a resource by name.
     template <class T> T* GetResource(const String& name, bool sendEventOnFailure = true);
@@ -231,15 +231,15 @@ private:
     /// Resource load directories.
     Vector<String> resourceDirs_;
     /// File watchers for resource directories, if automatic reloading enabled.
-    Vector<SharedPtr<FileWatcher> > fileWatchers_;
+    Vector<SharedPtr<FileWatcher>> fileWatchers_;
     /// Package files.
-    Vector<SharedPtr<PackageFile> > packages_;
+    Vector<SharedPtr<PackageFile>> packages_;
     /// Dependent resources. Only used with automatic reload to eg. trigger reload of a cube texture when any of its faces change.
-    HashMap<StringHash, HashSet<StringHash> > dependentResources_;
+    HashMap<StringHash, HashSet<StringHash>> dependentResources_;
     /// Resource background loader.
     SharedPtr<BackgroundLoader> backgroundLoader_;
     /// Resource routers.
-    Vector<SharedPtr<ResourceRouter> > resourceRouters_;
+    Vector<SharedPtr<ResourceRouter>> resourceRouters_;
     /// Automatic resource reloading flag.
     bool autoReloadResources_;
     /// Return failed resources flag.

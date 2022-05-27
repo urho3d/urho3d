@@ -79,7 +79,7 @@ public:
     }
 
     /// Move-construct from another vector.
-    Vector(Vector<T> && vector)
+    Vector(Vector<T>&& vector)
     {
         Swap(vector);
     }
@@ -124,7 +124,7 @@ public:
     }
 
     /// Move-assign from another vector.
-    Vector<T>& operator =(Vector<T> && rhs)
+    Vector<T>& operator =(Vector<T>&& rhs)
     {
         Swap(rhs);
         return *this;
@@ -268,7 +268,7 @@ public:
     }
 
     /// Move-add an element at the end.
-    void Push(T && value)
+    void Push(T&& value)
     {
         if (size_ < capacity_)
         {
@@ -377,7 +377,7 @@ public:
     }
 
     /// Move-insert an element by iterator.
-    Iterator Insert(const Iterator& dest, T && value)
+    Iterator Insert(const Iterator& dest, T&& value)
     {
         auto pos = (unsigned)(dest - Begin());
         return DoInsertElements(pos, &value, &value + 1, MoveTag{});

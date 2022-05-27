@@ -71,7 +71,7 @@ private:
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
 
     /// Box scene nodes.
-    Vector<SharedPtr<Node> > boxNodes_;
+    Vector<SharedPtr<Node>> boxNodes_;
     /// Animation flag.
     bool animate_;
     /// Group optimization flag.

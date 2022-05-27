@@ -358,7 +358,7 @@ bool Engine::InitializeResourceCache(const VariantMap& parameters, bool removeOl
     if (removeOld)
     {
         Vector<String> resourceDirs = cache->GetResourceDirs();
-        Vector<SharedPtr<PackageFile> > packageFiles = cache->GetPackageFiles();
+        Vector<SharedPtr<PackageFile>> packageFiles = cache->GetPackageFiles();
         for (unsigned i = 0; i < resourceDirs.Size(); ++i)
             cache->RemoveResourceDir(resourceDirs[i]);
         for (unsigned i = 0; i < packageFiles.Size(); ++i)
@@ -662,10 +662,10 @@ void Engine::DumpResources(bool dumpFileName)
         URHO3D_LOGRAW("Used resources:\n");
         for (HashMap<StringHash, ResourceGroup>::ConstIterator i = resourceGroups.Begin(); i != resourceGroups.End(); ++i)
         {
-            const HashMap<StringHash, SharedPtr<Resource> >& resources = i->second_.resources_;
+            const HashMap<StringHash, SharedPtr<Resource>>& resources = i->second_.resources_;
             if (dumpFileName)
             {
-                for (HashMap<StringHash, SharedPtr<Resource> >::ConstIterator j = resources.Begin(); j != resources.End(); ++j)
+                for (HashMap<StringHash, SharedPtr<Resource>>::ConstIterator j = resources.Begin(); j != resources.End(); ++j)
                     URHO3D_LOGRAW(j->second_->GetName() + "\n");
             }
         }

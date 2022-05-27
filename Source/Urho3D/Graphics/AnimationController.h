@@ -188,7 +188,7 @@ private:
     /// Animation control structures.
     Vector<AnimationControl> animations_;
     /// Node hierarchy mode animation states.
-    Vector<SharedPtr<AnimationState> > nodeAnimationStates_;
+    Vector<SharedPtr<AnimationState>> nodeAnimationStates_;
     /// Attribute buffer for network replication.
     mutable VectorBuffer attrBuffer_;
 };

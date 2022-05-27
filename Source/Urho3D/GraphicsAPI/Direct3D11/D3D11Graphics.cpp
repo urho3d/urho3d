@@ -856,7 +856,7 @@ bool Graphics::SetVertexBuffers_D3D11(const PODVector<VertexBuffer*>& buffers, u
     return true;
 }
 
-bool Graphics::SetVertexBuffers_D3D11(const Vector<SharedPtr<VertexBuffer> >& buffers, unsigned instanceOffset)
+bool Graphics::SetVertexBuffers_D3D11(const Vector<SharedPtr<VertexBuffer>>& buffers, unsigned instanceOffset)
 {
     return SetVertexBuffers_D3D11(reinterpret_cast<const PODVector<VertexBuffer*>&>(buffers), instanceOffset);
 }

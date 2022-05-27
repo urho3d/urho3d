@@ -430,7 +430,7 @@ void Renderer::SetMaxShadowMaps(int shadowMaps)
         return;
 
     maxShadowMaps_ = shadowMaps;
-    for (HashMap<int, Vector<SharedPtr<Texture2D> > >::Iterator i = shadowMaps_.Begin(); i != shadowMaps_.End(); ++i)
+    for (HashMap<int, Vector<SharedPtr<Texture2D>>>::Iterator i = shadowMaps_.Begin(); i != shadowMaps_.End(); ++i)
     {
         if ((int)i->second_.Size() > maxShadowMaps_)
             i->second_.Resize((unsigned)maxShadowMaps_);
@@ -785,7 +785,7 @@ void Renderer::QueueViewport(RenderSurface* renderTarget, Viewport* viewport)
 {
     if (viewport)
     {
-        Pair<WeakPtr<RenderSurface>, WeakPtr<Viewport> > newView =
+        Pair<WeakPtr<RenderSurface>, WeakPtr<Viewport>> newView =
             MakePair(WeakPtr<RenderSurface>(renderTarget), WeakPtr<Viewport>(viewport));
 
         // Prevent double add of the same rendertarget/viewport combination
@@ -1131,7 +1131,7 @@ void Renderer::StorePreparedView(View* view, Camera* camera)
 
 View* Renderer::GetPreparedView(Camera* camera)
 {
-    HashMap<Camera*, WeakPtr<View> >::Iterator i = preparedViews_.Find(camera);
+    HashMap<Camera*, WeakPtr<View>>::Iterator i = preparedViews_.Find(camera);
     return i != preparedViews_.End() ? i->second_ : nullptr;
 }
 
@@ -1151,8 +1151,8 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows,
     if (pass->GetShadersLoadedFrameNumber() != shadersChangedFrameNumber_)
         pass->ReleaseShaders();
 
-    Vector<SharedPtr<ShaderVariation> >& vertexShaders = queue.hasExtraDefines_ ? pass->GetVertexShaders(queue.vsExtraDefinesHash_) : pass->GetVertexShaders();
-    Vector<SharedPtr<ShaderVariation> >& pixelShaders = queue.hasExtraDefines_ ? pass->GetPixelShaders(queue.psExtraDefinesHash_) : pass->GetPixelShaders();
+    Vector<SharedPtr<ShaderVariation>>& vertexShaders = queue.hasExtraDefines_ ? pass->GetVertexShaders(queue.vsExtraDefinesHash_) : pass->GetVertexShaders();
+    Vector<SharedPtr<ShaderVariation>>& pixelShaders = queue.hasExtraDefines_ ? pass->GetPixelShaders(queue.psExtraDefinesHash_) : pass->GetPixelShaders();
 
     // Load shaders now if necessary
     if (!vertexShaders.Size() || !pixelShaders.Size())
@@ -1525,10 +1525,10 @@ void Renderer::RemoveUnusedBuffers()
         }
     }
 
-    for (HashMap<unsigned long long, Vector<SharedPtr<Texture> > >::Iterator i = screenBuffers_.Begin(); i != screenBuffers_.End();)
+    for (HashMap<unsigned long long, Vector<SharedPtr<Texture>>>::Iterator i = screenBuffers_.Begin(); i != screenBuffers_.End();)
     {
-        HashMap<unsigned long long, Vector<SharedPtr<Texture> > >::Iterator current = i++;
-        Vector<SharedPtr<Texture> >& buffers = current->second_;
+        HashMap<unsigned long long, Vector<SharedPtr<Texture>>>::Iterator current = i++;
+        Vector<SharedPtr<Texture>>& buffers = current->second_;
         for (unsigned j = buffers.Size() - 1; j < buffers.Size(); --j)
         {
             Texture* buffer = buffers[j];
@@ -1549,7 +1549,7 @@ void Renderer::RemoveUnusedBuffers()
 
 void Renderer::ResetShadowMapAllocations()
 {
-    for (HashMap<int, PODVector<Light*> >::Iterator i = shadowMapAllocations_.Begin(); i != shadowMapAllocations_.End(); ++i)
+    for (HashMap<int, PODVector<Light*>>::Iterator i = shadowMapAllocations_.Begin(); i != shadowMapAllocations_.End(); ++i)
         i->second_.Clear();
 }
 
@@ -1620,7 +1620,7 @@ void Renderer::LoadShaders()
     shadersDirty_ = false;
 }
 
-void Renderer::LoadPassShaders(Pass* pass, Vector<SharedPtr<ShaderVariation> >& vertexShaders, Vector<SharedPtr<ShaderVariation> >& pixelShaders, const BatchQueue& queue)
+void Renderer::LoadPassShaders(Pass* pass, Vector<SharedPtr<ShaderVariation>>& vertexShaders, Vector<SharedPtr<ShaderVariation> >& pixelShaders, const BatchQueue& queue)
 {
     URHO3D_PROFILE(LoadPassShaders);
 

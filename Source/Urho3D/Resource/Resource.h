@@ -153,7 +153,7 @@ inline ResourceRef GetResourceRef(Resource* resource, StringHash defaultType)
     return ResourceRef(GetResourceType(resource, defaultType), GetResourceName(resource));
 }
 
-template <class T> Vector<String> GetResourceNames(const Vector<SharedPtr<T> >& resources)
+template <class T> Vector<String> GetResourceNames(const Vector<SharedPtr<T>>& resources)
 {
     Vector<String> ret(resources.Size());
     for (unsigned i = 0; i < resources.Size(); ++i)
@@ -162,7 +162,7 @@ template <class T> Vector<String> GetResourceNames(const Vector<SharedPtr<T> >& 
     return ret;
 }
 
-template <class T> ResourceRefList GetResourceRefList(const Vector<SharedPtr<T> >& resources)
+template <class T> ResourceRefList GetResourceRefList(const Vector<SharedPtr<T>>& resources)
 {
     return ResourceRefList(T::GetTypeStatic(), GetResourceNames(resources));
 }

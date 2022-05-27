@@ -275,7 +275,7 @@ protected:
     /// Row widths.
     PODVector<float> rowWidths_;
     /// Glyph locations per each texture in the font.
-    Vector<PODVector<GlyphLocation> > pageGlyphLocations_;
+    Vector<PODVector<GlyphLocation>> pageGlyphLocations_;
     /// Cached locations of each character in the text.
     PODVector<CharLocation> charLocations_;
     /// The text will be automatically translated.

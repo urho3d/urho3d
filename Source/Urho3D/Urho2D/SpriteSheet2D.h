@@ -47,7 +47,7 @@ public:
     Sprite2D* GetSprite(const String& name) const;
 
     /// Return sprite mapping.
-    const HashMap<String, SharedPtr<Sprite2D> >& GetSpriteMapping() const { return spriteMapping_; }
+    const HashMap<String, SharedPtr<Sprite2D>>& GetSpriteMapping() const { return spriteMapping_; }
 
 private:
     /// Begin load from PList file.
@@ -67,7 +67,7 @@ private:
     /// Texture.
     SharedPtr<Texture2D> texture_;
     /// Sprite mapping.
-    HashMap<String, SharedPtr<Sprite2D> > spriteMapping_;
+    HashMap<String, SharedPtr<Sprite2D>> spriteMapping_;
     /// PList file used while loading.
     SharedPtr<PListFile> loadPListFile_;
     /// XML file used while loading.

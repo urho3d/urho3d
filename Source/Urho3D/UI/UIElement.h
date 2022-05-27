@@ -647,7 +647,7 @@ public:
     UIElement* GetChild(const StringHash& key, const Variant& value = Variant::EMPTY, bool recursive = false) const;
 
     /// Return immediate child elements.
-    const Vector<SharedPtr<UIElement> >& GetChildren() const { return children_; }
+    const Vector<SharedPtr<UIElement>>& GetChildren() const { return children_; }
 
     /// Return child elements either recursively or non-recursively.
     void GetChildren(PODVector<UIElement*>& dest, bool recursive = false) const;
@@ -768,7 +768,7 @@ protected:
     /// Name.
     String name_;
     /// Child elements.
-    Vector<SharedPtr<UIElement> > children_;
+    Vector<SharedPtr<UIElement>> children_;
     /// Parent element.
     UIElement* parent_{};
     /// Child element clipping border.

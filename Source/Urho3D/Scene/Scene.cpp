@@ -701,7 +701,7 @@ Node* Scene::GetNode(unsigned id) const
 bool Scene::GetNodesWithTag(PODVector<Node*>& dest, const String& tag) const
 {
     dest.Clear();
-    HashMap<StringHash, PODVector<Node*> >::ConstIterator it = taggedNodes_.Find(tag);
+    HashMap<StringHash, PODVector<Node*>>::ConstIterator it = taggedNodes_.Find(tag);
     if (it != taggedNodes_.End())
     {
         dest = it->second_;
@@ -939,11 +939,11 @@ void Scene::NodeAdded(Node* node)
     }
 
     // Add already created components and child nodes now
-    const Vector<SharedPtr<Component> >& components = node->GetComponents();
-    for (Vector<SharedPtr<Component> >::ConstIterator i = components.Begin(); i != components.End(); ++i)
+    const Vector<SharedPtr<Component>>& components = node->GetComponents();
+    for (Vector<SharedPtr<Component>>::ConstIterator i = components.Begin(); i != components.End(); ++i)
         ComponentAdded(*i);
-    const Vector<SharedPtr<Node> >& children = node->GetChildren();
-    for (Vector<SharedPtr<Node> >::ConstIterator i = children.Begin(); i != children.End(); ++i)
+    const Vector<SharedPtr<Node>>& children = node->GetChildren();
+    for (Vector<SharedPtr<Node>>::ConstIterator i = children.Begin(); i != children.End(); ++i)
         NodeAdded(*i);
 }
 
@@ -982,11 +982,11 @@ void Scene::NodeRemoved(Node* node)
     }
 
     // Remove components and child nodes as well
-    const Vector<SharedPtr<Component> >& components = node->GetComponents();
-    for (Vector<SharedPtr<Component> >::ConstIterator i = components.Begin(); i != components.End(); ++i)
+    const Vector<SharedPtr<Component>>& components = node->GetComponents();
+    for (Vector<SharedPtr<Component>>::ConstIterator i = components.Begin(); i != components.End(); ++i)
         ComponentRemoved(*i);
-    const Vector<SharedPtr<Node> >& children = node->GetChildren();
-    for (Vector<SharedPtr<Node> >::ConstIterator i = children.Begin(); i != children.End(); ++i)
+    const Vector<SharedPtr<Node>>& children = node->GetChildren();
+    for (Vector<SharedPtr<Node>>::ConstIterator i = children.Begin(); i != children.End(); ++i)
         NodeRemoved(*i);
 }
 

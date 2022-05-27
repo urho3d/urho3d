@@ -1430,7 +1430,7 @@ template <> inline VariantType GetVariantType<String>() { return VAR_STRING; }
 
 template <> inline VariantType GetVariantType<StringHash>() { return VAR_INT; }
 
-template <> inline VariantType GetVariantType<PODVector<unsigned char> >() { return VAR_BUFFER; }
+template <> inline VariantType GetVariantType<PODVector<unsigned char>>() { return VAR_BUFFER; }
 
 template <> inline VariantType GetVariantType<ResourceRef>() { return VAR_RESOURCEREF; }
 
@@ -1535,7 +1535,7 @@ template <> URHO3D_API IntVector2 Variant::Get<IntVector2>() const;
 
 template <> URHO3D_API IntVector3 Variant::Get<IntVector3>() const;
 
-template <> URHO3D_API PODVector<unsigned char> Variant::Get<PODVector<unsigned char> >() const;
+template <> URHO3D_API PODVector<unsigned char> Variant::Get<PODVector<unsigned char>>() const;
 
 template <> URHO3D_API Matrix3 Variant::Get<Matrix3>() const;
 

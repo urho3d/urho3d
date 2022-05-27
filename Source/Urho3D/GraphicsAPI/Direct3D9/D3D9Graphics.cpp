@@ -1023,7 +1023,7 @@ bool Graphics::SetVertexBuffers_D3D9(const PODVector<VertexBuffer*>& buffers, un
     return true;
 }
 
-bool Graphics::SetVertexBuffers_D3D9(const Vector<SharedPtr<VertexBuffer> >& buffers, unsigned instanceOffset)
+bool Graphics::SetVertexBuffers_D3D9(const Vector<SharedPtr<VertexBuffer>>& buffers, unsigned instanceOffset)
 {
     return SetVertexBuffers_D3D9(reinterpret_cast<const PODVector<VertexBuffer*>&>(buffers), instanceOffset);
 }

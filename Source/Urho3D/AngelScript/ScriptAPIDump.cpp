@@ -249,10 +249,10 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
 
         Log::WriteRaw("\n\\page AttributeList Attribute list\n");
 
-        const HashMap<StringHash, Vector<AttributeInfo> >& attributes = context_->GetAllAttributes();
+        const HashMap<StringHash, Vector<AttributeInfo>>& attributes = context_->GetAllAttributes();
 
         Vector<String> objectTypes;
-        for (HashMap<StringHash, Vector<AttributeInfo> >::ConstIterator i = attributes.Begin(); i != attributes.End(); ++i)
+        for (HashMap<StringHash, Vector<AttributeInfo>>::ConstIterator i = attributes.Begin(); i != attributes.End(); ++i)
             objectTypes.Push(context_->GetTypeName(i->first_));
 
         Sort(objectTypes.Begin(), objectTypes.End());
@@ -327,7 +327,7 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
         );
 
     unsigned types = scriptEngine_->GetObjectTypeCount();
-    Vector<Pair<String, unsigned> > sortedTypes;
+    Vector<Pair<String, unsigned>> sortedTypes;
     for (unsigned i = 0; i < types; ++i)
     {
         asITypeInfo* type = scriptEngine_->GetObjectTypeByIndex(i);
@@ -340,7 +340,7 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
     Sort(sortedTypes.Begin(), sortedTypes.End());
 
     // Get global constants by namespace
-    HashMap<String, Vector<String> > globalConstants;
+    HashMap<String, Vector<String>> globalConstants;
     unsigned properties = scriptEngine_->GetGlobalPropertyCount();
     for (unsigned i = 0; i < properties; ++i)
     {
@@ -354,7 +354,7 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
         String type(propertyDeclaration);
         globalConstants[String(propertyNameSpace)].Push(type + " " + String(propertyName));
     }
-    for (HashMap<String, Vector<String> >::Iterator i = globalConstants.Begin(); i != globalConstants.End(); ++i)
+    for (HashMap<String, Vector<String>>::Iterator i = globalConstants.Begin(); i != globalConstants.End(); ++i)
         Sort(i->second_.Begin(), i->second_.End(), ComparePropertyStrings);
 
     if (mode == DOXYGEN)
@@ -551,7 +551,7 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
             }
 
             // Check for namespaced constants to be included in the class documentation
-            HashMap<String, Vector<String> >::ConstIterator gcIt = globalConstants.Find(typeName);
+            HashMap<String, Vector<String>>::ConstIterator gcIt = globalConstants.Find(typeName);
             if (gcIt != globalConstants.End())
             {
                 String prefix;
@@ -606,7 +606,7 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
         Log::WriteRaw("\n// Enumerations\n");
 
     unsigned enums = scriptEngine_->GetEnumCount();
-    Vector<Pair<String, unsigned> > sortedEnums;
+    Vector<Pair<String, unsigned>> sortedEnums;
     for (unsigned i = 0; i < enums; ++i)
         sortedEnums.Push(MakePair(String(scriptEngine_->GetEnumByIndex(i)->GetName()), i));
     Sort(sortedEnums.Begin(), sortedEnums.End());

@@ -1006,8 +1006,8 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
     unsigned numButtons = 0;
     unsigned numAxes = 0;
     unsigned numHats = 0;
-    const Vector<SharedPtr<UIElement> >& children = state.screenJoystick_->GetChildren();
-    for (Vector<SharedPtr<UIElement> >::ConstIterator iter = children.Begin(); iter != children.End(); ++iter)
+    const Vector<SharedPtr<UIElement>>& children = state.screenJoystick_->GetChildren();
+    for (Vector<SharedPtr<UIElement>>::ConstIterator iter = children.Begin(); iter != children.End(); ++iter)
     {
         UIElement* element = iter->Get();
         String name = element->GetName();

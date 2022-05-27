@@ -218,7 +218,7 @@ protected:
     /// Internally used text element.
     Text text_;
     /// Geometries.
-    Vector<SharedPtr<Geometry> > geometries_;
+    Vector<SharedPtr<Geometry>> geometries_;
     /// Vertex buffer.
     SharedPtr<VertexBuffer> vertexBuffer_;
     /// Material to use as a base for the text material(s).

@@ -26,7 +26,7 @@ unsigned BufferedSoundStream::GetData(signed char* dest, unsigned numBytes)
     while (numBytes && buffers_.Size())
     {
         // Copy as much from the front buffer as possible, then discard it and move to the next
-        List<Pair<SharedArrayPtr<signed char>, unsigned> >::Iterator front = buffers_.Begin();
+        List<Pair<SharedArrayPtr<signed char>, unsigned>>::Iterator front = buffers_.Begin();
 
         unsigned copySize = front->second_ - position_;
         if (copySize > numBytes)
@@ -93,7 +93,7 @@ unsigned BufferedSoundStream::GetBufferNumBytes() const
     MutexLock lock(bufferMutex_);
 
     unsigned ret = 0;
-    for (List<Pair<SharedArrayPtr<signed char>, unsigned> >::ConstIterator i = buffers_.Begin(); i != buffers_.End(); ++i)
+    for (List<Pair<SharedArrayPtr<signed char>, unsigned>>::ConstIterator i = buffers_.Begin(); i != buffers_.End(); ++i)
         ret += i->second_;
     // Subtract amount of sound data played from the front buffer
     ret -= position_;

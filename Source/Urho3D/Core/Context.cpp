@@ -79,9 +79,9 @@ void EventReceiverGroup::Remove(Object* object)
         receivers_.Remove(object);
 }
 
-void RemoveNamedAttribute(HashMap<StringHash, Vector<AttributeInfo> >& attributes, StringHash objectType, const char* name)
+void RemoveNamedAttribute(HashMap<StringHash, Vector<AttributeInfo>>& attributes, StringHash objectType, const char* name)
 {
-    HashMap<StringHash, Vector<AttributeInfo> >::Iterator i = attributes.Find(objectType);
+    HashMap<StringHash, Vector<AttributeInfo>>::Iterator i = attributes.Find(objectType);
     if (i == attributes.End())
         return;
 
@@ -134,7 +134,7 @@ Context::~Context()
 
 SharedPtr<Object> Context::CreateObject(StringHash objectType)
 {
-    HashMap<StringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories_.Find(objectType);
+    HashMap<StringHash, SharedPtr<ObjectFactory>>::ConstIterator i = factories_.Find(objectType);
     if (i != factories_.End())
         return i->second_->CreateObject();
     else
@@ -169,7 +169,7 @@ void Context::RegisterSubsystem(Object* object)
 
 void Context::RemoveSubsystem(StringHash objectType)
 {
-    HashMap<StringHash, SharedPtr<Object> >::Iterator i = subsystems_.Find(objectType);
+    HashMap<StringHash, SharedPtr<Object>>::Iterator i = subsystems_.Find(objectType);
     if (i != subsystems_.End())
         subsystems_.Erase(i);
 }
@@ -334,7 +334,7 @@ void Context::CopyBaseAttributes(StringHash baseType, StringHash derivedType)
 
 Object* Context::GetSubsystem(StringHash type) const
 {
-    HashMap<StringHash, SharedPtr<Object> >::ConstIterator i = subsystems_.Find(type);
+    HashMap<StringHash, SharedPtr<Object>>::ConstIterator i = subsystems_.Find(type);
     if (i != subsystems_.End())
         return i->second_;
     else
@@ -363,13 +363,13 @@ Object* Context::GetEventSender() const
 const String& Context::GetTypeName(StringHash objectType) const
 {
     // Search factories to find the hash-to-name mapping
-    HashMap<StringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories_.Find(objectType);
+    HashMap<StringHash, SharedPtr<ObjectFactory>>::ConstIterator i = factories_.Find(objectType);
     return i != factories_.End() ? i->second_->GetTypeName() : String::EMPTY;
 }
 
 AttributeInfo* Context::GetAttribute(StringHash objectType, const char* name)
 {
-    HashMap<StringHash, Vector<AttributeInfo> >::Iterator i = attributes_.Find(objectType);
+    HashMap<StringHash, Vector<AttributeInfo>>::Iterator i = attributes_.Find(objectType);
     if (i == attributes_.End())
         return nullptr;
 
@@ -402,10 +402,10 @@ void Context::AddEventReceiver(Object* receiver, Object* sender, StringHash even
 
 void Context::RemoveEventSender(Object* sender)
 {
-    HashMap<Object*, HashMap<StringHash, SharedPtr<EventReceiverGroup> > >::Iterator i = specificEventReceivers_.Find(sender);
+    HashMap<Object*, HashMap<StringHash, SharedPtr<EventReceiverGroup>>>::Iterator i = specificEventReceivers_.Find(sender);
     if (i != specificEventReceivers_.End())
     {
-        for (HashMap<StringHash, SharedPtr<EventReceiverGroup> >::Iterator j = i->second_.Begin(); j != i->second_.End(); ++j)
+        for (HashMap<StringHash, SharedPtr<EventReceiverGroup>>::Iterator j = i->second_.Begin(); j != i->second_.End(); ++j)
         {
             for (PODVector<Object*>::Iterator k = j->second_->receivers_.Begin(); k != j->second_->receivers_.End(); ++k)
             {

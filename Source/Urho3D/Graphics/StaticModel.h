@@ -107,7 +107,7 @@ protected:
     /// Extra per-geometry data.
     PODVector<StaticModelGeometryData> geometryData_;
     /// All geometries.
-    Vector<Vector<SharedPtr<Geometry> > > geometries_;
+    Vector<Vector<SharedPtr<Geometry>>> geometries_;
     /// Model.
     SharedPtr<Model> model_;
     /// Occlusion LOD level.

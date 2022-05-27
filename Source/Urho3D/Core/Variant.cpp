@@ -922,7 +922,7 @@ template <> IntVector3 Variant::Get<IntVector3>() const
     return GetIntVector3();
 }
 
-template <> PODVector<unsigned char> Variant::Get<PODVector<unsigned char> >() const
+template <> PODVector<unsigned char> Variant::Get<PODVector<unsigned char>>() const
 {
     return GetBuffer();
 }

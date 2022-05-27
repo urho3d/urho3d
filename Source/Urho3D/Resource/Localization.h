@@ -55,8 +55,8 @@ private:
     Vector<String> languages_;
     /// Index of current language.
     int languageIndex_;
-    /// Storage strings: <Language <StringId, Value> >.
-    HashMap<StringHash, HashMap<StringHash, String> > strings_;
+    /// Storage strings: <Language <StringId, Value>>.
+    HashMap<StringHash, HashMap<StringHash, String>> strings_;
 };
 
 }

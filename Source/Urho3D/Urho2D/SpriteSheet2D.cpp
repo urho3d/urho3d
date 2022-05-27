@@ -96,7 +96,7 @@ void SpriteSheet2D::DefineSprite(const String& name, const IntRect& rectangle, c
 
 Sprite2D* SpriteSheet2D::GetSprite(const String& name) const
 {
-    HashMap<String, SharedPtr<Sprite2D> >::ConstIterator i = spriteMapping_.Find(name);
+    HashMap<String, SharedPtr<Sprite2D>>::ConstIterator i = spriteMapping_.Find(name);
     if (i == spriteMapping_.End())
         return nullptr;
 

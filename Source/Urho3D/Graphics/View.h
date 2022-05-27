@@ -365,7 +365,7 @@ private:
     /// Renderpath.
     RenderPath* renderPath_{};
     /// Per-thread octree query results.
-    Vector<PODVector<Drawable*> > tempDrawables_;
+    Vector<PODVector<Drawable*>> tempDrawables_;
     /// Per-thread geometries, lights and Z range collection results.
     Vector<PerThreadSceneResult> sceneResults_;
     /// Visible zones.

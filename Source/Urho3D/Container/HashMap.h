@@ -214,7 +214,7 @@ public:
     }
 
     /// Move-construct from another hash map.
-    HashMap(HashMap<T, U> && map) noexcept
+    HashMap(HashMap<T, U>&& map) noexcept
     {
         Swap(map);
     }

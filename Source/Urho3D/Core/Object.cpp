@@ -437,8 +437,8 @@ bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const
 
 const String& Object::GetCategory() const
 {
-    const HashMap<String, Vector<StringHash> >& objectCategories = context_->GetObjectCategories();
-    for (HashMap<String, Vector<StringHash> >::ConstIterator i = objectCategories.Begin(); i != objectCategories.End(); ++i)
+    const HashMap<String, Vector<StringHash>>& objectCategories = context_->GetObjectCategories();
+    for (HashMap<String, Vector<StringHash>>::ConstIterator i = objectCategories.Begin(); i != objectCategories.End(); ++i)
     {
         if (i->second_.Contains(GetType()))
             return i->first_;

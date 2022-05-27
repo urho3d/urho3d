@@ -705,8 +705,8 @@ void ScriptInstance::GetScriptAttributes()
             {
                 // For a handle type, check if it's an Object subclass with a registered factory
                 StringHash typeHash(typeName);
-                const HashMap<StringHash, SharedPtr<ObjectFactory> >& factories = context_->GetObjectFactories();
-                HashMap<StringHash, SharedPtr<ObjectFactory> >::ConstIterator j = factories.Find(typeHash);
+                const HashMap<StringHash, SharedPtr<ObjectFactory>>& factories = context_->GetObjectFactories();
+                HashMap<StringHash, SharedPtr<ObjectFactory>>::ConstIterator j = factories.Find(typeHash);
                 if (j != factories.End())
                 {
                     // Check base class type. Node & Component are supported as ID attributes, Resource as a resource reference

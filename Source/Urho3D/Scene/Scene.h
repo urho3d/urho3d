@@ -211,7 +211,7 @@ public:
 
     /// Return required package files.
     /// @property
-    const Vector<SharedPtr<PackageFile> >& GetRequiredPackageFiles() const { return requiredPackageFiles_; }
+    const Vector<SharedPtr<PackageFile>>& GetRequiredPackageFiles() const { return requiredPackageFiles_; }
 
     /// Return a node user variable name, or empty if not registered.
     const String& GetVarName(StringHash hash) const;
@@ -293,7 +293,7 @@ private:
     /// Local components by ID.
     HashMap<unsigned, Component*> localComponents_;
     /// Cached tagged nodes by tag.
-    HashMap<StringHash, PODVector<Node*> > taggedNodes_;
+    HashMap<StringHash, PODVector<Node*>> taggedNodes_;
     /// Asynchronous loading progress.
     AsyncProgress asyncProgress_;
     /// Node and component ID resolver for asynchronous loading.
@@ -301,7 +301,7 @@ private:
     /// Source file name.
     mutable String fileName_;
     /// Required package files for networking.
-    Vector<SharedPtr<PackageFile> > requiredPackageFiles_;
+    Vector<SharedPtr<PackageFile>> requiredPackageFiles_;
     /// Registered node user variable reverse mappings.
     HashMap<StringHash, String> varNames_;
     /// Nodes to check for attribute changes on the next network update.

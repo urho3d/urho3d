@@ -40,7 +40,7 @@ public:
 
 private:
     /// Buffers and their sizes.
-    List<Pair<SharedArrayPtr<signed char>, unsigned> > buffers_;
+    List<Pair<SharedArrayPtr<signed char>, unsigned>> buffers_;
     /// Byte position in the front most buffer.
     unsigned position_;
     /// Mutex for buffer data.

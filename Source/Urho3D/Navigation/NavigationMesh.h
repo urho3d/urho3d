@@ -378,7 +378,7 @@ protected:
     /// Debug draw NavArea components.
     bool drawNavAreas_;
     /// NavAreas for this NavMesh.
-    Vector<WeakPtr<NavArea> > areas_;
+    Vector<WeakPtr<NavArea>> areas_;
 };
 
 /// Register Navigation library objects.

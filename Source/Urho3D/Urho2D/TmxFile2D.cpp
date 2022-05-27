@@ -533,17 +533,17 @@ void TmxFile2D::AddLayer(TmxLayer2D *layer)
 
 Sprite2D* TmxFile2D::GetTileSprite(unsigned gid) const
 {
-    HashMap<unsigned, SharedPtr<Sprite2D> >::ConstIterator i = gidToSpriteMapping_.Find(gid);
+    HashMap<unsigned, SharedPtr<Sprite2D>>::ConstIterator i = gidToSpriteMapping_.Find(gid);
     if (i == gidToSpriteMapping_.End())
         return nullptr;
 
     return i->second_;
 }
 
-Vector<SharedPtr<TileMapObject2D> > TmxFile2D::GetTileCollisionShapes(unsigned gid) const
+Vector<SharedPtr<TileMapObject2D>> TmxFile2D::GetTileCollisionShapes(unsigned gid) const
 {
-    Vector<SharedPtr<TileMapObject2D> > tileShapes;
-    HashMap<unsigned, Vector<SharedPtr<TileMapObject2D> > >::ConstIterator i = gidToCollisionShapeMapping_.Find(gid);
+    Vector<SharedPtr<TileMapObject2D>> tileShapes;
+    HashMap<unsigned, Vector<SharedPtr<TileMapObject2D>>>::ConstIterator i = gidToCollisionShapeMapping_.Find(gid);
     if (i == gidToCollisionShapeMapping_.End())
         return tileShapes;
 
@@ -552,7 +552,7 @@ Vector<SharedPtr<TileMapObject2D> > TmxFile2D::GetTileCollisionShapes(unsigned g
 
 PropertySet2D* TmxFile2D::GetTilePropertySet(unsigned gid) const
 {
-    HashMap<unsigned, SharedPtr<PropertySet2D> >::ConstIterator i = gidToPropertySetMapping_.Find(gid);
+    HashMap<unsigned, SharedPtr<PropertySet2D>>::ConstIterator i = gidToPropertySetMapping_.Find(gid);
     if (i == gidToPropertySetMapping_.End())
         return nullptr;
     return i->second_;
@@ -604,7 +604,7 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
     if (element.HasAttribute("source"))
     {
         String source = element.GetAttribute("source");
-        HashMap<String, SharedPtr<XMLFile> >::Iterator i = tsxXMLFiles_.Find(source);
+        HashMap<String, SharedPtr<XMLFile>>::Iterator i = tsxXMLFiles_.Find(source);
         if (i == tsxXMLFiles_.End())
         {
             SharedPtr<XMLFile> tsxXMLFile = LoadTSXFile(source);
@@ -698,7 +698,7 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
         TmxObjectGroup2D objectGroup(this);
         for (XMLElement collisionElem = tileElem.GetChild("objectgroup"); collisionElem; collisionElem = collisionElem.GetNext("objectgroup"))
         {
-            Vector<SharedPtr<TileMapObject2D> > objects;
+            Vector<SharedPtr<TileMapObject2D>> objects;
             for (XMLElement objectElem = collisionElem.GetChild("object"); objectElem; objectElem = objectElem.GetNext("object"))
             {
                 SharedPtr<TileMapObject2D> object(new TileMapObject2D());

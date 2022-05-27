@@ -281,9 +281,9 @@ private:
     /// Material.
     SharedPtr<Material> material_;
     /// Terrain patches.
-    Vector<WeakPtr<TerrainPatch> > patches_;
+    Vector<WeakPtr<TerrainPatch>> patches_;
     /// Draw ranges for different LODs and stitching combinations.
-    PODVector<Pair<unsigned, unsigned> > drawRanges_;
+    PODVector<Pair<unsigned, unsigned>> drawRanges_;
     /// North neighbor terrain.
     WeakPtr<Terrain> north_;
     /// South neighbor terrain.

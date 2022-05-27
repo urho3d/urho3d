@@ -486,7 +486,7 @@ private:
     /// Reload shaders.
     void LoadShaders();
     /// Reload shaders for a material pass. The related batch queue is provided in case it has extra shader compilation defines.
-    void LoadPassShaders(Pass* pass, Vector<SharedPtr<ShaderVariation> >& vertexShaders, Vector<SharedPtr<ShaderVariation> >& pixelShaders, const BatchQueue& queue);
+    void LoadPassShaders(Pass* pass, Vector<SharedPtr<ShaderVariation>>& vertexShaders, Vector<SharedPtr<ShaderVariation>>& pixelShaders, const BatchQueue& queue);
     /// Release shaders used in materials.
     void ReleaseMaterialShaders();
     /// Reload textures.
@@ -547,33 +547,33 @@ private:
     /// Indirection cube map for shadowed pointlights.
     SharedPtr<TextureCube> indirectionCubeMap_;
     /// Reusable scene nodes with shadow camera components.
-    Vector<SharedPtr<Node> > shadowCameraNodes_;
+    Vector<SharedPtr<Node>> shadowCameraNodes_;
     /// Reusable occlusion buffers.
-    Vector<SharedPtr<OcclusionBuffer> > occlusionBuffers_;
+    Vector<SharedPtr<OcclusionBuffer>> occlusionBuffers_;
     /// Shadow maps by resolution.
-    HashMap<int, Vector<SharedPtr<Texture2D> > > shadowMaps_;
+    HashMap<int, Vector<SharedPtr<Texture2D>>> shadowMaps_;
     /// Shadow map dummy color buffers by resolution.
-    HashMap<int, SharedPtr<Texture2D> > colorShadowMaps_;
+    HashMap<int, SharedPtr<Texture2D>> colorShadowMaps_;
     /// Shadow map allocations by resolution.
-    HashMap<int, PODVector<Light*> > shadowMapAllocations_;
+    HashMap<int, PODVector<Light*>> shadowMapAllocations_;
     /// Instance of shadow map filter.
     Object* shadowMapFilterInstance_{};
     /// Function pointer of shadow map filter.
     ShadowMapFilter shadowMapFilter_{};
     /// Screen buffers by resolution and format.
-    HashMap<unsigned long long, Vector<SharedPtr<Texture> > > screenBuffers_;
+    HashMap<unsigned long long, Vector<SharedPtr<Texture>>> screenBuffers_;
     /// Current screen buffer allocations by resolution and format.
     HashMap<unsigned long long, unsigned> screenBufferAllocations_;
     /// Cache for light scissor queries.
     HashMap<Pair<Light*, Camera*>, Rect> lightScissorCache_;
     /// Backbuffer viewports.
-    Vector<SharedPtr<Viewport> > viewports_;
+    Vector<SharedPtr<Viewport>> viewports_;
     /// Render surface viewports queued for update.
-    Vector<Pair<WeakPtr<RenderSurface>, WeakPtr<Viewport> > > queuedViewports_;
+    Vector<Pair<WeakPtr<RenderSurface>, WeakPtr<Viewport>>> queuedViewports_;
     /// Views that have been processed this frame.
-    Vector<WeakPtr<View> > views_;
+    Vector<WeakPtr<View>> views_;
     /// Prepared views by culling camera.
-    HashMap<Camera*, WeakPtr<View> > preparedViews_;
+    HashMap<Camera*, WeakPtr<View>> preparedViews_;
     /// Octrees that have been updated during the frame.
     HashSet<Octree*> updatedOctrees_;
     /// Techniques for which missing shader error has been displayed.

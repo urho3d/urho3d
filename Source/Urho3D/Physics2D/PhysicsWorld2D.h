@@ -252,7 +252,7 @@ protected:
     /// Applying transforms.
     bool applyingTransforms_{};
     /// Rigid bodies.
-    Vector<WeakPtr<RigidBody2D> > rigidBodies_;
+    Vector<WeakPtr<RigidBody2D>> rigidBodies_;
     /// Delayed (parented) world transform assignments.
     HashMap<RigidBody2D*, DelayedWorldTransform2D> delayedWorldTransforms_;
 

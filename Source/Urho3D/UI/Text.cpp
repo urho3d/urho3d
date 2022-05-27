@@ -157,7 +157,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
 
     // Text batch
     TextEffect textEffect = font_->IsSDFFont() ? TE_NONE : textEffect_;
-    const Vector<SharedPtr<Texture2D> >& textures = face->GetTextures();
+    const Vector<SharedPtr<Texture2D>>& textures = face->GetTextures();
     for (unsigned n = 0; n < textures.Size() && n < pageGlyphLocations_.Size(); ++n)
     {
         // One batch per texture/page
