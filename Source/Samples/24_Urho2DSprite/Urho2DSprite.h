@@ -65,5 +65,5 @@ private:
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
 
     /// Sprite nodes.
-    Vector<SharedPtr<Node> > spriteNodes_;
+    Vector<SharedPtr<Node>> spriteNodes_;
 };

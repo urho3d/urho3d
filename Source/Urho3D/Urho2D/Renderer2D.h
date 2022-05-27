@@ -41,9 +41,9 @@ struct ViewBatchInfo2D
     /// Distances.
     PODVector<float> distances_;
     /// Materials.
-    Vector<SharedPtr<Material> > materials_;
+    Vector<SharedPtr<Material>> materials_;
     /// Geometries.
-    Vector<SharedPtr<Geometry> > geometries_;
+    Vector<SharedPtr<Geometry>> geometries_;
 };
 
 /// 2D renderer component.
@@ -111,9 +111,9 @@ private:
     /// View mask of current camera for visibility checking.
     unsigned viewMask_;
     /// Cached materials.
-    HashMap<Texture2D*, HashMap<int, SharedPtr<Material> > > cachedMaterials_;
+    HashMap<Texture2D*, HashMap<int, SharedPtr<Material>>> cachedMaterials_;
     /// Cached techniques per blend mode.
-    HashMap<int, SharedPtr<Technique> > cachedTechniques_;
+    HashMap<int, SharedPtr<Technique>> cachedTechniques_;
 };
 
 }

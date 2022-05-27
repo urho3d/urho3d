@@ -176,7 +176,7 @@ void Connection::SetScene(Scene* newScene)
         sceneState_.Clear();
 
         // When scene is assigned on the server, instruct the client to load it. This may require downloading packages
-        const Vector<SharedPtr<PackageFile> >& packages = scene_->GetRequiredPackageFiles();
+        const Vector<SharedPtr<PackageFile>>& packages = scene_->GetRequiredPackageFiles();
         unsigned numPackages = packages.Size();
         msg_.Clear();
         msg_.WriteString(scene_->GetFileName());
@@ -395,9 +395,9 @@ void Connection::ProcessPendingLatestData()
         return;
 
     // Iterate through pending node data and see if we can find the nodes now
-    for (HashMap<unsigned, PODVector<unsigned char> >::Iterator i = nodeLatestData_.Begin(); i != nodeLatestData_.End();)
+    for (HashMap<unsigned, PODVector<unsigned char>>::Iterator i = nodeLatestData_.Begin(); i != nodeLatestData_.End();)
     {
-        HashMap<unsigned, PODVector<unsigned char> >::Iterator current = i++;
+        HashMap<unsigned, PODVector<unsigned char>>::Iterator current = i++;
         Node* node = scene_->GetNode(current->first_);
         if (node)
         {
@@ -411,9 +411,9 @@ void Connection::ProcessPendingLatestData()
     }
 
     // Iterate through pending component data and see if we can find the components now
-    for (HashMap<unsigned, PODVector<unsigned char> >::Iterator i = componentLatestData_.Begin(); i != componentLatestData_.End();)
+    for (HashMap<unsigned, PODVector<unsigned char>>::Iterator i = componentLatestData_.Begin(); i != componentLatestData_.End();)
     {
-        HashMap<unsigned, PODVector<unsigned char> >::Iterator current = i++;
+        HashMap<unsigned, PODVector<unsigned char>>::Iterator current = i++;
         Component* component = scene_->GetComponent(current->first_);
         if (component)
         {
@@ -533,7 +533,7 @@ void Connection::ProcessLoadScene(int msgID, MemoryBuffer& msg)
     auto* cache = GetSubsystem<ResourceCache>();
     const String& packageCacheDir = GetSubsystem<Network>()->GetPackageCacheDir();
 
-    Vector<SharedPtr<PackageFile> > packages = cache->GetPackageFiles();
+    Vector<SharedPtr<PackageFile>> packages = cache->GetPackageFiles();
     for (unsigned i = 0; i < packages.Size(); ++i)
     {
         PackageFile* package = packages[i];
@@ -795,7 +795,7 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
             }
 
             // The package must be one of those required by the scene
-            const Vector<SharedPtr<PackageFile> >& packages = scene_->GetRequiredPackageFiles();
+            const Vector<SharedPtr<PackageFile>>& packages = scene_->GetRequiredPackageFiles();
             for (unsigned i = 0; i < packages.Size(); ++i)
             {
                 PackageFile* package = packages[i];
@@ -1251,7 +1251,7 @@ void Connection::ProcessNewNode(Node* node)
 
     // Write node's components
     msg_.WriteVLE(node->GetNumNetworkComponents());
-    const Vector<SharedPtr<Component> >& components = node->GetComponents();
+    const Vector<SharedPtr<Component>>& components = node->GetComponents();
     for (unsigned i = 0; i < components.Size(); ++i)
     {
         Component* component = components[i];
@@ -1419,7 +1419,7 @@ void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState
     // Check for new components
     if (nodeState.componentStates_.Size() != node->GetNumNetworkComponents())
     {
-        const Vector<SharedPtr<Component> >& components = node->GetComponents();
+        const Vector<SharedPtr<Component>>& components = node->GetComponents();
         for (unsigned i = 0; i < components.Size(); ++i)
         {
             Component* component = components[i];
@@ -1457,7 +1457,7 @@ bool Connection::RequestNeededPackages(unsigned numPackages, MemoryBuffer& msg)
     auto* cache = GetSubsystem<ResourceCache>();
     const String& packageCacheDir = GetSubsystem<Network>()->GetPackageCacheDir();
 
-    Vector<SharedPtr<PackageFile> > packages = cache->GetPackageFiles();
+    Vector<SharedPtr<PackageFile>> packages = cache->GetPackageFiles();
     Vector<String> downloadedPackages;
     bool packagesScanned = false;
 

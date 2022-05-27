@@ -30,7 +30,7 @@ public:
     }
 
     /// Construct from a list of faces.
-    explicit Polyhedron(const Vector<PODVector<Vector3> >& faces) :
+    explicit Polyhedron(const Vector<PODVector<Vector3>>& faces) :
         faces_(faces)
     {
     }
@@ -86,7 +86,7 @@ public:
     bool Empty() const { return faces_.Empty(); }
 
     /// Polygon faces.
-    Vector<PODVector<Vector3> > faces_;
+    Vector<PODVector<Vector3>> faces_;
 
 private:
     /// Set a triangle face by index.

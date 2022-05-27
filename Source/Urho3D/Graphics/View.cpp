@@ -2842,9 +2842,9 @@ Technique* View::GetTechnique(Drawable* drawable, Material* material)
 
 void View::CheckMaterialForAuxView(Material* material)
 {
-    const HashMap<TextureUnit, SharedPtr<Texture> >& textures = material->GetTextures();
+    const HashMap<TextureUnit, SharedPtr<Texture>>& textures = material->GetTextures();
 
-    for (HashMap<TextureUnit, SharedPtr<Texture> >::ConstIterator i = textures.Begin(); i != textures.End(); ++i)
+    for (HashMap<TextureUnit, SharedPtr<Texture>>::ConstIterator i = textures.Begin(); i != textures.End(); ++i)
     {
         Texture* texture = i->second_.Get();
         if (texture && texture->GetUsage() == TEXTURE_RENDERTARGET)

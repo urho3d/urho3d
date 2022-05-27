@@ -83,7 +83,7 @@ private:
     FontFace* GetFaceBitmap(float pointSize);
 
     /// Created faces.
-    HashMap<int, SharedPtr<FontFace> > faces_;
+    HashMap<int, SharedPtr<FontFace>> faces_;
     /// Font data.
     SharedArrayPtr<unsigned char> fontData_;
     /// Size of font data.

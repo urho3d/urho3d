@@ -109,7 +109,7 @@ void SplinePath::DrawDebugGeometry(DebugRenderer* debug, bool /*depthTest*/)
             }
         }
 
-        for (Vector<WeakPtr<Node> >::ConstIterator i = controlPoints_.Begin(); i != controlPoints_.End(); ++i)
+        for (Vector<WeakPtr<Node>>::ConstIterator i = controlPoints_.Begin(); i != controlPoints_.End(); ++i)
             debug->AddNode(*i);
 
         if (controlledNode_)

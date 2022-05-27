@@ -128,11 +128,11 @@ private:
     /// Search cache for functions.
     HashMap<String, asIScriptFunction*> functions_;
     /// Search cache for methods.
-    HashMap<asITypeInfo*, HashMap<String, asIScriptFunction*> > methods_;
+    HashMap<asITypeInfo*, HashMap<String, asIScriptFunction*>> methods_;
     /// Delayed function calls.
     Vector<DelayedCall> delayedCalls_;
     /// Event helper objects for handling procedural or non-ScriptInstance script events.
-    HashMap<asIScriptObject*, SharedPtr<ScriptEventInvoker> > eventInvokers_;
+    HashMap<asIScriptObject*, SharedPtr<ScriptEventInvoker>> eventInvokers_;
     /// Byte code for asynchronous loading.
     SharedArrayPtr<unsigned char> loadByteCode_;
     bool onlyCompile_{false};

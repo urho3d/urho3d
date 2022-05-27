@@ -201,7 +201,7 @@ public:
     Texture* GetTexture(TextureUnit unit) const;
 
     /// Return all textures.
-    const HashMap<TextureUnit, SharedPtr<Texture> >& GetTextures() const { return textures_; }
+    const HashMap<TextureUnit, SharedPtr<Texture>>& GetTextures() const { return textures_; }
 
     /// Return additional vertex shader defines.
     /// @property
@@ -297,11 +297,11 @@ private:
     /// Techniques.
     Vector<TechniqueEntry> techniques_;
     /// Textures.
-    HashMap<TextureUnit, SharedPtr<Texture> > textures_;
+    HashMap<TextureUnit, SharedPtr<Texture>> textures_;
     /// %Shader parameters.
     HashMap<StringHash, MaterialShaderParameter> shaderParameters_;
     /// %Shader parameters animation infos.
-    HashMap<StringHash, SharedPtr<ShaderParameterAnimationInfo> > shaderParameterAnimationInfos_;
+    HashMap<StringHash, SharedPtr<ShaderParameterAnimationInfo>> shaderParameterAnimationInfos_;
     /// Vertex shader defines.
     String vertexShaderDefines_;
     /// Pixel shader defines.

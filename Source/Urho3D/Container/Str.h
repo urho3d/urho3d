@@ -45,7 +45,7 @@ public:
     }
 
     /// Move-construct from another string.
-    String(String && str) noexcept
+    String(String&& str) noexcept
         : String()
     {
         Swap(str);
@@ -146,7 +146,7 @@ public:
     }
 
     /// Move-assign a string.
-    String& operator =(String && rhs) noexcept
+    String& operator =(String&& rhs) noexcept
     {
         Swap(rhs);
         return *this;

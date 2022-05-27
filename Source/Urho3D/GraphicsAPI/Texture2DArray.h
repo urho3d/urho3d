@@ -107,7 +107,7 @@ private:
     /// Memory use per layer.
     PODVector<unsigned> layerMemoryUse_;
     /// Layer image files acquired during BeginLoad.
-    Vector<SharedPtr<Image> > loadImages_;
+    Vector<SharedPtr<Image>> loadImages_;
     /// Parameter file acquired during BeginLoad.
     SharedPtr<XMLFile> loadParameters_;
 };

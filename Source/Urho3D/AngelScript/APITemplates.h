@@ -101,7 +101,7 @@ template <class T> CScriptArray* VectorToHandleArray(const Vector<T*>& vector, c
 }
 
 /// Template function for shared pointer Vector to handle array conversion.
-template <class T> CScriptArray* VectorToHandleArray(const Vector<SharedPtr<T> >& vector, const char* arrayName)
+template <class T> CScriptArray* VectorToHandleArray(const Vector<SharedPtr<T>>& vector, const char* arrayName)
 {
     Context* context = GetScriptContext();
 
@@ -135,10 +135,10 @@ template <class T> Vector<T> ArrayToVector(CScriptArray* arr)
     return dest;
 }
 
-template <class T> Vector<SharedPtr<T> > HandleArrayToVector(CScriptArray* arr)
+template <class T> Vector<SharedPtr<T>> HandleArrayToVector(CScriptArray* arr)
 {
     Vector<T*> rawPtrs = ArrayToVector<T*>(arr);
-    Vector<SharedPtr<T> > result(rawPtrs.Size());
+    Vector<SharedPtr<T>> result(rawPtrs.Size());
     for (unsigned i = 0; i < rawPtrs.Size(); ++i)
         result[i] = SharedPtr<T>(rawPtrs[i]);
     return result;

@@ -841,7 +841,7 @@ IntVector2 UI::ConvertUIToSystem(const IntVector2& uiPos) const
 
 UIElement* UI::GetFrontElement() const
 {
-    const Vector<SharedPtr<UIElement> >& rootChildren = rootElement_->GetChildren();
+    const Vector<SharedPtr<UIElement>>& rootChildren = rootElement_->GetChildren();
     int maxPriority = M_MIN_INT;
     UIElement* front = nullptr;
 
@@ -951,7 +951,7 @@ void UI::Update(float timeStep, UIElement* element)
     if (elementWeak.Expired())
         return;
 
-    const Vector<SharedPtr<UIElement> >& children = element->GetChildren();
+    const Vector<SharedPtr<UIElement>>& children = element->GetChildren();
     // Update of an element may modify its child vector. Use just index-based iteration to be safe
     for (unsigned i = 0; i < children.Size(); ++i)
         Update(timeStep, children[i]);
@@ -1149,16 +1149,16 @@ void UI::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, U
         return;
 
     element->SortChildren();
-    const Vector<SharedPtr<UIElement> >& children = element->GetChildren();
+    const Vector<SharedPtr<UIElement>>& children = element->GetChildren();
     if (children.Empty())
         return;
 
     // For non-root elements draw all children of same priority before recursing into their children: assumption is that they have
     // same renderstate
-    Vector<SharedPtr<UIElement> >::ConstIterator i = children.Begin();
+    Vector<SharedPtr<UIElement>>::ConstIterator i = children.Begin();
     if (element->GetTraversalMode() == TM_BREADTH_FIRST)
     {
-        Vector<SharedPtr<UIElement> >::ConstIterator j = i;
+        Vector<SharedPtr<UIElement>>::ConstIterator j = i;
         while (i != children.End())
         {
             int currentPriority = (*i)->GetPriority();
@@ -1200,7 +1200,7 @@ void UI::GetElementAt(UIElement*& result, UIElement* current, const IntVector2& 
         return;
 
     current->SortChildren();
-    const Vector<SharedPtr<UIElement> >& children = current->GetChildren();
+    const Vector<SharedPtr<UIElement>>& children = current->GetChildren();
     LayoutMode parentLayoutMode = current->GetLayoutMode();
 
     for (unsigned i = 0; i < children.Size(); ++i)

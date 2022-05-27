@@ -52,7 +52,7 @@ public:
     void Draw(Graphics* graphics);
 
     /// Return all vertex buffers.
-    const Vector<SharedPtr<VertexBuffer> >& GetVertexBuffers() const { return vertexBuffers_; }
+    const Vector<SharedPtr<VertexBuffer>>& GetVertexBuffers() const { return vertexBuffers_; }
 
     /// Return number of vertex buffers.
     /// @property
@@ -108,7 +108,7 @@ public:
 
 private:
     /// Vertex buffers.
-    Vector<SharedPtr<VertexBuffer> > vertexBuffers_;
+    Vector<SharedPtr<VertexBuffer>> vertexBuffers_;
     /// Index buffer.
     SharedPtr<IndexBuffer> indexBuffer_;
     /// Primitive type.

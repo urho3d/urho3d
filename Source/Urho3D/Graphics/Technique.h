@@ -136,15 +136,15 @@ public:
     const String& GetPixelShaderDefineExcludes() const { return pixelShaderDefineExcludes_; }
 
     /// Return vertex shaders.
-    Vector<SharedPtr<ShaderVariation> >& GetVertexShaders() { return vertexShaders_; }
+    Vector<SharedPtr<ShaderVariation>>& GetVertexShaders() { return vertexShaders_; }
 
     /// Return pixel shaders.
-    Vector<SharedPtr<ShaderVariation> >& GetPixelShaders() { return pixelShaders_; }
+    Vector<SharedPtr<ShaderVariation>>& GetPixelShaders() { return pixelShaders_; }
 
     /// Return vertex shaders with extra defines from the renderpath.
-    Vector<SharedPtr<ShaderVariation> >& GetVertexShaders(const StringHash& extraDefinesHash);
+    Vector<SharedPtr<ShaderVariation>>& GetVertexShaders(const StringHash& extraDefinesHash);
     /// Return pixel shaders with extra defines from the renderpath.
-    Vector<SharedPtr<ShaderVariation> >& GetPixelShaders(const StringHash& extraDefinesHash);
+    Vector<SharedPtr<ShaderVariation>>& GetPixelShaders(const StringHash& extraDefinesHash);
     /// Return the effective vertex shader defines, accounting for excludes. Called internally by Renderer.
     String GetEffectiveVertexShaderDefines() const;
     /// Return the effective pixel shader defines, accounting for excludes. Called internally by Renderer.
@@ -182,13 +182,13 @@ private:
     /// Pixel shader define excludes.
     String pixelShaderDefineExcludes_;
     /// Vertex shaders.
-    Vector<SharedPtr<ShaderVariation> > vertexShaders_;
+    Vector<SharedPtr<ShaderVariation>> vertexShaders_;
     /// Pixel shaders.
-    Vector<SharedPtr<ShaderVariation> > pixelShaders_;
+    Vector<SharedPtr<ShaderVariation>> pixelShaders_;
     /// Vertex shaders with extra defines from the renderpath.
-    HashMap<StringHash, Vector<SharedPtr<ShaderVariation> > > extraVertexShaders_;
+    HashMap<StringHash, Vector<SharedPtr<ShaderVariation>>> extraVertexShaders_;
     /// Pixel shaders with extra defines from the renderpath.
-    HashMap<StringHash, Vector<SharedPtr<ShaderVariation> > > extraPixelShaders_;
+    HashMap<StringHash, Vector<SharedPtr<ShaderVariation>>> extraPixelShaders_;
     /// Pass name.
     String name_;
 };
@@ -293,9 +293,9 @@ private:
     /// Cached desktop GPU support flag.
     bool desktopSupport_;
     /// Passes.
-    Vector<SharedPtr<Pass> > passes_;
+    Vector<SharedPtr<Pass>> passes_;
     /// Cached clones with added shader compilation defines.
-    HashMap<Pair<StringHash, StringHash>, SharedPtr<Technique> > cloneTechniques_;
+    HashMap<Pair<StringHash, StringHash>, SharedPtr<Technique>> cloneTechniques_;
 
     /// Pass index assignments.
     static HashMap<String, unsigned> passIndices;

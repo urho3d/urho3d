@@ -119,7 +119,7 @@ VertexDeclaration_D3D9::VertexDeclaration_D3D9(Graphics* graphics, const PODVect
     Create(graphics, elements);
 }
 
-VertexDeclaration_D3D9::VertexDeclaration_D3D9(Graphics* graphics, const Vector<SharedPtr<VertexBuffer> >& buffers) :
+VertexDeclaration_D3D9::VertexDeclaration_D3D9(Graphics* graphics, const Vector<SharedPtr<VertexBuffer>>& buffers) :
     declaration_(nullptr)
 {
     PODVector<VertexDeclarationElement_D3D9> elements;

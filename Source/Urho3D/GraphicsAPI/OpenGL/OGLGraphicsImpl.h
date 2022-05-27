@@ -58,8 +58,8 @@ namespace Urho3D
 
 class Context;
 
-using ConstantBufferMap = HashMap<unsigned, SharedPtr<ConstantBuffer> >;
-using ShaderProgramMap_OGL = HashMap<Pair<ShaderVariation*, ShaderVariation*>, SharedPtr<ShaderProgram_OGL> >;
+using ConstantBufferMap = HashMap<unsigned, SharedPtr<ConstantBuffer>>;
+using ShaderProgramMap_OGL = HashMap<Pair<ShaderVariation*, ShaderVariation*>, SharedPtr<ShaderProgram_OGL>>;
 
 /// Cached state of a frame buffer object.
 struct FrameBufferObject
@@ -128,7 +128,7 @@ private:
     /// Last used instance data offset.
     unsigned lastInstanceOffset_{};
     /// Map for additional depth textures, to emulate Direct3D9 ability to mix render texture and backbuffer rendering.
-    HashMap<unsigned, SharedPtr<Texture2D> > depthTextures_;
+    HashMap<unsigned, SharedPtr<Texture2D>> depthTextures_;
     /// Shader program in use.
     ShaderProgram_OGL* shaderProgram_{};
     /// Linked shader programs.

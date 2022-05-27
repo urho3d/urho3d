@@ -1057,7 +1057,7 @@ void NavigationMesh::CollectGeometries(Vector<NavigationGeometryInfo>& geometryL
 
     if (recursive)
     {
-        const Vector<SharedPtr<Node> >& children = node->GetChildren();
+        const Vector<SharedPtr<Node>>& children = node->GetChildren();
         for (unsigned i = 0; i < children.Size(); ++i)
             CollectGeometries(geometryList, children[i], processedNodes, recursive);
     }

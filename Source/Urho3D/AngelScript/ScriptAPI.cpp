@@ -47,8 +47,8 @@ static asIScriptObject* NodeCreateScriptObjectWithFile(ScriptFile* file, const S
         return nullptr;
 
     // Try first to reuse an existing, empty ScriptInstance
-    const Vector<SharedPtr<Component> >& components = ptr->GetComponents();
-    for (Vector<SharedPtr<Component> >::ConstIterator i = components.Begin(); i != components.End(); ++i)
+    const Vector<SharedPtr<Component>>& components = ptr->GetComponents();
+    for (Vector<SharedPtr<Component>>::ConstIterator i = components.Begin(); i != components.End(); ++i)
     {
         if ((*i)->GetType() == ScriptInstance::GetTypeStatic())
         {
@@ -108,8 +108,8 @@ static asIScriptObject* NodeCreateScriptObject(const String& scriptFileName, con
 asIScriptObject* NodeGetScriptObject(Node* ptr)
 {
     // Get the first available ScriptInstance with an object
-    const Vector<SharedPtr<Component> >& components = ptr->GetComponents();
-    for (Vector<SharedPtr<Component> >::ConstIterator i = components.Begin(); i != components.End(); ++i)
+    const Vector<SharedPtr<Component>>& components = ptr->GetComponents();
+    for (Vector<SharedPtr<Component>>::ConstIterator i = components.Begin(); i != components.End(); ++i)
     {
         if ((*i)->GetType() == ScriptInstance::GetTypeStatic())
         {
@@ -125,8 +125,8 @@ asIScriptObject* NodeGetScriptObject(Node* ptr)
 
 asIScriptObject* NodeGetNamedScriptObject(const String& className, Node* ptr)
 {
-    const Vector<SharedPtr<Component> >& components = ptr->GetComponents();
-    for (Vector<SharedPtr<Component> >::ConstIterator i = components.Begin(); i != components.End(); ++i)
+    const Vector<SharedPtr<Component>>& components = ptr->GetComponents();
+    for (Vector<SharedPtr<Component>>::ConstIterator i = components.Begin(); i != components.End(); ++i)
     {
         if ((*i)->GetType() == ScriptInstance::GetTypeStatic())
         {

@@ -19,9 +19,9 @@ namespace Urho3D
 
 #define URHO3D_LOGD3DERROR(msg, hr) URHO3D_LOGERRORF("%s (HRESULT %x)", msg, (unsigned)hr)
 
-using ShaderProgramMap_D3D11 = HashMap<Pair<ShaderVariation*, ShaderVariation*>, SharedPtr<ShaderProgram_D3D11> >;
-using VertexDeclarationMap_D3D11 = HashMap<unsigned long long, SharedPtr<VertexDeclaration_D3D11> >;
-using ConstantBufferMap = HashMap<unsigned, SharedPtr<ConstantBuffer> >;
+using ShaderProgramMap_D3D11 = HashMap<Pair<ShaderVariation*, ShaderVariation*>, SharedPtr<ShaderProgram_D3D11>>;
+using VertexDeclarationMap_D3D11 = HashMap<unsigned long long, SharedPtr<VertexDeclaration_D3D11>>;
+using ConstantBufferMap = HashMap<unsigned, SharedPtr<ConstantBuffer>>;
 
 /// %Graphics implementation. Holds API-specific objects.
 class URHO3D_API GraphicsImpl_D3D11

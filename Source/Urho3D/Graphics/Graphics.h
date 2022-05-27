@@ -231,7 +231,7 @@ public:
     /// @nobind
     bool SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, unsigned instanceOffset = 0);
     /// Set multiple vertex buffers.
-    bool SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers, unsigned instanceOffset = 0);
+    bool SetVertexBuffers(const Vector<SharedPtr<VertexBuffer>>& buffers, unsigned instanceOffset = 0);
     /// Set index buffer.
     void SetIndexBuffer(IndexBuffer* buffer);
     /// Set shaders.
@@ -904,7 +904,7 @@ private:
     void DrawInstanced_OGL(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex, unsigned vertexCount, unsigned instanceCount);
     void SetVertexBuffer_OGL(VertexBuffer* buffer);
     bool SetVertexBuffers_OGL(const PODVector<VertexBuffer*>& buffers, unsigned instanceOffset = 0);
-    bool SetVertexBuffers_OGL(const Vector<SharedPtr<VertexBuffer> >& buffers, unsigned instanceOffset = 0);
+    bool SetVertexBuffers_OGL(const Vector<SharedPtr<VertexBuffer>>& buffers, unsigned instanceOffset = 0);
     void SetIndexBuffer_OGL(IndexBuffer* buffer);
     void SetShaders_OGL(ShaderVariation* vs, ShaderVariation* ps);
     void SetShaderParameter_OGL(StringHash param, const float* data, unsigned count);
@@ -1008,7 +1008,7 @@ private:
     void DrawInstanced_D3D9(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex, unsigned vertexCount, unsigned instanceCount);
     void SetVertexBuffer_D3D9(VertexBuffer* buffer);
     bool SetVertexBuffers_D3D9(const PODVector<VertexBuffer*>& buffers, unsigned instanceOffset = 0);
-    bool SetVertexBuffers_D3D9(const Vector<SharedPtr<VertexBuffer> >& buffers, unsigned instanceOffset = 0);
+    bool SetVertexBuffers_D3D9(const Vector<SharedPtr<VertexBuffer>>& buffers, unsigned instanceOffset = 0);
     void SetIndexBuffer_D3D9(IndexBuffer* buffer);
     void SetShaders_D3D9(ShaderVariation* vs, ShaderVariation* ps);
     void SetShaderParameter_D3D9(StringHash param, const float* data, unsigned count);
@@ -1112,7 +1112,7 @@ private:
     void DrawInstanced_D3D11(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex, unsigned vertexCount, unsigned instanceCount);
     void SetVertexBuffer_D3D11(VertexBuffer* buffer);
     bool SetVertexBuffers_D3D11(const PODVector<VertexBuffer*>& buffers, unsigned instanceOffset = 0);
-    bool SetVertexBuffers_D3D11(const Vector<SharedPtr<VertexBuffer> >& buffers, unsigned instanceOffset = 0);
+    bool SetVertexBuffers_D3D11(const Vector<SharedPtr<VertexBuffer>>& buffers, unsigned instanceOffset = 0);
     void SetIndexBuffer_D3D11(IndexBuffer* buffer);
     void SetShaders_D3D11(ShaderVariation* vs, ShaderVariation* ps);
     void SetShaderParameter_D3D11(StringHash param, const float* data, unsigned count);

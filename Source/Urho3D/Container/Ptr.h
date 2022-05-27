@@ -545,7 +545,7 @@ template<class T> inline void CheckedDelete(T* x)
 }
 
 /// Construct SharedPtr.
-template <class T, class ... Args> SharedPtr<T> MakeShared(Args && ... args)
+template <class T, class ... Args> SharedPtr<T> MakeShared(Args&&... args)
 {
     return SharedPtr<T>(new T(std::forward<Args>(args)...));
 }

@@ -169,8 +169,8 @@ template <> int ToluaIsPODVector<bool>(double /*overload*/, lua_State* L, int lo
 template <> void* ToluaToPODVector<bool>(double /*overload*/, lua_State* L, int narg, void* def);
 template <> int ToluaPushPODVector<bool>(double /*overload*/, lua_State* L, void* data, const char* type);
 
-template <> void* ToluaToVector<SharedPtr<IndexBuffer> >(lua_State* L, int narg, void* def);
-template <> void* ToluaToVector<SharedPtr<VertexBuffer> >(lua_State* L, int narg, void* def);
+template <> void* ToluaToVector<SharedPtr<IndexBuffer>>(lua_State* L, int narg, void* def);
+template <> void* ToluaToVector<SharedPtr<VertexBuffer>>(lua_State* L, int narg, void* def);
 #endif
 
 /// Convert object at the given index and store it in Variant. This function is not thread-safe.

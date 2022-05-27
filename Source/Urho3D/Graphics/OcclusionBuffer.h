@@ -163,7 +163,7 @@ private:
     /// Highest-level buffer data per thread.
     Vector<OcclusionBufferData> buffers_;
     /// Reduced size depth buffers.
-    Vector<SharedArrayPtr<DepthValue> > mipBuffers_;
+    Vector<SharedArrayPtr<DepthValue>> mipBuffers_;
     /// Submitted render jobs.
     PODVector<OcclusionBatch> batches_;
     /// Buffer width.

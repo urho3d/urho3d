@@ -191,7 +191,7 @@ void ResourceCache::RemovePackageFile(PackageFile* package, bool releaseResource
 {
     MutexLock lock(resourceMutex_);
 
-    for (Vector<SharedPtr<PackageFile> >::Iterator i = packages_.Begin(); i != packages_.End(); ++i)
+    for (Vector<SharedPtr<PackageFile>>::Iterator i = packages_.Begin(); i != packages_.End(); ++i)
     {
         if (*i == package)
         {
@@ -211,7 +211,7 @@ void ResourceCache::RemovePackageFile(const String& fileName, bool releaseResour
     // Compare the name and extension only, not the path
     String fileNameNoPath = GetFileNameAndExtension(fileName);
 
-    for (Vector<SharedPtr<PackageFile> >::Iterator i = packages_.Begin(); i != packages_.End(); ++i)
+    for (Vector<SharedPtr<PackageFile>>::Iterator i = packages_.Begin(); i != packages_.End(); ++i)
     {
         if (!GetFileNameAndExtension((*i)->GetName()).Compare(fileNameNoPath, false))
         {
@@ -246,10 +246,10 @@ void ResourceCache::ReleaseResources(StringHash type, bool force)
     HashMap<StringHash, ResourceGroup>::Iterator i = resourceGroups_.Find(type);
     if (i != resourceGroups_.End())
     {
-        for (HashMap<StringHash, SharedPtr<Resource> >::Iterator j = i->second_.resources_.Begin();
+        for (HashMap<StringHash, SharedPtr<Resource>>::Iterator j = i->second_.resources_.Begin();
              j != i->second_.resources_.End();)
         {
-            HashMap<StringHash, SharedPtr<Resource> >::Iterator current = j++;
+            HashMap<StringHash, SharedPtr<Resource>>::Iterator current = j++;
             // If other references exist, do not release, unless forced
             if ((current->second_.Refs() == 1 && current->second_.WeakRefs() == 0) || force)
             {
@@ -270,10 +270,10 @@ void ResourceCache::ReleaseResources(StringHash type, const String& partialName,
     HashMap<StringHash, ResourceGroup>::Iterator i = resourceGroups_.Find(type);
     if (i != resourceGroups_.End())
     {
-        for (HashMap<StringHash, SharedPtr<Resource> >::Iterator j = i->second_.resources_.Begin();
+        for (HashMap<StringHash, SharedPtr<Resource>>::Iterator j = i->second_.resources_.Begin();
              j != i->second_.resources_.End();)
         {
-            HashMap<StringHash, SharedPtr<Resource> >::Iterator current = j++;
+            HashMap<StringHash, SharedPtr<Resource>>::Iterator current = j++;
             if (current->second_->GetName().Contains(partialName))
             {
                 // If other references exist, do not release, unless forced
@@ -301,10 +301,10 @@ void ResourceCache::ReleaseResources(const String& partialName, bool force)
 
         for (HashMap<StringHash, ResourceGroup>::Iterator i = resourceGroups_.Begin(); i != resourceGroups_.End(); ++i)
         {
-            for (HashMap<StringHash, SharedPtr<Resource> >::Iterator j = i->second_.resources_.Begin();
+            for (HashMap<StringHash, SharedPtr<Resource>>::Iterator j = i->second_.resources_.Begin();
                  j != i->second_.resources_.End();)
             {
-                HashMap<StringHash, SharedPtr<Resource> >::Iterator current = j++;
+                HashMap<StringHash, SharedPtr<Resource>>::Iterator current = j++;
                 if (current->second_->GetName().Contains(partialName))
                 {
                     // If other references exist, do not release, unless forced
@@ -332,10 +332,10 @@ void ResourceCache::ReleaseAllResources(bool force)
         for (HashMap<StringHash, ResourceGroup>::Iterator i = resourceGroups_.Begin();
              i != resourceGroups_.End(); ++i)
         {
-            for (HashMap<StringHash, SharedPtr<Resource> >::Iterator j = i->second_.resources_.Begin();
+            for (HashMap<StringHash, SharedPtr<Resource>>::Iterator j = i->second_.resources_.Begin();
                  j != i->second_.resources_.End();)
             {
-                HashMap<StringHash, SharedPtr<Resource> >::Iterator current = j++;
+                HashMap<StringHash, SharedPtr<Resource>>::Iterator current = j++;
                 // If other references exist, do not release, unless forced
                 if ((current->second_.Refs() == 1 && current->second_.WeakRefs() == 0) || force)
                 {
@@ -390,12 +390,12 @@ void ResourceCache::ReloadResourceWithDependencies(const String& fileName)
     if (!resource || GetExtension(resource->GetName()) == ".xml")
     {
         // Check if this is a dependency resource, reload dependents
-        HashMap<StringHash, HashSet<StringHash> >::ConstIterator j = dependentResources_.Find(fileNameHash);
+        HashMap<StringHash, HashSet<StringHash>>::ConstIterator j = dependentResources_.Find(fileNameHash);
         if (j != dependentResources_.End())
         {
             // Reloading a resource may modify the dependency tracking structure. Therefore collect the
             // resources we need to reload first
-            Vector<SharedPtr<Resource> > dependents;
+            Vector<SharedPtr<Resource>> dependents;
             dependents.Reserve(j->second_.Size());
 
             for (HashSet<StringHash>::ConstIterator k = j->second_.Begin(); k != j->second_.End(); ++k)
@@ -704,7 +704,7 @@ void ResourceCache::GetResources(PODVector<Resource*>& result, StringHash type) 
     HashMap<StringHash, ResourceGroup>::ConstIterator i = resourceGroups_.Find(type);
     if (i != resourceGroups_.End())
     {
-        for (HashMap<StringHash, SharedPtr<Resource> >::ConstIterator j = i->second_.resources_.Begin();
+        for (HashMap<StringHash, SharedPtr<Resource>>::ConstIterator j = i->second_.resources_.Begin();
              j != i->second_.resources_.End(); ++j)
             result.Push(j->second_);
     }
@@ -883,7 +883,7 @@ void ResourceCache::ResetDependencies(Resource* resource)
 
     StringHash nameHash(resource->GetName());
 
-    for (HashMap<StringHash, HashSet<StringHash> >::Iterator i = dependentResources_.Begin(); i != dependentResources_.End();)
+    for (HashMap<StringHash, HashSet<StringHash>>::Iterator i = dependentResources_.Begin(); i != dependentResources_.End();)
     {
         HashSet<StringHash>& dependents = i->second_;
         dependents.Erase(nameHash);
@@ -913,7 +913,7 @@ String ResourceCache::PrintMemoryUsage() const
         else
             average = 0;
         unsigned long long largest = 0;
-        for (HashMap<StringHash, SharedPtr<Resource> >::ConstIterator resIt = cit->second_.resources_.Begin(); resIt != cit->second_.resources_.End(); ++resIt)
+        for (HashMap<StringHash, SharedPtr<Resource>>::ConstIterator resIt = cit->second_.resources_.Begin(); resIt != cit->second_.resources_.End(); ++resIt)
         {
             if (resIt->second_->GetMemoryUse() > largest)
                 largest = resIt->second_->GetMemoryUse();
@@ -960,7 +960,7 @@ const SharedPtr<Resource>& ResourceCache::FindResource(StringHash type, StringHa
     HashMap<StringHash, ResourceGroup>::Iterator i = resourceGroups_.Find(type);
     if (i == resourceGroups_.End())
         return noResource;
-    HashMap<StringHash, SharedPtr<Resource> >::Iterator j = i->second_.resources_.Find(nameHash);
+    HashMap<StringHash, SharedPtr<Resource>>::Iterator j = i->second_.resources_.Find(nameHash);
     if (j == i->second_.resources_.End())
         return noResource;
 
@@ -973,7 +973,7 @@ const SharedPtr<Resource>& ResourceCache::FindResource(StringHash nameHash)
 
     for (HashMap<StringHash, ResourceGroup>::Iterator i = resourceGroups_.Begin(); i != resourceGroups_.End(); ++i)
     {
-        HashMap<StringHash, SharedPtr<Resource> >::Iterator j = i->second_.resources_.Find(nameHash);
+        HashMap<StringHash, SharedPtr<Resource>>::Iterator j = i->second_.resources_.Find(nameHash);
         if (j != i->second_.resources_.End())
             return j->second_;
     }
@@ -993,7 +993,7 @@ void ResourceCache::ReleasePackageResources(PackageFile* package, bool force)
         // We do not know the actual resource type, so search all type containers
         for (HashMap<StringHash, ResourceGroup>::Iterator j = resourceGroups_.Begin(); j != resourceGroups_.End(); ++j)
         {
-            HashMap<StringHash, SharedPtr<Resource> >::Iterator k = j->second_.resources_.Find(nameHash);
+            HashMap<StringHash, SharedPtr<Resource>>::Iterator k = j->second_.resources_.Find(nameHash);
             if (k != j->second_.resources_.End())
             {
                 // If other references exist, do not release, unless forced
@@ -1021,9 +1021,9 @@ void ResourceCache::UpdateResourceGroup(StringHash type)
     {
         unsigned totalSize = 0;
         unsigned oldestTimer = 0;
-        HashMap<StringHash, SharedPtr<Resource> >::Iterator oldestResource = i->second_.resources_.End();
+        HashMap<StringHash, SharedPtr<Resource>>::Iterator oldestResource = i->second_.resources_.End();
 
-        for (HashMap<StringHash, SharedPtr<Resource> >::Iterator j = i->second_.resources_.Begin();
+        for (HashMap<StringHash, SharedPtr<Resource>>::Iterator j = i->second_.resources_.Begin();
              j != i->second_.resources_.End(); ++j)
         {
             totalSize += j->second_->GetMemoryUse();

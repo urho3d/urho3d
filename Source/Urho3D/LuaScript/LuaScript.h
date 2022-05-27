@@ -105,9 +105,9 @@ private:
     /// Flag for executing engine console commands as script code. Default to true.
     bool executeConsoleCommands_;
     /// Function pointer to function map.
-    HashMap<const void*, SharedPtr<LuaFunction> > functionPointerToFunctionMap_;
+    HashMap<const void*, SharedPtr<LuaFunction>> functionPointerToFunctionMap_;
     /// Function name to function map.
-    HashMap<String, SharedPtr<LuaFunction> > functionNameToFunctionMap_;
+    HashMap<String, SharedPtr<LuaFunction>> functionNameToFunctionMap_;
 };
 
 /// Register Lua script library objects.

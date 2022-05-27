@@ -71,7 +71,7 @@ public:
     float GetRowHeight() const { return rowHeight_; }
 
     /// Return textures.
-    const Vector<SharedPtr<Texture2D> >& GetTextures() const { return textures_; }
+    const Vector<SharedPtr<Texture2D>>& GetTextures() const { return textures_; }
 
 protected:
     friend class FontFaceBitmap;
@@ -87,7 +87,7 @@ protected:
     /// Kerning mapping.
     HashMap<u32, float> kerningMapping_;
     /// Glyph texture pages.
-    Vector<SharedPtr<Texture2D> > textures_;
+    Vector<SharedPtr<Texture2D>> textures_;
     /// Point size.
     float pointSize_{};
     /// Row height.

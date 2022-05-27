@@ -81,7 +81,7 @@ public:
 
 protected:
     /// Tiles.
-    Vector<SharedPtr<Tile2D> > tiles_;
+    Vector<SharedPtr<Tile2D>> tiles_;
 };
 
 /// Tmx objects layer.
@@ -104,7 +104,7 @@ public:
 
 private:
     /// Objects.
-    Vector<SharedPtr<TileMapObject2D> > objects_;
+    Vector<SharedPtr<TileMapObject2D>> objects_;
 };
 
 /// Tmx image layer.
@@ -169,7 +169,7 @@ public:
     Sprite2D* GetTileSprite(unsigned gid) const;
 
     /// Return tile collision shapes for a given gid.
-    Vector<SharedPtr<TileMapObject2D> > GetTileCollisionShapes(unsigned gid) const;
+    Vector<SharedPtr<TileMapObject2D>> GetTileCollisionShapes(unsigned gid) const;
 
     /// Return tile property set by gid, if not exist return 0.
     PropertySet2D* GetTilePropertySet(unsigned gid) const;
@@ -197,15 +197,15 @@ private:
     /// XML file used during loading.
     SharedPtr<XMLFile> loadXMLFile_;
     /// TSX name to XML file mapping.
-    HashMap<String, SharedPtr<XMLFile> > tsxXMLFiles_;
+    HashMap<String, SharedPtr<XMLFile>> tsxXMLFiles_;
     /// Tile map information.
     TileMapInfo2D info_{};
     /// Gid to tile sprite mapping.
-    HashMap<unsigned, SharedPtr<Sprite2D> > gidToSpriteMapping_;
+    HashMap<unsigned, SharedPtr<Sprite2D>> gidToSpriteMapping_;
     /// Gid to tile property set mapping.
-    HashMap<unsigned, SharedPtr<PropertySet2D> > gidToPropertySetMapping_;
+    HashMap<unsigned, SharedPtr<PropertySet2D>> gidToPropertySetMapping_;
     /// Gid to tile collision shape mapping.
-    HashMap<unsigned, Vector<SharedPtr<TileMapObject2D> > > gidToCollisionShapeMapping_;
+    HashMap<unsigned, Vector<SharedPtr<TileMapObject2D>>> gidToCollisionShapeMapping_;
     /// Layers.
     Vector<TmxLayer2D*> layers_;
     /// Texture edge offset.

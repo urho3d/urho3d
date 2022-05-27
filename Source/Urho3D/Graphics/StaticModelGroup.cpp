@@ -272,7 +272,7 @@ void StaticModelGroup::RemoveInstanceNode(Node* node)
         return;
 
     WeakPtr<Node> instanceWeak(node);
-    Vector<WeakPtr<Node> >::Iterator i = instanceNodes_.Find(instanceWeak);
+    Vector<WeakPtr<Node>>::Iterator i = instanceNodes_.Find(instanceWeak);
     if (i == instanceNodes_.End())
         return;
 

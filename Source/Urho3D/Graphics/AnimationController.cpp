@@ -133,7 +133,7 @@ void AnimationController::Update(float timeStep)
     }
 
     // Node hierarchy animations need to be applied manually
-    for (Vector<SharedPtr<AnimationState> >::Iterator i = nodeAnimationStates_.Begin(); i != nodeAnimationStates_.End(); ++i)
+    for (Vector<SharedPtr<AnimationState>>::Iterator i = nodeAnimationStates_.Begin(); i != nodeAnimationStates_.End(); ++i)
         (*i)->Apply();
 }
 

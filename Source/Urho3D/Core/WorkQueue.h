@@ -68,7 +68,7 @@ public:
     /// Remove a work item before it has started executing. Return true if successfully removed.
     bool RemoveWorkItem(SharedPtr<WorkItem> item);
     /// Remove a number of work items before they have started executing. Return the number of items successfully removed.
-    unsigned RemoveWorkItems(const Vector<SharedPtr<WorkItem> >& items);
+    unsigned RemoveWorkItems(const Vector<SharedPtr<WorkItem>>& items);
     /// Pause worker threads.
     void Pause();
     /// Resume worker threads.
@@ -109,11 +109,11 @@ private:
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
 
     /// Worker threads.
-    Vector<SharedPtr<WorkerThread> > threads_;
+    Vector<SharedPtr<WorkerThread>> threads_;
     /// Work item pool for reuse to cut down on allocation. The bool is a flag for item pooling and whether it is available or not.
-    List<SharedPtr<WorkItem> > poolItems_;
+    List<SharedPtr<WorkItem>> poolItems_;
     /// Work item collection. Accessed only by the main thread.
-    List<SharedPtr<WorkItem> > workItems_;
+    List<SharedPtr<WorkItem>> workItems_;
     /// Work item prioritized queue for worker threads. Pointers are guaranteed to be valid (point to workItems).
     List<WorkItem*> queue_;
     /// Worker queue mutex.

@@ -161,7 +161,7 @@ private:
     /// Command history.
     Vector<String> history_;
     /// Pending log message rows.
-    Vector<Pair<int, String> > pendingRows_;
+    Vector<Pair<int, String>> pendingRows_;
     /// Current row being edited.
     String currentRow_;
     /// Maximum displayed rows.

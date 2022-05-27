@@ -99,7 +99,7 @@ public:
     Material* GetMaterial(unsigned index = 0) const;
 
     /// Return all vertices. These can be edited; calling Commit() updates the vertex buffer.
-    Vector<PODVector<CustomGeometryVertex> >& GetVertices() { return vertices_; }
+    Vector<PODVector<CustomGeometryVertex>>& GetVertices() { return vertices_; }
 
     /// Return a vertex in a geometry for editing, or null if out of bounds. After the edits are finished, calling Commit() updates  the vertex buffer.
     CustomGeometryVertex* GetVertex(unsigned geometryIndex, unsigned vertexNum);
@@ -121,9 +121,9 @@ private:
     /// Primitive type per geometry.
     PODVector<PrimitiveType> primitiveTypes_;
     /// Source vertices per geometry.
-    Vector<PODVector<CustomGeometryVertex> > vertices_;
+    Vector<PODVector<CustomGeometryVertex>> vertices_;
     /// All geometries.
-    Vector<SharedPtr<Geometry> > geometries_;
+    Vector<SharedPtr<Geometry>> geometries_;
     /// Vertex buffer.
     SharedPtr<VertexBuffer> vertexBuffer_;
     /// Element mask used so far.
