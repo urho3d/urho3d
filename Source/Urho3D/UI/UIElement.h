@@ -836,7 +836,7 @@ protected:
     /// Drag button combo.
     MouseButtonFlags dragButtonCombo_{};
     /// Drag button count.
-    unsigned dragButtonCount_{};
+    i32 dragButtonCount_{};
 
 private:
     /// Return child elements recursively.

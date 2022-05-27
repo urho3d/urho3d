@@ -276,10 +276,10 @@ inline unsigned LogBaseTwo(unsigned value)
 }
 
 /// Count the number of set bits in a mask.
-inline unsigned CountSetBits(unsigned value)
+inline i32 CountSetBits(u32 value)
 {
     // Brian Kernighan's method
-    unsigned count = 0;
+    i32 count = 0;
     for (count = 0; value; count++)
         value &= value - 1;
     return count;
