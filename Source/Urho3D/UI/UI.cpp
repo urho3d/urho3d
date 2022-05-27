@@ -1464,7 +1464,7 @@ void UI::ProcessClickBegin(const IntVector2& windowCursorPos, MouseButton button
                 dragData->dragBeginSumPos = cursorPos;
                 dragData->dragBeginTimer.Reset();
                 dragData->dragButtons = button;
-                dragData->numDragButtons = CountSetBits((unsigned)dragData->dragButtons);
+                dragData->numDragButtons = CountSetBits((u32)dragData->dragButtons);
                 dragElementsCount_++;
 
                 dragElementsContain = dragElements_.Contains(element);
@@ -1475,7 +1475,7 @@ void UI::ProcessClickBegin(const IntVector2& windowCursorPos, MouseButton button
                 dragData->sumPos += cursorPos;
                 dragData->dragBeginSumPos += cursorPos;
                 dragData->dragButtons |= button;
-                dragData->numDragButtons = CountSetBits((unsigned)dragData->dragButtons);
+                dragData->numDragButtons = CountSetBits((u32)dragData->dragButtons);
             }
         }
         else

@@ -37940,7 +37940,7 @@ VectorBuffer CompressVectorBuffer(VectorBuffer&);
 float ConvertGammaToLinear(float);
 float ConvertLinearToGamma(float);
 float Cos(float);
-uint CountSetBits(uint);
+int CountSetBits(uint);
 Object CreateObject(const String&);
 bool DecompressStream(Serializer&, Deserializer&);
 VectorBuffer DecompressVectorBuffer(VectorBuffer&);

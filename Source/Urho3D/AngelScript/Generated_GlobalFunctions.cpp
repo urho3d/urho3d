@@ -90,8 +90,8 @@ void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
     // template <class T> T Cos(T angle) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("float Cos(float)", AS_FUNCTIONPR(Cos, (float), float), AS_CALL_CDECL);
 
-    // unsigned CountSetBits(unsigned value) | File: ../Math/MathDefs.h
-    engine->RegisterGlobalFunction("uint CountSetBits(uint)", AS_FUNCTIONPR(CountSetBits, (unsigned), unsigned), AS_CALL_CDECL);
+    // i32 CountSetBits(u32 value) | File: ../Math/MathDefs.h
+    engine->RegisterGlobalFunction("int CountSetBits(uint)", AS_FUNCTIONPR(CountSetBits, (u32), i32), AS_CALL_CDECL);
 
     // PODVector<unsigned char> DecodeBase64(String encodedString) | File: ../Core/StringUtils.h
     // Error: type "PODVector<unsigned char>" can not automatically bind

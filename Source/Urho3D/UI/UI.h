@@ -254,7 +254,7 @@ public:
         /// Which button combo initiated the drag.
         MouseButtonFlags dragButtons;
         /// How many buttons initiated the drag.
-        int numDragButtons;
+        i32 numDragButtons;
         /// Sum of all touch locations.
         IntVector2 sumPos;
         /// Flag for a drag start event pending.
