@@ -21,6 +21,9 @@
 namespace Urho3D
 {
 
+/// No index.
+inline constexpr i32 NINDEX = -1;
+
 /// %Vector template class.
 template <class T> class Vector : public VectorBase
 {
@@ -36,22 +39,26 @@ public:
     Vector() noexcept = default;
 
     /// Construct with initial size.
-    explicit Vector(unsigned size)
+    explicit Vector(i32 size)
     {
+        assert(size >= 0);
         Resize(size);
     }
 
     /// Construct with initial size and default value.
-    Vector(unsigned size, const T& value)
+    Vector(i32 size, const T& value)
     {
+        assert(size >= 0);
         Resize(size);
-        for (unsigned i = 0; i < size; ++i)
+        for (i32 i = 0; i < size; ++i)
             At(i) = value;
     }
 
     /// Construct with initial data.
-    Vector(const T* data, unsigned size)
+    Vector(const T* data, i32 size)
     {
+        assert(size > 0);
+
         if constexpr (std::is_trivial<T>::value && std::is_standard_layout<T>::value)
         {
             Resize(size);
@@ -168,7 +175,7 @@ public:
 
         T* buffer = Buffer();
         T* rhsBuffer = rhs.Buffer();
-        for (unsigned i = 0; i < size_; ++i)
+        for (i32 i = 0; i < size_; ++i)
         {
             if (buffer[i] != rhsBuffer[i])
                 return false;
@@ -185,7 +192,7 @@ public:
 
         T* buffer = Buffer();
         T* rhsBuffer = rhs.Buffer();
-        for (unsigned i = 0; i < size_; ++i)
+        for (i32 i = 0; i < size_; ++i)
         {
             if (buffer[i] != rhsBuffer[i])
                 return true;
@@ -195,30 +202,30 @@ public:
     }
 
     /// Return element at index.
-    T& operator [](unsigned index)
+    T& operator [](i32 index)
     {
-        assert(index < size_);
+        assert(index >= 0 && index < size_);
         return Buffer()[index];
     }
 
     /// Return const element at index.
-    const T& operator [](unsigned index) const
+    const T& operator [](i32 index) const
     {
-        assert(index < size_);
+        assert(index >= 0 && index < size_);
         return Buffer()[index];
     }
 
     /// Return element at index.
-    T& At(unsigned index)
+    T& At(i32 index)
     {
-        assert(index < size_);
+        assert(index >= 0 && index < size_);
         return Buffer()[index];
     }
 
     /// Return const element at index.
-    const T& At(unsigned index) const
+    const T& At(i32 index) const
     {
-        assert(index < size_);
+        assert(index >= 0 && index < size_);
         return Buffer()[index];
     }
 
@@ -295,8 +302,8 @@ public:
         if constexpr (std::is_trivial<T>::value && std::is_standard_layout<T>::value)
         {
             // Obtain the size before resizing, in case the other vector is another reference to this vector
-            unsigned thisSize = size_;
-            unsigned vectorSize = vector.size_;
+            i32 thisSize = size_;
+            i32 vectorSize = vector.size_;
             Resize(thisSize + vectorSize);
             CopyElements(Buffer() + thisSize, vector.Buffer(), vectorSize);
         }
@@ -313,21 +320,24 @@ public:
             Resize(size_ - 1);
     }
 
-    /// Insert an element at position.
-    void Insert(unsigned pos, const T& value)
+    /// Insert an element at position. If pos is NINDEX, append the new value at the end.
+    void Insert(i32 pos, const T& value)
     {
+        assert((pos >= 0 && pos <= size_) || pos == NINDEX);
         DoInsertElements(pos, &value, &value + 1, CopyTag{});
     }
 
-    /// Insert an element at position.
-    void Insert(unsigned pos, T && value)
+    /// Insert an element at position. If pos is NINDEX, append the new value at the end.
+    void Insert(i32 pos, T&& value)
     {
+        assert((pos >= 0 && pos <= size_) || pos == NINDEX);
+
         if constexpr (std::is_trivial<T>::value && std::is_standard_layout<T>::value)
         {
-            if (pos > size_)
+            if (pos == NINDEX)
                 pos = size_;
 
-            unsigned oldSize = size_;
+            i32 oldSize = size_;
             Resize(size_ + 1);
             MoveRange(pos + 1, pos, oldSize - pos);
             Buffer()[pos] = value;
@@ -338,15 +348,17 @@ public:
         }
     }
 
-    /// Insert another vector at position.
-    void Insert(unsigned pos, const Vector<T>& vector)
+    /// Insert another vector at position. If pos is NINDEX, append the new elements at the end.
+    void Insert(i32 pos, const Vector<T>& vector)
     {
+        assert((pos >= 0 && pos <= size_) || pos == NINDEX);
+
         if constexpr (std::is_trivial<T>::value && std::is_standard_layout<T>::value)
         {
-            if (pos > size_)
+            if (pos == NINDEX)
                 pos = size_;
 
-            unsigned oldSize = size_;
+            i32 oldSize = size_;
             Resize(size_ + vector.size_);
             MoveRange(pos + vector.size_, pos, oldSize - pos);
             CopyElements(Buffer() + pos, vector.Buffer(), vector.size_);
@@ -362,16 +374,16 @@ public:
     {
         if constexpr (std::is_trivial<T>::value && std::is_standard_layout<T>::value)
         {
-            auto pos = (unsigned)(dest - Begin());
-            if (pos > size_)
-                pos = size_;
+            i32 pos = (i32)(dest - Begin());
+            assert(pos >= 0 && pos <= size_);
             Insert(pos, value);
 
             return Begin() + pos;
         }
         else
         {
-            auto pos = (unsigned)(dest - Begin());
+            i32 pos = (i32)(dest - Begin());
+            assert(pos >= 0 && pos <= size_);
             return DoInsertElements(pos, &value, &value + 1, CopyTag{});
         }
     }
@@ -379,7 +391,8 @@ public:
     /// Move-insert an element by iterator.
     Iterator Insert(const Iterator& dest, T&& value)
     {
-        auto pos = (unsigned)(dest - Begin());
+        i32 pos = (i32)(dest - Begin());
+        assert(pos >= 0 && pos <= size_);
         return DoInsertElements(pos, &value, &value + 1, MoveTag{});
     }
 
@@ -388,16 +401,16 @@ public:
     {
         if constexpr (std::is_trivial<T>::value && std::is_standard_layout<T>::value)
         {
-            auto pos = (unsigned)(dest - Begin());
-            if (pos > size_)
-                pos = size_;
+            i32 pos = (i32)(dest - Begin());
+            assert(pos >= 0 && pos <= size_);
             Insert(pos, vector);
 
             return Begin() + pos;
         }
         else
         {
-            auto pos = (unsigned)(dest - Begin());
+            i32 pos = (i32)(dest - Begin());
+            assert(pos >= 0 && pos <= size_);
             return DoInsertElements(pos, vector.Begin(), vector.End(), CopyTag{});
         }
     }
@@ -407,10 +420,9 @@ public:
     {
         if constexpr (std::is_trivial<T>::value && std::is_standard_layout<T>::value)
         {
-            auto pos = (unsigned)(dest - Begin());
-            if (pos > size_)
-                pos = size_;
-            auto length = (unsigned)(end - start);
+            i32 pos = (i32)(dest - Begin());
+            assert(pos >= 0 && pos <= size_);
+            i32 length = (i32)(end - start);
             Resize(size_ + length);
             MoveRange(pos + length, pos, size_ - pos - length);
             CopyElements(Buffer() + pos, &(*start), length);
@@ -419,7 +431,8 @@ public:
         }
         else
         {
-            auto pos = (unsigned)(dest - Begin());
+            i32 pos = (i32)(dest - Begin());
+            assert(pos >= 0 && pos <= size_);
             return DoInsertElements(pos, start, end, CopyTag{});
         }
     }
@@ -429,10 +442,9 @@ public:
     {
         if constexpr (std::is_trivial<T>::value && std::is_standard_layout<T>::value)
         {
-            auto pos = (unsigned)(dest - Begin());
-            if (pos > size_)
-                pos = size_;
-            auto length = (unsigned)(end - start);
+            i32 pos = (i32)(dest - Begin());
+            assert(pos >= 0 && pos <= size_);
+            i32 length = (i32)(end - start);
             Resize(size_ + length);
             MoveRange(pos + length, pos, size_ - pos - length);
 
@@ -444,16 +456,22 @@ public:
         }
         else
         {
-            auto pos = (unsigned)(dest - Begin());
+            i32 pos = (i32)(dest - Begin());
+            assert(pos >= 0 && pos <= size_);
             return DoInsertElements(pos, start, end, CopyTag{});
         }
     }
 
     /// Erase a range of elements.
-    void Erase(unsigned pos, unsigned length = 1)
+    void Erase(i32 pos, i32 length = 1)
     {
-        // Return if the range is illegal
-        if (pos + length > size_ || !length)
+        // TODO: Remove this
+        if (pos + length > size_)
+            return;
+
+        assert(pos >= 0 && length >= 0 && pos + length <= size_);
+
+        if (!length)
             return;
 
         if constexpr (std::is_trivial<T>::value && std::is_standard_layout<T>::value)
@@ -468,15 +486,13 @@ public:
     }
 
     /// Erase a range of elements by swapping elements from the end of the array.
-    void EraseSwap(unsigned pos, unsigned length = 1)
+    void EraseSwap(i32 pos, i32 length = 1)
     {
-        unsigned shiftStartIndex = pos + length;
-        // Return if the range is illegal
-        if (shiftStartIndex > size_ || !length)
-            return;
+        assert(pos >= 0 && length >= 1 && pos + length <= size_);
 
-        unsigned newSize = size_ - length;
-        unsigned trailingCount = size_ - shiftStartIndex;
+        i32 shiftStartIndex = pos + length;
+        i32 newSize = size_ - length;
+        i32 trailingCount = size_ - shiftStartIndex;
 
         if constexpr (std::is_trivial<T>::value && std::is_standard_layout<T>::value)
         {
@@ -512,9 +528,12 @@ public:
     /// Erase an element by iterator. Return iterator to the next element.
     Iterator Erase(const Iterator& it)
     {
-        auto pos = (unsigned)(it - Begin());
-        if (pos >= size_)
+        i32 pos = (i32)(it - Begin());
+        assert(pos >= 0 && pos <= size_);
+
+        if (pos == size_)
             return End();
+
         Erase(pos);
 
         return Begin() + pos;
@@ -523,10 +542,13 @@ public:
     /// Erase a range by iterators. Return iterator to the next element.
     Iterator Erase(const Iterator& start, const Iterator& end)
     {
-        auto pos = (unsigned)(start - Begin());
-        if (pos >= size_)
+        i32 pos = (i32)(start - Begin());
+        assert(pos >= 0 && pos <= size_);
+        
+        if (pos == size_)
             return End();
-        auto length = (unsigned)(end - start);
+        
+        i32 length = (i32)(end - start);
         Erase(pos, length);
 
         return Begin() + pos;
@@ -566,8 +588,10 @@ public:
     void Clear() { Resize(0); }
 
     /// Resize the vector.
-    void Resize(unsigned newSize)
+    void Resize(i32 newSize)
     {
+        assert(newSize >= 0);
+
         if constexpr (std::is_trivial<T>::value && std::is_standard_layout<T>::value)
         {
             if (newSize > capacity_)
@@ -580,7 +604,7 @@ public:
                         capacity_ += (capacity_ + 1) >> 1;
                 }
 
-                unsigned char* newBuffer = AllocateBuffer((unsigned)(capacity_ * sizeof(T)));
+                u8* newBuffer = AllocateBuffer((i32)(capacity_ * sizeof(T)));
                 // Move the data into the new buffer and delete the old
                 if (buffer_)
                 {
@@ -599,17 +623,20 @@ public:
     }
 
     /// Resize the vector and fill new elements with default value.
-    void Resize(unsigned newSize, const T& value)
+    void Resize(i32 newSize, const T& value)
     {
-        unsigned oldSize = Size();
+        assert(newSize >= 0);
+        i32 oldSize = Size();
         Resize(newSize);
-        for (unsigned i = oldSize; i < newSize; ++i)
+        for (i32 i = oldSize; i < newSize; ++i)
             At(i) = value;
     }
 
     /// Set new capacity.
-    void Reserve(unsigned newCapacity)
+    void Reserve(i32 newCapacity)
     {
+        assert(newCapacity >= 0);
+
         if (newCapacity < size_)
             newCapacity = size_;
 
@@ -617,12 +644,12 @@ public:
         {
             if (newCapacity != capacity_)
             {
-                unsigned char* newBuffer = nullptr;
+                u8* newBuffer = nullptr;
                 capacity_ = newCapacity;
 
                 if (capacity_)
                 {
-                    newBuffer = AllocateBuffer((unsigned)(capacity_ * sizeof(T)));
+                    newBuffer = AllocateBuffer((i32)(capacity_ * sizeof(T)));
                     // Move the data into the new buffer
                     CopyElements(reinterpret_cast<T*>(newBuffer), Buffer(), size_);
                 }
@@ -641,7 +668,7 @@ public:
 
                 if (capacity_)
                 {
-                    newBuffer = reinterpret_cast<T*>(AllocateBuffer((unsigned)(capacity_ * sizeof(T))));
+                    newBuffer = reinterpret_cast<T*>(AllocateBuffer((i32)(capacity_ * sizeof(T))));
                     // Move the data into the new buffer
                     ConstructElements(newBuffer, Begin(), End(), MoveTag{});
                 }
@@ -649,7 +676,7 @@ public:
                 // Delete the old buffer
                 DestructElements(Buffer(), size_);
                 delete[] buffer_;
-                buffer_ = reinterpret_cast<unsigned char*>(newBuffer);
+                buffer_ = reinterpret_cast<u8*>(newBuffer);
             }
         }
     }
@@ -676,7 +703,7 @@ public:
     }
 
     /// Return index of value in vector, or size if not found.
-    unsigned IndexOf(const T& value) const
+    i32 IndexOf(const T& value) const
     {
         return Find(value) - Begin();
     }
@@ -725,10 +752,10 @@ public:
     }
 
     /// Return number of elements.
-    unsigned Size() const { return size_; }
+    i32 Size() const { return size_; }
 
     /// Return capacity of vector.
-    unsigned Capacity() const { return capacity_; }
+    i32 Capacity() const { return capacity_; }
 
     /// Return whether vector is empty.
     bool Empty() const { return size_ == 0; }
@@ -738,9 +765,10 @@ public:
 
 private:
     /// Construct elements using default ctor.
-    static void ConstructElements(T* dest, unsigned count)
+    static void ConstructElements(T* dest, i32 count)
     {
-        for (unsigned i = 0; i < count; ++i)
+        assert(count >= 0);
+        for (i32 i = 0; i < count; ++i)
             new(dest + i) T();
     }
 
@@ -748,8 +776,9 @@ private:
     template <class RandomIteratorT>
     static void ConstructElements(T* dest, RandomIteratorT start, RandomIteratorT end, CopyTag)
     {
-        const auto count = (unsigned)(end - start);
-        for (unsigned i = 0; i < count; ++i)
+        const i32 count = (i32)(end - start);
+        assert(count > 0);
+        for (i32 i = 0; i < count; ++i)
             new(dest + i) T(*(start + i));
     }
 
@@ -757,14 +786,17 @@ private:
     template <class RandomIteratorT>
     static void ConstructElements(T* dest, RandomIteratorT start, RandomIteratorT end, MoveTag)
     {
-        const auto count = (unsigned)(end - start);
-        for (unsigned i = 0; i < count; ++i)
+        const i32 count = (i32)(end - start);
+        assert(count >= 0);
+        for (i32 i = 0; i < count; ++i)
             new(dest + i) T(std::move(*(start + i)));
     }
 
     /// Calculate new vector capacity.
-    static unsigned CalculateCapacity(unsigned size, unsigned capacity)
+    static i32 CalculateCapacity(i32 size, i32 capacity)
     {
+        assert(size > 0 && capacity >= 0);
+
         if (!capacity)
         {
             return size;
@@ -772,14 +804,16 @@ private:
         else
         {
             while (capacity < size)
-                capacity += (capacity + 1) >> 1;
+                capacity += (capacity + 1) >> 1; // += (capacity * 0.5 and round up)
             return capacity;
         }
     }
 
     /// Resize the vector and create/remove new elements as necessary.
-    void DoResize(unsigned newSize)
+    void DoResize(i32 newSize)
     {
+        assert(newSize >= 0);
+
         // If size shrinks, destruct the removed elements
         if (newSize < size_)
         {
@@ -812,13 +846,16 @@ private:
     }
 
     /// Insert elements into the vector using copy or move constructor.
+    /// If pos is NINDEX, append the new elements at the end.
     template <class Tag, class RandomIteratorT>
-    Iterator DoInsertElements(unsigned pos, RandomIteratorT start, RandomIteratorT end, Tag)
+    Iterator DoInsertElements(i32 pos, RandomIteratorT start, RandomIteratorT end, Tag)
     {
-        if (pos > size_)
+        assert((pos >= 0 && pos <= size_) || pos == NINDEX);
+
+        if (pos == NINDEX)
             pos = size_;
 
-        const auto numElements = (unsigned)(end - start);
+        const i32 numElements = (i32)(end - start);
         if (size_ + numElements > capacity_)
         {
             T* src = Buffer();
@@ -861,10 +898,9 @@ private:
     }
 
     /// Erase elements from the vector.
-    Iterator DoEraseElements(unsigned pos, unsigned count)
+    Iterator DoEraseElements(i32 pos, i32 count)
     {
-        assert(count > 0);
-        assert(pos + count <= size_);
+        assert(pos >= 0 && count > 0 && pos + count <= size_);
         T* buffer = Buffer();
         std::move(buffer + pos + count, buffer + size_, buffer + pos);
         Resize(size_ - count);
@@ -872,8 +908,10 @@ private:
     }
 
     /// Call the elements' destructors.
-    static void DestructElements(T* dest, unsigned count)
+    static void DestructElements(T* dest, i32 count)
     {
+        assert(count >= 0);
+
         while (count--)
         {
             dest->~T();
@@ -882,8 +920,10 @@ private:
     }
 
     /// Move a range of elements within the vector. Only for PODVector.
-    void MoveRange(unsigned dest, unsigned src, unsigned count)
+    void MoveRange(i32 dest, i32 src, i32 count)
     {
+        assert(dest >= 0 && src >= 0 && count >= 0);
+
         if constexpr (std::is_trivial<T>::value && std::is_standard_layout<T>::value)
         {
             if (count)
@@ -896,8 +936,10 @@ private:
     }
 
     /// Copy elements from one buffer to another. Only for PODVector.
-    static void CopyElements(T* dest, const T* src, unsigned count)
+    static void CopyElements(T* dest, const T* src, i32 count)
     {
+        assert(count >= 0);
+
         if constexpr (std::is_trivial<T>::value && std::is_standard_layout<T>::value)
         {
             if (count)

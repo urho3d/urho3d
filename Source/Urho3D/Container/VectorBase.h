@@ -39,12 +39,12 @@ public:
     }
 
 protected:
-    static unsigned char* AllocateBuffer(unsigned size);
+    static u8* AllocateBuffer(i32 size);
 
     /// Size of vector.
-    u32 size_;
+    i32 size_;
     /// Buffer capacity.
-    u32 capacity_;
+    i32 capacity_;
     /// Buffer.
     u8* buffer_;
 };

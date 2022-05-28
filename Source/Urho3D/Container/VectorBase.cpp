@@ -10,9 +10,9 @@
 namespace Urho3D
 {
 
-unsigned char* VectorBase::AllocateBuffer(unsigned size)
+u8* VectorBase::AllocateBuffer(i32 size)
 {
-    return new unsigned char[size];
+    return new u8[size];
 }
 
 }
