@@ -14,7 +14,7 @@
 
 namespace SLNet
 {
-    class SystemAddress;
+    struct SystemAddress;
     struct AddressOrGUID;
     struct RakNetGUID;
     struct Packet;
