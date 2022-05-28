@@ -234,7 +234,7 @@ void ListView::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifier
 
         case KEY_PAGEUP:
             pageDirection = -1;
-            // Fallthru
+            [[fallthrough]];
 
         case KEY_PAGEDOWN:
             {

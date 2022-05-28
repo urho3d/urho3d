@@ -245,7 +245,7 @@ void LineEdit::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifier
 
     case KEY_HOME:
         qualifiers |= QUAL_CTRL;
-        // Fallthru
+        [[fallthrough]];
 
     case KEY_LEFT:
         if (cursorMovable_ && cursorPosition_ > 0)
@@ -277,7 +277,7 @@ void LineEdit::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifier
 
     case KEY_END:
         qualifiers |= QUAL_CTRL;
-        // Fallthru
+        [[fallthrough]];
 
     case KEY_RIGHT:
         if (cursorMovable_ && cursorPosition_ < line_.LengthUTF8())

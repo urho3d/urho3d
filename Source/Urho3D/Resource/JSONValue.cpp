@@ -136,6 +136,7 @@ JSONValue& JSONValue::operator =(const JSONValue& rhs)
 
     case JSON_OBJECT:
         *objectValue_ = *rhs.objectValue_;
+        break;
 
     default:
         break;
