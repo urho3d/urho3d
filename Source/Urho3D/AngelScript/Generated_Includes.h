@@ -18,6 +18,7 @@
 #include "../Container/RefCounted.h"
 #include "../Container/Sort.h"
 #include "../Container/Str.h"
+#include "../Container/Vector.h"
 #include "../Container/VectorBase.h"
 #include "../Core/Attribute.h"
 #include "../Core/Condition.h"

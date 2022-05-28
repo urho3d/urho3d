@@ -376,6 +376,9 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // constexpr float M_RADTODEG | File: ../Math/MathDefs.h
     engine->RegisterGlobalProperty("const float M_RADTODEG", (void*)&M_RADTODEG);
 
+    // constexpr i32 NINDEX | File: ../Container/Vector.h
+    engine->RegisterGlobalProperty("const int NINDEX", (void*)&NINDEX);
+
     // static const unsigned NUM_FRUSTUM_PLANES | File: ../Math/Frustum.h
     engine->RegisterGlobalProperty("const uint NUM_FRUSTUM_PLANES", (void*)&NUM_FRUSTUM_PLANES);
 
