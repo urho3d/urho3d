@@ -926,13 +926,13 @@ void Image::SetPixelInt(int x, int y, int z, unsigned uintColor)
     {
     case 4:
         dest[3] = src[3];
-        // Fall through
+        [[fallthrough]];
     case 3:
         dest[2] = src[2];
-        // Fall through
+        [[fallthrough]];
     case 2:
         dest[1] = src[1];
-        // Fall through
+        [[fallthrough]];
     default:
         dest[0] = src[0];
         break;
@@ -1172,13 +1172,13 @@ bool Image::Resize(int width, int height)
             {
             case 4:
                 dest[3] = src[3];
-                // Fall through
+                [[fallthrough]];
             case 3:
                 dest[2] = src[2];
-                // Fall through
+                [[fallthrough]];
             case 2:
                 dest[1] = src[1];
-                // Fall through
+                [[fallthrough]];
             default:
                 dest[0] = src[0];
                 break;
@@ -1472,10 +1472,10 @@ Color Image::GetPixel(int x, int y, int z) const
     {
     case 4:
         ret.a_ = (float)src[3] / 255.0f;
-        // Fall through
+        [[fallthrough]];
     case 3:
         ret.b_ = (float)src[2] / 255.0f;
-        // Fall through
+        [[fallthrough]];
     case 2:
         ret.g_ = (float)src[1] / 255.0f;
         ret.r_ = (float)src[0] / 255.0f;
@@ -1509,10 +1509,10 @@ unsigned Image::GetPixelInt(int x, int y, int z) const
     {
     case 4:
         ret |= (unsigned)src[3] << 24;
-        // Fall through
+        [[fallthrough]];
     case 3:
         ret |= (unsigned)src[2] << 16;
-        // Fall through
+        [[fallthrough]];
     case 2:
         ret |= (unsigned)src[1] << 8;
         ret |= (unsigned)src[0];

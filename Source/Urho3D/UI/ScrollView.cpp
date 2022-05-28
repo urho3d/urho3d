@@ -201,7 +201,7 @@ void ScrollView::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifi
 
     case KEY_HOME:
         qualifiers |= QUAL_CTRL;
-        // Fallthru
+        [[fallthrough]];
 
     case KEY_UP:
         if (verticalScrollBar_->IsVisible())
@@ -215,7 +215,7 @@ void ScrollView::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifi
 
     case KEY_END:
         qualifiers |= QUAL_CTRL;
-        // Fallthru
+        [[fallthrough]];
 
     case KEY_DOWN:
         if (verticalScrollBar_->IsVisible())

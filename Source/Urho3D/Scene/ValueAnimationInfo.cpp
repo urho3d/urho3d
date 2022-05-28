@@ -124,7 +124,7 @@ float ValueAnimationInfo::CalculateScaledTime(float currentTime, bool& finished)
 
     case WM_ONCE:
         finished = (currentTime >= endTime);
-        // Fallthrough
+        [[fallthrough]];
 
     case WM_CLAMP:
         return Clamp(currentTime, beginTime, endTime);
