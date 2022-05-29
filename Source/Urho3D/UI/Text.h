@@ -104,7 +104,7 @@ public:
     /// @property
     void SetAutoLocalizable(bool enable);
     /// Set selection. When length is not provided, select until the text ends.
-    void SetSelection(unsigned start, unsigned length = M_MAX_UNSIGNED);
+    void SetSelection(i32 start, i32 length = M_MAX_INT);
     /// Clear selection.
     void ClearSelection();
     /// Set text effect.
@@ -153,11 +153,11 @@ public:
 
     /// Return selection start.
     /// @property
-    unsigned GetSelectionStart() const { return selectionStart_; }
+    i32 GetSelectionStart() const { return selectionStart_; }
 
     /// Return selection length.
     /// @property
-    unsigned GetSelectionLength() const { return selectionLength_; }
+    i32 GetSelectionLength() const { return selectionLength_; }
 
     /// Return text effect.
     /// @property
@@ -185,21 +185,21 @@ public:
 
     /// Return number of rows.
     /// @property
-    unsigned GetNumRows() const { return rowWidths_.Size(); }
+    i32 GetNumRows() const { return rowWidths_.Size(); }
 
     /// Return number of characters.
     /// @property
-    unsigned GetNumChars() const { return unicodeText_.Size(); }
+    i32 GetNumChars() const { return unicodeText_.Size(); }
 
     /// Return width of row by index.
     /// @property{get_rowWidths}
-    float GetRowWidth(unsigned index) const;
+    float GetRowWidth(i32 index) const;
     /// Return position of character by index relative to the text element origin.
     /// @property{get_charPositions}
-    Vector2 GetCharPosition(unsigned index);
+    Vector2 GetCharPosition(i32 index);
     /// Return size of character by index.
     /// @property{get_charSizes}
-    Vector2 GetCharSize(unsigned index);
+    Vector2 GetCharSize(i32 index);
 
     /// Set text effect Z bias. Zero by default, adjusted only in 3D mode.
     void SetEffectDepthBias(float bias);
@@ -226,7 +226,7 @@ protected:
     /// Validate text selection to be within the text.
     void ValidateSelection();
     /// Return row start X position.
-    int GetRowStartPosition(unsigned rowIndex) const;
+    int GetRowStartPosition(i32 rowIndex) const;
     /// Construct batch.
     void ConstructBatch
         (UIBatch& pageBatch, const PODVector<GlyphLocation>& pageGlyphLocation, float dx = 0, float dy = 0, Color* color = nullptr,
@@ -249,9 +249,9 @@ protected:
     /// Char positions dirty flag.
     bool charLocationsDirty_;
     /// Selection start.
-    unsigned selectionStart_;
+    i32 selectionStart_;
     /// Selection length.
-    unsigned selectionLength_;
+    i32 selectionLength_;
     /// Text effect.
     TextEffect textEffect_;
     /// Text effect shadow offset.
@@ -271,7 +271,7 @@ protected:
     /// Text modified into printed form.
     PODVector<c32> printText_;
     /// Mapping of printed form back to original char indices.
-    PODVector<unsigned> printToText_;
+    PODVector<i32> printToText_;
     /// Row widths.
     PODVector<float> rowWidths_;
     /// Glyph locations per each texture in the font.
