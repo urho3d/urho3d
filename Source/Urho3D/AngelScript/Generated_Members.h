@@ -15423,8 +15423,8 @@ template <class T> void RegisterMembers_Node(asIScriptEngine* engine, const char
     // void Node::SetOwner(Connection* owner)
     // Not registered because have @manualbind mark
 
-    // void Node::AddChild(Node* node, i32 index = NINDEX)
-    engine->RegisterObjectMethod(className, "void AddChild(Node@+, int = NINDEX)", AS_METHODPR(T, AddChild, (Node*, i32), void), AS_CALL_THISCALL);
+    // void Node::AddChild(Node* node, i32 index = ENDPOS)
+    engine->RegisterObjectMethod(className, "void AddChild(Node@+, int = ENDPOS)", AS_METHODPR(T, AddChild, (Node*, i32), void), AS_CALL_THISCALL);
 
     // void Node::AddComponent(Component* component, unsigned id, CreateMode mode)
     engine->RegisterObjectMethod(className, "void AddComponent(Component@+, uint, CreateMode)", AS_METHODPR(T, AddComponent, (Component*, unsigned, CreateMode), void), AS_CALL_THISCALL);
