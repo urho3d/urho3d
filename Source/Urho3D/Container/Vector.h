@@ -24,6 +24,9 @@ namespace Urho3D
 /// No index.
 inline constexpr i32 NINDEX = -1;
 
+/// End position.
+inline constexpr i32 ENDPOS = -1;
+
 /// %Vector template class.
 template <class T> class Vector : public VectorBase
 {
@@ -57,7 +60,7 @@ public:
     /// Construct with initial data.
     Vector(const T* data, i32 size)
     {
-        assert(size > 0);
+        assert((size >= 0 && data) || (!size && !data));
 
         if constexpr (std::is_trivial<T>::value && std::is_standard_layout<T>::value)
         {
@@ -320,21 +323,21 @@ public:
             Resize(size_ - 1);
     }
 
-    /// Insert an element at position. If pos is NINDEX, append the new value at the end.
+    /// Insert an element at position. If pos is ENDPOS, append the new value at the end.
     void Insert(i32 pos, const T& value)
     {
-        assert((pos >= 0 && pos <= size_) || pos == NINDEX);
+        assert((pos >= 0 && pos <= size_) || pos == ENDPOS);
         DoInsertElements(pos, &value, &value + 1, CopyTag{});
     }
 
-    /// Insert an element at position. If pos is NINDEX, append the new value at the end.
+    /// Insert an element at position. If pos is ENDPOS, append the new value at the end.
     void Insert(i32 pos, T&& value)
     {
-        assert((pos >= 0 && pos <= size_) || pos == NINDEX);
+        assert((pos >= 0 && pos <= size_) || pos == ENDPOS);
 
         if constexpr (std::is_trivial<T>::value && std::is_standard_layout<T>::value)
         {
-            if (pos == NINDEX)
+            if (pos == ENDPOS)
                 pos = size_;
 
             i32 oldSize = size_;
@@ -348,14 +351,14 @@ public:
         }
     }
 
-    /// Insert another vector at position. If pos is NINDEX, append the new elements at the end.
+    /// Insert another vector at position. If pos is ENDPOS, append the new elements at the end.
     void Insert(i32 pos, const Vector<T>& vector)
     {
-        assert((pos >= 0 && pos <= size_) || pos == NINDEX);
+        assert((pos >= 0 && pos <= size_) || pos == ENDPOS);
 
         if constexpr (std::is_trivial<T>::value && std::is_standard_layout<T>::value)
         {
-            if (pos == NINDEX)
+            if (pos == ENDPOS)
                 pos = size_;
 
             i32 oldSize = size_;
@@ -465,10 +468,6 @@ public:
     /// Erase a range of elements.
     void Erase(i32 pos, i32 length = 1)
     {
-        // TODO: Remove this
-        if (pos + length > size_)
-            return;
-
         assert(pos >= 0 && length >= 0 && pos + length <= size_);
 
         if (!length)
@@ -846,13 +845,13 @@ private:
     }
 
     /// Insert elements into the vector using copy or move constructor.
-    /// If pos is NINDEX, append the new elements at the end.
+    /// If pos is ENDPOS, append the new elements at the end.
     template <class Tag, class RandomIteratorT>
     Iterator DoInsertElements(i32 pos, RandomIteratorT start, RandomIteratorT end, Tag)
     {
-        assert((pos >= 0 && pos <= size_) || pos == NINDEX);
+        assert((pos >= 0 && pos <= size_) || pos == ENDPOS);
 
-        if (pos == NINDEX)
+        if (pos == ENDPOS)
             pos = size_;
 
         const i32 numElements = (i32)(end - start);

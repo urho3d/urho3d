@@ -103,6 +103,9 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // const u32 ELEMENT_TYPESIZES[] | File: ../GraphicsAPI/GraphicsDefs.h
     // Not registered because array
 
+    // constexpr i32 ENDPOS | File: ../Container/Vector.h
+    engine->RegisterGlobalProperty("const int ENDPOS", (void*)&ENDPOS);
+
     // static const String EP_AUTOLOAD_PATHS | File: ../Engine/EngineDefs.h
     engine->RegisterGlobalProperty("const String EP_AUTOLOAD_PATHS", (void*)&EP_AUTOLOAD_PATHS);
 

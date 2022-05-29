@@ -291,8 +291,8 @@ public:
     /// Create a temporary child scene node (with specified ID if provided).
     Node* CreateTemporaryChild(const String& name = String::EMPTY, CreateMode mode = REPLICATED, unsigned id = 0);
 
-    /// Add a child scene node at a specific index. If index is not explicitly specified or is NINDEX, append the new child at the end.
-    void AddChild(Node* node, i32 index = NINDEX);
+    /// Add a child scene node at a specific index. If index is not explicitly specified or is ENDPOS, append the new child at the end.
+    void AddChild(Node* node, i32 index = ENDPOS);
 
     /// Remove a child scene node.
     void RemoveChild(Node* node);
