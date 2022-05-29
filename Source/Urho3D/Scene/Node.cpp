@@ -786,7 +786,7 @@ Node* Node::CreateTemporaryChild(const String& name, CreateMode mode, unsigned i
 
 void Node::AddChild(Node* node, i32 index)
 {
-    assert((index >= 0 && index <= children_.Size()) || index == NINDEX);
+    assert((index >= 0 && index <= children_.Size()) || index == ENDPOS);
 
     // Check for illegal or redundant parent assignment
     if (!node || node == this || node->parent_ == this)
