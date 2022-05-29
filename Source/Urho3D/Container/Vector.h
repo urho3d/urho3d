@@ -544,10 +544,10 @@ public:
     {
         i32 pos = (i32)(start - Begin());
         assert(pos >= 0 && pos <= size_);
-        
+
         if (pos == size_)
             return End();
-        
+
         i32 length = (i32)(end - start);
         Erase(pos, length);
 

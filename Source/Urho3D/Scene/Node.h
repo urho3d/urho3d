@@ -290,10 +290,10 @@ public:
     Node* CreateChild(const String& name = String::EMPTY, CreateMode mode = REPLICATED, unsigned id = 0, bool temporary = false);
     /// Create a temporary child scene node (with specified ID if provided).
     Node* CreateTemporaryChild(const String& name = String::EMPTY, CreateMode mode = REPLICATED, unsigned id = 0);
-    
+
     /// Add a child scene node at a specific index. If index is not explicitly specified or is NINDEX, append the new child at the end.
     void AddChild(Node* node, i32 index = NINDEX);
-    
+
     /// Remove a child scene node.
     void RemoveChild(Node* node);
     /// Remove all child scene nodes.
