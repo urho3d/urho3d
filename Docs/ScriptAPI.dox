@@ -19331,7 +19331,7 @@ Properties:
 
 Methods:
 
-- void AddChild(Node@, uint = M_MAX_UNSIGNED)
+- void AddChild(Node@, int = NINDEX)
 - void AddComponent(Component@, uint, CreateMode)
 - void AddListener(Component@)
 - void AddTag(const String&)
@@ -25055,7 +25055,7 @@ Properties:
 
 Methods:
 
-- void AddChild(Node@, uint = M_MAX_UNSIGNED)
+- void AddChild(Node@, int = NINDEX)
 - void AddComponent(Component@, uint, CreateMode)
 - void AddListener(Component@)
 - void AddRequiredPackageFile(PackageFile@)
@@ -31191,8 +31191,8 @@ Methods:
 - bool GetBlockEvents() const
 - bool GetBringToBack() const
 - bool GetBringToFront() const
-- Vector2 GetCharPosition(uint)
-- Vector2 GetCharSize(uint)
+- Vector2 GetCharPosition(int)
+- Vector2 GetCharSize(int)
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant :: EMPTY, bool = false) const
 - UIElement@ GetChild(uint) const
@@ -31232,10 +31232,10 @@ Methods:
 - int GetMinHeight() const
 - int GetMinWidth() const
 - uint GetNumAttributes() const
-- uint GetNumChars() const
+- int GetNumChars() const
 - uint GetNumChildren(bool = false) const
 - uint GetNumNetworkAttributes() const
-- uint GetNumRows() const
+- int GetNumRows() const
 - ObjectAnimation@ GetObjectAnimation() const
 - ResourceRef GetObjectAnimationAttr() const
 - float GetOpacity() const
@@ -31244,9 +31244,9 @@ Methods:
 - UIElement@ GetRoot() const
 - float GetRowHeight() const
 - float GetRowSpacing() const
-- float GetRowWidth(uint) const
-- uint GetSelectionLength() const
-- uint GetSelectionStart() const
+- float GetRowWidth(int) const
+- int GetSelectionLength() const
+- int GetSelectionStart() const
 - bool GetSortChildren() const
 - Object@ GetSubsystem(StringHash) const
 - String[]@ GetTags() const
@@ -31438,7 +31438,7 @@ Methods:
 - void SetRenderTexture(Texture2D@)
 - void SetRowSpacing(float)
 - void SetSelected(bool)
-- void SetSelection(uint, uint = M_MAX_UNSIGNED)
+- void SetSelection(int, int = M_MAX_INT)
 - void SetSelectionColor(const Color&)
 - void SetSize(const IntVector2&)
 - void SetSize(int, int)
@@ -31561,9 +31561,9 @@ Properties:
 - String name
 - uint numAllChildren // readonly
 - uint numAttributes // readonly
-- uint numChars // readonly
+- int numChars // readonly
 - uint numChildren // readonly
-- uint numRows // readonly
+- int numRows // readonly
 - ObjectAnimation@ objectAnimation
 - float opacity
 - UIElement@ parent
@@ -31578,8 +31578,8 @@ Properties:
 - IntVector2 screenPosition // readonly
 - bool selected
 - Color selectionColor
-- uint selectionLength // readonly
-- uint selectionStart // readonly
+- int selectionLength // readonly
+- int selectionStart // readonly
 - IntVector2 size
 - bool sortChildren
 - String style
@@ -31632,8 +31632,8 @@ Methods:
 - Variant GetAttributeDefault(uint) const
 - bool GetBlockEvents() const
 - bool GetCastShadows() const
-- Vector2 GetCharPosition(uint)
-- Vector2 GetCharSize(uint)
+- Vector2 GetCharPosition(int)
+- Vector2 GetCharSize(int)
 - Component@ GetComponent(StringHash) const
 - float GetDistance() const
 - float GetDrawDistance() const
@@ -31664,16 +31664,16 @@ Methods:
 - float GetMinZ() const
 - Node@ GetNode() const
 - uint GetNumAttributes() const
-- uint GetNumChars() const
+- int GetNumChars() const
 - uint GetNumNetworkAttributes() const
 - uint GetNumOccluderTriangles()
-- uint GetNumRows() const
+- int GetNumRows() const
 - ObjectAnimation@ GetObjectAnimation() const
 - ResourceRef GetObjectAnimationAttr() const
 - float GetOpacity() const
 - int GetRowHeight() const
 - float GetRowSpacing() const
-- int GetRowWidth(uint) const
+- int GetRowWidth(int) const
 - Scene@ GetScene() const
 - float GetShadowDistance() const
 - uint GetShadowMask() const
@@ -31857,8 +31857,8 @@ Properties:
 - uint maxLights
 - Node@ node // readonly
 - uint numAttributes // readonly
-- uint numChars // readonly
-- uint numRows // readonly
+- int numChars // readonly
+- int numRows // readonly
 - ObjectAnimation@ objectAnimation
 - bool occludee
 - bool occluder
@@ -38997,6 +38997,7 @@ Properties:
 - uint M_MIN_UNSIGNED
 - float M_PI
 - float M_RADTODEG
+- int NINDEX
 - uint NUM_FRUSTUM_PLANES
 - uint NUM_FRUSTUM_VERTICES
 - int NUM_OCTANTS
