@@ -23133,13 +23133,13 @@ template <class T> void RegisterMembers_Text3D(asIScriptEngine* engine, const ch
 {
     RegisterMembers_Drawable<T>(engine, className);
 
-    // Vector2 Text3D::GetCharPosition(unsigned index)
-    engine->RegisterObjectMethod(className, "Vector2 GetCharPosition(uint)", AS_METHODPR(T, GetCharPosition, (unsigned), Vector2), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "Vector2 get_charPositions(uint)", AS_METHODPR(T, GetCharPosition, (unsigned), Vector2), AS_CALL_THISCALL);
+    // Vector2 Text3D::GetCharPosition(i32 index)
+    engine->RegisterObjectMethod(className, "Vector2 GetCharPosition(int)", AS_METHODPR(T, GetCharPosition, (i32), Vector2), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Vector2 get_charPositions(int)", AS_METHODPR(T, GetCharPosition, (i32), Vector2), AS_CALL_THISCALL);
 
-    // Vector2 Text3D::GetCharSize(unsigned index)
-    engine->RegisterObjectMethod(className, "Vector2 GetCharSize(uint)", AS_METHODPR(T, GetCharSize, (unsigned), Vector2), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "Vector2 get_charSizes(uint)", AS_METHODPR(T, GetCharSize, (unsigned), Vector2), AS_CALL_THISCALL);
+    // Vector2 Text3D::GetCharSize(i32 index)
+    engine->RegisterObjectMethod(className, "Vector2 GetCharSize(int)", AS_METHODPR(T, GetCharSize, (i32), Vector2), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Vector2 get_charSizes(int)", AS_METHODPR(T, GetCharSize, (i32), Vector2), AS_CALL_THISCALL);
 
     // const Color& Text3D::GetColor(Corner corner) const
     engine->RegisterObjectMethod(className, "const Color& GetColor(Corner) const", AS_METHODPR(T, GetColor, (Corner) const, const Color&), AS_CALL_THISCALL);
@@ -23198,13 +23198,13 @@ template <class T> void RegisterMembers_Text3D(asIScriptEngine* engine, const ch
     // ResourceRef Text3D::GetMaterialAttr() const
     engine->RegisterObjectMethod(className, "ResourceRef GetMaterialAttr() const", AS_METHODPR(T, GetMaterialAttr, () const, ResourceRef), AS_CALL_THISCALL);
 
-    // unsigned Text3D::GetNumChars() const
-    engine->RegisterObjectMethod(className, "uint GetNumChars() const", AS_METHODPR(T, GetNumChars, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numChars() const", AS_METHODPR(T, GetNumChars, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Text3D::GetNumChars() const
+    engine->RegisterObjectMethod(className, "int GetNumChars() const", AS_METHODPR(T, GetNumChars, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numChars() const", AS_METHODPR(T, GetNumChars, () const, i32), AS_CALL_THISCALL);
 
-    // unsigned Text3D::GetNumRows() const
-    engine->RegisterObjectMethod(className, "uint GetNumRows() const", AS_METHODPR(T, GetNumRows, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numRows() const", AS_METHODPR(T, GetNumRows, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Text3D::GetNumRows() const
+    engine->RegisterObjectMethod(className, "int GetNumRows() const", AS_METHODPR(T, GetNumRows, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numRows() const", AS_METHODPR(T, GetNumRows, () const, i32), AS_CALL_THISCALL);
 
     // float Text3D::GetOpacity() const
     engine->RegisterObjectMethod(className, "float GetOpacity() const", AS_METHODPR(T, GetOpacity, () const, float), AS_CALL_THISCALL);
@@ -23218,9 +23218,9 @@ template <class T> void RegisterMembers_Text3D(asIScriptEngine* engine, const ch
     engine->RegisterObjectMethod(className, "float GetRowSpacing() const", AS_METHODPR(T, GetRowSpacing, () const, float), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_rowSpacing() const", AS_METHODPR(T, GetRowSpacing, () const, float), AS_CALL_THISCALL);
 
-    // int Text3D::GetRowWidth(unsigned index) const
-    engine->RegisterObjectMethod(className, "int GetRowWidth(uint) const", AS_METHODPR(T, GetRowWidth, (unsigned) const, int), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "int get_rowWidths(uint) const", AS_METHODPR(T, GetRowWidth, (unsigned) const, int), AS_CALL_THISCALL);
+    // int Text3D::GetRowWidth(i32 index) const
+    engine->RegisterObjectMethod(className, "int GetRowWidth(int) const", AS_METHODPR(T, GetRowWidth, (i32) const, int), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_rowWidths(int) const", AS_METHODPR(T, GetRowWidth, (i32) const, int), AS_CALL_THISCALL);
 
     // const String& Text3D::GetText() const
     engine->RegisterObjectMethod(className, "const String& GetText() const", AS_METHODPR(T, GetText, () const, const String&), AS_CALL_THISCALL);

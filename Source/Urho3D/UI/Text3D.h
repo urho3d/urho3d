@@ -159,19 +159,19 @@ public:
     int GetRowHeight() const;
     /// Return number of rows.
     /// @property
-    unsigned GetNumRows() const;
+    i32 GetNumRows() const;
     /// Return number of characters.
     /// @property
-    unsigned GetNumChars() const;
+    i32 GetNumChars() const;
     /// Return width of row by index.
     /// @property{get_rowWidths}
-    int GetRowWidth(unsigned index) const;
+    int GetRowWidth(i32 index) const;
     /// Return position of character by index relative to the text element origin.
     /// @property{get_charPositions}
-    Vector2 GetCharPosition(unsigned index);
+    Vector2 GetCharPosition(i32 index);
     /// Return size of character by index.
     /// @property{get_charSizes}
-    Vector2 GetCharSize(unsigned index);
+    Vector2 GetCharSize(i32 index);
     /// Return corner color.
     /// @property{get_colors}
     const Color& GetColor(Corner corner) const;
