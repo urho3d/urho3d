@@ -196,8 +196,8 @@ void LineEdit::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifier
     case KEY_C:
         if (textCopyable_ && qualifiers & QUAL_CTRL)
         {
-            unsigned start = text_->GetSelectionStart();
-            unsigned length = text_->GetSelectionLength();
+            i32 start = text_->GetSelectionStart();
+            i32 length = text_->GetSelectionLength();
 
             if (text_->GetSelectionLength())
                 GetSubsystem<UI>()->SetClipboardText(line_.SubstringUTF8(start, length));
@@ -224,8 +224,8 @@ void LineEdit::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifier
                 // Remove selected text first
                 if (text_->GetSelectionLength() > 0)
                 {
-                    unsigned start = text_->GetSelectionStart();
-                    unsigned length = text_->GetSelectionLength();
+                    i32 start = text_->GetSelectionStart();
+                    i32 length = text_->GetSelectionLength();
                     if (start + length < line_.LengthUTF8())
                         line_ = line_.SubstringUTF8(0, start) + line_.SubstringUTF8(start + length);
                     else
@@ -321,8 +321,8 @@ void LineEdit::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifier
             else
             {
                 // If a selection exists, erase it
-                unsigned start = text_->GetSelectionStart();
-                unsigned length = text_->GetSelectionLength();
+                i32 start = text_->GetSelectionStart();
+                i32 length = text_->GetSelectionLength();
                 if (start + length < line_.LengthUTF8())
                     line_ = line_.SubstringUTF8(0, start) + line_.SubstringUTF8(start + length);
                 else
@@ -368,8 +368,8 @@ void LineEdit::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifier
             else
             {
                 // If a selection exists, erase it
-                unsigned start = text_->GetSelectionStart();
-                unsigned length = text_->GetSelectionLength();
+                i32 start = text_->GetSelectionStart();
+                i32 length = text_->GetSelectionLength();
                 if (start + length < line_.LengthUTF8())
                     line_ = line_.SubstringUTF8(0, start) + line_.SubstringUTF8(start + length);
                 else
@@ -439,8 +439,8 @@ void LineEdit::OnTextInput(const String& text)
         else
         {
             // If a selection exists, erase it first
-            unsigned start = text_->GetSelectionStart();
-            unsigned length = text_->GetSelectionLength();
+            i32 start = text_->GetSelectionStart();
+            i32 length = text_->GetSelectionLength();
             if (start + length < line_.LengthUTF8())
                 line_ = line_.SubstringUTF8(0, start) + newText + line_.SubstringUTF8(start + length);
             else
