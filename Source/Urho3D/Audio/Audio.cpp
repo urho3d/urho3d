@@ -17,10 +17,6 @@
 
 #include "../DebugNew.h"
 
-#ifdef _MSC_VER
-#pragma warning(disable:6293)
-#endif
-
 namespace Urho3D
 {
 
@@ -324,7 +320,7 @@ void Audio::UpdateInternal(float timeStep)
     URHO3D_PROFILE(UpdateAudio);
 
     // Update in reverse order, because sound sources might remove themselves
-    for (u32 i = soundSources_.Size() - 1; i < soundSources_.Size(); --i)
+    for (i32 i = soundSources_.Size() - 1; i >= 0; --i)
     {
         SoundSource* source = soundSources_[i];
 

@@ -11,10 +11,6 @@
 
 #include "../DebugNew.h"
 
-#ifdef _MSC_VER
-#pragma warning(disable:6293)
-#endif
-
 namespace Urho3D
 {
 
@@ -437,7 +433,7 @@ void RenderPath::RemoveRenderTarget(const String& name)
 
 void RenderPath::RemoveRenderTargets(const String& tag)
 {
-    for (unsigned i = renderTargets_.Size() - 1; i < renderTargets_.Size(); --i)
+    for (i32 i = renderTargets_.Size() - 1; i >= 0; --i)
     {
         if (!renderTargets_[i].tag_.Compare(tag, false))
             renderTargets_.Erase(i);
@@ -469,7 +465,7 @@ void RenderPath::RemoveCommand(unsigned index)
 
 void RenderPath::RemoveCommands(const String& tag)
 {
-    for (unsigned i = commands_.Size() - 1; i < commands_.Size(); --i)
+    for (i32 i = commands_.Size() - 1; i >= 0; --i)
     {
         if (!commands_[i].tag_.Compare(tag, false))
             commands_.Erase(i);

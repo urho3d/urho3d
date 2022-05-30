@@ -118,7 +118,7 @@ void Pack(const Vector<String>& arguments)
         ErrorExit("No files found");
 
     // Check for extensions to ignore
-    for (unsigned i = fileNames.Size() - 1; i < fileNames.Size(); --i)
+    for (i32 i = fileNames.Size() - 1; i >= 0; --i)
     {
         String extension = GetExtension(fileNames[i]);
         for (unsigned j = 0; ignoreExtensions_[j].Length(); ++j)

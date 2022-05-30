@@ -8,10 +8,6 @@
 
 #include "../DebugNew.h"
 
-#ifdef _MSC_VER
-#pragma warning(disable:6293)
-#endif
-
 namespace Urho3D
 {
 
@@ -135,16 +131,16 @@ void Polyhedron::Clip(const Plane& plane)
     }
 
     // Remove empty faces
-    for (unsigned i = faces_.Size() - 1; i < faces_.Size(); --i)
+    for (i32 i = faces_.Size() - 1; i >= 0; --i)
     {
         if (faces_[i].Empty())
             faces_.Erase(i);
     }
 
     // Create a new face from the clipped vertices. First remove duplicates
-    for (unsigned i = 0; i < clippedVertices_.Size(); ++i)
+    for (i32 i = 0; i < clippedVertices_.Size(); ++i)
     {
-        for (unsigned j = clippedVertices_.Size() - 1; j > i; --j)
+        for (i32 j = clippedVertices_.Size() - 1; j > i; --j)
         {
             if (clippedVertices_[j].Equals(clippedVertices_[i]))
                 clippedVertices_.Erase(j);

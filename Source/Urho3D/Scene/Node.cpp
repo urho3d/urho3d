@@ -21,10 +21,6 @@
 
 using namespace std;
 
-#ifdef _MSC_VER
-#pragma warning(disable:6293)
-#endif
-
 namespace Urho3D
 {
 
@@ -872,7 +868,7 @@ void Node::RemoveChildren(bool removeReplicated, bool removeLocal, bool recursiv
 {
     unsigned numRemoved = 0;
 
-    for (unsigned i = children_.Size() - 1; i < children_.Size(); --i)
+    for (i32 i = children_.Size() - 1; i >= 0; --i)
     {
         bool remove = false;
         Node* childNode = children_[i];
@@ -1020,7 +1016,7 @@ void Node::RemoveComponents(bool removeReplicated, bool removeLocal)
 {
     unsigned numRemoved = 0;
 
-    for (unsigned i = components_.Size() - 1; i < components_.Size(); --i)
+    for (i32 i = components_.Size() - 1; i >= 0; --i)
     {
         bool remove = false;
         Component* component = components_[i];
@@ -1046,7 +1042,7 @@ void Node::RemoveComponents(StringHash type)
 {
     unsigned numRemoved = 0;
 
-    for (unsigned i = components_.Size() - 1; i < components_.Size(); --i)
+    for (i32 i = components_.Size() - 1; i >= 0; --i)
     {
         if (components_[i]->GetType() == type)
         {
@@ -1762,7 +1758,7 @@ void Node::CleanupConnection(Connection* connection)
 
     if (networkState_)
     {
-        for (unsigned i = networkState_->replicationStates_.Size() - 1; i < networkState_->replicationStates_.Size(); --i)
+        for (i32 i = networkState_->replicationStates_.Size() - 1; i >= 0; --i)
         {
             if (networkState_->replicationStates_[i]->connection_ == connection)
                 networkState_->replicationStates_.Erase(i);

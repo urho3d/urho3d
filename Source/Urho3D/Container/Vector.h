@@ -13,11 +13,6 @@
 #include <type_traits>
 #include <utility>
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable:6293)
-#endif
-
 namespace Urho3D
 {
 
@@ -964,7 +959,3 @@ template <class T> typename Urho3D::Vector<T>::Iterator begin(Urho3D::Vector<T>&
 template <class T> typename Urho3D::Vector<T>::Iterator end(Urho3D::Vector<T>& v) { return v.End(); }
 
 }
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
