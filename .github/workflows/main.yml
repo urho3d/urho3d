@@ -239,8 +239,9 @@ jobs:
         id: install_dependencies
         run: |
           # Temporary use old version of Doxygen https://github.com/urho3d/Urho3D/issues/2757
-          choco install --no-progress doxygen.install --version 1.8.20
-          choco install --no-progress graphviz.portable
+          # Server may reject connection, so try again
+          do { choco install --no-progress doxygen.install --version 1.8.20 } until ($?)
+          do { choco install --no-progress graphviz.portable } until ($?)
           # Use MSYS2 instead obsolete MinGW
           # https://github.com/urho3d/Urho3D/issues/2887
           echo "c:\msys64\mingw32\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8
