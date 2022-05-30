@@ -481,7 +481,7 @@ ADD_ASSIMP_IMPORTER( IFC
 if (ASSIMP_BUILD_IFC_IMPORTER)
   if (MSVC)
     set_source_files_properties(IFCReaderGen1.cpp IFCReaderGen2.cpp PROPERTIES COMPILE_FLAGS "/bigobj")
-  elseif(CMAKE_COMPILER_IS_MINGW)
+  elseif(MINGW)
     set_source_files_properties(IFCReaderGen1.cpp IFCReaderGen2.cpp PROPERTIES COMPILE_FLAGS "-O2")   # Urho3D: Remove -Wa,-mbig-obj flag as some older MinGW version may not support it yet
   endif()
 endif (ASSIMP_BUILD_IFC_IMPORTER)
