@@ -32,7 +32,7 @@ void CollisionChain2D::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Loop", GetLoop, SetLoop, bool, false, AM_DEFAULT);
     URHO3D_COPY_BASE_ATTRIBUTES(CollisionShape2D);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Vertices", GetVerticesAttr, SetVerticesAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE);
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Vertices", GetVerticesAttr, SetVerticesAttr, Vector<unsigned char>, Variant::emptyBuffer, AM_FILE);
 }
 
 void CollisionChain2D::SetLoop(bool loop)
@@ -65,7 +65,7 @@ void CollisionChain2D::SetVertex(unsigned index, const Vector2& vertex)
     }
 }
 
-void CollisionChain2D::SetVertices(const PODVector<Vector2>& vertices)
+void CollisionChain2D::SetVertices(const Vector<Vector2>& vertices)
 {
     vertices_ = vertices;
 
@@ -73,12 +73,12 @@ void CollisionChain2D::SetVertices(const PODVector<Vector2>& vertices)
     RecreateFixture();
 }
 
-void CollisionChain2D::SetVerticesAttr(const PODVector<unsigned char>& value)
+void CollisionChain2D::SetVerticesAttr(const Vector<unsigned char>& value)
 {
     if (value.Empty())
         return;
 
-    PODVector<Vector2> vertices;
+    Vector<Vector2> vertices;
 
     MemoryBuffer buffer(value);
     while (!buffer.IsEof())
@@ -87,7 +87,7 @@ void CollisionChain2D::SetVerticesAttr(const PODVector<unsigned char>& value)
     SetVertices(vertices);
 }
 
-PODVector<unsigned char> CollisionChain2D::GetVerticesAttr() const
+Vector<unsigned char> CollisionChain2D::GetVerticesAttr() const
 {
     VectorBuffer ret;
 
@@ -106,7 +106,7 @@ void CollisionChain2D::RecreateFixture()
 {
     ReleaseFixture();
 
-    PODVector<b2Vec2> b2Vertices;
+    Vector<b2Vec2> b2Vertices;
     unsigned count = vertices_.Size();
     b2Vertices.Resize(count);
 

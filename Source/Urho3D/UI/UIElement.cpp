@@ -321,13 +321,13 @@ void UIElement::Update(float timeStep)
 {
 }
 
-void UIElement::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
+void UIElement::GetBatches(Vector<UIBatch>& batches, Vector<float>& vertexData, const IntRect& currentScissor)
 {
     // Reset hovering for next frame
     hovering_ = false;
 }
 
-void UIElement::GetDebugDrawBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
+void UIElement::GetDebugDrawBatches(Vector<UIBatch>& batches, Vector<float>& vertexData, const IntRect& currentScissor)
 {
     UIBatch batch(this, BLEND_ALPHA, currentScissor, nullptr, &vertexData);
 
@@ -1081,11 +1081,11 @@ void UIElement::UpdateLayout()
     // Prevent further updates while this update happens
     DisableLayoutUpdate();
 
-    PODVector<int> positions;
-    PODVector<int> sizes;
-    PODVector<int> minSizes;
-    PODVector<int> maxSizes;
-    PODVector<float> flexScales;
+    Vector<int> positions;
+    Vector<int> sizes;
+    Vector<int> minSizes;
+    Vector<int> maxSizes;
+    Vector<float> flexScales;
 
     int baseIndentWidth = GetIndentWidth();
 
@@ -1574,7 +1574,7 @@ XMLFile* UIElement::GetDefaultStyle(bool recursiveUp) const
         return defaultStyle_;
 }
 
-void UIElement::GetChildren(PODVector<UIElement*>& dest, bool recursive) const
+void UIElement::GetChildren(Vector<UIElement*>& dest, bool recursive) const
 {
     dest.Clear();
 
@@ -1588,9 +1588,9 @@ void UIElement::GetChildren(PODVector<UIElement*>& dest, bool recursive) const
         GetChildrenRecursive(dest);
 }
 
-PODVector<UIElement*> UIElement::GetChildren(bool recursive) const
+Vector<UIElement*> UIElement::GetChildren(bool recursive) const
 {
-    PODVector<UIElement*> dest;
+    Vector<UIElement*> dest;
     GetChildren(dest, recursive);
     return dest;
 }
@@ -1684,7 +1684,7 @@ bool UIElement::HasTag(const String& tag) const
     return tags_.Contains(tag);
 }
 
-void UIElement::GetChildrenWithTag(PODVector<UIElement*>& dest, const String& tag, bool recursive) const
+void UIElement::GetChildrenWithTag(Vector<UIElement*>& dest, const String& tag, bool recursive) const
 {
     dest.Clear();
 
@@ -1701,14 +1701,14 @@ void UIElement::GetChildrenWithTag(PODVector<UIElement*>& dest, const String& ta
         GetChildrenWithTagRecursive(dest, tag);
 }
 
-PODVector<UIElement*> UIElement::GetChildrenWithTag(const String& tag, bool recursive) const
+Vector<UIElement*> UIElement::GetChildrenWithTag(const String& tag, bool recursive) const
 {
-    PODVector<UIElement*> dest;
+    Vector<UIElement*> dest;
     GetChildrenWithTag(dest, tag, recursive);
     return dest;
 }
 
-void UIElement::GetChildrenWithTagRecursive(PODVector<UIElement*>& dest, const String& tag) const
+void UIElement::GetChildrenWithTagRecursive(Vector<UIElement*>& dest, const String& tag) const
 {
     for (Vector<SharedPtr<UIElement>>::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
     {
@@ -1809,7 +1809,7 @@ void UIElement::AdjustScissor(IntRect& currentScissor)
     }
 }
 
-void UIElement::GetBatchesWithOffset(IntVector2& offset, PODVector<UIBatch>& batches, PODVector<float>& vertexData,
+void UIElement::GetBatchesWithOffset(IntVector2& offset, Vector<UIBatch>& batches, Vector<float>& vertexData,
     IntRect currentScissor)
 {
     Vector2 floatOffset((float)offset.x_, (float)offset.y_);
@@ -2032,7 +2032,7 @@ void UIElement::UpdateAnchoring()
     }
 }
 
-void UIElement::GetChildrenRecursive(PODVector<UIElement*>& dest) const
+void UIElement::GetChildrenRecursive(Vector<UIElement*>& dest) const
 {
     for (Vector<SharedPtr<UIElement>>::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
     {
@@ -2054,7 +2054,7 @@ void UIElement::ApplyStyleRecursive(UIElement* element)
     }
 }
 
-int UIElement::CalculateLayoutParentSize(const PODVector<int>& sizes, int begin, int end, int spacing)
+int UIElement::CalculateLayoutParentSize(const Vector<int>& sizes, int begin, int end, int spacing)
 {
     int width = begin + end;
     if (sizes.Empty())
@@ -2071,8 +2071,8 @@ int UIElement::CalculateLayoutParentSize(const PODVector<int>& sizes, int begin,
     return width - spacing;
 }
 
-void UIElement::CalculateLayout(PODVector<int>& positions, PODVector<int>& sizes, const PODVector<int>& minSizes,
-    const PODVector<int>& maxSizes, const PODVector<float>& flexScales, int targetSize, int begin, int end, int spacing)
+void UIElement::CalculateLayout(Vector<int>& positions, Vector<int>& sizes, const Vector<int>& minSizes,
+    const Vector<int>& maxSizes, const Vector<float>& flexScales, int targetSize, int begin, int end, int spacing)
 {
     unsigned numChildren = sizes.Size();
     if (!numChildren)
@@ -2114,7 +2114,7 @@ void UIElement::CalculateLayout(PODVector<int>& positions, PODVector<int>& sizes
             break;
 
         // Check which of the children can be resized to correct the error. If none, must break
-        PODVector<unsigned> resizable;
+        Vector<unsigned> resizable;
         for (unsigned i = 0; i < numChildren; ++i)
         {
             if (error < 0 && sizes[i] > minSizes[i])

@@ -176,7 +176,7 @@ bool AnimationSet2D::HasAnimation(const String& animationName) const
 #endif
     if (spriterData_ && !spriterData_->entities_.Empty())
     {
-        const PODVector<Spriter::Animation*>& animations = spriterData_->entities_[0]->animations_;
+        const Vector<Spriter::Animation*>& animations = spriterData_->entities_[0]->animations_;
         for (unsigned i = 0; i < animations.Size(); ++i)
         {
             if (animationName == animations[i]->name_)

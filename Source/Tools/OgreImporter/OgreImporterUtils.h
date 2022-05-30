@@ -111,7 +111,7 @@ struct ModelVertexBuffer
     {
         dest.WriteUInt(vertices_.Size());
 
-        PODVector<VertexElement> elements = VertexBuffer::GetElements(elementMask_);
+        Vector<VertexElement> elements = VertexBuffer::GetElements(elementMask_);
         dest.WriteUInt(elements.Size());
         for (unsigned j = 0; j < elements.Size(); ++j)
         {
@@ -191,7 +191,7 @@ struct ModelMorph
 struct ModelIndexBuffer
 {
     unsigned indexSize_;
-    PODVector<unsigned> indices_;
+    Vector<unsigned> indices_;
 
     ModelIndexBuffer() :
         indexSize_(sizeof(unsigned short))
@@ -221,6 +221,6 @@ struct ModelSubGeometryLodLevel
     unsigned indexBuffer_{};
     unsigned indexStart_{};
     unsigned indexCount_{};
-    HashMap<unsigned, PODVector<BoneWeightAssignment> > boneWeights_;
-    PODVector<unsigned> boneMapping_;
+    HashMap<unsigned, Vector<BoneWeightAssignment> > boneWeights_;
+    Vector<unsigned> boneMapping_;
 };

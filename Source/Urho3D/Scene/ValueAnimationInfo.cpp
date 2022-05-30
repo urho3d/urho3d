@@ -74,7 +74,7 @@ bool ValueAnimationInfo::SetTime(float time)
     // Send keyframe event if necessary
     if (animation_->HasEventFrames())
     {
-        PODVector<const VAnimEventFrame*> eventFrames;
+        Vector<const VAnimEventFrame*> eventFrames;
         GetEventFrames(lastScaledTime_, scaledTime, eventFrames);
 
         if (eventFrames.Size())
@@ -135,7 +135,7 @@ float ValueAnimationInfo::CalculateScaledTime(float currentTime, bool& finished)
     }
 }
 
-void ValueAnimationInfo::GetEventFrames(float beginTime, float endTime, PODVector<const VAnimEventFrame*>& eventFrames)
+void ValueAnimationInfo::GetEventFrames(float beginTime, float endTime, Vector<const VAnimEventFrame*>& eventFrames)
 {
     switch (wrapMode_)
     {

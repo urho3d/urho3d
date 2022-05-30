@@ -66,9 +66,9 @@ void Node::RegisterObject(Context* context)
     URHO3D_ATTRIBUTE("Variables", VariantMap, vars_, Variant::emptyVariantMap, AM_FILE); // Network replication of vars uses custom data
     URHO3D_ACCESSOR_ATTRIBUTE("Network Position", GetNetPositionAttr, SetNetPositionAttr, Vector3, Vector3::ZERO,
         AM_NET | AM_LATESTDATA | AM_NOEDIT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Network Rotation", GetNetRotationAttr, SetNetRotationAttr, PODVector<unsigned char>, Variant::emptyBuffer,
+    URHO3D_ACCESSOR_ATTRIBUTE("Network Rotation", GetNetRotationAttr, SetNetRotationAttr, Vector<unsigned char>, Variant::emptyBuffer,
         AM_NET | AM_LATESTDATA | AM_NOEDIT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Network Parent Node", GetNetParentAttr, SetNetParentAttr, PODVector<unsigned char>, Variant::emptyBuffer,
+    URHO3D_ACCESSOR_ATTRIBUTE("Network Parent Node", GetNetParentAttr, SetNetParentAttr, Vector<unsigned char>, Variant::emptyBuffer,
         AM_NET | AM_NOEDIT);
 }
 
@@ -1214,7 +1214,7 @@ unsigned Node::GetNumChildren(bool recursive) const
     }
 }
 
-void Node::GetChildren(PODVector<Node*>& dest, bool recursive) const
+void Node::GetChildren(Vector<Node*>& dest, bool recursive) const
 {
     dest.Clear();
 
@@ -1227,14 +1227,14 @@ void Node::GetChildren(PODVector<Node*>& dest, bool recursive) const
         GetChildrenRecursive(dest);
 }
 
-PODVector<Node*> Node::GetChildren(bool recursive) const
+Vector<Node*> Node::GetChildren(bool recursive) const
 {
-    PODVector<Node*> dest;
+    Vector<Node*> dest;
     GetChildren(dest, recursive);
     return dest;
 }
 
-void Node::GetChildrenWithComponent(PODVector<Node*>& dest, StringHash type, bool recursive) const
+void Node::GetChildrenWithComponent(Vector<Node*>& dest, StringHash type, bool recursive) const
 {
     dest.Clear();
 
@@ -1250,14 +1250,14 @@ void Node::GetChildrenWithComponent(PODVector<Node*>& dest, StringHash type, boo
         GetChildrenWithComponentRecursive(dest, type);
 }
 
-PODVector<Node*> Node::GetChildrenWithComponent(StringHash type, bool recursive) const
+Vector<Node*> Node::GetChildrenWithComponent(StringHash type, bool recursive) const
 {
-    PODVector<Node*> dest;
+    Vector<Node*> dest;
     GetChildrenWithComponent(dest, type, recursive);
     return dest;
 }
 
-void Node::GetChildrenWithTag(PODVector<Node*>& dest, const String& tag, bool recursive /*= true*/) const
+void Node::GetChildrenWithTag(Vector<Node*>& dest, const String& tag, bool recursive /*= true*/) const
 {
     dest.Clear();
 
@@ -1273,9 +1273,9 @@ void Node::GetChildrenWithTag(PODVector<Node*>& dest, const String& tag, bool re
         GetChildrenWithTagRecursive(dest, tag);
 }
 
-PODVector<Node*> Node::GetChildrenWithTag(const String& tag, bool recursive) const
+Vector<Node*> Node::GetChildrenWithTag(const String& tag, bool recursive) const
 {
-    PODVector<Node*> dest;
+    Vector<Node*> dest;
     GetChildrenWithTag(dest, tag, recursive);
     return dest;
 }
@@ -1325,7 +1325,7 @@ unsigned Node::GetNumNetworkComponents() const
     return num;
 }
 
-void Node::GetComponents(PODVector<Component*>& dest, StringHash type, bool recursive) const
+void Node::GetComponents(Vector<Component*>& dest, StringHash type, bool recursive) const
 {
     dest.Clear();
 
@@ -1443,7 +1443,7 @@ void Node::SetNetPositionAttr(const Vector3& value)
         SetPosition(value);
 }
 
-void Node::SetNetRotationAttr(const PODVector<unsigned char>& value)
+void Node::SetNetRotationAttr(const Vector<unsigned char>& value)
 {
     MemoryBuffer buf(value);
     auto* transform = GetComponent<SmoothedTransform>();
@@ -1453,7 +1453,7 @@ void Node::SetNetRotationAttr(const PODVector<unsigned char>& value)
         SetRotation(buf.ReadPackedQuaternion());
 }
 
-void Node::SetNetParentAttr(const PODVector<unsigned char>& value)
+void Node::SetNetParentAttr(const Vector<unsigned char>& value)
 {
     Scene* scene = GetScene();
     if (!scene)
@@ -1495,14 +1495,14 @@ const Vector3& Node::GetNetPositionAttr() const
     return position_;
 }
 
-const PODVector<unsigned char>& Node::GetNetRotationAttr() const
+const Vector<unsigned char>& Node::GetNetRotationAttr() const
 {
     impl_->attrBuffer_.Clear();
     impl_->attrBuffer_.WritePackedQuaternion(rotation_);
     return impl_->attrBuffer_.GetBuffer();
 }
 
-const PODVector<unsigned char>& Node::GetNetParentAttr() const
+const Vector<unsigned char>& Node::GetNetParentAttr() const
 {
     impl_->attrBuffer_.Clear();
     Scene* scene = GetScene();
@@ -1708,7 +1708,7 @@ void Node::PrepareNetworkUpdate()
             networkState_->previousValues_[i] = networkState_->currentValues_[i];
 
             // Mark the attribute dirty in all replication states that are tracking this node
-            for (PODVector<ReplicationState*>::Iterator j = networkState_->replicationStates_.Begin();
+            for (Vector<ReplicationState*>::Iterator j = networkState_->replicationStates_.Begin();
                  j != networkState_->replicationStates_.End(); ++j)
             {
                 auto* nodeState = static_cast<NodeReplicationState*>(*j);
@@ -1733,7 +1733,7 @@ void Node::PrepareNetworkUpdate()
             networkState_->previousVars_[i->first_] = i->second_;
 
             // Mark the var dirty in all replication states that are tracking this node
-            for (PODVector<ReplicationState*>::Iterator j = networkState_->replicationStates_.Begin();
+            for (Vector<ReplicationState*>::Iterator j = networkState_->replicationStates_.Begin();
                  j != networkState_->replicationStates_.End(); ++j)
             {
                 auto* nodeState = static_cast<NodeReplicationState*>(*j);
@@ -1770,7 +1770,7 @@ void Node::MarkReplicationDirty()
 {
     if (networkState_)
     {
-        for (PODVector<ReplicationState*>::Iterator j = networkState_->replicationStates_.Begin();
+        for (Vector<ReplicationState*>::Iterator j = networkState_->replicationStates_.Begin();
              j != networkState_->replicationStates_.End(); ++j)
         {
             auto* nodeState = static_cast<NodeReplicationState*>(*j);
@@ -1958,7 +1958,7 @@ Animatable* Node::FindAttributeAnimationTarget(const String& name, String& outNa
         else
         {
             unsigned index = ToUInt(componentNames[1]);
-            PODVector<Component*> components;
+            Vector<Component*> components;
             node->GetComponents(components, StringHash(componentNames.Front()));
             if (index >= components.Size())
             {
@@ -2113,7 +2113,7 @@ void Node::RemoveChild(Vector<SharedPtr<Node>>::Iterator i)
     children_.Erase(i);
 }
 
-void Node::GetChildrenRecursive(PODVector<Node*>& dest) const
+void Node::GetChildrenRecursive(Vector<Node*>& dest) const
 {
     for (Vector<SharedPtr<Node>>::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
     {
@@ -2124,7 +2124,7 @@ void Node::GetChildrenRecursive(PODVector<Node*>& dest) const
     }
 }
 
-void Node::GetChildrenWithComponentRecursive(PODVector<Node*>& dest, StringHash type) const
+void Node::GetChildrenWithComponentRecursive(Vector<Node*>& dest, StringHash type) const
 {
     for (Vector<SharedPtr<Node>>::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
     {
@@ -2136,7 +2136,7 @@ void Node::GetChildrenWithComponentRecursive(PODVector<Node*>& dest, StringHash 
     }
 }
 
-void Node::GetComponentsRecursive(PODVector<Component*>& dest, StringHash type) const
+void Node::GetComponentsRecursive(Vector<Component*>& dest, StringHash type) const
 {
     for (Vector<SharedPtr<Component>>::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
     {
@@ -2147,7 +2147,7 @@ void Node::GetComponentsRecursive(PODVector<Component*>& dest, StringHash type) 
         (*i)->GetComponentsRecursive(dest, type);
 }
 
-void Node::GetChildrenWithTagRecursive(PODVector<Node*>& dest, const String& tag) const
+void Node::GetChildrenWithTagRecursive(Vector<Node*>& dest, const String& tag) const
 {
     for (Vector<SharedPtr<Node>>::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
     {

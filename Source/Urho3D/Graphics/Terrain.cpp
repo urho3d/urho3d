@@ -891,9 +891,9 @@ void Terrain::CreateGeometry()
     {
         URHO3D_PROFILE(RemoveOldPatches);
 
-        PODVector<Node*> oldPatchNodes;
+        Vector<Node*> oldPatchNodes;
         node_->GetChildrenWithComponent<TerrainPatch>(oldPatchNodes);
-        for (PODVector<Node*>::Iterator i = oldPatchNodes.Begin(); i != oldPatchNodes.End(); ++i)
+        for (Vector<Node*>::Iterator i = oldPatchNodes.Begin(); i != oldPatchNodes.End(); ++i)
         {
             bool nodeOk = false;
             Vector<String> coords = (*i)->GetName().Substring(6).Split('_');
@@ -911,7 +911,7 @@ void Terrain::CreateGeometry()
     }
 
     // Keep track of which patches actually need an update
-    PODVector<bool> dirtyPatches((unsigned)(numPatches_.x_ * numPatches_.y_));
+    Vector<bool> dirtyPatches((unsigned)(numPatches_.x_ * numPatches_.y_));
     for (unsigned i = 0; i < dirtyPatches.Size(); ++i)
         dirtyPatches[i] = updateAll;
 
@@ -1119,7 +1119,7 @@ void Terrain::CreateIndexData()
 {
     URHO3D_PROFILE(CreateIndexData);
 
-    PODVector<unsigned short> indices;
+    Vector<unsigned short> indices;
     drawRanges_.Clear();
     auto row = (unsigned)(patchSize_ + 1);
 
@@ -1348,7 +1348,7 @@ void Terrain::CalculateLodErrors(TerrainPatch* patch)
     URHO3D_PROFILE(CalculateLodErrors);
 
     const IntVector2& coords = patch->GetCoordinates();
-    PODVector<float>& lodErrors = patch->GetLodErrors();
+    Vector<float>& lodErrors = patch->GetLodErrors();
     lodErrors.Clear();
     lodErrors.Reserve(numLodLevels_);
 

@@ -26,12 +26,12 @@ public:
     /// Handle scene update. Called by LogicComponent base class.
     void Update(float timeStep) override;
     /// Return path attribute.
-    PODVector<unsigned char> GetPathAttr() const;
+    Vector<unsigned char> GetPathAttr() const;
     /// Set path attribute.
-    void SetPathAttr(const PODVector<unsigned char>& value);
+    void SetPathAttr(const Vector<unsigned char>& value);
 
     /// Path.
-    PODVector<Vector2> path_;
+    Vector<Vector2> path_;
     /// Movement speed.
     float speed_;
     /// ID of the current path point.

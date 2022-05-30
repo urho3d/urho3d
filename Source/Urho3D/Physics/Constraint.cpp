@@ -112,7 +112,7 @@ void Constraint::OnSetEnabled()
         constraint_->setEnabled(IsEnabledEffective());
 }
 
-void Constraint::GetDependencyNodes(PODVector<Node*>& dest)
+void Constraint::GetDependencyNodes(Vector<Node*>& dest)
 {
     if (otherBody_ && otherBody_->GetNode())
         dest.Push(otherBody_->GetNode());

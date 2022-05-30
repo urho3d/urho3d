@@ -125,7 +125,7 @@ private:
     /// Particle effect.
     SharedPtr<ParticleEffect> effect_;
     /// Particles.
-    PODVector<Particle> particles_;
+    Vector<Particle> particles_;
     /// Active/inactive period timer.
     float periodTimer_;
     /// New particle emission timer.

@@ -105,7 +105,7 @@ private:
     /// Render surface.
     SharedPtr<RenderSurface> renderSurface_;
     /// Memory use per layer.
-    PODVector<unsigned> layerMemoryUse_;
+    Vector<unsigned> layerMemoryUse_;
     /// Layer image files acquired during BeginLoad.
     Vector<SharedPtr<Image>> loadImages_;
     /// Parameter file acquired during BeginLoad.

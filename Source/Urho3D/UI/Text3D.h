@@ -224,9 +224,9 @@ protected:
     /// Material to use as a base for the text material(s).
     SharedPtr<Material> material_;
     /// Text UI batches.
-    PODVector<UIBatch> uiBatches_;
+    Vector<UIBatch> uiBatches_;
     /// Text vertex data.
-    PODVector<float> uiVertexData_;
+    Vector<float> uiVertexData_;
     /// Custom world transform for facing the camera automatically.
     Matrix3x4 customWorldTransform_;
     /// Text rotation mode in relation to the camera.

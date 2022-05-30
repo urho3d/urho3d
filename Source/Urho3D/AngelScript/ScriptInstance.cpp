@@ -79,14 +79,14 @@ void ScriptInstance::RegisterObject(Context* context)
     context->RegisterFactory<ScriptInstance>(LOGIC_CATEGORY);
 
     URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Delayed Method Calls", GetDelayedCallsAttr, SetDelayedCallsAttr, PODVector<unsigned char>,
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Delayed Method Calls", GetDelayedCallsAttr, SetDelayedCallsAttr, Vector<unsigned char>,
         Variant::emptyBuffer, AM_FILE | AM_NOEDIT);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Script File", GetScriptFileAttr, SetScriptFileAttr, ResourceRef,
         ResourceRef(ScriptFile::GetTypeStatic()), AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Class Name", GetClassName, SetClassName, String, String::EMPTY, AM_DEFAULT);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Script Data", GetScriptDataAttr, SetScriptDataAttr, PODVector<unsigned char>, Variant::emptyBuffer,
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Script Data", GetScriptDataAttr, SetScriptDataAttr, Vector<unsigned char>, Variant::emptyBuffer,
         AM_FILE | AM_NOEDIT);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Script Network Data", GetScriptNetworkDataAttr, SetScriptNetworkDataAttr, PODVector<unsigned char>,
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Script Network Data", GetScriptNetworkDataAttr, SetScriptNetworkDataAttr, Vector<unsigned char>,
         Variant::emptyBuffer, AM_NET | AM_NOEDIT);
 }
 
@@ -396,10 +396,10 @@ void ScriptInstance::RemoveEventHandlers(Object* sender)
 
 void ScriptInstance::RemoveEventHandlers()
 {
-    UnsubscribeFromAllEventsExcept(PODVector<StringHash>(), true);
+    UnsubscribeFromAllEventsExcept(Vector<StringHash>(), true);
 }
 
-void ScriptInstance::RemoveEventHandlersExcept(const PODVector<StringHash>& exceptions)
+void ScriptInstance::RemoveEventHandlersExcept(const Vector<StringHash>& exceptions)
 {
     UnsubscribeFromAllEventsExcept(exceptions, true);
 }
@@ -443,7 +443,7 @@ void ScriptInstance::SetScriptFileAttr(const ResourceRef& value)
     SetScriptFile(cache->GetResource<ScriptFile>(value.name_));
 }
 
-void ScriptInstance::SetDelayedCallsAttr(const PODVector<unsigned char>& value)
+void ScriptInstance::SetDelayedCallsAttr(const Vector<unsigned char>& value)
 {
     MemoryBuffer buf(value);
     delayedCalls_.Resize(buf.ReadVLE());
@@ -460,7 +460,7 @@ void ScriptInstance::SetDelayedCallsAttr(const PODVector<unsigned char>& value)
         UpdateEventSubscription();
 }
 
-void ScriptInstance::SetScriptDataAttr(const PODVector<unsigned char>& data)
+void ScriptInstance::SetScriptDataAttr(const Vector<unsigned char>& data)
 {
     if (scriptObject_ && methods_[METHOD_LOAD])
     {
@@ -471,7 +471,7 @@ void ScriptInstance::SetScriptDataAttr(const PODVector<unsigned char>& data)
     }
 }
 
-void ScriptInstance::SetScriptNetworkDataAttr(const PODVector<unsigned char>& data)
+void ScriptInstance::SetScriptNetworkDataAttr(const Vector<unsigned char>& data)
 {
     if (scriptObject_ && methods_[METHOD_READNETWORKUPDATE])
     {
@@ -487,7 +487,7 @@ ResourceRef ScriptInstance::GetScriptFileAttr() const
     return GetResourceRef(scriptFile_, ScriptFile::GetTypeStatic());
 }
 
-PODVector<unsigned char> ScriptInstance::GetDelayedCallsAttr() const
+Vector<unsigned char> ScriptInstance::GetDelayedCallsAttr() const
 {
     VectorBuffer buf;
     buf.WriteVLE(delayedCalls_.Size());
@@ -502,10 +502,10 @@ PODVector<unsigned char> ScriptInstance::GetDelayedCallsAttr() const
     return buf.GetBuffer();
 }
 
-PODVector<unsigned char> ScriptInstance::GetScriptDataAttr() const
+Vector<unsigned char> ScriptInstance::GetScriptDataAttr() const
 {
     if (!scriptObject_ || !methods_[METHOD_SAVE])
-        return PODVector<unsigned char>();
+        return Vector<unsigned char>();
     else
     {
         VectorBuffer buf;
@@ -516,10 +516,10 @@ PODVector<unsigned char> ScriptInstance::GetScriptDataAttr() const
     }
 }
 
-PODVector<unsigned char> ScriptInstance::GetScriptNetworkDataAttr() const
+Vector<unsigned char> ScriptInstance::GetScriptNetworkDataAttr() const
 {
     if (!scriptObject_ || !methods_[METHOD_WRITENETWORKUPDATE])
-        return PODVector<unsigned char>();
+        return Vector<unsigned char>();
     else
     {
         VectorBuffer buf;
@@ -592,7 +592,7 @@ void ScriptInstance::ReleaseObject()
         if (methods_[METHOD_STOP])
             executeScript(methods_[METHOD_STOP], [](asIScriptContext*) {});
 
-        PODVector<StringHash> exceptions;
+        Vector<StringHash> exceptions;
         exceptions.Push(E_RELOADSTARTED);
         exceptions.Push(E_RELOADFINISHED);
         UnsubscribeFromAllEventsExcept(exceptions, false);

@@ -119,7 +119,7 @@ private:
     /// Constant buffer search map.
     ConstantBufferMap allConstantBuffers_;
     /// Currently dirty constant buffers.
-    PODVector<ConstantBuffer*> dirtyConstantBuffers_;
+    Vector<ConstantBuffer*> dirtyConstantBuffers_;
     /// Shader programs.
     ShaderProgramMap_D3D11 shaderPrograms_;
     /// Shader program in use.

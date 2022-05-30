@@ -118,7 +118,7 @@ void Profiler::PrintData(ProfilerBlock* block, String& output, unsigned depth, u
         output += String(line);
     }
 
-    for (PODVector<ProfilerBlock*>::ConstIterator i = block->children_.Begin(); i != block->children_.End(); ++i)
+    for (Vector<ProfilerBlock*>::ConstIterator i = block->children_.Begin(); i != block->children_.End(); ++i)
         PrintData(*i, output, depth, maxDepth, showUnused, showTotal);
 }
 

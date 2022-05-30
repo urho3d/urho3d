@@ -189,23 +189,23 @@ template <class T> Vector3 Frustum_GetVertex(unsigned index, T* ptr)
 
 // ========================================================================================
 
-// Vector<PODVector<Vector3>> Polyhedron::faces_ | File: ../Math/Polyhedron.h
+// Vector<Vector<Vector3>> Polyhedron::faces_ | File: ../Math/Polyhedron.h
 template <class T> unsigned Polyhedron_GetNumFaces(T* ptr)
 {
     return ptr->faces_.Size();
 }
 
-// Vector<PODVector<Vector3>> Polyhedron::faces_ | File: ../Math/Polyhedron.h
+// Vector<Vector<Vector3>> Polyhedron::faces_ | File: ../Math/Polyhedron.h
 template <class T> CScriptArray* Polyhedron_GetFace(unsigned index, T* ptr)
 {
-    PODVector<Vector3> face;
+    Vector<Vector3> face;
     if (index < ptr->faces_.Size())
         face = ptr->faces_[index];
     return VectorToArray<Vector3>(face, "Array<Vector3>");
 }
 
 #define REGISTER_MEMBERS_MANUAL_PART_Polyhedron() \
-    /* Vector<PODVector<Vector3>> Polyhedron::faces_ | File: ../Math/Polyhedron.h */ \
+    /* Vector<Vector<Vector3>> Polyhedron::faces_ | File: ../Math/Polyhedron.h */ \
     engine->RegisterObjectMethod(className, "uint get_numFaces() const", AS_FUNCTION_OBJLAST(Polyhedron_GetNumFaces<T>), AS_CALL_CDECL_OBJLAST); \
     engine->RegisterObjectMethod(className, "Array<Vector3>@ get_face(uint) const", AS_FUNCTION_OBJLAST(Polyhedron_GetFace<T>), AS_CALL_CDECL_OBJLAST);
 

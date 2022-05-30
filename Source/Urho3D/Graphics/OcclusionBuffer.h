@@ -165,7 +165,7 @@ private:
     /// Reduced size depth buffers.
     Vector<SharedArrayPtr<DepthValue>> mipBuffers_;
     /// Submitted render jobs.
-    PODVector<OcclusionBatch> batches_;
+    Vector<OcclusionBatch> batches_;
     /// Buffer width.
     int width_{};
     /// Buffer height.

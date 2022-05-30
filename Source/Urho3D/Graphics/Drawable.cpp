@@ -91,7 +91,7 @@ void Drawable::OnSetEnabled()
         RemoveFromOctree();
 }
 
-void Drawable::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
+void Drawable::ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQueryResult>& results)
 {
     float distance = query.ray_.HitDistance(GetWorldBoundingBox());
     if (distance < query.maxDistance_)
@@ -395,7 +395,7 @@ void Drawable::RemoveFromOctree()
     }
 }
 
-bool WriteDrawablesToOBJ(const PODVector<Drawable*>& drawables, File* outputFile, bool asZUp, bool asRightHanded, bool writeLightmapUV)
+bool WriteDrawablesToOBJ(const Vector<Drawable*>& drawables, File* outputFile, bool asZUp, bool asRightHanded, bool writeLightmapUV)
 {
     // Must track indices independently to deal with potential mismatching of drawables vertex attributes (ie. one with UV, another without, then another with)
     unsigned currentPositionIndex = 1;
@@ -438,7 +438,7 @@ bool WriteDrawablesToOBJ(const PODVector<Drawable*>& drawables, File* outputFile
             const unsigned char* vertexData;
             const unsigned char* indexData;
             unsigned elementSize, indexSize;
-            const PODVector<VertexElement>* elements;
+            const Vector<VertexElement>* elements;
             geo->GetRawData(vertexData, elementSize, indexData, indexSize, elements);
             if (!vertexData || !elements)
                 continue;

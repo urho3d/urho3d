@@ -160,7 +160,7 @@ int DoSystemRun(const String& fileName, const Vector<String>& arguments)
     pid_t pid = fork();
     if (!pid)
     {
-        PODVector<const char*> argPtrs;
+        Vector<const char*> argPtrs;
         argPtrs.Push(fixedFileName.CString());
         for (unsigned i = 0; i < arguments.Size(); ++i)
             argPtrs.Push(arguments[i].CString());

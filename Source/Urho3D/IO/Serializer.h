@@ -91,7 +91,7 @@ public:
     /// Write a 32-bit StringHash.
     bool WriteStringHash(const StringHash& value);
     /// Write a buffer, with size encoded as VLE.
-    bool WriteBuffer(const PODVector<unsigned char>& value);
+    bool WriteBuffer(const Vector<unsigned char>& value);
     /// Write a resource reference.
     bool WriteResourceRef(const ResourceRef& value);
     /// Write a resource reference list.

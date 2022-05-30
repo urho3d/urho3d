@@ -184,7 +184,7 @@ bool Serializer::WriteStringHash(const StringHash& value)
     return WriteUInt(value.Value());
 }
 
-bool Serializer::WriteBuffer(const PODVector<unsigned char>& value)
+bool Serializer::WriteBuffer(const Vector<unsigned char>& value)
 {
     bool success = true;
     unsigned size = value.Size();

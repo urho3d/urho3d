@@ -262,7 +262,7 @@ public:
     Vector<String> GetPassNames() const;
     /// Return all passes.
     /// @property
-    PODVector<Pass*> GetPasses() const;
+    Vector<Pass*> GetPasses() const;
 
     /// Return a clone with added shader compilation defines. Called internally by Material.
     SharedPtr<Technique> CloneWithDefines(const String& vsDefines, const String& psDefines);

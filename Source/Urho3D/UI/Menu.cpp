@@ -292,9 +292,9 @@ void Menu::ShowPopup(bool enable)
         OnHidePopup();
 
         // If the popup has child menus, hide their popups as well
-        PODVector<UIElement*> children;
+        Vector<UIElement*> children;
         popup_->GetChildren(children, true);
-        for (PODVector<UIElement*>::ConstIterator i = children.Begin(); i != children.End(); ++i)
+        for (Vector<UIElement*>::ConstIterator i = children.Begin(); i != children.End(); ++i)
         {
             auto* menu = dynamic_cast<Menu*>(*i);
             if (menu)

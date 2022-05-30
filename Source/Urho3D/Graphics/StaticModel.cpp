@@ -52,7 +52,7 @@ void StaticModel::RegisterObject(Context* context)
     URHO3D_ATTRIBUTE("Occlusion LOD Level", int, occlusionLodLevel_, M_MAX_UNSIGNED, AM_DEFAULT);
 }
 
-void StaticModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
+void StaticModel::ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQueryResult>& results)
 {
     RayQueryLevel level = query.level_;
 
@@ -190,7 +190,7 @@ bool StaticModel::DrawOcclusion(OcclusionBuffer* buffer)
         unsigned vertexSize;
         const unsigned char* indexData;
         unsigned indexSize;
-        const PODVector<VertexElement>* elements;
+        const Vector<VertexElement>* elements;
 
         geometry->GetRawData(vertexData, vertexSize, indexData, indexSize, elements);
         // Check for valid geometry data
@@ -232,7 +232,7 @@ void StaticModel::SetModel(Model* model)
         // Copy the subgeometry & LOD level structure
         SetNumGeometries(model->GetNumGeometries());
         const Vector<Vector<SharedPtr<Geometry>>>& geometries = model->GetGeometries();
-        const PODVector<Vector3>& geometryCenters = model->GetGeometryCenters();
+        const Vector<Vector3>& geometryCenters = model->GetGeometryCenters();
         const Matrix3x4* worldTransform = node_ ? &node_->GetWorldTransform() : nullptr;
         for (unsigned i = 0; i < geometries.Size(); ++i)
         {

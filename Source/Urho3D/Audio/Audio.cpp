@@ -153,7 +153,7 @@ void Audio::SetMasterGain(const String& type, float gain)
 {
     masterGain_[type] = Clamp(gain, 0.0f, 1.0f);
 
-    for (PODVector<SoundSource*>::Iterator i = soundSources_.Begin(); i != soundSources_.End(); ++i)
+    for (Vector<SoundSource*>::Iterator i = soundSources_.Begin(); i != soundSources_.End(); ++i)
         (*i)->UpdateMasterGain();
 }
 
@@ -186,7 +186,7 @@ void Audio::SetListener(SoundListener* listener)
 
 void Audio::StopSound(Sound* sound)
 {
-    for (PODVector<SoundSource*>::Iterator i = soundSources_.Begin(); i != soundSources_.End(); ++i)
+    for (Vector<SoundSource*>::Iterator i = soundSources_.Begin(); i != soundSources_.End(); ++i)
     {
         if ((*i)->GetSound() == sound)
             (*i)->Stop();
@@ -221,7 +221,7 @@ void Audio::AddSoundSource(SoundSource* soundSource)
 
 void Audio::RemoveSoundSource(SoundSource* soundSource)
 {
-    PODVector<SoundSource*>::Iterator i = soundSources_.Find(soundSource);
+    Vector<SoundSource*>::Iterator i = soundSources_.Find(soundSource);
     if (i != soundSources_.End())
     {
         MutexLock lock(audioMutex_);
@@ -274,7 +274,7 @@ void Audio::MixOutput(void* dest, u32 samples)
         memset(clipPtr, 0, clipSamples * sizeof(i32));
 
         // Mix samples to clip buffer
-        for (PODVector<SoundSource*>::Iterator i = soundSources_.Begin(); i != soundSources_.End(); ++i)
+        for (Vector<SoundSource*>::Iterator i = soundSources_.Begin(); i != soundSources_.End(); ++i)
         {
             SoundSource* source = *i;
 

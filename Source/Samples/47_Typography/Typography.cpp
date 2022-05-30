@@ -204,7 +204,7 @@ void Typography::HandleWhiteBackground(StringHash eventType, VariantMap& eventDa
     Zone* zone = renderer->GetDefaultZone();
     zone->SetFogColor(bg);
 
-    PODVector<UIElement*> text = uielement_->GetChildrenWithTag(TEXT_TAG, true);
+    Vector<UIElement*> text = uielement_->GetChildrenWithTag(TEXT_TAG, true);
     for (int i = 0; i < text.Size(); i++)
     {
         text[i]->SetColor(fg);

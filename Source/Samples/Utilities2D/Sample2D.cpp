@@ -295,7 +295,7 @@ void Sample2D::PopulateMovingEntities(TileMapLayer2D* movingEntitiesLayer)
             auto* mover = movingClone->CreateComponent<Mover>();
 
             // Set path from points
-            PODVector<Vector2> path = CreatePathFromPoints(movingObject, offset);
+            Vector<Vector2> path = CreatePathFromPoints(movingObject, offset);
             mover->path_ = path;
 
             // Override default speed
@@ -374,9 +374,9 @@ float Sample2D::Zoom(Camera* camera)
     return zoom_;
 }
 
-PODVector<Vector2> Sample2D::CreatePathFromPoints(TileMapObject2D* object, const Vector2& offset)
+Vector<Vector2> Sample2D::CreatePathFromPoints(TileMapObject2D* object, const Vector2& offset)
 {
-    PODVector<Vector2> path;
+    Vector<Vector2> path;
     for (unsigned i=0; i < object->GetNumPoints(); ++i)
         path.Push(object->GetPoint(i) + offset);
     return path;

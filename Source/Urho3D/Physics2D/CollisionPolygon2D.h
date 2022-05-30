@@ -28,7 +28,7 @@ public:
     /// Set vertex.
     void SetVertex(unsigned index, const Vector2& vertex);
     /// Set vertices.
-    void SetVertices(const PODVector<Vector2>& vertices);
+    void SetVertices(const Vector<Vector2>& vertices);
 
     /// Return vertex count.
     /// @property
@@ -38,12 +38,12 @@ public:
     const Vector2& GetVertex(unsigned index) const { return (index < vertices_.Size()) ? vertices_[index] : Vector2::ZERO; }
 
     /// Return vertices.
-    const PODVector<Vector2>& GetVertices() const { return vertices_; }
+    const Vector<Vector2>& GetVertices() const { return vertices_; }
 
     /// Set vertices attribute.
-    void SetVerticesAttr(const PODVector<unsigned char>& value);
+    void SetVerticesAttr(const Vector<unsigned char>& value);
     /// Return vertices attribute.
-    PODVector<unsigned char> GetVerticesAttr() const;
+    Vector<unsigned char> GetVerticesAttr() const;
 
 private:
     /// Apply node world scale.
@@ -54,7 +54,7 @@ private:
     /// Polygon shape.
     b2PolygonShape polygonShape_;
     /// Vertices.
-    PODVector<Vector2> vertices_;
+    Vector<Vector2> vertices_;
 };
 
 }

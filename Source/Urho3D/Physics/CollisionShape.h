@@ -94,7 +94,7 @@ struct ConvexData : public CollisionGeometryData
     explicit ConvexData(CustomGeometry* custom);
 
     /// Build the convex hull from vertices.
-    void BuildHull(const PODVector<Vector3>& vertices);
+    void BuildHull(const Vector<Vector3>& vertices);
 
     /// Vertex data.
     SharedArrayPtr<Vector3> vertexData_;

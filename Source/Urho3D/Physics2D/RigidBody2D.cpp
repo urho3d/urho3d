@@ -532,10 +532,10 @@ void RigidBody2D::OnNodeSet(Node* node)
     {
         node->AddListener(this);
 
-        PODVector<CollisionShape2D*> shapes;
+        Vector<CollisionShape2D*> shapes;
         node_->GetDerivedComponents<CollisionShape2D>(shapes);
 
-        for (PODVector<CollisionShape2D*>::Iterator i = shapes.Begin(); i != shapes.End(); ++i)
+        for (Vector<CollisionShape2D*>::Iterator i = shapes.Begin(); i != shapes.End(); ++i)
         {
             (*i)->CreateFixture();
             AddCollisionShape2D(*i);

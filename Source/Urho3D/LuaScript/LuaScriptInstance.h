@@ -96,9 +96,9 @@ public:
     /// Set script object type.
     void SetScriptObjectType(const String& scriptObjectType);
     /// Set script file serialization attribute by calling a script function.
-    void SetScriptDataAttr(const PODVector<unsigned char>& data);
+    void SetScriptDataAttr(const Vector<unsigned char>& data);
     /// Set script network serialization attribute by calling a script function.
-    void SetScriptNetworkDataAttr(const PODVector<unsigned char>& data);
+    void SetScriptNetworkDataAttr(const Vector<unsigned char>& data);
 
     /// Return script file.
     LuaFile* GetScriptFile() const;
@@ -110,9 +110,9 @@ public:
     int GetScriptObjectRef() const { return scriptObjectRef_; }
 
     /// Get script file serialization attribute by calling a script function.
-    PODVector<unsigned char> GetScriptDataAttr() const;
+    Vector<unsigned char> GetScriptDataAttr() const;
     /// Get script network serialization attribute by calling a script function.
-    PODVector<unsigned char> GetScriptNetworkDataAttr() const;
+    Vector<unsigned char> GetScriptNetworkDataAttr() const;
     /// Return script object's funcition.
     LuaFunction* GetScriptObjectFunction(const String& functionName) const;
 

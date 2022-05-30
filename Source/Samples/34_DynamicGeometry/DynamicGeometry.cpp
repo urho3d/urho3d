@@ -206,7 +206,7 @@ void DynamicGeometry::CreateScene()
         vb->SetShadowed(true);
         // We could use the "legacy" element bitmask to define elements for more compact code, but let's demonstrate
         // defining the vertex elements explicitly to allow any element types and order
-        PODVector<VertexElement> elements;
+        Vector<VertexElement> elements;
         elements.Push(VertexElement(TYPE_VECTOR3, SEM_POSITION));
         elements.Push(VertexElement(TYPE_VECTOR3, SEM_NORMAL));
         vb->SetSize(numVertices, elements);
@@ -230,8 +230,8 @@ void DynamicGeometry::CreateScene()
         vertexBuffers.Push(vb);
         indexBuffers.Push(ib);
         // Morph ranges could also be not defined. Here we simply define a zero range (no morphing) for the vertex buffer
-        PODVector<unsigned> morphRangeStarts;
-        PODVector<unsigned> morphRangeCounts;
+        Vector<unsigned> morphRangeStarts;
+        Vector<unsigned> morphRangeCounts;
         morphRangeStarts.Push(0);
         morphRangeCounts.Push(0);
         fromScratchModel->SetVertexBuffers(vertexBuffers, morphRangeStarts, morphRangeCounts);

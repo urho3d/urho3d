@@ -73,7 +73,7 @@ void Character2D::Update(float timeStep)
     // Collision detection (AABB query)
     Vector2 characterHalfSize = Vector2(0.16f, 0.16f);
     auto* physicsWorld = GetScene()->GetComponent<PhysicsWorld2D>();
-    PODVector<RigidBody2D*> collidingBodies;
+    Vector<RigidBody2D*> collidingBodies;
     physicsWorld->GetRigidBodies(collidingBodies, Rect(node_->GetWorldPosition2D() - characterHalfSize - Vector2(0.0f, 0.1f), node_->GetWorldPosition2D() + characterHalfSize));
 
     if (collidingBodies.Size() > 1 && !isClimbing_)

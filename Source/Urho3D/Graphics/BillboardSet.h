@@ -54,7 +54,7 @@ public:
     static void RegisterObject(Context* context);
 
     /// Process octree raycast. May be called from a worker thread.
-    void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results) override;
+    void ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQueryResult>& results) override;
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
     void UpdateBatches(const FrameInfo& frame) override;
     /// Prepare geometry for rendering. Called from a worker thread if possible (no GPU update).
@@ -101,7 +101,7 @@ public:
     unsigned GetNumBillboards() const { return billboards_.Size(); }
 
     /// Return all billboards.
-    PODVector<Billboard>& GetBillboards() { return billboards_; }
+    Vector<Billboard>& GetBillboards() { return billboards_; }
 
     /// Return billboard by index.
     /// @property{get_billboards}
@@ -140,13 +140,13 @@ public:
     /// Set billboards attribute.
     void SetBillboardsAttr(const VariantVector& value);
     /// Set billboards attribute for network replication.
-    void SetNetBillboardsAttr(const PODVector<unsigned char>& value);
+    void SetNetBillboardsAttr(const Vector<unsigned char>& value);
     /// Return material attribute.
     ResourceRef GetMaterialAttr() const;
     /// Return billboards attribute.
     VariantVector GetBillboardsAttr() const;
     /// Return billboards attribute for network replication.
-    const PODVector<unsigned char>& GetNetBillboardsAttr() const;
+    const Vector<unsigned char>& GetNetBillboardsAttr() const;
 
 protected:
     /// Recalculate the world-space bounding box.
@@ -155,7 +155,7 @@ protected:
     void MarkPositionsDirty();
 
     /// Billboards.
-    PODVector<Billboard> billboards_;
+    Vector<Billboard> billboards_;
     /// Animation LOD bias.
     float animationLodBias_;
     /// Animation LOD timer.

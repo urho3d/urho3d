@@ -41,7 +41,7 @@ enum TransformSpace
 struct URHO3D_API NodeImpl
 {
     /// Nodes this node depends on for network updates.
-    PODVector<Node*> dependencyNodes_;
+    Vector<Node*> dependencyNodes_;
     /// Network owner connection.
     Connection* owner_;
     /// Name.
@@ -546,17 +546,17 @@ public:
     const Vector<SharedPtr<Node>>& GetChildren() const { return children_; }
 
     /// Return child scene nodes, optionally recursive.
-    void GetChildren(PODVector<Node*>& dest, bool recursive = false) const;
+    void GetChildren(Vector<Node*>& dest, bool recursive = false) const;
     /// Return child scene nodes, optionally recursive.
-    PODVector<Node*> GetChildren(bool recursive) const;
+    Vector<Node*> GetChildren(bool recursive) const;
     /// Return child scene nodes with a specific component.
-    void GetChildrenWithComponent(PODVector<Node*>& dest, StringHash type, bool recursive = false) const;
+    void GetChildrenWithComponent(Vector<Node*>& dest, StringHash type, bool recursive = false) const;
     /// Return child scene nodes with a specific component.
-    PODVector<Node*> GetChildrenWithComponent(StringHash type, bool recursive = false) const;
+    Vector<Node*> GetChildrenWithComponent(StringHash type, bool recursive = false) const;
     /// Return child scene nodes with a specific tag.
-    void GetChildrenWithTag(PODVector<Node*>& dest, const String& tag, bool recursive = false) const;
+    void GetChildrenWithTag(Vector<Node*>& dest, const String& tag, bool recursive = false) const;
     /// Return child scene nodes with a specific tag.
-    PODVector<Node*> GetChildrenWithTag(const String& tag, bool recursive = false) const;
+    Vector<Node*> GetChildrenWithTag(const String& tag, bool recursive = false) const;
 
     /// Return child scene node by index.
     Node* GetChild(unsigned index) const;
@@ -578,7 +578,7 @@ public:
     const Vector<SharedPtr<Component>>& GetComponents() const { return components_; }
 
     /// Return all components of type. Optionally recursive.
-    void GetComponents(PODVector<Component*>& dest, StringHash type, bool recursive = false) const;
+    void GetComponents(Vector<Component*>& dest, StringHash type, bool recursive = false) const;
     /// Return component by type. If there are several, returns the first.
     Component* GetComponent(StringHash type, bool recursive = false) const;
     /// Return component in parent node. If there are several, returns the first. May optional traverse up to the root node.
@@ -599,15 +599,15 @@ public:
     /// Return first component derived from class in the parent node, or if fully traversing then the first node up the tree with one.
     template <class T> T* GetParentDerivedComponent(bool fullTraversal = false) const;
     /// Return components derived from class.
-    template <class T> void GetDerivedComponents(PODVector<T*>& dest, bool recursive = false, bool clearVector = true) const;
+    template <class T> void GetDerivedComponents(Vector<T*>& dest, bool recursive = false, bool clearVector = true) const;
     /// Template version of returning child nodes with a specific component.
-    template <class T> void GetChildrenWithComponent(PODVector<Node*>& dest, bool recursive = false) const;
+    template <class T> void GetChildrenWithComponent(Vector<Node*>& dest, bool recursive = false) const;
     /// Template version of returning a component by type.
     template <class T> T* GetComponent(bool recursive = false) const;
     /// Template version of returning a parent's component by type.
     template <class T> T* GetParentComponent(bool fullTraversal = false) const;
     /// Template version of returning all components of type.
-    template <class T> void GetComponents(PODVector<T*>& dest, bool recursive = false) const;
+    template <class T> void GetComponents(Vector<T*>& dest, bool recursive = false) const;
     /// Template version of checking whether has a specific component.
     template <class T> bool HasComponent() const;
 
@@ -621,15 +621,15 @@ public:
     /// Set network position attribute.
     void SetNetPositionAttr(const Vector3& value);
     /// Set network rotation attribute.
-    void SetNetRotationAttr(const PODVector<unsigned char>& value);
+    void SetNetRotationAttr(const Vector<unsigned char>& value);
     /// Set network parent attribute.
-    void SetNetParentAttr(const PODVector<unsigned char>& value);
+    void SetNetParentAttr(const Vector<unsigned char>& value);
     /// Return network position attribute.
     const Vector3& GetNetPositionAttr() const;
     /// Return network rotation attribute.
-    const PODVector<unsigned char>& GetNetRotationAttr() const;
+    const Vector<unsigned char>& GetNetRotationAttr() const;
     /// Return network parent attribute.
-    const PODVector<unsigned char>& GetNetParentAttr() const;
+    const Vector<unsigned char>& GetNetParentAttr() const;
     /// Load components and optionally load child nodes.
     bool Load(Deserializer& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false,
         CreateMode mode = REPLICATED);
@@ -640,7 +640,7 @@ public:
     bool LoadJSON(const JSONValue& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false,
         CreateMode mode = REPLICATED);
     /// Return the depended on nodes to order network updates.
-    const PODVector<Node*>& GetDependencyNodes() const { return impl_->dependencyNodes_; }
+    const Vector<Node*>& GetDependencyNodes() const { return impl_->dependencyNodes_; }
 
     /// Prepare network update by comparing attributes and marking replication states dirty as necessary.
     void PrepareNetworkUpdate();
@@ -688,13 +688,13 @@ private:
     /// Remove child node by iterator.
     void RemoveChild(Vector<SharedPtr<Node>>::Iterator i);
     /// Return child nodes recursively.
-    void GetChildrenRecursive(PODVector<Node*>& dest) const;
+    void GetChildrenRecursive(Vector<Node*>& dest) const;
     /// Return child nodes with a specific component recursively.
-    void GetChildrenWithComponentRecursive(PODVector<Node*>& dest, StringHash type) const;
+    void GetChildrenWithComponentRecursive(Vector<Node*>& dest, StringHash type) const;
     /// Return child nodes with a specific tag recursively.
-    void GetChildrenWithTagRecursive(PODVector<Node*>& dest, const String& tag) const;
+    void GetChildrenWithTagRecursive(Vector<Node*>& dest, const String& tag) const;
     /// Return specific components recursively.
-    void GetComponentsRecursive(PODVector<Component*>& dest, StringHash type) const;
+    void GetComponentsRecursive(Vector<Component*>& dest, StringHash type) const;
     /// Clone node recursively.
     Node* CloneRecursive(Node* parent, SceneResolver& resolver, CreateMode mode);
     /// Remove a component from this node with the specified iterator.
@@ -759,7 +759,7 @@ template <class T> void Node::RemoveComponent() { RemoveComponent(T::GetTypeStat
 
 template <class T> void Node::RemoveComponents() { RemoveComponents(T::GetTypeStatic()); }
 
-template <class T> void Node::GetChildrenWithComponent(PODVector<Node*>& dest, bool recursive) const
+template <class T> void Node::GetChildrenWithComponent(Vector<Node*>& dest, bool recursive) const
 {
     GetChildrenWithComponent(dest, T::GetTypeStatic(), recursive);
 }
@@ -768,9 +768,9 @@ template <class T> T* Node::GetComponent(bool recursive) const { return static_c
 
 template <class T> T* Node::GetParentComponent(bool fullTraversal) const { return static_cast<T*>(GetParentComponent(T::GetTypeStatic(), fullTraversal)); }
 
-template <class T> void Node::GetComponents(PODVector<T*>& dest, bool recursive) const
+template <class T> void Node::GetComponents(Vector<T*>& dest, bool recursive) const
 {
-    GetComponents(reinterpret_cast<PODVector<Component*>&>(dest), T::GetTypeStatic(), recursive);
+    GetComponents(reinterpret_cast<Vector<Component*>&>(dest), T::GetTypeStatic(), recursive);
 }
 
 template <class T> bool Node::HasComponent() const { return HasComponent(T::GetTypeStatic()); }
@@ -814,7 +814,7 @@ template <class T> T* Node::GetParentDerivedComponent(bool fullTraversal) const
     return 0;
 }
 
-template <class T> void Node::GetDerivedComponents(PODVector<T*>& dest, bool recursive, bool clearVector) const
+template <class T> void Node::GetDerivedComponents(Vector<T*>& dest, bool recursive, bool clearVector) const
 {
     if (clearVector)
         dest.Clear();

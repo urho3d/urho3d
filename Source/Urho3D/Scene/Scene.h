@@ -163,7 +163,7 @@ public:
     /// Return component from the whole scene by ID, or null if not found.
     Component* GetComponent(unsigned id) const;
     /// Get nodes with specific tag from the whole scene, return false if empty.
-    bool GetNodesWithTag(PODVector<Node*>& dest, const String& tag)  const;
+    bool GetNodesWithTag(Vector<Node*>& dest, const String& tag)  const;
 
     /// Return whether updates are enabled.
     /// @property
@@ -293,7 +293,7 @@ private:
     /// Local components by ID.
     HashMap<unsigned, Component*> localComponents_;
     /// Cached tagged nodes by tag.
-    HashMap<StringHash, PODVector<Node*>> taggedNodes_;
+    HashMap<StringHash, Vector<Node*>> taggedNodes_;
     /// Asynchronous loading progress.
     AsyncProgress asyncProgress_;
     /// Node and component ID resolver for asynchronous loading.
@@ -309,7 +309,7 @@ private:
     /// Components to check for attribute changes on the next network update.
     HashSet<unsigned> networkUpdateComponents_;
     /// Delayed dirty notification queue for components.
-    PODVector<Component*> delayedDirtyComponents_;
+    Vector<Component*> delayedDirtyComponents_;
     /// Mutex for the delayed dirty notification queue.
     Mutex sceneMutex_;
     /// Preallocated event data map for smoothing update events.

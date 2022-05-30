@@ -84,7 +84,7 @@ void StaticModelGroup::ApplyAttributes()
     OnMarkedDirty(GetNode());
 }
 
-void StaticModelGroup::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
+void StaticModelGroup::ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQueryResult>& results)
 {
     // If no bones or no bone-level testing, use the Drawable test
     RayQueryLevel level = query.level_;
@@ -232,7 +232,7 @@ bool StaticModelGroup::DrawOcclusion(OcclusionBuffer* buffer)
             unsigned vertexSize;
             const unsigned char* indexData;
             unsigned indexSize;
-            const PODVector<VertexElement>* elements;
+            const Vector<VertexElement>* elements;
 
             geometry->GetRawData(vertexData, vertexSize, indexData, indexSize, elements);
             // Check for valid geometry data

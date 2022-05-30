@@ -75,7 +75,7 @@ public:
     /// Apply attribute changes that can not be applied immediately.
     void ApplyAttributes() override;
     /// Return UI rendering batches.
-    void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor) override;
+    void GetBatches(Vector<UIBatch>& batches, Vector<float>& vertexData, const IntRect& currentScissor) override;
     /// React to resize.
     void OnResize(const IntVector2& newSize, const IntVector2& delta) override;
     /// React to indent change.
@@ -229,7 +229,7 @@ protected:
     int GetRowStartPosition(i32 rowIndex) const;
     /// Construct batch.
     void ConstructBatch
-        (UIBatch& pageBatch, const PODVector<GlyphLocation>& pageGlyphLocation, float dx = 0, float dy = 0, Color* color = nullptr,
+        (UIBatch& pageBatch, const Vector<GlyphLocation>& pageGlyphLocation, float dx = 0, float dy = 0, Color* color = nullptr,
             float depthBias = 0.0f);
 
     /// Font.
@@ -267,17 +267,17 @@ protected:
     /// Row height.
     float rowHeight_;
     /// Text as Unicode characters.
-    PODVector<c32> unicodeText_;
+    Vector<c32> unicodeText_;
     /// Text modified into printed form.
-    PODVector<c32> printText_;
+    Vector<c32> printText_;
     /// Mapping of printed form back to original char indices.
-    PODVector<i32> printToText_;
+    Vector<i32> printToText_;
     /// Row widths.
-    PODVector<float> rowWidths_;
+    Vector<float> rowWidths_;
     /// Glyph locations per each texture in the font.
-    Vector<PODVector<GlyphLocation>> pageGlyphLocations_;
+    Vector<Vector<GlyphLocation>> pageGlyphLocations_;
     /// Cached locations of each character in the text.
-    PODVector<CharLocation> charLocations_;
+    Vector<CharLocation> charLocations_;
     /// The text will be automatically translated.
     bool autoLocalizable_;
     /// Localization string id storage. Used when autoLocalizable flag is set.

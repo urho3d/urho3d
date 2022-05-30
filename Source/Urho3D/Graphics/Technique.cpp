@@ -461,9 +461,9 @@ Vector<String> Technique::GetPassNames() const
     return ret;
 }
 
-PODVector<Pass*> Technique::GetPasses() const
+Vector<Pass*> Technique::GetPasses() const
 {
-    PODVector<Pass*> ret;
+    Vector<Pass*> ret;
 
     for (Vector<SharedPtr<Pass>>::ConstIterator i = passes_.Begin(); i != passes_.End(); ++i)
     {

@@ -113,16 +113,16 @@ template <class T> CScriptArray* XMLElement_GetVariantVector(T* ptr)
 
 // ========================================================================================
 
-// void ResourceCache::GetResources(PODVector<Resource*>& result, StringHash type) const | File: ../Resource/ResourceCache.h
+// void ResourceCache::GetResources(Vector<Resource*>& result, StringHash type) const | File: ../Resource/ResourceCache.h
 template <class T> CScriptArray* ResourceCache_GetResources(StringHash type, T* ptr)
 {
-    PODVector<Resource*> resources;
+    Vector<Resource*> resources;
     ptr->GetResources(resources, type);
     return VectorToHandleArray(resources, "Array<Resource@>");
 }
 
 #define REGISTER_MEMBERS_MANUAL_PART_ResourceCache() \
-    /* void ResourceCache::GetResources(PODVector<Resource*>& result, StringHash type) const | File: ../Resource/ResourceCache.h */ \
+    /* void ResourceCache::GetResources(Vector<Resource*>& result, StringHash type) const | File: ../Resource/ResourceCache.h */ \
     engine->RegisterObjectMethod(className, "Array<Resource@>@ GetResources(StringHash)", AS_FUNCTION_OBJLAST(ResourceCache_GetResources<T>), AS_CALL_CDECL_OBJLAST);
 
 // ========================================================================================

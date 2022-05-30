@@ -82,7 +82,7 @@ static inline bool CompareRayQueryResults(RayQueryResult& lr, RayQueryResult& rr
     return lhs->GetID() > rhs->GetID();
 }
 
-void Renderer2D::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
+void Renderer2D::ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQueryResult>& results)
 {
     unsigned resultSize = results.Size();
     for (unsigned i = 0; i < drawables_.Size(); ++i)
@@ -181,7 +181,7 @@ void Renderer2D::UpdateGeometry(const FrameInfo& frame)
             auto* dest = reinterpret_cast<Vertex2D*>(vertexBuffer->Lock(0, vertexCount, true));
             if (dest)
             {
-                const PODVector<const SourceBatch2D*>& sourceBatches = viewBatchInfo.sourceBatches_;
+                const Vector<const SourceBatch2D*>& sourceBatches = viewBatchInfo.sourceBatches_;
                 for (unsigned b = 0; b < sourceBatches.Size(); ++b)
                 {
                     const Vector<Vertex2D>& vertices = sourceBatches[b]->vertices_;
@@ -322,7 +322,7 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
         int numWorkItems = queue->GetNumThreads() + 1; // Worker threads + main thread
         int drawablesPerItem = drawables_.Size() / numWorkItems;
 
-        PODVector<Drawable2D*>::Iterator start = drawables_.Begin();
+        Vector<Drawable2D*>::Iterator start = drawables_.Begin();
         for (int i = 0; i < numWorkItems; ++i)
         {
             SharedPtr<WorkItem> item = queue->GetFreeItem();
@@ -330,7 +330,7 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
             item->workFunction_ = CheckDrawableVisibilityWork;
             item->aux_ = this;
 
-            PODVector<Drawable2D*>::Iterator end = drawables_.End();
+            Vector<Drawable2D*>::Iterator end = drawables_.End();
             if (i < numWorkItems - 1 && end - start > drawablesPerItem)
                 end = start + drawablesPerItem;
 
@@ -365,7 +365,7 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
     }
 }
 
-void Renderer2D::GetDrawables(PODVector<Drawable2D*>& drawables, Node* node)
+void Renderer2D::GetDrawables(Vector<Drawable2D*>& drawables, Node* node)
 {
     if (!node || !node->IsEnabled())
         return;
@@ -403,7 +403,7 @@ void Renderer2D::UpdateViewBatchInfo(ViewBatchInfo2D& viewBatchInfo, Camera* cam
     if (viewBatchInfo.batchUpdatedFrameNumber_ == frame_.frameNumber_)
         return;
 
-    PODVector<const SourceBatch2D*>& sourceBatches = viewBatchInfo.sourceBatches_;
+    Vector<const SourceBatch2D*>& sourceBatches = viewBatchInfo.sourceBatches_;
     sourceBatches.Clear();
     for (unsigned d = 0; d < drawables_.Size(); ++d)
     {

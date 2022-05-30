@@ -171,7 +171,7 @@ void CrowdManager::SetCrowdTarget(const Vector3& position, Node* node)
     if (!crowd_)
         return;
 
-    PODVector<CrowdAgent*> agents = GetAgents(node, false);     // Get all crowd agent components
+    Vector<CrowdAgent*> agents = GetAgents(node, false);     // Get all crowd agent components
     Vector3 moveTarget(position);
     for (unsigned i = 0; i < agents.Size(); ++i)
     {
@@ -199,7 +199,7 @@ void CrowdManager::SetCrowdVelocity(const Vector3& velocity, Node* node)
     if (!crowd_)
         return;
 
-    PODVector<CrowdAgent*> agents = GetAgents(node, true);      // Get only crowd agent components already in the crowd
+    Vector<CrowdAgent*> agents = GetAgents(node, true);      // Get only crowd agent components already in the crowd
     for (unsigned i = 0; i < agents.Size(); ++i)
         agents[i]->SetTargetVelocity(velocity);
 }
@@ -209,7 +209,7 @@ void CrowdManager::ResetCrowdTarget(Node* node)
     if (!crowd_)
         return;
 
-    PODVector<CrowdAgent*> agents = GetAgents(node, true);
+    Vector<CrowdAgent*> agents = GetAgents(node, true);
     for (unsigned i = 0; i < agents.Size(); ++i)
         agents[i]->ResetTarget();
 }
@@ -383,7 +383,7 @@ Vector3 CrowdManager::MoveAlongSurface(const Vector3& start, const Vector3& end,
         end;
 }
 
-void CrowdManager::FindPath(PODVector<Vector3>& dest, const Vector3& start, const Vector3& end, int queryFilterType)
+void CrowdManager::FindPath(Vector<Vector3>& dest, const Vector3& start, const Vector3& end, int queryFilterType)
 {
     if (crowd_ && navigationMesh_)
         navigationMesh_->FindPath(dest, start, end, Vector3(crowd_->getQueryExtents()), crowd_->getFilter(queryFilterType));
@@ -526,15 +526,15 @@ const CrowdObstacleAvoidanceParams& CrowdManager::GetObstacleAvoidanceParams(uns
     return params ? *reinterpret_cast<const CrowdObstacleAvoidanceParams*>(params) : EMPTY_PARAMS;
 }
 
-PODVector<CrowdAgent*> CrowdManager::GetAgents(Node* node, bool inCrowdFilter) const
+Vector<CrowdAgent*> CrowdManager::GetAgents(Node* node, bool inCrowdFilter) const
 {
     if (!node)
         node = GetScene();
-    PODVector<CrowdAgent*> agents;
+    Vector<CrowdAgent*> agents;
     node->GetComponents<CrowdAgent>(agents, true);
     if (inCrowdFilter)
     {
-        PODVector<CrowdAgent*>::Iterator i = agents.Begin();
+        Vector<CrowdAgent*>::Iterator i = agents.Begin();
         while (i != agents.End())
         {
             if ((*i)->IsInCrowd())
@@ -578,7 +578,7 @@ bool CrowdManager::CreateCrowd()
         SetObstacleAvoidanceTypesAttr(obstacleAvoidanceTypeConfiguration);
 
         // Re-add the existing crowd agents
-        PODVector<CrowdAgent*> agents = GetAgents();
+        Vector<CrowdAgent*> agents = GetAgents();
         for (unsigned i = 0; i < agents.Size(); ++i)
         {
             // Keep adding until the crowd cannot take it anymore

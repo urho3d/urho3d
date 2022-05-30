@@ -143,9 +143,9 @@ public:
     /// Rebuild part of the navigation mesh in the rectangular area. Return true if successful.
     virtual bool Build(const IntVector2& from, const IntVector2& to);
     /// Return tile data.
-    virtual PODVector<unsigned char> GetTileData(const IntVector2& tile) const;
+    virtual Vector<unsigned char> GetTileData(const IntVector2& tile) const;
     /// Add tile to navigation mesh.
-    virtual bool AddTile(const PODVector<unsigned char>& tileData);
+    virtual bool AddTile(const Vector<unsigned char>& tileData);
     /// Remove tile from navigation mesh.
     virtual void RemoveTile(const IntVector2& tile);
     /// Remove all tiles from navigation mesh.
@@ -163,11 +163,11 @@ public:
     Vector3 MoveAlongSurface(const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE, int maxVisited = 3,
         const dtQueryFilter* filter = nullptr);
     /// Find a path between world space points. Return non-empty list of points if successful. Extents specifies how far off the navigation mesh the points can be.
-    void FindPath(PODVector<Vector3>& dest, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE,
+    void FindPath(Vector<Vector3>& dest, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE,
         const dtQueryFilter* filter = nullptr);
     /// Find a path between world space points. Return non-empty list of navigation path points if successful. Extents specifies how far off the navigation mesh the points can be.
     void FindPath
-        (PODVector<NavigationPathPoint>& dest, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE,
+        (Vector<NavigationPathPoint>& dest, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE,
             const dtQueryFilter* filter = nullptr);
     /// Return a random point on the navigation mesh.
     Vector3 GetRandomPoint(const dtQueryFilter* filter = nullptr, dtPolyRef* randomRef = nullptr);
@@ -276,9 +276,9 @@ public:
     NavmeshPartitionType GetPartitionType() const { return partitionType_; }
 
     /// Set navigation data attribute.
-    virtual void SetNavigationDataAttr(const PODVector<unsigned char>& value);
+    virtual void SetNavigationDataAttr(const Vector<unsigned char>& value);
     /// Return navigation data attribute.
-    virtual PODVector<unsigned char> GetNavigationDataAttr() const;
+    virtual Vector<unsigned char> GetNavigationDataAttr() const;
 
     /// Draw debug geometry for OffMeshConnection components.
     /// @property

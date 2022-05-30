@@ -490,13 +490,13 @@ void ListView::RemoveAllItems()
 
 void ListView::SetSelection(unsigned index)
 {
-    PODVector<unsigned> indices;
+    Vector<unsigned> indices;
     indices.Push(index);
     SetSelections(indices);
     EnsureItemVisibility(index);
 }
 
-void ListView::SetSelections(const PODVector<unsigned>& indices)
+void ListView::SetSelections(const Vector<unsigned>& indices)
 {
     // Make a weak pointer to self to check for destruction as a response to events
     WeakPtr<ListView> self(this);
@@ -504,7 +504,7 @@ void ListView::SetSelections(const PODVector<unsigned>& indices)
     unsigned numItems = GetNumItems();
 
     // Remove first items that should no longer be selected
-    for (PODVector<unsigned>::Iterator i = selections_.Begin(); i != selections_.End();)
+    for (Vector<unsigned>::Iterator i = selections_.Begin(); i != selections_.End();)
     {
         unsigned index = *i;
         if (!indices.Contains(index))
@@ -528,7 +528,7 @@ void ListView::SetSelections(const PODVector<unsigned>& indices)
     bool added = false;
 
     // Then add missing items
-    for (PODVector<unsigned>::ConstIterator i = indices.Begin(); i != indices.End(); ++i)
+    for (Vector<unsigned>::ConstIterator i = indices.Begin(); i != indices.End(); ++i)
     {
         unsigned index = *i;
         if (index < numItems)
@@ -653,7 +653,7 @@ void ListView::ChangeSelection(int delta, bool additive)
     int direction = delta > 0 ? 1 : -1;
     unsigned newSelection = selection;
     unsigned okSelection = selection;
-    PODVector<unsigned> indices = selections_;
+    Vector<unsigned> indices = selections_;
 
     while (delta != 0)
     {
@@ -677,7 +677,7 @@ void ListView::ChangeSelection(int delta, bool additive)
 
 void ListView::ClearSelection()
 {
-    SetSelections(PODVector<unsigned>());
+    SetSelections(Vector<unsigned>());
 }
 
 void ListView::SetHighlightMode(HighlightMode mode)
@@ -765,7 +765,7 @@ void ListView::Expand(unsigned index, bool enable, bool recursive)
     SetItemExpanded(item, enable);
     int baseIndent = item->GetIndent();
 
-    PODVector<bool> expanded((unsigned)(baseIndent + 1));
+    Vector<bool> expanded((unsigned)(baseIndent + 1));
     expanded[baseIndent] = enable;
 
     contentElement_->DisableLayoutUpdate();
@@ -817,9 +817,9 @@ UIElement* ListView::GetItem(unsigned index) const
     return contentElement_->GetChild(index);
 }
 
-PODVector<UIElement*> ListView::GetItems() const
+Vector<UIElement*> ListView::GetItems() const
 {
-    PODVector<UIElement*> items;
+    Vector<UIElement*> items;
     contentElement_->GetChildren(items);
     return items;
 }
@@ -876,11 +876,11 @@ UIElement* ListView::GetSelectedItem() const
     return contentElement_->GetChild(GetSelection());
 }
 
-PODVector<UIElement*> ListView::GetSelectedItems() const
+Vector<UIElement*> ListView::GetSelectedItems() const
 {
-    PODVector<UIElement*> ret;
+    Vector<UIElement*> ret;
 
-    for (PODVector<unsigned>::ConstIterator i = selections_.Begin(); i != selections_.End(); ++i)
+    for (Vector<unsigned>::ConstIterator i = selections_.Begin(); i != selections_.End(); ++i)
     {
         UIElement* item = GetItem(*i);
         if (item)
@@ -894,7 +894,7 @@ void ListView::CopySelectedItemsToClipboard() const
 {
     String selectedText;
 
-    for (PODVector<unsigned>::ConstIterator i = selections_.Begin(); i != selections_.End(); ++i)
+    for (Vector<unsigned>::ConstIterator i = selections_.Begin(); i != selections_.End(); ++i)
     {
         // Only handle Text UI element
         auto* text = dynamic_cast<Text*>(GetItem(*i));
@@ -1038,7 +1038,7 @@ void ListView::HandleUIMouseClick(StringHash eventType, VariantMap& eventData)
                 {
                     unsigned first = selections_.Front();
                     unsigned last = selections_.Back();
-                    PODVector<unsigned> newSelections = selections_;
+                    Vector<unsigned> newSelections = selections_;
                     if (i == first || i == last)
                     {
                         for (unsigned j = first; j <= last; ++j)

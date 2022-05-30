@@ -245,16 +245,16 @@ void Zone::UpdateAmbientGradient()
         Vector3 minZPosition = worldTransform * Vector3(center.x_, center.y_, boundingBox_.min_.z_);
         Vector3 maxZPosition = worldTransform * Vector3(center.x_, center.y_, boundingBox_.max_.z_);
 
-        PODVector<Zone*> result;
+        Vector<Zone*> result;
         {
-            PointOctreeQuery query(reinterpret_cast<PODVector<Drawable*>&>(result), minZPosition, DRAWABLE_ZONE);
+            PointOctreeQuery query(reinterpret_cast<Vector<Drawable*>&>(result), minZPosition, DRAWABLE_ZONE);
             octant_->GetRoot()->GetDrawables(query);
         }
 
         // Gradient start position: get the highest priority zone that is not this zone
         int bestPriority = M_MIN_INT;
         Zone* bestZone = nullptr;
-        for (PODVector<Zone*>::ConstIterator i = result.Begin(); i != result.End(); ++i)
+        for (Vector<Zone*>::ConstIterator i = result.Begin(); i != result.End(); ++i)
         {
             Zone* zone = *i;
             int priority = zone->GetPriority();
@@ -273,13 +273,13 @@ void Zone::UpdateAmbientGradient()
 
         // Do the same for gradient end position
         {
-            PointOctreeQuery query(reinterpret_cast<PODVector<Drawable*>&>(result), maxZPosition, DRAWABLE_ZONE);
+            PointOctreeQuery query(reinterpret_cast<Vector<Drawable*>&>(result), maxZPosition, DRAWABLE_ZONE);
             octant_->GetRoot()->GetDrawables(query);
         }
         bestPriority = M_MIN_INT;
         bestZone = nullptr;
 
-        for (PODVector<Zone*>::ConstIterator i = result.Begin(); i != result.End(); ++i)
+        for (Vector<Zone*>::ConstIterator i = result.Begin(); i != result.End(); ++i)
         {
             Zone* zone = *i;
             int priority = zone->GetPriority();
@@ -307,11 +307,11 @@ void Zone::ClearDrawablesZone()
 {
     if (octant_ && lastWorldBoundingBox_.Defined())
     {
-        PODVector<Drawable*> result;
+        Vector<Drawable*> result;
         BoxOctreeQuery query(result, lastWorldBoundingBox_, DRAWABLE_GEOMETRY | DRAWABLE_ZONE);
         octant_->GetRoot()->GetDrawables(query);
 
-        for (PODVector<Drawable*>::Iterator i = result.Begin(); i != result.End(); ++i)
+        for (Vector<Drawable*>::Iterator i = result.Begin(); i != result.End(); ++i)
         {
             Drawable* drawable = *i;
             unsigned drawableFlags = drawable->GetDrawableFlags();

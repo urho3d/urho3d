@@ -89,7 +89,7 @@ protected:
     /// Return drawable objects by a ray query, called internally.
     void GetDrawablesInternal(RayOctreeQuery& query) const;
     /// Return drawable objects only for a threaded ray query, called internally.
-    void GetDrawablesOnlyInternal(RayOctreeQuery& query, PODVector<Drawable*>& drawables) const;
+    void GetDrawablesOnlyInternal(RayOctreeQuery& query, Vector<Drawable*>& drawables) const;
 
     /// Increase drawable object count recursively.
     void IncDrawableCount()
@@ -120,7 +120,7 @@ protected:
     /// Bounding box used for drawable object fitting.
     BoundingBox cullingBox_;
     /// Drawable objects.
-    PODVector<Drawable*> drawables_;
+    Vector<Drawable*> drawables_;
     /// Child octants.
     Octant* children_[NUM_OCTANTS]{};
     /// World bounding box center.
@@ -191,13 +191,13 @@ private:
     void UpdateOctreeSize() { SetSize(worldBoundingBox_, numLevels_); }
 
     /// Drawable objects that require update.
-    PODVector<Drawable*> drawableUpdates_;
+    Vector<Drawable*> drawableUpdates_;
     /// Drawable objects that were inserted during threaded update phase.
-    PODVector<Drawable*> threadedDrawableUpdates_;
+    Vector<Drawable*> threadedDrawableUpdates_;
     /// Mutex for octree reinsertions.
     Mutex octreeMutex_;
     /// Ray query temporary list of drawables.
-    mutable PODVector<Drawable*> rayQueryDrawables_;
+    mutable Vector<Drawable*> rayQueryDrawables_;
     /// Subdivision level.
     unsigned numLevels_;
 };

@@ -231,12 +231,12 @@ static const unsigned MAX_BUFFER_AGE = 1000;
 
 static const int MAX_EXTRA_INSTANCING_BUFFER_ELEMENTS = 4;
 
-inline PODVector<VertexElement> CreateInstancingBufferElements(unsigned numExtraElements)
+inline Vector<VertexElement> CreateInstancingBufferElements(unsigned numExtraElements)
 {
     static const unsigned NUM_INSTANCEMATRIX_ELEMENTS = 3;
     static const unsigned FIRST_UNUSED_TEXCOORD = 4;
 
-    PODVector<VertexElement> elements;
+    Vector<VertexElement> elements;
     for (unsigned i = 0; i < NUM_INSTANCEMATRIX_ELEMENTS + numExtraElements; ++i)
         elements.Push(VertexElement(TYPE_VECTOR4, SEM_TEXCOORD, FIRST_UNUSED_TEXCOORD + i, true));
     return elements;
@@ -744,8 +744,8 @@ void Renderer::DrawDebugGeometry(bool depthTest)
             continue;
 
         // Process geometries / lights only once
-        const PODVector<Drawable*>& geometries = view->GetGeometries();
-        const PODVector<Light*>& lights = view->GetLights();
+        const Vector<Drawable*>& geometries = view->GetGeometries();
+        const Vector<Light*>& lights = view->GetLights();
 
         for (unsigned i = 0; i < geometries.Size(); ++i)
         {
@@ -1336,7 +1336,7 @@ bool Renderer::ResizeInstancingBuffer(unsigned numInstances)
     while (newSize < numInstances)
         newSize <<= 1;
 
-    const PODVector<VertexElement> instancingBufferElements = CreateInstancingBufferElements(numExtraInstancingBufferElements_);
+    const Vector<VertexElement> instancingBufferElements = CreateInstancingBufferElements(numExtraInstancingBufferElements_);
     if (!instancingBuffer_->SetSize(newSize, instancingBufferElements, true))
     {
         URHO3D_LOGERROR("Failed to resize instancing buffer to " + String(newSize));
@@ -1545,7 +1545,7 @@ void Renderer::RemoveUnusedBuffers()
 
 void Renderer::ResetShadowMapAllocations()
 {
-    for (HashMap<int, PODVector<Light*>>::Iterator i = shadowMapAllocations_.Begin(); i != shadowMapAllocations_.End(); ++i)
+    for (HashMap<int, Vector<Light*>>::Iterator i = shadowMapAllocations_.Begin(); i != shadowMapAllocations_.End(); ++i)
         i->second_.Clear();
 }
 
@@ -1721,7 +1721,7 @@ void Renderer::LoadPassShaders(Pass* pass, Vector<SharedPtr<ShaderVariation>>& v
 void Renderer::ReleaseMaterialShaders()
 {
     auto* cache = GetSubsystem<ResourceCache>();
-    PODVector<Material*> materials;
+    Vector<Material*> materials;
 
     cache->GetResources<Material>(materials);
 
@@ -1732,7 +1732,7 @@ void Renderer::ReleaseMaterialShaders()
 void Renderer::ReloadTextures()
 {
     auto* cache = GetSubsystem<ResourceCache>();
-    PODVector<Resource*> textures;
+    Vector<Resource*> textures;
 
     cache->GetResources(textures, Texture2D::GetTypeStatic());
     for (unsigned i = 0; i < textures.Size(); ++i)
@@ -1870,7 +1870,7 @@ void Renderer::CreateInstancingBuffer()
     }
 
     instancingBuffer_ = new VertexBuffer(context_);
-    const PODVector<VertexElement> instancingBufferElements = CreateInstancingBufferElements(numExtraInstancingBufferElements_);
+    const Vector<VertexElement> instancingBufferElements = CreateInstancingBufferElements(numExtraInstancingBufferElements_);
     if (!instancingBuffer_->SetSize(INSTANCING_BUFFER_DEFAULT_SIZE, instancingBufferElements, true))
     {
         instancingBuffer_.Reset();

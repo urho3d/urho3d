@@ -164,6 +164,7 @@ public:
     /// @property
     UIElement* GetFrontElement() const;
     /// Return currently dragged elements.
+    /// @nobindtemp
     const Vector<UIElement*> GetDragElements();
 
     /// Return the number of currently dragged elements.
@@ -274,15 +275,15 @@ private:
         /// Texture that UIElement will be rendered into.
         SharedPtr<Texture2D> texture_;
         /// UI rendering batches.
-        PODVector<UIBatch> batches_;
+        Vector<UIBatch> batches_;
         /// UI rendering vertex data.
-        PODVector<float> vertexData_;
+        Vector<float> vertexData_;
         /// UI vertex buffer.
         SharedPtr<VertexBuffer> vertexBuffer_;
         /// UI rendering batches for debug draw.
-        PODVector<UIBatch> debugDrawBatches_;
+        Vector<UIBatch> debugDrawBatches_;
         /// UI rendering vertex data for debug draw.
-        PODVector<float> debugVertexData_;
+        Vector<float> debugVertexData_;
         /// UI debug geometry vertex buffer.
         SharedPtr<VertexBuffer> debugVertexBuffer_;
     };
@@ -292,11 +293,11 @@ private:
     /// Update UI element logic recursively.
     void Update(float timeStep, UIElement* element);
     /// Upload UI geometry into a vertex buffer.
-    void SetVertexData(VertexBuffer* dest, const PODVector<float>& vertexData);
+    void SetVertexData(VertexBuffer* dest, const Vector<float>& vertexData);
     /// Render UI batches to the current rendertarget. Geometry must have been uploaded first.
-    void Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigned batchStart, unsigned batchEnd);
+    void Render(VertexBuffer* buffer, const Vector<UIBatch>& batches, unsigned batchStart, unsigned batchEnd);
     /// Generate batches from an UI element recursively. Skip the cursor element.
-    void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, UIElement* element, IntRect currentScissor);
+    void GetBatches(Vector<UIBatch>& batches, Vector<float>& vertexData, UIElement* element, IntRect currentScissor);
     /// Return UI element at global screen coordinates. Return position converted to element's screen coordinates.
     UIElement* GetElementAt(const IntVector2& position, bool enabledOnly, IntVector2* elementScreenPosition);
     /// Return UI element at screen position recursively.
@@ -380,19 +381,19 @@ private:
     /// Currently focused element.
     WeakPtr<UIElement> focusElement_;
     /// UI rendering batches.
-    PODVector<UIBatch> batches_;
+    Vector<UIBatch> batches_;
     /// UI rendering vertex data.
-    PODVector<float> vertexData_;
+    Vector<float> vertexData_;
     /// UI rendering batches for debug draw.
-    PODVector<UIBatch> debugDrawBatches_;
+    Vector<UIBatch> debugDrawBatches_;
     /// UI rendering vertex data for debug draw.
-    PODVector<float> debugVertexData_;
+    Vector<float> debugVertexData_;
     /// UI vertex buffer.
     SharedPtr<VertexBuffer> vertexBuffer_;
     /// UI debug geometry vertex buffer.
     SharedPtr<VertexBuffer> debugVertexBuffer_;
     /// UI element query vector.
-    PODVector<UIElement*> tempElements_;
+    Vector<UIElement*> tempElements_;
     /// Clipboard text.
     mutable String clipBoard_;
     /// Seconds between clicks to register a double click.

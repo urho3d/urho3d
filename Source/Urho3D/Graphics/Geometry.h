@@ -43,7 +43,7 @@ public:
     /// @property
     void SetLodDistance(float distance);
     /// Override raw vertex data to be returned for CPU-side operations.
-    void SetRawVertexData(const SharedArrayPtr<unsigned char>& data, const PODVector<VertexElement>& elements);
+    void SetRawVertexData(const SharedArrayPtr<unsigned char>& data, const Vector<VertexElement>& elements);
     /// Override raw vertex data to be returned for CPU-side operations using a legacy vertex bitmask.
     void SetRawVertexData(const SharedArrayPtr<unsigned char>& data, unsigned elementMask);
     /// Override raw index data to be returned for CPU-side operations.
@@ -93,10 +93,10 @@ public:
     /// Return buffers' combined hash value for state sorting.
     unsigned short GetBufferHash() const;
     /// Return raw vertex and index data for CPU operations, or null pointers if not available. Will return data of the first vertex buffer if override data not set.
-    void GetRawData(const unsigned char*& vertexData, unsigned& vertexSize, const unsigned char*& indexData, unsigned& indexSize, const PODVector<VertexElement>*& elements) const;
+    void GetRawData(const unsigned char*& vertexData, unsigned& vertexSize, const unsigned char*& indexData, unsigned& indexSize, const Vector<VertexElement>*& elements) const;
     /// Return raw vertex and index data for CPU operations, or null pointers if not available. Will return data of the first vertex buffer if override data not set.
     void GetRawDataShared(SharedArrayPtr<unsigned char>& vertexData, unsigned& vertexSize, SharedArrayPtr<unsigned char>& indexData,
-        unsigned& indexSize, const PODVector<VertexElement>*& elements) const;
+        unsigned& indexSize, const Vector<VertexElement>*& elements) const;
     /// Return ray hit distance or infinity if no hit. Requires raw data to be set. Optionally return hit normal and hit uv coordinates at intersect point.
     float GetHitDistance(const Ray& ray, Vector3* outNormal = nullptr, Vector2* outUV = nullptr) const;
     /// Return whether or not the ray is inside geometry.
@@ -124,7 +124,7 @@ private:
     /// LOD distance.
     float lodDistance_;
     /// Raw vertex data elements.
-    PODVector<VertexElement> rawElements_;
+    Vector<VertexElement> rawElements_;
     /// Raw vertex data override.
     SharedArrayPtr<unsigned char> rawVertexData_;
     /// Raw index data override.

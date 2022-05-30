@@ -12,7 +12,7 @@ namespace Urho3D
 {
 
 const Variant Variant::EMPTY { };
-const PODVector<unsigned char> Variant::emptyBuffer { };
+const Vector<unsigned char> Variant::emptyBuffer { };
 const ResourceRef Variant::emptyResourceRef { };
 const ResourceRefList Variant::emptyResourceRefList { };
 const VariantMap Variant::emptyVariantMap;
@@ -216,10 +216,10 @@ bool Variant::operator ==(const Variant& rhs) const
     }
 }
 
-bool Variant::operator ==(const PODVector<unsigned char>& rhs) const
+bool Variant::operator ==(const Vector<unsigned char>& rhs) const
 {
-    // Use strncmp() instead of PODVector<unsigned char>::operator ==()
-    const PODVector<unsigned char>& buffer = value_.buffer_;
+    // Use strncmp() instead of Vector<unsigned char>::operator ==()
+    const Vector<unsigned char>& buffer = value_.buffer_;
     return type_ == VAR_BUFFER && buffer.Size() == rhs.Size() ?
         strncmp(reinterpret_cast<const char*>(&buffer[0]), reinterpret_cast<const char*>(&rhs[0]), buffer.Size()) == 0 :
         false;
@@ -227,7 +227,7 @@ bool Variant::operator ==(const PODVector<unsigned char>& rhs) const
 
 bool Variant::operator ==(const VectorBuffer& rhs) const
 {
-    const PODVector<unsigned char>& buffer = value_.buffer_;
+    const Vector<unsigned char>& buffer = value_.buffer_;
     return type_ == VAR_BUFFER && buffer.Size() == rhs.GetSize() ?
         strncmp(reinterpret_cast<const char*>(&buffer[0]), reinterpret_cast<const char*>(rhs.GetData()), buffer.Size()) == 0 :
         false;
@@ -376,7 +376,7 @@ void Variant::SetBuffer(const void* data, unsigned size)
         size = 0;
 
     SetType(VAR_BUFFER);
-    PODVector<unsigned char>& buffer = value_.buffer_;
+    Vector<unsigned char>& buffer = value_.buffer_;
     buffer.Resize(size);
     if (size)
         memcpy(&buffer[0], data, size);
@@ -454,7 +454,7 @@ String Variant::ToString() const
 
     case VAR_BUFFER:
         {
-            const PODVector<unsigned char>& buffer = value_.buffer_;
+            const Vector<unsigned char>& buffer = value_.buffer_;
             String ret;
             BufferToString(ret, buffer.Begin().ptr_, buffer.Size());
             return ret;
@@ -613,7 +613,7 @@ void Variant::SetType(VariantType newType)
         break;
 
     case VAR_BUFFER:
-        value_.buffer_.~PODVector<unsigned char>();
+        value_.buffer_.~Vector<unsigned char>();
         break;
 
     case VAR_RESOURCEREF:
@@ -673,7 +673,7 @@ void Variant::SetType(VariantType newType)
         break;
 
     case VAR_BUFFER:
-        new(&value_.buffer_) PODVector<unsigned char>();
+        new(&value_.buffer_) Vector<unsigned char>();
         break;
 
     case VAR_RESOURCEREF:
@@ -817,7 +817,7 @@ template <> const IntVector3& Variant::Get<const IntVector3&>() const
     return GetIntVector3();
 }
 
-template <> const PODVector<unsigned char>& Variant::Get<const PODVector<unsigned char>&>() const
+template <> const Vector<unsigned char>& Variant::Get<const Vector<unsigned char>&>() const
 {
     return GetBuffer();
 }
@@ -922,7 +922,7 @@ template <> IntVector3 Variant::Get<IntVector3>() const
     return GetIntVector3();
 }
 
-template <> PODVector<unsigned char> Variant::Get<PODVector<unsigned char>>() const
+template <> Vector<unsigned char> Variant::Get<Vector<unsigned char>>() const
 {
     return GetBuffer();
 }

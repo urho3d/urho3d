@@ -25,7 +25,7 @@ public:
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     void ApplyAttributes() override;
     /// Process octree raycast. May be called from a worker thread.
-    void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results) override;
+    void ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQueryResult>& results) override;
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
     void UpdateBatches(const FrameInfo& frame) override;
     /// Return number of occlusion geometry triangles.
@@ -69,7 +69,7 @@ private:
     /// Instance nodes.
     Vector<WeakPtr<Node>> instanceNodes_;
     /// World transforms of valid (existing and visible) instances.
-    PODVector<Matrix3x4> worldTransforms_;
+    Vector<Matrix3x4> worldTransforms_;
     /// IDs of instance nodes for serialization.
     mutable VariantVector nodeIDsAttr_;
     /// Number of valid instance node transforms.

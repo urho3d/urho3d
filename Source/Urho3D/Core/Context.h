@@ -34,7 +34,7 @@ public:
     void Remove(Object* object);
 
     /// Receivers. May contain holes during sending.
-    PODVector<Object*> receivers_;
+    Vector<Object*> receivers_;
 
 private:
     /// "In send" recursion counter.
@@ -216,9 +216,9 @@ private:
     /// Event receivers for specific senders' events.
     HashMap<Object*, HashMap<StringHash, SharedPtr<EventReceiverGroup>>> specificEventReceivers_;
     /// Event sender stack.
-    PODVector<Object*> eventSenders_;
+    Vector<Object*> eventSenders_;
     /// Event data stack.
-    PODVector<VariantMap*> eventDataMaps_;
+    Vector<VariantMap*> eventDataMaps_;
     /// Active event handler. Not stored in a stack for performance reasons; is needed only in esoteric cases.
     EventHandler* eventHandler_;
     /// Object categories.

@@ -41,7 +41,7 @@ public:
     static void RegisterObject(Context* context);
 
     /// Process octree raycast. May be called from a worker thread.
-    void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results) override;
+    void ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQueryResult>& results) override;
     /// Return the geometry for a specific LOD level.
     Geometry* GetLodGeometry(unsigned batchIndex, unsigned level) override;
     /// Return number of occlusion geometry triangles.
@@ -99,17 +99,17 @@ public:
     Material* GetMaterial(unsigned index = 0) const;
 
     /// Return all vertices. These can be edited; calling Commit() updates the vertex buffer.
-    Vector<PODVector<CustomGeometryVertex>>& GetVertices() { return vertices_; }
+    Vector<Vector<CustomGeometryVertex>>& GetVertices() { return vertices_; }
 
     /// Return a vertex in a geometry for editing, or null if out of bounds. After the edits are finished, calling Commit() updates  the vertex buffer.
     CustomGeometryVertex* GetVertex(unsigned geometryIndex, unsigned vertexNum);
 
     /// Set geometry data attribute.
-    void SetGeometryDataAttr(const PODVector<unsigned char>& value);
+    void SetGeometryDataAttr(const Vector<unsigned char>& value);
     /// Set materials attribute.
     void SetMaterialsAttr(const ResourceRefList& value);
     /// Return geometry data attribute.
-    PODVector<unsigned char> GetGeometryDataAttr() const;
+    Vector<unsigned char> GetGeometryDataAttr() const;
     /// Return materials attribute.
     const ResourceRefList& GetMaterialsAttr() const;
 
@@ -119,9 +119,9 @@ protected:
 
 private:
     /// Primitive type per geometry.
-    PODVector<PrimitiveType> primitiveTypes_;
+    Vector<PrimitiveType> primitiveTypes_;
     /// Source vertices per geometry.
-    Vector<PODVector<CustomGeometryVertex>> vertices_;
+    Vector<Vector<CustomGeometryVertex>> vertices_;
     /// All geometries.
     Vector<SharedPtr<Geometry>> geometries_;
     /// Vertex buffer.

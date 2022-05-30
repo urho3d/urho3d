@@ -946,12 +946,12 @@ void Graphics::DrawInstanced_OGL(PrimitiveType type, unsigned indexStart, unsign
 void Graphics::SetVertexBuffer_OGL(VertexBuffer* buffer)
 {
     // Note: this is not multi-instance safe
-    static PODVector<VertexBuffer*> vertexBuffers(1);
+    static Vector<VertexBuffer*> vertexBuffers(1);
     vertexBuffers[0] = buffer;
     SetVertexBuffers_OGL(vertexBuffers);
 }
 
-bool Graphics::SetVertexBuffers_OGL(const PODVector<VertexBuffer*>& buffers, unsigned instanceOffset)
+bool Graphics::SetVertexBuffers_OGL(const Vector<VertexBuffer*>& buffers, unsigned instanceOffset)
 {
     if (buffers.Size() > MAX_VERTEX_STREAMS)
     {
@@ -984,7 +984,7 @@ bool Graphics::SetVertexBuffers_OGL(const PODVector<VertexBuffer*>& buffers, uns
 
 bool Graphics::SetVertexBuffers_OGL(const Vector<SharedPtr<VertexBuffer>>& buffers, unsigned instanceOffset)
 {
-    return SetVertexBuffers_OGL(reinterpret_cast<const PODVector<VertexBuffer*>&>(buffers), instanceOffset);
+    return SetVertexBuffers_OGL(reinterpret_cast<const Vector<VertexBuffer*>&>(buffers), instanceOffset);
 }
 
 void Graphics::SetIndexBuffer_OGL(IndexBuffer* buffer)
@@ -1620,7 +1620,7 @@ void Graphics::SetTextureParametersDirty_OGL()
 {
     MutexLock lock(gpuObjectMutex_);
 
-    for (PODVector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
+    for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
     {
         auto* texture = dynamic_cast<Texture*>(*i);
         if (texture)
@@ -2065,9 +2065,9 @@ bool Graphics::IsDeviceLost_OGL() const
     return GetImpl_OGL()->context_ == nullptr;
 }
 
-PODVector<int> Graphics::GetMultiSampleLevels_OGL() const
+Vector<int> Graphics::GetMultiSampleLevels_OGL() const
 {
-    PODVector<int> ret;
+    Vector<int> ret;
     // No multisampling always supported
     ret.Push(1);
 
@@ -2390,14 +2390,14 @@ void Graphics::Release_OGL(bool clearGPUObjects, bool closeWindow)
             // Shader programs are also GPU objects; clear them first to avoid list modification during iteration
             impl->shaderPrograms_.Clear();
 
-            for (PODVector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
+            for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
                 (*i)->Release();
             gpuObjects_.Clear();
         }
         else
         {
             // We are not shutting down, but recreating the context: mark GPU objects lost
-            for (PODVector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
+            for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
                 (*i)->OnDeviceLost();
 
             // In this case clear shader programs last so that they do not attempt to delete their OpenGL program
@@ -2542,7 +2542,7 @@ void Graphics::Restore_OGL()
     {
         MutexLock lock(gpuObjectMutex_);
 
-        for (PODVector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
+        for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
             (*i)->OnDeviceReset();
     }
 
@@ -2863,7 +2863,7 @@ void Graphics::PrepareDraw_OGL()
 #ifndef GL_ES_VERSION_2_0
     if (gl3Support)
     {
-        for (PODVector<ConstantBuffer*>::Iterator i = impl->dirtyConstantBuffers_.Begin(); i != impl->dirtyConstantBuffers_.End(); ++i)
+        for (Vector<ConstantBuffer*>::Iterator i = impl->dirtyConstantBuffers_.Begin(); i != impl->dirtyConstantBuffers_.End(); ++i)
             (*i)->Apply();
         impl->dirtyConstantBuffers_.Clear();
     }
@@ -3101,9 +3101,9 @@ void Graphics::PrepareDraw_OGL()
             if (!buffer || !buffer->GetGPUObjectName() || !impl->vertexAttributes_)
                 continue;
 
-            const PODVector<VertexElement>& elements = buffer->GetElements();
+            const Vector<VertexElement>& elements = buffer->GetElements();
 
-            for (PODVector<VertexElement>::ConstIterator j = elements.Begin(); j != elements.End(); ++j)
+            for (Vector<VertexElement>::ConstIterator j = elements.Begin(); j != elements.End(); ++j)
             {
                 const VertexElement& element = *j;
                 HashMap<Pair<unsigned char, unsigned char>, unsigned>::ConstIterator k =

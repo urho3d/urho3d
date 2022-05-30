@@ -1712,8 +1712,8 @@ static void Polyhedron__Polyhedron_constspFrustumamp(Polyhedron* _ptr, const Fru
 // class Polyhedron | File: ../Math/Polyhedron.h
 static void Register_Polyhedron(asIScriptEngine* engine)
 {
-    // explicit Polyhedron::Polyhedron(const Vector<PODVector<Vector3>>& faces)
-    // Error: type "const Vector<PODVector<Vector3>>&" can not automatically bind
+    // explicit Polyhedron::Polyhedron(const Vector<Vector<Vector3>>& faces)
+    // Error: type "const Vector<Vector<Vector3>>&" can not automatically bind
 
     // Polyhedron::Polyhedron(const Polyhedron& polyhedron)
     engine->RegisterObjectBehaviour("Polyhedron", asBEHAVE_CONSTRUCT, "void f(const Polyhedron&in)", AS_FUNCTION_OBJFIRST(Polyhedron__Polyhedron_constspPolyhedronamp), AS_CALL_CDECL_OBJFIRST);
@@ -2318,6 +2318,13 @@ static void Spline__Spline_InterpolationMode(Spline* _ptr, InterpolationMode mod
     new(_ptr) Spline(mode);
 }
 
+// explicit Spline::Spline(const Vector<Variant>& knots, InterpolationMode mode = BEZIER_CURVE)
+static void Spline__Spline_constspVectorlesVariantgreamp_InterpolationMode(Spline* _ptr, CScriptArray* knots_conv, InterpolationMode mode)
+{
+    Vector<Variant> knots = ArrayToVector<Variant>(knots_conv);
+    new(_ptr) Spline(knots, mode);
+}
+
 // Spline::Spline(const Spline& rhs) = default
 static void Spline__Spline_constspSplineamp(Spline* _ptr, const Spline& rhs)
 {
@@ -2327,11 +2334,10 @@ static void Spline__Spline_constspSplineamp(Spline* _ptr, const Spline& rhs)
 // class Spline | File: ../Core/Spline.h
 static void Register_Spline(asIScriptEngine* engine)
 {
-    // explicit Spline::Spline(const Vector<Variant>& knots, InterpolationMode mode = BEZIER_CURVE)
-    // Error: type "const Vector<Variant>&" can not automatically bind
-
     // explicit Spline::Spline(InterpolationMode mode)
     engine->RegisterObjectBehaviour("Spline", asBEHAVE_CONSTRUCT, "void f(InterpolationMode)", AS_FUNCTION_OBJFIRST(Spline__Spline_InterpolationMode), AS_CALL_CDECL_OBJFIRST);
+    // explicit Spline::Spline(const Vector<Variant>& knots, InterpolationMode mode = BEZIER_CURVE)
+    engine->RegisterObjectBehaviour("Spline", asBEHAVE_CONSTRUCT, "void f(Array<Variant>@+, InterpolationMode = BEZIER_CURVE)", AS_FUNCTION_OBJFIRST(Spline__Spline_constspVectorlesVariantgreamp_InterpolationMode), AS_CALL_CDECL_OBJFIRST);
     // Spline::Spline(const Spline& rhs) = default
     engine->RegisterObjectBehaviour("Spline", asBEHAVE_CONSTRUCT, "void f(const Spline&in)", AS_FUNCTION_OBJFIRST(Spline__Spline_constspSplineamp), AS_CALL_CDECL_OBJFIRST);
 
@@ -2675,8 +2681,8 @@ static void Register_TrailPoint(asIScriptEngine* engine)
 // class UIBatch | File: ../UI/UIBatch.h
 static void Register_UIBatch(asIScriptEngine* engine)
 {
-    // UIBatch::UIBatch(UIElement* element, BlendMode blendMode, const IntRect& scissor, Texture* texture, PODVector<float>* vertexData)
-    // Error: type "PODVector<float>*" can not automatically bind
+    // UIBatch::UIBatch(UIElement* element, BlendMode blendMode, const IntRect& scissor, Texture* texture, Vector<float>* vertexData)
+    // Error: type "Vector<float>*" can not automatically bind
 
     // UIBatch::~UIBatch() | Implicitly-declared
     engine->RegisterObjectBehaviour("UIBatch", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(UIBatch), AS_CALL_CDECL_OBJFIRST);
@@ -2909,10 +2915,10 @@ static void Register_Variant(asIScriptEngine* engine)
 {
     // Variant::Variant(VariantType type, const char* value)
     // Error: type "const char*" can not automatically bind
-    // Variant::Variant(const PODVector<unsigned char>& value)
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
     // Variant::Variant(const VariantVector& value)
     // Error: type "const VariantVector&" can not automatically bind
+    // Variant::Variant(const Vector<unsigned char>& value)
+    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // Variant::Variant(const char* type, const char* value)
     // Error: type "const char*" can not automatically bind
     // Variant::Variant(const char* value)
@@ -4835,8 +4841,8 @@ static void Register_VectorBuffer(asIScriptEngine* engine)
 {
     // VectorBuffer::VectorBuffer(const void* data, unsigned size)
     // Error: type "const void*" can not automatically bind
-    // explicit VectorBuffer::VectorBuffer(const PODVector<unsigned char>& data)
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
+    // explicit VectorBuffer::VectorBuffer(const Vector<unsigned char>& data)
+    // Error: type "const Vector<unsigned char>&" can not automatically bind
 
     // VectorBuffer::VectorBuffer(Deserializer& source, unsigned size)
     engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_CONSTRUCT, "void f(Deserializer&, uint)", AS_FUNCTION_OBJFIRST(VectorBuffer__VectorBuffer_Deserializeramp_unsigned), AS_CALL_CDECL_OBJFIRST);

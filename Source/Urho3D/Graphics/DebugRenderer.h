@@ -157,13 +157,13 @@ private:
     void HandleEndFrame(StringHash eventType, VariantMap& eventData);
 
     /// Lines rendered with depth test.
-    PODVector<DebugLine> lines_;
+    Vector<DebugLine> lines_;
     /// Lines rendered without depth test.
-    PODVector<DebugLine> noDepthLines_;
+    Vector<DebugLine> noDepthLines_;
     /// Triangles rendered with depth test.
-    PODVector<DebugTriangle> triangles_;
+    Vector<DebugTriangle> triangles_;
     /// Triangles rendered without depth test.
-    PODVector<DebugTriangle> noDepthTriangles_;
+    Vector<DebugTriangle> noDepthTriangles_;
     /// View transform.
     Matrix3x4 view_;
     /// Projection transform.

@@ -48,7 +48,7 @@ void AnimationController::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Animations", GetAnimationsAttr, SetAnimationsAttr, VariantVector, Variant::emptyVariantVector,
         AM_FILE | AM_NOEDIT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Network Animations", GetNetAnimationsAttr, SetNetAnimationsAttr, PODVector<unsigned char>,
+    URHO3D_ACCESSOR_ATTRIBUTE("Network Animations", GetNetAnimationsAttr, SetNetAnimationsAttr, Vector<unsigned char>,
         Variant::emptyBuffer, AM_NET | AM_LATESTDATA | AM_NOEDIT);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Node Animation States", GetNodeAnimationStatesAttr, SetNodeAnimationStatesAttr, VariantVector,
         Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
@@ -590,7 +590,7 @@ void AnimationController::SetAnimationsAttr(const VariantVector& value)
     }
 }
 
-void AnimationController::SetNetAnimationsAttr(const PODVector<unsigned char>& value)
+void AnimationController::SetNetAnimationsAttr(const Vector<unsigned char>& value)
 {
     MemoryBuffer buf(value);
 
@@ -739,7 +739,7 @@ VariantVector AnimationController::GetAnimationsAttr() const
     return ret;
 }
 
-const PODVector<unsigned char>& AnimationController::GetNetAnimationsAttr() const
+const Vector<unsigned char>& AnimationController::GetNetAnimationsAttr() const
 {
     attrBuffer_.Clear();
 

@@ -106,7 +106,7 @@ void RibbonTrail::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Sort By Distance", IsSorted, SetSorted, bool, false, AM_DEFAULT);
 }
 
-void RibbonTrail::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
+void RibbonTrail::ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQueryResult>& results)
 {
     // If no trail-level testing, use the Drawable test
     if (query.level_ < RAY_TRIANGLE)

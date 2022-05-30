@@ -339,7 +339,7 @@ Variant ValueAnimation::GetAnimationValue(float scaledTime) const
     }
 }
 
-void ValueAnimation::GetEventFrames(float beginTime, float endTime, PODVector<const VAnimEventFrame*>& eventFrames) const
+void ValueAnimation::GetEventFrames(float beginTime, float endTime, Vector<const VAnimEventFrame*>& eventFrames) const
 {
     for (unsigned i = 0; i < eventFrames_.Size(); ++i)
     {

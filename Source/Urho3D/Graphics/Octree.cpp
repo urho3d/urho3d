@@ -63,7 +63,7 @@ Octant::~Octant()
     if (root_)
     {
         // Remove the drawables (if any) from this octant to the root octant
-        for (PODVector<Drawable*>::Iterator i = drawables_.Begin(); i != drawables_.End(); ++i)
+        for (Vector<Drawable*>::Iterator i = drawables_.Begin(); i != drawables_.End(); ++i)
         {
             (*i)->SetOctant(root_);
             root_->drawables_.Push(*i);
@@ -175,7 +175,7 @@ void Octant::ResetRoot()
     root_ = nullptr;
 
     // The whole octree is being destroyed, just detach the drawables
-    for (PODVector<Drawable*>::Iterator i = drawables_.Begin(); i != drawables_.End(); ++i)
+    for (Vector<Drawable*>::Iterator i = drawables_.Begin(); i != drawables_.End(); ++i)
         (*i)->SetOctant(nullptr);
 
     for (auto& child : children_)
@@ -262,7 +262,7 @@ void Octant::GetDrawablesInternal(RayOctreeQuery& query) const
     }
 }
 
-void Octant::GetDrawablesOnlyInternal(RayOctreeQuery& query, PODVector<Drawable*>& drawables) const
+void Octant::GetDrawablesOnlyInternal(RayOctreeQuery& query, Vector<Drawable*>& drawables) const
 {
     float octantDist = query.ray_.HitDistance(cullingBox_);
     if (octantDist >= query.maxDistance_)
@@ -364,7 +364,7 @@ void Octree::Update(const FrameInfo& frame)
         int numWorkItems = queue->GetNumThreads() + 1; // Worker threads + main thread
         int drawablesPerItem = Max((int)(drawableUpdates_.Size() / numWorkItems), 1);
 
-        PODVector<Drawable*>::Iterator start = drawableUpdates_.Begin();
+        Vector<Drawable*>::Iterator start = drawableUpdates_.Begin();
         // Create a work item for each thread
         for (int i = 0; i < numWorkItems; ++i)
         {
@@ -373,7 +373,7 @@ void Octree::Update(const FrameInfo& frame)
             item->workFunction_ = UpdateDrawablesWork;
             item->aux_ = const_cast<FrameInfo*>(&frame);
 
-            PODVector<Drawable*>::Iterator end = drawableUpdates_.End();
+            Vector<Drawable*>::Iterator end = drawableUpdates_.End();
             if (i < numWorkItems - 1 && end - start > drawablesPerItem)
                 end = start + drawablesPerItem;
 
@@ -393,7 +393,7 @@ void Octree::Update(const FrameInfo& frame)
     {
         URHO3D_PROFILE(UpdateDrawablesQueuedDuringUpdate);
 
-        for (PODVector<Drawable*>::ConstIterator i = threadedDrawableUpdates_.Begin(); i != threadedDrawableUpdates_.End(); ++i)
+        for (Vector<Drawable*>::ConstIterator i = threadedDrawableUpdates_.Begin(); i != threadedDrawableUpdates_.End(); ++i)
         {
             Drawable* drawable = *i;
             if (drawable)
@@ -424,7 +424,7 @@ void Octree::Update(const FrameInfo& frame)
     {
         URHO3D_PROFILE(ReinsertToOctree);
 
-        for (PODVector<Drawable*>::Iterator i = drawableUpdates_.Begin(); i != drawableUpdates_.End(); ++i)
+        for (Vector<Drawable*>::Iterator i = drawableUpdates_.Begin(); i != drawableUpdates_.End(); ++i)
         {
             Drawable* drawable = *i;
             drawable->updateQueued_ = false;
@@ -497,7 +497,7 @@ void Octree::RaycastSingle(RayOctreeQuery& query) const
     GetDrawablesOnlyInternal(query, rayQueryDrawables_);
 
     // Sort by increasing hit distance to AABB
-    for (PODVector<Drawable*>::Iterator i = rayQueryDrawables_.Begin(); i != rayQueryDrawables_.End(); ++i)
+    for (Vector<Drawable*>::Iterator i = rayQueryDrawables_.Begin(); i != rayQueryDrawables_.End(); ++i)
     {
         Drawable* drawable = *i;
         drawable->SetSortValue(query.ray_.HitDistance(drawable->GetWorldBoundingBox()));
@@ -507,7 +507,7 @@ void Octree::RaycastSingle(RayOctreeQuery& query) const
 
     // Then do the actual test according to the query, and early-out as possible
     float closestHit = M_INFINITY;
-    for (PODVector<Drawable*>::Iterator i = rayQueryDrawables_.Begin(); i != rayQueryDrawables_.End(); ++i)
+    for (Vector<Drawable*>::Iterator i = rayQueryDrawables_.Begin(); i != rayQueryDrawables_.End(); ++i)
     {
         Drawable* drawable = *i;
         if (drawable->GetSortValue() < Min(closestHit, query.maxDistance_))

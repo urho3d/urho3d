@@ -124,7 +124,7 @@ private:
     /// Currently bound constant buffers.
     ConstantBuffer* constantBuffers_[MAX_SHADER_PARAMETER_GROUPS * 2]{};
     /// Dirty constant buffers.
-    PODVector<ConstantBuffer*> dirtyConstantBuffers_;
+    Vector<ConstantBuffer*> dirtyConstantBuffers_;
     /// Last used instance data offset.
     unsigned lastInstanceOffset_{};
     /// Map for additional depth textures, to emulate Direct3D9 ability to mix render texture and backbuffer rendering.

@@ -56,7 +56,7 @@ public:
     /// @nobind
     static void RegisterObject(Context* context);
     /// Process octree raycast. May be called from a worker thread.
-    void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results) override;
+    void ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQueryResult>& results) override;
     /// Handle enabled/disabled state change.
     void OnSetEnabled() override;
     /// Update before octree reinsertion. Is called from a main thread.
@@ -189,7 +189,7 @@ protected:
     /// Mark vertex buffer to need an update.
     void MarkPositionsDirty();
     /// Tails.
-    PODVector<TrailPoint> points_;
+    Vector<TrailPoint> points_;
     /// Tails sorted flag.
     bool sorted_;
     /// Animation LOD bias.

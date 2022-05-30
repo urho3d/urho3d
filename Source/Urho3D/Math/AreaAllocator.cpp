@@ -44,14 +44,14 @@ bool AreaAllocator::Allocate(int width, int height, int& x, int& y)
     if (height < 0)
         height = 0;
 
-    PODVector<IntRect>::Iterator best;
+    Vector<IntRect>::Iterator best;
     int bestFreeArea;
 
     for (;;)
     {
         best = freeAreas_.End();
         bestFreeArea = M_MAX_INT;
-        for (PODVector<IntRect>::Iterator i = freeAreas_.Begin(); i != freeAreas_.End(); ++i)
+        for (Vector<IntRect>::Iterator i = freeAreas_.Begin(); i != freeAreas_.End(); ++i)
         {
             int freeWidth = i->Width();
             int freeHeight = i->Height();

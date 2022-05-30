@@ -164,7 +164,7 @@ void Urho2DConstraints::CreateScene()
     auto* polygonBody = polygon->CreateComponent<RigidBody2D>();
     polygonBody->SetBodyType(BT_DYNAMIC);
     auto* polygonShape = polygon->CreateComponent<CollisionPolygon2D>();
-    // TODO: create from PODVector<Vector2> using SetVertices()
+    // TODO: create from Vector<Vector2> using SetVertices()
     polygonShape->SetVertexCount(6); // Set number of vertices (mandatory when using SetVertex())
     polygonShape->SetVertex(0, Vector2(-0.8f, -0.3f));
     polygonShape->SetVertex(1, Vector2(0.5f, -0.8f));

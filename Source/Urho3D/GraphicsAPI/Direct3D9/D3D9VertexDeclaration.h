@@ -35,9 +35,9 @@ class URHO3D_API VertexDeclaration_D3D9 : public RefCounted
 {
 public:
     /// Construct with a single buffer's vertex element list.
-    VertexDeclaration_D3D9(Graphics* graphics, const PODVector<VertexElement>& srcElements);
+    VertexDeclaration_D3D9(Graphics* graphics, const Vector<VertexElement>& srcElements);
     /// Construct with vertex buffers to base declaration on. Higher index buffers will override semantics on lower indices.
-    VertexDeclaration_D3D9(Graphics* graphics, const PODVector<VertexBuffer*>& buffers);
+    VertexDeclaration_D3D9(Graphics* graphics, const Vector<VertexBuffer*>& buffers);
     /// Construct with vertex buffers (shared pointer vector) to base declaration on. Higher index buffers will override semantics on lower indices.
     VertexDeclaration_D3D9(Graphics* graphics, const Vector<SharedPtr<VertexBuffer>>& buffers);
     /// Destruct.
@@ -48,7 +48,7 @@ public:
 
 private:
     /// Create declaration.
-    void Create(Graphics* graphics, const PODVector<VertexDeclarationElement_D3D9>& elements);
+    void Create(Graphics* graphics, const Vector<VertexDeclarationElement_D3D9>& elements);
     /// Release declaration.
     void Release();
 

@@ -102,7 +102,7 @@ void AnimatedModel::RegisterObject(Context* context)
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Animation States", GetAnimationStatesAttr, SetAnimationStatesAttr,
         VariantVector, Variant::emptyVariantVector, AM_FILE)
         .SetMetadata(AttributeMetadata::P_VECTOR_STRUCT_ELEMENTS, animationStatesStructureElementNames);
-    URHO3D_ACCESSOR_ATTRIBUTE("Morphs", GetMorphsAttr, SetMorphsAttr, PODVector<unsigned char>, Variant::emptyBuffer,
+    URHO3D_ACCESSOR_ATTRIBUTE("Morphs", GetMorphsAttr, SetMorphsAttr, Vector<unsigned char>, Variant::emptyBuffer,
         AM_DEFAULT | AM_NOEDIT);
 }
 
@@ -139,7 +139,7 @@ void AnimatedModel::ApplyAttributes()
         AssignBoneNodes();
 }
 
-void AnimatedModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
+void AnimatedModel::ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQueryResult>& results)
 {
     // If no bones or no bone-level testing, use the StaticModel test
     RayQueryLevel level = query.level_;
@@ -334,7 +334,7 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
         // Copy the subgeometry & LOD level structure
         SetNumGeometries(model->GetNumGeometries());
         const Vector<Vector<SharedPtr<Geometry>>>& geometries = model->GetGeometries();
-        const PODVector<Vector3>& geometryCenters = model->GetGeometryCenters();
+        const Vector<Vector3>& geometryCenters = model->GetGeometryCenters();
         for (unsigned i = 0; i < geometries.Size(); ++i)
         {
             geometries_[i] = geometries[i];
@@ -342,7 +342,7 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
         }
 
         // Copy geometry bone mappings
-        const Vector<PODVector<unsigned>>& geometryBoneMappings = model->GetGeometryBoneMappings();
+        const Vector<Vector<unsigned>>& geometryBoneMappings = model->GetGeometryBoneMappings();
         geometryBoneMappings_.Clear();
         geometryBoneMappings_.Reserve(geometryBoneMappings.Size());
         for (unsigned i = 0; i < geometryBoneMappings.Size(); ++i)
@@ -546,7 +546,7 @@ void AnimatedModel::SetMorphWeight(unsigned index, float weight)
         // For a master model, set the same morph weight on non-master models
         if (isMaster_)
         {
-            PODVector<AnimatedModel*> models;
+            Vector<AnimatedModel*> models;
             GetComponents<AnimatedModel>(models);
 
             // Indexing might not be the same, so use the name hash instead
@@ -594,7 +594,7 @@ void AnimatedModel::ResetMorphWeights()
     // For a master model, reset weights on non-master models
     if (isMaster_)
     {
-        PODVector<AnimatedModel*> models;
+        Vector<AnimatedModel*> models;
         GetComponents<AnimatedModel>(models);
 
         for (unsigned i = 1; i < models.Size(); ++i)
@@ -834,7 +834,7 @@ void AnimatedModel::SetAnimationStatesAttr(const VariantVector& value)
     }
 }
 
-void AnimatedModel::SetMorphsAttr(const PODVector<unsigned char>& value)
+void AnimatedModel::SetMorphsAttr(const Vector<unsigned char>& value)
 {
     for (unsigned index = 0; index < value.Size(); ++index)
         SetMorphWeight(index, (float)value[index] / 255.0f);
@@ -875,7 +875,7 @@ VariantVector AnimatedModel::GetAnimationStatesAttr() const
     return ret;
 }
 
-const PODVector<unsigned char>& AnimatedModel::GetMorphsAttr() const
+const Vector<unsigned char>& AnimatedModel::GetMorphsAttr() const
 {
     attrBuffer_.Clear();
     for (Vector<ModelMorph>::ConstIterator i = morphs_.Begin(); i != morphs_.End(); ++i)
@@ -994,7 +994,7 @@ void AnimatedModel::AssignBoneNodes()
 void AnimatedModel::FinalizeBoneBoundingBoxes()
 {
     Vector<Bone>& bones = skeleton_.GetModifiableBones();
-    PODVector<AnimatedModel*> models;
+    Vector<AnimatedModel*> models;
     GetComponents<AnimatedModel>(models);
 
     if (models.Size() > 1)
@@ -1013,7 +1013,7 @@ void AnimatedModel::FinalizeBoneBoundingBoxes()
 
         // Get matching bones from all non-master models and merge their bone bounding information
         // to prevent culling errors (master model may not have geometry in all bones, or the bounds are smaller)
-        for (PODVector<AnimatedModel*>::Iterator i = models.Begin(); i != models.End(); ++i)
+        for (Vector<AnimatedModel*>::Iterator i = models.Begin(); i != models.End(); ++i)
         {
             if ((*i) == this)
                 continue;

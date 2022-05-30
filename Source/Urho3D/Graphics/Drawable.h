@@ -108,7 +108,7 @@ public:
     /// Handle enabled/disabled state change.
     void OnSetEnabled() override;
     /// Process octree raycast. May be called from a worker thread.
-    virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results);
+    virtual void ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQueryResult>& results);
     /// Update before octree reinsertion. Is called from a worker thread.
     virtual void Update(const FrameInfo& frame) { }
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
@@ -280,10 +280,10 @@ public:
     bool HasBasePass(unsigned batchIndex) const { return (basePassFlags_ & (1u << batchIndex)) != 0; }
 
     /// Return per-pixel lights.
-    const PODVector<Light*>& GetLights() const { return lights_; }
+    const Vector<Light*>& GetLights() const { return lights_; }
 
     /// Return per-vertex lights.
-    const PODVector<Light*>& GetVertexLights() const { return vertexLights_; }
+    const Vector<Light*>& GetVertexLights() const { return vertexLights_; }
 
     /// Return the first added per-pixel light.
     Light* GetFirstLight() const { return firstLight_; }
@@ -388,13 +388,13 @@ protected:
     /// Maximum per-pixel lights.
     unsigned maxLights_;
     /// List of cameras from which is seen on the current frame.
-    PODVector<Camera*> viewCameras_;
+    Vector<Camera*> viewCameras_;
     /// First per-pixel light added this frame.
     Light* firstLight_;
     /// Per-pixel lights affecting this drawable.
-    PODVector<Light*> lights_;
+    Vector<Light*> lights_;
     /// Per-vertex lights affecting this drawable.
-    PODVector<Light*> vertexLights_;
+    Vector<Light*> vertexLights_;
 };
 
 inline bool CompareDrawables(Drawable* lhs, Drawable* rhs)
@@ -402,6 +402,6 @@ inline bool CompareDrawables(Drawable* lhs, Drawable* rhs)
     return lhs->GetSortValue() < rhs->GetSortValue();
 }
 
-URHO3D_API bool WriteDrawablesToOBJ(const PODVector<Drawable*>& drawables, File* outputFile, bool asZUp, bool asRightHanded, bool writeLightmapUV = false);
+URHO3D_API bool WriteDrawablesToOBJ(const Vector<Drawable*>& drawables, File* outputFile, bool asZUp, bool asRightHanded, bool writeLightmapUV = false);
 
 }

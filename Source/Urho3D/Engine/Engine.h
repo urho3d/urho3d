@@ -125,7 +125,7 @@ private:
     /// Frame update timer.
     HiresTimer frameTimer_;
     /// Previous timesteps for smoothing.
-    PODVector<float> lastTimeSteps_;
+    Vector<float> lastTimeSteps_;
     /// Next frame timestep in seconds.
     float timeStep_;
     /// How many frames to average for the smoothed timestep.

@@ -13,7 +13,7 @@
 namespace Urho3D
 {
 
-// virtual PODVector<unsigned char> NavigationMesh::GetTileData(const IntVector2& tile) const | File: ../Navigation/NavigationMesh.h
+// virtual Vector<unsigned char> NavigationMesh::GetTileData(const IntVector2& tile) const | File: ../Navigation/NavigationMesh.h
 template <class T> VectorBuffer NavigationMesh_GetTileData(const IntVector2& tile, const T* ptr)
 {
     VectorBuffer buffer;
@@ -21,7 +21,7 @@ template <class T> VectorBuffer NavigationMesh_GetTileData(const IntVector2& til
     return buffer;
 }
 
-// virtual bool NavigationMesh::AddTile(const PODVector<unsigned char>& tileData) | File: ../Navigation/NavigationMesh.h
+// virtual bool NavigationMesh::AddTile(const Vector<unsigned char>& tileData) | File: ../Navigation/NavigationMesh.h
 template <class T> bool NavigationMesh_AddTile(const VectorBuffer& tileData, T* ptr)
 {
     return ptr->AddTile(tileData.GetBuffer());
@@ -63,19 +63,19 @@ template <class T> Vector3 NavigationMesh_MoveAlongSurface(const Vector3& start,
     return ptr->MoveAlongSurface(start, end, extents, maxVisited);
 }
 
-// void NavigationMesh::FindPath(PODVector<Vector3>& dest, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE, const dtQueryFilter* filter = nullptr) | File: ../Navigation/NavigationMesh.h
+// void NavigationMesh::FindPath(Vector<Vector3>& dest, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE, const dtQueryFilter* filter = nullptr) | File: ../Navigation/NavigationMesh.h
 template <class T> CScriptArray* NavigationMesh_FindPath(const Vector3& start, const Vector3& end, const Vector3& extents, T* ptr)
 {
-    PODVector<Vector3> dest;
+    Vector<Vector3> dest;
     ptr->FindPath(dest, start, end, extents);
     return VectorToArray<Vector3>(dest, "Array<Vector3>");
 }
 
 #define REGISTER_MEMBERS_MANUAL_PART_NavigationMesh() \
-    /* virtual PODVector<unsigned char> NavigationMesh::GetTileData(const IntVector2& tile) const | File: ../Navigation/NavigationMesh.h */ \
+    /* virtual Vector<unsigned char> NavigationMesh::GetTileData(const IntVector2& tile) const | File: ../Navigation/NavigationMesh.h */ \
     engine->RegisterObjectMethod(className, "VectorBuffer GetTileData(const IntVector2&) const", AS_FUNCTION_OBJLAST(NavigationMesh_GetTileData<T>), AS_CALL_CDECL_OBJLAST); \
     \
-    /* virtual bool NavigationMesh::AddTile(const PODVector<unsigned char>& tileData) | File: ../Navigation/NavigationMesh.h */ \
+    /* virtual bool NavigationMesh::AddTile(const Vector<unsigned char>& tileData) | File: ../Navigation/NavigationMesh.h */ \
     engine->RegisterObjectMethod(className, "bool AddTile(const VectorBuffer&in) const", AS_FUNCTION_OBJLAST(NavigationMesh_AddTile<T>), AS_CALL_CDECL_OBJLAST); \
     \
     /* Vector3 NavigationMesh::FindNearestPoint(const Vector3& point, const Vector3& extents = Vector3::ONE, const dtQueryFilter* filter = nullptr, dtPolyRef* nearestRef = nullptr) | File: ../Navigation/NavigationMesh.h */ \
@@ -96,7 +96,7 @@ template <class T> CScriptArray* NavigationMesh_FindPath(const Vector3& start, c
     /* Vector3 NavigationMesh::MoveAlongSurface(const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE, int maxVisited = 3, const dtQueryFilter* filter = nullptr)  | File: ../Navigation/NavigationMesh.h */ \
     engine->RegisterObjectMethod(className, "Vector3 MoveAlongSurface(const Vector3&in, const Vector3&in, const Vector3&in = Vector3::ONE, int = 3)", AS_FUNCTION_OBJLAST(NavigationMesh_MoveAlongSurface<T>), AS_CALL_CDECL_OBJLAST); \
     \
-    /* void NavigationMesh::FindPath(PODVector<Vector3>& dest, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE, const dtQueryFilter* filter = nullptr) | File: ../Navigation/NavigationMesh.h */ \
+    /* void NavigationMesh::FindPath(Vector<Vector3>& dest, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE, const dtQueryFilter* filter = nullptr) | File: ../Navigation/NavigationMesh.h */ \
     engine->RegisterObjectMethod(className, "Array<Vector3>@ FindPath(const Vector3&in, const Vector3&in, const Vector3&in extents = Vector3::ONE)", AS_FUNCTION_OBJLAST(NavigationMesh_FindPath<T>), AS_CALL_CDECL_OBJLAST);
 
 // ========================================================================================

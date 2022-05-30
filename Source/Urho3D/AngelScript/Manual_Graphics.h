@@ -366,7 +366,7 @@ template <class T> Node* RayQueryResult_GetNode(T* ptr)
 // void Octree::Raycast(RayOctreeQuery& query) const | File: ../Graphics/Octree.h
 template <class T> CScriptArray* Octree_Raycast(const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags, unsigned viewMask, Octree* ptr)
 {
-    PODVector<RayQueryResult> result;
+    Vector<RayQueryResult> result;
     RayOctreeQuery query(result, ray, level, maxDistance, drawableFlags, viewMask);
     ptr->Raycast(query);
     return VectorToArray<RayQueryResult>(result, "Array<RayQueryResult>");
@@ -375,7 +375,7 @@ template <class T> CScriptArray* Octree_Raycast(const Ray& ray, RayQueryLevel le
 // void Octree::RaycastSingle(RayOctreeQuery& query) const | File: ../Graphics/Octree.h
 template <class T> RayQueryResult Octree_RaycastSingle(const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags, unsigned viewMask, Octree* ptr)
 {
-    PODVector<RayQueryResult> result;
+    Vector<RayQueryResult> result;
     RayOctreeQuery query(result, ray, level, maxDistance, drawableFlags, viewMask);
     ptr->RaycastSingle(query);
 
@@ -397,7 +397,7 @@ template <class T> RayQueryResult Octree_RaycastSingle(const Ray& ray, RayQueryL
 // void Octree::GetDrawables(OctreeQuery& query) const | File: ../Graphics/Octree.h
 template <class T> CScriptArray* Octree_GetDrawables_Point(const Vector3& point, unsigned char drawableFlags, unsigned viewMask, Octree* ptr)
 {
-    PODVector<Drawable*> result;
+    Vector<Drawable*> result;
     PointOctreeQuery query(result, point, drawableFlags, viewMask);
     ptr->GetDrawables(query);
     return VectorToHandleArray<Drawable>(result, "Array<Drawable@>");
@@ -406,7 +406,7 @@ template <class T> CScriptArray* Octree_GetDrawables_Point(const Vector3& point,
 // void Octree::GetDrawables(OctreeQuery& query) const | File: ../Graphics/Octree.h
 template <class T> CScriptArray* Octree_GetDrawables_Box(const BoundingBox& box, unsigned char drawableFlags, unsigned viewMask, Octree* ptr)
 {
-    PODVector<Drawable*> result;
+    Vector<Drawable*> result;
     BoxOctreeQuery query(result, box, drawableFlags, viewMask);
     ptr->GetDrawables(query);
     return VectorToHandleArray<Drawable>(result, "Array<Drawable@>");
@@ -415,7 +415,7 @@ template <class T> CScriptArray* Octree_GetDrawables_Box(const BoundingBox& box,
 // void Octree::GetDrawables(OctreeQuery& query) const | File: ../Graphics/Octree.h
 template <class T> CScriptArray* Octree_GetDrawables_Frustum(const Frustum& frustum, unsigned char drawableFlags, unsigned viewMask, Octree* ptr)
 {
-    PODVector<Drawable*> result;
+    Vector<Drawable*> result;
     FrustumOctreeQuery query(result, frustum, drawableFlags, viewMask);
     ptr->GetDrawables(query);
     return VectorToHandleArray<Drawable>(result, "Array<Drawable@>");
@@ -424,7 +424,7 @@ template <class T> CScriptArray* Octree_GetDrawables_Frustum(const Frustum& frus
 // void Octree::GetDrawables(OctreeQuery& query) const | File: ../Graphics/Octree.h
 template <class T> CScriptArray* Octree_GetDrawables_Sphere(const Sphere& sphere, unsigned char drawableFlags, unsigned viewMask, Octree* ptr)
 {
-    PODVector<Drawable*> result;
+    Vector<Drawable*> result;
     SphereOctreeQuery query(result, sphere, drawableFlags, viewMask);
     ptr->GetDrawables(query);
     return VectorToHandleArray<Drawable>(result, "Array<Drawable@>");
@@ -433,7 +433,7 @@ template <class T> CScriptArray* Octree_GetDrawables_Sphere(const Sphere& sphere
 // void Octree::GetDrawables(OctreeQuery& query) const | File: ../Graphics/Octree.h
 template <class T> CScriptArray* Octree_GetDrawables_All(unsigned char drawableFlags, unsigned viewMask, Octree* ptr)
 {
-    PODVector<Drawable*> result;
+    Vector<Drawable*> result;
     AllContentOctreeQuery query(result, drawableFlags, viewMask);
     ptr->GetDrawables(query);
     return VectorToHandleArray<Drawable>(result, "Array<Drawable@>");

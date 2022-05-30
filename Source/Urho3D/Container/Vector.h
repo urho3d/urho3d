@@ -913,7 +913,7 @@ private:
         }
     }
 
-    /// Move a range of elements within the vector. Only for PODVector.
+    /// Move a range of elements within the vector. Only for POD Vector.
     void MoveRange(i32 dest, i32 src, i32 count)
     {
         assert(dest >= 0 && src >= 0 && count >= 0);
@@ -929,7 +929,7 @@ private:
         }
     }
 
-    /// Copy elements from one buffer to another. Only for PODVector.
+    /// Copy elements from one buffer to another. Only for POD Vector.
     static void CopyElements(T* dest, const T* src, i32 count)
     {
         assert(count >= 0);
@@ -945,10 +945,6 @@ private:
         }
     }
 };
-
-/// For backwards compatibility.
-template <typename T>
-using PODVector = Vector<T>;
 
 template <class T> typename Urho3D::Vector<T>::ConstIterator begin(const Urho3D::Vector<T>& v) { return v.Begin(); }
 

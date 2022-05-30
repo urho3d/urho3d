@@ -134,7 +134,7 @@ public:
     /// @property
     unsigned GetNumBackgroundLoadResources() const;
     /// Return all loaded resources of a specific type.
-    void GetResources(PODVector<Resource*>& result, StringHash type) const;
+    void GetResources(Vector<Resource*>& result, StringHash type) const;
     /// Return an already loaded resource of specific type & name, or null if not found. Will not load if does not exist.
     Resource* GetExistingResource(StringHash type, const String& name);
 
@@ -160,7 +160,7 @@ public:
     /// Template version of queueing a resource background load.
     template <class T> bool BackgroundLoadResource(const String& name, bool sendEventOnFailure = true, Resource* caller = nullptr);
     /// Template version of returning loaded resources of a specific type.
-    template <class T> void GetResources(PODVector<T*>& result) const;
+    template <class T> void GetResources(Vector<T*>& result) const;
     /// Return whether a file exists in the resource directories or package files. Does not check manually added in-memory resources.
     bool Exists(const String& name) const;
     /// Return memory budget for a resource type.
@@ -282,9 +282,9 @@ template <class T> bool ResourceCache::BackgroundLoadResource(const String& name
     return BackgroundLoadResource(type, name, sendEventOnFailure, caller);
 }
 
-template <class T> void ResourceCache::GetResources(PODVector<T*>& result) const
+template <class T> void ResourceCache::GetResources(Vector<T*>& result) const
 {
-    auto& resources = reinterpret_cast<PODVector<Resource*>&>(result);
+    auto& resources = reinterpret_cast<Vector<Resource*>&>(result);
     StringHash type = T::GetTypeStatic();
     GetResources(resources, type);
 

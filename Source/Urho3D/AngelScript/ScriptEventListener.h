@@ -49,7 +49,7 @@ public:
     /// Remove all scripted event handlers.
     virtual void RemoveEventHandlers() = 0;
     /// Remove all scripted event handlers, except those listed.
-    virtual void RemoveEventHandlersExcept(const PODVector<StringHash>& exceptions) = 0;
+    virtual void RemoveEventHandlersExcept(const Vector<StringHash>& exceptions) = 0;
     /// Return whether has subscribed to an event.
     virtual bool HasEventHandler(StringHash eventType) const = 0;
     /// Return whether has subscribed to a specific sender's event.

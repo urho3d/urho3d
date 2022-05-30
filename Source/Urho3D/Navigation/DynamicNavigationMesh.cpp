@@ -73,11 +73,11 @@ struct TileCompressor : public dtTileCacheCompressor
 struct MeshProcess : public dtTileCacheMeshProcess
 {
     DynamicNavigationMesh* owner_;
-    PODVector<Vector3> offMeshVertices_;
-    PODVector<float> offMeshRadii_;
-    PODVector<unsigned short> offMeshFlags_;
-    PODVector<unsigned char> offMeshAreas_;
-    PODVector<unsigned char> offMeshDir_;
+    Vector<Vector3> offMeshVertices_;
+    Vector<float> offMeshRadii_;
+    Vector<unsigned short> offMeshFlags_;
+    Vector<unsigned char> offMeshAreas_;
+    Vector<unsigned char> offMeshDir_;
 
     inline explicit MeshProcess(DynamicNavigationMesh* owner) :
         owner_(owner)
@@ -99,7 +99,7 @@ struct MeshProcess : public dtTileCacheMeshProcess
         rcVcopy(&bounds.max_.x_, params->bmin);
 
         // collect off-mesh connections
-        PODVector<OffMeshConnection*> offMeshConnections = owner_->CollectOffMeshConnections(bounds);
+        Vector<OffMeshConnection*> offMeshConnections = owner_->CollectOffMeshConnections(bounds);
 
         if (offMeshConnections.Size() > 0)
         {
@@ -297,7 +297,7 @@ bool DynamicNavigationMesh::Allocate(const BoundingBox& boundingBox, unsigned ma
     URHO3D_LOGDEBUG("Allocated empty navigation mesh with max " + String(maxTiles) + " tiles");
 
     // Scan for obstacles to insert into us
-    PODVector<Node*> obstacles;
+    Vector<Node*> obstacles;
     GetScene()->GetChildrenWithComponent<Obstacle>(obstacles, true);
     for (unsigned i = 0; i < obstacles.Size(); ++i)
     {
@@ -449,7 +449,7 @@ bool DynamicNavigationMesh::Build()
         }
 
         // Scan for obstacles to insert into us
-        PODVector<Node*> obstacles;
+        Vector<Node*> obstacles;
         GetScene()->GetChildrenWithComponent<Obstacle>(obstacles, true);
         for (unsigned i = 0; i < obstacles.Size(); ++i)
         {
@@ -521,7 +521,7 @@ bool DynamicNavigationMesh::Build(const IntVector2& from, const IntVector2& to)
     return true;
 }
 
-PODVector<unsigned char> DynamicNavigationMesh::GetTileData(const IntVector2& tile) const
+Vector<unsigned char> DynamicNavigationMesh::GetTileData(const IntVector2& tile) const
 {
     VectorBuffer ret;
     WriteTiles(ret, tile.x_, tile.y_);
@@ -535,7 +535,7 @@ bool DynamicNavigationMesh::IsObstacleInTile(Obstacle* obstacle, const IntVector
     return tileBoundingBox.DistanceToPoint(obstaclePosition) < obstacle->GetRadius();
 }
 
-bool DynamicNavigationMesh::AddTile(const PODVector<unsigned char>& tileData)
+bool DynamicNavigationMesh::AddTile(const Vector<unsigned char>& tileData)
 {
     MemoryBuffer buffer(tileData);
     return ReadTiles(buffer, false);
@@ -606,7 +606,7 @@ void DynamicNavigationMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTe
         // Draw Obstacle components
         if (drawObstacles_)
         {
-            PODVector<Node*> obstacles;
+            Vector<Node*> obstacles;
             scene->GetChildrenWithComponent<Obstacle>(obstacles, true);
             for (unsigned i = 0; i < obstacles.Size(); ++i)
             {
@@ -619,7 +619,7 @@ void DynamicNavigationMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTe
         // Draw OffMeshConnection components
         if (drawOffMeshConnections_)
         {
-            PODVector<Node*> connections;
+            Vector<Node*> connections;
             scene->GetChildrenWithComponent<OffMeshConnection>(connections, true);
             for (unsigned i = 0; i < connections.Size(); ++i)
             {
@@ -632,7 +632,7 @@ void DynamicNavigationMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTe
         // Draw NavArea components
         if (drawNavAreas_)
         {
-            PODVector<Node*> areas;
+            Vector<Node*> areas;
             scene->GetChildrenWithComponent<NavArea>(areas, true);
             for (unsigned i = 0; i < areas.Size(); ++i)
             {
@@ -655,7 +655,7 @@ void DynamicNavigationMesh::DrawDebugGeometry(bool depthTest)
     }
 }
 
-void DynamicNavigationMesh::SetNavigationDataAttr(const PODVector<unsigned char>& value)
+void DynamicNavigationMesh::SetNavigationDataAttr(const Vector<unsigned char>& value)
 {
     ReleaseNavigationMesh();
 
@@ -705,7 +705,7 @@ void DynamicNavigationMesh::SetNavigationDataAttr(const PODVector<unsigned char>
     // \todo Shall we send E_NAVIGATION_MESH_REBUILT here?
 }
 
-PODVector<unsigned char> DynamicNavigationMesh::GetNavigationDataAttr() const
+Vector<unsigned char> DynamicNavigationMesh::GetNavigationDataAttr() const
 {
     VectorBuffer ret;
     if (navMesh_ && tileCache_)
@@ -1019,9 +1019,9 @@ unsigned DynamicNavigationMesh::BuildTiles(Vector<NavigationGeometryInfo>& geome
     return numTiles;
 }
 
-PODVector<OffMeshConnection*> DynamicNavigationMesh::CollectOffMeshConnections(const BoundingBox& bounds)
+Vector<OffMeshConnection*> DynamicNavigationMesh::CollectOffMeshConnections(const BoundingBox& bounds)
 {
-    PODVector<OffMeshConnection*> connections;
+    Vector<OffMeshConnection*> connections;
     node_->GetComponents<OffMeshConnection>(connections, true);
     for (unsigned i = 0; i < connections.Size(); ++i)
     {

@@ -120,7 +120,7 @@ private:
     /// Search cache for inbuilt object types.
     HashMap<const char*, asITypeInfo*> objectTypes_;
     /// Cache of typeIds to array of enum value strings for attributes.
-    HashMap<int, PODVector<const char*>> enumValues_;
+    HashMap<int, Vector<const char*>> enumValues_;
     /// AngelScript resource router.
     SharedPtr<ResourceRouter> router_;
     /// Script module create/delete mutex.

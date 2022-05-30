@@ -48,7 +48,7 @@ public:
     /// Destruct. Free the child blocks.
     virtual ~ProfilerBlock()
     {
-        for (PODVector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
+        for (Vector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
         {
             delete *i;
             *i = nullptr;
@@ -91,7 +91,7 @@ public:
         maxTime_ = 0;
         count_ = 0;
 
-        for (PODVector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
+        for (Vector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
             (*i)->EndFrame();
     }
 
@@ -102,14 +102,14 @@ public:
         intervalMaxTime_ = 0;
         intervalCount_ = 0;
 
-        for (PODVector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
+        for (Vector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
             (*i)->BeginInterval();
     }
 
     /// Return child block with the specified name.
     ProfilerBlock* GetChild(const char* name)
     {
-        for (PODVector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
+        for (Vector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
         {
             if (!String::Compare((*i)->name_, name, true))
                 return *i;
@@ -134,7 +134,7 @@ public:
     /// Parent block.
     ProfilerBlock* parent_;
     /// Child blocks.
-    PODVector<ProfilerBlock*> children_;
+    Vector<ProfilerBlock*> children_;
     /// Time on the previous frame.
     long long frameTime_;
     /// Maximum time on the previous frame.

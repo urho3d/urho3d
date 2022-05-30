@@ -229,7 +229,7 @@ public:
     void SetVertexBuffer(VertexBuffer* buffer);
     /// Set multiple vertex buffers.
     /// @nobind
-    bool SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, unsigned instanceOffset = 0);
+    bool SetVertexBuffers(const Vector<VertexBuffer*>& buffers, unsigned instanceOffset = 0);
     /// Set multiple vertex buffers.
     bool SetVertexBuffers(const Vector<SharedPtr<VertexBuffer>>& buffers, unsigned instanceOffset = 0);
     /// Set index buffer.
@@ -501,12 +501,12 @@ public:
 
     /// Return supported fullscreen resolutions (third component is refreshRate). Will be empty if listing the resolutions is not supported on the platform (e.g. Web).
     /// @property
-    PODVector<IntVector3> GetResolutions(int monitor) const;
+    Vector<IntVector3> GetResolutions(int monitor) const;
     /// Return index of the best resolution for requested width, height and refresh rate.
     unsigned FindBestResolutionIndex(int monitor, int width, int height, int refreshRate) const;
     /// Return supported multisampling levels.
     /// @property
-    PODVector<int> GetMultiSampleLevels() const;
+    Vector<int> GetMultiSampleLevels() const;
     /// Return the desktop resolution.
     /// @property
     IntVector2 GetDesktopResolution(int monitor) const;
@@ -903,7 +903,7 @@ private:
     void DrawInstanced_OGL(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount, unsigned instanceCount);
     void DrawInstanced_OGL(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex, unsigned vertexCount, unsigned instanceCount);
     void SetVertexBuffer_OGL(VertexBuffer* buffer);
-    bool SetVertexBuffers_OGL(const PODVector<VertexBuffer*>& buffers, unsigned instanceOffset = 0);
+    bool SetVertexBuffers_OGL(const Vector<VertexBuffer*>& buffers, unsigned instanceOffset = 0);
     bool SetVertexBuffers_OGL(const Vector<SharedPtr<VertexBuffer>>& buffers, unsigned instanceOffset = 0);
     void SetIndexBuffer_OGL(IndexBuffer* buffer);
     void SetShaders_OGL(ShaderVariation* vs, ShaderVariation* ps);
@@ -950,7 +950,7 @@ private:
     bool IsInitialized_OGL() const;
     bool GetDither_OGL() const;
     bool IsDeviceLost_OGL() const;
-    PODVector<int> GetMultiSampleLevels_OGL() const;
+    Vector<int> GetMultiSampleLevels_OGL() const;
     unsigned GetFormat_OGL(CompressedFormat format) const;
     ShaderVariation* GetShader_OGL(ShaderType type, const String& name, const String& defines = String::EMPTY) const;
     ShaderVariation* GetShader_OGL(ShaderType type, const char* name, const char* defines) const;
@@ -1007,7 +1007,7 @@ private:
     void DrawInstanced_D3D9(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount, unsigned instanceCount);
     void DrawInstanced_D3D9(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex, unsigned vertexCount, unsigned instanceCount);
     void SetVertexBuffer_D3D9(VertexBuffer* buffer);
-    bool SetVertexBuffers_D3D9(const PODVector<VertexBuffer*>& buffers, unsigned instanceOffset = 0);
+    bool SetVertexBuffers_D3D9(const Vector<VertexBuffer*>& buffers, unsigned instanceOffset = 0);
     bool SetVertexBuffers_D3D9(const Vector<SharedPtr<VertexBuffer>>& buffers, unsigned instanceOffset = 0);
     void SetIndexBuffer_D3D9(IndexBuffer* buffer);
     void SetShaders_D3D9(ShaderVariation* vs, ShaderVariation* ps);
@@ -1054,7 +1054,7 @@ private:
     bool IsInitialized_D3D9() const;
     bool GetDither_D3D9() const;
     bool IsDeviceLost_D3D9() const;
-    PODVector<int> GetMultiSampleLevels_D3D9() const;
+    Vector<int> GetMultiSampleLevels_D3D9() const;
     unsigned GetFormat_D3D9(CompressedFormat format) const;
     ShaderVariation* GetShader_D3D9(ShaderType type, const String& name, const String& defines = String::EMPTY) const;
     ShaderVariation* GetShader_D3D9(ShaderType type, const char* name, const char* defines) const;
@@ -1111,7 +1111,7 @@ private:
     void DrawInstanced_D3D11(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount, unsigned instanceCount);
     void DrawInstanced_D3D11(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex, unsigned vertexCount, unsigned instanceCount);
     void SetVertexBuffer_D3D11(VertexBuffer* buffer);
-    bool SetVertexBuffers_D3D11(const PODVector<VertexBuffer*>& buffers, unsigned instanceOffset = 0);
+    bool SetVertexBuffers_D3D11(const Vector<VertexBuffer*>& buffers, unsigned instanceOffset = 0);
     bool SetVertexBuffers_D3D11(const Vector<SharedPtr<VertexBuffer>>& buffers, unsigned instanceOffset = 0);
     void SetIndexBuffer_D3D11(IndexBuffer* buffer);
     void SetShaders_D3D11(ShaderVariation* vs, ShaderVariation* ps);
@@ -1158,7 +1158,7 @@ private:
     bool IsInitialized_D3D11() const;
     bool GetDither_D3D11() const;
     bool IsDeviceLost_D3D11() const;
-    PODVector<int> GetMultiSampleLevels_D3D11() const;
+    Vector<int> GetMultiSampleLevels_D3D11() const;
     unsigned GetFormat_D3D11(CompressedFormat format) const;
     ShaderVariation* GetShader_D3D11(ShaderType type, const String& name, const String& defines = String::EMPTY) const;
     ShaderVariation* GetShader_D3D11(ShaderType type, const char* name, const char* defines) const;
@@ -1253,7 +1253,7 @@ private:
     /// Largest scratch buffer request this frame.
     unsigned maxScratchBufferRequest_{};
     /// GPU objects.
-    PODVector<GPUObject*> gpuObjects_;
+    Vector<GPUObject*> gpuObjects_;
     /// Scratch buffers.
     Vector<ScratchBuffer> scratchBuffers_;
     /// Shadow map dummy color texture format.

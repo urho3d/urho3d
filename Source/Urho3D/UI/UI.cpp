@@ -957,7 +957,7 @@ void UI::Update(float timeStep, UIElement* element)
         Update(timeStep, children[i]);
 }
 
-void UI::SetVertexData(VertexBuffer* dest, const PODVector<float>& vertexData)
+void UI::SetVertexData(VertexBuffer* dest, const Vector<float>& vertexData)
 {
     if (vertexData.Empty())
         return;
@@ -971,7 +971,7 @@ void UI::SetVertexData(VertexBuffer* dest, const PODVector<float>& vertexData)
     dest->SetData(&vertexData[0]);
 }
 
-void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigned batchStart, unsigned batchEnd)
+void UI::Render(VertexBuffer* buffer, const Vector<UIBatch>& batches, unsigned batchStart, unsigned batchEnd)
 {
     // Engine does not render when window is closed or device is lost
     assert(graphics_ && graphics_->IsInitialized() && !graphics_->IsDeviceLost());
@@ -1141,7 +1141,7 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
     }
 }
 
-void UI::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, UIElement* element, IntRect currentScissor)
+void UI::GetBatches(Vector<UIBatch>& batches, Vector<float>& vertexData, UIElement* element, IntRect currentScissor)
 {
     // Set clipping scissor for child elements. No need to draw if zero size
     element->AdjustScissor(currentScissor);
@@ -1315,7 +1315,7 @@ void UI::ReleaseFontFaces()
 {
     URHO3D_LOGDEBUG("Reloading font faces");
 
-    PODVector<Font*> fonts;
+    Vector<Font*> fonts;
     GetSubsystem<ResourceCache>()->GetResources<Font>(fonts);
 
     for (unsigned i = 0; i < fonts.Size(); ++i)
@@ -1973,7 +1973,7 @@ void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
             if (topLevel)
             {
                 topLevel->GetChildren(tempElements_, true);
-                for (PODVector<UIElement*>::Iterator i = tempElements_.Begin(); i != tempElements_.End();)
+                for (Vector<UIElement*>::Iterator i = tempElements_.Begin(); i != tempElements_.End();)
                 {
                     if ((*i)->GetFocusMode() < FM_FOCUSABLE)
                         i = tempElements_.Erase(i);
