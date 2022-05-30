@@ -134,7 +134,7 @@ void Geometry::SetLodDistance(float distance)
     lodDistance_ = distance;
 }
 
-void Geometry::SetRawVertexData(const SharedArrayPtr<unsigned char>& data, const PODVector<VertexElement>& elements)
+void Geometry::SetRawVertexData(const SharedArrayPtr<unsigned char>& data, const Vector<VertexElement>& elements)
 {
     rawVertexData_ = data;
     rawVertexSize_ = VertexBuffer::GetVertexSize(elements);
@@ -191,7 +191,7 @@ unsigned short Geometry::GetBufferHash() const
 }
 
 void Geometry::GetRawData(const unsigned char*& vertexData, unsigned& vertexSize, const unsigned char*& indexData,
-    unsigned& indexSize, const PODVector<VertexElement>*& elements) const
+    unsigned& indexSize, const Vector<VertexElement>*& elements) const
 {
     if (rawVertexData_)
     {
@@ -236,7 +236,7 @@ void Geometry::GetRawData(const unsigned char*& vertexData, unsigned& vertexSize
 }
 
 void Geometry::GetRawDataShared(SharedArrayPtr<unsigned char>& vertexData, unsigned& vertexSize,
-    SharedArrayPtr<unsigned char>& indexData, unsigned& indexSize, const PODVector<VertexElement>*& elements) const
+    SharedArrayPtr<unsigned char>& indexData, unsigned& indexSize, const Vector<VertexElement>*& elements) const
 {
     if (rawVertexData_)
     {
@@ -286,7 +286,7 @@ float Geometry::GetHitDistance(const Ray& ray, Vector3* outNormal, Vector2* outU
     const unsigned char* indexData;
     unsigned vertexSize;
     unsigned indexSize;
-    const PODVector<VertexElement>* elements;
+    const Vector<VertexElement>* elements;
 
     GetRawData(vertexData, vertexSize, indexData, indexSize, elements);
 
@@ -313,7 +313,7 @@ bool Geometry::IsInside(const Ray& ray) const
     const unsigned char* indexData;
     unsigned vertexSize;
     unsigned indexSize;
-    const PODVector<VertexElement>* elements;
+    const Vector<VertexElement>* elements;
 
     GetRawData(vertexData, vertexSize, indexData, indexSize, elements);
 

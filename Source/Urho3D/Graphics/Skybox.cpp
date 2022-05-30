@@ -31,7 +31,7 @@ void Skybox::RegisterObject(Context* context)
     URHO3D_COPY_BASE_ATTRIBUTES(StaticModel);
 }
 
-void Skybox::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
+void Skybox::ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQueryResult>& results)
 {
     // Do not record a raycast result for a skybox, as it would block all other results
 }

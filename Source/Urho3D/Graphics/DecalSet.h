@@ -75,9 +75,9 @@ struct Decal
     /// Local-space bounding box.
     BoundingBox boundingBox_;
     /// Decal vertices.
-    PODVector<DecalVertex> vertices_;
+    Vector<DecalVertex> vertices_;
     /// Decal indices.
-    PODVector<unsigned short> indices_;
+    Vector<unsigned short> indices_;
 };
 
 /// %Decal renderer component.
@@ -99,7 +99,7 @@ public:
     /// Handle enabled/disabled state change.
     void OnSetEnabled() override;
     /// Process octree raycast. May be called from a worker thread.
-    void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results) override;
+    void ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQueryResult>& results) override;
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
     void UpdateBatches(const FrameInfo& frame) override;
     /// Prepare geometry for rendering. Called from a worker thread if possible (no GPU update).
@@ -159,11 +159,11 @@ public:
     /// Set material attribute.
     void SetMaterialAttr(const ResourceRef& value);
     /// Set decals attribute.
-    void SetDecalsAttr(const PODVector<unsigned char>& value);
+    void SetDecalsAttr(const Vector<unsigned char>& value);
     /// Return material attribute.
     ResourceRef GetMaterialAttr() const;
     /// Return decals attribute.
-    PODVector<unsigned char> GetDecalsAttr() const;
+    Vector<unsigned char> GetDecalsAttr() const;
 
 protected:
     /// Recalculate the world-space bounding box.
@@ -173,11 +173,11 @@ protected:
 
 private:
     /// Get triangle faces from the target geometry.
-    void GetFaces(Vector<PODVector<DecalVertex>>& faces, Drawable* target, unsigned batchIndex, const Frustum& frustum,
+    void GetFaces(Vector<Vector<DecalVertex>>& faces, Drawable* target, unsigned batchIndex, const Frustum& frustum,
         const Vector3& decalNormal, float normalCutoff);
     /// Get triangle face from the target geometry.
     void GetFace
-        (Vector<PODVector<DecalVertex>>& faces, Drawable* target, unsigned batchIndex, unsigned i0, unsigned i1, unsigned i2,
+        (Vector<Vector<DecalVertex>>& faces, Drawable* target, unsigned batchIndex, unsigned i0, unsigned i1, unsigned i2,
             const unsigned char* positionData, const unsigned char* normalData, const unsigned char* skinningData,
             unsigned positionStride, unsigned normalStride, unsigned skinningStride, const Frustum& frustum,
             const Vector3& decalNormal, float normalCutoff);
@@ -219,7 +219,7 @@ private:
     /// Bones used for skinned decals.
     Vector<Bone> bones_;
     /// Skinning matrices.
-    PODVector<Matrix3x4> skinMatrices_;
+    Vector<Matrix3x4> skinMatrices_;
     /// Vertices in the current decals.
     unsigned numVertices_;
     /// Indices in the current decals.

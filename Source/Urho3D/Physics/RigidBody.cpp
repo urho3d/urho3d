@@ -102,7 +102,7 @@ void RigidBody::RegisterObject(Context* context)
         AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("CCD Radius", GetCcdRadius, SetCcdRadius, float, 0.0f, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("CCD Motion Threshold", GetCcdMotionThreshold, SetCcdMotionThreshold, float, 0.0f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Network Angular Velocity", GetNetAngularVelocityAttr, SetNetAngularVelocityAttr, PODVector<unsigned char>,
+    URHO3D_ACCESSOR_ATTRIBUTE("Network Angular Velocity", GetNetAngularVelocityAttr, SetNetAngularVelocityAttr, Vector<unsigned char>,
         Variant::emptyBuffer, AM_NET | AM_LATESTDATA | AM_NOEDIT);
     URHO3D_ENUM_ATTRIBUTE_EX("Collision Event Mode", collisionEventMode_, MarkBodyDirty, collisionEventModeNames, COLLISION_ACTIVE, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Use Gravity", GetUseGravity, SetUseGravity, bool, true, AM_DEFAULT);
@@ -683,7 +683,7 @@ bool RigidBody::IsActive() const
     return body_ ? body_->isActive() : false;
 }
 
-void RigidBody::GetCollidingBodies(PODVector<RigidBody*>& result) const
+void RigidBody::GetCollidingBodies(Vector<RigidBody*>& result) const
 {
     if (physicsWorld_)
         physicsWorld_->GetCollidingBodies(result, this);
@@ -732,7 +732,7 @@ void RigidBody::UpdateMass()
     auto numShapes = (unsigned)compoundShape_->getNumChildShapes();
     if (numShapes)
     {
-        PODVector<float> masses(numShapes);
+        Vector<float> masses(numShapes);
         for (unsigned i = 0; i < numShapes; ++i)
         {
             // The actual mass does not matter, divide evenly between child shapes
@@ -789,7 +789,7 @@ void RigidBody::UpdateMass()
     // Reapply constraint positions for new center of mass shift
     if (node_)
     {
-        for (PODVector<Constraint*>::Iterator i = constraints_.Begin(); i != constraints_.End(); ++i)
+        for (Vector<Constraint*>::Iterator i = constraints_.Begin(); i != constraints_.End(); ++i)
             (*i)->ApplyFrames();
     }
 
@@ -828,14 +828,14 @@ void RigidBody::UpdateGravity()
     }
 }
 
-void RigidBody::SetNetAngularVelocityAttr(const PODVector<unsigned char>& value)
+void RigidBody::SetNetAngularVelocityAttr(const Vector<unsigned char>& value)
 {
     float maxVelocity = physicsWorld_ ? physicsWorld_->GetMaxNetworkAngularVelocity() : DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY;
     MemoryBuffer buf(value);
     SetAngularVelocity(buf.ReadPackedVector3(maxVelocity));
 }
 
-const PODVector<unsigned char>& RigidBody::GetNetAngularVelocityAttr() const
+const Vector<unsigned char>& RigidBody::GetNetAngularVelocityAttr() const
 {
     float maxVelocity = physicsWorld_ ? physicsWorld_->GetMaxNetworkAngularVelocity() : DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY;
     attrBuffer_.Clear();
@@ -861,8 +861,8 @@ void RigidBody::ReleaseBody()
     {
         // Release all constraints which refer to this body
         // Make a copy for iteration
-        PODVector<Constraint*> constraints = constraints_;
-        for (PODVector<Constraint*>::Iterator i = constraints.Begin(); i != constraints.End(); ++i)
+        Vector<Constraint*> constraints = constraints_;
+        for (Vector<Constraint*>::Iterator i = constraints.Begin(); i != constraints.End(); ++i)
             (*i)->ReleaseConstraint();
 
         RemoveBodyFromWorld();
@@ -962,16 +962,16 @@ void RigidBody::AddBodyToWorld()
 
         // Check if CollisionShapes already exist in the node and add them to the compound shape.
         // Do not update mass yet, but do it once all shapes have been added
-        PODVector<CollisionShape*> shapes;
+        Vector<CollisionShape*> shapes;
         node_->GetComponents<CollisionShape>(shapes);
-        for (PODVector<CollisionShape*>::Iterator i = shapes.Begin(); i != shapes.End(); ++i)
+        for (Vector<CollisionShape*>::Iterator i = shapes.Begin(); i != shapes.End(); ++i)
             (*i)->NotifyRigidBody(false);
 
         // Check if this node contains Constraint components that were waiting for the rigid body to be created, and signal them
         // to create themselves now
-        PODVector<Constraint*> constraints;
+        Vector<Constraint*> constraints;
         node_->GetComponents<Constraint>(constraints);
-        for (PODVector<Constraint*>::Iterator i = constraints.Begin(); i != constraints.End(); ++i)
+        for (Vector<Constraint*>::Iterator i = constraints.Begin(); i != constraints.End(); ++i)
             (*i)->CreateConstraint();
     }
 

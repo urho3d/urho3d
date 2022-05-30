@@ -10,7 +10,7 @@ namespace Urho3D
 
 VectorBuffer::VectorBuffer() = default;
 
-VectorBuffer::VectorBuffer(const PODVector<unsigned char>& data)
+VectorBuffer::VectorBuffer(const Vector<unsigned char>& data)
 {
     SetData(data);
 }
@@ -70,7 +70,7 @@ unsigned VectorBuffer::Write(const void* data, unsigned size)
     return size;
 }
 
-void VectorBuffer::SetData(const PODVector<unsigned char>& data)
+void VectorBuffer::SetData(const Vector<unsigned char>& data)
 {
     buffer_ = data;
     position_ = 0;

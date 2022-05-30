@@ -27,7 +27,7 @@ public:
     /// Apply attribute changes that can not be applied immediately.
     void ApplyAttributes() override;
     /// Return UI rendering batches.
-    void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor) override;
+    void GetBatches(Vector<UIBatch>& batches, Vector<float>& vertexData, const IntRect& currentScissor) override;
     /// React to the popup being shown.
     void OnShowPopup() override;
     /// React to the popup being hidden.
@@ -62,7 +62,7 @@ public:
     /// @property{get_items}
     UIElement* GetItem(unsigned index) const;
     /// Return all items.
-    PODVector<UIElement*> GetItems() const;
+    Vector<UIElement*> GetItems() const;
     /// Return selection index, or M_MAX_UNSIGNED if none selected.
     /// @property
     unsigned GetSelection() const;

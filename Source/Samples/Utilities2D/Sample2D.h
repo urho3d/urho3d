@@ -72,7 +72,7 @@ public:
     /// Read input and zoom the camera.
     float Zoom(Camera* camera);
     /// Create path from tmx object's points.
-    PODVector<Vector2> CreatePathFromPoints(TileMapObject2D* object, const Vector2& offset);
+    Vector<Vector2> CreatePathFromPoints(TileMapObject2D* object, const Vector2& offset);
     /// Create the UI content.
     void CreateUIContent(const String& demoTitle, int remainingLifes, int remainingCoins);
     /// Handle 'EXIT' button released event.

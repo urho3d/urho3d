@@ -38,7 +38,7 @@ public:
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     void ApplyAttributes() override;
     /// Process octree raycast. May be called from a worker thread.
-    void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results) override;
+    void ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQueryResult>& results) override;
     /// Update before octree reinsertion. Is called from a worker thread.
     void Update(const FrameInfo& frame) override;
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
@@ -141,7 +141,7 @@ public:
     /// Set animation states attribute.
     void SetAnimationStatesAttr(const VariantVector& value);
     /// Set morphs attribute.
-    void SetMorphsAttr(const PODVector<unsigned char>& value);
+    void SetMorphsAttr(const Vector<unsigned char>& value);
     /// Return model attribute.
     ResourceRef GetModelAttr() const;
     /// Return bones' animation enabled attribute.
@@ -149,13 +149,13 @@ public:
     /// Return animation states attribute.
     VariantVector GetAnimationStatesAttr() const;
     /// Return morphs attribute.
-    const PODVector<unsigned char>& GetMorphsAttr() const;
+    const Vector<unsigned char>& GetMorphsAttr() const;
 
     /// Return per-geometry bone mappings.
-    const Vector<PODVector<unsigned>>& GetGeometryBoneMappings() const { return geometryBoneMappings_; }
+    const Vector<Vector<unsigned>>& GetGeometryBoneMappings() const { return geometryBoneMappings_; }
 
     /// Return per-geometry skin matrices. If empty, uses global skinning.
-    const Vector<PODVector<Matrix3x4>>& GetGeometrySkinMatrices() const { return geometrySkinMatrices_; }
+    const Vector<Vector<Matrix3x4>>& GetGeometrySkinMatrices() const { return geometrySkinMatrices_; }
 
     /// Recalculate the bone bounding box. Normally called internally, but can also be manually called if up-to-date information before rendering is necessary.
     void UpdateBoneBoundingBox();
@@ -210,13 +210,13 @@ private:
     /// Animation states.
     Vector<SharedPtr<AnimationState>> animationStates_;
     /// Skinning matrices.
-    PODVector<Matrix3x4> skinMatrices_;
+    Vector<Matrix3x4> skinMatrices_;
     /// Mapping of subgeometry bone indices, used if more bones than skinning shader can manage.
-    Vector<PODVector<unsigned>> geometryBoneMappings_;
+    Vector<Vector<unsigned>> geometryBoneMappings_;
     /// Subgeometry skinning matrices, used if more bones than skinning shader can manage.
-    Vector<PODVector<Matrix3x4>> geometrySkinMatrices_;
+    Vector<Vector<Matrix3x4>> geometrySkinMatrices_;
     /// Subgeometry skinning matrix pointers, if more bones than skinning shader can manage.
-    Vector<PODVector<Matrix3x4*>> geometrySkinMatrixPtrs_;
+    Vector<Vector<Matrix3x4*>> geometrySkinMatrixPtrs_;
     /// Bounding box calculated from bones.
     BoundingBox boneBoundingBox_;
     /// Attribute buffer.

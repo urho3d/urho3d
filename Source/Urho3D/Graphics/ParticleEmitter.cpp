@@ -303,7 +303,7 @@ void ParticleEmitter::ResetEmissionTimer()
 
 void ParticleEmitter::RemoveAllParticles()
 {
-    for (PODVector<Billboard>::Iterator i = billboards_.Begin(); i != billboards_.End(); ++i)
+    for (Vector<Billboard>::Iterator i = billboards_.Begin(); i != billboards_.End(); ++i)
         i->enabled_ = false;
 
     Commit();
@@ -352,7 +352,7 @@ void ParticleEmitter::SetParticlesAttr(const VariantVector& value)
     unsigned index = 0;
     SetNumParticles(index < value.Size() ? value[index++].GetUInt() : 0);
 
-    for (PODVector<Particle>::Iterator i = particles_.Begin(); i != particles_.End() && index < value.Size(); ++i)
+    for (Vector<Particle>::Iterator i = particles_.Begin(); i != particles_.End() && index < value.Size(); ++i)
     {
         i->velocity_ = value[index++].GetVector3();
         i->size_ = value[index++].GetVector2();
@@ -376,7 +376,7 @@ VariantVector ParticleEmitter::GetParticlesAttr() const
 
     ret.Reserve(particles_.Size() * 8 + 1);
     ret.Push(particles_.Size());
-    for (PODVector<Particle>::ConstIterator i = particles_.Begin(); i != particles_.End(); ++i)
+    for (Vector<Particle>::ConstIterator i = particles_.Begin(); i != particles_.End(); ++i)
     {
         ret.Push(i->velocity_);
         ret.Push(i->size_);
@@ -402,7 +402,7 @@ VariantVector ParticleEmitter::GetParticleBillboardsAttr() const
     ret.Reserve(billboards_.Size() * 7 + 1);
     ret.Push(billboards_.Size());
 
-    for (PODVector<Billboard>::ConstIterator i = billboards_.Begin(); i != billboards_.End(); ++i)
+    for (Vector<Billboard>::ConstIterator i = billboards_.Begin(); i != billboards_.End(); ++i)
     {
         ret.Push(i->position_);
         ret.Push(i->size_);

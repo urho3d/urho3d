@@ -108,13 +108,13 @@ struct JoystickState
     /// Joystick name.
     String name_;
     /// Button up/down state.
-    PODVector<bool> buttons_;
+    Vector<bool> buttons_;
     /// Button pressed on this frame.
-    PODVector<bool> buttonPress_;
+    Vector<bool> buttonPress_;
     /// Axis position from -1 to 1.
-    PODVector<float> axes_;
+    Vector<float> axes_;
     /// POV hat bits.
-    PODVector<int> hats_;
+    Vector<int> hats_;
 };
 
 #ifdef __EMSCRIPTEN__

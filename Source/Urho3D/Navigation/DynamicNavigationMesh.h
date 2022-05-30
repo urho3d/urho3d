@@ -47,11 +47,11 @@ public:
     /// Rebuild part of the navigation mesh in the rectangular area. Return true if successful.
     bool Build(const IntVector2& from, const IntVector2& to) override;
     /// Return tile data.
-    PODVector<unsigned char> GetTileData(const IntVector2& tile) const override;
+    Vector<unsigned char> GetTileData(const IntVector2& tile) const override;
     /// Return whether the Obstacle is touching the given tile.
     bool IsObstacleInTile(Obstacle* obstacle, const IntVector2& tile) const;
     /// Add tile to navigation mesh.
-    bool AddTile(const PODVector<unsigned char>& tileData) override;
+    bool AddTile(const Vector<unsigned char>& tileData) override;
     /// Remove tile from navigation mesh.
     void RemoveTile(const IntVector2& tile) override;
     /// Remove all tiles from navigation mesh.
@@ -62,9 +62,9 @@ public:
     void DrawDebugGeometry(bool depthTest);
 
     /// Set navigation data attribute.
-    void SetNavigationDataAttr(const PODVector<unsigned char>& value) override;
+    void SetNavigationDataAttr(const Vector<unsigned char>& value) override;
     /// Return navigation data attribute.
-    PODVector<unsigned char> GetNavigationDataAttr() const override;
+    Vector<unsigned char> GetNavigationDataAttr() const override;
 
     /// Set the maximum number of obstacles allowed.
     /// @property
@@ -108,7 +108,7 @@ protected:
     /// Build tiles in the rectangular area. Return number of built tiles.
     unsigned BuildTiles(Vector<NavigationGeometryInfo>& geometryList, const IntVector2& from, const IntVector2& to);
     /// Off-mesh connections to be rebuilt in the mesh processor.
-    PODVector<OffMeshConnection*> CollectOffMeshConnections(const BoundingBox& bounds);
+    Vector<OffMeshConnection*> CollectOffMeshConnections(const BoundingBox& bounds);
     /// Release the navigation mesh, query, and tile cache.
     void ReleaseNavigationMesh() override;
 
@@ -142,7 +142,7 @@ private:
     bool drawObstacles_{};
 
     /// Queue of tiles to be built.
-    PODVector<IntVector2> tileQueue_;
+    Vector<IntVector2> tileQueue_;
 };
 
 }

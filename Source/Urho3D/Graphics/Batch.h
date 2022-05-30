@@ -150,7 +150,7 @@ struct BatchGroup : public Batch
     void Draw(View* view, Camera* camera, bool allowDepthWrite) const;
 
     /// Instance data.
-    PODVector<InstanceData> instances_;
+    Vector<InstanceData> instances_;
     /// Instance stream start index, or M_MAX_UNSIGNED if transforms not pre-set.
     unsigned startIndex_;
 };
@@ -214,7 +214,7 @@ public:
     /// Sort instanced and non-instanced draw calls front to back.
     void SortFrontToBack();
     /// Sort batches front to back while also maintaining state sorting.
-    void SortFrontToBack2Pass(PODVector<Batch*>& batches);
+    void SortFrontToBack2Pass(Vector<Batch*>& batches);
     /// Pre-set instance data of all groups. The vertex buffer must be big enough to hold all data.
     void SetInstancingData(void* lockedData, unsigned stride, unsigned& freeIndex);
     /// Draw.
@@ -235,11 +235,11 @@ public:
     HashMap<unsigned short, unsigned short> geometryRemapping_;
 
     /// Unsorted non-instanced draw calls.
-    PODVector<Batch> batches_;
+    Vector<Batch> batches_;
     /// Sorted non-instanced draw calls.
-    PODVector<Batch*> sortedBatches_;
+    Vector<Batch*> sortedBatches_;
     /// Sorted instanced draw calls.
-    PODVector<BatchGroup*> sortedBatchGroups_;
+    Vector<BatchGroup*> sortedBatchGroups_;
     /// Maximum sorted instances.
     unsigned maxSortedInstances_;
     /// Whether the pass command contains extra shader defines.
@@ -285,9 +285,9 @@ struct LightBatchQueue
     /// Shadow map split queues.
     Vector<ShadowBatchQueue> shadowSplits_;
     /// Per-vertex lights.
-    PODVector<Light*> vertexLights_;
+    Vector<Light*> vertexLights_;
     /// Light volume draw calls.
-    PODVector<Batch> volumeBatches_;
+    Vector<Batch> volumeBatches_;
 };
 
 }

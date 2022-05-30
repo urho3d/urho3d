@@ -62,7 +62,7 @@ void Window::RegisterObject(Context* context)
     // Instead it should be set false in code when needed
 }
 
-void Window::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
+void Window::GetBatches(Vector<UIBatch>& batches, Vector<float>& vertexData, const IntRect& currentScissor)
 {
     if (modal_)
     {

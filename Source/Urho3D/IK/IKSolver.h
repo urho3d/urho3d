@@ -371,8 +371,8 @@ public:
     void SetAUTO_SOLVE(bool enable);
 
 private:
-    PODVector<IKEffector*> effectorList_;
-    PODVector<IKConstraint*> constraintList_;
+    Vector<IKEffector*> effectorList_;
+    Vector<IKConstraint*> constraintList_;
     ik_solver_t* solver_;
     Algorithm algorithm_;
     unsigned features_;

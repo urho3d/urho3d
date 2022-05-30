@@ -526,7 +526,7 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                  graphics->NeedParameterUpdate(SP_LIGHT, lightQueue_))
         {
             Vector4 vertexLights[MAX_VERTEX_LIGHTS * 3];
-            const PODVector<Light*>& lights = lightQueue_->vertexLights_;
+            const Vector<Light*>& lights = lightQueue_->vertexLights_;
 
             for (unsigned i = 0; i < lights.Size(); ++i)
             {
@@ -755,7 +755,7 @@ void BatchQueue::SortFrontToBack()
         else
         {
             float minDistance = M_INFINITY;
-            for (PODVector<InstanceData>::ConstIterator j = i->second_.instances_.Begin(); j != i->second_.instances_.End(); ++j)
+            for (Vector<InstanceData>::ConstIterator j = i->second_.instances_.Begin(); j != i->second_.instances_.End(); ++j)
                 minDistance = Min(minDistance, j->distance_);
             i->second_.distance_ = minDistance;
         }
@@ -767,10 +767,10 @@ void BatchQueue::SortFrontToBack()
     for (HashMap<BatchGroupKey, BatchGroup>::Iterator i = batchGroups_.Begin(); i != batchGroups_.End(); ++i)
         sortedBatchGroups_[index++] = &i->second_;
 
-    SortFrontToBack2Pass(reinterpret_cast<PODVector<Batch*>& >(sortedBatchGroups_));
+    SortFrontToBack2Pass(reinterpret_cast<Vector<Batch*>& >(sortedBatchGroups_));
 }
 
-void BatchQueue::SortFrontToBack2Pass(PODVector<Batch*>& batches)
+void BatchQueue::SortFrontToBack2Pass(Vector<Batch*>& batches)
 {
     // Mobile devices likely use a tiled deferred approach, with which front-to-back sorting is irrelevant. The 2-pass
     // method is also time consuming, so just sort with state having priority
@@ -784,7 +784,7 @@ void BatchQueue::SortFrontToBack2Pass(PODVector<Batch*>& batches)
     unsigned short freeMaterialID = 0;
     unsigned short freeGeometryID = 0;
 
-    for (PODVector<Batch*>::Iterator i = batches.Begin(); i != batches.End(); ++i)
+    for (Vector<Batch*>::Iterator i = batches.Begin(); i != batches.End(); ++i)
     {
         Batch* batch = *i;
 
@@ -852,7 +852,7 @@ void BatchQueue::Draw(View* view, Camera* camera, bool markToStencil, bool using
     }
 
     // Instanced
-    for (PODVector<BatchGroup*>::ConstIterator i = sortedBatchGroups_.Begin(); i != sortedBatchGroups_.End(); ++i)
+    for (Vector<BatchGroup*>::ConstIterator i = sortedBatchGroups_.Begin(); i != sortedBatchGroups_.End(); ++i)
     {
         BatchGroup* group = *i;
         if (markToStencil)
@@ -861,7 +861,7 @@ void BatchQueue::Draw(View* view, Camera* camera, bool markToStencil, bool using
         group->Draw(view, camera, allowDepthWrite);
     }
     // Non-instanced
-    for (PODVector<Batch*>::ConstIterator i = sortedBatches_.Begin(); i != sortedBatches_.End(); ++i)
+    for (Vector<Batch*>::ConstIterator i = sortedBatches_.Begin(); i != sortedBatches_.End(); ++i)
     {
         Batch* batch = *i;
         if (markToStencil)

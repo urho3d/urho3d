@@ -61,7 +61,7 @@ protected:
     /// Calculate scaled time.
     float CalculateScaledTime(float currentTime, bool& finished) const;
     /// Return event frames.
-    void GetEventFrames(float beginTime, float endTime, PODVector<const VAnimEventFrame*>& eventFrames);
+    void GetEventFrames(float beginTime, float endTime, Vector<const VAnimEventFrame*>& eventFrames);
 
     /// Target object.
     WeakPtr<Object> target_;

@@ -80,7 +80,7 @@ public:
     /// Remove all scripted event handlers.
     void RemoveEventHandlers() override;
     /// Remove all scripted event handlers, except those listed.
-    void RemoveEventHandlersExcept(const PODVector<StringHash>& exceptions) override;
+    void RemoveEventHandlersExcept(const Vector<StringHash>& exceptions) override;
     /// Return whether has subscribed to an event.
     bool HasEventHandler(StringHash eventType) const override;
     /// Return whether has subscribed to a specific sender's event.
@@ -119,19 +119,19 @@ public:
     /// Set script file attribute.
     void SetScriptFileAttr(const ResourceRef& value);
     /// Set delayed method calls attribute.
-    void SetDelayedCallsAttr(const PODVector<unsigned char>& value);
+    void SetDelayedCallsAttr(const Vector<unsigned char>& value);
     /// Set script file serialization attribute by calling a script function.
-    void SetScriptDataAttr(const PODVector<unsigned char>& data);
+    void SetScriptDataAttr(const Vector<unsigned char>& data);
     /// Set script network serialization attribute by calling a script function.
-    void SetScriptNetworkDataAttr(const PODVector<unsigned char>& data);
+    void SetScriptNetworkDataAttr(const Vector<unsigned char>& data);
     /// Return script file attribute.
     ResourceRef GetScriptFileAttr() const;
     /// Return delayed method calls attribute.
-    PODVector<unsigned char> GetDelayedCallsAttr() const;
+    Vector<unsigned char> GetDelayedCallsAttr() const;
     /// Get script file serialization attribute by calling a script function.
-    PODVector<unsigned char> GetScriptDataAttr() const;
+    Vector<unsigned char> GetScriptDataAttr() const;
     /// Get script network serialization attribute by calling a script function.
-    PODVector<unsigned char> GetScriptNetworkDataAttr() const;
+    Vector<unsigned char> GetScriptNetworkDataAttr() const;
 
 protected:
     /// Handle scene being assigned.

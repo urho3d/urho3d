@@ -48,7 +48,7 @@ void BorderImage::RegisterObject(Context* context)
         AM_FILE);
 }
 
-void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
+void BorderImage::GetBatches(Vector<UIBatch>& batches, Vector<float>& vertexData, const IntRect& currentScissor)
 {
     if (enabled_)
         GetBatches(batches, vertexData, currentScissor, (hovering_ || selected_ || HasFocus()) ? hoverOffset_ : IntVector2::ZERO);
@@ -121,7 +121,7 @@ void BorderImage::SetTiled(bool enable)
     tiled_ = enable;
 }
 
-void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor,
+void BorderImage::GetBatches(Vector<UIBatch>& batches, Vector<float>& vertexData, const IntRect& currentScissor,
     const IntVector2& offset)
 {
     bool allOpaque = true;

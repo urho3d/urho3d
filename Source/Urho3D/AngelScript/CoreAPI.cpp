@@ -133,7 +133,7 @@ static void UnsubscribeFromAllEventsExcept(CScriptArray* exceptions)
         return;
 
     unsigned numExceptions = exceptions->GetSize();
-    PODVector<StringHash> destExceptions(numExceptions);
+    Vector<StringHash> destExceptions(numExceptions);
     for (unsigned i = 0; i < numExceptions; ++i)
         destExceptions[i] = StringHash(*(static_cast<String*>(exceptions->At(i))));
 

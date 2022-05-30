@@ -28,7 +28,7 @@ public:
     /// Update and return screen position.
     const IntVector2& GetScreenPosition() const override;
     /// Return UI rendering batches.
-    void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor) override;
+    void GetBatches(Vector<UIBatch>& batches, Vector<float>& vertexData, const IntRect& currentScissor) override;
     /// React to position change.
     void OnPositionSet(const IntVector2& newPosition) override;
     /// Convert screen coordinates to element coordinates.

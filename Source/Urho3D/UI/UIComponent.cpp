@@ -100,7 +100,7 @@ public:
         pos = ui->ConvertUIToSystem(screenPos);
 
         Ray ray(camera->GetScreenRay((float)pos.x_ / rect.Width(), (float)pos.y_ / rect.Height()));
-        PODVector<RayQueryResult> queryResultVector;
+        Vector<RayQueryResult> queryResultVector;
         RayOctreeQuery query(queryResultVector, ray, RAY_TRIANGLE_UV, M_INFINITY, DRAWABLE_GEOMETRY, DEFAULT_VIEWMASK);
 
         octree->Raycast(query);

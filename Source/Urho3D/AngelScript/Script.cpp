@@ -373,7 +373,7 @@ const char **Script::GetEnumValues(int asTypeID)
                       asTypeID,name,val,count);
 
             //fill with empty buffer
-            enumValues_[asTypeID] = PODVector<const char*>();
+            enumValues_[asTypeID] = Vector<const char*>();
             return nullptr;
         }
         else

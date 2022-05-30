@@ -195,7 +195,7 @@ void Graphics::Destructor_D3D11()
         MutexLock lock(gpuObjectMutex_);
 
         // Release all GPU objects that still exist
-        for (PODVector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
+        for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
             (*i)->Release();
         gpuObjects_.Clear();
     }
@@ -791,12 +791,12 @@ void Graphics::DrawInstanced_D3D11(PrimitiveType type, unsigned indexStart, unsi
 void Graphics::SetVertexBuffer_D3D11(VertexBuffer* buffer)
 {
     // Note: this is not multi-instance safe
-    static PODVector<VertexBuffer*> vertexBuffers(1);
+    static Vector<VertexBuffer*> vertexBuffers(1);
     vertexBuffers[0] = buffer;
     SetVertexBuffers_D3D11(vertexBuffers);
 }
 
-bool Graphics::SetVertexBuffers_D3D11(const PODVector<VertexBuffer*>& buffers, unsigned instanceOffset)
+bool Graphics::SetVertexBuffers_D3D11(const Vector<VertexBuffer*>& buffers, unsigned instanceOffset)
 {
     if (buffers.Size() > MAX_VERTEX_STREAMS)
     {
@@ -814,7 +814,7 @@ bool Graphics::SetVertexBuffers_D3D11(const PODVector<VertexBuffer*>& buffers, u
         buffer = i < buffers.Size() ? buffers[i] : nullptr;
         if (buffer)
         {
-            const PODVector<VertexElement>& elements = buffer->GetElements();
+            const Vector<VertexElement>& elements = buffer->GetElements();
             // Check if buffer has per-instance data
             bool hasInstanceData = elements.Size() && elements[0].perInstance_;
             unsigned offset = hasInstanceData ? instanceOffset * buffer->GetVertexSize() : 0;
@@ -858,7 +858,7 @@ bool Graphics::SetVertexBuffers_D3D11(const PODVector<VertexBuffer*>& buffers, u
 
 bool Graphics::SetVertexBuffers_D3D11(const Vector<SharedPtr<VertexBuffer>>& buffers, unsigned instanceOffset)
 {
-    return SetVertexBuffers_D3D11(reinterpret_cast<const PODVector<VertexBuffer*>&>(buffers), instanceOffset);
+    return SetVertexBuffers_D3D11(reinterpret_cast<const Vector<VertexBuffer*>&>(buffers), instanceOffset);
 }
 
 void Graphics::SetIndexBuffer_D3D11(IndexBuffer* buffer)
@@ -1265,7 +1265,7 @@ void Graphics::SetTextureParametersDirty_D3D11()
 {
     MutexLock lock(gpuObjectMutex_);
 
-    for (PODVector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
+    for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
     {
         Texture* texture = dynamic_cast<Texture*>(*i);
         if (texture)
@@ -1613,9 +1613,9 @@ bool Graphics::IsInitialized_D3D11() const
     return window_ != nullptr && GetImpl_D3D11()->GetDevice() != nullptr;
 }
 
-PODVector<int> Graphics::GetMultiSampleLevels_D3D11() const
+Vector<int> Graphics::GetMultiSampleLevels_D3D11() const
 {
-    PODVector<int> ret;
+    Vector<int> ret;
     ret.Push(1);
 
     GraphicsImpl_D3D11* impl = GetImpl_D3D11();
@@ -2090,7 +2090,7 @@ bool Graphics::CreateDevice_D3D11(int width, int height)
     }
 
     // Check that multisample level is supported
-    PODVector<int> multiSampleLevels = GetMultiSampleLevels_D3D11();
+    Vector<int> multiSampleLevels = GetMultiSampleLevels_D3D11();
     if (!multiSampleLevels.Contains(screenParams_.multiSample_))
         screenParams_.multiSample_ = 1;
 

@@ -156,18 +156,19 @@ public:
     /// Find an animation state by animation name hash.
     AnimationState* GetAnimationState(StringHash nameHash) const;
     /// Return the animation control structures for inspection.
+    /// @nobindtemp
     const Vector<AnimationControl>& GetAnimations() const { return animations_; }
 
     /// Set animation control structures attribute.
     void SetAnimationsAttr(const VariantVector& value);
     /// Set animations attribute for network replication.
-    void SetNetAnimationsAttr(const PODVector<unsigned char>& value);
+    void SetNetAnimationsAttr(const Vector<unsigned char>& value);
     /// Set node animation states attribute.
     void SetNodeAnimationStatesAttr(const VariantVector& value);
     /// Return animation control structures attribute.
     VariantVector GetAnimationsAttr() const;
     /// Return animations attribute for network replication.
-    const PODVector<unsigned char>& GetNetAnimationsAttr() const;
+    const Vector<unsigned char>& GetNetAnimationsAttr() const;
     /// Return node animation states attribute.
     VariantVector GetNodeAnimationStatesAttr() const;
 

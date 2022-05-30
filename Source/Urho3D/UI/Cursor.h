@@ -86,7 +86,7 @@ public:
     static void RegisterObject(Context* context);
 
     /// Return UI rendering batches.
-    void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor) override;
+    void GetBatches(Vector<UIBatch>& batches, Vector<float>& vertexData, const IntRect& currentScissor) override;
 
     /// Define a shape.
     void DefineShape(const String& shape, Image* image, const IntRect& imageRect, const IntVector2& hotSpot);

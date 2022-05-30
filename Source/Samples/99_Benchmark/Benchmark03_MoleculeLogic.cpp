@@ -27,7 +27,7 @@ static constexpr float CONTAINER_RADIUS = 9.f;
 
 void Benchmark03_MoleculeLogic::Update(float timeStep)
 {
-    PODVector<Node*> moleculeNodes;
+    Vector<Node*> moleculeNodes;
     GetScene()->GetChildrenWithComponent<Benchmark03_MoleculeLogic>(moleculeNodes);
 
     Vector2 moleculePos = node_->GetPosition2D();

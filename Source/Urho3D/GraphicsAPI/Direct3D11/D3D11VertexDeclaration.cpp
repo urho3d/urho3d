@@ -29,7 +29,7 @@ static const DXGI_FORMAT d3dElementFormats[] =
 VertexDeclaration_D3D11::VertexDeclaration_D3D11(Graphics* graphics, ShaderVariation* vertexShader, VertexBuffer** vertexBuffers) :
     inputLayout_(nullptr)
 {
-    PODVector<D3D11_INPUT_ELEMENT_DESC> elementDescs;
+    Vector<D3D11_INPUT_ELEMENT_DESC> elementDescs;
     unsigned prevBufferDescs = 0;
 
     for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
@@ -37,7 +37,7 @@ VertexDeclaration_D3D11::VertexDeclaration_D3D11(Graphics* graphics, ShaderVaria
         if (!vertexBuffers[i])
             continue;
 
-        const PODVector<VertexElement>& srcElements = vertexBuffers[i]->GetElements();
+        const Vector<VertexElement>& srcElements = vertexBuffers[i]->GetElements();
         bool isExisting = false;
 
         for (unsigned j = 0; j < srcElements.Size(); ++j)
@@ -79,7 +79,7 @@ VertexDeclaration_D3D11::VertexDeclaration_D3D11(Graphics* graphics, ShaderVaria
     if (elementDescs.Empty())
         return;
 
-    const PODVector<unsigned char>& byteCode = vertexShader->GetByteCode();
+    const Vector<unsigned char>& byteCode = vertexShader->GetByteCode();
 
     HRESULT hr = graphics->GetImpl_D3D11()->GetDevice()->CreateInputLayout(&elementDescs[0], (UINT)elementDescs.Size(), &byteCode[0],
         byteCode.Size(), (ID3D11InputLayout**)&inputLayout_);

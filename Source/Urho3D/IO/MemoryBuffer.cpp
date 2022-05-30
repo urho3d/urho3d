@@ -26,14 +26,14 @@ MemoryBuffer::MemoryBuffer(const void* data, unsigned size) :
         size_ = 0;
 }
 
-MemoryBuffer::MemoryBuffer(PODVector<unsigned char>& data) :
+MemoryBuffer::MemoryBuffer(Vector<unsigned char>& data) :
     AbstractFile(data.Size()),
     buffer_(data.Begin().ptr_),
     readOnly_(false)
 {
 }
 
-MemoryBuffer::MemoryBuffer(const PODVector<unsigned char>& data) :
+MemoryBuffer::MemoryBuffer(const Vector<unsigned char>& data) :
     AbstractFile(data.Size()),
     buffer_(const_cast<unsigned char*>(data.Begin().ptr_)),
     readOnly_(true)

@@ -95,9 +95,9 @@ URHO3D_API String ToStringHex(unsigned value);
 /// Convert a byte buffer to a string.
 URHO3D_API void BufferToString(String& dest, const void* data, unsigned size);
 /// Convert a string to a byte buffer.
-URHO3D_API void StringToBuffer(PODVector<unsigned char>& dest, const String& source);
+URHO3D_API void StringToBuffer(Vector<unsigned char>& dest, const String& source);
 /// Convert a C string to a byte buffer.
-URHO3D_API void StringToBuffer(PODVector<unsigned char>& dest, const char* source);
+URHO3D_API void StringToBuffer(Vector<unsigned char>& dest, const char* source);
 /// Return an index to a string list corresponding to the given string, or a default value if not found. The string list must be empty-terminated.
 URHO3D_API unsigned GetStringListIndex(const String& value, const String* strings, unsigned defaultIndex, bool caseSensitive = false);
 /// Return an index to a string list corresponding to the given C string, or a default value if not found. The string list must be empty-terminated.
@@ -117,7 +117,7 @@ URHO3D_API unsigned ToLower(unsigned ch);
 /// Convert a memory size into a formatted size string, of the style "1.5 Mb".
 URHO3D_API String GetFileSizeString(unsigned long long memorySize);
 /// Decode a base64-encoded string into buffer.
-URHO3D_API PODVector<unsigned char> DecodeBase64(String encodedString);
+URHO3D_API Vector<unsigned char> DecodeBase64(String encodedString);
 /// Parse type from a C string.
 template <class T> T FromString(const char* source);
 

@@ -144,7 +144,7 @@ public:
     void AddDelayedWorldTransform(const DelayedWorldTransform2D& transform);
 
     /// Perform a physics world raycast and return all hits.
-    void Raycast(PODVector<PhysicsRaycastResult2D>& results, const Vector2& startPoint, const Vector2& endPoint,
+    void Raycast(Vector<PhysicsRaycastResult2D>& results, const Vector2& startPoint, const Vector2& endPoint,
         unsigned collisionMask = M_MAX_UNSIGNED);
     /// Perform a physics world raycast and return the closest hit.
     void RaycastSingle(PhysicsRaycastResult2D& result, const Vector2& startPoint, const Vector2& endPoint,
@@ -154,7 +154,7 @@ public:
     /// Return rigid body at screen point.
     RigidBody2D* GetRigidBody(int screenX, int screenY, unsigned collisionMask = M_MAX_UNSIGNED);
     /// Return rigid bodies by a box query.
-    void GetRigidBodies(PODVector<RigidBody2D*>& results, const Rect& aabb, unsigned collisionMask = M_MAX_UNSIGNED);
+    void GetRigidBodies(Vector<RigidBody2D*>& results, const Rect& aabb, unsigned collisionMask = M_MAX_UNSIGNED);
 
     /// Return whether physics world will automatically simulate during scene update.
     /// @property
@@ -264,7 +264,7 @@ protected:
         /// Construct.
         explicit ContactInfo(b2Contact* contact);
         /// Write contact info to buffer.
-        const PODVector<unsigned char>& Serialize(VectorBuffer& buffer) const;
+        const Vector<unsigned char>& Serialize(VectorBuffer& buffer) const;
 
         /// Rigid body A.
         SharedPtr<RigidBody2D> bodyA_;

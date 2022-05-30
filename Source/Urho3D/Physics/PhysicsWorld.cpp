@@ -102,7 +102,7 @@ void CleanupGeometryCacheImpl(CollisionGeometryDataCache& cache)
 struct PhysicsQueryCallback : public btCollisionWorld::ContactResultCallback
 {
     /// Construct.
-    PhysicsQueryCallback(PODVector<RigidBody*>& result, unsigned collisionMask) :
+    PhysicsQueryCallback(Vector<RigidBody*>& result, unsigned collisionMask) :
         result_(result),
         collisionMask_(collisionMask)
     {
@@ -122,7 +122,7 @@ struct PhysicsQueryCallback : public btCollisionWorld::ContactResultCallback
     }
 
     /// Found rigid bodies.
-    PODVector<RigidBody*>& result_;
+    Vector<RigidBody*>& result_;
     /// Collision mask for the query.
     unsigned collisionMask_;
 };
@@ -160,13 +160,13 @@ PhysicsWorld::~PhysicsWorld()
     if (scene_)
     {
         // Force all remaining constraints, rigid bodies and collision shapes to release themselves
-        for (PODVector<Constraint*>::Iterator i = constraints_.Begin(); i != constraints_.End(); ++i)
+        for (Vector<Constraint*>::Iterator i = constraints_.Begin(); i != constraints_.End(); ++i)
             (*i)->ReleaseConstraint();
 
-        for (PODVector<RigidBody*>::Iterator i = rigidBodies_.Begin(); i != rigidBodies_.End(); ++i)
+        for (Vector<RigidBody*>::Iterator i = rigidBodies_.Begin(); i != rigidBodies_.End(); ++i)
             (*i)->ReleaseBody();
 
-        for (PODVector<CollisionShape*>::Iterator i = collisionShapes_.Begin(); i != collisionShapes_.End(); ++i)
+        for (Vector<CollisionShape*>::Iterator i = collisionShapes_.Begin(); i != collisionShapes_.End(); ++i)
             (*i)->ReleaseShape();
     }
 
@@ -352,7 +352,7 @@ void PhysicsWorld::SetMaxNetworkAngularVelocity(float velocity)
     MarkNetworkUpdate();
 }
 
-void PhysicsWorld::Raycast(PODVector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask)
+void PhysicsWorld::Raycast(Vector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask)
 {
     URHO3D_PROFILE(PhysicsRaycast);
 
@@ -601,7 +601,7 @@ void PhysicsWorld::RemoveCachedGeometry(Model* model)
     RemoveCachedGeometryImpl(gimpactTrimeshCache_, model);
 }
 
-void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const Sphere& sphere, unsigned collisionMask)
+void PhysicsWorld::GetRigidBodies(Vector<RigidBody*>& result, const Sphere& sphere, unsigned collisionMask)
 {
     URHO3D_PROFILE(PhysicsSphereQuery);
 
@@ -620,7 +620,7 @@ void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const Sphere& s
     world_->removeRigidBody(tempRigidBody.get());
 }
 
-void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const BoundingBox& box, unsigned collisionMask)
+void PhysicsWorld::GetRigidBodies(Vector<RigidBody*>& result, const BoundingBox& box, unsigned collisionMask)
 {
     URHO3D_PROFILE(PhysicsBoxQuery);
 
@@ -638,7 +638,7 @@ void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const BoundingB
     world_->removeRigidBody(tempRigidBody.get());
 }
 
-void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const RigidBody* body)
+void PhysicsWorld::GetRigidBodies(Vector<RigidBody*>& result, const RigidBody* body)
 {
     URHO3D_PROFILE(PhysicsBodyQuery);
 
@@ -661,7 +661,7 @@ void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const RigidBody
     }
 }
 
-void PhysicsWorld::GetCollidingBodies(PODVector<RigidBody*>& result, const RigidBody* body)
+void PhysicsWorld::GetCollidingBodies(Vector<RigidBody*>& result, const RigidBody* body)
 {
     URHO3D_PROFILE(GetCollidingBodies);
 

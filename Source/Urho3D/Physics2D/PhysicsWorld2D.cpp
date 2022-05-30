@@ -441,7 +441,7 @@ class RayCastCallback : public b2RayCastCallback
 {
 public:
     // Construct.
-    RayCastCallback(PODVector<PhysicsRaycastResult2D>& results, const Vector2& startPoint, unsigned collisionMask) :
+    RayCastCallback(Vector<PhysicsRaycastResult2D>& results, const Vector2& startPoint, unsigned collisionMask) :
         results_(results),
         startPoint_(startPoint),
         collisionMask_(collisionMask)
@@ -470,14 +470,14 @@ public:
 
 protected:
     // Physics raycast results.
-    PODVector<PhysicsRaycastResult2D>& results_;
+    Vector<PhysicsRaycastResult2D>& results_;
     // Start point.
     Vector2 startPoint_;
     // Collision mask.
     unsigned collisionMask_;
 };
 
-void PhysicsWorld2D::Raycast(PODVector<PhysicsRaycastResult2D>& results, const Vector2& startPoint, const Vector2& endPoint,
+void PhysicsWorld2D::Raycast(Vector<PhysicsRaycastResult2D>& results, const Vector2& startPoint, const Vector2& endPoint,
     unsigned collisionMask)
 {
     results.Clear();
@@ -621,7 +621,7 @@ class AabbQueryCallback : public b2QueryCallback
 {
 public:
     // Construct.
-    AabbQueryCallback(PODVector<RigidBody2D*>& results, unsigned collisionMask) :
+    AabbQueryCallback(Vector<RigidBody2D*>& results, unsigned collisionMask) :
         results_(results),
         collisionMask_(collisionMask)
     {
@@ -643,12 +643,12 @@ public:
 
 private:
     // Results.
-    PODVector<RigidBody2D*>& results_;
+    Vector<RigidBody2D*>& results_;
     // Collision mask.
     unsigned collisionMask_;
 };
 
-void PhysicsWorld2D::GetRigidBodies(PODVector<RigidBody2D*>& results, const Rect& aabb, unsigned collisionMask)
+void PhysicsWorld2D::GetRigidBodies(Vector<RigidBody2D*>& results, const Rect& aabb, unsigned collisionMask)
 {
     AabbQueryCallback callback(results, collisionMask);
 
@@ -829,7 +829,7 @@ PhysicsWorld2D::ContactInfo::ContactInfo(b2Contact* contact)
     }
 }
 
-const Urho3D::PODVector<unsigned char>& PhysicsWorld2D::ContactInfo::Serialize(VectorBuffer& buffer) const
+const Urho3D::Vector<unsigned char>& PhysicsWorld2D::ContactInfo::Serialize(VectorBuffer& buffer) const
 {
     buffer.Clear();
     for (int i = 0; i < numPoints_; ++i)

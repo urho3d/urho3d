@@ -178,7 +178,7 @@ bool Model::BeginLoad(Deserializer& source)
     {
         // Read bone mappings
         unsigned boneMappingCount = source.ReadUInt();
-        PODVector<unsigned> boneMapping(boneMappingCount);
+        Vector<unsigned> boneMapping(boneMappingCount);
         for (unsigned j = 0; j < boneMappingCount; ++j)
             boneMapping[j] = source.ReadUInt();
         geometryBoneMappings_.Push(boneMapping);
@@ -358,7 +358,7 @@ bool Model::Save(Serializer& dest) const
     {
         VertexBuffer* buffer = vertexBuffers_[i];
         dest.WriteUInt(buffer->GetVertexCount());
-        const PODVector<VertexElement>& elements = buffer->GetElements();
+        const Vector<VertexElement>& elements = buffer->GetElements();
         dest.WriteUInt(elements.Size());
         for (unsigned j = 0; j < elements.Size(); ++j)
         {
@@ -469,8 +469,8 @@ void Model::SetBoundingBox(const BoundingBox& box)
     boundingBox_ = box;
 }
 
-bool Model::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer>>& buffers, const PODVector<unsigned>& morphRangeStarts,
-    const PODVector<unsigned>& morphRangeCounts)
+bool Model::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer>>& buffers, const Vector<unsigned>& morphRangeStarts,
+    const Vector<unsigned>& morphRangeCounts)
 {
     for (unsigned i = 0; i < buffers.Size(); ++i)
     {
@@ -585,7 +585,7 @@ void Model::SetSkeleton(const Skeleton& skeleton)
     skeleton_ = skeleton;
 }
 
-void Model::SetGeometryBoneMappings(const Vector<PODVector<unsigned>>& geometryBoneMappings)
+void Model::SetGeometryBoneMappings(const Vector<Vector<unsigned>>& geometryBoneMappings)
 {
     geometryBoneMappings_ = geometryBoneMappings;
 }

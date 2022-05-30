@@ -270,8 +270,8 @@ void Billboards::MoveCamera(float timeStep)
 void Billboards::AnimateScene(float timeStep)
 {
     // Get the light and billboard scene nodes
-    PODVector<Node*> lightNodes;
-    PODVector<Node*> billboardNodes;
+    Vector<Node*> lightNodes;
+    Vector<Node*> billboardNodes;
     scene_->GetChildrenWithComponent<Light>(lightNodes);
     scene_->GetChildrenWithComponent<BillboardSet>(billboardNodes);
 

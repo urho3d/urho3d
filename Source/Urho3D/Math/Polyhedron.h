@@ -30,7 +30,7 @@ public:
     }
 
     /// Construct from a list of faces.
-    explicit Polyhedron(const Vector<PODVector<Vector3>>& faces) :
+    explicit Polyhedron(const Vector<Vector<Vector3>>& faces) :
         faces_(faces)
     {
     }
@@ -63,7 +63,7 @@ public:
     /// Add a quadrilateral face.
     void AddFace(const Vector3& v0, const Vector3& v1, const Vector3& v2, const Vector3& v3);
     /// Add an arbitrary face.
-    void AddFace(const PODVector<Vector3>& face);
+    void AddFace(const Vector<Vector3>& face);
     /// Clip with a plane.
     void Clip(const Plane& plane);
     /// Clip with a bounding box.
@@ -86,7 +86,7 @@ public:
     bool Empty() const { return faces_.Empty(); }
 
     /// Polygon faces.
-    Vector<PODVector<Vector3>> faces_;
+    Vector<Vector<Vector3>> faces_;
 
 private:
     /// Set a triangle face by index.
@@ -94,9 +94,9 @@ private:
     /// Set a quadrilateral face by index.
     void SetFace(unsigned index, const Vector3& v0, const Vector3& v1, const Vector3& v2, const Vector3& v3);
     /// Internal vector for clipped vertices.
-    PODVector<Vector3> clippedVertices_;
+    Vector<Vector3> clippedVertices_;
     /// Internal vector for the new face being constructed.
-    PODVector<Vector3> outFace_;
+    Vector<Vector3> outFace_;
 };
 
 }

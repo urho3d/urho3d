@@ -1112,9 +1112,9 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
     }
 
     // Make sure all the children are non-focusable so they do not mistakenly to be considered as active UI input controls by application
-    PODVector<UIElement*> allChildren;
+    Vector<UIElement*> allChildren;
     state.screenJoystick_->GetChildren(allChildren, true);
-    for (PODVector<UIElement*>::Iterator iter = allChildren.Begin(); iter != allChildren.End(); ++iter)
+    for (Vector<UIElement*>::Iterator iter = allChildren.Begin(); iter != allChildren.End(); ++iter)
         (*iter)->SetFocusMode(FM_NOTFOCUSABLE);
 
     state.Initialize(numButtons, numAxes, numHats);

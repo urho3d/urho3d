@@ -247,7 +247,7 @@ void Object::UnsubscribeFromAllEvents()
     }
 }
 
-void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData)
+void Object::UnsubscribeFromAllEventsExcept(const Vector<StringHash>& exceptions, bool onlyUserData)
 {
     EventHandler* handler = eventHandlers_.First();
     EventHandler* previous = nullptr;

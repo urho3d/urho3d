@@ -249,7 +249,7 @@ void Graphics::Destructor_D3D9()
         MutexLock lock(gpuObjectMutex_);
 
         // Release all GPU objects that still exist
-        for (PODVector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
+        for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
             (*i)->Release();
         gpuObjects_.Clear();
     }
@@ -397,7 +397,7 @@ bool Graphics::SetScreenMode_D3D9(int width, int height, const ScreenModeParams&
             {
                 MutexLock lock(gpuObjectMutex_);
                 // Release all GPU objects that still exist
-                for (PODVector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
+                for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
                     (*i)->Release();
             }
 
@@ -895,7 +895,7 @@ void Graphics::DrawInstanced_D3D9(PrimitiveType type, unsigned indexStart, unsig
         VertexBuffer* buffer = vertexBuffers_[i];
         if (buffer)
         {
-            const PODVector<VertexElement>& elements = buffer->GetElements();
+            const Vector<VertexElement>& elements = buffer->GetElements();
             // Check if buffer has per-instance data
             if (elements.Size() && elements[0].perInstance_)
                 SetStreamFrequency_D3D9(i, D3DSTREAMSOURCE_INSTANCEDATA | 1u);
@@ -925,7 +925,7 @@ void Graphics::DrawInstanced_D3D9(PrimitiveType type, unsigned indexStart, unsig
         VertexBuffer* buffer = vertexBuffers_[i];
         if (buffer)
         {
-            const PODVector<VertexElement>& elements = buffer->GetElements();
+            const Vector<VertexElement>& elements = buffer->GetElements();
             // Check if buffer has per-instance data
             if (elements.Size() && elements[0].perInstance_)
                 SetStreamFrequency_D3D9(i, D3DSTREAMSOURCE_INSTANCEDATA | 1u);
@@ -947,12 +947,12 @@ void Graphics::DrawInstanced_D3D9(PrimitiveType type, unsigned indexStart, unsig
 void Graphics::SetVertexBuffer_D3D9(VertexBuffer* buffer)
 {
     // Note: this is not multi-instance safe
-    static PODVector<VertexBuffer*> vertexBuffers(1);
+    static Vector<VertexBuffer*> vertexBuffers(1);
     vertexBuffers[0] = buffer;
     SetVertexBuffers_D3D9(vertexBuffers);
 }
 
-bool Graphics::SetVertexBuffers_D3D9(const PODVector<VertexBuffer*>& buffers, unsigned instanceOffset)
+bool Graphics::SetVertexBuffers_D3D9(const Vector<VertexBuffer*>& buffers, unsigned instanceOffset)
 {
     if (buffers.Size() > MAX_VERTEX_STREAMS)
     {
@@ -1001,7 +1001,7 @@ bool Graphics::SetVertexBuffers_D3D9(const PODVector<VertexBuffer*>& buffers, un
         if (i < buffers.Size() && buffers[i])
         {
             buffer = buffers[i];
-            const PODVector<VertexElement>& elements = buffer->GetElements();
+            const Vector<VertexElement>& elements = buffer->GetElements();
             // Check if buffer has per-instance data; add instance offset in that case
             if (elements.Size() && elements[0].perInstance_)
                 offset = instanceOffset * buffer->GetVertexSize();
@@ -1025,7 +1025,7 @@ bool Graphics::SetVertexBuffers_D3D9(const PODVector<VertexBuffer*>& buffers, un
 
 bool Graphics::SetVertexBuffers_D3D9(const Vector<SharedPtr<VertexBuffer>>& buffers, unsigned instanceOffset)
 {
-    return SetVertexBuffers_D3D9(reinterpret_cast<const PODVector<VertexBuffer*>&>(buffers), instanceOffset);
+    return SetVertexBuffers_D3D9(reinterpret_cast<const Vector<VertexBuffer*>&>(buffers), instanceOffset);
 }
 
 void Graphics::SetIndexBuffer_D3D9(IndexBuffer* buffer)
@@ -1906,9 +1906,9 @@ bool Graphics::IsInitialized_D3D9() const
     return window_ != nullptr && GetImpl_D3D9()->GetDevice() != nullptr;
 }
 
-PODVector<int> Graphics::GetMultiSampleLevels_D3D9() const
+Vector<int> Graphics::GetMultiSampleLevels_D3D9() const
 {
-    PODVector<int> ret;
+    Vector<int> ret;
     // No multisampling always supported
     ret.Push(1);
 
@@ -2557,7 +2557,7 @@ void Graphics::OnDeviceLost_D3D9()
     {
         MutexLock lock(gpuObjectMutex_);
 
-        for (PODVector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
+        for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
             (*i)->OnDeviceLost();
     }
 
@@ -2569,7 +2569,7 @@ void Graphics::OnDeviceReset_D3D9()
     {
         MutexLock lock(gpuObjectMutex_);
 
-        for (PODVector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
+        for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
             (*i)->OnDeviceReset();
     }
 

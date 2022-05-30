@@ -165,7 +165,7 @@ bool TmxTileLayer2D::Load(const XMLElement& element, const TileMapInfo2D& info)
         while (!IsAlpha(dataValue[startPosition]) && !IsDigit(dataValue[startPosition])
               && dataValue[startPosition] != '+' && dataValue[startPosition] != '/') ++startPosition;
         dataValue = dataValue.Substring(startPosition);
-        PODVector<unsigned char> buffer = DecodeBase64(dataValue);
+        Vector<unsigned char> buffer = DecodeBase64(dataValue);
         int currentIndex = 0;
         for (int y = 0; y < height_; ++y)
         {

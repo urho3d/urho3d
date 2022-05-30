@@ -204,7 +204,7 @@ void LuaScript::RemoveAllEventHandlers()
 
 void LuaScript::RemoveEventHandlersExcept(const Vector<String>& exceptionNames)
 {
-    PODVector<StringHash> exceptionTypes(exceptionNames.Size());
+    Vector<StringHash> exceptionTypes(exceptionNames.Size());
     for (unsigned i = 0; i < exceptionTypes.Size(); ++i)
         exceptionTypes[i] = StringHash(exceptionNames[i]);
 

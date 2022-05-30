@@ -123,7 +123,7 @@ public:
     bool HasEventFrames() const { return !eventFrames_.Empty(); }
 
     /// Return all event frames between time.
-    void GetEventFrames(float beginTime, float endTime, PODVector<const VAnimEventFrame*>& eventFrames) const;
+    void GetEventFrames(float beginTime, float endTime, Vector<const VAnimEventFrame*>& eventFrames) const;
 
 protected:
     /// Linear interpolation.

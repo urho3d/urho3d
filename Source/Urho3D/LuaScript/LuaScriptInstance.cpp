@@ -67,9 +67,9 @@ void LuaScriptInstance::RegisterObject(Context* context)
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Script File", GetScriptFileAttr, SetScriptFileAttr, ResourceRef,
         ResourceRef(LuaFile::GetTypeStatic()), AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Script Object Type", GetScriptObjectType, SetScriptObjectType, String, String::EMPTY, AM_DEFAULT);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Script Data", GetScriptDataAttr, SetScriptDataAttr, PODVector<unsigned char>, Variant::emptyBuffer,
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Script Data", GetScriptDataAttr, SetScriptDataAttr, Vector<unsigned char>, Variant::emptyBuffer,
         AM_FILE | AM_NOEDIT);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Script Network Data", GetScriptNetworkDataAttr, SetScriptNetworkDataAttr, PODVector<unsigned char>,
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Script Network Data", GetScriptNetworkDataAttr, SetScriptNetworkDataAttr, Vector<unsigned char>,
         Variant::emptyBuffer, AM_NET | AM_NOEDIT);
 }
 
@@ -341,7 +341,7 @@ void LuaScriptInstance::RemoveAllEventHandlers()
 
 void LuaScriptInstance::RemoveEventHandlersExcept(const Vector<String>& exceptionNames)
 {
-    PODVector<StringHash> exceptionTypes(exceptionNames.Size());
+    Vector<StringHash> exceptionTypes(exceptionNames.Size());
     for (unsigned i = 0; i < exceptionTypes.Size(); ++i)
         exceptionTypes[i] = StringHash(exceptionNames[i]);
 
@@ -412,7 +412,7 @@ void LuaScriptInstance::SetScriptObjectType(const String& scriptObjectType)
     FindScriptObjectMethodRefs();
 }
 
-void LuaScriptInstance::SetScriptDataAttr(const PODVector<unsigned char>& data)
+void LuaScriptInstance::SetScriptDataAttr(const Vector<unsigned char>& data)
 {
     if (scriptObjectRef_ == LUA_REFNIL)
         return;
@@ -426,7 +426,7 @@ void LuaScriptInstance::SetScriptDataAttr(const PODVector<unsigned char>& data)
     }
 }
 
-void LuaScriptInstance::SetScriptNetworkDataAttr(const PODVector<unsigned char>& data)
+void LuaScriptInstance::SetScriptNetworkDataAttr(const Vector<unsigned char>& data)
 {
     if (scriptObjectRef_ == LUA_REFNIL)
         return;
@@ -445,10 +445,10 @@ LuaFile* LuaScriptInstance::GetScriptFile() const
     return scriptFile_;
 }
 
-PODVector<unsigned char> LuaScriptInstance::GetScriptDataAttr() const
+Vector<unsigned char> LuaScriptInstance::GetScriptDataAttr() const
 {
     if (scriptObjectRef_ == LUA_REFNIL)
-        return PODVector<unsigned char>();
+        return Vector<unsigned char>();
 
     VectorBuffer buf;
 
@@ -462,10 +462,10 @@ PODVector<unsigned char> LuaScriptInstance::GetScriptDataAttr() const
     return buf.GetBuffer();
 }
 
-PODVector<unsigned char> LuaScriptInstance::GetScriptNetworkDataAttr() const
+Vector<unsigned char> LuaScriptInstance::GetScriptNetworkDataAttr() const
 {
     if (scriptObjectRef_ == LUA_REFNIL)
-        return PODVector<unsigned char>();
+        return Vector<unsigned char>();
 
     VectorBuffer buf;
 

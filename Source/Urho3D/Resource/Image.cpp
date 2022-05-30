@@ -1331,7 +1331,7 @@ bool Image::SaveDDS(const String& fileName) const
     }
 
     // Write image
-    PODVector<const Image*> levels;
+    Vector<const Image*> levels;
     GetLevels(levels);
 
     outFile.WriteFileID("DDS ");
@@ -2141,7 +2141,7 @@ Image* Image::GetSubimage(const IntRect& rect) const
         paddedRect.bottom_ = (rect.bottom_ / 4) * 4;
         IntRect currentRect = paddedRect;
 
-        PODVector<unsigned char> subimageData;
+        Vector<unsigned char> subimageData;
         unsigned subimageLevels = 0;
 
         // Save as many mips as possible until the next mip would cross a block boundary
@@ -2293,7 +2293,7 @@ void Image::CleanupLevels()
     nextLevel_.Reset();
 }
 
-void Image::GetLevels(PODVector<Image*>& levels)
+void Image::GetLevels(Vector<Image*>& levels)
 {
     levels.Clear();
 
@@ -2305,7 +2305,7 @@ void Image::GetLevels(PODVector<Image*>& levels)
     }
 }
 
-void Image::GetLevels(PODVector<const Image*>& levels) const
+void Image::GetLevels(Vector<const Image*>& levels) const
 {
     levels.Clear();
 

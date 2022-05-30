@@ -41,7 +41,7 @@ class ShadowCasterOctreeQuery : public FrustumOctreeQuery
 {
 public:
     /// Construct with frustum and query parameters.
-    ShadowCasterOctreeQuery(PODVector<Drawable*>& result, const Frustum& frustum, unsigned char drawableFlags = DRAWABLE_ANY,
+    ShadowCasterOctreeQuery(Vector<Drawable*>& result, const Frustum& frustum, unsigned char drawableFlags = DRAWABLE_ANY,
         unsigned viewMask = DEFAULT_VIEWMASK) :
         FrustumOctreeQuery(result, frustum, drawableFlags, viewMask)
     {
@@ -69,7 +69,7 @@ class ZoneOccluderOctreeQuery : public FrustumOctreeQuery
 {
 public:
     /// Construct with frustum and query parameters.
-    ZoneOccluderOctreeQuery(PODVector<Drawable*>& result, const Frustum& frustum, unsigned char drawableFlags = DRAWABLE_ANY,
+    ZoneOccluderOctreeQuery(Vector<Drawable*>& result, const Frustum& frustum, unsigned char drawableFlags = DRAWABLE_ANY,
         unsigned viewMask = DEFAULT_VIEWMASK) :
         FrustumOctreeQuery(result, frustum, drawableFlags, viewMask)
     {
@@ -98,7 +98,7 @@ class OccludedFrustumOctreeQuery : public FrustumOctreeQuery
 {
 public:
     /// Construct with frustum, occlusion buffer and query parameters.
-    OccludedFrustumOctreeQuery(PODVector<Drawable*>& result, const Frustum& frustum, OcclusionBuffer* buffer,
+    OccludedFrustumOctreeQuery(Vector<Drawable*>& result, const Frustum& frustum, OcclusionBuffer* buffer,
         unsigned char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) :
         FrustumOctreeQuery(result, frustum, drawableFlags, viewMask),
         buffer_(buffer)
@@ -786,7 +786,7 @@ void View::GetDrawables()
     URHO3D_PROFILE(GetDrawables);
 
     auto* queue = GetSubsystem<WorkQueue>();
-    PODVector<Drawable*>& tempDrawables = tempDrawables_[0];
+    Vector<Drawable*>& tempDrawables = tempDrawables_[0];
 
     // Get zones and occluders first
     {
@@ -800,7 +800,7 @@ void View::GetDrawables()
     Node* cameraNode = cullCamera_->GetNode();
     Vector3 cameraPos = cameraNode->GetWorldPosition();
 
-    for (PODVector<Drawable*>::ConstIterator i = tempDrawables.Begin(); i != tempDrawables.End(); ++i)
+    for (Vector<Drawable*>::ConstIterator i = tempDrawables.Begin(); i != tempDrawables.End(); ++i)
     {
         Drawable* drawable = *i;
         unsigned char flags = drawable->GetDrawableFlags();
@@ -829,7 +829,7 @@ void View::GetDrawables()
         Vector3 farClipPos = cameraPos + cameraNode->GetWorldDirection() * Vector3(0.0f, 0.0f, cullCamera_->GetFarClip());
         bestPriority = M_MIN_INT;
 
-        for (PODVector<Zone*>::Iterator i = zones_.Begin(); i != zones_.End(); ++i)
+        for (Vector<Zone*>::Iterator i = zones_.Begin(); i != zones_.End(); ++i)
         {
             int priority = (*i)->GetPriority();
             if (priority > bestPriority && (*i)->IsInside(farClipPos))
@@ -886,7 +886,7 @@ void View::GetDrawables()
         int numWorkItems = queue->GetNumThreads() + 1; // Worker threads + main thread
         int drawablesPerItem = tempDrawables.Size() / numWorkItems;
 
-        PODVector<Drawable*>::Iterator start = tempDrawables.Begin();
+        Vector<Drawable*>::Iterator start = tempDrawables.Begin();
         // Create a work item for each thread
         for (int i = 0; i < numWorkItems; ++i)
         {
@@ -895,7 +895,7 @@ void View::GetDrawables()
             item->workFunction_ = CheckVisibilityWork;
             item->aux_ = this;
 
-            PODVector<Drawable*>::Iterator end = tempDrawables.End();
+            Vector<Drawable*>::Iterator end = tempDrawables.End();
             if (i < numWorkItems - 1 && end - start > drawablesPerItem)
                 end = start + drawablesPerItem;
 
@@ -1070,7 +1070,7 @@ void View::GetLightBatches()
                     FinalizeShadowCamera(shadowCamera, light, shadowQueue.shadowViewport_, query.shadowCasterBox_[j]);
 
                     // Loop through shadow casters
-                    for (PODVector<Drawable*>::ConstIterator k = query.shadowCasters_.Begin() + query.shadowCasterBegin_[j];
+                    for (Vector<Drawable*>::ConstIterator k = query.shadowCasters_.Begin() + query.shadowCasterBegin_[j];
                          k < query.shadowCasters_.Begin() + query.shadowCasterEnd_[j]; ++k)
                     {
                         Drawable* drawable = *k;
@@ -1110,7 +1110,7 @@ void View::GetLightBatches()
                 }
 
                 // Process lit geometries
-                for (PODVector<Drawable*>::ConstIterator j = query.litGeometries_.Begin(); j != query.litGeometries_.End(); ++j)
+                for (Vector<Drawable*>::ConstIterator j = query.litGeometries_.Begin(); j != query.litGeometries_.End(); ++j)
                 {
                     Drawable* drawable = *j;
                     drawable->AddLight(light);
@@ -1146,7 +1146,7 @@ void View::GetLightBatches()
             else
             {
                 // Add the vertex light to lit drawables. It will be processed later during base pass batch generation
-                for (PODVector<Drawable*>::ConstIterator j = query.litGeometries_.Begin(); j != query.litGeometries_.End(); ++j)
+                for (Vector<Drawable*>::ConstIterator j = query.litGeometries_.Begin(); j != query.litGeometries_.End(); ++j)
                 {
                     Drawable* drawable = *j;
                     drawable->AddVertexLight(light);
@@ -1164,7 +1164,7 @@ void View::GetLightBatches()
         {
             Drawable* drawable = *i;
             drawable->LimitLights();
-            const PODVector<Light*>& lights = drawable->GetLights();
+            const Vector<Light*>& lights = drawable->GetLights();
 
             for (unsigned i = 0; i < lights.Size(); ++i)
             {
@@ -1182,7 +1182,7 @@ void View::GetBaseBatches()
 {
     URHO3D_PROFILE(GetBaseBatches);
 
-    for (PODVector<Drawable*>::ConstIterator i = geometries_.Begin(); i != geometries_.End(); ++i)
+    for (Vector<Drawable*>::ConstIterator i = geometries_.Begin(); i != geometries_.End(); ++i)
     {
         Drawable* drawable = *i;
         UpdateGeometryType type = drawable->GetUpdateGeometryType();
@@ -1227,7 +1227,7 @@ void View::GetBaseBatches()
 
                 if (info.vertexLights_)
                 {
-                    const PODVector<Light*>& drawableVertexLights = drawable->GetVertexLights();
+                    const Vector<Light*>& drawableVertexLights = drawable->GetVertexLights();
                     if (drawableVertexLights.Size() && !vertexLightsProcessed)
                     {
                         // Limit vertex lights. If this is a deferred opaque batch, remove converted per-pixel lights,
@@ -1324,7 +1324,7 @@ void View::UpdateGeometries()
             // In special cases (context loss, multi-view) a drawable may theoretically first have reported a threaded update, but will actually
             // require a main thread update. Check these cases first and move as applicable. The threaded work routine will tolerate the null
             // pointer holes that we leave to the threaded update queue.
-            for (PODVector<Drawable*>::Iterator i = threadedGeometries_.Begin(); i != threadedGeometries_.End(); ++i)
+            for (Vector<Drawable*>::Iterator i = threadedGeometries_.Begin(); i != threadedGeometries_.End(); ++i)
             {
                 if ((*i)->GetUpdateGeometryType() == UPDATE_MAIN_THREAD)
                 {
@@ -1336,10 +1336,10 @@ void View::UpdateGeometries()
             int numWorkItems = queue->GetNumThreads() + 1; // Worker threads + main thread
             int drawablesPerItem = threadedGeometries_.Size() / numWorkItems;
 
-            PODVector<Drawable*>::Iterator start = threadedGeometries_.Begin();
+            Vector<Drawable*>::Iterator start = threadedGeometries_.Begin();
             for (int i = 0; i < numWorkItems; ++i)
             {
-                PODVector<Drawable*>::Iterator end = threadedGeometries_.End();
+                Vector<Drawable*>::Iterator end = threadedGeometries_.End();
                 if (i < numWorkItems - 1 && end - start > drawablesPerItem)
                     end = start + drawablesPerItem;
 
@@ -1356,7 +1356,7 @@ void View::UpdateGeometries()
         }
 
         // While the work queue is processed, update non-threaded geometries
-        for (PODVector<Drawable*>::ConstIterator i = nonThreadedGeometries_.Begin(); i != nonThreadedGeometries_.End(); ++i)
+        for (Vector<Drawable*>::ConstIterator i = nonThreadedGeometries_.Begin(); i != nonThreadedGeometries_.End(); ++i)
             (*i)->UpdateGeometry(frame_);
     }
 
@@ -2165,13 +2165,13 @@ void View::DrawFullscreenQuad(bool setIdentityProjection)
     geometry->Draw(graphics_);
 }
 
-void View::UpdateOccluders(PODVector<Drawable*>& occluders, Camera* camera)
+void View::UpdateOccluders(Vector<Drawable*>& occluders, Camera* camera)
 {
     float occluderSizeThreshold_ = renderer_->GetOccluderSizeThreshold();
     float halfViewSize = camera->GetHalfViewSize();
     float invOrthoSize = 1.0f / camera->GetOrthoSize();
 
-    for (PODVector<Drawable*>::Iterator i = occluders.Begin(); i != occluders.End();)
+    for (Vector<Drawable*>::Iterator i = occluders.Begin(); i != occluders.End();)
     {
         Drawable* occluder = *i;
         bool erase = false;
@@ -2225,7 +2225,7 @@ void View::UpdateOccluders(PODVector<Drawable*>& occluders, Camera* camera)
         Sort(occluders.Begin(), occluders.End(), CompareDrawables);
 }
 
-void View::DrawOccluders(OcclusionBuffer* buffer, const PODVector<Drawable*>& occluders)
+void View::DrawOccluders(OcclusionBuffer* buffer, const Vector<Drawable*>& occluders)
 {
     buffer->SetMaxTriangles((unsigned)maxOccluderTriangles_);
     buffer->Clear();
@@ -2288,7 +2288,7 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
         isShadowed = false;
 #endif
     // Get lit geometries. They must match the light mask and be inside the main camera frustum to be considered
-    PODVector<Drawable*>& tempDrawables = tempDrawables_[threadIndex];
+    Vector<Drawable*>& tempDrawables = tempDrawables_[threadIndex];
     query.litGeometries_.Clear();
 
     switch (type)
@@ -2373,7 +2373,7 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
         query.numSplits_ = 0;
 }
 
-void View::ProcessShadowCasters(LightQueryResult& query, const PODVector<Drawable*>& drawables, unsigned splitIndex)
+void View::ProcessShadowCasters(LightQueryResult& query, const Vector<Drawable*>& drawables, unsigned splitIndex)
 {
     Light* light = query.light_;
     unsigned lightMask = light->GetLightMask();
@@ -2405,7 +2405,7 @@ void View::ProcessShadowCasters(LightQueryResult& query, const PODVector<Drawabl
     BoundingBox lightViewBox;
     BoundingBox lightProjBox;
 
-    for (PODVector<Drawable*>::ConstIterator i = drawables.Begin(); i != drawables.End(); ++i)
+    for (Vector<Drawable*>::ConstIterator i = drawables.Begin(); i != drawables.End(); ++i)
     {
         Drawable* drawable = *i;
         // In case this is a point or spot light query result reused for optimization, we may have non-shadowcasters included.
@@ -2791,7 +2791,7 @@ void View::FindZone(Drawable* drawable)
         newZone = lastZone;
     else
     {
-        for (PODVector<Zone*>::Iterator i = zones_.Begin(); i != zones_.End(); ++i)
+        for (Vector<Zone*>::Iterator i = zones_.Begin(); i != zones_.End(); ++i)
         {
             Zone* zone = *i;
             int priority = zone->GetPriority();

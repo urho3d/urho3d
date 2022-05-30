@@ -603,12 +603,12 @@ void BufferToString(String& dest, const void* data, unsigned size)
     }
 }
 
-void StringToBuffer(PODVector<unsigned char>& dest, const String& source)
+void StringToBuffer(Vector<unsigned char>& dest, const String& source)
 {
     StringToBuffer(dest, source.CString());
 }
 
-void StringToBuffer(PODVector<unsigned char>& dest, const char* source)
+void StringToBuffer(Vector<unsigned char>& dest, const char* source)
 {
     if (!source)
     {
@@ -773,14 +773,14 @@ static inline bool IsBase64(char c) {
     return (isalnum(c) || (c == '+') || (c == '/'));
 }
 
-PODVector<unsigned char> DecodeBase64(String encodedString)
+Vector<unsigned char> DecodeBase64(String encodedString)
 {
     int inLen = encodedString.Length();
     int i = 0;
     int j = 0;
     int in_ = 0;
     unsigned char charArray4[4], charArray3[3];
-    PODVector<unsigned char> ret;
+    Vector<unsigned char> ret;
 
     while (inLen-- && (encodedString[in_] != '=') && IsBase64(encodedString[in_]))
     {

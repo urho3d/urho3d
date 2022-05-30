@@ -20,7 +20,7 @@
 namespace Urho3D
 {
 
-static void CopyStrippedCode(PODVector<unsigned char>& byteCode, unsigned char* bufData, unsigned bufSize)
+static void CopyStrippedCode(Vector<unsigned char>& byteCode, unsigned char* bufData, unsigned bufSize)
 {
     unsigned const D3DSIO_COMMENT = 0xFFFE;
     unsigned* srcWords = (unsigned*)bufData;
@@ -241,7 +241,7 @@ bool ShaderVariation::Compile_D3D9()
 
     // Collect defines into macros
     Vector<String> defineValues;
-    PODVector<D3D_SHADER_MACRO> macros;
+    Vector<D3D_SHADER_MACRO> macros;
 
     for (unsigned i = 0; i < defines.Size(); ++i)
     {

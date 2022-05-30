@@ -34,8 +34,8 @@ static const float sigma3Kernel9x9[9 * 9] = {
 int main(int argc, char** argv);
 void Run(const Vector<String>& arguments);
 
-bool ReadIES(File* data, PODVector<float>& vertical, PODVector<float>& horizontal, PODVector<float>& luminance);
-void WriteIES(unsigned char* data, unsigned width, unsigned height, PODVector<float>& horizontal, PODVector<float>& vertical, PODVector<float>& luminance);
+bool ReadIES(File* data, Vector<float>& vertical, Vector<float>& horizontal, Vector<float>& luminance);
+void WriteIES(unsigned char* data, unsigned width, unsigned height, Vector<float>& horizontal, Vector<float>& vertical, Vector<float>& luminance);
 void Blur(unsigned char* data, unsigned width, unsigned height, const float* kernel, unsigned kernelWidth);
 
 int main(int argc, char** argv)
@@ -76,9 +76,9 @@ void Run(const Vector<String>& arguments)
         File file(&context);
         file.Open(inputFile);
 
-        PODVector<float> horizontal;
-        PODVector<float> vertical;
-        PODVector<float> luminance;
+        Vector<float> horizontal;
+        Vector<float> vertical;
+        Vector<float> luminance;
         ReadIES(&file, vertical, horizontal, luminance);
 
         SharedArrayPtr<unsigned char> data(new unsigned char[width * height]);
@@ -157,7 +157,7 @@ void Run(const Vector<String>& arguments)
     }
 }
 
-unsigned GetSample(float position, PODVector<float>& inputs)
+unsigned GetSample(float position, Vector<float>& inputs)
 {
     unsigned pos = 0;
     // Early outs
@@ -216,7 +216,7 @@ int PopFirstInt(Vector<String>& words)
     return -1; // < 0 ever valid?
 }
 
-bool ReadIES(File* data, PODVector<float>& vertical, PODVector<float>& horizontal, PODVector<float>& luminance)
+bool ReadIES(File* data, Vector<float>& vertical, Vector<float>& horizontal, Vector<float>& luminance)
 {
     String line = data->ReadLine();
     if (!line.Contains("IESNA:LM-63-1995") && !line.Contains("IESNA:LM-63-2002"))
@@ -287,7 +287,7 @@ bool ReadIES(File* data, PODVector<float>& vertical, PODVector<float>& horizonta
     return true;
 }
 
-void WriteIES(unsigned char* data, unsigned width, unsigned height, PODVector<float>& horizontal, PODVector<float>& vertical, PODVector<float>& luminance)
+void WriteIES(unsigned char* data, unsigned width, unsigned height, Vector<float>& horizontal, Vector<float>& vertical, Vector<float>& luminance)
 {
     // Find maximum luminance value
     float maximum = -1;

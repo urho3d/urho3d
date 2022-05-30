@@ -22,10 +22,10 @@ static CScriptArray* constspVectorlesStringgreamp_ParseArguments_constspStringam
     return VectorToArray<String>(result, "Array<String>");
 }
 
-// bool WriteDrawablesToOBJ(const PODVector<Drawable*>& drawables, File* outputFile, bool asZUp, bool asRightHanded, bool writeLightmapUV = false) | File: ../Graphics/Drawable.h
-static bool bool_WriteDrawablesToOBJ_constspPODVectorlesDrawablestargreamp_Filestar_bool_bool_bool(CScriptArray* drawables_conv, File* outputFile, bool asZUp, bool asRightHanded, bool writeLightmapUV)
+// bool WriteDrawablesToOBJ(const Vector<Drawable*>& drawables, File* outputFile, bool asZUp, bool asRightHanded, bool writeLightmapUV = false) | File: ../Graphics/Drawable.h
+static bool bool_WriteDrawablesToOBJ_constspVectorlesDrawablestargreamp_Filestar_bool_bool_bool(CScriptArray* drawables_conv, File* outputFile, bool asZUp, bool asRightHanded, bool writeLightmapUV)
 {
-    PODVector<Drawable*> drawables = ArrayToVector<Drawable*>(drawables_conv);
+    Vector<Drawable*> drawables = ArrayToVector<Drawable*>(drawables_conv);
     bool result = WriteDrawablesToOBJ(drawables, outputFile, asZUp, asRightHanded, writeLightmapUV);
     return result;
 }
@@ -93,8 +93,8 @@ void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
     // i32 CountSetBits(u32 value) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("int CountSetBits(uint)", AS_FUNCTIONPR(CountSetBits, (u32), i32), AS_CALL_CDECL);
 
-    // PODVector<unsigned char> DecodeBase64(String encodedString) | File: ../Core/StringUtils.h
-    // Error: type "PODVector<unsigned char>" can not automatically bind
+    // Vector<unsigned char> DecodeBase64(String encodedString) | File: ../Core/StringUtils.h
+    // Error: type "Vector<unsigned char>" can not automatically bind
 
     // unsigned DecompressData(void* dest, const void* src, unsigned destSize) | File: ../IO/Compression.h
     // Error: type "void*" can not automatically bind
@@ -405,11 +405,11 @@ void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
     // float StableRandom(float seed) | File: ../Math/Vector2.h
     engine->RegisterGlobalFunction("float StableRandom(float)", AS_FUNCTIONPR(StableRandom, (float), float), AS_CALL_CDECL);
 
-    // void StringToBuffer(PODVector<unsigned char>& dest, const String& source) | File: ../Core/StringUtils.h
-    // Error: type "PODVector<unsigned char>&" can not automatically bind
+    // void StringToBuffer(Vector<unsigned char>& dest, const String& source) | File: ../Core/StringUtils.h
+    // Error: type "Vector<unsigned char>&" can not automatically bind
 
-    // void StringToBuffer(PODVector<unsigned char>& dest, const char* source) | File: ../Core/StringUtils.h
-    // Error: type "PODVector<unsigned char>&" can not automatically bind
+    // void StringToBuffer(Vector<unsigned char>& dest, const char* source) | File: ../Core/StringUtils.h
+    // Error: type "Vector<unsigned char>&" can not automatically bind
 
     // template <class T> T Tan(T angle) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("float Tan(float)", AS_FUNCTIONPR(Tan, (float), float), AS_CALL_CDECL);
@@ -645,8 +645,8 @@ void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
     // IntVector3 VectorRoundToInt(const Vector3& vec) | File: ../Math/Vector3.h
     engine->RegisterGlobalFunction("IntVector3 VectorRoundToInt(const Vector3&in)", AS_FUNCTIONPR(VectorRoundToInt, (const Vector3&), IntVector3), AS_CALL_CDECL);
 
-    // bool WriteDrawablesToOBJ(const PODVector<Drawable*>& drawables, File* outputFile, bool asZUp, bool asRightHanded, bool writeLightmapUV = false) | File: ../Graphics/Drawable.h
-    engine->RegisterGlobalFunction("bool WriteDrawablesToOBJ(Array<Drawable@>@, File@+, bool, bool, bool = false)", AS_FUNCTION(bool_WriteDrawablesToOBJ_constspPODVectorlesDrawablestargreamp_Filestar_bool_bool_bool), AS_CALL_CDECL);
+    // bool WriteDrawablesToOBJ(const Vector<Drawable*>& drawables, File* outputFile, bool asZUp, bool asRightHanded, bool writeLightmapUV = false) | File: ../Graphics/Drawable.h
+    engine->RegisterGlobalFunction("bool WriteDrawablesToOBJ(Array<Drawable@>@, File@+, bool, bool, bool = false)", AS_FUNCTION(bool_WriteDrawablesToOBJ_constspVectorlesDrawablestargreamp_Filestar_bool_bool_bool), AS_CALL_CDECL);
 
 #ifdef URHO3D_IK
     // void RegisterIKLibrary(Context* context) | File: ../IK/IK.h

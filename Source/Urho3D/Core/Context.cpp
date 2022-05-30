@@ -68,7 +68,7 @@ void EventReceiverGroup::Remove(Object* object)
 {
     if (inSend_ > 0)
     {
-        PODVector<Object*>::Iterator i = receivers_.Find(object);
+        Vector<Object*>::Iterator i = receivers_.Find(object);
         if (i != receivers_.End())
         {
             (*i) = nullptr;
@@ -127,7 +127,7 @@ Context::~Context()
     factories_.Clear();
 
     // Delete allocated event data maps
-    for (PODVector<VariantMap*>::Iterator i = eventDataMaps_.Begin(); i != eventDataMaps_.End(); ++i)
+    for (Vector<VariantMap*>::Iterator i = eventDataMaps_.Begin(); i != eventDataMaps_.End(); ++i)
         delete *i;
     eventDataMaps_.Clear();
 }
@@ -407,7 +407,7 @@ void Context::RemoveEventSender(Object* sender)
     {
         for (HashMap<StringHash, SharedPtr<EventReceiverGroup>>::Iterator j = i->second_.Begin(); j != i->second_.End(); ++j)
         {
-            for (PODVector<Object*>::Iterator k = j->second_->receivers_.Begin(); k != j->second_->receivers_.End(); ++k)
+            for (Vector<Object*>::Iterator k = j->second_->receivers_.Begin(); k != j->second_->receivers_.End(); ++k)
             {
                 Object* receiver = *k;
                 if (receiver)

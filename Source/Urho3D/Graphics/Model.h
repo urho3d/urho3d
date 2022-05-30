@@ -50,7 +50,7 @@ struct VertexBufferDesc
     /// Vertex count.
     unsigned vertexCount_;
     /// Vertex declaration.
-    PODVector<VertexElement> vertexElements_;
+    Vector<VertexElement> vertexElements_;
     /// Vertex data size.
     unsigned dataSize_;
     /// Vertex data.
@@ -110,8 +110,8 @@ public:
     /// @property
     void SetBoundingBox(const BoundingBox& box);
     /// Set vertex buffers and their morph ranges.
-    bool SetVertexBuffers(const Vector<SharedPtr<VertexBuffer>>& buffers, const PODVector<unsigned>& morphRangeStarts,
-        const PODVector<unsigned>& morphRangeCounts);
+    bool SetVertexBuffers(const Vector<SharedPtr<VertexBuffer>>& buffers, const Vector<unsigned>& morphRangeStarts,
+        const Vector<unsigned>& morphRangeCounts);
     /// Set index buffers.
     bool SetIndexBuffers(const Vector<SharedPtr<IndexBuffer>>& buffers);
     /// Set number of geometries.
@@ -128,7 +128,7 @@ public:
     /// Set skeleton.
     void SetSkeleton(const Skeleton& skeleton);
     /// Set bone mappings when model has more bones than the skinning shader can handle.
-    void SetGeometryBoneMappings(const Vector<PODVector<unsigned>>& geometryBoneMappings);
+    void SetGeometryBoneMappings(const Vector<Vector<unsigned>>& geometryBoneMappings);
     /// Set vertex morphs.
     void SetMorphs(const Vector<ModelMorph>& morphs);
     /// Clone the model. The geometry data is deep-copied and can be modified in the clone without affecting the original.
@@ -160,7 +160,7 @@ public:
     const Vector<Vector<SharedPtr<Geometry>>>& GetGeometries() const { return geometries_; }
 
     /// Return geometry center points.
-    const PODVector<Vector3>& GetGeometryCenters() const { return geometryCenters_; }
+    const Vector<Vector3>& GetGeometryCenters() const { return geometryCenters_; }
 
     /// Return geometry by index and LOD level. The LOD level is clamped if out of range.
     Geometry* GetGeometry(unsigned index, unsigned lodLevel) const;
@@ -173,7 +173,7 @@ public:
     }
 
     /// Return geometery bone mappings.
-    const Vector<PODVector<unsigned>>& GetGeometryBoneMappings() const { return geometryBoneMappings_; }
+    const Vector<Vector<unsigned>>& GetGeometryBoneMappings() const { return geometryBoneMappings_; }
 
     /// Return vertex morphs.
     const Vector<ModelMorph>& GetMorphs() const { return morphs_; }
@@ -205,21 +205,21 @@ private:
     /// Geometries.
     Vector<Vector<SharedPtr<Geometry>>> geometries_;
     /// Geometry bone mappings.
-    Vector<PODVector<unsigned>> geometryBoneMappings_;
+    Vector<Vector<unsigned>> geometryBoneMappings_;
     /// Geometry centers.
-    PODVector<Vector3> geometryCenters_;
+    Vector<Vector3> geometryCenters_;
     /// Vertex morphs.
     Vector<ModelMorph> morphs_;
     /// Vertex buffer morph range start.
-    PODVector<unsigned> morphRangeStarts_;
+    Vector<unsigned> morphRangeStarts_;
     /// Vertex buffer morph range vertex count.
-    PODVector<unsigned> morphRangeCounts_;
+    Vector<unsigned> morphRangeCounts_;
     /// Vertex buffer data for asynchronous loading.
     Vector<VertexBufferDesc> loadVBData_;
     /// Index buffer data for asynchronous loading.
     Vector<IndexBufferDesc> loadIBData_;
     /// Geometry definitions for asynchronous loading.
-    Vector<PODVector<GeometryDesc>> loadGeometries_;
+    Vector<Vector<GeometryDesc>> loadGeometries_;
 };
 
 }

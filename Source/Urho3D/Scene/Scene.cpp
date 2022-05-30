@@ -698,10 +698,10 @@ Node* Scene::GetNode(unsigned id) const
     }
 }
 
-bool Scene::GetNodesWithTag(PODVector<Node*>& dest, const String& tag) const
+bool Scene::GetNodesWithTag(Vector<Node*>& dest, const String& tag) const
 {
     dest.Clear();
-    HashMap<StringHash, PODVector<Node*>>::ConstIterator it = taggedNodes_.Find(tag);
+    HashMap<StringHash, Vector<Node*>>::ConstIterator it = taggedNodes_.Find(tag);
     if (it != taggedNodes_.End())
     {
         dest = it->second_;
@@ -808,7 +808,7 @@ void Scene::EndThreadedUpdate()
     {
         URHO3D_PROFILE(EndThreadedUpdate);
 
-        for (PODVector<Component*>::ConstIterator i = delayedDirtyComponents_.Begin(); i != delayedDirtyComponents_.End(); ++i)
+        for (Vector<Component*>::ConstIterator i = delayedDirtyComponents_.Begin(); i != delayedDirtyComponents_.End(); ++i)
             (*i)->OnMarkedDirty((*i)->GetNode());
         delayedDirtyComponents_.Clear();
     }
@@ -1133,7 +1133,7 @@ void Scene::MarkReplicationDirty(Node* node)
     if (networkState_ && node->IsReplicated())
     {
         unsigned id = node->GetID();
-        for (PODVector<ReplicationState*>::Iterator i = networkState_->replicationStates_.Begin();
+        for (Vector<ReplicationState*>::Iterator i = networkState_->replicationStates_.Begin();
              i != networkState_->replicationStates_.End(); ++i)
         {
             auto* nodeState = static_cast<NodeReplicationState*>(*i);

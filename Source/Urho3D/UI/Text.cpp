@@ -98,7 +98,7 @@ void Text::ApplyAttributes()
     UpdateText();
 }
 
-void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
+void Text::GetBatches(Vector<UIBatch>& batches, Vector<float>& vertexData, const IntRect& currentScissor)
 {
     FontFace* face = font_ ? font_->GetFace(fontSize_) : nullptr;
     if (!face)
@@ -163,7 +163,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
         // One batch per texture/page
         UIBatch pageBatch(this, BLEND_ALPHA, currentScissor, textures[n], &vertexData);
 
-        const PODVector<GlyphLocation>& pageGlyphLocation = pageGlyphLocations_[n];
+        const Vector<GlyphLocation>& pageGlyphLocation = pageGlyphLocations_[n];
 
         switch (textEffect)
         {
@@ -773,7 +773,7 @@ int Text::GetRowStartPosition(i32 rowIndex) const
     return ret;
 }
 
-void Text::ConstructBatch(UIBatch& pageBatch, const PODVector<GlyphLocation>& pageGlyphLocation, float dx, float dy, Color* color,
+void Text::ConstructBatch(UIBatch& pageBatch, const Vector<GlyphLocation>& pageGlyphLocation, float dx, float dy, Color* color,
     float depthBias)
 {
     i32 startDataSize = pageBatch.vertexData_->Size();

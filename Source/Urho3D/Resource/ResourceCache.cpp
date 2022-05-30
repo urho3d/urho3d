@@ -698,7 +698,7 @@ unsigned ResourceCache::GetNumBackgroundLoadResources() const
 #endif
 }
 
-void ResourceCache::GetResources(PODVector<Resource*>& result, StringHash type) const
+void ResourceCache::GetResources(Vector<Resource*>& result, StringHash type) const
 {
     result.Clear();
     HashMap<StringHash, ResourceGroup>::ConstIterator i = resourceGroups_.Find(type);

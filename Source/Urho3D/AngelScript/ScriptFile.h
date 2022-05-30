@@ -55,7 +55,7 @@ public:
     /// Remove all scripted event handlers.
     void RemoveEventHandlers() override;
     /// Remove all scripted event handlers, except those listed.
-    void RemoveEventHandlersExcept(const PODVector<StringHash>& exceptions) override;
+    void RemoveEventHandlersExcept(const Vector<StringHash>& exceptions) override;
     /// Return whether has subscribed to an event.
     bool HasEventHandler(StringHash eventType) const override;
     /// Return whether has subscribed to a specific sender's event.

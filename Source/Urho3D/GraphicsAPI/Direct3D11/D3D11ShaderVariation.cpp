@@ -243,7 +243,7 @@ bool ShaderVariation::Compile_D3D11()
 
     // Collect defines into macros
     Vector<String> defineValues;
-    PODVector<D3D_SHADER_MACRO> macros;
+    Vector<D3D_SHADER_MACRO> macros;
 
     for (unsigned i = 0; i < defines.Size(); ++i)
     {

@@ -86,7 +86,7 @@ void Component::MarkNetworkUpdate()
     }
 }
 
-void Component::GetDependencyNodes(PODVector<Node*>& dest)
+void Component::GetDependencyNodes(Vector<Node*>& dest)
 {
 }
 
@@ -168,7 +168,7 @@ void Component::PrepareNetworkUpdate()
             networkState_->previousValues_[i] = networkState_->currentValues_[i];
 
             // Mark the attribute dirty in all replication states that are tracking this component
-            for (PODVector<ReplicationState*>::Iterator j = networkState_->replicationStates_.Begin();
+            for (Vector<ReplicationState*>::Iterator j = networkState_->replicationStates_.Begin();
                  j != networkState_->replicationStates_.End(); ++j)
             {
                 auto* compState = static_cast<ComponentReplicationState*>(*j);
@@ -249,7 +249,7 @@ bool Component::IsEnabledEffective() const
     return enabled_ && node_ && node_->IsEnabled();
 }
 
-void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const
+void Component::GetComponents(Vector<Component*>& dest, StringHash type) const
 {
     if (node_)
         node_->GetComponents(dest, type);

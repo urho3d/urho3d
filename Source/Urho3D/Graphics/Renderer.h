@@ -555,7 +555,7 @@ private:
     /// Shadow map dummy color buffers by resolution.
     HashMap<int, SharedPtr<Texture2D>> colorShadowMaps_;
     /// Shadow map allocations by resolution.
-    HashMap<int, PODVector<Light*>> shadowMapAllocations_;
+    HashMap<int, Vector<Light*>> shadowMapAllocations_;
     /// Instance of shadow map filter.
     Object* shadowMapFilterInstance_{};
     /// Function pointer of shadow map filter.

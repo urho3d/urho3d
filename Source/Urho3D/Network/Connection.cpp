@@ -395,9 +395,9 @@ void Connection::ProcessPendingLatestData()
         return;
 
     // Iterate through pending node data and see if we can find the nodes now
-    for (HashMap<unsigned, PODVector<unsigned char>>::Iterator i = nodeLatestData_.Begin(); i != nodeLatestData_.End();)
+    for (HashMap<unsigned, Vector<unsigned char>>::Iterator i = nodeLatestData_.Begin(); i != nodeLatestData_.End();)
     {
-        HashMap<unsigned, PODVector<unsigned char>>::Iterator current = i++;
+        HashMap<unsigned, Vector<unsigned char>>::Iterator current = i++;
         Node* node = scene_->GetNode(current->first_);
         if (node)
         {
@@ -411,9 +411,9 @@ void Connection::ProcessPendingLatestData()
     }
 
     // Iterate through pending component data and see if we can find the components now
-    for (HashMap<unsigned, PODVector<unsigned char>>::Iterator i = componentLatestData_.Begin(); i != componentLatestData_.End();)
+    for (HashMap<unsigned, Vector<unsigned char>>::Iterator i = componentLatestData_.Begin(); i != componentLatestData_.End();)
     {
-        HashMap<unsigned, PODVector<unsigned char>>::Iterator current = i++;
+        HashMap<unsigned, Vector<unsigned char>>::Iterator current = i++;
         Component* component = scene_->GetComponent(current->first_);
         if (component)
         {
@@ -676,7 +676,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
             else
             {
                 // Latest data messages may be received out-of-order relative to node creation, so cache if necessary
-                PODVector<unsigned char>& data = nodeLatestData_[nodeID];
+                Vector<unsigned char>& data = nodeLatestData_[nodeID];
                 data.Resize(msg.GetSize());
                 memcpy(&data[0], msg.GetData(), msg.GetSize());
             }
@@ -753,7 +753,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
             else
             {
                 // Latest data messages may be received out-of-order relative to component creation, so cache if necessary
-                PODVector<unsigned char>& data = componentLatestData_[componentID];
+                Vector<unsigned char>& data = componentLatestData_[componentID];
                 data.Resize(msg.GetSize());
                 memcpy(&data[0], msg.GetData(), msg.GetSize());
             }
@@ -1220,8 +1220,8 @@ void Connection::ProcessNode(unsigned nodeID)
 void Connection::ProcessNewNode(Node* node)
 {
     // Process depended upon nodes first, if they are dirty
-    const PODVector<Node*>& dependencyNodes = node->GetDependencyNodes();
-    for (PODVector<Node*>::ConstIterator i = dependencyNodes.Begin(); i != dependencyNodes.End(); ++i)
+    const Vector<Node*>& dependencyNodes = node->GetDependencyNodes();
+    for (Vector<Node*>::ConstIterator i = dependencyNodes.Begin(); i != dependencyNodes.End(); ++i)
     {
         unsigned nodeID = (*i)->GetID();
         if (sceneState_.dirtyNodes_.Contains(nodeID))
@@ -1279,8 +1279,8 @@ void Connection::ProcessNewNode(Node* node)
 void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState)
 {
     // Process depended upon nodes first, if they are dirty
-    const PODVector<Node*>& dependencyNodes = node->GetDependencyNodes();
-    for (PODVector<Node*>::ConstIterator i = dependencyNodes.Begin(); i != dependencyNodes.End(); ++i)
+    const Vector<Node*>& dependencyNodes = node->GetDependencyNodes();
+    for (Vector<Node*>::ConstIterator i = dependencyNodes.Begin(); i != dependencyNodes.End(); ++i)
     {
         unsigned nodeID = (*i)->GetID();
         if (sceneState_.dirtyNodes_.Contains(nodeID))

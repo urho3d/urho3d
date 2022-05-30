@@ -194,9 +194,9 @@ void UIDrag::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
     if (input->GetKeyPress(KEY_SPACE))
     {
-        PODVector<UIElement*> elements;
+        Vector<UIElement*> elements;
         root->GetChildrenWithTag(elements, "SomeTag");
-        for (PODVector<UIElement*>::ConstIterator i = elements.Begin(); i != elements.End(); ++i)
+        for (Vector<UIElement*>::ConstIterator i = elements.Begin(); i != elements.End(); ++i)
         {
             UIElement* element = *i;
             element->SetVisible(!element->IsVisible());

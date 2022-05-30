@@ -108,7 +108,7 @@ struct URHO3D_API NetworkState
     /// Previous network attribute values.
     Vector<Variant> previousValues_;
     /// Replication states that are tracking this object.
-    PODVector<ReplicationState*> replicationStates_;
+    Vector<ReplicationState*> replicationStates_;
     /// Previous user variables.
     VariantMap previousVars_;
     /// Bitmask for intercepting network messages. Used on the client only.

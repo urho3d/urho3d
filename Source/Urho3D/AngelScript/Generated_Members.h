@@ -385,8 +385,8 @@ template <class T> void RegisterMembers_BatchQueue(asIScriptEngine* engine, cons
 {
     // void BatchQueue::SetInstancingData(void* lockedData, unsigned stride, unsigned& freeIndex)
     // Error: type "void*" can not automatically bind
-    // void BatchQueue::SortFrontToBack2Pass(PODVector<Batch*>& batches)
-    // Error: type "PODVector<Batch*>&" can not automatically bind
+    // void BatchQueue::SortFrontToBack2Pass(Vector<Batch*>& batches)
+    // Error: type "Vector<Batch*>&" can not automatically bind
 
     // void BatchQueue::Clear(int maxSortedInstances)
     engine->RegisterObjectMethod(className, "void Clear(int)", AS_METHODPR(T, Clear, (int), void), AS_CALL_THISCALL);
@@ -414,12 +414,12 @@ template <class T> void RegisterMembers_BatchQueue(asIScriptEngine* engine, cons
     // Error: type "HashMap<unsigned short, unsigned short>" can not automatically bind
     // HashMap<unsigned short, unsigned short> BatchQueue::geometryRemapping_
     // Error: type "HashMap<unsigned short, unsigned short>" can not automatically bind
-    // PODVector<Batch> BatchQueue::batches_
-    // Error: type "PODVector<Batch>" can not automatically bind
-    // PODVector<Batch*> BatchQueue::sortedBatches_
-    // Error: type "PODVector<Batch*>" can not automatically bind
-    // PODVector<BatchGroup*> BatchQueue::sortedBatchGroups_
-    // Error: type "PODVector<BatchGroup*>" can not automatically bind
+    // Vector<Batch> BatchQueue::batches_
+    // Error: type "Vector<Batch>" can not automatically bind
+    // Vector<Batch*> BatchQueue::sortedBatches_
+    // Error: type "Vector<Batch*>" can not automatically bind
+    // Vector<BatchGroup*> BatchQueue::sortedBatchGroups_
+    // Error: type "Vector<BatchGroup*>" can not automatically bind
 
     // unsigned BatchQueue::maxSortedInstances_
     engine->RegisterObjectProperty(className, "uint maxSortedInstances", offsetof(T, maxSortedInstances_));
@@ -1239,10 +1239,10 @@ template <class T> void RegisterMembers_Decal(asIScriptEngine* engine, const cha
     // void Decal::CalculateBoundingBox()
     engine->RegisterObjectMethod(className, "void CalculateBoundingBox()", AS_METHODPR(T, CalculateBoundingBox, (), void), AS_CALL_THISCALL);
 
-    // PODVector<DecalVertex> Decal::vertices_
-    // Error: type "PODVector<DecalVertex>" can not automatically bind
-    // PODVector<unsigned short> Decal::indices_
-    // Error: type "PODVector<unsigned short>" can not automatically bind
+    // Vector<DecalVertex> Decal::vertices_
+    // Error: type "Vector<DecalVertex>" can not automatically bind
+    // Vector<unsigned short> Decal::indices_
+    // Error: type "Vector<unsigned short>" can not automatically bind
 
     // float Decal::timer_
     engine->RegisterObjectProperty(className, "float timer", offsetof(T, timer_));
@@ -1309,8 +1309,8 @@ template <class T> void RegisterMembers_Deserializer(asIScriptEngine* engine, co
 {
     // virtual unsigned Deserializer::Read(void* dest, unsigned size) = 0
     // Error: type "void*" can not automatically bind
-    // PODVector<unsigned char> Deserializer::ReadBuffer()
-    // Error: type "PODVector<unsigned char>" can not automatically bind
+    // Vector<unsigned char> Deserializer::ReadBuffer()
+    // Error: type "Vector<unsigned char>" can not automatically bind
     // VariantVector Deserializer::ReadVariantVector()
     // Error: type "VariantVector" can not automatically bind
 
@@ -2432,14 +2432,14 @@ template <class T> void RegisterMembers_JoystickState(asIScriptEngine* engine, c
     // Not registered because pointer
     // UIElement* JoystickState::screenJoystick_
     // Not registered because pointer
-    // PODVector<bool> JoystickState::buttons_
-    // Error: type "PODVector<bool>" can not automatically bind
-    // PODVector<bool> JoystickState::buttonPress_
-    // Error: type "PODVector<bool>" can not automatically bind
-    // PODVector<float> JoystickState::axes_
-    // Error: type "PODVector<float>" can not automatically bind
-    // PODVector<int> JoystickState::hats_
-    // Error: type "PODVector<int>" can not automatically bind
+    // Vector<bool> JoystickState::buttons_
+    // Error: type "Vector<bool>" can not automatically bind
+    // Vector<bool> JoystickState::buttonPress_
+    // Error: type "Vector<bool>" can not automatically bind
+    // Vector<float> JoystickState::axes_
+    // Error: type "Vector<float>" can not automatically bind
+    // Vector<int> JoystickState::hats_
+    // Error: type "Vector<int>" can not automatically bind
 
     // SDL_JoystickID JoystickState::joystickID_
     engine->RegisterObjectProperty(className, "SDL_JoystickID joystickID", offsetof(T, joystickID_));
@@ -2461,10 +2461,10 @@ template <class T> void RegisterMembers_LightBatchQueue(asIScriptEngine* engine,
     // Not registered because pointer
     // Vector<ShadowBatchQueue> LightBatchQueue::shadowSplits_
     // Error: type "Vector<ShadowBatchQueue>" can not automatically bind
-    // PODVector<Light*> LightBatchQueue::vertexLights_
-    // Error: type "PODVector<Light*>" can not automatically bind
-    // PODVector<Batch> LightBatchQueue::volumeBatches_
-    // Error: type "PODVector<Batch>" can not automatically bind
+    // Vector<Light*> LightBatchQueue::vertexLights_
+    // Error: type "Vector<Light*>" can not automatically bind
+    // Vector<Batch> LightBatchQueue::volumeBatches_
+    // Error: type "Vector<Batch>" can not automatically bind
 
     // bool LightBatchQueue::negative_
     engine->RegisterObjectProperty(className, "bool negative", offsetof(T, negative_));
@@ -2485,10 +2485,10 @@ template <class T> void RegisterMembers_LightQueryResult(asIScriptEngine* engine
 {
     // Light* LightQueryResult::light_
     // Not registered because pointer
-    // PODVector<Drawable*> LightQueryResult::litGeometries_
-    // Error: type "PODVector<Drawable*>" can not automatically bind
-    // PODVector<Drawable*> LightQueryResult::shadowCasters_
-    // Error: type "PODVector<Drawable*>" can not automatically bind
+    // Vector<Drawable*> LightQueryResult::litGeometries_
+    // Error: type "Vector<Drawable*>" can not automatically bind
+    // Vector<Drawable*> LightQueryResult::shadowCasters_
+    // Error: type "Vector<Drawable*>" can not automatically bind
     // Camera* LightQueryResult::shadowCameras_[MAX_LIGHT_SPLITS]
     // Not registered because array
     // unsigned LightQueryResult::shadowCasterBegin_[MAX_LIGHT_SPLITS]
@@ -3144,8 +3144,8 @@ template <class T> void RegisterMembers_NetworkState(asIScriptEngine* engine, co
     // Error: type "Vector<Variant>" can not automatically bind
     // Vector<Variant> NetworkState::previousValues_
     // Error: type "Vector<Variant>" can not automatically bind
-    // PODVector<ReplicationState*> NetworkState::replicationStates_
-    // Error: type "PODVector<ReplicationState*>" can not automatically bind
+    // Vector<ReplicationState*> NetworkState::replicationStates_
+    // Error: type "Vector<ReplicationState*>" can not automatically bind
 
     // VariantMap NetworkState::previousVars_
     engine->RegisterObjectProperty(className, "VariantMap previousVars", offsetof(T, previousVars_));
@@ -3161,8 +3161,8 @@ template <class T> void RegisterMembers_NetworkState(asIScriptEngine* engine, co
 // struct NodeImpl | File: ../Scene/Node.h
 template <class T> void RegisterMembers_NodeImpl(asIScriptEngine* engine, const char* className)
 {
-    // PODVector<Node*> NodeImpl::dependencyNodes_
-    // Error: type "PODVector<Node*>" can not automatically bind
+    // Vector<Node*> NodeImpl::dependencyNodes_
+    // Error: type "Vector<Node*>" can not automatically bind
     // Connection* NodeImpl::owner_
     // Not registered because pointer
     // StringVector NodeImpl::tags_
@@ -3288,8 +3288,8 @@ template <class T> void RegisterMembers_OctreeQuery(asIScriptEngine* engine, con
     // OctreeQuery& OctreeQuery::operator =(const OctreeQuery& rhs) = delete
     // Not registered because deleted
 
-    // PODVector<Drawable*>& OctreeQuery::result_
-    // Error: type "PODVector<Drawable*>&" can not automatically bind
+    // Vector<Drawable*>& OctreeQuery::result_
+    // Error: type "Vector<Drawable*>&" can not automatically bind
 
     // unsigned char OctreeQuery::drawableFlags_
     engine->RegisterObjectProperty(className, "uint8 drawableFlags", offsetof(T, drawableFlags_));
@@ -3370,10 +3370,10 @@ template <class T> void RegisterMembers_Particle(asIScriptEngine* engine, const 
 // struct PerThreadSceneResult | File: ../Graphics/View.h
 template <class T> void RegisterMembers_PerThreadSceneResult(asIScriptEngine* engine, const char* className)
 {
-    // PODVector<Drawable*> PerThreadSceneResult::geometries_
-    // Error: type "PODVector<Drawable*>" can not automatically bind
-    // PODVector<Light*> PerThreadSceneResult::lights_
-    // Error: type "PODVector<Light*>" can not automatically bind
+    // Vector<Drawable*> PerThreadSceneResult::geometries_
+    // Error: type "Vector<Drawable*>" can not automatically bind
+    // Vector<Light*> PerThreadSceneResult::lights_
+    // Error: type "Vector<Light*>" can not automatically bind
 
     // float PerThreadSceneResult::minZ_
     engine->RegisterObjectProperty(className, "float minZ", offsetof(T, minZ_));
@@ -3452,10 +3452,10 @@ template <class T> void RegisterMembers_Plane(asIScriptEngine* engine, const cha
     #endif
 }
 
-// void Polyhedron::AddFace(const PODVector<Vector3>& face)
-template <class T> void Polyhedron_void_AddFace_constspPODVectorlesVector3greamp_template(T* _ptr, CScriptArray* face_conv)
+// void Polyhedron::AddFace(const Vector<Vector3>& face)
+template <class T> void Polyhedron_void_AddFace_constspVectorlesVector3greamp_template(T* _ptr, CScriptArray* face_conv)
 {
-    PODVector<Vector3> face = ArrayToVector<Vector3>(face_conv);
+    Vector<Vector3> face = ArrayToVector<Vector3>(face_conv);
     _ptr->AddFace(face);
 }
 
@@ -3468,8 +3468,8 @@ template <class T> void RegisterMembers_Polyhedron(asIScriptEngine* engine, cons
     // void Polyhedron::AddFace(const Vector3& v0, const Vector3& v1, const Vector3& v2, const Vector3& v3)
     engine->RegisterObjectMethod(className, "void AddFace(const Vector3&in, const Vector3&in, const Vector3&in, const Vector3&in)", AS_METHODPR(T, AddFace, (const Vector3&, const Vector3&, const Vector3&, const Vector3&), void), AS_CALL_THISCALL);
 
-    // void Polyhedron::AddFace(const PODVector<Vector3>& face)
-    engine->RegisterObjectMethod(className, "void AddFace(Array<Vector3>@+)", AS_FUNCTION_OBJFIRST(Polyhedron_void_AddFace_constspPODVectorlesVector3greamp_template<Polyhedron>), AS_CALL_CDECL_OBJFIRST);
+    // void Polyhedron::AddFace(const Vector<Vector3>& face)
+    engine->RegisterObjectMethod(className, "void AddFace(Array<Vector3>@+)", AS_FUNCTION_OBJFIRST(Polyhedron_void_AddFace_constspVectorlesVector3greamp_template<Polyhedron>), AS_CALL_CDECL_OBJFIRST);
 
     // void Polyhedron::Clear()
     engine->RegisterObjectMethod(className, "void Clear()", AS_METHODPR(T, Clear, (), void), AS_CALL_THISCALL);
@@ -3507,8 +3507,8 @@ template <class T> void RegisterMembers_Polyhedron(asIScriptEngine* engine, cons
     // Polyhedron Polyhedron::Transformed(const Matrix3x4& transform) const
     engine->RegisterObjectMethod(className, "Polyhedron Transformed(const Matrix3x4&in) const", AS_METHODPR(T, Transformed, (const Matrix3x4&) const, Polyhedron), AS_CALL_THISCALL);
 
-    // Vector<PODVector<Vector3>> Polyhedron::faces_
-    // Error: type "Vector<PODVector<Vector3>>" can not automatically bind
+    // Vector<Vector<Vector3>> Polyhedron::faces_
+    // Error: type "Vector<Vector<Vector3>>" can not automatically bind
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Polyhedron
         REGISTER_MEMBERS_MANUAL_PART_Polyhedron();
@@ -3537,8 +3537,8 @@ template <class T> void RegisterMembers_ProfilerBlock(asIScriptEngine* engine, c
     // Not registered because pointer
     // ProfilerBlock* ProfilerBlock::parent_
     // Not registered because pointer
-    // PODVector<ProfilerBlock*> ProfilerBlock::children_
-    // Error: type "PODVector<ProfilerBlock*>" can not automatically bind
+    // Vector<ProfilerBlock*> ProfilerBlock::children_
+    // Error: type "Vector<ProfilerBlock*>" can not automatically bind
 
     // HiresTimer ProfilerBlock::timer_
     engine->RegisterObjectProperty(className, "HiresTimer timer", offsetof(T, timer_));
@@ -3790,8 +3790,8 @@ template <class T> void RegisterMembers_RayOctreeQuery(asIScriptEngine* engine, 
     // RayOctreeQuery& RayOctreeQuery::operator =(const RayOctreeQuery& rhs) = delete
     // Not registered because deleted
 
-    // PODVector<RayQueryResult>& RayOctreeQuery::result_
-    // Error: type "PODVector<RayQueryResult>&" can not automatically bind
+    // Vector<RayQueryResult>& RayOctreeQuery::result_
+    // Error: type "Vector<RayQueryResult>&" can not automatically bind
 
     // Ray RayOctreeQuery::ray_
     engine->RegisterObjectProperty(className, "Ray ray", offsetof(T, ray_));
@@ -4385,8 +4385,8 @@ template <class T> void RegisterMembers_Serializer(asIScriptEngine* engine, cons
 {
     // virtual unsigned Serializer::Write(const void* data, unsigned size) = 0
     // Error: type "const void*" can not automatically bind
-    // bool Serializer::WriteBuffer(const PODVector<unsigned char>& value)
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
+    // bool Serializer::WriteBuffer(const Vector<unsigned char>& value)
+    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // bool Serializer::WriteVariantVector(const VariantVector& value)
     // Error: type "const VariantVector&" can not automatically bind
 
@@ -4580,7 +4580,7 @@ template <class T> void RegisterMembers_Skeleton(asIScriptEngine* engine, const 
     // Bone* Skeleton::GetBone(const char* name)
     // Error: type "const char*" can not automatically bind
     // const Vector<Bone>& Skeleton::GetBones() const
-    // Error: type "const Vector<Bone>&" can not automatically bind
+    // Not registered because have @nobind mark
     // Vector<Bone>& Skeleton::GetModifiableBones()
     // Error: type "Vector<Bone>&" can not automatically bind
 
@@ -4756,6 +4756,13 @@ template <class T> void RegisterMembers_Sphere(asIScriptEngine* engine, const ch
     #endif
 }
 
+// void Spline::SetKnots(const Vector<Variant>& knots)
+template <class T> void Spline_void_SetKnots_constspVectorlesVariantgreamp_template(T* _ptr, CScriptArray* knots_conv)
+{
+    Vector<Variant> knots = ArrayToVector<Variant>(knots_conv);
+    _ptr->SetKnots(knots);
+}
+
 // class Spline | File: ../Core/Spline.h
 template <class T> void RegisterMembers_Spline(asIScriptEngine* engine, const char* className)
 {
@@ -4763,8 +4770,6 @@ template <class T> void RegisterMembers_Spline(asIScriptEngine* engine, const ch
     // Error: type "const VariantVector&" can not automatically bind
     // bool Spline::operator !=(const Spline& rhs) const
     // Only operator == is needed
-    // void Spline::SetKnots(const Vector<Variant>& knots)
-    // Error: type "const Vector<Variant>&" can not automatically bind
 
     // void Spline::AddKnot(const Variant& knot)
     engine->RegisterObjectMethod(className, "void AddKnot(const Variant&in)", AS_METHODPR(T, AddKnot, (const Variant&), void), AS_CALL_THISCALL);
@@ -4804,6 +4809,9 @@ template <class T> void RegisterMembers_Spline(asIScriptEngine* engine, const ch
 
     // void Spline::SetKnot(const Variant& knot, unsigned index)
     engine->RegisterObjectMethod(className, "void SetKnot(const Variant&in, uint)", AS_METHODPR(T, SetKnot, (const Variant&, unsigned), void), AS_CALL_THISCALL);
+
+    // void Spline::SetKnots(const Vector<Variant>& knots)
+    engine->RegisterObjectMethod(className, "void SetKnots(Array<Variant>@+)", AS_FUNCTION_OBJFIRST(Spline_void_SetKnots_constspVectorlesVariantgreamp_template<Spline>), AS_CALL_CDECL_OBJFIRST);
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Spline
         REGISTER_MEMBERS_MANUAL_PART_Spline();
@@ -5448,14 +5456,14 @@ template <class T> void RegisterMembers_UIBatch(asIScriptEngine* engine, const c
     // void UIBatch::SetDefaultColor()
     engine->RegisterObjectMethod(className, "void SetDefaultColor()", AS_METHODPR(T, SetDefaultColor, (), void), AS_CALL_THISCALL);
 
-    // static void UIBatch::AddOrMerge(const UIBatch& batch, PODVector<UIBatch>& batches)
-    // Error: type "PODVector<UIBatch>&" can not automatically bind
+    // static void UIBatch::AddOrMerge(const UIBatch& batch, Vector<UIBatch>& batches)
+    // Error: type "Vector<UIBatch>&" can not automatically bind
 
     // UIElement* UIBatch::element_
     // Not registered because pointer
     // Texture* UIBatch::texture_
     // Not registered because pointer
-    // PODVector<float>* UIBatch::vertexData_
+    // Vector<float>* UIBatch::vertexData_
     // Not registered because pointer
     // Material* UIBatch::customMaterial_
     // Not registered because pointer
@@ -5550,10 +5558,10 @@ template <class T> void RegisterMembers_Variant(asIScriptEngine* engine, const c
     // Error: type "const char*" can not automatically bind
     // void Variant::FromString(VariantType type, const char* value)
     // Error: type "const char*" can not automatically bind
-    // const PODVector<unsigned char>& Variant::GetBuffer() const
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
-    // PODVector<unsigned char>* Variant::GetBufferPtr()
-    // Error: type "PODVector<unsigned char>*" can not automatically bind
+    // const Vector<unsigned char>& Variant::GetBuffer() const
+    // Error: type "const Vector<unsigned char>&" can not automatically bind
+    // Vector<unsigned char>* Variant::GetBufferPtr()
+    // Error: type "Vector<unsigned char>*" can not automatically bind
     // CustomVariantValue* Variant::GetCustomVariantValuePtr()
     // Error: type "CustomVariantValue" can not automatically bind bacause have @nobind mark
     // const CustomVariantValue* Variant::GetCustomVariantValuePtr() const
@@ -5594,8 +5602,8 @@ template <class T> void RegisterMembers_Variant(asIScriptEngine* engine, const c
     // Only operator == is needed
     // bool Variant::operator !=(const String& rhs) const
     // Only operator == is needed
-    // bool Variant::operator !=(const PODVector<unsigned char>& rhs) const
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
+    // bool Variant::operator !=(const Vector<unsigned char>& rhs) const
+    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // bool Variant::operator !=(const VectorBuffer& rhs) const
     // Only operator == is needed
     // bool Variant::operator !=(void* rhs) const
@@ -5630,14 +5638,14 @@ template <class T> void RegisterMembers_Variant(asIScriptEngine* engine, const c
     // Only operator == is needed
     // Variant& Variant::operator =(const char* rhs)
     // Error: type "const char*" can not automatically bind
-    // Variant& Variant::operator =(const PODVector<unsigned char>& rhs)
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
+    // Variant& Variant::operator =(const Vector<unsigned char>& rhs)
+    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // Variant& Variant::operator =(void* rhs)
     // Error: type "void*" can not automatically bind
     // Variant& Variant::operator =(const VariantVector& rhs)
     // Error: type "const VariantVector&" can not automatically bind
-    // bool Variant::operator ==(const PODVector<unsigned char>& rhs) const
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
+    // bool Variant::operator ==(const Vector<unsigned char>& rhs) const
+    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // bool Variant::operator ==(void* rhs) const
     // Error: type "void*" can not automatically bind
     // bool Variant::operator ==(const VariantVector& rhs) const
@@ -5965,7 +5973,7 @@ template <class T> void RegisterMembers_Variant(asIScriptEngine* engine, const c
     // Not registered because template
     // template <> const IntVector3& Variant::Get() const
     // Not registered because template
-    // template <> const PODVector<unsigned char>& Variant::Get() const
+    // template <> const Vector<unsigned char>& Variant::Get() const
     // Not registered because template
     // template <> void* Variant::Get() const
     // Not registered because template
@@ -6007,7 +6015,7 @@ template <class T> void RegisterMembers_Variant(asIScriptEngine* engine, const c
     // Not registered because template
     // template <> IntVector3 Variant::Get() const
     // Not registered because template
-    // template <> PODVector<unsigned char> Variant::Get() const
+    // template <> Vector<unsigned char> Variant::Get() const
     // Not registered because template
     // template <> Matrix3 Variant::Get() const
     // Not registered because template
@@ -6034,8 +6042,8 @@ template <class T> void RegisterMembers_Variant(asIScriptEngine* engine, const c
     // static VariantType Variant::GetTypeFromName(const String& typeName)
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("VariantType GetTypeFromName(const String&in)", AS_FUNCTIONPR(T::GetTypeFromName, (const String&), VariantType), AS_CALL_CDECL);engine->SetDefaultNamespace("");
 
-    // static const PODVector<unsigned char> Variant::emptyBuffer
-    // Error: type "const PODVector<unsigned char>" can not automatically bind
+    // static const Vector<unsigned char> Variant::emptyBuffer
+    // Error: type "const Vector<unsigned char>" can not automatically bind
     // static const VariantVector Variant::emptyVariantVector
     // Error: type "const VariantVector" can not automatically bind
     // static const StringVector Variant::emptyStringVector
@@ -6484,8 +6492,8 @@ template <class T> void RegisterMembers_VectorBase(asIScriptEngine* engine, cons
 // struct VertexBufferDesc | File: ../Graphics/Model.h
 template <class T> void RegisterMembers_VertexBufferDesc(asIScriptEngine* engine, const char* className)
 {
-    // PODVector<VertexElement> VertexBufferDesc::vertexElements_
-    // Error: type "PODVector<VertexElement>" can not automatically bind
+    // Vector<VertexElement> VertexBufferDesc::vertexElements_
+    // Error: type "Vector<VertexElement>" can not automatically bind
     // SharedArrayPtr<unsigned char> VertexBufferDesc::data_
     // Error: type "SharedArrayPtr<unsigned char>" can not automatically bind
 
@@ -6629,8 +6637,8 @@ template <class T> void RegisterMembers_XMLElement(asIScriptEngine* engine, cons
     // Error: type "const char*" can not automatically bind
     // String XMLElement::GetAttributeUpper(const char* name) const
     // Error: type "const char*" can not automatically bind
-    // PODVector<unsigned char> XMLElement::GetBuffer(const String& name) const
-    // Error: type "PODVector<unsigned char>" can not automatically bind
+    // Vector<unsigned char> XMLElement::GetBuffer(const String& name) const
+    // Error: type "Vector<unsigned char>" can not automatically bind
     // bool XMLElement::GetBuffer(const String& name, void* dest, unsigned size) const
     // Error: type "void*" can not automatically bind
     // XMLElement XMLElement::GetChild(const char* name) const
@@ -6667,8 +6675,8 @@ template <class T> void RegisterMembers_XMLElement(asIScriptEngine* engine, cons
     // Error: type "const char*" can not automatically bind
     // bool XMLElement::SetBuffer(const String& name, const void* data, unsigned size)
     // Error: type "const void*" can not automatically bind
-    // bool XMLElement::SetBuffer(const String& name, const PODVector<unsigned char>& value)
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
+    // bool XMLElement::SetBuffer(const String& name, const Vector<unsigned char>& value)
+    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // bool XMLElement::SetValue(const char* value)
     // Error: type "const char*" can not automatically bind
     // bool XMLElement::SetVariantVector(const VariantVector& value)
@@ -7093,28 +7101,28 @@ template <class T> void RegisterMembers_NavAreaStub(asIScriptEngine* engine, con
 // struct NavBuildData | File: ../Navigation/NavBuildData.h
 template <class T> void RegisterMembers_NavBuildData(asIScriptEngine* engine, const char* className)
 {
-    // PODVector<Vector3> NavBuildData::vertices_
-    // Error: type "PODVector<Vector3>" can not automatically bind
-    // PODVector<int> NavBuildData::indices_
-    // Error: type "PODVector<int>" can not automatically bind
-    // PODVector<Vector3> NavBuildData::offMeshVertices_
-    // Error: type "PODVector<Vector3>" can not automatically bind
-    // PODVector<float> NavBuildData::offMeshRadii_
-    // Error: type "PODVector<float>" can not automatically bind
-    // PODVector<unsigned short> NavBuildData::offMeshFlags_
-    // Error: type "PODVector<unsigned short>" can not automatically bind
-    // PODVector<unsigned char> NavBuildData::offMeshAreas_
-    // Error: type "PODVector<unsigned char>" can not automatically bind
-    // PODVector<unsigned char> NavBuildData::offMeshDir_
-    // Error: type "PODVector<unsigned char>" can not automatically bind
+    // Vector<Vector3> NavBuildData::vertices_
+    // Error: type "Vector<Vector3>" can not automatically bind
+    // Vector<int> NavBuildData::indices_
+    // Error: type "Vector<int>" can not automatically bind
+    // Vector<Vector3> NavBuildData::offMeshVertices_
+    // Error: type "Vector<Vector3>" can not automatically bind
+    // Vector<float> NavBuildData::offMeshRadii_
+    // Error: type "Vector<float>" can not automatically bind
+    // Vector<unsigned short> NavBuildData::offMeshFlags_
+    // Error: type "Vector<unsigned short>" can not automatically bind
+    // Vector<unsigned char> NavBuildData::offMeshAreas_
+    // Error: type "Vector<unsigned char>" can not automatically bind
+    // Vector<unsigned char> NavBuildData::offMeshDir_
+    // Error: type "Vector<unsigned char>" can not automatically bind
     // rcContext* NavBuildData::ctx_
     // Not registered because pointer
     // rcHeightfield* NavBuildData::heightField_
     // Not registered because pointer
     // rcCompactHeightfield* NavBuildData::compactHeightField_
     // Not registered because pointer
-    // PODVector<NavAreaStub> NavBuildData::navAreas_
-    // Error: type "PODVector<NavAreaStub>" can not automatically bind
+    // Vector<NavAreaStub> NavBuildData::navAreas_
+    // Error: type "Vector<NavAreaStub>" can not automatically bind
 
     // BoundingBox NavBuildData::worldBoundingBox_
     engine->RegisterObjectProperty(className, "BoundingBox worldBoundingBox", offsetof(T, worldBoundingBox_));
@@ -7489,10 +7497,10 @@ template <class T> void RegisterMembers_ViewBatchInfo2D(asIScriptEngine* engine,
 {
     // SharedPtr<VertexBuffer> ViewBatchInfo2D::vertexBuffer_
     // Error: type "SharedPtr<VertexBuffer>" can not automatically bind
-    // PODVector<const SourceBatch2D*> ViewBatchInfo2D::sourceBatches_
-    // Error: type "PODVector<const SourceBatch2D*>" can not automatically bind
-    // PODVector<float> ViewBatchInfo2D::distances_
-    // Error: type "PODVector<float>" can not automatically bind
+    // Vector<const SourceBatch2D*> ViewBatchInfo2D::sourceBatches_
+    // Error: type "Vector<const SourceBatch2D*>" can not automatically bind
+    // Vector<float> ViewBatchInfo2D::distances_
+    // Error: type "Vector<float>" can not automatically bind
     // Vector<SharedPtr<Material>> ViewBatchInfo2D::materials_
     // Error: type "Vector<SharedPtr<Material>>" can not automatically bind
     // Vector<SharedPtr<Geometry>> ViewBatchInfo2D::geometries_
@@ -7710,8 +7718,8 @@ template <class T> void RegisterMembers_BatchGroup(asIScriptEngine* engine, cons
     // void BatchGroup::AddTransforms(const Batch& batch)
     engine->RegisterObjectMethod(className, "void AddTransforms(const Batch&in)", AS_METHODPR(T, AddTransforms, (const Batch&), void), AS_CALL_THISCALL);
 
-    // PODVector<InstanceData> BatchGroup::instances_
-    // Error: type "PODVector<InstanceData>" can not automatically bind
+    // Vector<InstanceData> BatchGroup::instances_
+    // Error: type "Vector<InstanceData>" can not automatically bind
 
     // unsigned BatchGroup::startIndex_
     engine->RegisterObjectProperty(className, "uint startIndex", offsetof(T, startIndex_));
@@ -7933,8 +7941,8 @@ template <class T> void RegisterMembers_EventReceiverGroup(asIScriptEngine* engi
     // void EventReceiverGroup::Remove(Object* object)
     engine->RegisterObjectMethod(className, "void Remove(Object@+)", AS_METHODPR(T, Remove, (Object*), void), AS_CALL_THISCALL);
 
-    // PODVector<Object*> EventReceiverGroup::receivers_
-    // Error: type "PODVector<Object*>" can not automatically bind
+    // Vector<Object*> EventReceiverGroup::receivers_
+    // Error: type "Vector<Object*>" can not automatically bind
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_EventReceiverGroup
         REGISTER_MEMBERS_MANUAL_PART_EventReceiverGroup();
@@ -8022,10 +8030,10 @@ template <class T> void RegisterMembers_NodeReplicationState(asIScriptEngine* en
     #endif
 }
 
-// void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData)
-template <class T> void Object_void_UnsubscribeFromAllEventsExcept_constspPODVectorlesStringHashgreamp_bool_template(T* _ptr, CScriptArray* exceptions_conv, bool onlyUserData)
+// void Object::UnsubscribeFromAllEventsExcept(const Vector<StringHash>& exceptions, bool onlyUserData)
+template <class T> void Object_void_UnsubscribeFromAllEventsExcept_constspVectorlesStringHashgreamp_bool_template(T* _ptr, CScriptArray* exceptions_conv, bool onlyUserData)
 {
-    PODVector<StringHash> exceptions = ArrayToVector<StringHash>(exceptions_conv);
+    Vector<StringHash> exceptions = ArrayToVector<StringHash>(exceptions_conv);
     _ptr->UnsubscribeFromAllEventsExcept(exceptions, onlyUserData);
 }
 
@@ -8114,8 +8122,8 @@ template <class T> void RegisterMembers_Object(asIScriptEngine* engine, const ch
     // void Object::UnsubscribeFromAllEvents()
     engine->RegisterObjectMethod(className, "void UnsubscribeFromAllEvents()", AS_METHODPR(T, UnsubscribeFromAllEvents, (), void), AS_CALL_THISCALL);
 
-    // void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData)
-    engine->RegisterObjectMethod(className, "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", AS_FUNCTION_OBJFIRST(Object_void_UnsubscribeFromAllEventsExcept_constspPODVectorlesStringHashgreamp_bool_template<Object>), AS_CALL_CDECL_OBJFIRST);
+    // void Object::UnsubscribeFromAllEventsExcept(const Vector<StringHash>& exceptions, bool onlyUserData)
+    engine->RegisterObjectMethod(className, "void UnsubscribeFromAllEventsExcept(Array<StringHash>@+, bool)", AS_FUNCTION_OBJFIRST(Object_void_UnsubscribeFromAllEventsExcept_constspVectorlesStringHashgreamp_bool_template<Object>), AS_CALL_CDECL_OBJFIRST);
 
     // void Object::UnsubscribeFromEvent(StringHash eventType)
     engine->RegisterObjectMethod(className, "void UnsubscribeFromEvent(StringHash)", AS_METHODPR(T, UnsubscribeFromEvent, (StringHash), void), AS_CALL_THISCALL);
@@ -8604,8 +8612,8 @@ template <class T> void RegisterMembers_ShaderVariation(asIScriptEngine* engine,
     RegisterMembers_RefCounted<T>(engine, className);
     RegisterMembers_GPUObject<T>(engine, className);
 
-    // const PODVector<unsigned char>& ShaderVariation::GetByteCode() const
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
+    // const Vector<unsigned char>& ShaderVariation::GetByteCode() const
+    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // const unsigned* ShaderVariation::GetConstantBufferSizes() const
     // Error: type "const unsigned*" can not automatically bind
     // const HashMap<StringHash, ShaderParameter>& ShaderVariation::GetParameters() const
@@ -9040,10 +9048,10 @@ template <class T> void RegisterMembers_AttributeAnimationInfo(asIScriptEngine* 
     #endif
 }
 
-// const PODVector<SoundSource*>& Audio::GetSoundSources() const
-template <class T> CScriptArray* Audio_constspPODVectorlesSoundSourcestargreamp_GetSoundSources_void_template(T* _ptr)
+// const Vector<SoundSource*>& Audio::GetSoundSources() const
+template <class T> CScriptArray* Audio_constspVectorlesSoundSourcestargreamp_GetSoundSources_void_template(T* _ptr)
 {
-    const PODVector<SoundSource*>& result = _ptr->GetSoundSources();
+    const Vector<SoundSource*>& result = _ptr->GetSoundSources();
     return VectorToHandleArray(result, "Array<SoundSource@>");
 }
 
@@ -9084,8 +9092,8 @@ template <class T> void RegisterMembers_Audio(asIScriptEngine* engine, const cha
     // float Audio::GetSoundSourceMasterGain(StringHash typeHash) const
     engine->RegisterObjectMethod(className, "float GetSoundSourceMasterGain(StringHash) const", AS_METHODPR(T, GetSoundSourceMasterGain, (StringHash) const, float), AS_CALL_THISCALL);
 
-    // const PODVector<SoundSource*>& Audio::GetSoundSources() const
-    engine->RegisterObjectMethod(className, "Array<SoundSource@>@ GetSoundSources() const", AS_FUNCTION_OBJFIRST(Audio_constspPODVectorlesSoundSourcestargreamp_GetSoundSources_void_template<Audio>), AS_CALL_CDECL_OBJFIRST);
+    // const Vector<SoundSource*>& Audio::GetSoundSources() const
+    engine->RegisterObjectMethod(className, "Array<SoundSource@>@ GetSoundSources() const", AS_FUNCTION_OBJFIRST(Audio_constspVectorlesSoundSourcestargreamp_GetSoundSources_void_template<Audio>), AS_CALL_CDECL_OBJFIRST);
 
     // bool Audio::HasMasterGain(const String& type) const
     engine->RegisterObjectMethod(className, "bool HasMasterGain(const String&in) const", AS_METHODPR(T, HasMasterGain, (const String&) const, bool), AS_CALL_THISCALL);
@@ -9864,13 +9872,13 @@ template <class T> void RegisterMembers_Geometry(asIScriptEngine* engine, const 
 
     // float Geometry::GetHitDistance(const Ray& ray, Vector3* outNormal = nullptr, Vector2* outUV = nullptr) const
     // Error: type "Vector3*" can not automatically bind
-    // void Geometry::GetRawData(const unsigned char*& vertexData, unsigned& vertexSize, const unsigned char*& indexData, unsigned& indexSize, const PODVector<VertexElement>*& elements) const
+    // void Geometry::GetRawData(const unsigned char*& vertexData, unsigned& vertexSize, const unsigned char*& indexData, unsigned& indexSize, const Vector<VertexElement>*& elements) const
     // Error: type "const unsigned char*&" can not automatically bind
-    // void Geometry::GetRawDataShared(SharedArrayPtr<unsigned char>& vertexData, unsigned& vertexSize, SharedArrayPtr<unsigned char>& indexData, unsigned& indexSize, const PODVector<VertexElement>*& elements) const
+    // void Geometry::GetRawDataShared(SharedArrayPtr<unsigned char>& vertexData, unsigned& vertexSize, SharedArrayPtr<unsigned char>& indexData, unsigned& indexSize, const Vector<VertexElement>*& elements) const
     // Error: type "SharedArrayPtr<unsigned char>&" can not automatically bind
     // void Geometry::SetRawIndexData(const SharedArrayPtr<unsigned char>& data, unsigned indexSize)
     // Error: type "const SharedArrayPtr<unsigned char>&" can not automatically bind
-    // void Geometry::SetRawVertexData(const SharedArrayPtr<unsigned char>& data, const PODVector<VertexElement>& elements)
+    // void Geometry::SetRawVertexData(const SharedArrayPtr<unsigned char>& data, const Vector<VertexElement>& elements)
     // Error: type "const SharedArrayPtr<unsigned char>&" can not automatically bind
     // void Geometry::SetRawVertexData(const SharedArrayPtr<unsigned char>& data, unsigned elementMask)
     // Error: type "const SharedArrayPtr<unsigned char>&" can not automatically bind
@@ -9953,17 +9961,17 @@ template <class T> void RegisterMembers_Geometry(asIScriptEngine* engine, const 
     #endif
 }
 
-// PODVector<int> Graphics::GetMultiSampleLevels() const
-template <class T> CScriptArray* Graphics_PODVectorlesintgre_GetMultiSampleLevels_void_template(T* _ptr)
+// Vector<int> Graphics::GetMultiSampleLevels() const
+template <class T> CScriptArray* Graphics_Vectorlesintgre_GetMultiSampleLevels_void_template(T* _ptr)
 {
-    PODVector<int> result = _ptr->GetMultiSampleLevels();
+    Vector<int> result = _ptr->GetMultiSampleLevels();
     return VectorToArray(result, "Array<int>");
 }
 
-// PODVector<IntVector3> Graphics::GetResolutions(int monitor) const
-template <class T> CScriptArray* Graphics_PODVectorlesIntVector3gre_GetResolutions_int_template(T* _ptr, int monitor)
+// Vector<IntVector3> Graphics::GetResolutions(int monitor) const
+template <class T> CScriptArray* Graphics_VectorlesIntVector3gre_GetResolutions_int_template(T* _ptr, int monitor)
 {
-    PODVector<IntVector3> result = _ptr->GetResolutions(monitor);
+    Vector<IntVector3> result = _ptr->GetResolutions(monitor);
     return VectorToArray(result, "Array<IntVector3>");
 }
 
@@ -10002,7 +10010,7 @@ template <class T> void RegisterMembers_Graphics(asIScriptEngine* engine, const 
     // Error: type "void*" can not automatically bind
     // void Graphics::SetShaderParameter(StringHash param, const float* data, unsigned count)
     // Error: type "const float*" can not automatically bind
-    // bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, unsigned instanceOffset = 0)
+    // bool Graphics::SetVertexBuffers(const Vector<VertexBuffer*>& buffers, unsigned instanceOffset = 0)
     // Not registered because have @nobind mark
 
     // void Graphics::BeginDumpShaders(const String& fileName)
@@ -10180,9 +10188,9 @@ template <class T> void RegisterMembers_Graphics(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "int GetMultiSample() const", AS_METHODPR(T, GetMultiSample, () const, int), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "int get_multiSample() const", AS_METHODPR(T, GetMultiSample, () const, int), AS_CALL_THISCALL);
 
-    // PODVector<int> Graphics::GetMultiSampleLevels() const
-    engine->RegisterObjectMethod(className, "Array<int>@ GetMultiSampleLevels() const", AS_FUNCTION_OBJFIRST(Graphics_PODVectorlesintgre_GetMultiSampleLevels_void_template<Graphics>), AS_CALL_CDECL_OBJFIRST);
-    engine->RegisterObjectMethod(className, "Array<int>@ get_multiSampleLevels() const", AS_FUNCTION_OBJFIRST(Graphics_PODVectorlesintgre_GetMultiSampleLevels_void_template<Graphics>), AS_CALL_CDECL_OBJFIRST);
+    // Vector<int> Graphics::GetMultiSampleLevels() const
+    engine->RegisterObjectMethod(className, "Array<int>@ GetMultiSampleLevels() const", AS_FUNCTION_OBJFIRST(Graphics_Vectorlesintgre_GetMultiSampleLevels_void_template<Graphics>), AS_CALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod(className, "Array<int>@ get_multiSampleLevels() const", AS_FUNCTION_OBJFIRST(Graphics_Vectorlesintgre_GetMultiSampleLevels_void_template<Graphics>), AS_CALL_CDECL_OBJFIRST);
 
     // unsigned Graphics::GetNumBatches() const
     engine->RegisterObjectMethod(className, "uint GetNumBatches() const", AS_METHODPR(T, GetNumBatches, () const, unsigned), AS_CALL_THISCALL);
@@ -10216,9 +10224,9 @@ template <class T> void RegisterMembers_Graphics(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "bool GetResizable() const", AS_METHODPR(T, GetResizable, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_resizable() const", AS_METHODPR(T, GetResizable, () const, bool), AS_CALL_THISCALL);
 
-    // PODVector<IntVector3> Graphics::GetResolutions(int monitor) const
-    engine->RegisterObjectMethod(className, "Array<IntVector3>@ GetResolutions(int) const", AS_FUNCTION_OBJFIRST(Graphics_PODVectorlesIntVector3gre_GetResolutions_int_template<Graphics>), AS_CALL_CDECL_OBJFIRST);
-    engine->RegisterObjectMethod(className, "Array<IntVector3>@ get_resolutions(int) const", AS_FUNCTION_OBJFIRST(Graphics_PODVectorlesIntVector3gre_GetResolutions_int_template<Graphics>), AS_CALL_CDECL_OBJFIRST);
+    // Vector<IntVector3> Graphics::GetResolutions(int monitor) const
+    engine->RegisterObjectMethod(className, "Array<IntVector3>@ GetResolutions(int) const", AS_FUNCTION_OBJFIRST(Graphics_VectorlesIntVector3gre_GetResolutions_int_template<Graphics>), AS_CALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod(className, "Array<IntVector3>@ get_resolutions(int) const", AS_FUNCTION_OBJFIRST(Graphics_VectorlesIntVector3gre_GetResolutions_int_template<Graphics>), AS_CALL_CDECL_OBJFIRST);
 
     // const IntRect& Graphics::GetScissorRect() const
     engine->RegisterObjectMethod(className, "const IntRect& GetScissorRect() const", AS_METHODPR(T, GetScissorRect, () const, const IntRect&), AS_CALL_THISCALL);
@@ -11713,8 +11721,8 @@ template <class T> void RegisterMembers_ResourceCache(asIScriptEngine* engine, c
     // Error: type "const HashMap<StringHash, ResourceGroup>&" can not automatically bind
     // ResourceRouter* ResourceCache::GetResourceRouter(unsigned index) const
     // Error: type "ResourceRouter" can not automatically bind bacause have @nobind mark
-    // void ResourceCache::GetResources(PODVector<Resource*>& result, StringHash type) const
-    // Error: type "PODVector<Resource*>&" can not automatically bind
+    // void ResourceCache::GetResources(Vector<Resource*>& result, StringHash type) const
+    // Error: type "Vector<Resource*>&" can not automatically bind
     // void ResourceCache::RemoveResourceRouter(ResourceRouter* router)
     // Error: type "ResourceRouter" can not automatically bind bacause have @nobind mark
 
@@ -11865,7 +11873,7 @@ template <class T> void RegisterMembers_ResourceCache(asIScriptEngine* engine, c
     // Not registered because template
     // template <class T> T* ResourceCache::GetResource(const String& name, bool sendEventOnFailure = true)
     // Not registered because template
-    // template <class T> void ResourceCache::GetResources(PODVector<T*>& result) const
+    // template <class T> void ResourceCache::GetResources(Vector<T*>& result) const
     // Not registered because template
     // template <class T> SharedPtr<T> ResourceCache::GetTempResource(const String& name, bool sendEventOnFailure = true)
     // Not registered because template
@@ -12108,7 +12116,7 @@ template <class T> void RegisterMembers_UI(asIScriptEngine* engine, const char* 
     RegisterMembers_Object<T>(engine, className);
 
     // const Vector<UIElement*> UI::GetDragElements()
-    // Error: type "const Vector<UIElement*>" can not automatically bind
+    // Not registered because have @nobind mark
 
     // void UI::Clear()
     engine->RegisterObjectMethod(className, "void Clear()", AS_METHODPR(T, Clear, (), void), AS_CALL_THISCALL);
@@ -12353,14 +12361,14 @@ template <class T> void RegisterMembers_VectorBuffer(asIScriptEngine* engine, co
 {
     RegisterMembers_AbstractFile<T>(engine, className);
 
-    // const PODVector<unsigned char>& VectorBuffer::GetBuffer() const
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
+    // const Vector<unsigned char>& VectorBuffer::GetBuffer() const
+    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // const unsigned char* VectorBuffer::GetData() const
     // Error: type "const unsigned char*" can not automatically bind
     // unsigned char* VectorBuffer::GetModifiableData()
     // Error: type "unsigned char*" can not automatically bind
-    // void VectorBuffer::SetData(const PODVector<unsigned char>& data)
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
+    // void VectorBuffer::SetData(const Vector<unsigned char>& data)
+    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // void VectorBuffer::SetData(const void* data, unsigned size)
     // Error: type "const void*" can not automatically bind
 
@@ -12378,48 +12386,48 @@ template <class T> void RegisterMembers_VectorBuffer(asIScriptEngine* engine, co
     #endif
 }
 
-// const PODVector<VertexElement>& VertexBuffer::GetElements() const
-template <class T> CScriptArray* VertexBuffer_constspPODVectorlesVertexElementgreamp_GetElements_void_template(T* _ptr)
+// const Vector<VertexElement>& VertexBuffer::GetElements() const
+template <class T> CScriptArray* VertexBuffer_constspVectorlesVertexElementgreamp_GetElements_void_template(T* _ptr)
 {
-    const PODVector<VertexElement>& result = _ptr->GetElements();
+    const Vector<VertexElement>& result = _ptr->GetElements();
     return VectorToArray(result, "Array<VertexElement>");
 }
 
-// bool VertexBuffer::SetSize(unsigned vertexCount, const PODVector<VertexElement>& elements, bool dynamic = false)
-template <class T> bool VertexBuffer_bool_SetSize_unsigned_constspPODVectorlesVertexElementgreamp_bool_template(T* _ptr, unsigned vertexCount, CScriptArray* elements_conv, bool dynamic)
+// bool VertexBuffer::SetSize(unsigned vertexCount, const Vector<VertexElement>& elements, bool dynamic = false)
+template <class T> bool VertexBuffer_bool_SetSize_unsigned_constspVectorlesVertexElementgreamp_bool_template(T* _ptr, unsigned vertexCount, CScriptArray* elements_conv, bool dynamic)
 {
-    PODVector<VertexElement> elements = ArrayToVector<VertexElement>(elements_conv);
+    Vector<VertexElement> elements = ArrayToVector<VertexElement>(elements_conv);
     bool result = _ptr->SetSize(vertexCount, elements, dynamic);
     return result;
 }
 
-// static bool VertexBuffer::HasElement(const PODVector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0)
-template <class T> bool VertexBuffer_bool_HasElement_constspPODVectorlesVertexElementgreamp_VertexElementType_VertexElementSemantic_unsignedspchar(CScriptArray* elements_conv, VertexElementType type, VertexElementSemantic semantic, unsigned char index)
+// static bool VertexBuffer::HasElement(const Vector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0)
+template <class T> bool VertexBuffer_bool_HasElement_constspVectorlesVertexElementgreamp_VertexElementType_VertexElementSemantic_unsignedspchar(CScriptArray* elements_conv, VertexElementType type, VertexElementSemantic semantic, unsigned char index)
 {
-    PODVector<VertexElement> elements = ArrayToVector<VertexElement>(elements_conv);
+    Vector<VertexElement> elements = ArrayToVector<VertexElement>(elements_conv);
     bool result = T::HasElement(elements, type, semantic, index);
     return result;
 }
 
-// static unsigned VertexBuffer::GetElementOffset(const PODVector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0)
-template <class T> unsigned VertexBuffer_unsigned_GetElementOffset_constspPODVectorlesVertexElementgreamp_VertexElementType_VertexElementSemantic_unsignedspchar(CScriptArray* elements_conv, VertexElementType type, VertexElementSemantic semantic, unsigned char index)
+// static unsigned VertexBuffer::GetElementOffset(const Vector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0)
+template <class T> unsigned VertexBuffer_unsigned_GetElementOffset_constspVectorlesVertexElementgreamp_VertexElementType_VertexElementSemantic_unsignedspchar(CScriptArray* elements_conv, VertexElementType type, VertexElementSemantic semantic, unsigned char index)
 {
-    PODVector<VertexElement> elements = ArrayToVector<VertexElement>(elements_conv);
+    Vector<VertexElement> elements = ArrayToVector<VertexElement>(elements_conv);
     unsigned result = T::GetElementOffset(elements, type, semantic, index);
     return result;
 }
 
-// static PODVector<VertexElement> VertexBuffer::GetElements(unsigned elementMask)
-template <class T> CScriptArray* VertexBuffer_PODVectorlesVertexElementgre_GetElements_unsigned(unsigned elementMask)
+// static Vector<VertexElement> VertexBuffer::GetElements(unsigned elementMask)
+template <class T> CScriptArray* VertexBuffer_VectorlesVertexElementgre_GetElements_unsigned(unsigned elementMask)
 {
-    PODVector<VertexElement> result = T::GetElements(elementMask);
+    Vector<VertexElement> result = T::GetElements(elementMask);
     return VectorToArray(result, "Array<VertexElement>");
 }
 
-// static unsigned VertexBuffer::GetVertexSize(const PODVector<VertexElement>& elements)
-template <class T> unsigned VertexBuffer_unsigned_GetVertexSize_constspPODVectorlesVertexElementgreamp(CScriptArray* elements_conv)
+// static unsigned VertexBuffer::GetVertexSize(const Vector<VertexElement>& elements)
+template <class T> unsigned VertexBuffer_unsigned_GetVertexSize_constspVectorlesVertexElementgreamp(CScriptArray* elements_conv)
 {
-    PODVector<VertexElement> elements = ArrayToVector<VertexElement>(elements_conv);
+    Vector<VertexElement> elements = ArrayToVector<VertexElement>(elements_conv);
     unsigned result = T::GetVertexSize(elements);
     return result;
 }
@@ -12458,9 +12466,9 @@ template <class T> void RegisterMembers_VertexBuffer(asIScriptEngine* engine, co
     // unsigned VertexBuffer::GetElementOffset(VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0) const
     engine->RegisterObjectMethod(className, "uint GetElementOffset(VertexElementType, VertexElementSemantic, uint8 = 0) const", AS_METHODPR(T, GetElementOffset, (VertexElementType, VertexElementSemantic, unsigned char) const, unsigned), AS_CALL_THISCALL);
 
-    // const PODVector<VertexElement>& VertexBuffer::GetElements() const
-    engine->RegisterObjectMethod(className, "Array<VertexElement>@ GetElements() const", AS_FUNCTION_OBJFIRST(VertexBuffer_constspPODVectorlesVertexElementgreamp_GetElements_void_template<VertexBuffer>), AS_CALL_CDECL_OBJFIRST);
-    engine->RegisterObjectMethod(className, "Array<VertexElement>@ get_elements() const", AS_FUNCTION_OBJFIRST(VertexBuffer_constspPODVectorlesVertexElementgreamp_GetElements_void_template<VertexBuffer>), AS_CALL_CDECL_OBJFIRST);
+    // const Vector<VertexElement>& VertexBuffer::GetElements() const
+    engine->RegisterObjectMethod(className, "Array<VertexElement>@ GetElements() const", AS_FUNCTION_OBJFIRST(VertexBuffer_constspVectorlesVertexElementgreamp_GetElements_void_template<VertexBuffer>), AS_CALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod(className, "Array<VertexElement>@ get_elements() const", AS_FUNCTION_OBJFIRST(VertexBuffer_constspVectorlesVertexElementgreamp_GetElements_void_template<VertexBuffer>), AS_CALL_CDECL_OBJFIRST);
 
     // unsigned VertexBuffer::GetVertexCount() const
     engine->RegisterObjectMethod(className, "uint GetVertexCount() const", AS_METHODPR(T, GetVertexCount, () const, unsigned), AS_CALL_THISCALL);
@@ -12491,8 +12499,8 @@ template <class T> void RegisterMembers_VertexBuffer(asIScriptEngine* engine, co
     engine->RegisterObjectMethod(className, "void SetShadowed(bool)", AS_METHODPR(T, SetShadowed, (bool), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_shadowed(bool)", AS_METHODPR(T, SetShadowed, (bool), void), AS_CALL_THISCALL);
 
-    // bool VertexBuffer::SetSize(unsigned vertexCount, const PODVector<VertexElement>& elements, bool dynamic = false)
-    engine->RegisterObjectMethod(className, "bool SetSize(uint, Array<VertexElement>@+, bool = false)", AS_FUNCTION_OBJFIRST(VertexBuffer_bool_SetSize_unsigned_constspPODVectorlesVertexElementgreamp_bool_template<VertexBuffer>), AS_CALL_CDECL_OBJFIRST);
+    // bool VertexBuffer::SetSize(unsigned vertexCount, const Vector<VertexElement>& elements, bool dynamic = false)
+    engine->RegisterObjectMethod(className, "bool SetSize(uint, Array<VertexElement>@+, bool = false)", AS_FUNCTION_OBJFIRST(VertexBuffer_bool_SetSize_unsigned_constspVectorlesVertexElementgreamp_bool_template<VertexBuffer>), AS_CALL_CDECL_OBJFIRST);
 
     // bool VertexBuffer::SetSize(unsigned vertexCount, unsigned elementMask, bool dynamic = false)
     engine->RegisterObjectMethod(className, "bool SetSize(uint, uint, bool = false)", AS_METHODPR(T, SetSize, (unsigned, unsigned, bool), bool), AS_CALL_THISCALL);
@@ -12500,22 +12508,22 @@ template <class T> void RegisterMembers_VertexBuffer(asIScriptEngine* engine, co
     // void VertexBuffer::Unlock()
     engine->RegisterObjectMethod(className, "void Unlock()", AS_METHODPR(T, Unlock, (), void), AS_CALL_THISCALL);
 
-    // static const VertexElement* VertexBuffer::GetElement(const PODVector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0)
+    // static const VertexElement* VertexBuffer::GetElement(const Vector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0)
     // Error: type "const VertexElement*" can not automatically bind
-    // static void VertexBuffer::UpdateOffsets(PODVector<VertexElement>& elements)
-    // Error: type "PODVector<VertexElement>&" can not automatically bind
+    // static void VertexBuffer::UpdateOffsets(Vector<VertexElement>& elements)
+    // Error: type "Vector<VertexElement>&" can not automatically bind
 
-    // static bool VertexBuffer::HasElement(const PODVector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0)
-    engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("bool HasElement(Array<VertexElement>@+, VertexElementType, VertexElementSemantic, uint8 = 0)", AS_FUNCTION(VertexBuffer_bool_HasElement_constspPODVectorlesVertexElementgreamp_VertexElementType_VertexElementSemantic_unsignedspchar<VertexBuffer>), AS_CALL_CDECL);engine->SetDefaultNamespace("");
+    // static bool VertexBuffer::HasElement(const Vector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0)
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("bool HasElement(Array<VertexElement>@+, VertexElementType, VertexElementSemantic, uint8 = 0)", AS_FUNCTION(VertexBuffer_bool_HasElement_constspVectorlesVertexElementgreamp_VertexElementType_VertexElementSemantic_unsignedspchar<VertexBuffer>), AS_CALL_CDECL);engine->SetDefaultNamespace("");
 
-    // static unsigned VertexBuffer::GetElementOffset(const PODVector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0)
-    engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("uint GetElementOffset(Array<VertexElement>@+, VertexElementType, VertexElementSemantic, uint8 = 0)", AS_FUNCTION(VertexBuffer_unsigned_GetElementOffset_constspPODVectorlesVertexElementgreamp_VertexElementType_VertexElementSemantic_unsignedspchar<VertexBuffer>), AS_CALL_CDECL);engine->SetDefaultNamespace("");
+    // static unsigned VertexBuffer::GetElementOffset(const Vector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0)
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("uint GetElementOffset(Array<VertexElement>@+, VertexElementType, VertexElementSemantic, uint8 = 0)", AS_FUNCTION(VertexBuffer_unsigned_GetElementOffset_constspVectorlesVertexElementgreamp_VertexElementType_VertexElementSemantic_unsignedspchar<VertexBuffer>), AS_CALL_CDECL);engine->SetDefaultNamespace("");
 
-    // static PODVector<VertexElement> VertexBuffer::GetElements(unsigned elementMask)
-    engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("Array<VertexElement>@ GetElements(uint)", AS_FUNCTION(VertexBuffer_PODVectorlesVertexElementgre_GetElements_unsigned<VertexBuffer>), AS_CALL_CDECL);engine->SetDefaultNamespace("");
+    // static Vector<VertexElement> VertexBuffer::GetElements(unsigned elementMask)
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("Array<VertexElement>@ GetElements(uint)", AS_FUNCTION(VertexBuffer_VectorlesVertexElementgre_GetElements_unsigned<VertexBuffer>), AS_CALL_CDECL);engine->SetDefaultNamespace("");
 
-    // static unsigned VertexBuffer::GetVertexSize(const PODVector<VertexElement>& elements)
-    engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("uint GetVertexSize(Array<VertexElement>@+)", AS_FUNCTION(VertexBuffer_unsigned_GetVertexSize_constspPODVectorlesVertexElementgreamp<VertexBuffer>), AS_CALL_CDECL);engine->SetDefaultNamespace("");
+    // static unsigned VertexBuffer::GetVertexSize(const Vector<VertexElement>& elements)
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("uint GetVertexSize(Array<VertexElement>@+)", AS_FUNCTION(VertexBuffer_unsigned_GetVertexSize_constspVectorlesVertexElementgreamp<VertexBuffer>), AS_CALL_CDECL);engine->SetDefaultNamespace("");
 
     // static unsigned VertexBuffer::GetVertexSize(unsigned elementMask)
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("uint GetVertexSize(uint)", AS_FUNCTIONPR(T::GetVertexSize, (unsigned), unsigned), AS_CALL_CDECL);engine->SetDefaultNamespace("");
@@ -12525,24 +12533,31 @@ template <class T> void RegisterMembers_VertexBuffer(asIScriptEngine* engine, co
     #endif
 }
 
-// const PODVector<Drawable*>& View::GetGeometries() const
-template <class T> CScriptArray* View_constspPODVectorlesDrawablestargreamp_GetGeometries_void_template(T* _ptr)
+// const Vector<Drawable*>& View::GetGeometries() const
+template <class T> CScriptArray* View_constspVectorlesDrawablestargreamp_GetGeometries_void_template(T* _ptr)
 {
-    const PODVector<Drawable*>& result = _ptr->GetGeometries();
+    const Vector<Drawable*>& result = _ptr->GetGeometries();
     return VectorToHandleArray(result, "Array<Drawable@>");
 }
 
-// const PODVector<Light*>& View::GetLights() const
-template <class T> CScriptArray* View_constspPODVectorlesLightstargreamp_GetLights_void_template(T* _ptr)
+// const Vector<LightBatchQueue>& View::GetLightQueues() const
+template <class T> CScriptArray* View_constspVectorlesLightBatchQueuegreamp_GetLightQueues_void_template(T* _ptr)
 {
-    const PODVector<Light*>& result = _ptr->GetLights();
+    const Vector<LightBatchQueue>& result = _ptr->GetLightQueues();
+    return VectorToArray(result, "Array<LightBatchQueue>");
+}
+
+// const Vector<Light*>& View::GetLights() const
+template <class T> CScriptArray* View_constspVectorlesLightstargreamp_GetLights_void_template(T* _ptr)
+{
+    const Vector<Light*>& result = _ptr->GetLights();
     return VectorToHandleArray(result, "Array<Light@>");
 }
 
-// const PODVector<Drawable*>& View::GetOccluders() const
-template <class T> CScriptArray* View_constspPODVectorlesDrawablestargreamp_GetOccluders_void_template(T* _ptr)
+// const Vector<Drawable*>& View::GetOccluders() const
+template <class T> CScriptArray* View_constspVectorlesDrawablestargreamp_GetOccluders_void_template(T* _ptr)
 {
-    const PODVector<Drawable*>& result = _ptr->GetOccluders();
+    const Vector<Drawable*>& result = _ptr->GetOccluders();
     return VectorToHandleArray(result, "Array<Drawable@>");
 }
 
@@ -12550,9 +12565,6 @@ template <class T> CScriptArray* View_constspPODVectorlesDrawablestargreamp_GetO
 template <class T> void RegisterMembers_View(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_Object<T>(engine, className);
-
-    // const Vector<LightBatchQueue>& View::GetLightQueues() const
-    // Error: type "const Vector<LightBatchQueue>&" can not automatically bind
 
     // bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
     engine->RegisterObjectMethod(className, "bool Define(RenderSurface@+, Viewport@+)", AS_METHODPR(T, Define, (RenderSurface*, Viewport*), bool), AS_CALL_THISCALL);
@@ -12575,20 +12587,23 @@ template <class T> void RegisterMembers_View(asIScriptEngine* engine, const char
     // const FrameInfo& View::GetFrameInfo() const
     engine->RegisterObjectMethod(className, "const FrameInfo& GetFrameInfo() const", AS_METHODPR(T, GetFrameInfo, () const, const FrameInfo&), AS_CALL_THISCALL);
 
-    // const PODVector<Drawable*>& View::GetGeometries() const
-    engine->RegisterObjectMethod(className, "Array<Drawable@>@ GetGeometries() const", AS_FUNCTION_OBJFIRST(View_constspPODVectorlesDrawablestargreamp_GetGeometries_void_template<View>), AS_CALL_CDECL_OBJFIRST);
+    // const Vector<Drawable*>& View::GetGeometries() const
+    engine->RegisterObjectMethod(className, "Array<Drawable@>@ GetGeometries() const", AS_FUNCTION_OBJFIRST(View_constspVectorlesDrawablestargreamp_GetGeometries_void_template<View>), AS_CALL_CDECL_OBJFIRST);
 
     // Graphics* View::GetGraphics() const
     engine->RegisterObjectMethod(className, "Graphics@+ GetGraphics() const", AS_METHODPR(T, GetGraphics, () const, Graphics*), AS_CALL_THISCALL);
 
-    // const PODVector<Light*>& View::GetLights() const
-    engine->RegisterObjectMethod(className, "Array<Light@>@ GetLights() const", AS_FUNCTION_OBJFIRST(View_constspPODVectorlesLightstargreamp_GetLights_void_template<View>), AS_CALL_CDECL_OBJFIRST);
+    // const Vector<LightBatchQueue>& View::GetLightQueues() const
+    engine->RegisterObjectMethod(className, "Array<LightBatchQueue>@ GetLightQueues() const", AS_FUNCTION_OBJFIRST(View_constspVectorlesLightBatchQueuegreamp_GetLightQueues_void_template<View>), AS_CALL_CDECL_OBJFIRST);
+
+    // const Vector<Light*>& View::GetLights() const
+    engine->RegisterObjectMethod(className, "Array<Light@>@ GetLights() const", AS_FUNCTION_OBJFIRST(View_constspVectorlesLightstargreamp_GetLights_void_template<View>), AS_CALL_CDECL_OBJFIRST);
 
     // unsigned View::GetNumActiveOccluders() const
     engine->RegisterObjectMethod(className, "uint GetNumActiveOccluders() const", AS_METHODPR(T, GetNumActiveOccluders, () const, unsigned), AS_CALL_THISCALL);
 
-    // const PODVector<Drawable*>& View::GetOccluders() const
-    engine->RegisterObjectMethod(className, "Array<Drawable@>@ GetOccluders() const", AS_FUNCTION_OBJFIRST(View_constspPODVectorlesDrawablestargreamp_GetOccluders_void_template<View>), AS_CALL_CDECL_OBJFIRST);
+    // const Vector<Drawable*>& View::GetOccluders() const
+    engine->RegisterObjectMethod(className, "Array<Drawable@>@ GetOccluders() const", AS_FUNCTION_OBJFIRST(View_constspVectorlesDrawablestargreamp_GetOccluders_void_template<View>), AS_CALL_CDECL_OBJFIRST);
 
     // OcclusionBuffer* View::GetOcclusionBuffer() const
     engine->RegisterObjectMethod(className, "OcclusionBuffer@+ GetOcclusionBuffer() const", AS_METHODPR(T, GetOcclusionBuffer, () const, OcclusionBuffer*), AS_CALL_THISCALL);
@@ -13148,10 +13163,10 @@ template <class T> void RegisterMembers_Network(asIScriptEngine* engine, const c
 
 #ifdef URHO3D_PHYSICS
 
-// void ConvexData::BuildHull(const PODVector<Vector3>& vertices)
-template <class T> void ConvexData_void_BuildHull_constspPODVectorlesVector3greamp_template(T* _ptr, CScriptArray* vertices_conv)
+// void ConvexData::BuildHull(const Vector<Vector3>& vertices)
+template <class T> void ConvexData_void_BuildHull_constspVectorlesVector3greamp_template(T* _ptr, CScriptArray* vertices_conv)
 {
-    PODVector<Vector3> vertices = ArrayToVector<Vector3>(vertices_conv);
+    Vector<Vector3> vertices = ArrayToVector<Vector3>(vertices_conv);
     _ptr->BuildHull(vertices);
 }
 
@@ -13160,8 +13175,8 @@ template <class T> void RegisterMembers_ConvexData(asIScriptEngine* engine, cons
 {
     RegisterMembers_CollisionGeometryData<T>(engine, className);
 
-    // void ConvexData::BuildHull(const PODVector<Vector3>& vertices)
-    engine->RegisterObjectMethod(className, "void BuildHull(Array<Vector3>@+)", AS_FUNCTION_OBJFIRST(ConvexData_void_BuildHull_constspPODVectorlesVector3greamp_template<ConvexData>), AS_CALL_CDECL_OBJFIRST);
+    // void ConvexData::BuildHull(const Vector<Vector3>& vertices)
+    engine->RegisterObjectMethod(className, "void BuildHull(Array<Vector3>@+)", AS_FUNCTION_OBJFIRST(ConvexData_void_BuildHull_constspVectorlesVector3greamp_template<ConvexData>), AS_CALL_CDECL_OBJFIRST);
 
     // SharedArrayPtr<Vector3> ConvexData::vertexData_
     // Error: type "SharedArrayPtr<Vector3>" can not automatically bind
@@ -13470,10 +13485,10 @@ template <class T> void RegisterMembers_Image(asIScriptEngine* engine, const cha
 
     // unsigned char* Image::GetData() const
     // Error: type "unsigned char*" can not automatically bind
-    // void Image::GetLevels(PODVector<Image*>& levels)
-    // Error: type "PODVector<Image*>&" can not automatically bind
-    // void Image::GetLevels(PODVector<const Image*>& levels) const
-    // Error: type "PODVector<const Image*>&" can not automatically bind
+    // void Image::GetLevels(Vector<Image*>& levels)
+    // Error: type "Vector<Image*>&" can not automatically bind
+    // void Image::GetLevels(Vector<const Image*>& levels) const
+    // Error: type "Vector<const Image*>&" can not automatically bind
     // SDL_Surface* Image::GetSDLSurface(const IntRect& rect = IntRect::ZERO) const
     // Error: type "SDL_Surface*" can not automatically bind
     // void Image::SetData(const unsigned char* pixelData)
@@ -13666,6 +13681,13 @@ template <class T> Material* Material_SharedPtrlesMaterialgre_Clone_constspStrin
     return result.Detach();
 }
 
+// const Vector<TechniqueEntry>& Material::GetTechniques() const
+template <class T> CScriptArray* Material_constspVectorlesTechniqueEntrygreamp_GetTechniques_void_template(T* _ptr)
+{
+    const Vector<TechniqueEntry>& result = _ptr->GetTechniques();
+    return VectorToArray(result, "Array<TechniqueEntry>");
+}
+
 // class Material | File: ../Graphics/Material.h
 template <class T> void RegisterMembers_Material(asIScriptEngine* engine, const char* className)
 {
@@ -13673,8 +13695,6 @@ template <class T> void RegisterMembers_Material(asIScriptEngine* engine, const 
 
     // const HashMap<StringHash, MaterialShaderParameter>& Material::GetShaderParameters() const
     // Error: type "const HashMap<StringHash, MaterialShaderParameter>&" can not automatically bind
-    // const Vector<TechniqueEntry>& Material::GetTechniques() const
-    // Error: type "const Vector<TechniqueEntry>&" can not automatically bind
     // const HashMap<TextureUnit, SharedPtr<Texture>>& Material::GetTextures() const
     // Error: type "const HashMap<TextureUnit, SharedPtr<Texture>>&" can not automatically bind
 
@@ -13756,6 +13776,9 @@ template <class T> void RegisterMembers_Material(asIScriptEngine* engine, const 
 
     // const TechniqueEntry& Material::GetTechniqueEntry(unsigned index) const
     engine->RegisterObjectMethod(className, "const TechniqueEntry& GetTechniqueEntry(uint) const", AS_METHODPR(T, GetTechniqueEntry, (unsigned) const, const TechniqueEntry&), AS_CALL_THISCALL);
+
+    // const Vector<TechniqueEntry>& Material::GetTechniques() const
+    engine->RegisterObjectMethod(className, "Array<TechniqueEntry>@ GetTechniques() const", AS_FUNCTION_OBJFIRST(Material_constspVectorlesTechniqueEntrygreamp_GetTechniques_void_template<Material>), AS_CALL_CDECL_OBJFIRST);
 
     // Texture* Material::GetTexture(TextureUnit unit) const
     engine->RegisterObjectMethod(className, "Texture@+ GetTexture(TextureUnit) const", AS_METHODPR(T, GetTexture, (TextureUnit) const, Texture*), AS_CALL_THISCALL);
@@ -13942,13 +13965,13 @@ template <class T> void RegisterMembers_ParticleEffect(asIScriptEngine* engine, 
     RegisterMembers_Resource<T>(engine, className);
 
     // const Vector<ColorFrame>& ParticleEffect::GetColorFrames() const
-    // Error: type "const Vector<ColorFrame>&" can not automatically bind
+    // Not registered because have @nobind mark
     // const Vector<TextureFrame>& ParticleEffect::GetTextureFrames() const
-    // Error: type "const Vector<TextureFrame>&" can not automatically bind
+    // Not registered because have @nobind mark
     // void ParticleEffect::SetColorFrames(const Vector<ColorFrame>& colorFrames)
-    // Error: type "const Vector<ColorFrame>&" can not automatically bind
+    // Not registered because have @nobind mark
     // void ParticleEffect::SetTextureFrames(const Vector<TextureFrame>& textureFrames)
-    // Error: type "const Vector<TextureFrame>&" can not automatically bind
+    // Not registered because have @nobind mark
 
     // void ParticleEffect::AddColorFrame(const ColorFrame& colorFrame)
     engine->RegisterObjectMethod(className, "void AddColorFrame(const ColorFrame&in)", AS_METHODPR(T, AddColorFrame, (const ColorFrame&), void), AS_CALL_THISCALL);
@@ -14352,10 +14375,10 @@ template <class T> Technique* Technique_SharedPtrlesTechniquegre_CloneWithDefine
     return result.Detach();
 }
 
-// PODVector<Pass*> Technique::GetPasses() const
-template <class T> CScriptArray* Technique_PODVectorlesPassstargre_GetPasses_void_template(T* _ptr)
+// Vector<Pass*> Technique::GetPasses() const
+template <class T> CScriptArray* Technique_VectorlesPassstargre_GetPasses_void_template(T* _ptr)
 {
-    PODVector<Pass*> result = _ptr->GetPasses();
+    Vector<Pass*> result = _ptr->GetPasses();
     return VectorToHandleArray(result, "Array<Pass@>");
 }
 
@@ -14390,9 +14413,9 @@ template <class T> void RegisterMembers_Technique(asIScriptEngine* engine, const
     // Pass* Technique::GetPass(const String& name) const
     engine->RegisterObjectMethod(className, "Pass@+ GetPass(const String&in) const", AS_METHODPR(T, GetPass, (const String&) const, Pass*), AS_CALL_THISCALL);
 
-    // PODVector<Pass*> Technique::GetPasses() const
-    engine->RegisterObjectMethod(className, "Array<Pass@>@ GetPasses() const", AS_FUNCTION_OBJFIRST(Technique_PODVectorlesPassstargre_GetPasses_void_template<Technique>), AS_CALL_CDECL_OBJFIRST);
-    engine->RegisterObjectMethod(className, "Array<Pass@>@ get_passes() const", AS_FUNCTION_OBJFIRST(Technique_PODVectorlesPassstargre_GetPasses_void_template<Technique>), AS_CALL_CDECL_OBJFIRST);
+    // Vector<Pass*> Technique::GetPasses() const
+    engine->RegisterObjectMethod(className, "Array<Pass@>@ GetPasses() const", AS_FUNCTION_OBJFIRST(Technique_VectorlesPassstargre_GetPasses_void_template<Technique>), AS_CALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod(className, "Array<Pass@>@ get_passes() const", AS_FUNCTION_OBJFIRST(Technique_VectorlesPassstargre_GetPasses_void_template<Technique>), AS_CALL_CDECL_OBJFIRST);
 
     // Vector<String> Technique::GetPassNames() const
     engine->RegisterObjectMethod(className, "Array<String>@ GetPassNames() const", AS_FUNCTION_OBJFIRST(Technique_VectorlesStringgre_GetPassNames_void_template<Technique>), AS_CALL_CDECL_OBJFIRST);
@@ -14463,15 +14486,20 @@ template <class T> void RegisterMembers_Technique(asIScriptEngine* engine, const
     #endif
 }
 
+// const Vector<VAnimKeyFrame>& ValueAnimation::GetKeyFrames() const
+template <class T> CScriptArray* ValueAnimation_constspVectorlesVAnimKeyFramegreamp_GetKeyFrames_void_template(T* _ptr)
+{
+    const Vector<VAnimKeyFrame>& result = _ptr->GetKeyFrames();
+    return VectorToArray(result, "Array<VAnimKeyFrame>");
+}
+
 // class ValueAnimation | File: ../Scene/ValueAnimation.h
 template <class T> void RegisterMembers_ValueAnimation(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_Resource<T>(engine, className);
 
-    // void ValueAnimation::GetEventFrames(float beginTime, float endTime, PODVector<const VAnimEventFrame*>& eventFrames) const
-    // Error: type "PODVector<const VAnimEventFrame*>&" can not automatically bind
-    // const Vector<VAnimKeyFrame>& ValueAnimation::GetKeyFrames() const
-    // Error: type "const Vector<VAnimKeyFrame>&" can not automatically bind
+    // void ValueAnimation::GetEventFrames(float beginTime, float endTime, Vector<const VAnimEventFrame*>& eventFrames) const
+    // Error: type "Vector<const VAnimEventFrame*>&" can not automatically bind
     // void* ValueAnimation::GetOwner() const
     // Error: type "void*" can not automatically bind
     // void ValueAnimation::SetOwner(void* owner)
@@ -14489,6 +14517,9 @@ template <class T> void RegisterMembers_ValueAnimation(asIScriptEngine* engine, 
     // InterpMethod ValueAnimation::GetInterpolationMethod() const
     engine->RegisterObjectMethod(className, "InterpMethod GetInterpolationMethod() const", AS_METHODPR(T, GetInterpolationMethod, () const, InterpMethod), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "InterpMethod get_interpolationMethod() const", AS_METHODPR(T, GetInterpolationMethod, () const, InterpMethod), AS_CALL_THISCALL);
+
+    // const Vector<VAnimKeyFrame>& ValueAnimation::GetKeyFrames() const
+    engine->RegisterObjectMethod(className, "Array<VAnimKeyFrame>@ GetKeyFrames() const", AS_FUNCTION_OBJFIRST(ValueAnimation_constspVectorlesVAnimKeyFramegreamp_GetKeyFrames_void_template<ValueAnimation>), AS_CALL_CDECL_OBJFIRST);
 
     // float ValueAnimation::GetSplineTension() const
     engine->RegisterObjectMethod(className, "float GetSplineTension() const", AS_METHODPR(T, GetSplineTension, () const, float), AS_CALL_THISCALL);
@@ -15017,6 +15048,13 @@ template <class T> Animation* Animation_SharedPtrlesAnimationgre_Clone_constspSt
     return result.Detach();
 }
 
+// const Vector<AnimationTriggerPoint>& Animation::GetTriggers() const
+template <class T> CScriptArray* Animation_constspVectorlesAnimationTriggerPointgreamp_GetTriggers_void_template(T* _ptr)
+{
+    const Vector<AnimationTriggerPoint>& result = _ptr->GetTriggers();
+    return VectorToArray(result, "Array<AnimationTriggerPoint>");
+}
+
 // class Animation | File: ../Graphics/Animation.h
 template <class T> void RegisterMembers_Animation(asIScriptEngine* engine, const char* className)
 {
@@ -15026,8 +15064,6 @@ template <class T> void RegisterMembers_Animation(asIScriptEngine* engine, const
     // Error: type "const HashMap<StringHash, AnimationTrack>&" can not automatically bind
     // AnimationTriggerPoint* Animation::GetTrigger(unsigned index)
     // Error: type "AnimationTriggerPoint*" can not automatically bind
-    // const Vector<AnimationTriggerPoint>& Animation::GetTriggers() const
-    // Error: type "const Vector<AnimationTriggerPoint>&" can not automatically bind
 
     // void Animation::AddTrigger(const AnimationTriggerPoint& trigger)
     engine->RegisterObjectMethod(className, "void AddTrigger(const AnimationTriggerPoint&in)", AS_METHODPR(T, AddTrigger, (const AnimationTriggerPoint&), void), AS_CALL_THISCALL);
@@ -15069,6 +15105,9 @@ template <class T> void RegisterMembers_Animation(asIScriptEngine* engine, const
 
     // AnimationTrack* Animation::GetTrack(StringHash nameHash)
     engine->RegisterObjectMethod(className, "AnimationTrack@ GetTrack(StringHash)", AS_METHODPR(T, GetTrack, (StringHash), AnimationTrack*), AS_CALL_THISCALL);
+
+    // const Vector<AnimationTriggerPoint>& Animation::GetTriggers() const
+    engine->RegisterObjectMethod(className, "Array<AnimationTriggerPoint>@ GetTriggers() const", AS_FUNCTION_OBJFIRST(Animation_constspVectorlesAnimationTriggerPointgreamp_GetTriggers_void_template<Animation>), AS_CALL_CDECL_OBJFIRST);
 
     // void Animation::RemoveAllTracks()
     engine->RegisterObjectMethod(className, "void RemoveAllTracks()", AS_METHODPR(T, RemoveAllTracks, (), void), AS_CALL_THISCALL);
@@ -15115,10 +15154,10 @@ template <class T> void RegisterMembers_Component(asIScriptEngine* engine, const
     // Error: type "ComponentReplicationState*" can not automatically bind
     // void Component::CleanupConnection(Connection* connection)
     // Not registered because have @manualbind mark
-    // void Component::GetComponents(PODVector<Component*>& dest, StringHash type) const
-    // Error: type "PODVector<Component*>&" can not automatically bind
-    // virtual void Component::GetDependencyNodes(PODVector<Node*>& dest)
-    // Error: type "PODVector<Node*>&" can not automatically bind
+    // void Component::GetComponents(Vector<Component*>& dest, StringHash type) const
+    // Error: type "Vector<Component*>&" can not automatically bind
+    // virtual void Component::GetDependencyNodes(Vector<Node*>& dest)
+    // Error: type "Vector<Node*>&" can not automatically bind
 
     // Component* Component::GetComponent(StringHash type) const
     engine->RegisterObjectMethod(className, "Component@+ GetComponent(StringHash) const", AS_METHODPR(T, GetComponent, (StringHash) const, Component*), AS_CALL_THISCALL);
@@ -15161,7 +15200,7 @@ template <class T> void RegisterMembers_Component(asIScriptEngine* engine, const
 
     // template <class T> T* Component::GetComponent() const
     // Not registered because template
-    // template <class T> void Component::GetComponents(PODVector<T*>& dest) const
+    // template <class T> void Component::GetComponents(Vector<T*>& dest) const
     // Not registered because template
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Component
@@ -15176,10 +15215,10 @@ template <class T> Model* Model_SharedPtrlesModelgre_Clone_constspStringamp_temp
     return result.Detach();
 }
 
-// const PODVector<Vector3>& Model::GetGeometryCenters() const
-template <class T> CScriptArray* Model_constspPODVectorlesVector3greamp_GetGeometryCenters_void_template(T* _ptr)
+// const Vector<Vector3>& Model::GetGeometryCenters() const
+template <class T> CScriptArray* Model_constspVectorlesVector3greamp_GetGeometryCenters_void_template(T* _ptr)
 {
-    const PODVector<Vector3>& result = _ptr->GetGeometryCenters();
+    const Vector<Vector3>& result = _ptr->GetGeometryCenters();
     return VectorToArray(result, "Array<Vector3>");
 }
 
@@ -15188,6 +15227,13 @@ template <class T> CScriptArray* Model_constspVectorlesSharedPtrlesIndexBuffergr
 {
     const Vector<SharedPtr<IndexBuffer>>& result = _ptr->GetIndexBuffers();
     return VectorToHandleArray(result, "Array<IndexBuffer@>");
+}
+
+// const Vector<ModelMorph>& Model::GetMorphs() const
+template <class T> CScriptArray* Model_constspVectorlesModelMorphgreamp_GetMorphs_void_template(T* _ptr)
+{
+    const Vector<ModelMorph>& result = _ptr->GetMorphs();
+    return VectorToArray(result, "Array<ModelMorph>");
 }
 
 // const Vector<SharedPtr<VertexBuffer>>& Model::GetVertexBuffers() const
@@ -15205,12 +15251,19 @@ template <class T> bool Model_bool_SetIndexBuffers_constspVectorlesSharedPtrlesI
     return result;
 }
 
-// bool Model::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer>>& buffers, const PODVector<unsigned>& morphRangeStarts, const PODVector<unsigned>& morphRangeCounts)
-template <class T> bool Model_bool_SetVertexBuffers_constspVectorlesSharedPtrlesVertexBuffergregreamp_constspPODVectorlesunsignedgreamp_constspPODVectorlesunsignedgreamp_template(T* _ptr, CScriptArray* buffers_conv, CScriptArray* morphRangeStarts_conv, CScriptArray* morphRangeCounts_conv)
+// void Model::SetMorphs(const Vector<ModelMorph>& morphs)
+template <class T> void Model_void_SetMorphs_constspVectorlesModelMorphgreamp_template(T* _ptr, CScriptArray* morphs_conv)
+{
+    Vector<ModelMorph> morphs = ArrayToVector<ModelMorph>(morphs_conv);
+    _ptr->SetMorphs(morphs);
+}
+
+// bool Model::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer>>& buffers, const Vector<unsigned>& morphRangeStarts, const Vector<unsigned>& morphRangeCounts)
+template <class T> bool Model_bool_SetVertexBuffers_constspVectorlesSharedPtrlesVertexBuffergregreamp_constspVectorlesunsignedgreamp_constspVectorlesunsignedgreamp_template(T* _ptr, CScriptArray* buffers_conv, CScriptArray* morphRangeStarts_conv, CScriptArray* morphRangeCounts_conv)
 {
     Vector<SharedPtr<VertexBuffer>> buffers = HandleArrayToVector<VertexBuffer>(buffers_conv);
-    PODVector<unsigned> morphRangeStarts = ArrayToVector<unsigned>(morphRangeStarts_conv);
-    PODVector<unsigned> morphRangeCounts = ArrayToVector<unsigned>(morphRangeCounts_conv);
+    Vector<unsigned> morphRangeStarts = ArrayToVector<unsigned>(morphRangeStarts_conv);
+    Vector<unsigned> morphRangeCounts = ArrayToVector<unsigned>(morphRangeCounts_conv);
     bool result = _ptr->SetVertexBuffers(buffers, morphRangeStarts, morphRangeCounts);
     return result;
 }
@@ -15222,20 +15275,16 @@ template <class T> void RegisterMembers_Model(asIScriptEngine* engine, const cha
 
     // const Vector<Vector<SharedPtr<Geometry>>>& Model::GetGeometries() const
     // Error: type "const Vector<Vector<SharedPtr<Geometry>>>&" can not automatically bind
-    // const Vector<PODVector<unsigned>>& Model::GetGeometryBoneMappings() const
-    // Error: type "const Vector<PODVector<unsigned>>&" can not automatically bind
+    // const Vector<Vector<unsigned>>& Model::GetGeometryBoneMappings() const
+    // Error: type "const Vector<Vector<unsigned>>&" can not automatically bind
     // const ModelMorph* Model::GetMorph(unsigned index) const
     // Error: type "const ModelMorph*" can not automatically bind
     // const ModelMorph* Model::GetMorph(const String& name) const
     // Error: type "const ModelMorph*" can not automatically bind
     // const ModelMorph* Model::GetMorph(StringHash nameHash) const
     // Error: type "const ModelMorph*" can not automatically bind
-    // const Vector<ModelMorph>& Model::GetMorphs() const
-    // Error: type "const Vector<ModelMorph>&" can not automatically bind
-    // void Model::SetGeometryBoneMappings(const Vector<PODVector<unsigned>>& geometryBoneMappings)
-    // Error: type "const Vector<PODVector<unsigned>>&" can not automatically bind
-    // void Model::SetMorphs(const Vector<ModelMorph>& morphs)
-    // Error: type "const Vector<ModelMorph>&" can not automatically bind
+    // void Model::SetGeometryBoneMappings(const Vector<Vector<unsigned>>& geometryBoneMappings)
+    // Error: type "const Vector<Vector<unsigned>>&" can not automatically bind
 
     // SharedPtr<Model> Model::Clone(const String& cloneName = String::EMPTY) const
     engine->RegisterObjectMethod(className, "Model@+ Clone(const String&in = String::EMPTY) const", AS_FUNCTION_OBJFIRST(Model_SharedPtrlesModelgre_Clone_constspStringamp_template<Model>), AS_CALL_CDECL_OBJFIRST);
@@ -15251,8 +15300,8 @@ template <class T> void RegisterMembers_Model(asIScriptEngine* engine, const cha
     engine->RegisterObjectMethod(className, "const Vector3& GetGeometryCenter(uint) const", AS_METHODPR(T, GetGeometryCenter, (unsigned) const, const Vector3&), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "const Vector3& get_geometryCenters(uint) const", AS_METHODPR(T, GetGeometryCenter, (unsigned) const, const Vector3&), AS_CALL_THISCALL);
 
-    // const PODVector<Vector3>& Model::GetGeometryCenters() const
-    engine->RegisterObjectMethod(className, "Array<Vector3>@ GetGeometryCenters() const", AS_FUNCTION_OBJFIRST(Model_constspPODVectorlesVector3greamp_GetGeometryCenters_void_template<Model>), AS_CALL_CDECL_OBJFIRST);
+    // const Vector<Vector3>& Model::GetGeometryCenters() const
+    engine->RegisterObjectMethod(className, "Array<Vector3>@ GetGeometryCenters() const", AS_FUNCTION_OBJFIRST(Model_constspVectorlesVector3greamp_GetGeometryCenters_void_template<Model>), AS_CALL_CDECL_OBJFIRST);
 
     // const Vector<SharedPtr<IndexBuffer>>& Model::GetIndexBuffers() const
     engine->RegisterObjectMethod(className, "Array<IndexBuffer@>@ GetIndexBuffers() const", AS_FUNCTION_OBJFIRST(Model_constspVectorlesSharedPtrlesIndexBuffergregreamp_GetIndexBuffers_void_template<Model>), AS_CALL_CDECL_OBJFIRST);
@@ -15262,6 +15311,9 @@ template <class T> void RegisterMembers_Model(asIScriptEngine* engine, const cha
 
     // unsigned Model::GetMorphRangeStart(unsigned bufferIndex) const
     engine->RegisterObjectMethod(className, "uint GetMorphRangeStart(uint) const", AS_METHODPR(T, GetMorphRangeStart, (unsigned) const, unsigned), AS_CALL_THISCALL);
+
+    // const Vector<ModelMorph>& Model::GetMorphs() const
+    engine->RegisterObjectMethod(className, "Array<ModelMorph>@ GetMorphs() const", AS_FUNCTION_OBJFIRST(Model_constspVectorlesModelMorphgreamp_GetMorphs_void_template<Model>), AS_CALL_CDECL_OBJFIRST);
 
     // unsigned Model::GetNumGeometries() const
     engine->RegisterObjectMethod(className, "uint GetNumGeometries() const", AS_METHODPR(T, GetNumGeometries, () const, unsigned), AS_CALL_THISCALL);
@@ -15296,6 +15348,9 @@ template <class T> void RegisterMembers_Model(asIScriptEngine* engine, const cha
     // bool Model::SetIndexBuffers(const Vector<SharedPtr<IndexBuffer>>& buffers)
     engine->RegisterObjectMethod(className, "bool SetIndexBuffers(Array<IndexBuffer@>@+)", AS_FUNCTION_OBJFIRST(Model_bool_SetIndexBuffers_constspVectorlesSharedPtrlesIndexBuffergregreamp_template<Model>), AS_CALL_CDECL_OBJFIRST);
 
+    // void Model::SetMorphs(const Vector<ModelMorph>& morphs)
+    engine->RegisterObjectMethod(className, "void SetMorphs(Array<ModelMorph>@+)", AS_FUNCTION_OBJFIRST(Model_void_SetMorphs_constspVectorlesModelMorphgreamp_template<Model>), AS_CALL_CDECL_OBJFIRST);
+
     // void Model::SetNumGeometries(unsigned num)
     engine->RegisterObjectMethod(className, "void SetNumGeometries(uint)", AS_METHODPR(T, SetNumGeometries, (unsigned), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_numGeometries(uint)", AS_METHODPR(T, SetNumGeometries, (unsigned), void), AS_CALL_THISCALL);
@@ -15307,8 +15362,8 @@ template <class T> void RegisterMembers_Model(asIScriptEngine* engine, const cha
     // void Model::SetSkeleton(const Skeleton& skeleton)
     engine->RegisterObjectMethod(className, "void SetSkeleton(const Skeleton&in)", AS_METHODPR(T, SetSkeleton, (const Skeleton&), void), AS_CALL_THISCALL);
 
-    // bool Model::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer>>& buffers, const PODVector<unsigned>& morphRangeStarts, const PODVector<unsigned>& morphRangeCounts)
-    engine->RegisterObjectMethod(className, "bool SetVertexBuffers(Array<VertexBuffer@>@+, Array<uint>@+, Array<uint>@+)", AS_FUNCTION_OBJFIRST(Model_bool_SetVertexBuffers_constspVectorlesSharedPtrlesVertexBuffergregreamp_constspPODVectorlesunsignedgreamp_constspPODVectorlesunsignedgreamp_template<Model>), AS_CALL_CDECL_OBJFIRST);
+    // bool Model::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer>>& buffers, const Vector<unsigned>& morphRangeStarts, const Vector<unsigned>& morphRangeCounts)
+    engine->RegisterObjectMethod(className, "bool SetVertexBuffers(Array<VertexBuffer@>@+, Array<uint>@+, Array<uint>@+)", AS_FUNCTION_OBJFIRST(Model_bool_SetVertexBuffers_constspVectorlesSharedPtrlesVertexBuffergregreamp_constspVectorlesunsignedgreamp_constspVectorlesunsignedgreamp_template<Model>), AS_CALL_CDECL_OBJFIRST);
 
     // static void Model::RegisterObject(Context* context)
     // Not registered because have @nobind mark
@@ -15332,24 +15387,24 @@ template <class T> CScriptArray* Node_constspVectorlesSharedPtrlesNodegregreamp_
     return VectorToHandleArray(result, "Array<Node@>");
 }
 
-// PODVector<Node*> Node::GetChildren(bool recursive) const
-template <class T> CScriptArray* Node_PODVectorlesNodestargre_GetChildren_bool_template(T* _ptr, bool recursive)
+// Vector<Node*> Node::GetChildren(bool recursive) const
+template <class T> CScriptArray* Node_VectorlesNodestargre_GetChildren_bool_template(T* _ptr, bool recursive)
 {
-    PODVector<Node*> result = _ptr->GetChildren(recursive);
+    Vector<Node*> result = _ptr->GetChildren(recursive);
     return VectorToHandleArray(result, "Array<Node@>");
 }
 
-// PODVector<Node*> Node::GetChildrenWithComponent(StringHash type, bool recursive = false) const
-template <class T> CScriptArray* Node_PODVectorlesNodestargre_GetChildrenWithComponent_StringHash_bool_template(T* _ptr, StringHash type, bool recursive)
+// Vector<Node*> Node::GetChildrenWithComponent(StringHash type, bool recursive = false) const
+template <class T> CScriptArray* Node_VectorlesNodestargre_GetChildrenWithComponent_StringHash_bool_template(T* _ptr, StringHash type, bool recursive)
 {
-    PODVector<Node*> result = _ptr->GetChildrenWithComponent(type, recursive);
+    Vector<Node*> result = _ptr->GetChildrenWithComponent(type, recursive);
     return VectorToHandleArray(result, "Array<Node@>");
 }
 
-// PODVector<Node*> Node::GetChildrenWithTag(const String& tag, bool recursive = false) const
-template <class T> CScriptArray* Node_PODVectorlesNodestargre_GetChildrenWithTag_constspStringamp_bool_template(T* _ptr, const String& tag, bool recursive)
+// Vector<Node*> Node::GetChildrenWithTag(const String& tag, bool recursive = false) const
+template <class T> CScriptArray* Node_VectorlesNodestargre_GetChildrenWithTag_constspStringamp_bool_template(T* _ptr, const String& tag, bool recursive)
 {
-    PODVector<Node*> result = _ptr->GetChildrenWithTag(tag, recursive);
+    Vector<Node*> result = _ptr->GetChildrenWithTag(tag, recursive);
     return VectorToHandleArray(result, "Array<Node@>");
 }
 
@@ -15360,10 +15415,10 @@ template <class T> CScriptArray* Node_constspVectorlesSharedPtrlesComponentgregr
     return VectorToHandleArray(result, "Array<Component@>");
 }
 
-// const PODVector<Node*>& Node::GetDependencyNodes() const
-template <class T> CScriptArray* Node_constspPODVectorlesNodestargreamp_GetDependencyNodes_void_template(T* _ptr)
+// const Vector<Node*>& Node::GetDependencyNodes() const
+template <class T> CScriptArray* Node_constspVectorlesNodestargreamp_GetDependencyNodes_void_template(T* _ptr)
 {
-    const PODVector<Node*>& result = _ptr->GetDependencyNodes();
+    const Vector<Node*>& result = _ptr->GetDependencyNodes();
     return VectorToHandleArray(result, "Array<Node@>");
 }
 
@@ -15392,20 +15447,20 @@ template <class T> void RegisterMembers_Node(asIScriptEngine* engine, const char
     // Not registered because have @manualbind mark
     // Node* Node::GetChild(const char* name, bool recursive = false) const
     // Error: type "const char*" can not automatically bind
-    // void Node::GetChildren(PODVector<Node*>& dest, bool recursive = false) const
-    // Error: type "PODVector<Node*>&" can not automatically bind
-    // void Node::GetChildrenWithComponent(PODVector<Node*>& dest, StringHash type, bool recursive = false) const
-    // Error: type "PODVector<Node*>&" can not automatically bind
-    // void Node::GetChildrenWithTag(PODVector<Node*>& dest, const String& tag, bool recursive = false) const
-    // Error: type "PODVector<Node*>&" can not automatically bind
-    // void Node::GetComponents(PODVector<Component*>& dest, StringHash type, bool recursive = false) const
-    // Error: type "PODVector<Component*>&" can not automatically bind
+    // void Node::GetChildren(Vector<Node*>& dest, bool recursive = false) const
+    // Error: type "Vector<Node*>&" can not automatically bind
+    // void Node::GetChildrenWithComponent(Vector<Node*>& dest, StringHash type, bool recursive = false) const
+    // Error: type "Vector<Node*>&" can not automatically bind
+    // void Node::GetChildrenWithTag(Vector<Node*>& dest, const String& tag, bool recursive = false) const
+    // Error: type "Vector<Node*>&" can not automatically bind
+    // void Node::GetComponents(Vector<Component*>& dest, StringHash type, bool recursive = false) const
+    // Error: type "Vector<Component*>&" can not automatically bind
     // const Vector<WeakPtr<Component>> Node::GetListeners() const
     // Error: type "const Vector<WeakPtr<Component>>" can not automatically bind
-    // const PODVector<unsigned char>& Node::GetNetParentAttr() const
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
-    // const PODVector<unsigned char>& Node::GetNetRotationAttr() const
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
+    // const Vector<unsigned char>& Node::GetNetParentAttr() const
+    // Error: type "const Vector<unsigned char>&" can not automatically bind
+    // const Vector<unsigned char>& Node::GetNetRotationAttr() const
+    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // Connection* Node::GetOwner() const
     // Not registered because have @manualbind mark
     // bool Node::Load(Deserializer& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false, CreateMode mode = REPLICATED)
@@ -15416,10 +15471,10 @@ template <class T> void RegisterMembers_Node(asIScriptEngine* engine, const char
     // Can not be registered here bacause hidden in derived classes: Scene
     // void Node::MarkReplicationDirty()
     // Can not be registered here bacause hidden in derived classes: Scene
-    // void Node::SetNetParentAttr(const PODVector<unsigned char>& value)
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
-    // void Node::SetNetRotationAttr(const PODVector<unsigned char>& value)
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
+    // void Node::SetNetParentAttr(const Vector<unsigned char>& value)
+    // Error: type "const Vector<unsigned char>&" can not automatically bind
+    // void Node::SetNetRotationAttr(const Vector<unsigned char>& value)
+    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // void Node::SetOwner(Connection* owner)
     // Not registered because have @manualbind mark
 
@@ -15474,14 +15529,14 @@ template <class T> void RegisterMembers_Node(asIScriptEngine* engine, const char
     // const Vector<SharedPtr<Node>>& Node::GetChildren() const
     engine->RegisterObjectMethod(className, "Array<Node@>@ GetChildren() const", AS_FUNCTION_OBJFIRST(Node_constspVectorlesSharedPtrlesNodegregreamp_GetChildren_void_template<Node>), AS_CALL_CDECL_OBJFIRST);
 
-    // PODVector<Node*> Node::GetChildren(bool recursive) const
-    engine->RegisterObjectMethod(className, "Array<Node@>@ GetChildren(bool) const", AS_FUNCTION_OBJFIRST(Node_PODVectorlesNodestargre_GetChildren_bool_template<Node>), AS_CALL_CDECL_OBJFIRST);
+    // Vector<Node*> Node::GetChildren(bool recursive) const
+    engine->RegisterObjectMethod(className, "Array<Node@>@ GetChildren(bool) const", AS_FUNCTION_OBJFIRST(Node_VectorlesNodestargre_GetChildren_bool_template<Node>), AS_CALL_CDECL_OBJFIRST);
 
-    // PODVector<Node*> Node::GetChildrenWithComponent(StringHash type, bool recursive = false) const
-    engine->RegisterObjectMethod(className, "Array<Node@>@ GetChildrenWithComponent(StringHash, bool = false) const", AS_FUNCTION_OBJFIRST(Node_PODVectorlesNodestargre_GetChildrenWithComponent_StringHash_bool_template<Node>), AS_CALL_CDECL_OBJFIRST);
+    // Vector<Node*> Node::GetChildrenWithComponent(StringHash type, bool recursive = false) const
+    engine->RegisterObjectMethod(className, "Array<Node@>@ GetChildrenWithComponent(StringHash, bool = false) const", AS_FUNCTION_OBJFIRST(Node_VectorlesNodestargre_GetChildrenWithComponent_StringHash_bool_template<Node>), AS_CALL_CDECL_OBJFIRST);
 
-    // PODVector<Node*> Node::GetChildrenWithTag(const String& tag, bool recursive = false) const
-    engine->RegisterObjectMethod(className, "Array<Node@>@ GetChildrenWithTag(const String&in, bool = false) const", AS_FUNCTION_OBJFIRST(Node_PODVectorlesNodestargre_GetChildrenWithTag_constspStringamp_bool_template<Node>), AS_CALL_CDECL_OBJFIRST);
+    // Vector<Node*> Node::GetChildrenWithTag(const String& tag, bool recursive = false) const
+    engine->RegisterObjectMethod(className, "Array<Node@>@ GetChildrenWithTag(const String&in, bool = false) const", AS_FUNCTION_OBJFIRST(Node_VectorlesNodestargre_GetChildrenWithTag_constspStringamp_bool_template<Node>), AS_CALL_CDECL_OBJFIRST);
 
     // Component* Node::GetComponent(StringHash type, bool recursive = false) const
     engine->RegisterObjectMethod(className, "Component@+ GetComponent(StringHash, bool = false) const", AS_METHODPR(T, GetComponent, (StringHash, bool) const, Component*), AS_CALL_THISCALL);
@@ -15489,8 +15544,8 @@ template <class T> void RegisterMembers_Node(asIScriptEngine* engine, const char
     // const Vector<SharedPtr<Component>>& Node::GetComponents() const
     engine->RegisterObjectMethod(className, "Array<Component@>@ GetComponents() const", AS_FUNCTION_OBJFIRST(Node_constspVectorlesSharedPtrlesComponentgregreamp_GetComponents_void_template<Node>), AS_CALL_CDECL_OBJFIRST);
 
-    // const PODVector<Node*>& Node::GetDependencyNodes() const
-    engine->RegisterObjectMethod(className, "Array<Node@>@ GetDependencyNodes() const", AS_FUNCTION_OBJFIRST(Node_constspPODVectorlesNodestargreamp_GetDependencyNodes_void_template<Node>), AS_CALL_CDECL_OBJFIRST);
+    // const Vector<Node*>& Node::GetDependencyNodes() const
+    engine->RegisterObjectMethod(className, "Array<Node@>@ GetDependencyNodes() const", AS_FUNCTION_OBJFIRST(Node_constspVectorlesNodestargreamp_GetDependencyNodes_void_template<Node>), AS_CALL_CDECL_OBJFIRST);
 
     // Vector3 Node::GetDirection() const
     engine->RegisterObjectMethod(className, "Vector3 GetDirection() const", AS_METHODPR(T, GetDirection, () const, Vector3), AS_CALL_THISCALL);
@@ -15932,15 +15987,15 @@ template <class T> void RegisterMembers_Node(asIScriptEngine* engine, const char
 
     // template <class T> T* Node::CreateComponent(CreateMode mode = REPLICATED, unsigned id = 0)
     // Not registered because template
-    // template <class T> void Node::GetChildrenWithComponent(PODVector<Node*>& dest, bool recursive = false) const
+    // template <class T> void Node::GetChildrenWithComponent(Vector<Node*>& dest, bool recursive = false) const
     // Not registered because template
     // template <class T> T* Node::GetComponent(bool recursive = false) const
     // Not registered because template
-    // template <class T> void Node::GetComponents(PODVector<T*>& dest, bool recursive = false) const
+    // template <class T> void Node::GetComponents(Vector<T*>& dest, bool recursive = false) const
     // Not registered because template
     // template <class T> T* Node::GetDerivedComponent(bool recursive = false) const
     // Not registered because template
-    // template <class T> void Node::GetDerivedComponents(PODVector<T*>& dest, bool recursive = false, bool clearVector = true) const
+    // template <class T> void Node::GetDerivedComponents(Vector<T*>& dest, bool recursive = false, bool clearVector = true) const
     // Not registered because template
     // template <class T> T* Node::GetOrCreateComponent(CreateMode mode = REPLICATED, unsigned id = 0)
     // Not registered because template
@@ -16250,17 +16305,17 @@ template <class T> CScriptArray* UIElement_constspVectorlesSharedPtrlesUIElement
     return VectorToHandleArray(result, "Array<UIElement@>");
 }
 
-// PODVector<UIElement*> UIElement::GetChildren(bool recursive) const
-template <class T> CScriptArray* UIElement_PODVectorlesUIElementstargre_GetChildren_bool_template(T* _ptr, bool recursive)
+// Vector<UIElement*> UIElement::GetChildren(bool recursive) const
+template <class T> CScriptArray* UIElement_VectorlesUIElementstargre_GetChildren_bool_template(T* _ptr, bool recursive)
 {
-    PODVector<UIElement*> result = _ptr->GetChildren(recursive);
+    Vector<UIElement*> result = _ptr->GetChildren(recursive);
     return VectorToHandleArray(result, "Array<UIElement@>");
 }
 
-// PODVector<UIElement*> UIElement::GetChildrenWithTag(const String& tag, bool recursive = false) const
-template <class T> CScriptArray* UIElement_PODVectorlesUIElementstargre_GetChildrenWithTag_constspStringamp_bool_template(T* _ptr, const String& tag, bool recursive)
+// Vector<UIElement*> UIElement::GetChildrenWithTag(const String& tag, bool recursive = false) const
+template <class T> CScriptArray* UIElement_VectorlesUIElementstargre_GetChildrenWithTag_constspStringamp_bool_template(T* _ptr, const String& tag, bool recursive)
 {
-    PODVector<UIElement*> result = _ptr->GetChildrenWithTag(tag, recursive);
+    Vector<UIElement*> result = _ptr->GetChildrenWithTag(tag, recursive);
     return VectorToHandleArray(result, "Array<UIElement@>");
 }
 
@@ -16283,16 +16338,16 @@ template <class T> void RegisterMembers_UIElement(asIScriptEngine* engine, const
 {
     RegisterMembers_Animatable<T>(engine, className);
 
-    // virtual void UIElement::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
-    // Error: type "PODVector<UIBatch>&" can not automatically bind
-    // void UIElement::GetBatchesWithOffset(IntVector2& offset, PODVector<UIBatch>& batches, PODVector<float>& vertexData, IntRect currentScissor)
-    // Error: type "PODVector<UIBatch>&" can not automatically bind
-    // void UIElement::GetChildren(PODVector<UIElement*>& dest, bool recursive = false) const
-    // Error: type "PODVector<UIElement*>&" can not automatically bind
-    // void UIElement::GetChildrenWithTag(PODVector<UIElement*>& dest, const String& tag, bool recursive = false) const
-    // Error: type "PODVector<UIElement*>&" can not automatically bind
-    // virtual void UIElement::GetDebugDrawBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
-    // Error: type "PODVector<UIBatch>&" can not automatically bind
+    // virtual void UIElement::GetBatches(Vector<UIBatch>& batches, Vector<float>& vertexData, const IntRect& currentScissor)
+    // Error: type "Vector<UIBatch>&" can not automatically bind
+    // void UIElement::GetBatchesWithOffset(IntVector2& offset, Vector<UIBatch>& batches, Vector<float>& vertexData, IntRect currentScissor)
+    // Error: type "Vector<UIBatch>&" can not automatically bind
+    // void UIElement::GetChildren(Vector<UIElement*>& dest, bool recursive = false) const
+    // Error: type "Vector<UIElement*>&" can not automatically bind
+    // void UIElement::GetChildrenWithTag(Vector<UIElement*>& dest, const String& tag, bool recursive = false) const
+    // Error: type "Vector<UIElement*>&" can not automatically bind
+    // virtual void UIElement::GetDebugDrawBatches(Vector<UIBatch>& batches, Vector<float>& vertexData, const IntRect& currentScissor)
+    // Error: type "Vector<UIBatch>&" can not automatically bind
     // const IntVector2& UIElement::GetPosition() const
     // Can not be registered here bacause hidden in derived classes: Sprite
     // bool UIElement::IsSelected() const
@@ -16367,11 +16422,11 @@ template <class T> void RegisterMembers_UIElement(asIScriptEngine* engine, const
     // const Vector<SharedPtr<UIElement>>& UIElement::GetChildren() const
     engine->RegisterObjectMethod(className, "Array<UIElement@>@ GetChildren() const", AS_FUNCTION_OBJFIRST(UIElement_constspVectorlesSharedPtrlesUIElementgregreamp_GetChildren_void_template<UIElement>), AS_CALL_CDECL_OBJFIRST);
 
-    // PODVector<UIElement*> UIElement::GetChildren(bool recursive) const
-    engine->RegisterObjectMethod(className, "Array<UIElement@>@ GetChildren(bool) const", AS_FUNCTION_OBJFIRST(UIElement_PODVectorlesUIElementstargre_GetChildren_bool_template<UIElement>), AS_CALL_CDECL_OBJFIRST);
+    // Vector<UIElement*> UIElement::GetChildren(bool recursive) const
+    engine->RegisterObjectMethod(className, "Array<UIElement@>@ GetChildren(bool) const", AS_FUNCTION_OBJFIRST(UIElement_VectorlesUIElementstargre_GetChildren_bool_template<UIElement>), AS_CALL_CDECL_OBJFIRST);
 
-    // PODVector<UIElement*> UIElement::GetChildrenWithTag(const String& tag, bool recursive = false) const
-    engine->RegisterObjectMethod(className, "Array<UIElement@>@ GetChildrenWithTag(const String&in, bool = false) const", AS_FUNCTION_OBJFIRST(UIElement_PODVectorlesUIElementstargre_GetChildrenWithTag_constspStringamp_bool_template<UIElement>), AS_CALL_CDECL_OBJFIRST);
+    // Vector<UIElement*> UIElement::GetChildrenWithTag(const String& tag, bool recursive = false) const
+    engine->RegisterObjectMethod(className, "Array<UIElement@>@ GetChildrenWithTag(const String&in, bool = false) const", AS_FUNCTION_OBJFIRST(UIElement_VectorlesUIElementstargre_GetChildrenWithTag_constspStringamp_bool_template<UIElement>), AS_CALL_CDECL_OBJFIRST);
 
     // const IntRect& UIElement::GetClipBorder() const
     engine->RegisterObjectMethod(className, "const IntRect& GetClipBorder() const", AS_METHODPR(T, GetClipBorder, () const, const IntRect&), AS_CALL_THISCALL);
@@ -17016,17 +17071,17 @@ template <class T> void RegisterMembers_AnimationController(asIScriptEngine* eng
     RegisterMembers_Component<T>(engine, className);
 
     // const Vector<AnimationControl>& AnimationController::GetAnimations() const
-    // Error: type "const Vector<AnimationControl>&" can not automatically bind
+    // Not registered because have @nobind mark
     // VariantVector AnimationController::GetAnimationsAttr() const
     // Error: type "VariantVector" can not automatically bind
-    // const PODVector<unsigned char>& AnimationController::GetNetAnimationsAttr() const
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
+    // const Vector<unsigned char>& AnimationController::GetNetAnimationsAttr() const
+    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // VariantVector AnimationController::GetNodeAnimationStatesAttr() const
     // Error: type "VariantVector" can not automatically bind
     // void AnimationController::SetAnimationsAttr(const VariantVector& value)
     // Error: type "const VariantVector&" can not automatically bind
-    // void AnimationController::SetNetAnimationsAttr(const PODVector<unsigned char>& value)
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
+    // void AnimationController::SetNetAnimationsAttr(const Vector<unsigned char>& value)
+    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // void AnimationController::SetNodeAnimationStatesAttr(const VariantVector& value)
     // Error: type "const VariantVector&" can not automatically bind
 
@@ -17612,17 +17667,24 @@ template <class T> void RegisterMembers_DebugRenderer(asIScriptEngine* engine, c
     #endif
 }
 
-// const PODVector<Light*>& Drawable::GetLights() const
-template <class T> CScriptArray* Drawable_constspPODVectorlesLightstargreamp_GetLights_void_template(T* _ptr)
+// const Vector<SourceBatch>& Drawable::GetBatches() const
+template <class T> CScriptArray* Drawable_constspVectorlesSourceBatchgreamp_GetBatches_void_template(T* _ptr)
 {
-    const PODVector<Light*>& result = _ptr->GetLights();
+    const Vector<SourceBatch>& result = _ptr->GetBatches();
+    return VectorToArray(result, "Array<SourceBatch>");
+}
+
+// const Vector<Light*>& Drawable::GetLights() const
+template <class T> CScriptArray* Drawable_constspVectorlesLightstargreamp_GetLights_void_template(T* _ptr)
+{
+    const Vector<Light*>& result = _ptr->GetLights();
     return VectorToHandleArray(result, "Array<Light@>");
 }
 
-// const PODVector<Light*>& Drawable::GetVertexLights() const
-template <class T> CScriptArray* Drawable_constspPODVectorlesLightstargreamp_GetVertexLights_void_template(T* _ptr)
+// const Vector<Light*>& Drawable::GetVertexLights() const
+template <class T> CScriptArray* Drawable_constspVectorlesLightstargreamp_GetVertexLights_void_template(T* _ptr)
 {
-    const PODVector<Light*>& result = _ptr->GetVertexLights();
+    const Vector<Light*>& result = _ptr->GetVertexLights();
     return VectorToHandleArray(result, "Array<Light@>");
 }
 
@@ -17631,11 +17693,9 @@ template <class T> void RegisterMembers_Drawable(asIScriptEngine* engine, const 
 {
     RegisterMembers_Component<T>(engine, className);
 
-    // const Vector<SourceBatch>& Drawable::GetBatches() const
-    // Error: type "const Vector<SourceBatch>&" can not automatically bind
     // Octant* Drawable::GetOctant() const
     // Error: type "Octant" can not automatically bind bacause have @nobind mark
-    // virtual void Drawable::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
+    // virtual void Drawable::ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQueryResult>& results)
     // Error: type "RayOctreeQuery" can not automatically bind bacause have @nobind mark
     // virtual void Drawable::Update(const FrameInfo& frame)
     // Can not be registered here bacause hidden in derived classes: ParticleEmitter2D
@@ -17651,6 +17711,9 @@ template <class T> void RegisterMembers_Drawable(asIScriptEngine* engine, const 
 
     // virtual bool Drawable::DrawOcclusion(OcclusionBuffer* buffer)
     engine->RegisterObjectMethod(className, "bool DrawOcclusion(OcclusionBuffer@+)", AS_METHODPR(T, DrawOcclusion, (OcclusionBuffer*), bool), AS_CALL_THISCALL);
+
+    // const Vector<SourceBatch>& Drawable::GetBatches() const
+    engine->RegisterObjectMethod(className, "Array<SourceBatch>@ GetBatches() const", AS_FUNCTION_OBJFIRST(Drawable_constspVectorlesSourceBatchgreamp_GetBatches_void_template<Drawable>), AS_CALL_CDECL_OBJFIRST);
 
     // const BoundingBox& Drawable::GetBoundingBox() const
     engine->RegisterObjectMethod(className, "const BoundingBox& GetBoundingBox() const", AS_METHODPR(T, GetBoundingBox, () const, const BoundingBox&), AS_CALL_THISCALL);
@@ -17677,8 +17740,8 @@ template <class T> void RegisterMembers_Drawable(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "uint GetLightMask() const", AS_METHODPR(T, GetLightMask, () const, unsigned), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_lightMask() const", AS_METHODPR(T, GetLightMask, () const, unsigned), AS_CALL_THISCALL);
 
-    // const PODVector<Light*>& Drawable::GetLights() const
-    engine->RegisterObjectMethod(className, "Array<Light@>@ GetLights() const", AS_FUNCTION_OBJFIRST(Drawable_constspPODVectorlesLightstargreamp_GetLights_void_template<Drawable>), AS_CALL_CDECL_OBJFIRST);
+    // const Vector<Light*>& Drawable::GetLights() const
+    engine->RegisterObjectMethod(className, "Array<Light@>@ GetLights() const", AS_FUNCTION_OBJFIRST(Drawable_constspVectorlesLightstargreamp_GetLights_void_template<Drawable>), AS_CALL_CDECL_OBJFIRST);
 
     // float Drawable::GetLodBias() const
     engine->RegisterObjectMethod(className, "float GetLodBias() const", AS_METHODPR(T, GetLodBias, () const, float), AS_CALL_THISCALL);
@@ -17717,8 +17780,8 @@ template <class T> void RegisterMembers_Drawable(asIScriptEngine* engine, const 
     // virtual UpdateGeometryType Drawable::GetUpdateGeometryType()
     engine->RegisterObjectMethod(className, "UpdateGeometryType GetUpdateGeometryType()", AS_METHODPR(T, GetUpdateGeometryType, (), UpdateGeometryType), AS_CALL_THISCALL);
 
-    // const PODVector<Light*>& Drawable::GetVertexLights() const
-    engine->RegisterObjectMethod(className, "Array<Light@>@ GetVertexLights() const", AS_FUNCTION_OBJFIRST(Drawable_constspPODVectorlesLightstargreamp_GetVertexLights_void_template<Drawable>), AS_CALL_CDECL_OBJFIRST);
+    // const Vector<Light*>& Drawable::GetVertexLights() const
+    engine->RegisterObjectMethod(className, "Array<Light@>@ GetVertexLights() const", AS_FUNCTION_OBJFIRST(Drawable_constspVectorlesLightstargreamp_GetVertexLights_void_template<Drawable>), AS_CALL_CDECL_OBJFIRST);
 
     // unsigned Drawable::GetViewMask() const
     engine->RegisterObjectMethod(className, "uint GetViewMask() const", AS_METHODPR(T, GetViewMask, () const, unsigned), AS_CALL_THISCALL);
@@ -17943,8 +18006,8 @@ template <class T> void RegisterMembers_Scene(asIScriptEngine* engine, const cha
 {
     RegisterMembers_Node<T>(engine, className);
 
-    // bool Scene::GetNodesWithTag(PODVector<Node*>& dest, const String& tag) const
-    // Error: type "PODVector<Node*>&" can not automatically bind
+    // bool Scene::GetNodesWithTag(Vector<Node*>& dest, const String& tag) const
+    // Error: type "Vector<Node*>&" can not automatically bind
 
     // void Scene::AddRequiredPackageFile(PackageFile* package)
     engine->RegisterObjectMethod(className, "void AddRequiredPackageFile(PackageFile@+)", AS_METHODPR(T, AddRequiredPackageFile, (PackageFile*), void), AS_CALL_THISCALL);
@@ -19153,8 +19216,8 @@ template <class T> void RegisterMembers_UnknownComponent(asIScriptEngine* engine
 {
     RegisterMembers_Component<T>(engine, className);
 
-    // const PODVector<unsigned char>& UnknownComponent::GetBinaryAttributes() const
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
+    // const Vector<unsigned char>& UnknownComponent::GetBinaryAttributes() const
+    // Error: type "const Vector<unsigned char>&" can not automatically bind
 
     // virtual void Component::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     engine->RegisterObjectMethod(className, "void DrawDebugGeometry(DebugRenderer@+, bool)", AS_METHODPR(T, DrawDebugGeometry, (DebugRenderer*, bool), void), AS_CALL_THISCALL);
@@ -19591,10 +19654,10 @@ template <class T> void RegisterMembers_CrowdAgent(asIScriptEngine* engine, cons
     #endif
 }
 
-// PODVector<CrowdAgent*> CrowdManager::GetAgents(Node* node = nullptr, bool inCrowdFilter = true) const
-template <class T> CScriptArray* CrowdManager_PODVectorlesCrowdAgentstargre_GetAgents_Nodestar_bool_template(T* _ptr, Node* node, bool inCrowdFilter)
+// Vector<CrowdAgent*> CrowdManager::GetAgents(Node* node = nullptr, bool inCrowdFilter = true) const
+template <class T> CScriptArray* CrowdManager_VectorlesCrowdAgentstargre_GetAgents_Nodestar_bool_template(T* _ptr, Node* node, bool inCrowdFilter)
 {
-    PODVector<CrowdAgent*> result = _ptr->GetAgents(node, inCrowdFilter);
+    Vector<CrowdAgent*> result = _ptr->GetAgents(node, inCrowdFilter);
     return VectorToHandleArray(result, "Array<CrowdAgent@>");
 }
 
@@ -19605,8 +19668,8 @@ template <class T> void RegisterMembers_CrowdManager(asIScriptEngine* engine, co
 
     // Vector3 CrowdManager::FindNearestPoint(const Vector3& point, int queryFilterType, dtPolyRef* nearestRef = nullptr)
     // Error: type "dtPolyRef*" can not automatically bind
-    // void CrowdManager::FindPath(PODVector<Vector3>& dest, const Vector3& start, const Vector3& end, int queryFilterType)
-    // Error: type "PODVector<Vector3>&" can not automatically bind
+    // void CrowdManager::FindPath(Vector<Vector3>& dest, const Vector3& start, const Vector3& end, int queryFilterType)
+    // Error: type "Vector<Vector3>&" can not automatically bind
     // float CrowdManager::GetDistanceToWall(const Vector3& point, float radius, int queryFilterType, Vector3* hitPos = nullptr, Vector3* hitNormal = nullptr)
     // Error: type "Vector3*" can not automatically bind
     // VariantVector CrowdManager::GetObstacleAvoidanceTypesAttr() const
@@ -19630,8 +19693,8 @@ template <class T> void RegisterMembers_CrowdManager(asIScriptEngine* engine, co
     // void CrowdManager::DrawDebugGeometry(bool depthTest)
     engine->RegisterObjectMethod(className, "void DrawDebugGeometry(bool)", AS_METHODPR(T, DrawDebugGeometry, (bool), void), AS_CALL_THISCALL);
 
-    // PODVector<CrowdAgent*> CrowdManager::GetAgents(Node* node = nullptr, bool inCrowdFilter = true) const
-    engine->RegisterObjectMethod(className, "Array<CrowdAgent@>@ GetAgents(Node@+ = null, bool = true) const", AS_FUNCTION_OBJFIRST(CrowdManager_PODVectorlesCrowdAgentstargre_GetAgents_Nodestar_bool_template<CrowdManager>), AS_CALL_CDECL_OBJFIRST);
+    // Vector<CrowdAgent*> CrowdManager::GetAgents(Node* node = nullptr, bool inCrowdFilter = true) const
+    engine->RegisterObjectMethod(className, "Array<CrowdAgent@>@ GetAgents(Node@+ = null, bool = true) const", AS_FUNCTION_OBJFIRST(CrowdManager_VectorlesCrowdAgentstargre_GetAgents_Nodestar_bool_template<CrowdManager>), AS_CALL_CDECL_OBJFIRST);
 
     // float CrowdManager::GetAreaCost(unsigned queryFilterType, unsigned areaID) const
     engine->RegisterObjectMethod(className, "float GetAreaCost(uint, uint) const", AS_METHODPR(T, GetAreaCost, (unsigned, unsigned) const, float), AS_CALL_THISCALL);
@@ -19769,30 +19832,30 @@ template <class T> void RegisterMembers_NavigationMesh(asIScriptEngine* engine, 
 {
     RegisterMembers_Component<T>(engine, className);
 
-    // virtual bool NavigationMesh::AddTile(const PODVector<unsigned char>& tileData)
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
+    // virtual bool NavigationMesh::AddTile(const Vector<unsigned char>& tileData)
+    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // Vector3 NavigationMesh::FindNearestPoint(const Vector3& point, const Vector3& extents = Vector3::ONE, const dtQueryFilter* filter = nullptr, dtPolyRef* nearestRef = nullptr)
     // Error: type "const dtQueryFilter*" can not automatically bind
-    // void NavigationMesh::FindPath(PODVector<Vector3>& dest, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE, const dtQueryFilter* filter = nullptr)
-    // Error: type "PODVector<Vector3>&" can not automatically bind
-    // void NavigationMesh::FindPath(PODVector<NavigationPathPoint>& dest, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE, const dtQueryFilter* filter = nullptr)
-    // Error: type "PODVector<NavigationPathPoint>&" can not automatically bind
+    // void NavigationMesh::FindPath(Vector<Vector3>& dest, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE, const dtQueryFilter* filter = nullptr)
+    // Error: type "Vector<Vector3>&" can not automatically bind
+    // void NavigationMesh::FindPath(Vector<NavigationPathPoint>& dest, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE, const dtQueryFilter* filter = nullptr)
+    // Error: type "Vector<NavigationPathPoint>&" can not automatically bind
     // float NavigationMesh::GetDistanceToWall(const Vector3& point, float radius, const Vector3& extents = Vector3::ONE, const dtQueryFilter* filter = nullptr, Vector3* hitPos = nullptr, Vector3* hitNormal = nullptr)
     // Error: type "const dtQueryFilter*" can not automatically bind
-    // virtual PODVector<unsigned char> NavigationMesh::GetNavigationDataAttr() const
-    // Error: type "PODVector<unsigned char>" can not automatically bind
+    // virtual Vector<unsigned char> NavigationMesh::GetNavigationDataAttr() const
+    // Error: type "Vector<unsigned char>" can not automatically bind
     // Vector3 NavigationMesh::GetRandomPoint(const dtQueryFilter* filter = nullptr, dtPolyRef* randomRef = nullptr)
     // Error: type "const dtQueryFilter*" can not automatically bind
     // Vector3 NavigationMesh::GetRandomPointInCircle(const Vector3& center, float radius, const Vector3& extents = Vector3::ONE, const dtQueryFilter* filter = nullptr, dtPolyRef* randomRef = nullptr)
     // Error: type "const dtQueryFilter*" can not automatically bind
-    // virtual PODVector<unsigned char> NavigationMesh::GetTileData(const IntVector2& tile) const
-    // Error: type "PODVector<unsigned char>" can not automatically bind
+    // virtual Vector<unsigned char> NavigationMesh::GetTileData(const IntVector2& tile) const
+    // Error: type "Vector<unsigned char>" can not automatically bind
     // Vector3 NavigationMesh::MoveAlongSurface(const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE, int maxVisited = 3, const dtQueryFilter* filter = nullptr)
     // Error: type "const dtQueryFilter*" can not automatically bind
     // Vector3 NavigationMesh::Raycast(const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE, const dtQueryFilter* filter = nullptr, Vector3* hitNormal = nullptr)
     // Error: type "const dtQueryFilter*" can not automatically bind
-    // virtual void NavigationMesh::SetNavigationDataAttr(const PODVector<unsigned char>& value)
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
+    // virtual void NavigationMesh::SetNavigationDataAttr(const Vector<unsigned char>& value)
+    // Error: type "const Vector<unsigned char>&" can not automatically bind
 
     // virtual bool NavigationMesh::Allocate(const BoundingBox& boundingBox, unsigned maxTiles)
     engine->RegisterObjectMethod(className, "bool Allocate(const BoundingBox&in, uint)", AS_METHODPR(T, Allocate, (const BoundingBox&, unsigned), bool), AS_CALL_THISCALL);
@@ -20423,26 +20486,26 @@ template <class T> void RegisterMembers_PhysicsWorld(asIScriptEngine* engine, co
     // Error: type "const btVector3&" can not automatically bind
     // void PhysicsWorld::drawLine(const btVector3& from, const btVector3& to, const btVector3& color) override
     // Error: type "const btVector3&" can not automatically bind
-    // void PhysicsWorld::GetCollidingBodies(PODVector<RigidBody*>& result, const RigidBody* body)
-    // Error: type "PODVector<RigidBody*>&" can not automatically bind
+    // void PhysicsWorld::GetCollidingBodies(Vector<RigidBody*>& result, const RigidBody* body)
+    // Error: type "Vector<RigidBody*>&" can not automatically bind
     // CollisionGeometryDataCache& PhysicsWorld::GetConvexCache()
     // Error: type "CollisionGeometryDataCache&" can not automatically bind
     // CollisionGeometryDataCache& PhysicsWorld::GetGImpactTrimeshCache()
     // Error: type "CollisionGeometryDataCache&" can not automatically bind
-    // void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const Sphere& sphere, unsigned collisionMask = M_MAX_UNSIGNED)
-    // Error: type "PODVector<RigidBody*>&" can not automatically bind
-    // void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const BoundingBox& box, unsigned collisionMask = M_MAX_UNSIGNED)
-    // Error: type "PODVector<RigidBody*>&" can not automatically bind
-    // void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const RigidBody* body)
-    // Error: type "PODVector<RigidBody*>&" can not automatically bind
+    // void PhysicsWorld::GetRigidBodies(Vector<RigidBody*>& result, const Sphere& sphere, unsigned collisionMask = M_MAX_UNSIGNED)
+    // Error: type "Vector<RigidBody*>&" can not automatically bind
+    // void PhysicsWorld::GetRigidBodies(Vector<RigidBody*>& result, const BoundingBox& box, unsigned collisionMask = M_MAX_UNSIGNED)
+    // Error: type "Vector<RigidBody*>&" can not automatically bind
+    // void PhysicsWorld::GetRigidBodies(Vector<RigidBody*>& result, const RigidBody* body)
+    // Error: type "Vector<RigidBody*>&" can not automatically bind
     // CollisionGeometryDataCache& PhysicsWorld::GetTriMeshCache()
     // Error: type "CollisionGeometryDataCache&" can not automatically bind
     // btDiscreteDynamicsWorld* PhysicsWorld::GetWorld()
     // Error: type "btDiscreteDynamicsWorld*" can not automatically bind
     // bool PhysicsWorld::isVisible(const btVector3& aabbMin, const btVector3& aabbMax) override
     // Error: type "const btVector3&" can not automatically bind
-    // void PhysicsWorld::Raycast(PODVector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
-    // Error: type "PODVector<PhysicsRaycastResult>&" can not automatically bind
+    // void PhysicsWorld::Raycast(Vector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
+    // Error: type "Vector<PhysicsRaycastResult>&" can not automatically bind
     // void PhysicsWorld::reportErrorWarning(const char* warningString) override
     // Error: type "const char*" can not automatically bind
 
@@ -20603,16 +20666,16 @@ template <class T> void RegisterMembers_RigidBody(asIScriptEngine* engine, const
 
     // btRigidBody* RigidBody::GetBody() const
     // Error: type "btRigidBody*" can not automatically bind
-    // void RigidBody::GetCollidingBodies(PODVector<RigidBody*>& result) const
-    // Error: type "PODVector<RigidBody*>&" can not automatically bind
+    // void RigidBody::GetCollidingBodies(Vector<RigidBody*>& result) const
+    // Error: type "Vector<RigidBody*>&" can not automatically bind
     // btCompoundShape* RigidBody::GetCompoundShape() const
     // Error: type "btCompoundShape*" can not automatically bind
-    // const PODVector<unsigned char>& RigidBody::GetNetAngularVelocityAttr() const
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
+    // const Vector<unsigned char>& RigidBody::GetNetAngularVelocityAttr() const
+    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // void RigidBody::getWorldTransform(btTransform& worldTrans) const override
     // Not registered because have @nobind mark
-    // void RigidBody::SetNetAngularVelocityAttr(const PODVector<unsigned char>& value)
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
+    // void RigidBody::SetNetAngularVelocityAttr(const Vector<unsigned char>& value)
+    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // void RigidBody::setWorldTransform(const btTransform& worldTrans) override
     // Not registered because have @nobind mark
 
@@ -21060,14 +21123,14 @@ template <class T> void RegisterMembers_PhysicsWorld2D(asIScriptEngine* engine, 
     // Error: type "const b2Transform&" can not automatically bind
     // void PhysicsWorld2D::EndContact(b2Contact* contact) override
     // Error: type "b2Contact*" can not automatically bind
-    // void PhysicsWorld2D::GetRigidBodies(PODVector<RigidBody2D*>& results, const Rect& aabb, unsigned collisionMask = M_MAX_UNSIGNED)
-    // Error: type "PODVector<RigidBody2D*>&" can not automatically bind
+    // void PhysicsWorld2D::GetRigidBodies(Vector<RigidBody2D*>& results, const Rect& aabb, unsigned collisionMask = M_MAX_UNSIGNED)
+    // Error: type "Vector<RigidBody2D*>&" can not automatically bind
     // b2World* PhysicsWorld2D::GetWorld()
     // Error: type "b2World*" can not automatically bind
     // void PhysicsWorld2D::PreSolve(b2Contact* contact, const b2Manifold* oldManifold) override
     // Error: type "b2Contact*" can not automatically bind
-    // void PhysicsWorld2D::Raycast(PODVector<PhysicsRaycastResult2D>& results, const Vector2& startPoint, const Vector2& endPoint, unsigned collisionMask = M_MAX_UNSIGNED)
-    // Error: type "PODVector<PhysicsRaycastResult2D>&" can not automatically bind
+    // void PhysicsWorld2D::Raycast(Vector<PhysicsRaycastResult2D>& results, const Vector2& startPoint, const Vector2& endPoint, unsigned collisionMask = M_MAX_UNSIGNED)
+    // Error: type "Vector<PhysicsRaycastResult2D>&" can not automatically bind
 
     // void PhysicsWorld2D::AddDelayedWorldTransform(const DelayedWorldTransform2D& transform)
     engine->RegisterObjectMethod(className, "void AddDelayedWorldTransform(const DelayedWorldTransform2D&in)", AS_METHODPR(T, AddDelayedWorldTransform, (const DelayedWorldTransform2D&), void), AS_CALL_THISCALL);
@@ -21531,16 +21594,16 @@ template <class T> void RegisterMembers_BillboardSet(asIScriptEngine* engine, co
 {
     RegisterMembers_Drawable<T>(engine, className);
 
-    // PODVector<Billboard>& BillboardSet::GetBillboards()
-    // Error: type "PODVector<Billboard>&" can not automatically bind
+    // Vector<Billboard>& BillboardSet::GetBillboards()
+    // Error: type "Vector<Billboard>&" can not automatically bind
     // VariantVector BillboardSet::GetBillboardsAttr() const
     // Error: type "VariantVector" can not automatically bind
-    // const PODVector<unsigned char>& BillboardSet::GetNetBillboardsAttr() const
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
+    // const Vector<unsigned char>& BillboardSet::GetNetBillboardsAttr() const
+    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // void BillboardSet::SetBillboardsAttr(const VariantVector& value)
     // Error: type "const VariantVector&" can not automatically bind
-    // void BillboardSet::SetNetBillboardsAttr(const PODVector<unsigned char>& value)
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
+    // void BillboardSet::SetNetBillboardsAttr(const Vector<unsigned char>& value)
+    // Error: type "const Vector<unsigned char>&" can not automatically bind
 
     // void BillboardSet::Commit()
     engine->RegisterObjectMethod(className, "void Commit()", AS_METHODPR(T, Commit, (), void), AS_CALL_THISCALL);
@@ -21767,12 +21830,12 @@ template <class T> void RegisterMembers_CustomGeometry(asIScriptEngine* engine, 
 {
     RegisterMembers_Drawable<T>(engine, className);
 
-    // PODVector<unsigned char> CustomGeometry::GetGeometryDataAttr() const
-    // Error: type "PODVector<unsigned char>" can not automatically bind
-    // Vector<PODVector<CustomGeometryVertex>>& CustomGeometry::GetVertices()
-    // Error: type "Vector<PODVector<CustomGeometryVertex>>&" can not automatically bind
-    // void CustomGeometry::SetGeometryDataAttr(const PODVector<unsigned char>& value)
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
+    // Vector<unsigned char> CustomGeometry::GetGeometryDataAttr() const
+    // Error: type "Vector<unsigned char>" can not automatically bind
+    // Vector<Vector<CustomGeometryVertex>>& CustomGeometry::GetVertices()
+    // Error: type "Vector<Vector<CustomGeometryVertex>>&" can not automatically bind
+    // void CustomGeometry::SetGeometryDataAttr(const Vector<unsigned char>& value)
+    // Error: type "const Vector<unsigned char>&" can not automatically bind
 
     // void CustomGeometry::BeginGeometry(unsigned index, PrimitiveType type)
     engine->RegisterObjectMethod(className, "void BeginGeometry(uint, PrimitiveType)", AS_METHODPR(T, BeginGeometry, (unsigned, PrimitiveType), void), AS_CALL_THISCALL);
@@ -21855,10 +21918,10 @@ template <class T> void RegisterMembers_DecalSet(asIScriptEngine* engine, const 
 {
     RegisterMembers_Drawable<T>(engine, className);
 
-    // PODVector<unsigned char> DecalSet::GetDecalsAttr() const
-    // Error: type "PODVector<unsigned char>" can not automatically bind
-    // void DecalSet::SetDecalsAttr(const PODVector<unsigned char>& value)
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
+    // Vector<unsigned char> DecalSet::GetDecalsAttr() const
+    // Error: type "Vector<unsigned char>" can not automatically bind
+    // void DecalSet::SetDecalsAttr(const Vector<unsigned char>& value)
+    // Error: type "const Vector<unsigned char>&" can not automatically bind
 
     // bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Quaternion& worldRotation, float size, float aspectRatio, float depth, const Vector2& topLeftUV, const Vector2& bottomRightUV, float timeToLive = 0.0f, float normalCutoff = 0.1f, unsigned subGeometry = M_MAX_UNSIGNED)
     engine->RegisterObjectMethod(className, "bool AddDecal(Drawable@+, const Vector3&in, const Quaternion&in, float, float, float, const Vector2&in, const Vector2&in, float = 0.0f, float = 0.1f, uint = M_MAX_UNSIGNED)", AS_METHODPR(T, AddDecal, (Drawable*, const Vector3&, const Quaternion&, float, float, float, const Vector2&, const Vector2&, float, float, unsigned), bool), AS_CALL_THISCALL);
@@ -22265,31 +22328,31 @@ template <class T> void RegisterMembers_LineEdit(asIScriptEngine* engine, const 
     #endif
 }
 
-// PODVector<UIElement*> ListView::GetItems() const
-template <class T> CScriptArray* ListView_PODVectorlesUIElementstargre_GetItems_void_template(T* _ptr)
+// Vector<UIElement*> ListView::GetItems() const
+template <class T> CScriptArray* ListView_VectorlesUIElementstargre_GetItems_void_template(T* _ptr)
 {
-    PODVector<UIElement*> result = _ptr->GetItems();
+    Vector<UIElement*> result = _ptr->GetItems();
     return VectorToHandleArray(result, "Array<UIElement@>");
 }
 
-// PODVector<UIElement*> ListView::GetSelectedItems() const
-template <class T> CScriptArray* ListView_PODVectorlesUIElementstargre_GetSelectedItems_void_template(T* _ptr)
+// Vector<UIElement*> ListView::GetSelectedItems() const
+template <class T> CScriptArray* ListView_VectorlesUIElementstargre_GetSelectedItems_void_template(T* _ptr)
 {
-    PODVector<UIElement*> result = _ptr->GetSelectedItems();
+    Vector<UIElement*> result = _ptr->GetSelectedItems();
     return VectorToHandleArray(result, "Array<UIElement@>");
 }
 
-// const PODVector<unsigned>& ListView::GetSelections() const
-template <class T> CScriptArray* ListView_constspPODVectorlesunsignedgreamp_GetSelections_void_template(T* _ptr)
+// const Vector<unsigned>& ListView::GetSelections() const
+template <class T> CScriptArray* ListView_constspVectorlesunsignedgreamp_GetSelections_void_template(T* _ptr)
 {
-    const PODVector<unsigned>& result = _ptr->GetSelections();
+    const Vector<unsigned>& result = _ptr->GetSelections();
     return VectorToArray(result, "Array<uint>");
 }
 
-// void ListView::SetSelections(const PODVector<unsigned>& indices)
-template <class T> void ListView_void_SetSelections_constspPODVectorlesunsignedgreamp_template(T* _ptr, CScriptArray* indices_conv)
+// void ListView::SetSelections(const Vector<unsigned>& indices)
+template <class T> void ListView_void_SetSelections_constspVectorlesunsignedgreamp_template(T* _ptr, CScriptArray* indices_conv)
 {
-    PODVector<unsigned> indices = ArrayToVector<unsigned>(indices_conv);
+    Vector<unsigned> indices = ArrayToVector<unsigned>(indices_conv);
     _ptr->SetSelections(indices);
 }
 
@@ -22351,8 +22414,8 @@ template <class T> void RegisterMembers_ListView(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "UIElement@+ GetItem(uint) const", AS_METHODPR(T, GetItem, (unsigned) const, UIElement*), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "UIElement@+ get_items(uint) const", AS_METHODPR(T, GetItem, (unsigned) const, UIElement*), AS_CALL_THISCALL);
 
-    // PODVector<UIElement*> ListView::GetItems() const
-    engine->RegisterObjectMethod(className, "Array<UIElement@>@ GetItems() const", AS_FUNCTION_OBJFIRST(ListView_PODVectorlesUIElementstargre_GetItems_void_template<ListView>), AS_CALL_CDECL_OBJFIRST);
+    // Vector<UIElement*> ListView::GetItems() const
+    engine->RegisterObjectMethod(className, "Array<UIElement@>@ GetItems() const", AS_FUNCTION_OBJFIRST(ListView_VectorlesUIElementstargre_GetItems_void_template<ListView>), AS_CALL_CDECL_OBJFIRST);
 
     // bool ListView::GetMultiselect() const
     engine->RegisterObjectMethod(className, "bool GetMultiselect() const", AS_METHODPR(T, GetMultiselect, () const, bool), AS_CALL_THISCALL);
@@ -22366,17 +22429,17 @@ template <class T> void RegisterMembers_ListView(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "UIElement@+ GetSelectedItem() const", AS_METHODPR(T, GetSelectedItem, () const, UIElement*), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "UIElement@+ get_selectedItem() const", AS_METHODPR(T, GetSelectedItem, () const, UIElement*), AS_CALL_THISCALL);
 
-    // PODVector<UIElement*> ListView::GetSelectedItems() const
-    engine->RegisterObjectMethod(className, "Array<UIElement@>@ GetSelectedItems() const", AS_FUNCTION_OBJFIRST(ListView_PODVectorlesUIElementstargre_GetSelectedItems_void_template<ListView>), AS_CALL_CDECL_OBJFIRST);
-    engine->RegisterObjectMethod(className, "Array<UIElement@>@ get_selectedItems() const", AS_FUNCTION_OBJFIRST(ListView_PODVectorlesUIElementstargre_GetSelectedItems_void_template<ListView>), AS_CALL_CDECL_OBJFIRST);
+    // Vector<UIElement*> ListView::GetSelectedItems() const
+    engine->RegisterObjectMethod(className, "Array<UIElement@>@ GetSelectedItems() const", AS_FUNCTION_OBJFIRST(ListView_VectorlesUIElementstargre_GetSelectedItems_void_template<ListView>), AS_CALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod(className, "Array<UIElement@>@ get_selectedItems() const", AS_FUNCTION_OBJFIRST(ListView_VectorlesUIElementstargre_GetSelectedItems_void_template<ListView>), AS_CALL_CDECL_OBJFIRST);
 
     // unsigned ListView::GetSelection() const
     engine->RegisterObjectMethod(className, "uint GetSelection() const", AS_METHODPR(T, GetSelection, () const, unsigned), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_selection() const", AS_METHODPR(T, GetSelection, () const, unsigned), AS_CALL_THISCALL);
 
-    // const PODVector<unsigned>& ListView::GetSelections() const
-    engine->RegisterObjectMethod(className, "Array<uint>@ GetSelections() const", AS_FUNCTION_OBJFIRST(ListView_constspPODVectorlesunsignedgreamp_GetSelections_void_template<ListView>), AS_CALL_CDECL_OBJFIRST);
-    engine->RegisterObjectMethod(className, "Array<uint>@ get_selections() const", AS_FUNCTION_OBJFIRST(ListView_constspPODVectorlesunsignedgreamp_GetSelections_void_template<ListView>), AS_CALL_CDECL_OBJFIRST);
+    // const Vector<unsigned>& ListView::GetSelections() const
+    engine->RegisterObjectMethod(className, "Array<uint>@ GetSelections() const", AS_FUNCTION_OBJFIRST(ListView_constspVectorlesunsignedgreamp_GetSelections_void_template<ListView>), AS_CALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod(className, "Array<uint>@ get_selections() const", AS_FUNCTION_OBJFIRST(ListView_constspVectorlesunsignedgreamp_GetSelections_void_template<ListView>), AS_CALL_CDECL_OBJFIRST);
 
     // bool ListView::GetSelectOnClickEnd() const
     engine->RegisterObjectMethod(className, "bool GetSelectOnClickEnd() const", AS_METHODPR(T, GetSelectOnClickEnd, () const, bool), AS_CALL_THISCALL);
@@ -22427,8 +22490,8 @@ template <class T> void RegisterMembers_ListView(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "void SetSelection(uint)", AS_METHODPR(T, SetSelection, (unsigned), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_selection(uint)", AS_METHODPR(T, SetSelection, (unsigned), void), AS_CALL_THISCALL);
 
-    // void ListView::SetSelections(const PODVector<unsigned>& indices)
-    engine->RegisterObjectMethod(className, "void SetSelections(Array<uint>@+)", AS_FUNCTION_OBJFIRST(ListView_void_SetSelections_constspPODVectorlesunsignedgreamp_template<ListView>), AS_CALL_CDECL_OBJFIRST);
+    // void ListView::SetSelections(const Vector<unsigned>& indices)
+    engine->RegisterObjectMethod(className, "void SetSelections(Array<uint>@+)", AS_FUNCTION_OBJFIRST(ListView_void_SetSelections_constspVectorlesunsignedgreamp_template<ListView>), AS_CALL_CDECL_OBJFIRST);
 
     // void ListView::SetSelectOnClickEnd(bool enable)
     engine->RegisterObjectMethod(className, "void SetSelectOnClickEnd(bool)", AS_METHODPR(T, SetSelectOnClickEnd, (bool), void), AS_CALL_THISCALL);
@@ -22902,8 +22965,8 @@ template <class T> void RegisterMembers_TerrainPatch(asIScriptEngine* engine, co
 {
     RegisterMembers_Drawable<T>(engine, className);
 
-    // PODVector<float>& TerrainPatch::GetLodErrors()
-    // Error: type "PODVector<float>&" can not automatically bind
+    // Vector<float>& TerrainPatch::GetLodErrors()
+    // Error: type "Vector<float>&" can not automatically bind
 
     // const IntVector2& TerrainPatch::GetCoordinates() const
     engine->RegisterObjectMethod(className, "const IntVector2& GetCoordinates() const", AS_METHODPR(T, GetCoordinates, () const, const IntVector2&), AS_CALL_THISCALL);
@@ -23861,17 +23924,17 @@ template <class T> void RegisterMembers_CollisionBox2D(asIScriptEngine* engine, 
     #endif
 }
 
-// const PODVector<Vector2>& CollisionChain2D::GetVertices() const
-template <class T> CScriptArray* CollisionChain2D_constspPODVectorlesVector2greamp_GetVertices_void_template(T* _ptr)
+// const Vector<Vector2>& CollisionChain2D::GetVertices() const
+template <class T> CScriptArray* CollisionChain2D_constspVectorlesVector2greamp_GetVertices_void_template(T* _ptr)
 {
-    const PODVector<Vector2>& result = _ptr->GetVertices();
+    const Vector<Vector2>& result = _ptr->GetVertices();
     return VectorToArray(result, "Array<Vector2>");
 }
 
-// void CollisionChain2D::SetVertices(const PODVector<Vector2>& vertices)
-template <class T> void CollisionChain2D_void_SetVertices_constspPODVectorlesVector2greamp_template(T* _ptr, CScriptArray* vertices_conv)
+// void CollisionChain2D::SetVertices(const Vector<Vector2>& vertices)
+template <class T> void CollisionChain2D_void_SetVertices_constspVectorlesVector2greamp_template(T* _ptr, CScriptArray* vertices_conv)
 {
-    PODVector<Vector2> vertices = ArrayToVector<Vector2>(vertices_conv);
+    Vector<Vector2> vertices = ArrayToVector<Vector2>(vertices_conv);
     _ptr->SetVertices(vertices);
 }
 
@@ -23880,10 +23943,10 @@ template <class T> void RegisterMembers_CollisionChain2D(asIScriptEngine* engine
 {
     RegisterMembers_CollisionShape2D<T>(engine, className);
 
-    // PODVector<unsigned char> CollisionChain2D::GetVerticesAttr() const
-    // Error: type "PODVector<unsigned char>" can not automatically bind
-    // void CollisionChain2D::SetVerticesAttr(const PODVector<unsigned char>& value)
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
+    // Vector<unsigned char> CollisionChain2D::GetVerticesAttr() const
+    // Error: type "Vector<unsigned char>" can not automatically bind
+    // void CollisionChain2D::SetVerticesAttr(const Vector<unsigned char>& value)
+    // Error: type "const Vector<unsigned char>&" can not automatically bind
 
     // bool CollisionChain2D::GetLoop() const
     engine->RegisterObjectMethod(className, "bool GetLoop() const", AS_METHODPR(T, GetLoop, () const, bool), AS_CALL_THISCALL);
@@ -23896,8 +23959,8 @@ template <class T> void RegisterMembers_CollisionChain2D(asIScriptEngine* engine
     engine->RegisterObjectMethod(className, "uint GetVertexCount() const", AS_METHODPR(T, GetVertexCount, () const, unsigned), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_vertexCount() const", AS_METHODPR(T, GetVertexCount, () const, unsigned), AS_CALL_THISCALL);
 
-    // const PODVector<Vector2>& CollisionChain2D::GetVertices() const
-    engine->RegisterObjectMethod(className, "Array<Vector2>@ GetVertices() const", AS_FUNCTION_OBJFIRST(CollisionChain2D_constspPODVectorlesVector2greamp_GetVertices_void_template<CollisionChain2D>), AS_CALL_CDECL_OBJFIRST);
+    // const Vector<Vector2>& CollisionChain2D::GetVertices() const
+    engine->RegisterObjectMethod(className, "Array<Vector2>@ GetVertices() const", AS_FUNCTION_OBJFIRST(CollisionChain2D_constspVectorlesVector2greamp_GetVertices_void_template<CollisionChain2D>), AS_CALL_CDECL_OBJFIRST);
 
     // void CollisionChain2D::SetLoop(bool loop)
     engine->RegisterObjectMethod(className, "void SetLoop(bool)", AS_METHODPR(T, SetLoop, (bool), void), AS_CALL_THISCALL);
@@ -23910,8 +23973,8 @@ template <class T> void RegisterMembers_CollisionChain2D(asIScriptEngine* engine
     engine->RegisterObjectMethod(className, "void SetVertexCount(uint)", AS_METHODPR(T, SetVertexCount, (unsigned), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_vertexCount(uint)", AS_METHODPR(T, SetVertexCount, (unsigned), void), AS_CALL_THISCALL);
 
-    // void CollisionChain2D::SetVertices(const PODVector<Vector2>& vertices)
-    engine->RegisterObjectMethod(className, "void SetVertices(Array<Vector2>@+)", AS_FUNCTION_OBJFIRST(CollisionChain2D_void_SetVertices_constspPODVectorlesVector2greamp_template<CollisionChain2D>), AS_CALL_CDECL_OBJFIRST);
+    // void CollisionChain2D::SetVertices(const Vector<Vector2>& vertices)
+    engine->RegisterObjectMethod(className, "void SetVertices(Array<Vector2>@+)", AS_FUNCTION_OBJFIRST(CollisionChain2D_void_SetVertices_constspVectorlesVector2greamp_template<CollisionChain2D>), AS_CALL_CDECL_OBJFIRST);
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_CollisionChain2D
         REGISTER_MEMBERS_MANUAL_PART_CollisionChain2D();
@@ -23976,17 +24039,17 @@ template <class T> void RegisterMembers_CollisionEdge2D(asIScriptEngine* engine,
     #endif
 }
 
-// const PODVector<Vector2>& CollisionPolygon2D::GetVertices() const
-template <class T> CScriptArray* CollisionPolygon2D_constspPODVectorlesVector2greamp_GetVertices_void_template(T* _ptr)
+// const Vector<Vector2>& CollisionPolygon2D::GetVertices() const
+template <class T> CScriptArray* CollisionPolygon2D_constspVectorlesVector2greamp_GetVertices_void_template(T* _ptr)
 {
-    const PODVector<Vector2>& result = _ptr->GetVertices();
+    const Vector<Vector2>& result = _ptr->GetVertices();
     return VectorToArray(result, "Array<Vector2>");
 }
 
-// void CollisionPolygon2D::SetVertices(const PODVector<Vector2>& vertices)
-template <class T> void CollisionPolygon2D_void_SetVertices_constspPODVectorlesVector2greamp_template(T* _ptr, CScriptArray* vertices_conv)
+// void CollisionPolygon2D::SetVertices(const Vector<Vector2>& vertices)
+template <class T> void CollisionPolygon2D_void_SetVertices_constspVectorlesVector2greamp_template(T* _ptr, CScriptArray* vertices_conv)
 {
-    PODVector<Vector2> vertices = ArrayToVector<Vector2>(vertices_conv);
+    Vector<Vector2> vertices = ArrayToVector<Vector2>(vertices_conv);
     _ptr->SetVertices(vertices);
 }
 
@@ -23995,10 +24058,10 @@ template <class T> void RegisterMembers_CollisionPolygon2D(asIScriptEngine* engi
 {
     RegisterMembers_CollisionShape2D<T>(engine, className);
 
-    // PODVector<unsigned char> CollisionPolygon2D::GetVerticesAttr() const
-    // Error: type "PODVector<unsigned char>" can not automatically bind
-    // void CollisionPolygon2D::SetVerticesAttr(const PODVector<unsigned char>& value)
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
+    // Vector<unsigned char> CollisionPolygon2D::GetVerticesAttr() const
+    // Error: type "Vector<unsigned char>" can not automatically bind
+    // void CollisionPolygon2D::SetVerticesAttr(const Vector<unsigned char>& value)
+    // Error: type "const Vector<unsigned char>&" can not automatically bind
 
     // const Vector2& CollisionPolygon2D::GetVertex(unsigned index) const
     engine->RegisterObjectMethod(className, "const Vector2& GetVertex(uint) const", AS_METHODPR(T, GetVertex, (unsigned) const, const Vector2&), AS_CALL_THISCALL);
@@ -24007,8 +24070,8 @@ template <class T> void RegisterMembers_CollisionPolygon2D(asIScriptEngine* engi
     engine->RegisterObjectMethod(className, "uint GetVertexCount() const", AS_METHODPR(T, GetVertexCount, () const, unsigned), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_vertexCount() const", AS_METHODPR(T, GetVertexCount, () const, unsigned), AS_CALL_THISCALL);
 
-    // const PODVector<Vector2>& CollisionPolygon2D::GetVertices() const
-    engine->RegisterObjectMethod(className, "Array<Vector2>@ GetVertices() const", AS_FUNCTION_OBJFIRST(CollisionPolygon2D_constspPODVectorlesVector2greamp_GetVertices_void_template<CollisionPolygon2D>), AS_CALL_CDECL_OBJFIRST);
+    // const Vector<Vector2>& CollisionPolygon2D::GetVertices() const
+    engine->RegisterObjectMethod(className, "Array<Vector2>@ GetVertices() const", AS_FUNCTION_OBJFIRST(CollisionPolygon2D_constspVectorlesVector2greamp_GetVertices_void_template<CollisionPolygon2D>), AS_CALL_CDECL_OBJFIRST);
 
     // void CollisionPolygon2D::SetVertex(unsigned index, const Vector2& vertex)
     engine->RegisterObjectMethod(className, "void SetVertex(uint, const Vector2&in)", AS_METHODPR(T, SetVertex, (unsigned, const Vector2&), void), AS_CALL_THISCALL);
@@ -24017,8 +24080,8 @@ template <class T> void RegisterMembers_CollisionPolygon2D(asIScriptEngine* engi
     engine->RegisterObjectMethod(className, "void SetVertexCount(uint)", AS_METHODPR(T, SetVertexCount, (unsigned), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_vertexCount(uint)", AS_METHODPR(T, SetVertexCount, (unsigned), void), AS_CALL_THISCALL);
 
-    // void CollisionPolygon2D::SetVertices(const PODVector<Vector2>& vertices)
-    engine->RegisterObjectMethod(className, "void SetVertices(Array<Vector2>@+)", AS_FUNCTION_OBJFIRST(CollisionPolygon2D_void_SetVertices_constspPODVectorlesVector2greamp_template<CollisionPolygon2D>), AS_CALL_CDECL_OBJFIRST);
+    // void CollisionPolygon2D::SetVertices(const Vector<Vector2>& vertices)
+    engine->RegisterObjectMethod(className, "void SetVertices(Array<Vector2>@+)", AS_FUNCTION_OBJFIRST(CollisionPolygon2D_void_SetVertices_constspVectorlesVector2greamp_template<CollisionPolygon2D>), AS_CALL_CDECL_OBJFIRST);
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_CollisionPolygon2D
         REGISTER_MEMBERS_MANUAL_PART_CollisionPolygon2D();
@@ -24581,13 +24644,17 @@ template <class T> void RegisterMembers_ConstraintWheel2D(asIScriptEngine* engin
 
 #ifdef URHO3D_URHO2D
 
+// const Vector<SourceBatch2D>& Drawable2D::GetSourceBatches()
+template <class T> CScriptArray* Drawable2D_constspVectorlesSourceBatch2Dgreamp_GetSourceBatches_void_template(T* _ptr)
+{
+    const Vector<SourceBatch2D>& result = _ptr->GetSourceBatches();
+    return VectorToArray(result, "Array<SourceBatch2D>");
+}
+
 // class Drawable2D | File: ../Urho2D/Drawable2D.h
 template <class T> void RegisterMembers_Drawable2D(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_Drawable<T>(engine, className);
-
-    // const Vector<SourceBatch2D>& Drawable2D::GetSourceBatches()
-    // Error: type "const Vector<SourceBatch2D>&" can not automatically bind
 
     // int Drawable2D::GetLayer() const
     engine->RegisterObjectMethod(className, "int GetLayer() const", AS_METHODPR(T, GetLayer, () const, int), AS_CALL_THISCALL);
@@ -24596,6 +24663,9 @@ template <class T> void RegisterMembers_Drawable2D(asIScriptEngine* engine, cons
     // int Drawable2D::GetOrderInLayer() const
     engine->RegisterObjectMethod(className, "int GetOrderInLayer() const", AS_METHODPR(T, GetOrderInLayer, () const, int), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "int get_orderInLayer() const", AS_METHODPR(T, GetOrderInLayer, () const, int), AS_CALL_THISCALL);
+
+    // const Vector<SourceBatch2D>& Drawable2D::GetSourceBatches()
+    engine->RegisterObjectMethod(className, "Array<SourceBatch2D>@ GetSourceBatches()", AS_FUNCTION_OBJFIRST(Drawable2D_constspVectorlesSourceBatch2Dgreamp_GetSourceBatches_void_template<Drawable2D>), AS_CALL_CDECL_OBJFIRST);
 
     // void Drawable2D::SetLayer(int layer)
     engine->RegisterObjectMethod(className, "void SetLayer(int)", AS_METHODPR(T, SetLayer, (int), void), AS_CALL_THISCALL);
@@ -24644,6 +24714,13 @@ template <class T> CScriptArray* AnimatedModel_constspVectorlesSharedPtrlesAnima
     return VectorToHandleArray(result, "Array<AnimationState@>");
 }
 
+// const Vector<ModelMorph>& AnimatedModel::GetMorphs() const
+template <class T> CScriptArray* AnimatedModel_constspVectorlesModelMorphgreamp_GetMorphs_void_template(T* _ptr)
+{
+    const Vector<ModelMorph>& result = _ptr->GetMorphs();
+    return VectorToArray(result, "Array<ModelMorph>");
+}
+
 // const Vector<SharedPtr<VertexBuffer>>& AnimatedModel::GetMorphVertexBuffers() const
 template <class T> CScriptArray* AnimatedModel_constspVectorlesSharedPtrlesVertexBuffergregreamp_GetMorphVertexBuffers_void_template(T* _ptr)
 {
@@ -24660,20 +24737,18 @@ template <class T> void RegisterMembers_AnimatedModel(asIScriptEngine* engine, c
     // Error: type "VariantVector" can not automatically bind
     // VariantVector AnimatedModel::GetBonesEnabledAttr() const
     // Error: type "VariantVector" can not automatically bind
-    // const Vector<PODVector<unsigned>>& AnimatedModel::GetGeometryBoneMappings() const
-    // Error: type "const Vector<PODVector<unsigned>>&" can not automatically bind
-    // const Vector<PODVector<Matrix3x4>>& AnimatedModel::GetGeometrySkinMatrices() const
-    // Error: type "const Vector<PODVector<Matrix3x4>>&" can not automatically bind
-    // const Vector<ModelMorph>& AnimatedModel::GetMorphs() const
-    // Error: type "const Vector<ModelMorph>&" can not automatically bind
-    // const PODVector<unsigned char>& AnimatedModel::GetMorphsAttr() const
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
+    // const Vector<Vector<unsigned>>& AnimatedModel::GetGeometryBoneMappings() const
+    // Error: type "const Vector<Vector<unsigned>>&" can not automatically bind
+    // const Vector<Vector<Matrix3x4>>& AnimatedModel::GetGeometrySkinMatrices() const
+    // Error: type "const Vector<Vector<Matrix3x4>>&" can not automatically bind
+    // const Vector<unsigned char>& AnimatedModel::GetMorphsAttr() const
+    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // void AnimatedModel::SetAnimationStatesAttr(const VariantVector& value)
     // Error: type "const VariantVector&" can not automatically bind
     // void AnimatedModel::SetBonesEnabledAttr(const VariantVector& value)
     // Error: type "const VariantVector&" can not automatically bind
-    // void AnimatedModel::SetMorphsAttr(const PODVector<unsigned char>& value)
-    // Error: type "const PODVector<unsigned char>&" can not automatically bind
+    // void AnimatedModel::SetMorphsAttr(const Vector<unsigned char>& value)
+    // Error: type "const Vector<unsigned char>&" can not automatically bind
 
     // AnimationState* AnimatedModel::AddAnimationState(Animation* animation)
     engine->RegisterObjectMethod(className, "AnimationState@+ AddAnimationState(Animation@+)", AS_METHODPR(T, AddAnimationState, (Animation*), AnimationState*), AS_CALL_THISCALL);
@@ -24700,6 +24775,9 @@ template <class T> void RegisterMembers_AnimatedModel(asIScriptEngine* engine, c
 
     // const Vector<SharedPtr<AnimationState>>& AnimatedModel::GetAnimationStates() const
     engine->RegisterObjectMethod(className, "Array<AnimationState@>@ GetAnimationStates() const", AS_FUNCTION_OBJFIRST(AnimatedModel_constspVectorlesSharedPtrlesAnimationStategregreamp_GetAnimationStates_void_template<AnimatedModel>), AS_CALL_CDECL_OBJFIRST);
+
+    // const Vector<ModelMorph>& AnimatedModel::GetMorphs() const
+    engine->RegisterObjectMethod(className, "Array<ModelMorph>@ GetMorphs() const", AS_FUNCTION_OBJFIRST(AnimatedModel_constspVectorlesModelMorphgreamp_GetMorphs_void_template<AnimatedModel>), AS_CALL_CDECL_OBJFIRST);
 
     // const Vector<SharedPtr<VertexBuffer>>& AnimatedModel::GetMorphVertexBuffers() const
     engine->RegisterObjectMethod(className, "Array<VertexBuffer@>@ GetMorphVertexBuffers() const", AS_FUNCTION_OBJFIRST(AnimatedModel_constspVectorlesSharedPtrlesVertexBuffergregreamp_GetMorphVertexBuffers_void_template<AnimatedModel>), AS_CALL_CDECL_OBJFIRST);
@@ -25215,10 +25293,10 @@ template <class T> void RegisterMembers_StaticSprite2D(asIScriptEngine* engine, 
 
 #endif // def URHO3D_URHO2D
 
-// PODVector<UIElement*> DropDownList::GetItems() const
-template <class T> CScriptArray* DropDownList_PODVectorlesUIElementstargre_GetItems_void_template(T* _ptr)
+// Vector<UIElement*> DropDownList::GetItems() const
+template <class T> CScriptArray* DropDownList_VectorlesUIElementstargre_GetItems_void_template(T* _ptr)
 {
-    PODVector<UIElement*> result = _ptr->GetItems();
+    Vector<UIElement*> result = _ptr->GetItems();
     return VectorToHandleArray(result, "Array<UIElement@>");
 }
 
@@ -25234,8 +25312,8 @@ template <class T> void RegisterMembers_DropDownList(asIScriptEngine* engine, co
     engine->RegisterObjectMethod(className, "UIElement@+ GetItem(uint) const", AS_METHODPR(T, GetItem, (unsigned) const, UIElement*), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "UIElement@+ get_items(uint) const", AS_METHODPR(T, GetItem, (unsigned) const, UIElement*), AS_CALL_THISCALL);
 
-    // PODVector<UIElement*> DropDownList::GetItems() const
-    engine->RegisterObjectMethod(className, "Array<UIElement@>@ GetItems() const", AS_FUNCTION_OBJFIRST(DropDownList_PODVectorlesUIElementstargre_GetItems_void_template<DropDownList>), AS_CALL_CDECL_OBJFIRST);
+    // Vector<UIElement*> DropDownList::GetItems() const
+    engine->RegisterObjectMethod(className, "Array<UIElement@>@ GetItems() const", AS_FUNCTION_OBJFIRST(DropDownList_VectorlesUIElementstargre_GetItems_void_template<DropDownList>), AS_CALL_CDECL_OBJFIRST);
 
     // ListView* DropDownList::GetListView() const
     engine->RegisterObjectMethod(className, "ListView@+ GetListView() const", AS_METHODPR(T, GetListView, () const, ListView*), AS_CALL_THISCALL);

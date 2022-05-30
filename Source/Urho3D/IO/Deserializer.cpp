@@ -254,9 +254,9 @@ StringHash Deserializer::ReadStringHash()
     return StringHash(ReadUInt());
 }
 
-PODVector<unsigned char> Deserializer::ReadBuffer()
+Vector<unsigned char> Deserializer::ReadBuffer()
 {
-    PODVector<unsigned char> ret(ReadVLE());
+    Vector<unsigned char> ret(ReadVLE());
     if (ret.Size())
         Read(&ret[0], ret.Size());
     return ret;

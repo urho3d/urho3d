@@ -177,7 +177,7 @@ public:
     void SetMaxNetworkAngularVelocity(float velocity);
     /// Perform a physics world raycast and return all hits.
     void Raycast
-        (PODVector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
+        (Vector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
     /// Perform a physics world raycast and return the closest hit.
     void RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
     /// Perform a physics world segmented raycast and return the closest hit. Useful for big scenes with many bodies.
@@ -195,13 +195,13 @@ public:
     /// Invalidate cached collision geometry for a model.
     void RemoveCachedGeometry(Model* model);
     /// Return rigid bodies by a sphere query.
-    void GetRigidBodies(PODVector<RigidBody*>& result, const Sphere& sphere, unsigned collisionMask = M_MAX_UNSIGNED);
+    void GetRigidBodies(Vector<RigidBody*>& result, const Sphere& sphere, unsigned collisionMask = M_MAX_UNSIGNED);
     /// Return rigid bodies by a box query.
-    void GetRigidBodies(PODVector<RigidBody*>& result, const BoundingBox& box, unsigned collisionMask = M_MAX_UNSIGNED);
+    void GetRigidBodies(Vector<RigidBody*>& result, const BoundingBox& box, unsigned collisionMask = M_MAX_UNSIGNED);
     /// Return rigid bodies by contact test with the specified body. It needs to be active to return all contacts reliably.
-    void GetRigidBodies(PODVector<RigidBody*>& result, const RigidBody* body);
+    void GetRigidBodies(Vector<RigidBody*>& result, const RigidBody* body);
     /// Return rigid bodies that have been in collision with the specified body on the last simulation step. Only returns collisions that were sent as events (depends on collision event mode) and excludes e.g. static-static collisions.
-    void GetCollidingBodies(PODVector<RigidBody*>& result, const RigidBody* body);
+    void GetCollidingBodies(Vector<RigidBody*>& result, const RigidBody* body);
 
     /// Return gravity.
     /// @property
@@ -318,11 +318,11 @@ private:
     /// Extra weak pointer to scene to allow for cleanup in case the world is destroyed before other components.
     WeakPtr<Scene> scene_;
     /// Rigid bodies in the world.
-    PODVector<RigidBody*> rigidBodies_;
+    Vector<RigidBody*> rigidBodies_;
     /// Collision shapes in the world.
-    PODVector<CollisionShape*> collisionShapes_;
+    Vector<CollisionShape*> collisionShapes_;
     /// Constraints in the world.
-    PODVector<Constraint*> constraints_;
+    Vector<Constraint*> constraints_;
     /// Collision pairs on this frame.
     HashMap<Pair<WeakPtr<RigidBody>, WeakPtr<RigidBody>>, ManifoldPair> currentCollisions_;
     /// Collision pairs on the previous frame. Used to check if a collision is "new". Manifolds are not guaranteed to exist anymore.

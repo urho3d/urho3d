@@ -54,7 +54,7 @@ public:
     /// Return root spatial info.
     const SpatialInfo& GetSpatialInfo() const { return spatialInfo_; }
     /// Return animation result timeline keys.
-    const PODVector<SpatialTimelineKey*>& GetTimelineKeys() const { return timelineKeys_; }
+    const Vector<SpatialTimelineKey*>& GetTimelineKeys() const { return timelineKeys_; }
 
 private:
     /// Handle set entity.
@@ -87,7 +87,7 @@ private:
     /// Current mainline key.
     MainlineKey* mainlineKey_{};
     /// Current timeline keys.
-    PODVector<SpatialTimelineKey*> timelineKeys_;
+    Vector<SpatialTimelineKey*> timelineKeys_;
 };
 
 }

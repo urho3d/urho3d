@@ -88,7 +88,7 @@ IntVector2 Sprite::ElementToScreen(const IntVector2& position)
     return IntVector2((int)transformedPos.x_, (int)transformedPos.y_);
 }
 
-void Sprite::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
+void Sprite::GetBatches(Vector<UIBatch>& batches, Vector<float>& vertexData, const IntRect& currentScissor)
 {
     bool allOpaque = true;
     if (GetDerivedOpacity() < 1.0f || colors_[C_TOPLEFT].a_ < 1.0f || colors_[C_TOPRIGHT].a_ < 1.0f ||

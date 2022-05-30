@@ -238,7 +238,7 @@ void ScriptFile::RemoveEventHandlers()
     }
 }
 
-void ScriptFile::RemoveEventHandlersExcept(const PODVector<StringHash>& exceptions)
+void ScriptFile::RemoveEventHandlersExcept(const Vector<StringHash>& exceptions)
 {
     auto* receiver = static_cast<asIScriptObject*>(asGetActiveContext()->GetThisPointer());
     HashMap<asIScriptObject*, SharedPtr<ScriptEventInvoker>>::Iterator i = eventInvokers_.Find(receiver);

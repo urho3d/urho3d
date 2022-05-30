@@ -45,8 +45,8 @@ struct SpriterData
     int scmlVersion_{};
     String generator_;
     String generatorVersion_;
-    PODVector<Folder*> folders_;
-    PODVector<Entity*> entities_;
+    Vector<Folder*> folders_;
+    Vector<Entity*> entities_;
 };
 
 /// Folder.
@@ -60,7 +60,7 @@ struct Folder
 
     int id_{};
     String name_;
-    PODVector<File*> files_;
+    Vector<File*> files_;
 };
 
 /// File.
@@ -91,8 +91,8 @@ struct Entity
 
     int id_{};
     String name_;
-    PODVector<CharacterMap*> characterMaps_;
-    PODVector<Animation*> animations_;
+    Vector<CharacterMap*> characterMaps_;
+    Vector<Animation*> animations_;
 };
 
 /// Character map.
@@ -106,7 +106,7 @@ struct CharacterMap
 
     int id_{};
     String name_;
-    PODVector<MapInstruction*> maps_;
+    Vector<MapInstruction*> maps_;
 };
 
 /// Map instruction.
@@ -136,8 +136,8 @@ struct Animation
     String name_;
     float length_{};
     bool looping_{};
-    PODVector<MainlineKey*> mainlineKeys_;
-    PODVector<Timeline*> timelines_;
+    Vector<MainlineKey*> mainlineKeys_;
+    Vector<Timeline*> timelines_;
 };
 
 /// Mainline key.
@@ -151,8 +151,8 @@ struct MainlineKey
 
     int id_{};
     float time_{};
-    PODVector<Ref*> boneRefs_;
-    PODVector<Ref*> objectRefs_;
+    Vector<Ref*> boneRefs_;
+    Vector<Ref*> objectRefs_;
 };
 
 /// Ref.
@@ -189,7 +189,7 @@ struct Timeline
     int id_{};
     String name_;
     ObjectType objectType_;
-    PODVector<SpatialTimelineKey*> keys_;
+    Vector<SpatialTimelineKey*> keys_;
 };
 
 /// Curve type.

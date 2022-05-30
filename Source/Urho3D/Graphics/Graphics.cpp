@@ -198,7 +198,7 @@ void Graphics::SetShaderParameter(StringHash param, const Variant& value)
 
     case VAR_BUFFER:
         {
-            const PODVector<unsigned char>& buffer = value.GetBuffer();
+            const Vector<unsigned char>& buffer = value.GetBuffer();
             if (buffer.Size() >= sizeof(float))
                 SetShaderParameter(param, reinterpret_cast<const float*>(&buffer[0]), buffer.Size() / sizeof(float));
         }
@@ -221,9 +221,9 @@ IntVector2 Graphics::GetWindowPosition() const
     return position_;
 }
 
-PODVector<IntVector3> Graphics::GetResolutions(int monitor) const
+Vector<IntVector3> Graphics::GetResolutions(int monitor) const
 {
-    PODVector<IntVector3> ret;
+    Vector<IntVector3> ret;
     // Emscripten is not able to return a valid list
 #ifndef __EMSCRIPTEN__
     auto numModes = (unsigned)SDL_GetNumDisplayModes(monitor);
@@ -257,7 +257,7 @@ PODVector<IntVector3> Graphics::GetResolutions(int monitor) const
 
 unsigned Graphics::FindBestResolutionIndex(int monitor, int width, int height, int refreshRate) const
 {
-    const PODVector<IntVector3> resolutions = GetResolutions(monitor);
+    const Vector<IntVector3> resolutions = GetResolutions(monitor);
     if (resolutions.Empty())
         return M_MAX_UNSIGNED;
 
@@ -524,7 +524,7 @@ void Graphics::AdjustScreenMode(int& newWidth, int& newHeight, ScreenModeParams&
 #ifdef DESKTOP_GRAPHICS
     if (params.fullscreen_)
     {
-        const PODVector<IntVector3> resolutions = GetResolutions(params.monitor_);
+        const Vector<IntVector3> resolutions = GetResolutions(params.monitor_);
         if (!resolutions.Empty())
         {
             const unsigned bestResolution = FindBestResolutionIndex(params.monitor_,
@@ -1027,7 +1027,7 @@ void Graphics::SetVertexBuffer(VertexBuffer* buffer)
 #endif
 }
 
-bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, unsigned instanceOffset)
+bool Graphics::SetVertexBuffers(const Vector<VertexBuffer*>& buffers, unsigned instanceOffset)
 {
     GAPI gapi = Graphics::GetGAPI();
 
@@ -1984,7 +1984,7 @@ bool Graphics::IsDeviceLost() const
     return {}; // Prevent warning
 }
 
-PODVector<int> Graphics::GetMultiSampleLevels() const
+Vector<int> Graphics::GetMultiSampleLevels() const
 {
     GAPI gapi = Graphics::GetGAPI();
 

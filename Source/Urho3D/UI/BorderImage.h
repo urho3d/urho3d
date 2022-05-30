@@ -27,7 +27,7 @@ public:
     static void RegisterObject(Context* context);
 
     /// Return UI rendering batches.
-    void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor) override;
+    void GetBatches(Vector<UIBatch>& batches, Vector<float>& vertexData, const IntRect& currentScissor) override;
 
     /// Set texture.
     /// @property
@@ -111,7 +111,7 @@ public:
 protected:
     /// Return UI rendering batches with offset to image rectangle.
     void GetBatches
-        (PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor, const IntVector2& offset);
+        (Vector<UIBatch>& batches, Vector<float>& vertexData, const IntRect& currentScissor, const IntVector2& offset);
 
     /// Texture.
     SharedPtr<Texture> texture_;

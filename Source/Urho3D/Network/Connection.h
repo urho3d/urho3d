@@ -308,9 +308,9 @@ private:
     /// Ongoing package send transfers.
     HashMap<StringHash, PackageUpload> uploads_;
     /// Pending latest data for not yet received nodes.
-    HashMap<unsigned, PODVector<unsigned char>> nodeLatestData_;
+    HashMap<unsigned, Vector<unsigned char>> nodeLatestData_;
     /// Pending latest data for not yet received components.
-    HashMap<unsigned, PODVector<unsigned char>> componentLatestData_;
+    HashMap<unsigned, Vector<unsigned char>> componentLatestData_;
     /// Node ID's to process during a replication update.
     HashSet<unsigned> nodesToProcess_;
     /// Reusable message buffer.

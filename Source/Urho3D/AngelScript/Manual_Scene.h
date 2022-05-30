@@ -61,23 +61,23 @@ template <class T> bool Node_SaveJSON_VectorBuffer(VectorBuffer& buffer, T* ptr)
     return ptr->SaveJSON(buffer);
 }
 
-// template <class T> void Node::GetChildrenWithComponent(PODVector<Node*>& dest, bool recursive = false) const | File: ../Scene/Node.h
+// template <class T> void Node::GetChildrenWithComponent(Vector<Node*>& dest, bool recursive = false) const | File: ../Scene/Node.h
 template <class T> CScriptArray* Node_GetChildren_Script(bool recursive, T* ptr)
 {
-    PODVector<Node*> nodes;
+    Vector<Node*> nodes;
     ptr->template GetChildrenWithComponent<ScriptInstance>(nodes, recursive);
     return VectorToHandleArray<Node>(nodes, "Array<Node@>");
 }
 
-// template <class T> void Node::GetChildrenWithComponent(PODVector<Node*>& dest, bool recursive = false) const | File: ../Scene/Node.h
+// template <class T> void Node::GetChildrenWithComponent(Vector<Node*>& dest, bool recursive = false) const | File: ../Scene/Node.h
 template <class T> CScriptArray* Node_GetChildren_Script_ClassName(const String& className, bool recursive, T* ptr)
 {
-    PODVector<Node*> nodes;
+    Vector<Node*> nodes;
     ptr->template GetChildrenWithComponent<ScriptInstance>(nodes, recursive);
 
-    PODVector<Node*> result;
+    Vector<Node*> result;
 
-    for (PODVector<Node*>::Iterator i = nodes.Begin(); i != nodes.End(); ++i)
+    for (Vector<Node*>::Iterator i = nodes.Begin(); i != nodes.End(); ++i)
     {
         Node* node = *i;
         const Vector<SharedPtr<Component>>& components = node->GetComponents();
@@ -94,10 +94,10 @@ template <class T> CScriptArray* Node_GetChildren_Script_ClassName(const String&
     return VectorToHandleArray<Node>(result, "Array<Node@>");
 }
 
-// void Node::GetComponents(PODVector<Component*>& dest, StringHash type, bool recursive = false) const | File: ../Scene/Node.h
+// void Node::GetComponents(Vector<Component*>& dest, StringHash type, bool recursive = false) const | File: ../Scene/Node.h
 template <class T> CScriptArray* Node_GetComponents_Type(const String& typeName, bool recursive, T* ptr)
 {
-    PODVector<Component*> components;
+    Vector<Component*> components;
     ptr->GetComponents(components, typeName, recursive);
     return VectorToHandleArray<Component>(components, "Array<Component@>");
 }
@@ -171,11 +171,11 @@ template <class T> VariantMap& Node_GetVars(T* ptr)
     engine->RegisterObjectMethod(className, "bool SaveJSON(File@+)", AS_FUNCTION_OBJLAST(Node_SaveJSON_File<T>), AS_CALL_CDECL_OBJLAST); \
     engine->RegisterObjectMethod(className, "bool SaveJSON(VectorBuffer&)", AS_FUNCTION_OBJLAST(Node_SaveJSON_VectorBuffer<T>), AS_CALL_CDECL_OBJLAST); \
     \
-    /* template <class T> void Node::GetChildrenWithComponent(PODVector<Node*>& dest, bool recursive = false) const | File: ../Scene/Node.h */ \
+    /* template <class T> void Node::GetChildrenWithComponent(Vector<Node*>& dest, bool recursive = false) const | File: ../Scene/Node.h */ \
     engine->RegisterObjectMethod(className, "Array<Node@>@ GetChildrenWithScript(bool = false) const", AS_FUNCTION_OBJLAST(Node_GetChildren_Script<T>), AS_CALL_CDECL_OBJLAST); \
     engine->RegisterObjectMethod(className, "Array<Node@>@ GetChildrenWithScript(const String&in, bool = false) const", AS_FUNCTION_OBJLAST(Node_GetChildren_Script_ClassName<T>), AS_CALL_CDECL_OBJLAST); \
     \
-    /* void Node::GetComponents(PODVector<Component*>& dest, StringHash type, bool recursive = false) const | File: ../Scene/Node.h */ \
+    /* void Node::GetComponents(Vector<Component*>& dest, StringHash type, bool recursive = false) const | File: ../Scene/Node.h */ \
     engine->RegisterObjectMethod(className, "Array<Component@>@ GetComponents(const String&in, bool = false) const", AS_FUNCTION_OBJLAST(Node_GetComponents_Type<T>), AS_CALL_CDECL_OBJLAST); \
     \
     /* unsigned Node::GetNumChildren(bool recursive = false) const | File: ../Scene/Node.h */ \
@@ -284,10 +284,10 @@ template <class T> Node* Scene_InstantiateJSON_JSONFile(JSONFile* json, const Ve
     return json ? ptr->InstantiateJSON(json->GetRoot(), position, rotation, mode) : nullptr;
 }
 
-// bool Scene::GetNodesWithTag(PODVector<Node*>& dest, const String& tag) const | File: ../Scene/Scene.h
+// bool Scene::GetNodesWithTag(Vector<Node*>& dest, const String& tag) const | File: ../Scene/Scene.h
 template <class T> CScriptArray* Scene_GetNodesWithTag(const String& tag, T* ptr)
 {
-    PODVector<Node*> nodes;
+    Vector<Node*> nodes;
     ptr->GetNodesWithTag(nodes, tag);
     return VectorToHandleArray<Node>(nodes, "Array<Node@>");
 }
@@ -331,7 +331,7 @@ template <class T> Octree* Scene_GetOctree(T* ptr)
     /* Node* Scene::InstantiateJSON(const JSONValue& source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED)  | File: ../Scene/Scene.h */ \
     engine->RegisterObjectMethod(className, "Node@+ InstantiateJSON(JSONFile@+, const Vector3&in, const Quaternion&in, CreateMode = REPLICATED)", AS_FUNCTION_OBJLAST(Scene_InstantiateJSON_JSONFile<T>), AS_CALL_CDECL_OBJLAST); \
     \
-    /* bool Scene::GetNodesWithTag(PODVector<Node*>& dest, const String& tag) const | File: ../Scene/Scene.h */ \
+    /* bool Scene::GetNodesWithTag(Vector<Node*>& dest, const String& tag) const | File: ../Scene/Scene.h */ \
     engine->RegisterObjectMethod(className, "Array<Node@>@ GetNodesWithTag(const String&in) const", AS_FUNCTION_OBJLAST(Scene_GetNodesWithTag<T>), AS_CALL_CDECL_OBJLAST); \
     \
     /* template <class T> T* Scene::GetComponent(bool recursive = false) const | File: ../Scene/Node.h */ \

@@ -23,7 +23,7 @@ public:
     /// Return child block with the specified event ID.
     EventProfilerBlock* GetChild(StringHash eventID)
     {
-        for (PODVector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
+        for (Vector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
         {
             auto* eventProfilerBlock = static_cast<EventProfilerBlock*>(*i);
             if (eventProfilerBlock->eventID_ == eventID)

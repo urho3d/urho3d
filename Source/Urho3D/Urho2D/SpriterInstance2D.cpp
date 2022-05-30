@@ -218,7 +218,7 @@ void SpriterInstance::UpdateTimelineKeys()
 
 void SpriterInstance::UpdateMainlineKey()
 {
-    const PODVector<MainlineKey*>& mainlineKeys = animation_->mainlineKeys_;
+    const Vector<MainlineKey*>& mainlineKeys = animation_->mainlineKeys_;
     for (unsigned i = 0; i < mainlineKeys.Size(); ++i)
     {
         if (mainlineKeys[i]->time_ <= currentTime_)

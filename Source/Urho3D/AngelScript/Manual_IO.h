@@ -13,7 +13,7 @@ namespace Urho3D
 // virtual unsigned Deserializer::Read(void* dest, unsigned size) = 0 | File: ../IO/Deserializer.h
 template <class T> CScriptArray* Deserializer_Read(unsigned size, T* ptr)
 {
-    PODVector<unsigned char> vector(size);
+    Vector<unsigned char> vector(size);
     unsigned bytesRead = size ? ptr->Read(&vector[0], size) : 0;
     vector.Resize(bytesRead);
     return VectorToArray(vector, "Array<uint8>");

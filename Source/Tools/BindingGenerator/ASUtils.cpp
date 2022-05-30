@@ -363,7 +363,7 @@ ConvertedVariable CppVariableToAS(const TypeAnalyzer& type, VariableUsage usage,
         throw Exception("Error: type \"" + type.ToString() + "\" can not automatically bind");
     }
 
-    regex_match(cppTypeName, match, regex("PODVector<(\\w+)\\*>"));
+    regex_match(cppTypeName, match, regex("Vector<(\\w+)\\*>"));
     if (!match.empty())
     {
         string cppSubtypeName = match[1].str();
@@ -402,7 +402,7 @@ ConvertedVariable CppVariableToAS(const TypeAnalyzer& type, VariableUsage usage,
         throw Exception("Error: type \"" + type.ToString() + "\" can not automatically bind");
     }
 
-    regex_match(cppTypeName, match, regex("PODVector<(\\w+)>"));
+    regex_match(cppTypeName, match, regex("Vector<(\\w+)>"));
     if (!match.empty())
     {
         string cppSubtypeName = match[1].str();
