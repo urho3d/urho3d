@@ -48,7 +48,7 @@ void EventReceiverGroup::EndSendEvent()
     if (inSend_ == 0 && dirty_)
     {
         /// \todo Could be optimized by erase-swap, but this keeps the receiver order
-        for (unsigned i = receivers_.Size() - 1; i < receivers_.Size(); --i)
+        for (i32 i = receivers_.Size() - 1; i >= 0; --i)
         {
             if (!receivers_[i])
                 receivers_.Erase(i);

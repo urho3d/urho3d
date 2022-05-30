@@ -31,10 +31,6 @@
 
 #include "../DebugNew.h"
 
-#ifdef _MSC_VER
-#pragma warning(disable:6293)
-#endif
-
 namespace Urho3D
 {
 
@@ -651,7 +647,7 @@ void Renderer::Update(float timeStep)
 
     // Queue update of the main viewports. Use reverse order, as rendering order is also reverse
     // to render auxiliary views before dependent main views
-    for (unsigned i = viewports_.Size() - 1; i < viewports_.Size(); --i)
+    for (i32 i = viewports_.Size() - 1; i >= 0; --i)
         QueueViewport(nullptr, viewports_[i]);
 
     // Update main viewports. This may queue further views
@@ -706,7 +702,7 @@ void Renderer::Render()
     }
 
     // Render views from last to first. Each main (backbuffer) view is rendered after the auxiliary views it depends on
-    for (unsigned i = views_.Size() - 1; i < views_.Size(); --i)
+    for (i32 i = views_.Size() - 1; i >= 0; --i)
     {
         if (!views_[i])
             continue;
@@ -1516,7 +1512,7 @@ void Renderer::PrepareViewRender()
 
 void Renderer::RemoveUnusedBuffers()
 {
-    for (unsigned i = occlusionBuffers_.Size() - 1; i < occlusionBuffers_.Size(); --i)
+    for (i32 i = occlusionBuffers_.Size() - 1; i >= 0; --i)
     {
         if (occlusionBuffers_[i]->GetUseTimer() > MAX_BUFFER_AGE)
         {
@@ -1529,7 +1525,7 @@ void Renderer::RemoveUnusedBuffers()
     {
         HashMap<unsigned long long, Vector<SharedPtr<Texture>>>::Iterator current = i++;
         Vector<SharedPtr<Texture>>& buffers = current->second_;
-        for (unsigned j = buffers.Size() - 1; j < buffers.Size(); --j)
+        for (i32 j = buffers.Size() - 1; j >= 0; --j)
         {
             Texture* buffer = buffers[j];
             if (buffer->GetUseTimer() > MAX_BUFFER_AGE)

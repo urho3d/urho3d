@@ -18,10 +18,6 @@
 
 #include "../DebugNew.h"
 
-#ifdef _MSC_VER
-#pragma warning(disable:6293)
-#endif
-
 namespace Urho3D
 {
 
@@ -196,7 +192,7 @@ void Component::CleanupConnection(Connection* connection)
 {
     if (networkState_)
     {
-        for (unsigned i = networkState_->replicationStates_.Size() - 1; i < networkState_->replicationStates_.Size(); --i)
+        for (i32 i = networkState_->replicationStates_.Size() - 1; i >= 0; --i)
         {
             if (networkState_->replicationStates_[i]->connection_ == connection)
                 networkState_->replicationStates_.Erase(i);

@@ -18,10 +18,6 @@
 
 #include "../DebugNew.h"
 
-#ifdef _MSC_VER
-#pragma warning(disable:6293)
-#endif
-
 namespace Urho3D
 {
 
@@ -319,7 +315,7 @@ void Drawable::LimitVertexLights(bool removeConvertedLights)
 {
     if (removeConvertedLights)
     {
-        for (unsigned i = vertexLights_.Size() - 1; i < vertexLights_.Size(); --i)
+        for (i32 i = vertexLights_.Size() - 1; i >= 0; --i)
         {
             if (!vertexLights_[i]->GetPerVertex())
                 vertexLights_.Erase(i);

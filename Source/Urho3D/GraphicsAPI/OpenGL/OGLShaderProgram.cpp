@@ -147,7 +147,7 @@ bool ShaderProgram_OGL::Link()
         unsigned char semanticIndex = 0;
 
         // Go in reverse order so that "binormal" is detected before "normal"
-        for (unsigned j = MAX_VERTEX_ELEMENT_SEMANTICS - 1; j < MAX_VERTEX_ELEMENT_SEMANTICS; --j)
+        for (i32 j = MAX_VERTEX_ELEMENT_SEMANTICS - 1; j >= 0; --j)
         {
             if (name.Contains(ShaderVariation::elementSemanticNames_OGL[j], false))
             {

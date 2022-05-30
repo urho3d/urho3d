@@ -23,10 +23,6 @@
 
 #include "../DebugNew.h"
 
-#ifdef _MSC_VER
-#pragma warning(disable:6293)
-#endif
-
 namespace Urho3D
 {
 
@@ -822,7 +818,7 @@ void DecalSet::GetFace(Vector<PODVector<DecalVertex>>& faces, Drawable* target, 
         return;
 
     // Check if face is culled completely by any of the planes
-    for (unsigned i = PLANE_FAR; i < NUM_FRUSTUM_PLANES; --i)
+    for (i32 i = PLANE_FAR; i >= 0; --i)
     {
         const Plane& plane = frustum.planes_[i];
         if (plane.Distance(v0) < 0.0f && plane.Distance(v1) < 0.0f && plane.Distance(v2) < 0.0f)

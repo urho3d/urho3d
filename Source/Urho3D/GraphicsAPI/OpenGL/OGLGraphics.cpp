@@ -3093,7 +3093,7 @@ void Graphics::PrepareDraw_OGL()
         // Use reverse order so that elements from higher index buffers will override lower index buffers
         unsigned assignedLocations = 0;
 
-        for (unsigned i = MAX_VERTEX_STREAMS - 1; i < MAX_VERTEX_STREAMS; --i)
+        for (i32 i = MAX_VERTEX_STREAMS - 1; i >= 0; --i)
         {
             VertexBuffer* buffer = vertexBuffers_[i];
             // Beware buffers with missing OpenGL objects, as binding a zero buffer object means accessing CPU memory for vertex data,
