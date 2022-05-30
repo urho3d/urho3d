@@ -237,15 +237,35 @@ jobs:
         with: { fetch-depth: 0 }
       - name: Install dependencies
         id: install_dependencies
+        shell: bash {0} # Allow catching errors
         run: |
           # Temporary use old version of Doxygen https://github.com/urho3d/Urho3D/issues/2757
-          # Server may reject connection, so try again
-          do { choco install --no-progress doxygen.install --version 1.8.20 } until ($?)
-          do { choco install --no-progress graphviz.portable } until ($?)
+          # Server may reject connection, so try several times
+          for (( i = 0; i < 4; ++i ))
+          do
+            choco install --no-progress doxygen.install --version 1.8.20
+            if (( $? == 0 )) # Exit code of the previous command
+            then
+              break
+            else
+              echo "========== One more try =========="
+              sleep 20
+            fi
+          done
+          for (( i = 0; i < 4; ++i ))
+          do
+            choco install --no-progress graphviz.portable
+            if (( $? == 0 )) # Exit code of the previous command
+            then
+              break
+            else
+              echo "========== One more try =========="
+              sleep 20
+            fi
+          done
           # Use MSYS2 instead obsolete MinGW
           # https://github.com/urho3d/Urho3D/issues/2887
-          echo "c:\msys64\mingw32\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8
-        continue-on-error: ${{ !startsWith(github.ref, 'refs/tags/') }}
+          echo "c:\msys64\mingw32\bin" >> $GITHUB_PATH
       - name: CMake
         run: rake cmake
       - name: Build
@@ -255,7 +275,6 @@ jobs:
         if: matrix.graphics-api != 'OpenGL'
       - name: Documentation
         run: rake doc
-        if: steps.install_dependencies.outcome == 'success'
       - name: Install
         run: rake install
       - name: Scaffolding - new
