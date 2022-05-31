@@ -90,6 +90,10 @@ jobs:
         if: matrix.platform != 'android'
       - name: Build
         run: script/dockerized.sh ${PLATFORM/-*} rake build
+      - name: Test tools
+        if: startsWith(matrix.platform, 'linux')
+        shell: bash
+        run: script/dockerized.sh ${PLATFORM/-*} /home/runner/work/Urho3D/Urho3D/script/test_tools.sh /home/runner/work/Urho3D/Urho3D /home/runner/work/Urho3D/Urho3D/build/ci
       - name: Test
         run: script/dockerized.sh ${PLATFORM/-*} rake test
         if: startsWith(matrix.platform, 'linux') || matrix.platform == 'android'
@@ -179,6 +183,10 @@ jobs:
         run: rake cmake
       - name: Build
         run: rake build
+      - name: Test tools
+        if: matrix.platform == 'macOS'
+        shell: bash
+        run: /Users/runner/work/Urho3D/Urho3D/script/test_tools.sh /Users/runner/work/Urho3D/Urho3D /Users/runner/work/Urho3D/Urho3D/build/ci
       - name: Test
         run: rake test
         if: matrix.platform == 'macOS'
@@ -270,6 +278,9 @@ jobs:
         run: rake cmake
       - name: Build
         run: rake build
+      - name: Test tools
+        shell: bash
+        run: D:/a/Urho3D/Urho3D/script/test_tools.sh D:/a/Urho3D/Urho3D D:/a/Urho3D/Urho3D/build/ci
       - name: Test
         run: rake test
         if: matrix.graphics-api != 'OpenGL'
