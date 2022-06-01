@@ -193,14 +193,16 @@ src_filenames=(
 )
 
 result_filenames=(
-    Materials/Default.xml
+    #Materials/Default.xml # Is rewritten by default.xml on Windows
+    Materials/default.xml
     Materials/DefaultMaterial.xml
     Box.mdl
     TeaPot.mdl
 )
 
 result_sizes=(
-    306    # Materials/Default.xml
+    #256    # Materials/Default.xml
+    306    # Materials/default.xml
     261    # Materials/DefaultMaterial.xml
     1456   # Box.mdl
     494912 # TeaPot.mdl
