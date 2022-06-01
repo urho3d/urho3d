@@ -154,7 +154,7 @@ struct ModelMorphBuffer
 {
     unsigned vertexBuffer_;
     unsigned elementMask_;
-    Vector<Pair<unsigned, ModelVertex> > vertices_;
+    Vector<Pair<unsigned, ModelVertex>> vertices_;
 };
 
 struct ModelMorph
@@ -173,7 +173,7 @@ struct ModelMorph
             dest.WriteUInt(buffers_[i].vertices_.Size());
             unsigned elementMask = buffers_[i].elementMask_;
 
-            for (Vector<Pair<unsigned, ModelVertex> >::Iterator j = buffers_[i].vertices_.Begin();
+            for (Vector<Pair<unsigned, ModelVertex>>::Iterator j = buffers_[i].vertices_.Begin();
                 j != buffers_[i].vertices_.End(); ++j)
             {
                 dest.WriteUInt(j->first_);
@@ -221,6 +221,6 @@ struct ModelSubGeometryLodLevel
     unsigned indexBuffer_{};
     unsigned indexStart_{};
     unsigned indexCount_{};
-    HashMap<unsigned, Vector<BoneWeightAssignment> > boneWeights_;
+    HashMap<unsigned, Vector<BoneWeightAssignment>> boneWeights_;
     Vector<unsigned> boneMapping_;
 };

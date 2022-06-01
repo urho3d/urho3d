@@ -24,7 +24,7 @@ SharedPtr<XMLFile> meshFile_(new XMLFile(context_));
 SharedPtr<XMLFile> skelFile_(new XMLFile(context_));
 Vector<ModelIndexBuffer> indexBuffers_;
 Vector<ModelVertexBuffer> vertexBuffers_;
-Vector<Vector<ModelSubGeometryLodLevel> > subGeometries_;
+Vector<Vector<ModelSubGeometryLodLevel>> subGeometries_;
 Vector<Vector3> subGeometryCenters_;
 Vector<ModelBone> bones_;
 Vector<ModelMorph> morphs_;
@@ -486,7 +486,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                 {
                     HashMap<unsigned, unsigned> usedBoneMap;
                     unsigned remapIndex = 0;
-                    for (HashMap<unsigned, Vector<BoneWeightAssignment> >::Iterator i =
+                    for (HashMap<unsigned, Vector<BoneWeightAssignment>>::Iterator i =
                         subGeometryLodLevel.boneWeights_.Begin(); i != subGeometryLodLevel.boneWeights_.End(); ++i)
                     {
                         // Sort the bone assigns by weight
@@ -517,7 +517,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                     sorted = true;
                 }
 
-                for (HashMap<unsigned, Vector<BoneWeightAssignment> >::Iterator i = subGeometryLodLevel.boneWeights_.Begin();
+                for (HashMap<unsigned, Vector<BoneWeightAssignment>>::Iterator i = subGeometryLodLevel.boneWeights_.Begin();
                     i != subGeometryLodLevel.boneWeights_.End(); ++i)
                 {
                     // Sort the bone assigns by weight, if not sorted yet in bone remapping pass
