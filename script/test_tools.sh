@@ -18,6 +18,8 @@ repo_dir=${repo_dir%\\}
 build_dir=${build_dir%/}
 build_dir=${build_dir%\\}
 
+# ================== OgreImporter ==================
+
 src_filenames=(
     Jack.mesh.xml
     Level.mesh.xml
@@ -136,7 +138,6 @@ do
     # Check exit code of the previous command
     if [[ $? != 0 ]]
     then
-        echo temp
         exit 1
     fi
 done
@@ -161,6 +162,68 @@ done
 #        exit 1
 #    fi
 #done
+
+# Check sizes instead checksums
+for (( i = 0; i < ${#result_filenames[*]}; ++i ))
+do
+    # This works on any platform
+    file_size=$(wc -c ${result_filenames[$i]})
+
+    # Check exit code of the previous command
+    if [[ $? != 0 ]]
+    then
+        exit 1
+    fi
+
+    # Extract size from string
+    file_size=$(echo $file_size | awk '{print $1}')
+
+    if [[ $file_size != ${result_sizes[$i]} ]]
+    then
+        echo "${result_filenames[$i]}: incorrect size"
+        exit 1
+    fi
+done
+
+# ================== AssetImporter ==================
+
+src_filenames=(
+    TeaPot.blend
+    Box.blend
+)
+
+result_filenames=(
+    #Materials/Default.xml # Is rewritten by default.xml on Windows
+    Materials/default.xml
+    Materials/DefaultMaterial.xml
+    Box.mdl
+    TeaPot.mdl
+)
+
+result_sizes=(
+    #256    # Materials/Default.xml
+    306    # Materials/default.xml
+    261    # Materials/DefaultMaterial.xml
+    1456   # Box.mdl
+    494912 # TeaPot.mdl
+)
+
+# Convert models
+for (( i = 0; i < ${#src_filenames[*]}; ++i ))
+do
+    src_filepath=${repo_dir}/SourceAssets/${src_filenames[$i]}
+
+    # Replace extension from .blend to .mdl
+    output_filename=${src_filenames[$i]%.blend}.mdl
+
+    ${build_dir}/bin/tool/AssetImporter model $src_filepath $output_filename -t
+
+    # Check exit code of the previous command
+    if [[ $? != 0 ]]
+    then
+        exit 1
+    fi
+done
 
 # Check sizes instead checksums
 for (( i = 0; i < ${#result_filenames[*]}; ++i ))
