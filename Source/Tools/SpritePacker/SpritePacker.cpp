@@ -168,7 +168,7 @@ void Run(Vector<String>& arguments)
     offsetX = Min((int)offsetX, (int)padX);
     offsetY = Min((int)offsetY, (int)padY);
 
-    Vector<SharedPtr<PackerInfo > > packerInfos;
+    Vector<SharedPtr<PackerInfo>> packerInfos;
 
     for (unsigned i = 0; i < inputFiles.Size(); ++i)
     {
