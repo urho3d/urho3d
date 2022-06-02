@@ -1500,6 +1500,12 @@ endmacro ()
 #  TARGET_PROPERTIES - list of target properties
 macro (setup_executable)
     cmake_parse_arguments (ARG "PRIVATE;TOOL;NODEPS" "" "" ${ARGN})
+
+    if (MSVC)
+        # Set warning level
+        add_compile_options (/W3)
+    endif ()
+
     check_source_files ()
     add_executable (${TARGET_NAME} ${ARG_UNPARSED_ARGUMENTS} ${SOURCE_FILES})
     set (RUNTIME_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
@@ -1630,6 +1636,12 @@ endmacro ()
 #  TARGET_PROPERTIES - list of target properties
 macro (setup_main_executable)
     cmake_parse_arguments (ARG "NOBUNDLE;MACOSX_BUNDLE;WIN32" "" "" ${ARGN})
+
+    if (MSVC)
+        # Set warning level
+        add_compile_options (/W3)
+    endif ()
+
     if (NOT RESOURCE_DIRS)
         define_resource_dirs ()
     endif ()
