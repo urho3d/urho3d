@@ -814,13 +814,13 @@ public:
     /// Test for equality with an integer. To return true, both the type and value must match.
     bool operator ==(int rhs) const { return type_ == VAR_INT ? value_.int_ == rhs : false; }
 
-    /// Test for equality with an unsigned 64 bit integer. To return true, both the type and value must match.
+    /// Test for equality with an unsigned integer. To return true, both the type and value must match.
     bool operator ==(unsigned rhs) const { return type_ == VAR_INT ? value_.int_ == static_cast<int>(rhs) : false; }
 
     /// Test for equality with an 64 bit integer. To return true, both the type and value must match.
     bool operator ==(long long rhs) const { return type_ == VAR_INT64 ? value_.int64_ == rhs : false; }
 
-    /// Test for equality with an unsigned integer. To return true, both the type and value must match.
+    /// Test for equality with an unsigned 64 bit integer. To return true, both the type and value must match.
     bool operator ==(unsigned long long rhs) const { return type_ == VAR_INT64 ? value_.int64_ == static_cast<long long>(rhs) : false; }
 
     /// Test for equality with a bool. To return true, both the type and value must match.
