@@ -92,15 +92,15 @@ struct URHO3D_API RenderPathCommand
     void RemoveShaderParameter(const String& name);
     /// Set number of output rendertargets.
     /// @property
-    void SetNumOutputs(unsigned num);
+    void SetNumOutputs(i32 num);
     /// Set output rendertarget name and face index for cube maps.
-    void SetOutput(unsigned index, const String& name, CubeMapFace face = FACE_POSITIVE_X);
+    void SetOutput(i32 index, const String& name, CubeMapFace face = FACE_POSITIVE_X);
     /// Set output rendertarget name.
     /// @property{set_outputNames}
-    void SetOutputName(unsigned index, const String& name);
+    void SetOutputName(i32 index, const String& name);
     /// Set output rendertarget face index for cube maps.
     /// @property{set_outputFaces}
-    void SetOutputFace(unsigned index, CubeMapFace face);
+    void SetOutputFace(i32 index, CubeMapFace face);
     /// Set depth-stencil output name. When empty, will assign a depth-stencil buffer automatically.
     /// @property
     void SetDepthStencilName(const String& name);
@@ -114,14 +114,14 @@ struct URHO3D_API RenderPathCommand
 
     /// Return number of output rendertargets.
     /// @property
-    unsigned GetNumOutputs() const { return outputs_.Size(); }
+    i32 GetNumOutputs() const { return outputs_.Size(); }
 
     /// Return output rendertarget name.
     /// @property{get_outputNames}
-    const String& GetOutputName(unsigned index) const;
+    const String& GetOutputName(i32 index) const;
     /// Return output rendertarget face index.
     /// @property{get_outputFaces}
-    CubeMapFace GetOutputFace(unsigned index) const;
+    CubeMapFace GetOutputFace(i32 index) const;
 
     /// Return depth-stencil output name.
     /// @property
@@ -232,14 +232,18 @@ public:
 
     /// Return number of rendertargets.
     /// @property
-    unsigned GetNumRenderTargets() const { return renderTargets_.Size(); }
+    i32 GetNumRenderTargets() const { return renderTargets_.Size(); }
 
     /// Return number of commands.
     /// @property
-    unsigned GetNumCommands() const { return commands_.Size(); }
+    i32 GetNumCommands() const { return commands_.Size(); }
 
     /// Return command at index, or null if does not exist.
-    RenderPathCommand* GetCommand(unsigned index) { return index < commands_.Size() ? &commands_[index] : nullptr; }
+    RenderPathCommand* GetCommand(i32 index)
+    {
+        assert(index >= 0);
+        return index < commands_.Size() ? &commands_[index] : nullptr;
+    }
 
     /// Return a shader parameter (first appearance in any command).
     /// @property{get_shaderParameters}
