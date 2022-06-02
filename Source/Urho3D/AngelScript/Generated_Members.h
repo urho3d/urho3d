@@ -2388,36 +2388,36 @@ template <class T> void RegisterMembers_JSONValue(asIScriptEngine* engine, const
 // struct JoystickState | File: ../Input/Input.h
 template <class T> void RegisterMembers_JoystickState(asIScriptEngine* engine, const char* className)
 {
-    // float JoystickState::GetAxisPosition(unsigned index) const
-    engine->RegisterObjectMethod(className, "float GetAxisPosition(uint) const", AS_METHODPR(T, GetAxisPosition, (unsigned) const, float), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "float get_axisPosition(uint) const", AS_METHODPR(T, GetAxisPosition, (unsigned) const, float), AS_CALL_THISCALL);
+    // float JoystickState::GetAxisPosition(i32 index) const
+    engine->RegisterObjectMethod(className, "float GetAxisPosition(int) const", AS_METHODPR(T, GetAxisPosition, (i32) const, float), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "float get_axisPosition(int) const", AS_METHODPR(T, GetAxisPosition, (i32) const, float), AS_CALL_THISCALL);
 
-    // bool JoystickState::GetButtonDown(unsigned index) const
-    engine->RegisterObjectMethod(className, "bool GetButtonDown(uint) const", AS_METHODPR(T, GetButtonDown, (unsigned) const, bool), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "bool get_buttonDown(uint) const", AS_METHODPR(T, GetButtonDown, (unsigned) const, bool), AS_CALL_THISCALL);
+    // bool JoystickState::GetButtonDown(i32 index) const
+    engine->RegisterObjectMethod(className, "bool GetButtonDown(int) const", AS_METHODPR(T, GetButtonDown, (i32) const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_buttonDown(int) const", AS_METHODPR(T, GetButtonDown, (i32) const, bool), AS_CALL_THISCALL);
 
-    // bool JoystickState::GetButtonPress(unsigned index) const
-    engine->RegisterObjectMethod(className, "bool GetButtonPress(uint) const", AS_METHODPR(T, GetButtonPress, (unsigned) const, bool), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "bool get_buttonPress(uint) const", AS_METHODPR(T, GetButtonPress, (unsigned) const, bool), AS_CALL_THISCALL);
+    // bool JoystickState::GetButtonPress(i32 index) const
+    engine->RegisterObjectMethod(className, "bool GetButtonPress(int) const", AS_METHODPR(T, GetButtonPress, (i32) const, bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_buttonPress(int) const", AS_METHODPR(T, GetButtonPress, (i32) const, bool), AS_CALL_THISCALL);
 
-    // int JoystickState::GetHatPosition(unsigned index) const
-    engine->RegisterObjectMethod(className, "int GetHatPosition(uint) const", AS_METHODPR(T, GetHatPosition, (unsigned) const, int), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "int get_hatPosition(uint) const", AS_METHODPR(T, GetHatPosition, (unsigned) const, int), AS_CALL_THISCALL);
+    // int JoystickState::GetHatPosition(i32 index) const
+    engine->RegisterObjectMethod(className, "int GetHatPosition(int) const", AS_METHODPR(T, GetHatPosition, (i32) const, int), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_hatPosition(int) const", AS_METHODPR(T, GetHatPosition, (i32) const, int), AS_CALL_THISCALL);
 
-    // unsigned JoystickState::GetNumAxes() const
-    engine->RegisterObjectMethod(className, "uint GetNumAxes() const", AS_METHODPR(T, GetNumAxes, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numAxes() const", AS_METHODPR(T, GetNumAxes, () const, unsigned), AS_CALL_THISCALL);
+    // i32 JoystickState::GetNumAxes() const
+    engine->RegisterObjectMethod(className, "int GetNumAxes() const", AS_METHODPR(T, GetNumAxes, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numAxes() const", AS_METHODPR(T, GetNumAxes, () const, i32), AS_CALL_THISCALL);
 
-    // unsigned JoystickState::GetNumButtons() const
-    engine->RegisterObjectMethod(className, "uint GetNumButtons() const", AS_METHODPR(T, GetNumButtons, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numButtons() const", AS_METHODPR(T, GetNumButtons, () const, unsigned), AS_CALL_THISCALL);
+    // i32 JoystickState::GetNumButtons() const
+    engine->RegisterObjectMethod(className, "int GetNumButtons() const", AS_METHODPR(T, GetNumButtons, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numButtons() const", AS_METHODPR(T, GetNumButtons, () const, i32), AS_CALL_THISCALL);
 
-    // unsigned JoystickState::GetNumHats() const
-    engine->RegisterObjectMethod(className, "uint GetNumHats() const", AS_METHODPR(T, GetNumHats, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numHats() const", AS_METHODPR(T, GetNumHats, () const, unsigned), AS_CALL_THISCALL);
+    // i32 JoystickState::GetNumHats() const
+    engine->RegisterObjectMethod(className, "int GetNumHats() const", AS_METHODPR(T, GetNumHats, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numHats() const", AS_METHODPR(T, GetNumHats, () const, i32), AS_CALL_THISCALL);
 
-    // void JoystickState::Initialize(unsigned numButtons, unsigned numAxes, unsigned numHats)
-    engine->RegisterObjectMethod(className, "void Initialize(uint, uint, uint)", AS_METHODPR(T, Initialize, (unsigned, unsigned, unsigned), void), AS_CALL_THISCALL);
+    // void JoystickState::Initialize(i32 numButtons, i32 numAxes, i32 numHats)
+    engine->RegisterObjectMethod(className, "void Initialize(int, int, int)", AS_METHODPR(T, Initialize, (i32, i32, i32), void), AS_CALL_THISCALL);
 
     // bool JoystickState::IsController() const
     engine->RegisterObjectMethod(className, "bool IsController() const", AS_METHODPR(T, IsController, () const, bool), AS_CALL_THISCALL);

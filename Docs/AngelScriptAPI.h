@@ -13827,14 +13827,14 @@ class JoystickState
 public:
 // Methods:
 JoystickState&  operator=(const JoystickState&);
-float GetAxisPosition(uint) const;
-bool GetButtonDown(uint) const;
-bool GetButtonPress(uint) const;
-int GetHatPosition(uint) const;
-uint GetNumAxes() const;
-uint GetNumButtons() const;
-uint GetNumHats() const;
-void Initialize(uint, uint, uint);
+float GetAxisPosition(int) const;
+bool GetButtonDown(int) const;
+bool GetButtonPress(int) const;
+int GetHatPosition(int) const;
+int GetNumAxes() const;
+int GetNumButtons() const;
+int GetNumHats() const;
+void Initialize(int, int, int);
 bool IsController() const;
 void Reset();
 
@@ -13852,11 +13852,11 @@ Array<int> hatPosition;
 int joystickID;
 String name;
 /* readonly */
-uint numAxes;
+int numAxes;
 /* readonly */
-uint numButtons;
+int numButtons;
 /* readonly */
-uint numHats;
+int numHats;
 };
 
 class Light

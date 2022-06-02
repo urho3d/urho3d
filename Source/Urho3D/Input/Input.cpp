@@ -309,7 +309,7 @@ int Win32_ResizingEventWatcher(void* data, SDL_Event* event)
 }
 #endif
 
-void JoystickState::Initialize(unsigned numButtons, unsigned numAxes, unsigned numHats)
+void JoystickState::Initialize(i32 numButtons, i32 numAxes, i32 numHats)
 {
     buttons_.Resize(numButtons);
     buttonPress_.Resize(numButtons);
@@ -321,14 +321,16 @@ void JoystickState::Initialize(unsigned numButtons, unsigned numAxes, unsigned n
 
 void JoystickState::Reset()
 {
-    for (unsigned i = 0; i < buttons_.Size(); ++i)
+    for (i32 i = 0; i < buttons_.Size(); ++i)
     {
         buttons_[i] = false;
         buttonPress_[i] = false;
     }
-    for (unsigned i = 0; i < axes_.Size(); ++i)
+
+    for (i32 i = 0; i < axes_.Size(); ++i)
         axes_[i] = 0.0f;
-    for (unsigned i = 0; i < hats_.Size(); ++i)
+
+    for (i32 i = 0; i < hats_.Size(); ++i)
         hats_[i] = HAT_CENTER;
 }
 

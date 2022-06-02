@@ -61,7 +61,8 @@ struct TouchState
 struct JoystickState
 {
     /// Initialize the number of buttons, axes and hats and set them to neutral state.
-    void Initialize(unsigned numButtons, unsigned numAxes, unsigned numHats);
+    void Initialize(i32 numButtons, i32 numAxes, i32 numHats);
+    
     /// Reset button, axis and hat states to neutral.
     void Reset();
 
@@ -71,31 +72,47 @@ struct JoystickState
 
     /// Return number of buttons.
     /// @property
-    unsigned GetNumButtons() const { return buttons_.Size(); }
+    i32 GetNumButtons() const { return buttons_.Size(); }
 
     /// Return number of axes.
     /// @property
-    unsigned GetNumAxes() const { return axes_.Size(); }
+    i32 GetNumAxes() const { return axes_.Size(); }
 
     /// Return number of hats.
     /// @property
-    unsigned GetNumHats() const { return hats_.Size(); }
+    i32 GetNumHats() const { return hats_.Size(); }
 
     /// Check if a button is held down.
     /// @property
-    bool GetButtonDown(unsigned index) const { return index < buttons_.Size() ? buttons_[index] : false; }
+    bool GetButtonDown(i32 index) const
+    {
+        assert(index >= 0);
+        return index < buttons_.Size() ? buttons_[index] : false;
+    }
 
     /// Check if a button has been pressed on this frame.
     /// @property
-    bool GetButtonPress(unsigned index) const { return index < buttonPress_.Size() ? buttonPress_[index] : false; }
+    bool GetButtonPress(i32 index) const
+    {
+        assert(index >= 0);
+        return index < buttonPress_.Size() ? buttonPress_[index] : false;
+    }
 
     /// Return axis position.
     /// @property
-    float GetAxisPosition(unsigned index) const { return index < axes_.Size() ? axes_[index] : 0.0f; }
+    float GetAxisPosition(i32 index) const
+    {
+        assert(index >= 0);
+        return index < axes_.Size() ? axes_[index] : 0.0f;
+    }
 
     /// Return hat position.
     /// @property
-    int GetHatPosition(unsigned index) const { return index < hats_.Size() ? hats_[index] : int(HAT_CENTER); }
+    int GetHatPosition(i32 index) const
+    {
+        assert(index >= 0);
+        return index < hats_.Size() ? hats_[index] : int(HAT_CENTER);
+    }
 
     /// SDL joystick.
     SDL_Joystick* joystick_{};
