@@ -4022,17 +4022,17 @@ template <class T> void RegisterMembers_RenderPathCommand(asIScriptEngine* engin
     engine->RegisterObjectMethod(className, "const String& GetDepthStencilName() const", AS_METHODPR(T, GetDepthStencilName, () const, const String&), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "const String& get_depthStencilName() const", AS_METHODPR(T, GetDepthStencilName, () const, const String&), AS_CALL_THISCALL);
 
-    // unsigned RenderPathCommand::GetNumOutputs() const
-    engine->RegisterObjectMethod(className, "uint GetNumOutputs() const", AS_METHODPR(T, GetNumOutputs, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numOutputs() const", AS_METHODPR(T, GetNumOutputs, () const, unsigned), AS_CALL_THISCALL);
+    // i32 RenderPathCommand::GetNumOutputs() const
+    engine->RegisterObjectMethod(className, "int GetNumOutputs() const", AS_METHODPR(T, GetNumOutputs, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numOutputs() const", AS_METHODPR(T, GetNumOutputs, () const, i32), AS_CALL_THISCALL);
 
-    // CubeMapFace RenderPathCommand::GetOutputFace(unsigned index) const
-    engine->RegisterObjectMethod(className, "CubeMapFace GetOutputFace(uint) const", AS_METHODPR(T, GetOutputFace, (unsigned) const, CubeMapFace), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "CubeMapFace get_outputFaces(uint) const", AS_METHODPR(T, GetOutputFace, (unsigned) const, CubeMapFace), AS_CALL_THISCALL);
+    // CubeMapFace RenderPathCommand::GetOutputFace(i32 index) const
+    engine->RegisterObjectMethod(className, "CubeMapFace GetOutputFace(int) const", AS_METHODPR(T, GetOutputFace, (i32) const, CubeMapFace), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "CubeMapFace get_outputFaces(int) const", AS_METHODPR(T, GetOutputFace, (i32) const, CubeMapFace), AS_CALL_THISCALL);
 
-    // const String& RenderPathCommand::GetOutputName(unsigned index) const
-    engine->RegisterObjectMethod(className, "const String& GetOutputName(uint) const", AS_METHODPR(T, GetOutputName, (unsigned) const, const String&), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "const String& get_outputNames(uint) const", AS_METHODPR(T, GetOutputName, (unsigned) const, const String&), AS_CALL_THISCALL);
+    // const String& RenderPathCommand::GetOutputName(i32 index) const
+    engine->RegisterObjectMethod(className, "const String& GetOutputName(int) const", AS_METHODPR(T, GetOutputName, (i32) const, const String&), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const String& get_outputNames(int) const", AS_METHODPR(T, GetOutputName, (i32) const, const String&), AS_CALL_THISCALL);
 
     // const Variant& RenderPathCommand::GetShaderParameter(const String& name) const
     engine->RegisterObjectMethod(className, "const Variant& GetShaderParameter(const String&in) const", AS_METHODPR(T, GetShaderParameter, (const String&) const, const Variant&), AS_CALL_THISCALL);
@@ -4052,20 +4052,20 @@ template <class T> void RegisterMembers_RenderPathCommand(asIScriptEngine* engin
     engine->RegisterObjectMethod(className, "void SetDepthStencilName(const String&in)", AS_METHODPR(T, SetDepthStencilName, (const String&), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_depthStencilName(const String&in)", AS_METHODPR(T, SetDepthStencilName, (const String&), void), AS_CALL_THISCALL);
 
-    // void RenderPathCommand::SetNumOutputs(unsigned num)
-    engine->RegisterObjectMethod(className, "void SetNumOutputs(uint)", AS_METHODPR(T, SetNumOutputs, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_numOutputs(uint)", AS_METHODPR(T, SetNumOutputs, (unsigned), void), AS_CALL_THISCALL);
+    // void RenderPathCommand::SetNumOutputs(i32 num)
+    engine->RegisterObjectMethod(className, "void SetNumOutputs(int)", AS_METHODPR(T, SetNumOutputs, (i32), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_numOutputs(int)", AS_METHODPR(T, SetNumOutputs, (i32), void), AS_CALL_THISCALL);
 
-    // void RenderPathCommand::SetOutput(unsigned index, const String& name, CubeMapFace face = FACE_POSITIVE_X)
-    engine->RegisterObjectMethod(className, "void SetOutput(uint, const String&in, CubeMapFace = FACE_POSITIVE_X)", AS_METHODPR(T, SetOutput, (unsigned, const String&, CubeMapFace), void), AS_CALL_THISCALL);
+    // void RenderPathCommand::SetOutput(i32 index, const String& name, CubeMapFace face = FACE_POSITIVE_X)
+    engine->RegisterObjectMethod(className, "void SetOutput(int, const String&in, CubeMapFace = FACE_POSITIVE_X)", AS_METHODPR(T, SetOutput, (i32, const String&, CubeMapFace), void), AS_CALL_THISCALL);
 
-    // void RenderPathCommand::SetOutputFace(unsigned index, CubeMapFace face)
-    engine->RegisterObjectMethod(className, "void SetOutputFace(uint, CubeMapFace)", AS_METHODPR(T, SetOutputFace, (unsigned, CubeMapFace), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_outputFaces(uint, CubeMapFace)", AS_METHODPR(T, SetOutputFace, (unsigned, CubeMapFace), void), AS_CALL_THISCALL);
+    // void RenderPathCommand::SetOutputFace(i32 index, CubeMapFace face)
+    engine->RegisterObjectMethod(className, "void SetOutputFace(int, CubeMapFace)", AS_METHODPR(T, SetOutputFace, (i32, CubeMapFace), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_outputFaces(int, CubeMapFace)", AS_METHODPR(T, SetOutputFace, (i32, CubeMapFace), void), AS_CALL_THISCALL);
 
-    // void RenderPathCommand::SetOutputName(unsigned index, const String& name)
-    engine->RegisterObjectMethod(className, "void SetOutputName(uint, const String&in)", AS_METHODPR(T, SetOutputName, (unsigned, const String&), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_outputNames(uint, const String&in)", AS_METHODPR(T, SetOutputName, (unsigned, const String&), void), AS_CALL_THISCALL);
+    // void RenderPathCommand::SetOutputName(i32 index, const String& name)
+    engine->RegisterObjectMethod(className, "void SetOutputName(int, const String&in)", AS_METHODPR(T, SetOutputName, (i32, const String&), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_outputNames(int, const String&in)", AS_METHODPR(T, SetOutputName, (i32, const String&), void), AS_CALL_THISCALL);
 
     // void RenderPathCommand::SetShaderParameter(const String& name, const Variant& value)
     engine->RegisterObjectMethod(className, "void SetShaderParameter(const String&in, const Variant&in)", AS_METHODPR(T, SetShaderParameter, (const String&, const Variant&), void), AS_CALL_THISCALL);
@@ -8383,7 +8383,7 @@ template <class T> void RegisterMembers_RenderPath(asIScriptEngine* engine, cons
 {
     RegisterMembers_RefCounted<T>(engine, className);
 
-    // RenderPathCommand* RenderPath::GetCommand(unsigned index)
+    // RenderPathCommand* RenderPath::GetCommand(i32 index)
     // Error: type "RenderPathCommand*" can not automatically bind
 
     // void RenderPath::AddCommand(const RenderPathCommand& command)
@@ -8398,13 +8398,13 @@ template <class T> void RegisterMembers_RenderPath(asIScriptEngine* engine, cons
     // SharedPtr<RenderPath> RenderPath::Clone()
     engine->RegisterObjectMethod(className, "RenderPath@+ Clone()", AS_FUNCTION_OBJFIRST(RenderPath_SharedPtrlesRenderPathgre_Clone_void_template<RenderPath>), AS_CALL_CDECL_OBJFIRST);
 
-    // unsigned RenderPath::GetNumCommands() const
-    engine->RegisterObjectMethod(className, "uint GetNumCommands() const", AS_METHODPR(T, GetNumCommands, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numCommands() const", AS_METHODPR(T, GetNumCommands, () const, unsigned), AS_CALL_THISCALL);
+    // i32 RenderPath::GetNumCommands() const
+    engine->RegisterObjectMethod(className, "int GetNumCommands() const", AS_METHODPR(T, GetNumCommands, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numCommands() const", AS_METHODPR(T, GetNumCommands, () const, i32), AS_CALL_THISCALL);
 
-    // unsigned RenderPath::GetNumRenderTargets() const
-    engine->RegisterObjectMethod(className, "uint GetNumRenderTargets() const", AS_METHODPR(T, GetNumRenderTargets, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numRenderTargets() const", AS_METHODPR(T, GetNumRenderTargets, () const, unsigned), AS_CALL_THISCALL);
+    // i32 RenderPath::GetNumRenderTargets() const
+    engine->RegisterObjectMethod(className, "int GetNumRenderTargets() const", AS_METHODPR(T, GetNumRenderTargets, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numRenderTargets() const", AS_METHODPR(T, GetNumRenderTargets, () const, i32), AS_CALL_THISCALL);
 
     // const Variant& RenderPath::GetShaderParameter(const String& name) const
     engine->RegisterObjectMethod(className, "const Variant& GetShaderParameter(const String&in) const", AS_METHODPR(T, GetShaderParameter, (const String&) const, const Variant&), AS_CALL_THISCALL);
