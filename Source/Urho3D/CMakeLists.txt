@@ -6,7 +6,7 @@ set (TARGET_NAME Urho3D)
 
 if (MSVC)
     # Set warning level for Urho3D project
-    add_compile_options(/W3)
+    add_compile_options (/W3)
 endif ()
 
 # Prevent ICE from old MinGW versions, workaround from the GCC bugzilla https://gcc.gnu.org/bugzilla/show_bug.cgi?id=61189
