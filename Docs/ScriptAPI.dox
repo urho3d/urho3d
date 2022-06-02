@@ -3439,6 +3439,7 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - Variant GetAttributeDefault(uint) const
+- SourceBatch[]@ GetBatches() const
 - bool GetBlockEvents() const
 - bool GetCastShadows() const
 - Component@ GetComponent(StringHash) const
@@ -3466,6 +3467,7 @@ Methods:
 - float GetMorphWeight(StringHash) const
 - float GetMorphWeight(const String&) const
 - float GetMorphWeight(uint) const
+- ModelMorph[]@ GetMorphs() const
 - Node@ GetNode() const
 - uint GetNumAnimationStates() const
 - uint GetNumAttributes() const
@@ -3697,6 +3699,7 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - Variant GetAttributeDefault(uint) const
+- SourceBatch[]@ GetBatches() const
 - BlendMode GetBlendMode() const
 - bool GetBlockEvents() const
 - bool GetCastShadows() const
@@ -3734,6 +3737,7 @@ Methods:
 - float GetShadowDistance() const
 - uint GetShadowMask() const
 - float GetSortValue() const
+- SourceBatch2D[]@ GetSourceBatches()
 - float GetSpeed() const
 - Sprite2D@ GetSprite() const
 - ResourceRef GetSpriteAttr() const
@@ -3967,6 +3971,7 @@ Methods:
 - AnimationTrack@ GetTrack(StringHash)
 - AnimationTrack@ GetTrack(const String&)
 - AnimationTrack@ GetTrack(uint)
+- AnimationTriggerPoint[]@ GetTriggers() const
 - StringHash GetType() const
 - uint GetUseTimer()
 - bool HasEventHandlers() const
@@ -4817,6 +4822,7 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - Variant GetAttributeDefault(uint) const
+- SourceBatch[]@ GetBatches() const
 - Billboard@ GetBillboard(uint)
 - bool GetBlockEvents() const
 - bool GetCastShadows() const
@@ -11311,6 +11317,7 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - Variant GetAttributeDefault(uint) const
+- SourceBatch[]@ GetBatches() const
 - bool GetBlockEvents() const
 - bool GetCastShadows() const
 - Component@ GetComponent(StringHash) const
@@ -11933,6 +11940,7 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - Variant GetAttributeDefault(uint) const
+- SourceBatch[]@ GetBatches() const
 - bool GetBlockEvents() const
 - bool GetCastShadows() const
 - Component@ GetComponent(StringHash) const
@@ -12336,6 +12344,7 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - Variant GetAttributeDefault(uint) const
+- SourceBatch[]@ GetBatches() const
 - bool GetBlockEvents() const
 - bool GetCastShadows() const
 - Component@ GetComponent(StringHash) const
@@ -12568,6 +12577,7 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - Variant GetAttributeDefault(uint) const
+- SourceBatch[]@ GetBatches() const
 - bool GetBlockEvents() const
 - bool GetCastShadows() const
 - Component@ GetComponent(StringHash) const
@@ -12599,6 +12609,7 @@ Methods:
 - float GetShadowDistance() const
 - uint GetShadowMask() const
 - float GetSortValue() const
+- SourceBatch2D[]@ GetSourceBatches()
 - Object@ GetSubsystem(StringHash) const
 - StringHash GetType() const
 - UpdateGeometryType GetUpdateGeometryType()
@@ -14194,7 +14205,7 @@ Properties:
 - float height
 - float offsetX
 - float offsetY
-- uint page
+- int page
 - int16 texHeight
 - int16 texWidth
 - bool used
@@ -15913,6 +15924,7 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - Variant GetAttributeDefault(uint) const
+- SourceBatch[]@ GetBatches() const
 - bool GetBlockEvents() const
 - float GetBrightness() const
 - bool GetCastShadows() const
@@ -16245,7 +16257,7 @@ Methods:
 - IntRect GetCombinedScreenRect()
 - BorderImage@ GetCursor() const
 - float GetCursorBlinkRate() const
-- uint GetCursorPosition() const
+- int GetCursorPosition() const
 - XMLFile@ GetDefaultStyle(bool = true) const
 - float GetDerivedOpacity() const
 - uint GetDragButtonCombo() const
@@ -16270,7 +16282,7 @@ Methods:
 - Material@ GetMaterial() const
 - ResourceRef GetMaterialAttr() const
 - int GetMaxHeight() const
-- uint GetMaxLength() const
+- int GetMaxLength() const
 - int GetMaxWidth() const
 - int GetMinHeight() const
 - int GetMinWidth() const
@@ -16419,7 +16431,7 @@ Methods:
 - void SetColor(const Color&)
 - void SetCursorBlinkRate(float)
 - void SetCursorMovable(bool)
-- void SetCursorPosition(uint)
+- void SetCursorPosition(int)
 - void SetDeepEnabled(bool)
 - void SetDefaultStyle(XMLFile@)
 - void SetDisabledOffset(const IntVector2&)
@@ -16461,7 +16473,7 @@ Methods:
 - void SetMaxAnchor(const Vector2&)
 - void SetMaxAnchor(float, float)
 - void SetMaxHeight(int)
-- void SetMaxLength(uint)
+- void SetMaxLength(int)
 - void SetMaxOffset(const IntVector2&)
 - void SetMaxSize(const IntVector2&)
 - void SetMaxSize(int, int)
@@ -16560,7 +16572,7 @@ Properties:
 - BorderImage@ cursor // readonly
 - float cursorBlinkRate
 - bool cursorMovable
-- uint cursorPosition
+- int cursorPosition
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
 - IntVector2 disabledOffset
@@ -16597,7 +16609,7 @@ Properties:
 - Material@ material
 - Vector2 maxAnchor
 - int maxHeight
-- uint maxLength
+- int maxLength
 - IntVector2 maxOffset
 - IntVector2 maxSize
 - int maxWidth
@@ -17462,6 +17474,7 @@ Methods:
 - bool GetSpecular() const
 - Object@ GetSubsystem(StringHash) const
 - Technique@ GetTechnique(uint) const
+- TechniqueEntry[]@ GetTechniques() const
 - Texture@ GetTexture(TextureUnit) const
 - StringHash GetType() const
 - uint GetUseTimer()
@@ -18292,6 +18305,7 @@ Methods:
 - uint GetMemoryUse() const
 - uint GetMorphRangeCount(uint) const
 - uint GetMorphRangeStart(uint) const
+- ModelMorph[]@ GetMorphs() const
 - StringHash GetNameHash() const
 - uint GetNumGeometries() const
 - uint GetNumGeometryLodLevels(uint) const
@@ -18335,6 +18349,7 @@ Methods:
 - void SetGlobalVar(StringHash, const Variant&)
 - bool SetIndexBuffers(IndexBuffer@[]@)
 - void SetMemoryUse(uint)
+- void SetMorphs(ModelMorph[]@)
 - void SetName(const String&)
 - void SetNumGeometries(uint)
 - bool SetNumGeometryLodLevels(uint, uint)
@@ -19331,7 +19346,7 @@ Properties:
 
 Methods:
 
-- void AddChild(Node@, int = NINDEX)
+- void AddChild(Node@, int = ENDPOS)
 - void AddComponent(Component@, uint, CreateMode)
 - void AddListener(Component@)
 - void AddTag(const String&)
@@ -21205,6 +21220,7 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - Variant GetAttributeDefault(uint) const
 - AutoRemoveMode GetAutoRemoveMode() const
+- SourceBatch[]@ GetBatches() const
 - Billboard@ GetBillboard(uint)
 - bool GetBlockEvents() const
 - bool GetCastShadows() const
@@ -21456,6 +21472,7 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - Variant GetAttributeDefault(uint) const
+- SourceBatch[]@ GetBatches() const
 - BlendMode GetBlendMode() const
 - bool GetBlockEvents() const
 - bool GetCastShadows() const
@@ -21491,6 +21508,7 @@ Methods:
 - float GetShadowDistance() const
 - uint GetShadowMask() const
 - float GetSortValue() const
+- SourceBatch2D[]@ GetSourceBatches()
 - Sprite2D@ GetSprite() const
 - ResourceRef GetSpriteAttr() const
 - Object@ GetSubsystem(StringHash) const
@@ -23477,8 +23495,8 @@ Methods:
 - void AddRenderTarget(const RenderTargetInfo&)
 - bool Append(XMLFile@)
 - RenderPath@ Clone()
-- uint GetNumCommands() const
-- uint GetNumRenderTargets() const
+- int GetNumCommands() const
+- int GetNumRenderTargets() const
 - void InsertCommand(uint, const RenderPathCommand&)
 - bool IsAdded(const String&) const
 - bool IsEnabled(const String&) const
@@ -23504,8 +23522,8 @@ Properties:
 - bool[] added // readonly
 - RenderPathCommand[] commands
 - bool[] enabled // readonly
-- uint numCommands // readonly
-- uint numRenderTargets // readonly
+- int numCommands // readonly
+- int numRenderTargets // readonly
 - int refs // readonly
 - RenderTargetInfo[] renderTargets
 - Variant[] shaderParameters
@@ -23518,19 +23536,19 @@ Properties:
 Methods:
 
 - RenderPathCommand&  operator=(const RenderPathCommand&)
-- uint GetNumOutputs() const
-- CubeMapFace GetOutputFace(uint) const
+- int GetNumOutputs() const
+- CubeMapFace GetOutputFace(int) const
 - void Load(const XMLElement&)
 - void RemoveShaderParameter(const String&)
 - void SetDepthStencilName(const String&)
-- void SetNumOutputs(uint)
-- void SetOutput(uint, const String&, CubeMapFace = FACE_POSITIVE_X)
-- void SetOutputFace(uint, CubeMapFace)
-- void SetOutputName(uint, const String&)
+- void SetNumOutputs(int)
+- void SetOutput(int, const String&, CubeMapFace = FACE_POSITIVE_X)
+- void SetOutputFace(int, CubeMapFace)
+- void SetOutputName(int, const String&)
 - void SetShaderParameter(const String&, const Variant&)
 - void SetTextureName(TextureUnit, const String&)
 - const String& GetDepthStencilName() const
-- const String& GetOutputName(uint) const
+- const String& GetOutputName(int) const
 - const String& GetTextureName(TextureUnit) const
 - const Variant& GetShaderParameter(const String&) const
 
@@ -23547,7 +23565,7 @@ Properties:
 - String eventName
 - bool markToStencil
 - String metadata
-- uint numOutputs
+- int numOutputs
 - CubeMapFace[] outputFaces
 - String[] outputNames
 - String pass
@@ -23854,6 +23872,7 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - Variant GetAttributeDefault(uint) const
+- SourceBatch[]@ GetBatches() const
 - bool GetBlockEvents() const
 - bool GetCastShadows() const
 - Component@ GetComponent(StringHash) const
@@ -24424,6 +24443,7 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - Variant GetAttributeDefault(uint) const
+- SourceBatch[]@ GetBatches() const
 - bool GetBlockEvents() const
 - bool GetCastShadows() const
 - Component@ GetComponent(StringHash) const
@@ -25055,7 +25075,7 @@ Properties:
 
 Methods:
 
-- void AddChild(Node@, int = NINDEX)
+- void AddChild(Node@, int = ENDPOS)
 - void AddComponent(Component@, uint, CreateMode)
 - void AddListener(Component@)
 - void AddRequiredPackageFile(PackageFile@)
@@ -27260,6 +27280,7 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - Variant GetAttributeDefault(uint) const
+- SourceBatch[]@ GetBatches() const
 - bool GetBlockEvents() const
 - bool GetCastShadows() const
 - Component@ GetComponent(StringHash) const
@@ -28718,6 +28739,7 @@ Methods:
 - void RemoveKnot(uint)
 - void SetInterpolationMode(InterpolationMode)
 - void SetKnot(const Variant&, uint)
+- void SetKnots(Variant[]@)
 
 Properties:
 
@@ -29478,6 +29500,7 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - Variant GetAttributeDefault(uint) const
+- SourceBatch[]@ GetBatches() const
 - bool GetBlockEvents() const
 - bool GetCastShadows() const
 - Component@ GetComponent(StringHash) const
@@ -29718,6 +29741,7 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - Variant GetAttributeDefault(uint) const
+- SourceBatch[]@ GetBatches() const
 - bool GetBlockEvents() const
 - bool GetCastShadows() const
 - Component@ GetComponent(StringHash) const
@@ -29950,6 +29974,7 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - Variant GetAttributeDefault(uint) const
+- SourceBatch[]@ GetBatches() const
 - BlendMode GetBlendMode() const
 - bool GetBlockEvents() const
 - bool GetCastShadows() const
@@ -29986,6 +30011,7 @@ Methods:
 - float GetShadowDistance() const
 - uint GetShadowMask() const
 - float GetSortValue() const
+- SourceBatch2D[]@ GetSourceBatches()
 - Sprite2D@ GetSprite() const
 - ResourceRef GetSpriteAttr() const
 - Object@ GetSubsystem(StringHash) const
@@ -30222,6 +30248,7 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - Variant GetAttributeDefault(uint) const
+- SourceBatch[]@ GetBatches() const
 - BlendMode GetBlendMode() const
 - bool GetBlockEvents() const
 - bool GetCastShadows() const
@@ -30258,6 +30285,7 @@ Methods:
 - float GetShadowDistance() const
 - uint GetShadowMask() const
 - float GetSortValue() const
+- SourceBatch2D[]@ GetSourceBatches()
 - Sprite2D@ GetSprite() const
 - ResourceRef GetSpriteAttr() const
 - Object@ GetSubsystem(StringHash) const
@@ -30960,6 +30988,7 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - Variant GetAttributeDefault(uint) const
+- SourceBatch[]@ GetBatches() const
 - bool GetBlockEvents() const
 - bool GetCastShadows() const
 - Component@ GetComponent(StringHash) const
@@ -31630,6 +31659,7 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - Variant GetAttributeDefault(uint) const
+- SourceBatch[]@ GetBatches() const
 - bool GetBlockEvents() const
 - bool GetCastShadows() const
 - Vector2 GetCharPosition(int)
@@ -35080,6 +35110,7 @@ Methods:
 - VariantMap& GetEventDataMap() const
 - Object@ GetEventSender() const
 - InterpMethod GetInterpolationMethod() const
+- VAnimKeyFrame[]@ GetKeyFrames() const
 - uint GetMemoryUse() const
 - StringHash GetNameHash() const
 - float GetSplineTension() const
@@ -35732,6 +35763,7 @@ Methods:
 - Object@ GetEventSender() const
 - Drawable@[]@ GetGeometries() const
 - Graphics@ GetGraphics() const
+- LightBatchQueue[]@ GetLightQueues() const
 - Light@[]@ GetLights() const
 - uint GetNumActiveOccluders() const
 - Drawable@[]@ GetOccluders() const
@@ -37126,6 +37158,7 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - Variant GetAttributeDefault(uint) const
+- SourceBatch[]@ GetBatches() const
 - bool GetBlockEvents() const
 - bool GetCastShadows() const
 - Component@ GetComponent(StringHash) const
@@ -38616,6 +38649,7 @@ Properties:
 - uint DRAWABLE_LIGHT
 - uint DRAWABLE_UNDEFINED
 - uint DRAWABLE_ZONE
+- int ENDPOS
 - String EP_AUTOLOAD_PATHS
 - String EP_BORDERLESS
 - String EP_DIRECT3D11
