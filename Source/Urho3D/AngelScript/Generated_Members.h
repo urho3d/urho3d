@@ -1561,8 +1561,8 @@ template <class T> void RegisterMembers_FontGlyph(asIScriptEngine* engine, const
     // float FontGlyph::advanceX_
     engine->RegisterObjectProperty(className, "float advanceX", offsetof(T, advanceX_));
 
-    // unsigned FontGlyph::page_
-    engine->RegisterObjectProperty(className, "uint page", offsetof(T, page_));
+    // i32 FontGlyph::page_
+    engine->RegisterObjectProperty(className, "int page", offsetof(T, page_));
 
     // bool FontGlyph::used_
     engine->RegisterObjectProperty(className, "bool used", offsetof(T, used_));

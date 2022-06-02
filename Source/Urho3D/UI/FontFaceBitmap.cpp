@@ -119,7 +119,8 @@ bool FontFaceBitmap::Load(const unsigned char* fontData, unsigned fontDataSize, 
         glyph.offsetX_ = (short)charElem.GetInt("xoffset");
         glyph.offsetY_ = (short)charElem.GetInt("yoffset");
         glyph.advanceX_ = (short)charElem.GetInt("xadvance");
-        glyph.page_ = charElem.GetUInt("page");
+        glyph.page_ = charElem.GetInt("page");
+        assert(glyph.page_ >= 0);
 
         glyphMapping_[id] = glyph;
 
@@ -304,7 +305,7 @@ bool FontFaceBitmap::Save(Serializer& dest, int pointSize, const String& indenta
         charElem.SetInt("xoffset", glyph.offsetX_);
         charElem.SetInt("yoffset", glyph.offsetY_);
         charElem.SetInt("xadvance", glyph.advanceX_);
-        charElem.SetUInt("page", glyph.page_);
+        charElem.SetInt("page", glyph.page_);
     }
 
     if (!kerningMapping_.Empty())
