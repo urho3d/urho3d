@@ -26,7 +26,7 @@ LineEdit::LineEdit(Context* context) :
     lastFont_(nullptr),
     lastFontSize_(0),
     cursorPosition_(0),
-    dragBeginCursor_(M_MAX_UNSIGNED),
+    dragBeginCursor_(NINDEX),
     cursorBlinkRate_(1.0f),
     cursorBlinkTimer_(0.0f),
     maxLength_(0),
@@ -101,8 +101,8 @@ void LineEdit::OnClickBegin(const IntVector2& position, const IntVector2& screen
 {
     if (button == MOUSEB_LEFT && cursorMovable_)
     {
-        unsigned pos = GetCharIndex(position);
-        if (pos != M_MAX_UNSIGNED)
+        i32 pos = GetCharIndex(position);
+        if (pos != NINDEX)
         {
             SetCursorPosition(pos);
             text_->ClearSelection();
@@ -130,9 +130,9 @@ void LineEdit::OnDragMove(const IntVector2& position, const IntVector2& screenPo
 {
     if (cursorMovable_ && textSelectable_)
     {
-        unsigned start = dragBeginCursor_;
-        unsigned current = GetCharIndex(position);
-        if (start != M_MAX_UNSIGNED && current != M_MAX_UNSIGNED)
+        i32 start = dragBeginCursor_;
+        i32 current = GetCharIndex(position);
+        if (start != NINDEX && current != NINDEX)
         {
             if (start < current)
                 text_->SetSelection(start, current - start);
@@ -263,8 +263,8 @@ void LineEdit::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifier
 
             if (textSelectable_ && qualifiers & QUAL_SHIFT)
             {
-                unsigned start = dragBeginCursor_;
-                unsigned current = cursorPosition_;
+                i32 start = dragBeginCursor_;
+                i32 current = cursorPosition_;
                 if (start < current)
                     text_->SetSelection(start, current - start);
                 else
@@ -295,8 +295,8 @@ void LineEdit::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifier
 
             if (textSelectable_ && qualifiers & QUAL_SHIFT)
             {
-                unsigned start = dragBeginCursor_;
-                unsigned current = cursorPosition_;
+                i32 start = dragBeginCursor_;
+                i32 current = cursorPosition_;
                 if (start < current)
                     text_->SetSelection(start, current - start);
                 else
@@ -469,8 +469,10 @@ void LineEdit::SetText(const String& text)
     }
 }
 
-void LineEdit::SetCursorPosition(unsigned position)
+void LineEdit::SetCursorPosition(i32 position)
 {
+    assert(position >= 0);
+
     if (position > line_.LengthUTF8() || !cursorMovable_)
         position = line_.LengthUTF8();
 
@@ -489,8 +491,9 @@ void LineEdit::SetCursorBlinkRate(float rate)
         cursorBlinkTimer_ = 0.0f;   // Cursor does not blink, i.e. always visible
 }
 
-void LineEdit::SetMaxLength(unsigned length)
+void LineEdit::SetMaxLength(i32 length)
 {
+    assert(length >= 0);
     maxLength_ = length;
 }
 
@@ -582,7 +585,7 @@ void LineEdit::UpdateText()
 
 void LineEdit::UpdateCursor()
 {
-    int x = text_->GetCharPosition(cursorPosition_).x_;
+    i32 x = text_->GetCharPosition(cursorPosition_).x_;
 
     text_->SetPosition(GetIndentWidth() + clipBorder_.left_, clipBorder_.top_);
     cursor_->SetPosition(text_->GetPosition() + IntVector2(x, 0));
@@ -593,9 +596,9 @@ void LineEdit::UpdateCursor()
     SDL_SetTextInputRect(&rect);
 
     // Scroll if necessary
-    int sx = -GetChildOffset().x_;
-    int left = clipBorder_.left_;
-    int right = GetWidth() - clipBorder_.left_ - clipBorder_.right_ - cursor_->GetWidth();
+    i32 sx = -GetChildOffset().x_;
+    i32 left = clipBorder_.left_;
+    i32 right = GetWidth() - clipBorder_.left_ - clipBorder_.right_ - cursor_->GetWidth();
     if (x - sx > right)
         sx = x - right;
     if (x - sx < left)
@@ -608,7 +611,7 @@ void LineEdit::UpdateCursor()
     cursorBlinkTimer_ = 0.0f;
 }
 
-unsigned LineEdit::GetCharIndex(const IntVector2& position)
+i32 LineEdit::GetCharIndex(const IntVector2& position)
 {
     IntVector2 screenPosition = ElementToScreen(position);
     IntVector2 textPosition = text_->ScreenToElement(screenPosition);
@@ -616,13 +619,13 @@ unsigned LineEdit::GetCharIndex(const IntVector2& position)
     if (textPosition.x_ < 0)
         return 0;
 
-    for (int i = text_->GetNumChars(); i >= 0; --i)
+    for (i32 i = text_->GetNumChars(); i >= 0; --i)
     {
-        if (textPosition.x_ >= text_->GetCharPosition((unsigned)i).x_)
-            return (unsigned)i;
+        if (textPosition.x_ >= text_->GetCharPosition(i).x_)
+            return i;
     }
 
-    return M_MAX_UNSIGNED;
+    return NINDEX;
 }
 
 void LineEdit::HandleFocused(StringHash /*eventType*/, VariantMap& eventData)

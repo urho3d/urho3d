@@ -22259,17 +22259,17 @@ template <class T> void RegisterMembers_LineEdit(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "float GetCursorBlinkRate() const", AS_METHODPR(T, GetCursorBlinkRate, () const, float), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_cursorBlinkRate() const", AS_METHODPR(T, GetCursorBlinkRate, () const, float), AS_CALL_THISCALL);
 
-    // unsigned LineEdit::GetCursorPosition() const
-    engine->RegisterObjectMethod(className, "uint GetCursorPosition() const", AS_METHODPR(T, GetCursorPosition, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_cursorPosition() const", AS_METHODPR(T, GetCursorPosition, () const, unsigned), AS_CALL_THISCALL);
+    // i32 LineEdit::GetCursorPosition() const
+    engine->RegisterObjectMethod(className, "int GetCursorPosition() const", AS_METHODPR(T, GetCursorPosition, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_cursorPosition() const", AS_METHODPR(T, GetCursorPosition, () const, i32), AS_CALL_THISCALL);
 
     // c32 LineEdit::GetEchoCharacter() const
     engine->RegisterObjectMethod(className, "c32 GetEchoCharacter() const", AS_METHODPR(T, GetEchoCharacter, () const, c32), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "c32 get_echoCharacter() const", AS_METHODPR(T, GetEchoCharacter, () const, c32), AS_CALL_THISCALL);
 
-    // unsigned LineEdit::GetMaxLength() const
-    engine->RegisterObjectMethod(className, "uint GetMaxLength() const", AS_METHODPR(T, GetMaxLength, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_maxLength() const", AS_METHODPR(T, GetMaxLength, () const, unsigned), AS_CALL_THISCALL);
+    // i32 LineEdit::GetMaxLength() const
+    engine->RegisterObjectMethod(className, "int GetMaxLength() const", AS_METHODPR(T, GetMaxLength, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_maxLength() const", AS_METHODPR(T, GetMaxLength, () const, i32), AS_CALL_THISCALL);
 
     // const String& LineEdit::GetText() const
     engine->RegisterObjectMethod(className, "const String& GetText() const", AS_METHODPR(T, GetText, () const, const String&), AS_CALL_THISCALL);
@@ -22299,17 +22299,17 @@ template <class T> void RegisterMembers_LineEdit(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "void SetCursorMovable(bool)", AS_METHODPR(T, SetCursorMovable, (bool), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_cursorMovable(bool)", AS_METHODPR(T, SetCursorMovable, (bool), void), AS_CALL_THISCALL);
 
-    // void LineEdit::SetCursorPosition(unsigned position)
-    engine->RegisterObjectMethod(className, "void SetCursorPosition(uint)", AS_METHODPR(T, SetCursorPosition, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_cursorPosition(uint)", AS_METHODPR(T, SetCursorPosition, (unsigned), void), AS_CALL_THISCALL);
+    // void LineEdit::SetCursorPosition(i32 position)
+    engine->RegisterObjectMethod(className, "void SetCursorPosition(int)", AS_METHODPR(T, SetCursorPosition, (i32), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_cursorPosition(int)", AS_METHODPR(T, SetCursorPosition, (i32), void), AS_CALL_THISCALL);
 
     // void LineEdit::SetEchoCharacter(c32 c)
     engine->RegisterObjectMethod(className, "void SetEchoCharacter(c32)", AS_METHODPR(T, SetEchoCharacter, (c32), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_echoCharacter(c32)", AS_METHODPR(T, SetEchoCharacter, (c32), void), AS_CALL_THISCALL);
 
-    // void LineEdit::SetMaxLength(unsigned length)
-    engine->RegisterObjectMethod(className, "void SetMaxLength(uint)", AS_METHODPR(T, SetMaxLength, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_maxLength(uint)", AS_METHODPR(T, SetMaxLength, (unsigned), void), AS_CALL_THISCALL);
+    // void LineEdit::SetMaxLength(i32 length)
+    engine->RegisterObjectMethod(className, "void SetMaxLength(int)", AS_METHODPR(T, SetMaxLength, (i32), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_maxLength(int)", AS_METHODPR(T, SetMaxLength, (i32), void), AS_CALL_THISCALL);
 
     // void LineEdit::SetText(const String& text)
     engine->RegisterObjectMethod(className, "void SetText(const String&in)", AS_METHODPR(T, SetText, (const String&), void), AS_CALL_THISCALL);
