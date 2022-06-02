@@ -18777,9 +18777,9 @@ template <class T> void RegisterMembers_Terrain(asIScriptEngine* engine, const c
     engine->RegisterObjectMethod(className, "uint GetOcclusionLodLevel() const", AS_METHODPR(T, GetOcclusionLodLevel, () const, unsigned), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_occlusionLodLevel() const", AS_METHODPR(T, GetOcclusionLodLevel, () const, unsigned), AS_CALL_THISCALL);
 
-    // TerrainPatch* Terrain::GetPatch(unsigned index) const
-    engine->RegisterObjectMethod(className, "TerrainPatch@+ GetPatch(uint) const", AS_METHODPR(T, GetPatch, (unsigned) const, TerrainPatch*), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "TerrainPatch@+ get_patches(uint) const", AS_METHODPR(T, GetPatch, (unsigned) const, TerrainPatch*), AS_CALL_THISCALL);
+    // TerrainPatch* Terrain::GetPatch(i32 index) const
+    engine->RegisterObjectMethod(className, "TerrainPatch@+ GetPatch(int) const", AS_METHODPR(T, GetPatch, (i32) const, TerrainPatch*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "TerrainPatch@+ get_patches(int) const", AS_METHODPR(T, GetPatch, (i32) const, TerrainPatch*), AS_CALL_THISCALL);
 
     // TerrainPatch* Terrain::GetPatch(int x, int z) const
     engine->RegisterObjectMethod(className, "TerrainPatch@+ GetPatch(int, int) const", AS_METHODPR(T, GetPatch, (int, int) const, TerrainPatch*), AS_CALL_THISCALL);

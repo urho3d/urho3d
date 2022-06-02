@@ -141,7 +141,7 @@ public:
     Material* GetMaterial() const;
     /// Return patch by index.
     /// @property{get_patches}
-    TerrainPatch* GetPatch(unsigned index) const;
+    TerrainPatch* GetPatch(i32 index) const;
     /// Return patch by patch coordinates.
     TerrainPatch* GetPatch(int x, int z) const;
     /// Return patch by patch coordinates including neighbor terrains.
