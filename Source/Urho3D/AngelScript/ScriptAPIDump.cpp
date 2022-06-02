@@ -196,10 +196,10 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
 
         /// \hack Rename any Events2D to 2DEvents to work with the event category creation correctly (currently PhysicsEvents2D)
         Vector<HeaderFile> headerFiles;
-        for (unsigned i = 0; i < headerFileNames.Size(); ++i)
+        for (const String& headerFileName : headerFileNames)
         {
             HeaderFile entry;
-            entry.fileName = headerFileNames[i];
+            entry.fileName = headerFileName;
             entry.sectionName = GetFileNameAndExtension(entry.fileName).Replaced("Events2D", "2DEvents");
             if (entry.sectionName.EndsWith("Events.h"))
                 headerFiles.Push(entry);
@@ -210,13 +210,13 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
             Log::WriteRaw("\n\\page EventList Event list\n");
             Sort(headerFiles.Begin(), headerFiles.End(), CompareHeaderFiles);
 
-            for (unsigned i = 0; i < headerFiles.Size(); ++i)
+            for (const HeaderFile& headerFile : headerFiles)
             {
-                SharedPtr<File> file(new File(context_, path + headerFiles[i].fileName, FILE_READ));
+                SharedPtr<File> file(new File(context_, path + headerFile.fileName, FILE_READ));
                 if (!file->IsOpen())
                     continue;
 
-                const String& sectionName = headerFiles[i].sectionName;
+                const String& sectionName = headerFile.sectionName;
                 i32 start = sectionName.Find('/') + 1;
                 i32 end = sectionName.Find("Events.h");
                 Log::WriteRaw("\n## %" + sectionName.Substring(start, end - start) + " events\n");
@@ -257,38 +257,40 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
 
         Sort(objectTypes.Begin(), objectTypes.End());
 
-        for (unsigned i = 0; i < objectTypes.Size(); ++i)
+        for (const String& objectType : objectTypes)
         {
-            const Vector<AttributeInfo>& attrs = attributes.Find(objectTypes[i])->second_;
-            unsigned usableAttrs = 0;
-            for (unsigned j = 0; j < attrs.Size(); ++j)
+            const Vector<AttributeInfo>& attrs = attributes.Find(objectType)->second_;
+            bool hasEditableAttr = false;
+            for (const AttributeInfo& attr : attrs)
             {
                 // Attributes that are not shown in the editor are typically internal and not usable for eg. attribute
                 // animation
-                if (attrs[j].mode_ & AM_NOEDIT)
-                    continue;
-                ++usableAttrs;
+                if (!(attr.mode_ & AM_NOEDIT))
+                {
+                    hasEditableAttr = true;
+                    break;
+                }
             }
 
-            if (!usableAttrs)
+            if (!hasEditableAttr)
                 continue;
 
-            Log::WriteRaw("\n### " + objectTypes[i] + "\n");
+            Log::WriteRaw("\n### " + objectType + "\n");
 
-            for (unsigned j = 0; j < attrs.Size(); ++j)
+            for (const AttributeInfo& attr : attrs)
             {
-                if (attrs[j].mode_ & AM_NOEDIT)
+                if (attr.mode_ & AM_NOEDIT)
                     continue;
                 // Prepend each word in the attribute name with % to prevent unintended links
-                Vector<String> nameParts = attrs[j].name_.Split(' ');
-                for (unsigned k = 0; k < nameParts.Size(); ++k)
+                Vector<String> nameParts = attr.name_.Split(' ');
+                for (String& namePart : nameParts)
                 {
-                    if (nameParts[k].Length() > 1 && IsAlpha((unsigned)nameParts[k][0]))
-                        nameParts[k] = "%" + nameParts[k];
+                    if (namePart.Length() > 1 && IsAlpha((unsigned)namePart[0]))
+                        namePart = "%" + namePart;
                 }
                 String name;
                 name.Join(nameParts, " ");
-                String type = Variant::GetTypeName(attrs[j].type_);
+                String type = Variant::GetTypeName(attr.type_);
                 // Variant typenames are all uppercase. Convert primitive types to the proper lowercase form for the documentation
                 if (type == "Int" || type == "Bool" || type == "Float")
                     type[0] = (char)ToLower((unsigned)type[0]);
@@ -515,8 +517,8 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
                     Log::WriteRaw("\nMethods:\n\n");
                 else if (mode == C_HEADER)
                     Log::WriteRaw("// Methods:\n");
-                for (unsigned j = 0; j < methodDeclarations.Size(); ++j)
-                    OutputAPIRow(mode, methodDeclarations[j]);
+                for (const String& methodDeclaration : methodDeclarations)
+                    OutputAPIRow(mode, methodDeclaration);
             }
 
             if (!propertyInfos.Empty())
@@ -525,13 +527,13 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
                     Log::WriteRaw("\nProperties:\n\n");
                 else if (mode == C_HEADER)
                     Log::WriteRaw("\n// Properties:\n");
-                for (unsigned j = 0; j < propertyInfos.Size(); ++j)
+                for (const PropertyInfo& propertyInfo : propertyInfos)
                 {
                     String remark;
                     String cppdoc;
-                    if (!propertyInfos[j].write_)
+                    if (!propertyInfo.write_)
                         remark = "readonly";
-                    else if (!propertyInfos[j].read_)
+                    else if (!propertyInfo.read_)
                         remark = "writeonly";
                     if (!remark.Empty())
                     {
@@ -546,7 +548,7 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
                         }
                     }
 
-                    OutputAPIRow(mode, cppdoc + propertyInfos[j].type_ + " " + propertyInfos[j].name_ + remark);
+                    OutputAPIRow(mode, cppdoc + propertyInfo.type_ + " " + propertyInfo.name_ + remark);
                 }
             }
 
@@ -566,8 +568,8 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
                 }
 
                 const Vector<String>& constants = gcIt->second_;
-                for (unsigned j = 0; j < constants.Size(); ++j)
-                    OutputAPIRow(mode, prefix + constants[j]);
+                for (const String& constant : constants)
+                    OutputAPIRow(mode, prefix + constant);
             }
 
 
@@ -639,16 +641,16 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
     else if (mode == C_HEADER)
         Log::WriteRaw("\n// Global functions\n");
 
-    for (unsigned i = 0; i < globalFunctions.Size(); ++i)
-        OutputAPIRow(mode, globalFunctions[i]);
+    for (const String& globalFunction : globalFunctions)
+        OutputAPIRow(mode, globalFunction);
 
     if (mode == DOXYGEN)
         Log::WriteRaw("\\section ScriptAPI_GlobalProperties Global properties\n");
     else if (mode == C_HEADER)
         Log::WriteRaw("\n// Global properties\n");
 
-    for (unsigned i = 0; i < globalPropertyInfos.Size(); ++i)
-        OutputAPIRow(mode, globalPropertyInfos[i].type_ + " " + globalPropertyInfos[i].name_, true);
+    for (const PropertyInfo& globalPropertyInfo : globalPropertyInfos)
+        OutputAPIRow(mode, globalPropertyInfo.type_ + " " + globalPropertyInfo.name_, true);
 
     if (mode == DOXYGEN)
         Log::WriteRaw("\\section ScriptAPI_GlobalConstants Global constants\n");
@@ -656,8 +658,8 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
         Log::WriteRaw("\n// Global constants\n");
 
     const Vector<String>& noNameSpaceConstants = globalConstants[String()];
-    for (unsigned i = 0; i < noNameSpaceConstants.Size(); ++i)
-        OutputAPIRow(mode, noNameSpaceConstants[i], true);
+    for (const String& noNameSpaceConstant : noNameSpaceConstants)
+        OutputAPIRow(mode, noNameSpaceConstant, true);
 
     if (mode == DOXYGEN)
         Log::WriteRaw("*/\n\n}\n");
