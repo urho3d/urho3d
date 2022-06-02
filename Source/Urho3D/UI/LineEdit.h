@@ -56,13 +56,13 @@ public:
     void SetText(const String& text);
     /// Set cursor position.
     /// @property
-    void SetCursorPosition(unsigned position);
+    void SetCursorPosition(i32 position);
     /// Set cursor blink rate. 0 disables blinking.
     /// @property
     void SetCursorBlinkRate(float rate);
     /// Set maximum text length. 0 for unlimited.
     /// @property
-    void SetMaxLength(unsigned length);
+    void SetMaxLength(i32 length);
     /// Set echo character for password entry and such. 0 (default) shows the actual text.
     /// @property
     void SetEchoCharacter(c32 c);
@@ -82,7 +82,7 @@ public:
 
     /// Return cursor position.
     /// @property
-    unsigned GetCursorPosition() const { return cursorPosition_; }
+    i32 GetCursorPosition() const { return cursorPosition_; }
 
     /// Return cursor blink rate.
     /// @property
@@ -90,7 +90,7 @@ public:
 
     /// Return maximum text length.
     /// @property
-    unsigned GetMaxLength() const { return maxLength_; }
+    i32 GetMaxLength() const { return maxLength_; }
 
     /// Return echo character.
     /// @property
@@ -123,8 +123,8 @@ protected:
     void UpdateText();
     /// Update cursor position and restart cursor blinking.
     void UpdateCursor();
-    /// Return char index corresponding to position within element, or M_MAX_UNSIGNED if not found.
-    unsigned GetCharIndex(const IntVector2& position);
+    /// Return char index corresponding to position within element, or NINDEX if not found.
+    i32 GetCharIndex(const IntVector2& position);
 
     /// Text element.
     SharedPtr<Text> text_;
@@ -137,15 +137,15 @@ protected:
     /// Last used text size.
     int lastFontSize_;
     /// Text edit cursor position.
-    unsigned cursorPosition_;
+    i32 cursorPosition_;
     /// Drag begin cursor position.
-    unsigned dragBeginCursor_;
+    i32 dragBeginCursor_;
     /// Cursor blink rate.
     float cursorBlinkRate_;
     /// Cursor blink timer.
     float cursorBlinkTimer_;
     /// Maximum text length.
-    unsigned maxLength_;
+    i32 maxLength_;
     /// Echo character.
     c32 echoCharacter_;
     /// Cursor movable flag.
