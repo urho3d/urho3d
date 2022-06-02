@@ -34,8 +34,8 @@ struct URHO3D_API FontGlyph
     float offsetY_{};
     /// Horizontal advance.
     float advanceX_{};
-    /// Texture page. M_MAX_UNSIGNED if not yet resident on any texture.
-    unsigned page_{M_MAX_UNSIGNED};
+    /// Texture page. NINDEX if not yet resident on any texture.
+    i32 page_{NINDEX};
     /// Used flag.
     bool used_{};
 };

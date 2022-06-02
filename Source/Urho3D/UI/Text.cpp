@@ -698,7 +698,7 @@ void Text::UpdateCharLocations()
             if (glyph)
             {
                 // Store glyph's location for rendering. Verify that glyph page is valid
-                if (glyph->page_ < pageGlyphLocations_.Size())
+                if (glyph->page_ != NINDEX && glyph->page_ < pageGlyphLocations_.Size())
                     pageGlyphLocations_[glyph->page_].Push(GlyphLocation(x, y, glyph));
                 x += glyph->advanceX_;
                 if (i < printText_.Size() - 1)
