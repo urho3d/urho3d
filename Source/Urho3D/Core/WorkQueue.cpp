@@ -65,8 +65,8 @@ WorkQueue::~WorkQueue()
     shutDown_ = true;
     Resume();
 
-    for (unsigned i = 0; i < threads_.Size(); ++i)
-        threads_[i]->Stop();
+    for (const SharedPtr<WorkerThread>& thread : threads_)
+        thread->Stop();
 }
 
 void WorkQueue::CreateThreads(unsigned numThreads)

@@ -507,8 +507,8 @@ void Animatable::UpdateAttributeAnimations(float timeStep)
             finishedNames.Push(i->second_->GetAttributeInfo().name_);
     }
 
-    for (unsigned i = 0; i < finishedNames.Size(); ++i)
-        SetAttributeAnimation(finishedNames[i], nullptr);
+    for (const String& finishedName : finishedNames)
+        SetAttributeAnimation(finishedName, nullptr);
 }
 
 bool Animatable::IsAnimatedNetworkAttribute(const AttributeInfo& attrInfo) const

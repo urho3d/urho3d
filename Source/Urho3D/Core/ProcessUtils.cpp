@@ -277,8 +277,8 @@ const Vector<String>& ParseArguments(const String& cmdLine, bool skipFirstArgume
     }
 
     // Strip double quotes from the arguments
-    for (unsigned i = 0; i < arguments.Size(); ++i)
-        arguments[i].Replace("\"", "");
+    for (String& argument : arguments)
+        argument.Replace("\"", "");
 
     return arguments;
 }

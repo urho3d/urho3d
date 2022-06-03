@@ -1342,8 +1342,8 @@ void Material::HandleAttributeAnimationUpdate(StringHash eventType, VariantMap& 
     }
 
     // Remove finished animations
-    for (unsigned i = 0; i < finishedNames.Size(); ++i)
-        SetShaderParameterAnimation(finishedNames[i], nullptr);
+    for (const String& finishedName : finishedNames)
+        SetShaderParameterAnimation(finishedName, nullptr);
 }
 
 void Material::ApplyShaderDefines(unsigned index)
