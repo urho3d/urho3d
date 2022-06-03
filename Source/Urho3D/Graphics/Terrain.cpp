@@ -233,7 +233,7 @@ bool Terrain::SetHeightMap(Image* image)
 void Terrain::SetMaterial(Material* material)
 {
     material_ = material;
-    
+
     for (const WeakPtr<TerrainPatch>& patch : patches_)
     {
         if (patch)
@@ -362,7 +362,7 @@ void Terrain::SetNeighbors(Terrain* north, Terrain* south, Terrain* west, Terrai
 void Terrain::SetDrawDistance(float distance)
 {
     drawDistance_ = distance;
-    
+
     for (const WeakPtr<TerrainPatch>& patch : patches_)
     {
         if (patch)
@@ -375,7 +375,7 @@ void Terrain::SetDrawDistance(float distance)
 void Terrain::SetShadowDistance(float distance)
 {
     shadowDistance_ = distance;
-    
+
     for (const WeakPtr<TerrainPatch>& patch : patches_)
     {
         if (patch)
@@ -388,7 +388,7 @@ void Terrain::SetShadowDistance(float distance)
 void Terrain::SetLodBias(float bias)
 {
     lodBias_ = bias;
-    
+
     for (const WeakPtr<TerrainPatch>& patch : patches_)
     {
         if (patch)
@@ -401,7 +401,7 @@ void Terrain::SetLodBias(float bias)
 void Terrain::SetViewMask(unsigned mask)
 {
     viewMask_ = mask;
-    
+
     for (const WeakPtr<TerrainPatch>& patch : patches_)
     {
         if (patch)
@@ -414,7 +414,7 @@ void Terrain::SetViewMask(unsigned mask)
 void Terrain::SetLightMask(unsigned mask)
 {
     lightMask_ = mask;
-    
+
     for (const WeakPtr<TerrainPatch>& patch : patches_)
     {
         if (patch)
@@ -427,7 +427,7 @@ void Terrain::SetLightMask(unsigned mask)
 void Terrain::SetShadowMask(unsigned mask)
 {
     shadowMask_ = mask;
-    
+
     for (const WeakPtr<TerrainPatch>& patch : patches_)
     {
         if (patch)
@@ -440,7 +440,7 @@ void Terrain::SetShadowMask(unsigned mask)
 void Terrain::SetZoneMask(unsigned mask)
 {
     zoneMask_ = mask;
-    
+
     for (const WeakPtr<TerrainPatch>& patch : patches_)
     {
         if (patch)
@@ -453,7 +453,7 @@ void Terrain::SetZoneMask(unsigned mask)
 void Terrain::SetMaxLights(unsigned num)
 {
     maxLights_ = num;
-    
+
     for (const WeakPtr<TerrainPatch>& patch : patches_)
     {
         if (patch)
@@ -466,7 +466,7 @@ void Terrain::SetMaxLights(unsigned num)
 void Terrain::SetCastShadows(bool enable)
 {
     castShadows_ = enable;
-    
+
     for (const WeakPtr<TerrainPatch>& patch : patches_)
     {
         if (patch)
@@ -479,7 +479,7 @@ void Terrain::SetCastShadows(bool enable)
 void Terrain::SetOccluder(bool enable)
 {
     occluder_ = enable;
-    
+
     for (const WeakPtr<TerrainPatch>& patch : patches_)
     {
         if (patch)
@@ -492,7 +492,7 @@ void Terrain::SetOccluder(bool enable)
 void Terrain::SetOccludee(bool enable)
 {
     occludee_ = enable;
-    
+
     for (const WeakPtr<TerrainPatch>& patch : patches_)
     {
         if (patch)
