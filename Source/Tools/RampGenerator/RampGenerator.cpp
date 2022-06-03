@@ -239,8 +239,9 @@ bool ReadIES(File* data, Vector<float>& vertical, Vector<float>& horizontal, Vec
     while (!data->IsEof())
         lines.Push(data->ReadLine());
     Vector<String> words;
-    for (unsigned i = 0; i < lines.Size(); ++i)
-        words.Push(lines[i].Split(' '));
+    
+    for (const String& line : lines)
+        words.Push(line.Split(' '));
 
     // Prune any 'junk' collected
     for (unsigned i = 0; i < words.Size(); ++i)

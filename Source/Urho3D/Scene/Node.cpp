@@ -253,11 +253,11 @@ bool Node::SaveJSON(JSONValue& dest) const
 
 void Node::ApplyAttributes()
 {
-    for (unsigned i = 0; i < components_.Size(); ++i)
-        components_[i]->ApplyAttributes();
+    for (const SharedPtr<Component>& component : components_)
+        component->ApplyAttributes();
 
-    for (unsigned i = 0; i < children_.Size(); ++i)
-        children_[i]->ApplyAttributes();
+    for (const SharedPtr<Node>& child : children_)
+        child->ApplyAttributes();
 }
 
 void Node::MarkNetworkUpdate()
@@ -363,8 +363,8 @@ void Node::AddTags(const String& tags, char separator)
 void Node::AddTags(const StringVector& tags)
 {
     // This is OK, as MarkNetworkUpdate() early-outs when called multiple times
-    for (unsigned i = 0; i < tags.Size(); ++i)
-        AddTag(tags[i]);
+    for (const String& tag : tags)
+        AddTag(tag);
 }
 
 bool Node::RemoveTag(const String& tag)

@@ -682,14 +682,16 @@ void Renderer::Render()
 
     // If no views that render to the backbuffer, clear the screen so that e.g. the UI is not rendered on top of previous frame
     bool hasBackbufferViews = false;
-    for (unsigned i = 0; i < views_.Size(); ++i)
+    
+    for (const WeakPtr<View>& view : views_)
     {
-        if (!views_[i]->GetRenderTarget())
+        if (!view->GetRenderTarget())
         {
             hasBackbufferViews = true;
             break;
         }
     }
+    
     if (!hasBackbufferViews)
     {
         graphics_->SetBlendMode(BLEND_REPLACE);
@@ -739,7 +741,7 @@ void Renderer::DrawDebugGeometry(bool depthTest)
         Octree* octree = view->GetOctree();
         if (!octree)
             continue;
-        auto* debug = octree->GetComponent<DebugRenderer>();
+        DebugRenderer* debug = octree->GetComponent<DebugRenderer>();
         if (!debug || !debug->IsEnabledEffective())
             continue;
 
@@ -747,20 +749,21 @@ void Renderer::DrawDebugGeometry(bool depthTest)
         const Vector<Drawable*>& geometries = view->GetGeometries();
         const Vector<Light*>& lights = view->GetLights();
 
-        for (unsigned i = 0; i < geometries.Size(); ++i)
+        for (Drawable* geometry : geometries)
         {
-            if (!processedGeometries.Contains(geometries[i]))
+            if (!processedGeometries.Contains(geometry))
             {
-                geometries[i]->DrawDebugGeometry(debug, depthTest);
-                processedGeometries.Insert(geometries[i]);
+                geometry->DrawDebugGeometry(debug, depthTest);
+                processedGeometries.Insert(geometry);
             }
         }
-        for (unsigned i = 0; i < lights.Size(); ++i)
+        
+        for (Light* light : lights)
         {
-            if (!processedLights.Contains(lights[i]))
+            if (!processedLights.Contains(light))
             {
-                lights[i]->DrawDebugGeometry(debug, depthTest);
-                processedLights.Insert(lights[i]);
+                light->DrawDebugGeometry(debug, depthTest);
+                processedLights.Insert(light);
             }
         }
     }
@@ -1725,22 +1728,24 @@ void Renderer::ReleaseMaterialShaders()
 
     cache->GetResources<Material>(materials);
 
-    for (unsigned i = 0; i < materials.Size(); ++i)
-        materials[i]->ReleaseShaders();
+    for (Material* material : materials)
+        material->ReleaseShaders();
 }
 
 void Renderer::ReloadTextures()
 {
-    auto* cache = GetSubsystem<ResourceCache>();
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
     Vector<Resource*> textures;
 
     cache->GetResources(textures, Texture2D::GetTypeStatic());
-    for (unsigned i = 0; i < textures.Size(); ++i)
-        cache->ReloadResource(textures[i]);
+    
+    for (Resource* texture : textures)
+        cache->ReloadResource(texture);
 
     cache->GetResources(textures, TextureCube::GetTypeStatic());
-    for (unsigned i = 0; i < textures.Size(); ++i)
-        cache->ReloadResource(textures[i]);
+    
+    for (Resource* texture : textures)
+        cache->ReloadResource(texture);
 }
 
 void Renderer::CreateGeometries()

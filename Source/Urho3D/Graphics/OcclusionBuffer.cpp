@@ -136,8 +136,8 @@ void OcclusionBuffer::Clear()
 
     // Only clear the main thread buffer. Rest are cleared on-demand when drawing the first batch
     ClearBuffer(0);
-    for (unsigned i = 1; i < buffers_.Size(); ++i)
-        buffers_[i].used_ = false;
+    for (OcclusionBufferData& buffer : buffers_)
+        buffer.used_ = false;
 
     depthHierarchyDirty_ = true;
 }

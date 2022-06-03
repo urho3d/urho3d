@@ -940,9 +940,8 @@ void View::GetDrawables()
         minZ_ = 0.0f;
 
     // Sort the lights to brightest/closest first, and per-vertex lights first so that per-vertex base pass can be evaluated first
-    for (unsigned i = 0; i < lights_.Size(); ++i)
+    for (Light* light : lights_)
     {
-        Light* light = lights_[i];
         light->SetIntensitySortValue(cullCamera_->GetDistance(light->GetNode()->GetWorldPosition()));
         light->SetLightQueue(nullptr);
     }
@@ -1166,11 +1165,11 @@ void View::GetLightBatches()
             drawable->LimitLights();
             const Vector<Light*>& lights = drawable->GetLights();
 
-            for (unsigned i = 0; i < lights.Size(); ++i)
+            for (const Light* light : lights)
             {
-                Light* light = lights[i];
                 // Find the correct light queue again
                 LightBatchQueue* queue = light->GetLightQueue();
+
                 if (queue)
                     GetLitBatches(drawable, *queue, alphaQueue);
             }
@@ -1677,10 +1676,10 @@ void View::ExecuteRenderPathCommands()
                             passCommand_ = &command;
                         }
 
-                        for (unsigned j = 0; j < i->volumeBatches_.Size(); ++j)
+                        for (Batch& volumeBatch : i->volumeBatches_)
                         {
-                            SetupLightVolumeBatch(i->volumeBatches_[j]);
-                            i->volumeBatches_[j].Draw(this, camera_, false);
+                            SetupLightVolumeBatch(volumeBatch);
+                            volumeBatch.Draw(this, camera_, false);
                         }
 
                         passCommand_ = nullptr;
@@ -2255,11 +2254,12 @@ void View::DrawOccluders(OcclusionBuffer* buffer, const Vector<Drawable*>& occlu
     else
     {
         // In threaded mode submit all triangles first, then render (cannot test in this case)
-        for (unsigned i = 0; i < occluders.Size(); ++i)
+        for (Drawable* occluder : occluders)
         {
             // Check for running out of triangles
             ++activeOccluders_;
-            if (!occluders[i]->DrawOcclusion(buffer))
+            
+            if (!occluder->DrawOcclusion(buffer))
                 break;
         }
 
@@ -2294,10 +2294,10 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
     switch (type)
     {
     case LIGHT_DIRECTIONAL:
-        for (unsigned i = 0; i < geometries_.Size(); ++i)
+        for (Drawable* geometry : geometries_)
         {
-            if (GetLightMask(geometries_[i]) & lightMask)
-                query.litGeometries_.Push(geometries_[i]);
+            if (GetLightMask(geometry) & lightMask)
+                query.litGeometries_.Push(geometry);
         }
         break;
 
@@ -2306,10 +2306,11 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
             FrustumOctreeQuery octreeQuery(tempDrawables, light->GetFrustum(), DRAWABLE_GEOMETRY,
                 cullCamera_->GetViewMask());
             octree_->GetDrawables(octreeQuery);
-            for (unsigned i = 0; i < tempDrawables.Size(); ++i)
+            
+            for (Drawable* tempDrawable : tempDrawables)
             {
-                if (tempDrawables[i]->IsInView(frame_) && (GetLightMask(tempDrawables[i]) & lightMask))
-                    query.litGeometries_.Push(tempDrawables[i]);
+                if (tempDrawable->IsInView(frame_) && (GetLightMask(tempDrawable) & lightMask))
+                    query.litGeometries_.Push(tempDrawable);
             }
         }
         break;
@@ -2319,10 +2320,11 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
             SphereOctreeQuery octreeQuery(tempDrawables, Sphere(light->GetNode()->GetWorldPosition(), light->GetRange()),
                 DRAWABLE_GEOMETRY, cullCamera_->GetViewMask());
             octree_->GetDrawables(octreeQuery);
-            for (unsigned i = 0; i < tempDrawables.Size(); ++i)
+            
+            for (Drawable* tempDrawable : tempDrawables)
             {
-                if (tempDrawables[i]->IsInView(frame_) && (GetLightMask(tempDrawables[i]) & lightMask))
-                    query.litGeometries_.Push(tempDrawables[i]);
+                if (tempDrawable->IsInView(frame_) && (GetLightMask(tempDrawable) & lightMask))
+                    query.litGeometries_.Push(tempDrawable);
             }
         }
         break;
@@ -2966,8 +2968,9 @@ void View::PrepareInstancingBuffer()
 
     for (Vector<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
     {
-        for (unsigned j = 0; j < i->shadowSplits_.Size(); ++j)
-            totalInstances += i->shadowSplits_[j].shadowBatches_.GetNumInstances();
+        for (const ShadowBatchQueue& shadowSplit : i->shadowSplits_)
+            totalInstances += shadowSplit.shadowBatches_.GetNumInstances();
+        
         totalInstances += i->litBaseBatches_.GetNumInstances();
         totalInstances += i->litBatches_.GetNumInstances();
     }
@@ -2987,8 +2990,9 @@ void View::PrepareInstancingBuffer()
 
     for (Vector<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
     {
-        for (unsigned j = 0; j < i->shadowSplits_.Size(); ++j)
-            i->shadowSplits_[j].shadowBatches_.SetInstancingData(dest, stride, freeIndex);
+        for (ShadowBatchQueue& shadowSplit : i->shadowSplits_)
+            shadowSplit.shadowBatches_.SetInstancingData(dest, stride, freeIndex);
+
         i->litBaseBatches_.SetInstancingData(dest, stride, freeIndex);
         i->litBatches_.SetInstancingData(dest, stride, freeIndex);
     }

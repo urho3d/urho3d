@@ -91,9 +91,9 @@ bool ResourceCache::AddResourceDir(const String& pathName, unsigned priority)
     String fixedPath = SanitateResourceDirName(pathName);
 
     // Check that the same path does not already exist
-    for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
+    for (const String& resourceDir : resourceDirs_)
     {
-        if (!resourceDirs_[i].Compare(fixedPath, false))
+        if (!resourceDir.Compare(fixedPath, false))
             return true;
     }
 
@@ -405,10 +405,10 @@ void ResourceCache::ReloadResourceWithDependencies(const String& fileName)
                     dependents.Push(dependent);
             }
 
-            for (unsigned k = 0; k < dependents.Size(); ++k)
+            for (const SharedPtr<Resource>& dependent : dependents)
             {
-                URHO3D_LOGDEBUG("Reloading resource " + dependents[k]->GetName() + " depending on " + fileName);
-                ReloadResource(dependents[k]);
+                URHO3D_LOGDEBUG("Reloading resource " + dependent->GetName() + " depending on " + fileName);
+                ReloadResource(dependent);
             }
         }
     }
@@ -425,15 +425,17 @@ void ResourceCache::SetAutoReloadResources(bool enable)
     {
         if (enable)
         {
-            for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
+            for (const String& resourceDir : resourceDirs_)
             {
                 SharedPtr<FileWatcher> watcher(new FileWatcher(context_));
-                watcher->StartWatching(resourceDirs_[i], true);
+                watcher->StartWatching(resourceDir, true);
                 fileWatchers_.Push(watcher);
             }
         }
         else
+        {
             fileWatchers_.Clear();
+        }
 
         autoReloadResources_ = enable;
     }
@@ -442,9 +444,9 @@ void ResourceCache::SetAutoReloadResources(bool enable)
 void ResourceCache::AddResourceRouter(ResourceRouter* router, bool addAsFirst)
 {
     // Check for duplicate
-    for (unsigned i = 0; i < resourceRouters_.Size(); ++i)
+    for (const SharedPtr<ResourceRouter>& resourceRouter : resourceRouters_)
     {
-        if (resourceRouters_[i] == router)
+        if (resourceRouter == router)
             return;
     }
 
@@ -471,11 +473,14 @@ SharedPtr<File> ResourceCache::GetFile(const String& name, bool sendEventOnFailu
     MutexLock lock(resourceMutex_);
 
     String sanitatedName = SanitateResourceName(name);
+    
     if (!isRouting_)
     {
         isRouting_ = true;
-        for (unsigned i = 0; i < resourceRouters_.Size(); ++i)
-            resourceRouters_[i]->Route(sanitatedName, RESOURCE_GETFILE);
+        
+        for (const SharedPtr<ResourceRouter>& resourceRouter : resourceRouters_)
+            resourceRouter->Route(sanitatedName, RESOURCE_GETFILE);
+        
         isRouting_ = false;
     }
 
@@ -715,27 +720,31 @@ bool ResourceCache::Exists(const String& name) const
     MutexLock lock(resourceMutex_);
 
     String sanitatedName = SanitateResourceName(name);
+    
     if (!isRouting_)
     {
         isRouting_ = true;
-        for (unsigned i = 0; i < resourceRouters_.Size(); ++i)
-            resourceRouters_[i]->Route(sanitatedName, RESOURCE_CHECKEXISTS);
+        
+        for (const SharedPtr<ResourceRouter>& resourceRouter : resourceRouters_)
+            resourceRouter->Route(sanitatedName, RESOURCE_CHECKEXISTS);
+        
         isRouting_ = false;
     }
 
     if (sanitatedName.Empty())
         return false;
 
-    for (unsigned i = 0; i < packages_.Size(); ++i)
+    for (const SharedPtr<PackageFile>& package : packages_)
     {
-        if (packages_[i]->Exists(sanitatedName))
+        if (package->Exists(sanitatedName))
             return true;
     }
 
-    auto* fileSystem = GetSubsystem<FileSystem>();
-    for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    
+    for (const String& resourceDir : resourceDirs_)
     {
-        if (fileSystem->FileExists(resourceDirs_[i] + sanitatedName))
+        if (fileSystem->FileExists(resourceDir + sanitatedName))
             return true;
     }
 
@@ -765,11 +774,12 @@ unsigned long long ResourceCache::GetTotalMemoryUse() const
 
 String ResourceCache::GetResourceFileName(const String& name) const
 {
-    auto* fileSystem = GetSubsystem<FileSystem>();
-    for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    
+    for (const String& resourceDir : resourceDirs_)
     {
-        if (fileSystem->FileExists(resourceDirs_[i] + name))
-            return resourceDirs_[i] + name;
+        if (fileSystem->FileExists(resourceDir + name))
+            return resourceDir + name;
     }
 
     if (IsAbsolutePath(name) && fileSystem->FileExists(name))
@@ -1081,14 +1091,15 @@ void ResourceCache::HandleBeginFrame(StringHash eventType, VariantMap& eventData
 
 File* ResourceCache::SearchResourceDirs(const String& name)
 {
-    auto* fileSystem = GetSubsystem<FileSystem>();
-    for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    
+    for (const String& resourceDir : resourceDirs_)
     {
-        if (fileSystem->FileExists(resourceDirs_[i] + name))
+        if (fileSystem->FileExists(resourceDir + name))
         {
             // Construct the file first with full path, then rename it to not contain the resource path,
             // so that the file's sanitatedName can be used in further GetFile() calls (for example over the network)
-            File* file(new File(context_, resourceDirs_[i] + name));
+            File* file(new File(context_, resourceDir + name));
             file->SetName(name);
             return file;
         }
@@ -1103,10 +1114,10 @@ File* ResourceCache::SearchResourceDirs(const String& name)
 
 File* ResourceCache::SearchPackages(const String& name)
 {
-    for (unsigned i = 0; i < packages_.Size(); ++i)
+    for (const SharedPtr<PackageFile>& package : packages_)
     {
-        if (packages_[i]->Exists(name))
-            return new File(context_, packages_[i], name);
+        if (package->Exists(name))
+            return new File(context_, package, name);
     }
 
     return nullptr;

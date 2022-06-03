@@ -411,16 +411,16 @@ void Renderer2D::UpdateViewBatchInfo(ViewBatchInfo2D& viewBatchInfo, Camera* cam
             continue;
 
         const Vector<SourceBatch2D>& batches = drawables_[d]->GetSourceBatches();
-        for (unsigned b = 0; b < batches.Size(); ++b)
+        
+        for (const SourceBatch2D& batch : batches)
         {
-            if (batches[b].material_ && !batches[b].vertices_.Empty())
-                sourceBatches.Push(&batches[b]);
+            if (batch.material_ && !batch.vertices_.Empty())
+                sourceBatches.Push(&batch);
         }
     }
 
-    for (unsigned i = 0; i < sourceBatches.Size(); ++i)
+    for (const SourceBatch2D* sourceBatch : sourceBatches)
     {
-        const SourceBatch2D* sourceBatch = sourceBatches[i];
         Vector3 worldPos = sourceBatch->owner_->GetNode()->GetWorldPosition();
         sourceBatch->distance_ = camera->GetDistance(worldPos);
     }
