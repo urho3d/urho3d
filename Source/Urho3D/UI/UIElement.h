@@ -373,24 +373,34 @@ public:
     void EnableLayoutUpdate();
     /// Bring UI element to front.
     void BringToFront();
+    
     /// Create and add a child element and return it.
-    UIElement* CreateChild(StringHash type, const String& name = String::EMPTY, unsigned index = M_MAX_UNSIGNED);
+    UIElement* CreateChild(StringHash type, const String& name = String::EMPTY, i32 index = ENDPOS);
+    
     /// Add a child element.
     void AddChild(UIElement* element);
-    /// Insert a child element into a specific position in the child list.
-    void InsertChild(unsigned index, UIElement* element);
+    
+    /// Insert a child element into a specific position in the child list. index can be ENDPOS.
+    void InsertChild(i32 index, UIElement* element);
+    
     /// Remove a child element. Starting search at specified index if provided.
-    void RemoveChild(UIElement* element, unsigned index = 0);
+    void RemoveChild(UIElement* element, i32 index = 0);
+    
     /// Remove a child element at index.
-    void RemoveChildAtIndex(unsigned index);
+    void RemoveChildAtIndex(i32 index);
+    
     /// Remove all child elements.
     void RemoveAllChildren();
+    
     /// Remove from the parent element. If no other shared pointer references exist, causes immediate deletion.
     void Remove();
-    /// Find child index. Return M_MAX_UNSIGNED if not found.
-    unsigned FindChild(UIElement* element) const;
+    
+    /// Find child index. Return NINDEX if not found.
+    i32 FindChild(UIElement* element) const;
+    
     /// Set parent element. Same as parent->InsertChild(index, this).
-    void SetParent(UIElement* parent, unsigned index = M_MAX_UNSIGNED);
+    void SetParent(UIElement* parent, i32 index = ENDPOS);
+    
     /// Set a user variable.
     void SetVar(StringHash key, const Variant& value);
     /// Mark as internally (programmatically) created. Used when an element composes itself out of child elements.
@@ -417,17 +427,23 @@ public:
     void RemoveAllTags();
 
     /// Template version of creating a child element.
-    template <class T> T* CreateChild(const String& name = String::EMPTY, unsigned index = M_MAX_UNSIGNED);
+    template <class T> T* CreateChild(const String& name = String::EMPTY, i32 index = ENDPOS);
+    
     /// Template version of returning child element by index using static cast.
-    template <class T> T* GetChildStaticCast(unsigned index) const;
+    template <class T> T* GetChildStaticCast(i32 index) const;
+    
     /// Template version of returning child element by name using static cast.
     template <class T> T* GetChildStaticCast(const String& name, bool recursive = false) const;
+    
     /// Template version of returning child element by variable using static cast. If only key is provided, return the first child having the matching variable key. If value is also provided then the actual variable value would also be checked against.
     template <class T> T* GetChildStaticCast(const StringHash& key, const Variant& value = Variant::EMPTY, bool recursive = false) const;
+    
     /// Template version of returning child element by index using dynamic cast. May return 0 when casting failed.
-    template <class T> T* GetChildDynamicCast(unsigned index) const;
+    template <class T> T* GetChildDynamicCast(i32 index) const;
+    
     /// Template version of returning child element by name using dynamic cast. May return 0 when casting failed.
     template <class T> T* GetChildDynamicCast(const String& name, bool recursive = false) const;
+    
     /// Template version of returning child element by variable. If only key is provided, return the first child having the matching variable key. If value is also provided then the actual variable value would also be checked against using dynamic cast. May return 0 when casting failed.
     template <class T> T* GetChildDynamicCast(const StringHash& key, const Variant& value = Variant::EMPTY, bool recursive = false) const;
 
@@ -637,12 +653,15 @@ public:
     const Vector2& GetLayoutFlexScale() const { return layoutFlexScale_; }
 
     /// Return number of child elements.
-    unsigned GetNumChildren(bool recursive = false) const;
+    i32 GetNumChildren(bool recursive = false) const;
+    
     /// Return child element by index.
     /// @property{get_children}
-    UIElement* GetChild(unsigned index) const;
+    UIElement* GetChild(i32 index) const;
+    
     /// Return child element by name.
     UIElement* GetChild(const String& name, bool recursive = false) const;
+    
     /// Return child element by variable. If only key is provided, return the first child having the matching variable key. If value is also provided then the actual variable value would also be checked against.
     UIElement* GetChild(const StringHash& key, const Variant& value = Variant::EMPTY, bool recursive = false) const;
 
@@ -689,7 +708,7 @@ public:
 
     /// Return the number of buttons dragging this element.
     /// @property
-    unsigned GetDragButtonCount() const { return dragButtonCount_; }
+    i32 GetDragButtonCount() const { return dragButtonCount_; }
 
     /// Return whether a point (either in element or screen coordinates) is inside the element.
     bool IsInside(IntVector2 position, bool isScreen);
@@ -912,13 +931,15 @@ private:
     StringVector tags_;
 };
 
-template <class T> T* UIElement::CreateChild(const String& name, unsigned index)
+template <class T> T* UIElement::CreateChild(const String& name, i32 index/* = ENDPOS*/)
 {
+    assert(index >= 0 || index == ENDPOS);
     return static_cast<T*>(CreateChild(T::GetTypeStatic(), name, index));
 }
 
-template <class T> T* UIElement::GetChildStaticCast(unsigned index) const
+template <class T> T* UIElement::GetChildStaticCast(i32 index) const
 {
+    assert(index >= 0);
     return static_cast<T*>(GetChild(index));
 }
 
@@ -932,8 +953,9 @@ template <class T> T* UIElement::GetChildStaticCast(const StringHash& key, const
     return static_cast<T*>(GetChild(key, value, recursive));
 }
 
-template <class T> T* UIElement::GetChildDynamicCast(unsigned index) const
+template <class T> T* UIElement::GetChildDynamicCast(i32 index) const
 {
+    assert(index >= 0);
     return dynamic_cast<T*>(GetChild(index));
 }
 

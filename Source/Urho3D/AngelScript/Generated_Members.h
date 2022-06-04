@@ -16375,8 +16375,8 @@ template <class T> void RegisterMembers_UIElement(asIScriptEngine* engine, const
     // void UIElement::BringToFront()
     engine->RegisterObjectMethod(className, "void BringToFront()", AS_METHODPR(T, BringToFront, (), void), AS_CALL_THISCALL);
 
-    // UIElement* UIElement::CreateChild(StringHash type, const String& name = String::EMPTY, unsigned index = M_MAX_UNSIGNED)
-    engine->RegisterObjectMethod(className, "UIElement@+ CreateChild(StringHash, const String&in = String::EMPTY, uint = M_MAX_UNSIGNED)", AS_METHODPR(T, CreateChild, (StringHash, const String&, unsigned), UIElement*), AS_CALL_THISCALL);
+    // UIElement* UIElement::CreateChild(StringHash type, const String& name = String::EMPTY, i32 index = ENDPOS)
+    engine->RegisterObjectMethod(className, "UIElement@+ CreateChild(StringHash, const String&in = String::EMPTY, int = ENDPOS)", AS_METHODPR(T, CreateChild, (StringHash, const String&, i32), UIElement*), AS_CALL_THISCALL);
 
     // void UIElement::DisableLayoutUpdate()
     engine->RegisterObjectMethod(className, "void DisableLayoutUpdate()", AS_METHODPR(T, DisableLayoutUpdate, (), void), AS_CALL_THISCALL);
@@ -16390,8 +16390,8 @@ template <class T> void RegisterMembers_UIElement(asIScriptEngine* engine, const
     // bool UIElement::FilterAttributes(XMLElement& dest) const
     engine->RegisterObjectMethod(className, "bool FilterAttributes(XMLElement&) const", AS_METHODPR(T, FilterAttributes, (XMLElement&) const, bool), AS_CALL_THISCALL);
 
-    // unsigned UIElement::FindChild(UIElement* element) const
-    engine->RegisterObjectMethod(className, "uint FindChild(UIElement@+) const", AS_METHODPR(T, FindChild, (UIElement*) const, unsigned), AS_CALL_THISCALL);
+    // i32 UIElement::FindChild(UIElement* element) const
+    engine->RegisterObjectMethod(className, "int FindChild(UIElement@+) const", AS_METHODPR(T, FindChild, (UIElement*) const, i32), AS_CALL_THISCALL);
 
     // const String& UIElement::GetAppliedStyle() const
     engine->RegisterObjectMethod(className, "const String& GetAppliedStyle() const", AS_METHODPR(T, GetAppliedStyle, () const, const String&), AS_CALL_THISCALL);
@@ -16405,9 +16405,9 @@ template <class T> void RegisterMembers_UIElement(asIScriptEngine* engine, const
     engine->RegisterObjectMethod(className, "bool GetBringToFront() const", AS_METHODPR(T, GetBringToFront, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_bringToFront() const", AS_METHODPR(T, GetBringToFront, () const, bool), AS_CALL_THISCALL);
 
-    // UIElement* UIElement::GetChild(unsigned index) const
-    engine->RegisterObjectMethod(className, "UIElement@+ GetChild(uint) const", AS_METHODPR(T, GetChild, (unsigned) const, UIElement*), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "UIElement@+ get_children(uint) const", AS_METHODPR(T, GetChild, (unsigned) const, UIElement*), AS_CALL_THISCALL);
+    // UIElement* UIElement::GetChild(i32 index) const
+    engine->RegisterObjectMethod(className, "UIElement@+ GetChild(int) const", AS_METHODPR(T, GetChild, (i32) const, UIElement*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "UIElement@+ get_children(int) const", AS_METHODPR(T, GetChild, (i32) const, UIElement*), AS_CALL_THISCALL);
 
     // UIElement* UIElement::GetChild(const String& name, bool recursive = false) const
     engine->RegisterObjectMethod(className, "UIElement@+ GetChild(const String&in, bool = false) const", AS_METHODPR(T, GetChild, (const String&, bool) const, UIElement*), AS_CALL_THISCALL);
@@ -16461,9 +16461,9 @@ template <class T> void RegisterMembers_UIElement(asIScriptEngine* engine, const
     engine->RegisterObjectMethod(className, "MouseButtonFlags GetDragButtonCombo() const", AS_METHODPR(T, GetDragButtonCombo, () const, MouseButtonFlags), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "MouseButtonFlags get_dragButtonCombo() const", AS_METHODPR(T, GetDragButtonCombo, () const, MouseButtonFlags), AS_CALL_THISCALL);
 
-    // unsigned UIElement::GetDragButtonCount() const
-    engine->RegisterObjectMethod(className, "uint GetDragButtonCount() const", AS_METHODPR(T, GetDragButtonCount, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_dragButtonCount() const", AS_METHODPR(T, GetDragButtonCount, () const, unsigned), AS_CALL_THISCALL);
+    // i32 UIElement::GetDragButtonCount() const
+    engine->RegisterObjectMethod(className, "int GetDragButtonCount() const", AS_METHODPR(T, GetDragButtonCount, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_dragButtonCount() const", AS_METHODPR(T, GetDragButtonCount, () const, i32), AS_CALL_THISCALL);
 
     // DragAndDropModeFlags UIElement::GetDragDropMode() const
     engine->RegisterObjectMethod(className, "DragAndDropModeFlags GetDragDropMode() const", AS_METHODPR(T, GetDragDropMode, () const, DragAndDropModeFlags), AS_CALL_THISCALL);
@@ -16566,8 +16566,8 @@ template <class T> void RegisterMembers_UIElement(asIScriptEngine* engine, const
     engine->RegisterObjectMethod(className, "const String& GetName() const", AS_METHODPR(T, GetName, () const, const String&), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "const String& get_name() const", AS_METHODPR(T, GetName, () const, const String&), AS_CALL_THISCALL);
 
-    // unsigned UIElement::GetNumChildren(bool recursive = false) const
-    engine->RegisterObjectMethod(className, "uint GetNumChildren(bool = false) const", AS_METHODPR(T, GetNumChildren, (bool) const, unsigned), AS_CALL_THISCALL);
+    // i32 UIElement::GetNumChildren(bool recursive = false) const
+    engine->RegisterObjectMethod(className, "int GetNumChildren(bool = false) const", AS_METHODPR(T, GetNumChildren, (bool) const, i32), AS_CALL_THISCALL);
 
     // float UIElement::GetOpacity() const
     engine->RegisterObjectMethod(className, "float GetOpacity() const", AS_METHODPR(T, GetOpacity, () const, float), AS_CALL_THISCALL);
@@ -16638,8 +16638,8 @@ template <class T> void RegisterMembers_UIElement(asIScriptEngine* engine, const
     // bool UIElement::HasTag(const String& tag) const
     engine->RegisterObjectMethod(className, "bool HasTag(const String&in) const", AS_METHODPR(T, HasTag, (const String&) const, bool), AS_CALL_THISCALL);
 
-    // void UIElement::InsertChild(unsigned index, UIElement* element)
-    engine->RegisterObjectMethod(className, "void InsertChild(uint, UIElement@+)", AS_METHODPR(T, InsertChild, (unsigned, UIElement*), void), AS_CALL_THISCALL);
+    // void UIElement::InsertChild(i32 index, UIElement* element)
+    engine->RegisterObjectMethod(className, "void InsertChild(int, UIElement@+)", AS_METHODPR(T, InsertChild, (i32, UIElement*), void), AS_CALL_THISCALL);
 
     // bool UIElement::IsChildOf(UIElement* element) const
     engine->RegisterObjectMethod(className, "bool IsChildOf(UIElement@+) const", AS_METHODPR(T, IsChildOf, (UIElement*) const, bool), AS_CALL_THISCALL);
@@ -16769,11 +16769,11 @@ template <class T> void RegisterMembers_UIElement(asIScriptEngine* engine, const
     // void UIElement::RemoveAllTags()
     engine->RegisterObjectMethod(className, "void RemoveAllTags()", AS_METHODPR(T, RemoveAllTags, (), void), AS_CALL_THISCALL);
 
-    // void UIElement::RemoveChild(UIElement* element, unsigned index = 0)
-    engine->RegisterObjectMethod(className, "void RemoveChild(UIElement@+, uint = 0)", AS_METHODPR(T, RemoveChild, (UIElement*, unsigned), void), AS_CALL_THISCALL);
+    // void UIElement::RemoveChild(UIElement* element, i32 index = 0)
+    engine->RegisterObjectMethod(className, "void RemoveChild(UIElement@+, int = 0)", AS_METHODPR(T, RemoveChild, (UIElement*, i32), void), AS_CALL_THISCALL);
 
-    // void UIElement::RemoveChildAtIndex(unsigned index)
-    engine->RegisterObjectMethod(className, "void RemoveChildAtIndex(uint)", AS_METHODPR(T, RemoveChildAtIndex, (unsigned), void), AS_CALL_THISCALL);
+    // void UIElement::RemoveChildAtIndex(i32 index)
+    engine->RegisterObjectMethod(className, "void RemoveChildAtIndex(int)", AS_METHODPR(T, RemoveChildAtIndex, (i32), void), AS_CALL_THISCALL);
 
     // bool UIElement::RemoveTag(const String& tag)
     engine->RegisterObjectMethod(className, "bool RemoveTag(const String&in)", AS_METHODPR(T, RemoveTag, (const String&), bool), AS_CALL_THISCALL);
@@ -16969,8 +16969,8 @@ template <class T> void RegisterMembers_UIElement(asIScriptEngine* engine, const
     engine->RegisterObjectMethod(className, "void SetOpacity(float)", AS_METHODPR(T, SetOpacity, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_opacity(float)", AS_METHODPR(T, SetOpacity, (float), void), AS_CALL_THISCALL);
 
-    // void UIElement::SetParent(UIElement* parent, unsigned index = M_MAX_UNSIGNED)
-    engine->RegisterObjectMethod(className, "void SetParent(UIElement@+, uint = M_MAX_UNSIGNED)", AS_METHODPR(T, SetParent, (UIElement*, unsigned), void), AS_CALL_THISCALL);
+    // void UIElement::SetParent(UIElement* parent, i32 index = ENDPOS)
+    engine->RegisterObjectMethod(className, "void SetParent(UIElement@+, int = ENDPOS)", AS_METHODPR(T, SetParent, (UIElement*, i32), void), AS_CALL_THISCALL);
 
     // void UIElement::SetPivot(const Vector2& pivot)
     engine->RegisterObjectMethod(className, "void SetPivot(const Vector2&in)", AS_METHODPR(T, SetPivot, (const Vector2&), void), AS_CALL_THISCALL);
@@ -17045,15 +17045,15 @@ template <class T> void RegisterMembers_UIElement(asIScriptEngine* engine, const
     // void UIElement::UpdateLayout()
     engine->RegisterObjectMethod(className, "void UpdateLayout()", AS_METHODPR(T, UpdateLayout, (), void), AS_CALL_THISCALL);
 
-    // template <class T> T* UIElement::CreateChild(const String& name = String::EMPTY, unsigned index = M_MAX_UNSIGNED)
+    // template <class T> T* UIElement::CreateChild(const String& name = String::EMPTY, i32 index = ENDPOS)
     // Not registered because template
-    // template <class T> T* UIElement::GetChildDynamicCast(unsigned index) const
+    // template <class T> T* UIElement::GetChildDynamicCast(i32 index) const
     // Not registered because template
     // template <class T> T* UIElement::GetChildDynamicCast(const String& name, bool recursive = false) const
     // Not registered because template
     // template <class T> T* UIElement::GetChildDynamicCast(const StringHash& key, const Variant& value = Variant::EMPTY, bool recursive = false) const
     // Not registered because template
-    // template <class T> T* UIElement::GetChildStaticCast(unsigned index) const
+    // template <class T> T* UIElement::GetChildStaticCast(i32 index) const
     // Not registered because template
     // template <class T> T* UIElement::GetChildStaticCast(const String& name, bool recursive = false) const
     // Not registered because template
