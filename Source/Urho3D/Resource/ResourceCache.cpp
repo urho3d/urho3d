@@ -473,14 +473,14 @@ SharedPtr<File> ResourceCache::GetFile(const String& name, bool sendEventOnFailu
     MutexLock lock(resourceMutex_);
 
     String sanitatedName = SanitateResourceName(name);
-    
+
     if (!isRouting_)
     {
         isRouting_ = true;
-        
+
         for (const SharedPtr<ResourceRouter>& resourceRouter : resourceRouters_)
             resourceRouter->Route(sanitatedName, RESOURCE_GETFILE);
-        
+
         isRouting_ = false;
     }
 
@@ -720,14 +720,14 @@ bool ResourceCache::Exists(const String& name) const
     MutexLock lock(resourceMutex_);
 
     String sanitatedName = SanitateResourceName(name);
-    
+
     if (!isRouting_)
     {
         isRouting_ = true;
-        
+
         for (const SharedPtr<ResourceRouter>& resourceRouter : resourceRouters_)
             resourceRouter->Route(sanitatedName, RESOURCE_CHECKEXISTS);
-        
+
         isRouting_ = false;
     }
 
@@ -741,7 +741,7 @@ bool ResourceCache::Exists(const String& name) const
     }
 
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
-    
+
     for (const String& resourceDir : resourceDirs_)
     {
         if (fileSystem->FileExists(resourceDir + sanitatedName))
@@ -775,7 +775,7 @@ unsigned long long ResourceCache::GetTotalMemoryUse() const
 String ResourceCache::GetResourceFileName(const String& name) const
 {
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
-    
+
     for (const String& resourceDir : resourceDirs_)
     {
         if (fileSystem->FileExists(resourceDir + name))
@@ -1092,7 +1092,7 @@ void ResourceCache::HandleBeginFrame(StringHash eventType, VariantMap& eventData
 File* ResourceCache::SearchResourceDirs(const String& name)
 {
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
-    
+
     for (const String& resourceDir : resourceDirs_)
     {
         if (fileSystem->FileExists(resourceDir + name))

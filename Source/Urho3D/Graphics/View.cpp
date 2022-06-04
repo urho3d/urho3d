@@ -2258,7 +2258,7 @@ void View::DrawOccluders(OcclusionBuffer* buffer, const Vector<Drawable*>& occlu
         {
             // Check for running out of triangles
             ++activeOccluders_;
-            
+
             if (!occluder->DrawOcclusion(buffer))
                 break;
         }
@@ -2306,7 +2306,7 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
             FrustumOctreeQuery octreeQuery(tempDrawables, light->GetFrustum(), DRAWABLE_GEOMETRY,
                 cullCamera_->GetViewMask());
             octree_->GetDrawables(octreeQuery);
-            
+
             for (Drawable* tempDrawable : tempDrawables)
             {
                 if (tempDrawable->IsInView(frame_) && (GetLightMask(tempDrawable) & lightMask))
@@ -2320,7 +2320,7 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
             SphereOctreeQuery octreeQuery(tempDrawables, Sphere(light->GetNode()->GetWorldPosition(), light->GetRange()),
                 DRAWABLE_GEOMETRY, cullCamera_->GetViewMask());
             octree_->GetDrawables(octreeQuery);
-            
+
             for (Drawable* tempDrawable : tempDrawables)
             {
                 if (tempDrawable->IsInView(frame_) && (GetLightMask(tempDrawable) & lightMask))
@@ -2970,7 +2970,7 @@ void View::PrepareInstancingBuffer()
     {
         for (const ShadowBatchQueue& shadowSplit : i->shadowSplits_)
             totalInstances += shadowSplit.shadowBatches_.GetNumInstances();
-        
+
         totalInstances += i->litBaseBatches_.GetNumInstances();
         totalInstances += i->litBatches_.GetNumInstances();
     }

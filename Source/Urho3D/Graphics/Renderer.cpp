@@ -682,7 +682,7 @@ void Renderer::Render()
 
     // If no views that render to the backbuffer, clear the screen so that e.g. the UI is not rendered on top of previous frame
     bool hasBackbufferViews = false;
-    
+
     for (const WeakPtr<View>& view : views_)
     {
         if (!view->GetRenderTarget())
@@ -691,7 +691,7 @@ void Renderer::Render()
             break;
         }
     }
-    
+
     if (!hasBackbufferViews)
     {
         graphics_->SetBlendMode(BLEND_REPLACE);
@@ -757,7 +757,7 @@ void Renderer::DrawDebugGeometry(bool depthTest)
                 processedGeometries.Insert(geometry);
             }
         }
-        
+
         for (Light* light : lights)
         {
             if (!processedLights.Contains(light))
@@ -1738,12 +1738,12 @@ void Renderer::ReloadTextures()
     Vector<Resource*> textures;
 
     cache->GetResources(textures, Texture2D::GetTypeStatic());
-    
+
     for (Resource* texture : textures)
         cache->ReloadResource(texture);
 
     cache->GetResources(textures, TextureCube::GetTypeStatic());
-    
+
     for (Resource* texture : textures)
         cache->ReloadResource(texture);
 }

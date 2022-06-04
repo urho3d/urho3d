@@ -411,7 +411,7 @@ void Renderer2D::UpdateViewBatchInfo(ViewBatchInfo2D& viewBatchInfo, Camera* cam
             continue;
 
         const Vector<SourceBatch2D>& batches = drawables_[d]->GetSourceBatches();
-        
+
         for (const SourceBatch2D& batch : batches)
         {
             if (batch.material_ && !batch.vertices_.Empty())

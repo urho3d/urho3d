@@ -62,7 +62,7 @@ struct JoystickState
 {
     /// Initialize the number of buttons, axes and hats and set them to neutral state.
     void Initialize(i32 numButtons, i32 numAxes, i32 numHats);
-    
+
     /// Reset button, axis and hat states to neutral.
     void Reset();
 
