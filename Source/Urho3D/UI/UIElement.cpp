@@ -200,11 +200,13 @@ bool UIElement::LoadXML(const XMLElement& source, XMLFile* styleFile)
         String typeName = childElem.GetAttribute("type");
         if (typeName.Empty())
             typeName = "UIElement";
-        unsigned index = childElem.HasAttribute("index") ? childElem.GetUInt("index") : M_MAX_UNSIGNED;
+        i32 index = childElem.HasAttribute("index") ? childElem.GetInt("index") : ENDPOS;
         UIElement* child = nullptr;
 
         if (!internalElem)
+        {
             child = CreateChild(typeName, String::EMPTY, index);
+        }
         else
         {
             for (unsigned i = nextInternalChild; i < children_.Size(); ++i)
@@ -252,7 +254,7 @@ UIElement* UIElement::LoadChildXML(const XMLElement& childElem, XMLFile* styleFi
     String typeName = childElem.GetAttribute("type");
     if (typeName.Empty())
         typeName = "UIElement";
-    unsigned index = childElem.HasAttribute("index") ? childElem.GetUInt("index") : M_MAX_UNSIGNED;
+    i32 index = childElem.HasAttribute("index") ? childElem.GetUInt("index") : ENDPOS;
     UIElement* child = CreateChild(typeName, String::EMPTY, index);
 
     if (child)
@@ -1249,10 +1251,13 @@ void UIElement::BringToFront()
     }
 }
 
-UIElement* UIElement::CreateChild(StringHash type, const String& name, unsigned index)
+UIElement* UIElement::CreateChild(StringHash type, const String& name, i32 index/* = ENDPOS*/)
 {
+    assert(index == ENDPOS || (index >= 0 && index <= children_.Size()));
+
     // Check that creation succeeds and that the object in fact is a UI element
     SharedPtr<UIElement> newElement = DynamicCast<UIElement>(context_->CreateObject(type));
+    
     if (!newElement)
     {
         URHO3D_LOGERROR("Could not create unknown UI element type " + type.ToString());
@@ -1268,25 +1273,30 @@ UIElement* UIElement::CreateChild(StringHash type, const String& name, unsigned 
 
 void UIElement::AddChild(UIElement* element)
 {
-    InsertChild(M_MAX_UNSIGNED, element);
+    InsertChild(ENDPOS, element);
 }
 
-void UIElement::InsertChild(unsigned index, UIElement* element)
+void UIElement::InsertChild(i32 index, UIElement* element)
 {
+    assert(index == ENDPOS || (index >= 0 && index <= children_.Size()));
+
     // Check for illegal or redundant parent assignment
     if (!element || element == this || element->parent_ == this)
         return;
+
     // Check for possible cyclic parent assignment
     UIElement* parent = parent_;
+
     while (parent)
     {
         if (parent == element)
             return;
+
         parent = parent->parent_;
     }
 
     // Add first, then remove from old parent, to ensure the element does not get deleted
-    if (index >= children_.Size())
+    if (index >= children_.Size() || index == ENDPOS)
         children_.Push(SharedPtr<UIElement>(element));
     else
         children_.Insert(children_.Begin() + index, SharedPtr<UIElement>(element));
@@ -1308,6 +1318,7 @@ void UIElement::InsertChild(unsigned index, UIElement* element)
     // Send change event
     UIElement* root = GetRoot();
     UIElement* sender = GetElementEventSender();
+    
     if (sender)
     {
         using namespace ElementAdded;
@@ -1321,14 +1332,17 @@ void UIElement::InsertChild(unsigned index, UIElement* element)
     }
 }
 
-void UIElement::RemoveChild(UIElement* element, unsigned index)
+void UIElement::RemoveChild(UIElement* element, i32 index/* = 0*/)
 {
-    for (unsigned i = index; i < children_.Size(); ++i)
+    assert(index >= 0);
+
+    for (i32 i = index; i < children_.Size(); ++i)
     {
         if (children_[i] == element)
         {
             // Send change event if not already being destroyed
             UIElement* sender = Refs() > 0 ? GetElementEventSender() : nullptr;
+            
             if (sender)
             {
                 using namespace ElementRemoved;
@@ -1349,8 +1363,10 @@ void UIElement::RemoveChild(UIElement* element, unsigned index)
     }
 }
 
-void UIElement::RemoveChildAtIndex(unsigned index)
+void UIElement::RemoveChildAtIndex(i32 index)
 {
+    assert(index >= 0);
+
     if (index >= children_.Size())
         return;
 
@@ -1405,13 +1421,13 @@ void UIElement::Remove()
         parent_->RemoveChild(this);
 }
 
-unsigned UIElement::FindChild(UIElement* element) const
+i32 UIElement::FindChild(UIElement* element) const
 {
-    Vector<SharedPtr<UIElement>>::ConstIterator i = children_.Find(SharedPtr<UIElement>(element));
-    return i != children_.End() ? (unsigned)(i - children_.Begin()) : M_MAX_UNSIGNED;
+    Vector<SharedPtr<UIElement>>::ConstIterator it = children_.Find(SharedPtr<UIElement>(element));
+    return it != children_.End() ? (i32)(it - children_.Begin()) : NINDEX;
 }
 
-void UIElement::SetParent(UIElement* parent, unsigned index)
+void UIElement::SetParent(UIElement* parent, i32 index/* = ENDPOS*/)
 {
     if (parent)
         parent->InsertChild(index, this);
@@ -1595,23 +1611,27 @@ Vector<UIElement*> UIElement::GetChildren(bool recursive) const
     return dest;
 }
 
-unsigned UIElement::GetNumChildren(bool recursive) const
+i32 UIElement::GetNumChildren(bool recursive/* = false*/) const
 {
     if (!recursive)
+    {
         return children_.Size();
+    }
     else
     {
-        unsigned allChildren = children_.Size();
-        for (Vector<SharedPtr<UIElement>>::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
-            allChildren += (*i)->GetNumChildren(true);
+        i32 allChildren = children_.Size();
+        
+        for (const SharedPtr<UIElement>& child : children_)
+            allChildren += child->GetNumChildren(true);
 
         return allChildren;
     }
 }
 
-UIElement* UIElement::GetChild(unsigned index) const
+UIElement* UIElement::GetChild(i32 index) const
 {
-    return index < children_.Size() ? children_[index] : nullptr;
+    assert(index >= 0 || index == NINDEX);
+    return (index >= 0 && index < children_.Size()) ? children_[index] : nullptr;
 }
 
 UIElement* UIElement::GetChild(const String& name, bool recursive) const
