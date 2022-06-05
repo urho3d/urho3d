@@ -373,34 +373,34 @@ public:
     void EnableLayoutUpdate();
     /// Bring UI element to front.
     void BringToFront();
-    
+
     /// Create and add a child element and return it.
     UIElement* CreateChild(StringHash type, const String& name = String::EMPTY, i32 index = ENDPOS);
-    
+
     /// Add a child element.
     void AddChild(UIElement* element);
-    
+
     /// Insert a child element into a specific position in the child list. index can be ENDPOS.
     void InsertChild(i32 index, UIElement* element);
-    
+
     /// Remove a child element. Starting search at specified index if provided.
     void RemoveChild(UIElement* element, i32 index = 0);
-    
+
     /// Remove a child element at index.
     void RemoveChildAtIndex(i32 index);
-    
+
     /// Remove all child elements.
     void RemoveAllChildren();
-    
+
     /// Remove from the parent element. If no other shared pointer references exist, causes immediate deletion.
     void Remove();
-    
+
     /// Find child index. Return NINDEX if not found.
     i32 FindChild(UIElement* element) const;
-    
+
     /// Set parent element. Same as parent->InsertChild(index, this).
     void SetParent(UIElement* parent, i32 index = ENDPOS);
-    
+
     /// Set a user variable.
     void SetVar(StringHash key, const Variant& value);
     /// Mark as internally (programmatically) created. Used when an element composes itself out of child elements.
@@ -428,22 +428,22 @@ public:
 
     /// Template version of creating a child element.
     template <class T> T* CreateChild(const String& name = String::EMPTY, i32 index = ENDPOS);
-    
+
     /// Template version of returning child element by index using static cast.
     template <class T> T* GetChildStaticCast(i32 index) const;
-    
+
     /// Template version of returning child element by name using static cast.
     template <class T> T* GetChildStaticCast(const String& name, bool recursive = false) const;
-    
+
     /// Template version of returning child element by variable using static cast. If only key is provided, return the first child having the matching variable key. If value is also provided then the actual variable value would also be checked against.
     template <class T> T* GetChildStaticCast(const StringHash& key, const Variant& value = Variant::EMPTY, bool recursive = false) const;
-    
+
     /// Template version of returning child element by index using dynamic cast. May return 0 when casting failed.
     template <class T> T* GetChildDynamicCast(i32 index) const;
-    
+
     /// Template version of returning child element by name using dynamic cast. May return 0 when casting failed.
     template <class T> T* GetChildDynamicCast(const String& name, bool recursive = false) const;
-    
+
     /// Template version of returning child element by variable. If only key is provided, return the first child having the matching variable key. If value is also provided then the actual variable value would also be checked against using dynamic cast. May return 0 when casting failed.
     template <class T> T* GetChildDynamicCast(const StringHash& key, const Variant& value = Variant::EMPTY, bool recursive = false) const;
 
@@ -654,14 +654,14 @@ public:
 
     /// Return number of child elements.
     i32 GetNumChildren(bool recursive = false) const;
-    
+
     /// Return child element by index.
     /// @property{get_children}
     UIElement* GetChild(i32 index) const;
-    
+
     /// Return child element by name.
     UIElement* GetChild(const String& name, bool recursive = false) const;
-    
+
     /// Return child element by variable. If only key is provided, return the first child having the matching variable key. If value is also provided then the actual variable value would also be checked against.
     UIElement* GetChild(const StringHash& key, const Variant& value = Variant::EMPTY, bool recursive = false) const;
 

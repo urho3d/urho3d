@@ -1257,7 +1257,7 @@ UIElement* UIElement::CreateChild(StringHash type, const String& name, i32 index
 
     // Check that creation succeeds and that the object in fact is a UI element
     SharedPtr<UIElement> newElement = DynamicCast<UIElement>(context_->CreateObject(type));
-    
+
     if (!newElement)
     {
         URHO3D_LOGERROR("Could not create unknown UI element type " + type.ToString());
@@ -1318,7 +1318,7 @@ void UIElement::InsertChild(i32 index, UIElement* element)
     // Send change event
     UIElement* root = GetRoot();
     UIElement* sender = GetElementEventSender();
-    
+
     if (sender)
     {
         using namespace ElementAdded;
@@ -1342,7 +1342,7 @@ void UIElement::RemoveChild(UIElement* element, i32 index/* = 0*/)
         {
             // Send change event if not already being destroyed
             UIElement* sender = Refs() > 0 ? GetElementEventSender() : nullptr;
-            
+
             if (sender)
             {
                 using namespace ElementRemoved;
@@ -1620,7 +1620,7 @@ i32 UIElement::GetNumChildren(bool recursive/* = false*/) const
     else
     {
         i32 allChildren = children_.Size();
-        
+
         for (const SharedPtr<UIElement>& child : children_)
             allChildren += child->GetNumChildren(true);
 
