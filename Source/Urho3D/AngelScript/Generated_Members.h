@@ -4824,8 +4824,8 @@ template <class T> void RegisterMembers_StaticModelGeometryData(asIScriptEngine*
     // Vector3 StaticModelGeometryData::center_
     engine->RegisterObjectProperty(className, "Vector3 center", offsetof(T, center_));
 
-    // unsigned StaticModelGeometryData::lodLevel_
-    engine->RegisterObjectProperty(className, "uint lodLevel", offsetof(T, lodLevel_));
+    // i32 StaticModelGeometryData::lodLevel_
+    engine->RegisterObjectProperty(className, "int lodLevel", offsetof(T, lodLevel_));
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_StaticModelGeometryData
         REGISTER_MEMBERS_MANUAL_PART_StaticModelGeometryData();
@@ -7138,8 +7138,8 @@ template <class T> void RegisterMembers_NavigationGeometryInfo(asIScriptEngine* 
     // Component* NavigationGeometryInfo::component_
     // Not registered because pointer
 
-    // unsigned NavigationGeometryInfo::lodLevel_
-    engine->RegisterObjectProperty(className, "uint lodLevel", offsetof(T, lodLevel_));
+    // i32 NavigationGeometryInfo::lodLevel_
+    engine->RegisterObjectProperty(className, "int lodLevel", offsetof(T, lodLevel_));
 
     // Matrix3x4 NavigationGeometryInfo::transform_
     engine->RegisterObjectProperty(className, "Matrix3x4 transform", offsetof(T, transform_));
@@ -20218,9 +20218,9 @@ template <class T> void RegisterMembers_CollisionShape(asIScriptEngine* engine, 
     // CollisionGeometryData* CollisionShape::GetGeometryData() const
     engine->RegisterObjectMethod(className, "CollisionGeometryData@+ GetGeometryData() const", AS_METHODPR(T, GetGeometryData, () const, CollisionGeometryData*), AS_CALL_THISCALL);
 
-    // unsigned CollisionShape::GetLodLevel() const
-    engine->RegisterObjectMethod(className, "uint GetLodLevel() const", AS_METHODPR(T, GetLodLevel, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_lodLevel() const", AS_METHODPR(T, GetLodLevel, () const, unsigned), AS_CALL_THISCALL);
+    // i32 CollisionShape::GetLodLevel() const
+    engine->RegisterObjectMethod(className, "int GetLodLevel() const", AS_METHODPR(T, GetLodLevel, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_lodLevel() const", AS_METHODPR(T, GetLodLevel, () const, i32), AS_CALL_THISCALL);
 
     // float CollisionShape::GetMargin() const
     engine->RegisterObjectMethod(className, "float GetMargin() const", AS_METHODPR(T, GetMargin, () const, float), AS_CALL_THISCALL);
@@ -22977,8 +22977,8 @@ template <class T> void RegisterMembers_TerrainPatch(asIScriptEngine* engine, co
     // Geometry* TerrainPatch::GetGeometry() const
     engine->RegisterObjectMethod(className, "Geometry@+ GetGeometry() const", AS_METHODPR(T, GetGeometry, () const, Geometry*), AS_CALL_THISCALL);
 
-    // unsigned TerrainPatch::GetLodLevel() const
-    engine->RegisterObjectMethod(className, "uint GetLodLevel() const", AS_METHODPR(T, GetLodLevel, () const, unsigned), AS_CALL_THISCALL);
+    // i32 TerrainPatch::GetLodLevel() const
+    engine->RegisterObjectMethod(className, "int GetLodLevel() const", AS_METHODPR(T, GetLodLevel, () const, i32), AS_CALL_THISCALL);
 
     // Geometry* TerrainPatch::GetMaxLodGeometry() const
     engine->RegisterObjectMethod(className, "Geometry@+ GetMaxLodGeometry() const", AS_METHODPR(T, GetMaxLodGeometry, () const, Geometry*), AS_CALL_THISCALL);

@@ -86,7 +86,7 @@ public:
     const IntVector2& GetCoordinates() const { return coordinates_; }
 
     /// Return current LOD level.
-    unsigned GetLodLevel() const { return lodLevel_; }
+    i32 GetLodLevel() const { return lodLevel_; }
 
 protected:
     /// Recalculate the world-space bounding box.
@@ -94,7 +94,7 @@ protected:
 
 private:
     /// Return a corrected LOD level to ensure stitching can work correctly.
-    unsigned GetCorrectedLodLevel(unsigned lodLevel);
+    i32 GetCorrectedLodLevel(i32 lodLevel);
 
     /// Geometry.
     SharedPtr<Geometry> geometry_;
@@ -119,7 +119,7 @@ private:
     /// Patch coordinates in the terrain. (0,0) is the northwest corner.
     IntVector2 coordinates_;
     /// Current LOD level.
-    unsigned lodLevel_;
+    i32 lodLevel_;
 };
 
 }

@@ -107,8 +107,8 @@ void TerrainPatch::UpdateBatches(const FrameInfo& frame)
     batches_[0].distance_ = distance_;
     batches_[0].worldTransform_ = &worldTransform;
 
-    unsigned newLodLevel = 0;
-    for (unsigned i = 0; i < lodErrors_.Size(); ++i)
+    i32 newLodLevel = 0;
+    for (i32 i = 0; i < lodErrors_.Size(); ++i)
     {
         if (lodErrors_[i] / lodDistance_ > LOD_CONSTANT)
             break;
@@ -256,8 +256,10 @@ void TerrainPatch::OnWorldBoundingBoxUpdate()
     worldBoundingBox_ = boundingBox_.Transformed(node_->GetWorldTransform());
 }
 
-unsigned TerrainPatch::GetCorrectedLodLevel(unsigned lodLevel)
+i32 TerrainPatch::GetCorrectedLodLevel(i32 lodLevel)
 {
+    assert(lodLevel >= 0);
+
     if (north_)
         lodLevel = Min(lodLevel, north_->GetLodLevel() + 1);
     if (south_)
