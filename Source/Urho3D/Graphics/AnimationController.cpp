@@ -69,7 +69,7 @@ void AnimationController::OnSetEnabled()
 void AnimationController::Update(float timeStep)
 {
     // Loop through animations
-    for (unsigned i = 0; i < animations_.Size();)
+    for (i32 i = 0; i < animations_.Size();)
     {
         AnimationControl& ctrl = animations_[i];
         AnimationState* state = GetAnimationState(ctrl.hash_);
@@ -146,7 +146,7 @@ bool AnimationController::Play(const String& name, unsigned char layer, bool loo
         return false;
 
     // Check if already exists
-    unsigned index;
+    i32 index;
     AnimationState* state;
     FindAnimation(newAnimation->GetName(), index, state);
 
@@ -157,7 +157,7 @@ bool AnimationController::Play(const String& name, unsigned char layer, bool loo
             return false;
     }
 
-    if (index == M_MAX_UNSIGNED)
+    if (index == NINDEX)
     {
         AnimationControl newControl;
         newControl.name_ = newAnimation->GetName();
@@ -188,17 +188,17 @@ bool AnimationController::PlayExclusive(const String& name, unsigned char layer,
 
 bool AnimationController::Stop(const String& name, float fadeOutTime)
 {
-    unsigned index;
+    i32 index;
     AnimationState* state;
     FindAnimation(name, index, state);
-    if (index != M_MAX_UNSIGNED)
+    if (index != NINDEX)
     {
         animations_[index].targetWeight_ = 0.0f;
         animations_[index].fadeTime_ = fadeOutTime;
         MarkNetworkUpdate();
     }
 
-    return index != M_MAX_UNSIGNED || state != nullptr;
+    return index != NINDEX || state != nullptr;
 }
 
 void AnimationController::StopLayer(unsigned char layer, float fadeOutTime)
@@ -235,10 +235,10 @@ void AnimationController::StopAll(float fadeOutTime)
 
 bool AnimationController::Fade(const String& name, float targetWeight, float fadeTime)
 {
-    unsigned index;
+    i32 index;
     AnimationState* state;
     FindAnimation(name, index, state);
-    if (index == M_MAX_UNSIGNED)
+    if (index == NINDEX)
         return false;
 
     animations_[index].targetWeight_ = Clamp(targetWeight, 0.0f, 1.0f);
@@ -249,16 +249,16 @@ bool AnimationController::Fade(const String& name, float targetWeight, float fad
 
 bool AnimationController::FadeOthers(const String& name, float targetWeight, float fadeTime)
 {
-    unsigned index;
+    i32 index;
     AnimationState* state;
     FindAnimation(name, index, state);
-    if (index == M_MAX_UNSIGNED || !state)
+    if (index == NINDEX || !state)
         return false;
 
     unsigned char layer = state->GetLayer();
 
     bool needUpdate = false;
-    for (unsigned i = 0; i < animations_.Size(); ++i)
+    for (i32 i = 0; i < animations_.Size(); ++i)
     {
         if (i != index)
         {
@@ -308,10 +308,10 @@ bool AnimationController::SetStartBone(const String& name, const String& startBo
 
 bool AnimationController::SetTime(const String& name, float time)
 {
-    unsigned index;
+    i32 index;
     AnimationState* state;
     FindAnimation(name, index, state);
-    if (index == M_MAX_UNSIGNED || !state)
+    if (index == NINDEX || !state)
         return false;
 
     time = Clamp(time, 0.0f, state->GetLength());
@@ -326,10 +326,10 @@ bool AnimationController::SetTime(const String& name, float time)
 
 bool AnimationController::SetSpeed(const String& name, float speed)
 {
-    unsigned index;
+    i32 index;
     AnimationState* state;
     FindAnimation(name, index, state);
-    if (index == M_MAX_UNSIGNED)
+    if (index == NINDEX)
         return false;
 
     animations_[index].speed_ = speed;
@@ -339,10 +339,10 @@ bool AnimationController::SetSpeed(const String& name, float speed)
 
 bool AnimationController::SetWeight(const String& name, float weight)
 {
-    unsigned index;
+    i32 index;
     AnimationState* state;
     FindAnimation(name, index, state);
-    if (index == M_MAX_UNSIGNED || !state)
+    if (index == NINDEX || !state)
         return false;
 
     weight = Clamp(weight, 0.0f, 1.0f);
@@ -361,10 +361,10 @@ bool AnimationController::SetWeight(const String& name, float weight)
 
 bool AnimationController::SetRemoveOnCompletion(const String& name, bool removeOnCompletion)
 {
-    unsigned index;
+    i32 index;
     AnimationState* state;
     FindAnimation(name, index, state);
-    if (index == M_MAX_UNSIGNED || !state)
+    if (index == NINDEX || !state)
         return false;
 
     animations_[index].removeOnCompletion_ = removeOnCompletion;
@@ -396,10 +396,10 @@ bool AnimationController::SetBlendMode(const String& name, AnimationBlendMode mo
 
 bool AnimationController::SetAutoFade(const String& name, float fadeOutTime)
 {
-    unsigned index;
+    i32 index;
     AnimationState* state;
     FindAnimation(name, index, state);
-    if (index == M_MAX_UNSIGNED)
+    if (index == NINDEX)
         return false;
 
     animations_[index].autoFadeTime_ = Max(fadeOutTime, 0.0f);
@@ -409,10 +409,10 @@ bool AnimationController::SetAutoFade(const String& name, float fadeOutTime)
 
 bool AnimationController::IsPlaying(const String& name) const
 {
-    unsigned index;
+    i32 index;
     AnimationState* state;
     FindAnimation(name, index, state);
-    return index != M_MAX_UNSIGNED;
+    return index != NINDEX;
 }
 
 bool AnimationController::IsPlaying(unsigned char layer) const
@@ -429,10 +429,10 @@ bool AnimationController::IsPlaying(unsigned char layer) const
 
 bool AnimationController::IsFadingIn(const String& name) const
 {
-    unsigned index;
+    i32 index;
     AnimationState* state;
     FindAnimation(name, index, state);
-    if (index == M_MAX_UNSIGNED || !state)
+    if (index == NINDEX || !state)
         return false;
 
     return animations_[index].fadeTime_ && animations_[index].targetWeight_ > state->GetWeight();
@@ -440,10 +440,10 @@ bool AnimationController::IsFadingIn(const String& name) const
 
 bool AnimationController::IsFadingOut(const String& name) const
 {
-    unsigned index;
+    i32 index;
     AnimationState* state;
     FindAnimation(name, index, state);
-    if (index == M_MAX_UNSIGNED || !state)
+    if (index == NINDEX || !state)
         return false;
 
     return (animations_[index].fadeTime_ && animations_[index].targetWeight_ < state->GetWeight())
@@ -452,10 +452,10 @@ bool AnimationController::IsFadingOut(const String& name) const
 
 bool AnimationController::IsAtEnd(const String& name) const
 {
-    unsigned index;
+    i32 index;
     AnimationState* state;
     FindAnimation(name, index, state);
-    if (index == M_MAX_UNSIGNED || !state)
+    if (index == NINDEX || !state)
         return false;
     else
         return state->GetTime() >= state->GetLength();
@@ -511,42 +511,42 @@ float AnimationController::GetLength(const String& name) const
 
 float AnimationController::GetSpeed(const String& name) const
 {
-    unsigned index;
+    i32 index;
     AnimationState* state;
     FindAnimation(name, index, state);
-    return index != M_MAX_UNSIGNED ? animations_[index].speed_ : 0.0f;
+    return index != NINDEX ? animations_[index].speed_ : 0.0f;
 }
 
 float AnimationController::GetFadeTarget(const String& name) const
 {
-    unsigned index;
+    i32 index;
     AnimationState* state;
     FindAnimation(name, index, state);
-    return index != M_MAX_UNSIGNED ? animations_[index].targetWeight_ : 0.0f;
+    return index != NINDEX ? animations_[index].targetWeight_ : 0.0f;
 }
 
 float AnimationController::GetFadeTime(const String& name) const
 {
-    unsigned index;
+    i32 index;
     AnimationState* state;
     FindAnimation(name, index, state);
-    return index != M_MAX_UNSIGNED ? animations_[index].fadeTime_ : 0.0f;
+    return index != NINDEX ? animations_[index].fadeTime_ : 0.0f;
 }
 
 float AnimationController::GetAutoFade(const String& name) const
 {
-    unsigned index;
+    i32 index;
     AnimationState* state;
     FindAnimation(name, index, state);
-    return index != M_MAX_UNSIGNED ? animations_[index].autoFadeTime_ : 0.0f;
+    return index != NINDEX ? animations_[index].autoFadeTime_ : 0.0f;
 }
 
 bool AnimationController::GetRemoveOnCompletion(const String& name) const
 {
-    unsigned index;
+    i32 index;
     AnimationState* state;
     FindAnimation(name, index, state);
-    return index != M_MAX_UNSIGNED ? animations_[index].removeOnCompletion_ : false;
+    return index != NINDEX ? animations_[index].removeOnCompletion_ : false;
 }
 
 AnimationState* AnimationController::GetAnimationState(const String& name) const
@@ -576,7 +576,7 @@ void AnimationController::SetAnimationsAttr(const VariantVector& value)
 {
     animations_.Clear();
     animations_.Reserve(value.Size() / 5);  // Incomplete data is discarded
-    unsigned index = 0;
+    i32 index = 0;
     while (index + 4 < value.Size())    // Prevent out-of-bound index access
     {
         AnimationControl newControl;
@@ -619,7 +619,7 @@ void AnimationController::SetNetAnimationsAttr(const Vector<unsigned char>& valu
             }
         }
         // Check if the internal control structure exists. If not, add new
-        unsigned index;
+        i32 index;
         for (index = 0; index < animations_.Size(); ++index)
         {
             if (animations_[index].hash_ == animHash)
@@ -694,10 +694,10 @@ void AnimationController::SetNodeAnimationStatesAttr(const VariantVector& value)
 {
     auto* cache = GetSubsystem<ResourceCache>();
     nodeAnimationStates_.Clear();
-    unsigned index = 0;
-    unsigned numStates = index < value.Size() ? value[index++].GetUInt() : 0;
+    i32 index = 0;
+    i32 numStates = index < value.Size() ? value[index++].GetInt() : 0;
     // Prevent negative or overly large value being assigned from the editor
-    if (numStates > M_MAX_INT)
+    if (numStates < 0)
         numStates = 0;
     if (numStates > MAX_NODE_ANIMATION_STATES)
         numStates = MAX_NODE_ANIMATION_STATES;
@@ -865,7 +865,7 @@ void AnimationController::RemoveAnimationState(AnimationState* state)
     }
 }
 
-void AnimationController::FindAnimation(const String& name, unsigned& index, AnimationState*& state) const
+void AnimationController::FindAnimation(const String& name, i32& index, AnimationState*& state) const
 {
     StringHash nameHash(GetInternalPath(name));
 
@@ -878,8 +878,8 @@ void AnimationController::FindAnimation(const String& name, unsigned& index, Ani
     }
 
     // Find the internal control structure
-    index = M_MAX_UNSIGNED;
-    for (unsigned i = 0; i < animations_.Size(); ++i)
+    index = NINDEX;
+    for (i32 i = 0; i < animations_.Size(); ++i)
     {
         if (animations_[i].hash_ == nameHash)
         {
