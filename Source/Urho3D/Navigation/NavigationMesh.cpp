@@ -1109,7 +1109,7 @@ void NavigationMesh::GetTileGeometry(NavBuildData* build, Vector<NavigationGeome
                         if (!model)
                             continue;
 
-                        unsigned lodLevel = shape->GetLodLevel();
+                        i32 lodLevel = shape->GetLodLevel();
                         for (unsigned j = 0; j < model->GetNumGeometries(); ++j)
                             AddTriMeshGeometry(build, model->GetGeometry(j, lodLevel), transform);
                     }

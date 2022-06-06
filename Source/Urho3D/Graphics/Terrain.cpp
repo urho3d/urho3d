@@ -759,8 +759,8 @@ void Terrain::UpdatePatchLod(TerrainPatch* patch)
     Geometry* geometry = patch->GetGeometry();
 
     // All LOD levels except the coarsest have 16 versions for stitching
-    unsigned lodLevel = patch->GetLodLevel();
-    unsigned drawRangeIndex = lodLevel << 4u;
+    i32 lodLevel = patch->GetLodLevel();
+    i32 drawRangeIndex = lodLevel << 4;
     if (lodLevel < numLodLevels_ - 1)
     {
         TerrainPatch* north = patch->GetNorthPatch();

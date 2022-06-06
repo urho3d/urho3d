@@ -53,7 +53,7 @@ struct CollisionGeometryData : public RefCounted
 
 /// Cache of collision geometry data.
 /// \todo Remove duplicate declaration
-using CollisionGeometryDataCache = HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData>>;
+using CollisionGeometryDataCache = HashMap<Pair<Model*, i32>, SharedPtr<CollisionGeometryData>>;
 
 /// Triangle mesh geometry data.
 struct TriangleMeshData : public CollisionGeometryData
@@ -236,7 +236,7 @@ public:
 
     /// Return model LOD level.
     /// @property
-    unsigned GetLodLevel() const { return lodLevel_; }
+    i32 GetLodLevel() const { return lodLevel_; }
 
     /// Return world-space bounding box.
     /// @property
@@ -314,7 +314,7 @@ private:
     /// Cached world scale for determining if the collision shape needs update.
     Vector3 cachedWorldScale_;
     /// Model LOD level.
-    unsigned lodLevel_;
+    i32 lodLevel_;
     /// CustomGeometry component ID. 0 if not creating the convex hull / triangle mesh from a CustomGeometry.
     unsigned customGeometryID_;
     /// Collision margin.

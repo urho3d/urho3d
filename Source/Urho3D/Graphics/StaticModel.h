@@ -16,7 +16,7 @@ struct StaticModelGeometryData
     /// Geometry center.
     Vector3 center_;
     /// Current LOD level.
-    unsigned lodLevel_;
+    i32 lodLevel_;
 };
 
 /// Static model component.

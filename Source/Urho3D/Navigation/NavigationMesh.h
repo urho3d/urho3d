@@ -44,7 +44,7 @@ struct NavigationGeometryInfo
     /// Component.
     Component* component_;
     /// Geometry LOD level if applicable.
-    unsigned lodLevel_;
+    i32 lodLevel_;
     /// Transform relative to the navigation mesh root node.
     Matrix3x4 transform_;
     /// Bounding box relative to the navigation mesh root node.

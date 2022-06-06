@@ -1100,7 +1100,7 @@ void CollisionShape::UpdateCachedGeometryShape(CollisionGeometryDataCache& cache
     else if (model_ && model_->GetNumGeometries())
     {
         // Check the geometry cache
-        Pair<Model*, unsigned> id = MakePair(model_.Get(), lodLevel_);
+        Pair<Model*, i32> id = MakePair(model_.Get(), lodLevel_);
         auto cachedGeometry = cache.Find(id);
         if (cachedGeometry != cache.End())
             geometry_ = cachedGeometry->second_;
