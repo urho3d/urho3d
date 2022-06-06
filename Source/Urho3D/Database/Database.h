@@ -52,9 +52,9 @@ private:
     /// %Database connection pool size. Default to 0 when using ODBC 3.0 or later as ODBC 3.0 driver manager could manage its own database connection pool.
     unsigned poolSize_;
     /// Active database connections.
-    Vector<SharedPtr<DbConnection> > connections_;
+    Vector<SharedPtr<DbConnection>> connections_;
     ///%Database connections pool.
-    HashMap<String, Vector<SharedPtr<DbConnection> > > connectionsPool_;
+    HashMap<String, Vector<SharedPtr<DbConnection>>> connectionsPool_;
 };
 
 }
