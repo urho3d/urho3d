@@ -25,7 +25,7 @@ enum ClipMask : unsigned
 };
 URHO3D_FLAGSET(ClipMask, ClipMaskFlags);
 
-void DrawOcclusionBatchWork(const WorkItem* item, unsigned threadIndex)
+void DrawOcclusionBatchWork(const WorkItem* item, i32 threadIndex)
 {
     auto* buffer = reinterpret_cast<OcclusionBuffer*>(item->aux_);
     OcclusionBatch& batch = *reinterpret_cast<OcclusionBatch*>(item->start_);
@@ -196,14 +196,14 @@ void OcclusionBuffer::DrawTriangles()
         for (Vector<OcclusionBatch>::Iterator i = batches_.Begin(); i != batches_.End(); ++i)
         {
             SharedPtr<WorkItem> item = queue->GetFreeItem();
-            item->priority_ = M_MAX_UNSIGNED;
+            item->priority_ = WI_MAX_PRIORITY;
             item->workFunction_ = DrawOcclusionBatchWork;
             item->aux_ = this;
             item->start_ = &(*i);
             queue->AddWorkItem(item);
         }
 
-        queue->Complete(M_MAX_UNSIGNED);
+        queue->Complete(WI_MAX_PRIORITY);
 
         MergeBuffers();
         depthHierarchyDirty_ = true;

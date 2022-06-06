@@ -8763,7 +8763,7 @@ template <class T> void RegisterMembers_WorkItem(asIScriptEngine* engine, const 
 {
     RegisterMembers_RefCounted<T>(engine, className);
 
-    // void(* WorkItem::workFunction_) (const WorkItem* , unsigned)
+    // void(* WorkItem::workFunction_) (const WorkItem* , i32)
     // Not registered because pointer
     // void* WorkItem::start_
     // Not registered because pointer
@@ -8774,8 +8774,8 @@ template <class T> void RegisterMembers_WorkItem(asIScriptEngine* engine, const 
     // std::atomic<bool> WorkItem::completed_
     // Error: type "std::atomic<bool>" can not automatically bind
 
-    // unsigned WorkItem::priority_
-    engine->RegisterObjectProperty(className, "uint priority", offsetof(T, priority_));
+    // i32 WorkItem::priority_
+    engine->RegisterObjectProperty(className, "int priority", offsetof(T, priority_));
 
     // bool WorkItem::sendEvent_
     engine->RegisterObjectProperty(className, "bool sendEvent", offsetof(T, sendEvent_));
@@ -12739,26 +12739,26 @@ template <class T> void RegisterMembers_WorkQueue(asIScriptEngine* engine, const
     // Error: type "SharedPtr<WorkItem>" can not automatically bind
     // bool WorkQueue::RemoveWorkItem(SharedPtr<WorkItem> item)
     // Error: type "SharedPtr<WorkItem>" can not automatically bind
-    // unsigned WorkQueue::RemoveWorkItems(const Vector<SharedPtr<WorkItem>>& items)
+    // i32 WorkQueue::RemoveWorkItems(const Vector<SharedPtr<WorkItem>>& items)
     // Error: type "const Vector<SharedPtr<WorkItem>>&" can not automatically bind
 
-    // void WorkQueue::Complete(unsigned priority)
-    engine->RegisterObjectMethod(className, "void Complete(uint)", AS_METHODPR(T, Complete, (unsigned), void), AS_CALL_THISCALL);
+    // void WorkQueue::Complete(i32 priority)
+    engine->RegisterObjectMethod(className, "void Complete(int)", AS_METHODPR(T, Complete, (i32), void), AS_CALL_THISCALL);
 
-    // void WorkQueue::CreateThreads(unsigned numThreads)
-    engine->RegisterObjectMethod(className, "void CreateThreads(uint)", AS_METHODPR(T, CreateThreads, (unsigned), void), AS_CALL_THISCALL);
+    // void WorkQueue::CreateThreads(i32 numThreads)
+    engine->RegisterObjectMethod(className, "void CreateThreads(int)", AS_METHODPR(T, CreateThreads, (i32), void), AS_CALL_THISCALL);
 
     // int WorkQueue::GetNonThreadedWorkMs() const
     engine->RegisterObjectMethod(className, "int GetNonThreadedWorkMs() const", AS_METHODPR(T, GetNonThreadedWorkMs, () const, int), AS_CALL_THISCALL);
 
-    // unsigned WorkQueue::GetNumThreads() const
-    engine->RegisterObjectMethod(className, "uint GetNumThreads() const", AS_METHODPR(T, GetNumThreads, () const, unsigned), AS_CALL_THISCALL);
+    // i32 WorkQueue::GetNumThreads() const
+    engine->RegisterObjectMethod(className, "int GetNumThreads() const", AS_METHODPR(T, GetNumThreads, () const, i32), AS_CALL_THISCALL);
 
     // int WorkQueue::GetTolerance() const
     engine->RegisterObjectMethod(className, "int GetTolerance() const", AS_METHODPR(T, GetTolerance, () const, int), AS_CALL_THISCALL);
 
-    // bool WorkQueue::IsCompleted(unsigned priority) const
-    engine->RegisterObjectMethod(className, "bool IsCompleted(uint) const", AS_METHODPR(T, IsCompleted, (unsigned) const, bool), AS_CALL_THISCALL);
+    // bool WorkQueue::IsCompleted(i32 priority) const
+    engine->RegisterObjectMethod(className, "bool IsCompleted(int) const", AS_METHODPR(T, IsCompleted, (i32) const, bool), AS_CALL_THISCALL);
 
     // bool WorkQueue::IsCompleting() const
     engine->RegisterObjectMethod(className, "bool IsCompleting() const", AS_METHODPR(T, IsCompleting, () const, bool), AS_CALL_THISCALL);

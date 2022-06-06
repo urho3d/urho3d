@@ -628,6 +628,9 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // const StringHash VSP_ZONE | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash VSP_ZONE", (void*)&VSP_ZONE);
 
+    // constexpr i32 WI_MAX_PRIORITY | File: ../Core/WorkQueue.h
+    engine->RegisterGlobalProperty("const int WI_MAX_PRIORITY", (void*)&WI_MAX_PRIORITY);
+
 #ifdef URHO3D_NETWORK
     // static const unsigned CONTROLS_CONTENT_ID | File: ../Network/Protocol.h
     engine->RegisterGlobalProperty("const uint CONTROLS_CONTENT_ID", (void*)&CONTROLS_CONTENT_ID);

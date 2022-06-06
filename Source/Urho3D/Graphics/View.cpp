@@ -138,7 +138,7 @@ public:
     OcclusionBuffer* buffer_;
 };
 
-void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex)
+void CheckVisibilityWork(const WorkItem* item, i32 threadIndex)
 {
     auto* view = reinterpret_cast<View*>(item->aux_);
     auto** start = reinterpret_cast<Drawable**>(item->start_);
@@ -207,7 +207,7 @@ void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex)
     }
 }
 
-void ProcessLightWork(const WorkItem* item, unsigned threadIndex)
+void ProcessLightWork(const WorkItem* item, i32 threadIndex)
 {
     auto* view = reinterpret_cast<View*>(item->aux_);
     auto* query = reinterpret_cast<LightQueryResult*>(item->start_);
@@ -215,7 +215,7 @@ void ProcessLightWork(const WorkItem* item, unsigned threadIndex)
     view->ProcessLight(*query, threadIndex);
 }
 
-void UpdateDrawableGeometriesWork(const WorkItem* item, unsigned threadIndex)
+void UpdateDrawableGeometriesWork(const WorkItem* item, i32 threadIndex)
 {
     const FrameInfo& frame = *(reinterpret_cast<FrameInfo*>(item->aux_));
     auto** start = reinterpret_cast<Drawable**>(item->start_);
@@ -230,28 +230,28 @@ void UpdateDrawableGeometriesWork(const WorkItem* item, unsigned threadIndex)
     }
 }
 
-void SortBatchQueueFrontToBackWork(const WorkItem* item, unsigned threadIndex)
+void SortBatchQueueFrontToBackWork(const WorkItem* item, i32 threadIndex)
 {
     auto* queue = reinterpret_cast<BatchQueue*>(item->start_);
 
     queue->SortFrontToBack();
 }
 
-void SortBatchQueueBackToFrontWork(const WorkItem* item, unsigned threadIndex)
+void SortBatchQueueBackToFrontWork(const WorkItem* item, i32 threadIndex)
 {
     auto* queue = reinterpret_cast<BatchQueue*>(item->start_);
 
     queue->SortBackToFront();
 }
 
-void SortLightQueueWork(const WorkItem* item, unsigned threadIndex)
+void SortLightQueueWork(const WorkItem* item, i32 threadIndex)
 {
     auto* start = reinterpret_cast<LightBatchQueue*>(item->start_);
     start->litBaseBatches_.SortFrontToBack();
     start->litBatches_.SortFrontToBack();
 }
 
-void SortShadowQueueWork(const WorkItem* item, unsigned threadIndex)
+void SortShadowQueueWork(const WorkItem* item, i32 threadIndex)
 {
     auto* start = reinterpret_cast<LightBatchQueue*>(item->start_);
     for (unsigned i = 0; i < start->shadowSplits_.Size(); ++i)
@@ -891,7 +891,7 @@ void View::GetDrawables()
         for (int i = 0; i < numWorkItems; ++i)
         {
             SharedPtr<WorkItem> item = queue->GetFreeItem();
-            item->priority_ = M_MAX_UNSIGNED;
+            item->priority_ = WI_MAX_PRIORITY;
             item->workFunction_ = CheckVisibilityWork;
             item->aux_ = this;
 
@@ -906,7 +906,7 @@ void View::GetDrawables()
             start = end;
         }
 
-        queue->Complete(M_MAX_UNSIGNED);
+        queue->Complete(WI_MAX_PRIORITY);
     }
 
     // Combine lights, geometries & scene Z range from the threads
@@ -973,7 +973,7 @@ void View::ProcessLights()
     for (unsigned i = 0; i < lightQueryResults_.Size(); ++i)
     {
         SharedPtr<WorkItem> item = queue->GetFreeItem();
-        item->priority_ = M_MAX_UNSIGNED;
+        item->priority_ = WI_MAX_PRIORITY;
         item->workFunction_ = ProcessLightWork;
         item->aux_ = this;
 
@@ -985,7 +985,7 @@ void View::ProcessLights()
     }
 
     // Ensure all lights have been processed before proceeding
-    queue->Complete(M_MAX_UNSIGNED);
+    queue->Complete(WI_MAX_PRIORITY);
 }
 
 void View::GetLightBatches()
@@ -1289,7 +1289,7 @@ void View::UpdateGeometries()
             if (command.type_ == CMD_SCENEPASS)
             {
                 SharedPtr<WorkItem> item = queue->GetFreeItem();
-                item->priority_ = M_MAX_UNSIGNED;
+                item->priority_ = WI_MAX_PRIORITY;
                 item->workFunction_ =
                     command.sortMode_ == SORT_FRONTTOBACK ? SortBatchQueueFrontToBackWork : SortBatchQueueBackToFrontWork;
                 item->start_ = &batchQueues_[command.passIndex_];
@@ -1300,7 +1300,7 @@ void View::UpdateGeometries()
         for (Vector<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
         {
             SharedPtr<WorkItem> lightItem = queue->GetFreeItem();
-            lightItem->priority_ = M_MAX_UNSIGNED;
+            lightItem->priority_ = WI_MAX_PRIORITY;
             lightItem->workFunction_ = SortLightQueueWork;
             lightItem->start_ = &(*i);
             queue->AddWorkItem(lightItem);
@@ -1308,7 +1308,7 @@ void View::UpdateGeometries()
             if (i->shadowSplits_.Size())
             {
                 SharedPtr<WorkItem> shadowItem = queue->GetFreeItem();
-                shadowItem->priority_ = M_MAX_UNSIGNED;
+                shadowItem->priority_ = WI_MAX_PRIORITY;
                 shadowItem->workFunction_ = SortShadowQueueWork;
                 shadowItem->start_ = &(*i);
                 queue->AddWorkItem(shadowItem);
@@ -1343,7 +1343,7 @@ void View::UpdateGeometries()
                     end = start + drawablesPerItem;
 
                 SharedPtr<WorkItem> item = queue->GetFreeItem();
-                item->priority_ = M_MAX_UNSIGNED;
+                item->priority_ = WI_MAX_PRIORITY;
                 item->workFunction_ = UpdateDrawableGeometriesWork;
                 item->aux_ = const_cast<FrameInfo*>(&frame_);
                 item->start_ = &(*start);
@@ -1360,7 +1360,7 @@ void View::UpdateGeometries()
     }
 
     // Finally ensure all threaded work has completed
-    queue->Complete(M_MAX_UNSIGNED);
+    queue->Complete(WI_MAX_PRIORITY);
     geometriesUpdated_ = true;
 }
 
