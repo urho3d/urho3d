@@ -94,7 +94,7 @@ class URHO3D_API Drawable : public Component
 
     friend class Octant;
     friend class Octree;
-    friend void UpdateDrawablesWork(const WorkItem* item, unsigned threadIndex);
+    friend void UpdateDrawablesWork(const WorkItem* item, i32 threadIndex);
 
 public:
     /// Construct.

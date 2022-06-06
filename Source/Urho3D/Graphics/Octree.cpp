@@ -29,7 +29,7 @@ static const int DEFAULT_OCTREE_LEVELS = 8;
 
 extern const char* SUBSYSTEM_CATEGORY;
 
-void UpdateDrawablesWork(const WorkItem* item, unsigned threadIndex)
+void UpdateDrawablesWork(const WorkItem* item, i32 threadIndex)
 {
     const FrameInfo& frame = *(reinterpret_cast<FrameInfo*>(item->aux_));
     auto** start = reinterpret_cast<Drawable**>(item->start_);
@@ -369,7 +369,7 @@ void Octree::Update(const FrameInfo& frame)
         for (int i = 0; i < numWorkItems; ++i)
         {
             SharedPtr<WorkItem> item = queue->GetFreeItem();
-            item->priority_ = M_MAX_UNSIGNED;
+            item->priority_ = WI_MAX_PRIORITY;
             item->workFunction_ = UpdateDrawablesWork;
             item->aux_ = const_cast<FrameInfo*>(&frame);
 
@@ -384,7 +384,7 @@ void Octree::Update(const FrameInfo& frame)
             start = end;
         }
 
-        queue->Complete(M_MAX_UNSIGNED);
+        queue->Complete(WI_MAX_PRIORITY);
         scene->EndThreadedUpdate();
     }
 

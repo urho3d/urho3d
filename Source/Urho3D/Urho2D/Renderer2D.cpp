@@ -284,7 +284,7 @@ SharedPtr<Material> Renderer2D::CreateMaterial(Texture2D* texture, BlendMode ble
     return newMaterial;
 }
 
-void CheckDrawableVisibilityWork(const WorkItem* item, unsigned threadIndex)
+void CheckDrawableVisibilityWork(const WorkItem* item, i32 threadIndex)
 {
     auto* renderer = reinterpret_cast<Renderer2D*>(item->aux_);
     auto** start = reinterpret_cast<Drawable2D**>(item->start_);
@@ -326,7 +326,7 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
         for (int i = 0; i < numWorkItems; ++i)
         {
             SharedPtr<WorkItem> item = queue->GetFreeItem();
-            item->priority_ = M_MAX_UNSIGNED;
+            item->priority_ = WI_MAX_PRIORITY;
             item->workFunction_ = CheckDrawableVisibilityWork;
             item->aux_ = this;
 
@@ -341,7 +341,7 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
             start = end;
         }
 
-        queue->Complete(M_MAX_UNSIGNED);
+        queue->Complete(WI_MAX_PRIORITY);
     }
 
     ViewBatchInfo2D& viewBatchInfo = viewBatchInfos_[camera];

@@ -17,10 +17,11 @@ class WorkerThread : public Thread, public RefCounted
 {
 public:
     /// Construct.
-    WorkerThread(WorkQueue* owner, unsigned index) :
+    WorkerThread(WorkQueue* owner, i32 index) :
         owner_(owner),
         index_(index)
     {
+        assert(index >= 0);
     }
 
     /// Process work items until stopped.
@@ -37,13 +38,13 @@ public:
     }
 
     /// Return thread index.
-    unsigned GetIndex() const { return index_; }
+    i32 GetIndex() const { return index_; }
 
 private:
     /// Work queue.
     WorkQueue* owner_;
     /// Thread index.
-    unsigned index_;
+    i32 index_;
 };
 
 WorkQueue::WorkQueue(Context* context) :
@@ -69,9 +70,11 @@ WorkQueue::~WorkQueue()
         thread->Stop();
 }
 
-void WorkQueue::CreateThreads(unsigned numThreads)
+void WorkQueue::CreateThreads(i32 numThreads)
 {
 #ifdef URHO3D_THREADING
+    assert(numThreads >= 0);
+
     // Other subsystems may initialize themselves according to the number of threads.
     // Therefore allow creating the threads only once, after which the amount is fixed
     if (!threads_.Empty())
@@ -80,7 +83,7 @@ void WorkQueue::CreateThreads(unsigned numThreads)
     // Start threads in paused mode
     Pause();
 
-    for (unsigned i = 0; i < numThreads; ++i)
+    for (i32 i = 0; i < numThreads; ++i)
     {
         SharedPtr<WorkerThread> thread(new WorkerThread(this, i + 1));
         thread->Run();
@@ -180,10 +183,10 @@ bool WorkQueue::RemoveWorkItem(SharedPtr<WorkItem> item)
     return false;
 }
 
-unsigned WorkQueue::RemoveWorkItems(const Vector<SharedPtr<WorkItem>>& items)
+i32 WorkQueue::RemoveWorkItems(const Vector<SharedPtr<WorkItem>>& items)
 {
     MutexLock lock(queueMutex_);
-    unsigned removed = 0;
+    i32 removed = 0;
 
     for (Vector<SharedPtr<WorkItem>>::ConstIterator i = items.Begin(); i != items.End(); ++i)
     {
@@ -227,8 +230,9 @@ void WorkQueue::Resume()
 }
 
 
-void WorkQueue::Complete(unsigned priority)
+void WorkQueue::Complete(i32 priority)
 {
+    assert(priority >= 0);
     completing_ = true;
 
     if (threads_.Size())
@@ -279,8 +283,9 @@ void WorkQueue::Complete(unsigned priority)
     completing_ = false;
 }
 
-bool WorkQueue::IsCompleted(unsigned priority) const
+bool WorkQueue::IsCompleted(i32 priority) const
 {
+    assert(priority >= 0);
     for (List<SharedPtr<WorkItem>>::ConstIterator i = workItems_.Begin(); i != workItems_.End(); ++i)
     {
         if ((*i)->priority_ >= priority && !(*i)->completed_)
@@ -290,8 +295,10 @@ bool WorkQueue::IsCompleted(unsigned priority) const
     return true;
 }
 
-void WorkQueue::ProcessItems(unsigned threadIndex)
+void WorkQueue::ProcessItems(i32 threadIndex)
 {
+    assert(threadIndex >= 0);
+
     bool wasActive = false;
 
     for (;;)
@@ -325,8 +332,10 @@ void WorkQueue::ProcessItems(unsigned threadIndex)
     }
 }
 
-void WorkQueue::PurgeCompleted(unsigned priority)
+void WorkQueue::PurgeCompleted(i32 priority)
 {
+    assert(priority >= 0);
+
     // Purge completed work items and send completion events. Do not signal items lower than priority threshold,
     // as those may be user submitted and lead to eg. scene manipulation that could happen in the middle of the
     // render update, which is not allowed
@@ -353,11 +362,11 @@ void WorkQueue::PurgeCompleted(unsigned priority)
 
 void WorkQueue::PurgePool()
 {
-    unsigned currentSize = poolItems_.Size();
-    int difference = lastSize_ - currentSize;
+    i32 currentSize = poolItems_.Size();
+    i32 difference = lastSize_ - currentSize;
 
     // Difference tolerance, should be fairly significant to reduce the pool size.
-    for (unsigned i = 0; poolItems_.Size() > 0 && difference > tolerance_ && i < (unsigned)difference; i++)
+    for (i32 i = 0; poolItems_.Size() > 0 && difference > tolerance_ && i < difference; i++)
         poolItems_.PopFront();
 
     lastSize_ = currentSize;
@@ -376,7 +385,7 @@ void WorkQueue::ReturnToPool(SharedPtr<WorkItem>& item)
         item->end_ = nullptr;
         item->aux_ = nullptr;
         item->workFunction_ = nullptr;
-        item->priority_ = M_MAX_UNSIGNED;
+        item->priority_ = WI_MAX_PRIORITY;
         item->sendEvent_ = false;
         item->completed_ = false;
 
