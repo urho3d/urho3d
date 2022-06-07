@@ -49,13 +49,13 @@ public:
 
     /// Set number of buffered rows.
     /// @property
-    void SetNumBufferedRows(unsigned rows);
+    void SetNumBufferedRows(i32 rows);
     /// Set number of displayed rows.
     /// @property
-    void SetNumRows(unsigned rows);
+    void SetNumRows(i32 rows);
     /// Set command history maximum size, 0 disables history.
     /// @property
-    void SetNumHistoryRows(unsigned rows);
+    void SetNumHistoryRows(i32 rows);
     /// Set whether to automatically focus the line edit when showing. Default true on desktops and false on mobile devices, as on mobiles it would pop up the screen keyboard.
     /// @property
     void SetFocusOnShow(bool enable);
@@ -96,26 +96,26 @@ public:
 
     /// Return number of buffered rows.
     /// @property
-    unsigned GetNumBufferedRows() const;
+    i32 GetNumBufferedRows() const;
 
     /// Return number of displayed rows.
     /// @property
-    unsigned GetNumRows() const { return displayedRows_; }
+    i32 GetNumRows() const { return displayedRows_; }
 
     /// Copy selected rows to system clipboard.
     void CopySelectedRows() const;
 
     /// Return history maximum size.
     /// @property
-    unsigned GetNumHistoryRows() const { return historyRows_; }
+    i32 GetNumHistoryRows() const { return historyRows_; }
 
     /// Return current history position.
     /// @property
-    unsigned GetHistoryPosition() const { return historyPosition_; }
+    i32 GetHistoryPosition() const { return historyPosition_; }
 
     /// Return history row at index.
     /// @property
-    const String& GetHistoryRow(unsigned index) const;
+    const String& GetHistoryRow(i32 index) const;
 
     /// Return whether automatically focuses the line edit when showing.
     /// @property
@@ -165,11 +165,11 @@ private:
     /// Current row being edited.
     String currentRow_;
     /// Maximum displayed rows.
-    unsigned displayedRows_{};
+    i32 displayedRows_{};
     /// Command history maximum rows.
-    unsigned historyRows_;
+    i32 historyRows_;
     /// Command history current position.
-    unsigned historyPosition_;
+    i32 historyPosition_;
 
     /**
     Command auto complete options.
@@ -183,7 +183,7 @@ private:
     */
     Vector<String> autoComplete_;
     /// Command auto complete current position.
-    unsigned autoCompletePosition_;
+    i32 autoCompletePosition_;
     /// Store the original line which is being auto-completed.
     String autoCompleteLine_;
 

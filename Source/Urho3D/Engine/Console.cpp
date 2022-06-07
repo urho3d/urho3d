@@ -171,8 +171,10 @@ void Console::Toggle()
     SetVisible(!IsVisible());
 }
 
-void Console::SetNumBufferedRows(unsigned rows)
+void Console::SetNumBufferedRows(i32 rows)
 {
+    assert(rows >= 0);
+
     if (rows < displayedRows_)
         return;
 
@@ -183,7 +185,7 @@ void Console::SetNumBufferedRows(unsigned rows)
     {
         // We have more, remove oldest rows first
         for (int i = 0; i < delta; ++i)
-            rowContainer_->RemoveItem((unsigned)0);
+            rowContainer_->RemoveItem(0);
     }
     else
     {
@@ -206,8 +208,10 @@ void Console::SetNumBufferedRows(unsigned rows)
     UpdateElements();
 }
 
-void Console::SetNumRows(unsigned rows)
+void Console::SetNumRows(i32 rows)
 {
+    assert(rows >= 0);
+
     if (!rows)
         return;
 
@@ -218,8 +222,10 @@ void Console::SetNumRows(unsigned rows)
     UpdateElements();
 }
 
-void Console::SetNumHistoryRows(unsigned rows)
+void Console::SetNumHistoryRows(i32 rows)
 {
+    assert(rows >= 0);
+
     historyRows_ = rows;
     if (history_.Size() > rows)
         history_.Resize(rows);
@@ -274,7 +280,7 @@ bool Console::IsVisible() const
     return background_ && background_->IsVisible();
 }
 
-unsigned Console::GetNumBufferedRows() const
+i32 Console::GetNumBufferedRows() const
 {
     return rowContainer_->GetNumItems();
 }
@@ -284,8 +290,9 @@ void Console::CopySelectedRows() const
     rowContainer_->CopySelectedItemsToClipboard();
 }
 
-const String& Console::GetHistoryRow(unsigned index) const
+const String& Console::GetHistoryRow(i32 index) const
 {
+    assert(index >= 0);
     return index < history_.Size() ? history_[index] : String::EMPTY;
 }
 
@@ -298,21 +305,20 @@ bool Console::PopulateInterpreter()
         return false;
 
     Vector<String> names;
-    for (unsigned i = 0; i < group->receivers_.Size(); ++i)
+    for (const Object* receiver : group->receivers_)
     {
-        Object* receiver = group->receivers_[i];
         if (receiver)
             names.Push(receiver->GetTypeName());
     }
     Sort(names.Begin(), names.End());
 
-    unsigned selection = M_MAX_UNSIGNED;
-    for (unsigned i = 0; i < names.Size(); ++i)
+    i32 selection = NINDEX;
+    for (i32 i = 0; i < names.Size(); ++i)
     {
         const String& name = names[i];
         if (name == commandInterpreter_)
             selection = i;
-        auto* text = new Text(context_);
+        Text* text = new Text(context_);
         text->SetStyle("ConsoleText");
         text->SetText(name);
         interpreters_->AddItem(text);
@@ -324,7 +330,7 @@ bool Console::PopulateInterpreter()
     interpreters_->SetEnabled(enabled);
     interpreters_->SetFocusMode(enabled ? FM_FOCUSABLE_DEFOCUSABLE : FM_NOTFOCUSABLE);
 
-    if (selection == M_MAX_UNSIGNED)
+    if (selection == NINDEX)
     {
         selection = 0;
         commandInterpreter_ = names[selection];
@@ -399,7 +405,7 @@ void Console::HandleLineEditKey(StringHash eventType, VariantMap& eventData)
         if (autoCompletePosition_ < autoComplete_.Size())
         {
             // Search for auto completion that contains the contents of the line
-            for (--autoCompletePosition_; autoCompletePosition_ != M_MAX_UNSIGNED; --autoCompletePosition_)
+            for (--autoCompletePosition_; autoCompletePosition_ >= 0; --autoCompletePosition_)
             {
                 const String& current = autoComplete_[autoCompletePosition_];
                 if (current.StartsWith(autoCompleteLine_))
@@ -411,7 +417,7 @@ void Console::HandleLineEditKey(StringHash eventType, VariantMap& eventData)
             }
 
             // If not found
-            if (autoCompletePosition_ == M_MAX_UNSIGNED)
+            if (autoCompletePosition_ < 0)
             {
                 // Reset the position
                 autoCompletePosition_ = autoComplete_.Size();
@@ -448,7 +454,7 @@ void Console::HandleLineEditKey(StringHash eventType, VariantMap& eventData)
             else
                 ++autoCompletePosition_; // If not starting over, skip checking the currently found completion
 
-            unsigned startPosition = autoCompletePosition_;
+            i32 startPosition = autoCompletePosition_;
 
             // Search for auto completion that contains the contents of the line
             for (; autoCompletePosition_ < autoComplete_.Size(); ++autoCompletePosition_)
@@ -521,8 +527,8 @@ void Console::HandleLogMessage(StringHash eventType, VariantMap& eventData)
     // The message may be multi-line, so split to rows in that case
     Vector<String> rows = eventData[P_MESSAGE].GetString().Split('\n');
 
-    for (unsigned i = 0; i < rows.Size(); ++i)
-        pendingRows_.Push(MakePair(level, rows[i]));
+    for (const String& row : rows)
+        pendingRows_.Push(MakePair(level, row));
 
     if (autoVisibleOnError_ && level == LOG_ERROR && !IsVisible())
         SetVisible(true);
@@ -546,14 +552,14 @@ void Console::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
     rowContainer_->DisableLayoutUpdate();
 
     Text* text = nullptr;
-    for (unsigned i = 0; i < pendingRows_.Size(); ++i)
+    for (const Pair<i32, String>& pendingRow : pendingRows_)
     {
-        rowContainer_->RemoveItem((unsigned)0);
+        rowContainer_->RemoveItem(0);
         text = new Text(context_);
-        text->SetText(pendingRows_[i].second_);
+        text->SetText(pendingRow.second_);
 
         // Highlight console messages based on their type
-        text->SetStyle(logStyles[pendingRows_[i].first_]);
+        text->SetStyle(logStyles[pendingRow.first_]);
 
         rowContainer_->AddItem(text);
     }

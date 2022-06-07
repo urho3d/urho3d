@@ -9210,29 +9210,29 @@ template <class T> void RegisterMembers_Console(asIScriptEngine* engine, const c
     engine->RegisterObjectMethod(className, "bool GetFocusOnShow() const", AS_METHODPR(T, GetFocusOnShow, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_focusOnShow() const", AS_METHODPR(T, GetFocusOnShow, () const, bool), AS_CALL_THISCALL);
 
-    // unsigned Console::GetHistoryPosition() const
-    engine->RegisterObjectMethod(className, "uint GetHistoryPosition() const", AS_METHODPR(T, GetHistoryPosition, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_historyPosition() const", AS_METHODPR(T, GetHistoryPosition, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Console::GetHistoryPosition() const
+    engine->RegisterObjectMethod(className, "int GetHistoryPosition() const", AS_METHODPR(T, GetHistoryPosition, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_historyPosition() const", AS_METHODPR(T, GetHistoryPosition, () const, i32), AS_CALL_THISCALL);
 
-    // const String& Console::GetHistoryRow(unsigned index) const
-    engine->RegisterObjectMethod(className, "const String& GetHistoryRow(uint) const", AS_METHODPR(T, GetHistoryRow, (unsigned) const, const String&), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "const String& get_historyRow(uint) const", AS_METHODPR(T, GetHistoryRow, (unsigned) const, const String&), AS_CALL_THISCALL);
+    // const String& Console::GetHistoryRow(i32 index) const
+    engine->RegisterObjectMethod(className, "const String& GetHistoryRow(int) const", AS_METHODPR(T, GetHistoryRow, (i32) const, const String&), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const String& get_historyRow(int) const", AS_METHODPR(T, GetHistoryRow, (i32) const, const String&), AS_CALL_THISCALL);
 
     // LineEdit* Console::GetLineEdit() const
     engine->RegisterObjectMethod(className, "LineEdit@+ GetLineEdit() const", AS_METHODPR(T, GetLineEdit, () const, LineEdit*), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "LineEdit@+ get_lineEdit() const", AS_METHODPR(T, GetLineEdit, () const, LineEdit*), AS_CALL_THISCALL);
 
-    // unsigned Console::GetNumBufferedRows() const
-    engine->RegisterObjectMethod(className, "uint GetNumBufferedRows() const", AS_METHODPR(T, GetNumBufferedRows, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numBufferedRows() const", AS_METHODPR(T, GetNumBufferedRows, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Console::GetNumBufferedRows() const
+    engine->RegisterObjectMethod(className, "int GetNumBufferedRows() const", AS_METHODPR(T, GetNumBufferedRows, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numBufferedRows() const", AS_METHODPR(T, GetNumBufferedRows, () const, i32), AS_CALL_THISCALL);
 
-    // unsigned Console::GetNumHistoryRows() const
-    engine->RegisterObjectMethod(className, "uint GetNumHistoryRows() const", AS_METHODPR(T, GetNumHistoryRows, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numHistoryRows() const", AS_METHODPR(T, GetNumHistoryRows, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Console::GetNumHistoryRows() const
+    engine->RegisterObjectMethod(className, "int GetNumHistoryRows() const", AS_METHODPR(T, GetNumHistoryRows, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numHistoryRows() const", AS_METHODPR(T, GetNumHistoryRows, () const, i32), AS_CALL_THISCALL);
 
-    // unsigned Console::GetNumRows() const
-    engine->RegisterObjectMethod(className, "uint GetNumRows() const", AS_METHODPR(T, GetNumRows, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numRows() const", AS_METHODPR(T, GetNumRows, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Console::GetNumRows() const
+    engine->RegisterObjectMethod(className, "int GetNumRows() const", AS_METHODPR(T, GetNumRows, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numRows() const", AS_METHODPR(T, GetNumRows, () const, i32), AS_CALL_THISCALL);
 
     // bool Console::IsAutoVisibleOnError() const
     engine->RegisterObjectMethod(className, "bool IsAutoVisibleOnError() const", AS_METHODPR(T, IsAutoVisibleOnError, () const, bool), AS_CALL_THISCALL);
@@ -9261,17 +9261,17 @@ template <class T> void RegisterMembers_Console(asIScriptEngine* engine, const c
     engine->RegisterObjectMethod(className, "void SetFocusOnShow(bool)", AS_METHODPR(T, SetFocusOnShow, (bool), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_focusOnShow(bool)", AS_METHODPR(T, SetFocusOnShow, (bool), void), AS_CALL_THISCALL);
 
-    // void Console::SetNumBufferedRows(unsigned rows)
-    engine->RegisterObjectMethod(className, "void SetNumBufferedRows(uint)", AS_METHODPR(T, SetNumBufferedRows, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_numBufferedRows(uint)", AS_METHODPR(T, SetNumBufferedRows, (unsigned), void), AS_CALL_THISCALL);
+    // void Console::SetNumBufferedRows(i32 rows)
+    engine->RegisterObjectMethod(className, "void SetNumBufferedRows(int)", AS_METHODPR(T, SetNumBufferedRows, (i32), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_numBufferedRows(int)", AS_METHODPR(T, SetNumBufferedRows, (i32), void), AS_CALL_THISCALL);
 
-    // void Console::SetNumHistoryRows(unsigned rows)
-    engine->RegisterObjectMethod(className, "void SetNumHistoryRows(uint)", AS_METHODPR(T, SetNumHistoryRows, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_numHistoryRows(uint)", AS_METHODPR(T, SetNumHistoryRows, (unsigned), void), AS_CALL_THISCALL);
+    // void Console::SetNumHistoryRows(i32 rows)
+    engine->RegisterObjectMethod(className, "void SetNumHistoryRows(int)", AS_METHODPR(T, SetNumHistoryRows, (i32), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_numHistoryRows(int)", AS_METHODPR(T, SetNumHistoryRows, (i32), void), AS_CALL_THISCALL);
 
-    // void Console::SetNumRows(unsigned rows)
-    engine->RegisterObjectMethod(className, "void SetNumRows(uint)", AS_METHODPR(T, SetNumRows, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_numRows(uint)", AS_METHODPR(T, SetNumRows, (unsigned), void), AS_CALL_THISCALL);
+    // void Console::SetNumRows(i32 rows)
+    engine->RegisterObjectMethod(className, "void SetNumRows(int)", AS_METHODPR(T, SetNumRows, (i32), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_numRows(int)", AS_METHODPR(T, SetNumRows, (i32), void), AS_CALL_THISCALL);
 
     // void Console::SetVisible(bool enable)
     engine->RegisterObjectMethod(className, "void SetVisible(bool)", AS_METHODPR(T, SetVisible, (bool), void), AS_CALL_THISCALL);
@@ -22460,8 +22460,8 @@ template <class T> void RegisterMembers_ListView(asIScriptEngine* engine, const 
     // void ListView::RemoveItem(UIElement* item, unsigned index = 0)
     engine->RegisterObjectMethod(className, "void RemoveItem(UIElement@+, uint = 0)", AS_METHODPR(T, RemoveItem, (UIElement*, unsigned), void), AS_CALL_THISCALL);
 
-    // void ListView::RemoveItem(unsigned index)
-    engine->RegisterObjectMethod(className, "void RemoveItem(uint)", AS_METHODPR(T, RemoveItem, (unsigned), void), AS_CALL_THISCALL);
+    // void ListView::RemoveItem(i32 index)
+    engine->RegisterObjectMethod(className, "void RemoveItem(int)", AS_METHODPR(T, RemoveItem, (i32), void), AS_CALL_THISCALL);
 
     // void ListView::RemoveSelection(unsigned index)
     engine->RegisterObjectMethod(className, "void RemoveSelection(uint)", AS_METHODPR(T, RemoveSelection, (unsigned), void), AS_CALL_THISCALL);
