@@ -470,8 +470,9 @@ void ListView::RemoveItem(UIElement* item, unsigned index)
     }
 }
 
-void ListView::RemoveItem(unsigned index)
+void ListView::RemoveItem(i32 index)
 {
+    assert(index >= 0);
     RemoveItem(GetItem(index), index);
 }
 

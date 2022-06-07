@@ -58,7 +58,7 @@ public:
     /// Remove specific item, starting search at the specified index if provided. In hierarchy mode will also remove any children.
     void RemoveItem(UIElement* item, unsigned index = 0);
     /// Remove item at index. In hierarchy mode will also remove any children.
-    void RemoveItem(unsigned index);
+    void RemoveItem(i32 index);
     /// Remove all items.
     void RemoveAllItems();
     /// Set selection.
