@@ -508,8 +508,8 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // static const int QUICKSORT_THRESHOLD | File: ../Container/Sort.h
     engine->RegisterGlobalProperty("const int QUICKSORT_THRESHOLD", (void*)&QUICKSORT_THRESHOLD);
 
-    // static const unsigned ROOT_INDEX | File: ../Graphics/Octree.h
-    engine->RegisterGlobalProperty("const uint ROOT_INDEX", (void*)&ROOT_INDEX);
+    // static const i32 ROOT_INDEX | File: ../Graphics/Octree.h
+    engine->RegisterGlobalProperty("const int ROOT_INDEX", (void*)&ROOT_INDEX);
 
     // static const unsigned SCAN_DIRS | File: ../IO/FileSystem.h
     engine->RegisterGlobalProperty("const uint SCAN_DIRS", (void*)&SCAN_DIRS);

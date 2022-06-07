@@ -49,12 +49,14 @@ inline bool CompareRayQueryResults(const RayQueryResult& lhs, const RayQueryResu
     return lhs.distance_ < rhs.distance_;
 }
 
-Octant::Octant(const BoundingBox& box, unsigned level, Octant* parent, Octree* root, unsigned index) :
+Octant::Octant(const BoundingBox& box, i32 level, Octant* parent, Octree* root, i32 index/* = ROOT_INDEX*/) :
     level_(level),
     parent_(parent),
     root_(root),
     index_(index)
 {
+    assert(index >= 0 || index == ROOT_INDEX);
+    assert(level >= 0);
     Initialize(box);
 }
 
@@ -73,12 +75,14 @@ Octant::~Octant()
         numDrawables_ = 0;
     }
 
-    for (unsigned i = 0; i < NUM_OCTANTS; ++i)
+    for (i32 i = 0; i < NUM_OCTANTS; ++i)
         DeleteChild(i);
 }
 
-Octant* Octant::GetOrCreateChild(unsigned index)
+Octant* Octant::GetOrCreateChild(i32 index)
 {
+    assert(index >= 0);
+
     if (children_[index])
         return children_[index];
 
@@ -105,9 +109,9 @@ Octant* Octant::GetOrCreateChild(unsigned index)
     return children_[index];
 }
 
-void Octant::DeleteChild(unsigned index)
+void Octant::DeleteChild(i32 index)
 {
-    assert(index < NUM_OCTANTS);
+    assert(index >= 0 && index < NUM_OCTANTS);
     delete children_[index];
     children_[index] = nullptr;
 }
@@ -138,9 +142,9 @@ void Octant::InsertDrawable(Drawable* drawable)
     else
     {
         Vector3 boxCenter = box.Center();
-        unsigned x = boxCenter.x_ < center_.x_ ? 0 : 1;
-        unsigned y = boxCenter.y_ < center_.y_ ? 0 : 2;
-        unsigned z = boxCenter.z_ < center_.z_ ? 0 : 4;
+        i32 x = boxCenter.x_ < center_.x_ ? 0 : 1;
+        i32 y = boxCenter.y_ < center_.y_ ? 0 : 2;
+        i32 z = boxCenter.z_ < center_.z_ ? 0 : 4;
 
         GetOrCreateChild(x + y + z)->InsertDrawable(drawable);
     }
@@ -329,17 +333,19 @@ void Octree::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     }
 }
 
-void Octree::SetSize(const BoundingBox& box, unsigned numLevels)
+void Octree::SetSize(const BoundingBox& box, i32 numLevels)
 {
+    assert(numLevels >= 0);
+
     URHO3D_PROFILE(ResizeOctree);
 
     // If drawables exist, they are temporarily moved to the root
-    for (unsigned i = 0; i < NUM_OCTANTS; ++i)
+    for (i32 i = 0; i < NUM_OCTANTS; ++i)
         DeleteChild(i);
 
     Initialize(box);
     numDrawables_ = drawables_.Size();
-    numLevels_ = Max(numLevels, 1U);
+    numLevels_ = Max(numLevels, 1);
 }
 
 void Octree::Update(const FrameInfo& frame)
@@ -512,7 +518,7 @@ void Octree::RaycastSingle(RayOctreeQuery& query) const
         Drawable* drawable = *i;
         if (drawable->GetSortValue() < Min(closestHit, query.maxDistance_))
         {
-            unsigned oldSize = query.result_.Size();
+            i32 oldSize = query.result_.Size();
             drawable->ProcessRayQuery(query, query.result_);
             if (query.result_.Size() > oldSize)
                 closestHit = Min(closestHit, query.result_.Back().distance_);
