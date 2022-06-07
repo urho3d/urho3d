@@ -195,7 +195,7 @@ void Light::ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQueryResult>&
     result.distance_ = distance;
     result.drawable_ = this;
     result.node_ = node_;
-    result.subObject_ = M_MAX_UNSIGNED;
+    result.subObject_ = NINDEX;
     results.Push(result);
 }
 

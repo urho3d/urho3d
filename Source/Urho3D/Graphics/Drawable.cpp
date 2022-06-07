@@ -102,7 +102,7 @@ void Drawable::ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQueryResul
         result.distance_ = distance;
         result.drawable_ = this;
         result.node_ = GetNode();
-        result.subObject_ = M_MAX_UNSIGNED;
+        result.subObject_ = NINDEX;
         results.Push(result);
     }
 }

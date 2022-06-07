@@ -130,7 +130,7 @@ void BillboardSet::ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQueryR
     Matrix3x4 billboardTransform = relative_ ? worldTransform : Matrix3x4::IDENTITY;
     Vector3 billboardScale = scaled_ ? worldTransform.Scale() : Vector3::ONE;
 
-    for (unsigned i = 0; i < billboards_.Size(); ++i)
+    for (i32 i = 0; i < billboards_.Size(); ++i)
     {
         if (!billboards_[i].enabled_)
             continue;

@@ -70,13 +70,13 @@ void StaticModel::ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQueryRe
         float distance = localRay.HitDistance(boundingBox_);
         Vector3 normal = -query.ray_.direction_;
         Vector2 geometryUV;
-        unsigned hitBatch = M_MAX_UNSIGNED;
+        i32 hitBatch = NINDEX;
 
         if (level >= RAY_TRIANGLE && distance < query.maxDistance_)
         {
             distance = M_INFINITY;
 
-            for (unsigned i = 0; i < batches_.Size(); ++i)
+            for (i32 i = 0; i < batches_.Size(); ++i)
             {
                 Geometry* geometry = batches_[i].geometry_;
                 if (geometry)

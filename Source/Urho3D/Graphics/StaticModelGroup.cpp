@@ -99,7 +99,7 @@ void StaticModelGroup::ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQu
     if (query.ray_.HitDistance(GetWorldBoundingBox()) >= query.maxDistance_)
         return;
 
-    for (unsigned i = 0; i < numWorldTransforms_; ++i)
+    for (i32 i = 0; i < numWorldTransforms_; ++i)
     {
         // Initial test using AABB
         float distance = query.ray_.HitDistance(boundingBox_.Transformed(worldTransforms_[i]));

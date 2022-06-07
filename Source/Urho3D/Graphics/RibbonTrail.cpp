@@ -120,7 +120,7 @@ void RibbonTrail::ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQueryRe
         return;
 
     // Approximate the tails as spheres for raycasting
-    for (unsigned i = 0; i < points_.Size() - 1; ++i)
+    for (i32 i = 0; i < points_.Size() - 1; ++i)
     {
         Vector3 center = (points_[i].position_ + points_[i+1].position_) * 0.5f;
         Vector3 scale = width_ * Vector3::ONE;

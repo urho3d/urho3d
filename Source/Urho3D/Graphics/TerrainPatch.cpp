@@ -84,7 +84,7 @@ void TerrainPatch::ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQueryR
                 result.distance_ = distance;
                 result.drawable_ = this;
                 result.node_ = node_;
-                result.subObject_ = M_MAX_UNSIGNED;
+                result.subObject_ = NINDEX;
                 results.Push(result);
             }
         }

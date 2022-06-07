@@ -156,7 +156,7 @@ void AnimatedModel::ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQuery
     const Vector<Bone>& bones = skeleton_.GetBones();
     Sphere boneSphere;
 
-    for (unsigned i = 0; i < bones.Size(); ++i)
+    for (i32 i = 0; i < bones.Size(); ++i)
     {
         const Bone& bone = bones[i];
         if (!bone.node_)
