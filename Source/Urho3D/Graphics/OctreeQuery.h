@@ -201,7 +201,7 @@ struct URHO3D_API RayQueryResult
     /// Scene node.
     Node* node_;
     /// Drawable specific subobject if applicable.
-    unsigned subObject_{};
+    i32 subObject_{};
 };
 
 /// Raycast octree query.

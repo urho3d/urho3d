@@ -80,7 +80,7 @@ void CustomGeometry::ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQuer
         {
             distance = M_INFINITY;
 
-            for (unsigned i = 0; i < batches_.Size(); ++i)
+            for (i32 i = 0; i < batches_.Size(); ++i)
             {
                 Geometry* geometry = batches_[i].geometry_;
                 if (geometry)
@@ -104,7 +104,7 @@ void CustomGeometry::ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQuer
             result.distance_ = distance;
             result.drawable_ = this;
             result.node_ = node_;
-            result.subObject_ = M_MAX_UNSIGNED;
+            result.subObject_ = NINDEX;
             results.Push(result);
         }
     }

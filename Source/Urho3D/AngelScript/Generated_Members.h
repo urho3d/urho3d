@@ -3836,8 +3836,8 @@ template <class T> void RegisterMembers_RayQueryResult(asIScriptEngine* engine, 
     // float RayQueryResult::distance_
     engine->RegisterObjectProperty(className, "float distance", offsetof(T, distance_));
 
-    // unsigned RayQueryResult::subObject_
-    engine->RegisterObjectProperty(className, "uint subObject", offsetof(T, subObject_));
+    // i32 RayQueryResult::subObject_
+    engine->RegisterObjectProperty(className, "int subObject", offsetof(T, subObject_));
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_RayQueryResult
         REGISTER_MEMBERS_MANUAL_PART_RayQueryResult();
