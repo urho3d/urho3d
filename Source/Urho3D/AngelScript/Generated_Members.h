@@ -3229,7 +3229,7 @@ template <class T> void RegisterMembers_OcclusionBufferData(asIScriptEngine* eng
 // class Octant | File: ../Graphics/Octree.h
 template <class T> void RegisterMembers_Octant(asIScriptEngine* engine, const char* className)
 {
-    // Octant* Octant::GetOrCreateChild(unsigned index)
+    // Octant* Octant::GetOrCreateChild(i32 index)
     // Error: type "Octant" can not automatically bind bacause have @nobind mark
     // Octant* Octant::GetParent() const
     // Error: type "Octant" can not automatically bind bacause have @nobind mark
@@ -3240,17 +3240,17 @@ template <class T> void RegisterMembers_Octant(asIScriptEngine* engine, const ch
     // bool Octant::CheckDrawableFit(const BoundingBox& box) const
     engine->RegisterObjectMethod(className, "bool CheckDrawableFit(const BoundingBox&in) const", AS_METHODPR(T, CheckDrawableFit, (const BoundingBox&) const, bool), AS_CALL_THISCALL);
 
-    // void Octant::DeleteChild(unsigned index)
-    engine->RegisterObjectMethod(className, "void DeleteChild(uint)", AS_METHODPR(T, DeleteChild, (unsigned), void), AS_CALL_THISCALL);
+    // void Octant::DeleteChild(i32 index)
+    engine->RegisterObjectMethod(className, "void DeleteChild(int)", AS_METHODPR(T, DeleteChild, (i32), void), AS_CALL_THISCALL);
 
     // const BoundingBox& Octant::GetCullingBox() const
     engine->RegisterObjectMethod(className, "const BoundingBox& GetCullingBox() const", AS_METHODPR(T, GetCullingBox, () const, const BoundingBox&), AS_CALL_THISCALL);
 
-    // unsigned Octant::GetLevel() const
-    engine->RegisterObjectMethod(className, "uint GetLevel() const", AS_METHODPR(T, GetLevel, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Octant::GetLevel() const
+    engine->RegisterObjectMethod(className, "int GetLevel() const", AS_METHODPR(T, GetLevel, () const, i32), AS_CALL_THISCALL);
 
-    // unsigned Octant::GetNumDrawables() const
-    engine->RegisterObjectMethod(className, "uint GetNumDrawables() const", AS_METHODPR(T, GetNumDrawables, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Octant::GetNumDrawables() const
+    engine->RegisterObjectMethod(className, "int GetNumDrawables() const", AS_METHODPR(T, GetNumDrawables, () const, i32), AS_CALL_THISCALL);
 
     // Octree* Octant::GetRoot() const
     engine->RegisterObjectMethod(className, "Octree@+ GetRoot() const", AS_METHODPR(T, GetRoot, () const, Octree*), AS_CALL_THISCALL);
@@ -17973,9 +17973,9 @@ template <class T> void RegisterMembers_Octree(asIScriptEngine* engine, const ch
     // void Octree::DrawDebugGeometry(bool depthTest)
     engine->RegisterObjectMethod(className, "void DrawDebugGeometry(bool)", AS_METHODPR(T, DrawDebugGeometry, (bool), void), AS_CALL_THISCALL);
 
-    // unsigned Octree::GetNumLevels() const
-    engine->RegisterObjectMethod(className, "uint GetNumLevels() const", AS_METHODPR(T, GetNumLevels, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numLevels() const", AS_METHODPR(T, GetNumLevels, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Octree::GetNumLevels() const
+    engine->RegisterObjectMethod(className, "int GetNumLevels() const", AS_METHODPR(T, GetNumLevels, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numLevels() const", AS_METHODPR(T, GetNumLevels, () const, i32), AS_CALL_THISCALL);
 
     // void Octree::QueueUpdate(Drawable* drawable)
     engine->RegisterObjectMethod(className, "void QueueUpdate(Drawable@+)", AS_METHODPR(T, QueueUpdate, (Drawable*), void), AS_CALL_THISCALL);
@@ -17983,8 +17983,8 @@ template <class T> void RegisterMembers_Octree(asIScriptEngine* engine, const ch
     // void Octree::RemoveManualDrawable(Drawable* drawable)
     engine->RegisterObjectMethod(className, "void RemoveManualDrawable(Drawable@+)", AS_METHODPR(T, RemoveManualDrawable, (Drawable*), void), AS_CALL_THISCALL);
 
-    // void Octree::SetSize(const BoundingBox& box, unsigned numLevels)
-    engine->RegisterObjectMethod(className, "void SetSize(const BoundingBox&in, uint)", AS_METHODPR(T, SetSize, (const BoundingBox&, unsigned), void), AS_CALL_THISCALL);
+    // void Octree::SetSize(const BoundingBox& box, i32 numLevels)
+    engine->RegisterObjectMethod(className, "void SetSize(const BoundingBox&in, int)", AS_METHODPR(T, SetSize, (const BoundingBox&, i32), void), AS_CALL_THISCALL);
 
     // void Octree::Update(const FrameInfo& frame)
     engine->RegisterObjectMethod(className, "void Update(const FrameInfo&in)", AS_METHODPR(T, Update, (const FrameInfo&), void), AS_CALL_THISCALL);

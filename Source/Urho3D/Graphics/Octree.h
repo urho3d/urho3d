@@ -13,7 +13,7 @@ namespace Urho3D
 class Octree;
 
 static const int NUM_OCTANTS = 8;
-static const unsigned ROOT_INDEX = M_MAX_UNSIGNED;
+static const i32 ROOT_INDEX = NINDEX;
 
 /// %Octree octant.
 /// @nobind
@@ -21,14 +21,14 @@ class URHO3D_API Octant
 {
 public:
     /// Construct.
-    Octant(const BoundingBox& box, unsigned level, Octant* parent, Octree* root, unsigned index = ROOT_INDEX);
+    Octant(const BoundingBox& box, i32 level, Octant* parent, Octree* root, i32 index = ROOT_INDEX);
     /// Destruct. Move drawables to root if available (detach if not) and free child octants.
     virtual ~Octant();
 
     /// Return or create a child octant.
-    Octant* GetOrCreateChild(unsigned index);
+    Octant* GetOrCreateChild(i32 index);
     /// Delete child octant.
-    void DeleteChild(unsigned index);
+    void DeleteChild(i32 index);
     /// Insert a drawable object by checking for fit recursively.
     void InsertDrawable(Drawable* drawable);
     /// Check if a drawable object fits.
@@ -61,7 +61,7 @@ public:
     const BoundingBox& GetCullingBox() const { return cullingBox_; }
 
     /// Return subdivision level.
-    unsigned GetLevel() const { return level_; }
+    i32 GetLevel() const { return level_; }
 
     /// Return parent octant.
     Octant* GetParent() const { return parent_; }
@@ -70,7 +70,7 @@ public:
     Octree* GetRoot() const { return root_; }
 
     /// Return number of drawables.
-    unsigned GetNumDrawables() const { return numDrawables_; }
+    i32 GetNumDrawables() const { return numDrawables_; }
 
     /// Return true if there are no drawable objects in this octant and child octants.
     bool IsEmpty() { return numDrawables_ == 0; }
@@ -128,15 +128,15 @@ protected:
     /// World bounding box half size.
     Vector3 halfSize_;
     /// Subdivision level.
-    unsigned level_;
+    i32 level_;
     /// Number of drawable objects in this octant and child octants.
-    unsigned numDrawables_{};
+    i32 numDrawables_{};
     /// Parent octant.
     Octant* parent_;
     /// Octree root.
     Octree* root_;
     /// Octant index relative to its siblings or ROOT_INDEX for root octant.
-    unsigned index_;
+    i32 index_;
 };
 
 /// %Octree component. Should be added only to the root scene node.
@@ -157,7 +157,7 @@ public:
     void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
     /// Set size and maximum subdivision levels. If octree is not empty, drawable objects will be temporarily moved to the root.
-    void SetSize(const BoundingBox& box, unsigned numLevels);
+    void SetSize(const BoundingBox& box, i32 numLevels);
     /// Update and reinsert drawable objects.
     void Update(const FrameInfo& frame);
     /// Add a drawable manually.
@@ -175,7 +175,7 @@ public:
 
     /// Return subdivision levels.
     /// @property
-    unsigned GetNumLevels() const { return numLevels_; }
+    i32 GetNumLevels() const { return numLevels_; }
 
     /// Mark drawable object as requiring an update and a reinsertion.
     void QueueUpdate(Drawable* drawable);
@@ -199,7 +199,7 @@ private:
     /// Ray query temporary list of drawables.
     mutable Vector<Drawable*> rayQueryDrawables_;
     /// Subdivision level.
-    unsigned numLevels_;
+    i32 numLevels_;
 };
 
 }
