@@ -6440,11 +6440,11 @@ template <class T> void RegisterMembers_Vector4(asIScriptEngine* engine, const c
     // bool Vector4::operator ==(const Vector4& rhs) const
     engine->RegisterObjectMethod(className, "bool opEquals(const Vector4&in) const", AS_METHODPR(T, operator==, (const Vector4&) const, bool), AS_CALL_THISCALL);
 
-    // float Vector4::operator [](unsigned index) const
-    engine->RegisterObjectMethod(className, "float opIndex(uint) const", AS_METHODPR(T, operator[], (unsigned) const, float), AS_CALL_THISCALL);
+    // float Vector4::operator [](i32 index) const
+    engine->RegisterObjectMethod(className, "float opIndex(int) const", AS_METHODPR(T, operator[], (i32) const, float), AS_CALL_THISCALL);
 
-    // float& Vector4::operator [](unsigned index)
-    engine->RegisterObjectMethod(className, "float& opIndex(uint)", AS_METHODPR(T, operator[], (unsigned), float&), AS_CALL_THISCALL);
+    // float& Vector4::operator [](i32 index)
+    engine->RegisterObjectMethod(className, "float& opIndex(int)", AS_METHODPR(T, operator[], (i32), float&), AS_CALL_THISCALL);
 
     // float Vector4::ProjectOntoAxis(const Vector3& axis) const
     engine->RegisterObjectMethod(className, "float ProjectOntoAxis(const Vector3&in) const", AS_METHODPR(T, ProjectOntoAxis, (const Vector3&) const, float), AS_CALL_THISCALL);
