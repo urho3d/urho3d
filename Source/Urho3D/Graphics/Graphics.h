@@ -503,7 +503,7 @@ public:
     /// @property
     Vector<IntVector3> GetResolutions(int monitor) const;
     /// Return index of the best resolution for requested width, height and refresh rate.
-    unsigned FindBestResolutionIndex(int monitor, int width, int height, int refreshRate) const;
+    i32 FindBestResolutionIndex(int monitor, int width, int height, int refreshRate) const;
     /// Return supported multisampling levels.
     /// @property
     Vector<int> GetMultiSampleLevels() const;

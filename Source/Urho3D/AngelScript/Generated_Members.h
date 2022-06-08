@@ -10058,8 +10058,8 @@ template <class T> void RegisterMembers_Graphics(asIScriptEngine* engine, const 
     // void Graphics::EndFrame()
     engine->RegisterObjectMethod(className, "void EndFrame()", AS_METHODPR(T, EndFrame, (), void), AS_CALL_THISCALL);
 
-    // unsigned Graphics::FindBestResolutionIndex(int monitor, int width, int height, int refreshRate) const
-    engine->RegisterObjectMethod(className, "uint FindBestResolutionIndex(int, int, int, int) const", AS_METHODPR(T, FindBestResolutionIndex, (int, int, int, int) const, unsigned), AS_CALL_THISCALL);
+    // i32 Graphics::FindBestResolutionIndex(int monitor, int width, int height, int refreshRate) const
+    engine->RegisterObjectMethod(className, "int FindBestResolutionIndex(int, int, int, int) const", AS_METHODPR(T, FindBestResolutionIndex, (int, int, int, int) const, i32), AS_CALL_THISCALL);
 
     // bool Graphics::GetAlphaToCoverage() const
     engine->RegisterObjectMethod(className, "bool GetAlphaToCoverage() const", AS_METHODPR(T, GetAlphaToCoverage, () const, bool), AS_CALL_THISCALL);
