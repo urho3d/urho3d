@@ -75,7 +75,7 @@ public:
 
     /// Return frame number, starting from 1 once BeginFrame() is called for the first time.
     /// @property
-    unsigned GetFrameNumber() const { return frameNumber_; }
+    i32 GetFrameNumber() const { return frameNumber_; }
 
     /// Return current frame timestep as seconds.
     /// @property
@@ -105,7 +105,7 @@ private:
     /// Elapsed time since program start.
     Timer elapsedTime_;
     /// Frame number.
-    unsigned frameNumber_;
+    i32 frameNumber_;
     /// Timestep in seconds.
     float timeStep_;
     /// Low-resolution timer period.

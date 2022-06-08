@@ -1154,8 +1154,9 @@ void Material::SortTechniques()
     Sort(techniques_.Begin(), techniques_.End(), CompareTechniqueEntries);
 }
 
-void Material::MarkForAuxView(unsigned frameNumber)
+void Material::MarkForAuxView(i32 frameNumber)
 {
+    assert(frameNumber > 0);
     auxViewFrameNumber_ = frameNumber;
 }
 

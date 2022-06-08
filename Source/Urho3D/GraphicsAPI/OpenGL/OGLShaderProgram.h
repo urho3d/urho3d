@@ -87,10 +87,10 @@ private:
     /// Shader link error string.
     String linkerOutput_;
     /// Shader parameter source framenumber.
-    unsigned frameNumber_{};
+    i32 frameNumber_{};
 
     /// Global shader parameter source framenumber.
-    static unsigned globalFrameNumber;
+    static i32 globalFrameNumber;
     /// Remembered global shader parameter sources for constant buffer mode.
     static const void* globalParameterSources[MAX_SHADER_PARAMETER_GROUPS];
 };

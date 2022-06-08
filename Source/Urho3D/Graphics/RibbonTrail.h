@@ -246,7 +246,7 @@ private:
     /// Number of columns for every tails.
     unsigned tailColumn_;
     /// Rendering framenumber on which was last updated.
-    unsigned lastUpdateFrameNumber_;
+    i32 lastUpdateFrameNumber_;
     /// Need update flag.
     bool needUpdate_;
     /// Previous offset to camera for determining whether sorting is necessary.

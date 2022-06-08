@@ -133,7 +133,7 @@ private:
     /// Last scene timestep.
     float lastTimeStep_;
     /// Rendering framenumber on which was last updated.
-    unsigned lastUpdateFrameNumber_;
+    i32 lastUpdateFrameNumber_;
     /// Currently emitting flag.
     bool emitting_;
     /// Need update flag.

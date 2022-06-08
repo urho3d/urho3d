@@ -11,7 +11,7 @@ namespace Urho3D
 /// Frame begin event.
 URHO3D_EVENT(E_BEGINFRAME, BeginFrame)
 {
-    URHO3D_PARAM(P_FRAMENUMBER, FrameNumber);      // unsigned
+    URHO3D_PARAM(P_FRAMENUMBER, FrameNumber);      // i32
     URHO3D_PARAM(P_TIMESTEP, TimeStep);            // float
 }
 

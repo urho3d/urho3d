@@ -72,7 +72,7 @@ public:
     /// Reset shader pointers.
     void ReleaseShaders();
     /// Mark shaders loaded this frame.
-    void MarkShadersLoaded(unsigned frameNumber);
+    void MarkShadersLoaded(i32 frameNumber);
 
     /// Return pass name.
     const String& GetName() const { return name_; }
@@ -97,7 +97,7 @@ public:
     PassLightingMode GetLightingMode() const { return lightingMode_; }
 
     /// Return last shaders loaded frame number.
-    unsigned GetShadersLoadedFrameNumber() const { return shadersLoadedFrameNumber_; }
+    i32 GetShadersLoadedFrameNumber() const { return shadersLoadedFrameNumber_; }
 
     /// Return depth write mode.
     /// @property
@@ -162,7 +162,7 @@ private:
     /// Lighting mode.
     PassLightingMode lightingMode_;
     /// Last shaders loaded frame number.
-    unsigned shadersLoadedFrameNumber_;
+    i32 shadersLoadedFrameNumber_;
     /// Depth write mode.
     bool depthWrite_;
     /// Alpha-to-coverage mode.

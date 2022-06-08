@@ -36,7 +36,7 @@ static unsigned NumberPostfix(const String& str)
     return M_MAX_UNSIGNED;
 }
 
-unsigned ShaderProgram_OGL::globalFrameNumber = 0;
+i32 ShaderProgram_OGL::globalFrameNumber = 0;
 const void* ShaderProgram_OGL::globalParameterSources[MAX_SHADER_PARAMETER_GROUPS];
 
 ShaderProgram_OGL::ShaderProgram_OGL(Graphics* graphics, ShaderVariation* vertexShader, ShaderVariation* pixelShader) :

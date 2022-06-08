@@ -222,7 +222,7 @@ private:
     /// Attribute buffer.
     mutable VectorBuffer attrBuffer_;
     /// The frame number animation LOD distance was last calculated on.
-    unsigned animationLodFrameNumber_;
+    i32 animationLodFrameNumber_;
     /// Morph vertex element mask.
     VertexMaskFlags morphElementMask_;
     /// Animation LOD bias.
