@@ -621,8 +621,8 @@ template <class T> void RegisterMembers_Bone(asIScriptEngine* engine, const char
     // StringHash Bone::nameHash_
     engine->RegisterObjectProperty(className, "StringHash nameHash", offsetof(T, nameHash_));
 
-    // unsigned Bone::parentIndex_
-    engine->RegisterObjectProperty(className, "uint parentIndex", offsetof(T, parentIndex_));
+    // i32 Bone::parentIndex_
+    engine->RegisterObjectProperty(className, "int parentIndex", offsetof(T, parentIndex_));
 
     // Vector3 Bone::initialPosition_
     engine->RegisterObjectProperty(className, "Vector3 initialPosition", offsetof(T, initialPosition_));
@@ -4590,9 +4590,9 @@ template <class T> void RegisterMembers_Skeleton(asIScriptEngine* engine, const 
     // void Skeleton::Define(const Skeleton& src)
     engine->RegisterObjectMethod(className, "void Define(const Skeleton&in)", AS_METHODPR(T, Define, (const Skeleton&), void), AS_CALL_THISCALL);
 
-    // Bone* Skeleton::GetBone(unsigned index)
-    engine->RegisterObjectMethod(className, "Bone@ GetBone(uint)", AS_METHODPR(T, GetBone, (unsigned), Bone*), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "Bone@ get_bones(uint)", AS_METHODPR(T, GetBone, (unsigned), Bone*), AS_CALL_THISCALL);
+    // Bone* Skeleton::GetBone(i32 index)
+    engine->RegisterObjectMethod(className, "Bone@ GetBone(int)", AS_METHODPR(T, GetBone, (i32), Bone*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Bone@ get_bones(int)", AS_METHODPR(T, GetBone, (i32), Bone*), AS_CALL_THISCALL);
 
     // Bone* Skeleton::GetBone(const String& name)
     engine->RegisterObjectMethod(className, "Bone@ GetBone(const String&in)", AS_METHODPR(T, GetBone, (const String&), Bone*), AS_CALL_THISCALL);
@@ -4600,21 +4600,21 @@ template <class T> void RegisterMembers_Skeleton(asIScriptEngine* engine, const 
     // Bone* Skeleton::GetBone(const StringHash& boneNameHash)
     engine->RegisterObjectMethod(className, "Bone@ GetBone(const StringHash&in)", AS_METHODPR(T, GetBone, (const StringHash&), Bone*), AS_CALL_THISCALL);
 
-    // unsigned Skeleton::GetBoneIndex(const String& boneName) const
-    engine->RegisterObjectMethod(className, "uint GetBoneIndex(const String&in) const", AS_METHODPR(T, GetBoneIndex, (const String&) const, unsigned), AS_CALL_THISCALL);
+    // i32 Skeleton::GetBoneIndex(const String& boneName) const
+    engine->RegisterObjectMethod(className, "int GetBoneIndex(const String&in) const", AS_METHODPR(T, GetBoneIndex, (const String&) const, i32), AS_CALL_THISCALL);
 
-    // unsigned Skeleton::GetBoneIndex(const StringHash& boneNameHash) const
-    engine->RegisterObjectMethod(className, "uint GetBoneIndex(const StringHash&in) const", AS_METHODPR(T, GetBoneIndex, (const StringHash&) const, unsigned), AS_CALL_THISCALL);
+    // i32 Skeleton::GetBoneIndex(const StringHash& boneNameHash) const
+    engine->RegisterObjectMethod(className, "int GetBoneIndex(const StringHash&in) const", AS_METHODPR(T, GetBoneIndex, (const StringHash&) const, i32), AS_CALL_THISCALL);
 
-    // unsigned Skeleton::GetBoneIndex(const Bone* bone) const
-    engine->RegisterObjectMethod(className, "uint GetBoneIndex(Bone@) const", AS_METHODPR(T, GetBoneIndex, (const Bone*) const, unsigned), AS_CALL_THISCALL);
+    // i32 Skeleton::GetBoneIndex(const Bone* bone) const
+    engine->RegisterObjectMethod(className, "int GetBoneIndex(Bone@) const", AS_METHODPR(T, GetBoneIndex, (const Bone*) const, i32), AS_CALL_THISCALL);
 
     // Bone* Skeleton::GetBoneParent(const Bone* bone)
     engine->RegisterObjectMethod(className, "Bone@ GetBoneParent(Bone@)", AS_METHODPR(T, GetBoneParent, (const Bone*), Bone*), AS_CALL_THISCALL);
 
-    // unsigned Skeleton::GetNumBones() const
-    engine->RegisterObjectMethod(className, "uint GetNumBones() const", AS_METHODPR(T, GetNumBones, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numBones() const", AS_METHODPR(T, GetNumBones, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Skeleton::GetNumBones() const
+    engine->RegisterObjectMethod(className, "int GetNumBones() const", AS_METHODPR(T, GetNumBones, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numBones() const", AS_METHODPR(T, GetNumBones, () const, i32), AS_CALL_THISCALL);
 
     // Bone* Skeleton::GetRootBone()
     engine->RegisterObjectMethod(className, "Bone@ GetRootBone()", AS_METHODPR(T, GetRootBone, (), Bone*), AS_CALL_THISCALL);
@@ -4632,8 +4632,8 @@ template <class T> void RegisterMembers_Skeleton(asIScriptEngine* engine, const 
     // bool Skeleton::Save(Serializer& dest) const
     engine->RegisterObjectMethod(className, "bool Save(Serializer&) const", AS_METHODPR(T, Save, (Serializer&) const, bool), AS_CALL_THISCALL);
 
-    // void Skeleton::SetRootBoneIndex(unsigned index)
-    engine->RegisterObjectMethod(className, "void SetRootBoneIndex(uint)", AS_METHODPR(T, SetRootBoneIndex, (unsigned), void), AS_CALL_THISCALL);
+    // void Skeleton::SetRootBoneIndex(i32 index)
+    engine->RegisterObjectMethod(className, "void SetRootBoneIndex(int)", AS_METHODPR(T, SetRootBoneIndex, (i32), void), AS_CALL_THISCALL);
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Skeleton
         REGISTER_MEMBERS_MANUAL_PART_Skeleton();

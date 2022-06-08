@@ -43,7 +43,7 @@ struct Bone
     /// Bone name hash.
     StringHash nameHash_;
     /// Parent bone index.
-    unsigned parentIndex_;
+    i32 parentIndex_;
     /// Reset position.
     Vector3 initialPosition_;
     /// Reset rotation.
@@ -81,7 +81,7 @@ public:
     /// Define from another skeleton.
     void Define(const Skeleton& src);
     /// Set root bone's index.
-    void SetRootBoneIndex(unsigned index);
+    void SetRootBoneIndex(i32 index);
     /// Clear bones.
     void ClearBones();
     /// Reset all animating bones to initial positions.
@@ -96,22 +96,22 @@ public:
 
     /// Return number of bones.
     /// @property
-    unsigned GetNumBones() const { return bones_.Size(); }
+    i32 GetNumBones() const { return bones_.Size(); }
 
     /// Return root bone.
     /// @property
     Bone* GetRootBone();
-    /// Return index of the bone by name. Return M_MAX_UNSIGNED if not found.
-    unsigned GetBoneIndex(const String& boneName) const;
-    /// Return index of the bone by name hash. Return M_MAX_UNSIGNED if not found.
-    unsigned GetBoneIndex(const StringHash& boneNameHash) const;
-    /// Return index of the bone by the bone pointer. Return M_MAX_UNSIGNED if not found.
-    unsigned GetBoneIndex(const Bone* bone) const;
+    /// Return index of the bone by name. Return NINDEX if not found.
+    i32 GetBoneIndex(const String& boneName) const;
+    /// Return index of the bone by name hash. Return NINDEX if not found.
+    i32 GetBoneIndex(const StringHash& boneNameHash) const;
+    /// Return index of the bone by the bone pointer. Return NINDEX if not found.
+    i32 GetBoneIndex(const Bone* bone) const;
     /// Return parent of the given bone. Return null for root bones.
     Bone* GetBoneParent(const Bone* bone);
     /// Return bone by index.
     /// @property{get_bones}
-    Bone* GetBone(unsigned index);
+    Bone* GetBone(i32 index);
     /// Return bone by name.
     Bone* GetBone(const String& name);
     /// Return bone by name.
@@ -126,7 +126,7 @@ private:
     /// Bones.
     Vector<Bone> bones_;
     /// Root bone index.
-    unsigned rootBoneIndex_;
+    i32 rootBoneIndex_;
 };
 
 }
