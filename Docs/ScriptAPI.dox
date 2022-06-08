@@ -5048,7 +5048,7 @@ Properties:
 - StringHash nameHash
 - Node@ node
 - Matrix3x4 offsetMatrix
-- uint parentIndex
+- int parentIndex
 - float radius
 
 <a name="Class_BorderImage"></a>
@@ -5071,14 +5071,14 @@ Methods:
 - const Color& GetColor(Corner) const
 - const Color& GetColorAttr() const
 - const Color& GetDerivedColor() const
-- UIElement@ CreateChild(StringHash, const String& = String :: EMPTY, uint = M_MAX_UNSIGNED)
+- UIElement@ CreateChild(StringHash, const String& = String :: EMPTY, int = ENDPOS)
 - operator Cursor@() const
 - void DisableLayoutUpdate()
 - operator DropDownList@() const
 - IntVector2 ElementToScreen(const IntVector2&)
 - void EnableLayoutUpdate()
 - bool FilterAttributes(XMLElement&) const
-- uint FindChild(UIElement@) const
+- int FindChild(UIElement@) const
 - bool GetAnimationEnabled() const
 - Variant GetAttribute(const String&) const
 - Variant GetAttribute(uint) const
@@ -5094,7 +5094,7 @@ Methods:
 - bool GetBringToFront() const
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant :: EMPTY, bool = false) const
-- UIElement@ GetChild(uint) const
+- UIElement@ GetChild(int) const
 - UIElement@[]@ GetChildren() const
 - UIElement@[]@ GetChildren(bool) const
 - UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
@@ -5103,7 +5103,7 @@ Methods:
 - XMLFile@ GetDefaultStyle(bool = true) const
 - float GetDerivedOpacity() const
 - uint GetDragButtonCombo() const
-- uint GetDragButtonCount() const
+- int GetDragButtonCount() const
 - uint GetDragDropMode() const
 - IntVector2 GetEffectiveMinSize() const
 - UIElement@ GetElementEventSender() const
@@ -5127,7 +5127,7 @@ Methods:
 - int GetMinHeight() const
 - int GetMinWidth() const
 - uint GetNumAttributes() const
-- uint GetNumChildren(bool = false) const
+- int GetNumChildren(bool = false) const
 - uint GetNumNetworkAttributes() const
 - ObjectAnimation@ GetObjectAnimation() const
 - ResourceRef GetObjectAnimationAttr() const
@@ -5151,7 +5151,7 @@ Methods:
 - bool HasSubscribedToEvent(Object@, StringHash) const
 - bool HasSubscribedToEvent(StringHash) const
 - bool HasTag(const String&) const
-- void InsertChild(uint, UIElement@)
+- void InsertChild(int, UIElement@)
 - const IntRect& GetBorder() const
 - const IntRect& GetClipBorder() const
 - const IntRect& GetImageBorder() const
@@ -5230,9 +5230,9 @@ Methods:
 - void RemoveAllChildren()
 - void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
-- void RemoveChild(UIElement@, uint = 0)
+- void RemoveChild(UIElement@, int = 0)
 - void RemoveChild(uint)
-- void RemoveChildAtIndex(uint)
+- void RemoveChildAtIndex(int)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
 - bool RemoveTag(const String&)
@@ -5324,7 +5324,7 @@ Methods:
 - void SetObjectAnimation(ObjectAnimation@)
 - void SetObjectAnimationAttr(const ResourceRef&)
 - void SetOpacity(float)
-- void SetParent(UIElement@, uint = M_MAX_UNSIGNED)
+- void SetParent(UIElement@, int = ENDPOS)
 - void SetPivot(const Vector2&)
 - void SetPivot(float, float)
 - void SetPosition(const IntVector2&)
@@ -5417,7 +5417,7 @@ Properties:
 - float derivedOpacity // readonly
 - IntVector2 disabledOffset
 - uint dragButtonCombo // readonly
-- uint dragButtonCount // readonly
+- int dragButtonCount // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
@@ -5588,13 +5588,13 @@ Methods:
 - const Color& GetColor(Corner) const
 - const Color& GetColorAttr() const
 - const Color& GetDerivedColor() const
-- UIElement@ CreateChild(StringHash, const String& = String :: EMPTY, uint = M_MAX_UNSIGNED)
+- UIElement@ CreateChild(StringHash, const String& = String :: EMPTY, int = ENDPOS)
 - void DisableLayoutUpdate()
 - operator DropDownList@() const
 - IntVector2 ElementToScreen(const IntVector2&)
 - void EnableLayoutUpdate()
 - bool FilterAttributes(XMLElement&) const
-- uint FindChild(UIElement@) const
+- int FindChild(UIElement@) const
 - bool GetAnimationEnabled() const
 - Variant GetAttribute(const String&) const
 - Variant GetAttribute(uint) const
@@ -5610,7 +5610,7 @@ Methods:
 - bool GetBringToFront() const
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant :: EMPTY, bool = false) const
-- UIElement@ GetChild(uint) const
+- UIElement@ GetChild(int) const
 - UIElement@[]@ GetChildren() const
 - UIElement@[]@ GetChildren(bool) const
 - UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
@@ -5619,7 +5619,7 @@ Methods:
 - XMLFile@ GetDefaultStyle(bool = true) const
 - float GetDerivedOpacity() const
 - uint GetDragButtonCombo() const
-- uint GetDragButtonCount() const
+- int GetDragButtonCount() const
 - uint GetDragDropMode() const
 - IntVector2 GetEffectiveMinSize() const
 - UIElement@ GetElementEventSender() const
@@ -5643,7 +5643,7 @@ Methods:
 - int GetMinHeight() const
 - int GetMinWidth() const
 - uint GetNumAttributes() const
-- uint GetNumChildren(bool = false) const
+- int GetNumChildren(bool = false) const
 - uint GetNumNetworkAttributes() const
 - ObjectAnimation@ GetObjectAnimation() const
 - ResourceRef GetObjectAnimationAttr() const
@@ -5669,7 +5669,7 @@ Methods:
 - bool HasSubscribedToEvent(Object@, StringHash) const
 - bool HasSubscribedToEvent(StringHash) const
 - bool HasTag(const String&) const
-- void InsertChild(uint, UIElement@)
+- void InsertChild(int, UIElement@)
 - const IntRect& GetBorder() const
 - const IntRect& GetClipBorder() const
 - const IntRect& GetImageBorder() const
@@ -5749,9 +5749,9 @@ Methods:
 - void RemoveAllChildren()
 - void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
-- void RemoveChild(UIElement@, uint = 0)
+- void RemoveChild(UIElement@, int = 0)
 - void RemoveChild(uint)
-- void RemoveChildAtIndex(uint)
+- void RemoveChildAtIndex(int)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
 - bool RemoveTag(const String&)
@@ -5842,7 +5842,7 @@ Methods:
 - void SetObjectAnimation(ObjectAnimation@)
 - void SetObjectAnimationAttr(const ResourceRef&)
 - void SetOpacity(float)
-- void SetParent(UIElement@, uint = M_MAX_UNSIGNED)
+- void SetParent(UIElement@, int = ENDPOS)
 - void SetPivot(const Vector2&)
 - void SetPivot(float, float)
 - void SetPosition(const IntVector2&)
@@ -5931,7 +5931,7 @@ Properties:
 - float derivedOpacity // readonly
 - IntVector2 disabledOffset
 - uint dragButtonCombo // readonly
-- uint dragButtonCount // readonly
+- int dragButtonCount // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
@@ -6272,12 +6272,12 @@ Methods:
 - const Color& GetColor(Corner) const
 - const Color& GetColorAttr() const
 - const Color& GetDerivedColor() const
-- UIElement@ CreateChild(StringHash, const String& = String :: EMPTY, uint = M_MAX_UNSIGNED)
+- UIElement@ CreateChild(StringHash, const String& = String :: EMPTY, int = ENDPOS)
 - void DisableLayoutUpdate()
 - IntVector2 ElementToScreen(const IntVector2&)
 - void EnableLayoutUpdate()
 - bool FilterAttributes(XMLElement&) const
-- uint FindChild(UIElement@) const
+- int FindChild(UIElement@) const
 - bool GetAnimationEnabled() const
 - Variant GetAttribute(const String&) const
 - Variant GetAttribute(uint) const
@@ -6293,7 +6293,7 @@ Methods:
 - bool GetBringToFront() const
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant :: EMPTY, bool = false) const
-- UIElement@ GetChild(uint) const
+- UIElement@ GetChild(int) const
 - UIElement@[]@ GetChildren() const
 - UIElement@[]@ GetChildren(bool) const
 - UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
@@ -6302,7 +6302,7 @@ Methods:
 - XMLFile@ GetDefaultStyle(bool = true) const
 - float GetDerivedOpacity() const
 - uint GetDragButtonCombo() const
-- uint GetDragButtonCount() const
+- int GetDragButtonCount() const
 - uint GetDragDropMode() const
 - IntVector2 GetEffectiveMinSize() const
 - UIElement@ GetElementEventSender() const
@@ -6326,7 +6326,7 @@ Methods:
 - int GetMinHeight() const
 - int GetMinWidth() const
 - uint GetNumAttributes() const
-- uint GetNumChildren(bool = false) const
+- int GetNumChildren(bool = false) const
 - uint GetNumNetworkAttributes() const
 - ObjectAnimation@ GetObjectAnimation() const
 - ResourceRef GetObjectAnimationAttr() const
@@ -6350,7 +6350,7 @@ Methods:
 - bool HasSubscribedToEvent(Object@, StringHash) const
 - bool HasSubscribedToEvent(StringHash) const
 - bool HasTag(const String&) const
-- void InsertChild(uint, UIElement@)
+- void InsertChild(int, UIElement@)
 - const IntRect& GetBorder() const
 - const IntRect& GetClipBorder() const
 - const IntRect& GetImageBorder() const
@@ -6428,9 +6428,9 @@ Methods:
 - void RemoveAllChildren()
 - void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
-- void RemoveChild(UIElement@, uint = 0)
+- void RemoveChild(UIElement@, int = 0)
 - void RemoveChild(uint)
-- void RemoveChildAtIndex(uint)
+- void RemoveChildAtIndex(int)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
 - bool RemoveTag(const String&)
@@ -6524,7 +6524,7 @@ Methods:
 - void SetObjectAnimation(ObjectAnimation@)
 - void SetObjectAnimationAttr(const ResourceRef&)
 - void SetOpacity(float)
-- void SetParent(UIElement@, uint = M_MAX_UNSIGNED)
+- void SetParent(UIElement@, int = ENDPOS)
 - void SetPivot(const Vector2&)
 - void SetPivot(float, float)
 - void SetPosition(const IntVector2&)
@@ -6606,7 +6606,7 @@ Properties:
 - float derivedOpacity // readonly
 - IntVector2 disabledOffset
 - uint dragButtonCombo // readonly
-- uint dragButtonCount // readonly
+- int dragButtonCount // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
@@ -7556,7 +7556,7 @@ Methods:
 - CollisionGeometryData@ GetGeometryData() const
 - uint GetID() const
 - bool GetInterceptNetworkUpdate(const String&) const
-- uint GetLodLevel() const
+- int GetLodLevel() const
 - float GetMargin() const
 - Model@ GetModel() const
 - ResourceRef GetModelAttr() const
@@ -7679,7 +7679,7 @@ Properties:
 - Variant[] globalVar
 - VariantMap globalVars // readonly
 - uint id // readonly
-- uint lodLevel
+- int lodLevel
 - float margin
 - Model@ model
 - Node@ node // readonly
@@ -8378,11 +8378,11 @@ Methods:
 - VariantMap& GetEventDataMap() const
 - Object@ GetEventSender() const
 - bool GetFocusOnShow() const
-- uint GetHistoryPosition() const
+- int GetHistoryPosition() const
 - LineEdit@ GetLineEdit() const
-- uint GetNumBufferedRows() const
-- uint GetNumHistoryRows() const
-- uint GetNumRows() const
+- int GetNumBufferedRows() const
+- int GetNumHistoryRows() const
+- int GetNumRows() const
 - Object@ GetSubsystem(StringHash) const
 - StringHash GetType() const
 - bool HasEventHandlers() const
@@ -8404,13 +8404,13 @@ Methods:
 - void SetDefaultStyle(XMLFile@)
 - void SetFocusOnShow(bool)
 - void SetGlobalVar(StringHash, const Variant&)
-- void SetNumBufferedRows(uint)
-- void SetNumHistoryRows(uint)
-- void SetNumRows(uint)
+- void SetNumBufferedRows(int)
+- void SetNumHistoryRows(int)
+- void SetNumRows(int)
 - void SetVisible(bool)
 - const String& GetCategory() const
 - const String& GetCommandInterpreter() const
-- const String& GetHistoryRow(uint) const
+- const String& GetHistoryRow(int) const
 - const String& GetTypeName() const
 - void Toggle()
 - void UnsubscribeFromAllEvents()
@@ -8436,12 +8436,12 @@ Properties:
 - bool focusOnShow
 - Variant[] globalVar
 - VariantMap globalVars // readonly
-- uint historyPosition // readonly
+- int historyPosition // readonly
 - String[] historyRow // readonly
 - LineEdit@ lineEdit // readonly
-- uint numBufferedRows
-- uint numHistoryRows
-- uint numRows
+- int numBufferedRows
+- int numHistoryRows
+- int numRows
 - int refs // readonly
 - StringHash type // readonly
 - String typeName // readonly
@@ -10859,14 +10859,14 @@ Methods:
 - const Color& GetColor(Corner) const
 - const Color& GetColorAttr() const
 - const Color& GetDerivedColor() const
-- UIElement@ CreateChild(StringHash, const String& = String :: EMPTY, uint = M_MAX_UNSIGNED)
+- UIElement@ CreateChild(StringHash, const String& = String :: EMPTY, int = ENDPOS)
 - void DefineShape(CursorShape, Image@, const IntRect&, const IntVector2&)
 - void DefineShape(const String&, Image@, const IntRect&, const IntVector2&)
 - void DisableLayoutUpdate()
 - IntVector2 ElementToScreen(const IntVector2&)
 - void EnableLayoutUpdate()
 - bool FilterAttributes(XMLElement&) const
-- uint FindChild(UIElement@) const
+- int FindChild(UIElement@) const
 - bool GetAnimationEnabled() const
 - Variant GetAttribute(const String&) const
 - Variant GetAttribute(uint) const
@@ -10882,7 +10882,7 @@ Methods:
 - bool GetBringToFront() const
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant :: EMPTY, bool = false) const
-- UIElement@ GetChild(uint) const
+- UIElement@ GetChild(int) const
 - UIElement@[]@ GetChildren() const
 - UIElement@[]@ GetChildren(bool) const
 - UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
@@ -10891,7 +10891,7 @@ Methods:
 - XMLFile@ GetDefaultStyle(bool = true) const
 - float GetDerivedOpacity() const
 - uint GetDragButtonCombo() const
-- uint GetDragButtonCount() const
+- int GetDragButtonCount() const
 - uint GetDragDropMode() const
 - IntVector2 GetEffectiveMinSize() const
 - UIElement@ GetElementEventSender() const
@@ -10915,7 +10915,7 @@ Methods:
 - int GetMinHeight() const
 - int GetMinWidth() const
 - uint GetNumAttributes() const
-- uint GetNumChildren(bool = false) const
+- int GetNumChildren(bool = false) const
 - uint GetNumNetworkAttributes() const
 - ObjectAnimation@ GetObjectAnimation() const
 - ResourceRef GetObjectAnimationAttr() const
@@ -10940,7 +10940,7 @@ Methods:
 - bool HasSubscribedToEvent(Object@, StringHash) const
 - bool HasSubscribedToEvent(StringHash) const
 - bool HasTag(const String&) const
-- void InsertChild(uint, UIElement@)
+- void InsertChild(int, UIElement@)
 - const IntRect& GetBorder() const
 - const IntRect& GetClipBorder() const
 - const IntRect& GetImageBorder() const
@@ -11016,9 +11016,9 @@ Methods:
 - void RemoveAllChildren()
 - void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
-- void RemoveChild(UIElement@, uint = 0)
+- void RemoveChild(UIElement@, int = 0)
 - void RemoveChild(uint)
-- void RemoveChildAtIndex(uint)
+- void RemoveChildAtIndex(int)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
 - bool RemoveTag(const String&)
@@ -11109,7 +11109,7 @@ Methods:
 - void SetObjectAnimation(ObjectAnimation@)
 - void SetObjectAnimationAttr(const ResourceRef&)
 - void SetOpacity(float)
-- void SetParent(UIElement@, uint = M_MAX_UNSIGNED)
+- void SetParent(UIElement@, int = ENDPOS)
 - void SetPivot(const Vector2&)
 - void SetPivot(float, float)
 - void SetPosition(const IntVector2&)
@@ -11193,7 +11193,7 @@ Properties:
 - float derivedOpacity // readonly
 - IntVector2 disabledOffset
 - uint dragButtonCombo // readonly
-- uint dragButtonCount // readonly
+- int dragButtonCount // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
@@ -12786,12 +12786,12 @@ Methods:
 - const Color& GetColor(Corner) const
 - const Color& GetColorAttr() const
 - const Color& GetDerivedColor() const
-- UIElement@ CreateChild(StringHash, const String& = String :: EMPTY, uint = M_MAX_UNSIGNED)
+- UIElement@ CreateChild(StringHash, const String& = String :: EMPTY, int = ENDPOS)
 - void DisableLayoutUpdate()
 - IntVector2 ElementToScreen(const IntVector2&)
 - void EnableLayoutUpdate()
 - bool FilterAttributes(XMLElement&) const
-- uint FindChild(UIElement@) const
+- int FindChild(UIElement@) const
 - int GetAcceleratorKey() const
 - int GetAcceleratorQualifiers() const
 - bool GetAnimationEnabled() const
@@ -12809,7 +12809,7 @@ Methods:
 - bool GetBringToFront() const
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant :: EMPTY, bool = false) const
-- UIElement@ GetChild(uint) const
+- UIElement@ GetChild(int) const
 - UIElement@[]@ GetChildren() const
 - UIElement@[]@ GetChildren(bool) const
 - UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
@@ -12818,7 +12818,7 @@ Methods:
 - XMLFile@ GetDefaultStyle(bool = true) const
 - float GetDerivedOpacity() const
 - uint GetDragButtonCombo() const
-- uint GetDragButtonCount() const
+- int GetDragButtonCount() const
 - uint GetDragDropMode() const
 - IntVector2 GetEffectiveMinSize() const
 - UIElement@ GetElementEventSender() const
@@ -12845,7 +12845,7 @@ Methods:
 - int GetMinHeight() const
 - int GetMinWidth() const
 - uint GetNumAttributes() const
-- uint GetNumChildren(bool = false) const
+- int GetNumChildren(bool = false) const
 - uint GetNumItems() const
 - uint GetNumNetworkAttributes() const
 - ObjectAnimation@ GetObjectAnimation() const
@@ -12878,7 +12878,7 @@ Methods:
 - bool HasSubscribedToEvent(Object@, StringHash) const
 - bool HasSubscribedToEvent(StringHash) const
 - bool HasTag(const String&) const
-- void InsertChild(uint, UIElement@)
+- void InsertChild(int, UIElement@)
 - void InsertItem(uint, UIElement@)
 - const IntRect& GetBorder() const
 - const IntRect& GetClipBorder() const
@@ -12963,9 +12963,9 @@ Methods:
 - void RemoveAllItems()
 - void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
-- void RemoveChild(UIElement@, uint = 0)
+- void RemoveChild(UIElement@, int = 0)
 - void RemoveChild(uint)
-- void RemoveChildAtIndex(uint)
+- void RemoveChildAtIndex(int)
 - void RemoveInstanceDefault()
 - void RemoveItem(UIElement@)
 - void RemoveItem(uint)
@@ -13059,7 +13059,7 @@ Methods:
 - void SetObjectAnimation(ObjectAnimation@)
 - void SetObjectAnimationAttr(const ResourceRef&)
 - void SetOpacity(float)
-- void SetParent(UIElement@, uint = M_MAX_UNSIGNED)
+- void SetParent(UIElement@, int = ENDPOS)
 - void SetPivot(const Vector2&)
 - void SetPivot(float, float)
 - void SetPlaceholderText(const String&)
@@ -13159,7 +13159,7 @@ Properties:
 - float derivedOpacity // readonly
 - IntVector2 disabledOffset
 - uint dragButtonCombo // readonly
-- uint dragButtonCount // readonly
+- int dragButtonCount // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
@@ -14408,7 +14408,7 @@ Methods:
 - void DrawInstanced(PrimitiveType, uint, uint, uint, uint, uint, uint)
 - void EndDumpShaders()
 - void EndFrame()
-- uint FindBestResolutionIndex(int, int, int, int) const
+- int FindBestResolutionIndex(int, int, int, int) const
 - bool GetAlphaToCoverage() const
 - bool GetAnisotropySupport() const
 - BlendMode GetBlendMode() const
@@ -16228,12 +16228,12 @@ Methods:
 - const Color& GetColor(Corner) const
 - const Color& GetColorAttr() const
 - const Color& GetDerivedColor() const
-- UIElement@ CreateChild(StringHash, const String& = String :: EMPTY, uint = M_MAX_UNSIGNED)
+- UIElement@ CreateChild(StringHash, const String& = String :: EMPTY, int = ENDPOS)
 - void DisableLayoutUpdate()
 - IntVector2 ElementToScreen(const IntVector2&)
 - void EnableLayoutUpdate()
 - bool FilterAttributes(XMLElement&) const
-- uint FindChild(UIElement@) const
+- int FindChild(UIElement@) const
 - bool GetAnimationEnabled() const
 - Variant GetAttribute(const String&) const
 - Variant GetAttribute(uint) const
@@ -16249,7 +16249,7 @@ Methods:
 - bool GetBringToFront() const
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant :: EMPTY, bool = false) const
-- UIElement@ GetChild(uint) const
+- UIElement@ GetChild(int) const
 - UIElement@[]@ GetChildren() const
 - UIElement@[]@ GetChildren(bool) const
 - UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
@@ -16261,7 +16261,7 @@ Methods:
 - XMLFile@ GetDefaultStyle(bool = true) const
 - float GetDerivedOpacity() const
 - uint GetDragButtonCombo() const
-- uint GetDragButtonCount() const
+- int GetDragButtonCount() const
 - uint GetDragDropMode() const
 - uint GetEchoCharacter() const
 - IntVector2 GetEffectiveMinSize() const
@@ -16287,7 +16287,7 @@ Methods:
 - int GetMinHeight() const
 - int GetMinWidth() const
 - uint GetNumAttributes() const
-- uint GetNumChildren(bool = false) const
+- int GetNumChildren(bool = false) const
 - uint GetNumNetworkAttributes() const
 - ObjectAnimation@ GetObjectAnimation() const
 - ResourceRef GetObjectAnimationAttr() const
@@ -16312,7 +16312,7 @@ Methods:
 - bool HasSubscribedToEvent(Object@, StringHash) const
 - bool HasSubscribedToEvent(StringHash) const
 - bool HasTag(const String&) const
-- void InsertChild(uint, UIElement@)
+- void InsertChild(int, UIElement@)
 - const IntRect& GetBorder() const
 - const IntRect& GetClipBorder() const
 - const IntRect& GetImageBorder() const
@@ -16391,9 +16391,9 @@ Methods:
 - void RemoveAllChildren()
 - void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
-- void RemoveChild(UIElement@, uint = 0)
+- void RemoveChild(UIElement@, int = 0)
 - void RemoveChild(uint)
-- void RemoveChildAtIndex(uint)
+- void RemoveChildAtIndex(int)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
 - bool RemoveTag(const String&)
@@ -16489,7 +16489,7 @@ Methods:
 - void SetObjectAnimation(ObjectAnimation@)
 - void SetObjectAnimationAttr(const ResourceRef&)
 - void SetOpacity(float)
-- void SetParent(UIElement@, uint = M_MAX_UNSIGNED)
+- void SetParent(UIElement@, int = ENDPOS)
 - void SetPivot(const Vector2&)
 - void SetPivot(float, float)
 - void SetPosition(const IntVector2&)
@@ -16577,7 +16577,7 @@ Properties:
 - float derivedOpacity // readonly
 - IntVector2 disabledOffset
 - uint dragButtonCombo // readonly
-- uint dragButtonCount // readonly
+- int dragButtonCount // readonly
 - uint dragDropMode
 - uint echoCharacter
 - bool editable
@@ -16713,7 +16713,7 @@ Methods:
 - const Color& GetColorAttr() const
 - const Color& GetDerivedColor() const
 - void CopySelectedItemsToClipboard() const
-- UIElement@ CreateChild(StringHash, const String& = String :: EMPTY, uint = M_MAX_UNSIGNED)
+- UIElement@ CreateChild(StringHash, const String& = String :: EMPTY, int = ENDPOS)
 - void DisableInternalLayoutUpdate()
 - void DisableLayoutUpdate()
 - IntVector2 ElementToScreen(const IntVector2&)
@@ -16723,7 +16723,7 @@ Methods:
 - void EnsureItemVisibility(uint)
 - void Expand(uint, bool, bool = false)
 - bool FilterAttributes(XMLElement&) const
-- uint FindChild(UIElement@) const
+- int FindChild(UIElement@) const
 - uint FindItem(UIElement@) const
 - bool GetAnimationEnabled() const
 - Variant GetAttribute(const String&) const
@@ -16742,7 +16742,7 @@ Methods:
 - bool GetBringToFront() const
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant :: EMPTY, bool = false) const
-- UIElement@ GetChild(uint) const
+- UIElement@ GetChild(int) const
 - UIElement@[]@ GetChildren() const
 - UIElement@[]@ GetChildren(bool) const
 - UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
@@ -16753,7 +16753,7 @@ Methods:
 - XMLFile@ GetDefaultStyle(bool = true) const
 - float GetDerivedOpacity() const
 - uint GetDragButtonCombo() const
-- uint GetDragButtonCount() const
+- int GetDragButtonCount() const
 - uint GetDragDropMode() const
 - IntVector2 GetEffectiveMinSize() const
 - UIElement@ GetElementEventSender() const
@@ -16782,7 +16782,7 @@ Methods:
 - int GetMinWidth() const
 - bool GetMultiselect() const
 - uint GetNumAttributes() const
-- uint GetNumChildren(bool = false) const
+- int GetNumChildren(bool = false) const
 - uint GetNumItems() const
 - uint GetNumNetworkAttributes() const
 - ObjectAnimation@ GetObjectAnimation() const
@@ -16818,7 +16818,7 @@ Methods:
 - bool HasSubscribedToEvent(Object@, StringHash) const
 - bool HasSubscribedToEvent(StringHash) const
 - bool HasTag(const String&) const
-- void InsertChild(uint, UIElement@)
+- void InsertChild(int, UIElement@)
 - void InsertItem(uint, UIElement@, UIElement@ = null)
 - const IntRect& GetClipBorder() const
 - const IntRect& GetLayoutBorder() const
@@ -16892,12 +16892,12 @@ Methods:
 - void RemoveAllItems()
 - void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
-- void RemoveChild(UIElement@, uint = 0)
+- void RemoveChild(UIElement@, int = 0)
 - void RemoveChild(uint)
-- void RemoveChildAtIndex(uint)
+- void RemoveChildAtIndex(int)
 - void RemoveInstanceDefault()
 - void RemoveItem(UIElement@, uint = 0)
-- void RemoveItem(uint)
+- void RemoveItem(int)
 - void RemoveObjectAnimation()
 - void RemoveSelection(uint)
 - bool RemoveTag(const String&)
@@ -16988,7 +16988,7 @@ Methods:
 - void SetObjectAnimationAttr(const ResourceRef&)
 - void SetOpacity(float)
 - void SetPageStep(float)
-- void SetParent(UIElement@, uint = M_MAX_UNSIGNED)
+- void SetParent(UIElement@, int = ENDPOS)
 - void SetPivot(const Vector2&)
 - void SetPivot(float, float)
 - void SetPosition(const IntVector2&)
@@ -17082,7 +17082,7 @@ Properties:
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
 - uint dragButtonCombo // readonly
-- uint dragButtonCount // readonly
+- int dragButtonCount // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
@@ -17795,13 +17795,13 @@ Methods:
 - const Color& GetColor(Corner) const
 - const Color& GetColorAttr() const
 - const Color& GetDerivedColor() const
-- UIElement@ CreateChild(StringHash, const String& = String :: EMPTY, uint = M_MAX_UNSIGNED)
+- UIElement@ CreateChild(StringHash, const String& = String :: EMPTY, int = ENDPOS)
 - void DisableLayoutUpdate()
 - operator DropDownList@() const
 - IntVector2 ElementToScreen(const IntVector2&)
 - void EnableLayoutUpdate()
 - bool FilterAttributes(XMLElement&) const
-- uint FindChild(UIElement@) const
+- int FindChild(UIElement@) const
 - int GetAcceleratorKey() const
 - int GetAcceleratorQualifiers() const
 - bool GetAnimationEnabled() const
@@ -17819,7 +17819,7 @@ Methods:
 - bool GetBringToFront() const
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant :: EMPTY, bool = false) const
-- UIElement@ GetChild(uint) const
+- UIElement@ GetChild(int) const
 - UIElement@[]@ GetChildren() const
 - UIElement@[]@ GetChildren(bool) const
 - UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
@@ -17828,7 +17828,7 @@ Methods:
 - XMLFile@ GetDefaultStyle(bool = true) const
 - float GetDerivedOpacity() const
 - uint GetDragButtonCombo() const
-- uint GetDragButtonCount() const
+- int GetDragButtonCount() const
 - uint GetDragDropMode() const
 - IntVector2 GetEffectiveMinSize() const
 - UIElement@ GetElementEventSender() const
@@ -17852,7 +17852,7 @@ Methods:
 - int GetMinHeight() const
 - int GetMinWidth() const
 - uint GetNumAttributes() const
-- uint GetNumChildren(bool = false) const
+- int GetNumChildren(bool = false) const
 - uint GetNumNetworkAttributes() const
 - ObjectAnimation@ GetObjectAnimation() const
 - ResourceRef GetObjectAnimationAttr() const
@@ -17880,7 +17880,7 @@ Methods:
 - bool HasSubscribedToEvent(Object@, StringHash) const
 - bool HasSubscribedToEvent(StringHash) const
 - bool HasTag(const String&) const
-- void InsertChild(uint, UIElement@)
+- void InsertChild(int, UIElement@)
 - const IntRect& GetBorder() const
 - const IntRect& GetClipBorder() const
 - const IntRect& GetImageBorder() const
@@ -17962,9 +17962,9 @@ Methods:
 - void RemoveAllChildren()
 - void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
-- void RemoveChild(UIElement@, uint = 0)
+- void RemoveChild(UIElement@, int = 0)
 - void RemoveChild(uint)
-- void RemoveChildAtIndex(uint)
+- void RemoveChildAtIndex(int)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
 - bool RemoveTag(const String&)
@@ -18056,7 +18056,7 @@ Methods:
 - void SetObjectAnimation(ObjectAnimation@)
 - void SetObjectAnimationAttr(const ResourceRef&)
 - void SetOpacity(float)
-- void SetParent(UIElement@, uint = M_MAX_UNSIGNED)
+- void SetParent(UIElement@, int = ENDPOS)
 - void SetPivot(const Vector2&)
 - void SetPivot(float, float)
 - void SetPopup(UIElement@)
@@ -18151,7 +18151,7 @@ Properties:
 - float derivedOpacity // readonly
 - IntVector2 disabledOffset
 - uint dragButtonCombo // readonly
-- uint dragButtonCount // readonly
+- int dragButtonCount // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
@@ -18872,7 +18872,7 @@ Methods:
 Properties:
 
 - BoundingBox boundingBox
-- uint lodLevel
+- int lodLevel
 - Matrix3x4 transform
 
 <a name="Class_NavigationMesh"></a>
@@ -20389,7 +20389,7 @@ Methods:
 - bool CheckDrawableFit(const BoundingBox&) const
 - void CleanupConnection(Connection@)
 - operator Component@() const
-- void DeleteChild(uint)
+- void DeleteChild(int)
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - void DrawDebugGeometry(bool)
 - Drawable@[]@ GetAllDrawables(uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK)
@@ -20412,11 +20412,11 @@ Methods:
 - Object@ GetEventSender() const
 - uint GetID() const
 - bool GetInterceptNetworkUpdate(const String&) const
-- uint GetLevel() const
+- int GetLevel() const
 - Node@ GetNode() const
 - uint GetNumAttributes() const
-- uint GetNumDrawables() const
-- uint GetNumLevels() const
+- int GetNumDrawables() const
+- int GetNumLevels() const
 - uint GetNumNetworkAttributes() const
 - ObjectAnimation@ GetObjectAnimation() const
 - ResourceRef GetObjectAnimationAttr() const
@@ -20481,7 +20481,7 @@ Methods:
 - void SetInterceptNetworkUpdate(const String&, bool)
 - void SetObjectAnimation(ObjectAnimation@)
 - void SetObjectAnimationAttr(const ResourceRef&)
-- void SetSize(const BoundingBox&, uint)
+- void SetSize(const BoundingBox&, int)
 - void SetTemporary(bool)
 - const String& GetCategory() const
 - const String& GetTypeName() const
@@ -20517,7 +20517,7 @@ Properties:
 - uint id // readonly
 - Node@ node // readonly
 - uint numAttributes // readonly
-- uint numLevels // readonly
+- int numLevels // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
 - bool replicated // readonly
@@ -22287,12 +22287,12 @@ Methods:
 - const Color& GetColor(Corner) const
 - const Color& GetColorAttr() const
 - const Color& GetDerivedColor() const
-- UIElement@ CreateChild(StringHash, const String& = String :: EMPTY, uint = M_MAX_UNSIGNED)
+- UIElement@ CreateChild(StringHash, const String& = String :: EMPTY, int = ENDPOS)
 - void DisableLayoutUpdate()
 - IntVector2 ElementToScreen(const IntVector2&)
 - void EnableLayoutUpdate()
 - bool FilterAttributes(XMLElement&) const
-- uint FindChild(UIElement@) const
+- int FindChild(UIElement@) const
 - bool GetAnimationEnabled() const
 - Variant GetAttribute(const String&) const
 - Variant GetAttribute(uint) const
@@ -22308,7 +22308,7 @@ Methods:
 - bool GetBringToFront() const
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant :: EMPTY, bool = false) const
-- UIElement@ GetChild(uint) const
+- UIElement@ GetChild(int) const
 - UIElement@[]@ GetChildren() const
 - UIElement@[]@ GetChildren(bool) const
 - UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
@@ -22317,7 +22317,7 @@ Methods:
 - XMLFile@ GetDefaultStyle(bool = true) const
 - float GetDerivedOpacity() const
 - uint GetDragButtonCombo() const
-- uint GetDragButtonCount() const
+- int GetDragButtonCount() const
 - uint GetDragDropMode() const
 - IntVector2 GetEffectiveMinSize() const
 - UIElement@ GetElementEventSender() const
@@ -22342,7 +22342,7 @@ Methods:
 - int GetMinHeight() const
 - int GetMinWidth() const
 - uint GetNumAttributes() const
-- uint GetNumChildren(bool = false) const
+- int GetNumChildren(bool = false) const
 - uint GetNumNetworkAttributes() const
 - ObjectAnimation@ GetObjectAnimation() const
 - ResourceRef GetObjectAnimationAttr() const
@@ -22370,7 +22370,7 @@ Methods:
 - bool HasSubscribedToEvent(Object@, StringHash) const
 - bool HasSubscribedToEvent(StringHash) const
 - bool HasTag(const String&) const
-- void InsertChild(uint, UIElement@)
+- void InsertChild(int, UIElement@)
 - const IntRect& GetBorder() const
 - const IntRect& GetClipBorder() const
 - const IntRect& GetImageBorder() const
@@ -22446,9 +22446,9 @@ Methods:
 - void RemoveAllChildren()
 - void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
-- void RemoveChild(UIElement@, uint = 0)
+- void RemoveChild(UIElement@, int = 0)
 - void RemoveChild(uint)
-- void RemoveChildAtIndex(uint)
+- void RemoveChildAtIndex(int)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
 - bool RemoveTag(const String&)
@@ -22541,7 +22541,7 @@ Methods:
 - void SetObjectAnimationAttr(const ResourceRef&)
 - void SetOpacity(float)
 - void SetOrientation(Orientation)
-- void SetParent(UIElement@, uint = M_MAX_UNSIGNED)
+- void SetParent(UIElement@, int = ENDPOS)
 - void SetPivot(const Vector2&)
 - void SetPivot(float, float)
 - void SetPosition(const IntVector2&)
@@ -22625,7 +22625,7 @@ Properties:
 - float derivedOpacity // readonly
 - IntVector2 disabledOffset
 - uint dragButtonCombo // readonly
-- uint dragButtonCount // readonly
+- int dragButtonCount // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
@@ -22813,7 +22813,7 @@ Properties:
 - Node@ node // readonly
 - Vector3 normal
 - Vector3 position
-- uint subObject
+- int subObject
 - Vector2 textureUV
 
 <a name="Class_RaycastVehicle"></a>
@@ -25814,12 +25814,12 @@ Methods:
 - const Color& GetColor(Corner) const
 - const Color& GetColorAttr() const
 - const Color& GetDerivedColor() const
-- UIElement@ CreateChild(StringHash, const String& = String :: EMPTY, uint = M_MAX_UNSIGNED)
+- UIElement@ CreateChild(StringHash, const String& = String :: EMPTY, int = ENDPOS)
 - void DisableLayoutUpdate()
 - IntVector2 ElementToScreen(const IntVector2&)
 - void EnableLayoutUpdate()
 - bool FilterAttributes(XMLElement&) const
-- uint FindChild(UIElement@) const
+- int FindChild(UIElement@) const
 - bool GetAnimationEnabled() const
 - Variant GetAttribute(const String&) const
 - Variant GetAttribute(uint) const
@@ -25836,7 +25836,7 @@ Methods:
 - bool GetBringToFront() const
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant :: EMPTY, bool = false) const
-- UIElement@ GetChild(uint) const
+- UIElement@ GetChild(int) const
 - UIElement@[]@ GetChildren() const
 - UIElement@[]@ GetChildren(bool) const
 - UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
@@ -25845,7 +25845,7 @@ Methods:
 - XMLFile@ GetDefaultStyle(bool = true) const
 - float GetDerivedOpacity() const
 - uint GetDragButtonCombo() const
-- uint GetDragButtonCount() const
+- int GetDragButtonCount() const
 - uint GetDragDropMode() const
 - IntVector2 GetEffectiveMinSize() const
 - float GetEffectiveScrollStep() const
@@ -25871,7 +25871,7 @@ Methods:
 - int GetMinHeight() const
 - int GetMinWidth() const
 - uint GetNumAttributes() const
-- uint GetNumChildren(bool = false) const
+- int GetNumChildren(bool = false) const
 - uint GetNumNetworkAttributes() const
 - ObjectAnimation@ GetObjectAnimation() const
 - ResourceRef GetObjectAnimationAttr() const
@@ -25901,7 +25901,7 @@ Methods:
 - bool HasSubscribedToEvent(Object@, StringHash) const
 - bool HasSubscribedToEvent(StringHash) const
 - bool HasTag(const String&) const
-- void InsertChild(uint, UIElement@)
+- void InsertChild(int, UIElement@)
 - const IntRect& GetBorder() const
 - const IntRect& GetClipBorder() const
 - const IntRect& GetImageBorder() const
@@ -25977,9 +25977,9 @@ Methods:
 - void RemoveAllChildren()
 - void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
-- void RemoveChild(UIElement@, uint = 0)
+- void RemoveChild(UIElement@, int = 0)
 - void RemoveChild(uint)
-- void RemoveChildAtIndex(uint)
+- void RemoveChildAtIndex(int)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
 - bool RemoveTag(const String&)
@@ -26071,7 +26071,7 @@ Methods:
 - void SetObjectAnimationAttr(const ResourceRef&)
 - void SetOpacity(float)
 - void SetOrientation(Orientation)
-- void SetParent(UIElement@, uint = M_MAX_UNSIGNED)
+- void SetParent(UIElement@, int = ENDPOS)
 - void SetPivot(const Vector2&)
 - void SetPivot(float, float)
 - void SetPosition(const IntVector2&)
@@ -26158,7 +26158,7 @@ Properties:
 - float derivedOpacity // readonly
 - IntVector2 disabledOffset
 - uint dragButtonCombo // readonly
-- uint dragButtonCount // readonly
+- int dragButtonCount // readonly
 - uint dragDropMode
 - bool editable
 - float effectiveScrollStep // readonly
@@ -26255,12 +26255,12 @@ Methods:
 - const Color& GetColor(Corner) const
 - const Color& GetColorAttr() const
 - const Color& GetDerivedColor() const
-- UIElement@ CreateChild(StringHash, const String& = String :: EMPTY, uint = M_MAX_UNSIGNED)
+- UIElement@ CreateChild(StringHash, const String& = String :: EMPTY, int = ENDPOS)
 - void DisableLayoutUpdate()
 - IntVector2 ElementToScreen(const IntVector2&)
 - void EnableLayoutUpdate()
 - bool FilterAttributes(XMLElement&) const
-- uint FindChild(UIElement@) const
+- int FindChild(UIElement@) const
 - bool GetAnimationEnabled() const
 - Variant GetAttribute(const String&) const
 - Variant GetAttribute(uint) const
@@ -26277,7 +26277,7 @@ Methods:
 - bool GetBringToFront() const
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant :: EMPTY, bool = false) const
-- UIElement@ GetChild(uint) const
+- UIElement@ GetChild(int) const
 - UIElement@[]@ GetChildren() const
 - UIElement@[]@ GetChildren(bool) const
 - UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
@@ -26287,7 +26287,7 @@ Methods:
 - XMLFile@ GetDefaultStyle(bool = true) const
 - float GetDerivedOpacity() const
 - uint GetDragButtonCombo() const
-- uint GetDragButtonCount() const
+- int GetDragButtonCount() const
 - uint GetDragDropMode() const
 - IntVector2 GetEffectiveMinSize() const
 - UIElement@ GetElementEventSender() const
@@ -26311,7 +26311,7 @@ Methods:
 - int GetMinHeight() const
 - int GetMinWidth() const
 - uint GetNumAttributes() const
-- uint GetNumChildren(bool = false) const
+- int GetNumChildren(bool = false) const
 - uint GetNumNetworkAttributes() const
 - ObjectAnimation@ GetObjectAnimation() const
 - ResourceRef GetObjectAnimationAttr() const
@@ -26341,7 +26341,7 @@ Methods:
 - bool HasSubscribedToEvent(Object@, StringHash) const
 - bool HasSubscribedToEvent(StringHash) const
 - bool HasTag(const String&) const
-- void InsertChild(uint, UIElement@)
+- void InsertChild(int, UIElement@)
 - const IntRect& GetClipBorder() const
 - const IntRect& GetLayoutBorder() const
 - const IntVector2& GetChildOffset() const
@@ -26413,9 +26413,9 @@ Methods:
 - void RemoveAllChildren()
 - void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
-- void RemoveChild(UIElement@, uint = 0)
+- void RemoveChild(UIElement@, int = 0)
 - void RemoveChild(uint)
-- void RemoveChildAtIndex(uint)
+- void RemoveChildAtIndex(int)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
 - bool RemoveTag(const String&)
@@ -26500,7 +26500,7 @@ Methods:
 - void SetObjectAnimationAttr(const ResourceRef&)
 - void SetOpacity(float)
 - void SetPageStep(float)
-- void SetParent(UIElement@, uint = M_MAX_UNSIGNED)
+- void SetParent(UIElement@, int = ENDPOS)
 - void SetPivot(const Vector2&)
 - void SetPivot(float, float)
 - void SetPosition(const IntVector2&)
@@ -26586,7 +26586,7 @@ Properties:
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
 - uint dragButtonCombo // readonly
-- uint dragButtonCount // readonly
+- int dragButtonCount // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
@@ -27233,23 +27233,23 @@ Methods:
 - void Define(const Skeleton&)
 - Bone@ GetBone(const String&)
 - Bone@ GetBone(const StringHash&)
-- Bone@ GetBone(uint)
-- uint GetBoneIndex(Bone@) const
-- uint GetBoneIndex(const String&) const
-- uint GetBoneIndex(const StringHash&) const
+- Bone@ GetBone(int)
+- int GetBoneIndex(Bone@) const
+- int GetBoneIndex(const String&) const
+- int GetBoneIndex(const StringHash&) const
 - Bone@ GetBoneParent(Bone@)
-- uint GetNumBones() const
+- int GetNumBones() const
 - Bone@ GetRootBone()
 - bool Load(Deserializer&)
 - void Reset()
 - void ResetSilent()
 - bool Save(Serializer&) const
-- void SetRootBoneIndex(uint)
+- void SetRootBoneIndex(int)
 
 Properties:
 
 - Bone@[] bones // readonly
-- uint numBones // readonly
+- int numBones // readonly
 - Bone@ rootBone // readonly
 
 <a name="Class_Skybox"></a>
@@ -27496,12 +27496,12 @@ Methods:
 - const Color& GetColor(Corner) const
 - const Color& GetColorAttr() const
 - const Color& GetDerivedColor() const
-- UIElement@ CreateChild(StringHash, const String& = String :: EMPTY, uint = M_MAX_UNSIGNED)
+- UIElement@ CreateChild(StringHash, const String& = String :: EMPTY, int = ENDPOS)
 - void DisableLayoutUpdate()
 - IntVector2 ElementToScreen(const IntVector2&)
 - void EnableLayoutUpdate()
 - bool FilterAttributes(XMLElement&) const
-- uint FindChild(UIElement@) const
+- int FindChild(UIElement@) const
 - bool GetAnimationEnabled() const
 - Variant GetAttribute(const String&) const
 - Variant GetAttribute(uint) const
@@ -27517,7 +27517,7 @@ Methods:
 - bool GetBringToFront() const
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant :: EMPTY, bool = false) const
-- UIElement@ GetChild(uint) const
+- UIElement@ GetChild(int) const
 - UIElement@[]@ GetChildren() const
 - UIElement@[]@ GetChildren(bool) const
 - UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
@@ -27526,7 +27526,7 @@ Methods:
 - XMLFile@ GetDefaultStyle(bool = true) const
 - float GetDerivedOpacity() const
 - uint GetDragButtonCombo() const
-- uint GetDragButtonCount() const
+- int GetDragButtonCount() const
 - uint GetDragDropMode() const
 - IntVector2 GetEffectiveMinSize() const
 - UIElement@ GetElementEventSender() const
@@ -27551,7 +27551,7 @@ Methods:
 - int GetMinHeight() const
 - int GetMinWidth() const
 - uint GetNumAttributes() const
-- uint GetNumChildren(bool = false) const
+- int GetNumChildren(bool = false) const
 - uint GetNumNetworkAttributes() const
 - ObjectAnimation@ GetObjectAnimation() const
 - ResourceRef GetObjectAnimationAttr() const
@@ -27579,7 +27579,7 @@ Methods:
 - bool HasSubscribedToEvent(Object@, StringHash) const
 - bool HasSubscribedToEvent(StringHash) const
 - bool HasTag(const String&) const
-- void InsertChild(uint, UIElement@)
+- void InsertChild(int, UIElement@)
 - const IntRect& GetBorder() const
 - const IntRect& GetClipBorder() const
 - const IntRect& GetImageBorder() const
@@ -27655,9 +27655,9 @@ Methods:
 - void RemoveAllChildren()
 - void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
-- void RemoveChild(UIElement@, uint = 0)
+- void RemoveChild(UIElement@, int = 0)
 - void RemoveChild(uint)
-- void RemoveChildAtIndex(uint)
+- void RemoveChildAtIndex(int)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
 - bool RemoveTag(const String&)
@@ -27749,7 +27749,7 @@ Methods:
 - void SetObjectAnimationAttr(const ResourceRef&)
 - void SetOpacity(float)
 - void SetOrientation(Orientation)
-- void SetParent(UIElement@, uint = M_MAX_UNSIGNED)
+- void SetParent(UIElement@, int = ENDPOS)
 - void SetPivot(const Vector2&)
 - void SetPivot(float, float)
 - void SetPosition(const IntVector2&)
@@ -27832,7 +27832,7 @@ Properties:
 - float derivedOpacity // readonly
 - IntVector2 disabledOffset
 - uint dragButtonCombo // readonly
-- uint dragButtonCount // readonly
+- int dragButtonCount // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
@@ -28914,12 +28914,12 @@ Methods:
 - const Color& GetColor(Corner) const
 - const Color& GetColorAttr() const
 - const Color& GetDerivedColor() const
-- UIElement@ CreateChild(StringHash, const String& = String :: EMPTY, uint = M_MAX_UNSIGNED)
+- UIElement@ CreateChild(StringHash, const String& = String :: EMPTY, int = ENDPOS)
 - void DisableLayoutUpdate()
 - IntVector2 ElementToScreen(const IntVector2&)
 - void EnableLayoutUpdate()
 - bool FilterAttributes(XMLElement&) const
-- uint FindChild(UIElement@) const
+- int FindChild(UIElement@) const
 - bool GetAnimationEnabled() const
 - Variant GetAttribute(const String&) const
 - Variant GetAttribute(uint) const
@@ -28935,7 +28935,7 @@ Methods:
 - bool GetBringToFront() const
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant :: EMPTY, bool = false) const
-- UIElement@ GetChild(uint) const
+- UIElement@ GetChild(int) const
 - UIElement@[]@ GetChildren() const
 - UIElement@[]@ GetChildren(bool) const
 - UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
@@ -28944,7 +28944,7 @@ Methods:
 - XMLFile@ GetDefaultStyle(bool = true) const
 - float GetDerivedOpacity() const
 - uint GetDragButtonCombo() const
-- uint GetDragButtonCount() const
+- int GetDragButtonCount() const
 - uint GetDragDropMode() const
 - IntVector2 GetEffectiveMinSize() const
 - UIElement@ GetElementEventSender() const
@@ -28966,7 +28966,7 @@ Methods:
 - int GetMinHeight() const
 - int GetMinWidth() const
 - uint GetNumAttributes() const
-- uint GetNumChildren(bool = false) const
+- int GetNumChildren(bool = false) const
 - uint GetNumNetworkAttributes() const
 - ObjectAnimation@ GetObjectAnimation() const
 - ResourceRef GetObjectAnimationAttr() const
@@ -28991,7 +28991,7 @@ Methods:
 - bool HasSubscribedToEvent(Object@, StringHash) const
 - bool HasSubscribedToEvent(StringHash) const
 - bool HasTag(const String&) const
-- void InsertChild(uint, UIElement@)
+- void InsertChild(int, UIElement@)
 - const IntRect& GetClipBorder() const
 - const IntRect& GetImageRect() const
 - const IntRect& GetLayoutBorder() const
@@ -29063,9 +29063,9 @@ Methods:
 - void RemoveAllChildren()
 - void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
-- void RemoveChild(UIElement@, uint = 0)
+- void RemoveChild(UIElement@, int = 0)
 - void RemoveChild(uint)
-- void RemoveChildAtIndex(uint)
+- void RemoveChildAtIndex(int)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
 - bool RemoveTag(const String&)
@@ -29150,7 +29150,7 @@ Methods:
 - void SetObjectAnimation(ObjectAnimation@)
 - void SetObjectAnimationAttr(const ResourceRef&)
 - void SetOpacity(float)
-- void SetParent(UIElement@, uint = M_MAX_UNSIGNED)
+- void SetParent(UIElement@, int = ENDPOS)
 - void SetPivot(const Vector2&)
 - void SetPivot(float, float)
 - void SetPosition(const Vector2&)
@@ -29232,7 +29232,7 @@ Properties:
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
 - uint dragButtonCombo // readonly
-- uint dragButtonCount // readonly
+- int dragButtonCount // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
@@ -29710,7 +29710,7 @@ Methods:
 Properties:
 
 - Vector3 center
-- uint lodLevel
+- int lodLevel
 
 <a name="Class_StaticModelGroup"></a>
 
@@ -31007,7 +31007,7 @@ Methods:
 - float GetLodBias() const
 - float GetLodDistance() const
 - Geometry@ GetLodGeometry(uint, uint)
-- uint GetLodLevel() const
+- int GetLodLevel() const
 - uint GetMaxLights() const
 - Geometry@ GetMaxLodGeometry() const
 - float GetMaxZ() const
@@ -31201,12 +31201,12 @@ Methods:
 - const Color& GetEffectColor() const
 - const Color& GetHoverColor() const
 - const Color& GetSelectionColor() const
-- UIElement@ CreateChild(StringHash, const String& = String :: EMPTY, uint = M_MAX_UNSIGNED)
+- UIElement@ CreateChild(StringHash, const String& = String :: EMPTY, int = ENDPOS)
 - void DisableLayoutUpdate()
 - IntVector2 ElementToScreen(const IntVector2&)
 - void EnableLayoutUpdate()
 - bool FilterAttributes(XMLElement&) const
-- uint FindChild(UIElement@) const
+- int FindChild(UIElement@) const
 - bool GetAnimationEnabled() const
 - Variant GetAttribute(const String&) const
 - Variant GetAttribute(uint) const
@@ -31224,7 +31224,7 @@ Methods:
 - Vector2 GetCharSize(int)
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant :: EMPTY, bool = false) const
-- UIElement@ GetChild(uint) const
+- UIElement@ GetChild(int) const
 - UIElement@[]@ GetChildren() const
 - UIElement@[]@ GetChildren(bool) const
 - UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
@@ -31233,7 +31233,7 @@ Methods:
 - XMLFile@ GetDefaultStyle(bool = true) const
 - float GetDerivedOpacity() const
 - uint GetDragButtonCombo() const
-- uint GetDragButtonCount() const
+- int GetDragButtonCount() const
 - uint GetDragDropMode() const
 - float GetEffectDepthBias() const
 - bool GetEffectRoundStroke() const
@@ -31262,7 +31262,7 @@ Methods:
 - int GetMinWidth() const
 - uint GetNumAttributes() const
 - int GetNumChars() const
-- uint GetNumChildren(bool = false) const
+- int GetNumChildren(bool = false) const
 - uint GetNumNetworkAttributes() const
 - int GetNumRows() const
 - ObjectAnimation@ GetObjectAnimation() const
@@ -31294,7 +31294,7 @@ Methods:
 - bool HasSubscribedToEvent(Object@, StringHash) const
 - bool HasSubscribedToEvent(StringHash) const
 - bool HasTag(const String&) const
-- void InsertChild(uint, UIElement@)
+- void InsertChild(int, UIElement@)
 - const IntRect& GetClipBorder() const
 - const IntRect& GetLayoutBorder() const
 - const IntVector2& GetChildOffset() const
@@ -31365,9 +31365,9 @@ Methods:
 - void RemoveAllChildren()
 - void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
-- void RemoveChild(UIElement@, uint = 0)
+- void RemoveChild(UIElement@, int = 0)
 - void RemoveChild(uint)
-- void RemoveChildAtIndex(uint)
+- void RemoveChildAtIndex(int)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
 - bool RemoveTag(const String&)
@@ -31458,7 +31458,7 @@ Methods:
 - void SetObjectAnimation(ObjectAnimation@)
 - void SetObjectAnimationAttr(const ResourceRef&)
 - void SetOpacity(float)
-- void SetParent(UIElement@, uint = M_MAX_UNSIGNED)
+- void SetParent(UIElement@, int = ENDPOS)
 - void SetPivot(const Vector2&)
 - void SetPivot(float, float)
 - void SetPosition(const IntVector2&)
@@ -31545,7 +31545,7 @@ Properties:
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
 - uint dragButtonCombo // readonly
-- uint dragButtonCount // readonly
+- int dragButtonCount // readonly
 - uint dragDropMode
 - bool editable
 - Color effectColor
@@ -33409,12 +33409,12 @@ Methods:
 - const Color& GetColor(Corner) const
 - const Color& GetColorAttr() const
 - const Color& GetDerivedColor() const
-- UIElement@ CreateChild(StringHash, const String& = String :: EMPTY, uint = M_MAX_UNSIGNED)
+- UIElement@ CreateChild(StringHash, const String& = String :: EMPTY, int = ENDPOS)
 - void DisableLayoutUpdate()
 - IntVector2 ElementToScreen(const IntVector2&)
 - void EnableLayoutUpdate()
 - bool FilterAttributes(XMLElement&) const
-- uint FindChild(UIElement@) const
+- int FindChild(UIElement@) const
 - bool GetAnimationEnabled() const
 - Variant GetAttribute(const String&) const
 - Variant GetAttribute(uint) const
@@ -33429,7 +33429,7 @@ Methods:
 - bool GetBringToFront() const
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant :: EMPTY, bool = false) const
-- UIElement@ GetChild(uint) const
+- UIElement@ GetChild(int) const
 - UIElement@[]@ GetChildren() const
 - UIElement@[]@ GetChildren(bool) const
 - UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
@@ -33439,7 +33439,7 @@ Methods:
 - float GetDelay() const
 - float GetDerivedOpacity() const
 - uint GetDragButtonCombo() const
-- uint GetDragButtonCount() const
+- int GetDragButtonCount() const
 - uint GetDragDropMode() const
 - IntVector2 GetEffectiveMinSize() const
 - UIElement@ GetElementEventSender() const
@@ -33461,7 +33461,7 @@ Methods:
 - int GetMinHeight() const
 - int GetMinWidth() const
 - uint GetNumAttributes() const
-- uint GetNumChildren(bool = false) const
+- int GetNumChildren(bool = false) const
 - uint GetNumNetworkAttributes() const
 - ObjectAnimation@ GetObjectAnimation() const
 - ResourceRef GetObjectAnimationAttr() const
@@ -33483,7 +33483,7 @@ Methods:
 - bool HasSubscribedToEvent(Object@, StringHash) const
 - bool HasSubscribedToEvent(StringHash) const
 - bool HasTag(const String&) const
-- void InsertChild(uint, UIElement@)
+- void InsertChild(int, UIElement@)
 - const IntRect& GetClipBorder() const
 - const IntRect& GetLayoutBorder() const
 - const IntVector2& GetChildOffset() const
@@ -33553,9 +33553,9 @@ Methods:
 - void RemoveAllChildren()
 - void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
-- void RemoveChild(UIElement@, uint = 0)
+- void RemoveChild(UIElement@, int = 0)
 - void RemoveChild(uint)
-- void RemoveChildAtIndex(uint)
+- void RemoveChildAtIndex(int)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
 - bool RemoveTag(const String&)
@@ -33637,7 +33637,7 @@ Methods:
 - void SetObjectAnimation(ObjectAnimation@)
 - void SetObjectAnimationAttr(const ResourceRef&)
 - void SetOpacity(float)
-- void SetParent(UIElement@, uint = M_MAX_UNSIGNED)
+- void SetParent(UIElement@, int = ENDPOS)
 - void SetPivot(const Vector2&)
 - void SetPivot(float, float)
 - void SetPosition(const IntVector2&)
@@ -33711,7 +33711,7 @@ Properties:
 - float delay
 - float derivedOpacity // readonly
 - uint dragButtonCombo // readonly
-- uint dragButtonCount // readonly
+- int dragButtonCount // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
@@ -34154,14 +34154,14 @@ Methods:
 - const Color& GetColor(Corner) const
 - const Color& GetColorAttr() const
 - const Color& GetDerivedColor() const
-- UIElement@ CreateChild(StringHash, const String& = String :: EMPTY, uint = M_MAX_UNSIGNED)
+- UIElement@ CreateChild(StringHash, const String& = String :: EMPTY, int = ENDPOS)
 - operator Cursor@() const
 - void DisableLayoutUpdate()
 - operator DropDownList@() const
 - IntVector2 ElementToScreen(const IntVector2&)
 - void EnableLayoutUpdate()
 - bool FilterAttributes(XMLElement&) const
-- uint FindChild(UIElement@) const
+- int FindChild(UIElement@) const
 - bool GetAnimationEnabled() const
 - Variant GetAttribute(const String&) const
 - Variant GetAttribute(uint) const
@@ -34176,7 +34176,7 @@ Methods:
 - bool GetBringToFront() const
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant :: EMPTY, bool = false) const
-- UIElement@ GetChild(uint) const
+- UIElement@ GetChild(int) const
 - UIElement@[]@ GetChildren() const
 - UIElement@[]@ GetChildren(bool) const
 - UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
@@ -34185,7 +34185,7 @@ Methods:
 - XMLFile@ GetDefaultStyle(bool = true) const
 - float GetDerivedOpacity() const
 - uint GetDragButtonCombo() const
-- uint GetDragButtonCount() const
+- int GetDragButtonCount() const
 - uint GetDragDropMode() const
 - IntVector2 GetEffectiveMinSize() const
 - UIElement@ GetElementEventSender() const
@@ -34207,7 +34207,7 @@ Methods:
 - int GetMinHeight() const
 - int GetMinWidth() const
 - uint GetNumAttributes() const
-- uint GetNumChildren(bool = false) const
+- int GetNumChildren(bool = false) const
 - uint GetNumNetworkAttributes() const
 - ObjectAnimation@ GetObjectAnimation() const
 - ResourceRef GetObjectAnimationAttr() const
@@ -34229,7 +34229,7 @@ Methods:
 - bool HasSubscribedToEvent(Object@, StringHash) const
 - bool HasSubscribedToEvent(StringHash) const
 - bool HasTag(const String&) const
-- void InsertChild(uint, UIElement@)
+- void InsertChild(int, UIElement@)
 - const IntRect& GetClipBorder() const
 - const IntRect& GetLayoutBorder() const
 - const IntVector2& GetChildOffset() const
@@ -34303,9 +34303,9 @@ Methods:
 - void RemoveAllChildren()
 - void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
-- void RemoveChild(UIElement@, uint = 0)
+- void RemoveChild(UIElement@, int = 0)
 - void RemoveChild(uint)
-- void RemoveChildAtIndex(uint)
+- void RemoveChildAtIndex(int)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
 - bool RemoveTag(const String&)
@@ -34387,7 +34387,7 @@ Methods:
 - void SetObjectAnimation(ObjectAnimation@)
 - void SetObjectAnimationAttr(const ResourceRef&)
 - void SetOpacity(float)
-- void SetParent(UIElement@, uint = M_MAX_UNSIGNED)
+- void SetParent(UIElement@, int = ENDPOS)
 - void SetPivot(const Vector2&)
 - void SetPivot(float, float)
 - void SetPosition(const IntVector2&)
@@ -34483,7 +34483,7 @@ Properties:
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
 - uint dragButtonCombo // readonly
-- uint dragButtonCount // readonly
+- int dragButtonCount // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
@@ -34568,12 +34568,12 @@ Methods:
 - const Color& GetDerivedColor() const
 - const Color& GetHoverColor() const
 - const Color& GetSelectionColor() const
-- UIElement@ CreateChild(StringHash, const String& = String :: EMPTY, uint = M_MAX_UNSIGNED)
+- UIElement@ CreateChild(StringHash, const String& = String :: EMPTY, int = ENDPOS)
 - void DisableLayoutUpdate()
 - IntVector2 ElementToScreen(const IntVector2&)
 - void EnableLayoutUpdate()
 - bool FilterAttributes(XMLElement&) const
-- uint FindChild(UIElement@) const
+- int FindChild(UIElement@) const
 - bool GetAnimationEnabled() const
 - Variant GetAttribute(const String&) const
 - Variant GetAttribute(uint) const
@@ -34588,7 +34588,7 @@ Methods:
 - bool GetBringToFront() const
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant :: EMPTY, bool = false) const
-- UIElement@ GetChild(uint) const
+- UIElement@ GetChild(int) const
 - UIElement@[]@ GetChildren() const
 - UIElement@[]@ GetChildren(bool) const
 - UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
@@ -34597,7 +34597,7 @@ Methods:
 - XMLFile@ GetDefaultStyle(bool = true) const
 - float GetDerivedOpacity() const
 - uint GetDragButtonCombo() const
-- uint GetDragButtonCount() const
+- int GetDragButtonCount() const
 - uint GetDragDropMode() const
 - IntVector2 GetEffectiveMinSize() const
 - UIElement@ GetElementEventSender() const
@@ -34619,7 +34619,7 @@ Methods:
 - int GetMinHeight() const
 - int GetMinWidth() const
 - uint GetNumAttributes() const
-- uint GetNumChildren(bool = false) const
+- int GetNumChildren(bool = false) const
 - uint GetNumNetworkAttributes() const
 - ObjectAnimation@ GetObjectAnimation() const
 - ResourceRef GetObjectAnimationAttr() const
@@ -34641,7 +34641,7 @@ Methods:
 - bool HasSubscribedToEvent(Object@, StringHash) const
 - bool HasSubscribedToEvent(StringHash) const
 - bool HasTag(const String&) const
-- void InsertChild(uint, UIElement@)
+- void InsertChild(int, UIElement@)
 - const IntRect& GetClipBorder() const
 - const IntRect& GetLayoutBorder() const
 - const IntVector2& GetChildOffset() const
@@ -34711,9 +34711,9 @@ Methods:
 - void RemoveAllChildren()
 - void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
-- void RemoveChild(UIElement@, uint = 0)
+- void RemoveChild(UIElement@, int = 0)
 - void RemoveChild(uint)
-- void RemoveChildAtIndex(uint)
+- void RemoveChildAtIndex(int)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
 - bool RemoveTag(const String&)
@@ -34794,7 +34794,7 @@ Methods:
 - void SetObjectAnimation(ObjectAnimation@)
 - void SetObjectAnimationAttr(const ResourceRef&)
 - void SetOpacity(float)
-- void SetParent(UIElement@, uint = M_MAX_UNSIGNED)
+- void SetParent(UIElement@, int = ENDPOS)
 - void SetPivot(const Vector2&)
 - void SetPivot(float, float)
 - void SetPosition(const IntVector2&)
@@ -34870,7 +34870,7 @@ Properties:
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
 - uint dragButtonCombo // readonly
-- uint dragButtonCount // readonly
+- int dragButtonCount // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
@@ -35462,8 +35462,8 @@ Methods:
 - Vector4&  operator+=(const Vector4&)
 - Vector4&  operator=(const Vector4&)
 - bool  operator==(const Vector4&) const
-- float&  operator[ ](uint)
-- float  operator[ ](uint) const
+- float&  operator[ ](int)
+- float  operator[ ](int) const
 - Vector4 Abs() const
 - float AbsDotProduct(const Vector4&) const
 - float DotProduct(const Vector4&) const
@@ -35839,12 +35839,12 @@ Methods:
 - const Color& GetDerivedColor() const
 - const Color& GetModalFrameColor() const
 - const Color& GetModalShadeColor() const
-- UIElement@ CreateChild(StringHash, const String& = String :: EMPTY, uint = M_MAX_UNSIGNED)
+- UIElement@ CreateChild(StringHash, const String& = String :: EMPTY, int = ENDPOS)
 - void DisableLayoutUpdate()
 - IntVector2 ElementToScreen(const IntVector2&)
 - void EnableLayoutUpdate()
 - bool FilterAttributes(XMLElement&) const
-- uint FindChild(UIElement@) const
+- int FindChild(UIElement@) const
 - bool GetAnimationEnabled() const
 - Variant GetAttribute(const String&) const
 - Variant GetAttribute(uint) const
@@ -35862,7 +35862,7 @@ Methods:
 - Node@ GetCameraNode() const
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant :: EMPTY, bool = false) const
-- UIElement@ GetChild(uint) const
+- UIElement@ GetChild(int) const
 - UIElement@[]@ GetChildren() const
 - UIElement@[]@ GetChildren(bool) const
 - UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
@@ -35872,7 +35872,7 @@ Methods:
 - Texture2D@ GetDepthTexture() const
 - float GetDerivedOpacity() const
 - uint GetDragButtonCombo() const
-- uint GetDragButtonCount() const
+- int GetDragButtonCount() const
 - uint GetDragDropMode() const
 - IntVector2 GetEffectiveMinSize() const
 - UIElement@ GetElementEventSender() const
@@ -35900,7 +35900,7 @@ Methods:
 - int GetMinWidth() const
 - bool GetModalAutoDismiss() const
 - uint GetNumAttributes() const
-- uint GetNumChildren(bool = false) const
+- int GetNumChildren(bool = false) const
 - uint GetNumNetworkAttributes() const
 - ObjectAnimation@ GetObjectAnimation() const
 - ResourceRef GetObjectAnimationAttr() const
@@ -35927,7 +35927,7 @@ Methods:
 - bool HasSubscribedToEvent(Object@, StringHash) const
 - bool HasSubscribedToEvent(StringHash) const
 - bool HasTag(const String&) const
-- void InsertChild(uint, UIElement@)
+- void InsertChild(int, UIElement@)
 - const IntRect& GetBorder() const
 - const IntRect& GetClipBorder() const
 - const IntRect& GetImageBorder() const
@@ -36009,9 +36009,9 @@ Methods:
 - void RemoveAllChildren()
 - void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
-- void RemoveChild(UIElement@, uint = 0)
+- void RemoveChild(UIElement@, int = 0)
 - void RemoveChild(uint)
-- void RemoveChildAtIndex(uint)
+- void RemoveChildAtIndex(int)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
 - bool RemoveTag(const String&)
@@ -36112,7 +36112,7 @@ Methods:
 - void SetObjectAnimation(ObjectAnimation@)
 - void SetObjectAnimationAttr(const ResourceRef&)
 - void SetOpacity(float)
-- void SetParent(UIElement@, uint = M_MAX_UNSIGNED)
+- void SetParent(UIElement@, int = ENDPOS)
 - void SetPivot(const Vector2&)
 - void SetPivot(float, float)
 - void SetPosition(const IntVector2&)
@@ -36200,7 +36200,7 @@ Properties:
 - float derivedOpacity // readonly
 - IntVector2 disabledOffset
 - uint dragButtonCombo // readonly
-- uint dragButtonCount // readonly
+- int dragButtonCount // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
@@ -36392,12 +36392,12 @@ Methods:
 - const Color& GetDerivedColor() const
 - const Color& GetModalFrameColor() const
 - const Color& GetModalShadeColor() const
-- UIElement@ CreateChild(StringHash, const String& = String :: EMPTY, uint = M_MAX_UNSIGNED)
+- UIElement@ CreateChild(StringHash, const String& = String :: EMPTY, int = ENDPOS)
 - void DisableLayoutUpdate()
 - IntVector2 ElementToScreen(const IntVector2&)
 - void EnableLayoutUpdate()
 - bool FilterAttributes(XMLElement&) const
-- uint FindChild(UIElement@) const
+- int FindChild(UIElement@) const
 - bool GetAnimationEnabled() const
 - Variant GetAttribute(const String&) const
 - Variant GetAttribute(uint) const
@@ -36413,7 +36413,7 @@ Methods:
 - bool GetBringToFront() const
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant :: EMPTY, bool = false) const
-- UIElement@ GetChild(uint) const
+- UIElement@ GetChild(int) const
 - UIElement@[]@ GetChildren() const
 - UIElement@[]@ GetChildren(bool) const
 - UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
@@ -36422,7 +36422,7 @@ Methods:
 - XMLFile@ GetDefaultStyle(bool = true) const
 - float GetDerivedOpacity() const
 - uint GetDragButtonCombo() const
-- uint GetDragButtonCount() const
+- int GetDragButtonCount() const
 - uint GetDragDropMode() const
 - IntVector2 GetEffectiveMinSize() const
 - UIElement@ GetElementEventSender() const
@@ -36449,7 +36449,7 @@ Methods:
 - int GetMinWidth() const
 - bool GetModalAutoDismiss() const
 - uint GetNumAttributes() const
-- uint GetNumChildren(bool = false) const
+- int GetNumChildren(bool = false) const
 - uint GetNumNetworkAttributes() const
 - ObjectAnimation@ GetObjectAnimation() const
 - ResourceRef GetObjectAnimationAttr() const
@@ -36473,7 +36473,7 @@ Methods:
 - bool HasSubscribedToEvent(Object@, StringHash) const
 - bool HasSubscribedToEvent(StringHash) const
 - bool HasTag(const String&) const
-- void InsertChild(uint, UIElement@)
+- void InsertChild(int, UIElement@)
 - const IntRect& GetBorder() const
 - const IntRect& GetClipBorder() const
 - const IntRect& GetImageBorder() const
@@ -36554,9 +36554,9 @@ Methods:
 - void RemoveAllChildren()
 - void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
-- void RemoveChild(UIElement@, uint = 0)
+- void RemoveChild(UIElement@, int = 0)
 - void RemoveChild(uint)
-- void RemoveChildAtIndex(uint)
+- void RemoveChildAtIndex(int)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
 - bool RemoveTag(const String&)
@@ -36655,7 +36655,7 @@ Methods:
 - void SetObjectAnimation(ObjectAnimation@)
 - void SetObjectAnimationAttr(const ResourceRef&)
 - void SetOpacity(float)
-- void SetParent(UIElement@, uint = M_MAX_UNSIGNED)
+- void SetParent(UIElement@, int = ENDPOS)
 - void SetPivot(const Vector2&)
 - void SetPivot(float, float)
 - void SetPosition(const IntVector2&)
@@ -36739,7 +36739,7 @@ Properties:
 - float derivedOpacity // readonly
 - IntVector2 disabledOffset
 - uint dragButtonCombo // readonly
-- uint dragButtonCount // readonly
+- int dragButtonCount // readonly
 - uint dragDropMode
 - bool editable
 - bool elementEventSender
@@ -36840,20 +36840,20 @@ Properties:
 
 Methods:
 
-- void Complete(uint)
-- void CreateThreads(uint)
+- void Complete(int)
+- void CreateThreads(int)
 - bool GetBlockEvents() const
 - VariantMap& GetEventDataMap() const
 - Object@ GetEventSender() const
 - int GetNonThreadedWorkMs() const
-- uint GetNumThreads() const
+- int GetNumThreads() const
 - Object@ GetSubsystem(StringHash) const
 - int GetTolerance() const
 - StringHash GetType() const
 - bool HasEventHandlers() const
 - bool HasSubscribedToEvent(Object@, StringHash) const
 - bool HasSubscribedToEvent(StringHash) const
-- bool IsCompleted(uint) const
+- bool IsCompleted(int) const
 - bool IsCompleting() const
 - bool IsInstanceOf(StringHash) const
 - operator Object@() const
@@ -39085,7 +39085,7 @@ Properties:
 - uint QUAL_NONE
 - uint QUAL_SHIFT
 - int QUICKSORT_THRESHOLD
-- uint ROOT_INDEX
+- int ROOT_INDEX
 - uint SCANCODE_0
 - uint SCANCODE_1
 - uint SCANCODE_2
@@ -39382,6 +39382,7 @@ Properties:
 - StringHash VSP_VIEWPROJ
 - StringHash VSP_VOFFSET
 - StringHash VSP_ZONE
+- int WI_MAX_PRIORITY
 */
 
 }
