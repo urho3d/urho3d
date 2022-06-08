@@ -13724,16 +13724,16 @@ template <class T> void RegisterMembers_Material(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "bool GetLineAntiAlias() const", AS_METHODPR(T, GetLineAntiAlias, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_lineAntiAlias() const", AS_METHODPR(T, GetLineAntiAlias, () const, bool), AS_CALL_THISCALL);
 
-    // unsigned Material::GetNumTechniques() const
-    engine->RegisterObjectMethod(className, "uint GetNumTechniques() const", AS_METHODPR(T, GetNumTechniques, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numTechniques() const", AS_METHODPR(T, GetNumTechniques, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Material::GetNumTechniques() const
+    engine->RegisterObjectMethod(className, "int GetNumTechniques() const", AS_METHODPR(T, GetNumTechniques, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numTechniques() const", AS_METHODPR(T, GetNumTechniques, () const, i32), AS_CALL_THISCALL);
 
     // bool Material::GetOcclusion() const
     engine->RegisterObjectMethod(className, "bool GetOcclusion() const", AS_METHODPR(T, GetOcclusion, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_occlusion() const", AS_METHODPR(T, GetOcclusion, () const, bool), AS_CALL_THISCALL);
 
-    // Pass* Material::GetPass(unsigned index, const String& passName) const
-    engine->RegisterObjectMethod(className, "Pass@+ GetPass(uint, const String&in) const", AS_METHODPR(T, GetPass, (unsigned, const String&) const, Pass*), AS_CALL_THISCALL);
+    // Pass* Material::GetPass(i32 index, const String& passName) const
+    engine->RegisterObjectMethod(className, "Pass@+ GetPass(int, const String&in) const", AS_METHODPR(T, GetPass, (i32, const String&) const, Pass*), AS_CALL_THISCALL);
 
     // const String& Material::GetPixelShaderDefines() const
     engine->RegisterObjectMethod(className, "const String& GetPixelShaderDefines() const", AS_METHODPR(T, GetPixelShaderDefines, () const, const String&), AS_CALL_THISCALL);
@@ -13770,12 +13770,12 @@ template <class T> void RegisterMembers_Material(asIScriptEngine* engine, const 
     // bool Material::GetSpecular() const
     engine->RegisterObjectMethod(className, "bool GetSpecular() const", AS_METHODPR(T, GetSpecular, () const, bool), AS_CALL_THISCALL);
 
-    // Technique* Material::GetTechnique(unsigned index) const
-    engine->RegisterObjectMethod(className, "Technique@+ GetTechnique(uint) const", AS_METHODPR(T, GetTechnique, (unsigned) const, Technique*), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "Technique@+ get_techniques(uint) const", AS_METHODPR(T, GetTechnique, (unsigned) const, Technique*), AS_CALL_THISCALL);
+    // Technique* Material::GetTechnique(i32 index) const
+    engine->RegisterObjectMethod(className, "Technique@+ GetTechnique(int) const", AS_METHODPR(T, GetTechnique, (i32) const, Technique*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Technique@+ get_techniques(int) const", AS_METHODPR(T, GetTechnique, (i32) const, Technique*), AS_CALL_THISCALL);
 
-    // const TechniqueEntry& Material::GetTechniqueEntry(unsigned index) const
-    engine->RegisterObjectMethod(className, "const TechniqueEntry& GetTechniqueEntry(uint) const", AS_METHODPR(T, GetTechniqueEntry, (unsigned) const, const TechniqueEntry&), AS_CALL_THISCALL);
+    // const TechniqueEntry& Material::GetTechniqueEntry(i32 index) const
+    engine->RegisterObjectMethod(className, "const TechniqueEntry& GetTechniqueEntry(int) const", AS_METHODPR(T, GetTechniqueEntry, (i32) const, const TechniqueEntry&), AS_CALL_THISCALL);
 
     // const Vector<TechniqueEntry>& Material::GetTechniques() const
     engine->RegisterObjectMethod(className, "Array<TechniqueEntry>@ GetTechniques() const", AS_FUNCTION_OBJFIRST(Material_constspVectorlesTechniqueEntrygreamp_GetTechniques_void_template<Material>), AS_CALL_CDECL_OBJFIRST);
@@ -13829,9 +13829,9 @@ template <class T> void RegisterMembers_Material(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "void SetLineAntiAlias(bool)", AS_METHODPR(T, SetLineAntiAlias, (bool), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_lineAntiAlias(bool)", AS_METHODPR(T, SetLineAntiAlias, (bool), void), AS_CALL_THISCALL);
 
-    // void Material::SetNumTechniques(unsigned num)
-    engine->RegisterObjectMethod(className, "void SetNumTechniques(uint)", AS_METHODPR(T, SetNumTechniques, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_numTechniques(uint)", AS_METHODPR(T, SetNumTechniques, (unsigned), void), AS_CALL_THISCALL);
+    // void Material::SetNumTechniques(i32 num)
+    engine->RegisterObjectMethod(className, "void SetNumTechniques(int)", AS_METHODPR(T, SetNumTechniques, (i32), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_numTechniques(int)", AS_METHODPR(T, SetNumTechniques, (i32), void), AS_CALL_THISCALL);
 
     // void Material::SetOcclusion(bool enable)
     engine->RegisterObjectMethod(className, "void SetOcclusion(bool)", AS_METHODPR(T, SetOcclusion, (bool), void), AS_CALL_THISCALL);
@@ -13866,8 +13866,8 @@ template <class T> void RegisterMembers_Material(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "void SetShadowCullMode(CullMode)", AS_METHODPR(T, SetShadowCullMode, (CullMode), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_shadowCullMode(CullMode)", AS_METHODPR(T, SetShadowCullMode, (CullMode), void), AS_CALL_THISCALL);
 
-    // void Material::SetTechnique(unsigned index, Technique* tech, MaterialQuality qualityLevel = QUALITY_LOW, float lodDistance = 0.0f)
-    engine->RegisterObjectMethod(className, "void SetTechnique(uint, Technique@+, MaterialQuality = QUALITY_LOW, float = 0.0f)", AS_METHODPR(T, SetTechnique, (unsigned, Technique*, MaterialQuality, float), void), AS_CALL_THISCALL);
+    // void Material::SetTechnique(i32 index, Technique* tech, MaterialQuality qualityLevel = QUALITY_LOW, float lodDistance = 0.0f)
+    engine->RegisterObjectMethod(className, "void SetTechnique(int, Technique@+, MaterialQuality = QUALITY_LOW, float = 0.0f)", AS_METHODPR(T, SetTechnique, (i32, Technique*, MaterialQuality, float), void), AS_CALL_THISCALL);
 
     // void Material::SetTexture(TextureUnit unit, Texture* texture)
     engine->RegisterObjectMethod(className, "void SetTexture(TextureUnit, Texture@+)", AS_METHODPR(T, SetTexture, (TextureUnit, Texture*), void), AS_CALL_THISCALL);

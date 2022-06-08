@@ -323,11 +323,9 @@ bool Material::BeginLoadJSON(Deserializer& source)
             const JSONValue& rootVal = loadJSONFile_->GetRoot();
 
             JSONArray techniqueArray = rootVal.Get("techniques").GetArray();
-            for (unsigned i = 0; i < techniqueArray.Size(); i++)
-            {
-                const JSONValue& techVal = techniqueArray[i];
+
+            for (const JSONValue& techVal : techniqueArray)
                 cache->BackgroundLoadResource<Technique>(techVal.Get("name").GetString(), true, this);
-            }
 
             JSONObject textureObject = rootVal.Get("textures").GetObject();
             for (JSONObject::ConstIterator it = textureObject.Begin(); it != textureObject.End(); it++)
@@ -550,10 +548,9 @@ bool Material::Load(const JSONValue& source)
     techniques_.Clear();
     techniques_.Reserve(techniquesArray.Size());
 
-    for (unsigned i = 0; i < techniquesArray.Size(); i++)
+    for (const JSONValue& techVal : techniquesArray)
     {
-        const JSONValue& techVal = techniquesArray[i];
-        auto* tech = cache->GetResource<Technique>(techVal.Get("name").GetString());
+        Technique* tech = cache->GetResource<Technique>(techVal.Get("name").GetString());
         if (tech)
         {
             TechniqueEntry newTechnique;
@@ -696,9 +693,8 @@ bool Material::Save(XMLElement& dest) const
     }
 
     // Write techniques
-    for (unsigned i = 0; i < techniques_.Size(); ++i)
+    for (const TechniqueEntry& entry : techniques_)
     {
-        const TechniqueEntry& entry = techniques_[i];
         if (!entry.technique_)
             continue;
 
@@ -799,9 +795,8 @@ bool Material::Save(JSONValue& dest) const
     // Write techniques
     JSONArray techniquesArray;
     techniquesArray.Reserve(techniques_.Size());
-    for (unsigned i = 0; i < techniques_.Size(); ++i)
+    for (const TechniqueEntry& entry : techniques_)
     {
-        const TechniqueEntry& entry = techniques_[i];
         if (!entry.technique_)
             continue;
 
@@ -895,8 +890,10 @@ bool Material::Save(JSONValue& dest) const
     return true;
 }
 
-void Material::SetNumTechniques(unsigned num)
+void Material::SetNumTechniques(i32 num)
 {
+    assert(num >= 0);
+
     if (!num)
         return;
 
@@ -904,8 +901,10 @@ void Material::SetNumTechniques(unsigned num)
     RefreshMemoryUse();
 }
 
-void Material::SetTechnique(unsigned index, Technique* tech, MaterialQuality qualityLevel, float lodDistance)
+void Material::SetTechnique(i32 index, Technique* tech, MaterialQuality qualityLevel, float lodDistance)
 {
+    assert(index >= 0);
+
     if (index >= techniques_.Size())
         return;
 
@@ -1116,7 +1115,7 @@ void Material::RemoveShaderParameter(const String& name)
 
 void Material::ReleaseShaders()
 {
-    for (unsigned i = 0; i < techniques_.Size(); ++i)
+    for (i32 i = 0; i < techniques_.Size(); ++i)
     {
         Technique* tech = techniques_[i].technique_;
         if (tech)
@@ -1160,18 +1159,21 @@ void Material::MarkForAuxView(i32 frameNumber)
     auxViewFrameNumber_ = frameNumber;
 }
 
-const TechniqueEntry& Material::GetTechniqueEntry(unsigned index) const
+const TechniqueEntry& Material::GetTechniqueEntry(i32 index) const
 {
+    assert(index >= 0);
     return index < techniques_.Size() ? techniques_[index] : noEntry;
 }
 
-Technique* Material::GetTechnique(unsigned index) const
+Technique* Material::GetTechnique(i32 index) const
 {
+    assert(index >= 0);
     return index < techniques_.Size() ? techniques_[index].technique_ : nullptr;
 }
 
-Pass* Material::GetPass(unsigned index, const String& passName) const
+Pass* Material::GetPass(i32 index, const String& passName) const
 {
+    assert(index >= 0);
     Technique* tech = index < techniques_.Size() ? techniques_[index].technique_ : nullptr;
     return tech ? tech->GetPass(passName) : nullptr;
 }
@@ -1347,11 +1349,13 @@ void Material::HandleAttributeAnimationUpdate(StringHash eventType, VariantMap& 
         SetShaderParameterAnimation(finishedName, nullptr);
 }
 
-void Material::ApplyShaderDefines(unsigned index)
+void Material::ApplyShaderDefines(i32 index/* = NINDEX*/)
 {
-    if (index == M_MAX_UNSIGNED)
+    assert(index >= 0 || index == NINDEX);
+
+    if (index == NINDEX)
     {
-        for (unsigned i = 0; i < techniques_.Size(); ++i)
+        for (i32 i = 0; i < techniques_.Size(); ++i)
             ApplyShaderDefines(i);
         return;
     }

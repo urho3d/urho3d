@@ -17461,9 +17461,9 @@ Methods:
 - bool GetLineAntiAlias() const
 - uint GetMemoryUse() const
 - StringHash GetNameHash() const
-- uint GetNumTechniques() const
+- int GetNumTechniques() const
 - bool GetOcclusion() const
-- Pass@ GetPass(uint, const String&) const
+- Pass@ GetPass(int, const String&) const
 - uint8 GetRenderOrder() const
 - Scene@ GetScene() const
 - ValueAnimation@ GetShaderParameterAnimation(const String&) const
@@ -17473,7 +17473,7 @@ Methods:
 - CullMode GetShadowCullMode() const
 - bool GetSpecular() const
 - Object@ GetSubsystem(StringHash) const
-- Technique@ GetTechnique(uint) const
+- Technique@ GetTechnique(int) const
 - TechniqueEntry[]@ GetTechniques() const
 - Texture@ GetTexture(TextureUnit) const
 - StringHash GetType() const
@@ -17517,7 +17517,7 @@ Methods:
 - void SetLineAntiAlias(bool)
 - void SetMemoryUse(uint)
 - void SetName(const String&)
-- void SetNumTechniques(uint)
+- void SetNumTechniques(int)
 - void SetOcclusion(bool)
 - void SetPixelShaderDefines(const String&)
 - void SetRenderOrder(uint8)
@@ -17527,7 +17527,7 @@ Methods:
 - void SetShaderParameterAnimationSpeed(const String&, float)
 - void SetShaderParameterAnimationWrapMode(const String&, WrapMode)
 - void SetShadowCullMode(CullMode)
-- void SetTechnique(uint, Technique@, uint = QUALITY_LOW, float = 0.0f)
+- void SetTechnique(int, Technique@, uint = QUALITY_LOW, float = 0.0f)
 - void SetTexture(TextureUnit, Texture@)
 - void SetUVTransform(const Vector2&, float, const Vector2&)
 - void SetUVTransform(const Vector2&, float, float)
@@ -17538,7 +17538,7 @@ Methods:
 - const String& GetPixelShaderDefines() const
 - const String& GetTypeName() const
 - const String& GetVertexShaderDefines() const
-- const TechniqueEntry& GetTechniqueEntry(uint) const
+- const TechniqueEntry& GetTechniqueEntry(int) const
 - void UnsubscribeFromAllEvents()
 - void UnsubscribeFromAllEventsExcept(StringHash[]@, bool)
 - void UnsubscribeFromEvent(Object@, StringHash)
@@ -17564,7 +17564,7 @@ Properties:
 - bool lineAntiAlias
 - uint memoryUse // readonly
 - String name
-- uint numTechniques
+- int numTechniques
 - bool occlusion
 - String pixelShaderDefines
 - int refs // readonly
