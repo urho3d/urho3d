@@ -121,7 +121,7 @@ template <class T> unsigned UIElement_GetNumChildren_Recursive(T* ptr)
     return ptr->GetNumChildren(true);
 }
 
-// void UIElement::SetParent(UIElement* parent, unsigned index = M_MAX_UNSIGNED) | File: ../UI/UIElement.h
+// void UIElement::SetParent(UIElement* parent, i32 index = ENDPOS) | File: ../UI/UIElement.h
 template <class T> void UIElement_SetParent(UIElement* parent, T* ptr)
 {
     ptr->SetParent(parent);
@@ -164,7 +164,7 @@ template <class T> VariantMap& UIElement_GetVars(T* ptr)
     engine->RegisterObjectMethod(className, "uint get_numChildren() const", AS_FUNCTION_OBJLAST(UIElement_GetNumChildren_NonRecursive<T>), AS_CALL_CDECL_OBJLAST); \
     engine->RegisterObjectMethod(className, "uint get_numAllChildren() const", AS_FUNCTION_OBJLAST(UIElement_GetNumChildren_Recursive<T>), AS_CALL_CDECL_OBJLAST); \
     \
-    /* void UIElement::SetParent(UIElement* parent, unsigned index = M_MAX_UNSIGNED) | File: ../UI/UIElement.h */ \
+    /* void UIElement::SetParent(UIElement* parent, i32 index = ENDPOS) | File: ../UI/UIElement.h */ \
     engine->RegisterObjectMethod(className, "void set_parent(UIElement@+)", AS_FUNCTION_OBJLAST(UIElement_SetParent<T>), AS_CALL_CDECL_OBJLAST); \
     \
     /* XMLFile* UIElement::GetDefaultStyle(bool recursiveUp = true) const | File: ../UI/UIElement.h */ \
