@@ -255,20 +255,20 @@ Vector<IntVector3> Graphics::GetResolutions(int monitor) const
     return ret;
 }
 
-unsigned Graphics::FindBestResolutionIndex(int monitor, int width, int height, int refreshRate) const
+i32 Graphics::FindBestResolutionIndex(int monitor, int width, int height, int refreshRate) const
 {
     const Vector<IntVector3> resolutions = GetResolutions(monitor);
     if (resolutions.Empty())
-        return M_MAX_UNSIGNED;
+        return NINDEX;
 
-    unsigned best = 0;
-    unsigned bestError = M_MAX_UNSIGNED;
+    i32 best = 0;
+    i32 bestError = M_MAX_INT;
 
-    for (unsigned i = 0; i < resolutions.Size(); ++i)
+    for (i32 i = 0; i < resolutions.Size(); ++i)
     {
-        auto error = static_cast<unsigned>(Abs(resolutions[i].x_ - width) + Abs(resolutions[i].y_ - height));
+        i32 error = Abs(resolutions[i].x_ - width) + Abs(resolutions[i].y_ - height);
         if (refreshRate != 0)
-            error += static_cast<unsigned>(Abs(resolutions[i].z_ - refreshRate));
+            error += Abs(resolutions[i].z_ - refreshRate);
         if (error < bestError)
         {
             best = i;
@@ -527,7 +527,7 @@ void Graphics::AdjustScreenMode(int& newWidth, int& newHeight, ScreenModeParams&
         const Vector<IntVector3> resolutions = GetResolutions(params.monitor_);
         if (!resolutions.Empty())
         {
-            const unsigned bestResolution = FindBestResolutionIndex(params.monitor_,
+            const i32 bestResolution = FindBestResolutionIndex(params.monitor_,
                 newWidth, newHeight, params.refreshRate_);
             newWidth = resolutions[bestResolution].x_;
             newHeight = resolutions[bestResolution].y_;

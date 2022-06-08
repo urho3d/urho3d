@@ -276,7 +276,7 @@ void WindowSettingsDemo::SynchronizeSettings()
     }
 
     // Synchronize selected resolution
-    const unsigned currentResolution = graphics->FindBestResolutionIndex(currentMonitor,
+    const i32 currentResolution = graphics->FindBestResolutionIndex(currentMonitor,
         graphics->GetWidth(), graphics->GetHeight(), graphics->GetRefreshRate());
     resolutionControl_->SetSelection(currentResolution);
 
