@@ -180,7 +180,7 @@ public:
     /// Ensure that material techniques are listed in correct order.
     void SortTechniques();
     /// Mark material for auxiliary view rendering.
-    void MarkForAuxView(unsigned frameNumber);
+    void MarkForAuxView(i32 frameNumber);
 
     /// Return number of techniques.
     /// @property
@@ -252,7 +252,7 @@ public:
     unsigned char GetRenderOrder() const { return renderOrder_; }
 
     /// Return last auxiliary view rendered frame number.
-    unsigned GetAuxViewFrameNumber() const { return auxViewFrameNumber_; }
+    i32 GetAuxViewFrameNumber() const { return auxViewFrameNumber_; }
 
     /// Return whether should render occlusion.
     /// @property
@@ -317,7 +317,7 @@ private:
     /// Render order value.
     unsigned char renderOrder_{};
     /// Last auxiliary view rendered frame number.
-    unsigned auxViewFrameNumber_{};
+    i32 auxViewFrameNumber_{};
     /// Shader parameter hash value.
     unsigned shaderParameterHash_{};
     /// Alpha-to-coverage flag.

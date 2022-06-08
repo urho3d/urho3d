@@ -202,7 +202,7 @@ private:
     /// Whether was last rendered from an ortho camera.
     bool hasOrthoCamera_;
     /// Frame number on which was last sorted.
-    unsigned sortFrameNumber_;
+    i32 sortFrameNumber_;
     /// Previous offset to camera for determining whether sorting is necessary.
     Vector3 previousOffset_;
     /// Billboard pointers for sorting.

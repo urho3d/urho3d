@@ -29,7 +29,7 @@ ParticleEmitter::ParticleEmitter(Context* context) :
     periodTimer_(0.0f),
     emissionTimer_(0.0f),
     lastTimeStep_(0.0f),
-    lastUpdateFrameNumber_(M_MAX_UNSIGNED),
+    lastUpdateFrameNumber_(NINDEX),
     emitting_(true),
     needUpdate_(false),
     serializeParticles_(true),

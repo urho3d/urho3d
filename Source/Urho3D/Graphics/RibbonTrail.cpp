@@ -60,7 +60,7 @@ RibbonTrail::RibbonTrail(Context* context) :
     lastTimeStep_(0.0f),
     endColor_(Color(1.0f, 1.0f, 1.0f, 0.0f)),
     startColor_(Color(1.0f, 1.0f, 1.0f, 1.0f)),
-    lastUpdateFrameNumber_(M_MAX_UNSIGNED),
+    lastUpdateFrameNumber_(NINDEX),
     needUpdate_(false),
     sorted_(false),
     previousOffset_(Vector3::ZERO),
@@ -167,7 +167,7 @@ void RibbonTrail::HandleScenePostUpdate(StringHash eventType, VariantMap& eventD
     if (updateInvisible_ || viewFrameNumber_ != lastUpdateFrameNumber_)
     {
         // Reset if ribbon trail is too small and too much difference in frame
-        if (points_.Size() < 3 && viewFrameNumber_ - lastUpdateFrameNumber_ > 1)
+        if (points_.Size() < 3 && (viewFrameNumber_ - lastUpdateFrameNumber_) > 1)
         {
             previousPosition_ = node_->GetWorldPosition();
             points_.Erase(0, points_.Size());

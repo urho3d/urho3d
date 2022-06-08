@@ -1578,8 +1578,8 @@ template <class T> void RegisterMembers_FrameInfo(asIScriptEngine* engine, const
     // Camera* FrameInfo::camera_
     // Not registered because pointer
 
-    // unsigned FrameInfo::frameNumber_
-    engine->RegisterObjectProperty(className, "uint frameNumber", offsetof(T, frameNumber_));
+    // i32 FrameInfo::frameNumber_
+    engine->RegisterObjectProperty(className, "int frameNumber", offsetof(T, frameNumber_));
 
     // float FrameInfo::timeStep_
     engine->RegisterObjectProperty(className, "float timeStep", offsetof(T, timeStep_));
@@ -7506,8 +7506,8 @@ template <class T> void RegisterMembers_ViewBatchInfo2D(asIScriptEngine* engine,
     // Vector<SharedPtr<Geometry>> ViewBatchInfo2D::geometries_
     // Error: type "Vector<SharedPtr<Geometry>>" can not automatically bind
 
-    // unsigned ViewBatchInfo2D::vertexBufferUpdateFrameNumber_
-    engine->RegisterObjectProperty(className, "uint vertexBufferUpdateFrameNumber", offsetof(T, vertexBufferUpdateFrameNumber_));
+    // i32 ViewBatchInfo2D::vertexBufferUpdateFrameNumber_
+    engine->RegisterObjectProperty(className, "int vertexBufferUpdateFrameNumber", offsetof(T, vertexBufferUpdateFrameNumber_));
 
     // unsigned ViewBatchInfo2D::indexCount_
     engine->RegisterObjectProperty(className, "uint indexCount", offsetof(T, indexCount_));
@@ -7515,8 +7515,8 @@ template <class T> void RegisterMembers_ViewBatchInfo2D(asIScriptEngine* engine,
     // unsigned ViewBatchInfo2D::vertexCount_
     engine->RegisterObjectProperty(className, "uint vertexCount", offsetof(T, vertexCount_));
 
-    // unsigned ViewBatchInfo2D::batchUpdatedFrameNumber_
-    engine->RegisterObjectProperty(className, "uint batchUpdatedFrameNumber", offsetof(T, batchUpdatedFrameNumber_));
+    // i32 ViewBatchInfo2D::batchUpdatedFrameNumber_
+    engine->RegisterObjectProperty(className, "int batchUpdatedFrameNumber", offsetof(T, batchUpdatedFrameNumber_));
 
     // unsigned ViewBatchInfo2D::batchCount_
     engine->RegisterObjectProperty(className, "uint batchCount", offsetof(T, batchCount_));
@@ -8270,8 +8270,8 @@ template <class T> void RegisterMembers_Pass(asIScriptEngine* engine, const char
     // Vector<SharedPtr<ShaderVariation>>& Pass::GetPixelShaders(const StringHash& extraDefinesHash)
     engine->RegisterObjectMethod(className, "Array<ShaderVariation@>@ GetPixelShaders(const StringHash&in)", AS_FUNCTION_OBJFIRST(Pass_VectorlesSharedPtrlesShaderVariationgregreamp_GetPixelShaders_constspStringHashamp_template<Pass>), AS_CALL_CDECL_OBJFIRST);
 
-    // unsigned Pass::GetShadersLoadedFrameNumber() const
-    engine->RegisterObjectMethod(className, "uint GetShadersLoadedFrameNumber() const", AS_METHODPR(T, GetShadersLoadedFrameNumber, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Pass::GetShadersLoadedFrameNumber() const
+    engine->RegisterObjectMethod(className, "int GetShadersLoadedFrameNumber() const", AS_METHODPR(T, GetShadersLoadedFrameNumber, () const, i32), AS_CALL_THISCALL);
 
     // const String& Pass::GetVertexShader() const
     engine->RegisterObjectMethod(className, "const String& GetVertexShader() const", AS_METHODPR(T, GetVertexShader, () const, const String&), AS_CALL_THISCALL);
@@ -8295,8 +8295,8 @@ template <class T> void RegisterMembers_Pass(asIScriptEngine* engine, const char
     engine->RegisterObjectMethod(className, "bool IsDesktop() const", AS_METHODPR(T, IsDesktop, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_desktop() const", AS_METHODPR(T, IsDesktop, () const, bool), AS_CALL_THISCALL);
 
-    // void Pass::MarkShadersLoaded(unsigned frameNumber)
-    engine->RegisterObjectMethod(className, "void MarkShadersLoaded(uint)", AS_METHODPR(T, MarkShadersLoaded, (unsigned), void), AS_CALL_THISCALL);
+    // void Pass::MarkShadersLoaded(i32 frameNumber)
+    engine->RegisterObjectMethod(className, "void MarkShadersLoaded(int)", AS_METHODPR(T, MarkShadersLoaded, (i32), void), AS_CALL_THISCALL);
 
     // void Pass::ReleaseShaders()
     engine->RegisterObjectMethod(className, "void ReleaseShaders()", AS_METHODPR(T, ReleaseShaders, (), void), AS_CALL_THISCALL);
@@ -12061,9 +12061,9 @@ template <class T> void RegisterMembers_Time(asIScriptEngine* engine, const char
     engine->RegisterObjectMethod(className, "float GetElapsedTime()", AS_METHODPR(T, GetElapsedTime, (), float), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_elapsedTime()", AS_METHODPR(T, GetElapsedTime, (), float), AS_CALL_THISCALL);
 
-    // unsigned Time::GetFrameNumber() const
-    engine->RegisterObjectMethod(className, "uint GetFrameNumber() const", AS_METHODPR(T, GetFrameNumber, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_frameNumber() const", AS_METHODPR(T, GetFrameNumber, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Time::GetFrameNumber() const
+    engine->RegisterObjectMethod(className, "int GetFrameNumber() const", AS_METHODPR(T, GetFrameNumber, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_frameNumber() const", AS_METHODPR(T, GetFrameNumber, () const, i32), AS_CALL_THISCALL);
 
     // float Time::GetFramesPerSecond() const
     engine->RegisterObjectMethod(className, "float GetFramesPerSecond() const", AS_METHODPR(T, GetFramesPerSecond, () const, float), AS_CALL_THISCALL);
@@ -13705,8 +13705,8 @@ template <class T> void RegisterMembers_Material(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "bool GetAlphaToCoverage() const", AS_METHODPR(T, GetAlphaToCoverage, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_alphaToCoverage() const", AS_METHODPR(T, GetAlphaToCoverage, () const, bool), AS_CALL_THISCALL);
 
-    // unsigned Material::GetAuxViewFrameNumber() const
-    engine->RegisterObjectMethod(className, "uint GetAuxViewFrameNumber() const", AS_METHODPR(T, GetAuxViewFrameNumber, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Material::GetAuxViewFrameNumber() const
+    engine->RegisterObjectMethod(className, "int GetAuxViewFrameNumber() const", AS_METHODPR(T, GetAuxViewFrameNumber, () const, i32), AS_CALL_THISCALL);
 
     // CullMode Material::GetCullMode() const
     engine->RegisterObjectMethod(className, "CullMode GetCullMode() const", AS_METHODPR(T, GetCullMode, () const, CullMode), AS_CALL_THISCALL);
@@ -13794,8 +13794,8 @@ template <class T> void RegisterMembers_Material(asIScriptEngine* engine, const 
     // bool Material::Load(const JSONValue& source)
     engine->RegisterObjectMethod(className, "bool Load(const JSONValue&in)", AS_METHODPR(T, Load, (const JSONValue&), bool), AS_CALL_THISCALL);
 
-    // void Material::MarkForAuxView(unsigned frameNumber)
-    engine->RegisterObjectMethod(className, "void MarkForAuxView(uint)", AS_METHODPR(T, MarkForAuxView, (unsigned), void), AS_CALL_THISCALL);
+    // void Material::MarkForAuxView(i32 frameNumber)
+    engine->RegisterObjectMethod(className, "void MarkForAuxView(int)", AS_METHODPR(T, MarkForAuxView, (i32), void), AS_CALL_THISCALL);
 
     // void Material::ReleaseShaders()
     engine->RegisterObjectMethod(className, "void ReleaseShaders()", AS_METHODPR(T, ReleaseShaders, (), void), AS_CALL_THISCALL);
@@ -17835,8 +17835,8 @@ template <class T> void RegisterMembers_Drawable(asIScriptEngine* engine, const 
     // void Drawable::MarkInView(const FrameInfo& frame)
     engine->RegisterObjectMethod(className, "void MarkInView(const FrameInfo&in)", AS_METHODPR(T, MarkInView, (const FrameInfo&), void), AS_CALL_THISCALL);
 
-    // void Drawable::MarkInView(unsigned frameNumber)
-    engine->RegisterObjectMethod(className, "void MarkInView(uint)", AS_METHODPR(T, MarkInView, (unsigned), void), AS_CALL_THISCALL);
+    // void Drawable::MarkInView(i32 frameNumber)
+    engine->RegisterObjectMethod(className, "void MarkInView(int)", AS_METHODPR(T, MarkInView, (i32), void), AS_CALL_THISCALL);
 
     // void Drawable::SetBasePass(unsigned batchIndex)
     engine->RegisterObjectMethod(className, "void SetBasePass(uint)", AS_METHODPR(T, SetBasePass, (unsigned), void), AS_CALL_THISCALL);

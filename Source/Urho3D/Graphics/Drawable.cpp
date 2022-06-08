@@ -286,8 +286,10 @@ void Drawable::MarkInView(const FrameInfo& frame)
     vertexLights_.Clear();
 }
 
-void Drawable::MarkInView(unsigned frameNumber)
+void Drawable::MarkInView(i32 frameNumber)
 {
+    assert(frameNumber > 0);
+
     if (frameNumber != viewFrameNumber_)
     {
         viewFrameNumber_ = frameNumber;

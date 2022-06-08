@@ -629,7 +629,7 @@ private:
     /// Number of batches (3D geometry only).
     unsigned numBatches_{};
     /// Frame number on which shaders last changed.
-    unsigned shadersChangedFrameNumber_{M_MAX_UNSIGNED};
+    i32 shadersChangedFrameNumber_{NINDEX};
     /// Current stencil value for light optimization.
     unsigned char lightStencilValue_{};
     /// HDR rendering flag.

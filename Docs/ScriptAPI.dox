@@ -15,7 +15,7 @@ namespace Urho3D
 ## %Core events
 
 ### BeginFrame
-- %FrameNumber : unsigned
+- %FrameNumber : i32
 - %TimeStep : float
 
 ### Update
@@ -3516,7 +3516,7 @@ Methods:
 - bool LoadXML(const XMLElement&)
 - void MarkForUpdate()
 - void MarkInView(const FrameInfo&)
-- void MarkInView(uint)
+- void MarkInView(int)
 - void MarkNetworkUpdate()
 - operator Object@() const
 - void OnEvent(Object@, StringHash, VariantMap&)
@@ -3774,7 +3774,7 @@ Methods:
 - bool LoadXML(const XMLElement&)
 - void MarkForUpdate()
 - void MarkInView(const FrameInfo&)
-- void MarkInView(uint)
+- void MarkInView(int)
 - void MarkNetworkUpdate()
 - operator Object@() const
 - void OnEvent(Object@, StringHash, VariantMap&)
@@ -4891,7 +4891,7 @@ Methods:
 - bool LoadXML(const XMLElement&)
 - void MarkForUpdate()
 - void MarkInView(const FrameInfo&)
-- void MarkInView(uint)
+- void MarkInView(int)
 - void MarkNetworkUpdate()
 - operator Object@() const
 - void OnEvent(Object@, StringHash, VariantMap&)
@@ -11381,7 +11381,7 @@ Methods:
 - bool LoadXML(const XMLElement&)
 - void MarkForUpdate()
 - void MarkInView(const FrameInfo&)
-- void MarkInView(uint)
+- void MarkInView(int)
 - void MarkNetworkUpdate()
 - operator Object@() const
 - void OnEvent(Object@, StringHash, VariantMap&)
@@ -12007,7 +12007,7 @@ Methods:
 - bool LoadXML(const XMLElement&)
 - void MarkForUpdate()
 - void MarkInView(const FrameInfo&)
-- void MarkInView(uint)
+- void MarkInView(int)
 - void MarkNetworkUpdate()
 - operator Object@() const
 - void OnEvent(Object@, StringHash, VariantMap&)
@@ -12404,7 +12404,7 @@ Methods:
 - bool LoadXML(const XMLElement&)
 - void MarkForUpdate()
 - void MarkInView(const FrameInfo&)
-- void MarkInView(uint)
+- void MarkInView(int)
 - void MarkNetworkUpdate()
 - operator Object@() const
 - void OnEvent(Object@, StringHash, VariantMap&)
@@ -12639,7 +12639,7 @@ Methods:
 - bool LoadXML(const XMLElement&)
 - void MarkForUpdate()
 - void MarkInView(const FrameInfo&)
-- void MarkInView(uint)
+- void MarkInView(int)
 - void MarkNetworkUpdate()
 - operator Object@() const
 - void OnEvent(Object@, StringHash, VariantMap&)
@@ -14223,7 +14223,7 @@ Methods:
 
 Properties:
 
-- uint frameNumber
+- int frameNumber
 - float timeStep
 - IntVector2 viewSize
 
@@ -16011,7 +16011,7 @@ Methods:
 - bool LoadXML(const XMLElement&)
 - void MarkForUpdate()
 - void MarkInView(const FrameInfo&)
-- void MarkInView(uint)
+- void MarkInView(int)
 - void MarkNetworkUpdate()
 - const Matrix3x4& GetVolumeTransform(Camera@)
 - operator Object@() const
@@ -17452,7 +17452,7 @@ Methods:
 - bool EndLoad()
 - bool GetAlphaToCoverage() const
 - AsyncLoadState GetAsyncLoadState() const
-- uint GetAuxViewFrameNumber() const
+- int GetAuxViewFrameNumber() const
 - bool GetBlockEvents() const
 - CullMode GetCullMode() const
 - VariantMap& GetEventDataMap() const
@@ -17489,7 +17489,7 @@ Methods:
 - bool Load(const String&)
 - bool Load(const XMLElement&)
 - bool LoadFile(const String&)
-- void MarkForAuxView(uint)
+- void MarkForAuxView(int)
 - operator Object@() const
 - void OnEvent(Object@, StringHash, VariantMap&)
 - operator RefCounted@() const
@@ -21294,7 +21294,7 @@ Methods:
 - bool LoadXML(const XMLElement&)
 - void MarkForUpdate()
 - void MarkInView(const FrameInfo&)
-- void MarkInView(uint)
+- void MarkInView(int)
 - void MarkNetworkUpdate()
 - operator Object@() const
 - void OnEvent(Object@, StringHash, VariantMap&)
@@ -21541,7 +21541,7 @@ Methods:
 - bool LoadXML(const XMLElement&)
 - void MarkForUpdate()
 - void MarkInView(const FrameInfo&)
-- void MarkInView(uint)
+- void MarkInView(int)
 - void MarkNetworkUpdate()
 - operator Object@() const
 - void OnEvent(Object@, StringHash, VariantMap&)
@@ -21688,11 +21688,11 @@ Methods:
 - PassLightingMode GetLightingMode() const
 - ShaderVariation@[]@ GetPixelShaders()
 - ShaderVariation@[]@ GetPixelShaders(const StringHash&)
-- uint GetShadersLoadedFrameNumber() const
+- int GetShadersLoadedFrameNumber() const
 - ShaderVariation@[]@ GetVertexShaders()
 - ShaderVariation@[]@ GetVertexShaders(const StringHash&)
 - bool IsDesktop() const
-- void MarkShadersLoaded(uint)
+- void MarkShadersLoaded(int)
 - operator RefCounted@() const
 - int Refs() const
 - void ReleaseShaders()
@@ -23932,7 +23932,7 @@ Methods:
 - bool LoadXML(const XMLElement&)
 - void MarkForUpdate()
 - void MarkInView(const FrameInfo&)
-- void MarkInView(uint)
+- void MarkInView(int)
 - void MarkNetworkUpdate()
 - operator Object@() const
 - void OnEvent(Object@, StringHash, VariantMap&)
@@ -24514,7 +24514,7 @@ Methods:
 - bool LoadXML(const XMLElement&)
 - void MarkForUpdate()
 - void MarkInView(const FrameInfo&)
-- void MarkInView(uint)
+- void MarkInView(int)
 - void MarkNetworkUpdate()
 - operator Object@() const
 - void OnEvent(Object@, StringHash, VariantMap&)
@@ -27347,7 +27347,7 @@ Methods:
 - bool LoadXML(const XMLElement&)
 - void MarkForUpdate()
 - void MarkInView(const FrameInfo&)
-- void MarkInView(uint)
+- void MarkInView(int)
 - void MarkNetworkUpdate()
 - operator Object@() const
 - void OnEvent(Object@, StringHash, VariantMap&)
@@ -29567,7 +29567,7 @@ Methods:
 - bool LoadXML(const XMLElement&)
 - void MarkForUpdate()
 - void MarkInView(const FrameInfo&)
-- void MarkInView(uint)
+- void MarkInView(int)
 - void MarkNetworkUpdate()
 - operator Object@() const
 - void OnEvent(Object@, StringHash, VariantMap&)
@@ -29810,7 +29810,7 @@ Methods:
 - bool LoadXML(const XMLElement&)
 - void MarkForUpdate()
 - void MarkInView(const FrameInfo&)
-- void MarkInView(uint)
+- void MarkInView(int)
 - void MarkNetworkUpdate()
 - operator Object@() const
 - void OnEvent(Object@, StringHash, VariantMap&)
@@ -30047,7 +30047,7 @@ Methods:
 - bool LoadXML(const XMLElement&)
 - void MarkForUpdate()
 - void MarkInView(const FrameInfo&)
-- void MarkInView(uint)
+- void MarkInView(int)
 - void MarkNetworkUpdate()
 - operator Object@() const
 - void OnEvent(Object@, StringHash, VariantMap&)
@@ -30322,7 +30322,7 @@ Methods:
 - bool LoadXML(const XMLElement&)
 - void MarkForUpdate()
 - void MarkInView(const FrameInfo&)
-- void MarkInView(uint)
+- void MarkInView(int)
 - void MarkNetworkUpdate()
 - operator Object@() const
 - void OnEvent(Object@, StringHash, VariantMap&)
@@ -31058,7 +31058,7 @@ Methods:
 - bool LoadXML(const XMLElement&)
 - void MarkForUpdate()
 - void MarkInView(const FrameInfo&)
-- void MarkInView(uint)
+- void MarkInView(int)
 - void MarkNetworkUpdate()
 - operator Object@() const
 - void OnEvent(Object@, StringHash, VariantMap&)
@@ -31745,7 +31745,7 @@ Methods:
 - bool LoadXML(const XMLElement&)
 - void MarkForUpdate()
 - void MarkInView(const FrameInfo&)
-- void MarkInView(uint)
+- void MarkInView(int)
 - void MarkNetworkUpdate()
 - operator Object@() const
 - void OnEvent(Object@, StringHash, VariantMap&)
@@ -33131,7 +33131,7 @@ Methods:
 - float GetElapsedTime()
 - VariantMap& GetEventDataMap() const
 - Object@ GetEventSender() const
-- uint GetFrameNumber() const
+- int GetFrameNumber() const
 - float GetFramesPerSecond() const
 - Object@ GetSubsystem(StringHash) const
 - float GetTimeStep() const
@@ -33167,7 +33167,7 @@ Properties:
 
 - String category // readonly
 - float elapsedTime // readonly
-- uint frameNumber // readonly
+- int frameNumber // readonly
 - float framesPerSecond // readonly
 - Variant[] globalVar
 - VariantMap globalVars // readonly
@@ -37227,7 +37227,7 @@ Methods:
 - bool LoadXML(const XMLElement&)
 - void MarkForUpdate()
 - void MarkInView(const FrameInfo&)
-- void MarkInView(uint)
+- void MarkInView(int)
 - void MarkNetworkUpdate()
 - const Matrix3x4& GetInverseWorldTransform() const
 - operator Object@() const

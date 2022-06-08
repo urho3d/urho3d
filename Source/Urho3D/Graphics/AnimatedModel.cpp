@@ -210,7 +210,7 @@ void AnimatedModel::Update(const FrameInfo& frame)
 {
     // If node was invisible last frame, need to decide animation LOD distance here
     // If headless, retain the current animation distance (should be 0)
-    if (frame.camera_ && abs((int)frame.frameNumber_ - (int)viewFrameNumber_) > 1)
+    if (frame.camera_ && Abs(frame.frameNumber_ - viewFrameNumber_) > 1)
     {
         // First check for no update at all when invisible. In that case reset LOD timer to ensure update
         // next time the model is in view

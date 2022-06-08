@@ -49,7 +49,7 @@ enum UpdateGeometryType
 struct FrameInfo
 {
     /// Frame number.
-    unsigned frameNumber_;
+    i32 frameNumber_;
     /// Time elapsed since last frame.
     float timeStep_;
     /// Viewport size.
@@ -245,7 +245,7 @@ public:
     /// Mark in view. Also clear the light list.
     void MarkInView(const FrameInfo& frame);
     /// Mark in view without specifying a camera. Used for shadow casters.
-    void MarkInView(unsigned frameNumber);
+    void MarkInView(i32 frameNumber);
     /// Sort and limit per-pixel lights to maximum allowed. Convert extra lights into vertex lights.
     void LimitLights();
     /// Sort and limit per-vertex lights to maximum allowed.
@@ -366,7 +366,7 @@ protected:
     /// Zone mask.
     unsigned zoneMask_;
     /// Last visible frame number.
-    unsigned viewFrameNumber_;
+    i32 viewFrameNumber_;
     /// Current distance to camera.
     float distance_;
     /// LOD scaled distance.

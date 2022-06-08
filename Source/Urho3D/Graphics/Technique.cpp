@@ -157,8 +157,9 @@ void Pass::ReleaseShaders()
     extraPixelShaders_.Clear();
 }
 
-void Pass::MarkShadersLoaded(unsigned frameNumber)
+void Pass::MarkShadersLoaded(i32 frameNumber)
 {
+    assert(frameNumber > 0);
     shadersLoadedFrameNumber_ = frameNumber;
 }
 
