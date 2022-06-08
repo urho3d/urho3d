@@ -118,9 +118,9 @@ public:
 
     /// Set number of techniques.
     /// @property
-    void SetNumTechniques(unsigned num);
+    void SetNumTechniques(i32 num);
     /// Set technique.
-    void SetTechnique(unsigned index, Technique* tech, MaterialQuality qualityLevel = QUALITY_LOW, float lodDistance = 0.0f);
+    void SetTechnique(i32 index, Technique* tech, MaterialQuality qualityLevel = QUALITY_LOW, float lodDistance = 0.0f);
     /// Set additional vertex shader defines. Separate multiple defines with spaces. Setting defines at the material level causes technique(s) to be cloned as necessary.
     /// @property
     void SetVertexShaderDefines(const String& defines);
@@ -184,18 +184,18 @@ public:
 
     /// Return number of techniques.
     /// @property
-    unsigned GetNumTechniques() const { return techniques_.Size(); }
+    i32 GetNumTechniques() const { return techniques_.Size(); }
 
     /// Return all techniques.
     const Vector<TechniqueEntry>& GetTechniques() const { return techniques_; }
 
     /// Return technique entry by index.
-    const TechniqueEntry& GetTechniqueEntry(unsigned index) const;
+    const TechniqueEntry& GetTechniqueEntry(i32 index) const;
     /// Return technique by index.
     /// @property{get_techniques}
-    Technique* GetTechnique(unsigned index) const;
+    Technique* GetTechnique(i32 index) const;
     /// Return pass by technique index and pass name.
-    Pass* GetPass(unsigned index, const String& passName) const;
+    Pass* GetPass(i32 index, const String& passName) const;
     /// Return texture by unit.
     /// @property{get_textures}
     Texture* GetTexture(TextureUnit unit) const;
@@ -286,7 +286,7 @@ private:
     /// Recalculate the memory used by the material.
     void RefreshMemoryUse();
     /// Reapply shader defines to technique index. By default reapply all.
-    void ApplyShaderDefines(unsigned index = M_MAX_UNSIGNED);
+    void ApplyShaderDefines(i32 index = NINDEX);
     /// Return shader parameter animation info.
     ShaderParameterAnimationInfo* GetShaderParameterAnimationInfo(const String& name) const;
     /// Update whether should be subscribed to scene or global update events for shader parameter animation.
