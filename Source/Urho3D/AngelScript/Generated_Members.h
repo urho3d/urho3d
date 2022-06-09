@@ -20536,9 +20536,9 @@ template <class T> void RegisterMembers_PhysicsWorld(asIScriptEngine* engine, co
     // int PhysicsWorld::getDebugMode() const override
     engine->RegisterObjectMethod(className, "int getDebugMode() const", AS_METHODPR(T, getDebugMode, () const, int), AS_CALL_THISCALL);
 
-    // int PhysicsWorld::GetFps() const
-    engine->RegisterObjectMethod(className, "int GetFps() const", AS_METHODPR(T, GetFps, () const, int), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "int get_fps() const", AS_METHODPR(T, GetFps, () const, int), AS_CALL_THISCALL);
+    // i32 PhysicsWorld::GetFps() const
+    engine->RegisterObjectMethod(className, "int GetFps() const", AS_METHODPR(T, GetFps, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_fps() const", AS_METHODPR(T, GetFps, () const, i32), AS_CALL_THISCALL);
 
     // Vector3 PhysicsWorld::GetGravity() const
     engine->RegisterObjectMethod(className, "Vector3 GetGravity() const", AS_METHODPR(T, GetGravity, () const, Vector3), AS_CALL_THISCALL);
@@ -20607,9 +20607,9 @@ template <class T> void RegisterMembers_PhysicsWorld(asIScriptEngine* engine, co
     // void PhysicsWorld::SetDebugRenderer(DebugRenderer* debug)
     engine->RegisterObjectMethod(className, "void SetDebugRenderer(DebugRenderer@+)", AS_METHODPR(T, SetDebugRenderer, (DebugRenderer*), void), AS_CALL_THISCALL);
 
-    // void PhysicsWorld::SetFps(int fps)
-    engine->RegisterObjectMethod(className, "void SetFps(int)", AS_METHODPR(T, SetFps, (int), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_fps(int)", AS_METHODPR(T, SetFps, (int), void), AS_CALL_THISCALL);
+    // void PhysicsWorld::SetFps(i32 fps)
+    engine->RegisterObjectMethod(className, "void SetFps(int)", AS_METHODPR(T, SetFps, (i32), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_fps(int)", AS_METHODPR(T, SetFps, (i32), void), AS_CALL_THISCALL);
 
     // void PhysicsWorld::SetGravity(const Vector3& gravity)
     engine->RegisterObjectMethod(className, "void SetGravity(const Vector3&in)", AS_METHODPR(T, SetGravity, (const Vector3&), void), AS_CALL_THISCALL);

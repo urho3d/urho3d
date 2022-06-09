@@ -706,10 +706,10 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
 #endif
 
 #ifdef URHO3D_PHYSICS
-    // static const int DEFAULT_FPS | File: ../Physics/PhysicsWorld.h
+    // constexpr i32 DEFAULT_FPS | File: ../Physics/PhysicsWorld.h
     engine->RegisterGlobalProperty("const int DEFAULT_FPS", (void*)&DEFAULT_FPS);
 
-    // static const float DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY | File: ../Physics/PhysicsWorld.h
+    // constexpr float DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY | File: ../Physics/PhysicsWorld.h
     engine->RegisterGlobalProperty("const float DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY", (void*)&DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY);
 #endif
 
