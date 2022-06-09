@@ -28,6 +28,8 @@ inline constexpr i32 M_MIN_INT = 0x80000000;
 inline constexpr i32 M_MAX_INT = 0x7fffffff;
 inline constexpr u32 M_MIN_UNSIGNED = 0x00000000;
 inline constexpr u32 M_MAX_UNSIGNED = 0xffffffff;
+inline constexpr u32 M_U32_MASK_ALL_BITS = M_MAX_UNSIGNED;
+inline constexpr i32 M_I32_MASK_ALL_BITS = -1;
 
 inline constexpr float M_EPSILON = 0.000001f;
 inline constexpr float M_LARGE_EPSILON = 0.00005f;
