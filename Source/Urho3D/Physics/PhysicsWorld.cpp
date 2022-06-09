@@ -186,7 +186,7 @@ void PhysicsWorld::RegisterObject(Context* context)
     context->RegisterFactory<PhysicsWorld>(SUBSYSTEM_CATEGORY);
 
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Gravity", GetGravity, SetGravity, Vector3, DEFAULT_GRAVITY, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Physics FPS", int, fps_, DEFAULT_FPS, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Physics FPS", i32, fps_, DEFAULT_FPS, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Max Substeps", int, maxSubSteps_, 0, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Solver Iterations", GetNumIterations, SetNumIterations, int, 10, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Net Max Angular Vel.", float, maxNetworkAngularVelocity_, DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY, AM_DEFAULT);
@@ -241,7 +241,7 @@ void PhysicsWorld::Update(float timeStep)
     URHO3D_PROFILE(UpdatePhysics);
 
     float internalTimeStep = 1.0f / fps_;
-    int maxSubSteps = (int)(timeStep * fps_) + 1;
+    i32 maxSubSteps = (i32)(timeStep * fps_) + 1;
     if (maxSubSteps_ < 0)
     {
         internalTimeStep = timeStep;
@@ -293,9 +293,10 @@ void PhysicsWorld::UpdateCollisions()
     world_->performDiscreteCollisionDetection();
 }
 
-void PhysicsWorld::SetFps(int fps)
+void PhysicsWorld::SetFps(i32 fps)
 {
-    fps_ = (unsigned)Clamp(fps, 1, 1000);
+    assert(fps > 0);
+    fps_ = Clamp(fps, 1, 1000);
 
     MarkNetworkUpdate();
 }
