@@ -346,6 +346,9 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // constexpr float M_HALF_PI | File: ../Math/MathDefs.h
     engine->RegisterGlobalProperty("const float M_HALF_PI", (void*)&M_HALF_PI);
 
+    // constexpr i16 M_I16_MASK_ALL_BITS | File: ../Math/MathDefs.h
+    engine->RegisterGlobalProperty("const int16 M_I16_MASK_ALL_BITS", (void*)&M_I16_MASK_ALL_BITS);
+
     // constexpr i32 M_I32_MASK_ALL_BITS | File: ../Math/MathDefs.h
     engine->RegisterGlobalProperty("const int M_I32_MASK_ALL_BITS", (void*)&M_I32_MASK_ALL_BITS);
 
@@ -381,6 +384,9 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
 
     // constexpr float M_RADTODEG | File: ../Math/MathDefs.h
     engine->RegisterGlobalProperty("const float M_RADTODEG", (void*)&M_RADTODEG);
+
+    // constexpr u16 M_U16_MASK_ALL_BITS | File: ../Math/MathDefs.h
+    engine->RegisterGlobalProperty("const uint16 M_U16_MASK_ALL_BITS", (void*)&M_U16_MASK_ALL_BITS);
 
     // constexpr u32 M_U32_MASK_ALL_BITS | File: ../Math/MathDefs.h
     engine->RegisterGlobalProperty("const uint M_U32_MASK_ALL_BITS", (void*)&M_U32_MASK_ALL_BITS);

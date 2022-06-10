@@ -48,9 +48,11 @@ PhysicsWorld2D::PhysicsWorld2D(Context* context) :
 
 PhysicsWorld2D::~PhysicsWorld2D()
 {
-    for (unsigned i = 0; i < rigidBodies_.Size(); ++i)
-        if (rigidBodies_[i])
-            rigidBodies_[i]->ReleaseBody();
+    for (const WeakPtr<RigidBody2D>& rigidBody : rigidBodies_)
+    {
+        if (rigidBody)
+            rigidBody->ReleaseBody();
+    }
 }
 
 void PhysicsWorld2D::RegisterObject(Context* context)
@@ -275,7 +277,7 @@ void PhysicsWorld2D::Update(float timeStep)
     physicsStepping_ = false;
 
     // Apply world transforms. Unparented transforms first
-    for (unsigned i = 0; i < rigidBodies_.Size();)
+    for (i32 i = 0; i < rigidBodies_.Size();)
     {
         if (rigidBodies_[i])
         {
@@ -441,7 +443,7 @@ class RayCastCallback : public b2RayCastCallback
 {
 public:
     // Construct.
-    RayCastCallback(Vector<PhysicsRaycastResult2D>& results, const Vector2& startPoint, unsigned collisionMask) :
+    RayCastCallback(Vector<PhysicsRaycastResult2D>& results, const Vector2& startPoint, u16 collisionMask) :
         results_(results),
         startPoint_(startPoint),
         collisionMask_(collisionMask)
@@ -474,11 +476,11 @@ protected:
     // Start point.
     Vector2 startPoint_;
     // Collision mask.
-    unsigned collisionMask_;
+    u16 collisionMask_;
 };
 
 void PhysicsWorld2D::Raycast(Vector<PhysicsRaycastResult2D>& results, const Vector2& startPoint, const Vector2& endPoint,
-    unsigned collisionMask)
+    u16 collisionMask/* = M_U16_MASK_ALL_BITS*/)
 {
     results.Clear();
 
@@ -491,7 +493,7 @@ class SingleRayCastCallback : public b2RayCastCallback
 {
 public:
     // Construct.
-    SingleRayCastCallback(PhysicsRaycastResult2D& result, const Vector2& startPoint, unsigned collisionMask) :
+    SingleRayCastCallback(PhysicsRaycastResult2D& result, const Vector2& startPoint, u16 collisionMask) :
         result_(result),
         startPoint_(startPoint),
         collisionMask_(collisionMask),
@@ -529,13 +531,13 @@ private:
     // Start point.
     Vector2 startPoint_;
     // Collision mask.
-    unsigned collisionMask_;
+    u16 collisionMask_;
     // Minimum distance.
     float minDistance_;
 };
 
 void PhysicsWorld2D::RaycastSingle(PhysicsRaycastResult2D& result, const Vector2& startPoint, const Vector2& endPoint,
-    unsigned collisionMask)
+    u16 collisionMask/* = M_U16_MASK_ALL_BITS*/)
 {
     result.body_ = nullptr;
 
@@ -548,7 +550,7 @@ class PointQueryCallback : public b2QueryCallback
 {
 public:
     // Construct.
-    PointQueryCallback(const b2Vec2& point, unsigned collisionMask) :   // NOLINT(modernize-pass-by-value)
+    PointQueryCallback(const b2Vec2& point, u16 collisionMask) :   // NOLINT(modernize-pass-by-value)
         point_(point),
         collisionMask_(collisionMask),
         rigidBody_(nullptr)
@@ -581,12 +583,12 @@ private:
     // Point.
     b2Vec2 point_;
     // Collision mask.
-    unsigned collisionMask_;
+    u16 collisionMask_;
     // Rigid body.
     RigidBody2D* rigidBody_;
 };
 
-RigidBody2D* PhysicsWorld2D::GetRigidBody(const Vector2& point, unsigned collisionMask)
+RigidBody2D* PhysicsWorld2D::GetRigidBody(const Vector2& point, u16 collisionMask/* = M_U16_MASK_ALL_BITS*/)
 {
     PointQueryCallback callback(ToB2Vec2(point), collisionMask);
 
@@ -599,7 +601,7 @@ RigidBody2D* PhysicsWorld2D::GetRigidBody(const Vector2& point, unsigned collisi
     return callback.GetRigidBody();
 }
 
-RigidBody2D* PhysicsWorld2D::GetRigidBody(int screenX, int screenY, unsigned collisionMask)
+RigidBody2D* PhysicsWorld2D::GetRigidBody(int screenX, int screenY, u16 collisionMask/* = M_U16_MASK_ALL_BITS*/)
 {
     auto* renderer = GetSubsystem<Renderer>();
     for (unsigned i = 0; i < renderer->GetNumViewports(); ++i)
@@ -621,7 +623,7 @@ class AabbQueryCallback : public b2QueryCallback
 {
 public:
     // Construct.
-    AabbQueryCallback(Vector<RigidBody2D*>& results, unsigned collisionMask) :
+    AabbQueryCallback(Vector<RigidBody2D*>& results, u16 collisionMask) :
         results_(results),
         collisionMask_(collisionMask)
     {
@@ -645,10 +647,10 @@ private:
     // Results.
     Vector<RigidBody2D*>& results_;
     // Collision mask.
-    unsigned collisionMask_;
+    u16 collisionMask_;
 };
 
-void PhysicsWorld2D::GetRigidBodies(Vector<RigidBody2D*>& results, const Rect& aabb, unsigned collisionMask)
+void PhysicsWorld2D::GetRigidBodies(Vector<RigidBody2D*>& results, const Rect& aabb, u16 collisionMask/* = M_U16_MASK_ALL_BITS*/)
 {
     AabbQueryCallback callback(results, collisionMask);
 
@@ -713,9 +715,8 @@ void PhysicsWorld2D::SendBeginContactEvents()
     VariantMap nodeEventData;
     eventData[P_WORLD] = this;
 
-    for (unsigned i = 0; i < beginContactInfos_.Size(); ++i)
+    for (const ContactInfo& contactInfo : beginContactInfos_)
     {
-        ContactInfo& contactInfo = beginContactInfos_[i];
         eventData[P_BODYA] = contactInfo.bodyA_.Get();
         eventData[P_BODYB] = contactInfo.bodyB_.Get();
         eventData[P_NODEA] = contactInfo.nodeA_.Get();
@@ -764,9 +765,8 @@ void PhysicsWorld2D::SendEndContactEvents()
     VariantMap nodeEventData;
     eventData[P_WORLD] = this;
 
-    for (unsigned i = 0; i < endContactInfos_.Size(); ++i)
+    for (const ContactInfo& contactInfo : endContactInfos_)
     {
-        ContactInfo& contactInfo = endContactInfos_[i];
         eventData[P_BODYA] = contactInfo.bodyA_.Get();
         eventData[P_BODYB] = contactInfo.bodyB_.Get();
         eventData[P_NODEA] = contactInfo.nodeA_.Get();

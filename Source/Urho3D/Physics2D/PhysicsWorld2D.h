@@ -145,16 +145,16 @@ public:
 
     /// Perform a physics world raycast and return all hits.
     void Raycast(Vector<PhysicsRaycastResult2D>& results, const Vector2& startPoint, const Vector2& endPoint,
-        unsigned collisionMask = M_MAX_UNSIGNED);
+        u16 collisionMask = M_U16_MASK_ALL_BITS);
     /// Perform a physics world raycast and return the closest hit.
     void RaycastSingle(PhysicsRaycastResult2D& result, const Vector2& startPoint, const Vector2& endPoint,
-        unsigned collisionMask = M_MAX_UNSIGNED);
+        u16 collisionMask = M_U16_MASK_ALL_BITS);
     /// Return rigid body at point.
-    RigidBody2D* GetRigidBody(const Vector2& point, unsigned collisionMask = M_MAX_UNSIGNED);
+    RigidBody2D* GetRigidBody(const Vector2& point, u16 collisionMask = M_U16_MASK_ALL_BITS);
     /// Return rigid body at screen point.
-    RigidBody2D* GetRigidBody(int screenX, int screenY, unsigned collisionMask = M_MAX_UNSIGNED);
+    RigidBody2D* GetRigidBody(int screenX, int screenY, u16 collisionMask = M_U16_MASK_ALL_BITS);
     /// Return rigid bodies by a box query.
-    void GetRigidBodies(Vector<RigidBody2D*>& results, const Rect& aabb, unsigned collisionMask = M_MAX_UNSIGNED);
+    void GetRigidBodies(Vector<RigidBody2D*>& results, const Rect& aabb, u16 collisionMask = M_U16_MASK_ALL_BITS);
 
     /// Return whether physics world will automatically simulate during scene update.
     /// @property
