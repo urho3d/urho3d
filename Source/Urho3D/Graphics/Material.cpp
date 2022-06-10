@@ -79,7 +79,7 @@ TextureUnit ParseTextureUnitName(String name)
 {
     name = name.ToLower().Trimmed();
 
-    auto unit = (TextureUnit)GetStringListIndex(name.CString(), textureUnitNames, MAX_TEXTURE_UNITS);
+    TextureUnit unit = (TextureUnit)GetStringListIndex(name.CString(), textureUnitNames, MAX_TEXTURE_UNITS);
     if (unit == MAX_TEXTURE_UNITS)
     {
         // Check also for shorthand names

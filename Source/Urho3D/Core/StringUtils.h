@@ -99,11 +99,11 @@ URHO3D_API void StringToBuffer(Vector<unsigned char>& dest, const String& source
 /// Convert a C string to a byte buffer.
 URHO3D_API void StringToBuffer(Vector<unsigned char>& dest, const char* source);
 /// Return an index to a string list corresponding to the given string, or a default value if not found. The string list must be empty-terminated.
-URHO3D_API unsigned GetStringListIndex(const String& value, const String* strings, unsigned defaultIndex, bool caseSensitive = false);
+URHO3D_API i32 GetStringListIndex(const String& value, const String* strings, i32 defaultIndex, bool caseSensitive = false);
 /// Return an index to a string list corresponding to the given C string, or a default value if not found. The string list must be empty-terminated.
-URHO3D_API unsigned GetStringListIndex(const char* value, const String* strings, unsigned defaultIndex, bool caseSensitive = false);
+URHO3D_API i32 GetStringListIndex(const char* value, const String* strings, i32 defaultIndex, bool caseSensitive = false);
 /// Return an index to a C string list corresponding to the given C string, or a default value if not found. The string list must be empty-terminated.
-URHO3D_API unsigned GetStringListIndex(const char* value, const char** strings, unsigned defaultIndex, bool caseSensitive = false);
+URHO3D_API i32 GetStringListIndex(const char* value, const char** strings, i32 defaultIndex, bool caseSensitive = false);
 /// Return a formatted string.
 URHO3D_API String ToString(const char* formatString, ...);
 /// Return whether a char is an alphabet letter.

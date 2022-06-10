@@ -651,14 +651,14 @@ void StringToBuffer(Vector<unsigned char>& dest, const char* source)
         dest[index] = (unsigned char)value;
 }
 
-unsigned GetStringListIndex(const String& value, const String* strings, unsigned defaultIndex, bool caseSensitive)
+i32 GetStringListIndex(const String& value, const String* strings, i32 defaultIndex, bool caseSensitive)
 {
     return GetStringListIndex(value.CString(), strings, defaultIndex, caseSensitive);
 }
 
-unsigned GetStringListIndex(const char* value, const String* strings, unsigned defaultIndex, bool caseSensitive)
+i32 GetStringListIndex(const char* value, const String* strings, i32 defaultIndex, bool caseSensitive)
 {
-    unsigned i = 0;
+    i32 i = 0;
 
     while (!strings[i].Empty())
     {
@@ -670,9 +670,9 @@ unsigned GetStringListIndex(const char* value, const String* strings, unsigned d
     return defaultIndex;
 }
 
-unsigned GetStringListIndex(const char* value, const char** strings, unsigned defaultIndex, bool caseSensitive)
+i32 GetStringListIndex(const char* value, const char** strings, i32 defaultIndex, bool caseSensitive)
 {
-    unsigned i = 0;
+    i32 i = 0;
 
     while (strings[i])
     {

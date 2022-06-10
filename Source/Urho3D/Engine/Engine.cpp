@@ -898,8 +898,8 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
                 ret[EP_LOG_QUIET] = true;
             else if (argument == "log" && !value.Empty())
             {
-                unsigned logLevel = GetStringListIndex(value.CString(), logLevelPrefixes, M_MAX_UNSIGNED);
-                if (logLevel != M_MAX_UNSIGNED)
+                i32 logLevel = GetStringListIndex(value.CString(), logLevelPrefixes, NINDEX);
+                if (logLevel != NINDEX)
                 {
                     ret[EP_LOG_LEVEL] = logLevel;
                     ++i;
