@@ -222,13 +222,13 @@ void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
     // const char* GetRevision() | File: ../LibraryInfo.h
     // Error: type "const char*" can not automatically bind
 
-    // unsigned GetStringListIndex(const String& value, const String* strings, unsigned defaultIndex, bool caseSensitive = false) | File: ../Core/StringUtils.h
+    // i32 GetStringListIndex(const String& value, const String* strings, i32 defaultIndex, bool caseSensitive = false) | File: ../Core/StringUtils.h
     // Error: type "const String*" can not automatically bind
 
-    // unsigned GetStringListIndex(const char* value, const String* strings, unsigned defaultIndex, bool caseSensitive = false) | File: ../Core/StringUtils.h
+    // i32 GetStringListIndex(const char* value, const String* strings, i32 defaultIndex, bool caseSensitive = false) | File: ../Core/StringUtils.h
     // Error: type "const char*" can not automatically bind
 
-    // unsigned GetStringListIndex(const char* value, const char** strings, unsigned defaultIndex, bool caseSensitive = false) | File: ../Core/StringUtils.h
+    // i32 GetStringListIndex(const char* value, const char** strings, i32 defaultIndex, bool caseSensitive = false) | File: ../Core/StringUtils.h
     // Error: type "const char*" can not automatically bind
 
     // unsigned long long GetTotalMemory() | File: ../Core/ProcessUtils.h
