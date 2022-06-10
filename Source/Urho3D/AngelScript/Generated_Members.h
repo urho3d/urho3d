@@ -21123,13 +21123,13 @@ template <class T> void RegisterMembers_PhysicsWorld2D(asIScriptEngine* engine, 
     // Error: type "const b2Transform&" can not automatically bind
     // void PhysicsWorld2D::EndContact(b2Contact* contact) override
     // Error: type "b2Contact*" can not automatically bind
-    // void PhysicsWorld2D::GetRigidBodies(Vector<RigidBody2D*>& results, const Rect& aabb, unsigned collisionMask = M_MAX_UNSIGNED)
+    // void PhysicsWorld2D::GetRigidBodies(Vector<RigidBody2D*>& results, const Rect& aabb, u16 collisionMask = M_U16_MASK_ALL_BITS)
     // Error: type "Vector<RigidBody2D*>&" can not automatically bind
     // b2World* PhysicsWorld2D::GetWorld()
     // Error: type "b2World*" can not automatically bind
     // void PhysicsWorld2D::PreSolve(b2Contact* contact, const b2Manifold* oldManifold) override
     // Error: type "b2Contact*" can not automatically bind
-    // void PhysicsWorld2D::Raycast(Vector<PhysicsRaycastResult2D>& results, const Vector2& startPoint, const Vector2& endPoint, unsigned collisionMask = M_MAX_UNSIGNED)
+    // void PhysicsWorld2D::Raycast(Vector<PhysicsRaycastResult2D>& results, const Vector2& startPoint, const Vector2& endPoint, u16 collisionMask = M_U16_MASK_ALL_BITS)
     // Error: type "Vector<PhysicsRaycastResult2D>&" can not automatically bind
 
     // void PhysicsWorld2D::AddDelayedWorldTransform(const DelayedWorldTransform2D& transform)
@@ -21184,11 +21184,11 @@ template <class T> void RegisterMembers_PhysicsWorld2D(asIScriptEngine* engine, 
     engine->RegisterObjectMethod(className, "int GetPositionIterations() const", AS_METHODPR(T, GetPositionIterations, () const, int), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "int get_positionIterations() const", AS_METHODPR(T, GetPositionIterations, () const, int), AS_CALL_THISCALL);
 
-    // RigidBody2D* PhysicsWorld2D::GetRigidBody(const Vector2& point, unsigned collisionMask = M_MAX_UNSIGNED)
-    engine->RegisterObjectMethod(className, "RigidBody2D@+ GetRigidBody(const Vector2&in, uint = M_MAX_UNSIGNED)", AS_METHODPR(T, GetRigidBody, (const Vector2&, unsigned), RigidBody2D*), AS_CALL_THISCALL);
+    // RigidBody2D* PhysicsWorld2D::GetRigidBody(const Vector2& point, u16 collisionMask = M_U16_MASK_ALL_BITS)
+    engine->RegisterObjectMethod(className, "RigidBody2D@+ GetRigidBody(const Vector2&in, uint16 = M_U16_MASK_ALL_BITS)", AS_METHODPR(T, GetRigidBody, (const Vector2&, u16), RigidBody2D*), AS_CALL_THISCALL);
 
-    // RigidBody2D* PhysicsWorld2D::GetRigidBody(int screenX, int screenY, unsigned collisionMask = M_MAX_UNSIGNED)
-    engine->RegisterObjectMethod(className, "RigidBody2D@+ GetRigidBody(int, int, uint = M_MAX_UNSIGNED)", AS_METHODPR(T, GetRigidBody, (int, int, unsigned), RigidBody2D*), AS_CALL_THISCALL);
+    // RigidBody2D* PhysicsWorld2D::GetRigidBody(int screenX, int screenY, u16 collisionMask = M_U16_MASK_ALL_BITS)
+    engine->RegisterObjectMethod(className, "RigidBody2D@+ GetRigidBody(int, int, uint16 = M_U16_MASK_ALL_BITS)", AS_METHODPR(T, GetRigidBody, (int, int, u16), RigidBody2D*), AS_CALL_THISCALL);
 
     // bool PhysicsWorld2D::GetSubStepping() const
     engine->RegisterObjectMethod(className, "bool GetSubStepping() const", AS_METHODPR(T, GetSubStepping, () const, bool), AS_CALL_THISCALL);
@@ -21209,8 +21209,8 @@ template <class T> void RegisterMembers_PhysicsWorld2D(asIScriptEngine* engine, 
     engine->RegisterObjectMethod(className, "bool IsUpdateEnabled() const", AS_METHODPR(T, IsUpdateEnabled, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_updateEnabled() const", AS_METHODPR(T, IsUpdateEnabled, () const, bool), AS_CALL_THISCALL);
 
-    // void PhysicsWorld2D::RaycastSingle(PhysicsRaycastResult2D& result, const Vector2& startPoint, const Vector2& endPoint, unsigned collisionMask = M_MAX_UNSIGNED)
-    engine->RegisterObjectMethod(className, "void RaycastSingle(PhysicsRaycastResult2D&, const Vector2&in, const Vector2&in, uint = M_MAX_UNSIGNED)", AS_METHODPR(T, RaycastSingle, (PhysicsRaycastResult2D&, const Vector2&, const Vector2&, unsigned), void), AS_CALL_THISCALL);
+    // void PhysicsWorld2D::RaycastSingle(PhysicsRaycastResult2D& result, const Vector2& startPoint, const Vector2& endPoint, u16 collisionMask = M_U16_MASK_ALL_BITS)
+    engine->RegisterObjectMethod(className, "void RaycastSingle(PhysicsRaycastResult2D&, const Vector2&in, const Vector2&in, uint16 = M_U16_MASK_ALL_BITS)", AS_METHODPR(T, RaycastSingle, (PhysicsRaycastResult2D&, const Vector2&, const Vector2&, u16), void), AS_CALL_THISCALL);
 
     // void PhysicsWorld2D::RemoveRigidBody(RigidBody2D* rigidBody)
     engine->RegisterObjectMethod(className, "void RemoveRigidBody(RigidBody2D@+)", AS_METHODPR(T, RemoveRigidBody, (RigidBody2D*), void), AS_CALL_THISCALL);
