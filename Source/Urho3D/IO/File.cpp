@@ -478,7 +478,7 @@ bool File::OpenInternal(const String& fileName, FileMode mode, bool fromPackage)
     if (!fromPackage)
     {
         fseek((FILE*)handle_, 0, SEEK_END);
-        long size = ftell((FILE*)handle_);
+        long size = ftell((FILE*)handle_); // 64 bit on Unix 64
         fseek((FILE*)handle_, 0, SEEK_SET);
         if (size > M_MAX_UNSIGNED)
         {
