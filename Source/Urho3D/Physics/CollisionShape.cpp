@@ -69,9 +69,11 @@ extern const char* PHYSICS_CATEGORY;
 class TriangleMeshInterface : public btTriangleIndexVertexArray
 {
 public:
-    TriangleMeshInterface(Model* model, unsigned lodLevel) :
+    TriangleMeshInterface(Model* model, i32 lodLevel) :
         btTriangleIndexVertexArray()
     {
+        assert(lodLevel >= 0);
+
         unsigned numGeometries = model->GetNumGeometries();
         unsigned totalTriangles = 0;
 
@@ -130,7 +132,7 @@ public:
         unsigned totalVertexCount = 0;
         unsigned totalTriangles = 0;
 
-        for (unsigned i = 0; i < srcVertices.Size(); ++i)
+        for (i32 i = 0; i < srcVertices.Size(); ++i)
             totalVertexCount += srcVertices[i].Size();
 
         if (totalVertexCount)
@@ -145,9 +147,9 @@ public:
             auto* destIndex = reinterpret_cast<unsigned*>(&indexData[0]);
             unsigned k = 0;
 
-            for (unsigned i = 0; i < srcVertices.Size(); ++i)
+            for (i32 i = 0; i < srcVertices.Size(); ++i)
             {
-                for (unsigned j = 0; j < srcVertices[i].Size(); ++j)
+                for (i32 j = 0; j < srcVertices[i].Size(); ++j)
                 {
                     *destVertex++ = srcVertices[i][j].position_;
                     *destIndex++ = k++;
@@ -179,8 +181,9 @@ private:
     Vector<SharedArrayPtr<unsigned char>> dataArrays_;
 };
 
-TriangleMeshData::TriangleMeshData(Model* model, unsigned lodLevel)
+TriangleMeshData::TriangleMeshData(Model* model, i32 lodLevel)
 {
+    assert(lodLevel >= 0);
     meshInterface_ = make_unique<TriangleMeshInterface>(model, lodLevel);
     shape_ = make_unique<btBvhTriangleMeshShape>(meshInterface_.get(), meshInterface_->useQuantize_, true);
 
@@ -197,8 +200,9 @@ TriangleMeshData::TriangleMeshData(CustomGeometry* custom)
     btGenerateInternalEdgeInfo(shape_.get(), infoMap_.get());
 }
 
-GImpactMeshData::GImpactMeshData(Model* model, unsigned lodLevel)
+GImpactMeshData::GImpactMeshData(Model* model, i32 lodLevel)
 {
+    assert(lodLevel >= 0);
     meshInterface_ = make_unique<TriangleMeshInterface>(model, lodLevel);
 }
 
@@ -207,8 +211,9 @@ GImpactMeshData::GImpactMeshData(CustomGeometry* custom)
     meshInterface_ = make_unique<TriangleMeshInterface>(custom);
 }
 
-ConvexData::ConvexData(Model* model, unsigned lodLevel)
+ConvexData::ConvexData(Model* model, i32 lodLevel)
 {
+    assert(lodLevel >= 0);
     Vector<Vector3> vertices;
     unsigned numGeometries = model->GetNumGeometries();
 
@@ -253,9 +258,9 @@ ConvexData::ConvexData(CustomGeometry* custom)
     const Vector<Vector<CustomGeometryVertex>>& srcVertices = custom->GetVertices();
     Vector<Vector3> vertices;
 
-    for (unsigned i = 0; i < srcVertices.Size(); ++i)
+    for (i32 i = 0; i < srcVertices.Size(); ++i)
     {
-        for (unsigned j = 0; j < srcVertices[i].Size(); ++j)
+        for (i32 j = 0; j < srcVertices[i].Size(); ++j)
             vertices.Push(srcVertices[i][j].position_);
     }
 
@@ -297,13 +302,15 @@ void ConvexData::BuildHull(const Vector<Vector3>& vertices)
     }
 }
 
-HeightfieldData::HeightfieldData(Terrain* terrain, unsigned lodLevel) :
+HeightfieldData::HeightfieldData(Terrain* terrain, i32 lodLevel) :
     heightData_(terrain->GetHeightData()),
     spacing_(terrain->GetSpacing()),
     size_(terrain->GetNumVertices()),
     minHeight_(0.0f),
     maxHeight_(0.0f)
 {
+    assert(lodLevel >= 0);
+
     if (heightData_)
     {
         if (lodLevel > 0)
@@ -312,7 +319,7 @@ HeightfieldData::HeightfieldData(Terrain* terrain, unsigned lodLevel) :
             Vector3 lodSpacing = spacing_;
             unsigned skip = 1;
 
-            for (unsigned i = 0; i < lodLevel; ++i)
+            for (i32 i = 0; i < lodLevel; ++i)
             {
                 skip *= 2;
                 lodSpacing.x_ *= 2.0f;
@@ -351,8 +358,9 @@ HeightfieldData::HeightfieldData(Terrain* terrain, unsigned lodLevel) :
     }
 }
 
-bool HasDynamicBuffers(Model* model, unsigned lodLevel)
+bool HasDynamicBuffers(Model* model, i32 lodLevel)
 {
+    assert(lodLevel >= 0);
     unsigned numGeometries = model->GetNumGeometries();
 
     for (unsigned i = 0; i < numGeometries; ++i)
@@ -377,8 +385,10 @@ bool HasDynamicBuffers(Model* model, unsigned lodLevel)
     return false;
 }
 
-CollisionGeometryData* CreateCollisionGeometryData(ShapeType shapeType, Model* model, unsigned lodLevel)
+CollisionGeometryData* CreateCollisionGeometryData(ShapeType shapeType, Model* model, i32 lodLevel)
 {
+    assert(lodLevel >= 0);
+
     switch (shapeType)
     {
     case SHAPE_TRIANGLEMESH:
@@ -651,9 +661,10 @@ void CollisionShape::SetCone(float diameter, float height, const Vector3& positi
     MarkNetworkUpdate();
 }
 
-void CollisionShape::SetTriangleMesh(Model* model, unsigned lodLevel, const Vector3& scale, const Vector3& position,
+void CollisionShape::SetTriangleMesh(Model* model, i32 lodLevel, const Vector3& scale, const Vector3& position,
     const Quaternion& rotation)
 {
+    assert(lodLevel >= 0);
     SetModelShape(SHAPE_TRIANGLEMESH, model, lodLevel, scale, position, rotation);
 }
 
@@ -663,9 +674,10 @@ void CollisionShape::SetCustomTriangleMesh(CustomGeometry* custom, const Vector3
     SetCustomShape(SHAPE_TRIANGLEMESH, custom, scale, position, rotation);
 }
 
-void CollisionShape::SetConvexHull(Model* model, unsigned lodLevel, const Vector3& scale, const Vector3& position,
+void CollisionShape::SetConvexHull(Model* model, i32 lodLevel, const Vector3& scale, const Vector3& position,
     const Quaternion& rotation)
 {
+    assert(lodLevel >= 0);
     SetModelShape(SHAPE_CONVEXHULL, model, lodLevel, scale, position, rotation);
 }
 
@@ -675,9 +687,10 @@ void CollisionShape::SetCustomConvexHull(CustomGeometry* custom, const Vector3& 
     SetCustomShape(SHAPE_CONVEXHULL, custom, scale, position, rotation);
 }
 
-void CollisionShape::SetGImpactMesh(Model* model, unsigned lodLevel, const Vector3& scale, const Vector3& position,
+void CollisionShape::SetGImpactMesh(Model* model, i32 lodLevel, const Vector3& scale, const Vector3& position,
     const Quaternion& rotation)
 {
+    assert(lodLevel >= 0);
     SetModelShape(SHAPE_GIMPACTMESH, model, lodLevel, scale, position, rotation);
 }
 
@@ -687,9 +700,10 @@ void CollisionShape::SetCustomGImpactMesh(CustomGeometry* custom, const Vector3&
     SetCustomShape(SHAPE_GIMPACTMESH, custom, scale, position, rotation);
 }
 
-void CollisionShape::SetTerrain(unsigned lodLevel)
+void CollisionShape::SetTerrain(i32 lodLevel)
 {
-    auto* terrain = GetComponent<Terrain>();
+    assert(lodLevel >= 0);
+    Terrain* terrain = GetComponent<Terrain>();
     if (!terrain)
     {
         URHO3D_LOGERROR("No terrain component, can not set terrain shape");
@@ -790,8 +804,10 @@ void CollisionShape::SetModel(Model* model)
     }
 }
 
-void CollisionShape::SetLodLevel(unsigned lodLevel)
+void CollisionShape::SetLodLevel(i32 lodLevel)
 {
+    assert(lodLevel >= 0);
+
     if (lodLevel != lodLevel_)
     {
         lodLevel_ = lodLevel;
@@ -1043,7 +1059,7 @@ void CollisionShape::UpdateShape()
         case SHAPE_TERRAIN:
             size_ = size_.Abs();
             {
-                auto* terrain = GetComponent<Terrain>();
+                Terrain* terrain = GetComponent<Terrain>();
                 if (terrain && terrain->GetHeightData())
                 {
                     geometry_ = new HeightfieldData(terrain, lodLevel_);
@@ -1120,9 +1136,11 @@ void CollisionShape::UpdateCachedGeometryShape(CollisionGeometryDataCache& cache
     }
 }
 
-void CollisionShape::SetModelShape(ShapeType shapeType, Model* model, unsigned lodLevel,
+void CollisionShape::SetModelShape(ShapeType shapeType, Model* model, i32 lodLevel,
     const Vector3& scale, const Vector3& position, const Quaternion& rotation)
 {
+    assert(lodLevel >= 0);
+
     if (!model)
     {
         URHO3D_LOGERROR("Null model, can not set collsion shape");

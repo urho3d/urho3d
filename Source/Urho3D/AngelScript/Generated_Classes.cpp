@@ -5042,8 +5042,8 @@ static void Register_Network(asIScriptEngine* engine)
 
 #ifdef URHO3D_PHYSICS
 
-// ConvexData::ConvexData(Model* model, unsigned lodLevel)
-static ConvexData* ConvexData__ConvexData_Modelstar_unsigned(Model* model, unsigned lodLevel)
+// ConvexData::ConvexData(Model* model, i32 lodLevel)
+static ConvexData* ConvexData__ConvexData_Modelstar_i32(Model* model, i32 lodLevel)
 {
     return new ConvexData(model, lodLevel);
 }
@@ -5057,8 +5057,8 @@ static ConvexData* ConvexData__ConvexData_CustomGeometrystar(CustomGeometry* cus
 // struct ConvexData | File: ../Physics/CollisionShape.h
 static void Register_ConvexData(asIScriptEngine* engine)
 {
-    // ConvexData::ConvexData(Model* model, unsigned lodLevel)
-    engine->RegisterObjectBehaviour("ConvexData", asBEHAVE_FACTORY, "ConvexData@+ f(Model@+, uint)", AS_FUNCTION(ConvexData__ConvexData_Modelstar_unsigned) , AS_CALL_CDECL);
+    // ConvexData::ConvexData(Model* model, i32 lodLevel)
+    engine->RegisterObjectBehaviour("ConvexData", asBEHAVE_FACTORY, "ConvexData@+ f(Model@+, int)", AS_FUNCTION(ConvexData__ConvexData_Modelstar_i32) , AS_CALL_CDECL);
     // explicit ConvexData::ConvexData(CustomGeometry* custom)
     engine->RegisterObjectBehaviour("ConvexData", asBEHAVE_FACTORY, "ConvexData@+ f(CustomGeometry@+)", AS_FUNCTION(ConvexData__ConvexData_CustomGeometrystar) , AS_CALL_CDECL);
 
@@ -5072,8 +5072,8 @@ static void Register_ConvexData(asIScriptEngine* engine)
     #endif
 }
 
-// GImpactMeshData::GImpactMeshData(Model* model, unsigned lodLevel)
-static GImpactMeshData* GImpactMeshData__GImpactMeshData_Modelstar_unsigned(Model* model, unsigned lodLevel)
+// GImpactMeshData::GImpactMeshData(Model* model, i32 lodLevel)
+static GImpactMeshData* GImpactMeshData__GImpactMeshData_Modelstar_i32(Model* model, i32 lodLevel)
 {
     return new GImpactMeshData(model, lodLevel);
 }
@@ -5087,8 +5087,8 @@ static GImpactMeshData* GImpactMeshData__GImpactMeshData_CustomGeometrystar(Cust
 // struct GImpactMeshData | File: ../Physics/CollisionShape.h
 static void Register_GImpactMeshData(asIScriptEngine* engine)
 {
-    // GImpactMeshData::GImpactMeshData(Model* model, unsigned lodLevel)
-    engine->RegisterObjectBehaviour("GImpactMeshData", asBEHAVE_FACTORY, "GImpactMeshData@+ f(Model@+, uint)", AS_FUNCTION(GImpactMeshData__GImpactMeshData_Modelstar_unsigned) , AS_CALL_CDECL);
+    // GImpactMeshData::GImpactMeshData(Model* model, i32 lodLevel)
+    engine->RegisterObjectBehaviour("GImpactMeshData", asBEHAVE_FACTORY, "GImpactMeshData@+ f(Model@+, int)", AS_FUNCTION(GImpactMeshData__GImpactMeshData_Modelstar_i32) , AS_CALL_CDECL);
     // explicit GImpactMeshData::GImpactMeshData(CustomGeometry* custom)
     engine->RegisterObjectBehaviour("GImpactMeshData", asBEHAVE_FACTORY, "GImpactMeshData@+ f(CustomGeometry@+)", AS_FUNCTION(GImpactMeshData__GImpactMeshData_CustomGeometrystar) , AS_CALL_CDECL);
 
@@ -5102,8 +5102,8 @@ static void Register_GImpactMeshData(asIScriptEngine* engine)
     #endif
 }
 
-// HeightfieldData::HeightfieldData(Terrain* terrain, unsigned lodLevel)
-static HeightfieldData* HeightfieldData__HeightfieldData_Terrainstar_unsigned(Terrain* terrain, unsigned lodLevel)
+// HeightfieldData::HeightfieldData(Terrain* terrain, i32 lodLevel)
+static HeightfieldData* HeightfieldData__HeightfieldData_Terrainstar_i32(Terrain* terrain, i32 lodLevel)
 {
     return new HeightfieldData(terrain, lodLevel);
 }
@@ -5111,8 +5111,8 @@ static HeightfieldData* HeightfieldData__HeightfieldData_Terrainstar_unsigned(Te
 // struct HeightfieldData | File: ../Physics/CollisionShape.h
 static void Register_HeightfieldData(asIScriptEngine* engine)
 {
-    // HeightfieldData::HeightfieldData(Terrain* terrain, unsigned lodLevel)
-    engine->RegisterObjectBehaviour("HeightfieldData", asBEHAVE_FACTORY, "HeightfieldData@+ f(Terrain@+, uint)", AS_FUNCTION(HeightfieldData__HeightfieldData_Terrainstar_unsigned) , AS_CALL_CDECL);
+    // HeightfieldData::HeightfieldData(Terrain* terrain, i32 lodLevel)
+    engine->RegisterObjectBehaviour("HeightfieldData", asBEHAVE_FACTORY, "HeightfieldData@+ f(Terrain@+, int)", AS_FUNCTION(HeightfieldData__HeightfieldData_Terrainstar_i32) , AS_CALL_CDECL);
 
     RegisterSubclass<CollisionGeometryData, HeightfieldData>(engine, "CollisionGeometryData", "HeightfieldData");
     RegisterSubclass<RefCounted, HeightfieldData>(engine, "RefCounted", "HeightfieldData");
@@ -5124,8 +5124,8 @@ static void Register_HeightfieldData(asIScriptEngine* engine)
     #endif
 }
 
-// TriangleMeshData::TriangleMeshData(Model* model, unsigned lodLevel)
-static TriangleMeshData* TriangleMeshData__TriangleMeshData_Modelstar_unsigned(Model* model, unsigned lodLevel)
+// TriangleMeshData::TriangleMeshData(Model* model, i32 lodLevel)
+static TriangleMeshData* TriangleMeshData__TriangleMeshData_Modelstar_i32(Model* model, i32 lodLevel)
 {
     return new TriangleMeshData(model, lodLevel);
 }
@@ -5139,8 +5139,8 @@ static TriangleMeshData* TriangleMeshData__TriangleMeshData_CustomGeometrystar(C
 // struct TriangleMeshData | File: ../Physics/CollisionShape.h
 static void Register_TriangleMeshData(asIScriptEngine* engine)
 {
-    // TriangleMeshData::TriangleMeshData(Model* model, unsigned lodLevel)
-    engine->RegisterObjectBehaviour("TriangleMeshData", asBEHAVE_FACTORY, "TriangleMeshData@+ f(Model@+, uint)", AS_FUNCTION(TriangleMeshData__TriangleMeshData_Modelstar_unsigned) , AS_CALL_CDECL);
+    // TriangleMeshData::TriangleMeshData(Model* model, i32 lodLevel)
+    engine->RegisterObjectBehaviour("TriangleMeshData", asBEHAVE_FACTORY, "TriangleMeshData@+ f(Model@+, int)", AS_FUNCTION(TriangleMeshData__TriangleMeshData_Modelstar_i32) , AS_CALL_CDECL);
     // explicit TriangleMeshData::TriangleMeshData(CustomGeometry* custom)
     engine->RegisterObjectBehaviour("TriangleMeshData", asBEHAVE_FACTORY, "TriangleMeshData@+ f(CustomGeometry@+)", AS_FUNCTION(TriangleMeshData__TriangleMeshData_CustomGeometrystar) , AS_CALL_CDECL);
 
