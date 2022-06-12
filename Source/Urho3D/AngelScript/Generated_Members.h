@@ -11084,8 +11084,8 @@ template <class T> void RegisterMembers_OcclusionBuffer(asIScriptEngine* engine,
     // void OcclusionBuffer::Clear()
     engine->RegisterObjectMethod(className, "void Clear()", AS_METHODPR(T, Clear, (), void), AS_CALL_THISCALL);
 
-    // void OcclusionBuffer::DrawBatch(const OcclusionBatch& batch, unsigned threadIndex)
-    engine->RegisterObjectMethod(className, "void DrawBatch(const OcclusionBatch&in, uint)", AS_METHODPR(T, DrawBatch, (const OcclusionBatch&, unsigned), void), AS_CALL_THISCALL);
+    // void OcclusionBuffer::DrawBatch(const OcclusionBatch& batch, i32 threadIndex)
+    engine->RegisterObjectMethod(className, "void DrawBatch(const OcclusionBatch&in, int)", AS_METHODPR(T, DrawBatch, (const OcclusionBatch&, i32), void), AS_CALL_THISCALL);
 
     // void OcclusionBuffer::DrawTriangles()
     engine->RegisterObjectMethod(className, "void DrawTriangles()", AS_METHODPR(T, DrawTriangles, (), void), AS_CALL_THISCALL);

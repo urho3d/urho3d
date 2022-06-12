@@ -442,8 +442,10 @@ unsigned OcclusionBuffer::GetUseTimer()
 }
 
 
-void OcclusionBuffer::DrawBatch(const OcclusionBatch& batch, unsigned threadIndex)
+void OcclusionBuffer::DrawBatch(const OcclusionBatch& batch, i32 threadIndex)
 {
+    assert(threadIndex >= 0);
+
     // If buffer not yet used, clear it
     if (threadIndex > 0 && !buffers_[threadIndex].used_)
     {
@@ -567,8 +569,10 @@ void OcclusionBuffer::CalculateViewport()
     projOffsetScaleY_ = projection_.m11_ * scaleY_;
 }
 
-void OcclusionBuffer::DrawTriangle(Vector4* vertices, unsigned threadIndex)
+void OcclusionBuffer::DrawTriangle(Vector4* vertices, i32 threadIndex)
 {
+    assert(threadIndex >= 0);
+
     ClipMaskFlags clipMask{};
     ClipMaskFlags andClipMask{};
     bool drawOk = false;
@@ -793,8 +797,10 @@ struct Edge
     int invZStep_;
 };
 
-void OcclusionBuffer::DrawTriangle2D(const Vector3* vertices, bool clockwise, unsigned threadIndex)
+void OcclusionBuffer::DrawTriangle2D(const Vector3* vertices, bool clockwise, i32 threadIndex)
 {
+    assert(threadIndex >= 0);
+
     int top, middle, bottom;
     bool middleIsRight;
 
@@ -1006,8 +1012,10 @@ void OcclusionBuffer::MergeBuffers()
     }
 }
 
-void OcclusionBuffer::ClearBuffer(unsigned threadIndex)
+void OcclusionBuffer::ClearBuffer(i32 threadIndex)
 {
+    assert(threadIndex >= 0);
+
     if (threadIndex >= buffers_.Size())
         return;
 
