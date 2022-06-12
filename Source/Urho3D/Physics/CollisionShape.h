@@ -59,7 +59,7 @@ using CollisionGeometryDataCache = HashMap<Pair<Model*, i32>, SharedPtr<Collisio
 struct TriangleMeshData : public CollisionGeometryData
 {
     /// Construct from a model.
-    TriangleMeshData(Model* model, unsigned lodLevel);
+    TriangleMeshData(Model* model, i32 lodLevel);
     /// Construct from a custom geometry.
     explicit TriangleMeshData(CustomGeometry* custom);
 
@@ -77,7 +77,7 @@ struct TriangleMeshData : public CollisionGeometryData
 struct GImpactMeshData : public CollisionGeometryData
 {
     /// Construct from a model.
-    GImpactMeshData(Model* model, unsigned lodLevel);
+    GImpactMeshData(Model* model, i32 lodLevel);
     /// Construct from a custom geometry.
     explicit GImpactMeshData(CustomGeometry* custom);
 
@@ -89,7 +89,7 @@ struct GImpactMeshData : public CollisionGeometryData
 struct ConvexData : public CollisionGeometryData
 {
     /// Construct from a model.
-    ConvexData(Model* model, unsigned lodLevel);
+    ConvexData(Model* model, i32 lodLevel);
     /// Construct from a custom geometry.
     explicit ConvexData(CustomGeometry* custom);
 
@@ -110,7 +110,7 @@ struct ConvexData : public CollisionGeometryData
 struct HeightfieldData : public CollisionGeometryData
 {
     /// Construct from a terrain.
-    HeightfieldData(Terrain* terrain, unsigned lodLevel);
+    HeightfieldData(Terrain* terrain, i32 lodLevel);
 
     /// Height data. On LOD level 0 the original height data will be used.
     SharedArrayPtr<float> heightData_;
@@ -158,25 +158,25 @@ public:
     /// Set as a cone.
     void SetCone(float diameter, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
     /// Set as a triangle mesh from Model. If you update a model's geometry and want to reapply the shape, call physicsWorld->RemoveCachedGeometry(model) first.
-    void SetTriangleMesh(Model* model, unsigned lodLevel = 0, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO,
+    void SetTriangleMesh(Model* model, i32 lodLevel = 0, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO,
         const Quaternion& rotation = Quaternion::IDENTITY);
     /// Set as a triangle mesh from CustomGeometry.
     void SetCustomTriangleMesh(CustomGeometry* custom, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO,
         const Quaternion& rotation = Quaternion::IDENTITY);
     /// Set as a convex hull from Model.
-    void SetConvexHull(Model* model, unsigned lodLevel = 0, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO,
+    void SetConvexHull(Model* model, i32 lodLevel = 0, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO,
         const Quaternion& rotation = Quaternion::IDENTITY);
     /// Set as a convex hull from CustomGeometry.
     void SetCustomConvexHull(CustomGeometry* custom, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO,
         const Quaternion& rotation = Quaternion::IDENTITY);
     /// Set as a triangle mesh from Model. If you update a model's geometry and want to reapply the shape, call physicsWorld->RemoveCachedGeometry(model) first.
-    void SetGImpactMesh(Model* model, unsigned lodLevel = 0, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO,
+    void SetGImpactMesh(Model* model, i32 lodLevel = 0, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO,
         const Quaternion& rotation = Quaternion::IDENTITY);
     /// Set as a triangle mesh from CustomGeometry.
     void SetCustomGImpactMesh(CustomGeometry* custom, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO,
         const Quaternion& rotation = Quaternion::IDENTITY);
     /// Set as a terrain. Only works if the same scene node contains a Terrain component.
-    void SetTerrain(unsigned lodLevel = 0);
+    void SetTerrain(i32 lodLevel = 0);
     /// Set shape type.
     /// @property
     void SetShapeType(ShapeType type);
@@ -199,7 +199,7 @@ public:
     void SetModel(Model* model);
     /// Set model LOD level.
     /// @property
-    void SetLodLevel(unsigned lodLevel);
+    void SetLodLevel(i32 lodLevel);
 
     /// Return Bullet collision shape.
     btCollisionShape* GetCollisionShape() const { return shape_.get(); }
@@ -275,7 +275,7 @@ private:
     /// Update cached geometry collision shape.
     void UpdateCachedGeometryShape(CollisionGeometryDataCache& cache);
     /// Set as specified shape type using model and LOD.
-    void SetModelShape(ShapeType shapeType, Model* model, unsigned lodLevel,
+    void SetModelShape(ShapeType shapeType, Model* model, i32 lodLevel,
         const Vector3& scale, const Vector3& position, const Quaternion& rotation);
     /// Set as specified shape type using CustomGeometry.
     void SetCustomShape(ShapeType shapeType, CustomGeometry* custom,

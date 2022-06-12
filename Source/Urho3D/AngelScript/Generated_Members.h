@@ -20271,8 +20271,8 @@ template <class T> void RegisterMembers_CollisionShape(asIScriptEngine* engine, 
     // void CollisionShape::SetCone(float diameter, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY)
     engine->RegisterObjectMethod(className, "void SetCone(float, float, const Vector3&in = Vector3::ZERO, const Quaternion&in = Quaternion::IDENTITY)", AS_METHODPR(T, SetCone, (float, float, const Vector3&, const Quaternion&), void), AS_CALL_THISCALL);
 
-    // void CollisionShape::SetConvexHull(Model* model, unsigned lodLevel = 0, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY)
-    engine->RegisterObjectMethod(className, "void SetConvexHull(Model@+, uint = 0, const Vector3&in = Vector3::ONE, const Vector3&in = Vector3::ZERO, const Quaternion&in = Quaternion::IDENTITY)", AS_METHODPR(T, SetConvexHull, (Model*, unsigned, const Vector3&, const Vector3&, const Quaternion&), void), AS_CALL_THISCALL);
+    // void CollisionShape::SetConvexHull(Model* model, i32 lodLevel = 0, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY)
+    engine->RegisterObjectMethod(className, "void SetConvexHull(Model@+, int = 0, const Vector3&in = Vector3::ONE, const Vector3&in = Vector3::ZERO, const Quaternion&in = Quaternion::IDENTITY)", AS_METHODPR(T, SetConvexHull, (Model*, i32, const Vector3&, const Vector3&, const Quaternion&), void), AS_CALL_THISCALL);
 
     // void CollisionShape::SetCustomConvexHull(CustomGeometry* custom, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY)
     engine->RegisterObjectMethod(className, "void SetCustomConvexHull(CustomGeometry@+, const Vector3&in = Vector3::ONE, const Vector3&in = Vector3::ZERO, const Quaternion&in = Quaternion::IDENTITY)", AS_METHODPR(T, SetCustomConvexHull, (CustomGeometry*, const Vector3&, const Vector3&, const Quaternion&), void), AS_CALL_THISCALL);
@@ -20286,12 +20286,12 @@ template <class T> void RegisterMembers_CollisionShape(asIScriptEngine* engine, 
     // void CollisionShape::SetCylinder(float diameter, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY)
     engine->RegisterObjectMethod(className, "void SetCylinder(float, float, const Vector3&in = Vector3::ZERO, const Quaternion&in = Quaternion::IDENTITY)", AS_METHODPR(T, SetCylinder, (float, float, const Vector3&, const Quaternion&), void), AS_CALL_THISCALL);
 
-    // void CollisionShape::SetGImpactMesh(Model* model, unsigned lodLevel = 0, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY)
-    engine->RegisterObjectMethod(className, "void SetGImpactMesh(Model@+, uint = 0, const Vector3&in = Vector3::ONE, const Vector3&in = Vector3::ZERO, const Quaternion&in = Quaternion::IDENTITY)", AS_METHODPR(T, SetGImpactMesh, (Model*, unsigned, const Vector3&, const Vector3&, const Quaternion&), void), AS_CALL_THISCALL);
+    // void CollisionShape::SetGImpactMesh(Model* model, i32 lodLevel = 0, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY)
+    engine->RegisterObjectMethod(className, "void SetGImpactMesh(Model@+, int = 0, const Vector3&in = Vector3::ONE, const Vector3&in = Vector3::ZERO, const Quaternion&in = Quaternion::IDENTITY)", AS_METHODPR(T, SetGImpactMesh, (Model*, i32, const Vector3&, const Vector3&, const Quaternion&), void), AS_CALL_THISCALL);
 
-    // void CollisionShape::SetLodLevel(unsigned lodLevel)
-    engine->RegisterObjectMethod(className, "void SetLodLevel(uint)", AS_METHODPR(T, SetLodLevel, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_lodLevel(uint)", AS_METHODPR(T, SetLodLevel, (unsigned), void), AS_CALL_THISCALL);
+    // void CollisionShape::SetLodLevel(i32 lodLevel)
+    engine->RegisterObjectMethod(className, "void SetLodLevel(int)", AS_METHODPR(T, SetLodLevel, (i32), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_lodLevel(int)", AS_METHODPR(T, SetLodLevel, (i32), void), AS_CALL_THISCALL);
 
     // void CollisionShape::SetMargin(float margin)
     engine->RegisterObjectMethod(className, "void SetMargin(float)", AS_METHODPR(T, SetMargin, (float), void), AS_CALL_THISCALL);
@@ -20326,14 +20326,14 @@ template <class T> void RegisterMembers_CollisionShape(asIScriptEngine* engine, 
     // void CollisionShape::SetStaticPlane(const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY)
     engine->RegisterObjectMethod(className, "void SetStaticPlane(const Vector3&in = Vector3::ZERO, const Quaternion&in = Quaternion::IDENTITY)", AS_METHODPR(T, SetStaticPlane, (const Vector3&, const Quaternion&), void), AS_CALL_THISCALL);
 
-    // void CollisionShape::SetTerrain(unsigned lodLevel = 0)
-    engine->RegisterObjectMethod(className, "void SetTerrain(uint = 0)", AS_METHODPR(T, SetTerrain, (unsigned), void), AS_CALL_THISCALL);
+    // void CollisionShape::SetTerrain(i32 lodLevel = 0)
+    engine->RegisterObjectMethod(className, "void SetTerrain(int = 0)", AS_METHODPR(T, SetTerrain, (i32), void), AS_CALL_THISCALL);
 
     // void CollisionShape::SetTransform(const Vector3& position, const Quaternion& rotation)
     engine->RegisterObjectMethod(className, "void SetTransform(const Vector3&in, const Quaternion&in)", AS_METHODPR(T, SetTransform, (const Vector3&, const Quaternion&), void), AS_CALL_THISCALL);
 
-    // void CollisionShape::SetTriangleMesh(Model* model, unsigned lodLevel = 0, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY)
-    engine->RegisterObjectMethod(className, "void SetTriangleMesh(Model@+, uint = 0, const Vector3&in = Vector3::ONE, const Vector3&in = Vector3::ZERO, const Quaternion&in = Quaternion::IDENTITY)", AS_METHODPR(T, SetTriangleMesh, (Model*, unsigned, const Vector3&, const Vector3&, const Quaternion&), void), AS_CALL_THISCALL);
+    // void CollisionShape::SetTriangleMesh(Model* model, i32 lodLevel = 0, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY)
+    engine->RegisterObjectMethod(className, "void SetTriangleMesh(Model@+, int = 0, const Vector3&in = Vector3::ONE, const Vector3&in = Vector3::ZERO, const Quaternion&in = Quaternion::IDENTITY)", AS_METHODPR(T, SetTriangleMesh, (Model*, i32, const Vector3&, const Vector3&, const Quaternion&), void), AS_CALL_THISCALL);
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_CollisionShape
         REGISTER_MEMBERS_MANUAL_PART_CollisionShape();
