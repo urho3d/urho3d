@@ -155,7 +155,7 @@ unsigned VertexBuffer::GetVertexSize(const Vector<VertexElement>& elements)
 {
     unsigned size = 0;
 
-    for (unsigned i = 0; i < elements.Size(); ++i)
+    for (i32 i = 0; i < elements.Size(); ++i)
         size += ELEMENT_TYPESIZES[elements[i].type_];
 
     return size;

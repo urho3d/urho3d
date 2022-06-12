@@ -183,7 +183,7 @@ private:
     /// Vertex elements.
     Vector<VertexElement> elements_;
     /// Vertex element hash.
-    unsigned long long elementHash_{};
+    u64 elementHash_{};
     /// Vertex element legacy bitmask.
     VertexMaskFlags elementMask_{};
     /// Buffer locking state.
