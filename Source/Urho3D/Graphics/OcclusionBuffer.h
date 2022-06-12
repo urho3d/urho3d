@@ -136,7 +136,7 @@ public:
     unsigned GetUseTimer();
 
     /// Draw a batch. Called internally.
-    void DrawBatch(const OcclusionBatch& batch, unsigned threadIndex);
+    void DrawBatch(const OcclusionBatch& batch, i32 threadIndex);
 
 private:
     /// Apply modelview transform to vertex.
@@ -150,13 +150,13 @@ private:
     /// Calculate viewport transform.
     void CalculateViewport();
     /// Draw a triangle.
-    void DrawTriangle(Vector4* vertices, unsigned threadIndex);
+    void DrawTriangle(Vector4* vertices, i32 threadIndex);
     /// Clip vertices against a plane.
     void ClipVertices(const Vector4& plane, Vector4* vertices, bool* triangles, unsigned& numTriangles);
     /// Draw a clipped triangle.
-    void DrawTriangle2D(const Vector3* vertices, bool clockwise, unsigned threadIndex);
+    void DrawTriangle2D(const Vector3* vertices, bool clockwise, i32 threadIndex);
     /// Clear a thread work buffer.
-    void ClearBuffer(unsigned threadIndex);
+    void ClearBuffer(i32 threadIndex);
     /// Merge thread work buffers into the first buffer.
     void MergeBuffers();
 

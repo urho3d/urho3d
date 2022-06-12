@@ -215,7 +215,7 @@ private:
     /// Draw occluders to occlusion buffer.
     void DrawOccluders(OcclusionBuffer* buffer, const Vector<Drawable*>& occluders);
     /// Query for lit geometries and shadow casters for a light.
-    void ProcessLight(LightQueryResult& query, unsigned threadIndex);
+    void ProcessLight(LightQueryResult& query, i32 threadIndex);
     /// Process shadow casters' visibilities and build their combined view- or projection-space bounding box.
     void ProcessShadowCasters(LightQueryResult& query, const Vector<Drawable*>& drawables, unsigned splitIndex);
     /// Set up initial shadow camera view(s).

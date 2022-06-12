@@ -2270,8 +2270,9 @@ void View::DrawOccluders(OcclusionBuffer* buffer, const Vector<Drawable*>& occlu
     buffer->BuildDepthHierarchy();
 }
 
-void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
+void View::ProcessLight(LightQueryResult& query, i32 threadIndex)
 {
+    assert(threadIndex >= 0);
     Light* light = query.light_;
     LightType type = light->GetLightType();
     unsigned lightMask = light->GetLightMask();
