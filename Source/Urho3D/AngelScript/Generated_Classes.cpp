@@ -3185,8 +3185,8 @@ static void Register_VertexBufferMorph(asIScriptEngine* engine)
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<VertexBufferMorph>(engine, "VertexBufferMorph");
 }
 
-// VertexElement::VertexElement(VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0, bool perInstance = false) noexcept
-static void VertexElement__VertexElement_VertexElementType_VertexElementSemantic_unsignedspchar_bool(VertexElement* _ptr, VertexElementType type, VertexElementSemantic semantic, unsigned char index, bool perInstance)
+// VertexElement::VertexElement(VertexElementType type, VertexElementSemantic semantic, i8 index = 0, bool perInstance = false) noexcept
+static void VertexElement__VertexElement_VertexElementType_VertexElementSemantic_i8_bool(VertexElement* _ptr, VertexElementType type, VertexElementSemantic semantic, i8 index, bool perInstance)
 {
     new(_ptr) VertexElement(type, semantic, index, perInstance);
 }
@@ -3194,8 +3194,8 @@ static void VertexElement__VertexElement_VertexElementType_VertexElementSemantic
 // struct VertexElement | File: ../GraphicsAPI/GraphicsDefs.h
 static void Register_VertexElement(asIScriptEngine* engine)
 {
-    // VertexElement::VertexElement(VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0, bool perInstance = false) noexcept
-    engine->RegisterObjectBehaviour("VertexElement", asBEHAVE_CONSTRUCT, "void f(VertexElementType, VertexElementSemantic, uint8 = 0, bool = false)", AS_FUNCTION_OBJFIRST(VertexElement__VertexElement_VertexElementType_VertexElementSemantic_unsignedspchar_bool), AS_CALL_CDECL_OBJFIRST);
+    // VertexElement::VertexElement(VertexElementType type, VertexElementSemantic semantic, i8 index = 0, bool perInstance = false) noexcept
+    engine->RegisterObjectBehaviour("VertexElement", asBEHAVE_CONSTRUCT, "void f(VertexElementType, VertexElementSemantic, int8 = 0, bool = false)", AS_FUNCTION_OBJFIRST(VertexElement__VertexElement_VertexElementType_VertexElementSemantic_i8_bool), AS_CALL_CDECL_OBJFIRST);
 
     // VertexElement::~VertexElement() | Implicitly-declared
     engine->RegisterObjectBehaviour("VertexElement", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(VertexElement), AS_CALL_CDECL_OBJFIRST);

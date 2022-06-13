@@ -6543,8 +6543,8 @@ template <class T> void RegisterMembers_VertexElement(asIScriptEngine* engine, c
     // VertexElementSemantic VertexElement::semantic_
     engine->RegisterObjectProperty(className, "VertexElementSemantic semantic", offsetof(T, semantic_));
 
-    // unsigned char VertexElement::index_
-    engine->RegisterObjectProperty(className, "uint8 index", offsetof(T, index_));
+    // i8 VertexElement::index_
+    engine->RegisterObjectProperty(className, "int8 index", offsetof(T, index_));
 
     // bool VertexElement::perInstance_
     engine->RegisterObjectProperty(className, "bool perInstance", offsetof(T, perInstance_));
@@ -12401,19 +12401,19 @@ template <class T> bool VertexBuffer_bool_SetSize_unsigned_constspVectorlesVerte
     return result;
 }
 
-// static bool VertexBuffer::HasElement(const Vector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0)
-template <class T> bool VertexBuffer_bool_HasElement_constspVectorlesVertexElementgreamp_VertexElementType_VertexElementSemantic_unsignedspchar(CScriptArray* elements_conv, VertexElementType type, VertexElementSemantic semantic, unsigned char index)
+// static bool VertexBuffer::HasElement(const Vector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, i8 index = 0)
+template <class T> bool VertexBuffer_bool_HasElement_constspVectorlesVertexElementgreamp_VertexElementType_VertexElementSemantic_i8(CScriptArray* elements_conv, VertexElementType type, VertexElementSemantic semantic, i8 index)
 {
     Vector<VertexElement> elements = ArrayToVector<VertexElement>(elements_conv);
     bool result = T::HasElement(elements, type, semantic, index);
     return result;
 }
 
-// static unsigned VertexBuffer::GetElementOffset(const Vector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0)
-template <class T> unsigned VertexBuffer_unsigned_GetElementOffset_constspVectorlesVertexElementgreamp_VertexElementType_VertexElementSemantic_unsignedspchar(CScriptArray* elements_conv, VertexElementType type, VertexElementSemantic semantic, unsigned char index)
+// static i32 VertexBuffer::GetElementOffset(const Vector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, i8 index = 0)
+template <class T> i32 VertexBuffer_i32_GetElementOffset_constspVectorlesVertexElementgreamp_VertexElementType_VertexElementSemantic_i8(CScriptArray* elements_conv, VertexElementType type, VertexElementSemantic semantic, i8 index)
 {
     Vector<VertexElement> elements = ArrayToVector<VertexElement>(elements_conv);
-    unsigned result = T::GetElementOffset(elements, type, semantic, index);
+    i32 result = T::GetElementOffset(elements, type, semantic, index);
     return result;
 }
 
@@ -12438,14 +12438,14 @@ template <class T> void RegisterMembers_VertexBuffer(asIScriptEngine* engine, co
     RegisterMembers_Object<T>(engine, className);
     RegisterMembers_GPUObject<T>(engine, className);
 
-    // const VertexElement* VertexBuffer::GetElement(VertexElementSemantic semantic, unsigned char index = 0) const
+    // const VertexElement* VertexBuffer::GetElement(VertexElementSemantic semantic, i8 index = 0) const
     // Error: type "const VertexElement*" can not automatically bind
-    // const VertexElement* VertexBuffer::GetElement(VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0) const
+    // const VertexElement* VertexBuffer::GetElement(VertexElementType type, VertexElementSemantic semantic, i8 index = 0) const
     // Error: type "const VertexElement*" can not automatically bind
-    // unsigned char* VertexBuffer::GetShadowData() const
-    // Error: type "unsigned char*" can not automatically bind
-    // SharedArrayPtr<unsigned char> VertexBuffer::GetShadowDataShared() const
-    // Error: type "SharedArrayPtr<unsigned char>" can not automatically bind
+    // u8* VertexBuffer::GetShadowData() const
+    // Error: type "u8*" can not automatically bind
+    // SharedArrayPtr<u8> VertexBuffer::GetShadowDataShared() const
+    // Error: type "SharedArrayPtr<u8>" can not automatically bind
     // void* VertexBuffer::Lock(unsigned start, unsigned count, bool discard = false)
     // Error: type "void*" can not automatically bind
     // bool VertexBuffer::SetData(const void* data)
@@ -12460,11 +12460,11 @@ template <class T> void RegisterMembers_VertexBuffer(asIScriptEngine* engine, co
     engine->RegisterObjectMethod(className, "VertexMaskFlags GetElementMask() const", AS_METHODPR(T, GetElementMask, () const, VertexMaskFlags), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "VertexMaskFlags get_elementMask() const", AS_METHODPR(T, GetElementMask, () const, VertexMaskFlags), AS_CALL_THISCALL);
 
-    // unsigned VertexBuffer::GetElementOffset(VertexElementSemantic semantic, unsigned char index = 0) const
-    engine->RegisterObjectMethod(className, "uint GetElementOffset(VertexElementSemantic, uint8 = 0) const", AS_METHODPR(T, GetElementOffset, (VertexElementSemantic, unsigned char) const, unsigned), AS_CALL_THISCALL);
+    // i32 VertexBuffer::GetElementOffset(VertexElementSemantic semantic, i8 index = 0) const
+    engine->RegisterObjectMethod(className, "int GetElementOffset(VertexElementSemantic, int8 = 0) const", AS_METHODPR(T, GetElementOffset, (VertexElementSemantic, i8) const, i32), AS_CALL_THISCALL);
 
-    // unsigned VertexBuffer::GetElementOffset(VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0) const
-    engine->RegisterObjectMethod(className, "uint GetElementOffset(VertexElementType, VertexElementSemantic, uint8 = 0) const", AS_METHODPR(T, GetElementOffset, (VertexElementType, VertexElementSemantic, unsigned char) const, unsigned), AS_CALL_THISCALL);
+    // i32 VertexBuffer::GetElementOffset(VertexElementType type, VertexElementSemantic semantic, i8 index = 0) const
+    engine->RegisterObjectMethod(className, "int GetElementOffset(VertexElementType, VertexElementSemantic, int8 = 0) const", AS_METHODPR(T, GetElementOffset, (VertexElementType, VertexElementSemantic, i8) const, i32), AS_CALL_THISCALL);
 
     // const Vector<VertexElement>& VertexBuffer::GetElements() const
     engine->RegisterObjectMethod(className, "Array<VertexElement>@ GetElements() const", AS_FUNCTION_OBJFIRST(VertexBuffer_constspVectorlesVertexElementgreamp_GetElements_void_template<VertexBuffer>), AS_CALL_CDECL_OBJFIRST);
@@ -12478,11 +12478,11 @@ template <class T> void RegisterMembers_VertexBuffer(asIScriptEngine* engine, co
     engine->RegisterObjectMethod(className, "uint GetVertexSize() const", AS_METHODPR(T, GetVertexSize, () const, unsigned), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_vertexSize() const", AS_METHODPR(T, GetVertexSize, () const, unsigned), AS_CALL_THISCALL);
 
-    // bool VertexBuffer::HasElement(VertexElementSemantic semantic, unsigned char index = 0) const
-    engine->RegisterObjectMethod(className, "bool HasElement(VertexElementSemantic, uint8 = 0) const", AS_METHODPR(T, HasElement, (VertexElementSemantic, unsigned char) const, bool), AS_CALL_THISCALL);
+    // bool VertexBuffer::HasElement(VertexElementSemantic semantic, i8 index = 0) const
+    engine->RegisterObjectMethod(className, "bool HasElement(VertexElementSemantic, int8 = 0) const", AS_METHODPR(T, HasElement, (VertexElementSemantic, i8) const, bool), AS_CALL_THISCALL);
 
-    // bool VertexBuffer::HasElement(VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0) const
-    engine->RegisterObjectMethod(className, "bool HasElement(VertexElementType, VertexElementSemantic, uint8 = 0) const", AS_METHODPR(T, HasElement, (VertexElementType, VertexElementSemantic, unsigned char) const, bool), AS_CALL_THISCALL);
+    // bool VertexBuffer::HasElement(VertexElementType type, VertexElementSemantic semantic, i8 index = 0) const
+    engine->RegisterObjectMethod(className, "bool HasElement(VertexElementType, VertexElementSemantic, int8 = 0) const", AS_METHODPR(T, HasElement, (VertexElementType, VertexElementSemantic, i8) const, bool), AS_CALL_THISCALL);
 
     // bool VertexBuffer::IsDynamic() const
     engine->RegisterObjectMethod(className, "bool IsDynamic() const", AS_METHODPR(T, IsDynamic, () const, bool), AS_CALL_THISCALL);
@@ -12508,16 +12508,16 @@ template <class T> void RegisterMembers_VertexBuffer(asIScriptEngine* engine, co
     // void VertexBuffer::Unlock()
     engine->RegisterObjectMethod(className, "void Unlock()", AS_METHODPR(T, Unlock, (), void), AS_CALL_THISCALL);
 
-    // static const VertexElement* VertexBuffer::GetElement(const Vector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0)
+    // static const VertexElement* VertexBuffer::GetElement(const Vector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, i8 index = 0)
     // Error: type "const VertexElement*" can not automatically bind
     // static void VertexBuffer::UpdateOffsets(Vector<VertexElement>& elements)
     // Error: type "Vector<VertexElement>&" can not automatically bind
 
-    // static bool VertexBuffer::HasElement(const Vector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0)
-    engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("bool HasElement(Array<VertexElement>@+, VertexElementType, VertexElementSemantic, uint8 = 0)", AS_FUNCTION(VertexBuffer_bool_HasElement_constspVectorlesVertexElementgreamp_VertexElementType_VertexElementSemantic_unsignedspchar<VertexBuffer>), AS_CALL_CDECL);engine->SetDefaultNamespace("");
+    // static bool VertexBuffer::HasElement(const Vector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, i8 index = 0)
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("bool HasElement(Array<VertexElement>@+, VertexElementType, VertexElementSemantic, int8 = 0)", AS_FUNCTION(VertexBuffer_bool_HasElement_constspVectorlesVertexElementgreamp_VertexElementType_VertexElementSemantic_i8<VertexBuffer>), AS_CALL_CDECL);engine->SetDefaultNamespace("");
 
-    // static unsigned VertexBuffer::GetElementOffset(const Vector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0)
-    engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("uint GetElementOffset(Array<VertexElement>@+, VertexElementType, VertexElementSemantic, uint8 = 0)", AS_FUNCTION(VertexBuffer_unsigned_GetElementOffset_constspVectorlesVertexElementgreamp_VertexElementType_VertexElementSemantic_unsignedspchar<VertexBuffer>), AS_CALL_CDECL);engine->SetDefaultNamespace("");
+    // static i32 VertexBuffer::GetElementOffset(const Vector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, i8 index = 0)
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("int GetElementOffset(Array<VertexElement>@+, VertexElementType, VertexElementSemantic, int8 = 0)", AS_FUNCTION(VertexBuffer_i32_GetElementOffset_constspVectorlesVertexElementgreamp_VertexElementType_VertexElementSemantic_i8<VertexBuffer>), AS_CALL_CDECL);engine->SetDefaultNamespace("");
 
     // static Vector<VertexElement> VertexBuffer::GetElements(unsigned elementMask)
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("Array<VertexElement>@ GetElements(uint)", AS_FUNCTION(VertexBuffer_VectorlesVertexElementgre_GetElements_unsigned<VertexBuffer>), AS_CALL_CDECL);engine->SetDefaultNamespace("");

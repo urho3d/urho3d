@@ -39,7 +39,7 @@ void VertexBuffer::SetShadowed(bool enable)
     if (enable != shadowed_)
     {
         if (enable && vertexSize_ && vertexCount_)
-            shadowData_ = new unsigned char[vertexCount_ * vertexSize_];
+            shadowData_ = new u8[vertexCount_ * vertexSize_];
         else
             shadowData_.Reset();
 
@@ -63,7 +63,7 @@ bool VertexBuffer::SetSize(unsigned vertexCount, const Vector<VertexElement>& el
     UpdateOffsets();
 
     if (shadowed_ && vertexCount_ && vertexSize_)
-        shadowData_ = new unsigned char[vertexCount_ * vertexSize_];
+        shadowData_ = new u8[vertexCount_ * vertexSize_];
     else
         shadowData_.Reset();
 
@@ -94,48 +94,56 @@ void VertexBuffer::UpdateOffsets()
     vertexSize_ = elementOffset;
 }
 
-const VertexElement* VertexBuffer::GetElement(VertexElementSemantic semantic, unsigned char index) const
+const VertexElement* VertexBuffer::GetElement(VertexElementSemantic semantic, i8 index/* = 0*/) const
 {
-    for (Vector<VertexElement>::ConstIterator i = elements_.Begin(); i != elements_.End(); ++i)
+    assert(index >= 0);
+
+    for (const VertexElement& element : elements_)
     {
-        if (i->semantic_ == semantic && i->index_ == index)
-            return &(*i);
+        if (element.semantic_ == semantic && element.index_ == index)
+            return &element;
     }
 
     return nullptr;
 }
 
-const VertexElement* VertexBuffer::GetElement(VertexElementType type, VertexElementSemantic semantic, unsigned char index) const
+const VertexElement* VertexBuffer::GetElement(VertexElementType type, VertexElementSemantic semantic, i8 index/* = 0*/) const
 {
-    for (Vector<VertexElement>::ConstIterator i = elements_.Begin(); i != elements_.End(); ++i)
+    assert(index >= 0);
+
+    for (const VertexElement& element : elements_)
     {
-        if (i->type_ == type && i->semantic_ == semantic && i->index_ == index)
-            return &(*i);
+        if (element.type_ == type && element.semantic_ == semantic && element.index_ == index)
+            return &element;
     }
 
     return nullptr;
 }
 
-const VertexElement* VertexBuffer::GetElement(const Vector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index)
+const VertexElement* VertexBuffer::GetElement(const Vector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, i8 index/* = 0*/)
 {
-    for (Vector<VertexElement>::ConstIterator i = elements.Begin(); i != elements.End(); ++i)
+    assert(index >= 0);
+
+    for (const VertexElement& element : elements)
     {
-        if (i->type_ == type && i->semantic_ == semantic && i->index_ == index)
-            return &(*i);
+        if (element.type_ == type && element.semantic_ == semantic && element.index_ == index)
+            return &element;
     }
 
     return nullptr;
 }
 
-bool VertexBuffer::HasElement(const Vector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index)
+bool VertexBuffer::HasElement(const Vector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, i8 index/* = 0*/)
 {
+    assert(index >= 0);
     return GetElement(elements, type, semantic, index) != nullptr;
 }
 
-unsigned VertexBuffer::GetElementOffset(const Vector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index)
+i32 VertexBuffer::GetElementOffset(const Vector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, i8 index/* = 0*/)
 {
+    assert(index >= 0);
     const VertexElement* element = GetElement(elements, type, semantic, index);
-    return element ? element->offset_ : M_MAX_UNSIGNED;
+    return element ? element->offset_ : NINDEX;
 }
 
 Vector<VertexElement> VertexBuffer::GetElements(unsigned elementMask)

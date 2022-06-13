@@ -93,7 +93,13 @@ template <> inline unsigned MakeHash(const c32& value)
 }
 
 /// Unsigned char hash function.
-template <> inline unsigned MakeHash(const unsigned char& value)
+template <> inline unsigned MakeHash(const u8& value)
+{
+    return value;
+}
+
+/// Signed char hash function.
+template <> inline unsigned MakeHash(const i8& value)
 {
     return value;
 }

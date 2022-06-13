@@ -144,7 +144,7 @@ bool ShaderProgram_OGL::Link()
 
         String name = String(nameBuffer, nameLength);
         VertexElementSemantic semantic = MAX_VERTEX_ELEMENT_SEMANTICS;
-        unsigned char semanticIndex = 0;
+        i8 semanticIndex = 0;
 
         // Go in reverse order so that "binormal" is detected before "normal"
         for (i32 j = MAX_VERTEX_ELEMENT_SEMANTICS - 1; j >= 0; --j)
@@ -154,7 +154,7 @@ bool ShaderProgram_OGL::Link()
                 semantic = (VertexElementSemantic)j;
                 unsigned index = NumberPostfix(name);
                 if (index != M_MAX_UNSIGNED)
-                    semanticIndex = (unsigned char)index;
+                    semanticIndex = (i8)index;
                 break;
             }
         }
@@ -167,7 +167,7 @@ bool ShaderProgram_OGL::Link()
         }
 
         int location = glGetAttribLocation(object_.name_, name.CString());
-        vertexAttributes_[MakePair((unsigned char)semantic, semanticIndex)] = location;
+        vertexAttributes_[{(i8)semantic, semanticIndex}] = location;
         usedVertexAttributes_ |= (1u << location);
     }
 

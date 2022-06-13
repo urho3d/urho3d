@@ -69,44 +69,62 @@ public:
     const Vector<VertexElement>& GetElements() const { return elements_; }
 
     /// Return vertex element, or null if does not exist.
-    const VertexElement* GetElement(VertexElementSemantic semantic, unsigned char index = 0) const;
+    const VertexElement* GetElement(VertexElementSemantic semantic, i8 index = 0) const;
 
     /// Return vertex element with specific type, or null if does not exist.
-    const VertexElement* GetElement(VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0) const;
+    const VertexElement* GetElement(VertexElementType type, VertexElementSemantic semantic, i8 index = 0) const;
 
     /// Return whether has a specified element semantic.
-    bool HasElement(VertexElementSemantic semantic, unsigned char index = 0) const { return GetElement(semantic, index) != nullptr; }
+    bool HasElement(VertexElementSemantic semantic, i8 index = 0) const
+    {
+        assert(index >= 0);
+        return GetElement(semantic, index) != nullptr;
+    }
 
     /// Return whether has an element semantic with specific type.
-    bool HasElement(VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0) const { return GetElement(type, semantic, index) != nullptr; }
+    bool HasElement(VertexElementType type, VertexElementSemantic semantic, i8 index = 0) const
+    {
+        assert(index >= 0);
+        return GetElement(type, semantic, index) != nullptr;
+    }
 
-    /// Return offset of a element within vertex, or M_MAX_UNSIGNED if does not exist.
-    unsigned GetElementOffset(VertexElementSemantic semantic, unsigned char index = 0) const { const VertexElement* element = GetElement(semantic, index); return element ? element->offset_ : M_MAX_UNSIGNED; }
+    /// Return offset of a element within vertex, or NINDEX if does not exist.
+    i32 GetElementOffset(VertexElementSemantic semantic, i8 index = 0) const
+    {
+        assert(index >= 0);
+        const VertexElement* element = GetElement(semantic, index);
+        return element ? element->offset_ : NINDEX;
+    }
 
-    /// Return offset of a element with specific type within vertex, or M_MAX_UNSIGNED if element does not exist.
-    unsigned GetElementOffset(VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0) const { const VertexElement* element = GetElement(type, semantic, index); return element ? element->offset_ : M_MAX_UNSIGNED; }
+    /// Return offset of a element with specific type within vertex, or NINDEX if element does not exist.
+    i32 GetElementOffset(VertexElementType type, VertexElementSemantic semantic, i8 index = 0) const
+    {
+        assert(index >= 0);
+        const VertexElement* element = GetElement(type, semantic, index);
+        return element ? element->offset_ : NINDEX;
+    }
 
     /// Return legacy vertex element mask. Note that both semantic and type must match the legacy element for a mask bit to be set.
     /// @property
     VertexMaskFlags GetElementMask() const { return elementMask_; }
 
     /// Return CPU memory shadow data.
-    unsigned char* GetShadowData() const { return shadowData_.Get(); }
+    u8* GetShadowData() const { return shadowData_.Get(); }
 
     /// Return shared array pointer to the CPU memory shadow data.
-    SharedArrayPtr<unsigned char> GetShadowDataShared() const { return shadowData_; }
+    SharedArrayPtr<u8> GetShadowDataShared() const { return shadowData_; }
 
     /// Return buffer hash for building vertex declarations. Used internally.
     unsigned long long GetBufferHash(unsigned streamIndex) { return elementHash_ << (streamIndex * 16); }
 
     /// Return element with specified type and semantic from a vertex element list, or null if does not exist.
-    static const VertexElement* GetElement(const Vector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0);
+    static const VertexElement* GetElement(const Vector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, i8 index = 0);
 
     /// Return whether element list has a specified element type and semantic.
-    static bool HasElement(const Vector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0);
+    static bool HasElement(const Vector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, i8 index = 0);
 
-    /// Return element offset for specified type and semantic from a vertex element list, or M_MAX_UNSIGNED if does not exist.
-    static unsigned GetElementOffset(const Vector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0);
+    /// Return element offset for specified type and semantic from a vertex element list, or NINDEX if does not exist.
+    static i32 GetElementOffset(const Vector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, i8 index = 0);
 
     /// Return a vertex element list from a legacy element bitmask.
     static Vector<VertexElement> GetElements(unsigned elementMask);
@@ -175,7 +193,7 @@ private:
 #endif // def URHO3D_D3D11
 
     /// Shadow data.
-    SharedArrayPtr<unsigned char> shadowData_;
+    SharedArrayPtr<u8> shadowData_;
     /// Number of vertices.
     unsigned vertexCount_{};
     /// Vertex size.

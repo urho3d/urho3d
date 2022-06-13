@@ -183,7 +183,7 @@ struct URHO3D_API VertexElement
     }
 
     /// Construct with type, semantic, index and whether is per-instance data.
-    VertexElement(VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0, bool perInstance = false) noexcept :
+    VertexElement(VertexElementType type, VertexElementSemantic semantic, i8 index = 0, bool perInstance = false) noexcept :
         type_(type),
         semantic_(semantic),
         index_(index),
@@ -193,7 +193,10 @@ struct URHO3D_API VertexElement
     }
 
     /// Test for equality with another vertex element. Offset is intentionally not compared, as it's relevant only when an element exists within a vertex buffer.
-    bool operator ==(const VertexElement& rhs) const { return type_ == rhs.type_ && semantic_ == rhs.semantic_ && index_ == rhs.index_ && perInstance_ == rhs.perInstance_; }
+    bool operator ==(const VertexElement& rhs) const
+    {
+        return type_ == rhs.type_ && semantic_ == rhs.semantic_ && index_ == rhs.index_ && perInstance_ == rhs.perInstance_;
+    }
 
     /// Test for inequality with another vertex element.
     bool operator !=(const VertexElement& rhs) const { return !(*this == rhs); }
@@ -203,7 +206,7 @@ struct URHO3D_API VertexElement
     /// Semantic of element.
     VertexElementSemantic semantic_;
     /// Semantic index of element, for example multi-texcoords.
-    unsigned char index_;
+    i8 index_;
     /// Per-instance flag.
     bool perInstance_;
     /// Offset of element from vertex start. Filled by VertexBuffer once the vertex declaration is built.
