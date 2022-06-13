@@ -167,8 +167,9 @@ public:
 
     /// Return geometry center by index.
     /// @property{get_geometryCenters}
-    const Vector3& GetGeometryCenter(unsigned index) const
+    const Vector3& GetGeometryCenter(i32 index) const
     {
+        assert(index >= 0);
         return index < geometryCenters_.Size() ? geometryCenters_[index] : Vector3::ZERO;
     }
 

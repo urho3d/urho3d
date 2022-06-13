@@ -15296,9 +15296,9 @@ template <class T> void RegisterMembers_Model(asIScriptEngine* engine, const cha
     // Geometry* Model::GetGeometry(unsigned index, unsigned lodLevel) const
     engine->RegisterObjectMethod(className, "Geometry@+ GetGeometry(uint, uint) const", AS_METHODPR(T, GetGeometry, (unsigned, unsigned) const, Geometry*), AS_CALL_THISCALL);
 
-    // const Vector3& Model::GetGeometryCenter(unsigned index) const
-    engine->RegisterObjectMethod(className, "const Vector3& GetGeometryCenter(uint) const", AS_METHODPR(T, GetGeometryCenter, (unsigned) const, const Vector3&), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "const Vector3& get_geometryCenters(uint) const", AS_METHODPR(T, GetGeometryCenter, (unsigned) const, const Vector3&), AS_CALL_THISCALL);
+    // const Vector3& Model::GetGeometryCenter(i32 index) const
+    engine->RegisterObjectMethod(className, "const Vector3& GetGeometryCenter(int) const", AS_METHODPR(T, GetGeometryCenter, (i32) const, const Vector3&), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const Vector3& get_geometryCenters(int) const", AS_METHODPR(T, GetGeometryCenter, (i32) const, const Vector3&), AS_CALL_THISCALL);
 
     // const Vector<Vector3>& Model::GetGeometryCenters() const
     engine->RegisterObjectMethod(className, "Array<Vector3>@ GetGeometryCenters() const", AS_FUNCTION_OBJFIRST(Model_constspVectorlesVector3greamp_GetGeometryCenters_void_template<Model>), AS_CALL_CDECL_OBJFIRST);
