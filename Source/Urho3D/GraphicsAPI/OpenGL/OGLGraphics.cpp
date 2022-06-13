@@ -3106,8 +3106,8 @@ void Graphics::PrepareDraw_OGL()
             for (Vector<VertexElement>::ConstIterator j = elements.Begin(); j != elements.End(); ++j)
             {
                 const VertexElement& element = *j;
-                HashMap<Pair<unsigned char, unsigned char>, unsigned>::ConstIterator k =
-                    impl->vertexAttributes_->Find(MakePair((unsigned char)element.semantic_, element.index_));
+                HashMap<Pair<i8, i8>, unsigned>::ConstIterator k =
+                    impl->vertexAttributes_->Find(MakePair((i8)element.semantic_, element.index_));
 
                 if (k != impl->vertexAttributes_->End())
                 {
