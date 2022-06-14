@@ -174,18 +174,18 @@ VertexBuffer* Geometry::GetVertexBuffer(unsigned index) const
     return index < vertexBuffers_.Size() ? vertexBuffers_[index] : nullptr;
 }
 
-unsigned short Geometry::GetBufferHash() const
+u16 Geometry::GetBufferHash() const
 {
-    unsigned short hash = 0;
+    u16 hash = 0;
 
-    for (unsigned i = 0; i < vertexBuffers_.Size(); ++i)
+    for (i32 i = 0; i < vertexBuffers_.Size(); ++i)
     {
         VertexBuffer* vBuf = vertexBuffers_[i];
-        hash += *((unsigned short*)&vBuf);
+        hash += *((u16*)&vBuf);
     }
 
     IndexBuffer* iBuf = indexBuffer_;
-    hash += *((unsigned short*)&iBuf);
+    hash += *((u16*)&iBuf);
 
     return hash;
 }

@@ -9886,8 +9886,8 @@ template <class T> void RegisterMembers_Geometry(asIScriptEngine* engine, const 
     // void Geometry::Draw(Graphics* graphics)
     engine->RegisterObjectMethod(className, "void Draw(Graphics@+)", AS_METHODPR(T, Draw, (Graphics*), void), AS_CALL_THISCALL);
 
-    // unsigned short Geometry::GetBufferHash() const
-    engine->RegisterObjectMethod(className, "uint16 GetBufferHash() const", AS_METHODPR(T, GetBufferHash, () const, unsigned short), AS_CALL_THISCALL);
+    // u16 Geometry::GetBufferHash() const
+    engine->RegisterObjectMethod(className, "uint16 GetBufferHash() const", AS_METHODPR(T, GetBufferHash, () const, u16), AS_CALL_THISCALL);
 
     // IndexBuffer* Geometry::GetIndexBuffer() const
     engine->RegisterObjectMethod(className, "IndexBuffer@+ GetIndexBuffer() const", AS_METHODPR(T, GetIndexBuffer, () const, IndexBuffer*), AS_CALL_THISCALL);
@@ -12453,8 +12453,8 @@ template <class T> void RegisterMembers_VertexBuffer(asIScriptEngine* engine, co
     // bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count, bool discard = false)
     // Error: type "const void*" can not automatically bind
 
-    // unsigned long long VertexBuffer::GetBufferHash(unsigned streamIndex)
-    engine->RegisterObjectMethod(className, "uint64 GetBufferHash(uint)", AS_METHODPR(T, GetBufferHash, (unsigned), unsigned long long), AS_CALL_THISCALL);
+    // u64 VertexBuffer::GetBufferHash(i32 streamIndex)
+    engine->RegisterObjectMethod(className, "uint64 GetBufferHash(int)", AS_METHODPR(T, GetBufferHash, (i32), u64), AS_CALL_THISCALL);
 
     // VertexMaskFlags VertexBuffer::GetElementMask() const
     engine->RegisterObjectMethod(className, "VertexMaskFlags GetElementMask() const", AS_METHODPR(T, GetElementMask, () const, VertexMaskFlags), AS_CALL_THISCALL);

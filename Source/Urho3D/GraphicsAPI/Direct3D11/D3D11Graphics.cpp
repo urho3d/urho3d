@@ -2430,8 +2430,8 @@ void Graphics::PrepareDraw_D3D11()
             impl->firstDirtyVB_ = impl->lastDirtyVB_ = M_MAX_UNSIGNED;
         }
 
-        unsigned long long newVertexDeclarationHash = 0;
-        for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
+        u64 newVertexDeclarationHash = 0;
+        for (i32 i = 0; i < MAX_VERTEX_STREAMS; ++i)
         {
             if (vertexBuffers_[i])
                 newVertexDeclarationHash |= vertexBuffers_[i]->GetBufferHash(i);

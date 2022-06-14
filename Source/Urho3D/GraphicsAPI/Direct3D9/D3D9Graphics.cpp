@@ -961,8 +961,8 @@ bool Graphics::SetVertexBuffers_D3D9(const Vector<VertexBuffer*>& buffers, unsig
     }
 
     // Build vertex declaration hash code out of the buffers
-    unsigned long long hash = 0;
-    for (unsigned i = 0; i < buffers.Size(); ++i)
+    u64 hash = 0;
+    for (i32 i = 0; i < buffers.Size(); ++i)
     {
         if (!buffers[i])
             continue;
