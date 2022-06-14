@@ -51,10 +51,10 @@ void Skybox::UpdateBatches(const FrameInfo& frame)
     customWorldTransform.SetTranslation(node_->GetWorldPosition() + frame.camera_->GetEffectiveWorldTransform().Translation());
     HashMap<Camera*, Matrix3x4>::Iterator it = customWorldTransforms_.Insert(MakePair(frame.camera_, customWorldTransform));
 
-    for (unsigned i = 0; i < batches_.Size(); ++i)
+    for (SourceBatch& batch : batches_)
     {
-        batches_[i].worldTransform_ = &it->second_;
-        batches_[i].distance_ = 0.0f;
+        batch.worldTransform_ = &it->second_;
+        batch.distance_ = 0.0f;
     }
 }
 
