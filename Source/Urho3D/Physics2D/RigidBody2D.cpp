@@ -357,19 +357,19 @@ void RigidBody2D::CreateBody()
     body_ = physicsWorld_->GetWorld()->CreateBody(&bodyDef_);
     body_->GetUserData().pointer = (uintptr_t)this;
 
-    for (unsigned i = 0; i < collisionShapes_.Size(); ++i)
+    for (const WeakPtr<CollisionShape2D>& collisionShape : collisionShapes_)
     {
-        if (collisionShapes_[i])
-            collisionShapes_[i]->CreateFixture();
+        if (collisionShape)
+            collisionShape->CreateFixture();
     }
 
     if (!useFixtureMass_)
         body_->SetMassData(&massData_);
 
-    for (unsigned i = 0; i < constraints_.Size(); ++i)
+    for (const WeakPtr<Constraint2D>& constraint : constraints_)
     {
-        if (constraints_[i])
-            constraints_[i]->CreateJoint();
+        if (constraint)
+            constraint->CreateJoint();
     }
 }
 
@@ -383,16 +383,17 @@ void RigidBody2D::ReleaseBody()
 
     // Make a copy for iteration
     Vector<WeakPtr<Constraint2D>> constraints = constraints_;
-    for (unsigned i = 0; i < constraints.Size(); ++i)
+
+    for (const WeakPtr<Constraint2D>& constraint : constraints)
     {
-        if (constraints[i])
-            constraints[i]->ReleaseJoint();
+        if (constraint)
+            constraint->ReleaseJoint();
     }
 
-    for (unsigned i = 0; i < collisionShapes_.Size(); ++i)
+    for (const WeakPtr<CollisionShape2D>& collisionShape : collisionShapes_)
     {
-        if (collisionShapes_[i])
-            collisionShapes_[i]->ReleaseFixture();
+        if (collisionShape)
+            collisionShape->ReleaseFixture();
     }
 
     physicsWorld_->GetWorld()->DestroyBody(body_);
