@@ -115,7 +115,7 @@ public:
     SharedArrayPtr<u8> GetShadowDataShared() const { return shadowData_; }
 
     /// Return buffer hash for building vertex declarations. Used internally.
-    unsigned long long GetBufferHash(unsigned streamIndex) { return elementHash_ << (streamIndex * 16); }
+    u64 GetBufferHash(i32 streamIndex) { return elementHash_ << (streamIndex * 16); }
 
     /// Return element with specified type and semantic from a vertex element list, or null if does not exist.
     static const VertexElement* GetElement(const Vector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, i8 index = 0);
