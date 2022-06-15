@@ -29,7 +29,7 @@ void VertexBuffer::Release_D3D11()
 
     if (graphics_)
     {
-        for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
+        for (i32 i = 0; i < MAX_VERTEX_STREAMS; ++i)
         {
             if (graphics_->GetVertexBuffer(i) == this)
                 graphics_->SetVertexBuffer(nullptr);
@@ -54,7 +54,7 @@ bool VertexBuffer::SetData_D3D11(const void* data)
     }
 
     if (shadowData_ && data != shadowData_.Get())
-        memcpy(shadowData_.Get(), data, vertexCount_ * vertexSize_);
+        memcpy(shadowData_.Get(), data, (size_t)vertexCount_ * vertexSize_);
 
     if (object_.ptr_)
     {
@@ -63,7 +63,7 @@ bool VertexBuffer::SetData_D3D11(const void* data)
             void* hwData = MapBuffer_D3D11(0, vertexCount_, true);
             if (hwData)
             {
-                memcpy(hwData, data, vertexCount_ * vertexSize_);
+                memcpy(hwData, data, (size_t)vertexCount_ * vertexSize_);
                 UnmapBuffer_D3D11();
             }
             else
@@ -73,7 +73,7 @@ bool VertexBuffer::SetData_D3D11(const void* data)
         {
             D3D11_BOX destBox;
             destBox.left = 0;
-            destBox.right = vertexCount_ * vertexSize_;
+            destBox.right = (UINT)vertexCount_ * vertexSize_;
             destBox.top = 0;
             destBox.bottom = 1;
             destBox.front = 0;
@@ -86,8 +86,10 @@ bool VertexBuffer::SetData_D3D11(const void* data)
     return true;
 }
 
-bool VertexBuffer::SetDataRange_D3D11(const void* data, unsigned start, unsigned count, bool discard)
+bool VertexBuffer::SetDataRange_D3D11(const void* data, i32 start, i32 count, bool discard)
 {
+    assert(start >= 0 && count >= 0);
+
     if (start == 0 && count == vertexCount_)
         return SetData_D3D11(data);
 
@@ -112,8 +114,9 @@ bool VertexBuffer::SetDataRange_D3D11(const void* data, unsigned start, unsigned
     if (!count)
         return true;
 
-    if (shadowData_ && shadowData_.Get() + start * vertexSize_ != data)
-        memcpy(shadowData_.Get() + start * vertexSize_, data, count * vertexSize_);
+    u8* dst = shadowData_.Get() + (intptr_t)start * vertexSize_;
+    if (shadowData_ && dst != data)
+        memcpy(dst, data, (size_t)count * vertexSize_);
 
     if (object_.ptr_)
     {
@@ -122,7 +125,7 @@ bool VertexBuffer::SetDataRange_D3D11(const void* data, unsigned start, unsigned
             void* hwData = MapBuffer_D3D11(start, count, discard);
             if (hwData)
             {
-                memcpy(hwData, data, count * vertexSize_);
+                memcpy(hwData, data, (size_t)count * vertexSize_);
                 UnmapBuffer_D3D11();
             }
             else
@@ -131,8 +134,8 @@ bool VertexBuffer::SetDataRange_D3D11(const void* data, unsigned start, unsigned
         else
         {
             D3D11_BOX destBox;
-            destBox.left = start * vertexSize_;
-            destBox.right = destBox.left + count * vertexSize_;
+            destBox.left = (UINT)start * vertexSize_;
+            destBox.right = destBox.left + (UINT)count * vertexSize_;
             destBox.top = 0;
             destBox.bottom = 1;
             destBox.front = 0;
@@ -145,8 +148,10 @@ bool VertexBuffer::SetDataRange_D3D11(const void* data, unsigned start, unsigned
     return true;
 }
 
-void* VertexBuffer::Lock_D3D11(unsigned start, unsigned count, bool discard)
+void* VertexBuffer::Lock_D3D11(i32 start, i32 count, bool discard)
 {
+    assert(start >= 0 && count >= 0);
+
     if (lockState_ != LOCK_NONE)
     {
         URHO3D_LOGERROR("Vertex buffer already locked");
@@ -177,7 +182,7 @@ void* VertexBuffer::Lock_D3D11(unsigned start, unsigned count, bool discard)
     else if (shadowData_)
     {
         lockState_ = LOCK_SHADOW;
-        return shadowData_.Get() + start * vertexSize_;
+        return shadowData_.Get() + (intptr_t)start * vertexSize_;
     }
     else if (graphics_)
     {
@@ -198,7 +203,7 @@ void VertexBuffer::Unlock_D3D11()
         break;
 
     case LOCK_SHADOW:
-        SetDataRange_D3D11(shadowData_.Get() + lockStart_ * vertexSize_, lockStart_, lockCount_);
+        SetDataRange_D3D11(shadowData_.Get() + (intptr_t)lockStart_ * vertexSize_, lockStart_, lockCount_);
         lockState_ = LOCK_NONE;
         break;
 
@@ -228,7 +233,7 @@ bool VertexBuffer::Create_D3D11()
         bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
         bufferDesc.CPUAccessFlags = dynamic_ ? D3D11_CPU_ACCESS_WRITE : 0;
         bufferDesc.Usage = dynamic_ ? D3D11_USAGE_DYNAMIC : D3D11_USAGE_DEFAULT;
-        bufferDesc.ByteWidth = (UINT)(vertexCount_ * vertexSize_);
+        bufferDesc.ByteWidth = (UINT)vertexCount_ * vertexSize_;
 
         HRESULT hr = graphics_->GetImpl_D3D11()->GetDevice()->CreateBuffer(&bufferDesc, nullptr, (ID3D11Buffer**)&object_.ptr_);
         if (FAILED(hr))
@@ -250,8 +255,9 @@ bool VertexBuffer::UpdateToGPU_D3D11()
         return false;
 }
 
-void* VertexBuffer::MapBuffer_D3D11(unsigned start, unsigned count, bool discard)
+void* VertexBuffer::MapBuffer_D3D11(i32 start, i32 count, bool discard)
 {
+    assert(start >= 0 && count >= 0);
     void* hwData = nullptr;
 
     if (object_.ptr_)

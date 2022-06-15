@@ -214,7 +214,7 @@ struct URHO3D_API VertexElement
 };
 
 /// Sizes of vertex element types.
-extern URHO3D_API const u32 ELEMENT_TYPESIZES[];
+extern URHO3D_API const i32 ELEMENT_TYPESIZES[];
 
 /// Vertex element definitions for the legacy elements.
 extern URHO3D_API const VertexElement LEGACY_VERTEXELEMENTS[];

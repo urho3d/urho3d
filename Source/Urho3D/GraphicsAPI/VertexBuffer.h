@@ -33,15 +33,15 @@ public:
     /// @property
     void SetShadowed(bool enable);
     /// Set size, vertex elements and dynamic mode. Previous data will be lost.
-    bool SetSize(unsigned vertexCount, const Vector<VertexElement>& elements, bool dynamic = false);
+    bool SetSize(i32 vertexCount, const Vector<VertexElement>& elements, bool dynamic = false);
     /// Set size and vertex elements and dynamic mode using legacy element bitmask. Previous data will be lost.
-    bool SetSize(unsigned vertexCount, unsigned elementMask, bool dynamic = false);
+    bool SetSize(i32 vertexCount, unsigned elementMask, bool dynamic = false);
     /// Set all data in the buffer.
     bool SetData(const void* data);
     /// Set a data range in the buffer. Optionally discard data outside the range.
-    bool SetDataRange(const void* data, unsigned start, unsigned count, bool discard = false);
+    bool SetDataRange(const void* data, i32 start, i32 count, bool discard = false);
     /// Lock the buffer for write-only editing. Return data pointer if successful. Optionally discard data outside the range.
-    void* Lock(unsigned start, unsigned count, bool discard = false);
+    void* Lock(i32 start, i32 count, bool discard = false);
     /// Unlock the buffer and apply changes to the GPU buffer.
     void Unlock();
 
@@ -58,11 +58,11 @@ public:
 
     /// Return number of vertices.
     /// @property
-    unsigned GetVertexCount() const { return vertexCount_; }
+    i32 GetVertexCount() const { return vertexCount_; }
 
     /// Return vertex size in bytes.
     /// @property
-    unsigned GetVertexSize() const { return vertexSize_; }
+    i32 GetVertexSize() const { return vertexSize_; }
 
     /// Return vertex elements.
     /// @property
@@ -130,10 +130,10 @@ public:
     static Vector<VertexElement> GetElements(unsigned elementMask);
 
     /// Return vertex size from an element list.
-    static unsigned GetVertexSize(const Vector<VertexElement>& elements);
+    static i32 GetVertexSize(const Vector<VertexElement>& elements);
 
     /// Return vertex size for a legacy vertex element bitmask.
-    static unsigned GetVertexSize(unsigned elementMask);
+    static i32 GetVertexSize(unsigned elementMask);
 
     /// Update offsets of vertex elements.
     static void UpdateOffsets(Vector<VertexElement>& elements);
@@ -146,7 +146,7 @@ private:
     /// Update the shadow data to the GPU buffer.
     bool UpdateToGPU();
     /// Map the GPU buffer into CPU memory. Not used on OpenGL.
-    void* MapBuffer(unsigned start, unsigned count, bool discard);
+    void* MapBuffer(i32 start, i32 count, bool discard);
     /// Unmap the GPU buffer. Not used on OpenGL.
     void UnmapBuffer();
 
@@ -155,12 +155,12 @@ private:
     void OnDeviceReset_OGL();
     void Release_OGL();
     bool SetData_OGL(const void* data);
-    bool SetDataRange_OGL(const void* data, unsigned start, unsigned count, bool discard = false);
-    void* Lock_OGL(unsigned start, unsigned count, bool discard);
+    bool SetDataRange_OGL(const void* data, i32 start, i32 count, bool discard = false);
+    void* Lock_OGL(i32 start, i32 count, bool discard);
     void Unlock_OGL();
     bool Create_OGL();
     bool UpdateToGPU_OGL();
-    void* MapBuffer_OGL(unsigned start, unsigned count, bool discard);
+    void* MapBuffer_OGL(i32 start, i32 count, bool discard);
     void UnmapBuffer_OGL();
 #endif // def URHO3D_OPENGL
 
@@ -169,12 +169,12 @@ private:
     void OnDeviceReset_D3D9();
     void Release_D3D9();
     bool SetData_D3D9(const void* data);
-    bool SetDataRange_D3D9(const void* data, unsigned start, unsigned count, bool discard = false);
-    void* Lock_D3D9(unsigned start, unsigned count, bool discard);
+    bool SetDataRange_D3D9(const void* data, i32 start, i32 count, bool discard = false);
+    void* Lock_D3D9(i32 start, i32 count, bool discard);
     void Unlock_D3D9();
     bool Create_D3D9();
     bool UpdateToGPU_D3D9();
-    void* MapBuffer_D3D9(unsigned start, unsigned count, bool discard);
+    void* MapBuffer_D3D9(i32 start, i32 count, bool discard);
     void UnmapBuffer_D3D9();
 #endif // def URHO3D_D3D9
 
@@ -183,21 +183,21 @@ private:
     void OnDeviceReset_D3D11();
     void Release_D3D11();
     bool SetData_D3D11(const void* data);
-    bool SetDataRange_D3D11(const void* data, unsigned start, unsigned count, bool discard = false);
-    void* Lock_D3D11(unsigned start, unsigned count, bool discard);
+    bool SetDataRange_D3D11(const void* data, i32 start, i32 count, bool discard = false);
+    void* Lock_D3D11(i32 start, i32 count, bool discard);
     void Unlock_D3D11();
     bool Create_D3D11();
     bool UpdateToGPU_D3D11();
-    void* MapBuffer_D3D11(unsigned start, unsigned count, bool discard);
+    void* MapBuffer_D3D11(i32 start, i32 count, bool discard);
     void UnmapBuffer_D3D11();
 #endif // def URHO3D_D3D11
 
     /// Shadow data.
     SharedArrayPtr<u8> shadowData_;
     /// Number of vertices.
-    unsigned vertexCount_{};
+    i32 vertexCount_{};
     /// Vertex size.
-    unsigned vertexSize_{};
+    i32 vertexSize_{};
     /// Vertex elements.
     Vector<VertexElement> elements_;
     /// Vertex element hash.
@@ -207,9 +207,9 @@ private:
     /// Buffer locking state.
     LockState lockState_{LOCK_NONE};
     /// Lock start vertex.
-    unsigned lockStart_{};
+    i32 lockStart_{};
     /// Lock number of vertices.
-    unsigned lockCount_{};
+    i32 lockCount_{};
     /// Scratch buffer for fallback locking.
     void* lockScratchData_{};
     /// Dynamic flag.

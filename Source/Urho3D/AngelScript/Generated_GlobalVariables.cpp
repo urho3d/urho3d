@@ -100,7 +100,7 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // static const unsigned DRAWABLE_ZONE | File: ../Graphics/Drawable.h
     engine->RegisterGlobalProperty("const uint DRAWABLE_ZONE", (void*)&DRAWABLE_ZONE);
 
-    // const u32 ELEMENT_TYPESIZES[] | File: ../GraphicsAPI/GraphicsDefs.h
+    // const i32 ELEMENT_TYPESIZES[] | File: ../GraphicsAPI/GraphicsDefs.h
     // Not registered because array
 
     // constexpr i32 ENDPOS | File: ../Container/Vector.h
