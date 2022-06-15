@@ -4314,11 +4314,11 @@ template <class T> void RegisterMembers_SceneResolver(asIScriptEngine* engine, c
 // struct ScratchBuffer | File: ../Graphics/Graphics.h
 template <class T> void RegisterMembers_ScratchBuffer(asIScriptEngine* engine, const char* className)
 {
-    // SharedArrayPtr<unsigned char> ScratchBuffer::data_
-    // Error: type "SharedArrayPtr<unsigned char>" can not automatically bind
+    // SharedArrayPtr<u8> ScratchBuffer::data_
+    // Error: type "SharedArrayPtr<u8>" can not automatically bind
 
-    // unsigned ScratchBuffer::size_
-    engine->RegisterObjectProperty(className, "uint size", offsetof(T, size_));
+    // i32 ScratchBuffer::size_
+    engine->RegisterObjectProperty(className, "int size", offsetof(T, size_));
 
     // bool ScratchBuffer::reserved_
     engine->RegisterObjectProperty(className, "bool reserved", offsetof(T, reserved_));
@@ -10004,7 +10004,7 @@ template <class T> void RegisterMembers_Graphics(asIScriptEngine* engine, const 
     // Error: type "const void*" can not automatically bind
     // void Graphics::RemoveGPUObject(GPUObject* object)
     // Error: type "GPUObject*" can not automatically bind
-    // void* Graphics::ReserveScratchBuffer(unsigned size)
+    // void* Graphics::ReserveScratchBuffer(i32 size)
     // Error: type "void*" can not automatically bind
     // void Graphics::SetExternalWindow(void* window)
     // Error: type "void*" can not automatically bind
@@ -10272,8 +10272,8 @@ template <class T> void RegisterMembers_Graphics(asIScriptEngine* engine, const 
     // StencilOp Graphics::GetStencilPass() const
     engine->RegisterObjectMethod(className, "StencilOp GetStencilPass() const", AS_METHODPR(T, GetStencilPass, () const, StencilOp), AS_CALL_THISCALL);
 
-    // unsigned Graphics::GetStencilRef() const
-    engine->RegisterObjectMethod(className, "uint GetStencilRef() const", AS_METHODPR(T, GetStencilRef, () const, unsigned), AS_CALL_THISCALL);
+    // u32 Graphics::GetStencilRef() const
+    engine->RegisterObjectMethod(className, "uint GetStencilRef() const", AS_METHODPR(T, GetStencilRef, () const, u32), AS_CALL_THISCALL);
 
     // bool Graphics::GetStencilTest() const
     engine->RegisterObjectMethod(className, "bool GetStencilTest() const", AS_METHODPR(T, GetStencilTest, () const, bool), AS_CALL_THISCALL);

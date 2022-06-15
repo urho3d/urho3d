@@ -76,9 +76,9 @@ struct ScratchBuffer
     }
 
     /// Buffer data.
-    SharedArrayPtr<unsigned char> data_;
+    SharedArrayPtr<u8> data_;
     /// Data size.
-    unsigned size_;
+    i32 size_;
     /// Reserved flag.
     bool reserved_;
 };
@@ -642,7 +642,7 @@ public:
     StencilOp GetStencilZFail() const { return stencilZFail_; }
 
     /// Return stencil reference value.
-    unsigned GetStencilRef() const { return stencilRef_; }
+    u32 GetStencilRef() const { return stencilRef_; }
 
     /// Return stencil compare bitmask.
     unsigned GetStencilCompareMask() const { return stencilCompareMask_; }
@@ -696,7 +696,7 @@ public:
     /// Remove a GPU object. Called by GPUObject.
     void RemoveGPUObject(GPUObject* object);
     /// Reserve a CPU-side scratch buffer.
-    void* ReserveScratchBuffer(unsigned size);
+    void* ReserveScratchBuffer(i32 size);
     /// Free a CPU-side scratch buffer.
     void FreeScratchBuffer(void* buffer);
     /// Clean up too large scratch buffers.
@@ -1251,7 +1251,7 @@ private:
     /// Number of batches this frame.
     unsigned numBatches_{};
     /// Largest scratch buffer request this frame.
-    unsigned maxScratchBufferRequest_{};
+    i32 maxScratchBufferRequest_{};
     /// GPU objects.
     Vector<GPUObject*> gpuObjects_;
     /// Scratch buffers.
@@ -1321,7 +1321,7 @@ private:
     /// Stencil operation on depth fail.
     StencilOp stencilZFail_{};
     /// Stencil test reference value.
-    unsigned stencilRef_{};
+    u32 stencilRef_{};
     /// Stencil compare bitmask.
     unsigned stencilCompareMask_{};
     /// Stencil write bitmask.
