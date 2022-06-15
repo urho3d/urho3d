@@ -2023,7 +2023,7 @@ void Graphics::SetStencilTest_OGL(bool enable, CompareMode mode, StencilOp pass,
     {
         if (mode != stencilTestMode_ || stencilRef != stencilRef_ || compareMask != stencilCompareMask_)
         {
-            glStencilFunc(glCmpFunc[mode], stencilRef, compareMask);
+            glStencilFunc(glCmpFunc[mode], (GLint)stencilRef, compareMask);
             stencilTestMode_ = mode;
             stencilRef_ = stencilRef;
             stencilCompareMask_ = compareMask;

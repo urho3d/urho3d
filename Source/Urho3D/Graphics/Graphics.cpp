@@ -198,7 +198,7 @@ void Graphics::SetShaderParameter(StringHash param, const Variant& value)
 
     case VAR_BUFFER:
         {
-            const Vector<unsigned char>& buffer = value.GetBuffer();
+            const Vector<u8>& buffer = value.GetBuffer();
             if (buffer.Size() >= sizeof(float))
                 SetShaderParameter(param, reinterpret_cast<const float*>(&buffer[0]), buffer.Size() / sizeof(float));
         }
@@ -375,8 +375,10 @@ void Graphics::RemoveGPUObject(GPUObject* object)
     gpuObjects_.Remove(object);
 }
 
-void* Graphics::ReserveScratchBuffer(unsigned size)
+void* Graphics::ReserveScratchBuffer(i32 size)
 {
+    assert(size >= 0);
+
     if (!size)
         return nullptr;
 
@@ -384,33 +386,33 @@ void* Graphics::ReserveScratchBuffer(unsigned size)
         maxScratchBufferRequest_ = size;
 
     // First check for a free buffer that is large enough
-    for (Vector<ScratchBuffer>::Iterator i = scratchBuffers_.Begin(); i != scratchBuffers_.End(); ++i)
+    for (ScratchBuffer& scratchBuffer : scratchBuffers_)
     {
-        if (!i->reserved_ && i->size_ >= size)
+        if (!scratchBuffer.reserved_ && scratchBuffer.size_ >= size)
         {
-            i->reserved_ = true;
-            return i->data_.Get();
+            scratchBuffer.reserved_ = true;
+            return scratchBuffer.data_.Get();
         }
     }
 
     // Then check if a free buffer can be resized
-    for (Vector<ScratchBuffer>::Iterator i = scratchBuffers_.Begin(); i != scratchBuffers_.End(); ++i)
+    for (ScratchBuffer& scratchBuffer : scratchBuffers_)
     {
-        if (!i->reserved_)
+        if (!scratchBuffer.reserved_)
         {
-            i->data_ = new unsigned char[size];
-            i->size_ = size;
-            i->reserved_ = true;
+            scratchBuffer.data_ = new u8[size];
+            scratchBuffer.size_ = size;
+            scratchBuffer.reserved_ = true;
 
             URHO3D_LOGDEBUG("Resized scratch buffer to size " + String(size));
 
-            return i->data_.Get();
+            return scratchBuffer.data_.Get();
         }
     }
 
     // Finally allocate a new buffer
     ScratchBuffer newBuffer;
-    newBuffer.data_ = new unsigned char[size];
+    newBuffer.data_ = new u8[size];
     newBuffer.size_ = size;
     newBuffer.reserved_ = true;
     scratchBuffers_.Push(newBuffer);
@@ -425,11 +427,11 @@ void Graphics::FreeScratchBuffer(void* buffer)
     if (!buffer)
         return;
 
-    for (Vector<ScratchBuffer>::Iterator i = scratchBuffers_.Begin(); i != scratchBuffers_.End(); ++i)
+    for (ScratchBuffer& scratchBuffer : scratchBuffers_)
     {
-        if (i->reserved_ && i->data_.Get() == buffer)
+        if (scratchBuffer.reserved_ && scratchBuffer.data_.Get() == buffer)
         {
-            i->reserved_ = false;
+            scratchBuffer.reserved_ = false;
             return;
         }
     }
@@ -439,12 +441,12 @@ void Graphics::FreeScratchBuffer(void* buffer)
 
 void Graphics::CleanupScratchBuffers()
 {
-    for (Vector<ScratchBuffer>::Iterator i = scratchBuffers_.Begin(); i != scratchBuffers_.End(); ++i)
+    for (ScratchBuffer& scratchBuffer : scratchBuffers_)
     {
-        if (!i->reserved_ && i->size_ > maxScratchBufferRequest_ * 2 && i->size_ >= 1024 * 1024)
+        if (!scratchBuffer.reserved_ && scratchBuffer.size_ > maxScratchBufferRequest_ * 2 && scratchBuffer.size_ >= 1024 * 1024)
         {
-            i->data_ = maxScratchBufferRequest_ > 0 ? (new unsigned char[maxScratchBufferRequest_]) : nullptr;
-            i->size_ = maxScratchBufferRequest_;
+            scratchBuffer.data_ = maxScratchBufferRequest_ > 0 ? (new u8[maxScratchBufferRequest_]) : nullptr;
+            scratchBuffer.size_ = maxScratchBufferRequest_;
 
             URHO3D_LOGDEBUG("Resized scratch buffer to size " + String(maxScratchBufferRequest_));
         }
