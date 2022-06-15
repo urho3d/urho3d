@@ -696,7 +696,7 @@ void Graphics::EndFrame_D3D9()
     CleanupScratchBuffers();
 }
 
-void Graphics::Clear_D3D9(ClearTargetFlags flags, const Color& color, float depth, unsigned stencil)
+void Graphics::Clear_D3D9(ClearTargetFlags flags, const Color& color, float depth, u32 stencil)
 {
     DWORD d3dFlags = 0;
     if (flags & CLEAR_COLOR)
@@ -1833,8 +1833,8 @@ void Graphics::SetScissorTest_D3D9(bool enable, const IntRect& rect)
     }
 }
 
-void Graphics::SetStencilTest_D3D9(bool enable, CompareMode mode, StencilOp pass, StencilOp fail, StencilOp zFail, unsigned stencilRef,
-    unsigned compareMask, unsigned writeMask)
+void Graphics::SetStencilTest_D3D9(bool enable, CompareMode mode, StencilOp pass, StencilOp fail, StencilOp zFail, u32 stencilRef,
+    u32 compareMask, u32 writeMask)
 {
     GraphicsImpl_D3D9* impl = GetImpl_D3D9();
 
@@ -2646,8 +2646,8 @@ void Graphics::ResetCachedState_D3D9()
     stencilFail_ = OP_KEEP;
     stencilZFail_ = OP_KEEP;
     stencilRef_ = 0;
-    stencilCompareMask_ = M_MAX_UNSIGNED;
-    stencilWriteMask_ = M_MAX_UNSIGNED;
+    stencilCompareMask_ = M_U32_MASK_ALL_BITS;
+    stencilWriteMask_ = M_U32_MASK_ALL_BITS;
     useClipPlane_ = false;
     impl->blendEnable_ = FALSE;
     impl->srcBlend_ = D3DBLEND_ONE;

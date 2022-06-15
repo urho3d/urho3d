@@ -10022,8 +10022,8 @@ template <class T> void RegisterMembers_Graphics(asIScriptEngine* engine, const 
     // void Graphics::CleanupScratchBuffers()
     engine->RegisterObjectMethod(className, "void CleanupScratchBuffers()", AS_METHODPR(T, CleanupScratchBuffers, (), void), AS_CALL_THISCALL);
 
-    // void Graphics::Clear(ClearTargetFlags flags, const Color& color = Color(0.0f, 0.0f, 0.0f, 0.0f), float depth = 1.0f, unsigned stencil = 0)
-    engine->RegisterObjectMethod(className, "void Clear(ClearTargetFlags, const Color&in = Color(0.0f, 0.0f, 0.0f, 0.0f), float = 1.0f, uint = 0)", AS_METHODPR(T, Clear, (ClearTargetFlags, const Color&, float, unsigned), void), AS_CALL_THISCALL);
+    // void Graphics::Clear(ClearTargetFlags flags, const Color& color = Color(0.0f, 0.0f, 0.0f, 0.0f), float depth = 1.0f, u32 stencil = 0)
+    engine->RegisterObjectMethod(className, "void Clear(ClearTargetFlags, const Color&in = Color(0.0f, 0.0f, 0.0f, 0.0f), float = 1.0f, uint = 0)", AS_METHODPR(T, Clear, (ClearTargetFlags, const Color&, float, u32), void), AS_CALL_THISCALL);
 
     // void Graphics::ClearParameterSource(ShaderParameterGroup group)
     engine->RegisterObjectMethod(className, "void ClearParameterSource(ShaderParameterGroup)", AS_METHODPR(T, ClearParameterSource, (ShaderParameterGroup), void), AS_CALL_THISCALL);
@@ -10263,8 +10263,8 @@ template <class T> void RegisterMembers_Graphics(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "bool GetSRGBWriteSupport() const", AS_METHODPR(T, GetSRGBWriteSupport, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_sRGBWriteSupport() const", AS_METHODPR(T, GetSRGBWriteSupport, () const, bool), AS_CALL_THISCALL);
 
-    // unsigned Graphics::GetStencilCompareMask() const
-    engine->RegisterObjectMethod(className, "uint GetStencilCompareMask() const", AS_METHODPR(T, GetStencilCompareMask, () const, unsigned), AS_CALL_THISCALL);
+    // u32 Graphics::GetStencilCompareMask() const
+    engine->RegisterObjectMethod(className, "uint GetStencilCompareMask() const", AS_METHODPR(T, GetStencilCompareMask, () const, u32), AS_CALL_THISCALL);
 
     // StencilOp Graphics::GetStencilFail() const
     engine->RegisterObjectMethod(className, "StencilOp GetStencilFail() const", AS_METHODPR(T, GetStencilFail, () const, StencilOp), AS_CALL_THISCALL);
@@ -10281,8 +10281,8 @@ template <class T> void RegisterMembers_Graphics(asIScriptEngine* engine, const 
     // CompareMode Graphics::GetStencilTestMode() const
     engine->RegisterObjectMethod(className, "CompareMode GetStencilTestMode() const", AS_METHODPR(T, GetStencilTestMode, () const, CompareMode), AS_CALL_THISCALL);
 
-    // unsigned Graphics::GetStencilWriteMask() const
-    engine->RegisterObjectMethod(className, "uint GetStencilWriteMask() const", AS_METHODPR(T, GetStencilWriteMask, () const, unsigned), AS_CALL_THISCALL);
+    // u32 Graphics::GetStencilWriteMask() const
+    engine->RegisterObjectMethod(className, "uint GetStencilWriteMask() const", AS_METHODPR(T, GetStencilWriteMask, () const, u32), AS_CALL_THISCALL);
 
     // StencilOp Graphics::GetStencilZFail() const
     engine->RegisterObjectMethod(className, "StencilOp GetStencilZFail() const", AS_METHODPR(T, GetStencilZFail, () const, StencilOp), AS_CALL_THISCALL);
@@ -10506,8 +10506,8 @@ template <class T> void RegisterMembers_Graphics(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "void SetSRGB(bool)", AS_METHODPR(T, SetSRGB, (bool), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_sRGB(bool)", AS_METHODPR(T, SetSRGB, (bool), void), AS_CALL_THISCALL);
 
-    // void Graphics::SetStencilTest(bool enable, CompareMode mode = CMP_ALWAYS, StencilOp pass = OP_KEEP, StencilOp fail = OP_KEEP, StencilOp zFail = OP_KEEP, unsigned stencilRef = 0, unsigned compareMask = M_MAX_UNSIGNED, unsigned writeMask = M_MAX_UNSIGNED)
-    engine->RegisterObjectMethod(className, "void SetStencilTest(bool, CompareMode = CMP_ALWAYS, StencilOp = OP_KEEP, StencilOp = OP_KEEP, StencilOp = OP_KEEP, uint = 0, uint = M_MAX_UNSIGNED, uint = M_MAX_UNSIGNED)", AS_METHODPR(T, SetStencilTest, (bool, CompareMode, StencilOp, StencilOp, StencilOp, unsigned, unsigned, unsigned), void), AS_CALL_THISCALL);
+    // void Graphics::SetStencilTest(bool enable, CompareMode mode = CMP_ALWAYS, StencilOp pass = OP_KEEP, StencilOp fail = OP_KEEP, StencilOp zFail = OP_KEEP, u32 stencilRef = 0, u32 compareMask = M_U32_MASK_ALL_BITS, u32 writeMask = M_U32_MASK_ALL_BITS)
+    engine->RegisterObjectMethod(className, "void SetStencilTest(bool, CompareMode = CMP_ALWAYS, StencilOp = OP_KEEP, StencilOp = OP_KEEP, StencilOp = OP_KEEP, uint = 0, uint = M_U32_MASK_ALL_BITS, uint = M_U32_MASK_ALL_BITS)", AS_METHODPR(T, SetStencilTest, (bool, CompareMode, StencilOp, StencilOp, StencilOp, u32, u32, u32), void), AS_CALL_THISCALL);
 
     // void Graphics::SetTexture(unsigned index, Texture* texture)
     engine->RegisterObjectMethod(className, "void SetTexture(uint, Texture@+)", AS_METHODPR(T, SetTexture, (unsigned, Texture*), void), AS_CALL_THISCALL);

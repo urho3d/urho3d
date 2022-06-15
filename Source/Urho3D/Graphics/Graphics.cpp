@@ -1899,8 +1899,8 @@ void Graphics::SetClipPlane(bool enable, const Plane& clipPlane, const Matrix3x4
 #endif
 }
 
-void Graphics::SetStencilTest(bool enable, CompareMode mode, StencilOp pass, StencilOp fail, StencilOp zFail, unsigned stencilRef,
-    unsigned compareMask, unsigned writeMask)
+void Graphics::SetStencilTest(bool enable, CompareMode mode, StencilOp pass, StencilOp fail, StencilOp zFail, u32 stencilRef,
+    u32 compareMask, u32 writeMask)
 {
     GAPI gapi = Graphics::GetGAPI();
 

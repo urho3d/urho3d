@@ -123,7 +123,7 @@ EMSCRIPTEN_BINDINGS(Module) {
 namespace Urho3D
 {
 
-static const unsigned glCmpFunc[] =
+static const GLenum glCmpFunc[] =
 {
     GL_ALWAYS,
     GL_EQUAL,
@@ -134,7 +134,7 @@ static const unsigned glCmpFunc[] =
     GL_GEQUAL
 };
 
-static const unsigned glSrcBlend[] =
+static const GLenum glSrcBlend[] =
 {
     GL_ONE,
     GL_ONE,
@@ -147,7 +147,7 @@ static const unsigned glSrcBlend[] =
     GL_SRC_ALPHA
 };
 
-static const unsigned glDestBlend[] =
+static const GLenum glDestBlend[] =
 {
     GL_ZERO,
     GL_ONE,
@@ -160,7 +160,7 @@ static const unsigned glDestBlend[] =
     GL_ONE
 };
 
-static const unsigned glBlendOp[] =
+static const GLenum glBlendOp[] =
 {
     GL_FUNC_ADD,
     GL_FUNC_ADD,
@@ -174,14 +174,14 @@ static const unsigned glBlendOp[] =
 };
 
 #ifndef GL_ES_VERSION_2_0
-static const unsigned glFillMode[] =
+static const GLenum glFillMode[] =
 {
     GL_FILL,
     GL_LINE,
     GL_POINT
 };
 
-static const unsigned glStencilOps[] =
+static const GLenum glStencilOps[] =
 {
     GL_KEEP,
     GL_ZERO,
@@ -191,7 +191,7 @@ static const unsigned glStencilOps[] =
 };
 #endif
 
-static const unsigned glElementTypes[] =
+static const GLenum glElementTypes[] =
 {
     GL_INT,
     GL_FLOAT,
@@ -202,7 +202,7 @@ static const unsigned glElementTypes[] =
     GL_UNSIGNED_BYTE
 };
 
-static const unsigned glElementComponents[] =
+static const GLint glElementComponents[] =
 {
     1,
     1,
@@ -618,7 +618,7 @@ void Graphics::EndFrame_OGL()
     CleanupScratchBuffers();
 }
 
-void Graphics::Clear_OGL(ClearTargetFlags flags, const Color& color, float depth, unsigned stencil)
+void Graphics::Clear_OGL(ClearTargetFlags flags, const Color& color, float depth, u32 stencil)
 {
     PrepareDraw_OGL();
 
@@ -633,10 +633,10 @@ void Graphics::Clear_OGL(ClearTargetFlags flags, const Color& color, float depth
         SetColorWrite_OGL(true);
     if (flags & CLEAR_DEPTH && !oldDepthWrite)
         SetDepthWrite_OGL(true);
-    if (flags & CLEAR_STENCIL && stencilWriteMask_ != M_MAX_UNSIGNED)
-        glStencilMask(M_MAX_UNSIGNED);
+    if (flags & CLEAR_STENCIL && stencilWriteMask_ != M_U32_MASK_ALL_BITS)
+        glStencilMask(M_U32_MASK_ALL_BITS);
 
-    unsigned glFlags = 0;
+    GLbitfield glFlags = 0;
     if (flags & CLEAR_COLOR)
     {
         glFlags |= GL_COLOR_BUFFER_BIT;
@@ -650,7 +650,7 @@ void Graphics::Clear_OGL(ClearTargetFlags flags, const Color& color, float depth
     if (flags & CLEAR_STENCIL)
     {
         glFlags |= GL_STENCIL_BUFFER_BIT;
-        glClearStencil(stencil);
+        glClearStencil((GLint)stencil);
     }
 
     // If viewport is less than full screen, set a scissor to limit the clear
@@ -666,7 +666,7 @@ void Graphics::Clear_OGL(ClearTargetFlags flags, const Color& color, float depth
     SetScissorTest_OGL(false);
     SetColorWrite_OGL(oldColorWrite);
     SetDepthWrite_OGL(oldDepthWrite);
-    if (flags & CLEAR_STENCIL && stencilWriteMask_ != M_MAX_UNSIGNED)
+    if (flags & CLEAR_STENCIL && stencilWriteMask_ != M_U32_MASK_ALL_BITS)
         glStencilMask(stencilWriteMask_);
 }
 
@@ -2006,8 +2006,8 @@ void Graphics::SetClipPlane_OGL(bool enable, const Plane& clipPlane, const Matri
 #endif
 }
 
-void Graphics::SetStencilTest_OGL(bool enable, CompareMode mode, StencilOp pass, StencilOp fail, StencilOp zFail, unsigned stencilRef,
-    unsigned compareMask, unsigned writeMask)
+void Graphics::SetStencilTest_OGL(bool enable, CompareMode mode, StencilOp pass, StencilOp fail, StencilOp zFail, u32 stencilRef,
+    u32 compareMask, u32 writeMask)
 {
 #ifndef GL_ES_VERSION_2_0
     if (enable != stencilTest_)
@@ -2016,6 +2016,7 @@ void Graphics::SetStencilTest_OGL(bool enable, CompareMode mode, StencilOp pass,
             glEnable(GL_STENCIL_TEST);
         else
             glDisable(GL_STENCIL_TEST);
+
         stencilTest_ = enable;
     }
 
@@ -3237,8 +3238,8 @@ void Graphics::ResetCachedState_OGL()
     stencilFail_ = OP_KEEP;
     stencilZFail_ = OP_KEEP;
     stencilRef_ = 0;
-    stencilCompareMask_ = M_MAX_UNSIGNED;
-    stencilWriteMask_ = M_MAX_UNSIGNED;
+    stencilCompareMask_ = M_U32_MASK_ALL_BITS;
+    stencilWriteMask_ = M_U32_MASK_ALL_BITS;
     useClipPlane_ = false;
     impl->shaderProgram_ = nullptr;
     impl->lastInstanceOffset_ = 0;
