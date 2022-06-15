@@ -6549,8 +6549,8 @@ template <class T> void RegisterMembers_VertexElement(asIScriptEngine* engine, c
     // bool VertexElement::perInstance_
     engine->RegisterObjectProperty(className, "bool perInstance", offsetof(T, perInstance_));
 
-    // unsigned VertexElement::offset_
-    engine->RegisterObjectProperty(className, "uint offset", offsetof(T, offset_));
+    // i32 VertexElement::offset_
+    engine->RegisterObjectProperty(className, "int offset", offsetof(T, offset_));
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_VertexElement
         REGISTER_MEMBERS_MANUAL_PART_VertexElement();

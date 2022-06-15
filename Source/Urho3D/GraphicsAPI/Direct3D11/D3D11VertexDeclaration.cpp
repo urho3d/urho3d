@@ -30,9 +30,9 @@ VertexDeclaration_D3D11::VertexDeclaration_D3D11(Graphics* graphics, ShaderVaria
     inputLayout_(nullptr)
 {
     Vector<D3D11_INPUT_ELEMENT_DESC> elementDescs;
-    unsigned prevBufferDescs = 0;
+    i32 prevBufferDescs = 0;
 
-    for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
+    for (i32 i = 0; i < MAX_VERTEX_STREAMS; ++i)
     {
         if (!vertexBuffers[i])
             continue;
@@ -40,19 +40,18 @@ VertexDeclaration_D3D11::VertexDeclaration_D3D11(Graphics* graphics, ShaderVaria
         const Vector<VertexElement>& srcElements = vertexBuffers[i]->GetElements();
         bool isExisting = false;
 
-        for (unsigned j = 0; j < srcElements.Size(); ++j)
+        for (const VertexElement& srcElement : srcElements)
         {
-            const VertexElement& srcElement = srcElements[j];
             const char* semanticName = ShaderVariation::elementSemanticNames_D3D11[srcElement.semantic_];
 
             // Override existing element if necessary
-            for (unsigned k = 0; k < prevBufferDescs; ++k)
+            for (i32 k = 0; k < prevBufferDescs; ++k)
             {
                 if (elementDescs[k].SemanticName == semanticName && elementDescs[k].SemanticIndex == srcElement.index_)
                 {
                     isExisting = true;
-                    elementDescs[k].InputSlot = i;
-                    elementDescs[k].AlignedByteOffset = srcElement.offset_;
+                    elementDescs[k].InputSlot = (UINT)i;
+                    elementDescs[k].AlignedByteOffset = (UINT)srcElement.offset_;
                     elementDescs[k].InputSlotClass = srcElement.perInstance_ ? D3D11_INPUT_PER_INSTANCE_DATA : D3D11_INPUT_PER_VERTEX_DATA;
                     elementDescs[k].InstanceDataStepRate = srcElement.perInstance_ ? 1 : 0;
                     break;
@@ -67,7 +66,7 @@ VertexDeclaration_D3D11::VertexDeclaration_D3D11(Graphics* graphics, ShaderVaria
             newDesc.SemanticIndex = srcElement.index_;
             newDesc.Format = d3dElementFormats[srcElement.type_];
             newDesc.InputSlot = (UINT)i;
-            newDesc.AlignedByteOffset = srcElement.offset_;
+            newDesc.AlignedByteOffset = (UINT)srcElement.offset_;
             newDesc.InputSlotClass = srcElement.perInstance_ ? D3D11_INPUT_PER_INSTANCE_DATA : D3D11_INPUT_PER_VERTEX_DATA;
             newDesc.InstanceDataStepRate = srcElement.perInstance_ ? 1 : 0;
             elementDescs.Push(newDesc);
@@ -79,10 +78,10 @@ VertexDeclaration_D3D11::VertexDeclaration_D3D11(Graphics* graphics, ShaderVaria
     if (elementDescs.Empty())
         return;
 
-    const Vector<unsigned char>& byteCode = vertexShader->GetByteCode();
+    const Vector<u8>& byteCode = vertexShader->GetByteCode();
 
     HRESULT hr = graphics->GetImpl_D3D11()->GetDevice()->CreateInputLayout(&elementDescs[0], (UINT)elementDescs.Size(), &byteCode[0],
-        byteCode.Size(), (ID3D11InputLayout**)&inputLayout_);
+        (SIZE_T)byteCode.Size(), (ID3D11InputLayout**)&inputLayout_);
     if (FAILED(hr))
     {
         URHO3D_SAFE_RELEASE(inputLayout_);

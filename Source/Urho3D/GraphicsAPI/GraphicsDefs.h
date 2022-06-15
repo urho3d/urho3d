@@ -210,7 +210,7 @@ struct URHO3D_API VertexElement
     /// Per-instance flag.
     bool perInstance_;
     /// Offset of element from vertex start. Filled by VertexBuffer once the vertex declaration is built.
-    unsigned offset_;
+    i32 offset_;
 };
 
 /// Sizes of vertex element types.
