@@ -46,7 +46,7 @@ void IndexBuffer::SetShadowed(bool enable)
     if (enable != shadowed_)
     {
         if (enable && indexCount_ && indexSize_)
-            shadowData_ = new unsigned char[indexCount_ * indexSize_];
+            shadowData_ = new u8[(size_t)indexCount_ * indexSize_];
         else
             shadowData_.Reset();
 
@@ -54,24 +54,27 @@ void IndexBuffer::SetShadowed(bool enable)
     }
 }
 
-bool IndexBuffer::SetSize(unsigned indexCount, bool largeIndices, bool dynamic)
+bool IndexBuffer::SetSize(i32 indexCount, bool largeIndices, bool dynamic)
 {
+    assert(indexCount >= 0);
     Unlock();
 
     indexCount_ = indexCount;
-    indexSize_ = (unsigned)(largeIndices ? sizeof(unsigned) : sizeof(unsigned short));
+    indexSize_ = (i32)(largeIndices ? sizeof(u32) : sizeof(u16));
     dynamic_ = dynamic;
 
     if (shadowed_ && indexCount_ && indexSize_)
-        shadowData_ = new unsigned char[indexCount_ * indexSize_];
+        shadowData_ = new u8[(size_t)indexCount_ * indexSize_];
     else
         shadowData_.Reset();
 
     return Create();
 }
 
-bool IndexBuffer::GetUsedVertexRange(unsigned start, unsigned count, unsigned& minVertex, unsigned& vertexCount)
+bool IndexBuffer::GetUsedVertexRange(i32 start, i32 count, i32& minVertex, i32& vertexCount)
 {
+    assert(start >= 0 && count >= 0);
+
     if (!shadowData_)
     {
         URHO3D_LOGERROR("Used vertex range can only be queried from an index buffer with shadow data");
@@ -84,31 +87,37 @@ bool IndexBuffer::GetUsedVertexRange(unsigned start, unsigned count, unsigned& m
         return false;
     }
 
-    minVertex = M_MAX_UNSIGNED;
-    unsigned maxVertex = 0;
+    minVertex = M_MAX_INT;
+    i32 maxVertex = 0;
 
-    if (indexSize_ == sizeof(unsigned))
+    if (indexSize_ == sizeof(u32))
     {
-        unsigned* indices = ((unsigned*)shadowData_.Get()) + start;
+        u32* indices = (u32*)shadowData_.Get() + start;
 
-        for (unsigned i = 0; i < count; ++i)
+        for (i32 i = 0; i < count; ++i)
         {
-            if (indices[i] < minVertex)
-                minVertex = indices[i];
-            if (indices[i] > maxVertex)
-                maxVertex = indices[i];
+            i32 index = (i32)indices[i];
+
+            if (index < minVertex)
+                minVertex = index;
+
+            if (index > maxVertex)
+                maxVertex = index;
         }
     }
     else
     {
-        unsigned short* indices = ((unsigned short*)shadowData_.Get()) + start;
+        u16* indices = (u16*)shadowData_.Get() + start;
 
-        for (unsigned i = 0; i < count; ++i)
+        for (i32 i = 0; i < count; ++i)
         {
-            if (indices[i] < minVertex)
-                minVertex = indices[i];
-            if (indices[i] > maxVertex)
-                maxVertex = indices[i];
+            i32 index = (i32)indices[i];
+
+            if (index < minVertex)
+                minVertex = index;
+
+            if (index > maxVertex)
+                maxVertex = index;
         }
     }
 
@@ -198,8 +207,9 @@ bool IndexBuffer::SetData(const void* data)
     return {}; // Prevent warning
 }
 
-bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count, bool discard)
+bool IndexBuffer::SetDataRange(const void* data, i32 start, i32 count, bool discard)
 {
+    assert(start >= 0 && count >= 0);
     GAPI gapi = Graphics::GetGAPI();
 
 #ifdef URHO3D_OPENGL
@@ -220,8 +230,9 @@ bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count,
     return {}; // Prevent warning
 }
 
-void* IndexBuffer::Lock(unsigned start, unsigned count, bool discard)
+void* IndexBuffer::Lock(i32 start, i32 count, bool discard)
 {
+    assert(start >= 0 && count >= 0);
     GAPI gapi = Graphics::GetGAPI();
 
 #ifdef URHO3D_OPENGL
@@ -306,8 +317,9 @@ bool IndexBuffer::UpdateToGPU()
     return {}; // Prevent warning
 }
 
-void* IndexBuffer::MapBuffer(unsigned start, unsigned count, bool discard)
+void* IndexBuffer::MapBuffer(i32 start, i32 count, bool discard)
 {
+    assert(start >= 0 && count >= 0);
     GAPI gapi = Graphics::GetGAPI();
 
 #ifdef URHO3D_OPENGL

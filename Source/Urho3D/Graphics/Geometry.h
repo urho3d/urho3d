@@ -118,9 +118,9 @@ private:
     /// Number of indices.
     unsigned indexCount_;
     /// First used vertex.
-    unsigned vertexStart_;
+    i32 vertexStart_;
     /// Number of used vertices.
-    unsigned vertexCount_;
+    i32 vertexCount_;
     /// LOD distance.
     float lodDistance_;
     /// Raw vertex data elements.

@@ -33,13 +33,13 @@ public:
     /// @property
     void SetShadowed(bool enable);
     /// Set size and vertex elements and dynamic mode. Previous data will be lost.
-    bool SetSize(unsigned indexCount, bool largeIndices, bool dynamic = false);
+    bool SetSize(i32 indexCount, bool largeIndices, bool dynamic = false);
     /// Set all data in the buffer.
     bool SetData(const void* data);
     /// Set a data range in the buffer. Optionally discard data outside the range.
-    bool SetDataRange(const void* data, unsigned start, unsigned count, bool discard = false);
+    bool SetDataRange(const void* data, i32 start, i32 count, bool discard = false);
     /// Lock the buffer for write-only editing. Return data pointer if successful. Optionally discard data outside the range.
-    void* Lock(unsigned start, unsigned count, bool discard = false);
+    void* Lock(i32 start, i32 count, bool discard = false);
     /// Unlock the buffer and apply changes to the GPU buffer.
     void Unlock();
 
@@ -56,20 +56,20 @@ public:
 
     /// Return number of indices.
     /// @property
-    unsigned GetIndexCount() const { return indexCount_; }
+    i32 GetIndexCount() const { return indexCount_; }
 
     /// Return index size in bytes.
     /// @property
-    unsigned GetIndexSize() const { return indexSize_; }
+    i32 GetIndexSize() const { return indexSize_; }
 
     /// Return used vertex range from index range.
-    bool GetUsedVertexRange(unsigned start, unsigned count, unsigned& minVertex, unsigned& vertexCount);
+    bool GetUsedVertexRange(i32 start, i32 count, i32& minVertex, i32& vertexCount);
 
     /// Return CPU memory shadow data.
-    unsigned char* GetShadowData() const { return shadowData_.Get(); }
+    u8* GetShadowData() const { return shadowData_.Get(); }
 
     /// Return shared array pointer to the CPU memory shadow data.
-    SharedArrayPtr<unsigned char> GetShadowDataShared() const { return shadowData_; }
+    SharedArrayPtr<u8> GetShadowDataShared() const { return shadowData_; }
 
 private:
     /// Create buffer.
@@ -77,7 +77,7 @@ private:
     /// Update the shadow data to the GPU buffer.
     bool UpdateToGPU();
     /// Map the GPU buffer into CPU memory. Not used on OpenGL.
-    void* MapBuffer(unsigned start, unsigned count, bool discard);
+    void* MapBuffer(i32 start, i32 count, bool discard);
     /// Unmap the GPU buffer. Not used on OpenGL.
     void UnmapBuffer();
 
@@ -86,12 +86,12 @@ private:
     void OnDeviceReset_OGL();
     void Release_OGL();
     bool SetData_OGL(const void* data);
-    bool SetDataRange_OGL(const void* data, unsigned start, unsigned count, bool discard = false);
-    void* Lock_OGL(unsigned start, unsigned count, bool discard);
+    bool SetDataRange_OGL(const void* data, i32 start, i32 count, bool discard = false);
+    void* Lock_OGL(i32 start, i32 count, bool discard);
     void Unlock_OGL();
     bool Create_OGL();
     bool UpdateToGPU_OGL();
-    void* MapBuffer_OGL(unsigned start, unsigned count, bool discard);
+    void* MapBuffer_OGL(i32 start, i32 count, bool discard);
     void UnmapBuffer_OGL();
 #endif // def URHO3D_OPENGL
 
@@ -100,12 +100,12 @@ private:
     void OnDeviceReset_D3D9();
     void Release_D3D9();
     bool SetData_D3D9(const void* data);
-    bool SetDataRange_D3D9(const void* data, unsigned start, unsigned count, bool discard = false);
-    void* Lock_D3D9(unsigned start, unsigned count, bool discard);
+    bool SetDataRange_D3D9(const void* data, i32 start, i32 count, bool discard = false);
+    void* Lock_D3D9(i32 start, i32 count, bool discard);
     void Unlock_D3D9();
     bool Create_D3D9();
     bool UpdateToGPU_D3D9();
-    void* MapBuffer_D3D9(unsigned start, unsigned count, bool discard);
+    void* MapBuffer_D3D9(i32 start, i32 count, bool discard);
     void UnmapBuffer_D3D9();
 #endif // def URHO3D_D3D9
 
@@ -114,27 +114,27 @@ private:
     void OnDeviceReset_D3D11();
     void Release_D3D11();
     bool SetData_D3D11(const void* data);
-    bool SetDataRange_D3D11(const void* data, unsigned start, unsigned count, bool discard = false);
-    void* Lock_D3D11(unsigned start, unsigned count, bool discard);
+    bool SetDataRange_D3D11(const void* data, i32 start, i32 count, bool discard = false);
+    void* Lock_D3D11(i32 start, i32 count, bool discard);
     void Unlock_D3D11();
     bool Create_D3D11();
     bool UpdateToGPU_D3D11();
-    void* MapBuffer_D3D11(unsigned start, unsigned count, bool discard);
+    void* MapBuffer_D3D11(i32 start, i32 count, bool discard);
     void UnmapBuffer_D3D11();
 #endif // def URHO3D_D3D11
 
     /// Shadow data.
-    SharedArrayPtr<unsigned char> shadowData_;
+    SharedArrayPtr<u8> shadowData_;
     /// Number of indices.
-    unsigned indexCount_;
+    i32 indexCount_;
     /// Index size.
-    unsigned indexSize_;
+    i32 indexSize_;
     /// Buffer locking state.
     LockState lockState_;
     /// Lock start vertex.
-    unsigned lockStart_;
+    i32 lockStart_;
     /// Lock number of vertices.
-    unsigned lockCount_;
+    i32 lockCount_;
     /// Scratch buffer for fallback locking.
     void* lockScratchData_;
     /// Dynamic flag.

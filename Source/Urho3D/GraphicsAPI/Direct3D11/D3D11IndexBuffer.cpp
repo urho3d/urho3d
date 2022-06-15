@@ -49,7 +49,7 @@ bool IndexBuffer::SetData_D3D11(const void* data)
     }
 
     if (shadowData_ && data != shadowData_.Get())
-        memcpy(shadowData_.Get(), data, indexCount_ * indexSize_);
+        memcpy(shadowData_.Get(), data, (size_t)indexCount_ * indexSize_);
 
     if (object_.ptr_)
     {
@@ -58,7 +58,7 @@ bool IndexBuffer::SetData_D3D11(const void* data)
             void* hwData = MapBuffer_D3D11(0, indexCount_, true);
             if (hwData)
             {
-                memcpy(hwData, data, indexCount_ * indexSize_);
+                memcpy(hwData, data, (size_t)indexCount_ * indexSize_);
                 UnmapBuffer();
             }
             else
@@ -68,7 +68,7 @@ bool IndexBuffer::SetData_D3D11(const void* data)
         {
             D3D11_BOX destBox;
             destBox.left = 0;
-            destBox.right = indexCount_ * indexSize_;
+            destBox.right = (UINT)indexCount_ * indexSize_;
             destBox.top = 0;
             destBox.bottom = 1;
             destBox.front = 0;
@@ -81,8 +81,10 @@ bool IndexBuffer::SetData_D3D11(const void* data)
     return true;
 }
 
-bool IndexBuffer::SetDataRange_D3D11(const void* data, unsigned start, unsigned count, bool discard)
+bool IndexBuffer::SetDataRange_D3D11(const void* data, i32 start, i32 count, bool discard)
 {
+    assert(start >= 0 && count >= 0);
+
     if (start == 0 && count == indexCount_)
         return SetData_D3D11(data);
 
@@ -107,8 +109,9 @@ bool IndexBuffer::SetDataRange_D3D11(const void* data, unsigned start, unsigned 
     if (!count)
         return true;
 
-    if (shadowData_ && shadowData_.Get() + start * indexSize_ != data)
-        memcpy(shadowData_.Get() + start * indexSize_, data, count * indexSize_);
+    u8* dst = shadowData_.Get() + (intptr_t)start * indexSize_;
+    if (shadowData_ && dst != data)
+        memcpy(dst, data, (size_t)count * indexSize_);
 
     if (object_.ptr_)
     {
@@ -117,7 +120,7 @@ bool IndexBuffer::SetDataRange_D3D11(const void* data, unsigned start, unsigned 
             void* hwData = MapBuffer_D3D11(start, count, discard);
             if (hwData)
             {
-                memcpy(hwData, data, count * indexSize_);
+                memcpy(hwData, data, (size_t)count * indexSize_);
                 UnmapBuffer();
             }
             else
@@ -126,8 +129,8 @@ bool IndexBuffer::SetDataRange_D3D11(const void* data, unsigned start, unsigned 
         else
         {
             D3D11_BOX destBox;
-            destBox.left = start * indexSize_;
-            destBox.right = destBox.left + count * indexSize_;
+            destBox.left = (UINT)start * indexSize_;
+            destBox.right = destBox.left + (UINT)count * indexSize_;
             destBox.top = 0;
             destBox.bottom = 1;
             destBox.front = 0;
@@ -140,8 +143,10 @@ bool IndexBuffer::SetDataRange_D3D11(const void* data, unsigned start, unsigned 
     return true;
 }
 
-void* IndexBuffer::Lock_D3D11(unsigned start, unsigned count, bool discard)
+void* IndexBuffer::Lock_D3D11(i32 start, i32 count, bool discard)
 {
+    assert(start >= 0 && count >= 0);
+
     if (lockState_ != LOCK_NONE)
     {
         URHO3D_LOGERROR("Index buffer already locked");
@@ -172,7 +177,7 @@ void* IndexBuffer::Lock_D3D11(unsigned start, unsigned count, bool discard)
     else if (shadowData_)
     {
         lockState_ = LOCK_SHADOW;
-        return shadowData_.Get() + start * indexSize_;
+        return shadowData_.Get() + (intptr_t)start * indexSize_;
     }
     else if (graphics_)
     {
@@ -193,7 +198,7 @@ void IndexBuffer::Unlock_D3D11()
         break;
 
     case LOCK_SHADOW:
-        SetDataRange_D3D11(shadowData_.Get() + lockStart_ * indexSize_, lockStart_, lockCount_);
+        SetDataRange_D3D11(shadowData_.Get() + (intptr_t)lockStart_ * indexSize_, lockStart_, lockCount_);
         lockState_ = LOCK_NONE;
         break;
 
@@ -223,7 +228,7 @@ bool IndexBuffer::Create_D3D11()
         bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
         bufferDesc.CPUAccessFlags = dynamic_ ? D3D11_CPU_ACCESS_WRITE : 0;
         bufferDesc.Usage = dynamic_ ? D3D11_USAGE_DYNAMIC : D3D11_USAGE_DEFAULT;
-        bufferDesc.ByteWidth = (UINT)(indexCount_ * indexSize_);
+        bufferDesc.ByteWidth = (UINT)indexCount_ * indexSize_;
 
         HRESULT hr = graphics_->GetImpl_D3D11()->GetDevice()->CreateBuffer(&bufferDesc, nullptr, (ID3D11Buffer**)&object_.ptr_);
         if (FAILED(hr))
@@ -245,8 +250,9 @@ bool IndexBuffer::UpdateToGPU_D3D11()
         return false;
 }
 
-void* IndexBuffer::MapBuffer_D3D11(unsigned start, unsigned count, bool discard)
+void* IndexBuffer::MapBuffer_D3D11(i32 start, i32 count, bool discard)
 {
+    assert(start >= 0 && count >= 0);
     void* hwData = nullptr;
 
     if (object_.ptr_)
@@ -277,4 +283,4 @@ void IndexBuffer::UnmapBuffer_D3D11()
     }
 }
 
-}
+} // namespace Urho3D

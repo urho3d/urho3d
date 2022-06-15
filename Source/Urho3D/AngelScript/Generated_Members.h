@@ -10619,27 +10619,27 @@ template <class T> void RegisterMembers_IndexBuffer(asIScriptEngine* engine, con
     RegisterMembers_Object<T>(engine, className);
     RegisterMembers_GPUObject<T>(engine, className);
 
-    // unsigned char* IndexBuffer::GetShadowData() const
-    // Error: type "unsigned char*" can not automatically bind
-    // SharedArrayPtr<unsigned char> IndexBuffer::GetShadowDataShared() const
-    // Error: type "SharedArrayPtr<unsigned char>" can not automatically bind
-    // void* IndexBuffer::Lock(unsigned start, unsigned count, bool discard = false)
+    // u8* IndexBuffer::GetShadowData() const
+    // Error: type "u8*" can not automatically bind
+    // SharedArrayPtr<u8> IndexBuffer::GetShadowDataShared() const
+    // Error: type "SharedArrayPtr<u8>" can not automatically bind
+    // void* IndexBuffer::Lock(i32 start, i32 count, bool discard = false)
     // Error: type "void*" can not automatically bind
     // bool IndexBuffer::SetData(const void* data)
     // Error: type "const void*" can not automatically bind
-    // bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count, bool discard = false)
+    // bool IndexBuffer::SetDataRange(const void* data, i32 start, i32 count, bool discard = false)
     // Error: type "const void*" can not automatically bind
 
-    // unsigned IndexBuffer::GetIndexCount() const
-    engine->RegisterObjectMethod(className, "uint GetIndexCount() const", AS_METHODPR(T, GetIndexCount, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_indexCount() const", AS_METHODPR(T, GetIndexCount, () const, unsigned), AS_CALL_THISCALL);
+    // i32 IndexBuffer::GetIndexCount() const
+    engine->RegisterObjectMethod(className, "int GetIndexCount() const", AS_METHODPR(T, GetIndexCount, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_indexCount() const", AS_METHODPR(T, GetIndexCount, () const, i32), AS_CALL_THISCALL);
 
-    // unsigned IndexBuffer::GetIndexSize() const
-    engine->RegisterObjectMethod(className, "uint GetIndexSize() const", AS_METHODPR(T, GetIndexSize, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_indexSize() const", AS_METHODPR(T, GetIndexSize, () const, unsigned), AS_CALL_THISCALL);
+    // i32 IndexBuffer::GetIndexSize() const
+    engine->RegisterObjectMethod(className, "int GetIndexSize() const", AS_METHODPR(T, GetIndexSize, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_indexSize() const", AS_METHODPR(T, GetIndexSize, () const, i32), AS_CALL_THISCALL);
 
-    // bool IndexBuffer::GetUsedVertexRange(unsigned start, unsigned count, unsigned& minVertex, unsigned& vertexCount)
-    engine->RegisterObjectMethod(className, "bool GetUsedVertexRange(uint, uint, uint&, uint&)", AS_METHODPR(T, GetUsedVertexRange, (unsigned, unsigned, unsigned&, unsigned&), bool), AS_CALL_THISCALL);
+    // bool IndexBuffer::GetUsedVertexRange(i32 start, i32 count, i32& minVertex, i32& vertexCount)
+    engine->RegisterObjectMethod(className, "bool GetUsedVertexRange(int, int, int&, int&)", AS_METHODPR(T, GetUsedVertexRange, (i32, i32, i32&, i32&), bool), AS_CALL_THISCALL);
 
     // bool IndexBuffer::IsDynamic() const
     engine->RegisterObjectMethod(className, "bool IsDynamic() const", AS_METHODPR(T, IsDynamic, () const, bool), AS_CALL_THISCALL);
@@ -10656,8 +10656,8 @@ template <class T> void RegisterMembers_IndexBuffer(asIScriptEngine* engine, con
     engine->RegisterObjectMethod(className, "void SetShadowed(bool)", AS_METHODPR(T, SetShadowed, (bool), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_shadowed(bool)", AS_METHODPR(T, SetShadowed, (bool), void), AS_CALL_THISCALL);
 
-    // bool IndexBuffer::SetSize(unsigned indexCount, bool largeIndices, bool dynamic = false)
-    engine->RegisterObjectMethod(className, "bool SetSize(uint, bool, bool = false)", AS_METHODPR(T, SetSize, (unsigned, bool, bool), bool), AS_CALL_THISCALL);
+    // bool IndexBuffer::SetSize(i32 indexCount, bool largeIndices, bool dynamic = false)
+    engine->RegisterObjectMethod(className, "bool SetSize(int, bool, bool = false)", AS_METHODPR(T, SetSize, (i32, bool, bool), bool), AS_CALL_THISCALL);
 
     // void IndexBuffer::Unlock()
     engine->RegisterObjectMethod(className, "void Unlock()", AS_METHODPR(T, Unlock, (), void), AS_CALL_THISCALL);
