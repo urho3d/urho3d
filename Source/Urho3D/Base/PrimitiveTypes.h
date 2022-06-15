@@ -5,6 +5,7 @@
 
 #include <climits>
 #include <cstdint>
+#include <stddef.h>
 
 // https://en.cppreference.com/w/cpp/language/types
 static_assert(CHAR_BIT == 8);
