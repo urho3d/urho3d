@@ -39,7 +39,7 @@ void VertexBuffer::SetShadowed(bool enable)
     if (enable != shadowed_)
     {
         if (enable && vertexSize_ && vertexCount_)
-            shadowData_ = new u8[vertexCount_ * vertexSize_];
+            shadowData_ = new u8[(size_t)vertexCount_ * vertexSize_];
         else
             shadowData_.Reset();
 
@@ -47,13 +47,15 @@ void VertexBuffer::SetShadowed(bool enable)
     }
 }
 
-bool VertexBuffer::SetSize(unsigned vertexCount, unsigned elementMask, bool dynamic)
+bool VertexBuffer::SetSize(i32 vertexCount, unsigned elementMask, bool dynamic)
 {
+    assert(vertexCount >= 0);
     return SetSize(vertexCount, GetElements(elementMask), dynamic);
 }
 
-bool VertexBuffer::SetSize(unsigned vertexCount, const Vector<VertexElement>& elements, bool dynamic)
+bool VertexBuffer::SetSize(i32 vertexCount, const Vector<VertexElement>& elements, bool dynamic)
 {
+    assert(vertexCount >= 0);
     Unlock();
 
     vertexCount_ = vertexCount;
@@ -63,7 +65,7 @@ bool VertexBuffer::SetSize(unsigned vertexCount, const Vector<VertexElement>& el
     UpdateOffsets();
 
     if (shadowed_ && vertexCount_ && vertexSize_)
-        shadowData_ = new u8[vertexCount_ * vertexSize_];
+        shadowData_ = new u8[(size_t)vertexCount_ * vertexSize_];
     else
         shadowData_.Reset();
 
@@ -72,21 +74,21 @@ bool VertexBuffer::SetSize(unsigned vertexCount, const Vector<VertexElement>& el
 
 void VertexBuffer::UpdateOffsets()
 {
-    unsigned elementOffset = 0;
+    i32 elementOffset = 0;
     elementHash_ = 0;
     elementMask_ = MASK_NONE;
 
-    for (Vector<VertexElement>::Iterator i = elements_.Begin(); i != elements_.End(); ++i)
+    for (VertexElement& element : elements_)
     {
-        i->offset_ = elementOffset;
-        elementOffset += ELEMENT_TYPESIZES[i->type_];
+        element.offset_ = elementOffset;
+        elementOffset += ELEMENT_TYPESIZES[element.type_];
         elementHash_ <<= 6;
-        elementHash_ += (((int)i->type_ + 1) * ((int)i->semantic_ + 1) + i->index_);
+        elementHash_ += (u64)(((i32)element.type_ + 1) * ((i32)element.semantic_ + 1) + element.index_);
 
-        for (unsigned j = 0; j < MAX_LEGACY_VERTEX_ELEMENTS; ++j)
+        for (i32 j = 0; j < MAX_LEGACY_VERTEX_ELEMENTS; ++j)
         {
             const VertexElement& legacy = LEGACY_VERTEXELEMENTS[j];
-            if (i->type_ == legacy.type_ && i->semantic_ == legacy.semantic_ && i->index_ == legacy.index_)
+            if (element.type_ == legacy.type_ && element.semantic_ == legacy.semantic_ && element.index_ == legacy.index_)
                 elementMask_ |= VertexMaskFlags(1u << j);
         }
     }
@@ -150,7 +152,7 @@ Vector<VertexElement> VertexBuffer::GetElements(unsigned elementMask)
 {
     Vector<VertexElement> ret;
 
-    for (unsigned i = 0; i < MAX_LEGACY_VERTEX_ELEMENTS; ++i)
+    for (i32 i = 0; i < MAX_LEGACY_VERTEX_ELEMENTS; ++i)
     {
         if (elementMask & (1u << i))
             ret.Push(LEGACY_VERTEXELEMENTS[i]);
@@ -159,9 +161,9 @@ Vector<VertexElement> VertexBuffer::GetElements(unsigned elementMask)
     return ret;
 }
 
-unsigned VertexBuffer::GetVertexSize(const Vector<VertexElement>& elements)
+i32 VertexBuffer::GetVertexSize(const Vector<VertexElement>& elements)
 {
-    unsigned size = 0;
+    i32 size = 0;
 
     for (i32 i = 0; i < elements.Size(); ++i)
         size += ELEMENT_TYPESIZES[elements[i].type_];
@@ -169,11 +171,11 @@ unsigned VertexBuffer::GetVertexSize(const Vector<VertexElement>& elements)
     return size;
 }
 
-unsigned VertexBuffer::GetVertexSize(unsigned elementMask)
+i32 VertexBuffer::GetVertexSize(unsigned elementMask)
 {
-    unsigned size = 0;
+    i32 size = 0;
 
-    for (unsigned i = 0; i < MAX_LEGACY_VERTEX_ELEMENTS; ++i)
+    for (i32 i = 0; i < MAX_LEGACY_VERTEX_ELEMENTS; ++i)
     {
         if (elementMask & (1u << i))
             size += ELEMENT_TYPESIZES[LEGACY_VERTEXELEMENTS[i].type_];
@@ -184,12 +186,12 @@ unsigned VertexBuffer::GetVertexSize(unsigned elementMask)
 
 void VertexBuffer::UpdateOffsets(Vector<VertexElement>& elements)
 {
-    unsigned elementOffset = 0;
+    i32 elementOffset = 0;
 
-    for (Vector<VertexElement>::Iterator i = elements.Begin(); i != elements.End(); ++i)
+    for (VertexElement& element : elements)
     {
-        i->offset_ = elementOffset;
-        elementOffset += ELEMENT_TYPESIZES[i->type_];
+        element.offset_ = elementOffset;
+        elementOffset += ELEMENT_TYPESIZES[element.type_];
     }
 }
 
@@ -275,8 +277,9 @@ bool VertexBuffer::SetData(const void* data)
     return {}; // Prevent warning
 }
 
-bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count, bool discard)
+bool VertexBuffer::SetDataRange(const void* data, i32 start, i32 count, bool discard)
 {
+    assert(start >= 0 && count >= 0);
     GAPI gapi = Graphics::GetGAPI();
 
 #ifdef URHO3D_OPENGL
@@ -297,8 +300,9 @@ bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count
     return {}; // Prevent warning
 }
 
-void* VertexBuffer::Lock(unsigned start, unsigned count, bool discard)
+void* VertexBuffer::Lock(i32 start, i32 count, bool discard)
 {
+    assert(start >= 0 && count >= 0);
     GAPI gapi = Graphics::GetGAPI();
 
 #ifdef URHO3D_OPENGL
@@ -383,8 +387,9 @@ bool VertexBuffer::UpdateToGPU()
     return {}; // Prevent warning
 }
 
-void* VertexBuffer::MapBuffer(unsigned start, unsigned count, bool discard)
+void* VertexBuffer::MapBuffer(i32 start, i32 count, bool discard)
 {
+    assert(start >= 0 && count >= 0);
     GAPI gapi = Graphics::GetGAPI();
 
 #ifdef URHO3D_OPENGL

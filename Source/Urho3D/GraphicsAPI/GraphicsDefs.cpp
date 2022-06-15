@@ -28,7 +28,7 @@ const VertexElement LEGACY_VERTEXELEMENTS[] =
     VertexElement(TYPE_INT, SEM_OBJECTINDEX, 0, false)       // Objectindex
 };
 
-const u32 ELEMENT_TYPESIZES[] =
+const i32 ELEMENT_TYPESIZES[] =
 {
     sizeof(int),
     sizeof(float),

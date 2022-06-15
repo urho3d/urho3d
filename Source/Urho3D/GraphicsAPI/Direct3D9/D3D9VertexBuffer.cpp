@@ -40,7 +40,7 @@ void VertexBuffer::Release_D3D9()
 
     if (graphics_)
     {
-        for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
+        for (i32 i = 0; i < MAX_VERTEX_STREAMS; ++i)
         {
             if (graphics_->GetVertexBuffer(i) == this)
                 graphics_->SetVertexBuffer(nullptr);
@@ -65,7 +65,7 @@ bool VertexBuffer::SetData_D3D9(const void* data)
     }
 
     if (shadowData_ && data != shadowData_.Get())
-        memcpy(shadowData_.Get(), data, vertexCount_ * vertexSize_);
+        memcpy(shadowData_.Get(), data, (size_t)vertexCount_ * vertexSize_);
 
     if (object_.ptr_)
     {
@@ -79,7 +79,7 @@ bool VertexBuffer::SetData_D3D9(const void* data)
         void* hwData = MapBuffer_D3D9(0, vertexCount_, true);
         if (hwData)
         {
-            memcpy(hwData, data, vertexCount_ * vertexSize_);
+            memcpy(hwData, data, (size_t)vertexCount_ * vertexSize_);
             UnmapBuffer_D3D9();
         }
         else
@@ -90,8 +90,10 @@ bool VertexBuffer::SetData_D3D9(const void* data)
     return true;
 }
 
-bool VertexBuffer::SetDataRange_D3D9(const void* data, unsigned start, unsigned count, bool discard)
+bool VertexBuffer::SetDataRange_D3D9(const void* data, i32 start, i32 count, bool discard)
 {
+    assert(start >= 0 && count >= 0);
+
     if (start == 0 && count == vertexCount_)
         return SetData_D3D9(data);
 
@@ -116,8 +118,9 @@ bool VertexBuffer::SetDataRange_D3D9(const void* data, unsigned start, unsigned 
     if (!count)
         return true;
 
-    if (shadowData_ && shadowData_.Get() + start * vertexSize_ != data)
-        memcpy(shadowData_.Get() + start * vertexSize_, data, count * vertexSize_);
+    u8* dst = shadowData_.Get() + (intptr_t)start * vertexSize_;
+    if (shadowData_ && dst != data)
+        memcpy(dst, data, (size_t)count * vertexSize_);
 
     if (object_.ptr_)
     {
@@ -131,7 +134,7 @@ bool VertexBuffer::SetDataRange_D3D9(const void* data, unsigned start, unsigned 
         void* hwData = MapBuffer_D3D9(start, count, discard);
         if (hwData)
         {
-            memcpy(hwData, data, count * vertexSize_);
+            memcpy(hwData, data, (size_t)count * vertexSize_);
             UnmapBuffer_D3D9();
         }
         else
@@ -141,8 +144,10 @@ bool VertexBuffer::SetDataRange_D3D9(const void* data, unsigned start, unsigned 
     return true;
 }
 
-void* VertexBuffer::Lock_D3D9(unsigned start, unsigned count, bool discard)
+void* VertexBuffer::Lock_D3D9(i32 start, i32 count, bool discard)
 {
+    assert(start >= 0 && count >= 0);
+
     if (lockState_ != LOCK_NONE)
     {
         URHO3D_LOGERROR("Vertex buffer already locked");
@@ -173,7 +178,7 @@ void* VertexBuffer::Lock_D3D9(unsigned start, unsigned count, bool discard)
     else if (shadowData_)
     {
         lockState_ = LOCK_SHADOW;
-        return shadowData_.Get() + start * vertexSize_;
+        return shadowData_.Get() + (intptr_t)start * vertexSize_;
     }
     else if (graphics_)
     {
@@ -194,7 +199,7 @@ void VertexBuffer::Unlock_D3D9()
         break;
 
     case LOCK_SHADOW:
-        SetDataRange_D3D9(shadowData_.Get() + lockStart_ * vertexSize_, lockStart_, lockCount_);
+        SetDataRange_D3D9(shadowData_.Get() + (intptr_t)lockStart_ * vertexSize_, lockStart_, lockCount_);
         lockState_ = LOCK_NONE;
         break;
 
@@ -225,15 +230,15 @@ bool VertexBuffer::Create_D3D9()
             return true;
         }
 
-        unsigned pool = dynamic_ ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
-        unsigned d3dUsage = dynamic_ ? D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY : 0;
+        D3DPOOL pool = dynamic_ ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
+        DWORD d3dUsage = dynamic_ ? D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY : 0;
 
         IDirect3DDevice9* device = graphics_->GetImpl_D3D9()->GetDevice();
         HRESULT hr = device->CreateVertexBuffer(
-            vertexCount_ * vertexSize_,
+            (UINT)vertexCount_ * vertexSize_,
             d3dUsage,
             0,
-            (D3DPOOL)pool,
+            pool,
             (IDirect3DVertexBuffer9**)&object_.ptr_,
             nullptr);
         if (FAILED(hr))
@@ -255,8 +260,9 @@ bool VertexBuffer::UpdateToGPU_D3D9()
         return false;
 }
 
-void* VertexBuffer::MapBuffer_D3D9(unsigned start, unsigned count, bool discard)
+void* VertexBuffer::MapBuffer_D3D9(i32 start, i32 count, bool discard)
 {
+    assert(start >= 0 && count >= 0);
     void* hwData = nullptr;
 
     if (object_.ptr_)
@@ -266,7 +272,7 @@ void* VertexBuffer::MapBuffer_D3D9(unsigned start, unsigned count, bool discard)
         if (discard && dynamic_)
             flags = D3DLOCK_DISCARD;
 
-        HRESULT hr = ((IDirect3DVertexBuffer9*)object_.ptr_)->Lock(start * vertexSize_, count * vertexSize_, &hwData, flags);
+        HRESULT hr = ((IDirect3DVertexBuffer9*)object_.ptr_)->Lock((UINT)start * vertexSize_, (UINT)count * vertexSize_, &hwData, flags);
         if (FAILED(hr))
             URHO3D_LOGD3DERROR("Could not lock vertex buffer", hr);
         else

@@ -45,7 +45,7 @@ void VertexBuffer::Release_OGL()
 
         if (!graphics_->IsDeviceLost())
         {
-            for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
+            for (i32 i = 0; i < MAX_VERTEX_STREAMS; ++i)
             {
                 if (graphics_->GetVertexBuffer(i) == this)
                     graphics_->SetVertexBuffer(nullptr);
@@ -74,14 +74,14 @@ bool VertexBuffer::SetData_OGL(const void* data)
     }
 
     if (shadowData_ && data != shadowData_.Get())
-        memcpy(shadowData_.Get(), data, vertexCount_ * (size_t)vertexSize_);
+        memcpy(shadowData_.Get(), data, (size_t)vertexCount_ * vertexSize_);
 
     if (object_.name_)
     {
         if (!graphics_->IsDeviceLost())
         {
             graphics_->SetVBO_OGL(object_.name_);
-            glBufferData(GL_ARRAY_BUFFER, vertexCount_ * (size_t)vertexSize_, data, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr)vertexCount_ * vertexSize_, data, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
         }
         else
         {
@@ -94,8 +94,10 @@ bool VertexBuffer::SetData_OGL(const void* data)
     return true;
 }
 
-bool VertexBuffer::SetDataRange_OGL(const void* data, unsigned start, unsigned count, bool discard)
+bool VertexBuffer::SetDataRange_OGL(const void* data, i32 start, i32 count, bool discard)
 {
+    assert(start >= 0 && count >= 0);
+
     if (start == 0 && count == vertexCount_)
         return SetData_OGL(data);
 
@@ -120,8 +122,9 @@ bool VertexBuffer::SetDataRange_OGL(const void* data, unsigned start, unsigned c
     if (!count)
         return true;
 
-    if (shadowData_ && shadowData_.Get() + start * vertexSize_ != data)
-        memcpy(shadowData_.Get() + start * vertexSize_, data, count * (size_t)vertexSize_);
+    u8* dst = shadowData_.Get() + (intptr_t)start * vertexSize_;
+    if (shadowData_ && dst != data)
+        memcpy(dst, data, (size_t)count * vertexSize_);
 
     if (object_.name_)
     {
@@ -129,9 +132,9 @@ bool VertexBuffer::SetDataRange_OGL(const void* data, unsigned start, unsigned c
         {
             graphics_->SetVBO_OGL(object_.name_);
             if (!discard || start != 0)
-                glBufferSubData(GL_ARRAY_BUFFER, start * (size_t)vertexSize_, count * vertexSize_, data);
+                glBufferSubData(GL_ARRAY_BUFFER, (GLintptr)start * vertexSize_, (GLsizeiptr)count * vertexSize_, data);
             else
-                glBufferData(GL_ARRAY_BUFFER, count * (size_t)vertexSize_, data, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+                glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr)count * vertexSize_, data, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
         }
         else
         {
@@ -143,8 +146,10 @@ bool VertexBuffer::SetDataRange_OGL(const void* data, unsigned start, unsigned c
     return true;
 }
 
-void* VertexBuffer::Lock_OGL(unsigned start, unsigned count, bool discard)
+void* VertexBuffer::Lock_OGL(i32 start, i32 count, bool discard)
 {
+    assert(start >= 0 && count >= 0);
+
     if (lockState_ != LOCK_NONE)
     {
         URHO3D_LOGERROR("Vertex buffer already locked");
@@ -173,7 +178,7 @@ void* VertexBuffer::Lock_OGL(unsigned start, unsigned count, bool discard)
     if (shadowData_)
     {
         lockState_ = LOCK_SHADOW;
-        return shadowData_.Get() + start * vertexSize_;
+        return shadowData_.Get() + (intptr_t)start * vertexSize_;
     }
     else if (graphics_)
     {
@@ -190,7 +195,7 @@ void VertexBuffer::Unlock_OGL()
     switch (lockState_)
     {
     case LOCK_SHADOW:
-        SetDataRange_OGL(shadowData_.Get() + lockStart_ * vertexSize_, lockStart_, lockCount_, discardLock_);
+        SetDataRange_OGL(shadowData_.Get() + (intptr_t)lockStart_ * vertexSize_, lockStart_, lockCount_, discardLock_);
         lockState_ = LOCK_NONE;
         break;
 
@@ -232,7 +237,7 @@ bool VertexBuffer::Create_OGL()
         }
 
         graphics_->SetVBO_OGL(object_.name_);
-        glBufferData(GL_ARRAY_BUFFER, vertexCount_ * (size_t)vertexSize_, nullptr, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr)vertexCount_ * vertexSize_, nullptr, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
     }
 
     return true;
@@ -246,7 +251,7 @@ bool VertexBuffer::UpdateToGPU_OGL()
         return false;
 }
 
-void* VertexBuffer::MapBuffer_OGL(unsigned start, unsigned count, bool discard)
+void* VertexBuffer::MapBuffer_OGL(i32 start, i32 count, bool discard)
 {
     // Never called on OpenGL
     return nullptr;

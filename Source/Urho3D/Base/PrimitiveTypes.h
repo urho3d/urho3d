@@ -26,3 +26,7 @@ typedef uint64_t u64;
 // Unicode code point (UTF-32 code unit)
 static_assert(sizeof(char32_t) == 4);
 typedef char32_t c32;
+
+// Pointer arithmetics
+static_assert(sizeof(void*) == sizeof(ptrdiff_t));
+static_assert(sizeof(void*) == sizeof(intptr_t));
