@@ -43,10 +43,8 @@ VertexDeclaration_D3D9::VertexDeclaration_D3D9(Graphics* graphics, const Vector<
 {
     Vector<VertexDeclarationElement_D3D9> elements;
 
-    for (unsigned i = 0; i < srcElements.Size(); ++i)
+    for (const VertexElement& srcElement : srcElements)
     {
-        const VertexElement& srcElement = srcElements[i];
-
         if (srcElement.semantic_ == SEM_OBJECTINDEX)
         {
             URHO3D_LOGWARNING("Object index attribute is not supported on Direct3D9 and will be ignored");
@@ -56,9 +54,9 @@ VertexDeclaration_D3D9::VertexDeclaration_D3D9(Graphics* graphics, const Vector<
         VertexDeclarationElement_D3D9 element;
         element.semantic_ = srcElement.semantic_;
         element.type_ = srcElement.type_;
-        element.index_ = srcElement.index_;
+        element.index_ = (BYTE)srcElement.index_;
         element.streamIndex_ = 0;
-        element.offset_ = srcElement.offset_;
+        element.offset_ = (WORD)srcElement.offset_;
         elements.Push(element);
     }
 
@@ -69,9 +67,9 @@ VertexDeclaration_D3D9::VertexDeclaration_D3D9(Graphics* graphics, const Vector<
     declaration_(nullptr)
 {
     Vector<VertexDeclarationElement_D3D9> elements;
-    unsigned prevBufferElements = 0;
+    i32 prevBufferElements = 0;
 
-    for (unsigned i = 0; i < buffers.Size(); ++i)
+    for (i32 i = 0; i < buffers.Size(); ++i)
     {
         if (!buffers[i])
             continue;
@@ -79,10 +77,8 @@ VertexDeclaration_D3D9::VertexDeclaration_D3D9(Graphics* graphics, const Vector<
         const Vector<VertexElement>& srcElements = buffers[i]->GetElements();
         bool isExisting = false;
 
-        for (unsigned j = 0; j < srcElements.Size(); ++j)
+        for (const VertexElement& srcElement : srcElements)
         {
-            const VertexElement& srcElement = srcElements[j];
-
             if (srcElement.semantic_ == SEM_OBJECTINDEX)
             {
                 URHO3D_LOGWARNING("Object index attribute is not supported on Direct3D9 and will be ignored");
@@ -90,13 +86,13 @@ VertexDeclaration_D3D9::VertexDeclaration_D3D9(Graphics* graphics, const Vector<
             }
 
             // Override existing element if necessary
-            for (unsigned k = 0; k < prevBufferElements; ++k)
+            for (i32 k = 0; k < prevBufferElements; ++k)
             {
                 if (elements[k].semantic_ == srcElement.semantic_ && elements[k].index_ == srcElement.index_)
                 {
                     isExisting = true;
-                    elements[k].streamIndex_ = i;
-                    elements[k].offset_ = srcElement.offset_;
+                    elements[k].streamIndex_ = (WORD)i;
+                    elements[k].offset_ = (WORD)srcElement.offset_;
                     break;
                 }
             }
@@ -107,9 +103,9 @@ VertexDeclaration_D3D9::VertexDeclaration_D3D9(Graphics* graphics, const Vector<
             VertexDeclarationElement_D3D9 element;
             element.semantic_ = srcElement.semantic_;
             element.type_ = srcElement.type_;
-            element.index_ = srcElement.index_;
-            element.streamIndex_ = i;
-            element.offset_ = srcElement.offset_;
+            element.index_ = (BYTE)srcElement.index_;
+            element.streamIndex_ = (WORD)i;
+            element.offset_ = (WORD)srcElement.offset_;
             elements.Push(element);
         }
 
@@ -123,9 +119,9 @@ VertexDeclaration_D3D9::VertexDeclaration_D3D9(Graphics* graphics, const Vector<
     declaration_(nullptr)
 {
     Vector<VertexDeclarationElement_D3D9> elements;
-    unsigned prevBufferElements = 0;
+    i32 prevBufferElements = 0;
 
-    for (unsigned i = 0; i < buffers.Size(); ++i)
+    for (i32 i = 0; i < buffers.Size(); ++i)
     {
         if (!buffers[i])
             continue;
@@ -133,10 +129,8 @@ VertexDeclaration_D3D9::VertexDeclaration_D3D9(Graphics* graphics, const Vector<
         const Vector<VertexElement>& srcElements = buffers[i]->GetElements();
         bool isExisting = false;
 
-        for (unsigned j = 0; j < srcElements.Size(); ++j)
+        for (const VertexElement& srcElement : srcElements)
         {
-            const VertexElement& srcElement = srcElements[j];
-
             if (srcElement.semantic_ == SEM_OBJECTINDEX)
             {
                 URHO3D_LOGWARNING("Object index attribute is not supported on Direct3D9 and will be ignored");
@@ -144,13 +138,13 @@ VertexDeclaration_D3D9::VertexDeclaration_D3D9(Graphics* graphics, const Vector<
             }
 
             // Override existing element if necessary
-            for (unsigned k = 0; k < prevBufferElements; ++k)
+            for (i32 k = 0; k < prevBufferElements; ++k)
             {
                 if (elements[k].semantic_ == srcElement.semantic_ && elements[k].index_ == srcElement.index_)
                 {
                     isExisting = true;
-                    elements[k].streamIndex_ = i;
-                    elements[k].offset_ = srcElement.offset_;
+                    elements[k].streamIndex_ = (WORD)i;
+                    elements[k].offset_ = (WORD)srcElement.offset_;
                     break;
                 }
             }
@@ -161,9 +155,9 @@ VertexDeclaration_D3D9::VertexDeclaration_D3D9(Graphics* graphics, const Vector<
             VertexDeclarationElement_D3D9 element;
             element.semantic_ = srcElement.semantic_;
             element.type_ = srcElement.type_;
-            element.index_ = srcElement.index_;
-            element.streamIndex_ = i;
-            element.offset_ = srcElement.offset_;
+            element.index_ = (BYTE)srcElement.index_;
+            element.streamIndex_ = (WORD)i;
+            element.offset_ = (WORD)srcElement.offset_;
             elements.Push(element);
         }
 
@@ -180,17 +174,17 @@ VertexDeclaration_D3D9::~VertexDeclaration_D3D9()
 
 void VertexDeclaration_D3D9::Create(Graphics* graphics, const Vector<VertexDeclarationElement_D3D9>& elements)
 {
-    SharedArrayPtr<D3DVERTEXELEMENT9> elementArray(new D3DVERTEXELEMENT9[elements.Size() + 1]);
+    SharedArrayPtr<D3DVERTEXELEMENT9> elementArray(new D3DVERTEXELEMENT9[(size_t)elements.Size() + 1]);
 
     D3DVERTEXELEMENT9* dest = elementArray;
-    for (Vector<VertexDeclarationElement_D3D9>::ConstIterator i = elements.Begin(); i != elements.End(); ++i)
+    for (const VertexDeclarationElement_D3D9& element : elements)
     {
-        dest->Stream = (WORD)i->streamIndex_;
-        dest->Offset = (WORD)i->offset_;
-        dest->Type = d3dElementType[i->type_];
+        dest->Stream = element.streamIndex_;
+        dest->Offset = element.offset_;
+        dest->Type = d3dElementType[element.type_];
         dest->Method = D3DDECLMETHOD_DEFAULT;
-        dest->Usage = d3dElementUsage[i->semantic_];
-        dest->UsageIndex = i->index_;
+        dest->Usage = d3dElementUsage[element.semantic_];
+        dest->UsageIndex = element.index_;
         dest++;
     }
 

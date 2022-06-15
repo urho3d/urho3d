@@ -23,11 +23,11 @@ struct VertexDeclarationElement_D3D9
     /// Element semantic.
     VertexElementSemantic semantic_;
     /// Semantic index.
-    unsigned char index_;
+    BYTE index_;
     /// Stream index.
-    unsigned char streamIndex_;
+    WORD streamIndex_;
     /// Byte offset.
-    unsigned offset_;
+    WORD offset_;
 };
 
 /// Vertex declaration.
