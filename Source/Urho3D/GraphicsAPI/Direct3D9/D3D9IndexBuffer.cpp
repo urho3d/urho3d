@@ -60,7 +60,7 @@ bool IndexBuffer::SetData_D3D9(const void* data)
     }
 
     if (shadowData_ && data != shadowData_.Get())
-        memcpy(shadowData_.Get(), data, indexCount_ * indexSize_);
+        memcpy(shadowData_.Get(), data, (size_t)indexCount_ * indexSize_);
 
     if (object_.ptr_)
     {
@@ -74,7 +74,7 @@ bool IndexBuffer::SetData_D3D9(const void* data)
         void* hwData = MapBuffer_D3D9(0, indexCount_, true);
         if (hwData)
         {
-            memcpy(hwData, data, indexCount_ * indexSize_);
+            memcpy(hwData, data, (size_t)indexCount_ * indexSize_);
             UnmapBuffer();
         }
         else
@@ -85,8 +85,10 @@ bool IndexBuffer::SetData_D3D9(const void* data)
     return true;
 }
 
-bool IndexBuffer::SetDataRange_D3D9(const void* data, unsigned start, unsigned count, bool discard)
+bool IndexBuffer::SetDataRange_D3D9(const void* data, i32 start, i32 count, bool discard)
 {
+    assert(start >= 0 && count >= 0);
+
     if (start == 0 && count == indexCount_)
         return SetData_D3D9(data);
 
@@ -111,8 +113,9 @@ bool IndexBuffer::SetDataRange_D3D9(const void* data, unsigned start, unsigned c
     if (!count)
         return true;
 
-    if (shadowData_ && shadowData_.Get() + start * indexSize_ != data)
-        memcpy(shadowData_.Get() + start * indexSize_, data, count * indexSize_);
+    u8* dst = shadowData_.Get() + (intptr_t)start * indexSize_;
+    if (shadowData_ && dst != data)
+        memcpy(dst, data, (size_t)count * indexSize_);
 
     if (object_.ptr_)
     {
@@ -126,7 +129,7 @@ bool IndexBuffer::SetDataRange_D3D9(const void* data, unsigned start, unsigned c
         void* hwData = MapBuffer_D3D9(start, count, discard);
         if (hwData)
         {
-            memcpy(hwData, data, count * indexSize_);
+            memcpy(hwData, data, (size_t)count * indexSize_);
             UnmapBuffer();
         }
         else
@@ -136,8 +139,10 @@ bool IndexBuffer::SetDataRange_D3D9(const void* data, unsigned start, unsigned c
     return true;
 }
 
-void* IndexBuffer::Lock_D3D9(unsigned start, unsigned count, bool discard)
+void* IndexBuffer::Lock_D3D9(i32 start, i32 count, bool discard)
 {
+    assert(start >= 0 && count >= 0);
+
     if (lockState_ != LOCK_NONE)
     {
         URHO3D_LOGERROR("Index buffer already locked");
@@ -168,7 +173,7 @@ void* IndexBuffer::Lock_D3D9(unsigned start, unsigned count, bool discard)
     else if (shadowData_)
     {
         lockState_ = LOCK_SHADOW;
-        return shadowData_.Get() + start * indexSize_;
+        return shadowData_.Get() + (intptr_t)start * indexSize_;
     }
     else if (graphics_)
     {
@@ -189,7 +194,7 @@ void IndexBuffer::Unlock_D3D9()
         break;
 
     case LOCK_SHADOW:
-        SetDataRange_D3D9(shadowData_.Get() + lockStart_ * indexSize_, lockStart_, lockCount_);
+        SetDataRange_D3D9(shadowData_.Get() + (intptr_t)lockStart_ * indexSize_, lockStart_, lockCount_);
         lockState_ = LOCK_NONE;
         break;
 
@@ -220,15 +225,15 @@ bool IndexBuffer::Create_D3D9()
             return true;
         }
 
-        unsigned pool = dynamic_ ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
-        unsigned d3dUsage = dynamic_ ? D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY : 0;
+        D3DPOOL pool = dynamic_ ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
+        DWORD d3dUsage = dynamic_ ? D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY : 0;
 
         IDirect3DDevice9* device = graphics_->GetImpl_D3D9()->GetDevice();
         HRESULT hr = device->CreateIndexBuffer(
-            indexCount_ * indexSize_,
+            (UINT)indexCount_ * indexSize_,
             d3dUsage,
-            indexSize_ == sizeof(unsigned) ? D3DFMT_INDEX32 : D3DFMT_INDEX16,
-            (D3DPOOL)pool,
+            indexSize_ == sizeof(u32) ? D3DFMT_INDEX32 : D3DFMT_INDEX16,
+            pool,
             (IDirect3DIndexBuffer9**)&object_,
             nullptr);
         if (FAILED(hr))
@@ -250,8 +255,9 @@ bool IndexBuffer::UpdateToGPU_D3D9()
         return false;
 }
 
-void* IndexBuffer::MapBuffer_D3D9(unsigned start, unsigned count, bool discard)
+void* IndexBuffer::MapBuffer_D3D9(i32 start, i32 count, bool discard)
 {
+    assert(start >= 0 && count >= 0);
     void* hwData = nullptr;
 
     if (object_.ptr_)
@@ -261,7 +267,7 @@ void* IndexBuffer::MapBuffer_D3D9(unsigned start, unsigned count, bool discard)
         if (discard && dynamic_)
             flags = D3DLOCK_DISCARD;
 
-        HRESULT hr = ((IDirect3DIndexBuffer9*)object_.ptr_)->Lock(start * indexSize_, count * indexSize_, &hwData, flags);
+        HRESULT hr = ((IDirect3DIndexBuffer9*)object_.ptr_)->Lock((UINT)start * indexSize_, (UINT)count * indexSize_, &hwData, flags);
         if (FAILED(hr))
             URHO3D_LOGD3DERROR("Could not lock index buffer", hr);
         else
@@ -280,4 +286,4 @@ void IndexBuffer::UnmapBuffer_D3D9()
     }
 }
 
-}
+} // namespace Urho3D

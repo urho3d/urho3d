@@ -71,14 +71,14 @@ bool IndexBuffer::SetData_OGL(const void* data)
     }
 
     if (shadowData_ && data != shadowData_.Get())
-        memcpy(shadowData_.Get(), data, indexCount_ * (size_t)indexSize_);
+        memcpy(shadowData_.Get(), data, (size_t)indexCount_ * indexSize_);
 
     if (object_.name_)
     {
         if (!graphics_->IsDeviceLost())
         {
             graphics_->SetIndexBuffer(this);
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount_ * (size_t)indexSize_, data, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, (GLsizeiptr)indexCount_ * indexSize_, data, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
         }
         else
         {
@@ -91,8 +91,10 @@ bool IndexBuffer::SetData_OGL(const void* data)
     return true;
 }
 
-bool IndexBuffer::SetDataRange_OGL(const void* data, unsigned start, unsigned count, bool discard)
+bool IndexBuffer::SetDataRange_OGL(const void* data, i32 start, i32 count, bool discard)
 {
+    assert(start >= 0 && count >= 0);
+
     if (start == 0 && count == indexCount_)
         return SetData_OGL(data);
 
@@ -117,8 +119,9 @@ bool IndexBuffer::SetDataRange_OGL(const void* data, unsigned start, unsigned co
     if (!count)
         return true;
 
-    if (shadowData_ && shadowData_.Get() + start * indexSize_ != data)
-        memcpy(shadowData_.Get() + start * indexSize_, data, count * (size_t)indexSize_);
+    u8* dst = shadowData_.Get() + (intptr_t)start * indexSize_;
+    if (shadowData_ && dst != data)
+        memcpy(dst, data, (size_t)count * indexSize_);
 
     if (object_.name_)
     {
@@ -126,9 +129,9 @@ bool IndexBuffer::SetDataRange_OGL(const void* data, unsigned start, unsigned co
         {
             graphics_->SetIndexBuffer(this);
             if (!discard || start != 0)
-                glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, start * (size_t)indexSize_, count * indexSize_, data);
+                glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, (GLintptr)start * indexSize_, (GLsizeiptr)count * indexSize_, data);
             else
-                glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * (size_t)indexSize_, data, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, (GLsizeiptr)count * indexSize_, data, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
         }
         else
         {
@@ -140,8 +143,10 @@ bool IndexBuffer::SetDataRange_OGL(const void* data, unsigned start, unsigned co
     return true;
 }
 
-void* IndexBuffer::Lock_OGL(unsigned start, unsigned count, bool discard)
+void* IndexBuffer::Lock_OGL(i32 start, i32 count, bool discard)
 {
+    assert(start >= 0 && count >= 0);
+
     if (lockState_ != LOCK_NONE)
     {
         URHO3D_LOGERROR("Index buffer already locked");
@@ -170,7 +175,7 @@ void* IndexBuffer::Lock_OGL(unsigned start, unsigned count, bool discard)
     if (shadowData_)
     {
         lockState_ = LOCK_SHADOW;
-        return shadowData_.Get() + start * indexSize_;
+        return shadowData_.Get() + (intptr_t)start * indexSize_;
     }
     else if (graphics_)
     {
@@ -187,7 +192,7 @@ void IndexBuffer::Unlock_OGL()
     switch (lockState_)
     {
     case LOCK_SHADOW:
-        SetDataRange_OGL(shadowData_.Get() + lockStart_ * indexSize_, lockStart_, lockCount_, discardLock_);
+        SetDataRange_OGL(shadowData_.Get() + (intptr_t)lockStart_ * indexSize_, lockStart_, lockCount_, discardLock_);
         lockState_ = LOCK_NONE;
         break;
 
@@ -222,6 +227,7 @@ bool IndexBuffer::Create_OGL()
 
         if (!object_.name_)
             glGenBuffers(1, &object_.name_);
+
         if (!object_.name_)
         {
             URHO3D_LOGERROR("Failed to create index buffer");
@@ -229,7 +235,7 @@ bool IndexBuffer::Create_OGL()
         }
 
         graphics_->SetIndexBuffer(this);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount_ * (size_t)indexSize_, nullptr, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, (GLsizeiptr)indexCount_ * indexSize_, nullptr, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
     }
 
     return true;
@@ -243,7 +249,7 @@ bool IndexBuffer::UpdateToGPU_OGL()
         return false;
 }
 
-void* IndexBuffer::MapBuffer_OGL(unsigned start, unsigned count, bool discard)
+void* IndexBuffer::MapBuffer_OGL(i32 start, i32 count, bool discard)
 {
     // Never called on OpenGL
     return nullptr;
@@ -254,4 +260,4 @@ void IndexBuffer::UnmapBuffer_OGL()
     // Never called on OpenGL
 }
 
-}
+} // namespace Urho3D
