@@ -482,7 +482,7 @@ void Graphics::EndFrame_D3D11()
     CleanupScratchBuffers();
 }
 
-void Graphics::Clear_D3D11(ClearTargetFlags flags, const Color& color, float depth, unsigned stencil)
+void Graphics::Clear_D3D11(ClearTargetFlags flags, const Color& color, float depth, u32 stencil)
 {
     IntVector2 rtSize = GetRenderTargetDimensions_D3D11();
 
@@ -1544,8 +1544,8 @@ void Graphics::SetScissorTest_D3D11(bool enable, const IntRect& rect)
     }
 }
 
-void Graphics::SetStencilTest_D3D11(bool enable, CompareMode mode, StencilOp pass, StencilOp fail, StencilOp zFail, unsigned stencilRef,
-    unsigned compareMask, unsigned writeMask)
+void Graphics::SetStencilTest_D3D11(bool enable, CompareMode mode, StencilOp pass, StencilOp fail, StencilOp zFail, u32 stencilRef,
+    u32 compareMask, u32 writeMask)
 {
     GraphicsImpl_D3D11* impl = GetImpl_D3D11();
 
@@ -2355,8 +2355,8 @@ void Graphics::ResetCachedState_D3D11()
     stencilFail_ = OP_KEEP;
     stencilZFail_ = OP_KEEP;
     stencilRef_ = 0;
-    stencilCompareMask_ = M_MAX_UNSIGNED;
-    stencilWriteMask_ = M_MAX_UNSIGNED;
+    stencilCompareMask_ = M_U32_MASK_ALL_BITS;
+    stencilWriteMask_ = M_U32_MASK_ALL_BITS;
     useClipPlane_ = false;
     impl->shaderProgram_ = nullptr;
     impl->renderTargetsDirty_ = true;
@@ -2518,8 +2518,8 @@ void Graphics::PrepareDraw_D3D11()
                 stateDesc.DepthWriteMask = depthWrite_ ? D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ZERO;
                 stateDesc.DepthFunc = d3dCmpFunc[depthTestMode_];
                 stateDesc.StencilEnable = stencilTest_ ? TRUE : FALSE;
-                stateDesc.StencilReadMask = (unsigned char)stencilCompareMask_;
-                stateDesc.StencilWriteMask = (unsigned char)stencilWriteMask_;
+                stateDesc.StencilReadMask = (UINT8)stencilCompareMask_;
+                stateDesc.StencilWriteMask = (UINT8)stencilWriteMask_;
                 stateDesc.FrontFace.StencilFailOp = d3dStencilOp[stencilFail_];
                 stateDesc.FrontFace.StencilDepthFailOp = d3dStencilOp[stencilZFail_];
                 stateDesc.FrontFace.StencilPassOp = d3dStencilOp[stencilPass_];

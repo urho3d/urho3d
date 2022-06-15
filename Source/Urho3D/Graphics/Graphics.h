@@ -206,7 +206,7 @@ public:
     /// End frame rendering and swap buffers.
     void EndFrame();
     /// Clear any or all of rendertarget, depth buffer and stencil buffer.
-    void Clear(ClearTargetFlags flags, const Color& color = Color(0.0f, 0.0f, 0.0f, 0.0f), float depth = 1.0f, unsigned stencil = 0);
+    void Clear(ClearTargetFlags flags, const Color& color = Color(0.0f, 0.0f, 0.0f, 0.0f), float depth = 1.0f, u32 stencil = 0);
     /// Resolve multisampled backbuffer to a texture rendertarget. The texture's size should match the viewport size.
     bool ResolveToTexture(Texture2D* destination, const IntRect& viewport);
     /// Resolve a multisampled texture on itself.
@@ -317,7 +317,7 @@ public:
     /// Set stencil test.
     void SetStencilTest
         (bool enable, CompareMode mode = CMP_ALWAYS, StencilOp pass = OP_KEEP, StencilOp fail = OP_KEEP, StencilOp zFail = OP_KEEP,
-            unsigned stencilRef = 0, unsigned compareMask = M_MAX_UNSIGNED, unsigned writeMask = M_MAX_UNSIGNED);
+            u32 stencilRef = 0, u32 compareMask = M_U32_MASK_ALL_BITS, u32 writeMask = M_U32_MASK_ALL_BITS);
     /// Set a custom clipping plane. The plane is specified in world space, but is dependent on the view and projection matrices.
     void SetClipPlane(bool enable, const Plane& clipPlane = Plane::UP, const Matrix3x4& view = Matrix3x4::IDENTITY,
         const Matrix4& projection = Matrix4::IDENTITY);
@@ -645,10 +645,10 @@ public:
     u32 GetStencilRef() const { return stencilRef_; }
 
     /// Return stencil compare bitmask.
-    unsigned GetStencilCompareMask() const { return stencilCompareMask_; }
+    u32 GetStencilCompareMask() const { return stencilCompareMask_; }
 
     /// Return stencil write bitmask.
-    unsigned GetStencilWriteMask() const { return stencilWriteMask_; }
+    u32 GetStencilWriteMask() const { return stencilWriteMask_; }
 
     /// Return whether a custom clipping plane is in use.
     bool GetUseClipPlane() const { return useClipPlane_; }
@@ -893,7 +893,7 @@ private:
     bool TakeScreenShot_OGL(Image& destImage);
     bool BeginFrame_OGL();
     void EndFrame_OGL();
-    void Clear_OGL(ClearTargetFlags flags, const Color& color = Color(0.0f, 0.0f, 0.0f, 0.0f), float depth = 1.0f, unsigned stencil = 0);
+    void Clear_OGL(ClearTargetFlags flags, const Color& color = Color(0.0f, 0.0f, 0.0f, 0.0f), float depth = 1.0f, u32 stencil = 0);
     bool ResolveToTexture_OGL(Texture2D* destination, const IntRect& viewport);
     bool ResolveToTexture_OGL(Texture2D* texture);
     bool ResolveToTexture_OGL(TextureCube* texture);
@@ -946,7 +946,7 @@ private:
     void SetScissorTest_OGL(bool enable, const Rect& rect = Rect::FULL, bool borderInclusive = true);
     void SetScissorTest_OGL(bool enable, const IntRect& rect);
     void SetClipPlane_OGL(bool enable, const Plane& clipPlane, const Matrix3x4& view, const Matrix4& projection);
-    void SetStencilTest_OGL(bool enable, CompareMode mode, StencilOp pass, StencilOp fail, StencilOp zFail, unsigned stencilRef, unsigned compareMask, unsigned writeMask);
+    void SetStencilTest_OGL(bool enable, CompareMode mode = CMP_ALWAYS, StencilOp pass = OP_KEEP, StencilOp fail = OP_KEEP, StencilOp zFail = OP_KEEP, u32 stencilRef = 0, u32 compareMask = M_U32_MASK_ALL_BITS, u32 writeMask = M_U32_MASK_ALL_BITS);
     bool IsInitialized_OGL() const;
     bool GetDither_OGL() const;
     bool IsDeviceLost_OGL() const;
@@ -997,7 +997,7 @@ private:
     bool TakeScreenShot_D3D9(Image& destImage);
     bool BeginFrame_D3D9();
     void EndFrame_D3D9();
-    void Clear_D3D9(ClearTargetFlags flags, const Color& color = Color(0.0f, 0.0f, 0.0f, 0.0f), float depth = 1.0f, unsigned stencil = 0);
+    void Clear_D3D9(ClearTargetFlags flags, const Color& color = Color(0.0f, 0.0f, 0.0f, 0.0f), float depth = 1.0f, u32 stencil = 0);
     bool ResolveToTexture_D3D9(Texture2D* destination, const IntRect& viewport);
     bool ResolveToTexture_D3D9(Texture2D* texture);
     bool ResolveToTexture_D3D9(TextureCube* texture);
@@ -1050,7 +1050,7 @@ private:
     void SetScissorTest_D3D9(bool enable, const Rect& rect = Rect::FULL, bool borderInclusive = true);
     void SetScissorTest_D3D9(bool enable, const IntRect& rect);
     void SetClipPlane_D3D9(bool enable, const Plane& clipPlane, const Matrix3x4& view, const Matrix4& projection);
-    void SetStencilTest_D3D9(bool enable, CompareMode mode = CMP_ALWAYS, StencilOp pass = OP_KEEP, StencilOp fail = OP_KEEP, StencilOp zFail = OP_KEEP, unsigned stencilRef = 0, unsigned compareMask = M_MAX_UNSIGNED, unsigned writeMask = M_MAX_UNSIGNED);
+    void SetStencilTest_D3D9(bool enable, CompareMode mode = CMP_ALWAYS, StencilOp pass = OP_KEEP, StencilOp fail = OP_KEEP, StencilOp zFail = OP_KEEP, u32 stencilRef = 0, u32 compareMask = M_U32_MASK_ALL_BITS, u32 writeMask = M_U32_MASK_ALL_BITS);
     bool IsInitialized_D3D9() const;
     bool GetDither_D3D9() const;
     bool IsDeviceLost_D3D9() const;
@@ -1101,7 +1101,7 @@ private:
     bool TakeScreenShot_D3D11(Image& destImage);
     bool BeginFrame_D3D11();
     void EndFrame_D3D11();
-    void Clear_D3D11(ClearTargetFlags flags, const Color& color = Color(0.0f, 0.0f, 0.0f, 0.0f), float depth = 1.0f, unsigned stencil = 0);
+    void Clear_D3D11(ClearTargetFlags flags, const Color& color = Color(0.0f, 0.0f, 0.0f, 0.0f), float depth = 1.0f, u32 stencil = 0);
     bool ResolveToTexture_D3D11(Texture2D* destination, const IntRect& viewport);
     bool ResolveToTexture_D3D11(Texture2D* texture);
     bool ResolveToTexture_D3D11(TextureCube* texture);
@@ -1154,7 +1154,7 @@ private:
     void SetScissorTest_D3D11(bool enable, const Rect& rect = Rect::FULL, bool borderInclusive = true);
     void SetScissorTest_D3D11(bool enable, const IntRect& rect);
     void SetClipPlane_D3D11(bool enable, const Plane& clipPlane, const Matrix3x4& view, const Matrix4& projection);
-    void SetStencilTest_D3D11(bool enable, CompareMode mode = CMP_ALWAYS, StencilOp pass = OP_KEEP, StencilOp fail = OP_KEEP, StencilOp zFail = OP_KEEP, unsigned stencilRef = 0, unsigned compareMask = M_MAX_UNSIGNED, unsigned writeMask = M_MAX_UNSIGNED);
+    void SetStencilTest_D3D11(bool enable, CompareMode mode = CMP_ALWAYS, StencilOp pass = OP_KEEP, StencilOp fail = OP_KEEP, StencilOp zFail = OP_KEEP, u32 stencilRef = 0, u32 compareMask = M_U32_MASK_ALL_BITS, u32 writeMask = M_U32_MASK_ALL_BITS);
     bool IsInitialized_D3D11() const;
     bool GetDither_D3D11() const;
     bool IsDeviceLost_D3D11() const;
@@ -1323,9 +1323,9 @@ private:
     /// Stencil test reference value.
     u32 stencilRef_{};
     /// Stencil compare bitmask.
-    unsigned stencilCompareMask_{};
+    u32 stencilCompareMask_{};
     /// Stencil write bitmask.
-    unsigned stencilWriteMask_{};
+    u32 stencilWriteMask_{};
     /// Current custom clip plane in post-projection space.
     Vector4 clipPlane_;
     /// Stencil test enable flag.
