@@ -24061,6 +24061,13 @@ template <class T> CScriptArray* CollisionPolygon2D_constspVectorlesVector2gream
     return VectorToArray(result, "Array<Vector2>");
 }
 
+// Vector<u8> CollisionPolygon2D::GetVerticesAttr() const
+template <class T> CScriptArray* CollisionPolygon2D_Vectorlesu8gre_GetVerticesAttr_void_template(T* _ptr)
+{
+    Vector<u8> result = _ptr->GetVerticesAttr();
+    return VectorToArray(result, "Array<uint8>");
+}
+
 // void CollisionPolygon2D::SetVertices(const Vector<Vector2>& vertices)
 template <class T> void CollisionPolygon2D_void_SetVertices_constspVectorlesVector2greamp_template(T* _ptr, CScriptArray* vertices_conv)
 {
@@ -24068,35 +24075,43 @@ template <class T> void CollisionPolygon2D_void_SetVertices_constspVectorlesVect
     _ptr->SetVertices(vertices);
 }
 
+// void CollisionPolygon2D::SetVerticesAttr(const Vector<u8>& value)
+template <class T> void CollisionPolygon2D_void_SetVerticesAttr_constspVectorlesu8greamp_template(T* _ptr, CScriptArray* value_conv)
+{
+    Vector<u8> value = ArrayToVector<u8>(value_conv);
+    _ptr->SetVerticesAttr(value);
+}
+
 // class CollisionPolygon2D | File: ../Physics2D/CollisionPolygon2D.h
 template <class T> void RegisterMembers_CollisionPolygon2D(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_CollisionShape2D<T>(engine, className);
 
-    // Vector<unsigned char> CollisionPolygon2D::GetVerticesAttr() const
-    // Error: type "Vector<unsigned char>" can not automatically bind
-    // void CollisionPolygon2D::SetVerticesAttr(const Vector<unsigned char>& value)
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
+    // const Vector2& CollisionPolygon2D::GetVertex(i32 index) const
+    engine->RegisterObjectMethod(className, "const Vector2& GetVertex(int) const", AS_METHODPR(T, GetVertex, (i32) const, const Vector2&), AS_CALL_THISCALL);
 
-    // const Vector2& CollisionPolygon2D::GetVertex(unsigned index) const
-    engine->RegisterObjectMethod(className, "const Vector2& GetVertex(uint) const", AS_METHODPR(T, GetVertex, (unsigned) const, const Vector2&), AS_CALL_THISCALL);
-
-    // unsigned CollisionPolygon2D::GetVertexCount() const
-    engine->RegisterObjectMethod(className, "uint GetVertexCount() const", AS_METHODPR(T, GetVertexCount, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_vertexCount() const", AS_METHODPR(T, GetVertexCount, () const, unsigned), AS_CALL_THISCALL);
+    // i32 CollisionPolygon2D::GetVertexCount() const
+    engine->RegisterObjectMethod(className, "int GetVertexCount() const", AS_METHODPR(T, GetVertexCount, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_vertexCount() const", AS_METHODPR(T, GetVertexCount, () const, i32), AS_CALL_THISCALL);
 
     // const Vector<Vector2>& CollisionPolygon2D::GetVertices() const
     engine->RegisterObjectMethod(className, "Array<Vector2>@ GetVertices() const", AS_FUNCTION_OBJFIRST(CollisionPolygon2D_constspVectorlesVector2greamp_GetVertices_void_template<CollisionPolygon2D>), AS_CALL_CDECL_OBJFIRST);
 
-    // void CollisionPolygon2D::SetVertex(unsigned index, const Vector2& vertex)
-    engine->RegisterObjectMethod(className, "void SetVertex(uint, const Vector2&in)", AS_METHODPR(T, SetVertex, (unsigned, const Vector2&), void), AS_CALL_THISCALL);
+    // Vector<u8> CollisionPolygon2D::GetVerticesAttr() const
+    engine->RegisterObjectMethod(className, "Array<uint8>@ GetVerticesAttr() const", AS_FUNCTION_OBJFIRST(CollisionPolygon2D_Vectorlesu8gre_GetVerticesAttr_void_template<CollisionPolygon2D>), AS_CALL_CDECL_OBJFIRST);
 
-    // void CollisionPolygon2D::SetVertexCount(unsigned count)
-    engine->RegisterObjectMethod(className, "void SetVertexCount(uint)", AS_METHODPR(T, SetVertexCount, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_vertexCount(uint)", AS_METHODPR(T, SetVertexCount, (unsigned), void), AS_CALL_THISCALL);
+    // void CollisionPolygon2D::SetVertex(i32 index, const Vector2& vertex)
+    engine->RegisterObjectMethod(className, "void SetVertex(int, const Vector2&in)", AS_METHODPR(T, SetVertex, (i32, const Vector2&), void), AS_CALL_THISCALL);
+
+    // void CollisionPolygon2D::SetVertexCount(i32 count)
+    engine->RegisterObjectMethod(className, "void SetVertexCount(int)", AS_METHODPR(T, SetVertexCount, (i32), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_vertexCount(int)", AS_METHODPR(T, SetVertexCount, (i32), void), AS_CALL_THISCALL);
 
     // void CollisionPolygon2D::SetVertices(const Vector<Vector2>& vertices)
     engine->RegisterObjectMethod(className, "void SetVertices(Array<Vector2>@+)", AS_FUNCTION_OBJFIRST(CollisionPolygon2D_void_SetVertices_constspVectorlesVector2greamp_template<CollisionPolygon2D>), AS_CALL_CDECL_OBJFIRST);
+
+    // void CollisionPolygon2D::SetVerticesAttr(const Vector<u8>& value)
+    engine->RegisterObjectMethod(className, "void SetVerticesAttr(Array<uint8>@+)", AS_FUNCTION_OBJFIRST(CollisionPolygon2D_void_SetVerticesAttr_constspVectorlesu8greamp_template<CollisionPolygon2D>), AS_CALL_CDECL_OBJFIRST);
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_CollisionPolygon2D
         REGISTER_MEMBERS_MANUAL_PART_CollisionPolygon2D();

@@ -24,26 +24,30 @@ public:
 
     /// Set vertex count.
     /// @property
-    void SetVertexCount(unsigned count);
+    void SetVertexCount(i32 count);
     /// Set vertex.
-    void SetVertex(unsigned index, const Vector2& vertex);
+    void SetVertex(i32 index, const Vector2& vertex);
     /// Set vertices.
     void SetVertices(const Vector<Vector2>& vertices);
 
     /// Return vertex count.
     /// @property
-    unsigned GetVertexCount() const { return vertices_.Size(); }
+    i32 GetVertexCount() const { return vertices_.Size(); }
 
     /// Return vertex.
-    const Vector2& GetVertex(unsigned index) const { return (index < vertices_.Size()) ? vertices_[index] : Vector2::ZERO; }
+    const Vector2& GetVertex(i32 index) const
+    {
+        assert(index >= 0);
+        return (index < vertices_.Size()) ? vertices_[index] : Vector2::ZERO;
+    }
 
     /// Return vertices.
     const Vector<Vector2>& GetVertices() const { return vertices_; }
 
     /// Set vertices attribute.
-    void SetVerticesAttr(const Vector<unsigned char>& value);
+    void SetVerticesAttr(const Vector<u8>& value);
     /// Return vertices attribute.
-    Vector<unsigned char> GetVerticesAttr() const;
+    Vector<u8> GetVerticesAttr() const;
 
 private:
     /// Apply node world scale.

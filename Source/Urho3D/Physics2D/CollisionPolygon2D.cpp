@@ -30,16 +30,19 @@ void CollisionPolygon2D::RegisterObject(Context* context)
 
     URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     URHO3D_COPY_BASE_ATTRIBUTES(CollisionShape2D);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Vertices", GetVerticesAttr, SetVerticesAttr, Vector<unsigned char>, Variant::emptyBuffer, AM_FILE);
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Vertices", GetVerticesAttr, SetVerticesAttr, Vector<u8>, Variant::emptyBuffer, AM_FILE);
 }
 
-void CollisionPolygon2D::SetVertexCount(unsigned count)
+void CollisionPolygon2D::SetVertexCount(i32 count)
 {
+    assert(count >= 0);
     vertices_.Resize(count);
 }
 
-void CollisionPolygon2D::SetVertex(unsigned index, const Vector2& vertex)
+void CollisionPolygon2D::SetVertex(i32 index, const Vector2& vertex)
 {
+    assert(index >= 0);
+
     if (index >= vertices_.Size())
         return;
 
@@ -60,7 +63,7 @@ void CollisionPolygon2D::SetVertices(const Vector<Vector2>& vertices)
     RecreateFixture();
 }
 
-void CollisionPolygon2D::SetVerticesAttr(const Vector<unsigned char>& value)
+void CollisionPolygon2D::SetVerticesAttr(const Vector<u8>& value)
 {
     if (value.Empty())
         return;
@@ -74,12 +77,12 @@ void CollisionPolygon2D::SetVerticesAttr(const Vector<unsigned char>& value)
     SetVertices(vertices);
 }
 
-Vector<unsigned char> CollisionPolygon2D::GetVerticesAttr() const
+Vector<u8> CollisionPolygon2D::GetVerticesAttr() const
 {
     VectorBuffer ret;
 
-    for (unsigned i = 0; i < vertices_.Size(); ++i)
-        ret.WriteVector2(vertices_[i]);
+    for (const Vector2& vertex : vertices_)
+        ret.WriteVector2(vertex);
 
     return ret.GetBuffer();
 }
@@ -97,11 +100,11 @@ void CollisionPolygon2D::RecreateFixture()
         return;
 
     Vector<b2Vec2> b2Vertices;
-    unsigned count = vertices_.Size();
+    i32 count = vertices_.Size();
     b2Vertices.Resize(count);
 
     Vector2 worldScale(cachedWorldScale_.x_, cachedWorldScale_.y_);
-    for (unsigned i = 0; i < count; ++i)
+    for (i32 i = 0; i < count; ++i)
         b2Vertices[i] = ToB2Vec2(vertices_[i] * worldScale);
 
     polygonShape_.Set(&b2Vertices[0], count);
