@@ -224,11 +224,12 @@ IntVector2 Graphics::GetWindowPosition() const
 Vector<IntVector3> Graphics::GetResolutions(int monitor) const
 {
     Vector<IntVector3> ret;
+
     // Emscripten is not able to return a valid list
 #ifndef __EMSCRIPTEN__
-    auto numModes = (unsigned)SDL_GetNumDisplayModes(monitor);
+    i32 numModes = SDL_GetNumDisplayModes(monitor);
 
-    for (unsigned i = 0; i < numModes; ++i)
+    for (i32 i = 0; i < numModes; ++i)
     {
         SDL_DisplayMode mode;
         SDL_GetDisplayMode(monitor, i, &mode);
@@ -238,9 +239,9 @@ Vector<IntVector3> Graphics::GetResolutions(int monitor) const
 
         // Store mode if unique
         bool unique = true;
-        for (unsigned j = 0; j < ret.Size(); ++j)
+        for (const IntVector3& resolution : ret)
         {
-            if (ret[j].x_ == width && ret[j].y_ == height && ret[j].z_ == rate)
+            if (resolution.x_ == width && resolution.y_ == height && resolution.z_ == rate)
             {
                 unique = false;
                 break;
