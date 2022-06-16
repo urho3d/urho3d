@@ -319,10 +319,9 @@ void RaycastVehicle::FixedPostUpdate(float timeStep)
                 whInfo.m_rotation += delta - whInfo.m_deltaRotation;
                 whInfo.m_deltaRotation = delta;
             }
+
             if (skidInfoCumulative_[i] > 0.05f)
-            {
-                skidInfoCumulative_[i] -= 0.002;
-            }
+                skidInfoCumulative_[i] -= 0.002f;
         }
         else
         {
