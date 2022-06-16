@@ -171,8 +171,8 @@ String Pass::GetEffectiveVertexShaderDefines() const
 
     Vector<String> vsDefines = vertexShaderDefines_.Split(' ');
     Vector<String> vsExcludes = vertexShaderDefineExcludes_.Split(' ');
-    for (unsigned i = 0; i < vsExcludes.Size(); ++i)
-        vsDefines.Remove(vsExcludes[i]);
+    for (const String& vsExclude : vsExcludes)
+        vsDefines.Remove(vsExclude);
 
     return String::Joined(vsDefines, " ");
 }
@@ -185,8 +185,8 @@ String Pass::GetEffectivePixelShaderDefines() const
 
     Vector<String> psDefines = pixelShaderDefines_.Split(' ');
     Vector<String> psExcludes = pixelShaderDefineExcludes_.Split(' ');
-    for (unsigned i = 0; i < psExcludes.Size(); ++i)
-        psDefines.Remove(psExcludes[i]);
+    for (const String& psExclude : psExcludes)
+        psDefines.Remove(psExclude);
 
     return String::Joined(psDefines, " ");
 }
@@ -208,16 +208,16 @@ Vector<SharedPtr<ShaderVariation>>& Pass::GetPixelShaders(const StringHash& extr
         return extraPixelShaders_[extraDefinesHash];
 }
 
-unsigned Technique::basePassIndex = 0;
-unsigned Technique::alphaPassIndex = 0;
-unsigned Technique::materialPassIndex = 0;
-unsigned Technique::deferredPassIndex = 0;
-unsigned Technique::lightPassIndex = 0;
-unsigned Technique::litBasePassIndex = 0;
-unsigned Technique::litAlphaPassIndex = 0;
-unsigned Technique::shadowPassIndex = 0;
+i32 Technique::basePassIndex = 0;
+i32 Technique::alphaPassIndex = 0;
+i32 Technique::materialPassIndex = 0;
+i32 Technique::deferredPassIndex = 0;
+i32 Technique::lightPassIndex = 0;
+i32 Technique::litBasePassIndex = 0;
+i32 Technique::litAlphaPassIndex = 0;
+i32 Technique::shadowPassIndex = 0;
 
-HashMap<String, unsigned> Technique::passIndices;
+HashMap<String, i32> Technique::passIndices;
 
 Technique::Technique(Context* context) :
     Resource(context),
@@ -407,7 +407,7 @@ Pass* Technique::CreatePass(const String& name)
 
 void Technique::RemovePass(const String& name)
 {
-    HashMap<String, unsigned>::ConstIterator i = passIndices.Find(name.ToLower());
+    HashMap<String, i32>::ConstIterator i = passIndices.Find(name.ToLower());
     if (i == passIndices.End())
         return;
     else if (i->second_ < passes_.Size() && passes_[i->second_].Get())
@@ -419,25 +419,25 @@ void Technique::RemovePass(const String& name)
 
 bool Technique::HasPass(const String& name) const
 {
-    HashMap<String, unsigned>::ConstIterator i = passIndices.Find(name.ToLower());
+    HashMap<String, i32>::ConstIterator i = passIndices.Find(name.ToLower());
     return i != passIndices.End() ? HasPass(i->second_) : false;
 }
 
 Pass* Technique::GetPass(const String& name) const
 {
-    HashMap<String, unsigned>::ConstIterator i = passIndices.Find(name.ToLower());
+    HashMap<String, i32>::ConstIterator i = passIndices.Find(name.ToLower());
     return i != passIndices.End() ? GetPass(i->second_) : nullptr;
 }
 
 Pass* Technique::GetSupportedPass(const String& name) const
 {
-    HashMap<String, unsigned>::ConstIterator i = passIndices.Find(name.ToLower());
+    HashMap<String, i32>::ConstIterator i = passIndices.Find(name.ToLower());
     return i != passIndices.End() ? GetSupportedPass(i->second_) : nullptr;
 }
 
-unsigned Technique::GetNumPasses() const
+i32 Technique::GetNumPasses() const
 {
-    unsigned ret = 0;
+    i32 ret = 0;
 
     for (Vector<SharedPtr<Pass>>::ConstIterator i = passes_.Begin(); i != passes_.End(); ++i)
     {
@@ -508,7 +508,7 @@ SharedPtr<Technique> Technique::CloneWithDefines(const String& vsDefines, const 
     return i->second_;
 }
 
-unsigned Technique::GetPassIndex(const String& passName)
+i32 Technique::GetPassIndex(const String& passName)
 {
     // Initialize built-in pass indices on first call
     if (passIndices.Empty())
@@ -524,12 +524,14 @@ unsigned Technique::GetPassIndex(const String& passName)
     }
 
     String nameLower = passName.ToLower();
-    HashMap<String, unsigned>::Iterator i = passIndices.Find(nameLower);
+    HashMap<String, i32>::Iterator i = passIndices.Find(nameLower);
     if (i != passIndices.End())
+    {
         return i->second_;
+    }
     else
     {
-        unsigned newPassIndex = passIndices.Size();
+        i32 newPassIndex = passIndices.Size();
         passIndices[nameLower] = newPassIndex;
         return newPassIndex;
     }

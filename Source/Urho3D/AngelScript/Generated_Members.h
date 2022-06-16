@@ -8242,8 +8242,8 @@ template <class T> void RegisterMembers_Pass(asIScriptEngine* engine, const char
     // String Pass::GetEffectiveVertexShaderDefines() const
     engine->RegisterObjectMethod(className, "String GetEffectiveVertexShaderDefines() const", AS_METHODPR(T, GetEffectiveVertexShaderDefines, () const, String), AS_CALL_THISCALL);
 
-    // unsigned Pass::GetIndex() const
-    engine->RegisterObjectMethod(className, "uint GetIndex() const", AS_METHODPR(T, GetIndex, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Pass::GetIndex() const
+    engine->RegisterObjectMethod(className, "int GetIndex() const", AS_METHODPR(T, GetIndex, () const, i32), AS_CALL_THISCALL);
 
     // PassLightingMode Pass::GetLightingMode() const
     engine->RegisterObjectMethod(className, "PassLightingMode GetLightingMode() const", AS_METHODPR(T, GetLightingMode, () const, PassLightingMode), AS_CALL_THISCALL);
@@ -14403,12 +14403,12 @@ template <class T> void RegisterMembers_Technique(asIScriptEngine* engine, const
     // Pass* Technique::CreatePass(const String& name)
     engine->RegisterObjectMethod(className, "Pass@+ CreatePass(const String&in)", AS_METHODPR(T, CreatePass, (const String&), Pass*), AS_CALL_THISCALL);
 
-    // unsigned Technique::GetNumPasses() const
-    engine->RegisterObjectMethod(className, "uint GetNumPasses() const", AS_METHODPR(T, GetNumPasses, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numPasses() const", AS_METHODPR(T, GetNumPasses, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Technique::GetNumPasses() const
+    engine->RegisterObjectMethod(className, "int GetNumPasses() const", AS_METHODPR(T, GetNumPasses, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numPasses() const", AS_METHODPR(T, GetNumPasses, () const, i32), AS_CALL_THISCALL);
 
-    // Pass* Technique::GetPass(unsigned passIndex) const
-    engine->RegisterObjectMethod(className, "Pass@+ GetPass(uint) const", AS_METHODPR(T, GetPass, (unsigned) const, Pass*), AS_CALL_THISCALL);
+    // Pass* Technique::GetPass(i32 passIndex) const
+    engine->RegisterObjectMethod(className, "Pass@+ GetPass(int) const", AS_METHODPR(T, GetPass, (i32) const, Pass*), AS_CALL_THISCALL);
 
     // Pass* Technique::GetPass(const String& name) const
     engine->RegisterObjectMethod(className, "Pass@+ GetPass(const String&in) const", AS_METHODPR(T, GetPass, (const String&) const, Pass*), AS_CALL_THISCALL);
@@ -14421,14 +14421,14 @@ template <class T> void RegisterMembers_Technique(asIScriptEngine* engine, const
     engine->RegisterObjectMethod(className, "Array<String>@ GetPassNames() const", AS_FUNCTION_OBJFIRST(Technique_VectorlesStringgre_GetPassNames_void_template<Technique>), AS_CALL_CDECL_OBJFIRST);
     engine->RegisterObjectMethod(className, "Array<String>@ get_passNames() const", AS_FUNCTION_OBJFIRST(Technique_VectorlesStringgre_GetPassNames_void_template<Technique>), AS_CALL_CDECL_OBJFIRST);
 
-    // Pass* Technique::GetSupportedPass(unsigned passIndex) const
-    engine->RegisterObjectMethod(className, "Pass@+ GetSupportedPass(uint) const", AS_METHODPR(T, GetSupportedPass, (unsigned) const, Pass*), AS_CALL_THISCALL);
+    // Pass* Technique::GetSupportedPass(i32 passIndex) const
+    engine->RegisterObjectMethod(className, "Pass@+ GetSupportedPass(int) const", AS_METHODPR(T, GetSupportedPass, (i32) const, Pass*), AS_CALL_THISCALL);
 
     // Pass* Technique::GetSupportedPass(const String& name) const
     engine->RegisterObjectMethod(className, "Pass@+ GetSupportedPass(const String&in) const", AS_METHODPR(T, GetSupportedPass, (const String&) const, Pass*), AS_CALL_THISCALL);
 
-    // bool Technique::HasPass(unsigned passIndex) const
-    engine->RegisterObjectMethod(className, "bool HasPass(uint) const", AS_METHODPR(T, HasPass, (unsigned) const, bool), AS_CALL_THISCALL);
+    // bool Technique::HasPass(i32 passIndex) const
+    engine->RegisterObjectMethod(className, "bool HasPass(int) const", AS_METHODPR(T, HasPass, (i32) const, bool), AS_CALL_THISCALL);
 
     // bool Technique::HasPass(const String& name) const
     engine->RegisterObjectMethod(className, "bool HasPass(const String&in) const", AS_METHODPR(T, HasPass, (const String&) const, bool), AS_CALL_THISCALL);
@@ -14454,32 +14454,32 @@ template <class T> void RegisterMembers_Technique(asIScriptEngine* engine, const
     // static void Technique::RegisterObject(Context* context)
     // Not registered because have @nobind mark
 
-    // static unsigned Technique::GetPassIndex(const String& passName)
-    engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("uint GetPassIndex(const String&in)", AS_FUNCTIONPR(T::GetPassIndex, (const String&), unsigned), AS_CALL_CDECL);engine->SetDefaultNamespace("");
+    // static i32 Technique::GetPassIndex(const String& passName)
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("int GetPassIndex(const String&in)", AS_FUNCTIONPR(T::GetPassIndex, (const String&), i32), AS_CALL_CDECL);engine->SetDefaultNamespace("");
 
-    // static unsigned Technique::basePassIndex
-    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("uint basePassIndex", (void*)&T::basePassIndex);engine->SetDefaultNamespace("");
+    // static i32 Technique::basePassIndex
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("int basePassIndex", (void*)&T::basePassIndex);engine->SetDefaultNamespace("");
 
-    // static unsigned Technique::alphaPassIndex
-    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("uint alphaPassIndex", (void*)&T::alphaPassIndex);engine->SetDefaultNamespace("");
+    // static i32 Technique::alphaPassIndex
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("int alphaPassIndex", (void*)&T::alphaPassIndex);engine->SetDefaultNamespace("");
 
-    // static unsigned Technique::materialPassIndex
-    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("uint materialPassIndex", (void*)&T::materialPassIndex);engine->SetDefaultNamespace("");
+    // static i32 Technique::materialPassIndex
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("int materialPassIndex", (void*)&T::materialPassIndex);engine->SetDefaultNamespace("");
 
-    // static unsigned Technique::deferredPassIndex
-    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("uint deferredPassIndex", (void*)&T::deferredPassIndex);engine->SetDefaultNamespace("");
+    // static i32 Technique::deferredPassIndex
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("int deferredPassIndex", (void*)&T::deferredPassIndex);engine->SetDefaultNamespace("");
 
-    // static unsigned Technique::lightPassIndex
-    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("uint lightPassIndex", (void*)&T::lightPassIndex);engine->SetDefaultNamespace("");
+    // static i32 Technique::lightPassIndex
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("int lightPassIndex", (void*)&T::lightPassIndex);engine->SetDefaultNamespace("");
 
-    // static unsigned Technique::litBasePassIndex
-    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("uint litBasePassIndex", (void*)&T::litBasePassIndex);engine->SetDefaultNamespace("");
+    // static i32 Technique::litBasePassIndex
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("int litBasePassIndex", (void*)&T::litBasePassIndex);engine->SetDefaultNamespace("");
 
-    // static unsigned Technique::litAlphaPassIndex
-    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("uint litAlphaPassIndex", (void*)&T::litAlphaPassIndex);engine->SetDefaultNamespace("");
+    // static i32 Technique::litAlphaPassIndex
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("int litAlphaPassIndex", (void*)&T::litAlphaPassIndex);engine->SetDefaultNamespace("");
 
-    // static unsigned Technique::shadowPassIndex
-    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("uint shadowPassIndex", (void*)&T::shadowPassIndex);engine->SetDefaultNamespace("");
+    // static i32 Technique::shadowPassIndex
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("int shadowPassIndex", (void*)&T::shadowPassIndex);engine->SetDefaultNamespace("");
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Technique
         REGISTER_MEMBERS_MANUAL_PART_Technique();

@@ -78,7 +78,7 @@ public:
     const String& GetName() const { return name_; }
 
     /// Return pass index. This is used for optimal render-time pass queries that avoid map lookups.
-    unsigned GetIndex() const { return index_; }
+    i32 GetIndex() const { return index_; }
 
     /// Return blend mode.
     /// @property
@@ -152,7 +152,7 @@ public:
 
 private:
     /// Pass index.
-    unsigned index_;
+    i32 index_;
     /// Blend mode.
     BlendMode blendMode_;
     /// Culling mode.
@@ -233,20 +233,29 @@ public:
     bool IsSupported() const { return !isDesktop_ || desktopSupport_; }
 
     /// Return whether has a pass.
-    bool HasPass(unsigned passIndex) const { return passIndex < passes_.Size() && passes_[passIndex].Get() != nullptr; }
+    bool HasPass(i32 passIndex) const
+    {
+        assert(passIndex >= 0);
+        return passIndex < passes_.Size() && passes_[passIndex].Get() != nullptr;
+    }
 
     /// Return whether has a pass by name. This overload should not be called in time-critical rendering loops; use a pre-acquired pass index instead.
     bool HasPass(const String& name) const;
 
     /// Return a pass, or null if not found.
-    Pass* GetPass(unsigned passIndex) const { return passIndex < passes_.Size() ? passes_[passIndex].Get() : nullptr; }
+    Pass* GetPass(i32 passIndex) const
+    {
+        assert(passIndex >= 0);
+        return passIndex < passes_.Size() ? passes_[passIndex].Get() : nullptr;
+    }
 
     /// Return a pass by name, or null if not found. This overload should not be called in time-critical rendering loops; use a pre-acquired pass index instead.
     Pass* GetPass(const String& name) const;
 
     /// Return a pass that is supported for rendering, or null if not found.
-    Pass* GetSupportedPass(unsigned passIndex) const
+    Pass* GetSupportedPass(i32 passIndex) const
     {
+        assert(passIndex >= 0);
         Pass* pass = passIndex < passes_.Size() ? passes_[passIndex].Get() : nullptr;
         return pass && (!pass->IsDesktop() || desktopSupport_) ? pass : nullptr;
     }
@@ -256,7 +265,7 @@ public:
 
     /// Return number of passes.
     /// @property
-    unsigned GetNumPasses() const;
+    i32 GetNumPasses() const;
     /// Return all pass names.
     /// @property
     Vector<String> GetPassNames() const;
@@ -268,24 +277,24 @@ public:
     SharedPtr<Technique> CloneWithDefines(const String& vsDefines, const String& psDefines);
 
     /// Return a pass type index by name. Allocate new if not used yet.
-    static unsigned GetPassIndex(const String& passName);
+    static i32 GetPassIndex(const String& passName);
 
     /// Index for base pass. Initialized once GetPassIndex() has been called for the first time.
-    static unsigned basePassIndex;
+    static i32 basePassIndex;
     /// Index for alpha pass. Initialized once GetPassIndex() has been called for the first time.
-    static unsigned alphaPassIndex;
+    static i32 alphaPassIndex;
     /// Index for prepass material pass. Initialized once GetPassIndex() has been called for the first time.
-    static unsigned materialPassIndex;
+    static i32 materialPassIndex;
     /// Index for deferred G-buffer pass. Initialized once GetPassIndex() has been called for the first time.
-    static unsigned deferredPassIndex;
+    static i32 deferredPassIndex;
     /// Index for per-pixel light pass. Initialized once GetPassIndex() has been called for the first time.
-    static unsigned lightPassIndex;
+    static i32 lightPassIndex;
     /// Index for lit base pass. Initialized once GetPassIndex() has been called for the first time.
-    static unsigned litBasePassIndex;
+    static i32 litBasePassIndex;
     /// Index for lit alpha pass. Initialized once GetPassIndex() has been called for the first time.
-    static unsigned litAlphaPassIndex;
+    static i32 litAlphaPassIndex;
     /// Index for shadow pass. Initialized once GetPassIndex() has been called for the first time.
-    static unsigned shadowPassIndex;
+    static i32 shadowPassIndex;
 
 private:
     /// Require desktop GPU flag.
@@ -298,7 +307,7 @@ private:
     HashMap<Pair<StringHash, StringHash>, SharedPtr<Technique>> cloneTechniques_;
 
     /// Pass index assignments.
-    static HashMap<String, unsigned> passIndices;
+    static HashMap<String, i32> passIndices;
 };
 
 }
