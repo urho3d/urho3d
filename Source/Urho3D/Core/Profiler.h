@@ -39,9 +39,9 @@ public:
     {
         if (name)
         {
-            unsigned nameLength = String::CStringLength(name);
-            name_ = new char[nameLength + 1];
-            memcpy(name_, name, nameLength + 1);
+            size_t size = (size_t)String::CStringLength(name) + 1;
+            name_ = new char[size];
+            memcpy(name_, name, size);
         }
     }
 
