@@ -845,17 +845,17 @@ UIElement* UI::GetFrontElement() const
     int maxPriority = M_MIN_INT;
     UIElement* front = nullptr;
 
-    for (unsigned i = 0; i < rootChildren.Size(); ++i)
+    for (const SharedPtr<UIElement>& rootChild : rootChildren)
     {
         // Do not take into account input-disabled elements, hidden elements or those that are always in the front
-        if (!rootChildren[i]->IsEnabled() || !rootChildren[i]->IsVisible() || !rootChildren[i]->GetBringToBack())
+        if (!rootChild->IsEnabled() || !rootChild->IsVisible() || !rootChild->GetBringToBack())
             continue;
 
-        int priority = rootChildren[i]->GetPriority();
+        int priority = rootChild->GetPriority();
         if (priority > maxPriority)
         {
             maxPriority = priority;
-            front = rootChildren[i];
+            front = rootChild;
         }
     }
 
@@ -953,8 +953,8 @@ void UI::Update(float timeStep, UIElement* element)
 
     const Vector<SharedPtr<UIElement>>& children = element->GetChildren();
     // Update of an element may modify its child vector. Use just index-based iteration to be safe
-    for (unsigned i = 0; i < children.Size(); ++i)
-        Update(timeStep, children[i]);
+    for (const SharedPtr<UIElement>& child : children)
+        Update(timeStep, child);
 }
 
 void UI::SetVertexData(VertexBuffer* dest, const Vector<float>& vertexData)
@@ -964,7 +964,7 @@ void UI::SetVertexData(VertexBuffer* dest, const Vector<float>& vertexData)
 
     // Update quad geometry into the vertex buffer
     // Resize the vertex buffer first if too small or much too large
-    unsigned numVertices = vertexData.Size() / UI_VERTEX_SIZE;
+    i32 numVertices = vertexData.Size() / UI_VERTEX_SIZE;
     if (dest->GetVertexCount() < numVertices || dest->GetVertexCount() > numVertices * 2)
         dest->SetSize(numVertices, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1, true);
 
@@ -1318,8 +1318,8 @@ void UI::ReleaseFontFaces()
     Vector<Font*> fonts;
     GetSubsystem<ResourceCache>()->GetResources<Font>(fonts);
 
-    for (unsigned i = 0; i < fonts.Size(); ++i)
-        fonts[i]->ReleaseFaces();
+    for (Font* font : fonts)
+        font->ReleaseFaces();
 }
 
 void UI::ProcessHover(const IntVector2& windowCursorPos, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor)

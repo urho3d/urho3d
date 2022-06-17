@@ -284,12 +284,12 @@ template <class T> bool ResourceCache::BackgroundLoadResource(const String& name
 
 template <class T> void ResourceCache::GetResources(Vector<T*>& result) const
 {
-    auto& resources = reinterpret_cast<Vector<Resource*>&>(result);
+    Vector<Resource*>& resources = reinterpret_cast<Vector<Resource*>&>(result);
     StringHash type = T::GetTypeStatic();
     GetResources(resources, type);
 
     // Perform conversion of the returned pointers
-    for (unsigned i = 0; i < result.Size(); ++i)
+    for (i32 i = 0; i < result.Size(); ++i)
     {
         Resource* resource = resources[i];
         result[i] = static_cast<T*>(resource);
