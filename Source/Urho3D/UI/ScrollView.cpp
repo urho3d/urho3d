@@ -108,9 +108,8 @@ void ScrollView::Update(float timeStep)
     {
         Vector<UIElement*> dragElements = GetSubsystem<UI>()->GetDragElements();
 
-        for (unsigned i = 0; i < dragElements.Size(); i++)
+        for (const UIElement* dragElement : dragElements)
         {
-            UIElement* dragElement = dragElements[i];
             MouseButtonFlags dragButtons = dragElement->GetDragButtonCombo();
 
             if (dragButtons != MOUSEB_LEFT)
