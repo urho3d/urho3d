@@ -109,17 +109,15 @@ bool ValueAnimation::SaveXML(XMLElement& dest) const
     if (interpolationMethod_ == IM_SPLINE)
         dest.SetFloat("splinetension", splineTension_);
 
-    for (unsigned i = 0; i < keyFrames_.Size(); ++i)
+    for (const VAnimKeyFrame& keyFrame : keyFrames_)
     {
-        const VAnimKeyFrame& keyFrame = keyFrames_[i];
         XMLElement keyFrameEleme = dest.CreateChild("keyframe");
         keyFrameEleme.SetFloat("time", keyFrame.time_);
         keyFrameEleme.SetVariant(keyFrame.value_);
     }
 
-    for (unsigned i = 0; i < eventFrames_.Size(); ++i)
+    for (const VAnimEventFrame& eventFrame : eventFrames_)
     {
-        const VAnimEventFrame& eventFrame = eventFrames_[i];
         XMLElement eventFrameElem = dest.CreateChild("eventframe");
         eventFrameElem.SetFloat("time", eventFrame.time_);
         eventFrameElem.SetUInt("eventtype", eventFrame.eventType_.Value());
@@ -143,9 +141,8 @@ bool ValueAnimation::LoadJSON(const JSONValue& source)
 
     // Load keyframes
     JSONArray keyFramesArray = source.Get("keyframes").GetArray();
-    for (unsigned i = 0; i < keyFramesArray.Size(); i++)
+    for (const JSONValue& val : keyFramesArray)
     {
-        const JSONValue& val = keyFramesArray[i];
         float time = val.Get("time").GetFloat();
         Variant value = val.Get("value").GetVariant();
         SetKeyFrame(time, value);
@@ -153,9 +150,8 @@ bool ValueAnimation::LoadJSON(const JSONValue& source)
 
     // Load event frames
     JSONArray eventFramesArray = source.Get("eventframes").GetArray();
-    for (unsigned i = 0; i < eventFramesArray.Size(); i++)
+    for (const JSONValue& eventFrameVal : eventFramesArray)
     {
-        const JSONValue& eventFrameVal = eventFramesArray[i];
         float time = eventFrameVal.Get("time").GetFloat();
         unsigned eventType = eventFrameVal.Get("eventtype").GetUInt();
         VariantMap eventData = eventFrameVal.Get("eventdata").GetVariantMap();
@@ -173,9 +169,8 @@ bool ValueAnimation::SaveJSON(JSONValue& dest) const
 
     JSONArray keyFramesArray;
     keyFramesArray.Reserve(keyFrames_.Size());
-    for (unsigned i = 0; i < keyFrames_.Size(); ++i)
+    for (const VAnimKeyFrame& keyFrame : keyFrames_)
     {
-        const VAnimKeyFrame& keyFrame = keyFrames_[i];
         JSONValue keyFrameVal;
         keyFrameVal.Set("time", keyFrame.time_);
         JSONValue valueVal;
@@ -187,9 +182,8 @@ bool ValueAnimation::SaveJSON(JSONValue& dest) const
 
     JSONArray eventFramesArray;
     eventFramesArray.Reserve(eventFrames_.Size());
-    for (unsigned i = 0; i < eventFrames_.Size(); ++i)
+    for (const VAnimEventFrame& eventFrame : eventFrames_)
     {
-        const VAnimEventFrame& eventFrame = eventFrames_[i];
         JSONValue eventFrameVal;
         eventFrameVal.Set("time", eventFrame.time_);
         eventFrameVal.Set("eventtype", eventFrame.eventType_.Value());
@@ -267,7 +261,7 @@ bool ValueAnimation::SetKeyFrame(float time, const Variant& value)
         keyFrames_.Push(keyFrame);
     else
     {
-        for (unsigned i = 0; i < keyFrames_.Size(); ++i)
+        for (i32 i = 0; i < keyFrames_.Size(); ++i)
         {
             // Guard against interpolation error caused by division by error due to 0 delta time between two key frames
             if (time == keyFrames_[i].time_)
@@ -298,7 +292,7 @@ void ValueAnimation::SetEventFrame(float time, const StringHash& eventType, cons
         eventFrames_.Push(eventFrame);
     else
     {
-        for (unsigned i = 0; i < eventFrames_.Size(); ++i)
+        for (i32 i = 0; i < eventFrames_.Size(); ++i)
         {
             if (time < eventFrames_[i].time_)
             {
@@ -321,7 +315,7 @@ bool ValueAnimation::IsValid() const
 
 Variant ValueAnimation::GetAnimationValue(float scaledTime) const
 {
-    unsigned index = 1;
+    i32 index = 1;
     for (; index < keyFrames_.Size(); ++index)
     {
         if (scaledTime < keyFrames_[index].time_)
@@ -341,9 +335,8 @@ Variant ValueAnimation::GetAnimationValue(float scaledTime) const
 
 void ValueAnimation::GetEventFrames(float beginTime, float endTime, Vector<const VAnimEventFrame*>& eventFrames) const
 {
-    for (unsigned i = 0; i < eventFrames_.Size(); ++i)
+    for (const VAnimEventFrame& eventFrame : eventFrames_)
     {
-        const VAnimEventFrame& eventFrame = eventFrames_[i];
         if (eventFrame.time_ > endTime)
             break;
 
