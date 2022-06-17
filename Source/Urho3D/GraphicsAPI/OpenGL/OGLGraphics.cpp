@@ -856,7 +856,8 @@ void Graphics::Draw_OGL(PrimitiveType type, unsigned indexStart, unsigned indexC
 
     GetGLPrimitiveType(indexCount, type, primitiveCount, glPrimitiveType);
     GLenum indexType = indexSize == sizeof(unsigned short) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
-    glDrawElements(glPrimitiveType, indexCount, indexType, reinterpret_cast<const GLvoid*>(indexStart * indexSize));
+    intptr_t offset = (intptr_t)indexStart * indexSize;
+    glDrawElements(glPrimitiveType, indexCount, indexType, (const void*)offset);
 
     numPrimitives_ += primitiveCount;
     ++numBatches_;
@@ -876,7 +877,8 @@ void Graphics::Draw_OGL(PrimitiveType type, unsigned indexStart, unsigned indexC
 
     GetGLPrimitiveType(indexCount, type, primitiveCount, glPrimitiveType);
     GLenum indexType = indexSize == sizeof(unsigned short) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
-    glDrawElementsBaseVertex(glPrimitiveType, indexCount, indexType, reinterpret_cast<GLvoid*>(indexStart * indexSize), baseVertexIndex);
+    intptr_t offset = (intptr_t)indexStart * indexSize;
+    glDrawElementsBaseVertex(glPrimitiveType, indexCount, indexType, (const void*)offset, baseVertexIndex);
 
     numPrimitives_ += primitiveCount;
     ++numBatches_;
@@ -898,19 +900,17 @@ void Graphics::DrawInstanced_OGL(PrimitiveType type, unsigned indexStart, unsign
 
     GetGLPrimitiveType(indexCount, type, primitiveCount, glPrimitiveType);
     GLenum indexType = indexSize == sizeof(unsigned short) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
+    intptr_t offset = (intptr_t)indexStart * indexSize;
 #ifdef __EMSCRIPTEN__
-    glDrawElementsInstancedANGLE(glPrimitiveType, indexCount, indexType, reinterpret_cast<const GLvoid*>(indexStart * indexSize),
-        instanceCount);
+    glDrawElementsInstancedANGLE(glPrimitiveType, indexCount, indexType, (const void*)offset, instanceCount);
 #else
     if (gl3Support)
     {
-        glDrawElementsInstanced(glPrimitiveType, indexCount, indexType, reinterpret_cast<const GLvoid*>(indexStart * indexSize),
-            instanceCount);
+        glDrawElementsInstanced(glPrimitiveType, indexCount, indexType, (const void*)offset, instanceCount);
     }
     else
     {
-        glDrawElementsInstancedARB(glPrimitiveType, indexCount, indexType, reinterpret_cast<const GLvoid*>(indexStart * indexSize),
-            instanceCount);
+        glDrawElementsInstancedARB(glPrimitiveType, indexCount, indexType, (const void*)offset, instanceCount);
     }
 #endif
 
@@ -934,9 +934,8 @@ void Graphics::DrawInstanced_OGL(PrimitiveType type, unsigned indexStart, unsign
 
     GetGLPrimitiveType(indexCount, type, primitiveCount, glPrimitiveType);
     GLenum indexType = indexSize == sizeof(unsigned short) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
-
-    glDrawElementsInstancedBaseVertex(glPrimitiveType, indexCount, indexType, reinterpret_cast<const GLvoid*>(indexStart * indexSize),
-        instanceCount, baseVertexIndex);
+    intptr_t offset = (intptr_t)indexStart * indexSize;
+    glDrawElementsInstancedBaseVertex(glPrimitiveType, indexCount, indexType, (const void*)offset, instanceCount, baseVertexIndex);
 
     numPrimitives_ += instanceCount * primitiveCount;
     ++numBatches_;
@@ -967,7 +966,7 @@ bool Graphics::SetVertexBuffers_OGL(const Vector<VertexBuffer*>& buffers, unsign
         impl->vertexBuffersDirty_ = true;
     }
 
-    for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
+    for (i32 i = 0; i < MAX_VERTEX_STREAMS; ++i)
     {
         VertexBuffer* buffer = nullptr;
         if (i < buffers.Size())
