@@ -26,9 +26,9 @@ struct Particle
     /// Rotation speed.
     float rotationSpeed_;
     /// Current color animation index.
-    unsigned colorIndex_;
+    i32 colorIndex_;
     /// Current texture animation index.
-    unsigned texIndex_;
+    i32 texIndex_;
 };
 
 /// %Particle emitter component.
@@ -55,7 +55,7 @@ public:
     void SetEffect(ParticleEffect* effect);
     /// Set maximum number of particles.
     /// @property
-    void SetNumParticles(unsigned num);
+    void SetNumParticles(i32 num);
     /// Set whether should be emitting. If the state was changed, also resets the emission period timer.
     /// @property
     void SetEmitting(bool enable);
@@ -80,7 +80,7 @@ public:
 
     /// Return maximum number of particles.
     /// @property
-    unsigned GetNumParticles() const { return particles_.Size(); }
+    i32 GetNumParticles() const { return particles_.Size(); }
 
     /// Return whether is currently emitting.
     /// @property
@@ -112,7 +112,7 @@ protected:
     /// Create a new particle. Return true if there was room.
     bool EmitNewParticle();
     /// Return a free particle index.
-    unsigned GetFreeParticle() const;
+    i32 GetFreeParticle() const;
     /// Return whether has active particles.
     bool CheckActiveParticles() const;
 
