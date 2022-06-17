@@ -61,13 +61,6 @@ struct OcclusionBatch
     unsigned drawCount_;
 };
 
-static const int OCCLUSION_MIN_SIZE = 8;
-static const int OCCLUSION_DEFAULT_MAX_TRIANGLES = 5000;
-static const float OCCLUSION_RELATIVE_BIAS = 0.00001f;
-static const int OCCLUSION_FIXED_BIAS = 16;
-static const float OCCLUSION_X_SCALE = 65536.0f;
-static const float OCCLUSION_Z_SCALE = 16777216.0f;
-
 /// Software renderer for occlusion.
 class URHO3D_API OcclusionBuffer : public Object
 {
@@ -173,7 +166,7 @@ private:
     /// Number of rendered triangles.
     unsigned numTriangles_{};
     /// Maximum number of triangles.
-    unsigned maxTriangles_{OCCLUSION_DEFAULT_MAX_TRIANGLES};
+    unsigned maxTriangles_;
     /// Culling mode.
     CullMode cullMode_{CULL_CCW};
     /// Depth hierarchy needs update flag.

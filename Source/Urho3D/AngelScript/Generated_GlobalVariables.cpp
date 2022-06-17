@@ -403,24 +403,6 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // static const int NUM_OCTANTS | File: ../Graphics/Octree.h
     engine->RegisterGlobalProperty("const int NUM_OCTANTS", (void*)&NUM_OCTANTS);
 
-    // static const int OCCLUSION_DEFAULT_MAX_TRIANGLES | File: ../Graphics/OcclusionBuffer.h
-    engine->RegisterGlobalProperty("const int OCCLUSION_DEFAULT_MAX_TRIANGLES", (void*)&OCCLUSION_DEFAULT_MAX_TRIANGLES);
-
-    // static const int OCCLUSION_FIXED_BIAS | File: ../Graphics/OcclusionBuffer.h
-    engine->RegisterGlobalProperty("const int OCCLUSION_FIXED_BIAS", (void*)&OCCLUSION_FIXED_BIAS);
-
-    // static const int OCCLUSION_MIN_SIZE | File: ../Graphics/OcclusionBuffer.h
-    engine->RegisterGlobalProperty("const int OCCLUSION_MIN_SIZE", (void*)&OCCLUSION_MIN_SIZE);
-
-    // static const float OCCLUSION_RELATIVE_BIAS | File: ../Graphics/OcclusionBuffer.h
-    engine->RegisterGlobalProperty("const float OCCLUSION_RELATIVE_BIAS", (void*)&OCCLUSION_RELATIVE_BIAS);
-
-    // static const float OCCLUSION_X_SCALE | File: ../Graphics/OcclusionBuffer.h
-    engine->RegisterGlobalProperty("const float OCCLUSION_X_SCALE", (void*)&OCCLUSION_X_SCALE);
-
-    // static const float OCCLUSION_Z_SCALE | File: ../Graphics/OcclusionBuffer.h
-    engine->RegisterGlobalProperty("const float OCCLUSION_Z_SCALE", (void*)&OCCLUSION_Z_SCALE);
-
     // static const unsigned PRIORITY_LAST | File: ../Resource/ResourceCache.h
     engine->RegisterGlobalProperty("const uint PRIORITY_LAST", (void*)&PRIORITY_LAST);
 

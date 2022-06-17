@@ -25,6 +25,13 @@ enum ClipMask : unsigned
 };
 URHO3D_FLAGSET(ClipMask, ClipMaskFlags);
 
+static constexpr int OCCLUSION_MIN_SIZE = 8;
+static constexpr int OCCLUSION_DEFAULT_MAX_TRIANGLES = 5000;
+static constexpr float OCCLUSION_RELATIVE_BIAS = 0.00001f;
+static constexpr int OCCLUSION_FIXED_BIAS = 16;
+static constexpr float OCCLUSION_X_SCALE = 65536.0f;
+static constexpr float OCCLUSION_Z_SCALE = 16777216.0f;
+
 void DrawOcclusionBatchWork(const WorkItem* item, i32 threadIndex)
 {
     auto* buffer = reinterpret_cast<OcclusionBuffer*>(item->aux_);
@@ -32,8 +39,9 @@ void DrawOcclusionBatchWork(const WorkItem* item, i32 threadIndex)
     buffer->DrawBatch(batch, threadIndex);
 }
 
-OcclusionBuffer::OcclusionBuffer(Context* context) :
-    Object(context)
+OcclusionBuffer::OcclusionBuffer(Context* context)
+    : Object(context)
+    , maxTriangles_(OCCLUSION_DEFAULT_MAX_TRIANGLES)
 {
 }
 
