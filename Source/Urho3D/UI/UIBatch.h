@@ -17,7 +17,7 @@ class Matrix3x4;
 class Texture;
 class UIElement;
 
-static const unsigned UI_VERTEX_SIZE = 6;
+inline constexpr i32 UI_VERTEX_SIZE = 6;
 
 /// %UI rendering draw call.
 class URHO3D_API UIBatch

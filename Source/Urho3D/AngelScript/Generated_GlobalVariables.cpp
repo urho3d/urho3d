@@ -559,8 +559,8 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // static const int STREAM_BUFFER_LENGTH | File: ../Audio/SoundSource.h
     engine->RegisterGlobalProperty("const int STREAM_BUFFER_LENGTH", (void*)&STREAM_BUFFER_LENGTH);
 
-    // static const unsigned UI_VERTEX_SIZE | File: ../UI/UIBatch.h
-    engine->RegisterGlobalProperty("const uint UI_VERTEX_SIZE", (void*)&UI_VERTEX_SIZE);
+    // constexpr i32 UI_VERTEX_SIZE | File: ../UI/UIBatch.h
+    engine->RegisterGlobalProperty("const int UI_VERTEX_SIZE", (void*)&UI_VERTEX_SIZE);
 
     // static const unsigned VARIANT_VALUE_SIZE | File: ../Core/Variant.h
     engine->RegisterGlobalProperty("const uint VARIANT_VALUE_SIZE", (void*)&VARIANT_VALUE_SIZE);
