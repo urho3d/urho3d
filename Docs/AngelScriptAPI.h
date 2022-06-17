@@ -4059,8 +4059,9 @@ float GetRestitution() const;
 Scene GetScene() const;
 Object GetSubsystem(StringHash) const;
 StringHash GetType() const;
-uint GetVertexCount() const;
+int GetVertexCount() const;
 Array<Vector2> GetVertices() const;
+Array<uint8> GetVerticesAttr() const;
 bool HasEventHandlers() const;
 bool HasSubscribedToEvent(Object, StringHash) const;
 bool HasSubscribedToEvent(StringHash) const;
@@ -4121,9 +4122,10 @@ void SetObjectAnimationAttr(const ResourceRef&);
 void SetRestitution(float);
 void SetTemporary(bool);
 void SetTrigger(bool);
-void SetVertex(uint, const Vector2&);
-void SetVertexCount(uint);
+void SetVertex(int, const Vector2&);
+void SetVertexCount(int);
 void SetVertices(Array<Vector2>);
+void SetVerticesAttr(Array<uint8>);
 const String& GetCategory() const;
 const String& GetTypeName() const;
 void UnsubscribeFromAllEvents();
@@ -4133,7 +4135,7 @@ void UnsubscribeFromEvent(StringHash);
 void UnsubscribeFromEvents(Object);
 const Variant& GetGlobalVar(StringHash) const;
 const VariantMap& GetGlobalVars() const;
-const Vector2& GetVertex(uint) const;
+const Vector2& GetVertex(int) const;
 int WeakRefs() const;
 void WriteDeltaUpdate(Serializer&, const DirtyBits&, uint8);
 void WriteInitialDeltaUpdate(Serializer&, uint8);
@@ -4190,7 +4192,7 @@ bool trigger;
 StringHash type;
 /* readonly */
 String typeName;
-uint vertexCount;
+int vertexCount;
 /* readonly */
 int weakRefs;
 };
@@ -4622,8 +4624,9 @@ float GetRestitution() const;
 Scene GetScene() const;
 Object GetSubsystem(StringHash) const;
 StringHash GetType() const;
-uint GetVertexCount() const;
+int GetVertexCount() const;
 Array<Vector2> GetVertices() const;
+Array<uint8> GetVerticesAttr() const;
 bool HasEventHandlers() const;
 bool HasSubscribedToEvent(Object, StringHash) const;
 bool HasSubscribedToEvent(StringHash) const;
@@ -4683,9 +4686,10 @@ void SetObjectAnimationAttr(const ResourceRef&);
 void SetRestitution(float);
 void SetTemporary(bool);
 void SetTrigger(bool);
-void SetVertex(uint, const Vector2&);
-void SetVertexCount(uint);
+void SetVertex(int, const Vector2&);
+void SetVertexCount(int);
 void SetVertices(Array<Vector2>);
+void SetVerticesAttr(Array<uint8>);
 const String& GetCategory() const;
 const String& GetTypeName() const;
 void UnsubscribeFromAllEvents();
@@ -4695,7 +4699,7 @@ void UnsubscribeFromEvent(StringHash);
 void UnsubscribeFromEvents(Object);
 const Variant& GetGlobalVar(StringHash) const;
 const VariantMap& GetGlobalVars() const;
-const Vector2& GetVertex(uint) const;
+const Vector2& GetVertex(int) const;
 int WeakRefs() const;
 void WriteDeltaUpdate(Serializer&, const DirtyBits&, uint8);
 void WriteInitialDeltaUpdate(Serializer&, uint8);
@@ -4751,7 +4755,7 @@ bool trigger;
 StringHash type;
 /* readonly */
 String typeName;
-uint vertexCount;
+int vertexCount;
 /* readonly */
 int weakRefs;
 };
@@ -4847,17 +4851,17 @@ void SetBlockEvents(bool);
 void SetBox(const Vector3&, const Vector3& = Vector3 :: ZERO, const Quaternion& = Quaternion :: IDENTITY);
 void SetCapsule(float, float, const Vector3& = Vector3 :: ZERO, const Quaternion& = Quaternion :: IDENTITY);
 void SetCone(float, float, const Vector3& = Vector3 :: ZERO, const Quaternion& = Quaternion :: IDENTITY);
-void SetConvexHull(Model, uint = 0, const Vector3& = Vector3 :: ONE, const Vector3& = Vector3 :: ZERO, const Quaternion& = Quaternion :: IDENTITY);
+void SetConvexHull(Model, int = 0, const Vector3& = Vector3 :: ONE, const Vector3& = Vector3 :: ZERO, const Quaternion& = Quaternion :: IDENTITY);
 void SetCustomConvexHull(CustomGeometry, const Vector3& = Vector3 :: ONE, const Vector3& = Vector3 :: ZERO, const Quaternion& = Quaternion :: IDENTITY);
 void SetCustomGImpactMesh(CustomGeometry, const Vector3& = Vector3 :: ONE, const Vector3& = Vector3 :: ZERO, const Quaternion& = Quaternion :: IDENTITY);
 void SetCustomTriangleMesh(CustomGeometry, const Vector3& = Vector3 :: ONE, const Vector3& = Vector3 :: ZERO, const Quaternion& = Quaternion :: IDENTITY);
 void SetCylinder(float, float, const Vector3& = Vector3 :: ZERO, const Quaternion& = Quaternion :: IDENTITY);
 void SetEnabled(bool);
-void SetGImpactMesh(Model, uint = 0, const Vector3& = Vector3 :: ONE, const Vector3& = Vector3 :: ZERO, const Quaternion& = Quaternion :: IDENTITY);
+void SetGImpactMesh(Model, int = 0, const Vector3& = Vector3 :: ONE, const Vector3& = Vector3 :: ZERO, const Quaternion& = Quaternion :: IDENTITY);
 void SetGlobalVar(StringHash, const Variant&);
 void SetInstanceDefault(bool);
 void SetInterceptNetworkUpdate(const String&, bool);
-void SetLodLevel(uint);
+void SetLodLevel(int);
 void SetMargin(float);
 void SetModel(Model);
 void SetModelAttr(const ResourceRef&);
@@ -4870,9 +4874,9 @@ void SetSize(const Vector3&);
 void SetSphere(float, const Vector3& = Vector3 :: ZERO, const Quaternion& = Quaternion :: IDENTITY);
 void SetStaticPlane(const Vector3& = Vector3 :: ZERO, const Quaternion& = Quaternion :: IDENTITY);
 void SetTemporary(bool);
-void SetTerrain(uint = 0);
+void SetTerrain(int = 0);
 void SetTransform(const Vector3&, const Quaternion&);
-void SetTriangleMesh(Model, uint = 0, const Vector3& = Vector3 :: ONE, const Vector3& = Vector3 :: ZERO, const Quaternion& = Quaternion :: IDENTITY);
+void SetTriangleMesh(Model, int = 0, const Vector3& = Vector3 :: ONE, const Vector3& = Vector3 :: ZERO, const Quaternion& = Quaternion :: IDENTITY);
 const String& GetCategory() const;
 const String& GetTypeName() const;
 void UnsubscribeFromAllEvents();
@@ -7928,7 +7932,7 @@ float yaw;
 class ConvexData
 {
 public:
-ConvexData(Model&, uint);
+ConvexData(Model&, int);
 ConvexData(CustomGeometry&);
 // Methods:
 void BuildHull(Array<Vector3>);
@@ -12028,7 +12032,7 @@ Array<Vector3> vertices;
 class GImpactMeshData
 {
 public:
-GImpactMeshData(Model&, uint);
+GImpactMeshData(Model&, int);
 GImpactMeshData(CustomGeometry&);
 // Methods:
 operator CollisionGeometryData() const;
@@ -12340,7 +12344,7 @@ void SetShaderParameter(StringHash, const Vector4&);
 void SetShaderParameter(StringHash, float);
 void SetShaderParameter(StringHash, int);
 void SetShaders(ShaderVariation, ShaderVariation);
-void SetStencilTest(bool, CompareMode = CMP_ALWAYS, StencilOp = OP_KEEP, StencilOp = OP_KEEP, StencilOp = OP_KEEP, uint = 0, uint = M_MAX_UNSIGNED, uint = M_MAX_UNSIGNED);
+void SetStencilTest(bool, CompareMode = CMP_ALWAYS, StencilOp = OP_KEEP, StencilOp = OP_KEEP, StencilOp = OP_KEEP, uint = 0, uint = M_U32_MASK_ALL_BITS, uint = M_U32_MASK_ALL_BITS);
 void SetTexture(uint, Texture);
 void SetVertexBuffer(VertexBuffer);
 bool SetVertexBuffers(Array<VertexBuffer>, uint = 0);
@@ -12492,7 +12496,7 @@ HashNodeBase&  operator=(const HashNodeBase&);
 class HeightfieldData
 {
 public:
-HeightfieldData(Terrain&, uint);
+HeightfieldData(Terrain&, int);
 // Methods:
 operator CollisionGeometryData() const;
 operator RefCounted() const;
@@ -13269,11 +13273,11 @@ VariantMap& GetEventDataMap() const;
 Object GetEventSender() const;
 uint GetGPUObjectName() const;
 Graphics GetGraphics() const;
-uint GetIndexCount() const;
-uint GetIndexSize() const;
+int GetIndexCount() const;
+int GetIndexSize() const;
 Object GetSubsystem(StringHash) const;
 StringHash GetType() const;
-bool GetUsedVertexRange(uint, uint, uint&, uint&);
+bool GetUsedVertexRange(int, int, int&, int&);
 bool HasEventHandlers() const;
 bool HasPendingData() const;
 bool HasSubscribedToEvent(Object, StringHash) const;
@@ -13297,7 +13301,7 @@ bool SetData(VectorBuffer&);
 bool SetDataRange(VectorBuffer&, uint, uint, bool discard = false);
 void SetGlobalVar(StringHash, const Variant&);
 void SetShadowed(bool);
-bool SetSize(uint, bool, bool = false);
+bool SetSize(int, bool, bool = false);
 const String& GetCategory() const;
 const String& GetTypeName() const;
 void Unlock();
@@ -13323,9 +13327,9 @@ Array<Variant> globalVar;
 /* readonly */
 VariantMap globalVars;
 /* readonly */
-uint indexCount;
+int indexCount;
 /* readonly */
-uint indexSize;
+int indexSize;
 /* readonly */
 int refs;
 bool shadowed;
@@ -16508,7 +16512,7 @@ void UnsubscribeFromEvents(Object);
 const Variant& GetGlobalVar(StringHash) const;
 const Variant& GetMetadata(const String&) const;
 const VariantMap& GetGlobalVars() const;
-const Vector3& GetGeometryCenter(uint) const;
+const Vector3& GetGeometryCenter(int) const;
 int WeakRefs() const;
 operator const Object() const;
 operator const RefCounted() const;
@@ -18588,7 +18592,7 @@ OcclusionBuffer();
 // Methods:
 void BuildDepthHierarchy();
 void Clear();
-void DrawBatch(const OcclusionBatch&, uint);
+void DrawBatch(const OcclusionBatch&, int);
 void DrawTriangles();
 bool GetBlockEvents() const;
 CullMode GetCullMode() const;
@@ -20060,7 +20064,7 @@ CompareMode GetDepthTestMode() const;
 bool GetDepthWrite() const;
 String GetEffectivePixelShaderDefines() const;
 String GetEffectiveVertexShaderDefines() const;
-uint GetIndex() const;
+int GetIndex() const;
 PassLightingMode GetLightingMode() const;
 Array<ShaderVariation> GetPixelShaders();
 Array<ShaderVariation> GetPixelShaders(const StringHash&);
@@ -20400,9 +20404,9 @@ uint GetNumNetworkAttributes() const;
 ObjectAnimation GetObjectAnimation() const;
 ResourceRef GetObjectAnimationAttr() const;
 int GetPositionIterations() const;
-Array<RigidBody2D> GetRigidBodies(const Rect&, uint = 0xffff);
-RigidBody2D GetRigidBody(const Vector2&, uint = M_MAX_UNSIGNED);
-RigidBody2D GetRigidBody(int, int, uint = M_MAX_UNSIGNED);
+Array<RigidBody2D> GetRigidBodies(const Rect&, uint16 = 0xffff);
+RigidBody2D GetRigidBody(const Vector2&, uint16 = M_U16_MASK_ALL_BITS);
+RigidBody2D GetRigidBody(int, int, uint16 = M_U16_MASK_ALL_BITS);
 Scene GetScene() const;
 bool GetSubStepping() const;
 Object GetSubsystem(StringHash) const;
@@ -20429,9 +20433,9 @@ void OnGetAttribute(const AttributeInfo&, Variant&) const;
 void OnSetAttribute(const AttributeInfo&, const Variant&);
 void OnSetEnabled();
 void PrepareNetworkUpdate();
-Array<PhysicsRaycastResult2D> Raycast(const Vector2&, const Vector2&, uint = 0xffff);
-void RaycastSingle(PhysicsRaycastResult2D&, const Vector2&, const Vector2&, uint = M_MAX_UNSIGNED);
-PhysicsRaycastResult2D RaycastSingle(const Vector2&, const Vector2&, uint = 0xffff);
+Array<PhysicsRaycastResult2D> Raycast(const Vector2&, const Vector2&, uint16 = 0xffff);
+void RaycastSingle(PhysicsRaycastResult2D&, const Vector2&, const Vector2&, uint16 = M_U16_MASK_ALL_BITS);
+PhysicsRaycastResult2D RaycastSingle(const Vector2&, const Vector2&, uint16 = 0xffff);
 bool ReadDeltaUpdate(Deserializer&);
 bool ReadLatestDataUpdate(Deserializer&);
 operator RefCounted() const;
@@ -24162,7 +24166,7 @@ ScratchBuffer&  operator=(const ScratchBuffer&);
 
 // Properties:
 bool reserved;
-uint size;
+int size;
 };
 
 class ScreenModeParams
@@ -29680,19 +29684,19 @@ VariantMap& GetEventDataMap() const;
 Object GetEventSender() const;
 uint GetMemoryUse() const;
 StringHash GetNameHash() const;
-uint GetNumPasses() const;
+int GetNumPasses() const;
 Pass GetPass(const String&) const;
-Pass GetPass(uint) const;
+Pass GetPass(int) const;
 Array<String> GetPassNames() const;
 Array<Pass> GetPasses() const;
 Object GetSubsystem(StringHash) const;
 Pass GetSupportedPass(const String&) const;
-Pass GetSupportedPass(uint) const;
+Pass GetSupportedPass(int) const;
 StringHash GetType() const;
 uint GetUseTimer();
 bool HasEventHandlers() const;
 bool HasPass(const String&) const;
-bool HasPass(uint) const;
+bool HasPass(int) const;
 bool HasSubscribedToEvent(Object, StringHash) const;
 bool HasSubscribedToEvent(StringHash) const;
 bool IsDesktop() const;
@@ -29750,7 +29754,7 @@ VariantMap globalVars;
 uint memoryUse;
 String name;
 /* readonly */
-uint numPasses;
+int numPasses;
 /* readonly */
 Array<String> passNames;
 /* readonly */
@@ -29769,14 +29773,14 @@ uint useTimer;
 int weakRefs;
 
 // Constants:
-static const uint alphaPassIndex;
-static const uint basePassIndex;
-static const uint deferredPassIndex;
-static const uint lightPassIndex;
-static const uint litAlphaPassIndex;
-static const uint litBasePassIndex;
-static const uint materialPassIndex;
-static const uint shadowPassIndex;
+static const int alphaPassIndex;
+static const int basePassIndex;
+static const int deferredPassIndex;
+static const int lightPassIndex;
+static const int litAlphaPassIndex;
+static const int litBasePassIndex;
+static const int materialPassIndex;
+static const int shadowPassIndex;
 };
 
 class TechniqueEntry
@@ -33169,7 +33173,7 @@ float sortDistance;
 class TriangleMeshData
 {
 public:
-TriangleMeshData(Model&, uint);
+TriangleMeshData(Model&, int);
 TriangleMeshData(CustomGeometry&);
 // Methods:
 operator CollisionGeometryData() const;
@@ -35148,11 +35152,11 @@ VertexBuffer(bool = false);
 // Methods:
 void ClearDataLost();
 bool GetBlockEvents() const;
-uint64 GetBufferHash(uint);
+uint64 GetBufferHash(int);
 VectorBuffer GetData() const;
 uint GetElementMask() const;
-uint GetElementOffset(VertexElementSemantic, uint8 = 0) const;
-uint GetElementOffset(VertexElementType, VertexElementSemantic, uint8 = 0) const;
+int GetElementOffset(VertexElementSemantic, int8 = 0) const;
+int GetElementOffset(VertexElementType, VertexElementSemantic, int8 = 0) const;
 Array<VertexElement> GetElements() const;
 VariantMap& GetEventDataMap() const;
 Object GetEventSender() const;
@@ -35160,10 +35164,10 @@ uint GetGPUObjectName() const;
 Graphics GetGraphics() const;
 Object GetSubsystem(StringHash) const;
 StringHash GetType() const;
-uint GetVertexCount() const;
-uint GetVertexSize() const;
-bool HasElement(VertexElementSemantic, uint8 = 0) const;
-bool HasElement(VertexElementType, VertexElementSemantic, uint8 = 0) const;
+int GetVertexCount() const;
+int GetVertexSize() const;
+bool HasElement(VertexElementSemantic, int8 = 0) const;
+bool HasElement(VertexElementType, VertexElementSemantic, int8 = 0) const;
 bool HasEventHandlers() const;
 bool HasPendingData() const;
 bool HasSubscribedToEvent(Object, StringHash) const;
@@ -35187,8 +35191,8 @@ bool SetData(VectorBuffer&);
 bool SetDataRange(VectorBuffer&, uint, uint, bool = false);
 void SetGlobalVar(StringHash, const Variant&);
 void SetShadowed(bool);
-bool SetSize(uint, Array<VertexElement>, bool = false);
-bool SetSize(uint, uint, bool = false);
+bool SetSize(int, Array<VertexElement>, bool = false);
+bool SetSize(int, uint, bool = false);
 const String& GetCategory() const;
 const String& GetTypeName() const;
 void Unlock();
@@ -35225,9 +35229,9 @@ StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
-uint vertexCount;
+int vertexCount;
 /* readonly */
-uint vertexSize;
+int vertexSize;
 /* readonly */
 int weakRefs;
 };
@@ -35264,14 +35268,14 @@ class VertexElement
 public:
 ~VertexElement();
 VertexElement();
-VertexElement(VertexElementType, VertexElementSemantic, uint8 = 0, bool = false);
+VertexElement(VertexElementType, VertexElementSemantic, int8 = 0, bool = false);
 // Methods:
 VertexElement&  operator=(const VertexElement&);
 bool  operator==(const VertexElement&) const;
 
 // Properties:
-uint8 index;
-uint offset;
+int8 index;
+int offset;
 bool perInstance;
 VertexElementSemantic semantic;
 VertexElementType type;
@@ -37994,7 +37998,7 @@ uint GetAlphaFormat();
 Array<String> GetArguments();
 String GetConsoleInput();
 uint GetDepthStencilFormat();
-uint GetElementOffset(Array<VertexElement>, VertexElementType, VertexElementSemantic, uint8 = 0);
+int GetElementOffset(Array<VertexElement>, VertexElementType, VertexElementSemantic, int8 = 0);
 Array<VertexElement> GetElements(uint);
 StringHashRegister& GetEventNameRegister();
 Object GetEventSender();
@@ -38028,7 +38032,7 @@ Array<AttributeInfo> GetObjectAttributeInfos(const String&);
 Array<String> GetObjectCategories();
 Array<String> GetObjectsByCategory(const String&);
 String GetParentPath(const String&);
-uint GetPassIndex(const String&);
+int GetPassIndex(const String&);
 String GetPath(const String&);
 String GetPlatform();
 uint GetRG16Format();
@@ -38054,10 +38058,10 @@ JSONValueType GetValueTypeFromName(const String&);
 String GetValueTypeName(JSONValueType);
 VariantType GetVariantTypeFromName(const String&);
 String GetVariantTypeName(VariantType);
-uint GetVertexSize(Array<VertexElement>);
-uint GetVertexSize(uint);
+int GetVertexSize(Array<VertexElement>);
+int GetVertexSize(uint);
 float HalfToFloat(uint16);
-bool HasElement(Array<VertexElement>, VertexElementType, VertexElementSemantic, uint8 = 0);
+bool HasElement(Array<VertexElement>, VertexElementType, VertexElementSemantic, int8 = 0);
 bool HasParameter(const VariantMap&, const String&);
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
@@ -38678,6 +38682,8 @@ float M_DEGTORAD;
 float M_DEGTORAD_2;
 float M_EPSILON;
 float M_HALF_PI;
+int16 M_I16_MASK_ALL_BITS;
+int M_I32_MASK_ALL_BITS;
 float M_INFINITY;
 float M_LARGE_EPSILON;
 float M_LARGE_VALUE;
@@ -38689,16 +38695,12 @@ float M_MIN_NEARCLIP;
 uint M_MIN_UNSIGNED;
 float M_PI;
 float M_RADTODEG;
+uint16 M_U16_MASK_ALL_BITS;
+uint M_U32_MASK_ALL_BITS;
 int NINDEX;
 uint NUM_FRUSTUM_PLANES;
 uint NUM_FRUSTUM_VERTICES;
 int NUM_OCTANTS;
-int OCCLUSION_DEFAULT_MAX_TRIANGLES;
-int OCCLUSION_FIXED_BIAS;
-int OCCLUSION_MIN_SIZE;
-float OCCLUSION_RELATIVE_BIAS;
-float OCCLUSION_X_SCALE;
-float OCCLUSION_Z_SCALE;
 uint PACKAGE_FRAGMENT_SIZE;
 float PIXEL_SIZE;
 uint PRIORITY_LAST;
@@ -39004,7 +39006,7 @@ String SOUND_MASTER;
 String SOUND_MUSIC;
 String SOUND_VOICE;
 int STREAM_BUFFER_LENGTH;
-uint UI_VERTEX_SIZE;
+int UI_VERTEX_SIZE;
 uint USE_FIXEDPOSTUPDATE;
 uint USE_FIXEDUPDATE;
 uint USE_NO_EVENT;
