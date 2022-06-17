@@ -3356,11 +3356,11 @@ template <class T> void RegisterMembers_Particle(asIScriptEngine* engine, const 
     // float Particle::rotationSpeed_
     engine->RegisterObjectProperty(className, "float rotationSpeed", offsetof(T, rotationSpeed_));
 
-    // unsigned Particle::colorIndex_
-    engine->RegisterObjectProperty(className, "uint colorIndex", offsetof(T, colorIndex_));
+    // i32 Particle::colorIndex_
+    engine->RegisterObjectProperty(className, "int colorIndex", offsetof(T, colorIndex_));
 
-    // unsigned Particle::texIndex_
-    engine->RegisterObjectProperty(className, "uint texIndex", offsetof(T, texIndex_));
+    // i32 Particle::texIndex_
+    engine->RegisterObjectProperty(className, "int texIndex", offsetof(T, texIndex_));
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Particle
         REGISTER_MEMBERS_MANUAL_PART_Particle();
@@ -24971,9 +24971,9 @@ template <class T> void RegisterMembers_ParticleEmitter(asIScriptEngine* engine,
     // ResourceRef ParticleEmitter::GetEffectAttr() const
     engine->RegisterObjectMethod(className, "ResourceRef GetEffectAttr() const", AS_METHODPR(T, GetEffectAttr, () const, ResourceRef), AS_CALL_THISCALL);
 
-    // unsigned ParticleEmitter::GetNumParticles() const
-    engine->RegisterObjectMethod(className, "uint GetNumParticles() const", AS_METHODPR(T, GetNumParticles, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numParticles() const", AS_METHODPR(T, GetNumParticles, () const, unsigned), AS_CALL_THISCALL);
+    // i32 ParticleEmitter::GetNumParticles() const
+    engine->RegisterObjectMethod(className, "int GetNumParticles() const", AS_METHODPR(T, GetNumParticles, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numParticles() const", AS_METHODPR(T, GetNumParticles, () const, i32), AS_CALL_THISCALL);
 
     // bool ParticleEmitter::GetSerializeParticles() const
     engine->RegisterObjectMethod(className, "bool GetSerializeParticles() const", AS_METHODPR(T, GetSerializeParticles, () const, bool), AS_CALL_THISCALL);
@@ -25007,9 +25007,9 @@ template <class T> void RegisterMembers_ParticleEmitter(asIScriptEngine* engine,
     engine->RegisterObjectMethod(className, "void SetEmitting(bool)", AS_METHODPR(T, SetEmitting, (bool), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_emitting(bool)", AS_METHODPR(T, SetEmitting, (bool), void), AS_CALL_THISCALL);
 
-    // void ParticleEmitter::SetNumParticles(unsigned num)
-    engine->RegisterObjectMethod(className, "void SetNumParticles(uint)", AS_METHODPR(T, SetNumParticles, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_numParticles(uint)", AS_METHODPR(T, SetNumParticles, (unsigned), void), AS_CALL_THISCALL);
+    // void ParticleEmitter::SetNumParticles(i32 num)
+    engine->RegisterObjectMethod(className, "void SetNumParticles(int)", AS_METHODPR(T, SetNumParticles, (i32), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_numParticles(int)", AS_METHODPR(T, SetNumParticles, (i32), void), AS_CALL_THISCALL);
 
     // void ParticleEmitter::SetSerializeParticles(bool enable)
     engine->RegisterObjectMethod(className, "void SetSerializeParticles(bool)", AS_METHODPR(T, SetSerializeParticles, (bool), void), AS_CALL_THISCALL);

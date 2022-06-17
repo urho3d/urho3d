@@ -20,7 +20,7 @@ namespace Urho3D
 
 extern const char* GEOMETRY_CATEGORY;
 extern const char* faceCameraModeNames[];
-static const unsigned MAX_PARTICLES_IN_FRAME = 100;
+static const i32 MAX_PARTICLES_IN_FRAME = 100;
 
 extern const char* autoRemoveModeNames[];
 
@@ -131,7 +131,7 @@ void ParticleEmitter::Update(const FrameInfo& frame)
         if (emissionTimer_ < -intervalMax)
             emissionTimer_ = -intervalMax;
 
-        unsigned counter = MAX_PARTICLES_IN_FRAME;
+        i32 counter = MAX_PARTICLES_IN_FRAME;
 
         while (emissionTimer_ > 0.0f && counter)
         {
@@ -153,7 +153,7 @@ void ParticleEmitter::Update(const FrameInfo& frame)
     if (scaled_ && !relative_)
         scaleVector = node_->GetWorldScale();
 
-    for (unsigned i = 0; i < particles_.Size(); ++i)
+    for (i32 i = 0; i < particles_.Size(); ++i)
     {
         Particle& particle = particles_[i];
         Billboard& billboard = billboards_[i];
@@ -206,7 +206,7 @@ void ParticleEmitter::Update(const FrameInfo& frame)
             }
 
             // Color interpolation
-            unsigned& index = particle.colorIndex_;
+            i32& index = particle.colorIndex_;
             const Vector<ColorFrame>& colorFrames_ = effect_->GetColorFrames();
             if (index < colorFrames_.Size())
             {
@@ -222,7 +222,7 @@ void ParticleEmitter::Update(const FrameInfo& frame)
             }
 
             // Texture animation
-            unsigned& texIndex = particle.texIndex_;
+            i32& texIndex = particle.texIndex_;
             const Vector<TextureFrame>& textureFrames_ = effect_->GetTextureFrames();
             if (textureFrames_.Size() && texIndex < textureFrames_.Size() - 1)
             {
@@ -261,10 +261,10 @@ void ParticleEmitter::SetEffect(ParticleEffect* effect)
     MarkNetworkUpdate();
 }
 
-void ParticleEmitter::SetNumParticles(unsigned num)
+void ParticleEmitter::SetNumParticles(i32 num)
 {
     // Prevent negative value being assigned from the editor
-    if (num > M_MAX_INT)
+    if (num < 0)
         num = 0;
 
     particles_.Resize(num);
@@ -349,7 +349,7 @@ ResourceRef ParticleEmitter::GetEffectAttr() const
 
 void ParticleEmitter::SetParticlesAttr(const VariantVector& value)
 {
-    unsigned index = 0;
+    i32 index = 0;
     SetNumParticles(index < value.Size() ? value[index++].GetUInt() : 0);
 
     for (Vector<Particle>::Iterator i = particles_.Begin(); i != particles_.End() && index < value.Size(); ++i)
@@ -360,8 +360,8 @@ void ParticleEmitter::SetParticlesAttr(const VariantVector& value)
         i->timeToLive_ = value[index++].GetFloat();
         i->scale_ = value[index++].GetFloat();
         i->rotationSpeed_ = value[index++].GetFloat();
-        i->colorIndex_ = (unsigned)value[index++].GetInt();
-        i->texIndex_ = (unsigned)value[index++].GetInt();
+        i->colorIndex_ = value[index++].GetInt();
+        i->texIndex_ = value[index++].GetInt();
     }
 }
 
@@ -428,8 +428,8 @@ void ParticleEmitter::OnSceneSet(Scene* scene)
 
 bool ParticleEmitter::EmitNewParticle()
 {
-    unsigned index = GetFreeParticle();
-    if (index == M_MAX_UNSIGNED)
+    i32 index = GetFreeParticle();
+    if (index == NINDEX)
         return false;
     assert(index < particles_.Size());
     Particle& particle = particles_[index];
@@ -528,20 +528,20 @@ bool ParticleEmitter::EmitNewParticle()
     return true;
 }
 
-unsigned ParticleEmitter::GetFreeParticle() const
+i32 ParticleEmitter::GetFreeParticle() const
 {
-    for (unsigned i = 0; i < billboards_.Size(); ++i)
+    for (i32 i = 0; i < billboards_.Size(); ++i)
     {
         if (!billboards_[i].enabled_)
             return i;
     }
 
-    return M_MAX_UNSIGNED;
+    return NINDEX;
 }
 
 bool ParticleEmitter::CheckActiveParticles() const
 {
-    for (unsigned i = 0; i < billboards_.Size(); ++i)
+    for (i32 i = 0; i < billboards_.Size(); ++i)
     {
         if (billboards_[i].enabled_)
         {
