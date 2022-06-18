@@ -940,7 +940,7 @@ String String::SubstringUTF8(i32 pos, i32 length) const
 void String::EncodeUTF8(char*& dest, c32 unicodeChar)
 {
     if (unicodeChar < 0x80)
-        *dest++ = unicodeChar;
+        *dest++ = (char)unicodeChar;
     else if (unicodeChar < 0x800)
     {
         dest[0] = (char)(0xc0u | ((unicodeChar >> 6u) & 0x1fu));
@@ -1045,7 +1045,7 @@ c32 String::DecodeUTF8(const char*& src)
 void String::EncodeUTF16(wchar_t*& dest, c32 unicodeChar)
 {
     if (unicodeChar < 0x10000)
-        *dest++ = unicodeChar;
+        *dest++ = (wchar_t)unicodeChar;
     else
     {
         unicodeChar -= 0x10000;
@@ -1096,14 +1096,14 @@ Vector<String> String::Split(const char* str, char separator, bool keepEmptyStri
         {
             const ptrdiff_t splitLen = splitEnd - str;
             if (splitLen > 0 || keepEmptyStrings)
-                ret.Push(String(str, splitLen));
+                ret.Push(String(str, (i32)splitLen));
             str = splitEnd + 1;
         }
     }
 
     const ptrdiff_t splitLen = strEnd - str;
     if (splitLen > 0 || keepEmptyStrings)
-        ret.Push(String(str, splitLen));
+        ret.Push(String(str, (i32)splitLen));
 
     return ret;
 }
@@ -1302,7 +1302,7 @@ WString::WString(const String& str) :
     {
         wchar_t* dest = temp;
         String::EncodeUTF16(dest, str.NextUTF8Char(byteOffset));
-        neededSize += dest - temp;
+        neededSize += (i32)(dest - temp);
     }
 
     Resize(neededSize);
