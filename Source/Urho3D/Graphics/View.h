@@ -205,7 +205,7 @@ private:
     /// Check if a command writes into the destination render target.
     bool CheckViewportWrite(const RenderPathCommand& command);
     /// Check whether a command should use pingponging instead of resolve from destination render target to viewport texture.
-    bool CheckPingpong(unsigned index);
+    bool CheckPingpong(i32 index);
     /// Allocate needed screen buffers.
     void AllocateScreenBuffers();
     /// Blit the viewport from one surface to another.
