@@ -90,9 +90,9 @@ public:
 
 private:
     /// Set a triangle face by index.
-    void SetFace(unsigned index, const Vector3& v0, const Vector3& v1, const Vector3& v2);
+    void SetFace(i32 index, const Vector3& v0, const Vector3& v1, const Vector3& v2);
     /// Set a quadrilateral face by index.
-    void SetFace(unsigned index, const Vector3& v0, const Vector3& v1, const Vector3& v2, const Vector3& v3);
+    void SetFace(i32 index, const Vector3& v0, const Vector3& v1, const Vector3& v2, const Vector3& v3);
     /// Internal vector for clipped vertices.
     Vector<Vector3> clippedVertices_;
     /// Internal vector for the new face being constructed.
