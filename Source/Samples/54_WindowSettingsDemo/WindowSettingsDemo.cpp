@@ -232,7 +232,7 @@ void WindowSettingsDemo::InitSettings()
             return;
 
         const auto& resolutions = graphics->GetResolutions(monitor);
-        const unsigned selectedResolution = resolutionControl_->GetSelection();
+        const i32 selectedResolution = resolutionControl_->GetSelection();
         if (selectedResolution >= resolutions.Size())
             return;
 

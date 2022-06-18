@@ -220,8 +220,8 @@ void HugeObjectCount::AnimateObjects(float timeStep)
     // Rotate about the Z axis (roll)
     Quaternion rotateQuat(ROTATE_SPEED * timeStep, Vector3::FORWARD);
 
-    for (unsigned i = 0; i < boxNodes_.Size(); ++i)
-        boxNodes_[i]->Rotate(rotateQuat);
+    for (const SharedPtr<Node>& boxNode : boxNodes_)
+        boxNode->Rotate(rotateQuat);
 }
 
 void HugeObjectCount::HandleUpdate(StringHash eventType, VariantMap& eventData)

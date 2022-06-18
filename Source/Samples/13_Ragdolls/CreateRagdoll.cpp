@@ -83,9 +83,9 @@ void CreateRagdoll::HandleNodeCollision(StringHash eventType, VariantMap& eventD
             Vector2(90.0f, 0.0f), Vector2::ZERO);
 
         // Disable keyframe animation from all bones so that they will not interfere with the ragdoll
-        auto* model = GetComponent<AnimatedModel>();
+        AnimatedModel* model = GetComponent<AnimatedModel>();
         Skeleton& skeleton = model->GetSkeleton();
-        for (unsigned i = 0; i < skeleton.GetNumBones(); ++i)
+        for (i32 i = 0; i < skeleton.GetNumBones(); ++i)
             skeleton.GetBone(i)->animated_ = false;
 
         // Finally remove self from the scene node. Note that this must be the last operation performed in the function

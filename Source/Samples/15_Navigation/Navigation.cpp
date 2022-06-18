@@ -484,7 +484,7 @@ void Navigation::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventD
 
         if (currentPath_.Size() > 1)
         {
-            for (unsigned i = 0; i < currentPath_.Size() - 1; ++i)
+            for (i32 i = 0; i < currentPath_.Size() - 1; ++i)
                 debug->AddLine(currentPath_[i] + bias, currentPath_[i + 1] + bias, Color(1.0f, 1.0f, 1.0f));
         }
     }

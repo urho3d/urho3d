@@ -139,7 +139,7 @@ void InverseKinematics::CreateScene()
 
     // Set an initial position for the camera scene node above the plane
     cameraNode_->SetPosition(Vector3(0, 0, -4));
-    cameraRotateNode_->SetPosition(Vector3(0, 0.4, 0));
+    cameraRotateNode_->SetPosition(Vector3(0, 0.4f, 0));
     pitch_ = 20;
     yaw_ = 50;
 }

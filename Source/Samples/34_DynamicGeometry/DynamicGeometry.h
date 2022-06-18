@@ -65,7 +65,7 @@ private:
     /// Original vertex positions for the sphere model.
     Vector<Vector3> originalVertices_;
     /// If the vertices are duplicates, indices to the original vertices (to allow seamless animation.)
-    Vector<unsigned> vertexDuplicates_;
+    Vector<i32> vertexDuplicates_;
     /// Animation flag.
     bool animate_;
     /// Animation's elapsed time.

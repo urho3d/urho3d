@@ -52,8 +52,8 @@ Vector<unsigned char> Mover::GetPathAttr() const
 {
     VectorBuffer buffer;
 
-    for (unsigned i = 0; i < path_.Size(); ++i)
-        buffer.WriteVector2(path_[i]);
+    for (const Vector2& point : path_)
+        buffer.WriteVector2(point);
 
     return buffer.GetBuffer();
 }

@@ -107,10 +107,10 @@ void DynamicGeometry::CreateScene()
 
         // Detect duplicate vertices to allow seamless animation
         vertexDuplicates_.Resize(originalVertices_.Size());
-        for (unsigned i = 0; i < originalVertices_.Size(); ++i)
+        for (i32 i = 0; i < originalVertices_.Size(); ++i)
         {
             vertexDuplicates_[i] = i; // Assume not a duplicate
-            for (unsigned j = 0; j < i; ++j)
+            for (i32 j = 0; j < i; ++j)
             {
                 if (originalVertices_[i].Equals(originalVertices_[j]))
                 {
@@ -326,7 +326,7 @@ void DynamicGeometry::AnimateObjects(float timeStep)
     time_ += timeStep * 100.0f;
 
     // Repeat for each of the cloned vertex buffers
-    for (unsigned i = 0; i < animatingBuffers_.Size(); ++i)
+    for (i32 i = 0; i < animatingBuffers_.Size(); ++i)
     {
         float startPhase = time_ + i * 30.0f;
         VertexBuffer* buffer = animatingBuffers_[i];
