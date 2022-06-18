@@ -397,15 +397,14 @@ void SceneReplication::HandlePhysicsPreStep(StringHash eventType, VariantMap& ev
     {
         const Vector<SharedPtr<Connection>>& connections = network->GetClientConnections();
 
-        for (unsigned i = 0; i < connections.Size(); ++i)
+        for (Connection* connection : connections)
         {
-            Connection* connection = connections[i];
             // Get the object this connection is controlling
             Node* ballNode = serverObjects_[connection];
             if (!ballNode)
                 continue;
 
-            auto* body = ballNode->GetComponent<RigidBody>();
+            RigidBody* body = ballNode->GetComponent<RigidBody>();
 
             // Get the last controls sent by the client
             const Controls& controls = connection->GetControls();

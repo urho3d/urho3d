@@ -92,10 +92,8 @@ void Sprites::MoveSprites(float timeStep)
     auto height = (float)graphics->GetHeight();
 
     // Go through all sprites
-    for (unsigned i = 0; i < sprites_.Size(); ++i)
+    for (const SharedPtr<Sprite>& sprite : sprites_)
     {
-        Sprite* sprite = sprites_[i];
-
         // Rotate
         float newRot = sprite->GetRotation() + timeStep * 30.0f;
         sprite->SetRotation(newRot);

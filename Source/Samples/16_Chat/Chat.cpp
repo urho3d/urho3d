@@ -147,8 +147,8 @@ void Chat::ShowChatText(const String& row)
 
     // Concatenate all the rows in history
     String allRows;
-    for (unsigned i = 0; i < chatHistory_.Size(); ++i)
-        allRows += chatHistory_[i] + "\n";
+    for (const String& row : chatHistory_)
+        allRows += row + "\n";
 
     chatHistoryText_->SetText(allRows);
 }

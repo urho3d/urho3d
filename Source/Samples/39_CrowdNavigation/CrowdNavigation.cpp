@@ -275,9 +275,8 @@ void CrowdNavigation::CreateMushroom(const Vector3& pos)
 void CrowdNavigation::CreateBoxOffMeshConnections(DynamicNavigationMesh* navMesh, Node* boxGroup)
 {
     const Vector<SharedPtr<Node>>& boxes = boxGroup->GetChildren();
-    for (unsigned i=0; i < boxes.Size(); ++i)
+    for (const SharedPtr<Node>& box : boxes)
     {
-        Node* box = boxes[i];
         Vector3 boxPos = box->GetPosition();
         float boxHalfSize = box->GetScale().x_ / 2;
 

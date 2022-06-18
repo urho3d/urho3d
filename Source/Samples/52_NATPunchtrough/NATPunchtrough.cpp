@@ -162,8 +162,8 @@ void NATPunchtrough::ShowLogMessage(const String& row)
 
     // Concatenate all the rows in history
     String allRows;
-    for (unsigned i = 0; i < logHistory_.Size(); ++i)
-        allRows += logHistory_[i] + "\n";
+    for (const String& row : logHistory_)
+        allRows += row + "\n";
 
     logHistoryText_->SetText(allRows);
 }

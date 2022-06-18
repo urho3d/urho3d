@@ -279,13 +279,13 @@ void Billboards::AnimateScene(float timeStep)
     const float BILLBOARD_ROTATION_SPEED = 50.0f;
 
     // Rotate the lights around the world Y-axis
-    for (unsigned i = 0; i < lightNodes.Size(); ++i)
-        lightNodes[i]->Rotate(Quaternion(0.0f, LIGHT_ROTATION_SPEED * timeStep, 0.0f), TS_WORLD);
+    for (Node* lightNode : lightNodes)
+        lightNode->Rotate(Quaternion(0.0f, LIGHT_ROTATION_SPEED * timeStep, 0.0f), TS_WORLD);
 
     // Rotate the individual billboards within the billboard sets, then recommit to make the changes visible
-    for (unsigned i = 0; i < billboardNodes.Size(); ++i)
+    for (i32 i = 0; i < billboardNodes.Size(); ++i)
     {
-        auto* billboardObject = billboardNodes[i]->GetComponent<BillboardSet>();
+        BillboardSet* billboardObject = billboardNodes[i]->GetComponent<BillboardSet>();
 
         for (unsigned j = 0; j < billboardObject->GetNumBillboards(); ++j)
         {
