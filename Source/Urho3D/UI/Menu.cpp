@@ -60,9 +60,9 @@ void Menu::Update(float timeStep)
     if (popup_ && showPopup_)
     {
         const Vector<SharedPtr<UIElement>>& children = popup_->GetChildren();
-        for (unsigned i = 0; i < children.Size(); ++i)
+        for (i32 i = 0; i < children.Size(); ++i)
         {
-            auto* menu = dynamic_cast<Menu*>(children[i].Get());
+            Menu* menu = dynamic_cast<Menu*>(children[i].Get());
             if (menu && !menu->autoPopup_ && !menu->IsHovering())
                 menu->autoPopup_ = true;
         }
@@ -73,7 +73,7 @@ void Menu::OnHover(const IntVector2& position, const IntVector2& screenPosition,
 {
     Button::OnHover(position, screenPosition, buttons, qualifiers, cursor);
 
-    auto* sibling = parent_->GetChildStaticCast<Menu>(VAR_SHOW_POPUP, true);
+    Menu* sibling = parent_->GetChildStaticCast<Menu>(VAR_SHOW_POPUP, true);
     if (popup_ && !showPopup_)
     {
         // Check if popup is shown by one of the siblings
@@ -88,7 +88,7 @@ void Menu::OnHover(const IntVector2& position, const IntVector2& screenPosition,
         if (autoPopup_)
         {
             // Show popup when parent menu has its popup shown
-            auto* parentMenu = static_cast<Menu*>(parent_->GetVar(VAR_ORIGIN).GetPtr());
+            Menu* parentMenu = static_cast<Menu*>(parent_->GetVar(VAR_ORIGIN).GetPtr());
             if (parentMenu && parentMenu->showPopup_)
                 ShowPopup(true);
         }
@@ -138,7 +138,7 @@ bool Menu::LoadXML(const XMLElement& source, XMLFile* styleFile)
     if (!Serializable::LoadXML(source))
         return false;
 
-    unsigned nextInternalChild = 0;
+    i32 nextInternalChild = 0;
 
     // Load child elements. Internal elements are not to be created as they already exist
     XMLElement childElem = source.GetChild("element");
@@ -149,7 +149,7 @@ bool Menu::LoadXML(const XMLElement& source, XMLFile* styleFile)
         String typeName = childElem.GetAttribute("type");
         if (typeName.Empty())
             typeName = "UIElement";
-        unsigned index = childElem.HasAttribute("index") ? childElem.GetUInt("index") : M_MAX_UNSIGNED;
+        i32 index = childElem.HasAttribute("index") ? childElem.GetInt("index") : ENDPOS;
         UIElement* child = nullptr;
 
         if (!internalElem)
@@ -176,7 +176,7 @@ bool Menu::LoadXML(const XMLElement& source, XMLFile* styleFile)
                 child = popup_;
             else
             {
-                for (unsigned i = nextInternalChild; i < children_.Size(); ++i)
+                for (i32 i = nextInternalChild; i < children_.Size(); ++i)
                 {
                     if (children_[i]->IsInternal() && children_[i]->GetTypeName() == typeName)
                     {
