@@ -49,4 +49,13 @@ void Test_Container_Str()
         str.Replace(10, 3, "Array<T>");
         assert(str == "bool Swap(Array<T>&)");
     }
+
+    {
+        const char* str = "aa bb CC";
+        Vector<String> substrings = String::Split(str, ' ');
+        assert(substrings.Size() == 3);
+        assert(substrings[0] == "aa");
+        assert(substrings[1] == "bb");
+        assert(substrings[2] == "CC");
+    }
 }
