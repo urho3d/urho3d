@@ -209,7 +209,7 @@ void RibbonTrail::UpdateTail(float timeStep)
     if (points_.Size() > 0)
     {
         // No need to update last point
-        for (unsigned i = 0; i < points_.Size() - 1; ++i)
+        for (i32 i = 0; i < points_.Size() - 1; ++i)
         {
             points_[i].lifetime_ += lastTimeStep_;
 
@@ -222,7 +222,7 @@ void RibbonTrail::UpdateTail(float timeStep)
     // Delete expired points
     if (expiredIndex != -1)
     {
-        points_.Erase(0, (unsigned)(expiredIndex + 1));
+        points_.Erase(0, expiredIndex + 1);
 
         // Update endTail pointer
         if (points_.Size() > 1)
@@ -412,7 +412,7 @@ void RibbonTrail::OnWorldBoundingBoxUpdate()
 {
     BoundingBox worldBox;
 
-    for (unsigned i = 0; i < points_.Size(); ++i)
+    for (i32 i = 0; i < points_.Size(); ++i)
     {
         Vector3 &p = points_[i].position_;
         Vector3 scale = width_ * Vector3::ONE;
