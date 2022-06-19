@@ -400,19 +400,19 @@ bool ParticleEffect::Save(XMLElement& dest) const
 
     if (colorFrames_.Size() > 1)
     {
-        for (unsigned i = 0; i < colorFrames_.Size(); ++i)
+        for (const ColorFrame& colorFrame : colorFrames_)
         {
             childElem = dest.CreateChild("colorfade");
-            childElem.SetColor("color", colorFrames_[i].color_);
-            childElem.SetFloat("time", colorFrames_[i].time_);
+            childElem.SetColor("color", colorFrame.color_);
+            childElem.SetFloat("time", colorFrame.time_);
         }
     }
 
-    for (unsigned i = 0; i < textureFrames_.Size(); ++i)
+    for (const TextureFrame& textureFrame : textureFrames_)
     {
         childElem = dest.CreateChild("texanim");
-        childElem.SetRect("uv", textureFrames_[i].uv_);
-        childElem.SetFloat("time", textureFrames_[i].time_);
+        childElem.SetRect("uv", textureFrame.uv_);
+        childElem.SetFloat("time", textureFrame.time_);
     }
 
     return true;
@@ -640,8 +640,8 @@ void ParticleEffect::SortColorFrames()
 {
     Vector<ColorFrame> cf = colorFrames_;
     colorFrames_.Clear();
-    for (unsigned i = 0; i < cf.Size(); i++)
-        AddColorFrame(cf[i]);
+    for (const ColorFrame& colorFrame : cf)
+        AddColorFrame(colorFrame);
 }
 
 void ParticleEffect::AddTextureTime(const Rect& uv, const float time)
@@ -710,8 +710,8 @@ void ParticleEffect::SortTextureFrames()
 {
     Vector<TextureFrame> tf = textureFrames_;
     textureFrames_.Clear();
-    for (unsigned i = 0; i < tf.Size(); i++)
-        AddTextureFrame(tf[i]);
+    for (const TextureFrame& textureFrame : tf)
+        AddTextureFrame(textureFrame);
 }
 
 SharedPtr<ParticleEffect> ParticleEffect::Clone(const String& cloneName) const
