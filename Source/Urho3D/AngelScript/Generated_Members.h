@@ -22445,8 +22445,8 @@ template <class T> void RegisterMembers_ListView(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "bool GetSelectOnClickEnd() const", AS_METHODPR(T, GetSelectOnClickEnd, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_selectOnClickEnd() const", AS_METHODPR(T, GetSelectOnClickEnd, () const, bool), AS_CALL_THISCALL);
 
-    // void ListView::InsertItem(unsigned index, UIElement* item, UIElement* parentItem = nullptr)
-    engine->RegisterObjectMethod(className, "void InsertItem(uint, UIElement@+, UIElement@+ = null)", AS_METHODPR(T, InsertItem, (unsigned, UIElement*, UIElement*), void), AS_CALL_THISCALL);
+    // void ListView::InsertItem(i32 index, UIElement* item, UIElement* parentItem = nullptr)
+    engine->RegisterObjectMethod(className, "void InsertItem(int, UIElement@+, UIElement@+ = null)", AS_METHODPR(T, InsertItem, (i32, UIElement*, UIElement*), void), AS_CALL_THISCALL);
 
     // bool ListView::IsExpanded(unsigned index) const
     engine->RegisterObjectMethod(className, "bool IsExpanded(uint) const", AS_METHODPR(T, IsExpanded, (unsigned) const, bool), AS_CALL_THISCALL);
