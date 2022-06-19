@@ -270,7 +270,7 @@ void OcclusionBuffer::BuildDepthHierarchy()
     }
 
     // Build the rest of the mip levels
-    for (unsigned i = 1; i < mipBuffers_.Size(); ++i)
+    for (i32 i = 1; i < mipBuffers_.Size(); ++i)
     {
         int prevWidth = width;
         int prevHeight = height;
@@ -1000,7 +1000,7 @@ void OcclusionBuffer::MergeBuffers()
 {
     URHO3D_PROFILE(MergeBuffers);
 
-    for (unsigned i = 1; i < buffers_.Size(); ++i)
+    for (i32 i = 1; i < buffers_.Size(); ++i)
     {
         if (!buffers_[i].used_)
             continue;
