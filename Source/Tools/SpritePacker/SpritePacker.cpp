@@ -157,11 +157,11 @@ void Run(Vector<String>& arguments)
         ErrorExit("Both output xml and png must be in the same folder");
 
     // check all input files exist
-    for (unsigned i = 0; i < inputFiles.Size(); ++i)
+    for (const String& inputFile : inputFiles)
     {
-        URHO3D_LOGINFO("Checking " + inputFiles[i] + " to see if file exists.");
-        if (!fileSystem->FileExists(inputFiles[i]))
-            ErrorExit("File " + inputFiles[i] + " does not exist.");
+        URHO3D_LOGINFO("Checking " + inputFile + " to see if file exists.");
+        if (!fileSystem->FileExists(inputFile))
+            ErrorExit("File " + inputFile + " does not exist.");
     }
 
     // Set the max offset equal to padding to prevent images from going out of bounds
@@ -170,9 +170,8 @@ void Run(Vector<String>& arguments)
 
     Vector<SharedPtr<PackerInfo>> packerInfos;
 
-    for (unsigned i = 0; i < inputFiles.Size(); ++i)
+    for (const String& path : inputFiles)
     {
-        String path = inputFiles[i];
         String name = ReplaceExtension(GetFileName(path), "");
         File file(context, path);
         Image image(context);
@@ -246,9 +245,9 @@ void Run(Vector<String>& arguments)
                 tries.Push(IntVector2((1u<<x), (1u<<y)));
         }
 
-        // load rectangles
-        auto* packerRects = new stbrp_rect[packerInfos.Size()];
-        for (unsigned i = 0; i < packerInfos.Size(); ++i)
+        // Load rectangles
+        stbrp_rect* packerRects = new stbrp_rect[packerInfos.Size()];
+        for (i32 i = 0; i < packerInfos.Size(); ++i)
         {
             PackerInfo* packerInfo = packerInfos[i];
             stbrp_rect* packerRect = &packerRects[i];
@@ -281,7 +280,7 @@ void Run(Vector<String>& arguments)
             {
                 success = true;
                 // distribute values to packer info
-                for (unsigned i = 0; i < packerInfos.Size(); ++i)
+                for (i32 i = 0; i < packerInfos.Size(); ++i)
                 {
                     stbrp_rect* packerRect = &packerRects[i];
                     PackerInfo* packerInfo = packerInfos[packerRect->id];
@@ -308,9 +307,8 @@ void Run(Vector<String>& arguments)
     XMLElement root = xml.CreateRoot("TextureAtlas");
     root.SetAttribute("imagePath", GetFileNameAndExtension(outputFile));
 
-    for (unsigned i = 0; i < packerInfos.Size(); ++i)
+    for (const SharedPtr<PackerInfo>& packerInfo : packerInfos)
     {
-        SharedPtr<PackerInfo> packerInfo = packerInfos[i];
         XMLElement subTexture = root.CreateChild("SubTexture");
         subTexture.SetString("name", packerInfo->name);
         subTexture.SetInt("x", packerInfo->x + offsetX);
@@ -351,10 +349,8 @@ void Run(Vector<String>& arguments)
         unsigned INNER_BOUNDS_DEBUG_COLOR = Color::GREEN.ToUInt();
 
         URHO3D_LOGINFO("Drawing debug information.");
-        for (unsigned i = 0; i < packerInfos.Size(); ++i)
+        for (const SharedPtr<PackerInfo>& packerInfo : packerInfos)
         {
-            SharedPtr<PackerInfo> packerInfo = packerInfos[i];
-
             // Draw outer bounds
             for (int x = 0; x < packerInfo->frameWidth; ++x)
             {
