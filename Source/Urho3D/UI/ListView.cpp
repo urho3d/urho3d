@@ -328,8 +328,10 @@ void ListView::AddItem(UIElement* item)
     InsertItem(M_MAX_UNSIGNED, item);
 }
 
-void ListView::InsertItem(unsigned index, UIElement* item, UIElement* parentItem)
+void ListView::InsertItem(i32 index, UIElement* item, UIElement* parentItem)
 {
+    assert(index >= 0 || index == ENDPOS);
+
     if (!item || item->GetParent() == contentElement_)
         return;
 
@@ -337,7 +339,7 @@ void ListView::InsertItem(unsigned index, UIElement* item, UIElement* parentItem
     item->SetEnabled(true);
     item->SetSelected(false);
 
-    const unsigned numItems = contentElement_->GetNumChildren();
+    const i32 numItems = contentElement_->GetNumChildren();
     if (hierarchyMode_)
     {
         int baseIndent = baseIndent_;
@@ -347,22 +349,26 @@ void ListView::InsertItem(unsigned index, UIElement* item, UIElement* parentItem
             SetItemHierarchyParent(parentItem, true);
 
             // Hide item if parent is collapsed
-            const unsigned parentIndex = FindItem(parentItem);
+            const i32 parentIndex = FindItem(parentItem);
             if (!IsExpanded(parentIndex))
                 item->SetVisible(false);
 
             // Adjust the index to ensure it is within the children index limit of the parent item
-            unsigned indexLimit = parentIndex;
-            if (index <= indexLimit)
-                index = indexLimit + 1;
+            if (index <= parentIndex && index != ENDPOS)
+            {
+                index = parentIndex + 1;
+            }
             else
             {
+                i32 indexLimit = parentIndex;
+
                 while (++indexLimit < numItems)
                 {
                     if (contentElement_->GetChild(indexLimit)->GetIndent() <= baseIndent)
                         break;
                 }
-                if (index > indexLimit)
+
+                if (index > indexLimit || index == ENDPOS)
                     index = indexLimit;
             }
         }
@@ -374,7 +380,7 @@ void ListView::InsertItem(unsigned index, UIElement* item, UIElement* parentItem
     }
     else
     {
-        if (index > numItems)
+        if (index > numItems || index == ENDPOS)
             index = numItems;
 
         contentElement_->InsertChild(index, item);
@@ -383,7 +389,7 @@ void ListView::InsertItem(unsigned index, UIElement* item, UIElement* parentItem
     // If necessary, shift the following selections
     if (!selections_.Empty())
     {
-        for (unsigned i = 0; i < selections_.Size(); ++i)
+        for (i32 i = 0; i < selections_.Size(); ++i)
         {
             if (selections_[i] >= index)
                 ++selections_[i];
