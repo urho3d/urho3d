@@ -76,8 +76,8 @@ void TileMap2D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
         break;
     }
 
-    for (unsigned i = 0; i < layers_.Size(); ++i)
-        layers_[i]->DrawDebugGeometry(debug, depthTest);
+    for (const WeakPtr<TileMapLayer2D>& layer : layers_)
+        layer->DrawDebugGeometry(debug, depthTest);
 }
 
 void TileMap2D::DrawDebugGeometry()
