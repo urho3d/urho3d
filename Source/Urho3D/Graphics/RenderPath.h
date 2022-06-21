@@ -14,6 +14,7 @@
 namespace Urho3D
 {
 
+class Variant;
 class XMLElement;
 class XMLFile;
 
