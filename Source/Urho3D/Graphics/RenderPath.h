@@ -7,6 +7,7 @@
 
 #include "../Container/Ptr.h"
 #include "../Container/RefCounted.h"
+#include "../Core/Variant.h"
 #include "../GraphicsAPI/GraphicsDefs.h"
 #include "../Math/Color.h"
 #include "../Math/Vector4.h"
