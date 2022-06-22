@@ -40,6 +40,7 @@ enum JSONNumberType
     JSONNT_FLOAT_DOUBLE
 };
 
+class Context;
 class JSONValue;
 
 /// JSON array type.
