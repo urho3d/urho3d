@@ -4,6 +4,7 @@
 #pragma once
 
 #include "../Container/ArrayPtr.h"
+#include "../GraphicsAPI/GraphicsDefs.h"
 #include "../Resource/Resource.h"
 
 namespace Urho3D
