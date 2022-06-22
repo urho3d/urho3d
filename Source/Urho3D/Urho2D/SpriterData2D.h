@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "../Container/Str.h"
+
 namespace pugi
 {
 class xml_node;
