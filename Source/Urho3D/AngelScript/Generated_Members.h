@@ -22342,17 +22342,17 @@ template <class T> CScriptArray* ListView_VectorlesUIElementstargre_GetSelectedI
     return VectorToHandleArray(result, "Array<UIElement@>");
 }
 
-// const Vector<unsigned>& ListView::GetSelections() const
-template <class T> CScriptArray* ListView_constspVectorlesunsignedgreamp_GetSelections_void_template(T* _ptr)
+// const Vector<i32>& ListView::GetSelections() const
+template <class T> CScriptArray* ListView_constspVectorlesi32greamp_GetSelections_void_template(T* _ptr)
 {
-    const Vector<unsigned>& result = _ptr->GetSelections();
-    return VectorToArray(result, "Array<uint>");
+    const Vector<i32>& result = _ptr->GetSelections();
+    return VectorToArray(result, "Array<int>");
 }
 
-// void ListView::SetSelections(const Vector<unsigned>& indices)
-template <class T> void ListView_void_SetSelections_constspVectorlesunsignedgreamp_template(T* _ptr, CScriptArray* indices_conv)
+// void ListView::SetSelections(const Vector<i32>& indices)
+template <class T> void ListView_void_SetSelections_constspVectorlesi32greamp_template(T* _ptr, CScriptArray* indices_conv)
 {
-    Vector<unsigned> indices = ArrayToVector<unsigned>(indices_conv);
+    Vector<i32> indices = ArrayToVector<i32>(indices_conv);
     _ptr->SetSelections(indices);
 }
 
@@ -22364,8 +22364,8 @@ template <class T> void RegisterMembers_ListView(asIScriptEngine* engine, const 
     // void ListView::AddItem(UIElement* item)
     engine->RegisterObjectMethod(className, "void AddItem(UIElement@+)", AS_METHODPR(T, AddItem, (UIElement*), void), AS_CALL_THISCALL);
 
-    // void ListView::AddSelection(unsigned index)
-    engine->RegisterObjectMethod(className, "void AddSelection(uint)", AS_METHODPR(T, AddSelection, (unsigned), void), AS_CALL_THISCALL);
+    // void ListView::AddSelection(i32 index)
+    engine->RegisterObjectMethod(className, "void AddSelection(int)", AS_METHODPR(T, AddSelection, (i32), void), AS_CALL_THISCALL);
 
     // void ListView::ChangeSelection(int delta, bool additive = false)
     engine->RegisterObjectMethod(className, "void ChangeSelection(int, bool = false)", AS_METHODPR(T, ChangeSelection, (int, bool), void), AS_CALL_THISCALL);
@@ -22382,17 +22382,17 @@ template <class T> void RegisterMembers_ListView(asIScriptEngine* engine, const 
     // void ListView::EnableInternalLayoutUpdate()
     engine->RegisterObjectMethod(className, "void EnableInternalLayoutUpdate()", AS_METHODPR(T, EnableInternalLayoutUpdate, (), void), AS_CALL_THISCALL);
 
-    // void ListView::EnsureItemVisibility(unsigned index)
-    engine->RegisterObjectMethod(className, "void EnsureItemVisibility(uint)", AS_METHODPR(T, EnsureItemVisibility, (unsigned), void), AS_CALL_THISCALL);
+    // void ListView::EnsureItemVisibility(i32 index)
+    engine->RegisterObjectMethod(className, "void EnsureItemVisibility(int)", AS_METHODPR(T, EnsureItemVisibility, (i32), void), AS_CALL_THISCALL);
 
     // void ListView::EnsureItemVisibility(UIElement* item)
     engine->RegisterObjectMethod(className, "void EnsureItemVisibility(UIElement@+)", AS_METHODPR(T, EnsureItemVisibility, (UIElement*), void), AS_CALL_THISCALL);
 
-    // void ListView::Expand(unsigned index, bool enable, bool recursive = false)
-    engine->RegisterObjectMethod(className, "void Expand(uint, bool, bool = false)", AS_METHODPR(T, Expand, (unsigned, bool, bool), void), AS_CALL_THISCALL);
+    // void ListView::Expand(i32 index, bool enable, bool recursive = false)
+    engine->RegisterObjectMethod(className, "void Expand(int, bool, bool = false)", AS_METHODPR(T, Expand, (i32, bool, bool), void), AS_CALL_THISCALL);
 
-    // unsigned ListView::FindItem(UIElement* item) const
-    engine->RegisterObjectMethod(className, "uint FindItem(UIElement@+) const", AS_METHODPR(T, FindItem, (UIElement*) const, unsigned), AS_CALL_THISCALL);
+    // i32 ListView::FindItem(UIElement* item) const
+    engine->RegisterObjectMethod(className, "int FindItem(UIElement@+) const", AS_METHODPR(T, FindItem, (UIElement*) const, i32), AS_CALL_THISCALL);
 
     // int ListView::GetBaseIndent() const
     engine->RegisterObjectMethod(className, "int GetBaseIndent() const", AS_METHODPR(T, GetBaseIndent, () const, int), AS_CALL_THISCALL);
@@ -22410,9 +22410,9 @@ template <class T> void RegisterMembers_ListView(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "HighlightMode GetHighlightMode() const", AS_METHODPR(T, GetHighlightMode, () const, HighlightMode), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "HighlightMode get_highlightMode() const", AS_METHODPR(T, GetHighlightMode, () const, HighlightMode), AS_CALL_THISCALL);
 
-    // UIElement* ListView::GetItem(unsigned index) const
-    engine->RegisterObjectMethod(className, "UIElement@+ GetItem(uint) const", AS_METHODPR(T, GetItem, (unsigned) const, UIElement*), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "UIElement@+ get_items(uint) const", AS_METHODPR(T, GetItem, (unsigned) const, UIElement*), AS_CALL_THISCALL);
+    // UIElement* ListView::GetItem(i32 index) const
+    engine->RegisterObjectMethod(className, "UIElement@+ GetItem(int) const", AS_METHODPR(T, GetItem, (i32) const, UIElement*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "UIElement@+ get_items(int) const", AS_METHODPR(T, GetItem, (i32) const, UIElement*), AS_CALL_THISCALL);
 
     // Vector<UIElement*> ListView::GetItems() const
     engine->RegisterObjectMethod(className, "Array<UIElement@>@ GetItems() const", AS_FUNCTION_OBJFIRST(ListView_VectorlesUIElementstargre_GetItems_void_template<ListView>), AS_CALL_CDECL_OBJFIRST);
@@ -22421,9 +22421,9 @@ template <class T> void RegisterMembers_ListView(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "bool GetMultiselect() const", AS_METHODPR(T, GetMultiselect, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_multiselect() const", AS_METHODPR(T, GetMultiselect, () const, bool), AS_CALL_THISCALL);
 
-    // unsigned ListView::GetNumItems() const
-    engine->RegisterObjectMethod(className, "uint GetNumItems() const", AS_METHODPR(T, GetNumItems, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numItems() const", AS_METHODPR(T, GetNumItems, () const, unsigned), AS_CALL_THISCALL);
+    // i32 ListView::GetNumItems() const
+    engine->RegisterObjectMethod(className, "int GetNumItems() const", AS_METHODPR(T, GetNumItems, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numItems() const", AS_METHODPR(T, GetNumItems, () const, i32), AS_CALL_THISCALL);
 
     // UIElement* ListView::GetSelectedItem() const
     engine->RegisterObjectMethod(className, "UIElement@+ GetSelectedItem() const", AS_METHODPR(T, GetSelectedItem, () const, UIElement*), AS_CALL_THISCALL);
@@ -22433,13 +22433,13 @@ template <class T> void RegisterMembers_ListView(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "Array<UIElement@>@ GetSelectedItems() const", AS_FUNCTION_OBJFIRST(ListView_VectorlesUIElementstargre_GetSelectedItems_void_template<ListView>), AS_CALL_CDECL_OBJFIRST);
     engine->RegisterObjectMethod(className, "Array<UIElement@>@ get_selectedItems() const", AS_FUNCTION_OBJFIRST(ListView_VectorlesUIElementstargre_GetSelectedItems_void_template<ListView>), AS_CALL_CDECL_OBJFIRST);
 
-    // unsigned ListView::GetSelection() const
-    engine->RegisterObjectMethod(className, "uint GetSelection() const", AS_METHODPR(T, GetSelection, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_selection() const", AS_METHODPR(T, GetSelection, () const, unsigned), AS_CALL_THISCALL);
+    // i32 ListView::GetSelection() const
+    engine->RegisterObjectMethod(className, "int GetSelection() const", AS_METHODPR(T, GetSelection, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_selection() const", AS_METHODPR(T, GetSelection, () const, i32), AS_CALL_THISCALL);
 
-    // const Vector<unsigned>& ListView::GetSelections() const
-    engine->RegisterObjectMethod(className, "Array<uint>@ GetSelections() const", AS_FUNCTION_OBJFIRST(ListView_constspVectorlesunsignedgreamp_GetSelections_void_template<ListView>), AS_CALL_CDECL_OBJFIRST);
-    engine->RegisterObjectMethod(className, "Array<uint>@ get_selections() const", AS_FUNCTION_OBJFIRST(ListView_constspVectorlesunsignedgreamp_GetSelections_void_template<ListView>), AS_CALL_CDECL_OBJFIRST);
+    // const Vector<i32>& ListView::GetSelections() const
+    engine->RegisterObjectMethod(className, "Array<int>@ GetSelections() const", AS_FUNCTION_OBJFIRST(ListView_constspVectorlesi32greamp_GetSelections_void_template<ListView>), AS_CALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod(className, "Array<int>@ get_selections() const", AS_FUNCTION_OBJFIRST(ListView_constspVectorlesi32greamp_GetSelections_void_template<ListView>), AS_CALL_CDECL_OBJFIRST);
 
     // bool ListView::GetSelectOnClickEnd() const
     engine->RegisterObjectMethod(className, "bool GetSelectOnClickEnd() const", AS_METHODPR(T, GetSelectOnClickEnd, () const, bool), AS_CALL_THISCALL);
@@ -22448,23 +22448,23 @@ template <class T> void RegisterMembers_ListView(asIScriptEngine* engine, const 
     // void ListView::InsertItem(i32 index, UIElement* item, UIElement* parentItem = nullptr)
     engine->RegisterObjectMethod(className, "void InsertItem(int, UIElement@+, UIElement@+ = null)", AS_METHODPR(T, InsertItem, (i32, UIElement*, UIElement*), void), AS_CALL_THISCALL);
 
-    // bool ListView::IsExpanded(unsigned index) const
-    engine->RegisterObjectMethod(className, "bool IsExpanded(uint) const", AS_METHODPR(T, IsExpanded, (unsigned) const, bool), AS_CALL_THISCALL);
+    // bool ListView::IsExpanded(i32 index) const
+    engine->RegisterObjectMethod(className, "bool IsExpanded(int) const", AS_METHODPR(T, IsExpanded, (i32) const, bool), AS_CALL_THISCALL);
 
-    // bool ListView::IsSelected(unsigned index) const
-    engine->RegisterObjectMethod(className, "bool IsSelected(uint) const", AS_METHODPR(T, IsSelected, (unsigned) const, bool), AS_CALL_THISCALL);
+    // bool ListView::IsSelected(i32 index) const
+    engine->RegisterObjectMethod(className, "bool IsSelected(int) const", AS_METHODPR(T, IsSelected, (i32) const, bool), AS_CALL_THISCALL);
 
     // void ListView::RemoveAllItems()
     engine->RegisterObjectMethod(className, "void RemoveAllItems()", AS_METHODPR(T, RemoveAllItems, (), void), AS_CALL_THISCALL);
 
-    // void ListView::RemoveItem(UIElement* item, unsigned index = 0)
-    engine->RegisterObjectMethod(className, "void RemoveItem(UIElement@+, uint = 0)", AS_METHODPR(T, RemoveItem, (UIElement*, unsigned), void), AS_CALL_THISCALL);
+    // void ListView::RemoveItem(UIElement* item, i32 index = 0)
+    engine->RegisterObjectMethod(className, "void RemoveItem(UIElement@+, int = 0)", AS_METHODPR(T, RemoveItem, (UIElement*, i32), void), AS_CALL_THISCALL);
 
     // void ListView::RemoveItem(i32 index)
     engine->RegisterObjectMethod(className, "void RemoveItem(int)", AS_METHODPR(T, RemoveItem, (i32), void), AS_CALL_THISCALL);
 
-    // void ListView::RemoveSelection(unsigned index)
-    engine->RegisterObjectMethod(className, "void RemoveSelection(uint)", AS_METHODPR(T, RemoveSelection, (unsigned), void), AS_CALL_THISCALL);
+    // void ListView::RemoveSelection(i32 index)
+    engine->RegisterObjectMethod(className, "void RemoveSelection(int)", AS_METHODPR(T, RemoveSelection, (i32), void), AS_CALL_THISCALL);
 
     // void ListView::SetBaseIndent(int baseIndent)
     engine->RegisterObjectMethod(className, "void SetBaseIndent(int)", AS_METHODPR(T, SetBaseIndent, (int), void), AS_CALL_THISCALL);
@@ -22486,22 +22486,22 @@ template <class T> void RegisterMembers_ListView(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "void SetMultiselect(bool)", AS_METHODPR(T, SetMultiselect, (bool), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_multiselect(bool)", AS_METHODPR(T, SetMultiselect, (bool), void), AS_CALL_THISCALL);
 
-    // void ListView::SetSelection(unsigned index)
-    engine->RegisterObjectMethod(className, "void SetSelection(uint)", AS_METHODPR(T, SetSelection, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_selection(uint)", AS_METHODPR(T, SetSelection, (unsigned), void), AS_CALL_THISCALL);
+    // void ListView::SetSelection(i32 index)
+    engine->RegisterObjectMethod(className, "void SetSelection(int)", AS_METHODPR(T, SetSelection, (i32), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_selection(int)", AS_METHODPR(T, SetSelection, (i32), void), AS_CALL_THISCALL);
 
-    // void ListView::SetSelections(const Vector<unsigned>& indices)
-    engine->RegisterObjectMethod(className, "void SetSelections(Array<uint>@+)", AS_FUNCTION_OBJFIRST(ListView_void_SetSelections_constspVectorlesunsignedgreamp_template<ListView>), AS_CALL_CDECL_OBJFIRST);
+    // void ListView::SetSelections(const Vector<i32>& indices)
+    engine->RegisterObjectMethod(className, "void SetSelections(Array<int>@+)", AS_FUNCTION_OBJFIRST(ListView_void_SetSelections_constspVectorlesi32greamp_template<ListView>), AS_CALL_CDECL_OBJFIRST);
 
     // void ListView::SetSelectOnClickEnd(bool enable)
     engine->RegisterObjectMethod(className, "void SetSelectOnClickEnd(bool)", AS_METHODPR(T, SetSelectOnClickEnd, (bool), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_selectOnClickEnd(bool)", AS_METHODPR(T, SetSelectOnClickEnd, (bool), void), AS_CALL_THISCALL);
 
-    // void ListView::ToggleExpand(unsigned index, bool recursive = false)
-    engine->RegisterObjectMethod(className, "void ToggleExpand(uint, bool = false)", AS_METHODPR(T, ToggleExpand, (unsigned, bool), void), AS_CALL_THISCALL);
+    // void ListView::ToggleExpand(i32 index, bool recursive = false)
+    engine->RegisterObjectMethod(className, "void ToggleExpand(int, bool = false)", AS_METHODPR(T, ToggleExpand, (i32, bool), void), AS_CALL_THISCALL);
 
-    // void ListView::ToggleSelection(unsigned index)
-    engine->RegisterObjectMethod(className, "void ToggleSelection(uint)", AS_METHODPR(T, ToggleSelection, (unsigned), void), AS_CALL_THISCALL);
+    // void ListView::ToggleSelection(i32 index)
+    engine->RegisterObjectMethod(className, "void ToggleSelection(int)", AS_METHODPR(T, ToggleSelection, (i32), void), AS_CALL_THISCALL);
 
     // void ListView::UpdateInternalLayout()
     engine->RegisterObjectMethod(className, "void UpdateInternalLayout()", AS_METHODPR(T, UpdateInternalLayout, (), void), AS_CALL_THISCALL);

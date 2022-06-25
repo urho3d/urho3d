@@ -635,7 +635,7 @@ bool UIElementDelete()
 bool UIElementSelectAll()
 {
     BeginSelectionModify();
-    Array<uint> indices;
+    Array<int> indices;
     uint baseIndex = GetListIndex(editorUIElement);
     indices.Push(baseIndex);
     int baseIndent = hierarchyList.items[baseIndex].indent;

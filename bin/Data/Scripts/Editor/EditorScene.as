@@ -1244,7 +1244,7 @@ bool SceneSelectAll()
 {
     BeginSelectionModify();
     Array<Node@> rootLevelNodes = editorScene.GetChildren();
-    Array<uint> indices;
+    Array<int> indices;
     for (uint i = 0; i < rootLevelNodes.length; ++i)
         indices.Push(GetListIndex(rootLevelNodes[i]));
     hierarchyList.SetSelections(indices);
