@@ -17,6 +17,7 @@ class Deserializer;
 class Node;
 class Serializer;
 class Skeleton;
+class StringHash;
 struct AnimationTrack;
 struct Bone;
 
