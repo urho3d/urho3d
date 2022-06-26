@@ -245,7 +245,7 @@ void ListView::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifier
                 i32 newSelection = selection;
                 i32 okSelection = selection;
                 i32 invisible = 0;
-                while (newSelection < numItems)
+                while (newSelection < numItems && newSelection >= 0)
                 {
                     UIElement* item = GetItem(newSelection);
                     int height = 0;
@@ -675,7 +675,7 @@ void ListView::ChangeSelection(int delta, bool additive)
     while (delta != 0)
     {
         newSelection += direction;
-        if (newSelection >= numItems)
+        if (newSelection >= numItems || newSelection < 0)
             break;
 
         UIElement* item = GetItem(newSelection);
