@@ -31,7 +31,7 @@ const uint UI_ELEMENT_BASE_ID = 1;
 uint uiElementNextID = UI_ELEMENT_BASE_ID;
 bool showInternalUIElement = false;
 bool showTemporaryObject = false;
-Array<uint> hierarchyUpdateSelections;
+Array<int> hierarchyUpdateSelections;
 
 Variant GetUIElementID(UIElement@ element)
 {
@@ -122,7 +122,7 @@ void ExpandCollapseHierarchy(StringHash eventType, VariantMap& eventData)
     bool all = checkBox.checked;
     checkBox.checked = false;    // Auto-reset
 
-    Array<uint> selections = hierarchyList.selections;
+    Array<int> selections = hierarchyList.selections;
     for (uint i = 0; i < selections.length; ++i)
         hierarchyList.Expand(selections[i], enable, all);
 }
@@ -190,7 +190,7 @@ uint UpdateHierarchyItem(uint itemIndex, Serializable@ serializable, UIElement@ 
     Variant id = GetID(serializable, itemType);
 
     // Remove old item if exists
-    if (itemIndex < hierarchyList.numItems && MatchID(hierarchyList.items[itemIndex], id, itemType))
+    if (itemIndex < hierarchyList.numItems && itemIndex != NINDEX && MatchID(hierarchyList.items[itemIndex], id, itemType))
         hierarchyList.RemoveItem(itemIndex);
 
     Text@ text = Text();
@@ -689,7 +689,7 @@ void HandleHierarchyListSelectionChange()
     ClearSceneSelection();
     ClearUIElementSelection();
 
-    Array<uint> indices = hierarchyList.selections;
+    Array<int> indices = hierarchyList.selections;
 
     // Enable Expand/Collapse button when there is selection
     EnableExpandCollapseButtons(indices.length > 0);
@@ -1917,8 +1917,8 @@ void HandleHierarchyContextUIElementCloseAllUILayouts()
 
 void CollapseHierarchy()
 {
-    Array<uint> oldSelections = hierarchyList.selections;
-    Array<uint> selections = {0};
+    Array<int> oldSelections = hierarchyList.selections;
+    Array<int> selections = {0};
 
     hierarchyList.SetSelections(selections);
 

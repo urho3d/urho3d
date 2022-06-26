@@ -77,7 +77,7 @@ public:
         // Adjust the container size for child clipping effect
         overlayContainer_->SetSize(GetParent()->GetSize());
 
-        for (unsigned i = 0; i < children_.Size(); ++i)
+        for (i32 i = 0; i < children_.Size(); ++i)
         {
             const IntVector2& position = children_[i]->GetPosition();
             auto* overlay = overlayContainer_->GetChildStaticCast<CheckBox>(i);
@@ -114,12 +114,12 @@ public:
             const Vector<SharedPtr<UIElement>>& children = overlayContainer_->GetChildren();
             Vector<SharedPtr<UIElement>>::ConstIterator i = children.Find(SharedPtr<UIElement>(overlay));
             if (i != children.End())
-                listView_->ToggleExpand((unsigned)(i - children.Begin()));
+                listView_->ToggleExpand((i32)(i - children.Begin()));
         }
     }
 
     /// Insert a child element into a specific position in the child list.
-    void InsertChild(unsigned index, UIElement* element)
+    void InsertChild(i32 index, UIElement* element)
     {
         // Insert the overlay at the same index position to the overlay container
         CheckBox* overlay = static_cast<CheckBox*>(overlayContainer_->CreateChild(CheckBox::GetTypeStatic(), String::EMPTY, index));
@@ -187,8 +187,8 @@ void ListView::RegisterObject(Context* context)
 void ListView::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifiers)
 {
     // If no selection, can not move with keys
-    unsigned numItems = GetNumItems();
-    unsigned selection = GetSelection();
+    i32 numItems = GetNumItems();
+    i32 selection = GetSelection();
 
     // If either shift or ctrl held down, add to selection if multiselect enabled
     bool additive = multiselect_ && qualifiers & (QUAL_SHIFT | QUAL_CTRL);
@@ -197,7 +197,7 @@ void ListView::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifier
 
     if (numItems)
     {
-        if (selection != M_MAX_UNSIGNED && qualifiers & QUAL_CTRL && key == KEY_C)
+        if (selection != NINDEX && qualifiers & QUAL_CTRL && key == KEY_C)
         {
             CopySelectedItemsToClipboard();
             return;
@@ -207,7 +207,7 @@ void ListView::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifier
         {
         case KEY_LEFT:
         case KEY_RIGHT:
-            if (selection != M_MAX_UNSIGNED && hierarchyMode_)
+            if (selection != NINDEX && hierarchyMode_)
             {
                 Expand(selection, key == KEY_RIGHT);
                 return;
@@ -217,7 +217,7 @@ void ListView::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifier
         case KEY_RETURN:
         case KEY_RETURN2:
         case KEY_KP_ENTER:
-            if (selection != M_MAX_UNSIGNED && hierarchyMode_)
+            if (selection != NINDEX && hierarchyMode_)
             {
                 ToggleExpand(selection);
                 return;
@@ -239,13 +239,13 @@ void ListView::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifier
         case KEY_PAGEDOWN:
             {
                 // Convert page step to pixels and see how many items have to be skipped to reach that many pixels
-                if (selection == M_MAX_UNSIGNED)
+                if (selection == NINDEX)
                     selection = 0;      // Assume as if first item is selected
                 int stepPixels = ((int)(pageStep_ * scrollPanel_->GetHeight())) - contentElement_->GetChild(selection)->GetHeight();
-                unsigned newSelection = selection;
-                unsigned okSelection = selection;
-                unsigned invisible = 0;
-                while (newSelection < numItems)
+                i32 newSelection = selection;
+                i32 okSelection = selection;
+                i32 invisible = 0;
+                while (newSelection < numItems && newSelection >= 0)
                 {
                     UIElement* item = GetItem(newSelection);
                     int height = 0;
@@ -266,7 +266,7 @@ void ListView::OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifier
             break;
 
         case KEY_HOME:
-            delta = -(int)GetNumItems();
+            delta = -GetNumItems();
             break;
 
         case KEY_END:
@@ -325,7 +325,7 @@ void ListView::EnableInternalLayoutUpdate()
 
 void ListView::AddItem(UIElement* item)
 {
-    InsertItem(M_MAX_UNSIGNED, item);
+    InsertItem(ENDPOS, item);
 }
 
 void ListView::InsertItem(i32 index, UIElement* item, UIElement* parentItem)
@@ -399,27 +399,29 @@ void ListView::InsertItem(i32 index, UIElement* item, UIElement* parentItem)
     }
 }
 
-void ListView::RemoveItem(UIElement* item, unsigned index)
+void ListView::RemoveItem(UIElement* item, i32 index/* = 0*/)
 {
+    assert(index >= 0);
+
     if (!item)
         return;
 
-    unsigned numItems = GetNumItems();
-    for (unsigned i = index; i < numItems; ++i)
+    i32 numItems = GetNumItems();
+    for (i32 i = index; i < numItems; ++i)
     {
         if (GetItem(i) == item)
         {
             item->SetSelected(false);
             selections_.Remove(i);
 
-            unsigned removed = 1;
+            i32 removed = 1;
             if (hierarchyMode_)
             {
                 // Remove any child items in hierarchy mode
                 if (GetItemHierarchyParent(item))
                 {
                     int baseIndent = item->GetIndent();
-                    for (unsigned j = i + 1; ; ++j)
+                    for (i32 j = i + 1; ; ++j)
                     {
                         UIElement* childItem = GetItem(i + 1);
                         if (!childItem)
@@ -461,7 +463,7 @@ void ListView::RemoveItem(UIElement* item, unsigned index)
             // If necessary, shift the following selections
             if (!selections_.Empty())
             {
-                for (unsigned j = 0; j < selections_.Size(); ++j)
+                for (i32 j = 0; j < selections_.Size(); ++j)
                 {
                     if (selections_[j] > i)
                         selections_[j] -= removed;
@@ -495,25 +497,26 @@ void ListView::RemoveAllItems()
     contentElement_->UpdateLayout();
 }
 
-void ListView::SetSelection(unsigned index)
+void ListView::SetSelection(i32 index)
 {
-    Vector<unsigned> indices;
+    assert(index >= 0);
+    Vector<i32> indices;
     indices.Push(index);
     SetSelections(indices);
     EnsureItemVisibility(index);
 }
 
-void ListView::SetSelections(const Vector<unsigned>& indices)
+void ListView::SetSelections(const Vector<i32>& indices)
 {
     // Make a weak pointer to self to check for destruction as a response to events
     WeakPtr<ListView> self(this);
 
-    unsigned numItems = GetNumItems();
+    i32 numItems = GetNumItems();
 
     // Remove first items that should no longer be selected
-    for (Vector<unsigned>::Iterator i = selections_.Begin(); i != selections_.End();)
+    for (Vector<i32>::Iterator i = selections_.Begin(); i != selections_.End();)
     {
-        unsigned index = *i;
+        i32 index = *i;
         if (!indices.Contains(index))
         {
             i = selections_.Erase(i);
@@ -535,9 +538,9 @@ void ListView::SetSelections(const Vector<unsigned>& indices)
     bool added = false;
 
     // Then add missing items
-    for (Vector<unsigned>::ConstIterator i = indices.Begin(); i != indices.End(); ++i)
+    for (Vector<i32>::ConstIterator i = indices.Begin(); i != indices.End(); ++i)
     {
-        unsigned index = *i;
+        i32 index = *i;
         if (index < numItems)
         {
             // In singleselect mode, resend the event even for the same selection
@@ -574,8 +577,10 @@ void ListView::SetSelections(const Vector<unsigned>& indices)
     SendEvent(E_SELECTIONCHANGED);
 }
 
-void ListView::AddSelection(unsigned index)
+void ListView::AddSelection(i32 index)
 {
+    assert(index >= 0);
+
     // Make a weak pointer to self to check for destruction as a response to events
     WeakPtr<ListView> self(this);
 
@@ -609,8 +614,10 @@ void ListView::AddSelection(unsigned index)
     }
 }
 
-void ListView::RemoveSelection(unsigned index)
+void ListView::RemoveSelection(i32 index)
 {
+    assert(index >= 0);
+
     if (index >= GetNumItems())
         return;
 
@@ -629,9 +636,12 @@ void ListView::RemoveSelection(unsigned index)
     SendEvent(E_SELECTIONCHANGED);
 }
 
-void ListView::ToggleSelection(unsigned index)
+void ListView::ToggleSelection(i32 index)
 {
-    unsigned numItems = GetNumItems();
+    assert(index >= 0);
+
+    i32 numItems = GetNumItems();
+
     if (index >= numItems)
         return;
 
@@ -643,7 +653,7 @@ void ListView::ToggleSelection(unsigned index)
 
 void ListView::ChangeSelection(int delta, bool additive)
 {
-    unsigned numItems = GetNumItems();
+    i32 numItems = GetNumItems();
     if (selections_.Empty())
     {
         // Select first item if there is no selection yet
@@ -656,16 +666,16 @@ void ListView::ChangeSelection(int delta, bool additive)
         additive = false;
 
     // If going downwards, use the last selection as a base. Otherwise use first
-    unsigned selection = delta > 0 ? selections_.Back() : selections_.Front();
+    i32 selection = delta > 0 ? selections_.Back() : selections_.Front();
     int direction = delta > 0 ? 1 : -1;
-    unsigned newSelection = selection;
-    unsigned okSelection = selection;
-    Vector<unsigned> indices = selections_;
+    i32 newSelection = selection;
+    i32 okSelection = selection;
+    Vector<i32> indices = selections_;
 
     while (delta != 0)
     {
         newSelection += direction;
-        if (newSelection >= numItems)
+        if (newSelection >= numItems || newSelection < 0)
             break;
 
         UIElement* item = GetItem(newSelection);
@@ -684,7 +694,7 @@ void ListView::ChangeSelection(int delta, bool additive)
 
 void ListView::ClearSelection()
 {
-    SetSelections(Vector<unsigned>());
+    SetSelections(Vector<i32>());
 }
 
 void ListView::SetHighlightMode(HighlightMode mode)
@@ -759,12 +769,14 @@ void ListView::SetSelectOnClickEnd(bool enable)
     }
 }
 
-void ListView::Expand(unsigned index, bool enable, bool recursive)
+void ListView::Expand(i32 index, bool enable, bool recursive)
 {
+    assert(index >= 0);
+
     if (!hierarchyMode_)
         return;
 
-    unsigned numItems = GetNumItems();
+    i32 numItems = GetNumItems();
     if (index >= numItems)
         return;
 
@@ -772,7 +784,7 @@ void ListView::Expand(unsigned index, bool enable, bool recursive)
     SetItemExpanded(item, enable);
     int baseIndent = item->GetIndent();
 
-    Vector<bool> expanded((unsigned)(baseIndent + 1));
+    Vector<bool> expanded(baseIndent + 1);
     expanded[baseIndent] = enable;
 
     contentElement_->DisableLayoutUpdate();
@@ -792,8 +804,8 @@ void ListView::Expand(unsigned index, bool enable, bool recursive)
         bool visible = enable && expanded[indent - 1];
         item->SetVisible(visible);
 
-        if (indent >= (int)expanded.Size())
-            expanded.Resize((unsigned)(indent + 1));
+        if (indent >= expanded.Size())
+            expanded.Resize(indent + 1);
         expanded[indent] = visible && GetItemExpanded(item);
     }
 
@@ -801,12 +813,14 @@ void ListView::Expand(unsigned index, bool enable, bool recursive)
     contentElement_->UpdateLayout();
 }
 
-void ListView::ToggleExpand(unsigned index, bool recursive)
+void ListView::ToggleExpand(i32 index, bool recursive)
 {
+    assert(index >= 0);
+
     if (!hierarchyMode_)
         return;
 
-    unsigned numItems = GetNumItems();
+    i32 numItems = GetNumItems();
     if (index >= numItems)
         return;
 
@@ -814,13 +828,14 @@ void ListView::ToggleExpand(unsigned index, bool recursive)
     Expand(index, !GetItemExpanded(item), recursive);
 }
 
-unsigned ListView::GetNumItems() const
+i32 ListView::GetNumItems() const
 {
     return contentElement_->GetNumChildren();
 }
 
-UIElement* ListView::GetItem(unsigned index) const
+UIElement* ListView::GetItem(i32 index) const
 {
+    assert(index >= 0 || index == NINDEX);
     return contentElement_->GetChild(index);
 }
 
@@ -831,14 +846,14 @@ Vector<UIElement*> ListView::GetItems() const
     return items;
 }
 
-unsigned ListView::FindItem(UIElement* item) const
+i32 ListView::FindItem(UIElement* item) const
 {
     if (!item)
-        return M_MAX_UNSIGNED;
+        return NINDEX;
 
     // Early-out by checking if the item belongs to the listview hierarchy at all
     if (item->GetParent() != contentElement_)
-        return M_MAX_UNSIGNED;
+        return NINDEX;
 
     const Vector<SharedPtr<UIElement>>& children = contentElement_->GetChildren();
 
@@ -852,7 +867,7 @@ unsigned ListView::FindItem(UIElement* item) const
         {
             int mid = (left + right) / 2;
             if (children[mid] == item)
-                return (unsigned)mid;
+                return mid;
             if (itemY < children[mid]->GetScreenPosition().y_)
                 right = mid - 1;
             else
@@ -861,19 +876,19 @@ unsigned ListView::FindItem(UIElement* item) const
     }
 
     // Fallback to linear search in case the coordinates/sizes were not yet initialized
-    for (unsigned i = 0; i < children.Size(); ++i)
+    for (i32 i = 0; i < children.Size(); ++i)
     {
         if (children[i] == item)
             return i;
     }
 
-    return M_MAX_UNSIGNED;
+    return NINDEX;
 }
 
-unsigned ListView::GetSelection() const
+i32 ListView::GetSelection() const
 {
     if (selections_.Empty())
-        return M_MAX_UNSIGNED;
+        return NINDEX;
     else
         return GetSelections().Front();
 }
@@ -887,7 +902,7 @@ Vector<UIElement*> ListView::GetSelectedItems() const
 {
     Vector<UIElement*> ret;
 
-    for (Vector<unsigned>::ConstIterator i = selections_.Begin(); i != selections_.End(); ++i)
+    for (Vector<i32>::ConstIterator i = selections_.Begin(); i != selections_.End(); ++i)
     {
         UIElement* item = GetItem(*i);
         if (item)
@@ -901,7 +916,7 @@ void ListView::CopySelectedItemsToClipboard() const
 {
     String selectedText;
 
-    for (Vector<unsigned>::ConstIterator i = selections_.Begin(); i != selections_.End(); ++i)
+    for (Vector<i32>::ConstIterator i = selections_.Begin(); i != selections_.End(); ++i)
     {
         // Only handle Text UI element
         auto* text = dynamic_cast<Text*>(GetItem(*i));
@@ -912,13 +927,15 @@ void ListView::CopySelectedItemsToClipboard() const
     GetSubsystem<UI>()->SetClipboardText(selectedText);
 }
 
-bool ListView::IsSelected(unsigned index) const
+bool ListView::IsSelected(i32 index) const
 {
+    assert(index >= 0);
     return selections_.Contains(index);
 }
 
-bool ListView::IsExpanded(unsigned index) const
+bool ListView::IsExpanded(i32 index) const
 {
+    assert(index >= 0);
     return GetItemExpanded(contentElement_->GetChild(index));
 }
 
@@ -967,10 +984,10 @@ bool ListView::FilterImplicitAttributes(XMLElement& dest) const
 
 void ListView::UpdateSelectionEffect()
 {
-    unsigned numItems = GetNumItems();
+    i32 numItems = GetNumItems();
     bool highlighted = highlightMode_ == HM_ALWAYS || HasFocus();
 
-    for (unsigned i = 0; i < numItems; ++i)
+    for (i32 i = 0; i < numItems; ++i)
     {
         UIElement* item = GetItem(i);
         if (highlightMode_ != HM_NEVER && selections_.Contains(i))
@@ -980,8 +997,9 @@ void ListView::UpdateSelectionEffect()
     }
 }
 
-void ListView::EnsureItemVisibility(unsigned index)
+void ListView::EnsureItemVisibility(i32 index)
 {
+    assert(index >= 0);
     EnsureItemVisibility(GetItem(index));
 }
 
@@ -1017,8 +1035,8 @@ void ListView::HandleUIMouseClick(StringHash eventType, VariantMap& eventData)
     auto* element = static_cast<UIElement*>(eventData[UIMouseClick::P_ELEMENT].GetPtr());
 
     // Check if the clicked element belongs to the list
-    unsigned i = FindItem(element);
-    if (i >= GetNumItems())
+    i32 i = FindItem(element);
+    if (i >= GetNumItems() || i == NINDEX)
         return;
 
     // If not editable, repeat the previous selection. This will send an event and allow eg. a dropdownlist to close
@@ -1043,35 +1061,35 @@ void ListView::HandleUIMouseClick(StringHash eventType, VariantMap& eventData)
                     SetSelection(i);
                 else
                 {
-                    unsigned first = selections_.Front();
-                    unsigned last = selections_.Back();
-                    Vector<unsigned> newSelections = selections_;
+                    i32 first = selections_.Front();
+                    i32 last = selections_.Back();
+                    Vector<i32> newSelections = selections_;
                     if (i == first || i == last)
                     {
-                        for (unsigned j = first; j <= last; ++j)
+                        for (i32 j = first; j <= last; ++j)
                             newSelections.Push(j);
                     }
                     else if (i < first)
                     {
-                        for (unsigned j = i; j <= first; ++j)
+                        for (i32 j = i; j <= first; ++j)
                             newSelections.Push(j);
                     }
                     else if (i < last)
                     {
-                        if ((abs((int)i - (int)first)) <= (abs((int)i - (int)last)))
+                        if ((abs(i - first)) <= (abs(i - last)))
                         {
-                            for (unsigned j = first; j <= i; ++j)
+                            for (i32 j = first; j <= i; ++j)
                                 newSelections.Push(j);
                         }
                         else
                         {
-                            for (unsigned j = i; j <= last; ++j)
+                            for (i32 j = i; j <= last; ++j)
                                 newSelections.Push(j);
                         }
                     }
                     else if (i > last)
                     {
-                        for (unsigned j = last; j <= i; ++j)
+                        for (i32 j = last; j <= i; ++j)
                             newSelections.Push(j);
                     }
                     SetSelections(newSelections);
@@ -1101,7 +1119,7 @@ void ListView::HandleUIMouseDoubleClick(StringHash eventType, VariantMap& eventD
 
     auto* element = static_cast<UIElement*>(eventData[UIMouseClick::P_ELEMENT].GetPtr());
     // Check if the clicked element belongs to the list
-    unsigned i = FindItem(element);
+    i32 i = FindItem(element);
     if (i >= GetNumItems())
         return;
 

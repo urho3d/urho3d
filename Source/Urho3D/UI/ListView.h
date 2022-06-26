@@ -59,22 +59,22 @@ public:
     void InsertItem(i32 index, UIElement* item, UIElement* parentItem = nullptr);
 
     /// Remove specific item, starting search at the specified index if provided. In hierarchy mode will also remove any children.
-    void RemoveItem(UIElement* item, unsigned index = 0);
+    void RemoveItem(UIElement* item, i32 index = 0);
     /// Remove item at index. In hierarchy mode will also remove any children.
     void RemoveItem(i32 index);
     /// Remove all items.
     void RemoveAllItems();
     /// Set selection.
     /// @property
-    void SetSelection(unsigned index);
+    void SetSelection(i32 index);
     /// Set multiple selected items. If multiselect disabled, sets only the first.
-    void SetSelections(const Vector<unsigned>& indices);
+    void SetSelections(const Vector<i32>& indices);
     /// Add item to the selection, multiselect mode only.
-    void AddSelection(unsigned index);
+    void AddSelection(i32 index);
     /// Remove item from the selection.
-    void RemoveSelection(unsigned index);
+    void RemoveSelection(i32 index);
     /// Toggle selection of an item.
-    void ToggleSelection(unsigned index);
+    void ToggleSelection(i32 index);
     /// Move selection by a delta and clamp at list ends. If additive (multiselect only), will add to the existing selection.
     void ChangeSelection(int delta, bool additive = false);
     /// Clear selection.
@@ -100,27 +100,27 @@ public:
     void SetSelectOnClickEnd(bool enable);
 
     /// Expand item at index. Only has effect in hierarchy mode.
-    void Expand(unsigned index, bool enable, bool recursive = false);
+    void Expand(i32 index, bool enable, bool recursive = false);
     /// Toggle item's expanded flag at index. Only has effect in hierarchy mode.
-    void ToggleExpand(unsigned index, bool recursive = false);
+    void ToggleExpand(i32 index, bool recursive = false);
 
     /// Return number of items.
     /// @property
-    unsigned GetNumItems() const;
+    i32 GetNumItems() const;
     /// Return item at index.
     /// @property{get_items}
-    UIElement* GetItem(unsigned index) const;
+    UIElement* GetItem(i32 index) const;
     /// Return all items.
     Vector<UIElement*> GetItems() const;
-    /// Return index of item, or M_MAX_UNSIGNED If not found.
-    unsigned FindItem(UIElement* item) const;
-    /// Return first selected index, or M_MAX_UNSIGNED if none selected.
+    /// Return index of item, or NINDEX If not found.
+    i32 FindItem(UIElement* item) const;
+    /// Return first selected index, or NINDEX if none selected.
     /// @property
-    unsigned GetSelection() const;
+    i32 GetSelection() const;
 
     /// Return all selected indices.
     /// @property
-    const Vector<unsigned>& GetSelections() const { return selections_; }
+    const Vector<i32>& GetSelections() const { return selections_; }
 
     /// Copy selected items to system clipboard. Currently only applicable to Text items.
     void CopySelectedItemsToClipboard() const;
@@ -131,9 +131,9 @@ public:
     /// @property
     Vector<UIElement*> GetSelectedItems() const;
     /// Return whether an item at index is selected.
-    bool IsSelected(unsigned index) const;
+    bool IsSelected(i32 index) const;
     /// Return whether an item at index has its children expanded (in hierarchy mode only).
-    bool IsExpanded(unsigned index) const;
+    bool IsExpanded(i32 index) const;
 
     /// Return highlight mode.
     /// @property
@@ -160,7 +160,7 @@ public:
     int GetBaseIndent() const { return baseIndent_; }
 
     /// Ensure full visibility of the item.
-    void EnsureItemVisibility(unsigned index);
+    void EnsureItemVisibility(i32 index);
     /// Ensure full visibility of the item.
     void EnsureItemVisibility(UIElement* item);
 
@@ -171,7 +171,7 @@ protected:
     void UpdateSelectionEffect();
 
     /// Current selection.
-    Vector<unsigned> selections_;
+    Vector<i32> selections_;
     /// Highlight mode.
     HighlightMode highlightMode_;
     /// Multiselect flag.
