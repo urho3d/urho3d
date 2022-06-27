@@ -25338,9 +25338,9 @@ template <class T> void RegisterMembers_DropDownList(asIScriptEngine* engine, co
     // void DropDownList::AddItem(UIElement* item)
     engine->RegisterObjectMethod(className, "void AddItem(UIElement@+)", AS_METHODPR(T, AddItem, (UIElement*), void), AS_CALL_THISCALL);
 
-    // UIElement* DropDownList::GetItem(unsigned index) const
-    engine->RegisterObjectMethod(className, "UIElement@+ GetItem(uint) const", AS_METHODPR(T, GetItem, (unsigned) const, UIElement*), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "UIElement@+ get_items(uint) const", AS_METHODPR(T, GetItem, (unsigned) const, UIElement*), AS_CALL_THISCALL);
+    // UIElement* DropDownList::GetItem(i32 index) const
+    engine->RegisterObjectMethod(className, "UIElement@+ GetItem(int) const", AS_METHODPR(T, GetItem, (i32) const, UIElement*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "UIElement@+ get_items(int) const", AS_METHODPR(T, GetItem, (i32) const, UIElement*), AS_CALL_THISCALL);
 
     // Vector<UIElement*> DropDownList::GetItems() const
     engine->RegisterObjectMethod(className, "Array<UIElement@>@ GetItems() const", AS_FUNCTION_OBJFIRST(DropDownList_VectorlesUIElementstargre_GetItems_void_template<DropDownList>), AS_CALL_CDECL_OBJFIRST);
@@ -25349,9 +25349,9 @@ template <class T> void RegisterMembers_DropDownList(asIScriptEngine* engine, co
     engine->RegisterObjectMethod(className, "ListView@+ GetListView() const", AS_METHODPR(T, GetListView, () const, ListView*), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "ListView@+ get_listView() const", AS_METHODPR(T, GetListView, () const, ListView*), AS_CALL_THISCALL);
 
-    // unsigned DropDownList::GetNumItems() const
-    engine->RegisterObjectMethod(className, "uint GetNumItems() const", AS_METHODPR(T, GetNumItems, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numItems() const", AS_METHODPR(T, GetNumItems, () const, unsigned), AS_CALL_THISCALL);
+    // i32 DropDownList::GetNumItems() const
+    engine->RegisterObjectMethod(className, "int GetNumItems() const", AS_METHODPR(T, GetNumItems, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numItems() const", AS_METHODPR(T, GetNumItems, () const, i32), AS_CALL_THISCALL);
 
     // UIElement* DropDownList::GetPlaceholder() const
     engine->RegisterObjectMethod(className, "UIElement@+ GetPlaceholder() const", AS_METHODPR(T, GetPlaceholder, () const, UIElement*), AS_CALL_THISCALL);
@@ -25369,12 +25369,12 @@ template <class T> void RegisterMembers_DropDownList(asIScriptEngine* engine, co
     engine->RegisterObjectMethod(className, "UIElement@+ GetSelectedItem() const", AS_METHODPR(T, GetSelectedItem, () const, UIElement*), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "UIElement@+ get_selectedItem() const", AS_METHODPR(T, GetSelectedItem, () const, UIElement*), AS_CALL_THISCALL);
 
-    // unsigned DropDownList::GetSelection() const
-    engine->RegisterObjectMethod(className, "uint GetSelection() const", AS_METHODPR(T, GetSelection, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_selection() const", AS_METHODPR(T, GetSelection, () const, unsigned), AS_CALL_THISCALL);
+    // i32 DropDownList::GetSelection() const
+    engine->RegisterObjectMethod(className, "int GetSelection() const", AS_METHODPR(T, GetSelection, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_selection() const", AS_METHODPR(T, GetSelection, () const, i32), AS_CALL_THISCALL);
 
-    // void DropDownList::InsertItem(unsigned index, UIElement* item)
-    engine->RegisterObjectMethod(className, "void InsertItem(uint, UIElement@+)", AS_METHODPR(T, InsertItem, (unsigned, UIElement*), void), AS_CALL_THISCALL);
+    // void DropDownList::InsertItem(i32 index, UIElement* item)
+    engine->RegisterObjectMethod(className, "void InsertItem(int, UIElement@+)", AS_METHODPR(T, InsertItem, (i32, UIElement*), void), AS_CALL_THISCALL);
 
     // void DropDownList::RemoveAllItems()
     engine->RegisterObjectMethod(className, "void RemoveAllItems()", AS_METHODPR(T, RemoveAllItems, (), void), AS_CALL_THISCALL);
@@ -25382,8 +25382,8 @@ template <class T> void RegisterMembers_DropDownList(asIScriptEngine* engine, co
     // void DropDownList::RemoveItem(UIElement* item)
     engine->RegisterObjectMethod(className, "void RemoveItem(UIElement@+)", AS_METHODPR(T, RemoveItem, (UIElement*), void), AS_CALL_THISCALL);
 
-    // void DropDownList::RemoveItem(unsigned index)
-    engine->RegisterObjectMethod(className, "void RemoveItem(uint)", AS_METHODPR(T, RemoveItem, (unsigned), void), AS_CALL_THISCALL);
+    // void DropDownList::RemoveItem(i32 index)
+    engine->RegisterObjectMethod(className, "void RemoveItem(int)", AS_METHODPR(T, RemoveItem, (i32), void), AS_CALL_THISCALL);
 
     // void DropDownList::SetPlaceholderText(const String& text)
     engine->RegisterObjectMethod(className, "void SetPlaceholderText(const String&in)", AS_METHODPR(T, SetPlaceholderText, (const String&), void), AS_CALL_THISCALL);
@@ -25393,12 +25393,12 @@ template <class T> void RegisterMembers_DropDownList(asIScriptEngine* engine, co
     engine->RegisterObjectMethod(className, "void SetResizePopup(bool)", AS_METHODPR(T, SetResizePopup, (bool), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_resizePopup(bool)", AS_METHODPR(T, SetResizePopup, (bool), void), AS_CALL_THISCALL);
 
-    // void DropDownList::SetSelection(unsigned index)
-    engine->RegisterObjectMethod(className, "void SetSelection(uint)", AS_METHODPR(T, SetSelection, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_selection(uint)", AS_METHODPR(T, SetSelection, (unsigned), void), AS_CALL_THISCALL);
+    // void DropDownList::SetSelection(i32 index)
+    engine->RegisterObjectMethod(className, "void SetSelection(int)", AS_METHODPR(T, SetSelection, (i32), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_selection(int)", AS_METHODPR(T, SetSelection, (i32), void), AS_CALL_THISCALL);
 
-    // void DropDownList::SetSelectionAttr(unsigned index)
-    engine->RegisterObjectMethod(className, "void SetSelectionAttr(uint)", AS_METHODPR(T, SetSelectionAttr, (unsigned), void), AS_CALL_THISCALL);
+    // void DropDownList::SetSelectionAttr(i32 index)
+    engine->RegisterObjectMethod(className, "void SetSelectionAttr(int)", AS_METHODPR(T, SetSelectionAttr, (i32), void), AS_CALL_THISCALL);
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_DropDownList
         REGISTER_MEMBERS_MANUAL_PART_DropDownList();

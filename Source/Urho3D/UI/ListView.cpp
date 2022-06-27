@@ -771,14 +771,14 @@ void ListView::SetSelectOnClickEnd(bool enable)
 
 void ListView::Expand(i32 index, bool enable, bool recursive)
 {
-    assert(index >= 0);
+    assert(index >= 0 || index == NINDEX);
 
     if (!hierarchyMode_)
         return;
 
     i32 numItems = GetNumItems();
-    if (index >= numItems)
-        return;
+    if (index >= numItems || index == NINDEX)
+        return; // TODO: write out of range warning to log
 
     UIElement* item = GetItem(index++);
     SetItemExpanded(item, enable);
@@ -935,7 +935,7 @@ bool ListView::IsSelected(i32 index) const
 
 bool ListView::IsExpanded(i32 index) const
 {
-    assert(index >= 0);
+    assert(index >= 0 || index == NINDEX);
     return GetItemExpanded(contentElement_->GetChild(index));
 }
 
