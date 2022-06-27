@@ -75,16 +75,16 @@ public:
     float HitDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2, Vector3* outNormal = nullptr, Vector3* outBary = nullptr) const;
     /// Return hit distance to non-indexed geometry data, or infinity if no hit. Optionally return hit normal and hit uv coordinates at intersect point.
     float HitDistance
-        (const void* vertexData, unsigned vertexStride, unsigned vertexStart, unsigned vertexCount, Vector3* outNormal = nullptr,
-            Vector2* outUV = nullptr, unsigned uvOffset = 0) const;
+        (const void* vertexData, i32 vertexStride, i32 vertexStart, i32 vertexCount, Vector3* outNormal = nullptr,
+            Vector2* outUV = nullptr, i32 uvOffset = 0) const;
     /// Return hit distance to indexed geometry data, or infinity if no hit. Optionally return hit normal and hit uv coordinates at intersect point.
-    float HitDistance(const void* vertexData, unsigned vertexStride, const void* indexData, unsigned indexSize, unsigned indexStart,
-        unsigned indexCount, Vector3* outNormal = nullptr, Vector2* outUV = nullptr, unsigned uvOffset = 0) const;
+    float HitDistance(const void* vertexData, i32 vertexStride, const void* indexData, i32 indexSize, i32 indexStart,
+        i32 indexCount, Vector3* outNormal = nullptr, Vector2* outUV = nullptr, i32 uvOffset = 0) const;
     /// Return whether ray is inside non-indexed geometry.
-    bool InsideGeometry(const void* vertexData, unsigned vertexSize, unsigned vertexStart, unsigned vertexCount) const;
+    bool InsideGeometry(const void* vertexData, i32 vertexSize, i32 vertexStart, i32 vertexCount) const;
     /// Return whether ray is inside indexed geometry.
-    bool InsideGeometry(const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart,
-        unsigned indexCount) const;
+    bool InsideGeometry(const void* vertexData, i32 vertexSize, const void* indexData, i32 indexSize, i32 indexStart,
+        i32 indexCount) const;
     /// Return transformed by a 3x4 matrix. This may result in a non-normalized direction.
     Ray Transformed(const Matrix3x4& transform) const;
 
