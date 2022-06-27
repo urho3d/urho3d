@@ -3729,13 +3729,13 @@ template <class T> void RegisterMembers_Ray(asIScriptEngine* engine, const char*
 {
     // float Ray::HitDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2, Vector3* outNormal = nullptr, Vector3* outBary = nullptr) const
     // Error: type "Vector3*" can not automatically bind
-    // float Ray::HitDistance(const void* vertexData, unsigned vertexStride, unsigned vertexStart, unsigned vertexCount, Vector3* outNormal = nullptr, Vector2* outUV = nullptr, unsigned uvOffset = 0) const
+    // float Ray::HitDistance(const void* vertexData, i32 vertexStride, i32 vertexStart, i32 vertexCount, Vector3* outNormal = nullptr, Vector2* outUV = nullptr, i32 uvOffset = 0) const
     // Error: type "const void*" can not automatically bind
-    // float Ray::HitDistance(const void* vertexData, unsigned vertexStride, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount, Vector3* outNormal = nullptr, Vector2* outUV = nullptr, unsigned uvOffset = 0) const
+    // float Ray::HitDistance(const void* vertexData, i32 vertexStride, const void* indexData, i32 indexSize, i32 indexStart, i32 indexCount, Vector3* outNormal = nullptr, Vector2* outUV = nullptr, i32 uvOffset = 0) const
     // Error: type "const void*" can not automatically bind
-    // bool Ray::InsideGeometry(const void* vertexData, unsigned vertexSize, unsigned vertexStart, unsigned vertexCount) const
+    // bool Ray::InsideGeometry(const void* vertexData, i32 vertexSize, i32 vertexStart, i32 vertexCount) const
     // Error: type "const void*" can not automatically bind
-    // bool Ray::InsideGeometry(const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount) const
+    // bool Ray::InsideGeometry(const void* vertexData, i32 vertexSize, const void* indexData, i32 indexSize, i32 indexStart, i32 indexCount) const
     // Error: type "const void*" can not automatically bind
     // bool Ray::operator !=(const Ray& rhs) const
     // Only operator == is needed
