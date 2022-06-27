@@ -318,8 +318,10 @@ public:
     void RemoveComponents(StringHash type);
     /// Remove all components from this node.
     void RemoveAllComponents();
-    /// Adjust index order of an existing component in this node.
-    void ReorderComponent(Component* component, unsigned index);
+
+    /// Adjust index order of an existing component in this node. index can be ENDPOS.
+    void ReorderComponent(Component* component, i32 index);
+
     /// Clone scene node, components and child nodes. Return the clone.
     Node* Clone(CreateMode mode = REPLICATED);
     /// Remove from the parent node. If no other shared pointer references exist, causes immediate deletion.

@@ -1061,8 +1061,10 @@ void Node::RemoveAllComponents()
     RemoveComponents(true, true);
 }
 
-void Node::ReorderComponent(Component* component, unsigned index)
+void Node::ReorderComponent(Component* component, i32 index)
 {
+    assert((index >= 0 && index < components_.Size()) || index == ENDPOS);
+
     if (!component || component->GetNode() != this)
         return;
 
