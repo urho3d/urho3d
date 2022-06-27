@@ -37,17 +37,17 @@ public:
 
     /// Add item to the end of the list.
     void AddItem(UIElement* item);
-    /// Insert item to a specific position.
-    void InsertItem(unsigned index, UIElement* item);
+    /// Insert item to a specific position. index can be ENDPOS.
+    void InsertItem(i32 index, UIElement* item);
     /// Remove specific item.
     void RemoveItem(UIElement* item);
     /// Remove item at index.
-    void RemoveItem(unsigned index);
+    void RemoveItem(i32 index);
     /// Remove all items.
     void RemoveAllItems();
     /// Set selection.
     /// @property
-    void SetSelection(unsigned index);
+    void SetSelection(i32 index);
     /// Set place holder text. This is the text shown when there is no selection (-1) in drop down list. Note that if the list has items, the default is to show the first item, so the "no selection" state has to be set explicitly.
     /// @property
     void SetPlaceholderText(const String& text);
@@ -57,15 +57,15 @@ public:
 
     /// Return number of items.
     /// @property
-    unsigned GetNumItems() const;
+    i32 GetNumItems() const;
     /// Return item at index.
     /// @property{get_items}
-    UIElement* GetItem(unsigned index) const;
+    UIElement* GetItem(i32 index) const;
     /// Return all items.
     Vector<UIElement*> GetItems() const;
-    /// Return selection index, or M_MAX_UNSIGNED if none selected.
+    /// Return selection index, or NINDEX if none selected.
     /// @property
-    unsigned GetSelection() const;
+    i32 GetSelection() const;
     /// Return selected item, or null if none selected.
     /// @property
     UIElement* GetSelectedItem() const;
@@ -87,7 +87,7 @@ public:
     bool GetResizePopup() const { return resizePopup_; }
 
     /// Set selection attribute.
-    void SetSelectionAttr(unsigned index);
+    void SetSelectionAttr(i32 index);
 
 protected:
     /// Filter implicit attributes in serialization process.
@@ -111,7 +111,7 @@ private:
     void HandleSelectionChanged(StringHash eventType, VariantMap& eventData);
 
     /// Selected item index attribute.
-    unsigned selectionAttr_;
+    i32 selectionAttr_;
 };
 
 }

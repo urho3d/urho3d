@@ -55,7 +55,7 @@ void DropDownList::RegisterObject(Context* context)
 
     URHO3D_COPY_BASE_ATTRIBUTES(Menu);
     URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Focus Mode", FM_FOCUSABLE_DEFOCUSABLE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Selection", GetSelection, SetSelectionAttr, unsigned, 0, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Selection", GetSelection, SetSelectionAttr, i32, 0, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Resize Popup", GetResizePopup, SetResizePopup, bool, false, AM_FILE);
 }
 
@@ -134,15 +134,16 @@ void DropDownList::OnSetEditable()
 
 void DropDownList::AddItem(UIElement* item)
 {
-    InsertItem(M_MAX_UNSIGNED, item);
+    InsertItem(ENDPOS, item);
 }
 
-void DropDownList::InsertItem(unsigned index, UIElement* item)
+void DropDownList::InsertItem(i32 index, UIElement* item)
 {
+    assert(index >= 0 || index == ENDPOS);
     listView_->InsertItem(index, item);
 
     // If there was no selection, set to the first
-    if (GetSelection() == M_MAX_UNSIGNED)
+    if (GetSelection() == NINDEX)
         SetSelection(0);
 }
 
@@ -151,8 +152,9 @@ void DropDownList::RemoveItem(UIElement* item)
     listView_->RemoveItem(item);
 }
 
-void DropDownList::RemoveItem(unsigned index)
+void DropDownList::RemoveItem(i32 index)
 {
+    assert(index >= 0);
     listView_->RemoveItem(index);
 }
 
@@ -161,8 +163,9 @@ void DropDownList::RemoveAllItems()
     listView_->RemoveAllItems();
 }
 
-void DropDownList::SetSelection(unsigned index)
+void DropDownList::SetSelection(i32 index)
 {
+    assert(index >= 0);
     listView_->SetSelection(index);
 }
 
@@ -176,13 +179,14 @@ void DropDownList::SetResizePopup(bool enable)
     resizePopup_ = enable;
 }
 
-unsigned DropDownList::GetNumItems() const
+i32 DropDownList::GetNumItems() const
 {
     return listView_->GetNumItems();
 }
 
-UIElement* DropDownList::GetItem(unsigned index) const
+UIElement* DropDownList::GetItem(i32 index) const
 {
+    assert(index >= 0);
     return listView_->GetItem(index);
 }
 
@@ -191,7 +195,7 @@ Vector<UIElement*> DropDownList::GetItems() const
     return listView_->GetItems();
 }
 
-unsigned DropDownList::GetSelection() const
+i32 DropDownList::GetSelection() const
 {
     return listView_->GetSelection();
 }
@@ -206,8 +210,9 @@ const String& DropDownList::GetPlaceholderText() const
     return placeholder_->GetChildStaticCast<Text>(0)->GetText();
 }
 
-void DropDownList::SetSelectionAttr(unsigned index)
+void DropDownList::SetSelectionAttr(i32 index)
 {
+    assert(index >= 0);
     selectionAttr_ = index;
 
     // We may not have the list items yet. Apply the index again in ApplyAttributes().
@@ -321,7 +326,7 @@ void DropDownList::HandleListViewKey(StringHash eventType, VariantMap& eventData
 void DropDownList::HandleSelectionChanged(StringHash eventType, VariantMap& eventData)
 {
     // Display the place holder text when there is no selection, however, the place holder text is only visible when the place holder itself is set to visible
-    placeholder_->GetChild(0)->SetVisible(GetSelection() == M_MAX_UNSIGNED);
+    placeholder_->GetChild(0)->SetVisible(GetSelection() == NINDEX);
 }
 
 }
