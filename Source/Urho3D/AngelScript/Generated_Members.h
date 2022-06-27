@@ -15766,8 +15766,8 @@ template <class T> void RegisterMembers_Node(asIScriptEngine* engine, const char
     // bool Node::RemoveTag(const String& tag)
     engine->RegisterObjectMethod(className, "bool RemoveTag(const String&in)", AS_METHODPR(T, RemoveTag, (const String&), bool), AS_CALL_THISCALL);
 
-    // void Node::ReorderComponent(Component* component, unsigned index)
-    engine->RegisterObjectMethod(className, "void ReorderComponent(Component@+, uint)", AS_METHODPR(T, ReorderComponent, (Component*, unsigned), void), AS_CALL_THISCALL);
+    // void Node::ReorderComponent(Component* component, i32 index)
+    engine->RegisterObjectMethod(className, "void ReorderComponent(Component@+, int)", AS_METHODPR(T, ReorderComponent, (Component*, i32), void), AS_CALL_THISCALL);
 
     // void Node::ResetDeepEnabled()
     engine->RegisterObjectMethod(className, "void ResetDeepEnabled()", AS_METHODPR(T, ResetDeepEnabled, (), void), AS_CALL_THISCALL);
