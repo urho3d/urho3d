@@ -1283,6 +1283,8 @@ Vector<Node*> Node::GetChildrenWithTag(const String& tag, bool recursive) const
 
 Node* Node::GetChild(i32 index) const
 {
+    assert(index >= 0);
+
     if (index < 0 || index >= children_.Size())
     {
         URHO3D_LOGWARNING("Node* Node::GetChild(i32 index) const: index out of range");
