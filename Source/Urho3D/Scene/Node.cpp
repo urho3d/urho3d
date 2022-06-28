@@ -1202,18 +1202,17 @@ Vector2 Node::WorldToLocal2D(const Vector2& vector) const
     return Vector2(result.x_, result.y_);
 }
 
-unsigned Node::GetNumChildren(bool recursive) const
+i32 Node::GetNumChildren(bool recursive) const
 {
     if (!recursive)
         return children_.Size();
-    else
-    {
-        unsigned allChildren = children_.Size();
-        for (Vector<SharedPtr<Node>>::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
-            allChildren += (*i)->GetNumChildren(true);
 
-        return allChildren;
-    }
+    i32 allChildren = children_.Size();
+
+    for (const SharedPtr<Node>& child : children_)
+        allChildren += child->GetNumChildren(true);
+
+    return allChildren;
 }
 
 void Node::GetChildren(Vector<Node*>& dest, bool recursive) const
@@ -1282,9 +1281,15 @@ Vector<Node*> Node::GetChildrenWithTag(const String& tag, bool recursive) const
     return dest;
 }
 
-Node* Node::GetChild(unsigned index) const
+Node* Node::GetChild(i32 index) const
 {
-    return index < children_.Size() ? children_[index].Get() : nullptr;
+    if (index < 0 || index >= children_.Size())
+    {
+        URHO3D_LOGWARNING("Node* Node::GetChild(i32 index) const: index out of range");
+        return nullptr;
+    }
+
+    return children_[index].Get();
 }
 
 Node* Node::GetChild(const String& name, bool recursive) const
@@ -1315,12 +1320,13 @@ Node* Node::GetChild(StringHash nameHash, bool recursive) const
     return nullptr;
 }
 
-unsigned Node::GetNumNetworkComponents() const
+i32 Node::GetNumNetworkComponents() const
 {
-    unsigned num = 0;
-    for (Vector<SharedPtr<Component>>::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
+    i32 num = 0;
+
+    for (const SharedPtr<Component>& component : components_)
     {
-        if ((*i)->IsReplicated())
+        if (component->IsReplicated())
             ++num;
     }
 
@@ -1848,26 +1854,26 @@ void Node::AddComponent(Component* component, unsigned id, CreateMode mode)
     }
 }
 
-unsigned Node::GetNumPersistentChildren() const
+i32 Node::GetNumPersistentChildren() const
 {
-    unsigned ret = 0;
+    i32 ret = 0;
 
-    for (Vector<SharedPtr<Node>>::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
+    for (const SharedPtr<Node>& child : children_)
     {
-        if (!(*i)->IsTemporary())
+        if (!child->IsTemporary())
             ++ret;
     }
 
     return ret;
 }
 
-unsigned Node::GetNumPersistentComponents() const
+i32 Node::GetNumPersistentComponents() const
 {
-    unsigned ret = 0;
+    i32 ret = 0;
 
-    for (Vector<SharedPtr<Component>>::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
+    for (const SharedPtr<Component>& component : components_)
     {
-        if (!(*i)->IsTemporary())
+        if (!component->IsTemporary())
             ++ret;
     }
 

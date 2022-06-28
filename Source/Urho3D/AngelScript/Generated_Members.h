@@ -15517,8 +15517,8 @@ template <class T> void RegisterMembers_Node(asIScriptEngine* engine, const char
     // Node* Node::CreateTemporaryChild(const String& name = String::EMPTY, CreateMode mode = REPLICATED, unsigned id = 0)
     engine->RegisterObjectMethod(className, "Node@+ CreateTemporaryChild(const String&in = String::EMPTY, CreateMode = REPLICATED, uint = 0)", AS_METHODPR(T, CreateTemporaryChild, (const String&, CreateMode, unsigned), Node*), AS_CALL_THISCALL);
 
-    // Node* Node::GetChild(unsigned index) const
-    engine->RegisterObjectMethod(className, "Node@+ GetChild(uint) const", AS_METHODPR(T, GetChild, (unsigned) const, Node*), AS_CALL_THISCALL);
+    // Node* Node::GetChild(i32 index) const
+    engine->RegisterObjectMethod(className, "Node@+ GetChild(int) const", AS_METHODPR(T, GetChild, (i32) const, Node*), AS_CALL_THISCALL);
 
     // Node* Node::GetChild(const String& name, bool recursive = false) const
     engine->RegisterObjectMethod(className, "Node@+ GetChild(const String&in, bool = false) const", AS_METHODPR(T, GetChild, (const String&, bool) const, Node*), AS_CALL_THISCALL);
@@ -15565,21 +15565,21 @@ template <class T> void RegisterMembers_Node(asIScriptEngine* engine, const char
     // const Vector3& Node::GetNetPositionAttr() const
     engine->RegisterObjectMethod(className, "const Vector3& GetNetPositionAttr() const", AS_METHODPR(T, GetNetPositionAttr, () const, const Vector3&), AS_CALL_THISCALL);
 
-    // unsigned Node::GetNumChildren(bool recursive = false) const
-    engine->RegisterObjectMethod(className, "uint GetNumChildren(bool = false) const", AS_METHODPR(T, GetNumChildren, (bool) const, unsigned), AS_CALL_THISCALL);
+    // i32 Node::GetNumChildren(bool recursive = false) const
+    engine->RegisterObjectMethod(className, "int GetNumChildren(bool = false) const", AS_METHODPR(T, GetNumChildren, (bool) const, i32), AS_CALL_THISCALL);
 
-    // unsigned Node::GetNumComponents() const
-    engine->RegisterObjectMethod(className, "uint GetNumComponents() const", AS_METHODPR(T, GetNumComponents, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numComponents() const", AS_METHODPR(T, GetNumComponents, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Node::GetNumComponents() const
+    engine->RegisterObjectMethod(className, "int GetNumComponents() const", AS_METHODPR(T, GetNumComponents, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numComponents() const", AS_METHODPR(T, GetNumComponents, () const, i32), AS_CALL_THISCALL);
 
-    // unsigned Node::GetNumNetworkComponents() const
-    engine->RegisterObjectMethod(className, "uint GetNumNetworkComponents() const", AS_METHODPR(T, GetNumNetworkComponents, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Node::GetNumNetworkComponents() const
+    engine->RegisterObjectMethod(className, "int GetNumNetworkComponents() const", AS_METHODPR(T, GetNumNetworkComponents, () const, i32), AS_CALL_THISCALL);
 
-    // unsigned Node::GetNumPersistentChildren() const
-    engine->RegisterObjectMethod(className, "uint GetNumPersistentChildren() const", AS_METHODPR(T, GetNumPersistentChildren, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Node::GetNumPersistentChildren() const
+    engine->RegisterObjectMethod(className, "int GetNumPersistentChildren() const", AS_METHODPR(T, GetNumPersistentChildren, () const, i32), AS_CALL_THISCALL);
 
-    // unsigned Node::GetNumPersistentComponents() const
-    engine->RegisterObjectMethod(className, "uint GetNumPersistentComponents() const", AS_METHODPR(T, GetNumPersistentComponents, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Node::GetNumPersistentComponents() const
+    engine->RegisterObjectMethod(className, "int GetNumPersistentComponents() const", AS_METHODPR(T, GetNumPersistentComponents, () const, i32), AS_CALL_THISCALL);
 
     // Component* Node::GetOrCreateComponent(StringHash type, CreateMode mode = REPLICATED, unsigned id = 0)
     engine->RegisterObjectMethod(className, "Component@+ GetOrCreateComponent(StringHash, CreateMode = REPLICATED, uint = 0)", AS_METHODPR(T, GetOrCreateComponent, (StringHash, CreateMode, unsigned), Component*), AS_CALL_THISCALL);
