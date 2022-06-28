@@ -26,7 +26,7 @@ public:
     /// Set position from the beginning of the buffer. Return actual new position.
     unsigned Seek(unsigned position) override;
     /// Write bytes to the buffer. Return number of bytes actually written.
-    unsigned Write(const void* data, unsigned size) override;
+    i32 Write(const void* data, i32 size) override;
 
     /// Set data from another buffer.
     void SetData(const Vector<unsigned char>& data);

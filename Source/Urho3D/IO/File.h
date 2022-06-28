@@ -59,7 +59,7 @@ public:
     /// Set position from the beginning of the file.
     unsigned Seek(unsigned position) override;
     /// Write bytes to the file. Return number of bytes actually written.
-    unsigned Write(const void* data, unsigned size) override;
+    i32 Write(const void* data, i32 size) override;
 
     /// Return a checksum of the file contents using the SDBM hash algorithm.
     unsigned GetChecksum() override;

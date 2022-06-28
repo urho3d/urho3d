@@ -32,7 +32,7 @@ public:
     /// Set position. No-op for pipes.
     unsigned Seek(unsigned position) override;
     /// Write bytes to the pipe. Return number of bytes actually written.
-    unsigned Write(const void* data, unsigned size) override;
+    i32 Write(const void* data, i32 size) override;
     /// Return whether pipe has no data available.
     bool IsEof() const override;
     /// Not supported.

@@ -27,7 +27,7 @@ public:
     /// Set position from the beginning of the memory area. Return actual new position.
     unsigned Seek(unsigned position) override;
     /// Write bytes to the memory area.
-    unsigned Write(const void* data, unsigned size) override;
+    i32 Write(const void* data, i32 size) override;
 
     /// Return memory area.
     unsigned char* GetData() { return buffer_; }
