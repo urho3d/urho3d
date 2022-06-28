@@ -1036,7 +1036,7 @@ void ListView::HandleUIMouseClick(StringHash eventType, VariantMap& eventData)
 
     // Check if the clicked element belongs to the list
     i32 i = FindItem(element);
-    if (i >= GetNumItems() || i == NINDEX)
+    if (i >= GetNumItems() || i == NINDEX) // TODO: Can this be >= GetNumItems() ?
         return;
 
     // If not editable, repeat the previous selection. This will send an event and allow eg. a dropdownlist to close
@@ -1120,8 +1120,8 @@ void ListView::HandleUIMouseDoubleClick(StringHash eventType, VariantMap& eventD
     auto* element = static_cast<UIElement*>(eventData[UIMouseClick::P_ELEMENT].GetPtr());
     // Check if the clicked element belongs to the list
     i32 i = FindItem(element);
-    if (i >= GetNumItems())
-        return;
+    if (i >= GetNumItems() || i == NINDEX) // TODO: for some reason, this is called in Editor when double-click on a model in a scene
+        return;                            // Can this be >= GetNumItems() ?
 
     VariantMap& clickEventData = GetEventDataMap();
     clickEventData[ItemDoubleClicked::P_ELEMENT] = this;
