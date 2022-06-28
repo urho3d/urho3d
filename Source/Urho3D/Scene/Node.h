@@ -542,7 +542,7 @@ public:
     bool IsDirty() const { return dirty_; }
 
     /// Return number of child scene nodes.
-    unsigned GetNumChildren(bool recursive = false) const;
+    i32 GetNumChildren(bool recursive = false) const;
 
     /// Return immediate child scene nodes.
     const Vector<SharedPtr<Node>>& GetChildren() const { return children_; }
@@ -561,7 +561,8 @@ public:
     Vector<Node*> GetChildrenWithTag(const String& tag, bool recursive = false) const;
 
     /// Return child scene node by index.
-    Node* GetChild(unsigned index) const;
+    Node* GetChild(i32 index) const;
+
     /// Return child scene node by name.
     Node* GetChild(const String& name, bool recursive = false) const;
     /// Return child scene node by name.
@@ -571,10 +572,10 @@ public:
 
     /// Return number of components.
     /// @property
-    unsigned GetNumComponents() const { return components_.Size(); }
+    i32 GetNumComponents() const { return components_.Size(); }
 
     /// Return number of non-local components.
-    unsigned GetNumNetworkComponents() const;
+    i32 GetNumNetworkComponents() const;
 
     /// Return all components.
     const Vector<SharedPtr<Component>>& GetComponents() const { return components_; }
@@ -655,10 +656,12 @@ public:
     Node* CreateChild(unsigned id, CreateMode mode, bool temporary = false);
     /// Add a pre-created component. Using this function from application code is discouraged, as component operation without an owner node may not be well-defined in all cases. Prefer CreateComponent() instead.
     void AddComponent(Component* component, unsigned id, CreateMode mode);
+
     /// Calculate number of non-temporary child nodes.
-    unsigned GetNumPersistentChildren() const;
+    i32 GetNumPersistentChildren() const;
+
     /// Calculate number of non-temporary components.
-    unsigned GetNumPersistentComponents() const;
+    i32 GetNumPersistentComponents() const;
 
     /// Set position in parent space silently without marking the node & child nodes dirty. Used by animation code.
     void SetPositionSilent(const Vector3& position) { position_ = position; }
