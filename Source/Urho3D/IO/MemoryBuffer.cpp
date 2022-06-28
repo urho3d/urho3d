@@ -65,8 +65,10 @@ unsigned MemoryBuffer::Seek(unsigned position)
     return position_;
 }
 
-unsigned MemoryBuffer::Write(const void* data, unsigned size)
+i32 MemoryBuffer::Write(const void* data, i32 size)
 {
+    assert(size >= 0);
+
     if (size + position_ > size_)
         size = size_ - position_;
     if (!size)

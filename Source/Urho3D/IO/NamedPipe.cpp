@@ -133,8 +133,10 @@ unsigned NamedPipe::Read(void* dest, unsigned size)
     return 0;
 }
 
-unsigned NamedPipe::Write(const void* data, unsigned size)
+i32 NamedPipe::Write(const void* data, i32 size)
 {
+    assert(size >= 0);
+
     if (handle_ != INVALID_HANDLE_VALUE)
     {
         DWORD written = 0;

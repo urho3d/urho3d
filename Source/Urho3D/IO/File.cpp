@@ -293,8 +293,10 @@ unsigned File::Seek(unsigned position)
     return position_;
 }
 
-unsigned File::Write(const void* data, unsigned size)
+i32 File::Write(const void* data, i32 size)
 {
+    assert(size >= 0);
+
     if (!IsOpen())
     {
         // If file not open, do not log the error further here to prevent spamming the stderr stream

@@ -4383,7 +4383,7 @@ template <class T> bool Serializer_bool_WriteStringVector_constspStringVectoramp
 // class Serializer | File: ../IO/Serializer.h
 template <class T> void RegisterMembers_Serializer(asIScriptEngine* engine, const char* className)
 {
-    // virtual unsigned Serializer::Write(const void* data, unsigned size) = 0
+    // virtual i32 Serializer::Write(const void* data, i32 size) = 0
     // Error: type "const void*" can not automatically bind
     // bool Serializer::WriteBuffer(const Vector<unsigned char>& value)
     // Error: type "const Vector<unsigned char>&" can not automatically bind

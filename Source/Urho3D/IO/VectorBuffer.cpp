@@ -50,8 +50,10 @@ unsigned VectorBuffer::Seek(unsigned position)
     return position_;
 }
 
-unsigned VectorBuffer::Write(const void* data, unsigned size)
+i32 VectorBuffer::Write(const void* data, i32 size)
 {
+    assert(size >= 0);
+
     if (!size)
         return 0;
 

@@ -30,7 +30,7 @@ public:
     virtual ~Serializer();
 
     /// Write bytes to the stream. Return number of bytes actually written.
-    virtual unsigned Write(const void* data, unsigned size) = 0;
+    virtual i32 Write(const void* data, i32 size) = 0;
 
     /// Write a 64-bit integer.
     bool WriteInt64(long long value);
