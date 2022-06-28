@@ -274,8 +274,10 @@ unsigned NamedPipe::Read(void* dest, unsigned size)
         return 0;
 }
 
-unsigned NamedPipe::Write(const void* data, unsigned size)
+i32 NamedPipe::Write(const void* data, i32 size)
 {
+    assert(size >= 0);
+
     // Attempt to open late if only the read handle is open yet
     if (writeHandle_ == -1 && readHandle_ != -1)
     {
@@ -297,7 +299,7 @@ unsigned NamedPipe::Write(const void* data, unsigned size)
             written += writtenNow;
         }
 
-        return (unsigned)written;
+        return written;
     }
     else
         return 0;
