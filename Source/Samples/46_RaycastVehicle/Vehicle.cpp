@@ -35,7 +35,7 @@ Vehicle::Vehicle(Urho3D::Context* context)
     : LogicComponent(context),
       steering_(0.0f)
 {
-    SetUpdateEventMask(USE_FIXEDUPDATE | USE_POSTUPDATE);
+    SetUpdateEventMask(LogicComponentEvents::FixedUpdate | LogicComponentEvents::PostUpdate);
     engineForce_ = 0.0f;
     brakingForce_ = 50.0f;
     vehicleSteering_ = 0.0f;

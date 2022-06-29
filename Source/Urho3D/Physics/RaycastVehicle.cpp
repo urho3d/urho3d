@@ -121,7 +121,7 @@ RaycastVehicle::RaycastVehicle(Context* context) :
     LogicComponent(context)
 {
     // fixed update() for inputs and post update() to sync wheels for rendering
-    SetUpdateEventMask(USE_FIXEDUPDATE | USE_FIXEDPOSTUPDATE | USE_POSTUPDATE);
+    SetUpdateEventMask(LogicComponentEvents::FixedUpdate | LogicComponentEvents::FixedPostUpdate | LogicComponentEvents::PostUpdate);
     vehicleData_ = new RaycastVehicleData();
     coordinateSystem_ = RIGHT_UP_FORWARD;
     wheelNodes_.Clear();

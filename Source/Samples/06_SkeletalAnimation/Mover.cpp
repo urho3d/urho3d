@@ -15,7 +15,7 @@ Mover::Mover(Context* context) :
     rotationSpeed_(0.0f)
 {
     // Only the scene update event is needed: unsubscribe from the rest for optimization
-    SetUpdateEventMask(USE_UPDATE);
+    SetUpdateEventMask(LogicComponentEvents::Update);
 }
 
 void Mover::SetParameters(float moveSpeed, float rotationSpeed, const BoundingBox& bounds)

@@ -17,7 +17,7 @@ Benchmark02_WomanMover::Benchmark02_WomanMover(Context* context)
     , rotationSpeed_(0.f)
 {
     // Only the scene update event is needed: unsubscribe from the rest for optimization
-    SetUpdateEventMask(USE_UPDATE);
+    SetUpdateEventMask(LogicComponentEvents::Update);
 }
 
 void Benchmark02_WomanMover::SetParameters(float moveSpeed, float rotationSpeed, const BoundingBox& bounds)

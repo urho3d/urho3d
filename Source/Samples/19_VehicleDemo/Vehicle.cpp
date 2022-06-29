@@ -19,7 +19,7 @@ Vehicle::Vehicle(Context* context) :
     LogicComponent(context)
 {
     // Only the physics update event is needed: unsubscribe from the rest for optimization
-    SetUpdateEventMask(USE_FIXEDUPDATE);
+    SetUpdateEventMask(LogicComponentEvents::FixedUpdate);
 }
 
 void Vehicle::RegisterObject(Context* context)

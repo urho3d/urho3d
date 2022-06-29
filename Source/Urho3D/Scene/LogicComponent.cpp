@@ -16,8 +16,8 @@ namespace Urho3D
 
 LogicComponent::LogicComponent(Context* context) :
     Component(context),
-    updateEventMask_(USE_UPDATE | USE_POSTUPDATE | USE_FIXEDUPDATE | USE_FIXEDPOSTUPDATE),
-    currentEventMask_(0),
+    updateEventMask_(LogicComponentEvents::All),
+    currentEventMask_(LogicComponentEvents::None),
     delayedStartCalled_(false)
 {
 }
@@ -45,7 +45,7 @@ void LogicComponent::FixedPostUpdate(float timeStep)
 {
 }
 
-void LogicComponent::SetUpdateEventMask(UpdateEventFlags mask)
+void LogicComponent::SetUpdateEventMask(LogicComponentEvents mask)
 {
     if (updateEventMask_ != mask)
     {
@@ -80,7 +80,7 @@ void LogicComponent::OnSceneSet(Scene* scene)
         UnsubscribeFromEvent(E_PHYSICSPRESTEP);
         UnsubscribeFromEvent(E_PHYSICSPOSTSTEP);
 #endif
-        currentEventMask_ = USE_NO_EVENT;
+        currentEventMask_ = LogicComponentEvents::None;
     }
 }
 
@@ -92,28 +92,28 @@ void LogicComponent::UpdateEventSubscription()
 
     bool enabled = IsEnabledEffective();
 
-    bool needUpdate = enabled && ((updateEventMask_ & USE_UPDATE) || !delayedStartCalled_);
-    if (needUpdate && !(currentEventMask_ & USE_UPDATE))
+    bool needUpdate = enabled && (!!(updateEventMask_ & LogicComponentEvents::Update) || !delayedStartCalled_);
+    if (needUpdate && !(currentEventMask_ & LogicComponentEvents::Update))
     {
         SubscribeToEvent(scene, E_SCENEUPDATE, URHO3D_HANDLER(LogicComponent, HandleSceneUpdate));
-        currentEventMask_ |= USE_UPDATE;
+        currentEventMask_ |= LogicComponentEvents::Update;
     }
-    else if (!needUpdate && (currentEventMask_ & USE_UPDATE))
+    else if (!needUpdate && !!(currentEventMask_ & LogicComponentEvents::Update))
     {
         UnsubscribeFromEvent(scene, E_SCENEUPDATE);
-        currentEventMask_ &= ~USE_UPDATE;
+        currentEventMask_ &= ~LogicComponentEvents::Update;
     }
 
-    bool needPostUpdate = enabled && (updateEventMask_ & USE_POSTUPDATE);
-    if (needPostUpdate && !(currentEventMask_ & USE_POSTUPDATE))
+    bool needPostUpdate = enabled && !!(updateEventMask_ & LogicComponentEvents::PostUpdate);
+    if (needPostUpdate && !(currentEventMask_ & LogicComponentEvents::PostUpdate))
     {
         SubscribeToEvent(scene, E_SCENEPOSTUPDATE, URHO3D_HANDLER(LogicComponent, HandleScenePostUpdate));
-        currentEventMask_ |= USE_POSTUPDATE;
+        currentEventMask_ |= LogicComponentEvents::PostUpdate;
     }
-    else if (!needPostUpdate && (currentEventMask_ & USE_POSTUPDATE))
+    else if (!needPostUpdate && !!(currentEventMask_ & LogicComponentEvents::PostUpdate))
     {
         UnsubscribeFromEvent(scene, E_SCENEPOSTUPDATE);
-        currentEventMask_ &= ~USE_POSTUPDATE;
+        currentEventMask_ &= ~LogicComponentEvents::PostUpdate;
     }
 
 #if defined(URHO3D_PHYSICS) || defined(URHO3D_PHYSICS2D)
@@ -121,28 +121,28 @@ void LogicComponent::UpdateEventSubscription()
     if (!world)
         return;
 
-    bool needFixedUpdate = enabled && (updateEventMask_ & USE_FIXEDUPDATE);
-    if (needFixedUpdate && !(currentEventMask_ & USE_FIXEDUPDATE))
+    bool needFixedUpdate = enabled && !!(updateEventMask_ & LogicComponentEvents::FixedUpdate);
+    if (needFixedUpdate && !(currentEventMask_ & LogicComponentEvents::FixedUpdate))
     {
         SubscribeToEvent(world, E_PHYSICSPRESTEP, URHO3D_HANDLER(LogicComponent, HandlePhysicsPreStep));
-        currentEventMask_ |= USE_FIXEDUPDATE;
+        currentEventMask_ |= LogicComponentEvents::FixedUpdate;
     }
-    else if (!needFixedUpdate && (currentEventMask_ & USE_FIXEDUPDATE))
+    else if (!needFixedUpdate && !!(currentEventMask_ & LogicComponentEvents::FixedUpdate))
     {
         UnsubscribeFromEvent(world, E_PHYSICSPRESTEP);
-        currentEventMask_ &= ~USE_FIXEDUPDATE;
+        currentEventMask_ &= ~LogicComponentEvents::FixedUpdate;
     }
 
-    bool needFixedPostUpdate = enabled && (updateEventMask_ & USE_FIXEDPOSTUPDATE);
-    if (needFixedPostUpdate && !(currentEventMask_ & USE_FIXEDPOSTUPDATE))
+    bool needFixedPostUpdate = enabled && !!(updateEventMask_ & LogicComponentEvents::FixedPostUpdate);
+    if (needFixedPostUpdate && !(currentEventMask_ & LogicComponentEvents::FixedPostUpdate))
     {
         SubscribeToEvent(world, E_PHYSICSPOSTSTEP, URHO3D_HANDLER(LogicComponent, HandlePhysicsPostStep));
-        currentEventMask_ |= USE_FIXEDPOSTUPDATE;
+        currentEventMask_ |= LogicComponentEvents::FixedPostUpdate;
     }
-    else if (!needFixedPostUpdate && (currentEventMask_ & USE_FIXEDPOSTUPDATE))
+    else if (!needFixedPostUpdate && !!(currentEventMask_ & LogicComponentEvents::FixedPostUpdate))
     {
         UnsubscribeFromEvent(world, E_PHYSICSPOSTSTEP);
-        currentEventMask_ &= ~USE_FIXEDPOSTUPDATE;
+        currentEventMask_ &= ~LogicComponentEvents::FixedPostUpdate;
     }
 #endif
 }
@@ -158,10 +158,10 @@ void LogicComponent::HandleSceneUpdate(StringHash eventType, VariantMap& eventDa
         delayedStartCalled_ = true;
 
         // If did not need actual update events, unsubscribe now
-        if (!(updateEventMask_ & USE_UPDATE))
+        if (!(updateEventMask_ & LogicComponentEvents::Update))
         {
             UnsubscribeFromEvent(GetScene(), E_SCENEUPDATE);
-            currentEventMask_ &= ~USE_UPDATE;
+            currentEventMask_ &= ~LogicComponentEvents::Update;
             return;
         }
     }

@@ -21,7 +21,7 @@ Mover::Mover(Context* context) :
     flip_(0.0f)
 {
     // Only the scene update event is needed: unsubscribe from the rest for optimization
-    SetUpdateEventMask(USE_UPDATE);
+    SetUpdateEventMask(LogicComponentEvents::Update);
 }
 
 void Mover::RegisterObject(Context* context)
