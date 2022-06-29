@@ -314,6 +314,14 @@ static const unsigned Key_KEY_VOLUMEDOWN = KEY_VOLUMEDOWN;
 static const unsigned Key_KEY_VOLUMEUP = KEY_VOLUMEUP;
 static const unsigned Key_KEY_WWW = KEY_WWW;
 
+// enum class LogicComponentEvents | File: ../Scene/LogicComponent.h
+static const int LogicComponentEvents_None = static_cast<int>(LogicComponentEvents::None); 
+static const int LogicComponentEvents_Update = static_cast<int>(LogicComponentEvents::Update); 
+static const int LogicComponentEvents_PostUpdate = static_cast<int>(LogicComponentEvents::PostUpdate); 
+static const int LogicComponentEvents_FixedUpdate = static_cast<int>(LogicComponentEvents::FixedUpdate); 
+static const int LogicComponentEvents_FixedPostUpdate = static_cast<int>(LogicComponentEvents::FixedPostUpdate); 
+static const int LogicComponentEvents_All = static_cast<int>(LogicComponentEvents::All); 
+
 // enum MaterialQuality : u32 | File: ../GraphicsAPI/GraphicsDefs.h
 static const u32 MaterialQuality_QUALITY_LOW = QUALITY_LOW;
 static const u32 MaterialQuality_QUALITY_MEDIUM = QUALITY_MEDIUM;
@@ -587,13 +595,6 @@ static const unsigned Scancode_SCANCODE_APP2 = SCANCODE_APP2;
 static const unsigned SmoothingType_SMOOTH_NONE = SMOOTH_NONE;
 static const unsigned SmoothingType_SMOOTH_POSITION = SMOOTH_POSITION;
 static const unsigned SmoothingType_SMOOTH_ROTATION = SMOOTH_ROTATION;
-
-// enum UpdateEvent : unsigned | File: ../Scene/LogicComponent.h
-static const unsigned UpdateEvent_USE_NO_EVENT = USE_NO_EVENT;
-static const unsigned UpdateEvent_USE_UPDATE = USE_UPDATE;
-static const unsigned UpdateEvent_USE_POSTUPDATE = USE_POSTUPDATE;
-static const unsigned UpdateEvent_USE_FIXEDUPDATE = USE_FIXEDUPDATE;
-static const unsigned UpdateEvent_USE_FIXEDPOSTUPDATE = USE_FIXEDPOSTUPDATE;
 
 // enum VertexMask : u32 | File: ../GraphicsAPI/GraphicsDefs.h
 static const u32 VertexMask_MASK_NONE = MASK_NONE;
@@ -1337,6 +1338,17 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     engine->RegisterEnumValue("LockState", "LOCK_SHADOW", LOCK_SHADOW);
     engine->RegisterEnumValue("LockState", "LOCK_SCRATCH", LOCK_SCRATCH);
 
+    // enum class LogicComponentEvents | File: ../Scene/LogicComponent.h
+    engine->RegisterTypedef("LogicComponentEvents", "int");
+    engine->SetDefaultNamespace("LogicComponentEvents");
+    engine->RegisterGlobalProperty("const int None", (void*)&LogicComponentEvents_None);
+    engine->RegisterGlobalProperty("const int Update", (void*)&LogicComponentEvents_Update);
+    engine->RegisterGlobalProperty("const int PostUpdate", (void*)&LogicComponentEvents_PostUpdate);
+    engine->RegisterGlobalProperty("const int FixedUpdate", (void*)&LogicComponentEvents_FixedUpdate);
+    engine->RegisterGlobalProperty("const int FixedPostUpdate", (void*)&LogicComponentEvents_FixedPostUpdate);
+    engine->RegisterGlobalProperty("const int All", (void*)&LogicComponentEvents_All);
+    engine->SetDefaultNamespace("");
+
     // enum MaterialQuality : u32 | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterTypedef("MaterialQuality", "uint");
     engine->RegisterGlobalProperty("const uint QUALITY_LOW", (void*)&MaterialQuality_QUALITY_LOW);
@@ -1782,17 +1794,6 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     engine->RegisterEnum("TraversalMode");
     engine->RegisterEnumValue("TraversalMode", "TM_BREADTH_FIRST", TM_BREADTH_FIRST);
     engine->RegisterEnumValue("TraversalMode", "TM_DEPTH_FIRST", TM_DEPTH_FIRST);
-
-    // enum UpdateEvent : unsigned | File: ../Scene/LogicComponent.h
-    engine->RegisterTypedef("UpdateEvent", "uint");
-    engine->RegisterGlobalProperty("const uint USE_NO_EVENT", (void*)&UpdateEvent_USE_NO_EVENT);
-    engine->RegisterGlobalProperty("const uint USE_UPDATE", (void*)&UpdateEvent_USE_UPDATE);
-    engine->RegisterGlobalProperty("const uint USE_POSTUPDATE", (void*)&UpdateEvent_USE_POSTUPDATE);
-    engine->RegisterGlobalProperty("const uint USE_FIXEDUPDATE", (void*)&UpdateEvent_USE_FIXEDUPDATE);
-    engine->RegisterGlobalProperty("const uint USE_FIXEDPOSTUPDATE", (void*)&UpdateEvent_USE_FIXEDPOSTUPDATE);
-
-    // URHO3D_FLAGSET(UpdateEvent, UpdateEventFlags) | File: ../Scene/LogicComponent.h
-    engine->RegisterTypedef("UpdateEventFlags", "uint");
 
     // enum UpdateGeometryType | File: ../Graphics/Drawable.h
     engine->RegisterEnum("UpdateGeometryType");

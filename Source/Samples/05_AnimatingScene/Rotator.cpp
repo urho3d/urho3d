@@ -12,7 +12,7 @@ Rotator::Rotator(Context* context) :
     rotationSpeed_(Vector3::ZERO)
 {
     // Only the scene update event is needed: unsubscribe from the rest for optimization
-    SetUpdateEventMask(USE_UPDATE);
+    SetUpdateEventMask(LogicComponentEvents::Update);
 }
 
 void Rotator::SetRotationSpeed(const Vector3& speed)

@@ -17922,8 +17922,8 @@ template <class T> void RegisterMembers_LogicComponent(asIScriptEngine* engine, 
     // virtual void LogicComponent::FixedUpdate(float timeStep)
     engine->RegisterObjectMethod(className, "void FixedUpdate(float)", AS_METHODPR(T, FixedUpdate, (float), void), AS_CALL_THISCALL);
 
-    // UpdateEventFlags LogicComponent::GetUpdateEventMask() const
-    engine->RegisterObjectMethod(className, "UpdateEventFlags GetUpdateEventMask() const", AS_METHODPR(T, GetUpdateEventMask, () const, UpdateEventFlags), AS_CALL_THISCALL);
+    // LogicComponentEvents LogicComponent::GetUpdateEventMask() const
+    engine->RegisterObjectMethod(className, "LogicComponentEvents GetUpdateEventMask() const", AS_METHODPR(T, GetUpdateEventMask, () const, LogicComponentEvents), AS_CALL_THISCALL);
 
     // bool LogicComponent::IsDelayedStartCalled() const
     engine->RegisterObjectMethod(className, "bool IsDelayedStartCalled() const", AS_METHODPR(T, IsDelayedStartCalled, () const, bool), AS_CALL_THISCALL);
@@ -17931,8 +17931,8 @@ template <class T> void RegisterMembers_LogicComponent(asIScriptEngine* engine, 
     // virtual void LogicComponent::PostUpdate(float timeStep)
     engine->RegisterObjectMethod(className, "void PostUpdate(float)", AS_METHODPR(T, PostUpdate, (float), void), AS_CALL_THISCALL);
 
-    // void LogicComponent::SetUpdateEventMask(UpdateEventFlags mask)
-    engine->RegisterObjectMethod(className, "void SetUpdateEventMask(UpdateEventFlags)", AS_METHODPR(T, SetUpdateEventMask, (UpdateEventFlags), void), AS_CALL_THISCALL);
+    // void LogicComponent::SetUpdateEventMask(LogicComponentEvents mask)
+    engine->RegisterObjectMethod(className, "void SetUpdateEventMask(LogicComponentEvents)", AS_METHODPR(T, SetUpdateEventMask, (LogicComponentEvents), void), AS_CALL_THISCALL);
 
     // virtual void LogicComponent::Start()
     engine->RegisterObjectMethod(className, "void Start()", AS_METHODPR(T, Start, (), void), AS_CALL_THISCALL);

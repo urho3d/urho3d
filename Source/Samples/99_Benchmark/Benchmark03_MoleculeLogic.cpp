@@ -13,7 +13,7 @@ Benchmark03_MoleculeLogic::Benchmark03_MoleculeLogic(Context* context)
     : LogicComponent(context)
     , moleculeType_(0)
 {
-    SetUpdateEventMask(USE_UPDATE | USE_POSTUPDATE);
+    SetUpdateEventMask(LogicComponentEvents::Update | LogicComponentEvents::PostUpdate);
 }
 
 void Benchmark03_MoleculeLogic::SetParameters(i32 type)

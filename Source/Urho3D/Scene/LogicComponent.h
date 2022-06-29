@@ -11,20 +11,27 @@
 namespace Urho3D
 {
 
-enum UpdateEvent : unsigned
+enum class LogicComponentEvents
 {
-    /// Bitmask for not using any events.
-    USE_NO_EVENT = 0x0,
-    /// Bitmask for using the scene update event.
-    USE_UPDATE = 0x1,
-    /// Bitmask for using the scene post-update event.
-    USE_POSTUPDATE = 0x2,
-    /// Bitmask for using the physics update event.
-    USE_FIXEDUPDATE = 0x4,
-    /// Bitmask for using the physics post-update event.
-    USE_FIXEDPOSTUPDATE = 0x8,
+    /// Not use any events
+    None            = 0,
+
+    /// Use the scene update event
+    Update          = 1 << 0,
+
+    /// Use the scene post-update event
+    PostUpdate      = 1 << 1,
+
+    /// Use the physics update event
+    FixedUpdate     = 1 << 2,
+
+    /// Use the physics post-update event
+    FixedPostUpdate = 1 << 3, 
+
+    /// Use all events
+    All             = Update | PostUpdate | FixedUpdate | FixedPostUpdate
 };
-URHO3D_FLAGSET(UpdateEvent, UpdateEventFlags);
+URHO3D_FLAGS(LogicComponentEvents);
 
 /// Helper base class for user-defined game logic components that hooks up to update events and forwards them to virtual functions similar to ScriptInstance class.
 class URHO3D_API LogicComponent : public Component
@@ -59,10 +66,10 @@ public:
     virtual void FixedPostUpdate(float timeStep);
 
     /// Set what update events should be subscribed to. Use this for optimization: by default all are in use. Note that this is not an attribute and is not saved or network-serialized, therefore it should always be called eg. in the subclass constructor.
-    void SetUpdateEventMask(UpdateEventFlags mask);
+    void SetUpdateEventMask(LogicComponentEvents mask);
 
     /// Return what update events are subscribed to.
-    UpdateEventFlags GetUpdateEventMask() const { return updateEventMask_; }
+    LogicComponentEvents GetUpdateEventMask() const { return updateEventMask_; }
 
     /// Return whether the DelayedStart() function has been called.
     bool IsDelayedStartCalled() const { return delayedStartCalled_; }
@@ -87,9 +94,9 @@ private:
     void HandlePhysicsPostStep(StringHash eventType, VariantMap& eventData);
 #endif
     /// Requested event subscription mask.
-    UpdateEventFlags updateEventMask_;
+    LogicComponentEvents updateEventMask_;
     /// Current event subscription mask.
-    UpdateEventFlags currentEventMask_;
+    LogicComponentEvents currentEventMask_;
     /// Flag for delayed start.
     bool delayedStartCalled_;
 };
