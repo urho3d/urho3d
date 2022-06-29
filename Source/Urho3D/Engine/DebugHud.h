@@ -24,7 +24,6 @@ enum class DebugHudElements
     EventProfiler = 1 << 4,
     All           = Stats | Mode | Profiler | Memory
 };
-
 URHO3D_FLAGS(DebugHudElements);
 
 /// Displays rendering stats and profiling information.
