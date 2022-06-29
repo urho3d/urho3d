@@ -9332,9 +9332,9 @@ template <class T> void RegisterMembers_DebugHud(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "Text@+ GetMemoryText() const", AS_METHODPR(T, GetMemoryText, () const, Text*), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "Text@+ get_memoryText() const", AS_METHODPR(T, GetMemoryText, () const, Text*), AS_CALL_THISCALL);
 
-    // unsigned DebugHud::GetMode() const
-    engine->RegisterObjectMethod(className, "uint GetMode() const", AS_METHODPR(T, GetMode, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_mode() const", AS_METHODPR(T, GetMode, () const, unsigned), AS_CALL_THISCALL);
+    // DebugHudElements DebugHud::GetMode() const
+    engine->RegisterObjectMethod(className, "DebugHudElements GetMode() const", AS_METHODPR(T, GetMode, () const, DebugHudElements), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "DebugHudElements get_mode() const", AS_METHODPR(T, GetMode, () const, DebugHudElements), AS_CALL_THISCALL);
 
     // Text* DebugHud::GetModeText() const
     engine->RegisterObjectMethod(className, "Text@+ GetModeText() const", AS_METHODPR(T, GetModeText, () const, Text*), AS_CALL_THISCALL);
@@ -9373,9 +9373,9 @@ template <class T> void RegisterMembers_DebugHud(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "void SetDefaultStyle(XMLFile@+)", AS_METHODPR(T, SetDefaultStyle, (XMLFile*), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_defaultStyle(XMLFile@+)", AS_METHODPR(T, SetDefaultStyle, (XMLFile*), void), AS_CALL_THISCALL);
 
-    // void DebugHud::SetMode(unsigned mode)
-    engine->RegisterObjectMethod(className, "void SetMode(uint)", AS_METHODPR(T, SetMode, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_mode(uint)", AS_METHODPR(T, SetMode, (unsigned), void), AS_CALL_THISCALL);
+    // void DebugHud::SetMode(DebugHudElements mode)
+    engine->RegisterObjectMethod(className, "void SetMode(DebugHudElements)", AS_METHODPR(T, SetMode, (DebugHudElements), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_mode(DebugHudElements)", AS_METHODPR(T, SetMode, (DebugHudElements), void), AS_CALL_THISCALL);
 
     // void DebugHud::SetProfilerInterval(float interval)
     engine->RegisterObjectMethod(className, "void SetProfilerInterval(float)", AS_METHODPR(T, SetProfilerInterval, (float), void), AS_CALL_THISCALL);
@@ -9389,8 +9389,8 @@ template <class T> void RegisterMembers_DebugHud(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "void SetUseRendererStats(bool)", AS_METHODPR(T, SetUseRendererStats, (bool), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_useRendererStats(bool)", AS_METHODPR(T, SetUseRendererStats, (bool), void), AS_CALL_THISCALL);
 
-    // void DebugHud::Toggle(unsigned mode)
-    engine->RegisterObjectMethod(className, "void Toggle(uint)", AS_METHODPR(T, Toggle, (unsigned), void), AS_CALL_THISCALL);
+    // void DebugHud::Toggle(DebugHudElements mode)
+    engine->RegisterObjectMethod(className, "void Toggle(DebugHudElements)", AS_METHODPR(T, Toggle, (DebugHudElements), void), AS_CALL_THISCALL);
 
     // void DebugHud::ToggleAll()
     engine->RegisterObjectMethod(className, "void ToggleAll()", AS_METHODPR(T, ToggleAll, (), void), AS_CALL_THISCALL);

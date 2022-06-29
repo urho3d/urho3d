@@ -416,7 +416,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     }
     else
     {
-        if (debugHud.mode != DEBUGHUD_SHOW_NONE)
+        if (debugHud.mode != DebugHudElements::None)
         {
             Node@ playerNode = FindOwnNode();
             if (playerNode !is null)
@@ -488,7 +488,7 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
         drawOctreeDebug = !drawOctreeDebug;
 
     if (key == KEY_F5)
-        debugHud.Toggle(DEBUGHUD_SHOW_EVENTPROFILER);
+        debugHud.Toggle(DebugHudElements::EventProfiler);
 
     // Take screenshot
     if (key == KEY_F6)
