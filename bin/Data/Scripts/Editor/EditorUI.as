@@ -1116,7 +1116,7 @@ void CreateDebugHud()
 {
     engine.CreateDebugHud();
     debugHud.defaultStyle = uiStyle;
-    debugHud.mode = DEBUGHUD_SHOW_NONE;
+    debugHud.mode = DebugHudElements::None;
 }
 
 void CenterDialog(UIElement@ element)

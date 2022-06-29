@@ -25,27 +25,6 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // static const int CONVERSION_BUFFER_LENGTH | File: ../Container/Str.h
     engine->RegisterGlobalProperty("const int CONVERSION_BUFFER_LENGTH", (void*)&CONVERSION_BUFFER_LENGTH);
 
-    // static const unsigned DEBUGHUD_SHOW_ALL | File: ../Engine/DebugHud.h
-    engine->RegisterGlobalProperty("const uint DEBUGHUD_SHOW_ALL", (void*)&DEBUGHUD_SHOW_ALL);
-
-    // static const unsigned DEBUGHUD_SHOW_EVENTPROFILER | File: ../Engine/DebugHud.h
-    engine->RegisterGlobalProperty("const uint DEBUGHUD_SHOW_EVENTPROFILER", (void*)&DEBUGHUD_SHOW_EVENTPROFILER);
-
-    // static const unsigned DEBUGHUD_SHOW_MEMORY | File: ../Engine/DebugHud.h
-    engine->RegisterGlobalProperty("const uint DEBUGHUD_SHOW_MEMORY", (void*)&DEBUGHUD_SHOW_MEMORY);
-
-    // static const unsigned DEBUGHUD_SHOW_MODE | File: ../Engine/DebugHud.h
-    engine->RegisterGlobalProperty("const uint DEBUGHUD_SHOW_MODE", (void*)&DEBUGHUD_SHOW_MODE);
-
-    // static const unsigned DEBUGHUD_SHOW_NONE | File: ../Engine/DebugHud.h
-    engine->RegisterGlobalProperty("const uint DEBUGHUD_SHOW_NONE", (void*)&DEBUGHUD_SHOW_NONE);
-
-    // static const unsigned DEBUGHUD_SHOW_PROFILER | File: ../Engine/DebugHud.h
-    engine->RegisterGlobalProperty("const uint DEBUGHUD_SHOW_PROFILER", (void*)&DEBUGHUD_SHOW_PROFILER);
-
-    // static const unsigned DEBUGHUD_SHOW_STATS | File: ../Engine/DebugHud.h
-    engine->RegisterGlobalProperty("const uint DEBUGHUD_SHOW_STATS", (void*)&DEBUGHUD_SHOW_STATS);
-
     // static const float DEFAULT_CAMERA_FOV | File: ../Graphics/Camera.h
     engine->RegisterGlobalProperty("const float DEFAULT_CAMERA_FOV", (void*)&DEFAULT_CAMERA_FOV);
 

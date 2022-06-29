@@ -45,7 +45,7 @@ DebugHud::DebugHud(Context* context) :
     profilerMaxDepth_(M_MAX_UNSIGNED),
     profilerInterval_(1000),
     useRendererStats_(false),
-    mode_(DEBUGHUD_SHOW_NONE)
+    mode_(DebugHudElements::None)
 {
     auto* ui = GetSubsystem<UI>();
     UIElement* uiRoot = ui->GetRoot();
@@ -203,13 +203,13 @@ void DebugHud::SetDefaultStyle(XMLFile* style)
     eventProfilerText_->SetStyle("DebugHudText");
 }
 
-void DebugHud::SetMode(unsigned mode)
+void DebugHud::SetMode(DebugHudElements mode)
 {
-    statsText_->SetVisible((mode & DEBUGHUD_SHOW_STATS) != 0);
-    modeText_->SetVisible((mode & DEBUGHUD_SHOW_MODE) != 0);
-    profilerText_->SetVisible((mode & DEBUGHUD_SHOW_PROFILER) != 0);
-    memoryText_->SetVisible((mode & DEBUGHUD_SHOW_MEMORY) != 0);
-    eventProfilerText_->SetVisible((mode & DEBUGHUD_SHOW_EVENTPROFILER) != 0);
+    statsText_->SetVisible(!!(mode & DebugHudElements::Stats));
+    modeText_->SetVisible(!!(mode & DebugHudElements::Mode));
+    profilerText_->SetVisible(!!(mode & DebugHudElements::Profiler));
+    memoryText_->SetVisible(!!(mode & DebugHudElements::Memory));
+    eventProfilerText_->SetVisible(!!(mode & DebugHudElements::EventProfiler));
 
     memoryText_->SetPosition(0, modeText_->IsVisible() ? modeText_->GetHeight() * -2 : 0);
 
@@ -217,7 +217,7 @@ void DebugHud::SetMode(unsigned mode)
     // Event profiler is created on engine initialization if "EventProfiler" parameter is set
     auto* eventProfiler = GetSubsystem<EventProfiler>();
     if (eventProfiler)
-        EventProfiler::SetActive((mode & DEBUGHUD_SHOW_EVENTPROFILER) != 0);
+        EventProfiler::SetActive(!!(mode & DebugHudElements::EventProfiler));
 #endif
 
     mode_ = mode;
@@ -238,14 +238,14 @@ void DebugHud::SetUseRendererStats(bool enable)
     useRendererStats_ = enable;
 }
 
-void DebugHud::Toggle(unsigned mode)
+void DebugHud::Toggle(DebugHudElements mode)
 {
     SetMode(GetMode() ^ mode);
 }
 
 void DebugHud::ToggleAll()
 {
-    Toggle(DEBUGHUD_SHOW_ALL);
+    Toggle(DebugHudElements::All);
 }
 
 XMLFile* DebugHud::GetDefaultStyle() const

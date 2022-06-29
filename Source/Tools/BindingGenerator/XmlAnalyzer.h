@@ -208,12 +208,12 @@ public:
     bool IsInternal() const { return GetHeaderFile().empty(); } // true if declared in .cpp file
     std::string GetBaseType() const;
     std::string GetLocation() const;
+    bool IsClass() const;
 
     // <memberdef kind="enum">
     //     <enumvalue><name>...</name></enumvalue>
     //     <enumvalue><name>...</name></enumvalue>
     std::vector<std::string> GetEnumerators() const;
-
 };
 
 // <compounddef kind="namespace">

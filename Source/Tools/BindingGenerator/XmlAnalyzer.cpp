@@ -505,10 +505,27 @@ string EnumAnalyzer::GetLocation() const
 {
     string baseType = GetBaseType();
 
-    if (baseType == "int")
-        return "enum " + GetTypeName() + " | File: " + GetHeaderFile();
+    string ret = "enum ";
 
-    return "enum " + GetTypeName() + " : " + baseType + " | File: " + GetHeaderFile();
+    if (IsClass())
+        ret += "class ";
+
+    ret += GetTypeName();
+
+    if (baseType != "int")
+        ret += " : " + baseType;
+
+    ret += " | File: " + GetHeaderFile();
+
+    return ret;
+}
+
+bool EnumAnalyzer::IsClass() const
+{
+    string strong = memberdef_.attribute("strong").value();
+    assert(!strong.empty());
+
+    return strong == "yes";
 }
 
 vector<string> EnumAnalyzer::GetEnumerators() const

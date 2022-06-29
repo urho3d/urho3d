@@ -51,6 +51,15 @@ static const unsigned ControllerButton_CONTROLLER_BUTTON_DPAD_DOWN = CONTROLLER_
 static const unsigned ControllerButton_CONTROLLER_BUTTON_DPAD_LEFT = CONTROLLER_BUTTON_DPAD_LEFT;
 static const unsigned ControllerButton_CONTROLLER_BUTTON_DPAD_RIGHT = CONTROLLER_BUTTON_DPAD_RIGHT;
 
+// enum class DebugHudElements | File: ../Engine/DebugHud.h
+static const int DebugHudElements_None = static_cast<int>(DebugHudElements::None); 
+static const int DebugHudElements_Stats = static_cast<int>(DebugHudElements::Stats); 
+static const int DebugHudElements_Mode = static_cast<int>(DebugHudElements::Mode); 
+static const int DebugHudElements_Profiler = static_cast<int>(DebugHudElements::Profiler); 
+static const int DebugHudElements_Memory = static_cast<int>(DebugHudElements::Memory); 
+static const int DebugHudElements_EventProfiler = static_cast<int>(DebugHudElements::EventProfiler); 
+static const int DebugHudElements_All = static_cast<int>(DebugHudElements::All); 
+
 // enum DragAndDropMode : unsigned | File: ../UI/UIElement.h
 static const unsigned DragAndDropMode_DD_DISABLED = DD_DISABLED;
 static const unsigned DragAndDropMode_DD_SOURCE = DD_SOURCE;
@@ -793,6 +802,18 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     engine->RegisterEnumValue("CursorShape", "CS_BUSY", CS_BUSY);
     engine->RegisterEnumValue("CursorShape", "CS_BUSY_ARROW", CS_BUSY_ARROW);
     engine->RegisterEnumValue("CursorShape", "CS_MAX_SHAPES", CS_MAX_SHAPES);
+
+    // enum class DebugHudElements | File: ../Engine/DebugHud.h
+    engine->RegisterTypedef("DebugHudElements", "int");
+    engine->SetDefaultNamespace("DebugHudElements");
+    engine->RegisterGlobalProperty("const int None", (void*)&DebugHudElements_None);
+    engine->RegisterGlobalProperty("const int Stats", (void*)&DebugHudElements_Stats);
+    engine->RegisterGlobalProperty("const int Mode", (void*)&DebugHudElements_Mode);
+    engine->RegisterGlobalProperty("const int Profiler", (void*)&DebugHudElements_Profiler);
+    engine->RegisterGlobalProperty("const int Memory", (void*)&DebugHudElements_Memory);
+    engine->RegisterGlobalProperty("const int EventProfiler", (void*)&DebugHudElements_EventProfiler);
+    engine->RegisterGlobalProperty("const int All", (void*)&DebugHudElements_All);
+    engine->SetDefaultNamespace("");
 
     // enum DeferredLightPSVariation | File: ../Graphics/Renderer.h
     engine->RegisterEnum("DeferredLightPSVariation");
