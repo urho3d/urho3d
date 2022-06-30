@@ -11653,7 +11653,7 @@ Methods:
 - VariantMap& GetEventDataMap() const
 - Object@ GetEventSender() const
 - Text@ GetMemoryText() const
-- uint GetMode() const
+- int GetMode() const
 - Text@ GetModeText() const
 - float GetProfilerInterval() const
 - uint GetProfilerMaxDepth() const
@@ -11678,13 +11678,13 @@ Methods:
 - void SetBlockEvents(bool)
 - void SetDefaultStyle(XMLFile@)
 - void SetGlobalVar(StringHash, const Variant&)
-- void SetMode(uint)
+- void SetMode(int)
 - void SetProfilerInterval(float)
 - void SetProfilerMaxDepth(uint)
 - void SetUseRendererStats(bool)
 - const String& GetCategory() const
 - const String& GetTypeName() const
-- void Toggle(uint)
+- void Toggle(int)
 - void ToggleAll()
 - void UnsubscribeFromAllEvents()
 - void UnsubscribeFromAllEventsExcept(StringHash[]@, bool)
@@ -11705,7 +11705,7 @@ Properties:
 - Variant[] globalVar
 - VariantMap globalVars // readonly
 - Text@ memoryText // readonly
-- uint mode
+- int mode
 - Text@ modeText // readonly
 - float profilerInterval
 - uint profilerMaxDepth
@@ -12836,7 +12836,7 @@ Methods:
 - int GetIndentSpacing() const
 - int GetIndentWidth() const
 - bool GetInterceptNetworkUpdate(const String&) const
-- UIElement@ GetItem(uint) const
+- UIElement@ GetItem(int) const
 - UIElement@[]@ GetItems() const
 - int GetLayoutElementMaxSize() const
 - LayoutMode GetLayoutMode() const
@@ -12850,7 +12850,7 @@ Methods:
 - int GetMinWidth() const
 - uint GetNumAttributes() const
 - int GetNumChildren(bool = false) const
-- uint GetNumItems() const
+- int GetNumItems() const
 - uint GetNumNetworkAttributes() const
 - ObjectAnimation@ GetObjectAnimation() const
 - ResourceRef GetObjectAnimationAttr() const
@@ -12864,7 +12864,7 @@ Methods:
 - bool GetResizePopup() const
 - UIElement@ GetRoot() const
 - UIElement@ GetSelectedItem() const
-- uint GetSelection() const
+- int GetSelection() const
 - bool GetShowPopup() const
 - bool GetSortChildren() const
 - Object@ GetSubsystem(StringHash) const
@@ -12883,7 +12883,7 @@ Methods:
 - bool HasSubscribedToEvent(StringHash) const
 - bool HasTag(const String&) const
 - void InsertChild(int, UIElement@)
-- void InsertItem(uint, UIElement@)
+- void InsertItem(int, UIElement@)
 - const IntRect& GetBorder() const
 - const IntRect& GetClipBorder() const
 - const IntRect& GetImageBorder() const
@@ -12972,7 +12972,7 @@ Methods:
 - void RemoveChildAtIndex(int)
 - void RemoveInstanceDefault()
 - void RemoveItem(UIElement@)
-- void RemoveItem(uint)
+- void RemoveItem(int)
 - void RemoveObjectAnimation()
 - bool RemoveTag(const String&)
 - void ResetDeepEnabled()
@@ -13083,8 +13083,8 @@ Methods:
 - void SetRepeatRate(float)
 - void SetResizePopup(bool)
 - void SetSelected(bool)
-- void SetSelection(uint)
-- void SetSelectionAttr(uint)
+- void SetSelection(int)
+- void SetSelectionAttr(int)
 - void SetSize(const IntVector2&)
 - void SetSize(int, int)
 - void SetSortChildren(bool)
@@ -13208,7 +13208,7 @@ Properties:
 - uint numAllChildren // readonly
 - uint numAttributes // readonly
 - uint numChildren // readonly
-- uint numItems // readonly
+- int numItems // readonly
 - ObjectAnimation@ objectAnimation
 - float opacity
 - UIElement@ parent
@@ -13230,7 +13230,7 @@ Properties:
 - IntVector2 screenPosition // readonly
 - bool selected
 - UIElement@ selectedItem // readonly
-- uint selection
+- int selection
 - bool showPopup
 - IntVector2 size
 - bool sortChildren
@@ -16702,7 +16702,7 @@ Methods:
 
 - void AddChild(UIElement@)
 - void AddItem(UIElement@)
-- void AddSelection(uint)
+- void AddSelection(int)
 - void AddTag(const String&)
 - void AddTags(String[]@)
 - void AddTags(const String&, int8 = ';')
@@ -16724,11 +16724,11 @@ Methods:
 - void EnableInternalLayoutUpdate()
 - void EnableLayoutUpdate()
 - void EnsureItemVisibility(UIElement@)
-- void EnsureItemVisibility(uint)
-- void Expand(uint, bool, bool = false)
+- void EnsureItemVisibility(int)
+- void Expand(int, bool, bool = false)
 - bool FilterAttributes(XMLElement&) const
 - int FindChild(UIElement@) const
-- uint FindItem(UIElement@) const
+- int FindItem(UIElement@) const
 - bool GetAnimationEnabled() const
 - Variant GetAttribute(const String&) const
 - Variant GetAttribute(uint) const
@@ -16775,7 +16775,7 @@ Methods:
 - int GetIndentSpacing() const
 - int GetIndentWidth() const
 - bool GetInterceptNetworkUpdate(const String&) const
-- UIElement@ GetItem(uint) const
+- UIElement@ GetItem(int) const
 - UIElement@[]@ GetItems() const
 - int GetLayoutElementMaxSize() const
 - LayoutMode GetLayoutMode() const
@@ -16787,7 +16787,7 @@ Methods:
 - bool GetMultiselect() const
 - uint GetNumAttributes() const
 - int GetNumChildren(bool = false) const
-- uint GetNumItems() const
+- int GetNumItems() const
 - uint GetNumNetworkAttributes() const
 - ObjectAnimation@ GetObjectAnimation() const
 - ResourceRef GetObjectAnimationAttr() const
@@ -16804,8 +16804,8 @@ Methods:
 - bool GetSelectOnClickEnd() const
 - UIElement@ GetSelectedItem() const
 - UIElement@[]@ GetSelectedItems() const
-- uint GetSelection() const
-- uint[]@ GetSelections() const
+- int GetSelection() const
+- int[]@ GetSelections() const
 - bool GetSortChildren() const
 - Object@ GetSubsystem(StringHash) const
 - String[]@ GetTags() const
@@ -16823,7 +16823,7 @@ Methods:
 - bool HasSubscribedToEvent(StringHash) const
 - bool HasTag(const String&) const
 - void InsertChild(int, UIElement@)
-- void InsertItem(uint, UIElement@, UIElement@ = null)
+- void InsertItem(int, UIElement@, UIElement@ = null)
 - const IntRect& GetClipBorder() const
 - const IntRect& GetLayoutBorder() const
 - const IntVector2& GetChildOffset() const
@@ -16840,7 +16840,7 @@ Methods:
 - bool IsElementEventSender() const
 - bool IsEnabled() const
 - bool IsEnabledSelf() const
-- bool IsExpanded(uint) const
+- bool IsExpanded(int) const
 - bool IsFixedHeight() const
 - bool IsFixedSize() const
 - bool IsFixedWidth() const
@@ -16849,7 +16849,7 @@ Methods:
 - bool IsInsideCombined(IntVector2, bool)
 - bool IsInstanceOf(StringHash) const
 - bool IsInternal() const
-- bool IsSelected(uint) const
+- bool IsSelected(int) const
 - bool IsTemporary() const
 - bool IsVisible() const
 - bool IsVisibleEffective() const
@@ -16900,10 +16900,10 @@ Methods:
 - void RemoveChild(uint)
 - void RemoveChildAtIndex(int)
 - void RemoveInstanceDefault()
-- void RemoveItem(UIElement@, uint = 0)
+- void RemoveItem(UIElement@, int = 0)
 - void RemoveItem(int)
 - void RemoveObjectAnimation()
-- void RemoveSelection(uint)
+- void RemoveSelection(int)
 - bool RemoveTag(const String&)
 - void ResetDeepEnabled()
 - void ResetToDefault()
@@ -17006,8 +17006,8 @@ Methods:
 - void SetScrollStep(float)
 - void SetSelectOnClickEnd(bool)
 - void SetSelected(bool)
-- void SetSelection(uint)
-- void SetSelections(uint[]@)
+- void SetSelection(int)
+- void SetSelections(int[]@)
 - void SetSize(const IntVector2&)
 - void SetSize(int, int)
 - void SetSortChildren(bool)
@@ -17031,8 +17031,8 @@ Methods:
 - const String& GetCategory() const
 - const String& GetName() const
 - const String& GetTypeName() const
-- void ToggleExpand(uint, bool = false)
-- void ToggleSelection(uint)
+- void ToggleExpand(int, bool = false)
+- void ToggleSelection(int)
 - operator UIElement@() const
 - void UnsubscribeFromAllEvents()
 - void UnsubscribeFromAllEventsExcept(StringHash[]@, bool)
@@ -17131,7 +17131,7 @@ Properties:
 - uint numAllChildren // readonly
 - uint numAttributes // readonly
 - uint numChildren // readonly
-- uint numItems // readonly
+- int numItems // readonly
 - ObjectAnimation@ objectAnimation
 - float opacity
 - float pageStep
@@ -17151,8 +17151,8 @@ Properties:
 - bool selected // writeonly
 - UIElement@ selectedItem // readonly
 - UIElement@[]@ selectedItems // readonly
-- uint selection
-- uint[]@ selections // readonly
+- int selection
+- int[]@ selections // readonly
 - IntVector2 size
 - bool sortChildren
 - String style
@@ -17336,7 +17336,7 @@ Methods:
 - Scene@ GetScene() const
 - Object@ GetSubsystem(StringHash) const
 - StringHash GetType() const
-- uint GetUpdateEventMask() const
+- int GetUpdateEventMask() const
 - bool HasEventHandlers() const
 - bool HasSubscribedToEvent(Object@, StringHash) const
 - bool HasSubscribedToEvent(StringHash) const
@@ -17390,7 +17390,7 @@ Methods:
 - void SetObjectAnimation(ObjectAnimation@)
 - void SetObjectAnimationAttr(const ResourceRef&)
 - void SetTemporary(bool)
-- void SetUpdateEventMask(uint)
+- void SetUpdateEventMask(int)
 - void Start()
 - void Stop()
 - const String& GetCategory() const
@@ -19381,7 +19381,7 @@ Methods:
 - bool GetBlockEvents() const
 - Node@ GetChild(StringHash, bool = false) const
 - Node@ GetChild(const String&, bool = false) const
-- Node@ GetChild(uint) const
+- Node@ GetChild(int) const
 - Node@[]@ GetChildren() const
 - Node@[]@ GetChildren(bool) const
 - Node@[]@ GetChildrenWithComponent(StringHash, bool = false) const
@@ -19399,12 +19399,12 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - StringHash GetNameHash() const
 - uint GetNumAttributes() const
-- uint GetNumChildren(bool = false) const
-- uint GetNumComponents() const
+- int GetNumChildren(bool = false) const
+- int GetNumComponents() const
 - uint GetNumNetworkAttributes() const
-- uint GetNumNetworkComponents() const
-- uint GetNumPersistentChildren() const
-- uint GetNumPersistentComponents() const
+- int GetNumNetworkComponents() const
+- int GetNumPersistentChildren() const
+- int GetNumPersistentComponents() const
 - ObjectAnimation@ GetObjectAnimation() const
 - ResourceRef GetObjectAnimationAttr() const
 - Component@ GetOrCreateComponent(StringHash, CreateMode = REPLICATED, uint = 0)
@@ -19485,7 +19485,7 @@ Methods:
 - void RemoveListener(Component@)
 - void RemoveObjectAnimation()
 - bool RemoveTag(const String&)
-- void ReorderComponent(Component@, uint)
+- void ReorderComponent(Component@, int)
 - void ResetDeepEnabled()
 - void ResetScene()
 - void ResetToDefault()
@@ -19627,7 +19627,7 @@ Properties:
 - uint numAllChildren // readonly
 - uint numAttributes // readonly
 - uint numChildren // readonly
-- uint numComponents // readonly
+- int numComponents // readonly
 - ObjectAnimation@ objectAnimation
 - Connection@ owner
 - Node@ parent
@@ -20821,11 +20821,11 @@ Methods:
 
 Properties:
 
-- uint colorIndex
+- int colorIndex
 - float rotationSpeed
 - float scale
 - Vector2 size
-- uint texIndex
+- int texIndex
 - float timeToLive
 - float timer
 - Vector3 velocity
@@ -21256,7 +21256,7 @@ Methods:
 - uint GetNumBillboards() const
 - uint GetNumNetworkAttributes() const
 - uint GetNumOccluderTriangles()
-- uint GetNumParticles() const
+- int GetNumParticles() const
 - ObjectAnimation@ GetObjectAnimation() const
 - ResourceRef GetObjectAnimationAttr() const
 - Scene@ GetScene() const
@@ -21356,7 +21356,7 @@ Methods:
 - void SetMinAngle(float)
 - void SetMinMaxZ(float, float)
 - void SetNumBillboards(uint)
-- void SetNumParticles(uint)
+- void SetNumParticles(int)
 - void SetObjectAnimation(ObjectAnimation@)
 - void SetObjectAnimationAttr(const ResourceRef&)
 - void SetOccludee(bool)
@@ -21427,7 +21427,7 @@ Properties:
 - Node@ node // readonly
 - uint numAttributes // readonly
 - uint numBillboards
-- uint numParticles
+- int numParticles
 - ObjectAnimation@ objectAnimation
 - bool occludee
 - bool occluder
@@ -22869,7 +22869,7 @@ Methods:
 - float GetSteeringValue(int) const
 - Object@ GetSubsystem(StringHash) const
 - StringHash GetType() const
-- uint GetUpdateEventMask() const
+- int GetUpdateEventMask() const
 - Vector3 GetWheelAxle(int) const
 - Vector3 GetWheelConnectionPoint(int) const
 - float GetWheelDampingCompression(int) const
@@ -22951,7 +22951,7 @@ Methods:
 - void SetObjectAnimationAttr(const ResourceRef&)
 - void SetSteeringValue(int, float)
 - void SetTemporary(bool)
-- void SetUpdateEventMask(uint)
+- void SetUpdateEventMask(int)
 - void SetWheelAxle(int, Vector3)
 - void SetWheelDampingCompression(int, float)
 - void SetWheelDampingRelaxation(int, float)
@@ -25122,7 +25122,7 @@ Methods:
 - uint GetChecksum() const
 - Node@ GetChild(StringHash, bool = false) const
 - Node@ GetChild(const String&, bool = false) const
-- Node@ GetChild(uint) const
+- Node@ GetChild(int) const
 - Node@[]@ GetChildren() const
 - Node@[]@ GetChildren(bool) const
 - Node@[]@ GetChildrenWithComponent(StringHash, bool = false) const
@@ -25146,12 +25146,12 @@ Methods:
 - Node@ GetNode(uint) const
 - Node@[]@ GetNodesWithTag(const String&) const
 - uint GetNumAttributes() const
-- uint GetNumChildren(bool = false) const
-- uint GetNumComponents() const
+- int GetNumChildren(bool = false) const
+- int GetNumComponents() const
 - uint GetNumNetworkAttributes() const
-- uint GetNumNetworkComponents() const
-- uint GetNumPersistentChildren() const
-- uint GetNumPersistentComponents() const
+- int GetNumNetworkComponents() const
+- int GetNumPersistentChildren() const
+- int GetNumPersistentComponents() const
 - ObjectAnimation@ GetObjectAnimation() const
 - ResourceRef GetObjectAnimationAttr() const
 - Component@ GetOrCreateComponent(StringHash, CreateMode = REPLICATED, uint = 0)
@@ -25267,7 +25267,7 @@ Methods:
 - void RemoveListener(Component@)
 - void RemoveObjectAnimation()
 - bool RemoveTag(const String&)
-- void ReorderComponent(Component@, uint)
+- void ReorderComponent(Component@, int)
 - void ResetDeepEnabled()
 - void ResetScene()
 - void ResetToDefault()
@@ -25429,7 +25429,7 @@ Properties:
 - uint numAllChildren // readonly
 - uint numAttributes // readonly
 - uint numChildren // readonly
-- uint numComponents // readonly
+- int numComponents // readonly
 - ObjectAnimation@ objectAnimation
 - Octree@ octree // readonly
 - Connection@ owner
@@ -38626,13 +38626,6 @@ Properties:
 - uint DD_SOURCE
 - uint DD_SOURCE_AND_TARGET
 - uint DD_TARGET
-- uint DEBUGHUD_SHOW_ALL
-- uint DEBUGHUD_SHOW_EVENTPROFILER
-- uint DEBUGHUD_SHOW_MEMORY
-- uint DEBUGHUD_SHOW_MODE
-- uint DEBUGHUD_SHOW_NONE
-- uint DEBUGHUD_SHOW_PROFILER
-- uint DEBUGHUD_SHOW_STATS
 - float DEFAULT_CAMERA_FOV
 - float DEFAULT_FARCLIP
 - float DEFAULT_FONT_SIZE
@@ -39349,11 +39342,6 @@ Properties:
 - String SOUND_VOICE
 - int STREAM_BUFFER_LENGTH
 - int UI_VERTEX_SIZE
-- uint USE_FIXEDPOSTUPDATE
-- uint USE_FIXEDUPDATE
-- uint USE_NO_EVENT
-- uint USE_POSTUPDATE
-- uint USE_UPDATE
 - uint VARIANT_VALUE_SIZE
 - uint VO_DISABLE_OCCLUSION
 - uint VO_DISABLE_SHADOWS
