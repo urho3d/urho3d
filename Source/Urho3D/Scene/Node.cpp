@@ -1543,8 +1543,8 @@ bool Node::Load(Deserializer& source, SceneResolver& resolver, bool loadChildren
     if (!Animatable::Load(source))
         return false;
 
-    unsigned numComponents = source.ReadVLE();
-    for (unsigned i = 0; i < numComponents; ++i)
+    i32 numComponents = source.ReadVLE();
+    for (i32 i = 0; i < numComponents; ++i)
     {
         VectorBuffer compBuffer(source, source.ReadVLE());
         StringHash compType = compBuffer.ReadStringHash();
@@ -1563,8 +1563,8 @@ bool Node::Load(Deserializer& source, SceneResolver& resolver, bool loadChildren
     if (!loadChildren)
         return true;
 
-    unsigned numChildren = source.ReadVLE();
-    for (unsigned i = 0; i < numChildren; ++i)
+    i32 numChildren = source.ReadVLE();
+    for (i32 i = 0; i < numChildren; ++i)
     {
         unsigned nodeID = source.ReadUInt();
         Node* newNode = CreateChild(rewriteIDs ? 0 : nodeID, (mode == REPLICATED && Scene::IsReplicatedID(nodeID)) ? REPLICATED :
@@ -1695,10 +1695,10 @@ void Node::PrepareNetworkUpdate()
         AllocateNetworkState();
 
     const Vector<AttributeInfo>* attributes = networkState_->attributes_;
-    unsigned numAttributes = attributes->Size();
+    i32 numAttributes = attributes->Size();
 
     // Check for attribute changes
-    for (unsigned i = 0; i < numAttributes; ++i)
+    for (i32 i = 0; i < numAttributes; ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
 
