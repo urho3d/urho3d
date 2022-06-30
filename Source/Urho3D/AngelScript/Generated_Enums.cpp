@@ -52,13 +52,13 @@ static const unsigned ControllerButton_CONTROLLER_BUTTON_DPAD_LEFT = CONTROLLER_
 static const unsigned ControllerButton_CONTROLLER_BUTTON_DPAD_RIGHT = CONTROLLER_BUTTON_DPAD_RIGHT;
 
 // enum class DebugHudElements | File: ../Engine/DebugHud.h
-static const int DebugHudElements_None = static_cast<int>(DebugHudElements::None); 
-static const int DebugHudElements_Stats = static_cast<int>(DebugHudElements::Stats); 
-static const int DebugHudElements_Mode = static_cast<int>(DebugHudElements::Mode); 
-static const int DebugHudElements_Profiler = static_cast<int>(DebugHudElements::Profiler); 
-static const int DebugHudElements_Memory = static_cast<int>(DebugHudElements::Memory); 
-static const int DebugHudElements_EventProfiler = static_cast<int>(DebugHudElements::EventProfiler); 
-static const int DebugHudElements_All = static_cast<int>(DebugHudElements::All); 
+static const int DebugHudElements_None = static_cast<int>(DebugHudElements::None);
+static const int DebugHudElements_Stats = static_cast<int>(DebugHudElements::Stats);
+static const int DebugHudElements_Mode = static_cast<int>(DebugHudElements::Mode);
+static const int DebugHudElements_Profiler = static_cast<int>(DebugHudElements::Profiler);
+static const int DebugHudElements_Memory = static_cast<int>(DebugHudElements::Memory);
+static const int DebugHudElements_EventProfiler = static_cast<int>(DebugHudElements::EventProfiler);
+static const int DebugHudElements_All = static_cast<int>(DebugHudElements::All);
 
 // enum DragAndDropMode : unsigned | File: ../UI/UIElement.h
 static const unsigned DragAndDropMode_DD_DISABLED = DD_DISABLED;
