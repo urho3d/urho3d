@@ -103,9 +103,8 @@ bool Node::Save(Serializer& dest) const
 
     // Write components
     dest.WriteVLE(GetNumPersistentComponents());
-    for (unsigned i = 0; i < components_.Size(); ++i)
+    for (const SharedPtr<Component>& component : components_)
     {
-        Component* component = components_[i];
         if (component->IsTemporary())
             continue;
 
@@ -119,9 +118,8 @@ bool Node::Save(Serializer& dest) const
 
     // Write child nodes
     dest.WriteVLE(GetNumPersistentChildren());
-    for (unsigned i = 0; i < children_.Size(); ++i)
+    for (const SharedPtr<Node>& node : children_)
     {
-        Node* node = children_[i];
         if (node->IsTemporary())
             continue;
 
@@ -181,9 +179,8 @@ bool Node::SaveXML(XMLElement& dest) const
         return false;
 
     // Write components
-    for (unsigned i = 0; i < components_.Size(); ++i)
+    for (const SharedPtr<Component>& component : components_)
     {
-        Component* component = components_[i];
         if (component->IsTemporary())
             continue;
 
@@ -193,9 +190,8 @@ bool Node::SaveXML(XMLElement& dest) const
     }
 
     // Write child nodes
-    for (unsigned i = 0; i < children_.Size(); ++i)
+    for (const SharedPtr<Node>& node : children_)
     {
-        Node* node = children_[i];
         if (node->IsTemporary())
             continue;
 
@@ -219,9 +215,8 @@ bool Node::SaveJSON(JSONValue& dest) const
     // Write components
     JSONArray componentsArray;
     componentsArray.Reserve(components_.Size());
-    for (unsigned i = 0; i < components_.Size(); ++i)
+    for (const SharedPtr<Component>& component : components_)
     {
-        Component* component = components_[i];
         if (component->IsTemporary())
             continue;
 
@@ -235,9 +230,8 @@ bool Node::SaveJSON(JSONValue& dest) const
     // Write child nodes
     JSONArray childrenArray;
     childrenArray.Reserve(children_.Size());
-    for (unsigned i = 0; i < children_.Size(); ++i)
+    for (const SharedPtr<Node>& node : children_)
     {
-        Node* node = children_[i];
         if (node->IsTemporary())
             continue;
 
@@ -398,16 +392,16 @@ void Node::RemoveAllTags()
     // Clear old scene cache
     if (scene_)
     {
-        for (unsigned i = 0; i < impl_->tags_.Size(); ++i)
+        for (const String& tag : impl_->tags_)
         {
-            scene_->NodeTagRemoved(this, impl_->tags_[i]);
+            scene_->NodeTagRemoved(this, tag);
 
             // Send event
             using namespace NodeTagRemoved;
             VariantMap& eventData = GetEventDataMap();
             eventData[P_SCENE] = scene_;
             eventData[P_NODE] = this;
-            eventData[P_TAG] = impl_->tags_[i];
+            eventData[P_TAG] = tag;
             scene_->SendEvent(E_NODETAGREMOVED, eventData);
         }
     }
@@ -866,7 +860,7 @@ void Node::RemoveAllChildren()
 
 void Node::RemoveChildren(bool removeReplicated, bool removeLocal, bool recursive)
 {
-    unsigned numRemoved = 0;
+    i32 numRemoved = 0;
 
     for (i32 i = children_.Size() - 1; i >= 0; --i)
     {
@@ -951,7 +945,7 @@ Component* Node::CloneComponent(Component* component, CreateMode mode, unsigned 
 
     if (compAttributes)
     {
-        for (unsigned i = 0; i < compAttributes->Size() && i < cloneAttributes->Size(); ++i)
+        for (i32 i = 0; i < compAttributes->Size() && i < cloneAttributes->Size(); ++i)
         {
             const AttributeInfo& attr = compAttributes->At(i);
             const AttributeInfo& cloneAttr = cloneAttributes->At(i);
@@ -1014,7 +1008,7 @@ void Node::RemoveComponent(StringHash type)
 
 void Node::RemoveComponents(bool removeReplicated, bool removeLocal)
 {
-    unsigned numRemoved = 0;
+    i32 numRemoved = 0;
 
     for (i32 i = components_.Size() - 1; i >= 0; --i)
     {
@@ -1040,7 +1034,7 @@ void Node::RemoveComponents(bool removeReplicated, bool removeLocal)
 
 void Node::RemoveComponents(StringHash type)
 {
-    unsigned numRemoved = 0;
+    i32 numRemoved = 0;
 
     for (i32 i = components_.Size() - 1; i >= 0; --i)
     {
@@ -1639,7 +1633,7 @@ bool Node::LoadJSON(const JSONValue& source, SceneResolver& resolver, bool loadC
 
     const JSONArray& componentsArray = source.Get("components").GetArray();
 
-    for (unsigned i = 0; i < componentsArray.Size(); i++)
+    for (i32 i = 0; i < componentsArray.Size(); i++)
     {
         const JSONValue& compVal = componentsArray.At(i);
         String typeName = compVal.Get("type").GetString();
@@ -1658,7 +1652,7 @@ bool Node::LoadJSON(const JSONValue& source, SceneResolver& resolver, bool loadC
         return true;
 
     const JSONArray& childrenArray = source.Get("children").GetArray();
-    for (unsigned i = 0; i < childrenArray.Size(); i++)
+    for (i32 i = 0; i < childrenArray.Size(); i++)
     {
         const JSONValue& childVal = childrenArray.At(i);
 
@@ -1914,7 +1908,7 @@ Animatable* Node::FindAttributeAnimationTarget(const String& name, String& outNa
     {
         // Name must in following format: "#0/#1/@component#0/attribute"
         Node* node = this;
-        unsigned i = 0;
+        i32 i = 0;
         for (; i < names.Size() - 1; ++i)
         {
             if (names[i].Front() != '#')
@@ -1924,7 +1918,7 @@ Animatable* Node::FindAttributeAnimationTarget(const String& name, String& outNa
             char s = name.Front();
             if (s >= '0' && s <= '9')
             {
-                unsigned index = ToUInt(name);
+                i32 index = ToInt(name);
                 node = node->GetChild(index);
             }
             else
@@ -1967,7 +1961,7 @@ Animatable* Node::FindAttributeAnimationTarget(const String& name, String& outNa
         }
         else
         {
-            unsigned index = ToUInt(componentNames[1]);
+            i32 index = ToInt(componentNames[1]);
             Vector<Component*> components;
             node->GetComponents(components, StringHash(componentNames.Front()));
             if (index >= components.Size())
@@ -2177,7 +2171,7 @@ Node* Node::CloneRecursive(Node* parent, SceneResolver& resolver, CreateMode mod
 
     // Copy attributes
     const Vector<AttributeInfo>* attributes = GetAttributes();
-    for (unsigned j = 0; j < attributes->Size(); ++j)
+    for (i32 j = 0; j < attributes->Size(); ++j)
     {
         const AttributeInfo& attr = attributes->At(j);
         // Do not copy network-only attributes, as they may have unintended side effects
