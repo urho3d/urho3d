@@ -3859,7 +3859,10 @@ byte[]     Bytecode, produced by AngelScript serializer
 
 - \c using is used instead of \c typedef in type declarations.
 
-- `enum class` is not used because of legacy reasons.
+- `enum class` is used wherever possible.
+  - Use a singular type names for enums unless its values are bit fields.
+  - Use a plural type names for enums with bit fields as values.
+  - Don't use suffixes like "Enum", "Flags" and so on
 
 - Class definitions proceed in the following order:
   - public constructors and the destructor
@@ -3874,24 +3877,17 @@ byte[]     Bytecode, produced by AngelScript serializer
 
 - Inline functions are defined inside the class definitions where possible, without using the inline keyword.
 
-It's recommended to follow <a href="https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md">C++ Core Guidelines</a> (except items that contradict Urho legacy, e.g. ES.107, Enum.3, Enum.5)
-
 Use this brief checklist to keep code style consistent among contributions and contributors:
 
 - Prefer inplace member initialization to initializer lists.
 
 - Prefer range-based \c for to old style \c for unless index or iterator is used by itself.
 
-- Avoid \c auto unless it increases code readability. More details <a href="https://clang.llvm.org/extra/clang-tidy/checks/modernize-use-auto.html">here</a> and <a href="https://google.github.io/styleguide/cppguide.html#auto">here</a>.
-
-  - Use \c auto for verbose, unknown or redundant types. Example:
-    \code
-    auto iter = variables.Find(name); // verbose iterator type: HashMap<String, Variant>::Iterator
-    for (auto& variable : variables) { } // verbose pair type: HashMap<String, Variant>::KeyValue
-    auto model = MakeShared<Model>(context_); // type is already mentioned in the expression: SharedPtr<Model>
-    \endcode
-
-  - Use \c auto instead of manual type deduction via \c decltype and \c typename.
+- Avoid \c auto unless it greatly reduces a code size. Examples:
+  \code
+  auto iter = variables.Find(name); // verbose iterator type: HashMap<String, Variant>::Iterator
+  for (auto& variable : variables) { } // verbose pair type: HashMap<String, Variant>::KeyValue
+  \endcode
 
 \page ContributionChecklist Contribution checklist
 
