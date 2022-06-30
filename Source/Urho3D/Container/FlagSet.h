@@ -8,6 +8,8 @@
 namespace Urho3D
 {
 
+/// Define bitwise operators for scoped enum.
+/// Use !! to convert scoped enum to bool
 #define URHO3D_FLAGS(EnumClass) \
     inline EnumClass operator |(const EnumClass lhs, const EnumClass rhs) \
     { \
