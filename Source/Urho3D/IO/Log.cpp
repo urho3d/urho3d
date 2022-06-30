@@ -119,9 +119,15 @@ void Log::SetQuiet(bool quiet)
 
 void Log::WriteFormat(int level, const char* format, ...)
 {
-    // No-op if illegal level
-    if (!logInstance || (logInstance->level_ > level && level != LOG_RAW) || level >= LOG_NONE)
+    if (!logInstance)
         return;
+
+    if (level != LOG_RAW)
+    {
+        // No-op if illegal level
+        if (level < LOG_TRACE || level >= LOG_NONE || logInstance->level_ > level)
+            return;
+    }
 
     // Forward to normal Write() after formatting the input
     String message;
@@ -129,7 +135,7 @@ void Log::WriteFormat(int level, const char* format, ...)
     va_start(args, format);
     message.AppendWithFormatArgs(format, args);
     va_end(args);
-    
+
     Write(level, message);
 }
 
