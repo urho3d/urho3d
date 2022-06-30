@@ -59,7 +59,7 @@ static void ProcessEnum(const EnumAnalyzer& analyzer)
         for (const string& value : analyzer.GetEnumerators())
         {
             string constName = enumTypeName + "_" + value;
-            processedEnum.glue_.push_back("static const " + cppEnumBaseType + " " + constName + " = static_cast<" + cppEnumBaseType + ">(" + enumTypeName + "::" + value + "); ");
+            processedEnum.glue_.push_back("static const " + cppEnumBaseType + " " + constName + " = static_cast<" + cppEnumBaseType + ">(" + enumTypeName + "::" + value + ");");
             processedEnum.registration_.push_back("engine->RegisterGlobalProperty(\"const " + asEnumBaseType + " " + value + "\", (void*)&" + constName + ");");
         }
 
