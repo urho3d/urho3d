@@ -315,12 +315,12 @@ static const unsigned Key_KEY_VOLUMEUP = KEY_VOLUMEUP;
 static const unsigned Key_KEY_WWW = KEY_WWW;
 
 // enum class LogicComponentEvents | File: ../Scene/LogicComponent.h
-static const int LogicComponentEvents_None = static_cast<int>(LogicComponentEvents::None); 
-static const int LogicComponentEvents_Update = static_cast<int>(LogicComponentEvents::Update); 
-static const int LogicComponentEvents_PostUpdate = static_cast<int>(LogicComponentEvents::PostUpdate); 
-static const int LogicComponentEvents_FixedUpdate = static_cast<int>(LogicComponentEvents::FixedUpdate); 
-static const int LogicComponentEvents_FixedPostUpdate = static_cast<int>(LogicComponentEvents::FixedPostUpdate); 
-static const int LogicComponentEvents_All = static_cast<int>(LogicComponentEvents::All); 
+static const int LogicComponentEvents_None = static_cast<int>(LogicComponentEvents::None);
+static const int LogicComponentEvents_Update = static_cast<int>(LogicComponentEvents::Update);
+static const int LogicComponentEvents_PostUpdate = static_cast<int>(LogicComponentEvents::PostUpdate);
+static const int LogicComponentEvents_FixedUpdate = static_cast<int>(LogicComponentEvents::FixedUpdate);
+static const int LogicComponentEvents_FixedPostUpdate = static_cast<int>(LogicComponentEvents::FixedPostUpdate);
+static const int LogicComponentEvents_All = static_cast<int>(LogicComponentEvents::All);
 
 // enum MaterialQuality : u32 | File: ../GraphicsAPI/GraphicsDefs.h
 static const u32 MaterialQuality_QUALITY_LOW = QUALITY_LOW;
