@@ -22053,9 +22053,9 @@ template <class T> void RegisterMembers_Light(asIScriptEngine* engine, const cha
     engine->RegisterObjectMethod(className, "LightType GetLightType() const", AS_METHODPR(T, GetLightType, () const, LightType), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "LightType get_lightType() const", AS_METHODPR(T, GetLightType, () const, LightType), AS_CALL_THISCALL);
 
-    // int Light::GetNumShadowSplits() const
-    engine->RegisterObjectMethod(className, "int GetNumShadowSplits() const", AS_METHODPR(T, GetNumShadowSplits, () const, int), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "int get_numShadowSplits() const", AS_METHODPR(T, GetNumShadowSplits, () const, int), AS_CALL_THISCALL);
+    // i32 Light::GetNumShadowSplits() const
+    engine->RegisterObjectMethod(className, "int GetNumShadowSplits() const", AS_METHODPR(T, GetNumShadowSplits, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numShadowSplits() const", AS_METHODPR(T, GetNumShadowSplits, () const, i32), AS_CALL_THISCALL);
 
     // bool Light::GetPerVertex() const
     engine->RegisterObjectMethod(className, "bool GetPerVertex() const", AS_METHODPR(T, GetPerVertex, () const, bool), AS_CALL_THISCALL);

@@ -453,22 +453,24 @@ Frustum Light::GetViewSpaceFrustum(const Matrix3x4& view) const
     return ret;
 }
 
-int Light::GetNumShadowSplits() const
+i32 Light::GetNumShadowSplits() const
 {
-    unsigned ret = 1;
+    i32 ret = 1;
 
     if (shadowCascade_.splits_[1] > shadowCascade_.splits_[0])
     {
         ++ret;
+
         if (shadowCascade_.splits_[2] > shadowCascade_.splits_[1])
         {
             ++ret;
+
             if (shadowCascade_.splits_[3] > shadowCascade_.splits_[2])
                 ++ret;
         }
     }
 
-    return (int)Min(ret, MAX_CASCADE_SPLITS);
+    return Min(ret, MAX_CASCADE_SPLITS);
 }
 
 const Matrix3x4& Light::GetVolumeTransform(Camera* camera)
