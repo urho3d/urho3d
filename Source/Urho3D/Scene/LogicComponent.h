@@ -26,7 +26,7 @@ enum class LogicComponentEvents
     FixedUpdate     = 1 << 2,
 
     /// Use the physics post-update event
-    FixedPostUpdate = 1 << 3, 
+    FixedPostUpdate = 1 << 3,
 
     /// Use all events
     All             = Update | PostUpdate | FixedUpdate | FixedPostUpdate
