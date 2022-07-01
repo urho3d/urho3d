@@ -528,7 +528,7 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
             Vector4 vertexLights[MAX_VERTEX_LIGHTS * 3];
             const Vector<Light*>& lights = lightQueue_->vertexLights_;
 
-            for (unsigned i = 0; i < lights.Size(); ++i)
+            for (i32 i = 0; i < lights.Size(); ++i)
             {
                 Light* vertexLight = lights[i];
                 Node* vertexLightNode = vertexLight->GetNode();
@@ -642,11 +642,10 @@ void BatchGroup::SetInstancingData(void* lockedData, unsigned stride, unsigned& 
     startIndex_ = freeIndex;
     unsigned char* buffer = static_cast<unsigned char*>(lockedData) + startIndex_ * stride;
 
-    for (unsigned i = 0; i < instances_.Size(); ++i)
+    for (const InstanceData& instance : instances_)
     {
-        const InstanceData& instance = instances_[i];
-
         memcpy(buffer, instance.worldTransform_, sizeof(Matrix3x4));
+ 
         if (instance.instancingData_)
             memcpy(buffer + sizeof(Matrix3x4), instance.instancingData_, stride - sizeof(Matrix3x4));
 
@@ -672,10 +671,10 @@ void BatchGroup::Draw(View* view, Camera* camera, bool allowDepthWrite) const
             graphics->SetIndexBuffer(geometry_->GetIndexBuffer());
             graphics->SetVertexBuffers(geometry_->GetVertexBuffers());
 
-            for (unsigned i = 0; i < instances_.Size(); ++i)
+            for (const InstanceData& instance : instances_)
             {
-                if (graphics->NeedParameterUpdate(SP_OBJECT, instances_[i].worldTransform_))
-                    graphics->SetShaderParameter(VSP_MODEL, *instances_[i].worldTransform_);
+                if (graphics->NeedParameterUpdate(SP_OBJECT, instance.worldTransform_))
+                    graphics->SetShaderParameter(VSP_MODEL, *instance.worldTransform_);
 
                 graphics->Draw(geometry_->GetPrimitiveType(), geometry_->GetIndexStart(), geometry_->GetIndexCount(),
                     geometry_->GetVertexStart(), geometry_->GetVertexCount());
@@ -720,7 +719,7 @@ void BatchQueue::SortBackToFront()
 {
     sortedBatches_.Resize(batches_.Size());
 
-    for (unsigned i = 0; i < batches_.Size(); ++i)
+    for (i32 i = 0; i < batches_.Size(); ++i)
         sortedBatches_[i] = &batches_[i];
 
     Sort(sortedBatches_.Begin(), sortedBatches_.End(), CompareBatchesBackToFront);
@@ -738,8 +737,8 @@ void BatchQueue::SortFrontToBack()
 {
     sortedBatches_.Clear();
 
-    for (unsigned i = 0; i < batches_.Size(); ++i)
-        sortedBatches_.Push(&batches_[i]);
+    for (Batch& batch : batches_)
+        sortedBatches_.Push(&batch);
 
     SortFrontToBack2Pass(sortedBatches_);
 
