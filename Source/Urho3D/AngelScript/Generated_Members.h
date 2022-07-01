@@ -5432,6 +5432,9 @@ template <class T> void RegisterMembers_UIBatch(asIScriptEngine* engine, const c
     // void UIBatch::AddQuad(float x, float y, float width, float height, int texOffsetX, int texOffsetY, int texWidth = 0, int texHeight = 0)
     engine->RegisterObjectMethod(className, "void AddQuad(float, float, float, float, int, int, int = 0, int = 0)", AS_METHODPR(T, AddQuad, (float, float, float, float, int, int, int, int), void), AS_CALL_THISCALL);
 
+    // void UIBatch::AddQuad(i32 x, i32 y, i32 width, i32 height, int texOffsetX, int texOffsetY, int texWidth = 0, int texHeight = 0)
+    engine->RegisterObjectMethod(className, "void AddQuad(int, int, int, int, int, int, int = 0, int = 0)", AS_METHODPR(T, AddQuad, (i32, i32, i32, i32, int, int, int, int), void), AS_CALL_THISCALL);
+
     // void UIBatch::AddQuad(const Matrix3x4& transform, int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth = 0, int texHeight = 0)
     engine->RegisterObjectMethod(className, "void AddQuad(const Matrix3x4&in, int, int, int, int, int, int, int = 0, int = 0)", AS_METHODPR(T, AddQuad, (const Matrix3x4&, int, int, int, int, int, int, int, int), void), AS_CALL_THISCALL);
 
@@ -5446,6 +5449,9 @@ template <class T> void RegisterMembers_UIBatch(asIScriptEngine* engine, const c
 
     // unsigned UIBatch::GetInterpolatedColor(float x, float y)
     engine->RegisterObjectMethod(className, "uint GetInterpolatedColor(float, float)", AS_METHODPR(T, GetInterpolatedColor, (float, float), unsigned), AS_CALL_THISCALL);
+
+    // unsigned UIBatch::GetInterpolatedColor(i32 x, i32 y)
+    engine->RegisterObjectMethod(className, "uint GetInterpolatedColor(int, int)", AS_METHODPR(T, GetInterpolatedColor, (i32, i32), unsigned), AS_CALL_THISCALL);
 
     // bool UIBatch::Merge(const UIBatch& batch)
     engine->RegisterObjectMethod(className, "bool Merge(const UIBatch&in)", AS_METHODPR(T, Merge, (const UIBatch&), bool), AS_CALL_THISCALL);
