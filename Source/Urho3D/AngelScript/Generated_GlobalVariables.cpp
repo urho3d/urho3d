@@ -283,13 +283,13 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // static const int MATRIX_CONVERSION_BUFFER_LENGTH | File: ../Container/Str.h
     engine->RegisterGlobalProperty("const int MATRIX_CONVERSION_BUFFER_LENGTH", (void*)&MATRIX_CONVERSION_BUFFER_LENGTH);
 
-    // static const unsigned MAX_CASCADE_SPLITS | File: ../Graphics/Light.h
-    engine->RegisterGlobalProperty("const uint MAX_CASCADE_SPLITS", (void*)&MAX_CASCADE_SPLITS);
+    // constexpr i32 MAX_CASCADE_SPLITS | File: ../Graphics/Light.h
+    engine->RegisterGlobalProperty("const int MAX_CASCADE_SPLITS", (void*)&MAX_CASCADE_SPLITS);
 
     // constexpr i32 MAX_CONSTANT_REGISTERS | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const int MAX_CONSTANT_REGISTERS", (void*)&MAX_CONSTANT_REGISTERS);
 
-    // static const int MAX_LIGHT_SPLITS | File: ../Graphics/Light.h
+    // constexpr i32 MAX_LIGHT_SPLITS | File: ../Graphics/Light.h
     engine->RegisterGlobalProperty("const int MAX_LIGHT_SPLITS", (void*)&MAX_LIGHT_SPLITS);
 
     // static const unsigned MAX_NETWORK_ATTRIBUTES | File: ../Scene/ReplicationState.h
@@ -496,10 +496,10 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // static const int SHADOW_MIN_PIXELS | File: ../Graphics/Renderer.h
     engine->RegisterGlobalProperty("const int SHADOW_MIN_PIXELS", (void*)&SHADOW_MIN_PIXELS);
 
-    // static const float SHADOW_MIN_QUANTIZE | File: ../Graphics/Light.h
+    // constexpr float SHADOW_MIN_QUANTIZE | File: ../Graphics/Light.h
     engine->RegisterGlobalProperty("const float SHADOW_MIN_QUANTIZE", (void*)&SHADOW_MIN_QUANTIZE);
 
-    // static const float SHADOW_MIN_VIEW | File: ../Graphics/Light.h
+    // constexpr float SHADOW_MIN_VIEW | File: ../Graphics/Light.h
     engine->RegisterGlobalProperty("const float SHADOW_MIN_VIEW", (void*)&SHADOW_MIN_VIEW);
 
     // static const String SOUND_AMBIENT | File: ../Audio/AudioDefs.h
