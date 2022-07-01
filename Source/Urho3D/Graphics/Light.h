@@ -332,7 +332,7 @@ public:
 
     /// Return number of shadow map cascade splits for a directional light, considering also graphics API limitations.
     /// @property
-    int GetNumShadowSplits() const;
+    i32 GetNumShadowSplits() const;
 
     /// Return whether light has negative (darkening) color.
     /// @property
