@@ -645,7 +645,7 @@ void BatchGroup::SetInstancingData(void* lockedData, unsigned stride, unsigned& 
     for (const InstanceData& instance : instances_)
     {
         memcpy(buffer, instance.worldTransform_, sizeof(Matrix3x4));
- 
+
         if (instance.instancingData_)
             memcpy(buffer + sizeof(Matrix3x4), instance.instancingData_, stride - sizeof(Matrix3x4));
 
