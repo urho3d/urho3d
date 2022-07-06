@@ -953,8 +953,8 @@ void UI::Update(float timeStep, UIElement* element)
 
     const Vector<SharedPtr<UIElement>>& children = element->GetChildren();
     // Update of an element may modify its child vector. Use just index-based iteration to be safe
-    for (const SharedPtr<UIElement>& child : children)
-        Update(timeStep, child);
+    for (i32 i = 0; i < children.Size(); ++i)
+        Update(timeStep, children[i]);
 }
 
 void UI::SetVertexData(VertexBuffer* dest, const Vector<float>& vertexData)
