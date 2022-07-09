@@ -214,7 +214,7 @@ public:
     /// Return buffer attribute, or empty if missing.
     Vector<unsigned char> GetBuffer(const String& name) const;
     /// Copy buffer attribute into a supplied buffer. Return true if buffer was large enough.
-    bool GetBuffer(const String& name, void* dest, unsigned size) const;
+    bool GetBuffer(const String& name, void* dest, i32 size) const;
     /// Return bounding box attribute, or empty if missing.
     BoundingBox GetBoundingBox() const;
     /// Return a color attribute, or default if missing.

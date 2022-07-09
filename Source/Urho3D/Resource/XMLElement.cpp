@@ -444,10 +444,10 @@ bool XMLElement::SetResourceRefList(const ResourceRefList& value)
     Context* context = file_->GetContext();
 
     String str(context->GetTypeName(value.type_));
-    for (unsigned i = 0; i < value.names_.Size(); ++i)
+    for (const String& name : value.names_)
     {
         str += ";";
-        str += value.names_[i];
+        str += name;
     }
 
     return SetAttribute("value", str.CString());
@@ -755,15 +755,15 @@ Vector<unsigned char> XMLElement::GetBuffer(const String& name) const
     return ret;
 }
 
-bool XMLElement::GetBuffer(const String& name, void* dest, unsigned size) const
+bool XMLElement::GetBuffer(const String& name, void* dest, i32 size) const
 {
     Vector<String> bytes = GetAttribute(name).Split(' ');
     if (size < bytes.Size())
         return false;
 
-    auto* destBytes = (unsigned char*)dest;
-    for (unsigned i = 0; i < bytes.Size(); ++i)
-        destBytes[i] = (unsigned char)ToInt(bytes[i]);
+    u8* destBytes = (u8*)dest;
+    for (i32 i = 0; i < bytes.Size(); ++i)
+        destBytes[i] = (u8)ToInt(bytes[i]);
     return true;
 }
 
@@ -876,7 +876,7 @@ ResourceRefList XMLElement::GetResourceRefList() const
     {
         ret.type_ = values[0];
         ret.names_.Resize(values.Size() - 1);
-        for (unsigned i = 1; i < values.Size(); ++i)
+        for (i32 i = 1; i < values.Size(); ++i)
             ret.names_[i - 1] = values[i];
     }
 
