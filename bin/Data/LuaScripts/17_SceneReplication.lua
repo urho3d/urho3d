@@ -200,7 +200,7 @@ end
 function CreateControllableObject()
     -- Create the scene node & visual representation. This will be a replicated object
     local ballNode = scene_:CreateChild("Ball")
-    ballNode.position = Vector3(Random(40.0) - 20.0, 5.0, Random(40.0) - 20.0)
+    ballNode.position = Vector3(Random(40.0) - 20.0, 5.0, -Random(40.0) + 20.0)
     ballNode:SetScale(0.5)
     local ballObject = ballNode:CreateComponent("StaticModel")
     ballObject.model = cache:GetResource("Model", "Models/Sphere.mdl")
