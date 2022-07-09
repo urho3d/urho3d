@@ -6645,7 +6645,7 @@ template <class T> void RegisterMembers_XMLElement(asIScriptEngine* engine, cons
     // Error: type "const char*" can not automatically bind
     // Vector<unsigned char> XMLElement::GetBuffer(const String& name) const
     // Error: type "Vector<unsigned char>" can not automatically bind
-    // bool XMLElement::GetBuffer(const String& name, void* dest, unsigned size) const
+    // bool XMLElement::GetBuffer(const String& name, void* dest, i32 size) const
     // Error: type "void*" can not automatically bind
     // XMLElement XMLElement::GetChild(const char* name) const
     // Error: type "const char*" can not automatically bind
