@@ -1175,7 +1175,7 @@ String XPathQuery::EvaluateToString(const XMLElement& element) const
     const pugi::xml_node& node = element.GetXPathNode() ? element.GetXPathNode()->node() : pugi::xml_node(element.GetNode());
     String result;
     // First call get the size
-    result.Reserve((unsigned)query_->evaluate_string(nullptr, 0, node));
+    result.Reserve((i32)query_->evaluate_string(nullptr, 0, node));
     // Second call get the actual string
     query_->evaluate_string(const_cast<pugi::char_t*>(result.CString()), result.Capacity(), node);
     return result;
