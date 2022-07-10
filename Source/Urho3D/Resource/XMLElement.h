@@ -304,7 +304,7 @@ private:
     /// Pugixml xpath_node.
     const pugi::xpath_node* xpathNode_;
     /// Current XPath query result index (used internally to advance to subsequent query result).
-    mutable unsigned xpathResultIndex_;
+    mutable i32 xpathResultIndex_;
 };
 
 /// XPath query result set.
