@@ -37,7 +37,7 @@ public:
     /// Construct with document and node pointers.
     XMLElement(XMLFile* file, pugi::xml_node_struct* node);
     /// Construct from xpath query result set.
-    XMLElement(XMLFile* file, const XPathResultSet* resultSet, const pugi::xpath_node* xpathNode, unsigned xpathResultIndex);
+    XMLElement(XMLFile* file, const XPathResultSet* resultSet, const pugi::xpath_node* xpathNode, i32 xpathResultIndex);
     /// Copy-construct from another element.
     XMLElement(const XMLElement& rhs);
     /// Destruct.
@@ -99,7 +99,7 @@ public:
     /// Set a BoundingBox attribute.
     bool SetBoundingBox(const BoundingBox& value);
     /// Set a buffer attribute.
-    bool SetBuffer(const String& name, const void* data, unsigned size);
+    bool SetBuffer(const String& name, const void* data, i32 size);
     /// Set a buffer attribute.
     bool SetBuffer(const String& name, const Vector<unsigned char>& value);
     /// Set a color attribute.
@@ -185,7 +185,7 @@ public:
     XMLElement GetParent() const;
     /// Return number of attributes.
     /// @property
-    unsigned GetNumAttributes() const;
+    i32 GetNumAttributes() const;
     /// Return whether has an attribute.
     bool HasAttribute(const String& name) const;
     /// Return whether has an attribute.
@@ -285,7 +285,7 @@ public:
     const pugi::xpath_node* GetXPathNode() const { return xpathNode_; }
 
     /// Return current result index.
-    unsigned GetXPathResultIndex() const { return xpathResultIndex_; }
+    i32 GetXPathResultIndex() const { return xpathResultIndex_; }
 
     /// Return next XPath query result. Only valid when this instance of XMLElement is itself one of the query result in the result set.
     /// @property
@@ -323,14 +323,14 @@ public:
     XPathResultSet& operator =(const XPathResultSet& rhs);
     /// Return the n-th result in the set. Call XMLElement::GetNextResult() to get the subsequent result in the set.
     /// Note: The XPathResultSet return value must be stored in a lhs variable to ensure the underlying xpath_node_set* is still valid while performing XPathResultSet::FirstResult(), XPathResultSet::operator [], and XMLElement::NextResult().
-    XMLElement operator [](unsigned index) const;
+    XMLElement operator [](i32 index) const;
     /// Return the first result in the set. Call XMLElement::GetNextResult() to get the subsequent result in the set.
     /// Note: The XPathResultSet return value must be stored in a lhs variable to ensure the underlying xpath_node_set* is still valid while performing XPathResultSet::FirstResult(), XPathResultSet::operator [], and XMLElement::NextResult().
     /// @property
     XMLElement FirstResult();
     /// Return size of result set.
     /// @property
-    unsigned Size() const;
+    i32 Size() const;
     /// Return whether result set is empty.
     /// @property
     bool Empty() const;

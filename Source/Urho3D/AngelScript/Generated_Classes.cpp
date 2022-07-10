@@ -3235,7 +3235,7 @@ static void XMLElement__XMLElement_constspXMLElementamp(XMLElement* _ptr, const 
 // class XMLElement | File: ../Resource/XMLElement.h
 static void Register_XMLElement(asIScriptEngine* engine)
 {
-    // XMLElement::XMLElement(XMLFile* file, const XPathResultSet* resultSet, const pugi::xpath_node* xpathNode, unsigned xpathResultIndex)
+    // XMLElement::XMLElement(XMLFile* file, const XPathResultSet* resultSet, const pugi::xpath_node* xpathNode, i32 xpathResultIndex)
     // Error: type "const XPathResultSet*" can not automatically bind
     // XMLElement::XMLElement(XMLFile* file, pugi::xml_node_struct* node)
     // Error: type "pugi::xml_node_struct*" can not automatically bind

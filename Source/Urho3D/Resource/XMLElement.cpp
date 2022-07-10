@@ -36,13 +36,14 @@ XMLElement::XMLElement(XMLFile* file, pugi::xml_node_struct* node) :
 }
 
 XMLElement::XMLElement(XMLFile* file, const XPathResultSet* resultSet, const pugi::xpath_node* xpathNode,
-    unsigned xpathResultIndex) :
+    i32 xpathResultIndex) :
     file_(file),
     node_(nullptr),
     xpathResultSet_(resultSet),
     xpathNode_(resultSet ? xpathNode : (xpathNode ? new pugi::xpath_node(*xpathNode) : nullptr)),
     xpathResultIndex_(xpathResultIndex)
 {
+    assert(xpathResultIndex >= 0);
 }
 
 XMLElement::XMLElement(const XMLElement& rhs) :
@@ -312,8 +313,9 @@ bool XMLElement::SetBoundingBox(const BoundingBox& value)
     return SetVector3("max", value.max_);
 }
 
-bool XMLElement::SetBuffer(const String& name, const void* data, unsigned size)
+bool XMLElement::SetBuffer(const String& name, const void* data, i32 size)
 {
+    assert(size >= 0);
     String dataStr;
     BufferToString(dataStr, data, size);
     return SetAttribute(name, dataStr);
@@ -628,13 +630,13 @@ XMLElement XMLElement::GetParent() const
     return XMLElement(file_, node.parent().internal_object());
 }
 
-unsigned XMLElement::GetNumAttributes() const
+i32 XMLElement::GetNumAttributes() const
 {
     if (!file_ || (!node_ && !xpathNode_))
         return 0;
 
     const pugi::xml_node& node = xpathNode_ ? xpathNode_->node() : pugi::xml_node(node_);
-    unsigned ret = 0;
+    i32 ret = 0;
 
     pugi::xml_attribute attr = node.first_attribute();
     while (!attr.empty())
@@ -1016,8 +1018,10 @@ XPathResultSet& XPathResultSet::operator =(const XPathResultSet& rhs)
     return *this;
 }
 
-XMLElement XPathResultSet::operator [](unsigned index) const
+XMLElement XPathResultSet::operator [](i32 index) const
 {
+    assert(index >= 0);
+
     if (!resultSet_)
         URHO3D_LOGERRORF(
             "Could not return result at index: %u. Most probably this is caused by the XPathResultSet not being stored in a lhs variable.",
@@ -1031,9 +1035,9 @@ XMLElement XPathResultSet::FirstResult()
     return operator [](0);
 }
 
-unsigned XPathResultSet::Size() const
+i32 XPathResultSet::Size() const
 {
-    return resultSet_ ? (unsigned)resultSet_->size() : 0;
+    return resultSet_ ? (i32)resultSet_->size() : 0;
 }
 
 bool XPathResultSet::Empty() const
