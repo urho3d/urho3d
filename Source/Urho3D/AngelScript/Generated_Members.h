@@ -6679,7 +6679,7 @@ template <class T> void RegisterMembers_XMLElement(asIScriptEngine* engine, cons
     // Error: type "const char*" can not automatically bind
     // bool XMLElement::SetAttribute(const char* value)
     // Error: type "const char*" can not automatically bind
-    // bool XMLElement::SetBuffer(const String& name, const void* data, unsigned size)
+    // bool XMLElement::SetBuffer(const String& name, const void* data, i32 size)
     // Error: type "const void*" can not automatically bind
     // bool XMLElement::SetBuffer(const String& name, const Vector<unsigned char>& value)
     // Error: type "const Vector<unsigned char>&" can not automatically bind
@@ -6759,9 +6759,9 @@ template <class T> void RegisterMembers_XMLElement(asIScriptEngine* engine, cons
     // XMLElement XMLElement::GetNext(const String& name = String::EMPTY) const
     engine->RegisterObjectMethod(className, "XMLElement GetNext(const String&in = String::EMPTY) const", AS_METHODPR(T, GetNext, (const String&) const, XMLElement), AS_CALL_THISCALL);
 
-    // unsigned XMLElement::GetNumAttributes() const
-    engine->RegisterObjectMethod(className, "uint GetNumAttributes() const", AS_METHODPR(T, GetNumAttributes, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numAttributes() const", AS_METHODPR(T, GetNumAttributes, () const, unsigned), AS_CALL_THISCALL);
+    // i32 XMLElement::GetNumAttributes() const
+    engine->RegisterObjectMethod(className, "int GetNumAttributes() const", AS_METHODPR(T, GetNumAttributes, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numAttributes() const", AS_METHODPR(T, GetNumAttributes, () const, i32), AS_CALL_THISCALL);
 
     // XMLElement XMLElement::GetOrCreateChild(const String& name)
     engine->RegisterObjectMethod(className, "XMLElement GetOrCreateChild(const String&in)", AS_METHODPR(T, GetOrCreateChild, (const String&), XMLElement), AS_CALL_THISCALL);
@@ -6819,8 +6819,8 @@ template <class T> void RegisterMembers_XMLElement(asIScriptEngine* engine, cons
     // Variant XMLElement::GetVectorVariant(const String& name) const
     engine->RegisterObjectMethod(className, "Variant GetVectorVariant(const String&in) const", AS_METHODPR(T, GetVectorVariant, (const String&) const, Variant), AS_CALL_THISCALL);
 
-    // unsigned XMLElement::GetXPathResultIndex() const
-    engine->RegisterObjectMethod(className, "uint GetXPathResultIndex() const", AS_METHODPR(T, GetXPathResultIndex, () const, unsigned), AS_CALL_THISCALL);
+    // i32 XMLElement::GetXPathResultIndex() const
+    engine->RegisterObjectMethod(className, "int GetXPathResultIndex() const", AS_METHODPR(T, GetXPathResultIndex, () const, i32), AS_CALL_THISCALL);
 
     // bool XMLElement::HasAttribute(const String& name) const
     engine->RegisterObjectMethod(className, "bool HasAttribute(const String&in) const", AS_METHODPR(T, HasAttribute, (const String&) const, bool), AS_CALL_THISCALL);
@@ -7038,12 +7038,12 @@ template <class T> void RegisterMembers_XPathResultSet(asIScriptEngine* engine, 
     // XPathResultSet& XPathResultSet::operator =(const XPathResultSet& rhs)
     engine->RegisterObjectMethod(className, "XPathResultSet& opAssign(const XPathResultSet&in)", AS_METHODPR(T, operator=, (const XPathResultSet&), XPathResultSet&), AS_CALL_THISCALL);
 
-    // XMLElement XPathResultSet::operator [](unsigned index) const
-    engine->RegisterObjectMethod(className, "XMLElement opIndex(uint) const", AS_METHODPR(T, operator[], (unsigned) const, XMLElement), AS_CALL_THISCALL);
+    // XMLElement XPathResultSet::operator [](i32 index) const
+    engine->RegisterObjectMethod(className, "XMLElement opIndex(int) const", AS_METHODPR(T, operator[], (i32) const, XMLElement), AS_CALL_THISCALL);
 
-    // unsigned XPathResultSet::Size() const
-    engine->RegisterObjectMethod(className, "uint Size() const", AS_METHODPR(T, Size, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_size() const", AS_METHODPR(T, Size, () const, unsigned), AS_CALL_THISCALL);
+    // i32 XPathResultSet::Size() const
+    engine->RegisterObjectMethod(className, "int Size() const", AS_METHODPR(T, Size, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_size() const", AS_METHODPR(T, Size, () const, i32), AS_CALL_THISCALL);
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_XPathResultSet
         REGISTER_MEMBERS_MANUAL_PART_XPathResultSet();
