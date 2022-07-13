@@ -212,7 +212,7 @@ XMLElement XMLElement::SelectSingle(const String& query, pugi::xpath_variable_se
         return XMLElement();
 
     const pugi::xml_node& node = xpathNode_ ? xpathNode_->node() : pugi::xml_node(node_);
-    pugi::xpath_node result = node.select_single_node(query.CString(), variables);
+    pugi::xpath_node result = node.select_node(query.CString(), variables);
     return XMLElement(file_, nullptr, &result, 0);
 }
 
@@ -222,7 +222,7 @@ XMLElement XMLElement::SelectSinglePrepared(const XPathQuery& query) const
         return XMLElement();
 
     const pugi::xml_node& node = xpathNode_ ? xpathNode_->node() : pugi::xml_node(node_);
-    pugi::xpath_node result = node.select_single_node(*query.GetXPathQuery());
+    pugi::xpath_node result = node.select_node(*query.GetXPathQuery());
     return XMLElement(file_, nullptr, &result, 0);
 }
 
