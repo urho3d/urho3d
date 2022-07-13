@@ -192,7 +192,7 @@ void XMLFile::Patch(const XMLElement& patchElement)
         }
 
         // Only select a single node at a time, they can use xpath to select specific ones in multiple otherwise the node set becomes invalid due to changes
-        pugi::xpath_node original = document_->select_single_node(sel.value());
+        pugi::xpath_node original = document_->select_node(sel.value());
         if (!original)
         {
             URHO3D_LOGERRORF("XML Patch failed with bad select: %s.", sel.value());
