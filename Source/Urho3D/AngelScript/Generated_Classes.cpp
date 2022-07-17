@@ -3017,6 +3017,12 @@ static void Vector2__Vector2_float_float(Vector2* _ptr, float x, float y)
     new(_ptr) Vector2(x, y);
 }
 
+// Vector2::Vector2(i32 x, i32 y) noexcept
+static void Vector2__Vector2_i32_i32(Vector2* _ptr, i32 x, i32 y)
+{
+    new(_ptr) Vector2(x, y);
+}
+
 // class Vector2 | File: ../Math/Vector2.h
 static void Register_Vector2(asIScriptEngine* engine)
 {
@@ -3029,6 +3035,8 @@ static void Register_Vector2(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Vector2", asBEHAVE_CONSTRUCT, "void f(const IntVector2&in)", AS_FUNCTION_OBJFIRST(Vector2__Vector2_constspIntVector2amp), AS_CALL_CDECL_OBJFIRST);
     // Vector2::Vector2(float x, float y) noexcept
     engine->RegisterObjectBehaviour("Vector2", asBEHAVE_CONSTRUCT, "void f(float, float)", AS_FUNCTION_OBJFIRST(Vector2__Vector2_float_float), AS_CALL_CDECL_OBJFIRST);
+    // Vector2::Vector2(i32 x, i32 y) noexcept
+    engine->RegisterObjectBehaviour("Vector2", asBEHAVE_CONSTRUCT, "void f(int, int)", AS_FUNCTION_OBJFIRST(Vector2__Vector2_i32_i32), AS_CALL_CDECL_OBJFIRST);
 
     RegisterMembers_Vector2<Vector2>(engine, "Vector2");
 
