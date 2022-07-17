@@ -279,7 +279,7 @@ bool SpriteSheet2D::BeginLoadFromJSONFile(Deserializer& source)
 
 bool SpriteSheet2D::EndLoadFromJSONFile()
 {
-    auto* cache = GetSubsystem<ResourceCache>();
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
     texture_ = cache->GetResource<Texture2D>(loadTextureName_);
     if (!texture_)
     {
@@ -292,9 +292,8 @@ bool SpriteSheet2D::EndLoadFromJSONFile()
     JSONValue rootVal = loadJSONFile_->GetRoot();
     JSONArray subTextureArray = rootVal.Get("subtextures").GetArray();
 
-    for (unsigned i = 0; i < subTextureArray.Size(); i++)
+    for (const JSONValue& subTextureVal : subTextureArray)
     {
-        const JSONValue& subTextureVal = subTextureArray.At(i);
         String name = subTextureVal.Get("name").GetString();
 
         int x = subTextureVal.Get("x").GetInt();
@@ -319,7 +318,6 @@ bool SpriteSheet2D::EndLoadFromJSONFile()
         }
 
         DefineSprite(name, rectangle, hotSpot, offset);
-
     }
 
     loadJSONFile_.Reset();
