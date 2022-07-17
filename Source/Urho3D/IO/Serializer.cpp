@@ -164,17 +164,17 @@ bool Serializer::WriteString(const String& value)
 {
     const char* chars = value.CString();
     // Count length to the first zero, because ReadString() does the same
-    unsigned length = String::CStringLength(chars);
+    i32 length = String::CStringLength(chars);
     return Write(chars, length + 1) == length + 1;
 }
 
 bool Serializer::WriteFileID(const String& value)
 {
     bool success = true;
-    unsigned length = Min(value.Length(), 4U);
+    i32 length = Min(value.Length(), 4);
 
     success &= Write(value.CString(), length) == length;
-    for (unsigned i = value.Length(); i < 4; ++i)
+    for (i32 i = value.Length(); i < 4; ++i)
         success &= WriteByte(' ');
     return success;
 }
@@ -209,8 +209,8 @@ bool Serializer::WriteResourceRefList(const ResourceRefList& value)
 
     success &= WriteStringHash(value.type_);
     success &= WriteVLE(value.names_.Size());
-    for (unsigned i = 0; i < value.names_.Size(); ++i)
-        success &= WriteString(value.names_[i]);
+    for (const String& name : value.names_)
+        success &= WriteString(name);
 
     return success;
 }
