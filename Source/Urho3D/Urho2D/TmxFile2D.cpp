@@ -284,7 +284,7 @@ void TmxObjectGroup2D::StoreObject(const XMLElement& objectElem, const SharedPtr
 
                 object->points_.Resize(points.Size());
 
-                for (unsigned i = 0; i < points.Size(); ++i)
+                for (i32 i = 0; i < points.Size(); ++i)
                 {
                     points[i].Replace(',', ' ');
                     Vector2 point = position + ToVector2(points[i]);
@@ -360,8 +360,8 @@ TmxFile2D::TmxFile2D(Context* context) :
 
 TmxFile2D::~TmxFile2D()
 {
-    for (unsigned i = 0; i < layers_.Size(); ++i)
-        delete layers_[i];
+    for (const TmxLayer2D* layer : layers_)
+        delete layer;
 }
 
 void TmxFile2D::RegisterObject(Context* context)
@@ -460,8 +460,8 @@ bool TmxFile2D::EndLoad()
     info_.tileWidth_ = rootElem.GetFloat("tilewidth") * PIXEL_SIZE;
     info_.tileHeight_ = rootElem.GetFloat("tileheight") * PIXEL_SIZE;
 
-    for (unsigned i = 0; i < layers_.Size(); ++i)
-        delete layers_[i];
+    for (const TmxLayer2D* layer : layers_)
+        delete layer;
     layers_.Clear();
 
     for (XMLElement childElement = rootElem.GetChild(); childElement; childElement = childElement.GetNext())
