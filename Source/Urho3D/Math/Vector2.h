@@ -180,6 +180,13 @@ public:
     {
     }
 
+    /// Construct from int coordinates.
+    Vector2(i32 x, i32 y) noexcept :
+        x_((float)x),
+        y_((float)y)
+    {
+    }
+
     /// Construct from a float array.
     explicit Vector2(const float* data) noexcept :
         x_(data[0]),
