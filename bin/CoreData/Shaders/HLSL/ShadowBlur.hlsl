@@ -3,21 +3,12 @@
 #include "Transform.hlsl"
 #include "ScreenPos.hlsl"
 
-#ifndef D3D11
-
-// D3D9 uniforms
-uniform float2 cBlurOffsets;
-
-#else
-
 #ifdef COMPILEPS
 // D3D11 constant buffers
 cbuffer CustomPS : register(b6)
 {
     float2 cBlurOffsets;
 }
-#endif
-
 #endif
 
 void VS(float4 iPos : POSITION,

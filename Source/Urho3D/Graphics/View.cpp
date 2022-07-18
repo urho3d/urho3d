@@ -758,14 +758,13 @@ void View::SetGBufferShaderParameters(const IntVector2& texSize, const IntRect& 
 
     if (Graphics::GetGAPI() == GAPI_OPENGL)
     {
-        bufferUVOffset = Vector4(((float)viewRect.left_) / texWidth + widthRange,
-            1.0f - (((float)viewRect.top_) / texHeight + heightRange), widthRange, heightRange);
+        bufferUVOffset = Vector4((float)viewRect.left_ / texWidth + widthRange,
+            1.0f - ((float)viewRect.top_ / texHeight + heightRange), widthRange, heightRange);
     }
     else
     {
-        const Vector2& pixelUVOffset = Graphics::GetPixelUVOffset();
-        bufferUVOffset = Vector4((pixelUVOffset.x_ + (float)viewRect.left_) / texWidth + widthRange,
-            (pixelUVOffset.y_ + (float)viewRect.top_) / texHeight + heightRange, widthRange, heightRange);
+        bufferUVOffset = Vector4((float)viewRect.left_ / texWidth + widthRange,
+            (float)viewRect.top_ / texHeight + heightRange, widthRange, heightRange);
     }
 
     graphics_->SetShaderParameter(VSP_GBUFFEROFFSETS, bufferUVOffset);
@@ -1850,9 +1849,7 @@ void View::RenderQuad(RenderPathCommand& command)
         auto width = (float)renderTargets_[nameHash]->GetWidth();
         auto height = (float)renderTargets_[nameHash]->GetHeight();
 
-        const Vector2& pixelUVOffset = Graphics::GetPixelUVOffset();
         graphics_->SetShaderParameter(invSizeName, Vector2(1.0f / width, 1.0f / height));
-        graphics_->SetShaderParameter(offsetsName, Vector2(pixelUVOffset.x_ / width, pixelUVOffset.y_ / height));
     }
 
     // Set command's shader parameters last to allow them to override any of the above

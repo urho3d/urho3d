@@ -225,9 +225,7 @@ float GetShadow(float4 shadowPos)
 {
     #if defined(SIMPLE_SHADOW)
         // Take one sample
-        #ifdef D3D11
-            shadowPos.xyz /= shadowPos.w;
-        #endif
+        shadowPos.xyz /= shadowPos.w;
         float inLight = SampleShadow(ShadowMap, shadowPos).r;
         #ifndef SHADOWCMP
             return cShadowIntensity.y + cShadowIntensity.x * inLight;
@@ -242,14 +240,8 @@ float GetShadow(float4 shadowPos)
     #elif defined(PCF_SHADOW)
         // Take four samples and average them
         // Note: in case of sampling a point light cube shadow, we optimize out the w divide as it has already been performed
-        #ifdef D3D11
-            shadowPos.xyz /= shadowPos.w;
-        #endif
-        #if !defined(POINTLIGHT) && !defined(D3D11)
-            float2 offsets = cShadowMapInvSize * shadowPos.w;
-        #else
-            float2 offsets = cShadowMapInvSize;
-        #endif
+        shadowPos.xyz /= shadowPos.w;
+        float2 offsets = cShadowMapInvSize;
         float4 shadowPos2 = float4(shadowPos.x + offsets.x, shadowPos.yzw);
         float4 shadowPos3 = float4(shadowPos.x, shadowPos.y + offsets.y, shadowPos.zw);
         float4 shadowPos4 = float4(shadowPos.xy + offsets.xy, shadowPos.zw);

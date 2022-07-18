@@ -278,7 +278,6 @@ void Graphics::Constructor_OGL()
     apiName_ = "GLES2";
 #endif
 
-    Graphics::pixelUVOffset = Vector2(0.0f, 0.0f);
     Graphics::gl3Support = false;
 
     SetTextureUnitMappings_OGL();

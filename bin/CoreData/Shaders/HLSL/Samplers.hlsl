@@ -1,4 +1,3 @@
-#ifdef D3D11
 // Make sampling macros also available for VS on D3D11
 #define Sample2D(tex, uv) t##tex.Sample(s##tex, uv)
 #define Sample2DProj(tex, uv) t##tex.Sample(s##tex, uv.xy / uv.w)
@@ -6,43 +5,8 @@
 #define SampleCube(tex, uv) t##tex.Sample(s##tex, uv)
 #define SampleCubeLOD(tex, uv) t##tex.SampleLevel(s##tex, uv.xyz, uv.w)
 #define SampleShadow(tex, uv) t##tex.SampleCmpLevelZero(s##tex, uv.xy, uv.z)
-#endif
 
 #ifdef COMPILEPS
-
-#ifndef D3D11
-
-// D3D9 samplers
-sampler2D sDiffMap : register(s0);
-samplerCUBE sDiffCubeMap : register(s0);
-sampler2D sAlbedoBuffer : register(s0);
-sampler2D sNormalMap : register(s1);
-sampler2D sNormalBuffer : register(s1);
-sampler2D sSpecMap : register(s2);
-sampler2D sRoughMetalFresnel : register(s2); //R: Roughness, G: Metal
-sampler2D sEmissiveMap : register(s3);
-sampler2D sEnvMap : register(s4);
-sampler3D sVolumeMap : register(s5);
-samplerCUBE sEnvCubeMap : register(s4);
-sampler2D sLightRampMap : register(s8);
-sampler2D sLightSpotMap : register(s9);
-samplerCUBE sLightCubeMap : register(s9);
-sampler2D sShadowMap : register(s10);
-samplerCUBE sFaceSelectCubeMap : register(s11);
-samplerCUBE sIndirectionCubeMap : register(s12);
-sampler2D sDepthBuffer : register(s13);
-sampler2D sLightBuffer : register(s14);
-samplerCUBE sZoneCubeMap : register(s15);
-sampler3D sZoneVolumeMap : register(s15);
-
-#define Sample2D(tex, uv) tex2D(s##tex, uv)
-#define Sample2DProj(tex, uv) tex2Dproj(s##tex, uv)
-#define Sample2DLod0(tex, uv) tex2Dlod(s##tex, float4(uv, 0.0, 0.0))
-#define SampleCube(tex, uv) texCUBE(s##tex, uv)
-#define SampleCubeLOD(tex, uv) texCUBElod(s##tex, uv)
-#define SampleShadow(tex, uv) tex2Dproj(s##tex, uv)
-
-#else
 
 // D3D11 textures and samplers
 
@@ -93,8 +57,6 @@ SamplerState sDepthBuffer : register(s13);
 SamplerState sLightBuffer : register(s14);
 SamplerState sZoneCubeMap : register(s15);
 SamplerState sZoneVolumeMap : register(s15);
-
-#endif
 
 float3 DecodeNormal(float4 normalInput)
 {

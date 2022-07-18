@@ -5495,9 +5495,6 @@ template <class T> void RegisterMembers_UIBatch(asIScriptEngine* engine, const c
     // bool UIBatch::useGradient_
     engine->RegisterObjectProperty(className, "bool useGradient", offsetof(T, useGradient_));
 
-    // static Vector3 UIBatch::posAdjust
-    engine->SetDefaultNamespace(className);engine->RegisterGlobalProperty("Vector3 posAdjust", (void*)&T::posAdjust);engine->SetDefaultNamespace("");
-
     #ifdef REGISTER_MEMBERS_MANUAL_PART_UIBatch
         REGISTER_MEMBERS_MANUAL_PART_UIBatch();
     #endif
@@ -10604,9 +10601,6 @@ template <class T> void RegisterMembers_Graphics(asIScriptEngine* engine, const 
 
     // static unsigned Graphics::GetFormat(const String& formatName)
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("uint GetFormat(const String&in)", AS_FUNCTIONPR(T::GetFormat, (const String&), unsigned), AS_CALL_CDECL);engine->SetDefaultNamespace("");
-
-    // static const Vector2& Graphics::GetPixelUVOffset()
-    engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("const Vector2& GetPixelUVOffset()", AS_FUNCTIONPR(T::GetPixelUVOffset, (), const Vector2&), AS_CALL_CDECL);engine->SetDefaultNamespace("");
 
     // static unsigned Graphics::GetMaxBones()
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("uint GetMaxBones()", AS_FUNCTIONPR(T::GetMaxBones, (), unsigned), AS_CALL_CDECL);engine->SetDefaultNamespace("");
