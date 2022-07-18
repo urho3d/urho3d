@@ -5,20 +5,6 @@
 #include "Lighting.hlsl"
 #include "Fog.hlsl"
 
-#ifndef D3D11
-
-// D3D9 uniforms and samplers
-#ifdef COMPILEVS
-uniform float2 cDetailTiling;
-#else
-sampler2D sWeightMap0 : register(s0);
-sampler2D sDetailMap1 : register(s1);
-sampler2D sDetailMap2 : register(s2);
-sampler2D sDetailMap3 : register(s3);
-#endif
-
-#else
-
 // D3D11 constant buffers and samplers
 #ifdef COMPILEVS
 cbuffer CustomVS : register(b6)
@@ -34,8 +20,6 @@ SamplerState sWeightMap0 : register(s0);
 SamplerState sDetailMap1 : register(s1);
 SamplerState sDetailMap2 : register(s2);
 SamplerState sDetailMap3 : register(s3);
-#endif
-
 #endif
 
 void VS(float4 iPos : POSITION,
@@ -72,7 +56,7 @@ void VS(float4 iPos : POSITION,
         out float3 oVertexLight : TEXCOORD4,
         out float4 oScreenPos : TEXCOORD5,
     #endif
-    #if defined(D3D11) && defined(CLIPPLANE)
+    #if defined(CLIPPLANE)
         out float oClip : SV_CLIPDISTANCE0,
     #endif
     out float4 oPos : OUTPOSITION)
@@ -85,7 +69,7 @@ void VS(float4 iPos : POSITION,
     oTexCoord = GetTexCoord(iTexCoord);
     oDetailTexCoord = cDetailTiling * oTexCoord;
 
-    #if defined(D3D11) && defined(CLIPPLANE)
+    #if defined(CLIPPLANE)
         oClip = dot(oPos, cClipPlane);
     #endif
 
@@ -137,7 +121,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
         float3 iVertexLight : TEXCOORD4,
         float4 iScreenPos : TEXCOORD5,
     #endif
-    #if defined(D3D11) && defined(CLIPPLANE)
+    #if defined(CLIPPLANE)
         float iClip : SV_CLIPDISTANCE0,
     #endif
     #ifdef PREPASS

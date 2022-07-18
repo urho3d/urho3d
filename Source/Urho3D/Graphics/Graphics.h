@@ -719,9 +719,6 @@ public:
     /// Return the API-specific texture format from a textual description, for example "rgb".
     static unsigned GetFormat(const String& formatName);
 
-    /// Return UV offset required for pixel perfect rendering.
-    static const Vector2& GetPixelUVOffset() { return pixelUVOffset; }
-
     /// Return maximum number of supported bones for skinning.
     static unsigned GetMaxBones();
     /// Return whether is using an OpenGL 3 context. Return always false on Direct3D9 & Direct3D11.
@@ -1184,8 +1181,6 @@ private:
     /// Graphics API name.
     String apiName_;
 
-    /// Pixel perfect UV offset.
-    inline static Vector2 pixelUVOffset;
     /// OpenGL3 support flag.
     inline static bool gl3Support;
     /// Used graphics API.

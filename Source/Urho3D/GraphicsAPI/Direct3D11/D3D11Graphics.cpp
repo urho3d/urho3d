@@ -177,7 +177,6 @@ void Graphics::Constructor_D3D11()
     orientations_ = "LandscapeLeft LandscapeRight";
     apiName_ = "D3D11";
 
-    Graphics::pixelUVOffset = Vector2(0.0f, 0.0f);
     Graphics::gl3Support = false;
 
     SetTextureUnitMappings_D3D11();

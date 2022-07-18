@@ -925,7 +925,6 @@ void UI::Initialize()
     URHO3D_PROFILE(InitUI);
 
     graphics_ = graphics;
-    UIBatch::posAdjust = Vector3(Graphics::GetPixelUVOffset(), 0.0f);
 
     // Set initial root element size
     ResizeRootElement();

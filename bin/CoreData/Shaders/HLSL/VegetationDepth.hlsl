@@ -2,19 +2,6 @@
 #include "Samplers.hlsl"
 #include "Transform.hlsl"
 
-#ifndef D3D11
-
-// D3D9 uniforms
-uniform float cWindHeightFactor;
-uniform float cWindHeightPivot;
-uniform float cWindPeriod;
-uniform float2 cWindWorldSpacing;
-#ifdef WINDSTEMAXIS
-    uniform float3 cWindStemAxis;
-#endif
-
-#else
-
 // D3D11 constant buffer
 cbuffer CustomVS : register(b6)
 {
@@ -26,8 +13,6 @@ cbuffer CustomVS : register(b6)
         float3 cWindStemAxis;
     #endif
 }
-
-#endif
 
 void VS(float4 iPos : POSITION,
     #ifdef SKINNED

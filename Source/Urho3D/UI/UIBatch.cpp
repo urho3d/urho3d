@@ -12,8 +12,6 @@
 namespace Urho3D
 {
 
-Vector3 UIBatch::posAdjust(0.0f, 0.0f, 0.0f);
-
 UIBatch::UIBatch()
 {
     SetDefaultColor();
@@ -81,9 +79,9 @@ void UIBatch::AddQuad(float x, float y, float width, float height, int texOffset
 
     const IntVector2& screenPos = element_->GetScreenPosition();
 
-    float left = x + screenPos.x_ - posAdjust.x_;
+    float left = x + screenPos.x_;
     float right = left + width;
-    float top = y + screenPos.y_ - posAdjust.x_;
+    float top = y + screenPos.y_;
     float bottom = top + height;
 
     float leftUV = texOffsetX * invTextureSize_.x_;
@@ -163,10 +161,10 @@ void UIBatch::AddQuad(const Matrix3x4& transform, int x, int y, int width, int h
         bottomRightColor = GetInterpolatedColor(x + width, y + height);
     }
 
-    Vector3 v1 = (transform * Vector3((float)x, (float)y, 0.0f)) - posAdjust;
-    Vector3 v2 = (transform * Vector3((float)x + (float)width, (float)y, 0.0f)) - posAdjust;
-    Vector3 v3 = (transform * Vector3((float)x, (float)y + (float)height, 0.0f)) - posAdjust;
-    Vector3 v4 = (transform * Vector3((float)x + (float)width, (float)y + (float)height, 0.0f)) - posAdjust;
+    Vector3 v1 = (transform * Vector3((float)x, (float)y, 0.0f));
+    Vector3 v2 = (transform * Vector3((float)x + (float)width, (float)y, 0.0f));
+    Vector3 v3 = (transform * Vector3((float)x, (float)y + (float)height, 0.0f));
+    Vector3 v4 = (transform * Vector3((float)x + (float)width, (float)y + (float)height, 0.0f));
 
     float leftUV = ((float)texOffsetX) * invTextureSize_.x_;
     float topUV = ((float)texOffsetY) * invTextureSize_.y_;
@@ -258,10 +256,10 @@ void UIBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, int t
 void UIBatch::AddQuad(const Matrix3x4& transform, const IntVector2& a, const IntVector2& b, const IntVector2& c, const IntVector2& d,
     const IntVector2& texA, const IntVector2& texB, const IntVector2& texC, const IntVector2& texD)
 {
-    Vector3 v1 = (transform * Vector3((float)a.x_, (float)a.y_, 0.0f)) - posAdjust;
-    Vector3 v2 = (transform * Vector3((float)b.x_, (float)b.y_, 0.0f)) - posAdjust;
-    Vector3 v3 = (transform * Vector3((float)c.x_, (float)c.y_, 0.0f)) - posAdjust;
-    Vector3 v4 = (transform * Vector3((float)d.x_, (float)d.y_, 0.0f)) - posAdjust;
+    Vector3 v1 = (transform * Vector3((float)a.x_, (float)a.y_, 0.0f));
+    Vector3 v2 = (transform * Vector3((float)b.x_, (float)b.y_, 0.0f));
+    Vector3 v3 = (transform * Vector3((float)c.x_, (float)c.y_, 0.0f));
+    Vector3 v4 = (transform * Vector3((float)d.x_, (float)d.y_, 0.0f));
 
     Vector2 uv1((float)texA.x_ * invTextureSize_.x_, (float)texA.y_ * invTextureSize_.y_);
     Vector2 uv2((float)texB.x_ * invTextureSize_.x_, (float)texB.y_ * invTextureSize_.y_);
@@ -320,10 +318,10 @@ void UIBatch::AddQuad(const Matrix3x4& transform, const IntVector2& a, const Int
     const IntVector2& texA, const IntVector2& texB, const IntVector2& texC, const IntVector2& texD, const Color& colA,
     const Color& colB, const Color& colC, const Color& colD)
 {
-    Vector3 v1 = (transform * Vector3((float)a.x_, (float)a.y_, 0.0f)) - posAdjust;
-    Vector3 v2 = (transform * Vector3((float)b.x_, (float)b.y_, 0.0f)) - posAdjust;
-    Vector3 v3 = (transform * Vector3((float)c.x_, (float)c.y_, 0.0f)) - posAdjust;
-    Vector3 v4 = (transform * Vector3((float)d.x_, (float)d.y_, 0.0f)) - posAdjust;
+    Vector3 v1 = (transform * Vector3((float)a.x_, (float)a.y_, 0.0f));
+    Vector3 v2 = (transform * Vector3((float)b.x_, (float)b.y_, 0.0f));
+    Vector3 v3 = (transform * Vector3((float)c.x_, (float)c.y_, 0.0f));
+    Vector3 v4 = (transform * Vector3((float)d.x_, (float)d.y_, 0.0f));
 
     Vector2 uv1((float)texA.x_ * invTextureSize_.x_, (float)texA.y_ * invTextureSize_.y_);
     Vector2 uv2((float)texB.x_ * invTextureSize_.x_, (float)texB.y_ * invTextureSize_.y_);

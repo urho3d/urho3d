@@ -3,31 +3,14 @@
 #include "Samplers.hlsl"
 #include "ScreenPos.hlsl"
 
-#ifndef D3D11
-
-// D3D9 uniforms
-uniform float cBloomThreshold;
-uniform float2 cBloomMix;
-uniform float2 cBlurHOffsets;
-uniform float2 cBlurHInvSize;
-
-#else
-
 // D3D11 constant buffers
-#ifdef COMPILEVS
-cbuffer CustomVS : register(b6)
-{
-    float2 cBlurHOffsets;
-}
-#else
+#ifdef COMPILEPS
 cbuffer CustomPS : register(b6)
 {
     float cBloomThreshold;
     float2 cBloomMix;
     float2 cBlurHInvSize;
 }
-#endif
-
 #endif
 
 static const float offsets[5] = {
@@ -54,7 +37,7 @@ void VS(float4 iPos : POSITION,
     float4x3 modelMatrix = iModelMatrix;
     float3 worldPos = GetWorldPos(modelMatrix);
     oPos = GetClipPos(worldPos);
-    oTexCoord = GetQuadTexCoord(oPos) + cBlurHOffsets;
+    oTexCoord = GetQuadTexCoord(oPos);
     oScreenPos = GetScreenPosPreDiv(oPos);
 }
 

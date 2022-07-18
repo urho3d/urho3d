@@ -5,16 +5,11 @@
 #include "Fog.hlsl"
 
 #if defined(COMPILEPS) && defined(SOFTPARTICLES)
-#ifndef D3D11
-// D3D9 uniform
-uniform float cSoftParticleFadeScale;
-#else
 // D3D11 constant buffer
 cbuffer CustomPS : register(b6)
 {
     float cSoftParticleFadeScale;
 }
-#endif
 #endif
 
 void VS(float4 iPos : POSITION,
@@ -48,7 +43,7 @@ void VS(float4 iPos : POSITION,
     #ifdef VERTEXCOLOR
         out float4 oColor : COLOR0,
     #endif
-    #if defined(D3D11) && defined(CLIPPLANE)
+    #if defined(CLIPPLANE)
         out float oClip : SV_CLIPDISTANCE0,
     #endif
     out float4 oPos : OUTPOSITION)
@@ -64,7 +59,7 @@ void VS(float4 iPos : POSITION,
     oTexCoord = GetTexCoord(iTexCoord);
     oWorldPos = float4(worldPos, GetDepth(oPos));
 
-    #if defined(D3D11) && defined(CLIPPLANE)
+    #if defined(CLIPPLANE)
         oClip = dot(oPos, cClipPlane);
     #endif
 
@@ -85,7 +80,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
     #ifdef VERTEXCOLOR
         float4 iColor : COLOR0,
     #endif
-    #if defined(D3D11) && defined(CLIPPLANE)
+    #if defined(CLIPPLANE)
         float iClip : SV_CLIPDISTANCE0,
     #endif
     out float4 oColor : OUTCOLOR0)

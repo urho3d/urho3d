@@ -8,19 +8,6 @@
 #include "PBR.hlsl"
 #include "IBL.hlsl"
 
-#ifndef D3D11
-
-// D3D9 uniforms
-uniform float cWindHeightFactor;
-uniform float cWindHeightPivot;
-uniform float cWindPeriod;
-uniform float2 cWindWorldSpacing;
-#ifdef WINDSTEMAXIS
-    uniform float3 cWindStemAxis;
-#endif
-
-#else
-
 // D3D11 constant buffer
 cbuffer CustomVS : register(b6)
 {
@@ -32,8 +19,6 @@ cbuffer CustomVS : register(b6)
         float3 cWindStemAxis;
     #endif
 }
-
-#endif
 
 void VS(float4 iPos : POSITION,
     #if !defined(BILLBOARD) && !defined(TRAILFACECAM)
@@ -92,7 +77,7 @@ void VS(float4 iPos : POSITION,
     #ifdef VERTEXCOLOR
         out float4 oColor : COLOR0,
     #endif
-    #if defined(D3D11) && defined(CLIPPLANE)
+    #if defined(CLIPPLANE)
         out float oClip : SV_CLIPDISTANCE0,
     #endif
     out float4 oPos : OUTPOSITION)
@@ -119,7 +104,7 @@ void VS(float4 iPos : POSITION,
     oNormal = GetWorldNormal(modelMatrix);
     oWorldPos = float4(worldPos, GetDepth(oPos));
 
-    #if defined(D3D11) && defined(CLIPPLANE)
+    #if defined(CLIPPLANE)
         oClip = dot(oPos, cClipPlane);
     #endif
 

@@ -7,7 +7,6 @@
 uniform float2 cBlurDir;
 uniform float cBlurRadius;
 uniform float cBlurSigma;
-uniform float2 cBlurHOffsets;
 uniform float2 cBlurHInvSize;
 
 void VS(float4 iPos : POSITION,
@@ -18,7 +17,7 @@ void VS(float4 iPos : POSITION,
     float4x3 modelMatrix = iModelMatrix;
     float3 worldPos = GetWorldPos(modelMatrix);
     oPos = GetClipPos(worldPos);
-    oTexCoord = GetQuadTexCoord(oPos) + cBlurHOffsets;
+    oTexCoord = GetQuadTexCoord(oPos);
     oScreenPos = GetScreenPosPreDiv(oPos);
 }
 
@@ -27,34 +26,18 @@ void PS(float2 iTexCoord : TEXCOORD0,
     out float4 oColor : OUTCOLOR0)
 {
     #ifdef BLUR3
-        #ifndef D3D11
-            oColor = GaussianBlur(3, cBlurDir, cBlurHInvSize * cBlurRadius, cBlurSigma, sDiffMap, iTexCoord);
-        #else
-            oColor = GaussianBlur(3, cBlurDir, cBlurHInvSize * cBlurRadius, cBlurSigma, tDiffMap, sDiffMap, iTexCoord);
-        #endif
+        oColor = GaussianBlur(3, cBlurDir, cBlurHInvSize * cBlurRadius, cBlurSigma, tDiffMap, sDiffMap, iTexCoord);
     #endif
 
     #ifdef BLUR5
-        #ifndef D3D11
-            oColor = GaussianBlur(5, cBlurDir, cBlurHInvSize * cBlurRadius, cBlurSigma, sDiffMap, iTexCoord);
-        #else
-            oColor = GaussianBlur(5, cBlurDir, cBlurHInvSize * cBlurRadius, cBlurSigma, tDiffMap, sDiffMap, iTexCoord);
-        #endif
+        oColor = GaussianBlur(5, cBlurDir, cBlurHInvSize * cBlurRadius, cBlurSigma, tDiffMap, sDiffMap, iTexCoord);
     #endif
 
     #ifdef BLUR7
-        #ifndef D3D11
-            oColor = GaussianBlur(7, cBlurDir, cBlurHInvSize * cBlurRadius, cBlurSigma, sDiffMap, iTexCoord);
-        #else
-            oColor = GaussianBlur(7, cBlurDir, cBlurHInvSize * cBlurRadius, cBlurSigma, tDiffMap, sDiffMap, iTexCoord);
-        #endif
+        oColor = GaussianBlur(7, cBlurDir, cBlurHInvSize * cBlurRadius, cBlurSigma, tDiffMap, sDiffMap, iTexCoord);
     #endif
 
     #ifdef BLUR9
-        #ifndef D3D11
-            oColor = GaussianBlur(9, cBlurDir, cBlurHInvSize * cBlurRadius, cBlurSigma, sDiffMap, iTexCoord);
-        #else
-            oColor = GaussianBlur(9, cBlurDir, cBlurHInvSize * cBlurRadius, cBlurSigma, tDiffMap, sDiffMap, iTexCoord);
-        #endif
+        oColor = GaussianBlur(9, cBlurDir, cBlurHInvSize * cBlurRadius, cBlurSigma, tDiffMap, sDiffMap, iTexCoord);
     #endif
 }
