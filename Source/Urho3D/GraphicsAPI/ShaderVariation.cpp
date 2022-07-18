@@ -67,11 +67,6 @@ void ShaderVariation::OnDeviceLost()
         return OnDeviceLost_OGL();
 #endif
 
-#ifdef URHO3D_D3D9
-    if (gapi == GAPI_D3D9)
-        return OnDeviceLost_D3D9();
-#endif
-
 #ifdef URHO3D_D3D11
     if (gapi == GAPI_D3D11)
         return OnDeviceLost_D3D11();
@@ -85,11 +80,6 @@ void ShaderVariation::Release()
 #ifdef URHO3D_OPENGL
     if (gapi == GAPI_OPENGL)
         return Release_OGL();
-#endif
-
-#ifdef URHO3D_D3D9
-    if (gapi == GAPI_D3D9)
-        return Release_D3D9();
 #endif
 
 #ifdef URHO3D_D3D11
@@ -107,11 +97,6 @@ bool ShaderVariation::Create()
         return Create_OGL();
 #endif
 
-#ifdef URHO3D_D3D9
-    if (gapi == GAPI_D3D9)
-        return Create_D3D9();
-#endif
-
 #ifdef URHO3D_D3D11
     if (gapi == GAPI_D3D11)
         return Create_D3D11();
@@ -127,11 +112,6 @@ void ShaderVariation::SetDefines(const String& defines)
 #ifdef URHO3D_OPENGL
     if (gapi == GAPI_OPENGL)
         return SetDefines_OGL(defines);
-#endif
-
-#ifdef URHO3D_D3D9
-    if (gapi == GAPI_D3D9)
-        return SetDefines_D3D9(defines);
 #endif
 
 #ifdef URHO3D_D3D11

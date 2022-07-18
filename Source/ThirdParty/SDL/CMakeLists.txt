@@ -322,7 +322,7 @@ endif ()
 dep_option(WASAPI              "Use the Windows WASAPI audio driver" ON WINDOWS OFF)
 # Urho3D
 if (WINDOWS)
-  if (URHO3D_D3D9 OR URHO3D_D3D11)
+  if (URHO3D_D3D11)
     set (RENDER_D3D TRUE)
   else ()
     set (RENDER_D3D FALSE)

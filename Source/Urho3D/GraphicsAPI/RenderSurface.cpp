@@ -102,14 +102,6 @@ RenderSurface::RenderSurface(Texture* parentTexture)
     }
 #endif
 
-#ifdef URHO3D_D3D9
-    if (gapi == GAPI_D3D9)
-    {
-        Constructor_D3D9(parentTexture);
-        return;
-    }
-#endif
-
 #ifdef URHO3D_D3D11
     if (gapi == GAPI_D3D11)
     {
@@ -126,11 +118,6 @@ bool RenderSurface::CreateRenderBuffer(unsigned width, unsigned height, unsigned
 #ifdef URHO3D_OPENGL
     if (gapi == GAPI_OPENGL)
         return CreateRenderBuffer_OGL(width, height, format, multiSample);
-#endif
-
-#ifdef URHO3D_D3D9
-    if (gapi == GAPI_D3D9)
-        return CreateRenderBuffer_D3D9(width, height, format, multiSample);
 #endif
 
 #ifdef URHO3D_D3D11
@@ -150,11 +137,6 @@ void RenderSurface::OnDeviceLost()
         return OnDeviceLost_OGL();
 #endif
 
-#ifdef URHO3D_D3D9
-    if (gapi == GAPI_D3D9)
-        return OnDeviceLost_D3D9();
-#endif
-
 #ifdef URHO3D_D3D11
     if (gapi == GAPI_D3D11)
         return OnDeviceLost_D3D11();
@@ -168,11 +150,6 @@ void RenderSurface::Release()
 #ifdef URHO3D_OPENGL
     if (gapi == GAPI_OPENGL)
         return Release_OGL();
-#endif
-
-#ifdef URHO3D_D3D9
-    if (gapi == GAPI_D3D9)
-        return Release_D3D9();
 #endif
 
 #ifdef URHO3D_D3D11
