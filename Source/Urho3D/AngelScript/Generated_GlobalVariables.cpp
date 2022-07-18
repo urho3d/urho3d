@@ -94,9 +94,6 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // static const String EP_DIRECT3D11 | File: ../Engine/EngineDefs.h
     engine->RegisterGlobalProperty("const String EP_DIRECT3D11", (void*)&EP_DIRECT3D11);
 
-    // static const String EP_DIRECT3D9 | File: ../Engine/EngineDefs.h
-    engine->RegisterGlobalProperty("const String EP_DIRECT3D9", (void*)&EP_DIRECT3D9);
-
     // static const String EP_DUMP_SHADERS | File: ../Engine/EngineDefs.h
     engine->RegisterGlobalProperty("const String EP_DUMP_SHADERS", (void*)&EP_DUMP_SHADERS);
 

@@ -1733,14 +1733,7 @@ void View::SetRenderTargets(RenderPathCommand& command)
                 useColorWrite = false;
                 useCustomDepth = true;
 
-                // On D3D9 actual depth-only rendering is illegal, we need a color rendertarget
-                if (Graphics::GetGAPI() == GAPI_D3D9 && !depthOnlyDummyTexture_)
-                {
-                    depthOnlyDummyTexture_ = renderer_->GetScreenBuffer(texture->GetWidth(), texture->GetHeight(),
-                        graphics_->GetDummyColorFormat(), texture->GetMultiSample(), texture->GetAutoResolve(), false, false, false);
-                }
-
-                graphics_->SetRenderTarget(0, GetRenderSurfaceFromTexture(depthOnlyDummyTexture_));
+                graphics_->SetRenderTarget(0, (RenderSurface*)nullptr);
                 graphics_->SetDepthStencil(GetRenderSurfaceFromTexture(texture));
             }
             else
@@ -1942,7 +1935,6 @@ void View::AllocateScreenBuffers()
     bool hasPingpong = false;
     bool needSubstitute = false;
     unsigned numViewportTextures = 0;
-    depthOnlyDummyTexture_ = nullptr;
     lastCustomDepthSurface_ = nullptr;
 
     // Check for commands with special meaning: has custom depth, renders a scene pass to other than the destination viewport,

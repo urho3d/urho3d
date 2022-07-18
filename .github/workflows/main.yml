@@ -232,7 +232,6 @@ jobs:
           - shared
         graphics-api:
           - DX11
-          - DX9
           - OpenGL
     env:
       HOST: ${{ github.job }}

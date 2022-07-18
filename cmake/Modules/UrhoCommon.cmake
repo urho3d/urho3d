@@ -162,7 +162,6 @@ if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
     cmake_dependent_option (URHO3D_OPENGL "Use OpenGL (Windows platform only)" "${DEFAULT_OPENGL}" WIN32 TRUE)
     # On Windows platform Direct3D11 can be optionally chosen
     # Using Direct3D11 on non-MSVC compiler may require copying and renaming Microsoft official libraries (.lib to .a), else link failures or non-functioning graphics may result
-    cmake_dependent_option (URHO3D_D3D9 "Use Direct3D9 (Windows platform only)" TRUE "WIN32" FALSE)
     cmake_dependent_option (URHO3D_D3D11 "Use Direct3D11 (Windows platform only)" TRUE "WIN32" FALSE)
     if (X86 OR E2K OR WEB)
         # TODO: Rename URHO3D_SSE to URHO3D_SIMD
@@ -358,14 +357,6 @@ endif ()
 if (RPI)
     set_property (CACHE RPI_ABI PROPERTY STRINGS ${RPI_SUPPORTED_ABIS})
 endif ()
-# Handle mutually exclusive options and implied options
-#if (URHO3D_D3D11)
-#    set (URHO3D_OPENGL 0)
-#    unset (URHO3D_OPENGL CACHE)
-#endif ()
-#if (NOT URHO3D_OPENGL AND NOT URHO3D_D3D11)
-#    set (URHO3D_D3D9 1) # TODO: Make option
-#endif ()
 if (URHO3D_DATABASE_ODBC)
     set (URHO3D_DATABASE_SQLITE 0)
     unset (URHO3D_DATABASE_SQLITE CACHE)
@@ -486,10 +477,6 @@ if (WIN32 AND NOT CMAKE_PROJECT_NAME MATCHES ^Urho3D-ExternalProject-)
     set (DIRECTX_OPTIONAL_COMPONENTS DInput DSound XInput)
     if (URHO3D_D3D11)
         list (APPEND DIRECTX_REQUIRED_COMPONENTS D3D11)
-    endif ()
-
-    if (URHO3D_D3D9)
-        list (APPEND DIRECTX_REQUIRED_COMPONENTS D3D)
     endif ()
 
     find_package (DirectX REQUIRED ${DIRECTX_REQUIRED_COMPONENTS} OPTIONAL_COMPONENTS ${DIRECTX_OPTIONAL_COMPONENTS})

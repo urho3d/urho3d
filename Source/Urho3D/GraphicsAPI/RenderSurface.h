@@ -126,13 +126,6 @@ private:
     void Release_OGL();
 #endif // def URHO3D_OPENGL
 
-#ifdef URHO3D_D3D9
-    void Constructor_D3D9(Texture* parentTexture);
-    bool CreateRenderBuffer_D3D9(unsigned width, unsigned height, unsigned format, int multiSample);
-    void OnDeviceLost_D3D9();
-    void Release_D3D9();
-#endif // def URHO3D_D3D9
-
 #ifdef URHO3D_D3D11
     void Constructor_D3D11(Texture* parentTexture);
     bool CreateRenderBuffer_D3D11(unsigned width, unsigned height, unsigned format, int multiSample);

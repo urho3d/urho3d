@@ -10,10 +10,6 @@
 #include "OpenGL/OGLGraphicsImpl.h"
 #endif
 
-#ifdef URHO3D_D3D9
-#include "Direct3D9/D3D9GraphicsImpl.h"
-#endif
-
 #ifdef URHO3D_D3D11
 #include "Direct3D11/D3D11GraphicsImpl.h"
 #endif

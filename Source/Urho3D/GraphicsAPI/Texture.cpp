@@ -274,11 +274,6 @@ void Texture::SetSRGB(bool enable)
         return SetSRGB_OGL(enable);
 #endif
 
-#ifdef URHO3D_D3D9
-    if (gapi == GAPI_D3D9)
-        return SetSRGB_D3D9(enable);
-#endif
-
 #ifdef URHO3D_D3D11
     if (gapi == GAPI_D3D11)
         return SetSRGB_D3D11(enable);
@@ -294,11 +289,6 @@ void Texture::UpdateParameters()
         return UpdateParameters_OGL();
 #endif
 
-#ifdef URHO3D_D3D9
-    if (gapi == GAPI_D3D9)
-        return UpdateParameters_D3D9();
-#endif
-
 #ifdef URHO3D_D3D11
     if (gapi == GAPI_D3D11)
         return UpdateParameters_D3D11();
@@ -312,11 +302,6 @@ bool Texture::GetParametersDirty() const
 #ifdef URHO3D_OPENGL
     if (gapi == GAPI_OPENGL)
         return GetParametersDirty_OGL();
-#endif
-
-#ifdef URHO3D_D3D9
-    if (gapi == GAPI_D3D9)
-        return GetParametersDirty_D3D9();
 #endif
 
 #ifdef URHO3D_D3D11
@@ -336,11 +321,6 @@ bool Texture::IsCompressed() const
         return IsCompressed_OGL();
 #endif
 
-#ifdef URHO3D_D3D9
-    if (gapi == GAPI_D3D9)
-        return IsCompressed_D3D9();
-#endif
-
 #ifdef URHO3D_D3D11
     if (gapi == GAPI_D3D11)
         return IsCompressed_D3D11();
@@ -358,11 +338,6 @@ unsigned Texture::GetRowDataSize(int width) const
         return GetRowDataSize_OGL(width);
 #endif
 
-#ifdef URHO3D_D3D9
-    if (gapi == GAPI_D3D9)
-        return GetRowDataSize_D3D9(width);
-#endif
-
 #ifdef URHO3D_D3D11
     if (gapi == GAPI_D3D11)
         return GetRowDataSize_D3D11(width);
@@ -378,11 +353,6 @@ void Texture::RegenerateLevels()
 #ifdef URHO3D_OPENGL
     if (gapi == GAPI_OPENGL)
         return RegenerateLevels_OGL();
-#endif
-
-#ifdef URHO3D_D3D9
-    if (gapi == GAPI_D3D9)
-        return RegenerateLevels_D3D9();
 #endif
 
 #ifdef URHO3D_D3D11

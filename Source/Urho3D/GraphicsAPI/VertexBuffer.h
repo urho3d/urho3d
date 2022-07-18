@@ -164,20 +164,6 @@ private:
     void UnmapBuffer_OGL();
 #endif // def URHO3D_OPENGL
 
-#ifdef URHO3D_D3D9
-    void OnDeviceLost_D3D9();
-    void OnDeviceReset_D3D9();
-    void Release_D3D9();
-    bool SetData_D3D9(const void* data);
-    bool SetDataRange_D3D9(const void* data, i32 start, i32 count, bool discard = false);
-    void* Lock_D3D9(i32 start, i32 count, bool discard);
-    void Unlock_D3D9();
-    bool Create_D3D9();
-    bool UpdateToGPU_D3D9();
-    void* MapBuffer_D3D9(i32 start, i32 count, bool discard);
-    void UnmapBuffer_D3D9();
-#endif // def URHO3D_D3D9
-
 #ifdef URHO3D_D3D11
     void OnDeviceLost_D3D11();
     void OnDeviceReset_D3D11();
