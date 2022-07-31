@@ -28,7 +28,10 @@ set "arch="
 :loop
 if not "%~1" == "" (
     if "%~1" == "-D" (
-        if "%~2" == "WEB" if "%~3" == "1" set "OPTS=-G "MinGW Makefiles" -D CMAKE_TOOLCHAIN_FILE="%TOOLCHAINS%\Emscripten.cmake""
+        if "%~2" == "WEB" if "%~3" == "1" (
+            set "TOOLCHAINS=%EMSCRIPTEN_ROOT_PATH%\tools\cmake\Modules\Platform"
+            set "OPTS=-G "MinGW Makefiles" -D CMAKE_TOOLCHAIN_FILE="%TOOLCHAINS%\Emscripten.cmake""
+        )
         if "%~2" == "MINGW" if "%~3" == "1" set "OPTS=-G "MinGW Makefiles""
         if "%~2" == "URHO3D_64BIT" if "%~3" == "1" set "arch=-A x64"
         if "%~2" == "URHO3D_64BIT" if "%~3" == "0" set "arch=-A Win32"
