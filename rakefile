@@ -222,7 +222,7 @@ end
 task :ci_publish_web do
   require 'json'
   system 'git clone --depth 1 -q https://github.com/urho3d/urho3d.github.io.git build/urho3d.github.io' or abort 'Failed to clone urho3d/urho3d.github.io'
-  system "rsync -a --delete --exclude tool --exclude *.pak --exclude index.md build/ci/bin/ build/urho3d.github.io/samples" or abort 'Failed to rsync Web samples'
+  system "rsync -a --delete --exclude tool --exclude *.pak --exclude index.md ../engine_build/bin/ build/urho3d.github.io/samples" or abort 'Failed to rsync Web samples'
   Dir.chdir('build/urho3d.github.io/samples') {
     next unless system 'git diff --quiet Urho3D.js.data'
     uuid = `git diff --color=never --word-diff-regex='\\w+' --word-diff=porcelain Urho3D.js`.split.grep(/^[+-]\w+-/).map { |it| it[0] = ''; it }
