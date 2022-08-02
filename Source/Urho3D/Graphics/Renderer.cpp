@@ -1554,7 +1554,7 @@ void Renderer::ResetShadowMapAllocations()
 
 void Renderer::ResetScreenBufferAllocations()
 {
-    for (HashMap<unsigned long long, unsigned>::Iterator i = screenBufferAllocations_.Begin(); i != screenBufferAllocations_.End(); ++i)
+    for (HashMap<hash64, unsigned>::Iterator i = screenBufferAllocations_.Begin(); i != screenBufferAllocations_.End(); ++i)
         i->second_ = 0;
 }
 
