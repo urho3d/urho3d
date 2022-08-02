@@ -90,6 +90,8 @@ void ASRegisterManualFirst(asIScriptEngine* engine)
 
     engine->RegisterTypedef("SDL_JoystickID", "int");
     engine->RegisterTypedef("c32", "uint");
+    engine->RegisterTypedef("hash32", "uint");
+    engine->RegisterTypedef("hash64", "uint64");
 
     ASRegisterManualFirst_Addons(engine);
     ASRegisterManualFirst_Graphics(engine);

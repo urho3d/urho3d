@@ -233,7 +233,7 @@ public:
     unsigned ToUIntArgb() const { return ToUIntMask(ARGB); }
 
     /// Return hash value for HashSet & HashMap.
-    unsigned ToHash() const { return ToUInt(); }
+    hash32 ToHash() const { return ToUInt(); }
 
     /// Red value.
     float r_;

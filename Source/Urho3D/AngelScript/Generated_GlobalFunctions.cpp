@@ -369,8 +369,8 @@ void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
     // template <class T> int RoundToInt(T x) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("int RoundToInt(float)", AS_FUNCTIONPR(RoundToInt, (float), int), AS_CALL_CDECL);
 
-    // constexpr unsigned SDBMHash(unsigned hash, unsigned char c) | File: ../Math/MathDefs.h
-    engine->RegisterGlobalFunction("uint SDBMHash(uint, uint8)", AS_FUNCTIONPR(SDBMHash, (unsigned, unsigned char), unsigned), AS_CALL_CDECL);
+    // constexpr hash32 SDBMHash(hash32 hash, u8 c) | File: ../Math/MathDefs.h
+    engine->RegisterGlobalFunction("hash32 SDBMHash(hash32, uint8)", AS_FUNCTIONPR(SDBMHash, (hash32, u8), hash32), AS_CALL_CDECL);
 
     // void SetMiniDumpDir(const String& pathName) | File: ../Core/ProcessUtils.h
     engine->RegisterGlobalFunction("void SetMiniDumpDir(const String&in)", AS_FUNCTIONPR(SetMiniDumpDir, (const String&), void), AS_CALL_CDECL);

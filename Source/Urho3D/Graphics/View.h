@@ -280,11 +280,11 @@ private:
     }
 
     /// Return hash code for a vertex light queue.
-    unsigned long long GetVertexLightQueueHash(const Vector<Light*>& vertexLights)
+    hash64 GetVertexLightQueueHash(const Vector<Light*>& vertexLights)
     {
-        unsigned long long hash = 0;
+        hash64 hash = 0;
         for (Vector<Light*>::ConstIterator i = vertexLights.Begin(); i != vertexLights.End(); ++i)
-            hash += (unsigned long long)(*i);
+            hash += (hash64)(*i);
         return hash;
     }
 
@@ -392,7 +392,7 @@ private:
     /// Per-pixel light queues.
     Vector<LightBatchQueue> lightQueues_;
     /// Per-vertex light queues.
-    HashMap<unsigned long long, LightBatchQueue> vertexLightQueues_;
+    HashMap<hash64, LightBatchQueue> vertexLightQueues_;
     /// Batch queues by pass index.
     HashMap<unsigned, BatchQueue> batchQueues_;
     /// Index of the GBuffer pass.

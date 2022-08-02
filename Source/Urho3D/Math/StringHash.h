@@ -25,7 +25,7 @@ public:
     StringHash(const StringHash& rhs) noexcept = default;
 
     /// Construct with an initial value.
-    constexpr explicit StringHash(unsigned value) noexcept
+    constexpr explicit StringHash(hash32 value) noexcept
         : value_(value)
     {
     }
@@ -78,7 +78,7 @@ public:
 
     /// Return hash value.
     /// @property
-    unsigned Value() const { return value_; }
+    hash32 Value() const { return value_; }
 
     /// Return as string.
     String ToString() const;
@@ -87,18 +87,16 @@ public:
     String Reverse() const;
 
     /// Return hash value for HashSet & HashMap.
-    unsigned ToHash() const { return value_; }
+    hash32 ToHash() const { return value_; }
 
     /// Calculate hash value from a C string.
-    static constexpr u32 Calculate(const char* str, unsigned hash = 0)
+    static constexpr hash32 Calculate(const char* str, hash32 hash = 0)
     {
         if (!str)
             return hash;
 
         while (*str)
-        {
-            hash = SDBMHash(hash, (unsigned char)*str++);
-        }
+            hash = SDBMHash(hash, (u8)*str++);
 
         return hash;
     }
@@ -111,7 +109,7 @@ public:
 
 private:
     /// Hash value.
-    unsigned value_;
+    hash32 value_;
 };
 
 constexpr StringHash operator ""_hash(const char* str, size_t)

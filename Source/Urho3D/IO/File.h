@@ -62,7 +62,7 @@ public:
     i32 Write(const void* data, i32 size) override;
 
     /// Return a checksum of the file contents using the SDBM hash algorithm.
-    unsigned GetChecksum() override;
+    hash32 GetChecksum() override;
 
     /// Open a filesystem file. Return true if successful.
     bool Open(const String& fileName, FileMode mode = FILE_READ);
@@ -115,7 +115,7 @@ private:
     /// Start position within a package file, 0 for regular files.
     unsigned offset_;
     /// Content checksum.
-    unsigned checksum_;
+    hash32 checksum_;
     /// Compression flag.
     bool compressed_;
     /// Synchronization needed before read -flag.

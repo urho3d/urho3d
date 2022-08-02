@@ -128,7 +128,7 @@ public:
     String ToString() const;
 
     /// Return hash value for HashSet & HashMap.
-    unsigned ToHash() const { return (unsigned)x_ * 31 + (unsigned)y_; }
+    hash32 ToHash() const { return (hash32)x_ * 31 + (hash32)y_; }
 
     /// Return length.
     float Length() const { return sqrtf((float)(x_ * x_ + y_ * y_)); }
