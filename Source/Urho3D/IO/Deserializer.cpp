@@ -36,7 +36,7 @@ const String& Deserializer::GetName() const
     return String::EMPTY;
 }
 
-unsigned Deserializer::GetChecksum()
+hash32 Deserializer::GetChecksum()
 {
     return 0;
 }

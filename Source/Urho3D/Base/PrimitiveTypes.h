@@ -15,19 +15,23 @@ static_assert(sizeof(long) == 4 || sizeof(long) == 8); // (Win32, Win64, Unix32)
 static_assert(sizeof(long long) == 8);
 
 // https://en.cppreference.com/w/cpp/types/integer
-typedef int8_t   i8;
-typedef uint8_t  u8;
-typedef int16_t  i16;
-typedef uint16_t u16;
-typedef int32_t  i32;
-typedef uint32_t u32;
-typedef int64_t  i64;
-typedef uint64_t u64;
+using i8 = int8_t;
+using u8 = uint8_t;
+using i16 = int16_t;
+using u16 = uint16_t;
+using i32 = int32_t;
+using u32 = uint32_t;
+using i64 = int64_t;
+using u64 = uint64_t;
 
 // Unicode code point (UTF-32 code unit)
 static_assert(sizeof(char32_t) == 4);
-typedef char32_t c32;
+using c32 = char32_t;
 
 // Pointer arithmetics
 static_assert(sizeof(void*) == sizeof(ptrdiff_t));
 static_assert(sizeof(void*) == sizeof(intptr_t));
+
+// Some hash value (checksum for example)
+using hash32 = u32;
+using hash64 = u64;

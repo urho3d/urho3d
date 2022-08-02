@@ -2529,8 +2529,8 @@ static void StringHash__StringHash_constspStringHashamp(StringHash* _ptr, const 
     new(_ptr) StringHash(rhs);
 }
 
-// explicit constexpr StringHash::StringHash(unsigned value) noexcept
-static void StringHash_constexpr_StringHash_unsigned(StringHash* _ptr, unsigned value)
+// explicit constexpr StringHash::StringHash(hash32 value) noexcept
+static void StringHash_constexpr_StringHash_hash32(StringHash* _ptr, hash32 value)
 {
     new(_ptr) StringHash(value);
 }
@@ -2549,8 +2549,8 @@ static void Register_StringHash(asIScriptEngine* engine)
 
     // StringHash::StringHash(const StringHash& rhs) noexcept = default
     engine->RegisterObjectBehaviour("StringHash", asBEHAVE_CONSTRUCT, "void f(const StringHash&in)", AS_FUNCTION_OBJFIRST(StringHash__StringHash_constspStringHashamp), AS_CALL_CDECL_OBJFIRST);
-    // explicit constexpr StringHash::StringHash(unsigned value) noexcept
-    engine->RegisterObjectBehaviour("StringHash", asBEHAVE_CONSTRUCT, "void f(uint)", AS_FUNCTION_OBJFIRST(StringHash_constexpr_StringHash_unsigned), AS_CALL_CDECL_OBJFIRST);
+    // explicit constexpr StringHash::StringHash(hash32 value) noexcept
+    engine->RegisterObjectBehaviour("StringHash", asBEHAVE_CONSTRUCT, "void f(hash32)", AS_FUNCTION_OBJFIRST(StringHash_constexpr_StringHash_hash32), AS_CALL_CDECL_OBJFIRST);
     // StringHash::StringHash(const String& str) noexcept
     engine->RegisterObjectBehaviour("StringHash", asBEHAVE_CONSTRUCT, "void f(const String&in)", AS_FUNCTION_OBJFIRST(StringHash__StringHash_constspStringamp), AS_CALL_CDECL_OBJFIRST);
 

@@ -26,14 +26,14 @@ struct FileEntry
     String name_;
     unsigned offset_{};
     unsigned size_{};
-    unsigned checksum_{};
+    hash32 checksum_{};
 };
 
 SharedPtr<Context> context_(new Context());
 SharedPtr<FileSystem> fileSystem_(new FileSystem(context_));
 String basePath_;
 Vector<FileEntry> entries_;
-unsigned checksum_ = 0;
+hash32 checksum_ = 0;
 bool compress_ = false;
 bool quiet_ = false;
 unsigned blockSize_ = COMPRESSED_BLOCK_SIZE;

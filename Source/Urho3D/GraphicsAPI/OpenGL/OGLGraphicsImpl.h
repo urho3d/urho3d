@@ -116,7 +116,7 @@ private:
     /// Current pixel format.
     int pixelFormat_{};
     /// Map for FBO's per resolution and format.
-    HashMap<unsigned long long, FrameBufferObject> frameBuffers_;
+    HashMap<hash64, FrameBufferObject> frameBuffers_;
     /// OpenGL texture types in use.
     unsigned textureTypes_[MAX_TEXTURE_UNITS]{};
     /// Constant buffer search map.
