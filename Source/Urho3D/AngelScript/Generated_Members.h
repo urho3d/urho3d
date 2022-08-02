@@ -8634,8 +8634,8 @@ template <class T> void RegisterMembers_ShaderVariation(asIScriptEngine* engine,
     // const String& ShaderVariation::GetDefinesClipPlane()
     engine->RegisterObjectMethod(className, "const String& GetDefinesClipPlane()", AS_METHODPR(T, GetDefinesClipPlane, (), const String&), AS_CALL_THISCALL);
 
-    // unsigned long long ShaderVariation::GetElementHash() const
-    engine->RegisterObjectMethod(className, "uint64 GetElementHash() const", AS_METHODPR(T, GetElementHash, () const, unsigned long long), AS_CALL_THISCALL);
+    // hash64 ShaderVariation::GetElementHash() const
+    engine->RegisterObjectMethod(className, "hash64 GetElementHash() const", AS_METHODPR(T, GetElementHash, () const, hash64), AS_CALL_THISCALL);
 
     // String ShaderVariation::GetFullName() const
     engine->RegisterObjectMethod(className, "String GetFullName() const", AS_METHODPR(T, GetFullName, () const, String), AS_CALL_THISCALL);
