@@ -327,8 +327,8 @@ jobs:
         set -x # Echo commands
         echo "Current dir: $PWD"
         git clone --depth 1 https://github.com/emscripten-core/emsdk.git
-        ./emsdk/emsdk install latest
-        ./emsdk/emsdk activate latest
+        ./emsdk/emsdk install 3.1.17
+        ./emsdk/emsdk activate 3.1.17
         chmod +x ./emsdk/emsdk_env.sh
         ./emsdk/emsdk_env.sh
         TOOLCHAIN=$PWD/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
