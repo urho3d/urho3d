@@ -993,7 +993,7 @@ Texture* Renderer::GetScreenBuffer(int width, int height, unsigned format, int m
     if (multiSample == 1)
         autoResolve = false;
 
-    auto searchKey = (unsigned long long)format << 32u | multiSample << 24u | width << 12u | height;
+    hash64 searchKey = (hash64)format << 32u | multiSample << 24u | width << 12u | height;
     if (filtered)
         searchKey |= 0x8000000000000000ULL;
     if (srgb)
@@ -1005,7 +1005,7 @@ Texture* Renderer::GetScreenBuffer(int width, int height, unsigned format, int m
 
     // Add persistent key if defined
     if (persistentKey)
-        searchKey += (unsigned long long)persistentKey << 32u;
+        searchKey += (hash64)persistentKey << 32u;
 
     // If new size or format, initialize the allocation stats
     if (screenBuffers_.Find(searchKey) == screenBuffers_.End())
@@ -1524,9 +1524,9 @@ void Renderer::RemoveUnusedBuffers()
         }
     }
 
-    for (HashMap<unsigned long long, Vector<SharedPtr<Texture>>>::Iterator i = screenBuffers_.Begin(); i != screenBuffers_.End();)
+    for (HashMap<hash64, Vector<SharedPtr<Texture>>>::Iterator i = screenBuffers_.Begin(); i != screenBuffers_.End();)
     {
-        HashMap<unsigned long long, Vector<SharedPtr<Texture>>>::Iterator current = i++;
+        HashMap<hash64, Vector<SharedPtr<Texture>>>::Iterator current = i++;
         Vector<SharedPtr<Texture>>& buffers = current->second_;
         for (i32 j = buffers.Size() - 1; j >= 0; --j)
         {
