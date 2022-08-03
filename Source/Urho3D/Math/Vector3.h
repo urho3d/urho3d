@@ -131,7 +131,7 @@ public:
     String ToString() const;
 
     /// Return hash value for HashSet & HashMap.
-    unsigned ToHash() const { return (unsigned)x_ * 31 * 31 + (unsigned)y_ * 31 + (unsigned)z_; }
+    hash32 ToHash() const { return (hash32)x_ * 31 * 31 + (hash32)y_ * 31 + (hash32)z_; }
 
     /// Return length.
     float Length() const { return sqrtf((float)(x_ * x_ + y_ * y_ + z_ * z_)); }
@@ -443,9 +443,9 @@ public:
     String ToString() const;
 
     /// Return hash value for HashSet & HashMap.
-    unsigned ToHash() const
+    hash32 ToHash() const
     {
-        unsigned hash = 37;
+        hash32 hash = 37;
         hash = 37 * hash + FloatToRawIntBits(x_);
         hash = 37 * hash + FloatToRawIntBits(y_);
         hash = 37 * hash + FloatToRawIntBits(z_);

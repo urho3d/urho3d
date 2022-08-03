@@ -70,6 +70,12 @@ string CppPrimitiveTypeToAS(const string& cppType)
     if (cppType == "c32")
         return "c32";
 
+    if (cppType == "hash32")
+        return "hash32";
+
+    if (cppType == "hash64")
+        return "hash64";
+
     throw Exception(cppType + " not a primitive type");
 }
 

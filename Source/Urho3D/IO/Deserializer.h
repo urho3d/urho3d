@@ -31,7 +31,7 @@ public:
     virtual const String& GetName() const;
     /// Return a checksum if applicable.
     /// @property
-    virtual unsigned GetChecksum();
+    virtual hash32 GetChecksum();
     /// Return whether the end of stream has been reached.
     /// @property
     virtual bool IsEof() const { return position_ >= size_; }

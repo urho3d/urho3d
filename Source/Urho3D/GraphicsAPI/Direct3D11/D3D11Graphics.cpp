@@ -1824,7 +1824,7 @@ ConstantBuffer* Graphics::GetOrCreateConstantBuffer_D3D11(ShaderType type, unsig
     GraphicsImpl_D3D11* impl = GetImpl_D3D11();
 
     // Ensure that different shader types and index slots get unique buffers, even if the size is same
-    unsigned key = type | (index << 1) | (size << 4);
+    hash32 key = type | (index << 1) | (size << 4);
     ConstantBufferMap::Iterator i = impl->allConstantBuffers_.Find(key);
     if (i != impl->allConstantBuffers_.End())
         return i->second_.Get();
@@ -2429,7 +2429,7 @@ void Graphics::PrepareDraw_D3D11()
             impl->firstDirtyVB_ = impl->lastDirtyVB_ = M_MAX_UNSIGNED;
         }
 
-        u64 newVertexDeclarationHash = 0;
+        hash64 newVertexDeclarationHash = 0;
         for (i32 i = 0; i < MAX_VERTEX_STREAMS; ++i)
         {
             if (vertexBuffers_[i])

@@ -1097,7 +1097,7 @@ private:
     /// Index buffer in use.
     IndexBuffer* indexBuffer_{};
     /// Current vertex declaration hash.
-    unsigned long long vertexDeclarationHash_{};
+    hash64 vertexDeclarationHash_{};
     /// Current primitive type.
     unsigned primitiveType_{};
     /// Vertex shader in use.

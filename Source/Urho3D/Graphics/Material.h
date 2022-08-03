@@ -266,7 +266,7 @@ public:
     Scene* GetScene() const;
 
     /// Return shader parameter hash value. Used as an optimization to avoid setting shader parameters unnecessarily.
-    unsigned GetShaderParameterHash() const { return shaderParameterHash_; }
+    hash32 GetShaderParameterHash() const { return shaderParameterHash_; }
 
     /// Return name for texture unit.
     static String GetTextureUnitName(TextureUnit unit);
@@ -319,7 +319,7 @@ private:
     /// Last auxiliary view rendered frame number.
     i32 auxViewFrameNumber_{};
     /// Shader parameter hash value.
-    unsigned shaderParameterHash_{};
+    hash32 shaderParameterHash_{};
     /// Alpha-to-coverage flag.
     bool alphaToCoverage_{};
     /// Line antialiasing flag.
