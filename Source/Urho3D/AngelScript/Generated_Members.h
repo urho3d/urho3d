@@ -358,8 +358,8 @@ template <class T> void RegisterMembers_BatchGroupKey(asIScriptEngine* engine, c
     // bool BatchGroupKey::operator ==(const BatchGroupKey& rhs) const
     engine->RegisterObjectMethod(className, "bool opEquals(const BatchGroupKey&in) const", AS_METHODPR(T, operator==, (const BatchGroupKey&) const, bool), AS_CALL_THISCALL);
 
-    // unsigned BatchGroupKey::ToHash() const
-    engine->RegisterObjectMethod(className, "uint ToHash() const", AS_METHODPR(T, ToHash, () const, unsigned), AS_CALL_THISCALL);
+    // hash32 BatchGroupKey::ToHash() const
+    engine->RegisterObjectMethod(className, "hash32 ToHash() const", AS_METHODPR(T, ToHash, () const, hash32), AS_CALL_THISCALL);
 
     // Zone* BatchGroupKey::zone_
     // Not registered because pointer
@@ -920,8 +920,8 @@ template <class T> void RegisterMembers_Color(asIScriptEngine* engine, const cha
     // float Color::SumRGB() const
     engine->RegisterObjectMethod(className, "float SumRGB() const", AS_METHODPR(T, SumRGB, () const, float), AS_CALL_THISCALL);
 
-    // unsigned Color::ToHash() const
-    engine->RegisterObjectMethod(className, "uint ToHash() const", AS_METHODPR(T, ToHash, () const, unsigned), AS_CALL_THISCALL);
+    // hash32 Color::ToHash() const
+    engine->RegisterObjectMethod(className, "hash32 ToHash() const", AS_METHODPR(T, ToHash, () const, hash32), AS_CALL_THISCALL);
 
     // Vector3 Color::ToHSL() const
     engine->RegisterObjectMethod(className, "Vector3 ToHSL() const", AS_METHODPR(T, ToHSL, () const, Vector3), AS_CALL_THISCALL);
@@ -1314,9 +1314,9 @@ template <class T> void RegisterMembers_Deserializer(asIScriptEngine* engine, co
     // VariantVector Deserializer::ReadVariantVector()
     // Error: type "VariantVector" can not automatically bind
 
-    // virtual unsigned Deserializer::GetChecksum()
-    engine->RegisterObjectMethod(className, "uint GetChecksum()", AS_METHODPR(T, GetChecksum, (), unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_checksum()", AS_METHODPR(T, GetChecksum, (), unsigned), AS_CALL_THISCALL);
+    // virtual hash32 Deserializer::GetChecksum()
+    engine->RegisterObjectMethod(className, "hash32 GetChecksum()", AS_METHODPR(T, GetChecksum, (), hash32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "hash32 get_checksum()", AS_METHODPR(T, GetChecksum, (), hash32), AS_CALL_THISCALL);
 
     // virtual const String& Deserializer::GetName() const
     engine->RegisterObjectMethod(className, "const String& GetName() const", AS_METHODPR(T, GetName, () const, const String&), AS_CALL_THISCALL);
@@ -2014,8 +2014,8 @@ template <class T> void RegisterMembers_IntVector2(asIScriptEngine* engine, cons
     // bool IntVector2::operator ==(const IntVector2& rhs) const
     engine->RegisterObjectMethod(className, "bool opEquals(const IntVector2&in) const", AS_METHODPR(T, operator==, (const IntVector2&) const, bool), AS_CALL_THISCALL);
 
-    // unsigned IntVector2::ToHash() const
-    engine->RegisterObjectMethod(className, "uint ToHash() const", AS_METHODPR(T, ToHash, () const, unsigned), AS_CALL_THISCALL);
+    // hash32 IntVector2::ToHash() const
+    engine->RegisterObjectMethod(className, "hash32 ToHash() const", AS_METHODPR(T, ToHash, () const, hash32), AS_CALL_THISCALL);
 
     // String IntVector2::ToString() const
     engine->RegisterObjectMethod(className, "String ToString() const", AS_METHODPR(T, ToString, () const, String), AS_CALL_THISCALL);
@@ -2105,8 +2105,8 @@ template <class T> void RegisterMembers_IntVector3(asIScriptEngine* engine, cons
     // bool IntVector3::operator ==(const IntVector3& rhs) const
     engine->RegisterObjectMethod(className, "bool opEquals(const IntVector3&in) const", AS_METHODPR(T, operator==, (const IntVector3&) const, bool), AS_CALL_THISCALL);
 
-    // unsigned IntVector3::ToHash() const
-    engine->RegisterObjectMethod(className, "uint ToHash() const", AS_METHODPR(T, ToHash, () const, unsigned), AS_CALL_THISCALL);
+    // hash32 IntVector3::ToHash() const
+    engine->RegisterObjectMethod(className, "hash32 ToHash() const", AS_METHODPR(T, ToHash, () const, hash32), AS_CALL_THISCALL);
 
     // String IntVector3::ToString() const
     engine->RegisterObjectMethod(className, "String ToString() const", AS_METHODPR(T, ToString, () const, String), AS_CALL_THISCALL);
@@ -3327,8 +3327,8 @@ template <class T> void RegisterMembers_PackageEntry(asIScriptEngine* engine, co
     // unsigned PackageEntry::size_
     engine->RegisterObjectProperty(className, "uint size", offsetof(T, size_));
 
-    // unsigned PackageEntry::checksum_
-    engine->RegisterObjectProperty(className, "uint checksum", offsetof(T, checksum_));
+    // hash32 PackageEntry::checksum_
+    engine->RegisterObjectProperty(className, "hash32 checksum", offsetof(T, checksum_));
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_PackageEntry
         REGISTER_MEMBERS_MANUAL_PART_PackageEntry();
@@ -5127,8 +5127,8 @@ template <class T> void RegisterMembers_String(asIScriptEngine* engine, const ch
     // void String::Swap(String& str)
     engine->RegisterObjectMethod(className, "void Swap(String&)", AS_METHODPR(T, Swap, (String&), void), AS_CALL_THISCALL);
 
-    // unsigned String::ToHash() const
-    engine->RegisterObjectMethod(className, "uint ToHash() const", AS_METHODPR(T, ToHash, () const, unsigned), AS_CALL_THISCALL);
+    // hash32 String::ToHash() const
+    engine->RegisterObjectMethod(className, "hash32 ToHash() const", AS_METHODPR(T, ToHash, () const, hash32), AS_CALL_THISCALL);
 
     // String String::ToLower() const
     engine->RegisterObjectMethod(className, "String ToLower() const", AS_METHODPR(T, ToLower, () const, String), AS_CALL_THISCALL);
@@ -5213,20 +5213,20 @@ template <class T> void RegisterMembers_StringHash(asIScriptEngine* engine, cons
     // String StringHash::Reverse() const
     engine->RegisterObjectMethod(className, "String Reverse() const", AS_METHODPR(T, Reverse, () const, String), AS_CALL_THISCALL);
 
-    // unsigned StringHash::ToHash() const
-    engine->RegisterObjectMethod(className, "uint ToHash() const", AS_METHODPR(T, ToHash, () const, unsigned), AS_CALL_THISCALL);
+    // hash32 StringHash::ToHash() const
+    engine->RegisterObjectMethod(className, "hash32 ToHash() const", AS_METHODPR(T, ToHash, () const, hash32), AS_CALL_THISCALL);
 
     // String StringHash::ToString() const
     engine->RegisterObjectMethod(className, "String ToString() const", AS_METHODPR(T, ToString, () const, String), AS_CALL_THISCALL);
 
-    // unsigned StringHash::Value() const
-    engine->RegisterObjectMethod(className, "uint Value() const", AS_METHODPR(T, Value, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_value() const", AS_METHODPR(T, Value, () const, unsigned), AS_CALL_THISCALL);
+    // hash32 StringHash::Value() const
+    engine->RegisterObjectMethod(className, "hash32 Value() const", AS_METHODPR(T, Value, () const, hash32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "hash32 get_value() const", AS_METHODPR(T, Value, () const, hash32), AS_CALL_THISCALL);
 
     // bool StringHash::operator <(const StringHash& rhs) const
     engine->RegisterObjectMethod(className, "int opCmp(const StringHash& in) const", AS_FUNCTION_OBJFIRST(StringHash_bool_operatorles_constspStringHashamp<T>), AS_CALL_CDECL_OBJFIRST);
 
-    // static constexpr u32 StringHash::Calculate(const char* str, unsigned hash = 0)
+    // static constexpr hash32 StringHash::Calculate(const char* str, hash32 hash = 0)
     // Error: type "const char*" can not automatically bind
     // static StringHashRegister* StringHash::GetGlobalStringHashRegister()
     // Error: type "StringHashRegister*" can not automatically bind
@@ -6319,8 +6319,8 @@ template <class T> void RegisterMembers_Vector3(asIScriptEngine* engine, const c
     // Vector3 Vector3::ReNormalized(float minLength, float maxLength, const Vector3& defaultValue = Vector3::ZERO, float eps = M_LARGE_EPSILON) const
     engine->RegisterObjectMethod(className, "Vector3 ReNormalized(float, float, const Vector3&in = Vector3::ZERO, float = M_LARGE_EPSILON) const", AS_METHODPR(T, ReNormalized, (float, float, const Vector3&, float) const, Vector3), AS_CALL_THISCALL);
 
-    // unsigned Vector3::ToHash() const
-    engine->RegisterObjectMethod(className, "uint ToHash() const", AS_METHODPR(T, ToHash, () const, unsigned), AS_CALL_THISCALL);
+    // hash32 Vector3::ToHash() const
+    engine->RegisterObjectMethod(className, "hash32 ToHash() const", AS_METHODPR(T, ToHash, () const, hash32), AS_CALL_THISCALL);
 
     // String Vector3::ToString() const
     engine->RegisterObjectMethod(className, "String ToString() const", AS_METHODPR(T, ToString, () const, String), AS_CALL_THISCALL);
@@ -6452,8 +6452,8 @@ template <class T> void RegisterMembers_Vector4(asIScriptEngine* engine, const c
     // float Vector4::ProjectOntoAxis(const Vector3& axis) const
     engine->RegisterObjectMethod(className, "float ProjectOntoAxis(const Vector3&in) const", AS_METHODPR(T, ProjectOntoAxis, (const Vector3&) const, float), AS_CALL_THISCALL);
 
-    // unsigned Vector4::ToHash() const
-    engine->RegisterObjectMethod(className, "uint ToHash() const", AS_METHODPR(T, ToHash, () const, unsigned), AS_CALL_THISCALL);
+    // hash32 Vector4::ToHash() const
+    engine->RegisterObjectMethod(className, "hash32 ToHash() const", AS_METHODPR(T, ToHash, () const, hash32), AS_CALL_THISCALL);
 
     // String Vector4::ToString() const
     engine->RegisterObjectMethod(className, "String ToString() const", AS_METHODPR(T, ToString, () const, String), AS_CALL_THISCALL);
@@ -8634,8 +8634,8 @@ template <class T> void RegisterMembers_ShaderVariation(asIScriptEngine* engine,
     // const String& ShaderVariation::GetDefinesClipPlane()
     engine->RegisterObjectMethod(className, "const String& GetDefinesClipPlane()", AS_METHODPR(T, GetDefinesClipPlane, (), const String&), AS_CALL_THISCALL);
 
-    // unsigned long long ShaderVariation::GetElementHash() const
-    engine->RegisterObjectMethod(className, "uint64 GetElementHash() const", AS_METHODPR(T, GetElementHash, () const, unsigned long long), AS_CALL_THISCALL);
+    // hash64 ShaderVariation::GetElementHash() const
+    engine->RegisterObjectMethod(className, "hash64 GetElementHash() const", AS_METHODPR(T, GetElementHash, () const, hash64), AS_CALL_THISCALL);
 
     // String ShaderVariation::GetFullName() const
     engine->RegisterObjectMethod(className, "String GetFullName() const", AS_METHODPR(T, GetFullName, () const, String), AS_CALL_THISCALL);
@@ -11173,9 +11173,9 @@ template <class T> void RegisterMembers_PackageFile(asIScriptEngine* engine, con
     // bool PackageFile::Exists(const String& fileName) const
     engine->RegisterObjectMethod(className, "bool Exists(const String&in) const", AS_METHODPR(T, Exists, (const String&) const, bool), AS_CALL_THISCALL);
 
-    // unsigned PackageFile::GetChecksum() const
-    engine->RegisterObjectMethod(className, "uint GetChecksum() const", AS_METHODPR(T, GetChecksum, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_checksum() const", AS_METHODPR(T, GetChecksum, () const, unsigned), AS_CALL_THISCALL);
+    // hash32 PackageFile::GetChecksum() const
+    engine->RegisterObjectMethod(className, "hash32 GetChecksum() const", AS_METHODPR(T, GetChecksum, () const, hash32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "hash32 get_checksum() const", AS_METHODPR(T, GetChecksum, () const, hash32), AS_CALL_THISCALL);
 
     // const Vector<String> PackageFile::GetEntryNames() const
     engine->RegisterObjectMethod(className, "Array<String>@ GetEntryNames() const", AS_FUNCTION_OBJFIRST(PackageFile_constspVectorlesStringgre_GetEntryNames_void_template<PackageFile>), AS_CALL_CDECL_OBJFIRST);
@@ -12453,8 +12453,8 @@ template <class T> void RegisterMembers_VertexBuffer(asIScriptEngine* engine, co
     // bool VertexBuffer::SetDataRange(const void* data, i32 start, i32 count, bool discard = false)
     // Error: type "const void*" can not automatically bind
 
-    // u64 VertexBuffer::GetBufferHash(i32 streamIndex)
-    engine->RegisterObjectMethod(className, "uint64 GetBufferHash(int)", AS_METHODPR(T, GetBufferHash, (i32), u64), AS_CALL_THISCALL);
+    // hash64 VertexBuffer::GetBufferHash(i32 streamIndex)
+    engine->RegisterObjectMethod(className, "hash64 GetBufferHash(int)", AS_METHODPR(T, GetBufferHash, (i32), hash64), AS_CALL_THISCALL);
 
     // VertexMaskFlags VertexBuffer::GetElementMask() const
     engine->RegisterObjectMethod(className, "VertexMaskFlags GetElementMask() const", AS_METHODPR(T, GetElementMask, () const, VertexMaskFlags), AS_CALL_THISCALL);
@@ -13760,8 +13760,8 @@ template <class T> void RegisterMembers_Material(asIScriptEngine* engine, const 
     // WrapMode Material::GetShaderParameterAnimationWrapMode(const String& name) const
     engine->RegisterObjectMethod(className, "WrapMode GetShaderParameterAnimationWrapMode(const String&in) const", AS_METHODPR(T, GetShaderParameterAnimationWrapMode, (const String&) const, WrapMode), AS_CALL_THISCALL);
 
-    // unsigned Material::GetShaderParameterHash() const
-    engine->RegisterObjectMethod(className, "uint GetShaderParameterHash() const", AS_METHODPR(T, GetShaderParameterHash, () const, unsigned), AS_CALL_THISCALL);
+    // hash32 Material::GetShaderParameterHash() const
+    engine->RegisterObjectMethod(className, "hash32 GetShaderParameterHash() const", AS_METHODPR(T, GetShaderParameterHash, () const, hash32), AS_CALL_THISCALL);
 
     // CullMode Material::GetShadowCullMode() const
     engine->RegisterObjectMethod(className, "CullMode GetShadowCullMode() const", AS_METHODPR(T, GetShadowCullMode, () const, CullMode), AS_CALL_THISCALL);

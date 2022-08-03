@@ -947,7 +947,7 @@ bool ClassAnalyzer::AllInts() const
             continue;
 
         string type = field.GetType().ToString();
-        if (type != "int" && type != "unsigned")
+        if (type != "int" && type != "unsigned" && type != "hash32")
             return false;
     }
 

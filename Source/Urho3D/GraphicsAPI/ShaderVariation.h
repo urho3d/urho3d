@@ -101,7 +101,7 @@ public:
     const HashMap<StringHash, ShaderParameter>& GetParameters() const { return parameters_; }
 
     /// Return vertex element hash.
-    unsigned long long GetElementHash() const { return elementHash_; }
+    hash64 GetElementHash() const { return elementHash_; }
 
     /// Return shader bytecode. Stored persistently on Direct3D11 only.
     const Vector<unsigned char>& GetByteCode() const { return byteCode_; }
@@ -166,7 +166,7 @@ private:
     /// Shader type.
     ShaderType type_;
     /// Vertex element hash for vertex shaders. Zero for pixel shaders. Note that hashing is different than vertex buffers.
-    unsigned long long elementHash_{};
+    hash64 elementHash_{};
     /// Shader parameters.
     HashMap<StringHash, ShaderParameter> parameters_;
     /// Texture unit use flags.

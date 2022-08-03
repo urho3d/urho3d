@@ -13,10 +13,12 @@ struct PackageEntry
 {
     /// Offset from the beginning.
     unsigned offset_;
+
     /// File size.
     unsigned size_;
+
     /// File checksum.
-    unsigned checksum_;
+    hash32 checksum_;
 };
 
 /// Stores files of a directory tree sequentially for convenient access.
@@ -63,7 +65,7 @@ public:
 
     /// Return checksum of the package file contents.
     /// @property
-    unsigned GetChecksum() const { return checksum_; }
+    hash32 GetChecksum() const { return checksum_; }
 
     /// Return whether the files are compressed.
     /// @property
@@ -84,7 +86,7 @@ private:
     /// Total data size in the package using each entry's actual size if it is a compressed package file.
     unsigned totalDataSize_;
     /// Package file checksum.
-    unsigned checksum_;
+    hash32 checksum_;
     /// Compressed flag.
     bool compressed_;
 };

@@ -1229,8 +1229,8 @@ void View::GetBaseBatches()
                     if (drawableVertexLights.Size())
                     {
                         // Find a vertex light queue. If not found, create new
-                        unsigned long long hash = GetVertexLightQueueHash(drawableVertexLights);
-                        HashMap<unsigned long long, LightBatchQueue>::Iterator i = vertexLightQueues_.Find(hash);
+                        hash64 hash = GetVertexLightQueueHash(drawableVertexLights);
+                        HashMap<hash64, LightBatchQueue>::Iterator i = vertexLightQueues_.Find(hash);
                         if (i == vertexLightQueues_.End())
                         {
                             i = vertexLightQueues_.Insert(MakePair(hash, LightBatchQueue()));

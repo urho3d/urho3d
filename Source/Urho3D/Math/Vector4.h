@@ -191,9 +191,9 @@ public:
     String ToString() const;
 
     /// Return hash value for HashSet & HashMap.
-    unsigned ToHash() const
+    hash32 ToHash() const
     {
-        unsigned hash = 37;
+        hash32 hash = 37;
         hash = 37 * hash + FloatToRawIntBits(x_);
         hash = 37 * hash + FloatToRawIntBits(y_);
         hash = 37 * hash + FloatToRawIntBits(z_);

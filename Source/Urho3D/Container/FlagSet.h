@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include "../Base/PrimitiveTypes.h"
+
 #include <type_traits>
 
 namespace Urho3D
@@ -275,7 +277,7 @@ public:
     Integer& AsInteger() { return value_; }
 
     /// Return hash value.
-    unsigned ToHash() const { return static_cast<unsigned>(value_); }
+    hash32 ToHash() const { return static_cast<hash32>(value_); }
 
 protected:
     /// Value.

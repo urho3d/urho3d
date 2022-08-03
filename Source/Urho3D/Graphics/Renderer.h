@@ -561,9 +561,9 @@ private:
     /// Function pointer of shadow map filter.
     ShadowMapFilter shadowMapFilter_{};
     /// Screen buffers by resolution and format.
-    HashMap<unsigned long long, Vector<SharedPtr<Texture>>> screenBuffers_;
+    HashMap<hash64, Vector<SharedPtr<Texture>>> screenBuffers_;
     /// Current screen buffer allocations by resolution and format.
-    HashMap<unsigned long long, unsigned> screenBufferAllocations_;
+    HashMap<hash64, unsigned> screenBufferAllocations_;
     /// Cache for light scissor queries.
     HashMap<Pair<Light*, Camera*>, Rect> lightScissorCache_;
     /// Backbuffer viewports.

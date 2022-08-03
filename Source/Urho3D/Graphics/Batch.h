@@ -200,7 +200,7 @@ struct BatchGroupKey
     }
 
     /// Return hash value.
-    unsigned ToHash() const;
+    hash32 ToHash() const;
 };
 
 /// Queue that contains both instanced and non-instanced draw calls.
