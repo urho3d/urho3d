@@ -54,6 +54,13 @@ desc 'Build the software'
 task :build, [:target] => [:cmake] do |_, args|
   system "ccache -z" if ENV['USE_CCACHE']
   if ENV['PLATFORM'] == 'android'
+    system "echo '!which java';which java" # Where is Java executable
+    system "echo '!java -version';java -version" # Print Java veriosn
+    system "echo '!env';env" # Print all environment variables
+    system "echo '!ls $ANDROID_HOME';ls $ANDROID_HOME"
+    system "echo '!ls $ANDROID_HOME/platforms';ls $ANDROID_HOME/platforms"
+    system "echo '!ls $ANDROID_HOME/ndk';ls $ANDROID_HOME/ndk"
+    system "echo '!ls $ANDROID_HOME/build-tools';ls $ANDROID_HOME/build-tools"
     Rake::Task[:gradle].invoke('build -x test')
     system "ccache -s" if ENV['USE_CCACHE']
     next
