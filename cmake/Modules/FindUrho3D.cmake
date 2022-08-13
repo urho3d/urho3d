@@ -65,7 +65,7 @@ else ()
         else ()
             message (FATAL_ERROR "Neither 'BUILD_STAGING_DIR' nor 'JNI_DIR' is set")
         endif ()
-        if (URHO3D_LIB_TYPE STREQUAL STATIC)
+        if (NOT URHO3D_LIB_TYPE STREQUAL SHARED) # Static lib if URHO3D_LIB_TYPE is not defined
             set (URHO3D_LIBRARIES ${URHO3D_HOME}/lib/libUrho3D.a)
         else ()
             set (URHO3D_LIBRARIES ${URHO3D_HOME}/lib/libUrho3D.so)

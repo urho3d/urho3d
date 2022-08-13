@@ -57,10 +57,14 @@ task :build, [:target] => [:cmake] do |_, args|
     system "echo '!which java';which java" # Where is Java executable
     system "echo '!java -version';java -version" # Print Java veriosn
     system "echo '!env';env" # Print all environment variables
-    system "echo '!ls $ANDROID_HOME';ls $ANDROID_HOME"
-    system "echo '!ls $ANDROID_HOME/platforms';ls $ANDROID_HOME/platforms"
-    system "echo '!ls $ANDROID_HOME/ndk';ls $ANDROID_HOME/ndk"
-    system "echo '!ls $ANDROID_HOME/build-tools';ls $ANDROID_HOME/build-tools"
+    system "echo '!ls -a $ANDROID_HOME';ls -a $ANDROID_HOME"
+    system "echo '!ls -a $ANDROID_HOME/platforms';ls -a $ANDROID_HOME/platforms"
+    system "echo '!ls -a $ANDROID_HOME/ndk';ls -a $ANDROID_HOME/ndk"
+    system "echo '!ls -a $ANDROID_HOME/build-tools';ls -a $ANDROID_HOME/build-tools"
+    system "echo '!ls -a $ANDROID_HOME/cmdline-tools';ls -a $ANDROID_HOME/cmdline-tools"
+    system "echo '!ls -a $ANDROID_HOME/cmake';ls -a $ANDROID_HOME/cmake"
+    #system "rm -r $ANDROID_HOME/.temp"
+    #system "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager 'build-tools;30.0.2'"
     Rake::Task[:gradle].invoke('build -x test')
     system "ccache -s" if ENV['USE_CCACHE']
     next

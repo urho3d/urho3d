@@ -9,10 +9,10 @@ buildscript {
     val kotlinVersion: String by extra
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:4.0.2")
+        classpath("com.android.tools.build:gradle:4.2.0+")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
     }
 }
@@ -32,7 +32,7 @@ allprojects {
     """.trimIndent().replace('\n', ' ')
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
     buildscript {
         ext {
