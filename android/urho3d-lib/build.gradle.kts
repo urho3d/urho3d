@@ -57,11 +57,14 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
+    lintOptions {
+        isAbortOnError = false
+    }
     externalNativeBuild {
         cmake {
             version = cmakeVersion
             path = project.file("../../CMakeLists.txt")
-            setBuildStagingDirectory(buildStagingDir)
+            buildStagingDirectory(buildStagingDir)
         }
     }
     sourceSets {
@@ -74,7 +77,7 @@ android {
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
-    implementation("com.getkeepsafe.relinker:relinker:1.4.1")
+    implementation("com.getkeepsafe.relinker:relinker:1.4.5")
     testImplementation("junit:junit:4.13.1")
     androidTestImplementation("androidx.test:runner:1.3.0")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
