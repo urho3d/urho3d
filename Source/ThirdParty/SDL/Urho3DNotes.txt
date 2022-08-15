@@ -1,0 +1,1 @@
+Verison: https://github.com/libsdl-org/SDL/releases/tag/release-2.0.10
