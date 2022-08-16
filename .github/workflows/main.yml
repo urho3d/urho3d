@@ -360,8 +360,27 @@ jobs:
     needs: init
 
     steps:
-    - name: Build
+    - name: Free up space
+      run: |
+        echo "Current user: $USER"
+        echo "Current dir: $PWD"
+        echo "!df -h"; df -h # Disks usage
+        echo "!df -h ~"; df -h ~ # Home physical device
+        echo "!du -sh /usr/share/*/ | sort -rh"; du -sh /usr/share/*/ | sort -rh # Sort subdirs by size
+        echo "!du -sh /usr/local/share/*/ | sort -rh"; du -sh /usr/local/share/*/ | sort -rh
+        echo "!du -sh /opt/*/ | sort -rh"; du -sh /opt/*/ | sort -rh
+        sudo rm -rf /usr/share/dotnet
+        sudo rm -rf /usr/share/swift
+        sudo rm -rf /usr/share/miniconda
+        sudo rm -rf /usr/local/share/powershell
+        sudo rm -rf /usr/local/share/chromium
+        sudo rm -rf /opt/hostedtoolcache
+        sudo rm -rf /opt/az
+        sudo rm -rf /opt/microsoft
+        sudo apt-get clean
+        echo "!df -h ~ after free up"; df -h ~
 
+    - name: Build
       run: |
         #set -x # Echo commands
         echo "Current dir: $PWD"
@@ -402,9 +421,16 @@ jobs:
         echo '!ls -a $ANDROID_HOME/build-tools';ls -a $ANDROID_HOME/build-tools
         git clone https://github.com/${{ github.repository }} engine_repo
         cd engine_repo
+
+        #URHO3D_LIB_TYPE=SHARED
+
         #./gradlew buildEnvironment
         #./gradlew build -x test
         ./gradlew build
+
+    - name: Show remaining space
+      if: ${{ always() }}
+      run: echo "!df -h"; df -h # Disks usage
 
 ...
 
