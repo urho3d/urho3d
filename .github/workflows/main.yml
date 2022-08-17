@@ -318,8 +318,11 @@ jobs:
         - Debug
 
     steps:
-    - name: Build
+    - name: Checkout
+      uses: actions/checkout@v3
+      with: { path: "engine_repo" }
 
+    - name: Build
       run: |
         set -x # Echo commands
         echo "Current dir: $PWD"
@@ -329,7 +332,6 @@ jobs:
         chmod +x ./emsdk/emsdk_env.sh
         ./emsdk/emsdk_env.sh
         TOOLCHAIN=$PWD/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
-        git clone https://github.com/${{ github.repository }} engine_repo
         cmake engine_repo -B engine_build -G "Unix Makefiles" \
           -D WEB=1 -D CMAKE_TOOLCHAIN_FILE=${TOOLCHAIN} \
           -D EMSCRIPTEN_SHARE_DATA=1 -D URHO3D_DATABASE_SQLITE=1 \
@@ -349,7 +351,7 @@ jobs:
         echo "Current dir: $PWD"
         cd engine_repo
         rake ci_publish_web
-      if: |
+      if: | # If not PR
         github.event_name == 'push' && matrix.build-type == 'Release' &&
           (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/'))
       continue-on-error: ${{ !startsWith(github.ref, 'refs/tags/') }}
@@ -360,6 +362,10 @@ jobs:
     needs: init
 
     steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with: { path: "engine_repo" }
+
     - name: Free up space
       run: |
         echo "Current user: $USER"
@@ -419,7 +425,6 @@ jobs:
         echo '!ls -a $ANDROID_HOME/platforms';ls -a $ANDROID_HOME/platforms
         echo '!ls -a $ANDROID_HOME/ndk';ls -a $ANDROID_HOME/ndk
         echo '!ls -a $ANDROID_HOME/build-tools';ls -a $ANDROID_HOME/build-tools
-        git clone https://github.com/${{ github.repository }} engine_repo
         cd engine_repo
 
         #URHO3D_LIB_TYPE=SHARED
