@@ -32,7 +32,6 @@ jobs:
       fail-fast: false
       matrix:
         platform:
-          - mingw
           - rpi
           - arm
         lib-type:
@@ -478,6 +477,81 @@ jobs:
 
         cmake --build $HOME/projects/UrhoApp_build
         xvfb-run ctest --test-dir $HOME/projects/UrhoApp_build
+
+  Linux_MinGW:
+    runs-on: ubuntu-latest
+    needs: init
+    if: needs.init.outputs.skip == '0'
+
+    strategy:
+      fail-fast: false
+      matrix:
+        BITS:
+        - 64
+        - 32
+        LIB_TYPE:
+        - {
+            ID: shared,
+            VALUE: SHARED,
+          }
+        - {
+            ID: static,
+            VALUE: STATIC,
+          }
+        BUILD_TYPE:
+        - {
+            ID: rel,
+            VALUE: Release,
+          }
+        - {
+            ID: dbg,
+            VALUE: Debug,
+          }
+
+    name: 🐧-mingw-${{ matrix.BITS }}-${{ matrix.LIB_TYPE.ID }}-${{ matrix.BUILD_TYPE.ID }}
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with: { path: "engine_repo" }
+
+    - name: Install dependencies
+      run: sudo apt install mingw-w64
+
+    - name: Cache
+      uses: actions/cache@v3
+      with:
+        path: engine_build
+        key: linux-mingw-${{ matrix.BITS }}-${{ matrix.LIB_TYPE.ID }}-${{ matrix.BUILD_TYPE.ID }}-${{ github.sha }}
+        restore-keys: linux-mingw-${{ matrix.BITS }}-${{ matrix.LIB_TYPE.ID }}-${{ matrix.BUILD_TYPE.ID }}
+
+    - name: Build
+      run: |
+        #set -x # Echo commands
+        echo "Current dir: $PWD" # $GITHUB_WORKSPACE
+
+        if [ "${{ matrix.BITS }}" == "32" ]
+        then
+          export MINGW_PREFIX=/usr/bin/i686-w64-mingw32
+          BITS64=0
+          DX_INC=/usr/i686-w64-mingw32/include
+          DX_LIB=/usr/i686-w64-mingw32/lib
+        else
+          export MINGW_PREFIX=/usr/bin/x86_64-w64-mingw32
+          BITS64=1
+          DX_INC=/usr/x86_64-w64-mingw32/include
+          DX_LIB=/usr/x86_64-w64-mingw32/lib
+        fi
+
+        TOOLCHAIN=$GITHUB_WORKSPACE/engine_repo/cmake/Toolchains/MinGW.cmake
+
+        cmake engine_repo -B engine_build -D CMAKE_TOOLCHAIN_FILE=${TOOLCHAIN} -D MINGW=1 \
+          -D URHO3D_EXTRAS=1 -D URHO3D_OPENGL=1 -D URHO3D_D3D11=1 \
+          -D DIRECTX_INC_SEARCH_PATHS=$DX_INC -D DIRECTX_LIB_SEARCH_PATHS=$DX_LIB \
+          -D URHO3D_DATABASE_SQLITE=1 -D CMAKE_BUILD_TYPE=${{ matrix.BUILD_TYPE.VALUE }} \
+          -D URHO3D_64BIT=$BITS64 -D URHO3D_LIB_TYPE=${{ matrix.LIB_TYPE.VALUE }}
+
+        cmake --build engine_build
 
   Android:
     name: 🤖 Android

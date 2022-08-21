@@ -1,6 +1,8 @@
 # Copyright (c) 2008-2022 the Urho3D project
 # License: MIT
 
+# https://cmake.org/cmake/help/book/mastering-cmake/chapter/Cross%20Compiling%20With%20CMake.html
+
 # Workaround try_compile() limitation where it cannot yet see cache variables during initial configuration
 get_property (IN_TRY_COMPILE GLOBAL PROPERTY IN_TRY_COMPILE)
 if (IN_TRY_COMPILE)
@@ -93,7 +95,7 @@ if (NOT IN_TRY_COMPILE AND NOT SAVED_MINGW_SYSROOT)
         if (DEFINED ENV{MINGW_SYSROOT})
             file (TO_CMAKE_PATH $ENV{MINGW_SYSROOT} MINGW_SYSROOT)
         else ()
-            execute_process (COMMAND ${CMAKE_COMMAND} -E echo "#include <_mingw.h>" COMMAND ${CMAKE_C_COMPILER} -E -M - OUTPUT_FILE find_mingw_sysroot_output ERROR_QUIET)
+            execute_process (COMMAND ${CMAKE_COMMAND} -E echo "#include <_mingw.h>" COMMAND ${CMAKE_C_COMPILER} -E -M - OUTPUT_FILE ${CMAKE_BINARY_DIR}/find_mingw_sysroot_output ERROR_QUIET)
             file (STRINGS ${CMAKE_BINARY_DIR}/find_mingw_sysroot_output MINGW_SYSROOT REGEX _mingw\\.h)
             string (REGEX REPLACE "^[^ ]* *(.*)/include.*$" \\1 MINGW_SYSROOT "${MINGW_SYSROOT}")  # Stringify for string replacement
             string (REPLACE "\\ " " " MINGW_SYSROOT "${MINGW_SYSROOT}")
