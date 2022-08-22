@@ -479,7 +479,7 @@ jobs:
         xvfb-run ctest --test-dir $HOME/projects/UrhoApp_build
 
   Linux_MinGW:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: init
     if: needs.init.outputs.skip == '0'
 
