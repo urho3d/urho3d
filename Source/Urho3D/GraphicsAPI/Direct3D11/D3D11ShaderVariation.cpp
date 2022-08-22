@@ -14,6 +14,11 @@
 
 #include <d3dcompiler.h>
 
+// https://github.com/urho3d/Urho3D/issues/2887
+#if defined(__MINGW32__) && !defined(D3D_COMPILER_VERSION)
+#error Please update MinGW
+#endif
+
 #include "../../DebugNew.h"
 
 namespace Urho3D
