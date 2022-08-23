@@ -456,7 +456,7 @@ jobs:
     - name: Test app
       run: |
         #cmake --install engine_build --prefix=$HOME/installed_engine # Not works
-        #URHO3D_HOME=$HOME/installed_engine # Not works
+        #URHO3D_HOME=$HOME/installed_engine # Not works (add export?)
         #URHO3D_HOME=$GITHUB_WORKSPACE/engine_build # Not works
         sudo cmake --build engine_build --target install
         cd engine_repo
@@ -552,6 +552,38 @@ jobs:
           -D URHO3D_64BIT=$BITS64 -D URHO3D_LIB_TYPE=${{ matrix.LIB_TYPE.VALUE }}
 
         cmake --build engine_build
+
+    - name: Test app
+      run: |
+        #sudo cmake --build engine_build --target install
+        export URHO3D_HOME=$GITHUB_WORKSPACE/engine_build
+
+        cd engine_repo
+        rake new
+        cd ..
+
+        if [ "${{ matrix.BITS }}" == "32" ]
+        then
+          export MINGW_PREFIX=/usr/bin/i686-w64-mingw32
+          BITS64=0
+          DX_INC=/usr/i686-w64-mingw32/include
+          DX_LIB=/usr/i686-w64-mingw32/lib
+        else
+          export MINGW_PREFIX=/usr/bin/x86_64-w64-mingw32
+          BITS64=1
+          DX_INC=/usr/x86_64-w64-mingw32/include
+          DX_LIB=/usr/x86_64-w64-mingw32/lib
+        fi
+
+        TOOLCHAIN=$GITHUB_WORKSPACE/engine_repo/cmake/Toolchains/MinGW.cmake
+
+        cmake $HOME/projects/UrhoApp -B $HOME/projects/UrhoApp_build -D CMAKE_TOOLCHAIN_FILE=${TOOLCHAIN} -D MINGW=1 \
+          -D URHO3D_EXTRAS=1 -D URHO3D_OPENGL=1 -D URHO3D_D3D11=1 \
+          -D DIRECTX_INC_SEARCH_PATHS=$DX_INC -D DIRECTX_LIB_SEARCH_PATHS=$DX_LIB \
+          -D URHO3D_DATABASE_SQLITE=1 -D CMAKE_BUILD_TYPE=${{ matrix.BUILD_TYPE.VALUE }} \
+          -D URHO3D_64BIT=$BITS64 -D URHO3D_LIB_TYPE=${{ matrix.LIB_TYPE.VALUE }}
+
+        cmake --build $HOME/projects/UrhoApp_build
 
   Android:
     name: 🤖 Android
