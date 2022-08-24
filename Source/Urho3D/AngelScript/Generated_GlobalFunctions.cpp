@@ -8,6 +8,13 @@
 namespace Urho3D
 {
 
+// Vector<unsigned char> DecodeBase64(String encodedString) | File: ../Core/StringUtils.h
+static CScriptArray* Vectorlesunsignedspchargre_DecodeBase64_String(String encodedString)
+{
+    Vector<unsigned char> result = DecodeBase64(encodedString);
+    return VectorToArray(result, "Array<uint8>");
+}
+
 // const Vector<String>& GetArguments() | File: ../Core/ProcessUtils.h
 static CScriptArray* constspVectorlesStringgreamp_GetArguments_void()
 {
@@ -94,7 +101,7 @@ void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("int CountSetBits(uint)", AS_FUNCTIONPR(CountSetBits, (u32), i32), AS_CALL_CDECL);
 
     // Vector<unsigned char> DecodeBase64(String encodedString) | File: ../Core/StringUtils.h
-    // Error: type "Vector<unsigned char>" can not automatically bind
+    engine->RegisterGlobalFunction("Array<uint8>@ DecodeBase64(String)", AS_FUNCTION(Vectorlesunsignedspchargre_DecodeBase64_String), AS_CALL_CDECL);
 
     // unsigned DecompressData(void* dest, const void* src, unsigned destSize) | File: ../IO/Compression.h
     // Error: type "void*" can not automatically bind

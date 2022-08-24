@@ -408,7 +408,7 @@ ConvertedVariable CppVariableToAS(const TypeAnalyzer& type, VariableUsage usage,
         throw Exception("Error: type \"" + type.ToString() + "\" can not automatically bind");
     }
 
-    regex_match(cppTypeName, match, regex("Vector<(\\w+)>"));
+    regex_match(cppTypeName, match, regex("Vector<([\\w ]+)>"));
     if (!match.empty())
     {
         string cppSubtypeName = match[1].str();
@@ -424,7 +424,7 @@ ConvertedVariable CppVariableToAS(const TypeAnalyzer& type, VariableUsage usage,
             asSubtypeName = cppSubtypeName;
         }
 
-        if (usage == VariableUsage::FunctionReturn && type.IsConst() == type.IsReference())
+        if (usage == VariableUsage::FunctionReturn && type.IsConst() == type.IsReference() && !type.IsPointer())
         {
             result.asDeclaration_ = "Array<" + asSubtypeName + ">@";
             result.cppDeclaration_ = "CScriptArray*";

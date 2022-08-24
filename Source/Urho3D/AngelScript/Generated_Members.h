@@ -1297,6 +1297,13 @@ template <class T> void RegisterMembers_DepthValue(asIScriptEngine* engine, cons
     #endif
 }
 
+// Vector<unsigned char> Deserializer::ReadBuffer()
+template <class T> CScriptArray* Deserializer_Vectorlesunsignedspchargre_ReadBuffer_void_template(T* _ptr)
+{
+    Vector<unsigned char> result = _ptr->ReadBuffer();
+    return VectorToArray(result, "Array<uint8>");
+}
+
 // StringVector Deserializer::ReadStringVector()
 template <class T> CScriptArray* Deserializer_StringVector_ReadStringVector_void_template(T* _ptr)
 {
@@ -1309,8 +1316,6 @@ template <class T> void RegisterMembers_Deserializer(asIScriptEngine* engine, co
 {
     // virtual unsigned Deserializer::Read(void* dest, unsigned size) = 0
     // Error: type "void*" can not automatically bind
-    // Vector<unsigned char> Deserializer::ReadBuffer()
-    // Error: type "Vector<unsigned char>" can not automatically bind
     // VariantVector Deserializer::ReadVariantVector()
     // Error: type "VariantVector" can not automatically bind
 
@@ -1339,6 +1344,9 @@ template <class T> void RegisterMembers_Deserializer(asIScriptEngine* engine, co
 
     // BoundingBox Deserializer::ReadBoundingBox()
     engine->RegisterObjectMethod(className, "BoundingBox ReadBoundingBox()", AS_METHODPR(T, ReadBoundingBox, (), BoundingBox), AS_CALL_THISCALL);
+
+    // Vector<unsigned char> Deserializer::ReadBuffer()
+    engine->RegisterObjectMethod(className, "Array<uint8>@ ReadBuffer()", AS_FUNCTION_OBJFIRST(Deserializer_Vectorlesunsignedspchargre_ReadBuffer_void_template<Deserializer>), AS_CALL_CDECL_OBJFIRST);
 
     // signed char Deserializer::ReadByte()
     engine->RegisterObjectMethod(className, "int8 ReadByte()", AS_METHODPR(T, ReadByte, (), signed char), AS_CALL_THISCALL);
@@ -4372,6 +4380,14 @@ template <class T> void RegisterMembers_ScreenModeParams(asIScriptEngine* engine
     #endif
 }
 
+// bool Serializer::WriteBuffer(const Vector<unsigned char>& value)
+template <class T> bool Serializer_bool_WriteBuffer_constspVectorlesunsignedspchargreamp_template(T* _ptr, CScriptArray* value_conv)
+{
+    Vector<unsigned char> value = ArrayToVector<unsigned char>(value_conv);
+    bool result = _ptr->WriteBuffer(value);
+    return result;
+}
+
 // bool Serializer::WriteStringVector(const StringVector& value)
 template <class T> bool Serializer_bool_WriteStringVector_constspStringVectoramp_template(T* _ptr, CScriptArray* value_conv)
 {
@@ -4385,8 +4401,6 @@ template <class T> void RegisterMembers_Serializer(asIScriptEngine* engine, cons
 {
     // virtual i32 Serializer::Write(const void* data, i32 size) = 0
     // Error: type "const void*" can not automatically bind
-    // bool Serializer::WriteBuffer(const Vector<unsigned char>& value)
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // bool Serializer::WriteVariantVector(const VariantVector& value)
     // Error: type "const VariantVector&" can not automatically bind
 
@@ -4395,6 +4409,9 @@ template <class T> void RegisterMembers_Serializer(asIScriptEngine* engine, cons
 
     // bool Serializer::WriteBoundingBox(const BoundingBox& value)
     engine->RegisterObjectMethod(className, "bool WriteBoundingBox(const BoundingBox&in)", AS_METHODPR(T, WriteBoundingBox, (const BoundingBox&), bool), AS_CALL_THISCALL);
+
+    // bool Serializer::WriteBuffer(const Vector<unsigned char>& value)
+    engine->RegisterObjectMethod(className, "bool WriteBuffer(Array<uint8>@+)", AS_FUNCTION_OBJFIRST(Serializer_bool_WriteBuffer_constspVectorlesunsignedspchargreamp_template<Serializer>), AS_CALL_CDECL_OBJFIRST);
 
     // bool Serializer::WriteByte(signed char value)
     engine->RegisterObjectMethod(className, "bool WriteByte(int8)", AS_METHODPR(T, WriteByte, (signed char), bool), AS_CALL_THISCALL);
@@ -5531,6 +5548,13 @@ template <class T> void RegisterMembers_VAnimKeyFrame(asIScriptEngine* engine, c
     #endif
 }
 
+// const Vector<unsigned char>& Variant::GetBuffer() const
+template <class T> CScriptArray* Variant_constspVectorlesunsignedspchargreamp_GetBuffer_void_template(T* _ptr)
+{
+    const Vector<unsigned char>& result = _ptr->GetBuffer();
+    return VectorToArray(result, "Array<uint8>");
+}
+
 // const StringVector& Variant::GetStringVector() const
 template <class T> CScriptArray* Variant_constspStringVectoramp_GetStringVector_void_template(T* _ptr)
 {
@@ -5538,11 +5562,27 @@ template <class T> CScriptArray* Variant_constspStringVectoramp_GetStringVector_
     return VectorToArray<String>(result, "Array<String>");
 }
 
+// Variant& Variant::operator =(const Vector<unsigned char>& rhs)
+template <class T> Variant& Variant_Variantamp_operatoreq_constspVectorlesunsignedspchargreamp_template(T* _ptr, CScriptArray* rhs_conv)
+{
+    Vector<unsigned char> rhs = ArrayToVector<unsigned char>(rhs_conv);
+    Variant& result = _ptr->operator=(rhs);
+    return result;
+}
+
 // Variant& Variant::operator =(const StringVector& rhs)
 template <class T> Variant& Variant_Variantamp_operatoreq_constspStringVectoramp_template(T* _ptr, CScriptArray* rhs_conv)
 {
     StringVector rhs = ArrayToVector<String>(rhs_conv);
     Variant& result = _ptr->operator=(rhs);
+    return result;
+}
+
+// bool Variant::operator ==(const Vector<unsigned char>& rhs) const
+template <class T> bool Variant_bool_operatoreqeq_constspVectorlesunsignedspchargreamp_template(T* _ptr, CScriptArray* rhs_conv)
+{
+    Vector<unsigned char> rhs = ArrayToVector<unsigned char>(rhs_conv);
+    bool result = _ptr->operator==(rhs);
     return result;
 }
 
@@ -5561,8 +5601,6 @@ template <class T> void RegisterMembers_Variant(asIScriptEngine* engine, const c
     // Error: type "const char*" can not automatically bind
     // void Variant::FromString(VariantType type, const char* value)
     // Error: type "const char*" can not automatically bind
-    // const Vector<unsigned char>& Variant::GetBuffer() const
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // Vector<unsigned char>* Variant::GetBufferPtr()
     // Error: type "Vector<unsigned char>*" can not automatically bind
     // CustomVariantValue* Variant::GetCustomVariantValuePtr()
@@ -5606,7 +5644,7 @@ template <class T> void RegisterMembers_Variant(asIScriptEngine* engine, const c
     // bool Variant::operator !=(const String& rhs) const
     // Only operator == is needed
     // bool Variant::operator !=(const Vector<unsigned char>& rhs) const
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
+    // Only operator == is needed
     // bool Variant::operator !=(const VectorBuffer& rhs) const
     // Only operator == is needed
     // bool Variant::operator !=(void* rhs) const
@@ -5641,14 +5679,10 @@ template <class T> void RegisterMembers_Variant(asIScriptEngine* engine, const c
     // Only operator == is needed
     // Variant& Variant::operator =(const char* rhs)
     // Error: type "const char*" can not automatically bind
-    // Variant& Variant::operator =(const Vector<unsigned char>& rhs)
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // Variant& Variant::operator =(void* rhs)
     // Error: type "void*" can not automatically bind
     // Variant& Variant::operator =(const VariantVector& rhs)
     // Error: type "const VariantVector&" can not automatically bind
-    // bool Variant::operator ==(const Vector<unsigned char>& rhs) const
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // bool Variant::operator ==(void* rhs) const
     // Error: type "void*" can not automatically bind
     // bool Variant::operator ==(const VariantVector& rhs) const
@@ -5669,6 +5703,9 @@ template <class T> void RegisterMembers_Variant(asIScriptEngine* engine, const c
 
     // bool Variant::GetBool() const
     engine->RegisterObjectMethod(className, "bool GetBool() const", AS_METHODPR(T, GetBool, () const, bool), AS_CALL_THISCALL);
+
+    // const Vector<unsigned char>& Variant::GetBuffer() const
+    engine->RegisterObjectMethod(className, "Array<uint8>@ GetBuffer() const", AS_FUNCTION_OBJFIRST(Variant_constspVectorlesunsignedspchargreamp_GetBuffer_void_template<Variant>), AS_CALL_CDECL_OBJFIRST);
 
     // const Color& Variant::GetColor() const
     engine->RegisterObjectMethod(className, "const Color& GetColor() const", AS_METHODPR(T, GetColor, () const, const Color&), AS_CALL_THISCALL);
@@ -5812,6 +5849,9 @@ template <class T> void RegisterMembers_Variant(asIScriptEngine* engine, const c
     // Variant& Variant::operator =(const String& rhs)
     engine->RegisterObjectMethod(className, "Variant& opAssign(const String&in)", AS_METHODPR(T, operator=, (const String&), Variant&), AS_CALL_THISCALL);
 
+    // Variant& Variant::operator =(const Vector<unsigned char>& rhs)
+    engine->RegisterObjectMethod(className, "Variant& opAssign(Array<uint8>@+)", AS_FUNCTION_OBJFIRST(Variant_Variantamp_operatoreq_constspVectorlesunsignedspchargreamp_template<Variant>), AS_CALL_CDECL_OBJFIRST);
+
     // Variant& Variant::operator =(const VectorBuffer& rhs)
     engine->RegisterObjectMethod(className, "Variant& opAssign(const VectorBuffer&in)", AS_METHODPR(T, operator=, (const VectorBuffer&), Variant&), AS_CALL_THISCALL);
 
@@ -5892,6 +5932,9 @@ template <class T> void RegisterMembers_Variant(asIScriptEngine* engine, const c
 
     // bool Variant::operator ==(const String& rhs) const
     engine->RegisterObjectMethod(className, "bool opEquals(const String&in) const", AS_METHODPR(T, operator==, (const String&) const, bool), AS_CALL_THISCALL);
+
+    // bool Variant::operator ==(const Vector<unsigned char>& rhs) const
+    engine->RegisterObjectMethod(className, "bool opEquals(Array<uint8>@+) const", AS_FUNCTION_OBJFIRST(Variant_bool_operatoreqeq_constspVectorlesunsignedspchargreamp_template<Variant>), AS_CALL_CDECL_OBJFIRST);
 
     // bool Variant::operator ==(const VectorBuffer& rhs) const
     engine->RegisterObjectMethod(className, "bool opEquals(const VectorBuffer&in) const", AS_METHODPR(T, operator==, (const VectorBuffer&) const, bool), AS_CALL_THISCALL);
@@ -6612,11 +6655,26 @@ template <class T> CScriptArray* XMLElement_VectorlesStringgre_GetAttributeNames
     return VectorToArray<String>(result, "Array<String>");
 }
 
+// Vector<unsigned char> XMLElement::GetBuffer(const String& name) const
+template <class T> CScriptArray* XMLElement_Vectorlesunsignedspchargre_GetBuffer_constspStringamp_template(T* _ptr, const String& name)
+{
+    Vector<unsigned char> result = _ptr->GetBuffer(name);
+    return VectorToArray(result, "Array<uint8>");
+}
+
 // StringVector XMLElement::GetStringVector() const
 template <class T> CScriptArray* XMLElement_StringVector_GetStringVector_void_template(T* _ptr)
 {
     StringVector result = _ptr->GetStringVector();
     return VectorToArray<String>(result, "Array<String>");
+}
+
+// bool XMLElement::SetBuffer(const String& name, const Vector<unsigned char>& value)
+template <class T> bool XMLElement_bool_SetBuffer_constspStringamp_constspVectorlesunsignedspchargreamp_template(T* _ptr, const String& name, CScriptArray* value_conv)
+{
+    Vector<unsigned char> value = ArrayToVector<unsigned char>(value_conv);
+    bool result = _ptr->SetBuffer(name, value);
+    return result;
 }
 
 // bool XMLElement::SetStringVector(const StringVector& value)
@@ -6640,8 +6698,6 @@ template <class T> void RegisterMembers_XMLElement(asIScriptEngine* engine, cons
     // Error: type "const char*" can not automatically bind
     // String XMLElement::GetAttributeUpper(const char* name) const
     // Error: type "const char*" can not automatically bind
-    // Vector<unsigned char> XMLElement::GetBuffer(const String& name) const
-    // Error: type "Vector<unsigned char>" can not automatically bind
     // bool XMLElement::GetBuffer(const String& name, void* dest, i32 size) const
     // Error: type "void*" can not automatically bind
     // XMLElement XMLElement::GetChild(const char* name) const
@@ -6678,8 +6734,6 @@ template <class T> void RegisterMembers_XMLElement(asIScriptEngine* engine, cons
     // Error: type "const char*" can not automatically bind
     // bool XMLElement::SetBuffer(const String& name, const void* data, i32 size)
     // Error: type "const void*" can not automatically bind
-    // bool XMLElement::SetBuffer(const String& name, const Vector<unsigned char>& value)
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // bool XMLElement::SetValue(const char* value)
     // Error: type "const char*" can not automatically bind
     // bool XMLElement::SetVariantVector(const VariantVector& value)
@@ -6708,6 +6762,9 @@ template <class T> void RegisterMembers_XMLElement(asIScriptEngine* engine, cons
 
     // BoundingBox XMLElement::GetBoundingBox() const
     engine->RegisterObjectMethod(className, "BoundingBox GetBoundingBox() const", AS_METHODPR(T, GetBoundingBox, () const, BoundingBox), AS_CALL_THISCALL);
+
+    // Vector<unsigned char> XMLElement::GetBuffer(const String& name) const
+    engine->RegisterObjectMethod(className, "Array<uint8>@ GetBuffer(const String&in) const", AS_FUNCTION_OBJFIRST(XMLElement_Vectorlesunsignedspchargre_GetBuffer_constspStringamp_template<XMLElement>), AS_CALL_CDECL_OBJFIRST);
 
     // XMLElement XMLElement::GetChild(const String& name = String::EMPTY) const
     engine->RegisterObjectMethod(className, "XMLElement GetChild(const String&in = String::EMPTY) const", AS_METHODPR(T, GetChild, (const String&) const, XMLElement), AS_CALL_THISCALL);
@@ -6875,6 +6932,9 @@ template <class T> void RegisterMembers_XMLElement(asIScriptEngine* engine, cons
 
     // bool XMLElement::SetBoundingBox(const BoundingBox& value)
     engine->RegisterObjectMethod(className, "bool SetBoundingBox(const BoundingBox&in)", AS_METHODPR(T, SetBoundingBox, (const BoundingBox&), bool), AS_CALL_THISCALL);
+
+    // bool XMLElement::SetBuffer(const String& name, const Vector<unsigned char>& value)
+    engine->RegisterObjectMethod(className, "bool SetBuffer(const String&in, Array<uint8>@+)", AS_FUNCTION_OBJFIRST(XMLElement_bool_SetBuffer_constspStringamp_constspVectorlesunsignedspchargreamp_template<XMLElement>), AS_CALL_CDECL_OBJFIRST);
 
     // bool XMLElement::SetColor(const String& name, const Color& value)
     engine->RegisterObjectMethod(className, "bool SetColor(const String&in, const Color&in)", AS_METHODPR(T, SetColor, (const String&, const Color&), bool), AS_CALL_THISCALL);
@@ -8609,14 +8669,19 @@ template <class T> void RegisterMembers_SceneReplicationState(asIScriptEngine* e
     #endif
 }
 
+// const Vector<unsigned char>& ShaderVariation::GetByteCode() const
+template <class T> CScriptArray* ShaderVariation_constspVectorlesunsignedspchargreamp_GetByteCode_void_template(T* _ptr)
+{
+    const Vector<unsigned char>& result = _ptr->GetByteCode();
+    return VectorToArray(result, "Array<uint8>");
+}
+
 // class ShaderVariation | File: ../GraphicsAPI/ShaderVariation.h
 template <class T> void RegisterMembers_ShaderVariation(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_RefCounted<T>(engine, className);
     RegisterMembers_GPUObject<T>(engine, className);
 
-    // const Vector<unsigned char>& ShaderVariation::GetByteCode() const
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // const unsigned* ShaderVariation::GetConstantBufferSizes() const
     // Error: type "const unsigned*" can not automatically bind
     // const HashMap<StringHash, ShaderParameter>& ShaderVariation::GetParameters() const
@@ -8624,6 +8689,9 @@ template <class T> void RegisterMembers_ShaderVariation(asIScriptEngine* engine,
 
     // bool ShaderVariation::Create()
     engine->RegisterObjectMethod(className, "bool Create()", AS_METHODPR(T, Create, (), bool), AS_CALL_THISCALL);
+
+    // const Vector<unsigned char>& ShaderVariation::GetByteCode() const
+    engine->RegisterObjectMethod(className, "Array<uint8>@ GetByteCode() const", AS_FUNCTION_OBJFIRST(ShaderVariation_constspVectorlesunsignedspchargreamp_GetByteCode_void_template<ShaderVariation>), AS_CALL_CDECL_OBJFIRST);
 
     // const String& ShaderVariation::GetCompilerOutput() const
     engine->RegisterObjectMethod(className, "const String& GetCompilerOutput() const", AS_METHODPR(T, GetCompilerOutput, () const, const String&), AS_CALL_THISCALL);
@@ -12356,27 +12424,43 @@ template <class T> void RegisterMembers_UI(asIScriptEngine* engine, const char* 
     #endif
 }
 
+// const Vector<unsigned char>& VectorBuffer::GetBuffer() const
+template <class T> CScriptArray* VectorBuffer_constspVectorlesunsignedspchargreamp_GetBuffer_void_template(T* _ptr)
+{
+    const Vector<unsigned char>& result = _ptr->GetBuffer();
+    return VectorToArray(result, "Array<uint8>");
+}
+
+// void VectorBuffer::SetData(const Vector<unsigned char>& data)
+template <class T> void VectorBuffer_void_SetData_constspVectorlesunsignedspchargreamp_template(T* _ptr, CScriptArray* data_conv)
+{
+    Vector<unsigned char> data = ArrayToVector<unsigned char>(data_conv);
+    _ptr->SetData(data);
+}
+
 // class VectorBuffer | File: ../IO/VectorBuffer.h
 template <class T> void RegisterMembers_VectorBuffer(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_AbstractFile<T>(engine, className);
 
-    // const Vector<unsigned char>& VectorBuffer::GetBuffer() const
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // const unsigned char* VectorBuffer::GetData() const
     // Error: type "const unsigned char*" can not automatically bind
     // unsigned char* VectorBuffer::GetModifiableData()
     // Error: type "unsigned char*" can not automatically bind
-    // void VectorBuffer::SetData(const Vector<unsigned char>& data)
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // void VectorBuffer::SetData(const void* data, unsigned size)
     // Error: type "const void*" can not automatically bind
 
     // void VectorBuffer::Clear()
     engine->RegisterObjectMethod(className, "void Clear()", AS_METHODPR(T, Clear, (), void), AS_CALL_THISCALL);
 
+    // const Vector<unsigned char>& VectorBuffer::GetBuffer() const
+    engine->RegisterObjectMethod(className, "Array<uint8>@ GetBuffer() const", AS_FUNCTION_OBJFIRST(VectorBuffer_constspVectorlesunsignedspchargreamp_GetBuffer_void_template<VectorBuffer>), AS_CALL_CDECL_OBJFIRST);
+
     // void VectorBuffer::Resize(unsigned size)
     engine->RegisterObjectMethod(className, "void Resize(uint)", AS_METHODPR(T, Resize, (unsigned), void), AS_CALL_THISCALL);
+
+    // void VectorBuffer::SetData(const Vector<unsigned char>& data)
+    engine->RegisterObjectMethod(className, "void SetData(Array<uint8>@+)", AS_FUNCTION_OBJFIRST(VectorBuffer_void_SetData_constspVectorlesunsignedspchargreamp_template<VectorBuffer>), AS_CALL_CDECL_OBJFIRST);
 
     // void VectorBuffer::SetData(Deserializer& source, unsigned size)
     engine->RegisterObjectMethod(className, "void SetData(Deserializer&, uint)", AS_METHODPR(T, SetData, (Deserializer&, unsigned), void), AS_CALL_THISCALL);
@@ -15422,11 +15506,39 @@ template <class T> CScriptArray* Node_constspVectorlesNodestargreamp_GetDependen
     return VectorToHandleArray(result, "Array<Node@>");
 }
 
+// const Vector<unsigned char>& Node::GetNetParentAttr() const
+template <class T> CScriptArray* Node_constspVectorlesunsignedspchargreamp_GetNetParentAttr_void_template(T* _ptr)
+{
+    const Vector<unsigned char>& result = _ptr->GetNetParentAttr();
+    return VectorToArray(result, "Array<uint8>");
+}
+
+// const Vector<unsigned char>& Node::GetNetRotationAttr() const
+template <class T> CScriptArray* Node_constspVectorlesunsignedspchargreamp_GetNetRotationAttr_void_template(T* _ptr)
+{
+    const Vector<unsigned char>& result = _ptr->GetNetRotationAttr();
+    return VectorToArray(result, "Array<uint8>");
+}
+
 // const StringVector& Node::GetTags() const
 template <class T> CScriptArray* Node_constspStringVectoramp_GetTags_void_template(T* _ptr)
 {
     const StringVector& result = _ptr->GetTags();
     return VectorToArray<String>(result, "Array<String>");
+}
+
+// void Node::SetNetParentAttr(const Vector<unsigned char>& value)
+template <class T> void Node_void_SetNetParentAttr_constspVectorlesunsignedspchargreamp_template(T* _ptr, CScriptArray* value_conv)
+{
+    Vector<unsigned char> value = ArrayToVector<unsigned char>(value_conv);
+    _ptr->SetNetParentAttr(value);
+}
+
+// void Node::SetNetRotationAttr(const Vector<unsigned char>& value)
+template <class T> void Node_void_SetNetRotationAttr_constspVectorlesunsignedspchargreamp_template(T* _ptr, CScriptArray* value_conv)
+{
+    Vector<unsigned char> value = ArrayToVector<unsigned char>(value_conv);
+    _ptr->SetNetRotationAttr(value);
 }
 
 // void Node::SetTags(const StringVector& tags)
@@ -15457,10 +15569,6 @@ template <class T> void RegisterMembers_Node(asIScriptEngine* engine, const char
     // Error: type "Vector<Component*>&" can not automatically bind
     // const Vector<WeakPtr<Component>> Node::GetListeners() const
     // Error: type "const Vector<WeakPtr<Component>>" can not automatically bind
-    // const Vector<unsigned char>& Node::GetNetParentAttr() const
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
-    // const Vector<unsigned char>& Node::GetNetRotationAttr() const
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // Connection* Node::GetOwner() const
     // Not registered because have @manualbind mark
     // bool Node::Load(Deserializer& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false, CreateMode mode = REPLICATED)
@@ -15471,10 +15579,6 @@ template <class T> void RegisterMembers_Node(asIScriptEngine* engine, const char
     // Can not be registered here bacause hidden in derived classes: Scene
     // void Node::MarkReplicationDirty()
     // Can not be registered here bacause hidden in derived classes: Scene
-    // void Node::SetNetParentAttr(const Vector<unsigned char>& value)
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
-    // void Node::SetNetRotationAttr(const Vector<unsigned char>& value)
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // void Node::SetOwner(Connection* owner)
     // Not registered because have @manualbind mark
 
@@ -15562,8 +15666,14 @@ template <class T> void RegisterMembers_Node(asIScriptEngine* engine, const char
     // StringHash Node::GetNameHash() const
     engine->RegisterObjectMethod(className, "StringHash GetNameHash() const", AS_METHODPR(T, GetNameHash, () const, StringHash), AS_CALL_THISCALL);
 
+    // const Vector<unsigned char>& Node::GetNetParentAttr() const
+    engine->RegisterObjectMethod(className, "Array<uint8>@ GetNetParentAttr() const", AS_FUNCTION_OBJFIRST(Node_constspVectorlesunsignedspchargreamp_GetNetParentAttr_void_template<Node>), AS_CALL_CDECL_OBJFIRST);
+
     // const Vector3& Node::GetNetPositionAttr() const
     engine->RegisterObjectMethod(className, "const Vector3& GetNetPositionAttr() const", AS_METHODPR(T, GetNetPositionAttr, () const, const Vector3&), AS_CALL_THISCALL);
+
+    // const Vector<unsigned char>& Node::GetNetRotationAttr() const
+    engine->RegisterObjectMethod(className, "Array<uint8>@ GetNetRotationAttr() const", AS_FUNCTION_OBJFIRST(Node_constspVectorlesunsignedspchargreamp_GetNetRotationAttr_void_template<Node>), AS_CALL_CDECL_OBJFIRST);
 
     // i32 Node::GetNumChildren(bool recursive = false) const
     engine->RegisterObjectMethod(className, "int GetNumChildren(bool = false) const", AS_METHODPR(T, GetNumChildren, (bool) const, i32), AS_CALL_THISCALL);
@@ -15827,8 +15937,14 @@ template <class T> void RegisterMembers_Node(asIScriptEngine* engine, const char
     engine->RegisterObjectMethod(className, "void SetName(const String&in)", AS_METHODPR(T, SetName, (const String&), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_name(const String&in)", AS_METHODPR(T, SetName, (const String&), void), AS_CALL_THISCALL);
 
+    // void Node::SetNetParentAttr(const Vector<unsigned char>& value)
+    engine->RegisterObjectMethod(className, "void SetNetParentAttr(Array<uint8>@+)", AS_FUNCTION_OBJFIRST(Node_void_SetNetParentAttr_constspVectorlesunsignedspchargreamp_template<Node>), AS_CALL_CDECL_OBJFIRST);
+
     // void Node::SetNetPositionAttr(const Vector3& value)
     engine->RegisterObjectMethod(className, "void SetNetPositionAttr(const Vector3&in)", AS_METHODPR(T, SetNetPositionAttr, (const Vector3&), void), AS_CALL_THISCALL);
+
+    // void Node::SetNetRotationAttr(const Vector<unsigned char>& value)
+    engine->RegisterObjectMethod(className, "void SetNetRotationAttr(Array<uint8>@+)", AS_FUNCTION_OBJFIRST(Node_void_SetNetRotationAttr_constspVectorlesunsignedspchargreamp_template<Node>), AS_CALL_CDECL_OBJFIRST);
 
     // void Node::SetParent(Node* parent)
     engine->RegisterObjectMethod(className, "void SetParent(Node@+)", AS_METHODPR(T, SetParent, (Node*), void), AS_CALL_THISCALL);
@@ -17065,6 +17181,20 @@ template <class T> void RegisterMembers_UIElement(asIScriptEngine* engine, const
     #endif
 }
 
+// const Vector<unsigned char>& AnimationController::GetNetAnimationsAttr() const
+template <class T> CScriptArray* AnimationController_constspVectorlesunsignedspchargreamp_GetNetAnimationsAttr_void_template(T* _ptr)
+{
+    const Vector<unsigned char>& result = _ptr->GetNetAnimationsAttr();
+    return VectorToArray(result, "Array<uint8>");
+}
+
+// void AnimationController::SetNetAnimationsAttr(const Vector<unsigned char>& value)
+template <class T> void AnimationController_void_SetNetAnimationsAttr_constspVectorlesunsignedspchargreamp_template(T* _ptr, CScriptArray* value_conv)
+{
+    Vector<unsigned char> value = ArrayToVector<unsigned char>(value_conv);
+    _ptr->SetNetAnimationsAttr(value);
+}
+
 // class AnimationController | File: ../Graphics/AnimationController.h
 template <class T> void RegisterMembers_AnimationController(asIScriptEngine* engine, const char* className)
 {
@@ -17074,14 +17204,10 @@ template <class T> void RegisterMembers_AnimationController(asIScriptEngine* eng
     // Not registered because have @nobind mark
     // VariantVector AnimationController::GetAnimationsAttr() const
     // Error: type "VariantVector" can not automatically bind
-    // const Vector<unsigned char>& AnimationController::GetNetAnimationsAttr() const
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // VariantVector AnimationController::GetNodeAnimationStatesAttr() const
     // Error: type "VariantVector" can not automatically bind
     // void AnimationController::SetAnimationsAttr(const VariantVector& value)
     // Error: type "const VariantVector&" can not automatically bind
-    // void AnimationController::SetNetAnimationsAttr(const Vector<unsigned char>& value)
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // void AnimationController::SetNodeAnimationStatesAttr(const VariantVector& value)
     // Error: type "const VariantVector&" can not automatically bind
 
@@ -17117,6 +17243,9 @@ template <class T> void RegisterMembers_AnimationController(asIScriptEngine* eng
 
     // float AnimationController::GetLength(const String& name) const
     engine->RegisterObjectMethod(className, "float GetLength(const String&in) const", AS_METHODPR(T, GetLength, (const String&) const, float), AS_CALL_THISCALL);
+
+    // const Vector<unsigned char>& AnimationController::GetNetAnimationsAttr() const
+    engine->RegisterObjectMethod(className, "Array<uint8>@ GetNetAnimationsAttr() const", AS_FUNCTION_OBJFIRST(AnimationController_constspVectorlesunsignedspchargreamp_GetNetAnimationsAttr_void_template<AnimationController>), AS_CALL_CDECL_OBJFIRST);
 
     // bool AnimationController::GetRemoveOnCompletion(const String& name) const
     engine->RegisterObjectMethod(className, "bool GetRemoveOnCompletion(const String&in) const", AS_METHODPR(T, GetRemoveOnCompletion, (const String&) const, bool), AS_CALL_THISCALL);
@@ -17171,6 +17300,9 @@ template <class T> void RegisterMembers_AnimationController(asIScriptEngine* eng
 
     // bool AnimationController::SetLooped(const String& name, bool enable)
     engine->RegisterObjectMethod(className, "bool SetLooped(const String&in, bool)", AS_METHODPR(T, SetLooped, (const String&, bool), bool), AS_CALL_THISCALL);
+
+    // void AnimationController::SetNetAnimationsAttr(const Vector<unsigned char>& value)
+    engine->RegisterObjectMethod(className, "void SetNetAnimationsAttr(Array<uint8>@+)", AS_FUNCTION_OBJFIRST(AnimationController_void_SetNetAnimationsAttr_constspVectorlesunsignedspchargreamp_template<AnimationController>), AS_CALL_CDECL_OBJFIRST);
 
     // bool AnimationController::SetRemoveOnCompletion(const String& name, bool removeOnCompletion)
     engine->RegisterObjectMethod(className, "bool SetRemoveOnCompletion(const String&in, bool)", AS_METHODPR(T, SetRemoveOnCompletion, (const String&, bool), bool), AS_CALL_THISCALL);
@@ -19204,6 +19336,13 @@ template <class T> void RegisterMembers_UISelectable(asIScriptEngine* engine, co
     #endif
 }
 
+// const Vector<unsigned char>& UnknownComponent::GetBinaryAttributes() const
+template <class T> CScriptArray* UnknownComponent_constspVectorlesunsignedspchargreamp_GetBinaryAttributes_void_template(T* _ptr)
+{
+    const Vector<unsigned char>& result = _ptr->GetBinaryAttributes();
+    return VectorToArray(result, "Array<uint8>");
+}
+
 // const Vector<String>& UnknownComponent::GetXMLAttributes() const
 template <class T> CScriptArray* UnknownComponent_constspVectorlesStringgreamp_GetXMLAttributes_void_template(T* _ptr)
 {
@@ -19216,11 +19355,11 @@ template <class T> void RegisterMembers_UnknownComponent(asIScriptEngine* engine
 {
     RegisterMembers_Component<T>(engine, className);
 
-    // const Vector<unsigned char>& UnknownComponent::GetBinaryAttributes() const
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
-
     // virtual void Component::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     engine->RegisterObjectMethod(className, "void DrawDebugGeometry(DebugRenderer@+, bool)", AS_METHODPR(T, DrawDebugGeometry, (DebugRenderer*, bool), void), AS_CALL_THISCALL);
+
+    // const Vector<unsigned char>& UnknownComponent::GetBinaryAttributes() const
+    engine->RegisterObjectMethod(className, "Array<uint8>@ GetBinaryAttributes() const", AS_FUNCTION_OBJFIRST(UnknownComponent_constspVectorlesunsignedspchargreamp_GetBinaryAttributes_void_template<UnknownComponent>), AS_CALL_CDECL_OBJFIRST);
 
     // bool UnknownComponent::GetUseXML() const
     engine->RegisterObjectMethod(className, "bool GetUseXML() const", AS_METHODPR(T, GetUseXML, () const, bool), AS_CALL_THISCALL);
@@ -19827,13 +19966,40 @@ template <class T> void RegisterMembers_Navigable(asIScriptEngine* engine, const
     #endif
 }
 
+// virtual bool NavigationMesh::AddTile(const Vector<unsigned char>& tileData)
+template <class T> bool NavigationMesh_bool_AddTile_constspVectorlesunsignedspchargreamp_template(T* _ptr, CScriptArray* tileData_conv)
+{
+    Vector<unsigned char> tileData = ArrayToVector<unsigned char>(tileData_conv);
+    bool result = _ptr->AddTile(tileData);
+    return result;
+}
+
+// virtual Vector<unsigned char> NavigationMesh::GetNavigationDataAttr() const
+template <class T> CScriptArray* NavigationMesh_Vectorlesunsignedspchargre_GetNavigationDataAttr_void_template(T* _ptr)
+{
+    Vector<unsigned char> result = _ptr->GetNavigationDataAttr();
+    return VectorToArray(result, "Array<uint8>");
+}
+
+// virtual Vector<unsigned char> NavigationMesh::GetTileData(const IntVector2& tile) const
+template <class T> CScriptArray* NavigationMesh_Vectorlesunsignedspchargre_GetTileData_constspIntVector2amp_template(T* _ptr, const IntVector2& tile)
+{
+    Vector<unsigned char> result = _ptr->GetTileData(tile);
+    return VectorToArray(result, "Array<uint8>");
+}
+
+// virtual void NavigationMesh::SetNavigationDataAttr(const Vector<unsigned char>& value)
+template <class T> void NavigationMesh_void_SetNavigationDataAttr_constspVectorlesunsignedspchargreamp_template(T* _ptr, CScriptArray* value_conv)
+{
+    Vector<unsigned char> value = ArrayToVector<unsigned char>(value_conv);
+    _ptr->SetNavigationDataAttr(value);
+}
+
 // class NavigationMesh | File: ../Navigation/NavigationMesh.h
 template <class T> void RegisterMembers_NavigationMesh(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_Component<T>(engine, className);
 
-    // virtual bool NavigationMesh::AddTile(const Vector<unsigned char>& tileData)
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // Vector3 NavigationMesh::FindNearestPoint(const Vector3& point, const Vector3& extents = Vector3::ONE, const dtQueryFilter* filter = nullptr, dtPolyRef* nearestRef = nullptr)
     // Error: type "const dtQueryFilter*" can not automatically bind
     // void NavigationMesh::FindPath(Vector<Vector3>& dest, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE, const dtQueryFilter* filter = nullptr)
@@ -19842,20 +20008,17 @@ template <class T> void RegisterMembers_NavigationMesh(asIScriptEngine* engine, 
     // Error: type "Vector<NavigationPathPoint>&" can not automatically bind
     // float NavigationMesh::GetDistanceToWall(const Vector3& point, float radius, const Vector3& extents = Vector3::ONE, const dtQueryFilter* filter = nullptr, Vector3* hitPos = nullptr, Vector3* hitNormal = nullptr)
     // Error: type "const dtQueryFilter*" can not automatically bind
-    // virtual Vector<unsigned char> NavigationMesh::GetNavigationDataAttr() const
-    // Error: type "Vector<unsigned char>" can not automatically bind
     // Vector3 NavigationMesh::GetRandomPoint(const dtQueryFilter* filter = nullptr, dtPolyRef* randomRef = nullptr)
     // Error: type "const dtQueryFilter*" can not automatically bind
     // Vector3 NavigationMesh::GetRandomPointInCircle(const Vector3& center, float radius, const Vector3& extents = Vector3::ONE, const dtQueryFilter* filter = nullptr, dtPolyRef* randomRef = nullptr)
     // Error: type "const dtQueryFilter*" can not automatically bind
-    // virtual Vector<unsigned char> NavigationMesh::GetTileData(const IntVector2& tile) const
-    // Error: type "Vector<unsigned char>" can not automatically bind
     // Vector3 NavigationMesh::MoveAlongSurface(const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE, int maxVisited = 3, const dtQueryFilter* filter = nullptr)
     // Error: type "const dtQueryFilter*" can not automatically bind
     // Vector3 NavigationMesh::Raycast(const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE, const dtQueryFilter* filter = nullptr, Vector3* hitNormal = nullptr)
     // Error: type "const dtQueryFilter*" can not automatically bind
-    // virtual void NavigationMesh::SetNavigationDataAttr(const Vector<unsigned char>& value)
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
+
+    // virtual bool NavigationMesh::AddTile(const Vector<unsigned char>& tileData)
+    engine->RegisterObjectMethod(className, "bool AddTile(Array<uint8>@+)", AS_FUNCTION_OBJFIRST(NavigationMesh_bool_AddTile_constspVectorlesunsignedspchargreamp_template<NavigationMesh>), AS_CALL_CDECL_OBJFIRST);
 
     // virtual bool NavigationMesh::Allocate(const BoundingBox& boundingBox, unsigned maxTiles)
     engine->RegisterObjectMethod(className, "bool Allocate(const BoundingBox&in, uint)", AS_METHODPR(T, Allocate, (const BoundingBox&, unsigned), bool), AS_CALL_THISCALL);
@@ -19933,6 +20096,9 @@ template <class T> void RegisterMembers_NavigationMesh(asIScriptEngine* engine, 
     // String NavigationMesh::GetMeshName() const
     engine->RegisterObjectMethod(className, "String GetMeshName() const", AS_METHODPR(T, GetMeshName, () const, String), AS_CALL_THISCALL);
 
+    // virtual Vector<unsigned char> NavigationMesh::GetNavigationDataAttr() const
+    engine->RegisterObjectMethod(className, "Array<uint8>@ GetNavigationDataAttr() const", AS_FUNCTION_OBJFIRST(NavigationMesh_Vectorlesunsignedspchargre_GetNavigationDataAttr_void_template<NavigationMesh>), AS_CALL_CDECL_OBJFIRST);
+
     // IntVector2 NavigationMesh::GetNumTiles() const
     engine->RegisterObjectMethod(className, "IntVector2 GetNumTiles() const", AS_METHODPR(T, GetNumTiles, () const, IntVector2), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "IntVector2 get_numTiles() const", AS_METHODPR(T, GetNumTiles, () const, IntVector2), AS_CALL_THISCALL);
@@ -19955,6 +20121,9 @@ template <class T> void RegisterMembers_NavigationMesh(asIScriptEngine* engine, 
 
     // BoundingBox NavigationMesh::GetTileBoundingBox(const IntVector2& tile) const
     engine->RegisterObjectMethod(className, "BoundingBox GetTileBoundingBox(const IntVector2&in) const", AS_METHODPR(T, GetTileBoundingBox, (const IntVector2&) const, BoundingBox), AS_CALL_THISCALL);
+
+    // virtual Vector<unsigned char> NavigationMesh::GetTileData(const IntVector2& tile) const
+    engine->RegisterObjectMethod(className, "Array<uint8>@ GetTileData(const IntVector2&in) const", AS_FUNCTION_OBJFIRST(NavigationMesh_Vectorlesunsignedspchargre_GetTileData_constspIntVector2amp_template<NavigationMesh>), AS_CALL_CDECL_OBJFIRST);
 
     // IntVector2 NavigationMesh::GetTileIndex(const Vector3& position) const
     engine->RegisterObjectMethod(className, "IntVector2 GetTileIndex(const Vector3&in) const", AS_METHODPR(T, GetTileIndex, (const Vector3&) const, IntVector2), AS_CALL_THISCALL);
@@ -20033,6 +20202,9 @@ template <class T> void RegisterMembers_NavigationMesh(asIScriptEngine* engine, 
 
     // void NavigationMesh::SetMeshName(const String& newName)
     engine->RegisterObjectMethod(className, "void SetMeshName(const String&in)", AS_METHODPR(T, SetMeshName, (const String&), void), AS_CALL_THISCALL);
+
+    // virtual void NavigationMesh::SetNavigationDataAttr(const Vector<unsigned char>& value)
+    engine->RegisterObjectMethod(className, "void SetNavigationDataAttr(Array<uint8>@+)", AS_FUNCTION_OBJFIRST(NavigationMesh_void_SetNavigationDataAttr_constspVectorlesunsignedspchargreamp_template<NavigationMesh>), AS_CALL_CDECL_OBJFIRST);
 
     // void NavigationMesh::SetPadding(const Vector3& padding)
     engine->RegisterObjectMethod(className, "void SetPadding(const Vector3&in)", AS_METHODPR(T, SetPadding, (const Vector3&), void), AS_CALL_THISCALL);
@@ -20659,6 +20831,20 @@ template <class T> void RegisterMembers_PhysicsWorld(asIScriptEngine* engine, co
     #endif
 }
 
+// const Vector<unsigned char>& RigidBody::GetNetAngularVelocityAttr() const
+template <class T> CScriptArray* RigidBody_constspVectorlesunsignedspchargreamp_GetNetAngularVelocityAttr_void_template(T* _ptr)
+{
+    const Vector<unsigned char>& result = _ptr->GetNetAngularVelocityAttr();
+    return VectorToArray(result, "Array<uint8>");
+}
+
+// void RigidBody::SetNetAngularVelocityAttr(const Vector<unsigned char>& value)
+template <class T> void RigidBody_void_SetNetAngularVelocityAttr_constspVectorlesunsignedspchargreamp_template(T* _ptr, CScriptArray* value_conv)
+{
+    Vector<unsigned char> value = ArrayToVector<unsigned char>(value_conv);
+    _ptr->SetNetAngularVelocityAttr(value);
+}
+
 // class RigidBody | File: ../Physics/RigidBody.h
 template <class T> void RegisterMembers_RigidBody(asIScriptEngine* engine, const char* className)
 {
@@ -20670,12 +20856,8 @@ template <class T> void RegisterMembers_RigidBody(asIScriptEngine* engine, const
     // Error: type "Vector<RigidBody*>&" can not automatically bind
     // btCompoundShape* RigidBody::GetCompoundShape() const
     // Error: type "btCompoundShape*" can not automatically bind
-    // const Vector<unsigned char>& RigidBody::GetNetAngularVelocityAttr() const
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // void RigidBody::getWorldTransform(btTransform& worldTrans) const override
     // Not registered because have @nobind mark
-    // void RigidBody::SetNetAngularVelocityAttr(const Vector<unsigned char>& value)
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // void RigidBody::setWorldTransform(const btTransform& worldTrans) override
     // Not registered because have @nobind mark
 
@@ -20790,6 +20972,9 @@ template <class T> void RegisterMembers_RigidBody(asIScriptEngine* engine, const
     // float RigidBody::GetMass() const
     engine->RegisterObjectMethod(className, "float GetMass() const", AS_METHODPR(T, GetMass, () const, float), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_mass() const", AS_METHODPR(T, GetMass, () const, float), AS_CALL_THISCALL);
+
+    // const Vector<unsigned char>& RigidBody::GetNetAngularVelocityAttr() const
+    engine->RegisterObjectMethod(className, "Array<uint8>@ GetNetAngularVelocityAttr() const", AS_FUNCTION_OBJFIRST(RigidBody_constspVectorlesunsignedspchargreamp_GetNetAngularVelocityAttr_void_template<RigidBody>), AS_CALL_CDECL_OBJFIRST);
 
     // PhysicsWorld* RigidBody::GetPhysicsWorld() const
     engine->RegisterObjectMethod(className, "PhysicsWorld@+ GetPhysicsWorld() const", AS_METHODPR(T, GetPhysicsWorld, () const, PhysicsWorld*), AS_CALL_THISCALL);
@@ -20919,6 +21104,9 @@ template <class T> void RegisterMembers_RigidBody(asIScriptEngine* engine, const
     // void RigidBody::SetMass(float mass)
     engine->RegisterObjectMethod(className, "void SetMass(float)", AS_METHODPR(T, SetMass, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_mass(float)", AS_METHODPR(T, SetMass, (float), void), AS_CALL_THISCALL);
+
+    // void RigidBody::SetNetAngularVelocityAttr(const Vector<unsigned char>& value)
+    engine->RegisterObjectMethod(className, "void SetNetAngularVelocityAttr(Array<uint8>@+)", AS_FUNCTION_OBJFIRST(RigidBody_void_SetNetAngularVelocityAttr_constspVectorlesunsignedspchargreamp_template<RigidBody>), AS_CALL_CDECL_OBJFIRST);
 
     // void RigidBody::SetPosition(const Vector3& position)
     engine->RegisterObjectMethod(className, "void SetPosition(const Vector3&in)", AS_METHODPR(T, SetPosition, (const Vector3&), void), AS_CALL_THISCALL);
@@ -21589,6 +21777,20 @@ template <class T> void RegisterMembers_TileMapLayer2D(asIScriptEngine* engine, 
 
 #endif // def URHO3D_URHO2D
 
+// const Vector<unsigned char>& BillboardSet::GetNetBillboardsAttr() const
+template <class T> CScriptArray* BillboardSet_constspVectorlesunsignedspchargreamp_GetNetBillboardsAttr_void_template(T* _ptr)
+{
+    const Vector<unsigned char>& result = _ptr->GetNetBillboardsAttr();
+    return VectorToArray(result, "Array<uint8>");
+}
+
+// void BillboardSet::SetNetBillboardsAttr(const Vector<unsigned char>& value)
+template <class T> void BillboardSet_void_SetNetBillboardsAttr_constspVectorlesunsignedspchargreamp_template(T* _ptr, CScriptArray* value_conv)
+{
+    Vector<unsigned char> value = ArrayToVector<unsigned char>(value_conv);
+    _ptr->SetNetBillboardsAttr(value);
+}
+
 // class BillboardSet | File: ../Graphics/BillboardSet.h
 template <class T> void RegisterMembers_BillboardSet(asIScriptEngine* engine, const char* className)
 {
@@ -21598,12 +21800,8 @@ template <class T> void RegisterMembers_BillboardSet(asIScriptEngine* engine, co
     // Error: type "Vector<Billboard>&" can not automatically bind
     // VariantVector BillboardSet::GetBillboardsAttr() const
     // Error: type "VariantVector" can not automatically bind
-    // const Vector<unsigned char>& BillboardSet::GetNetBillboardsAttr() const
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // void BillboardSet::SetBillboardsAttr(const VariantVector& value)
     // Error: type "const VariantVector&" can not automatically bind
-    // void BillboardSet::SetNetBillboardsAttr(const Vector<unsigned char>& value)
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
 
     // void BillboardSet::Commit()
     engine->RegisterObjectMethod(className, "void Commit()", AS_METHODPR(T, Commit, (), void), AS_CALL_THISCALL);
@@ -21630,6 +21828,9 @@ template <class T> void RegisterMembers_BillboardSet(asIScriptEngine* engine, co
     // float BillboardSet::GetMinAngle() const
     engine->RegisterObjectMethod(className, "float GetMinAngle() const", AS_METHODPR(T, GetMinAngle, () const, float), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_minAngle() const", AS_METHODPR(T, GetMinAngle, () const, float), AS_CALL_THISCALL);
+
+    // const Vector<unsigned char>& BillboardSet::GetNetBillboardsAttr() const
+    engine->RegisterObjectMethod(className, "Array<uint8>@ GetNetBillboardsAttr() const", AS_FUNCTION_OBJFIRST(BillboardSet_constspVectorlesunsignedspchargreamp_GetNetBillboardsAttr_void_template<BillboardSet>), AS_CALL_CDECL_OBJFIRST);
 
     // unsigned BillboardSet::GetNumBillboards() const
     engine->RegisterObjectMethod(className, "uint GetNumBillboards() const", AS_METHODPR(T, GetNumBillboards, () const, unsigned), AS_CALL_THISCALL);
@@ -21673,6 +21874,9 @@ template <class T> void RegisterMembers_BillboardSet(asIScriptEngine* engine, co
     // void BillboardSet::SetMinAngle(float angle)
     engine->RegisterObjectMethod(className, "void SetMinAngle(float)", AS_METHODPR(T, SetMinAngle, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_minAngle(float)", AS_METHODPR(T, SetMinAngle, (float), void), AS_CALL_THISCALL);
+
+    // void BillboardSet::SetNetBillboardsAttr(const Vector<unsigned char>& value)
+    engine->RegisterObjectMethod(className, "void SetNetBillboardsAttr(Array<uint8>@+)", AS_FUNCTION_OBJFIRST(BillboardSet_void_SetNetBillboardsAttr_constspVectorlesunsignedspchargreamp_template<BillboardSet>), AS_CALL_CDECL_OBJFIRST);
 
     // void BillboardSet::SetNumBillboards(unsigned num)
     engine->RegisterObjectMethod(className, "void SetNumBillboards(uint)", AS_METHODPR(T, SetNumBillboards, (unsigned), void), AS_CALL_THISCALL);
@@ -21825,17 +22029,27 @@ template <class T> void RegisterMembers_Cursor(asIScriptEngine* engine, const ch
     #endif
 }
 
+// Vector<unsigned char> CustomGeometry::GetGeometryDataAttr() const
+template <class T> CScriptArray* CustomGeometry_Vectorlesunsignedspchargre_GetGeometryDataAttr_void_template(T* _ptr)
+{
+    Vector<unsigned char> result = _ptr->GetGeometryDataAttr();
+    return VectorToArray(result, "Array<uint8>");
+}
+
+// void CustomGeometry::SetGeometryDataAttr(const Vector<unsigned char>& value)
+template <class T> void CustomGeometry_void_SetGeometryDataAttr_constspVectorlesunsignedspchargreamp_template(T* _ptr, CScriptArray* value_conv)
+{
+    Vector<unsigned char> value = ArrayToVector<unsigned char>(value_conv);
+    _ptr->SetGeometryDataAttr(value);
+}
+
 // class CustomGeometry | File: ../Graphics/CustomGeometry.h
 template <class T> void RegisterMembers_CustomGeometry(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_Drawable<T>(engine, className);
 
-    // Vector<unsigned char> CustomGeometry::GetGeometryDataAttr() const
-    // Error: type "Vector<unsigned char>" can not automatically bind
     // Vector<Vector<CustomGeometryVertex>>& CustomGeometry::GetVertices()
     // Error: type "Vector<Vector<CustomGeometryVertex>>&" can not automatically bind
-    // void CustomGeometry::SetGeometryDataAttr(const Vector<unsigned char>& value)
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
 
     // void CustomGeometry::BeginGeometry(unsigned index, PrimitiveType type)
     engine->RegisterObjectMethod(className, "void BeginGeometry(uint, PrimitiveType)", AS_METHODPR(T, BeginGeometry, (unsigned, PrimitiveType), void), AS_CALL_THISCALL);
@@ -21864,6 +22078,9 @@ template <class T> void RegisterMembers_CustomGeometry(asIScriptEngine* engine, 
     // void CustomGeometry::DefineVertex(const Vector3& position)
     engine->RegisterObjectMethod(className, "void DefineVertex(const Vector3&in)", AS_METHODPR(T, DefineVertex, (const Vector3&), void), AS_CALL_THISCALL);
 
+    // Vector<unsigned char> CustomGeometry::GetGeometryDataAttr() const
+    engine->RegisterObjectMethod(className, "Array<uint8>@ GetGeometryDataAttr() const", AS_FUNCTION_OBJFIRST(CustomGeometry_Vectorlesunsignedspchargre_GetGeometryDataAttr_void_template<CustomGeometry>), AS_CALL_CDECL_OBJFIRST);
+
     // Material* CustomGeometry::GetMaterial(unsigned index = 0) const
     engine->RegisterObjectMethod(className, "Material@+ GetMaterial(uint = 0) const", AS_METHODPR(T, GetMaterial, (unsigned) const, Material*), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "Material@+ get_materials(uint = 0) const", AS_METHODPR(T, GetMaterial, (unsigned) const, Material*), AS_CALL_THISCALL);
@@ -21890,6 +22107,9 @@ template <class T> void RegisterMembers_CustomGeometry(asIScriptEngine* engine, 
     engine->RegisterObjectMethod(className, "void SetDynamic(bool)", AS_METHODPR(T, SetDynamic, (bool), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_dynamic(bool)", AS_METHODPR(T, SetDynamic, (bool), void), AS_CALL_THISCALL);
 
+    // void CustomGeometry::SetGeometryDataAttr(const Vector<unsigned char>& value)
+    engine->RegisterObjectMethod(className, "void SetGeometryDataAttr(Array<uint8>@+)", AS_FUNCTION_OBJFIRST(CustomGeometry_void_SetGeometryDataAttr_constspVectorlesunsignedspchargreamp_template<CustomGeometry>), AS_CALL_CDECL_OBJFIRST);
+
     // void CustomGeometry::SetMaterial(Material* material)
     engine->RegisterObjectMethod(className, "void SetMaterial(Material@+)", AS_METHODPR(T, SetMaterial, (Material*), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_material(Material@+)", AS_METHODPR(T, SetMaterial, (Material*), void), AS_CALL_THISCALL);
@@ -21913,18 +22133,30 @@ template <class T> void RegisterMembers_CustomGeometry(asIScriptEngine* engine, 
     #endif
 }
 
+// Vector<unsigned char> DecalSet::GetDecalsAttr() const
+template <class T> CScriptArray* DecalSet_Vectorlesunsignedspchargre_GetDecalsAttr_void_template(T* _ptr)
+{
+    Vector<unsigned char> result = _ptr->GetDecalsAttr();
+    return VectorToArray(result, "Array<uint8>");
+}
+
+// void DecalSet::SetDecalsAttr(const Vector<unsigned char>& value)
+template <class T> void DecalSet_void_SetDecalsAttr_constspVectorlesunsignedspchargreamp_template(T* _ptr, CScriptArray* value_conv)
+{
+    Vector<unsigned char> value = ArrayToVector<unsigned char>(value_conv);
+    _ptr->SetDecalsAttr(value);
+}
+
 // class DecalSet | File: ../Graphics/DecalSet.h
 template <class T> void RegisterMembers_DecalSet(asIScriptEngine* engine, const char* className)
 {
     RegisterMembers_Drawable<T>(engine, className);
 
-    // Vector<unsigned char> DecalSet::GetDecalsAttr() const
-    // Error: type "Vector<unsigned char>" can not automatically bind
-    // void DecalSet::SetDecalsAttr(const Vector<unsigned char>& value)
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
-
     // bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Quaternion& worldRotation, float size, float aspectRatio, float depth, const Vector2& topLeftUV, const Vector2& bottomRightUV, float timeToLive = 0.0f, float normalCutoff = 0.1f, unsigned subGeometry = M_MAX_UNSIGNED)
     engine->RegisterObjectMethod(className, "bool AddDecal(Drawable@+, const Vector3&in, const Quaternion&in, float, float, float, const Vector2&in, const Vector2&in, float = 0.0f, float = 0.1f, uint = M_MAX_UNSIGNED)", AS_METHODPR(T, AddDecal, (Drawable*, const Vector3&, const Quaternion&, float, float, float, const Vector2&, const Vector2&, float, float, unsigned), bool), AS_CALL_THISCALL);
+
+    // Vector<unsigned char> DecalSet::GetDecalsAttr() const
+    engine->RegisterObjectMethod(className, "Array<uint8>@ GetDecalsAttr() const", AS_FUNCTION_OBJFIRST(DecalSet_Vectorlesunsignedspchargre_GetDecalsAttr_void_template<DecalSet>), AS_CALL_CDECL_OBJFIRST);
 
     // Material* DecalSet::GetMaterial() const
     engine->RegisterObjectMethod(className, "Material@+ GetMaterial() const", AS_METHODPR(T, GetMaterial, () const, Material*), AS_CALL_THISCALL);
@@ -21962,6 +22194,9 @@ template <class T> void RegisterMembers_DecalSet(asIScriptEngine* engine, const 
 
     // void DecalSet::RemoveDecals(unsigned num)
     engine->RegisterObjectMethod(className, "void RemoveDecals(uint)", AS_METHODPR(T, RemoveDecals, (unsigned), void), AS_CALL_THISCALL);
+
+    // void DecalSet::SetDecalsAttr(const Vector<unsigned char>& value)
+    engine->RegisterObjectMethod(className, "void SetDecalsAttr(Array<uint8>@+)", AS_FUNCTION_OBJFIRST(DecalSet_void_SetDecalsAttr_constspVectorlesunsignedspchargreamp_template<DecalSet>), AS_CALL_CDECL_OBJFIRST);
 
     // void DecalSet::SetMaterial(Material* material)
     engine->RegisterObjectMethod(className, "void SetMaterial(Material@+)", AS_METHODPR(T, SetMaterial, (Material*), void), AS_CALL_THISCALL);
@@ -24751,11 +24986,25 @@ template <class T> CScriptArray* AnimatedModel_constspVectorlesModelMorphgreamp_
     return VectorToArray(result, "Array<ModelMorph>");
 }
 
+// const Vector<unsigned char>& AnimatedModel::GetMorphsAttr() const
+template <class T> CScriptArray* AnimatedModel_constspVectorlesunsignedspchargreamp_GetMorphsAttr_void_template(T* _ptr)
+{
+    const Vector<unsigned char>& result = _ptr->GetMorphsAttr();
+    return VectorToArray(result, "Array<uint8>");
+}
+
 // const Vector<SharedPtr<VertexBuffer>>& AnimatedModel::GetMorphVertexBuffers() const
 template <class T> CScriptArray* AnimatedModel_constspVectorlesSharedPtrlesVertexBuffergregreamp_GetMorphVertexBuffers_void_template(T* _ptr)
 {
     const Vector<SharedPtr<VertexBuffer>>& result = _ptr->GetMorphVertexBuffers();
     return VectorToHandleArray(result, "Array<VertexBuffer@>");
+}
+
+// void AnimatedModel::SetMorphsAttr(const Vector<unsigned char>& value)
+template <class T> void AnimatedModel_void_SetMorphsAttr_constspVectorlesunsignedspchargreamp_template(T* _ptr, CScriptArray* value_conv)
+{
+    Vector<unsigned char> value = ArrayToVector<unsigned char>(value_conv);
+    _ptr->SetMorphsAttr(value);
 }
 
 // class AnimatedModel | File: ../Graphics/AnimatedModel.h
@@ -24771,14 +25020,10 @@ template <class T> void RegisterMembers_AnimatedModel(asIScriptEngine* engine, c
     // Error: type "const Vector<Vector<unsigned>>&" can not automatically bind
     // const Vector<Vector<Matrix3x4>>& AnimatedModel::GetGeometrySkinMatrices() const
     // Error: type "const Vector<Vector<Matrix3x4>>&" can not automatically bind
-    // const Vector<unsigned char>& AnimatedModel::GetMorphsAttr() const
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // void AnimatedModel::SetAnimationStatesAttr(const VariantVector& value)
     // Error: type "const VariantVector&" can not automatically bind
     // void AnimatedModel::SetBonesEnabledAttr(const VariantVector& value)
     // Error: type "const VariantVector&" can not automatically bind
-    // void AnimatedModel::SetMorphsAttr(const Vector<unsigned char>& value)
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
 
     // AnimationState* AnimatedModel::AddAnimationState(Animation* animation)
     engine->RegisterObjectMethod(className, "AnimationState@+ AddAnimationState(Animation@+)", AS_METHODPR(T, AddAnimationState, (Animation*), AnimationState*), AS_CALL_THISCALL);
@@ -24808,6 +25053,9 @@ template <class T> void RegisterMembers_AnimatedModel(asIScriptEngine* engine, c
 
     // const Vector<ModelMorph>& AnimatedModel::GetMorphs() const
     engine->RegisterObjectMethod(className, "Array<ModelMorph>@ GetMorphs() const", AS_FUNCTION_OBJFIRST(AnimatedModel_constspVectorlesModelMorphgreamp_GetMorphs_void_template<AnimatedModel>), AS_CALL_CDECL_OBJFIRST);
+
+    // const Vector<unsigned char>& AnimatedModel::GetMorphsAttr() const
+    engine->RegisterObjectMethod(className, "Array<uint8>@ GetMorphsAttr() const", AS_FUNCTION_OBJFIRST(AnimatedModel_constspVectorlesunsignedspchargreamp_GetMorphsAttr_void_template<AnimatedModel>), AS_CALL_CDECL_OBJFIRST);
 
     // const Vector<SharedPtr<VertexBuffer>>& AnimatedModel::GetMorphVertexBuffers() const
     engine->RegisterObjectMethod(className, "Array<VertexBuffer@>@ GetMorphVertexBuffers() const", AS_FUNCTION_OBJFIRST(AnimatedModel_constspVectorlesSharedPtrlesVertexBuffergregreamp_GetMorphVertexBuffers_void_template<AnimatedModel>), AS_CALL_CDECL_OBJFIRST);
@@ -24868,6 +25116,9 @@ template <class T> void RegisterMembers_AnimatedModel(asIScriptEngine* engine, c
 
     // void AnimatedModel::SetModel(Model* model, bool createBones = true)
     engine->RegisterObjectMethod(className, "void SetModel(Model@+, bool = true)", AS_METHODPR(T, SetModel, (Model*, bool), void), AS_CALL_THISCALL);
+
+    // void AnimatedModel::SetMorphsAttr(const Vector<unsigned char>& value)
+    engine->RegisterObjectMethod(className, "void SetMorphsAttr(Array<uint8>@+)", AS_FUNCTION_OBJFIRST(AnimatedModel_void_SetMorphsAttr_constspVectorlesunsignedspchargreamp_template<AnimatedModel>), AS_CALL_CDECL_OBJFIRST);
 
     // void AnimatedModel::SetMorphWeight(unsigned index, float weight)
     engine->RegisterObjectMethod(className, "void SetMorphWeight(uint, float)", AS_METHODPR(T, SetMorphWeight, (unsigned, float), void), AS_CALL_THISCALL);

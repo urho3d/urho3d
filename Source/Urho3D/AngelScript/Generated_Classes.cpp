@@ -2813,6 +2813,13 @@ static void Variant__Variant_constspStringamp(Variant* _ptr, const String& value
     new(_ptr) Variant(value);
 }
 
+// Variant::Variant(const Vector<unsigned char>& value)
+static void Variant__Variant_constspVectorlesunsignedspchargreamp(Variant* _ptr, CScriptArray* value_conv)
+{
+    Vector<unsigned char> value = ArrayToVector<unsigned char>(value_conv);
+    new(_ptr) Variant(value);
+}
+
 // Variant::Variant(const VectorBuffer& value)
 static void Variant__Variant_constspVectorBufferamp(Variant* _ptr, const VectorBuffer& value)
 {
@@ -2917,8 +2924,6 @@ static void Register_Variant(asIScriptEngine* engine)
     // Error: type "const char*" can not automatically bind
     // Variant::Variant(const VariantVector& value)
     // Error: type "const VariantVector&" can not automatically bind
-    // Variant::Variant(const Vector<unsigned char>& value)
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
     // Variant::Variant(const char* type, const char* value)
     // Error: type "const char*" can not automatically bind
     // Variant::Variant(const char* value)
@@ -2956,6 +2961,8 @@ static void Register_Variant(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const Color&in)", AS_FUNCTION_OBJFIRST(Variant__Variant_constspColoramp), AS_CALL_CDECL_OBJFIRST);
     // Variant::Variant(const String& value)
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const String&in)", AS_FUNCTION_OBJFIRST(Variant__Variant_constspStringamp), AS_CALL_CDECL_OBJFIRST);
+    // Variant::Variant(const Vector<unsigned char>& value)
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(Array<uint8>@+)", AS_FUNCTION_OBJFIRST(Variant__Variant_constspVectorlesunsignedspchargreamp), AS_CALL_CDECL_OBJFIRST);
     // Variant::Variant(const VectorBuffer& value)
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const VectorBuffer&in)", AS_FUNCTION_OBJFIRST(Variant__Variant_constspVectorBufferamp), AS_CALL_CDECL_OBJFIRST);
     // Variant::Variant(const ResourceRef& value)
@@ -4838,6 +4845,13 @@ static void Register_UI(asIScriptEngine* engine)
     #endif
 }
 
+// explicit VectorBuffer::VectorBuffer(const Vector<unsigned char>& data)
+static void VectorBuffer__VectorBuffer_constspVectorlesunsignedspchargreamp(VectorBuffer* _ptr, CScriptArray* data_conv)
+{
+    Vector<unsigned char> data = ArrayToVector<unsigned char>(data_conv);
+    new(_ptr) VectorBuffer(data);
+}
+
 // VectorBuffer::VectorBuffer(Deserializer& source, unsigned size)
 static void VectorBuffer__VectorBuffer_Deserializeramp_unsigned(VectorBuffer* _ptr, Deserializer& source, unsigned size)
 {
@@ -4849,9 +4863,9 @@ static void Register_VectorBuffer(asIScriptEngine* engine)
 {
     // VectorBuffer::VectorBuffer(const void* data, unsigned size)
     // Error: type "const void*" can not automatically bind
-    // explicit VectorBuffer::VectorBuffer(const Vector<unsigned char>& data)
-    // Error: type "const Vector<unsigned char>&" can not automatically bind
 
+    // explicit VectorBuffer::VectorBuffer(const Vector<unsigned char>& data)
+    engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_CONSTRUCT, "void f(Array<uint8>@+)", AS_FUNCTION_OBJFIRST(VectorBuffer__VectorBuffer_constspVectorlesunsignedspchargreamp), AS_CALL_CDECL_OBJFIRST);
     // VectorBuffer::VectorBuffer(Deserializer& source, unsigned size)
     engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_CONSTRUCT, "void f(Deserializer&, uint)", AS_FUNCTION_OBJFIRST(VectorBuffer__VectorBuffer_Deserializeramp_unsigned), AS_CALL_CDECL_OBJFIRST);
 
