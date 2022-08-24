@@ -46,6 +46,24 @@ static const unsigned READ_BUFFER_SIZE = 32768;
 #endif
 static const unsigned SKIP_BUFFER_SIZE = 1024;
 
+static i32 FSeek64(FILE* stream, i64 offset, i32 origin)
+{
+#ifdef _MSC_VER
+    return _fseeki64(stream, offset, origin);
+#else
+    return fseeko64(stream, offset, origin);
+#endif
+}
+
+static i64 FTell64(FILE* stream)
+{
+#ifdef _MSC_VER
+    return _ftelli64(stream);
+#else
+    return ftello64(stream);
+#endif
+}
+
 File::File(Context* context) :
     Object(context),
     mode_(FILE_READ),
@@ -315,14 +333,14 @@ i32 File::Write(const void* data, i32 size)
     // Need to reassign the position due to internal buffering when transitioning from reading to writing
     if (writeSyncNeeded_)
     {
-        fseek((FILE*)handle_, (long)position_ + offset_, SEEK_SET);
+        FSeek64((FILE*)handle_, position_ + offset_, SEEK_SET);
         writeSyncNeeded_ = false;
     }
 
     if (fwrite(data, size, 1, (FILE*)handle_) != 1)
     {
         // Return to the position where the write began
-        fseek((FILE*)handle_, (long)position_ + offset_, SEEK_SET);
+        FSeek64((FILE*)handle_, position_ + offset_, SEEK_SET);
         URHO3D_LOGERROR("Error while writing to file " + GetName());
         return 0;
     }
@@ -458,7 +476,7 @@ bool File::OpenInternal(const String& fileName, FileMode mode, bool fromPackage)
 #ifdef _WIN32
     handle_ = _wfopen(GetWideNativePath(fileName).CString(), openMode[mode]);
 #else
-    handle_ = fopen(GetNativePath(fileName).CString(), openMode[mode]);
+    handle_ = fopen64(GetNativePath(fileName).CString(), openMode[mode]);
 #endif
 
     // If file did not exist in readwrite mode, retry with write-update mode
@@ -467,7 +485,7 @@ bool File::OpenInternal(const String& fileName, FileMode mode, bool fromPackage)
 #ifdef _WIN32
         handle_ = _wfopen(GetWideNativePath(fileName).CString(), openMode[mode + 1]);
 #else
-        handle_ = fopen(GetNativePath(fileName).CString(), openMode[mode + 1]);
+        handle_ = fopen64(GetNativePath(fileName).CString(), openMode[mode + 1]);
 #endif
     }
 
@@ -479,9 +497,9 @@ bool File::OpenInternal(const String& fileName, FileMode mode, bool fromPackage)
 
     if (!fromPackage)
     {
-        fseek((FILE*)handle_, 0, SEEK_END);
-        long size = ftell((FILE*)handle_); // 64 bit on Unix 64
-        fseek((FILE*)handle_, 0, SEEK_SET);
+        FSeek64((FILE*)handle_, 0, SEEK_END);
+        i64 size = FTell64((FILE*)handle_);
+        FSeek64((FILE*)handle_, 0, SEEK_SET);
         if (size > M_MAX_UNSIGNED)
         {
             URHO3D_LOGERRORF("Could not open file %s which is larger than 4GB", fileName.CString());
@@ -526,11 +544,7 @@ void File::SeekInternal(unsigned newPosition)
     else
 #endif
     {
-#ifdef _MSC_VER
-        _fseeki64((FILE*)handle_, newPosition, SEEK_SET);
-#else
-        fseeko64((FILE*)handle_, newPosition, SEEK_SET);
-#endif
+        FSeek64((FILE*)handle_, newPosition, SEEK_SET);
     }
 }
 
