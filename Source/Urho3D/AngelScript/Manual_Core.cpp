@@ -311,7 +311,7 @@ static void RegisterVariant(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Variant", "Array<Variant>@ GetVariantVector() const", AS_FUNCTION_OBJLAST(Variant_GetVariantVector), AS_CALL_CDECL_OBJLAST);
 
     // VectorBuffer Variant::GetVectorBuffer() const | File: ../Core/Variant.h
-    engine->RegisterObjectMethod("Variant", "VectorBuffer GetBuffer() const", AS_METHOD(Variant, GetVectorBuffer), AS_CALL_THISCALL);
+    //engine->RegisterObjectMethod("Variant", "VectorBuffer GetBuffer() const", AS_METHOD(Variant, GetVectorBuffer), AS_CALL_THISCALL);
 }
 
 // ========================================================================================
