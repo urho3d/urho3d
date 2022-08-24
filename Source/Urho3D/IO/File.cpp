@@ -525,7 +525,13 @@ void File::SeekInternal(unsigned newPosition)
     }
     else
 #endif
-        fseek((FILE*)handle_, newPosition, SEEK_SET);
+    {
+#ifdef _MSC_VER
+        _fseeki64((FILE*)handle_, newPosition, SEEK_SET);
+#else
+        fseeko64((FILE*)handle_, newPosition, SEEK_SET);
+#endif
+    }
 }
 
 }
