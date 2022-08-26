@@ -340,17 +340,29 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // constexpr float M_MAX_FOV | File: ../Math/MathDefs.h
     engine->RegisterGlobalProperty("const float M_MAX_FOV", (void*)&M_MAX_FOV);
 
+    // constexpr i64 M_MAX_I64 | File: ../Math/MathDefs.h
+    engine->RegisterGlobalProperty("const int64 M_MAX_I64", (void*)&M_MAX_I64);
+
     // constexpr i32 M_MAX_INT | File: ../Math/MathDefs.h
     engine->RegisterGlobalProperty("const int M_MAX_INT", (void*)&M_MAX_INT);
 
+    // constexpr u64 M_MAX_U64 | File: ../Math/MathDefs.h
+    engine->RegisterGlobalProperty("const uint64 M_MAX_U64", (void*)&M_MAX_U64);
+
     // constexpr u32 M_MAX_UNSIGNED | File: ../Math/MathDefs.h
     engine->RegisterGlobalProperty("const uint M_MAX_UNSIGNED", (void*)&M_MAX_UNSIGNED);
+
+    // constexpr i64 M_MIN_I64 | File: ../Math/MathDefs.h
+    engine->RegisterGlobalProperty("const int64 M_MIN_I64", (void*)&M_MIN_I64);
 
     // constexpr i32 M_MIN_INT | File: ../Math/MathDefs.h
     engine->RegisterGlobalProperty("const int M_MIN_INT", (void*)&M_MIN_INT);
 
     // constexpr float M_MIN_NEARCLIP | File: ../Math/MathDefs.h
     engine->RegisterGlobalProperty("const float M_MIN_NEARCLIP", (void*)&M_MIN_NEARCLIP);
+
+    // constexpr u64 M_MIN_U64 | File: ../Math/MathDefs.h
+    engine->RegisterGlobalProperty("const uint64 M_MIN_U64", (void*)&M_MIN_U64);
 
     // constexpr u32 M_MIN_UNSIGNED | File: ../Math/MathDefs.h
     engine->RegisterGlobalProperty("const uint M_MIN_UNSIGNED", (void*)&M_MIN_UNSIGNED);
