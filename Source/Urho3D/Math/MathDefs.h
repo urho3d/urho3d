@@ -25,9 +25,13 @@ namespace Urho3D
 inline constexpr float M_PI = 3.14159265358979323846264338327950288f;
 inline constexpr float M_HALF_PI = M_PI * 0.5f;
 inline constexpr i32 M_MIN_INT = 0x80000000;
-inline constexpr i32 M_MAX_INT = 0x7fffffff;
+inline constexpr i32 M_MAX_INT = 0x7FFFFFFF;
 inline constexpr u32 M_MIN_UNSIGNED = 0x00000000;
-inline constexpr u32 M_MAX_UNSIGNED = 0xffffffff;
+inline constexpr u32 M_MAX_UNSIGNED = 0xFFFFFFFF;
+inline constexpr i64 M_MIN_I64 = 0x8000000000000000;
+inline constexpr i64 M_MAX_I64 = 0x7FFFFFFFFFFFFFFF;
+inline constexpr u64 M_MIN_U64 = 0;
+inline constexpr u64 M_MAX_U64 = 0xFFFFFFFFFFFFFFFF;
 
 inline constexpr u16 M_U16_MASK_ALL_BITS = 0xFFFF;
 inline constexpr i16 M_I16_MASK_ALL_BITS = -1;
