@@ -12424,17 +12424,17 @@ template <class T> void RegisterMembers_UI(asIScriptEngine* engine, const char* 
     #endif
 }
 
-// const Vector<unsigned char>& VectorBuffer::GetBuffer() const
-template <class T> CScriptArray* VectorBuffer_constspVectorlesunsignedspchargreamp_GetBuffer_void_template(T* _ptr)
+// const Vector<u8>& VectorBuffer::GetBuffer() const
+template <class T> CScriptArray* VectorBuffer_constspVectorlesu8greamp_GetBuffer_void_template(T* _ptr)
 {
-    const Vector<unsigned char>& result = _ptr->GetBuffer();
+    const Vector<u8>& result = _ptr->GetBuffer();
     return VectorToArray(result, "Array<uint8>");
 }
 
-// void VectorBuffer::SetData(const Vector<unsigned char>& data)
-template <class T> void VectorBuffer_void_SetData_constspVectorlesunsignedspchargreamp_template(T* _ptr, CScriptArray* data_conv)
+// void VectorBuffer::SetData(const Vector<u8>& data)
+template <class T> void VectorBuffer_void_SetData_constspVectorlesu8greamp_template(T* _ptr, CScriptArray* data_conv)
 {
-    Vector<unsigned char> data = ArrayToVector<unsigned char>(data_conv);
+    Vector<u8> data = ArrayToVector<u8>(data_conv);
     _ptr->SetData(data);
 }
 
@@ -12443,24 +12443,24 @@ template <class T> void RegisterMembers_VectorBuffer(asIScriptEngine* engine, co
 {
     RegisterMembers_AbstractFile<T>(engine, className);
 
-    // const unsigned char* VectorBuffer::GetData() const
-    // Error: type "const unsigned char*" can not automatically bind
-    // unsigned char* VectorBuffer::GetModifiableData()
-    // Error: type "unsigned char*" can not automatically bind
+    // const u8* VectorBuffer::GetData() const
+    // Error: type "const u8*" can not automatically bind
+    // u8* VectorBuffer::GetModifiableData()
+    // Error: type "u8*" can not automatically bind
     // void VectorBuffer::SetData(const void* data, unsigned size)
     // Error: type "const void*" can not automatically bind
 
     // void VectorBuffer::Clear()
     engine->RegisterObjectMethod(className, "void Clear()", AS_METHODPR(T, Clear, (), void), AS_CALL_THISCALL);
 
-    // const Vector<unsigned char>& VectorBuffer::GetBuffer() const
-    engine->RegisterObjectMethod(className, "Array<uint8>@ GetBuffer() const", AS_FUNCTION_OBJFIRST(VectorBuffer_constspVectorlesunsignedspchargreamp_GetBuffer_void_template<VectorBuffer>), AS_CALL_CDECL_OBJFIRST);
+    // const Vector<u8>& VectorBuffer::GetBuffer() const
+    engine->RegisterObjectMethod(className, "Array<uint8>@ GetBuffer() const", AS_FUNCTION_OBJFIRST(VectorBuffer_constspVectorlesu8greamp_GetBuffer_void_template<VectorBuffer>), AS_CALL_CDECL_OBJFIRST);
 
     // void VectorBuffer::Resize(unsigned size)
     engine->RegisterObjectMethod(className, "void Resize(uint)", AS_METHODPR(T, Resize, (unsigned), void), AS_CALL_THISCALL);
 
-    // void VectorBuffer::SetData(const Vector<unsigned char>& data)
-    engine->RegisterObjectMethod(className, "void SetData(Array<uint8>@+)", AS_FUNCTION_OBJFIRST(VectorBuffer_void_SetData_constspVectorlesunsignedspchargreamp_template<VectorBuffer>), AS_CALL_CDECL_OBJFIRST);
+    // void VectorBuffer::SetData(const Vector<u8>& data)
+    engine->RegisterObjectMethod(className, "void SetData(Array<uint8>@+)", AS_FUNCTION_OBJFIRST(VectorBuffer_void_SetData_constspVectorlesu8greamp_template<VectorBuffer>), AS_CALL_CDECL_OBJFIRST);
 
     // void VectorBuffer::SetData(Deserializer& source, unsigned size)
     engine->RegisterObjectMethod(className, "void SetData(Deserializer&, uint)", AS_METHODPR(T, SetData, (Deserializer&, unsigned), void), AS_CALL_THISCALL);
