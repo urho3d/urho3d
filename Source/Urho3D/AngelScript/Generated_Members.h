@@ -1297,10 +1297,10 @@ template <class T> void RegisterMembers_DepthValue(asIScriptEngine* engine, cons
     #endif
 }
 
-// Vector<unsigned char> Deserializer::ReadBuffer()
-template <class T> CScriptArray* Deserializer_Vectorlesunsignedspchargre_ReadBuffer_void_template(T* _ptr)
+// Vector<u8> Deserializer::ReadBuffer()
+template <class T> CScriptArray* Deserializer_Vectorlesu8gre_ReadBuffer_void_template(T* _ptr)
 {
-    Vector<unsigned char> result = _ptr->ReadBuffer();
+    Vector<u8> result = _ptr->ReadBuffer();
     return VectorToArray(result, "Array<uint8>");
 }
 
@@ -1345,8 +1345,8 @@ template <class T> void RegisterMembers_Deserializer(asIScriptEngine* engine, co
     // BoundingBox Deserializer::ReadBoundingBox()
     engine->RegisterObjectMethod(className, "BoundingBox ReadBoundingBox()", AS_METHODPR(T, ReadBoundingBox, (), BoundingBox), AS_CALL_THISCALL);
 
-    // Vector<unsigned char> Deserializer::ReadBuffer()
-    engine->RegisterObjectMethod(className, "Array<uint8>@ ReadBuffer()", AS_FUNCTION_OBJFIRST(Deserializer_Vectorlesunsignedspchargre_ReadBuffer_void_template<Deserializer>), AS_CALL_CDECL_OBJFIRST);
+    // Vector<u8> Deserializer::ReadBuffer()
+    engine->RegisterObjectMethod(className, "Array<uint8>@ ReadBuffer()", AS_FUNCTION_OBJFIRST(Deserializer_Vectorlesu8gre_ReadBuffer_void_template<Deserializer>), AS_CALL_CDECL_OBJFIRST);
 
     // signed char Deserializer::ReadByte()
     engine->RegisterObjectMethod(className, "int8 ReadByte()", AS_METHODPR(T, ReadByte, (), signed char), AS_CALL_THISCALL);
@@ -1423,8 +1423,8 @@ template <class T> void RegisterMembers_Deserializer(asIScriptEngine* engine, co
     // StringVector Deserializer::ReadStringVector()
     engine->RegisterObjectMethod(className, "Array<String>@ ReadStringVector()", AS_FUNCTION_OBJFIRST(Deserializer_StringVector_ReadStringVector_void_template<Deserializer>), AS_CALL_CDECL_OBJFIRST);
 
-    // unsigned char Deserializer::ReadUByte()
-    engine->RegisterObjectMethod(className, "uint8 ReadUByte()", AS_METHODPR(T, ReadUByte, (), unsigned char), AS_CALL_THISCALL);
+    // u8 Deserializer::ReadUByte()
+    engine->RegisterObjectMethod(className, "uint8 ReadUByte()", AS_METHODPR(T, ReadUByte, (), u8), AS_CALL_THISCALL);
 
     // unsigned Deserializer::ReadUInt()
     engine->RegisterObjectMethod(className, "uint ReadUInt()", AS_METHODPR(T, ReadUInt, (), unsigned), AS_CALL_THISCALL);

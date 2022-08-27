@@ -90,9 +90,9 @@ unsigned short Deserializer::ReadUShort()
     return ret;
 }
 
-unsigned char Deserializer::ReadUByte()
+u8 Deserializer::ReadUByte()
 {
-    unsigned char ret;
+    u8 ret;
     Read(&ret, sizeof ret);
     return ret;
 }
@@ -254,9 +254,9 @@ StringHash Deserializer::ReadStringHash()
     return StringHash(ReadUInt());
 }
 
-Vector<unsigned char> Deserializer::ReadBuffer()
+Vector<u8> Deserializer::ReadBuffer()
 {
-    Vector<unsigned char> ret(ReadVLE());
+    Vector<u8> ret(ReadVLE());
     if (ret.Size())
         Read(&ret[0], ret.Size());
     return ret;
@@ -409,7 +409,7 @@ VariantMap Deserializer::ReadVariantMap()
 unsigned Deserializer::ReadVLE()
 {
     unsigned ret;
-    unsigned char byte;
+    u8 byte;
 
     byte = ReadUByte();
     ret = (unsigned)(byte & 0x7fu);
