@@ -105,9 +105,9 @@ private:
     SDL_RWops* assetHandle_;
 #endif
     /// Read buffer for Android asset or compressed file loading.
-    SharedArrayPtr<unsigned char> readBuffer_;
+    SharedArrayPtr<u8> readBuffer_;
     /// Decompression input buffer for compressed file loading.
-    SharedArrayPtr<unsigned char> inputBuffer_;
+    SharedArrayPtr<u8> inputBuffer_;
     /// Read buffer position.
     unsigned readBufferOffset_;
     /// Bytes in the current read buffer.
