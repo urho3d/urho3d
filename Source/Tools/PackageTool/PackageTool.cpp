@@ -322,7 +322,7 @@ void WritePackageFile(const String& fileName, const String& rootDir)
 
         unsigned dataSize = entries_[i].size_;
         totalDataSize += dataSize;
-        SharedArrayPtr<unsigned char> buffer(new unsigned char[dataSize]);
+        SharedArrayPtr<u8> buffer(new u8[dataSize]);
 
         if (srcFile.Read(&buffer[0], dataSize) != dataSize)
             ErrorExit("Could not read file " + fileFullPath);
@@ -342,7 +342,7 @@ void WritePackageFile(const String& fileName, const String& rootDir)
         }
         else // Compress 
         {
-            SharedArrayPtr<unsigned char> compressBuffer(new unsigned char[LZ4_compressBound(blockSize_)]);
+            SharedArrayPtr<u8> compressBuffer(new u8[LZ4_compressBound(blockSize_)]);
 
             unsigned pos = 0;
 
