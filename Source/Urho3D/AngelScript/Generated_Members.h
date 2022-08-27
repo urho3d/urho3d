@@ -8905,9 +8905,9 @@ template <class T> void RegisterMembers_HttpRequest(asIScriptEngine* engine, con
     RegisterMembers_Deserializer<T>(engine, className);
     RegisterMembers_Thread<T>(engine, className);
 
-    // unsigned HttpRequest::GetAvailableSize() const
-    engine->RegisterObjectMethod(className, "uint GetAvailableSize() const", AS_METHODPR(T, GetAvailableSize, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_availableSize() const", AS_METHODPR(T, GetAvailableSize, () const, unsigned), AS_CALL_THISCALL);
+    // i32 HttpRequest::GetAvailableSize() const
+    engine->RegisterObjectMethod(className, "int GetAvailableSize() const", AS_METHODPR(T, GetAvailableSize, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_availableSize() const", AS_METHODPR(T, GetAvailableSize, () const, i32), AS_CALL_THISCALL);
 
     // String HttpRequest::GetError() const
     engine->RegisterObjectMethod(className, "String GetError() const", AS_METHODPR(T, GetError, () const, String), AS_CALL_THISCALL);

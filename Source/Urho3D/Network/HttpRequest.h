@@ -58,7 +58,7 @@ public:
     HttpRequestState GetState() const;
     /// Return amount of bytes in the read buffer.
     /// @property
-    unsigned GetAvailableSize() const;
+    i32 GetAvailableSize() const;
 
     /// Return whether connection is in the open state.
     /// @property
@@ -66,7 +66,7 @@ public:
 
 private:
     /// Check for available read data in buffer and whether end has been reached. Must only be called when the mutex is held by the main thread.
-    Pair<unsigned, bool> CheckAvailableSizeAndEof() const;
+    Pair<i32, bool> CheckAvailableSizeAndEof() const;
 
     /// URL.
     String url_;
@@ -87,9 +87,9 @@ private:
     /// Read buffer for the main thread.
     SharedArrayPtr<u8> readBuffer_;
     /// Read buffer read cursor.
-    unsigned readPosition_;
+    i32 readPosition_;
     /// Read buffer write cursor.
-    unsigned writePosition_;
+    i32 writePosition_;
 };
 
 }

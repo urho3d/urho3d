@@ -14,8 +14,8 @@
 namespace Urho3D
 {
 
-static const unsigned ERROR_BUFFER_SIZE = 256;
-static const unsigned READ_BUFFER_SIZE = 65536; // Must be a power of two
+static constexpr i32 ERROR_BUFFER_SIZE = 256;
+static constexpr i32 READ_BUFFER_SIZE = 65536; // Must be a power of two
 
 HttpRequest::HttpRequest(const String& url, const String& verb, const Vector<String>& headers, const String& postData) :
     url_(url.Trimmed()),
@@ -139,7 +139,7 @@ void HttpRequest::ThreadFunction()
     while (shouldRun_)
     {
         // Read less than full buffer to be able to distinguish between full and empty ring buffer. Reading may block
-        int bytesRead = mg_read(connection, httpReadBuffer_.Get(), READ_BUFFER_SIZE / 4);
+        i32 bytesRead = mg_read(connection, httpReadBuffer_.Get(), READ_BUFFER_SIZE / 4);
         if (bytesRead <= 0)
             break;
 
@@ -148,8 +148,8 @@ void HttpRequest::ThreadFunction()
         // Wait until enough space in the main thread's ring buffer
         for (;;)
         {
-            unsigned spaceInBuffer = READ_BUFFER_SIZE - ((writePosition_ - readPosition_) & (READ_BUFFER_SIZE - 1));
-            if ((int)spaceInBuffer > bytesRead || !shouldRun_)
+            i32 spaceInBuffer = READ_BUFFER_SIZE - ((writePosition_ - readPosition_) & (READ_BUFFER_SIZE - 1));
+            if (spaceInBuffer > bytesRead || !shouldRun_)
                 break;
 
             mutex_.Release();
@@ -168,8 +168,8 @@ void HttpRequest::ThreadFunction()
         else
         {
             // Handle ring buffer wrap
-            unsigned part1 = READ_BUFFER_SIZE - writePosition_;
-            unsigned part2 = bytesRead - part1;
+            i32 part1 = READ_BUFFER_SIZE - writePosition_;
+            i32 part2 = bytesRead - part1;
             memcpy(readBuffer_.Get() + writePosition_, httpReadBuffer_.Get(), part1);
             memcpy(readBuffer_.Get(), httpReadBuffer_.Get() + part1, part2);
         }
@@ -195,12 +195,12 @@ unsigned HttpRequest::Read(void* dest, unsigned size)
     mutex_.Acquire();
 
     u8* destPtr = (u8*)dest;
-    unsigned sizeLeft = size;
-    unsigned totalRead = 0;
+    i32 sizeLeft = size;
+    i32 totalRead = 0;
 
     for (;;)
     {
-        Pair<unsigned, bool> status{};
+        Pair<i32, bool> status{};
 
         for (;;)
         {
@@ -213,7 +213,7 @@ unsigned HttpRequest::Read(void* dest, unsigned size)
             mutex_.Acquire();
         }
 
-        unsigned bytesAvailable = status.first_;
+        i32 bytesAvailable = status.first_;
 
         if (bytesAvailable)
         {
@@ -225,8 +225,8 @@ unsigned HttpRequest::Read(void* dest, unsigned size)
             else
             {
                 // Handle ring buffer wrap
-                unsigned part1 = READ_BUFFER_SIZE - readPosition_;
-                unsigned part2 = bytesAvailable - part1;
+                i32 part1 = READ_BUFFER_SIZE - readPosition_;
+                i32 part2 = bytesAvailable - part1;
                 memcpy(destPtr, readBuffer_.Get() + readPosition_, part1);
                 memcpy(destPtr + part1, readBuffer_.Get(), part2);
             }
@@ -273,15 +273,15 @@ HttpRequestState HttpRequest::GetState() const
     return state_;
 }
 
-unsigned HttpRequest::GetAvailableSize() const
+i32 HttpRequest::GetAvailableSize() const
 {
     MutexLock lock(mutex_);
     return CheckAvailableSizeAndEof().first_;
 }
 
-Pair<unsigned, bool> HttpRequest::CheckAvailableSizeAndEof() const
+Pair<i32, bool> HttpRequest::CheckAvailableSizeAndEof() const
 {
-    unsigned size = (writePosition_ - readPosition_) & (READ_BUFFER_SIZE - 1);
+    i32 size = (writePosition_ - readPosition_) & (READ_BUFFER_SIZE - 1);
     return {size, (state_ == HTTP_ERROR || (state_ == HTTP_CLOSED && !size))};
 }
 
