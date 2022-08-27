@@ -23,8 +23,8 @@ HttpRequest::HttpRequest(const String& url, const String& verb, const Vector<Str
     headers_(headers),
     postData_(postData),
     state_(HTTP_INITIALIZING),
-    httpReadBuffer_(new unsigned char[READ_BUFFER_SIZE]),
-    readBuffer_(new unsigned char[READ_BUFFER_SIZE]),
+    httpReadBuffer_(new u8[READ_BUFFER_SIZE]),
+    readBuffer_(new u8[READ_BUFFER_SIZE]),
     readPosition_(0),
     writePosition_(0)
 {
@@ -194,7 +194,7 @@ unsigned HttpRequest::Read(void* dest, unsigned size)
 #ifdef URHO3D_THREADING
     mutex_.Acquire();
 
-    auto* destPtr = (unsigned char*)dest;
+    u8* destPtr = (u8*)dest;
     unsigned sizeLeft = size;
     unsigned totalRead = 0;
 

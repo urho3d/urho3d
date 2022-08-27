@@ -83,9 +83,9 @@ private:
     /// Mutex for synchronizing the worker and the main thread.
     mutable Mutex mutex_;
     /// Read buffer for the worker thread.
-    SharedArrayPtr<unsigned char> httpReadBuffer_;
+    SharedArrayPtr<u8> httpReadBuffer_;
     /// Read buffer for the main thread.
-    SharedArrayPtr<unsigned char> readBuffer_;
+    SharedArrayPtr<u8> readBuffer_;
     /// Read buffer read cursor.
     unsigned readPosition_;
     /// Read buffer write cursor.
