@@ -179,13 +179,13 @@ unsigned File::Read(void* dest, unsigned size)
         // If not using a compressed package file, buffer file reads on Android for better performance
         if (!readBuffer_)
         {
-            readBuffer_ = new unsigned char[READ_BUFFER_SIZE];
+            readBuffer_ = new u8[READ_BUFFER_SIZE];
             readBufferOffset_ = 0;
             readBufferSize_ = 0;
         }
 
         unsigned sizeLeft = size;
-        unsigned char* destPtr = (unsigned char*)dest;
+        u8* destPtr = (u8*)dest;
 
         while (sizeLeft)
         {
@@ -211,13 +211,13 @@ unsigned File::Read(void* dest, unsigned size)
     if (compressed_)
     {
         unsigned sizeLeft = size;
-        auto* destPtr = (unsigned char*)dest;
+        u8* destPtr = (u8*)dest;
 
         while (sizeLeft)
         {
             if (!readBuffer_ || readBufferOffset_ >= readBufferSize_)
             {
-                unsigned char blockHeaderBytes[4];
+                u8 blockHeaderBytes[4];
                 ReadInternal(blockHeaderBytes, sizeof blockHeaderBytes);
 
                 MemoryBuffer blockHeader(&blockHeaderBytes[0], sizeof blockHeaderBytes);
@@ -226,8 +226,8 @@ unsigned File::Read(void* dest, unsigned size)
 
                 if (!readBuffer_)
                 {
-                    readBuffer_ = new unsigned char[unpackedSize];
-                    inputBuffer_ = new unsigned char[LZ4_compressBound(unpackedSize)];
+                    readBuffer_ = new u8[unpackedSize];
+                    inputBuffer_ = new u8[LZ4_compressBound(unpackedSize)];
                 }
 
                 /// \todo Handle errors
@@ -294,7 +294,7 @@ unsigned File::Seek(unsigned position)
         // Skip bytes
         else if (position >= position_)
         {
-            unsigned char skipBuffer[SKIP_BUFFER_SIZE];
+            u8 skipBuffer[SKIP_BUFFER_SIZE];
             while (position > position_)
                 Read(skipBuffer, Min(position - position_, SKIP_BUFFER_SIZE));
         }
@@ -372,7 +372,7 @@ unsigned File::GetChecksum()
     Seek(0);
     while (!IsEof())
     {
-        unsigned char block[1024];
+        u8 block[1024];
         unsigned readBytes = Read(block, 1024);
         for (unsigned i = 0; i < readBytes; ++i)
             checksum_ = SDBMHash(checksum_, block[i]);
