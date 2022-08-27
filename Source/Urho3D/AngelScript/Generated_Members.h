@@ -11065,8 +11065,8 @@ template <class T> void RegisterMembers_MemoryBuffer(asIScriptEngine* engine, co
 {
     RegisterMembers_AbstractFile<T>(engine, className);
 
-    // unsigned char* MemoryBuffer::GetData()
-    // Error: type "unsigned char*" can not automatically bind
+    // u8* MemoryBuffer::GetData()
+    // Error: type "u8*" can not automatically bind
 
     // bool MemoryBuffer::IsReadOnly()
     engine->RegisterObjectMethod(className, "bool IsReadOnly()", AS_METHODPR(T, IsReadOnly, (), bool), AS_CALL_THISCALL);

@@ -10,7 +10,7 @@ namespace Urho3D
 
 MemoryBuffer::MemoryBuffer(void* data, unsigned size) :
     AbstractFile(size),
-    buffer_((unsigned char*)data),
+    buffer_((u8*)data),
     readOnly_(false)
 {
     if (!buffer_)
@@ -19,23 +19,23 @@ MemoryBuffer::MemoryBuffer(void* data, unsigned size) :
 
 MemoryBuffer::MemoryBuffer(const void* data, unsigned size) :
     AbstractFile(size),
-    buffer_((unsigned char*)data),
+    buffer_((u8*)data),
     readOnly_(true)
 {
     if (!buffer_)
         size_ = 0;
 }
 
-MemoryBuffer::MemoryBuffer(Vector<unsigned char>& data) :
+MemoryBuffer::MemoryBuffer(Vector<u8>& data) :
     AbstractFile(data.Size()),
     buffer_(data.Begin().ptr_),
     readOnly_(false)
 {
 }
 
-MemoryBuffer::MemoryBuffer(const Vector<unsigned char>& data) :
+MemoryBuffer::MemoryBuffer(const Vector<u8>& data) :
     AbstractFile(data.Size()),
-    buffer_(const_cast<unsigned char*>(data.Begin().ptr_)),
+    buffer_(const_cast<u8*>(data.Begin().ptr_)),
     readOnly_(true)
 {
 }
@@ -47,8 +47,8 @@ unsigned MemoryBuffer::Read(void* dest, unsigned size)
     if (!size)
         return 0;
 
-    unsigned char* srcPtr = &buffer_[position_];
-    auto* destPtr = (unsigned char*)dest;
+    u8* srcPtr = &buffer_[position_];
+    u8* destPtr = (u8*)dest;
     position_ += size;
 
     memcpy(destPtr, srcPtr, size);
@@ -74,8 +74,8 @@ i32 MemoryBuffer::Write(const void* data, i32 size)
     if (!size)
         return 0;
 
-    auto* srcPtr = (unsigned char*)data;
-    unsigned char* destPtr = &buffer_[position_];
+    u8* srcPtr = (u8*)data;
+    u8* destPtr = &buffer_[position_];
     position_ += size;
 
     memcpy(destPtr, srcPtr, size);
