@@ -63,7 +63,7 @@ public:
     /// Read a 16-bit unsigned integer.
     unsigned short ReadUShort();
     /// Read an 8-bit unsigned integer.
-    unsigned char ReadUByte();
+    u8 ReadUByte();
     /// Read a bool.
     bool ReadBool();
     /// Read a float.
@@ -107,7 +107,7 @@ public:
     /// Read a 32-bit StringHash.
     StringHash ReadStringHash();
     /// Read a buffer with size encoded as VLE.
-    Vector<unsigned char> ReadBuffer();
+    Vector<u8> ReadBuffer();
     /// Read a resource reference.
     ResourceRef ReadResourceRef();
     /// Read a resource reference list.
