@@ -23,9 +23,9 @@ public:
     explicit MemoryBuffer(const Vector<u8>& data);
 
     /// Read bytes from the memory area. Return number of bytes actually read.
-    unsigned Read(void* dest, unsigned size) override;
+    i32 Read(void* dest, i32 size) override;
     /// Set position from the beginning of the memory area. Return actual new position.
-    unsigned Seek(unsigned position) override;
+    i64 Seek(i64 position) override;
     /// Write bytes to the memory area.
     i32 Write(const void* data, i32 size) override;
 

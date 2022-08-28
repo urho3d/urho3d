@@ -36,9 +36,9 @@ public:
     void ThreadFunction() override;
 
     /// Read response data from the HTTP connection and return number of bytes actually read. While the connection is open, will block while trying to read the specified size. To avoid blocking, only read up to as many bytes as GetAvailableSize() returns.
-    unsigned Read(void* dest, unsigned size) override;
+    i32 Read(void* dest, i32 size) override;
     /// Set position from the beginning of the stream. Not supported.
-    unsigned Seek(unsigned position) override;
+    i64 Seek(i64 position) override;
     /// Return whether all response data has been read.
     bool IsEof() const override;
 

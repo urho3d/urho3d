@@ -18,14 +18,14 @@ public:
     /// Construct with zero size.
     Deserializer();
     /// Construct with defined size.
-    explicit Deserializer(unsigned size);
+    explicit Deserializer(i64 size);
     /// Destruct.
     virtual ~Deserializer();
 
     /// Read bytes from the stream. Return number of bytes actually read.
-    virtual unsigned Read(void* dest, unsigned size) = 0;
+    virtual i32 Read(void* dest, i32 size) = 0;
     /// Set position from the beginning of the stream. Return actual new position.
-    virtual unsigned Seek(unsigned position) = 0;
+    virtual i64 Seek(i64 position) = 0;
     /// Return name of the stream.
     /// @property
     virtual const String& GetName() const;
@@ -37,16 +37,16 @@ public:
     virtual bool IsEof() const { return position_ >= size_; }
 
     /// Set position relative to current position. Return actual new position.
-    unsigned SeekRelative(int delta);
+    i64 SeekRelative(i64 delta);
     /// Return current position.
     /// @property
-    unsigned GetPosition() const { return position_; }
+    i64 GetPosition() const { return position_; }
     /// Return current position.
-    unsigned Tell() const { return position_; }
+    i64 Tell() const { return position_; }
 
     /// Return size.
     /// @property
-    unsigned GetSize() const { return size_; }
+    i64 GetSize() const { return size_; }
 
     /// Read a 64-bit integer.
     long long ReadInt64();
@@ -131,9 +131,9 @@ public:
 
 protected:
     /// Stream position.
-    unsigned position_;
+    i64 position_;
     /// Stream size.
-    unsigned size_;
+    i64 size_;
 };
 
 }

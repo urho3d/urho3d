@@ -1314,7 +1314,7 @@ template <class T> CScriptArray* Deserializer_StringVector_ReadStringVector_void
 // class Deserializer | File: ../IO/Deserializer.h
 template <class T> void RegisterMembers_Deserializer(asIScriptEngine* engine, const char* className)
 {
-    // virtual unsigned Deserializer::Read(void* dest, unsigned size) = 0
+    // virtual i32 Deserializer::Read(void* dest, i32 size) = 0
     // Error: type "void*" can not automatically bind
     // VariantVector Deserializer::ReadVariantVector()
     // Error: type "VariantVector" can not automatically bind
@@ -1327,13 +1327,13 @@ template <class T> void RegisterMembers_Deserializer(asIScriptEngine* engine, co
     engine->RegisterObjectMethod(className, "const String& GetName() const", AS_METHODPR(T, GetName, () const, const String&), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "const String& get_name() const", AS_METHODPR(T, GetName, () const, const String&), AS_CALL_THISCALL);
 
-    // unsigned Deserializer::GetPosition() const
-    engine->RegisterObjectMethod(className, "uint GetPosition() const", AS_METHODPR(T, GetPosition, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_position() const", AS_METHODPR(T, GetPosition, () const, unsigned), AS_CALL_THISCALL);
+    // i64 Deserializer::GetPosition() const
+    engine->RegisterObjectMethod(className, "int64 GetPosition() const", AS_METHODPR(T, GetPosition, () const, i64), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int64 get_position() const", AS_METHODPR(T, GetPosition, () const, i64), AS_CALL_THISCALL);
 
-    // unsigned Deserializer::GetSize() const
-    engine->RegisterObjectMethod(className, "uint GetSize() const", AS_METHODPR(T, GetSize, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_size() const", AS_METHODPR(T, GetSize, () const, unsigned), AS_CALL_THISCALL);
+    // i64 Deserializer::GetSize() const
+    engine->RegisterObjectMethod(className, "int64 GetSize() const", AS_METHODPR(T, GetSize, () const, i64), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int64 get_size() const", AS_METHODPR(T, GetSize, () const, i64), AS_CALL_THISCALL);
 
     // virtual bool Deserializer::IsEof() const
     engine->RegisterObjectMethod(className, "bool IsEof() const", AS_METHODPR(T, IsEof, () const, bool), AS_CALL_THISCALL);
@@ -1456,14 +1456,14 @@ template <class T> void RegisterMembers_Deserializer(asIScriptEngine* engine, co
     // unsigned Deserializer::ReadVLE()
     engine->RegisterObjectMethod(className, "uint ReadVLE()", AS_METHODPR(T, ReadVLE, (), unsigned), AS_CALL_THISCALL);
 
-    // virtual unsigned Deserializer::Seek(unsigned position) = 0
-    engine->RegisterObjectMethod(className, "uint Seek(uint)", AS_METHODPR(T, Seek, (unsigned), unsigned), AS_CALL_THISCALL);
+    // virtual i64 Deserializer::Seek(i64 position) = 0
+    engine->RegisterObjectMethod(className, "int64 Seek(int64)", AS_METHODPR(T, Seek, (i64), i64), AS_CALL_THISCALL);
 
-    // unsigned Deserializer::SeekRelative(int delta)
-    engine->RegisterObjectMethod(className, "uint SeekRelative(int)", AS_METHODPR(T, SeekRelative, (int), unsigned), AS_CALL_THISCALL);
+    // i64 Deserializer::SeekRelative(i64 delta)
+    engine->RegisterObjectMethod(className, "int64 SeekRelative(int64)", AS_METHODPR(T, SeekRelative, (i64), i64), AS_CALL_THISCALL);
 
-    // unsigned Deserializer::Tell() const
-    engine->RegisterObjectMethod(className, "uint Tell() const", AS_METHODPR(T, Tell, () const, unsigned), AS_CALL_THISCALL);
+    // i64 Deserializer::Tell() const
+    engine->RegisterObjectMethod(className, "int64 Tell() const", AS_METHODPR(T, Tell, () const, i64), AS_CALL_THISCALL);
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Deserializer
         REGISTER_MEMBERS_MANUAL_PART_Deserializer();

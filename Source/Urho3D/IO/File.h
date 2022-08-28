@@ -55,9 +55,9 @@ public:
     ~File() override;
 
     /// Read bytes from the file. Return number of bytes actually read.
-    unsigned Read(void* dest, unsigned size) override;
+    i32 Read(void* dest, i32 size) override;
     /// Set position from the beginning of the file.
-    unsigned Seek(unsigned position) override;
+    i64 Seek(i64 position) override;
     /// Write bytes to the file. Return number of bytes actually written.
     i32 Write(const void* data, i32 size) override;
 
@@ -92,9 +92,9 @@ private:
     /// Open file internally using either C standard IO functions or SDL RWops for Android asset files. Return true if successful.
     bool OpenInternal(const String& fileName, FileMode mode, bool fromPackage = false);
     /// Perform the file read internally using either C standard IO functions or SDL RWops for Android asset files. Return true if successful. This does not handle compressed package file reading.
-    bool ReadInternal(void* dest, unsigned size);
+    bool ReadInternal(void* dest, i32 size);
     /// Seek in file internally using either C standard IO functions or SDL RWops for Android asset files.
-    void SeekInternal(unsigned newPosition);
+    void SeekInternal(i64 newPosition);
 
     /// Open mode.
     FileMode mode_;
@@ -109,11 +109,11 @@ private:
     /// Decompression input buffer for compressed file loading.
     SharedArrayPtr<u8> inputBuffer_;
     /// Read buffer position.
-    unsigned readBufferOffset_;
+    i32 readBufferOffset_;
     /// Bytes in the current read buffer.
-    unsigned readBufferSize_;
+    i32 readBufferSize_;
     /// Start position within a package file, 0 for regular files.
-    unsigned offset_;
+    i64 offset_;
     /// Content checksum.
     hash32 checksum_;
     /// Compression flag.

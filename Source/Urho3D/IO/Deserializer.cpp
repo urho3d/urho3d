@@ -18,15 +18,16 @@ Deserializer::Deserializer() :
 {
 }
 
-Deserializer::Deserializer(unsigned size) :
+Deserializer::Deserializer(i64 size) :
     position_(0),
     size_(size)
 {
+    assert(size >= 0);
 }
 
 Deserializer::~Deserializer() = default;
 
-unsigned Deserializer::SeekRelative(int delta)
+i64 Deserializer::SeekRelative(i64 delta)
 {
     return Seek(GetPosition() + delta);
 }
