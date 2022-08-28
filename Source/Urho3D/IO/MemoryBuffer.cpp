@@ -44,8 +44,10 @@ MemoryBuffer::MemoryBuffer(const Vector<u8>& data) :
 {
 }
 
-unsigned MemoryBuffer::Read(void* dest, unsigned size)
+i32 MemoryBuffer::Read(void* dest, i32 size)
 {
+    assert(size >= 0);
+
     if (size + position_ > size_)
         size = size_ - position_;
     if (!size)
@@ -60,8 +62,10 @@ unsigned MemoryBuffer::Read(void* dest, unsigned size)
     return size;
 }
 
-unsigned MemoryBuffer::Seek(unsigned position)
+i64 MemoryBuffer::Seek(i64 position)
 {
+    assert(position >= 0 && position <= M_MAX_INT);
+
     if (position > size_)
         position = size_;
 

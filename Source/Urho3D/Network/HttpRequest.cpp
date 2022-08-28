@@ -189,8 +189,10 @@ void HttpRequest::ThreadFunction()
     }
 }
 
-unsigned HttpRequest::Read(void* dest, unsigned size)
+i32 HttpRequest::Read(void* dest, i32 size)
 {
+    assert(size >= 0);
+
 #ifdef URHO3D_THREADING
     mutex_.Acquire();
 
@@ -250,7 +252,7 @@ unsigned HttpRequest::Read(void* dest, unsigned size)
 #endif
 }
 
-unsigned HttpRequest::Seek(unsigned position)
+i64 HttpRequest::Seek(i64 position)
 {
     return 0;
 }

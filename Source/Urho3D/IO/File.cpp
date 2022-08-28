@@ -42,9 +42,9 @@ static const char* openMode[] =
 
 #ifdef __ANDROID__
 const char* APK = "/apk/";
-static const unsigned READ_BUFFER_SIZE = 32768;
+static constexpr i32 READ_BUFFER_SIZE = 32768;
 #endif
-static const unsigned SKIP_BUFFER_SIZE = 1024;
+static constexpr i32 SKIP_BUFFER_SIZE = 1024;
 
 static i32 FSeek64(FILE* stream, i64 offset, i32 origin)
 {
@@ -154,8 +154,10 @@ bool File::Open(PackageFile* package, const String& fileName)
     return true;
 }
 
-unsigned File::Read(void* dest, unsigned size)
+i32 File::Read(void* dest, i32 size)
 {
+    assert(size >= 0);
+
     if (!IsOpen())
     {
         // If file not open, do not log the error further here to prevent spamming the stderr stream
@@ -184,7 +186,7 @@ unsigned File::Read(void* dest, unsigned size)
             readBufferSize_ = 0;
         }
 
-        unsigned sizeLeft = size;
+        i32 sizeLeft = size;
         u8* destPtr = (u8*)dest;
 
         while (sizeLeft)
@@ -196,7 +198,7 @@ unsigned File::Read(void* dest, unsigned size)
                 ReadInternal(readBuffer_.Get(), readBufferSize_);
             }
 
-            unsigned copySize = Min((readBufferSize_ - readBufferOffset_), sizeLeft);
+            i32 copySize = Min((readBufferSize_ - readBufferOffset_), sizeLeft);
             memcpy(destPtr, readBuffer_.Get() + readBufferOffset_, copySize);
             destPtr += copySize;
             sizeLeft -= copySize;
@@ -210,7 +212,7 @@ unsigned File::Read(void* dest, unsigned size)
 
     if (compressed_)
     {
-        unsigned sizeLeft = size;
+        i32 sizeLeft = size;
         u8* destPtr = (u8*)dest;
 
         while (sizeLeft)
@@ -221,8 +223,8 @@ unsigned File::Read(void* dest, unsigned size)
                 ReadInternal(blockHeaderBytes, sizeof blockHeaderBytes);
 
                 MemoryBuffer blockHeader(&blockHeaderBytes[0], sizeof blockHeaderBytes);
-                unsigned unpackedSize = blockHeader.ReadUShort();
-                unsigned packedSize = blockHeader.ReadUShort();
+                i32 unpackedSize = blockHeader.ReadUShort();
+                i32 packedSize = blockHeader.ReadUShort();
 
                 if (!readBuffer_)
                 {
@@ -238,7 +240,7 @@ unsigned File::Read(void* dest, unsigned size)
                 readBufferOffset_ = 0;
             }
 
-            unsigned copySize = Min((readBufferSize_ - readBufferOffset_), sizeLeft);
+            i32 copySize = Min((readBufferSize_ - readBufferOffset_), sizeLeft);
             memcpy(destPtr, readBuffer_.Get() + readBufferOffset_, copySize);
             destPtr += copySize;
             sizeLeft -= copySize;
@@ -269,8 +271,10 @@ unsigned File::Read(void* dest, unsigned size)
     return size;
 }
 
-unsigned File::Seek(unsigned position)
+i64 File::Seek(i64 position)
 {
+    assert(position >= 0);
+
     if (!IsOpen())
     {
         // If file not open, do not log the error further here to prevent spamming the stderr stream
@@ -353,7 +357,7 @@ i32 File::Write(const void* data, i32 size)
     return size;
 }
 
-unsigned File::GetChecksum()
+hash32 File::GetChecksum()
 {
     if (offset_ || checksum_)
         return checksum_;
@@ -366,15 +370,15 @@ unsigned File::GetChecksum()
 
     URHO3D_PROFILE(CalculateFileChecksum);
 
-    unsigned oldPos = position_;
+    i64 oldPos = position_;
     checksum_ = 0;
 
     Seek(0);
     while (!IsEof())
     {
         u8 block[1024];
-        unsigned readBytes = Read(block, 1024);
-        for (unsigned i = 0; i < readBytes; ++i)
+        i32 readBytes = Read(block, 1024);
+        for (i32 i = 0; i < readBytes; ++i)
             checksum_ = SDBMHash(checksum_, block[i]);
     }
 
@@ -519,8 +523,10 @@ bool File::OpenInternal(const String& fileName, FileMode mode, bool fromPackage)
     return true;
 }
 
-bool File::ReadInternal(void* dest, unsigned size)
+bool File::ReadInternal(void* dest, i32 size)
 {
+    assert(size >= 0);
+
 #ifdef __ANDROID__
     if (assetHandle_)
     {
@@ -531,8 +537,10 @@ bool File::ReadInternal(void* dest, unsigned size)
         return fread(dest, size, 1, (FILE*)handle_) == 1;
 }
 
-void File::SeekInternal(unsigned newPosition)
+void File::SeekInternal(i64 newPosition)
 {
+    assert(newPosition >= 0);
+
 #ifdef __ANDROID__
     if (assetHandle_)
     {
