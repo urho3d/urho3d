@@ -14,9 +14,9 @@ class URHO3D_API MemoryBuffer : public AbstractFile
 {
 public:
     /// Construct with a pointer and size.
-    MemoryBuffer(void* data, unsigned size);
+    MemoryBuffer(void* data, i32 size);
     /// Construct as read-only with a pointer and size.
-    MemoryBuffer(const void* data, unsigned size);
+    MemoryBuffer(const void* data, i32 size);
     /// Construct from a vector, which must not go out of scope before MemoryBuffer.
     explicit MemoryBuffer(Vector<u8>& data);
     /// Construct from a read-only vector, which must not go out of scope before MemoryBuffer.
