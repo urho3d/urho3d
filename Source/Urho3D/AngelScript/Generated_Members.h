@@ -19981,13 +19981,6 @@ template <class T> CScriptArray* NavigationMesh_Vectorlesunsignedspchargre_GetNa
     return VectorToArray(result, "Array<uint8>");
 }
 
-// virtual Vector<unsigned char> NavigationMesh::GetTileData(const IntVector2& tile) const
-template <class T> CScriptArray* NavigationMesh_Vectorlesunsignedspchargre_GetTileData_constspIntVector2amp_template(T* _ptr, const IntVector2& tile)
-{
-    Vector<unsigned char> result = _ptr->GetTileData(tile);
-    return VectorToArray(result, "Array<uint8>");
-}
-
 // virtual void NavigationMesh::SetNavigationDataAttr(const Vector<unsigned char>& value)
 template <class T> void NavigationMesh_void_SetNavigationDataAttr_constspVectorlesunsignedspchargreamp_template(T* _ptr, CScriptArray* value_conv)
 {
@@ -20012,6 +20005,8 @@ template <class T> void RegisterMembers_NavigationMesh(asIScriptEngine* engine, 
     // Error: type "const dtQueryFilter*" can not automatically bind
     // Vector3 NavigationMesh::GetRandomPointInCircle(const Vector3& center, float radius, const Vector3& extents = Vector3::ONE, const dtQueryFilter* filter = nullptr, dtPolyRef* randomRef = nullptr)
     // Error: type "const dtQueryFilter*" can not automatically bind
+    // virtual Vector<unsigned char> NavigationMesh::GetTileData(const IntVector2& tile) const
+    // Not registered because have @manualbind mark
     // Vector3 NavigationMesh::MoveAlongSurface(const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE, int maxVisited = 3, const dtQueryFilter* filter = nullptr)
     // Error: type "const dtQueryFilter*" can not automatically bind
     // Vector3 NavigationMesh::Raycast(const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE, const dtQueryFilter* filter = nullptr, Vector3* hitNormal = nullptr)
@@ -20121,9 +20116,6 @@ template <class T> void RegisterMembers_NavigationMesh(asIScriptEngine* engine, 
 
     // BoundingBox NavigationMesh::GetTileBoundingBox(const IntVector2& tile) const
     engine->RegisterObjectMethod(className, "BoundingBox GetTileBoundingBox(const IntVector2&in) const", AS_METHODPR(T, GetTileBoundingBox, (const IntVector2&) const, BoundingBox), AS_CALL_THISCALL);
-
-    // virtual Vector<unsigned char> NavigationMesh::GetTileData(const IntVector2& tile) const
-    engine->RegisterObjectMethod(className, "Array<uint8>@ GetTileData(const IntVector2&in) const", AS_FUNCTION_OBJFIRST(NavigationMesh_Vectorlesunsignedspchargre_GetTileData_constspIntVector2amp_template<NavigationMesh>), AS_CALL_CDECL_OBJFIRST);
 
     // IntVector2 NavigationMesh::GetTileIndex(const Vector3& position) const
     engine->RegisterObjectMethod(className, "IntVector2 GetTileIndex(const Vector3&in) const", AS_METHODPR(T, GetTileIndex, (const Vector3&) const, IntVector2), AS_CALL_THISCALL);

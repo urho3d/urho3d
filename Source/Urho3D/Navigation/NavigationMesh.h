@@ -143,6 +143,7 @@ public:
     /// Rebuild part of the navigation mesh in the rectangular area. Return true if successful.
     virtual bool Build(const IntVector2& from, const IntVector2& to);
     /// Return tile data.
+    /// @manualbind
     virtual Vector<unsigned char> GetTileData(const IntVector2& tile) const;
     /// Add tile to navigation mesh.
     virtual bool AddTile(const Vector<unsigned char>& tileData);
