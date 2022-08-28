@@ -684,6 +684,9 @@ public:
     /// Get used graphics API.
     static GAPI GetGAPI() { return gapi; }
 
+    /// Set GAP manually. Used for headless mode only https://github.com/urho3d/Urho3D/issues/3040
+    static GAPI SetGAPI(GAPI value) { return gapi = value; }
+
     /// Return the API-specific alpha texture format.
     static unsigned GetAlphaFormat();
     /// Return the API-specific luminance texture format.
