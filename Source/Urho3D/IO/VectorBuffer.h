@@ -17,9 +17,9 @@ public:
     /// Construct from another buffer.
     explicit VectorBuffer(const Vector<u8>& data);
     /// Construct from a memory area.
-    VectorBuffer(const void* data, unsigned size);
+    VectorBuffer(const void* data, i32 size);
     /// Construct from a stream.
-    VectorBuffer(Deserializer& source, unsigned size);
+    VectorBuffer(Deserializer& source, i32 size);
 
     /// Read bytes from the buffer. Return number of bytes actually read.
     unsigned Read(void* dest, unsigned size) override;
@@ -31,13 +31,13 @@ public:
     /// Set data from another buffer.
     void SetData(const Vector<u8>& data);
     /// Set data from a memory area.
-    void SetData(const void* data, unsigned size);
+    void SetData(const void* data, i32 size);
     /// Set data from a stream.
-    void SetData(Deserializer& source, unsigned size);
+    void SetData(Deserializer& source, i32 size);
     /// Reset to zero size.
     void Clear();
     /// Set size.
-    void Resize(unsigned size);
+    void Resize(i32 size);
 
     /// Return data.
     const u8* GetData() const { return size_ ? &buffer_[0] : nullptr; }

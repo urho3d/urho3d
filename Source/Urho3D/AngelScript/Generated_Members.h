@@ -12447,7 +12447,7 @@ template <class T> void RegisterMembers_VectorBuffer(asIScriptEngine* engine, co
     // Error: type "const u8*" can not automatically bind
     // u8* VectorBuffer::GetModifiableData()
     // Error: type "u8*" can not automatically bind
-    // void VectorBuffer::SetData(const void* data, unsigned size)
+    // void VectorBuffer::SetData(const void* data, i32 size)
     // Error: type "const void*" can not automatically bind
 
     // void VectorBuffer::Clear()
@@ -12456,14 +12456,14 @@ template <class T> void RegisterMembers_VectorBuffer(asIScriptEngine* engine, co
     // const Vector<u8>& VectorBuffer::GetBuffer() const
     engine->RegisterObjectMethod(className, "Array<uint8>@ GetBuffer() const", AS_FUNCTION_OBJFIRST(VectorBuffer_constspVectorlesu8greamp_GetBuffer_void_template<VectorBuffer>), AS_CALL_CDECL_OBJFIRST);
 
-    // void VectorBuffer::Resize(unsigned size)
-    engine->RegisterObjectMethod(className, "void Resize(uint)", AS_METHODPR(T, Resize, (unsigned), void), AS_CALL_THISCALL);
+    // void VectorBuffer::Resize(i32 size)
+    engine->RegisterObjectMethod(className, "void Resize(int)", AS_METHODPR(T, Resize, (i32), void), AS_CALL_THISCALL);
 
     // void VectorBuffer::SetData(const Vector<u8>& data)
     engine->RegisterObjectMethod(className, "void SetData(Array<uint8>@+)", AS_FUNCTION_OBJFIRST(VectorBuffer_void_SetData_constspVectorlesu8greamp_template<VectorBuffer>), AS_CALL_CDECL_OBJFIRST);
 
-    // void VectorBuffer::SetData(Deserializer& source, unsigned size)
-    engine->RegisterObjectMethod(className, "void SetData(Deserializer&, uint)", AS_METHODPR(T, SetData, (Deserializer&, unsigned), void), AS_CALL_THISCALL);
+    // void VectorBuffer::SetData(Deserializer& source, i32 size)
+    engine->RegisterObjectMethod(className, "void SetData(Deserializer&, int)", AS_METHODPR(T, SetData, (Deserializer&, i32), void), AS_CALL_THISCALL);
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_VectorBuffer
         REGISTER_MEMBERS_MANUAL_PART_VectorBuffer();

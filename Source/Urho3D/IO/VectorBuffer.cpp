@@ -15,13 +15,17 @@ VectorBuffer::VectorBuffer(const Vector<u8>& data)
     SetData(data);
 }
 
-VectorBuffer::VectorBuffer(const void* data, unsigned size)
+VectorBuffer::VectorBuffer(const void* data, i32 size)
 {
+    assert(size >= 0);
+
     SetData(data, size);
 }
 
-VectorBuffer::VectorBuffer(Deserializer& source, unsigned size)
+VectorBuffer::VectorBuffer(Deserializer& source, i32 size)
 {
+    assert(size >= 0);
+
     SetData(source, size);
 }
 
@@ -79,8 +83,10 @@ void VectorBuffer::SetData(const Vector<u8>& data)
     size_ = data.Size();
 }
 
-void VectorBuffer::SetData(const void* data, unsigned size)
+void VectorBuffer::SetData(const void* data, i32 size)
 {
+    assert(size >= 0);
+
     if (!data)
         size = 0;
 
@@ -92,10 +98,12 @@ void VectorBuffer::SetData(const void* data, unsigned size)
     size_ = size;
 }
 
-void VectorBuffer::SetData(Deserializer& source, unsigned size)
+void VectorBuffer::SetData(Deserializer& source, i32 size)
 {
+    assert(size >= 0);
+
     buffer_.Resize(size);
-    unsigned actualSize = source.Read(&buffer_[0], size);
+    i32 actualSize = (i32)source.Read(&buffer_[0], size);
     if (actualSize != size)
         buffer_.Resize(actualSize);
 
@@ -110,8 +118,10 @@ void VectorBuffer::Clear()
     size_ = 0;
 }
 
-void VectorBuffer::Resize(unsigned size)
+void VectorBuffer::Resize(i32 size)
 {
+    assert(size >= 0);
+
     buffer_.Resize(size);
     size_ = size;
     if (position_ > size_)
