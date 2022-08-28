@@ -3468,6 +3468,7 @@ Methods:
 - float GetMorphWeight(const String&) const
 - float GetMorphWeight(uint) const
 - ModelMorph[]@ GetMorphs() const
+- uint8[]@ GetMorphsAttr() const
 - Node@ GetNode() const
 - uint GetNumAnimationStates() const
 - uint GetNumAttributes() const
@@ -3578,6 +3579,7 @@ Methods:
 - void SetMorphWeight(StringHash, float)
 - void SetMorphWeight(const String&, float)
 - void SetMorphWeight(uint, float)
+- void SetMorphsAttr(uint8[]@)
 - void SetObjectAnimation(ObjectAnimation@)
 - void SetObjectAnimationAttr(const ResourceRef&)
 - void SetOccludee(bool)
@@ -4113,6 +4115,7 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint8 GetLayer(const String&) const
 - float GetLength(const String&) const
+- uint8[]@ GetNetAnimationsAttr() const
 - Node@ GetNode() const
 - uint GetNumAttributes() const
 - uint GetNumNetworkAttributes() const
@@ -4185,6 +4188,7 @@ Methods:
 - void SetInterceptNetworkUpdate(const String&, bool)
 - bool SetLayer(const String&, uint8)
 - bool SetLooped(const String&, bool)
+- void SetNetAnimationsAttr(uint8[]@)
 - void SetObjectAnimation(ObjectAnimation@)
 - void SetObjectAnimationAttr(const ResourceRef&)
 - bool SetRemoveOnCompletion(const String&, bool)
@@ -4847,6 +4851,7 @@ Methods:
 - float GetMaxZ() const
 - float GetMinAngle() const
 - float GetMinZ() const
+- uint8[]@ GetNetBillboardsAttr() const
 - Node@ GetNode() const
 - uint GetNumAttributes() const
 - uint GetNumBillboards() const
@@ -4942,6 +4947,7 @@ Methods:
 - void SetMaxLights(uint)
 - void SetMinAngle(float)
 - void SetMinMaxZ(float, float)
+- void SetNetBillboardsAttr(uint8[]@)
 - void SetNumBillboards(uint)
 - void SetObjectAnimation(ObjectAnimation@)
 - void SetObjectAnimationAttr(const ResourceRef&)
@@ -11331,6 +11337,7 @@ Methods:
 - VariantMap& GetEventDataMap() const
 - Object@ GetEventSender() const
 - Light@ GetFirstLight() const
+- uint8[]@ GetGeometryDataAttr() const
 - uint GetID() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetLightMask() const
@@ -11424,6 +11431,7 @@ Methods:
 - void SetDrawDistance(float)
 - void SetDynamic(bool)
 - void SetEnabled(bool)
+- void SetGeometryDataAttr(uint8[]@)
 - void SetGlobalVar(StringHash, const Variant&)
 - void SetInstanceDefault(bool)
 - void SetInterceptNetworkUpdate(const String&, bool)
@@ -11948,6 +11956,7 @@ Methods:
 - bool GetBlockEvents() const
 - bool GetCastShadows() const
 - Component@ GetComponent(StringHash) const
+- uint8[]@ GetDecalsAttr() const
 - float GetDistance() const
 - float GetDrawDistance() const
 - uint8 GetDrawableFlags() const
@@ -12048,6 +12057,7 @@ Methods:
 - void SetBasePass(uint)
 - void SetBlockEvents(bool)
 - void SetCastShadows(bool)
+- void SetDecalsAttr(uint8[]@)
 - void SetDrawDistance(float)
 - void SetEnabled(bool)
 - void SetGlobalVar(StringHash, const Variant&)
@@ -12203,14 +12213,15 @@ Methods:
 - Deserializer&  operator=(const Deserializer&)
 - operator File@() const
 - uint GetChecksum()
-- uint GetPosition() const
-- uint GetSize() const
+- int64 GetPosition() const
+- int64 GetSize() const
 - operator HttpRequest@() const
 - bool IsEof() const
 - operator NamedPipe@() const
 - uint8[]@ Read(uint)
 - bool ReadBool()
 - BoundingBox ReadBoundingBox()
+- uint8[]@ ReadBuffer()
 - int8 ReadByte()
 - Color ReadColor()
 - double ReadDouble()
@@ -12248,10 +12259,10 @@ Methods:
 - Vector3 ReadVector3()
 - Vector4 ReadVector4()
 - VectorBuffer ReadVectorBuffer(uint)
-- uint Seek(uint)
-- uint SeekRelative(int)
+- int64 Seek(int64)
+- int64 SeekRelative(int64)
 - const String& GetName() const
-- uint Tell() const
+- int64 Tell() const
 - operator const File@() const
 - operator const HttpRequest@() const
 - operator const NamedPipe@() const
@@ -12261,8 +12272,8 @@ Properties:
 - uint checksum // readonly
 - bool eof // readonly
 - String name // readonly
-- uint position // readonly
-- uint size // readonly
+- int64 position // readonly
+- int64 size // readonly
 
 <a name="Class_Dictionary"></a>
 
@@ -13257,6 +13268,7 @@ Properties:
 Methods:
 
 - bool AddTile(const VectorBuffer&) const
+- bool AddTile(uint8[]@)
 - bool Allocate(const BoundingBox&, uint)
 - void AllocateNetworkState()
 - operator Animatable@() const
@@ -13304,6 +13316,7 @@ Methods:
 - uint GetMaxLayers() const
 - uint GetMaxObstacles() const
 - String GetMeshName() const
+- uint8[]@ GetNavigationDataAttr() const
 - Node@ GetNode() const
 - uint GetNumAttributes() const
 - uint GetNumNetworkAttributes() const
@@ -13395,6 +13408,7 @@ Methods:
 - void SetMaxLayers(uint)
 - void SetMaxObstacles(uint)
 - void SetMeshName(const String&)
+- void SetNavigationDataAttr(uint8[]@)
 - void SetObjectAnimation(ObjectAnimation@)
 - void SetObjectAnimationAttr(const ResourceRef&)
 - void SetPadding(const Vector3&)
@@ -13642,8 +13656,8 @@ Methods:
 - VariantMap& GetEventDataMap() const
 - Object@ GetEventSender() const
 - FileMode GetMode() const
-- uint GetPosition() const
-- uint GetSize() const
+- int64 GetPosition() const
+- int64 GetSize() const
 - Object@ GetSubsystem(StringHash) const
 - StringHash GetType() const
 - bool HasEventHandlers() const
@@ -13660,6 +13674,7 @@ Methods:
 - uint8[]@ Read(uint)
 - bool ReadBool()
 - BoundingBox ReadBoundingBox()
+- uint8[]@ ReadBuffer()
 - int8 ReadByte()
 - Color ReadColor()
 - double ReadDouble()
@@ -13699,8 +13714,8 @@ Methods:
 - VectorBuffer ReadVectorBuffer(uint)
 - operator RefCounted@() const
 - int Refs() const
-- uint Seek(uint)
-- uint SeekRelative(int)
+- int64 Seek(int64)
+- int64 SeekRelative(int64)
 - void SendEvent(StringHash)
 - void SendEvent(StringHash, VariantMap&)
 - operator Serializer@() const
@@ -13710,7 +13725,7 @@ Methods:
 - const String& GetCategory() const
 - const String& GetName() const
 - const String& GetTypeName() const
-- uint Tell() const
+- int64 Tell() const
 - void UnsubscribeFromAllEvents()
 - void UnsubscribeFromAllEventsExcept(StringHash[]@, bool)
 - void UnsubscribeFromEvent(Object@, StringHash)
@@ -13722,6 +13737,7 @@ Methods:
 - uint Write(uint8[]@)
 - bool WriteBool(bool)
 - bool WriteBoundingBox(const BoundingBox&)
+- bool WriteBuffer(uint8[]@)
 - bool WriteByte(int8)
 - bool WriteColor(const Color&)
 - bool WriteDouble(double)
@@ -13775,9 +13791,9 @@ Properties:
 - String name
 - bool open // readonly
 - bool packaged // readonly
-- uint position // readonly
+- int64 position // readonly
 - int refs // readonly
-- uint size // readonly
+- int64 size // readonly
 - StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
@@ -14713,11 +14729,11 @@ Methods:
 Methods:
 
 - operator Deserializer@() const
-- uint GetAvailableSize() const
+- int GetAvailableSize() const
 - uint GetChecksum()
 - String GetError() const
-- uint GetPosition() const
-- uint GetSize() const
+- int64 GetPosition() const
+- int64 GetSize() const
 - HttpRequestState GetState() const
 - bool IsEof() const
 - bool IsOpen() const
@@ -14725,6 +14741,7 @@ Methods:
 - uint8[]@ Read(uint)
 - bool ReadBool()
 - BoundingBox ReadBoundingBox()
+- uint8[]@ ReadBuffer()
 - int8 ReadByte()
 - Color ReadColor()
 - double ReadDouble()
@@ -14765,14 +14782,14 @@ Methods:
 - operator RefCounted@() const
 - int Refs() const
 - bool Run()
-- uint Seek(uint)
-- uint SeekRelative(int)
+- int64 Seek(int64)
+- int64 SeekRelative(int64)
 - void SetPriority(int)
 - void Stop()
 - const String& GetName() const
 - const String& GetURL() const
 - const String& GetVerb() const
-- uint Tell() const
+- int64 Tell() const
 - void ThreadFunction()
 - int WeakRefs() const
 - operator const Deserializer@() const
@@ -14780,15 +14797,15 @@ Methods:
 
 Properties:
 
-- uint availableSize // readonly
+- int availableSize // readonly
 - uint checksum // readonly
 - bool eof // readonly
 - String error // readonly
 - String name // readonly
 - bool open // readonly
-- uint position // readonly
+- int64 position // readonly
 - int refs // readonly
-- uint size // readonly
+- int64 size // readonly
 - HttpRequestState state // readonly
 - String url // readonly
 - String verb // readonly
@@ -18439,8 +18456,8 @@ Methods:
 - uint GetChecksum()
 - VariantMap& GetEventDataMap() const
 - Object@ GetEventSender() const
-- uint GetPosition() const
-- uint GetSize() const
+- int64 GetPosition() const
+- int64 GetSize() const
 - Object@ GetSubsystem(StringHash) const
 - StringHash GetType() const
 - bool HasEventHandlers() const
@@ -18456,6 +18473,7 @@ Methods:
 - uint8[]@ Read(uint)
 - bool ReadBool()
 - BoundingBox ReadBoundingBox()
+- uint8[]@ ReadBuffer()
 - int8 ReadByte()
 - Color ReadColor()
 - double ReadDouble()
@@ -18495,8 +18513,8 @@ Methods:
 - VectorBuffer ReadVectorBuffer(uint)
 - operator RefCounted@() const
 - int Refs() const
-- uint Seek(uint)
-- uint SeekRelative(int)
+- int64 Seek(int64)
+- int64 SeekRelative(int64)
 - void SendEvent(StringHash)
 - void SendEvent(StringHash, VariantMap&)
 - operator Serializer@() const
@@ -18506,7 +18524,7 @@ Methods:
 - const String& GetCategory() const
 - const String& GetName() const
 - const String& GetTypeName() const
-- uint Tell() const
+- int64 Tell() const
 - void UnsubscribeFromAllEvents()
 - void UnsubscribeFromAllEventsExcept(StringHash[]@, bool)
 - void UnsubscribeFromEvent(Object@, StringHash)
@@ -18518,6 +18536,7 @@ Methods:
 - uint Write(uint8[]@)
 - bool WriteBool(bool)
 - bool WriteBoundingBox(const BoundingBox&)
+- bool WriteBuffer(uint8[]@)
 - bool WriteByte(int8)
 - bool WriteColor(const Color&)
 - bool WriteDouble(double)
@@ -18569,10 +18588,10 @@ Properties:
 - VariantMap globalVars // readonly
 - String name
 - bool open // readonly
-- uint position // readonly
+- int64 position // readonly
 - int refs // readonly
 - bool server // readonly
-- uint size // readonly
+- int64 size // readonly
 - StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
@@ -18886,6 +18905,7 @@ Properties:
 Methods:
 
 - bool AddTile(const VectorBuffer&) const
+- bool AddTile(uint8[]@)
 - bool Allocate(const BoundingBox&, uint)
 - void AllocateNetworkState()
 - operator Animatable@() const
@@ -18931,6 +18951,7 @@ Methods:
 - uint GetID() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - String GetMeshName() const
+- uint8[]@ GetNavigationDataAttr() const
 - Node@ GetNode() const
 - uint GetNumAttributes() const
 - uint GetNumNetworkAttributes() const
@@ -19017,6 +19038,7 @@ Methods:
 - void SetInstanceDefault(bool)
 - void SetInterceptNetworkUpdate(const String&, bool)
 - void SetMeshName(const String&)
+- void SetNavigationDataAttr(uint8[]@)
 - void SetObjectAnimation(ObjectAnimation@)
 - void SetObjectAnimationAttr(const ResourceRef&)
 - void SetPadding(const Vector3&)
@@ -19398,6 +19420,8 @@ Methods:
 - uint GetID() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - StringHash GetNameHash() const
+- uint8[]@ GetNetParentAttr() const
+- uint8[]@ GetNetRotationAttr() const
 - uint GetNumAttributes() const
 - int GetNumChildren(bool = false) const
 - int GetNumComponents() const
@@ -19529,7 +19553,9 @@ Methods:
 - void SetInstanceDefault(bool)
 - void SetInterceptNetworkUpdate(const String&, bool)
 - void SetName(const String&)
+- void SetNetParentAttr(uint8[]@)
 - void SetNetPositionAttr(const Vector3&)
+- void SetNetRotationAttr(uint8[]@)
 - void SetObjectAnimation(ObjectAnimation@)
 - void SetObjectAnimationAttr(const ResourceRef&)
 - void SetOwner(Connection@)
@@ -21251,6 +21277,7 @@ Methods:
 - float GetMaxZ() const
 - float GetMinAngle() const
 - float GetMinZ() const
+- uint8[]@ GetNetBillboardsAttr() const
 - Node@ GetNode() const
 - uint GetNumAttributes() const
 - uint GetNumBillboards() const
@@ -21355,6 +21382,7 @@ Methods:
 - void SetMaxLights(uint)
 - void SetMinAngle(float)
 - void SetMinMaxZ(float, float)
+- void SetNetBillboardsAttr(uint8[]@)
 - void SetNumBillboards(uint)
 - void SetNumParticles(int)
 - void SetObjectAnimation(ObjectAnimation@)
@@ -24720,6 +24748,7 @@ Methods:
 - float GetLinearRestThreshold() const
 - Vector3 GetLinearVelocity() const
 - float GetMass() const
+- uint8[]@ GetNetAngularVelocityAttr() const
 - Node@ GetNode() const
 - uint GetNumAttributes() const
 - uint GetNumNetworkAttributes() const
@@ -24809,6 +24838,7 @@ Methods:
 - void SetLinearRestThreshold(float)
 - void SetLinearVelocity(const Vector3&)
 - void SetMass(float)
+- void SetNetAngularVelocityAttr(uint8[]@)
 - void SetObjectAnimation(ObjectAnimation@)
 - void SetObjectAnimationAttr(const ResourceRef&)
 - void SetPosition(const Vector3&)
@@ -25143,6 +25173,8 @@ Methods:
 - uint GetID() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - StringHash GetNameHash() const
+- uint8[]@ GetNetParentAttr() const
+- uint8[]@ GetNetRotationAttr() const
 - Node@ GetNode(uint) const
 - Node@[]@ GetNodesWithTag(const String&) const
 - uint GetNumAttributes() const
@@ -25312,7 +25344,9 @@ Methods:
 - void SetInstanceDefault(bool)
 - void SetInterceptNetworkUpdate(const String&, bool)
 - void SetName(const String&)
+- void SetNetParentAttr(uint8[]@)
 - void SetNetPositionAttr(const Vector3&)
+- void SetNetRotationAttr(uint8[]@)
 - void SetObjectAnimation(ObjectAnimation@)
 - void SetObjectAnimationAttr(const ResourceRef&)
 - void SetOwner(Connection@)
@@ -26951,6 +26985,7 @@ Methods:
 - uint Write(uint8[]@)
 - bool WriteBool(bool)
 - bool WriteBoundingBox(const BoundingBox&)
+- bool WriteBuffer(uint8[]@)
 - bool WriteByte(int8)
 - bool WriteColor(const Color&)
 - bool WriteDouble(double)
@@ -27169,6 +27204,7 @@ Methods:
 
 - void ClearDataLost()
 - bool Create()
+- uint8[]@ GetByteCode() const
 - uint64 GetElementHash() const
 - String GetFullName() const
 - uint GetGPUObjectName() const
@@ -33984,8 +34020,10 @@ Methods:
 - void AddQuad(const Matrix3x4&, const IntVector2&, const IntVector2&, const IntVector2&, const IntVector2&, const IntVector2&, const IntVector2&, const IntVector2&, const IntVector2&, const Color&, const Color&, const Color&, const Color&)
 - void AddQuad(const Matrix3x4&, int, int, int, int, int, int, int = 0, int = 0)
 - void AddQuad(float, float, float, float, int, int, int = 0, int = 0)
+- void AddQuad(int, int, int, int, int, int, int = 0, int = 0)
 - void AddQuad(int, int, int, int, int, int, int, int, bool)
 - uint GetInterpolatedColor(float, float)
+- uint GetInterpolatedColor(int, int)
 - bool Merge(const UIBatch&)
 - void SetColor(const Color&, bool = false)
 - void SetDefaultColor()
@@ -33999,10 +34037,6 @@ Properties:
 - bool useGradient
 - uint vertexEnd
 - uint vertexStart
-
-Constants:
-
-- Vector3 posAdjust
 
 <a name="Class_UIComponent"></a>
 
@@ -34962,6 +34996,7 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - Variant GetAttributeDefault(uint) const
+- uint8[]@ GetBinaryAttributes() const
 - bool GetBlockEvents() const
 - Component@ GetComponent(StringHash) const
 - VariantMap& GetEventDataMap() const
@@ -35256,6 +35291,7 @@ Methods:
 - Variant&  operator=(int64)
 - Variant&  operator=(uint)
 - Variant&  operator=(uint64)
+- Variant&  operator=(uint8[]@)
 - bool  operator==(RefCounted@) const
 - bool  operator==(ScriptObject@) const
 - bool  operator==(String[]@) const
@@ -35286,12 +35322,13 @@ Methods:
 - bool  operator==(int64) const
 - bool  operator==(uint) const
 - bool  operator==(uint64) const
+- bool  operator==(uint8[]@) const
 - void Clear()
 - const Color& GetColor() const
 - void FromString(VariantType, const String&)
 - void FromString(const String&, const String&)
 - bool GetBool() const
-- VectorBuffer GetBuffer() const
+- uint8[]@ GetBuffer() const
 - double GetDouble() const
 - float GetFloat() const
 - int GetInt() const
@@ -35510,13 +35547,15 @@ Methods:
 - VectorBuffer&  operator=(const VectorBuffer&)
 - uint8&  operator[ ](uint)
 - void Clear()
+- uint8[]@ GetBuffer() const
 - uint GetChecksum()
-- uint GetPosition() const
-- uint GetSize() const
+- int64 GetPosition() const
+- int64 GetSize() const
 - bool IsEof() const
 - uint8[]@ Read(uint)
 - bool ReadBool()
 - BoundingBox ReadBoundingBox()
+- uint8[]@ ReadBuffer()
 - int8 ReadByte()
 - Color ReadColor()
 - double ReadDouble()
@@ -35554,16 +35593,18 @@ Methods:
 - Vector3 ReadVector3()
 - Vector4 ReadVector4()
 - VectorBuffer ReadVectorBuffer(uint)
-- void Resize(uint)
-- uint Seek(uint)
-- uint SeekRelative(int)
-- void SetData(Deserializer&, uint)
+- void Resize(int)
+- int64 Seek(int64)
+- int64 SeekRelative(int64)
+- void SetData(Deserializer&, int)
+- void SetData(uint8[]@)
 - void SetName(const String&)
 - const String& GetName() const
-- uint Tell() const
+- int64 Tell() const
 - uint Write(uint8[]@)
 - bool WriteBool(bool)
 - bool WriteBoundingBox(const BoundingBox&)
+- bool WriteBuffer(uint8[]@)
 - bool WriteByte(int8)
 - bool WriteColor(const Color&)
 - bool WriteDouble(double)
@@ -35608,8 +35649,8 @@ Properties:
 - uint checksum // readonly
 - bool eof // readonly
 - String name
-- uint position // readonly
-- uint size // readonly
+- int64 position // readonly
+- int64 size // readonly
 
 <a name="Class_Vertex2D"></a>
 
@@ -36910,6 +36951,7 @@ Methods:
 - String GetAttributeUpper(const String&) const
 - bool GetBool(const String&) const
 - BoundingBox GetBoundingBox() const
+- uint8[]@ GetBuffer(const String&) const
 - XMLElement GetChild(const String& = String :: EMPTY) const
 - Color GetColor(const String&) const
 - double GetDouble(const String&) const
@@ -36925,7 +36967,7 @@ Methods:
 - Matrix4 GetMatrix4(const String&) const
 - String GetName() const
 - XMLElement GetNext(const String& = String :: EMPTY) const
-- uint GetNumAttributes() const
+- int GetNumAttributes() const
 - XMLElement GetOrCreateChild(const String&)
 - XMLElement GetParent() const
 - Quaternion GetQuaternion(const String&) const
@@ -36945,7 +36987,7 @@ Methods:
 - Vector3 GetVector3(const String&) const
 - Vector4 GetVector4(const String&) const
 - Variant GetVectorVariant(const String&) const
-- uint GetXPathResultIndex() const
+- int GetXPathResultIndex() const
 - bool HasAttribute(const String&) const
 - bool HasChild(const String&) const
 - bool IsNull() const
@@ -36964,6 +37006,7 @@ Methods:
 - bool SetAttribute(const String&, const String&)
 - bool SetBool(const String&, bool)
 - bool SetBoundingBox(const BoundingBox&)
+- bool SetBuffer(const String&, uint8[]@)
 - bool SetColor(const String&, const Color&)
 - bool SetDouble(const String&, double)
 - bool SetFloat(const String&, float)
@@ -37000,7 +37043,7 @@ Properties:
 - String name // readonly
 - XMLElement nextResult // readonly
 - bool notNull // readonly
-- uint numAttributes // readonly
+- int numAttributes // readonly
 - XMLElement parent // readonly
 - String value
 
@@ -37119,16 +37162,16 @@ Properties:
 Methods:
 
 - XPathResultSet&  operator=(const XPathResultSet&)
-- XMLElement  operator[ ](uint) const
+- XMLElement  operator[ ](int) const
 - bool Empty() const
 - XMLElement FirstResult()
-- uint Size() const
+- int Size() const
 
 Properties:
 
 - bool empty // readonly
 - XMLElement firstResult // readonly
-- uint size // readonly
+- int size // readonly
 
 <a name="Class_Zone"></a>
 
@@ -37712,7 +37755,6 @@ Properties:
 
 - GAPI_NONE
 - GAPI_OPENGL
-- GAPI_D3D9
 - GAPI_D3D11
 
 
@@ -38324,6 +38366,7 @@ Properties:
 - float Cos(float)
 - int CountSetBits(uint)
 - Object@ CreateObject(const String&)
+- uint8[]@ DecodeBase64(String)
 - bool DecompressStream(Serializer&, Deserializer&)
 - VectorBuffer DecompressVectorBuffer(VectorBuffer&)
 - void DelayedExecute(float, bool, const String&, const Variant[]@ params = null)
@@ -38473,6 +38516,7 @@ Properties:
 - ResourceRef SaveToResourceRef(Sprite2D@)
 - void SendEvent(const String&, VariantMap& eventData = VariantMap ( ))
 - void SetActive(bool)
+- GAPI SetGAPI(GAPI)
 - void SetGlobalVar(const String&, Variant&)
 - void SetMainThread()
 - void SetMainThread()
@@ -38522,7 +38566,6 @@ Properties:
 - void UnsubscribeFromEvent(const String&)
 - void UnsubscribeFromEvents(Object@)
 - const Variant& GetParameter(const VariantMap&, const String&, const Variant& = Variant :: EMPTY)
-- const Vector2& GetPixelUVOffset()
 - IntVector2 VectorAbs(const IntVector2&)
 - IntVector3 VectorAbs(const IntVector3&)
 - Vector2 VectorAbs(const Vector2&)
@@ -38650,7 +38693,6 @@ Properties:
 - String EP_AUTOLOAD_PATHS
 - String EP_BORDERLESS
 - String EP_DIRECT3D11
-- String EP_DIRECT3D9
 - String EP_DUMP_SHADERS
 - String EP_EVENT_PROFILER
 - String EP_EXTERNAL_WINDOW
@@ -38976,7 +39018,7 @@ Properties:
 - uint MASK_TEXCOORD1
 - uint MASK_TEXCOORD2
 - int MATRIX_CONVERSION_BUFFER_LENGTH
-- uint MAX_CASCADE_SPLITS
+- int MAX_CASCADE_SPLITS
 - int MAX_CONSTANT_REGISTERS
 - int MAX_LIGHT_SPLITS
 - uint MAX_NETWORK_ATTRIBUTES
@@ -39023,10 +39065,14 @@ Properties:
 - float M_LARGE_EPSILON
 - float M_LARGE_VALUE
 - float M_MAX_FOV
+- int64 M_MAX_I64
 - int M_MAX_INT
+- uint64 M_MAX_U64
 - uint M_MAX_UNSIGNED
+- int64 M_MIN_I64
 - int M_MIN_INT
 - float M_MIN_NEARCLIP
+- uint64 M_MIN_U64
 - uint M_MIN_UNSIGNED
 - float M_PI
 - float M_RADTODEG
