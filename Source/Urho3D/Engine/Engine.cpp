@@ -158,46 +158,50 @@ bool Engine::Initialize(const VariantMap& parameters)
     // Set headless mode
     headless_ = GetParameter(parameters, EP_HEADLESS, false).GetBool();
 
-    // Register the rest of the subsystems
-    if (!headless_)
-    {
-        GAPI gapi = GAPI_NONE;
+    // Detect GAPI even in headless mode
+    // https://github.com/urho3d/Urho3D/issues/3040
+    GAPI gapi = GAPI_NONE;
 
-        // Try to set any possible graphics API as default
+    // Try to set any possible graphics API as default
 
 #ifdef URHO3D_OPENGL
+    gapi = GAPI_OPENGL;
+#endif
+
+#ifdef URHO3D_D3D11
+    gapi = GAPI_D3D11;
+#endif
+
+    // Use command line parameters
+
+#ifdef URHO3D_OPENGL
+    bool gapi_gl = GetParameter(parameters, EP_OPENGL, false).GetBool();
+    if (gapi_gl)
         gapi = GAPI_OPENGL;
 #endif
 
 #ifdef URHO3D_D3D11
+    bool gapi_d3d11 = GetParameter(parameters, EP_DIRECT3D11, false).GetBool();
+    if (gapi_d3d11)
         gapi = GAPI_D3D11;
 #endif
 
-        // Use command line parameters
+    if (gapi == GAPI_NONE)
+    {
+        URHO3D_LOGERROR("Graphics API not selected");
+        return false;
+    }
 
-#ifdef URHO3D_OPENGL
-        bool gapi_gl = GetParameter(parameters, EP_OPENGL, false).GetBool();
-        if (gapi_gl)
-            gapi = GAPI_OPENGL;
-#endif
-
-#ifdef URHO3D_D3D11
-        bool gapi_d3d11 = GetParameter(parameters, EP_DIRECT3D11, false).GetBool();
-        if (gapi_d3d11)
-            gapi = GAPI_D3D11;
-#endif
-
-        if (gapi == GAPI_NONE)
-        {
-            URHO3D_LOGERROR("Graphics API not selected");
-            return false;
-        }
-
+    // Register the rest of the subsystems
+    if (!headless_)
+    {
         context_->RegisterSubsystem(new Graphics(context_, gapi));
         context_->RegisterSubsystem(new Renderer(context_));
     }
     else
     {
+        Graphics::SetGAPI(gapi); // https://github.com/urho3d/Urho3D/issues/3040
+
         // Register graphics library objects explicitly in headless mode to allow them to work without using actual GPU resources
         RegisterGraphicsLibrary(context_);
     }

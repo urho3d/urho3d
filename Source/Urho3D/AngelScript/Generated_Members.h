@@ -10619,6 +10619,9 @@ template <class T> void RegisterMembers_Graphics(asIScriptEngine* engine, const 
     // static GAPI Graphics::GetGAPI()
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("GAPI GetGAPI()", AS_FUNCTIONPR(T::GetGAPI, (), GAPI), AS_CALL_CDECL);engine->SetDefaultNamespace("");
 
+    // static GAPI Graphics::SetGAPI(GAPI value)
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("GAPI SetGAPI(GAPI)", AS_FUNCTIONPR(T::SetGAPI, (GAPI), GAPI), AS_CALL_CDECL);engine->SetDefaultNamespace("");
+
     // static unsigned Graphics::GetAlphaFormat()
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("uint GetAlphaFormat()", AS_FUNCTIONPR(T::GetAlphaFormat, (), unsigned), AS_CALL_CDECL);engine->SetDefaultNamespace("");
 
