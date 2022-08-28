@@ -4852,8 +4852,8 @@ static void VectorBuffer__VectorBuffer_constspVectorlesu8greamp(VectorBuffer* _p
     new(_ptr) VectorBuffer(data);
 }
 
-// VectorBuffer::VectorBuffer(Deserializer& source, unsigned size)
-static void VectorBuffer__VectorBuffer_Deserializeramp_unsigned(VectorBuffer* _ptr, Deserializer& source, unsigned size)
+// VectorBuffer::VectorBuffer(Deserializer& source, i32 size)
+static void VectorBuffer__VectorBuffer_Deserializeramp_i32(VectorBuffer* _ptr, Deserializer& source, i32 size)
 {
     new(_ptr) VectorBuffer(source, size);
 }
@@ -4861,13 +4861,13 @@ static void VectorBuffer__VectorBuffer_Deserializeramp_unsigned(VectorBuffer* _p
 // class VectorBuffer | File: ../IO/VectorBuffer.h
 static void Register_VectorBuffer(asIScriptEngine* engine)
 {
-    // VectorBuffer::VectorBuffer(const void* data, unsigned size)
+    // VectorBuffer::VectorBuffer(const void* data, i32 size)
     // Error: type "const void*" can not automatically bind
 
     // explicit VectorBuffer::VectorBuffer(const Vector<u8>& data)
     engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_CONSTRUCT, "void f(Array<uint8>@+)", AS_FUNCTION_OBJFIRST(VectorBuffer__VectorBuffer_constspVectorlesu8greamp), AS_CALL_CDECL_OBJFIRST);
-    // VectorBuffer::VectorBuffer(Deserializer& source, unsigned size)
-    engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_CONSTRUCT, "void f(Deserializer&, uint)", AS_FUNCTION_OBJFIRST(VectorBuffer__VectorBuffer_Deserializeramp_unsigned), AS_CALL_CDECL_OBJFIRST);
+    // VectorBuffer::VectorBuffer(Deserializer& source, i32 size)
+    engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_CONSTRUCT, "void f(Deserializer&, int)", AS_FUNCTION_OBJFIRST(VectorBuffer__VectorBuffer_Deserializeramp_i32), AS_CALL_CDECL_OBJFIRST);
 
     // VectorBuffer::~VectorBuffer() | Implicitly-declared
     engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(VectorBuffer), AS_CALL_CDECL_OBJFIRST);
