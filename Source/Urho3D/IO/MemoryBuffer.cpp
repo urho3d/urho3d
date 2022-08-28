@@ -8,20 +8,24 @@
 namespace Urho3D
 {
 
-MemoryBuffer::MemoryBuffer(void* data, unsigned size) :
+MemoryBuffer::MemoryBuffer(void* data, i32 size) :
     AbstractFile(size),
     buffer_((u8*)data),
     readOnly_(false)
 {
+    assert(size >= 0);
+
     if (!buffer_)
         size_ = 0;
 }
 
-MemoryBuffer::MemoryBuffer(const void* data, unsigned size) :
+MemoryBuffer::MemoryBuffer(const void* data, i32 size) :
     AbstractFile(size),
     buffer_((u8*)data),
     readOnly_(true)
 {
+    assert(size >= 0);
+
     if (!buffer_)
         size_ = 0;
 }
