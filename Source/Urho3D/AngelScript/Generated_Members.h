@@ -7250,8 +7250,8 @@ template <class T> void RegisterMembers_PackageDownload(asIScriptEngine* engine,
     // unsigned PackageDownload::totalFragments_
     engine->RegisterObjectProperty(className, "uint totalFragments", offsetof(T, totalFragments_));
 
-    // unsigned PackageDownload::checksum_
-    engine->RegisterObjectProperty(className, "uint checksum", offsetof(T, checksum_));
+    // hash32 PackageDownload::checksum_
+    engine->RegisterObjectProperty(className, "hash32 checksum", offsetof(T, checksum_));
 
     // bool PackageDownload::initiated_
     engine->RegisterObjectProperty(className, "bool initiated", offsetof(T, initiated_));
@@ -18180,9 +18180,9 @@ template <class T> void RegisterMembers_Scene(asIScriptEngine* engine, const cha
     engine->RegisterObjectMethod(className, "float GetAsyncProgress() const", AS_METHODPR(T, GetAsyncProgress, () const, float), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_asyncProgress() const", AS_METHODPR(T, GetAsyncProgress, () const, float), AS_CALL_THISCALL);
 
-    // unsigned Scene::GetChecksum() const
-    engine->RegisterObjectMethod(className, "uint GetChecksum() const", AS_METHODPR(T, GetChecksum, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_checksum() const", AS_METHODPR(T, GetChecksum, () const, unsigned), AS_CALL_THISCALL);
+    // hash32 Scene::GetChecksum() const
+    engine->RegisterObjectMethod(className, "hash32 GetChecksum() const", AS_METHODPR(T, GetChecksum, () const, hash32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "hash32 get_checksum() const", AS_METHODPR(T, GetChecksum, () const, hash32), AS_CALL_THISCALL);
 
     // Component* Scene::GetComponent(unsigned id) const
     engine->RegisterObjectMethod(className, "Component@+ GetComponent(uint) const", AS_METHODPR(T, GetComponent, (unsigned) const, Component*), AS_CALL_THISCALL);

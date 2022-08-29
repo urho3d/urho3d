@@ -975,7 +975,7 @@ void Connection::ProcessSceneLoaded(int msgID, MemoryBuffer& msg)
         return;
     }
 
-    unsigned checksum = msg.ReadUInt();
+    hash32 checksum = msg.ReadUInt();
 
     if (checksum != scene_->GetChecksum())
     {
@@ -1465,7 +1465,7 @@ bool Connection::RequestNeededPackages(unsigned numPackages, MemoryBuffer& msg)
     {
         String name = msg.ReadString();
         unsigned fileSize = msg.ReadUInt();
-        unsigned checksum = msg.ReadUInt();
+        hash32 checksum = msg.ReadUInt();
         String checksumString = ToStringHex(checksum);
         bool found = false;
 
@@ -1523,7 +1523,7 @@ bool Connection::RequestNeededPackages(unsigned numPackages, MemoryBuffer& msg)
     return true;
 }
 
-void Connection::RequestPackage(const String& name, unsigned fileSize, unsigned checksum)
+void Connection::RequestPackage(const String& name, unsigned fileSize, hash32 checksum)
 {
     StringHash nameHash(name);
     if (downloads_.Contains(nameHash))

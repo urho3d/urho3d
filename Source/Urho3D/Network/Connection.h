@@ -60,7 +60,7 @@ struct PackageDownload
     /// Total number of fragments.
     unsigned totalFragments_;
     /// Checksum.
-    unsigned checksum_;
+    hash32 checksum_;
     /// Download initiated flag.
     bool initiated_;
 };
@@ -289,7 +289,7 @@ private:
     /// Check a package list received from server and initiate package downloads as necessary. Return true on success, or false if failed to initialze downloads (cache dir not set).
     bool RequestNeededPackages(unsigned numPackages, MemoryBuffer& msg);
     /// Initiate a package download.
-    void RequestPackage(const String& name, unsigned fileSize, unsigned checksum);
+    void RequestPackage(const String& name, unsigned fileSize, hash32 checksum);
     /// Send an error reply for a package download.
     void SendPackageError(const String& name);
     /// Handle scene load failure on the server or client.

@@ -187,7 +187,7 @@ public:
 
     /// Return source file checksum.
     /// @property
-    unsigned GetChecksum() const { return checksum_; }
+    hash32 GetChecksum() const { return checksum_; }
 
     /// Return update time scale.
     /// @property
@@ -323,7 +323,7 @@ private:
     /// Next free local component ID.
     unsigned localComponentID_;
     /// Scene source file checksum.
-    mutable unsigned checksum_;
+    mutable hash32 checksum_;
     /// Maximum milliseconds per frame to spend on async scene loading.
     int asyncLoadingMs_;
     /// Scene update time scale.
