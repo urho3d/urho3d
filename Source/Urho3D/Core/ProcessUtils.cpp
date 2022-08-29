@@ -240,11 +240,11 @@ const Vector<String>& ParseArguments(const String& cmdLine, bool skipFirstArgume
 {
     arguments.Clear();
 
-    unsigned cmdStart = 0, cmdEnd = 0;
+    i32 cmdStart = 0, cmdEnd = 0;
     bool inCmd = false;
     bool inQuote = false;
 
-    for (unsigned i = 0; i < cmdLine.Length(); ++i)
+    for (i32 i = 0; i < cmdLine.Length(); ++i)
     {
         if (cmdLine[i] == '\"')
             inQuote = !inQuote;
