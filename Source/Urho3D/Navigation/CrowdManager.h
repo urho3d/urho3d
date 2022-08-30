@@ -31,10 +31,10 @@ struct CrowdObstacleAvoidanceParams
     float weightSide;
     float weightToi;
     float horizTime;
-    unsigned char gridSize;         ///< grid
-    unsigned char adaptiveDivs;     ///< adaptive
-    unsigned char adaptiveRings;    ///< adaptive
-    unsigned char adaptiveDepth;    ///< adaptive
+    u8 gridSize;         ///< grid
+    u8 adaptiveDivs;     ///< adaptive
+    u8 adaptiveRings;    ///< adaptive
+    u8 adaptiveDepth;    ///< adaptive
 };
 
 /// Crowd manager scene component. Should be added only to the root scene node.
@@ -68,7 +68,7 @@ public:
     void ResetCrowdTarget(Node* node = nullptr);
     /// Set the maximum number of agents.
     /// @property
-    void SetMaxAgents(unsigned maxAgents);
+    void SetMaxAgents(i32 maxAgents);
     /// Set the maximum radius of any agent.
     /// @property
     void SetMaxAgentRadius(float maxAgentRadius);
@@ -107,7 +107,7 @@ public:
 
     /// Get the maximum number of agents.
     /// @property
-    unsigned GetMaxAgents() const { return maxAgents_; }
+    i32 GetMaxAgents() const { return maxAgents_; }
 
     /// Get the maximum radius of any agent.
     /// @property
@@ -178,7 +178,7 @@ private:
     /// The NavigationMesh component Id for pending crowd creation.
     unsigned navigationMeshId_{};
     /// The maximum number of agents the crowd can manage.
-    unsigned maxAgents_{};
+    i32 maxAgents_{};
     /// The maximum radius of any agent that will be added to the crowd.
     float maxAgentRadius_{};
     /// Number of query filter types configured in the crowd. Limit to DT_CROWD_MAX_QUERY_FILTER_TYPE.
