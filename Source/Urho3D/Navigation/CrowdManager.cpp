@@ -24,8 +24,8 @@ namespace Urho3D
 
 extern const char* NAVIGATION_CATEGORY;
 
-static const unsigned DEFAULT_MAX_AGENTS = 512;
-static const float DEFAULT_MAX_AGENT_RADIUS = 0.f;
+static constexpr i32 DEFAULT_MAX_AGENTS = 512;
+static constexpr float DEFAULT_MAX_AGENT_RADIUS = 0.f;
 
 static const StringVector filterTypesStructureElementNames =
 {
@@ -76,7 +76,7 @@ void CrowdManager::RegisterObject(Context* context)
 {
     context->RegisterFactory<CrowdManager>(NAVIGATION_CATEGORY);
 
-    URHO3D_ATTRIBUTE("Max Agents", unsigned, maxAgents_, DEFAULT_MAX_AGENTS, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Max Agents", i32, maxAgents_, DEFAULT_MAX_AGENTS, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Max Agent Radius", float, maxAgentRadius_, DEFAULT_MAX_AGENT_RADIUS, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Navigation Mesh", unsigned, navigationMeshId_, 0, AM_DEFAULT | AM_COMPONENTID);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Filter Types", GetQueryFilterTypesAttr, SetQueryFilterTypesAttr,
@@ -90,7 +90,7 @@ void CrowdManager::RegisterObject(Context* context)
 void CrowdManager::ApplyAttributes()
 {
     // Values from Editor, saved-file, or network must be checked before applying
-    maxAgents_ = Max(1U, maxAgents_);
+    maxAgents_ = Max(1, maxAgents_);
     maxAgentRadius_ = Max(0.f, maxAgentRadius_);
 
     bool navMeshChange = false;
@@ -214,7 +214,7 @@ void CrowdManager::ResetCrowdTarget(Node* node)
         agents[i]->ResetTarget();
 }
 
-void CrowdManager::SetMaxAgents(unsigned maxAgents)
+void CrowdManager::SetMaxAgents(i32 maxAgents)
 {
     if (maxAgents != maxAgents_ && maxAgents > 0)
     {

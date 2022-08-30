@@ -7130,16 +7130,16 @@ template <class T> void RegisterMembers_CrowdObstacleAvoidanceParams(asIScriptEn
     // float CrowdObstacleAvoidanceParams::horizTime
     engine->RegisterObjectProperty(className, "float horizTime", offsetof(T, horizTime));
 
-    // unsigned char CrowdObstacleAvoidanceParams::gridSize
+    // u8 CrowdObstacleAvoidanceParams::gridSize
     engine->RegisterObjectProperty(className, "uint8 gridSize", offsetof(T, gridSize));
 
-    // unsigned char CrowdObstacleAvoidanceParams::adaptiveDivs
+    // u8 CrowdObstacleAvoidanceParams::adaptiveDivs
     engine->RegisterObjectProperty(className, "uint8 adaptiveDivs", offsetof(T, adaptiveDivs));
 
-    // unsigned char CrowdObstacleAvoidanceParams::adaptiveRings
+    // u8 CrowdObstacleAvoidanceParams::adaptiveRings
     engine->RegisterObjectProperty(className, "uint8 adaptiveRings", offsetof(T, adaptiveRings));
 
-    // unsigned char CrowdObstacleAvoidanceParams::adaptiveDepth
+    // u8 CrowdObstacleAvoidanceParams::adaptiveDepth
     engine->RegisterObjectProperty(className, "uint8 adaptiveDepth", offsetof(T, adaptiveDepth));
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_CrowdObstacleAvoidanceParams
@@ -19851,9 +19851,9 @@ template <class T> void RegisterMembers_CrowdManager(asIScriptEngine* engine, co
     engine->RegisterObjectMethod(className, "float GetMaxAgentRadius() const", AS_METHODPR(T, GetMaxAgentRadius, () const, float), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_maxAgentRadius() const", AS_METHODPR(T, GetMaxAgentRadius, () const, float), AS_CALL_THISCALL);
 
-    // unsigned CrowdManager::GetMaxAgents() const
-    engine->RegisterObjectMethod(className, "uint GetMaxAgents() const", AS_METHODPR(T, GetMaxAgents, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_maxAgents() const", AS_METHODPR(T, GetMaxAgents, () const, unsigned), AS_CALL_THISCALL);
+    // i32 CrowdManager::GetMaxAgents() const
+    engine->RegisterObjectMethod(className, "int GetMaxAgents() const", AS_METHODPR(T, GetMaxAgents, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_maxAgents() const", AS_METHODPR(T, GetMaxAgents, () const, i32), AS_CALL_THISCALL);
 
     // NavigationMesh* CrowdManager::GetNavigationMesh() const
     engine->RegisterObjectMethod(className, "NavigationMesh@+ GetNavigationMesh() const", AS_METHODPR(T, GetNavigationMesh, () const, NavigationMesh*), AS_CALL_THISCALL);
@@ -19899,9 +19899,9 @@ template <class T> void RegisterMembers_CrowdManager(asIScriptEngine* engine, co
     engine->RegisterObjectMethod(className, "void SetMaxAgentRadius(float)", AS_METHODPR(T, SetMaxAgentRadius, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_maxAgentRadius(float)", AS_METHODPR(T, SetMaxAgentRadius, (float), void), AS_CALL_THISCALL);
 
-    // void CrowdManager::SetMaxAgents(unsigned maxAgents)
-    engine->RegisterObjectMethod(className, "void SetMaxAgents(uint)", AS_METHODPR(T, SetMaxAgents, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_maxAgents(uint)", AS_METHODPR(T, SetMaxAgents, (unsigned), void), AS_CALL_THISCALL);
+    // void CrowdManager::SetMaxAgents(i32 maxAgents)
+    engine->RegisterObjectMethod(className, "void SetMaxAgents(int)", AS_METHODPR(T, SetMaxAgents, (i32), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_maxAgents(int)", AS_METHODPR(T, SetMaxAgents, (i32), void), AS_CALL_THISCALL);
 
     // void CrowdManager::SetNavigationMesh(NavigationMesh* navMesh)
     engine->RegisterObjectMethod(className, "void SetNavigationMesh(NavigationMesh@+)", AS_METHODPR(T, SetNavigationMesh, (NavigationMesh*), void), AS_CALL_THISCALL);
