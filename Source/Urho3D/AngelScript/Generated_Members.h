@@ -90,8 +90,8 @@ template <class T> void RegisterMembers_AnimationStateTrack(asIScriptEngine* eng
     // float AnimationStateTrack::weight_
     engine->RegisterObjectProperty(className, "float weight", offsetof(T, weight_));
 
-    // unsigned AnimationStateTrack::keyFrame_
-    engine->RegisterObjectProperty(className, "uint keyFrame", offsetof(T, keyFrame_));
+    // i32 AnimationStateTrack::keyFrame_
+    engine->RegisterObjectProperty(className, "int keyFrame", offsetof(T, keyFrame_));
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_AnimationStateTrack
         REGISTER_MEMBERS_MANUAL_PART_AnimationStateTrack();
@@ -101,31 +101,31 @@ template <class T> void RegisterMembers_AnimationStateTrack(asIScriptEngine* eng
 // struct AnimationTrack | File: ../Graphics/Animation.h
 template <class T> void RegisterMembers_AnimationTrack(asIScriptEngine* engine, const char* className)
 {
-    // AnimationKeyFrame* AnimationTrack::GetKeyFrame(unsigned index)
+    // AnimationKeyFrame* AnimationTrack::GetKeyFrame(i32 index)
     // Error: type "AnimationKeyFrame*" can not automatically bind
 
     // void AnimationTrack::AddKeyFrame(const AnimationKeyFrame& keyFrame)
     engine->RegisterObjectMethod(className, "void AddKeyFrame(const AnimationKeyFrame&in)", AS_METHODPR(T, AddKeyFrame, (const AnimationKeyFrame&), void), AS_CALL_THISCALL);
 
-    // bool AnimationTrack::GetKeyFrameIndex(float time, unsigned& index) const
-    engine->RegisterObjectMethod(className, "bool GetKeyFrameIndex(float, uint&) const", AS_METHODPR(T, GetKeyFrameIndex, (float, unsigned&) const, bool), AS_CALL_THISCALL);
+    // bool AnimationTrack::GetKeyFrameIndex(float time, i32& index) const
+    engine->RegisterObjectMethod(className, "bool GetKeyFrameIndex(float, int&) const", AS_METHODPR(T, GetKeyFrameIndex, (float, i32&) const, bool), AS_CALL_THISCALL);
 
-    // unsigned AnimationTrack::GetNumKeyFrames() const
-    engine->RegisterObjectMethod(className, "uint GetNumKeyFrames() const", AS_METHODPR(T, GetNumKeyFrames, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numKeyFrames() const", AS_METHODPR(T, GetNumKeyFrames, () const, unsigned), AS_CALL_THISCALL);
+    // i32 AnimationTrack::GetNumKeyFrames() const
+    engine->RegisterObjectMethod(className, "int GetNumKeyFrames() const", AS_METHODPR(T, GetNumKeyFrames, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numKeyFrames() const", AS_METHODPR(T, GetNumKeyFrames, () const, i32), AS_CALL_THISCALL);
 
-    // void AnimationTrack::InsertKeyFrame(unsigned index, const AnimationKeyFrame& keyFrame)
-    engine->RegisterObjectMethod(className, "void InsertKeyFrame(uint, const AnimationKeyFrame&in)", AS_METHODPR(T, InsertKeyFrame, (unsigned, const AnimationKeyFrame&), void), AS_CALL_THISCALL);
+    // void AnimationTrack::InsertKeyFrame(i32 index, const AnimationKeyFrame& keyFrame)
+    engine->RegisterObjectMethod(className, "void InsertKeyFrame(int, const AnimationKeyFrame&in)", AS_METHODPR(T, InsertKeyFrame, (i32, const AnimationKeyFrame&), void), AS_CALL_THISCALL);
 
     // void AnimationTrack::RemoveAllKeyFrames()
     engine->RegisterObjectMethod(className, "void RemoveAllKeyFrames()", AS_METHODPR(T, RemoveAllKeyFrames, (), void), AS_CALL_THISCALL);
 
-    // void AnimationTrack::RemoveKeyFrame(unsigned index)
-    engine->RegisterObjectMethod(className, "void RemoveKeyFrame(uint)", AS_METHODPR(T, RemoveKeyFrame, (unsigned), void), AS_CALL_THISCALL);
+    // void AnimationTrack::RemoveKeyFrame(i32 index)
+    engine->RegisterObjectMethod(className, "void RemoveKeyFrame(int)", AS_METHODPR(T, RemoveKeyFrame, (i32), void), AS_CALL_THISCALL);
 
-    // void AnimationTrack::SetKeyFrame(unsigned index, const AnimationKeyFrame& keyFrame)
-    engine->RegisterObjectMethod(className, "void SetKeyFrame(uint, const AnimationKeyFrame&in)", AS_METHODPR(T, SetKeyFrame, (unsigned, const AnimationKeyFrame&), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_keyFrames(uint, const AnimationKeyFrame&in)", AS_METHODPR(T, SetKeyFrame, (unsigned, const AnimationKeyFrame&), void), AS_CALL_THISCALL);
+    // void AnimationTrack::SetKeyFrame(i32 index, const AnimationKeyFrame& keyFrame)
+    engine->RegisterObjectMethod(className, "void SetKeyFrame(int, const AnimationKeyFrame&in)", AS_METHODPR(T, SetKeyFrame, (i32, const AnimationKeyFrame&), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_keyFrames(int, const AnimationKeyFrame&in)", AS_METHODPR(T, SetKeyFrame, (i32, const AnimationKeyFrame&), void), AS_CALL_THISCALL);
 
     // Vector<AnimationKeyFrame> AnimationTrack::keyFrames_
     // Error: type "Vector<AnimationKeyFrame>" can not automatically bind
@@ -15149,7 +15149,7 @@ template <class T> void RegisterMembers_Animation(asIScriptEngine* engine, const
 
     // const HashMap<StringHash, AnimationTrack>& Animation::GetTracks() const
     // Error: type "const HashMap<StringHash, AnimationTrack>&" can not automatically bind
-    // AnimationTriggerPoint* Animation::GetTrigger(unsigned index)
+    // AnimationTriggerPoint* Animation::GetTrigger(i32 index)
     // Error: type "AnimationTriggerPoint*" can not automatically bind
 
     // void Animation::AddTrigger(const AnimationTriggerPoint& trigger)
@@ -15175,16 +15175,16 @@ template <class T> void RegisterMembers_Animation(asIScriptEngine* engine, const
     engine->RegisterObjectMethod(className, "float GetLength() const", AS_METHODPR(T, GetLength, () const, float), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_length() const", AS_METHODPR(T, GetLength, () const, float), AS_CALL_THISCALL);
 
-    // unsigned Animation::GetNumTracks() const
-    engine->RegisterObjectMethod(className, "uint GetNumTracks() const", AS_METHODPR(T, GetNumTracks, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numTracks() const", AS_METHODPR(T, GetNumTracks, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Animation::GetNumTracks() const
+    engine->RegisterObjectMethod(className, "int GetNumTracks() const", AS_METHODPR(T, GetNumTracks, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numTracks() const", AS_METHODPR(T, GetNumTracks, () const, i32), AS_CALL_THISCALL);
 
-    // unsigned Animation::GetNumTriggers() const
-    engine->RegisterObjectMethod(className, "uint GetNumTriggers() const", AS_METHODPR(T, GetNumTriggers, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numTriggers() const", AS_METHODPR(T, GetNumTriggers, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Animation::GetNumTriggers() const
+    engine->RegisterObjectMethod(className, "int GetNumTriggers() const", AS_METHODPR(T, GetNumTriggers, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numTriggers() const", AS_METHODPR(T, GetNumTriggers, () const, i32), AS_CALL_THISCALL);
 
-    // AnimationTrack* Animation::GetTrack(unsigned index)
-    engine->RegisterObjectMethod(className, "AnimationTrack@ GetTrack(uint)", AS_METHODPR(T, GetTrack, (unsigned), AnimationTrack*), AS_CALL_THISCALL);
+    // AnimationTrack* Animation::GetTrack(i32 index)
+    engine->RegisterObjectMethod(className, "AnimationTrack@ GetTrack(int)", AS_METHODPR(T, GetTrack, (i32), AnimationTrack*), AS_CALL_THISCALL);
 
     // AnimationTrack* Animation::GetTrack(const String& name)
     engine->RegisterObjectMethod(className, "AnimationTrack@ GetTrack(const String&in)", AS_METHODPR(T, GetTrack, (const String&), AnimationTrack*), AS_CALL_THISCALL);
@@ -15205,8 +15205,8 @@ template <class T> void RegisterMembers_Animation(asIScriptEngine* engine, const
     // bool Animation::RemoveTrack(const String& name)
     engine->RegisterObjectMethod(className, "bool RemoveTrack(const String&in)", AS_METHODPR(T, RemoveTrack, (const String&), bool), AS_CALL_THISCALL);
 
-    // void Animation::RemoveTrigger(unsigned index)
-    engine->RegisterObjectMethod(className, "void RemoveTrigger(uint)", AS_METHODPR(T, RemoveTrigger, (unsigned), void), AS_CALL_THISCALL);
+    // void Animation::RemoveTrigger(i32 index)
+    engine->RegisterObjectMethod(className, "void RemoveTrigger(int)", AS_METHODPR(T, RemoveTrigger, (i32), void), AS_CALL_THISCALL);
 
     // void Animation::SetAnimationName(const String& name)
     engine->RegisterObjectMethod(className, "void SetAnimationName(const String&in)", AS_METHODPR(T, SetAnimationName, (const String&), void), AS_CALL_THISCALL);
@@ -15216,13 +15216,13 @@ template <class T> void RegisterMembers_Animation(asIScriptEngine* engine, const
     engine->RegisterObjectMethod(className, "void SetLength(float)", AS_METHODPR(T, SetLength, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_length(float)", AS_METHODPR(T, SetLength, (float), void), AS_CALL_THISCALL);
 
-    // void Animation::SetNumTriggers(unsigned num)
-    engine->RegisterObjectMethod(className, "void SetNumTriggers(uint)", AS_METHODPR(T, SetNumTriggers, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_numTriggers(uint)", AS_METHODPR(T, SetNumTriggers, (unsigned), void), AS_CALL_THISCALL);
+    // void Animation::SetNumTriggers(i32 num)
+    engine->RegisterObjectMethod(className, "void SetNumTriggers(int)", AS_METHODPR(T, SetNumTriggers, (i32), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_numTriggers(int)", AS_METHODPR(T, SetNumTriggers, (i32), void), AS_CALL_THISCALL);
 
-    // void Animation::SetTrigger(unsigned index, const AnimationTriggerPoint& trigger)
-    engine->RegisterObjectMethod(className, "void SetTrigger(uint, const AnimationTriggerPoint&in)", AS_METHODPR(T, SetTrigger, (unsigned, const AnimationTriggerPoint&), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_triggers(uint, const AnimationTriggerPoint&in)", AS_METHODPR(T, SetTrigger, (unsigned, const AnimationTriggerPoint&), void), AS_CALL_THISCALL);
+    // void Animation::SetTrigger(i32 index, const AnimationTriggerPoint& trigger)
+    engine->RegisterObjectMethod(className, "void SetTrigger(int, const AnimationTriggerPoint&in)", AS_METHODPR(T, SetTrigger, (i32, const AnimationTriggerPoint&), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_triggers(int, const AnimationTriggerPoint&in)", AS_METHODPR(T, SetTrigger, (i32, const AnimationTriggerPoint&), void), AS_CALL_THISCALL);
 
     // static void Animation::RegisterObject(Context* context)
     // Not registered because have @nobind mark

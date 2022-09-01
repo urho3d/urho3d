@@ -463,7 +463,7 @@ void AnimationState::ApplyTrack(AnimationStateTrack& stateTrack, float weight, b
     if (track->keyFrames_.Empty() || !node)
         return;
 
-    unsigned& frame = stateTrack.keyFrame_;
+    i32& frame = stateTrack.keyFrame_;
     track->GetKeyFrameIndex(time_, frame);
 
     // Check if next frame to interpolate to is valid, or if wrapping is needed (looping animation only)

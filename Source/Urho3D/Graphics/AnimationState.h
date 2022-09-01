@@ -47,7 +47,7 @@ struct AnimationStateTrack
     /// Blending weight.
     float weight_;
     /// Last key frame.
-    unsigned keyFrame_;
+    i32 keyFrame_;
 };
 
 /// %Animation instance.
