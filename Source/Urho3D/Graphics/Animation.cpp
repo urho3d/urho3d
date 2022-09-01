@@ -30,8 +30,10 @@ inline bool CompareKeyFrames(AnimationKeyFrame& lhs, AnimationKeyFrame& rhs)
     return lhs.time_ < rhs.time_;
 }
 
-void AnimationTrack::SetKeyFrame(unsigned index, const AnimationKeyFrame& keyFrame)
+void AnimationTrack::SetKeyFrame(i32 index, const AnimationKeyFrame& keyFrame)
 {
+    assert(index >= 0);
+
     if (index < keyFrames_.Size())
     {
         keyFrames_[index] = keyFrame;
@@ -49,14 +51,16 @@ void AnimationTrack::AddKeyFrame(const AnimationKeyFrame& keyFrame)
         Urho3D::Sort(keyFrames_.Begin(), keyFrames_.End(), CompareKeyFrames);
 }
 
-void AnimationTrack::InsertKeyFrame(unsigned index, const AnimationKeyFrame& keyFrame)
+void AnimationTrack::InsertKeyFrame(i32 index, const AnimationKeyFrame& keyFrame)
 {
+    assert(index >= 0);
     keyFrames_.Insert(index, keyFrame);
     Urho3D::Sort(keyFrames_.Begin(), keyFrames_.End(), CompareKeyFrames);
 }
 
-void AnimationTrack::RemoveKeyFrame(unsigned index)
+void AnimationTrack::RemoveKeyFrame(i32 index)
 {
+    assert(index >= 0);
     keyFrames_.Erase(index);
 }
 
@@ -65,12 +69,13 @@ void AnimationTrack::RemoveAllKeyFrames()
     keyFrames_.Clear();
 }
 
-AnimationKeyFrame* AnimationTrack::GetKeyFrame(unsigned index)
+AnimationKeyFrame* AnimationTrack::GetKeyFrame(i32 index)
 {
+    assert(index >= 0);
     return index < keyFrames_.Size() ? &keyFrames_[index] : nullptr;
 }
 
-bool AnimationTrack::GetKeyFrameIndex(float time, unsigned& index) const
+bool AnimationTrack::GetKeyFrameIndex(float time, i32& index) const
 {
     if (keyFrames_.Empty())
         return false;
@@ -309,8 +314,10 @@ void Animation::RemoveAllTracks()
     tracks_.Clear();
 }
 
-void Animation::SetTrigger(unsigned index, const AnimationTriggerPoint& trigger)
+void Animation::SetTrigger(i32 index, const AnimationTriggerPoint& trigger)
 {
+    assert(index >= 0);
+
     if (index == triggers_.Size())
         AddTrigger(trigger);
     else if (index < triggers_.Size())
@@ -336,8 +343,10 @@ void Animation::AddTrigger(float time, bool timeIsNormalized, const Variant& dat
     Sort(triggers_.Begin(), triggers_.End(), CompareTriggers);
 }
 
-void Animation::RemoveTrigger(unsigned index)
+void Animation::RemoveTrigger(i32 index)
 {
+    assert(index >= 0);
+
     if (index < triggers_.Size())
         triggers_.Erase(index);
 }
@@ -347,8 +356,9 @@ void Animation::RemoveAllTriggers()
     triggers_.Clear();
 }
 
-void Animation::SetNumTriggers(unsigned num)
+void Animation::SetNumTriggers(i32 num)
 {
+    assert(num >= 0);
     triggers_.Resize(num);
 }
 
@@ -367,8 +377,10 @@ SharedPtr<Animation> Animation::Clone(const String& cloneName) const
     return ret;
 }
 
-AnimationTrack* Animation::GetTrack(unsigned index)
+AnimationTrack* Animation::GetTrack(i32 index)
 {
+    assert(index >= 0);
+
     if (index >= GetNumTracks())
         return nullptr;
 
@@ -396,8 +408,9 @@ AnimationTrack* Animation::GetTrack(StringHash nameHash)
     return i != tracks_.End() ? &i->second_ : nullptr;
 }
 
-AnimationTriggerPoint* Animation::GetTrigger(unsigned index)
+AnimationTriggerPoint* Animation::GetTrigger(i32 index)
 {
+    assert(index >= 0);
     return index < triggers_.Size() ? &triggers_[index] : nullptr;
 }
 
