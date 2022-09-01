@@ -129,7 +129,7 @@ bool Animation::BeginLoad(Deserializer& source)
     for (unsigned i = 0; i < tracks; ++i)
     {
         AnimationTrack* newTrack = CreateTrack(source.ReadString());
-        newTrack->channelMask_ = AnimationChannelFlags(source.ReadUByte());
+        newTrack->channelMask_ = AnimationChannels(source.ReadUByte());
 
         unsigned keyFrames = source.ReadUInt();
         newTrack->keyFrames_.Resize(keyFrames);
@@ -140,11 +140,11 @@ bool Animation::BeginLoad(Deserializer& source)
         {
             AnimationKeyFrame& newKeyFrame = newTrack->keyFrames_[j];
             newKeyFrame.time_ = source.ReadFloat();
-            if (newTrack->channelMask_ & CHANNEL_POSITION)
+            if (!!(newTrack->channelMask_ & AnimationChannels::Position))
                 newKeyFrame.position_ = source.ReadVector3();
-            if (newTrack->channelMask_ & CHANNEL_ROTATION)
+            if (!!(newTrack->channelMask_ & AnimationChannels::Rotation))
                 newKeyFrame.rotation_ = source.ReadQuaternion();
-            if (newTrack->channelMask_ & CHANNEL_SCALE)
+            if (!!(newTrack->channelMask_ & AnimationChannels::Scale))
                 newKeyFrame.scale_ = source.ReadVector3();
         }
     }
@@ -220,7 +220,7 @@ bool Animation::Save(Serializer& dest) const
     {
         const AnimationTrack& track = i->second_;
         dest.WriteString(track.name_);
-        dest.WriteUByte(track.channelMask_);
+        dest.WriteUByte((u8)track.channelMask_);
         dest.WriteUInt(track.keyFrames_.Size());
 
         // Write keyframes of the track
@@ -228,11 +228,11 @@ bool Animation::Save(Serializer& dest) const
         {
             const AnimationKeyFrame& keyFrame = track.keyFrames_[j];
             dest.WriteFloat(keyFrame.time_);
-            if (track.channelMask_ & CHANNEL_POSITION)
+            if (!!(track.channelMask_ & AnimationChannels::Position))
                 dest.WriteVector3(keyFrame.position_);
-            if (track.channelMask_ & CHANNEL_ROTATION)
+            if (!!(track.channelMask_ & AnimationChannels::Rotation))
                 dest.WriteQuaternion(keyFrame.rotation_);
-            if (track.channelMask_ & CHANNEL_SCALE)
+            if (!!(track.channelMask_ & AnimationChannels::Scale))
                 dest.WriteVector3(keyFrame.scale_);
         }
     }

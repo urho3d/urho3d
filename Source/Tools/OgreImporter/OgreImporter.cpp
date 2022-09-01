@@ -953,9 +953,9 @@ void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotat
                     AnimationTrack newAnimationTrack;
                     newAnimationTrack.name_ = trackName;
                     if (!rotationsOnly)
-                        newAnimationTrack.channelMask_ = CHANNEL_POSITION | CHANNEL_ROTATION;
+                        newAnimationTrack.channelMask_ = AnimationChannels::Position | AnimationChannels::Rotation;
                     else
-                        newAnimationTrack.channelMask_ = CHANNEL_ROTATION;
+                        newAnimationTrack.channelMask_ = AnimationChannels::Rotation;
 
                     XMLElement keyFramesRoot = track.GetChild("keyframes");
                     XMLElement keyFrame = keyFramesRoot.GetChild("keyframe");
@@ -1017,17 +1017,17 @@ void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotat
                 {
                     AnimationTrack& track = newAnimation.tracks_[i];
                     dest.WriteString(track.name_);
-                    dest.WriteUByte(track.channelMask_);
+                    dest.WriteUByte((u8)track.channelMask_);
                     dest.WriteUInt(track.keyFrames_.Size());
                     for (unsigned j = 0; j < track.keyFrames_.Size(); ++j)
                     {
                         AnimationKeyFrame& keyFrame = track.keyFrames_[j];
                         dest.WriteFloat(keyFrame.time_);
-                        if (track.channelMask_ & CHANNEL_POSITION)
+                        if (!!(track.channelMask_ & AnimationChannels::Position))
                             dest.WriteVector3(keyFrame.position_);
-                        if (track.channelMask_ & CHANNEL_ROTATION)
+                        if (!!(track.channelMask_ & AnimationChannels::Rotation))
                             dest.WriteQuaternion(keyFrame.rotation_);
-                        if (track.channelMask_ & CHANNEL_SCALE)
+                        if (!!(track.channelMask_ & AnimationChannels::Scale))
                             dest.WriteVector3(keyFrame.scale_);
                     }
                 }
