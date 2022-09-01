@@ -10,11 +10,11 @@
 namespace Urho3D
 {
 
-// enum AnimationChannel : unsigned char | File: ../Graphics/Animation.h
-static const unsigned char AnimationChannel_CHANNEL_NONE = CHANNEL_NONE;
-static const unsigned char AnimationChannel_CHANNEL_POSITION = CHANNEL_POSITION;
-static const unsigned char AnimationChannel_CHANNEL_ROTATION = CHANNEL_ROTATION;
-static const unsigned char AnimationChannel_CHANNEL_SCALE = CHANNEL_SCALE;
+// enum class AnimationChannels : u8 | File: ../Graphics/Animation.h
+static const u8 AnimationChannels_None = static_cast<u8>(AnimationChannels::None);
+static const u8 AnimationChannels_Position = static_cast<u8>(AnimationChannels::Position);
+static const u8 AnimationChannels_Rotation = static_cast<u8>(AnimationChannels::Rotation);
+static const u8 AnimationChannels_Scale = static_cast<u8>(AnimationChannels::Scale);
 
 // enum BoneCollisionShape : unsigned char | File: ../Graphics/Skeleton.h
 static const unsigned char BoneCollisionShape_BONECOLLISION_NONE = BONECOLLISION_NONE;
@@ -626,15 +626,14 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     engine->RegisterEnumValue("AnimationBlendMode", "ABM_LERP", ABM_LERP);
     engine->RegisterEnumValue("AnimationBlendMode", "ABM_ADDITIVE", ABM_ADDITIVE);
 
-    // enum AnimationChannel : unsigned char | File: ../Graphics/Animation.h
-    engine->RegisterTypedef("AnimationChannel", "uint8");
-    engine->RegisterGlobalProperty("const uint8 CHANNEL_NONE", (void*)&AnimationChannel_CHANNEL_NONE);
-    engine->RegisterGlobalProperty("const uint8 CHANNEL_POSITION", (void*)&AnimationChannel_CHANNEL_POSITION);
-    engine->RegisterGlobalProperty("const uint8 CHANNEL_ROTATION", (void*)&AnimationChannel_CHANNEL_ROTATION);
-    engine->RegisterGlobalProperty("const uint8 CHANNEL_SCALE", (void*)&AnimationChannel_CHANNEL_SCALE);
-
-    // URHO3D_FLAGSET(AnimationChannel, AnimationChannelFlags) | File: ../Graphics/Animation.h
-    engine->RegisterTypedef("AnimationChannelFlags", "uint8");
+    // enum class AnimationChannels : u8 | File: ../Graphics/Animation.h
+    engine->RegisterTypedef("AnimationChannels", "uint8");
+    engine->SetDefaultNamespace("AnimationChannels");
+    engine->RegisterGlobalProperty("const uint8 None", (void*)&AnimationChannels_None);
+    engine->RegisterGlobalProperty("const uint8 Position", (void*)&AnimationChannels_Position);
+    engine->RegisterGlobalProperty("const uint8 Rotation", (void*)&AnimationChannels_Rotation);
+    engine->RegisterGlobalProperty("const uint8 Scale", (void*)&AnimationChannels_Scale);
+    engine->SetDefaultNamespace("");
 
     // enum AsyncLoadState | File: ../Resource/Resource.h
     engine->RegisterEnum("AsyncLoadState");

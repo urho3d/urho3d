@@ -481,7 +481,7 @@ void AnimationState::ApplyTrack(AnimationStateTrack& stateTrack, float weight, b
     }
 
     const AnimationKeyFrame* keyFrame = &track->keyFrames_[frame];
-    const AnimationChannelFlags channelMask = track->channelMask_;
+    const AnimationChannels channelMask = track->channelMask_;
 
     Vector3 newPosition;
     Quaternion newRotation;
@@ -495,38 +495,38 @@ void AnimationState::ApplyTrack(AnimationStateTrack& stateTrack, float weight, b
             timeInterval += animation_->GetLength();
         float t = timeInterval > 0.0f ? (time_ - keyFrame->time_) / timeInterval : 1.0f;
 
-        if (channelMask & CHANNEL_POSITION)
+        if (!!(channelMask & AnimationChannels::Position))
             newPosition = keyFrame->position_.Lerp(nextKeyFrame->position_, t);
-        if (channelMask & CHANNEL_ROTATION)
+        if (!!(channelMask & AnimationChannels::Rotation))
             newRotation = keyFrame->rotation_.Slerp(nextKeyFrame->rotation_, t);
-        if (channelMask & CHANNEL_SCALE)
+        if (!!(channelMask & AnimationChannels::Scale))
             newScale = keyFrame->scale_.Lerp(nextKeyFrame->scale_, t);
     }
     else
     {
-        if (channelMask & CHANNEL_POSITION)
+        if (!!(channelMask & AnimationChannels::Position))
             newPosition = keyFrame->position_;
-        if (channelMask & CHANNEL_ROTATION)
+        if (!!(channelMask & AnimationChannels::Rotation))
             newRotation = keyFrame->rotation_;
-        if (channelMask & CHANNEL_SCALE)
+        if (!!(channelMask & AnimationChannels::Scale))
             newScale = keyFrame->scale_;
     }
 
     if (blendingMode_ == ABM_ADDITIVE) // not ABM_LERP
     {
-        if (channelMask & CHANNEL_POSITION)
+        if (!!(channelMask & AnimationChannels::Position))
         {
             Vector3 delta = newPosition - stateTrack.bone_->initialPosition_;
             newPosition = node->GetPosition() + delta * weight;
         }
-        if (channelMask & CHANNEL_ROTATION)
+        if (!!(channelMask & AnimationChannels::Rotation))
         {
             Quaternion delta = newRotation * stateTrack.bone_->initialRotation_.Inverse();
             newRotation = (delta * node->GetRotation()).Normalized();
             if (!Equals(weight, 1.0f))
                 newRotation = node->GetRotation().Slerp(newRotation, weight);
         }
-        if (channelMask & CHANNEL_SCALE)
+        if (!!(channelMask & AnimationChannels::Scale))
         {
             Vector3 delta = newScale - stateTrack.bone_->initialScale_;
             newScale = node->GetScale() + delta * weight;
@@ -536,31 +536,31 @@ void AnimationState::ApplyTrack(AnimationStateTrack& stateTrack, float weight, b
     {
         if (!Equals(weight, 1.0f)) // not full weight
         {
-            if (channelMask & CHANNEL_POSITION)
+            if (!!(channelMask & AnimationChannels::Position))
                 newPosition = node->GetPosition().Lerp(newPosition, weight);
-            if (channelMask & CHANNEL_ROTATION)
+            if (!!(channelMask & AnimationChannels::Rotation))
                 newRotation = node->GetRotation().Slerp(newRotation, weight);
-            if (channelMask & CHANNEL_SCALE)
+            if (!!(channelMask & AnimationChannels::Scale))
                 newScale = node->GetScale().Lerp(newScale, weight);
         }
     }
 
     if (silent)
     {
-        if (channelMask & CHANNEL_POSITION)
+        if (!!(channelMask & AnimationChannels::Position))
             node->SetPositionSilent(newPosition);
-        if (channelMask & CHANNEL_ROTATION)
+        if (!!(channelMask & AnimationChannels::Rotation))
             node->SetRotationSilent(newRotation);
-        if (channelMask & CHANNEL_SCALE)
+        if (!!(channelMask & AnimationChannels::Scale))
             node->SetScaleSilent(newScale);
     }
     else
     {
-        if (channelMask & CHANNEL_POSITION)
+        if (!!(channelMask & AnimationChannels::Position))
             node->SetPosition(newPosition);
-        if (channelMask & CHANNEL_ROTATION)
+        if (!!(channelMask & AnimationChannels::Rotation))
             node->SetRotation(newRotation);
-        if (channelMask & CHANNEL_SCALE)
+        if (!!(channelMask & AnimationChannels::Scale))
             node->SetScale(newScale);
     }
 }

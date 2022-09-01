@@ -14,14 +14,14 @@
 namespace Urho3D
 {
 
-enum AnimationChannel : unsigned char
+enum class AnimationChannels : u8
 {
-    CHANNEL_NONE = 0x0,
-    CHANNEL_POSITION = 0x1,
-    CHANNEL_ROTATION = 0x2,
-    CHANNEL_SCALE = 0x4,
+    None     = 0,
+    Position = 1 << 0,
+    Rotation = 1 << 1,
+    Scale    = 1 << 2,
 };
-URHO3D_FLAGSET(AnimationChannel, AnimationChannelFlags);
+URHO3D_FLAGS(AnimationChannels);
 
 /// Skeletal animation keyframe.
 struct AnimationKeyFrame
@@ -77,7 +77,7 @@ struct URHO3D_API AnimationTrack
     /// Name hash.
     StringHash nameHash_;
     /// Bitmask of included data (position, rotation, scale).
-    AnimationChannelFlags channelMask_{};
+    AnimationChannels channelMask_{};
     /// Keyframes.
     Vector<AnimationKeyFrame> keyFrames_;
 };

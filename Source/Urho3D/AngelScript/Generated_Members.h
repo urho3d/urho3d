@@ -136,8 +136,8 @@ template <class T> void RegisterMembers_AnimationTrack(asIScriptEngine* engine, 
     // StringHash AnimationTrack::nameHash_
     engine->RegisterObjectProperty(className, "StringHash nameHash", offsetof(T, nameHash_));
 
-    // AnimationChannelFlags AnimationTrack::channelMask_
-    engine->RegisterObjectProperty(className, "AnimationChannelFlags channelMask", offsetof(T, channelMask_));
+    // AnimationChannels AnimationTrack::channelMask_
+    engine->RegisterObjectProperty(className, "AnimationChannels channelMask", offsetof(T, channelMask_));
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_AnimationTrack
         REGISTER_MEMBERS_MANUAL_PART_AnimationTrack();
