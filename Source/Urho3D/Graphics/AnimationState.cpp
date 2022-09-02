@@ -183,9 +183,11 @@ void AnimationState::SetTime(float time)
     }
 }
 
-void AnimationState::SetBoneWeight(unsigned index, float weight, bool recursive)
+void AnimationState::SetBoneWeight(i32 index, float weight, bool recursive)
 {
-    if (index >= stateTracks_.Size())
+    assert(index >= 0 || index == NINDEX);
+
+    if (index >= stateTracks_.Size() || index == NINDEX)
         return;
 
     weight = Clamp(weight, 0.0f, 1.0f);
@@ -203,10 +205,10 @@ void AnimationState::SetBoneWeight(unsigned index, float weight, bool recursive)
         if (boneNode)
         {
             const Vector<SharedPtr<Node>>& children = boneNode->GetChildren();
-            for (unsigned i = 0; i < children.Size(); ++i)
+            for (i32 i = 0; i < children.Size(); ++i)
             {
-                unsigned childTrackIndex = GetTrackIndex(children[i]);
-                if (childTrackIndex != M_MAX_UNSIGNED)
+                i32 childTrackIndex = GetTrackIndex(children[i]);
+                if (childTrackIndex != NINDEX)
                     SetBoneWeight(childTrackIndex, weight, true);
             }
         }
@@ -367,9 +369,10 @@ Bone* AnimationState::GetStartBone() const
     return model_ ? startBone_ : nullptr;
 }
 
-float AnimationState::GetBoneWeight(unsigned index) const
+float AnimationState::GetBoneWeight(i32 index) const
 {
-    return index < stateTracks_.Size() ? stateTracks_[index].weight_ : 0.0f;
+    assert(index >= 0 || index == NINDEX);
+    return (index != NINDEX && index < stateTracks_.Size()) ? stateTracks_[index].weight_ : 0.0f;
 }
 
 float AnimationState::GetBoneWeight(const String& name) const
@@ -382,39 +385,39 @@ float AnimationState::GetBoneWeight(StringHash nameHash) const
     return GetBoneWeight(GetTrackIndex(nameHash));
 }
 
-unsigned AnimationState::GetTrackIndex(const String& name) const
+i32 AnimationState::GetTrackIndex(const String& name) const
 {
-    for (unsigned i = 0; i < stateTracks_.Size(); ++i)
+    for (i32 i = 0; i < stateTracks_.Size(); ++i)
     {
         Node* node = stateTracks_[i].node_;
         if (node && node->GetName() == name)
             return i;
     }
 
-    return M_MAX_UNSIGNED;
+    return NINDEX;
 }
 
-unsigned AnimationState::GetTrackIndex(Node* node) const
+i32 AnimationState::GetTrackIndex(Node* node) const
 {
-    for (unsigned i = 0; i < stateTracks_.Size(); ++i)
+    for (i32 i = 0; i < stateTracks_.Size(); ++i)
     {
         if (stateTracks_[i].node_ == node)
             return i;
     }
 
-    return M_MAX_UNSIGNED;
+    return NINDEX;
 }
 
-unsigned AnimationState::GetTrackIndex(StringHash nameHash) const
+i32 AnimationState::GetTrackIndex(StringHash nameHash) const
 {
-    for (unsigned i = 0; i < stateTracks_.Size(); ++i)
+    for (i32 i = 0; i < stateTracks_.Size(); ++i)
     {
         Node* node = stateTracks_[i].node_;
         if (node && node->GetNameHash() == nameHash)
             return i;
     }
 
-    return M_MAX_UNSIGNED;
+    return NINDEX;
 }
 
 float AnimationState::GetLength() const
@@ -467,7 +470,7 @@ void AnimationState::ApplyTrack(AnimationStateTrack& stateTrack, float weight, b
     track->GetKeyFrameIndex(time_, frame);
 
     // Check if next frame to interpolate to is valid, or if wrapping is needed (looping animation only)
-    unsigned nextFrame = frame + 1;
+    i32 nextFrame = frame + 1;
     bool interpolate = true;
     if (nextFrame >= track->keyFrames_.Size())
     {

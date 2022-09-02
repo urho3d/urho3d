@@ -77,7 +77,7 @@ public:
     /// @property
     void SetTime(float time);
     /// Set per-bone blending weight by track index. Default is 1.0 (full), is multiplied  with the state's blending weight when applying the animation. Optionally recurses to child bones.
-    void SetBoneWeight(unsigned index, float weight, bool recursive = false);
+    void SetBoneWeight(i32 index, float weight, bool recursive = false);
     /// Set per-bone blending weight by name.
     void SetBoneWeight(const String& name, float weight, bool recursive = false);
     /// Set per-bone blending weight by name hash.
@@ -88,7 +88,7 @@ public:
     void AddTime(float delta);
     /// Set blending layer.
     /// @property
-    void SetLayer(unsigned char layer);
+    void SetLayer(unsigned char layer); // TODO: i8?
 
     /// Return animation.
     /// @property
@@ -104,18 +104,18 @@ public:
     /// @property
     Bone* GetStartBone() const;
     /// Return per-bone blending weight by track index.
-    float GetBoneWeight(unsigned index) const;
+    float GetBoneWeight(i32 index) const;
     /// Return per-bone blending weight by name.
     /// @property{get_boneWeights}
     float GetBoneWeight(const String& name) const;
     /// Return per-bone blending weight by name.
     float GetBoneWeight(StringHash nameHash) const;
-    /// Return track index with matching bone node, or M_MAX_UNSIGNED if not found.
-    unsigned GetTrackIndex(Node* node) const;
-    /// Return track index by bone name, or M_MAX_UNSIGNED if not found.
-    unsigned GetTrackIndex(const String& name) const;
-    /// Return track index by bone name hash, or M_MAX_UNSIGNED if not found.
-    unsigned GetTrackIndex(StringHash nameHash) const;
+    /// Return track index with matching bone node, or NINDEX if not found.
+    i32 GetTrackIndex(Node* node) const;
+    /// Return track index by bone name, or NINDEX if not found.
+    i32 GetTrackIndex(const String& name) const;
+    /// Return track index by bone name hash, or NINDEX if not found.
+    i32 GetTrackIndex(StringHash nameHash) const;
 
     /// Return whether weight is nonzero.
     /// @property
