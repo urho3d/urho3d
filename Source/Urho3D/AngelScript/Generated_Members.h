@@ -7638,8 +7638,8 @@ template <class T> void RegisterMembers_AnimationState(asIScriptEngine* engine, 
     engine->RegisterObjectMethod(className, "AnimationBlendMode GetBlendMode() const", AS_METHODPR(T, GetBlendMode, () const, AnimationBlendMode), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "AnimationBlendMode get_blendMode() const", AS_METHODPR(T, GetBlendMode, () const, AnimationBlendMode), AS_CALL_THISCALL);
 
-    // float AnimationState::GetBoneWeight(unsigned index) const
-    engine->RegisterObjectMethod(className, "float GetBoneWeight(uint) const", AS_METHODPR(T, GetBoneWeight, (unsigned) const, float), AS_CALL_THISCALL);
+    // float AnimationState::GetBoneWeight(i32 index) const
+    engine->RegisterObjectMethod(className, "float GetBoneWeight(int) const", AS_METHODPR(T, GetBoneWeight, (i32) const, float), AS_CALL_THISCALL);
 
     // float AnimationState::GetBoneWeight(const String& name) const
     engine->RegisterObjectMethod(className, "float GetBoneWeight(const String&in) const", AS_METHODPR(T, GetBoneWeight, (const String&) const, float), AS_CALL_THISCALL);
@@ -7672,14 +7672,14 @@ template <class T> void RegisterMembers_AnimationState(asIScriptEngine* engine, 
     engine->RegisterObjectMethod(className, "float GetTime() const", AS_METHODPR(T, GetTime, () const, float), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_time() const", AS_METHODPR(T, GetTime, () const, float), AS_CALL_THISCALL);
 
-    // unsigned AnimationState::GetTrackIndex(Node* node) const
-    engine->RegisterObjectMethod(className, "uint GetTrackIndex(Node@+) const", AS_METHODPR(T, GetTrackIndex, (Node*) const, unsigned), AS_CALL_THISCALL);
+    // i32 AnimationState::GetTrackIndex(Node* node) const
+    engine->RegisterObjectMethod(className, "int GetTrackIndex(Node@+) const", AS_METHODPR(T, GetTrackIndex, (Node*) const, i32), AS_CALL_THISCALL);
 
-    // unsigned AnimationState::GetTrackIndex(const String& name) const
-    engine->RegisterObjectMethod(className, "uint GetTrackIndex(const String&in) const", AS_METHODPR(T, GetTrackIndex, (const String&) const, unsigned), AS_CALL_THISCALL);
+    // i32 AnimationState::GetTrackIndex(const String& name) const
+    engine->RegisterObjectMethod(className, "int GetTrackIndex(const String&in) const", AS_METHODPR(T, GetTrackIndex, (const String&) const, i32), AS_CALL_THISCALL);
 
-    // unsigned AnimationState::GetTrackIndex(StringHash nameHash) const
-    engine->RegisterObjectMethod(className, "uint GetTrackIndex(StringHash) const", AS_METHODPR(T, GetTrackIndex, (StringHash) const, unsigned), AS_CALL_THISCALL);
+    // i32 AnimationState::GetTrackIndex(StringHash nameHash) const
+    engine->RegisterObjectMethod(className, "int GetTrackIndex(StringHash) const", AS_METHODPR(T, GetTrackIndex, (StringHash) const, i32), AS_CALL_THISCALL);
 
     // float AnimationState::GetWeight() const
     engine->RegisterObjectMethod(className, "float GetWeight() const", AS_METHODPR(T, GetWeight, () const, float), AS_CALL_THISCALL);
@@ -7697,8 +7697,8 @@ template <class T> void RegisterMembers_AnimationState(asIScriptEngine* engine, 
     engine->RegisterObjectMethod(className, "void SetBlendMode(AnimationBlendMode)", AS_METHODPR(T, SetBlendMode, (AnimationBlendMode), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_blendMode(AnimationBlendMode)", AS_METHODPR(T, SetBlendMode, (AnimationBlendMode), void), AS_CALL_THISCALL);
 
-    // void AnimationState::SetBoneWeight(unsigned index, float weight, bool recursive = false)
-    engine->RegisterObjectMethod(className, "void SetBoneWeight(uint, float, bool = false)", AS_METHODPR(T, SetBoneWeight, (unsigned, float, bool), void), AS_CALL_THISCALL);
+    // void AnimationState::SetBoneWeight(i32 index, float weight, bool recursive = false)
+    engine->RegisterObjectMethod(className, "void SetBoneWeight(int, float, bool = false)", AS_METHODPR(T, SetBoneWeight, (i32, float, bool), void), AS_CALL_THISCALL);
 
     // void AnimationState::SetBoneWeight(const String& name, float weight, bool recursive = false)
     engine->RegisterObjectMethod(className, "void SetBoneWeight(const String&in, float, bool = false)", AS_METHODPR(T, SetBoneWeight, (const String&, float, bool), void), AS_CALL_THISCALL);
