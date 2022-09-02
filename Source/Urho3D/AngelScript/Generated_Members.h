@@ -21772,17 +21772,17 @@ template <class T> void RegisterMembers_TileMapLayer2D(asIScriptEngine* engine, 
 
 #endif // def URHO3D_URHO2D
 
-// const Vector<unsigned char>& BillboardSet::GetNetBillboardsAttr() const
-template <class T> CScriptArray* BillboardSet_constspVectorlesunsignedspchargreamp_GetNetBillboardsAttr_void_template(T* _ptr)
+// const Vector<u8>& BillboardSet::GetNetBillboardsAttr() const
+template <class T> CScriptArray* BillboardSet_constspVectorlesu8greamp_GetNetBillboardsAttr_void_template(T* _ptr)
 {
-    const Vector<unsigned char>& result = _ptr->GetNetBillboardsAttr();
+    const Vector<u8>& result = _ptr->GetNetBillboardsAttr();
     return VectorToArray(result, "Array<uint8>");
 }
 
-// void BillboardSet::SetNetBillboardsAttr(const Vector<unsigned char>& value)
-template <class T> void BillboardSet_void_SetNetBillboardsAttr_constspVectorlesunsignedspchargreamp_template(T* _ptr, CScriptArray* value_conv)
+// void BillboardSet::SetNetBillboardsAttr(const Vector<u8>& value)
+template <class T> void BillboardSet_void_SetNetBillboardsAttr_constspVectorlesu8greamp_template(T* _ptr, CScriptArray* value_conv)
 {
-    Vector<unsigned char> value = ArrayToVector<unsigned char>(value_conv);
+    Vector<u8> value = ArrayToVector<u8>(value_conv);
     _ptr->SetNetBillboardsAttr(value);
 }
 
@@ -21805,9 +21805,9 @@ template <class T> void RegisterMembers_BillboardSet(asIScriptEngine* engine, co
     engine->RegisterObjectMethod(className, "float GetAnimationLodBias() const", AS_METHODPR(T, GetAnimationLodBias, () const, float), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_animationLodBias() const", AS_METHODPR(T, GetAnimationLodBias, () const, float), AS_CALL_THISCALL);
 
-    // Billboard* BillboardSet::GetBillboard(unsigned index)
-    engine->RegisterObjectMethod(className, "Billboard@ GetBillboard(uint)", AS_METHODPR(T, GetBillboard, (unsigned), Billboard*), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "Billboard@ get_billboards(uint)", AS_METHODPR(T, GetBillboard, (unsigned), Billboard*), AS_CALL_THISCALL);
+    // Billboard* BillboardSet::GetBillboard(i32 index)
+    engine->RegisterObjectMethod(className, "Billboard@ GetBillboard(int)", AS_METHODPR(T, GetBillboard, (i32), Billboard*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Billboard@ get_billboards(int)", AS_METHODPR(T, GetBillboard, (i32), Billboard*), AS_CALL_THISCALL);
 
     // FaceCameraMode BillboardSet::GetFaceCameraMode() const
     engine->RegisterObjectMethod(className, "FaceCameraMode GetFaceCameraMode() const", AS_METHODPR(T, GetFaceCameraMode, () const, FaceCameraMode), AS_CALL_THISCALL);
@@ -21824,12 +21824,12 @@ template <class T> void RegisterMembers_BillboardSet(asIScriptEngine* engine, co
     engine->RegisterObjectMethod(className, "float GetMinAngle() const", AS_METHODPR(T, GetMinAngle, () const, float), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_minAngle() const", AS_METHODPR(T, GetMinAngle, () const, float), AS_CALL_THISCALL);
 
-    // const Vector<unsigned char>& BillboardSet::GetNetBillboardsAttr() const
-    engine->RegisterObjectMethod(className, "Array<uint8>@ GetNetBillboardsAttr() const", AS_FUNCTION_OBJFIRST(BillboardSet_constspVectorlesunsignedspchargreamp_GetNetBillboardsAttr_void_template<BillboardSet>), AS_CALL_CDECL_OBJFIRST);
+    // const Vector<u8>& BillboardSet::GetNetBillboardsAttr() const
+    engine->RegisterObjectMethod(className, "Array<uint8>@ GetNetBillboardsAttr() const", AS_FUNCTION_OBJFIRST(BillboardSet_constspVectorlesu8greamp_GetNetBillboardsAttr_void_template<BillboardSet>), AS_CALL_CDECL_OBJFIRST);
 
-    // unsigned BillboardSet::GetNumBillboards() const
-    engine->RegisterObjectMethod(className, "uint GetNumBillboards() const", AS_METHODPR(T, GetNumBillboards, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numBillboards() const", AS_METHODPR(T, GetNumBillboards, () const, unsigned), AS_CALL_THISCALL);
+    // i32 BillboardSet::GetNumBillboards() const
+    engine->RegisterObjectMethod(className, "int GetNumBillboards() const", AS_METHODPR(T, GetNumBillboards, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numBillboards() const", AS_METHODPR(T, GetNumBillboards, () const, i32), AS_CALL_THISCALL);
 
     // bool BillboardSet::IsFixedScreenSize() const
     engine->RegisterObjectMethod(className, "bool IsFixedScreenSize() const", AS_METHODPR(T, IsFixedScreenSize, () const, bool), AS_CALL_THISCALL);
@@ -21870,12 +21870,12 @@ template <class T> void RegisterMembers_BillboardSet(asIScriptEngine* engine, co
     engine->RegisterObjectMethod(className, "void SetMinAngle(float)", AS_METHODPR(T, SetMinAngle, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_minAngle(float)", AS_METHODPR(T, SetMinAngle, (float), void), AS_CALL_THISCALL);
 
-    // void BillboardSet::SetNetBillboardsAttr(const Vector<unsigned char>& value)
-    engine->RegisterObjectMethod(className, "void SetNetBillboardsAttr(Array<uint8>@+)", AS_FUNCTION_OBJFIRST(BillboardSet_void_SetNetBillboardsAttr_constspVectorlesunsignedspchargreamp_template<BillboardSet>), AS_CALL_CDECL_OBJFIRST);
+    // void BillboardSet::SetNetBillboardsAttr(const Vector<u8>& value)
+    engine->RegisterObjectMethod(className, "void SetNetBillboardsAttr(Array<uint8>@+)", AS_FUNCTION_OBJFIRST(BillboardSet_void_SetNetBillboardsAttr_constspVectorlesu8greamp_template<BillboardSet>), AS_CALL_CDECL_OBJFIRST);
 
-    // void BillboardSet::SetNumBillboards(unsigned num)
-    engine->RegisterObjectMethod(className, "void SetNumBillboards(uint)", AS_METHODPR(T, SetNumBillboards, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_numBillboards(uint)", AS_METHODPR(T, SetNumBillboards, (unsigned), void), AS_CALL_THISCALL);
+    // void BillboardSet::SetNumBillboards(i32 num)
+    engine->RegisterObjectMethod(className, "void SetNumBillboards(int)", AS_METHODPR(T, SetNumBillboards, (i32), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_numBillboards(int)", AS_METHODPR(T, SetNumBillboards, (i32), void), AS_CALL_THISCALL);
 
     // void BillboardSet::SetRelative(bool enable)
     engine->RegisterObjectMethod(className, "void SetRelative(bool)", AS_METHODPR(T, SetRelative, (bool), void), AS_CALL_THISCALL);
