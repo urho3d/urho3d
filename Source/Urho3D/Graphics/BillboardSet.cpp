@@ -13,6 +13,7 @@
 #include "../Graphics/OctreeQuery.h"
 #include "../GraphicsAPI/IndexBuffer.h"
 #include "../GraphicsAPI/VertexBuffer.h"
+#include "../IO/Log.h"
 #include "../IO/MemoryBuffer.h"
 #include "../Resource/ResourceCache.h"
 #include "../Scene/Node.h"
@@ -109,7 +110,7 @@ void BillboardSet::RegisterObject(Context* context)
     URHO3D_COPY_BASE_ATTRIBUTES(Drawable);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Billboards", GetBillboardsAttr, SetBillboardsAttr, VariantVector, Variant::emptyVariantVector, AM_FILE)
         .SetMetadata(AttributeMetadata::P_VECTOR_STRUCT_ELEMENTS, billboardsStructureElementNames);
-    URHO3D_ACCESSOR_ATTRIBUTE("Network Billboards", GetNetBillboardsAttr, SetNetBillboardsAttr, Vector<unsigned char>,
+    URHO3D_ACCESSOR_ATTRIBUTE("Network Billboards", GetNetBillboardsAttr, SetNetBillboardsAttr, Vector<u8>,
         Variant::emptyBuffer, AM_NET | AM_NOEDIT);
 }
 
@@ -239,20 +240,23 @@ void BillboardSet::SetMaterial(Material* material)
     MarkNetworkUpdate();
 }
 
-void BillboardSet::SetNumBillboards(unsigned num)
+void BillboardSet::SetNumBillboards(i32 num)
 {
     // Prevent negative value being assigned from the editor
-    if (num > M_MAX_INT)
+    if (num < 0)
+    {
+        URHO3D_LOGWARNING("BillboardSet::SetNumBillboards(i32): num < 0");
         num = 0;
+    }
 
-    unsigned oldNum = billboards_.Size();
+    i32 oldNum = billboards_.Size();
     if (num == oldNum)
         return;
 
     billboards_.Resize(num);
 
     // Set default values to new billboards
-    for (unsigned i = oldNum; i < num; ++i)
+    for (i32 i = oldNum; i < num; ++i)
     {
         billboards_[i].position_ = Vector3::ZERO;
         billboards_[i].size_ = Vector2::ONE;
@@ -335,9 +339,15 @@ Material* BillboardSet::GetMaterial() const
     return batches_[0].material_;
 }
 
-Billboard* BillboardSet::GetBillboard(unsigned index)
+Billboard* BillboardSet::GetBillboard(i32 index)
 {
-    return index < billboards_.Size() ? &billboards_[index] : nullptr;
+    if (index < 0 || index >= billboards_.Size())
+    {
+        URHO3D_LOGWARNING("BillboardSet::GetBillboard(i32): index out of range");
+        return nullptr;
+    }
+
+    return &billboards_[index];
 }
 
 void BillboardSet::SetMaterialAttr(const ResourceRef& value)
@@ -348,8 +358,9 @@ void BillboardSet::SetMaterialAttr(const ResourceRef& value)
 
 void BillboardSet::SetBillboardsAttr(const VariantVector& value)
 {
-    unsigned index = 0;
-    unsigned numBillboards = index < value.Size() ? value[index++].GetUInt() : 0;
+    i32 index = 0;
+    i32 numBillboards = index < value.Size() ? value[index++].GetInt() : 0;
+    assert(numBillboards >= 0);
     SetNumBillboards(numBillboards);
 
     // Dealing with old billboard format
@@ -385,10 +396,10 @@ void BillboardSet::SetBillboardsAttr(const VariantVector& value)
     Commit();
 }
 
-void BillboardSet::SetNetBillboardsAttr(const Vector<unsigned char>& value)
+void BillboardSet::SetNetBillboardsAttr(const Vector<u8>& value)
 {
     MemoryBuffer buf(value);
-    unsigned numBillboards = buf.ReadVLE();
+    i32 numBillboards = buf.ReadVLE();
     SetNumBillboards(numBillboards);
 
     for (Vector<Billboard>::Iterator i = billboards_.Begin(); i != billboards_.End(); ++i)
@@ -430,7 +441,7 @@ VariantVector BillboardSet::GetBillboardsAttr() const
     return ret;
 }
 
-const Vector<unsigned char>& BillboardSet::GetNetBillboardsAttr() const
+const Vector<u8>& BillboardSet::GetNetBillboardsAttr() const
 {
     attrBuffer_.Clear();
     attrBuffer_.WriteVLE(billboards_.Size());
@@ -451,22 +462,22 @@ const Vector<unsigned char>& BillboardSet::GetNetBillboardsAttr() const
 
 void BillboardSet::OnWorldBoundingBoxUpdate()
 {
-    unsigned enabledBillboards = 0;
+    i32 enabledBillboards = 0; // TODO: not used
     const Matrix3x4& worldTransform = node_->GetWorldTransform();
     Matrix3x4 billboardTransform = relative_ ? worldTransform : Matrix3x4::IDENTITY;
     Vector3 billboardScale = scaled_ ? worldTransform.Scale() : Vector3::ONE;
     BoundingBox worldBox;
 
-    for (unsigned i = 0; i < billboards_.Size(); ++i)
+    for (const Billboard& billboard : billboards_)
     {
-        if (!billboards_[i].enabled_)
+        if (!billboard.enabled_)
             continue;
 
-        float size = INV_SQRT_TWO * (billboards_[i].size_.x_ * billboardScale.x_ + billboards_[i].size_.y_ * billboardScale.y_);
+        float size = INV_SQRT_TWO * (billboard.size_.x_ * billboardScale.x_ + billboard.size_.y_ * billboardScale.y_);
         if (fixedScreenSize_)
-            size *= billboards_[i].screenScaleFactor_;
+            size *= billboard.screenScaleFactor_;
 
-        Vector3 center = billboardTransform * billboards_[i].position_;
+        Vector3 center = billboardTransform * billboard.position_;
         Vector3 edge = Vector3::ONE * size;
         worldBox.Merge(BoundingBox(center - edge, center + edge));
 
@@ -481,7 +492,7 @@ void BillboardSet::OnWorldBoundingBoxUpdate()
 
 void BillboardSet::UpdateBufferSize()
 {
-    unsigned numBillboards = billboards_.Size();
+    i32 numBillboards = billboards_.Size();
 
     if (vertexBuffer_->GetVertexCount() != numBillboards * 4 || geometryTypeUpdate_)
     {
@@ -571,31 +582,29 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
         }
     }
 
-    unsigned numBillboards = billboards_.Size();
-    unsigned enabledBillboards = 0;
+    i32 enabledBillboards = 0;
     const Matrix3x4& worldTransform = node_->GetWorldTransform();
     Matrix3x4 billboardTransform = relative_ ? worldTransform : Matrix3x4::IDENTITY;
     Vector3 billboardScale = scaled_ ? worldTransform.Scale() : Vector3::ONE;
 
     // First check number of enabled billboards
-    for (unsigned i = 0; i < numBillboards; ++i)
+    for (const Billboard& billboard : billboards_)
     {
-        if (billboards_[i].enabled_)
+        if (billboard.enabled_)
             ++enabledBillboards;
     }
 
     sortedBillboards_.Resize(enabledBillboards);
-    unsigned index = 0;
+    i32 index = 0;
 
     // Then set initial sort order and distances
-    for (unsigned i = 0; i < numBillboards; ++i)
+    for (Billboard& billboard : billboards_)
     {
-        Billboard& billboard = billboards_[i];
         if (billboard.enabled_)
         {
             sortedBillboards_[index++] = &billboard;
             if (sorted_)
-                billboard.sortDistance_ = frame.camera_->GetDistanceSquared(billboardTransform * billboards_[i].position_);
+                billboard.sortDistance_ = frame.camera_->GetDistanceSquared(billboardTransform * billboard.position_);
         }
     }
 
@@ -620,7 +629,7 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
 
     if (faceCameraMode_ != FC_DIRECTION)
     {
-        for (unsigned i = 0; i < enabledBillboards; ++i)
+        for (i32 i = 0; i < enabledBillboards; ++i)
         {
             Billboard& billboard = *sortedBillboards_[i];
 
@@ -675,7 +684,7 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
     }
     else
     {
-        for (unsigned i = 0; i < enabledBillboards; ++i)
+        for (i32 i = 0; i < enabledBillboards; ++i)
         {
             Billboard& billboard = *sortedBillboards_[i];
 
@@ -763,25 +772,25 @@ void BillboardSet::CalculateFixedScreenSize(const FrameInfo& frame)
         const Matrix3x4& worldTransform = node_->GetWorldTransform();
         Matrix3x4 billboardTransform = relative_ ? worldTransform : Matrix3x4::IDENTITY;
 
-        for (unsigned i = 0; i < billboards_.Size(); ++i)
+        for (Billboard& billboard : billboards_)
         {
-            Vector4 projPos(viewProj * Vector4(billboardTransform * billboards_[i].position_, 1.0f));
+            Vector4 projPos(viewProj * Vector4(billboardTransform * billboard.position_, 1.0f));
             float newScaleFactor = invViewHeight * halfViewWorldSize * projPos.w_;
-            if (newScaleFactor != billboards_[i].screenScaleFactor_)
+            if (newScaleFactor != billboard.screenScaleFactor_)
             {
-                billboards_[i].screenScaleFactor_ = newScaleFactor;
+                billboard.screenScaleFactor_ = newScaleFactor;
                 scaleFactorChanged = true;
             }
         }
     }
     else
     {
-        for (unsigned i = 0; i < billboards_.Size(); ++i)
+        for (Billboard& billboard : billboards_)
         {
             float newScaleFactor = invViewHeight * halfViewWorldSize;
-            if (newScaleFactor != billboards_[i].screenScaleFactor_)
+            if (newScaleFactor != billboard.screenScaleFactor_)
             {
-                billboards_[i].screenScaleFactor_ = newScaleFactor;
+                billboard.screenScaleFactor_ = newScaleFactor;
                 scaleFactorChanged = true;
             }
         }
