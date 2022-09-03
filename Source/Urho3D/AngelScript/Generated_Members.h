@@ -1679,8 +1679,8 @@ template <class T> void RegisterMembers_GPUObject(asIScriptEngine* engine, const
     // void GPUObject::ClearDataLost()
     engine->RegisterObjectMethod(className, "void ClearDataLost()", AS_METHODPR(T, ClearDataLost, (), void), AS_CALL_THISCALL);
 
-    // unsigned GPUObject::GetGPUObjectName() const
-    engine->RegisterObjectMethod(className, "uint GetGPUObjectName() const", AS_METHODPR(T, GetGPUObjectName, () const, unsigned), AS_CALL_THISCALL);
+    // u32 GPUObject::GetGPUObjectName() const
+    engine->RegisterObjectMethod(className, "uint GetGPUObjectName() const", AS_METHODPR(T, GetGPUObjectName, () const, u32), AS_CALL_THISCALL);
 
     // Graphics* GPUObject::GetGraphics() const
     engine->RegisterObjectMethod(className, "Graphics@+ GetGraphics() const", AS_METHODPR(T, GetGraphics, () const, Graphics*), AS_CALL_THISCALL);
