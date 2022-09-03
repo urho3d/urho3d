@@ -65,11 +65,11 @@ private:
     /// Current depth-stencil view.
     ID3D11DepthStencilView* depthStencilView_;
     /// Created blend state objects.
-    HashMap<unsigned, ID3D11BlendState*> blendStates_;
+    HashMap<hash32, ID3D11BlendState*> blendStates_;
     /// Created depth state objects.
-    HashMap<unsigned, ID3D11DepthStencilState*> depthStates_;
+    HashMap<hash32, ID3D11DepthStencilState*> depthStates_;
     /// Created rasterizer state objects.
-    HashMap<unsigned, ID3D11RasterizerState*> rasterizerStates_;
+    HashMap<hash32, ID3D11RasterizerState*> rasterizerStates_;
     /// Intermediate texture for multisampled screenshots and less than whole viewport multisampled resolve, created on demand.
     ID3D11Texture2D* resolveTexture_;
     /// Bound shader resource views.
@@ -101,11 +101,11 @@ private:
     /// Stencil ref dirty flag.
     bool stencilRefDirty_;
     /// Hash of current blend state.
-    unsigned blendStateHash_;
+    hash32 blendStateHash_;
     /// Hash of current depth state.
-    unsigned depthStateHash_;
+    hash32 depthStateHash_;
     /// Hash of current rasterizer state.
-    unsigned rasterizerStateHash_;
+    hash32 rasterizerStateHash_;
     /// First dirtied texture unit.
     unsigned firstDirtyTexture_;
     /// Last dirtied texture unit.
