@@ -852,8 +852,8 @@ EXCLUDE_SYMLINKS       = NO
 # Note that the wildcards are matched against the file with absolute path, so to
 # exclude all test directories for example use the pattern */test/*
 
-EXCLUDE_PATTERNS       = */*API*.cpp \
-                         */*API*.h \
+EXCLUDE_PATTERNS       = "@CMAKE_SOURCE_DIR@/Source/Urho3D/AngelScript/*" \
+                         "@CMAKE_SOURCE_DIR@/Source/Urho3D/LuaScript/*" \
                          "@CMAKE_CURRENT_SOURCE_DIR@/*API.dox" \
                          */@EXCLUDE_GRAPHICS_API@/* \
                          */@EXCLUDE_GRAPHICS_API2@/* \
