@@ -56,7 +56,7 @@ struct Batch
     void Draw(View* view, Camera* camera, bool allowDepthWrite) const;
 
     /// State sorting key.
-    unsigned long long sortKey_{};
+    hash64 sortKey_{};
     /// Distance from camera.
     float distance_{};
     /// 8-bit render order modifier from material.
@@ -228,11 +228,11 @@ public:
     /// Instanced draw calls.
     HashMap<BatchGroupKey, BatchGroup> batchGroups_;
     /// Shader remapping table for 2-pass state and distance sort.
-    HashMap<unsigned, unsigned> shaderRemapping_;
+    HashMap<hash32, hash32> shaderRemapping_;
     /// Material remapping table for 2-pass state and distance sort.
-    HashMap<unsigned short, unsigned short> materialRemapping_;
+    HashMap<hash16, hash16> materialRemapping_;
     /// Geometry remapping table for 2-pass state and distance sort.
-    HashMap<unsigned short, unsigned short> geometryRemapping_;
+    HashMap<hash16, hash16> geometryRemapping_;
 
     /// Unsorted non-instanced draw calls.
     Vector<Batch> batches_;

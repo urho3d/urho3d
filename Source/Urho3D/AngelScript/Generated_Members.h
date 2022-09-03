@@ -323,8 +323,8 @@ template <class T> void RegisterMembers_Batch(asIScriptEngine* engine, const cha
     // ShaderVariation* Batch::pixelShader_
     // Not registered because pointer
 
-    // unsigned long long Batch::sortKey_
-    engine->RegisterObjectProperty(className, "uint64 sortKey", offsetof(T, sortKey_));
+    // hash64 Batch::sortKey_
+    engine->RegisterObjectProperty(className, "hash64 sortKey", offsetof(T, sortKey_));
 
     // float Batch::distance_
     engine->RegisterObjectProperty(className, "float distance", offsetof(T, distance_));
@@ -408,12 +408,12 @@ template <class T> void RegisterMembers_BatchQueue(asIScriptEngine* engine, cons
 
     // HashMap<BatchGroupKey, BatchGroup> BatchQueue::batchGroups_
     // Error: type "HashMap<BatchGroupKey, BatchGroup>" can not automatically bind
-    // HashMap<unsigned, unsigned> BatchQueue::shaderRemapping_
-    // Error: type "HashMap<unsigned, unsigned>" can not automatically bind
-    // HashMap<unsigned short, unsigned short> BatchQueue::materialRemapping_
-    // Error: type "HashMap<unsigned short, unsigned short>" can not automatically bind
-    // HashMap<unsigned short, unsigned short> BatchQueue::geometryRemapping_
-    // Error: type "HashMap<unsigned short, unsigned short>" can not automatically bind
+    // HashMap<hash32, hash32> BatchQueue::shaderRemapping_
+    // Error: type "HashMap<hash32, hash32>" can not automatically bind
+    // HashMap<hash16, hash16> BatchQueue::materialRemapping_
+    // Error: type "HashMap<hash16, hash16>" can not automatically bind
+    // HashMap<hash16, hash16> BatchQueue::geometryRemapping_
+    // Error: type "HashMap<hash16, hash16>" can not automatically bind
     // Vector<Batch> BatchQueue::batches_
     // Error: type "Vector<Batch>" can not automatically bind
     // Vector<Batch*> BatchQueue::sortedBatches_

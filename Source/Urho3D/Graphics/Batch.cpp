@@ -146,18 +146,18 @@ void CalculateSpotMatrix(Matrix4& dest, Light* light)
 
 void Batch::CalculateSortKey()
 {
-    auto shaderID = (unsigned)(
-        ((*((unsigned*)&vertexShader_) / sizeof(ShaderVariation)) + (*((unsigned*)&pixelShader_) / sizeof(ShaderVariation))) &
+    u32 shaderID = (u32)(
+        ((*((u32*)&vertexShader_) / sizeof(ShaderVariation)) + (*((u32*)&pixelShader_) / sizeof(ShaderVariation))) &
         0x7fffu);
     if (!isBase_)
         shaderID |= 0x8000;
 
-    auto lightQueueID = (unsigned)((*((unsigned*)&lightQueue_) / sizeof(LightBatchQueue)) & 0xffffu);
-    auto materialID = (unsigned)((*((unsigned*)&material_) / sizeof(Material)) & 0xffffu);
-    auto geometryID = (unsigned)((*((unsigned*)&geometry_) / sizeof(Geometry)) & 0xffffu);
+    u32 lightQueueID = (u32)((*((u32*)&lightQueue_) / sizeof(LightBatchQueue)) & 0xffffu);
+    u32 materialID = (u32)((*((u32*)&material_) / sizeof(Material)) & 0xffffu);
+    u32 geometryID = (u32)((*((u32*)&geometry_) / sizeof(Geometry)) & 0xffffu);
 
-    sortKey_ = (((unsigned long long)shaderID) << 48u) | (((unsigned long long)lightQueueID) << 32u) |
-               (((unsigned long long)materialID) << 16u) | geometryID;
+    sortKey_ = (((hash64)shaderID) << 48u) | (((hash64)lightQueueID) << 32u) |
+               (((hash64)materialID) << 16u) | geometryID;
 }
 
 void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool allowDepthWrite) const
@@ -777,16 +777,16 @@ void BatchQueue::SortFrontToBack2Pass(Vector<Batch*>& batches)
     // For desktop, first sort by distance and remap shader/material/geometry IDs in the sort key
     Sort(batches.Begin(), batches.End(), CompareBatchesFrontToBack);
 
-    unsigned freeShaderID = 0;
-    unsigned short freeMaterialID = 0;
-    unsigned short freeGeometryID = 0;
+    hash32 freeShaderID = 0;
+    hash16 freeMaterialID = 0;
+    hash16 freeGeometryID = 0;
 
     for (Vector<Batch*>::Iterator i = batches.Begin(); i != batches.End(); ++i)
     {
         Batch* batch = *i;
 
-        auto shaderID = (unsigned)(batch->sortKey_ >> 32u);
-        HashMap<unsigned, unsigned>::ConstIterator j = shaderRemapping_.Find(shaderID);
+        hash32 shaderID = (hash32)(batch->sortKey_ >> 32u);
+        HashMap<hash32, hash32>::ConstIterator j = shaderRemapping_.Find(shaderID);
         if (j != shaderRemapping_.End())
             shaderID = j->second_;
         else
@@ -795,8 +795,8 @@ void BatchQueue::SortFrontToBack2Pass(Vector<Batch*>& batches)
             ++freeShaderID;
         }
 
-        auto materialID = (unsigned short)((batch->sortKey_ & 0xffff0000) >> 16u);
-        HashMap<unsigned short, unsigned short>::ConstIterator k = materialRemapping_.Find(materialID);
+        hash16 materialID = (hash16)((batch->sortKey_ & 0xffff0000) >> 16u);
+        HashMap<hash16, hash16>::ConstIterator k = materialRemapping_.Find(materialID);
         if (k != materialRemapping_.End())
             materialID = k->second_;
         else
@@ -805,8 +805,8 @@ void BatchQueue::SortFrontToBack2Pass(Vector<Batch*>& batches)
             ++freeMaterialID;
         }
 
-        auto geometryID = (unsigned short)(batch->sortKey_ & 0xffffu);
-        HashMap<unsigned short, unsigned short>::ConstIterator l = geometryRemapping_.Find(geometryID);
+        hash16 geometryID = (hash16)(batch->sortKey_ & 0xffffu);
+        HashMap<hash16, hash16>::ConstIterator l = geometryRemapping_.Find(geometryID);
         if (l != geometryRemapping_.End())
             geometryID = l->second_;
         else
@@ -815,7 +815,7 @@ void BatchQueue::SortFrontToBack2Pass(Vector<Batch*>& batches)
             ++freeGeometryID;
         }
 
-        batch->sortKey_ = (((unsigned long long)shaderID) << 32u) | (((unsigned long long)materialID) << 16u) | geometryID;
+        batch->sortKey_ = (((hash64)shaderID) << 32u) | (((hash64)materialID) << 16u) | geometryID;
     }
 
     shaderRemapping_.Clear();
