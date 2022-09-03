@@ -33,5 +33,6 @@ static_assert(sizeof(void*) == sizeof(ptrdiff_t));
 static_assert(sizeof(void*) == sizeof(intptr_t));
 
 // Some hash value (checksum for example)
+using hash16 = u16;
 using hash32 = u32;
 using hash64 = u64;
