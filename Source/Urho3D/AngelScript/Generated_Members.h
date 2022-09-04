@@ -329,8 +329,8 @@ template <class T> void RegisterMembers_Batch(asIScriptEngine* engine, const cha
     // float Batch::distance_
     engine->RegisterObjectProperty(className, "float distance", offsetof(T, distance_));
 
-    // unsigned char Batch::renderOrder_
-    engine->RegisterObjectProperty(className, "uint8 renderOrder", offsetof(T, renderOrder_));
+    // i8 Batch::renderOrder_
+    engine->RegisterObjectProperty(className, "int8 renderOrder", offsetof(T, renderOrder_));
 
     // unsigned char Batch::lightMask_
     engine->RegisterObjectProperty(className, "uint8 lightMask", offsetof(T, lightMask_));
@@ -372,8 +372,8 @@ template <class T> void RegisterMembers_BatchGroupKey(asIScriptEngine* engine, c
     // Geometry* BatchGroupKey::geometry_
     // Not registered because pointer
 
-    // unsigned char BatchGroupKey::renderOrder_
-    engine->RegisterObjectProperty(className, "uint8 renderOrder", offsetof(T, renderOrder_));
+    // i8 BatchGroupKey::renderOrder_
+    engine->RegisterObjectProperty(className, "int8 renderOrder", offsetof(T, renderOrder_));
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_BatchGroupKey
         REGISTER_MEMBERS_MANUAL_PART_BatchGroupKey();
@@ -13826,9 +13826,9 @@ template <class T> void RegisterMembers_Material(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "const String& GetPixelShaderDefines() const", AS_METHODPR(T, GetPixelShaderDefines, () const, const String&), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "const String& get_pixelShaderDefines() const", AS_METHODPR(T, GetPixelShaderDefines, () const, const String&), AS_CALL_THISCALL);
 
-    // unsigned char Material::GetRenderOrder() const
-    engine->RegisterObjectMethod(className, "uint8 GetRenderOrder() const", AS_METHODPR(T, GetRenderOrder, () const, unsigned char), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint8 get_renderOrder() const", AS_METHODPR(T, GetRenderOrder, () const, unsigned char), AS_CALL_THISCALL);
+    // i8 Material::GetRenderOrder() const
+    engine->RegisterObjectMethod(className, "int8 GetRenderOrder() const", AS_METHODPR(T, GetRenderOrder, () const, i8), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int8 get_renderOrder() const", AS_METHODPR(T, GetRenderOrder, () const, i8), AS_CALL_THISCALL);
 
     // Scene* Material::GetScene() const
     engine->RegisterObjectMethod(className, "Scene@+ GetScene() const", AS_METHODPR(T, GetScene, () const, Scene*), AS_CALL_THISCALL);
@@ -13928,9 +13928,9 @@ template <class T> void RegisterMembers_Material(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "void SetPixelShaderDefines(const String&in)", AS_METHODPR(T, SetPixelShaderDefines, (const String&), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_pixelShaderDefines(const String&in)", AS_METHODPR(T, SetPixelShaderDefines, (const String&), void), AS_CALL_THISCALL);
 
-    // void Material::SetRenderOrder(unsigned char order)
-    engine->RegisterObjectMethod(className, "void SetRenderOrder(uint8)", AS_METHODPR(T, SetRenderOrder, (unsigned char), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_renderOrder(uint8)", AS_METHODPR(T, SetRenderOrder, (unsigned char), void), AS_CALL_THISCALL);
+    // void Material::SetRenderOrder(i8 order)
+    engine->RegisterObjectMethod(className, "void SetRenderOrder(int8)", AS_METHODPR(T, SetRenderOrder, (i8), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_renderOrder(int8)", AS_METHODPR(T, SetRenderOrder, (i8), void), AS_CALL_THISCALL);
 
     // void Material::SetScene(Scene* scene)
     engine->RegisterObjectMethod(className, "void SetScene(Scene@+)", AS_METHODPR(T, SetScene, (Scene*), void), AS_CALL_THISCALL);

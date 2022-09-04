@@ -46,8 +46,8 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // static const float DEFAULT_ORTHOSIZE | File: ../Graphics/Camera.h
     engine->RegisterGlobalProperty("const float DEFAULT_ORTHOSIZE", (void*)&DEFAULT_ORTHOSIZE);
 
-    // static const unsigned char DEFAULT_RENDER_ORDER | File: ../Graphics/Material.h
-    engine->RegisterGlobalProperty("const uint8 DEFAULT_RENDER_ORDER", (void*)&DEFAULT_RENDER_ORDER);
+    // static constexpr i8 DEFAULT_RENDER_ORDER | File: ../Graphics/Material.h
+    engine->RegisterGlobalProperty("const int8 DEFAULT_RENDER_ORDER", (void*)&DEFAULT_RENDER_ORDER);
 
     // static const unsigned DEFAULT_SHADOWMASK | File: ../Graphics/Drawable.h
     engine->RegisterGlobalProperty("const uint DEFAULT_SHADOWMASK", (void*)&DEFAULT_SHADOWMASK);

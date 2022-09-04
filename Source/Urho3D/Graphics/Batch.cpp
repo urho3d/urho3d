@@ -702,7 +702,7 @@ void BatchGroup::Draw(View* view, Camera* camera, bool allowDepthWrite) const
 hash32 BatchGroupKey::ToHash() const
 {
     return (hash32)((size_t)zone_ / sizeof(Zone) + (size_t)lightQueue_ / sizeof(LightBatchQueue) + (size_t)pass_ / sizeof(Pass) +
-                      (size_t)material_ / sizeof(Material) + (size_t)geometry_ / sizeof(Geometry)) + renderOrder_;
+                      (size_t)material_ / sizeof(Material) + (size_t)geometry_ / sizeof(Geometry)) + (u8)renderOrder_;
 }
 
 void BatchQueue::Clear(int maxSortedInstances)
