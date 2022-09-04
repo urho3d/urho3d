@@ -60,7 +60,7 @@ struct Batch
     /// Distance from camera.
     float distance_{};
     /// 8-bit render order modifier from material.
-    unsigned char renderOrder_{};
+    i8 renderOrder_{};
     /// 8-bit light mask for stencil marking in deferred rendering.
     unsigned char lightMask_{};
     /// Base batch flag. This tells to draw the object fully without light optimizations.
@@ -183,7 +183,7 @@ struct BatchGroupKey
     /// Geometry.
     Geometry* geometry_;
     /// 8-bit render order modifier from material.
-    unsigned char renderOrder_;
+    i8 renderOrder_;
 
     /// Test for equality with another batch group key.
     bool operator ==(const BatchGroupKey& rhs) const

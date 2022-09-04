@@ -513,7 +513,7 @@ bool Material::Load(const XMLElement& source)
 
     XMLElement renderOrderElem = source.GetChild("renderorder");
     if (renderOrderElem)
-        SetRenderOrder((unsigned char)renderOrderElem.GetUInt("value"));
+        SetRenderOrder((i8)renderOrderElem.GetInt("value"));
 
     XMLElement occlusionElem = source.GetChild("occlusion");
     if (occlusionElem)
@@ -673,7 +673,7 @@ bool Material::Load(const JSONValue& source)
 
     JSONValue renderOrderVal = source.Get("renderorder");
     if (!renderOrderVal.IsNull())
-        SetRenderOrder((unsigned char)renderOrderVal.GetUInt());
+        SetRenderOrder((i8)renderOrderVal.GetInt());
 
     JSONValue occlusionVal = source.Get("occlusion");
     if (!occlusionVal.IsNull())
@@ -781,7 +781,7 @@ bool Material::Save(XMLElement& dest) const
 
     // Write render order
     XMLElement renderOrderElem = dest.CreateChild("renderorder");
-    renderOrderElem.SetUInt("value", renderOrder_);
+    renderOrderElem.SetInt("value", renderOrder_);
 
     // Write occlusion
     XMLElement occlusionElem = dest.CreateChild("occlusion");
@@ -882,7 +882,7 @@ bool Material::Save(JSONValue& dest) const
     dest.Set("lineantialias", lineAntiAlias_);
 
     // Write render order
-    dest.Set("renderorder", (unsigned) renderOrder_);
+    dest.Set("renderorder", renderOrder_);
 
     // Write occlusion
     dest.Set("occlusion", occlusion_);
@@ -1082,7 +1082,7 @@ void Material::SetLineAntiAlias(bool enable)
     lineAntiAlias_ = enable;
 }
 
-void Material::SetRenderOrder(unsigned char order)
+void Material::SetRenderOrder(i8 order)
 {
     renderOrder_ = order;
 }

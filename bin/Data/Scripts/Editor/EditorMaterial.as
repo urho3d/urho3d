@@ -343,7 +343,7 @@ void RefreshMaterialMiscParameters()
     attrEdit = materialWindow.GetChild("SlopeBiasEdit", true);
     attrEdit.text = String(bias.slopeScaledBias);
     attrEdit = materialWindow.GetChild("RenderOrderEdit", true);
-    attrEdit.text = String(uint(editMaterial.renderOrder));
+    attrEdit.text = String(int(editMaterial.renderOrder));
     attrEdit = materialWindow.GetChild("VSDefinesEdit", true);
     attrEdit.text = editMaterial.vertexShaderDefines;
     attrEdit = materialWindow.GetChild("PSDefinesEdit", true);
@@ -893,7 +893,7 @@ void EditRenderOrder(StringHash eventType, VariantMap& eventData)
     BeginMaterialEdit();
 
     LineEdit@ attrEdit = eventData["Element"].GetPtr();
-    editMaterial.renderOrder = attrEdit.text.ToUInt();
+    editMaterial.renderOrder = attrEdit.text.ToInt();
 
     EndMaterialEdit();
 }
