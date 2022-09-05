@@ -31,7 +31,7 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // static const float DEFAULT_FARCLIP | File: ../Graphics/Camera.h
     engine->RegisterGlobalProperty("const float DEFAULT_FARCLIP", (void*)&DEFAULT_FARCLIP);
 
-    // static const float DEFAULT_FONT_SIZE | File: ../UI/Text.h
+    // constexpr float DEFAULT_FONT_SIZE | File: ../UI/Text.h
     engine->RegisterGlobalProperty("const float DEFAULT_FONT_SIZE", (void*)&DEFAULT_FONT_SIZE);
 
     // static const unsigned DEFAULT_LIGHTMASK | File: ../Graphics/Drawable.h

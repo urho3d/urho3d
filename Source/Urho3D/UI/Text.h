@@ -10,7 +10,7 @@
 namespace Urho3D
 {
 
-static const float DEFAULT_FONT_SIZE = 12;
+inline constexpr float DEFAULT_FONT_SIZE = 12;
 
 class Font;
 class FontFace;
