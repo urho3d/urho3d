@@ -32,7 +32,7 @@ class Serializer;
 class UIElement;
 class XMLFile;
 
-const IntVector2 MOUSE_POSITION_OFFSCREEN = IntVector2(M_MIN_INT, M_MIN_INT);
+inline const IntVector2 MOUSE_POSITION_OFFSCREEN = IntVector2(M_MIN_INT, M_MIN_INT);
 
 /// %Input state for a finger touch.
 /// @nocount
