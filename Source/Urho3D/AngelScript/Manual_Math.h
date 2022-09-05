@@ -176,16 +176,17 @@ template <class T> float Ray_HitDistance(const Vector3& v0, const Vector3& v1, c
 // ========================================================================================
 
 // Vector3 Frustum::vertices_[NUM_FRUSTUM_VERTICES] | File: ../Math/Frustum.h
-template <class T> Vector3 Frustum_GetVertex(unsigned index, T* ptr)
+template <class T> Vector3 Frustum_GetVertex(i32 index, T* ptr)
 {
-    if (index >= NUM_FRUSTUM_VERTICES)
+    if (index < 0 || index >= NUM_FRUSTUM_VERTICES)
         return Vector3::ZERO;
+
     return ptr->vertices_[index];
 }
 
 #define REGISTER_MEMBERS_MANUAL_PART_Frustum() \
     /* Vector3 Frustum::vertices_[NUM_FRUSTUM_VERTICES] | File: ../Math/Frustum.h */ \
-    engine->RegisterObjectMethod(className, "Vector3 get_vertices(uint) const", AS_FUNCTION_OBJLAST(Frustum_GetVertex<T>), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "Vector3 get_vertices(int) const", AS_FUNCTION_OBJLAST(Frustum_GetVertex<T>), AS_CALL_CDECL_OBJLAST);
 
 // ========================================================================================
 
