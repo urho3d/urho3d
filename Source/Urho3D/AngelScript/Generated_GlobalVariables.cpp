@@ -418,11 +418,11 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // constexpr i32 NINDEX | File: ../Container/Vector.h
     engine->RegisterGlobalProperty("const int NINDEX", (void*)&NINDEX);
 
-    // static const unsigned NUM_FRUSTUM_PLANES | File: ../Math/Frustum.h
-    engine->RegisterGlobalProperty("const uint NUM_FRUSTUM_PLANES", (void*)&NUM_FRUSTUM_PLANES);
+    // constexpr i32 NUM_FRUSTUM_PLANES | File: ../Math/Frustum.h
+    engine->RegisterGlobalProperty("const int NUM_FRUSTUM_PLANES", (void*)&NUM_FRUSTUM_PLANES);
 
-    // static const unsigned NUM_FRUSTUM_VERTICES | File: ../Math/Frustum.h
-    engine->RegisterGlobalProperty("const uint NUM_FRUSTUM_VERTICES", (void*)&NUM_FRUSTUM_VERTICES);
+    // constexpr i32 NUM_FRUSTUM_VERTICES | File: ../Math/Frustum.h
+    engine->RegisterGlobalProperty("const int NUM_FRUSTUM_VERTICES", (void*)&NUM_FRUSTUM_VERTICES);
 
     // static const int NUM_OCTANTS | File: ../Graphics/Octree.h
     engine->RegisterGlobalProperty("const int NUM_OCTANTS", (void*)&NUM_OCTANTS);

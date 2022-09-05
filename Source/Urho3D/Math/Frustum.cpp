@@ -45,9 +45,10 @@ Frustum::Frustum(const Frustum& frustum) noexcept
 
 Frustum& Frustum::operator =(const Frustum& rhs) noexcept
 {
-    for (unsigned i = 0; i < NUM_FRUSTUM_PLANES; ++i)
+    for (i32 i = 0; i < NUM_FRUSTUM_PLANES; ++i)
         planes_[i] = rhs.planes_[i];
-    for (unsigned i = 0; i < NUM_FRUSTUM_VERTICES; ++i)
+
+    for (i32 i = 0; i < NUM_FRUSTUM_VERTICES; ++i)
         vertices_[i] = rhs.vertices_[i];
 
     return *this;
@@ -170,7 +171,8 @@ void Frustum::Transform(const Matrix3x4& transform)
 Frustum Frustum::Transformed(const Matrix3& transform) const
 {
     Frustum transformed;
-    for (unsigned i = 0; i < NUM_FRUSTUM_VERTICES; ++i)
+
+    for (i32 i = 0; i < NUM_FRUSTUM_VERTICES; ++i)
         transformed.vertices_[i] = transform * vertices_[i];
 
     transformed.UpdatePlanes();
@@ -180,7 +182,8 @@ Frustum Frustum::Transformed(const Matrix3& transform) const
 Frustum Frustum::Transformed(const Matrix3x4& transform) const
 {
     Frustum transformed;
-    for (unsigned i = 0; i < NUM_FRUSTUM_VERTICES; ++i)
+
+    for (i32 i = 0; i < NUM_FRUSTUM_VERTICES; ++i)
         transformed.vertices_[i] = transform * vertices_[i];
 
     transformed.UpdatePlanes();

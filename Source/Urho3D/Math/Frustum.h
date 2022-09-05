@@ -25,8 +25,8 @@ enum FrustumPlane
     PLANE_FAR,
 };
 
-static const unsigned NUM_FRUSTUM_PLANES = 6;
-static const unsigned NUM_FRUSTUM_VERTICES = 8;
+inline constexpr i32 NUM_FRUSTUM_PLANES = 6;
+inline constexpr i32 NUM_FRUSTUM_VERTICES = 8;
 
 /// Convex constructed of 6 planes.
 class URHO3D_API Frustum
