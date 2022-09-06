@@ -427,8 +427,8 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // static const int NUM_OCTANTS | File: ../Graphics/Octree.h
     engine->RegisterGlobalProperty("const int NUM_OCTANTS", (void*)&NUM_OCTANTS);
 
-    // static const unsigned PRIORITY_LAST | File: ../Resource/ResourceCache.h
-    engine->RegisterGlobalProperty("const uint PRIORITY_LAST", (void*)&PRIORITY_LAST);
+    // constexpr i32 PRIORITY_LAST | File: ../Resource/ResourceCache.h
+    engine->RegisterGlobalProperty("const int PRIORITY_LAST", (void*)&PRIORITY_LAST);
 
     // const StringHash PSP_AMBIENTCOLOR | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const StringHash PSP_AMBIENTCOLOR", (void*)&PSP_AMBIENTCOLOR);
