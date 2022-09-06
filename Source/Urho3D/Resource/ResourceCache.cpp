@@ -76,8 +76,10 @@ ResourceCache::~ResourceCache()
 #endif
 }
 
-bool ResourceCache::AddResourceDir(const String& pathName, unsigned priority)
+bool ResourceCache::AddResourceDir(const String& pathName, i32 priority)
 {
+    assert(priority >= 0 || priority == PRIORITY_LAST);
+
     MutexLock lock(resourceMutex_);
 
     auto* fileSystem = GetSubsystem<FileSystem>();
@@ -97,7 +99,7 @@ bool ResourceCache::AddResourceDir(const String& pathName, unsigned priority)
             return true;
     }
 
-    if (priority < resourceDirs_.Size())
+    if (priority >= 0 && priority < resourceDirs_.Size())
         resourceDirs_.Insert(priority, fixedPath);
     else
         resourceDirs_.Push(fixedPath);
@@ -114,8 +116,10 @@ bool ResourceCache::AddResourceDir(const String& pathName, unsigned priority)
     return true;
 }
 
-bool ResourceCache::AddPackageFile(PackageFile* package, unsigned priority)
+bool ResourceCache::AddPackageFile(PackageFile* package, i32 priority)
 {
+    assert(priority >= 0 || priority == PRIORITY_LAST);
+
     MutexLock lock(resourceMutex_);
 
     // Do not add packages that failed to load
@@ -125,7 +129,7 @@ bool ResourceCache::AddPackageFile(PackageFile* package, unsigned priority)
         return false;
     }
 
-    if (priority < packages_.Size())
+    if (priority >= 0 && priority < packages_.Size())
         packages_.Insert(priority, SharedPtr<PackageFile>(package));
     else
         packages_.Push(SharedPtr<PackageFile>(package));
@@ -134,8 +138,9 @@ bool ResourceCache::AddPackageFile(PackageFile* package, unsigned priority)
     return true;
 }
 
-bool ResourceCache::AddPackageFile(const String& fileName, unsigned priority)
+bool ResourceCache::AddPackageFile(const String& fileName, i32 priority)
 {
+    assert(priority >= 0 || priority == PRIORITY_LAST);
     SharedPtr<PackageFile> package(new PackageFile(context_));
     return package->Open(fileName) && AddPackageFile(package, priority);
 }

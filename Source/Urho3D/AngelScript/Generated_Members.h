@@ -11800,14 +11800,14 @@ template <class T> void RegisterMembers_ResourceCache(asIScriptEngine* engine, c
     // bool ResourceCache::AddManualResource(Resource* resource)
     engine->RegisterObjectMethod(className, "bool AddManualResource(Resource@+)", AS_METHODPR(T, AddManualResource, (Resource*), bool), AS_CALL_THISCALL);
 
-    // bool ResourceCache::AddPackageFile(PackageFile* package, unsigned priority = PRIORITY_LAST)
-    engine->RegisterObjectMethod(className, "bool AddPackageFile(PackageFile@+, uint = PRIORITY_LAST)", AS_METHODPR(T, AddPackageFile, (PackageFile*, unsigned), bool), AS_CALL_THISCALL);
+    // bool ResourceCache::AddPackageFile(PackageFile* package, i32 priority = PRIORITY_LAST)
+    engine->RegisterObjectMethod(className, "bool AddPackageFile(PackageFile@+, int = PRIORITY_LAST)", AS_METHODPR(T, AddPackageFile, (PackageFile*, i32), bool), AS_CALL_THISCALL);
 
-    // bool ResourceCache::AddPackageFile(const String& fileName, unsigned priority = PRIORITY_LAST)
-    engine->RegisterObjectMethod(className, "bool AddPackageFile(const String&in, uint = PRIORITY_LAST)", AS_METHODPR(T, AddPackageFile, (const String&, unsigned), bool), AS_CALL_THISCALL);
+    // bool ResourceCache::AddPackageFile(const String& fileName, i32 priority = PRIORITY_LAST)
+    engine->RegisterObjectMethod(className, "bool AddPackageFile(const String&in, int = PRIORITY_LAST)", AS_METHODPR(T, AddPackageFile, (const String&, i32), bool), AS_CALL_THISCALL);
 
-    // bool ResourceCache::AddResourceDir(const String& pathName, unsigned priority = PRIORITY_LAST)
-    engine->RegisterObjectMethod(className, "bool AddResourceDir(const String&in, uint = PRIORITY_LAST)", AS_METHODPR(T, AddResourceDir, (const String&, unsigned), bool), AS_CALL_THISCALL);
+    // bool ResourceCache::AddResourceDir(const String& pathName, i32 priority = PRIORITY_LAST)
+    engine->RegisterObjectMethod(className, "bool AddResourceDir(const String&in, int = PRIORITY_LAST)", AS_METHODPR(T, AddResourceDir, (const String&, i32), bool), AS_CALL_THISCALL);
 
     // bool ResourceCache::BackgroundLoadResource(StringHash type, const String& name, bool sendEventOnFailure = true, Resource* caller = nullptr)
     engine->RegisterObjectMethod(className, "bool BackgroundLoadResource(StringHash, const String&in, bool = true, Resource@+ = null)", AS_METHODPR(T, BackgroundLoadResource, (StringHash, const String&, bool, Resource*), bool), AS_CALL_THISCALL);
