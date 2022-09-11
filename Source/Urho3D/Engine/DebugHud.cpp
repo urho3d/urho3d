@@ -147,7 +147,7 @@ void DebugHud::Update()
         String mode;
         mode.AppendWithFormat("Tex:%s Mat:%s Spec:%s Shadows:%s Size:%i Quality:%s Occlusion:%s Instancing:%s API:%s",
             qualityTexts[renderer->GetTextureQuality()],
-            qualityTexts[Min((unsigned)renderer->GetMaterialQuality(), 3)],
+            qualityTexts[Min((i32)renderer->GetMaterialQuality(), 3)],
             renderer->GetSpecularLighting() ? "On" : "Off",
             renderer->GetDrawShadows() ? "On" : "Off",
             renderer->GetShadowMapSize(),
