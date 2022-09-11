@@ -4689,9 +4689,9 @@ template <class T> void RegisterMembers_SourceBatch(asIScriptEngine* engine, con
 // class Sphere | File: ../Math/Sphere.h
 template <class T> void RegisterMembers_Sphere(asIScriptEngine* engine, const char* className)
 {
-    // void Sphere::Define(const Vector3* vertices, unsigned count)
+    // void Sphere::Define(const Vector3* vertices, i32 count)
     // Error: type "const Vector3*" can not automatically bind
-    // void Sphere::Merge(const Vector3* vertices, unsigned count)
+    // void Sphere::Merge(const Vector3* vertices, i32 count)
     // Error: type "const Vector3*" can not automatically bind
     // bool Sphere::operator !=(const Sphere& rhs) const
     // Only operator == is needed
