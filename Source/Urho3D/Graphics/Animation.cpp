@@ -155,7 +155,7 @@ bool Animation::BeginLoad(Deserializer& source)
     }
 
     // Optionally read triggers from an XML file
-    auto* cache = GetSubsystem<ResourceCache>();
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
     String xmlName = ReplaceExtension(GetName(), ".xml");
 
     SharedPtr<XMLFile> file(cache->GetTempResource<XMLFile>(xmlName, false));
@@ -186,9 +186,8 @@ bool Animation::BeginLoad(Deserializer& source)
         const JSONValue& rootVal = jsonFile->GetRoot();
         const JSONArray& triggerArray = rootVal.Get("triggers").GetArray();
 
-        for (unsigned i = 0; i < triggerArray.Size(); i++)
+        for (const JSONValue& triggerValue : triggerArray)
         {
-            const JSONValue& triggerValue = triggerArray.At(i);
             JSONValue normalizedTimeValue = triggerValue.Get("normalizedTime");
             if (!normalizedTimeValue.IsNull())
                 AddTrigger(normalizedTimeValue.GetFloat(), true, triggerValue.GetVariant());
@@ -229,9 +228,8 @@ bool Animation::Save(Serializer& dest) const
         dest.WriteUInt(track.keyFrames_.Size());
 
         // Write keyframes of the track
-        for (unsigned j = 0; j < track.keyFrames_.Size(); ++j)
+        for (const AnimationKeyFrame& keyFrame : track.keyFrames_)
         {
-            const AnimationKeyFrame& keyFrame = track.keyFrames_[j];
             dest.WriteFloat(keyFrame.time_);
             if (!!(track.channelMask_ & AnimationChannels::Position))
                 dest.WriteVector3(keyFrame.position_);
@@ -245,7 +243,7 @@ bool Animation::Save(Serializer& dest) const
     // If triggers have been defined, write an XML file for them
     if (!triggers_.Empty() || HasMetadata())
     {
-        auto* destFile = dynamic_cast<File*>(&dest);
+        File* destFile = dynamic_cast<File*>(&dest);
         if (destFile)
         {
             String xmlName = ReplaceExtension(destFile->GetName(), ".xml");
@@ -253,11 +251,11 @@ bool Animation::Save(Serializer& dest) const
             SharedPtr<XMLFile> xml(new XMLFile(context_));
             XMLElement rootElem = xml->CreateRoot("animation");
 
-            for (unsigned i = 0; i < triggers_.Size(); ++i)
+            for (const AnimationTriggerPoint& trigger : triggers_)
             {
                 XMLElement triggerElem = rootElem.CreateChild("trigger");
-                triggerElem.SetFloat("time", triggers_[i].time_);
-                triggerElem.SetVariant(triggers_[i].data_);
+                triggerElem.SetFloat("time", trigger.time_);
+                triggerElem.SetVariant(trigger.data_);
             }
 
             SaveMetadataToXML(rootElem);
