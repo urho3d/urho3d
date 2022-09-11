@@ -88,8 +88,9 @@ void Resource::SetName(const String& name)
     nameHash_ = name;
 }
 
-void Resource::SetMemoryUse(unsigned size)
+void Resource::SetMemoryUse(i32 size)
 {
+    assert(size >= 0);
     memoryUse_ = size;
 }
 
@@ -154,20 +155,17 @@ void ResourceWithMetadata::LoadMetadataFromXML(const XMLElement& source)
 
 void ResourceWithMetadata::LoadMetadataFromJSON(const JSONArray& array)
 {
-    for (unsigned i = 0; i < array.Size(); i++)
-    {
-        const JSONValue& value = array.At(i);
+    for (const JSONValue& value : array)
         AddMetadata(value.Get("name").GetString(), value.GetVariant());
-    }
 }
 
 void ResourceWithMetadata::SaveMetadataToXML(XMLElement& destination) const
 {
-    for (unsigned i = 0; i < metadataKeys_.Size(); ++i)
+    for (const String& metadataKey : metadataKeys_)
     {
         XMLElement elem = destination.CreateChild("metadata");
-        elem.SetString("name", metadataKeys_[i]);
-        elem.SetVariant(GetMetadata(metadataKeys_[i]));
+        elem.SetString("name", metadataKey);
+        elem.SetVariant(GetMetadata(metadataKey));
     }
 }
 
