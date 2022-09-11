@@ -107,10 +107,10 @@ void Console::SetDefaultStyle(XMLFile* style)
     background_->SetDefaultStyle(style);
     background_->SetStyle("ConsoleBackground");
     rowContainer_->SetStyleAuto();
-    for (unsigned i = 0; i < rowContainer_->GetNumItems(); ++i)
+    for (i32 i = 0; i < rowContainer_->GetNumItems(); ++i)
         rowContainer_->GetItem(i)->SetStyle("ConsoleText");
     interpreters_->SetStyleAuto();
-    for (unsigned i = 0; i < interpreters_->GetNumItems(); ++i)
+    for (i32 i = 0; i < interpreters_->GetNumItems(); ++i)
         interpreters_->GetItem(i)->SetStyle("ConsoleText");
     lineEdit_->SetStyle("ConsoleLineEdit");
 
