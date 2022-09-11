@@ -227,12 +227,11 @@ void DebugRenderer::AddPolyhedron(const Polyhedron& poly, const Color& color, bo
 {
     unsigned uintColor = color.ToUInt();
 
-    for (unsigned i = 0; i < poly.faces_.Size(); ++i)
+    for (const Vector<Vector3>& face : poly.faces_)
     {
-        const Vector<Vector3>& face = poly.faces_[i];
         if (face.Size() >= 3)
         {
-            for (unsigned j = 0; j < face.Size(); ++j)
+            for (i32 j = 0; j < face.Size(); ++j)
                 AddLine(face[j], face[(j + 1) % face.Size()], uintColor, depthTest);
         }
     }
@@ -340,20 +339,20 @@ void DebugRenderer::AddSkeleton(const Skeleton& skeleton, const Color& color, bo
 
     unsigned uintColor = color.ToUInt();
 
-    for (unsigned i = 0; i < bones.Size(); ++i)
+    for (const Bone& bone : bones)
     {
         // Skip if bone contains no skinned geometry
-        if (bones[i].radius_ < M_EPSILON && bones[i].boundingBox_.Size().LengthSquared() < M_EPSILON)
+        if (bone.radius_ < M_EPSILON && bone.boundingBox_.Size().LengthSquared() < M_EPSILON)
             continue;
 
-        Node* boneNode = bones[i].node_;
+        Node* boneNode = bone.node_;
         if (!boneNode)
             continue;
 
         Vector3 start = boneNode->GetWorldPosition();
         Vector3 end;
 
-        unsigned j = bones[i].parentIndex_;
+        i32 j = bone.parentIndex_;
         Node* parentNode = boneNode->GetParent();
 
         // If bone has a parent defined, and it also skins geometry, draw a line to it. Else draw the bone as a point
@@ -480,7 +479,7 @@ void DebugRenderer::Render()
     ShaderVariation* vs = graphics->GetShader(VS, "Basic", "VERTEXCOLOR");
     ShaderVariation* ps = graphics->GetShader(PS, "Basic", "VERTEXCOLOR");
 
-    unsigned numVertices = (lines_.Size() + noDepthLines_.Size()) * 2 + (triangles_.Size() + noDepthTriangles_.Size()) * 3;
+    i32 numVertices = (lines_.Size() + noDepthLines_.Size()) * 2 + (triangles_.Size() + noDepthTriangles_.Size()) * 3;
     // Resize the vertex buffer if too small or much too large
     if (vertexBuffer_->GetVertexCount() < numVertices || vertexBuffer_->GetVertexCount() > numVertices * 2)
         vertexBuffer_->SetSize(numVertices, MASK_POSITION | MASK_COLOR, true);
@@ -489,10 +488,8 @@ void DebugRenderer::Render()
     if (!dest)
         return;
 
-    for (unsigned i = 0; i < lines_.Size(); ++i)
+    for (const DebugLine& line : lines_)
     {
-        const DebugLine& line = lines_[i];
-
         dest[0] = line.start_.x_;
         dest[1] = line.start_.y_;
         dest[2] = line.start_.z_;
@@ -505,10 +502,8 @@ void DebugRenderer::Render()
         dest += 8;
     }
 
-    for (unsigned i = 0; i < noDepthLines_.Size(); ++i)
+    for (const DebugLine& line : noDepthLines_)
     {
-        const DebugLine& line = noDepthLines_[i];
-
         dest[0] = line.start_.x_;
         dest[1] = line.start_.y_;
         dest[2] = line.start_.z_;
@@ -521,10 +516,8 @@ void DebugRenderer::Render()
         dest += 8;
     }
 
-    for (unsigned i = 0; i < triangles_.Size(); ++i)
+    for (const DebugTriangle& triangle : triangles_)
     {
-        const DebugTriangle& triangle = triangles_[i];
-
         dest[0] = triangle.v1_.x_;
         dest[1] = triangle.v1_.y_;
         dest[2] = triangle.v1_.z_;
@@ -543,10 +536,8 @@ void DebugRenderer::Render()
         dest += 12;
     }
 
-    for (unsigned i = 0; i < noDepthTriangles_.Size(); ++i)
+    for (const DebugTriangle& triangle : noDepthTriangles_)
     {
-        const DebugTriangle& triangle = noDepthTriangles_[i];
-
         dest[0] = triangle.v1_.x_;
         dest[1] = triangle.v1_.y_;
         dest[2] = triangle.v1_.z_;
@@ -632,10 +623,10 @@ bool DebugRenderer::HasContent() const
 void DebugRenderer::HandleEndFrame(StringHash eventType, VariantMap& eventData)
 {
     // When the amount of debug geometry is reduced, release memory
-    unsigned linesSize = lines_.Size();
-    unsigned noDepthLinesSize = noDepthLines_.Size();
-    unsigned trianglesSize = triangles_.Size();
-    unsigned noDepthTrianglesSize = noDepthTriangles_.Size();
+    i32 linesSize = lines_.Size();
+    i32 noDepthLinesSize = noDepthLines_.Size();
+    i32 trianglesSize = triangles_.Size();
+    i32 noDepthTrianglesSize = noDepthTriangles_.Size();
 
     lines_.Clear();
     noDepthLines_.Clear();
