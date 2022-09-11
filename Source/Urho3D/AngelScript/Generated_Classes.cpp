@@ -2291,7 +2291,7 @@ static void Sphere__Sphere_constspPolyhedronamp(Sphere* _ptr, const Polyhedron& 
 // class Sphere | File: ../Math/Sphere.h
 static void Register_Sphere(asIScriptEngine* engine)
 {
-    // Sphere::Sphere(const Vector3* vertices, unsigned count) noexcept
+    // Sphere::Sphere(const Vector3* vertices, i32 count) noexcept
     // Error: type "const Vector3*" can not automatically bind
 
     // Sphere::Sphere(const Sphere& sphere) noexcept = default
