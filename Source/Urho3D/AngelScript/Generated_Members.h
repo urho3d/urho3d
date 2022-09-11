@@ -11706,9 +11706,9 @@ template <class T> void RegisterMembers_Resource(asIScriptEngine* engine, const 
     // AsyncLoadState Resource::GetAsyncLoadState() const
     engine->RegisterObjectMethod(className, "AsyncLoadState GetAsyncLoadState() const", AS_METHODPR(T, GetAsyncLoadState, () const, AsyncLoadState), AS_CALL_THISCALL);
 
-    // unsigned Resource::GetMemoryUse() const
-    engine->RegisterObjectMethod(className, "uint GetMemoryUse() const", AS_METHODPR(T, GetMemoryUse, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_memoryUse() const", AS_METHODPR(T, GetMemoryUse, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Resource::GetMemoryUse() const
+    engine->RegisterObjectMethod(className, "int GetMemoryUse() const", AS_METHODPR(T, GetMemoryUse, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_memoryUse() const", AS_METHODPR(T, GetMemoryUse, () const, i32), AS_CALL_THISCALL);
 
     // const String& Resource::GetName() const
     engine->RegisterObjectMethod(className, "const String& GetName() const", AS_METHODPR(T, GetName, () const, const String&), AS_CALL_THISCALL);
@@ -11741,8 +11741,8 @@ template <class T> void RegisterMembers_Resource(asIScriptEngine* engine, const 
     // void Resource::SetAsyncLoadState(AsyncLoadState newState)
     engine->RegisterObjectMethod(className, "void SetAsyncLoadState(AsyncLoadState)", AS_METHODPR(T, SetAsyncLoadState, (AsyncLoadState), void), AS_CALL_THISCALL);
 
-    // void Resource::SetMemoryUse(unsigned size)
-    engine->RegisterObjectMethod(className, "void SetMemoryUse(uint)", AS_METHODPR(T, SetMemoryUse, (unsigned), void), AS_CALL_THISCALL);
+    // void Resource::SetMemoryUse(i32 size)
+    engine->RegisterObjectMethod(className, "void SetMemoryUse(int)", AS_METHODPR(T, SetMemoryUse, (i32), void), AS_CALL_THISCALL);
 
     // void Resource::SetName(const String& name)
     engine->RegisterObjectMethod(className, "void SetName(const String&in)", AS_METHODPR(T, SetName, (const String&), void), AS_CALL_THISCALL);
