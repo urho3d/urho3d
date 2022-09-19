@@ -23,7 +23,7 @@ SourceBatch2D::SourceBatch2D() :
 }
 
 Drawable2D::Drawable2D(Context* context) :
-    Drawable(context, DRAWABLE_GEOMETRY2D),
+    Drawable(context, DrawableTypes::Geometry2D),
     layer_(0),
     orderInLayer_(0),
     sourceBatchesDirty_(true)

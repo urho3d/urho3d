@@ -272,7 +272,7 @@ bool Decals::Raycast(float maxDistance, Vector3& hitPos, Drawable*& hitDrawable)
     Ray cameraRay = camera->GetScreenRay((float)pos.x_ / graphics->GetWidth(), (float)pos.y_ / graphics->GetHeight());
     // Pick only geometry objects, not eg. zones or lights, only get the first (closest) hit
     Vector<RayQueryResult> results;
-    RayOctreeQuery query(results, cameraRay, RAY_TRIANGLE, maxDistance, DRAWABLE_GEOMETRY);
+    RayOctreeQuery query(results, cameraRay, RAY_TRIANGLE, maxDistance, DrawableTypes::Geometry);
     scene_->GetComponent<Octree>()->RaycastSingle(query);
     if (results.Size())
     {

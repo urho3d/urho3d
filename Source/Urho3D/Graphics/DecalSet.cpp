@@ -129,7 +129,7 @@ void Decal::CalculateBoundingBox()
 }
 
 DecalSet::DecalSet(Context* context) :
-    Drawable(context, DRAWABLE_GEOMETRY),
+    Drawable(context, DrawableTypes::Geometry),
     geometry_(new Geometry(context)),
     vertexBuffer_(new VertexBuffer(context_)),
     indexBuffer_(new IndexBuffer(context_)),

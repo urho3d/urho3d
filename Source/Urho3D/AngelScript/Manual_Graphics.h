@@ -364,19 +364,19 @@ template <class T> Node* RayQueryResult_GetNode(T* ptr)
 // ========================================================================================
 
 // void Octree::Raycast(RayOctreeQuery& query) const | File: ../Graphics/Octree.h
-template <class T> CScriptArray* Octree_Raycast(const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags, unsigned viewMask, Octree* ptr)
+template <class T> CScriptArray* Octree_Raycast(const Ray& ray, RayQueryLevel level, float maxDistance, DrawableTypes drawableTypes, unsigned viewMask, Octree* ptr)
 {
     Vector<RayQueryResult> result;
-    RayOctreeQuery query(result, ray, level, maxDistance, drawableFlags, viewMask);
+    RayOctreeQuery query(result, ray, level, maxDistance, drawableTypes, viewMask);
     ptr->Raycast(query);
     return VectorToArray<RayQueryResult>(result, "Array<RayQueryResult>");
 }
 
 // void Octree::RaycastSingle(RayOctreeQuery& query) const | File: ../Graphics/Octree.h
-template <class T> RayQueryResult Octree_RaycastSingle(const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags, unsigned viewMask, Octree* ptr)
+template <class T> RayQueryResult Octree_RaycastSingle(const Ray& ray, RayQueryLevel level, float maxDistance, DrawableTypes drawableTypes, unsigned viewMask, Octree* ptr)
 {
     Vector<RayQueryResult> result;
-    RayOctreeQuery query(result, ray, level, maxDistance, drawableFlags, viewMask);
+    RayOctreeQuery query(result, ray, level, maxDistance, drawableTypes, viewMask);
     ptr->RaycastSingle(query);
 
     if (!query.result_.Empty())
@@ -395,63 +395,63 @@ template <class T> RayQueryResult Octree_RaycastSingle(const Ray& ray, RayQueryL
 }
 
 // void Octree::GetDrawables(OctreeQuery& query) const | File: ../Graphics/Octree.h
-template <class T> CScriptArray* Octree_GetDrawables_Point(const Vector3& point, unsigned char drawableFlags, unsigned viewMask, Octree* ptr)
+template <class T> CScriptArray* Octree_GetDrawables_Point(const Vector3& point, DrawableTypes drawableTypes, unsigned viewMask, Octree* ptr)
 {
     Vector<Drawable*> result;
-    PointOctreeQuery query(result, point, drawableFlags, viewMask);
+    PointOctreeQuery query(result, point, drawableTypes, viewMask);
     ptr->GetDrawables(query);
     return VectorToHandleArray<Drawable>(result, "Array<Drawable@>");
 }
 
 // void Octree::GetDrawables(OctreeQuery& query) const | File: ../Graphics/Octree.h
-template <class T> CScriptArray* Octree_GetDrawables_Box(const BoundingBox& box, unsigned char drawableFlags, unsigned viewMask, Octree* ptr)
+template <class T> CScriptArray* Octree_GetDrawables_Box(const BoundingBox& box, DrawableTypes drawableTypes, unsigned viewMask, Octree* ptr)
 {
     Vector<Drawable*> result;
-    BoxOctreeQuery query(result, box, drawableFlags, viewMask);
+    BoxOctreeQuery query(result, box, drawableTypes, viewMask);
     ptr->GetDrawables(query);
     return VectorToHandleArray<Drawable>(result, "Array<Drawable@>");
 }
 
 // void Octree::GetDrawables(OctreeQuery& query) const | File: ../Graphics/Octree.h
-template <class T> CScriptArray* Octree_GetDrawables_Frustum(const Frustum& frustum, unsigned char drawableFlags, unsigned viewMask, Octree* ptr)
+template <class T> CScriptArray* Octree_GetDrawables_Frustum(const Frustum& frustum, DrawableTypes drawableTypes, unsigned viewMask, Octree* ptr)
 {
     Vector<Drawable*> result;
-    FrustumOctreeQuery query(result, frustum, drawableFlags, viewMask);
+    FrustumOctreeQuery query(result, frustum, drawableTypes, viewMask);
     ptr->GetDrawables(query);
     return VectorToHandleArray<Drawable>(result, "Array<Drawable@>");
 }
 
 // void Octree::GetDrawables(OctreeQuery& query) const | File: ../Graphics/Octree.h
-template <class T> CScriptArray* Octree_GetDrawables_Sphere(const Sphere& sphere, unsigned char drawableFlags, unsigned viewMask, Octree* ptr)
+template <class T> CScriptArray* Octree_GetDrawables_Sphere(const Sphere& sphere, DrawableTypes drawableTypes, unsigned viewMask, Octree* ptr)
 {
     Vector<Drawable*> result;
-    SphereOctreeQuery query(result, sphere, drawableFlags, viewMask);
+    SphereOctreeQuery query(result, sphere, drawableTypes, viewMask);
     ptr->GetDrawables(query);
     return VectorToHandleArray<Drawable>(result, "Array<Drawable@>");
 }
 
 // void Octree::GetDrawables(OctreeQuery& query) const | File: ../Graphics/Octree.h
-template <class T> CScriptArray* Octree_GetDrawables_All(unsigned char drawableFlags, unsigned viewMask, Octree* ptr)
+template <class T> CScriptArray* Octree_GetDrawables_All(DrawableTypes drawableTypes, unsigned viewMask, Octree* ptr)
 {
     Vector<Drawable*> result;
-    AllContentOctreeQuery query(result, drawableFlags, viewMask);
+    AllContentOctreeQuery query(result, drawableTypes, viewMask);
     ptr->GetDrawables(query);
     return VectorToHandleArray<Drawable>(result, "Array<Drawable@>");
 }
 
 #define REGISTER_MEMBERS_MANUAL_PART_Octree() \
     /* void Octree::Raycast(RayOctreeQuery& query) const | File: ../Graphics/Octree.h */ \
-    engine->RegisterObjectMethod(className, "Array<RayQueryResult>@ Raycast(const Ray&in, RayQueryLevel = RAY_TRIANGLE, float = M_INFINITY, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK) const", AS_FUNCTION_OBJLAST(Octree_Raycast<T>), AS_CALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "Array<RayQueryResult>@ Raycast(const Ray&in, RayQueryLevel = RAY_TRIANGLE, float = M_INFINITY, DrawableTypes = DrawableTypes::Any, uint = DEFAULT_VIEWMASK) const", AS_FUNCTION_OBJLAST(Octree_Raycast<T>), AS_CALL_CDECL_OBJLAST); \
     \
     /* void Octree::RaycastSingle(RayOctreeQuery& query) const | File: ../Graphics/Octree.h */ \
-    engine->RegisterObjectMethod(className, "RayQueryResult RaycastSingle(const Ray&in, RayQueryLevel = RAY_TRIANGLE, float = M_INFINITY, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK) const", AS_FUNCTION_OBJLAST(Octree_RaycastSingle<T>), AS_CALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "RayQueryResult RaycastSingle(const Ray&in, RayQueryLevel = RAY_TRIANGLE, float = M_INFINITY, DrawableTypes = DrawableTypes::Any, uint = DEFAULT_VIEWMASK) const", AS_FUNCTION_OBJLAST(Octree_RaycastSingle<T>), AS_CALL_CDECL_OBJLAST); \
     \
     /* void Octree::GetDrawables(OctreeQuery& query) const | File: ../Graphics/Octree.h */ \
-    engine->RegisterObjectMethod(className, "Array<Drawable@>@ GetDrawables(const Vector3&in, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK)", AS_FUNCTION_OBJLAST(Octree_GetDrawables_Point<T>), AS_CALL_CDECL_OBJLAST); \
-    engine->RegisterObjectMethod(className, "Array<Drawable@>@ GetDrawables(const BoundingBox&in, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK)", AS_FUNCTION_OBJLAST(Octree_GetDrawables_Box<T>), AS_CALL_CDECL_OBJLAST); \
-    engine->RegisterObjectMethod(className, "Array<Drawable@>@ GetDrawables(const Frustum&in, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK)", AS_FUNCTION_OBJLAST(Octree_GetDrawables_Frustum<T>), AS_CALL_CDECL_OBJLAST); \
-    engine->RegisterObjectMethod(className, "Array<Drawable@>@ GetDrawables(const Sphere&in, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK)", AS_FUNCTION_OBJLAST(Octree_GetDrawables_Sphere<T>), AS_CALL_CDECL_OBJLAST); \
-    engine->RegisterObjectMethod(className, "Array<Drawable@>@ GetAllDrawables(uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK)", AS_FUNCTION_OBJLAST(Octree_GetDrawables_All<T>), AS_CALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "Array<Drawable@>@ GetDrawables(const Vector3&in, DrawableTypes = DrawableTypes::Any, uint = DEFAULT_VIEWMASK)", AS_FUNCTION_OBJLAST(Octree_GetDrawables_Point<T>), AS_CALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "Array<Drawable@>@ GetDrawables(const BoundingBox&in, DrawableTypes = DrawableTypes::Any, uint = DEFAULT_VIEWMASK)", AS_FUNCTION_OBJLAST(Octree_GetDrawables_Box<T>), AS_CALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "Array<Drawable@>@ GetDrawables(const Frustum&in, DrawableTypes = DrawableTypes::Any, uint = DEFAULT_VIEWMASK)", AS_FUNCTION_OBJLAST(Octree_GetDrawables_Frustum<T>), AS_CALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "Array<Drawable@>@ GetDrawables(const Sphere&in, DrawableTypes = DrawableTypes::Any, uint = DEFAULT_VIEWMASK)", AS_FUNCTION_OBJLAST(Octree_GetDrawables_Sphere<T>), AS_CALL_CDECL_OBJLAST); \
+    engine->RegisterObjectMethod(className, "Array<Drawable@>@ GetAllDrawables(DrawableTypes = DrawableTypes::Any, uint = DEFAULT_VIEWMASK)", AS_FUNCTION_OBJLAST(Octree_GetDrawables_All<T>), AS_CALL_CDECL_OBJLAST);
 
 // ========================================================================================
 

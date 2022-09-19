@@ -29,7 +29,7 @@ static const float DEFAULT_FOG_HEIGHT_SCALE = 0.5f;
 extern const char* SCENE_CATEGORY;
 
 Zone::Zone(Context* context) :
-    Drawable(context, DRAWABLE_ZONE),
+    Drawable(context, DrawableTypes::Zone),
     inverseWorldDirty_(true),
     heightFog_(false),
     override_(false),
@@ -247,7 +247,7 @@ void Zone::UpdateAmbientGradient()
 
         Vector<Zone*> result;
         {
-            PointOctreeQuery query(reinterpret_cast<Vector<Drawable*>&>(result), minZPosition, DRAWABLE_ZONE);
+            PointOctreeQuery query(reinterpret_cast<Vector<Drawable*>&>(result), minZPosition, DrawableTypes::Zone);
             octant_->GetRoot()->GetDrawables(query);
         }
 
@@ -273,7 +273,7 @@ void Zone::UpdateAmbientGradient()
 
         // Do the same for gradient end position
         {
-            PointOctreeQuery query(reinterpret_cast<Vector<Drawable*>&>(result), maxZPosition, DRAWABLE_ZONE);
+            PointOctreeQuery query(reinterpret_cast<Vector<Drawable*>&>(result), maxZPosition, DrawableTypes::Zone);
             octant_->GetRoot()->GetDrawables(query);
         }
         bestPriority = M_MIN_INT;
@@ -308,18 +308,18 @@ void Zone::ClearDrawablesZone()
     if (octant_ && lastWorldBoundingBox_.Defined())
     {
         Vector<Drawable*> result;
-        BoxOctreeQuery query(result, lastWorldBoundingBox_, DRAWABLE_GEOMETRY | DRAWABLE_ZONE);
+        BoxOctreeQuery query(result, lastWorldBoundingBox_, DrawableTypes::Geometry | DrawableTypes::Zone);
         octant_->GetRoot()->GetDrawables(query);
 
         for (Vector<Drawable*>::Iterator i = result.Begin(); i != result.End(); ++i)
         {
             Drawable* drawable = *i;
-            unsigned drawableFlags = drawable->GetDrawableFlags();
-            if (drawableFlags & DRAWABLE_GEOMETRY)
+            DrawableTypes drawableType = drawable->GetDrawableType();
+            if (drawableType == DrawableTypes::Geometry)
                 drawable->SetZone(nullptr);
-            else if (drawableFlags & DRAWABLE_ZONE)
+            else // drawableType == DrawableTypes::Zone
             {
-                auto* zone = static_cast<Zone*>(drawable);
+                Zone* zone = static_cast<Zone*>(drawable);
                 zone->lastAmbientStartZone_.Reset();
                 zone->lastAmbientEndZone_.Reset();
             }

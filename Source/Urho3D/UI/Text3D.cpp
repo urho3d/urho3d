@@ -30,7 +30,7 @@ static const float TEXT_SCALING = 1.0f / 128.0f;
 static const float DEFAULT_EFFECT_DEPTH_BIAS = 0.1f;
 
 Text3D::Text3D(Context* context) :
-    Drawable(context, DRAWABLE_GEOMETRY),
+    Drawable(context, DrawableTypes::Geometry),
     text_(context),
     vertexBuffer_(new VertexBuffer(context_)),
     customWorldTransform_(Matrix3x4::IDENTITY),

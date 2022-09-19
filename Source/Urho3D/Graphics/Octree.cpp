@@ -254,7 +254,7 @@ void Octant::GetDrawablesInternal(RayOctreeQuery& query) const
         {
             Drawable* drawable = *start++;
 
-            if ((drawable->GetDrawableFlags() & query.drawableFlags_) && (drawable->GetViewMask() & query.viewMask_))
+            if (!!(drawable->GetDrawableType() & query.drawableTypes_) && (drawable->GetViewMask() & query.viewMask_))
                 drawable->ProcessRayQuery(query, query.result_);
         }
     }
@@ -281,7 +281,7 @@ void Octant::GetDrawablesOnlyInternal(RayOctreeQuery& query, Vector<Drawable*>& 
         {
             Drawable* drawable = *start++;
 
-            if ((drawable->GetDrawableFlags() & query.drawableFlags_) && (drawable->GetViewMask() & query.viewMask_))
+            if (!!(drawable->GetDrawableType() & query.drawableTypes_) && (drawable->GetViewMask() & query.viewMask_))
                 drawables.Push(drawable);
         }
     }

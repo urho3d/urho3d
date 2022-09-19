@@ -66,6 +66,14 @@ static const unsigned DragAndDropMode_DD_SOURCE = DD_SOURCE;
 static const unsigned DragAndDropMode_DD_TARGET = DD_TARGET;
 static const unsigned DragAndDropMode_DD_SOURCE_AND_TARGET = DD_SOURCE_AND_TARGET;
 
+// enum class DrawableTypes : u8 | File: ../Graphics/Drawable.h
+static const u8 DrawableTypes_Undefined = static_cast<u8>(DrawableTypes::Undefined);
+static const u8 DrawableTypes_Geometry = static_cast<u8>(DrawableTypes::Geometry);
+static const u8 DrawableTypes_Light = static_cast<u8>(DrawableTypes::Light);
+static const u8 DrawableTypes_Zone = static_cast<u8>(DrawableTypes::Zone);
+static const u8 DrawableTypes_Geometry2D = static_cast<u8>(DrawableTypes::Geometry2D);
+static const u8 DrawableTypes_Any = static_cast<u8>(DrawableTypes::Any);
+
 // enum HatPosition : unsigned | File: ../Input/InputConstants.h
 static const unsigned HatPosition_HAT_CENTER = HAT_CENTER;
 static const unsigned HatPosition_HAT_UP = HAT_UP;
@@ -884,6 +892,17 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
 
     // URHO3D_FLAGSET(DragAndDropMode, DragAndDropModeFlags) | File: ../UI/UIElement.h
     engine->RegisterTypedef("DragAndDropModeFlags", "uint");
+
+    // enum class DrawableTypes : u8 | File: ../Graphics/Drawable.h
+    engine->RegisterTypedef("DrawableTypes", "uint8");
+    engine->SetDefaultNamespace("DrawableTypes");
+    engine->RegisterGlobalProperty("const uint8 Undefined", (void*)&DrawableTypes_Undefined);
+    engine->RegisterGlobalProperty("const uint8 Geometry", (void*)&DrawableTypes_Geometry);
+    engine->RegisterGlobalProperty("const uint8 Light", (void*)&DrawableTypes_Light);
+    engine->RegisterGlobalProperty("const uint8 Zone", (void*)&DrawableTypes_Zone);
+    engine->RegisterGlobalProperty("const uint8 Geometry2D", (void*)&DrawableTypes_Geometry2D);
+    engine->RegisterGlobalProperty("const uint8 Any", (void*)&DrawableTypes_Any);
+    engine->SetDefaultNamespace("");
 
     // enum EmitterType | File: ../Graphics/ParticleEffect.h
     engine->RegisterEnum("EmitterType");

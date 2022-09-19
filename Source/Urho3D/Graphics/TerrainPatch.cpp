@@ -27,7 +27,7 @@ static const float LOD_CONSTANT = 1.0f / 150.0f;
 extern const char* GEOMETRY_CATEGORY;
 
 TerrainPatch::TerrainPatch(Context* context) :
-    Drawable(context, DRAWABLE_GEOMETRY),
+    Drawable(context, DrawableTypes::Geometry),
     geometry_(new Geometry(context)),
     maxLodGeometry_(new Geometry(context)),
     occlusionGeometry_(new Geometry(context)),

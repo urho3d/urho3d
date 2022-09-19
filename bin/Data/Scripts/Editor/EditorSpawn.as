@@ -293,7 +293,7 @@ bool GetSpawnPosition(const Ray&in cameraRay, float maxDistance, Vector3&out pos
 {
     if (pickMode < PICK_RIGIDBODIES && editorScene.octree !is null)
     {
-        RayQueryResult result = editorScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, maxDistance, DRAWABLE_GEOMETRY,
+        RayQueryResult result = editorScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, maxDistance, DrawableTypes::Geometry,
             0x7fffffff);
         if (result.drawable !is null)
         {
@@ -302,7 +302,7 @@ bool GetSpawnPosition(const Ray&in cameraRay, float maxDistance, Vector3&out pos
                 Vector3 basePosition = RandomizeSpawnPosition(result.position, randomRadius);
                 basePosition.y += randomRadius;
                 result = editorScene.octree.RaycastSingle(Ray(basePosition, Vector3(0, -1, 0)), RAY_TRIANGLE, randomRadius * 2.0,
-                    DRAWABLE_GEOMETRY, 0x7fffffff);
+                    DrawableTypes::Geometry, 0x7fffffff);
                 if (result.drawable !is null)
                 {
                     position = result.position;
@@ -359,7 +359,7 @@ bool GetSpawnPositionOnNode(const Ray&in cameraRay, float maxDistance, Vector3&o
 {
     if (pickMode < PICK_RIGIDBODIES && editorScene.octree !is null)
     {
-        Array<RayQueryResult> results = editorScene.octree.Raycast(cameraRay, RAY_TRIANGLE, maxDistance, DRAWABLE_GEOMETRY, 0x7fffffff);
+        Array<RayQueryResult> results = editorScene.octree.Raycast(cameraRay, RAY_TRIANGLE, maxDistance, DrawableTypes::Geometry, 0x7fffffff);
         
         if (!results.empty)
         {
@@ -378,7 +378,7 @@ bool GetSpawnPositionOnNode(const Ray&in cameraRay, float maxDistance, Vector3&o
             {
                 Vector3 basePosition = RandomizeSpawnPosition(result.position, randomRadius);
                 basePosition.y += randomRadius;
-                Array<RayQueryResult> randomResults = editorScene.octree.Raycast(Ray(basePosition, Vector3(0, -1, 0)), RAY_TRIANGLE, randomRadius * 2.0, DRAWABLE_GEOMETRY, 0x7fffffff);
+                Array<RayQueryResult> randomResults = editorScene.octree.Raycast(Ray(basePosition, Vector3(0, -1, 0)), RAY_TRIANGLE, randomRadius * 2.0, DrawableTypes::Geometry, 0x7fffffff);
 
                 if (randomResults.length == 0)
                 {

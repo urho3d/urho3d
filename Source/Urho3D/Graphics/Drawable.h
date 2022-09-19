@@ -12,12 +12,17 @@
 namespace Urho3D
 {
 
-static const unsigned DRAWABLE_UNDEFINED = 0x0;
-static const unsigned DRAWABLE_GEOMETRY = 0x1;
-static const unsigned DRAWABLE_LIGHT = 0x2;
-static const unsigned DRAWABLE_ZONE = 0x4;
-static const unsigned DRAWABLE_GEOMETRY2D = 0x8;
-static const unsigned DRAWABLE_ANY = 0xff;
+enum class DrawableTypes : u8
+{
+    Undefined  = 0,
+    Geometry   = 1 << 0,
+    Light      = 1 << 1,
+    Zone       = 1 << 2,
+    Geometry2D = 1 << 3,
+    Any        = 0xFF
+};
+URHO3D_FLAGS(DrawableTypes);
+
 static const unsigned DEFAULT_VIEWMASK = M_MAX_UNSIGNED;
 static const unsigned DEFAULT_LIGHTMASK = M_MAX_UNSIGNED;
 static const unsigned DEFAULT_SHADOWMASK = M_MAX_UNSIGNED;
@@ -98,7 +103,7 @@ class URHO3D_API Drawable : public Component
 
 public:
     /// Construct.
-    Drawable(Context* context, unsigned char drawableFlags);
+    Drawable(Context* context, DrawableTypes drawableType);
     /// Destruct.
     ~Drawable() override;
     /// Register object attributes. Drawable must be registered first.
@@ -174,8 +179,8 @@ public:
     /// @property
     const BoundingBox& GetWorldBoundingBox();
 
-    /// Return drawable flags.
-    unsigned char GetDrawableFlags() const { return drawableFlags_; }
+    /// Return drawable type.
+    DrawableTypes GetDrawableType() const { return drawableType_; }
 
     /// Return draw distance.
     /// @property
@@ -339,8 +344,8 @@ protected:
     BoundingBox boundingBox_;
     /// Draw call source data.
     Vector<SourceBatch> batches_;
-    /// Drawable flags.
-    unsigned char drawableFlags_;
+    /// Drawable type
+    DrawableTypes drawableType_;
     /// Bounding box dirty flag.
     bool worldBoundingBoxDirty_;
     /// Shadowcaster flag.

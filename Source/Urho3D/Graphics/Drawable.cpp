@@ -32,10 +32,10 @@ SourceBatch::~SourceBatch() = default;
 SourceBatch& SourceBatch::operator =(const SourceBatch& rhs)= default;
 
 
-Drawable::Drawable(Context* context, unsigned char drawableFlags) :
+Drawable::Drawable(Context* context, DrawableTypes drawableType) :
     Component(context),
     boundingBox_(0.0f, 0.0f),
-    drawableFlags_(drawableFlags),
+    drawableType_(drawableType),
     worldBoundingBoxDirty_(true),
     castShadows_(false),
     occluder_(false),
@@ -61,10 +61,10 @@ Drawable::Drawable(Context* context, unsigned char drawableFlags) :
     maxLights_(0),
     firstLight_(nullptr)
 {
-    if (drawableFlags == DRAWABLE_UNDEFINED || drawableFlags > DRAWABLE_ANY)
-    {
-        URHO3D_LOGERROR("Drawable with undefined drawableFlags");
-    }
+    if (drawableType == DrawableTypes::Undefined)
+        URHO3D_LOGERROR("Drawable with undefined drawableType");
+    else if (CountSetBits((u32)drawableType) != 1)
+        URHO3D_LOGERROR("Drawable with incorrect drawableType");
 }
 
 Drawable::~Drawable()
