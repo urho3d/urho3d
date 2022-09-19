@@ -41,9 +41,9 @@ class ShadowCasterOctreeQuery : public FrustumOctreeQuery
 {
 public:
     /// Construct with frustum and query parameters.
-    ShadowCasterOctreeQuery(Vector<Drawable*>& result, const Frustum& frustum, unsigned char drawableFlags = DRAWABLE_ANY,
+    ShadowCasterOctreeQuery(Vector<Drawable*>& result, const Frustum& frustum, DrawableTypes drawableTypes = DrawableTypes::Any,
         unsigned viewMask = DEFAULT_VIEWMASK) :
-        FrustumOctreeQuery(result, frustum, drawableFlags, viewMask)
+        FrustumOctreeQuery(result, frustum, drawableTypes, viewMask)
     {
     }
 
@@ -54,7 +54,7 @@ public:
         {
             Drawable* drawable = *start++;
 
-            if (drawable->GetCastShadows() && (drawable->GetDrawableFlags() & drawableFlags_) &&
+            if (drawable->GetCastShadows() && !!(drawable->GetDrawableType() & drawableTypes_) &&
                 (drawable->GetViewMask() & viewMask_))
             {
                 if (inside || frustum_.IsInsideFast(drawable->GetWorldBoundingBox()))
@@ -69,9 +69,9 @@ class ZoneOccluderOctreeQuery : public FrustumOctreeQuery
 {
 public:
     /// Construct with frustum and query parameters.
-    ZoneOccluderOctreeQuery(Vector<Drawable*>& result, const Frustum& frustum, unsigned char drawableFlags = DRAWABLE_ANY,
+    ZoneOccluderOctreeQuery(Vector<Drawable*>& result, const Frustum& frustum, DrawableTypes drawableTypes = DrawableTypes::Any,
         unsigned viewMask = DEFAULT_VIEWMASK) :
-        FrustumOctreeQuery(result, frustum, drawableFlags, viewMask)
+        FrustumOctreeQuery(result, frustum, drawableTypes, viewMask)
     {
     }
 
@@ -81,9 +81,9 @@ public:
         while (start != end)
         {
             Drawable* drawable = *start++;
-            unsigned char flags = drawable->GetDrawableFlags();
+            DrawableTypes type = drawable->GetDrawableType();
 
-            if ((flags == DRAWABLE_ZONE || (flags == DRAWABLE_GEOMETRY && drawable->IsOccluder())) &&
+            if ((type == DrawableTypes::Zone || (type == DrawableTypes::Geometry && drawable->IsOccluder())) &&
                 (drawable->GetViewMask() & viewMask_))
             {
                 if (inside || frustum_.IsInsideFast(drawable->GetWorldBoundingBox()))
@@ -99,8 +99,8 @@ class OccludedFrustumOctreeQuery : public FrustumOctreeQuery
 public:
     /// Construct with frustum, occlusion buffer and query parameters.
     OccludedFrustumOctreeQuery(Vector<Drawable*>& result, const Frustum& frustum, OcclusionBuffer* buffer,
-        unsigned char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) :
-        FrustumOctreeQuery(result, frustum, drawableFlags, viewMask),
+        DrawableTypes drawableTypes = DrawableTypes::Any, unsigned viewMask = DEFAULT_VIEWMASK) :
+        FrustumOctreeQuery(result, frustum, drawableTypes, viewMask),
         buffer_(buffer)
     {
     }
@@ -126,7 +126,7 @@ public:
         {
             Drawable* drawable = *start++;
 
-            if ((drawable->GetDrawableFlags() & drawableFlags_) && (drawable->GetViewMask() & viewMask_))
+            if (!!(drawable->GetDrawableType() & drawableTypes_) && (drawable->GetViewMask() & viewMask_))
             {
                 if (inside || frustum_.IsInsideFast(drawable->GetWorldBoundingBox()))
                     result_.Push(drawable);
@@ -169,7 +169,7 @@ void CheckVisibilityWork(const WorkItem* item, i32 threadIndex)
             drawable->MarkInView(view->frame_);
 
             // For geometries, find zone, clear lights and calculate view space Z range
-            if (drawable->GetDrawableFlags() & DRAWABLE_GEOMETRY)
+            if (drawable->GetDrawableType() == DrawableTypes::Geometry)
             {
                 Zone* drawableZone = drawable->GetZone();
                 if (!cameraZoneOverride &&
@@ -196,9 +196,9 @@ void CheckVisibilityWork(const WorkItem* item, i32 threadIndex)
 
                 result.geometries_.Push(drawable);
             }
-            else if (drawable->GetDrawableFlags() & DRAWABLE_LIGHT)
+            else if (drawable->GetDrawableType() == DrawableTypes::Light)
             {
-                auto* light = static_cast<Light*>(drawable);
+                Light* light = static_cast<Light*>(drawable);
                 // Skip lights with zero brightness or black color
                 if (!light->GetEffectiveColor().Equals(Color::BLACK))
                     result.lights_.Push(light);
@@ -787,7 +787,7 @@ void View::GetDrawables()
     // Get zones and occluders first
     {
         ZoneOccluderOctreeQuery
-            query(tempDrawables, cullCamera_->GetFrustum(), DRAWABLE_GEOMETRY | DRAWABLE_ZONE, cullCamera_->GetViewMask());
+            query(tempDrawables, cullCamera_->GetFrustum(), DrawableTypes::Geometry | DrawableTypes::Zone, cullCamera_->GetViewMask());
         octree_->GetDrawables(query);
     }
 
@@ -799,11 +799,11 @@ void View::GetDrawables()
     for (Vector<Drawable*>::ConstIterator i = tempDrawables.Begin(); i != tempDrawables.End(); ++i)
     {
         Drawable* drawable = *i;
-        unsigned char flags = drawable->GetDrawableFlags();
+        DrawableTypes type = drawable->GetDrawableType();
 
-        if (flags & DRAWABLE_ZONE)
+        if (type == DrawableTypes::Zone)
         {
-            auto* zone = static_cast<Zone*>(drawable);
+            Zone* zone = static_cast<Zone*>(drawable);
             zones_.Push(zone);
             int priority = zone->GetPriority();
             if (priority > highestZonePriority_)
@@ -858,12 +858,12 @@ void View::GetDrawables()
     if (occlusionBuffer_)
     {
         OccludedFrustumOctreeQuery query
-            (tempDrawables, cullCamera_->GetFrustum(), occlusionBuffer_, DRAWABLE_GEOMETRY | DRAWABLE_LIGHT, cullCamera_->GetViewMask());
+            (tempDrawables, cullCamera_->GetFrustum(), occlusionBuffer_, DrawableTypes::Geometry | DrawableTypes::Light, cullCamera_->GetViewMask());
         octree_->GetDrawables(query);
     }
     else
     {
-        FrustumOctreeQuery query(tempDrawables, cullCamera_->GetFrustum(), DRAWABLE_GEOMETRY | DRAWABLE_LIGHT, cullCamera_->GetViewMask());
+        FrustumOctreeQuery query(tempDrawables, cullCamera_->GetFrustum(), DrawableTypes::Geometry | DrawableTypes::Light, cullCamera_->GetViewMask());
         octree_->GetDrawables(query);
     }
 
@@ -2283,7 +2283,7 @@ void View::ProcessLight(LightQueryResult& query, i32 threadIndex)
 
     case LIGHT_SPOT:
         {
-            FrustumOctreeQuery octreeQuery(tempDrawables, light->GetFrustum(), DRAWABLE_GEOMETRY,
+            FrustumOctreeQuery octreeQuery(tempDrawables, light->GetFrustum(), DrawableTypes::Geometry,
                 cullCamera_->GetViewMask());
             octree_->GetDrawables(octreeQuery);
 
@@ -2298,7 +2298,7 @@ void View::ProcessLight(LightQueryResult& query, i32 threadIndex)
     case LIGHT_POINT:
         {
             SphereOctreeQuery octreeQuery(tempDrawables, Sphere(light->GetNode()->GetWorldPosition(), light->GetRange()),
-                DRAWABLE_GEOMETRY, cullCamera_->GetViewMask());
+                DrawableTypes::Geometry, cullCamera_->GetViewMask());
             octree_->GetDrawables(octreeQuery);
 
             for (Drawable* tempDrawable : tempDrawables)
@@ -2341,7 +2341,7 @@ void View::ProcessLight(LightQueryResult& query, i32 threadIndex)
                 continue;
 
             // Reuse lit geometry query for all except directional lights
-            ShadowCasterOctreeQuery query(tempDrawables, shadowCameraFrustum, DRAWABLE_GEOMETRY, cullCamera_->GetViewMask());
+            ShadowCasterOctreeQuery query(tempDrawables, shadowCameraFrustum, DrawableTypes::Geometry, cullCamera_->GetViewMask());
             octree_->GetDrawables(query);
         }
 

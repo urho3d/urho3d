@@ -3299,8 +3299,8 @@ template <class T> void RegisterMembers_OctreeQuery(asIScriptEngine* engine, con
     // Vector<Drawable*>& OctreeQuery::result_
     // Error: type "Vector<Drawable*>&" can not automatically bind
 
-    // unsigned char OctreeQuery::drawableFlags_
-    engine->RegisterObjectProperty(className, "uint8 drawableFlags", offsetof(T, drawableFlags_));
+    // DrawableTypes OctreeQuery::drawableTypes_
+    engine->RegisterObjectProperty(className, "DrawableTypes drawableTypes", offsetof(T, drawableTypes_));
 
     // unsigned OctreeQuery::viewMask_
     engine->RegisterObjectProperty(className, "uint viewMask", offsetof(T, viewMask_));
@@ -3804,8 +3804,8 @@ template <class T> void RegisterMembers_RayOctreeQuery(asIScriptEngine* engine, 
     // Ray RayOctreeQuery::ray_
     engine->RegisterObjectProperty(className, "Ray ray", offsetof(T, ray_));
 
-    // unsigned char RayOctreeQuery::drawableFlags_
-    engine->RegisterObjectProperty(className, "uint8 drawableFlags", offsetof(T, drawableFlags_));
+    // DrawableTypes RayOctreeQuery::drawableTypes_
+    engine->RegisterObjectProperty(className, "DrawableTypes drawableTypes", offsetof(T, drawableTypes_));
 
     // unsigned RayOctreeQuery::viewMask_
     engine->RegisterObjectProperty(className, "uint viewMask", offsetof(T, viewMask_));
@@ -17861,8 +17861,8 @@ template <class T> void RegisterMembers_Drawable(asIScriptEngine* engine, const 
     // float Drawable::GetDistance() const
     engine->RegisterObjectMethod(className, "float GetDistance() const", AS_METHODPR(T, GetDistance, () const, float), AS_CALL_THISCALL);
 
-    // unsigned char Drawable::GetDrawableFlags() const
-    engine->RegisterObjectMethod(className, "uint8 GetDrawableFlags() const", AS_METHODPR(T, GetDrawableFlags, () const, unsigned char), AS_CALL_THISCALL);
+    // DrawableTypes Drawable::GetDrawableType() const
+    engine->RegisterObjectMethod(className, "DrawableTypes GetDrawableType() const", AS_METHODPR(T, GetDrawableType, () const, DrawableTypes), AS_CALL_THISCALL);
 
     // float Drawable::GetDrawDistance() const
     engine->RegisterObjectMethod(className, "float GetDrawDistance() const", AS_METHODPR(T, GetDrawDistance, () const, float), AS_CALL_THISCALL);

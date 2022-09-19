@@ -57,7 +57,7 @@ inline bool CompareBillboards(Billboard* lhs, Billboard* rhs)
 }
 
 BillboardSet::BillboardSet(Context* context) :
-    Drawable(context, DRAWABLE_GEOMETRY),
+    Drawable(context, DrawableTypes::Geometry),
     animationLodBias_(1.0f),
     animationLodTimer_(0.0f),
     relative_(true),

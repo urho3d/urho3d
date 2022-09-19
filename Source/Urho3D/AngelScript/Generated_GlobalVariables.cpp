@@ -61,24 +61,6 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // const Vector3 DOT_SCALE | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const Vector3 DOT_SCALE", (void*)&DOT_SCALE);
 
-    // static const unsigned DRAWABLE_ANY | File: ../Graphics/Drawable.h
-    engine->RegisterGlobalProperty("const uint DRAWABLE_ANY", (void*)&DRAWABLE_ANY);
-
-    // static const unsigned DRAWABLE_GEOMETRY | File: ../Graphics/Drawable.h
-    engine->RegisterGlobalProperty("const uint DRAWABLE_GEOMETRY", (void*)&DRAWABLE_GEOMETRY);
-
-    // static const unsigned DRAWABLE_GEOMETRY2D | File: ../Graphics/Drawable.h
-    engine->RegisterGlobalProperty("const uint DRAWABLE_GEOMETRY2D", (void*)&DRAWABLE_GEOMETRY2D);
-
-    // static const unsigned DRAWABLE_LIGHT | File: ../Graphics/Drawable.h
-    engine->RegisterGlobalProperty("const uint DRAWABLE_LIGHT", (void*)&DRAWABLE_LIGHT);
-
-    // static const unsigned DRAWABLE_UNDEFINED | File: ../Graphics/Drawable.h
-    engine->RegisterGlobalProperty("const uint DRAWABLE_UNDEFINED", (void*)&DRAWABLE_UNDEFINED);
-
-    // static const unsigned DRAWABLE_ZONE | File: ../Graphics/Drawable.h
-    engine->RegisterGlobalProperty("const uint DRAWABLE_ZONE", (void*)&DRAWABLE_ZONE);
-
     // const i32 ELEMENT_TYPESIZES[] | File: ../GraphicsAPI/GraphicsDefs.h
     // Not registered because array
 

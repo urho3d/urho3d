@@ -26,7 +26,7 @@ namespace Urho3D
 extern const char* GEOMETRY_CATEGORY;
 
 CustomGeometry::CustomGeometry(Context* context)
-    : Drawable(context, DRAWABLE_GEOMETRY)
+    : Drawable(context, DrawableTypes::Geometry)
     , vertexBuffer_(new VertexBuffer(context))
     , elementMask_(MASK_POSITION)
     , geometryIndex_(0)

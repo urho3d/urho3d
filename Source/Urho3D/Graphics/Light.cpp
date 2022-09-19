@@ -71,7 +71,7 @@ void FocusParameters::Validate()
 }
 
 Light::Light(Context* context) :
-    Drawable(context, DRAWABLE_LIGHT),
+    Drawable(context, DrawableTypes::Light),
     lightType_(DEFAULT_LIGHTTYPE),
     shadowBias_(BiasParameters(DEFAULT_CONSTANTBIAS, DEFAULT_SLOPESCALEDBIAS)),
     shadowCascade_(CascadeParameters(DEFAULT_SHADOWSPLIT, 0.0f, 0.0f, 0.0f, DEFAULT_SHADOWFADESTART)),

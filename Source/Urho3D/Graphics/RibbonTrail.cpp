@@ -41,7 +41,7 @@ TrailPoint::TrailPoint(const Vector3& position, const Vector3& forward) :
 }
 
 RibbonTrail::RibbonTrail(Context* context) :
-    Drawable(context, DRAWABLE_GEOMETRY),
+    Drawable(context, DrawableTypes::Geometry),
     geometry_(new Geometry(context_)),
     animationLodBias_(1.0f),
     animationLodTimer_(0.0f),

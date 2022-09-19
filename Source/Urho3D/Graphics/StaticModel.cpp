@@ -26,7 +26,7 @@ namespace Urho3D
 extern const char* GEOMETRY_CATEGORY;
 
 StaticModel::StaticModel(Context* context) :
-    Drawable(context, DRAWABLE_GEOMETRY),
+    Drawable(context, DrawableTypes::Geometry),
     occlusionLodLevel_(M_MAX_UNSIGNED),
     materialsAttr_(Material::GetTypeStatic())
 {

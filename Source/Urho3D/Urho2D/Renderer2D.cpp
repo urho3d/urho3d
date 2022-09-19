@@ -41,7 +41,7 @@ ViewBatchInfo2D::ViewBatchInfo2D() :
 }
 
 Renderer2D::Renderer2D(Context* context) :
-    Drawable(context, DRAWABLE_GEOMETRY),
+    Drawable(context, DrawableTypes::Geometry),
     material_(new Material(context)),
     indexBuffer_(new IndexBuffer(context_)),
     viewMask_(DEFAULT_VIEWMASK)

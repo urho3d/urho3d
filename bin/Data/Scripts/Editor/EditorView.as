@@ -474,10 +474,10 @@ Color gridXColor(0.5, 0.1, 0.1);
 Color gridYColor(0.1, 0.5, 0.1);
 Color gridZColor(0.1, 0.1, 0.5);
 
-Array<int> pickModeDrawableFlags = {
-    DRAWABLE_GEOMETRY,
-    DRAWABLE_LIGHT,
-    DRAWABLE_ZONE
+Array<DrawableTypes> pickModeDrawableTypes = {
+    DrawableTypes::Geometry,
+    DrawableTypes::Light,
+    DrawableTypes::Zone
 };
 
 Array<String> editModeText = {
@@ -2244,7 +2244,7 @@ void ViewMouseMove()
     if (pickMode < PICK_RIGIDBODIES && editorScene.octree !is null)
     {
         RayQueryResult result = editorScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, camera.farClip,
-            pickModeDrawableFlags[pickMode], 0x7fffffff);
+            pickModeDrawableTypes[pickMode], 0x7fffffff);
 
         if (result.drawable !is null && result.drawable.typeName == "TerrainPatch" && result.drawable.node.parent !is null)
         {
@@ -2366,7 +2366,7 @@ void ViewRaycast(bool mouseClick)
             return;
 
         RayQueryResult result = editorScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, camera.farClip,
-            pickModeDrawableFlags[pickMode], 0x7fffffff);
+            pickModeDrawableTypes[pickMode], 0x7fffffff);
 
         if (result.drawable !is null)
         {
@@ -2762,7 +2762,7 @@ Drawable@ GetDrawableAtMousePostion()
     if (editorScene.octree is null)
         return null;
 
-    RayQueryResult result = editorScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, camera.farClip, DRAWABLE_GEOMETRY, 0x7fffffff);
+    RayQueryResult result = editorScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, camera.farClip, DrawableTypes::Geometry, 0x7fffffff);
 
     return result.drawable;
 }
