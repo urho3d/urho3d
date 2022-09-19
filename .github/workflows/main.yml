@@ -238,11 +238,10 @@ jobs:
         id: install_dependencies
         shell: bash {0} # Allow catching errors
         run: |
-          # Temporary use old version of Doxygen https://github.com/urho3d/Urho3D/issues/2757
           # Server may reject connection, so try several times
           for (( i = 0; i < 4; ++i ))
           do
-            choco install --no-progress doxygen.install --version 1.8.20
+            choco install --no-progress doxygen.install
             if (( $? == 0 )) # Exit code of the previous command
             then
               break

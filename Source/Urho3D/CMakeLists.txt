@@ -155,9 +155,10 @@ define_source_files (EXCLUDE_PATTERNS ${EXCLUDE_PATTERNS} GLOB_CPP_PATTERNS *.cp
 
 if (URHO3D_GENERATEBINDINGS)
 
-    find_package (Doxygen 1.8.17 REQUIRED)
+    # https://github.com/urho3d/Urho3D/issues/2757
+    find_package (Doxygen 1.9.2 REQUIRED)
     if (NOT DOXYGEN_FOUND)
-        message (FATAL_ERROR "Doxygen >= 1.8.17 required to generate bindings")
+        message (FATAL_ERROR "Doxygen >= 1.9.2 required to generate bindings")
     endif ()
 
     # Generating Doxyfile

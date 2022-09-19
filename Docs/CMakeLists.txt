@@ -24,7 +24,8 @@ unset (CMAKE_FIND_ROOT_PATH)
 if (URHO3D_DOCS)
     set (REQUIRED REQUIRED)
 endif ()
-find_package (Doxygen ${REQUIRED})
+# https://github.com/urho3d/Urho3D/issues/2757
+find_package (Doxygen 1.9.2 ${REQUIRED})
 
 if (DOXYGEN_FOUND)
     # It is not an error when DOT is not found, instead just switching off the Doxygen's HAVE_DOT option
