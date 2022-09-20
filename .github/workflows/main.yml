@@ -89,8 +89,8 @@ jobs:
       - name: Test
         run: script/dockerized.sh ${PLATFORM/-*} rake test
         if: startsWith(matrix.platform, 'linux') || matrix.platform == 'android'
-      - name: Documentation
-        run: script/dockerized.sh ${PLATFORM/-*} rake doc
+      #- name: Documentation
+      #  run: script/dockerized.sh ${PLATFORM/-*} rake doc
       - name: Install
         run: |
           script/dockerized.sh ${PLATFORM/-*} rake install
