@@ -2478,3 +2478,7 @@ ALIASES += alias{1}=""
 ALIASES += specialization{1}=""
 ALIASES += specialization{2}=""
 ALIASES += specialization{3}=""
+
+# For Doxygen 1.9.5
+HTML_DYNAMIC_MENUS = NO
+HTML_COLORSTYLE = LIGHT
