@@ -40,7 +40,7 @@ void Drawable2D::RegisterObject(Context* context)
 {
     URHO3D_ACCESSOR_ATTRIBUTE("Layer", GetLayer, SetLayer, int, 0, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Order in Layer", GetOrderInLayer, SetOrderInLayer, int, 0, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("View Mask", int, viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("View Mask", u32, viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
 }
 
 void Drawable2D::OnSetEnabled()

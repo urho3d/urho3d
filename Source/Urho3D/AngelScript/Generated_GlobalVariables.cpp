@@ -13,7 +13,7 @@ namespace Urho3D
 
 void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
 {
-    // static const float ANIMATION_LOD_BASESCALE | File: ../Graphics/Drawable.h
+    // constexpr float ANIMATION_LOD_BASESCALE | File: ../Graphics/Drawable.h
     engine->RegisterGlobalProperty("const float ANIMATION_LOD_BASESCALE", (void*)&ANIMATION_LOD_BASESCALE);
 
     // constexpr i32 BITS_PER_COMPONENT | File: ../GraphicsAPI/GraphicsDefs.h
@@ -34,7 +34,7 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // constexpr float DEFAULT_FONT_SIZE | File: ../UI/Text.h
     engine->RegisterGlobalProperty("const float DEFAULT_FONT_SIZE", (void*)&DEFAULT_FONT_SIZE);
 
-    // static const unsigned DEFAULT_LIGHTMASK | File: ../Graphics/Drawable.h
+    // constexpr u32 DEFAULT_LIGHTMASK | File: ../Graphics/Drawable.h
     engine->RegisterGlobalProperty("const uint DEFAULT_LIGHTMASK", (void*)&DEFAULT_LIGHTMASK);
 
     // static const float DEFAULT_NEARCLIP | File: ../Graphics/Camera.h
@@ -49,13 +49,13 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // static constexpr i8 DEFAULT_RENDER_ORDER | File: ../Graphics/Material.h
     engine->RegisterGlobalProperty("const int8 DEFAULT_RENDER_ORDER", (void*)&DEFAULT_RENDER_ORDER);
 
-    // static const unsigned DEFAULT_SHADOWMASK | File: ../Graphics/Drawable.h
+    // constexpr u32 DEFAULT_SHADOWMASK | File: ../Graphics/Drawable.h
     engine->RegisterGlobalProperty("const uint DEFAULT_SHADOWMASK", (void*)&DEFAULT_SHADOWMASK);
 
-    // static const unsigned DEFAULT_VIEWMASK | File: ../Graphics/Drawable.h
+    // constexpr u32 DEFAULT_VIEWMASK | File: ../Graphics/Drawable.h
     engine->RegisterGlobalProperty("const uint DEFAULT_VIEWMASK", (void*)&DEFAULT_VIEWMASK);
 
-    // static const unsigned DEFAULT_ZONEMASK | File: ../Graphics/Drawable.h
+    // constexpr u32 DEFAULT_ZONEMASK | File: ../Graphics/Drawable.h
     engine->RegisterGlobalProperty("const uint DEFAULT_ZONEMASK", (void*)&DEFAULT_ZONEMASK);
 
     // const Vector3 DOT_SCALE | File: ../GraphicsAPI/GraphicsDefs.h
@@ -280,7 +280,7 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // static const int MAX_TEXTURE_QUALITY_LEVELS | File: ../GraphicsAPI/Texture.h
     engine->RegisterGlobalProperty("const int MAX_TEXTURE_QUALITY_LEVELS", (void*)&MAX_TEXTURE_QUALITY_LEVELS);
 
-    // static const int MAX_VERTEX_LIGHTS | File: ../Graphics/Drawable.h
+    // constexpr i32 MAX_VERTEX_LIGHTS | File: ../Graphics/Drawable.h
     engine->RegisterGlobalProperty("const int MAX_VERTEX_LIGHTS", (void*)&MAX_VERTEX_LIGHTS);
 
     // constexpr i32 MAX_VERTEX_STREAMS | File: ../GraphicsAPI/GraphicsDefs.h
