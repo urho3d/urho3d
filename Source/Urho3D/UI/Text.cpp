@@ -63,16 +63,16 @@ void Text::RegisterObject(Context* context)
     URHO3D_COPY_BASE_ATTRIBUTES(UISelectable);
     URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Use Derived Opacity", false);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Font", GetFontAttr, SetFontAttr, ResourceRef, ResourceRef(Font::GetTypeStatic()), AM_FILE);
-    URHO3D_ATTRIBUTE("Font Size", float, fontSize_, DEFAULT_FONT_SIZE, AM_FILE);
+    URHO3D_ATTRIBUTE("Font Size", fontSize_, DEFAULT_FONT_SIZE, AM_FILE);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Text", GetTextAttr, SetTextAttr, String, String::EMPTY, AM_FILE);
     URHO3D_ENUM_ATTRIBUTE("Text Alignment", textAlignment_, horizontalAlignments, HA_LEFT, AM_FILE);
-    URHO3D_ATTRIBUTE("Row Spacing", float, rowSpacing_, 1.0f, AM_FILE);
-    URHO3D_ATTRIBUTE("Word Wrap", bool, wordWrap_, false, AM_FILE);
+    URHO3D_ATTRIBUTE("Row Spacing", rowSpacing_, 1.0f, AM_FILE);
+    URHO3D_ATTRIBUTE("Word Wrap", wordWrap_, false, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Auto Localizable", GetAutoLocalizable, SetAutoLocalizable, bool, false, AM_FILE);
     URHO3D_ENUM_ATTRIBUTE("Text Effect", textEffect_, textEffects, TE_NONE, AM_FILE);
-    URHO3D_ATTRIBUTE("Shadow Offset", IntVector2, shadowOffset_, IntVector2(1, 1), AM_FILE);
-    URHO3D_ATTRIBUTE("Stroke Thickness", int, strokeThickness_, 1, AM_FILE);
-    URHO3D_ATTRIBUTE("Round Stroke", bool, roundStroke_, false, AM_FILE);
+    URHO3D_ATTRIBUTE("Shadow Offset", shadowOffset_, IntVector2(1, 1), AM_FILE);
+    URHO3D_ATTRIBUTE("Stroke Thickness", strokeThickness_, 1, AM_FILE);
+    URHO3D_ATTRIBUTE("Round Stroke", roundStroke_, false, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Effect Color", GetEffectColor, SetEffectColor, Color, Color::BLACK, AM_FILE);
 
     // Change the default value for UseDerivedOpacity

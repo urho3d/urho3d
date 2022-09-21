@@ -74,10 +74,10 @@ Drawable::~Drawable()
 
 void Drawable::RegisterObject(Context* context)
 {
-    URHO3D_ATTRIBUTE("Max Lights", int, maxLights_, 0, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("View Mask", u32, viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Light Mask", u32, lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Shadow Mask", u32, shadowMask_, DEFAULT_SHADOWMASK, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Max Lights", maxLights_, 0, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("View Mask", viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Light Mask", lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Shadow Mask", shadowMask_, DEFAULT_SHADOWMASK, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Zone Mask", GetZoneMask, SetZoneMask, u32, DEFAULT_ZONEMASK, AM_DEFAULT);
 }
 
