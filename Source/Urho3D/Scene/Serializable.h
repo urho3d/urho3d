@@ -232,8 +232,9 @@ namespace AttributeMetadata
     Urho3D::GetVariantType<std::remove_reference_t<decltype(variable)>>(), name, URHO3D_MAKE_MEMBER_ATTRIBUTE_ACCESSOR(std::remove_reference_t<decltype(variable)>, variable), nullptr, defaultValue, mode))
 
 /// Define an object member attribute. Post-set member function callback is called when attribute set.
-#define URHO3D_ATTRIBUTE_EX(name, typeName, variable, postSetCallback, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
-    Urho3D::GetVariantType<typeName>(), name, URHO3D_MAKE_MEMBER_ATTRIBUTE_ACCESSOR_EX(typeName, variable, postSetCallback), nullptr, defaultValue, mode))
+#define URHO3D_ATTRIBUTE_EX(name, variable, postSetCallback, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
+    Urho3D::GetVariantType<std::remove_reference_t<decltype(variable)>>(), name, URHO3D_MAKE_MEMBER_ATTRIBUTE_ACCESSOR_EX(std::remove_reference_t<decltype(variable)>, variable, postSetCallback), nullptr, defaultValue, mode))
+
 /// Define an attribute that uses get and set functions.
 #define URHO3D_ACCESSOR_ATTRIBUTE(name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
     Urho3D::GetVariantType<typeName>(), name, URHO3D_MAKE_GET_SET_ATTRIBUTE_ACCESSOR(getFunction, setFunction, typeName), nullptr, defaultValue, mode))
