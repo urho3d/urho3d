@@ -141,8 +141,8 @@ void Light::RegisterObject(Context* context)
     URHO3D_ATTRIBUTE_EX("Normal Offset", float, shadowBias_.normalOffset_, ValidateShadowBias, DEFAULT_NORMALOFFSET, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Near/Farclip Ratio", float, shadowNearFarRatio_, DEFAULT_SHADOWNEARFARRATIO, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Max Extrusion", GetShadowMaxExtrusion, SetShadowMaxExtrusion, float, DEFAULT_SHADOWMAXEXTRUSION, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("View Mask", int, viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Light Mask", int, lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("View Mask", u32, viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Light Mask", u32, lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
 }
 
 void Light::ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQueryResult>& results)

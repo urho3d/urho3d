@@ -66,9 +66,9 @@ void Zone::RegisterObject(Context* context)
     URHO3D_ATTRIBUTE_EX("Priority", int, priority_, MarkNodeDirty, 0, AM_DEFAULT);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Zone Texture", GetZoneTextureAttr, SetZoneTextureAttr, ResourceRef,
         ResourceRef(TextureCube::GetTypeStatic()), AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Light Mask", int, lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Shadow Mask", int, shadowMask_, DEFAULT_SHADOWMASK, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Zone Mask", GetZoneMask, SetZoneMask, unsigned, DEFAULT_ZONEMASK, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Light Mask", u32, lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Shadow Mask", u32, shadowMask_, DEFAULT_SHADOWMASK, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Zone Mask", GetZoneMask, SetZoneMask, u32, DEFAULT_ZONEMASK, AM_DEFAULT);
 }
 
 void Zone::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)

@@ -23,12 +23,12 @@ enum class DrawableTypes : u8
 };
 URHO3D_FLAGS(DrawableTypes);
 
-static const unsigned DEFAULT_VIEWMASK = M_MAX_UNSIGNED;
-static const unsigned DEFAULT_LIGHTMASK = M_MAX_UNSIGNED;
-static const unsigned DEFAULT_SHADOWMASK = M_MAX_UNSIGNED;
-static const unsigned DEFAULT_ZONEMASK = M_MAX_UNSIGNED;
-static const int MAX_VERTEX_LIGHTS = 4;
-static const float ANIMATION_LOD_BASESCALE = 2500.0f;
+inline constexpr u32 DEFAULT_VIEWMASK = M_U32_MASK_ALL_BITS;
+inline constexpr u32 DEFAULT_LIGHTMASK = M_U32_MASK_ALL_BITS;
+inline constexpr u32 DEFAULT_SHADOWMASK = M_U32_MASK_ALL_BITS;
+inline constexpr u32 DEFAULT_ZONEMASK = M_U32_MASK_ALL_BITS;
+inline constexpr i32 MAX_VERTEX_LIGHTS = 4;
+inline constexpr float ANIMATION_LOD_BASESCALE = 2500.0f;
 
 class Camera;
 class File;
