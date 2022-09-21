@@ -334,19 +334,28 @@ public:
     /// Construct from unsigned integer.
     Variant(unsigned value)             // NOLINT(google-explicit-constructor)
     {
-        *this = (int)value;
+        *this = value;
+    }
+
+    // c32 not bound because in AngelScript c32 just alias for u32 and c32 conflicts with u32
+
+    /// Construct from Unicode code point.
+    /// @nobind
+    Variant(c32 value)                  // NOLINT(google-explicit-constructor)
+    {
+        *this = value;
     }
 
     /// Construct from unsigned integer.
     Variant(unsigned long long value)   // NOLINT(google-explicit-constructor)
     {
-        *this = (long long)value;
+        *this = value;
     }
 
     /// Construct from a string hash (convert to integer).
     Variant(const StringHash& value)    // NOLINT(google-explicit-constructor)
     {
-        *this = (int)value.Value();
+        *this = value;
     }
 
     /// Construct from a bool.
@@ -589,6 +598,15 @@ public:
         return *this;
     }
 
+    /// Assign from an Unicode code point.
+    /// @nobind
+    Variant& operator =(c32 rhs)
+    {
+        SetType(VAR_INT);
+        value_.int_ = (int)rhs;
+        return *this;
+    }
+
     /// Assign from a StringHash (convert to integer).
     Variant& operator =(const StringHash& rhs)
     {
@@ -817,6 +835,10 @@ public:
     /// Test for equality with an unsigned integer. To return true, both the type and value must match.
     bool operator ==(unsigned rhs) const { return type_ == VAR_INT ? value_.int_ == static_cast<int>(rhs) : false; }
 
+    /// Test for equality with an Unicode code point. To return true, both the type and value must match.
+    /// @nobind
+    bool operator ==(c32 rhs) const { return type_ == VAR_INT ? value_.int_ == static_cast<int>(rhs) : false; }
+
     /// Test for equality with an 64 bit integer. To return true, both the type and value must match.
     bool operator ==(long long rhs) const { return type_ == VAR_INT64 ? value_.int64_ == rhs : false; }
 
@@ -939,7 +961,7 @@ public:
     }
 
     /// Test for equality with a StringHash. To return true, both the type and value must match.
-    bool operator ==(const StringHash& rhs) const { return type_ == VAR_INT ? static_cast<unsigned>(value_.int_) == rhs.Value() : false; }
+    bool operator ==(const StringHash& rhs) const { return type_ == VAR_INT ? static_cast<hash32>(value_.int_) == rhs.Value() : false; }
 
     /// Test for equality with a RefCounted pointer. To return true, both the type and value must match, with the exception that void pointer is also allowed.
     bool operator ==(RefCounted* rhs) const
@@ -978,6 +1000,9 @@ public:
 
     /// Test for inequality with an unsigned integer.
     bool operator !=(unsigned rhs) const { return !(*this == rhs); }
+
+    /// Test for inequality with an Unicode code point.
+    bool operator !=(c32 rhs) const { return !(*this == rhs); }
 
     /// Test for inequality with an 64 bit integer.
     bool operator !=(long long rhs) const { return !(*this == rhs); }
@@ -1127,6 +1152,15 @@ public:
             return static_cast<unsigned>(value_.float_);
         else if (type_ == VAR_DOUBLE)
             return static_cast<unsigned>(value_.double_);
+        else
+            return 0;
+    }
+
+    /// Return Unicode code point or zero on type mismatch.
+    c32 GetC32() const
+    {
+        if (type_ == VAR_INT)
+            return static_cast<c32>(value_.int_);
         else
             return 0;
     }
@@ -1406,6 +1440,8 @@ template <> inline VariantType GetVariantType<int>() { return VAR_INT; }
 
 template <> inline VariantType GetVariantType<unsigned>() { return VAR_INT; }
 
+template <> inline VariantType GetVariantType<c32>() { return VAR_INT; }
+
 template <> inline VariantType GetVariantType<long long>() { return VAR_INT64; }
 
 template <> inline VariantType GetVariantType<unsigned long long>() { return VAR_INT64; }
@@ -1460,6 +1496,8 @@ template <> inline VariantType GetVariantType<Matrix4>() { return VAR_MATRIX4; }
 template <> URHO3D_API int Variant::Get<int>() const;
 
 template <> URHO3D_API unsigned Variant::Get<unsigned>() const;
+
+template <> URHO3D_API c32 Variant::Get<c32>() const;
 
 template <> URHO3D_API long long Variant::Get<long long>() const;
 
