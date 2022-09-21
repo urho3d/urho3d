@@ -8,6 +8,7 @@
 
 #include <cstddef>
 #include <memory>
+#include <type_traits>
 
 namespace Urho3D
 {
@@ -227,8 +228,9 @@ namespace AttributeMetadata
 #define URHO3D_REMOVE_ATTRIBUTE(name) context->RemoveAttribute<ClassName>(name)
 
 /// Define an object member attribute.
-#define URHO3D_ATTRIBUTE(name, typeName, variable, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
-    Urho3D::GetVariantType<typeName>(), name, URHO3D_MAKE_MEMBER_ATTRIBUTE_ACCESSOR(typeName, variable), nullptr, defaultValue, mode))
+#define URHO3D_ATTRIBUTE(name, variable, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
+    Urho3D::GetVariantType<std::remove_reference_t<decltype(variable)>>(), name, URHO3D_MAKE_MEMBER_ATTRIBUTE_ACCESSOR(std::remove_reference_t<decltype(variable)>, variable), nullptr, defaultValue, mode))
+
 /// Define an object member attribute. Post-set member function callback is called when attribute set.
 #define URHO3D_ATTRIBUTE_EX(name, typeName, variable, postSetCallback, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
     Urho3D::GetVariantType<typeName>(), name, URHO3D_MAKE_MEMBER_ATTRIBUTE_ACCESSOR_EX(typeName, variable, postSetCallback), nullptr, defaultValue, mode))

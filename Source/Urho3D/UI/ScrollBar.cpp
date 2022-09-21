@@ -68,10 +68,10 @@ void ScrollBar::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Value", GetValue, SetValue, float, 0.0f, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Scroll Step", GetScrollStep, SetScrollStep, float, DEFAULT_SCROLL_STEP, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Step Factor", GetStepFactor, SetStepFactor, float, 1.0f, AM_FILE);
-    URHO3D_ATTRIBUTE("Left Image Rect", IntRect, leftRect_, IntRect::ZERO, AM_FILE);
-    URHO3D_ATTRIBUTE("Right Image Rect", IntRect, rightRect_, IntRect::ZERO, AM_FILE);
-    URHO3D_ATTRIBUTE("Up Image Rect", IntRect, upRect_, IntRect::ZERO, AM_FILE);
-    URHO3D_ATTRIBUTE("Down Image Rect", IntRect, downRect_, IntRect::ZERO, AM_FILE);
+    URHO3D_ATTRIBUTE("Left Image Rect", leftRect_, IntRect::ZERO, AM_FILE);
+    URHO3D_ATTRIBUTE("Right Image Rect", rightRect_, IntRect::ZERO, AM_FILE);
+    URHO3D_ATTRIBUTE("Up Image Rect", upRect_, IntRect::ZERO, AM_FILE);
+    URHO3D_ATTRIBUTE("Down Image Rect", downRect_, IntRect::ZERO, AM_FILE);
 }
 
 void ScrollBar::ApplyAttributes()

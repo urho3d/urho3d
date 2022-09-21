@@ -168,9 +168,9 @@ void RaycastVehicle::RegisterObject(Context* context)
     context->RegisterFactory<RaycastVehicle>();
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Wheel data", GetWheelDataAttr, SetWheelDataAttr, VariantVector, Variant::emptyVariantVector, AM_DEFAULT)
         .SetMetadata(AttributeMetadata::P_VECTOR_STRUCT_ELEMENTS, wheelElementNames);
-    URHO3D_ATTRIBUTE("Maximum side slip threshold", float, maxSideSlipSpeed_, 4.0f, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("RPM for wheel motors in air (0=calculate)", float, inAirRPM_, 0.0f, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Coordinate system", IntVector3, coordinateSystem_, RIGHT_UP_FORWARD, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Maximum side slip threshold", maxSideSlipSpeed_, 4.0f, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("RPM for wheel motors in air (0=calculate)", inAirRPM_, 0.0f, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Coordinate system", coordinateSystem_, RIGHT_UP_FORWARD, AM_DEFAULT);
 }
 
 void RaycastVehicle::OnSetEnabled()

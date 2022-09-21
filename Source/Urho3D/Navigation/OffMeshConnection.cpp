@@ -38,10 +38,10 @@ void OffMeshConnection::RegisterObject(Context* context)
 
     URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     URHO3D_ATTRIBUTE_EX("Endpoint NodeID", int, endPointID_, MarkEndPointDirty, 0, AM_DEFAULT | AM_NODEID);
-    URHO3D_ATTRIBUTE("Radius", float, radius_, DEFAULT_RADIUS, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Bidirectional", bool, bidirectional_, true, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Flags Mask", unsigned, mask_, DEFAULT_MASK_FLAG, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Area Type", unsigned, areaId_, DEFAULT_AREA, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Radius", radius_, DEFAULT_RADIUS, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Bidirectional", bidirectional_, true, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Flags Mask", mask_, DEFAULT_MASK_FLAG, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Area Type", areaId_, DEFAULT_AREA, AM_DEFAULT);
 }
 
 void OffMeshConnection::ApplyAttributes()
