@@ -737,6 +737,11 @@ template <> unsigned Variant::Get<unsigned>() const
     return GetUInt();
 }
 
+template <> c32 Variant::Get<c32>() const
+{
+    return GetC32();
+}
+
 template <> long long Variant::Get<long long>() const
 {
     return GetInt64();

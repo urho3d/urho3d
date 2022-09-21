@@ -2922,6 +2922,8 @@ static void Register_Variant(asIScriptEngine* engine)
 {
     // Variant::Variant(VariantType type, const char* value)
     // Error: type "const char*" can not automatically bind
+    // Variant::Variant(c32 value)
+    // Not registered because have @nobind mark
     // Variant::Variant(const VariantVector& value)
     // Error: type "const VariantVector&" can not automatically bind
     // Variant::Variant(const char* type, const char* value)

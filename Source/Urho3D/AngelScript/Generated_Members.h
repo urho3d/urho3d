@@ -5623,6 +5623,8 @@ template <class T> void RegisterMembers_Variant(asIScriptEngine* engine, const c
     // Only operator == is needed
     // bool Variant::operator !=(unsigned rhs) const
     // Only operator == is needed
+    // bool Variant::operator !=(c32 rhs) const
+    // Only operator == is needed
     // bool Variant::operator !=(long long rhs) const
     // Only operator == is needed
     // bool Variant::operator !=(unsigned long long rhs) const
@@ -5677,12 +5679,16 @@ template <class T> void RegisterMembers_Variant(asIScriptEngine* engine, const c
     // Only operator == is needed
     // bool Variant::operator !=(const Matrix4& rhs) const
     // Only operator == is needed
+    // Variant& Variant::operator =(c32 rhs)
+    // Not registered because have @nobind mark
     // Variant& Variant::operator =(const char* rhs)
     // Error: type "const char*" can not automatically bind
     // Variant& Variant::operator =(void* rhs)
     // Error: type "void*" can not automatically bind
     // Variant& Variant::operator =(const VariantVector& rhs)
     // Error: type "const VariantVector&" can not automatically bind
+    // bool Variant::operator ==(c32 rhs) const
+    // Not registered because have @nobind mark
     // bool Variant::operator ==(void* rhs) const
     // Error: type "void*" can not automatically bind
     // bool Variant::operator ==(const VariantVector& rhs) const
@@ -5706,6 +5712,9 @@ template <class T> void RegisterMembers_Variant(asIScriptEngine* engine, const c
 
     // const Vector<unsigned char>& Variant::GetBuffer() const
     engine->RegisterObjectMethod(className, "Array<uint8>@ GetBuffer() const", AS_FUNCTION_OBJFIRST(Variant_constspVectorlesunsignedspchargreamp_GetBuffer_void_template<Variant>), AS_CALL_CDECL_OBJFIRST);
+
+    // c32 Variant::GetC32() const
+    engine->RegisterObjectMethod(className, "c32 GetC32() const", AS_METHODPR(T, GetC32, () const, c32), AS_CALL_THISCALL);
 
     // const Color& Variant::GetColor() const
     engine->RegisterObjectMethod(className, "const Color& GetColor() const", AS_METHODPR(T, GetColor, () const, const Color&), AS_CALL_THISCALL);
@@ -5986,6 +5995,8 @@ template <class T> void RegisterMembers_Variant(asIScriptEngine* engine, const c
     // template <> int Variant::Get() const
     // Not registered because template
     // template <> unsigned Variant::Get() const
+    // Not registered because template
+    // template <> c32 Variant::Get() const
     // Not registered because template
     // template <> long long Variant::Get() const
     // Not registered because template
