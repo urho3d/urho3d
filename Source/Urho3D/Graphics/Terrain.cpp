@@ -102,31 +102,31 @@ void Terrain::RegisterObject(Context* context)
 {
     context->RegisterFactory<Terrain>(GEOMETRY_CATEGORY);
 
-    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Height Map", GetHeightMapAttr, SetHeightMapAttr, ResourceRef, ResourceRef(Image::GetTypeStatic()),
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, true, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Height Map", GetHeightMapAttr, SetHeightMapAttr, ResourceRef(Image::GetTypeStatic()),
         AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()),
+    URHO3D_ACCESSOR_ATTRIBUTE("Material", GetMaterialAttr, SetMaterialAttr, ResourceRef(Material::GetTypeStatic()),
         AM_DEFAULT);
     URHO3D_ATTRIBUTE_EX("North Neighbor NodeID", northID_, MarkNeighborsDirty, 0, AM_DEFAULT | AM_NODEID);
     URHO3D_ATTRIBUTE_EX("South Neighbor NodeID", southID_, MarkNeighborsDirty, 0, AM_DEFAULT | AM_NODEID);
     URHO3D_ATTRIBUTE_EX("West Neighbor NodeID", westID_, MarkNeighborsDirty, 0, AM_DEFAULT | AM_NODEID);
     URHO3D_ATTRIBUTE_EX("East Neighbor NodeID", eastID_, MarkNeighborsDirty, 0, AM_DEFAULT | AM_NODEID);
     URHO3D_ATTRIBUTE_EX("Vertex Spacing", spacing_, MarkTerrainDirty, DEFAULT_SPACING, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Patch Size", GetPatchSize, SetPatchSizeAttr, int, DEFAULT_PATCH_SIZE, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Max LOD Levels", GetMaxLodLevels, SetMaxLodLevelsAttr, unsigned, MAX_LOD_LEVELS, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Patch Size", GetPatchSize, SetPatchSizeAttr, DEFAULT_PATCH_SIZE, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Max LOD Levels", GetMaxLodLevels, SetMaxLodLevelsAttr, MAX_LOD_LEVELS, AM_DEFAULT);
     URHO3D_ATTRIBUTE_EX("Smooth Height Map", smoothing_, MarkTerrainDirty, false, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Is Occluder", IsOccluder, SetOccluder, bool, false, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Cast Shadows", GetCastShadows, SetCastShadows, bool, false, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("LOD Bias", GetLodBias, SetLodBias, float, 1.0f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Max Lights", GetMaxLights, SetMaxLights, unsigned, 0, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("View Mask", GetViewMask, SetViewMask, u32, DEFAULT_VIEWMASK, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Light Mask", GetLightMask, SetLightMask, u32, DEFAULT_LIGHTMASK, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Shadow Mask", GetShadowMask, SetShadowMask, u32, DEFAULT_SHADOWMASK, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Zone Mask", GetZoneMask, SetZoneMask, u32, DEFAULT_ZONEMASK, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Occlusion LOD level", GetOcclusionLodLevel, SetOcclusionLodLevelAttr, unsigned, M_MAX_UNSIGNED, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Occluder", IsOccluder, SetOccluder, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, true, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Cast Shadows", GetCastShadows, SetCastShadows, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Draw Distance", GetDrawDistance, SetDrawDistance, 0.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Shadow Distance", GetShadowDistance, SetShadowDistance, 0.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("LOD Bias", GetLodBias, SetLodBias, 1.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Max Lights", GetMaxLights, SetMaxLights, 0, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("View Mask", GetViewMask, SetViewMask, DEFAULT_VIEWMASK, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Light Mask", GetLightMask, SetLightMask, DEFAULT_LIGHTMASK, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Shadow Mask", GetShadowMask, SetShadowMask, DEFAULT_SHADOWMASK, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Zone Mask", GetZoneMask, SetZoneMask, DEFAULT_ZONEMASK, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Occlusion LOD level", GetOcclusionLodLevel, SetOcclusionLodLevelAttr, M_MAX_UNSIGNED, AM_DEFAULT);
 }
 
 void Terrain::ApplyAttributes()

@@ -87,23 +87,23 @@ void RibbonTrail::RegisterObject(Context* context)
 {
     context->RegisterFactory<RibbonTrail>(GEOMETRY_CATEGORY);
 
-    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled,true, AM_DEFAULT);
     URHO3D_COPY_BASE_ATTRIBUTES(Drawable);
-    URHO3D_ACCESSOR_ATTRIBUTE("Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Emitting", IsEmitting, SetEmitting, bool, true, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Update Invisible", GetUpdateInvisible, SetUpdateInvisible, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Material", GetMaterialAttr, SetMaterialAttr, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Emitting", IsEmitting, SetEmitting, true, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Update Invisible", GetUpdateInvisible, SetUpdateInvisible, false, AM_DEFAULT);
     URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Trail Type", GetTrailType, SetTrailType, TrailType, trailTypeNames, TT_FACE_CAMERA, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Base Velocity", GetBaseVelocity, SetBaseVelocity, Vector3, Vector3::ZERO, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Tail Lifetime", GetLifetime, SetLifetime, float, 1.0f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Tail Column", GetTailColumn, SetTailColumn, unsigned, 0, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Vertex Distance", GetVertexDistance, SetVertexDistance, float, 0.1f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Width", GetWidth, SetWidth, float, 0.2f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Start Scale", GetStartScale, SetStartScale, float, 1.0f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("End Scale", GetEndScale, SetEndScale, float, 1.0f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Start Color", GetStartColor, SetStartColor, Color, Color::WHITE, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("End Color", GetEndColor, SetEndColor, Color, Color(1.0f, 1.0f, 1.0f, 0.0f), AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Animation LOD Bias", GetAnimationLodBias, SetAnimationLodBias, float, 1.0f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Sort By Distance", IsSorted, SetSorted, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Base Velocity", GetBaseVelocity, SetBaseVelocity, Vector3::ZERO, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Tail Lifetime", GetLifetime, SetLifetime, 1.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Tail Column", GetTailColumn, SetTailColumn, 0, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Vertex Distance", GetVertexDistance, SetVertexDistance, 0.1f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Width", GetWidth, SetWidth, 0.2f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Start Scale", GetStartScale, SetStartScale, 1.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("End Scale", GetEndScale, SetEndScale, 1.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Start Color", GetStartColor, SetStartColor, Color::WHITE, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("End Color", GetEndColor, SetEndColor, Color(1.0f, 1.0f, 1.0f, 0.0f), AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Animation LOD Bias", GetAnimationLodBias, SetAnimationLodBias, 1.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Sort By Distance", IsSorted, SetSorted, false, AM_DEFAULT);
 }
 
 void RibbonTrail::ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQueryResult>& results)

@@ -102,32 +102,32 @@ void Light::RegisterObject(Context* context)
 {
     context->RegisterFactory<Light>(SCENE_CATEGORY);
 
-    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, true, AM_DEFAULT);
     URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Light Type", GetLightType, SetLightType, LightType, typeNames, DEFAULT_LIGHTTYPE, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Color", GetColor, SetColor, Color, Color::WHITE, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Specular Intensity", GetSpecularIntensity, SetSpecularIntensity, float, DEFAULT_SPECULARINTENSITY,
+    URHO3D_ACCESSOR_ATTRIBUTE("Color", GetColor, SetColor, Color::WHITE, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Specular Intensity", GetSpecularIntensity, SetSpecularIntensity, DEFAULT_SPECULARINTENSITY,
         AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Brightness Multiplier", GetBrightness, SetBrightness, float, DEFAULT_BRIGHTNESS, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Temperature", GetTemperature, SetTemperature, float, DEFAULT_TEMPERATURE, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Brightness Multiplier", GetBrightness, SetBrightness, DEFAULT_BRIGHTNESS, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Temperature", GetTemperature, SetTemperature, DEFAULT_TEMPERATURE, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Use Physical Values", usePhysicalValues_, false, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Radius", GetRadius, SetRadius, float, DEFAULT_RADIUS, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Length", GetLength, SetLength, float, DEFAULT_LENGTH, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Range", GetRange, SetRange, float, DEFAULT_RANGE, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Spot FOV", GetFov, SetFov, float, DEFAULT_LIGHT_FOV, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Spot Aspect Ratio", GetAspectRatio, SetAspectRatio, float, 1.0f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Attenuation Texture", GetRampTextureAttr, SetRampTextureAttr, ResourceRef,
+    URHO3D_ACCESSOR_ATTRIBUTE("Radius", GetRadius, SetRadius, DEFAULT_RADIUS, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Length", GetLength, SetLength, DEFAULT_LENGTH, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Range", GetRange, SetRange, DEFAULT_RANGE, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Spot FOV", GetFov, SetFov, DEFAULT_LIGHT_FOV, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Spot Aspect Ratio", GetAspectRatio, SetAspectRatio, 1.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Attenuation Texture", GetRampTextureAttr, SetRampTextureAttr,
         ResourceRef(Texture2D::GetTypeStatic()), AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Light Shape Texture", GetShapeTextureAttr, SetShapeTextureAttr, ResourceRef,
+    URHO3D_ACCESSOR_ATTRIBUTE("Light Shape Texture", GetShapeTextureAttr, SetShapeTextureAttr,
         ResourceRef(Texture2D::GetTypeStatic()), AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, true, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Cast Shadows", castShadows_, false, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Per Vertex", perVertex_, false, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Fade Distance", GetFadeDistance, SetFadeDistance, float, 0.0f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Shadow Fade Distance", GetShadowFadeDistance, SetShadowFadeDistance, float, 0.0f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Shadow Intensity", GetShadowIntensity, SetShadowIntensity, float, 0.0f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Shadow Resolution", GetShadowResolution, SetShadowResolution, float, 1.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Draw Distance", GetDrawDistance, SetDrawDistance, 0.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Fade Distance", GetFadeDistance, SetFadeDistance, 0.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Shadow Distance", GetShadowDistance, SetShadowDistance, 0.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Shadow Fade Distance", GetShadowFadeDistance, SetShadowFadeDistance, 0.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Shadow Intensity", GetShadowIntensity, SetShadowIntensity, 0.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Shadow Resolution", GetShadowResolution, SetShadowResolution, 1.0f, AM_DEFAULT);
     URHO3D_ATTRIBUTE_EX("Focus To Scene", shadowFocus_.focus_, ValidateShadowFocus, true, AM_DEFAULT);
     URHO3D_ATTRIBUTE_EX("Non-uniform View", shadowFocus_.nonUniform_, ValidateShadowFocus, true, AM_DEFAULT);
     URHO3D_ATTRIBUTE_EX("Auto-Reduce Size", shadowFocus_.autoSize_, ValidateShadowFocus, true, AM_DEFAULT);
@@ -140,7 +140,7 @@ void Light::RegisterObject(Context* context)
     URHO3D_ATTRIBUTE_EX("Depth Slope Bias", shadowBias_.slopeScaledBias_, ValidateShadowBias, DEFAULT_SLOPESCALEDBIAS, AM_DEFAULT);
     URHO3D_ATTRIBUTE_EX("Normal Offset", shadowBias_.normalOffset_, ValidateShadowBias, DEFAULT_NORMALOFFSET, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Near/Farclip Ratio", shadowNearFarRatio_, DEFAULT_SHADOWNEARFARRATIO, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Max Extrusion", GetShadowMaxExtrusion, SetShadowMaxExtrusion, float, DEFAULT_SHADOWMAXEXTRUSION, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Max Extrusion", GetShadowMaxExtrusion, SetShadowMaxExtrusion, DEFAULT_SHADOWMAXEXTRUSION, AM_DEFAULT);
     URHO3D_ATTRIBUTE("View Mask", viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Light Mask", lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
 }

@@ -30,7 +30,7 @@ Constraint2D::~Constraint2D()
 
 void Constraint2D::RegisterObject(Context* context)
 {
-    URHO3D_ACCESSOR_ATTRIBUTE("Collide Connected", GetCollideConnected, SetCollideConnected, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Collide Connected", GetCollideConnected, SetCollideConnected, false, AM_DEFAULT);
     URHO3D_ATTRIBUTE_EX("Other Body NodeID", otherBodyNodeID_, MarkOtherBodyNodeIDDirty, 0, AM_DEFAULT | AM_NODEID);
 }
 

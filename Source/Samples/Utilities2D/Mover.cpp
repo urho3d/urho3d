@@ -30,7 +30,7 @@ void Mover::RegisterObject(Context* context)
 
     // These macros register the class attribute to the Context for automatic load / save handling.
     // We specify the Default attribute mode which means it will be used both for saving into file, and network replication.
-    URHO3D_ACCESSOR_ATTRIBUTE("Path", GetPathAttr, SetPathAttr, Vector<unsigned char>, Variant::emptyBuffer, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Path", GetPathAttr, SetPathAttr, Variant::emptyBuffer, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Speed", speed_, 0.8f, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Current Path ID", currentPathID_, 1, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Emit Time", emitTime_, 0.0f, AM_DEFAULT);

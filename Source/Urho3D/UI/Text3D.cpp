@@ -51,27 +51,27 @@ void Text3D::RegisterObject(Context* context)
 {
     context->RegisterFactory<Text3D>(GEOMETRY_CATEGORY);
 
-    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Font", GetFontAttr, SetFontAttr, ResourceRef, ResourceRef(Font::GetTypeStatic()), AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()),
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, true, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Font", GetFontAttr, SetFontAttr, ResourceRef(Font::GetTypeStatic()), AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Material", GetMaterialAttr, SetMaterialAttr, ResourceRef(Material::GetTypeStatic()),
         AM_DEFAULT);
     URHO3D_ATTRIBUTE("Font Size", text_.fontSize_, DEFAULT_FONT_SIZE, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Text", GetTextAttr, SetTextAttr, String, String::EMPTY, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Text", GetTextAttr, SetTextAttr, String::EMPTY, AM_DEFAULT);
     URHO3D_ENUM_ATTRIBUTE("Text Alignment", text_.textAlignment_, horizontalAlignments, HA_LEFT, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Row Spacing", text_.rowSpacing_, 1.0f, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Word Wrap", text_.wordWrap_, false, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Fixed Screen Size", IsFixedScreenSize, SetFixedScreenSize, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, true, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Fixed Screen Size", IsFixedScreenSize, SetFixedScreenSize, false, AM_DEFAULT);
     URHO3D_ENUM_ATTRIBUTE("Face Camera Mode", faceCameraMode_, faceCameraModeNames, FC_NONE, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Min Angle", minAngle_, 0.0f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Width", GetWidth, SetWidth, int, 0, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Draw Distance", GetDrawDistance, SetDrawDistance, 0.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Width", GetWidth, SetWidth, 0, AM_DEFAULT);
     URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Horiz Alignment", GetHorizontalAlignment, SetHorizontalAlignment, HorizontalAlignment,
         horizontalAlignments, HA_LEFT, AM_DEFAULT);
     URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Vert Alignment", GetVerticalAlignment, SetVerticalAlignment, VerticalAlignment, verticalAlignments,
         VA_TOP, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Opacity", GetOpacity, SetOpacity, float, 1.0f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Color", GetColorAttr, SetColor, Color, Color::WHITE, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Opacity", GetOpacity, SetOpacity, 1.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Color", GetColorAttr, SetColor, Color::WHITE, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Top Left Color", text_.colors_[0], Color::WHITE, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Top Right Color", text_.colors_[1], Color::WHITE, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Bottom Left Color", text_.colors_[2], Color::WHITE, AM_DEFAULT);
@@ -80,7 +80,7 @@ void Text3D::RegisterObject(Context* context)
     URHO3D_ATTRIBUTE("Shadow Offset", text_.shadowOffset_, IntVector2(1, 1), AM_DEFAULT);
     URHO3D_ATTRIBUTE("Stroke Thickness", text_.strokeThickness_, 1, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Round Stroke", text_.roundStroke_, false, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Effect Color", GetEffectColor, SetEffectColor, Color, Color::BLACK, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Effect Color", GetEffectColor, SetEffectColor, Color::BLACK, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Effect Depth Bias", text_.effectDepthBias_, DEFAULT_EFFECT_DEPTH_BIAS, AM_DEFAULT);
     URHO3D_COPY_BASE_ATTRIBUTES(Drawable);
 }

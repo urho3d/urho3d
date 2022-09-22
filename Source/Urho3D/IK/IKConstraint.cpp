@@ -32,9 +32,9 @@ void IKConstraint::RegisterObject(Context* context)
 {
     context->RegisterFactory<IKConstraint>(IK_CATEGORY);
 
-    URHO3D_ACCESSOR_ATTRIBUTE("Stiffness", GetStiffness, SetStiffness, float, 0.0f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Stretchiness", GetStretchiness, SetStretchiness, float, 0.0f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Length Constraints", GetLengthConstraints, SetLengthConstraints, Vector2, Vector2::ZERO, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Stiffness", GetStiffness, SetStiffness, 0.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Stretchiness", GetStretchiness, SetStretchiness, 0.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Length Constraints", GetLengthConstraints, SetLengthConstraints, Vector2::ZERO, AM_DEFAULT);
 }
 
 // ----------------------------------------------------------------------------

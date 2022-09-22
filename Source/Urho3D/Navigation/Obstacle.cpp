@@ -36,8 +36,8 @@ void Obstacle::RegisterObject(Context* context)
 {
     context->RegisterFactory<Obstacle>(NAVIGATION_CATEGORY);
     URHO3D_COPY_BASE_ATTRIBUTES(Component);
-    URHO3D_ACCESSOR_ATTRIBUTE("Radius", GetRadius, SetRadius, float, 5.0f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Height", GetHeight, SetHeight, float, 5.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Radius", GetRadius, SetRadius, 5.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Height", GetHeight, SetHeight, 5.0f, AM_DEFAULT);
 }
 
 void Obstacle::OnSetEnabled()

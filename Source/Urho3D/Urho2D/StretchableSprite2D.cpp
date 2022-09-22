@@ -110,7 +110,7 @@ void StretchableSprite2D::RegisterObject(Context* context)
     context->RegisterFactory<StretchableSprite2D>(URHO2D_CATEGORY);
 
     URHO3D_COPY_BASE_ATTRIBUTES(StaticSprite2D);
-    URHO3D_ACCESSOR_ATTRIBUTE("Border", GetBorder, SetBorder, IntRect, IntRect::ZERO, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Border", GetBorder, SetBorder, IntRect::ZERO, AM_DEFAULT);
 }
 
 void StretchableSprite2D::SetBorder(const IntRect& border)

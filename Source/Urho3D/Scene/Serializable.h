@@ -217,6 +217,10 @@ namespace AttributeMetadata
     static const StringHash P_VECTOR_STRUCT_ELEMENTS("VectorStructElements");
 }
 
+/// Get result type of a class member function with zero args.
+#define URHO3D_GETTER_RETURN_TYPE(getFunction) \
+    std::remove_cv_t<std::remove_reference_t<std::invoke_result_t<decltype(&ClassName::getFunction), ClassName>>>
+
 // The following macros need to be used within a class member function such as ClassName::RegisterObject().
 // A variable called "context" needs to exist in the current scope and point to a valid Context object.
 
@@ -244,7 +248,11 @@ namespace AttributeMetadata
     Urho3D::GetVariantType<typeName>(), name, URHO3D_MAKE_MEMBER_ATTRIBUTE_ACCESSOR_EX(typeName, variable, postSetCallback), nullptr, defaultValue, mode))
 
 /// Define an attribute that uses get and set functions.
-#define URHO3D_ACCESSOR_ATTRIBUTE(name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
+#define URHO3D_ACCESSOR_ATTRIBUTE(name, getFunction, setFunction, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
+    Urho3D::GetVariantType<URHO3D_GETTER_RETURN_TYPE(getFunction)>(), name, URHO3D_MAKE_GET_SET_ATTRIBUTE_ACCESSOR(getFunction, setFunction, URHO3D_GETTER_RETURN_TYPE(getFunction)), nullptr, defaultValue, mode))
+
+/// Define an attribute that uses get and set functions with forced type.
+#define URHO3D_ACCESSOR_ATTRIBUTE_FORCE_TYPE(name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo( \
     Urho3D::GetVariantType<typeName>(), name, URHO3D_MAKE_GET_SET_ATTRIBUTE_ACCESSOR(getFunction, setFunction, typeName), nullptr, defaultValue, mode))
 
 /// Define an object member attribute. Zero-based enum values are mapped to names through an array of C string pointers.
