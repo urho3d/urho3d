@@ -176,7 +176,7 @@ void ListView::RegisterObject(Context* context)
     HierarchyContainer::RegisterObject(context);
 
     URHO3D_COPY_BASE_ATTRIBUTES(ScrollView);
-    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Highlight Mode", GetHighlightMode, SetHighlightMode, HighlightMode, highlightModes, HM_FOCUS, AM_FILE);
+    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Highlight Mode", GetHighlightMode, SetHighlightMode, highlightModes, HM_FOCUS, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Multiselect", GetMultiselect, SetMultiselect, false, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Hierarchy Mode", GetHierarchyMode, SetHierarchyMode, false, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Base Indent", GetBaseIndent, SetBaseIndent, 0, AM_FILE);

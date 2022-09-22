@@ -48,7 +48,7 @@ void StaticSprite2D::RegisterObject(Context* context)
     URHO3D_COPY_BASE_ATTRIBUTES(Drawable2D);
     URHO3D_ACCESSOR_ATTRIBUTE("Sprite", GetSpriteAttr, SetSpriteAttr, ResourceRef(Sprite2D::GetTypeStatic()),
         AM_DEFAULT);
-    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Blend Mode", GetBlendMode, SetBlendMode, BlendMode, blendModeNames, BLEND_ALPHA, AM_DEFAULT);
+    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Blend Mode", GetBlendMode, SetBlendMode, blendModeNames, BLEND_ALPHA, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Flip X", GetFlipX, SetFlipX, false, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Flip Y", GetFlipY, SetFlipY, false, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Color", GetColor, SetColor, Color::WHITE, AM_DEFAULT);
