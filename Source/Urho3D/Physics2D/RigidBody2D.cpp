@@ -54,7 +54,7 @@ void RigidBody2D::RegisterObject(Context* context)
     context->RegisterFactory<RigidBody2D>(PHYSICS2D_CATEGORY);
 
     URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, true, AM_DEFAULT);
-    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Body Type", GetBodyType, SetBodyType, BodyType2D, bodyTypeNames, DEFAULT_BODYTYPE, AM_DEFAULT);
+    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Body Type", GetBodyType, SetBodyType, bodyTypeNames, DEFAULT_BODYTYPE, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Mass", GetMass, SetMass, 0.0f, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Inertia", GetInertia, SetInertia, 0.0f, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Mass Center", GetMassCenter, SetMassCenter, Vector2::ZERO, AM_DEFAULT);
