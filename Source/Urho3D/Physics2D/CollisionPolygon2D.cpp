@@ -30,7 +30,7 @@ void CollisionPolygon2D::RegisterObject(Context* context)
 
     URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     URHO3D_COPY_BASE_ATTRIBUTES(CollisionShape2D);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Vertices", GetVerticesAttr, SetVerticesAttr, Vector<u8>, Variant::emptyBuffer, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Vertices", GetVerticesAttr, SetVerticesAttr, Vector<u8>, Variant::emptyBuffer, AM_FILE);
 }
 
 void CollisionPolygon2D::SetVertexCount(i32 count)

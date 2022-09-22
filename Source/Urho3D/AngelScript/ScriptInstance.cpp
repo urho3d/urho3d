@@ -79,14 +79,14 @@ void ScriptInstance::RegisterObject(Context* context)
     context->RegisterFactory<ScriptInstance>(LOGIC_CATEGORY);
 
     URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Delayed Method Calls", GetDelayedCallsAttr, SetDelayedCallsAttr, Vector<unsigned char>,
+    URHO3D_ACCESSOR_ATTRIBUTE("Delayed Method Calls", GetDelayedCallsAttr, SetDelayedCallsAttr, Vector<unsigned char>,
         Variant::emptyBuffer, AM_FILE | AM_NOEDIT);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Script File", GetScriptFileAttr, SetScriptFileAttr, ResourceRef,
+    URHO3D_ACCESSOR_ATTRIBUTE("Script File", GetScriptFileAttr, SetScriptFileAttr, ResourceRef,
         ResourceRef(ScriptFile::GetTypeStatic()), AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Class Name", GetClassName, SetClassName, String, String::EMPTY, AM_DEFAULT);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Script Data", GetScriptDataAttr, SetScriptDataAttr, Vector<unsigned char>, Variant::emptyBuffer,
+    URHO3D_ACCESSOR_ATTRIBUTE("Script Data", GetScriptDataAttr, SetScriptDataAttr, Vector<unsigned char>, Variant::emptyBuffer,
         AM_FILE | AM_NOEDIT);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Script Network Data", GetScriptNetworkDataAttr, SetScriptNetworkDataAttr, Vector<unsigned char>,
+    URHO3D_ACCESSOR_ATTRIBUTE("Script Network Data", GetScriptNetworkDataAttr, SetScriptNetworkDataAttr, Vector<unsigned char>,
         Variant::emptyBuffer, AM_NET | AM_NOEDIT);
 }
 

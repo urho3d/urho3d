@@ -114,8 +114,8 @@ void SoundSource::RegisterObject(Context* context)
     context->RegisterFactory<SoundSource>(AUDIO_CATEGORY);
 
     URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Sound", GetSoundAttr, SetSoundAttr, ResourceRef, ResourceRef(Sound::GetTypeStatic()), AM_DEFAULT);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Type", GetSoundType, SetSoundType, String, SOUND_EFFECT, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Sound", GetSoundAttr, SetSoundAttr, ResourceRef, ResourceRef(Sound::GetTypeStatic()), AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Type", GetSoundType, SetSoundType, String, SOUND_EFFECT, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Frequency", frequency_, 0.0f, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Gain", gain_, 1.0f, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Attenuation", attenuation_, 1.0f, AM_DEFAULT);

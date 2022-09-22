@@ -62,9 +62,9 @@ void Text::RegisterObject(Context* context)
 
     URHO3D_COPY_BASE_ATTRIBUTES(UISelectable);
     URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Use Derived Opacity", false);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Font", GetFontAttr, SetFontAttr, ResourceRef, ResourceRef(Font::GetTypeStatic()), AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Font", GetFontAttr, SetFontAttr, ResourceRef, ResourceRef(Font::GetTypeStatic()), AM_FILE);
     URHO3D_ATTRIBUTE("Font Size", fontSize_, DEFAULT_FONT_SIZE, AM_FILE);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Text", GetTextAttr, SetTextAttr, String, String::EMPTY, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Text", GetTextAttr, SetTextAttr, String, String::EMPTY, AM_FILE);
     URHO3D_ENUM_ATTRIBUTE("Text Alignment", textAlignment_, horizontalAlignments, HA_LEFT, AM_FILE);
     URHO3D_ATTRIBUTE("Row Spacing", rowSpacing_, 1.0f, AM_FILE);
     URHO3D_ATTRIBUTE("Word Wrap", wordWrap_, false, AM_FILE);

@@ -35,7 +35,7 @@ void BorderImage::RegisterObject(Context* context)
     context->RegisterFactory<BorderImage>(UI_CATEGORY);
 
     URHO3D_COPY_BASE_ATTRIBUTES(UIElement);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Texture", GetTextureAttr, SetTextureAttr, ResourceRef, ResourceRef(Texture2D::GetTypeStatic()),
+    URHO3D_ACCESSOR_ATTRIBUTE("Texture", GetTextureAttr, SetTextureAttr, ResourceRef, ResourceRef(Texture2D::GetTypeStatic()),
         AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Image Rect", GetImageRect, SetImageRect, IntRect, IntRect::ZERO, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Border", GetBorder, SetBorder, IntRect, IntRect::ZERO, AM_FILE);
@@ -44,7 +44,7 @@ void BorderImage::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Disabled Image Offset", GetDisabledOffset, SetDisabledOffset, IntVector2, IntVector2::ZERO, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Tiled", IsTiled, SetTiled, bool, false, AM_FILE);
     URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Blend Mode", GetBlendMode, SetBlendMode, BlendMode, blendModeNames, 0, AM_FILE);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()),
+    URHO3D_ACCESSOR_ATTRIBUTE("Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()),
         AM_FILE);
 }
 
