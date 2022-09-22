@@ -80,10 +80,10 @@ void CrowdManager::RegisterObject(Context* context)
     URHO3D_ATTRIBUTE("Max Agent Radius", maxAgentRadius_, DEFAULT_MAX_AGENT_RADIUS, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Navigation Mesh", navigationMeshId_, 0, AM_DEFAULT | AM_COMPONENTID);
     URHO3D_ACCESSOR_ATTRIBUTE("Filter Types", GetQueryFilterTypesAttr, SetQueryFilterTypesAttr,
-        VariantVector, Variant::emptyVariantVector, AM_DEFAULT)
+        Variant::emptyVariantVector, AM_DEFAULT)
         .SetMetadata(AttributeMetadata::P_VECTOR_STRUCT_ELEMENTS, filterTypesStructureElementNames);
     URHO3D_ACCESSOR_ATTRIBUTE("Obstacle Avoidance Types", GetObstacleAvoidanceTypesAttr, SetObstacleAvoidanceTypesAttr,
-        VariantVector, Variant::emptyVariantVector, AM_DEFAULT)
+        Variant::emptyVariantVector, AM_DEFAULT)
         .SetMetadata(AttributeMetadata::P_VECTOR_STRUCT_ELEMENTS, obstacleAvoidanceTypesStructureElementNames);
 }
 

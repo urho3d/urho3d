@@ -42,7 +42,7 @@ DebugRenderer::~DebugRenderer() = default;
 void DebugRenderer::RegisterObject(Context* context)
 {
     context->RegisterFactory<DebugRenderer>(SUBSYSTEM_CATEGORY);
-    URHO3D_ACCESSOR_ATTRIBUTE("Line Antialias", GetLineAntiAlias, SetLineAntiAlias, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Line Antialias", GetLineAntiAlias, SetLineAntiAlias, false, AM_DEFAULT);
 }
 
 void DebugRenderer::SetLineAntiAlias(bool enable)

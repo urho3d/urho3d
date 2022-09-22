@@ -42,7 +42,7 @@ void StaticModelGroup::RegisterObject(Context* context)
 
     URHO3D_COPY_BASE_ATTRIBUTES(StaticModel);
     URHO3D_ACCESSOR_ATTRIBUTE("Instance Nodes", GetNodeIDsAttr, SetNodeIDsAttr,
-        VariantVector, Variant::emptyVariantVector, AM_DEFAULT | AM_NODEIDVECTOR)
+        Variant::emptyVariantVector, AM_DEFAULT | AM_NODEIDVECTOR)
         .SetMetadata(AttributeMetadata::P_VECTOR_STRUCT_ELEMENTS, instanceNodesStructureElementNames);
 }
 
