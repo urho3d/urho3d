@@ -116,8 +116,11 @@ void CustomGeometry::ProcessRayQuery(const RayOctreeQuery& query, Vector<RayQuer
     }
 }
 
-Geometry* CustomGeometry::GetLodGeometry(unsigned batchIndex, unsigned level)
+Geometry* CustomGeometry::GetLodGeometry(i32 batchIndex, i32 level)
 {
+    assert(batchIndex >= 0);
+    assert(level >= 0 || level == NINDEX);
+
     return batchIndex < geometries_.Size() ? geometries_[batchIndex] : nullptr;
 }
 

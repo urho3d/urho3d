@@ -17896,8 +17896,8 @@ template <class T> void RegisterMembers_Drawable(asIScriptEngine* engine, const 
     // float Drawable::GetLodDistance() const
     engine->RegisterObjectMethod(className, "float GetLodDistance() const", AS_METHODPR(T, GetLodDistance, () const, float), AS_CALL_THISCALL);
 
-    // virtual Geometry* Drawable::GetLodGeometry(unsigned batchIndex, unsigned level)
-    engine->RegisterObjectMethod(className, "Geometry@+ GetLodGeometry(uint, uint)", AS_METHODPR(T, GetLodGeometry, (unsigned, unsigned), Geometry*), AS_CALL_THISCALL);
+    // virtual Geometry* Drawable::GetLodGeometry(i32 batchIndex, i32 level)
+    engine->RegisterObjectMethod(className, "Geometry@+ GetLodGeometry(int, int)", AS_METHODPR(T, GetLodGeometry, (i32, i32), Geometry*), AS_CALL_THISCALL);
 
     // unsigned Drawable::GetMaxLights() const
     engine->RegisterObjectMethod(className, "uint GetMaxLights() const", AS_METHODPR(T, GetMaxLights, () const, unsigned), AS_CALL_THISCALL);
@@ -18919,9 +18919,9 @@ template <class T> void RegisterMembers_Terrain(asIScriptEngine* engine, const c
     engine->RegisterObjectMethod(className, "const IntVector2& GetNumVertices() const", AS_METHODPR(T, GetNumVertices, () const, const IntVector2&), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "const IntVector2& get_numVertices() const", AS_METHODPR(T, GetNumVertices, () const, const IntVector2&), AS_CALL_THISCALL);
 
-    // unsigned Terrain::GetOcclusionLodLevel() const
-    engine->RegisterObjectMethod(className, "uint GetOcclusionLodLevel() const", AS_METHODPR(T, GetOcclusionLodLevel, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_occlusionLodLevel() const", AS_METHODPR(T, GetOcclusionLodLevel, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Terrain::GetOcclusionLodLevel() const
+    engine->RegisterObjectMethod(className, "int GetOcclusionLodLevel() const", AS_METHODPR(T, GetOcclusionLodLevel, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_occlusionLodLevel() const", AS_METHODPR(T, GetOcclusionLodLevel, () const, i32), AS_CALL_THISCALL);
 
     // TerrainPatch* Terrain::GetPatch(i32 index) const
     engine->RegisterObjectMethod(className, "TerrainPatch@+ GetPatch(int) const", AS_METHODPR(T, GetPatch, (i32) const, TerrainPatch*), AS_CALL_THISCALL);
@@ -19040,12 +19040,12 @@ template <class T> void RegisterMembers_Terrain(asIScriptEngine* engine, const c
     engine->RegisterObjectMethod(className, "void SetOccluder(bool)", AS_METHODPR(T, SetOccluder, (bool), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_occluder(bool)", AS_METHODPR(T, SetOccluder, (bool), void), AS_CALL_THISCALL);
 
-    // void Terrain::SetOcclusionLodLevel(unsigned level)
-    engine->RegisterObjectMethod(className, "void SetOcclusionLodLevel(uint)", AS_METHODPR(T, SetOcclusionLodLevel, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_occlusionLodLevel(uint)", AS_METHODPR(T, SetOcclusionLodLevel, (unsigned), void), AS_CALL_THISCALL);
+    // void Terrain::SetOcclusionLodLevel(i32 level)
+    engine->RegisterObjectMethod(className, "void SetOcclusionLodLevel(int)", AS_METHODPR(T, SetOcclusionLodLevel, (i32), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_occlusionLodLevel(int)", AS_METHODPR(T, SetOcclusionLodLevel, (i32), void), AS_CALL_THISCALL);
 
-    // void Terrain::SetOcclusionLodLevelAttr(unsigned value)
-    engine->RegisterObjectMethod(className, "void SetOcclusionLodLevelAttr(uint)", AS_METHODPR(T, SetOcclusionLodLevelAttr, (unsigned), void), AS_CALL_THISCALL);
+    // void Terrain::SetOcclusionLodLevelAttr(i32 value)
+    engine->RegisterObjectMethod(className, "void SetOcclusionLodLevelAttr(int)", AS_METHODPR(T, SetOcclusionLodLevelAttr, (i32), void), AS_CALL_THISCALL);
 
     // void Terrain::SetPatchSize(int size)
     engine->RegisterObjectMethod(className, "void SetPatchSize(int)", AS_METHODPR(T, SetPatchSize, (int), void), AS_CALL_THISCALL);
@@ -23165,9 +23165,9 @@ template <class T> void RegisterMembers_StaticModel(asIScriptEngine* engine, con
     engine->RegisterObjectMethod(className, "uint GetNumGeometries() const", AS_METHODPR(T, GetNumGeometries, () const, unsigned), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_numGeometries() const", AS_METHODPR(T, GetNumGeometries, () const, unsigned), AS_CALL_THISCALL);
 
-    // unsigned StaticModel::GetOcclusionLodLevel() const
-    engine->RegisterObjectMethod(className, "uint GetOcclusionLodLevel() const", AS_METHODPR(T, GetOcclusionLodLevel, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_occlusionLodLevel() const", AS_METHODPR(T, GetOcclusionLodLevel, () const, unsigned), AS_CALL_THISCALL);
+    // i32 StaticModel::GetOcclusionLodLevel() const
+    engine->RegisterObjectMethod(className, "int GetOcclusionLodLevel() const", AS_METHODPR(T, GetOcclusionLodLevel, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_occlusionLodLevel() const", AS_METHODPR(T, GetOcclusionLodLevel, () const, i32), AS_CALL_THISCALL);
 
     // bool StaticModel::IsInside(const Vector3& point) const
     engine->RegisterObjectMethod(className, "bool IsInside(const Vector3&in) const", AS_METHODPR(T, IsInside, (const Vector3&) const, bool), AS_CALL_THISCALL);
@@ -23189,9 +23189,9 @@ template <class T> void RegisterMembers_StaticModel(asIScriptEngine* engine, con
     // void StaticModel::SetModelAttr(const ResourceRef& value)
     engine->RegisterObjectMethod(className, "void SetModelAttr(const ResourceRef&in)", AS_METHODPR(T, SetModelAttr, (const ResourceRef&), void), AS_CALL_THISCALL);
 
-    // void StaticModel::SetOcclusionLodLevel(unsigned level)
-    engine->RegisterObjectMethod(className, "void SetOcclusionLodLevel(uint)", AS_METHODPR(T, SetOcclusionLodLevel, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_occlusionLodLevel(uint)", AS_METHODPR(T, SetOcclusionLodLevel, (unsigned), void), AS_CALL_THISCALL);
+    // void StaticModel::SetOcclusionLodLevel(i32 level)
+    engine->RegisterObjectMethod(className, "void SetOcclusionLodLevel(int)", AS_METHODPR(T, SetOcclusionLodLevel, (i32), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_occlusionLodLevel(int)", AS_METHODPR(T, SetOcclusionLodLevel, (i32), void), AS_CALL_THISCALL);
 
     // virtual void Drawable::Update(const FrameInfo& frame)
     engine->RegisterObjectMethod(className, "void Update(const FrameInfo&in)", AS_METHODPR(T, Update, (const FrameInfo&), void), AS_CALL_THISCALL);

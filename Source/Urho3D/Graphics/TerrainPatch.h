@@ -35,7 +35,7 @@ public:
     /// Return whether a geometry update is necessary, and if it can happen in a worker thread.
     UpdateGeometryType GetUpdateGeometryType() override;
     /// Return the geometry for a specific LOD level.
-    Geometry* GetLodGeometry(unsigned batchIndex, unsigned level) override;
+    Geometry* GetLodGeometry(i32 batchIndex, i32 level) override;
     /// Return number of occlusion geometry triangles.
     unsigned GetNumOccluderTriangles() override;
     /// Draw to occlusion buffer. Return true if did not run out of triangles.
