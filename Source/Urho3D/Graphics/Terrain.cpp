@@ -72,7 +72,7 @@ Terrain::Terrain(Context* context) :
     lastPatchSize_(0),
     numLodLevels_(1),
     maxLodLevels_(MAX_LOD_LEVELS),
-    occlusionLodLevel_(M_MAX_UNSIGNED),
+    occlusionLodLevel_(NINDEX),
     smoothing_(false),
     visible_(true),
     castShadows_(false),
@@ -126,7 +126,7 @@ void Terrain::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Light Mask", GetLightMask, SetLightMask, DEFAULT_LIGHTMASK, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Shadow Mask", GetShadowMask, SetShadowMask, DEFAULT_SHADOWMASK, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Zone Mask", GetZoneMask, SetZoneMask, DEFAULT_ZONEMASK, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Occlusion LOD level", GetOcclusionLodLevel, SetOcclusionLodLevelAttr, M_MAX_UNSIGNED, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Occlusion LOD level", GetOcclusionLodLevel, SetOcclusionLodLevelAttr, NINDEX, AM_DEFAULT);
 }
 
 void Terrain::ApplyAttributes()
@@ -199,8 +199,10 @@ void Terrain::SetMaxLodLevels(unsigned levels)
     }
 }
 
-void Terrain::SetOcclusionLodLevel(unsigned level)
+void Terrain::SetOcclusionLodLevel(i32 level)
 {
+    assert(level >= 0 || level == NINDEX);
+
     if (level != occlusionLodLevel_)
     {
         occlusionLodLevel_ = level;
@@ -663,8 +665,8 @@ void Terrain::CreatePatchGeometry(TerrainPatch* patch)
     auto* occlusionData = (float*)occlusionCpuVertexData.Get();
     BoundingBox box;
 
-    unsigned occlusionLevel = occlusionLodLevel_;
-    if (occlusionLevel > numLodLevels_ - 1)
+    i32 occlusionLevel = occlusionLodLevel_;
+    if (occlusionLevel > numLodLevels_ - 1 || occlusionLevel == NINDEX)
         occlusionLevel = numLodLevels_ - 1;
 
     if (vertexData)
@@ -819,8 +821,10 @@ void Terrain::SetMaxLodLevelsAttr(unsigned value)
     }
 }
 
-void Terrain::SetOcclusionLodLevelAttr(unsigned value)
+void Terrain::SetOcclusionLodLevelAttr(i32 value)
 {
+    assert(value >= 0 || value == NINDEX);
+
     if (value != occlusionLodLevel_)
     {
         occlusionLodLevel_ = value;

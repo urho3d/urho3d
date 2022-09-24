@@ -140,8 +140,11 @@ UpdateGeometryType TerrainPatch::GetUpdateGeometryType()
     return UPDATE_MAIN_THREAD;
 }
 
-Geometry* TerrainPatch::GetLodGeometry(unsigned batchIndex, unsigned level)
+Geometry* TerrainPatch::GetLodGeometry(i32 batchIndex, i32 level)
 {
+    assert(batchIndex >= 0);
+    assert(level >= 0 || level == NINDEX);
+
     if (!level)
         return maxLodGeometry_;
     else

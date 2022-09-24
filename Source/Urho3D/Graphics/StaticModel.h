@@ -38,7 +38,7 @@ public:
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
     void UpdateBatches(const FrameInfo& frame) override;
     /// Return the geometry for a specific LOD level.
-    Geometry* GetLodGeometry(unsigned batchIndex, unsigned level) override;
+    Geometry* GetLodGeometry(i32 batchIndex, i32 level) override;
     /// Return number of occlusion geometry triangles.
     unsigned GetNumOccluderTriangles() override;
     /// Draw to occlusion buffer. Return true if did not run out of triangles.
@@ -53,9 +53,9 @@ public:
     /// Set material on one geometry. Return true if successful.
     /// @property{set_materials}
     virtual bool SetMaterial(unsigned index, Material* material);
-    /// Set occlusion LOD level. By default (M_MAX_UNSIGNED) same as visible.
+    /// Set occlusion LOD level. By default (NINDEX) same as visible.
     /// @property
-    void SetOcclusionLodLevel(unsigned level);
+    void SetOcclusionLodLevel(i32 level);
     /// Apply default materials from a material list file. If filename is empty (default), the model's resource name with extension .txt will be used.
     void ApplyMaterialList(const String& fileName = String::EMPTY);
 
@@ -76,7 +76,7 @@ public:
 
     /// Return occlusion LOD level.
     /// @property
-    unsigned GetOcclusionLodLevel() const { return occlusionLodLevel_; }
+    i32 GetOcclusionLodLevel() const { return occlusionLodLevel_; }
 
     /// Determines if the given world space point is within the model geometry.
     bool IsInside(const Vector3& point) const;
@@ -111,7 +111,7 @@ protected:
     /// Model.
     SharedPtr<Model> model_;
     /// Occlusion LOD level.
-    unsigned occlusionLodLevel_;
+    i32 occlusionLodLevel_;
     /// Material list attribute.
     mutable ResourceRefList materialsAttr_;
 

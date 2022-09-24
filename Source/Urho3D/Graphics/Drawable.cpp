@@ -126,8 +126,11 @@ void Drawable::UpdateBatches(const FrameInfo& frame)
         lodDistance_ = newLodDistance;
 }
 
-Geometry* Drawable::GetLodGeometry(unsigned batchIndex, unsigned level)
+Geometry* Drawable::GetLodGeometry(i32 batchIndex, i32 level)
 {
+    assert(batchIndex >= 0);
+    assert(level >= 0 || level == NINDEX);
+
     // By default return the visible batch geometry
     if (batchIndex < batches_.Size())
         return batches_[batchIndex].geometry_;

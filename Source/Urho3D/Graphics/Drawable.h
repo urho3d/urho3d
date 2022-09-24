@@ -125,7 +125,7 @@ public:
     virtual UpdateGeometryType GetUpdateGeometryType() { return UPDATE_NONE; }
 
     /// Return the geometry for a specific LOD level.
-    virtual Geometry* GetLodGeometry(unsigned batchIndex, unsigned level);
+    virtual Geometry* GetLodGeometry(i32 batchIndex, i32 level);
 
     /// Return number of occlusion geometry triangles.
     virtual unsigned GetNumOccluderTriangles() { return 0; }
