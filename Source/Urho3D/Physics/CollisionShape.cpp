@@ -88,8 +88,8 @@ public:
 
             SharedArrayPtr<unsigned char> vertexData;
             SharedArrayPtr<unsigned char> indexData;
-            unsigned vertexSize;
-            unsigned indexSize;
+            i32 vertexSize;
+            i32 indexSize;
             const Vector<VertexElement>* elements;
 
             geometry->GetRawDataShared(vertexData, vertexSize, indexData, indexSize, elements);
@@ -228,8 +228,8 @@ ConvexData::ConvexData(Model* model, i32 lodLevel)
 
         const unsigned char* vertexData;
         const unsigned char* indexData;
-        unsigned vertexSize;
-        unsigned indexSize;
+        i32 vertexSize;
+        i32 indexSize;
         const Vector<VertexElement>* elements;
 
         geometry->GetRawData(vertexData, vertexSize, indexData, indexSize, elements);

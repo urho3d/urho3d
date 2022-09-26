@@ -442,7 +442,7 @@ bool WriteDrawablesToOBJ(const Vector<Drawable*>& drawables, File* outputFile, b
 
             const unsigned char* vertexData;
             const unsigned char* indexData;
-            unsigned elementSize, indexSize;
+            i32 elementSize, indexSize;
             const Vector<VertexElement>* elements;
             geo->GetRawData(vertexData, elementSize, indexData, indexSize, elements);
             if (!vertexData || !elements)

@@ -683,10 +683,10 @@ void DecalSet::GetFaces(Vector<Vector<DecalVertex>>& faces, Drawable* target, un
     const unsigned char* normalData = nullptr;
     const unsigned char* skinningData = nullptr;
     const unsigned char* indexData = nullptr;
-    unsigned positionStride = 0;
+    i32 positionStride = 0;
     unsigned normalStride = 0;
     unsigned skinningStride = 0;
-    unsigned indexStride = 0;
+    i32 indexStride = 0;
 
     IndexBuffer* ib = geometry->GetIndexBuffer();
     if (ib)
