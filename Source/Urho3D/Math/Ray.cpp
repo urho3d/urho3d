@@ -227,6 +227,11 @@ float Ray::HitDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2, 
 float Ray::HitDistance(const void* vertexData, i32 vertexStride, i32 vertexStart, i32 vertexCount,
     Vector3* outNormal, Vector2* outUV, i32 uvOffset) const
 {
+    assert(vertexStride >= 0);
+    assert(vertexStart >= 0);
+    assert(vertexCount >= 0);
+    assert(uvOffset >= 0);
+
     float nearest = M_INFINITY;
     const u8* vertices = ((const u8*)vertexData) + vertexStart * vertexStride;
     i32 index = 0, nearestIdx = NINDEX;
@@ -279,6 +284,12 @@ float Ray::HitDistance(const void* vertexData, i32 vertexStride, i32 vertexStart
 float Ray::HitDistance(const void* vertexData, i32 vertexStride, const void* indexData, i32 indexSize,
     i32 indexStart, i32 indexCount, Vector3* outNormal, Vector2* outUV, i32 uvOffset) const
 {
+    assert(vertexStride >= 0);
+    assert(indexSize >= 0);
+    assert(indexStart >= 0);
+    assert(indexCount >= 0);
+    assert(uvOffset >= 0);
+
     float nearest = M_INFINITY;
     const u8* vertices = (const u8*)vertexData;
 
@@ -379,6 +390,10 @@ float Ray::HitDistance(const void* vertexData, i32 vertexStride, const void* ind
 
 bool Ray::InsideGeometry(const void* vertexData, i32 vertexSize, i32 vertexStart, i32 vertexCount) const
 {
+    assert(vertexSize >= 0);
+    assert(vertexStart >= 0);
+    assert(vertexCount >= 0);
+
     float currentFrontFace = M_INFINITY;
     float currentBackFace = M_INFINITY;
     const u8* vertices = ((const u8*)vertexData) + vertexStart * vertexSize;
@@ -412,6 +427,11 @@ bool Ray::InsideGeometry(const void* vertexData, i32 vertexSize, i32 vertexStart
 bool Ray::InsideGeometry(const void* vertexData, i32 vertexSize, const void* indexData, i32 indexSize,
     i32 indexStart, i32 indexCount) const
 {
+    assert(vertexSize >= 0);
+    assert(indexSize >= 0);
+    assert(indexStart >= 0);
+    assert(indexCount >= 0);
+
     float currentFrontFace = M_INFINITY;
     float currentBackFace = M_INFINITY;
     const u8* vertices = (const u8*)vertexData;
