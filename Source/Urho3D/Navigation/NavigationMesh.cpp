@@ -1178,8 +1178,8 @@ void NavigationMesh::AddTriMeshGeometry(NavBuildData* build, Geometry* geometry,
 
     const unsigned char* vertexData;
     const unsigned char* indexData;
-    unsigned vertexSize;
-    unsigned indexSize;
+    i32 vertexSize;
+    i32 indexSize;
     const Vector<VertexElement>* elements;
 
     geometry->GetRawData(vertexData, vertexSize, indexData, indexSize, elements);

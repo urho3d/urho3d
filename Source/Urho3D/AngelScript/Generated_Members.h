@@ -9954,11 +9954,11 @@ template <class T> void RegisterMembers_Geometry(asIScriptEngine* engine, const 
 
     // float Geometry::GetHitDistance(const Ray& ray, Vector3* outNormal = nullptr, Vector2* outUV = nullptr) const
     // Error: type "Vector3*" can not automatically bind
-    // void Geometry::GetRawData(const unsigned char*& vertexData, unsigned& vertexSize, const unsigned char*& indexData, unsigned& indexSize, const Vector<VertexElement>*& elements) const
+    // void Geometry::GetRawData(const unsigned char*& vertexData, i32& vertexSize, const unsigned char*& indexData, i32& indexSize, const Vector<VertexElement>*& elements) const
     // Error: type "const unsigned char*&" can not automatically bind
-    // void Geometry::GetRawDataShared(SharedArrayPtr<unsigned char>& vertexData, unsigned& vertexSize, SharedArrayPtr<unsigned char>& indexData, unsigned& indexSize, const Vector<VertexElement>*& elements) const
+    // void Geometry::GetRawDataShared(SharedArrayPtr<unsigned char>& vertexData, i32& vertexSize, SharedArrayPtr<unsigned char>& indexData, i32& indexSize, const Vector<VertexElement>*& elements) const
     // Error: type "SharedArrayPtr<unsigned char>&" can not automatically bind
-    // void Geometry::SetRawIndexData(const SharedArrayPtr<unsigned char>& data, unsigned indexSize)
+    // void Geometry::SetRawIndexData(const SharedArrayPtr<unsigned char>& data, i32 indexSize)
     // Error: type "const SharedArrayPtr<unsigned char>&" can not automatically bind
     // void Geometry::SetRawVertexData(const SharedArrayPtr<unsigned char>& data, const Vector<VertexElement>& elements)
     // Error: type "const SharedArrayPtr<unsigned char>&" can not automatically bind
@@ -9975,40 +9975,40 @@ template <class T> void RegisterMembers_Geometry(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "IndexBuffer@+ GetIndexBuffer() const", AS_METHODPR(T, GetIndexBuffer, () const, IndexBuffer*), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "IndexBuffer@+ get_indexBuffer() const", AS_METHODPR(T, GetIndexBuffer, () const, IndexBuffer*), AS_CALL_THISCALL);
 
-    // unsigned Geometry::GetIndexCount() const
-    engine->RegisterObjectMethod(className, "uint GetIndexCount() const", AS_METHODPR(T, GetIndexCount, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_indexCount() const", AS_METHODPR(T, GetIndexCount, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Geometry::GetIndexCount() const
+    engine->RegisterObjectMethod(className, "int GetIndexCount() const", AS_METHODPR(T, GetIndexCount, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_indexCount() const", AS_METHODPR(T, GetIndexCount, () const, i32), AS_CALL_THISCALL);
 
-    // unsigned Geometry::GetIndexStart() const
-    engine->RegisterObjectMethod(className, "uint GetIndexStart() const", AS_METHODPR(T, GetIndexStart, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_indexStart() const", AS_METHODPR(T, GetIndexStart, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Geometry::GetIndexStart() const
+    engine->RegisterObjectMethod(className, "int GetIndexStart() const", AS_METHODPR(T, GetIndexStart, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_indexStart() const", AS_METHODPR(T, GetIndexStart, () const, i32), AS_CALL_THISCALL);
 
     // float Geometry::GetLodDistance() const
     engine->RegisterObjectMethod(className, "float GetLodDistance() const", AS_METHODPR(T, GetLodDistance, () const, float), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_lodDistance() const", AS_METHODPR(T, GetLodDistance, () const, float), AS_CALL_THISCALL);
 
-    // unsigned Geometry::GetNumVertexBuffers() const
-    engine->RegisterObjectMethod(className, "uint GetNumVertexBuffers() const", AS_METHODPR(T, GetNumVertexBuffers, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numVertexBuffers() const", AS_METHODPR(T, GetNumVertexBuffers, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Geometry::GetNumVertexBuffers() const
+    engine->RegisterObjectMethod(className, "int GetNumVertexBuffers() const", AS_METHODPR(T, GetNumVertexBuffers, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numVertexBuffers() const", AS_METHODPR(T, GetNumVertexBuffers, () const, i32), AS_CALL_THISCALL);
 
     // PrimitiveType Geometry::GetPrimitiveType() const
     engine->RegisterObjectMethod(className, "PrimitiveType GetPrimitiveType() const", AS_METHODPR(T, GetPrimitiveType, () const, PrimitiveType), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "PrimitiveType get_primitiveType() const", AS_METHODPR(T, GetPrimitiveType, () const, PrimitiveType), AS_CALL_THISCALL);
 
-    // VertexBuffer* Geometry::GetVertexBuffer(unsigned index) const
-    engine->RegisterObjectMethod(className, "VertexBuffer@+ GetVertexBuffer(uint) const", AS_METHODPR(T, GetVertexBuffer, (unsigned) const, VertexBuffer*), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "VertexBuffer@+ get_vertexBuffers(uint) const", AS_METHODPR(T, GetVertexBuffer, (unsigned) const, VertexBuffer*), AS_CALL_THISCALL);
+    // VertexBuffer* Geometry::GetVertexBuffer(i32 index) const
+    engine->RegisterObjectMethod(className, "VertexBuffer@+ GetVertexBuffer(int) const", AS_METHODPR(T, GetVertexBuffer, (i32) const, VertexBuffer*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "VertexBuffer@+ get_vertexBuffers(int) const", AS_METHODPR(T, GetVertexBuffer, (i32) const, VertexBuffer*), AS_CALL_THISCALL);
 
     // const Vector<SharedPtr<VertexBuffer>>& Geometry::GetVertexBuffers() const
     engine->RegisterObjectMethod(className, "Array<VertexBuffer@>@ GetVertexBuffers() const", AS_FUNCTION_OBJFIRST(Geometry_constspVectorlesSharedPtrlesVertexBuffergregreamp_GetVertexBuffers_void_template<Geometry>), AS_CALL_CDECL_OBJFIRST);
 
-    // unsigned Geometry::GetVertexCount() const
-    engine->RegisterObjectMethod(className, "uint GetVertexCount() const", AS_METHODPR(T, GetVertexCount, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_vertexCount() const", AS_METHODPR(T, GetVertexCount, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Geometry::GetVertexCount() const
+    engine->RegisterObjectMethod(className, "int GetVertexCount() const", AS_METHODPR(T, GetVertexCount, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_vertexCount() const", AS_METHODPR(T, GetVertexCount, () const, i32), AS_CALL_THISCALL);
 
-    // unsigned Geometry::GetVertexStart() const
-    engine->RegisterObjectMethod(className, "uint GetVertexStart() const", AS_METHODPR(T, GetVertexStart, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_vertexStart() const", AS_METHODPR(T, GetVertexStart, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Geometry::GetVertexStart() const
+    engine->RegisterObjectMethod(className, "int GetVertexStart() const", AS_METHODPR(T, GetVertexStart, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_vertexStart() const", AS_METHODPR(T, GetVertexStart, () const, i32), AS_CALL_THISCALL);
 
     // bool Geometry::IsEmpty() const
     engine->RegisterObjectMethod(className, "bool IsEmpty() const", AS_METHODPR(T, IsEmpty, () const, bool), AS_CALL_THISCALL);
@@ -10017,11 +10017,11 @@ template <class T> void RegisterMembers_Geometry(asIScriptEngine* engine, const 
     // bool Geometry::IsInside(const Ray& ray) const
     engine->RegisterObjectMethod(className, "bool IsInside(const Ray&in) const", AS_METHODPR(T, IsInside, (const Ray&) const, bool), AS_CALL_THISCALL);
 
-    // bool Geometry::SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, bool getUsedVertexRange = true)
-    engine->RegisterObjectMethod(className, "bool SetDrawRange(PrimitiveType, uint, uint, bool = true)", AS_METHODPR(T, SetDrawRange, (PrimitiveType, unsigned, unsigned, bool), bool), AS_CALL_THISCALL);
+    // bool Geometry::SetDrawRange(PrimitiveType type, i32 indexStart, i32 indexCount, bool getUsedVertexRange = true)
+    engine->RegisterObjectMethod(className, "bool SetDrawRange(PrimitiveType, int, int, bool = true)", AS_METHODPR(T, SetDrawRange, (PrimitiveType, i32, i32, bool), bool), AS_CALL_THISCALL);
 
-    // bool Geometry::SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount, bool checkIllegal = true)
-    engine->RegisterObjectMethod(className, "bool SetDrawRange(PrimitiveType, uint, uint, uint, uint, bool = true)", AS_METHODPR(T, SetDrawRange, (PrimitiveType, unsigned, unsigned, unsigned, unsigned, bool), bool), AS_CALL_THISCALL);
+    // bool Geometry::SetDrawRange(PrimitiveType type, i32 indexStart, i32 indexCount, i32 vertexStart, i32 vertexCount, bool checkIllegal = true)
+    engine->RegisterObjectMethod(className, "bool SetDrawRange(PrimitiveType, int, int, int, int, bool = true)", AS_METHODPR(T, SetDrawRange, (PrimitiveType, i32, i32, i32, i32, bool), bool), AS_CALL_THISCALL);
 
     // void Geometry::SetIndexBuffer(IndexBuffer* buffer)
     engine->RegisterObjectMethod(className, "void SetIndexBuffer(IndexBuffer@+)", AS_METHODPR(T, SetIndexBuffer, (IndexBuffer*), void), AS_CALL_THISCALL);
@@ -10031,12 +10031,12 @@ template <class T> void RegisterMembers_Geometry(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "void SetLodDistance(float)", AS_METHODPR(T, SetLodDistance, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_lodDistance(float)", AS_METHODPR(T, SetLodDistance, (float), void), AS_CALL_THISCALL);
 
-    // bool Geometry::SetNumVertexBuffers(unsigned num)
-    engine->RegisterObjectMethod(className, "bool SetNumVertexBuffers(uint)", AS_METHODPR(T, SetNumVertexBuffers, (unsigned), bool), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "bool set_numVertexBuffers(uint)", AS_METHODPR(T, SetNumVertexBuffers, (unsigned), bool), AS_CALL_THISCALL);
+    // bool Geometry::SetNumVertexBuffers(i32 num)
+    engine->RegisterObjectMethod(className, "bool SetNumVertexBuffers(int)", AS_METHODPR(T, SetNumVertexBuffers, (i32), bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool set_numVertexBuffers(int)", AS_METHODPR(T, SetNumVertexBuffers, (i32), bool), AS_CALL_THISCALL);
 
-    // bool Geometry::SetVertexBuffer(unsigned index, VertexBuffer* buffer)
-    engine->RegisterObjectMethod(className, "bool SetVertexBuffer(uint, VertexBuffer@+)", AS_METHODPR(T, SetVertexBuffer, (unsigned, VertexBuffer*), bool), AS_CALL_THISCALL);
+    // bool Geometry::SetVertexBuffer(i32 index, VertexBuffer* buffer)
+    engine->RegisterObjectMethod(className, "bool SetVertexBuffer(int, VertexBuffer@+)", AS_METHODPR(T, SetVertexBuffer, (i32, VertexBuffer*), bool), AS_CALL_THISCALL);
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Geometry
         REGISTER_MEMBERS_MANUAL_PART_Geometry();
