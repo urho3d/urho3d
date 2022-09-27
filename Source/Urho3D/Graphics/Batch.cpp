@@ -61,8 +61,10 @@ inline bool CompareBatchGroupOrder(BatchGroup* lhs, BatchGroup* rhs)
     return lhs->renderOrder_ < rhs->renderOrder_;
 }
 
-void CalculateShadowMatrix(Matrix4& dest, LightBatchQueue* queue, unsigned split, Renderer* renderer)
+void CalculateShadowMatrix(Matrix4& dest, LightBatchQueue* queue, i32 split, Renderer* renderer)
 {
+    assert(split >= 0);
+
     Camera* shadowCamera = queue->shadowSplits_[split].shadowCamera_;
     const IntRect& viewport = queue->shadowSplits_[split].shadowViewport_;
 
@@ -213,10 +215,10 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
         view->SetGlobalShaderParameters();
 
     // Set camera & viewport shader parameters
-    auto cameraHash = (unsigned)(size_t)camera;
+    hash32 cameraHash = (hash32)(size_t)camera;
     IntRect viewport = graphics->GetViewport();
     IntVector2 viewSize = IntVector2(viewport.Width(), viewport.Height());
-    auto viewportHash = (unsigned)viewSize.x_ | (unsigned)viewSize.y_ << 16u;
+    hash32 viewportHash = (hash32)viewSize.x_ | (hash32)viewSize.y_ << 16u;
     if (graphics->NeedParameterUpdate(SP_CAMERA, reinterpret_cast<const void*>(cameraHash + viewportHash)))
     {
         view->SetCameraShaderParameters(camera);
@@ -249,7 +251,7 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
     BlendMode blend = graphics->GetBlendMode();
     // If the pass is additive, override fog color to black so that shaders do not need a separate additive path
     bool overrideFogColorToBlack = blend == BLEND_ADD || blend == BLEND_ADDALPHA;
-    auto zoneHash = (unsigned)(size_t)zone_;
+    hash32 zoneHash = (hash32)(size_t)zone_;
     if (overrideFogColorToBlack)
         zoneHash += 0x80000000;
     if (zone_ && graphics->NeedParameterUpdate(SP_ZONE, reinterpret_cast<const void*>(zoneHash)))
@@ -310,9 +312,9 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                 case LIGHT_DIRECTIONAL:
                     {
                         Matrix4 shadowMatrices[MAX_CASCADE_SPLITS];
-                        unsigned numSplits = Min(MAX_CASCADE_SPLITS, lightQueue_->shadowSplits_.Size());
+                        i32 numSplits = Min(MAX_CASCADE_SPLITS, lightQueue_->shadowSplits_.Size());
 
-                        for (unsigned i = 0; i < numSplits; ++i)
+                        for (i32 i = 0; i < numSplits; ++i)
                             CalculateShadowMatrix(shadowMatrices[i], lightQueue_, i, renderer);
 
                         graphics->SetShaderParameter(VSP_LIGHTMATRICES, shadowMatrices[0].Data(), 16 * numSplits);
@@ -369,9 +371,9 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                 case LIGHT_DIRECTIONAL:
                     {
                         Matrix4 shadowMatrices[MAX_CASCADE_SPLITS];
-                        unsigned numSplits = Min(MAX_CASCADE_SPLITS, lightQueue_->shadowSplits_.Size());
+                        i32 numSplits = Min(MAX_CASCADE_SPLITS, lightQueue_->shadowSplits_.Size());
 
-                        for (unsigned i = 0; i < numSplits; ++i)
+                        for (i32 i = 0; i < numSplits; ++i)
                             CalculateShadowMatrix(shadowMatrices[i], lightQueue_, i, renderer);
 
                         graphics->SetShaderParameter(PSP_LIGHTMATRICES, shadowMatrices[0].Data(), 16 * numSplits);
@@ -631,8 +633,10 @@ void Batch::Draw(View* view, Camera* camera, bool allowDepthWrite) const
     }
 }
 
-void BatchGroup::SetInstancingData(void* lockedData, unsigned stride, unsigned& freeIndex)
+void BatchGroup::SetInstancingData(void* lockedData, i32 stride, i32& freeIndex)
 {
+    assert(stride >= 0);
+
     // Do not use up buffer space if not going to draw as instanced
     if (geometryType_ != GEOM_INSTANCED)
         return;
@@ -662,7 +666,7 @@ void BatchGroup::Draw(View* view, Camera* camera, bool allowDepthWrite) const
     {
         // Draw as individual objects if instancing not supported or could not fill the instancing buffer
         VertexBuffer* instanceBuffer = renderer->GetInstancingBuffer();
-        if (!instanceBuffer || geometryType_ != GEOM_INSTANCED || startIndex_ == M_MAX_UNSIGNED)
+        if (!instanceBuffer || geometryType_ != GEOM_INSTANCED || startIndex_ == NINDEX)
         {
             Batch::Prepare(view, camera, false, allowDepthWrite);
 
@@ -710,7 +714,7 @@ void BatchQueue::Clear(int maxSortedInstances)
     batches_.Clear();
     sortedBatches_.Clear();
     batchGroups_.Clear();
-    maxSortedInstances_ = (unsigned)maxSortedInstances;
+    maxSortedInstances_ = maxSortedInstances;
 }
 
 void BatchQueue::SortBackToFront()
@@ -827,8 +831,9 @@ void BatchQueue::SortFrontToBack2Pass(Vector<Batch*>& batches)
 #endif
 }
 
-void BatchQueue::SetInstancingData(void* lockedData, unsigned stride, unsigned& freeIndex)
+void BatchQueue::SetInstancingData(void* lockedData, i32 stride, i32& freeIndex)
 {
+    assert(stride >= 0);
     for (HashMap<BatchGroupKey, BatchGroup>::Iterator i = batchGroups_.Begin(); i != batchGroups_.End(); ++i)
         i->second_.SetInstancingData(lockedData, stride, freeIndex);
 }
@@ -876,9 +881,9 @@ void BatchQueue::Draw(View* view, Camera* camera, bool markToStencil, bool using
     }
 }
 
-unsigned BatchQueue::GetNumInstances() const
+i32 BatchQueue::GetNumInstances() const
 {
-    unsigned total = 0;
+    i32 total = 0;
 
     for (HashMap<BatchGroupKey, BatchGroup>::ConstIterator i = batchGroups_.Begin(); i != batchGroups_.End(); ++i)
     {

@@ -338,8 +338,8 @@ template <class T> void RegisterMembers_Batch(asIScriptEngine* engine, const cha
     // bool Batch::isBase_
     engine->RegisterObjectProperty(className, "bool isBase", offsetof(T, isBase_));
 
-    // unsigned Batch::numWorldTransforms_
-    engine->RegisterObjectProperty(className, "uint numWorldTransforms", offsetof(T, numWorldTransforms_));
+    // i32 Batch::numWorldTransforms_
+    engine->RegisterObjectProperty(className, "int numWorldTransforms", offsetof(T, numWorldTransforms_));
 
     // GeometryType Batch::geometryType_
     engine->RegisterObjectProperty(className, "GeometryType geometryType", offsetof(T, geometryType_));
@@ -383,7 +383,7 @@ template <class T> void RegisterMembers_BatchGroupKey(asIScriptEngine* engine, c
 // struct BatchQueue | File: ../Graphics/Batch.h
 template <class T> void RegisterMembers_BatchQueue(asIScriptEngine* engine, const char* className)
 {
-    // void BatchQueue::SetInstancingData(void* lockedData, unsigned stride, unsigned& freeIndex)
+    // void BatchQueue::SetInstancingData(void* lockedData, i32 stride, i32& freeIndex)
     // Error: type "void*" can not automatically bind
     // void BatchQueue::SortFrontToBack2Pass(Vector<Batch*>& batches)
     // Error: type "Vector<Batch*>&" can not automatically bind
@@ -394,8 +394,8 @@ template <class T> void RegisterMembers_BatchQueue(asIScriptEngine* engine, cons
     // void BatchQueue::Draw(View* view, Camera* camera, bool markToStencil, bool usingLightOptimization, bool allowDepthWrite) const
     engine->RegisterObjectMethod(className, "void Draw(View@+, Camera@+, bool, bool, bool) const", AS_METHODPR(T, Draw, (View*, Camera*, bool, bool, bool) const, void), AS_CALL_THISCALL);
 
-    // unsigned BatchQueue::GetNumInstances() const
-    engine->RegisterObjectMethod(className, "uint GetNumInstances() const", AS_METHODPR(T, GetNumInstances, () const, unsigned), AS_CALL_THISCALL);
+    // i32 BatchQueue::GetNumInstances() const
+    engine->RegisterObjectMethod(className, "int GetNumInstances() const", AS_METHODPR(T, GetNumInstances, () const, i32), AS_CALL_THISCALL);
 
     // bool BatchQueue::IsEmpty() const
     engine->RegisterObjectMethod(className, "bool IsEmpty() const", AS_METHODPR(T, IsEmpty, () const, bool), AS_CALL_THISCALL);
@@ -421,8 +421,8 @@ template <class T> void RegisterMembers_BatchQueue(asIScriptEngine* engine, cons
     // Vector<BatchGroup*> BatchQueue::sortedBatchGroups_
     // Error: type "Vector<BatchGroup*>" can not automatically bind
 
-    // unsigned BatchQueue::maxSortedInstances_
-    engine->RegisterObjectProperty(className, "uint maxSortedInstances", offsetof(T, maxSortedInstances_));
+    // i32 BatchQueue::maxSortedInstances_
+    engine->RegisterObjectProperty(className, "int maxSortedInstances", offsetof(T, maxSortedInstances_));
 
     // bool BatchQueue::hasExtraDefines_
     engine->RegisterObjectProperty(className, "bool hasExtraDefines", offsetof(T, hasExtraDefines_));
@@ -7786,7 +7786,7 @@ template <class T> void RegisterMembers_BatchGroup(asIScriptEngine* engine, cons
 {
     RegisterMembers_Batch<T>(engine, className);
 
-    // void BatchGroup::SetInstancingData(void* lockedData, unsigned stride, unsigned& freeIndex)
+    // void BatchGroup::SetInstancingData(void* lockedData, i32 stride, i32& freeIndex)
     // Error: type "void*" can not automatically bind
 
     // void BatchGroup::AddTransforms(const Batch& batch)
@@ -7795,8 +7795,8 @@ template <class T> void RegisterMembers_BatchGroup(asIScriptEngine* engine, cons
     // Vector<InstanceData> BatchGroup::instances_
     // Error: type "Vector<InstanceData>" can not automatically bind
 
-    // unsigned BatchGroup::startIndex_
-    engine->RegisterObjectProperty(className, "uint startIndex", offsetof(T, startIndex_));
+    // i32 BatchGroup::startIndex_
+    engine->RegisterObjectProperty(className, "int startIndex", offsetof(T, startIndex_));
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_BatchGroup
         REGISTER_MEMBERS_MANUAL_PART_BatchGroup();

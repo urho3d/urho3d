@@ -2957,12 +2957,12 @@ void View::PrepareInstancingBuffer()
         return;
 
     VertexBuffer* instancingBuffer = renderer_->GetInstancingBuffer();
-    unsigned freeIndex = 0;
+    i32 freeIndex = 0;
     void* dest = instancingBuffer->Lock(0, totalInstances, true);
     if (!dest)
         return;
 
-    const unsigned stride = instancingBuffer->GetVertexSize();
+    const i32 stride = instancingBuffer->GetVertexSize();
     for (HashMap<unsigned, BatchQueue>::Iterator i = batchQueues_.Begin(); i != batchQueues_.End(); ++i)
         i->second_.SetInstancingData(dest, stride, freeIndex);
 
