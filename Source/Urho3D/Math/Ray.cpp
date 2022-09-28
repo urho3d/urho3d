@@ -230,7 +230,7 @@ float Ray::HitDistance(const void* vertexData, i32 vertexStride, i32 vertexStart
     assert(vertexStride >= 0);
     assert(vertexStart >= 0);
     assert(vertexCount >= 0);
-    assert(uvOffset >= 0);
+    assert(uvOffset >= 0 || (uvOffset == NINDEX && !outUV));
 
     float nearest = M_INFINITY;
     const u8* vertices = ((const u8*)vertexData) + vertexStart * vertexStride;
@@ -288,7 +288,7 @@ float Ray::HitDistance(const void* vertexData, i32 vertexStride, const void* ind
     assert(indexSize >= 0);
     assert(indexStart >= 0);
     assert(indexCount >= 0);
-    assert(uvOffset >= 0);
+    assert(uvOffset >= 0 || (uvOffset == NINDEX && !outUV));
 
     float nearest = M_INFINITY;
     const u8* vertices = (const u8*)vertexData;
