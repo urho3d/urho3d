@@ -167,10 +167,10 @@ public:
 
     /// Set number of backbuffer viewports to render.
     /// @property
-    void SetNumViewports(unsigned num);
+    void SetNumViewports(i32 num);
     /// Set a backbuffer viewport.
     /// @property{set_viewports}
-    void SetViewport(unsigned index, Viewport* viewport);
+    void SetViewport(i32 index, Viewport* viewport);
     /// Set default renderpath.
     /// @property
     void SetDefaultRenderPath(RenderPath* renderPath);
@@ -264,13 +264,13 @@ public:
 
     /// Return number of backbuffer viewports.
     /// @property
-    unsigned GetNumViewports() const { return viewports_.Size(); }
+    i32 GetNumViewports() const { return viewports_.Size(); }
 
     /// Return backbuffer viewport by index.
     /// @property{get_viewports}
-    Viewport* GetViewport(unsigned index) const;
+    Viewport* GetViewport(i32 index) const;
     /// Return nth backbuffer viewport associated to a scene. Index 0 returns the first.
-    Viewport* GetViewportForScene(Scene* scene, unsigned index) const;
+    Viewport* GetViewportForScene(Scene* scene, i32 index) const;
     /// Return default renderpath.
     /// @property
     RenderPath* GetDefaultRenderPath() const;
@@ -380,28 +380,28 @@ public:
 
     /// Return number of views rendered.
     /// @property
-    unsigned GetNumViews() const { return views_.Size(); }
+    i32 GetNumViews() const { return views_.Size(); }
 
     /// Return number of primitives rendered.
     /// @property
-    unsigned GetNumPrimitives() const { return numPrimitives_; }
+    i32 GetNumPrimitives() const { return numPrimitives_; }
 
     /// Return number of batches rendered.
     /// @property
-    unsigned GetNumBatches() const { return numBatches_; }
+    i32 GetNumBatches() const { return numBatches_; }
 
     /// Return number of geometries rendered.
     /// @property
-    unsigned GetNumGeometries(bool allViews = false) const;
+    i32 GetNumGeometries(bool allViews = false) const;
     /// Return number of lights rendered.
     /// @property
-    unsigned GetNumLights(bool allViews = false) const;
+    i32 GetNumLights(bool allViews = false) const;
     /// Return number of shadow maps rendered.
     /// @property
-    unsigned GetNumShadowMaps(bool allViews = false) const;
+    i32 GetNumShadowMaps(bool allViews = false) const;
     /// Return number of occluders rendered.
     /// @property
-    unsigned GetNumOccluders(bool allViews = false) const;
+    i32 GetNumOccluders(bool allViews = false) const;
 
     /// Return the default zone.
     /// @property
@@ -447,10 +447,10 @@ public:
     /// Return quad geometry used in postprocessing.
     Geometry* GetQuadGeometry();
     /// Allocate a shadow map. If shadow map reuse is disabled, a different map is returned each time.
-    Texture2D* GetShadowMap(Light* light, Camera* camera, unsigned viewWidth, unsigned viewHeight);
+    Texture2D* GetShadowMap(Light* light, Camera* camera, i32 viewWidth, i32 viewHeight);
     /// Allocate a rendertarget or depth-stencil texture for deferred rendering or postprocessing. Should only be called during actual rendering, not before.
     Texture* GetScreenBuffer
-        (int width, int height, unsigned format, int multiSample, bool autoResolve, bool cubemap, bool filtered, bool srgb, unsigned persistentKey = 0);
+        (int width, int height, unsigned format, int multiSample, bool autoResolve, bool cubemap, bool filtered, bool srgb, hash32 persistentKey = 0);
     /// Allocate a depth-stencil surface that does not need to be readable. Should only be called during actual rendering, not before.
     RenderSurface* GetDepthStencil(int width, int height, int multiSample, bool autoResolve);
     /// Allocate an occlusion buffer.
@@ -469,7 +469,7 @@ public:
     /// Set cull mode while taking possible projection flipping into account.
     void SetCullMode(CullMode mode, Camera* camera);
     /// Ensure sufficient size of the instancing vertex buffer. Return true if successful.
-    bool ResizeInstancingBuffer(unsigned numInstances);
+    bool ResizeInstancingBuffer(i32 numInstances);
     /// Optimize a light by scissor rectangle.
     void OptimizeLightByScissor(Light* light, Camera* camera);
     /// Optimize a light by marking it to the stencil buffer and setting a stencil test.
@@ -498,7 +498,7 @@ private:
     /// Create point light shadow indirection texture data.
     void SetIndirectionTextureData();
     /// Update a queued viewport for rendering.
-    void UpdateQueuedViewport(unsigned index);
+    void UpdateQueuedViewport(i32 index);
     /// Prepare for rendering of a new view.
     void PrepareViewRender();
     /// Remove unused occlusion and screen buffers.
@@ -563,7 +563,7 @@ private:
     /// Screen buffers by resolution and format.
     HashMap<hash64, Vector<SharedPtr<Texture>>> screenBuffers_;
     /// Current screen buffer allocations by resolution and format.
-    HashMap<hash64, unsigned> screenBufferAllocations_;
+    HashMap<hash64, i32> screenBufferAllocations_;
     /// Cache for light scissor queries.
     HashMap<Pair<Light*, Camera*>, Rect> lightScissorCache_;
     /// Backbuffer viewports.
@@ -621,13 +621,13 @@ private:
     /// Mobile platform shadow normal offset multiplier.
     float mobileNormalOffsetMul_{1.0f};
     /// Number of occlusion buffers in use.
-    unsigned numOcclusionBuffers_{};
+    i32 numOcclusionBuffers_{};
     /// Number of temporary shadow cameras in use.
-    unsigned numShadowCameras_{};
+    i32 numShadowCameras_{};
     /// Number of primitives (3D geometry only).
-    unsigned numPrimitives_{};
+    i32 numPrimitives_{};
     /// Number of batches (3D geometry only).
-    unsigned numBatches_{};
+    i32 numBatches_{};
     /// Frame number on which shaders last changed.
     i32 shadersChangedFrameNumber_{NINDEX};
     /// Current stencil value for light optimization.

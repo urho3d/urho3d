@@ -11428,41 +11428,41 @@ template <class T> void RegisterMembers_Renderer(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "float GetMobileShadowBiasMul() const", AS_METHODPR(T, GetMobileShadowBiasMul, () const, float), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_mobileShadowBiasMul() const", AS_METHODPR(T, GetMobileShadowBiasMul, () const, float), AS_CALL_THISCALL);
 
-    // unsigned Renderer::GetNumBatches() const
-    engine->RegisterObjectMethod(className, "uint GetNumBatches() const", AS_METHODPR(T, GetNumBatches, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numBatches() const", AS_METHODPR(T, GetNumBatches, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Renderer::GetNumBatches() const
+    engine->RegisterObjectMethod(className, "int GetNumBatches() const", AS_METHODPR(T, GetNumBatches, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numBatches() const", AS_METHODPR(T, GetNumBatches, () const, i32), AS_CALL_THISCALL);
 
     // int Renderer::GetNumExtraInstancingBufferElements() const
     engine->RegisterObjectMethod(className, "int GetNumExtraInstancingBufferElements() const", AS_METHODPR(T, GetNumExtraInstancingBufferElements, () const, int), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "int get_numExtraInstancingBufferElements() const", AS_METHODPR(T, GetNumExtraInstancingBufferElements, () const, int), AS_CALL_THISCALL);
 
-    // unsigned Renderer::GetNumGeometries(bool allViews = false) const
-    engine->RegisterObjectMethod(className, "uint GetNumGeometries(bool = false) const", AS_METHODPR(T, GetNumGeometries, (bool) const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numGeometries(bool = false) const", AS_METHODPR(T, GetNumGeometries, (bool) const, unsigned), AS_CALL_THISCALL);
+    // i32 Renderer::GetNumGeometries(bool allViews = false) const
+    engine->RegisterObjectMethod(className, "int GetNumGeometries(bool = false) const", AS_METHODPR(T, GetNumGeometries, (bool) const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numGeometries(bool = false) const", AS_METHODPR(T, GetNumGeometries, (bool) const, i32), AS_CALL_THISCALL);
 
-    // unsigned Renderer::GetNumLights(bool allViews = false) const
-    engine->RegisterObjectMethod(className, "uint GetNumLights(bool = false) const", AS_METHODPR(T, GetNumLights, (bool) const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numLights(bool = false) const", AS_METHODPR(T, GetNumLights, (bool) const, unsigned), AS_CALL_THISCALL);
+    // i32 Renderer::GetNumLights(bool allViews = false) const
+    engine->RegisterObjectMethod(className, "int GetNumLights(bool = false) const", AS_METHODPR(T, GetNumLights, (bool) const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numLights(bool = false) const", AS_METHODPR(T, GetNumLights, (bool) const, i32), AS_CALL_THISCALL);
 
-    // unsigned Renderer::GetNumOccluders(bool allViews = false) const
-    engine->RegisterObjectMethod(className, "uint GetNumOccluders(bool = false) const", AS_METHODPR(T, GetNumOccluders, (bool) const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numOccluders(bool = false) const", AS_METHODPR(T, GetNumOccluders, (bool) const, unsigned), AS_CALL_THISCALL);
+    // i32 Renderer::GetNumOccluders(bool allViews = false) const
+    engine->RegisterObjectMethod(className, "int GetNumOccluders(bool = false) const", AS_METHODPR(T, GetNumOccluders, (bool) const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numOccluders(bool = false) const", AS_METHODPR(T, GetNumOccluders, (bool) const, i32), AS_CALL_THISCALL);
 
-    // unsigned Renderer::GetNumPrimitives() const
-    engine->RegisterObjectMethod(className, "uint GetNumPrimitives() const", AS_METHODPR(T, GetNumPrimitives, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numPrimitives() const", AS_METHODPR(T, GetNumPrimitives, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Renderer::GetNumPrimitives() const
+    engine->RegisterObjectMethod(className, "int GetNumPrimitives() const", AS_METHODPR(T, GetNumPrimitives, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numPrimitives() const", AS_METHODPR(T, GetNumPrimitives, () const, i32), AS_CALL_THISCALL);
 
-    // unsigned Renderer::GetNumShadowMaps(bool allViews = false) const
-    engine->RegisterObjectMethod(className, "uint GetNumShadowMaps(bool = false) const", AS_METHODPR(T, GetNumShadowMaps, (bool) const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numShadowMaps(bool = false) const", AS_METHODPR(T, GetNumShadowMaps, (bool) const, unsigned), AS_CALL_THISCALL);
+    // i32 Renderer::GetNumShadowMaps(bool allViews = false) const
+    engine->RegisterObjectMethod(className, "int GetNumShadowMaps(bool = false) const", AS_METHODPR(T, GetNumShadowMaps, (bool) const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numShadowMaps(bool = false) const", AS_METHODPR(T, GetNumShadowMaps, (bool) const, i32), AS_CALL_THISCALL);
 
-    // unsigned Renderer::GetNumViewports() const
-    engine->RegisterObjectMethod(className, "uint GetNumViewports() const", AS_METHODPR(T, GetNumViewports, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numViewports() const", AS_METHODPR(T, GetNumViewports, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Renderer::GetNumViewports() const
+    engine->RegisterObjectMethod(className, "int GetNumViewports() const", AS_METHODPR(T, GetNumViewports, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numViewports() const", AS_METHODPR(T, GetNumViewports, () const, i32), AS_CALL_THISCALL);
 
-    // unsigned Renderer::GetNumViews() const
-    engine->RegisterObjectMethod(className, "uint GetNumViews() const", AS_METHODPR(T, GetNumViews, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numViews() const", AS_METHODPR(T, GetNumViews, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Renderer::GetNumViews() const
+    engine->RegisterObjectMethod(className, "int GetNumViews() const", AS_METHODPR(T, GetNumViews, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numViews() const", AS_METHODPR(T, GetNumViews, () const, i32), AS_CALL_THISCALL);
 
     // float Renderer::GetOccluderSizeThreshold() const
     engine->RegisterObjectMethod(className, "float GetOccluderSizeThreshold() const", AS_METHODPR(T, GetOccluderSizeThreshold, () const, float), AS_CALL_THISCALL);
@@ -11485,14 +11485,14 @@ template <class T> void RegisterMembers_Renderer(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "bool GetReuseShadowMaps() const", AS_METHODPR(T, GetReuseShadowMaps, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_reuseShadowMaps() const", AS_METHODPR(T, GetReuseShadowMaps, () const, bool), AS_CALL_THISCALL);
 
-    // Texture* Renderer::GetScreenBuffer(int width, int height, unsigned format, int multiSample, bool autoResolve, bool cubemap, bool filtered, bool srgb, unsigned persistentKey = 0)
-    engine->RegisterObjectMethod(className, "Texture@+ GetScreenBuffer(int, int, uint, int, bool, bool, bool, bool, uint = 0)", AS_METHODPR(T, GetScreenBuffer, (int, int, unsigned, int, bool, bool, bool, bool, unsigned), Texture*), AS_CALL_THISCALL);
+    // Texture* Renderer::GetScreenBuffer(int width, int height, unsigned format, int multiSample, bool autoResolve, bool cubemap, bool filtered, bool srgb, hash32 persistentKey = 0)
+    engine->RegisterObjectMethod(className, "Texture@+ GetScreenBuffer(int, int, uint, int, bool, bool, bool, bool, hash32 = 0)", AS_METHODPR(T, GetScreenBuffer, (int, int, unsigned, int, bool, bool, bool, bool, hash32), Texture*), AS_CALL_THISCALL);
 
     // Camera* Renderer::GetShadowCamera()
     engine->RegisterObjectMethod(className, "Camera@+ GetShadowCamera()", AS_METHODPR(T, GetShadowCamera, (), Camera*), AS_CALL_THISCALL);
 
-    // Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWidth, unsigned viewHeight)
-    engine->RegisterObjectMethod(className, "Texture2D@+ GetShadowMap(Light@+, Camera@+, uint, uint)", AS_METHODPR(T, GetShadowMap, (Light*, Camera*, unsigned, unsigned), Texture2D*), AS_CALL_THISCALL);
+    // Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, i32 viewWidth, i32 viewHeight)
+    engine->RegisterObjectMethod(className, "Texture2D@+ GetShadowMap(Light@+, Camera@+, int, int)", AS_METHODPR(T, GetShadowMap, (Light*, Camera*, i32, i32), Texture2D*), AS_CALL_THISCALL);
 
     // int Renderer::GetShadowMapSize() const
     engine->RegisterObjectMethod(className, "int GetShadowMapSize() const", AS_METHODPR(T, GetShadowMapSize, () const, int), AS_CALL_THISCALL);
@@ -11526,12 +11526,12 @@ template <class T> void RegisterMembers_Renderer(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "bool GetThreadedOcclusion() const", AS_METHODPR(T, GetThreadedOcclusion, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_threadedOcclusion() const", AS_METHODPR(T, GetThreadedOcclusion, () const, bool), AS_CALL_THISCALL);
 
-    // Viewport* Renderer::GetViewport(unsigned index) const
-    engine->RegisterObjectMethod(className, "Viewport@+ GetViewport(uint) const", AS_METHODPR(T, GetViewport, (unsigned) const, Viewport*), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "Viewport@+ get_viewports(uint) const", AS_METHODPR(T, GetViewport, (unsigned) const, Viewport*), AS_CALL_THISCALL);
+    // Viewport* Renderer::GetViewport(i32 index) const
+    engine->RegisterObjectMethod(className, "Viewport@+ GetViewport(int) const", AS_METHODPR(T, GetViewport, (i32) const, Viewport*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Viewport@+ get_viewports(int) const", AS_METHODPR(T, GetViewport, (i32) const, Viewport*), AS_CALL_THISCALL);
 
-    // Viewport* Renderer::GetViewportForScene(Scene* scene, unsigned index) const
-    engine->RegisterObjectMethod(className, "Viewport@+ GetViewportForScene(Scene@+, uint) const", AS_METHODPR(T, GetViewportForScene, (Scene*, unsigned) const, Viewport*), AS_CALL_THISCALL);
+    // Viewport* Renderer::GetViewportForScene(Scene* scene, i32 index) const
+    engine->RegisterObjectMethod(className, "Viewport@+ GetViewportForScene(Scene@+, int) const", AS_METHODPR(T, GetViewportForScene, (Scene*, i32) const, Viewport*), AS_CALL_THISCALL);
 
     // int Renderer::GetVSMMultiSample() const
     engine->RegisterObjectMethod(className, "int GetVSMMultiSample() const", AS_METHODPR(T, GetVSMMultiSample, () const, int), AS_CALL_THISCALL);
@@ -11559,8 +11559,8 @@ template <class T> void RegisterMembers_Renderer(asIScriptEngine* engine, const 
     // void Renderer::Render()
     engine->RegisterObjectMethod(className, "void Render()", AS_METHODPR(T, Render, (), void), AS_CALL_THISCALL);
 
-    // bool Renderer::ResizeInstancingBuffer(unsigned numInstances)
-    engine->RegisterObjectMethod(className, "bool ResizeInstancingBuffer(uint)", AS_METHODPR(T, ResizeInstancingBuffer, (unsigned), bool), AS_CALL_THISCALL);
+    // bool Renderer::ResizeInstancingBuffer(i32 numInstances)
+    engine->RegisterObjectMethod(className, "bool ResizeInstancingBuffer(int)", AS_METHODPR(T, ResizeInstancingBuffer, (i32), bool), AS_CALL_THISCALL);
 
     // void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows, const BatchQueue& queue)
     engine->RegisterObjectMethod(className, "void SetBatchShaders(Batch&, Technique@+, bool, const BatchQueue&in)", AS_METHODPR(T, SetBatchShaders, (Batch&, Technique*, bool, const BatchQueue&), void), AS_CALL_THISCALL);
@@ -11630,9 +11630,9 @@ template <class T> void RegisterMembers_Renderer(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "void SetNumExtraInstancingBufferElements(int)", AS_METHODPR(T, SetNumExtraInstancingBufferElements, (int), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_numExtraInstancingBufferElements(int)", AS_METHODPR(T, SetNumExtraInstancingBufferElements, (int), void), AS_CALL_THISCALL);
 
-    // void Renderer::SetNumViewports(unsigned num)
-    engine->RegisterObjectMethod(className, "void SetNumViewports(uint)", AS_METHODPR(T, SetNumViewports, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_numViewports(uint)", AS_METHODPR(T, SetNumViewports, (unsigned), void), AS_CALL_THISCALL);
+    // void Renderer::SetNumViewports(i32 num)
+    engine->RegisterObjectMethod(className, "void SetNumViewports(int)", AS_METHODPR(T, SetNumViewports, (i32), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_numViewports(int)", AS_METHODPR(T, SetNumViewports, (i32), void), AS_CALL_THISCALL);
 
     // void Renderer::SetOccluderSizeThreshold(float screenSize)
     engine->RegisterObjectMethod(className, "void SetOccluderSizeThreshold(float)", AS_METHODPR(T, SetOccluderSizeThreshold, (float), void), AS_CALL_THISCALL);
@@ -11678,9 +11678,9 @@ template <class T> void RegisterMembers_Renderer(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "void SetThreadedOcclusion(bool)", AS_METHODPR(T, SetThreadedOcclusion, (bool), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_threadedOcclusion(bool)", AS_METHODPR(T, SetThreadedOcclusion, (bool), void), AS_CALL_THISCALL);
 
-    // void Renderer::SetViewport(unsigned index, Viewport* viewport)
-    engine->RegisterObjectMethod(className, "void SetViewport(uint, Viewport@+)", AS_METHODPR(T, SetViewport, (unsigned, Viewport*), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_viewports(uint, Viewport@+)", AS_METHODPR(T, SetViewport, (unsigned, Viewport*), void), AS_CALL_THISCALL);
+    // void Renderer::SetViewport(i32 index, Viewport* viewport)
+    engine->RegisterObjectMethod(className, "void SetViewport(int, Viewport@+)", AS_METHODPR(T, SetViewport, (i32, Viewport*), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_viewports(int, Viewport@+)", AS_METHODPR(T, SetViewport, (i32, Viewport*), void), AS_CALL_THISCALL);
 
     // void Renderer::SetVSMMultiSample(int multiSample)
     engine->RegisterObjectMethod(className, "void SetVSMMultiSample(int)", AS_METHODPR(T, SetVSMMultiSample, (int), void), AS_CALL_THISCALL);
