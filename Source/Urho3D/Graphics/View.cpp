@@ -266,7 +266,7 @@ View::View(Context* context) :
     renderer_(GetSubsystem<Renderer>())
 {
     // Create octree query and scene results vector for each thread
-    unsigned numThreads = GetSubsystem<WorkQueue>()->GetNumThreads() + 1; // Worker threads + main thread
+    i32 numThreads = GetSubsystem<WorkQueue>()->GetNumThreads() + 1; // Worker threads + main thread
     tempDrawables_.Resize(numThreads);
     sceneResults_.Resize(numThreads);
 }
@@ -336,7 +336,7 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
     }
 
     // Set default passes
-    gBufferPassIndex_ = M_MAX_UNSIGNED;
+    gBufferPassIndex_ = NINDEX;
     basePassIndex_ = Technique::GetPassIndex("base");
     alphaPassIndex_ = Technique::GetPassIndex("alpha");
     lightPassIndex_ = Technique::GetPassIndex("light");
@@ -409,9 +409,9 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
                 }
             }
 
-            HashMap<unsigned, BatchQueue>::Iterator j = batchQueues_.Find(info.passIndex_);
+            HashMap<i32, BatchQueue>::Iterator j = batchQueues_.Find(info.passIndex_);
             if (j == batchQueues_.End())
-                j = batchQueues_.Insert(Pair<unsigned, BatchQueue>(info.passIndex_, BatchQueue()));
+                j = batchQueues_.Insert(Pair<i32, BatchQueue>(info.passIndex_, BatchQueue()));
             info.batchQueue_ = &j->second_;
             SetQueueShaderDefines(*info.batchQueue_, command);
 
@@ -477,7 +477,7 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
     // Set possible quality overrides from the camera
     // Note that the culling camera is used here (its settings are authoritative) while the render camera
     // will be just used for the final view & projection matrices
-    unsigned viewOverrideFlags = cullCamera_ ? cullCamera_->GetViewOverrideFlags() : VO_NONE;
+    ViewOverrideFlags viewOverrideFlags = cullCamera_ ? cullCamera_->GetViewOverrideFlags() : VO_NONE;
     if (viewOverrideFlags & VO_LOW_MATERIAL_QUALITY)
         materialQuality_ = QUALITY_LOW;
     if (viewOverrideFlags & VO_DISABLE_SHADOWS)
@@ -517,7 +517,7 @@ void View::Update(const FrameInfo& frame)
     occluders_.Clear();
     activeOccluders_ = 0;
     vertexLightQueues_.Clear();
-    for (HashMap<unsigned, BatchQueue>::Iterator i = batchQueues_.Begin(); i != batchQueues_.End(); ++i)
+    for (HashMap<i32, BatchQueue>::Iterator i = batchQueues_.Begin(); i != batchQueues_.End(); ++i)
         i->second_.Clear(maxSortedInstances);
 
     if (hasScenePasses_ && (!cullCamera_ || !octree_))
@@ -613,7 +613,7 @@ void View::Render()
             }
 
             graphics_->SetRenderTarget(0, currentRenderTarget_);
-            for (unsigned i = 1; i < MAX_RENDERTARGETS; ++i)
+            for (i32 i = 1; i < MAX_RENDERTARGETS; ++i)
                 graphics_->SetRenderTarget(i, (RenderSurface*)nullptr);
 
             // If a custom depth surface was used, use it also for debug rendering
@@ -990,8 +990,8 @@ void View::GetLightBatches()
         URHO3D_PROFILE(GetLightBatches);
 
         // Preallocate light queues: per-pixel lights which have lit geometries
-        unsigned numLightQueues = 0;
-        unsigned usedLightQueues = 0;
+        i32 numLightQueues = 0;
+        i32 usedLightQueues = 0;
         for (Vector<LightQueryResult>::ConstIterator i = lightQueryResults_.Begin(); i != lightQueryResults_.End(); ++i)
         {
             if (!i->light_->GetPerVertex() && i->litGeometries_.Size())
@@ -1000,7 +1000,7 @@ void View::GetLightBatches()
 
         lightQueues_.Resize(numLightQueues);
         maxLightsDrawables_.Clear();
-        auto maxSortedInstances = (unsigned)renderer_->GetMaxSortedInstances();
+        i32 maxSortedInstances = renderer_->GetMaxSortedInstances();
 
         for (Vector<LightQueryResult>::Iterator i = lightQueryResults_.Begin(); i != lightQueryResults_.End(); ++i)
         {
@@ -1015,7 +1015,7 @@ void View::GetLightBatches()
             // Per-pixel light
             if (!light->GetPerVertex())
             {
-                unsigned shadowSplits = query.numSplits_;
+                i32 shadowSplits = query.numSplits_;
 
                 // Initialize light queue and store it to the light so that it can be found later
                 LightBatchQueue& lightQueue = lightQueues_[usedLightQueues++];
@@ -1040,7 +1040,7 @@ void View::GetLightBatches()
                 // Allocate shadow map now
                 if (shadowSplits > 0)
                 {
-                    lightQueue.shadowMap_ = renderer_->GetShadowMap(light, cullCamera_, (unsigned)viewSize_.x_, (unsigned)viewSize_.y_);
+                    lightQueue.shadowMap_ = renderer_->GetShadowMap(light, cullCamera_, viewSize_.x_, viewSize_.y_);
                     // If did not manage to get a shadow map, convert the light to unshadowed
                     if (!lightQueue.shadowMap_)
                         shadowSplits = 0;
@@ -1048,7 +1048,7 @@ void View::GetLightBatches()
 
                 // Setup shadow batch queues
                 lightQueue.shadowSplits_.Resize(shadowSplits);
-                for (unsigned j = 0; j < shadowSplits; ++j)
+                for (i32 j = 0; j < shadowSplits; ++j)
                 {
                     ShadowBatchQueue& shadowQueue = lightQueue.shadowSplits_[j];
                     Camera* shadowCamera = query.shadowCameras_[j];
@@ -1372,7 +1372,7 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue, BatchQ
             continue;
 
         // Do not create pixel lit forward passes for materials that render into the G-buffer
-        if (gBufferPassIndex_ != M_MAX_UNSIGNED && tech->HasPass(gBufferPassIndex_))
+        if (gBufferPassIndex_ != NINDEX && tech->HasPass(gBufferPassIndex_))
             continue;
 
         Batch destBatch(srcBatch);
@@ -1775,7 +1775,7 @@ bool View::SetTextures(RenderPathCommand& command)
 {
     bool allowDepthWrite = true;
 
-    for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
+    for (i32 i = 0; i < MAX_TEXTURE_UNITS; ++i)
     {
         if (command.textureNames_[i].Empty())
             continue;
@@ -1931,7 +1931,7 @@ void View::AllocateScreenBuffers()
     bool hasViewportRead = false;
     bool hasPingpong = false;
     bool needSubstitute = false;
-    unsigned numViewportTextures = 0;
+    i32 numViewportTextures = 0;
     lastCustomDepthSurface_ = nullptr;
 
     // Check for commands with special meaning: has custom depth, renders a scene pass to other than the destination viewport,
@@ -2028,7 +2028,7 @@ void View::AllocateScreenBuffers()
     bool sRGB = renderTarget_ ? renderTarget_->GetParentTexture()->GetSRGB() : graphics_->GetSRGB();
     substituteRenderTarget_ = needSubstitute ? GetRenderSurfaceFromTexture(renderer_->GetScreenBuffer(viewSize_.x_, viewSize_.y_,
         format, 1, false, false, true, sRGB)) : nullptr;
-    for (unsigned i = 0; i < MAX_VIEWPORT_TEXTURES; ++i)
+    for (i32 i = 0; i < MAX_VIEWPORT_TEXTURES; ++i)
     {
         viewportTextures_[i] = i < numViewportTextures ? renderer_->GetScreenBuffer(viewSize_.x_, viewSize_.y_, format, 1, false,
             false, true, sRGB) : nullptr;
@@ -2093,7 +2093,7 @@ void View::BlitFramebuffer(Texture* source, RenderSurface* destination, bool dep
     graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
     graphics_->SetRenderTarget(0, destination);
-    for (unsigned i = 1; i < MAX_RENDERTARGETS; ++i)
+    for (i32 i = 1; i < MAX_RENDERTARGETS; ++i)
         graphics_->SetRenderTarget(i, (RenderSurface*)nullptr);
     graphics_->SetDepthStencil(GetDepthStencil(destination));
     graphics_->SetViewport(destRect);
@@ -2205,7 +2205,7 @@ void View::UpdateOccluders(Vector<Drawable*>& occluders, Camera* camera)
 
 void View::DrawOccluders(OcclusionBuffer* buffer, const Vector<Drawable*>& occluders)
 {
-    buffer->SetMaxTriangles((unsigned)maxOccluderTriangles_);
+    buffer->SetMaxTriangles(maxOccluderTriangles_);
     buffer->Clear();
 
     if (!buffer->IsThreaded())
@@ -2322,7 +2322,7 @@ void View::ProcessLight(LightQueryResult& query, i32 threadIndex)
 
     // Process each split for shadow casters
     query.shadowCasters_.Clear();
-    for (unsigned i = 0; i < query.numSplits_; ++i)
+    for (i32 i = 0; i < query.numSplits_; ++i)
     {
         Camera* shadowCamera = query.shadowCameras_[i];
         const Frustum& shadowCameraFrustum = shadowCamera->GetFrustum();
@@ -2355,8 +2355,10 @@ void View::ProcessLight(LightQueryResult& query, i32 threadIndex)
         query.numSplits_ = 0;
 }
 
-void View::ProcessShadowCasters(LightQueryResult& query, const Vector<Drawable*>& drawables, unsigned splitIndex)
+void View::ProcessShadowCasters(LightQueryResult& query, const Vector<Drawable*>& drawables, i32 splitIndex)
 {
+    assert(splitIndex >= 0);
+
     Light* light = query.light_;
     unsigned lightMask = light->GetLightMask();
 
@@ -2565,7 +2567,7 @@ void View::SetupShadowCameras(LightQueryResult& query)
                 &Vector3::BACK
             };
 
-            for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
+            for (i32 i = 0; i < MAX_CUBEMAP_FACES; ++i)
             {
                 Camera* shadowCamera = renderer_->GetShadowCamera();
                 query.shadowCameras_[i] = shadowCamera;
@@ -2840,7 +2842,7 @@ void View::CheckMaterialForAuxView(Material* material)
             else if (texture->GetType() == TextureCube::GetTypeStatic())
             {
                 auto* texCube = static_cast<TextureCube*>(texture);
-                for (unsigned j = 0; j < MAX_CUBEMAP_FACES; ++j)
+                for (i32 j = 0; j < MAX_CUBEMAP_FACES; ++j)
                 {
                     RenderSurface* target = texCube->GetRenderSurface((CubeMapFace)j);
                     if (target && target->GetUpdateMode() == SURFACE_UPDATEVISIBLE)
@@ -2913,9 +2915,9 @@ void View::AddBatchToQueue(BatchQueue& queue, Batch& batch, Technique* tech, boo
         // If batch is static with multiple world transforms and cannot instance, we must push copies of the batch individually
         if (batch.geometryType_ == GEOM_STATIC && batch.numWorldTransforms_ > 1)
         {
-            unsigned numTransforms = batch.numWorldTransforms_;
+            i32 numTransforms = batch.numWorldTransforms_;
             batch.numWorldTransforms_ = 1;
-            for (unsigned i = 0; i < numTransforms; ++i)
+            for (i32 i = 0; i < numTransforms; ++i)
             {
                 // Move the transform pointer to generate copies of the batch which only refer to 1 world transform
                 queue.batches_.Push(batch);
@@ -2939,9 +2941,9 @@ void View::PrepareInstancingBuffer()
 
     URHO3D_PROFILE(PrepareInstancingBuffer);
 
-    unsigned totalInstances = 0;
+    i32 totalInstances = 0;
 
-    for (HashMap<unsigned, BatchQueue>::Iterator i = batchQueues_.Begin(); i != batchQueues_.End(); ++i)
+    for (HashMap<i32, BatchQueue>::Iterator i = batchQueues_.Begin(); i != batchQueues_.End(); ++i)
         totalInstances += i->second_.GetNumInstances();
 
     for (Vector<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
@@ -2963,7 +2965,7 @@ void View::PrepareInstancingBuffer()
         return;
 
     const i32 stride = instancingBuffer->GetVertexSize();
-    for (HashMap<unsigned, BatchQueue>::Iterator i = batchQueues_.Begin(); i != batchQueues_.End(); ++i)
+    for (HashMap<i32, BatchQueue>::Iterator i = batchQueues_.Begin(); i != batchQueues_.End(); ++i)
         i->second_.SetInstancingData(dest, stride, freeIndex);
 
     for (Vector<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
@@ -3055,7 +3057,7 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
         graphics_->SetDepthStencil(shadowMap);
         graphics_->SetRenderTarget(0, shadowMap->GetRenderSurface()->GetLinkedRenderTarget());
         // Disable other render targets
-        for (unsigned i = 1; i < MAX_RENDERTARGETS; ++i)
+        for (i32 i = 1; i < MAX_RENDERTARGETS; ++i)
             graphics_->SetRenderTarget(i, (RenderSurface*) nullptr);
         graphics_->SetViewport(IntRect(0, 0, shadowMap->GetWidth(), shadowMap->GetHeight()));
         graphics_->Clear(CLEAR_DEPTH);
@@ -3065,7 +3067,7 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
         graphics_->SetColorWrite(true);
         graphics_->SetRenderTarget(0, shadowMap);
         // Disable other render targets
-        for (unsigned i = 1; i < MAX_RENDERTARGETS; ++i)
+        for (i32 i = 1; i < MAX_RENDERTARGETS; ++i)
             graphics_->SetRenderTarget(i, (RenderSurface*) nullptr);
         graphics_->SetDepthStencil(renderer_->GetDepthStencil(shadowMap->GetWidth(), shadowMap->GetHeight(),
             shadowMap->GetMultiSample(), shadowMap->GetAutoResolve()));
