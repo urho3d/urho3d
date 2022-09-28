@@ -286,8 +286,8 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // constexpr i32 MAX_VERTEX_STREAMS | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const int MAX_VERTEX_STREAMS", (void*)&MAX_VERTEX_STREAMS);
 
-    // static const unsigned MAX_VIEWPORT_TEXTURES | File: ../Graphics/View.h
-    engine->RegisterGlobalProperty("const uint MAX_VIEWPORT_TEXTURES", (void*)&MAX_VIEWPORT_TEXTURES);
+    // constexpr i32 MAX_VIEWPORT_TEXTURES | File: ../Graphics/View.h
+    engine->RegisterGlobalProperty("const int MAX_VIEWPORT_TEXTURES", (void*)&MAX_VIEWPORT_TEXTURES);
 
     // const IntVector2 MOUSE_POSITION_OFFSCREEN | File: ../Input/Input.h
     engine->RegisterGlobalProperty("const IntVector2 MOUSE_POSITION_OFFSCREEN", (void*)&MOUSE_POSITION_OFFSCREEN);

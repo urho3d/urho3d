@@ -2499,9 +2499,9 @@ template <class T> void RegisterMembers_LightQueryResult(asIScriptEngine* engine
     // Error: type "Vector<Drawable*>" can not automatically bind
     // Camera* LightQueryResult::shadowCameras_[MAX_LIGHT_SPLITS]
     // Not registered because array
-    // unsigned LightQueryResult::shadowCasterBegin_[MAX_LIGHT_SPLITS]
+    // i32 LightQueryResult::shadowCasterBegin_[MAX_LIGHT_SPLITS]
     // Not registered because array
-    // unsigned LightQueryResult::shadowCasterEnd_[MAX_LIGHT_SPLITS]
+    // i32 LightQueryResult::shadowCasterEnd_[MAX_LIGHT_SPLITS]
     // Not registered because array
     // BoundingBox LightQueryResult::shadowCasterBox_[MAX_LIGHT_SPLITS]
     // Not registered because array
@@ -2510,8 +2510,8 @@ template <class T> void RegisterMembers_LightQueryResult(asIScriptEngine* engine
     // float LightQueryResult::shadowFarSplits_[MAX_LIGHT_SPLITS]
     // Not registered because array
 
-    // unsigned LightQueryResult::numSplits_
-    engine->RegisterObjectProperty(className, "uint numSplits", offsetof(T, numSplits_));
+    // i32 LightQueryResult::numSplits_
+    engine->RegisterObjectProperty(className, "int numSplits", offsetof(T, numSplits_));
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_LightQueryResult
         REGISTER_MEMBERS_MANUAL_PART_LightQueryResult();
@@ -4282,8 +4282,8 @@ template <class T> void RegisterMembers_ScenePassInfo(asIScriptEngine* engine, c
     // BatchQueue* ScenePassInfo::batchQueue_
     // Not registered because pointer
 
-    // unsigned ScenePassInfo::passIndex_
-    engine->RegisterObjectProperty(className, "uint passIndex", offsetof(T, passIndex_));
+    // i32 ScenePassInfo::passIndex_
+    engine->RegisterObjectProperty(className, "int passIndex", offsetof(T, passIndex_));
 
     // bool ScenePassInfo::allowInstancing_
     engine->RegisterObjectProperty(className, "bool allowInstancing", offsetof(T, allowInstancing_));
@@ -12697,8 +12697,8 @@ template <class T> void RegisterMembers_View(asIScriptEngine* engine, const char
     // const Vector<Light*>& View::GetLights() const
     engine->RegisterObjectMethod(className, "Array<Light@>@ GetLights() const", AS_FUNCTION_OBJFIRST(View_constspVectorlesLightstargreamp_GetLights_void_template<View>), AS_CALL_CDECL_OBJFIRST);
 
-    // unsigned View::GetNumActiveOccluders() const
-    engine->RegisterObjectMethod(className, "uint GetNumActiveOccluders() const", AS_METHODPR(T, GetNumActiveOccluders, () const, unsigned), AS_CALL_THISCALL);
+    // i32 View::GetNumActiveOccluders() const
+    engine->RegisterObjectMethod(className, "int GetNumActiveOccluders() const", AS_METHODPR(T, GetNumActiveOccluders, () const, i32), AS_CALL_THISCALL);
 
     // const Vector<Drawable*>& View::GetOccluders() const
     engine->RegisterObjectMethod(className, "Array<Drawable@>@ GetOccluders() const", AS_FUNCTION_OBJFIRST(View_constspVectorlesDrawablestargreamp_GetOccluders_void_template<View>), AS_CALL_CDECL_OBJFIRST);

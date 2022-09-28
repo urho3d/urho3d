@@ -43,9 +43,9 @@ struct LightQueryResult
     /// Shadow cameras.
     Camera* shadowCameras_[MAX_LIGHT_SPLITS];
     /// Shadow caster start indices.
-    unsigned shadowCasterBegin_[MAX_LIGHT_SPLITS];
+    i32 shadowCasterBegin_[MAX_LIGHT_SPLITS];
     /// Shadow caster end indices.
-    unsigned shadowCasterEnd_[MAX_LIGHT_SPLITS];
+    i32 shadowCasterEnd_[MAX_LIGHT_SPLITS];
     /// Combined bounding box of shadow casters in light projection space. Only used for focused spot lights.
     BoundingBox shadowCasterBox_[MAX_LIGHT_SPLITS];
     /// Shadow camera near splits (directional lights only).
@@ -53,14 +53,14 @@ struct LightQueryResult
     /// Shadow camera far splits (directional lights only).
     float shadowFarSplits_[MAX_LIGHT_SPLITS];
     /// Shadow map split count.
-    unsigned numSplits_;
+    i32 numSplits_;
 };
 
 /// Scene render pass info.
 struct ScenePassInfo
 {
     /// Pass index.
-    unsigned passIndex_;
+    i32 passIndex_;
     /// Allow instancing flag.
     bool allowInstancing_;
     /// Mark to stencil flag.
@@ -84,7 +84,7 @@ struct PerThreadSceneResult
     float maxZ_;
 };
 
-static const unsigned MAX_VIEWPORT_TEXTURES = 2;
+inline constexpr i32 MAX_VIEWPORT_TEXTURES = 2;
 
 /// Internal structure for 3D rendering work. Created for each backbuffer and texture viewport, but not for shadow cameras.
 class URHO3D_API View : public Object
@@ -155,7 +155,7 @@ public:
     OcclusionBuffer* GetOcclusionBuffer() const { return occlusionBuffer_; }
 
     /// Return number of occluders that were actually rendered. Occluders may be rejected if running out of triangles or if behind other occluders.
-    unsigned GetNumActiveOccluders() const { return activeOccluders_; }
+    i32 GetNumActiveOccluders() const { return activeOccluders_; }
 
     /// Return the source view that was already prepared. Used when viewports specify the same culling camera.
     View* GetSourceView() const;
@@ -217,7 +217,7 @@ private:
     /// Query for lit geometries and shadow casters for a light.
     void ProcessLight(LightQueryResult& query, i32 threadIndex);
     /// Process shadow casters' visibilities and build their combined view- or projection-space bounding box.
-    void ProcessShadowCasters(LightQueryResult& query, const Vector<Drawable*>& drawables, unsigned splitIndex);
+    void ProcessShadowCasters(LightQueryResult& query, const Vector<Drawable*>& drawables, i32 splitIndex);
     /// Set up initial shadow camera view(s).
     void SetupShadowCameras(LightQueryResult& query);
     /// Set up a directional light shadow camera.
@@ -379,7 +379,7 @@ private:
     /// Lights.
     Vector<Light*> lights_;
     /// Number of active occluders.
-    unsigned activeOccluders_{};
+    i32 activeOccluders_{};
 
     /// Drawables that limit their maximum light count.
     HashSet<Drawable*> maxLightsDrawables_;
@@ -394,19 +394,19 @@ private:
     /// Per-vertex light queues.
     HashMap<hash64, LightBatchQueue> vertexLightQueues_;
     /// Batch queues by pass index.
-    HashMap<unsigned, BatchQueue> batchQueues_;
+    HashMap<i32, BatchQueue> batchQueues_;
     /// Index of the GBuffer pass.
-    unsigned gBufferPassIndex_{};
+    i32 gBufferPassIndex_{};
     /// Index of the opaque forward base pass.
-    unsigned basePassIndex_{};
+    i32 basePassIndex_{};
     /// Index of the alpha pass.
-    unsigned alphaPassIndex_{};
+    i32 alphaPassIndex_{};
     /// Index of the forward light pass.
-    unsigned lightPassIndex_{};
+    i32 lightPassIndex_{};
     /// Index of the litbase pass.
-    unsigned litBasePassIndex_{};
+    i32 litBasePassIndex_{};
     /// Index of the litalpha pass.
-    unsigned litAlphaPassIndex_{};
+    i32 litAlphaPassIndex_{};
     /// Pointer to the light volume command if any.
     const RenderPathCommand* lightVolumeCommand_{};
     /// Pointer to the forwardlights command if any.
