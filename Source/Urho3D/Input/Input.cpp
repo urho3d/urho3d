@@ -50,7 +50,7 @@ const StringHash VAR_BUTTON_MOUSE_BUTTON_BINDING("VAR_BUTTON_MOUSE_BUTTON_BINDIN
 const StringHash VAR_LAST_KEYSYM("VAR_LAST_KEYSYM");
 const StringHash VAR_SCREEN_JOYSTICK_ID("VAR_SCREEN_JOYSTICK_ID");
 
-const unsigned TOUCHID_MAX = 32;
+static constexpr i32 TOUCHID_MAX = 32;
 
 /// Convert SDL keycode if necessary.
 Key ConvertSDLKeyCode(int keySym, int scanCode)
@@ -1005,9 +1005,9 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
     state.name_ = screenJoystick->GetName();
     state.screenJoystick_ = screenJoystick;
 
-    unsigned numButtons = 0;
-    unsigned numAxes = 0;
-    unsigned numHats = 0;
+    i32 numButtons = 0;
+    i32 numAxes = 0;
+    i32 numHats = 0;
     const Vector<SharedPtr<UIElement>>& children = state.screenJoystick_->GetChildren();
     for (Vector<SharedPtr<UIElement>>::ConstIterator iter = children.Begin(); iter != children.End(); ++iter)
     {
@@ -1082,14 +1082,14 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
                 else if (keyBinding.Length() == 4)
                 {
                     keyBindings.Resize(4);      // e.g.: "WSAD"
-                    for (unsigned i = 0; i < 4; ++i)
+                    for (i32 i = 0; i < 4; ++i)
                         keyBindings[i] = keyBinding.Substring(i, 1);
                 }
                 if (keyBindings.Size() == 4)
                 {
                     PopulateKeyBindingMap(keyBindingMap);
 
-                    for (unsigned j = 0; j < 4; ++j)
+                    for (i32 j = 0; j < 4; ++j)
                     {
                         if (keyBindings[j].Length() == 1)
                             mappedKeyBinding[j] = keyBindings[j][0];
@@ -1220,7 +1220,7 @@ bool Input::SaveGesture(Serializer& dest, unsigned gestureID)
     return SDL_SaveDollarTemplate(gestureID, wrapper.GetRWOps()) != 0;
 }
 
-unsigned Input::LoadGestures(Deserializer& source)
+i32 Input::LoadGestures(Deserializer& source)
 {
     // If have no touch devices, fail
     if (!SDL_GetNumTouchDevices())
@@ -1230,7 +1230,7 @@ unsigned Input::LoadGestures(Deserializer& source)
     }
 
     RWOpsWrapper<Deserializer> wrapper(source);
-    return (unsigned)SDL_LoadDollarTemplates(-1, wrapper.GetRWOps());
+    return SDL_LoadDollarTemplates(-1, wrapper.GetRWOps());
 }
 
 
@@ -1250,8 +1250,10 @@ void Input::RemoveAllGestures()
 #endif
 }
 
-SDL_JoystickID Input::OpenJoystick(unsigned index)
+SDL_JoystickID Input::OpenJoystick(i32 index)
 {
+    assert(index >= 0);
+
     SDL_Joystick* joystick = SDL_JoystickOpen(index);
     if (!joystick)
     {
@@ -1268,9 +1270,9 @@ SDL_JoystickID Input::OpenJoystick(unsigned index)
     if (SDL_IsGameController(index))
         state.controller_ = SDL_GameControllerOpen(index);
 
-    auto numButtons = (unsigned)SDL_JoystickNumButtons(joystick);
-    auto numAxes = (unsigned)SDL_JoystickNumAxes(joystick);
-    auto numHats = (unsigned)SDL_JoystickNumHats(joystick);
+    i32 numButtons = SDL_JoystickNumButtons(joystick);
+    i32 numAxes = SDL_JoystickNumAxes(joystick);
+    i32 numHats = SDL_JoystickNumHats(joystick);
 
     // When the joystick is a controller, make sure there's enough axes & buttons for the standard controller mappings
     if (state.controller_)
@@ -1421,8 +1423,10 @@ int Input::GetMouseMoveY() const
         return 0;
 }
 
-TouchState* Input::GetTouch(unsigned index) const
+TouchState* Input::GetTouch(i32 index) const
 {
+    assert(index >= 0);
+
     if (index >= touches_.Size())
         return nullptr;
 
@@ -1433,9 +1437,11 @@ TouchState* Input::GetTouch(unsigned index) const
     return const_cast<TouchState*>(&i->second_);
 }
 
-JoystickState* Input::GetJoystickByIndex(unsigned index)
+JoystickState* Input::GetJoystickByIndex(i32 index)
 {
-    unsigned compare = 0;
+    assert(index >= 0);
+
+    i32 compare = 0;
     for (HashMap<SDL_JoystickID, JoystickState>::Iterator i = joysticks_.Begin(); i != joysticks_.End(); ++i)
     {
         if (compare++ == index)
@@ -1545,8 +1551,8 @@ void Input::ResetJoysticks()
     joysticks_.Clear();
 
     // Open each detected joystick automatically on startup
-    auto size = static_cast<unsigned>(SDL_NumJoysticks());
-    for (unsigned i = 0; i < size; ++i)
+    i32 size = SDL_NumJoysticks();
+    for (i32 i = 0; i < size; ++i)
         OpenJoystick(i);
 }
 
@@ -1560,7 +1566,7 @@ void Input::ResetInputAccumulation()
     mouseMoveWheel_ = 0;
     for (HashMap<SDL_JoystickID, JoystickState>::Iterator i = joysticks_.Begin(); i != joysticks_.End(); ++i)
     {
-        for (unsigned j = 0; j < i->second_.buttonPress_.Size(); ++j)
+        for (i32 j = 0; j < i->second_.buttonPress_.Size(); ++j)
             i->second_.buttonPress_[j] = false;
     }
 
@@ -1663,25 +1669,25 @@ void Input::ResetTouches()
 
 }
 
-unsigned Input::GetTouchIndexFromID(int touchID)
+i32 Input::GetTouchIndexFromID(int touchID)
 {
     HashMap<int, int>::ConstIterator i = touchIDMap_.Find(touchID);
     if (i != touchIDMap_.End())
     {
-        return (unsigned)i->second_;
+        return i->second_;
     }
 
-    unsigned index = PopTouchIndex();
+    i32 index = PopTouchIndex();
     touchIDMap_[touchID] = index;
     return index;
 }
 
-unsigned Input::PopTouchIndex()
+i32 Input::PopTouchIndex()
 {
     if (availableTouchIDs_.Empty())
         return 0;
 
-    auto index = (unsigned)availableTouchIDs_.Front();
+    i32 index = availableTouchIDs_.Front();
     availableTouchIDs_.PopFront();
     return index;
 }
@@ -2151,7 +2157,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
         {
             using namespace JoystickConnected;
 
-            SDL_JoystickID joystickID = OpenJoystick((unsigned)evt.jdevice.which);
+            SDL_JoystickID joystickID = OpenJoystick(evt.jdevice.which);
 
             VariantMap& eventData = GetEventDataMap();
             eventData[P_JOYSTICKID] = joystickID;

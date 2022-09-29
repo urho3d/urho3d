@@ -10768,9 +10768,9 @@ template <class T> void RegisterMembers_Input(asIScriptEngine* engine, const cha
     engine->RegisterObjectMethod(className, "JoystickState@ GetJoystick(SDL_JoystickID)", AS_METHODPR(T, GetJoystick, (SDL_JoystickID), JoystickState*), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "JoystickState@ get_joysticks(SDL_JoystickID)", AS_METHODPR(T, GetJoystick, (SDL_JoystickID), JoystickState*), AS_CALL_THISCALL);
 
-    // JoystickState* Input::GetJoystickByIndex(unsigned index)
-    engine->RegisterObjectMethod(className, "JoystickState@ GetJoystickByIndex(uint)", AS_METHODPR(T, GetJoystickByIndex, (unsigned), JoystickState*), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "JoystickState@ get_joysticksByIndex(uint)", AS_METHODPR(T, GetJoystickByIndex, (unsigned), JoystickState*), AS_CALL_THISCALL);
+    // JoystickState* Input::GetJoystickByIndex(i32 index)
+    engine->RegisterObjectMethod(className, "JoystickState@ GetJoystickByIndex(int)", AS_METHODPR(T, GetJoystickByIndex, (i32), JoystickState*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "JoystickState@ get_joysticksByIndex(int)", AS_METHODPR(T, GetJoystickByIndex, (i32), JoystickState*), AS_CALL_THISCALL);
 
     // JoystickState* Input::GetJoystickByName(const String& name)
     engine->RegisterObjectMethod(className, "JoystickState@ GetJoystickByName(const String&in)", AS_METHODPR(T, GetJoystickByName, (const String&), JoystickState*), AS_CALL_THISCALL);
@@ -10825,13 +10825,13 @@ template <class T> void RegisterMembers_Input(asIScriptEngine* engine, const cha
     engine->RegisterObjectMethod(className, "IntVector2 GetMousePosition() const", AS_METHODPR(T, GetMousePosition, () const, IntVector2), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "IntVector2 get_mousePosition() const", AS_METHODPR(T, GetMousePosition, () const, IntVector2), AS_CALL_THISCALL);
 
-    // unsigned Input::GetNumJoysticks() const
-    engine->RegisterObjectMethod(className, "uint GetNumJoysticks() const", AS_METHODPR(T, GetNumJoysticks, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numJoysticks() const", AS_METHODPR(T, GetNumJoysticks, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Input::GetNumJoysticks() const
+    engine->RegisterObjectMethod(className, "int GetNumJoysticks() const", AS_METHODPR(T, GetNumJoysticks, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numJoysticks() const", AS_METHODPR(T, GetNumJoysticks, () const, i32), AS_CALL_THISCALL);
 
-    // unsigned Input::GetNumTouches() const
-    engine->RegisterObjectMethod(className, "uint GetNumTouches() const", AS_METHODPR(T, GetNumTouches, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numTouches() const", AS_METHODPR(T, GetNumTouches, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Input::GetNumTouches() const
+    engine->RegisterObjectMethod(className, "int GetNumTouches() const", AS_METHODPR(T, GetNumTouches, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numTouches() const", AS_METHODPR(T, GetNumTouches, () const, i32), AS_CALL_THISCALL);
 
     // bool Input::GetQualifierDown(Qualifier qualifier) const
     engine->RegisterObjectMethod(className, "bool GetQualifierDown(Qualifier) const", AS_METHODPR(T, GetQualifierDown, (Qualifier) const, bool), AS_CALL_THISCALL);
@@ -10870,9 +10870,9 @@ template <class T> void RegisterMembers_Input(asIScriptEngine* engine, const cha
     engine->RegisterObjectMethod(className, "bool GetToggleFullscreen() const", AS_METHODPR(T, GetToggleFullscreen, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_toggleFullscreen() const", AS_METHODPR(T, GetToggleFullscreen, () const, bool), AS_CALL_THISCALL);
 
-    // TouchState* Input::GetTouch(unsigned index) const
-    engine->RegisterObjectMethod(className, "TouchState@ GetTouch(uint) const", AS_METHODPR(T, GetTouch, (unsigned) const, TouchState*), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "TouchState@ get_touches(uint) const", AS_METHODPR(T, GetTouch, (unsigned) const, TouchState*), AS_CALL_THISCALL);
+    // TouchState* Input::GetTouch(i32 index) const
+    engine->RegisterObjectMethod(className, "TouchState@ GetTouch(int) const", AS_METHODPR(T, GetTouch, (i32) const, TouchState*), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "TouchState@ get_touches(int) const", AS_METHODPR(T, GetTouch, (i32) const, TouchState*), AS_CALL_THISCALL);
 
     // bool Input::GetTouchEmulation() const
     engine->RegisterObjectMethod(className, "bool GetTouchEmulation() const", AS_METHODPR(T, GetTouchEmulation, () const, bool), AS_CALL_THISCALL);
@@ -10906,8 +10906,8 @@ template <class T> void RegisterMembers_Input(asIScriptEngine* engine, const cha
     engine->RegisterObjectMethod(className, "bool IsScreenKeyboardVisible() const", AS_METHODPR(T, IsScreenKeyboardVisible, () const, bool), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_screenKeyboardVisible() const", AS_METHODPR(T, IsScreenKeyboardVisible, () const, bool), AS_CALL_THISCALL);
 
-    // unsigned Input::LoadGestures(Deserializer& source)
-    engine->RegisterObjectMethod(className, "uint LoadGestures(Deserializer&)", AS_METHODPR(T, LoadGestures, (Deserializer&), unsigned), AS_CALL_THISCALL);
+    // i32 Input::LoadGestures(Deserializer& source)
+    engine->RegisterObjectMethod(className, "int LoadGestures(Deserializer&)", AS_METHODPR(T, LoadGestures, (Deserializer&), i32), AS_CALL_THISCALL);
 
     // bool Input::RecordGesture()
     engine->RegisterObjectMethod(className, "bool RecordGesture()", AS_METHODPR(T, RecordGesture, (), bool), AS_CALL_THISCALL);
