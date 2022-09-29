@@ -48,20 +48,20 @@ struct AsyncProgress
     XMLElement xmlElement_;
 
     /// Current JSON child array and for JSON mode.
-    unsigned jsonIndex_;
+    i32 jsonIndex_;
 
     /// Current load mode.
     LoadMode mode_;
     /// Resource name hashes left to load.
     HashSet<StringHash> resources_;
     /// Loaded resources.
-    unsigned loadedResources_;
+    i32 loadedResources_;
     /// Total resources.
-    unsigned totalResources_;
+    i32 totalResources_;
     /// Loaded root-level nodes.
-    unsigned loadedNodes_;
+    i32 loadedNodes_;
     /// Total root-level nodes.
-    unsigned totalNodes_;
+    i32 totalNodes_;
 };
 
 /// Root scene node, represents the whole scene.

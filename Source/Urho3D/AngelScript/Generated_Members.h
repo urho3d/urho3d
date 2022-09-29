@@ -196,23 +196,23 @@ template <class T> void RegisterMembers_AsyncProgress(asIScriptEngine* engine, c
     // XMLElement AsyncProgress::xmlElement_
     engine->RegisterObjectProperty(className, "XMLElement xmlElement", offsetof(T, xmlElement_));
 
-    // unsigned AsyncProgress::jsonIndex_
-    engine->RegisterObjectProperty(className, "uint jsonIndex", offsetof(T, jsonIndex_));
+    // i32 AsyncProgress::jsonIndex_
+    engine->RegisterObjectProperty(className, "int jsonIndex", offsetof(T, jsonIndex_));
 
     // LoadMode AsyncProgress::mode_
     engine->RegisterObjectProperty(className, "LoadMode mode", offsetof(T, mode_));
 
-    // unsigned AsyncProgress::loadedResources_
-    engine->RegisterObjectProperty(className, "uint loadedResources", offsetof(T, loadedResources_));
+    // i32 AsyncProgress::loadedResources_
+    engine->RegisterObjectProperty(className, "int loadedResources", offsetof(T, loadedResources_));
 
-    // unsigned AsyncProgress::totalResources_
-    engine->RegisterObjectProperty(className, "uint totalResources", offsetof(T, totalResources_));
+    // i32 AsyncProgress::totalResources_
+    engine->RegisterObjectProperty(className, "int totalResources", offsetof(T, totalResources_));
 
-    // unsigned AsyncProgress::loadedNodes_
-    engine->RegisterObjectProperty(className, "uint loadedNodes", offsetof(T, loadedNodes_));
+    // i32 AsyncProgress::loadedNodes_
+    engine->RegisterObjectProperty(className, "int loadedNodes", offsetof(T, loadedNodes_));
 
-    // unsigned AsyncProgress::totalNodes_
-    engine->RegisterObjectProperty(className, "uint totalNodes", offsetof(T, totalNodes_));
+    // i32 AsyncProgress::totalNodes_
+    engine->RegisterObjectProperty(className, "int totalNodes", offsetof(T, totalNodes_));
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_AsyncProgress
         REGISTER_MEMBERS_MANUAL_PART_AsyncProgress();
