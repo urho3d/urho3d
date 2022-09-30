@@ -78,9 +78,9 @@ private:
 };
 
 /// TextureUnit hash function.
-template <> inline unsigned MakeHash(const TextureUnit& value)
+template <> inline hash32 MakeHash(const TextureUnit& value)
 {
-    return (unsigned)value;
+    return (hash32)value;
 }
 
 /// Describes how to render 3D geometries.
