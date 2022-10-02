@@ -411,6 +411,12 @@ jobs:
           sudo apt install libgl1-mesa-dev
         fi
 
+        # Ubuntu repository contains obsolete Doxygen 1.9.1. Download own build
+        mkdir $HOME/programs
+        cd $HOME/programs
+        wget -q -O tmp.zip https://github.com/rurho3d/doxygen-builder/raw/main/doxygen_linux64.zip && unzip tmp.zip && rm tmp.zip
+        echo "$HOME/programs" >> $GITHUB_PATH
+
     - name: Cache
       uses: actions/cache@v3
       with:
@@ -433,9 +439,17 @@ jobs:
         cmake engine_repo -B engine_build -G "Unix Makefiles" \
           -D CMAKE_C_COMPILER=${{ matrix.COMPILER.C }} -D CMAKE_CXX_COMPILER=${{ matrix.COMPILER.CXX }} \
           -D URHO3D_DATABASE_SQLITE=1 -D URHO3D_TESTING=1 -D CMAKE_BUILD_TYPE=${{ matrix.BUILD_TYPE.VALUE }} \
-          -D URHO3D_64BIT=$BITS64 -D URHO3D_LIB_TYPE=${{ matrix.LIB_TYPE.VALUE }}
+          -D URHO3D_64BIT=$BITS64 -D URHO3D_LIB_TYPE=${{ matrix.LIB_TYPE.VALUE }} -D URHO3D_GENERATEBINDINGS=1
 
         cmake --build engine_build
+
+        # If there are changes in repository, then generated bindings are different from existing ones
+        cd engine_repo
+        if [[ `git status --porcelain` ]]; then
+          echo "!!!!! ERROR: Generated bindings are different from existing ones"
+          return -1 # Exit from script with error code
+        fi
+        cd ..
 
     - name: CTest
       shell: bash {0} # Allow catching errors
