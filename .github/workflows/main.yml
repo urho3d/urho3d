@@ -230,6 +230,7 @@ jobs:
       PLATFORM: ${{ matrix.platform }}
       LIB_TYPE: ${{ matrix.lib-type }}
       GRAPHICS_API: ${{ matrix.graphics-api }}
+      URHO3D_GENERATEBINDINGS: 1
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -267,7 +268,17 @@ jobs:
       - name: CMake
         run: rake cmake
       - name: Build
-        run: rake build
+        shell: bash
+        run: |
+          rake build
+
+          # If there are changes in repository, then generated bindings are different from existing ones
+          cd D:/a/Urho3D/Urho3D
+          if [[ `git status --porcelain` ]]; then
+            echo "!!!!! ERROR: Generated bindings are different from existing ones"
+            exit -1 # Exit from the script with error code
+          fi
+
       - name: Test tools
         shell: bash
         run: D:/a/Urho3D/Urho3D/script/test_tools.sh D:/a/Urho3D/Urho3D D:/a/Urho3D/Urho3D/build/ci
@@ -447,7 +458,7 @@ jobs:
         cd engine_repo
         if [[ `git status --porcelain` ]]; then
           echo "!!!!! ERROR: Generated bindings are different from existing ones"
-          return -1 # Exit from script with error code
+          exit -1 # Exit from the script with error code
         fi
         cd ..
 
