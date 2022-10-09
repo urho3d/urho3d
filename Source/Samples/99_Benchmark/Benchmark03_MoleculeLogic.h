@@ -4,8 +4,10 @@
 #pragma once
 
 #include <Urho3D/Scene/LogicComponent.h>
+#include <Urho3D/Base/PrimitiveTypes.h>
 
 namespace U3D = Urho3D;
+using namespace Urho3D::PrimitiveTypes;
 
 class Benchmark03_MoleculeLogic : public U3D::LogicComponent
 {
