@@ -7,7 +7,7 @@
 
 #if defined(_WIN32) && !defined(URHO3D_WIN32_CONSOLE)
 #include "../Core/MiniDump.h"
-#include <windows.h>
+#include "../Engine/WinWrapped.h"
 #ifdef _MSC_VER
 #include <crtdbg.h>
 #endif
