@@ -26,7 +26,7 @@
 #include <Urho3D/Scene/Scene.h>
 
 #ifdef WIN32
-#include <windows.h>
+#include <Urho3D/Engine/WinWrapped.h>
 #endif
 
 #include <assimp/config.h>

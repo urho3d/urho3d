@@ -9,7 +9,7 @@
 #ifdef _WIN32
 // Needs to be included above sql.h for windows
 #define NOMINMAX
-#include <windows.h>
+#include "../../Engine/WinWrapped.h"
 #endif
 
 #include <sqlext.h>

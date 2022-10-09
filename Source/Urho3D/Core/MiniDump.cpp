@@ -7,12 +7,12 @@
 
 #include "../Core/MiniDump.h"
 #include "../Core/ProcessUtils.h"
+#include "../Engine/WinWrapped.h"
 
 #include <cstdio>
 #include <io.h>
 #include <fcntl.h>
 #include <time.h>
-#include <windows.h>
 #include <dbghelp.h>
 
 namespace Urho3D

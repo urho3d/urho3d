@@ -12,7 +12,7 @@
 #include <Urho3D/Resource/XMLFile.h>
 
 #ifdef WIN32
-#include <windows.h>
+#include <Urho3D/Engine/WinWrapped.h>
 #endif
 
 #define STBRP_LARGE_RECTS

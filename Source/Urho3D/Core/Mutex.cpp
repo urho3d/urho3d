@@ -6,7 +6,7 @@
 #include "../Core/Mutex.h"
 
 #ifdef _WIN32
-#include <windows.h>
+#include "../Engine/WinWrapped.h"
 #else
 #include <pthread.h>
 #endif

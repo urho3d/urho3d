@@ -9,7 +9,7 @@
 #include <Urho3D/IO/PackageFile.h>
 
 #ifdef WIN32
-#include <windows.h>
+#include <Urho3D/Engine/WinWrapped.h>
 #endif
 
 #include <LZ4/lz4.h>

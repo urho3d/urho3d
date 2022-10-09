@@ -8,7 +8,7 @@
 #include "../IO/Log.h"
 
 #ifdef _WIN32
-#include <windows.h>
+#include "../Engine/WinWrapped.h"
 #else
 #include <fcntl.h>
 #include <sys/stat.h>

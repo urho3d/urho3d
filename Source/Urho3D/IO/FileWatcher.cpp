@@ -10,7 +10,7 @@
 #include "../Core/Profiler.h"
 
 #ifdef _WIN32
-#include <windows.h>
+#include "../Engine/WinWrapped.h"
 #elif __linux__
 #include <sys/inotify.h>
 extern "C"
