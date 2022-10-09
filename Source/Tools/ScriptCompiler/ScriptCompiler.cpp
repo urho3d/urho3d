@@ -17,7 +17,7 @@
 #endif
 
 #ifdef WIN32
-#include <windows.h>
+#include <Urho3D/Engine/WinWrapped.h>
 #endif
 
 #include <Urho3D/DebugNew.h>

@@ -9,7 +9,7 @@
 #include <ctime>
 
 #ifdef _WIN32
-#include <windows.h>
+#include "../Engine/WinWrapped.h"
 #include <mmsystem.h>
 #elif __EMSCRIPTEN__
 #include <emscripten/emscripten.h>

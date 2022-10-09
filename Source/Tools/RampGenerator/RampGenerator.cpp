@@ -9,7 +9,7 @@
 #include <Urho3D/Core/StringUtils.h>
 
 #ifdef WIN32
-#include <windows.h>
+#include <Urho3D/Engine/WinWrapped.h>
 #endif
 
 #include <STB/stb_image_write.h>
