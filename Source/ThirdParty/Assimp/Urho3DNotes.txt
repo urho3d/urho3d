@@ -1,0 +1,26 @@
+Original: https://github.com/assimp/assimp/releases/tag/v4.1.0
+
+Changes from the original
+=========================
+
+root:
+* removed dirs: doc, packaging, port, samples, scripts, test, tools
+* removed files: .editorconfig, all *.in files except revision.h.in
+* changed file: CMakeLists.txt
+
+cmake-modules: removed all files except Findrt.cmake
+
+code:
+* removed dir: res
+* removed files: .editorconfig, makefile.mingw
+* changed files: ImporterRegistry.cpp, CMakeLists.txt
+
+contrib:
+* removed dirs: android-cmake, gtest, utf8cpp/doc, zip/test, zlib/win32
+* removed files: CMakeLists.txt, irrXML/CMakeLists.txt, openddlparser/CMakeLists.txt,
+                 zlib/CMakeLists.txt, zlib/zconf.h.in, zlib/zconf.h.included, zlib/zlib.pc.cmakein
+* added files: zip/.gitignore, zip/appveyor.yml
+
+include/assimp:
+* removed dir: port
+* removed file: .editorconfig
