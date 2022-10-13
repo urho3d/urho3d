@@ -1176,8 +1176,8 @@ void NavigationMesh::AddTriMeshGeometry(NavBuildData* build, Geometry* geometry,
     if (!geometry)
         return;
 
-    const unsigned char* vertexData;
-    const unsigned char* indexData;
+    const byte* vertexData;
+    const byte* indexData;
     i32 vertexSize;
     i32 indexSize;
     const Vector<VertexElement>* elements;

@@ -440,8 +440,8 @@ bool WriteDrawablesToOBJ(const Vector<Drawable*>& drawables, File* outputFile, b
             // If we've reached here than we're going to actually write something to the OBJ file
             anythingWritten = true;
 
-            const unsigned char* vertexData;
-            const unsigned char* indexData;
+            const byte* vertexData;
+            const byte* indexData;
             i32 elementSize, indexSize;
             const Vector<VertexElement>* elements;
             geo->GetRawData(vertexData, elementSize, indexData, indexSize, elements);

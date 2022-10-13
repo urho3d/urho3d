@@ -657,8 +657,8 @@ void Terrain::CreatePatchGeometry(TerrainPatch* patch)
     if (vertexBuffer->GetVertexCount() != row * row)
         vertexBuffer->SetSize(row * row, MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT);
 
-    SharedArrayPtr<unsigned char> cpuVertexData(new unsigned char[row * row * sizeof(Vector3)]);
-    SharedArrayPtr<unsigned char> occlusionCpuVertexData(new unsigned char[row * row * sizeof(Vector3)]);
+    SharedArrayPtr<byte> cpuVertexData(new byte[row * row * sizeof(Vector3)]);
+    SharedArrayPtr<byte> occlusionCpuVertexData(new byte[row * row * sizeof(Vector3)]);
 
     auto* vertexData = (float*)vertexBuffer->Lock(0, vertexBuffer->GetVertexCount());
     auto* positionData = (float*)cpuVertexData.Get();

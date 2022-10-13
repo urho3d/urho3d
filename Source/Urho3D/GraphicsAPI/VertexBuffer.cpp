@@ -39,7 +39,7 @@ void VertexBuffer::SetShadowed(bool enable)
     if (enable != shadowed_)
     {
         if (enable && vertexSize_ && vertexCount_)
-            shadowData_ = new u8[(size_t)vertexCount_ * vertexSize_];
+            shadowData_ = new byte[(size_t)vertexCount_ * vertexSize_];
         else
             shadowData_.Reset();
 
@@ -65,7 +65,7 @@ bool VertexBuffer::SetSize(i32 vertexCount, const Vector<VertexElement>& element
     UpdateOffsets();
 
     if (shadowed_ && vertexCount_ && vertexSize_)
-        shadowData_ = new u8[(size_t)vertexCount_ * vertexSize_];
+        shadowData_ = new byte[(size_t)vertexCount_ * vertexSize_];
     else
         shadowData_.Reset();
 

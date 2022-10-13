@@ -86,8 +86,8 @@ public:
                 continue;
             }
 
-            SharedArrayPtr<unsigned char> vertexData;
-            SharedArrayPtr<unsigned char> indexData;
+            SharedArrayPtr<byte> vertexData;
+            SharedArrayPtr<byte> indexData;
             i32 vertexSize;
             i32 indexSize;
             const Vector<VertexElement>* elements;
@@ -103,15 +103,15 @@ public:
             dataArrays_.Push(vertexData);
             dataArrays_.Push(indexData);
 
-            unsigned indexStart = geometry->GetIndexStart();
-            unsigned indexCount = geometry->GetIndexCount();
+            i32 indexStart = geometry->GetIndexStart();
+            i32 indexCount = geometry->GetIndexCount();
 
             btIndexedMesh meshIndex;
             meshIndex.m_numTriangles = indexCount / 3;
-            meshIndex.m_triangleIndexBase = &indexData[indexStart * indexSize];
+            meshIndex.m_triangleIndexBase = reinterpret_cast<unsigned char*>(&indexData[indexStart * indexSize]);
             meshIndex.m_triangleIndexStride = 3 * indexSize;
             meshIndex.m_numVertices = 0;
-            meshIndex.m_vertexBase = vertexData;
+            meshIndex.m_vertexBase = reinterpret_cast<unsigned char*>(vertexData.Get());
             meshIndex.m_vertexStride = vertexSize;
             meshIndex.m_indexType = (indexSize == sizeof(unsigned short)) ? PHY_SHORT : PHY_INTEGER;
             meshIndex.m_vertexType = PHY_FLOAT;
@@ -138,8 +138,8 @@ public:
         if (totalVertexCount)
         {
             // CustomGeometry vertex data is unindexed, so build index data here
-            SharedArrayPtr<unsigned char> vertexData(new unsigned char[totalVertexCount * sizeof(Vector3)]);
-            SharedArrayPtr<unsigned char> indexData(new unsigned char[totalVertexCount * sizeof(unsigned)]);
+            SharedArrayPtr<byte> vertexData(new byte[totalVertexCount * sizeof(Vector3)]);
+            SharedArrayPtr<byte> indexData(new byte[totalVertexCount * sizeof(unsigned)]);
             dataArrays_.Push(vertexData);
             dataArrays_.Push(indexData);
 
@@ -158,10 +158,10 @@ public:
 
             btIndexedMesh meshIndex;
             meshIndex.m_numTriangles = totalVertexCount / 3;
-            meshIndex.m_triangleIndexBase = indexData;
+            meshIndex.m_triangleIndexBase = reinterpret_cast<unsigned char*>(indexData.Get());
             meshIndex.m_triangleIndexStride = 3 * sizeof(unsigned);
             meshIndex.m_numVertices = totalVertexCount;
-            meshIndex.m_vertexBase = vertexData;
+            meshIndex.m_vertexBase = reinterpret_cast<unsigned char*>(vertexData.Get());
             meshIndex.m_vertexStride = sizeof(Vector3);
             meshIndex.m_indexType = PHY_INTEGER;
             meshIndex.m_vertexType = PHY_FLOAT;
@@ -178,7 +178,7 @@ public:
 
 private:
     /// Shared vertex/index data used in the collision.
-    Vector<SharedArrayPtr<unsigned char>> dataArrays_;
+    Vector<SharedArrayPtr<byte>> dataArrays_;
 };
 
 TriangleMeshData::TriangleMeshData(Model* model, i32 lodLevel)
@@ -226,8 +226,8 @@ ConvexData::ConvexData(Model* model, i32 lodLevel)
             continue;
         };
 
-        const unsigned char* vertexData;
-        const unsigned char* indexData;
+        const byte* vertexData;
+        const byte* indexData;
         i32 vertexSize;
         i32 indexSize;
         const Vector<VertexElement>* elements;

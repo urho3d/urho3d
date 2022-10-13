@@ -9954,16 +9954,16 @@ template <class T> void RegisterMembers_Geometry(asIScriptEngine* engine, const 
 
     // float Geometry::GetHitDistance(const Ray& ray, Vector3* outNormal = nullptr, Vector2* outUV = nullptr) const
     // Error: type "Vector3*" can not automatically bind
-    // void Geometry::GetRawData(const unsigned char*& vertexData, i32& vertexSize, const unsigned char*& indexData, i32& indexSize, const Vector<VertexElement>*& elements) const
-    // Error: type "const unsigned char*&" can not automatically bind
-    // void Geometry::GetRawDataShared(SharedArrayPtr<unsigned char>& vertexData, i32& vertexSize, SharedArrayPtr<unsigned char>& indexData, i32& indexSize, const Vector<VertexElement>*& elements) const
-    // Error: type "SharedArrayPtr<unsigned char>&" can not automatically bind
-    // void Geometry::SetRawIndexData(const SharedArrayPtr<unsigned char>& data, i32 indexSize)
-    // Error: type "const SharedArrayPtr<unsigned char>&" can not automatically bind
-    // void Geometry::SetRawVertexData(const SharedArrayPtr<unsigned char>& data, const Vector<VertexElement>& elements)
-    // Error: type "const SharedArrayPtr<unsigned char>&" can not automatically bind
-    // void Geometry::SetRawVertexData(const SharedArrayPtr<unsigned char>& data, unsigned elementMask)
-    // Error: type "const SharedArrayPtr<unsigned char>&" can not automatically bind
+    // void Geometry::GetRawData(const byte*& vertexData, i32& vertexSize, const byte*& indexData, i32& indexSize, const Vector<VertexElement>*& elements) const
+    // Error: type "const byte*&" can not automatically bind
+    // void Geometry::GetRawDataShared(SharedArrayPtr<byte>& vertexData, i32& vertexSize, SharedArrayPtr<byte>& indexData, i32& indexSize, const Vector<VertexElement>*& elements) const
+    // Error: type "SharedArrayPtr<byte>&" can not automatically bind
+    // void Geometry::SetRawIndexData(const SharedArrayPtr<byte>& data, i32 indexSize)
+    // Error: type "const SharedArrayPtr<byte>&" can not automatically bind
+    // void Geometry::SetRawVertexData(const SharedArrayPtr<byte>& data, const Vector<VertexElement>& elements)
+    // Error: type "const SharedArrayPtr<byte>&" can not automatically bind
+    // void Geometry::SetRawVertexData(const SharedArrayPtr<byte>& data, unsigned elementMask)
+    // Error: type "const SharedArrayPtr<byte>&" can not automatically bind
 
     // void Geometry::Draw(Graphics* graphics)
     engine->RegisterObjectMethod(className, "void Draw(Graphics@+)", AS_METHODPR(T, Draw, (Graphics*), void), AS_CALL_THISCALL);
@@ -10701,10 +10701,10 @@ template <class T> void RegisterMembers_IndexBuffer(asIScriptEngine* engine, con
     RegisterMembers_Object<T>(engine, className);
     RegisterMembers_GPUObject<T>(engine, className);
 
-    // u8* IndexBuffer::GetShadowData() const
-    // Error: type "u8*" can not automatically bind
-    // SharedArrayPtr<u8> IndexBuffer::GetShadowDataShared() const
-    // Error: type "SharedArrayPtr<u8>" can not automatically bind
+    // byte* IndexBuffer::GetShadowData() const
+    // Error: type "byte*" can not automatically bind
+    // SharedArrayPtr<byte> IndexBuffer::GetShadowDataShared() const
+    // Error: type "SharedArrayPtr<byte>" can not automatically bind
     // void* IndexBuffer::Lock(i32 start, i32 count, bool discard = false)
     // Error: type "void*" can not automatically bind
     // bool IndexBuffer::SetData(const void* data)
@@ -12540,10 +12540,10 @@ template <class T> void RegisterMembers_VertexBuffer(asIScriptEngine* engine, co
     // Error: type "const VertexElement*" can not automatically bind
     // const VertexElement* VertexBuffer::GetElement(VertexElementType type, VertexElementSemantic semantic, i8 index = 0) const
     // Error: type "const VertexElement*" can not automatically bind
-    // u8* VertexBuffer::GetShadowData() const
-    // Error: type "u8*" can not automatically bind
-    // SharedArrayPtr<u8> VertexBuffer::GetShadowDataShared() const
-    // Error: type "SharedArrayPtr<u8>" can not automatically bind
+    // byte* VertexBuffer::GetShadowData() const
+    // Error: type "byte*" can not automatically bind
+    // SharedArrayPtr<byte> VertexBuffer::GetShadowDataShared() const
+    // Error: type "SharedArrayPtr<byte>" can not automatically bind
     // void* VertexBuffer::Lock(i32 start, i32 count, bool discard = false)
     // Error: type "void*" can not automatically bind
     // bool VertexBuffer::SetData(const void* data)

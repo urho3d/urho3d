@@ -43,11 +43,11 @@ public:
     /// @property
     void SetLodDistance(float distance);
     /// Override raw vertex data to be returned for CPU-side operations.
-    void SetRawVertexData(const SharedArrayPtr<unsigned char>& data, const Vector<VertexElement>& elements);
+    void SetRawVertexData(const SharedArrayPtr<byte>& data, const Vector<VertexElement>& elements);
     /// Override raw vertex data to be returned for CPU-side operations using a legacy vertex bitmask.
-    void SetRawVertexData(const SharedArrayPtr<unsigned char>& data, unsigned elementMask);
+    void SetRawVertexData(const SharedArrayPtr<byte>& data, unsigned elementMask);
     /// Override raw index data to be returned for CPU-side operations.
-    void SetRawIndexData(const SharedArrayPtr<unsigned char>& data, i32 indexSize);
+    void SetRawIndexData(const SharedArrayPtr<byte>& data, i32 indexSize);
     /// Draw.
     void Draw(Graphics* graphics);
 
@@ -93,9 +93,9 @@ public:
     /// Return buffers' combined hash value for state sorting.
     u16 GetBufferHash() const;
     /// Return raw vertex and index data for CPU operations, or null pointers if not available. Will return data of the first vertex buffer if override data not set.
-    void GetRawData(const unsigned char*& vertexData, i32& vertexSize, const unsigned char*& indexData, i32& indexSize, const Vector<VertexElement>*& elements) const;
+    void GetRawData(const byte*& vertexData, i32& vertexSize, const byte*& indexData, i32& indexSize, const Vector<VertexElement>*& elements) const;
     /// Return raw vertex and index data for CPU operations, or null pointers if not available. Will return data of the first vertex buffer if override data not set.
-    void GetRawDataShared(SharedArrayPtr<unsigned char>& vertexData, i32& vertexSize, SharedArrayPtr<unsigned char>& indexData,
+    void GetRawDataShared(SharedArrayPtr<byte>& vertexData, i32& vertexSize, SharedArrayPtr<byte>& indexData,
         i32& indexSize, const Vector<VertexElement>*& elements) const;
     /// Return ray hit distance or infinity if no hit. Requires raw data to be set. Optionally return hit normal and hit uv coordinates at intersect point.
     float GetHitDistance(const Ray& ray, Vector3* outNormal = nullptr, Vector2* outUV = nullptr) const;
@@ -126,9 +126,9 @@ private:
     /// Raw vertex data elements.
     Vector<VertexElement> rawElements_;
     /// Raw vertex data override.
-    SharedArrayPtr<unsigned char> rawVertexData_;
+    SharedArrayPtr<byte> rawVertexData_;
     /// Raw index data override.
-    SharedArrayPtr<unsigned char> rawIndexData_;
+    SharedArrayPtr<byte> rawIndexData_;
     /// Raw vertex data override size.
     i32 rawVertexSize_;
     /// Raw index data override size.

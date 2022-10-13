@@ -166,9 +166,9 @@ bool CustomGeometry::DrawOcclusion(OcclusionBuffer* buffer)
         else
             buffer->SetCullMode(CULL_CCW);
 
-        const unsigned char* vertexData;
+        const byte* vertexData;
         i32 vertexSize;
-        const unsigned char* indexData;
+        const byte* indexData;
         i32 indexSize;
         const Vector<VertexElement>* elements;
 

@@ -679,10 +679,10 @@ void DecalSet::GetFaces(Vector<Vector<DecalVertex>>& faces, Drawable* target, un
     if (!geometry || geometry->GetPrimitiveType() != TRIANGLE_LIST)
         return;
 
-    const unsigned char* positionData = nullptr;
-    const unsigned char* normalData = nullptr;
-    const unsigned char* skinningData = nullptr;
-    const unsigned char* indexData = nullptr;
+    const byte* positionData = nullptr;
+    const byte* normalData = nullptr;
+    const byte* skinningData = nullptr;
+    const byte* indexData = nullptr;
     i32 positionStride = 0;
     unsigned normalStride = 0;
     unsigned skinningStride = 0;
@@ -703,7 +703,7 @@ void DecalSet::GetFaces(Vector<Vector<DecalVertex>>& faces, Drawable* target, un
             continue;
 
         unsigned elementMask = vb->GetElementMask();
-        unsigned char* data = vb->GetShadowData();
+        byte* data = vb->GetShadowData();
         if (!data)
             continue;
 
@@ -785,7 +785,7 @@ void DecalSet::GetFaces(Vector<Vector<DecalVertex>>& faces, Drawable* target, un
 }
 
 void DecalSet::GetFace(Vector<Vector<DecalVertex>>& faces, Drawable* target, unsigned batchIndex, unsigned i0, unsigned i1,
-    unsigned i2, const unsigned char* positionData, const unsigned char* normalData, const unsigned char* skinningData,
+    unsigned i2, const byte* positionData, const byte* normalData, const byte* skinningData,
     unsigned positionStride, unsigned normalStride, unsigned skinningStride, const Frustum& frustum, const Vector3& decalNormal,
     float normalCutoff)
 {
@@ -809,9 +809,9 @@ void DecalSet::GetFace(Vector<Vector<DecalVertex>>& faces, Drawable* target, uns
     const Vector3& n1 = hasNormals ? *((const Vector3*)(&normalData[i1 * normalStride])) : faceNormal;
     const Vector3& n2 = hasNormals ? *((const Vector3*)(&normalData[i2 * normalStride])) : faceNormal;
 
-    const unsigned char* s0 = hasSkinning ? &skinningData[i0 * skinningStride] : nullptr;
-    const unsigned char* s1 = hasSkinning ? &skinningData[i1 * skinningStride] : nullptr;
-    const unsigned char* s2 = hasSkinning ? &skinningData[i2 * skinningStride] : nullptr;
+    const byte* s0 = hasSkinning ? &skinningData[i0 * skinningStride] : nullptr;
+    const byte* s1 = hasSkinning ? &skinningData[i1 * skinningStride] : nullptr;
+    const byte* s2 = hasSkinning ? &skinningData[i2 * skinningStride] : nullptr;
 
     // Check if face is too much away from the decal normal
     if (decalNormal.DotProduct((n0 + n1 + n2) / 3.0f) < normalCutoff)
@@ -839,9 +839,9 @@ void DecalSet::GetFace(Vector<Vector<DecalVertex>>& faces, Drawable* target, uns
         const auto* bw0 = (const float*)s0;
         const auto* bw1 = (const float*)s1;
         const auto* bw2 = (const float*)s2;
-        const unsigned char* bi0 = s0 + sizeof(float) * 4;
-        const unsigned char* bi1 = s1 + sizeof(float) * 4;
-        const unsigned char* bi2 = s2 + sizeof(float) * 4;
+        const unsigned char* bi0 = reinterpret_cast<const unsigned char*>(s0 + sizeof(float) * 4);
+        const unsigned char* bi1 = reinterpret_cast<const unsigned char*>(s1 + sizeof(float) * 4);
+        const unsigned char* bi2 = reinterpret_cast<const unsigned char*>(s2 + sizeof(float) * 4);
         unsigned char nbi0[4];
         unsigned char nbi1[4];
         unsigned char nbi2[4];
