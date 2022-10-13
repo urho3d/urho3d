@@ -1080,8 +1080,8 @@ void BuildAndSaveModel(OutModel& model)
         if (model.bones_.Size() > 0 && !mesh->HasBones())
             PrintLine("Warning: model has bones but geometry " + String(i) + " has no skinning information");
 
-        unsigned char* vertexData = vb->GetShadowData();
-        unsigned char* indexData = ib->GetShadowData();
+        byte* vertexData = vb->GetShadowData();
+        byte* indexData = ib->GetShadowData();
 
         // Build the index data
         if (!largeIndices)

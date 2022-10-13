@@ -109,10 +109,10 @@ public:
     VertexMaskFlags GetElementMask() const { return elementMask_; }
 
     /// Return CPU memory shadow data.
-    u8* GetShadowData() const { return shadowData_.Get(); }
+    byte* GetShadowData() const { return shadowData_.Get(); }
 
     /// Return shared array pointer to the CPU memory shadow data.
-    SharedArrayPtr<u8> GetShadowDataShared() const { return shadowData_; }
+    SharedArrayPtr<byte> GetShadowDataShared() const { return shadowData_; }
 
     /// Return buffer hash for building vertex declarations. Used internally.
     hash64 GetBufferHash(i32 streamIndex) { return elementHash_ << (streamIndex * 16); }
@@ -179,7 +179,7 @@ private:
 #endif // def URHO3D_D3D11
 
     /// Shadow data.
-    SharedArrayPtr<u8> shadowData_;
+    SharedArrayPtr<byte> shadowData_;
     /// Number of vertices.
     i32 vertexCount_{};
     /// Vertex size.

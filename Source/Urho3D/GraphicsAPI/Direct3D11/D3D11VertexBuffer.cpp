@@ -114,7 +114,7 @@ bool VertexBuffer::SetDataRange_D3D11(const void* data, i32 start, i32 count, bo
     if (!count)
         return true;
 
-    u8* dst = shadowData_.Get() + (intptr_t)start * vertexSize_;
+    byte* dst = shadowData_.Get() + (intptr_t)start * vertexSize_;
     if (shadowData_ && dst != data)
         memcpy(dst, data, (size_t)count * vertexSize_);
 

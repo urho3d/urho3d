@@ -109,7 +109,7 @@ bool IndexBuffer::SetDataRange_D3D11(const void* data, i32 start, i32 count, boo
     if (!count)
         return true;
 
-    u8* dst = shadowData_.Get() + (intptr_t)start * indexSize_;
+    byte* dst = shadowData_.Get() + (intptr_t)start * indexSize_;
     if (shadowData_ && dst != data)
         memcpy(dst, data, (size_t)count * indexSize_);
 

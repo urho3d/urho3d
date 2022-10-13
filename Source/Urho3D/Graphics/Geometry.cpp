@@ -146,21 +146,21 @@ void Geometry::SetLodDistance(float distance)
     lodDistance_ = distance;
 }
 
-void Geometry::SetRawVertexData(const SharedArrayPtr<unsigned char>& data, const Vector<VertexElement>& elements)
+void Geometry::SetRawVertexData(const SharedArrayPtr<byte>& data, const Vector<VertexElement>& elements)
 {
     rawVertexData_ = data;
     rawVertexSize_ = VertexBuffer::GetVertexSize(elements);
     rawElements_ = elements;
 }
 
-void Geometry::SetRawVertexData(const SharedArrayPtr<unsigned char>& data, unsigned elementMask)
+void Geometry::SetRawVertexData(const SharedArrayPtr<byte>& data, unsigned elementMask)
 {
     rawVertexData_ = data;
     rawVertexSize_ = VertexBuffer::GetVertexSize(elementMask);
     rawElements_ = VertexBuffer::GetElements(elementMask);
 }
 
-void Geometry::SetRawIndexData(const SharedArrayPtr<unsigned char>& data, i32 indexSize)
+void Geometry::SetRawIndexData(const SharedArrayPtr<byte>& data, i32 indexSize)
 {
     assert(indexSize >= 0);
     rawIndexData_ = data;
@@ -204,7 +204,7 @@ u16 Geometry::GetBufferHash() const
     return hash;
 }
 
-void Geometry::GetRawData(const unsigned char*& vertexData, i32& vertexSize, const unsigned char*& indexData,
+void Geometry::GetRawData(const byte*& vertexData, i32& vertexSize, const byte*& indexData,
     i32& indexSize, const Vector<VertexElement>*& elements) const
 {
     if (rawVertexData_)
@@ -249,8 +249,8 @@ void Geometry::GetRawData(const unsigned char*& vertexData, i32& vertexSize, con
     }
 }
 
-void Geometry::GetRawDataShared(SharedArrayPtr<unsigned char>& vertexData, i32& vertexSize,
-    SharedArrayPtr<unsigned char>& indexData, i32& indexSize, const Vector<VertexElement>*& elements) const
+void Geometry::GetRawDataShared(SharedArrayPtr<byte>& vertexData, i32& vertexSize,
+    SharedArrayPtr<byte>& indexData, i32& indexSize, const Vector<VertexElement>*& elements) const
 {
     if (rawVertexData_)
     {
@@ -296,8 +296,8 @@ void Geometry::GetRawDataShared(SharedArrayPtr<unsigned char>& vertexData, i32& 
 
 float Geometry::GetHitDistance(const Ray& ray, Vector3* outNormal, Vector2* outUV) const
 {
-    const unsigned char* vertexData;
-    const unsigned char* indexData;
+    const byte* vertexData;
+    const byte* indexData;
     i32 vertexSize;
     i32 indexSize;
     const Vector<VertexElement>* elements;
@@ -323,8 +323,8 @@ float Geometry::GetHitDistance(const Ray& ray, Vector3* outNormal, Vector2* outU
 
 bool Geometry::IsInside(const Ray& ray) const
 {
-    const unsigned char* vertexData;
-    const unsigned char* indexData;
+    const byte* vertexData;
+    const byte* indexData;
     i32 vertexSize;
     i32 indexSize;
     const Vector<VertexElement>* elements;

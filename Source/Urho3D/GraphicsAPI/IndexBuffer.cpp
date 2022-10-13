@@ -46,7 +46,7 @@ void IndexBuffer::SetShadowed(bool enable)
     if (enable != shadowed_)
     {
         if (enable && indexCount_ && indexSize_)
-            shadowData_ = new u8[(size_t)indexCount_ * indexSize_];
+            shadowData_ = new byte[(size_t)indexCount_ * indexSize_];
         else
             shadowData_.Reset();
 
@@ -64,7 +64,7 @@ bool IndexBuffer::SetSize(i32 indexCount, bool largeIndices, bool dynamic)
     dynamic_ = dynamic;
 
     if (shadowed_ && indexCount_ && indexSize_)
-        shadowData_ = new u8[(size_t)indexCount_ * indexSize_];
+        shadowData_ = new byte[(size_t)indexCount_ * indexSize_];
     else
         shadowData_.Reset();
 

@@ -66,10 +66,10 @@ public:
     bool GetUsedVertexRange(i32 start, i32 count, i32& minVertex, i32& vertexCount);
 
     /// Return CPU memory shadow data.
-    u8* GetShadowData() const { return shadowData_.Get(); }
+    byte* GetShadowData() const { return shadowData_.Get(); }
 
     /// Return shared array pointer to the CPU memory shadow data.
-    SharedArrayPtr<u8> GetShadowDataShared() const { return shadowData_; }
+    SharedArrayPtr<byte> GetShadowDataShared() const { return shadowData_; }
 
 private:
     /// Create buffer.
@@ -110,7 +110,7 @@ private:
 #endif // def URHO3D_D3D11
 
     /// Shadow data.
-    SharedArrayPtr<u8> shadowData_;
+    SharedArrayPtr<byte> shadowData_;
     /// Number of indices.
     i32 indexCount_;
     /// Index size.
