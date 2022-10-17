@@ -228,6 +228,7 @@ public:
 
     std::string GetName() const { return ExtractName(memberdef_); }
     std::string GetHeaderFile() const { return ExtractHeaderFile(memberdef_); }
+    std::string GetComment() const { return ExtractComment(memberdef_); }
     bool IsStatic() const { return ::IsStatic(memberdef_); }
     TypeAnalyzer GetType() const { return ExtractType(memberdef_); }
     bool IsArray() const { return StartsWith(ExtractArgsstring(memberdef_), "["); }
