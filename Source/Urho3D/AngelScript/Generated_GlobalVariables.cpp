@@ -631,6 +631,9 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // constexpr i32 WI_MAX_PRIORITY | File: ../Core/WorkQueue.h
     engine->RegisterGlobalProperty("const int WI_MAX_PRIORITY", (void*)&WI_MAX_PRIORITY);
 
+    // constexpr bool always_false | File: ../Container/Vector.h
+    // Not registered because have @nobind mark
+
 #ifdef URHO3D_NETWORK
     // static const unsigned CONTROLS_CONTENT_ID | File: ../Network/Protocol.h
     engine->RegisterGlobalProperty("const uint CONTROLS_CONTENT_ID", (void*)&CONTROLS_CONTENT_ID);

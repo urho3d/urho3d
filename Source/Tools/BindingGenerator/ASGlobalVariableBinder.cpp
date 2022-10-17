@@ -13,6 +13,11 @@ using namespace std;
 namespace ASBindingGenerator
 {
 
+static bool HaveMark(const GlobalVariableAnalyzer& varAnalyzer, const string& mark)
+{
+    return Contains(varAnalyzer.GetComment(), mark);
+}
+
 static void ProcessGlobalVariable(GlobalVariableAnalyzer varAnalyzer)
 {
     string header = varAnalyzer.GetHeaderFile();
@@ -30,6 +35,13 @@ static void ProcessGlobalVariable(GlobalVariableAnalyzer varAnalyzer)
     if (varAnalyzer.IsArray())
     {
         processedGlobalVariable.registration_ = "// Not registered because array";
+        Result::globalVariables_.push_back(processedGlobalVariable);
+        return;
+    }
+
+    if (HaveMark(varAnalyzer, "NO_BIND"))
+    {
+        processedGlobalVariable.registration_ = "// Not registered because have @nobind mark";
         Result::globalVariables_.push_back(processedGlobalVariable);
         return;
     }
