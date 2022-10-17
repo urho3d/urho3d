@@ -3,23 +3,8 @@
 
 #pragma once
 
-#include <cstddef> // std::byte, std::ptrdiff_t
-#include <cstdint> // std::intptr_t, std::int8_t, ...
-#include <limits> // std::numeric_limits
-
-
-// https://en.cppreference.com/w/cpp/language/types
-static_assert(std::numeric_limits<unsigned char>::digits == 8);
-static_assert(sizeof(short) == 2);
-static_assert(sizeof(int) == 4);
-static_assert(sizeof(long) == 4 || sizeof(long) == 8); // (Win32, Win64, Unix32) || Unix64
-static_assert(sizeof(long long) == 8);
-static_assert(sizeof(char32_t) == 4);
-
-// Pointer arithmetics
-static_assert(sizeof(void*) == sizeof(std::ptrdiff_t));
-static_assert(sizeof(void*) == sizeof(std::intptr_t));
-
+#include <cstddef> // std::byte
+#include <cstdint> // std::int8_t, ...
 
 // User can inject Urho3D::PrimitiveTypes into other namespace
 namespace Urho3D::PrimitiveTypes
@@ -47,7 +32,6 @@ using hash32 = u32;
 using hash64 = u64;
 
 } // namespace Urho3D::PrimitiveTypes
-
 
 namespace Urho3D
 {
