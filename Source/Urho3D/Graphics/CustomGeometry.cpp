@@ -439,13 +439,13 @@ void CustomGeometry::SetGeometryDataAttr(const Vector<unsigned char>& value)
     MemoryBuffer buffer(value);
 
     SetNumGeometries(buffer.ReadVLE());
-    elementMask_ = VertexMaskFlags(buffer.ReadUInt());
+    elementMask_ = VertexMaskFlags(buffer.ReadU32());
 
     for (unsigned i = 0; i < geometries_.Size(); ++i)
     {
         unsigned numVertices = buffer.ReadVLE();
         vertices_[i].Resize(numVertices);
-        primitiveTypes_[i] = (PrimitiveType)buffer.ReadUByte();
+        primitiveTypes_[i] = (PrimitiveType)buffer.ReadU8();
 
         for (unsigned j = 0; j < numVertices; ++j)
         {
@@ -454,7 +454,7 @@ void CustomGeometry::SetGeometryDataAttr(const Vector<unsigned char>& value)
             if (elementMask_ & MASK_NORMAL)
                 vertices_[i][j].normal_ = buffer.ReadVector3();
             if (elementMask_ & MASK_COLOR)
-                vertices_[i][j].color_ = buffer.ReadUInt();
+                vertices_[i][j].color_ = buffer.ReadU32();
             if (elementMask_ & MASK_TEXCOORD1)
                 vertices_[i][j].texCoord_ = buffer.ReadVector2();
             if (elementMask_ & MASK_TANGENT)
@@ -477,13 +477,13 @@ Vector<unsigned char> CustomGeometry::GetGeometryDataAttr() const
     VectorBuffer ret;
 
     ret.WriteVLE(geometries_.Size());
-    ret.WriteUInt(elementMask_);
+    ret.WriteU32(elementMask_);
 
     for (unsigned i = 0; i < geometries_.Size(); ++i)
     {
         unsigned numVertices = vertices_[i].Size();
         ret.WriteVLE(numVertices);
-        ret.WriteUByte(primitiveTypes_[i]);
+        ret.WriteU8(primitiveTypes_[i]);
 
         for (unsigned j = 0; j < numVertices; ++j)
         {
@@ -492,7 +492,7 @@ Vector<unsigned char> CustomGeometry::GetGeometryDataAttr() const
             if (elementMask_ & MASK_NORMAL)
                 ret.WriteVector3(vertices_[i][j].normal_);
             if (elementMask_ & MASK_COLOR)
-                ret.WriteUInt(vertices_[i][j].color_);
+                ret.WriteU32(vertices_[i][j].color_);
             if (elementMask_ & MASK_TEXCOORD1)
                 ret.WriteVector2(vertices_[i][j].texCoord_);
             if (elementMask_ & MASK_TANGENT)

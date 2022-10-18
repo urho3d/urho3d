@@ -664,8 +664,8 @@ void DynamicNavigationMesh::SetNavigationDataAttr(const Vector<unsigned char>& v
 
     MemoryBuffer buffer(value);
     boundingBox_ = buffer.ReadBoundingBox();
-    numTilesX_ = buffer.ReadInt();
-    numTilesZ_ = buffer.ReadInt();
+    numTilesX_ = buffer.ReadI32();
+    numTilesZ_ = buffer.ReadI32();
 
     dtNavMeshParams params;     // NOLINT(hicpp-member-init)
     buffer.Read(&params, sizeof(dtNavMeshParams));
@@ -711,8 +711,8 @@ Vector<unsigned char> DynamicNavigationMesh::GetNavigationDataAttr() const
     if (navMesh_ && tileCache_)
     {
         ret.WriteBoundingBox(boundingBox_);
-        ret.WriteInt(numTilesX_);
-        ret.WriteInt(numTilesZ_);
+        ret.WriteI32(numTilesX_);
+        ret.WriteI32(numTilesZ_);
 
         const dtNavMeshParams* params = navMesh_->getParams();
         ret.Write(params, sizeof(dtNavMeshParams));
@@ -745,7 +745,7 @@ void DynamicNavigationMesh::WriteTiles(Serializer& dest, int x, int z) const
             continue; // Don't write "void-space" tiles
                       // The header conveniently has the majority of the information required
         dest.Write(tile->header, sizeof(dtTileCacheLayerHeader));
-        dest.WriteInt(tile->dataSize);
+        dest.WriteI32(tile->dataSize);
         dest.Write(tile->data, (unsigned)tile->dataSize);
     }
 }
@@ -757,7 +757,7 @@ bool DynamicNavigationMesh::ReadTiles(Deserializer& source, bool silent)
     {
         dtTileCacheLayerHeader header;      // NOLINT(hicpp-member-init)
         source.Read(&header, sizeof(dtTileCacheLayerHeader));
-        const int dataSize = source.ReadInt();
+        const int dataSize = source.ReadI32();
 
         auto* data = (unsigned char*)dtAlloc(dataSize, DT_ALLOC_PERM);
         if (!data)

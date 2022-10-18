@@ -33,21 +33,25 @@ public:
     virtual i32 Write(const void* data, i32 size) = 0;
 
     /// Write a 64-bit integer.
-    bool WriteInt64(long long value);
+    bool WriteI64(i64 value);
     /// Write a 32-bit integer.
-    bool WriteInt(int value);
+    bool WriteI32(i32 value);
     /// Write a 16-bit integer.
-    bool WriteShort(short value);
+    bool WriteI16(i16 value);
     /// Write an 8-bit integer.
-    bool WriteByte(signed char value);
+    bool WriteI8(i8 value);
     /// Write a 64-bit unsigned integer.
-    bool WriteUInt64(unsigned long long value);
+    bool WriteU64(u64 value);
     /// Write a 32-bit unsigned integer.
-    bool WriteUInt(unsigned value);
+    bool WriteU32(u32 value);
     /// Write a 16-bit unsigned integer.
-    bool WriteUShort(unsigned short value);
+    bool WriteU16(u16 value);
     /// Write an 8-bit unsigned integer.
-    bool WriteUByte(unsigned char value);
+    bool WriteU8(u8 value);
+
+    /// Write an byte
+    bool WriteByte(byte value);
+
     /// Write a bool.
     bool WriteBool(bool value);
     /// Write a float.

@@ -223,8 +223,8 @@ i32 File::Read(void* dest, i32 size)
                 ReadInternal(blockHeaderBytes, sizeof blockHeaderBytes);
 
                 MemoryBuffer blockHeader(&blockHeaderBytes[0], sizeof blockHeaderBytes);
-                i32 unpackedSize = blockHeader.ReadUShort();
-                i32 packedSize = blockHeader.ReadUShort();
+                i32 unpackedSize = blockHeader.ReadU16();
+                i32 packedSize = blockHeader.ReadU16();
 
                 if (!readBuffer_)
                 {

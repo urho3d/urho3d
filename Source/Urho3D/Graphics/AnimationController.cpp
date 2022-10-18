@@ -633,13 +633,13 @@ void AnimationController::SetNetAnimationsAttr(const Vector<unsigned char>& valu
             animations_.Push(newControl);
         }
 
-        unsigned char ctrl = buf.ReadUByte();
-        state->SetLayer(buf.ReadUByte());
+        unsigned char ctrl = buf.ReadU8();
+        state->SetLayer(buf.ReadU8());
         state->SetLooped((ctrl & CTRL_LOOPED) != 0);
         state->SetBlendMode((ctrl & CTRL_ADDITIVE) != 0 ? ABM_ADDITIVE : ABM_LERP);
-        animations_[index].speed_ = (float)buf.ReadShort() / 2048.0f; // 11 bits of decimal precision, max. 16x playback speed
-        animations_[index].targetWeight_ = (float)buf.ReadUByte() / 255.0f; // 8 bits of decimal precision
-        animations_[index].fadeTime_ = (float)buf.ReadUByte() / 64.0f; // 6 bits of decimal precision, max. 4 seconds fade
+        animations_[index].speed_ = (float)buf.ReadI16() / 2048.0f; // 11 bits of decimal precision, max. 16x playback speed
+        animations_[index].targetWeight_ = (float)buf.ReadU8() / 255.0f; // 8 bits of decimal precision
+        animations_[index].fadeTime_ = (float)buf.ReadU8() / 64.0f; // 6 bits of decimal precision, max. 4 seconds fade
         if (ctrl & CTRL_STARTBONE)
         {
             StringHash boneHash = buf.ReadStringHash();
@@ -649,7 +649,7 @@ void AnimationController::SetNetAnimationsAttr(const Vector<unsigned char>& valu
         else
             state->SetStartBone(nullptr);
         if (ctrl & CTRL_AUTOFADE)
-            animations_[index].autoFadeTime_ = (float)buf.ReadUByte() / 64.0f; // 6 bits of decimal precision, max. 4 seconds fade
+            animations_[index].autoFadeTime_ = (float)buf.ReadU8() / 64.0f; // 6 bits of decimal precision, max. 4 seconds fade
         else
             animations_[index].autoFadeTime_ = 0.0f;
 
@@ -657,8 +657,8 @@ void AnimationController::SetNetAnimationsAttr(const Vector<unsigned char>& valu
 
         if (ctrl & CTRL_SETTIME)
         {
-            unsigned char setTimeRev = buf.ReadUByte();
-            unsigned short setTime = buf.ReadUShort();
+            unsigned char setTimeRev = buf.ReadU8();
+            unsigned short setTime = buf.ReadU16();
             // Apply set time command only if revision differs
             if (setTimeRev != animations_[index].setTimeRev_)
             {
@@ -668,8 +668,8 @@ void AnimationController::SetNetAnimationsAttr(const Vector<unsigned char>& valu
         }
         if (ctrl & CTRL_SETWEIGHT)
         {
-            unsigned char setWeightRev = buf.ReadUByte();
-            unsigned char setWeight = buf.ReadUByte();
+            unsigned char setWeightRev = buf.ReadU8();
+            unsigned char setWeight = buf.ReadU8();
             // Apply set weight command only if revision differs
             if (setWeightRev != animations_[index].setWeightRev_)
             {
@@ -777,24 +777,24 @@ const Vector<unsigned char>& AnimationController::GetNetAnimationsAttr() const
             ctrl |= CTRL_SETWEIGHT;
 
         attrBuffer_.WriteString(i->name_);
-        attrBuffer_.WriteUByte(ctrl);
-        attrBuffer_.WriteUByte(state->GetLayer());
-        attrBuffer_.WriteShort((short)Clamp(i->speed_ * 2048.0f, -32767.0f, 32767.0f));
-        attrBuffer_.WriteUByte((unsigned char)(i->targetWeight_ * 255.0f));
-        attrBuffer_.WriteUByte((unsigned char)Clamp(i->fadeTime_ * 64.0f, 0.0f, 255.0f));
+        attrBuffer_.WriteU8(ctrl);
+        attrBuffer_.WriteU8(state->GetLayer());
+        attrBuffer_.WriteI16((short)Clamp(i->speed_ * 2048.0f, -32767.0f, 32767.0f));
+        attrBuffer_.WriteU8((unsigned char)(i->targetWeight_ * 255.0f));
+        attrBuffer_.WriteU8((unsigned char)Clamp(i->fadeTime_ * 64.0f, 0.0f, 255.0f));
         if (ctrl & CTRL_STARTBONE)
             attrBuffer_.WriteStringHash(startBone->nameHash_);
         if (ctrl & CTRL_AUTOFADE)
-            attrBuffer_.WriteUByte((unsigned char)Clamp(i->autoFadeTime_ * 64.0f, 0.0f, 255.0f));
+            attrBuffer_.WriteU8((unsigned char)Clamp(i->autoFadeTime_ * 64.0f, 0.0f, 255.0f));
         if (ctrl & CTRL_SETTIME)
         {
-            attrBuffer_.WriteUByte(i->setTimeRev_);
-            attrBuffer_.WriteUShort(i->setTime_);
+            attrBuffer_.WriteU8(i->setTimeRev_);
+            attrBuffer_.WriteU16(i->setTime_);
         }
         if (ctrl & CTRL_SETWEIGHT)
         {
-            attrBuffer_.WriteUByte(i->setWeightRev_);
-            attrBuffer_.WriteUByte(i->setWeight_);
+            attrBuffer_.WriteU8(i->setWeightRev_);
+            attrBuffer_.WriteU8(i->setWeight_);
         }
     }
 

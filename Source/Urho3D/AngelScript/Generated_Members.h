@@ -1316,6 +1316,8 @@ template <class T> void RegisterMembers_Deserializer(asIScriptEngine* engine, co
 {
     // virtual i32 Deserializer::Read(void* dest, i32 size) = 0
     // Error: type "void*" can not automatically bind
+    // byte Deserializer::ReadByte()
+    // Error: type "byte" can not automatically bind
     // VariantVector Deserializer::ReadVariantVector()
     // Error: type "VariantVector" can not automatically bind
 
@@ -1348,9 +1350,6 @@ template <class T> void RegisterMembers_Deserializer(asIScriptEngine* engine, co
     // Vector<u8> Deserializer::ReadBuffer()
     engine->RegisterObjectMethod(className, "Array<uint8>@ ReadBuffer()", AS_FUNCTION_OBJFIRST(Deserializer_Vectorlesu8gre_ReadBuffer_void_template<Deserializer>), AS_CALL_CDECL_OBJFIRST);
 
-    // signed char Deserializer::ReadByte()
-    engine->RegisterObjectMethod(className, "int8 ReadByte()", AS_METHODPR(T, ReadByte, (), signed char), AS_CALL_THISCALL);
-
     // Color Deserializer::ReadColor()
     engine->RegisterObjectMethod(className, "Color ReadColor()", AS_METHODPR(T, ReadColor, (), Color), AS_CALL_THISCALL);
 
@@ -1363,11 +1362,17 @@ template <class T> void RegisterMembers_Deserializer(asIScriptEngine* engine, co
     // float Deserializer::ReadFloat()
     engine->RegisterObjectMethod(className, "float ReadFloat()", AS_METHODPR(T, ReadFloat, (), float), AS_CALL_THISCALL);
 
-    // int Deserializer::ReadInt()
-    engine->RegisterObjectMethod(className, "int ReadInt()", AS_METHODPR(T, ReadInt, (), int), AS_CALL_THISCALL);
+    // i16 Deserializer::ReadI16()
+    engine->RegisterObjectMethod(className, "int16 ReadI16()", AS_METHODPR(T, ReadI16, (), i16), AS_CALL_THISCALL);
 
-    // long long Deserializer::ReadInt64()
-    engine->RegisterObjectMethod(className, "int64 ReadInt64()", AS_METHODPR(T, ReadInt64, (), long long), AS_CALL_THISCALL);
+    // i32 Deserializer::ReadI32()
+    engine->RegisterObjectMethod(className, "int ReadI32()", AS_METHODPR(T, ReadI32, (), i32), AS_CALL_THISCALL);
+
+    // i64 Deserializer::ReadI64()
+    engine->RegisterObjectMethod(className, "int64 ReadI64()", AS_METHODPR(T, ReadI64, (), i64), AS_CALL_THISCALL);
+
+    // i8 Deserializer::ReadI8()
+    engine->RegisterObjectMethod(className, "int8 ReadI8()", AS_METHODPR(T, ReadI8, (), i8), AS_CALL_THISCALL);
 
     // IntRect Deserializer::ReadIntRect()
     engine->RegisterObjectMethod(className, "IntRect ReadIntRect()", AS_METHODPR(T, ReadIntRect, (), IntRect), AS_CALL_THISCALL);
@@ -1411,9 +1416,6 @@ template <class T> void RegisterMembers_Deserializer(asIScriptEngine* engine, co
     // ResourceRefList Deserializer::ReadResourceRefList()
     engine->RegisterObjectMethod(className, "ResourceRefList ReadResourceRefList()", AS_METHODPR(T, ReadResourceRefList, (), ResourceRefList), AS_CALL_THISCALL);
 
-    // short Deserializer::ReadShort()
-    engine->RegisterObjectMethod(className, "int16 ReadShort()", AS_METHODPR(T, ReadShort, (), short), AS_CALL_THISCALL);
-
     // String Deserializer::ReadString()
     engine->RegisterObjectMethod(className, "String ReadString()", AS_METHODPR(T, ReadString, (), String), AS_CALL_THISCALL);
 
@@ -1423,17 +1425,17 @@ template <class T> void RegisterMembers_Deserializer(asIScriptEngine* engine, co
     // StringVector Deserializer::ReadStringVector()
     engine->RegisterObjectMethod(className, "Array<String>@ ReadStringVector()", AS_FUNCTION_OBJFIRST(Deserializer_StringVector_ReadStringVector_void_template<Deserializer>), AS_CALL_CDECL_OBJFIRST);
 
-    // u8 Deserializer::ReadUByte()
-    engine->RegisterObjectMethod(className, "uint8 ReadUByte()", AS_METHODPR(T, ReadUByte, (), u8), AS_CALL_THISCALL);
+    // u16 Deserializer::ReadU16()
+    engine->RegisterObjectMethod(className, "uint16 ReadU16()", AS_METHODPR(T, ReadU16, (), u16), AS_CALL_THISCALL);
 
-    // unsigned Deserializer::ReadUInt()
-    engine->RegisterObjectMethod(className, "uint ReadUInt()", AS_METHODPR(T, ReadUInt, (), unsigned), AS_CALL_THISCALL);
+    // u32 Deserializer::ReadU32()
+    engine->RegisterObjectMethod(className, "uint ReadU32()", AS_METHODPR(T, ReadU32, (), u32), AS_CALL_THISCALL);
 
-    // unsigned long long Deserializer::ReadUInt64()
-    engine->RegisterObjectMethod(className, "uint64 ReadUInt64()", AS_METHODPR(T, ReadUInt64, (), unsigned long long), AS_CALL_THISCALL);
+    // u64 Deserializer::ReadU64()
+    engine->RegisterObjectMethod(className, "uint64 ReadU64()", AS_METHODPR(T, ReadU64, (), u64), AS_CALL_THISCALL);
 
-    // unsigned short Deserializer::ReadUShort()
-    engine->RegisterObjectMethod(className, "uint16 ReadUShort()", AS_METHODPR(T, ReadUShort, (), unsigned short), AS_CALL_THISCALL);
+    // u8 Deserializer::ReadU8()
+    engine->RegisterObjectMethod(className, "uint8 ReadU8()", AS_METHODPR(T, ReadU8, (), u8), AS_CALL_THISCALL);
 
     // Variant Deserializer::ReadVariant()
     engine->RegisterObjectMethod(className, "Variant ReadVariant()", AS_METHODPR(T, ReadVariant, (), Variant), AS_CALL_THISCALL);
@@ -4401,6 +4403,8 @@ template <class T> void RegisterMembers_Serializer(asIScriptEngine* engine, cons
 {
     // virtual i32 Serializer::Write(const void* data, i32 size) = 0
     // Error: type "const void*" can not automatically bind
+    // bool Serializer::WriteByte(byte value)
+    // Error: type "byte" can not automatically bind
     // bool Serializer::WriteVariantVector(const VariantVector& value)
     // Error: type "const VariantVector&" can not automatically bind
 
@@ -4412,9 +4416,6 @@ template <class T> void RegisterMembers_Serializer(asIScriptEngine* engine, cons
 
     // bool Serializer::WriteBuffer(const Vector<unsigned char>& value)
     engine->RegisterObjectMethod(className, "bool WriteBuffer(Array<uint8>@+)", AS_FUNCTION_OBJFIRST(Serializer_bool_WriteBuffer_constspVectorlesunsignedspchargreamp_template<Serializer>), AS_CALL_CDECL_OBJFIRST);
-
-    // bool Serializer::WriteByte(signed char value)
-    engine->RegisterObjectMethod(className, "bool WriteByte(int8)", AS_METHODPR(T, WriteByte, (signed char), bool), AS_CALL_THISCALL);
 
     // bool Serializer::WriteColor(const Color& value)
     engine->RegisterObjectMethod(className, "bool WriteColor(const Color&in)", AS_METHODPR(T, WriteColor, (const Color&), bool), AS_CALL_THISCALL);
@@ -4428,11 +4429,17 @@ template <class T> void RegisterMembers_Serializer(asIScriptEngine* engine, cons
     // bool Serializer::WriteFloat(float value)
     engine->RegisterObjectMethod(className, "bool WriteFloat(float)", AS_METHODPR(T, WriteFloat, (float), bool), AS_CALL_THISCALL);
 
-    // bool Serializer::WriteInt(int value)
-    engine->RegisterObjectMethod(className, "bool WriteInt(int)", AS_METHODPR(T, WriteInt, (int), bool), AS_CALL_THISCALL);
+    // bool Serializer::WriteI16(i16 value)
+    engine->RegisterObjectMethod(className, "bool WriteI16(int16)", AS_METHODPR(T, WriteI16, (i16), bool), AS_CALL_THISCALL);
 
-    // bool Serializer::WriteInt64(long long value)
-    engine->RegisterObjectMethod(className, "bool WriteInt64(int64)", AS_METHODPR(T, WriteInt64, (long long), bool), AS_CALL_THISCALL);
+    // bool Serializer::WriteI32(i32 value)
+    engine->RegisterObjectMethod(className, "bool WriteI32(int)", AS_METHODPR(T, WriteI32, (i32), bool), AS_CALL_THISCALL);
+
+    // bool Serializer::WriteI64(i64 value)
+    engine->RegisterObjectMethod(className, "bool WriteI64(int64)", AS_METHODPR(T, WriteI64, (i64), bool), AS_CALL_THISCALL);
+
+    // bool Serializer::WriteI8(i8 value)
+    engine->RegisterObjectMethod(className, "bool WriteI8(int8)", AS_METHODPR(T, WriteI8, (i8), bool), AS_CALL_THISCALL);
 
     // bool Serializer::WriteIntRect(const IntRect& value)
     engine->RegisterObjectMethod(className, "bool WriteIntRect(const IntRect&in)", AS_METHODPR(T, WriteIntRect, (const IntRect&), bool), AS_CALL_THISCALL);
@@ -4476,9 +4483,6 @@ template <class T> void RegisterMembers_Serializer(asIScriptEngine* engine, cons
     // bool Serializer::WriteResourceRefList(const ResourceRefList& value)
     engine->RegisterObjectMethod(className, "bool WriteResourceRefList(const ResourceRefList&in)", AS_METHODPR(T, WriteResourceRefList, (const ResourceRefList&), bool), AS_CALL_THISCALL);
 
-    // bool Serializer::WriteShort(short value)
-    engine->RegisterObjectMethod(className, "bool WriteShort(int16)", AS_METHODPR(T, WriteShort, (short), bool), AS_CALL_THISCALL);
-
     // bool Serializer::WriteString(const String& value)
     engine->RegisterObjectMethod(className, "bool WriteString(const String&in)", AS_METHODPR(T, WriteString, (const String&), bool), AS_CALL_THISCALL);
 
@@ -4488,17 +4492,17 @@ template <class T> void RegisterMembers_Serializer(asIScriptEngine* engine, cons
     // bool Serializer::WriteStringVector(const StringVector& value)
     engine->RegisterObjectMethod(className, "bool WriteStringVector(Array<String>@+)", AS_FUNCTION_OBJFIRST(Serializer_bool_WriteStringVector_constspStringVectoramp_template<Serializer>), AS_CALL_CDECL_OBJFIRST);
 
-    // bool Serializer::WriteUByte(unsigned char value)
-    engine->RegisterObjectMethod(className, "bool WriteUByte(uint8)", AS_METHODPR(T, WriteUByte, (unsigned char), bool), AS_CALL_THISCALL);
+    // bool Serializer::WriteU16(u16 value)
+    engine->RegisterObjectMethod(className, "bool WriteU16(uint16)", AS_METHODPR(T, WriteU16, (u16), bool), AS_CALL_THISCALL);
 
-    // bool Serializer::WriteUInt(unsigned value)
-    engine->RegisterObjectMethod(className, "bool WriteUInt(uint)", AS_METHODPR(T, WriteUInt, (unsigned), bool), AS_CALL_THISCALL);
+    // bool Serializer::WriteU32(u32 value)
+    engine->RegisterObjectMethod(className, "bool WriteU32(uint)", AS_METHODPR(T, WriteU32, (u32), bool), AS_CALL_THISCALL);
 
-    // bool Serializer::WriteUInt64(unsigned long long value)
-    engine->RegisterObjectMethod(className, "bool WriteUInt64(uint64)", AS_METHODPR(T, WriteUInt64, (unsigned long long), bool), AS_CALL_THISCALL);
+    // bool Serializer::WriteU64(u64 value)
+    engine->RegisterObjectMethod(className, "bool WriteU64(uint64)", AS_METHODPR(T, WriteU64, (u64), bool), AS_CALL_THISCALL);
 
-    // bool Serializer::WriteUShort(unsigned short value)
-    engine->RegisterObjectMethod(className, "bool WriteUShort(uint16)", AS_METHODPR(T, WriteUShort, (unsigned short), bool), AS_CALL_THISCALL);
+    // bool Serializer::WriteU8(u8 value)
+    engine->RegisterObjectMethod(className, "bool WriteU8(uint8)", AS_METHODPR(T, WriteU8, (u8), bool), AS_CALL_THISCALL);
 
     // bool Serializer::WriteVariant(const Variant& value)
     engine->RegisterObjectMethod(className, "bool WriteVariant(const Variant&in)", AS_METHODPR(T, WriteVariant, (const Variant&), bool), AS_CALL_THISCALL);

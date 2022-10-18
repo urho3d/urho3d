@@ -508,19 +508,19 @@ bool Image::BeginLoad(Deserializer& source)
     {
         source.Seek(12);
 
-        unsigned endianness = source.ReadUInt();
-        unsigned type = source.ReadUInt();
-        /* unsigned typeSize = */ source.ReadUInt();
-        unsigned format = source.ReadUInt();
-        unsigned internalFormat = source.ReadUInt();
-        /* unsigned baseInternalFormat = */ source.ReadUInt();
-        unsigned width = source.ReadUInt();
-        unsigned height = source.ReadUInt();
-        unsigned depth = source.ReadUInt();
-        /* unsigned arrayElements = */ source.ReadUInt();
-        unsigned faces = source.ReadUInt();
-        unsigned mipmaps = source.ReadUInt();
-        unsigned keyValueBytes = source.ReadUInt();
+        unsigned endianness = source.ReadU32();
+        unsigned type = source.ReadU32();
+        /* unsigned typeSize = */ source.ReadU32();
+        unsigned format = source.ReadU32();
+        unsigned internalFormat = source.ReadU32();
+        /* unsigned baseInternalFormat = */ source.ReadU32();
+        unsigned width = source.ReadU32();
+        unsigned height = source.ReadU32();
+        unsigned depth = source.ReadU32();
+        /* unsigned arrayElements = */ source.ReadU32();
+        unsigned faces = source.ReadU32();
+        unsigned mipmaps = source.ReadU32();
+        unsigned keyValueBytes = source.ReadU32();
 
         if (endianness != 0x04030201)
         {
@@ -620,7 +620,7 @@ bool Image::BeginLoad(Deserializer& source)
         unsigned dataOffset = 0;
         for (unsigned i = 0; i < mipmaps; ++i)
         {
-            unsigned levelSize = source.ReadUInt();
+            unsigned levelSize = source.ReadU32();
             if (levelSize + dataOffset > dataSize)
             {
                 URHO3D_LOGERROR("KTX mipmap level data size exceeds file size");
@@ -637,18 +637,18 @@ bool Image::BeginLoad(Deserializer& source)
     }
     else if (fileID == "PVR\3")
     {
-        /* unsigned flags = */ source.ReadUInt();
-        unsigned pixelFormatLo = source.ReadUInt();
-        /* unsigned pixelFormatHi = */ source.ReadUInt();
-        /* unsigned colourSpace = */ source.ReadUInt();
-        /* unsigned channelType = */ source.ReadUInt();
-        unsigned height = source.ReadUInt();
-        unsigned width = source.ReadUInt();
-        unsigned depth = source.ReadUInt();
-        /* unsigned numSurfaces = */ source.ReadUInt();
-        unsigned numFaces = source.ReadUInt();
-        unsigned mipmapCount = source.ReadUInt();
-        unsigned metaDataSize = source.ReadUInt();
+        /* unsigned flags = */ source.ReadU32();
+        unsigned pixelFormatLo = source.ReadU32();
+        /* unsigned pixelFormatHi = */ source.ReadU32();
+        /* unsigned colourSpace = */ source.ReadU32();
+        /* unsigned channelType = */ source.ReadU32();
+        unsigned height = source.ReadU32();
+        unsigned width = source.ReadU32();
+        unsigned depth = source.ReadU32();
+        /* unsigned numSurfaces = */ source.ReadU32();
+        unsigned numFaces = source.ReadU32();
+        unsigned mipmapCount = source.ReadU32();
+        unsigned metaDataSize = source.ReadU32();
 
         if (depth > 1 || numFaces > 1)
         {

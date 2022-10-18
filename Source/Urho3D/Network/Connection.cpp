@@ -111,12 +111,12 @@ void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const unsig
 
     if (buffer.GetSize() == 0)
     {
-        buffer.WriteUByte((unsigned char)DefaultMessageIDTypes::ID_USER_PACKET_ENUM);
-        buffer.WriteUInt((unsigned int)MSG_PACKED_MESSAGE);
+        buffer.WriteU8((unsigned char)DefaultMessageIDTypes::ID_USER_PACKET_ENUM);
+        buffer.WriteU32((unsigned int)MSG_PACKED_MESSAGE);
     }
 
-    buffer.WriteUInt((unsigned int) msgID);
-    buffer.WriteUInt(numBytes);
+    buffer.WriteU32((unsigned int) msgID);
+    buffer.WriteU32(numBytes);
     buffer.Write(data, numBytes);
 }
 
@@ -185,8 +185,8 @@ void Connection::SetScene(Scene* newScene)
         {
             PackageFile* package = packages[i];
             msg_.WriteString(GetFileNameAndExtension(package->GetName()));
-            msg_.WriteUInt(package->GetTotalSize());
-            msg_.WriteUInt(package->GetChecksum());
+            msg_.WriteU32(package->GetTotalSize());
+            msg_.WriteU32(package->GetChecksum());
         }
         SendMessage(MSG_LOADSCENE, true, true, msg_);
     }
@@ -265,11 +265,11 @@ void Connection::SendClientUpdate()
         return;
 
     msg_.Clear();
-    msg_.WriteUInt(controls_.buttons_);
+    msg_.WriteU32(controls_.buttons_);
     msg_.WriteFloat(controls_.yaw_);
     msg_.WriteFloat(controls_.pitch_);
     msg_.WriteVariantMap(controls_.extraData_);
-    msg_.WriteUByte(timeStamp_);
+    msg_.WriteU8(timeStamp_);
     if (sendMode_ >= OPSM_POSITION)
         msg_.WriteVector3(position_);
     if (sendMode_ >= OPSM_POSITION_ROTATION)
@@ -345,7 +345,7 @@ void Connection::SendPackages()
 
             msg_.Clear();
             msg_.WriteStringHash(current->first_);
-            msg_.WriteUInt(upload.fragment_++);
+            msg_.WriteU32(upload.fragment_++);
             msg_.Write(buffer, fragmentSize);
             SendMessage(MSG_PACKAGEDATA, true, false, msg_);
 
@@ -439,8 +439,8 @@ bool Connection::ProcessMessage(int msgID, MemoryBuffer& buffer)
     }
 
     while (!buffer.IsEof()) {
-        msgID = buffer.ReadUInt();
-        unsigned int packetSize = buffer.ReadUInt();
+        msgID = buffer.ReadU32();
+        unsigned int packetSize = buffer.ReadU32();
         MemoryBuffer msg(buffer.GetData() + buffer.GetPosition(), packetSize);
         buffer.Seek(buffer.GetPosition() + packetSize);
 
@@ -876,7 +876,7 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
 
             // Write the fragment data to the proper index
             unsigned char buffer[PACKAGE_FRAGMENT_SIZE];
-            unsigned index = msg.ReadUInt();
+            unsigned index = msg.ReadU32();
             unsigned fragmentSize = msg.GetSize() - msg.GetPosition();
 
             msg.Read(buffer, fragmentSize);
@@ -946,13 +946,13 @@ void Connection::ProcessControls(int msgID, MemoryBuffer& msg)
     }
 
     Controls newControls;
-    newControls.buttons_ = msg.ReadUInt();
+    newControls.buttons_ = msg.ReadU32();
     newControls.yaw_ = msg.ReadFloat();
     newControls.pitch_ = msg.ReadFloat();
     newControls.extraData_ = msg.ReadVariantMap();
 
     SetControls(newControls);
-    timeStamp_ = msg.ReadUByte();
+    timeStamp_ = msg.ReadU8();
 
     // Client may or may not send observer position & rotation for interest management
     if (!msg.IsEof())
@@ -975,7 +975,7 @@ void Connection::ProcessSceneLoaded(int msgID, MemoryBuffer& msg)
         return;
     }
 
-    hash32 checksum = msg.ReadUInt();
+    hash32 checksum = msg.ReadU32();
 
     if (checksum != scene_->GetChecksum())
     {
@@ -1149,8 +1149,8 @@ void Connection::SendPackageToClient(PackageFile* package)
 
     String filename = GetFileNameAndExtension(package->GetName());
     msg_.WriteString(filename);
-    msg_.WriteUInt(package->GetTotalSize());
-    msg_.WriteUInt(package->GetChecksum());
+    msg_.WriteU32(package->GetTotalSize());
+    msg_.WriteU32(package->GetChecksum());
     SendMessage(MSG_PACKAGEINFO, true, true, msg_);
 }
 
@@ -1173,7 +1173,7 @@ void Connection::HandleAsyncLoadFinished(StringHash eventType, VariantMap& event
     scene_->Clear(true, false);
 
     msg_.Clear();
-    msg_.WriteUInt(scene_->GetChecksum());
+    msg_.WriteU32(scene_->GetChecksum());
     SendMessage(MSG_SCENELOADED, true, true, msg_);
 }
 
@@ -1464,8 +1464,8 @@ bool Connection::RequestNeededPackages(unsigned numPackages, MemoryBuffer& msg)
     for (unsigned i = 0; i < numPackages; ++i)
     {
         String name = msg.ReadString();
-        unsigned fileSize = msg.ReadUInt();
-        hash32 checksum = msg.ReadUInt();
+        unsigned fileSize = msg.ReadU32();
+        hash32 checksum = msg.ReadU32();
         String checksumString = ToStringHex(checksum);
         bool found = false;
 
@@ -1588,7 +1588,7 @@ void Connection::OnPackagesReady()
         sceneLoaded_ = true;
 
         msg_.Clear();
-        msg_.WriteUInt(scene_->GetChecksum());
+        msg_.WriteU32(scene_->GetChecksum());
         SendMessage(MSG_SCENELOADED, true, true, msg_);
     }
     else

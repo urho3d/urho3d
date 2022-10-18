@@ -531,12 +531,12 @@ void DecalSet::SetDecalsAttr(const Vector<unsigned char>& value)
                 for (float& blendWeight : i->blendWeights_)
                     blendWeight = buffer.ReadFloat();
                 for (unsigned char& blendIndex : i->blendIndices_)
-                    blendIndex = buffer.ReadUByte();
+                    blendIndex = buffer.ReadU8();
             }
         }
 
         for (Vector<unsigned short>::Iterator i = newDecal.indices_.Begin(); i != newDecal.indices_.End(); ++i)
-            *i = buffer.ReadUShort();
+            *i = buffer.ReadU16();
 
         newDecal.CalculateBoundingBox();
         numVertices_ += newDecal.vertices_.Size();
@@ -554,7 +554,7 @@ void DecalSet::SetDecalsAttr(const Vector<unsigned char>& value)
             Bone& newBone = bones_[i];
 
             newBone.name_ = buffer.ReadString();
-            newBone.collisionMask_ = BoneCollisionShapeFlags(buffer.ReadUByte());
+            newBone.collisionMask_ = BoneCollisionShapeFlags(buffer.ReadU8());
             if (newBone.collisionMask_ & BONECOLLISION_SPHERE)
                 newBone.radius_ = buffer.ReadFloat();
             if (newBone.collisionMask_ & BONECOLLISION_BOX)
@@ -601,12 +601,12 @@ Vector<unsigned char> DecalSet::GetDecalsAttr() const
                 for (float blendWeight : j->blendWeights_)
                     ret.WriteFloat(blendWeight);
                 for (unsigned char blendIndex : j->blendIndices_)
-                    ret.WriteUByte(blendIndex);
+                    ret.WriteU8(blendIndex);
             }
         }
 
         for (Vector<unsigned short>::ConstIterator j = i->indices_.Begin(); j != i->indices_.End(); ++j)
-            ret.WriteUShort(*j);
+            ret.WriteU16(*j);
     }
 
     if (skinned_)
@@ -616,7 +616,7 @@ Vector<unsigned char> DecalSet::GetDecalsAttr() const
         for (Vector<Bone>::ConstIterator i = bones_.Begin(); i != bones_.End(); ++i)
         {
             ret.WriteString(i->name_);
-            ret.WriteUByte(i->collisionMask_);
+            ret.WriteU8(i->collisionMask_);
             if (i->collisionMask_ & BONECOLLISION_SPHERE)
                 ret.WriteFloat(i->radius_);
             if (i->collisionMask_ & BONECOLLISION_BOX)

@@ -866,15 +866,15 @@ void NavigationMesh::SetNavigationDataAttr(const Vector<unsigned char>& value)
     MemoryBuffer buffer(value);
 
     boundingBox_ = buffer.ReadBoundingBox();
-    numTilesX_ = buffer.ReadInt();
-    numTilesZ_ = buffer.ReadInt();
+    numTilesX_ = buffer.ReadI32();
+    numTilesZ_ = buffer.ReadI32();
 
     dtNavMeshParams params;     // NOLINT(hicpp-member-init)
     rcVcopy(params.orig, &boundingBox_.min_.x_);
     params.tileWidth = buffer.ReadFloat();
     params.tileHeight = buffer.ReadFloat();
-    params.maxTiles = buffer.ReadInt();
-    params.maxPolys = buffer.ReadInt();
+    params.maxTiles = buffer.ReadI32();
+    params.maxPolys = buffer.ReadI32();
 
     navMesh_ = dtAllocNavMesh();
     if (!navMesh_)
@@ -911,14 +911,14 @@ Vector<unsigned char> NavigationMesh::GetNavigationDataAttr() const
     if (navMesh_)
     {
         ret.WriteBoundingBox(boundingBox_);
-        ret.WriteInt(numTilesX_);
-        ret.WriteInt(numTilesZ_);
+        ret.WriteI32(numTilesX_);
+        ret.WriteI32(numTilesZ_);
 
         const dtNavMeshParams* params = navMesh_->getParams();
         ret.WriteFloat(params->tileWidth);
         ret.WriteFloat(params->tileHeight);
-        ret.WriteInt(params->maxTiles);
-        ret.WriteInt(params->maxPolys);
+        ret.WriteI32(params->maxTiles);
+        ret.WriteI32(params->maxPolys);
 
         const dtNavMesh* navMesh = navMesh_;
 
@@ -1234,19 +1234,19 @@ void NavigationMesh::WriteTile(Serializer& dest, int x, int z) const
     if (!tile)
         return;
 
-    dest.WriteInt(x);
-    dest.WriteInt(z);
-    dest.WriteUInt(navMesh->getTileRef(tile));
-    dest.WriteUInt((unsigned)tile->dataSize);
+    dest.WriteI32(x);
+    dest.WriteI32(z);
+    dest.WriteU32(navMesh->getTileRef(tile));
+    dest.WriteU32((unsigned)tile->dataSize);
     dest.Write(tile->data, (unsigned)tile->dataSize);
 }
 
 bool NavigationMesh::ReadTile(Deserializer& source, bool silent)
 {
-    const int x = source.ReadInt();
-    const int z = source.ReadInt();
-    /*dtTileRef tileRef =*/ source.ReadUInt();
-    unsigned navDataSize = source.ReadUInt();
+    const int x = source.ReadI32();
+    const int z = source.ReadI32();
+    /*dtTileRef tileRef =*/ source.ReadU32();
+    unsigned navDataSize = source.ReadU32();
 
     auto* navData = (unsigned char*)dtAlloc(navDataSize, DT_ALLOC_PERM);
     if (!navData)

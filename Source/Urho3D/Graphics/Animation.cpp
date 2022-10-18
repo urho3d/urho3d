@@ -127,16 +127,16 @@ bool Animation::BeginLoad(Deserializer& source)
     length_ = source.ReadFloat();
     tracks_.Clear();
 
-    unsigned tracks = source.ReadUInt();
+    unsigned tracks = source.ReadU32();
     memoryUse += tracks * sizeof(AnimationTrack);
 
     // Read tracks
     for (unsigned i = 0; i < tracks; ++i)
     {
         AnimationTrack* newTrack = CreateTrack(source.ReadString());
-        newTrack->channelMask_ = AnimationChannels(source.ReadUByte());
+        newTrack->channelMask_ = AnimationChannels(source.ReadU8());
 
-        unsigned keyFrames = source.ReadUInt();
+        unsigned keyFrames = source.ReadU32();
         newTrack->keyFrames_.Resize(keyFrames);
         memoryUse += keyFrames * sizeof(AnimationKeyFrame);
 
@@ -219,13 +219,13 @@ bool Animation::Save(Serializer& dest) const
     dest.WriteFloat(length_);
 
     // Write tracks
-    dest.WriteUInt(tracks_.Size());
+    dest.WriteU32(tracks_.Size());
     for (HashMap<StringHash, AnimationTrack>::ConstIterator i = tracks_.Begin(); i != tracks_.End(); ++i)
     {
         const AnimationTrack& track = i->second_;
         dest.WriteString(track.name_);
-        dest.WriteUByte((u8)track.channelMask_);
-        dest.WriteUInt(track.keyFrames_.Size());
+        dest.WriteU8((u8)track.channelMask_);
+        dest.WriteU32(track.keyFrames_.Size());
 
         // Write keyframes of the track
         for (const AnimationKeyFrame& keyFrame : track.keyFrames_)

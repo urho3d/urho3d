@@ -25,7 +25,7 @@ bool Skeleton::Load(Deserializer& source)
     if (source.IsEof())
         return false;
 
-    i32 bones = source.ReadInt();
+    i32 bones = source.ReadI32();
     bones_.Reserve(bones);
 
     for (i32 i = 0; i < bones; ++i)
@@ -33,14 +33,14 @@ bool Skeleton::Load(Deserializer& source)
         Bone newBone;
         newBone.name_ = source.ReadString();
         newBone.nameHash_ = newBone.name_;
-        newBone.parentIndex_ = source.ReadInt();
+        newBone.parentIndex_ = source.ReadI32();
         newBone.initialPosition_ = source.ReadVector3();
         newBone.initialRotation_ = source.ReadQuaternion();
         newBone.initialScale_ = source.ReadVector3();
         source.Read(&newBone.offsetMatrix_.m00_, sizeof(Matrix3x4));
 
         // Read bone collision data
-        newBone.collisionMask_ = BoneCollisionShapeFlags(source.ReadUByte());
+        newBone.collisionMask_ = BoneCollisionShapeFlags(source.ReadU8());
         if (newBone.collisionMask_ & BONECOLLISION_SPHERE)
             newBone.radius_ = source.ReadFloat();
         if (newBone.collisionMask_ & BONECOLLISION_BOX)
@@ -57,21 +57,21 @@ bool Skeleton::Load(Deserializer& source)
 
 bool Skeleton::Save(Serializer& dest) const
 {
-    if (!dest.WriteInt(bones_.Size()))
+    if (!dest.WriteI32(bones_.Size()))
         return false;
 
     for (i32 i = 0; i < bones_.Size(); ++i)
     {
         const Bone& bone = bones_[i];
         dest.WriteString(bone.name_);
-        dest.WriteInt(bone.parentIndex_);
+        dest.WriteI32(bone.parentIndex_);
         dest.WriteVector3(bone.initialPosition_);
         dest.WriteQuaternion(bone.initialRotation_);
         dest.WriteVector3(bone.initialScale_);
         dest.Write(bone.offsetMatrix_.Data(), sizeof(Matrix3x4));
 
         // Collision info
-        dest.WriteUByte(bone.collisionMask_);
+        dest.WriteU8(bone.collisionMask_);
         if (bone.collisionMask_ & BONECOLLISION_SPHERE)
             dest.WriteFloat(bone.radius_);
         if (bone.collisionMask_ & BONECOLLISION_BOX)
