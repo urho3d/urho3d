@@ -773,7 +773,7 @@ static inline bool IsBase64(char c) {
     return (isalnum(c) || (c == '+') || (c == '/'));
 }
 
-Vector<unsigned char> DecodeBase64(String encodedString)
+Vector<unsigned char> DecodeBase64(const String& encodedString)
 {
     int inLen = encodedString.Length();
     int i = 0;
