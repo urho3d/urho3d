@@ -14,49 +14,54 @@ static const float q = 32767.0f;
 
 Serializer::~Serializer() = default;
 
-bool Serializer::WriteInt64(long long value)
+bool Serializer::WriteI64(i64 value)
 {
     return Write(&value, sizeof value) == sizeof value;
 }
 
-bool Serializer::WriteInt(int value)
+bool Serializer::WriteI32(i32 value)
 {
     return Write(&value, sizeof value) == sizeof value;
 }
 
-bool Serializer::WriteShort(short value)
+bool Serializer::WriteI16(i16 value)
 {
     return Write(&value, sizeof value) == sizeof value;
 }
 
-bool Serializer::WriteByte(signed char value)
+bool Serializer::WriteI8(i8 value)
 {
     return Write(&value, sizeof value) == sizeof value;
 }
 
-bool Serializer::WriteUInt64(unsigned long long value)
+bool Serializer::WriteU64(u64 value)
 {
     return Write(&value, sizeof value) == sizeof value;
 }
 
-bool Serializer::WriteUInt(unsigned value)
+bool Serializer::WriteU32(u32 value)
 {
     return Write(&value, sizeof value) == sizeof value;
 }
 
-bool Serializer::WriteUShort(unsigned short value)
+bool Serializer::WriteU16(u16 value)
 {
     return Write(&value, sizeof value) == sizeof value;
 }
 
-bool Serializer::WriteUByte(unsigned char value)
+bool Serializer::WriteU8(u8 value)
+{
+    return Write(&value, sizeof value) == sizeof value;
+}
+
+bool Serializer::WriteByte(byte value)
 {
     return Write(&value, sizeof value) == sizeof value;
 }
 
 bool Serializer::WriteBool(bool value)
 {
-    return WriteUByte((unsigned char)(value ? 1 : 0)) == 1;
+    return WriteU8((u8)(value ? 1 : 0)) == 1;
 }
 
 bool Serializer::WriteFloat(float value)
@@ -175,13 +180,13 @@ bool Serializer::WriteFileID(const String& value)
 
     success &= Write(value.CString(), length) == length;
     for (i32 i = value.Length(); i < 4; ++i)
-        success &= WriteByte(' ');
+        success &= WriteU8(' ');
     return success;
 }
 
 bool Serializer::WriteStringHash(const StringHash& value)
 {
-    return WriteUInt(value.Value());
+    return WriteU32(value.Value());
 }
 
 bool Serializer::WriteBuffer(const Vector<unsigned char>& value)
@@ -220,7 +225,7 @@ bool Serializer::WriteVariant(const Variant& value)
     bool success = true;
     VariantType type = value.GetType();
 
-    success &= WriteUByte((unsigned char)type);
+    success &= WriteU8((u8)type);
     success &= WriteVariantData(value);
     return success;
 }
@@ -233,10 +238,10 @@ bool Serializer::WriteVariantData(const Variant& value)
         return true;
 
     case VAR_INT:
-        return WriteInt(value.GetInt());
+        return WriteI32(value.GetInt());
 
     case VAR_INT64:
-        return WriteInt64(value.GetInt64());
+        return WriteI64(value.GetInt64());
 
     case VAR_BOOL:
         return WriteBool(value.GetBool());
@@ -270,7 +275,7 @@ bool Serializer::WriteVariantData(const Variant& value)
     case VAR_PTR:
     case VAR_CUSTOM_HEAP:
     case VAR_CUSTOM_STACK:
-        return WriteUInt(0);
+        return WriteU32(0);
 
     case VAR_RESOURCEREF:
         return WriteResourceRef(value.GetResourceRef());
@@ -345,29 +350,29 @@ bool Serializer::WriteVariantMap(const VariantMap& value)
 
 bool Serializer::WriteVLE(unsigned value)
 {
-    unsigned char data[4];
+    byte data[4];
 
     if (value < 0x80)
-        return WriteUByte((unsigned char)value);
+        return WriteByte((byte)value);
     else if (value < 0x4000)
     {
-        data[0] = (unsigned char)(value | 0x80u);
-        data[1] = (unsigned char)(value >> 7u);
+        data[0] = (byte)(value | 0x80u);
+        data[1] = (byte)(value >> 7u);
         return Write(data, 2) == 2;
     }
     else if (value < 0x200000)
     {
-        data[0] = (unsigned char)(value | 0x80u);
-        data[1] = (unsigned char)(value >> 7u | 0x80u);
-        data[2] = (unsigned char)(value >> 14u);
+        data[0] = (byte)(value | 0x80u);
+        data[1] = (byte)(value >> 7u | 0x80u);
+        data[2] = (byte)(value >> 14u);
         return Write(data, 3) == 3;
     }
     else
     {
-        data[0] = (unsigned char)(value | 0x80u);
-        data[1] = (unsigned char)(value >> 7u | 0x80u);
-        data[2] = (unsigned char)(value >> 14u | 0x80u);
-        data[3] = (unsigned char)(value >> 21u);
+        data[0] = (byte)(value | 0x80u);
+        data[1] = (byte)(value >> 7u | 0x80u);
+        data[2] = (byte)(value >> 14u | 0x80u);
+        data[3] = (byte)(value >> 21u);
         return Write(data, 4) == 4;
     }
 }
@@ -381,8 +386,8 @@ bool Serializer::WriteLine(const String& value)
 {
     bool success = true;
     success &= Write(value.CString(), value.Length()) == value.Length();
-    success &= WriteUByte(13);
-    success &= WriteUByte(10);
+    success &= WriteU8(13);
+    success &= WriteU8(10);
     return success;
 }
 

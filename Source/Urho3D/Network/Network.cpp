@@ -503,8 +503,8 @@ void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const uns
         return;
 
     VectorBuffer msgData;
-    msgData.WriteUByte((unsigned char)ID_USER_PACKET_ENUM);
-    msgData.WriteUInt((unsigned int)msgID);
+    msgData.WriteU8((unsigned char)ID_USER_PACKET_ENUM);
+    msgData.WriteU32((unsigned int)msgID);
     msgData.Write(data, numBytes);
 
     if (isServer_)

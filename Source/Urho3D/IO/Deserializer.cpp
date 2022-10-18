@@ -42,65 +42,72 @@ hash32 Deserializer::GetChecksum()
     return 0;
 }
 
-long long Deserializer::ReadInt64()
+i64 Deserializer::ReadI64()
 {
-    long long ret;
+    i64 ret;
     Read(&ret, sizeof ret);
     return ret;
 }
 
-int Deserializer::ReadInt()
+i32 Deserializer::ReadI32()
 {
-    int ret;
+    i32 ret;
     Read(&ret, sizeof ret);
     return ret;
 }
 
-short Deserializer::ReadShort()
+i16 Deserializer::ReadI16()
 {
-    short ret;
+    i16 ret;
     Read(&ret, sizeof ret);
     return ret;
 }
 
-signed char Deserializer::ReadByte()
+i8 Deserializer::ReadI8()
 {
-    signed char ret;
+    i8 ret;
     Read(&ret, sizeof ret);
     return ret;
 }
 
-unsigned long long Deserializer::ReadUInt64()
+u64 Deserializer::ReadU64()
 {
-    unsigned long long ret;
+    u64 ret;
     Read(&ret, sizeof ret);
     return ret;
 }
 
-unsigned Deserializer::ReadUInt()
+u32 Deserializer::ReadU32()
 {
-    unsigned ret;
+    u32 ret;
     Read(&ret, sizeof ret);
     return ret;
 }
 
-unsigned short Deserializer::ReadUShort()
+u16 Deserializer::ReadU16()
 {
-    unsigned short ret;
+    u16 ret;
     Read(&ret, sizeof ret);
     return ret;
 }
 
-u8 Deserializer::ReadUByte()
+u8 Deserializer::ReadU8()
 {
     u8 ret;
     Read(&ret, sizeof ret);
     return ret;
 }
 
+byte Deserializer::ReadByte()
+{
+    byte ret;
+    Read(&ret, sizeof ret);
+    return ret;
+}
+
 bool Deserializer::ReadBool()
 {
-    return ReadUByte() != 0;
+    return ReadU8() != 0;
 }
 
 float Deserializer::ReadFloat()
@@ -232,7 +239,7 @@ String Deserializer::ReadString()
 
     while (!IsEof())
     {
-        char c = ReadByte();
+        char c = ReadU8();
         if (!c)
             break;
         else
@@ -252,7 +259,7 @@ String Deserializer::ReadFileID()
 
 StringHash Deserializer::ReadStringHash()
 {
-    return StringHash(ReadUInt());
+    return StringHash(ReadU32());
 }
 
 Vector<u8> Deserializer::ReadBuffer()
@@ -283,7 +290,7 @@ ResourceRefList Deserializer::ReadResourceRefList()
 
 Variant Deserializer::ReadVariant()
 {
-    auto type = (VariantType)ReadUByte();
+    VariantType type = (VariantType)ReadU8();
     return ReadVariant(type);
 }
 
@@ -292,10 +299,10 @@ Variant Deserializer::ReadVariant(VariantType type)
     switch (type)
     {
     case VAR_INT:
-        return Variant(ReadInt());
+        return Variant(ReadI32());
 
     case VAR_INT64:
-        return Variant(ReadInt64());
+        return Variant(ReadI64());
 
     case VAR_BOOL:
         return Variant(ReadBool());
@@ -327,7 +334,7 @@ Variant Deserializer::ReadVariant(VariantType type)
         // Deserializing pointers is not supported. Return null
     case VAR_VOIDPTR:
     case VAR_PTR:
-        ReadUInt();
+        ReadU32();
         return Variant((void*)nullptr);
 
     case VAR_RESOURCEREF:
@@ -369,7 +376,7 @@ Variant Deserializer::ReadVariant(VariantType type)
         // Deserializing custom values is not supported. Return empty
     case VAR_CUSTOM_HEAP:
     case VAR_CUSTOM_STACK:
-        ReadUInt();
+        ReadU32();
         return Variant::EMPTY;
 
     default:
@@ -410,25 +417,25 @@ VariantMap Deserializer::ReadVariantMap()
 unsigned Deserializer::ReadVLE()
 {
     unsigned ret;
-    u8 byte;
+    u8 b;
 
-    byte = ReadUByte();
-    ret = (unsigned)(byte & 0x7fu);
-    if (byte < 0x80)
+    b = ReadU8();
+    ret = (unsigned)(b & 0x7fu);
+    if (b < 0x80)
         return ret;
 
-    byte = ReadUByte();
-    ret |= ((unsigned)(byte & 0x7fu)) << 7u;
-    if (byte < 0x80)
+    b = ReadU8();
+    ret |= ((unsigned)(b & 0x7fu)) << 7u;
+    if (b < 0x80)
         return ret;
 
-    byte = ReadUByte();
-    ret |= ((unsigned)(byte & 0x7fu)) << 14u;
-    if (byte < 0x80)
+    b = ReadU8();
+    ret |= ((unsigned)(b & 0x7fu)) << 14u;
+    if (b < 0x80)
         return ret;
 
-    byte = ReadUByte();
-    ret |= ((unsigned)byte) << 21u;
+    b = ReadU8();
+    ret |= ((unsigned)b) << 21u;
     return ret;
 }
 
@@ -445,7 +452,7 @@ String Deserializer::ReadLine()
 
     while (!IsEof())
     {
-        char c = ReadByte();
+        char c = ReadU8();
         if (c == 10)
             break;
         if (c == 13)
@@ -453,7 +460,7 @@ String Deserializer::ReadLine()
             // Peek next char to see if it's 10, and skip it too
             if (!IsEof())
             {
-                char next = ReadByte();
+                char next = ReadU8();
                 if (next != 10)
                     Seek(position_ - 1);
             }

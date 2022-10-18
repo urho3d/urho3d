@@ -15,7 +15,7 @@ class Mover : ScriptObject
 
     void Load(Deserializer& deserializer)
     {
-        bufferSize = deserializer.ReadUInt(); // Get buffer size
+        bufferSize = deserializer.ReadU32(); // Get buffer size
         SetPathAttr(deserializer.ReadVectorBuffer(bufferSize));
     }
 
@@ -41,7 +41,7 @@ class Mover : ScriptObject
             buffer.WriteVector2(path[i]);
 
         bufferSize = buffer.size;
-        serializer.WriteUInt(bufferSize);
+        serializer.WriteU32(bufferSize);
 
         return buffer;
     }

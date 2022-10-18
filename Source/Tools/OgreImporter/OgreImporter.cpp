@@ -838,48 +838,48 @@ void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotat
         dest.WriteFileID("UMD2");
 
         // Vertexbuffers
-        dest.WriteUInt(vertexBuffers_.Size());
+        dest.WriteU32(vertexBuffers_.Size());
         for (unsigned i = 0; i < vertexBuffers_.Size(); ++i)
             vertexBuffers_[i].WriteData(dest);
 
         // Indexbuffers
-        dest.WriteUInt(indexBuffers_.Size());
+        dest.WriteU32(indexBuffers_.Size());
         for (unsigned i = 0; i < indexBuffers_.Size(); ++i)
             indexBuffers_[i].WriteData(dest);
 
         // Subgeometries
-        dest.WriteUInt(subGeometries_.Size());
+        dest.WriteU32(subGeometries_.Size());
         for (unsigned i = 0; i < subGeometries_.Size(); ++i)
         {
             // Write bone mapping info from the first LOD level. It does not change for further LODs
-            dest.WriteUInt(subGeometries_[i][0].boneMapping_.Size());
+            dest.WriteU32(subGeometries_[i][0].boneMapping_.Size());
             for (unsigned k = 0; k < subGeometries_[i][0].boneMapping_.Size(); ++k)
-                dest.WriteUInt(subGeometries_[i][0].boneMapping_[k]);
+                dest.WriteU32(subGeometries_[i][0].boneMapping_[k]);
 
             // Lod levels for this subgeometry
-            dest.WriteUInt(subGeometries_[i].Size());
+            dest.WriteU32(subGeometries_[i].Size());
             for (unsigned j = 0; j < subGeometries_[i].Size(); ++j)
             {
                 dest.WriteFloat(subGeometries_[i][j].distance_);
-                dest.WriteUInt((unsigned)subGeometries_[i][j].primitiveType_);
-                dest.WriteUInt(subGeometries_[i][j].vertexBuffer_);
-                dest.WriteUInt(subGeometries_[i][j].indexBuffer_);
-                dest.WriteUInt(subGeometries_[i][j].indexStart_);
-                dest.WriteUInt(subGeometries_[i][j].indexCount_);
+                dest.WriteU32((unsigned)subGeometries_[i][j].primitiveType_);
+                dest.WriteU32(subGeometries_[i][j].vertexBuffer_);
+                dest.WriteU32(subGeometries_[i][j].indexBuffer_);
+                dest.WriteU32(subGeometries_[i][j].indexStart_);
+                dest.WriteU32(subGeometries_[i][j].indexCount_);
             }
         }
 
         // Morphs
-        dest.WriteUInt(morphs_.Size());
+        dest.WriteU32(morphs_.Size());
         for (unsigned i = 0; i < morphs_.Size(); ++i)
             morphs_[i].WriteData(dest);
 
         // Skeleton
-        dest.WriteUInt(bones_.Size());
+        dest.WriteU32(bones_.Size());
         for (unsigned i = 0; i < bones_.Size(); ++i)
         {
             dest.WriteString(bones_[i].name_);
-            dest.WriteUInt(bones_[i].parentIndex_);
+            dest.WriteU32(bones_[i].parentIndex_);
             dest.WriteVector3(bones_[i].bindPosition_);
             dest.WriteQuaternion(bones_[i].bindRotation_);
             dest.WriteVector3(bones_[i].bindScale_);
@@ -888,7 +888,7 @@ void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotat
             offsetMatrix = offsetMatrix.Inverse();
             dest.Write(offsetMatrix.Data(), sizeof(Matrix3x4));
 
-            dest.WriteUByte(bones_[i].collisionMask_);
+            dest.WriteU8(bones_[i].collisionMask_);
             if (bones_[i].collisionMask_ & 1u)
                 dest.WriteFloat(bones_[i].radius_);
             if (bones_[i].collisionMask_ & 2u)
@@ -1012,13 +1012,13 @@ void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotat
                 dest.WriteFileID("UANI");
                 dest.WriteString(newAnimation.name_);
                 dest.WriteFloat(newAnimation.length_);
-                dest.WriteUInt(newAnimation.tracks_.Size());
+                dest.WriteU32(newAnimation.tracks_.Size());
                 for (unsigned i = 0; i < newAnimation.tracks_.Size(); ++i)
                 {
                     AnimationTrack& track = newAnimation.tracks_[i];
                     dest.WriteString(track.name_);
-                    dest.WriteUByte((u8)track.channelMask_);
-                    dest.WriteUInt(track.keyFrames_.Size());
+                    dest.WriteU8((u8)track.channelMask_);
+                    dest.WriteU32(track.keyFrames_.Size());
                     for (unsigned j = 0; j < track.keyFrames_.Size(); ++j)
                     {
                         AnimationKeyFrame& keyFrame = track.keyFrames_[j];

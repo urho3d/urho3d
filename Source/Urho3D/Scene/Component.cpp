@@ -44,7 +44,7 @@ bool Component::Save(Serializer& dest) const
     // Write type and ID
     if (!dest.WriteStringHash(GetType()))
         return false;
-    if (!dest.WriteUInt(id_))
+    if (!dest.WriteU32(id_))
         return false;
 
     // Write attributes

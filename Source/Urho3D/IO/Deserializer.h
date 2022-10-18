@@ -49,21 +49,25 @@ public:
     i64 GetSize() const { return size_; }
 
     /// Read a 64-bit integer.
-    long long ReadInt64();
+    i64 ReadI64();
     /// Read a 32-bit integer.
-    int ReadInt();
+    i32 ReadI32();
     /// Read a 16-bit integer.
-    short ReadShort();
+    i16 ReadI16();
     /// Read an 8-bit integer.
-    signed char ReadByte();
+    i8 ReadI8();
     /// Read a 64-bit unsigned integer.
-    unsigned long long ReadUInt64();
+    u64 ReadU64();
     /// Read a 32-bit unsigned integer.
-    unsigned ReadUInt();
+    u32 ReadU32();
     /// Read a 16-bit unsigned integer.
-    unsigned short ReadUShort();
+    u16 ReadU16();
     /// Read an 8-bit unsigned integer.
-    u8 ReadUByte();
+    u8 ReadU8();
+
+    /// Read an 8-bit unsigned integer
+    byte ReadByte();
+
     /// Read a bool.
     bool ReadBool();
     /// Read a float.

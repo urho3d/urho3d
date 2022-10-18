@@ -302,9 +302,9 @@ void WritePackageFile(const String& fileName, const String& rootDir)
     {
         // Write entry (correct offset is still unknown, will be filled in later)
         dest.WriteString(basePath_ + entries_[i].name_);
-        dest.WriteUInt(entries_[i].offset_);
-        dest.WriteUInt(entries_[i].size_);
-        dest.WriteUInt(entries_[i].checksum_);
+        dest.WriteU32(entries_[i].offset_);
+        dest.WriteU32(entries_[i].size_);
+        dest.WriteU32(entries_[i].checksum_);
     }
 
     unsigned totalDataSize = 0;
@@ -356,8 +356,8 @@ void WritePackageFile(const String& fileName, const String& rootDir)
                 if (!packedSize)
                     ErrorExit("LZ4 compression failed for file " + entries_[i].name_ + " at offset " + String(pos));
 
-                dest.WriteUShort((unsigned short)unpackedSize);
-                dest.WriteUShort((unsigned short)packedSize);
+                dest.WriteU16((unsigned short)unpackedSize);
+                dest.WriteU16((unsigned short)packedSize);
                 dest.Write(compressBuffer.Get(), packedSize);
 
                 pos += unpackedSize;
@@ -376,7 +376,7 @@ void WritePackageFile(const String& fileName, const String& rootDir)
 
     // Write package size to the end of file to allow finding it linked to an executable file
     unsigned currentSize = dest.GetSize();
-    dest.WriteUInt(currentSize + sizeof(unsigned));
+    dest.WriteU32(currentSize + sizeof(unsigned));
 
     // Write header again with correct offsets & checksums
     dest.Seek(0);
@@ -385,9 +385,9 @@ void WritePackageFile(const String& fileName, const String& rootDir)
     for (unsigned i = 0; i < entries_.Size(); ++i)
     {
         dest.WriteString(basePath_ + entries_[i].name_);
-        dest.WriteUInt(entries_[i].offset_);
-        dest.WriteUInt(entries_[i].size_);
-        dest.WriteUInt(entries_[i].checksum_);
+        dest.WriteU32(entries_[i].offset_);
+        dest.WriteU32(entries_[i].size_);
+        dest.WriteU32(entries_[i].checksum_);
     }
 
     if (!quiet_)
@@ -406,6 +406,6 @@ void WriteHeader(File& dest)
         dest.WriteFileID("UPAK");
     else
         dest.WriteFileID("ULZ4");
-    dest.WriteUInt(entries_.Size());
-    dest.WriteUInt(checksum_);
+    dest.WriteU32(entries_.Size());
+    dest.WriteU32(checksum_);
 }

@@ -42,8 +42,8 @@ bool CompressStream(Serializer& dest, Deserializer& src)
     // Prepend the source and dest. data size in the stream so that we know to buffer & uncompress the right amount
     if (!srcSize)
     {
-        dest.WriteUInt(0);
-        dest.WriteUInt(0);
+        dest.WriteU32(0);
+        dest.WriteU32(0);
         return true;
     }
 
@@ -56,8 +56,8 @@ bool CompressStream(Serializer& dest, Deserializer& src)
 
     auto destSize = (unsigned)LZ4_compress_HC((const char*)srcBuffer.Get(), (char*)destBuffer.Get(), srcSize, LZ4_compressBound(srcSize), 0);
     bool success = true;
-    success &= dest.WriteUInt(srcSize);
-    success &= dest.WriteUInt(destSize);
+    success &= dest.WriteU32(srcSize);
+    success &= dest.WriteU32(destSize);
     success &= dest.Write(destBuffer, destSize) == destSize;
     return success;
 }
@@ -67,8 +67,8 @@ bool DecompressStream(Serializer& dest, Deserializer& src)
     if (src.IsEof())
         return false;
 
-    unsigned destSize = src.ReadUInt();
-    unsigned srcSize = src.ReadUInt();
+    unsigned destSize = src.ReadU32();
+    unsigned srcSize = src.ReadU32();
     if (!srcSize || !destSize)
         return true; // No data
 

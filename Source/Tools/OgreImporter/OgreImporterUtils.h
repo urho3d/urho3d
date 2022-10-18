@@ -109,20 +109,20 @@ struct ModelVertexBuffer
 
     void WriteData(Serializer& dest)
     {
-        dest.WriteUInt(vertices_.Size());
+        dest.WriteU32(vertices_.Size());
 
         Vector<VertexElement> elements = VertexBuffer::GetElements(elementMask_);
-        dest.WriteUInt(elements.Size());
+        dest.WriteU32(elements.Size());
         for (unsigned j = 0; j < elements.Size(); ++j)
         {
             unsigned elementDesc = ((unsigned)elements[j].type_) |
                 (((unsigned)elements[j].semantic_) << 8u) |
                 (((unsigned)elements[j].index_) << 16u);
-            dest.WriteUInt(elementDesc);
+            dest.WriteU32(elementDesc);
         }
 
-        dest.WriteUInt(morphStart_);
-        dest.WriteUInt(morphCount_);
+        dest.WriteU32(morphStart_);
+        dest.WriteU32(morphCount_);
 
         for (unsigned i = 0; i < vertices_.Size(); ++i)
         {
@@ -131,7 +131,7 @@ struct ModelVertexBuffer
             if (elementMask_ & MASK_NORMAL)
                 dest.WriteVector3(vertices_[i].normal_);
             if (elementMask_ & MASK_COLOR)
-                dest.WriteUInt(vertices_[i].color_.ToUInt());
+                dest.WriteU32(vertices_[i].color_.ToUInt());
             if (elementMask_ & MASK_TEXCOORD1)
                 dest.WriteVector2(vertices_[i].texCoord1_);
             if (elementMask_ & MASK_TEXCOORD2)
@@ -165,18 +165,18 @@ struct ModelMorph
     void WriteData(Serializer& dest)
     {
         dest.WriteString(name_);
-        dest.WriteUInt(buffers_.Size());
+        dest.WriteU32(buffers_.Size());
         for (unsigned i = 0; i < buffers_.Size(); ++i)
         {
-            dest.WriteUInt(buffers_[i].vertexBuffer_);
-            dest.WriteUInt(buffers_[i].elementMask_);
-            dest.WriteUInt(buffers_[i].vertices_.Size());
+            dest.WriteU32(buffers_[i].vertexBuffer_);
+            dest.WriteU32(buffers_[i].elementMask_);
+            dest.WriteU32(buffers_[i].vertices_.Size());
             unsigned elementMask = buffers_[i].elementMask_;
 
             for (Vector<Pair<unsigned, ModelVertex>>::Iterator j = buffers_[i].vertices_.Begin();
                 j != buffers_[i].vertices_.End(); ++j)
             {
-                dest.WriteUInt(j->first_);
+                dest.WriteU32(j->first_);
                 if (elementMask & MASK_POSITION)
                     dest.WriteVector3(j->second_.position_);
                 if (elementMask & MASK_NORMAL)
@@ -200,15 +200,15 @@ struct ModelIndexBuffer
 
     void WriteData(Serializer& dest)
     {
-        dest.WriteUInt(indices_.Size());
-        dest.WriteUInt(indexSize_);
+        dest.WriteU32(indices_.Size());
+        dest.WriteU32(indexSize_);
 
         for (unsigned i = 0; i < indices_.Size(); ++i)
         {
             if (indexSize_ == sizeof(unsigned short))
-                dest.WriteUShort(indices_[i]);
+                dest.WriteU16(indices_[i]);
             else
-                dest.WriteUInt(indices_[i]);
+                dest.WriteU32(indices_[i]);
         }
     }
 };

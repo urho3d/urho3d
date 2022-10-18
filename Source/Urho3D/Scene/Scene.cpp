@@ -336,7 +336,7 @@ bool Scene::LoadAsync(File* file, LoadMode mode)
         }
 
         // Store own old ID for resolving possible root node references
-        unsigned nodeID = file->ReadUInt();
+        unsigned nodeID = file->ReadU32();
         resolver_.AddNode(nodeID, this);
 
         // Load root level components first
@@ -511,7 +511,7 @@ Node* Scene::Instantiate(Deserializer& source, const Vector3& position, const Qu
     URHO3D_PROFILE(Instantiate);
 
     SceneResolver resolver;
-    unsigned nodeID = source.ReadUInt();
+    unsigned nodeID = source.ReadU32();
     // Rewrite IDs when instantiating
     Node* node = CreateChild(0, mode);
     resolver.AddNode(nodeID, node);
@@ -1207,7 +1207,7 @@ void Scene::UpdateAsyncLoading()
         }
         else // Load from binary
         {
-            unsigned nodeID = asyncProgress_.file_->ReadUInt();
+            unsigned nodeID = asyncProgress_.file_->ReadU32();
             Node* newNode = CreateChild(nodeID, IsReplicatedID(nodeID) ? REPLICATED : LOCAL);
             resolver_.AddNode(nodeID, newNode);
             newNode->Load(*asyncProgress_.file_, resolver_);
@@ -1276,7 +1276,7 @@ void Scene::PreloadResources(File* file, bool isSceneFile)
     auto* cache = GetSubsystem<ResourceCache>();
 
     // Read node ID (not needed)
-    /*unsigned nodeID = */file->ReadUInt();
+    /*unsigned nodeID = */file->ReadU32();
 
     // Read Node or Scene attributes; these do not include any resources
     const Vector<AttributeInfo>* attributes = context_->GetAttributes(isSceneFile ? Scene::GetTypeStatic() : Node::GetTypeStatic());
@@ -1297,7 +1297,7 @@ void Scene::PreloadResources(File* file, bool isSceneFile)
         VectorBuffer compBuffer(*file, file->ReadVLE());
         StringHash compType = compBuffer.ReadStringHash();
         // Read component ID (not needed)
-        /*unsigned compID = */compBuffer.ReadUInt();
+        /*unsigned compID = */compBuffer.ReadU32();
 
         attributes = context_->GetAttributes(compType);
         if (attributes)

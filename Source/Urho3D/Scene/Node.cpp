@@ -77,7 +77,7 @@ bool Node::Load(Deserializer& source)
     SceneResolver resolver;
 
     // Read own ID. Will not be applied, only stored for resolving possible references
-    unsigned nodeID = source.ReadUInt();
+    unsigned nodeID = source.ReadU32();
     resolver.AddNode(nodeID, this);
 
     // Read attributes, components and child nodes
@@ -94,7 +94,7 @@ bool Node::Load(Deserializer& source)
 bool Node::Save(Serializer& dest) const
 {
     // Write node ID
-    if (!dest.WriteUInt(id_))
+    if (!dest.WriteU32(id_))
         return false;
 
     // Write attributes
@@ -1548,7 +1548,7 @@ bool Node::Load(Deserializer& source, SceneResolver& resolver, bool loadChildren
     {
         VectorBuffer compBuffer(source, source.ReadVLE());
         StringHash compType = compBuffer.ReadStringHash();
-        unsigned compID = compBuffer.ReadUInt();
+        unsigned compID = compBuffer.ReadU32();
 
         Component* newComponent = SafeCreateComponent(String::EMPTY, compType,
             (mode == REPLICATED && Scene::IsReplicatedID(compID)) ? REPLICATED : LOCAL, rewriteIDs ? 0 : compID);
@@ -1566,7 +1566,7 @@ bool Node::Load(Deserializer& source, SceneResolver& resolver, bool loadChildren
     i32 numChildren = source.ReadVLE();
     for (i32 i = 0; i < numChildren; ++i)
     {
-        unsigned nodeID = source.ReadUInt();
+        unsigned nodeID = source.ReadU32();
         Node* newNode = CreateChild(rewriteIDs ? 0 : nodeID, (mode == REPLICATED && Scene::IsReplicatedID(nodeID)) ? REPLICATED :
             LOCAL);
         resolver.AddNode(nodeID, newNode);

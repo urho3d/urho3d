@@ -881,7 +881,7 @@ const Vector<unsigned char>& AnimatedModel::GetMorphsAttr() const
 {
     attrBuffer_.Clear();
     for (Vector<ModelMorph>::ConstIterator i = morphs_.Begin(); i != morphs_.End(); ++i)
-        attrBuffer_.WriteUByte((unsigned char)(i->weight_ * 255.0f));
+        attrBuffer_.WriteU8((unsigned char)(i->weight_ * 255.0f));
 
     return attrBuffer_.GetBuffer();
 }

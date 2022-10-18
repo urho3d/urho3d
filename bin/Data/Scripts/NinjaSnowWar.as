@@ -640,7 +640,7 @@ void HandleUpdateHiscores(StringHash eventType, VariantMap& eventData)
     for (uint i = 0; i < hiscores.length; ++i)
     {
         hiscores[i].name = data.ReadString();
-        hiscores[i].score = data.ReadInt();
+        hiscores[i].score = data.ReadI32();
     }
 
     String allHiscores;
@@ -743,7 +743,7 @@ void SendHiscores(int playerIndex)
     for (uint i = 0; i < hiscores.length; ++i)
     {
         data.WriteString(hiscores[i].name);
-        data.WriteInt(hiscores[i].score);
+        data.WriteI32(hiscores[i].score);
     }
 
     VariantMap eventData;
