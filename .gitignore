@@ -60,6 +60,9 @@ build/
 # Qt Creator project settings
 /CMakeLists.txt.user
 
+# VSCode project settings
+/.vscode/
+
 # JetBrains IDE project settings
 /.idea/
 /cmake-build-*/
