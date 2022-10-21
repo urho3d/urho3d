@@ -1279,7 +1279,7 @@ void Material::RefreshShaderParameterHash()
     }
 
     shaderParameterHash_ = 0;
-    const unsigned char* data = temp.GetData();
+    const byte* data = temp.GetData();
     unsigned dataSize = temp.GetSize();
     for (unsigned i = 0; i < dataSize; ++i)
         shaderParameterHash_ = SDBMHash(shaderParameterHash_, data[i]);

@@ -273,9 +273,9 @@ public:
     /// Update gravity parameters to the Bullet rigid body.
     void UpdateGravity();
     /// Set network angular velocity attribute.
-    void SetNetAngularVelocityAttr(const Vector<unsigned char>& value);
+    void SetNetAngularVelocityAttr(const Vector<byte>& value);
     /// Return network angular velocity attribute.
-    const Vector<unsigned char>& GetNetAngularVelocityAttr() const;
+    const Vector<byte>& GetNetAngularVelocityAttr() const;
     /// Add a constraint that refers to this rigid body.
     void AddConstraint(Constraint* constraint);
     /// Remove a constraint that refers to this rigid body.

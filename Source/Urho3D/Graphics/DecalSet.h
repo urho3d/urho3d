@@ -159,11 +159,11 @@ public:
     /// Set material attribute.
     void SetMaterialAttr(const ResourceRef& value);
     /// Set decals attribute.
-    void SetDecalsAttr(const Vector<unsigned char>& value);
+    void SetDecalsAttr(const Vector<byte>& value);
     /// Return material attribute.
     ResourceRef GetMaterialAttr() const;
     /// Return decals attribute.
-    Vector<unsigned char> GetDecalsAttr() const;
+    Vector<byte> GetDecalsAttr() const;
 
 protected:
     /// Recalculate the world-space bounding box.

@@ -16,8 +16,8 @@ void ASRegisterManualFirst_IO(asIScriptEngine* engine)
 
 // ========================================================================================
 
-// unsigned char* VectorBuffer::GetModifiableData() | File: ../IO/VectorBuffer.h
-static unsigned char* VectorBufferAt(unsigned index, VectorBuffer* ptr)
+// byte* VectorBuffer::GetModifiableData() | File: ../IO/VectorBuffer.h
+static byte* VectorBufferAt(unsigned index, VectorBuffer* ptr)
 {
     if (index >= ptr->GetSize())
     {

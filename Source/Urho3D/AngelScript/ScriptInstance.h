@@ -119,19 +119,19 @@ public:
     /// Set script file attribute.
     void SetScriptFileAttr(const ResourceRef& value);
     /// Set delayed method calls attribute.
-    void SetDelayedCallsAttr(const Vector<unsigned char>& value);
+    void SetDelayedCallsAttr(const Vector<byte>& value);
     /// Set script file serialization attribute by calling a script function.
-    void SetScriptDataAttr(const Vector<unsigned char>& data);
+    void SetScriptDataAttr(const Vector<byte>& data);
     /// Set script network serialization attribute by calling a script function.
-    void SetScriptNetworkDataAttr(const Vector<unsigned char>& data);
+    void SetScriptNetworkDataAttr(const Vector<byte>& data);
     /// Return script file attribute.
     ResourceRef GetScriptFileAttr() const;
     /// Return delayed method calls attribute.
-    Vector<unsigned char> GetDelayedCallsAttr() const;
+    Vector<byte> GetDelayedCallsAttr() const;
     /// Get script file serialization attribute by calling a script function.
-    Vector<unsigned char> GetScriptDataAttr() const;
+    Vector<byte> GetScriptDataAttr() const;
     /// Get script network serialization attribute by calling a script function.
-    Vector<unsigned char> GetScriptNetworkDataAttr() const;
+    Vector<byte> GetScriptNetworkDataAttr() const;
 
 protected:
     /// Handle scene being assigned.

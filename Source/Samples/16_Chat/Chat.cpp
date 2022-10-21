@@ -242,7 +242,7 @@ void Chat::HandleNetworkMessage(StringHash /*eventType*/, VariantMap& eventData)
     int msgID = eventData[P_MESSAGEID].GetInt();
     if (msgID == MSG_CHAT)
     {
-        const Vector<unsigned char>& data = eventData[P_DATA].GetBuffer();
+        const Vector<byte>& data = eventData[P_DATA].GetBuffer();
         // Use a MemoryBuffer to read the message data so that there is no unnecessary copying
         MemoryBuffer msg(data);
         String text = msg.ReadString();

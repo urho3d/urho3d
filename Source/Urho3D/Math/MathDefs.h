@@ -315,6 +315,10 @@ inline i32 CountSetBits(u32 value)
 /// Update a hash with the given 8-bit value using the SDBM algorithm.
 inline constexpr hash32 SDBMHash(hash32 hash, u8 c) { return c + (hash << 6u) + (hash << 16u) - hash; }
 
+/// Update a hash with the given byte value using the SDBM algorithm.
+/// @nobind
+inline constexpr hash32 SDBMHash(hash32 hash, byte b) { return SDBMHash(hash, (u8)b); }
+
 /// Return a random float between 0.0 (inclusive) and 1.0 (exclusive).
 inline float Random() { return Rand() / 32768.0f; }
 

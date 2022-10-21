@@ -162,13 +162,13 @@ public:
     /// Set animation control structures attribute.
     void SetAnimationsAttr(const VariantVector& value);
     /// Set animations attribute for network replication.
-    void SetNetAnimationsAttr(const Vector<unsigned char>& value);
+    void SetNetAnimationsAttr(const Vector<byte>& value);
     /// Set node animation states attribute.
     void SetNodeAnimationStatesAttr(const VariantVector& value);
     /// Return animation control structures attribute.
     VariantVector GetAnimationsAttr() const;
     /// Return animations attribute for network replication.
-    const Vector<unsigned char>& GetNetAnimationsAttr() const;
+    const Vector<byte>& GetNetAnimationsAttr() const;
     /// Return node animation states attribute.
     VariantVector GetNodeAnimationStatesAttr() const;
 

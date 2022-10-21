@@ -498,7 +498,7 @@ void DecalSet::SetMaterialAttr(const ResourceRef& value)
     SetMaterial(cache->GetResource<Material>(value.name_));
 }
 
-void DecalSet::SetDecalsAttr(const Vector<unsigned char>& value)
+void DecalSet::SetDecalsAttr(const Vector<byte>& value)
 {
     RemoveAllDecals();
 
@@ -576,7 +576,7 @@ ResourceRef DecalSet::GetMaterialAttr() const
     return GetResourceRef(batches_[0].material_, Material::GetTypeStatic());
 }
 
-Vector<unsigned char> DecalSet::GetDecalsAttr() const
+Vector<byte> DecalSet::GetDecalsAttr() const
 {
     VectorBuffer ret;
 

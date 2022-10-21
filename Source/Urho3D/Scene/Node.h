@@ -624,15 +624,15 @@ public:
     /// Set network position attribute.
     void SetNetPositionAttr(const Vector3& value);
     /// Set network rotation attribute.
-    void SetNetRotationAttr(const Vector<unsigned char>& value);
+    void SetNetRotationAttr(const Vector<byte>& value);
     /// Set network parent attribute.
-    void SetNetParentAttr(const Vector<unsigned char>& value);
+    void SetNetParentAttr(const Vector<byte>& value);
     /// Return network position attribute.
     const Vector3& GetNetPositionAttr() const;
     /// Return network rotation attribute.
-    const Vector<unsigned char>& GetNetRotationAttr() const;
+    const Vector<byte>& GetNetRotationAttr() const;
     /// Return network parent attribute.
-    const Vector<unsigned char>& GetNetParentAttr() const;
+    const Vector<byte>& GetNetParentAttr() const;
     /// Load components and optionally load child nodes.
     bool Load(Deserializer& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false,
         CreateMode mode = REPLICATED);

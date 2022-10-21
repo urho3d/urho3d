@@ -151,7 +151,7 @@ private:
     /// Streaming distance.
     int streamingDistance_;
     /// Tile data.
-    HashMap<IntVector2, Vector<unsigned char>> tileData_;
+    HashMap<IntVector2, Vector<byte>> tileData_;
     /// Added tiles.
     HashSet<IntVector2> addedTiles_;
 };

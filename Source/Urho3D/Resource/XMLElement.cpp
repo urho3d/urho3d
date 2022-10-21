@@ -750,9 +750,9 @@ BoundingBox XMLElement::GetBoundingBox() const
     return ret;
 }
 
-Vector<unsigned char> XMLElement::GetBuffer(const String& name) const
+Vector<byte> XMLElement::GetBuffer(const String& name) const
 {
-    Vector<unsigned char> ret;
+    Vector<byte> ret;
     StringToBuffer(ret, GetAttribute(name));
     return ret;
 }

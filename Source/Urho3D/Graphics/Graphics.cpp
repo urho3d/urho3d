@@ -198,7 +198,7 @@ void Graphics::SetShaderParameter(StringHash param, const Variant& value)
 
     case VAR_BUFFER:
         {
-            const Vector<u8>& buffer = value.GetBuffer();
+            const Vector<byte>& buffer = value.GetBuffer();
             if (buffer.Size() >= sizeof(float))
                 SetShaderParameter(param, reinterpret_cast<const float*>(&buffer[0]), buffer.Size() / sizeof(float));
         }

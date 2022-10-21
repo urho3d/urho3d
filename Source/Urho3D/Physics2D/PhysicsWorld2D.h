@@ -264,7 +264,7 @@ protected:
         /// Construct.
         explicit ContactInfo(b2Contact* contact);
         /// Write contact info to buffer.
-        const Vector<unsigned char>& Serialize(VectorBuffer& buffer) const;
+        const Vector<byte>& Serialize(VectorBuffer& buffer) const;
 
         /// Rigid body A.
         SharedPtr<RigidBody2D> bodyA_;

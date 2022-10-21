@@ -45,9 +45,9 @@ public:
     const Vector<Vector2>& GetVertices() const { return vertices_; }
 
     /// Set vertices attribute.
-    void SetVerticesAttr(const Vector<u8>& value);
+    void SetVerticesAttr(const Vector<byte>& value);
     /// Return vertices attribute.
-    Vector<u8> GetVerticesAttr() const;
+    Vector<byte> GetVerticesAttr() const;
 
 private:
     /// Apply node world scale.

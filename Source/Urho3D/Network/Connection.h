@@ -111,7 +111,7 @@ public:
     /// Send a message.
     void SendMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID = 0);
     /// Send a message.
-    void SendMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes, unsigned contentID = 0);
+    void SendMessage(int msgID, bool reliable, bool inOrder, const byte* data, unsigned numBytes, unsigned contentID = 0);
     /// Send a remote event.
     void SendRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
     /// Send a remote event with the specified node as sender.
@@ -308,9 +308,9 @@ private:
     /// Ongoing package send transfers.
     HashMap<StringHash, PackageUpload> uploads_;
     /// Pending latest data for not yet received nodes.
-    HashMap<unsigned, Vector<unsigned char>> nodeLatestData_;
+    HashMap<unsigned, Vector<byte>> nodeLatestData_;
     /// Pending latest data for not yet received components.
-    HashMap<unsigned, Vector<unsigned char>> componentLatestData_;
+    HashMap<unsigned, Vector<byte>> componentLatestData_;
     /// Node ID's to process during a replication update.
     HashSet<unsigned> nodesToProcess_;
     /// Reusable message buffer.

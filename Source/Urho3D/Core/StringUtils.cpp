@@ -603,12 +603,12 @@ void BufferToString(String& dest, const void* data, unsigned size)
     }
 }
 
-void StringToBuffer(Vector<unsigned char>& dest, const String& source)
+void StringToBuffer(Vector<byte>& dest, const String& source)
 {
     StringToBuffer(dest, source.CString());
 }
 
-void StringToBuffer(Vector<unsigned char>& dest, const char* source)
+void StringToBuffer(Vector<byte>& dest, const char* source)
 {
     if (!source)
     {
@@ -639,7 +639,7 @@ void StringToBuffer(Vector<unsigned char>& dest, const char* source)
         }
         else if (!inSpace && *ptr == ' ')
         {
-            dest[index++] = (unsigned char)value;
+            dest[index++] = (byte)value;
             inSpace = true;
         }
 
@@ -648,7 +648,7 @@ void StringToBuffer(Vector<unsigned char>& dest, const char* source)
 
     // Write the final value
     if (!inSpace && index < size)
-        dest[index] = (unsigned char)value;
+        dest[index] = (byte)value;
 }
 
 i32 GetStringListIndex(const String& value, const String* strings, i32 defaultIndex, bool caseSensitive)

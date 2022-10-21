@@ -94,7 +94,7 @@ void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const Vecto
     SendMessage(msgID, reliable, inOrder, msg.GetData(), msg.GetSize(), contentID);
 }
 
-void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes,
+void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const byte* data, unsigned numBytes,
     unsigned contentID)
 {
     if (numBytes && !data)
@@ -395,9 +395,9 @@ void Connection::ProcessPendingLatestData()
         return;
 
     // Iterate through pending node data and see if we can find the nodes now
-    for (HashMap<unsigned, Vector<unsigned char>>::Iterator i = nodeLatestData_.Begin(); i != nodeLatestData_.End();)
+    for (HashMap<unsigned, Vector<byte>>::Iterator i = nodeLatestData_.Begin(); i != nodeLatestData_.End();)
     {
-        HashMap<unsigned, Vector<unsigned char>>::Iterator current = i++;
+        HashMap<unsigned, Vector<byte>>::Iterator current = i++;
         Node* node = scene_->GetNode(current->first_);
         if (node)
         {
@@ -411,9 +411,9 @@ void Connection::ProcessPendingLatestData()
     }
 
     // Iterate through pending component data and see if we can find the components now
-    for (HashMap<unsigned, Vector<unsigned char>>::Iterator i = componentLatestData_.Begin(); i != componentLatestData_.End();)
+    for (HashMap<unsigned, Vector<byte>>::Iterator i = componentLatestData_.Begin(); i != componentLatestData_.End();)
     {
-        HashMap<unsigned, Vector<unsigned char>>::Iterator current = i++;
+        HashMap<unsigned, Vector<byte>>::Iterator current = i++;
         Component* component = scene_->GetComponent(current->first_);
         if (component)
         {
@@ -676,7 +676,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
             else
             {
                 // Latest data messages may be received out-of-order relative to node creation, so cache if necessary
-                Vector<unsigned char>& data = nodeLatestData_[nodeID];
+                Vector<byte>& data = nodeLatestData_[nodeID];
                 data.Resize(msg.GetSize());
                 memcpy(&data[0], msg.GetData(), msg.GetSize());
             }
@@ -753,7 +753,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
             else
             {
                 // Latest data messages may be received out-of-order relative to component creation, so cache if necessary
-                Vector<unsigned char>& data = componentLatestData_[componentID];
+                Vector<byte>& data = componentLatestData_[componentID];
                 data.Resize(msg.GetSize());
                 memcpy(&data[0], msg.GetData(), msg.GetSize());
             }

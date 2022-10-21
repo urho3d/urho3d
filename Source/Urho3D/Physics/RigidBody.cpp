@@ -828,14 +828,14 @@ void RigidBody::UpdateGravity()
     }
 }
 
-void RigidBody::SetNetAngularVelocityAttr(const Vector<unsigned char>& value)
+void RigidBody::SetNetAngularVelocityAttr(const Vector<byte>& value)
 {
     float maxVelocity = physicsWorld_ ? physicsWorld_->GetMaxNetworkAngularVelocity() : DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY;
     MemoryBuffer buf(value);
     SetAngularVelocity(buf.ReadPackedVector3(maxVelocity));
 }
 
-const Vector<unsigned char>& RigidBody::GetNetAngularVelocityAttr() const
+const Vector<byte>& RigidBody::GetNetAngularVelocityAttr() const
 {
     float maxVelocity = physicsWorld_ ? physicsWorld_->GetMaxNetworkAngularVelocity() : DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY;
     attrBuffer_.Clear();

@@ -76,7 +76,7 @@ void CollisionChain2D::SetVertices(const Vector<Vector2>& vertices)
     RecreateFixture();
 }
 
-void CollisionChain2D::SetVerticesAttr(const Vector<u8>& value)
+void CollisionChain2D::SetVerticesAttr(const Vector<byte>& value)
 {
     if (value.Empty())
         return;
@@ -90,7 +90,7 @@ void CollisionChain2D::SetVerticesAttr(const Vector<u8>& value)
     SetVertices(vertices);
 }
 
-Vector<u8> CollisionChain2D::GetVerticesAttr() const
+Vector<byte> CollisionChain2D::GetVerticesAttr() const
 {
     VectorBuffer ret;
 

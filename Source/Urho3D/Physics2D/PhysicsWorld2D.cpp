@@ -829,7 +829,7 @@ PhysicsWorld2D::ContactInfo::ContactInfo(b2Contact* contact)
     }
 }
 
-const Urho3D::Vector<unsigned char>& PhysicsWorld2D::ContactInfo::Serialize(VectorBuffer& buffer) const
+const Urho3D::Vector<byte>& PhysicsWorld2D::ContactInfo::Serialize(VectorBuffer& buffer) const
 {
     buffer.Clear();
     for (int i = 0; i < numPoints_; ++i)
