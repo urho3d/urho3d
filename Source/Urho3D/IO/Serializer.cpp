@@ -189,7 +189,7 @@ bool Serializer::WriteStringHash(const StringHash& value)
     return WriteU32(value.Value());
 }
 
-bool Serializer::WriteBuffer(const Vector<unsigned char>& value)
+bool Serializer::WriteBuffer(const Vector<byte>& value)
 {
     bool success = true;
     unsigned size = value.Size();

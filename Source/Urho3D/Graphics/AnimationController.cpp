@@ -590,7 +590,7 @@ void AnimationController::SetAnimationsAttr(const VariantVector& value)
     }
 }
 
-void AnimationController::SetNetAnimationsAttr(const Vector<unsigned char>& value)
+void AnimationController::SetNetAnimationsAttr(const Vector<byte>& value)
 {
     MemoryBuffer buf(value);
 
@@ -739,7 +739,7 @@ VariantVector AnimationController::GetAnimationsAttr() const
     return ret;
 }
 
-const Vector<unsigned char>& AnimationController::GetNetAnimationsAttr() const
+const Vector<byte>& AnimationController::GetNetAnimationsAttr() const
 {
     attrBuffer_.Clear();
 

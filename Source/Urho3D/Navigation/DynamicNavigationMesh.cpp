@@ -521,7 +521,7 @@ bool DynamicNavigationMesh::Build(const IntVector2& from, const IntVector2& to)
     return true;
 }
 
-Vector<unsigned char> DynamicNavigationMesh::GetTileData(const IntVector2& tile) const
+Vector<byte> DynamicNavigationMesh::GetTileData(const IntVector2& tile) const
 {
     VectorBuffer ret;
     WriteTiles(ret, tile.x_, tile.y_);
@@ -535,7 +535,7 @@ bool DynamicNavigationMesh::IsObstacleInTile(Obstacle* obstacle, const IntVector
     return tileBoundingBox.DistanceToPoint(obstaclePosition) < obstacle->GetRadius();
 }
 
-bool DynamicNavigationMesh::AddTile(const Vector<unsigned char>& tileData)
+bool DynamicNavigationMesh::AddTile(const Vector<byte>& tileData)
 {
     MemoryBuffer buffer(tileData);
     return ReadTiles(buffer, false);
@@ -655,7 +655,7 @@ void DynamicNavigationMesh::DrawDebugGeometry(bool depthTest)
     }
 }
 
-void DynamicNavigationMesh::SetNavigationDataAttr(const Vector<unsigned char>& value)
+void DynamicNavigationMesh::SetNavigationDataAttr(const Vector<byte>& value)
 {
     ReleaseNavigationMesh();
 
@@ -705,7 +705,7 @@ void DynamicNavigationMesh::SetNavigationDataAttr(const Vector<unsigned char>& v
     // \todo Shall we send E_NAVIGATION_MESH_REBUILT here?
 }
 
-Vector<unsigned char> DynamicNavigationMesh::GetNavigationDataAttr() const
+Vector<byte> DynamicNavigationMesh::GetNavigationDataAttr() const
 {
     VectorBuffer ret;
     if (navMesh_ && tileCache_)

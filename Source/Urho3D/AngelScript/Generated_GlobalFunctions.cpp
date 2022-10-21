@@ -376,6 +376,9 @@ void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
     // template <class T> int RoundToInt(T x) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("int RoundToInt(float)", AS_FUNCTIONPR(RoundToInt, (float), int), AS_CALL_CDECL);
 
+    // constexpr hash32 SDBMHash(hash32 hash, byte b) | File: ../Math/MathDefs.h
+    // Not registered because have @nobind mark
+
     // constexpr hash32 SDBMHash(hash32 hash, u8 c) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("hash32 SDBMHash(hash32, uint8)", AS_FUNCTIONPR(SDBMHash, (hash32, u8), hash32), AS_CALL_CDECL);
 
@@ -412,11 +415,11 @@ void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
     // float StableRandom(float seed) | File: ../Math/Vector2.h
     engine->RegisterGlobalFunction("float StableRandom(float)", AS_FUNCTIONPR(StableRandom, (float), float), AS_CALL_CDECL);
 
-    // void StringToBuffer(Vector<unsigned char>& dest, const String& source) | File: ../Core/StringUtils.h
-    // Error: type "Vector<unsigned char>&" can not automatically bind
+    // void StringToBuffer(Vector<byte>& dest, const String& source) | File: ../Core/StringUtils.h
+    // Error: type "Vector<byte>&" can not automatically bind
 
-    // void StringToBuffer(Vector<unsigned char>& dest, const char* source) | File: ../Core/StringUtils.h
-    // Error: type "Vector<unsigned char>&" can not automatically bind
+    // void StringToBuffer(Vector<byte>& dest, const char* source) | File: ../Core/StringUtils.h
+    // Error: type "Vector<byte>&" can not automatically bind
 
     // template <class T> T Tan(T angle) | File: ../Math/MathDefs.h
     engine->RegisterGlobalFunction("float Tan(float)", AS_FUNCTIONPR(Tan, (float), float), AS_CALL_CDECL);

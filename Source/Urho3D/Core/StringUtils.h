@@ -95,9 +95,9 @@ URHO3D_API String ToStringHex(unsigned value);
 /// Convert a byte buffer to a string.
 URHO3D_API void BufferToString(String& dest, const void* data, unsigned size);
 /// Convert a string to a byte buffer.
-URHO3D_API void StringToBuffer(Vector<unsigned char>& dest, const String& source);
+URHO3D_API void StringToBuffer(Vector<byte>& dest, const String& source);
 /// Convert a C string to a byte buffer.
-URHO3D_API void StringToBuffer(Vector<unsigned char>& dest, const char* source);
+URHO3D_API void StringToBuffer(Vector<byte>& dest, const char* source);
 /// Return an index to a string list corresponding to the given string, or a default value if not found. The string list must be empty-terminated.
 URHO3D_API i32 GetStringListIndex(const String& value, const String* strings, i32 defaultIndex, bool caseSensitive = false);
 /// Return an index to a string list corresponding to the given C string, or a default value if not found. The string list must be empty-terminated.

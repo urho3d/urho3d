@@ -141,7 +141,7 @@ public:
     /// Set animation states attribute.
     void SetAnimationStatesAttr(const VariantVector& value);
     /// Set morphs attribute.
-    void SetMorphsAttr(const Vector<unsigned char>& value);
+    void SetMorphsAttr(const Vector<byte>& value);
     /// Return model attribute.
     ResourceRef GetModelAttr() const;
     /// Return bones' animation enabled attribute.
@@ -149,7 +149,7 @@ public:
     /// Return animation states attribute.
     VariantVector GetAnimationStatesAttr() const;
     /// Return morphs attribute.
-    const Vector<unsigned char>& GetMorphsAttr() const;
+    const Vector<byte>& GetMorphsAttr() const;
 
     /// Return per-geometry bone mappings.
     const Vector<Vector<unsigned>>& GetGeometryBoneMappings() const { return geometryBoneMappings_; }

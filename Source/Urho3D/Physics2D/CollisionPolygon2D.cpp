@@ -63,7 +63,7 @@ void CollisionPolygon2D::SetVertices(const Vector<Vector2>& vertices)
     RecreateFixture();
 }
 
-void CollisionPolygon2D::SetVerticesAttr(const Vector<u8>& value)
+void CollisionPolygon2D::SetVerticesAttr(const Vector<byte>& value)
 {
     if (value.Empty())
         return;
@@ -77,7 +77,7 @@ void CollisionPolygon2D::SetVerticesAttr(const Vector<u8>& value)
     SetVertices(vertices);
 }
 
-Vector<u8> CollisionPolygon2D::GetVerticesAttr() const
+Vector<byte> CollisionPolygon2D::GetVerticesAttr() const
 {
     VectorBuffer ret;
 

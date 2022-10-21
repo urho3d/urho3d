@@ -59,7 +59,7 @@ public:
     /// Broadcast a message with content ID to all client connections.
     void BroadcastMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID = 0);
     /// Broadcast a message with content ID to all client connections.
-    void BroadcastMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes, unsigned contentID = 0);
+    void BroadcastMessage(int msgID, bool reliable, bool inOrder, const byte* data, unsigned numBytes, unsigned contentID = 0);
     /// Broadcast a remote event to all client connections.
     void BroadcastRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
     /// Broadcast a remote event to all client connections in a specific scene.

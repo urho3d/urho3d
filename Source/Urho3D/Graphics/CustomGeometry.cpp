@@ -431,7 +431,7 @@ CustomGeometryVertex* CustomGeometry::GetVertex(unsigned geometryIndex, unsigned
                : nullptr;
 }
 
-void CustomGeometry::SetGeometryDataAttr(const Vector<unsigned char>& value)
+void CustomGeometry::SetGeometryDataAttr(const Vector<byte>& value)
 {
     if (value.Empty())
         return;
@@ -472,7 +472,7 @@ void CustomGeometry::SetMaterialsAttr(const ResourceRefList& value)
         SetMaterial(i, cache->GetResource<Material>(value.names_[i]));
 }
 
-Vector<unsigned char> CustomGeometry::GetGeometryDataAttr() const
+Vector<byte> CustomGeometry::GetGeometryDataAttr() const
 {
     VectorBuffer ret;
 

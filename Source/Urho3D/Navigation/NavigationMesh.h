@@ -144,9 +144,9 @@ public:
     virtual bool Build(const IntVector2& from, const IntVector2& to);
     /// Return tile data.
     /// @manualbind
-    virtual Vector<unsigned char> GetTileData(const IntVector2& tile) const;
+    virtual Vector<byte> GetTileData(const IntVector2& tile) const;
     /// Add tile to navigation mesh.
-    virtual bool AddTile(const Vector<unsigned char>& tileData);
+    virtual bool AddTile(const Vector<byte>& tileData);
     /// Remove tile from navigation mesh.
     virtual void RemoveTile(const IntVector2& tile);
     /// Remove all tiles from navigation mesh.
@@ -277,9 +277,9 @@ public:
     NavmeshPartitionType GetPartitionType() const { return partitionType_; }
 
     /// Set navigation data attribute.
-    virtual void SetNavigationDataAttr(const Vector<unsigned char>& value);
+    virtual void SetNavigationDataAttr(const Vector<byte>& value);
     /// Return navigation data attribute.
-    virtual Vector<unsigned char> GetNavigationDataAttr() const;
+    virtual Vector<byte> GetNavigationDataAttr() const;
 
     /// Draw debug geometry for OffMeshConnection components.
     /// @property

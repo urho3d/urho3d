@@ -396,7 +396,7 @@ void BillboardSet::SetBillboardsAttr(const VariantVector& value)
     Commit();
 }
 
-void BillboardSet::SetNetBillboardsAttr(const Vector<u8>& value)
+void BillboardSet::SetNetBillboardsAttr(const Vector<byte>& value)
 {
     MemoryBuffer buf(value);
     i32 numBillboards = buf.ReadVLE();
@@ -441,7 +441,7 @@ VariantVector BillboardSet::GetBillboardsAttr() const
     return ret;
 }
 
-const Vector<u8>& BillboardSet::GetNetBillboardsAttr() const
+const Vector<byte>& BillboardSet::GetNetBillboardsAttr() const
 {
     attrBuffer_.Clear();
     attrBuffer_.WriteVLE(billboards_.Size());

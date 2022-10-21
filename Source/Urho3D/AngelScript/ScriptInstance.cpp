@@ -443,7 +443,7 @@ void ScriptInstance::SetScriptFileAttr(const ResourceRef& value)
     SetScriptFile(cache->GetResource<ScriptFile>(value.name_));
 }
 
-void ScriptInstance::SetDelayedCallsAttr(const Vector<unsigned char>& value)
+void ScriptInstance::SetDelayedCallsAttr(const Vector<byte>& value)
 {
     MemoryBuffer buf(value);
     delayedCalls_.Resize(buf.ReadVLE());
@@ -460,7 +460,7 @@ void ScriptInstance::SetDelayedCallsAttr(const Vector<unsigned char>& value)
         UpdateEventSubscription();
 }
 
-void ScriptInstance::SetScriptDataAttr(const Vector<unsigned char>& data)
+void ScriptInstance::SetScriptDataAttr(const Vector<byte>& data)
 {
     if (scriptObject_ && methods_[METHOD_LOAD])
     {
@@ -471,7 +471,7 @@ void ScriptInstance::SetScriptDataAttr(const Vector<unsigned char>& data)
     }
 }
 
-void ScriptInstance::SetScriptNetworkDataAttr(const Vector<unsigned char>& data)
+void ScriptInstance::SetScriptNetworkDataAttr(const Vector<byte>& data)
 {
     if (scriptObject_ && methods_[METHOD_READNETWORKUPDATE])
     {
@@ -487,7 +487,7 @@ ResourceRef ScriptInstance::GetScriptFileAttr() const
     return GetResourceRef(scriptFile_, ScriptFile::GetTypeStatic());
 }
 
-Vector<unsigned char> ScriptInstance::GetDelayedCallsAttr() const
+Vector<byte> ScriptInstance::GetDelayedCallsAttr() const
 {
     VectorBuffer buf;
     buf.WriteVLE(delayedCalls_.Size());
@@ -502,10 +502,10 @@ Vector<unsigned char> ScriptInstance::GetDelayedCallsAttr() const
     return buf.GetBuffer();
 }
 
-Vector<unsigned char> ScriptInstance::GetScriptDataAttr() const
+Vector<byte> ScriptInstance::GetScriptDataAttr() const
 {
     if (!scriptObject_ || !methods_[METHOD_SAVE])
-        return Vector<unsigned char>();
+        return Vector<byte>();
     else
     {
         VectorBuffer buf;
@@ -516,10 +516,10 @@ Vector<unsigned char> ScriptInstance::GetScriptDataAttr() const
     }
 }
 
-Vector<unsigned char> ScriptInstance::GetScriptNetworkDataAttr() const
+Vector<byte> ScriptInstance::GetScriptNetworkDataAttr() const
 {
     if (!scriptObject_ || !methods_[METHOD_WRITENETWORKUPDATE])
-        return Vector<unsigned char>();
+        return Vector<byte>();
     else
     {
         VectorBuffer buf;

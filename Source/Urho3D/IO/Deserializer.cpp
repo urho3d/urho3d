@@ -262,9 +262,9 @@ StringHash Deserializer::ReadStringHash()
     return StringHash(ReadU32());
 }
 
-Vector<u8> Deserializer::ReadBuffer()
+Vector<byte> Deserializer::ReadBuffer()
 {
-    Vector<u8> ret(ReadVLE());
+    Vector<byte> ret(ReadVLE());
     if (ret.Size())
         Read(&ret[0], ret.Size());
     return ret;

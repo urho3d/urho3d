@@ -15,7 +15,7 @@ public:
     /// Construct an empty buffer.
     VectorBuffer();
     /// Construct from another buffer.
-    explicit VectorBuffer(const Vector<u8>& data);
+    explicit VectorBuffer(const Vector<byte>& data);
     /// Construct from a memory area.
     VectorBuffer(const void* data, i32 size);
     /// Construct from a stream.
@@ -29,7 +29,7 @@ public:
     i32 Write(const void* data, i32 size) override;
 
     /// Set data from another buffer.
-    void SetData(const Vector<u8>& data);
+    void SetData(const Vector<byte>& data);
     /// Set data from a memory area.
     void SetData(const void* data, i32 size);
     /// Set data from a stream.
@@ -40,17 +40,17 @@ public:
     void Resize(i32 size);
 
     /// Return data.
-    const u8* GetData() const { return size_ ? &buffer_[0] : nullptr; }
+    const byte* GetData() const { return size_ ? &buffer_[0] : nullptr; }
 
     /// Return non-const data.
-    u8* GetModifiableData() { return size_ ? &buffer_[0] : nullptr; }
+    byte* GetModifiableData() { return size_ ? &buffer_[0] : nullptr; }
 
     /// Return the buffer.
-    const Vector<u8>& GetBuffer() const { return buffer_; }
+    const Vector<byte>& GetBuffer() const { return buffer_; }
 
 private:
     /// Dynamic data buffer.
-    Vector<u8> buffer_;
+    Vector<byte> buffer_;
 };
 
 }

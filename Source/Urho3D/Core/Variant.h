@@ -262,7 +262,7 @@ static const unsigned VARIANT_VALUE_SIZE = sizeof(void*) * 4;
 /// Union for the possible variant values. Objects exceeding the VARIANT_VALUE_SIZE are allocated on the heap.
 union VariantValue
 {
-    unsigned char storage_[VARIANT_VALUE_SIZE];
+    byte storage_[VARIANT_VALUE_SIZE];
     int int_;
     bool bool_;
     float float_;
@@ -286,7 +286,7 @@ union VariantValue
     StringVector stringVector_;
     VariantVector variantVector_;
     VariantMap variantMap_;
-    Vector<unsigned char> buffer_;
+    Vector<byte> buffer_;
     ResourceRef resourceRef_;
     ResourceRefList resourceRefList_;
     CustomVariantValue* customValueHeap_;
@@ -419,7 +419,7 @@ public:
     }
 
     /// Construct from a buffer.
-    Variant(const Vector<unsigned char>& value)      // NOLINT(google-explicit-constructor)
+    Variant(const Vector<byte>& value)      // NOLINT(google-explicit-constructor)
     {
         *this = value;
     }
@@ -696,7 +696,7 @@ public:
     }
 
     /// Assign from a buffer.
-    Variant& operator =(const Vector<unsigned char>& rhs)
+    Variant& operator =(const Vector<byte>& rhs)
     {
         SetType(VAR_BUFFER);
         value_.buffer_ = rhs;
@@ -891,7 +891,7 @@ public:
     }
 
     /// Test for equality with a buffer. To return true, both the type and value must match.
-    bool operator ==(const Vector<unsigned char>& rhs) const;
+    bool operator ==(const Vector<byte>& rhs) const;
     /// Test for equality with a %VectorBuffer. To return true, both the type and value must match.
     bool operator ==(const VectorBuffer& rhs) const;
 
@@ -1035,7 +1035,7 @@ public:
     bool operator !=(const String& rhs) const { return !(*this == rhs); }
 
     /// Test for inequality with a buffer.
-    bool operator !=(const Vector<unsigned char>& rhs) const { return !(*this == rhs); }
+    bool operator !=(const Vector<byte>& rhs) const { return !(*this == rhs); }
 
     /// Test for inequality with a %VectorBuffer.
     bool operator !=(const VectorBuffer& rhs) const { return !(*this == rhs); }
@@ -1223,7 +1223,7 @@ public:
     const String& GetString() const { return type_ == VAR_STRING ? value_.string_ : String::EMPTY; }
 
     /// Return buffer or empty on type mismatch.
-    const Vector<unsigned char>& GetBuffer() const
+    const Vector<byte>& GetBuffer() const
     {
         return type_ == VAR_BUFFER ? value_.buffer_ : emptyBuffer;
     }
@@ -1375,7 +1375,7 @@ public:
     template <class T> T Get() const;
 
     /// Return a pointer to a modifiable buffer or null on type mismatch.
-    Vector<unsigned char>* GetBufferPtr()
+    Vector<byte>* GetBufferPtr()
     {
         return type_ == VAR_BUFFER ? &value_.buffer_ : nullptr;
     }
@@ -1410,7 +1410,7 @@ public:
     /// Empty variant.
     static const Variant EMPTY;
     /// Empty buffer.
-    static const Vector<unsigned char> emptyBuffer;
+    static const Vector<byte> emptyBuffer;
     /// Empty resource reference.
     static const ResourceRef emptyResourceRef;
     /// Empty resource reference list.
@@ -1466,7 +1466,7 @@ template <> inline VariantType GetVariantType<String>() { return VAR_STRING; }
 
 template <> inline VariantType GetVariantType<StringHash>() { return VAR_INT; }
 
-template <> inline VariantType GetVariantType<Vector<unsigned char>>() { return VAR_BUFFER; }
+template <> inline VariantType GetVariantType<Vector<byte>>() { return VAR_BUFFER; }
 
 template <> inline VariantType GetVariantType<ResourceRef>() { return VAR_RESOURCEREF; }
 
@@ -1531,7 +1531,7 @@ template <> URHO3D_API const IntVector2& Variant::Get<const IntVector2&>() const
 
 template <> URHO3D_API const IntVector3& Variant::Get<const IntVector3&>() const;
 
-template <> URHO3D_API const Vector<unsigned char>& Variant::Get<const Vector<unsigned char>&>() const;
+template <> URHO3D_API const Vector<byte>& Variant::Get<const Vector<byte>&>() const;
 
 template <> URHO3D_API void* Variant::Get<void*>() const;
 
@@ -1573,7 +1573,7 @@ template <> URHO3D_API IntVector2 Variant::Get<IntVector2>() const;
 
 template <> URHO3D_API IntVector3 Variant::Get<IntVector3>() const;
 
-template <> URHO3D_API Vector<unsigned char> Variant::Get<Vector<unsigned char>>() const;
+template <> URHO3D_API Vector<byte> Variant::Get<Vector<byte>>() const;
 
 template <> URHO3D_API Matrix3 Variant::Get<Matrix3>() const;
 

@@ -836,7 +836,7 @@ void AnimatedModel::SetAnimationStatesAttr(const VariantVector& value)
     }
 }
 
-void AnimatedModel::SetMorphsAttr(const Vector<unsigned char>& value)
+void AnimatedModel::SetMorphsAttr(const Vector<byte>& value)
 {
     for (unsigned index = 0; index < value.Size(); ++index)
         SetMorphWeight(index, (float)value[index] / 255.0f);
@@ -877,7 +877,7 @@ VariantVector AnimatedModel::GetAnimationStatesAttr() const
     return ret;
 }
 
-const Vector<unsigned char>& AnimatedModel::GetMorphsAttr() const
+const Vector<byte>& AnimatedModel::GetMorphsAttr() const
 {
     attrBuffer_.Clear();
     for (Vector<ModelMorph>::ConstIterator i = morphs_.Begin(); i != morphs_.End(); ++i)

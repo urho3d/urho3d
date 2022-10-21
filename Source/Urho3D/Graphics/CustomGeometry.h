@@ -105,11 +105,11 @@ public:
     CustomGeometryVertex* GetVertex(unsigned geometryIndex, unsigned vertexNum);
 
     /// Set geometry data attribute.
-    void SetGeometryDataAttr(const Vector<unsigned char>& value);
+    void SetGeometryDataAttr(const Vector<byte>& value);
     /// Set materials attribute.
     void SetMaterialsAttr(const ResourceRefList& value);
     /// Return geometry data attribute.
-    Vector<unsigned char> GetGeometryDataAttr() const;
+    Vector<byte> GetGeometryDataAttr() const;
     /// Return materials attribute.
     const ResourceRefList& GetMaterialsAttr() const;
 

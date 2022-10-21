@@ -111,7 +111,7 @@ public:
     /// Read a 32-bit StringHash.
     StringHash ReadStringHash();
     /// Read a buffer with size encoded as VLE.
-    Vector<u8> ReadBuffer();
+    Vector<byte> ReadBuffer();
     /// Read a resource reference.
     ResourceRef ReadResourceRef();
     /// Read a resource reference list.

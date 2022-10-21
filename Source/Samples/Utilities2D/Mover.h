@@ -26,9 +26,9 @@ public:
     /// Handle scene update. Called by LogicComponent base class.
     void Update(float timeStep) override;
     /// Return path attribute.
-    Vector<unsigned char> GetPathAttr() const;
+    Vector<byte> GetPathAttr() const;
     /// Set path attribute.
-    void SetPathAttr(const Vector<unsigned char>& value);
+    void SetPathAttr(const Vector<byte>& value);
 
     /// Path.
     Vector<Vector2> path_;

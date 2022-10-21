@@ -10,7 +10,7 @@ namespace Urho3D
 
 VectorBuffer::VectorBuffer() = default;
 
-VectorBuffer::VectorBuffer(const Vector<u8>& data)
+VectorBuffer::VectorBuffer(const Vector<byte>& data)
 {
     SetData(data);
 }
@@ -38,8 +38,8 @@ i32 VectorBuffer::Read(void* dest, i32 size)
     if (!size)
         return 0;
 
-    u8* srcPtr = &buffer_[position_];
-    u8* destPtr = (u8*)dest;
+    byte* srcPtr = &buffer_[position_];
+    byte* destPtr = (byte*)dest;
     position_ += size;
 
     memcpy(destPtr, srcPtr, size);
@@ -71,8 +71,8 @@ i32 VectorBuffer::Write(const void* data, i32 size)
         buffer_.Resize(size_);
     }
 
-    u8* srcPtr = (u8*)data;
-    u8* destPtr = &buffer_[position_];
+    byte* srcPtr = (byte*)data;
+    byte* destPtr = &buffer_[position_];
     position_ += size;
 
     memcpy(destPtr, srcPtr, size);
@@ -80,7 +80,7 @@ i32 VectorBuffer::Write(const void* data, i32 size)
     return size;
 }
 
-void VectorBuffer::SetData(const Vector<u8>& data)
+void VectorBuffer::SetData(const Vector<byte>& data)
 {
     buffer_ = data;
     position_ = 0;

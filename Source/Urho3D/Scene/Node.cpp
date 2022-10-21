@@ -1447,7 +1447,7 @@ void Node::SetNetPositionAttr(const Vector3& value)
         SetPosition(value);
 }
 
-void Node::SetNetRotationAttr(const Vector<unsigned char>& value)
+void Node::SetNetRotationAttr(const Vector<byte>& value)
 {
     MemoryBuffer buf(value);
     auto* transform = GetComponent<SmoothedTransform>();
@@ -1457,7 +1457,7 @@ void Node::SetNetRotationAttr(const Vector<unsigned char>& value)
         SetRotation(buf.ReadPackedQuaternion());
 }
 
-void Node::SetNetParentAttr(const Vector<unsigned char>& value)
+void Node::SetNetParentAttr(const Vector<byte>& value)
 {
     Scene* scene = GetScene();
     if (!scene)
@@ -1499,14 +1499,14 @@ const Vector3& Node::GetNetPositionAttr() const
     return position_;
 }
 
-const Vector<unsigned char>& Node::GetNetRotationAttr() const
+const Vector<byte>& Node::GetNetRotationAttr() const
 {
     impl_->attrBuffer_.Clear();
     impl_->attrBuffer_.WritePackedQuaternion(rotation_);
     return impl_->attrBuffer_.GetBuffer();
 }
 
-const Vector<unsigned char>& Node::GetNetParentAttr() const
+const Vector<byte>& Node::GetNetParentAttr() const
 {
     impl_->attrBuffer_.Clear();
     Scene* scene = GetScene();

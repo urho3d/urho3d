@@ -140,13 +140,13 @@ public:
     /// Set billboards attribute.
     void SetBillboardsAttr(const VariantVector& value);
     /// Set billboards attribute for network replication.
-    void SetNetBillboardsAttr(const Vector<u8>& value);
+    void SetNetBillboardsAttr(const Vector<byte>& value);
     /// Return material attribute.
     ResourceRef GetMaterialAttr() const;
     /// Return billboards attribute.
     VariantVector GetBillboardsAttr() const;
     /// Return billboards attribute for network replication.
-    const Vector<u8>& GetNetBillboardsAttr() const;
+    const Vector<byte>& GetNetBillboardsAttr() const;
 
 protected:
     /// Recalculate the world-space bounding box.

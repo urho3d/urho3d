@@ -496,7 +496,7 @@ void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const Vec
     BroadcastMessage(msgID, reliable, inOrder, msg.GetData(), msg.GetSize(), contentID);
 }
 
-void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes,
+void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const byte* data, unsigned numBytes,
     unsigned contentID)
 {
     if (!rakPeer_)

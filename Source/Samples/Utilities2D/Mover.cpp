@@ -38,7 +38,7 @@ void Mover::RegisterObject(Context* context)
     URHO3D_ATTRIBUTE("Flip Animation", flip_, 0.0f, AM_DEFAULT);
 }
 
-void Mover::SetPathAttr(const Vector<unsigned char>& value)
+void Mover::SetPathAttr(const Vector<byte>& value)
 {
     if (value.Empty())
         return;
@@ -48,7 +48,7 @@ void Mover::SetPathAttr(const Vector<unsigned char>& value)
         path_.Push(buffer.ReadVector2());
 }
 
-Vector<unsigned char> Mover::GetPathAttr() const
+Vector<byte> Mover::GetPathAttr() const
 {
     VectorBuffer buffer;
 

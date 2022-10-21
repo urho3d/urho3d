@@ -501,14 +501,14 @@ bool NavigationMesh::Build(const IntVector2& from, const IntVector2& to)
     return true;
 }
 
-Vector<unsigned char> NavigationMesh::GetTileData(const IntVector2& tile) const
+Vector<byte> NavigationMesh::GetTileData(const IntVector2& tile) const
 {
     VectorBuffer ret;
     WriteTile(ret, tile.x_, tile.y_);
     return ret.GetBuffer();
 }
 
-bool NavigationMesh::AddTile(const Vector<unsigned char>& tileData)
+bool NavigationMesh::AddTile(const Vector<byte>& tileData)
 {
     MemoryBuffer buffer(tileData);
     return ReadTile(buffer, false);
@@ -856,7 +856,7 @@ float NavigationMesh::GetAreaCost(unsigned areaID) const
     return 1.0f;
 }
 
-void NavigationMesh::SetNavigationDataAttr(const Vector<unsigned char>& value)
+void NavigationMesh::SetNavigationDataAttr(const Vector<byte>& value)
 {
     ReleaseNavigationMesh();
 
@@ -904,7 +904,7 @@ void NavigationMesh::SetNavigationDataAttr(const Vector<unsigned char>& value)
     // \todo Shall we send E_NAVIGATION_MESH_REBUILT here?
 }
 
-Vector<unsigned char> NavigationMesh::GetNavigationDataAttr() const
+Vector<byte> NavigationMesh::GetNavigationDataAttr() const
 {
     VectorBuffer ret;
 
