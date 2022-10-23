@@ -538,16 +538,16 @@ void Node::Translate(const Vector3& delta, TransformSpace space)
 {
     switch (space)
     {
-    case TS_LOCAL:
+    case TransformSpace::Local:
         // Note: local space translation disregards local scale for scale-independent movement speed
         position_ += rotation_ * delta;
         break;
 
-    case TS_PARENT:
+    case TransformSpace::Parent:
         position_ += delta;
         break;
 
-    case TS_WORLD:
+    case TransformSpace::World:
         position_ += (parent_ == scene_ || !parent_) ? delta : parent_->GetWorldTransform().Inverse() * Vector4(delta, 0.0f);
         break;
     }
@@ -561,15 +561,15 @@ void Node::Rotate(const Quaternion& delta, TransformSpace space)
 {
     switch (space)
     {
-    case TS_LOCAL:
+    case TransformSpace::Local:
         rotation_ = (rotation_ * delta).Normalized();
         break;
 
-    case TS_PARENT:
+    case TransformSpace::Parent:
         rotation_ = (delta * rotation_).Normalized();
         break;
 
-    case TS_WORLD:
+    case TransformSpace::World:
         if (parent_ == scene_ || !parent_)
             rotation_ = (delta * rotation_).Normalized();
         else
@@ -592,17 +592,17 @@ void Node::RotateAround(const Vector3& point, const Quaternion& delta, Transform
 
     switch (space)
     {
-    case TS_LOCAL:
+    case TransformSpace::Local:
         parentSpacePoint = GetTransform() * point;
         rotation_ = (rotation_ * delta).Normalized();
         break;
 
-    case TS_PARENT:
+    case TransformSpace::Parent:
         parentSpacePoint = point;
         rotation_ = (delta * rotation_).Normalized();
         break;
 
-    case TS_WORLD:
+    case TransformSpace::World:
         if (parent_ == scene_ || !parent_)
         {
             parentSpacePoint = point;
@@ -646,15 +646,15 @@ bool Node::LookAt(const Vector3& target, const Vector3& up, TransformSpace space
 
     switch (space)
     {
-    case TS_LOCAL:
+    case TransformSpace::Local:
         worldSpaceTarget = GetWorldTransform() * target;
         break;
 
-    case TS_PARENT:
+    case TransformSpace::Parent:
         worldSpaceTarget = (parent_ == scene_ || !parent_) ? target : parent_->GetWorldTransform() * target;
         break;
 
-    case TS_WORLD:
+    case TransformSpace::World:
         worldSpaceTarget = target;
         break;
     }

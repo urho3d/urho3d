@@ -241,7 +241,7 @@ void AnimateScene(float timeStep)
 
     // Rotate the lights around the world Y-axis
     for (uint i = 0; i < lightNodes.length; ++i)
-        lightNodes[i].Rotate(Quaternion(0.0f, LIGHT_ROTATION_SPEED * timeStep, 0.0f), TS_WORLD);
+        lightNodes[i].Rotate(Quaternion(0.0f, LIGHT_ROTATION_SPEED * timeStep, 0.0f), TransformSpace::World);
 
     // Rotate the individual billboards within the billboard sets, then recommit to make the changes visible
     for (uint i = 0; i < billboardNodes.length; ++i)

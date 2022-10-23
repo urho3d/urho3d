@@ -901,7 +901,7 @@ bool SceneSmartDuplicateNode()
     Node@ newInstance = parent.children[parent.numChildren-1];
     SelectNode(newInstance, false);
     newInstance.worldPosition = lastInstancePosition;
-    newInstance.Translate(offset, TS_WORLD);
+    newInstance.Translate(offset, TransformSpace::World);
     newInstance.name = parent.name + "Instance" + String(parent.numChildren-1);
 
     lastOffsetForSmartDuplicate = offset;

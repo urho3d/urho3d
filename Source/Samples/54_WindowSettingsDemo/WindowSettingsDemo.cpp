@@ -98,7 +98,7 @@ void WindowSettingsDemo::CreateScene()
         [objectNode](StringHash /*eventType*/, VariantMap& eventData)
     {
         const float timeStep = eventData[SceneUpdate::P_TIMESTEP].GetFloat();
-        objectNode->Rotate(Quaternion(0.0f, 20.0f * timeStep, 0.0f), TS_WORLD);
+        objectNode->Rotate(Quaternion(0.0f, 20.0f * timeStep, 0.0f), TransformSpace::World);
     });
 }
 

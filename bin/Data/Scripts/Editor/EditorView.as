@@ -1579,7 +1579,7 @@ void CameraMoveForward(Vector3 trans)
 {
     cameraSmoothInterpolate.Stop();
     
-    cameraNode.Translate(trans, TS_PARENT);
+    cameraNode.Translate(trans, TransformSpace::Parent);
 }
 
 void CameraRotateAroundLookAt(Quaternion rot)

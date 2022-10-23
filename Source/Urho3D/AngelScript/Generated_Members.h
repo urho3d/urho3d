@@ -15848,14 +15848,14 @@ template <class T> void RegisterMembers_Node(asIScriptEngine* engine, const char
     // Vector2 Node::LocalToWorld2D(const Vector2& vector) const
     engine->RegisterObjectMethod(className, "Vector2 LocalToWorld2D(const Vector2&in) const", AS_METHODPR(T, LocalToWorld2D, (const Vector2&) const, Vector2), AS_CALL_THISCALL);
 
-    // bool Node::LookAt(const Vector3& target, const Vector3& up = Vector3::UP, TransformSpace space = TS_WORLD)
-    engine->RegisterObjectMethod(className, "bool LookAt(const Vector3&in, const Vector3&in = Vector3::UP, TransformSpace = TS_WORLD)", AS_METHODPR(T, LookAt, (const Vector3&, const Vector3&, TransformSpace), bool), AS_CALL_THISCALL);
+    // bool Node::LookAt(const Vector3& target, const Vector3& up = Vector3::UP, TransformSpace space = TransformSpace::World)
+    engine->RegisterObjectMethod(className, "bool LookAt(const Vector3&in, const Vector3&in = Vector3::UP, TransformSpace = TransformSpace::World)", AS_METHODPR(T, LookAt, (const Vector3&, const Vector3&, TransformSpace), bool), AS_CALL_THISCALL);
 
     // void Node::MarkDirty()
     engine->RegisterObjectMethod(className, "void MarkDirty()", AS_METHODPR(T, MarkDirty, (), void), AS_CALL_THISCALL);
 
-    // void Node::Pitch(float angle, TransformSpace space = TS_LOCAL)
-    engine->RegisterObjectMethod(className, "void Pitch(float, TransformSpace = TS_LOCAL)", AS_METHODPR(T, Pitch, (float, TransformSpace), void), AS_CALL_THISCALL);
+    // void Node::Pitch(float angle, TransformSpace space = TransformSpace::Local)
+    engine->RegisterObjectMethod(className, "void Pitch(float, TransformSpace = TransformSpace::Local)", AS_METHODPR(T, Pitch, (float, TransformSpace), void), AS_CALL_THISCALL);
 
     // void Node::PrepareNetworkUpdate()
     engine->RegisterObjectMethod(className, "void PrepareNetworkUpdate()", AS_METHODPR(T, PrepareNetworkUpdate, (), void), AS_CALL_THISCALL);
@@ -15905,20 +15905,20 @@ template <class T> void RegisterMembers_Node(asIScriptEngine* engine, const char
     // void Node::ResetScene()
     engine->RegisterObjectMethod(className, "void ResetScene()", AS_METHODPR(T, ResetScene, (), void), AS_CALL_THISCALL);
 
-    // void Node::Roll(float angle, TransformSpace space = TS_LOCAL)
-    engine->RegisterObjectMethod(className, "void Roll(float, TransformSpace = TS_LOCAL)", AS_METHODPR(T, Roll, (float, TransformSpace), void), AS_CALL_THISCALL);
+    // void Node::Roll(float angle, TransformSpace space = TransformSpace::Local)
+    engine->RegisterObjectMethod(className, "void Roll(float, TransformSpace = TransformSpace::Local)", AS_METHODPR(T, Roll, (float, TransformSpace), void), AS_CALL_THISCALL);
 
-    // void Node::Rotate(const Quaternion& delta, TransformSpace space = TS_LOCAL)
-    engine->RegisterObjectMethod(className, "void Rotate(const Quaternion&in, TransformSpace = TS_LOCAL)", AS_METHODPR(T, Rotate, (const Quaternion&, TransformSpace), void), AS_CALL_THISCALL);
+    // void Node::Rotate(const Quaternion& delta, TransformSpace space = TransformSpace::Local)
+    engine->RegisterObjectMethod(className, "void Rotate(const Quaternion&in, TransformSpace = TransformSpace::Local)", AS_METHODPR(T, Rotate, (const Quaternion&, TransformSpace), void), AS_CALL_THISCALL);
 
-    // void Node::Rotate2D(float delta, TransformSpace space = TS_LOCAL)
-    engine->RegisterObjectMethod(className, "void Rotate2D(float, TransformSpace = TS_LOCAL)", AS_METHODPR(T, Rotate2D, (float, TransformSpace), void), AS_CALL_THISCALL);
+    // void Node::Rotate2D(float delta, TransformSpace space = TransformSpace::Local)
+    engine->RegisterObjectMethod(className, "void Rotate2D(float, TransformSpace = TransformSpace::Local)", AS_METHODPR(T, Rotate2D, (float, TransformSpace), void), AS_CALL_THISCALL);
 
-    // void Node::RotateAround(const Vector3& point, const Quaternion& delta, TransformSpace space = TS_LOCAL)
-    engine->RegisterObjectMethod(className, "void RotateAround(const Vector3&in, const Quaternion&in, TransformSpace = TS_LOCAL)", AS_METHODPR(T, RotateAround, (const Vector3&, const Quaternion&, TransformSpace), void), AS_CALL_THISCALL);
+    // void Node::RotateAround(const Vector3& point, const Quaternion& delta, TransformSpace space = TransformSpace::Local)
+    engine->RegisterObjectMethod(className, "void RotateAround(const Vector3&in, const Quaternion&in, TransformSpace = TransformSpace::Local)", AS_METHODPR(T, RotateAround, (const Vector3&, const Quaternion&, TransformSpace), void), AS_CALL_THISCALL);
 
-    // void Node::RotateAround2D(const Vector2& point, float delta, TransformSpace space = TS_LOCAL)
-    engine->RegisterObjectMethod(className, "void RotateAround2D(const Vector2&in, float, TransformSpace = TS_LOCAL)", AS_METHODPR(T, RotateAround2D, (const Vector2&, float, TransformSpace), void), AS_CALL_THISCALL);
+    // void Node::RotateAround2D(const Vector2& point, float delta, TransformSpace space = TransformSpace::Local)
+    engine->RegisterObjectMethod(className, "void RotateAround2D(const Vector2&in, float, TransformSpace = TransformSpace::Local)", AS_METHODPR(T, RotateAround2D, (const Vector2&, float, TransformSpace), void), AS_CALL_THISCALL);
 
     // bool Node::SaveJSON(Serializer& dest, const String& indentation = "\t") const
     engine->RegisterObjectMethod(className, "bool SaveJSON(Serializer&, const String&in = \"\t\") const", AS_METHODPR(T, SaveJSON, (Serializer&, const String&) const, bool), AS_CALL_THISCALL);
@@ -16103,11 +16103,11 @@ template <class T> void RegisterMembers_Node(asIScriptEngine* engine, const char
     // void Node::SetWorldTransform2D(const Vector2& position, float rotation, const Vector2& scale)
     engine->RegisterObjectMethod(className, "void SetWorldTransform2D(const Vector2&in, float, const Vector2&in)", AS_METHODPR(T, SetWorldTransform2D, (const Vector2&, float, const Vector2&), void), AS_CALL_THISCALL);
 
-    // void Node::Translate(const Vector3& delta, TransformSpace space = TS_LOCAL)
-    engine->RegisterObjectMethod(className, "void Translate(const Vector3&in, TransformSpace = TS_LOCAL)", AS_METHODPR(T, Translate, (const Vector3&, TransformSpace), void), AS_CALL_THISCALL);
+    // void Node::Translate(const Vector3& delta, TransformSpace space = TransformSpace::Local)
+    engine->RegisterObjectMethod(className, "void Translate(const Vector3&in, TransformSpace = TransformSpace::Local)", AS_METHODPR(T, Translate, (const Vector3&, TransformSpace), void), AS_CALL_THISCALL);
 
-    // void Node::Translate2D(const Vector2& delta, TransformSpace space = TS_LOCAL)
-    engine->RegisterObjectMethod(className, "void Translate2D(const Vector2&in, TransformSpace = TS_LOCAL)", AS_METHODPR(T, Translate2D, (const Vector2&, TransformSpace), void), AS_CALL_THISCALL);
+    // void Node::Translate2D(const Vector2& delta, TransformSpace space = TransformSpace::Local)
+    engine->RegisterObjectMethod(className, "void Translate2D(const Vector2&in, TransformSpace = TransformSpace::Local)", AS_METHODPR(T, Translate2D, (const Vector2&, TransformSpace), void), AS_CALL_THISCALL);
 
     // Vector3 Node::WorldToLocal(const Vector3& position) const
     engine->RegisterObjectMethod(className, "Vector3 WorldToLocal(const Vector3&in) const", AS_METHODPR(T, WorldToLocal, (const Vector3&) const, Vector3), AS_CALL_THISCALL);
@@ -16118,8 +16118,8 @@ template <class T> void RegisterMembers_Node(asIScriptEngine* engine, const char
     // Vector2 Node::WorldToLocal2D(const Vector2& vector) const
     engine->RegisterObjectMethod(className, "Vector2 WorldToLocal2D(const Vector2&in) const", AS_METHODPR(T, WorldToLocal2D, (const Vector2&) const, Vector2), AS_CALL_THISCALL);
 
-    // void Node::Yaw(float angle, TransformSpace space = TS_LOCAL)
-    engine->RegisterObjectMethod(className, "void Yaw(float, TransformSpace = TS_LOCAL)", AS_METHODPR(T, Yaw, (float, TransformSpace), void), AS_CALL_THISCALL);
+    // void Node::Yaw(float angle, TransformSpace space = TransformSpace::Local)
+    engine->RegisterObjectMethod(className, "void Yaw(float, TransformSpace = TransformSpace::Local)", AS_METHODPR(T, Yaw, (float, TransformSpace), void), AS_CALL_THISCALL);
 
     // template <class T> T* Node::CreateComponent(CreateMode mode = REPLICATED, ComponentId id = 0)
     // Not registered because template
