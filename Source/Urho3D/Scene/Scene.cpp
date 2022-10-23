@@ -68,9 +68,9 @@ Scene::~Scene()
     RemoveAllChildren();
 
     // Remove scene reference and owner from all nodes that still exist
-    for (HashMap<unsigned, Node*>::Iterator i = replicatedNodes_.Begin(); i != replicatedNodes_.End(); ++i)
+    for (HashMap<NodeId, Node*>::Iterator i = replicatedNodes_.Begin(); i != replicatedNodes_.End(); ++i)
         i->second_->ResetScene();
-    for (HashMap<unsigned, Node*>::Iterator i = localNodes_.Begin(); i != localNodes_.End(); ++i)
+    for (HashMap<NodeId, Node*>::Iterator i = localNodes_.Begin(); i != localNodes_.End(); ++i)
         i->second_->ResetScene();
 }
 
@@ -191,7 +191,7 @@ void Scene::AddReplicationState(NodeReplicationState* state)
     Node::AddReplicationState(state);
 
     // This is the first update for a new connection. Mark all replicated nodes dirty
-    for (HashMap<unsigned, Node*>::ConstIterator i = replicatedNodes_.Begin(); i != replicatedNodes_.End(); ++i)
+    for (HashMap<NodeId, Node*>::ConstIterator i = replicatedNodes_.Begin(); i != replicatedNodes_.End(); ++i)
         state->sceneState_->dirtyNodes_.Insert(i->first_);
 }
 
@@ -336,7 +336,7 @@ bool Scene::LoadAsync(File* file, LoadMode mode)
         }
 
         // Store own old ID for resolving possible root node references
-        unsigned nodeID = file->ReadU32();
+        NodeId nodeID = file->ReadU32();
         resolver_.AddNode(nodeID, this);
 
         // Load root level components first
@@ -400,7 +400,7 @@ bool Scene::LoadAsyncXML(File* file, LoadMode mode)
         }
 
         // Store own old ID for resolving possible root node references
-        unsigned nodeID = rootElement.GetUInt("id");
+        NodeId nodeID = rootElement.GetUInt("id");
         resolver_.AddNode(nodeID, this);
 
         // Load the root level components first
@@ -469,7 +469,7 @@ bool Scene::LoadAsyncJSON(File* file, LoadMode mode)
         }
 
         // Store own old ID for resolving possible root node references
-        unsigned nodeID = rootVal.Get("id").GetUInt();
+        NodeId nodeID = rootVal.Get("id").GetUInt();
         resolver_.AddNode(nodeID, this);
 
         // Load the root level components first
@@ -511,7 +511,7 @@ Node* Scene::Instantiate(Deserializer& source, const Vector3& position, const Qu
     URHO3D_PROFILE(Instantiate);
 
     SceneResolver resolver;
-    unsigned nodeID = source.ReadU32();
+    NodeId nodeID = source.ReadU32();
     // Rewrite IDs when instantiating
     Node* node = CreateChild(0, mode);
     resolver.AddNode(nodeID, node);
@@ -534,7 +534,7 @@ Node* Scene::InstantiateXML(const XMLElement& source, const Vector3& position, c
     URHO3D_PROFILE(InstantiateXML);
 
     SceneResolver resolver;
-    unsigned nodeID = source.GetUInt("id");
+    NodeId nodeID = source.GetUInt("id");
     // Rewrite IDs when instantiating
     Node* node = CreateChild(0, mode);
     resolver.AddNode(nodeID, node);
@@ -557,7 +557,7 @@ Node* Scene::InstantiateJSON(const JSONValue& source, const Vector3& position, c
     URHO3D_PROFILE(InstantiateJSON);
 
     SceneResolver resolver;
-    unsigned nodeID = source.Get("id").GetUInt();
+    NodeId nodeID = source.Get("id").GetUInt();
     // Rewrite IDs when instantiating
     Node* node = CreateChild(0, mode);
     resolver.AddNode(nodeID, node);
@@ -684,16 +684,16 @@ void Scene::UnregisterAllVars()
     varNames_.Clear();
 }
 
-Node* Scene::GetNode(unsigned id) const
+Node* Scene::GetNode(NodeId id) const
 {
     if (IsReplicatedID(id))
     {
-        HashMap<unsigned, Node*>::ConstIterator i = replicatedNodes_.Find(id);
+        HashMap<NodeId, Node*>::ConstIterator i = replicatedNodes_.Find(id);
         return i != replicatedNodes_.End() ? i->second_ : nullptr;
     }
     else
     {
-        HashMap<unsigned, Node*>::ConstIterator i = localNodes_.Find(id);
+        HashMap<NodeId, Node*>::ConstIterator i = localNodes_.Find(id);
         return i != localNodes_.End() ? i->second_ : nullptr;
     }
 }
@@ -711,16 +711,16 @@ bool Scene::GetNodesWithTag(Vector<Node*>& dest, const String& tag) const
         return false;
 }
 
-Component* Scene::GetComponent(unsigned id) const
+Component* Scene::GetComponent(ComponentId id) const
 {
     if (IsReplicatedID(id))
     {
-        HashMap<unsigned, Component*>::ConstIterator i = replicatedComponents_.Find(id);
+        HashMap<ComponentId, Component*>::ConstIterator i = replicatedComponents_.Find(id);
         return i != replicatedComponents_.End() ? i->second_ : nullptr;
     }
     else
     {
-        HashMap<unsigned, Component*>::ConstIterator i = localComponents_.Find(id);
+        HashMap<ComponentId, Component*>::ConstIterator i = localComponents_.Find(id);
         return i != localComponents_.End() ? i->second_ : nullptr;
     }
 }
@@ -820,13 +820,13 @@ void Scene::DelayedMarkedDirty(Component* component)
     delayedDirtyComponents_.Push(component);
 }
 
-unsigned Scene::GetFreeNodeID(CreateMode mode)
+NodeId Scene::GetFreeNodeID(CreateMode mode)
 {
     if (mode == REPLICATED)
     {
         for (;;)
         {
-            unsigned ret = replicatedNodeID_;
+            NodeId ret = replicatedNodeID_;
             if (replicatedNodeID_ < LAST_REPLICATED_ID)
                 ++replicatedNodeID_;
             else
@@ -840,7 +840,7 @@ unsigned Scene::GetFreeNodeID(CreateMode mode)
     {
         for (;;)
         {
-            unsigned ret = localNodeID_;
+            NodeId ret = localNodeID_;
             if (localNodeID_ < LAST_LOCAL_ID)
                 ++localNodeID_;
             else
@@ -852,13 +852,13 @@ unsigned Scene::GetFreeNodeID(CreateMode mode)
     }
 }
 
-unsigned Scene::GetFreeComponentID(CreateMode mode)
+ComponentId Scene::GetFreeComponentID(CreateMode mode)
 {
     if (mode == REPLICATED)
     {
         for (;;)
         {
-            unsigned ret = replicatedComponentID_;
+            ComponentId ret = replicatedComponentID_;
             if (replicatedComponentID_ < LAST_REPLICATED_ID)
                 ++replicatedComponentID_;
             else
@@ -872,7 +872,7 @@ unsigned Scene::GetFreeComponentID(CreateMode mode)
     {
         for (;;)
         {
-            unsigned ret = localComponentID_;
+            ComponentId ret = localComponentID_;
             if (localComponentID_ < LAST_LOCAL_ID)
                 ++localComponentID_;
             else
@@ -897,7 +897,7 @@ void Scene::NodeAdded(Node* node)
     node->SetScene(this);
 
     // If the new node has an ID of zero (default), assign a replicated ID now
-    unsigned id = node->GetID();
+    NodeId id = node->GetID();
     if (!id)
     {
         id = GetFreeNodeID(REPLICATED);
@@ -907,7 +907,7 @@ void Scene::NodeAdded(Node* node)
     // If node with same ID exists, remove the scene reference from it and overwrite with the new node
     if (IsReplicatedID(id))
     {
-        HashMap<unsigned, Node*>::Iterator i = replicatedNodes_.Find(id);
+        HashMap<NodeId, Node*>::Iterator i = replicatedNodes_.Find(id);
         if (i != replicatedNodes_.End() && i->second_ != node)
         {
             URHO3D_LOGWARNING("Overwriting node with ID " + String(id));
@@ -921,7 +921,7 @@ void Scene::NodeAdded(Node* node)
     }
     else
     {
-        HashMap<unsigned, Node*>::Iterator i = localNodes_.Find(id);
+        HashMap<NodeId, Node*>::Iterator i = localNodes_.Find(id);
         if (i != localNodes_.End() && i->second_ != node)
         {
             URHO3D_LOGWARNING("Overwriting node with ID " + String(id));
@@ -962,7 +962,7 @@ void Scene::NodeRemoved(Node* node)
     if (!node || node->GetScene() != this)
         return;
 
-    unsigned id = node->GetID();
+    NodeId id = node->GetID();
     if (Scene::IsReplicatedID(id))
     {
         replicatedNodes_.Erase(id);
@@ -995,7 +995,7 @@ void Scene::ComponentAdded(Component* component)
     if (!component)
         return;
 
-    unsigned id = component->GetID();
+    ComponentId id = component->GetID();
 
     // If the new component has an ID of zero (default), assign a replicated ID now
     if (!id)
@@ -1006,7 +1006,7 @@ void Scene::ComponentAdded(Component* component)
 
     if (IsReplicatedID(id))
     {
-        HashMap<unsigned, Component*>::Iterator i = replicatedComponents_.Find(id);
+        HashMap<ComponentId, Component*>::Iterator i = replicatedComponents_.Find(id);
         if (i != replicatedComponents_.End() && i->second_ != component)
         {
             URHO3D_LOGWARNING("Overwriting component with ID " + String(id));
@@ -1017,7 +1017,7 @@ void Scene::ComponentAdded(Component* component)
     }
     else
     {
-        HashMap<unsigned, Component*>::Iterator i = localComponents_.Find(id);
+        HashMap<ComponentId, Component*>::Iterator i = localComponents_.Find(id);
         if (i != localComponents_.End() && i->second_ != component)
         {
             URHO3D_LOGWARNING("Overwriting component with ID " + String(id));
@@ -1035,7 +1035,7 @@ void Scene::ComponentRemoved(Component* component)
     if (!component)
         return;
 
-    unsigned id = component->GetID();
+    ComponentId id = component->GetID();
     if (Scene::IsReplicatedID(id))
         replicatedComponents_.Erase(id);
     else
@@ -1071,14 +1071,14 @@ String Scene::GetVarNamesAttr() const
 
 void Scene::PrepareNetworkUpdate()
 {
-    for (HashSet<unsigned>::Iterator i = networkUpdateNodes_.Begin(); i != networkUpdateNodes_.End(); ++i)
+    for (HashSet<NodeId>::Iterator i = networkUpdateNodes_.Begin(); i != networkUpdateNodes_.End(); ++i)
     {
         Node* node = GetNode(*i);
         if (node)
             node->PrepareNetworkUpdate();
     }
 
-    for (HashSet<unsigned>::Iterator i = networkUpdateComponents_.Begin(); i != networkUpdateComponents_.End(); ++i)
+    for (HashSet<ComponentId>::Iterator i = networkUpdateComponents_.Begin(); i != networkUpdateComponents_.End(); ++i)
     {
         Component* component = GetComponent(*i);
         if (component)
@@ -1093,10 +1093,10 @@ void Scene::CleanupConnection(Connection* connection)
 {
     Node::CleanupConnection(connection);
 
-    for (HashMap<unsigned, Node*>::Iterator i = replicatedNodes_.Begin(); i != replicatedNodes_.End(); ++i)
+    for (HashMap<NodeId, Node*>::Iterator i = replicatedNodes_.Begin(); i != replicatedNodes_.End(); ++i)
         i->second_->CleanupConnection(connection);
 
-    for (HashMap<unsigned, Component*>::Iterator i = replicatedComponents_.Begin(); i != replicatedComponents_.End(); ++i)
+    for (HashMap<ComponentId, Component*>::Iterator i = replicatedComponents_.Begin(); i != replicatedComponents_.End(); ++i)
         i->second_->CleanupConnection(connection);
 }
 
@@ -1132,7 +1132,7 @@ void Scene::MarkReplicationDirty(Node* node)
 {
     if (networkState_ && node->IsReplicated())
     {
-        unsigned id = node->GetID();
+        NodeId id = node->GetID();
         for (Vector<ReplicationState*>::Iterator i = networkState_->replicationStates_.Begin();
              i != networkState_->replicationStates_.End(); ++i)
         {
@@ -1189,7 +1189,7 @@ void Scene::UpdateAsyncLoading()
         /// \todo Works poorly in scenes where one root-level child node contains all content
         if (asyncProgress_.xmlFile_)
         {
-            unsigned nodeID = asyncProgress_.xmlElement_.GetUInt("id");
+            NodeId nodeID = asyncProgress_.xmlElement_.GetUInt("id");
             Node* newNode = CreateChild(nodeID, IsReplicatedID(nodeID) ? REPLICATED : LOCAL);
             resolver_.AddNode(nodeID, newNode);
             newNode->LoadXML(asyncProgress_.xmlElement_, resolver_);
@@ -1199,7 +1199,7 @@ void Scene::UpdateAsyncLoading()
         {
             const JSONValue& childValue = asyncProgress_.jsonFile_->GetRoot().Get("children").GetArray().At(asyncProgress_.jsonIndex_);
 
-            unsigned nodeID =childValue.Get("id").GetUInt();
+            NodeId nodeID = childValue.Get("id").GetUInt();
             Node* newNode = CreateChild(nodeID, IsReplicatedID(nodeID) ? REPLICATED : LOCAL);
             resolver_.AddNode(nodeID, newNode);
             newNode->LoadJSON(childValue, resolver_);
@@ -1207,7 +1207,7 @@ void Scene::UpdateAsyncLoading()
         }
         else // Load from binary
         {
-            unsigned nodeID = asyncProgress_.file_->ReadU32();
+            NodeId nodeID = asyncProgress_.file_->ReadU32();
             Node* newNode = CreateChild(nodeID, IsReplicatedID(nodeID) ? REPLICATED : LOCAL);
             resolver_.AddNode(nodeID, newNode);
             newNode->Load(*asyncProgress_.file_, resolver_);
@@ -1276,7 +1276,7 @@ void Scene::PreloadResources(File* file, bool isSceneFile)
     auto* cache = GetSubsystem<ResourceCache>();
 
     // Read node ID (not needed)
-    /*unsigned nodeID = */file->ReadU32();
+    /*NodeId nodeID = */file->ReadU32();
 
     // Read Node or Scene attributes; these do not include any resources
     const Vector<AttributeInfo>* attributes = context_->GetAttributes(isSceneFile ? Scene::GetTypeStatic() : Node::GetTypeStatic());
@@ -1297,7 +1297,7 @@ void Scene::PreloadResources(File* file, bool isSceneFile)
         VectorBuffer compBuffer(*file, file->ReadVLE());
         StringHash compType = compBuffer.ReadStringHash();
         // Read component ID (not needed)
-        /*unsigned compID = */compBuffer.ReadU32();
+        /*ComponentId compID = */compBuffer.ReadU32();
 
         attributes = context_->GetAttributes(compType);
         if (attributes)

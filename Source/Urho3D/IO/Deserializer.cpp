@@ -439,9 +439,9 @@ unsigned Deserializer::ReadVLE()
     return ret;
 }
 
-unsigned Deserializer::ReadNetID()
+id32 Deserializer::ReadNetID()
 {
-    unsigned ret = 0;
+    id32 ret = 0;
     Read(&ret, 3);
     return ret;
 }

@@ -1396,8 +1396,8 @@ template <class T> void RegisterMembers_Deserializer(asIScriptEngine* engine, co
     // Matrix4 Deserializer::ReadMatrix4()
     engine->RegisterObjectMethod(className, "Matrix4 ReadMatrix4()", AS_METHODPR(T, ReadMatrix4, (), Matrix4), AS_CALL_THISCALL);
 
-    // unsigned Deserializer::ReadNetID()
-    engine->RegisterObjectMethod(className, "uint ReadNetID()", AS_METHODPR(T, ReadNetID, (), unsigned), AS_CALL_THISCALL);
+    // id32 Deserializer::ReadNetID()
+    engine->RegisterObjectMethod(className, "id32 ReadNetID()", AS_METHODPR(T, ReadNetID, (), id32), AS_CALL_THISCALL);
 
     // Quaternion Deserializer::ReadPackedQuaternion()
     engine->RegisterObjectMethod(className, "Quaternion ReadPackedQuaternion()", AS_METHODPR(T, ReadPackedQuaternion, (), Quaternion), AS_CALL_THISCALL);
@@ -4305,11 +4305,11 @@ template <class T> void RegisterMembers_ScenePassInfo(asIScriptEngine* engine, c
 // class SceneResolver | File: ../Scene/SceneResolver.h
 template <class T> void RegisterMembers_SceneResolver(asIScriptEngine* engine, const char* className)
 {
-    // void SceneResolver::AddComponent(unsigned oldID, Component* component)
-    engine->RegisterObjectMethod(className, "void AddComponent(uint, Component@+)", AS_METHODPR(T, AddComponent, (unsigned, Component*), void), AS_CALL_THISCALL);
+    // void SceneResolver::AddComponent(ComponentId oldID, Component* component)
+    engine->RegisterObjectMethod(className, "void AddComponent(ComponentId, Component@+)", AS_METHODPR(T, AddComponent, (ComponentId, Component*), void), AS_CALL_THISCALL);
 
-    // void SceneResolver::AddNode(unsigned oldID, Node* node)
-    engine->RegisterObjectMethod(className, "void AddNode(uint, Node@+)", AS_METHODPR(T, AddNode, (unsigned, Node*), void), AS_CALL_THISCALL);
+    // void SceneResolver::AddNode(NodeId oldID, Node* node)
+    engine->RegisterObjectMethod(className, "void AddNode(NodeId, Node@+)", AS_METHODPR(T, AddNode, (NodeId, Node*), void), AS_CALL_THISCALL);
 
     // void SceneResolver::Reset()
     engine->RegisterObjectMethod(className, "void Reset()", AS_METHODPR(T, Reset, (), void), AS_CALL_THISCALL);
@@ -4464,8 +4464,8 @@ template <class T> void RegisterMembers_Serializer(asIScriptEngine* engine, cons
     // bool Serializer::WriteMatrix4(const Matrix4& value)
     engine->RegisterObjectMethod(className, "bool WriteMatrix4(const Matrix4&in)", AS_METHODPR(T, WriteMatrix4, (const Matrix4&), bool), AS_CALL_THISCALL);
 
-    // bool Serializer::WriteNetID(unsigned value)
-    engine->RegisterObjectMethod(className, "bool WriteNetID(uint)", AS_METHODPR(T, WriteNetID, (unsigned), bool), AS_CALL_THISCALL);
+    // bool Serializer::WriteNetID(id32 value)
+    engine->RegisterObjectMethod(className, "bool WriteNetID(id32)", AS_METHODPR(T, WriteNetID, (id32), bool), AS_CALL_THISCALL);
 
     // bool Serializer::WritePackedQuaternion(const Quaternion& value)
     engine->RegisterObjectMethod(className, "bool WritePackedQuaternion(const Quaternion&in)", AS_METHODPR(T, WritePackedQuaternion, (const Quaternion&), bool), AS_CALL_THISCALL);
@@ -15266,9 +15266,9 @@ template <class T> void RegisterMembers_Component(asIScriptEngine* engine, const
     // Component* Component::GetComponent(StringHash type) const
     engine->RegisterObjectMethod(className, "Component@+ GetComponent(StringHash) const", AS_METHODPR(T, GetComponent, (StringHash) const, Component*), AS_CALL_THISCALL);
 
-    // unsigned Component::GetID() const
-    engine->RegisterObjectMethod(className, "uint GetID() const", AS_METHODPR(T, GetID, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_id() const", AS_METHODPR(T, GetID, () const, unsigned), AS_CALL_THISCALL);
+    // ComponentId Component::GetID() const
+    engine->RegisterObjectMethod(className, "ComponentId GetID() const", AS_METHODPR(T, GetID, () const, ComponentId), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "ComponentId get_id() const", AS_METHODPR(T, GetID, () const, ComponentId), AS_CALL_THISCALL);
 
     // Node* Component::GetNode() const
     engine->RegisterObjectMethod(className, "Node@+ GetNode() const", AS_METHODPR(T, GetNode, () const, Node*), AS_CALL_THISCALL);
@@ -15605,8 +15605,8 @@ template <class T> void RegisterMembers_Node(asIScriptEngine* engine, const char
     // void Node::AddChild(Node* node, i32 index = ENDPOS)
     engine->RegisterObjectMethod(className, "void AddChild(Node@+, int = ENDPOS)", AS_METHODPR(T, AddChild, (Node*, i32), void), AS_CALL_THISCALL);
 
-    // void Node::AddComponent(Component* component, unsigned id, CreateMode mode)
-    engine->RegisterObjectMethod(className, "void AddComponent(Component@+, uint, CreateMode)", AS_METHODPR(T, AddComponent, (Component*, unsigned, CreateMode), void), AS_CALL_THISCALL);
+    // void Node::AddComponent(Component* component, ComponentId id, CreateMode mode)
+    engine->RegisterObjectMethod(className, "void AddComponent(Component@+, ComponentId, CreateMode)", AS_METHODPR(T, AddComponent, (Component*, ComponentId, CreateMode), void), AS_CALL_THISCALL);
 
     // void Node::AddListener(Component* component)
     engine->RegisterObjectMethod(className, "void AddListener(Component@+)", AS_METHODPR(T, AddListener, (Component*), void), AS_CALL_THISCALL);
@@ -15623,23 +15623,23 @@ template <class T> void RegisterMembers_Node(asIScriptEngine* engine, const char
     // Node* Node::Clone(CreateMode mode = REPLICATED)
     engine->RegisterObjectMethod(className, "Node@+ Clone(CreateMode = REPLICATED)", AS_METHODPR(T, Clone, (CreateMode), Node*), AS_CALL_THISCALL);
 
-    // Component* Node::CloneComponent(Component* component, unsigned id = 0)
-    engine->RegisterObjectMethod(className, "Component@+ CloneComponent(Component@+, uint = 0)", AS_METHODPR(T, CloneComponent, (Component*, unsigned), Component*), AS_CALL_THISCALL);
+    // Component* Node::CloneComponent(Component* component, ComponentId id = 0)
+    engine->RegisterObjectMethod(className, "Component@+ CloneComponent(Component@+, ComponentId = 0)", AS_METHODPR(T, CloneComponent, (Component*, ComponentId), Component*), AS_CALL_THISCALL);
 
-    // Component* Node::CloneComponent(Component* component, CreateMode mode, unsigned id = 0)
-    engine->RegisterObjectMethod(className, "Component@+ CloneComponent(Component@+, CreateMode, uint = 0)", AS_METHODPR(T, CloneComponent, (Component*, CreateMode, unsigned), Component*), AS_CALL_THISCALL);
+    // Component* Node::CloneComponent(Component* component, CreateMode mode, ComponentId id = 0)
+    engine->RegisterObjectMethod(className, "Component@+ CloneComponent(Component@+, CreateMode, ComponentId = 0)", AS_METHODPR(T, CloneComponent, (Component*, CreateMode, ComponentId), Component*), AS_CALL_THISCALL);
 
-    // Node* Node::CreateChild(const String& name = String::EMPTY, CreateMode mode = REPLICATED, unsigned id = 0, bool temporary = false)
-    engine->RegisterObjectMethod(className, "Node@+ CreateChild(const String&in = String::EMPTY, CreateMode = REPLICATED, uint = 0, bool = false)", AS_METHODPR(T, CreateChild, (const String&, CreateMode, unsigned, bool), Node*), AS_CALL_THISCALL);
+    // Node* Node::CreateChild(const String& name = String::EMPTY, CreateMode mode = REPLICATED, NodeId id = 0, bool temporary = false)
+    engine->RegisterObjectMethod(className, "Node@+ CreateChild(const String&in = String::EMPTY, CreateMode = REPLICATED, NodeId = 0, bool = false)", AS_METHODPR(T, CreateChild, (const String&, CreateMode, NodeId, bool), Node*), AS_CALL_THISCALL);
 
-    // Node* Node::CreateChild(unsigned id, CreateMode mode, bool temporary = false)
-    engine->RegisterObjectMethod(className, "Node@+ CreateChild(uint, CreateMode, bool = false)", AS_METHODPR(T, CreateChild, (unsigned, CreateMode, bool), Node*), AS_CALL_THISCALL);
+    // Node* Node::CreateChild(NodeId id, CreateMode mode, bool temporary = false)
+    engine->RegisterObjectMethod(className, "Node@+ CreateChild(NodeId, CreateMode, bool = false)", AS_METHODPR(T, CreateChild, (NodeId, CreateMode, bool), Node*), AS_CALL_THISCALL);
 
-    // Component* Node::CreateComponent(StringHash type, CreateMode mode = REPLICATED, unsigned id = 0)
-    engine->RegisterObjectMethod(className, "Component@+ CreateComponent(StringHash, CreateMode = REPLICATED, uint = 0)", AS_METHODPR(T, CreateComponent, (StringHash, CreateMode, unsigned), Component*), AS_CALL_THISCALL);
+    // Component* Node::CreateComponent(StringHash type, CreateMode mode = REPLICATED, ComponentId id = 0)
+    engine->RegisterObjectMethod(className, "Component@+ CreateComponent(StringHash, CreateMode = REPLICATED, ComponentId = 0)", AS_METHODPR(T, CreateComponent, (StringHash, CreateMode, ComponentId), Component*), AS_CALL_THISCALL);
 
-    // Node* Node::CreateTemporaryChild(const String& name = String::EMPTY, CreateMode mode = REPLICATED, unsigned id = 0)
-    engine->RegisterObjectMethod(className, "Node@+ CreateTemporaryChild(const String&in = String::EMPTY, CreateMode = REPLICATED, uint = 0)", AS_METHODPR(T, CreateTemporaryChild, (const String&, CreateMode, unsigned), Node*), AS_CALL_THISCALL);
+    // Node* Node::CreateTemporaryChild(const String& name = String::EMPTY, CreateMode mode = REPLICATED, NodeId id = 0)
+    engine->RegisterObjectMethod(className, "Node@+ CreateTemporaryChild(const String&in = String::EMPTY, CreateMode = REPLICATED, NodeId = 0)", AS_METHODPR(T, CreateTemporaryChild, (const String&, CreateMode, NodeId), Node*), AS_CALL_THISCALL);
 
     // Node* Node::GetChild(i32 index) const
     engine->RegisterObjectMethod(className, "Node@+ GetChild(int) const", AS_METHODPR(T, GetChild, (i32) const, Node*), AS_CALL_THISCALL);
@@ -15675,9 +15675,9 @@ template <class T> void RegisterMembers_Node(asIScriptEngine* engine, const char
     engine->RegisterObjectMethod(className, "Vector3 GetDirection() const", AS_METHODPR(T, GetDirection, () const, Vector3), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "Vector3 get_direction() const", AS_METHODPR(T, GetDirection, () const, Vector3), AS_CALL_THISCALL);
 
-    // unsigned Node::GetID() const
-    engine->RegisterObjectMethod(className, "uint GetID() const", AS_METHODPR(T, GetID, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_id() const", AS_METHODPR(T, GetID, () const, unsigned), AS_CALL_THISCALL);
+    // NodeId Node::GetID() const
+    engine->RegisterObjectMethod(className, "NodeId GetID() const", AS_METHODPR(T, GetID, () const, NodeId), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "NodeId get_id() const", AS_METHODPR(T, GetID, () const, NodeId), AS_CALL_THISCALL);
 
     // const String& Node::GetName() const
     engine->RegisterObjectMethod(className, "const String& GetName() const", AS_METHODPR(T, GetName, () const, const String&), AS_CALL_THISCALL);
@@ -15711,8 +15711,8 @@ template <class T> void RegisterMembers_Node(asIScriptEngine* engine, const char
     // i32 Node::GetNumPersistentComponents() const
     engine->RegisterObjectMethod(className, "int GetNumPersistentComponents() const", AS_METHODPR(T, GetNumPersistentComponents, () const, i32), AS_CALL_THISCALL);
 
-    // Component* Node::GetOrCreateComponent(StringHash type, CreateMode mode = REPLICATED, unsigned id = 0)
-    engine->RegisterObjectMethod(className, "Component@+ GetOrCreateComponent(StringHash, CreateMode = REPLICATED, uint = 0)", AS_METHODPR(T, GetOrCreateComponent, (StringHash, CreateMode, unsigned), Component*), AS_CALL_THISCALL);
+    // Component* Node::GetOrCreateComponent(StringHash type, CreateMode mode = REPLICATED, ComponentId id = 0)
+    engine->RegisterObjectMethod(className, "Component@+ GetOrCreateComponent(StringHash, CreateMode = REPLICATED, ComponentId = 0)", AS_METHODPR(T, GetOrCreateComponent, (StringHash, CreateMode, ComponentId), Component*), AS_CALL_THISCALL);
 
     // Node* Node::GetParent() const
     engine->RegisterObjectMethod(className, "Node@+ GetParent() const", AS_METHODPR(T, GetParent, () const, Node*), AS_CALL_THISCALL);
@@ -15949,9 +15949,9 @@ template <class T> void RegisterMembers_Node(asIScriptEngine* engine, const char
     // void Node::SetEnabledRecursive(bool enable)
     engine->RegisterObjectMethod(className, "void SetEnabledRecursive(bool)", AS_METHODPR(T, SetEnabledRecursive, (bool), void), AS_CALL_THISCALL);
 
-    // void Node::SetID(unsigned id)
-    engine->RegisterObjectMethod(className, "void SetID(uint)", AS_METHODPR(T, SetID, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_id(uint)", AS_METHODPR(T, SetID, (unsigned), void), AS_CALL_THISCALL);
+    // void Node::SetID(NodeId id)
+    engine->RegisterObjectMethod(className, "void SetID(NodeId)", AS_METHODPR(T, SetID, (NodeId), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_id(NodeId)", AS_METHODPR(T, SetID, (NodeId), void), AS_CALL_THISCALL);
 
     // void Node::SetName(const String& name)
     engine->RegisterObjectMethod(className, "void SetName(const String&in)", AS_METHODPR(T, SetName, (const String&), void), AS_CALL_THISCALL);
@@ -16121,7 +16121,7 @@ template <class T> void RegisterMembers_Node(asIScriptEngine* engine, const char
     // void Node::Yaw(float angle, TransformSpace space = TS_LOCAL)
     engine->RegisterObjectMethod(className, "void Yaw(float, TransformSpace = TS_LOCAL)", AS_METHODPR(T, Yaw, (float, TransformSpace), void), AS_CALL_THISCALL);
 
-    // template <class T> T* Node::CreateComponent(CreateMode mode = REPLICATED, unsigned id = 0)
+    // template <class T> T* Node::CreateComponent(CreateMode mode = REPLICATED, ComponentId id = 0)
     // Not registered because template
     // template <class T> void Node::GetChildrenWithComponent(Vector<Node*>& dest, bool recursive = false) const
     // Not registered because template
@@ -16133,7 +16133,7 @@ template <class T> void RegisterMembers_Node(asIScriptEngine* engine, const char
     // Not registered because template
     // template <class T> void Node::GetDerivedComponents(Vector<T*>& dest, bool recursive = false, bool clearVector = true) const
     // Not registered because template
-    // template <class T> T* Node::GetOrCreateComponent(CreateMode mode = REPLICATED, unsigned id = 0)
+    // template <class T> T* Node::GetOrCreateComponent(CreateMode mode = REPLICATED, ComponentId id = 0)
     // Not registered because template
     // template <class T> T* Node::GetParentComponent(bool fullTraversal = false) const
     // Not registered because template
@@ -18201,8 +18201,8 @@ template <class T> void RegisterMembers_Scene(asIScriptEngine* engine, const cha
     engine->RegisterObjectMethod(className, "hash32 GetChecksum() const", AS_METHODPR(T, GetChecksum, () const, hash32), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "hash32 get_checksum() const", AS_METHODPR(T, GetChecksum, () const, hash32), AS_CALL_THISCALL);
 
-    // Component* Scene::GetComponent(unsigned id) const
-    engine->RegisterObjectMethod(className, "Component@+ GetComponent(uint) const", AS_METHODPR(T, GetComponent, (unsigned) const, Component*), AS_CALL_THISCALL);
+    // Component* Scene::GetComponent(ComponentId id) const
+    engine->RegisterObjectMethod(className, "Component@+ GetComponent(ComponentId) const", AS_METHODPR(T, GetComponent, (ComponentId) const, Component*), AS_CALL_THISCALL);
 
     // float Scene::GetElapsedTime() const
     engine->RegisterObjectMethod(className, "float GetElapsedTime() const", AS_METHODPR(T, GetElapsedTime, () const, float), AS_CALL_THISCALL);
@@ -18212,14 +18212,14 @@ template <class T> void RegisterMembers_Scene(asIScriptEngine* engine, const cha
     engine->RegisterObjectMethod(className, "const String& GetFileName() const", AS_METHODPR(T, GetFileName, () const, const String&), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "const String& get_fileName() const", AS_METHODPR(T, GetFileName, () const, const String&), AS_CALL_THISCALL);
 
-    // unsigned Scene::GetFreeComponentID(CreateMode mode)
-    engine->RegisterObjectMethod(className, "uint GetFreeComponentID(CreateMode)", AS_METHODPR(T, GetFreeComponentID, (CreateMode), unsigned), AS_CALL_THISCALL);
+    // ComponentId Scene::GetFreeComponentID(CreateMode mode)
+    engine->RegisterObjectMethod(className, "ComponentId GetFreeComponentID(CreateMode)", AS_METHODPR(T, GetFreeComponentID, (CreateMode), ComponentId), AS_CALL_THISCALL);
 
-    // unsigned Scene::GetFreeNodeID(CreateMode mode)
-    engine->RegisterObjectMethod(className, "uint GetFreeNodeID(CreateMode)", AS_METHODPR(T, GetFreeNodeID, (CreateMode), unsigned), AS_CALL_THISCALL);
+    // NodeId Scene::GetFreeNodeID(CreateMode mode)
+    engine->RegisterObjectMethod(className, "NodeId GetFreeNodeID(CreateMode)", AS_METHODPR(T, GetFreeNodeID, (CreateMode), NodeId), AS_CALL_THISCALL);
 
-    // Node* Scene::GetNode(unsigned id) const
-    engine->RegisterObjectMethod(className, "Node@+ GetNode(uint) const", AS_METHODPR(T, GetNode, (unsigned) const, Node*), AS_CALL_THISCALL);
+    // Node* Scene::GetNode(NodeId id) const
+    engine->RegisterObjectMethod(className, "Node@+ GetNode(NodeId) const", AS_METHODPR(T, GetNode, (NodeId) const, Node*), AS_CALL_THISCALL);
 
     // const Vector<SharedPtr<PackageFile>>& Scene::GetRequiredPackageFiles() const
     engine->RegisterObjectMethod(className, "Array<PackageFile@>@ GetRequiredPackageFiles() const", AS_FUNCTION_OBJFIRST(Scene_constspVectorlesSharedPtrlesPackageFilegregreamp_GetRequiredPackageFiles_void_template<Scene>), AS_CALL_CDECL_OBJFIRST);
@@ -18347,8 +18347,8 @@ template <class T> void RegisterMembers_Scene(asIScriptEngine* engine, const cha
     // void Scene::Update(float timeStep)
     engine->RegisterObjectMethod(className, "void Update(float)", AS_METHODPR(T, Update, (float), void), AS_CALL_THISCALL);
 
-    // static bool Scene::IsReplicatedID(unsigned id)
-    engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("bool IsReplicatedID(uint)", AS_FUNCTIONPR(T::IsReplicatedID, (unsigned), bool), AS_CALL_CDECL);engine->SetDefaultNamespace("");
+    // static bool Scene::IsReplicatedID(id32 id)
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("bool IsReplicatedID(id32)", AS_FUNCTIONPR(T::IsReplicatedID, (id32), bool), AS_CALL_CDECL);engine->SetDefaultNamespace("");
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Scene
         REGISTER_MEMBERS_MANUAL_PART_Scene();

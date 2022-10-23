@@ -77,7 +77,7 @@ bool Node::Load(Deserializer& source)
     SceneResolver resolver;
 
     // Read own ID. Will not be applied, only stored for resolving possible references
-    unsigned nodeID = source.ReadU32();
+    NodeId nodeID = source.ReadU32();
     resolver.AddNode(nodeID, this);
 
     // Read attributes, components and child nodes
@@ -135,7 +135,7 @@ bool Node::LoadXML(const XMLElement& source)
     SceneResolver resolver;
 
     // Read own ID. Will not be applied, only stored for resolving possible references
-    unsigned nodeID = source.GetUInt("id");
+    NodeId nodeID = source.GetUInt("id");
     resolver.AddNode(nodeID, this);
 
     // Read attributes, components and child nodes
@@ -154,7 +154,7 @@ bool Node::LoadJSON(const JSONValue& source)
     SceneResolver resolver;
 
     // Read own ID. Will not be applied, only stored for resolving possible references
-    unsigned nodeID = source.Get("id").GetUInt();
+    NodeId nodeID = source.Get("id").GetUInt();
     resolver.AddNode(nodeID, this);
 
     // Read attributes, components and child nodes
@@ -762,14 +762,14 @@ void Node::MarkDirty()
     }
 }
 
-Node* Node::CreateChild(const String& name, CreateMode mode, unsigned id, bool temporary)
+Node* Node::CreateChild(const String& name, CreateMode mode, NodeId id, bool temporary)
 {
     Node* newNode = CreateChild(id, mode, temporary);
     newNode->SetName(name);
     return newNode;
 }
 
-Node* Node::CreateTemporaryChild(const String& name, CreateMode mode, unsigned id)
+Node* Node::CreateTemporaryChild(const String& name, CreateMode mode, NodeId id)
 {
     return CreateChild(name, mode, id, true);
 }
@@ -886,7 +886,7 @@ void Node::RemoveChildren(bool removeReplicated, bool removeLocal, bool recursiv
         MarkReplicationDirty();
 }
 
-Component* Node::CreateComponent(StringHash type, CreateMode mode, unsigned id)
+Component* Node::CreateComponent(StringHash type, CreateMode mode, ComponentId id)
 {
     // Do not attempt to create replicated components to local nodes, as that may lead to component ID overwrite
     // as replicated components are synced over
@@ -905,7 +905,7 @@ Component* Node::CreateComponent(StringHash type, CreateMode mode, unsigned id)
     return newComponent;
 }
 
-Component* Node::GetOrCreateComponent(StringHash type, CreateMode mode, unsigned id)
+Component* Node::GetOrCreateComponent(StringHash type, CreateMode mode, ComponentId id)
 {
     Component* oldComponent = GetComponent(type);
     if (oldComponent)
@@ -914,7 +914,7 @@ Component* Node::GetOrCreateComponent(StringHash type, CreateMode mode, unsigned
         return CreateComponent(type, mode, id);
 }
 
-Component* Node::CloneComponent(Component* component, unsigned id)
+Component* Node::CloneComponent(Component* component, ComponentId id)
 {
     if (!component)
     {
@@ -925,7 +925,7 @@ Component* Node::CloneComponent(Component* component, unsigned id)
     return CloneComponent(component, component->IsReplicated() ? REPLICATED : LOCAL, id);
 }
 
-Component* Node::CloneComponent(Component* component, CreateMode mode, unsigned id)
+Component* Node::CloneComponent(Component* component, CreateMode mode, ComponentId id)
 {
     if (!component)
     {
@@ -1421,7 +1421,7 @@ Component* Node::GetParentComponent(StringHash type, bool fullTraversal) const
     return nullptr;
 }
 
-void Node::SetID(unsigned id)
+void Node::SetID(NodeId id)
 {
     id_ = id;
 }
@@ -1471,7 +1471,7 @@ void Node::SetNetParentAttr(const Vector<byte>& value)
         return;
     }
 
-    unsigned baseNodeID = buf.ReadNetID();
+    NodeId baseNodeID = buf.ReadNetID();
     Node* baseNode = scene->GetNode(baseNodeID);
     if (!baseNode)
     {
@@ -1513,7 +1513,7 @@ const Vector<byte>& Node::GetNetParentAttr() const
     if (scene && parent_ && parent_ != scene)
     {
         // If parent is replicated, can write the ID directly
-        unsigned parentID = parent_->GetID();
+        NodeId parentID = parent_->GetID();
         if (Scene::IsReplicatedID(parentID))
             impl_->attrBuffer_.WriteNetID(parentID);
         else
@@ -1548,7 +1548,7 @@ bool Node::Load(Deserializer& source, SceneResolver& resolver, bool loadChildren
     {
         VectorBuffer compBuffer(source, source.ReadVLE());
         StringHash compType = compBuffer.ReadStringHash();
-        unsigned compID = compBuffer.ReadU32();
+        ComponentId compID = compBuffer.ReadU32();
 
         Component* newComponent = SafeCreateComponent(String::EMPTY, compType,
             (mode == REPLICATED && Scene::IsReplicatedID(compID)) ? REPLICATED : LOCAL, rewriteIDs ? 0 : compID);
@@ -1566,7 +1566,7 @@ bool Node::Load(Deserializer& source, SceneResolver& resolver, bool loadChildren
     i32 numChildren = source.ReadVLE();
     for (i32 i = 0; i < numChildren; ++i)
     {
-        unsigned nodeID = source.ReadU32();
+        NodeId nodeID = source.ReadU32();
         Node* newNode = CreateChild(rewriteIDs ? 0 : nodeID, (mode == REPLICATED && Scene::IsReplicatedID(nodeID)) ? REPLICATED :
             LOCAL);
         resolver.AddNode(nodeID, newNode);
@@ -1590,7 +1590,7 @@ bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool loadC
     while (compElem)
     {
         String typeName = compElem.GetAttribute("type");
-        unsigned compID = compElem.GetUInt("id");
+        ComponentId compID = compElem.GetUInt("id");
         Component* newComponent = SafeCreateComponent(typeName, StringHash(typeName),
             (mode == REPLICATED && Scene::IsReplicatedID(compID)) ? REPLICATED : LOCAL, rewriteIDs ? 0 : compID);
         if (newComponent)
@@ -1609,7 +1609,7 @@ bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool loadC
     XMLElement childElem = source.GetChild("node");
     while (childElem)
     {
-        unsigned nodeID = childElem.GetUInt("id");
+        NodeId nodeID = childElem.GetUInt("id");
         Node* newNode = CreateChild(rewriteIDs ? 0 : nodeID, (mode == REPLICATED && Scene::IsReplicatedID(nodeID)) ? REPLICATED :
             LOCAL);
         resolver.AddNode(nodeID, newNode);
@@ -1637,7 +1637,7 @@ bool Node::LoadJSON(const JSONValue& source, SceneResolver& resolver, bool loadC
     {
         const JSONValue& compVal = componentsArray.At(i);
         String typeName = compVal.Get("type").GetString();
-        unsigned compID = compVal.Get("id").GetUInt();
+        ComponentId compID = compVal.Get("id").GetUInt();
         Component* newComponent = SafeCreateComponent(typeName, StringHash(typeName),
             (mode == REPLICATED && Scene::IsReplicatedID(compID)) ? REPLICATED : LOCAL, rewriteIDs ? 0 : compID);
         if (newComponent)
@@ -1656,7 +1656,7 @@ bool Node::LoadJSON(const JSONValue& source, SceneResolver& resolver, bool loadC
     {
         const JSONValue& childVal = childrenArray.At(i);
 
-        unsigned nodeID = childVal.Get("id").GetUInt();
+        NodeId nodeID = childVal.Get("id").GetUInt();
         Node* newNode = CreateChild(rewriteIDs ? 0 : nodeID, (mode == REPLICATED && Scene::IsReplicatedID(nodeID)) ? REPLICATED :
             LOCAL);
         resolver.AddNode(nodeID, newNode);
@@ -1787,7 +1787,7 @@ void Node::MarkReplicationDirty()
     }
 }
 
-Node* Node::CreateChild(unsigned id, CreateMode mode, bool temporary)
+Node* Node::CreateChild(NodeId id, CreateMode mode, bool temporary)
 {
     SharedPtr<Node> newNode(new Node(context_));
     newNode->SetTemporary(temporary);
@@ -1806,7 +1806,7 @@ Node* Node::CreateChild(unsigned id, CreateMode mode, bool temporary)
     return newNode;
 }
 
-void Node::AddComponent(Component* component, unsigned id, CreateMode mode)
+void Node::AddComponent(Component* component, ComponentId id, CreateMode mode)
 {
     if (!component)
         return;
@@ -2044,7 +2044,7 @@ void Node::SetEnabled(bool enable, bool recursive, bool storeSelf)
     }
 }
 
-Component* Node::SafeCreateComponent(const String& typeName, StringHash type, CreateMode mode, unsigned id)
+Component* Node::SafeCreateComponent(const String& typeName, StringHash type, CreateMode mode, ComponentId id)
 {
     // Do not attempt to create replicated components to local nodes, as that may lead to component ID overwrite
     // as replicated components are synced over

@@ -228,7 +228,7 @@ void Component::OnNodeSetEnabled(Node* node)
 {
 }
 
-void Component::SetID(unsigned id)
+void Component::SetID(ComponentId id)
 {
     id_ = id;
 }

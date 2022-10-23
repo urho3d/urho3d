@@ -37,6 +37,9 @@ enum TransformSpace
     TS_WORLD
 };
 
+using ComponentId = id32;
+using NodeId = id32;
+
 /// Internal implementation structure for less performance-critical Node variables.
 struct URHO3D_API NodeImpl
 {
@@ -287,9 +290,9 @@ public:
     /// Mark node and child nodes to need world transform recalculation. Notify listener components.
     void MarkDirty();
     /// Create a child scene node (with specified ID if provided).
-    Node* CreateChild(const String& name = String::EMPTY, CreateMode mode = REPLICATED, unsigned id = 0, bool temporary = false);
+    Node* CreateChild(const String& name = String::EMPTY, CreateMode mode = REPLICATED, NodeId id = 0, bool temporary = false);
     /// Create a temporary child scene node (with specified ID if provided).
-    Node* CreateTemporaryChild(const String& name = String::EMPTY, CreateMode mode = REPLICATED, unsigned id = 0);
+    Node* CreateTemporaryChild(const String& name = String::EMPTY, CreateMode mode = REPLICATED, NodeId id = 0);
 
     /// Add a child scene node at a specific index. If index is not explicitly specified or is ENDPOS, append the new child at the end.
     void AddChild(Node* node, i32 index = ENDPOS);
@@ -301,13 +304,13 @@ public:
     /// Remove child scene nodes that match criteria.
     void RemoveChildren(bool removeReplicated, bool removeLocal, bool recursive);
     /// Create a component to this node (with specified ID if provided).
-    Component* CreateComponent(StringHash type, CreateMode mode = REPLICATED, unsigned id = 0);
+    Component* CreateComponent(StringHash type, CreateMode mode = REPLICATED, ComponentId id = 0);
     /// Create a component to this node if it does not exist already.
-    Component* GetOrCreateComponent(StringHash type, CreateMode mode = REPLICATED, unsigned id = 0);
+    Component* GetOrCreateComponent(StringHash type, CreateMode mode = REPLICATED, ComponentId id = 0);
     /// Clone a component from another node using its create mode. Return the clone if successful or null on failure.
-    Component* CloneComponent(Component* component, unsigned id = 0);
+    Component* CloneComponent(Component* component, ComponentId id = 0);
     /// Clone a component from another node and specify the create mode. Return the clone if successful or null on failure.
-    Component* CloneComponent(Component* component, CreateMode mode, unsigned id = 0);
+    Component* CloneComponent(Component* component, CreateMode mode, ComponentId id = 0);
     /// Remove a component from this node.
     void RemoveComponent(Component* component);
     /// Remove the first component of specific type from this node.
@@ -336,9 +339,9 @@ public:
     /// Remove listener component.
     void RemoveListener(Component* component);
     /// Template version of creating a component.
-    template <class T> T* CreateComponent(CreateMode mode = REPLICATED, unsigned id = 0);
+    template <class T> T* CreateComponent(CreateMode mode = REPLICATED, ComponentId id = 0);
     /// Template version of getting or creating a component.
-    template <class T> T* GetOrCreateComponent(CreateMode mode = REPLICATED, unsigned id = 0);
+    template <class T> T* GetOrCreateComponent(CreateMode mode = REPLICATED, ComponentId id = 0);
     /// Template version of removing a component.
     template <class T> void RemoveComponent();
     /// Template version of removing all components of specific type.
@@ -346,7 +349,7 @@ public:
 
     /// Return ID.
     /// @property{get_id}
-    unsigned GetID() const { return id_; }
+    NodeId GetID() const { return id_; }
     /// Return whether the node is replicated or local to a scene.
     /// @property
     bool IsReplicated() const;
@@ -616,7 +619,7 @@ public:
 
     /// Set ID. Called by Scene.
     /// @property{set_id}
-    void SetID(unsigned id);
+    void SetID(NodeId id);
     /// Set scene. Called by Scene.
     void SetScene(Scene* scene);
     /// Reset scene, ID and owner. Called by Scene.
@@ -653,9 +656,9 @@ public:
     /// Mark node dirty in scene replication states.
     void MarkReplicationDirty();
     /// Create a child node with specific ID.
-    Node* CreateChild(unsigned id, CreateMode mode, bool temporary = false);
+    Node* CreateChild(NodeId id, CreateMode mode, bool temporary = false);
     /// Add a pre-created component. Using this function from application code is discouraged, as component operation without an owner node may not be well-defined in all cases. Prefer CreateComponent() instead.
-    void AddComponent(Component* component, unsigned id, CreateMode mode);
+    void AddComponent(Component* component, ComponentId id, CreateMode mode);
 
     /// Calculate number of non-temporary child nodes.
     i32 GetNumPersistentChildren() const;
@@ -687,7 +690,7 @@ private:
     /// Set enabled/disabled state with optional recursion. Optionally affect the remembered enable state.
     void SetEnabled(bool enable, bool recursive, bool storeSelf);
     /// Create component, allowing UnknownComponent if actual type is not supported. Leave typeName empty if not known.
-    Component* SafeCreateComponent(const String& typeName, StringHash type, CreateMode mode, unsigned id);
+    Component* SafeCreateComponent(const String& typeName, StringHash type, CreateMode mode, ComponentId id);
     /// Recalculate the world transform.
     void UpdateWorldTransform() const;
     /// Remove child node by iterator.
@@ -726,7 +729,7 @@ private:
     /// Scene (root node).
     Scene* scene_;
     /// Unique ID within the scene.
-    unsigned id_;
+    NodeId id_;
     /// Position.
     Vector3 position_;
     /// Rotation.
@@ -750,12 +753,12 @@ protected:
     VariantMap vars_;
 };
 
-template <class T> T* Node::CreateComponent(CreateMode mode, unsigned id)
+template <class T> T* Node::CreateComponent(CreateMode mode, ComponentId id)
 {
     return static_cast<T*>(CreateComponent(T::GetTypeStatic(), mode, id));
 }
 
-template <class T> T* Node::GetOrCreateComponent(CreateMode mode, unsigned id)
+template <class T> T* Node::GetOrCreateComponent(CreateMode mode, ComponentId id)
 {
     return static_cast<T*>(GetOrCreateComponent(T::GetTypeStatic(), mode, id));
 }

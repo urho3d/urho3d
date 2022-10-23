@@ -24,6 +24,8 @@ enum AutoRemoveMode
     REMOVE_NODE
 };
 
+using ComponentId = id32;
+
 /// Base class for components. Components can be created to scene nodes.
 /// @templateversion
 class URHO3D_API Component : public Animatable
@@ -63,7 +65,7 @@ public:
 
     /// Return ID.
     /// @property{get_id}
-    unsigned GetID() const { return id_; }
+    ComponentId GetID() const { return id_; }
     /// Return whether the component is replicated or local to a scene.
     /// @property
     bool IsReplicated() const;
@@ -114,7 +116,7 @@ protected:
     virtual void OnNodeSetEnabled(Node* node);
     /// Set ID. Called by Scene.
     /// @property{set_id}
-    void SetID(unsigned id);
+    void SetID(ComponentId id);
     /// Set scene node. Called by Node when creating the component.
     void SetNode(Node* node);
     /// Handle scene attribute animation update event.
@@ -127,7 +129,7 @@ protected:
     /// Scene node.
     Node* node_;
     /// Unique ID within the scene.
-    unsigned id_;
+    ComponentId id_;
     /// Network update queued flag.
     bool networkUpdate_;
     /// Enabled flag.
