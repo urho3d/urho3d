@@ -230,7 +230,7 @@ void HandleSceneDrawableUpdateFinished(StringHash eventType, VariantMap& eventDa
         float footOffset = leftFoot_.worldPosition.y - jackNode_.worldPosition.y;
         leftEffector_.targetPosition = result.position + result.normal * footOffset;
         // Rotate foot according to normal
-        leftFoot_.Rotate(Quaternion(Vector3(0, 1, 0), result.normal), TS_WORLD);
+        leftFoot_.Rotate(Quaternion(Vector3(0, 1, 0), result.normal), TransformSpace::World);
     }
 
     // Same deal with the right foot
@@ -240,7 +240,7 @@ void HandleSceneDrawableUpdateFinished(StringHash eventType, VariantMap& eventDa
         result = scene_.physicsWorld.RaycastSingle(Ray(rightFootPosition + result.normal, -result.normal), 2);
         float footOffset = rightFoot_.worldPosition.y - jackNode_.worldPosition.y;
         rightEffector_.targetPosition = result.position + result.normal * footOffset;
-        rightFoot_.Rotate(Quaternion(Vector3(0, 1, 0), result.normal), TS_WORLD);
+        rightFoot_.Rotate(Quaternion(Vector3(0, 1, 0), result.normal), TransformSpace::World);
     }
 
     solver_.Solve();

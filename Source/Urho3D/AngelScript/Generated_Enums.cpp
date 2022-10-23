@@ -604,6 +604,11 @@ static const unsigned SmoothingType_SMOOTH_NONE = SMOOTH_NONE;
 static const unsigned SmoothingType_SMOOTH_POSITION = SMOOTH_POSITION;
 static const unsigned SmoothingType_SMOOTH_ROTATION = SMOOTH_ROTATION;
 
+// enum class TransformSpace | File: ../Scene/Node.h
+static const int TransformSpace_Local = static_cast<int>(TransformSpace::Local);
+static const int TransformSpace_Parent = static_cast<int>(TransformSpace::Parent);
+static const int TransformSpace_World = static_cast<int>(TransformSpace::World);
+
 // enum VertexMask : u32 | File: ../GraphicsAPI/GraphicsDefs.h
 static const u32 VertexMask_MASK_NONE = MASK_NONE;
 static const u32 VertexMask_MASK_POSITION = MASK_POSITION;
@@ -1801,11 +1806,13 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     engine->RegisterEnumValue("TrailType", "TT_FACE_CAMERA", TT_FACE_CAMERA);
     engine->RegisterEnumValue("TrailType", "TT_BONE", TT_BONE);
 
-    // enum TransformSpace | File: ../Scene/Node.h
-    engine->RegisterEnum("TransformSpace");
-    engine->RegisterEnumValue("TransformSpace", "TS_LOCAL", TS_LOCAL);
-    engine->RegisterEnumValue("TransformSpace", "TS_PARENT", TS_PARENT);
-    engine->RegisterEnumValue("TransformSpace", "TS_WORLD", TS_WORLD);
+    // enum class TransformSpace | File: ../Scene/Node.h
+    engine->RegisterTypedef("TransformSpace", "int");
+    engine->SetDefaultNamespace("TransformSpace");
+    engine->RegisterGlobalProperty("const int Local", (void*)&TransformSpace_Local);
+    engine->RegisterGlobalProperty("const int Parent", (void*)&TransformSpace_Parent);
+    engine->RegisterGlobalProperty("const int World", (void*)&TransformSpace_World);
+    engine->SetDefaultNamespace("");
 
     // enum TraversalMode | File: ../UI/UIElement.h
     engine->RegisterEnum("TraversalMode");

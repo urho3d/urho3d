@@ -30,11 +30,11 @@ enum CreateMode
 };
 
 /// Transform space for translations and rotations.
-enum TransformSpace
+enum class TransformSpace
 {
-    TS_LOCAL = 0,
-    TS_PARENT,
-    TS_WORLD
+    Local = 0,
+    Parent,
+    World
 };
 
 using ComponentId = id32;
@@ -239,34 +239,34 @@ public:
     }
 
     /// Move the scene node in the chosen transform space.
-    void Translate(const Vector3& delta, TransformSpace space = TS_LOCAL);
+    void Translate(const Vector3& delta, TransformSpace space = TransformSpace::Local);
 
     /// Move the scene node in the chosen transform space (for Urho2D).
-    void Translate2D(const Vector2& delta, TransformSpace space = TS_LOCAL) { Translate(Vector3(delta), space); }
+    void Translate2D(const Vector2& delta, TransformSpace space = TransformSpace::Local) { Translate(Vector3(delta), space); }
 
     /// Rotate the scene node in the chosen transform space.
-    void Rotate(const Quaternion& delta, TransformSpace space = TS_LOCAL);
+    void Rotate(const Quaternion& delta, TransformSpace space = TransformSpace::Local);
 
     /// Rotate the scene node in the chosen transform space (for Urho2D).
-    void Rotate2D(float delta, TransformSpace space = TS_LOCAL) { Rotate(Quaternion(delta), space); }
+    void Rotate2D(float delta, TransformSpace space = TransformSpace::Local) { Rotate(Quaternion(delta), space); }
 
     /// Rotate around a point in the chosen transform space.
-    void RotateAround(const Vector3& point, const Quaternion& delta, TransformSpace space = TS_LOCAL);
+    void RotateAround(const Vector3& point, const Quaternion& delta, TransformSpace space = TransformSpace::Local);
 
     /// Rotate around a point in the chosen transform space (for Urho2D).
-    void RotateAround2D(const Vector2& point, float delta, TransformSpace space = TS_LOCAL)
+    void RotateAround2D(const Vector2& point, float delta, TransformSpace space = TransformSpace::Local)
     {
         RotateAround(Vector3(point), Quaternion(delta), space);
     }
 
     /// Rotate around the X axis.
-    void Pitch(float angle, TransformSpace space = TS_LOCAL);
+    void Pitch(float angle, TransformSpace space = TransformSpace::Local);
     /// Rotate around the Y axis.
-    void Yaw(float angle, TransformSpace space = TS_LOCAL);
+    void Yaw(float angle, TransformSpace space = TransformSpace::Local);
     /// Rotate around the Z axis.
-    void Roll(float angle, TransformSpace space = TS_LOCAL);
+    void Roll(float angle, TransformSpace space = TransformSpace::Local);
     /// Look at a target position in the chosen transform space. Note that the up vector is always specified in world space. Return true if successful, or false if resulted in an illegal rotation, in which case the current rotation remains.
-    bool LookAt(const Vector3& target, const Vector3& up = Vector3::UP, TransformSpace space = TS_WORLD);
+    bool LookAt(const Vector3& target, const Vector3& up = Vector3::UP, TransformSpace space = TransformSpace::World);
     /// Modify scale in parent space uniformly.
     void Scale(float scale);
     /// Modify scale in parent space.
