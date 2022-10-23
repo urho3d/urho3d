@@ -18,10 +18,10 @@ namespace Urho3D
 class File;
 class PackageFile;
 
-static const unsigned FIRST_REPLICATED_ID = 0x1;
-static const unsigned LAST_REPLICATED_ID = 0xffffff;
-static const unsigned FIRST_LOCAL_ID = 0x01000000;
-static const unsigned LAST_LOCAL_ID = 0xffffffff;
+inline constexpr id32 FIRST_REPLICATED_ID = 0x1;
+inline constexpr id32 LAST_REPLICATED_ID = 0xffffff;
+inline constexpr id32 FIRST_LOCAL_ID = 0x01000000;
+inline constexpr id32 LAST_LOCAL_ID = 0xffffffff;
 
 /// Asynchronous scene loading mode.
 enum LoadMode
@@ -159,9 +159,9 @@ public:
     void UnregisterAllVars();
 
     /// Return node from the whole scene by ID, or null if not found.
-    Node* GetNode(unsigned id) const;
+    Node* GetNode(NodeId id) const;
     /// Return component from the whole scene by ID, or null if not found.
-    Component* GetComponent(unsigned id) const;
+    Component* GetComponent(ComponentId id) const;
     /// Get nodes with specific tag from the whole scene, return false if empty.
     bool GetNodesWithTag(Vector<Node*>& dest, const String& tag)  const;
 
@@ -229,11 +229,11 @@ public:
     bool IsThreadedUpdate() const { return threadedUpdate_; }
 
     /// Get free node ID, either non-local or local.
-    unsigned GetFreeNodeID(CreateMode mode);
+    NodeId GetFreeNodeID(CreateMode mode);
     /// Get free component ID, either non-local or local.
-    unsigned GetFreeComponentID(CreateMode mode);
+    ComponentId GetFreeComponentID(CreateMode mode);
     /// Return whether the specified id is a replicated id.
-    static bool IsReplicatedID(unsigned id) { return id < FIRST_LOCAL_ID; }
+    static bool IsReplicatedID(id32 id) { return id < FIRST_LOCAL_ID; }
 
     /// Cache node by tag if tag not zero, no checking if already added. Used internaly in Node::AddTag.
     void NodeTagAdded(Node* node, const String& tag);
@@ -285,13 +285,13 @@ private:
     void PreloadResourcesJSON(const JSONValue& value);
 
     /// Replicated scene nodes by ID.
-    HashMap<unsigned, Node*> replicatedNodes_;
+    HashMap<NodeId, Node*> replicatedNodes_;
     /// Local scene nodes by ID.
-    HashMap<unsigned, Node*> localNodes_;
+    HashMap<NodeId, Node*> localNodes_;
     /// Replicated components by ID.
-    HashMap<unsigned, Component*> replicatedComponents_;
+    HashMap<ComponentId, Component*> replicatedComponents_;
     /// Local components by ID.
-    HashMap<unsigned, Component*> localComponents_;
+    HashMap<ComponentId, Component*> localComponents_;
     /// Cached tagged nodes by tag.
     HashMap<StringHash, Vector<Node*>> taggedNodes_;
     /// Asynchronous loading progress.
@@ -305,9 +305,9 @@ private:
     /// Registered node user variable reverse mappings.
     HashMap<StringHash, String> varNames_;
     /// Nodes to check for attribute changes on the next network update.
-    HashSet<unsigned> networkUpdateNodes_;
+    HashSet<NodeId> networkUpdateNodes_;
     /// Components to check for attribute changes on the next network update.
-    HashSet<unsigned> networkUpdateComponents_;
+    HashSet<ComponentId> networkUpdateComponents_;
     /// Delayed dirty notification queue for components.
     Vector<Component*> delayedDirtyComponents_;
     /// Mutex for the delayed dirty notification queue.
@@ -315,13 +315,13 @@ private:
     /// Preallocated event data map for smoothing update events.
     VariantMap smoothingData_;
     /// Next free non-local node ID.
-    unsigned replicatedNodeID_;
+    NodeId replicatedNodeID_;
     /// Next free non-local component ID.
-    unsigned replicatedComponentID_;
+    ComponentId replicatedComponentID_;
     /// Next free local node ID.
-    unsigned localNodeID_;
+    NodeId localNodeID_;
     /// Next free local component ID.
-    unsigned localComponentID_;
+    ComponentId localComponentID_;
     /// Scene source file checksum.
     mutable hash32 checksum_;
     /// Maximum milliseconds per frame to spend on async scene loading.

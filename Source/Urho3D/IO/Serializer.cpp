@@ -377,7 +377,7 @@ bool Serializer::WriteVLE(unsigned value)
     }
 }
 
-bool Serializer::WriteNetID(unsigned value)
+bool Serializer::WriteNetID(id32 value)
 {
     return Write(&value, 3) == 3;
 }

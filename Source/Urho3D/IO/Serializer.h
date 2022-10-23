@@ -113,7 +113,7 @@ public:
     /// Write a variable-length encoded unsigned integer, which can use 29 bits maximum.
     bool WriteVLE(unsigned value);
     /// Write a 24-bit network object ID.
-    bool WriteNetID(unsigned value);
+    bool WriteNetID(id32 value);
     /// Write a text line. Char codes 13 & 10 will be automatically appended.
     bool WriteLine(const String& value);
 };

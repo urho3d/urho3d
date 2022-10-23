@@ -214,11 +214,11 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // static const String EP_WORKER_THREADS | File: ../Engine/EngineDefs.h
     engine->RegisterGlobalProperty("const String EP_WORKER_THREADS", (void*)&EP_WORKER_THREADS);
 
-    // static const unsigned FIRST_LOCAL_ID | File: ../Scene/Scene.h
-    engine->RegisterGlobalProperty("const uint FIRST_LOCAL_ID", (void*)&FIRST_LOCAL_ID);
+    // constexpr id32 FIRST_LOCAL_ID | File: ../Scene/Scene.h
+    engine->RegisterGlobalProperty("const id32 FIRST_LOCAL_ID", (void*)&FIRST_LOCAL_ID);
 
-    // static const unsigned FIRST_REPLICATED_ID | File: ../Scene/Scene.h
-    engine->RegisterGlobalProperty("const uint FIRST_REPLICATED_ID", (void*)&FIRST_REPLICATED_ID);
+    // constexpr id32 FIRST_REPLICATED_ID | File: ../Scene/Scene.h
+    engine->RegisterGlobalProperty("const id32 FIRST_REPLICATED_ID", (void*)&FIRST_REPLICATED_ID);
 
     // static const int FONT_DPI | File: ../UI/Font.h
     engine->RegisterGlobalProperty("const int FONT_DPI", (void*)&FONT_DPI);
@@ -229,11 +229,11 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // static const int INSTANCING_BUFFER_DEFAULT_SIZE | File: ../Graphics/Renderer.h
     engine->RegisterGlobalProperty("const int INSTANCING_BUFFER_DEFAULT_SIZE", (void*)&INSTANCING_BUFFER_DEFAULT_SIZE);
 
-    // static const unsigned LAST_LOCAL_ID | File: ../Scene/Scene.h
-    engine->RegisterGlobalProperty("const uint LAST_LOCAL_ID", (void*)&LAST_LOCAL_ID);
+    // constexpr id32 LAST_LOCAL_ID | File: ../Scene/Scene.h
+    engine->RegisterGlobalProperty("const id32 LAST_LOCAL_ID", (void*)&LAST_LOCAL_ID);
 
-    // static const unsigned LAST_REPLICATED_ID | File: ../Scene/Scene.h
-    engine->RegisterGlobalProperty("const uint LAST_REPLICATED_ID", (void*)&LAST_REPLICATED_ID);
+    // constexpr id32 LAST_REPLICATED_ID | File: ../Scene/Scene.h
+    engine->RegisterGlobalProperty("const id32 LAST_REPLICATED_ID", (void*)&LAST_REPLICATED_ID);
 
     // const VertexElement LEGACY_VERTEXELEMENTS[] | File: ../GraphicsAPI/GraphicsDefs.h
     // Not registered because array

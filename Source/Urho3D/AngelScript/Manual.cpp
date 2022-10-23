@@ -94,6 +94,9 @@ void ASRegisterManualFirst(asIScriptEngine* engine)
     engine->RegisterTypedef("hash16", "uint16");
     engine->RegisterTypedef("hash32", "uint");
     engine->RegisterTypedef("hash64", "uint64");
+    engine->RegisterTypedef("id32", "uint");
+    engine->RegisterTypedef("NodeId", "uint");
+    engine->RegisterTypedef("ComponentId", "uint");
 
     ASRegisterManualFirst_Addons(engine);
     ASRegisterManualFirst_Graphics(engine);

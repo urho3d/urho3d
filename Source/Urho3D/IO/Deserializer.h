@@ -129,7 +129,7 @@ public:
     /// Read a variable-length encoded unsigned integer, which can use 29 bits maximum.
     unsigned ReadVLE();
     /// Read a 24-bit network object ID.
-    unsigned ReadNetID();
+    id32 ReadNetID();
     /// Read a text line.
     String ReadLine();
 
