@@ -149,11 +149,11 @@ Geometry* StaticModel::GetLodGeometry(i32 batchIndex, i32 level)
         return batches_[batchIndex].geometry_;
 }
 
-unsigned StaticModel::GetNumOccluderTriangles()
+i32 StaticModel::GetNumOccluderTriangles()
 {
-    unsigned triangles = 0;
+    i32 triangles = 0;
 
-    for (unsigned i = 0; i < batches_.Size(); ++i)
+    for (i32 i = 0; i < batches_.Size(); ++i)
     {
         Geometry* geometry = GetLodGeometry(i, occlusionLodLevel_);
         if (!geometry)

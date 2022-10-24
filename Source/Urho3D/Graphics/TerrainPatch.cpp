@@ -151,7 +151,7 @@ Geometry* TerrainPatch::GetLodGeometry(i32 batchIndex, i32 level)
         return geometry_;
 }
 
-unsigned TerrainPatch::GetNumOccluderTriangles()
+i32 TerrainPatch::GetNumOccluderTriangles()
 {
     // Check that the material is suitable for occlusion (default material always is)
     Material* mat = batches_[0].material_;
