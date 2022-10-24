@@ -17915,8 +17915,8 @@ template <class T> void RegisterMembers_Drawable(asIScriptEngine* engine, const 
     // float Drawable::GetMinZ() const
     engine->RegisterObjectMethod(className, "float GetMinZ() const", AS_METHODPR(T, GetMinZ, () const, float), AS_CALL_THISCALL);
 
-    // virtual unsigned Drawable::GetNumOccluderTriangles()
-    engine->RegisterObjectMethod(className, "uint GetNumOccluderTriangles()", AS_METHODPR(T, GetNumOccluderTriangles, (), unsigned), AS_CALL_THISCALL);
+    // virtual i32 Drawable::GetNumOccluderTriangles()
+    engine->RegisterObjectMethod(className, "int GetNumOccluderTriangles()", AS_METHODPR(T, GetNumOccluderTriangles, (), i32), AS_CALL_THISCALL);
 
     // float Drawable::GetShadowDistance() const
     engine->RegisterObjectMethod(className, "float GetShadowDistance() const", AS_METHODPR(T, GetShadowDistance, () const, float), AS_CALL_THISCALL);

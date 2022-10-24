@@ -180,14 +180,14 @@ void StaticModelGroup::UpdateBatches(const FrameInfo& frame)
     }
 }
 
-unsigned StaticModelGroup::GetNumOccluderTriangles()
+i32 StaticModelGroup::GetNumOccluderTriangles()
 {
     // Make sure instance transforms are up-to-date
     GetWorldBoundingBox();
 
-    unsigned triangles = 0;
+    i32 triangles = 0;
 
-    for (unsigned i = 0; i < batches_.Size(); ++i)
+    for (i32 i = 0; i < batches_.Size(); ++i)
     {
         Geometry* geometry = GetLodGeometry(i, occlusionLodLevel_);
         if (!geometry)

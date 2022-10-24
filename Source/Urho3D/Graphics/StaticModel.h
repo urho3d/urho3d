@@ -40,7 +40,7 @@ public:
     /// Return the geometry for a specific LOD level.
     Geometry* GetLodGeometry(i32 batchIndex, i32 level) override;
     /// Return number of occlusion geometry triangles.
-    unsigned GetNumOccluderTriangles() override;
+    i32 GetNumOccluderTriangles() override;
     /// Draw to occlusion buffer. Return true if did not run out of triangles.
     bool DrawOcclusion(OcclusionBuffer* buffer) override;
 

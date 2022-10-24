@@ -124,11 +124,11 @@ Geometry* CustomGeometry::GetLodGeometry(i32 batchIndex, i32 level)
     return batchIndex < geometries_.Size() ? geometries_[batchIndex] : nullptr;
 }
 
-unsigned CustomGeometry::GetNumOccluderTriangles()
+i32 CustomGeometry::GetNumOccluderTriangles()
 {
-    unsigned triangles = 0;
+    i32 triangles = 0;
 
-    for (unsigned i = 0; i < batches_.Size(); ++i)
+    for (i32 i = 0; i < batches_.Size(); ++i)
     {
         Geometry* geometry = GetLodGeometry(i, 0);
         if (!geometry)

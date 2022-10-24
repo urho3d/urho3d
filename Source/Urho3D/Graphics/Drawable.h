@@ -128,7 +128,7 @@ public:
     virtual Geometry* GetLodGeometry(i32 batchIndex, i32 level);
 
     /// Return number of occlusion geometry triangles.
-    virtual unsigned GetNumOccluderTriangles() { return 0; }
+    virtual i32 GetNumOccluderTriangles() { return 0; }
 
     /// Draw to occlusion buffer. Return true if did not run out of triangles.
     virtual bool DrawOcclusion(OcclusionBuffer* buffer);
