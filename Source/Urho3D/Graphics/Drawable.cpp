@@ -167,25 +167,25 @@ void Drawable::SetLodBias(float bias)
     MarkNetworkUpdate();
 }
 
-void Drawable::SetViewMask(unsigned mask)
+void Drawable::SetViewMask(mask32 mask)
 {
     viewMask_ = mask;
     MarkNetworkUpdate();
 }
 
-void Drawable::SetLightMask(unsigned mask)
+void Drawable::SetLightMask(mask32 mask)
 {
     lightMask_ = mask;
     MarkNetworkUpdate();
 }
 
-void Drawable::SetShadowMask(unsigned mask)
+void Drawable::SetShadowMask(mask32 mask)
 {
     shadowMask_ = mask;
     MarkNetworkUpdate();
 }
 
-void Drawable::SetZoneMask(unsigned mask)
+void Drawable::SetZoneMask(mask32 mask)
 {
     zoneMask_ = mask;
     // Mark dirty to reset cached zone

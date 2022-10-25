@@ -4681,8 +4681,8 @@ template <class T> void RegisterMembers_SourceBatch(asIScriptEngine* engine, con
     // float SourceBatch::distance_
     engine->RegisterObjectProperty(className, "float distance", offsetof(T, distance_));
 
-    // unsigned SourceBatch::numWorldTransforms_
-    engine->RegisterObjectProperty(className, "uint numWorldTransforms", offsetof(T, numWorldTransforms_));
+    // i32 SourceBatch::numWorldTransforms_
+    engine->RegisterObjectProperty(className, "int numWorldTransforms", offsetof(T, numWorldTransforms_));
 
     // GeometryType SourceBatch::geometryType_
     engine->RegisterObjectProperty(className, "GeometryType geometryType", offsetof(T, geometryType_));
@@ -17888,9 +17888,9 @@ template <class T> void RegisterMembers_Drawable(asIScriptEngine* engine, const 
     // Light* Drawable::GetFirstLight() const
     engine->RegisterObjectMethod(className, "Light@+ GetFirstLight() const", AS_METHODPR(T, GetFirstLight, () const, Light*), AS_CALL_THISCALL);
 
-    // unsigned Drawable::GetLightMask() const
-    engine->RegisterObjectMethod(className, "uint GetLightMask() const", AS_METHODPR(T, GetLightMask, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_lightMask() const", AS_METHODPR(T, GetLightMask, () const, unsigned), AS_CALL_THISCALL);
+    // mask32 Drawable::GetLightMask() const
+    engine->RegisterObjectMethod(className, "mask32 GetLightMask() const", AS_METHODPR(T, GetLightMask, () const, mask32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "mask32 get_lightMask() const", AS_METHODPR(T, GetLightMask, () const, mask32), AS_CALL_THISCALL);
 
     // const Vector<Light*>& Drawable::GetLights() const
     engine->RegisterObjectMethod(className, "Array<Light@>@ GetLights() const", AS_FUNCTION_OBJFIRST(Drawable_constspVectorlesLightstargreamp_GetLights_void_template<Drawable>), AS_CALL_CDECL_OBJFIRST);
@@ -17922,9 +17922,9 @@ template <class T> void RegisterMembers_Drawable(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "float GetShadowDistance() const", AS_METHODPR(T, GetShadowDistance, () const, float), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_shadowDistance() const", AS_METHODPR(T, GetShadowDistance, () const, float), AS_CALL_THISCALL);
 
-    // unsigned Drawable::GetShadowMask() const
-    engine->RegisterObjectMethod(className, "uint GetShadowMask() const", AS_METHODPR(T, GetShadowMask, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_shadowMask() const", AS_METHODPR(T, GetShadowMask, () const, unsigned), AS_CALL_THISCALL);
+    // mask32 Drawable::GetShadowMask() const
+    engine->RegisterObjectMethod(className, "mask32 GetShadowMask() const", AS_METHODPR(T, GetShadowMask, () const, mask32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "mask32 get_shadowMask() const", AS_METHODPR(T, GetShadowMask, () const, mask32), AS_CALL_THISCALL);
 
     // float Drawable::GetSortValue() const
     engine->RegisterObjectMethod(className, "float GetSortValue() const", AS_METHODPR(T, GetSortValue, () const, float), AS_CALL_THISCALL);
@@ -17935,9 +17935,9 @@ template <class T> void RegisterMembers_Drawable(asIScriptEngine* engine, const 
     // const Vector<Light*>& Drawable::GetVertexLights() const
     engine->RegisterObjectMethod(className, "Array<Light@>@ GetVertexLights() const", AS_FUNCTION_OBJFIRST(Drawable_constspVectorlesLightstargreamp_GetVertexLights_void_template<Drawable>), AS_CALL_CDECL_OBJFIRST);
 
-    // unsigned Drawable::GetViewMask() const
-    engine->RegisterObjectMethod(className, "uint GetViewMask() const", AS_METHODPR(T, GetViewMask, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_viewMask() const", AS_METHODPR(T, GetViewMask, () const, unsigned), AS_CALL_THISCALL);
+    // mask32 Drawable::GetViewMask() const
+    engine->RegisterObjectMethod(className, "mask32 GetViewMask() const", AS_METHODPR(T, GetViewMask, () const, mask32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "mask32 get_viewMask() const", AS_METHODPR(T, GetViewMask, () const, mask32), AS_CALL_THISCALL);
 
     // const BoundingBox& Drawable::GetWorldBoundingBox()
     engine->RegisterObjectMethod(className, "const BoundingBox& GetWorldBoundingBox()", AS_METHODPR(T, GetWorldBoundingBox, (), const BoundingBox&), AS_CALL_THISCALL);
@@ -17947,9 +17947,9 @@ template <class T> void RegisterMembers_Drawable(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "Zone@+ GetZone() const", AS_METHODPR(T, GetZone, () const, Zone*), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "Zone@+ get_zone() const", AS_METHODPR(T, GetZone, () const, Zone*), AS_CALL_THISCALL);
 
-    // unsigned Drawable::GetZoneMask() const
-    engine->RegisterObjectMethod(className, "uint GetZoneMask() const", AS_METHODPR(T, GetZoneMask, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_zoneMask() const", AS_METHODPR(T, GetZoneMask, () const, unsigned), AS_CALL_THISCALL);
+    // mask32 Drawable::GetZoneMask() const
+    engine->RegisterObjectMethod(className, "mask32 GetZoneMask() const", AS_METHODPR(T, GetZoneMask, () const, mask32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "mask32 get_zoneMask() const", AS_METHODPR(T, GetZoneMask, () const, mask32), AS_CALL_THISCALL);
 
     // bool Drawable::HasBasePass(unsigned batchIndex) const
     engine->RegisterObjectMethod(className, "bool HasBasePass(uint) const", AS_METHODPR(T, HasBasePass, (unsigned) const, bool), AS_CALL_THISCALL);
@@ -18001,9 +18001,9 @@ template <class T> void RegisterMembers_Drawable(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "void SetDrawDistance(float)", AS_METHODPR(T, SetDrawDistance, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_drawDistance(float)", AS_METHODPR(T, SetDrawDistance, (float), void), AS_CALL_THISCALL);
 
-    // void Drawable::SetLightMask(unsigned mask)
-    engine->RegisterObjectMethod(className, "void SetLightMask(uint)", AS_METHODPR(T, SetLightMask, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_lightMask(uint)", AS_METHODPR(T, SetLightMask, (unsigned), void), AS_CALL_THISCALL);
+    // void Drawable::SetLightMask(mask32 mask)
+    engine->RegisterObjectMethod(className, "void SetLightMask(mask32)", AS_METHODPR(T, SetLightMask, (mask32), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_lightMask(mask32)", AS_METHODPR(T, SetLightMask, (mask32), void), AS_CALL_THISCALL);
 
     // void Drawable::SetLodBias(float bias)
     engine->RegisterObjectMethod(className, "void SetLodBias(float)", AS_METHODPR(T, SetLodBias, (float), void), AS_CALL_THISCALL);
@@ -18028,23 +18028,23 @@ template <class T> void RegisterMembers_Drawable(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "void SetShadowDistance(float)", AS_METHODPR(T, SetShadowDistance, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_shadowDistance(float)", AS_METHODPR(T, SetShadowDistance, (float), void), AS_CALL_THISCALL);
 
-    // void Drawable::SetShadowMask(unsigned mask)
-    engine->RegisterObjectMethod(className, "void SetShadowMask(uint)", AS_METHODPR(T, SetShadowMask, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_shadowMask(uint)", AS_METHODPR(T, SetShadowMask, (unsigned), void), AS_CALL_THISCALL);
+    // void Drawable::SetShadowMask(mask32 mask)
+    engine->RegisterObjectMethod(className, "void SetShadowMask(mask32)", AS_METHODPR(T, SetShadowMask, (mask32), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_shadowMask(mask32)", AS_METHODPR(T, SetShadowMask, (mask32), void), AS_CALL_THISCALL);
 
     // void Drawable::SetSortValue(float value)
     engine->RegisterObjectMethod(className, "void SetSortValue(float)", AS_METHODPR(T, SetSortValue, (float), void), AS_CALL_THISCALL);
 
-    // void Drawable::SetViewMask(unsigned mask)
-    engine->RegisterObjectMethod(className, "void SetViewMask(uint)", AS_METHODPR(T, SetViewMask, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_viewMask(uint)", AS_METHODPR(T, SetViewMask, (unsigned), void), AS_CALL_THISCALL);
+    // void Drawable::SetViewMask(mask32 mask)
+    engine->RegisterObjectMethod(className, "void SetViewMask(mask32)", AS_METHODPR(T, SetViewMask, (mask32), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_viewMask(mask32)", AS_METHODPR(T, SetViewMask, (mask32), void), AS_CALL_THISCALL);
 
     // void Drawable::SetZone(Zone* zone, bool temporary = false)
     engine->RegisterObjectMethod(className, "void SetZone(Zone@+, bool = false)", AS_METHODPR(T, SetZone, (Zone*, bool), void), AS_CALL_THISCALL);
 
-    // void Drawable::SetZoneMask(unsigned mask)
-    engine->RegisterObjectMethod(className, "void SetZoneMask(uint)", AS_METHODPR(T, SetZoneMask, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_zoneMask(uint)", AS_METHODPR(T, SetZoneMask, (unsigned), void), AS_CALL_THISCALL);
+    // void Drawable::SetZoneMask(mask32 mask)
+    engine->RegisterObjectMethod(className, "void SetZoneMask(mask32)", AS_METHODPR(T, SetZoneMask, (mask32), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_zoneMask(mask32)", AS_METHODPR(T, SetZoneMask, (mask32), void), AS_CALL_THISCALL);
 
     // virtual void Drawable::UpdateBatches(const FrameInfo& frame)
     engine->RegisterObjectMethod(className, "void UpdateBatches(const FrameInfo&in)", AS_METHODPR(T, UpdateBatches, (const FrameInfo&), void), AS_CALL_THISCALL);
