@@ -17,7 +17,7 @@ jobs:
       PUBLISHER_TOKEN: ${{ secrets.PUBLISHER_TOKEN }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           token: ${{ env.PUBLISHER_TOKEN }}
       - name: Update dot files for DBE
