@@ -61,6 +61,8 @@ template <class T> CScriptArray* VectorToArray(const Vector<T>& vector, const ch
 /// Template function for data buffer to array conversion.
 template <class T> CScriptArray* BufferToArray(const T* buffer, asUINT size, const char* arrayName)
 {
+    assert(size <= M_MAX_I32);
+
     Context* context = GetScriptContext();
     if (context)
     {
