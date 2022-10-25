@@ -33,6 +33,9 @@ using hash64 = u64;
 // Some ID
 using id32 = u32;
 
+// Some mask
+using mask32 = u32;
+
 } // namespace Urho3D::PrimitiveTypes
 
 namespace Urho3D

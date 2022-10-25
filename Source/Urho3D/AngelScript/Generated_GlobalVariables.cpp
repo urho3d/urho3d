@@ -34,8 +34,8 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // constexpr float DEFAULT_FONT_SIZE | File: ../UI/Text.h
     engine->RegisterGlobalProperty("const float DEFAULT_FONT_SIZE", (void*)&DEFAULT_FONT_SIZE);
 
-    // constexpr u32 DEFAULT_LIGHTMASK | File: ../Graphics/Drawable.h
-    engine->RegisterGlobalProperty("const uint DEFAULT_LIGHTMASK", (void*)&DEFAULT_LIGHTMASK);
+    // constexpr mask32 DEFAULT_LIGHTMASK | File: ../Graphics/Drawable.h
+    engine->RegisterGlobalProperty("const mask32 DEFAULT_LIGHTMASK", (void*)&DEFAULT_LIGHTMASK);
 
     // static const float DEFAULT_NEARCLIP | File: ../Graphics/Camera.h
     engine->RegisterGlobalProperty("const float DEFAULT_NEARCLIP", (void*)&DEFAULT_NEARCLIP);
@@ -49,14 +49,14 @@ void ASRegisterGeneratedGlobalVariables(asIScriptEngine* engine)
     // static constexpr i8 DEFAULT_RENDER_ORDER | File: ../Graphics/Material.h
     engine->RegisterGlobalProperty("const int8 DEFAULT_RENDER_ORDER", (void*)&DEFAULT_RENDER_ORDER);
 
-    // constexpr u32 DEFAULT_SHADOWMASK | File: ../Graphics/Drawable.h
-    engine->RegisterGlobalProperty("const uint DEFAULT_SHADOWMASK", (void*)&DEFAULT_SHADOWMASK);
+    // constexpr mask32 DEFAULT_SHADOWMASK | File: ../Graphics/Drawable.h
+    engine->RegisterGlobalProperty("const mask32 DEFAULT_SHADOWMASK", (void*)&DEFAULT_SHADOWMASK);
 
-    // constexpr u32 DEFAULT_VIEWMASK | File: ../Graphics/Drawable.h
-    engine->RegisterGlobalProperty("const uint DEFAULT_VIEWMASK", (void*)&DEFAULT_VIEWMASK);
+    // constexpr mask32 DEFAULT_VIEWMASK | File: ../Graphics/Drawable.h
+    engine->RegisterGlobalProperty("const mask32 DEFAULT_VIEWMASK", (void*)&DEFAULT_VIEWMASK);
 
-    // constexpr u32 DEFAULT_ZONEMASK | File: ../Graphics/Drawable.h
-    engine->RegisterGlobalProperty("const uint DEFAULT_ZONEMASK", (void*)&DEFAULT_ZONEMASK);
+    // constexpr mask32 DEFAULT_ZONEMASK | File: ../Graphics/Drawable.h
+    engine->RegisterGlobalProperty("const mask32 DEFAULT_ZONEMASK", (void*)&DEFAULT_ZONEMASK);
 
     // const Vector3 DOT_SCALE | File: ../GraphicsAPI/GraphicsDefs.h
     engine->RegisterGlobalProperty("const Vector3 DOT_SCALE", (void*)&DOT_SCALE);

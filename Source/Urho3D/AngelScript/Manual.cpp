@@ -97,6 +97,7 @@ void ASRegisterManualFirst(asIScriptEngine* engine)
     engine->RegisterTypedef("id32", "uint");
     engine->RegisterTypedef("NodeId", "uint");
     engine->RegisterTypedef("ComponentId", "uint");
+    engine->RegisterTypedef("mask32", "uint");
 
     ASRegisterManualFirst_Addons(engine);
     ASRegisterManualFirst_Graphics(engine);

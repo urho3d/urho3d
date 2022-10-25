@@ -23,10 +23,10 @@ enum class DrawableTypes : u8
 };
 URHO3D_FLAGS(DrawableTypes);
 
-inline constexpr u32 DEFAULT_VIEWMASK = M_U32_MASK_ALL_BITS;
-inline constexpr u32 DEFAULT_LIGHTMASK = M_U32_MASK_ALL_BITS;
-inline constexpr u32 DEFAULT_SHADOWMASK = M_U32_MASK_ALL_BITS;
-inline constexpr u32 DEFAULT_ZONEMASK = M_U32_MASK_ALL_BITS;
+inline constexpr mask32 DEFAULT_VIEWMASK = M_U32_MASK_ALL_BITS;
+inline constexpr mask32 DEFAULT_LIGHTMASK = M_U32_MASK_ALL_BITS;
+inline constexpr mask32 DEFAULT_SHADOWMASK = M_U32_MASK_ALL_BITS;
+inline constexpr mask32 DEFAULT_ZONEMASK = M_U32_MASK_ALL_BITS;
 inline constexpr i32 MAX_VERTEX_LIGHTS = 4;
 inline constexpr float ANIMATION_LOD_BASESCALE = 2500.0f;
 
@@ -85,7 +85,7 @@ struct URHO3D_API SourceBatch
     /// World transform(s). For a skinned model, these are the bone transforms.
     const Matrix3x4* worldTransform_{&Matrix3x4::IDENTITY};
     /// Number of world transforms.
-    unsigned numWorldTransforms_{1};
+    i32 numWorldTransforms_{1};
     /// Per-instance data. If not null, must contain enough data to fill instancing buffer.
     void* instancingData_{};
     /// %Geometry type.
@@ -146,16 +146,16 @@ public:
     void SetLodBias(float bias);
     /// Set view mask. Is and'ed with camera's view mask to see if the object should be rendered.
     /// @property
-    void SetViewMask(unsigned mask);
+    void SetViewMask(mask32 mask);
     /// Set light mask. Is and'ed with light's and zone's light mask to see if the object should be lit.
     /// @property
-    void SetLightMask(unsigned mask);
+    void SetLightMask(mask32 mask);
     /// Set shadow mask. Is and'ed with light's light mask and zone's shadow mask to see if the object should be rendered to a shadow map.
     /// @property
-    void SetShadowMask(unsigned mask);
+    void SetShadowMask(mask32 mask);
     /// Set zone mask. Is and'ed with zone's zone mask to see if the object should belong to the zone.
     /// @property
-    void SetZoneMask(unsigned mask);
+    void SetZoneMask(mask32 mask);
     /// Set maximum number of per-pixel lights. Default 0 is unlimited.
     /// @property
     void SetMaxLights(unsigned num);
@@ -196,19 +196,19 @@ public:
 
     /// Return view mask.
     /// @property
-    unsigned GetViewMask() const { return viewMask_; }
+    mask32 GetViewMask() const { return viewMask_; }
 
     /// Return light mask.
     /// @property
-    unsigned GetLightMask() const { return lightMask_; }
+    mask32 GetLightMask() const { return lightMask_; }
 
     /// Return shadow mask.
     /// @property
-    unsigned GetShadowMask() const { return shadowMask_; }
+    mask32 GetShadowMask() const { return shadowMask_; }
 
     /// Return zone mask.
     /// @property
-    unsigned GetZoneMask() const { return zoneMask_; }
+    mask32 GetZoneMask() const { return zoneMask_; }
 
     /// Return maximum number of per-pixel lights.
     /// @property
@@ -363,13 +363,13 @@ protected:
     /// Current zone.
     Zone* zone_;
     /// View mask.
-    unsigned viewMask_;
+    mask32 viewMask_;
     /// Light mask.
-    unsigned lightMask_;
+    mask32 lightMask_;
     /// Shadow mask.
-    unsigned shadowMask_;
+    mask32 shadowMask_;
     /// Zone mask.
-    unsigned zoneMask_;
+    mask32 zoneMask_;
     /// Last visible frame number.
     i32 viewFrameNumber_;
     /// Current distance to camera.

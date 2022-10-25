@@ -91,6 +91,9 @@ string CppPrimitiveTypeToAS(const string& cppType)
     if (cppType == "ComponentId")
         return "ComponentId";
 
+    if (cppType == "mask32")
+        return "mask32";
+
     throw Exception(cppType + " not a primitive type");
 }
 
