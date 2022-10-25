@@ -49,7 +49,7 @@ template <class T> CScriptArray* VectorToArray(const Vector<T>& vector, const ch
         asITypeInfo* type = context->GetSubsystem<Script>()->GetObjectType(arrayName);
         CScriptArray* arr = CScriptArray::Create(type, vector.Size());
 
-        for (unsigned i = 0; i < arr->GetSize(); ++i)
+        for (asUINT i = 0; i < arr->GetSize(); ++i)
             *(static_cast<T*>(arr->At(i))) = vector[i];
 
         return arr;
@@ -59,7 +59,7 @@ template <class T> CScriptArray* VectorToArray(const Vector<T>& vector, const ch
 }
 
 /// Template function for data buffer to array conversion.
-template <class T> CScriptArray* BufferToArray(const T* buffer, unsigned size, const char* arrayName)
+template <class T> CScriptArray* BufferToArray(const T* buffer, asUINT size, const char* arrayName)
 {
     Context* context = GetScriptContext();
     if (context)
@@ -67,7 +67,7 @@ template <class T> CScriptArray* BufferToArray(const T* buffer, unsigned size, c
         asITypeInfo* type = context->GetSubsystem<Script>()->GetObjectType(arrayName);
         CScriptArray* arr = CScriptArray::Create(type, size);
 
-        for (unsigned i = 0; i < arr->GetSize(); ++i)
+        for (asUINT i = 0; i < arr->GetSize(); ++i)
             *(static_cast<T*>(arr->At(i))) = buffer[i];
 
         return arr;
@@ -85,7 +85,7 @@ template <class T> CScriptArray* VectorToHandleArray(const Vector<T*>& vector, c
         asITypeInfo* type = context->GetSubsystem<Script>()->GetObjectType(arrayName);
         CScriptArray* arr = CScriptArray::Create(type, vector.Size());
 
-        for (unsigned i = 0; i < arr->GetSize(); ++i)
+        for (asUINT i = 0; i < arr->GetSize(); ++i)
         {
             // Increment reference count for storing in the array
             T* ptr = vector[i];
@@ -111,7 +111,7 @@ template <class T> CScriptArray* VectorToHandleArray(const Vector<SharedPtr<T>>&
     asITypeInfo* type = context->GetSubsystem<Script>()->GetObjectType(arrayName);
     CScriptArray* arr = CScriptArray::Create(type, vector.Size());
 
-    for (unsigned i = 0; i < arr->GetSize(); ++i)
+    for (asUINT i = 0; i < arr->GetSize(); ++i)
     {
         // Increment reference count for storing in the array
         T* ptr = vector[i];
@@ -129,7 +129,7 @@ template <class T> Vector<T> ArrayToVector(CScriptArray* arr)
     Vector<T> dest(arr ? arr->GetSize() : 0);
     if (arr)
     {
-        for (unsigned i = 0; i < arr->GetSize(); ++i)
+        for (asUINT i = 0; i < arr->GetSize(); ++i)
             dest[i] = *static_cast<T*>(arr->At(i));
     }
     return dest;
@@ -139,7 +139,7 @@ template <class T> Vector<SharedPtr<T>> HandleArrayToVector(CScriptArray* arr)
 {
     Vector<T*> rawPtrs = ArrayToVector<T*>(arr);
     Vector<SharedPtr<T>> result(rawPtrs.Size());
-    for (unsigned i = 0; i < rawPtrs.Size(); ++i)
+    for (i32 i = 0; i < rawPtrs.Size(); ++i)
         result[i] = SharedPtr<T>(rawPtrs[i]);
     return result;
 }
