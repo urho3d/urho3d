@@ -16,7 +16,7 @@ jobs:
       skip: ${{ steps.whatchanged.outputs.skip }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: What changed
         id: whatchanged
         run: |
@@ -52,7 +52,7 @@ jobs:
       DBE_TAG: master
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with: { fetch-depth: 0 }
       - name: Free up space
         run: |
@@ -165,7 +165,7 @@ jobs:
       LIB_TYPE: ${{ matrix.lib-type }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with: { fetch-depth: 0 }
       - name: Select xcode
         run: sudo xcode-select -s '/Applications/Xcode_12.app'
@@ -233,7 +233,7 @@ jobs:
       URHO3D_GENERATEBINDINGS: 1
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with: { fetch-depth: 0 }
       - name: Install dependencies
         id: install_dependencies
