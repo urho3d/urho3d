@@ -64,7 +64,7 @@ jobs:
         id: source_checksum
         run: rake source_checksum
       - name: Cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             build/cache/.ccache
@@ -118,7 +118,7 @@ jobs:
         run: script/dockerized.sh ${PLATFORM/-*} rake package
         if: github.event_name == 'push' && matrix.platform != 'android'
       - name: Upload
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.platform }}-${{ matrix.lib-type }}-${{ matrix.architecture }}-${{ matrix.build-type }}
           path: |
@@ -203,7 +203,7 @@ jobs:
         run: rake package
         if: github.event_name == 'push'
       - name: Upload
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.platform }}-${{ matrix.lib-type }}-all-rel
           path: build/ci/*.tar.gz
@@ -306,7 +306,7 @@ jobs:
         run: rake package
         if: github.event_name == 'push'
       - name: Upload
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.platform }}-${{ matrix.lib-type }}-64-${{ matrix.graphics-api }}-rel
           path: build/ci/*.zip
