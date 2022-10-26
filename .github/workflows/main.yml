@@ -22,7 +22,7 @@ jobs:
         run: |
           git fetch --deepen=1
           git log --raw --no-merges -1 |grep '^:' >/tmp/whatchanged
-          echo ::set-output name=skip::$(grep -cqv 'website/' /tmp/whatchanged; echo $?)
+          echo "name=skip::$(grep -cqv 'website/' /tmp/whatchanged; echo $?)" >> $GITHUB_OUTPUT
   linux-old:
     name: 🐧-old
     runs-on: ubuntu-latest

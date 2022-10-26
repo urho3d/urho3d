@@ -177,7 +177,7 @@ task :check_license do
     commit = 1
   end
   # TODO: Check and merge any new 3rd-party license into 'Source/ThirdParty/LICENSES'
-  puts "::set-output name=commit::#{commit}"
+  system 'echo "name=commit::#{commit}" >> $GITHUB_OUTPUT'
 end
 
 task :ci do
@@ -333,7 +333,7 @@ task :source_checksum do
   sha256_final = Digest::SHA256.new
   sha256_iter = Digest::SHA256
   Dir['Source/**/*.{c,h}*'].each { |it| sha256_final << sha256_iter.file(it).hexdigest }
-  puts "::set-output name=hexdigest::#{sha256_final.hexdigest}"
+  system 'echo "name=hexdigest::#{sha256_final.hexdigest}" >> $GITHUB_OUTPUT'
 end
 
 task :update_dot_files do
@@ -353,7 +353,7 @@ task :update_dot_files do
       git add script/.build-options script/.env-file && \\
       commit=0 && \\
       if git commit -qm 'GH Actions: Update dot files for DBE.'; then commit=1; fi && \\
-      echo ::set-output name=commit::$commit
+      echo "name=commit::$commit" >> $GITHUB_OUTPUT
     } or abort "Failed to commit dot files update"
   end
 end
