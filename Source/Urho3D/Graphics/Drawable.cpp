@@ -193,8 +193,9 @@ void Drawable::SetZoneMask(mask32 mask)
     MarkNetworkUpdate();
 }
 
-void Drawable::SetMaxLights(unsigned num)
+void Drawable::SetMaxLights(i32 num)
 {
+    assert(num >= 0);
     maxLights_ = num;
     MarkNetworkUpdate();
 }

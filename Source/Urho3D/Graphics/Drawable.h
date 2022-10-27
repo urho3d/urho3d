@@ -158,7 +158,7 @@ public:
     void SetZoneMask(mask32 mask);
     /// Set maximum number of per-pixel lights. Default 0 is unlimited.
     /// @property
-    void SetMaxLights(unsigned num);
+    void SetMaxLights(i32 num);
     /// Set shadowcaster flag.
     /// @property
     void SetCastShadows(bool enable);
@@ -212,7 +212,7 @@ public:
 
     /// Return maximum number of per-pixel lights.
     /// @property
-    unsigned GetMaxLights() const { return maxLights_; }
+    i32 GetMaxLights() const { return maxLights_; }
 
     /// Return shadowcaster flag.
     /// @property
@@ -257,7 +257,11 @@ public:
     void LimitVertexLights(bool removeConvertedLights);
 
     /// Set base pass flag for a batch.
-    void SetBasePass(unsigned batchIndex) { basePassFlags_ |= (1u << batchIndex); }
+    void SetBasePass(i32 batchIndex)
+    {
+        assert(batchIndex >= 0 && batchIndex < 32);
+        basePassFlags_ |= (1u << batchIndex);
+    }
 
     /// Return octree octant.
     Octant* GetOctant() const { return octant_; }
@@ -282,7 +286,11 @@ public:
     bool IsInView(const FrameInfo& frame, bool anyCamera = false) const;
 
     /// Return whether has a base pass.
-    bool HasBasePass(unsigned batchIndex) const { return (basePassFlags_ & (1u << batchIndex)) != 0; }
+    bool HasBasePass(i32 batchIndex) const
+    {
+        assert(batchIndex >= 0 && batchIndex < 32);
+        return (basePassFlags_ & (1u << batchIndex)) != 0;
+    }
 
     /// Return per-pixel lights.
     const Vector<Light*>& GetLights() const { return lights_; }
@@ -389,9 +397,9 @@ protected:
     /// LOD bias.
     float lodBias_;
     /// Base pass flags, bit per batch.
-    unsigned basePassFlags_;
+    flagset32 basePassFlags_;
     /// Maximum per-pixel lights.
-    unsigned maxLights_;
+    i32 maxLights_;
     /// List of cameras from which is seen on the current frame.
     Vector<Camera*> viewCameras_;
     /// First per-pixel light added this frame.

@@ -17905,9 +17905,9 @@ template <class T> void RegisterMembers_Drawable(asIScriptEngine* engine, const 
     // virtual Geometry* Drawable::GetLodGeometry(i32 batchIndex, i32 level)
     engine->RegisterObjectMethod(className, "Geometry@+ GetLodGeometry(int, int)", AS_METHODPR(T, GetLodGeometry, (i32, i32), Geometry*), AS_CALL_THISCALL);
 
-    // unsigned Drawable::GetMaxLights() const
-    engine->RegisterObjectMethod(className, "uint GetMaxLights() const", AS_METHODPR(T, GetMaxLights, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_maxLights() const", AS_METHODPR(T, GetMaxLights, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Drawable::GetMaxLights() const
+    engine->RegisterObjectMethod(className, "int GetMaxLights() const", AS_METHODPR(T, GetMaxLights, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_maxLights() const", AS_METHODPR(T, GetMaxLights, () const, i32), AS_CALL_THISCALL);
 
     // float Drawable::GetMaxZ() const
     engine->RegisterObjectMethod(className, "float GetMaxZ() const", AS_METHODPR(T, GetMaxZ, () const, float), AS_CALL_THISCALL);
@@ -17951,8 +17951,8 @@ template <class T> void RegisterMembers_Drawable(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "mask32 GetZoneMask() const", AS_METHODPR(T, GetZoneMask, () const, mask32), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "mask32 get_zoneMask() const", AS_METHODPR(T, GetZoneMask, () const, mask32), AS_CALL_THISCALL);
 
-    // bool Drawable::HasBasePass(unsigned batchIndex) const
-    engine->RegisterObjectMethod(className, "bool HasBasePass(uint) const", AS_METHODPR(T, HasBasePass, (unsigned) const, bool), AS_CALL_THISCALL);
+    // bool Drawable::HasBasePass(i32 batchIndex) const
+    engine->RegisterObjectMethod(className, "bool HasBasePass(int) const", AS_METHODPR(T, HasBasePass, (i32) const, bool), AS_CALL_THISCALL);
 
     // bool Drawable::IsInView() const
     engine->RegisterObjectMethod(className, "bool IsInView() const", AS_METHODPR(T, IsInView, () const, bool), AS_CALL_THISCALL);
@@ -17990,8 +17990,8 @@ template <class T> void RegisterMembers_Drawable(asIScriptEngine* engine, const 
     // void Drawable::MarkInView(i32 frameNumber)
     engine->RegisterObjectMethod(className, "void MarkInView(int)", AS_METHODPR(T, MarkInView, (i32), void), AS_CALL_THISCALL);
 
-    // void Drawable::SetBasePass(unsigned batchIndex)
-    engine->RegisterObjectMethod(className, "void SetBasePass(uint)", AS_METHODPR(T, SetBasePass, (unsigned), void), AS_CALL_THISCALL);
+    // void Drawable::SetBasePass(i32 batchIndex)
+    engine->RegisterObjectMethod(className, "void SetBasePass(int)", AS_METHODPR(T, SetBasePass, (i32), void), AS_CALL_THISCALL);
 
     // void Drawable::SetCastShadows(bool enable)
     engine->RegisterObjectMethod(className, "void SetCastShadows(bool)", AS_METHODPR(T, SetCastShadows, (bool), void), AS_CALL_THISCALL);
@@ -18009,9 +18009,9 @@ template <class T> void RegisterMembers_Drawable(asIScriptEngine* engine, const 
     engine->RegisterObjectMethod(className, "void SetLodBias(float)", AS_METHODPR(T, SetLodBias, (float), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_lodBias(float)", AS_METHODPR(T, SetLodBias, (float), void), AS_CALL_THISCALL);
 
-    // void Drawable::SetMaxLights(unsigned num)
-    engine->RegisterObjectMethod(className, "void SetMaxLights(uint)", AS_METHODPR(T, SetMaxLights, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_maxLights(uint)", AS_METHODPR(T, SetMaxLights, (unsigned), void), AS_CALL_THISCALL);
+    // void Drawable::SetMaxLights(i32 num)
+    engine->RegisterObjectMethod(className, "void SetMaxLights(int)", AS_METHODPR(T, SetMaxLights, (i32), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_maxLights(int)", AS_METHODPR(T, SetMaxLights, (i32), void), AS_CALL_THISCALL);
 
     // void Drawable::SetMinMaxZ(float minZ, float maxZ)
     engine->RegisterObjectMethod(className, "void SetMinMaxZ(float, float)", AS_METHODPR(T, SetMinMaxZ, (float, float), void), AS_CALL_THISCALL);
