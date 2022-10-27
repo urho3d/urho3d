@@ -36,6 +36,9 @@ using id32 = u32;
 // Some mask
 using mask32 = u32;
 
+// Some flags
+using flagset32 = u32;
+
 } // namespace Urho3D::PrimitiveTypes
 
 namespace Urho3D
