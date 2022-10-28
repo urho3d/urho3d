@@ -3,6 +3,7 @@
 
 #include "../Precompiled.h"
 
+#include "../Base/Utils.h"
 #include "../Core/Context.h"
 #include "../Core/Profiler.h"
 #include "../Graphics/Batch.h"
@@ -28,7 +29,7 @@ extern const char* GEOMETRY_CATEGORY;
 CustomGeometry::CustomGeometry(Context* context)
     : Drawable(context, DrawableTypes::Geometry)
     , vertexBuffer_(new VertexBuffer(context))
-    , elementMask_(MASK_POSITION)
+    , elementMask_(VertexElements::Position)
     , geometryIndex_(0)
     , materialsAttr_(Material::GetTypeStatic())
     , dynamic_(false)
@@ -190,7 +191,7 @@ bool CustomGeometry::DrawOcclusion(OcclusionBuffer* buffer)
 
 void CustomGeometry::Clear()
 {
-    elementMask_ = MASK_POSITION;
+    elementMask_ = VertexElements::Position;
     batches_.Clear();
     geometries_.Clear();
     primitiveTypes_.Clear();
@@ -234,7 +235,7 @@ void CustomGeometry::BeginGeometry(unsigned index, PrimitiveType type)
 
     // If beginning the first geometry, reset the element mask
     if (!index)
-        elementMask_ = MASK_POSITION;
+        elementMask_ = VertexElements::Position;
 }
 
 void CustomGeometry::DefineVertex(const Vector3& position)
@@ -252,7 +253,7 @@ void CustomGeometry::DefineNormal(const Vector3& normal)
         return;
 
     vertices_[geometryIndex_].Back().normal_ = normal;
-    elementMask_ |= MASK_NORMAL;
+    elementMask_ |= VertexElements::Normal;
 }
 
 void CustomGeometry::DefineColor(const Color& color)
@@ -261,7 +262,7 @@ void CustomGeometry::DefineColor(const Color& color)
         return;
 
     vertices_[geometryIndex_].Back().color_ = color.ToUInt();
-    elementMask_ |= MASK_COLOR;
+    elementMask_ |= VertexElements::Color;
 }
 
 void CustomGeometry::DefineTexCoord(const Vector2& texCoord)
@@ -270,7 +271,7 @@ void CustomGeometry::DefineTexCoord(const Vector2& texCoord)
         return;
 
     vertices_[geometryIndex_].Back().texCoord_ = texCoord;
-    elementMask_ |= MASK_TEXCOORD1;
+    elementMask_ |= VertexElements::TexCoord1;
 }
 
 void CustomGeometry::DefineTangent(const Vector4& tangent)
@@ -279,7 +280,7 @@ void CustomGeometry::DefineTangent(const Vector4& tangent)
         return;
 
     vertices_[geometryIndex_].Back().tangent_ = tangent;
-    elementMask_ |= MASK_TANGENT;
+    elementMask_ |= VertexElements::Tangent;
 }
 
 void CustomGeometry::DefineGeometry(unsigned index, PrimitiveType type, unsigned numVertices, bool hasNormals,
@@ -297,15 +298,15 @@ void CustomGeometry::DefineGeometry(unsigned index, PrimitiveType type, unsigned
 
     // If defining the first geometry, reset the element mask
     if (!index)
-        elementMask_ = MASK_POSITION;
+        elementMask_ = VertexElements::Position;
     if (hasNormals)
-        elementMask_ |= MASK_NORMAL;
+        elementMask_ |= VertexElements::Normal;
     if (hasColors)
-        elementMask_ |= MASK_COLOR;
+        elementMask_ |= VertexElements::Color;
     if (hasTexCoords)
-        elementMask_ |= MASK_TEXCOORD1;
+        elementMask_ |= VertexElements::TexCoord1;
     if (hasTangents)
-        elementMask_ |= MASK_TANGENT;
+        elementMask_ |= VertexElements::Tangent;
 }
 
 void CustomGeometry::Commit()
@@ -347,22 +348,22 @@ void CustomGeometry::Commit()
                     *((Vector3*)dest) = vertices_[i][j].position_;
                     dest += sizeof(Vector3);
 
-                    if (elementMask_ & MASK_NORMAL)
+                    if (!!(elementMask_ & VertexElements::Normal))
                     {
                         *((Vector3*)dest) = vertices_[i][j].normal_;
                         dest += sizeof(Vector3);
                     }
-                    if (elementMask_ & MASK_COLOR)
+                    if (!!(elementMask_ & VertexElements::Color))
                     {
                         *((unsigned*)dest) = vertices_[i][j].color_;
                         dest += sizeof(unsigned);
                     }
-                    if (elementMask_ & MASK_TEXCOORD1)
+                    if (!!(elementMask_ & VertexElements::TexCoord1))
                     {
                         *((Vector2*)dest) = vertices_[i][j].texCoord_;
                         dest += sizeof(Vector2);
                     }
-                    if (elementMask_ & MASK_TANGENT)
+                    if (!!(elementMask_ & VertexElements::Tangent))
                     {
                         *((Vector4*)dest) = vertices_[i][j].tangent_;
                         dest += sizeof(Vector4);
@@ -439,7 +440,7 @@ void CustomGeometry::SetGeometryDataAttr(const Vector<byte>& value)
     MemoryBuffer buffer(value);
 
     SetNumGeometries(buffer.ReadVLE());
-    elementMask_ = VertexMaskFlags(buffer.ReadU32());
+    elementMask_ = VertexElements{buffer.ReadU32()};
 
     for (unsigned i = 0; i < geometries_.Size(); ++i)
     {
@@ -449,15 +450,15 @@ void CustomGeometry::SetGeometryDataAttr(const Vector<byte>& value)
 
         for (unsigned j = 0; j < numVertices; ++j)
         {
-            if (elementMask_ & MASK_POSITION)
+            if (!!(elementMask_ & VertexElements::Position))
                 vertices_[i][j].position_ = buffer.ReadVector3();
-            if (elementMask_ & MASK_NORMAL)
+            if (!!(elementMask_ & VertexElements::Normal))
                 vertices_[i][j].normal_ = buffer.ReadVector3();
-            if (elementMask_ & MASK_COLOR)
+            if (!!(elementMask_ & VertexElements::Color))
                 vertices_[i][j].color_ = buffer.ReadU32();
-            if (elementMask_ & MASK_TEXCOORD1)
+            if (!!(elementMask_ & VertexElements::TexCoord1))
                 vertices_[i][j].texCoord_ = buffer.ReadVector2();
-            if (elementMask_ & MASK_TANGENT)
+            if (!!(elementMask_ & VertexElements::Tangent))
                 vertices_[i][j].tangent_ = buffer.ReadVector4();
         }
     }
@@ -477,7 +478,7 @@ Vector<byte> CustomGeometry::GetGeometryDataAttr() const
     VectorBuffer ret;
 
     ret.WriteVLE(geometries_.Size());
-    ret.WriteU32(elementMask_);
+    ret.WriteU32(ToU32(elementMask_));
 
     for (unsigned i = 0; i < geometries_.Size(); ++i)
     {
@@ -487,15 +488,15 @@ Vector<byte> CustomGeometry::GetGeometryDataAttr() const
 
         for (unsigned j = 0; j < numVertices; ++j)
         {
-            if (elementMask_ & MASK_POSITION)
+            if (!!(elementMask_ & VertexElements::Position))
                 ret.WriteVector3(vertices_[i][j].position_);
-            if (elementMask_ & MASK_NORMAL)
+            if (!!(elementMask_ & VertexElements::Normal))
                 ret.WriteVector3(vertices_[i][j].normal_);
-            if (elementMask_ & MASK_COLOR)
+            if (!!(elementMask_ & VertexElements::Color))
                 ret.WriteU32(vertices_[i][j].color_);
-            if (elementMask_ & MASK_TEXCOORD1)
+            if (!!(elementMask_ & VertexElements::TexCoord1))
                 ret.WriteVector2(vertices_[i][j].texCoord_);
-            if (elementMask_ & MASK_TANGENT)
+            if (!!(elementMask_ & VertexElements::Tangent))
                 ret.WriteVector4(vertices_[i][j].tangent_);
         }
     }

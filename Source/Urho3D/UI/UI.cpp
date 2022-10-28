@@ -965,7 +965,7 @@ void UI::SetVertexData(VertexBuffer* dest, const Vector<float>& vertexData)
     // Resize the vertex buffer first if too small or much too large
     i32 numVertices = vertexData.Size() / UI_VERTEX_SIZE;
     if (dest->GetVertexCount() < numVertices || dest->GetVertexCount() > numVertices * 2)
-        dest->SetSize(numVertices, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1, true);
+        dest->SetSize(numVertices, VertexElements::Position | VertexElements::Color | VertexElements::TexCoord1, true);
 
     dest->SetData(&vertexData[0]);
 }

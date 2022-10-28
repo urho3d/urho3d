@@ -153,7 +153,7 @@ void Geometry::SetRawVertexData(const SharedArrayPtr<byte>& data, const Vector<V
     rawElements_ = elements;
 }
 
-void Geometry::SetRawVertexData(const SharedArrayPtr<byte>& data, unsigned elementMask)
+void Geometry::SetRawVertexData(const SharedArrayPtr<byte>& data, VertexElements elementMask)
 {
     rawVertexData_ = data;
     rawVertexSize_ = VertexBuffer::GetVertexSize(elementMask);

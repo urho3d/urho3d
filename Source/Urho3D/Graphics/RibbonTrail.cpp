@@ -429,17 +429,17 @@ void RibbonTrail::UpdateBufferSize()
     unsigned indexPerSegment = 6 + (tailColumn_ - 1) * 6;
     unsigned vertexPerSegment = 4 + (tailColumn_ - 1) * 2;
 
-    unsigned mask = 0;
+    VertexElements mask = VertexElements::None;
 
     if (trailType_ == TT_FACE_CAMERA)
     {
         batches_[0].geometryType_ = GEOM_TRAIL_FACE_CAMERA;
-        mask =  MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1 | MASK_TANGENT;
+        mask = VertexElements::Position | VertexElements::Color | VertexElements::TexCoord1 | VertexElements::Tangent;
     }
     else if (trailType_ == TT_BONE)
     {
         batches_[0].geometryType_ = GEOM_TRAIL_BONE;
-        mask =  MASK_POSITION | MASK_NORMAL | MASK_COLOR | MASK_TEXCOORD1 | MASK_TANGENT;
+        mask = VertexElements::Position | VertexElements::Normal | VertexElements::Color | VertexElements::TexCoord1 | VertexElements::Tangent;
     }
 
     bufferSizeDirty_ = false;

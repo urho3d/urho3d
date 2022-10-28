@@ -144,7 +144,7 @@ void Text3D::UpdateGeometry(const FrameInfo& frame)
     {
         i32 vertexCount = uiVertexData_.Size() / UI_VERTEX_SIZE;
         if (vertexBuffer_->GetVertexCount() != vertexCount)
-            vertexBuffer_->SetSize(vertexCount, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1);
+            vertexBuffer_->SetSize(vertexCount, VertexElements::Position | VertexElements::Color | VertexElements::TexCoord1);
         vertexBuffer_->SetData(&uiVertexData_[0]);
     }
 

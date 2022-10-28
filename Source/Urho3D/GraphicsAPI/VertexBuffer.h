@@ -35,7 +35,7 @@ public:
     /// Set size, vertex elements and dynamic mode. Previous data will be lost.
     bool SetSize(i32 vertexCount, const Vector<VertexElement>& elements, bool dynamic = false);
     /// Set size and vertex elements and dynamic mode using legacy element bitmask. Previous data will be lost.
-    bool SetSize(i32 vertexCount, unsigned elementMask, bool dynamic = false);
+    bool SetSize(i32 vertexCount, VertexElements elementMask, bool dynamic = false);
     /// Set all data in the buffer.
     bool SetData(const void* data);
     /// Set a data range in the buffer. Optionally discard data outside the range.
@@ -106,7 +106,7 @@ public:
 
     /// Return legacy vertex element mask. Note that both semantic and type must match the legacy element for a mask bit to be set.
     /// @property
-    VertexMaskFlags GetElementMask() const { return elementMask_; }
+    VertexElements GetElementMask() const { return elementMask_; }
 
     /// Return CPU memory shadow data.
     byte* GetShadowData() const { return shadowData_.Get(); }
@@ -127,13 +127,13 @@ public:
     static i32 GetElementOffset(const Vector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, i8 index = 0);
 
     /// Return a vertex element list from a legacy element bitmask.
-    static Vector<VertexElement> GetElements(unsigned elementMask);
+    static Vector<VertexElement> GetElements(VertexElements elementMask);
 
     /// Return vertex size from an element list.
     static i32 GetVertexSize(const Vector<VertexElement>& elements);
 
     /// Return vertex size for a legacy vertex element bitmask.
-    static i32 GetVertexSize(unsigned elementMask);
+    static i32 GetVertexSize(VertexElements elementMask);
 
     /// Update offsets of vertex elements.
     static void UpdateOffsets(Vector<VertexElement>& elements);
@@ -189,7 +189,7 @@ private:
     /// Vertex element hash.
     hash64 elementHash_{};
     /// Vertex element legacy bitmask.
-    VertexMaskFlags elementMask_{};
+    VertexElements elementMask_{};
     /// Buffer locking state.
     LockState lockState_{LOCK_NONE};
     /// Lock start vertex.

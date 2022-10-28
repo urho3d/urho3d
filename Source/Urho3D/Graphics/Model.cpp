@@ -3,6 +3,7 @@
 
 #include "../Precompiled.h"
 
+#include "../Base/Utils.h"
 #include "../Core/Context.h"
 #include "../Core/Profiler.h"
 #include "../Graphics/Geometry.h"
@@ -88,7 +89,7 @@ bool Model::BeginLoad(Deserializer& source)
         desc.vertexCount_ = source.ReadU32();
         if (!hasVertexDeclarations)
         {
-            unsigned elementMask = source.ReadU32();
+            VertexElements elementMask{source.ReadU32()};
             desc.vertexElements_ = VertexBuffer::GetElements(elementMask);
         }
         else
@@ -249,17 +250,17 @@ bool Model::BeginLoad(Deserializer& source)
             VertexBufferMorph newBuffer;
             unsigned bufferIndex = source.ReadU32();
 
-            newBuffer.elementMask_ = VertexMaskFlags(source.ReadU32());
+            newBuffer.elementMask_ = VertexElements{source.ReadU32()};
             newBuffer.vertexCount_ = source.ReadU32();
 
             // Base size: size of each vertex index
             unsigned vertexSize = sizeof(unsigned);
             // Add size of individual elements
-            if (newBuffer.elementMask_ & MASK_POSITION)
+            if (!!(newBuffer.elementMask_ & VertexElements::Position))
                 vertexSize += sizeof(Vector3);
-            if (newBuffer.elementMask_ & MASK_NORMAL)
+            if (!!(newBuffer.elementMask_ & VertexElements::Normal))
                 vertexSize += sizeof(Vector3);
-            if (newBuffer.elementMask_ & MASK_TANGENT)
+            if (!!(newBuffer.elementMask_ & VertexElements::Tangent))
                 vertexSize += sizeof(Vector3);
             newBuffer.dataSize_ = newBuffer.vertexCount_ * vertexSize;
             newBuffer.morphData_ = new unsigned char[newBuffer.dataSize_];
@@ -415,17 +416,17 @@ bool Model::Save(Serializer& dest) const
              j != morphs_[i].buffers_.End(); ++j)
         {
             dest.WriteU32(j->first_);
-            dest.WriteU32(j->second_.elementMask_);
+            dest.WriteU32(ToU32(j->second_.elementMask_));
             dest.WriteU32(j->second_.vertexCount_);
 
             // Base size: size of each vertex index
             unsigned vertexSize = sizeof(unsigned);
             // Add size of individual elements
-            if (j->second_.elementMask_ & MASK_POSITION)
+            if (!!(j->second_.elementMask_ & VertexElements::Position))
                 vertexSize += sizeof(Vector3);
-            if (j->second_.elementMask_ & MASK_NORMAL)
+            if (!!(j->second_.elementMask_ & VertexElements::Normal))
                 vertexSize += sizeof(Vector3);
-            if (j->second_.elementMask_ & MASK_TANGENT)
+            if (!!(j->second_.elementMask_ & VertexElements::Tangent))
                 vertexSize += sizeof(Vector3);
 
             dest.Write(j->second_.morphData_.Get(), vertexSize * j->second_.vertexCount_);
