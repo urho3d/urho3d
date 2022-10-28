@@ -482,7 +482,7 @@ void DebugRenderer::Render()
     i32 numVertices = (lines_.Size() + noDepthLines_.Size()) * 2 + (triangles_.Size() + noDepthTriangles_.Size()) * 3;
     // Resize the vertex buffer if too small or much too large
     if (vertexBuffer_->GetVertexCount() < numVertices || vertexBuffer_->GetVertexCount() > numVertices * 2)
-        vertexBuffer_->SetSize(numVertices, MASK_POSITION | MASK_COLOR, true);
+        vertexBuffer_->SetSize(numVertices, VertexElements::Position | VertexElements::Color, true);
 
     auto* dest = (float*)vertexBuffer_->Lock(0, numVertices, true);
     if (!dest)

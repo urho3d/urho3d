@@ -347,14 +347,14 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
         while (bufferDef)
         {
             if (bufferDef.HasAttribute("positions"))
-                vBuf->elementMask_ |= MASK_POSITION;
+                vBuf->elementMask_ |= VertexElements::Position;
             if (bufferDef.HasAttribute("normals"))
-                vBuf->elementMask_ |= MASK_NORMAL;
+                vBuf->elementMask_ |= VertexElements::Normal;
             if (bufferDef.HasAttribute("texture_coords"))
             {
-                vBuf->elementMask_ |= MASK_TEXCOORD1;
+                vBuf->elementMask_ |= VertexElements::TexCoord1;
                 if (bufferDef.GetInt("texture_coords") > 1)
-                    vBuf->elementMask_ |= MASK_TEXCOORD2;
+                    vBuf->elementMask_ |= VertexElements::TexCoord2;
             }
 
             unsigned vertexNum = vertexStart;
@@ -395,7 +395,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
 
                         vBuf->vertices_[vertexNum].texCoord1_ = vec;
 
-                        if (vBuf->elementMask_ & MASK_TEXCOORD2)
+                        if (!!(vBuf->elementMask_ & VertexElements::TexCoord2))
                         {
                             uv = uv.GetNext("texcoord");
                             if (uv)
@@ -478,7 +478,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
 
             if ((subGeometryLodLevel.boneWeights_.Size()) && bones_.Size())
             {
-                vBuf->elementMask_ |= MASK_BLENDWEIGHTS | MASK_BLENDINDICES;
+                vBuf->elementMask_ |= VertexElements::BlendWeights | VertexElements::BlendIndices;
                 bool sorted = false;
 
                 // If amount of bones is larger than supported by HW skinning, must remap per submesh
@@ -731,7 +731,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                             else
                                 newMorph.buffers_[bufIndex].vertexBuffer_ = targetSubMesh;
 
-                            newMorph.buffers_[bufIndex].elementMask_ = MASK_POSITION;
+                            newMorph.buffers_[bufIndex].elementMask_ = VertexElements::Position;
 
                             ModelVertexBuffer* vBuf = &vertexBuffers_[newMorph.buffers_[bufIndex].vertexBuffer_];
 
@@ -784,7 +784,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
     // Check any of the buffers for vertices with missing blend weight assignments
     for (unsigned i = 0; i < vertexBuffers_.Size(); ++i)
     {
-        if (vertexBuffers_[i].elementMask_ & MASK_BLENDWEIGHTS)
+        if (!!(vertexBuffers_[i].elementMask_ & VertexElements::BlendWeights))
         {
             for (unsigned j = 0; j < vertexBuffers_[i].vertices_.Size(); ++j)
                 if (!vertexBuffers_[i].vertices_[j].hasBlendWeights_)
@@ -805,13 +805,13 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                 unsigned indexCount = subGeometries_[i][j].indexCount_;
 
                 // If already has tangents, do not regenerate
-                if (vBuf.elementMask_ & MASK_TANGENT || vBuf.vertices_.Empty() || iBuf.indices_.Empty())
+                if (!!(vBuf.elementMask_ & VertexElements::Tangent) || vBuf.vertices_.Empty() || iBuf.indices_.Empty())
                     continue;
 
-                vBuf.elementMask_ |= MASK_TANGENT;
+                vBuf.elementMask_ |= VertexElements::Tangent;
 
-                if ((vBuf.elementMask_ & (MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1)) != (MASK_POSITION | MASK_NORMAL |
-                    MASK_TEXCOORD1))
+                if ((vBuf.elementMask_ & (VertexElements::Position | VertexElements::Normal | VertexElements::TexCoord1))
+                    != (VertexElements::Position | VertexElements::Normal | VertexElements::TexCoord1))
                     ErrorExit("To generate tangents, positions normals and texcoords are required");
 
                 GenerateTangents(&vBuf.vertices_[0], sizeof(ModelVertex), &iBuf.indices_[0], sizeof(unsigned), indexStart,

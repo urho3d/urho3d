@@ -45,7 +45,7 @@ public:
     /// Override raw vertex data to be returned for CPU-side operations.
     void SetRawVertexData(const SharedArrayPtr<byte>& data, const Vector<VertexElement>& elements);
     /// Override raw vertex data to be returned for CPU-side operations using a legacy vertex bitmask.
-    void SetRawVertexData(const SharedArrayPtr<byte>& data, unsigned elementMask);
+    void SetRawVertexData(const SharedArrayPtr<byte>& data, VertexElements elementMask);
     /// Override raw index data to be returned for CPU-side operations.
     void SetRawIndexData(const SharedArrayPtr<byte>& data, i32 indexSize);
     /// Draw.

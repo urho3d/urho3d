@@ -655,7 +655,10 @@ void Terrain::CreatePatchGeometry(TerrainPatch* patch)
     Geometry* occlusionGeometry = patch->GetOcclusionGeometry();
 
     if (vertexBuffer->GetVertexCount() != row * row)
-        vertexBuffer->SetSize(row * row, MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT);
+    {
+        vertexBuffer->SetSize(row * row, VertexElements::Position | VertexElements::Normal
+                                         | VertexElements::TexCoord1 | VertexElements::Tangent);
+    }
 
     SharedArrayPtr<byte> cpuVertexData(new byte[row * row * sizeof(Vector3)]);
     SharedArrayPtr<byte> occlusionCpuVertexData(new byte[row * row * sizeof(Vector3)]);
@@ -744,13 +747,13 @@ void Terrain::CreatePatchGeometry(TerrainPatch* patch)
 
         geometry->SetIndexBuffer(indexBuffer_);
         geometry->SetDrawRange(TRIANGLE_LIST, drawRanges_[0].first_, drawRanges_[0].second_, false);
-        geometry->SetRawVertexData(cpuVertexData, MASK_POSITION);
+        geometry->SetRawVertexData(cpuVertexData, VertexElements::Position);
         maxLodGeometry->SetIndexBuffer(indexBuffer_);
         maxLodGeometry->SetDrawRange(TRIANGLE_LIST, drawRanges_[0].first_, drawRanges_[0].second_, false);
-        maxLodGeometry->SetRawVertexData(cpuVertexData, MASK_POSITION);
+        maxLodGeometry->SetRawVertexData(cpuVertexData, VertexElements::Position);
         occlusionGeometry->SetIndexBuffer(indexBuffer_);
         occlusionGeometry->SetDrawRange(TRIANGLE_LIST, drawRanges_[occlusionDrawRange].first_, drawRanges_[occlusionDrawRange].second_, false);
-        occlusionGeometry->SetRawVertexData(occlusionCpuVertexData, MASK_POSITION);
+        occlusionGeometry->SetRawVertexData(occlusionCpuVertexData, VertexElements::Position);
     }
 
     patch->ResetLod();

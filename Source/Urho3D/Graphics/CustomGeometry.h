@@ -127,7 +127,7 @@ private:
     /// Vertex buffer.
     SharedPtr<VertexBuffer> vertexBuffer_;
     /// Element mask used so far.
-    VertexMaskFlags elementMask_;
+    VertexElements elementMask_;
     /// Current geometry being updated.
     unsigned geometryIndex_;
     /// Material list attribute.

@@ -47,7 +47,7 @@ void VertexBuffer::SetShadowed(bool enable)
     }
 }
 
-bool VertexBuffer::SetSize(i32 vertexCount, unsigned elementMask, bool dynamic)
+bool VertexBuffer::SetSize(i32 vertexCount, VertexElements elementMask, bool dynamic)
 {
     assert(vertexCount >= 0);
     return SetSize(vertexCount, GetElements(elementMask), dynamic);
@@ -76,7 +76,7 @@ void VertexBuffer::UpdateOffsets()
 {
     i32 elementOffset = 0;
     elementHash_ = 0;
-    elementMask_ = MASK_NONE;
+    elementMask_ = VertexElements::None;
 
     for (VertexElement& element : elements_)
     {
@@ -89,7 +89,7 @@ void VertexBuffer::UpdateOffsets()
         {
             const VertexElement& legacy = LEGACY_VERTEXELEMENTS[j];
             if (element.type_ == legacy.type_ && element.semantic_ == legacy.semantic_ && element.index_ == legacy.index_)
-                elementMask_ |= VertexMaskFlags(1u << j);
+                elementMask_ |= VertexElements{1u << j};
         }
     }
 
@@ -148,13 +148,13 @@ i32 VertexBuffer::GetElementOffset(const Vector<VertexElement>& elements, Vertex
     return element ? element->offset_ : NINDEX;
 }
 
-Vector<VertexElement> VertexBuffer::GetElements(unsigned elementMask)
+Vector<VertexElement> VertexBuffer::GetElements(VertexElements elementMask)
 {
     Vector<VertexElement> ret;
 
     for (i32 i = 0; i < MAX_LEGACY_VERTEX_ELEMENTS; ++i)
     {
-        if (elementMask & (1u << i))
+        if (!!(elementMask & VertexElements{1u << i}))
             ret.Push(LEGACY_VERTEXELEMENTS[i]);
     }
 
@@ -171,13 +171,13 @@ i32 VertexBuffer::GetVertexSize(const Vector<VertexElement>& elements)
     return size;
 }
 
-i32 VertexBuffer::GetVertexSize(unsigned elementMask)
+i32 VertexBuffer::GetVertexSize(VertexElements elementMask)
 {
     i32 size = 0;
 
     for (i32 i = 0; i < MAX_LEGACY_VERTEX_ELEMENTS; ++i)
     {
-        if (elementMask & (1u << i))
+        if (!!(elementMask & VertexElements{1u << i}))
             size += ELEMENT_TYPESIZES[LEGACY_VERTEXELEMENTS[i].type_];
     }
 

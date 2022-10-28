@@ -609,22 +609,22 @@ static const int TransformSpace_Local = static_cast<int>(TransformSpace::Local);
 static const int TransformSpace_Parent = static_cast<int>(TransformSpace::Parent);
 static const int TransformSpace_World = static_cast<int>(TransformSpace::World);
 
-// enum VertexMask : u32 | File: ../GraphicsAPI/GraphicsDefs.h
-static const u32 VertexMask_MASK_NONE = MASK_NONE;
-static const u32 VertexMask_MASK_POSITION = MASK_POSITION;
-static const u32 VertexMask_MASK_NORMAL = MASK_NORMAL;
-static const u32 VertexMask_MASK_COLOR = MASK_COLOR;
-static const u32 VertexMask_MASK_TEXCOORD1 = MASK_TEXCOORD1;
-static const u32 VertexMask_MASK_TEXCOORD2 = MASK_TEXCOORD2;
-static const u32 VertexMask_MASK_CUBETEXCOORD1 = MASK_CUBETEXCOORD1;
-static const u32 VertexMask_MASK_CUBETEXCOORD2 = MASK_CUBETEXCOORD2;
-static const u32 VertexMask_MASK_TANGENT = MASK_TANGENT;
-static const u32 VertexMask_MASK_BLENDWEIGHTS = MASK_BLENDWEIGHTS;
-static const u32 VertexMask_MASK_BLENDINDICES = MASK_BLENDINDICES;
-static const u32 VertexMask_MASK_INSTANCEMATRIX1 = MASK_INSTANCEMATRIX1;
-static const u32 VertexMask_MASK_INSTANCEMATRIX2 = MASK_INSTANCEMATRIX2;
-static const u32 VertexMask_MASK_INSTANCEMATRIX3 = MASK_INSTANCEMATRIX3;
-static const u32 VertexMask_MASK_OBJECTINDEX = MASK_OBJECTINDEX;
+// enum class VertexElements : u32 | File: ../GraphicsAPI/GraphicsDefs.h
+static const u32 VertexElements_None = static_cast<u32>(VertexElements::None);
+static const u32 VertexElements_Position = static_cast<u32>(VertexElements::Position);
+static const u32 VertexElements_Normal = static_cast<u32>(VertexElements::Normal);
+static const u32 VertexElements_Color = static_cast<u32>(VertexElements::Color);
+static const u32 VertexElements_TexCoord1 = static_cast<u32>(VertexElements::TexCoord1);
+static const u32 VertexElements_TexCoord2 = static_cast<u32>(VertexElements::TexCoord2);
+static const u32 VertexElements_CubeTexCoord1 = static_cast<u32>(VertexElements::CubeTexCoord1);
+static const u32 VertexElements_CubeTexCoord2 = static_cast<u32>(VertexElements::CubeTexCoord2);
+static const u32 VertexElements_Tangent = static_cast<u32>(VertexElements::Tangent);
+static const u32 VertexElements_BlendWeights = static_cast<u32>(VertexElements::BlendWeights);
+static const u32 VertexElements_BlendIndices = static_cast<u32>(VertexElements::BlendIndices);
+static const u32 VertexElements_InstanceMatrix1 = static_cast<u32>(VertexElements::InstanceMatrix1);
+static const u32 VertexElements_InstanceMatrix2 = static_cast<u32>(VertexElements::InstanceMatrix2);
+static const u32 VertexElements_InstanceMatrix3 = static_cast<u32>(VertexElements::InstanceMatrix3);
+static const u32 VertexElements_ObjectIndex = static_cast<u32>(VertexElements::ObjectIndex);
 
 // enum ViewOverride : unsigned | File: ../Graphics/Camera.h
 static const unsigned ViewOverride_VO_NONE = VO_NONE;
@@ -1882,6 +1882,26 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     engine->RegisterEnumValue("VertexElementType", "TYPE_UBYTE4_NORM", TYPE_UBYTE4_NORM);
     engine->RegisterEnumValue("VertexElementType", "MAX_VERTEX_ELEMENT_TYPES", MAX_VERTEX_ELEMENT_TYPES);
 
+    // enum class VertexElements : u32 | File: ../GraphicsAPI/GraphicsDefs.h
+    engine->RegisterTypedef("VertexElements", "uint");
+    engine->SetDefaultNamespace("VertexElements");
+    engine->RegisterGlobalProperty("const uint None", (void*)&VertexElements_None);
+    engine->RegisterGlobalProperty("const uint Position", (void*)&VertexElements_Position);
+    engine->RegisterGlobalProperty("const uint Normal", (void*)&VertexElements_Normal);
+    engine->RegisterGlobalProperty("const uint Color", (void*)&VertexElements_Color);
+    engine->RegisterGlobalProperty("const uint TexCoord1", (void*)&VertexElements_TexCoord1);
+    engine->RegisterGlobalProperty("const uint TexCoord2", (void*)&VertexElements_TexCoord2);
+    engine->RegisterGlobalProperty("const uint CubeTexCoord1", (void*)&VertexElements_CubeTexCoord1);
+    engine->RegisterGlobalProperty("const uint CubeTexCoord2", (void*)&VertexElements_CubeTexCoord2);
+    engine->RegisterGlobalProperty("const uint Tangent", (void*)&VertexElements_Tangent);
+    engine->RegisterGlobalProperty("const uint BlendWeights", (void*)&VertexElements_BlendWeights);
+    engine->RegisterGlobalProperty("const uint BlendIndices", (void*)&VertexElements_BlendIndices);
+    engine->RegisterGlobalProperty("const uint InstanceMatrix1", (void*)&VertexElements_InstanceMatrix1);
+    engine->RegisterGlobalProperty("const uint InstanceMatrix2", (void*)&VertexElements_InstanceMatrix2);
+    engine->RegisterGlobalProperty("const uint InstanceMatrix3", (void*)&VertexElements_InstanceMatrix3);
+    engine->RegisterGlobalProperty("const uint ObjectIndex", (void*)&VertexElements_ObjectIndex);
+    engine->SetDefaultNamespace("");
+
     // enum VertexLightVSVariation | File: ../Graphics/Renderer.h
     engine->RegisterEnum("VertexLightVSVariation");
     engine->RegisterEnumValue("VertexLightVSVariation", "VLVS_NOLIGHTS", VLVS_NOLIGHTS);
@@ -1890,27 +1910,6 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     engine->RegisterEnumValue("VertexLightVSVariation", "VLVS_3LIGHTS", VLVS_3LIGHTS);
     engine->RegisterEnumValue("VertexLightVSVariation", "VLVS_4LIGHTS", VLVS_4LIGHTS);
     engine->RegisterEnumValue("VertexLightVSVariation", "MAX_VERTEXLIGHT_VS_VARIATIONS", MAX_VERTEXLIGHT_VS_VARIATIONS);
-
-    // enum VertexMask : u32 | File: ../GraphicsAPI/GraphicsDefs.h
-    engine->RegisterTypedef("VertexMask", "uint");
-    engine->RegisterGlobalProperty("const uint MASK_NONE", (void*)&VertexMask_MASK_NONE);
-    engine->RegisterGlobalProperty("const uint MASK_POSITION", (void*)&VertexMask_MASK_POSITION);
-    engine->RegisterGlobalProperty("const uint MASK_NORMAL", (void*)&VertexMask_MASK_NORMAL);
-    engine->RegisterGlobalProperty("const uint MASK_COLOR", (void*)&VertexMask_MASK_COLOR);
-    engine->RegisterGlobalProperty("const uint MASK_TEXCOORD1", (void*)&VertexMask_MASK_TEXCOORD1);
-    engine->RegisterGlobalProperty("const uint MASK_TEXCOORD2", (void*)&VertexMask_MASK_TEXCOORD2);
-    engine->RegisterGlobalProperty("const uint MASK_CUBETEXCOORD1", (void*)&VertexMask_MASK_CUBETEXCOORD1);
-    engine->RegisterGlobalProperty("const uint MASK_CUBETEXCOORD2", (void*)&VertexMask_MASK_CUBETEXCOORD2);
-    engine->RegisterGlobalProperty("const uint MASK_TANGENT", (void*)&VertexMask_MASK_TANGENT);
-    engine->RegisterGlobalProperty("const uint MASK_BLENDWEIGHTS", (void*)&VertexMask_MASK_BLENDWEIGHTS);
-    engine->RegisterGlobalProperty("const uint MASK_BLENDINDICES", (void*)&VertexMask_MASK_BLENDINDICES);
-    engine->RegisterGlobalProperty("const uint MASK_INSTANCEMATRIX1", (void*)&VertexMask_MASK_INSTANCEMATRIX1);
-    engine->RegisterGlobalProperty("const uint MASK_INSTANCEMATRIX2", (void*)&VertexMask_MASK_INSTANCEMATRIX2);
-    engine->RegisterGlobalProperty("const uint MASK_INSTANCEMATRIX3", (void*)&VertexMask_MASK_INSTANCEMATRIX3);
-    engine->RegisterGlobalProperty("const uint MASK_OBJECTINDEX", (void*)&VertexMask_MASK_OBJECTINDEX);
-
-    // URHO3D_FLAGSET(VertexMask, VertexMaskFlags) | File: ../GraphicsAPI/GraphicsDefs.h
-    engine->RegisterTypedef("VertexMaskFlags", "uint");
 
     // enum VerticalAlignment | File: ../UI/UIElement.h
     engine->RegisterEnum("VerticalAlignment");

@@ -51,7 +51,7 @@ static const unsigned MAX_ANIMATION_STATES = 256;
 AnimatedModel::AnimatedModel(Context* context) :
     StaticModel(context),
     animationLodFrameNumber_(0),
-    morphElementMask_(0),
+    morphElementMask_(VertexElements::None),
     animationLodBias_(1.0f),
     animationLodTimer_(-1.0f),
     animationLodDistance_(0.0f),
@@ -355,7 +355,7 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
         morphs_.Clear();
         const Vector<ModelMorph>& morphs = model->GetMorphs();
         morphs_.Reserve(morphs.Size());
-        morphElementMask_ = MASK_NONE;
+        morphElementMask_ = VertexElements::None;
         for (unsigned i = 0; i < morphs.Size(); ++i)
         {
             ModelMorph newMorph;
@@ -415,7 +415,7 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
         geometryBoneMappings_.Clear();
         morphVertexBuffers_.Clear();
         morphs_.Clear();
-        morphElementMask_ = MASK_NONE;
+        morphElementMask_ = VertexElements::None;
         SetBoundingBox(BoundingBox());
         SetSkeleton(Skeleton(), false);
     }
@@ -1164,7 +1164,7 @@ void AnimatedModel::CloneGeometries()
 void AnimatedModel::CopyMorphVertices(void* destVertexData, void* srcVertexData, unsigned vertexCount, VertexBuffer* destBuffer,
     VertexBuffer* srcBuffer)
 {
-    unsigned mask = destBuffer->GetElementMask() & srcBuffer->GetElementMask();
+    VertexElements mask = destBuffer->GetElementMask() & srcBuffer->GetElementMask();
     unsigned normalOffset = srcBuffer->GetElementOffset(SEM_NORMAL);
     unsigned tangentOffset = srcBuffer->GetElementOffset(SEM_TANGENT);
     unsigned vertexSize = srcBuffer->GetVertexSize();
@@ -1173,7 +1173,7 @@ void AnimatedModel::CopyMorphVertices(void* destVertexData, void* srcVertexData,
 
     while (vertexCount--)
     {
-        if (mask & MASK_POSITION)
+        if (!!(mask & VertexElements::Position))
         {
             auto* posSrc = (float*)src;
             dest[0] = posSrc[0];
@@ -1181,7 +1181,7 @@ void AnimatedModel::CopyMorphVertices(void* destVertexData, void* srcVertexData,
             dest[2] = posSrc[2];
             dest += 3;
         }
-        if (mask & MASK_NORMAL)
+        if (!!(mask & VertexElements::Normal))
         {
             auto* normalSrc = (float*)(src + normalOffset);
             dest[0] = normalSrc[0];
@@ -1189,7 +1189,7 @@ void AnimatedModel::CopyMorphVertices(void* destVertexData, void* srcVertexData,
             dest[2] = normalSrc[2];
             dest += 3;
         }
-        if (mask & MASK_TANGENT)
+        if (!!(mask & VertexElements::Tangent))
         {
             auto* tangentSrc = (float*)(src + tangentOffset);
             dest[0] = tangentSrc[0];
@@ -1369,7 +1369,7 @@ void AnimatedModel::UpdateMorphs()
 void AnimatedModel::ApplyMorph(VertexBuffer* buffer, void* destVertexData, unsigned morphRangeStart, const VertexBufferMorph& morph,
     float weight)
 {
-    const VertexMaskFlags elementMask = morph.elementMask_ & buffer->GetElementMask();
+    const VertexElements elementMask = morph.elementMask_ & buffer->GetElementMask();
     unsigned vertexCount = morph.vertexCount_;
     unsigned normalOffset = buffer->GetElementOffset(SEM_NORMAL);
     unsigned tangentOffset = buffer->GetElementOffset(SEM_TANGENT);
@@ -1383,7 +1383,7 @@ void AnimatedModel::ApplyMorph(VertexBuffer* buffer, void* destVertexData, unsig
         unsigned vertexIndex = *((unsigned*)srcData) - morphRangeStart;
         srcData += sizeof(unsigned);
 
-        if (elementMask & MASK_POSITION)
+        if (!!(elementMask & VertexElements::Position))
         {
             auto* dest = (float*)(destData + vertexIndex * vertexSize);
             auto* src = (float*)srcData;
@@ -1392,7 +1392,7 @@ void AnimatedModel::ApplyMorph(VertexBuffer* buffer, void* destVertexData, unsig
             dest[2] += src[2] * weight;
             srcData += 3 * sizeof(float);
         }
-        if (elementMask & MASK_NORMAL)
+        if (!!(elementMask & VertexElements::Normal))
         {
             auto* dest = (float*)(destData + vertexIndex * vertexSize + normalOffset);
             auto* src = (float*)srcData;
@@ -1401,7 +1401,7 @@ void AnimatedModel::ApplyMorph(VertexBuffer* buffer, void* destVertexData, unsig
             dest[2] += src[2] * weight;
             srcData += 3 * sizeof(float);
         }
-        if (elementMask & MASK_TANGENT)
+        if (!!(elementMask & VertexElements::Tangent))
         {
             auto* dest = (float*)(destData + vertexIndex * vertexSize + tangentOffset);
             auto* src = (float*)srcData;

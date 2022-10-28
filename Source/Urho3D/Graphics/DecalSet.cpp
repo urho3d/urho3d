@@ -33,9 +33,12 @@ static const unsigned MIN_INDICES = 6;
 static const unsigned MAX_VERTICES = 65536;
 static const unsigned DEFAULT_MAX_VERTICES = 512;
 static const unsigned DEFAULT_MAX_INDICES = 1024;
-static const VertexMaskFlags STATIC_ELEMENT_MASK = MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT;
-static const VertexMaskFlags SKINNED_ELEMENT_MASK = MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT |
-    MASK_BLENDWEIGHTS | MASK_BLENDINDICES;
+
+static constexpr VertexElements STATIC_ELEMENT_MASK{VertexElements::Position | VertexElements::Normal
+    | VertexElements::TexCoord1 | VertexElements::Tangent};
+
+static constexpr VertexElements SKINNED_ELEMENT_MASK{VertexElements::Position | VertexElements::Normal
+    | VertexElements::TexCoord1 | VertexElements::Tangent | VertexElements::BlendWeights | VertexElements::BlendIndices};
 
 static DecalVertex ClipEdge(const DecalVertex& v0, const DecalVertex& v1, float d0, float d1, bool skinned)
 {
@@ -702,22 +705,22 @@ void DecalSet::GetFaces(Vector<Vector<DecalVertex>>& faces, Drawable* target, un
         if (!vb)
             continue;
 
-        unsigned elementMask = vb->GetElementMask();
+        VertexElements elementMask = vb->GetElementMask();
         byte* data = vb->GetShadowData();
         if (!data)
             continue;
 
-        if (elementMask & MASK_POSITION)
+        if (!!(elementMask & VertexElements::Position))
         {
             positionData = data;
             positionStride = vb->GetVertexSize();
         }
-        if (elementMask & MASK_NORMAL)
+        if (!!(elementMask & VertexElements::Normal))
         {
             normalData = data + vb->GetElementOffset(SEM_NORMAL);
             normalStride = vb->GetVertexSize();
         }
-        if (elementMask & MASK_BLENDWEIGHTS)
+        if (!!(elementMask & VertexElements::BlendWeights))
         {
             skinningData = data + vb->GetElementOffset(SEM_BLENDWEIGHTS);
             skinningStride = vb->GetVertexSize();
@@ -987,7 +990,7 @@ void DecalSet::CalculateBoundingBox()
 
 void DecalSet::UpdateBuffers()
 {
-    const VertexMaskFlags newElementMask = skinned_ ? SKINNED_ELEMENT_MASK : STATIC_ELEMENT_MASK;
+    const VertexElements newElementMask = skinned_ ? SKINNED_ELEMENT_MASK : STATIC_ELEMENT_MASK;
     unsigned newVBSize = optimizeBufferSize_ ? numVertices_ : maxVertices_;
     unsigned newIBSize = optimizeBufferSize_ ? numIndices_ : maxIndices_;
 

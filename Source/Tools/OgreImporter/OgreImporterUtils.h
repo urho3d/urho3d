@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <Urho3D/Base/Utils.h>
 #include <Urho3D/Graphics/Animation.h>
 #include <Urho3D/Graphics/Graphics.h>
 #include <Urho3D/GraphicsAPI/VertexBuffer.h>
@@ -95,13 +96,13 @@ struct ModelVertex
 
 struct ModelVertexBuffer
 {
-    VertexMaskFlags elementMask_;
+    VertexElements elementMask_;
     unsigned morphStart_;
     unsigned morphCount_;
     Vector<ModelVertex> vertices_;
 
     ModelVertexBuffer() :
-        elementMask_(MASK_NONE),
+        elementMask_(VertexElements::None),
         morphStart_(0),
         morphCount_(0)
     {
@@ -126,25 +127,25 @@ struct ModelVertexBuffer
 
         for (unsigned i = 0; i < vertices_.Size(); ++i)
         {
-            if (elementMask_ & MASK_POSITION)
+            if (!!(elementMask_ & VertexElements::Position))
                 dest.WriteVector3(vertices_[i].position_);
-            if (elementMask_ & MASK_NORMAL)
+            if (!!(elementMask_ & VertexElements::Normal))
                 dest.WriteVector3(vertices_[i].normal_);
-            if (elementMask_ & MASK_COLOR)
+            if (!!(elementMask_ & VertexElements::Color))
                 dest.WriteU32(vertices_[i].color_.ToUInt());
-            if (elementMask_ & MASK_TEXCOORD1)
+            if (!!(elementMask_ & VertexElements::TexCoord1))
                 dest.WriteVector2(vertices_[i].texCoord1_);
-            if (elementMask_ & MASK_TEXCOORD2)
+            if (!!(elementMask_ & VertexElements::TexCoord2))
                 dest.WriteVector2(vertices_[i].texCoord2_);
-            if (elementMask_ & MASK_CUBETEXCOORD1)
+            if (!!(elementMask_ & VertexElements::CubeTexCoord1))
                 dest.WriteVector3(vertices_[i].cubeTexCoord1_);
-            if (elementMask_ & MASK_CUBETEXCOORD2)
+            if (!!(elementMask_ & VertexElements::CubeTexCoord2))
                 dest.WriteVector3(vertices_[i].cubeTexCoord2_);
-            if (elementMask_ & MASK_TANGENT)
+            if (!!(elementMask_ & VertexElements::Tangent))
                 dest.WriteVector4(vertices_[i].tangent_);
-            if (elementMask_ & MASK_BLENDWEIGHTS)
+            if (!!(elementMask_ & VertexElements::BlendWeights))
                 dest.Write(&vertices_[i].blendWeights_[0], 4 * sizeof(float));
-            if (elementMask_ & MASK_BLENDINDICES)
+            if (!!(elementMask_ & VertexElements::BlendIndices))
                 dest.Write(&vertices_[i].blendIndices_[0], 4 * sizeof(unsigned char));
         }
     }
@@ -153,7 +154,7 @@ struct ModelVertexBuffer
 struct ModelMorphBuffer
 {
     unsigned vertexBuffer_;
-    unsigned elementMask_;
+    VertexElements elementMask_;
     Vector<Pair<unsigned, ModelVertex>> vertices_;
 };
 
@@ -169,19 +170,19 @@ struct ModelMorph
         for (unsigned i = 0; i < buffers_.Size(); ++i)
         {
             dest.WriteU32(buffers_[i].vertexBuffer_);
-            dest.WriteU32(buffers_[i].elementMask_);
+            dest.WriteU32(ToU32(buffers_[i].elementMask_));
             dest.WriteU32(buffers_[i].vertices_.Size());
-            unsigned elementMask = buffers_[i].elementMask_;
+            VertexElements elementMask = buffers_[i].elementMask_;
 
             for (Vector<Pair<unsigned, ModelVertex>>::Iterator j = buffers_[i].vertices_.Begin();
                 j != buffers_[i].vertices_.End(); ++j)
             {
                 dest.WriteU32(j->first_);
-                if (elementMask & MASK_POSITION)
+                if (!!(elementMask & VertexElements::Position))
                     dest.WriteVector3(j->second_.position_);
-                if (elementMask & MASK_NORMAL)
+                if (!!(elementMask & VertexElements::Normal))
                     dest.WriteVector3(j->second_.normal_);
-                if (elementMask & MASK_TANGENT)
+                if (!!(elementMask & VertexElements::Tangent))
                     dest.WriteVector3(Vector3(j->second_.tangent_.x_, j->second_.tangent_.y_, j->second_.tangent_.z_));
             }
         }

@@ -29,7 +29,7 @@ namespace Urho3D
 
 extern const char* blendModeNames[];
 
-static const unsigned MASK_VERTEX2D = MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1;
+static const VertexElements MASK_VERTEX2D = VertexElements::Position | VertexElements::Color | VertexElements::TexCoord1;
 
 ViewBatchInfo2D::ViewBatchInfo2D() :
     vertexBufferUpdateFrameNumber_(0),

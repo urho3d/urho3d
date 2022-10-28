@@ -498,13 +498,17 @@ void BillboardSet::UpdateBufferSize()
     {
         if (faceCameraMode_ == FC_DIRECTION)
         {
-            vertexBuffer_->SetSize(numBillboards * 4, MASK_POSITION | MASK_NORMAL | MASK_COLOR | MASK_TEXCOORD1 | MASK_TEXCOORD2, true);
+            vertexBuffer_->SetSize(numBillboards * 4, VertexElements::Position | VertexElements::Normal
+                | VertexElements::Color | VertexElements::TexCoord1 | VertexElements::TexCoord2, true);
+
             geometry_->SetVertexBuffer(0, vertexBuffer_);
 
         }
         else
         {
-            vertexBuffer_->SetSize(numBillboards * 4, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1 | MASK_TEXCOORD2, true);
+            vertexBuffer_->SetSize(numBillboards * 4, VertexElements::Position | VertexElements::Color
+                | VertexElements::TexCoord1 | VertexElements::TexCoord2, true);
+
             geometry_->SetVertexBuffer(0, vertexBuffer_);
         }
         geometryTypeUpdate_ = false;

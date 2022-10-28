@@ -6577,8 +6577,8 @@ template <class T> void RegisterMembers_VertexBufferMorph(asIScriptEngine* engin
     // SharedArrayPtr<unsigned char> VertexBufferMorph::morphData_
     // Error: type "SharedArrayPtr<unsigned char>" can not automatically bind
 
-    // VertexMaskFlags VertexBufferMorph::elementMask_
-    engine->RegisterObjectProperty(className, "VertexMaskFlags elementMask", offsetof(T, elementMask_));
+    // VertexElements VertexBufferMorph::elementMask_
+    engine->RegisterObjectProperty(className, "VertexElements elementMask", offsetof(T, elementMask_));
 
     // unsigned VertexBufferMorph::vertexCount_
     engine->RegisterObjectProperty(className, "uint vertexCount", offsetof(T, vertexCount_));
@@ -9968,7 +9968,7 @@ template <class T> void RegisterMembers_Geometry(asIScriptEngine* engine, const 
     // Error: type "const SharedArrayPtr<byte>&" can not automatically bind
     // void Geometry::SetRawVertexData(const SharedArrayPtr<byte>& data, const Vector<VertexElement>& elements)
     // Error: type "const SharedArrayPtr<byte>&" can not automatically bind
-    // void Geometry::SetRawVertexData(const SharedArrayPtr<byte>& data, unsigned elementMask)
+    // void Geometry::SetRawVertexData(const SharedArrayPtr<byte>& data, VertexElements elementMask)
     // Error: type "const SharedArrayPtr<byte>&" can not automatically bind
 
     // void Geometry::Draw(Graphics* graphics)
@@ -12521,8 +12521,8 @@ template <class T> i32 VertexBuffer_i32_GetElementOffset_constspVectorlesVertexE
     return result;
 }
 
-// static Vector<VertexElement> VertexBuffer::GetElements(unsigned elementMask)
-template <class T> CScriptArray* VertexBuffer_VectorlesVertexElementgre_GetElements_unsigned(unsigned elementMask)
+// static Vector<VertexElement> VertexBuffer::GetElements(VertexElements elementMask)
+template <class T> CScriptArray* VertexBuffer_VectorlesVertexElementgre_GetElements_VertexElements(VertexElements elementMask)
 {
     Vector<VertexElement> result = T::GetElements(elementMask);
     return VectorToArray(result, "Array<VertexElement>");
@@ -12560,9 +12560,9 @@ template <class T> void RegisterMembers_VertexBuffer(asIScriptEngine* engine, co
     // hash64 VertexBuffer::GetBufferHash(i32 streamIndex)
     engine->RegisterObjectMethod(className, "hash64 GetBufferHash(int)", AS_METHODPR(T, GetBufferHash, (i32), hash64), AS_CALL_THISCALL);
 
-    // VertexMaskFlags VertexBuffer::GetElementMask() const
-    engine->RegisterObjectMethod(className, "VertexMaskFlags GetElementMask() const", AS_METHODPR(T, GetElementMask, () const, VertexMaskFlags), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "VertexMaskFlags get_elementMask() const", AS_METHODPR(T, GetElementMask, () const, VertexMaskFlags), AS_CALL_THISCALL);
+    // VertexElements VertexBuffer::GetElementMask() const
+    engine->RegisterObjectMethod(className, "VertexElements GetElementMask() const", AS_METHODPR(T, GetElementMask, () const, VertexElements), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "VertexElements get_elementMask() const", AS_METHODPR(T, GetElementMask, () const, VertexElements), AS_CALL_THISCALL);
 
     // i32 VertexBuffer::GetElementOffset(VertexElementSemantic semantic, i8 index = 0) const
     engine->RegisterObjectMethod(className, "int GetElementOffset(VertexElementSemantic, int8 = 0) const", AS_METHODPR(T, GetElementOffset, (VertexElementSemantic, i8) const, i32), AS_CALL_THISCALL);
@@ -12606,8 +12606,8 @@ template <class T> void RegisterMembers_VertexBuffer(asIScriptEngine* engine, co
     // bool VertexBuffer::SetSize(i32 vertexCount, const Vector<VertexElement>& elements, bool dynamic = false)
     engine->RegisterObjectMethod(className, "bool SetSize(int, Array<VertexElement>@+, bool = false)", AS_FUNCTION_OBJFIRST(VertexBuffer_bool_SetSize_i32_constspVectorlesVertexElementgreamp_bool_template<VertexBuffer>), AS_CALL_CDECL_OBJFIRST);
 
-    // bool VertexBuffer::SetSize(i32 vertexCount, unsigned elementMask, bool dynamic = false)
-    engine->RegisterObjectMethod(className, "bool SetSize(int, uint, bool = false)", AS_METHODPR(T, SetSize, (i32, unsigned, bool), bool), AS_CALL_THISCALL);
+    // bool VertexBuffer::SetSize(i32 vertexCount, VertexElements elementMask, bool dynamic = false)
+    engine->RegisterObjectMethod(className, "bool SetSize(int, VertexElements, bool = false)", AS_METHODPR(T, SetSize, (i32, VertexElements, bool), bool), AS_CALL_THISCALL);
 
     // void VertexBuffer::Unlock()
     engine->RegisterObjectMethod(className, "void Unlock()", AS_METHODPR(T, Unlock, (), void), AS_CALL_THISCALL);
@@ -12623,14 +12623,14 @@ template <class T> void RegisterMembers_VertexBuffer(asIScriptEngine* engine, co
     // static i32 VertexBuffer::GetElementOffset(const Vector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, i8 index = 0)
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("int GetElementOffset(Array<VertexElement>@+, VertexElementType, VertexElementSemantic, int8 = 0)", AS_FUNCTION(VertexBuffer_i32_GetElementOffset_constspVectorlesVertexElementgreamp_VertexElementType_VertexElementSemantic_i8<VertexBuffer>), AS_CALL_CDECL);engine->SetDefaultNamespace("");
 
-    // static Vector<VertexElement> VertexBuffer::GetElements(unsigned elementMask)
-    engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("Array<VertexElement>@ GetElements(uint)", AS_FUNCTION(VertexBuffer_VectorlesVertexElementgre_GetElements_unsigned<VertexBuffer>), AS_CALL_CDECL);engine->SetDefaultNamespace("");
+    // static Vector<VertexElement> VertexBuffer::GetElements(VertexElements elementMask)
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("Array<VertexElement>@ GetElements(VertexElements)", AS_FUNCTION(VertexBuffer_VectorlesVertexElementgre_GetElements_VertexElements<VertexBuffer>), AS_CALL_CDECL);engine->SetDefaultNamespace("");
 
     // static i32 VertexBuffer::GetVertexSize(const Vector<VertexElement>& elements)
     engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("int GetVertexSize(Array<VertexElement>@+)", AS_FUNCTION(VertexBuffer_i32_GetVertexSize_constspVectorlesVertexElementgreamp<VertexBuffer>), AS_CALL_CDECL);engine->SetDefaultNamespace("");
 
-    // static i32 VertexBuffer::GetVertexSize(unsigned elementMask)
-    engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("int GetVertexSize(uint)", AS_FUNCTIONPR(T::GetVertexSize, (unsigned), i32), AS_CALL_CDECL);engine->SetDefaultNamespace("");
+    // static i32 VertexBuffer::GetVertexSize(VertexElements elementMask)
+    engine->SetDefaultNamespace(className);engine->RegisterGlobalFunction("int GetVertexSize(VertexElements)", AS_FUNCTIONPR(T::GetVertexSize, (VertexElements), i32), AS_CALL_CDECL);engine->SetDefaultNamespace("");
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_VertexBuffer
         REGISTER_MEMBERS_MANUAL_PART_VertexBuffer();
