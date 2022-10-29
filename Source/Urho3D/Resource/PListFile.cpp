@@ -371,7 +371,7 @@ bool PListFile::LoadValue(PListValue& value, const XMLElement& valueElem)
     else if (valueType == "real")
         value.SetFloat(ToFloat(valueElem.GetValue()));
     else if (valueType == "integer")
-        value.SetInt(ToInt(valueElem.GetValue()));
+        value.SetInt(ToI32(valueElem.GetValue()));
     else if (valueType == "true")
         value.SetBool(true);
     else if (valueType == "false")

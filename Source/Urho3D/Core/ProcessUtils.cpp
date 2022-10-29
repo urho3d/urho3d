@@ -621,8 +621,8 @@ String GetOSVersion()
     {
         Vector<String> kernel_version = String(kernel_r).Split('.');
         String version = "macOS/Mac OS X ";
-        int major = ToInt(kernel_version[0]);
-        int minor = ToInt(kernel_version[1]);
+        int major = ToI32(kernel_version[0]);
+        int minor = ToI32(kernel_version[1]);
 
         // https://en.wikipedia.org/wiki/Darwin_(operating_system)
         if (major == 18) // macOS Mojave

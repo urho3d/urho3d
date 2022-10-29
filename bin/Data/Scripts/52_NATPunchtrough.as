@@ -150,7 +150,7 @@ Button@ CreateButton(const String&in text, int width, IntVector2 pos)
 void HandleSaveNatSettings(StringHash eventType, VariantMap& eventData)
 {
     // Save NAT server configuration
-    network.SetNATServerInfo(natServerAddress.text, natServerPort.text.ToInt());
+    network.SetNATServerInfo(natServerAddress.text, natServerPort.text.ToI32());
     ShowLogMessage("Saving NAT settings: " + natServerAddress.text + ":" + natServerPort.text);
 }
 

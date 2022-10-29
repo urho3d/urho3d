@@ -1915,7 +1915,7 @@ Animatable* UIElement::FindAttributeAnimationTarget(const String& name, String& 
             char s = name.Front();
             if (s >= '0' && s <= '9')
             {
-                i32 index = ToInt(name);
+                i32 index = ToI32(name);
                 element = element->GetChild(index);
             }
             else

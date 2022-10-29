@@ -388,7 +388,7 @@ void Run(const Vector<String>& arguments)
             }
             else if (argument == "mb" && !value.Empty())
             {
-                maxBones_ = ToUInt(value);
+                maxBones_ = ToU32(value);
                 if (maxBones_ < 1)
                     maxBones_ = 1;
                 ++i;
@@ -1960,7 +1960,7 @@ void CopyTextures(const HashSet<String>& usedTextures, const String& sourcePath)
         // Handle assimp embedded textures
         if (i->Length() && i->At(0) == '*')
         {
-            unsigned texIndex = ToInt(i->Substring(1));
+            unsigned texIndex = ToI32(i->Substring(1));
             if (texIndex >= scene_->mNumTextures)
                 PrintLine("Skipping out of range texture index " + String(texIndex));
             else
@@ -2349,7 +2349,7 @@ String GetMaterialTextureName(const String& nameIn)
 {
     // Detect assimp embedded texture
     if (nameIn.Length() && nameIn[0] == '*')
-        return GenerateTextureName(ToInt(nameIn.Substring(1)));
+        return GenerateTextureName(ToI32(nameIn.Substring(1)));
     else
         return (useSubdirs_ ? "Textures/" : "") + nameIn;
 }

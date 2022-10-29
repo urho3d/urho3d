@@ -131,7 +131,7 @@ void HandleInput(const String&in input)
         if (input.StartsWith("set") && tokens.length > 1)
         {
             if (setting == "maxrows")
-                maxRows = Max(tokens[1].ToUInt(), 1);
+                maxRows = Max(tokens[1].ToU32(), 1);
             else if (setting == "connstr") {
                 String newConnectionString(input.Substring(input.Find(" ", input.Find("connstr")) + 1));
                 DbConnection@ newConnection = database.Connect(newConnectionString);

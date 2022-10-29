@@ -396,7 +396,7 @@ void EditShadowQuality(StringHash eventType, VariantMap& eventData)
 void EditMaxOccluderTriangles(StringHash eventType, VariantMap& eventData)
 {
     LineEdit@ edit = eventData["Element"].GetPtr();
-    renderer.maxOccluderTriangles = edit.text.ToInt();
+    renderer.maxOccluderTriangles = edit.text.ToI32();
     if (eventType == StringHash("TextFinished"))
         edit.text = String(renderer.maxOccluderTriangles);
 }
@@ -452,7 +452,7 @@ void EditCubemapName(StringHash eventType, VariantMap& eventData)
 void EditCubemapSize(StringHash eventType, VariantMap& eventData)
 {
     LineEdit@ edit = eventData["Element"].GetPtr();
-    cubeMapGen_Size = edit.text.ToInt();
+    cubeMapGen_Size = edit.text.ToI32();
 }
 
 void EditDefaultTags(StringHash eventType, VariantMap& eventData)

@@ -2477,7 +2477,7 @@ void Input::HandleScreenJoystickTouch(StringHash eventType, VariantMap& eventDat
         {
             evt.type = eventType == E_TOUCHBEGIN ? SDL_JOYBUTTONDOWN : SDL_JOYBUTTONUP;
             evt.jbutton.which = joystickID;
-            evt.jbutton.button = (Uint8)ToUInt(name.Substring(6));
+            evt.jbutton.button = (Uint8)ToU32(name.Substring(6));
         }
         else
         {
@@ -2510,7 +2510,7 @@ void Input::HandleScreenJoystickTouch(StringHash eventType, VariantMap& eventDat
         {
             evt.type = SDL_JOYHATMOTION;
             evt.jaxis.which = joystickID;
-            evt.jhat.hat = (Uint8)ToUInt(name.Substring(3));
+            evt.jhat.hat = (Uint8)ToU32(name.Substring(3));
             evt.jhat.value = HAT_CENTER;
             if (eventType != E_TOUCHEND)
             {

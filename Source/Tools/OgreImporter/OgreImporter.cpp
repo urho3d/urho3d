@@ -112,7 +112,7 @@ void Run(const Vector<String>& arguments)
                 }
                 else if (argument == "mb" && i < arguments.Size() - 1)
                 {
-                    maxBones_ = ToUInt(arguments[i + 1]);
+                    maxBones_ = ToU32(arguments[i + 1]);
                     if (maxBones_ < 1)
                         maxBones_ = 1;
                     ++i;
