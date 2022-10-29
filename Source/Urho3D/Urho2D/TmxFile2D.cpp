@@ -145,7 +145,7 @@ bool TmxTileLayer2D::Load(const XMLElement& element, const TileMapInfo2D& info)
             for (int x = 0; x < width_; ++x)
             {
                 gidVector[currentIndex].Replace("\n", "");
-                unsigned gid = ToUInt(gidVector[currentIndex]);
+                unsigned gid = ToU32(gidVector[currentIndex]);
                 if (gid > 0)
                 {
                     SharedPtr<Tile2D> tile(new Tile2D());

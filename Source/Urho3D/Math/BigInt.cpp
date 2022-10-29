@@ -205,11 +205,11 @@ BigInt::BigInt(const String& str)
     for (; i > firstDigitPos; i -= BASE_DIGITS)
     {
         String chunk = str.Substring(i, BASE_DIGITS);
-        magnitude_.Push(ToInt64(chunk)); // To Digit
+        magnitude_.Push(ToI64(chunk)); // To Digit
     }
 
     String lastChunk = str.Substring(firstDigitPos, BASE_DIGITS + i - firstDigitPos);
-    magnitude_.Push(ToInt64(lastChunk)); // To Digit
+    magnitude_.Push(ToI64(lastChunk)); // To Digit
 }
 
 BigInt::BigInt(i32 value)

@@ -253,11 +253,11 @@ void Variant::FromString(VariantType type, const char* value)
     switch (type)
     {
     case VAR_INT:
-        *this = ToInt(value);
+        *this = ToI32(value);
         break;
 
     case VAR_INT64:
-        *this = ToInt64(value);
+        *this = ToI64(value);
         break;
 
     case VAR_BOOL:

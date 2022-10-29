@@ -117,12 +117,12 @@ void Run(Vector<String>& arguments)
 
         if (arg.StartsWith("-"))
         {
-            if (arg == "-px")      { padX = ToUInt(arguments[0]); arguments.Erase(0); }
-            else if (arg == "-py") { padY = ToUInt(arguments[0]); arguments.Erase(0); }
-            else if (arg == "-ox") { offsetX = ToUInt(arguments[0]); arguments.Erase(0); }
-            else if (arg == "-oy") { offsetY = ToUInt(arguments[0]); arguments.Erase(0); }
-            else if (arg == "-frameWidth") { frameWidth = ToUInt(arguments[0]); arguments.Erase(0); }
-            else if (arg == "-frameHeight") { frameHeight = ToUInt(arguments[0]); arguments.Erase(0); }
+            if (arg == "-px")      { padX = ToU32(arguments[0]); arguments.Erase(0); }
+            else if (arg == "-py") { padY = ToU32(arguments[0]); arguments.Erase(0); }
+            else if (arg == "-ox") { offsetX = ToU32(arguments[0]); arguments.Erase(0); }
+            else if (arg == "-oy") { offsetY = ToU32(arguments[0]); arguments.Erase(0); }
+            else if (arg == "-frameWidth") { frameWidth = ToU32(arguments[0]); arguments.Erase(0); }
+            else if (arg == "-frameHeight") { frameHeight = ToU32(arguments[0]); arguments.Erase(0); }
             else if (arg == "-trim") { trim = true; }
             else if (arg == "-xml")  { spriteSheetFileName = arguments[0]; arguments.Erase(0); }
             else if (arg == "-h")  { help = true; break; }

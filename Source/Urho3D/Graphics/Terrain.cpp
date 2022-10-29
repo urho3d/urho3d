@@ -919,8 +919,8 @@ void Terrain::CreateGeometry()
             Vector<String> coords = (*i)->GetName().Substring(6).Split('_');
             if (coords.Size() == 2)
             {
-                int x = ToInt(coords[0]);
-                int z = ToInt(coords[1]);
+                int x = ToI32(coords[0]);
+                int z = ToI32(coords[1]);
                 if (x < numPatches_.x_ && z < numPatches_.y_)
                     nodeOk = true;
             }

@@ -172,7 +172,7 @@ void ToggleParentToSelected(StringHash eventType, VariantMap& eventData)
 void UpdateNumberSpawnedObjects(StringHash eventType, VariantMap& eventData)
 {
     LineEdit@ edit = eventData["Element"].GetPtr();
-    numberSpawnedObjects = edit.text.ToUInt();
+    numberSpawnedObjects = edit.text.ToU32();
     edit.text = String(numberSpawnedObjects);
     RefreshPickedObjects();
 }
@@ -186,7 +186,7 @@ void EditSpawnRadius(StringHash eventType, VariantMap& eventData)
 void EditSpawnCount(StringHash eventType, VariantMap& eventData)
 {
     LineEdit@ edit = eventData["Element"].GetPtr();
-    spawnCount = edit.text.ToUInt();
+    spawnCount = edit.text.ToU32();
 }
 
 void RefreshPickedObjects()

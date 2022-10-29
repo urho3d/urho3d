@@ -84,7 +84,7 @@ void HttpRequest::ThreadFunction()
     i32 portStart = host.Find(':');
     if (portStart != String::NPOS)
     {
-        port = ToInt(host.Substring(portStart + 1));
+        port = ToI32(host.Substring(portStart + 1));
         host = host.Substring(0, portStart);
     } else if (protocol.Compare("https", false) >= 0)
         port = 443;

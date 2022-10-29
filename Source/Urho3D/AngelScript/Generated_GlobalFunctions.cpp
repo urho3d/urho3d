@@ -448,16 +448,16 @@ void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
     // float ToFloat(const char* source) | File: ../Core/StringUtils.h
     // Error: type "const char*" can not automatically bind
 
-    // int ToInt(const String& source, int base = 10) | File: ../Core/StringUtils.h
-    engine->RegisterGlobalFunction("int ToInt(const String&in, int = 10)", AS_FUNCTIONPR(ToInt, (const String&, int), int), AS_CALL_CDECL);
+    // i32 ToI32(const String& source, i32 base = 10) | File: ../Core/StringUtils.h
+    engine->RegisterGlobalFunction("int ToI32(const String&in, int = 10)", AS_FUNCTIONPR(ToI32, (const String&, i32), i32), AS_CALL_CDECL);
 
-    // int ToInt(const char* source, int base = 10) | File: ../Core/StringUtils.h
+    // i32 ToI32(const char* source, i32 base = 10) | File: ../Core/StringUtils.h
     // Error: type "const char*" can not automatically bind
 
-    // long long ToInt64(const String& source, int base = 10) | File: ../Core/StringUtils.h
-    engine->RegisterGlobalFunction("int64 ToInt64(const String&in, int = 10)", AS_FUNCTIONPR(ToInt64, (const String&, int), long long), AS_CALL_CDECL);
+    // i64 ToI64(const String& source, i32 base = 10) | File: ../Core/StringUtils.h
+    engine->RegisterGlobalFunction("int64 ToI64(const String&in, int = 10)", AS_FUNCTIONPR(ToI64, (const String&, i32), i64), AS_CALL_CDECL);
 
-    // long long ToInt64(const char* source, int base = 10) | File: ../Core/StringUtils.h
+    // i64 ToI64(const char* source, i32 base = 10) | File: ../Core/StringUtils.h
     // Error: type "const char*" can not automatically bind
 
     // IntRect ToIntRect(const String& source) | File: ../Core/StringUtils.h
@@ -520,16 +520,16 @@ void ASRegisterGeneratedGlobalFunctions(asIScriptEngine* engine)
     // String ToStringHex(unsigned value) | File: ../Core/StringUtils.h
     engine->RegisterGlobalFunction("String ToStringHex(uint)", AS_FUNCTIONPR(ToStringHex, (unsigned), String), AS_CALL_CDECL);
 
-    // unsigned ToUInt(const String& source, int base = 10) | File: ../Core/StringUtils.h
-    engine->RegisterGlobalFunction("uint ToUInt(const String&in, int = 10)", AS_FUNCTIONPR(ToUInt, (const String&, int), unsigned), AS_CALL_CDECL);
+    // u32 ToU32(const String& source, i32 base = 10) | File: ../Core/StringUtils.h
+    engine->RegisterGlobalFunction("uint ToU32(const String&in, int = 10)", AS_FUNCTIONPR(ToU32, (const String&, i32), u32), AS_CALL_CDECL);
 
-    // unsigned ToUInt(const char* source, int base = 10) | File: ../Core/StringUtils.h
+    // u32 ToU32(const char* source, i32 base = 10) | File: ../Core/StringUtils.h
     // Error: type "const char*" can not automatically bind
 
-    // unsigned long long ToUInt64(const String& source, int base = 10) | File: ../Core/StringUtils.h
-    engine->RegisterGlobalFunction("uint64 ToUInt64(const String&in, int = 10)", AS_FUNCTIONPR(ToUInt64, (const String&, int), unsigned long long), AS_CALL_CDECL);
+    // u64 ToU64(const String& source, i32 base = 10) | File: ../Core/StringUtils.h
+    engine->RegisterGlobalFunction("uint64 ToU64(const String&in, int = 10)", AS_FUNCTIONPR(ToU64, (const String&, i32), u64), AS_CALL_CDECL);
 
-    // unsigned long long ToUInt64(const char* source, int base = 10) | File: ../Core/StringUtils.h
+    // u64 ToU64(const char* source, i32 base = 10) | File: ../Core/StringUtils.h
     // Error: type "const char*" can not automatically bind
 
     // unsigned ToUpper(unsigned ch) | File: ../Core/StringUtils.h

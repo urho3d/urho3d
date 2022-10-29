@@ -1918,7 +1918,7 @@ Animatable* Node::FindAttributeAnimationTarget(const String& name, String& outNa
             char s = name.Front();
             if (s >= '0' && s <= '9')
             {
-                i32 index = ToInt(name);
+                i32 index = ToI32(name);
                 node = node->GetChild(index);
             }
             else
@@ -1961,7 +1961,7 @@ Animatable* Node::FindAttributeAnimationTarget(const String& name, String& outNa
         }
         else
         {
-            i32 index = ToInt(componentNames[1]);
+            i32 index = ToI32(componentNames[1]);
             Vector<Component*> components;
             node->GetComponents(components, StringHash(componentNames.Front()));
             if (index >= components.Size())

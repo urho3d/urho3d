@@ -819,7 +819,7 @@ void EditTechniqueQuality(StringHash eventType, VariantMap& eventData)
         return;
 
     LineEdit@ attrEdit = eventData["Element"].GetPtr();
-    uint newQualityLevel = attrEdit.text.ToUInt();
+    uint newQualityLevel = attrEdit.text.ToU32();
     uint index = attrEdit.vars["Index"].GetUInt();
 
     BeginMaterialEdit();
@@ -893,7 +893,7 @@ void EditRenderOrder(StringHash eventType, VariantMap& eventData)
     BeginMaterialEdit();
 
     LineEdit@ attrEdit = eventData["Element"].GetPtr();
-    editMaterial.renderOrder = attrEdit.text.ToInt();
+    editMaterial.renderOrder = attrEdit.text.ToI32();
 
     EndMaterialEdit();
 }

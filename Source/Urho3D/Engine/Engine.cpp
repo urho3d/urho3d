@@ -899,35 +899,35 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
             }
             else if (argument == "x" && !value.Empty())
             {
-                ret[EP_WINDOW_WIDTH] = ToInt(value);
+                ret[EP_WINDOW_WIDTH] = ToI32(value);
                 ++i;
             }
             else if (argument == "y" && !value.Empty())
             {
-                ret[EP_WINDOW_HEIGHT] = ToInt(value);
+                ret[EP_WINDOW_HEIGHT] = ToI32(value);
                 ++i;
             }
             else if (argument == "monitor" && !value.Empty()) {
-                ret[EP_MONITOR] = ToInt(value);
+                ret[EP_MONITOR] = ToI32(value);
                 ++i;
             }
             else if (argument == "hz" && !value.Empty()) {
-                ret[EP_REFRESH_RATE] = ToInt(value);
+                ret[EP_REFRESH_RATE] = ToI32(value);
                 ++i;
             }
             else if (argument == "m" && !value.Empty())
             {
-                ret[EP_MULTI_SAMPLE] = ToInt(value);
+                ret[EP_MULTI_SAMPLE] = ToI32(value);
                 ++i;
             }
             else if (argument == "b" && !value.Empty())
             {
-                ret[EP_SOUND_BUFFER] = ToInt(value);
+                ret[EP_SOUND_BUFFER] = ToI32(value);
                 ++i;
             }
             else if (argument == "r" && !value.Empty())
             {
-                ret[EP_SOUND_MIX_RATE] = ToInt(value);
+                ret[EP_SOUND_MIX_RATE] = ToI32(value);
                 ++i;
             }
             else if (argument == "pp" && !value.Empty())
@@ -957,23 +957,23 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
             }
             else if (argument == "mq" && !value.Empty())
             {
-                ret[EP_MATERIAL_QUALITY] = ToInt(value);
+                ret[EP_MATERIAL_QUALITY] = ToI32(value);
                 ++i;
             }
             else if (argument == "tq" && !value.Empty())
             {
-                ret[EP_TEXTURE_QUALITY] = ToInt(value);
+                ret[EP_TEXTURE_QUALITY] = ToI32(value);
                 ++i;
             }
             else if (argument == "tf" && !value.Empty())
             {
-                ret[EP_TEXTURE_FILTER_MODE] = ToInt(value);
+                ret[EP_TEXTURE_FILTER_MODE] = ToI32(value);
                 ++i;
             }
             else if (argument == "af" && !value.Empty())
             {
                 ret[EP_TEXTURE_FILTER_MODE] = FILTER_ANISOTROPIC;
-                ret[EP_TEXTURE_ANISOTROPY] = ToInt(value);
+                ret[EP_TEXTURE_ANISOTROPY] = ToI32(value);
                 ++i;
             }
             else if (argument == "touch")
@@ -981,7 +981,7 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
 #ifdef URHO3D_TESTING
             else if (argument == "timeout" && !value.Empty())
             {
-                ret[EP_TIME_OUT] = ToInt(value);
+                ret[EP_TIME_OUT] = ToI32(value);
                 ++i;
             }
 #endif

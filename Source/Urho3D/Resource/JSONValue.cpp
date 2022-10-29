@@ -564,7 +564,7 @@ VariantMap JSONValue::GetVariantMap() const
     for (ConstJSONObjectIterator i = Begin(); i != End(); ++i)
     {
         /// \todo Ideally this should allow any strings, but for now the convention is that the keys need to be hexadecimal StringHashes
-        StringHash key(ToUInt(i->first_, 16));
+        StringHash key(ToU32(i->first_, 16));
         Variant variant = i->second_.GetVariant();
         variantMap[key] = variant;
     }

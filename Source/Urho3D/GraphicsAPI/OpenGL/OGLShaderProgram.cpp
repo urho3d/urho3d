@@ -30,7 +30,7 @@ static unsigned NumberPostfix(const String& str)
     for (unsigned i = 0; i < str.Length(); ++i)
     {
         if (IsDigit(str[i]))
-            return ToUInt(str.CString() + i);
+            return ToU32(str.CString() + i);
     }
 
     return M_MAX_UNSIGNED;

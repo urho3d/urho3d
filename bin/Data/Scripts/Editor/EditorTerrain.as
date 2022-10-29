@@ -330,7 +330,7 @@ class TerrainEditor
 
         LineEdit@ lineEdit = window.GetChild("CreateTerrainValue", true);
 
-        uint lineEditLength = lineEdit.text.Trimmed().ToUInt();
+        uint lineEditLength = lineEdit.text.Trimmed().ToU32();
 
         // The parse failed, so use a decent default
         if (lineEditLength == 0)

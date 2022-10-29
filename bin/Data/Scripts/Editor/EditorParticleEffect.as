@@ -619,7 +619,7 @@ void EditParticleEffectNumParticles(StringHash eventType, VariantMap& eventData)
 
     LineEdit@ element = eventData["Element"].GetPtr();
 
-    editParticleEffect.numParticles = element.text.ToInt();
+    editParticleEffect.numParticles = element.text.ToI32();
     particleEffectEmitter.ApplyEffect();
 
     EndParticleEffectEdit();

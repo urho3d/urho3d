@@ -396,7 +396,7 @@ void ToggleGrid2DMode(StringHash eventType, VariantMap& eventData)
 void EditGridSize(StringHash eventType, VariantMap& eventData)
 {
     LineEdit@ edit = eventData["Element"].GetPtr();
-    gridSize = edit.text.ToInt();
+    gridSize = edit.text.ToI32();
     edit.text = String(gridSize);
     UpdateGrid();
 }
@@ -404,7 +404,7 @@ void EditGridSize(StringHash eventType, VariantMap& eventData)
 void EditGridSubdivisions(StringHash eventType, VariantMap& eventData)
 {
     LineEdit@ edit = eventData["Element"].GetPtr();
-    gridSubdivisions = edit.text.ToInt();
+    gridSubdivisions = edit.text.ToI32();
     edit.text = String(gridSubdivisions);
     UpdateGrid();
 }

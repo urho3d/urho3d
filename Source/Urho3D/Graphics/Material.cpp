@@ -95,7 +95,7 @@ TextureUnit ParseTextureUnitName(String name)
             unit = TU_ENVIRONMENT;
         // Finally check for specifying the texture unit directly as a number
         else if (name.Length() < 3)
-            unit = (TextureUnit)Clamp(ToInt(name), 0, MAX_TEXTURE_UNITS - 1);
+            unit = (TextureUnit)Clamp(ToI32(name), 0, MAX_TEXTURE_UNITS - 1);
     }
 
     if (unit == MAX_TEXTURE_UNITS)

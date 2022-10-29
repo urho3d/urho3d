@@ -232,7 +232,7 @@ void HandleBitSelectionEdit(StringHash eventType, VariantMap& eventData)
         LineEdit@ attrEdit = eventData["Element"].GetPtr();
 
         inUpdateBitSelection = true;
-        SetBitSelection(attrEdit.parent, attrEdit.text.ToInt());
+        SetBitSelection(attrEdit.parent, attrEdit.text.ToI32());
         inUpdateBitSelection = false;
     }
 
@@ -870,7 +870,7 @@ void SanitizeNumericalValue(VariantType type, String& value)
     if ((type >= VAR_FLOAT && type <= VAR_COLOR) || type == VAR_RECT)
         value = String(value.ToFloat());
     else if (type == VAR_INT || type == VAR_INTRECT || type == VAR_INTVECTOR2 || type == VAR_INTVECTOR3)
-        value = String(value.ToInt());
+        value = String(value.ToI32());
     else if (type == VAR_DOUBLE)
         value = String(value.ToDouble());
 }
@@ -906,7 +906,7 @@ void GetEditorValue(UIElement@ parent, VariantType type, Array<String>@ enumName
     else if (type == VAR_INT)
     {
         if (enumNames is null || enumNames.empty)
-            FillValue(values, Variant(attrEdit.text.ToInt()));
+            FillValue(values, Variant(attrEdit.text.ToI32()));
         else
         {
             DropDownList@ ddl = parent.children[1];

@@ -43,10 +43,10 @@ static void RegisterStringUtils(asIScriptEngine* engine)
     engine->RegisterObjectMethod("String", "bool ToBool() const", AS_FUNCTIONPR_OBJFIRST(ToBool, (const String&), bool), AS_CALL_CDECL_OBJFIRST);
     engine->RegisterObjectMethod("String", "float ToFloat() const", AS_FUNCTIONPR_OBJFIRST(ToFloat, (const String&), float), AS_CALL_CDECL_OBJFIRST);
     engine->RegisterObjectMethod("String", "double ToDouble() const", AS_FUNCTIONPR_OBJFIRST(ToDouble, (const String&), double), AS_CALL_CDECL_OBJFIRST);
-    engine->RegisterObjectMethod("String", "int ToInt(int base = 10) const", AS_FUNCTIONPR_OBJFIRST(ToInt, (const String&, int), int), AS_CALL_CDECL_OBJFIRST);
-    engine->RegisterObjectMethod("String", "uint ToUInt(int base = 10) const", AS_FUNCTIONPR_OBJFIRST(ToUInt, (const String&, int), unsigned), AS_CALL_CDECL_OBJFIRST);
-    engine->RegisterObjectMethod("String", "int64 ToInt64(int base = 10) const", AS_FUNCTIONPR_OBJFIRST(ToInt64, (const String&, int), long long), AS_CALL_CDECL_OBJFIRST);
-    engine->RegisterObjectMethod("String", "uint64 ToUInt64(int base = 10) const", AS_FUNCTIONPR_OBJFIRST(ToUInt64, (const String&, int), unsigned long long), AS_CALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("String", "int ToI32(int base = 10) const", AS_FUNCTIONPR_OBJFIRST(ToI32, (const String&, i32), i32), AS_CALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("String", "uint ToU32(int base = 10) const", AS_FUNCTIONPR_OBJFIRST(ToU32, (const String&, i32), u32), AS_CALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("String", "int64 ToI64(int base = 10) const", AS_FUNCTIONPR_OBJFIRST(ToI64, (const String&, i32), i64), AS_CALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("String", "uint64 ToU64(int base = 10) const", AS_FUNCTIONPR_OBJFIRST(ToU64, (const String&, i32), u64), AS_CALL_CDECL_OBJFIRST);
     engine->RegisterObjectMethod("String", "Color ToColor() const", AS_FUNCTIONPR_OBJFIRST(ToColor, (const String&), Color), AS_CALL_CDECL_OBJFIRST);
     engine->RegisterObjectMethod("String", "IntRect ToIntRect() const", AS_FUNCTIONPR_OBJFIRST(ToIntRect, (const String&), IntRect), AS_CALL_CDECL_OBJFIRST);
     engine->RegisterObjectMethod("String", "IntVector2 ToIntVector2() const", AS_FUNCTIONPR_OBJFIRST(ToIntVector2, (const String&), IntVector2), AS_CALL_CDECL_OBJFIRST);

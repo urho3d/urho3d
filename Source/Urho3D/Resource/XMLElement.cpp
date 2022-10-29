@@ -763,9 +763,9 @@ bool XMLElement::GetBuffer(const String& name, void* dest, i32 size) const
     if (size < bytes.Size())
         return false;
 
-    u8* destBytes = (u8*)dest;
+    byte* destBytes = (byte*)dest;
     for (i32 i = 0; i < bytes.Size(); ++i)
-        destBytes[i] = (u8)ToInt(bytes[i]);
+        destBytes[i] = static_cast<byte>(ToI32(bytes[i]));
     return true;
 }
 
@@ -786,22 +786,22 @@ double XMLElement::GetDouble(const String& name) const
 
 unsigned XMLElement::GetUInt(const String& name) const
 {
-    return ToUInt(GetAttribute(name));
+    return ToU32(GetAttribute(name));
 }
 
 int XMLElement::GetInt(const String& name) const
 {
-    return ToInt(GetAttribute(name));
+    return ToI32(GetAttribute(name));
 }
 
 unsigned long long XMLElement::GetUInt64(const String& name) const
 {
-    return ToUInt64(GetAttribute(name));
+    return ToU64(GetAttribute(name));
 }
 
 long long XMLElement::GetInt64(const String& name) const
 {
-    return ToInt64(GetAttribute(name));
+    return ToI64(GetAttribute(name));
 }
 
 IntRect XMLElement::GetIntRect(const String& name) const
