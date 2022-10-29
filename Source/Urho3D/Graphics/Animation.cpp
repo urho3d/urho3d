@@ -3,6 +3,7 @@
 
 #include "../Precompiled.h"
 
+#include "../Base/Utils.h"
 #include "../Container/Sort.h"
 #include "../Core/Context.h"
 #include "../Core/Profiler.h"
@@ -11,9 +12,9 @@
 #include "../IO/FileSystem.h"
 #include "../IO/Log.h"
 #include "../IO/Serializer.h"
+#include "../Resource/JSONFile.h"
 #include "../Resource/ResourceCache.h"
 #include "../Resource/XMLFile.h"
-#include "../Resource/JSONFile.h"
 
 #include "../DebugNew.h"
 
@@ -224,7 +225,7 @@ bool Animation::Save(Serializer& dest) const
     {
         const AnimationTrack& track = i->second_;
         dest.WriteString(track.name_);
-        dest.WriteU8((u8)track.channelMask_);
+        dest.WriteU8(ToU8(track.channelMask_));
         dest.WriteU32(track.keyFrames_.Size());
 
         // Write keyframes of the track
