@@ -221,20 +221,20 @@ bool SpriteSheet2D::EndLoadFromXMLFile()
     {
         String name = subTextureElem.GetAttribute("name");
 
-        int x = subTextureElem.GetInt("x");
-        int y = subTextureElem.GetInt("y");
-        int width = subTextureElem.GetInt("width");
-        int height = subTextureElem.GetInt("height");
+        int x = subTextureElem.GetI32("x");
+        int y = subTextureElem.GetI32("y");
+        int width = subTextureElem.GetI32("width");
+        int height = subTextureElem.GetI32("height");
         IntRect rectangle(x, y, x + width, y + height);
 
         Vector2 hotSpot(0.5f, 0.5f);
         IntVector2 offset(0, 0);
         if (subTextureElem.HasAttribute("frameWidth") && subTextureElem.HasAttribute("frameHeight"))
         {
-            offset.x_ = subTextureElem.GetInt("frameX");
-            offset.y_ = subTextureElem.GetInt("frameY");
-            int frameWidth = subTextureElem.GetInt("frameWidth");
-            int frameHeight = subTextureElem.GetInt("frameHeight");
+            offset.x_ = subTextureElem.GetI32("frameX");
+            offset.y_ = subTextureElem.GetI32("frameY");
+            int frameWidth = subTextureElem.GetI32("frameWidth");
+            int frameHeight = subTextureElem.GetI32("frameHeight");
             hotSpot.x_ = (offset.x_ + frameWidth / 2.f) / width;
             hotSpot.y_ = 1.0f - (offset.y_ + frameHeight / 2.f) / height;
         }
@@ -296,10 +296,10 @@ bool SpriteSheet2D::EndLoadFromJSONFile()
     {
         String name = subTextureVal.Get("name").GetString();
 
-        int x = subTextureVal.Get("x").GetInt();
-        int y = subTextureVal.Get("y").GetInt();
-        int width = subTextureVal.Get("width").GetInt();
-        int height = subTextureVal.Get("height").GetInt();
+        int x = subTextureVal.Get("x").GetI32();
+        int y = subTextureVal.Get("y").GetI32();
+        int width = subTextureVal.Get("width").GetI32();
+        int height = subTextureVal.Get("height").GetI32();
         IntRect rectangle(x, y, x + width, y + height);
 
         Vector2 hotSpot(0.5f, 0.5f);
@@ -309,10 +309,10 @@ bool SpriteSheet2D::EndLoadFromJSONFile()
 
         if (!frameWidthVal.IsNull() && !frameHeightVal.IsNull())
         {
-            offset.x_ = subTextureVal.Get("frameX").GetInt();
-            offset.y_ = subTextureVal.Get("frameY").GetInt();
-            int frameWidth = frameWidthVal.GetInt();
-            int frameHeight = frameHeightVal.GetInt();
+            offset.x_ = subTextureVal.Get("frameX").GetI32();
+            offset.y_ = subTextureVal.Get("frameY").GetI32();
+            int frameWidth = frameWidthVal.GetI32();
+            int frameHeight = frameHeightVal.GetI32();
             hotSpot.x_ = (offset.x_ + frameWidth / 2.f) / width;
             hotSpot.y_ = 1.0f - (offset.y_ + frameHeight / 2.f) / height;
         }

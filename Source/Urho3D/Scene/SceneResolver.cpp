@@ -59,7 +59,7 @@ void SceneResolver::Resolve()
             if (info.mode_ & AM_NODEID)
             {
                 hasIDAttributes = true;
-                NodeId oldNodeID = component->GetAttribute(j).GetUInt();
+                NodeId oldNodeID = component->GetAttribute(j).GetU32();
 
                 if (oldNodeID)
                 {
@@ -77,7 +77,7 @@ void SceneResolver::Resolve()
             else if (info.mode_ & AM_COMPONENTID)
             {
                 hasIDAttributes = true;
-                ComponentId oldComponentID = component->GetAttribute(j).GetUInt();
+                ComponentId oldComponentID = component->GetAttribute(j).GetU32();
 
                 if (oldComponentID)
                 {
@@ -101,13 +101,13 @@ void SceneResolver::Resolve()
                 if (oldNodeIDs.Size())
                 {
                     // The first index stores the number of IDs redundantly. This is for editing
-                    unsigned numIDs = oldNodeIDs[0].GetUInt();
+                    unsigned numIDs = oldNodeIDs[0].GetU32();
                     VariantVector newIDs;
                     newIDs.Push(numIDs);
 
                     for (unsigned k = 1; k < oldNodeIDs.Size(); ++k)
                     {
-                        NodeId oldNodeID = oldNodeIDs[k].GetUInt();
+                        NodeId oldNodeID = oldNodeIDs[k].GetU32();
                         HashMap<NodeId, WeakPtr<Node>>::ConstIterator l = nodes_.Find(oldNodeID);
 
                         if (l != nodes_.End() && l->second_)

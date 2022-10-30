@@ -239,7 +239,7 @@ void Chat::HandleNetworkMessage(StringHash /*eventType*/, VariantMap& eventData)
 
     using namespace NetworkMessage;
 
-    int msgID = eventData[P_MESSAGEID].GetInt();
+    int msgID = eventData[P_MESSAGEID].GetI32();
     if (msgID == MSG_CHAT)
     {
         const Vector<byte>& data = eventData[P_DATA].GetBuffer();

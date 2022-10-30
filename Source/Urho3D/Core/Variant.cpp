@@ -727,14 +727,14 @@ void Variant::SetType(VariantType newType)
     }
 }
 
-template <> int Variant::Get<int>() const
+template <> i32 Variant::Get<i32>() const
 {
-    return GetInt();
+    return GetI32();
 }
 
-template <> unsigned Variant::Get<unsigned>() const
+template <> u32 Variant::Get<u32>() const
 {
-    return GetUInt();
+    return GetU32();
 }
 
 template <> c32 Variant::Get<c32>() const
@@ -742,14 +742,14 @@ template <> c32 Variant::Get<c32>() const
     return GetC32();
 }
 
-template <> long long Variant::Get<long long>() const
+template <> i64 Variant::Get<i64>() const
 {
-    return GetInt64();
+    return GetI64();
 }
 
-template <> unsigned long long Variant::Get<unsigned long long>() const
+template <> u64 Variant::Get<u64>() const
 {
-    return GetUInt64();
+    return GetU64();
 }
 
 template <> StringHash Variant::Get<StringHash>() const

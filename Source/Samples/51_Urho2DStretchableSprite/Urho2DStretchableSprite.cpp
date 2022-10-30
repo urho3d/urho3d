@@ -145,7 +145,7 @@ void Urho2DStretchableSprite::OnKeyUp(StringHash /*eventType*/, VariantMap& even
 {
     using namespace KeyUp;
 
-    const auto key = eventData[P_KEY].GetInt();
+    const auto key = eventData[P_KEY].GetI32();
 
     if (key == KEY_TAB)
     {

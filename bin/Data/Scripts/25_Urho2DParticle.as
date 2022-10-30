@@ -107,8 +107,8 @@ void HandleMouseMove(StringHash eventType, VariantMap& eventData)
 {
     if (particleNode !is null)
     {
-        float x = eventData["X"].GetInt();
-        float y = eventData["Y"].GetInt();
+        float x = eventData["X"].GetI32();
+        float y = eventData["Y"].GetI32();
         Camera@ camera = cameraNode.GetComponent("Camera");
         particleNode.position = camera.ScreenToWorldPoint(Vector3(x / graphics.width, y / graphics.height, 10.0f));
     }

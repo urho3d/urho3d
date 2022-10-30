@@ -162,7 +162,7 @@ bool ParticleEffect::Load(const XMLElement& source)
     }
 
     if (source.HasChild("numparticles"))
-        SetNumParticles((unsigned)source.GetChild("numparticles").GetInt("value"));
+        SetNumParticles((unsigned)source.GetChild("numparticles").GetI32("value"));
 
     if (source.HasChild("updateinvisible"))
         updateInvisible_ = source.GetChild("updateinvisible").GetBool("enable");
@@ -319,7 +319,7 @@ bool ParticleEffect::Save(XMLElement& dest) const
     childElem.SetAttribute("name", GetResourceName(material_));
 
     childElem = dest.CreateChild("numparticles");
-    childElem.SetInt("value", numParticles_);
+    childElem.SetI32("value", numParticles_);
 
     childElem = dest.CreateChild("updateinvisible");
     childElem.SetBool("enable", updateInvisible_);

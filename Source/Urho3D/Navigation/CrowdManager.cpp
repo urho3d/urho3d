@@ -265,7 +265,7 @@ void CrowdManager::SetQueryFilterTypesAttr(const VariantVector& value)
 
     unsigned index = 0;
     unsigned queryFilterType = 0;
-    numQueryFilterTypes_ = index < value.Size() ? Min(value[index++].GetUInt(), (unsigned)DT_CROWD_MAX_QUERY_FILTER_TYPE) : 0;
+    numQueryFilterTypes_ = index < value.Size() ? Min(value[index++].GetU32(), (unsigned)DT_CROWD_MAX_QUERY_FILTER_TYPE) : 0;
 
     while (queryFilterType < numQueryFilterTypes_)
     {
@@ -273,10 +273,10 @@ void CrowdManager::SetQueryFilterTypesAttr(const VariantVector& value)
         {
             dtQueryFilter* filter = crowd_->getEditableFilter(queryFilterType);
             assert(filter);
-            filter->setIncludeFlags((unsigned short)value[index++].GetUInt());
-            filter->setExcludeFlags((unsigned short)value[index++].GetUInt());
+            filter->setIncludeFlags((unsigned short)value[index++].GetU32());
+            filter->setExcludeFlags((unsigned short)value[index++].GetU32());
             unsigned prevNumAreas = numAreas_[queryFilterType];
-            numAreas_[queryFilterType] = Min(value[index++].GetUInt(), (unsigned)DT_MAX_AREAS);
+            numAreas_[queryFilterType] = Min(value[index++].GetU32(), (unsigned)DT_MAX_AREAS);
 
             // Must loop through based on previous number of areas, the new area cost (if any) can only be set in the next attribute get/set iteration
             if (index + prevNumAreas <= value.Size())
@@ -334,7 +334,7 @@ void CrowdManager::SetObstacleAvoidanceTypesAttr(const VariantVector& value)
 
     unsigned index = 0;
     unsigned obstacleAvoidanceType = 0;
-    numObstacleAvoidanceTypes_ = index < value.Size() ? Min(value[index++].GetUInt(), (unsigned)DT_CROWD_MAX_OBSTAVOIDANCE_PARAMS) : 0;
+    numObstacleAvoidanceTypes_ = index < value.Size() ? Min(value[index++].GetU32(), (unsigned)DT_CROWD_MAX_OBSTAVOIDANCE_PARAMS) : 0;
 
     while (obstacleAvoidanceType < numObstacleAvoidanceTypes_)
     {
@@ -347,10 +347,10 @@ void CrowdManager::SetObstacleAvoidanceTypesAttr(const VariantVector& value)
             params.weightSide = value[index++].GetFloat();
             params.weightToi = value[index++].GetFloat();
             params.horizTime = value[index++].GetFloat();
-            params.gridSize = (unsigned char)value[index++].GetUInt();
-            params.adaptiveDivs = (unsigned char)value[index++].GetUInt();
-            params.adaptiveRings = (unsigned char)value[index++].GetUInt();
-            params.adaptiveDepth = (unsigned char)value[index++].GetUInt();
+            params.gridSize = (unsigned char)value[index++].GetU32();
+            params.adaptiveDivs = (unsigned char)value[index++].GetU32();
+            params.adaptiveRings = (unsigned char)value[index++].GetU32();
+            params.adaptiveDepth = (unsigned char)value[index++].GetU32();
             crowd_->setObstacleAvoidanceParams(obstacleAvoidanceType, &params);
         }
         ++obstacleAvoidanceType;

@@ -510,5 +510,5 @@ void SceneReplication::HandleClientDisconnected(StringHash eventType, VariantMap
 
 void SceneReplication::HandleClientObjectID(StringHash eventType, VariantMap& eventData)
 {
-    clientObjectID_ = eventData[P_ID].GetUInt();
+    clientObjectID_ = eventData[P_ID].GetU32();
 }

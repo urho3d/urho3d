@@ -93,7 +93,7 @@ bool ValueAnimation::LoadXML(const XMLElement& source)
     while (eventFrameElem)
     {
         float time = eventFrameElem.GetFloat("time");
-        unsigned eventType = eventFrameElem.GetUInt("eventtype");
+        unsigned eventType = eventFrameElem.GetU32("eventtype");
         VariantMap eventData = eventFrameElem.GetChild("eventdata").GetVariantMap();
 
         SetEventFrame(time, StringHash(eventType), eventData);
@@ -120,7 +120,7 @@ bool ValueAnimation::SaveXML(XMLElement& dest) const
     {
         XMLElement eventFrameElem = dest.CreateChild("eventframe");
         eventFrameElem.SetFloat("time", eventFrame.time_);
-        eventFrameElem.SetUInt("eventtype", eventFrame.eventType_.Value());
+        eventFrameElem.SetU32("eventtype", eventFrame.eventType_.Value());
         eventFrameElem.CreateChild("eventdata").SetVariantMap(eventFrame.eventData_);
     }
 
@@ -153,7 +153,7 @@ bool ValueAnimation::LoadJSON(const JSONValue& source)
     for (const JSONValue& eventFrameVal : eventFramesArray)
     {
         float time = eventFrameVal.Get("time").GetFloat();
-        unsigned eventType = eventFrameVal.Get("eventtype").GetUInt();
+        unsigned eventType = eventFrameVal.Get("eventtype").GetU32();
         VariantMap eventData = eventFrameVal.Get("eventdata").GetVariantMap();
         SetEventFrame(time, StringHash(eventType), eventData);
     }

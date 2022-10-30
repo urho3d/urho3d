@@ -350,7 +350,7 @@ ResourceRef ParticleEmitter::GetEffectAttr() const
 void ParticleEmitter::SetParticlesAttr(const VariantVector& value)
 {
     i32 index = 0;
-    SetNumParticles(index < value.Size() ? value[index++].GetUInt() : 0);
+    SetNumParticles(index < value.Size() ? value[index++].GetU32() : 0);
 
     for (Vector<Particle>::Iterator i = particles_.Begin(); i != particles_.End() && index < value.Size(); ++i)
     {
@@ -360,8 +360,8 @@ void ParticleEmitter::SetParticlesAttr(const VariantVector& value)
         i->timeToLive_ = value[index++].GetFloat();
         i->scale_ = value[index++].GetFloat();
         i->rotationSpeed_ = value[index++].GetFloat();
-        i->colorIndex_ = value[index++].GetInt();
-        i->texIndex_ = value[index++].GetInt();
+        i->colorIndex_ = value[index++].GetI32();
+        i->texIndex_ = value[index++].GetI32();
     }
 }
 

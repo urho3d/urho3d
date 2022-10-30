@@ -72,7 +72,7 @@ void SplinePath::ApplyAttributes()
         // The first index stores the number of IDs redundantly. This is for editing
         for (unsigned i = 1; i < controlPointIdsAttr_.Size(); ++i)
         {
-            Node* node = scene->GetNode(controlPointIdsAttr_[i].GetUInt());
+            Node* node = scene->GetNode(controlPointIdsAttr_[i].GetU32());
             if (node)
             {
                 WeakPtr<Node> controlPoint(node);
@@ -229,7 +229,7 @@ void SplinePath::SetControlPointIdsAttr(const VariantVector& value)
         controlPointIdsAttr_.Clear();
 
         unsigned index = 0;
-        unsigned numInstances = value[index++].GetUInt();
+        unsigned numInstances = value[index++].GetU32();
         // Prevent crash on entering negative value in the editor
         if (numInstances > M_MAX_INT)
             numInstances = 0;
@@ -239,7 +239,7 @@ void SplinePath::SetControlPointIdsAttr(const VariantVector& value)
         {
             // If vector contains less IDs than should, fill the rest with zeros
             if (index < value.Size())
-                controlPointIdsAttr_.Push(value[index++].GetUInt());
+                controlPointIdsAttr_.Push(value[index++].GetU32());
             else
                 controlPointIdsAttr_.Push(0);
         }

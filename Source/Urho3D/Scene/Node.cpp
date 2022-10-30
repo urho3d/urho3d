@@ -135,7 +135,7 @@ bool Node::LoadXML(const XMLElement& source)
     SceneResolver resolver;
 
     // Read own ID. Will not be applied, only stored for resolving possible references
-    NodeId nodeID = source.GetUInt("id");
+    NodeId nodeID = source.GetU32("id");
     resolver.AddNode(nodeID, this);
 
     // Read attributes, components and child nodes
@@ -154,7 +154,7 @@ bool Node::LoadJSON(const JSONValue& source)
     SceneResolver resolver;
 
     // Read own ID. Will not be applied, only stored for resolving possible references
-    NodeId nodeID = source.Get("id").GetUInt();
+    NodeId nodeID = source.Get("id").GetU32();
     resolver.AddNode(nodeID, this);
 
     // Read attributes, components and child nodes
@@ -171,7 +171,7 @@ bool Node::LoadJSON(const JSONValue& source)
 bool Node::SaveXML(XMLElement& dest) const
 {
     // Write node ID
-    if (!dest.SetUInt("id", id_))
+    if (!dest.SetU32("id", id_))
         return false;
 
     // Write attributes
@@ -1590,7 +1590,7 @@ bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool loadC
     while (compElem)
     {
         String typeName = compElem.GetAttribute("type");
-        ComponentId compID = compElem.GetUInt("id");
+        ComponentId compID = compElem.GetU32("id");
         Component* newComponent = SafeCreateComponent(typeName, StringHash(typeName),
             (mode == REPLICATED && Scene::IsReplicatedID(compID)) ? REPLICATED : LOCAL, rewriteIDs ? 0 : compID);
         if (newComponent)
@@ -1609,7 +1609,7 @@ bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool loadC
     XMLElement childElem = source.GetChild("node");
     while (childElem)
     {
-        NodeId nodeID = childElem.GetUInt("id");
+        NodeId nodeID = childElem.GetU32("id");
         Node* newNode = CreateChild(rewriteIDs ? 0 : nodeID, (mode == REPLICATED && Scene::IsReplicatedID(nodeID)) ? REPLICATED :
             LOCAL);
         resolver.AddNode(nodeID, newNode);
@@ -1637,7 +1637,7 @@ bool Node::LoadJSON(const JSONValue& source, SceneResolver& resolver, bool loadC
     {
         const JSONValue& compVal = componentsArray.At(i);
         String typeName = compVal.Get("type").GetString();
-        ComponentId compID = compVal.Get("id").GetUInt();
+        ComponentId compID = compVal.Get("id").GetU32();
         Component* newComponent = SafeCreateComponent(typeName, StringHash(typeName),
             (mode == REPLICATED && Scene::IsReplicatedID(compID)) ? REPLICATED : LOCAL, rewriteIDs ? 0 : compID);
         if (newComponent)
@@ -1656,7 +1656,7 @@ bool Node::LoadJSON(const JSONValue& source, SceneResolver& resolver, bool loadC
     {
         const JSONValue& childVal = childrenArray.At(i);
 
-        NodeId nodeID = childVal.Get("id").GetUInt();
+        NodeId nodeID = childVal.Get("id").GetU32();
         Node* newNode = CreateChild(rewriteIDs ? 0 : nodeID, (mode == REPLICATED && Scene::IsReplicatedID(nodeID)) ? REPLICATED :
             LOCAL);
         resolver.AddNode(nodeID, newNode);

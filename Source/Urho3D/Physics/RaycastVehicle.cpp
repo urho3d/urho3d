@@ -186,7 +186,7 @@ void RaycastVehicle::ApplyAttributes()
     Scene* scene = GetScene();
     vehicleData_->Init(scene, hullBody_, IsEnabledEffective(), coordinateSystem_);
     VariantVector& value = loadedWheelData_;
-    int numObjects = value[index++].GetInt();
+    int numObjects = value[index++].GetI32();
     int wheelIndex = 0;
     origRotation_.Clear();
     skidInfoCumulative_.Clear();
@@ -194,7 +194,7 @@ void RaycastVehicle::ApplyAttributes()
 
     for (int i = 0; i < numObjects; i++)
     {
-        int node_id = value[index++].GetInt();
+        int node_id = value[index++].GetI32();
         Vector3 direction = value[index++].GetVector3();
         Vector3 axle = value[index++].GetVector3();
         float restLength = value[index++].GetFloat();

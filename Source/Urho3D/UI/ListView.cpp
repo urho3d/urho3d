@@ -96,8 +96,8 @@ public:
     {
         using namespace ViewChanged;
 
-        int x = eventData[P_X].GetInt();
-        int y = eventData[P_Y].GetInt();
+        int x = eventData[P_X].GetI32();
+        int y = eventData[P_Y].GetI32();
 
         IntRect panelBorder = GetParent()->GetClipBorder();
         overlayContainer_->SetChildOffset(IntVector2(-x + panelBorder.left_, -y + panelBorder.top_));
@@ -1028,9 +1028,9 @@ void ListView::HandleUIMouseClick(StringHash eventType, VariantMap& eventData)
     if (selectOnClickEnd_ && GetSubsystem<UI>()->IsDragging())
         return;
 
-    int button = eventData[UIMouseClick::P_BUTTON].GetInt();
-    int buttons = eventData[UIMouseClick::P_BUTTONS].GetInt();
-    int qualifiers = eventData[UIMouseClick::P_QUALIFIERS].GetInt();
+    int button = eventData[UIMouseClick::P_BUTTON].GetI32();
+    int buttons = eventData[UIMouseClick::P_BUTTONS].GetI32();
+    int qualifiers = eventData[UIMouseClick::P_QUALIFIERS].GetI32();
 
     auto* element = static_cast<UIElement*>(eventData[UIMouseClick::P_ELEMENT].GetPtr());
 
@@ -1113,9 +1113,9 @@ void ListView::HandleUIMouseClick(StringHash eventType, VariantMap& eventData)
 
 void ListView::HandleUIMouseDoubleClick(StringHash eventType, VariantMap& eventData)
 {
-    int button = eventData[UIMouseClick::P_BUTTON].GetInt();
-    int buttons = eventData[UIMouseClick::P_BUTTONS].GetInt();
-    int qualifiers = eventData[UIMouseClick::P_QUALIFIERS].GetInt();
+    int button = eventData[UIMouseClick::P_BUTTON].GetI32();
+    int buttons = eventData[UIMouseClick::P_BUTTONS].GetI32();
+    int qualifiers = eventData[UIMouseClick::P_QUALIFIERS].GetI32();
 
     auto* element = static_cast<UIElement*>(eventData[UIMouseClick::P_ELEMENT].GetPtr());
     // Check if the clicked element belongs to the list

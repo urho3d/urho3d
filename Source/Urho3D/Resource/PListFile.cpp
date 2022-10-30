@@ -25,10 +25,10 @@ PListValue::PListValue() :                                  // NOLINT(hicpp-memb
 {
 }
 
-PListValue::PListValue(int value) :                         // NOLINT(hicpp-member-init)
+PListValue::PListValue(i32 value) :                         // NOLINT(hicpp-member-init)
     type_(PLVT_NONE)
 {
-    SetInt(value);
+    SetI32(value);
 }
 
 PListValue::PListValue(bool value) :                        // NOLINT(hicpp-member-init)
@@ -80,7 +80,7 @@ PListValue& PListValue::operator =(const PListValue& rhs)
         Reset();
         break;
     case PLVT_INT:
-        SetInt(rhs.int_);
+        SetI32(rhs.int_);
         break;
     case PLVT_BOOL:
         SetBool(rhs.bool_);
@@ -102,7 +102,7 @@ PListValue& PListValue::operator =(const PListValue& rhs)
     return *this;
 }
 
-void PListValue::SetInt(int value)
+void PListValue::SetI32(i32 value)
 {
     if (type_ != PLVT_INT)
     {
@@ -170,7 +170,7 @@ void PListValue::SetValueVector(const PListValueVector& valueVector)
     *valueVector_ = valueVector;
 }
 
-int PListValue::GetInt() const
+i32 PListValue::GetI32() const
 {
     return type_ == PLVT_INT ? int_ : 0;
 }
@@ -371,7 +371,7 @@ bool PListFile::LoadValue(PListValue& value, const XMLElement& valueElem)
     else if (valueType == "real")
         value.SetFloat(ToFloat(valueElem.GetValue()));
     else if (valueType == "integer")
-        value.SetInt(ToI32(valueElem.GetValue()));
+        value.SetI32(ToI32(valueElem.GetValue()));
     else if (valueType == "true")
         value.SetBool(true);
     else if (valueType == "false")

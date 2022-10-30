@@ -238,10 +238,10 @@ bool Serializer::WriteVariantData(const Variant& value)
         return true;
 
     case VAR_INT:
-        return WriteI32(value.GetInt());
+        return WriteI32(value.GetI32());
 
     case VAR_INT64:
-        return WriteI64(value.GetInt64());
+        return WriteI64(value.GetI64());
 
     case VAR_BOOL:
         return WriteBool(value.GetBool());

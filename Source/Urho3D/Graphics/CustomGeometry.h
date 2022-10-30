@@ -17,7 +17,7 @@ struct CustomGeometryVertex
     /// Normal.
     Vector3 normal_;
     /// Color.
-    unsigned color_;
+    color32 color_;
     /// Texture coordinates.
     Vector2 texCoord_;
     /// Tangent.

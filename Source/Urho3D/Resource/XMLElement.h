@@ -109,13 +109,13 @@ public:
     /// Set a double attribute.
     bool SetDouble(const String& name, double value);
     /// Set an unsigned integer attribute.
-    bool SetUInt(const String& name, unsigned value);
+    bool SetU32(const String& name, u32 value);
     /// Set an integer attribute.
-    bool SetInt(const String& name, int value);
+    bool SetI32(const String& name, i32 value);
     /// Set an unsigned long long integer attribute.
-    bool SetUInt64(const String& name, unsigned long long value);
+    bool SetU64(const String& name, u64 value);
     /// Set a long long integer attribute.
-    bool SetInt64(const String& name, long long value);
+    bool SetI64(const String& name, i64 value);
     /// Set an IntRect attribute.
     bool SetIntRect(const String& name, const IntRect& value);
     /// Set an IntVector2 attribute.
@@ -224,13 +224,13 @@ public:
     /// Return a double attribute, or zero if missing.
     double GetDouble(const String& name) const;
     /// Return an unsigned integer attribute, or zero if missing.
-    unsigned GetUInt(const String& name) const;
+    u32 GetU32(const String& name) const;
     /// Return an integer attribute, or zero if missing.
-    int GetInt(const String& name) const;
+    i32 GetI32(const String& name) const;
     /// Return an unsigned long long integer attribute, or zero if missing.
-    unsigned long long GetUInt64(const String& name) const;
+    u64 GetU64(const String& name) const;
     /// Return a long long integer attribute, or zero if missing.
-    long long GetInt64(const String& name) const;
+    i64 GetI64(const String& name) const;
     /// Return an IntRect attribute, or default if missing.
     IntRect GetIntRect(const String& name) const;
     /// Return an IntVector2 attribute, or default if missing.

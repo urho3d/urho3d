@@ -200,7 +200,7 @@ bool UIElement::LoadXML(const XMLElement& source, XMLFile* styleFile)
         String typeName = childElem.GetAttribute("type");
         if (typeName.Empty())
             typeName = "UIElement";
-        i32 index = childElem.HasAttribute("index") ? childElem.GetInt("index") : ENDPOS;
+        i32 index = childElem.HasAttribute("index") ? childElem.GetI32("index") : ENDPOS;
         UIElement* child = nullptr;
 
         if (!internalElem)
@@ -254,7 +254,7 @@ UIElement* UIElement::LoadChildXML(const XMLElement& childElem, XMLFile* styleFi
     String typeName = childElem.GetAttribute("type");
     if (typeName.Empty())
         typeName = "UIElement";
-    i32 index = childElem.HasAttribute("index") ? childElem.GetUInt("index") : ENDPOS;
+    i32 index = childElem.HasAttribute("index") ? childElem.GetU32("index") : ENDPOS;
     UIElement* child = CreateChild(typeName, String::EMPTY, index);
 
     if (child)

@@ -105,7 +105,7 @@ void ScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant& sr
         // The component / node to which the ID refers to may not be in the scene yet, and furthermore the ID must go through the
         // SceneResolver first. Delay searching for the object to ApplyAttributes
         auto* attrPtr = const_cast<AttributeInfo*>(&attr);
-        idAttributes_[attrPtr] = src.GetUInt();
+        idAttributes_[attrPtr] = src.GetU32();
     }
     else if (attr.type_ == VAR_RESOURCEREF && attr.ptr_)
     {

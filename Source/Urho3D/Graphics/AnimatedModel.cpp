@@ -798,7 +798,7 @@ void AnimatedModel::SetAnimationStatesAttr(const VariantVector& value)
     auto* cache = GetSubsystem<ResourceCache>();
     RemoveAllAnimationStates();
     unsigned index = 0;
-    unsigned numStates = index < value.Size() ? value[index++].GetUInt() : 0;
+    unsigned numStates = index < value.Size() ? value[index++].GetU32() : 0;
     // Prevent negative or overly large value being assigned from the editor
     if (numStates > M_MAX_INT)
         numStates = 0;
@@ -819,7 +819,7 @@ void AnimatedModel::SetAnimationStatesAttr(const VariantVector& value)
             newState->SetLooped(value[index++].GetBool());
             newState->SetWeight(value[index++].GetFloat());
             newState->SetTime(value[index++].GetFloat());
-            newState->SetLayer((unsigned char)value[index++].GetInt());
+            newState->SetLayer((unsigned char)value[index++].GetI32());
         }
         else
         {

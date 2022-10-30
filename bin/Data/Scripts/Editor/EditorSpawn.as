@@ -218,7 +218,7 @@ void RefreshPickedObjects()
 void EditSpawnedObjectName(StringHash eventType, VariantMap& eventData)
 {
     LineEdit@ nameEdit = eventData["Element"].GetPtr();
-    int index = nameEdit.vars["Index"].GetUInt();
+    int index = nameEdit.vars["Index"].GetU32();
     String resourceName = VerifySpawnedObjectFile(nameEdit.text);
     nameEdit.text = resourceName;
     spawnedObjectsNames[index] = resourceName;
@@ -236,7 +236,7 @@ String VerifySpawnedObjectFile(const String&in resourceName)
 void PickSpawnedObject(StringHash eventType, VariantMap& eventData)
 {
     UIElement@ button = eventData["Element"].GetPtr();
-    resourcePickIndex = button.vars["Index"].GetUInt();
+    resourcePickIndex = button.vars["Index"].GetU32();
     CreateFileSelector("Pick spawned object", "Pick", "Cancel", uiNodePath, uiSceneFilters, uiNodeFilter);
     
     SubscribeToEvent(uiFileSelector, "FileSelected", "PickSpawnedObjectNameDone");

@@ -212,8 +212,8 @@ void UIComponent::OnNodeSet(Node* node)
 
 void UIComponent::OnElementResized(StringHash eventType, VariantMap& args)
 {
-    int width = args[Resized::P_WIDTH].GetInt();
-    int height = args[Resized::P_HEIGHT].GetInt();
+    int width = args[Resized::P_WIDTH].GetI32();
+    int height = args[Resized::P_HEIGHT].GetI32();
 
     if (width < UICOMPONENT_MIN_TEXTURE_SIZE || width > UICOMPONENT_MAX_TEXTURE_SIZE ||
         height < UICOMPONENT_MIN_TEXTURE_SIZE || height > UICOMPONENT_MAX_TEXTURE_SIZE)

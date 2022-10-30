@@ -143,7 +143,7 @@ void UpdateViewDebugIcons()
                     float distance = (camPos - nodes[i].worldPosition).length;
                     if (isOrthographic)
                         distance = debugIconsOrthoDistance;
-                    int iconsOffset = debugIconsPlacement[StringHash(nodes[i].id)].GetInt();
+                    int iconsOffset = debugIconsPlacement[StringHash(nodes[i].id)].GetI32();
                     float iconsYPos = 0;
 
                     if (iconType == ICON_SPLINE_PATH)
@@ -269,7 +269,7 @@ void IncrementIconPlacement(bool componentEnabled, Node@ node, int offset)
 {
     if (componentEnabled == true)
     {
-        int oldPlacement = debugIconsPlacement[StringHash(node.id)].GetInt();
+        int oldPlacement = debugIconsPlacement[StringHash(node.id)].GetI32();
         debugIconsPlacement[StringHash(node.id)] = Variant(oldPlacement + offset);
     }
 }

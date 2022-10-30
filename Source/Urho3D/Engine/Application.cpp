@@ -106,7 +106,7 @@ void Application::HandleLogMessage(StringHash eventType, VariantMap& eventData)
 {
     using namespace LogMessage;
 
-    if (eventData[P_LEVEL].GetInt() == LOG_ERROR)
+    if (eventData[P_LEVEL].GetI32() == LOG_ERROR)
     {
         // Strip the timestamp if necessary
         String error = eventData[P_MESSAGE].GetString();

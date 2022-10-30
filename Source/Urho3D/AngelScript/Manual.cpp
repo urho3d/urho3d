@@ -99,6 +99,7 @@ void ASRegisterManualFirst(asIScriptEngine* engine)
     engine->RegisterTypedef("ComponentId", "uint");
     engine->RegisterTypedef("mask32", "uint");
     engine->RegisterTypedef("flagset32", "uint");
+    engine->RegisterTypedef("color32", "uint");
 
     ASRegisterManualFirst_Addons(engine);
     ASRegisterManualFirst_Graphics(engine);

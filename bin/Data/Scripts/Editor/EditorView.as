@@ -1127,7 +1127,7 @@ void HandleViewportBorderDragMove(StringHash eventType, VariantMap& eventData)
         if (border is null || border is dragBorder || border.name != "border")
             continue;
 
-        uint borderViewMode = border.vars["VIEWMODE"].GetUInt();
+        uint borderViewMode = border.vars["VIEWMODE"].GetU32();
         if (resizingBorder == VIEWPORT_BORDER_H)
         {
             if (borderViewMode == VIEWPORT_BORDER_V1)
@@ -1173,7 +1173,7 @@ void HandleViewportBorderDragEnd(StringHash eventType, VariantMap& eventData)
         if (children[i].name == "border")
         {
             BorderImage@ border = children[i];
-            uint mode = border.vars["VIEWMODE"].GetUInt();
+            uint mode = border.vars["VIEWMODE"].GetU32();
             if (mode == VIEWPORT_BORDER_V)
                 borderV = border;
             else if (mode == VIEWPORT_BORDER_V1)
@@ -2078,7 +2078,7 @@ void UpdateView(float timeStep)
         UIElement@ uiElement = ui.GetElementAt(ui.cursorPosition);
         if (uiElement !is null && uiElement.vars.Contains("VIEWMODE"))
         {
-            setViewportCursor = uiElement.vars["VIEWMODE"].GetUInt();
+            setViewportCursor = uiElement.vars["VIEWMODE"].GetU32();
             if (input.mouseButtonDown[MOUSEB_LEFT])
                 resizingBorder = setViewportCursor;
         }

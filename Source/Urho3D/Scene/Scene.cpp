@@ -400,7 +400,7 @@ bool Scene::LoadAsyncXML(File* file, LoadMode mode)
         }
 
         // Store own old ID for resolving possible root node references
-        NodeId nodeID = rootElement.GetUInt("id");
+        NodeId nodeID = rootElement.GetU32("id");
         resolver_.AddNode(nodeID, this);
 
         // Load the root level components first
@@ -469,7 +469,7 @@ bool Scene::LoadAsyncJSON(File* file, LoadMode mode)
         }
 
         // Store own old ID for resolving possible root node references
-        NodeId nodeID = rootVal.Get("id").GetUInt();
+        NodeId nodeID = rootVal.Get("id").GetU32();
         resolver_.AddNode(nodeID, this);
 
         // Load the root level components first
@@ -534,7 +534,7 @@ Node* Scene::InstantiateXML(const XMLElement& source, const Vector3& position, c
     URHO3D_PROFILE(InstantiateXML);
 
     SceneResolver resolver;
-    NodeId nodeID = source.GetUInt("id");
+    NodeId nodeID = source.GetU32("id");
     // Rewrite IDs when instantiating
     Node* node = CreateChild(0, mode);
     resolver.AddNode(nodeID, node);
@@ -557,7 +557,7 @@ Node* Scene::InstantiateJSON(const JSONValue& source, const Vector3& position, c
     URHO3D_PROFILE(InstantiateJSON);
 
     SceneResolver resolver;
-    NodeId nodeID = source.Get("id").GetUInt();
+    NodeId nodeID = source.Get("id").GetU32();
     // Rewrite IDs when instantiating
     Node* node = CreateChild(0, mode);
     resolver.AddNode(nodeID, node);
@@ -1189,7 +1189,7 @@ void Scene::UpdateAsyncLoading()
         /// \todo Works poorly in scenes where one root-level child node contains all content
         if (asyncProgress_.xmlFile_)
         {
-            NodeId nodeID = asyncProgress_.xmlElement_.GetUInt("id");
+            NodeId nodeID = asyncProgress_.xmlElement_.GetU32("id");
             Node* newNode = CreateChild(nodeID, IsReplicatedID(nodeID) ? REPLICATED : LOCAL);
             resolver_.AddNode(nodeID, newNode);
             newNode->LoadXML(asyncProgress_.xmlElement_, resolver_);
@@ -1199,7 +1199,7 @@ void Scene::UpdateAsyncLoading()
         {
             const JSONValue& childValue = asyncProgress_.jsonFile_->GetRoot().Get("children").GetArray().At(asyncProgress_.jsonIndex_);
 
-            NodeId nodeID = childValue.Get("id").GetUInt();
+            NodeId nodeID = childValue.Get("id").GetU32();
             Node* newNode = CreateChild(nodeID, IsReplicatedID(nodeID) ? REPLICATED : LOCAL);
             resolver_.AddNode(nodeID, newNode);
             newNode->LoadJSON(childValue, resolver_);

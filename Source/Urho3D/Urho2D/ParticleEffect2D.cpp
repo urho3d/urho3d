@@ -500,7 +500,7 @@ SharedPtr<ParticleEffect2D> ParticleEffect2D::Clone(const String& cloneName) con
 
 int ParticleEffect2D::ReadInt(const XMLElement& element, const String& name) const
 {
-    return element.GetChild(name).GetInt("value");
+    return element.GetChild(name).GetI32("value");
 }
 
 float ParticleEffect2D::ReadFloat(const XMLElement& element, const String& name) const
@@ -523,7 +523,7 @@ Vector2 ParticleEffect2D::ReadVector2(const XMLElement& element, const String& n
 void ParticleEffect2D::WriteInt(XMLElement& element, const String& name, int value) const
 {
     XMLElement child = element.CreateChild(name);
-    child.SetInt("value", value);
+    child.SetI32("value", value);
 }
 
 void ParticleEffect2D::WriteFloat(XMLElement& element, const String& name, float value) const

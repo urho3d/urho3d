@@ -235,7 +235,7 @@ void HandleMaskTypeScroll(StringHash eventType, VariantMap& eventData)
     DropDownList@ listView = layerWindow.GetChild("LayerModeEdit", true);
     editMaskType = listView.selection;
     
-    int wheel = eventData["Wheel"].GetInt();
+    int wheel = eventData["Wheel"].GetI32();
     
     if (wheel > 0) 
     {
@@ -258,8 +258,8 @@ void HandleHideLayerEditor(StringHash eventType, VariantMap& eventData)
     if ( eventType == eventTypeMouseMove) 
     {
         IntVector2 mousePos;
-        mousePos.x = eventData["X"].GetInt();
-        mousePos.y = eventData["Y"].GetInt();
+        mousePos.x = eventData["X"].GetI32();
+        mousePos.y = eventData["Y"].GetI32();
         
         Vector2 a = Vector2(layerWindowPosition.x, layerWindowPosition.y);
         Vector2 b = Vector2(mousePos.x, mousePos.y);
@@ -286,7 +286,7 @@ void ToggleBits(StringHash eventType, VariantMap& eventData)
     toggleBusy = true;
     
     CheckBox@ cb = cast<CheckBox>(eventData["Element"].GetPtr());
-    int bitIndex = cb.vars["index"].GetInt();
+    int bitIndex = cb.vars["index"].GetI32();
     
     
     if (bitIndex < MAX_BITMASK_BITS) 

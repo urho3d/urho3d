@@ -37,14 +37,14 @@ void UIBatch::SetColor(const Color& color, bool overrideAlpha)
 
     useGradient_ = false;
     color_ =
-        overrideAlpha ? color.ToUInt() : Color(color.r_, color.g_, color.b_, color.a_ * element_->GetDerivedOpacity()).ToUInt();
+        overrideAlpha ? color.ToU32() : Color(color.r_, color.g_, color.b_, color.a_ * element_->GetDerivedOpacity()).ToU32();
 }
 
 void UIBatch::SetDefaultColor()
 {
     if (element_)
     {
-        color_ = element_->GetDerivedColor().ToUInt();
+        color_ = element_->GetDerivedColor().ToU32();
         useGradient_ = element_->HasColorGradient();
     }
     else
@@ -221,7 +221,7 @@ void UIBatch::AddQuad(const Matrix3x4& transform, int x, int y, int width, int h
 
 void UIBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight, bool tiled)
 {
-    if (!(element_->HasColorGradient() || element_->GetDerivedColor().ToUInt() & 0xff000000))
+    if (!(element_->HasColorGradient() || element_->GetDerivedColor().ToU32() & 0xff000000))
         return; // No gradient and alpha is 0, so do not add the quad
 
     if (!tiled)
@@ -328,10 +328,10 @@ void UIBatch::AddQuad(const Matrix3x4& transform, const IntVector2& a, const Int
     Vector2 uv3((float)texC.x_ * invTextureSize_.x_, (float)texC.y_ * invTextureSize_.y_);
     Vector2 uv4((float)texD.x_ * invTextureSize_.x_, (float)texD.y_ * invTextureSize_.y_);
 
-    unsigned c1 = colA.ToUInt();
-    unsigned c2 = colB.ToUInt();
-    unsigned c3 = colC.ToUInt();
-    unsigned c4 = colD.ToUInt();
+    color32 c1 = colA.ToU32();
+    color32 c2 = colB.ToU32();
+    color32 c3 = colC.ToU32();
+    color32 c4 = colD.ToU32();
 
     unsigned begin = vertexData_->Size();
     vertexData_->Resize(begin + 6 * UI_VERTEX_SIZE);
@@ -341,35 +341,35 @@ void UIBatch::AddQuad(const Matrix3x4& transform, const IntVector2& a, const Int
     dest[0] = v1.x_;
     dest[1] = v1.y_;
     dest[2] = 0.0f;
-    ((unsigned&)dest[3]) = c1;
+    ((color32&)dest[3]) = c1;
     dest[4] = uv1.x_;
     dest[5] = uv1.y_;
 
     dest[6] = v2.x_;
     dest[7] = v2.y_;
     dest[8] = 0.0f;
-    ((unsigned&)dest[9]) = c2;
+    ((color32&)dest[9]) = c2;
     dest[10] = uv2.x_;
     dest[11] = uv2.y_;
 
     dest[12] = v3.x_;
     dest[13] = v3.y_;
     dest[14] = 0.0f;
-    ((unsigned&)dest[15]) = c3;
+    ((color32&)dest[15]) = c3;
     dest[16] = uv3.x_;
     dest[17] = uv3.y_;
 
     dest[18] = v1.x_;
     dest[19] = v1.y_;
     dest[20] = 0.0f;
-    ((unsigned&)dest[21]) = c1;
+    ((color32&)dest[21]) = c1;
     dest[22] = uv1.x_;
     dest[23] = uv1.y_;
 
     dest[24] = v3.x_;
     dest[25] = v3.y_;
     dest[26] = 0.0f;
-    ((unsigned&)dest[27]) = c3;
+    ((color32&)dest[27]) = c3;
     dest[28] = uv3.x_;
     dest[29] = uv3.y_;
 
@@ -407,13 +407,13 @@ unsigned UIBatch::GetInterpolatedColor(float x, float y)
         Color bottomColor = element_->GetColor(C_BOTTOMLEFT).Lerp(element_->GetColor(C_BOTTOMRIGHT), cLerpX);
         Color color = topColor.Lerp(bottomColor, cLerpY);
         color.a_ *= element_->GetDerivedOpacity();
-        return color.ToUInt();
+        return color.ToU32();
     }
     else
     {
         Color color = element_->GetColor(C_TOPLEFT);
         color.a_ *= element_->GetDerivedOpacity();
-        return color.ToUInt();
+        return color.ToU32();
     }
 }
 

@@ -57,11 +57,11 @@ bool FontFaceBitmap::Load(const unsigned char* fontData, unsigned fontDataSize, 
 
     XMLElement infoElem = root.GetChild("info");
     if (!infoElem.IsNull())
-        pointSize_ = infoElem.GetInt("size");
+        pointSize_ = infoElem.GetI32("size");
 
     XMLElement commonElem = root.GetChild("common");
-    rowHeight_ = commonElem.GetInt("lineHeight");
-    unsigned pages = commonElem.GetUInt("pages");
+    rowHeight_ = commonElem.GetI32("lineHeight");
+    unsigned pages = commonElem.GetU32("pages");
     textures_.Reserve(pages);
 
     auto* resourceCache = font_->GetSubsystem<ResourceCache>();
@@ -104,22 +104,22 @@ bool FontFaceBitmap::Load(const unsigned char* fontData, unsigned fontDataSize, 
     }
 
     XMLElement charsElem = root.GetChild("chars");
-    int count = charsElem.GetInt("count");
+    int count = charsElem.GetI32("count");
 
     XMLElement charElem = charsElem.GetChild("char");
     while (!charElem.IsNull())
     {
-        int id = charElem.GetInt("id");
+        int id = charElem.GetI32("id");
 
         FontGlyph glyph;
-        glyph.x_ = (short)charElem.GetInt("x");
-        glyph.y_ = (short)charElem.GetInt("y");
-        glyph.width_ = glyph.texWidth_ = (short)charElem.GetInt("width");
-        glyph.height_ = glyph.texHeight_ = (short)charElem.GetInt("height");
-        glyph.offsetX_ = (short)charElem.GetInt("xoffset");
-        glyph.offsetY_ = (short)charElem.GetInt("yoffset");
-        glyph.advanceX_ = (short)charElem.GetInt("xadvance");
-        glyph.page_ = charElem.GetInt("page");
+        glyph.x_ = (short)charElem.GetI32("x");
+        glyph.y_ = (short)charElem.GetI32("y");
+        glyph.width_ = glyph.texWidth_ = (short)charElem.GetI32("width");
+        glyph.height_ = glyph.texHeight_ = (short)charElem.GetI32("height");
+        glyph.offsetX_ = (short)charElem.GetI32("xoffset");
+        glyph.offsetY_ = (short)charElem.GetI32("yoffset");
+        glyph.advanceX_ = (short)charElem.GetI32("xadvance");
+        glyph.page_ = charElem.GetI32("page");
         assert(glyph.page_ >= 0);
 
         glyphMapping_[id] = glyph;
@@ -133,10 +133,10 @@ bool FontFaceBitmap::Load(const unsigned char* fontData, unsigned fontDataSize, 
         XMLElement kerningElem = kerningsElem.GetChild("kerning");
         while (!kerningElem.IsNull())
         {
-            unsigned first = kerningElem.GetInt("first");
-            unsigned second = kerningElem.GetInt("second");
+            unsigned first = kerningElem.GetI32("first");
+            unsigned second = kerningElem.GetI32("second");
             unsigned value = first << 16u | second;
-            kerningMapping_[value] = (short)kerningElem.GetInt("amount");
+            kerningMapping_[value] = (short)kerningElem.GetI32("amount");
 
             kerningElem = kerningElem.GetNext("kerning");
         }
@@ -259,9 +259,9 @@ bool FontFaceBitmap::Save(Serializer& dest, int pointSize, const String& indenta
 
     // Common
     childElem = rootElem.CreateChild("common");
-    childElem.SetInt("lineHeight", rowHeight_);
+    childElem.SetI32("lineHeight", rowHeight_);
     unsigned pages = textures_.Size();
-    childElem.SetUInt("pages", pages);
+    childElem.SetU32("pages", pages);
 
     // Construct the path to store the texture
     String pathName;
@@ -278,7 +278,7 @@ bool FontFaceBitmap::Save(Serializer& dest, int pointSize, const String& indenta
     for (unsigned i = 0; i < pages; ++i)
     {
         XMLElement pageElem = childElem.CreateChild("page");
-        pageElem.SetInt("id", i);
+        pageElem.SetI32("id", i);
         String texFileName = fileName + "_" + String(i) + ".png";
         pageElem.SetAttribute("file", texFileName);
 
@@ -289,23 +289,23 @@ bool FontFaceBitmap::Save(Serializer& dest, int pointSize, const String& indenta
     // Chars and kernings
     XMLElement charsElem = rootElem.CreateChild("chars");
     unsigned numGlyphs = glyphMapping_.Size();
-    charsElem.SetInt("count", numGlyphs);
+    charsElem.SetI32("count", numGlyphs);
 
     for (HashMap<c32, FontGlyph>::ConstIterator i = glyphMapping_.Begin(); i != glyphMapping_.End(); ++i)
     {
         // Char
         XMLElement charElem = charsElem.CreateChild("char");
-        charElem.SetInt("id", i->first_);
+        charElem.SetI32("id", i->first_);
 
         const FontGlyph& glyph = i->second_;
-        charElem.SetInt("x", glyph.x_);
-        charElem.SetInt("y", glyph.y_);
-        charElem.SetInt("width", glyph.width_);
-        charElem.SetInt("height", glyph.height_);
-        charElem.SetInt("xoffset", glyph.offsetX_);
-        charElem.SetInt("yoffset", glyph.offsetY_);
-        charElem.SetInt("xadvance", glyph.advanceX_);
-        charElem.SetInt("page", glyph.page_);
+        charElem.SetI32("x", glyph.x_);
+        charElem.SetI32("y", glyph.y_);
+        charElem.SetI32("width", glyph.width_);
+        charElem.SetI32("height", glyph.height_);
+        charElem.SetI32("xoffset", glyph.offsetX_);
+        charElem.SetI32("yoffset", glyph.offsetY_);
+        charElem.SetI32("xadvance", glyph.advanceX_);
+        charElem.SetI32("page", glyph.page_);
     }
 
     if (!kerningMapping_.Empty())
@@ -314,9 +314,9 @@ bool FontFaceBitmap::Save(Serializer& dest, int pointSize, const String& indenta
         for (HashMap<u32, float>::ConstIterator i = kerningMapping_.Begin(); i != kerningMapping_.End(); ++i)
         {
             XMLElement kerningElem = kerningsElem.CreateChild("kerning");
-            kerningElem.SetInt("first", i->first_ >> 16u);
-            kerningElem.SetInt("second", i->first_ & 0xffffu);
-            kerningElem.SetInt("amount", i->second_);
+            kerningElem.SetI32("first", i->first_ >> 16u);
+            kerningElem.SetI32("second", i->first_ & 0xffffu);
+            kerningElem.SetI32("amount", i->second_);
         }
     }
 

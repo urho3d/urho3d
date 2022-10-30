@@ -184,7 +184,7 @@ void Texture::SetParameters(const XMLElement& element)
             String mode = paramElem.GetAttributeLower("mode");
             SetFilterMode((TextureFilterMode)GetStringListIndex(mode.CString(), filterModeNames, FILTER_DEFAULT));
             if (paramElem.HasAttribute("anisotropy"))
-                SetAnisotropy(paramElem.GetUInt("anisotropy"));
+                SetAnisotropy(paramElem.GetU32("anisotropy"));
         }
 
         if (name == "mipmap")
@@ -193,13 +193,13 @@ void Texture::SetParameters(const XMLElement& element)
         if (name == "quality")
         {
             if (paramElem.HasAttribute("low"))
-                SetMipsToSkip(QUALITY_LOW, paramElem.GetInt("low"));
+                SetMipsToSkip(QUALITY_LOW, paramElem.GetI32("low"));
             if (paramElem.HasAttribute("med"))
-                SetMipsToSkip(QUALITY_MEDIUM, paramElem.GetInt("med"));
+                SetMipsToSkip(QUALITY_MEDIUM, paramElem.GetI32("med"));
             if (paramElem.HasAttribute("medium"))
-                SetMipsToSkip(QUALITY_MEDIUM, paramElem.GetInt("medium"));
+                SetMipsToSkip(QUALITY_MEDIUM, paramElem.GetI32("medium"));
             if (paramElem.HasAttribute("high"))
-                SetMipsToSkip(QUALITY_HIGH, paramElem.GetInt("high"));
+                SetMipsToSkip(QUALITY_HIGH, paramElem.GetI32("high"));
         }
 
         if (name == "srgb")

@@ -193,7 +193,7 @@ void HandleStartServer(StringHash eventType, VariantMap& eventData)
 
 void HandleNetworkMessage(StringHash eventType, VariantMap& eventData)
 {
-    int msgID = eventData["MessageID"].GetInt();
+    int msgID = eventData["MessageID"].GetI32();
     if (msgID == MSG_CHAT)
     {
         VectorBuffer msg = eventData["Data"].GetBuffer();

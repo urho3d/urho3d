@@ -131,7 +131,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
 
 void OnKeyUp(StringHash eventType, VariantMap& eventData)
 {
-    int key = eventData["Key"].GetInt();
+    int key = eventData["Key"].GetI32();
 
     if(key == KEY_TAB)
     {

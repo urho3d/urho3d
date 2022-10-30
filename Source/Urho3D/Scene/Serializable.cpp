@@ -67,13 +67,13 @@ void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
     case VAR_INT:
         // If enum type, use the low 8 bits only
         if (attr.enumNames_)
-            *(reinterpret_cast<unsigned char*>(dest)) = src.GetInt();
+            *(reinterpret_cast<unsigned char*>(dest)) = src.GetI32();
         else
-            *(reinterpret_cast<int*>(dest)) = src.GetInt();
+            *(reinterpret_cast<int*>(dest)) = src.GetI32();
         break;
 
     case VAR_INT64:
-        *(reinterpret_cast<long long*>(dest)) = src.GetInt64();
+        *(reinterpret_cast<long long*>(dest)) = src.GetI64();
         break;
 
     case VAR_BOOL:
@@ -519,7 +519,7 @@ bool Serializable::SaveXML(XMLElement& dest) const
         // If enums specified, set as an enum string. Otherwise set directly as a Variant
         if (attr.enumNames_)
         {
-            int enumValue = value.GetInt();
+            int enumValue = value.GetI32();
             attrElem.SetAttribute("value", attr.enumNames_[enumValue]);
         }
         else
@@ -555,7 +555,7 @@ bool Serializable::SaveJSON(JSONValue& dest) const
         // If enums specified, set as an enum string. Otherwise set directly as a Variant
         if (attr.enumNames_)
         {
-            int enumValue = value.GetInt();
+            int enumValue = value.GetI32();
             attrVal = attr.enumNames_[enumValue];
         }
         else

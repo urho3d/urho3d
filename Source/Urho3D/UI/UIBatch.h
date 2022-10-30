@@ -87,7 +87,7 @@ public:
     /// Vertex data end index.
     unsigned vertexEnd_{};
     /// Current color. By default calculated from the element.
-    unsigned color_{};
+    color32 color_{};
     /// Gradient flag.
     bool useGradient_{};
     /// Custom material.

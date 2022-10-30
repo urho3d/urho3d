@@ -399,7 +399,7 @@ void JSONValue::SetVariantValue(const Variant& variant, Context* context)
         return;
 
     case VAR_INT:
-        *this = variant.GetInt();
+        *this = variant.GetI32();
         return;
 
     case VAR_FLOAT:
@@ -478,7 +478,7 @@ Variant JSONValue::GetVariantValue(VariantType type) const
         break;
 
     case VAR_INT:
-        variant = GetInt();
+        variant = GetI32();
         break;
 
     case VAR_FLOAT:

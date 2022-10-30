@@ -12,22 +12,22 @@
 namespace Urho3D
 {
 
-unsigned Color::ToUInt() const
+color32 Color::ToU32() const
 {
-    auto r = (unsigned)Clamp(((int)(r_ * 255.0f)), 0, 255);
-    auto g = (unsigned)Clamp(((int)(g_ * 255.0f)), 0, 255);
-    auto b = (unsigned)Clamp(((int)(b_ * 255.0f)), 0, 255);
-    auto a = (unsigned)Clamp(((int)(a_ * 255.0f)), 0, 255);
+    u32 r = (u32)Clamp(((i32)(r_ * 255.0f)), 0, 255);
+    u32 g = (u32)Clamp(((i32)(g_ * 255.0f)), 0, 255);
+    u32 b = (u32)Clamp(((i32)(b_ * 255.0f)), 0, 255);
+    u32 a = (u32)Clamp(((i32)(a_ * 255.0f)), 0, 255);
     return (a << 24u) | (b << 16u) | (g << 8u) | r;
 }
 
-unsigned Color::ToUIntMask(const ChannelMask& mask) const
+color32 Color::ToU32(const ChannelMask& mask) const
 {
-    const auto max = static_cast<double>(M_MAX_UNSIGNED);
-    const auto r = static_cast<unsigned>(Clamp(static_cast<double>(r_) * mask.r_, 0.0, max)) & mask.r_;
-    const auto g = static_cast<unsigned>(Clamp(static_cast<double>(g_) * mask.g_, 0.0, max)) & mask.g_;
-    const auto b = static_cast<unsigned>(Clamp(static_cast<double>(b_) * mask.b_, 0.0, max)) & mask.b_;
-    const auto a = static_cast<unsigned>(Clamp(static_cast<double>(a_) * mask.a_, 0.0, max)) & mask.a_;
+    const double max = static_cast<double>(M_MAX_U32);
+    const u32 r = static_cast<u32>(Clamp(static_cast<double>(r_) * mask.r_, 0.0, max)) & mask.r_;
+    const u32 g = static_cast<u32>(Clamp(static_cast<double>(g_) * mask.g_, 0.0, max)) & mask.g_;
+    const u32 b = static_cast<u32>(Clamp(static_cast<double>(b_) * mask.b_, 0.0, max)) & mask.b_;
+    const u32 a = static_cast<u32>(Clamp(static_cast<double>(a_) * mask.a_, 0.0, max)) & mask.a_;
     return r | g | b | a;
 }
 
@@ -55,7 +55,7 @@ Vector3 Color::ToHSV() const
     return Vector3(h, s, v);
 }
 
-void Color::FromUInt(unsigned color)
+void Color::FromU32(color32 color)
 {
     a_ = ((color >> 24u) & 0xffu) / 255.0f;
     b_ = ((color >> 16u) & 0xffu) / 255.0f;
@@ -63,7 +63,7 @@ void Color::FromUInt(unsigned color)
     r_ = ((color >> 0u)  & 0xffu) / 255.0f;
 }
 
-void Color::FromUIntMask(unsigned color, const ChannelMask& mask)
+void Color::FromU32(color32 color, const ChannelMask& mask)
 {
     // Channel offset is irrelevant during division, but double should be used to avoid precision loss.
     r_ = !mask.r_ ? 0.0f : static_cast<float>((color & mask.r_) / static_cast<double>(mask.r_));

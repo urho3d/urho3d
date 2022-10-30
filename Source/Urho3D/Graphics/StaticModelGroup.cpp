@@ -67,7 +67,7 @@ void StaticModelGroup::ApplyAttributes()
         // The first index stores the number of IDs redundantly. This is for editing
         for (unsigned i = 1; i < nodeIDsAttr_.Size(); ++i)
         {
-            Node* node = scene->GetNode(nodeIDsAttr_[i].GetUInt());
+            Node* node = scene->GetNode(nodeIDsAttr_[i].GetU32());
             if (node)
             {
                 WeakPtr<Node> instanceWeak(node);
@@ -308,7 +308,7 @@ void StaticModelGroup::SetNodeIDsAttr(const VariantVector& value)
         nodeIDsAttr_.Clear();
 
         unsigned index = 0;
-        unsigned numInstances = value[index++].GetUInt();
+        unsigned numInstances = value[index++].GetU32();
         // Prevent crash on entering negative value in the editor
         if (numInstances > M_MAX_INT)
             numInstances = 0;
@@ -318,7 +318,7 @@ void StaticModelGroup::SetNodeIDsAttr(const VariantVector& value)
         {
             // If vector contains less IDs than should, fill the rest with zeroes
             if (index < value.Size())
-                nodeIDsAttr_.Push(value[index++].GetUInt());
+                nodeIDsAttr_.Push(value[index++].GetU32());
             else
                 nodeIDsAttr_.Push(0);
         }

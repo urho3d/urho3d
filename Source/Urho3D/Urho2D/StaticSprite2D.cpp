@@ -316,7 +316,7 @@ void StaticSprite2D::UpdateSourceBatches()
     vertex2.uv_ = textureRect_.max_;
     (swapXY_ ? vertex1.uv_ : vertex3.uv_) = Vector2(textureRect_.max_.x_, textureRect_.min_.y_);
 
-    vertex0.color_ = vertex1.color_ = vertex2.color_ = vertex3.color_ = color_.ToUInt();
+    vertex0.color_ = vertex1.color_ = vertex2.color_ = vertex3.color_ = color_.ToU32();
 
     vertices.Push(vertex0);
     vertices.Push(vertex1);

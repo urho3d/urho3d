@@ -434,7 +434,7 @@ void HandleClientDisconnected(StringHash eventType, VariantMap& eventData)
 
 void HandleClientObjectID(StringHash eventType, VariantMap& eventData)
 {
-    clientObjectID = eventData["ID"].GetUInt();
+    clientObjectID = eventData["ID"].GetU32();
 }
 
 // Create XML patch instructions for screen joystick layout specific to this sample app
