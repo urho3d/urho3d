@@ -132,7 +132,7 @@ struct ModelVertexBuffer
             if (!!(elementMask_ & VertexElements::Normal))
                 dest.WriteVector3(vertices_[i].normal_);
             if (!!(elementMask_ & VertexElements::Color))
-                dest.WriteU32(vertices_[i].color_.ToUInt());
+                dest.WriteU32(vertices_[i].color_.ToU32());
             if (!!(elementMask_ & VertexElements::TexCoord1))
                 dest.WriteVector2(vertices_[i].texCoord1_);
             if (!!(elementMask_ & VertexElements::TexCoord2))

@@ -104,7 +104,7 @@ public:
     /// Clear the image with a color.
     void Clear(const Color& color);
     /// Clear the image with an integer color. R component is in the 8 lowest bits.
-    void ClearInt(unsigned uintColor);
+    void Clear(color32 uintColor);
     /// Save in BMP format. Return true if successful.
     bool SaveBMP(const String& fileName) const;
     /// Save in PNG format. Return true if successful.

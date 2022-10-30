@@ -97,7 +97,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
 void HandleEscKeyDown(StringHash eventType, VariantMap& eventData)
 {
     // Unlike the other samples, exiting the engine when ESC is pressed instead of just closing the console
-    if (eventData["Key"].GetInt() == KEY_ESCAPE)
+    if (eventData["Key"].GetI32() == KEY_ESCAPE)
         engine.Exit();
 }
 

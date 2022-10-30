@@ -48,10 +48,10 @@ const String& TmxLayer2D::GetProperty(const String& name) const
 void TmxLayer2D::LoadInfo(const XMLElement& element)
 {
     name_ = element.GetAttribute("name");
-    width_ = element.GetInt("width");
-    height_ = element.GetInt("height");
+    width_ = element.GetI32("width");
+    height_ = element.GetI32("height");
     if (element.HasAttribute("visible"))
-        visible_ = element.GetInt("visible") != 0;
+        visible_ = element.GetI32("visible") != 0;
     else
         visible_ = true;
 }
@@ -121,7 +121,7 @@ bool TmxTileLayer2D::Load(const XMLElement& element, const TileMapInfo2D& info)
                 if (!tileElem)
                     return false;
 
-                unsigned gid = tileElem.GetUInt("gid");
+                unsigned gid = tileElem.GetU32("gid");
                 if (gid > 0)
                 {
                     SharedPtr<Tile2D> tile(new Tile2D());
@@ -256,7 +256,7 @@ void TmxObjectGroup2D::StoreObject(const XMLElement& objectElem, const SharedPtr
 
         case OT_TILE:
             object->position_ = info.ConvertPosition(position);
-            object->gid_ = objectElem.GetUInt("gid");
+            object->gid_ = objectElem.GetU32("gid");
             object->sprite_ = tmxFile_->GetTileSprite(object->gid_ & ~FLIP_ALL);
 
             if (objectElem.HasAttribute("width") || objectElem.HasAttribute("height"))
@@ -455,8 +455,8 @@ bool TmxFile2D::EndLoad()
         return false;
     }
 
-    info_.width_ = rootElem.GetInt("width");
-    info_.height_ = rootElem.GetInt("height");
+    info_.width_ = rootElem.GetI32("width");
+    info_.height_ = rootElem.GetI32("height");
     info_.tileWidth_ = rootElem.GetFloat("tilewidth") * PIXEL_SIZE;
     info_.tileHeight_ = rootElem.GetFloat("tileheight") * PIXEL_SIZE;
 
@@ -598,7 +598,7 @@ struct TileImageInfo {
 
 bool TmxFile2D::LoadTileSet(const XMLElement& element)
 {
-    unsigned firstgid = element.GetUInt("firstgid");
+    unsigned firstgid = element.GetU32("firstgid");
 
     XMLElement tileSetElem;
     if (element.HasAttribute("source"))
@@ -622,10 +622,10 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
     else
         tileSetElem = element;
 
-    int tileWidth = tileSetElem.GetInt("tilewidth");
-    int tileHeight = tileSetElem.GetInt("tileheight");
-    int spacing = tileSetElem.GetInt("spacing");
-    int margin = tileSetElem.GetInt("margin");
+    int tileWidth = tileSetElem.GetI32("tilewidth");
+    int tileHeight = tileSetElem.GetI32("tileheight");
+    int spacing = tileSetElem.GetI32("spacing");
+    int margin = tileSetElem.GetI32("margin");
     int imageWidth;
     int imageHeight;
     bool isSingleTileSet = false;
@@ -653,8 +653,8 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
                 hotSpot.y_ += offsetElem.GetFloat("y") / (float)tileHeight;
             }
 
-            imageWidth = imageElem.GetInt("width");
-            imageHeight = imageElem.GetInt("height");
+            imageWidth = imageElem.GetI32("width");
+            imageHeight = imageElem.GetI32("height");
 
             unsigned gid = firstgid;
             for (int y = margin; y + tileHeight <= imageHeight - margin; y += tileHeight + spacing)
@@ -675,7 +675,7 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
     Vector<TileImageInfo> tileImageInfos;
     for (XMLElement tileElem = tileSetElem.GetChild("tile"); tileElem; tileElem = tileElem.GetNext("tile"))
     {
-        unsigned gid = firstgid + tileElem.GetUInt("id");
+        unsigned gid = firstgid + tileElem.GetU32("id");
         // Tileset based on collection of images
         if (!isSingleTileSet)
         {
@@ -688,8 +688,8 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
                     URHO3D_LOGERROR("Could not load image " + textureFilePath);
                     return false;
                 }
-                tileWidth = imageWidth = imageElem.GetInt("width");
-                tileHeight = imageHeight = imageElem.GetInt("height");
+                tileWidth = imageWidth = imageElem.GetI32("width");
+                tileHeight = imageHeight = imageElem.GetI32("height");
                 TileImageInfo info = {image, gid, imageWidth, imageHeight, 0, 0};
                 tileImageInfos.Push(info);
             }

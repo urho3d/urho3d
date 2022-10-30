@@ -262,7 +262,7 @@ bool UI::SetModalElement(UIElement* modalElement, bool enable)
 
         // Revert back to original parent
         modalElement->SetParent(static_cast<UIElement*>(modalElement->GetVar(VAR_ORIGINAL_PARENT).GetPtr()),
-            modalElement->GetVar(VAR_ORIGINAL_CHILD_INDEX).GetUInt());
+            modalElement->GetVar(VAR_ORIGINAL_CHILD_INDEX).GetU32());
         auto& vars = const_cast<VariantMap&>(modalElement->GetVars());
         vars.Erase(VAR_ORIGINAL_PARENT);
         vars.Erase(VAR_ORIGINAL_CHILD_INDEX);
@@ -276,7 +276,7 @@ bool UI::SetModalElement(UIElement* modalElement, bool enable)
             {
                 const_cast<VariantMap&>(originElement->GetVars()).Erase(VAR_PARENT_CHANGED);
                 element->SetParent(static_cast<UIElement*>(element->GetVar(VAR_ORIGINAL_PARENT).GetPtr()),
-                    element->GetVar(VAR_ORIGINAL_CHILD_INDEX).GetUInt());
+                    element->GetVar(VAR_ORIGINAL_CHILD_INDEX).GetU32());
                 vars = const_cast<VariantMap&>(element->GetVars());
                 vars.Erase(VAR_ORIGINAL_PARENT);
                 vars.Erase(VAR_ORIGINAL_CHILD_INDEX);
@@ -1738,8 +1738,8 @@ void UI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
 {
     using namespace MouseButtonDown;
 
-    mouseButtons_ = MouseButtonFlags(eventData[P_BUTTONS].GetUInt());
-    qualifiers_ = QualifierFlags(eventData[P_QUALIFIERS].GetUInt());
+    mouseButtons_ = MouseButtonFlags(eventData[P_BUTTONS].GetU32());
+    qualifiers_ = QualifierFlags(eventData[P_QUALIFIERS].GetU32());
     usingTouchInput_ = false;
 
     IntVector2 cursorPos;
@@ -1752,37 +1752,37 @@ void UI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
     auto* input = GetSubsystem<Input>();
 
     if (!input->IsMouseGrabbed())
-        ProcessClickBegin(cursorPos, MouseButton(eventData[P_BUTTON].GetUInt()), mouseButtons_, qualifiers_, cursor_, cursorVisible);
+        ProcessClickBegin(cursorPos, MouseButton(eventData[P_BUTTON].GetU32()), mouseButtons_, qualifiers_, cursor_, cursorVisible);
 }
 
 void UI::HandleMouseButtonUp(StringHash eventType, VariantMap& eventData)
 {
     using namespace MouseButtonUp;
 
-    mouseButtons_ = MouseButtonFlags(eventData[P_BUTTONS].GetUInt());
-    qualifiers_ = QualifierFlags(eventData[P_QUALIFIERS].GetUInt());
+    mouseButtons_ = MouseButtonFlags(eventData[P_BUTTONS].GetU32());
+    qualifiers_ = QualifierFlags(eventData[P_QUALIFIERS].GetU32());
 
     IntVector2 cursorPos;
     bool cursorVisible;
     GetCursorPositionAndVisible(cursorPos, cursorVisible);
 
-    ProcessClickEnd(cursorPos, (MouseButton)eventData[P_BUTTON].GetUInt(), mouseButtons_, qualifiers_, cursor_, cursorVisible);
+    ProcessClickEnd(cursorPos, (MouseButton)eventData[P_BUTTON].GetU32(), mouseButtons_, qualifiers_, cursor_, cursorVisible);
 }
 
 void UI::HandleMouseMove(StringHash eventType, VariantMap& eventData)
 {
     using namespace MouseMove;
 
-    mouseButtons_ = MouseButtonFlags(eventData[P_BUTTONS].GetUInt());
-    qualifiers_ = QualifierFlags(eventData[P_QUALIFIERS].GetUInt());
+    mouseButtons_ = MouseButtonFlags(eventData[P_BUTTONS].GetU32());
+    qualifiers_ = QualifierFlags(eventData[P_QUALIFIERS].GetU32());
     usingTouchInput_ = false;
 
     auto* input = GetSubsystem<Input>();
     const IntVector2& rootSize = rootElement_->GetSize();
     const IntVector2& rootPos = rootElement_->GetPosition();
 
-    const IntVector2 mouseDeltaPos{ eventData[P_DX].GetInt(), eventData[P_DY].GetInt() };
-    const IntVector2 mousePos{ eventData[P_X].GetInt(), eventData[P_Y].GetInt() };
+    const IntVector2 mouseDeltaPos{ eventData[P_DX].GetI32(), eventData[P_DY].GetI32() };
+    const IntVector2 mousePos{ eventData[P_X].GetI32(), eventData[P_Y].GetI32() };
 
     if (cursor_)
     {
@@ -1822,9 +1822,9 @@ void UI::HandleMouseWheel(StringHash eventType, VariantMap& eventData)
 
     using namespace MouseWheel;
 
-    mouseButtons_ = MouseButtonFlags(eventData[P_BUTTONS].GetInt());
-    qualifiers_ = QualifierFlags(eventData[P_QUALIFIERS].GetInt());
-    int delta = eventData[P_WHEEL].GetInt();
+    mouseButtons_ = MouseButtonFlags(eventData[P_BUTTONS].GetI32());
+    qualifiers_ = QualifierFlags(eventData[P_QUALIFIERS].GetI32());
+    int delta = eventData[P_WHEEL].GetI32();
     usingTouchInput_ = false;
 
     IntVector2 cursorPos;
@@ -1866,11 +1866,11 @@ void UI::HandleTouchBegin(StringHash eventType, VariantMap& eventData)
 
     using namespace TouchBegin;
 
-    IntVector2 pos(eventData[P_X].GetInt(), eventData[P_Y].GetInt());
+    IntVector2 pos(eventData[P_X].GetI32(), eventData[P_Y].GetI32());
     pos = ConvertSystemToUI(pos);
     usingTouchInput_ = true;
 
-    const MouseButton touchId = MakeTouchIDMask(eventData[P_TOUCHID].GetInt());
+    const MouseButton touchId = MakeTouchIDMask(eventData[P_TOUCHID].GetI32());
     WeakPtr<UIElement> element(GetElementAt(pos));
 
     if (element)
@@ -1886,11 +1886,11 @@ void UI::HandleTouchEnd(StringHash eventType, VariantMap& eventData)
 {
     using namespace TouchEnd;
 
-    IntVector2 pos(eventData[P_X].GetInt(), eventData[P_Y].GetInt());
+    IntVector2 pos(eventData[P_X].GetI32(), eventData[P_Y].GetI32());
     pos = ConvertSystemToUI(pos);
 
     // Get the touch index
-    const MouseButton touchId = MakeTouchIDMask(eventData[P_TOUCHID].GetInt());
+    const MouseButton touchId = MakeTouchIDMask(eventData[P_TOUCHID].GetI32());
 
     // Transmit hover end to the position where the finger was lifted
     WeakPtr<UIElement> element(GetElementAt(pos));
@@ -1915,13 +1915,13 @@ void UI::HandleTouchMove(StringHash eventType, VariantMap& eventData)
 {
     using namespace TouchMove;
 
-    IntVector2 pos(eventData[P_X].GetInt(), eventData[P_Y].GetInt());
-    IntVector2 deltaPos(eventData[P_DX].GetInt(), eventData[P_DY].GetInt());
+    IntVector2 pos(eventData[P_X].GetI32(), eventData[P_Y].GetI32());
+    IntVector2 deltaPos(eventData[P_DX].GetI32(), eventData[P_DY].GetI32());
     pos = ConvertSystemToUI(pos);
     deltaPos = ConvertSystemToUI(deltaPos);
     usingTouchInput_ = true;
 
-    const MouseButton touchId = MakeTouchIDMask(eventData[P_TOUCHID].GetInt());
+    const MouseButton touchId = MakeTouchIDMask(eventData[P_TOUCHID].GetI32());
 
     ProcessMove(pos, deltaPos, touchId, QUAL_NONE, nullptr, true);
 }
@@ -1930,9 +1930,9 @@ void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
 {
     using namespace KeyDown;
 
-    mouseButtons_ = MouseButtonFlags(eventData[P_BUTTONS].GetUInt());
-    qualifiers_ = QualifierFlags(eventData[P_QUALIFIERS].GetUInt());
-    auto key = (Key)eventData[P_KEY].GetUInt();
+    mouseButtons_ = MouseButtonFlags(eventData[P_BUTTONS].GetU32());
+    qualifiers_ = QualifierFlags(eventData[P_QUALIFIERS].GetU32());
+    auto key = (Key)eventData[P_KEY].GetU32();
 
     // Cancel UI dragging
     if (key == KEY_ESCAPE && dragElementsCount_ > 0)

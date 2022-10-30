@@ -184,7 +184,7 @@ bool UnknownComponent::SaveXML(XMLElement& dest) const
     // Write type and ID
     if (!dest.SetString("type", GetTypeName()))
         return false;
-    if (!dest.SetInt("id", id_))
+    if (!dest.SetI32("id", id_))
         return false;
 
     for (unsigned i = 0; i < xmlAttributeInfos_.Size(); ++i)

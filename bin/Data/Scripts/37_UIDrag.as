@@ -107,31 +107,31 @@ void HandleDragBegin(StringHash eventType, VariantMap& eventData)
 {
     Button@ element = eventData["Element"].GetPtr();
 
-    int lx = eventData["X"].GetInt();
-    int ly = eventData["Y"].GetInt();
+    int lx = eventData["X"].GetI32();
+    int ly = eventData["Y"].GetI32();
 
     IntVector2 p = element.position;
     element.vars[VAR_START] = p;
     element.vars[VAR_DELTA] = IntVector2(p.x - lx, p.y - ly);
 
-    int buttons = eventData["Buttons"].GetInt();
+    int buttons = eventData["Buttons"].GetI32();
     element.vars[VAR_BUTTONS] = buttons;
 
     Text@ t = element.GetChild(String("Text"));
     t.text = "Drag Begin Buttons: " + String(buttons);
 
     t = element.GetChild(String("Num Touch"));
-    t.text = "Number of buttons: " + String(eventData["NumButtons"].GetInt());
+    t.text = "Number of buttons: " + String(eventData["NumButtons"].GetI32());
 }
 
 void HandleDragMove(StringHash eventType, VariantMap& eventData)
 {
     Button@ element = eventData["Element"].GetPtr();
-    int buttons = eventData["Buttons"].GetInt();
+    int buttons = eventData["Buttons"].GetI32();
     IntVector2 d = element.vars[VAR_DELTA].GetIntVector2();
-    int X = eventData["X"].GetInt() + d.x;
-    int Y = eventData["Y"].GetInt() + d.y;
-    int BUTTONS = element.vars[VAR_BUTTONS].GetInt();
+    int X = eventData["X"].GetI32() + d.x;
+    int Y = eventData["Y"].GetI32() + d.y;
+    int BUTTONS = element.vars[VAR_BUTTONS].GetI32();
 
     Text@ t = element.GetChild(String("Event Touch"));
     t.text = "Drag Move Buttons: " + String(buttons);

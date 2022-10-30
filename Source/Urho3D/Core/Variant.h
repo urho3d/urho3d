@@ -1101,57 +1101,57 @@ public:
     template <class T> void SetCustom(const T& value) { SetCustomVariantValue(MakeCustomValue<T>(value)); }
 
     /// Return int or zero on type mismatch. Floats and doubles are converted.
-    int GetInt() const
+    i32 GetI32() const
     {
         if (type_ == VAR_INT)
             return value_.int_;
         else if (type_ == VAR_FLOAT)
-            return static_cast<int>(value_.float_);
+            return static_cast<i32>(value_.float_);
         else if (type_ == VAR_DOUBLE)
-            return static_cast<int>(value_.double_);
+            return static_cast<i32>(value_.double_);
         else
             return 0;
     }
 
     /// Return 64 bit int or zero on type mismatch. Floats and doubles are converted.
-    long long GetInt64() const
+    i64 GetI64() const
     {
         if (type_ == VAR_INT64)
             return value_.int64_;
         else if (type_ == VAR_INT)
             return value_.int_;
         else if (type_ == VAR_FLOAT)
-            return static_cast<long long>(value_.float_);
+            return static_cast<i64>(value_.float_);
         else if (type_ == VAR_DOUBLE)
-            return static_cast<long long>(value_.double_);
+            return static_cast<i64>(value_.double_);
         else
             return 0;
     }
 
     /// Return unsigned 64 bit int or zero on type mismatch. Floats and doubles are converted.
-    unsigned long long GetUInt64() const
+    u64 GetU64() const
     {
         if (type_ == VAR_INT64)
-            return static_cast<unsigned long long>(value_.int64_);
+            return static_cast<u64>(value_.int64_);
         else if (type_ == VAR_INT)
-            return static_cast<unsigned long long>(value_.int_);
+            return static_cast<u64>(value_.int_);
         else if (type_ == VAR_FLOAT)
-            return static_cast<unsigned long long>(value_.float_);
+            return static_cast<u64>(value_.float_);
         else if (type_ == VAR_DOUBLE)
-            return static_cast<unsigned long long>(value_.double_);
+            return static_cast<u64>(value_.double_);
         else
             return 0;
     }
 
     /// Return unsigned int or zero on type mismatch. Floats and doubles are converted.
-    unsigned GetUInt() const
+    u32 GetU32() const
     {
         if (type_ == VAR_INT)
-            return static_cast<unsigned>(value_.int_);
+            return static_cast<u32>(value_.int_);
         else if (type_ == VAR_FLOAT)
-            return static_cast<unsigned>(value_.float_);
+            return static_cast<u32>(value_.float_);
         else if (type_ == VAR_DOUBLE)
-            return static_cast<unsigned>(value_.double_);
+            return static_cast<u32>(value_.double_);
         else
             return 0;
     }
@@ -1166,7 +1166,7 @@ public:
     }
 
     /// Return StringHash or zero on type mismatch.
-    StringHash GetStringHash() const { return StringHash(GetUInt()); }
+    StringHash GetStringHash() const { return StringHash(GetU32()); }
 
     /// Return bool or false on type mismatch.
     bool GetBool() const { return type_ == VAR_BOOL ? value_.bool_ : false; }

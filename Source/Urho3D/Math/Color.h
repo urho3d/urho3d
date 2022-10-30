@@ -10,6 +10,8 @@ namespace Urho3D
 
 class String;
 
+using color32 = u32;
+
 /// RGBA color.
 class URHO3D_API Color
 {
@@ -80,7 +82,7 @@ public:
     }
 
     /// Construct from 32-bit integer. Default format is 0xAABBGGRR.
-    explicit Color(unsigned color, const ChannelMask& mask = ABGR) { FromUIntMask(color, mask); }
+    explicit Color(unsigned color, const ChannelMask& mask = ABGR) { FromU32(color, mask); }
 
     /// Construct from 3-vector.
     explicit Color(const Vector3& color) : Color(color.x_, color.y_, color.z_) {}
@@ -123,17 +125,17 @@ public:
     const float* Data() const { return &r_; }
 
     /// Return color packed to a 32-bit integer, with R component in the lowest 8 bits. Components are clamped to [0, 1] range.
-    unsigned ToUInt() const;
+    color32 ToU32() const;
     /// Return color packed to a 32-bit integer with arbitrary channel mask. Components are clamped to [0, 1] range.
-    unsigned ToUIntMask(const ChannelMask& mask) const;
+    color32 ToU32(const ChannelMask& mask) const;
     /// Return HSL color-space representation as a Vector3; the RGB values are clipped before conversion but not changed in the process.
     Vector3 ToHSL() const;
     /// Return HSV color-space representation as a Vector3; the RGB values are clipped before conversion but not changed in the process.
     Vector3 ToHSV() const;
     /// Set RGBA values from packed 32-bit integer, with R component in the lowest 8 bits (format 0xAABBGGRR).
-    void FromUInt(unsigned color);
+    void FromU32(color32 color);
     /// Set RGBA values from packed 32-bit integer with arbitrary channel mask.
-    void FromUIntMask(unsigned color, const ChannelMask& mask);
+    void FromU32(color32 color, const ChannelMask& mask);
     /// Set RGBA values from specified HSL values and alpha.
     void FromHSL(float h, float s, float l, float a = 1.0f);
     /// Set RGBA values from specified HSV values and alpha.
@@ -230,10 +232,10 @@ public:
     String ToString() const;
 
     /// Return color packed to a 32-bit integer, with B component in the lowest 8 bits. Components are clamped to [0, 1] range.
-    unsigned ToUIntArgb() const { return ToUIntMask(ARGB); }
+    color32 ToU32Argb() const { return ToU32(ARGB); }
 
     /// Return hash value for HashSet & HashMap.
-    hash32 ToHash() const { return ToUInt(); }
+    hash32 ToHash() const { return ToU32(); }
 
     /// Red value.
     float r_;

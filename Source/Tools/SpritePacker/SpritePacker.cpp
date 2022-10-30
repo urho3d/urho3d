@@ -311,17 +311,17 @@ void Run(Vector<String>& arguments)
     {
         XMLElement subTexture = root.CreateChild("SubTexture");
         subTexture.SetString("name", packerInfo->name);
-        subTexture.SetInt("x", packerInfo->x + offsetX);
-        subTexture.SetInt("y", packerInfo->y + offsetY);
-        subTexture.SetInt("width", packerInfo->width);
-        subTexture.SetInt("height", packerInfo->height);
+        subTexture.SetI32("x", packerInfo->x + offsetX);
+        subTexture.SetI32("y", packerInfo->y + offsetY);
+        subTexture.SetI32("width", packerInfo->width);
+        subTexture.SetI32("height", packerInfo->height);
 
         if (packerInfo->frameWidth || packerInfo->frameHeight)
         {
-            subTexture.SetInt("frameWidth", packerInfo->frameWidth);
-            subTexture.SetInt("frameHeight", packerInfo->frameHeight);
-            subTexture.SetInt("offsetX", packerInfo->offsetX);
-            subTexture.SetInt("offsetY", packerInfo->offsetY);
+            subTexture.SetI32("frameWidth", packerInfo->frameWidth);
+            subTexture.SetI32("frameHeight", packerInfo->frameHeight);
+            subTexture.SetI32("offsetX", packerInfo->offsetX);
+            subTexture.SetI32("offsetY", packerInfo->offsetY);
         }
 
         URHO3D_LOGINFO("Transferring " + packerInfo->path + " to sprite sheet.");
@@ -345,8 +345,8 @@ void Run(Vector<String>& arguments)
 
     if (debug)
     {
-        unsigned OUTER_BOUNDS_DEBUG_COLOR = Color::BLUE.ToUInt();
-        unsigned INNER_BOUNDS_DEBUG_COLOR = Color::GREEN.ToUInt();
+        unsigned OUTER_BOUNDS_DEBUG_COLOR = Color::BLUE.ToU32();
+        unsigned INNER_BOUNDS_DEBUG_COLOR = Color::GREEN.ToU32();
 
         URHO3D_LOGINFO("Drawing debug information.");
         for (const SharedPtr<PackerInfo>& packerInfo : packerInfos)

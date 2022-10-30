@@ -318,7 +318,7 @@ void DropDownList::HandleListViewKey(StringHash eventType, VariantMap& eventData
     using namespace UnhandledKey;
 
     // If enter pressed in the list view, close and propagate selection
-    int key = eventData[P_KEY].GetInt();
+    int key = eventData[P_KEY].GetI32();
     if (key == KEY_RETURN || key == KEY_RETURN2 || key == KEY_KP_ENTER)
         HandleItemClicked(eventType, eventData);
 }

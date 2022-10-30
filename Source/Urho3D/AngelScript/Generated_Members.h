@@ -829,11 +829,11 @@ template <class T> void RegisterMembers_Color(asIScriptEngine* engine, const cha
     // Error: type "float*" can not automatically bind
     // const float* Color::Data() const
     // Error: type "const float*" can not automatically bind
-    // void Color::FromUIntMask(unsigned color, const ChannelMask& mask)
+    // void Color::FromU32(color32 color, const ChannelMask& mask)
     // Error: type "const ChannelMask&" can not automatically bind
     // bool Color::operator !=(const Color& rhs) const
     // Only operator == is needed
-    // unsigned Color::ToUIntMask(const ChannelMask& mask) const
+    // color32 Color::ToU32(const ChannelMask& mask) const
     // Error: type "const ChannelMask&" can not automatically bind
 
     // Color Color::Abs() const
@@ -857,8 +857,8 @@ template <class T> void RegisterMembers_Color(asIScriptEngine* engine, const cha
     // void Color::FromHSV(float h, float s, float v, float a = 1.0f)
     engine->RegisterObjectMethod(className, "void FromHSV(float, float, float, float = 1.0f)", AS_METHODPR(T, FromHSV, (float, float, float, float), void), AS_CALL_THISCALL);
 
-    // void Color::FromUInt(unsigned color)
-    engine->RegisterObjectMethod(className, "void FromUInt(uint)", AS_METHODPR(T, FromUInt, (unsigned), void), AS_CALL_THISCALL);
+    // void Color::FromU32(color32 color)
+    engine->RegisterObjectMethod(className, "void FromU32(color32)", AS_METHODPR(T, FromU32, (color32), void), AS_CALL_THISCALL);
 
     // Color Color::GammaToLinear() const
     engine->RegisterObjectMethod(className, "Color GammaToLinear() const", AS_METHODPR(T, GammaToLinear, () const, Color), AS_CALL_THISCALL);
@@ -932,11 +932,11 @@ template <class T> void RegisterMembers_Color(asIScriptEngine* engine, const cha
     // String Color::ToString() const
     engine->RegisterObjectMethod(className, "String ToString() const", AS_METHODPR(T, ToString, () const, String), AS_CALL_THISCALL);
 
-    // unsigned Color::ToUInt() const
-    engine->RegisterObjectMethod(className, "uint ToUInt() const", AS_METHODPR(T, ToUInt, () const, unsigned), AS_CALL_THISCALL);
+    // color32 Color::ToU32() const
+    engine->RegisterObjectMethod(className, "color32 ToU32() const", AS_METHODPR(T, ToU32, () const, color32), AS_CALL_THISCALL);
 
-    // unsigned Color::ToUIntArgb() const
-    engine->RegisterObjectMethod(className, "uint ToUIntArgb() const", AS_METHODPR(T, ToUIntArgb, () const, unsigned), AS_CALL_THISCALL);
+    // color32 Color::ToU32Argb() const
+    engine->RegisterObjectMethod(className, "color32 ToU32Argb() const", AS_METHODPR(T, ToU32Argb, () const, color32), AS_CALL_THISCALL);
 
     // Vector3 Color::ToVector3() const
     engine->RegisterObjectMethod(className, "Vector3 ToVector3() const", AS_METHODPR(T, ToVector3, () const, Vector3), AS_CALL_THISCALL);
@@ -1144,8 +1144,8 @@ template <class T> void RegisterMembers_CustomGeometryVertex(asIScriptEngine* en
     // Vector3 CustomGeometryVertex::normal_
     engine->RegisterObjectProperty(className, "Vector3 normal", offsetof(T, normal_));
 
-    // unsigned CustomGeometryVertex::color_
-    engine->RegisterObjectProperty(className, "uint color", offsetof(T, color_));
+    // color32 CustomGeometryVertex::color_
+    engine->RegisterObjectProperty(className, "color32 color", offsetof(T, color_));
 
     // Vector2 CustomGeometryVertex::texCoord_
     engine->RegisterObjectProperty(className, "Vector2 texCoord", offsetof(T, texCoord_));
@@ -2233,8 +2233,8 @@ template <class T> void RegisterMembers_JSONValue(asIScriptEngine* engine, const
     // float JSONValue::GetFloat(float defaultValue = 0.0f) const
     engine->RegisterObjectMethod(className, "float GetFloat(float = 0.0f) const", AS_METHODPR(T, GetFloat, (float) const, float), AS_CALL_THISCALL);
 
-    // int JSONValue::GetInt(int defaultValue = 0) const
-    engine->RegisterObjectMethod(className, "int GetInt(int = 0) const", AS_METHODPR(T, GetInt, (int) const, int), AS_CALL_THISCALL);
+    // i32 JSONValue::GetI32(i32 defaultValue = 0) const
+    engine->RegisterObjectMethod(className, "int GetI32(int = 0) const", AS_METHODPR(T, GetI32, (i32) const, i32), AS_CALL_THISCALL);
 
     // JSONNumberType JSONValue::GetNumberType() const
     engine->RegisterObjectMethod(className, "JSONNumberType GetNumberType() const", AS_METHODPR(T, GetNumberType, () const, JSONNumberType), AS_CALL_THISCALL);
@@ -2247,8 +2247,8 @@ template <class T> void RegisterMembers_JSONValue(asIScriptEngine* engine, const
     // const String& JSONValue::GetString(const String& defaultValue = String::EMPTY) const
     engine->RegisterObjectMethod(className, "const String& GetString(const String&in = String::EMPTY) const", AS_METHODPR(T, GetString, (const String&) const, const String&), AS_CALL_THISCALL);
 
-    // unsigned JSONValue::GetUInt(unsigned defaultValue = 0) const
-    engine->RegisterObjectMethod(className, "uint GetUInt(uint = 0) const", AS_METHODPR(T, GetUInt, (unsigned) const, unsigned), AS_CALL_THISCALL);
+    // u32 JSONValue::GetU32(u32 defaultValue = 0) const
+    engine->RegisterObjectMethod(className, "uint GetU32(uint = 0) const", AS_METHODPR(T, GetU32, (u32) const, u32), AS_CALL_THISCALL);
 
     // JSONValueType JSONValue::GetValueType() const
     engine->RegisterObjectMethod(className, "JSONValueType GetValueType() const", AS_METHODPR(T, GetValueType, () const, JSONValueType), AS_CALL_THISCALL);
@@ -5512,8 +5512,8 @@ template <class T> void RegisterMembers_UIBatch(asIScriptEngine* engine, const c
     // unsigned UIBatch::vertexEnd_
     engine->RegisterObjectProperty(className, "uint vertexEnd", offsetof(T, vertexEnd_));
 
-    // unsigned UIBatch::color_
-    engine->RegisterObjectProperty(className, "uint color", offsetof(T, color_));
+    // color32 UIBatch::color_
+    engine->RegisterObjectProperty(className, "color32 color", offsetof(T, color_));
 
     // bool UIBatch::useGradient_
     engine->RegisterObjectProperty(className, "bool useGradient", offsetof(T, useGradient_));
@@ -5731,11 +5731,11 @@ template <class T> void RegisterMembers_Variant(asIScriptEngine* engine, const c
     // float Variant::GetFloat() const
     engine->RegisterObjectMethod(className, "float GetFloat() const", AS_METHODPR(T, GetFloat, () const, float), AS_CALL_THISCALL);
 
-    // int Variant::GetInt() const
-    engine->RegisterObjectMethod(className, "int GetInt() const", AS_METHODPR(T, GetInt, () const, int), AS_CALL_THISCALL);
+    // i32 Variant::GetI32() const
+    engine->RegisterObjectMethod(className, "int GetI32() const", AS_METHODPR(T, GetI32, () const, i32), AS_CALL_THISCALL);
 
-    // long long Variant::GetInt64() const
-    engine->RegisterObjectMethod(className, "int64 GetInt64() const", AS_METHODPR(T, GetInt64, () const, long long), AS_CALL_THISCALL);
+    // i64 Variant::GetI64() const
+    engine->RegisterObjectMethod(className, "int64 GetI64() const", AS_METHODPR(T, GetI64, () const, i64), AS_CALL_THISCALL);
 
     // const IntRect& Variant::GetIntRect() const
     engine->RegisterObjectMethod(className, "const IntRect& GetIntRect() const", AS_METHODPR(T, GetIntRect, () const, const IntRect&), AS_CALL_THISCALL);
@@ -5787,11 +5787,11 @@ template <class T> void RegisterMembers_Variant(asIScriptEngine* engine, const c
     engine->RegisterObjectMethod(className, "String GetTypeName() const", AS_METHODPR(T, GetTypeName, () const, String), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "String get_typeName() const", AS_METHODPR(T, GetTypeName, () const, String), AS_CALL_THISCALL);
 
-    // unsigned Variant::GetUInt() const
-    engine->RegisterObjectMethod(className, "uint GetUInt() const", AS_METHODPR(T, GetUInt, () const, unsigned), AS_CALL_THISCALL);
+    // u32 Variant::GetU32() const
+    engine->RegisterObjectMethod(className, "uint GetU32() const", AS_METHODPR(T, GetU32, () const, u32), AS_CALL_THISCALL);
 
-    // unsigned long long Variant::GetUInt64() const
-    engine->RegisterObjectMethod(className, "uint64 GetUInt64() const", AS_METHODPR(T, GetUInt64, () const, unsigned long long), AS_CALL_THISCALL);
+    // u64 Variant::GetU64() const
+    engine->RegisterObjectMethod(className, "uint64 GetU64() const", AS_METHODPR(T, GetU64, () const, u64), AS_CALL_THISCALL);
 
     // const VariantMap& Variant::GetVariantMap() const
     engine->RegisterObjectMethod(className, "const VariantMap& GetVariantMap() const", AS_METHODPR(T, GetVariantMap, () const, const VariantMap&), AS_CALL_THISCALL);
@@ -6799,11 +6799,11 @@ template <class T> void RegisterMembers_XMLElement(asIScriptEngine* engine, cons
     // float XMLElement::GetFloat(const String& name) const
     engine->RegisterObjectMethod(className, "float GetFloat(const String&in) const", AS_METHODPR(T, GetFloat, (const String&) const, float), AS_CALL_THISCALL);
 
-    // int XMLElement::GetInt(const String& name) const
-    engine->RegisterObjectMethod(className, "int GetInt(const String&in) const", AS_METHODPR(T, GetInt, (const String&) const, int), AS_CALL_THISCALL);
+    // i32 XMLElement::GetI32(const String& name) const
+    engine->RegisterObjectMethod(className, "int GetI32(const String&in) const", AS_METHODPR(T, GetI32, (const String&) const, i32), AS_CALL_THISCALL);
 
-    // long long XMLElement::GetInt64(const String& name) const
-    engine->RegisterObjectMethod(className, "int64 GetInt64(const String&in) const", AS_METHODPR(T, GetInt64, (const String&) const, long long), AS_CALL_THISCALL);
+    // i64 XMLElement::GetI64(const String& name) const
+    engine->RegisterObjectMethod(className, "int64 GetI64(const String&in) const", AS_METHODPR(T, GetI64, (const String&) const, i64), AS_CALL_THISCALL);
 
     // IntRect XMLElement::GetIntRect(const String& name) const
     engine->RegisterObjectMethod(className, "IntRect GetIntRect(const String&in) const", AS_METHODPR(T, GetIntRect, (const String&) const, IntRect), AS_CALL_THISCALL);
@@ -6856,11 +6856,11 @@ template <class T> void RegisterMembers_XMLElement(asIScriptEngine* engine, cons
     // StringVector XMLElement::GetStringVector() const
     engine->RegisterObjectMethod(className, "Array<String>@ GetStringVector() const", AS_FUNCTION_OBJFIRST(XMLElement_StringVector_GetStringVector_void_template<XMLElement>), AS_CALL_CDECL_OBJFIRST);
 
-    // unsigned XMLElement::GetUInt(const String& name) const
-    engine->RegisterObjectMethod(className, "uint GetUInt(const String&in) const", AS_METHODPR(T, GetUInt, (const String&) const, unsigned), AS_CALL_THISCALL);
+    // u32 XMLElement::GetU32(const String& name) const
+    engine->RegisterObjectMethod(className, "uint GetU32(const String&in) const", AS_METHODPR(T, GetU32, (const String&) const, u32), AS_CALL_THISCALL);
 
-    // unsigned long long XMLElement::GetUInt64(const String& name) const
-    engine->RegisterObjectMethod(className, "uint64 GetUInt64(const String&in) const", AS_METHODPR(T, GetUInt64, (const String&) const, unsigned long long), AS_CALL_THISCALL);
+    // u64 XMLElement::GetU64(const String& name) const
+    engine->RegisterObjectMethod(className, "uint64 GetU64(const String&in) const", AS_METHODPR(T, GetU64, (const String&) const, u64), AS_CALL_THISCALL);
 
     // String XMLElement::GetValue() const
     engine->RegisterObjectMethod(className, "String GetValue() const", AS_METHODPR(T, GetValue, () const, String), AS_CALL_THISCALL);
@@ -6962,11 +6962,11 @@ template <class T> void RegisterMembers_XMLElement(asIScriptEngine* engine, cons
     // bool XMLElement::SetFloat(const String& name, float value)
     engine->RegisterObjectMethod(className, "bool SetFloat(const String&in, float)", AS_METHODPR(T, SetFloat, (const String&, float), bool), AS_CALL_THISCALL);
 
-    // bool XMLElement::SetInt(const String& name, int value)
-    engine->RegisterObjectMethod(className, "bool SetInt(const String&in, int)", AS_METHODPR(T, SetInt, (const String&, int), bool), AS_CALL_THISCALL);
+    // bool XMLElement::SetI32(const String& name, i32 value)
+    engine->RegisterObjectMethod(className, "bool SetI32(const String&in, int)", AS_METHODPR(T, SetI32, (const String&, i32), bool), AS_CALL_THISCALL);
 
-    // bool XMLElement::SetInt64(const String& name, long long value)
-    engine->RegisterObjectMethod(className, "bool SetInt64(const String&in, int64)", AS_METHODPR(T, SetInt64, (const String&, long long), bool), AS_CALL_THISCALL);
+    // bool XMLElement::SetI64(const String& name, i64 value)
+    engine->RegisterObjectMethod(className, "bool SetI64(const String&in, int64)", AS_METHODPR(T, SetI64, (const String&, i64), bool), AS_CALL_THISCALL);
 
     // bool XMLElement::SetIntRect(const String& name, const IntRect& value)
     engine->RegisterObjectMethod(className, "bool SetIntRect(const String&in, const IntRect&in)", AS_METHODPR(T, SetIntRect, (const String&, const IntRect&), bool), AS_CALL_THISCALL);
@@ -7004,11 +7004,11 @@ template <class T> void RegisterMembers_XMLElement(asIScriptEngine* engine, cons
     // bool XMLElement::SetStringVector(const StringVector& value)
     engine->RegisterObjectMethod(className, "bool SetStringVector(Array<String>@+)", AS_FUNCTION_OBJFIRST(XMLElement_bool_SetStringVector_constspStringVectoramp_template<XMLElement>), AS_CALL_CDECL_OBJFIRST);
 
-    // bool XMLElement::SetUInt(const String& name, unsigned value)
-    engine->RegisterObjectMethod(className, "bool SetUInt(const String&in, uint)", AS_METHODPR(T, SetUInt, (const String&, unsigned), bool), AS_CALL_THISCALL);
+    // bool XMLElement::SetU32(const String& name, u32 value)
+    engine->RegisterObjectMethod(className, "bool SetU32(const String&in, uint)", AS_METHODPR(T, SetU32, (const String&, u32), bool), AS_CALL_THISCALL);
 
-    // bool XMLElement::SetUInt64(const String& name, unsigned long long value)
-    engine->RegisterObjectMethod(className, "bool SetUInt64(const String&in, uint64)", AS_METHODPR(T, SetUInt64, (const String&, unsigned long long), bool), AS_CALL_THISCALL);
+    // bool XMLElement::SetU64(const String& name, u64 value)
+    engine->RegisterObjectMethod(className, "bool SetU64(const String&in, uint64)", AS_METHODPR(T, SetU64, (const String&, u64), bool), AS_CALL_THISCALL);
 
     // bool XMLElement::SetValue(const String& value)
     engine->RegisterObjectMethod(className, "bool SetValue(const String&in)", AS_METHODPR(T, SetValue, (const String&), bool), AS_CALL_THISCALL);
@@ -13604,8 +13604,8 @@ template <class T> void RegisterMembers_Image(asIScriptEngine* engine, const cha
     // void Image::Clear(const Color& color)
     engine->RegisterObjectMethod(className, "void Clear(const Color&in)", AS_METHODPR(T, Clear, (const Color&), void), AS_CALL_THISCALL);
 
-    // void Image::ClearInt(unsigned uintColor)
-    engine->RegisterObjectMethod(className, "void ClearInt(uint)", AS_METHODPR(T, ClearInt, (unsigned), void), AS_CALL_THISCALL);
+    // void Image::Clear(color32 uintColor)
+    engine->RegisterObjectMethod(className, "void Clear(color32)", AS_METHODPR(T, Clear, (color32), void), AS_CALL_THISCALL);
 
     // SharedPtr<Image> Image::ConvertToRGBA() const
     engine->RegisterObjectMethod(className, "Image@+ ConvertToRGBA() const", AS_FUNCTION_OBJFIRST(Image_SharedPtrlesImagegre_ConvertToRGBA_void_template<Image>), AS_CALL_CDECL_OBJFIRST);

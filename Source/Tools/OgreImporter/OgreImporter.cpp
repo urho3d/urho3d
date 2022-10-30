@@ -143,7 +143,7 @@ void LoadSkeleton(const String& skeletonFileName)
         XMLElement bone = bonesRoot.GetChild("bone");
         while (bone)
         {
-            unsigned index = bone.GetInt("id");
+            unsigned index = bone.GetI32("id");
             String name = bone.GetAttribute("name");
             if (index >= bones_.Size())
                 bones_.Resize(index + 1);
@@ -253,7 +253,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
         XMLElement geometry = subMesh.GetChild("geometry");
         if (geometry)
         {
-            unsigned vertices = geometry.GetInt("vertexcount");
+            unsigned vertices = geometry.GetI32("vertexcount");
             totalVertices += vertices;
             if (maxSubMeshVertices < vertices)
                 maxSubMeshVertices = vertices;
@@ -266,7 +266,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
     XMLElement sharedGeometry = root.GetChild("sharedgeometry");
     if (sharedGeometry)
     {
-        unsigned vertices = sharedGeometry.GetInt("vertexcount");
+        unsigned vertices = sharedGeometry.GetI32("vertexcount");
         totalVertices += vertices;
         if (maxSubMeshVertices < vertices)
             maxSubMeshVertices = vertices;
@@ -307,7 +307,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
         }
 
         if (geometry)
-            vertices = geometry.GetInt("vertexcount");
+            vertices = geometry.GetI32("vertexcount");
 
         ModelSubGeometryLodLevel subGeometryLodLevel;
         ModelVertexBuffer* vBuf;
@@ -353,7 +353,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
             if (bufferDef.HasAttribute("texture_coords"))
             {
                 vBuf->elementMask_ |= VertexElements::TexCoord1;
-                if (bufferDef.GetInt("texture_coords") > 1)
+                if (bufferDef.GetI32("texture_coords") > 1)
                     vBuf->elementMask_ |= VertexElements::TexCoord2;
             }
 
@@ -417,15 +417,15 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
             bufferDef = bufferDef.GetNext("vertexbuffer");
         }
 
-        unsigned triangles = faces.GetInt("count");
+        unsigned triangles = faces.GetI32("count");
         unsigned indices = triangles * 3;
 
         XMLElement triangle = faces.GetChild("face");
         while (triangle)
         {
-            unsigned v1 = triangle.GetInt("v1");
-            unsigned v2 = triangle.GetInt("v2");
-            unsigned v3 = triangle.GetInt("v3");
+            unsigned v1 = triangle.GetI32("v1");
+            unsigned v2 = triangle.GetI32("v2");
+            unsigned v3 = triangle.GetI32("v3");
             iBuf->indices_.Push(v3 + vertexStart);
             iBuf->indices_.Push(v2 + vertexStart);
             iBuf->indices_.Push(v1 + vertexStart);
@@ -445,8 +445,8 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                 XMLElement boneAssignment = boneAssignments.GetChild("vertexboneassignment");
                 while (boneAssignment)
                 {
-                    unsigned vertex = boneAssignment.GetInt("vertexindex") + vertexStart;
-                    unsigned bone = boneAssignment.GetInt("boneindex");
+                    unsigned vertex = boneAssignment.GetI32("vertexindex") + vertexStart;
+                    unsigned bone = boneAssignment.GetI32("boneindex");
                     float weight = boneAssignment.GetFloat("weight");
 
                     BoneWeightAssignment assign{static_cast<unsigned char>(bone), weight};
@@ -598,8 +598,8 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                 XMLElement lodSubMesh = lod.GetChild("lodfacelist");
                 while (lodSubMesh)
                 {
-                    unsigned subMeshIndex = lodSubMesh.GetInt("submeshindex");
-                    unsigned triangles = lodSubMesh.GetInt("numfaces");
+                    unsigned subMeshIndex = lodSubMesh.GetI32("submeshindex");
+                    unsigned triangles = lodSubMesh.GetI32("numfaces");
 
                     ModelSubGeometryLodLevel newLodLevel;
                     ModelSubGeometryLodLevel& originalLodLevel = subGeometries_[subMeshIndex][0];
@@ -633,9 +633,9 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                     XMLElement triangle = lodSubMesh.GetChild("face");
                     while (triangle)
                     {
-                        unsigned v1 = triangle.GetInt("v1");
-                        unsigned v2 = triangle.GetInt("v2");
-                        unsigned v3 = triangle.GetInt("v3");
+                        unsigned v1 = triangle.GetI32("v1");
+                        unsigned v2 = triangle.GetI32("v2");
+                        unsigned v3 = triangle.GetI32("v3");
                         iBuf->indices_.Push(v3 + vertexStart);
                         iBuf->indices_.Push(v2 + vertexStart);
                         iBuf->indices_.Push(v1 + vertexStart);
@@ -699,7 +699,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                                     XMLElement poseref = keyframe.GetChild("poseref");
                                     // Get only the end pose
                                     if (poseref && time == length)
-                                        usedPoses.Insert(poseref.GetInt("poseindex"));
+                                        usedPoses.Insert(poseref.GetI32("poseindex"));
 
                                     keyframe = keyframe.GetNext("keyframe");
                                 }
@@ -723,7 +723,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                         for (HashSet<unsigned>::Iterator i = usedPoses.Begin(); i != usedPoses.End(); ++i)
                         {
                             XMLElement pose = poses[*i];
-                            unsigned targetSubMesh = pose.GetInt("index");
+                            unsigned targetSubMesh = pose.GetI32("index");
                             XMLElement poseOffset = pose.GetChild("poseoffset");
 
                             if (useOneBuffer_)
@@ -738,7 +738,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                             while (poseOffset)
                             {
                                 // Convert from right- to left-handed
-                                unsigned vertexIndex = poseOffset.GetInt("index") + vertexStarts[targetSubMesh];
+                                unsigned vertexIndex = poseOffset.GetI32("index") + vertexStarts[targetSubMesh];
                                 float x = poseOffset.GetFloat("x");
                                 float y = poseOffset.GetFloat("y");
                                 float z = poseOffset.GetFloat("z");

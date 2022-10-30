@@ -123,32 +123,32 @@ void UIDrag::HandleDragBegin(StringHash eventType, VariantMap& eventData)
     using namespace DragBegin;
     auto* element = (Button*)eventData[P_ELEMENT].GetVoidPtr();
 
-    int lx = eventData[P_X].GetInt();
-    int ly = eventData[P_Y].GetInt();
+    int lx = eventData[P_X].GetI32();
+    int ly = eventData[P_Y].GetI32();
 
     IntVector2 p = element->GetPosition();
     element->SetVar("START", p);
     element->SetVar("DELTA", IntVector2(p.x_ - lx, p.y_ - ly));
 
-    int buttons = eventData[P_BUTTONS].GetInt();
+    int buttons = eventData[P_BUTTONS].GetI32();
     element->SetVar("BUTTONS", buttons);
 
     auto* t = element->GetChildStaticCast<Text>("Text", false);
     t->SetText("Drag Begin Buttons: " + String(buttons));
 
     t = element->GetChildStaticCast<Text>("Num Touch", false);
-    t->SetText("Number of buttons: " + String(eventData[P_NUMBUTTONS].GetInt()));
+    t->SetText("Number of buttons: " + String(eventData[P_NUMBUTTONS].GetI32()));
 }
 
 void UIDrag::HandleDragMove(StringHash eventType, VariantMap& eventData)
 {
     using namespace DragBegin;
     auto* element = (Button*)eventData[P_ELEMENT].GetVoidPtr();
-    int buttons = eventData[P_BUTTONS].GetInt();
+    int buttons = eventData[P_BUTTONS].GetI32();
     IntVector2 d = element->GetVar("DELTA").GetIntVector2();
-    int X = eventData[P_X].GetInt() + d.x_;
-    int Y = eventData[P_Y].GetInt() + d.y_;
-    int BUTTONS = element->GetVar("BUTTONS").GetInt();
+    int X = eventData[P_X].GetI32() + d.x_;
+    int Y = eventData[P_Y].GetI32() + d.y_;
+    int BUTTONS = element->GetVar("BUTTONS").GetI32();
 
     auto* t = element->GetChildStaticCast<Text>("Event Touch", false);
     t->SetText("Drag Move Buttons: " + String(buttons));

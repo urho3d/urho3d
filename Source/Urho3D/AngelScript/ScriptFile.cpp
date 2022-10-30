@@ -834,22 +834,22 @@ void ScriptFile::SetParameters(asIScriptContext* context, asIScriptFunction* fun
 
         case asTYPEID_INT8:
         case asTYPEID_UINT8:
-            context->SetArgByte(i, (asBYTE)parameters[i].GetInt());
+            context->SetArgByte(i, (asBYTE)parameters[i].GetI32());
             break;
 
         case asTYPEID_INT16:
         case asTYPEID_UINT16:
-            context->SetArgWord(i, (asWORD)parameters[i].GetInt());
+            context->SetArgWord(i, (asWORD)parameters[i].GetI32());
             break;
 
         case asTYPEID_INT32:
         case asTYPEID_UINT32:
-            context->SetArgDWord(i, (asDWORD)parameters[i].GetInt());
+            context->SetArgDWord(i, (asDWORD)parameters[i].GetI32());
             break;
 
         case asTYPEID_INT64:
         case asTYPEID_UINT64:
-            context->SetArgQWord(i, (asQWORD)parameters[i].GetInt64());
+            context->SetArgQWord(i, (asQWORD)parameters[i].GetI64());
             break;
 
         case asTYPEID_FLOAT:

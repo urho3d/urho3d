@@ -845,7 +845,7 @@ void HandleMenuSelected(StringHash eventType, VariantMap& eventData)
     // Execute the callback if available
     Variant variant = menu.GetVar(CALLBACK_VAR);
     if (!variant.empty)
-        menuCallbacks[variant.GetUInt()]();
+        menuCallbacks[variant.GetU32()]();
 }
 
 Menu@ CreateMenuItem(const String&in title, MENU_CALLBACK@ callback = null, int accelKey = 0, int accelQual = 0, bool addToQuickMenu = true, String quickMenuText="", bool autoLocalize = true)
@@ -1305,8 +1305,8 @@ void HandleUIElementDefaultStyle(StringHash eventType, VariantMap& eventData)
 
 void HandleHotKeysBlender( VariantMap& eventData)
 {
-    int key = eventData["Key"].GetInt();
-    int viewDirection = eventData["Qualifiers"].GetInt() == QUAL_CTRL ? -1 : 1;
+    int key = eventData["Key"].GetI32();
+    int viewDirection = eventData["Qualifiers"].GetI32() == QUAL_CTRL ? -1 : 1;
 
     if (key == KEY_ESCAPE)
     {
@@ -1417,7 +1417,7 @@ void HandleHotKeysBlender( VariantMap& eventData)
         if (pickMode >= MAX_PICK_MODES)
             pickMode = PICK_GEOMETRIES;
     }
-    else if (key == KEY_Z && eventData["Qualifiers"].GetInt() != QUAL_CTRL)
+    else if (key == KEY_Z && eventData["Qualifiers"].GetI32() != QUAL_CTRL)
     {
         if (ui.focusElement is null)
         {
@@ -1441,7 +1441,7 @@ void HandleHotKeysBlender( VariantMap& eventData)
 
     if ((ui.focusElement is null) && (selectedNodes.length > 0) && !cameraFlyMode)
     {
-         if (eventData["Qualifiers"].GetInt() == QUAL_ALT) // reset transformations
+         if (eventData["Qualifiers"].GetI32() == QUAL_ALT) // reset transformations
          {
             if (key == KEY_G)
                 SceneResetPosition();
@@ -1450,7 +1450,7 @@ void HandleHotKeysBlender( VariantMap& eventData)
             else if (key == KEY_S)
                 SceneResetScale();
          }
-         else if (eventData["Qualifiers"].GetInt() != QUAL_CTRL) // set transformations
+         else if (eventData["Qualifiers"].GetI32() != QUAL_CTRL) // set transformations
          {
             if (key == KEY_G)
             {
@@ -1477,8 +1477,8 @@ void HandleHotKeysBlender( VariantMap& eventData)
 
 void HandleHotKeysStandard(VariantMap& eventData)
 {
-    int key = eventData["Key"].GetInt();
-    int viewDirection = eventData["Qualifiers"].GetInt() == QUAL_CTRL ? -1 : 1;
+    int key = eventData["Key"].GetI32();
+    int viewDirection = eventData["Qualifiers"].GetI32() == QUAL_CTRL ? -1 : 1;
 
     if (key == KEY_ESCAPE)
     {
@@ -1571,7 +1571,7 @@ void HandleHotKeysStandard(VariantMap& eventData)
     {
         activeViewport.ToggleOrthographic();
     }
-    else if (eventData["Qualifiers"].GetInt() == QUAL_CTRL)
+    else if (eventData["Qualifiers"].GetI32() == QUAL_CTRL)
     {
         if (key == '1')
             editMode = EDIT_MOVE;

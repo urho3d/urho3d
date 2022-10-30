@@ -155,7 +155,7 @@ void CreateConsoleAndDebugHud()
 
 void HandleKeyUp(StringHash eventType, VariantMap& eventData)
 {
-    int key = eventData["Key"].GetInt();
+    int key = eventData["Key"].GetI32();
 
     // Close console (if open) or exit when ESC is pressed
     if (key == KEY_ESCAPE)
@@ -178,7 +178,7 @@ void HandleKeyUp(StringHash eventType, VariantMap& eventData)
 
 void HandleKeyDown(StringHash eventType, VariantMap& eventData)
 {
-    int key = eventData["Key"].GetInt();
+    int key = eventData["Key"].GetI32();
 
     // Toggle console with F1
     if (key == KEY_F1)

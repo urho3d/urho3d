@@ -141,12 +141,12 @@ void CreateDraggableFish()
 void HandleDragBegin(StringHash eventType, VariantMap& eventData)
 {
     // Get UIElement relative position where input (touch or click) occurred (top-left = IntVector2(0,0))
-    dragBeginPosition = IntVector2(eventData["ElementX"].GetInt(), eventData["ElementY"].GetInt());
+    dragBeginPosition = IntVector2(eventData["ElementX"].GetI32(), eventData["ElementY"].GetI32());
 }
 
 void HandleDragMove(StringHash eventType, VariantMap& eventData)
 {
-    IntVector2 dragCurrentPosition = IntVector2(eventData["X"].GetInt(), eventData["Y"].GetInt());
+    IntVector2 dragCurrentPosition = IntVector2(eventData["X"].GetI32(), eventData["Y"].GetI32());
     // Get the element (fish) that is being dragged. GetPtr() returns a RefCounted handle which can be cast implicitly
     UIElement@ draggedElement = eventData["Element"].GetPtr();
     draggedElement.position = dragCurrentPosition - dragBeginPosition;

@@ -536,8 +536,8 @@ void ScrollView::HandleTouchMove(StringHash eventType, VariantMap& eventData)
     {
         scrollTouchDown_ = true;
         // Take new scrolling speed if it's faster than the current accumulated value
-        auto dX = (float)-eventData[P_DX].GetInt();
-        auto dY = (float)-eventData[P_DY].GetInt();
+        auto dX = (float)-eventData[P_DX].GetI32();
+        auto dY = (float)-eventData[P_DY].GetI32();
 
         if (Abs(dX) > Abs(touchScrollSpeed_.x_))
             touchScrollSpeed_.x_ = dX;
@@ -560,8 +560,8 @@ void ScrollView::HandleTouchMove(StringHash eventType, VariantMap& eventData)
     }
     else if (eventType == E_TOUCHBEGIN)
     {
-        int X = eventData[P_X].GetInt();
-        int Y = eventData[P_Y].GetInt();
+        int X = eventData[P_X].GetI32();
+        int Y = eventData[P_Y].GetI32();
         IntVector2 pos = IntVector2(X, Y);
 
         // Prevent conflict between touch scroll and scrollbar scroll

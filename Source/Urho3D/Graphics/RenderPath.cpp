@@ -85,7 +85,7 @@ void RenderTargetInfo::Load(const XMLElement& element)
         size_.y_ = element.GetFloat("height");
 
     if (element.HasAttribute("multisample"))
-        multiSample_ = Clamp(element.GetInt("multisample"), 1, 16);
+        multiSample_ = Clamp(element.GetI32("multisample"), 1, 16);
     if (element.HasAttribute("autoresolve"))
         autoResolve_ = element.GetBool("autoresolve");
 }
@@ -118,7 +118,7 @@ void RenderPathCommand::Load(const XMLElement& element)
         if (element.HasAttribute("stencil"))
         {
             clearFlags_ |= CLEAR_STENCIL;
-            clearStencil_ = (unsigned)element.GetInt("stencil");
+            clearStencil_ = (unsigned)element.GetI32("stencil");
         }
         break;
 
@@ -164,20 +164,20 @@ void RenderPathCommand::Load(const XMLElement& element)
     if (element.HasAttribute("output"))
         outputs_[0].first_ = element.GetAttribute("output");
     if (element.HasAttribute("face"))
-        outputs_[0].second_ = (CubeMapFace)element.GetInt("face");
+        outputs_[0].second_ = (CubeMapFace)element.GetI32("face");
     if (element.HasAttribute("depthstencil"))
         depthStencilName_ = element.GetAttribute("depthstencil");
     // Check for defining multiple outputs
     XMLElement outputElem = element.GetChild("output");
     while (outputElem)
     {
-        unsigned index = (unsigned)outputElem.GetInt("index");
+        unsigned index = (unsigned)outputElem.GetI32("index");
         if (index < MAX_RENDERTARGETS)
         {
             if (index >= outputs_.Size())
                 outputs_.Resize(index + 1);
             outputs_[index].first_ = outputElem.GetAttribute("name");
-            outputs_[index].second_ = outputElem.HasAttribute("face") ? (CubeMapFace)outputElem.GetInt("face") : FACE_POSITIVE_X;
+            outputs_[index].second_ = outputElem.HasAttribute("face") ? (CubeMapFace)outputElem.GetI32("face") : FACE_POSITIVE_X;
         }
         outputElem = outputElem.GetNext("output");
     }

@@ -403,7 +403,7 @@ bool Material::Load(const XMLElement& source)
             TechniqueEntry newTechnique;
             newTechnique.technique_ = newTechnique.original_ = tech;
             if (techniqueElem.HasAttribute("quality"))
-                newTechnique.qualityLevel_ = (MaterialQuality)techniqueElem.GetInt("quality");
+                newTechnique.qualityLevel_ = (MaterialQuality)techniqueElem.GetI32("quality");
             if (techniqueElem.HasAttribute("loddistance"))
                 newTechnique.lodDistance_ = techniqueElem.GetFloat("loddistance");
             techniques_.Push(newTechnique);
@@ -513,7 +513,7 @@ bool Material::Load(const XMLElement& source)
 
     XMLElement renderOrderElem = source.GetChild("renderorder");
     if (renderOrderElem)
-        SetRenderOrder((i8)renderOrderElem.GetInt("value"));
+        SetRenderOrder((i8)renderOrderElem.GetI32("value"));
 
     XMLElement occlusionElem = source.GetChild("occlusion");
     if (occlusionElem)
@@ -557,7 +557,7 @@ bool Material::Load(const JSONValue& source)
             newTechnique.technique_ = newTechnique.original_ = tech;
             JSONValue qualityVal = techVal.Get("quality");
             if (!qualityVal.IsNull())
-                newTechnique.qualityLevel_ = (MaterialQuality)qualityVal.GetInt();
+                newTechnique.qualityLevel_ = (MaterialQuality)qualityVal.GetI32();
             JSONValue lodDistanceVal = techVal.Get("loddistance");
             if (!lodDistanceVal.IsNull())
                 newTechnique.lodDistance_ = lodDistanceVal.GetFloat();
@@ -673,7 +673,7 @@ bool Material::Load(const JSONValue& source)
 
     JSONValue renderOrderVal = source.Get("renderorder");
     if (!renderOrderVal.IsNull())
-        SetRenderOrder((i8)renderOrderVal.GetInt());
+        SetRenderOrder((i8)renderOrderVal.GetI32());
 
     JSONValue occlusionVal = source.Get("occlusion");
     if (!occlusionVal.IsNull())
@@ -700,7 +700,7 @@ bool Material::Save(XMLElement& dest) const
 
         XMLElement techniqueElem = dest.CreateChild("technique");
         techniqueElem.SetString("name", entry.technique_->GetName());
-        techniqueElem.SetInt("quality", entry.qualityLevel_);
+        techniqueElem.SetI32("quality", entry.qualityLevel_);
         techniqueElem.SetFloat("loddistance", entry.lodDistance_);
     }
 
@@ -781,7 +781,7 @@ bool Material::Save(XMLElement& dest) const
 
     // Write render order
     XMLElement renderOrderElem = dest.CreateChild("renderorder");
-    renderOrderElem.SetInt("value", renderOrder_);
+    renderOrderElem.SetI32("value", renderOrder_);
 
     // Write occlusion
     XMLElement occlusionElem = dest.CreateChild("occlusion");

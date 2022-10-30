@@ -194,9 +194,9 @@ public:
     /// Return boolean value.
     bool GetBool(bool defaultValue = false) const { return IsBool() ? boolValue_ : defaultValue;}
     /// Return integer value.
-    int GetInt(int defaultValue = 0) const { return IsNumber() ? (int)numberValue_ : defaultValue; }
+    i32 GetI32(i32 defaultValue = 0) const { return IsNumber() ? (i32)numberValue_ : defaultValue; }
     /// Return unsigned integer value.
-    unsigned GetUInt(unsigned defaultValue = 0) const { return IsNumber() ? (unsigned)numberValue_ : defaultValue; }
+    u32 GetU32(u32 defaultValue = 0) const { return IsNumber() ? (u32)numberValue_ : defaultValue; }
     /// Return float value.
     float GetFloat(float defaultValue = 0.0f) const { return IsNumber() ? (float)numberValue_ : defaultValue; }
     /// Return double value.
@@ -295,7 +295,7 @@ public:
     static JSONNumberType GetNumberTypeFromName(const char* typeName);
 
 private:
-    /// type.
+    /// Type.
     unsigned type_;
 
     // https://github.com/doxygen/doxygen/issues/7623

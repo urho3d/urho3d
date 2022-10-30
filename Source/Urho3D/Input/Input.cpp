@@ -2446,7 +2446,7 @@ void Input::HandleScreenJoystickTouch(StringHash eventType, VariantMap& eventDat
     using namespace TouchBegin;
 
     // Only interested in events from screen joystick(s)
-    TouchState& state = touches_[eventData[P_TOUCHID].GetInt()];
+    TouchState& state = touches_[eventData[P_TOUCHID].GetI32()];
     IntVector2 position(int(state.position_.x_ / GetSubsystem<UI>()->GetScale()), int(state.position_.y_ / GetSubsystem<UI>()->GetScale()));
     UIElement* element = eventType == E_TOUCHBEGIN ? GetSubsystem<UI>()->GetElementAt(position) : state.touchedElement_;
     if (!element)
@@ -2454,7 +2454,7 @@ void Input::HandleScreenJoystickTouch(StringHash eventType, VariantMap& eventDat
     Variant variant = element->GetVar(VAR_SCREEN_JOYSTICK_ID);
     if (variant.IsEmpty())
         return;
-    SDL_JoystickID joystickID = variant.GetInt();
+    SDL_JoystickID joystickID = variant.GetI32();
 
     if (eventType == E_TOUCHEND)
         state.touchedElement_.Reset();
@@ -2484,7 +2484,7 @@ void Input::HandleScreenJoystickTouch(StringHash eventType, VariantMap& eventDat
             if (!keyBindingVar.IsEmpty())
             {
                 evt.type = eventType == E_TOUCHBEGIN ? SDL_KEYDOWN : SDL_KEYUP;
-                evt.key.keysym.sym = ToLower(keyBindingVar.GetInt());
+                evt.key.keysym.sym = ToLower(keyBindingVar.GetI32());
                 evt.key.keysym.scancode = SDL_SCANCODE_UNKNOWN;
             }
             if (!mouseButtonBindingVar.IsEmpty())
@@ -2496,7 +2496,7 @@ void Input::HandleScreenJoystickTouch(StringHash eventType, VariantMap& eventDat
 
                 SDL_Event mouseEvent;
                 mouseEvent.type = eventType == E_TOUCHBEGIN ? SDL_MOUSEBUTTONDOWN : SDL_MOUSEBUTTONUP;
-                mouseEvent.button.button = (Uint8)mouseButtonBindingVar.GetInt();
+                mouseEvent.button.button = (Uint8)mouseButtonBindingVar.GetI32();
                 HandleSDLEvent(&mouseEvent);
 
                 touchEmulation_ = oldTouchEmulation;
@@ -2533,7 +2533,7 @@ void Input::HandleScreenJoystickTouch(StringHash eventType, VariantMap& eventDat
             if (eventType == E_TOUCHEND)
             {
                 evt.type = SDL_KEYUP;
-                evt.key.keysym.sym = element->GetVar(VAR_LAST_KEYSYM).GetInt();
+                evt.key.keysym.sym = element->GetVar(VAR_LAST_KEYSYM).GetI32();
                 if (!evt.key.keysym.sym)
                     return;
 
@@ -2554,12 +2554,12 @@ void Input::HandleScreenJoystickTouch(StringHash eventType, VariantMap& eventDat
                 else
                     return;
 
-                if (eventType == E_TOUCHMOVE && evt.key.keysym.sym != element->GetVar(VAR_LAST_KEYSYM).GetInt())
+                if (eventType == E_TOUCHMOVE && evt.key.keysym.sym != element->GetVar(VAR_LAST_KEYSYM).GetI32())
                 {
                     // Dragging past the directional boundary will cause an additional key up event for previous key symbol
                     SDL_Event keyEvent;
                     keyEvent.type = SDL_KEYUP;
-                    keyEvent.key.keysym.sym = element->GetVar(VAR_LAST_KEYSYM).GetInt();
+                    keyEvent.key.keysym.sym = element->GetVar(VAR_LAST_KEYSYM).GetI32();
                     if (keyEvent.key.keysym.sym)
                     {
                         keyEvent.key.keysym.scancode = SDL_SCANCODE_UNKNOWN;

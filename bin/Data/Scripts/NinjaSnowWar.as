@@ -465,7 +465,7 @@ void HandleTouchBegin(StringHash eventType, VariantMap& eventData)
 
 void HandleKeyDown(StringHash eventType, VariantMap& eventData)
 {
-    int key = eventData["Key"].GetInt();
+    int key = eventData["Key"].GetI32();
 
     if (key == KEY_ESCAPE)
     {
@@ -532,13 +532,13 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
 
 void HandlePoints(StringHash eventType, VariantMap& eventData)
 {
-    if (eventData["DamageSide"].GetInt() == SIDE_PLAYER)
+    if (eventData["DamageSide"].GetI32() == SIDE_PLAYER)
     {
         // Get node ID of the object that should receive points -> use it to find player index
-        int playerIndex = FindPlayerIndex(eventData["Receiver"].GetInt());
+        int playerIndex = FindPlayerIndex(eventData["Receiver"].GetI32());
         if (playerIndex >= 0)
         {
-            players[playerIndex].score += eventData["Points"].GetInt();
+            players[playerIndex].score += eventData["Points"].GetI32();
             SendScore(playerIndex);
 
             bool newHiscore = CheckHiscore(playerIndex);
@@ -550,7 +550,7 @@ void HandlePoints(StringHash eventType, VariantMap& eventData)
 
 void HandleKill(StringHash eventType, VariantMap& eventData)
 {
-    if (eventData["DamageSide"].GetInt() == SIDE_PLAYER)
+    if (eventData["DamageSide"].GetI32() == SIDE_PLAYER)
     {
         MakeAIHarder();
 
@@ -610,7 +610,7 @@ void HandleClientDisconnected(StringHash eventType, VariantMap& eventData)
 void HandlePlayerSpawned(StringHash eventType, VariantMap& eventData)
 {
     // Store our node ID and mark the game as started
-    clientNodeID = eventData["NodeID"].GetInt();
+    clientNodeID = eventData["NodeID"].GetI32();
     gameOn = true;
     SetMessage("");
 
@@ -629,7 +629,7 @@ void HandlePlayerSpawned(StringHash eventType, VariantMap& eventData)
 
 void HandleUpdateScore(StringHash eventType, VariantMap& eventData)
 {
-    clientScore = eventData["Score"].GetInt();
+    clientScore = eventData["Score"].GetI32();
     scoreText.text = "Score " + clientScore;
 }
 
@@ -1044,7 +1044,7 @@ void UpdateCamera()
     Quaternion dir;
 
     // Make controls seem more immediate by forcing the current mouse yaw to player ninja's Y-axis rotation
-    if (playerNode.vars["Health"].GetInt() > 0)
+    if (playerNode.vars["Health"].GetI32() > 0)
         playerNode.rotation = Quaternion(0, playerControls.yaw, 0);
 
     dir = dir * Quaternion(playerNode.rotation.yaw, Vector3(0, 1, 0));
@@ -1117,7 +1117,7 @@ void UpdateStatus()
         else
         {
             // In multiplayer the client does not have script logic components, but health is replicated via node user variables
-            health = playerNode.vars["Health"].GetInt();
+            health = playerNode.vars["Health"].GetI32();
         }
         healthBar.width = 116 * health / playerHealth;
     }

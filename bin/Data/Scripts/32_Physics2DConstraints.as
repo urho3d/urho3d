@@ -426,7 +426,7 @@ void HandleMouseMove(StringHash eventType, VariantMap& eventData)
 void HandleTouchBegin3(StringHash eventType, VariantMap& eventData)
 {
     PhysicsWorld2D@ physicsWorld = scene_.GetComponent("PhysicsWorld2D");
-    RigidBody2D@ rigidBody = physicsWorld.GetRigidBody(eventData["X"].GetInt(), eventData["Y"].GetInt()); // Raycast for RigidBody2Ds to pick
+    RigidBody2D@ rigidBody = physicsWorld.GetRigidBody(eventData["X"].GetI32(), eventData["Y"].GetI32()); // Raycast for RigidBody2Ds to pick
     if (rigidBody !is null)
     {
         pickedNode = rigidBody.node;
@@ -436,7 +436,7 @@ void HandleTouchBegin3(StringHash eventType, VariantMap& eventData)
 
         // Create a ConstraintMouse2D - Temporary apply this constraint to the pickedNode to allow grasping and moving with touch
         ConstraintMouse2D@ constraintMouse = pickedNode.CreateComponent("ConstraintMouse2D");
-        Vector3 pos = camera.ScreenToWorldPoint(Vector3(float(eventData["X"].GetInt()) / graphics.width, float(eventData["Y"].GetInt()) / graphics.height, 0.0f));
+        Vector3 pos = camera.ScreenToWorldPoint(Vector3(float(eventData["X"].GetI32()) / graphics.width, float(eventData["Y"].GetI32()) / graphics.height, 0.0f));
         constraintMouse.target = Vector2(pos.x, pos.y);
         constraintMouse.maxForce = 1000 * rigidBody.mass;
         constraintMouse.collideConnected = true;
@@ -452,7 +452,7 @@ void HandleTouchMove3(StringHash eventType, VariantMap& eventData)
     if (pickedNode !is null)
     {
         ConstraintMouse2D@ constraintMouse = pickedNode.GetComponent("ConstraintMouse2D");
-        Vector3 pos = camera.ScreenToWorldPoint(Vector3(float(eventData["X"].GetInt()) / graphics.width, float(eventData["Y"].GetInt()) / graphics.height, 0.0f));
+        Vector3 pos = camera.ScreenToWorldPoint(Vector3(float(eventData["X"].GetI32()) / graphics.width, float(eventData["Y"].GetI32()) / graphics.height, 0.0f));
         constraintMouse.target = Vector2(pos.x, pos.y);
     }
 }

@@ -166,12 +166,12 @@ void HelloGUI::CreateDraggableFish()
 void HelloGUI::HandleDragBegin(StringHash eventType, VariantMap& eventData)
 {
     // Get UIElement relative position where input (touch or click) occurred (top-left = IntVector2(0,0))
-    dragBeginPosition_ = IntVector2(eventData["ElementX"].GetInt(), eventData["ElementY"].GetInt());
+    dragBeginPosition_ = IntVector2(eventData["ElementX"].GetI32(), eventData["ElementY"].GetI32());
 }
 
 void HelloGUI::HandleDragMove(StringHash eventType, VariantMap& eventData)
 {
-    IntVector2 dragCurrentPosition = IntVector2(eventData["X"].GetInt(), eventData["Y"].GetInt());
+    IntVector2 dragCurrentPosition = IntVector2(eventData["X"].GetI32(), eventData["Y"].GetI32());
     UIElement* draggedElement = static_cast<UIElement*>(eventData["Element"].GetPtr());
     draggedElement->SetPosition(dragCurrentPosition - dragBeginPosition_);
 }

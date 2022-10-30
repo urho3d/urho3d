@@ -695,7 +695,7 @@ void AnimationController::SetNodeAnimationStatesAttr(const VariantVector& value)
     auto* cache = GetSubsystem<ResourceCache>();
     nodeAnimationStates_.Clear();
     i32 index = 0;
-    i32 numStates = index < value.Size() ? value[index++].GetInt() : 0;
+    i32 numStates = index < value.Size() ? value[index++].GetI32() : 0;
     // Prevent negative or overly large value being assigned from the editor
     if (numStates < 0)
         numStates = 0;

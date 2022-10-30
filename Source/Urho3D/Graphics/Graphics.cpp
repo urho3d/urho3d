@@ -160,7 +160,7 @@ void Graphics::SetShaderParameter(StringHash param, const Variant& value)
         break;
 
     case VAR_INT:
-        SetShaderParameter(param, value.GetInt());
+        SetShaderParameter(param, value.GetI32());
         break;
 
     case VAR_FLOAT:

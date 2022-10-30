@@ -236,7 +236,7 @@ void ParticleEmitter2D::UpdateSourceBatches()
         vertex2.position_ = Vector3(p.position_.x_ + sub, p.position_.y_ + add, p.position_.z_);
         vertex3.position_ = Vector3(p.position_.x_ + add, p.position_.y_ - sub, p.position_.z_);
 
-        vertex0.color_ = vertex1.color_ = vertex2.color_ = vertex3.color_ = p.color_.ToUInt();
+        vertex0.color_ = vertex1.color_ = vertex2.color_ = vertex3.color_ = p.color_.ToU32();
 
         vertices.Push(vertex0);
         vertices.Push(vertex1);

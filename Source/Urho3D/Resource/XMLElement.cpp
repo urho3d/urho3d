@@ -344,22 +344,22 @@ bool XMLElement::SetDouble(const String& name, double value)
     return SetAttribute(name, String(value));
 }
 
-bool XMLElement::SetUInt(const String& name, unsigned value)
+bool XMLElement::SetU32(const String& name, u32 value)
 {
     return SetAttribute(name, String(value));
 }
 
-bool XMLElement::SetInt(const String& name, int value)
+bool XMLElement::SetI32(const String& name, i32 value)
 {
     return SetAttribute(name, String(value));
 }
 
-bool XMLElement::SetUInt64(const String& name, unsigned long long value)
+bool XMLElement::SetU64(const String& name, u64 value)
 {
     return SetAttribute(name, String(value));
 }
 
-bool XMLElement::SetInt64(const String& name, long long value)
+bool XMLElement::SetI64(const String& name, i64 value)
 {
     return SetAttribute(name, String(value));
 }
@@ -498,7 +498,7 @@ bool XMLElement::SetVariantMap(const VariantMap& value)
         XMLElement variantElem = CreateChild("variant");
         if (!variantElem)
             return false;
-        variantElem.SetUInt("hash", i->first_.Value());
+        variantElem.SetU32("hash", i->first_.Value());
         variantElem.SetVariant(i->second_);
     }
 
@@ -784,22 +784,22 @@ double XMLElement::GetDouble(const String& name) const
     return ToDouble(GetAttribute(name));
 }
 
-unsigned XMLElement::GetUInt(const String& name) const
+u32 XMLElement::GetU32(const String& name) const
 {
     return ToU32(GetAttribute(name));
 }
 
-int XMLElement::GetInt(const String& name) const
+i32 XMLElement::GetI32(const String& name) const
 {
     return ToI32(GetAttribute(name));
 }
 
-unsigned long long XMLElement::GetUInt64(const String& name) const
+u64 XMLElement::GetU64(const String& name) const
 {
     return ToU64(GetAttribute(name));
 }
 
-long long XMLElement::GetInt64(const String& name) const
+i64 XMLElement::GetI64(const String& name) const
 {
     return ToI64(GetAttribute(name));
 }
@@ -924,7 +924,7 @@ VariantMap XMLElement::GetVariantMap() const
         if (variantElem.HasAttribute("name"))
             ret[StringHash(variantElem.GetAttribute("name"))] = variantElem.GetVariant();
         else if (variantElem.HasAttribute("hash"))
-            ret[StringHash(variantElem.GetUInt("hash"))] = variantElem.GetVariant();
+            ret[StringHash(variantElem.GetU32("hash"))] = variantElem.GetVariant();
 
         variantElem = variantElem.GetNext("variant");
     }

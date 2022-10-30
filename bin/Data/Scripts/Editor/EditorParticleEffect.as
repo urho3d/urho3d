@@ -1338,7 +1338,7 @@ void EditParticleEffectColorFrame(StringHash eventType, VariantMap& eventData)
     BeginParticleEffectEdit();
 
     LineEdit@ element = eventData["Element"].GetPtr();
-    uint i = element.vars["ColorFrame"].GetInt();
+    uint i = element.vars["ColorFrame"].GetI32();
     ColorFrame@ cf = editParticleEffect.GetColorFrame(i);
 
     if (element.name == "ColorTime")
@@ -1376,7 +1376,7 @@ void EditParticleEffectTextureFrame(StringHash eventType, VariantMap& eventData)
     BeginParticleEffectEdit();
 
     LineEdit@ element = eventData["Element"].GetPtr();
-    uint i = element.vars["TextureFrame"].GetInt();
+    uint i = element.vars["TextureFrame"].GetI32();
     TextureFrame@ tf = editParticleEffect.GetTextureFrame(i);
 
     if (element.name == "TextureTime")
@@ -1556,8 +1556,8 @@ void RefreshParticleEffectMaterial()
 
 void NavigateParticleEffectPreview(StringHash eventType, VariantMap& eventData)
 {
-    int dx = eventData["DX"].GetInt();
-    int dy = eventData["DY"].GetInt();
+    int dx = eventData["DX"].GetI32();
+    int dy = eventData["DY"].GetI32();
 
     if (particleEffectPreview.height > 0 && particleEffectPreview.width > 0)
     {

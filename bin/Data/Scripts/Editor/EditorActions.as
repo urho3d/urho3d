@@ -155,7 +155,7 @@ class DeleteNodeAction : EditAction
         nodeData = XMLFile();
         XMLElement rootElem = nodeData.CreateRoot("node");
         node.SaveXML(rootElem);
-        rootElem.SetUInt("listItemIndex", GetListIndex(node));
+        rootElem.SetU32("listItemIndex", GetListIndex(node));
     }
 
     void Undo()
@@ -169,7 +169,7 @@ class DeleteNodeAction : EditAction
             Node@ node = parent.CreateChild("", Scene::IsReplicatedID(nodeID) ? REPLICATED : LOCAL, nodeID);
             if (node.LoadXML(nodeData.root))
             {
-                uint listItemIndex = nodeData.root.GetUInt("listItemIndex");
+                uint listItemIndex = nodeData.root.GetU32("listItemIndex");
                 UIElement@ parentItem = hierarchyList.items[GetListIndex(parent)];
                 UpdateHierarchyItem(listItemIndex, node, parentItem);
                 FocusNode(node);
@@ -386,7 +386,7 @@ class DeleteComponentAction : EditAction
         componentData = XMLFile();
         XMLElement rootElem = componentData.CreateRoot("component");
         component.SaveXML(rootElem);
-        rootElem.SetUInt("listItemIndex", GetComponentListIndex(component));
+        rootElem.SetU32("listItemIndex", GetComponentListIndex(component));
     }
 
     void Undo()
@@ -403,7 +403,7 @@ class DeleteComponentAction : EditAction
             {
                 component.ApplyAttributes();
 
-                uint listItemIndex = componentData.root.GetUInt("listItemIndex");
+                uint listItemIndex = componentData.root.GetU32("listItemIndex");
                 UIElement@ parentItem = hierarchyList.items[GetListIndex(node)];
                 UpdateHierarchyItem(listItemIndex, component, parentItem);
                 FocusComponent(component);
@@ -760,8 +760,8 @@ class DeleteUIElementAction : EditAction
         elementData = XMLFile();
         XMLElement rootElem = elementData.CreateRoot("element");
         element.SaveXML(rootElem);
-        rootElem.SetUInt("index", element.parent.FindChild(element));
-        rootElem.SetUInt("listItemIndex", GetListIndex(element));
+        rootElem.SetU32("index", element.parent.FindChild(element));
+        rootElem.SetU32("listItemIndex", GetListIndex(element));
         styleFile = element.defaultStyle;
     }
 
@@ -776,8 +776,8 @@ class DeleteUIElementAction : EditAction
             if (parent.LoadChildXML(elementData.root, styleFile) !is null)
             {
                 XMLElement rootElem = elementData.root;
-                uint index = rootElem.GetUInt("index");
-                uint listItemIndex = rootElem.GetUInt("listItemIndex");
+                uint index = rootElem.GetU32("index");
+                uint listItemIndex = rootElem.GetU32("listItemIndex");
                 UIElement@ element = parent.children[index];
                 UIElement@ parentItem = hierarchyList.items[GetListIndex(parent)];
                 UpdateHierarchyItem(listItemIndex, element, parentItem);
@@ -888,8 +888,8 @@ class ApplyUIElementStyleAction : EditAction
         elementData = XMLFile();
         XMLElement rootElem = elementData.CreateRoot("element");
         element.SaveXML(rootElem);
-        rootElem.SetUInt("index", element.parent.FindChild(element));
-        rootElem.SetUInt("listItemIndex", GetListIndex(element));
+        rootElem.SetU32("index", element.parent.FindChild(element));
+        rootElem.SetU32("listItemIndex", GetListIndex(element));
         styleFile = element.defaultStyle;
         elementOldStyle = element.style;
         elementNewStyle = newStyle;
@@ -911,8 +911,8 @@ class ApplyUIElementStyleAction : EditAction
             if (parent.LoadChildXML(elementData.root, styleFile) !is null)
             {
                 XMLElement rootElem = elementData.root;
-                uint index = rootElem.GetUInt("index");
-                uint listItemIndex = rootElem.GetUInt("listItemIndex");
+                uint index = rootElem.GetU32("index");
+                uint listItemIndex = rootElem.GetU32("listItemIndex");
                 UIElement@ elem = parent.children[index];
                 UIElement@ parentItem = hierarchyList.items[GetListIndex(parent)];
                 UpdateHierarchyItem(listItemIndex, elem, parentItem);

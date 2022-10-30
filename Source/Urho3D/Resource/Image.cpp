@@ -901,12 +901,12 @@ bool Image::SetSize(int width, int height, int depth, unsigned components)
 
 void Image::SetPixel(int x, int y, const Color& color)
 {
-    SetPixelInt(x, y, 0, color.ToUInt());
+    SetPixelInt(x, y, 0, color.ToU32());
 }
 
 void Image::SetPixel(int x, int y, int z, const Color& color)
 {
-    SetPixelInt(x, y, z, color.ToUInt());
+    SetPixelInt(x, y, z, color.ToU32());
 }
 
 void Image::SetPixelInt(int x, int y, unsigned uintColor)
@@ -1164,7 +1164,7 @@ bool Image::Resize(int width, int height)
             // Calculate float coordinates between 0 - 1 for resampling
             float xF = (width_ > 1) ? (float)x / (float)(width - 1) : 0.0f;
             float yF = (height_ > 1) ? (float)y / (float)(height - 1) : 0.0f;
-            unsigned uintColor = GetPixelBilinear(xF, yF).ToUInt();
+            color32 uintColor = GetPixelBilinear(xF, yF).ToU32();
             unsigned char* dest = newData + (y * width + x) * components_;
             auto* src = (unsigned char*)&uintColor;
 
@@ -1195,10 +1195,10 @@ bool Image::Resize(int width, int height)
 
 void Image::Clear(const Color& color)
 {
-    ClearInt(color.ToUInt());
+    Clear(color.ToU32());
 }
 
-void Image::ClearInt(unsigned uintColor)
+void Image::Clear(color32 uintColor)
 {
     URHO3D_PROFILE(ClearImage);
 
@@ -1213,7 +1213,7 @@ void Image::ClearInt(unsigned uintColor)
 
     if (components_ == 4)
     {
-        unsigned color = uintColor;
+        color32 color = uintColor;
         auto* data = (unsigned*)GetData();
         auto* data_end = (unsigned*)(GetData() + width_ * height_ * depth_ * components_);
         for (; data < data_end; ++data)
@@ -2388,7 +2388,7 @@ bool Image::SetSubimage(const Image* image, const IntRect& rect)
                 // Calculate float coordinates between 0 - 1 for resampling
                 const float xF = (image->width_ > 1) ? static_cast<float>(x) / (destWidth - 1) : 0.0f;
                 const float yF = (image->height_ > 1) ? static_cast<float>(y) / (destHeight - 1) : 0.0f;
-                const unsigned uintColor = image->GetPixelBilinear(xF, yF).ToUInt();
+                const color32 uintColor = image->GetPixelBilinear(xF, yF).ToU32();
 
                 memcpy(dest, reinterpret_cast<const unsigned char*>(&uintColor), components_);
 

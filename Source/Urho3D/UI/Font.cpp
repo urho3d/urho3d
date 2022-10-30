@@ -186,8 +186,8 @@ void Font::LoadParameters()
 
     if (absoluteElem)
     {
-        absoluteOffset_.x_ = absoluteElem.GetInt("x");
-        absoluteOffset_.y_ = absoluteElem.GetInt("y");
+        absoluteOffset_.x_ = absoluteElem.GetI32("x");
+        absoluteOffset_.y_ = absoluteElem.GetI32("y");
     }
 
     XMLElement scaledElem = rootElem.GetChild("scaledoffset");

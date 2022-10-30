@@ -149,7 +149,7 @@ bool Menu::LoadXML(const XMLElement& source, XMLFile* styleFile)
         String typeName = childElem.GetAttribute("type");
         if (typeName.Empty())
             typeName = "UIElement";
-        i32 index = childElem.HasAttribute("index") ? childElem.GetInt("index") : ENDPOS;
+        i32 index = childElem.HasAttribute("index") ? childElem.GetI32("index") : ENDPOS;
         UIElement* child = nullptr;
 
         if (!internalElem)
@@ -408,8 +408,8 @@ void Menu::HandleKeyDown(StringHash eventType, VariantMap& eventData)
     using namespace KeyDown;
 
     // Activate if accelerator key pressed
-    if (eventData[P_KEY].GetInt() == acceleratorKey_ &&
-        (acceleratorQualifiers_ == QUAL_ANY || eventData[P_QUALIFIERS].GetInt() == acceleratorQualifiers_) &&
+    if (eventData[P_KEY].GetI32() == acceleratorKey_ &&
+        (acceleratorQualifiers_ == QUAL_ANY || eventData[P_QUALIFIERS].GetI32() == acceleratorQualifiers_) &&
         eventData[P_REPEAT].GetBool() == false)
     {
         // Ignore if UI has modal element or focused LineEdit

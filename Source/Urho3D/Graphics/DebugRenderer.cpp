@@ -67,7 +67,7 @@ void DebugRenderer::SetView(Camera* camera)
 
 void DebugRenderer::AddLine(const Vector3& start, const Vector3& end, const Color& color, bool depthTest)
 {
-    AddLine(start, end, color.ToUInt(), depthTest);
+    AddLine(start, end, color.ToU32(), depthTest);
 }
 
 void DebugRenderer::AddLine(const Vector3& start, const Vector3& end, unsigned color, bool depthTest)
@@ -83,7 +83,7 @@ void DebugRenderer::AddLine(const Vector3& start, const Vector3& end, unsigned c
 
 void DebugRenderer::AddTriangle(const Vector3& v1, const Vector3& v2, const Vector3& v3, const Color& color, bool depthTest)
 {
-    AddTriangle(v1, v2, v3, color.ToUInt(), depthTest);
+    AddTriangle(v1, v2, v3, color.ToU32(), depthTest);
 }
 
 void DebugRenderer::AddTriangle(const Vector3& v1, const Vector3& v2, const Vector3& v3, unsigned color, bool depthTest)
@@ -117,9 +117,9 @@ void DebugRenderer::AddNode(Node* node, float scale, bool depthTest)
     Vector3 start = node->GetWorldPosition();
     Quaternion rotation = node->GetWorldRotation();
 
-    AddLine(start, start + rotation * (scale * Vector3::RIGHT), Color::RED.ToUInt(), depthTest);
-    AddLine(start, start + rotation * (scale * Vector3::UP), Color::GREEN.ToUInt(), depthTest);
-    AddLine(start, start + rotation * (scale * Vector3::FORWARD), Color::BLUE.ToUInt(), depthTest);
+    AddLine(start, start + rotation * (scale * Vector3::RIGHT), Color::RED.ToU32(), depthTest);
+    AddLine(start, start + rotation * (scale * Vector3::UP), Color::GREEN.ToU32(), depthTest);
+    AddLine(start, start + rotation * (scale * Vector3::FORWARD), Color::BLUE.ToU32(), depthTest);
 }
 
 void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Color& color, bool depthTest, bool solid)
@@ -134,7 +134,7 @@ void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Color& color, b
     Vector3 v5(max.x_, min.y_, max.z_);
     Vector3 v6(min.x_, max.y_, max.z_);
 
-    unsigned uintColor = color.ToUInt();
+    color32 uintColor = color.ToU32();
 
     if (!solid)
     {
@@ -176,7 +176,7 @@ void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Matrix3x4& tran
     Vector3 v6(transform * Vector3(min.x_, max.y_, max.z_));
     Vector3 v7(transform * max);
 
-    unsigned uintColor = color.ToUInt();
+    color32 uintColor = color.ToU32();
 
     if (!solid)
     {
@@ -207,7 +207,7 @@ void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Matrix3x4& tran
 void DebugRenderer::AddFrustum(const Frustum& frustum, const Color& color, bool depthTest)
 {
     const Vector3* vertices = frustum.vertices_;
-    unsigned uintColor = color.ToUInt();
+    color32 uintColor = color.ToU32();
 
     AddLine(vertices[0], vertices[1], uintColor, depthTest);
     AddLine(vertices[1], vertices[2], uintColor, depthTest);
@@ -225,7 +225,7 @@ void DebugRenderer::AddFrustum(const Frustum& frustum, const Color& color, bool 
 
 void DebugRenderer::AddPolyhedron(const Polyhedron& poly, const Color& color, bool depthTest)
 {
-    unsigned uintColor = color.ToUInt();
+    color32 uintColor = color.ToU32();
 
     for (const Vector<Vector3>& face : poly.faces_)
     {
@@ -239,7 +239,7 @@ void DebugRenderer::AddPolyhedron(const Polyhedron& poly, const Color& color, bo
 
 void DebugRenderer::AddSphere(const Sphere& sphere, const Color& color, bool depthTest)
 {
-    unsigned uintColor = color.ToUInt();
+    color32 uintColor = color.ToU32();
 
     for (auto j = 0; j < 180; j += 45)
     {
@@ -273,7 +273,7 @@ void DebugRenderer::AddSphereSector(const Sphere& sphere, const Quaternion& rota
     static const unsigned numLines = 4;
     static const float arcStep = 45.0f;
 
-    const unsigned uintColor = color.ToUInt();
+    const color32 uintColor = color.ToU32();
     const float halfAngle = 0.5f * angle;
     const unsigned numArcSegments = static_cast<unsigned>(Ceil(halfAngle / arcStep)) + 1;
 
@@ -337,7 +337,7 @@ void DebugRenderer::AddSkeleton(const Skeleton& skeleton, const Color& color, bo
     if (!bones.Size())
         return;
 
-    unsigned uintColor = color.ToUInt();
+    color32 uintColor = color.ToU32();
 
     for (const Bone& bone : bones)
     {
@@ -374,7 +374,7 @@ void DebugRenderer::AddTriangleMesh(const void* vertexData, unsigned vertexSize,
 void DebugRenderer::AddTriangleMesh(const void* vertexData, unsigned vertexSize, unsigned vertexStart, const void* indexData,
     unsigned indexSize, unsigned indexStart, unsigned indexCount, const Matrix3x4& transform, const Color& color, bool depthTest)
 {
-    unsigned uintColor = color.ToUInt();
+    color32 uintColor = color.ToU32();
     const auto* srcData = ((const unsigned char*)vertexData) + vertexStart;
 
     // 16-bit indices
@@ -421,7 +421,7 @@ void DebugRenderer::AddCircle(const Vector3& center, const Vector3& normal, floa
     Quaternion orientation;
     orientation.FromRotationTo(Vector3::UP, normal.Normalized());
     Vector3 p = orientation * Vector3(radius, 0, 0) + center;
-    unsigned uintColor = color.ToUInt();
+    color32 uintColor = color.ToU32();
 
     for(int i = 1; i <= steps; ++i)
     {
@@ -438,7 +438,7 @@ void DebugRenderer::AddCircle(const Vector3& center, const Vector3& normal, floa
 
 void DebugRenderer::AddCross(const Vector3& center, float size, const Color& color, bool depthTest)
 {
-    unsigned uintColor = color.ToUInt();
+    color32 uintColor = color.ToU32();
 
     float halfSize = size / 2.0f;
     for (int i = 0; i < 3; ++i)
@@ -453,7 +453,7 @@ void DebugRenderer::AddCross(const Vector3& center, float size, const Color& col
 
 void DebugRenderer::AddQuad(const Vector3& center, float width, float height, const Color& color, bool depthTest)
 {
-    unsigned uintColor = color.ToUInt();
+    color32 uintColor = color.ToU32();
 
     Vector3 v0(center.x_ - width / 2, center.y_, center.z_ - height / 2);
     Vector3 v1(center.x_ + width / 2, center.y_, center.z_ - height / 2);

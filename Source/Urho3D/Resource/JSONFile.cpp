@@ -137,11 +137,11 @@ static void ToRapidjsonValue(rapidjson::Value& rapidjsonValue, const JSONValue& 
             switch (jsonValue.GetNumberType())
             {
             case JSONNT_INT:
-                rapidjsonValue.SetInt(jsonValue.GetInt());
+                rapidjsonValue.SetInt(jsonValue.GetI32());
                 break;
 
             case JSONNT_UINT:
-                rapidjsonValue.SetUint(jsonValue.GetUInt());
+                rapidjsonValue.SetUint(jsonValue.GetU32());
                 break;
 
             default:

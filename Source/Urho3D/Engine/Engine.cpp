@@ -216,7 +216,7 @@ bool Engine::Initialize(const VariantMap& parameters)
     if (log)
     {
         if (HasParameter(parameters, EP_LOG_LEVEL))
-            log->SetLevel(GetParameter(parameters, EP_LOG_LEVEL).GetInt());
+            log->SetLevel(GetParameter(parameters, EP_LOG_LEVEL).GetI32());
         log->SetQuiet(GetParameter(parameters, EP_LOG_QUIET, false).GetBool());
         log->Open(GetParameter(parameters, EP_LOG_NAME, "Urho3D.log").GetString());
     }
@@ -261,8 +261,8 @@ bool Engine::Initialize(const VariantMap& parameters)
         graphics->SetOrientations(GetParameter(parameters, EP_ORIENTATIONS, "LandscapeLeft LandscapeRight").GetString());
 
         if (HasParameter(parameters, EP_WINDOW_POSITION_X) && HasParameter(parameters, EP_WINDOW_POSITION_Y))
-            graphics->SetWindowPosition(GetParameter(parameters, EP_WINDOW_POSITION_X).GetInt(),
-                GetParameter(parameters, EP_WINDOW_POSITION_Y).GetInt());
+            graphics->SetWindowPosition(GetParameter(parameters, EP_WINDOW_POSITION_X).GetI32(),
+                GetParameter(parameters, EP_WINDOW_POSITION_Y).GetI32());
 
         if (Graphics::GetGAPI() == GAPI_OPENGL)
         {
@@ -271,17 +271,17 @@ bool Engine::Initialize(const VariantMap& parameters)
         }
 
         if (!graphics->SetMode(
-            GetParameter(parameters, EP_WINDOW_WIDTH, 0).GetInt(),
-            GetParameter(parameters, EP_WINDOW_HEIGHT, 0).GetInt(),
+            GetParameter(parameters, EP_WINDOW_WIDTH, 0).GetI32(),
+            GetParameter(parameters, EP_WINDOW_HEIGHT, 0).GetI32(),
             GetParameter(parameters, EP_FULL_SCREEN, true).GetBool(),
             GetParameter(parameters, EP_BORDERLESS, false).GetBool(),
             GetParameter(parameters, EP_WINDOW_RESIZABLE, false).GetBool(),
             GetParameter(parameters, EP_HIGH_DPI, true).GetBool(),
             GetParameter(parameters, EP_VSYNC, false).GetBool(),
             GetParameter(parameters, EP_TRIPLE_BUFFER, false).GetBool(),
-            GetParameter(parameters, EP_MULTI_SAMPLE, 1).GetInt(),
-            GetParameter(parameters, EP_MONITOR, 0).GetInt(),
-            GetParameter(parameters, EP_REFRESH_RATE, 0).GetInt()
+            GetParameter(parameters, EP_MULTI_SAMPLE, 1).GetI32(),
+            GetParameter(parameters, EP_MONITOR, 0).GetI32(),
+            GetParameter(parameters, EP_REFRESH_RATE, 0).GetI32()
         ))
             return false;
 
@@ -295,16 +295,16 @@ bool Engine::Initialize(const VariantMap& parameters)
         renderer->SetDrawShadows(GetParameter(parameters, EP_SHADOWS, true).GetBool());
         if (renderer->GetDrawShadows() && GetParameter(parameters, EP_LOW_QUALITY_SHADOWS, false).GetBool())
             renderer->SetShadowQuality(SHADOWQUALITY_SIMPLE_16BIT);
-        renderer->SetMaterialQuality((MaterialQuality)GetParameter(parameters, EP_MATERIAL_QUALITY, QUALITY_HIGH).GetInt());
-        renderer->SetTextureQuality((MaterialQuality)GetParameter(parameters, EP_TEXTURE_QUALITY, QUALITY_HIGH).GetInt());
-        renderer->SetTextureFilterMode((TextureFilterMode)GetParameter(parameters, EP_TEXTURE_FILTER_MODE, FILTER_TRILINEAR).GetInt());
-        renderer->SetTextureAnisotropy(GetParameter(parameters, EP_TEXTURE_ANISOTROPY, 4).GetInt());
+        renderer->SetMaterialQuality((MaterialQuality)GetParameter(parameters, EP_MATERIAL_QUALITY, QUALITY_HIGH).GetI32());
+        renderer->SetTextureQuality((MaterialQuality)GetParameter(parameters, EP_TEXTURE_QUALITY, QUALITY_HIGH).GetI32());
+        renderer->SetTextureFilterMode((TextureFilterMode)GetParameter(parameters, EP_TEXTURE_FILTER_MODE, FILTER_TRILINEAR).GetI32());
+        renderer->SetTextureAnisotropy(GetParameter(parameters, EP_TEXTURE_ANISOTROPY, 4).GetI32());
 
         if (GetParameter(parameters, EP_SOUND, true).GetBool())
         {
             GetSubsystem<Audio>()->SetMode(
-                GetParameter(parameters, EP_SOUND_BUFFER, 100).GetInt(),
-                GetParameter(parameters, EP_SOUND_MIX_RATE, 44100).GetInt(),
+                GetParameter(parameters, EP_SOUND_BUFFER, 100).GetI32(),
+                GetParameter(parameters, EP_SOUND_MIX_RATE, 44100).GetI32(),
                 GetParameter(parameters, EP_SOUND_STEREO, true).GetBool(),
                 GetParameter(parameters, EP_SOUND_INTERPOLATION, true).GetBool()
             );
@@ -326,7 +326,7 @@ bool Engine::Initialize(const VariantMap& parameters)
 
 #ifdef URHO3D_TESTING
     if (HasParameter(parameters, EP_TIME_OUT))
-        timeOut_ = GetParameter(parameters, EP_TIME_OUT, 0).GetInt() * 1000000LL;
+        timeOut_ = GetParameter(parameters, EP_TIME_OUT, 0).GetI32() * 1000000LL;
 #endif
 
 #ifdef URHO3D_PROFILING

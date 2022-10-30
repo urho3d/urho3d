@@ -407,7 +407,7 @@ void InitResourceBrowserPreview()
 // Opens a contextual menu based on what resource item was actioned
 void HandleBrowserFileClick(StringHash eventType, VariantMap& eventData)
 {
-    if (eventData["Button"].GetInt() != MOUSEB_RIGHT)
+    if (eventData["Button"].GetI32() != MOUSEB_RIGHT)
         return;
 
     UIElement@ uiElement = eventData["Item"].GetPtr();
@@ -736,7 +736,7 @@ void HandleResourceTypeFilterToggled(StringHash eventType, VariantMap& eventData
     if (!checkbox.vars.Contains(TEXT_VAR_RESOURCE_TYPE))
         return;
 
-    int resourceType = checkbox.GetVar(TEXT_VAR_RESOURCE_TYPE).GetInt();
+    int resourceType = checkbox.GetVar(TEXT_VAR_RESOURCE_TYPE).GetI32();
     int find = activeResourceTypeFilters.Find(resourceType);
 
     if (checkbox.checked && find != -1)
@@ -771,7 +771,7 @@ void HandleResourceDirFilterToggled(StringHash eventType, VariantMap& eventData)
     if (!checkbox.vars.Contains(TEXT_VAR_RESOURCE_DIR_ID))
         return;
 
-    int resourceDir = checkbox.GetVar(TEXT_VAR_RESOURCE_DIR_ID).GetInt();
+    int resourceDir = checkbox.GetVar(TEXT_VAR_RESOURCE_DIR_ID).GetI32();
     int find = activeResourceDirFilters.Find(resourceDir);
 
     if (checkbox.checked && find != -1)
@@ -869,7 +869,7 @@ BrowserFile@ GetBrowserFileFromUIElement(UIElement@ element)
 {
     if (element is null || !element.vars.Contains(TEXT_VAR_FILE_ID))
         return null;
-    return GetBrowserFileFromId(element.vars[TEXT_VAR_FILE_ID].GetUInt());
+    return GetBrowserFileFromId(element.vars[TEXT_VAR_FILE_ID].GetU32());
 }
 
 BrowserFile@ GetBrowserFileFromPath(String path)
@@ -1658,8 +1658,8 @@ void CreateResourcePreview(String path, Node@ previewNode)
 
 void RotateResourceBrowserPreview(StringHash eventType, VariantMap& eventData)
 {
-    int elemX = eventData["ElementX"].GetInt();
-    int elemY = eventData["ElementY"].GetInt();
+    int elemX = eventData["ElementX"].GetI32();
+    int elemY = eventData["ElementY"].GetI32();
 
     if (resourceBrowserPreview.height > 0 && resourceBrowserPreview.width > 0)
     {
