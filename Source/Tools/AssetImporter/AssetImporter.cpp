@@ -189,7 +189,7 @@ unsigned GetMeshIndex(aiMesh* mesh);
 unsigned GetBoneIndex(OutModel& model, const String& boneName);
 aiBone* GetMeshBone(OutModel& model, const String& boneName);
 Matrix3x4 GetOffsetMatrix(OutModel& model, const String& boneName);
-void GetBlendData(OutModel& model, aiMesh* mesh, aiNode* meshNode, Vector<unsigned>& boneMappings, Vector<Vector<unsigned char>>&
+void GetBlendData(OutModel& model, aiMesh* mesh, aiNode* meshNode, Vector<i32>& boneMappings, Vector<Vector<unsigned char>>&
     blendIndices, Vector<Vector<float>>& blendWeights);
 String GetMeshMaterialName(aiMesh* mesh);
 String GetMaterialTextureName(const String& nameIn);
@@ -981,7 +981,7 @@ void BuildAndSaveModel(OutModel& model)
     PrintLine("Writing model " + rootNodeName);
 
     SharedPtr<Model> outModel(new Model(context_));
-    Vector<Vector<unsigned>> allBoneMappings;
+    Vector<Vector<i32>> allBoneMappings;
     BoundingBox box;
 
     unsigned numValidGeometries = 0;
@@ -1101,7 +1101,7 @@ void BuildAndSaveModel(OutModel& model)
         // If there are bones, get blend data
         Vector<Vector<unsigned char>> blendIndices;
         Vector<Vector<float>> blendWeights;
-        Vector<unsigned> boneMappings;
+        Vector<i32> boneMappings;
         if (model.bones_.Size())
             GetBlendData(model, mesh, model.meshNodes_[i], boneMappings, blendIndices, blendWeights);
 
@@ -1142,7 +1142,7 @@ void BuildAndSaveModel(OutModel& model)
     }
 
     // Define the model buffers and bounding box
-    Vector<unsigned> emptyMorphRange;
+    Vector<i32> emptyMorphRange;
     outModel->SetVertexBuffers(vbVector, emptyMorphRange, emptyMorphRange);
     outModel->SetIndexBuffers(ibVector);
     outModel->SetBoundingBox(box);
@@ -2077,7 +2077,7 @@ void CombineLods(const Vector<float>& lodDistances, const Vector<String>& modelN
 
     Vector<SharedPtr<VertexBuffer>> vbVector;
     Vector<SharedPtr<IndexBuffer>> ibVector;
-    Vector<unsigned> emptyMorphRange;
+    Vector<i32> emptyMorphRange;
 
     // Create the final model
     SharedPtr<Model> outModel(new Model(context_));
@@ -2196,7 +2196,7 @@ Matrix3x4 GetOffsetMatrix(OutModel& model, const String& boneName)
     return Matrix3x4::IDENTITY;
 }
 
-void GetBlendData(OutModel& model, aiMesh* mesh, aiNode* meshNode, Vector<unsigned>& boneMappings, Vector<Vector<unsigned char>>&
+void GetBlendData(OutModel& model, aiMesh* mesh, aiNode* meshNode, Vector<i32>& boneMappings, Vector<Vector<unsigned char>>&
     blendIndices, Vector<Vector<float>>& blendWeights)
 {
     blendIndices.Resize(mesh->mNumVertices);

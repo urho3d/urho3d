@@ -870,7 +870,7 @@ bool DecalSet::GetBones(Drawable* target, unsigned batchIndex, const float* blen
 
     // Check whether target is using global or per-geometry skinning
     const Vector<Vector<Matrix3x4>>& geometrySkinMatrices = animatedModel->GetGeometrySkinMatrices();
-    const Vector<Vector<unsigned>>& geometryBoneMappings = animatedModel->GetGeometryBoneMappings();
+    const Vector<Vector<i32>>& geometryBoneMappings = animatedModel->GetGeometryBoneMappings();
 
     for (unsigned i = 0; i < 4; ++i)
     {

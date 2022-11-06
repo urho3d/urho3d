@@ -230,8 +230,8 @@ void DynamicGeometry::CreateScene()
         vertexBuffers.Push(vb);
         indexBuffers.Push(ib);
         // Morph ranges could also be not defined. Here we simply define a zero range (no morphing) for the vertex buffer
-        Vector<unsigned> morphRangeStarts;
-        Vector<unsigned> morphRangeCounts;
+        Vector<i32> morphRangeStarts;
+        Vector<i32> morphRangeCounts;
         morphRangeStarts.Push(0);
         morphRangeCounts.Push(0);
         fromScratchModel->SetVertexBuffers(vertexBuffers, morphRangeStarts, morphRangeCounts);
