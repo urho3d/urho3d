@@ -116,7 +116,7 @@ bool Model::BeginLoad(Deserializer& source)
         // Prepare vertex buffer data to be uploaded during EndLoad()
         if (async)
         {
-            desc.data_ = new unsigned char[desc.dataSize_];
+            desc.data_ = new byte[desc.dataSize_];
             source.Read(desc.data_.Get(), desc.dataSize_);
         }
         else
@@ -151,7 +151,7 @@ bool Model::BeginLoad(Deserializer& source)
             loadIBData_[i].indexCount_ = indexCount;
             loadIBData_[i].indexSize_ = indexSize;
             loadIBData_[i].dataSize_ = indexCount * indexSize;
-            loadIBData_[i].data_ = new unsigned char[loadIBData_[i].dataSize_];
+            loadIBData_[i].data_ = new byte[loadIBData_[i].dataSize_];
             source.Read(loadIBData_[i].data_.Get(), loadIBData_[i].dataSize_);
         }
         else
@@ -179,7 +179,7 @@ bool Model::BeginLoad(Deserializer& source)
     {
         // Read bone mappings
         unsigned boneMappingCount = source.ReadU32();
-        Vector<unsigned> boneMapping(boneMappingCount);
+        Vector<i32> boneMapping(boneMappingCount);
         for (unsigned j = 0; j < boneMappingCount; ++j)
             boneMapping[j] = source.ReadU32();
         geometryBoneMappings_.Push(boneMapping);
@@ -263,7 +263,7 @@ bool Model::BeginLoad(Deserializer& source)
             if (!!(newBuffer.elementMask_ & VertexElements::Tangent))
                 vertexSize += sizeof(Vector3);
             newBuffer.dataSize_ = newBuffer.vertexCount_ * vertexSize;
-            newBuffer.morphData_ = new unsigned char[newBuffer.dataSize_];
+            newBuffer.morphData_ = new byte[newBuffer.dataSize_];
 
             source.Read(&newBuffer.morphData_[0], newBuffer.vertexCount_ * vertexSize);
 
@@ -412,7 +412,7 @@ bool Model::Save(Serializer& dest) const
         dest.WriteU32(morphs_[i].buffers_.Size());
 
         // Write morph vertex buffers
-        for (HashMap<unsigned, VertexBufferMorph>::ConstIterator j = morphs_[i].buffers_.Begin();
+        for (HashMap<i32, VertexBufferMorph>::ConstIterator j = morphs_[i].buffers_.Begin();
              j != morphs_[i].buffers_.End(); ++j)
         {
             dest.WriteU32(j->first_);
@@ -470,8 +470,8 @@ void Model::SetBoundingBox(const BoundingBox& box)
     boundingBox_ = box;
 }
 
-bool Model::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer>>& buffers, const Vector<unsigned>& morphRangeStarts,
-    const Vector<unsigned>& morphRangeCounts)
+bool Model::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer>>& buffers, const Vector<i32>& morphRangeStarts,
+    const Vector<i32>& morphRangeCounts)
 {
     for (unsigned i = 0; i < buffers.Size(); ++i)
     {
@@ -521,8 +521,10 @@ bool Model::SetIndexBuffers(const Vector<SharedPtr<IndexBuffer>>& buffers)
     return true;
 }
 
-void Model::SetNumGeometries(unsigned num)
+void Model::SetNumGeometries(i32 num)
 {
+    assert(num >= 0);
+
     geometries_.Resize(num);
     geometryBoneMappings_.Resize(num);
     geometryCenters_.Resize(num);
@@ -535,8 +537,11 @@ void Model::SetNumGeometries(unsigned num)
     }
 }
 
-bool Model::SetNumGeometryLodLevels(unsigned index, unsigned num)
+bool Model::SetNumGeometryLodLevels(i32 index, i32 num)
 {
+    assert(index >= 0);
+    assert(num >= 0);
+
     if (index >= geometries_.Size())
     {
         URHO3D_LOGERROR("Geometry index out of bounds");
@@ -552,8 +557,11 @@ bool Model::SetNumGeometryLodLevels(unsigned index, unsigned num)
     return true;
 }
 
-bool Model::SetGeometry(unsigned index, unsigned lodLevel, Geometry* geometry)
+bool Model::SetGeometry(i32 index, i32 lodLevel, Geometry* geometry)
 {
+    assert(index >= 0);
+    assert(lodLevel >= 0);
+
     if (index >= geometries_.Size())
     {
         URHO3D_LOGERROR("Geometry index out of bounds");
@@ -569,8 +577,10 @@ bool Model::SetGeometry(unsigned index, unsigned lodLevel, Geometry* geometry)
     return true;
 }
 
-bool Model::SetGeometryCenter(unsigned index, const Vector3& center)
+bool Model::SetGeometryCenter(i32 index, const Vector3& center)
 {
+    assert(index >= 0);
+
     if (index >= geometryCenters_.Size())
     {
         URHO3D_LOGERROR("Geometry index out of bounds");
@@ -586,7 +596,7 @@ void Model::SetSkeleton(const Skeleton& skeleton)
     skeleton_ = skeleton;
 }
 
-void Model::SetGeometryBoneMappings(const Vector<Vector<unsigned>>& geometryBoneMappings)
+void Model::SetGeometryBoneMappings(const Vector<Vector<i32>>& geometryBoneMappings)
 {
     geometryBoneMappings_ = geometryBoneMappings;
 }
@@ -698,12 +708,12 @@ SharedPtr<Model> Model::Clone(const String& cloneName) const
     for (Vector<ModelMorph>::Iterator i = ret->morphs_.Begin(); i != ret->morphs_.End(); ++i)
     {
         ModelMorph& morph = *i;
-        for (HashMap<unsigned, VertexBufferMorph>::Iterator j = morph.buffers_.Begin(); j != morph.buffers_.End(); ++j)
+        for (HashMap<i32, VertexBufferMorph>::Iterator j = morph.buffers_.Begin(); j != morph.buffers_.End(); ++j)
         {
             VertexBufferMorph& vbMorph = j->second_;
             if (vbMorph.dataSize_)
             {
-                SharedArrayPtr<unsigned char> cloneData(new unsigned char[vbMorph.dataSize_]);
+                SharedArrayPtr<byte> cloneData(new byte[vbMorph.dataSize_]);
                 memcpy(cloneData.Get(), vbMorph.morphData_.Get(), vbMorph.dataSize_);
                 vbMorph.morphData_ = cloneData;
             }
@@ -715,13 +725,17 @@ SharedPtr<Model> Model::Clone(const String& cloneName) const
     return ret;
 }
 
-unsigned Model::GetNumGeometryLodLevels(unsigned index) const
+i32 Model::GetNumGeometryLodLevels(i32 index) const
 {
+    assert(index >= 0);
     return index < geometries_.Size() ? geometries_[index].Size() : 0;
 }
 
-Geometry* Model::GetGeometry(unsigned index, unsigned lodLevel) const
+Geometry* Model::GetGeometry(i32 index, i32 lodLevel) const
 {
+    assert(index >= 0);
+    assert(lodLevel >= 0);
+
     if (index >= geometries_.Size() || geometries_[index].Empty())
         return nullptr;
 
@@ -731,8 +745,9 @@ Geometry* Model::GetGeometry(unsigned index, unsigned lodLevel) const
     return geometries_[index][lodLevel];
 }
 
-const ModelMorph* Model::GetMorph(unsigned index) const
+const ModelMorph* Model::GetMorph(i32 index) const
 {
+    assert(index >= 0);
     return index < morphs_.Size() ? &morphs_[index] : nullptr;
 }
 
@@ -752,13 +767,15 @@ const ModelMorph* Model::GetMorph(StringHash nameHash) const
     return nullptr;
 }
 
-unsigned Model::GetMorphRangeStart(unsigned bufferIndex) const
+i32 Model::GetMorphRangeStart(i32 bufferIndex) const
 {
+    assert(bufferIndex >= 0);
     return bufferIndex < vertexBuffers_.Size() ? morphRangeStarts_[bufferIndex] : 0;
 }
 
-unsigned Model::GetMorphRangeCount(unsigned bufferIndex) const
+i32 Model::GetMorphRangeCount(i32 bufferIndex) const
 {
+    assert(bufferIndex >= 0);
     return bufferIndex < vertexBuffers_.Size() ? morphRangeCounts_[bufferIndex] : 0;
 }
 

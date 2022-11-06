@@ -344,7 +344,7 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
         }
 
         // Copy geometry bone mappings
-        const Vector<Vector<unsigned>>& geometryBoneMappings = model->GetGeometryBoneMappings();
+        const Vector<Vector<i32>>& geometryBoneMappings = model->GetGeometryBoneMappings();
         geometryBoneMappings_.Clear();
         geometryBoneMappings_.Reserve(geometryBoneMappings.Size());
         for (unsigned i = 0; i < geometryBoneMappings.Size(); ++i)
@@ -363,7 +363,7 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
             newMorph.nameHash_ = morphs[i].nameHash_;
             newMorph.weight_ = 0.0f;
             newMorph.buffers_ = morphs[i].buffers_;
-            for (HashMap<unsigned, VertexBufferMorph>::ConstIterator j = morphs[i].buffers_.Begin();
+            for (HashMap<i32, VertexBufferMorph>::ConstIterator j = morphs[i].buffers_.Begin();
                  j != morphs[i].buffers_.End(); ++j)
                 morphElementMask_ |= j->second_.elementMask_;
             morphs_.Push(newMorph);
@@ -501,8 +501,10 @@ void AnimatedModel::RemoveAnimationState(AnimationState* state)
     }
 }
 
-void AnimatedModel::RemoveAnimationState(unsigned index)
+void AnimatedModel::RemoveAnimationState(i32 index)
 {
+    assert(index >= 0);
+
     if (index < animationStates_.Size())
     {
         animationStates_.Erase(index);
@@ -532,8 +534,10 @@ void AnimatedModel::SetUpdateInvisible(bool enable)
 }
 
 
-void AnimatedModel::SetMorphWeight(unsigned index, float weight)
+void AnimatedModel::SetMorphWeight(i32 index, float weight)
 {
+    assert(index >= 0);
+
     if (index >= morphs_.Size())
         return;
 
@@ -610,8 +614,9 @@ void AnimatedModel::ResetMorphWeights()
     MarkNetworkUpdate();
 }
 
-float AnimatedModel::GetMorphWeight(unsigned index) const
+float AnimatedModel::GetMorphWeight(i32 index) const
 {
+    assert(index >= 0);
     return index < morphs_.Size() ? morphs_[index].weight_ : 0.0f;
 }
 
@@ -669,8 +674,9 @@ AnimationState* AnimatedModel::GetAnimationState(StringHash animationNameHash) c
     return nullptr;
 }
 
-AnimationState* AnimatedModel::GetAnimationState(unsigned index) const
+AnimationState* AnimatedModel::GetAnimationState(i32 index) const
 {
+    assert(index >= 0);
     return index < animationStates_.Size() ? animationStates_[index].Get() : nullptr;
 }
 
@@ -1161,9 +1167,11 @@ void AnimatedModel::CloneGeometries()
     MarkMorphsDirty();
 }
 
-void AnimatedModel::CopyMorphVertices(void* destVertexData, void* srcVertexData, unsigned vertexCount, VertexBuffer* destBuffer,
+void AnimatedModel::CopyMorphVertices(void* destVertexData, void* srcVertexData, i32 vertexCount, VertexBuffer* destBuffer,
     VertexBuffer* srcBuffer)
 {
+    assert(vertexCount >= 0);
+
     VertexElements mask = destBuffer->GetElementMask() & srcBuffer->GetElementMask();
     unsigned normalOffset = srcBuffer->GetElementOffset(SEM_NORMAL);
     unsigned tangentOffset = srcBuffer->GetElementOffset(SEM_TANGENT);
@@ -1351,7 +1359,7 @@ void AnimatedModel::UpdateMorphs()
                     {
                         if (morphs_[j].weight_ != 0.0f)
                         {
-                            HashMap<unsigned, VertexBufferMorph>::Iterator k = morphs_[j].buffers_.Find(i);
+                            HashMap<i32, VertexBufferMorph>::Iterator k = morphs_[j].buffers_.Find(i);
                             if (k != morphs_[j].buffers_.End())
                                 ApplyMorph(buffer, dest, morphStart, k->second_, morphs_[j].weight_);
                         }
@@ -1366,17 +1374,19 @@ void AnimatedModel::UpdateMorphs()
     morphsDirty_ = false;
 }
 
-void AnimatedModel::ApplyMorph(VertexBuffer* buffer, void* destVertexData, unsigned morphRangeStart, const VertexBufferMorph& morph,
+void AnimatedModel::ApplyMorph(VertexBuffer* buffer, void* destVertexData, i32 morphRangeStart, const VertexBufferMorph& morph,
     float weight)
 {
+    assert(morphRangeStart >= 0);
+
     const VertexElements elementMask = morph.elementMask_ & buffer->GetElementMask();
     unsigned vertexCount = morph.vertexCount_;
     unsigned normalOffset = buffer->GetElementOffset(SEM_NORMAL);
     unsigned tangentOffset = buffer->GetElementOffset(SEM_TANGENT);
     unsigned vertexSize = buffer->GetVertexSize();
 
-    unsigned char* srcData = morph.morphData_;
-    auto* destData = (unsigned char*)destVertexData;
+    byte* srcData = morph.morphData_;
+    byte* destData = (byte*)destVertexData;
 
     while (vertexCount--)
     {

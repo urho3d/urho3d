@@ -63,7 +63,7 @@ public:
     /// Remove an animation by AnimationState pointer.
     void RemoveAnimationState(AnimationState* state);
     /// Remove an animation by index.
-    void RemoveAnimationState(unsigned index);
+    void RemoveAnimationState(i32 index);
     /// Remove all animations.
     void RemoveAllAnimationStates();
     /// Set animation LOD bias.
@@ -73,7 +73,7 @@ public:
     /// @property
     void SetUpdateInvisible(bool enable);
     /// Set vertex morph weight by index.
-    void SetMorphWeight(unsigned index, float weight);
+    void SetMorphWeight(i32 index, float weight);
     /// Set vertex morph weight by name.
     /// @property{set_morphWeights}
     void SetMorphWeight(const String& name, float weight);
@@ -93,7 +93,7 @@ public:
 
     /// Return number of animation states.
     /// @property
-    unsigned GetNumAnimationStates() const { return animationStates_.Size(); }
+    i32 GetNumAnimationStates() const { return animationStates_.Size(); }
 
     /// Return animation state by animation pointer.
     AnimationState* GetAnimationState(Animation* animation) const;
@@ -103,7 +103,7 @@ public:
     /// Return animation state by animation name hash.
     AnimationState* GetAnimationState(StringHash animationNameHash) const;
     /// Return animation state by index.
-    AnimationState* GetAnimationState(unsigned index) const;
+    AnimationState* GetAnimationState(i32 index) const;
 
     /// Return animation LOD bias.
     /// @property
@@ -121,10 +121,10 @@ public:
 
     /// Return number of vertex morphs.
     /// @property
-    unsigned GetNumMorphs() const { return morphs_.Size(); }
+    i32 GetNumMorphs() const { return morphs_.Size(); }
 
     /// Return vertex morph weight by index.
-    float GetMorphWeight(unsigned index) const;
+    float GetMorphWeight(i32 index) const;
     /// Return vertex morph weight by name.
     /// @property{get_morphWeights}
     float GetMorphWeight(const String& name) const;
@@ -152,7 +152,7 @@ public:
     const Vector<byte>& GetMorphsAttr() const;
 
     /// Return per-geometry bone mappings.
-    const Vector<Vector<unsigned>>& GetGeometryBoneMappings() const { return geometryBoneMappings_; }
+    const Vector<Vector<i32>>& GetGeometryBoneMappings() const { return geometryBoneMappings_; }
 
     /// Return per-geometry skin matrices. If empty, uses global skinning.
     const Vector<Vector<Matrix3x4>>& GetGeometrySkinMatrices() const { return geometrySkinMatrices_; }
@@ -188,7 +188,7 @@ private:
     /// Clone geometries for vertex morphing.
     void CloneGeometries();
     /// Copy morph vertices.
-    void CopyMorphVertices(void* destVertexData, void* srcVertexData, unsigned vertexCount, VertexBuffer* destBuffer, VertexBuffer* srcBuffer);
+    void CopyMorphVertices(void* destVertexData, void* srcVertexData, i32 vertexCount, VertexBuffer* destBuffer, VertexBuffer* srcBuffer);
     /// Recalculate animations. Called from Update().
     void UpdateAnimation(const FrameInfo& frame);
     /// Recalculate skinning.
@@ -197,7 +197,7 @@ private:
     void UpdateMorphs();
     /// Apply a vertex morph.
     void ApplyMorph
-        (VertexBuffer* buffer, void* destVertexData, unsigned morphRangeStart, const VertexBufferMorph& morph, float weight);
+        (VertexBuffer* buffer, void* destVertexData, i32 morphRangeStart, const VertexBufferMorph& morph, float weight);
     /// Handle model reload finished.
     void HandleModelReloadFinished(StringHash eventType, VariantMap& eventData);
 
@@ -212,7 +212,7 @@ private:
     /// Skinning matrices.
     Vector<Matrix3x4> skinMatrices_;
     /// Mapping of subgeometry bone indices, used if more bones than skinning shader can manage.
-    Vector<Vector<unsigned>> geometryBoneMappings_;
+    Vector<Vector<i32>> geometryBoneMappings_;
     /// Subgeometry skinning matrices, used if more bones than skinning shader can manage.
     Vector<Vector<Matrix3x4>> geometrySkinMatrices_;
     /// Subgeometry skinning matrix pointers, if more bones than skinning shader can manage.

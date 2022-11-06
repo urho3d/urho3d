@@ -1715,17 +1715,17 @@ template <class T> void RegisterMembers_GeometryDesc(asIScriptEngine* engine, co
     // PrimitiveType GeometryDesc::type_
     engine->RegisterObjectProperty(className, "PrimitiveType type", offsetof(T, type_));
 
-    // unsigned GeometryDesc::vbRef_
-    engine->RegisterObjectProperty(className, "uint vbRef", offsetof(T, vbRef_));
+    // i32 GeometryDesc::vbRef_
+    engine->RegisterObjectProperty(className, "int vbRef", offsetof(T, vbRef_));
 
-    // unsigned GeometryDesc::ibRef_
-    engine->RegisterObjectProperty(className, "uint ibRef", offsetof(T, ibRef_));
+    // i32 GeometryDesc::ibRef_
+    engine->RegisterObjectProperty(className, "int ibRef", offsetof(T, ibRef_));
 
-    // unsigned GeometryDesc::indexStart_
-    engine->RegisterObjectProperty(className, "uint indexStart", offsetof(T, indexStart_));
+    // i32 GeometryDesc::indexStart_
+    engine->RegisterObjectProperty(className, "int indexStart", offsetof(T, indexStart_));
 
-    // unsigned GeometryDesc::indexCount_
-    engine->RegisterObjectProperty(className, "uint indexCount", offsetof(T, indexCount_));
+    // i32 GeometryDesc::indexCount_
+    engine->RegisterObjectProperty(className, "int indexCount", offsetof(T, indexCount_));
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_GeometryDesc
         REGISTER_MEMBERS_MANUAL_PART_GeometryDesc();
@@ -1836,17 +1836,17 @@ template <class T> void RegisterMembers_HiresTimer(asIScriptEngine* engine, cons
 // struct IndexBufferDesc | File: ../Graphics/Model.h
 template <class T> void RegisterMembers_IndexBufferDesc(asIScriptEngine* engine, const char* className)
 {
-    // SharedArrayPtr<unsigned char> IndexBufferDesc::data_
-    // Error: type "SharedArrayPtr<unsigned char>" can not automatically bind
+    // SharedArrayPtr<byte> IndexBufferDesc::data_
+    // Error: type "SharedArrayPtr<byte>" can not automatically bind
 
-    // unsigned IndexBufferDesc::indexCount_
-    engine->RegisterObjectProperty(className, "uint indexCount", offsetof(T, indexCount_));
+    // i32 IndexBufferDesc::indexCount_
+    engine->RegisterObjectProperty(className, "int indexCount", offsetof(T, indexCount_));
 
-    // unsigned IndexBufferDesc::indexSize_
-    engine->RegisterObjectProperty(className, "uint indexSize", offsetof(T, indexSize_));
+    // i32 IndexBufferDesc::indexSize_
+    engine->RegisterObjectProperty(className, "int indexSize", offsetof(T, indexSize_));
 
-    // unsigned IndexBufferDesc::dataSize_
-    engine->RegisterObjectProperty(className, "uint dataSize", offsetof(T, dataSize_));
+    // i32 IndexBufferDesc::dataSize_
+    engine->RegisterObjectProperty(className, "int dataSize", offsetof(T, dataSize_));
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_IndexBufferDesc
         REGISTER_MEMBERS_MANUAL_PART_IndexBufferDesc();
@@ -3101,8 +3101,8 @@ template <class T> void RegisterMembers_Matrix4(asIScriptEngine* engine, const c
 // struct ModelMorph | File: ../Graphics/Model.h
 template <class T> void RegisterMembers_ModelMorph(asIScriptEngine* engine, const char* className)
 {
-    // HashMap<unsigned, VertexBufferMorph> ModelMorph::buffers_
-    // Error: type "HashMap<unsigned, VertexBufferMorph>" can not automatically bind
+    // HashMap<i32, VertexBufferMorph> ModelMorph::buffers_
+    // Error: type "HashMap<i32, VertexBufferMorph>" can not automatically bind
 
     // String ModelMorph::name_
     engine->RegisterObjectProperty(className, "String name", offsetof(T, name_));
@@ -6557,14 +6557,14 @@ template <class T> void RegisterMembers_VertexBufferDesc(asIScriptEngine* engine
 {
     // Vector<VertexElement> VertexBufferDesc::vertexElements_
     // Error: type "Vector<VertexElement>" can not automatically bind
-    // SharedArrayPtr<unsigned char> VertexBufferDesc::data_
-    // Error: type "SharedArrayPtr<unsigned char>" can not automatically bind
+    // SharedArrayPtr<byte> VertexBufferDesc::data_
+    // Error: type "SharedArrayPtr<byte>" can not automatically bind
 
-    // unsigned VertexBufferDesc::vertexCount_
-    engine->RegisterObjectProperty(className, "uint vertexCount", offsetof(T, vertexCount_));
+    // i32 VertexBufferDesc::vertexCount_
+    engine->RegisterObjectProperty(className, "int vertexCount", offsetof(T, vertexCount_));
 
-    // unsigned VertexBufferDesc::dataSize_
-    engine->RegisterObjectProperty(className, "uint dataSize", offsetof(T, dataSize_));
+    // i32 VertexBufferDesc::dataSize_
+    engine->RegisterObjectProperty(className, "int dataSize", offsetof(T, dataSize_));
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_VertexBufferDesc
         REGISTER_MEMBERS_MANUAL_PART_VertexBufferDesc();
@@ -6574,17 +6574,17 @@ template <class T> void RegisterMembers_VertexBufferDesc(asIScriptEngine* engine
 // struct VertexBufferMorph | File: ../Graphics/Model.h
 template <class T> void RegisterMembers_VertexBufferMorph(asIScriptEngine* engine, const char* className)
 {
-    // SharedArrayPtr<unsigned char> VertexBufferMorph::morphData_
-    // Error: type "SharedArrayPtr<unsigned char>" can not automatically bind
+    // SharedArrayPtr<byte> VertexBufferMorph::morphData_
+    // Error: type "SharedArrayPtr<byte>" can not automatically bind
 
     // VertexElements VertexBufferMorph::elementMask_
     engine->RegisterObjectProperty(className, "VertexElements elementMask", offsetof(T, elementMask_));
 
-    // unsigned VertexBufferMorph::vertexCount_
-    engine->RegisterObjectProperty(className, "uint vertexCount", offsetof(T, vertexCount_));
+    // i32 VertexBufferMorph::vertexCount_
+    engine->RegisterObjectProperty(className, "int vertexCount", offsetof(T, vertexCount_));
 
-    // unsigned VertexBufferMorph::dataSize_
-    engine->RegisterObjectProperty(className, "uint dataSize", offsetof(T, dataSize_));
+    // i32 VertexBufferMorph::dataSize_
+    engine->RegisterObjectProperty(className, "int dataSize", offsetof(T, dataSize_));
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_VertexBufferMorph
         REGISTER_MEMBERS_MANUAL_PART_VertexBufferMorph();
@@ -15362,12 +15362,12 @@ template <class T> void Model_void_SetMorphs_constspVectorlesModelMorphgreamp_te
     _ptr->SetMorphs(morphs);
 }
 
-// bool Model::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer>>& buffers, const Vector<unsigned>& morphRangeStarts, const Vector<unsigned>& morphRangeCounts)
-template <class T> bool Model_bool_SetVertexBuffers_constspVectorlesSharedPtrlesVertexBuffergregreamp_constspVectorlesunsignedgreamp_constspVectorlesunsignedgreamp_template(T* _ptr, CScriptArray* buffers_conv, CScriptArray* morphRangeStarts_conv, CScriptArray* morphRangeCounts_conv)
+// bool Model::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer>>& buffers, const Vector<i32>& morphRangeStarts, const Vector<i32>& morphRangeCounts)
+template <class T> bool Model_bool_SetVertexBuffers_constspVectorlesSharedPtrlesVertexBuffergregreamp_constspVectorlesi32greamp_constspVectorlesi32greamp_template(T* _ptr, CScriptArray* buffers_conv, CScriptArray* morphRangeStarts_conv, CScriptArray* morphRangeCounts_conv)
 {
     Vector<SharedPtr<VertexBuffer>> buffers = HandleArrayToVector<VertexBuffer>(buffers_conv);
-    Vector<unsigned> morphRangeStarts = ArrayToVector<unsigned>(morphRangeStarts_conv);
-    Vector<unsigned> morphRangeCounts = ArrayToVector<unsigned>(morphRangeCounts_conv);
+    Vector<i32> morphRangeStarts = ArrayToVector<i32>(morphRangeStarts_conv);
+    Vector<i32> morphRangeCounts = ArrayToVector<i32>(morphRangeCounts_conv);
     bool result = _ptr->SetVertexBuffers(buffers, morphRangeStarts, morphRangeCounts);
     return result;
 }
@@ -15379,16 +15379,16 @@ template <class T> void RegisterMembers_Model(asIScriptEngine* engine, const cha
 
     // const Vector<Vector<SharedPtr<Geometry>>>& Model::GetGeometries() const
     // Error: type "const Vector<Vector<SharedPtr<Geometry>>>&" can not automatically bind
-    // const Vector<Vector<unsigned>>& Model::GetGeometryBoneMappings() const
-    // Error: type "const Vector<Vector<unsigned>>&" can not automatically bind
-    // const ModelMorph* Model::GetMorph(unsigned index) const
+    // const Vector<Vector<i32>>& Model::GetGeometryBoneMappings() const
+    // Error: type "const Vector<Vector<i32>>&" can not automatically bind
+    // const ModelMorph* Model::GetMorph(i32 index) const
     // Error: type "const ModelMorph*" can not automatically bind
     // const ModelMorph* Model::GetMorph(const String& name) const
     // Error: type "const ModelMorph*" can not automatically bind
     // const ModelMorph* Model::GetMorph(StringHash nameHash) const
     // Error: type "const ModelMorph*" can not automatically bind
-    // void Model::SetGeometryBoneMappings(const Vector<Vector<unsigned>>& geometryBoneMappings)
-    // Error: type "const Vector<Vector<unsigned>>&" can not automatically bind
+    // void Model::SetGeometryBoneMappings(const Vector<Vector<i32>>& geometryBoneMappings)
+    // Error: type "const Vector<Vector<i32>>&" can not automatically bind
 
     // SharedPtr<Model> Model::Clone(const String& cloneName = String::EMPTY) const
     engine->RegisterObjectMethod(className, "Model@+ Clone(const String&in = String::EMPTY) const", AS_FUNCTION_OBJFIRST(Model_SharedPtrlesModelgre_Clone_constspStringamp_template<Model>), AS_CALL_CDECL_OBJFIRST);
@@ -15397,8 +15397,8 @@ template <class T> void RegisterMembers_Model(asIScriptEngine* engine, const cha
     engine->RegisterObjectMethod(className, "const BoundingBox& GetBoundingBox() const", AS_METHODPR(T, GetBoundingBox, () const, const BoundingBox&), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "const BoundingBox& get_boundingBox() const", AS_METHODPR(T, GetBoundingBox, () const, const BoundingBox&), AS_CALL_THISCALL);
 
-    // Geometry* Model::GetGeometry(unsigned index, unsigned lodLevel) const
-    engine->RegisterObjectMethod(className, "Geometry@+ GetGeometry(uint, uint) const", AS_METHODPR(T, GetGeometry, (unsigned, unsigned) const, Geometry*), AS_CALL_THISCALL);
+    // Geometry* Model::GetGeometry(i32 index, i32 lodLevel) const
+    engine->RegisterObjectMethod(className, "Geometry@+ GetGeometry(int, int) const", AS_METHODPR(T, GetGeometry, (i32, i32) const, Geometry*), AS_CALL_THISCALL);
 
     // const Vector3& Model::GetGeometryCenter(i32 index) const
     engine->RegisterObjectMethod(className, "const Vector3& GetGeometryCenter(int) const", AS_METHODPR(T, GetGeometryCenter, (i32) const, const Vector3&), AS_CALL_THISCALL);
@@ -15410,26 +15410,26 @@ template <class T> void RegisterMembers_Model(asIScriptEngine* engine, const cha
     // const Vector<SharedPtr<IndexBuffer>>& Model::GetIndexBuffers() const
     engine->RegisterObjectMethod(className, "Array<IndexBuffer@>@ GetIndexBuffers() const", AS_FUNCTION_OBJFIRST(Model_constspVectorlesSharedPtrlesIndexBuffergregreamp_GetIndexBuffers_void_template<Model>), AS_CALL_CDECL_OBJFIRST);
 
-    // unsigned Model::GetMorphRangeCount(unsigned bufferIndex) const
-    engine->RegisterObjectMethod(className, "uint GetMorphRangeCount(uint) const", AS_METHODPR(T, GetMorphRangeCount, (unsigned) const, unsigned), AS_CALL_THISCALL);
+    // i32 Model::GetMorphRangeCount(i32 bufferIndex) const
+    engine->RegisterObjectMethod(className, "int GetMorphRangeCount(int) const", AS_METHODPR(T, GetMorphRangeCount, (i32) const, i32), AS_CALL_THISCALL);
 
-    // unsigned Model::GetMorphRangeStart(unsigned bufferIndex) const
-    engine->RegisterObjectMethod(className, "uint GetMorphRangeStart(uint) const", AS_METHODPR(T, GetMorphRangeStart, (unsigned) const, unsigned), AS_CALL_THISCALL);
+    // i32 Model::GetMorphRangeStart(i32 bufferIndex) const
+    engine->RegisterObjectMethod(className, "int GetMorphRangeStart(int) const", AS_METHODPR(T, GetMorphRangeStart, (i32) const, i32), AS_CALL_THISCALL);
 
     // const Vector<ModelMorph>& Model::GetMorphs() const
     engine->RegisterObjectMethod(className, "Array<ModelMorph>@ GetMorphs() const", AS_FUNCTION_OBJFIRST(Model_constspVectorlesModelMorphgreamp_GetMorphs_void_template<Model>), AS_CALL_CDECL_OBJFIRST);
 
-    // unsigned Model::GetNumGeometries() const
-    engine->RegisterObjectMethod(className, "uint GetNumGeometries() const", AS_METHODPR(T, GetNumGeometries, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numGeometries() const", AS_METHODPR(T, GetNumGeometries, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Model::GetNumGeometries() const
+    engine->RegisterObjectMethod(className, "int GetNumGeometries() const", AS_METHODPR(T, GetNumGeometries, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numGeometries() const", AS_METHODPR(T, GetNumGeometries, () const, i32), AS_CALL_THISCALL);
 
-    // unsigned Model::GetNumGeometryLodLevels(unsigned index) const
-    engine->RegisterObjectMethod(className, "uint GetNumGeometryLodLevels(uint) const", AS_METHODPR(T, GetNumGeometryLodLevels, (unsigned) const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numGeometryLodLevels(uint) const", AS_METHODPR(T, GetNumGeometryLodLevels, (unsigned) const, unsigned), AS_CALL_THISCALL);
+    // i32 Model::GetNumGeometryLodLevels(i32 index) const
+    engine->RegisterObjectMethod(className, "int GetNumGeometryLodLevels(int) const", AS_METHODPR(T, GetNumGeometryLodLevels, (i32) const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numGeometryLodLevels(int) const", AS_METHODPR(T, GetNumGeometryLodLevels, (i32) const, i32), AS_CALL_THISCALL);
 
-    // unsigned Model::GetNumMorphs() const
-    engine->RegisterObjectMethod(className, "uint GetNumMorphs() const", AS_METHODPR(T, GetNumMorphs, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numMorphs() const", AS_METHODPR(T, GetNumMorphs, () const, unsigned), AS_CALL_THISCALL);
+    // i32 Model::GetNumMorphs() const
+    engine->RegisterObjectMethod(className, "int GetNumMorphs() const", AS_METHODPR(T, GetNumMorphs, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numMorphs() const", AS_METHODPR(T, GetNumMorphs, () const, i32), AS_CALL_THISCALL);
 
     // Skeleton& Model::GetSkeleton()
     engine->RegisterObjectMethod(className, "Skeleton& GetSkeleton()", AS_METHODPR(T, GetSkeleton, (), Skeleton&), AS_CALL_THISCALL);
@@ -15442,12 +15442,12 @@ template <class T> void RegisterMembers_Model(asIScriptEngine* engine, const cha
     engine->RegisterObjectMethod(className, "void SetBoundingBox(const BoundingBox&in)", AS_METHODPR(T, SetBoundingBox, (const BoundingBox&), void), AS_CALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_boundingBox(const BoundingBox&in)", AS_METHODPR(T, SetBoundingBox, (const BoundingBox&), void), AS_CALL_THISCALL);
 
-    // bool Model::SetGeometry(unsigned index, unsigned lodLevel, Geometry* geometry)
-    engine->RegisterObjectMethod(className, "bool SetGeometry(uint, uint, Geometry@+)", AS_METHODPR(T, SetGeometry, (unsigned, unsigned, Geometry*), bool), AS_CALL_THISCALL);
+    // bool Model::SetGeometry(i32 index, i32 lodLevel, Geometry* geometry)
+    engine->RegisterObjectMethod(className, "bool SetGeometry(int, int, Geometry@+)", AS_METHODPR(T, SetGeometry, (i32, i32, Geometry*), bool), AS_CALL_THISCALL);
 
-    // bool Model::SetGeometryCenter(unsigned index, const Vector3& center)
-    engine->RegisterObjectMethod(className, "bool SetGeometryCenter(uint, const Vector3&in)", AS_METHODPR(T, SetGeometryCenter, (unsigned, const Vector3&), bool), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "bool set_geometryCenters(uint, const Vector3&in)", AS_METHODPR(T, SetGeometryCenter, (unsigned, const Vector3&), bool), AS_CALL_THISCALL);
+    // bool Model::SetGeometryCenter(i32 index, const Vector3& center)
+    engine->RegisterObjectMethod(className, "bool SetGeometryCenter(int, const Vector3&in)", AS_METHODPR(T, SetGeometryCenter, (i32, const Vector3&), bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool set_geometryCenters(int, const Vector3&in)", AS_METHODPR(T, SetGeometryCenter, (i32, const Vector3&), bool), AS_CALL_THISCALL);
 
     // bool Model::SetIndexBuffers(const Vector<SharedPtr<IndexBuffer>>& buffers)
     engine->RegisterObjectMethod(className, "bool SetIndexBuffers(Array<IndexBuffer@>@+)", AS_FUNCTION_OBJFIRST(Model_bool_SetIndexBuffers_constspVectorlesSharedPtrlesIndexBuffergregreamp_template<Model>), AS_CALL_CDECL_OBJFIRST);
@@ -15455,19 +15455,19 @@ template <class T> void RegisterMembers_Model(asIScriptEngine* engine, const cha
     // void Model::SetMorphs(const Vector<ModelMorph>& morphs)
     engine->RegisterObjectMethod(className, "void SetMorphs(Array<ModelMorph>@+)", AS_FUNCTION_OBJFIRST(Model_void_SetMorphs_constspVectorlesModelMorphgreamp_template<Model>), AS_CALL_CDECL_OBJFIRST);
 
-    // void Model::SetNumGeometries(unsigned num)
-    engine->RegisterObjectMethod(className, "void SetNumGeometries(uint)", AS_METHODPR(T, SetNumGeometries, (unsigned), void), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_numGeometries(uint)", AS_METHODPR(T, SetNumGeometries, (unsigned), void), AS_CALL_THISCALL);
+    // void Model::SetNumGeometries(i32 num)
+    engine->RegisterObjectMethod(className, "void SetNumGeometries(int)", AS_METHODPR(T, SetNumGeometries, (i32), void), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_numGeometries(int)", AS_METHODPR(T, SetNumGeometries, (i32), void), AS_CALL_THISCALL);
 
-    // bool Model::SetNumGeometryLodLevels(unsigned index, unsigned num)
-    engine->RegisterObjectMethod(className, "bool SetNumGeometryLodLevels(uint, uint)", AS_METHODPR(T, SetNumGeometryLodLevels, (unsigned, unsigned), bool), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "bool set_numGeometryLodLevels(uint, uint)", AS_METHODPR(T, SetNumGeometryLodLevels, (unsigned, unsigned), bool), AS_CALL_THISCALL);
+    // bool Model::SetNumGeometryLodLevels(i32 index, i32 num)
+    engine->RegisterObjectMethod(className, "bool SetNumGeometryLodLevels(int, int)", AS_METHODPR(T, SetNumGeometryLodLevels, (i32, i32), bool), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool set_numGeometryLodLevels(int, int)", AS_METHODPR(T, SetNumGeometryLodLevels, (i32, i32), bool), AS_CALL_THISCALL);
 
     // void Model::SetSkeleton(const Skeleton& skeleton)
     engine->RegisterObjectMethod(className, "void SetSkeleton(const Skeleton&in)", AS_METHODPR(T, SetSkeleton, (const Skeleton&), void), AS_CALL_THISCALL);
 
-    // bool Model::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer>>& buffers, const Vector<unsigned>& morphRangeStarts, const Vector<unsigned>& morphRangeCounts)
-    engine->RegisterObjectMethod(className, "bool SetVertexBuffers(Array<VertexBuffer@>@+, Array<uint>@+, Array<uint>@+)", AS_FUNCTION_OBJFIRST(Model_bool_SetVertexBuffers_constspVectorlesSharedPtrlesVertexBuffergregreamp_constspVectorlesunsignedgreamp_constspVectorlesunsignedgreamp_template<Model>), AS_CALL_CDECL_OBJFIRST);
+    // bool Model::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer>>& buffers, const Vector<i32>& morphRangeStarts, const Vector<i32>& morphRangeCounts)
+    engine->RegisterObjectMethod(className, "bool SetVertexBuffers(Array<VertexBuffer@>@+, Array<int>@+, Array<int>@+)", AS_FUNCTION_OBJFIRST(Model_bool_SetVertexBuffers_constspVectorlesSharedPtrlesVertexBuffergregreamp_constspVectorlesi32greamp_constspVectorlesi32greamp_template<Model>), AS_CALL_CDECL_OBJFIRST);
 
     // static void Model::RegisterObject(Context* context)
     // Not registered because have @nobind mark
@@ -25028,8 +25028,8 @@ template <class T> void RegisterMembers_AnimatedModel(asIScriptEngine* engine, c
     // Error: type "VariantVector" can not automatically bind
     // VariantVector AnimatedModel::GetBonesEnabledAttr() const
     // Error: type "VariantVector" can not automatically bind
-    // const Vector<Vector<unsigned>>& AnimatedModel::GetGeometryBoneMappings() const
-    // Error: type "const Vector<Vector<unsigned>>&" can not automatically bind
+    // const Vector<Vector<i32>>& AnimatedModel::GetGeometryBoneMappings() const
+    // Error: type "const Vector<Vector<i32>>&" can not automatically bind
     // const Vector<Vector<Matrix3x4>>& AnimatedModel::GetGeometrySkinMatrices() const
     // Error: type "const Vector<Vector<Matrix3x4>>&" can not automatically bind
     // void AnimatedModel::SetAnimationStatesAttr(const VariantVector& value)
@@ -25057,8 +25057,8 @@ template <class T> void RegisterMembers_AnimatedModel(asIScriptEngine* engine, c
     // AnimationState* AnimatedModel::GetAnimationState(StringHash animationNameHash) const
     engine->RegisterObjectMethod(className, "AnimationState@+ GetAnimationState(StringHash) const", AS_METHODPR(T, GetAnimationState, (StringHash) const, AnimationState*), AS_CALL_THISCALL);
 
-    // AnimationState* AnimatedModel::GetAnimationState(unsigned index) const
-    engine->RegisterObjectMethod(className, "AnimationState@+ GetAnimationState(uint) const", AS_METHODPR(T, GetAnimationState, (unsigned) const, AnimationState*), AS_CALL_THISCALL);
+    // AnimationState* AnimatedModel::GetAnimationState(i32 index) const
+    engine->RegisterObjectMethod(className, "AnimationState@+ GetAnimationState(int) const", AS_METHODPR(T, GetAnimationState, (i32) const, AnimationState*), AS_CALL_THISCALL);
 
     // const Vector<SharedPtr<AnimationState>>& AnimatedModel::GetAnimationStates() const
     engine->RegisterObjectMethod(className, "Array<AnimationState@>@ GetAnimationStates() const", AS_FUNCTION_OBJFIRST(AnimatedModel_constspVectorlesSharedPtrlesAnimationStategregreamp_GetAnimationStates_void_template<AnimatedModel>), AS_CALL_CDECL_OBJFIRST);
@@ -25072,8 +25072,8 @@ template <class T> void RegisterMembers_AnimatedModel(asIScriptEngine* engine, c
     // const Vector<SharedPtr<VertexBuffer>>& AnimatedModel::GetMorphVertexBuffers() const
     engine->RegisterObjectMethod(className, "Array<VertexBuffer@>@ GetMorphVertexBuffers() const", AS_FUNCTION_OBJFIRST(AnimatedModel_constspVectorlesSharedPtrlesVertexBuffergregreamp_GetMorphVertexBuffers_void_template<AnimatedModel>), AS_CALL_CDECL_OBJFIRST);
 
-    // float AnimatedModel::GetMorphWeight(unsigned index) const
-    engine->RegisterObjectMethod(className, "float GetMorphWeight(uint) const", AS_METHODPR(T, GetMorphWeight, (unsigned) const, float), AS_CALL_THISCALL);
+    // float AnimatedModel::GetMorphWeight(i32 index) const
+    engine->RegisterObjectMethod(className, "float GetMorphWeight(int) const", AS_METHODPR(T, GetMorphWeight, (i32) const, float), AS_CALL_THISCALL);
 
     // float AnimatedModel::GetMorphWeight(const String& name) const
     engine->RegisterObjectMethod(className, "float GetMorphWeight(const String&in) const", AS_METHODPR(T, GetMorphWeight, (const String&) const, float), AS_CALL_THISCALL);
@@ -25082,13 +25082,13 @@ template <class T> void RegisterMembers_AnimatedModel(asIScriptEngine* engine, c
     // float AnimatedModel::GetMorphWeight(StringHash nameHash) const
     engine->RegisterObjectMethod(className, "float GetMorphWeight(StringHash) const", AS_METHODPR(T, GetMorphWeight, (StringHash) const, float), AS_CALL_THISCALL);
 
-    // unsigned AnimatedModel::GetNumAnimationStates() const
-    engine->RegisterObjectMethod(className, "uint GetNumAnimationStates() const", AS_METHODPR(T, GetNumAnimationStates, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numAnimationStates() const", AS_METHODPR(T, GetNumAnimationStates, () const, unsigned), AS_CALL_THISCALL);
+    // i32 AnimatedModel::GetNumAnimationStates() const
+    engine->RegisterObjectMethod(className, "int GetNumAnimationStates() const", AS_METHODPR(T, GetNumAnimationStates, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numAnimationStates() const", AS_METHODPR(T, GetNumAnimationStates, () const, i32), AS_CALL_THISCALL);
 
-    // unsigned AnimatedModel::GetNumMorphs() const
-    engine->RegisterObjectMethod(className, "uint GetNumMorphs() const", AS_METHODPR(T, GetNumMorphs, () const, unsigned), AS_CALL_THISCALL);
-    engine->RegisterObjectMethod(className, "uint get_numMorphs() const", AS_METHODPR(T, GetNumMorphs, () const, unsigned), AS_CALL_THISCALL);
+    // i32 AnimatedModel::GetNumMorphs() const
+    engine->RegisterObjectMethod(className, "int GetNumMorphs() const", AS_METHODPR(T, GetNumMorphs, () const, i32), AS_CALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_numMorphs() const", AS_METHODPR(T, GetNumMorphs, () const, i32), AS_CALL_THISCALL);
 
     // Skeleton& AnimatedModel::GetSkeleton()
     engine->RegisterObjectMethod(className, "Skeleton& GetSkeleton()", AS_METHODPR(T, GetSkeleton, (), Skeleton&), AS_CALL_THISCALL);
@@ -25116,8 +25116,8 @@ template <class T> void RegisterMembers_AnimatedModel(asIScriptEngine* engine, c
     // void AnimatedModel::RemoveAnimationState(AnimationState* state)
     engine->RegisterObjectMethod(className, "void RemoveAnimationState(AnimationState@+)", AS_METHODPR(T, RemoveAnimationState, (AnimationState*), void), AS_CALL_THISCALL);
 
-    // void AnimatedModel::RemoveAnimationState(unsigned index)
-    engine->RegisterObjectMethod(className, "void RemoveAnimationState(uint)", AS_METHODPR(T, RemoveAnimationState, (unsigned), void), AS_CALL_THISCALL);
+    // void AnimatedModel::RemoveAnimationState(i32 index)
+    engine->RegisterObjectMethod(className, "void RemoveAnimationState(int)", AS_METHODPR(T, RemoveAnimationState, (i32), void), AS_CALL_THISCALL);
 
     // void AnimatedModel::ResetMorphWeights()
     engine->RegisterObjectMethod(className, "void ResetMorphWeights()", AS_METHODPR(T, ResetMorphWeights, (), void), AS_CALL_THISCALL);
@@ -25132,8 +25132,8 @@ template <class T> void RegisterMembers_AnimatedModel(asIScriptEngine* engine, c
     // void AnimatedModel::SetMorphsAttr(const Vector<byte>& value)
     engine->RegisterObjectMethod(className, "void SetMorphsAttr(Array<byte>@+)", AS_FUNCTION_OBJFIRST(AnimatedModel_void_SetMorphsAttr_constspVectorlesbytegreamp_template<AnimatedModel>), AS_CALL_CDECL_OBJFIRST);
 
-    // void AnimatedModel::SetMorphWeight(unsigned index, float weight)
-    engine->RegisterObjectMethod(className, "void SetMorphWeight(uint, float)", AS_METHODPR(T, SetMorphWeight, (unsigned, float), void), AS_CALL_THISCALL);
+    // void AnimatedModel::SetMorphWeight(i32 index, float weight)
+    engine->RegisterObjectMethod(className, "void SetMorphWeight(int, float)", AS_METHODPR(T, SetMorphWeight, (i32, float), void), AS_CALL_THISCALL);
 
     // void AnimatedModel::SetMorphWeight(const String& name, float weight)
     engine->RegisterObjectMethod(className, "void SetMorphWeight(const String&in, float)", AS_METHODPR(T, SetMorphWeight, (const String&, float), void), AS_CALL_THISCALL);
