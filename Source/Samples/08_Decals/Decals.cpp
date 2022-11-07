@@ -3,6 +3,8 @@
 
 #include <Urho3D/Core/CoreEvents.h>
 #include <Urho3D/Engine/Engine.h>
+#include <Urho3D/Graphics/AnimatedModel.h>
+#include <Urho3D/Graphics/AnimationController.h>
 #include <Urho3D/Graphics/Camera.h>
 #include <Urho3D/Graphics/DebugRenderer.h>
 #include <Urho3D/Graphics/DecalSet.h>
@@ -120,6 +122,23 @@ void Decals::CreateScene()
         boxObject->SetCastShadows(true);
         if (size >= 3.0f)
             boxObject->SetOccluder(true);
+    }
+
+    // Create some animated models
+    const i32 NUM_MUTANTS = 20;
+    for (i32 i = 0; i < NUM_MUTANTS; ++i)
+    {
+        Node* mutantNode = scene_->CreateChild("Mutant");
+        mutantNode->SetPosition(Vector3(Random(90.0f) - 45.0f, 0.0f, Random(90.0f) - 45.0f));
+        mutantNode->SetRotation(Quaternion(0.0f, Random(360.0f), 0.0f));
+        mutantNode->SetScale(0.5f + Random(2.0f));
+        AnimatedModel* mutantObject = mutantNode->CreateComponent<AnimatedModel>();
+        mutantObject->SetModel(cache->GetResource<Model>("Models/Mutant/Mutant.mdl"));
+        mutantObject->SetMaterial(cache->GetResource<Material>("Models/Mutant/Materials/mutant_M.xml"));
+        mutantObject->SetCastShadows(true);
+        AnimationController* animCtrl = mutantNode->CreateComponent<AnimationController>();
+        animCtrl->PlayExclusive("Models/Mutant/Mutant_Idle0.ani", 0, true, 0.f);
+        animCtrl->SetTime("Models/Mutant/Mutant_Idle0.ani", Random(animCtrl->GetLength("Models/Mutant/Mutant_Idle0.ani")));
     }
 
     // Create the camera. Limit far clip distance to match the fog
