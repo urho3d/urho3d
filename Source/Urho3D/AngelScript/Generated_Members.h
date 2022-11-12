@@ -161,20 +161,20 @@ template <class T> void RegisterMembers_AnimationTriggerPoint(asIScriptEngine* e
 // class AreaAllocator | File: ../Math/AreaAllocator.h
 template <class T> void RegisterMembers_AreaAllocator(asIScriptEngine* engine, const char* className)
 {
-    // bool AreaAllocator::Allocate(int width, int height, int& x, int& y)
-    engine->RegisterObjectMethod(className, "bool Allocate(int, int, int&, int&)", AS_METHODPR(T, Allocate, (int, int, int&, int&), bool), AS_CALL_THISCALL);
+    // bool AreaAllocator::Allocate(i32 width, i32 height, i32& x, i32& y)
+    engine->RegisterObjectMethod(className, "bool Allocate(int, int, int&, int&)", AS_METHODPR(T, Allocate, (i32, i32, i32&, i32&), bool), AS_CALL_THISCALL);
 
     // bool AreaAllocator::GetFastMode() const
     engine->RegisterObjectMethod(className, "bool GetFastMode() const", AS_METHODPR(T, GetFastMode, () const, bool), AS_CALL_THISCALL);
 
-    // int AreaAllocator::GetHeight() const
-    engine->RegisterObjectMethod(className, "int GetHeight() const", AS_METHODPR(T, GetHeight, () const, int), AS_CALL_THISCALL);
+    // i32 AreaAllocator::GetHeight() const
+    engine->RegisterObjectMethod(className, "int GetHeight() const", AS_METHODPR(T, GetHeight, () const, i32), AS_CALL_THISCALL);
 
-    // int AreaAllocator::GetWidth() const
-    engine->RegisterObjectMethod(className, "int GetWidth() const", AS_METHODPR(T, GetWidth, () const, int), AS_CALL_THISCALL);
+    // i32 AreaAllocator::GetWidth() const
+    engine->RegisterObjectMethod(className, "int GetWidth() const", AS_METHODPR(T, GetWidth, () const, i32), AS_CALL_THISCALL);
 
-    // void AreaAllocator::Reset(int width, int height, int maxWidth = 0, int maxHeight = 0, bool fastMode = true)
-    engine->RegisterObjectMethod(className, "void Reset(int, int, int = 0, int = 0, bool = true)", AS_METHODPR(T, Reset, (int, int, int, int, bool), void), AS_CALL_THISCALL);
+    // void AreaAllocator::Reset(i32 width, i32 height, i32 maxWidth = 0, i32 maxHeight = 0, bool fastMode = true)
+    engine->RegisterObjectMethod(className, "void Reset(int, int, int = 0, int = 0, bool = true)", AS_METHODPR(T, Reset, (i32, i32, i32, i32, bool), void), AS_CALL_THISCALL);
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_AreaAllocator
         REGISTER_MEMBERS_MANUAL_PART_AreaAllocator();
