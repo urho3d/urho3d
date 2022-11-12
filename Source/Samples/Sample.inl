@@ -337,7 +337,7 @@ void Sample::HandleSceneUpdate(StringHash /*eventType*/, VariantMap& eventData)
     if (touchEnabled_ && cameraNode_)
     {
         Input* input = GetSubsystem<Input>();
-        for (unsigned i = 0; i < input->GetNumTouches(); ++i)
+        for (i32 i = 0; i < input->GetNumTouches(); ++i)
         {
             TouchState* state = input->GetTouch(i);
             if (!state->touchedElement_)    // Touch on empty space
