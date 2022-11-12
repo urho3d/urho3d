@@ -90,14 +90,14 @@ static void Register_AnimationTriggerPoint(asIScriptEngine* engine)
     RegisterImplicitlyDeclaredAssignOperatorIfPossible<AnimationTriggerPoint>(engine, "AnimationTriggerPoint");
 }
 
-// AreaAllocator::AreaAllocator(int width, int height, bool fastMode = true)
-static void AreaAllocator__AreaAllocator_int_int_bool(AreaAllocator* _ptr, int width, int height, bool fastMode)
+// AreaAllocator::AreaAllocator(i32 width, i32 height, bool fastMode = true)
+static void AreaAllocator__AreaAllocator_i32_i32_bool(AreaAllocator* _ptr, i32 width, i32 height, bool fastMode)
 {
     new(_ptr) AreaAllocator(width, height, fastMode);
 }
 
-// AreaAllocator::AreaAllocator(int width, int height, int maxWidth, int maxHeight, bool fastMode = true)
-static void AreaAllocator__AreaAllocator_int_int_int_int_bool(AreaAllocator* _ptr, int width, int height, int maxWidth, int maxHeight, bool fastMode)
+// AreaAllocator::AreaAllocator(i32 width, i32 height, i32 maxWidth, i32 maxHeight, bool fastMode = true)
+static void AreaAllocator__AreaAllocator_i32_i32_i32_i32_bool(AreaAllocator* _ptr, i32 width, i32 height, i32 maxWidth, i32 maxHeight, bool fastMode)
 {
     new(_ptr) AreaAllocator(width, height, maxWidth, maxHeight, fastMode);
 }
@@ -105,10 +105,10 @@ static void AreaAllocator__AreaAllocator_int_int_int_int_bool(AreaAllocator* _pt
 // class AreaAllocator | File: ../Math/AreaAllocator.h
 static void Register_AreaAllocator(asIScriptEngine* engine)
 {
-    // AreaAllocator::AreaAllocator(int width, int height, bool fastMode = true)
-    engine->RegisterObjectBehaviour("AreaAllocator", asBEHAVE_CONSTRUCT, "void f(int, int, bool = true)", AS_FUNCTION_OBJFIRST(AreaAllocator__AreaAllocator_int_int_bool), AS_CALL_CDECL_OBJFIRST);
-    // AreaAllocator::AreaAllocator(int width, int height, int maxWidth, int maxHeight, bool fastMode = true)
-    engine->RegisterObjectBehaviour("AreaAllocator", asBEHAVE_CONSTRUCT, "void f(int, int, int, int, bool = true)", AS_FUNCTION_OBJFIRST(AreaAllocator__AreaAllocator_int_int_int_int_bool), AS_CALL_CDECL_OBJFIRST);
+    // AreaAllocator::AreaAllocator(i32 width, i32 height, bool fastMode = true)
+    engine->RegisterObjectBehaviour("AreaAllocator", asBEHAVE_CONSTRUCT, "void f(int, int, bool = true)", AS_FUNCTION_OBJFIRST(AreaAllocator__AreaAllocator_i32_i32_bool), AS_CALL_CDECL_OBJFIRST);
+    // AreaAllocator::AreaAllocator(i32 width, i32 height, i32 maxWidth, i32 maxHeight, bool fastMode = true)
+    engine->RegisterObjectBehaviour("AreaAllocator", asBEHAVE_CONSTRUCT, "void f(int, int, int, int, bool = true)", AS_FUNCTION_OBJFIRST(AreaAllocator__AreaAllocator_i32_i32_i32_i32_bool), AS_CALL_CDECL_OBJFIRST);
 
     // AreaAllocator::~AreaAllocator() | Implicitly-declared
     engine->RegisterObjectBehaviour("AreaAllocator", asBEHAVE_DESTRUCT, "void f()", AS_DESTRUCTOR(AreaAllocator), AS_CALL_CDECL_OBJFIRST);
