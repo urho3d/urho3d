@@ -42,3 +42,5 @@ std::string FirstCharToLower(const std::string& str);
 std::string JoinNonEmpty(const std::vector<std::string>& strings, const std::string& separator);
 
 std::string ToIdentifier(const std::string& str);
+
+bool CreateDir(const std::string& pathName);
