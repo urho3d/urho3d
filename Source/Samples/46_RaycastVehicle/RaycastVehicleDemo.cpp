@@ -187,7 +187,7 @@ void RaycastVehicleDemo::HandleUpdate(StringHash eventType,
             // Add yaw & pitch from the mouse motion or touch input. Used only for the camera, does not affect motion
             if (touchEnabled_)
             {
-                for (unsigned i = 0; i < input->GetNumTouches(); ++i)
+                for (i32 i = 0; i < input->GetNumTouches(); ++i)
                 {
                     TouchState* state = input->GetTouch(i);
                     if (!state->touchedElement_) // Touch on empty space
