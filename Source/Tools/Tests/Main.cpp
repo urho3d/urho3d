@@ -16,7 +16,8 @@ int main(int argc, char* argv[])
 {
     Run();
 
-    std::cout << "All tests success" << std::endl;
+    std::setlocale(LC_ALL, "en_US.UTF-8");
+    std::cout << "Все тесты пройдены успешно" << std::endl;
 
     return 0;
 }
