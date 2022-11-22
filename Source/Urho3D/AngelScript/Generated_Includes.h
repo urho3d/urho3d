@@ -70,6 +70,8 @@
 #include "../Graphics/RibbonTrail.h"
 #include "../Graphics/Skeleton.h"
 #include "../Graphics/Skybox.h"
+#include "../Graphics/SpriteBatch.h"
+#include "../Graphics/SpriteBatchBase.h"
 #include "../Graphics/StaticModel.h"
 #include "../Graphics/StaticModelGroup.h"
 #include "../Graphics/Tangent.h"

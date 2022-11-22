@@ -97,6 +97,7 @@ void AppState_Benchmark02::OnEnter()
 
 void AppState_Benchmark02::OnLeave()
 {
+    UnsubscribeFromAllEvents();
     DestroyViewport();
     scene_ = nullptr;
 }

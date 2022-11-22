@@ -6,6 +6,7 @@
 #include "AppState_Benchmark01.h"
 #include "AppState_Benchmark02.h"
 #include "AppState_Benchmark03.h"
+#include "AppState_Benchmark04.h"
 #include "AppState_MainScreen.h"
 #include "AppState_ResultScreen.h"
 
@@ -21,6 +22,7 @@ AppStateManager::AppStateManager(Context* context)
     appStates_.Insert({APPSTATEID_BENCHMARK01, MakeShared<AppState_Benchmark01>(context_)});
     appStates_.Insert({APPSTATEID_BENCHMARK02, MakeShared<AppState_Benchmark02>(context_)});
     appStates_.Insert({APPSTATEID_BENCHMARK03, MakeShared<AppState_Benchmark03>(context_)});
+    appStates_.Insert({APPSTATEID_BENCHMARK04, MakeShared<AppState_Benchmark04>(context_)});
 }
 
 void AppStateManager::Apply()

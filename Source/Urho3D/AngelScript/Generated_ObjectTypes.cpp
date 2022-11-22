@@ -696,6 +696,9 @@ void ASRegisterGeneratedObjectTypes(asIScriptEngine* engine)
     // class ShaderPrecache | File: ../GraphicsAPI/ShaderPrecache.h
     engine->RegisterObjectType("ShaderPrecache", 0, asOBJ_REF);
 
+    // class SpriteBatchBase | File: ../Graphics/SpriteBatchBase.h
+    // Not registered because have @nobind mark
+
     // class Time | File: ../Core/Timer.h
     engine->RegisterObjectType("Time", 0, asOBJ_REF);
 
@@ -784,6 +787,9 @@ void ASRegisterGeneratedObjectTypes(asIScriptEngine* engine)
 
     // class Shader | File: ../GraphicsAPI/Shader.h
     engine->RegisterObjectType("Shader", 0, asOBJ_REF);
+
+    // class SpriteBatch | File: ../Graphics/SpriteBatch.h
+    // Not registered because have @nobind mark
 
     // class Technique | File: ../Graphics/Technique.h
     engine->RegisterObjectType("Technique", 0, asOBJ_REF);

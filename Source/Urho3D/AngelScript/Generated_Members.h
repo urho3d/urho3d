@@ -12134,6 +12134,63 @@ template <class T> void RegisterMembers_ShaderPrecache(asIScriptEngine* engine, 
     #endif
 }
 
+// class SpriteBatchBase | File: ../Graphics/SpriteBatchBase.h
+template <class T> void RegisterMembers_SpriteBatchBase(asIScriptEngine* engine, const char* className)
+{
+    RegisterMembers_Object<T>(engine, className);
+
+    // void SpriteBatchBase::Flush()
+    engine->RegisterObjectMethod(className, "void Flush()", AS_METHODPR(T, Flush, (), void), AS_CALL_THISCALL);
+
+    // Vector2 SpriteBatchBase::GetVirtualPos(const Vector2& realPos)
+    engine->RegisterObjectMethod(className, "Vector2 GetVirtualPos(const Vector2&in)", AS_METHODPR(T, GetVirtualPos, (const Vector2&), Vector2), AS_CALL_THISCALL);
+
+    // void SpriteBatchBase::SetShapeColor(u32 color)
+    engine->RegisterObjectMethod(className, "void SetShapeColor(uint)", AS_METHODPR(T, SetShapeColor, (u32), void), AS_CALL_THISCALL);
+
+    // void SpriteBatchBase::SetShapeColor(const Color& color)
+    engine->RegisterObjectMethod(className, "void SetShapeColor(const Color&in)", AS_METHODPR(T, SetShapeColor, (const Color&), void), AS_CALL_THISCALL);
+
+    // bool SpriteBatchBase::VirtualScreenUsed() const
+    engine->RegisterObjectMethod(className, "bool VirtualScreenUsed() const", AS_METHODPR(T, VirtualScreenUsed, () const, bool), AS_CALL_THISCALL);
+
+    // TVertex SpriteBatchBase::v0_
+    // Error: type "TVertex" can not automatically bind
+    // TVertex SpriteBatchBase::v1_
+    // Error: type "TVertex" can not automatically bind
+    // TVertex SpriteBatchBase::v2_
+    // Error: type "TVertex" can not automatically bind
+    // Texture2D* SpriteBatchBase::texture_
+    // Not registered because pointer
+    // ShaderVariation* SpriteBatchBase::vs_
+    // Not registered because pointer
+    // ShaderVariation* SpriteBatchBase::ps_
+    // Not registered because pointer
+    // QVertex SpriteBatchBase::v0_
+    // Error: type "QVertex" can not automatically bind
+    // QVertex SpriteBatchBase::v1_
+    // Error: type "QVertex" can not automatically bind
+    // QVertex SpriteBatchBase::v2_
+    // Error: type "QVertex" can not automatically bind
+    // QVertex SpriteBatchBase::v3_
+    // Error: type "QVertex" can not automatically bind
+    // Camera* SpriteBatchBase::camera_
+    // Not registered because pointer
+
+    // BlendMode SpriteBatchBase::blendMode_
+    engine->RegisterObjectProperty(className, "BlendMode blendMode", offsetof(T, blendMode_));
+
+    // CompareMode SpriteBatchBase::compareMode_
+    engine->RegisterObjectProperty(className, "CompareMode compareMode", offsetof(T, compareMode_));
+
+    // IntVector2 SpriteBatchBase::virtualScreenSize_
+    engine->RegisterObjectProperty(className, "IntVector2 virtualScreenSize", offsetof(T, virtualScreenSize_));
+
+    #ifdef REGISTER_MEMBERS_MANUAL_PART_SpriteBatchBase
+        REGISTER_MEMBERS_MANUAL_PART_SpriteBatchBase();
+    #endif
+}
+
 // class Time | File: ../Core/Timer.h
 template <class T> void RegisterMembers_Time(asIScriptEngine* engine, const char* className)
 {
@@ -14462,6 +14519,91 @@ template <class T> void RegisterMembers_Shader(asIScriptEngine* engine, const ch
 
     #ifdef REGISTER_MEMBERS_MANUAL_PART_Shader
         REGISTER_MEMBERS_MANUAL_PART_Shader();
+    #endif
+}
+
+// class SpriteBatch | File: ../Graphics/SpriteBatch.h
+template <class T> void RegisterMembers_SpriteBatch(asIScriptEngine* engine, const char* className)
+{
+    RegisterMembers_SpriteBatchBase<T>(engine, className);
+
+    // void SpriteBatch::DrawSprite(Texture2D* texture, const Rect& destination, Rect* source = nullptr, u32 color = 0xFFFFFFFF, float rotation = 0.0f, const Vector2& origin = Vector2::ZERO, const Vector2& scale = Vector2::ONE, FlipModes flipModes = FlipModes::None)
+    // Error: type "Rect*" can not automatically bind
+    // void SpriteBatch::DrawSprite(Texture2D* texture, const Vector2& position, Rect* source = nullptr, u32 color = 0xFFFFFFFF, float rotation = 0.0f, const Vector2& origin = Vector2::ZERO, const Vector2& scale = Vector2::ONE, FlipModes flipModes = FlipModes::None)
+    // Error: type "Rect*" can not automatically bind
+
+    // void SpriteBatch::DrawAABBSolid(const Vector2& min, const Vector2& max)
+    engine->RegisterObjectMethod(className, "void DrawAABBSolid(const Vector2&in, const Vector2&in)", AS_METHODPR(T, DrawAABBSolid, (const Vector2&, const Vector2&), void), AS_CALL_THISCALL);
+
+    // void SpriteBatch::DrawAABoxBorder(float centerX, float centerY, float halfWidth, float halfHeight, float borderWidth)
+    engine->RegisterObjectMethod(className, "void DrawAABoxBorder(float, float, float, float, float)", AS_METHODPR(T, DrawAABoxBorder, (float, float, float, float, float), void), AS_CALL_THISCALL);
+
+    // void SpriteBatch::DrawAABoxSolid(const Vector2& centerPos, const Vector2& halfSize)
+    engine->RegisterObjectMethod(className, "void DrawAABoxSolid(const Vector2&in, const Vector2&in)", AS_METHODPR(T, DrawAABoxSolid, (const Vector2&, const Vector2&), void), AS_CALL_THISCALL);
+
+    // void SpriteBatch::DrawAABoxSolid(float centerX, float centerY, float halfWidth, float halfHeight)
+    engine->RegisterObjectMethod(className, "void DrawAABoxSolid(float, float, float, float)", AS_METHODPR(T, DrawAABoxSolid, (float, float, float, float), void), AS_CALL_THISCALL);
+
+    // void SpriteBatch::DrawArrow(const Vector2& start, const Vector2& end, float width)
+    engine->RegisterObjectMethod(className, "void DrawArrow(const Vector2&in, const Vector2&in, float)", AS_METHODPR(T, DrawArrow, (const Vector2&, const Vector2&, float), void), AS_CALL_THISCALL);
+
+    // void SpriteBatch::DrawCircle(const Vector2& centerPos, float radius)
+    engine->RegisterObjectMethod(className, "void DrawCircle(const Vector2&in, float)", AS_METHODPR(T, DrawCircle, (const Vector2&, float), void), AS_CALL_THISCALL);
+
+    // void SpriteBatch::DrawCircle(float centerX, float centerY, float radius)
+    engine->RegisterObjectMethod(className, "void DrawCircle(float, float, float)", AS_METHODPR(T, DrawCircle, (float, float, float), void), AS_CALL_THISCALL);
+
+    // void SpriteBatch::DrawLine(const Vector2& start, const Vector2& end, float width)
+    engine->RegisterObjectMethod(className, "void DrawLine(const Vector2&in, const Vector2&in, float)", AS_METHODPR(T, DrawLine, (const Vector2&, const Vector2&, float), void), AS_CALL_THISCALL);
+
+    // void SpriteBatch::DrawLine(float startX, float startY, float endX, float endY, float width)
+    engine->RegisterObjectMethod(className, "void DrawLine(float, float, float, float, float)", AS_METHODPR(T, DrawLine, (float, float, float, float, float), void), AS_CALL_THISCALL);
+
+    // void SpriteBatch::DrawString(const String& text, Font* font, float fontSize, const Vector2& position, u32 color = 0xFFFFFFFF, float rotation = 0.0f, const Vector2& origin = Vector2::ZERO, const Vector2& scale = Vector2::ONE, FlipModes flipModes = FlipModes::None)
+    engine->RegisterObjectMethod(className, "void DrawString(const String&in, Font@+, float, const Vector2&in, uint = 0xFFFFFFFF, float = 0.0f, const Vector2&in = Vector2::ZERO, const Vector2&in = Vector2::ONE, FlipModes = FlipModes::None)", AS_METHODPR(T, DrawString, (const String&, Font*, float, const Vector2&, u32, float, const Vector2&, const Vector2&, FlipModes), void), AS_CALL_THISCALL);
+
+    // void SpriteBatch::DrawTriangle(const Vector2& v0, const Vector2& v1, const Vector2& v2)
+    engine->RegisterObjectMethod(className, "void DrawTriangle(const Vector2&in, const Vector2&in, const Vector2&in)", AS_METHODPR(T, DrawTriangle, (const Vector2&, const Vector2&, const Vector2&), void), AS_CALL_THISCALL);
+
+    // Texture2D* SpriteBatch::texture_
+    // Not registered because pointer
+    // ShaderVariation* SpriteBatch::vs_
+    // Not registered because pointer
+    // ShaderVariation* SpriteBatch::ps_
+    // Not registered because pointer
+
+    // Rect SpriteBatch::destination_
+    engine->RegisterObjectProperty(className, "Rect destination", offsetof(T, destination_));
+
+    // Rect SpriteBatch::sourceUV_
+    engine->RegisterObjectProperty(className, "Rect sourceUV", offsetof(T, sourceUV_));
+
+    // FlipModes SpriteBatch::flipModes_
+    engine->RegisterObjectProperty(className, "FlipModes flipModes", offsetof(T, flipModes_));
+
+    // Vector2 SpriteBatch::scale_
+    engine->RegisterObjectProperty(className, "Vector2 scale", offsetof(T, scale_));
+
+    // float SpriteBatch::rotation_
+    engine->RegisterObjectProperty(className, "float rotation", offsetof(T, rotation_));
+
+    // Vector2 SpriteBatch::origin_
+    engine->RegisterObjectProperty(className, "Vector2 origin", offsetof(T, origin_));
+
+    // u32 SpriteBatch::color0_
+    engine->RegisterObjectProperty(className, "uint color0", offsetof(T, color0_));
+
+    // u32 SpriteBatch::color1_
+    engine->RegisterObjectProperty(className, "uint color1", offsetof(T, color1_));
+
+    // u32 SpriteBatch::color2_
+    engine->RegisterObjectProperty(className, "uint color2", offsetof(T, color2_));
+
+    // u32 SpriteBatch::color3_
+    engine->RegisterObjectProperty(className, "uint color3", offsetof(T, color3_));
+
+    #ifdef REGISTER_MEMBERS_MANUAL_PART_SpriteBatch
+        REGISTER_MEMBERS_MANUAL_PART_SpriteBatch();
     #endif
 }
 

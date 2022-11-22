@@ -17,7 +17,7 @@ public:
     URHO3D_OBJECT(AppState_Base, Object);
 
 protected:
-    U3D::String name_;
+    U3D::String name_ = "Название бенчмарка";
 
     U3D::SharedPtr<U3D::Scene> scene_;
     void LoadSceneXml(const U3D::String& path);

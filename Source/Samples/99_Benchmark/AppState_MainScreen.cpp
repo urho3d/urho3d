@@ -20,6 +20,7 @@ static const String MAIN_SCREEN_WINDOW_STR = "Main Screen Window";
 static const String BENCHMARK_01_STR = "Benchmark 01";
 static const String BENCHMARK_02_STR = "Benchmark 02";
 static const String BENCHMARK_03_STR = "Benchmark 03";
+static const String BENCHMARK_04_STR = "Benchmark 04";
 
 void AppState_MainScreen::HandleButtonPressed(StringHash eventType, VariantMap& eventData)
 {
@@ -32,6 +33,8 @@ void AppState_MainScreen::HandleButtonPressed(StringHash eventType, VariantMap& 
         appStateManager->SetRequiredAppStateId(APPSTATEID_BENCHMARK02);
     else if (pressedButton->GetName() == BENCHMARK_03_STR)
         appStateManager->SetRequiredAppStateId(APPSTATEID_BENCHMARK03);
+    else if (pressedButton->GetName() == BENCHMARK_04_STR)
+        appStateManager->SetRequiredAppStateId(APPSTATEID_BENCHMARK04);
 }
 
 void AppState_MainScreen::CreateButton(const String& name, const String& text, Window& parent)
@@ -67,6 +70,7 @@ void AppState_MainScreen::CreateGui()
     CreateButton(BENCHMARK_01_STR, appStateManager->GetName(APPSTATEID_BENCHMARK01), *window);
     CreateButton(BENCHMARK_02_STR, appStateManager->GetName(APPSTATEID_BENCHMARK02), *window);
     CreateButton(BENCHMARK_03_STR, appStateManager->GetName(APPSTATEID_BENCHMARK03), *window);
+    CreateButton(BENCHMARK_04_STR, appStateManager->GetName(APPSTATEID_BENCHMARK04), *window);
 }
 
 void AppState_MainScreen::DestroyGui()
