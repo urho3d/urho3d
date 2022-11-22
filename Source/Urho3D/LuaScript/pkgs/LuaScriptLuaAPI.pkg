@@ -1,6 +1,0 @@
-$pfile "LuaScript/Coroutine.pkg"
-$pfile "LuaScript/LuaScript.pkg"
-$pfile "LuaScript/LuaScriptInstance.pkg"
-
-$using namespace Urho3D;
-$#pragma warning(disable:4800)

@@ -1,6 +1,0 @@
-$pfile "Engine/Console.pkg"
-$pfile "Engine/DebugHud.pkg"
-$pfile "Engine/Engine.pkg"
-
-$using namespace Urho3D;
-$#pragma warning(disable:4800)
