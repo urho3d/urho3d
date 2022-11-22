@@ -24,6 +24,7 @@ void AppState_Benchmark01::OnEnter()
 
 void AppState_Benchmark01::OnLeave()
 {
+    UnsubscribeFromAllEvents();
     DestroyViewport();
     scene_ = nullptr;
 }

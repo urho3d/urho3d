@@ -7,7 +7,7 @@
 
 #include <Urho3D/Container/HashMap.h>
 
-using AppStateId = unsigned;
+using AppStateId = u32;
 
 inline constexpr AppStateId APPSTATEID_NULL = 0;
 inline constexpr AppStateId APPSTATEID_MAINSCREEN = 1;
@@ -15,6 +15,7 @@ inline constexpr AppStateId APPSTATEID_RESULTSCREEN = 2;
 inline constexpr AppStateId APPSTATEID_BENCHMARK01 = 3;
 inline constexpr AppStateId APPSTATEID_BENCHMARK02 = 4;
 inline constexpr AppStateId APPSTATEID_BENCHMARK03 = 5;
+inline constexpr AppStateId APPSTATEID_BENCHMARK04 = 6;
 
 class AppStateManager : public U3D::Object
 {

@@ -74,6 +74,12 @@ static const u8 DrawableTypes_Zone = static_cast<u8>(DrawableTypes::Zone);
 static const u8 DrawableTypes_Geometry2D = static_cast<u8>(DrawableTypes::Geometry2D);
 static const u8 DrawableTypes_Any = static_cast<u8>(DrawableTypes::Any);
 
+// enum class FlipModes : u32 | File: ../Graphics/SpriteBatch.h
+static const u32 FlipModes_None = static_cast<u32>(FlipModes::None);
+static const u32 FlipModes_Horizontally = static_cast<u32>(FlipModes::Horizontally);
+static const u32 FlipModes_Vertically = static_cast<u32>(FlipModes::Vertically);
+static const u32 FlipModes_Both = static_cast<u32>(FlipModes::Both);
+
 // enum HatPosition : unsigned | File: ../Input/InputConstants.h
 static const unsigned HatPosition_HAT_CENTER = HAT_CENTER;
 static const unsigned HatPosition_HAT_UP = HAT_UP;
@@ -938,6 +944,15 @@ void ASRegisterGeneratedEnums(asIScriptEngine* engine)
     engine->RegisterEnumValue("FillMode", "FILL_SOLID", FILL_SOLID);
     engine->RegisterEnumValue("FillMode", "FILL_WIREFRAME", FILL_WIREFRAME);
     engine->RegisterEnumValue("FillMode", "FILL_POINT", FILL_POINT);
+
+    // enum class FlipModes : u32 | File: ../Graphics/SpriteBatch.h
+    engine->RegisterTypedef("FlipModes", "uint");
+    engine->SetDefaultNamespace("FlipModes");
+    engine->RegisterGlobalProperty("const uint None", (void*)&FlipModes_None);
+    engine->RegisterGlobalProperty("const uint Horizontally", (void*)&FlipModes_Horizontally);
+    engine->RegisterGlobalProperty("const uint Vertically", (void*)&FlipModes_Vertically);
+    engine->RegisterGlobalProperty("const uint Both", (void*)&FlipModes_Both);
+    engine->SetDefaultNamespace("");
 
     // enum FocusMode | File: ../UI/UIElement.h
     engine->RegisterEnum("FocusMode");
