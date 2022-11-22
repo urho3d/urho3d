@@ -575,7 +575,7 @@ String String::ToLower() const
         }
         else
         {
-            ret.Append(cp);
+            ret.AppendUTF8(cp);
         }
     }
 
@@ -605,7 +605,7 @@ String String::ToUpper() const
         }
         else
         {
-            ret.Append(cp);
+            ret.AppendUTF8(cp);
         }
     }
 
