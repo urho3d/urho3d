@@ -1,3 +1,0 @@
-$#include "Network/Protocol.h"
-
-static const int MSG_USER;
