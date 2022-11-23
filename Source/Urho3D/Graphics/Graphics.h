@@ -683,6 +683,10 @@ public:
 
     /// Bind texture unit 0 for update. Called by Texture. Used only on OpenGL.
     void SetTextureForUpdate_OGL(Texture* texture);
+    /// Get Renderer name. Used on OpenGL
+    const String& GetRendererName() const { return rendererName_; }
+    /// Get Version string. Used on OpenGL
+    const String& GetVersionString() const { return versionString_; }
 #endif // def URHO3D_OPENGL
 
     /// Maximize the window.
@@ -1350,7 +1354,12 @@ private:
     String orientations_;
     /// Graphics API name.
     String apiName_;
-
+#ifdef URHO3D_OPENGL
+    /// Renderer name (usually GPU name)
+    String rendererName_;
+    /// Version of GL drivers
+    String versionString_;
+#endif
     /// Pixel perfect UV offset.
     inline static Vector2 pixelUVOffset;
     /// OpenGL3 support flag.

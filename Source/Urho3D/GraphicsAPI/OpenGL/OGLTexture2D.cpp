@@ -151,11 +151,6 @@ bool Texture2D::SetData_OGL(unsigned level, int x, int y, int width, int height,
     return true;
 }
 
-bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, const VectorBuffer& data)
-{
-    return SetData(level, x, y, width, height, data.GetBuffer().Buffer());
-}
-
 bool Texture2D::SetData_OGL(Image* image, bool useAlpha)
 {
     if (!image)
